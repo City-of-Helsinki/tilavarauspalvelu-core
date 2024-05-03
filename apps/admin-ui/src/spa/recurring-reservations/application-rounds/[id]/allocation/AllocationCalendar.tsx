@@ -81,40 +81,52 @@ const CalendarSlot = styled.div<{
   ${({ $eventCount, $isAccepted, $isDeclined, $isRelated }) => {
     if ($isAccepted) {
       return css`
-        background-color: var(--color-success);
-        color: var(--color-white);
+        background-color: var(
+          --tilavaraus-allocation-calendar-colour-bg-allocated
+        );
+        color: var(--tilavaraus-allocation-calendar-colour-text-allocated);
       `;
     }
     if ($isRelated) {
       return css`
-        background-color: var(--color-black-70);
-        color: var(--color-white);
+        background-color: var(
+          --tilavaraus-allocation-calendar-colour-bg-allocated-elsewhere
+        );
+        color: var(
+          --tilavaraus-allocation-calendar-colour-text-allocated-elsewhere
+        );
       `;
     }
     if ($isDeclined) {
       return css`
-        background-color: var(--color-black-30);
-        color: var(--color-black);
+        background-color: var(
+          --tilavaraus-allocation-calendar-colour-bg-disabled
+        );
+        color: var(--tilavaraus-allocation-calendar-colour-text-disabled);
       `;
     }
     if ($eventCount && $eventCount > 10) {
       return css`
-        background-color: var(--color-gold-dark);
+        background-color: var(--tilavaraus-allocation-calendar-colour-bg-full);
+        color: var(--tilavaraus-allocation-calendar-colour-text-full);
       `;
     }
-    if ($eventCount && $eventCount > 3) {
+    if ($eventCount && $eventCount > 4) {
       return css`
-        background-color: var(--color-summer-medium-light);
+        background-color: var(--tilavaraus-allocation-calendar-colour-bg-many);
+        color: var(--tilavaraus-allocation-calendar-colour-text-many);
       `;
     }
     if ($eventCount && $eventCount > 1) {
       return css`
-        background-color: var(--color-summer-light);
+        background-color: var(--tilavaraus-allocation-calendar-colour-bg-few);
+        color: var(--tilavaraus-allocation-calendar-colour-text-few);
       `;
     }
     if ($eventCount && $eventCount > 0) {
       return css`
-        background-color: var(--color-tram-light);
+        background-color: var(--tilavaraus-allocation-calendar-colour-bg-one);
+        color: var(--tilavaraus-allocation-calendar-colour-text-one);
       `;
     }
   }}

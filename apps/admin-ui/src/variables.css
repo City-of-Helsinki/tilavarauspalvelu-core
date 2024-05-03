@@ -64,6 +64,23 @@
   --tilavaraus-event-booking-wish-border: var(--color-gold-dark);
   --tilavaraus-event-booking-internal-border: var(--color-bus-dark);
   --tilavaraus-event-booking-closed-border: var(--color-black);
+
+  /* Allocation calendar colours */
+  --tilavaraus-allocation-calendar-colour-bg-one: #DFF7EB;
+  --tilavaraus-allocation-calendar-colour-text-one: #1A1A1A;
+  --tilavaraus-allocation-calendar-colour-bg-few: #FFDD82;
+  --tilavaraus-allocation-calendar-colour-text-few: #1A1A1A;
+  --tilavaraus-allocation-calendar-colour-bg-many: #DE9621;
+  --tilavaraus-allocation-calendar-colour-text-many: #1A1A1A;
+  --tilavaraus-allocation-calendar-colour-bg-full: #C85029;
+  --tilavaraus-allocation-calendar-colour-text-full: #FFFFFF;
+  --tilavaraus-allocation-calendar-colour-bg-none: #E5E5E5;
+  --tilavaraus-allocation-calendar-colour-bg-disabled: #B2B2B2;
+  --tilavaraus-allocation-calendar-colour-text-disabled: #1A1A1A;
+  --tilavaraus-allocation-calendar-colour-bg-allocated: #006631;
+  --tilavaraus-allocation-calendar-colour-text-allocated: #FFFFFF;
+  --tilavaraus-allocation-calendar-colour-bg-allocated-elsewhere: #1A1A1A;
+  --tilavaraus-allocation-calendar-colour-text-allocated-elsewhere: #FFFFFF;
 }
 
 /* override HDS variables */
