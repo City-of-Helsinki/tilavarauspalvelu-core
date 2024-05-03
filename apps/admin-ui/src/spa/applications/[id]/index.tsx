@@ -2,13 +2,14 @@ import React, { useRef, type ReactNode } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
-import { Card, Table, IconCheck, IconEnvelope } from "hds-react";
+import { Card, Table, IconCheck, IconEnvelope, Button } from "hds-react";
 import { isEqual, trim } from "lodash";
-import { useQuery } from "@apollo/client";
-import { TFunction } from "i18next";
+import { type ApolloQueryResult, useMutation, useQuery } from "@apollo/client";
+import { type TFunction } from "i18next";
 import { H2, H4, H5, Strong } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { base64encode, filterNonNullable } from "common/src/helpers";
+import { getValidationErrors } from "common/src/apolloUtils";
 import {
   type Query,
   ApplicationStatusChoice,
@@ -18,6 +19,9 @@ import {
   type SuitableTimeRangeNode,
   Priority,
   type QueryApplicationArgs,
+  type MutationUpdateReservationUnitOptionArgs,
+  type ReservationUnitOptionNode,
+  type Maybe,
 } from "common/types/gql-types";
 import { formatDuration } from "common/src/common/util";
 import { convertWeekday, type Day } from "common/src/conversion";
@@ -39,6 +43,9 @@ import { ValueBox } from "../ValueBox";
 import { TimeSelector } from "../TimeSelector";
 import { APPLICATION_ADMIN_QUERY } from "../queries";
 import { getApplicantName, getApplicationStatusColor } from "@/helpers";
+// TODO move
+import { UPDATE_RESERVATION_UNIT_OPTION } from "@/spa/recurring-reservations/application-rounds/[id]/allocation/queries";
+import Error404 from "@/common/Error404";
 
 function printSuitableTimes(
   timeRanges: SuitableTimeRangeNode[],
@@ -226,24 +233,24 @@ const KV = ({
   </div>
 );
 
-const formatApplicationDuration = (
+function formatApplicationDuration(
   durationSeconds: number | undefined,
   t: TFunction,
   type?: "min" | "max"
-): string => {
+): string {
   if (!durationSeconds) {
     return "";
   }
   const durMinutes = durationSeconds / 60;
   const translationKey = `common.${type}Amount`;
   return `${type ? t(translationKey) : ""} ${formatDuration(durMinutes, t)}`;
-};
+}
 
-const appEventDuration = (
+function appEventDuration(
   min: number | undefined,
   max: number | undefined,
   t: TFunction
-): string => {
+): string {
   let duration = "";
   if (isEqual(min, max)) {
     duration += formatApplicationDuration(min, t);
@@ -252,7 +259,7 @@ const appEventDuration = (
     duration += `, ${formatApplicationDuration(max, t, "max")}`;
   }
   return trim(duration, ", ");
-};
+}
 
 function SchedulesContent({
   as,
@@ -285,12 +292,110 @@ function SchedulesContent({
   );
 }
 
+function RejectOptionButton({
+  option,
+  refetch,
+}: {
+  option: ReservationUnitOptionNode;
+  refetch: () => Promise<ApolloQueryResult<Query>>;
+}) {
+  const [mutation, { loading }] = useMutation<
+    Query,
+    MutationUpdateReservationUnitOptionArgs
+  >(UPDATE_RESERVATION_UNIT_OPTION);
+
+  const { notifyError } = useNotification();
+  const { t } = useTranslation();
+
+  const updateOption = async (
+    pk: Maybe<number> | undefined,
+    rejected: boolean
+  ) => {
+    if (pk == null) {
+      return;
+    }
+    try {
+      await mutation({
+        variables: {
+          input: {
+            pk,
+            rejected,
+          },
+        },
+      });
+      refetch();
+    } catch (err) {
+      const mutationErrors = getValidationErrors(err);
+      if (mutationErrors.length > 0) {
+        // TODO handle other codes also
+        const isInvalidState = mutationErrors.find(
+          (e) => e.code === "invalid" && e.field === "rejected"
+        );
+        if (isInvalidState) {
+          notifyError(t("errors.cantRejectAlreadyAllocated"));
+        } else {
+          // TODO this should show them with cleaner formatting (multiple errors)
+          // TODO these should be translated
+          const message = mutationErrors.map((e) => e.message).join(", ");
+          notifyError(t("errors.formValidationError", { message }));
+        }
+      } else {
+        notifyError(t("errors.errorRejectingOption"));
+      }
+    }
+  };
+
+  const handleReject = async () => {
+    updateOption(option.pk, true);
+  };
+
+  const handleRevert = async () => {
+    updateOption(option.pk, false);
+  };
+
+  const isRejected = option.rejected;
+
+  // codegen types are allow nulls so have to do this for debugging
+  if (option.allocatedTimeSlots == null) {
+    // eslint-disable-next-line no-console
+    console.warn("no allocatedTimeSlots", option);
+  }
+
+  const isDisabled = option.allocatedTimeSlots?.length > 0;
+  return (
+    <Button
+      // supplementary style requires an Icon which we don't want
+      variant="secondary"
+      style={{ border: "none" }}
+      size="small"
+      onClick={isRejected ? handleRevert : handleReject}
+      isLoading={loading}
+      disabled={isDisabled}
+      // translate
+      data-testid={`reject-${option.pk}`}
+    >
+      {isRejected ? "Revert" : "Reject"}
+    </Button>
+  );
+}
+
+interface DataType extends ReservationUnitOptionNode {
+  index: number;
+}
+type ColumnType = {
+  headerName: string;
+  key: string;
+  transform: (data: DataType) => JSX.Element | string;
+};
+
 function ApplicationSectionDetails({
   section,
   application,
+  refetch,
 }: {
   section: ApplicationSectionNode;
   application: ApplicationNode;
+  refetch: () => Promise<ApolloQueryResult<Query>>;
 }): JSX.Element {
   const { t } = useTranslation();
 
@@ -308,14 +413,48 @@ function ApplicationSectionDetails({
         )}`
       : "No dates";
 
-  const rows = filterNonNullable(section?.reservationUnitOptions).map(
-    (ru, index) => ({
-      index: index + 1,
-      pk: ru?.pk,
-      unit: ru?.reservationUnit?.unit?.nameFi,
-      name: ru?.reservationUnit?.nameFi,
-    })
-  );
+  const cols: Array<ColumnType> = [
+    {
+      headerName: "a",
+      key: "index",
+      transform: (d: DataType) => {
+        return d.index.toString();
+      },
+    },
+    {
+      headerName: "b",
+      key: "unit",
+      transform: (reservationUnitOption: ReservationUnitOptionNode) => {
+        return reservationUnitOption?.reservationUnit?.unit?.nameFi ?? "-";
+      },
+    },
+    {
+      headerName: "c",
+      key: "name",
+      transform: (reservationUnitOption: ReservationUnitOptionNode) => {
+        return reservationUnitOption?.reservationUnit?.nameFi ?? "-";
+      },
+    },
+    {
+      headerName: "d",
+      key: "reject",
+      transform: (reservationUnitOption: ReservationUnitOptionNode) => {
+        return (
+          <RejectOptionButton
+            option={reservationUnitOption}
+            refetch={refetch}
+          />
+        );
+      },
+    },
+  ];
+
+  const rows: DataType[] = filterNonNullable(
+    section?.reservationUnitOptions
+  ).map((ru, index) => ({
+    ...ru,
+    index: index + 1,
+  }));
 
   return (
     <ScrollIntoView key={section.pk} hash={hash}>
@@ -352,15 +491,7 @@ function ApplicationSectionDetails({
           <ValueBox label={t("ApplicationEvent.dates")} value={dates} />
         </EventProps>
         <H4>{t("ApplicationEvent.requestedReservationUnits")}</H4>
-        <StyledTable
-          rows={rows}
-          cols={[
-            { headerName: "a", key: "index" },
-            { headerName: "b", key: "unit" },
-            { headerName: "c", key: "name" },
-          ]}
-          indexKey="pk"
-        />
+        <StyledTable rows={rows} cols={cols} indexKey="pk" />
         <H4>{t("ApplicationEvent.requestedTimes")}</H4>
         <EventSchedules>
           <TimeSelector applicationSection={section} />
@@ -433,7 +564,7 @@ function ApplicationDetails({
   );
 
   if (application == null || applicationRound == null) {
-    return null;
+    return <Error404 />;
   }
 
   const route = [
@@ -446,6 +577,7 @@ function ApplicationDetails({
       alias: t("breadcrumb.application-rounds"),
     },
     {
+      // TODO url builder
       slug: `/recurring-reservations/application-rounds/${applicationRound.pk}`,
       alias: applicationRound.nameFi ?? "-",
     },
@@ -520,6 +652,7 @@ function ApplicationDetails({
             section={section}
             application={application}
             key={section.pk}
+            refetch={refetch}
           />
         ))}
         <H4>{t("Application.customerBasicInfo")}</H4>

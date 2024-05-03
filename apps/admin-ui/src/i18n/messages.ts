@@ -200,6 +200,8 @@ const translations: ITranslations = {
     mutationFailed: ["Muutos epäonnistui"],
     noPermission: ["Sinulla ei ole käyttöoikeutta."],
     mutationNoDataReturned: ["Odottamaton vastaus."],
+    cantRejectAlreadyAllocated: ["Jo jaettua vuoroa ei voi hylätä."],
+    formValidationError: ["Lomakkeessa on virheitä. {{ message }}"],
     descriptive: {
       "Reservation overlaps with reservation before due to buffer time.": [
         "Varaus menee päällekkäin edellisen varauksen kanssa tauon takia.",

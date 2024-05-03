@@ -22,6 +22,7 @@ import {
   convertApplication,
   ApplicationFormSchemaRefined,
 } from "@/components/application/Form";
+import { getValidationErrors } from "common/src/apolloUtils";
 import useReservationUnitsList from "@/hooks/useReservationUnitList";
 import { useApplicationUpdate } from "@/hooks/useApplicationUpdate";
 import { ErrorToast } from "@/components/common/ErrorToast";
@@ -65,24 +66,16 @@ function getErrorMessages(error: unknown): string {
       }
       return networkError.message;
     }
+    // Possible mutations errors (there are others too)
+    // 1. message: "Voi hakea vain 1-7 varausta viikossa."
+    //  - code: "invalid"
+    // 2. message: "Reservations begin date cannot be before the application round's reservation period begin date."
+    //  - code: ""
+    const mutationErrors = getValidationErrors(error);
+    if (mutationErrors.length > 0) {
+      return "Form validation error";
+    }
     if (graphQLErrors.length > 0) {
-      // TODO separate validation errors: this is invalid form values (user error)
-      const MUTATION_ERROR_CODE = "MUTATION_VALIDATION_ERROR";
-      const isMutationError =
-        graphQLErrors.find((e) => {
-          if (e.extensions == null) {
-            return false;
-          }
-          return e.extensions.code === MUTATION_ERROR_CODE;
-        }) != null;
-      // Possible mutations errors (there are others too)
-      // 1. message: "Voi hakea vain 1-7 varausta viikossa."
-      //  - code: "invalid"
-      // 2. message: "Reservations begin date cannot be before the application round's reservation period begin date."
-      //  - code: ""
-      if (isMutationError) {
-        return "Form validation error";
-      }
       return "Unknown GQL error";
     }
   }

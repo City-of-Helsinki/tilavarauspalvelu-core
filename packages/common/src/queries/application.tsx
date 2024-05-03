@@ -114,58 +114,9 @@ const APPLICATION_SECTION_UI_FRAGMENT = gql`
   }
 `;
 
-// TODO fragment this futher
-// ex. admin side doesn't need nameEn / nameSv
-// a lot of the deep hierarchy is only needed in the client side
-// other uncommon fields ?
-export const APPLICATION_FRAGMENT = gql`
-  ${APPLICATION_SECTION_UI_FRAGMENT}
-  ${IMAGE_FRAGMENT}
-  fragment ApplicationCommon on ApplicationNode {
-    pk
-    status
+const APPLICANT_FRAGMENT = gql`
+  fragment ApplicantFragment on ApplicationNode {
     applicantType
-    lastModifiedDate
-    user {
-      name
-      email
-      pk
-    }
-    applicationRound {
-      pk
-      nameFi
-      nameSv
-      nameEn
-      serviceSector {
-        pk
-        nameFi
-      }
-      reservationUnits {
-        pk
-        nameFi
-        nameSv
-        nameEn
-        minPersons
-        maxPersons
-        images {
-          ...ImageFragment
-        }
-        unit {
-          pk
-          nameFi
-          nameSv
-          nameEn
-        }
-      }
-      applicationPeriodBegin
-      applicationPeriodEnd
-      reservationPeriodBegin
-      reservationPeriodEnd
-      status
-      applicationsCount
-      reservationUnitCount
-      statusTimestamp
-    }
     contactPerson {
       pk
       firstName
@@ -197,6 +148,90 @@ export const APPLICATION_FRAGMENT = gql`
       postCode
       streetAddress
       city
+    }
+    user {
+      name
+      email
+      pk
+    }
+  }
+`;
+
+const APPLICATION_ROUND_FRAGMENT = gql`
+  ${IMAGE_FRAGMENT}
+  fragment ApplicationRoundFragment on ApplicationRoundNode {
+    pk
+    nameFi
+    nameSv
+    nameEn
+    serviceSector {
+      pk
+      nameFi
+    }
+    reservationUnits {
+      pk
+      nameFi
+      nameSv
+      nameEn
+      minPersons
+      maxPersons
+      images {
+        ...ImageFragment
+      }
+      unit {
+        pk
+        nameFi
+        nameSv
+        nameEn
+      }
+    }
+    applicationPeriodBegin
+    applicationPeriodEnd
+    reservationPeriodBegin
+    reservationPeriodEnd
+    status
+    applicationsCount
+    reservationUnitCount
+    statusTimestamp
+  }
+`;
+
+// TODO what does admin side require from UIFragment?
+export const APPLICATION_ADMIN_FRAGMENT = gql`
+  ${APPLICANT_FRAGMENT}
+  ${APPLICATION_SECTION_UI_FRAGMENT}
+  fragment ApplicationCommon on ApplicationNode {
+    pk
+    status
+    lastModifiedDate
+    ...ApplicantFragment
+    applicationRound {
+      pk
+      nameFi
+    }
+    applicationSections {
+      ...ApplicationSectionUIFragment
+      reservationUnitOptions {
+        rejected
+        allocatedTimeSlots {
+          pk
+        }
+      }
+    }
+  }
+`;
+
+export const APPLICATION_FRAGMENT = gql`
+  ${APPLICATION_SECTION_UI_FRAGMENT}
+  ${APPLICANT_FRAGMENT}
+  ${APPLICATION_ROUND_FRAGMENT}
+  fragment ApplicationCommon on ApplicationNode {
+    pk
+    status
+    lastModifiedDate
+    ...ApplicantFragment
+    applicationRound {
+      ...ApplicationRoundFragment
     }
     applicationSections {
       ...ApplicationSectionUIFragment
