@@ -5,6 +5,7 @@ from typing import NamedTuple
 
 import freezegun
 import pytest
+from graphene_django_extensions.testing.client import GQLResponse
 from graphene_django_extensions.testing.utils import parametrize_helper
 
 from applications.choices import ApplicationRoundStatusChoice
@@ -43,6 +44,24 @@ def _datetime(year=2024, month=1, day=1, hour=0, minute=0) -> datetime:
 
 def _date(year=2024, month=1, day=1) -> date:
     return date(year, month, day)
+
+
+def is_closed(response: GQLResponse, *, node: int = 0) -> bool:
+    """Get isClosed value from response"""
+    return response.node(node)["isClosed"]
+
+
+def frt(response: GQLResponse, *, node: int = 0) -> str | None:
+    """Get first reservable time as ISO 8601 string from response"""
+    first_reservable_time = response.node(node)["firstReservableDatetime"]
+    if first_reservable_time is None:
+        return None
+    return datetime.fromisoformat(first_reservable_time).astimezone(DEFAULT_TIMEZONE).isoformat(timespec="seconds")
+
+
+def dt(*, year: int = 2024, month: int = 1, day: int = 1, hour: int = 0, minute: int = 0) -> str:
+    """Get time in local timezone as ISO 8601 string"""
+    return datetime(year, month, day, hour, minute, tzinfo=DEFAULT_TIMEZONE).isoformat(timespec="seconds")
 
 
 NOW = _datetime()
@@ -2089,3 +2108,81 @@ def test__query_reservation_unit__first_reservable_time__blocked_type_reservatio
 
 
 ########################################################################################################################
+
+
+@freezegun.freeze_time(datetime(2024, 1, 1, hour=8, tzinfo=DEFAULT_TIMEZONE))
+def test_reservation_unit__first_reservable_time__duration_exactly_min_but_buffers_overlap(graphql, reservation_unit):
+    """
+    This is a regression test for a bug that was found during manual testing.
+
+    Tests a case where the algorithm for finding the first reservable time exited too
+    early when shortening reservable time spans based on reservations.
+
+    This happened when the reservable time duration was exactly the minimum duration after
+    processing a reservation, which caused the shortening to stop, but subsequent checks would
+    still determine the reservable time span to be _just_ long enough to fit the minimum duration.
+
+    In reality, the shortening should have continued until the reservable time was
+    _actually_ shorter than the minimum duration, since there could be a reservation
+    that could shorten it still, like in this example case.
+
+    ┌────────────────────────────────────────────────────┐
+    │ █ = Reservation                                    │
+    │ ▄ = Reservation Buffer                             │
+    │ ░ = Not reservable                                 │
+    │ ▁ = Reservable                                     │
+    │ ═ = First reservable time                          │
+    │ ─ = Reservation Unit Buffer                        │
+    ├────────────────────────────────────────────────────┤
+    │   ...       17  18  19  20  21  22             ... │
+    │ 1 ░░░░░░░░░░████▁▁████▁▄████▄▄▁▁░░░░░░░░░░░░░░░░░░ │
+    │                              ─═─                   │
+    └────────────────────────────────────────────────────┘
+    """
+    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_15_MINUTES.value
+    reservation_unit.buffer_time_before = timedelta(minutes=15)
+    reservation_unit.buffer_time_after = timedelta(minutes=15)
+    reservation_unit.save()
+
+    # 2024-01-01 17:00 - 22:00 (5h)
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(hour=17),
+        end_datetime=_datetime(hour=22),
+    )
+
+    # 2024-01-01 17:00-18:00 (1h) | Buffer: none
+    ReservationFactory.create(
+        begin=_datetime(hour=17),
+        end=_datetime(hour=18),
+        buffer_time_before=timedelta(),
+        buffer_time_after=timedelta(),
+        reservation_unit=[reservation_unit],
+        state=ReservationStateChoice.CREATED,
+    )
+
+    # 2024-01-01 18:30-19:30 (1h) | Buffer: none
+    ReservationFactory.create(
+        begin=_datetime(hour=18, minute=30),
+        end=_datetime(hour=19, minute=30),
+        buffer_time_before=timedelta(),
+        buffer_time_after=timedelta(),
+        reservation_unit=[reservation_unit],
+        state=ReservationStateChoice.CREATED,
+    )
+
+    # 2024-01-01 20:00-21:00 (1h) | Buffer: 19:45-21:30
+    ReservationFactory.create(
+        begin=_datetime(hour=20),
+        end=_datetime(hour=21),
+        buffer_time_before=timedelta(minutes=15),
+        buffer_time_after=timedelta(minutes=30),
+        reservation_unit=[reservation_unit],
+        state=ReservationStateChoice.CREATED,
+    )
+
+    response = graphql(reservation_units_reservable_query())
+
+    assert response.has_errors is False, response
+    assert is_closed(response) is False
+    assert frt(response) == dt(hour=21, minute=30)
