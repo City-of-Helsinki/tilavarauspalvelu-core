@@ -9,7 +9,7 @@ import {
 import {
   getApplicationSectiontatusColor,
   getApplicationStatusColor,
-} from "@/component//applications/util";
+} from "@/helpers";
 
 const dotCss = css`
   display: inline-block;

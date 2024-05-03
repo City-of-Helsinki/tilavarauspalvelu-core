@@ -34,7 +34,7 @@ const ResourceEditorView = dynamic(
 );
 
 const ApplicationDetails = dynamic(
-  () => import("./component/applications/ApplicationDetails")
+  () => import("./spa/applications/[id]/index")
 );
 
 const ReservationUnits = dynamic(

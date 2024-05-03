@@ -6,10 +6,9 @@ import { IconLinkExternal } from "hds-react";
 import type { AllocatedTimeSlotNode } from "common/types/gql-types";
 import { convertWeekday } from "common/src/conversion";
 import { PUBLIC_URL } from "@/common/const";
-import { truncate } from "@/helpers";
+import { getApplicantName, truncate } from "@/helpers";
 import { applicationDetailsUrl } from "@/common/urls";
 import { CustomTable, ExternalTableLink } from "@/component/Table";
-import { getApplicantName } from "@/component/applications/util";
 import { TimeSlotStatusCell } from "./StatusCell";
 
 const unitsTruncateLen = 23;

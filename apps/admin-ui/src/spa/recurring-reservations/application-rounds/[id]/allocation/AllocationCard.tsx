@@ -15,7 +15,6 @@ import { filterNonNullable } from "common/src/helpers";
 import { NotificationInline } from "common/src/components/NotificationInline";
 import { convertWeekday } from "common/src/conversion";
 import { SemiBold } from "common";
-import { getApplicantName } from "@/component/applications/util";
 import { formatDuration } from "@/common/util";
 import { Accordion } from "@/component/Accordion";
 import {
@@ -30,6 +29,7 @@ import {
   useRefreshApplications,
   useRemoveAllocation,
 } from "./hooks";
+import { getApplicantName } from "@/helpers";
 
 type Props = {
   applicationSection: ApplicationSectionNode;

@@ -2,8 +2,6 @@ import { padStart, sortBy } from "lodash";
 import {
   type SuitableTimeRangeNode,
   type ApplicationSectionNode,
-  ApplicantTypeChoice,
-  type ApplicationNode,
   Priority,
   type AllocatedTimeSlotNode,
   Weekday,
@@ -153,14 +151,6 @@ export const getTimeSeries = (
 
   return timeSlots;
 };
-
-export function getApplicantName(
-  application: ApplicationNode | undefined
-): string {
-  return application?.applicantType === ApplicantTypeChoice.Individual
-    ? `${application?.contactPerson?.firstName} ${application?.contactPerson?.lastName}`.trim()
-    : application?.user?.name || "";
-}
 
 // TODO is this parse? or format? it looks like a format
 function formatTimeRange(range: SuitableTimeRangeNode): string {

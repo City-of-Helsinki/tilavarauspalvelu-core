@@ -11,7 +11,6 @@ import type {
   ReservationUnitNode,
 } from "common/types/gql-types";
 import { SemiBold, fontMedium } from "common";
-import { getApplicantName } from "@/component/applications/util";
 import { ageGroup } from "@/component/reservations/requested/util";
 import { filterNonNullable } from "common/src/helpers";
 import { convertWeekday } from "common/src/conversion";
@@ -25,6 +24,7 @@ import { type ApolloQueryResult, useMutation } from "@apollo/client";
 import { getApplicationSectionUrl } from "@/common/urls";
 import { useNotification } from "@/context/NotificationContext";
 import { UPDATE_RESERVATION_UNIT_OPTION } from "./queries";
+import { getApplicantName } from "@/helpers";
 
 export type AllocationApplicationSectionCardType =
   | "unallocated"

@@ -35,10 +35,10 @@ import StickyHeader from "@/component/StickyHeader";
 import StatusBlock from "@/component/StatusBlock";
 import { BirthDate } from "@/component/BirthDate";
 import { Container } from "@/styles/layout";
-import { ValueBox } from "./ValueBox";
-import { getApplicantName, getApplicationStatusColor } from "./util";
-import { TimeSelector } from "./TimeSelector";
-import { APPLICATION_ADMIN_QUERY } from "./queries";
+import { ValueBox } from "../ValueBox";
+import { TimeSelector } from "../TimeSelector";
+import { APPLICATION_ADMIN_QUERY } from "../queries";
+import { getApplicantName, getApplicationStatusColor } from "@/helpers";
 
 function printSuitableTimes(
   timeRanges: SuitableTimeRangeNode[],

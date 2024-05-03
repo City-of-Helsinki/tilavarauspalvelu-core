@@ -10,8 +10,7 @@ import type {
 import { filterNonNullable } from "common/src/helpers";
 import { PUBLIC_URL } from "@/common/const";
 import { applicationDetailsUrl } from "@/common/urls";
-import { truncate } from "@/helpers";
-import { getApplicantName } from "@/component/applications/util";
+import { getApplicantName, truncate } from "@/helpers";
 import { CustomTable, ExternalTableLink } from "@/component/Table";
 import { ApplicationStatusCell } from "./StatusCell";
 import {

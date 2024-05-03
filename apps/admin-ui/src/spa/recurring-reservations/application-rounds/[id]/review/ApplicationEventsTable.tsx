@@ -5,9 +5,8 @@ import { memoize, orderBy, uniqBy } from "lodash";
 import { IconLinkExternal } from "hds-react";
 import type { ApplicationSectionNode } from "common/types/gql-types";
 import { MAX_APPLICATION_ROUND_NAME_LENGTH, PUBLIC_URL } from "@/common/const";
-import { truncate } from "@/helpers";
+import { getApplicantName, truncate } from "@/helpers";
 import { applicationDetailsUrl } from "@/common/urls";
-import { getApplicantName } from "@/component/applications/util";
 import { CustomTable, ExternalTableLink } from "@/component/Table";
 import { ApplicationSectionStatusCell } from "./StatusCell";
 import {
