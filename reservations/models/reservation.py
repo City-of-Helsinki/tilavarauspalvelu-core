@@ -69,7 +69,7 @@ class Reservation(SerializableMixin, models.Model):
     buffer_time_before: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
     buffer_time_after: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
     handled_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
-    confirmed_at: datetime.datetime | None = models.DateTimeField(null=True)
+    confirmed_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
     created_at: datetime.datetime | None = models.DateTimeField(null=True, default=now)
 
     # Pricing details
