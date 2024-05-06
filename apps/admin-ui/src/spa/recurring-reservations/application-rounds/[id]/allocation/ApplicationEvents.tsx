@@ -202,9 +202,6 @@ function ApplicationSectionColumn({
 >): JSX.Element {
   const { t } = useTranslation();
 
-  // TODO how is Rejected supposed to be shown? or is it ever shown in this list (or any other list)?
-  // there are no possible actions on this page for it, but do we filter out completely or disable all actions?
-
   // allocations are not specific to the reservation unit
   const isAllocated = (as: ApplicationSectionNode) =>
     as.allocations != null && as.allocations > 0;
@@ -213,6 +210,11 @@ function ApplicationSectionColumn({
     as.reservationUnitOptions
       .filter((ruo) => ruo.reservationUnit.pk === reservationUnit.pk)
       ?.map((ruo) => ruo.locked)
+      .some(Boolean);
+  const isRejected = (as: ApplicationSectionNode) =>
+    as.reservationUnitOptions
+      .filter((ruo) => ruo.reservationUnit.pk === reservationUnit.pk)
+      ?.map((ruo) => ruo.rejected)
       .some(Boolean);
 
   const sections = filterNonNullable(applicationSections);
@@ -224,14 +226,15 @@ function ApplicationSectionColumn({
     (as) =>
       as.status !== ApplicationSectionStatusChoice.Handled &&
       isAllocated(as) &&
-      !isLocked(as)
+      !isLocked(as) &&
+      !isRejected(as)
   );
 
-  const locked = sections.filter((as) => isLocked(as));
+  const locked = sections.filter((as) => isLocked(as) || isRejected(as));
 
   // take certain states and omit colliding application events
   const unallocatedApplicationEvents = (applicationSections ?? []).filter(
-    (as) => !isAllocated(as)
+    (as) => !isAllocated(as) && !isLocked(as) && !isRejected(as)
   );
 
   return (

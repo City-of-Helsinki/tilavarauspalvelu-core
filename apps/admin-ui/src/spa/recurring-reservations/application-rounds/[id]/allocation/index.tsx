@@ -381,31 +381,54 @@ function ApplicationRoundAllocation({
   // for calendar / right hand side we do more extensive filtering later.
   const applicationSections = filterNonNullable(
     appEventsData?.applicationSections?.edges.map((e) => e?.node)
-  ).filter((section) => {
-    const opts = section?.reservationUnitOptions?.filter((r) => {
-      if (r?.reservationUnit == null) {
-        return false;
-      }
-      if (
-        r.allocatedTimeSlots.filter(
-          (ats) => ats.reservationUnitOption?.pk === r.pk
-        ).length > 0
-      ) {
+  )
+    .filter((section) => {
+      const opts = section?.reservationUnitOptions?.filter((r) => {
+        if (r?.reservationUnit == null) {
+          return false;
+        }
+        if (
+          r.allocatedTimeSlots.filter(
+            (ats) => ats.reservationUnitOption?.pk === r.pk
+          ).length > 0
+        ) {
+          return true;
+        }
+        if (preferredOrderFilterQuery.length > 0) {
+          const includedInPreferredOrder =
+            preferredOrderFilterQuery.includes(r.preferredOrder) ||
+            (includePreferredOrder10OrHigher && (r.preferredOrder ?? 0) >= 10);
+          const orderFiltered =
+            includedInPreferredOrder &&
+            r.reservationUnit.pk === reservationUnitFilterQuery;
+          return orderFiltered;
+        }
+        return r?.reservationUnit.pk === reservationUnitFilterQuery;
+      });
+      return opts.length > 0;
+    })
+    .map((section) => {
+      // query includes locked and rejected show we can show them in the left column
+      // but no allocation can be made to those
+      // which are made using suitableTimeRanges so filter them out
+      const opts = section?.reservationUnitOptions?.filter((r) => {
+        if (r.reservationUnit.pk !== reservationUnitFilterQuery) {
+          return false;
+        }
+        if (r?.locked || r?.rejected) {
+          return false;
+        }
         return true;
+      });
+
+      if (opts.length === 0) {
+        return {
+          ...section,
+          suitableTimeRanges: [],
+        };
       }
-      if (preferredOrderFilterQuery.length > 0) {
-        const includedInPreferredOrder =
-          preferredOrderFilterQuery.includes(r.preferredOrder) ||
-          (includePreferredOrder10OrHigher && (r.preferredOrder ?? 0) >= 10);
-        const orderFiltered =
-          includedInPreferredOrder &&
-          r.reservationUnit.pk === reservationUnitFilterQuery;
-        return orderFiltered;
-      }
-      return r?.reservationUnit.pk === reservationUnitFilterQuery;
+      return section;
     });
-    return opts.length > 0;
-  });
 
   const priorityOptions = ([300, 200] as const).map((n) => ({
     value: n,
