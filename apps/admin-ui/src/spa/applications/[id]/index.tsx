@@ -2,7 +2,15 @@ import React, { useRef, type ReactNode } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
-import { Card, Table, IconCheck, IconEnvelope, Button } from "hds-react";
+import {
+  Card,
+  IconCheck,
+  IconEnvelope,
+  Button,
+  IconCross,
+  IconArrowRedo,
+  Tag,
+} from "hds-react";
 import { isEqual, trim } from "lodash";
 import { type ApolloQueryResult, useMutation, useQuery } from "@apollo/client";
 import { type TFunction } from "i18next";
@@ -158,17 +166,6 @@ const PreCard = styled.div`
   margin-bottom: var(--spacing-m);
 `;
 
-const StyledTable = styled(Table)`
-  width: 100%;
-  border-spacing: 0;
-  thead {
-    display: none;
-  }
-  td:nth-child(1) {
-    padding-left: var(--spacing-xs);
-  }
-`;
-
 const EventSchedules = styled.div`
   gap: var(--spacing-l);
   display: flex;
@@ -214,6 +211,57 @@ const HeadingContainer = styled.div`
   display: flex;
   justify-content: space-between;
   margin-top: var(--spacing-s);
+`;
+
+const ApplicationSectionsContainer = styled.div`
+  display: grid;
+
+  /* responsive shinanigans the tag takes too much space, so we only use 4 columns on mobile */
+  grid-template-columns: 1rem repeat(2, auto) 8rem;
+  align-items: stretch;
+  justify-content: stretch;
+  gap: 0;
+
+  border-collapse: collapse;
+  > div > div {
+    border: 1px solid var(--color-black-20);
+    border-left: none;
+    border-right: none;
+    display: flex;
+    align-items: center;
+    padding-left: 1rem;
+
+    /* responsive shinanigans the tag takes too much space */
+    :nth-child(4) {
+      display: none;
+    }
+  }
+
+  > div:nth-child(2n) {
+    > div {
+      border-top: none;
+    }
+  }
+
+  @media (min-width: ${breakpoints.m}) {
+    grid-template-columns: 3rem repeat(2, auto) repeat(2, 8rem);
+
+    /* undo responsive shinanigans, and align the HDS tag */
+    > div > div:nth-child(4) {
+      display: flex;
+      align-items: center;
+    }
+  }
+`;
+
+// the default HDS tag css can't align icons properly so we have to do this
+// TODO reusable Tags that allow setting both the background and optional Icon
+const DeclinedTag = styled(Tag)`
+  background-color: var(--color-metro-medium-light);
+  > span > span {
+    display: flex;
+    align-items: center;
+  }
 `;
 
 const KV = ({
@@ -364,17 +412,16 @@ function RejectOptionButton({
   const isDisabled = option.allocatedTimeSlots?.length > 0;
   return (
     <Button
-      // supplementary style requires an Icon which we don't want
-      variant="secondary"
-      style={{ border: "none" }}
+      variant="supplementary"
+      iconLeft={isRejected ? <IconArrowRedo /> : <IconCross />}
+      theme="black"
       size="small"
       onClick={isRejected ? handleRevert : handleReject}
       isLoading={loading}
       disabled={isDisabled}
-      // translate
-      data-testid={`reject-${option.pk}`}
+      data-testid={`reject-btn-${option.pk}`}
     >
-      {isRejected ? "Revert" : "Reject"}
+      {isRejected ? t("Application.btnRevert") : t("Application.btnReject")}
     </Button>
   );
 }
@@ -383,9 +430,8 @@ interface DataType extends ReservationUnitOptionNode {
   index: number;
 }
 type ColumnType = {
-  headerName: string;
   key: string;
-  transform: (data: DataType) => JSX.Element | string;
+  transform: (data: DataType) => ReactNode;
 };
 
 function ApplicationSectionDetails({
@@ -415,30 +461,39 @@ function ApplicationSectionDetails({
 
   const cols: Array<ColumnType> = [
     {
-      headerName: "a",
       key: "index",
-      transform: (d: DataType) => {
-        return d.index.toString();
-      },
+      transform: (d: DataType) => d.index.toString(),
     },
     {
-      headerName: "b",
       key: "unit",
-      transform: (reservationUnitOption: ReservationUnitOptionNode) => {
-        return reservationUnitOption?.reservationUnit?.unit?.nameFi ?? "-";
-      },
+      transform: (reservationUnitOption: ReservationUnitOptionNode) =>
+        reservationUnitOption?.reservationUnit?.unit?.nameFi ?? "-",
     },
     {
-      headerName: "c",
       key: "name",
+      transform: (reservationUnitOption: ReservationUnitOptionNode) =>
+        reservationUnitOption?.reservationUnit?.nameFi ?? "-",
+    },
+    {
+      key: "status",
       transform: (reservationUnitOption: ReservationUnitOptionNode) => {
-        return reservationUnitOption?.reservationUnit?.nameFi ?? "-";
+        if (reservationUnitOption.rejected) {
+          return (
+            <DeclinedTag>
+              <IconCross />
+              {t("Application.rejected")}
+            </DeclinedTag>
+          );
+        }
       },
     },
     {
-      headerName: "d",
       key: "reject",
       transform: (reservationUnitOption: ReservationUnitOptionNode) => {
+        // TODO button should only be visible if user has "can_handle_applications" permission
+        // the application is visible to the user if they have "can_view_application" permission
+        // but they aren't allowed to reject it
+        // requires mergin a PR with changes to application permission checks
         return (
           <RejectOptionButton
             option={reservationUnitOption}
@@ -491,7 +546,15 @@ function ApplicationSectionDetails({
           <ValueBox label={t("ApplicationEvent.dates")} value={dates} />
         </EventProps>
         <H4>{t("ApplicationEvent.requestedReservationUnits")}</H4>
-        <StyledTable rows={rows} cols={cols} indexKey="pk" />
+        <ApplicationSectionsContainer>
+          {rows.map((row) => (
+            <div style={{ display: "contents" }} key={row.pk}>
+              {cols.map((col) => (
+                <div key={`${col.key}-${row.pk}`}>{col.transform(row)}</div>
+              ))}
+            </div>
+          ))}
+        </ApplicationSectionsContainer>
         <H4>{t("ApplicationEvent.requestedTimes")}</H4>
         <EventSchedules>
           <TimeSelector applicationSection={section} />

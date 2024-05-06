@@ -415,6 +415,9 @@ const translations: ITranslations = {
     numTurns: ["Vuorojen määrä"],
     authenticatedUser: ["Tunnistautunut käyttäjä"],
     emptyFilterPageName: ["hakemusta"],
+    rejected: ["Hylätty"],
+    btnReject: ["Hylkää"],
+    btnRevert: ["Palauta"],
     headings: {
       id: ["id"],
       customer: ["Hakija"],
