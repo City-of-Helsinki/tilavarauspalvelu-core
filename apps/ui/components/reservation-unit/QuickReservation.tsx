@@ -38,8 +38,6 @@ type Props = {
   LoginAndSubmit: JSX.Element;
 };
 
-const timeItems = 24;
-
 const Wrapper = styled.form`
   background-color: var(--color-gold-light);
   margin-bottom: var(--spacing-l);
@@ -193,10 +191,11 @@ const QuickReservation = ({
     const itemsPerChunk = 8;
 
     return chunkArray(
-      startingTimeOptions.map((opt) => (opt.label ? opt.label.toString() : "")),
+      startingTimeOptions.map((opt) => opt.label),
       itemsPerChunk
-    ).slice(0, timeItems / itemsPerChunk);
+    );
   }, [startingTimeOptions]);
+
   // Find out which slide has the slot that reflects the selected focusSlot
   let activeChunk = 0;
   for (let i = 0; i < timeChunks.length; i++) {
