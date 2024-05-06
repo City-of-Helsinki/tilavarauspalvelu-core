@@ -295,6 +295,10 @@ type ApplicationRoundNode implements Node {
   criteriaFi: String
   criteriaEn: String
   criteriaSv: String
+  notesWhenApplying: String!
+  notesWhenApplyingFi: String
+  notesWhenApplyingEn: String
+  notesWhenApplyingSv: String
   applicationPeriodBegin: DateTime!
   applicationPeriodEnd: DateTime!
   reservationPeriodBegin: Date!
@@ -1097,6 +1101,7 @@ enum GeneralPermissionChoices {
   CAN_MANAGE_PURPOSES
   CAN_MANAGE_RESERVATION_PURPOSES
   CAN_MANAGE_AGE_GROUPS
+  CAN_MANAGE_QUALIFIERS
   CAN_MANAGE_ABILITY_GROUPS
   CAN_MANAGE_RESERVATION_UNIT_TYPES
   CAN_MANAGE_EQUIPMENT_CATEGORIES
@@ -1142,6 +1147,23 @@ type GeneralRolePermissionNode implements Node {
   """The ID of the object"""
   id: ID!
   pk: Int
+}
+
+type HelsinkiProfileDataNode {
+  pk: Int!
+  firstName: String
+  lastName: String
+  email: String
+  phone: String
+  birthday: Date
+  ssn: String
+  streetAddress: String
+  postalCode: String
+  city: String
+  municipalityCode: String
+  municipalityName: String
+  loginMethod: LoginMethod
+  isStrongLogin: Boolean!
 }
 
 """An enumeration."""
@@ -1303,6 +1325,13 @@ enum LocationType {
   MOVABLE
 }
 
+"""An enumeration."""
+enum LoginMethod {
+  PROFILE
+  AD
+  OTHER
+}
+
 type Mutation {
   createApplication(input: ApplicationCreateMutationInput!): ApplicationCreateMutationPayload
   updateApplication(input: ApplicationUpdateMutationInput!): ApplicationUpdateMutationPayload
@@ -1314,6 +1343,10 @@ type Mutation {
   createAllocatedTimeslot(input: AllocatedTimeSlotCreateMutationInput!): AllocatedTimeSlotCreateMutationPayload
   deleteAllocatedTimeslot(input: AllocatedTimeSlotDeleteMutationInput!): AllocatedTimeSlotDeleteMutationPayload
   updateReservationUnitOption(input: ReservationUnitOptionUpdateMutationInput!): ReservationUnitOptionUpdateMutationPayload
+  rejectAllSectionOptions(input: RejectAllSectionOptionsMutationInput!): RejectAllSectionOptionsMutationPayload
+  restoreAllSectionOptions(input: RestoreAllSectionOptionsMutationInput!): RestoreAllSectionOptionsMutationPayload
+  rejectAllApplicationOptions(input: RejectAllApplicationOptionsMutationInput!): RejectAllApplicationOptionsMutationPayload
+  restoreAllApplicationOptions(input: RestoreAllApplicationOptionsMutationInput!): RestoreAllApplicationOptionsMutationPayload
   updateUnit(input: UnitUpdateMutationInput!): UnitUpdateMutationPayload
   createResource(input: ResourceCreateMutationInput!): ResourceCreateMutationPayload
   updateResource(input: ResourceUpdateMutationInput!): ResourceUpdateMutationPayload
@@ -2211,6 +2244,9 @@ type Query {
     id: ID!
   ): UserNode
   currentUser: UserNode
+
+  """Get information about the user, using Helsinki profile if necessary."""
+  profileData(reservationId: Int, applicationId: Int): HelsinkiProfileDataNode
   termsOfUse(
     first: Int
     last: Int
@@ -2416,6 +2452,22 @@ type RefreshOrderMutationPayload {
   orderUuid: String
   status: String
   reservationPk: Int
+}
+
+input RejectAllApplicationOptionsMutationInput {
+  pk: Int!
+}
+
+type RejectAllApplicationOptionsMutationPayload {
+  pk: Int
+}
+
+input RejectAllSectionOptionsMutationInput {
+  pk: Int!
+}
+
+type RejectAllSectionOptionsMutationPayload {
+  pk: Int
 }
 
 type ReservableTimeSpanType {
@@ -4264,6 +4316,22 @@ type ResourceUpdateMutationPayload {
   space: Int
   bufferTimeBefore: Duration
   bufferTimeAfter: Duration
+}
+
+input RestoreAllApplicationOptionsMutationInput {
+  pk: Int!
+}
+
+type RestoreAllApplicationOptionsMutationPayload {
+  pk: Int
+}
+
+input RestoreAllSectionOptionsMutationInput {
+  pk: Int!
+}
+
+type RestoreAllSectionOptionsMutationPayload {
+  pk: Int
 }
 
 type ServiceNode implements Node {

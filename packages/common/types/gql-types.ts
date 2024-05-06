@@ -356,6 +356,10 @@ export type ApplicationRoundNode = Node & {
   nameEn?: Maybe<Scalars["String"]["output"]>;
   nameFi?: Maybe<Scalars["String"]["output"]>;
   nameSv?: Maybe<Scalars["String"]["output"]>;
+  notesWhenApplying: Scalars["String"]["output"];
+  notesWhenApplyingEn?: Maybe<Scalars["String"]["output"]>;
+  notesWhenApplyingFi?: Maybe<Scalars["String"]["output"]>;
+  notesWhenApplyingSv?: Maybe<Scalars["String"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
   publicDisplayBegin: Scalars["DateTime"]["output"];
   publicDisplayEnd: Scalars["DateTime"]["output"];
@@ -1143,6 +1147,7 @@ export enum GeneralPermissionChoices {
   CanManageGeneralRoles = "CAN_MANAGE_GENERAL_ROLES",
   CanManageNotifications = "CAN_MANAGE_NOTIFICATIONS",
   CanManagePurposes = "CAN_MANAGE_PURPOSES",
+  CanManageQualifiers = "CAN_MANAGE_QUALIFIERS",
   CanManageReservations = "CAN_MANAGE_RESERVATIONS",
   CanManageReservationPurposes = "CAN_MANAGE_RESERVATION_PURPOSES",
   CanManageReservationUnits = "CAN_MANAGE_RESERVATION_UNITS",
@@ -1183,6 +1188,24 @@ export type GeneralRolePermissionNode = Node & {
   id: Scalars["ID"]["output"];
   permission?: Maybe<GeneralPermissionChoices>;
   pk?: Maybe<Scalars["Int"]["output"]>;
+};
+
+export type HelsinkiProfileDataNode = {
+  __typename?: "HelsinkiProfileDataNode";
+  birthday?: Maybe<Scalars["Date"]["output"]>;
+  city?: Maybe<Scalars["String"]["output"]>;
+  email?: Maybe<Scalars["String"]["output"]>;
+  firstName?: Maybe<Scalars["String"]["output"]>;
+  isStrongLogin: Scalars["Boolean"]["output"];
+  lastName?: Maybe<Scalars["String"]["output"]>;
+  loginMethod?: Maybe<LoginMethod>;
+  municipalityCode?: Maybe<Scalars["String"]["output"]>;
+  municipalityName?: Maybe<Scalars["String"]["output"]>;
+  phone?: Maybe<Scalars["String"]["output"]>;
+  pk: Scalars["Int"]["output"];
+  postalCode?: Maybe<Scalars["String"]["output"]>;
+  ssn?: Maybe<Scalars["String"]["output"]>;
+  streetAddress?: Maybe<Scalars["String"]["output"]>;
 };
 
 /** An enumeration. */
@@ -1340,6 +1363,13 @@ export enum LocationType {
   Movable = "MOVABLE",
 }
 
+/** An enumeration. */
+export enum LoginMethod {
+  Ad = "AD",
+  Other = "OTHER",
+  Profile = "PROFILE",
+}
+
 export type Mutation = {
   __typename?: "Mutation";
   adjustReservationTime?: Maybe<ReservationAdjustTimeMutationPayload>;
@@ -1373,7 +1403,11 @@ export type Mutation = {
   denyReservation?: Maybe<ReservationDenyMutationPayload>;
   refreshOrder?: Maybe<RefreshOrderMutationPayload>;
   refundReservation?: Maybe<ReservationRefundMutationPayload>;
+  rejectAllApplicationOptions?: Maybe<RejectAllApplicationOptionsMutationPayload>;
+  rejectAllSectionOptions?: Maybe<RejectAllSectionOptionsMutationPayload>;
   requireHandlingForReservation?: Maybe<ReservationRequiresHandlingMutationPayload>;
+  restoreAllApplicationOptions?: Maybe<RestoreAllApplicationOptionsMutationPayload>;
+  restoreAllSectionOptions?: Maybe<RestoreAllSectionOptionsMutationPayload>;
   sendApplication?: Maybe<ApplicationSendMutationPayload>;
   staffAdjustReservationTime?: Maybe<ReservationStaffAdjustTimeMutationPayload>;
   staffReservationModify?: Maybe<ReservationStaffModifyMutationPayload>;
@@ -1519,8 +1553,24 @@ export type MutationRefundReservationArgs = {
   input: ReservationRefundMutationInput;
 };
 
+export type MutationRejectAllApplicationOptionsArgs = {
+  input: RejectAllApplicationOptionsMutationInput;
+};
+
+export type MutationRejectAllSectionOptionsArgs = {
+  input: RejectAllSectionOptionsMutationInput;
+};
+
 export type MutationRequireHandlingForReservationArgs = {
   input: ReservationRequiresHandlingMutationInput;
+};
+
+export type MutationRestoreAllApplicationOptionsArgs = {
+  input: RestoreAllApplicationOptionsMutationInput;
+};
+
+export type MutationRestoreAllSectionOptionsArgs = {
+  input: RestoreAllSectionOptionsMutationInput;
 };
 
 export type MutationSendApplicationArgs = {
@@ -1920,6 +1970,8 @@ export type Query = {
   keywords?: Maybe<KeywordNodeConnection>;
   metadataSets?: Maybe<ReservationMetadataSetNodeConnection>;
   order?: Maybe<PaymentOrderNode>;
+  /** Get information about the user, using Helsinki profile if necessary. */
+  profileData?: Maybe<HelsinkiProfileDataNode>;
   purposes?: Maybe<PurposeNodeConnection>;
   qualifiers?: Maybe<QualifierNodeConnection>;
   recurringReservation?: Maybe<RecurringReservationNode>;
@@ -2186,6 +2238,11 @@ export type QueryMetadataSetsArgs = {
 
 export type QueryOrderArgs = {
   orderUuid: Scalars["String"]["input"];
+};
+
+export type QueryProfileDataArgs = {
+  applicationId?: InputMaybe<Scalars["Int"]["input"]>;
+  reservationId?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type QueryPurposesArgs = {
@@ -2684,6 +2741,24 @@ export type RefreshOrderMutationPayload = {
   orderUuid?: Maybe<Scalars["String"]["output"]>;
   reservationPk?: Maybe<Scalars["Int"]["output"]>;
   status?: Maybe<Scalars["String"]["output"]>;
+};
+
+export type RejectAllApplicationOptionsMutationInput = {
+  pk: Scalars["Int"]["input"];
+};
+
+export type RejectAllApplicationOptionsMutationPayload = {
+  __typename?: "RejectAllApplicationOptionsMutationPayload";
+  pk?: Maybe<Scalars["Int"]["output"]>;
+};
+
+export type RejectAllSectionOptionsMutationInput = {
+  pk: Scalars["Int"]["input"];
+};
+
+export type RejectAllSectionOptionsMutationPayload = {
+  __typename?: "RejectAllSectionOptionsMutationPayload";
+  pk?: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type ReservableTimeSpanType = {
@@ -4518,6 +4593,24 @@ export type ResourceUpdateMutationPayload = {
   nameSv?: Maybe<Scalars["String"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
   space?: Maybe<Scalars["Int"]["output"]>;
+};
+
+export type RestoreAllApplicationOptionsMutationInput = {
+  pk: Scalars["Int"]["input"];
+};
+
+export type RestoreAllApplicationOptionsMutationPayload = {
+  __typename?: "RestoreAllApplicationOptionsMutationPayload";
+  pk?: Maybe<Scalars["Int"]["output"]>;
+};
+
+export type RestoreAllSectionOptionsMutationInput = {
+  pk: Scalars["Int"]["input"];
+};
+
+export type RestoreAllSectionOptionsMutationPayload = {
+  __typename?: "RestoreAllSectionOptionsMutationPayload";
+  pk?: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type ServiceNode = Node & {
