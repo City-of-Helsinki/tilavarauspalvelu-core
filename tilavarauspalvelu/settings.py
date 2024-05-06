@@ -8,14 +8,24 @@ from env_config import Environment, values
 from helusers.defaults import SOCIAL_AUTH_PIPELINE
 
 try:
-    from local_settings import AutomatedTestMixin, DockerMixin, LocalMixin
+    from local_settings import AutomatedTestMixin
 except ImportError:
 
-    class LocalMixin: ...
+    class AutomatedTestMixin: ...
+
+
+try:
+    from local_settings import DockerMixin
+except ImportError:
 
     class DockerMixin: ...
 
-    class AutomatedTestMixin: ...
+
+try:
+    from local_settings import LocalMixin
+except ImportError:
+
+    class LocalMixin: ...
 
 
 class Common(Environment):
@@ -483,7 +493,7 @@ class Common(Environment):
     REMOVE_RESERVATION_STATS_OLDER_THAN_YEARS = 5
     REMOVE_RECURRING_RESERVATIONS_OLDER_THAN_DAYS = 1
 
-    ICAL_HASH_SECRET = values.StringValue(default="")  # TODO: Only used in tests?
+    ICAL_HASH_SECRET = values.StringValue()
 
 
 class EmptyDefaults:
@@ -534,6 +544,7 @@ class EmptyDefaults:
     OPEN_CITY_PROFILE_GRAPHQL_API = ""
 
     TPREK_UNIT_URL = ""
+    ICAL_HASH_SECRET = ""  # nosec # NOSONAR
 
 
 class Local(LocalMixin, Common):
@@ -607,6 +618,7 @@ class Local(LocalMixin, Common):
     # ----- Misc -------------------------------------------------------------------------------------------
 
     GRAPHQL_CODEGEN_ENABLED = values.BooleanValue(default=False)
+    ICAL_HASH_SECRET = ""  # nosec # NOSONAR
 
 
 class Docker(DockerMixin, Common):
@@ -628,6 +640,7 @@ class Docker(DockerMixin, Common):
     ELASTICSEARCH_URL = "http://elastic:9200"
 
     GRAPHQL_CODEGEN_ENABLED = values.BooleanValue(default=False)
+    ICAL_HASH_SECRET = ""  # nosec # NOSONAR
 
 
 class AutomatedTests(AutomatedTestMixin, EmptyDefaults, Common, dotenv_path=None):

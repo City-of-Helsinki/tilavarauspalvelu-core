@@ -56,7 +56,7 @@ The preferred contact method is through Helsinki City Slack.
 
 ## Setup
 
-### With docker
+### With Docker
 
 These instructions will set up the backend for local development using Docker.
 This is recommended for especially for frontend developers, as it requires fewer dependencies.
@@ -100,7 +100,7 @@ make generate
 ```
 
 
-### Backend devs
+### Without Docker
 
 These instructions will set up the backend for local development without Docker.
 This is mainly for backend developers, as it requires more dependencies and setup.
@@ -110,9 +110,9 @@ Before you start, you'll need the following dependencies:
 - CPython (check `pyproject.toml` for version)
 - [Poetry] (latest version)
 - [Make] ([Windows][Make (Windows)], [Mac][Make (Mac)])
-- [PostgreSQL] (with the [PostGIS] extension) (13 or newer)
-- [Redis] (7 or newer)
-- [Elasticsearch] (8.8 or newer)
+- [PostgreSQL] (with the [PostGIS] extension) (version 13 or newer)
+- [Redis] (version 7 or newer)
+- [Elasticsearch] (version 8.8)
 - [GDAL] (version compatible with Django, check their documentation for more info)
     - Ubuntu: `sudo apt-get install gdal-bin`
     - Mac: `brew install gdal`
