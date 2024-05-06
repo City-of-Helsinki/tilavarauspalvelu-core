@@ -510,7 +510,7 @@ const ReservationUnit = ({
   }, [dateValue, timeValue]);
 
   const submitReservation = (_data: PendingReservationFormType) => {
-    if (focusSlot.start && focusSlot.end && reservationUnit.pk) {
+    if (reservationUnit.pk) {
       setErrorMsg(null);
     }
     const { start: begin, end } = focusSlot;
@@ -525,6 +525,10 @@ const ReservationUnit = ({
     createReservation(input);
   };
 
+  // TODO the use of focusSlot is weird it double's up for both
+  // calendar focus date and the reservation slot which causes issues
+  // the calendar focus date should always be defined but the form values should not have valid default values
+  // not having valid values will break other things so requires refactoring.
   const focusSlot: FocusTimeSlot = useMemo(() => {
     const start = focusDate;
     const end = addMinutes(start, durationValue);
@@ -746,28 +750,26 @@ const ReservationUnit = ({
   }, [isMobile]);
 
   const calendarEvents: CalendarEvent<ReservationNode>[] = useMemo(() => {
-    const diff =
-      focusSlot?.durationMinutes != null ? focusSlot.durationMinutes : 0;
+    const { durationMinutes: diff, start, end } = focusSlot;
     const calendarDuration = diff >= 90 ? `(${formatDuration(diff, t)})` : "";
 
     const existingReservations = filterNonNullable(
       reservationUnit?.reservationSet
     );
     const focusEvent = {
-      begin: focusSlot?.start,
-      end: focusSlot?.end,
+      begin: start,
+      end,
       state: "INITIAL",
     };
     const isReservable = isReservationReservable({
       reservationUnit,
       activeApplicationRounds,
-      start: focusSlot?.start,
-      end: focusSlot?.end,
+      start,
+      end,
       skipLengthCheck: false,
     });
 
-    const shouldDisplayFocusSlot =
-      focusSlot?.start != null && focusSlot?.end != null && isReservable;
+    const shouldDisplayFocusSlot = isReservable;
 
     return [
       ...existingReservations,
@@ -775,7 +777,6 @@ const ReservationUnit = ({
     ]
       .filter((n): n is NonNullable<typeof n> => n != null)
       .map((n) => {
-        const { begin: start, end } = n;
         const suffix = n.state === "INITIAL" ? calendarDuration : "";
         const event: CalendarEvent<ReservationNode> = {
           title: `${
@@ -783,8 +784,8 @@ const ReservationUnit = ({
               ? `${t("reservationCalendar:prefixForCancelled")}: `
               : suffix
           }`,
-          start: new Date(start ?? ""),
-          end: new Date(end ?? ""),
+          start: new Date(n.begin ?? ""),
+          end: new Date(n.end ?? ""),
           allDay: false,
           // TODO refactor and remove modifying the state
           event: n as ReservationNode,
@@ -794,20 +795,25 @@ const ReservationUnit = ({
       });
   }, [reservationUnit, activeApplicationRounds, t, focusSlot]);
 
+  // TODO should be combined with calendar events
   const eventBuffers = useMemo(() => {
     const bufferTimeBefore = reservationUnit.bufferTimeBefore ?? 0;
     const bufferTimeAfter = reservationUnit.bufferTimeAfter ?? 0;
+    const evts = calendarEvents
+      .flatMap((e) => e.event)
+      .filter((n): n is NonNullable<typeof n> => n != null);
+    const pendingReservation: PendingReservation = {
+      begin: focusSlot.start.toISOString(),
+      end: focusSlot.end.toISOString(),
+      state: "INITIAL",
+      bufferTimeBefore,
+      bufferTimeAfter,
+    };
     return getEventBuffers([
-      ...calendarEvents
-        .flatMap((e) => e.event)
-        .filter((n): n is NonNullable<typeof n> => n != null),
-      {
-        begin: focusSlot.start.toISOString(),
-        end: focusSlot.end.toISOString(),
-        state: "INITIAL",
-        bufferTimeBefore,
-        bufferTimeAfter,
-      } as PendingReservation,
+      ...evts,
+      // focusSlot has invalid reservations when the slot isn't properly selected
+      // similar check is in calendarEvents
+      ...(focusSlot.isReservable ? [pendingReservation] : []),
     ]);
   }, [calendarEvents, focusSlot, reservationUnit]);
 
