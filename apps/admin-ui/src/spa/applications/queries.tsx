@@ -11,3 +11,23 @@ export const APPLICATION_ADMIN_QUERY = gql`
     }
   }
 `;
+
+export const REJECT_ALL_SECTION_OPTIONS = gql`
+  mutation rejectAllSectionOptions(
+    $input: RejectAllSectionOptionsMutationInput!
+  ) {
+    rejectAllSectionOptions(input: $input) {
+      pk
+    }
+  }
+`;
+
+export const RESTORE_ALL_SECTION_OPTIONS = gql`
+  mutation restoreAllSectionOptions(
+    $input: RestoreAllSectionOptionsMutationInput!
+  ) {
+    restoreAllSectionOptions(input: $input) {
+      pk
+    }
+  }
+`;

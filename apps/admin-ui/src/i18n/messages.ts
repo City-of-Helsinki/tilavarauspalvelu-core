@@ -418,6 +418,8 @@ const translations: ITranslations = {
     rejected: ["Hylätty"],
     btnReject: ["Hylkää"],
     btnRevert: ["Palauta"],
+    btnRejectAll: ["Hylkää kaikki"],
+    btnRestoreAll: ["Palauta kaikki"],
     headings: {
       id: ["id"],
       customer: ["Hakija"],

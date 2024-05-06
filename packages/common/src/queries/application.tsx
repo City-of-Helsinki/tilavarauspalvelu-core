@@ -212,6 +212,7 @@ export const APPLICATION_ADMIN_FRAGMENT = gql`
     }
     applicationSections {
       ...ApplicationSectionUIFragment
+      allocations
       reservationUnitOptions {
         rejected
         allocatedTimeSlots {
