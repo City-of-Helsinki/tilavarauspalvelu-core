@@ -22,9 +22,9 @@ def api_client() -> APIClient:
 
 
 @pytest.fixture(autouse=True)
-def _toggle_elasticsearch(request, settings):
-    """Enable or disable syncing to Elasticsearch for the duration of the test."""
-    use_elasticsearch = "elasticsearch" in request.keywords
+def _enable_elasticsearch(request, settings):
+    """Enable syncing to Elasticsearch for the duration of the test."""
+    use_elasticsearch = "enable_elasticsearch" in request.keywords
 
     settings.SEARCH_SETTINGS["settings"]["auto_sync"] = use_elasticsearch
 
@@ -51,10 +51,10 @@ def pytest_collection_modifyitems(config, items):
         if skip_slow and "slow" in item.keywords:
             item.add_marker(pytest.mark.skip(reason="Skipped due to --skip-slow option"))
 
-        if "elasticsearch" in item.keywords:
+        if "enable_elasticsearch" in item.keywords:
             # Enable Elasticsearch for this test
-            item.add_marker(pytest.mark.xdist_group(name="elasticsearch"))
+            item.add_marker(pytest.mark.xdist_group(name="enable_elasticsearch"))
 
-            # Skip this test if --noelastic option was given
+            # Skip this test if --inelastic option was given
             if skip_elastic:
                 item.add_marker(pytest.mark.skip(reason="Skipped due to --skip-elastic"))
