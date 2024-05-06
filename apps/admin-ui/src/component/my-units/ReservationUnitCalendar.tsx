@@ -28,6 +28,7 @@ import {
 } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { ReservationUnitWithAffectingArgs } from "common/src/queries/fragments";
+import { TFunction } from "next-i18next";
 
 type Props = {
   begin: string;
@@ -50,14 +51,16 @@ const Container = styled.div`
 const getEventTitle = ({
   reservationUnitPk,
   reservation,
+  t,
 }: {
   reservationUnitPk: number;
   reservation: ReservationNode;
+  t: TFunction;
 }) => {
   const reservationUnit = reservation.reservationUnit?.[0];
   const isOtherReservationUnit = reservationUnitPk !== reservationUnit?.pk;
 
-  const reserveeName = getReserveeName(reservation);
+  const reserveeName = getReserveeName(reservation, t);
   if (isOtherReservationUnit) {
     const reservationUnitName = reservationUnit?.nameFi ?? "";
 
@@ -67,10 +70,15 @@ const getEventTitle = ({
   return [reserveeName, ""];
 };
 
-const constructEventTitle = (res: ReservationNode, resUnitPk: number) => {
+const constructEventTitle = (
+  res: ReservationNode,
+  resUnitPk: number,
+  t: TFunction
+) => {
   const [reservee, unit] = getEventTitle({
     reservationUnitPk: resUnitPk,
     reservation: res,
+    t,
   });
   if (unit.length > 0) {
     return `${reservee} (${unit})`;
@@ -124,7 +132,7 @@ export function ReservationUnitCalendar({
   const events = reservations.map((reservation) => {
     const isBlocked = reservation.type === ReservationTypeChoice.Blocked;
     const title = !isBlocked
-      ? constructEventTitle(reservation, reservationUnitPk)
+      ? constructEventTitle(reservation, reservationUnitPk, t)
       : t("MyUnits.Calendar.legend.closed");
     return {
       title,

@@ -317,7 +317,7 @@ function getEventTitle({
   }
 
   return event && event?.pk !== event?.reservationUnit?.[0]?.pk
-    ? getReserveeName(event)
+    ? getReserveeName(event, t)
     : title;
 }
 

@@ -198,7 +198,7 @@ export const getTranslationKeyForCustomerTypeChoice = (
 
 export const getReserveeName = (
   reservation: ReservationNode,
-  t?: TFunction,
+  t: TFunction,
   length = 50
 ): string => {
   let prefix = "";
