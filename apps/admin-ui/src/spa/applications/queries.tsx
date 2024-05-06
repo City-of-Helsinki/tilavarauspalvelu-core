@@ -6,7 +6,7 @@ export const APPLICATION_ADMIN_QUERY = gql`
   ${APPLICATION_ADMIN_FRAGMENT}
   query ApplicationAdmin($id: ID!) {
     application(id: $id) {
-      ...ApplicationCommon
+      ...ApplicationAdminFragment
       workingMemo
     }
   }

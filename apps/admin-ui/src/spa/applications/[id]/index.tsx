@@ -342,9 +342,11 @@ function SchedulesContent({
 
 function RejectOptionButton({
   option,
+  applicationStatus,
   refetch,
 }: {
   option: ReservationUnitOptionNode;
+  applicationStatus: ApplicationStatusChoice;
   refetch: () => Promise<ApolloQueryResult<Query>>;
 }) {
   const [mutation, { loading }] = useMutation<
@@ -409,7 +411,8 @@ function RejectOptionButton({
     console.warn("no allocatedTimeSlots", option);
   }
 
-  const isDisabled = option.allocatedTimeSlots?.length > 0;
+  const canReject = applicationStatus === ApplicationStatusChoice.InAllocation;
+  const isDisabled = !canReject || option.allocatedTimeSlots?.length > 0;
   return (
     <Button
       variant="supplementary"
@@ -497,6 +500,9 @@ function ApplicationSectionDetails({
         return (
           <RejectOptionButton
             option={reservationUnitOption}
+            applicationStatus={
+              application.status ?? ApplicationStatusChoice.Draft
+            }
             refetch={refetch}
           />
         );

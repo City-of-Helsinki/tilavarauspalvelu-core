@@ -200,8 +200,9 @@ const APPLICATION_ROUND_FRAGMENT = gql`
 export const APPLICATION_ADMIN_FRAGMENT = gql`
   ${APPLICANT_FRAGMENT}
   ${APPLICATION_SECTION_UI_FRAGMENT}
-  fragment ApplicationCommon on ApplicationNode {
+  fragment ApplicationAdminFragment on ApplicationNode {
     pk
+    id
     status
     lastModifiedDate
     ...ApplicantFragment
@@ -215,6 +216,7 @@ export const APPLICATION_ADMIN_FRAGMENT = gql`
         rejected
         allocatedTimeSlots {
           pk
+          id
         }
       }
     }
