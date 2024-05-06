@@ -618,10 +618,14 @@ const ReservationUnit = ({
   const isReservationQuotaReached = useMemo(() => {
     return (
       reservationUnit?.maxReservationsPerUser != null &&
-      userReservations?.length != null &&
-      userReservations?.length >= reservationUnit?.maxReservationsPerUser
+      reservationUnit?.numActiveUserReservations != null &&
+      reservationUnit?.numActiveUserReservations >=
+        reservationUnit?.maxReservationsPerUser
     );
-  }, [reservationUnit?.maxReservationsPerUser, userReservations]);
+  }, [
+    reservationUnit?.maxReservationsPerUser,
+    reservationUnit?.numActiveUserReservations,
+  ]);
 
   const shouldDisplayApplicationRoundTimeSlots =
     !!activeApplicationRounds?.length;

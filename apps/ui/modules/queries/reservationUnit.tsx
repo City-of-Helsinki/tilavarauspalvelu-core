@@ -78,6 +78,7 @@ const RESERVATION_UNIT_PAGE_FRAGMENT = gql`
       ...ReservationUnitTypeFields
     }
     ...ReservationInfoContainer
+    numActiveUserReservations
     requireReservationHandling
     equipments {
       id

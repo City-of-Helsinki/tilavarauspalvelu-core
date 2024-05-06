@@ -6315,6 +6315,7 @@ export type ReservationUnitPageFieldsFragment = {
   canApplyFreeOfCharge: boolean;
   state?: ReservationUnitState | null;
   reservationState?: ReservationState | null;
+  numActiveUserReservations?: number | null;
   requireReservationHandling: boolean;
   id: string;
   pk?: number | null;
@@ -6472,6 +6473,7 @@ export type ReservationUnitQuery = {
     canApplyFreeOfCharge: boolean;
     state?: ReservationUnitState | null;
     reservationState?: ReservationState | null;
+    numActiveUserReservations?: number | null;
     requireReservationHandling: boolean;
     id: string;
     pk?: number | null;
@@ -6652,6 +6654,7 @@ export type ReservationUnitPageQuery = {
     canApplyFreeOfCharge: boolean;
     state?: ReservationUnitState | null;
     reservationState?: ReservationState | null;
+    numActiveUserReservations?: number | null;
     requireReservationHandling: boolean;
     maxReservationDuration?: number | null;
     minReservationDuration?: number | null;
@@ -8075,6 +8078,7 @@ export const ReservationUnitPageFieldsFragmentDoc = gql`
       ...ReservationUnitTypeFields
     }
     ...ReservationInfoContainer
+    numActiveUserReservations
     requireReservationHandling
     equipments {
       id
