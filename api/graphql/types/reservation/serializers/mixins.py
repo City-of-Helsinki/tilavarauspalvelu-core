@@ -9,6 +9,7 @@ from django.utils.timezone import get_default_timezone
 
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from api.graphql.types.reservation.types import ReservationNode
+from common.date_utils import local_datetime, local_start_of_day
 from reservation_units.enums import PriceUnit, PricingType, ReservationStartInterval, ReservationUnitState
 from reservation_units.models import ReservationUnit, ReservationUnitPricing
 from reservation_units.utils.reservation_unit_pricing_helper import ReservationUnitPricingHelper
@@ -325,22 +326,17 @@ class ReservationSchedulingMixin:
 
     @staticmethod
     def check_reservation_days_before(begin: datetime.datetime, reservation_unit: ReservationUnit) -> None:
-        now = datetime.datetime.now().astimezone(get_default_timezone())
-        start_of_the_day = datetime.datetime.combine(now, datetime.time.min).astimezone(get_default_timezone())
-
-        if reservation_unit.reservations_max_days_before and now < (
-            begin - datetime.timedelta(days=reservation_unit.reservations_max_days_before)
-        ):
+        max_days_before = reservation_unit.reservations_max_days_before
+        if max_days_before and (begin - local_datetime()) > datetime.timedelta(days=max_days_before):
             raise ValidationErrorWithCode(
                 f"Reservation start time is earlier than {reservation_unit.reservations_max_days_before} days before.",
                 ValidationErrorCodes.RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE,
             )
 
-        if reservation_unit.reservations_min_days_before and start_of_the_day > (
-            begin - datetime.timedelta(days=reservation_unit.reservations_min_days_before)
-        ):
+        min_days_before = reservation_unit.reservations_min_days_before
+        if min_days_before and (begin - local_start_of_day()) < datetime.timedelta(days=min_days_before):
             raise ValidationErrorWithCode(
-                f"Reservation start time is less than {reservation_unit.reservations_min_days_before} days before.",
+                f"Reservation start time is later than {reservation_unit.reservations_min_days_before} days before.",
                 ValidationErrorCodes.RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE,
             )
 
