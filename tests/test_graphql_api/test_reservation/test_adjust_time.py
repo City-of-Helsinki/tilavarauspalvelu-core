@@ -265,12 +265,12 @@ def test_reservation__adjust_time__min_days_before_subceeded(graphql):
     graphql.login_with_superuser()
     data = get_adjust_data(
         reservation,
-        begin=(reservation.begin + datetime.timedelta(days=6)).isoformat(),
-        end=(reservation.end + datetime.timedelta(days=6)).isoformat(),
+        begin=(reservation.begin + datetime.timedelta(days=5)).isoformat(),
+        end=(reservation.end + datetime.timedelta(days=5)).isoformat(),
     )
     response = graphql(ADJUST_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation start time is less than 7 days before."
+    assert response.error_message() == "Reservation start time is later than 7 days before."
 
 
 def test_reservation__adjust_time__reservation_unit_not_open_in_new_time(graphql):

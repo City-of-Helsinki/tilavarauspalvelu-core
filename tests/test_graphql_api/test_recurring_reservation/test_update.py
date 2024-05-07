@@ -2,7 +2,7 @@ import datetime
 
 import pytest
 
-from common.date_utils import next_hour
+from common.date_utils import local_start_of_day, next_hour
 from tests.factories import RecurringReservationFactory, ReservationUnitFactory
 from tests.helpers import UserType
 
@@ -30,7 +30,7 @@ def test_recurring_reservations__update(graphql):
 
 
 def test_recurring_reservations__update__end_time_before_begin_time(graphql):
-    begin = next_hour(plus_hours=1)
+    begin = local_start_of_day() + datetime.timedelta(hours=12)
     end = begin - datetime.timedelta(hours=1)
 
     recurring_reservation = RecurringReservationFactory.create(begin=begin, end=end)
@@ -46,7 +46,7 @@ def test_recurring_reservations__update__end_time_before_begin_time(graphql):
 
 
 def test_recurring_reservations__update__end_time_same_as_begin_time(graphql):
-    begin = next_hour(plus_hours=1)
+    begin = local_start_of_day() + datetime.timedelta(hours=12)
     end = begin - datetime.timedelta(hours=1)
 
     recurring_reservation = RecurringReservationFactory.create(begin=begin, end=end)

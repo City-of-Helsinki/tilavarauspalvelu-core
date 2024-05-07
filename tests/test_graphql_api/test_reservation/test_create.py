@@ -604,24 +604,24 @@ class ReservationsMinMaxDaysParams(NamedTuple):
     **parametrize_helper(
         {
             "Max days before exceeded": ReservationsMinMaxDaysParams(
-                reservation_days_delta=1,
-                reservations_max_days_before=1,
-                error_message="Reservation start time is earlier than 1 days before.",
+                reservation_days_delta=2,
+                reservations_max_days_before=2,
+                error_message="Reservation start time is earlier than 2 days before.",
             ),
             "Max days before in limits": ReservationsMinMaxDaysParams(
                 reservation_days_delta=0,
-                reservations_max_days_before=1,
+                reservations_max_days_before=2,
                 error_message=None,
             ),
             "Min days before in limits": ReservationsMinMaxDaysParams(
-                reservation_days_delta=1,
-                reservations_min_days_before=1,
+                reservation_days_delta=2,
+                reservations_min_days_before=2,
                 error_message=None,
             ),
             "Min days before subceeded": ReservationsMinMaxDaysParams(
                 reservation_days_delta=0,
-                reservations_min_days_before=1,
-                error_message="Reservation start time is less than 1 days before.",
+                reservations_min_days_before=2,
+                error_message="Reservation start time is later than 2 days before.",
             ),
         }
     )
@@ -646,6 +646,7 @@ def test_reservation__create__reservation_unit_reservations_min_and_max_days_bef
     response = graphql(CREATE_MUTATION, input_data=data)
 
     if error_message:
+        assert response.has_errors is True, response
         assert response.error_message() == error_message
     else:
         assert response.has_errors is False, response.errors

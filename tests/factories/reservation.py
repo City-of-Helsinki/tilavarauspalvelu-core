@@ -175,7 +175,7 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         ReservableTimeSpanFactory.create(
             resource=reservation_unit.origin_hauki_resource,
             start_datetime=day_start - datetime.timedelta(days=1),
-            end_datetime=day_start + datetime.timedelta(days=1),
+            end_datetime=day_start + datetime.timedelta(days=2),
         )
 
         begin = next_hour(plus_hours=1)
