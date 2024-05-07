@@ -94,6 +94,11 @@ class UnitGroup(models.Model):
     name: str = models.CharField(max_length=255)
     units = models.ManyToManyField("spaces.Unit", related_name="unit_groups")
 
+    # Translated field hints
+    name_fi: str | None
+    name_sv: str | None
+    name_en: str | None
+
     class Meta:
         db_table = "unit_group"
         base_manager_name = "objects"

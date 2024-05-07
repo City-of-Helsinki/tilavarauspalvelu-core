@@ -3,7 +3,6 @@ from typing import Any
 from graphene_django_extensions.permissions import BasePermission
 
 from common.typing import AnyUser
-from spaces.models import UnitGroup
 
 __all__ = [
     "UnitGroupPermission",
@@ -13,8 +12,12 @@ __all__ = [
 class UnitGroupPermission(BasePermission):
     @classmethod
     def has_permission(cls, user: AnyUser) -> bool:
-        return True
+        if user.is_anonymous:
+            return False
+        if user.is_superuser:
+            return True
+        return user.has_staff_permissions
 
     @classmethod
-    def has_update_permission(cls, instance: UnitGroup, user: AnyUser, input_data: dict[str, Any]) -> bool:
+    def has_mutation_permission(cls, user: AnyUser, input_data: dict[str, Any]) -> bool:
         return False
