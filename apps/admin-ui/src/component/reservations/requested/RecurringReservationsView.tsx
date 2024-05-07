@@ -79,6 +79,7 @@ function RecurringReservationsView({
   const forDisplay = reservations.map((x) => {
     const buttons = [];
     const startDate = new Date(x.begin);
+    const endDate = new Date(x.end);
     const now = new Date();
 
     if (x.state !== State.Denied) {
@@ -103,7 +104,7 @@ function RecurringReservationsView({
           />
         );
       }
-      if (startDate > now) {
+      if (endDate <= now) {
         buttons.push(
           <ReservationListButton
             key="deny"
@@ -117,7 +118,7 @@ function RecurringReservationsView({
     return {
       date: startDate,
       startTime: format(startDate, "H:mm"),
-      endTime: format(new Date(x.end), "H:mm"),
+      endTime: format(endDate, "H:mm"),
       isRemoved: x.state === "DENIED",
       buttons,
     };
