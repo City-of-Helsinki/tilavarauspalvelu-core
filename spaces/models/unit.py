@@ -102,6 +102,7 @@ class UnitGroup(models.Model):
     class Meta:
         db_table = "unit_group"
         base_manager_name = "objects"
+        ordering = ["name"]
 
     def __str__(self) -> str:
         return self.name
