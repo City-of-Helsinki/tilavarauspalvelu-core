@@ -104,6 +104,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     query: SearchFormParamsUnitDocument,
     variables: {
       publishedReservationUnits: true,
+      onlySeasonalBookable: true,
     },
   });
 
