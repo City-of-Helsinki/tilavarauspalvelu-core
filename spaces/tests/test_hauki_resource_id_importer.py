@@ -1,5 +1,4 @@
 import pytest
-from django.test import override_settings
 
 from opening_hours.utils.hauki_api_client import HaukiAPIClient
 from spaces.importers.units import UnitHaukiResourceIdImporter
@@ -35,7 +34,6 @@ SECOND_RET_VAL = {
 }
 
 
-@override_settings(HAUKI_API_URL="url")
 @patch_method(
     HaukiAPIClient.get,
     side_effect=[
@@ -53,7 +51,6 @@ def test__hauki_resource_id_importer__from_unit_id():
     assert HaukiAPIClient.get.call_count == 2
 
 
-@override_settings(HAUKI_API_URL="url")
 @patch_method(
     HaukiAPIClient.get,
     side_effect=[

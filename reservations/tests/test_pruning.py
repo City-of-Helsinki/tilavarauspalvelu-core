@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime, timedelta
 
 from dateutil.relativedelta import relativedelta
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from django.utils.timezone import get_current_timezone, get_default_timezone
 from freezegun import freeze_time
 
@@ -18,7 +18,6 @@ from reservations.pruning import (
 from tests.factories import PaymentOrderFactory, RecurringReservationFactory, ReservationFactory
 
 
-@override_settings(PRUNE_OLDER_THAN_MINUTES=20)
 class PruneInactiveReservationsTestCase(TestCase):
     def test_prune_reservations_deletes_old_reservations_with_state_created(self):
         twenty_minutes_ago = datetime.now(tz=get_current_timezone()) - timedelta(minutes=20)
@@ -43,7 +42,6 @@ class PruneInactiveReservationsTestCase(TestCase):
         assert Reservation.objects.exists() is True
 
 
-@override_settings(REMOVE_STATS_OLDER_THAN_YEARS=5)
 class PruneReservationStatisticsTestCase(TestCase):
     def test_prune_statistics_deletes_in_the_given_time(self):
         five_years_ago = datetime.now(tz=get_current_timezone()) - relativedelta(years=5)
@@ -58,7 +56,6 @@ class PruneReservationStatisticsTestCase(TestCase):
         assert ReservationStatistic.objects.filter(reservation=keep).count() == 1
 
 
-@override_settings(VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES=5)
 class PruneReservationsWithInactivePaymentsTestCase(TestCase):
     def test_prune_deletes_reservations_with_inactive_payments(self):
         now = datetime.now(tz=get_current_timezone())
@@ -167,7 +164,6 @@ class PruneReservationsWithInactivePaymentsTestCase(TestCase):
         assert Reservation.objects.exists() is True
 
 
-@override_settings(REMOVE_RECURRINGS_OLDER_THAN_DAYS=1)
 class PruneRecurringReservationsTestCase(TestCase):
     def test_prune_recurring_reservations_deletes_older_without_reservations(self):
         day_ago = datetime.now(tz=get_default_timezone()) - timedelta(days=1)

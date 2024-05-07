@@ -39,7 +39,7 @@ class TaskTestBase(TestCase):
         cls.runit.save()
 
 
-@override_settings(CELERY_TASK_ALWAYS_EAGER=True, UPDATE_PRODUCT_MAPPING=True)
+@override_settings(UPDATE_PRODUCT_MAPPING=True)
 class ReservationUnitProductMappingTaskTestCase(TaskTestBase):
     @patch_method(VerkkokauppaAPIClient.create_product)
     @patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
@@ -90,7 +90,7 @@ class ReservationUnitProductMappingTaskTestCase(TaskTestBase):
         assert self.runit.payment_product is None
 
 
-@override_settings(CELERY_TASK_ALWAYS_EAGER=True, UPDATE_PRODUCT_MAPPING=True)
+@override_settings(UPDATE_PRODUCT_MAPPING=True)
 class ReservationUnitRefreshAccountingTaskTestCase(TaskTestBase):
     @patch_method(VerkkokauppaAPIClient.create_product)
     @patch_method(VerkkokauppaAPIClient.create_or_update_accounting)

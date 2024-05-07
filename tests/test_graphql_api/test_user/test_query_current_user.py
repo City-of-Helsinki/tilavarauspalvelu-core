@@ -12,9 +12,7 @@ pytestmark = [
 ]
 
 
-def test_query_current_user__all_fields(graphql, settings):
-    settings.CELERY_TASK_ALWAYS_EAGER = True
-
+def test_query_current_user__all_fields(graphql):
     # given:
     # - There is a user in the system
     # - That user is using the system
@@ -67,9 +65,7 @@ def test_query_current_user__all_fields(graphql, settings):
     }
 
 
-def test_query_current_user__unauthenticated(graphql, settings):
-    settings.CELERY_TASK_ALWAYS_EAGER = True
-
+def test_query_current_user__unauthenticated(graphql):
     # given:
     # - An anonymous user is using the system
     graphql.login_user_based_on_type(UserType.ANONYMOUS)

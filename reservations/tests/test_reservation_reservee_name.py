@@ -136,8 +136,6 @@ class Params(NamedTuple):
     )
 )
 def test__reservation__reservee_name(fields: dict[str, Any], result: str, settings):
-    settings.LOCALE_PATHS = []
-
     fields.setdefault("type", None)
     fields.setdefault("reservee_type", None)
     fields.setdefault("reservee_organisation_name", "")

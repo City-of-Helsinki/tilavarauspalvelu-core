@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timedelta
 
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from django.utils.timezone import get_default_timezone
 from freezegun import freeze_time
 
@@ -20,7 +20,6 @@ from utils.sentry import SentryLogger
 DEFAULT_TIMEZONE = get_default_timezone()
 
 
-@override_settings(VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES=5)
 @freeze_time(datetime(2022, 11, 28, 10, 10, 0, tzinfo=DEFAULT_TIMEZONE))
 class UpdateExpiredOrderTestCase(TestCase):
     def setUp(self) -> None:

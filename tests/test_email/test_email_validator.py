@@ -3,13 +3,11 @@ from unittest import mock
 import pytest
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.test import override_settings
 
 from email_notification.helpers.email_builder_reservation import ReservationEmailContext
 from email_notification.helpers.email_validator import EmailTemplateValidator
 
 
-@override_settings(EMAIL_HTML_MAX_FILE_SIZE=150000)
 def test_email_validator__raises__validation_error_on_invalid_file_extension():
     mock_field_file = mock.MagicMock()
     mock_field_file.name = "/tmp/mock_template.jpg"
@@ -20,7 +18,6 @@ def test_email_validator__raises__validation_error_on_invalid_file_extension():
         EmailTemplateValidator(ReservationEmailContext.from_mock_data()).validate_html_file(mock_field_file)
 
 
-@override_settings(EMAIL_HTML_MAX_FILE_SIZE=150000)
 def test_email_validator__raises__validation_error_on_zero_size_file():
     mock_field_file = mock.MagicMock()
     mock_field_file.name = "/tmp/mock_template.html"
@@ -31,7 +28,6 @@ def test_email_validator__raises__validation_error_on_zero_size_file():
         EmailTemplateValidator(ReservationEmailContext.from_mock_data()).validate_html_file(mock_field_file)
 
 
-@override_settings(EMAIL_HTML_MAX_FILE_SIZE=150000)
 def test_email_validator__raises__validation_error_on_big_file():
     mock_field_file = mock.MagicMock()
     mock_field_file.name = "/tmp/mock_template.html"
@@ -42,7 +38,6 @@ def test_email_validator__raises__validation_error_on_big_file():
         EmailTemplateValidator(ReservationEmailContext.from_mock_data()).validate_html_file(mock_field_file)
 
 
-@override_settings(EMAIL_HTML_MAX_FILE_SIZE=150000)
 def test_email_validator__raises__validation_error_on_unsupported_tag():
     mock_file = mock.MagicMock()
     mock_file.read.return_value = b"<html>{{invalid_tag}}</html>"
@@ -57,7 +52,6 @@ def test_email_validator__raises__validation_error_on_unsupported_tag():
         EmailTemplateValidator(ReservationEmailContext.from_mock_data()).validate_html_file(mock_field_file)
 
 
-@override_settings(EMAIL_HTML_MAX_FILE_SIZE=150000)
 def test_email_validator__raises__validation_error_on_illegal_tag():
     mock_file = mock.MagicMock()
     mock_file.read.return_value = b"<html>{% invalid_tag %}</html>"
@@ -72,7 +66,6 @@ def test_email_validator__raises__validation_error_on_illegal_tag():
         EmailTemplateValidator(ReservationEmailContext.from_mock_data()).validate_html_file(mock_field_file)
 
 
-@override_settings(EMAIL_HTML_MAX_FILE_SIZE=150000)
 def valid_email_validator__file_raises_no_exceptions_with_supported_tag():
     mock_file = mock.MagicMock()
     mock_file.read.return_value = b"<html>{{supported_tag}}</html>"

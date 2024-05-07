@@ -19,7 +19,7 @@ def mock_create_product(*args, **kwargs):
     )
 
 
-@override_settings(CELERY_TASK_ALWAYS_EAGER=True, UPDATE_PRODUCT_MAPPING=True)
+@override_settings(UPDATE_PRODUCT_MAPPING=True)
 class ReservationUnitProductMappingTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
