@@ -31,3 +31,23 @@ export const RESTORE_ALL_SECTION_OPTIONS = gql`
     }
   }
 `;
+
+export const REJECT_APPLICATION = gql`
+  mutation rejectAllApplicationOptions(
+    $input: RejectAllApplicationOptionsMutationInput!
+  ) {
+    rejectAllApplicationOptions(input: $input) {
+      pk
+    }
+  }
+`;
+
+export const RESTORE_APPLICATION = gql`
+  mutation restoreAllApplicationOptions(
+    $input: RestoreAllApplicationOptionsMutationInput!
+  ) {
+    restoreAllApplicationOptions(input: $input) {
+      pk
+    }
+  }
+`;

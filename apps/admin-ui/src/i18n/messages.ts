@@ -190,6 +190,7 @@ const translations: ITranslations = {
     errorFetchingData: ["Virhe haettaessa tietoja"],
     errorFetchingApplication: ["Virhe haettaessa hakemusta"],
     errorFetchingApplications: ["Virhe haettaessa hakemuksia"],
+    errorRejectingApplication: ["Virhe hylätessä hakemusta"],
     // TODO describe what failed if you don't know why it failed
     functionFailedTitle: ["Toiminto epäonnistui"],
     unexpectedError: ["Odottamaton virhe"],
@@ -416,10 +417,14 @@ const translations: ITranslations = {
     authenticatedUser: ["Tunnistautunut käyttäjä"],
     emptyFilterPageName: ["hakemusta"],
     rejected: ["Hylätty"],
-    btnReject: ["Hylkää"],
-    btnRevert: ["Palauta"],
-    btnRejectAll: ["Hylkää kaikki"],
-    btnRestoreAll: ["Palauta kaikki"],
+    btnRestore: ["Palauta koko hakemus"],
+    btnReject: ["Hylkää koko hakemus"],
+    section: {
+      btnReject: ["Hylkää"],
+      btnRestore: ["Palauta"],
+      btnRejectAll: ["Hylkää kaikki"],
+      btnRestoreAll: ["Palauta kaikki"],
+    },
     headings: {
       id: ["id"],
       customer: ["Hakija"],

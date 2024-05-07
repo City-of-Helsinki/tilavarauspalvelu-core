@@ -32,6 +32,8 @@ import {
   type Maybe,
   type MutationRejectAllSectionOptionsArgs,
   type MutationRestoreAllSectionOptionsArgs,
+  type MutationRejectAllApplicationOptionsArgs,
+  type MutationRestoreAllApplicationOptionsArgs,
 } from "common/types/gql-types";
 import { formatDuration } from "common/src/common/util";
 import { convertWeekday, type Day } from "common/src/conversion";
@@ -54,7 +56,9 @@ import { TimeSelector } from "../TimeSelector";
 import {
   APPLICATION_ADMIN_QUERY,
   REJECT_ALL_SECTION_OPTIONS,
+  REJECT_APPLICATION,
   RESTORE_ALL_SECTION_OPTIONS,
+  RESTORE_APPLICATION,
 } from "../queries";
 import { getApplicantName, getApplicationStatusColor } from "@/helpers";
 // TODO move
@@ -166,7 +170,7 @@ const StyledAccordion = styled(Accordion).attrs({
 
 const PreCard = styled.div`
   font-size: var(--fontsize-body-s);
-  margin-bottom: var(--spacing-m);
+  margin-bottom: var(--spacing-2-xs);
 `;
 
 const EventSchedules = styled.div`
@@ -428,7 +432,9 @@ function RejectOptionButton({
       disabled={isDisabled}
       data-testid={`reject-btn-${option.pk}`}
     >
-      {isRejected ? t("Application.btnRevert") : t("Application.btnReject")}
+      {isRejected
+        ? t("Application.section.btnRestore")
+        : t("Application.section.btnReject")}
     </Button>
   );
 }
@@ -525,8 +531,8 @@ function RejectAllOptionsButton({
       isLoading={isLoading}
     >
       {isRejected
-        ? t("Application.btnRestoreAll")
-        : t("Application.btnRejectAll")}
+        ? t("Application.section.btnRestoreAll")
+        : t("Application.section.btnRejectAll")}
     </Button>
   );
 }
@@ -694,6 +700,115 @@ function ApplicationSectionDetails({
   );
 }
 
+function RejectApplicationButton({
+  application,
+  refetch,
+}: {
+  application: ApplicationNode;
+  refetch: () => Promise<ApolloQueryResult<Query>>;
+}): JSX.Element {
+  const { t } = useTranslation();
+  const { notifyError } = useNotification();
+
+  const [rejectionMutation, { loading: isRejectionLoading }] = useMutation<
+    Query,
+    MutationRejectAllApplicationOptionsArgs
+  >(REJECT_APPLICATION);
+
+  const [restoreMutation, { loading: isRestoreLoading }] = useMutation<
+    Query,
+    MutationRestoreAllApplicationOptionsArgs
+  >(RESTORE_APPLICATION);
+
+  const isLoading = isRejectionLoading || isRestoreLoading;
+
+  const updateApplication = async (
+    pk: Maybe<number> | undefined,
+    shouldReject: boolean
+  ) => {
+    if (pk == null) {
+      return;
+    }
+    if (isLoading) {
+      return;
+    }
+
+    const mutation = shouldReject ? rejectionMutation : restoreMutation;
+    try {
+      await mutation({
+        variables: {
+          input: {
+            pk,
+          },
+        },
+      });
+      refetch();
+    } catch (err) {
+      const mutationErrors = getValidationErrors(err);
+      if (mutationErrors.length > 0) {
+        // TODO handle other codes also
+        const isInvalidState = mutationErrors.find(
+          (e) => e.code === "CANNOT_REJECT_APPLICATION_OPTIONS"
+        );
+        if (isInvalidState) {
+          notifyError(t("errors.cantRejectAlreadyAllocated"));
+        } else {
+          // TODO this should show them with cleaner formatting (multiple errors)
+          // TODO these should be translated
+          const message = mutationErrors.map((e) => e.message).join(", ");
+          notifyError(t("errors.formValidationError", { message }));
+        }
+      } else {
+        notifyError(t("errors.errorRejectingApplication"));
+      }
+    }
+  };
+
+  const handleRejectAll = async () => {
+    updateApplication(application.pk, true);
+  };
+
+  const handleRestoreAll = async () => {
+    updateApplication(application.pk, false);
+  };
+
+  // codegen types allow undefined so have to do this for debugging
+  if (application.applicationSections == null) {
+    // eslint-disable-next-line no-console
+    console.warn("application.applicationSections is null", application);
+  }
+  if (application.status == null) {
+    // eslint-disable-next-line no-console
+    console.warn("application.status is null", application);
+  }
+
+  const isInAllocation =
+    application.status === ApplicationStatusChoice.InAllocation;
+  const hasBeenAllocated =
+    application.applicationSections?.some((section) =>
+      section.reservationUnitOptions.some(
+        (option) => option.allocatedTimeSlots?.length > 0
+      )
+    ) ?? false;
+  const canReject = isInAllocation && !hasBeenAllocated;
+  const isRejected =
+    application.applicationSections?.every((section) =>
+      section.reservationUnitOptions.every((option) => option.rejected)
+    ) ?? false;
+
+  return (
+    <Button
+      size="small"
+      variant="secondary"
+      theme="black"
+      onClick={() => (isRejected ? handleRestoreAll() : handleRejectAll())}
+      disabled={!canReject}
+    >
+      {isRejected ? t("Application.btnRestore") : t("Application.btnReject")}
+    </Button>
+  );
+}
+
 function ApplicationDetails({
   applicationPk,
 }: {
@@ -789,12 +904,19 @@ function ApplicationDetails({
           {t("Application.applicationReceivedTime")}{" "}
           {formatDate(application.lastModifiedDate, "d.M.yyyy HH:mm")}
         </PreCard>
+        <div style={{ marginBottom: "var(--spacing-s)" }}>
+          <RejectApplicationButton
+            application={application}
+            refetch={refetch}
+          />
+        </div>
         <Card
           theme={{
             "--background-color": "var(--color-black-5)",
             "--padding-horizontal": "var(--spacing-m)",
             "--padding-vertical": "var(--spacing-m)",
           }}
+          style={{ marginBottom: "var(--spacing-m)" }}
         >
           <CardContentContainer>
             <DefinitionList>
