@@ -1,6 +1,6 @@
 import pytest
 
-from tests.factories import UnitFactory
+from tests.factories import UnitFactory, UnitGroupFactory
 from tests.helpers import UserType
 
 from .helpers import units_query
@@ -41,6 +41,9 @@ def test_units__query(graphql):
         serviceSectors {
             nameFi
         }
+        unitGroups {
+            nameFi
+        }
         paymentMerchant {
             name
         }
@@ -68,5 +71,51 @@ def test_units__query(graphql):
         "paymentMerchant": None,
         "reservationunitSet": [],
         "serviceSectors": [],
+        "unitGroups": [],
         "spaces": [],
     }
+
+
+def test_units__query__unit_groups_alphabetical_order(graphql):
+    unit = UnitFactory.create()
+    unit_group_1 = UnitGroupFactory.create(units=[unit], name="AAA")
+    unit_group_2 = UnitGroupFactory.create(units=[unit], name="XXX")
+    unit_group_3 = UnitGroupFactory.create(units=[unit], name="ABC")
+
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    fields = """
+        pk
+        unitGroups {
+            nameFi
+        }
+    """
+    response = graphql(units_query(fields=fields))
+
+    assert response.has_errors is False
+
+    assert len(response.edges) == 1
+    assert response.node(0) == {
+        "pk": unit.pk,
+        "unitGroups": [
+            {"nameFi": unit_group_1.name_fi},
+            {"nameFi": unit_group_3.name_fi},
+            {"nameFi": unit_group_2.name_fi},
+        ],
+    }
+
+
+def test_units__query__unit_groups__no_permissions(graphql):
+    unit = UnitFactory.create()
+    UnitGroupFactory.create(units=[unit], name="AAA")
+
+    graphql.login_user_based_on_type(UserType.REGULAR)
+    fields = """
+        pk
+        unitGroups {
+            nameFi
+        }
+    """
+    response = graphql(units_query(fields=fields))
+
+    assert response.has_errors is True
+    assert response.error_message() == "No permission to access node."
