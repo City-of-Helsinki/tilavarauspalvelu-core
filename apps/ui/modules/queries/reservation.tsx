@@ -170,6 +170,7 @@ export const GET_RESERVATION = gql`
       calendarUrl
       user {
         email
+        pk
       }
       state
       price
