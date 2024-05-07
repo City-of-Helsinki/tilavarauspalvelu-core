@@ -43,10 +43,14 @@ class UnitFilterSet(ModelFilterSet):
             "name_sv",
             "rank",
             "reservation_count",
+            "reservation_units_count",
         ]
 
     def filter_queryset(self, queryset):
-        queryset = queryset.annotate(reservation_count=Count("reservationunit__reservation"))
+        queryset = queryset.annotate(
+            reservation_count=Count("reservationunit__reservation"),
+            reservation_units_count=Count("reservationunit"),
+        )
 
         return super().filter_queryset(queryset)
 

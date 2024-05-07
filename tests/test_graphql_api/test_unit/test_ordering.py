@@ -65,3 +65,29 @@ def test_units__order__by_own_reservations_count(graphql):
     assert response.node(0) == {"pk": unit_1.pk}
     assert response.node(1) == {"pk": unit_3.pk}
     assert response.node(2) == {"pk": unit_2.pk}
+
+
+def test_units__order__by_reservation_units_count(graphql):
+    unit_1 = UnitFactory.create(name="1")
+    unit_2 = UnitFactory.create(name="2")
+    unit_3 = UnitFactory.create(name="3")
+    unit_4 = UnitFactory.create(name="4")
+
+    for _ in range(4):
+        ReservationUnitFactory.create(unit=unit_1)
+
+    for _ in range(2):
+        ReservationUnitFactory.create(unit=unit_2)
+
+    for _ in range(3):
+        ReservationUnitFactory.create(unit=unit_3)
+
+    response = graphql(units_query(order_by="reservationUnitsCountDesc"))
+
+    assert response.has_errors is False, response.errors
+
+    assert len(response.edges) == 4
+    assert response.node(0) == {"pk": unit_1.pk}
+    assert response.node(1) == {"pk": unit_3.pk}
+    assert response.node(2) == {"pk": unit_2.pk}
+    assert response.node(3) == {"pk": unit_4.pk}
