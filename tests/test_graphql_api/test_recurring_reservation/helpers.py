@@ -19,7 +19,7 @@ def get_minimal_create_date(reservation_unit: ReservationUnit, **overrides: Any)
     return {
         "weekdays": [0],
         "beginDate": datetime.date(2023, 1, 1).isoformat(),
-        "endDate": datetime.date(2023, 1, 2).isoformat(),
+        "endDate": datetime.date(2023, 1, 1).isoformat(),
         "beginTime": datetime.time(10, 0, 0).isoformat(),
         "endTime": datetime.time(12, 0, 0).isoformat(),
         "recurrenceInDays": 7,

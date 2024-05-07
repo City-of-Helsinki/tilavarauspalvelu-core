@@ -9,7 +9,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from api.graphql.extensions import error_codes
-from common.date_utils import DEFAULT_TIMEZONE, combine, get_periods_between
+from common.date_utils import DEFAULT_TIMEZONE, combine, get_periods_between, local_date
 from common.fields.serializer import CurrentUserDefaultNullable, input_only_field
 from opening_hours.models import ReservableTimeSpan
 from opening_hours.utils.time_span_element import TimeSpanElement
@@ -65,8 +65,12 @@ class RecurringReservationCreateSerializer(NestingModelSerializer):
             msg = "Begin date cannot be after end date."
             raise ValidationError(msg, code=error_codes.RESERVATION_BEGIN_DATE_AFTER_END_DATE)
 
-        if end_time <= begin_time:
-            msg = "Begin time cannot be after end time."
+        if end_date > local_date() + datetime.timedelta(days=365 * 3):
+            msg = "Cannot create recurring reservation for more than 3 years in the future."
+            raise ValidationError(msg, code=error_codes.RESERVATION_END_DATE_TOO_FAR)
+
+        if begin_date == end_date and end_time <= begin_time:
+            msg = "Begin time cannot be after end time if on the same day."
             raise ValidationError(msg, code=error_codes.RESERVATION_BEGIN_TIME_AFTER_END_TIME)
 
         self.validate_start_interval(reservation_unit, begin_time)
@@ -93,16 +97,12 @@ class RecurringReservationCreateSerializer(NestingModelSerializer):
         interval_minutes = ReservationStartInterval(reservation_unit.reservation_start_interval).as_number
 
         # Staff reservations ignore start intervals longer than 30 minutes
-        if interval_minutes != 15:
-            interval_minutes = 30
+        interval_minutes = min(interval_minutes, 30)
 
         # For staff reservations, we don't need to care about opening hours,
         # so we can just check start interval from the beginning of the day.
-        for hour in range(24):
-            for minute in range(0, 60, interval_minutes):
-                start_time = datetime.time(hour=hour, minute=minute, tzinfo=DEFAULT_TIMEZONE)
-                if start_time == begin_time:
-                    return
+        if begin_time.second == 0 and begin_time.microsecond == 0 and begin_time.minute % interval_minutes == 0:
+            return
 
         msg = f"Reservation start time does not match the allowed interval of {interval_minutes} minutes."
         raise ValidationError(msg, code=error_codes.RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL)
@@ -218,14 +218,14 @@ class ReservationSeriesSerializer(RecurringReservationCreateSerializer):
 
     def save(self, **kwargs: Any) -> RecurringReservation:
         reservation_details: dict[str, Any] = self.initial_data.get("reservation_details")
-        skip = self.initial_data.get("skip_dates", [])
+        skip_dates = self.initial_data.get("skip_dates", [])
         check_opening_hours = self.initial_data.get("check_opening_hours", False)
 
         # Create both the recurring reservation and the reservations in a transaction.
         # This way if we get, e.g., overlapping reservations, the whole operation is rolled back.
         with transaction.atomic():
             instance = super().save()
-            self.create_reservations(instance, reservation_details, skip, check_opening_hours)
+            self.create_reservations(instance, reservation_details, skip_dates, check_opening_hours)
 
         return instance
 
@@ -233,7 +233,7 @@ class ReservationSeriesSerializer(RecurringReservationCreateSerializer):
         self,
         instance: RecurringReservation,
         reservation_details: dict[str, Any],
-        skip: list[datetime.date],
+        skip_dates: list[datetime.date],
         check_opening_hours: bool,
     ) -> None:
         reserved_timespans = self.get_reserved_timespans(
@@ -271,7 +271,7 @@ class ReservationSeriesSerializer(RecurringReservationCreateSerializer):
                 tzinfo=DEFAULT_TIMEZONE,
             )
             for begin, end in periods:
-                if begin.date() in skip:
+                if begin.date() in skip_dates:
                     continue
 
                 timespan = TimeSpanElement(

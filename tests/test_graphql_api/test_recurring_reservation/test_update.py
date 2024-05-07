@@ -41,7 +41,7 @@ def test_recurring_reservations__update__end_time_before_begin_time(graphql):
     response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Begin time cannot be after end time."]
+    assert response.field_error_messages() == ["Begin time cannot be after end time if on the same day."]
 
 
 def test_recurring_reservations__update__end_time_same_as_begin_time(graphql):
@@ -56,7 +56,7 @@ def test_recurring_reservations__update__end_time_same_as_begin_time(graphql):
     response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Begin time cannot be after end time."]
+    assert response.field_error_messages() == ["Begin time cannot be after end time if on the same day."]
 
 
 def test_recurring_reservations__update__end_date_before_begin_date(graphql):
