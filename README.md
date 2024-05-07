@@ -272,7 +272,7 @@ For debugging during development, the [Django Debug Toolbar] package can be used
 The [Django GraphQL Debug Toolbar] extension is used for the GraphQL endpoint.
 
 You should add a `local_settings.py` on the root level of the project and add
-a two classes called `LocalMixin` and `AutomatedTestMixin` to it.
+three classes called `LocalMixin`, `DockerMixin` and `AutomatedTestMixin` to it.
 These can be used to override settings for local development and automated tests respectively.
 
 Note that in order for development settings to work correctly, you need to set the
