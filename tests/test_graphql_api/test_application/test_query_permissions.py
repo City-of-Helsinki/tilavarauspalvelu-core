@@ -211,3 +211,21 @@ def test_application__unit_admin__working_memo(graphql):
     # then:
     # - The response has no errors
     assert response.has_errors is False, response
+
+
+def test_application__unit_admin__user(graphql):
+    section = ApplicationSectionFactory.create_in_status_unallocated(
+        reservation_unit_options__reservation_unit__unit__name="foo",
+    )
+    user = section.application.user
+    admin = UserFactory.create_with_unit_permissions(
+        unit=section.reservation_unit_options.first().reservation_unit.unit,
+        perms=["can_validate_applications"],
+    )
+    graphql.force_login(admin)
+
+    response = graphql(applications_query(fields="user { firstName lastName }"))
+
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1
+    assert response.node(0) == {"user": {"firstName": user.first_name, "lastName": user.last_name}}

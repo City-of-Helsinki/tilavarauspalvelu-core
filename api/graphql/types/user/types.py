@@ -8,6 +8,30 @@ from common.typing import GQLInfo
 from users.models import User
 from users.tasks import save_personal_info_view_log
 
+__all__ = [
+    "ApplicantNode",
+    "UserNode",
+]
+
+
+_FIELDS = [
+    "pk",
+    "uuid",
+    "username",
+    "name",
+    "first_name",
+    "last_name",
+    "email",
+    "date_of_birth",
+    "is_superuser",
+    "is_ad_authenticated",
+    "is_strongly_authenticated",
+    "reservation_notification",
+    "general_roles",
+    "unit_roles",
+    "service_sector_roles",
+]
+
 
 class UserNode(DjangoNode):
     name = graphene.String()
@@ -17,23 +41,7 @@ class UserNode(DjangoNode):
 
     class Meta:
         model = User
-        fields = [
-            "pk",
-            "uuid",
-            "username",
-            "name",
-            "first_name",
-            "last_name",
-            "email",
-            "date_of_birth",
-            "is_superuser",
-            "is_ad_authenticated",
-            "is_strongly_authenticated",
-            "reservation_notification",
-            "general_roles",
-            "unit_roles",
-            "service_sector_roles",
-        ]
+        fields = _FIELDS
         permission_classes = [UserPermission]
 
     def resolve_reservation_notification(root: User, info: GQLInfo) -> str | None:
@@ -59,3 +67,15 @@ class UserNode(DjangoNode):
         if token is None:
             return False
         return token.is_strong_login
+
+
+class ApplicantNode(UserNode):
+    class Meta:
+        model = User
+        fields = _FIELDS
+        # Don't override the default `UserNode` in the registry.
+        # This node should only be used with the `ApplicationNode`.
+        skip_registry = True
+        # No need to check permissions, since permissions for the
+        # `ApplicationNode` are enough to access the `ApplicantNode`.
+        permission_classes = []

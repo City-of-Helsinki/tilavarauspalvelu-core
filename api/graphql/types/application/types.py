@@ -7,6 +7,7 @@ from query_optimizer import AnnotatedField
 from api.graphql.types.application.filtersets import ApplicationFilterSet
 from api.graphql.types.application.permissions import ApplicationPermission
 from api.graphql.types.application_section.types import ApplicationSectionNode
+from api.graphql.types.user.types import ApplicantNode
 from applications.choices import ApplicationStatusChoice
 from applications.models import Application
 from common.typing import GQLInfo
@@ -21,6 +22,7 @@ class ApplicationNode(DjangoNode):
     status = AnnotatedField(graphene.Enum.from_enum(ApplicationStatusChoice), expression=L("status"))
 
     application_sections = ApplicationSectionNode.ListField()
+    user = ApplicantNode.RelatedField()
 
     class Meta:
         model = Application

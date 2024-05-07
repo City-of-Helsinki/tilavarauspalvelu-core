@@ -58,13 +58,14 @@ from .types.tax_percentage.types import TaxPercentageNode
 from .types.terms_of_use.types import TermsOfUseNode
 from .types.unit.types import UnitNode
 from .types.unit_group.types import UnitGroupNode
-from .types.user.types import UserNode
+from .types.user.types import ApplicantNode, UserNode
 
 __all__ = [
     "AbilityGroupNode",
     "AddressNode",
     "AgeGroupNode",
     "AllocatedTimeSlotNode",
+    "ApplicantNode",
     "ApplicationNode",
     "ApplicationRoundNode",
     "ApplicationRoundTimeSlotNode",
