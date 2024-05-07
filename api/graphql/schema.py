@@ -110,6 +110,7 @@ from .queries import (
     SpaceNode,
     TaxPercentageNode,
     TermsOfUseNode,
+    UnitGroupNode,
     UnitNode,
     UserNode,
 )
@@ -205,6 +206,7 @@ class Query(graphene.ObjectType):
     banner_notification = BannerNotificationNode.Node()
     banner_notifications = BannerNotificationNode.Connection()
     service_sectors = ServiceSectorNode.Connection()
+    unit_groups = UnitGroupNode.Connection()
     #
     # Debug
     if "graphiql_debug_toolbar" in settings.INSTALLED_APPS:
