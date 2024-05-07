@@ -7,25 +7,6 @@ from tests.factories import OriginHaukiResourceFactory, ReservationUnitFactory
 
 
 @pytest.fixture(autouse=True)
-def _toggle_elasticsearch(request, settings):
-    """Enable or disable syncing to Elasticsearch for the duration of the test."""
-    use_elasticsearch = "elasticsearch" in request.keywords
-
-    settings.SEARCH_SETTINGS["settings"]["auto_sync"] = use_elasticsearch
-
-
-@pytest.fixture(autouse=True)
-def _use_hauki_env_variables(settings):
-    settings.HAUKI_API_URL = "url"
-    settings.HAUKI_API_KEY = "secret_key"
-    settings.HAUKI_EXPORTS_ENABLED = None
-    settings.HAUKI_ORIGIN_ID = "test-tvp"
-    settings.HAUKI_SECRET = "super_secret"  # noqa: S105
-    settings.HAUKI_ORGANISATION_ID = "parent-organisation"
-    settings.HAUKI_ADMIN_UI_URL = "http://test.com/admin"
-
-
-@pytest.fixture(autouse=True)
 def _force_HaukiAPIClient_to_be_mocked():
     """Force 'HaukiAPIClient.generic' to be mocked in all tests."""
     with mock.patch(

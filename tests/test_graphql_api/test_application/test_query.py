@@ -1,5 +1,4 @@
 import pytest
-from django.test import override_settings
 
 from tests.factories import ApplicationFactory
 from tests.helpers import UserType
@@ -94,7 +93,6 @@ def test_can_query_application__all_fields(graphql):
     }
 
 
-@override_settings(CELERY_TASK_ALWAYS_EAGER=True)
 def test_accessing_applicant_date_of_birth_creates_personal_info_view_log(graphql):
     # given:
     # - There is an application in the system

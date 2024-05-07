@@ -30,7 +30,7 @@ class UnitMerchantUpdateTestCase(TestCase):
         )
         cls.unit = UnitFactory(name="Test unit", payment_merchant=cls.merchant_1)
 
-    @override_settings(CELERY_TASK_ALWAYS_EAGER=True, UPDATE_PRODUCT_MAPPING=True)
+    @override_settings(UPDATE_PRODUCT_MAPPING=True)
     @patch_method(VerkkokauppaAPIClient.create_product)
     def test_changing_merchant_updates_reservation_units_without_merchant(self):
         VerkkokauppaAPIClient.create_product.side_effect = [

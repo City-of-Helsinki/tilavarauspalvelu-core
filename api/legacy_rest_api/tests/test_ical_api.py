@@ -7,14 +7,12 @@ from rest_framework.reverse import reverse
 
 from api.legacy_rest_api.utils import hmac_signature
 
+pytestmark = [
+    pytest.mark.django_db,
+]
 
-@pytest.mark.usefixtures("_set_ical_secret")
-@pytest.mark.django_db()
-def test_getting_reservation_calendar(
-    user_api_client,
-    reservation,
-    reservation_in_second_unit,
-):
+
+def test_getting_reservation_calendar(user_api_client, reservation, reservation_in_second_unit):
     base_url = reverse("reservation_calendar-detail", kwargs={"pk": reservation.pk})
     url = f"{base_url}?hash={hmac_signature(f'reservation-{reservation.pk}')}"
     response = user_api_client.get(url)
@@ -32,22 +30,12 @@ def test_getting_reservation_calendar(
     assert_that(zip_content).does_not_contain(unexpected_start)
 
 
-@pytest.mark.usefixtures("_set_ical_secret")
-@pytest.mark.django_db()
-def test_getting_reservation_calendar_without_hash(
-    user_api_client,
-    reservation,
-):
+def test_getting_reservation_calendar_without_hash(user_api_client, reservation):
     response = user_api_client.get(reverse("reservation_calendar-detail", kwargs={"pk": reservation.pk}))
     assert response.status_code == 400
 
 
-@pytest.mark.usefixtures("_set_ical_secret")
-@pytest.mark.django_db()
-def test_getting_reservation_calendar_with_invalid_hash(
-    user_api_client,
-    reservation,
-):
+def test_getting_reservation_calendar_with_invalid_hash(user_api_client, reservation):
     base_url = reverse("reservation_calendar-detail", kwargs={"pk": reservation.pk})
     url = f"{base_url}?hash={hmac_signature('this-does-not-exist')}"
     response = user_api_client.get(url)

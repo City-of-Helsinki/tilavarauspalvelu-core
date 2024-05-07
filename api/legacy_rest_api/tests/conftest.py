@@ -1,7 +1,6 @@
 import datetime
 
 import pytest
-from django.conf import settings
 from django.utils import timezone
 from django.utils.timezone import get_default_timezone
 from rest_framework.test import APIClient
@@ -34,11 +33,6 @@ from tests.factories import UserFactory
 from users.models import ReservationNotification
 
 DEFAULT_TIMEZONE = get_default_timezone()
-
-
-@pytest.fixture(autouse=True)
-def _setup_audit_log(settings):
-    settings.AUDIT_LOGGING_ENABLED = False
 
 
 @pytest.mark.django_db()
@@ -810,11 +804,6 @@ def valid_unit_manager_data(user, unit):
 @pytest.fixture()
 def valid_unit_viewer_data(user, unit):
     return {"user_id": user.id, "role": "viewer", "unit_id": [unit.id]}
-
-
-@pytest.fixture()
-def _set_ical_secret(db):
-    settings.ICAL_HASH_SECRET = "qhoew923uqqwee"  # noqa: S105,RUF100
 
 
 @pytest.mark.django_db()

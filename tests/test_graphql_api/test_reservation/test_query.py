@@ -2,7 +2,6 @@ import datetime
 
 import freezegun
 import pytest
-from django.test import override_settings
 from graphql_relay import to_global_id
 
 from reservations.choices import CustomerTypeChoice, ReservationTypeChoice
@@ -214,9 +213,7 @@ def test_reservation__query__reservee_name_for_nonprofit_reservee(graphql):
     assert response.first_query_object["reserveeName"] == "Nonprofit Ry"
 
 
-def test_reservation__query__reservee_date_of_birth_is_not_shown_to_regular_user(graphql, settings):
-    settings.CELERY_TASK_ALWAYS_EAGER = True
-
+def test_reservation__query__reservee_date_of_birth_is_not_shown_to_regular_user(graphql):
     reservation = ReservationFactory.create()
 
     graphql.login_user_based_on_type(UserType.REGULAR)
@@ -230,9 +227,7 @@ def test_reservation__query__reservee_date_of_birth_is_not_shown_to_regular_user
     assert PersonalInfoViewLog.objects.first() is None
 
 
-def test_reservation__query__reservee_date_of_birth_is_show_but_logged__general_admin(graphql, settings):
-    settings.CELERY_TASK_ALWAYS_EAGER = True
-
+def test_reservation__query__reservee_date_of_birth_is_show_but_logged__general_admin(graphql):
     reservation = ReservationFactory.create()
     admin = UserFactory.create_with_general_permissions(perms=["can_view_reservations"])
 
@@ -257,9 +252,7 @@ def test_reservation__query__reservee_date_of_birth_is_show_but_logged__general_
     assert view_log.field == "User.date_of_birth"
 
 
-def test_reservation__query__reservee_date_of_birth_is_show_but_logged__unit_admin(graphql, settings):
-    settings.CELERY_TASK_ALWAYS_EAGER = True
-
+def test_reservation__query__reservee_date_of_birth_is_show_but_logged__unit_admin(graphql):
     unit = UnitFactory.create()
     reservation_unit = ReservationUnitFactory.create(unit=unit)
     reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
@@ -286,9 +279,7 @@ def test_reservation__query__reservee_date_of_birth_is_show_but_logged__unit_adm
     assert view_log.field == "User.date_of_birth"
 
 
-def test_reservation__query__reservee_date_of_birth_is_show_but_logged__unit_group_admin(graphql, settings):
-    settings.CELERY_TASK_ALWAYS_EAGER = True
-
+def test_reservation__query__reservee_date_of_birth_is_show_but_logged__unit_group_admin(graphql):
     unit_group = UnitGroupFactory.create()
     unit = UnitFactory.create(unit_groups=[unit_group])
     reservation_unit = ReservationUnitFactory.create(unit=unit)
@@ -359,7 +350,6 @@ def test_reservation__query__is_blocked(graphql):
 
 
 @freezegun.freeze_time()  # Freeze time for consistent 'expiresInMinutes' result
-@override_settings(VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES=5)
 def test_reservation__query__order__all_fields(graphql):
     reservation = ReservationFactory.create()
     PaymentOrderFactory.create(

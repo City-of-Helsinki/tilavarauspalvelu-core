@@ -102,8 +102,8 @@ def test_email_builder__get_content__with_html_file(language, email_template, re
 
 @freezegun.freeze_time("2021-01-01T12:00:00+02:00")
 def test_email_builder__get_content(settings, email_template):
-    settings.EMAIL_VARAAMO_EXT_LINK = link = "https://varaamo.hel.fi"
-    settings.EMAIL_FEEDBACK_EXT_LINK = feedback = "https://varaamo.hel.fi/feedback"
+    link = settings.EMAIL_VARAAMO_EXT_LINK
+    feedback = settings.EMAIL_FEEDBACK_EXT_LINK
 
     reservation = ReservationFactory.create(
         name="foo",

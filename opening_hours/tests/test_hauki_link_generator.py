@@ -7,8 +7,8 @@ from freezegun import freeze_time
 
 from opening_hours.utils.hauki_link_generator import generate_hauki_link
 
-VALID_SIGNATURE = "1e52776ccc95118a29835938593c277bbddca384317820eb5e59835f36307ba6"
-ORGANIZATION = "parent-organisation"
+VALID_SIGNATURE = "87cbd7cc4f1730cb71094d2648e79045d0dde31e1025695b69f4d76c301e4f20"
+ORGANIZATION = settings.HAUKI_ORGANISATION_ID
 
 
 @freeze_time("2021-01-01 12:00:00", tz_offset=2)
