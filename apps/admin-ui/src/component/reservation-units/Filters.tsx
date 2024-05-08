@@ -9,16 +9,9 @@ import { ReservationUnitState } from "@gql/gql-types";
 import {
   MultiSelectFilter,
   SearchFilter,
-  NumberFilter,
+  RangeNumberFilter,
 } from "@/component/QueryParamFilters";
 import { SearchTags } from "@/component/SearchTags";
-
-const RangeContrainer = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: top;
-  text-align: center;
-`;
 
 const Wrapper = styled.div`
   display: flex;
@@ -102,20 +95,16 @@ function Filters(): JSX.Element {
         maximumNumber={0}
       >
         <AutoGrid>
-          <div>
-            <div>{t("ReservationUnitsSearch.maxPersonsLabel")}</div>
-            <RangeContrainer>
-              <NumberFilter name="maxPersonsGte" />
-              <NumberFilter name="maxPersonsLte" />
-            </RangeContrainer>
-          </div>
-          <div>
-            <div>{t("ReservationUnitsSearch.surfaceAreaLabel")}</div>
-            <RangeContrainer>
-              <NumberFilter name="surfaceAreaGte" />
-              <NumberFilter name="surfaceAreaLte" />
-            </RangeContrainer>
-          </div>
+          <RangeNumberFilter
+            label={t("ReservationUnitsSearch.maxPersonsLabel")}
+            minName="maxPersonsGte"
+            maxName="maxPersonsLte"
+          />
+          <RangeNumberFilter
+            label={t("ReservationUnitsSearch.surfaceAreaLabel")}
+            minName="surfaceAreaGte"
+            maxName="surfaceAreaLte"
+          />
         </AutoGrid>
       </MoreWrapper>
       <SearchTags hide={[]} translateTag={translateTag} />
