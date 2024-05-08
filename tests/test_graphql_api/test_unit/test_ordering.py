@@ -1,6 +1,6 @@
 import pytest
 
-from tests.factories import ReservationFactory, ReservationUnitFactory, UnitFactory, UserFactory
+from tests.factories import ReservationFactory, ReservationUnitFactory, UnitFactory, UnitGroupFactory, UserFactory
 from tests.helpers import UserType
 
 from .helpers import units_query
@@ -91,3 +91,35 @@ def test_units__order__by_reservation_units_count(graphql):
     assert response.node(1) == {"pk": unit_3.pk}
     assert response.node(2) == {"pk": unit_2.pk}
     assert response.node(3) == {"pk": unit_4.pk}
+
+
+def test_units__order__unit_group_name(graphql):
+    unit_1 = UnitFactory.create(name="1")
+    unit_2 = UnitFactory.create(name="2")
+    unit_3 = UnitFactory.create(name="3")
+    unit_4 = UnitFactory.create(name="4")
+
+    UnitGroupFactory.create(name="AAA", units=[unit_1, unit_2])
+    UnitGroupFactory.create(name="BBB", units=[unit_4])
+    UnitGroupFactory.create(name="CCC", units=[unit_3, unit_1])
+
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    response = graphql(units_query(order_by=["unitGroupNameAsc", "pkDesc"]))
+
+    assert response.has_errors is False, response.errors
+
+    assert len(response.edges) == 4
+    assert response.node(0) == {"pk": unit_2.pk}
+    assert response.node(1) == {"pk": unit_1.pk}
+    assert response.node(2) == {"pk": unit_4.pk}
+    assert response.node(3) == {"pk": unit_3.pk}
+
+    response = graphql(units_query(order_by=["unitGroupNameDesc", "pkDesc"]))
+
+    assert response.has_errors is False, response.errors
+
+    assert len(response.edges) == 4
+    assert response.node(0) == {"pk": unit_3.pk}
+    assert response.node(1) == {"pk": unit_1.pk}
+    assert response.node(2) == {"pk": unit_4.pk}
+    assert response.node(3) == {"pk": unit_2.pk}

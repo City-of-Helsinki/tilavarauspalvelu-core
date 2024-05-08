@@ -44,6 +44,7 @@ class UnitFilterSet(ModelFilterSet):
             "rank",
             "reservation_count",
             "reservation_units_count",
+            ("unit_groups__name", "unit_group_name"),
         ]
 
     def filter_queryset(self, queryset):
