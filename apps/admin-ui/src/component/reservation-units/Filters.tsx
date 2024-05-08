@@ -5,11 +5,13 @@ import ShowAllContainer from "common/src/components/ShowAllContainer";
 import { useUnitFilterOptions } from "../filters/UnitFilter";
 import { AutoGrid } from "@/styles/layout";
 import { useReservationUnitTypes } from "../filters/ReservationUnitTypeFilter";
-import { MultiSelectFilter, SearchFilter } from "../QueryParamFilters";
-import { TextInput } from "hds-react";
-import { useSearchParams } from "react-router-dom";
-import { SearchTags } from "../SearchTags";
 import { ReservationUnitState } from "@gql/gql-types";
+import {
+  MultiSelectFilter,
+  SearchFilter,
+  NumberFilter,
+} from "@/component/QueryParamFilters";
+import { SearchTags } from "@/component/SearchTags";
 
 const RangeContrainer = styled.div`
   display: grid;
@@ -33,56 +35,15 @@ const MoreWrapper = styled(ShowAllContainer)`
   }
 `;
 
-export const emptyState = {
-  reservationUnitType: [],
-  unit: [],
-  reservationUnitStates: [],
-};
-
-// TODO move to same place with other filters
-function NumberFilter({ name }: { name: string }) {
-  const { t } = useTranslation();
-
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const params = new URLSearchParams(searchParams);
-    if (e.target.value.length > 0) {
-      params.set(name, e.target.value);
-      setSearchParams(params, { replace: true });
-    } else {
-      params.delete(name);
-      setSearchParams(params, { replace: true });
-    }
-  };
-
-  const value = searchParams.get(name);
-  return (
-    <TextInput
-      id={name}
-      label=" "
-      onChange={handleOnChange}
-      value={value || ""}
-      // TODO change the key (same as the other filters)
-      placeholder={t(`ReservationUnitsSearch.${name}PlaceHolder`)}
-      errorText={
-        value !== "" && Number.isNaN(Number(value))
-          ? t("ReservationUnitsSearch.notANumber")
-          : undefined
-      }
-    />
-  );
-}
-
 function Filters(): JSX.Element {
   const { t } = useTranslation();
 
-  const reservationUnitStateOptions = Object.values(ReservationUnitState).map(
-    (s) => ({
+  const reservationUnitStateOptions = Object.values(ReservationUnitState)
+    .filter((x) => x !== ReservationUnitState.Archived)
+    .map((s) => ({
       value: s,
       label: t(`ReservationUnits.state.${s}`),
-    })
-  );
+    }));
 
   const { options: unitOptions } = useUnitFilterOptions();
   const { options: reservationUnitTypeOptions } = useReservationUnitTypes();

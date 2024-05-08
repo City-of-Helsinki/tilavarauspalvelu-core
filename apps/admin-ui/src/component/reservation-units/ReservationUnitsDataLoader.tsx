@@ -4,7 +4,7 @@ import {
   ReservationUnitOrderingChoices,
   useSearchReservationUnitsQuery,
 } from "@gql/gql-types";
-import { filterNonNullable } from "common/src/helpers";
+import { filterNonNullable, toNumber } from "common/src/helpers";
 import { LARGE_LIST_PAGE_SIZE } from "@/common/const";
 import { useNotification } from "@/context/NotificationContext";
 import Loader from "@/component/Loader";
@@ -79,18 +79,20 @@ export function ReservationUnitsDataReader(): JSX.Element {
     .map(Number)
     .filter(Number.isInteger);
 
-  const reservationUnitStates = searchParams
-    .getAll("reservationUnitStates")
-    .map(Number)
-    .filter(Number.isInteger);
+  const reservationUnitStates = searchParams.getAll("reservationUnitState");
 
   const unit = searchParams.getAll("unit").map(Number).filter(Number.isInteger);
 
   const searchFilter = searchParams.get("search");
-  const maxPersonsLte = searchParams.get("maxPersonsLte");
-  const maxPersonsGte = searchParams.get("maxPersonsGte");
-  const surfaceAreaLte = searchParams.get("surfaceAreaLte");
-  const surfaceAreaGte = searchParams.get("surfaceAreaGte");
+  // it's typed string but it's actually a number (python Decimal)
+  const maxPersonsLte = toNumber(searchParams.get("maxPersonsLte"))?.toString();
+  const maxPersonsGte = toNumber(searchParams.get("maxPersonsGte"))?.toString();
+  const surfaceAreaLte = toNumber(
+    searchParams.get("surfaceAreaLte")
+  )?.toString();
+  const surfaceAreaGte = toNumber(
+    searchParams.get("surfaceAreaGte")
+  )?.toString();
 
   const query = useSearchReservationUnitsQuery({
     variables: {
@@ -102,7 +104,7 @@ export function ReservationUnitsDataReader(): JSX.Element {
       surfaceAreaGte,
       nameFi: searchFilter,
       unit,
-      state: reservationUnitStates.map(String),
+      state: reservationUnitStates,
       reservationUnitType: reservationUnitTypes,
     },
     onError: (err: ApolloError) => {

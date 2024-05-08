@@ -7,6 +7,23 @@ export function filterNonNullable<T>(
   return arr?.filter((n): n is NonNullable<T> => n != null) ?? [];
 }
 
+/// Safe string -> number conversion
+/// handles the special cases of empty string and NaN with type safety
+export function toNumber(filter: string | null): number | null {
+  if (filter == null) {
+    return null;
+  }
+  // empty string converts to 0 which is not what we want
+  if (filter.trim() === "") {
+    return null;
+  }
+  const n = Number(filter);
+  if (Number.isNaN(n)) {
+    return null;
+  }
+  return n;
+}
+
 export const toMondayFirstUnsafe = (day: number) => {
   if (day < 0 || day > 6) {
     throw new Error(`Invalid day ${day}`);
