@@ -1,44 +1,21 @@
-import React, { useEffect, useReducer } from "react";
-import { DateInput, NumberInput, TextInput } from "hds-react";
+import React from "react";
+import { DateInput } from "hds-react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import i18next from "i18next";
 import ShowAllContainer from "common/src/components/ShowAllContainer";
-import type { OptionType } from "@/common/types";
-import ReservationUnitTypeFilter from "../filters/ReservationUnitTypeFilter";
-import Tags, { type Action, getReducer, toTags } from "../lists/Tags";
-import { UnitFilter } from "../filters/UnitFilter";
-import ReservationUnitFilter from "../filters/ReservationUnitFilter";
-import ReservationStateFilter from "../filters/ReservationStateFilter";
-import PaymentStatusFilter from "./PaymentStatusFilter";
+import { useReservationUnitTypes } from "../filters/ReservationUnitTypeFilter";
+import { useUnitFilterOptions } from "../filters/UnitFilter";
+import { useReservationUnitOptions } from "../filters/ReservationUnitFilter";
 import { AutoGrid } from "@/styles/layout";
-
-export type FilterArguments = {
-  reservationUnitType: Array<{ label: string; value: number }>;
-  unit: Array<{ label: string; value: number }>;
-  reservationUnit: Array<{ label: string; value: number }>;
-  reservationState: OptionType[];
-  paymentStatuses: OptionType[];
-  textSearch: string;
-  begin: string;
-  end: string;
-  minPrice: string;
-  maxPrice: string;
-};
-
-const multivaluedFields = [
-  "unit",
-  "reservationUnit",
-  "reservationUnitType",
-  "reservationUnitStates",
-  "reservationState",
-  "paymentStatuses",
-];
-
-type Props = {
-  onSearch: (args: FilterArguments) => void;
-  initialFiltering?: Partial<FilterArguments>;
-};
+import {
+  MultiSelectFilter,
+  RangeNumberFilter,
+  SearchFilter,
+} from "../QueryParamFilters";
+import { useSearchParams } from "react-router-dom";
+import { SearchTags } from "../SearchTags";
+import { OrderStatus, State } from "@gql/gql-types";
+import { fromUIDate, isValidDate } from "common/src/common/util";
 
 const Wrapper = styled.div`
   display: flex;
@@ -52,121 +29,123 @@ const MoreWrapper = styled(ShowAllContainer)`
   }
 `;
 
-export const emptyState: FilterArguments = {
-  reservationUnitType: [],
-  unit: [],
-  reservationUnit: [],
-  paymentStatuses: [],
-  reservationState: [],
-  textSearch: "",
-  begin: "",
-  end: "",
-  minPrice: "",
-  maxPrice: "",
-};
-
-const MyTextInput = ({
-  id,
-  value,
-  dispatch,
-}: {
-  id: keyof FilterArguments;
-  value: string;
-  dispatch: React.Dispatch<Action<FilterArguments>>;
-}) => (
-  <TextInput
-    id={id}
-    label={i18next.t("ReservationsSearch.textSearch")}
-    onChange={(e) => {
-      if (e.target.value.length > 0) {
-        dispatch({
-          type: "set",
-          value: { [id]: e.target.value },
-        });
-      } else {
-        dispatch({
-          type: "deleteTag",
-          field: id,
-        });
-      }
-    }}
-    value={value || ""}
-    placeholder={i18next.t("ReservationsSearch.textSearchPlaceholder")}
-  />
-);
-
-function Filters({ onSearch, initialFiltering }: Props): JSX.Element {
+function DateInputFilter({ name }: { name: string }) {
   const { t } = useTranslation();
-  const initialEmptyState = { ...emptyState, ...initialFiltering };
+  const [searchParams, setParams] = useSearchParams();
 
-  const [state, dispatch] = useReducer(
-    getReducer<FilterArguments>(initialEmptyState),
-    initialEmptyState
+  const filter = searchParams.get(name);
+
+  const handleChange = (val: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (val.length > 0) {
+      params.set(name, val);
+      setParams(params, { replace: true });
+    } else {
+      setParams(params, { replace: true });
+    }
+  };
+
+  const label = t(`filters.label.${name}`);
+  // TODO make the translation empty. no placeholder on purpose
+  const placeholder = t(`filters.placeholder.${name}`);
+  return (
+    <DateInput
+      language="fi"
+      // TODO ids should be unique and the name nor the tr key is not
+      id={name}
+      label={label}
+      placeholder={placeholder}
+      disableConfirmation
+      onChange={(val: string) => handleChange(val)}
+      value={filter ?? ""}
+    />
   );
+}
 
-  useEffect(() => {
-    onSearch(state);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state]);
+export function Filters({
+  defaultFilters = [],
+}: {
+  defaultFilters?: Array<{ key: string; value: string | string[] }>;
+}): JSX.Element {
+  const { t } = useTranslation();
 
-  const tags = toTags(
-    state,
-    t,
-    multivaluedFields,
-    ["textSearch"],
-    "ReservationsSearch"
-  );
+  const { options: reservationUnitTypeOptions } = useReservationUnitTypes();
+  // TODO is there some states that should not be available in the filters?
+  const stateOptions = Object.values(State).map((s) => ({
+    value: s,
+    label: t(`RequestedReservation.state.${s}`),
+  }));
+  // TODO is there some states that should not be available in the filters?
+  const paymentStatusOptions = Object.values(OrderStatus).map((s) => ({
+    value: s,
+    label: t(`Payment.status.${s}`),
+  }));
+
+  const { options: unitOptions } = useUnitFilterOptions();
+  const { options: reservationUnitOptions } = useReservationUnitOptions();
+
+  // TODO unkown parameters should be null right? not empty string? or does it matter
+  function translateTag(tag: string, val: string): string {
+    switch (tag) {
+      case "reservationUnitType":
+        return (
+          reservationUnitTypeOptions.find((x) => x.value === Number(val))
+            ?.label ?? ""
+        );
+      case "state":
+        return stateOptions.find((x) => x.value === val)?.label ?? "";
+      case "paymentStatus":
+        return paymentStatusOptions.find((x) => x.value === val)?.label ?? "";
+      case "reservationUnit":
+        return (
+          reservationUnitOptions.find((x) => x.value === Number(val))?.label ??
+          ""
+        );
+      case "unit":
+        return unitOptions.find((x) => x.value === Number(val))?.label ?? "";
+      case "minPrice":
+        return `${t("filters.label.minPrice")} ${val} €`;
+      case "maxPrice":
+        return `${t("filters.label.maxPrice")} ${val} €`;
+      case "begin": {
+        const d = fromUIDate(val);
+        if (d == null || !isValidDate(d)) {
+          return "";
+        }
+        return `${t("filters.label.begin")} ${val}`;
+      }
+      case "end": {
+        const d = fromUIDate(val);
+        if (d == null || !isValidDate(d)) {
+          return "";
+        }
+        return `${t("filters.label.end")} ${val}`;
+      }
+      default:
+        return val;
+    }
+  }
 
   return (
     <Wrapper>
       <AutoGrid>
-        <ReservationUnitTypeFilter
-          onChange={(reservationUnitType) =>
-            dispatch({ type: "set", value: { reservationUnitType } })
-          }
-          value={state.reservationUnitType}
+        <MultiSelectFilter
+          options={reservationUnitTypeOptions}
+          name="reservationUnitType"
         />
-        <ReservationStateFilter
-          onChange={(reservationState) =>
-            dispatch({ type: "set", value: { reservationState } })
-          }
-          value={state.reservationState}
+        <MultiSelectFilter options={stateOptions} name="state" />
+        <MultiSelectFilter options={unitOptions} name="unit" />
+        <SearchFilter name="search" labelKey="searchReservation" />
+        <MultiSelectFilter
+          options={paymentStatusOptions}
+          name="paymentStatus"
         />
-        <UnitFilter
-          onChange={(unit) => dispatch({ type: "set", value: { unit } })}
-          value={state.unit}
+        <MultiSelectFilter
+          options={reservationUnitOptions}
+          name="reservationUnit"
         />
-        <MyTextInput
-          id="textSearch"
-          dispatch={dispatch}
-          value={state.textSearch || ""}
-        />
-        <PaymentStatusFilter
-          onChange={(paymentStatuses) =>
-            dispatch({ type: "set", value: { paymentStatuses } })
-          }
-          value={state.paymentStatuses || []}
-        />
-        <ReservationUnitFilter
-          onChange={(reservationUnit) =>
-            dispatch({ type: "set", value: { reservationUnit } })
-          }
-          value={state.reservationUnit}
-        />
-        <DateInput
-          language="fi"
-          id="begin"
-          label={t("ReservationsSearch.begin")}
-          onChange={(begin) => dispatch({ type: "set", value: { begin } })}
-          value={state.begin}
-        />
-        <DateInput
-          id="end"
-          language="fi"
-          label={t("ReservationsSearch.end")}
-          onChange={(end) => dispatch({ type: "set", value: { end } })}
-          value={state.end}
-        />
+        <DateInputFilter name="begin" />
+        <DateInputFilter name="end" />
       </AutoGrid>
       <MoreWrapper
         showAllLabel={t("ReservationUnitsSearch.moreFilters")}
@@ -174,49 +153,14 @@ function Filters({ onSearch, initialFiltering }: Props): JSX.Element {
         maximumNumber={0}
       >
         <AutoGrid>
-          <NumberInput
-            type="number"
-            value={
-              state.minPrice === "" ? state.minPrice : Number(state.minPrice)
-            }
-            min={0}
-            minusStepButtonAriaLabel={t("common:subtract")}
-            plusStepButtonAriaLabel={t("common:add")}
-            step={1}
-            id="minPrice"
-            label={t("ReservationsSearch.minPrice")}
-            onChange={(e) =>
-              dispatch({
-                type: "set",
-                value: { minPrice: e.target.value },
-              })
-            }
-          />
-          <NumberInput
-            type="number"
-            value={
-              state.maxPrice === "" ? state.maxPrice : Number(state.maxPrice)
-            }
-            min={0}
-            minusStepButtonAriaLabel={t("common:subtract")}
-            plusStepButtonAriaLabel={t("common:add")}
-            step={1}
-            id="maxPrice"
-            label={t("ReservationsSearch.maxPrice")}
-            onChange={(e) => {
-              dispatch({
-                type: "set",
-                value: {
-                  maxPrice: e.target.value,
-                },
-              });
-            }}
+          <RangeNumberFilter
+            label={t("filters.label.price")}
+            minName="minPrice"
+            maxName="maxPrice"
           />
         </AutoGrid>
       </MoreWrapper>
-      <Tags tags={tags} t={t} dispatch={dispatch} />
+      <SearchTags translateTag={translateTag} defaultTags={defaultFilters} />
     </Wrapper>
   );
 }
-
-export default Filters;

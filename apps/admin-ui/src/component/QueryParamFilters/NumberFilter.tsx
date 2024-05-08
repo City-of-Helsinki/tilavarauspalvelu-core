@@ -25,8 +25,7 @@ export function NumberFilter({ name }: { name: string }) {
       label=" "
       onChange={handleOnChange}
       value={value || ""}
-      // TODO change the key (same as the other filters)
-      placeholder={t(`ReservationUnitsSearch.${name}PlaceHolder`)}
+      placeholder={t(`filters.placeholder.${name}`)}
       errorText={
         value !== "" && Number.isNaN(Number(value))
           ? t("ReservationUnitsSearch.notANumber")

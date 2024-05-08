@@ -1,19 +1,34 @@
-import { debounce } from "lodash";
-import React, { useState } from "react";
+import React, { useEffect, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
+import { toUIDate } from "common/src/common/util";
 import { useTranslation } from "react-i18next";
 import { H1 } from "common/src/common/typography";
-import Filters, { type FilterArguments, emptyState } from "./Filters";
 import { ReservationsDataLoader } from "./ReservationsDataLoader";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import { HR } from "@/component/Table";
 import { Container } from "@/styles/layout";
-import { toUIDate } from "common/src/common/util";
+import { Filters } from "./Filters";
 
 function AllReservations(): JSX.Element {
-  const [filters, setFilters] = useState<FilterArguments>(emptyState);
-  const debouncedSearch = debounce((value) => setFilters(value), 300);
-
   const { t } = useTranslation();
+
+  const [params, setParams] = useSearchParams();
+  useEffect(() => {
+    if (params.size === 0) {
+      const p = new URLSearchParams(params);
+      p.set("begin", toUIDate(today));
+      setParams(p);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only on page load
+  }, []);
+
+  const today = useMemo(() => new Date(), []);
+  const defaultFilters = [
+    {
+      key: "begin",
+      value: toUIDate(today),
+    },
+  ];
 
   return (
     <>
@@ -23,14 +38,9 @@ function AllReservations(): JSX.Element {
           <H1 $legacy>{t("Reservations.allReservationListHeading")}</H1>
           <p>{t("Reservations.allReservationListDescription")}</p>
         </div>
-        <Filters
-          onSearch={debouncedSearch}
-          initialFiltering={{
-            begin: toUIDate(new Date()) ?? "",
-          }}
-        />
+        <Filters defaultFilters={defaultFilters} />
         <HR />
-        <ReservationsDataLoader defaultFiltering={{}} filters={filters} />
+        <ReservationsDataLoader />
       </Container>
     </>
   );

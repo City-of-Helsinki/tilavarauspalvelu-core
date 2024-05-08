@@ -1,11 +1,9 @@
-import React from "react";
 import { gql } from "@apollo/client";
-import { useTranslation } from "react-i18next";
 import { useUnitsFilterQuery } from "@gql/gql-types";
-import { SortedSelect } from "@/component/SortedSelect";
 import { filterNonNullable } from "common/src/helpers";
 
 // exporting so it doesn't get removed
+// TODO combine with other options queries so we only make a single request for all of them
 export const UNITS_QUERY = gql`
   query UnitsFilter($offset: Int, $first: Int) {
     units(onlyWithPermission: true, offset: $offset, first: $first) {
@@ -21,15 +19,6 @@ export const UNITS_QUERY = gql`
   }
 `;
 
-type OptionType = {
-  label: string;
-  value: number;
-};
-type Props = {
-  onChange: (units: OptionType[]) => void;
-  value: OptionType[];
-};
-
 export function useUnitFilterOptions() {
   const query = useUnitsFilterQuery();
 
@@ -41,24 +30,4 @@ export function useUnitFilterOptions() {
   }));
 
   return { options, ...query };
-}
-
-export function UnitFilter({ onChange, value }: Props): JSX.Element {
-  const { t } = useTranslation();
-
-  const { options, loading } = useUnitFilterOptions();
-
-  return (
-    <SortedSelect
-      disabled={loading}
-      sort
-      label={t("ReservationUnitsSearch.unitLabel")}
-      multiselect
-      placeholder={t("ReservationUnitsSearch.unitPlaceHolder")}
-      options={options}
-      value={value}
-      onChange={onChange}
-      id="reservation-unit-combobox"
-    />
-  );
 }

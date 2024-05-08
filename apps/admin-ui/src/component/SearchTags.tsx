@@ -4,14 +4,19 @@ import { useTranslation } from "react-i18next";
 import { FilterTags, StyledTag, ResetButton } from "common/src/tags";
 
 /// Creates tags from the search params (uses react-router-dom)
-/// TODO allow passing keys here that are not supposed to be shown / reset
+/// @param translateTag callback to format the tag
+/// @param hide list of search param keys that are not shown as tags
+/// @param defaultTags default optios to set when user clicks clear tags
 /// TODO create a wrapper that allows us switching the router (next / react-router)
+/// TODO translateTag should be string | null (to make non printed values explicit, though we will remove "" also)
 export function SearchTags({
   translateTag,
   hide = [],
+  defaultTags = [],
 }: {
   translateTag: (key: string, val: string) => string;
   hide?: string[];
+  defaultTags?: Array<{ key: string; value: string | string[] }>;
 }): JSX.Element {
   const { t } = useTranslation();
   const [params, setParams] = useSearchParams();
@@ -27,13 +32,27 @@ export function SearchTags({
       (acc, s) => (params.get(s) ? { ...acc, [s]: params.get(s) } : acc),
       new URLSearchParams()
     );
+    // TODO defaultTags and hide should never overlap
+    for (const d of defaultTags) {
+      if (Array.isArray(d.value)) {
+        for (const v of d.value) {
+          newParams.append(d.key, v);
+        }
+      } else {
+        newParams.set(d.key, d.value);
+      }
+    }
     setParams(newParams);
   };
 
-  const tags: { key: string; value: string }[] = [];
-  params.forEach((value, key) =>
-    !hide.includes(key) ? tags.push({ key, value }) : null
-  );
+  const tags: { key: string; value: string; tr: string }[] = [];
+  for (const [key, value] of params) {
+    if (hide.includes(key) || value === "") {
+      continue;
+    }
+    const tr = translateTag(key, value);
+    tags.push({ key, value, tr });
+  }
 
   return (
     <FilterTags
@@ -47,7 +66,7 @@ export function SearchTags({
           onDelete={() => handleDelete(tag)}
           key={`${tag.key}-${tag.value}`}
         >
-          {translateTag(tag.key, tag.value)}
+          {tag.tr}
         </StyledTag>
       ))}
       {tags.length > 0 && (

@@ -1,70 +1,104 @@
 import React, { useState } from "react";
 import { type ApolloError } from "@apollo/client";
-import { values } from "lodash";
 import {
   type QueryReservationsArgs,
   ReservationOrderingChoices,
   useReservationsQuery,
+  OrderStatus,
+  State,
 } from "@gql/gql-types";
 import { More } from "@/component/More";
 import { LIST_PAGE_SIZE } from "@/common/const";
 import { useNotification } from "@/context/NotificationContext";
 import Loader from "../Loader";
-import { FilterArguments } from "./Filters";
 import { ReservationsTable } from "./ReservationsTable";
 import { fromUIDate, toApiDate } from "common/src/common/util";
-import { filterNonNullable } from "common/src/helpers";
+import { filterNonNullable, toNumber } from "common/src/helpers";
+import { useSearchParams } from "react-router-dom";
 
-type Props = {
-  filters: FilterArguments;
-  defaultFiltering: QueryReservationsArgs;
-};
+function transformPaymentStatusSafe(t: string): OrderStatus | null {
+  switch (t) {
+    case OrderStatus.Paid:
+      return OrderStatus.Paid;
+    case OrderStatus.PaidManually:
+      return OrderStatus.PaidManually;
+    case OrderStatus.Draft:
+      return OrderStatus.Draft;
+    case OrderStatus.Expired:
+      return OrderStatus.Expired;
+    case OrderStatus.Refunded:
+      return OrderStatus.Refunded;
+    case OrderStatus.Cancelled:
+      return OrderStatus.Cancelled;
+    default:
+      return null;
+  }
+}
 
-function mapFilterParams(
-  params: FilterArguments,
-  defaultParams: QueryReservationsArgs
-): QueryReservationsArgs {
-  const emptySearch =
-    values(params).filter((v) => !(v === "" || v.length === 0)).length === 0;
+function transformStateSafe(t: string): State | null {
+  switch (t) {
+    case State.Cancelled:
+      return State.Cancelled;
+    case State.Denied:
+      return State.Denied;
+    case State.Created:
+      return State.Created;
+    case State.Confirmed:
+      return State.Confirmed;
+    case State.RequiresHandling:
+      return State.RequiresHandling;
+    case State.WaitingForPayment:
+      return State.WaitingForPayment;
+    default:
+      return null;
+  }
+}
 
-  // only use defaults if search is "empty"
-  const defaults = emptySearch ? defaultParams : {};
+function mapFilterParams(searchParams: URLSearchParams): QueryReservationsArgs {
+  const reservationUnitTypes = searchParams
+    .getAll("reservationUnitType")
+    .map(Number)
+    .filter(Number.isInteger);
 
-  const states = filterNonNullable(
-    params.reservationState.map((ru) => ru.value?.toString())
+  const unit = searchParams.getAll("unit").map(Number).filter(Number.isInteger);
+  const paymentStatus = filterNonNullable(
+    searchParams.getAll("paymentStatus").map(transformPaymentStatusSafe)
   );
-  const state = states.length > 0 ? states : defaults.state;
+  const reservationUnit = searchParams
+    .getAll("reservationUnit")
+    .map(Number)
+    .filter(Number.isInteger);
+  const reservationState = filterNonNullable(
+    searchParams.getAll("reservationState").map(transformStateSafe)
+  );
+  const textSearch = searchParams.get("search");
 
-  const begin = fromUIDate(params.begin);
-  const end = fromUIDate(params.end);
-  const beginDate = begin ? toApiDate(begin) : defaults.beginDate;
-  const endDate = end ? toApiDate(end) : defaults.endDate;
+  const uiBegin = searchParams.get("begin");
+  const uiEnd = searchParams.get("end");
+
+  const minPrice = searchParams.get("minPrice");
+  const maxPrice = searchParams.get("maxPrice");
+
+  const begin = uiBegin ? fromUIDate(uiBegin) : undefined;
+  const end = uiEnd ? fromUIDate(uiEnd) : undefined;
+  const beginDate = begin ? toApiDate(begin) : undefined;
+  const endDate = end ? toApiDate(end) : undefined;
 
   return {
-    unit: filterNonNullable(params.unit?.map((u) => u.value?.toString())),
-    reservationUnitType: filterNonNullable(
-      params.reservationUnitType?.map((u) => u.value?.toString())
-    ),
-    reservationUnit: filterNonNullable(
-      params.reservationUnit?.map((ru) => ru.value?.toString())
-    ),
-    state,
-    textSearch: params.textSearch || undefined,
+    unit: unit.map((u) => u.toString()),
+    reservationUnitType: reservationUnitTypes.map((u) => u.toString()),
+    reservationUnit: reservationUnit.map((ru) => ru.toString()),
+    orderStatus: paymentStatus.map((status) => status.toString()),
+    state: reservationState.map((status) => status.toString()),
+    textSearch,
     beginDate,
     endDate,
-    priceGte: params.minPrice !== "" ? params.minPrice : undefined,
-    priceLte: params.maxPrice !== "" ? params.maxPrice : undefined,
-    orderStatus: filterNonNullable(
-      params.paymentStatuses?.map((status) => status.value?.toString())
-    ),
+    priceGte: minPrice ? toNumber(minPrice)?.toString() : undefined,
+    priceLte: maxPrice ? toNumber(maxPrice)?.toString() : undefined,
   };
 }
 
-export function ReservationsDataLoader({
-  filters,
-  defaultFiltering,
-}: Props): JSX.Element {
-  const { notifyError } = useNotification();
+export function ReservationsDataLoader(): JSX.Element {
   const [sort, setSort] = useState<string>("-state");
   const onSortChanged = (sortField: string) => {
     if (sort === sortField) {
@@ -74,7 +108,11 @@ export function ReservationsDataLoader({
     }
   };
 
+  const { notifyError } = useNotification();
+
+  // TODO the sort string should be in the url
   const orderBy = transformSortString(sort);
+  const [searchParams] = useSearchParams();
   const { fetchMore, loading, data, previousData } = useReservationsQuery({
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
@@ -82,19 +120,19 @@ export function ReservationsDataLoader({
     variables: {
       orderBy,
       first: LIST_PAGE_SIZE,
-      ...mapFilterParams(filters, defaultFiltering),
+      ...mapFilterParams(searchParams),
     },
     onError: (err: ApolloError) => {
       notifyError(err.message);
     },
   });
 
-  const totalCount = data?.reservations?.totalCount;
-
   const currData = data ?? previousData;
+
   const reservations = filterNonNullable(
     currData?.reservations?.edges.map((edge) => edge?.node)
   );
+  const totalCount = currData?.reservations?.totalCount;
 
   if (loading && reservations.length === 0) {
     return <Loader />;
