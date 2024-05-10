@@ -7,7 +7,8 @@ from actions.recurring_reservation import ReservationDetails
 from applications.choices import ApplicantTypeChoice, Weekday
 from applications.models import AllocatedTimeSlot
 from common.utils import translate_for_user
-from opening_hours.utils.hauki_resource_hash_updater import HaukiResourceHashUpdater
+from opening_hours.utils.reservable_time_span_client import ReservableTimeSpanClient
+from opening_hours.utils.time_span_element import TimeSpanElement
 from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import RecurringReservation
 from tilavarauspalvelu.celery import app
@@ -24,11 +25,21 @@ def generate_reservation_series_from_allocations(application_round_id: int) -> N
         "reservation_unit_option__application_section__application__application_round",
     )
 
-    # Update the reservable times for all reservation units where allocations were made
-    origin_ids: set[int] = {
-        allocation.reservation_unit_option.reservation_unit.origin_hauki_resource.id for allocation in allocations
-    }
-    HaukiResourceHashUpdater(list(origin_ids)).run()
+    # Find all closed opening hours for all reservation units where allocations were made.
+    # Check against these and not fully normalized opening hours since allocations can be made
+    # outside opening hours (as this system defines them), but should not be on explicitly
+    # closed hours, like holidays.
+    closed_time_spans: dict[int, list[TimeSpanElement]] = {}
+    for allocation in allocations:
+        resource = allocation.reservation_unit_option.reservation_unit.origin_hauki_resource
+        if resource is None or resource.id in closed_time_spans:
+            continue
+
+        application_round = allocation.reservation_unit_option.application_section.application.application_round
+        closed_time_spans[resource.id] = ReservableTimeSpanClient(resource).get_closed_time_spans(
+            start_date=application_round.reservation_period_begin,
+            end_date=application_round.reservation_period_end,
+        )
 
     recurring_reservations: list[RecurringReservation] = [
         RecurringReservation(
@@ -54,10 +65,10 @@ def generate_reservation_series_from_allocations(application_round_id: int) -> N
     with transaction.atomic():
         recurring_reservations = RecurringReservation.objects.bulk_create(recurring_reservations)
         for recurring_reservation in recurring_reservations:
+            resource = recurring_reservation.reservation_unit.origin_hauki_resource
             slots = recurring_reservation.actions.pre_calculate_slots(
-                check_opening_hours=True,
                 check_start_interval=True,
-                check_buffers=False,
+                closed_hours=closed_time_spans.get(resource.id),
             )
 
             allocated_time_slot = recurring_reservation.allocated_time_slot

@@ -65,6 +65,14 @@ class ReservableTimeSpanClient:
 
         return created_reservable_time_spans
 
+    def get_closed_time_spans(self, start_date: datetime.date, end_date: datetime.date) -> list[TimeSpanElement]:
+        """Get closed time spans for the resource."""
+        self.start_date = start_date
+        self.end_date = end_date
+        opening_hours_response = self._get_opening_hours_from_hauki_api()
+        parsed_time_spans = self._parse_opening_hours(opening_hours_response)
+        return self._merge_overlapping_closed_time_spans(parsed_time_spans)
+
     def _init_date_range(self):
         today = local_date()
         if self.origin_hauki_resource.latest_fetched_date:
@@ -156,6 +164,14 @@ class ReservableTimeSpanClient:
         ]
 
         return ReservableTimeSpan.objects.bulk_create(reservable_time_spans)
+
+    def _merge_overlapping_closed_time_spans(self, parsed_time_spans: list[TimeSpanElement]) -> list[TimeSpanElement]:
+        closed_time_spans: list[TimeSpanElement] = [
+            timespan
+            for timespan in sorted(parsed_time_spans, key=lambda x: x.start_datetime)
+            if not timespan.is_reservable
+        ]
+        return merge_overlapping_time_span_elements(closed_time_spans)
 
 
 def merge_overlapping_time_span_elements(time_span_elements: list[TimeSpanElement]) -> list[TimeSpanElement]:

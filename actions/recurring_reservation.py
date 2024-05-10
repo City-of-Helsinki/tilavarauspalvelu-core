@@ -116,14 +116,16 @@ class RecurringReservationActions:
         check_buffers: bool = False,
         check_start_interval: bool = False,
         skip_dates: Collection[datetime.date] = (),
+        closed_hours: Collection[TimeSpanElement] = (),
     ) -> ReservationSeriesCalculationResults:
         """
-        Pre-calculate slots in the recurring reservation.
+        Pre-calculate slots for reservations for the recurring reservation.
 
         :param check_opening_hours: Whether to check if the reservation falls within reservable times.
         :param check_buffers: Whether to check if the reservation overlaps with other reservations' buffers.
         :param check_start_interval: Whether to check if the reservation starts at the correct interval.
         :param skip_dates: Dates to skip when calculating slots.
+        :param closed_hours: Explicitly closed opening hours for the resource.
         """
         pk = self.recurring_reservation.reservation_unit.pk
         closed, blocked = Reservation.objects.get_affecting_reservations_as_closed_time_spans(
@@ -184,7 +186,7 @@ class RecurringReservationActions:
                 # 1) Unbuffered reservation timespan overlapping with any buffered closed timespan
                 # 2) Unbuffered closed timespan overlapping with any buffered reservation timespan
                 # 3) Unbuffered reservation timespan overlapping with any unbuffered blocked timespan
-                # Note that reservation timespans buffers are only checks if `check_buffers=True`.
+                # Note that reservation timespans buffers are only checked if `check_buffers=True`.
                 if (
                     any(reservation_timespan.overlaps_with(closed) for closed in closed_timespans)
                     or any(closed.overlaps_with(reservation_timespan) for closed in closed_timespans)
@@ -197,6 +199,13 @@ class RecurringReservationActions:
                 # Ignore buffers for the reservation, since those can be outside reservable times.
                 if check_opening_hours and not any(
                     reservation_timespan.fully_inside_of(reservable) for reservable in reservable_timespans
+                ):
+                    results.not_reservable.append(ReservationPeriod(begin=begin, end=end))
+                    continue
+
+                # Would the reservation overlap with any explicitly closed opening hours for the resource?
+                if closed_hours and any(
+                    reservation_timespan.overlaps_with(closed_time_span) for closed_time_span in closed_hours
                 ):
                     results.not_reservable.append(ReservationPeriod(begin=begin, end=end))
                     continue

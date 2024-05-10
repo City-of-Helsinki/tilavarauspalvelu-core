@@ -32,15 +32,14 @@ class AllocatedTimeSlotFactory(GenericDjangoModelFactory[AllocatedTimeSlot]):
         start_time: datetime.time | None = None,
         end_time: datetime.time | None = None,
         applicant_type: ApplicantTypeChoice = ApplicantTypeChoice.INDIVIDUAL,
-        no_opening_hours: bool = False,
     ) -> AllocatedTimeSlot:
         from .application_round import ApplicationRoundFactory
-        from .opening_hours import OriginHaukiResourceFactory, ReservableTimeSpanFactory
+        from .opening_hours import OriginHaukiResourceFactory
         from .reservation_unit import ReservationUnitFactory
         from .space import SpaceFactory
 
         space = SpaceFactory.create()
-        resource = OriginHaukiResourceFactory.create(id="987")
+        resource = OriginHaukiResourceFactory.create(id="987", opening_hours_hash="foo")
 
         reservation_unit = ReservationUnitFactory.create(
             origin_hauki_resource=resource,
@@ -49,13 +48,6 @@ class AllocatedTimeSlotFactory(GenericDjangoModelFactory[AllocatedTimeSlot]):
         )
 
         start_of_today = local_start_of_day()
-
-        if not no_opening_hours:
-            ReservableTimeSpanFactory.create(
-                resource=resource,
-                start_datetime=start_of_today,
-                end_datetime=start_of_today + datetime.timedelta(days=365),
-            )
 
         application_round = ApplicationRoundFactory.create_in_status_handled(
             reservation_units=[reservation_unit],
