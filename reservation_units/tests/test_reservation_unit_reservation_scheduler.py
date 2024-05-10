@@ -75,7 +75,7 @@ def test__reservation_unit_reservation_scheduler__get_reservation_unit_possible_
         interval_minutes=90,
     )
 
-    assert possible_start_times == {
+    expected = {
         _get_dt(month=1, day=1, hour=10, minute=0),
         _get_dt(month=1, day=1, hour=11, minute=30),
         _get_dt(month=1, day=1, hour=13, minute=0),
@@ -86,3 +86,6 @@ def test__reservation_unit_reservation_scheduler__get_reservation_unit_possible_
         _get_dt(month=1, day=1, hour=20, minute=30),
         _get_dt(month=1, day=1, hour=20, minute=30),
     }
+
+    # All possible start times are in the expected set
+    assert possible_start_times - expected == set()

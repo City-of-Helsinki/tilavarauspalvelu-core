@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any
 
 from django.db import models
 
-from common.date_utils import DEFAULT_TIMEZONE, local_start_of_day, time_as_timedelta
+from common.date_utils import DEFAULT_TIMEZONE, time_as_timedelta
 from opening_hours.errors import HaukiAPIError
 from opening_hours.models import OriginHaukiResource, ReservableTimeSpan
 from opening_hours.utils.hauki_api_client import HaukiAPIClient
@@ -250,6 +250,9 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         return ReservationUnit.objects.filter(pk=self.reservation_unit.pk).reservation_units_with_common_hierarchy()
 
     def get_possible_start_times(self, from_date: datetime.date, interval_minutes: int) -> set[datetime.datetime]:
+        if self.reservation_unit.origin_hauki_resource is None:
+            return set()
+
         reservable_time_spans: Iterable[ReservableTimeSpan] = (
             self.reservation_unit.origin_hauki_resource.reservable_time_spans.filter(
                 start_datetime__date__lte=from_date,
@@ -257,19 +260,33 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
             )
         )
 
-        possible_start_times = set()
-        start_time = local_start_of_day(from_date)
+        possible_start_times: set[datetime.datetime] = set()
         interval_timedelta = datetime.timedelta(minutes=interval_minutes)
 
         for time_span in reservable_time_spans:
-            # If the time span starts on the previous day, start from the beginning of selected date instead.
-            # Also handles cases where the time spans have a break smaller than the interval.
-            start_time = max(time_span.start_datetime, start_time).astimezone(DEFAULT_TIMEZONE)
+            start_datetime = time_span.start_datetime.astimezone(DEFAULT_TIMEZONE)
+            end_datetime = time_span.end_datetime.astimezone(DEFAULT_TIMEZONE)
 
-            # Get all possible start times by looping through the time span until the time span or day ends
-            while start_time < time_span.end_datetime and start_time.date() == from_date:
-                possible_start_times.add(start_time)
-                start_time += interval_timedelta
+            while start_datetime < end_datetime:
+                # If "start date" is before "from date", set "start date" to the start of "from date"
+                if start_datetime.date() < from_date:
+                    start_datetime = start_datetime.replace(
+                        year=from_date.year,
+                        month=from_date.month,
+                        day=from_date.day,
+                        hour=0,
+                        minute=0,
+                        second=0,
+                        microsecond=0,
+                    )
+                    continue
+
+                # If the remaining time is less than the interval, don't include it
+                if end_datetime - start_datetime < interval_timedelta:
+                    break
+
+                possible_start_times.add(start_datetime)
+                start_datetime += interval_timedelta
 
         return possible_start_times
 
