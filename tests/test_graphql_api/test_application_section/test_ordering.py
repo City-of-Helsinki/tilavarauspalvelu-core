@@ -376,3 +376,67 @@ def test_application_section__order__by_preferred_unit_name__desc(graphql, lang)
     assert response.node(1) == {"pk": section_4.pk}
     assert response.node(2) == {"pk": section_1.pk}
     assert response.node(3) == {"pk": section_2.pk}
+
+
+def test_application_section__order__by_has_allocations__asc(graphql):
+    section_1 = ApplicationSectionFactory.create_in_status_unallocated()
+    section_2 = ApplicationSectionFactory.create_in_status_handled()
+
+    assert section_1.allocations == 0
+    assert section_2.allocations == 1
+
+    graphql.login_with_superuser()
+    query = sections_query(order_by="hasAllocationsAsc")
+    response = graphql(query)
+
+    assert len(response.edges) == 2, response
+    assert response.node(0) == {"pk": section_1.pk}
+    assert response.node(1) == {"pk": section_2.pk}
+
+
+def test_application_section__order__by_has_allocations__desc(graphql):
+    section_1 = ApplicationSectionFactory.create_in_status_unallocated()
+    section_2 = ApplicationSectionFactory.create_in_status_handled()
+
+    assert section_1.allocations == 0
+    assert section_2.allocations == 1
+
+    graphql.login_with_superuser()
+    query = sections_query(order_by="hasAllocationsDesc")
+    response = graphql(query)
+
+    assert len(response.edges) == 2, response
+    assert response.node(0) == {"pk": section_2.pk}
+    assert response.node(1) == {"pk": section_1.pk}
+
+
+def test_application_section__order__by_allocations__asc(graphql):
+    section_1 = ApplicationSectionFactory.create_in_status_unallocated()
+    section_2 = ApplicationSectionFactory.create_in_status_handled()
+
+    assert section_1.allocations == 0
+    assert section_2.allocations == 1
+
+    graphql.login_with_superuser()
+    query = sections_query(order_by="allocationsAsc")
+    response = graphql(query)
+
+    assert len(response.edges) == 2, response
+    assert response.node(0) == {"pk": section_1.pk}
+    assert response.node(1) == {"pk": section_2.pk}
+
+
+def test_application_section__order__by_allocations__desc(graphql):
+    section_1 = ApplicationSectionFactory.create_in_status_unallocated()
+    section_2 = ApplicationSectionFactory.create_in_status_handled()
+
+    assert section_1.allocations == 0
+    assert section_2.allocations == 1
+
+    graphql.login_with_superuser()
+    query = sections_query(order_by="allocationsDesc")
+    response = graphql(query)
+
+    assert len(response.edges) == 2, response
+    assert response.node(0) == {"pk": section_2.pk}
+    assert response.node(1) == {"pk": section_1.pk}

@@ -1172,3 +1172,33 @@ def test_application_section__filter__suitable_time_ranges__by_fulfilled(graphql
             {"pk": time_range_2.pk, "dayOfTheWeek": Weekday.TUESDAY.value},
         ],
     }
+
+
+def test_application_section__filter__by_has_allocations__true(graphql):
+    section_1 = ApplicationSectionFactory.create_in_status_unallocated()
+    section_2 = ApplicationSectionFactory.create_in_status_handled()
+
+    assert section_1.allocations == 0
+    assert section_2.allocations == 1
+
+    graphql.login_with_superuser()
+    query = sections_query(has_allocations=True)
+    response = graphql(query)
+
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": section_2.pk}
+
+
+def test_application_section__filter__by_has_allocations__false(graphql):
+    section_1 = ApplicationSectionFactory.create_in_status_unallocated()
+    section_2 = ApplicationSectionFactory.create_in_status_handled()
+
+    assert section_1.allocations == 0
+    assert section_2.allocations == 1
+
+    graphql.login_with_superuser()
+    query = sections_query(has_allocations=False)
+    response = graphql(query)
+
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": section_1.pk}

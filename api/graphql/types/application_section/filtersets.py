@@ -46,6 +46,8 @@ class ApplicationSectionFilterSet(ModelFilterSet):
 
     text_search = django_filters.CharFilter(method="filter_text_search")
 
+    has_allocations = django_filters.BooleanFilter(method="filter_has_allocations")
+
     class Meta:
         model = ApplicationSection
         combination_methods = [
@@ -61,6 +63,8 @@ class ApplicationSectionFilterSet(ModelFilterSet):
             "preferred_unit_name_fi",
             "preferred_unit_name_en",
             "preferred_unit_name_sv",
+            "has_allocations",
+            "allocations",
         ]
 
     @staticmethod
@@ -89,6 +93,11 @@ class ApplicationSectionFilterSet(ModelFilterSet):
         query = raw_prefixed_query(value)
         return qs.alias(applicant=L("application__applicant")).annotate(search=vector).filter(search=query)
 
+    def filter_has_allocations(self, queryset: ApplicationSectionQuerySet, name: str, value: bool) -> QuerySet:
+        if value:
+            return queryset.filter(L(allocations__gt=0))
+        return queryset.filter(L(allocations=0))
+
     @staticmethod
     def order_by_name(qs: ApplicationSectionQuerySet, desc: bool) -> QuerySet:
         return qs.alias(name_lower=Lower("name")).order_by(models.OrderBy(models.F("name_lower"), descending=desc))
@@ -116,3 +125,11 @@ class ApplicationSectionFilterSet(ModelFilterSet):
     @staticmethod
     def order_by_preferred_unit_name_sv(qs: ApplicationSectionQuerySet, desc: bool) -> QuerySet:
         return qs.order_by_preferred_unit_name(lang="sv", desc=desc)
+
+    @staticmethod
+    def order_by_has_allocations(qs: ApplicationSectionQuerySet, desc: bool) -> QuerySet:
+        return qs.order_by(models.OrderBy(L(allocations__gt=0), descending=desc))
+
+    @staticmethod
+    def order_by_allocations(qs: ApplicationSectionQuerySet, desc: bool) -> QuerySet:
+        return qs.order_by(models.OrderBy(L("allocations"), descending=desc))
