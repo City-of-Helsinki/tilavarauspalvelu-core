@@ -7,7 +7,7 @@ from graphql_relay import to_global_id
 from applications.choices import WeekdayChoice
 from common.date_utils import local_datetime, next_hour
 from reservation_units.enums import PricingType, ReservationUnitState
-from reservations.choices import ReservationStateChoice
+from reservations.choices import ReservationStateChoice, ReservationTypeChoice
 from terms_of_use.models import TermsOfUse
 from tests.factories import (
     ApplicationRoundFactory,
@@ -703,13 +703,25 @@ def test_reservation_unit__query__num_active_user_reservations(graphql):
     end = begin + datetime.timedelta(hours=1)
 
     # Correct user
-    ReservationFactory.create_for_reservation_unit(begin=begin, end=end, reservation_unit=reservation_unit, user=user)
+    ReservationFactory.create_for_reservation_unit(
+        begin=begin,
+        end=end,
+        reservation_unit=reservation_unit,
+        user=user,
+    )
     # Another user
     ReservationFactory.create_for_reservation_unit(
-        begin=begin, end=end, reservation_unit=reservation_unit, user=other_user
+        begin=begin,
+        end=end,
+        reservation_unit=reservation_unit,
+        user=other_user,
     )
     # Unauthenticated user
-    ReservationFactory.create_for_reservation_unit(begin=begin, end=end, reservation_unit=reservation_unit)
+    ReservationFactory.create_for_reservation_unit(
+        begin=begin,
+        end=end,
+        reservation_unit=reservation_unit,
+    )
     # Another reservation unit
     ReservationFactory.create(begin=begin, end=end)
     # Another reservation unit with correct user
@@ -723,7 +735,19 @@ def test_reservation_unit__query__num_active_user_reservations(graphql):
     )
     # Denied reservation
     ReservationFactory.create_for_reservation_unit(
-        begin=begin, end=end, reservation_unit=reservation_unit, user=user, state=ReservationStateChoice.DENIED
+        begin=begin,
+        end=end,
+        reservation_unit=reservation_unit,
+        user=user,
+        state=ReservationStateChoice.DENIED,
+    )
+    # Seasonal reservation
+    ReservationFactory.create_for_reservation_unit(
+        begin=begin,
+        end=end,
+        reservation_unit=reservation_unit,
+        user=user,
+        type=ReservationTypeChoice.SEASONAL,
     )
 
     query = reservation_units_query(fields="numActiveUserReservations", pk=reservation_unit.pk)

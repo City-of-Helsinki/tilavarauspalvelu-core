@@ -421,7 +421,7 @@ def test_reservation__create__not_logged_in(graphql):
     assert response.error_message() == "No permission to create."
 
 
-def test_reservation__create__under_max_reservations_per_user(graphql):
+def test_reservation__create__max_reservations_per_user__under(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(max_reservations_per_user=1)
 
     graphql.login_with_superuser()
@@ -433,7 +433,7 @@ def test_reservation__create__under_max_reservations_per_user(graphql):
     assert Reservation.objects.count() == 1
 
 
-def test_reservation__create__over_max_reservations_per_user(graphql):
+def test_reservation__create__max_reservations_per_user__over(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(max_reservations_per_user=1)
 
     begin = next_hour(plus_hours=1)
@@ -452,6 +452,33 @@ def test_reservation__create__over_max_reservations_per_user(graphql):
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.error_message() == "Maximum number of active reservations for this reservation unit exceeded."
+
+
+def test_reservation__create__max_reservations_per_user__seasonal_reservation(graphql):
+    reservation_unit = ReservationUnitFactory.create_reservable_now(max_reservations_per_user=1)
+
+    begin = next_hour(plus_hours=3)
+    end = begin + timedelta(hours=1)
+
+    # Seasonal reservations don't count towards the `max_reservations_per_user` limit
+    user = graphql.login_with_superuser()
+    ReservationFactory.create(
+        begin=begin,
+        end=end,
+        state=ReservationStateChoice.CONFIRMED,
+        reservation_unit=[reservation_unit],
+        user=user,
+        type=ReservationTypeChoice.SEASONAL,
+    )
+
+    data = get_create_data(reservation_unit)
+
+    assert Reservation.objects.count() == 1
+
+    response = graphql(CREATE_MUTATION, input_data=data)
+    assert response.has_errors is False, response.errors
+
+    assert Reservation.objects.count() == 2
 
 
 def test_reservation__create__max_reservations_per_user__past_reservations(graphql):

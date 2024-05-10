@@ -248,6 +248,7 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
         existing_reservations_count = (
             Reservation.objects.filter(user=user, reservation_unit=reservation_unit)
             .exclude(pk=getattr(self.instance, "pk", None))  # Safely handle both create and update cases
+            .exclude(type=ReservationTypeChoice.SEASONAL)
             .active()
             .count()
         )
