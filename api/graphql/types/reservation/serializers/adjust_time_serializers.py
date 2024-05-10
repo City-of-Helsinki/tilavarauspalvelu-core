@@ -8,7 +8,7 @@ from api.graphql.extensions.validation_errors import ValidationErrorCodes, Valid
 from api.graphql.types.reservation.serializers.mixins import ReservationPriceMixin, ReservationSchedulingMixin
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from reservation_units.models import ReservationUnit
-from reservations.choices import ReservationStateChoice
+from reservations.choices import ReservationStateChoice, ReservationTypeChoice
 from reservations.models import Reservation
 
 DEFAULT_TIMEZONE = get_default_timezone()
@@ -47,6 +47,12 @@ class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reservation
         if self.instance.state != ReservationStateChoice.CONFIRMED.value:
             raise ValidationErrorWithCode(
                 "Only reservations in confirmed state can be rescheduled.",
+                ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED,
+            )
+
+        if self.instance.type not in ReservationTypeChoice.allowed_for_user_time_adjust:
+            raise ValidationErrorWithCode(
+                "Only reservations of type 'normal' or 'behalf' can be rescheduled.",
                 ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED,
             )
 

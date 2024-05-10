@@ -142,7 +142,7 @@ def test_reservation__query__all_fields(graphql):
         "staffEvent": False,
         "state": reservation.state.upper(),
         "taxPercentageValue": f"{reservation.tax_percentage_value:.2f}",
-        "type": reservation.type,
+        "type": reservation.type.value.upper(),
         "unitPrice": f"{reservation.unit_price:.2f}",
         "user": {"email": reservation.user.email},
         "workingMemo": reservation.working_memo,

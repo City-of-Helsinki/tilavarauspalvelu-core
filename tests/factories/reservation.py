@@ -27,15 +27,8 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
     name = fuzzy.FuzzyText()
     description = fuzzy.FuzzyText()
     num_persons = None
-    state = fuzzy.FuzzyChoice(
-        choices=(
-            ReservationStateChoice.CREATED,
-            ReservationStateChoice.CANCELLED,
-            ReservationStateChoice.CONFIRMED,
-            ReservationStateChoice.DENIED,
-        )
-    )
-    type = None
+    state = ReservationStateChoice.CREATED
+    type = ReservationTypeChoice.NORMAL
     cancel_details = ""
     handling_details = ""
     working_memo = ""

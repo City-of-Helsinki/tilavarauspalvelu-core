@@ -49,6 +49,13 @@ class ReservationTypeChoice(models.TextChoices):
     SEASONAL = "seasonal", _("Seasonal")
 
     @classproperty
+    def allowed_for_user_time_adjust(cls) -> list[str]:
+        return [  # type: ignore[return-type]
+            ReservationTypeChoice.NORMAL.value,
+            ReservationTypeChoice.BEHALF.value,
+        ]
+
+    @classproperty
     def allowed_for_staff_create(cls) -> list[str]:
         return [  # type: ignore[return-type]
             ReservationTypeChoice.BLOCKED.value,
