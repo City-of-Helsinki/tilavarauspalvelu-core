@@ -18,6 +18,7 @@ class AllocatedTimeSlotNode(DjangoNode):
             "begin_time",
             "end_time",
             "reservation_unit_option",
+            "recurring_reservation",
         ]
         filterset_class = AllocatedTimeSlotFilterSet
         permission_classes = [AllocatedTimeSlotPermission]

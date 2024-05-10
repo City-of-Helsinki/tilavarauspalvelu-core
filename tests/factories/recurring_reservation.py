@@ -39,6 +39,7 @@ class RecurringReservationFactory(GenericDjangoModelFactory[RecurringReservation
     reservation_unit = factory.SubFactory("tests.factories.ReservationUnitFactory")
     age_group = factory.SubFactory("tests.factories.AgeGroupFactory")
     ability_group = factory.SubFactory("tests.factories.AbilityGroupFactory")
+    allocated_time_slot = factory.SubFactory("tests.factories.AllocatedTimeSlotFactory")
 
     @factory.post_generation
     def reservations(self, create: bool, reservations: Iterable[Reservation] | None, **kwargs: Any):

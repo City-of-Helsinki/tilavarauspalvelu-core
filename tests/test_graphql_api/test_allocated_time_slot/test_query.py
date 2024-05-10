@@ -1,7 +1,7 @@
 import pytest
 from graphene_django_extensions.testing import build_query
 
-from tests.factories import AllocatedTimeSlotFactory, ReservationUnitFactory, SpaceFactory
+from tests.factories import AllocatedTimeSlotFactory, RecurringReservationFactory, ReservationUnitFactory, SpaceFactory
 from tests.helpers import UserType
 
 from .helpers import allocations_query
@@ -16,7 +16,8 @@ def test_allocated_time_slot__query__all_fields(graphql):
     # given:
     # - There is an allocated time slot
     allocation = AllocatedTimeSlotFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    RecurringReservationFactory.create(allocated_time_slot=allocation)
+    graphql.login_with_superuser()
 
     fields = """
         pk
@@ -31,6 +32,13 @@ def test_allocated_time_slot__query__all_fields(graphql):
             reservationUnit {
                 pk
                 nameFi
+            }
+        }
+        recurringReservation {
+            pk
+            name
+            reservations {
+                pk
             }
         }
     """
@@ -57,6 +65,11 @@ def test_allocated_time_slot__query__all_fields(graphql):
                 "pk": allocation.reservation_unit_option.reservation_unit.pk,
                 "nameFi": allocation.reservation_unit_option.reservation_unit.name,
             },
+        },
+        "recurringReservation": {
+            "pk": allocation.recurring_reservation.pk,
+            "name": allocation.recurring_reservation.name,
+            "reservations": [],
         },
     }
 
