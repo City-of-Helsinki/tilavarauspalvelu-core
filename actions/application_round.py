@@ -1,5 +1,10 @@
 from typing import TYPE_CHECKING
 
+from django.db import models
+
+from applications.choices import ApplicationRoundStatusChoice
+from reservations.models import RecurringReservation, Reservation
+
 if TYPE_CHECKING:
     from applications.models import ApplicationRound
 
@@ -15,12 +20,48 @@ class ApplicationRoundActions:
         """
         from applications.models import AllocatedTimeSlot, ReservationUnitOption
 
-        ReservationUnitOption.objects.filter(
-            application_section__application__application_round=self.application_round,
-        ).update(
-            locked=False,
-        )
+        match self.application_round.status:
+            case ApplicationRoundStatusChoice.IN_ALLOCATION:
+                # Unlock all reservation unit options, and remove all allocated time slots
+                lookup = (
+                    "application_section"  #
+                    "__application"
+                    "__application_round"
+                )
+                ReservationUnitOption.objects.filter(models.Q(**{lookup: self.application_round})).update(locked=False)
 
-        AllocatedTimeSlot.objects.filter(
-            reservation_unit_option__application_section__application__application_round=self.application_round,
-        ).delete()
+                lookup = (
+                    "reservation_unit_option"  #
+                    "__application_section"
+                    "__application"
+                    "__application_round"
+                )
+                AllocatedTimeSlot.objects.filter(models.Q(**{lookup: self.application_round})).delete()
+
+            case ApplicationRoundStatusChoice.HANDLED:
+                # Remove all recurring reservations, and set application round back to HANDLED
+                lookup = (
+                    "recurring_reservation"  #
+                    "__allocated_time_slot"
+                    "__reservation_unit_option"
+                    "__application_section"
+                    "__application"
+                    "__application_round"
+                )
+                Reservation.objects.filter(models.Q(**{lookup: self.application_round})).delete()
+
+                lookup = (
+                    "allocated_time_slot"  #
+                    "__reservation_unit_option"
+                    "__application_section"
+                    "__application"
+                    "__application_round"
+                )
+                RecurringReservation.objects.filter(models.Q(**{lookup: self.application_round})).delete()
+
+                self.application_round.handled_date = None
+                self.application_round.save()
+
+            case _:
+                msg = f"Application round in status {self.application_round.status.value!r} cannot be reset"
+                raise ValueError(msg)

@@ -11,6 +11,7 @@ from lookup_property import L
 from modeltranslation.admin import TranslationAdmin
 
 from applications.admin.forms.application_round import ApplicationRoundAdminForm
+from applications.choices import ApplicationRoundStatusChoice
 from applications.exporter.application_round_applications_exporter import ApplicationRoundApplicationsCSVExporter
 from applications.exporter.application_round_result_exporter import ApplicationRoundResultCSVExporter
 from applications.models import ApplicationRound
@@ -85,8 +86,22 @@ class ApplicationRoundAdmin(ExtraButtonsMixin, TranslationAdmin):
     @admin.action(description=_("Reset application round allocations"))
     def reset_application_rounds(self, request: WSGIRequest, queryset: QuerySet) -> TemplateResponse | None:
         # Coming from confirmation page, perform the action
-        if request.POST.get("post"):
+        if request.POST.get("confirmed"):
             application_round: ApplicationRound
+
+            proceed = True
+            for application_round in queryset:
+                if not ApplicationRoundStatusChoice(application_round.status).allows_resetting:
+                    msg = (
+                        f"Application round {application_round.name!r} is in status "
+                        f"{application_round.status!r} and cannot be reset."
+                    )
+                    self.message_user(request, msg, level=messages.ERROR)
+                    proceed = False
+
+            if not proceed:
+                return None
+
             for application_round in queryset:
                 application_round.actions.reset_application_round_allocation()
 

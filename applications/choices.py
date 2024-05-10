@@ -163,6 +163,13 @@ class ApplicationRoundStatusChoice(models.TextChoices):
     def is_ongoing(self) -> bool:
         return self != ApplicationRoundStatusChoice.RESULTS_SENT
 
+    @DynamicClassAttribute
+    def allows_resetting(self) -> bool:
+        return self in [
+            ApplicationRoundStatusChoice.IN_ALLOCATION,
+            ApplicationRoundStatusChoice.HANDLED,
+        ]
+
 
 class ApplicationStatusChoice(models.TextChoices):
     DRAFT = "DRAFT", _("Draft")
