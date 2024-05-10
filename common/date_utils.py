@@ -3,15 +3,9 @@ from __future__ import annotations
 import datetime
 import zoneinfo
 from collections.abc import Generator
-from typing import TYPE_CHECKING, Generic, TypedDict, TypeVar
+from typing import Generic, TypedDict, TypeVar
 
 from django.utils.timezone import get_default_timezone
-
-if TYPE_CHECKING:
-    from opening_hours.utils.time_span_element import TimeSpanElement
-
-TCanHaveTZ = TypeVar("TCanHaveTZ", datetime.datetime, datetime.time)
-TValid = TypeVar("TValid", datetime.datetime, datetime.time)
 
 __all__ = [
     "DEFAULT_TIMEZONE",
@@ -44,6 +38,9 @@ __all__ = [
     "utc_time_max",
     "utc_time_min",
 ]
+
+TCanHaveTZ = TypeVar("TCanHaveTZ", datetime.datetime, datetime.time)
+TValid = TypeVar("TValid", datetime.datetime, datetime.time)
 
 
 DEFAULT_TIMEZONE = get_default_timezone()
@@ -346,51 +343,6 @@ def merge_time_slots(time_slots: list[TimeSlot]) -> list[TimeSlot]:
         # Otherwise the periods are not contiguous -> append the period and continue.
         merged_slots.append(period)
     return merged_slots
-
-
-class ReservationPeriod(TypedDict):
-    begin: datetime.datetime
-    end: datetime.datetime
-
-
-def merge_periods_into_time_span_elements(periods: list[ReservationPeriod]) -> list[TimeSpanElement]:
-    """Merge overlapping or touching reservation start and end time periods into timespan elements."""
-    from opening_hours.utils.time_span_element import TimeSpanElement
-
-    time_spans: list[TimeSpanElement] = []
-    current_period: ReservationPeriod | None = None
-
-    # Go through all affected reservations' periods and merge overlapping ones
-    for period in periods:
-        if current_period is None:
-            current_period = period
-            continue
-
-        # If periods overlap or touch, merge them
-        if period["begin"] <= current_period["end"]:
-            current_period["end"] = period["end"]
-            continue
-
-        time_spans.append(
-            TimeSpanElement(
-                start_datetime=current_period["begin"],
-                end_datetime=current_period["end"],
-                is_reservable=False,
-            )
-        )
-        current_period = period
-
-    # Add the remaining period after merging
-    if current_period is not None:
-        time_spans.append(
-            TimeSpanElement(
-                start_datetime=current_period["begin"],
-                end_datetime=current_period["end"],
-                is_reservable=False,
-            )
-        )
-
-    return time_spans
 
 
 def get_periods_between(

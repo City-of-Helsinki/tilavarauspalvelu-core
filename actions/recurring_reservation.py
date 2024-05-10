@@ -3,20 +3,21 @@ from __future__ import annotations
 import dataclasses
 import datetime
 from collections.abc import Collection, Iterable
-from typing import Any
+from typing import Any, TypedDict
 
 from django.db import models
 
-from common.date_utils import (
-    DEFAULT_TIMEZONE,
-    ReservationPeriod,
-    combine,
-    get_periods_between,
-    merge_periods_into_time_span_elements,
-)
+from common.date_utils import DEFAULT_TIMEZONE, combine, get_periods_between
 from opening_hours.models import ReservableTimeSpan
+from opening_hours.utils.reservable_time_span_client import merge_overlapping_time_span_elements
 from opening_hours.utils.time_span_element import TimeSpanElement
+from reservation_units.models import ReservationUnit
 from reservations.models import RecurringReservation, Reservation
+
+
+class ReservationPeriod(TypedDict):
+    begin: datetime.datetime
+    end: datetime.datetime
 
 
 @dataclasses.dataclass
@@ -57,25 +58,23 @@ class RecurringReservationActions:
         skip_dates: Collection[datetime.date] = (),
     ) -> ReservationSeriesCalculationResults:
         """Pre-calculate slots in the recurring reservation."""
-        periods = (
-            Reservation.objects.overlapping_period(
-                period_start=self.recurring_reservation.begin_date,
-                period_end=self.recurring_reservation.end_date,
-            )
-            .affecting_reservations(
-                reservation_units=[self.recurring_reservation.reservation_unit.pk],
-            )
-            .values("begin", "end")
-            .order_by("begin")
+        pk = self.recurring_reservation.reservation_unit.pk
+        closed, blocked = Reservation.objects.get_affecting_reservations_as_closed_time_spans(
+            reservation_unit_queryset=ReservationUnit.objects.filter(pk=pk),
+            start_date=self.recurring_reservation.begin_date,
+            end_date=self.recurring_reservation.end_date,
         )
+        sorted_closed = sorted(closed.get(pk, []), key=lambda x: x.buffered_start_datetime)
+        sorted_blocked = sorted(blocked.get(pk, []), key=lambda x: x.buffered_start_datetime)
+        closed_timespans = merge_overlapping_time_span_elements(sorted_closed)
+        blocked_timespans = merge_overlapping_time_span_elements(sorted_blocked)
 
-        reserved_timespans = merge_periods_into_time_span_elements(periods)
         reservable_timespans = self.get_reservable_timespans() if check_opening_hours else []
 
         results = ReservationSeriesCalculationResults()
 
-        begin_time: datetime.time = self.recurring_reservation.begin_time  # type: ignore[assignment]
-        end_time: datetime.time = self.recurring_reservation.end_time  # type: ignore[assignment]
+        begin_time: datetime.time = self.recurring_reservation.begin_time
+        end_time: datetime.time = self.recurring_reservation.end_time
 
         weekdays: list[int] = [int(val) for val in self.recurring_reservation.weekdays.split(",")]
         if not weekdays:
@@ -100,7 +99,7 @@ class RecurringReservationActions:
                 if begin.date() in skip_dates:
                     continue
 
-                timespan = TimeSpanElement(
+                reservation_timespan = TimeSpanElement(
                     start_datetime=begin,
                     end_datetime=end,
                     is_reservable=True,
@@ -108,16 +107,23 @@ class RecurringReservationActions:
                     buffer_time_before=self.recurring_reservation.reservation_unit.buffer_time_before,
                 )
 
-                # Would the reservation overlap with any existing reservations?
-                # Also checks that buffers for the reservation will also not overlap.
-                if any(timespan.overlaps_with(reserved) for reserved in reserved_timespans):
+                # Would the reservation timespan overlap with any closing timespans
+                # that exist due to existing reservations? Checks for:
+                # 1) Unbuffered reservation timespan overlapping with any buffered closed timespan
+                # 2) Unbuffered closed timespan overlapping with any buffered reservation timespan
+                # 3) Unbuffered reservation timespan overlapping with any unbuffered blocked timespan
+                if (
+                    any(reservation_timespan.overlaps_with(closed) for closed in closed_timespans)
+                    or any(closed.overlaps_with(reservation_timespan) for closed in closed_timespans)
+                    or any(reservation_timespan.overlaps_with(blocked) for blocked in blocked_timespans)
+                ):
                     results.overlapping.append(ReservationPeriod(begin=begin, end=end))
                     continue
 
                 # Would the reservation be fully inside any reservable timespans for the resource?
                 # Ignores buffers for the reservation, since those can be outside reservable times.
                 if check_opening_hours and not any(
-                    timespan.fully_inside_of(reservable) for reservable in reservable_timespans
+                    reservation_timespan.fully_inside_of(reservable) for reservable in reservable_timespans
                 ):
                     results.not_reservable.append(ReservationPeriod(begin=begin, end=end))
                     continue
@@ -129,11 +135,11 @@ class RecurringReservationActions:
     def get_reservable_timespans(self) -> list[TimeSpanElement]:
         begin_time = self.recurring_reservation.begin_time
         end_time = self.recurring_reservation.end_time
-        resource = self.recurring_reservation.reservation_unit.origin_hauki_resource
-        if resource is None:
+        hauki_resource = self.recurring_reservation.reservation_unit.origin_hauki_resource
+        if hauki_resource is None:
             return []
 
-        timespans: Iterable[ReservableTimeSpan] = resource.reservable_time_spans.all().overlapping_with_period(
+        timespans: Iterable[ReservableTimeSpan] = hauki_resource.reservable_time_spans.all().overlapping_with_period(
             start=combine(self.recurring_reservation.begin_date, begin_time, tzinfo=DEFAULT_TIMEZONE),
             end=combine(self.recurring_reservation.end_date, end_time, tzinfo=DEFAULT_TIMEZONE),
         )

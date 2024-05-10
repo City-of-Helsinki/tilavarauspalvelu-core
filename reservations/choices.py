@@ -27,14 +27,14 @@ class ReservationStateChoice(models.TextChoices):
     DENIED = "denied", _("Denied")
 
     @classproperty
-    def states_that_can_change_to_handling(self) -> list["ReservationStateChoice"]:
+    def states_that_can_change_to_handling(self) -> list[ReservationStateChoice]:
         return [
             ReservationStateChoice.CONFIRMED,
             ReservationStateChoice.DENIED,
         ]
 
     @classproperty
-    def states_that_can_change_to_deny(self) -> list["ReservationStateChoice"]:
+    def states_that_can_change_to_deny(self) -> list[ReservationStateChoice]:
         return [
             ReservationStateChoice.REQUIRES_HANDLING,
             ReservationStateChoice.CONFIRMED,

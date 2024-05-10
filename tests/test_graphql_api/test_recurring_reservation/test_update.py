@@ -2,8 +2,9 @@ import datetime
 
 import pytest
 
+from common.date_utils import next_hour
 from tests.factories import RecurringReservationFactory, ReservationUnitFactory
-from tests.helpers import UserType, next_hour
+from tests.helpers import UserType
 
 from .helpers import UPDATE_MUTATION
 
