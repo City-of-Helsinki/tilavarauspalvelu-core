@@ -177,6 +177,6 @@ def test_recurring_reservations__create__end_date_too_far(graphql):
 
     assert response.error_message() == "Mutation was unsuccessful."
     assert response.field_error_messages() == [
-        "Cannot create recurring reservation for more than 3 years in the future."
+        "Cannot create recurring reservation for more than 2 years in the future."
     ]
     assert RecurringReservation.objects.exists() is False

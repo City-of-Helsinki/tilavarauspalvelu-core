@@ -10,6 +10,7 @@ from rest_framework.exceptions import ValidationError
 from api.graphql.extensions import error_codes
 from common.date_utils import local_date
 from common.fields.serializer import CurrentUserDefaultNullable, input_only_field
+from opening_hours.utils.reservable_time_span_client import ReservableTimeSpanClient
 from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import ReservationUnit
 from reservations.choices import ReservationTypeChoice
@@ -62,8 +63,8 @@ class RecurringReservationCreateSerializer(NestingModelSerializer):
             msg = "Begin date cannot be after end date."
             raise ValidationError(msg, code=error_codes.RESERVATION_BEGIN_DATE_AFTER_END_DATE)
 
-        if end_date > local_date() + datetime.timedelta(days=365 * 3):
-            msg = "Cannot create recurring reservation for more than 3 years in the future."
+        if end_date > local_date() + datetime.timedelta(days=ReservableTimeSpanClient.DAYS_TO_FETCH):
+            msg = "Cannot create recurring reservation for more than 2 years in the future."
             raise ValidationError(msg, code=error_codes.RESERVATION_END_DATE_TOO_FAR)
 
         if begin_date == end_date and end_time <= begin_time:
