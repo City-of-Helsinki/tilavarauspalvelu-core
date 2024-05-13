@@ -1,0 +1,25 @@
+name: Fast-forward merge a pull request
+
+on:
+  # Trigger when a comment is created or edited.
+  issue_comment:
+    types: [created, edited]
+
+jobs:
+  fast-forward:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write  # Allows merging the PR.
+      pull-requests: write  # Writing comments on PRs.
+      issues: write  # Also required for posting comments on PRs.
+
+    # Only run if the comment contains the '/fast-forward' command.
+    if: ${{ contains(github.event.comment.body, '/fast-forward') && github.event.issue.pull_request }}
+
+    steps:
+      - name: "Fast forwarding"
+        uses: sequoia-pgp/fast-forward@v1
+        with:
+          merge: true
+          comment: always

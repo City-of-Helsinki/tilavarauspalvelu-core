@@ -7,9 +7,10 @@ on:
 jobs:
   approve:
     runs-on: ubuntu-latest
+
     permissions:
-      pull-requests: write  # allows approving the PR
-      contents: write  # allows merging the PR
+      pull-requests: write  # Allows approving the PR.
+      contents: write  # Allows merging the PR.
 
     # Only run if one of the defined bots is the pull request author.
     # https://github.com/City-of-Helsinki/tilavarauspalvelu-core/settings/variables/actions
