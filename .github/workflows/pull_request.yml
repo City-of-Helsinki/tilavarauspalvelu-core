@@ -1,0 +1,22 @@
+name: Can PR can be merged with fast-forward?
+
+on:
+  # Trigger when a pull request is opened, reopened, or synchronized.
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+jobs:
+  check-fast-forward:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read  # Allows reading repo to check if fast-forwarding is possible.
+      pull-requests: write  # Writing comments on PRs.
+      issues: write  # Also required for posting comments on PRs.
+
+    steps:
+      - name: "Checking if fast forwarding is possible"
+        uses: sequoia-pgp/fast-forward@v1
+        with:
+          merge: false
+          comment: on-error
