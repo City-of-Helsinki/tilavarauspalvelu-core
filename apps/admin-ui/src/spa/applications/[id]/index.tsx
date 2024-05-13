@@ -992,7 +992,7 @@ function ApplicationDetails({
           />
           <ValueBox
             label={t("Application.headings.userBirthDate")}
-            value={<BirthDate userPk={application.user?.pk ?? 0} />}
+            value={<BirthDate applicationPk={application.pk ?? 0} />}
           />
         </EventProps>
         <H4>{t("Application.contactPersonInformation")}</H4>

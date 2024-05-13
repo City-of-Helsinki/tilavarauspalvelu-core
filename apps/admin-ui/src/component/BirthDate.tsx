@@ -7,17 +7,26 @@ import { formatDate } from "@/common/util";
 import { HorisontalFlex } from "@/styles/layout";
 import { base64encode } from "common/src/helpers";
 
-type Props = {
-  userPk: number;
-};
-
 // NOTE separate query because all requests for dateOfBirth are logged
 // so don't make them automatically or inside other queries
-const DATE_OF_BIRTH_QUERY = gql`
-  query getDateOfBirth($id: ID!) {
-    user(id: $id) {
-      pk
-      dateOfBirth
+const RESERVATION_DATE_OF_BIRTH_QUERY = gql`
+  query getReservationDateOfBirth($id: ID!) {
+    reservation(id: $id) {
+      user {
+        pk
+        dateOfBirth
+      }
+    }
+  }
+`;
+
+const APPLICATION_DATE_OF_BIRTH_QUERY = gql`
+  query getApplicationDateOfBirth($id: ID!) {
+    application(id: $id) {
+      user {
+        pk
+        dateOfBirth
+      }
     }
   }
 `;
@@ -31,29 +40,58 @@ const Button = styled.button`
   text-decoration: underline;
 `;
 
+type Props =
+  | {
+      reservationPk: number;
+    }
+  | {
+      applicationPk: number;
+    };
+
 /// Component for toggling the visibility of the user's birth date
-/// @param userPk - pk of the user
+/// Queries through reservation or application because of permission checks (most users are not allowed query users api)
+/// @param reservationPk - the pk of the reservation
+/// @param applicationPk - the pk of the application
 /// Only makes the query if the user clicks the show button to minimise logging
-export function BirthDate({ userPk }: Props): JSX.Element {
+export function BirthDate(props: Props): JSX.Element {
   const [visible, setVisible] = useState(false);
 
-  const typename = "UserNode";
-  const id = base64encode(`${typename}:${userPk}`);
+  const reservationPk = "reservationPk" in props ? props.reservationPk : null;
+  const applicationPk = "applicationPk" in props ? props.applicationPk : null;
+
   const {
-    data,
-    loading: isLoading,
-    error,
-  } = useQuery<Query, QueryUserArgs>(DATE_OF_BIRTH_QUERY, {
+    data: dataReservation,
+    loading: isReservationLoading,
+    error: errorReservation,
+  } = useQuery<Query, QueryUserArgs>(RESERVATION_DATE_OF_BIRTH_QUERY, {
     variables: {
-      id,
+      id: base64encode(`ReservationNode:${reservationPk}`),
     },
-    fetchPolicy: "network-only",
-    skip: !userPk || !visible,
+    fetchPolicy: "no-cache",
+    skip: !reservationPk || !visible,
+  });
+
+  const {
+    data: dataApplication,
+    loading: isApplicationLoading,
+    error: errorApplication,
+  } = useQuery<Query, QueryUserArgs>(APPLICATION_DATE_OF_BIRTH_QUERY, {
+    variables: {
+      id: base64encode(`ApplicationNode:${applicationPk}`),
+    },
+    fetchPolicy: "no-cache",
+    skip: !applicationPk || !visible,
   });
 
   const { t } = useTranslation();
 
-  const dateOfBirth = data?.user?.dateOfBirth;
+  const data = "reservationPk" in props ? dataReservation : dataApplication;
+  const isLoading =
+    "reservationPk" in props ? isReservationLoading : isApplicationLoading;
+  const error = "reservationPk" in props ? errorReservation : errorApplication;
+
+  const user = data?.reservation?.user || data?.application?.user;
+  const dateOfBirth = user?.dateOfBirth;
 
   const hideLabel = t("RequestedReservation.hideBirthDate");
   const showLabel = t("RequestedReservation.showBirthDate");

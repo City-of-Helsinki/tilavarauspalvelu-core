@@ -590,7 +590,7 @@ const RequestedReservation = ({
               />
               <ApplicationData
                 label={t("RequestedReservation.birthDate")}
-                data={<BirthDate userPk={reservation?.user?.pk ?? 0} />}
+                data={<BirthDate reservationPk={reservation?.pk ?? 0} />}
               />
               <ApplicationData
                 label={t("RequestedReservation.addressStreet")}
