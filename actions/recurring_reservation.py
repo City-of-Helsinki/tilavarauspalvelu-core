@@ -117,6 +117,8 @@ class RecurringReservationActions:
         check_start_interval: bool = False,
         skip_dates: Collection[datetime.date] = (),
         closed_hours: Collection[TimeSpanElement] = (),
+        buffer_time_before: datetime.timedelta | None = None,
+        buffer_time_after: datetime.timedelta | None = None,
     ) -> ReservationSeriesCalculationResults:
         """
         Pre-calculate slots for reservations for the recurring reservation.
@@ -126,6 +128,8 @@ class RecurringReservationActions:
         :param check_start_interval: Whether to check if the reservation starts at the correct interval.
         :param skip_dates: Dates to skip when calculating slots.
         :param closed_hours: Explicitly closed opening hours for the resource.
+        :param buffer_time_before: Used buffer time before the reservation.
+        :param buffer_time_after: Used buffer time after the reservation.
         """
         pk = self.recurring_reservation.reservation_unit.pk
         closed, blocked = Reservation.objects.get_affecting_reservations_as_closed_time_spans(
@@ -173,11 +177,15 @@ class RecurringReservationActions:
                     start_datetime=begin,
                     end_datetime=end,
                     is_reservable=True,
-                    buffer_time_after=(
-                        reservation_unit.actions.get_actual_after_buffer(begin) if check_buffers else None
-                    ),
                     buffer_time_before=(
-                        reservation_unit.actions.get_actual_before_buffer(end) if check_buffers else None
+                        reservation_unit.actions.get_actual_before_buffer(begin, buffer_time_before)
+                        if check_buffers
+                        else None
+                    ),
+                    buffer_time_after=(
+                        reservation_unit.actions.get_actual_after_buffer(end, buffer_time_after)
+                        if check_buffers
+                        else None
                     ),
                 )
 

@@ -128,28 +128,48 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
     def __init__(self, reservation_unit: ReservationUnit):
         self.reservation_unit = reservation_unit
 
-    def get_actual_before_buffer(self, reservation_begin: datetime.datetime | datetime.time) -> datetime.timedelta:
+    def get_actual_before_buffer(
+        self,
+        reservation_begin: datetime.datetime | datetime.time,
+        override: datetime.timedelta | None = None,
+    ) -> datetime.timedelta:
         """
         Helper for finding actual buffer time before for a reservation unit to be used for its reservation.
+
         For reservation units where only one reservation is possible per day,
         the buffer is dependent on the reservation begin time (last until beginning of day).
+
+        In some cases, an override can be provided that will be used instead of the reservation unit's value,
+        but the override can not be used for reservation units that block the whole day.
         """
         if self.reservation_unit.reservation_block_whole_day:
             return time_as_timedelta(reservation_begin)
+        if override is not None:
+            return override
         return self.reservation_unit.buffer_time_before
 
-    def get_actual_after_buffer(self, reservation_end: datetime.datetime | datetime.time) -> datetime.timedelta:
+    def get_actual_after_buffer(
+        self,
+        reservation_end: datetime.datetime | datetime.time,
+        override: datetime.timedelta | None = None,
+    ) -> datetime.timedelta:
         """
         Helper for finding actual buffer time after for a reservation unit to be used for its reservation.
+
         For reservation units where only one reservation is possible per day,
         the buffer is dependent on the reservation end time (last until end of day).
         For reservations ending at midnight the next day, the buffer should be 0.
+
+        In some cases, an override can be provided that will be used instead of the reservation unit's value,
+        but the override can not be used for reservation units that block the whole day.
         """
         if self.reservation_unit.reservation_block_whole_day:
             delta = time_as_timedelta(reservation_end)
             if delta == datetime.timedelta():  # midnight
                 return delta
             return datetime.timedelta(hours=24) - delta
+        if override is not None:
+            return override
         return self.reservation_unit.buffer_time_after
 
     def get_location(self) -> Location:

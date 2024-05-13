@@ -221,6 +221,8 @@ class ReservationSeriesSerializer(RecurringReservationCreateSerializer):
         slots = instance.actions.pre_calculate_slots(
             check_opening_hours=check_opening_hours,
             check_buffers=True,
+            buffer_time_before=reservation_details.get("buffer_time_before"),
+            buffer_time_after=reservation_details.get("buffer_time_after"),
             skip_dates=skip_dates,
         )
 
