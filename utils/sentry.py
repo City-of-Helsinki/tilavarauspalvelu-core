@@ -4,12 +4,12 @@ from typing import Any, Literal
 
 from sentry_sdk import capture_exception, capture_message, push_scope
 
-MessageLevel = Literal["fatal", "error", "warning", "log", "info", "debug"]
+LogLevelStr = Literal["fatal", "critical", "error", "warning", "info", "debug"]
 
 
 class SentryLogger:
     @staticmethod
-    def log_message(message: str, details: str | dict[str, Any] | None = None, level: MessageLevel = "info"):
+    def log_message(message: str, details: str | dict[str, Any] | None = None, level: LogLevelStr = "info"):
         with push_scope() as scope:
             if details:
                 scope.set_extra("details", details)
