@@ -47,7 +47,7 @@ class HaukiResourceHashUpdater:
         self._update_origin_hauki_resource_hashes(force_refetch=force_refetch)
 
         if not self.resources_updated:
-            logger.info("There was need to update any OriginHaukiResource hashes.")
+            logger.info("There was no need to update any OriginHaukiResource hashes.")
             return
 
         self._create_reservable_time_spans_for_reservation_units()
@@ -55,7 +55,7 @@ class HaukiResourceHashUpdater:
         logger.info(f"Updated hashes for {len(self.resources_updated)} origin hauki resources.")
         logger.info("Done!")
 
-    def _fetch_hauki_resources(self):
+    def _fetch_hauki_resources(self) -> None:
         """Fetch resources from Hauki API based on the given resource ids."""
         response_json = HaukiAPIClient.get_resources(hauki_resource_ids=self.hauki_resource_ids)
 
@@ -109,7 +109,7 @@ class HaukiResourceHashUpdater:
 
             self.resources_updated.append(origin_hauki_resource)
 
-    def _create_reservable_time_spans_for_reservation_units(self):
+    def _create_reservable_time_spans_for_reservation_units(self) -> int:
         """Create reservable time spans for all updated OriginHaukiResources."""
         total_reservable_time_spans_created = 0
 
