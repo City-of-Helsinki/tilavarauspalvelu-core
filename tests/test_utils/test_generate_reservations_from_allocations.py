@@ -213,9 +213,7 @@ def test_generate_reservation_series_from_allocations__invalid_start_interval():
     assert len(series) == 1
 
     reservations: list[Reservation] = list(series[0].reservations.all())
-    assert len(reservations) == 1
-
-    assert reservations[0].state == ReservationStateChoice.DENIED.value
+    assert len(reservations) == 0
 
 
 @patch_method(HaukiAPIClient.get_resource_opening_hours, return_value=EMPTY_RESPONSE)
@@ -236,10 +234,9 @@ def test_generate_reservation_series_from_allocations__overlapping_reservation()
     assert len(series) == 1
 
     reservations: list[Reservation] = list(series[0].reservations.all())
-    assert len(reservations) == 2
+    assert len(reservations) == 1
 
-    assert reservations[0].state == ReservationStateChoice.DENIED.value
-    assert reservations[1].state == ReservationStateChoice.CONFIRMED.value
+    assert reservations[0].state == ReservationStateChoice.CONFIRMED.value
 
 
 @patch_method(HaukiAPIClient.get_resource_opening_hours)
@@ -279,6 +276,4 @@ def test_generate_reservation_series_from_allocations__explicitly_closed_opening
     assert len(series) == 1
 
     reservations: list[Reservation] = list(series[0].reservations.all())
-    assert len(reservations) == 1
-
-    assert reservations[0].state == ReservationStateChoice.DENIED.value
+    assert len(reservations) == 0

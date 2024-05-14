@@ -77,10 +77,11 @@ def generate_reservation_series_from_allocations(application_round_id: int) -> N
             application = application_section.application
             application_round = application.application_round
 
-            common_details = ReservationDetails(
+            reservation_details = ReservationDetails(
                 name=recurring_reservation.name,
                 description=application.additional_information,
                 type=ReservationTypeChoice.SEASONAL,
+                state=ReservationStateChoice.CONFIRMED,
                 user=recurring_reservation.user,
                 handled_at=application_round.handled_date,
                 num_persons=application_section.num_persons,
@@ -95,7 +96,7 @@ def generate_reservation_series_from_allocations(application_round_id: int) -> N
                 billing_address_zip=application.billing_address.post_code,
             )
 
-            common_details["reservee_type"] = (
+            reservation_details["reservee_type"] = (
                 CustomerTypeChoice.INDIVIDUAL
                 if application.applicant_type == ApplicantTypeChoice.INDIVIDUAL
                 else CustomerTypeChoice.BUSINESS
@@ -103,34 +104,22 @@ def generate_reservation_series_from_allocations(application_round_id: int) -> N
                 else CustomerTypeChoice.NONPROFIT
             )
 
-            if common_details["reservee_type"] == CustomerTypeChoice.INDIVIDUAL:
-                common_details["reservee_address_street"] = application.billing_address.street_address
-                common_details["reservee_address_city"] = application.billing_address.city
-                common_details["reservee_address_zip"] = application.billing_address.post_code
+            if reservation_details["reservee_type"] == CustomerTypeChoice.INDIVIDUAL:
+                reservation_details["reservee_address_street"] = application.billing_address.street_address
+                reservation_details["reservee_address_city"] = application.billing_address.city
+                reservation_details["reservee_address_zip"] = application.billing_address.post_code
 
             else:
-                common_details["reservee_organisation_name"] = application.organisation.name
-                common_details["reservee_id"] = application.organisation.identifier
-                common_details["reservee_is_unregistered_association"] = application.organisation.identifier is None
-                common_details["reservee_address_street"] = application.organisation.address.street_address
-                common_details["reservee_address_city"] = application.organisation.address.city
-                common_details["reservee_address_zip"] = application.organisation.address.post_code
+                reservation_details["reservee_organisation_name"] = application.organisation.name
+                reservation_details["reservee_id"] = application.organisation.identifier
+                reservation_details["reservee_is_unregistered_association"] = (
+                    application.organisation.identifier is None
+                )
+                reservation_details["reservee_address_street"] = application.organisation.address.street_address
+                reservation_details["reservee_address_city"] = application.organisation.address.city
+                reservation_details["reservee_address_zip"] = application.organisation.address.post_code
 
             recurring_reservation.actions.bulk_create_reservation_for_periods(
                 periods=slots.possible,
-                reservation_details=(
-                    common_details
-                    | ReservationDetails(
-                        state=ReservationStateChoice.CONFIRMED,
-                    )
-                ),
-            )
-            recurring_reservation.actions.bulk_create_reservation_for_periods(
-                periods=slots.not_possible,
-                reservation_details=(
-                    common_details
-                    | ReservationDetails(
-                        state=ReservationStateChoice.DENIED,
-                    )
-                ),
+                reservation_details=reservation_details,
             )
