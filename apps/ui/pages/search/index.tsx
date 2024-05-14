@@ -74,7 +74,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     optionsData?.reservationUnitTypes?.edges?.map((edge) => edge?.node)
   );
   const purposes = filterNonNullable(
-    optionsData?.reservationPurposes?.edges?.map((edge) => edge?.node)
+    optionsData?.purposes?.edges?.map((edge) => edge?.node)
   );
 
   const reservationUnitTypeOptions = reservationUnitTypes.map((n) => ({

@@ -29,6 +29,16 @@ export const OPTIONS_QUERY = gql`
         }
       }
     }
+    purposes {
+      edges {
+        node {
+          pk
+          nameFi
+          nameEn
+          nameSv
+        }
+      }
+    }
     reservationPurposes {
       edges {
         node {
