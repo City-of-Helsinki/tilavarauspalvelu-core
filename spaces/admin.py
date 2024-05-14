@@ -47,6 +47,7 @@ class UnitAdmin(SortableAdminMixin, admin.ModelAdmin):
     search_fields = ["name", "tprek_id"]
     list_display = ("__str__", "payment_merchant", "payment_accounting")
     list_filter = ("payment_merchant", "payment_accounting")
+    readonly_fields = ("tprek_last_modified",)
 
     @admin.action
     def update_from_tprek(self, request, queryset):
