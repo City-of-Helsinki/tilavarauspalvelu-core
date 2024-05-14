@@ -224,7 +224,13 @@ class ApplicationSection(SerializableMixin, models.Model):
         from .reservation_unit_option import ReservationUnitOption
 
         usable_reservation_unit_options = Coalesce(
-            SubqueryCount(queryset=ReservationUnitOption.objects.filter(rejected=False, locked=False).values("id")),
+            SubqueryCount(
+                queryset=(
+                    ReservationUnitOption.objects.filter(application_section=models.OuterRef("pk"))
+                    .filter(rejected=False, locked=False)
+                    .values("id")
+                )
+            ),
             models.Value(0),
         )
         return usable_reservation_unit_options  # type: ignore[return-value]
