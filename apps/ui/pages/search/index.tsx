@@ -37,6 +37,10 @@ import { SEARCH_FORM_PARAMS_UNIT } from "@/modules/queries/params";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getUnitName } from "@/modules/reservationUnit";
 import { OPTIONS_QUERY } from "@/hooks/useOptions";
+import {
+  convertLanguageCode,
+  getTranslationSafe,
+} from "common/src/common/util";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
@@ -79,11 +83,11 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   const reservationUnitTypeOptions = reservationUnitTypes.map((n) => ({
     value: n.pk?.toString() ?? "",
-    label: n.nameFi ?? "",
+    label: getTranslationSafe(n, "name", convertLanguageCode(locale ?? "")),
   }));
   const purposeOptions = purposes.map((n) => ({
     value: n.pk?.toString() ?? "",
-    label: n.nameFi ?? "",
+    label: getTranslationSafe(n, "name", convertLanguageCode(locale ?? "")),
   }));
 
   const { data: unitData } = await apolloClient.query<Query, QueryUnitsArgs>({
@@ -98,7 +102,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   )
     .map((node) => ({
       pk: node.pk ?? 0,
-      name: getUnitName(node) ?? "",
+      name: getUnitName(node, locale) ?? "",
     }))
     .map((node) => ({
       value: node.pk,

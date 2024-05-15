@@ -31,6 +31,10 @@ import { useSearchValues } from "@/hooks/useSearchValues";
 import { OPTIONS_QUERY } from "@/hooks/useOptions";
 import { SEARCH_FORM_PARAMS_UNIT } from "@/modules/queries/params";
 import { getUnitName } from "@/modules/reservationUnit";
+import {
+  convertLanguageCode,
+  getTranslationSafe,
+} from "common/src/common/util";
 
 const Wrapper = styled.div`
   margin-bottom: var(--spacing-layout-l);
@@ -95,15 +99,15 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   const reservationUnitTypeOptions = reservationUnitTypes.map((n) => ({
     value: n.pk?.toString() ?? "",
-    label: n.nameFi ?? "",
+    label: getTranslationSafe(n, "name", convertLanguageCode(locale ?? "")),
   }));
   const purposeOptions = purposes.map((n) => ({
     value: n.pk?.toString() ?? "",
-    label: n.nameFi ?? "",
+    label: getTranslationSafe(n, "name", convertLanguageCode(locale ?? "")),
   }));
   const equipmentsOptions = equipments.map((n) => ({
     value: n.pk ?? 0,
-    label: n.nameFi ?? "",
+    label: getTranslationSafe(n, "name", convertLanguageCode(locale ?? "")),
   }));
 
   const { data: unitData } = await apolloClient.query<Query, QueryUnitsArgs>({
@@ -118,7 +122,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   )
     .map((node) => ({
       pk: node.pk ?? 0,
-      name: getUnitName(node) ?? "",
+      name: getUnitName(node, locale) ?? "",
     }))
     .map((node) => ({
       value: node.pk,
