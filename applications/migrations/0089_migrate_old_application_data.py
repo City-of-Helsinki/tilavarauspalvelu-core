@@ -4,6 +4,8 @@ import logging
 
 from django.db import migrations
 
+from common.date_utils import time_as_timedelta
+
 logger = logging.getLogger(__name__)
 
 
@@ -90,6 +92,34 @@ def migrate_application_data(apps, schema_editor):
             logger.critical(msg)
             continue
 
+        begin_time: datetime.time = schedule.begin
+        end_time: datetime.time = schedule.end
+
+        # If times are not a multiple of 60 minutes, convert them to the last multiple of 60 minutes
+        if time_as_timedelta(begin_time).total_seconds() % 3600 != 0:
+            msg = (
+                f"Begin time {begin_time.isoformat()} for schedule {schedule.id} is not exactly at the hour mark. "
+                f"Converting it to the last hour mark..."
+            )
+            logger.warning(msg)
+            begin_time = begin_time.replace(minute=0, second=0, microsecond=0)
+
+        if time_as_timedelta(end_time).total_seconds() % 3600 != 0:
+            msg = (
+                f"End time {end_time.isoformat()} for schedule {schedule.id} is not exactly at the hour mark. "
+                f"Converting it to the last hour mark..."
+            )
+            logger.warning(msg)
+            end_time = end_time.replace(minute=0, second=0, microsecond=0)
+
+        if begin_time >= end_time:
+            msg = (
+                f"Suitable begin time {begin_time.isoformat()} for schedule {schedule.id} "
+                f"is at or after suitable end time {end_time.isoformat()}."
+            )
+            logger.critical(msg)
+            continue
+
         suitable_time_ranges.append(
             SuitableTimeRange(
                 priority="PRIMARY" if schedule.priority == 300 else "SECONDARY",
@@ -108,8 +138,8 @@ def migrate_application_data(apps, schema_editor):
                     if schedule.day == 5
                     else "SUNDAY"
                 ),
-                begin_time=schedule.begin,
-                end_time=schedule.end,
+                begin_time=begin_time,
+                end_time=end_time,
                 application_section=section,
             )
         )
@@ -132,6 +162,17 @@ def migrate_application_data(apps, schema_editor):
                 logger.critical(msg)
                 continue
 
+            allocated_begin_time: datetime.time = schedule.begin
+            allocated_end_time: datetime.time = schedule.end
+
+            if allocated_begin_time >= allocated_end_time:
+                msg = (
+                    f"Allocated begin time {allocated_begin_time.isoformat()} is "
+                    f"at or after allocated end time {allocated_end_time.isoformat()}."
+                )
+                logger.critical(msg)
+                continue
+
             allocated_time_slots.append(
                 AllocatedTimeSlot(
                     day_of_the_week=(
@@ -149,8 +190,8 @@ def migrate_application_data(apps, schema_editor):
                         if schedule.allocated_day == 5
                         else "SUNDAY"
                     ),
-                    begin_time=schedule.allocated_begin,
-                    end_time=schedule.allocated_end,
+                    begin_time=allocated_begin_time,
+                    end_time=allocated_end_time,
                     reservation_unit_option=option,
                 )
             )
