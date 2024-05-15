@@ -10,6 +10,8 @@ from graphene_django_extensions.filters import IntMultipleChoiceFilter
 
 from common.date_utils import local_datetime
 from elastic_django.reservation_units.query_builder import build_elastic_query_str
+from permissions.helpers import has_any_general_permission
+from permissions.models import GeneralPermissionChoices
 from reservation_units.enums import ReservationKind, ReservationState, ReservationUnitState
 from reservation_units.models import ReservationUnit
 from reservation_units.querysets import ReservationUnitQuerySet
@@ -19,6 +21,8 @@ from reservation_units.utils.reservation_unit_state_helper import ReservationUni
 if TYPE_CHECKING:
     from datetime import date, time
     from decimal import Decimal
+
+    from common.typing import AnyUser
 
 __all__ = [
     "ReservationUnitFilterSet",
@@ -184,17 +188,16 @@ class ReservationUnitFilterSet(ModelFilterSet):
         if not value:
             return qs
 
-        user = self.request.user
-
+        user: AnyUser = self.request.user
         if user.is_anonymous:
             return qs.none()
-        if user.is_superuser or user.general_roles.exists():
+        if user.is_superuser or has_any_general_permission(user, GeneralPermissionChoices.required_for_unit):
             return qs
 
-        return qs.filter(
-            Q(unit_id__in=user.unit_roles.values_list("unit", flat=True))
-            | Q(unit__unit_groups__in=user.unit_roles.values_list("unit_group", flat=True))
-        ).distinct()
+        unit_ids = list(user.unit_permissions)
+        unit_group_ids = list(user.unit_group_permissions)
+
+        return qs.filter(Q(unit_id__in=unit_ids) | Q(unit__unit_groups__in=unit_group_ids)).distinct()
 
     @staticmethod
     def get_filter_reservable(qs: ReservationUnitQuerySet, name: str, value: dict[str, Any]) -> QuerySet:
