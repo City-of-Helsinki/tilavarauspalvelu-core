@@ -6,20 +6,21 @@ import { useTranslation } from "next-i18next";
 import { CenteredContainer } from "common/src/layout/Container";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 
-export const getStaticProps = async ({ locale }: GetServerSidePropsContext) => {
+/// next doesn't allow getServersideProps in 500.tsx (you have to use app router for that)
+export async function getStaticProps({ locale }: GetServerSidePropsContext) {
   return {
     props: {
       ...getCommonServerSideProps(),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
-};
+}
 
 const Wrapper = styled.div`
   padding: var(--spacing-layout-xl) 0;
 `;
 
-const Custom500 = (): JSX.Element => {
+function Page500(): JSX.Element {
   const { t } = useTranslation("errors");
 
   return (
@@ -30,6 +31,6 @@ const Custom500 = (): JSX.Element => {
       </CenteredContainer>
     </Wrapper>
   );
-};
+}
 
-export default Custom500;
+export default Page500;

@@ -1,6 +1,5 @@
 import React, { useMemo } from "react";
 import type { GetServerSidePropsContext } from "next";
-import Error from "next/error";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import router from "next/router";
@@ -58,7 +57,7 @@ import { GET_RESERVATION } from "@/modules/queries/reservation";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { fromApiDate } from "common/src/common/util";
 import { containsField, containsNameField } from "common/src/metaFieldsHelpers";
-import { useSession } from "@/hooks/auth";
+import { CURRENT_USER } from "@/modules/queries/user";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -86,13 +85,24 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       variables: { id },
     });
 
+    const { data: userData } = await apolloClient.query<Query>({
+      query: CURRENT_USER,
+      fetchPolicy: "no-cache",
+    });
+    const user = userData?.currentUser;
+
     if (error) {
       // eslint-disable-next-line no-console
       console.error("Error while fetching reservation", error);
     }
 
     const { reservation } = data ?? {};
-    if (reservation != null) {
+    // Return 404 for unauthorized access
+    if (
+      reservation != null &&
+      user != null &&
+      reservation.user?.pk === user.pk
+    ) {
       return {
         props: {
           ...commonProps,
@@ -403,7 +413,6 @@ function Reservation({
   reservation,
 }: PropsNarrowed): JSX.Element | null {
   const { t, i18n } = useTranslation();
-  const { user } = useSession();
 
   // TODO this should be moved to SSR also
   const { order, isLoading: orderLoading } = useOrder({
@@ -467,10 +476,6 @@ function Reservation({
     }
   }, [reservation]);
 
-  // TODO this causes a flash of unauthorized content, because the user is not fetched on first render
-  if (reservation.user?.pk !== user?.pk) {
-    return <Error statusCode={403} />;
-  }
   const normalizedOrderStatus =
     getNormalizedReservationOrderStatus(reservation);
 
