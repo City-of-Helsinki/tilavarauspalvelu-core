@@ -25,12 +25,14 @@ import {
   encodeTimeSlot,
   type RelatedSlot,
   isInsideCell,
+  convertPriorityFilter,
 } from "./modules/applicationRoundAllocation";
 import {
   useFocusAllocatedSlot,
   useFocusApplicationEvent,
   useSlotSelection,
 } from "./hooks";
+import { useSearchParams } from "react-router-dom";
 
 type Props = {
   applicationSections: ApplicationSectionNode[] | null;
@@ -314,10 +316,27 @@ export function AllocationCalendar({
     )
   );
 
+  const [searchParams] = useSearchParams();
+  const priorityFilter = searchParams.getAll("priority");
+  const priorityFilterSanitized = convertPriorityFilter(priorityFilter);
+
   const [focused] = useFocusApplicationEvent();
-  const focusedApplicationEvent = applicationSections?.find(
-    (ae) => ae.pk === focused
-  );
+  const aes = applicationSections?.map((ae) => {
+    // if priority filter is set, we need to filter what is shown in calendar based on that
+    // these are included in the backend request because we want to show them elsewhere, but not in the calendar
+    if (priorityFilter.length > 0) {
+      return {
+        ...ae,
+        suitableTimeRanges: ae.suitableTimeRanges?.filter((tr) =>
+          priorityFilterSanitized.find((p) => p === tr.priority)
+        ),
+      };
+    }
+    return ae;
+  });
+
+  const focusedApplicationEvent = aes?.find((ae) => ae.pk === focused);
+
   const [focusedAllocated] = useFocusAllocatedSlot();
 
   const data = WEEKDAYS.map((day) => {
@@ -325,13 +344,11 @@ export function AllocationCalendar({
       ae.status !== ApplicationSectionStatusChoice.Handled;
 
     // Only show allocated that match the unit and day
-    const timeslots = filterNonNullable(applicationSections)
+    const timeslots = filterNonNullable(aes)
       .filter(isNotHandled)
       .filter((ae) => ae.suitableTimeRanges?.some((tr) => isDay(tr, day)));
 
-    const resUnits = applicationSections?.flatMap(
-      (ae) => ae.reservationUnitOptions
-    );
+    const resUnits = aes?.flatMap((ae) => ae.reservationUnitOptions);
 
     const allocated = filterNonNullable(resUnits)
       .filter((a) => a.allocatedTimeSlots?.some((ts) => isDay(ts, day)))

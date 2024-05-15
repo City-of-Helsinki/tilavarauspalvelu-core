@@ -13,7 +13,6 @@ import {
   type UnitNode,
   ApplicantTypeChoice,
   ApplicationRoundStatusChoice,
-  Priority,
   type QueryApplicationRoundArgs,
   type QueryAffectingAllocatedTimeSlotsArgs,
   type ApplicationRoundNode,
@@ -44,6 +43,7 @@ import {
 } from "./queries";
 import { AllocationPageContent } from "./ApplicationEvents";
 import { ComboboxFilter, SearchFilter } from "@/component/QueryParamFilters";
+import { convertPriorityFilter } from "./modules/applicationRoundAllocation";
 
 const MAX_RES_UNIT_NAME_LENGTH = 35;
 
@@ -259,17 +259,7 @@ function ApplicationRoundAllocation({
 
   // NOTE sanitize all other query filters similar to this
   // backend returns an error on invalid filter values, but user can cause them by manipulating the url
-  const priorityFilterSanitized = priorityFilter
-    ?.map((x) => Number(x))
-    .reduce<Array<Priority.Secondary | Priority.Primary>>((acc, x) => {
-      if (x === 200) {
-        return [...acc, Priority.Secondary];
-      } else if (x === 300) {
-        return [...acc, Priority.Primary];
-      }
-      return acc;
-    }, []);
-
+  const priorityFilterSanitized = convertPriorityFilter(priorityFilter);
   const priorityFilterQuery =
     priorityFilterSanitized.length > 0 ? priorityFilterSanitized : null;
   const ageGroupFilterQuery = ageGroupFilter

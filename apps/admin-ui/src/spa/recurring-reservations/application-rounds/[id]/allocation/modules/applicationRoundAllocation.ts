@@ -315,3 +315,16 @@ export function isInsideCell(
   const endMinutes = (end === 0 ? 24 : end) * 60;
   return cellTime >= beginMinutes && cellTime < endMinutes;
 }
+
+export function convertPriorityFilter(values: string[]): Priority[] {
+  return values
+    ?.map((x) => Number(x))
+    .reduce<Array<Priority>>((acc, x) => {
+      if (x === 200) {
+        return [...acc, Priority.Secondary];
+      } else if (x === 300) {
+        return [...acc, Priority.Primary];
+      }
+      return acc;
+    }, []);
+}
