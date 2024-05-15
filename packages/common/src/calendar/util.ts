@@ -22,7 +22,7 @@ import {
   type ReservationUnitNode,
   ReservationKind,
   ReservationStartInterval,
-} from "../../types/gql-types";
+} from "../../gql/gql-types";
 import {
   type CalendarEventBuffer,
   type OptionType,

@@ -11,10 +11,7 @@ import {
 } from "common";
 import { breakpoints } from "common/src/common/style";
 import { H4, Strong } from "common/src/common/typography";
-import type {
-  ReservationUnitNode,
-  ReservationNode,
-} from "common/types/gql-types";
+import type { ReservationUnitNode, ReservationNode } from "@gql/gql-types";
 import { getReservationUnitPrice } from "@/modules/reservationUnit";
 import {
   capitalize,

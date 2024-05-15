@@ -14,7 +14,7 @@ import {
   type QueryReservationUnitsArgs,
   type QueryUnitsArgs,
   ReservationKind,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
 import { isBrowser } from "@/modules/const";

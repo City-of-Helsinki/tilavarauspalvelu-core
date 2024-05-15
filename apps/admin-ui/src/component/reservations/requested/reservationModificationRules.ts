@@ -1,4 +1,4 @@
-import { State } from "common/types/gql-types";
+import { State } from "@gql/gql-types";
 import { addHours, isToday } from "date-fns";
 
 /* Rules

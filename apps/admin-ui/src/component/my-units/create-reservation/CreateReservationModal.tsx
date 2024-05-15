@@ -9,7 +9,7 @@ import {
   type ReservationUnitNode,
   ReservationStartInterval,
   ReservationTypeChoice,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import styled from "styled-components";
 import { get } from "lodash";
 import { format } from "date-fns";

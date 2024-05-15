@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { State } from "common/types/gql-types";
+import { State } from "@gql/gql-types";
 import { SortedSelect } from "@/component/SortedSelect";
 import { OptionType } from "@/common/types";
 

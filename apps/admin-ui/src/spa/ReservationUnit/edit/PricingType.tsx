@@ -8,7 +8,7 @@ import {
   RadioButton,
   Select,
 } from "hds-react";
-import { PriceUnit, PricingType } from "common/types/gql-types";
+import { PriceUnit, PricingType } from "@gql/gql-types";
 import { Controller, UseFormReturn } from "react-hook-form";
 import { addDays } from "date-fns";
 import { AutoGrid } from "@/styles/layout";

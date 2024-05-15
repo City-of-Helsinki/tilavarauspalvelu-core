@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { gql, useQuery } from "@apollo/client";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
-import type { Query, QueryUserArgs } from "common/types/gql-types";
+import type { Query, QueryUserArgs } from "@gql/gql-types";
 import { formatDate } from "@/common/util";
 import { HorisontalFlex } from "@/styles/layout";
 import { base64encode } from "common/src/helpers";

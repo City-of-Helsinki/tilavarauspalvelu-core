@@ -56,6 +56,9 @@ module.exports = defineConfig({
       },
     },
   },
+  ignorePatterns: [
+    'gql-types.ts',
+  ],
   env: {
     browser: true,
     jest: true,

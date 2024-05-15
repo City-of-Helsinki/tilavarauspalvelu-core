@@ -7,7 +7,7 @@ import Link from "next/link";
 import styled from "styled-components";
 import { useMedia } from "react-use";
 import { breakpoints } from "common/src/common/style";
-import type { ReservationUnitNode } from "common/types/gql-types";
+import type { ReservationUnitNode } from "@gql/gql-types";
 import { reservationUnitPath } from "@/modules/const";
 import { getMainImage, getTranslation } from "@/modules/util";
 import IconWithText from "../common/IconWithText";

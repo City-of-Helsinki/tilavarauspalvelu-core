@@ -1,4 +1,4 @@
-import type { Query, UserNode } from "common/types/gql-types";
+import type { Query, UserNode } from "@gql/gql-types";
 import { type ApolloError, useQuery } from "@apollo/client";
 import { CURRENT_USER } from "@/modules/queries/user";
 

@@ -15,7 +15,7 @@ import type {
   Mutation,
   ReservationApproveMutationInput,
   ReservationNode,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
 import { APPROVE_RESERVATION } from "./queries";
 import { useNotification } from "@/context/NotificationContext";

@@ -1,7 +1,7 @@
 import React from "react";
 import { render } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
-import { type ReservationNode, State } from "common/types/gql-types";
+import { type ReservationNode, State } from "@gql/gql-types";
 import { addDays, addMinutes } from "date-fns";
 import ApprovalButtons from "./ApprovalButtons";
 

@@ -4,7 +4,7 @@ import {
   type Query,
   type QueryUnitsArgs,
   UnitOrderingChoices,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { useNotification } from "@/context/NotificationContext";
 import { LARGE_LIST_PAGE_SIZE } from "@/common/const";

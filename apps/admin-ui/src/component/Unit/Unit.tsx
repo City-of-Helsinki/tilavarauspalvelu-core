@@ -6,7 +6,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { H1, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import type { Query, QueryUnitArgs } from "common/types/gql-types";
+import type { Query, QueryUnitArgs } from "@gql/gql-types";
 import { UNIT_QUERY } from "@/common/queries";
 import { parseAddress } from "@/common/util";
 import { useNotification } from "@/context/NotificationContext";

@@ -1,5 +1,5 @@
 import React from "react";
-import { ReservationState, ReservationUnitState } from "common/types/gql-types";
+import { ReservationState, ReservationUnitState } from "@gql/gql-types";
 import { Tag } from "hds-react";
 import { useTranslation } from "react-i18next";
 

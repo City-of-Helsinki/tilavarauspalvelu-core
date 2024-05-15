@@ -13,9 +13,10 @@ import {
   type Query,
   type QueryApplicationRoundsArgs,
   type QueryReservationUnitsArgs,
+  type QueryUnitsArgs,
   ReservationKind,
   ApplicationRoundOrderingChoices,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
 import { SeasonalSearchForm } from "@/components/search/SeasonalSearchForm";
@@ -32,7 +33,6 @@ import StartApplicationBar from "@/components/common/StartApplicationBar";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { processVariables } from "@/modules/search";
 import { useSearchValues } from "@/hooks/useSearchValues";
-import { QueryUnitsArgs } from "common/types/gql-types";
 import { SEARCH_FORM_PARAMS_UNIT } from "@/modules/queries/params";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getUnitName } from "@/modules/reservationUnit";

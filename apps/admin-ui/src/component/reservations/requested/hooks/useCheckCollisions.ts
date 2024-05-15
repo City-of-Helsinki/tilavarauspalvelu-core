@@ -1,4 +1,4 @@
-import { type Query, ReservationTypeChoice } from "common/types/gql-types";
+import { type Query, ReservationTypeChoice } from "@gql/gql-types";
 import { useQuery } from "@apollo/client";
 import { useNotification } from "@/context/NotificationContext";
 import { doesIntervalCollide, reservationToInterval } from "@/helpers";

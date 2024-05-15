@@ -11,7 +11,7 @@ import {
   fontRegular,
 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { ReservationUnitNode } from "common/types/gql-types";
+import type { ReservationUnitNode } from "@gql/gql-types";
 import { truncatedText } from "@/styles/util";
 import {
   getReservationUnitPrice,

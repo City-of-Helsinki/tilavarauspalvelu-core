@@ -15,7 +15,7 @@ import {
   type ReservationNode,
   type ReservationUnitNode,
   State,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { Subheading } from "common/src/reservation-form/styles";
 import { breakpoints } from "common/src/common/style";
 import { IconButton } from "common/src/components";

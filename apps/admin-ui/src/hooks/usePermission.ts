@@ -3,8 +3,8 @@ import type {
   UnitNode,
   ReservationNode,
   UserNode,
-  ApplicationRoundNode,
-} from "common/types/gql-types";
+  ApplicationRoundQuery,
+} from "@gql/gql-types";
 import {
   hasPermission as baseHasPermission,
   hasSomePermission as baseHasSomePermission,
@@ -86,15 +86,16 @@ const usePermission = () => {
 
   // TODO restrict the Permission type to only those that are applicable to application rounds
   const hasApplicationRoundPermission = (
-    applicationRound: ApplicationRoundNode,
+    applicationRound: ApplicationRoundQuery["applicationRound"],
     permission: Permission
   ) => {
+    if (!applicationRound) return false;
     if (!user) return false;
     const units = filterNonNullable(
       applicationRound.reservationUnits.flatMap((ru) => ru.unit)
     );
     for (const unit of units) {
-      if (hasUnitPermission(user, permission, unit)) {
+      if (hasUnitPermission(user, permission, unit as UnitNode)) {
         return true;
       }
     }

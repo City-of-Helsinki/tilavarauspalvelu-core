@@ -7,7 +7,7 @@ import {
   ApplicantTypeChoice,
   type ApplicationNode,
   ApplicationStatusChoice,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { useRouter } from "next/router";
 import Head from "./Head";
 import Stepper, { StepperProps } from "./Stepper";

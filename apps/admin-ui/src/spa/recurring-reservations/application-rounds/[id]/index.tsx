@@ -1,16 +1,14 @@
 import React from "react";
-import { useQuery } from "@apollo/client";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
-  type Query,
-  type QueryApplicationRoundArgs,
-} from "common/types/gql-types";
+  useApplicationRoundQuery,
+  ApplicationRoundNode
+} from "@gql/gql-types";
 import { useNotification } from "@/context/NotificationContext";
 import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import Loader from "@/component/Loader";
 import { Review } from "./review/Review";
-import { APPLICATION_ROUND_QUERY } from "../queries";
 import usePermission from "@/hooks/usePermission";
 import { Permission } from "@/modules/permissionHelper";
 import { base64encode } from "common/src/helpers";
@@ -20,10 +18,7 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
   const { t } = useTranslation();
 
   const id = base64encode(`ApplicationRoundNode:${pk}`);
-  const { data, loading: isLoading } = useQuery<
-    Query,
-    QueryApplicationRoundArgs
-  >(APPLICATION_ROUND_QUERY, {
+  const { data, loading: isLoading } = useApplicationRoundQuery({
     skip: !pk,
     variables: { id },
     onError: () => {
@@ -73,7 +68,7 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
   return (
     <>
       <BreadcrumbWrapper route={route} />
-      <Review applicationRound={applicationRound} />
+      <Review applicationRound={applicationRound as ApplicationRoundNode} />
     </>
   );
 }

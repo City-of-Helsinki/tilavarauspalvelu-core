@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { chunkArray, fromUIDate, toUIDate } from "common/src/common/util";
 import { fontBold, fontMedium, H4 } from "common/src/common/typography";
-import type { ReservationUnitNode } from "common/types/gql-types";
+import type { ReservationUnitNode } from "@gql/gql-types";
 import { breakpoints } from "common";
 import { getReservationUnitPrice } from "@/modules/reservationUnit";
 import Carousel from "../Carousel";

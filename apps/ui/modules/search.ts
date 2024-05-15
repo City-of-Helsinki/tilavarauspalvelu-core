@@ -8,7 +8,7 @@ import {
   type QueryReservationUnitsArgs,
   ReservationKind,
   ReservationUnitOrderingChoices,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { ParsedUrlQuery } from "node:querystring";
 import { fromUIDate } from "./util";
 import { startOfDay } from "date-fns";

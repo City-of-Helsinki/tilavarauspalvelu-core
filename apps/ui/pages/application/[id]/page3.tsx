@@ -4,7 +4,7 @@ import {
   ApplicantTypeChoice,
   type ApplicationNode,
   type ApplicationUpdateMutationInput,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import type { GetServerSidePropsContext } from "next";

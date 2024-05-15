@@ -17,9 +17,7 @@
     "generate-email-templates": "node ./email/convertToHTML.mjs",
     "tsc:check": "tsc --noEmit --project tsconfig.tscheck.json",
     "tsc:clean": "tsc --build --clean",
-    "codegen": "pnpm codegen:schema && pnpm codegen:types && pnpm generate-email-templates",
-    "codegen:schema": "npx --yes get-graphql-schema http://localhost:8000/graphql/ > ../../tilavaraus.graphql",
-    "codegen:types": "graphql-codegen"
+    "generate:emails": "pnpm generate-email-templates"
   },
   "dependencies": {
     "classnames": "^2.5.1",
@@ -49,10 +47,6 @@
   },
   "devDependencies": {
     "@apollo/client": "^3.9.7",
-    "@graphql-codegen/cli": "^5.0.2",
-    "@graphql-codegen/typescript": "^4.0.6",
-    "@graphql-codegen/typescript-operations": "^4.2.0",
-    "@graphql-codegen/typescript-react-apollo": "^4.3.0",
     "@testing-library/jest-dom": "^6.2.0",
     "@testing-library/react": "^14.2.1",
     "@testing-library/user-event": "^14.5.2",

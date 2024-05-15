@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
 import type { ApplicationEventSchedulePriority } from "common/types/common";
-import { Priority, type ApplicationNode } from "common/types/gql-types";
+import { Priority, type ApplicationNode } from "@gql/gql-types";
 import {
   filterNonNullable,
   getLocalizationLang,

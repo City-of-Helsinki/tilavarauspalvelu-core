@@ -2,7 +2,7 @@ import { camelCase } from "lodash";
 import React, { useMemo } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { State } from "common/types/gql-types";
+import { State } from "@gql/gql-types";
 import { truncatedText } from "../../styles/util";
 
 export type Props = {

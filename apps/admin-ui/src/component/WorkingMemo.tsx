@@ -6,7 +6,7 @@ import {
   type ApplicationUpdateMutationInput,
   type Mutation,
   type ReservationWorkingMemoMutationInput,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { useNotification } from "@/context/NotificationContext";
 import {

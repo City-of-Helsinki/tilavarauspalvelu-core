@@ -2,7 +2,7 @@ import type {
   Maybe,
   ReservationNode,
   ReservationUnitImageNode,
-} from "../types/gql-types";
+} from "../gql/gql-types";
 import { pixel } from "./common/style";
 
 export function filterNonNullable<T>(

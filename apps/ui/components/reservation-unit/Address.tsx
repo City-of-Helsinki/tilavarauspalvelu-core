@@ -7,7 +7,7 @@ import type {
   Maybe,
   UnitNode,
   ReservationUnitNode,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { IconLinkExternal } from "hds-react";
 import { IconButton } from "common/src/components";
 import { mapUrlPrefix } from "@/modules/const";

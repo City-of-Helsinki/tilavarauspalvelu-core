@@ -1,5 +1,5 @@
 import React from "react";
-import { type ReservationNode } from "common/types/gql-types";
+import { type ReservationNode } from "@gql/gql-types";
 import { Permission } from "app/modules/permissionHelper";
 import usePermission from "app/hooks/usePermission";
 

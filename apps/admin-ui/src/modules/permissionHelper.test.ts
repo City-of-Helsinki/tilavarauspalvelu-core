@@ -4,7 +4,7 @@ import {
   UnitRoleNode,
   UnitRolePermissionNode,
   UserNode,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { Permission, hasPermission } from "./permissionHelper";
 
 const userCommon = {

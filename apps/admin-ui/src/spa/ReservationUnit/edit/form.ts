@@ -16,7 +16,7 @@ import {
   ImageType,
   type ReservationUnitImageNode,
   type ReservationUnitNode,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { addDays, format } from "date-fns";
 import { z } from "zod";
 import {

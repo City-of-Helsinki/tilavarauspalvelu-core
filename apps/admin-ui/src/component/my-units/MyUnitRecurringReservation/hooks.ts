@@ -12,11 +12,11 @@ import type {
   QueryUnitArgs,
   Maybe,
   ReservationMetadataFieldNode,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import {
   ReservationTypeChoice,
   ReservationStartInterval,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import type { UseFormReturn } from "react-hook-form";
 import type { RecurringReservationForm } from "app/schemas";
 import {

@@ -1,7 +1,7 @@
 import {
   ReservableTimeSpanType,
   ReservationUnitsReservationUnitReservationStartIntervalChoices,
-} from "../../../types/gql-types";
+} from "../../../gql/gql-types";
 import {
   areReservableTimesAvailable,
   getIntervalMinutes,

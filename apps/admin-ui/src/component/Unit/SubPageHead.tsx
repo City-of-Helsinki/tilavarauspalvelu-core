@@ -3,7 +3,7 @@ import React from "react";
 import { H1, fontMedium } from "common/src/common/typography";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { type UnitNode } from "common/types/gql-types";
+import { type UnitNode } from "@gql/gql-types";
 import { parseAddress } from "../../common/util";
 
 interface IProps {

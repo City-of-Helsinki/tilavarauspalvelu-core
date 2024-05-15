@@ -1,7 +1,7 @@
 import { format, parseISO } from "date-fns";
 import i18next from "i18next";
 import { set, get, trim } from "lodash";
-import type { LocationNode, Query } from "common/types/gql-types";
+import type { LocationNode, Query } from "@gql/gql-types";
 import { NUMBER_OF_DECIMALS } from "./const";
 import type { TFunction } from "next-i18next";
 

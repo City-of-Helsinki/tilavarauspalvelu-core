@@ -8,9 +8,9 @@ import { breakpoints } from "common/src/common/style";
 import { H4 } from "common/src/common/typography";
 import ClientOnly from "common/src/ClientOnly";
 import {
-  ApplicationRoundNode,
+  type ApplicationRoundNode,
   ApplicationRoundStatusChoice,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { IconButton } from "common/src/components";
 import { searchUrl } from "@/modules/util";
 import { MediumButton } from "@/styles/util";

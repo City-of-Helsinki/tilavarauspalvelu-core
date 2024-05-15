@@ -17,7 +17,7 @@ import {
   type QueryAffectingAllocatedTimeSlotsArgs,
   type ApplicationRoundNode,
   type ReservationUnitNode,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { SearchTags } from "@/component/SearchTags";
 import Loader from "@/component/Loader";

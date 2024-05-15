@@ -1,9 +1,9 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { TFunction } from "i18next";
+import type { TFunction } from "i18next";
 import { memoize } from "lodash";
 import { IconLinkExternal } from "hds-react";
-import type { AllocatedTimeSlotNode } from "common/types/gql-types";
+import type { AllocatedTimeSlotNode } from "@gql/gql-types";
 import { convertWeekday } from "common/src/conversion";
 import { PUBLIC_URL } from "@/common/const";
 import { getApplicantName, truncate } from "@/helpers";

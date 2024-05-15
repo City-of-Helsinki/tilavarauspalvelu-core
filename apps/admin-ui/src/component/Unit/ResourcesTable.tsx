@@ -15,7 +15,7 @@ import type {
   ResourceDeleteMutationPayload,
   ResourceNode,
   UnitNode,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { PopupMenu } from "@/component/PopupMenu";
 import ConfirmationDialog, { ModalRef } from "../ConfirmationDialog";
 import { DELETE_RESOURCE } from "@/common/queries";

@@ -4,6 +4,7 @@
     "plugins": [{ "name": "next" }],
     "paths": {
       "@/*": ["./*"],
+      "@gql/*": ["./gql/*"],
       // ~ is old prefer the @ as base path
       "~/*": ["./*"]
     }

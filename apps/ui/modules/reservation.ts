@@ -9,7 +9,7 @@ import {
   CustomerTypeChoice,
   type ReservationMetadataFieldNode,
   type Maybe,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import {
   type RoundPeriod,
   doBuffersCollide,

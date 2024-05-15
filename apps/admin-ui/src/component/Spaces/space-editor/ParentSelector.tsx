@@ -3,7 +3,7 @@ import { useQuery } from "@apollo/client";
 import type { TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
 import { Select } from "hds-react";
-import type { Query, QueryUnitArgs } from "common/types/gql-types";
+import type { Query, QueryUnitArgs } from "@gql/gql-types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { SPACE_HIERARCHY_QUERY } from "./queries";
 import { spacesAsHierarchy } from "./util";

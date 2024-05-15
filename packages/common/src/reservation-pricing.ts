@@ -1,4 +1,4 @@
-import { Maybe, PriceUnit } from "../types/gql-types";
+import { Maybe, PriceUnit } from "../gql/gql-types";
 import formatters from "./number-formatters";
 
 export const getPriceUnitMinutes = (unit: PriceUnit): number => {

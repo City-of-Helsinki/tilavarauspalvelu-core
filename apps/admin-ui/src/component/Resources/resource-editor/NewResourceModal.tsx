@@ -10,7 +10,7 @@ import {
   type MutationCreateResourceArgs,
   type ResourceCreateMutationInput,
   type UnitNode,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { parseAddress } from "@/common/util";
 import { CustomDialogHeader } from "@/component/CustomDialogHeader";
 import { CREATE_RESOURCE } from "./queries";

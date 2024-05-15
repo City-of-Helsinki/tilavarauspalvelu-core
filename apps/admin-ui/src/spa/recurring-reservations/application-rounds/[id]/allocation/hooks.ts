@@ -13,7 +13,7 @@ import {
   type MutationCreateAllocatedTimeslotArgs,
   type AllocatedTimeSlotCreateMutationInput,
   type AllocatedTimeSlotNode,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useNotification } from "@/context/NotificationContext";

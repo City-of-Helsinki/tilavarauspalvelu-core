@@ -53,7 +53,7 @@ import {
   type ReservationCreateMutationPayload,
   type ReservationNode,
   type ReservationUnitNode,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import {
   base64encode,
   concatAffectedReservations,

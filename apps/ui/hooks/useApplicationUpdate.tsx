@@ -3,7 +3,7 @@ import type {
   Mutation,
   MutationUpdateApplicationArgs,
   ApplicationUpdateMutationInput,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { UPDATE_APPLICATION_MUTATION } from "@/modules/queries/application";
 
 export function useApplicationUpdate() {

@@ -20,7 +20,7 @@ import {
   State,
   type ReservationNode,
   type ReservationMetadataFieldNode,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import Link from "next/link";
 import { Container } from "common";
 import { useOrder } from "@/hooks/reservation";

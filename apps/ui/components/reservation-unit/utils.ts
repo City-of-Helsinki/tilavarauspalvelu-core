@@ -1,15 +1,15 @@
 import { filterNonNullable } from "common/src/helpers";
 import { addDays, addMinutes, isAfter, isBefore, set } from "date-fns";
-import {
+import type {
   ReservableTimeSpanType,
   ReservationUnitNode,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import {
   getPossibleTimesForDay,
   isInTimeSpan,
 } from "@/modules/reservationUnit";
 import { isReservationReservable } from "@/modules/reservation";
-import { RoundPeriod } from "common/src/calendar/util";
+import type { RoundPeriod } from "common/src/calendar/util";
 
 function pickMaybeDay(
   a: Date | undefined,

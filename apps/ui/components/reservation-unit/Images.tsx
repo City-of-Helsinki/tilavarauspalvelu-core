@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import dynamic from "next/dynamic";
 import { breakpoints } from "common/src/common/style";
-import type { ReservationUnitImageNode } from "common/types/gql-types";
+import type { ReservationUnitImageNode } from "@gql/gql-types";
 import Carousel from "../Carousel";
 import { getImageSource } from "common/src/helpers";
 

@@ -6,7 +6,7 @@ import {
   type ApplicationSectionNode,
   type SuitableTimeRangeNode,
   Priority,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { convertWeekday } from "common/src/conversion";
 import { filterNonNullable } from "common/src/helpers";
 import { WEEKDAYS } from "common/src/const";

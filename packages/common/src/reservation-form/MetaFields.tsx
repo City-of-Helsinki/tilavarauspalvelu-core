@@ -18,7 +18,7 @@ import {
   type ReservationMetadataSetNode,
   CustomerTypeChoice,
   type ReservationUnitNode,
-} from "../../types/gql-types";
+} from "../../gql/gql-types";
 import ReservationFormField from "./ReservationFormField";
 import { Inputs, Reservation } from "./types";
 import RadioButtonWithImage from "./RadioButtonWithImage";

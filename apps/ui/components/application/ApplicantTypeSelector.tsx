@@ -3,9 +3,9 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { fontRegular } from "common/src/common/typography";
-import { ApplicantTypeChoice } from "common/types/gql-types";
+import { ApplicantTypeChoice } from "@gql/gql-types";
 import { useController, useFormContext } from "react-hook-form";
-import { ApplicationFormPage3Values } from "./Form";
+import type { ApplicationFormPage3Values } from "./Form";
 
 const Container = styled.div`
   margin-top: var(--spacing-m);

@@ -8,7 +8,7 @@ import {
   startOfDay,
 } from "date-fns";
 import React, {
-  CSSProperties,
+  type CSSProperties,
   Fragment,
   useCallback,
   useEffect,
@@ -17,10 +17,7 @@ import React, {
 } from "react";
 import Popup from "reactjs-popup";
 import styled, { css } from "styled-components";
-import {
-  type ReservationNode,
-  ReservationTypeChoice,
-} from "common/types/gql-types";
+import { type ReservationNode, ReservationTypeChoice } from "@gql/gql-types";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { POST_PAUSE, PRE_PAUSE } from "@/common/calendarStyling";

@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import type { SpaceNode } from "common/types/gql-types";
+import type { SpaceNode } from "@gql/gql-types";
 
 type Props = {
   space: SpaceNode;

@@ -1,8 +1,5 @@
 import { useSessionStorage } from "react-use";
-import type {
-  ApplicationRoundNode,
-  ReservationUnitNode,
-} from "common/types/gql-types";
+import type { ApplicationRoundNode, ReservationUnitNode } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 
 type ReservationUnitList = {

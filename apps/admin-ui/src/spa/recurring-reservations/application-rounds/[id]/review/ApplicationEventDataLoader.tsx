@@ -5,7 +5,7 @@ import {
   ApplicationSectionOrderingChoices,
   type Query,
   type QueryApplicationSectionsArgs,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { filterNonNullable } from "common/src/helpers";
 import {

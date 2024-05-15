@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { APPLICATION_ROUND_FRAGMENT } from "./applicationRound";
 import { APPLICANT_NAME_FRAGMENT } from "common/src/queries/application";
-import { ApplicationOrderingChoices } from "common/types/gql-types";
+import { ApplicationOrderingChoices } from "@gql/gql-types";
 
 // TODO this doesn't have pagination so the orderBy is for development purposes only
 // in production the order isn't specified and pagination is not needed

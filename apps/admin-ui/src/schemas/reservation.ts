@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { fromUIDate } from "common/src/common/util";
-import { ReservationStartInterval } from "common/types/gql-types";
+import { ReservationStartInterval } from "@gql/gql-types";
 import { intervalToNumber } from "./utils";
 import {
   checkTimeStringFormat,

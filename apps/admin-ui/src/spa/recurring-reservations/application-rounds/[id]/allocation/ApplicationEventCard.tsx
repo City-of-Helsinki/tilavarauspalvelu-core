@@ -9,7 +9,7 @@ import type {
   MutationUpdateReservationUnitOptionArgs,
   Query,
   ReservationUnitNode,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { SemiBold, fontMedium } from "common";
 import { ageGroup } from "@/component/reservations/requested/util";
 import { filterNonNullable } from "common/src/helpers";

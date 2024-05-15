@@ -10,7 +10,7 @@ import {
   ApplicationRoundStatusChoice,
   type Query,
   type QueryApplicationRoundsArgs,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { HeroSubheading } from "@/modules/style/typography";
 import ApplicationRoundCard from "@/components/recurring/ApplicationRoundCard";

@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Card, IconArrowRight, IconCalendar } from "hds-react";
-import { ApplicationRoundNode } from "common/types/gql-types";
+import { type ApplicationRoundNode } from "@gql/gql-types";
 import { breakpoints } from "common/src/common/style";
 import { formatDate } from "@/common/util";
 import { applicationRoundUrl } from "@/common/urls";

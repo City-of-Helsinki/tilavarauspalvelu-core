@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { type Query } from "common/types/gql-types";
+import { type Query } from "@gql/gql-types";
 import { CURRENT_USER } from "@/context/queries";
 
 export { signIn, signOut } from "common/src/browserHelpers";

@@ -1,4 +1,4 @@
-import { ReservationStartInterval } from "common/types/gql-types";
+import { ReservationStartInterval } from "@gql/gql-types";
 import { addDays, addHours, format, setMinutes, subDays } from "date-fns";
 import { ReservationFormSchema } from "./reservation";
 

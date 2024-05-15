@@ -10,7 +10,7 @@ import {
   type ReservationNode,
   ReservationStartInterval,
   ReservationTypeChoice,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { FormProvider, useForm } from "react-hook-form";
 import { differenceInMinutes, format } from "date-fns";
 import { ErrorBoundary } from "react-error-boundary";

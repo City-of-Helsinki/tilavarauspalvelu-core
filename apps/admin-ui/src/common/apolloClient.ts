@@ -17,7 +17,7 @@ import type {
   ReservationNodeConnection,
   BannerNotificationNodeConnection,
   ReservationUnitNodeConnection,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { buildGraphQLUrl } from "common/src/urlBuilder";
 import { env } from "@/env.mjs";
 import { isBrowser } from "./const";

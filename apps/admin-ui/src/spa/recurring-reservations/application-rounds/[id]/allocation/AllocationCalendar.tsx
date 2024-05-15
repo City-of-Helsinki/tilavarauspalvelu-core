@@ -10,7 +10,7 @@ import {
   ApplicationSectionStatusChoice,
   type AllocatedTimeSlotNode,
   type SuitableTimeRangeNode,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { breakpoints } from "common";
 import { type Day } from "common/src/conversion";
 import { transformWeekday } from "common/src/conversion";

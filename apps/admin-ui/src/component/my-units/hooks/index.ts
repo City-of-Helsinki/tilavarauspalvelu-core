@@ -9,7 +9,7 @@ import {
   type ReservationNode,
   CustomerTypeChoice,
   ReservationTypeChoice,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { toApiDate } from "common/src/common/util";
 import {
   base64encode,

@@ -12,7 +12,7 @@ import type {
   SpaceNode,
   UnitNode,
   Query,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { DELETE_SPACE } from "@/common/queries";
 import { PopupMenu } from "@/component/PopupMenu";
 import Modal, { useModal as useHDSModal } from "../HDSModal";

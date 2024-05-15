@@ -14,7 +14,7 @@ import {
   type BannerNotificationNodeConnection,
   type Maybe,
   BannerNotificationTarget,
-} from "../../types/gql-types";
+} from "../../gql/gql-types";
 import { BANNER_NOTIFICATIONS_LIST } from "./BannerNotificationsQuery";
 
 type BannerNotificationListProps = {

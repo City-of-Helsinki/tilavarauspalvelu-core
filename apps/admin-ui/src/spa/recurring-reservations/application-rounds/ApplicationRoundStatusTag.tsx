@@ -1,7 +1,7 @@
 import { Tag } from "hds-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { ApplicationRoundStatusChoice } from "common/types/gql-types";
+import { ApplicationRoundStatusChoice } from "@gql/gql-types";
 
 type RoundStatus = {
   color: string;

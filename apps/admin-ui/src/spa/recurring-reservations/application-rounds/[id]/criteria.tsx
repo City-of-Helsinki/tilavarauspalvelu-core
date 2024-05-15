@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import { H1, H2, H3, Strong } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { type Query } from "common/types/gql-types";
+import { type Query } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { Container } from "@/styles/layout";
 import { formatDate } from "@/common/util";

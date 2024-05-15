@@ -2,7 +2,7 @@ import { parseISO } from "date-fns";
 import { i18n, TFunction } from "next-i18next";
 import queryString from "query-string";
 import { trim } from "lodash";
-import { ApolloError } from "@apollo/client";
+import type { ApolloError } from "@apollo/client";
 import type { OptionType } from "common";
 import {
   toApiDate,
@@ -11,11 +11,11 @@ import {
   fromApiDate as fromAPIDate,
   fromUIDate,
 } from "common/src/common/util";
-import {
-  type ReservationUnitImageNode,
-  type ReservationUnitNode,
-  type AgeGroupNode,
-} from "common/types/gql-types";
+import type {
+  ReservationUnitImageNode,
+  ReservationUnitNode,
+  AgeGroupNode,
+} from "@gql/gql-types";
 import {
   searchPrefix,
   applicationsPrefix,

@@ -1,6 +1,6 @@
 import React from "react";
 import { formatDuration } from "common/src/common/util";
-import { type ReservationUnitNode } from "common/types/gql-types";
+import { type ReservationUnitNode } from "@gql/gql-types";
 import ClientOnly from "common/src/ClientOnly";
 import { Trans, useTranslation } from "next-i18next";
 import { daysByMonths } from "@/modules/const";

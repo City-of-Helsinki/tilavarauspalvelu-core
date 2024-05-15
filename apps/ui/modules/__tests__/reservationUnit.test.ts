@@ -11,7 +11,7 @@ import {
   type ReservationUnitNode,
   type UnitNode,
   Status,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import {
   getEquipmentCategories,
   getEquipmentList,

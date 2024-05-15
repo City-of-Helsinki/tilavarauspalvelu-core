@@ -1,26 +1,8 @@
 ## Available Scripts
 
-Run all code generation scripts.
-``` sh
-pnpm codegen
-```
-
-### individual commands
-
-Generate only the `tilavaraus.schema` file, no Typescript types.
-Uses localhost:8000 as the API backend so make sure it's running.
-``` sh
-pnpm codegen:schema
-```
-
-Generate only the Typescript types without updating the `tilavaraus.schema` from API.
-``` sh
-pnpm codegen:types
-```
-
 Generate email .html templates
 ``` sh
-pnpm generate-email-templates
+pnpm generate:emails
 ```
 
  - Converts and translates (using `i18n/*.json`) the `templates/*.template.mjml` files to `html/*_{lang}.html` and `text-templates/*.template.txt` to `txt/*_{lang}.txt`.

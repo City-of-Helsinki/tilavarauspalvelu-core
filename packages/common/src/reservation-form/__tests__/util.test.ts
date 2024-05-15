@@ -1,5 +1,5 @@
 import { getReservationApplicationFields } from "../util";
-import { CustomerTypeChoice } from "../../../types/gql-types";
+import { CustomerTypeChoice } from "../../../gql/gql-types";
 
 describe("getReservationApplicationFields", () => {
   test("with empty input", () => {

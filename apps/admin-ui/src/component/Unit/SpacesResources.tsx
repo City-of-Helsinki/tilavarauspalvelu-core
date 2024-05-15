@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import { useQuery } from "@apollo/client";
-import type { Query, QueryUnitArgs } from "common/types/gql-types";
+import type { Query, QueryUnitArgs } from "@gql/gql-types";
 import { Container } from "@/styles/layout";
 import Loader from "../Loader";
 import { ResourcesTable } from "./ResourcesTable";

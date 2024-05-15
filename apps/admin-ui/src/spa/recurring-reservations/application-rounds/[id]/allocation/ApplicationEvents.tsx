@@ -10,7 +10,7 @@ import {
   ApplicationSectionStatusChoice,
   type AllocatedTimeSlotNode,
   type ReservationUnitNode,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { breakpoints } from "common";
 import { Accordion } from "@/component/Accordion";
 import { AllocationCalendar } from "./AllocationCalendar";

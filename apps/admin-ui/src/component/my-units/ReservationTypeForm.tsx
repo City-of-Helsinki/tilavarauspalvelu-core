@@ -1,10 +1,7 @@
 import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { Notification, RadioButton, SelectionGroup, TextArea } from "hds-react";
-import {
-  Authentication,
-  type ReservationUnitNode,
-} from "common/types/gql-types";
+import { Authentication, type ReservationUnitNode } from "@gql/gql-types";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { type ReservationFormType, ReservationTypes } from "@/schemas";

@@ -9,7 +9,7 @@ import type {
   Query,
   QueryReservationArgs,
   QueryReservationCancelReasonsArgs,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import Error from "next/error";
 import ReservationCancellation from "@/components/reservation/ReservationCancellation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";

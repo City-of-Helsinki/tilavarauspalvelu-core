@@ -1,9 +1,9 @@
-import { CalendarEvent } from "common/src/calendar/Calendar";
+import type { CalendarEvent } from "common/src/calendar/Calendar";
 import {
   State,
   type ReservationNode,
   ReservationTypeChoice,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import {
   COMMON_LEGEND,
   CONFIRMED,

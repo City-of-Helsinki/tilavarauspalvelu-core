@@ -1,9 +1,9 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { TFunction } from "i18next";
+import type { TFunction } from "i18next";
 import { memoize, orderBy, uniqBy } from "lodash";
 import { IconLinkExternal } from "hds-react";
-import type { ApplicationSectionNode } from "common/types/gql-types";
+import type { ApplicationSectionNode } from "@gql/gql-types";
 import { MAX_APPLICATION_ROUND_NAME_LENGTH, PUBLIC_URL } from "@/common/const";
 import { getApplicantName, truncate } from "@/helpers";
 import { applicationDetailsUrl } from "@/common/urls";

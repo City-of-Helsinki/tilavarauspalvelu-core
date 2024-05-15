@@ -5,7 +5,7 @@ import {
   type ServiceSectorRoleNode,
   type UserNode,
   GeneralPermissionChoices,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 
 // TODO reuse the backend enums
 // TODO add a safe conversion from Unit -> General permission

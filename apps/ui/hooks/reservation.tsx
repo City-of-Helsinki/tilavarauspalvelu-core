@@ -15,7 +15,7 @@ import {
   type UserNode,
   OrderStatus,
   ReservationOrderingChoices,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import {
   DELETE_RESERVATION,
   GET_ORDER,

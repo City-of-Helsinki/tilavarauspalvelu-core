@@ -7,7 +7,7 @@ import {
   type ReservationUnitNode,
   type ReservationNode,
   type TermsOfUseNode,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import TermsBox from "common/src/termsbox/TermsBox";
 import {
   Subheading,
@@ -25,7 +25,7 @@ import {
   PinkBox,
 } from "../reservation-unit/ReservationUnitStyles";
 import { useFormContext } from "react-hook-form";
-import { TFunction } from "i18next";
+import type { TFunction } from "i18next";
 
 type OptionType = {
   label: string;

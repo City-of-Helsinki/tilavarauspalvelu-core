@@ -8,7 +8,7 @@ import {
   ApplicationRoundStatusChoice,
   type ApplicationRoundNode,
   type Query,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { applicationRoundUrl } from "@/common/urls";
 import { formatDate } from "@/common/util";

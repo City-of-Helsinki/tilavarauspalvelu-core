@@ -10,7 +10,7 @@ import {
   type Query,
   type QueryBannerNotificationsArgs,
   BannerNotificationOrderingChoices,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { H1 } from "common/src/common/typography";
 import { Container } from "@/styles/layout";
 import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";

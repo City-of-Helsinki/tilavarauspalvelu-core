@@ -12,7 +12,7 @@ import {
   ApplicationRoundStatusChoice,
   type ReservationUnitNode,
   type UnitNode,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { Container, TabWrapper } from "@/styles/layout";
 import { ApplicationRoundStatusTag } from "../../ApplicationRoundStatusTag";

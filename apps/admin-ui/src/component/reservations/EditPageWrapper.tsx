@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { ReservationNode } from "common/types/gql-types";
+import { type ReservationNode } from "@gql/gql-types";
 import styled from "styled-components";
 import LinkPrev from "../LinkPrev";
 import { Container } from "../../styles/layout";

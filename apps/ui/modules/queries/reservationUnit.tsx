@@ -100,7 +100,7 @@ export { type ReservationUnitWithAffectingArgs } from "common/src/queries/fragme
 export const RESERVATION_UNIT_PAGE_QUERY = gql`
   ${RESERVATION_UNIT_PAGE_FRAGMENT}
   ${BLOCKING_RESERVATION_FRAGMENT}
-  query ReservationUnit(
+  query ReservationUnitPage(
     $id: ID!
     $pk: Int!
     $beginDate: Date!

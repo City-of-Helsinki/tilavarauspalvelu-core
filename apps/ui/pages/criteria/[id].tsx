@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import type { GetServerSidePropsContext } from "next";
 import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import type { Query, QueryApplicationRoundsArgs } from "common/types/gql-types";
+import type { Query, QueryApplicationRoundsArgs } from "@gql/gql-types";
 import { Container } from "common";
 import { createApolloClient } from "@/modules/apolloClient";
 import Sanitize from "@/components/common/Sanitize";

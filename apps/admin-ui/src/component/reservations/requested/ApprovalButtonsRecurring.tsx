@@ -1,5 +1,5 @@
 import React from "react";
-import { type RecurringReservationNode, State } from "common/types/gql-types";
+import { type RecurringReservationNode, State } from "@gql/gql-types";
 import { useTranslation } from "react-i18next";
 import { Button } from "hds-react";
 import { ButtonLikeLink } from "app/component/ButtonLikeLink";

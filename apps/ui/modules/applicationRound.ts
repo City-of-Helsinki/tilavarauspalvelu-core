@@ -1,4 +1,4 @@
-import { ApplicationRoundNode } from "common/types/gql-types";
+import type { ApplicationRoundNode } from "@gql/gql-types";
 import { getTranslation } from "./util";
 
 export const getApplicationRoundName = (

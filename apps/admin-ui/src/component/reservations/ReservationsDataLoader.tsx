@@ -5,7 +5,7 @@ import {
   type Query,
   type QueryReservationsArgs,
   ReservationOrderingChoices,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { More } from "@/component/More";
 import { LIST_PAGE_SIZE } from "@/common/const";
 import { useNotification } from "@/context/NotificationContext";

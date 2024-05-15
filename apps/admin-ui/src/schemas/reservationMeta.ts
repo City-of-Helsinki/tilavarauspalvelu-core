@@ -1,8 +1,7 @@
 // Rewriting the metafields using zod validators
 // TODO move to common after they are tested in use with
 // CreateReservationModal / RecurringReservation / EditReservation
-
-import { CustomerTypeChoice } from "common/types/gql-types";
+import { CustomerTypeChoice } from "@gql/gql-types";
 import { z } from "zod";
 import { OptionSchema } from "common/src/schemas/schemaCommon";
 

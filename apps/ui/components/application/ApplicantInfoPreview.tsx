@@ -1,9 +1,6 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import {
-  type ApplicationNode,
-  ApplicantTypeChoice,
-} from "common/types/gql-types";
+import { type ApplicationNode, ApplicantTypeChoice } from "@gql/gql-types";
 import { getTranslation } from "common/src/common/util";
 import { SpanTwoColumns, TwoColumnContainer } from "../common/common";
 import Address from "./AddressPreview";

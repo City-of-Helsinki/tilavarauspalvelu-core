@@ -13,7 +13,7 @@ import {
   type SuitableTimeRangeNode,
   ApplicationSectionStatusChoice,
   type ReservationUnitNode,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { ShowAllContainer } from "common/src/components/";
 import { transformWeekday, type Day } from "common/src/conversion";
 import { ALLOCATION_CALENDAR_TIMES } from "@/common/const";

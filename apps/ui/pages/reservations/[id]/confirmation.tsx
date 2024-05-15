@@ -1,6 +1,6 @@
 import React from "react";
 import { useQuery } from "@apollo/client";
-import type { Query, QueryReservationArgs } from "common/types/gql-types";
+import type { Query, QueryReservationArgs } from "@gql/gql-types";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { breakpoints, Container } from "common";

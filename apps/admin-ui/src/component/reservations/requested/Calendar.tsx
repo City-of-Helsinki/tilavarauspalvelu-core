@@ -3,10 +3,7 @@ import CommonCalendar from "common/src/calendar/Calendar";
 import { Toolbar } from "common/src/calendar/Toolbar";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import {
-  type ReservationNode,
-  ReservationTypeChoice,
-} from "common/types/gql-types";
+import { type ReservationNode, ReservationTypeChoice } from "@gql/gql-types";
 import { useModal } from "app/context/ModalContext";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
 import Legend from "./Legend";

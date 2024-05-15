@@ -6,7 +6,7 @@ import styled from "styled-components";
 import { getReservationPrice } from "common";
 import { trim } from "lodash";
 import { breakpoints } from "common/src/common/style";
-import { ReservationNode, State } from "common/types/gql-types";
+import { type ReservationNode, State } from "@gql/gql-types";
 import {
   capitalize,
   getMainImage,

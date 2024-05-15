@@ -16,7 +16,7 @@ import {
   type ReservationDenyMutationInput,
   type ReservationRefundMutationInput,
   type ReservationNode,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
 import { DENY_RESERVATION, REFUND_RESERVATION } from "./queries";
 import { useNotification } from "@/context/NotificationContext";

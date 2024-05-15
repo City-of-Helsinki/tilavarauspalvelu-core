@@ -1,6 +1,5 @@
 import { addDays, format } from "date-fns";
-
-import { ReservationStartInterval } from "common/types/gql-types";
+import { ReservationStartInterval } from "@gql/gql-types";
 import { timeSelectionSchema } from "./recurringReservation";
 
 const DATE_FORMAT = "dd.MM.yyyy";

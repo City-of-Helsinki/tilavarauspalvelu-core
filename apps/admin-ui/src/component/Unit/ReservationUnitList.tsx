@@ -1,5 +1,5 @@
 import React from "react";
-import type { ReservationUnitNode } from "common/types/gql-types";
+import type { ReservationUnitNode } from "@gql/gql-types";
 import { ReservationUnitCard } from "./ReservationUnitCard";
 
 interface IProps {

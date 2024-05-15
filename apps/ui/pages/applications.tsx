@@ -6,11 +6,11 @@ import { Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import {
-  ApplicationNode,
+  type ApplicationNode,
   ApplicationStatusChoice,
-  Query,
-  QueryApplicationsArgs,
-} from "common/types/gql-types";
+  type Query,
+  type QueryApplicationsArgs,
+} from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import Head from "@/components/applications/Head";
 import ApplicationsGroup from "@/components/applications/ApplicationsGroup";

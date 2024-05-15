@@ -23,7 +23,7 @@ import {
   Subheading,
 } from "../reservation-unit/ReservationUnitStyles";
 import Sanitize from "../common/Sanitize";
-import { ReservationUnitNode } from "common/types/gql-types";
+import type { ReservationUnitNode } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { containsField } from "common/src/metaFieldsHelpers";
 

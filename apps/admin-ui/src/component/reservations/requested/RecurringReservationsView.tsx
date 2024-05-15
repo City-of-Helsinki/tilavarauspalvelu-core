@@ -2,11 +2,7 @@ import React from "react";
 import { H6 } from "common/src/common/typography";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
-import {
-  State,
-  type ReservationNode,
-  type Query,
-} from "common/types/gql-types";
+import { State, type ReservationNode, type Query } from "@gql/gql-types";
 import { type ApolloQueryResult } from "@apollo/client";
 import { useRecurringReservations } from "./hooks";
 import { ReservationList } from "@/component/ReservationsList";

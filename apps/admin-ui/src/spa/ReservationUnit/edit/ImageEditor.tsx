@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { Button, FileInput } from "hds-react";
-import { ImageType } from "common/types/gql-types";
+import { ImageType } from "@gql/gql-types";
 import { AutoGrid } from "@/styles/layout";
 import { type ImageFormType } from "./form";
 

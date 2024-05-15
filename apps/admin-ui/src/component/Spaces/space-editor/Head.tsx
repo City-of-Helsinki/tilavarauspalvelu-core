@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
-import type { Maybe, UnitNode } from "common/types/gql-types";
+import type { Maybe, UnitNode } from "@gql/gql-types";
 import { parseAddress } from "@/common/util";
 
 interface IProps {

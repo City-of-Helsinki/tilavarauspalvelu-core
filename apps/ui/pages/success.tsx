@@ -4,7 +4,7 @@ import type { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
-import { State } from "common/types/gql-types";
+import { State } from "@gql/gql-types";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { Container } from "common";
 import { useOrder, useReservation } from "@/hooks/reservation";

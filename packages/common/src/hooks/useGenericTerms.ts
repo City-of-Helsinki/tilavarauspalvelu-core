@@ -2,7 +2,7 @@ import {
   type QueryTermsOfUseArgs,
   type Query,
   TermsType,
-} from "../../types/gql-types";
+} from "../../gql/gql-types";
 import { useQuery } from "@apollo/client";
 import { filterNonNullable } from "../helpers";
 import { genericTermsVariant } from "../const";

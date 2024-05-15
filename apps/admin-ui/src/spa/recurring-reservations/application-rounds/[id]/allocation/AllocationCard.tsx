@@ -10,7 +10,7 @@ import {
   Priority,
   type SuitableTimeRangeNode,
   type AllocatedTimeSlotNode,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { NotificationInline } from "common/src/components/NotificationInline";
 import { convertWeekday } from "common/src/conversion";

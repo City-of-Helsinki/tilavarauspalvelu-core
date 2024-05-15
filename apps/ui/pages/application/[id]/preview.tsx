@@ -2,10 +2,7 @@ import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { useMutation } from "@apollo/client";
-import type {
-  Mutation,
-  MutationSendApplicationArgs,
-} from "common/types/gql-types";
+import type { Mutation, MutationSendApplicationArgs } from "@gql/gql-types";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Error from "next/error";

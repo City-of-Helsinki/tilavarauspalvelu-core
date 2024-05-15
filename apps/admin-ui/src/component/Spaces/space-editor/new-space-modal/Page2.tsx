@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Button, Dialog, IconArrowLeft, IconCheck } from "hds-react";
-import type { UnitNode } from "common/types/gql-types";
+import type { UnitNode } from "@gql/gql-types";
 import { CustomDialogHeader } from "@/component/CustomDialogHeader";
 import {
   Address,

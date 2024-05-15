@@ -17,9 +17,19 @@
     "test": "turbo test",
     "tsc:check": "turbo tsc:check",
     "tsc:clean": "turbo tsc:clean",
-    "codegen": "turbo codegen"
+    "codegen:admin": "graphql-codegen --config codegen.ts --project admin-ui",
+    "codegen:ui": "graphql-codegen --config codegen.ts --project ui",
+    "codegen:common": "graphql-codegen --config codegen.ts --project common",
+    "codegen": "pnpm codegen:admin && pnpm codegen:ui && pnpm codegen:common",
+    "generate:emails": "turbo generate:emails"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.2",
+    "@graphql-codegen/schema-ast": "^4.0.2",
+    "@graphql-codegen/typescript": "^4.0.6",
+    "@graphql-codegen/typescript-operations": "^4.2.0",
+    "@graphql-codegen/typescript-react-apollo": "^4.3.0",
+    "graphql-config": "^5.0.3",
     "npkill": "^0.11.3",
     "turbo": "^1.11.3"
   },

@@ -1,5 +1,5 @@
-import { CalendarEvent } from "common/src/calendar/Calendar";
-import { ReservationNode } from "common/types/gql-types";
+import type { CalendarEvent } from "common/src/calendar/Calendar";
+import type { ReservationNode } from "@gql/gql-types";
 import React from "react";
 
 type ReservationStateWithInitial = string;

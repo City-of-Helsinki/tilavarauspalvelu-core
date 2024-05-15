@@ -13,7 +13,7 @@ import {
   type QueryReservationsArgs,
   State,
   ReservationOrderingChoices,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
 import { useSession } from "@/hooks/auth";

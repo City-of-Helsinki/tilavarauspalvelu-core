@@ -1,12 +1,12 @@
 import React from "react";
-import { ApolloError, useQuery } from "@apollo/client";
+import { type ApolloError, useQuery } from "@apollo/client";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "next-i18next";
 import {
   ApplicationOrderingChoices,
   type Query,
   type QueryApplicationsArgs,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { LIST_PAGE_SIZE } from "@/common/const";
 import { useNotification } from "@/context/NotificationContext";

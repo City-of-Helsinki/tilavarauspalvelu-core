@@ -14,7 +14,7 @@ import type {
   ReservationCancellationMutationInput,
   ReservationCancellationMutationPayload,
   ReservationNode,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { Container as CommonContainer } from "common";
 import { IconButton, ShowAllContainer } from "common/src/components";
 import Sanitize from "../common/Sanitize";

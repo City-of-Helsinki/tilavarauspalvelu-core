@@ -1,4 +1,4 @@
-import { ApolloQueryResult, useQuery } from "@apollo/client";
+import { type ApolloQueryResult, useQuery } from "@apollo/client";
 import { trim } from "lodash";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -15,7 +15,7 @@ import {
   CustomerTypeChoice,
   PricingType,
   State,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { Permission } from "@/modules/permissionHelper";
 import { useNotification } from "@/context/NotificationContext";
 import Loader from "@/component/Loader";

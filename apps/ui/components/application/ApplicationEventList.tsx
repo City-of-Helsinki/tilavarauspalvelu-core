@@ -7,7 +7,7 @@ import {
   type Maybe,
   type SuitableTimeRangeNode,
   Priority,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { getTranslation } from "common/src/common/util";
 import { convertWeekday } from "common/src/conversion";
 import { TimePreview } from "./TimePreview";

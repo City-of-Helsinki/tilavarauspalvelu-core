@@ -4,16 +4,13 @@ import { useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import type { OptionType } from "common/types/common";
-import type {
-  ApplicationRoundNode,
-  ReservationUnitNode,
-} from "common/types/gql-types";
+import type { ApplicationRoundNode, ReservationUnitNode } from "@gql/gql-types";
 import { IconButton } from "common/src/components";
 import { filterNonNullable } from "common/src/helpers";
 import Modal from "../common/Modal";
 import ReservationUnitModal from "../reservation-unit/ReservationUnitModal";
 import ReservationUnitCard from "../reservation-unit/ReservationUnitCard";
-import { ApplicationFormValues } from "./Form";
+import type { ApplicationFormValues } from "./Form";
 
 type OptionTypes = {
   purposeOptions: OptionType[];

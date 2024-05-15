@@ -2,7 +2,7 @@ import React from "react";
 import Head from "next/head";
 import styled from "styled-components";
 import { BannerNotificationsList } from "common/src/components";
-import { BannerNotificationTarget } from "common/types/gql-types";
+import { BannerNotificationTarget } from "@gql/gql-types";
 import Footer from "./Footer";
 import { Navigation } from "./Navigation/Navigation";
 import { InProgressReservationNotification } from "@/components/reservations/UnpaidReservationNotification";

@@ -1,5 +1,5 @@
 import React from "react";
-import { GetServerSidePropsContext } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
 import {
@@ -8,7 +8,7 @@ import {
   type Query,
   type QueryPurposesArgs,
   type QueryUnitsArgs,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { Container } from "common";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import Header from "@/components/index/Header";

@@ -34,7 +34,7 @@ import {
   type MutationRestoreAllSectionOptionsArgs,
   type MutationRejectAllApplicationOptionsArgs,
   type MutationRestoreAllApplicationOptionsArgs,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { formatDuration } from "common/src/common/util";
 import { convertWeekday, type Day } from "common/src/conversion";
 import { WEEKDAYS } from "common/src/const";

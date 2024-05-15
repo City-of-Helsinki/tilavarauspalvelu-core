@@ -2,10 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type {
-  ReservationNode,
-  ReservationUnitNode,
-} from "common/types/gql-types";
+import type { ReservationNode, ReservationUnitNode } from "@gql/gql-types";
 import { Button, TextInput } from "hds-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";

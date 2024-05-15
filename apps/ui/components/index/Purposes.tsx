@@ -6,7 +6,7 @@ import { useMedia } from "react-use";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { H3 } from "common/src/common/typography";
-import type { PurposeNode } from "common/types/gql-types";
+import type { PurposeNode } from "@gql/gql-types";
 import { ShowAllContainer } from "common/src/components";
 import { singleSearchPrefix } from "../../modules/const";
 import { getTranslation } from "../../modules/util";

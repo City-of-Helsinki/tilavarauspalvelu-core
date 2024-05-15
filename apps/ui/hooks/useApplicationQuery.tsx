@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import type { Query, QueryApplicationArgs } from "common/types/gql-types";
+import type { Query, QueryApplicationArgs } from "@gql/gql-types";
 import { APPLICATION_QUERY } from "common/src/queries/application";
 import { base64encode } from "common/src/helpers";
 

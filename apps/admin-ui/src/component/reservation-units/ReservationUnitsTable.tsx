@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { TFunction } from "i18next";
-import { ReservationUnitNode } from "common/types/gql-types";
+import type { TFunction } from "i18next";
+import type { ReservationUnitNode } from "@gql/gql-types";
 import { truncate } from "@/helpers";
 import { reservationUnitUrl } from "@/common/urls";
 import { CustomTable, TableLink } from "@/component/Table";

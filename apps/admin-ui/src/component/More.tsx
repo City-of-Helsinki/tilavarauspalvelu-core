@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { Button } from "hds-react";
 import { useTranslation } from "react-i18next";
 import type { ApolloQueryResult } from "@apollo/client";
-import type { Query } from "common/types/gql-types";
+import type { Query } from "@gql/gql-types";
 
 const Wrapper = styled.div`
   display: flex;

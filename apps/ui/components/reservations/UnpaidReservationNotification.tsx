@@ -7,7 +7,7 @@ import {
   type ReservationNode,
   State,
   ReservationOrderingChoices,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import NotificationWrapper from "common/src/components/NotificationWrapper";
 import { useCurrentUser } from "@/hooks/user";
 import { BlackButton, Toast } from "@/styles/util";

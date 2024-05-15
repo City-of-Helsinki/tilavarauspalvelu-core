@@ -3,17 +3,17 @@ import { render, waitFor } from "@testing-library/react";
 import { MockedProvider } from "@apollo/client/testing";
 import { add, format, set } from "date-fns";
 import userEvent from "@testing-library/user-event";
-import { RecurringReservationForm } from "app/schemas";
-import { NewReservationListItem } from "app/component/ReservationsList";
+import type { RecurringReservationForm } from "@/schemas";
+import type { NewReservationListItem } from "@/component/ReservationsList";
 import { useCreateRecurringReservation } from "./hooks";
 import { mocks } from "./__test__/mocks";
-import { ReservationMade } from "./RecurringReservationDone";
+import type { ReservationMade } from "./RecurringReservationDone";
 import { CREATE_RECURRING_RESERVATION } from "./queries";
 import { CREATE_STAFF_RESERVATION } from "../create-reservation/queries";
-import {
+import type {
   RecurringReservationCreateMutationInput,
   RecurringReservationCreateMutationPayload,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 
 const N_DAYS = 10;
 const today = new Date();

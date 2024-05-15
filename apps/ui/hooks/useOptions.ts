@@ -1,7 +1,7 @@
 import { useQuery, gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
 import type { OptionType } from "common/types/common";
-import type { Query, AgeGroupNode, Maybe } from "common/types/gql-types";
+import type { Query, AgeGroupNode, Maybe } from "@gql/gql-types";
 import { participantCountOptions } from "@/modules/const";
 import { mapOptions } from "@/modules/util";
 import { filterNonNullable, getLocalizationLang } from "common/src/helpers";

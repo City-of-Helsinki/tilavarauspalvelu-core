@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { type ApolloError, useQuery } from "@apollo/client";
 import {
-  Query,
-  QueryReservationUnitsArgs,
+  type Query,
+  type QueryReservationUnitsArgs,
   ReservationUnitOrderingChoices,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { LARGE_LIST_PAGE_SIZE } from "@/common/const";
 import { useNotification } from "@/context/NotificationContext";

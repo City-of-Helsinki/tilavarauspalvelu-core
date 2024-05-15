@@ -1,4 +1,4 @@
-import type { SpaceNode } from "common/types/gql-types";
+import type { SpaceNode } from "@gql/gql-types";
 
 const recurse = (
   parent: SpaceNode,

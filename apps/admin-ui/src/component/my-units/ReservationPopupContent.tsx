@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { ReservationNode } from "common/types/gql-types";
+import type { ReservationNode } from "@gql/gql-types";
 import { Permission } from "@/modules/permissionHelper";
 import { reservationUrl } from "@/common/urls";
 import { formatTime } from "@/common/util";

@@ -44,7 +44,17 @@ pnpm i
 
 Update GraphQL schema and types.
 ``` sh
+# all apps
 pnpm codegen
+# individual app
+pnpm codegen:ui
+# or
+pnpm codegen:admin
+```
+
+Update email templates
+``` sh
+pnpm generate:emails
 ```
 
 Start both frontends in dev mode

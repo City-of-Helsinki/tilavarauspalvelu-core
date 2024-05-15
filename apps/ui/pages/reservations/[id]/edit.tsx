@@ -4,7 +4,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { ReservationEdit } from "@/components/reservation/ReservationEdit";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
-import type { Query, QueryReservationArgs } from "common/types/gql-types";
+import type { Query, QueryReservationArgs } from "@gql/gql-types";
 import {
   base64encode,
   concatAffectedReservations,

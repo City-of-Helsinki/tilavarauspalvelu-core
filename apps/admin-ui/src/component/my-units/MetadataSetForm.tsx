@@ -1,7 +1,7 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
-import { Reservation } from "common/src/reservation-form/types";
-import { ReservationUnitNode } from "common/types/gql-types";
+import type { Reservation } from "common/src/reservation-form/types";
+import type { ReservationUnitNode } from "@gql/gql-types";
 import {
   ReserverMetaFields,
   ReservationMetaFields,

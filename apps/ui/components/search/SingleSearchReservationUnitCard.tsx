@@ -6,7 +6,7 @@ import NextImage from "next/image";
 import styled from "styled-components";
 import { H5 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import type { ReservationUnitNode } from "common/types/gql-types";
+import type { ReservationUnitNode } from "@gql/gql-types";
 import { format, isToday, isTomorrow } from "date-fns";
 import { toUIDate } from "common/src/common/util";
 import { getMainImage, getTranslation } from "@/modules/util";

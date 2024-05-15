@@ -25,7 +25,7 @@ import {
   Authentication,
   ReservationKind,
   ReservationState,
-} from "../../../types/gql-types";
+} from "../../../gql/gql-types";
 
 test("isReservationShortEnough", () => {
   expect(

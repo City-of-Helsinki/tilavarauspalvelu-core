@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { startOfDay } from "date-fns";
 import { useQuery } from "@apollo/client";
 import { useSession } from "@/hooks/auth";
-import { Query, QueryReservationsArgs } from "common/types/gql-types";
+import { Query, QueryReservationsArgs } from "@gql/gql-types";
 import { toApiDate } from "common/src/common/util";
 import { HANDLING_COUNT_QUERY } from "../common/queries";
 

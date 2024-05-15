@@ -5,7 +5,7 @@ import { MemoryRouter, Route, Routes, generatePath } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 // @ts-expect-error -- FIXME
 import * as router from "react-router";
-import { CustomerTypeChoice } from "common/types/gql-types";
+import { CustomerTypeChoice } from "@gql/gql-types";
 import NotificationContextMock, {
   notifySuccess,
 } from "app/__mocks__/NotificationContextMock";

@@ -1,12 +1,9 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { memoize, orderBy, uniqBy } from "lodash";
-import { TFunction } from "i18next";
+import type { TFunction } from "i18next";
 import { IconLinkExternal } from "hds-react";
-import type {
-  ApplicationNode,
-  ApplicationStatusChoice,
-} from "common/types/gql-types";
+import type { ApplicationNode, ApplicationStatusChoice } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { PUBLIC_URL } from "@/common/const";
 import { applicationDetailsUrl } from "@/common/urls";

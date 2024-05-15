@@ -7,7 +7,7 @@ import {
   type QueryReservationArgs,
   type QueryRecurringReservationArgs,
   ReservationTypeChoice,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@apollo/client";
 import { toApiDate } from "common/src/common/util";

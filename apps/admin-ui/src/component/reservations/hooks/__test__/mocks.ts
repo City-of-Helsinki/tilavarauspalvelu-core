@@ -6,8 +6,8 @@ import {
   ReservationKind,
   ReservationStartInterval,
   State,
-  ReservationUnitNode,
-} from "common/types/gql-types";
+  type ReservationUnitNode,
+} from "@gql/gql-types";
 import {
   UPDATE_STAFF_RECURRING_RESERVATION,
   UPDATE_STAFF_RESERVATION,

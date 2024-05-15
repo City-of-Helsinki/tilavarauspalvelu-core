@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import {
   ApplicationSectionStatusChoice,
   ApplicationStatusChoice,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import {
   getApplicationSectiontatusColor,
   getApplicationStatusColor,

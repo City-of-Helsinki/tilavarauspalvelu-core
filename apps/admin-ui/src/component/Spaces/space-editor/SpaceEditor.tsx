@@ -11,7 +11,7 @@ import type {
   Query,
   QuerySpaceArgs,
   SpaceUpdateMutationInput,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { useNotification } from "@/context/NotificationContext";
 import Loader from "@/component/Loader";
 import { ButtonContainer, Container } from "@/styles/layout";

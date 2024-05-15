@@ -1,11 +1,11 @@
 import React from "react";
-import { ApolloError, useQuery } from "@apollo/client";
+import { type ApolloError, useQuery } from "@apollo/client";
 import {
   type Query,
   type QueryAllocatedTimeSlotsArgs,
   ApplicationSectionStatusChoice,
   AllocatedTimeSlotOrderingChoices,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { filterNonNullable } from "common/src/helpers";
 import { LIST_PAGE_SIZE } from "@/common/const";

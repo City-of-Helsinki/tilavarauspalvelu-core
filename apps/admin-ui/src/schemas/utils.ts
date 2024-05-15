@@ -1,4 +1,4 @@
-import { ReservationStartInterval } from "common/types/gql-types";
+import { ReservationStartInterval } from "@gql/gql-types";
 
 export function intervalToNumber(i: ReservationStartInterval) {
   switch (i) {

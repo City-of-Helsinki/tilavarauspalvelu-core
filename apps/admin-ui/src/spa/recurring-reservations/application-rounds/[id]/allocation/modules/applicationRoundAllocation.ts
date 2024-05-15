@@ -5,7 +5,7 @@ import {
   Priority,
   type AllocatedTimeSlotNode,
   Weekday,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import i18next from "i18next";
 import { type TFunction } from "next-i18next";
 import { filterNonNullable } from "common/src/helpers";

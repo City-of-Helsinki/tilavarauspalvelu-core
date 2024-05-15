@@ -3,7 +3,7 @@ import {
   State,
   type ReservationNode,
   ReservationTypeChoice,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import {
   CLOSED,
   COMMON_LEGEND,

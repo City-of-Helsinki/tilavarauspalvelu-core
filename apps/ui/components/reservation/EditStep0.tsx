@@ -11,7 +11,7 @@ import type {
   ApplicationRoundNode,
   ReservationNode,
   ReservationUnitNode,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { addMinutes, addSeconds, differenceInMinutes } from "date-fns";
 import classNames from "classnames";
 import { IconArrowRight, IconCross } from "hds-react";

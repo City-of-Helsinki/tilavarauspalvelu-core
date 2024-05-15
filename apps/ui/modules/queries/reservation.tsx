@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { ReservationTypeChoice } from "common/types/gql-types";
+import { ReservationTypeChoice } from "@gql/gql-types";
 import {
   RESERVEE_NAME_FRAGMENT,
   IMAGE_FRAGMENT,

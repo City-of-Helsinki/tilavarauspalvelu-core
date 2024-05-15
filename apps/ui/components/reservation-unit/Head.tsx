@@ -7,10 +7,7 @@ import { isReservationStartInFuture } from "common/src/calendar/util";
 import { formatDuration } from "common/src/common/util";
 import { fontRegular, H2, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import {
-  ReservationKind,
-  type ReservationUnitNode,
-} from "common/types/gql-types";
+import { ReservationKind, type ReservationUnitNode } from "@gql/gql-types";
 import { Container } from "common";
 import {
   formatDate,

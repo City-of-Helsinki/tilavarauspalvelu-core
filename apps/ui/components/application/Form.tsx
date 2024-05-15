@@ -13,7 +13,7 @@ import {
   Priority,
   type UpdateApplicationSectionForApplicationSerializerInput,
   type ReservationUnitNode,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { type Maybe } from "graphql/jsutils/Maybe";
 import { z } from "zod";
 import { toApiDate } from "common/src/common/util";

@@ -7,7 +7,7 @@ import {
   type QueryTermsOfUseArgs,
   type Query,
   TermsType,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { H2 } from "common/src/common/typography";
 import { Container } from "common";
 import { TERMS_OF_USE } from "@/modules/queries/reservationUnit";

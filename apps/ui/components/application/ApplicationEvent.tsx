@@ -6,7 +6,7 @@ import { useTranslation } from "next-i18next";
 import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
 import { OptionType } from "common/types/common";
-import type { ApplicationRoundNode } from "common/types/gql-types";
+import type { ApplicationRoundNode } from "@gql/gql-types";
 import { fontRegular, H5 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { CheckboxWrapper } from "common/src/reservation-form/components";

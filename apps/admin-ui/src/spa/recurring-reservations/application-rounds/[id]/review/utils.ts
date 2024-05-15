@@ -5,8 +5,8 @@ import {
   ApplicantTypeChoice,
   ApplicationStatusChoice,
   ApplicationSectionStatusChoice,
-  ApplicationSectionNode,
-} from "common/types/gql-types";
+  type ApplicationSectionNode,
+} from "@gql/gql-types";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import { formatNumber } from "@/common/util";
 

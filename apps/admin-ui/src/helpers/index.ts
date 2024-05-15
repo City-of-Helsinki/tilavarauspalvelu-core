@@ -6,7 +6,7 @@ import {
   type ApplicationNode,
   ApplicationSectionStatusChoice,
   ApplicationStatusChoice,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { addSeconds } from "date-fns";
 
 export { truncate } from "common/src/helpers";

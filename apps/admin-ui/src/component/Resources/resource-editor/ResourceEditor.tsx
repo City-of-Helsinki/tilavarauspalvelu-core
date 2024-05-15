@@ -12,7 +12,7 @@ import {
   type QueryUnitArgs,
   type QueryResourceArgs,
   LocationType,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { base64encode } from "common/src/helpers";
 import { UNIT_WITH_SPACES_AND_RESOURCES } from "@/common/queries";
 import Loader from "@/component/Loader";

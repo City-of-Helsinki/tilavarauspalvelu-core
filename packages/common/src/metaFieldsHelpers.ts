@@ -1,5 +1,5 @@
 import { camelCase } from "lodash";
-import type { ReservationMetadataFieldNode } from "../types/gql-types";
+import type { ReservationMetadataFieldNode } from "../gql/gql-types";
 
 /// Transitional helper when moving from string fields
 /// backend field names are in snake_case so we convert them to camelCase

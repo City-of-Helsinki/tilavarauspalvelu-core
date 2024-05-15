@@ -17,8 +17,8 @@ import {
   PricingType,
   PriceUnit,
   Status,
-  ReservationUnitPricingNode,
-} from "common/types/gql-types";
+  type ReservationUnitPricingNode,
+} from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { capitalize, getTranslation } from "./util";
 import { isReservationReservable } from "@/modules/reservation";

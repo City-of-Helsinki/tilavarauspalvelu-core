@@ -1,4 +1,4 @@
-import { FetchResult, useMutation, useQuery } from "@apollo/client";
+import { type FetchResult, useMutation, useQuery } from "@apollo/client";
 import { breakpoints } from "common/src/common/style";
 import { H2 } from "common/src/common/typography";
 import {
@@ -9,7 +9,7 @@ import {
   type ReservationNode,
   type ReservationUnitNode,
   ReservationTypeChoice,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { useRouter } from "next/router";
 import { Stepper } from "hds-react";
 import { differenceInMinutes, set } from "date-fns";

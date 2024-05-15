@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { H1, Strong } from "common/src/common/typography";
 import { useQuery, type ApolloError } from "@apollo/client";
-import type { Query, QuerySpacesArgs, SpaceNode } from "common/types/gql-types";
+import type { Query, QuerySpacesArgs, SpaceNode } from "@gql/gql-types";
 import Loader from "../Loader";
 import { SPACES_QUERY } from "@/common/queries";
 import { useNotification } from "@/context/NotificationContext";

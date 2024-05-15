@@ -4,7 +4,7 @@ import {
   ReservationStartInterval,
   ReservationTypeChoice,
   type ReservationUnitNode,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { Button, TextInput } from "hds-react";

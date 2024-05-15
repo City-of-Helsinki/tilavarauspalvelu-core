@@ -6,7 +6,7 @@ import type {
   SpaceCreateMutationPayload,
   SpaceNode,
   UnitNode,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { CREATE_SPACE } from "../queries";
 import { Page1 } from "./Page1";
 import { Page2 } from "./Page2";

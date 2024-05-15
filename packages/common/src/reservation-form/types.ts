@@ -1,4 +1,4 @@
-import { type CustomerTypeChoice } from "../../types/gql-types";
+import { type CustomerTypeChoice } from "../../gql/gql-types";
 
 type Billing = {
   billingFirstName: string;

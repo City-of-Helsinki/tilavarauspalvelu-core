@@ -1,7 +1,7 @@
 import React from "react";
 import { Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
-import type { ApplicationNode, TermsOfUseNode } from "common/types/gql-types";
+import type { ApplicationNode, TermsOfUseNode } from "@gql/gql-types";
 import { getTranslation } from "@/modules/util";
 import { ApplicantInfoPreview } from "./ApplicantInfoPreview";
 import { CheckboxContainer, StyledNotification } from "./styled";

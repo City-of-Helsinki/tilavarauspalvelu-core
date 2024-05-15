@@ -2,7 +2,7 @@ import {
   type ReservationNode,
   type ReservationUnitNode,
   CustomerTypeChoice,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { IconArrowLeft, IconCross, LoadingSpinner } from "hds-react";
 import { get } from "lodash";
 import { useRouter } from "next/router";

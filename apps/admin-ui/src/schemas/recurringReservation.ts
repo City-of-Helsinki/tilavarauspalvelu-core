@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ReservationStartInterval } from "common/types/gql-types";
+import { ReservationStartInterval } from "@gql/gql-types";
 import { fromUIDate } from "common/src/common/util";
 import {
   ReservationTypeSchema,

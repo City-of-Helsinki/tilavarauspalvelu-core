@@ -13,7 +13,7 @@ import Link from "next/link";
 import { useTranslation } from "next-i18next";
 import { useQuery } from "@apollo/client";
 import styled from "styled-components";
-import { OptionType } from "common/types/common";
+import type { OptionType } from "common/types/common";
 import { fontMedium } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
@@ -22,7 +22,7 @@ import {
   type QueryReservationUnitsArgs,
   type ReservationUnitNode,
   ReservationUnitOrderingChoices,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { filterNonNullable, getImageSource } from "common/src/helpers";
 import { reservationUnitPath } from "@/modules/const";
 import { getAddressAlt, getMainImage, getTranslation } from "@/modules/util";

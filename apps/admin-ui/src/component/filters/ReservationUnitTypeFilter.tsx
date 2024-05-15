@@ -5,8 +5,8 @@ import type {
   Query,
   QueryReservationUnitTypesArgs,
   ReservationUnitTypeNode,
-} from "common/types/gql-types";
-import { OptionType } from "@/common/types";
+} from "@gql/gql-types";
+import type { OptionType } from "@/common/types";
 import { GQL_MAX_RESULTS_PER_QUERY } from "@/common/const";
 import { SortedSelect } from "@/component/SortedSelect";
 import { RESERVATION_UNIT_TYPES_QUERY } from "./queries";

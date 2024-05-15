@@ -46,7 +46,7 @@ import {
   ImageType,
   ReservationUnitImageUpdateMutationInput,
   ReservationUnitImageDeleteMutationInput,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { DateTimeInput } from "common/src/components/form/DateTimeInput";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { H1, H4, fontBold } from "common/src/common/typography";

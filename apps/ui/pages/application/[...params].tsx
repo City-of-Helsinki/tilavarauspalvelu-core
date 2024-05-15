@@ -7,7 +7,6 @@ import { useTranslation } from "next-i18next";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { QueryApplicationArgs, Query } from "common/types/gql-types";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
 import { Page1 } from "@/components/application/Page1";
 import Page2 from "@/components/application/Page2";
@@ -26,6 +25,7 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { base64encode } from "common/src/helpers";
 import { createApolloClient } from "@/modules/apolloClient";
 import { APPLICATION_QUERY } from "common/src/queries/application";
+import type { Query, QueryApplicationArgs } from "common/gql/gql-types";
 
 // TODO move this to a shared file
 // and combine all the separate error handling functions to one
@@ -124,7 +124,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   // Pass the application and round as props because we don't need to hydrate
   // and our codegen would allow undefineds if we passed data instead.
-  const { application } = data;
+  const { application } = data
 
   const applicationRound = application?.applicationRound ?? undefined;
   if (application == null || applicationRound == null) {

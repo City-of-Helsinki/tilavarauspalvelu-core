@@ -5,7 +5,7 @@ import type {
   Query,
   QueryReservationUnitsArgs,
   ReservationUnitNode,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { SortedSelect } from "@/component/SortedSelect";
 import { GQL_MAX_RESULTS_PER_QUERY } from "@/common/const";
 import { RESERVATION_UNITS_FILTER_PARAMS_QUERY } from "./queries";

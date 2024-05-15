@@ -4,7 +4,7 @@ import {
   type Query,
   type QueryTermsOfUseArgs,
   TermsType,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { TERMS_OF_USE } from "./queries/reservationUnit";
 import { genericTermsVariant } from "./const";
 

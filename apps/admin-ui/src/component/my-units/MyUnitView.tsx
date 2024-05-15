@@ -16,7 +16,7 @@ import UnitReservationsView from "./UnitReservationsView";
 import { TabHeader, Tabs } from "../Tabs";
 import { useNotification } from "@/context/NotificationContext";
 import { useQuery } from "@apollo/client";
-import { Query, QueryUnitArgs } from "common/types/gql-types";
+import type { Query, QueryUnitArgs } from "@gql/gql-types";
 import { UNIT_VIEW_QUERY } from "./hooks/queries";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 

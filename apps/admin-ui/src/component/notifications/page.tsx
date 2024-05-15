@@ -27,7 +27,7 @@ import {
   type MutationCreateBannerNotificationArgs,
   type MutationDeleteBannerNotificationArgs,
   type BannerNotificationNodeConnection,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { BANNER_NOTIFICATIONS_ADMIN } from "common/src/components/BannerNotificationsQuery";
 import { H1 } from "common/src/common/typography";
 import { fromUIDate } from "common/src/common/util";

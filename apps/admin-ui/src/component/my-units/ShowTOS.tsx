@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { type ReservationUnitNode } from "common/types/gql-types";
+import { type ReservationUnitNode } from "@gql/gql-types";
 import { useGenericTerms } from "common/src/hooks/useGenericTerms";
 
 // NOTE This is partial duplicate from ui/application/Preview.tsx

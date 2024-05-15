@@ -3,7 +3,7 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import { useQuery } from "@apollo/client";
 import { uniq } from "lodash";
-import { type Query, type ApplicationRoundNode } from "common/types/gql-types";
+import { type Query, type ApplicationRoundNode } from "@gql/gql-types";
 import { useFormContext } from "react-hook-form";
 import { filterNonNullable } from "common/src/helpers";
 import { getTranslation, mapOptions } from "@/modules/util";

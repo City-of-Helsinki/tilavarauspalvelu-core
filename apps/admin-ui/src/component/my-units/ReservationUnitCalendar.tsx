@@ -10,7 +10,7 @@ import {
   type Query,
   type ReservationNode,
   ReservationTypeChoice,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { Permission } from "@/modules/permissionHelper";
 import usePermission from "@/hooks/usePermission";
 import { getEventBuffers } from "common/src/calendar/util";

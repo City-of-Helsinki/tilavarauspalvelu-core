@@ -1,8 +1,8 @@
 import { camelCase, get, uniq } from "lodash";
 import {
   CustomerTypeChoice,
-  ReservationMetadataFieldNode,
-} from "../../types/gql-types";
+  type ReservationMetadataFieldNode,
+} from "../../gql/gql-types";
 import { reservationApplicationFields } from "./types";
 import { containsField } from "../metaFieldsHelpers";
 

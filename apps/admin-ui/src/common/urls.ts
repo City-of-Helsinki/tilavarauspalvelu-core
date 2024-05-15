@@ -1,4 +1,4 @@
-import { type Maybe } from "common/types/gql-types";
+import { type Maybe } from "@gql/gql-types";
 import { PUBLIC_URL } from "./const";
 
 export const prefixes = {

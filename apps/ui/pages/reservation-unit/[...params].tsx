@@ -23,7 +23,7 @@ import {
   type ReservationUpdateMutationPayload,
   CustomerTypeChoice,
   State,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { Inputs } from "common/src/reservation-form/types";
 import { Subheading } from "common/src/reservation-form/styles";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";

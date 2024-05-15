@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Button, LoadingSpinner } from "hds-react";
 import { breakpoints } from "common/src/common/style";
-import { PageInfo } from "common/types/gql-types";
+import type { PageInfo } from "@gql/gql-types";
 
 export type Props = {
   items: JSX.Element[];

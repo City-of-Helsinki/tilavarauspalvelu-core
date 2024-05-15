@@ -9,7 +9,7 @@ import {
   Status,
   type ReservationUnitNode,
   State,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import {
   createTagString,
   getReservatinUnitPricing,

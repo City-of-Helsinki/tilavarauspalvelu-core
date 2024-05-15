@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { memoize } from "lodash";
-import type { ReservationNode } from "common/types/gql-types";
+import type { ReservationNode } from "@gql/gql-types";
 import { truncate } from "@/helpers";
 import { reservationUrl } from "@/common/urls";
 import { formatDateTime } from "@/common/util";

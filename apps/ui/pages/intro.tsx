@@ -15,7 +15,7 @@ import {
   type MutationCreateApplicationArgs,
   type Query,
   type QueryApplicationRoundsArgs,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { MediumButton } from "@/styles/util";
 import Head from "@/components/application/Head";
 import { APPLICATION_ROUNDS } from "@/modules/queries/applicationRound";

@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useQuery, type ApolloError } from "@apollo/client";
 import { H1, Strong } from "common/src/common/typography";
-import type { Query, ResourceNode } from "common/types/gql-types";
+import type { Query, ResourceNode } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import Loader from "@/component/Loader";
 import { RESOURCES_QUERY } from "@/common/queries";

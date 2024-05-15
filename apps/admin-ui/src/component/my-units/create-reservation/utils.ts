@@ -3,8 +3,8 @@ import {
   type ReservationFormType,
   type RecurringReservationForm,
   type ReservationChangeFormType,
-} from "app/schemas";
-import { type ReservationMetadataFieldNode } from "common/types/gql-types";
+} from "@/schemas";
+import { type ReservationMetadataFieldNode } from "@gql/gql-types";
 
 export function flattenMetadata(
   values:

@@ -2,7 +2,7 @@ import React from "react";
 import { MockedProvider } from "@apollo/client/testing";
 import { act, render, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { ReservationNode } from "common/types/gql-types";
+import type { ReservationNode } from "@gql/gql-types";
 import NotificationContextMock, {
   notifyError,
   notifySuccess,

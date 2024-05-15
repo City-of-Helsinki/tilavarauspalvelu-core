@@ -6,7 +6,7 @@ import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import {
   ApplicantTypeChoice,
   ApplicationSectionStatusChoice,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { HR } from "@/component/Table";
 import { MultiSelectFilter, SearchFilter } from "@/component/QueryParamFilters";
 

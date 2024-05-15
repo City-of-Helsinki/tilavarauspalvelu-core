@@ -2,7 +2,7 @@ import React from "react";
 import { useQuery } from "@apollo/client";
 import { breakpoints } from "common/src/common/style";
 import { H2 } from "common/src/common/typography";
-import type { Query, QueryReservationArgs } from "common/types/gql-types";
+import type { Query, QueryReservationArgs } from "@gql/gql-types";
 import { LoadingSpinner } from "hds-react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";

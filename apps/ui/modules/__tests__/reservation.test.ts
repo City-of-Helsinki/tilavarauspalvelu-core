@@ -1,19 +1,19 @@
 import { get as mockGet } from "lodash";
 import { addDays, addHours, addMinutes, startOfToday } from "date-fns";
 import {
-  PaymentOrderNode,
+  type PaymentOrderNode,
   State,
-  ReservationNode,
+  type ReservationNode,
   ReservationStartInterval,
   Authentication,
   ReservationKind,
-  ReservationUnitCancellationRuleNode,
-  ReservationUnitNode,
+  type ReservationUnitCancellationRuleNode,
+  type ReservationUnitNode,
   CustomerTypeChoice,
-  ReservationMetadataFieldNode,
+  type ReservationMetadataFieldNode,
   OrderStatus,
   PaymentType,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import {
   CanReservationBeChangedProps,
   canReservationTimeBeChanged,

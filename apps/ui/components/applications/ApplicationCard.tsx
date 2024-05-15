@@ -17,8 +17,8 @@ import {
   type MutationCancelApplicationArgs,
   ApplicantTypeChoice,
   ApplicationStatusChoice,
-  Maybe,
-} from "common/types/gql-types";
+  type Maybe,
+} from "@gql/gql-types";
 import { applicationUrl } from "@/modules/util";
 import { BlackButton } from "@/styles/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";

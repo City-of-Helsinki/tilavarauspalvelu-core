@@ -7,7 +7,7 @@ import {
   TermsOfUseNode,
   TermsType,
   ReservationTypeChoice,
-} from "common/types/gql-types";
+} from "@gql/gql-types";
 import { RESERVATION_UNIT_QUERY } from "../../hooks/queries";
 import { CREATE_STAFF_RESERVATION } from "../../create-reservation/queries";
 import {

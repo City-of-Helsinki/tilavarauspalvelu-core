@@ -5,7 +5,8 @@
     "paths": {
       // old version
       "app/*": ["./src/*"],
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@gql/*": ["./gql/*"]
     }
   },
   "exclude": ["node_modules"],
