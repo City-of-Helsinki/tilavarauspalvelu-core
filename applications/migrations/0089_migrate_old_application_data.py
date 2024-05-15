@@ -4,12 +4,13 @@ import logging
 
 from django.db import migrations
 
-from common.date_utils import time_as_timedelta
+from common.date_utils import DEFAULT_TIMEZONE, time_as_timedelta
 
 logger = logging.getLogger(__name__)
 
 
 def migrate_application_data(apps, schema_editor):
+    midnight = datetime.time(tzinfo=DEFAULT_TIMEZONE)
     # Migrate application events
 
     ApplicationEvent = apps.get_model("applications", "ApplicationEvent")
@@ -92,8 +93,8 @@ def migrate_application_data(apps, schema_editor):
             logger.critical(msg)
             continue
 
-        begin_time: datetime.time = schedule.begin
-        end_time: datetime.time = schedule.end
+        begin_time: datetime.time = schedule.begin.astimezone(DEFAULT_TIMEZONE)
+        end_time: datetime.time = schedule.end.astimezone(DEFAULT_TIMEZONE)
 
         # If times are not a multiple of 60 minutes, convert them to the last multiple of 60 minutes
         if time_as_timedelta(begin_time).total_seconds() % 3600 != 0:
@@ -112,7 +113,9 @@ def migrate_application_data(apps, schema_editor):
             logger.warning(msg)
             end_time = end_time.replace(minute=0, second=0, microsecond=0)
 
-        if begin_time >= end_time:
+        # Handle cases where end is at 00:00 and begin is not -> interpret start as previous day.
+        # Still, both can't be at 00:00, or any other time, at the same time.
+        if (end_time != midnight and begin_time >= end_time) or begin_time == end_time:
             msg = (
                 f"Suitable begin time {begin_time.isoformat()} for schedule {schedule.id} "
                 f"is at or after suitable end time {end_time.isoformat()}."
@@ -162,10 +165,14 @@ def migrate_application_data(apps, schema_editor):
                 logger.critical(msg)
                 continue
 
-            allocated_begin_time: datetime.time = schedule.begin
-            allocated_end_time: datetime.time = schedule.end
+            allocated_begin_time: datetime.time = schedule.begin.astimezone(DEFAULT_TIMEZONE)
+            allocated_end_time: datetime.time = schedule.end.astimezone(DEFAULT_TIMEZONE)
 
-            if allocated_begin_time >= allocated_end_time:
+            # Handle cases where end is at 00:00 and begin is not -> interpret start as previous day.
+            # Still, both can't be at 00:00, or any other time, at the same time.
+            if (allocated_end_time != midnight and allocated_begin_time >= allocated_end_time) or (
+                allocated_begin_time == allocated_end_time
+            ):
                 msg = (
                     f"Allocated begin time {allocated_begin_time.isoformat()} is "
                     f"at or after allocated end time {allocated_end_time.isoformat()}."
