@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
@@ -19,6 +19,7 @@ import {
 import { getCheckoutUrl } from "@/modules/reservation";
 import { filterNonNullable } from "common/src/helpers";
 import { reservationUnitPrefix } from "@/modules/const";
+import { ApolloError } from "@apollo/client";
 
 const NotificationContent = styled.div`
   display: flex;
@@ -44,6 +45,24 @@ const NotificationButtons = styled.div`
   }
 `;
 
+function isNotFoundError(error: unknown): boolean {
+  if (error == null) {
+    return false;
+  }
+
+  if (error instanceof ApolloError) {
+    const { graphQLErrors } = error;
+    if (graphQLErrors.length > 0) {
+      const NOT_FOUND = "NOT_FOUND";
+      if (graphQLErrors[0].extensions == null) {
+        return false;
+      }
+      return graphQLErrors[0].extensions.code === NOT_FOUND;
+    }
+  }
+  return false;
+}
+
 function ReservationNotification({
   onDelete,
   onNext,
@@ -57,20 +76,42 @@ function ReservationNotification({
   disabled?: boolean;
   isLoading?: boolean;
 }) {
+  const startRemainingMinutes = reservation.order?.expiresInMinutes;
+  const [remainingMinutes, setRemainingMinutes] = useState(
+    startRemainingMinutes
+  );
   const { t } = useTranslation(["notification, common"]);
+  const isCreated = reservation.state === State.Created;
 
-  const title =
-    reservation.state === State.Created
-      ? t("notification:createdReservation.title")
-      : t("notification:waitingForPayment.title");
-  const text =
-    reservation.state === State.Created
-      ? t("notification:createdReservation.body")
-      : t("notification:waitingForPayment.body");
-  const submitButtonText =
-    reservation.state === State.Created
-      ? t("notification:createdReservation.continueReservation")
-      : t("notification:waitingForPayment.payReservation");
+  const translateKey = isCreated
+    ? "notification:createdReservation"
+    : "notification:waitingForPayment";
+  const title = t(`${translateKey}.title`);
+  const submitButtonText = t(
+    `${translateKey}${isCreated ? ".continueReservation" : ".payReservation"}`
+  );
+  const text = t(`${translateKey}.body`, {
+    time: remainingMinutes,
+  });
+
+  function countdownMinute(minutes: number) {
+    if (minutes === 0) {
+      return 0;
+    }
+    return minutes - 1;
+  }
+  useEffect(() => {
+    const paymentTimeout = setTimeout(() => {
+      const minutes = remainingMinutes ?? 0;
+      setRemainingMinutes(countdownMinute(minutes));
+    }, 60000);
+    if (remainingMinutes === 0 || isCreated) {
+      return clearTimeout(paymentTimeout);
+    }
+  }, [remainingMinutes, isCreated]);
+  if (!isCreated && !remainingMinutes) {
+    return null;
+  }
   return (
     <NotificationWrapper
       type="alert"
@@ -89,6 +130,9 @@ function ReservationNotification({
             onClick={onDelete}
             disabled={disabled}
             isLoading={isLoading}
+            loadingText={t(
+              "notification:waitingForPayment.cancelingReservation"
+            )}
             data-testid="reservation-notification__button--delete"
           >
             {t("notification:waitingForPayment.cancelReservation")}
@@ -187,13 +231,19 @@ export function InProgressReservationNotification() {
     }
 
     if (reservation?.pk) {
-      await deleteReservation({
-        variables: {
-          input: {
-            pk: reservation.pk.toString(),
+      try {
+        await deleteReservation({
+          variables: {
+            input: {
+              pk: reservation.pk.toString(),
+            },
           },
-        },
-      });
+        });
+      } catch (e) {
+        if (!isNotFoundError(e)) {
+          throw e;
+        }
+      }
       if (shouldRedirect) {
         router.push("/");
       } else {
@@ -219,7 +269,7 @@ export function InProgressReservationNotification() {
     router.push(url);
   };
 
-  if (deleteError) {
+  if (deleteError && !isNotFoundError(deleteError)) {
     return (
       <Toast
         type="error"

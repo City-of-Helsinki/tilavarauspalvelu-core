@@ -116,10 +116,7 @@ export function useDeleteReservation() {
   const [mutation, { data, error, loading }] = useMutation<
     { deleteReservation: ReservationDeleteMutationPayload },
     { input: ReservationDeleteMutationInput }
-  >(DELETE_RESERVATION, {
-    // catch all thrown errors so we don't crash
-    onError: () => {},
-  });
+  >(DELETE_RESERVATION);
 
   const deleted = data?.deleteReservation.deleted ?? false;
 

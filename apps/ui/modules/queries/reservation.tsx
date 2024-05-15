@@ -102,6 +102,7 @@ export const LIST_RESERVATIONS = gql`
           bufferTimeAfter
           order {
             orderUuid
+            expiresInMinutes
           }
           isBlocked
           reservationUnit {
