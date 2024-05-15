@@ -10,6 +10,7 @@ from graphene_django_extensions import ModelFilterSet
 
 from api.graphql.extensions.filters import TimezoneAwareDateFilter
 from common.db import raw_prefixed_query
+from common.typing import AnyUser
 from merchants.models import OrderStatus
 from permissions.getters import get_units_with_permission
 from permissions.helpers import get_units_where_can_view_reservations
@@ -145,11 +146,12 @@ class ReservationFilterSet(ModelFilterSet):
         if not value:
             return qs
 
-        user = self.request.user
-        viewable_units = get_units_where_can_view_reservations(user)
+        user: AnyUser = self.request.user
         if user.is_anonymous:
             return qs.none()
-        return qs.filter(Q(reservation_unit__unit__in=viewable_units) | Q(user=user)).distinct()
+
+        viewable_units = get_units_where_can_view_reservations(user)
+        return qs.filter(Q(reservation_unit__unit__in=viewable_units))
 
     def get_only_with_handling_permission(self, qs: QuerySet, name: str, value: bool) -> QuerySet:
         if not value:
