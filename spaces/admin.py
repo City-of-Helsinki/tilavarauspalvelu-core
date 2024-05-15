@@ -1,9 +1,12 @@
 from typing import Any
 
+from admin_extra_buttons.api import ExtraButtonsMixin, button
 from adminsortable2.admin import SortableAdminMixin
 from django.conf import settings
 from django.contrib import admin, messages
 from django.core.management import call_command
+from django.core.handlers.wsgi import WSGIRequest
+from django.db.models import QuerySet
 from django.forms import IntegerField, ModelForm
 from django.utils.translation import gettext_lazy as _
 from mptt.admin import MPTTModelAdmin
@@ -40,7 +43,7 @@ class SpaceAdmin(MPTTModelAdmin):
 
 
 @admin.register(Unit)
-class UnitAdmin(SortableAdminMixin, admin.ModelAdmin):
+class UnitAdmin(SortableAdminMixin, ExtraButtonsMixin, admin.ModelAdmin):
     model = Unit
     inlines = [LocationInline]
     actions = ["update_from_tprek"]
@@ -50,7 +53,7 @@ class UnitAdmin(SortableAdminMixin, admin.ModelAdmin):
     readonly_fields = ("tprek_last_modified",)
 
     @admin.action
-    def update_from_tprek(self, request, queryset):
+    def update_from_tprek(self, request: WSGIRequest, queryset: QuerySet[Unit]) -> None:
         ids = queryset.filter(tprek_id__isnull=False).values_list("tprek_id", flat=True)
         try:
             output = call_command("import_units", settings.TPREK_UNIT_URL, "--ids", *ids)
@@ -58,6 +61,10 @@ class UnitAdmin(SortableAdminMixin, admin.ModelAdmin):
             self.message_user(request, f"Error while importing units: {e}", level=messages.ERROR)
         else:
             self.message_user(request, output, level=messages.SUCCESS)
+
+    @button(label="Update from TPREK")
+    def update_from_tprek_button(self, request: WSGIRequest, pk: int) -> None:
+        self.update_from_tprek(request, Unit.objects.filter(pk=pk))
 
 
 class UnitGroupForm(ModelForm):
