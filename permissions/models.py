@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.functional import classproperty
 from django.utils.translation import gettext_lazy as _
 
 from permissions.base_models import BaseRole
@@ -124,6 +125,22 @@ class GeneralPermissionChoices(models.TextChoices):
         "can_manage_notifications",
         _("Can create, edit and delete banner notifications in the whole system"),
     )
+
+    @classproperty
+    def required_for_unit(cls) -> list[str]:
+        return [
+            cls.CAN_MANAGE_UNIT_ROLES,
+            cls.CAN_MANAGE_UNITS,
+            cls.CAN_MANAGE_RESERVATION_UNITS,
+            cls.CAN_MANAGE_RESERVATIONS,
+            cls.CAN_CREATE_STAFF_RESERVATIONS,
+            cls.CAN_VIEW_RESERVATIONS,
+            cls.CAN_COMMENT_RESERVATIONS,
+            cls.CAN_VALIDATE_APPLICATIONS,
+            cls.CAN_HANDLE_APPLICATIONS,
+            cls.CAN_ALLOCATE_APPLICATIONS,
+            cls.CAN_MANAGE_APPLICATION_ROUNDS,
+        ]
 
 
 class GeneralRoleChoice(models.Model):
