@@ -190,6 +190,7 @@ export function ApplicationSectionCard({
           checked={isActive}
           onClick={toggleSelection}
           $topPadding
+          disabled={type === "declined"}
         />
         <ToggleButton onClick={() => setIsExpanded(!isExpanded)}>
           {isExpanded ? <IconAngleUp /> : <IconAngleDown />}
