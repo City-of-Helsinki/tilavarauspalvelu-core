@@ -12,6 +12,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.gis.geos import Point
 from django.core.management import BaseCommand, call_command
 from django.utils.timezone import localtime
+from django_celery_beat.models import CrontabSchedule, PeriodicTask
 
 from applications.choices import (
     ApplicantTypeChoice,
@@ -51,7 +52,7 @@ from common.management.commands._utils import (
     with_logs,
 )
 from common.models import BannerNotification
-from opening_hours.models import OriginHaukiResource, ReservableTimeSpan
+from opening_hours.models import DEFAULT_TIMEZONE, OriginHaukiResource, ReservableTimeSpan
 from permissions.models import (
     GeneralPermissionChoices,
     GeneralRole,
@@ -96,6 +97,7 @@ from reservations.models import (
     ReservationMetadataSet,
     ReservationPurpose,
 )
+from reservations.tasks import prune_reservations_task, update_expired_orders_task
 from resources.choices import ResourceLocationType
 from resources.models import Resource
 from services.models import Service
@@ -223,6 +225,7 @@ def create_test_data(flush: bool = True) -> None:
         cities,
     )
     _create_banner_notifications()
+    _create_periodic_tasks()
 
 
 def _rename_empty_units(units: list[Unit]) -> None:
@@ -2436,3 +2439,40 @@ def _create_banner_notifications():
             ]
 
     return BannerNotification.objects.bulk_create(banner_notifications)
+
+
+@with_logs(
+    text_entering="Creating periodic tasks...",
+    text_exiting="Periodic tasks created!",
+)
+def _create_periodic_tasks():
+    even_5_minute = CrontabSchedule.objects.create(
+        minute="0,5,10,15,20,25,30,35,40,45,50,55",
+        timezone=DEFAULT_TIMEZONE,
+    )
+    off_5_minute = CrontabSchedule.objects.create(
+        minute="2,7,12,17,22,27,32,37,42,47,52,57",
+        timezone=DEFAULT_TIMEZONE,
+    )
+
+    PeriodicTask.objects.create(
+        name="Maksamattomien tilausten rauetus",
+        task=update_expired_orders_task.name,
+        crontab=off_5_minute,
+        description=(
+            "Merkitsee rauenneiksi ja peruuu verkkokaupan rajapinnasta maksutilaukset, "
+            "jotka on luotu yli 10 minuuttia sitten mutta joita ei ole maksettu."
+        ),
+    )
+
+    PeriodicTask.objects.create(
+        name="Vahvistamattomien väliaikaisten varausten poisto",
+        task=prune_reservations_task.name,
+        crontab=even_5_minute,
+        description=(
+            "Poistaa väliaikaiset varaukset, joita ei ole vahvistettu (lähetetty), "
+            "jos ne ovat yli 20 minuuttia vanhoja eikä niihin liity verkkomaksua."
+            "Ne joihin liittyy verkkomaksu, poistetaan jos tilaus verkkokauppaan on "
+            "luotu yli 10 minuuttia sitten ja maksutilauksen status on rauennut tai peruttu."
+        ),
+    )
