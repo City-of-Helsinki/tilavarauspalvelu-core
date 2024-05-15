@@ -12,8 +12,8 @@ from api.graphql.extensions.filters import TimezoneAwareDateFilter
 from common.db import raw_prefixed_query
 from common.typing import AnyUser
 from merchants.models import OrderStatus
-from permissions.getters import get_units_with_permission
-from permissions.helpers import get_units_where_can_view_reservations
+from permissions.helpers import has_general_permission
+from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
 from reservation_units.models import ReservationUnit, ReservationUnitType
 from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import RecurringReservation, Reservation
@@ -149,20 +149,42 @@ class ReservationFilterSet(ModelFilterSet):
         user: AnyUser = self.request.user
         if user.is_anonymous:
             return qs.none()
+        if user.is_superuser:
+            return qs
+        if has_general_permission(user, GeneralPermissionChoices.CAN_VIEW_RESERVATIONS):
+            return qs
 
-        viewable_units = get_units_where_can_view_reservations(user)
-        return qs.filter(Q(reservation_unit__unit__in=viewable_units))
+        unit_permission = UnitPermissionChoices.CAN_VIEW_RESERVATIONS.value
+        unit_ids = [pk for pk, perms in user.unit_permissions.items() if unit_permission in perms]
+        unit_group_ids = [pk for pk, perms in user.unit_group_permissions.items() if unit_permission in perms]
+
+        return qs.filter(
+            Q(reservation_unit__unit__in=unit_ids)  #
+            | Q(reservation_unit__unit__unit_groups__in=unit_group_ids)
+        )
 
     def get_only_with_handling_permission(self, qs: QuerySet, name: str, value: bool) -> QuerySet:
         if not value:
             return qs
 
-        user = self.request.user
+        user: AnyUser = self.request.user
+
         if user.is_anonymous:
             return qs.none()
+        if user.is_superuser:
+            return qs
+        if has_general_permission(user, GeneralPermissionChoices.CAN_MANAGE_RESERVATIONS):
+            return qs
 
-        units = get_units_with_permission(user, permission="can_manage_reservations")
-        return qs.filter(Q(user=user) | Q(reservation_unit__unit__in=units)).distinct()
+        unit_permission = UnitPermissionChoices.CAN_MANAGE_RESERVATIONS.value
+        unit_ids = [pk for pk, perms in user.unit_permissions.items() if unit_permission in perms]
+        unit_group_ids = [pk for pk, perms in user.unit_group_permissions.items() if unit_permission in perms]
+
+        return qs.filter(
+            Q(user=user)
+            | Q(reservation_unit__unit__in=unit_ids)
+            | Q(reservation_unit__unit__unit_groups__in=unit_group_ids)
+        )
 
     def get_requested(self, qs: QuerySet, name, value: str) -> QuerySet:
         query = Q(state=ReservationStateChoice.REQUIRES_HANDLING) | Q(handled_at__isnull=False)

@@ -19,8 +19,10 @@ from api.legacy_rest_api.permissions import (
     ReservationPermission,
     ReservationUnitPermission,
 )
+from common.typing import AnyUser
 from opening_hours.utils.summaries import get_resources_total_hours_per_resource
-from permissions.helpers import get_units_where_can_view_reservations
+from permissions.helpers import has_general_permission
+from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
 from reservation_units.models import Equipment, ReservationUnit
 from reservations.models import RecurringReservation, Reservation
 from resources.models import Resource
@@ -123,10 +125,24 @@ class RecurringReservationViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        user = self.request.user
+
+        user: AnyUser = self.request.user
+
+        if user.is_anonymous:
+            return queryset.none()
+        if user.is_superuser:
+            return queryset
+        if has_general_permission(user, GeneralPermissionChoices.CAN_VIEW_RESERVATIONS):
+            return queryset
+
+        unit_permission = UnitPermissionChoices.CAN_VIEW_RESERVATIONS.value
+        unit_ids = [pk for pk, perms in user.unit_permissions.items() if unit_permission in perms]
+        unit_group_ids = [pk for pk, perms in user.unit_group_permissions.items() if unit_permission in perms]
 
         return queryset.filter(
-            Q(reservations__reservation_unit__unit__in=get_units_where_can_view_reservations(user)) | Q(user=user)
+            Q(user=user)
+            | Q(reservations__reservation_unit__unit__in=unit_ids)
+            | Q(reservations__reservation_unit__unit__unit_groups__in=unit_group_ids)
         ).distinct()
 
 
@@ -268,7 +284,25 @@ class ReservationViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
 
-        user = self.request.user
-        return queryset.filter(
-            Q(reservation_unit__unit__in=get_units_where_can_view_reservations(user)) | Q(user=user)
-        ).order_by("begin")
+        user: AnyUser = self.request.user
+
+        if user.is_anonymous:
+            return queryset.none()
+        if user.is_superuser:
+            return queryset
+        if has_general_permission(user, GeneralPermissionChoices.CAN_VIEW_RESERVATIONS):
+            return queryset
+
+        unit_permission = UnitPermissionChoices.CAN_VIEW_RESERVATIONS.value
+        unit_ids = [pk for pk, perms in user.unit_permissions.items() if unit_permission in perms]
+        unit_group_ids = [pk for pk, perms in user.unit_group_permissions.items() if unit_permission in perms]
+
+        return (
+            queryset.filter(
+                Q(user=user)
+                | Q(reservation_unit__unit__in=unit_ids)
+                | Q(reservation_unit__unit__unit_groups__in=unit_group_ids)
+            )
+            .distinct()
+            .order_by("begin")
+        )

@@ -142,6 +142,13 @@ class GeneralPermissionChoices(models.TextChoices):
             cls.CAN_MANAGE_APPLICATION_ROUNDS,
         ]
 
+    @classproperty
+    def handle_or_validate_applications(cls) -> list[str]:
+        return [
+            cls.CAN_HANDLE_APPLICATIONS,
+            cls.CAN_VALIDATE_APPLICATIONS,
+        ]
+
 
 class GeneralRoleChoice(models.Model):
     code = models.CharField(verbose_name=_("Code"), max_length=50, primary_key=True)

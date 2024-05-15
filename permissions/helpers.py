@@ -3,8 +3,6 @@ from __future__ import annotations
 from collections.abc import Iterable
 from typing import TYPE_CHECKING
 
-from django.db import models
-
 from common.date_utils import local_datetime
 from common.typing import AnyUser
 from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
@@ -450,76 +448,3 @@ def can_manage_banner_notifications(user: AnyUser) -> bool:
     if user.is_superuser:
         return True
     return has_general_permission(user, general_permission)
-
-
-# HELPERS FOR FINDING OBJECTS WHERE USER HAS PERMISSIONS
-
-
-def get_units_where_can_view_applications(user: AnyUser) -> models.QuerySet:
-    from spaces.models import Unit
-
-    unit_permission = UnitPermissionChoices.CAN_VALIDATE_APPLICATIONS
-
-    if user.is_anonymous:
-        return Unit.objects.none().values("id")
-    if user.is_superuser:
-        return Unit.objects.all().values("id")
-    if has_general_permission(user, GeneralPermissionChoices.CAN_HANDLE_APPLICATIONS):
-        return Unit.objects.all().values("id")
-    if has_general_permission(user, GeneralPermissionChoices.CAN_VALIDATE_APPLICATIONS):
-        return Unit.objects.all().values("id")
-
-    unit_ids = [pk for pk, perms in user.unit_permissions.items() if unit_permission.value in perms]
-    unit_group_ids = [pk for pk, perms in user.unit_group_permissions.items() if unit_permission.value in perms]
-
-    return (
-        Unit.objects.filter(models.Q(id__in=unit_ids) | models.Q(unit_groups__in=unit_group_ids))
-        .distinct()
-        .values("id")
-    )
-
-
-def get_units_where_can_view_reservations(user: AnyUser) -> models.QuerySet:
-    from spaces.models import Unit
-
-    general_permission = GeneralPermissionChoices.CAN_VIEW_RESERVATIONS
-    unit_permission = UnitPermissionChoices.CAN_VIEW_RESERVATIONS
-
-    if user.is_anonymous:
-        return Unit.objects.none().values("pk")
-    if user.is_superuser:
-        return Unit.objects.all().values("pk")
-    if has_general_permission(user, general_permission):
-        return Unit.objects.all().values("pk")
-
-    unit_ids = [pk for pk, perms in user.unit_permissions.items() if unit_permission.value in perms]
-    unit_group_ids = [pk for pk, perms in user.unit_group_permissions.items() if unit_permission.value in perms]
-
-    return (
-        Unit.objects.filter(models.Q(id__in=unit_ids) | models.Q(unit_groups__in=unit_group_ids))
-        .distinct()
-        .values("id")
-    )
-
-
-def get_units_with_permission(user: AnyUser, permission: str) -> models.QuerySet:
-    """Given a permission, returns units that match to that permission on different levels"""
-    from spaces.models import Unit
-
-    general_permission = GeneralPermissionChoices(permission)
-
-    if user.is_anonymous:
-        return Unit.objects.none().values("pk")
-    if user.is_superuser:
-        return Unit.objects.all().values("pk")
-    if has_general_permission(user, general_permission):
-        return Unit.objects.all().values("pk")
-
-    unit_ids = [pk for pk, perms in user.unit_permissions.items() if permission in perms]
-    unit_group_ids = [pk for pk, perms in user.unit_group_permissions.items() if permission in perms]
-
-    return (
-        Unit.objects.filter(models.Q(id__in=unit_ids) | models.Q(unit_groups__in=unit_group_ids))
-        .distinct()
-        .values("pk")
-    )
