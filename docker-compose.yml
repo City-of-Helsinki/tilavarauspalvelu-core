@@ -64,6 +64,23 @@ services:
       - "127.0.0.1:8000:8000"
     entrypoint: /tvp/docker/entrypoint_dev.sh
 
+  celery:
+    container_name: tvp-celery
+    image: tvp-celery
+    depends_on:
+      backend:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    env_file:
+      - .env
+    environment:
+      DJANGO_SETTINGS_ENVIRONMENT: Docker
+    entrypoint: /tvp/docker/worker.sh
+
 volumes:
   tvp-postgres:
   tvp-elastic:

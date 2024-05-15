@@ -649,6 +649,16 @@ class Docker(DockerMixin, Common):
     REDIS_URL = values.ParentValue(default="redis://redis:6379/0", check_limit=1)
     ELASTICSEARCH_URL = values.ParentValue(default="http://elastic:9200", check_limit=1)
 
+    @classmethod
+    @property
+    def CELERY_BROKER_URL(cls):
+        return cls.REDIS_URL
+
+    @classmethod
+    @property
+    def CELERY_BROKER_TRANSPORT_OPTIONS(cls):
+        return {}
+
     HAUKI_API_KEY = values.StringValue(default=None)
 
     GRAPHQL_CODEGEN_ENABLED = values.BooleanValue(default=False)
