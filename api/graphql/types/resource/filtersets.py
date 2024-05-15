@@ -1,10 +1,17 @@
+from typing import TYPE_CHECKING
+
 import django_filters
+from django.db import models
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import IntMultipleChoiceFilter
 
-from permissions.helpers import can_manage_resources, get_units_with_permission
+from permissions.helpers import has_general_permission
+from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
 from resources.models import Resource
 from spaces.models import Space
+
+if TYPE_CHECKING:
+    from common.typing import AnyUser
 
 __all__ = [
     "ResourceFilterSet",
@@ -28,13 +35,24 @@ class ResourceFilterSet(ModelFilterSet):
         if not value:
             return qs
 
-        user = self.request.user
+        user: AnyUser = self.request.user
 
         if user.is_anonymous:
             return qs.none()
-        if user.is_superuser or can_manage_resources(user):
+        if user.is_superuser or has_general_permission(user, GeneralPermissionChoices.CAN_MANAGE_RESOURCES):
             return qs
 
-        units = get_units_with_permission(user, "can_manage_resources")
-        spaces = Space.objects.filter(unit__in=units).distinct()
-        return qs.filter(space__in=spaces).distinct()
+        unit_permission = UnitPermissionChoices.CAN_MANAGE_RESOURCES.value
+        unit_ids = [pk for pk, perms in user.unit_permissions.items() if unit_permission in perms]
+        unit_group_ids = [pk for pk, perms in user.unit_group_permissions.items() if unit_permission in perms]
+
+        return qs.filter(
+            space__in=models.Subquery(
+                queryset=(
+                    Space.objects.filter(
+                        models.Q(unit__in=unit_ids)  #
+                        | models.Q(unit__unit_groups__in=unit_group_ids)
+                    ).values("id")
+                )
+            )
+        ).distinct()
