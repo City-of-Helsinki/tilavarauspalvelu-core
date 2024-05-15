@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from typing import TYPE_CHECKING
 
 from django.db import models
@@ -20,6 +21,18 @@ def has_general_permission(user: AnyUser, required_permission: GeneralPermission
     if user.is_anonymous:
         return False
     return required_permission in user.general_permissions
+
+
+def has_any_general_permission(user: AnyUser, permissions: Iterable[GeneralPermissionChoices]) -> bool:
+    if user.is_anonymous:
+        return False
+    return any(permission in user.general_permissions for permission in permissions)
+
+
+def has_all_general_permissions(user: AnyUser, permissions: Iterable[GeneralPermissionChoices]) -> bool:
+    if user.is_anonymous:
+        return False
+    return all(permission in user.general_permissions for permission in permissions)
 
 
 def has_unit_permission(user: AnyUser, required_permission: UnitPermissionChoices, units: list[int]) -> bool:
