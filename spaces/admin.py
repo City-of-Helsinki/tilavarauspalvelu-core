@@ -2,9 +2,7 @@ from typing import Any
 
 from admin_extra_buttons.api import ExtraButtonsMixin, button
 from adminsortable2.admin import SortableAdminMixin
-from django.conf import settings
 from django.contrib import admin, messages
-from django.core.management import call_command
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.models import QuerySet
 from django.forms import IntegerField, ModelForm
@@ -12,7 +10,9 @@ from django.utils.translation import gettext_lazy as _
 from mptt.admin import MPTTModelAdmin
 
 from common.fields.forms import ModelMultipleChoiceFilteredField
+from spaces.importers.tprek_unit_importer import TprekUnitImporter
 from spaces.models import Building, Location, RealEstate, ServiceSector, Space, Unit, UnitGroup
+from utils.sentry import SentryLogger
 
 
 class LocationInline(admin.TabularInline):
@@ -54,13 +54,28 @@ class UnitAdmin(SortableAdminMixin, ExtraButtonsMixin, admin.ModelAdmin):
 
     @admin.action
     def update_from_tprek(self, request: WSGIRequest, queryset: QuerySet[Unit]) -> None:
-        ids = queryset.filter(tprek_id__isnull=False).values_list("tprek_id", flat=True)
+        """
+        Update selected units from TPREK data.
+
+        Even if the TPREK data has not changed since the last update, the unit's data is still updated.
+        """
+        units: QuerySet[Unit] = queryset.exclude(tprek_id__isnull=True)
+        tprek_unit_importer = TprekUnitImporter()
         try:
-            output = call_command("import_units", settings.TPREK_UNIT_URL, "--ids", *ids)
-        except Exception as e:
-            self.message_user(request, f"Error while importing units: {e}", level=messages.ERROR)
+            tprek_unit_importer.update_unit_from_tprek(units, force_update=True)
+        except Exception as err:
+            details = f"Tried to import units from TPREK: '{units.values_list('pk', flat=True)}'"
+            SentryLogger.log_exception(err, details=details)
+            self.message_user(request, f"Error while importing units from TPREK: {err}", level=messages.ERROR)
         else:
-            self.message_user(request, output, level=messages.SUCCESS)
+            if not tprek_unit_importer.updated_units_count:
+                self.message_user(request, "No units were updated.", level=messages.WARNING)
+            else:
+                msg = f"Updated {tprek_unit_importer.updated_units_count} units."
+                not_updated_count = len(queryset) - tprek_unit_importer.updated_units_count
+                if not_updated_count:
+                    msg += f" Skipped {not_updated_count} units."
+                self.message_user(request, msg, level=messages.SUCCESS)
 
     @button(label="Update from TPREK")
     def update_from_tprek_button(self, request: WSGIRequest, pk: int) -> None:
