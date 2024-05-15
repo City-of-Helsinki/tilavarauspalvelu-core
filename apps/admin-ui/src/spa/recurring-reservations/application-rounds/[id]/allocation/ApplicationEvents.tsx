@@ -205,6 +205,13 @@ function ApplicationSectionColumn({
   // allocations are not specific to the reservation unit
   const isAllocated = (as: ApplicationSectionNode) =>
     as.allocations != null && as.allocations > 0;
+
+  const isAllocatedToThisUnit = (as: ApplicationSectionNode) =>
+    as.reservationUnitOptions
+      .filter((ruo) => ruo.reservationUnit.pk === reservationUnit.pk)
+      ?.map((ruo) => ruo.allocatedTimeSlots.length > 0)
+      .some(Boolean);
+
   // Locked is specific to this reservation unit
   const isLocked = (as: ApplicationSectionNode) =>
     as.reservationUnitOptions
@@ -218,19 +225,28 @@ function ApplicationSectionColumn({
       .some(Boolean);
 
   const sections = filterNonNullable(applicationSections);
+
+  // one of:
+  // - handled or
+  // - allocated and here and locked
   const allocated = sections.filter(
-    (as) => as.status === ApplicationSectionStatusChoice.Handled
-  );
-
-  const partiallyAllocated = sections.filter(
     (as) =>
-      as.status !== ApplicationSectionStatusChoice.Handled &&
-      isAllocated(as) &&
-      !isLocked(as) &&
-      !isRejected(as)
+      as.status === ApplicationSectionStatusChoice.Handled ||
+      (isAllocated(as) && isAllocatedToThisUnit(as) && isLocked(as))
   );
 
-  const locked = sections.filter((as) => isLocked(as) || isRejected(as));
+  const isPartiallyAllocated = (as: ApplicationSectionNode) =>
+    as.status !== ApplicationSectionStatusChoice.Handled &&
+    isAllocated(as) &&
+    !isLocked(as) &&
+    !isRejected(as);
+
+  const partiallyAllocated = sections.filter(isPartiallyAllocated);
+
+  // locked or rejected but not in the allocated list
+  const locked = sections
+    .filter((x) => allocated.find((y) => x.pk === y.pk) == null)
+    .filter((as) => isLocked(as) || isRejected(as));
 
   // take certain states and omit colliding application events
   const unallocatedApplicationEvents = (applicationSections ?? []).filter(
