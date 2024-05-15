@@ -5,7 +5,8 @@ from graphene_django_extensions import DjangoNode
 from api.graphql.types.recurring_reservation.filtersets import RecurringReservationFilterSet
 from api.graphql.types.recurring_reservation.permissions import RecurringReservationPermission
 from common.typing import GQLInfo
-from permissions.helpers import can_view_recurring_reservation, get_units_where_can_view_reservations
+from permissions.helpers import can_view_recurring_reservation, has_general_permission
+from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
 from reservations.models import RecurringReservation
 
 __all__ = [
@@ -47,12 +48,23 @@ class RecurringReservationNode(DjangoNode):
     @classmethod
     def filter_queryset(cls, queryset: models.QuerySet, info: GQLInfo) -> models.QuerySet:
         user = info.context.user
+
         if user.is_anonymous:
             return queryset.none()
+        if user.is_superuser:
+            return queryset
+        if has_general_permission(user, GeneralPermissionChoices.CAN_VIEW_RESERVATIONS):
+            return queryset
 
-        viewable_units = get_units_where_can_view_reservations(user)
+        unit_permission = UnitPermissionChoices.CAN_VIEW_RESERVATIONS.value
+        unit_ids = [pk for pk, perms in user.unit_permissions.items() if unit_permission in perms]
+        unit_group_ids = [pk for pk, perms in user.unit_group_permissions.items() if unit_permission in perms]
 
-        return queryset.filter(models.Q(reservation_unit__unit__in=viewable_units) | models.Q(user=user)).distinct()
+        return queryset.filter(
+            models.Q(user=user)
+            | models.Q(reservation_unit__unit__in=unit_ids)
+            | models.Q(reservation_unit__unit__unit_groups__in=unit_group_ids)
+        ).distinct()
 
     def resolve_weekdays(root: RecurringReservation, info: GQLInfo) -> list[int]:
         if root.weekdays:
