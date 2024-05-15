@@ -104,7 +104,7 @@ function RecurringReservationsView({
           />
         );
       }
-      if (endDate <= now) {
+      if (endDate > now) {
         buttons.push(
           <ReservationListButton
             key="deny"
