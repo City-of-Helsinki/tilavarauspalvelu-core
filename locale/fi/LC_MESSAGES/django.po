@@ -758,7 +758,7 @@ msgstr "Pyydetty aloitusaika allokaatioille."
 msgid "Requested end time for allocations."
 msgstr "Pyydetty lopetusaika allokaatioille."
 
-#: applications/apps.py
+#: applications/apps.py applications/tasks.py
 msgid "Seasonal Booking"
 msgstr "Kausivaraus"
 
@@ -1060,17 +1060,13 @@ msgstr ""
 "Onko ilmoitus luonnos. Luonnoksia ei näytetä käyttäjille, vaikka ne olisivat "
 "aktiivisia."
 
+#: common/admin/forms/sql_log.py common/models/sql_log.py
+msgid "Request log"
+msgstr "Rajapintakutsun loki"
+
 #: common/admin/forms/sql_log.py common/admin/sql_log.py
 msgid "SQL"
 msgstr "SQL"
-
-#: common/admin/forms/sql_log.py
-msgid "Path"
-msgstr "Polku"
-
-#: common/admin/forms/sql_log.py
-msgid "Body"
-msgstr "Sisältö"
 
 #: common/admin/forms/sql_log.py
 msgid "Duration (ns)"
@@ -1081,25 +1077,8 @@ msgid "Succeeded"
 msgstr "Onnistunut"
 
 #: common/admin/forms/sql_log.py
-msgid "Request ID"
-msgstr "Pyynnön ID"
-
-#: common/admin/forms/sql_log.py permissions/base_models.py
-#: reservations/choices.py
-msgid "Created"
-msgstr "Luotu"
-
-#: common/admin/forms/sql_log.py
 msgid "SQL that was executed (without params)."
 msgstr "Suoritettu SQL (ilman parametreja)."
-
-#: common/admin/forms/sql_log.py
-msgid "Request path where the SQL was executed."
-msgstr "Polku, jossa SQL suoritettiin."
-
-#: common/admin/forms/sql_log.py
-msgid "Body of the request that executed the SQL."
-msgstr "Pyynnön sisältö, joka suoritti SQL:n."
 
 #: common/admin/forms/sql_log.py
 msgid "Duration of the SQL query in nanoseconds."
@@ -1107,17 +1086,54 @@ msgstr "SQL-kyselyn kesto nanosekunteina."
 
 #: common/admin/forms/sql_log.py
 msgid "Whether the SQL query succeeded or not."
-msgstr "Onko SQL-kysely onnistunut vai ei."
+msgstr "Onnistuiko SQL-kysely vai ei."
+
+#: common/admin/forms/sql_log.py common/admin/sql_log.py
+msgid "Request ID"
+msgstr "Rajapintakyselyn ID"
+
+#: common/admin/forms/sql_log.py common/admin/sql_log.py
+msgid "Path"
+msgstr "Polku"
+
+#: common/admin/forms/sql_log.py
+msgid "Body"
+msgstr "Sisältö"
+
+#: common/admin/forms/sql_log.py
+msgid "Duration (ms)"
+msgstr "Kesto (ms)"
+
+#: common/admin/forms/sql_log.py permissions/base_models.py
+#: reservations/choices.py
+msgid "Created"
+msgstr "Luotu"
 
 #: common/admin/forms/sql_log.py
 msgid "Random ID for grouping this log with other logs from the same request."
 msgstr ""
 "Satunnainen ID, jonka avulla tämä loki voidaan ryhmitellä muiden saman "
-"pyynnön aikana luotujen lokien kanssa."
+"rajapintakyselyn aikana luotujen lokien kanssa."
+
+#: common/admin/forms/sql_log.py
+msgid "Request path where the SQL was executed."
+msgstr "Rajapintakyselyn polku, jossa SQL suoritettiin."
+
+#: common/admin/forms/sql_log.py
+msgid "Body of the request that executed the SQL."
+msgstr "Rajapintakyselyn sisältö, joka suoritti SQL:n."
+
+#: common/admin/forms/sql_log.py
+msgid "Duration of the request in milliseconds."
+msgstr "Rajapintakyselyn kesto millisekuntia."
 
 #: common/admin/forms/sql_log.py
 msgid "When the SQL query was executed."
 msgstr "Milloin SQL-kysely suoritettiin."
+
+#: common/admin/sql_log.py
+msgid "Queries"
+msgstr "Tietokantakyselyjä"
 
 #: common/choices/banner_notification.py
 msgid "Exception"
@@ -1159,6 +1175,10 @@ msgid ""
 msgstr ""
 "'active_from' ja 'active_until' täytyy olla joko tyhjiä tai asetettuja. Jos "
 "molemmat on asetettu, 'active_until' täytyy olla 'active_from' jälkeen."
+
+#: common/models/sql_log.py
+msgid "Request logs"
+msgstr "Rajapintakutsujen lokit"
 
 #: common/models/sql_log.py
 msgid "SQL log"

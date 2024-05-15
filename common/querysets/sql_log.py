@@ -7,3 +7,7 @@ __all__ = [
 
 class SQLLogQuerySet(models.QuerySet):
     pass
+
+
+class RequestLogQuerySet(models.QuerySet):
+    pass

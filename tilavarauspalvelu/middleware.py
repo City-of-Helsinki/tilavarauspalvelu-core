@@ -74,15 +74,22 @@ class QueryLoggingMiddleware:
     @contextlib.contextmanager
     def query_logger(self, request: WSGIRequest) -> Generator[None, None, None]:
         self.query_log = []
-        with connection.execute_wrapper(self.log):
-            yield
-
+        start = time.perf_counter_ns()
         try:
-            from common.tasks import save_sql_queries_from_request
+            with connection.execute_wrapper(self.log):
+                yield
+        finally:
+            try:
+                from common.tasks import save_sql_queries_from_request
 
-            save_sql_queries_from_request.delay(queries=self.query_log, path=request.path, body=request.body)
-        except Exception as error:
-            SentryLogger.log_exception(error, "Error in QueryLoggingMiddleware")
+                save_sql_queries_from_request.delay(
+                    queries=self.query_log,
+                    path=request.path,
+                    body=request.body,
+                    duration_ms=(time.perf_counter_ns() - start) // 1_000_000,
+                )
+            except Exception as error:
+                SentryLogger.log_exception(error, "Error in QueryLoggingMiddleware")
 
     def log(
         self,

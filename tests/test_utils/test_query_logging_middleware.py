@@ -32,25 +32,25 @@ def test_query_logging_middleware(graphql, settings):
     assert len(logs) == 3
 
     # Fetching user
-    assert logs[0].path == "/graphql/"
+    assert logs[0].request_log.path == "/graphql/"
     assert logs[0].succeeded is True
     assert 'FROM "user"' in logs[0].sql
 
     # Counting spaces for pagination
-    assert logs[1].path == "/graphql/"
+    assert logs[1].request_log.path == "/graphql/"
     assert logs[1].succeeded is True
     assert logs[1].sql == 'SELECT COUNT(*) AS "__count" FROM "space"'
 
     # Fetching spaces
-    assert logs[2].path == "/graphql/"
+    assert logs[2].request_log.path == "/graphql/"
     assert logs[2].succeeded is True
     assert logs[2].sql == 'SELECT "space"."id" FROM "space" ORDER BY "space"."tree_id" ASC, "space"."lft" ASC LIMIT 1'
 
     # All logs are for the same request
-    assert logs[0].request_id == logs[1].request_id
-    assert logs[0].request_id == logs[2].request_id
+    assert logs[0].request_log.request_id == logs[1].request_log.request_id
+    assert logs[0].request_log.request_id == logs[2].request_log.request_id
 
     # All logs have the same body saved
-    assert logs[0].body == "query { spaces { edges { node { pk } } } }"
-    assert logs[0].body == logs[1].body
-    assert logs[0].body == logs[2].body
+    assert logs[0].request_log.body == "query { spaces { edges { node { pk } } } }"
+    assert logs[0].request_log.body == logs[1].request_log.body
+    assert logs[0].request_log.body == logs[2].request_log.body
