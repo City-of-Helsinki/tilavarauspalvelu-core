@@ -16,7 +16,7 @@ from tilavarauspalvelu.celery import app
 
 
 @app.task(name="prune_reservations")
-def _prune_reservations() -> None:
+def prune_reservations_task() -> None:
     prune_inactive_reservations()
     prune_reservation_with_inactive_payments()
 
