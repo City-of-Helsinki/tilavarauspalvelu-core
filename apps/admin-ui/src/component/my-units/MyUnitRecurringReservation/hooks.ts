@@ -7,7 +7,6 @@ import type {
   ReservationUnitNode,
   RecurringReservationCreateMutationInput,
   ReservationStaffCreateMutationInput,
-  QueryUnitArgs,
   Maybe,
   ReservationMetadataFieldNode,
 } from "@gql/gql-types";
@@ -16,6 +15,7 @@ import {
   ReservationStartInterval,
   useCreateStaffReservationMutation,
   useCreateRecurringReservationMutation,
+  useRecurringReservationUnitQuery,
 } from "@gql/gql-types";
 import type { UseFormReturn } from "react-hook-form";
 import type { RecurringReservationForm } from "app/schemas";
@@ -33,7 +33,6 @@ import {
 } from "@/helpers";
 import { generateReservations } from "./generateReservations";
 import { useNotification } from "@/context/NotificationContext";
-import { RECURRING_RESERVATION_UNIT_QUERY } from "../queries";
 import { GET_RESERVATIONS_IN_INTERVAL } from "./queries";
 import { NewReservationListItem } from "../../ReservationsList";
 import { convertToDate } from "./utils";
@@ -95,15 +94,12 @@ export function useRecurringReservationsUnits(unitId: number) {
   const { notifyError } = useNotification();
 
   const id = base64encode(`UnitNode:${unitId}`);
-  const { loading, data } = useQuery<Query, QueryUnitArgs>(
-    RECURRING_RESERVATION_UNIT_QUERY,
-    {
-      variables: { id },
-      onError: (err) => {
-        notifyError(err.message);
-      },
-    }
-  );
+  const { loading, data } = useRecurringReservationUnitQuery({
+    variables: { id },
+    onError: (err) => {
+      notifyError(err.message);
+    },
+  });
 
   const { unit } = data ?? {};
   const reservationUnits = filterNonNullable(unit?.reservationunitSet);

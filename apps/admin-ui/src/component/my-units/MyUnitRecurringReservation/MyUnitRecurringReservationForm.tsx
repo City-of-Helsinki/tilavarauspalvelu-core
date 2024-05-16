@@ -3,7 +3,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ReservationStartInterval,
   ReservationTypeChoice,
-  type ReservationUnitNode,
 } from "@gql/gql-types";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -122,7 +121,10 @@ const ReservationListEditor = ({
 };
 
 type Props = {
-  reservationUnits: ReservationUnitNode[];
+  reservationUnits: {
+    pk?: number | null | undefined;
+    nameFi?: string | null | undefined;
+  }[];
 };
 
 const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
