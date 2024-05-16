@@ -11,11 +11,11 @@ import {
 import { parseISO } from "date-fns";
 import { breakpoints } from "common/src/common/style";
 import {
-  type ApplicationNode,
   ApplicantTypeChoice,
   ApplicationStatusChoice,
   type Maybe,
   useCancelApplicationMutation,
+  type ApplicationsQuery,
 } from "@gql/gql-types";
 import { applicationUrl } from "@/modules/util";
 import { BlackButton } from "@/styles/util";
@@ -136,13 +136,19 @@ const StyledButton = styled(BlackButton).attrs({
   }
 `;
 
+type ApplicationType = NonNullable<
+  NonNullable<
+    NonNullable<ApplicationsQuery["applications"]>["edges"][0]
+  >["node"]
+>;
 type Props = {
-  application: ApplicationNode;
+  application: ApplicationType;
   // TODO refactor the action callback (it's not a good idea in general, but especially error callback)
   actionCallback: (string: "error" | "cancel") => Promise<void>;
 };
 
-function getApplicant(application: ApplicationNode, t: TFunction): string {
+// TODO should use a name fragment
+function getApplicant(application: ApplicationType, t: TFunction): string {
   if (application.applicantType === ApplicantTypeChoice.Individual) {
     return t("applicationCard:person");
   }

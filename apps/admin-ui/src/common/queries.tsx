@@ -62,6 +62,10 @@ export const UNIT_QUERY = gql`
       shortDescriptionFi
       reservationunitSet {
         ...ReservationUnitCommonFields
+        isArchived
+        resources {
+          pk
+        }
         isDraft
         purposes {
           pk

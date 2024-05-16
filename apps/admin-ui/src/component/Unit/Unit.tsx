@@ -1,4 +1,3 @@
-import { useQuery } from "@apollo/client";
 import { Button, IconPlusCircleFill, Notification } from "hds-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -6,8 +5,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { H1, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import type { Query, QueryUnitArgs } from "@gql/gql-types";
-import { UNIT_QUERY } from "@/common/queries";
+import { useUnitQuery } from "@gql/gql-types";
 import { parseAddress } from "@/common/util";
 import { useNotification } from "@/context/NotificationContext";
 import { Container } from "@/styles/layout";
@@ -118,16 +116,13 @@ function Unit(): JSX.Element {
 
   const typename = "UnitNode";
   const id = base64encode(`${typename}:${unitPk}`);
-  const { data, loading: isLoading } = useQuery<Query, QueryUnitArgs>(
-    UNIT_QUERY,
-    {
-      variables: { id },
-      fetchPolicy: "network-only",
-      onError: () => {
-        notifyError(t("errors.errorFetchingData"));
-      },
-    }
-  );
+  const { data, loading: isLoading } = useUnitQuery({
+    variables: { id },
+    fetchPolicy: "network-only",
+    onError: () => {
+      notifyError(t("errors.errorFetchingData"));
+    },
+  });
 
   const { unit } = data ?? {};
   const hasSpacesResources = Boolean(unit?.spaces?.length);

@@ -2,8 +2,8 @@ import { useSession } from "app/hooks/auth";
 import type {
   UnitNode,
   ReservationNode,
-  UserNode,
   ApplicationRoundQuery,
+  CurrentUserQuery,
 } from "@gql/gql-types";
 import {
   hasPermission as baseHasPermission,
@@ -14,7 +14,7 @@ import {
 import { filterNonNullable } from "common/src/helpers";
 
 const hasUnitPermission = (
-  user: UserNode | undefined,
+  user: CurrentUserQuery["currentUser"],
   permissionName: Permission,
   unit: UnitNode | undefined
 ): boolean => {
@@ -37,7 +37,7 @@ const hasUnitPermission = (
 };
 
 const hasPermission = (
-  user: UserNode | undefined,
+  user: CurrentUserQuery["currentUser"] | undefined,
   reservation: ReservationNode,
   permissionName: Permission,
   includeOwn = true

@@ -1,11 +1,12 @@
 import { filterNonNullable } from "common/src/helpers";
 import {
-  type UnitRoleNode,
-  type GeneralRoleNode,
-  type ServiceSectorRoleNode,
-  type UserNode,
   GeneralPermissionChoices,
+  type CurrentUserQuery,
+  ServiceSectorPermissionsChoices,
+  UnitPermissionChoices,
 } from "@gql/gql-types";
+
+type UserNode = CurrentUserQuery["currentUser"];
 
 // TODO reuse the backend enums
 // TODO add a safe conversion from Unit -> General permission
@@ -26,7 +27,7 @@ export enum Permission {
 /* eslint-enable @typescript-eslint/prefer-literal-enum-member */
 
 const hasGeneralPermission = (permissionName: string, user: UserNode) =>
-  user.generalRoles?.find((x) =>
+  user?.generalRoles?.find((x) =>
     x?.role.permissions?.find((y) => y?.permission === permissionName)
   ) != null;
 
@@ -35,7 +36,7 @@ function hasUnitPermission(
   unitPk: number,
   user: UserNode
 ): boolean {
-  const unitRoles = filterNonNullable(user.unitRoles);
+  const unitRoles = filterNonNullable(user?.unitRoles);
 
   for (const role of unitRoles) {
     const perms = filterNonNullable(
@@ -66,7 +67,7 @@ function hasServiceSectorPermission(
   serviceSectorPks: number[],
   user: UserNode
 ): boolean {
-  const roles = filterNonNullable(user.serviceSectorRoles);
+  const roles = filterNonNullable(user?.serviceSectorRoles);
   for (const role of roles) {
     const perms = filterNonNullable(
       role.role.permissions?.flatMap((x) => x.permission)
@@ -87,12 +88,15 @@ function hasServiceSectorPermission(
 
 /// Returns true if the user is allowed to perform operation for a specific unit or service sector
 export const hasPermission =
-  (user: UserNode) =>
+  (user: CurrentUserQuery["currentUser"]) =>
   (
     permissionName: Permission,
     unitPk?: number,
     serviceSectorPk?: number[]
   ): boolean => {
+    if (!user) {
+      return false;
+    }
     if (user.isSuperuser) {
       return true;
     }
@@ -114,27 +118,39 @@ export const hasPermission =
     return false;
   };
 
+type PermissionType =
+  | GeneralPermissionChoices
+  | UnitPermissionChoices
+  | ServiceSectorPermissionsChoices;
+type RoleType = {
+  role:
+    | {
+        permissions?:
+          | { permission?: PermissionType | undefined | null }[]
+          | null
+          | undefined;
+      }
+    | null
+    | undefined;
+};
+
 /// Returns true if the user if the user is allowed to perform what the permission is for
 /// e.g. if the user allowed to view some reservations but not all this will return true
 export function hasSomePermission(
-  user: UserNode,
+  user: NonNullable<CurrentUserQuery["currentUser"]>,
   permission: Permission
 ): boolean {
   if (user.isSuperuser) {
     return true;
   }
 
-  const hasPerm = (
-    role: UnitRoleNode | ServiceSectorRoleNode | GeneralRoleNode | undefined,
-    perm: Permission
-  ) =>
-    role?.role.permissions?.some(
+  const hasPerm = (role: RoleType | undefined | null, perm: Permission) =>
+    role?.role?.permissions?.some(
       (p) => p?.permission != null && p.permission.toString() === perm
     );
 
   const someUnitRoles =
-    user?.unitRoles?.some((role) => hasPerm(role ?? undefined, permission)) ??
-    false;
+    user?.unitRoles?.some((role) => hasPerm(role, permission)) ?? false;
 
   const someSectorRoles =
     user?.serviceSectorRoles?.some((role) =>
@@ -151,13 +167,15 @@ export function hasSomePermission(
 
 /// Returns true if the user has any kind of access to the system
 export function hasAnyPermission(user: UserNode): boolean {
+  if (!user) {
+    return false;
+  }
   if (user.isSuperuser) {
     return true;
   }
 
-  const hasAnyPerm = (
-    role?: UnitRoleNode | ServiceSectorRoleNode | GeneralRoleNode
-  ) => role?.role.permissions?.some((p) => p?.permission != null) ?? false;
+  const hasAnyPerm = (role: RoleType | undefined | null) =>
+    role?.role?.permissions?.some((p) => p?.permission != null) ?? false;
 
   const someUnitRoles =
     user?.unitRoles?.some((role) => hasAnyPerm(role ?? undefined)) ?? false;

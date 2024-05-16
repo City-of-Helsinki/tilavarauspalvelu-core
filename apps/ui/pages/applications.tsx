@@ -1,23 +1,23 @@
 import React, { useState } from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useLazyQuery } from "@apollo/client";
 import { Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import {
-  type ApplicationNode,
   ApplicationStatusChoice,
-  type Query,
-  type QueryApplicationsArgs,
+  type ApplicationsQuery,
+  useApplicationsLazyQuery,
+  ApplicationsDocument,
+  type ApplicationsQueryVariables,
+  GetCurrentUserDocument,
+  type GetCurrentUserQuery,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import Head from "@/components/applications/Head";
 import ApplicationsGroup from "@/components/applications/ApplicationsGroup";
-import { APPLICATIONS } from "@/modules/queries/application";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
-import { CURRENT_USER } from "@/modules/queries/user";
 import { useCurrentUser } from "@/hooks/user";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
@@ -37,13 +37,13 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const commonProps = getCommonServerSideProps();
   const client = createApolloClient(commonProps.apiBaseUrl, ctx);
 
-  const { data: userData } = await client.query<Query>({
-    query: CURRENT_USER,
+  const { data: userData } = await client.query<GetCurrentUserQuery>({
+    query: GetCurrentUserDocument,
   });
 
   const { currentUser: user } = userData;
 
-  if (!user) {
+  if (!user?.pk) {
     return {
       notFound: true,
       props: {
@@ -54,8 +54,11 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     };
   }
 
-  const { data: appData } = await client.query<Query, QueryApplicationsArgs>({
-    query: APPLICATIONS,
+  const { data: appData } = await client.query<
+    ApplicationsQuery,
+    ApplicationsQueryVariables
+>({
+    query: ApplicationsDocument,
     fetchPolicy: "no-cache",
     variables: {
       user: user.pk,
@@ -84,7 +87,11 @@ function ApplicationGroups({
   applications,
   actionCallback,
 }: {
-  applications: ApplicationNode[];
+  applications: NonNullable<
+    NonNullable<
+      NonNullable<ApplicationsQuery["applications"]>["edges"][0]
+    >["node"]
+  >[];
   actionCallback: (string: "error" | "cancel") => Promise<void>;
 }) {
   const { t } = useTranslation();
@@ -146,23 +153,19 @@ function ApplicationsPage({
   const { currentUser } = useCurrentUser();
   // Requires a client side query because we can do modifications without leaving the page
   // TODO better would be to hydrate the client and use refetch when modifying
-  const [fetch, { data: appData }] = useLazyQuery<Query, QueryApplicationsArgs>(
-    APPLICATIONS,
-    {
-      fetchPolicy: "no-cache",
-      variables: {
-        user: currentUser?.pk,
-        status: VALID_STATUSES,
-      },
-    }
-  );
+  const [fetch, { data: appData }] = useApplicationsLazyQuery({
+    fetchPolicy: "no-cache",
+    variables: {
+      user: currentUser?.pk ?? 0,
+      status: VALID_STATUSES,
+    },
+  });
 
   const data = appData ?? initialData;
   const applications = filterNonNullable(
     data.applications?.edges?.map((n) => n?.node)
   );
 
-  // TODO add refetching?
   const actionCallback = async (type: "cancel" | "error") => {
     switch (type) {
       case "cancel":

@@ -1,7 +1,7 @@
 import type {
+  ImageFragmentFragment,
   Maybe,
   ReservationNode,
-  ReservationUnitImageNode,
 } from "../gql/gql-types";
 import { pixel } from "./common/style";
 
@@ -65,7 +65,7 @@ export function truncate(val: string, maxLen: number): string {
 /// On development we don't have image cache so we return the full image url
 /// If image is null or undefined returns a static pixel
 export function getImageSource(
-  image: ReservationUnitImageNode | null,
+  image: ImageFragmentFragment | null,
   size: "small" | "large" | "medium" | "full" = "medium"
 ): string {
   if (!image) {
@@ -75,7 +75,7 @@ export function getImageSource(
 }
 
 function getImageSourceWithoutDefault(
-  image: ReservationUnitImageNode,
+  image: ImageFragmentFragment,
   size: "small" | "large" | "medium" | "full"
 ): string | null {
   switch (size) {

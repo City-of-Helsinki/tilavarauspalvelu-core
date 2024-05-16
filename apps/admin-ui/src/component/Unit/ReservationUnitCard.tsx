@@ -10,13 +10,15 @@ import {
 import { useTranslation } from "react-i18next";
 import { H2, fontMedium } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { ImageType, type ReservationUnitNode } from "@gql/gql-types";
+import { ImageType, type UnitQuery } from "@gql/gql-types";
 import { BasicLink } from "@/styles/util";
 import IconDraft from "@/images/icon_draft.svg";
 import { getImageSource } from "common/src/helpers";
 
+type UnitType = NonNullable<UnitQuery["unit"]>;
+type ReservationUnitType = NonNullable<UnitType["reservationunitSet"]>[0];
 interface IProps {
-  reservationUnit: ReservationUnitNode;
+  reservationUnit: ReservationUnitType;
   unitId: number;
 }
 

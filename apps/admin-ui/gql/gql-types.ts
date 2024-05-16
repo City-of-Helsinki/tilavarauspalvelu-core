@@ -6509,11 +6509,13 @@ export type UnitQuery = {
     shortDescriptionFi?: string | null;
     reservationunitSet: Array<{
       __typename?: "ReservationUnitNode";
+      isArchived: boolean;
       isDraft: boolean;
       pk?: number | null;
       nameFi?: string | null;
       maxPersons?: number | null;
       surfaceArea?: number | null;
+      resources: Array<{ __typename?: "ResourceNode"; pk?: number | null }>;
       purposes: Array<{
         __typename?: "PurposeNode";
         pk?: number | null;
@@ -10546,6 +10548,10 @@ export const UnitDocument = gql`
       shortDescriptionFi
       reservationunitSet {
         ...ReservationUnitCommonFields
+        isArchived
+        resources {
+          pk
+        }
         isDraft
         purposes {
           pk

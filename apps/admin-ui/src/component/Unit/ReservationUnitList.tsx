@@ -1,9 +1,11 @@
 import React from "react";
-import type { ReservationUnitNode } from "@gql/gql-types";
+import type { UnitQuery } from "@gql/gql-types";
 import { ReservationUnitCard } from "./ReservationUnitCard";
 
+type UnitType = NonNullable<UnitQuery["unit"]>;
+type ReservationUnitType = NonNullable<UnitType["reservationunitSet"]>[0];
 interface IProps {
-  reservationUnits: ReservationUnitNode[];
+  reservationUnits: ReservationUnitType[];
   unitId: number;
 }
 

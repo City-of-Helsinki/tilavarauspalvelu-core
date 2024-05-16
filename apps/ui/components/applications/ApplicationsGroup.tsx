@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { H3 } from "common/src/common/typography";
-import { type ApplicationNode } from "@gql/gql-types";
+import { type ApplicationsQuery } from "@gql/gql-types";
 import ApplicationCard from "./ApplicationCard";
 
 const GroupName = styled(H3).attrs({ as: "h2" })`
@@ -10,7 +10,11 @@ const GroupName = styled(H3).attrs({ as: "h2" })`
 
 type Props = {
   name: string;
-  applications: ApplicationNode[];
+  applications: NonNullable<
+    NonNullable<
+      NonNullable<ApplicationsQuery["applications"]>["edges"][0]
+    >["node"]
+  >[];
   actionCallback: (string: "error" | "cancel") => Promise<void>;
 };
 
