@@ -22,7 +22,6 @@ const RESERVATION_UNIT_PAGE_FRAGMENT = gql`
   ${RESERVATION_UNIT_TYPE_FRAGMENT}
   fragment ReservationUnitPageFields on ReservationUnitNode {
     ...ReservationUnitFields
-    id
     isDraft
     images {
       ...ImageFragment
@@ -202,7 +201,6 @@ export const RESERVATION_UNITS = gql`
           }
           unit {
             ...UnitNameFieldsI18N
-            id: pk
           }
           maxPersons
           images {

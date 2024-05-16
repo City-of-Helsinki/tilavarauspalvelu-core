@@ -4,7 +4,11 @@ import { useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import type { OptionType } from "common/types/common";
-import type { ApplicationRoundNode, ReservationUnitNode } from "@gql/gql-types";
+import type {
+  ApplicationRoundNode,
+  ReservationUnitNode,
+  SearchReservationUnitsQuery,
+} from "@gql/gql-types";
 import { IconButton } from "common/src/components";
 import { filterNonNullable } from "common/src/helpers";
 import Modal from "../common/Modal";
@@ -12,6 +16,11 @@ import ReservationUnitModal from "../reservation-unit/ReservationUnitModal";
 import ReservationUnitCard from "../reservation-unit/ReservationUnitCard";
 import type { ApplicationFormValues } from "./Form";
 
+type ReservationUnitType = NonNullable<
+  NonNullable<
+    NonNullable<SearchReservationUnitsQuery["reservationUnits"]>["edges"][0]
+  >["node"]
+>;
 type OptionTypes = {
   purposeOptions: OptionType[];
   reservationUnitTypeOptions: OptionType[];
@@ -96,7 +105,7 @@ const ReservationUnitList = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reservationUnits, minSize]);
 
-  const handleAdd = (ru: ReservationUnitNode) => {
+  const handleAdd = (ru: ReservationUnitType) => {
     if (ru.pk == null) {
       return;
     }
@@ -111,13 +120,13 @@ const ReservationUnitList = ({
     return copy;
   };
 
-  const remove = (reservationUnit: ReservationUnitNode) => {
+  const remove = (reservationUnit: ReservationUnitType) => {
     setReservationUnits([
       ...reservationUnits.filter((pk) => pk !== reservationUnit.pk),
     ]);
   };
 
-  const moveUp = (reservationUnit: ReservationUnitNode) => {
+  const moveUp = (reservationUnit: ReservationUnitType) => {
     if (reservationUnit.pk == null) {
       return;
     }
@@ -126,7 +135,7 @@ const ReservationUnitList = ({
     setReservationUnits(move(reservationUnits, from, to));
   };
 
-  const moveDown = (reservationUnit: ReservationUnitNode) => {
+  const moveDown = (reservationUnit: ReservationUnitType) => {
     if (reservationUnit.pk == null) {
       return;
     }

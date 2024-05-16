@@ -1,15 +1,17 @@
-import type { Query, UserNode } from "@gql/gql-types";
-import { type ApolloError, useQuery } from "@apollo/client";
-import { CURRENT_USER } from "@/modules/queries/user";
+import {
+  useGetCurrentUserQuery,
+  type GetCurrentUserQuery,
+} from "@gql/gql-types";
+import { type ApolloError } from "@apollo/client";
 
 // TODO this should be replaced with SSR current user in most cases.
 // Causes a flash of unauthenticated content on page load.
-export const useCurrentUser = (): {
-  currentUser?: UserNode;
+export function useCurrentUser(): {
+  currentUser?: GetCurrentUserQuery["currentUser"] | undefined;
   error: ApolloError | undefined;
   loading: boolean;
-} => {
-  const { data, error, previousData, loading } = useQuery<Query>(CURRENT_USER, {
+} {
+  const { data, error, previousData, loading } = useGetCurrentUserQuery({
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
   });
@@ -21,4 +23,4 @@ export const useCurrentUser = (): {
     error,
     loading,
   };
-};
+}

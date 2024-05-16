@@ -11,23 +11,21 @@ import {
 import React, { ChangeEvent, useState } from "react";
 import Link from "next/link";
 import { useTranslation } from "next-i18next";
-import { useQuery } from "@apollo/client";
 import styled from "styled-components";
 import type { OptionType } from "common/types/common";
 import { fontMedium } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
   type ApplicationRoundNode,
-  type Query,
-  type QueryReservationUnitsArgs,
   type ReservationUnitNode,
   ReservationUnitOrderingChoices,
+  useSearchReservationUnitsQuery,
+  type SearchReservationUnitsQuery,
 } from "@gql/gql-types";
 import { filterNonNullable, getImageSource } from "common/src/helpers";
 import { reservationUnitPath } from "@/modules/const";
 import { getAddressAlt, getMainImage, getTranslation } from "@/modules/util";
 import { MediumButton } from "@/styles/util";
-import { RESERVATION_UNITS } from "@/modules/queries/reservationUnit";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
 import IconWithText from "../common/IconWithText";
@@ -128,16 +126,21 @@ const LinkText = styled.span`
   margin-left: var(--spacing-xs);
 `;
 
+type ReservationUnitType = NonNullable<
+  NonNullable<
+    NonNullable<SearchReservationUnitsQuery["reservationUnits"]>["edges"][0]
+  >["node"]
+>;
 const ReservationUnitCard = ({
   reservationUnit,
   handleAdd,
   handleRemove,
   isSelected,
 }: {
-  reservationUnit: ReservationUnitNode;
+  reservationUnit: ReservationUnitType;
   isSelected: boolean;
-  handleAdd: (ru: ReservationUnitNode) => void;
-  handleRemove: (ru: ReservationUnitNode) => void;
+  handleAdd: (ru: ReservationUnitType) => void;
+  handleRemove: (ru: ReservationUnitType) => void;
 }) => {
   const { t } = useTranslation();
 
@@ -291,8 +294,8 @@ const ReservationUnitModal = ({
   options,
 }: {
   applicationRound: ApplicationRoundNode;
-  handleAdd: (ru: ReservationUnitNode) => void;
-  handleRemove: (ru: ReservationUnitNode) => void;
+  handleAdd: (ru: ReservationUnitType) => void;
+  handleRemove: (ru: ReservationUnitType) => void;
   currentReservationUnits: ReservationUnitNode[];
   options: OptionsType;
 }): JSX.Element => {
@@ -317,27 +320,24 @@ const ReservationUnitModal = ({
 
   const { t } = useTranslation();
 
-  const { data, refetch, loading } = useQuery<Query, QueryReservationUnitsArgs>(
-    RESERVATION_UNITS,
-    {
-      skip: !applicationRound.pk,
-      variables: {
-        applicationRound: [applicationRound.pk ?? 0],
-        textSearch: searchTerm,
-        maxPersonsGte: maxPersons?.value?.toString(),
-        reservationUnitType:
-          reservationUnitType?.value != null
-            ? [Number(reservationUnitType?.value)]
-            : [],
-        unit: unit?.value != null ? [Number(unit?.value)] : [],
-        orderBy: [ReservationUnitOrderingChoices.NameFiAsc],
-        isDraft: false,
-        isVisible: true,
-      },
-      notifyOnNetworkStatusChange: true,
-      fetchPolicy: "no-cache",
-    }
-  );
+  const { data, refetch, loading } = useSearchReservationUnitsQuery({
+    skip: !applicationRound.pk,
+    variables: {
+      applicationRound: [applicationRound.pk ?? 0],
+      textSearch: searchTerm,
+      maxPersons: maxPersons?.value?.toString(),
+      reservationUnitType:
+        reservationUnitType?.value != null
+          ? [Number(reservationUnitType?.value)]
+          : [],
+      unit: unit?.value != null ? [Number(unit?.value)] : [],
+      orderBy: [ReservationUnitOrderingChoices.NameFiAsc],
+      isDraft: false,
+      isVisible: true,
+    },
+    notifyOnNetworkStatusChange: true,
+    fetchPolicy: "no-cache",
+  });
 
   const reservationUnits = filterNonNullable(
     data?.reservationUnits?.edges.map((n) => n?.node)

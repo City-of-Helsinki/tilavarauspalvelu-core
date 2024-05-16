@@ -8,7 +8,6 @@ import {
   type QueryReservationsArgs,
   type ReservationNode,
   State,
-  type UserNode,
   OrderStatus,
   ReservationOrderingChoices,
   useDeleteReservationMutation,
@@ -145,7 +144,12 @@ export function useReservation({ reservationPk }: UseReservationProps): {
 }
 
 type UseReservationsProps = {
-  currentUser?: UserNode;
+  currentUser?:
+    | {
+        pk?: number | null | undefined;
+      }
+    | null
+    | undefined;
   states?: State[];
   orderBy?: ReservationOrderingChoices;
 };

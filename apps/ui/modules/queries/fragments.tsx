@@ -12,6 +12,7 @@ import {
 export const UNIT_NAME_FRAGMENT_I18N = gql`
   ${LOCATION_FRAGMENT_I18N}
   fragment UnitNameFieldsI18N on UnitNode {
+    id
     pk
     nameFi
     nameEn
@@ -47,6 +48,7 @@ export const RESERVATION_UNIT_FRAGMENT = gql`
     unit {
       ...UnitFields
     }
+    id
     pk
     uuid
     nameFi

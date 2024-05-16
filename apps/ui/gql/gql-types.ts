@@ -5676,6 +5676,7 @@ export type ApplicationRoundsUiQuery = {
 
 export type UnitNameFieldsI18NFragment = {
   __typename?: "UnitNode";
+  id: string;
   pk?: number | null;
   nameFi?: string | null;
   nameEn?: string | null;
@@ -5716,6 +5717,7 @@ export type UnitFieldsFragment = {
 
 export type ReservationUnitFieldsFragment = {
   __typename?: "ReservationUnitNode";
+  id: string;
   pk?: number | null;
   uuid: string;
   nameFi?: string | null;
@@ -5990,6 +5992,7 @@ export type ReservationsQuery = {
           nameSv?: string | null;
           unit?: {
             __typename?: "UnitNode";
+            id: string;
             pk?: number | null;
             nameFi?: string | null;
             nameEn?: string | null;
@@ -6099,6 +6102,7 @@ export type ReservationQuery = {
     } | null;
     reservationUnit?: Array<{
       __typename?: "ReservationUnitNode";
+      id: string;
       pk?: number | null;
       uuid: string;
       nameFi?: string | null;
@@ -6300,7 +6304,6 @@ export type ReservationUnitTypeFieldsFragment = {
 
 export type ReservationUnitPageFieldsFragment = {
   __typename?: "ReservationUnitNode";
-  id: string;
   isDraft: boolean;
   descriptionFi?: string | null;
   descriptionEn?: string | null;
@@ -6320,6 +6323,7 @@ export type ReservationUnitPageFieldsFragment = {
   reservationsMinDaysBefore?: number | null;
   reservationsMaxDaysBefore?: number | null;
   requireReservationHandling: boolean;
+  id: string;
   pk?: number | null;
   uuid: string;
   nameFi?: string | null;
@@ -6473,7 +6477,6 @@ export type ReservationUnitQuery = {
   __typename?: "Query";
   reservationUnit?: {
     __typename?: "ReservationUnitNode";
-    id: string;
     isDraft: boolean;
     descriptionFi?: string | null;
     descriptionEn?: string | null;
@@ -6493,6 +6496,7 @@ export type ReservationUnitQuery = {
     reservationsMinDaysBefore?: number | null;
     reservationsMaxDaysBefore?: number | null;
     requireReservationHandling: boolean;
+    id: string;
     pk?: number | null;
     uuid: string;
     nameFi?: string | null;
@@ -6640,7 +6644,6 @@ export type ReservationUnitPageQuery = {
   __typename?: "Query";
   reservationUnit?: {
     __typename?: "ReservationUnitNode";
-    id: string;
     isDraft: boolean;
     descriptionFi?: string | null;
     descriptionEn?: string | null;
@@ -6660,6 +6663,7 @@ export type ReservationUnitPageQuery = {
     reservationsMinDaysBefore?: number | null;
     reservationsMaxDaysBefore?: number | null;
     requireReservationHandling: boolean;
+    id: string;
     pk?: number | null;
     uuid: string;
     nameFi?: string | null;
@@ -6897,11 +6901,11 @@ export type SearchReservationUnitsQuery = {
         } | null;
         unit?: {
           __typename?: "UnitNode";
+          id: string;
           pk?: number | null;
           nameFi?: string | null;
           nameEn?: string | null;
           nameSv?: string | null;
-          id?: number | null;
           location?: {
             __typename?: "LocationNode";
             addressStreetEn?: string | null;
@@ -6974,6 +6978,7 @@ export type RelatedReservationUnitsQuery = {
         }>;
         unit?: {
           __typename?: "UnitNode";
+          id: string;
           pk?: number | null;
           nameFi?: string | null;
           nameEn?: string | null;
@@ -8050,6 +8055,7 @@ export const LocationFieldsI18nFragmentDoc = gql`
 `;
 export const UnitNameFieldsI18NFragmentDoc = gql`
   fragment UnitNameFieldsI18N on UnitNode {
+    id
     pk
     nameFi
     nameEn
@@ -8113,6 +8119,7 @@ export const ReservationUnitFieldsFragmentDoc = gql`
     unit {
       ...UnitFields
     }
+    id
     pk
     uuid
     nameFi
@@ -8180,7 +8187,6 @@ export const ReservationUnitTypeFieldsFragmentDoc = gql`
 export const ReservationUnitPageFieldsFragmentDoc = gql`
   fragment ReservationUnitPageFields on ReservationUnitNode {
     ...ReservationUnitFields
-    id
     isDraft
     images {
       ...ImageFragment
@@ -10270,7 +10276,6 @@ export const SearchReservationUnitsDocument = gql`
           }
           unit {
             ...UnitNameFieldsI18N
-            id: pk
           }
           maxPersons
           images {

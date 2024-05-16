@@ -11,7 +11,6 @@ import {
 import {
   type EquipmentNode,
   ReservationUnitState,
-  type UnitNode,
   type ReservationUnitNode,
   State,
   PricingType,
@@ -106,7 +105,12 @@ export const getEquipmentList = (equipment: EquipmentNode[]): string[] => {
 };
 
 export const getReservationUnitName = (
-  reservationUnit?: ReservationUnitNode,
+  // TODO use a fragment for ReservationUnitName
+  reservationUnit?: {
+    nameFi?: string | null;
+    nameSv?: string | null;
+    nameEn?: string | null;
+  } | null,
   language: string = i18n?.language ?? "fi"
 ): string | undefined => {
   if (!reservationUnit) {
@@ -124,7 +128,11 @@ export const getReservationUnitName = (
 };
 
 export const getUnitName = (
-  unit?: UnitNode,
+  unit?: {
+    nameFi?: string | null;
+    nameSv?: string | null;
+    nameEn?: string | null;
+  } | null,
   language: string = i18n?.language ?? "fi"
 ): string | undefined => {
   if (unit == null) {

@@ -10,20 +10,25 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { fontBold, H6 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import type { ReservationUnitNode } from "@gql/gql-types";
+import type { SearchReservationUnitsQuery } from "@gql/gql-types";
 import { getMainImage, getTranslation } from "@/modules/util";
 import { MediumButton } from "@/styles/util";
 import { getReservationUnitName } from "@/modules/reservationUnit";
 import { getImageSource } from "common/src/helpers";
 
+type ReservationUnitType = NonNullable<
+  NonNullable<
+    NonNullable<SearchReservationUnitsQuery["reservationUnits"]>["edges"][0]
+  >["node"]
+>;
 type Props = {
   order: number;
-  reservationUnit: ReservationUnitNode;
-  onDelete: (reservationUnit: ReservationUnitNode) => void;
+  reservationUnit: ReservationUnitType;
+  onDelete: (reservationUnit: ReservationUnitType) => void;
   first: boolean;
   last: boolean;
-  onMoveUp: (reservationUnit: ReservationUnitNode) => void;
-  onMoveDown: (reservationUnit: ReservationUnitNode) => void;
+  onMoveUp: (reservationUnit: ReservationUnitType) => void;
+  onMoveDown: (reservationUnit: ReservationUnitType) => void;
   invalid: boolean;
 };
 

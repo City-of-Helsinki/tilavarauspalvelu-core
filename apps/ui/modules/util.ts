@@ -13,8 +13,9 @@ import {
 } from "common/src/common/util";
 import type {
   ReservationUnitImageNode,
-  ReservationUnitNode,
   AgeGroupNode,
+  ImageFragmentFragment,
+  LocationFieldsI18nFragment,
 } from "@gql/gql-types";
 import {
   searchPrefix,
@@ -184,9 +185,9 @@ const imagePriority = ["main", "map", "ground_plan", "other"].map((n) =>
   n.toUpperCase()
 );
 
-export const getMainImage = (
-  ru?: ReservationUnitNode
-): ReservationUnitImageNode | null => {
+export const getMainImage = (ru?: {
+  images: ImageFragmentFragment[];
+}): ImageFragmentFragment | null => {
   if (!ru || !ru.images || ru.images.length === 0) {
     return null;
   }
@@ -214,23 +215,22 @@ export const orderImages = (
   return result;
 };
 
-export const getAddressAlt = (ru: ReservationUnitNode): string | null => {
+export const getAddressAlt = (ru: {
+  unit?: {
+    location?: LocationFieldsI18nFragment | null;
+  } | null;
+}): string | null => {
   const { location } = ru.unit || {};
 
   if (!location) {
     return null;
   }
 
-  return trim(
-    `${
-      getTranslation(location, "addressStreet") ||
-      location.addressStreetFi ||
-      ""
-    }, ${
-      getTranslation(location, "addressCity") || location.addressCityFi || ""
-    }`,
-    ", "
-  );
+  const street =
+    getTranslation(location, "addressStreet") || location.addressStreetFi || "";
+  const city =
+    getTranslation(location, "addressCity") || location.addressCityFi || "";
+  return trim(`${street}, ${city}`, ", ");
 };
 
 export const applicationUrl = (id: number): string => `/application/${id}`;
