@@ -1,10 +1,9 @@
 import React from "react";
 import styled from "styled-components";
-import type { SpaceNode } from "@gql/gql-types";
+import type { SpaceQuery } from "@gql/gql-types";
 
 type Props = {
-  space: SpaceNode;
-  unitSpaces?: SpaceNode[];
+  space: SpaceQuery["space"];
 };
 
 const Tree = styled.div`
@@ -13,8 +12,14 @@ const Tree = styled.div`
   margin-bottom: var(--spacing-xs);
 `;
 
+type SpaceNode = {
+  pk?: number | null;
+  nameFi?: string | null;
+  parent?: SpaceNode | null;
+};
+
 function getParents(
-  root?: SpaceNode,
+  root?: SpaceNode | null | undefined,
   spaces?: SpaceNode[],
   hierarchy: SpaceNode[] = []
 ) {
@@ -30,9 +35,9 @@ function getParents(
 }
 
 // TODO this is a huge problem because we cant do a recursive query, would require backend support
-export function SpaceHierarchy({ space, unitSpaces }: Props): JSX.Element {
+export function SpaceHierarchy({ space }: Props): JSX.Element {
+  const unitSpaces = space?.unit?.spaces;
   const tree = getParents(space, unitSpaces, []).reverse();
-  // TODO there is weird: unit spaces is undefined all
 
   return (
     <Tree>

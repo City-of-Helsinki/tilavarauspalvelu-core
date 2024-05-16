@@ -1,12 +1,41 @@
 import React from "react";
-import { useQuery } from "@apollo/client";
 import type { TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
 import { Select } from "hds-react";
-import type { Query, QueryUnitArgs } from "@gql/gql-types";
+import { UnitSpacesQuery, useUnitSpacesQuery } from "@gql/gql-types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
-import { SPACE_HIERARCHY_QUERY } from "./queries";
-import { spacesAsHierarchy } from "./util";
+
+function spacesAsHierarchy(unit: UnitSpacesQuery["unit"], paddingChar: string) {
+  const allSpaces = filterNonNullable(unit?.spaces);
+  type SpaceNode = (typeof allSpaces)[0];
+
+  function recurse(
+    parent: SpaceNode,
+    spaces: SpaceNode[],
+    depth: number,
+    pad: string
+  ): SpaceNode[] {
+    const newParent = {
+      ...parent,
+      nameFi: "".padStart(depth, pad) + parent.nameFi,
+    };
+
+    const children = spaces.filter((e) => e.parent?.pk === parent.pk);
+
+    if (children.length === 0) {
+      return [newParent];
+    }
+    const c = children.flatMap((space) =>
+      recurse(space, spaces, depth + 1, pad)
+    );
+    return [newParent, ...c];
+  }
+
+  const roots = allSpaces.filter((e) => e.parent == null);
+  return roots.flatMap((rootSpace) =>
+    recurse(rootSpace, allSpaces, 0, paddingChar)
+  );
+}
 
 type Props = {
   unitPk: number;
@@ -39,7 +68,7 @@ export function ParentSelector({
   helperText,
   errorText,
 }: Props): JSX.Element {
-  const { data } = useQuery<Query, QueryUnitArgs>(SPACE_HIERARCHY_QUERY, {
+  const { data } = useUnitSpacesQuery({
     fetchPolicy: "no-cache",
     variables: { id: base64encode(`UnitNode:${unitPk}`) },
     skip: !unitPk,
@@ -47,8 +76,7 @@ export function ParentSelector({
 
   const { t } = useTranslation();
 
-  const parentSpaces = filterNonNullable(data?.unit?.spaces);
-  const unitSpaces = spacesAsHierarchy(parentSpaces, "\u2007");
+  const unitSpaces = spacesAsHierarchy(data?.unit, "\u2007");
 
   // NOTE there used to be children filtering, but it filtered out all possible options
   // this handles the first level of children, but if it's a deeper hierarchy, it's not handled

@@ -4,12 +4,12 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
-import type { Maybe, UnitNode } from "@gql/gql-types";
+import type { SpaceQuery } from "@gql/gql-types";
 import { parseAddress } from "@/common/util";
 
 interface IProps {
   title: string;
-  unit?: Maybe<UnitNode>;
+  space?: SpaceQuery["space"];
   maxPersons?: number;
   surfaceArea?: number;
 }
@@ -52,10 +52,11 @@ const Prop = styled.div<{ $disabled: boolean }>`
 
 export function Head({
   title,
-  unit,
+  space,
   surfaceArea,
   maxPersons,
 }: IProps): JSX.Element {
+  const { unit } = space || {};
   const { t } = useTranslation();
 
   // TODO use urlBuilder

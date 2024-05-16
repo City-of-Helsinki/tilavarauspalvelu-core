@@ -1,4 +1,4 @@
-import { type FetchResult, useMutation, useQuery } from "@apollo/client";
+import { type FetchResult, useQuery } from "@apollo/client";
 import { breakpoints } from "common/src/common/style";
 import { H2 } from "common/src/common/typography";
 import {
@@ -9,6 +9,7 @@ import {
   type ReservationNode,
   type ReservationUnitNode,
   ReservationTypeChoice,
+  useAdjustReservationTimeMutation,
 } from "@gql/gql-types";
 import { useRouter } from "next/router";
 import { Stepper } from "hds-react";
@@ -21,10 +22,7 @@ import { Subheading } from "common/src/reservation-form/styles";
 import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
 import { useCurrentUser } from "@/hooks/user";
-import {
-  ADJUST_RESERVATION_TIME,
-  LIST_RESERVATIONS,
-} from "@/modules/queries/reservation";
+import { LIST_RESERVATIONS } from "@/modules/queries/reservation";
 import { getTranslation } from "../../modules/util";
 import Sanitize from "../common/Sanitize";
 import ReservationInfoCard from "./ReservationInfoCard";
@@ -229,12 +227,7 @@ export function ReservationEdit({
     ar.reservationUnits?.map((n) => n?.pk).includes(reservationUnit.pk)
   );
 
-  const [mutation, { loading: isLoading }] = useMutation<
-    Mutation,
-    MutationAdjustReservationTimeArgs
-  >(ADJUST_RESERVATION_TIME, {
-    errorPolicy: "all",
-  });
+  const [mutation, { loading: isLoading }] = useAdjustReservationTimeMutation();
 
   // TODO should rework this so we don't pass a string here (use Dates till we do the mutation)
   const adjustReservationTime = (

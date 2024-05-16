@@ -6781,6 +6781,11 @@ export type SpaceQuery = {
         addressZip: string;
         addressCityFi?: string | null;
       } | null;
+      spaces: Array<{
+        __typename?: "SpaceNode";
+        pk?: number | null;
+        nameFi?: string | null;
+      }>;
     } | null;
     parent?: {
       __typename?: "SpaceNode";
@@ -11282,7 +11287,7 @@ export type UpdateSpaceMutationOptions = Apollo.BaseMutationOptions<
   UpdateSpaceMutationVariables
 >;
 export const UnitSpacesDocument = gql`
-  query unitSpaces($id: ID!) {
+  query UnitSpaces($id: ID!) {
     unit(id: $id) {
       spaces {
         pk
@@ -11363,7 +11368,7 @@ export type UnitSpacesQueryResult = Apollo.QueryResult<
   UnitSpacesQueryVariables
 >;
 export const SpaceDocument = gql`
-  query space($id: ID!) {
+  query Space($id: ID!) {
     space(id: $id) {
       ...SpaceCommonFields
       nameSv
@@ -11375,6 +11380,10 @@ export const SpaceDocument = gql`
         descriptionFi
         location {
           ...LocationFields
+        }
+        spaces {
+          pk
+          nameFi
         }
       }
       parent {

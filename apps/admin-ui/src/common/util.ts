@@ -141,7 +141,9 @@ export const parseAgeGroups = (ageGroups: IAgeGroups): string => {
 };
 
 // TODO rename to print or format
-export function parseAddress(location: LocationFieldsFragment | null | undefined): string {
+export function parseAddress(
+  location: LocationFieldsFragment | null | undefined
+): string {
   if (!location) {
     return "";
   }

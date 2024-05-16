@@ -19,7 +19,7 @@ export const UPDATE_SPACE = gql`
 `;
 
 export const SPACE_HIERARCHY_QUERY = gql`
-  query unitSpaces($id: ID!) {
+  query UnitSpaces($id: ID!) {
     unit(id: $id) {
       spaces {
         pk
@@ -36,7 +36,7 @@ export const SPACE_HIERARCHY_QUERY = gql`
 export const SPACE_QUERY = gql`
   ${SPACE_COMMON_FRAGMENT}
   ${LOCATION_FRAGMENT}
-  query space($id: ID!) {
+  query Space($id: ID!) {
     space(id: $id) {
       ...SpaceCommonFields
       nameSv
@@ -48,6 +48,10 @@ export const SPACE_QUERY = gql`
         descriptionFi
         location {
           ...LocationFields
+        }
+        spaces {
+          pk
+          nameFi
         }
       }
       parent {

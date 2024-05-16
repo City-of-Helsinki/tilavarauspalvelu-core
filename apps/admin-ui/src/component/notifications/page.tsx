@@ -1,7 +1,7 @@
 import React, { type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import { useParams, useNavigate } from "react-router-dom";
-import { useQuery, useMutation, gql, ApolloError } from "@apollo/client";
+import { gql, ApolloError } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { z } from "zod";
@@ -17,18 +17,15 @@ import {
 } from "hds-react";
 import {
   BannerNotificationState,
-  type BannerNotificationNode,
   BannerNotificationLevel,
   BannerNotificationTarget,
-  type Mutation,
-  type Query,
-  type QueryBannerNotificationArgs,
-  type MutationUpdateBannerNotificationArgs,
-  type MutationCreateBannerNotificationArgs,
-  type MutationDeleteBannerNotificationArgs,
   type BannerNotificationNodeConnection,
+  useBannerNotificationDeleteMutation,
+  useBannerNotificationUpdateMutation,
+  useBannerNotificationCreateMutation,
+  useBannerNotificationsAdminQuery,
+  BannerNotificationsAdminQuery,
 } from "@gql/gql-types";
-import { BANNER_NOTIFICATIONS_ADMIN } from "common/src/components/BannerNotificationsQuery";
 import { H1 } from "common/src/common/typography";
 import { fromUIDate } from "common/src/common/util";
 import { breakpoints } from "common";
@@ -48,16 +45,18 @@ import {
   valueForTimeInput,
   dateTime,
   parseDateTimeSafe,
-} from "app/helpers";
-import { TFunction } from "i18next";
+} from "@/helpers";
+import type { TFunction } from "i18next";
 import ControlledDateInput from "../my-units/components/ControlledDateInput";
 import ControlledTimeInput from "../my-units/components/ControlledTimeInput";
+import { base64encode } from "common/src/helpers";
 
 const RichTextInput = dynamic(() => import("app/component/RichTextInput"), {
   ssr: false,
 });
 
-const BANNER_NOTIFICATIONS_CREATE = gql`
+// export for codegen (otherwise they might get removed)
+export const BANNER_NOTIFICATIONS_CREATE = gql`
   mutation BannerNotificationCreate(
     $input: BannerNotificationCreateMutationInput!
   ) {
@@ -67,7 +66,7 @@ const BANNER_NOTIFICATIONS_CREATE = gql`
   }
 `;
 
-const BANNER_NOTIFICATIONS_UPDATE = gql`
+export const BANNER_NOTIFICATIONS_UPDATE = gql`
   mutation BannerNotificationUpdate(
     $input: BannerNotificationUpdateMutationInput!
   ) {
@@ -76,7 +75,8 @@ const BANNER_NOTIFICATIONS_UPDATE = gql`
     }
   }
 `;
-const BANNER_NOTIFICATIONS_DELETE = gql`
+
+export const BANNER_NOTIFICATIONS_DELETE = gql`
   mutation BannerNotificationDelete(
     $input: BannerNotificationDeleteMutationInput!
   ) {
@@ -280,7 +280,7 @@ const deleteQueryFromCache = (cache: any, matcher: string | RegExp): void => {
 const NotificationForm = ({
   notification,
 }: {
-  notification?: BannerNotificationNode;
+  notification?: BannerNotificationsAdminQuery["bannerNotification"];
 }) => {
   const { t } = useTranslation("translation", { keyPrefix: "Notifications" });
 
@@ -328,19 +328,13 @@ const NotificationForm = ({
     },
   });
 
-  const [createMutation] = useMutation<
-    Mutation,
-    MutationCreateBannerNotificationArgs
-  >(BANNER_NOTIFICATIONS_CREATE, {
+  const [createMutation] = useBannerNotificationCreateMutation({
     update(cache) {
       deleteQueryFromCache(cache, "bannerNotifications");
       deleteQueryFromCache(cache, "bannerNotification");
     },
   });
-  const [updateMutation] = useMutation<
-    Mutation,
-    MutationUpdateBannerNotificationArgs
-  >(BANNER_NOTIFICATIONS_UPDATE, {
+  const [updateMutation] = useBannerNotificationUpdateMutation({
     update(cache) {
       deleteQueryFromCache(cache, "bannerNotifications");
       deleteQueryFromCache(cache, "bannerNotification");
@@ -669,7 +663,7 @@ const getName = (
 const useRemoveNotification = ({
   notification,
 }: {
-  notification?: BannerNotificationNode;
+  notification?: BannerNotificationsAdminQuery["bannerNotification"];
 }) => {
   const { t } = useTranslation();
   const { notifyError, notifySuccess } = useNotification();
@@ -680,10 +674,8 @@ const useRemoveNotification = ({
     notifyError(t("Notifications.error.deleteFailed.generic"));
   };
 
-  const [removeMutation] = useMutation<
-    Mutation,
-    MutationDeleteBannerNotificationArgs
-  >(BANNER_NOTIFICATIONS_DELETE, {
+  // TODO remove cache modifications
+  const [removeMutation] = useBannerNotificationDeleteMutation({
     update(cache, { data: newData }) {
       cache.modify({
         fields: {
@@ -737,7 +729,7 @@ function LoadedContent({
   children,
 }: {
   isNew: boolean;
-  notification?: BannerNotificationNode;
+  notification?: BannerNotificationsAdminQuery["bannerNotification"];
   children?: ReactNode;
 }) {
   const { t } = useTranslation();
@@ -779,16 +771,11 @@ function LoadedContent({
 /// We don't have proper layouts yet, so just separate the container stuff here
 const PageWrapped = ({ pk }: { pk?: number }) => {
   const typename = "BannerNotificationNode";
-  const id = pk ? window?.btoa(`${typename}:${pk}`) : undefined;
 
-  const { data, loading: isLoading } = useQuery<
-    Query,
-    QueryBannerNotificationArgs
-  >(BANNER_NOTIFICATIONS_ADMIN, {
-    skip: !id,
-    variables: {
-      id: String(id ?? ""),
-    },
+  const id = base64encode(`${typename}:${pk}`);
+  const { data, loading: isLoading } = useBannerNotificationsAdminQuery({
+    skip: !pk,
+    variables: { id },
   });
   const { t } = useTranslation();
 

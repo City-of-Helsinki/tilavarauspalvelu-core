@@ -1,22 +1,18 @@
 import React, { useEffect } from "react";
 import { Button, Notification } from "hds-react";
-import { useMutation, useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { H2 } from "common/src/common/typography";
-import type {
-  Mutation,
-  MutationUpdateSpaceArgs,
-  Query,
-  QuerySpaceArgs,
-  SpaceUpdateMutationInput,
+import {
+  useUpdateSpaceMutation,
+  type SpaceUpdateMutationInput,
+  useSpaceQuery,
 } from "@gql/gql-types";
 import { useNotification } from "@/context/NotificationContext";
 import Loader from "@/component/Loader";
 import { ButtonContainer, Container } from "@/styles/layout";
 import { FormErrorSummary } from "@/common/FormErrorSummary";
-import { SPACE_QUERY, UPDATE_SPACE } from "./queries";
 import { Head } from "./Head";
 import { SpaceHierarchy } from "./SpaceHierarchy";
 import { ParentSelector } from "./ParentSelector";
@@ -57,10 +53,8 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
 
   const { t } = useTranslation();
 
-  const [updateSpaceMutation, { loading: isMutationLoading }] = useMutation<
-    Mutation,
-    MutationUpdateSpaceArgs
-  >(UPDATE_SPACE);
+  const [updateSpaceMutation, { loading: isMutationLoading }] =
+    useUpdateSpaceMutation();
 
   const updateSpace = (input: SpaceUpdateMutationInput) =>
     updateSpaceMutation({ variables: { input } });
@@ -70,7 +64,7 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
     refetch,
     loading: isQueryLoading,
     error,
-  } = useQuery<Query, QuerySpaceArgs>(SPACE_QUERY, {
+  } = useSpaceQuery({
     variables: { id: base64encode(`SpaceNode:${space}`) },
     onError: (e) => {
       notifyError(t("errors.errorFetchingData", { error: e }));
@@ -156,7 +150,7 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
       <Container>
         <Head
           title={data?.space?.parent?.nameFi || t("SpaceEditor.noParent")}
-          unit={data?.space?.unit}
+          space={data?.space}
           maxPersons={watch("maxPersons") || undefined}
           surfaceArea={watch("surfaceArea") || undefined}
         />
@@ -167,12 +161,7 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
           <FormErrorSummary errors={errors} />
           <Section>
             <SubHeading>{t("SpaceEditor.hierarchy")}</SubHeading>
-            {data?.space && (
-              <SpaceHierarchy
-                space={data?.space}
-                unitSpaces={data?.unit?.spaces}
-              />
-            )}
+            <SpaceHierarchy space={data?.space} />
             <Controller
               control={control}
               name="parent"

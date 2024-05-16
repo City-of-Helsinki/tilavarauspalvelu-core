@@ -1,27 +1,18 @@
-import {
-  ApolloError,
-  type ApolloQueryResult,
-  useMutation,
-} from "@apollo/client";
+import { ApolloError, type ApolloQueryResult } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import {
   type ApplicationSectionNode,
   type Query,
   type SuitableTimeRangeNode,
-  type Mutation,
-  type MutationDeleteAllocatedTimeslotArgs,
-  type MutationCreateAllocatedTimeslotArgs,
   type AllocatedTimeSlotCreateMutationInput,
   type AllocatedTimeSlotNode,
+  useCreateAllocatedTimeSlotMutation,
+  useDeleteAllocatedTimeSlotMutation,
 } from "@gql/gql-types";
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useNotification } from "@/context/NotificationContext";
 import { timeSlotKeyToScheduleTime } from "./modules/applicationRoundAllocation";
-import {
-  CREATE_ALLOCATED_TIME_SLOT,
-  DELETE_ALLOCATED_TIME_SLOT,
-} from "./queries";
 
 export function useFocusApplicationEvent(): [
   number | undefined,
@@ -229,10 +220,8 @@ export function useAcceptSlotMutation({
   const { notifySuccess, notifyError } = useNotification();
   const { t } = useTranslation();
 
-  const [acceptApplicationEvent, { loading: isLoading }] = useMutation<
-    Mutation,
-    MutationCreateAllocatedTimeslotArgs
-  >(CREATE_ALLOCATED_TIME_SLOT);
+  const [acceptApplicationEvent, { loading: isLoading }] =
+    useCreateAllocatedTimeSlotMutation();
 
   if (!reservationUnitOptionPk) {
     // eslint-disable-next-line no-console
@@ -342,10 +331,8 @@ export function useRemoveAllocation({
   const { notifySuccess, notifyError } = useNotification();
   const { t } = useTranslation();
 
-  const [resetApplicationEvent, { loading: isLoading }] = useMutation<
-    Mutation,
-    MutationDeleteAllocatedTimeslotArgs
-  >(DELETE_ALLOCATED_TIME_SLOT);
+  const [resetApplicationEvent, { loading: isLoading }] =
+    useDeleteAllocatedTimeSlotMutation();
 
   const handleRemoveAllocation = async () => {
     // TODO both of these error cases should be handled before we are in this event handler

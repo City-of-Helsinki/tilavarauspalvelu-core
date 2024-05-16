@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useMutation, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import {
   Button,
   Checkbox,
@@ -25,26 +25,23 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   type Query,
   type QueryReservationUnitArgs,
-  type Mutation,
   ReservationStartInterval,
-  type ReservationUnitImageCreateMutationInput,
   Authentication,
   type ReservationState,
   type ReservationUnitState,
   TermsType,
   Status,
   type ReservationUnitNode,
-  type ReservationUnitTypeNode,
-  type EquipmentNode,
-  type MutationCreateReservationUnitArgs,
-  type MutationUpdateReservationUnitArgs,
-  type PurposeNode,
-  type QualifierNode,
   ImageType,
   useUnitWithSpacesAndResourcesQuery,
   useDeleteImageMutation,
   useUpdateImageMutation,
   UnitWithSpacesAndResourcesQuery,
+  useReservationUnitEditorParametersQuery,
+  ReservationUnitEditorParametersQuery,
+  useCreateImageMutation,
+  useCreateReservationUnitMutation,
+  useUpdateReservationUnitMutation,
 } from "@gql/gql-types";
 import { DateTimeInput } from "common/src/components/form/DateTimeInput";
 import { base64encode, filterNonNullable } from "common/src/helpers";
@@ -68,13 +65,7 @@ import { parseAddress, getTranslatedError } from "@/common/util";
 import Error404 from "@/common/Error404";
 import { Accordion } from "@/component/Accordion";
 import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
-import {
-  CREATE_IMAGE,
-  CREATE_RESERVATION_UNIT,
-  RESERVATIONUNIT_QUERY,
-  RESERVATION_UNIT_EDITOR_PARAMETERS,
-  UPDATE_RESERVATION_UNIT,
-} from "./queries";
+import { RESERVATIONUNIT_QUERY } from "./queries";
 import { ControlledNumberInput } from "common/src/components/form/ControlledNumberInput";
 import { ArchiveDialog } from "./ArchiveDialog";
 import { ReservationStateTag, ReservationUnitStateTag } from "./tags";
@@ -324,7 +315,7 @@ const durationOptions = bufferTimeOptions.concat(
 
 // Terms PK is not a number but any valid string
 const makeTermsOptions = (
-  parameters: Query | undefined,
+  parameters: ReservationUnitEditorParametersQuery | undefined,
   termsType: TermsType
 ) => {
   return filterNonNullable(parameters?.termsOfUse?.edges.map((e) => e?.node))
@@ -431,14 +422,7 @@ function DisplayUnit({
   reservationState,
 }: {
   heading: string;
-  unit?: UnitWithSpacesAndResourcesQuery['unit']; /*{
-    nameFi: string | null | undefined;
-    location: {
-      addressStreetFi?: string | null;
-      addressZip: string;
-      addressCityFi?: string | null;
-      } | null | undefined;
-    }; */
+  unit?: UnitWithSpacesAndResourcesQuery["unit"];
   unitState?: ReservationUnitState;
   reservationState?: ReservationState;
 }): JSX.Element {
@@ -461,19 +445,9 @@ function DisplayUnit({
 }
 
 const useImageMutations = () => {
-  const [createImage] = useMutation<
-    Mutation,
-    ReservationUnitImageCreateMutationInput
-  >(CREATE_IMAGE);
-
-  const [delImage] = useDeleteImageMutation();/* useMutation<
-    Mutation,
-    ReservationUnitImageDeleteMutationInput
-  >(DELETE_IMAGE); */
-  const [updateImagetype] = useUpdateImageMutation() /* useMutation<
-    Mutation,
-    ReservationUnitImageUpdateMutationInput
-  >(UPDATE_IMAGE_TYPE);*/
+  const [createImage] = useCreateImageMutation();
+  const [delImage] = useDeleteImageMutation();
+  const [updateImagetype] = useUpdateImageMutation();
 
   const reconcileImageChanges = async (
     resUnitPk: number,
@@ -564,13 +538,17 @@ const getTranslatedTooltipTex = (t: TFunction, fieldName: string) => {
 };
 
 // default is 20 if no spaces selected
-const getMaxPersons = (spaceList: Array<{ maxPersons?: number | null | undefined }>) => {
+const getMaxPersons = (
+  spaceList: Array<{ maxPersons?: number | null | undefined }>
+) => {
   const persons =
     spaceList.map((s) => s.maxPersons ?? 0).reduce((a, x) => a + x, 0) || 20;
   return Math.floor(persons);
 };
 // default is 1 if no spaces selected
-const getMinSurfaceArea = (spaceList: Array<{ surfaceArea?: number | null | undefined }>) => {
+const getMinSurfaceArea = (
+  spaceList: Array<{ surfaceArea?: number | null | undefined }>
+) => {
   const area =
     spaceList.map((s) => s.surfaceArea ?? 0).reduce((a, x) => a + x, 0) || 1;
   return Math.floor(area);
@@ -626,17 +604,18 @@ function BasicSection({
   unit,
 }: {
   form: UseFormReturn<ReservationUnitEditFormValues>;
-  unit: UnitWithSpacesAndResourcesQuery["unit"]
+  unit: UnitWithSpacesAndResourcesQuery["unit"];
 }) {
   const { t } = useTranslation();
   const { control, formState, register, watch, setValue } = form;
   const { errors } = formState;
   const { spaces } = unit ?? {};
 
-  const spaceOptions = spaces?.map((s) => ({
-    label: String(s?.nameFi),
-    value: Number(s?.pk),
-  })) ?? [];
+  const spaceOptions =
+    spaces?.map((s) => ({
+      label: String(s?.nameFi),
+      value: Number(s?.pk),
+    })) ?? [];
   const resourceOptions = filterNonNullable(
     spaces?.flatMap((s) => s?.resourceSet)
   ).map((r) => ({ label: String(r?.nameFi), value: Number(r?.pk) }));
@@ -1635,29 +1614,37 @@ function DescriptionSection({
   reservationUnitTypes,
 }: {
   form: UseFormReturn<ReservationUnitEditFormValues>;
-  equipments: EquipmentNode[];
-  purposes: PurposeNode[];
-  qualifiers: QualifierNode[];
-  reservationUnitTypes: ReservationUnitTypeNode[];
+  equipments: ReservationUnitEditorParametersQuery["equipments"];
+  purposes: ReservationUnitEditorParametersQuery["purposes"];
+  qualifiers: ReservationUnitEditorParametersQuery["qualifiers"];
+  reservationUnitTypes: ReservationUnitEditorParametersQuery["reservationUnitTypes"];
 }) {
   const { t } = useTranslation();
   const { control, formState } = form;
   const { errors } = formState;
 
-  const equipmentOptions = equipments.map((n) => ({
+  const equipmentOptions = filterNonNullable(
+    equipments?.edges.map((n) => n?.node)
+  ).map((n) => ({
     value: n?.pk ?? -1,
     label: n?.nameFi ?? "no-name",
   }));
 
-  const purposeOptions = purposes.map((n) => ({
+  const purposeOptions = filterNonNullable(
+    purposes?.edges.map((n) => n?.node)
+  ).map((n) => ({
     value: n?.pk ?? -1,
     label: n?.nameFi ?? "no-name",
   }));
-  const qualifierOptions = qualifiers.map((n) => ({
+  const qualifierOptions = filterNonNullable(
+    qualifiers?.edges.map((n) => n?.node)
+  ).map((n) => ({
     value: n?.pk ?? -1,
     label: n?.nameFi ?? "no-name",
   }));
-  const reservationUnitTypeOptions = reservationUnitTypes.map((n) => ({
+  const reservationUnitTypeOptions = filterNonNullable(
+    reservationUnitTypes?.edges.map((n) => n?.node)
+  ).map((n) => ({
     value: n?.pk ?? -1,
     label: n?.nameFi ?? "no-name",
   }));
@@ -1886,14 +1873,8 @@ const ReservationUnitEditor = ({
   const { setModalContent } = useModal();
   const [reconcileImageChanges] = useImageMutations();
 
-  const [updateMutation] = useMutation<
-    Mutation,
-    MutationUpdateReservationUnitArgs
-  >(UPDATE_RESERVATION_UNIT);
-  const [createMutation] = useMutation<
-    Mutation,
-    MutationCreateReservationUnitArgs
-  >(CREATE_RESERVATION_UNIT);
+  const [updateMutation] = useUpdateReservationUnitMutation();
+  const [createMutation] = useCreateReservationUnitMutation();
 
   const id = base64encode(`UnitNode:${unitPk}`);
   const { data: unitResourcesData } = useUnitWithSpacesAndResourcesQuery({
@@ -1906,16 +1887,13 @@ const ReservationUnitEditor = ({
     },
   });
 
-  const { data: parametersData } = useQuery<Query>(
-    RESERVATION_UNIT_EDITOR_PARAMETERS,
-    {
-      onError: (e) => {
-        // eslint-disable-next-line no-console
-        console.error(e);
-        notifyError(t("errors.errorFetchingData"));
-      },
-    }
-  );
+  const { data: parametersData } = useReservationUnitEditorParametersQuery({
+    onError: (e) => {
+      // eslint-disable-next-line no-console
+      console.error(e);
+      notifyError(t("errors.errorFetchingData"));
+    },
+  });
 
   // ----------------------------- Constants ---------------------------------
   const { getValues, setValue, watch, formState, handleSubmit } = form;
@@ -1945,18 +1923,6 @@ const ReservationUnitEditor = ({
   );
 
   const { unit } = unitResourcesData ?? {};
-  const equipments = filterNonNullable(
-    parametersData?.equipments?.edges?.map((e) => e?.node)
-  );
-  const purposes = filterNonNullable(
-    parametersData?.purposes?.edges?.map((e) => e?.node)
-  );
-  const qualifiers = filterNonNullable(
-    parametersData?.qualifiers?.edges?.map((e) => e?.node)
-  );
-  const reservationUnitTypes = filterNonNullable(
-    parametersData?.reservationUnitTypes?.edges?.map((e) => e?.node)
-  );
   const cancellationRuleOptions = filterNonNullable(
     parametersData?.reservationUnitCancellationRules?.edges.map((e) => e?.node)
   ).map((n) => ({
@@ -1991,6 +1957,7 @@ const ReservationUnitEditor = ({
       }
 
       const upPk =
+        // @ts-expect-error - FIXME (type issues in switching between create and update)
         data?.updateReservationUnit?.pk ?? data?.createReservationUnit?.pk;
 
       if (upPk) {
@@ -2142,10 +2109,10 @@ const ReservationUnitEditor = ({
         <BasicSection form={form} unit={unit} />
         <DescriptionSection
           form={form}
-          equipments={equipments}
-          purposes={purposes}
-          qualifiers={qualifiers}
-          reservationUnitTypes={reservationUnitTypes}
+          equipments={parametersData?.equipments}
+          purposes={parametersData?.purposes}
+          qualifiers={parametersData?.qualifiers}
+          reservationUnitTypes={parametersData?.reservationUnitTypes}
         />
         {isDirect && (
           <ReservationUnitSettings

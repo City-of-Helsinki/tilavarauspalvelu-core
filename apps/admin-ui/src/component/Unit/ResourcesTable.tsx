@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import { trim } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { type ApolloQueryResult, } from "@apollo/client";
+import { type ApolloQueryResult } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 import {
   useDeleteResourceMutation,
@@ -42,7 +42,7 @@ export function ResourcesTable({
   unit,
   refetch,
 }: IProps): JSX.Element {
-  const [deleteResourceMutation] = useDeleteResourceMutation()
+  const [deleteResourceMutation] = useDeleteResourceMutation();
 
   const deleteResource = (pk: number) =>
     deleteResourceMutation({ variables: { input: { pk: String(pk) } } });
