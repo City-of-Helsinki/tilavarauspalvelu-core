@@ -29,6 +29,12 @@ class HaukiGetResourcesParams(TypedDict):
 
 
 class HaukiAPIClient(BaseExternalServiceClient):
+    """
+    Client for the Hauki API.
+
+    API documentation: https://hauki-api.test.hel.ninja/api_docs/swagger/
+    """
+
     SERVICE_NAME = "Hauki"
     REQUEST_TIMEOUT_SECONDS = 30
 
@@ -38,7 +44,10 @@ class HaukiAPIClient(BaseExternalServiceClient):
 
     @classmethod
     def get_resources(
-        cls, *, hauki_resource_ids: list[int], **kwargs: Unpack[HaukiGetResourcesParams]
+        cls,
+        *,
+        hauki_resource_ids: list[int | str],
+        **kwargs: Unpack[HaukiGetResourcesParams],
     ) -> HaukiAPIResourceListResponse:
         # Prepare the URL
         url = cls._build_url("resource")
@@ -50,6 +59,26 @@ class HaukiAPIClient(BaseExternalServiceClient):
         response = cls.get(url=url, params=query_params)
         response_json: HaukiAPIResourceListResponse = cls.response_json(response)
         return response_json
+
+    @classmethod
+    def get_resources_all_pages(
+        cls,
+        *,
+        hauki_resource_ids: list[int | str],
+        **kwargs: Unpack[HaukiGetResourcesParams],
+    ) -> list[HaukiAPIResource]:
+        """Fetch resources from Hauki API based on the given resource ids."""
+        response_json = HaukiAPIClient.get_resources(hauki_resource_ids=hauki_resource_ids, **kwargs)
+        fetched_hauki_resources: list[HaukiAPIResource] = response_json["results"]
+
+        # In case of multiple pages, keep fetching resources until there are no more pages
+        resource_page_counter = 1
+        while next_page_url := response_json.get("next"):
+            resource_page_counter += 1
+            response_json: HaukiAPIResourceListResponse = cls.response_json(cls.get(url=next_page_url))
+            fetched_hauki_resources.extend(response_json["results"])
+
+        return fetched_hauki_resources
 
     @classmethod
     def get_resource(cls, *, hauki_resource_id: str) -> HaukiAPIResource:

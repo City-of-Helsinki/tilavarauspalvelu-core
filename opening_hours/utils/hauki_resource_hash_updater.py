@@ -7,7 +7,7 @@ from django.utils.timezone import get_default_timezone
 from opening_hours.errors import ReservableTimeSpanClientNothingToDoError, ReservableTimeSpanClientValueError
 from opening_hours.models import OriginHaukiResource
 from opening_hours.utils.hauki_api_client import HaukiAPIClient
-from opening_hours.utils.hauki_api_types import HaukiAPIResource, HaukiAPIResourceListResponse
+from opening_hours.utils.hauki_api_types import HaukiAPIResource
 from opening_hours.utils.reservable_time_span_client import ReservableTimeSpanClient
 
 logger = logging.getLogger(__name__)
@@ -57,20 +57,9 @@ class HaukiResourceHashUpdater:
 
     def _fetch_hauki_resources(self) -> None:
         """Fetch resources from Hauki API based on the given resource ids."""
-        response_json = HaukiAPIClient.get_resources(hauki_resource_ids=self.hauki_resource_ids)
-
-        self.fetched_hauki_resources: list[HaukiAPIResource] = response_json["results"]
-
-        # In case of multiple pages, keep fetching resources until there are no more pages
-        resource_page_counter = 1
-        while response_json.get("next", None):
-            resource_page_counter += 1
-            logger.info(f"Fetching from Hauki. Page number: {resource_page_counter}")
-            response_json: HaukiAPIResourceListResponse = HaukiAPIClient.response_json(
-                HaukiAPIClient.get(url=response_json["next"])
-            )
-            self.fetched_hauki_resources.extend(response_json["results"])
-
+        self.fetched_hauki_resources = HaukiAPIClient.get_resources_all_pages(
+            hauki_resource_ids=self.hauki_resource_ids
+        )
         logger.info(f"Fetched {len(self.fetched_hauki_resources)} hauki resources in total.")
 
     def _update_origin_hauki_resource_hashes(self, force_refetch: bool = False):
