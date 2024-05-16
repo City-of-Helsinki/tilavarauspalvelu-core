@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
-import { useMutation } from "@apollo/client";
-import type { Mutation, MutationSendApplicationArgs } from "@gql/gql-types";
+import { useSendApplicationMutation } from "@gql/gql-types";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Error from "next/error";
-import { SEND_APPLICATION_MUTATION } from "@/modules/queries/application";
 import { MediumButton } from "@/styles/util";
 import { ButtonContainer, CenterSpinner } from "@/components/common/common";
 import { ViewInner } from "@/components/application/ViewInner";
@@ -38,9 +36,7 @@ function Preview(props: PropsNarrowed): JSX.Element {
   const { t } = useTranslation();
 
   const [send, { error: mutationError, loading: isMutationLoading }] =
-    useMutation<Mutation, MutationSendApplicationArgs>(
-      SEND_APPLICATION_MUTATION
-    );
+    useSendApplicationMutation();
 
   const onSubmit = async (evt: React.FormEvent) => {
     evt.preventDefault();

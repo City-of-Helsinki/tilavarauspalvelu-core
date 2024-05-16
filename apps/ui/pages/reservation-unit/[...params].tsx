@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { FetchResult, useMutation, useQuery } from "@apollo/client";
+import { type FetchResult, useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
 import { useLocalStorage } from "react-use";
 import { Stepper } from "hds-react";
@@ -14,15 +14,12 @@ import {
   type Query,
   type QueryReservationArgs,
   type QueryReservationUnitArgs,
-  type ReservationConfirmMutationInput,
-  type ReservationConfirmMutationPayload,
-  type ReservationDeleteMutationInput,
-  type ReservationDeleteMutationPayload,
   type ReservationNode,
-  type ReservationUpdateMutationInput,
-  type ReservationUpdateMutationPayload,
   CustomerTypeChoice,
   State,
+  useConfirmReservationMutation,
+  useUpdateReservationMutation,
+  useDeleteReservationMutation,
 } from "@gql/gql-types";
 import { Inputs } from "common/src/reservation-form/types";
 import { Subheading } from "common/src/reservation-form/styles";
@@ -32,12 +29,7 @@ import { createApolloClient } from "@/modules/apolloClient";
 import { isBrowser, reservationUnitPrefix } from "@/modules/const";
 import { getTranslation, reservationsUrl } from "@/modules/util";
 import { RESERVATION_UNIT_PARAMS_PAGE_QUERY } from "@/modules/queries/reservationUnit";
-import {
-  CONFIRM_RESERVATION,
-  DELETE_RESERVATION,
-  GET_RESERVATION,
-  UPDATE_RESERVATION,
-} from "@/modules/queries/reservation";
+import { GET_RESERVATION } from "@/modules/queries/reservation";
 import Sanitize from "@/components/common/Sanitize";
 import { getReservationUnitPrice } from "@/modules/reservationUnit";
 import {
@@ -264,10 +256,7 @@ function ReservationUnitReservationWithReservationProp({
     });
   }, [step, requireHandling, reservationUnit, reservation, t]);
 
-  const [deleteReservation] = useMutation<
-    { deleteReservation: ReservationDeleteMutationPayload },
-    { input: ReservationDeleteMutationInput }
-  >(DELETE_RESERVATION, {
+  const [deleteReservation] = useDeleteReservationMutation({
     errorPolicy: "all",
     onError: () => {
       router.push(`${reservationUnitPrefix}/${reservationUnit?.pk}`);
@@ -301,10 +290,7 @@ function ReservationUnitReservationWithReservationProp({
     whitelist,
   });
 
-  const [updateReservation] = useMutation<
-    { updateReservation: ReservationUpdateMutationPayload },
-    { input: ReservationUpdateMutationInput }
-  >(UPDATE_RESERVATION, {
+  const [updateReservation] = useUpdateReservationMutation({
     errorPolicy: "all",
     onCompleted: async (data) => {
       if (data.updateReservation?.state === "CANCELLED") {
@@ -317,13 +303,10 @@ function ReservationUnitReservationWithReservationProp({
     },
   });
 
-  const [confirmReservation] = useMutation<
-    { confirmReservation: ReservationConfirmMutationPayload },
-    { input: ReservationConfirmMutationInput }
-  >(CONFIRM_RESERVATION, {
+  const [confirmReservation] = useConfirmReservationMutation({
     onCompleted: (data) => {
       window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-      const { pk, state } = data.confirmReservation;
+      const { pk, state } = data.confirmReservation ?? {};
       if (pk == null) {
         setErrorMsg(t("errors:general_error"));
         return;

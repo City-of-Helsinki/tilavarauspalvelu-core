@@ -9,20 +9,17 @@ import {
   Tag as HdsTag,
 } from "hds-react";
 import { parseISO } from "date-fns";
-import { useMutation } from "@apollo/client";
 import { breakpoints } from "common/src/common/style";
 import {
-  type Mutation,
   type ApplicationNode,
-  type MutationCancelApplicationArgs,
   ApplicantTypeChoice,
   ApplicationStatusChoice,
   type Maybe,
+  useCancelApplicationMutation,
 } from "@gql/gql-types";
 import { applicationUrl } from "@/modules/util";
 import { BlackButton } from "@/styles/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
-import { CANCEL_APPLICATION_MUTATION } from "@/modules/queries/application";
 import ConfirmationModal, {
   ModalRef,
 } from "@/components/common/ConfirmationModal";
@@ -200,10 +197,7 @@ function ApplicationCard({ application, actionCallback }: Props): JSX.Element {
   const { t } = useTranslation();
   const modal = useRef<ModalRef>();
 
-  const [mutation, { loading: isLoading }] = useMutation<
-    Mutation,
-    MutationCancelApplicationArgs
-  >(CANCEL_APPLICATION_MUTATION, {
+  const [mutation, { loading: isLoading }] = useCancelApplicationMutation({
     variables: {
       input: {
         pk: application.pk ?? 0,

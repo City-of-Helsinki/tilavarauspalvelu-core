@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useMutation } from "@apollo/client";
 import type { GetServerSidePropsContext } from "next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
@@ -11,17 +10,15 @@ import { filterNonNullable } from "common/src/helpers";
 import {
   ApplicationRoundStatusChoice,
   type ApplicationCreateMutationInput,
-  type Mutation,
-  type MutationCreateApplicationArgs,
   type Query,
   type QueryApplicationRoundsArgs,
+  useCreateApplicationMutation,
 } from "@gql/gql-types";
 import { MediumButton } from "@/styles/util";
 import Head from "@/components/application/Head";
 import { APPLICATION_ROUNDS } from "@/modules/queries/applicationRound";
 import { CenterSpinner } from "@/components/common/common";
 import { getApplicationRoundName } from "@/modules/applicationRound";
-import { CREATE_APPLICATION_MUTATION } from "@/modules/queries/application";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 
@@ -83,10 +80,7 @@ const IntroPage = ({ applicationRounds }: Props): JSX.Element => {
         label: getApplicationRoundName(ar),
       })) ?? [];
 
-  const [create, { loading: isSaving }] = useMutation<
-    Mutation,
-    MutationCreateApplicationArgs
-  >(CREATE_APPLICATION_MUTATION, {
+  const [create, { loading: isSaving }] = useCreateApplicationMutation({
     onError: (e) => {
       // eslint-disable-next-line no-console
       console.warn("create application mutation failed: ", e);

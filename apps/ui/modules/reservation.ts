@@ -1,7 +1,6 @@
 import { addMinutes, addSeconds, isAfter, isValid } from "date-fns";
 import type { PendingReservation } from "common/types/common";
 import {
-  type PaymentOrderNode,
   State,
   type ReservationNode,
   type ReservationUnitNode,
@@ -440,7 +439,7 @@ export const getReservationValue = (
 };
 
 export function getCheckoutUrl(
-  order?: Maybe<PaymentOrderNode>,
+  order?: Maybe<{ checkoutUrl?: Maybe<string> }>,
   lang = "fi"
 ): string | undefined {
   const { checkoutUrl } = order ?? {};

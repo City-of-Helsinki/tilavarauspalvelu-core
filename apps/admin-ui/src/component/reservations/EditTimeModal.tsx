@@ -5,22 +5,19 @@ import { Button, Dialog, Notification } from "hds-react";
 import { z } from "zod";
 import { type TFunction } from "i18next";
 import {
-  type Mutation,
-  type MutationStaffAdjustReservationTimeArgs,
   type ReservationNode,
   ReservationStartInterval,
   ReservationTypeChoice,
+  useStaffAdjustReservationTimeMutation,
 } from "@gql/gql-types";
 import { FormProvider, useForm } from "react-hook-form";
 import { differenceInMinutes, format } from "date-fns";
 import { ErrorBoundary } from "react-error-boundary";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@apollo/client";
 import { formatDuration, toUIDate } from "common/src/common/util";
 import { useNotification } from "app/context/NotificationContext";
 import { useModal } from "app/context/ModalContext";
 import { TimeChangeFormSchemaRefined, TimeFormSchema } from "app/schemas";
-import { CHANGE_RESERVATION_TIME } from "./queries";
 import ControlledTimeInput from "../my-units/components/ControlledTimeInput";
 import { reservationDateTime } from "./requested/util";
 import ControlledDateInput from "../my-units/components/ControlledDateInput";
@@ -100,10 +97,7 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
   const { t, i18n } = useTranslation();
   const { notifyError, notifySuccess } = useNotification();
 
-  const [changeTimeMutation] = useMutation<
-    Mutation,
-    MutationStaffAdjustReservationTimeArgs
-  >(CHANGE_RESERVATION_TIME, {
+  const [changeTimeMutation] = useStaffAdjustReservationTimeMutation({
     onCompleted: () => {
       notifySuccess(t("Reservation.EditTime.successToast"));
       onAccept();

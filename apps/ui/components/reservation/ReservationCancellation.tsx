@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
-import { useMutation } from "@apollo/client";
 import router from "next/router";
 import { Controller, useForm } from "react-hook-form";
 import { IconArrowRight, IconCross, IconSignout, Select } from "hds-react";
@@ -9,16 +8,14 @@ import { OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
 import NotificationBox from "common/src/common/NotificationBox";
 import { fontMedium, H2 } from "common/src/common/typography";
-import type {
-  ReservationCancelReasonNode,
-  ReservationCancellationMutationInput,
-  ReservationCancellationMutationPayload,
-  ReservationNode,
+import {
+  useCancelReservationMutation,
+  type ReservationCancelReasonNode,
+  type ReservationNode,
 } from "@gql/gql-types";
 import { Container as CommonContainer } from "common";
 import { IconButton, ShowAllContainer } from "common/src/components";
 import Sanitize from "../common/Sanitize";
-import { CANCEL_RESERVATION } from "@/modules/queries/reservation";
 import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
 import { getSelectedOption, getTranslation } from "@/modules/util";
 import { CenterSpinner } from "../common/common";
@@ -168,10 +165,7 @@ function ReservationCancellation(props: Props): JSX.Element {
     value: node?.pk != null ? node?.pk : "",
   }));
 
-  const [cancelReservation, { loading }] = useMutation<
-    { cancelReservation: ReservationCancellationMutationPayload },
-    { input: ReservationCancellationMutationInput }
-  >(CANCEL_RESERVATION);
+  const [cancelReservation, { loading }] = useCancelReservationMutation();
 
   const { register, handleSubmit, getValues, setValue, watch, control } =
     useForm();

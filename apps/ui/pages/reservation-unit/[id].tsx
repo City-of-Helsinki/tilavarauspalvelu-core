@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import type { GetServerSidePropsContext } from "next";
 import { Trans, useTranslation } from "next-i18next";
-import { useMutation, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
@@ -50,9 +50,9 @@ import {
   type QueryReservationsArgs,
   type QueryReservationUnitsArgs,
   type ReservationCreateMutationInput,
-  type ReservationCreateMutationPayload,
   type ReservationNode,
   type ReservationUnitNode,
+  useCreateReservationMutation,
 } from "@gql/gql-types";
 import {
   base64encode,
@@ -84,10 +84,7 @@ import {
   RESERVATION_UNIT_PAGE_QUERY,
   type ReservationUnitWithAffectingArgs,
 } from "@/modules/queries/reservationUnit";
-import {
-  CREATE_RESERVATION,
-  LIST_RESERVATIONS,
-} from "@/modules/queries/reservation";
+import { LIST_RESERVATIONS } from "@/modules/queries/reservation";
 import {
   getFuturePricing,
   getPossibleTimesForDay,
@@ -818,12 +815,9 @@ const ReservationUnit = ({
   }, [calendarEvents, focusSlot, reservationUnit]);
 
   // TODO: Refactor to try/catch
-  const [addReservation] = useMutation<
-    { createReservation: ReservationCreateMutationPayload },
-    { input: ReservationCreateMutationInput }
-  >(CREATE_RESERVATION, {
+  const [addReservation] = useCreateReservationMutation({
     onCompleted: ({ createReservation }) => {
-      const { pk } = createReservation;
+      const { pk } = createReservation ?? {};
       /// ??? errors
       if (focusSlot == null || pk == null) {
         return;

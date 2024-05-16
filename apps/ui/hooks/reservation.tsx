@@ -1,27 +1,23 @@
 import { useState } from "react";
-import { type ApolloError, useMutation, useQuery } from "@apollo/client";
+import { type ApolloError, useQuery } from "@apollo/client";
 import {
   type PaymentOrderNode,
   type Query,
   type QueryOrderArgs,
   type QueryReservationArgs,
   type QueryReservationsArgs,
-  type RefreshOrderMutationInput,
-  type RefreshOrderMutationPayload,
-  type ReservationDeleteMutationInput,
-  type ReservationDeleteMutationPayload,
   type ReservationNode,
   State,
   type UserNode,
   OrderStatus,
   ReservationOrderingChoices,
+  useDeleteReservationMutation,
+  useRefreshOrderMutation,
 } from "@gql/gql-types";
 import {
-  DELETE_RESERVATION,
   GET_ORDER,
   GET_RESERVATION,
   LIST_RESERVATIONS,
-  REFRESH_ORDER,
 } from "../modules/queries/reservation";
 import { toApiDate } from "common/src/common/util";
 import { base64encode, filterNonNullable } from "common/src/helpers";
@@ -79,14 +75,11 @@ export const useOrder = ({
   );
 
   const [refresh, { error: refreshError, loading: refreshLoading }] =
-    useMutation<
-      { refreshOrder: RefreshOrderMutationPayload },
-      { input: RefreshOrderMutationInput }
-    >(REFRESH_ORDER, {
+    useRefreshOrderMutation({
       fetchPolicy: "no-cache",
       variables: { input: { orderUuid: orderUuid ?? "" } },
       onCompleted: (res) => {
-        if (data != null && res.refreshOrder.status != null) {
+        if (data != null && res.refreshOrder?.status != null) {
           const status = convertOrderStatus(res.refreshOrder.status);
           setData({ ...data, status });
         } else {
@@ -113,12 +106,9 @@ type UseReservationProps = {
 };
 
 export function useDeleteReservation() {
-  const [mutation, { data, error, loading }] = useMutation<
-    { deleteReservation: ReservationDeleteMutationPayload },
-    { input: ReservationDeleteMutationInput }
-  >(DELETE_RESERVATION);
+  const [mutation, { data, error, loading }] = useDeleteReservationMutation();
 
-  const deleted = data?.deleteReservation.deleted ?? false;
+  const deleted = data?.deleteReservation?.deleted ?? false;
 
   return {
     mutation,

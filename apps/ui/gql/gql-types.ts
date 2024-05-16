@@ -5889,6 +5889,7 @@ export type UpdateReservationMutation = {
   updateReservation?: {
     __typename?: "ReservationUpdateMutationPayload";
     pk?: number | null;
+    state?: string | null;
   } | null;
 };
 
@@ -9334,6 +9335,7 @@ export const UpdateReservationDocument = gql`
   mutation updateReservation($input: ReservationUpdateMutationInput!) {
     updateReservation(input: $input) {
       pk
+      state
     }
   }
 `;

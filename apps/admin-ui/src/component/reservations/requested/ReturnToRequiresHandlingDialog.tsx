@@ -1,15 +1,13 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useMutation } from "@apollo/client";
 import { Button, Dialog, IconInfoCircle } from "hds-react";
-import type {
-  Mutation,
-  ReservationRequiresHandlingMutationInput,
-  ReservationNode,
+import {
+  type ReservationRequiresHandlingMutationInput,
+  type ReservationNode,
+  useRequireHandlingMutation,
 } from "@gql/gql-types";
-import { useModal } from "../../../context/ModalContext";
-import { REQUIRE_HANDLING_RESERVATION } from "./queries";
-import { useNotification } from "../../../context/NotificationContext";
+import { useModal } from "@/context/ModalContext";
+import { useNotification } from "@/context/NotificationContext";
 
 const DialogContent = ({
   reservation,
@@ -23,31 +21,28 @@ const DialogContent = ({
   const { notifyError, notifySuccess } = useNotification();
   const { t, i18n } = useTranslation();
 
-  const [backToRequireHandlingMutation] = useMutation<Mutation>(
-    REQUIRE_HANDLING_RESERVATION,
-    {
-      onCompleted: () => {
-        notifySuccess(
-          t("RequestedReservation.ReturnToRequiresHandlingDialog.returned")
-        );
-        onAccept();
-      },
-      onError: (err) => {
-        const { message } = err;
-        const hasTranslatedErrorMsg = i18n.exists(
-          `errors.descriptive.${message}`
-        );
-        const errorTranslated = hasTranslatedErrorMsg
-          ? `errors.descriptive.${message}`
-          : `errors.descriptive.genericError`;
-        notifyError(
-          t("RequestedReservation.ReturnToRequiresHandlingDialog.errorSaving", {
-            error: t(errorTranslated),
-          })
-        );
-      },
-    }
-  );
+  const [backToRequireHandlingMutation] = useRequireHandlingMutation({
+    onCompleted: () => {
+      notifySuccess(
+        t("RequestedReservation.ReturnToRequiresHandlingDialog.returned")
+      );
+      onAccept();
+    },
+    onError: (err) => {
+      const { message } = err;
+      const hasTranslatedErrorMsg = i18n.exists(
+        `errors.descriptive.${message}`
+      );
+      const errorTranslated = hasTranslatedErrorMsg
+        ? `errors.descriptive.${message}`
+        : `errors.descriptive.genericError`;
+      notifyError(
+        t("RequestedReservation.ReturnToRequiresHandlingDialog.errorSaving", {
+          error: t(errorTranslated),
+        })
+      );
+    },
+  });
 
   const backToRequireHandling = (
     input: ReservationRequiresHandlingMutationInput

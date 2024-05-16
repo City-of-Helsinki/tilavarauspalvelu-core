@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { trim } from "lodash";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { useMutation } from "@apollo/client";
 import {
   Button,
   Checkbox,
@@ -11,13 +10,12 @@ import {
   NumberInput,
   TextArea,
 } from "hds-react";
-import type {
-  Mutation,
-  ReservationApproveMutationInput,
-  ReservationNode,
+import {
+  useApproveReservationMutation,
+  type ReservationApproveMutationInput,
+  type ReservationNode,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
-import { APPROVE_RESERVATION } from "./queries";
 import { useNotification } from "@/context/NotificationContext";
 import { VerticalFlex } from "@/styles/layout";
 import { getReservationPriceDetails } from "./util";
@@ -57,32 +55,29 @@ const DialogContent = ({
   const { notifyError, notifySuccess } = useNotification();
   const { t, i18n } = useTranslation();
 
-  const [approveReservationMutation] = useMutation<Mutation>(
-    APPROVE_RESERVATION,
-    {
-      onCompleted: () => {
-        notifySuccess(t("RequestedReservation.ApproveDialog.approved"));
-        onAccept();
-      },
-      onError: (err) => {
-        const { message } = err;
-        const hasTranslatedErrorMsg = i18n.exists(
-          `errors.descriptive.${message}`
-        );
-        const errorTranslated = hasTranslatedErrorMsg
-          ? `errors.descriptive.${message}`
-          : `errors.descriptive.genericError`;
-        notifyError(
-          t("RequestedReservation.ApproveDialog.errorSaving", {
-            error: t(errorTranslated),
-          })
-        );
-      },
-    }
-  );
+  const [mutation] = useApproveReservationMutation({
+    onCompleted: () => {
+      notifySuccess(t("RequestedReservation.ApproveDialog.approved"));
+      onAccept();
+    },
+    onError: (err) => {
+      const { message } = err;
+      const hasTranslatedErrorMsg = i18n.exists(
+        `errors.descriptive.${message}`
+      );
+      const errorTranslated = hasTranslatedErrorMsg
+        ? `errors.descriptive.${message}`
+        : `errors.descriptive.genericError`;
+      notifyError(
+        t("RequestedReservation.ApproveDialog.errorSaving", {
+          error: t(errorTranslated),
+        })
+      );
+    },
+  });
 
   const approveReservation = (input: ReservationApproveMutationInput) =>
-    approveReservationMutation({ variables: { input } });
+    mutation({ variables: { input } });
 
   const [price, setPrice] = useState(Number(reservation.price) ?? 0);
   const [handlingDetails, setHandlingDetails] = useState<string>(

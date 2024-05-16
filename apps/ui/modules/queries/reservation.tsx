@@ -23,6 +23,7 @@ export const UPDATE_RESERVATION = gql`
   mutation updateReservation($input: ReservationUpdateMutationInput!) {
     updateReservation(input: $input) {
       pk
+      state
     }
   }
 `;

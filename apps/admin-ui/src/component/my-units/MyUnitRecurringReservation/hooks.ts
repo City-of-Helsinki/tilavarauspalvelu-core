@@ -1,14 +1,12 @@
 import { useMemo } from "react";
-import { useQuery, useMutation } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import get from "lodash/get";
 import type {
   Query,
   ReservationUnitNode,
   RecurringReservationCreateMutationInput,
-  RecurringReservationCreateMutationPayload,
   ReservationStaffCreateMutationInput,
-  ReservationStaffCreateMutationPayload,
   QueryUnitArgs,
   Maybe,
   ReservationMetadataFieldNode,
@@ -16,6 +14,8 @@ import type {
 import {
   ReservationTypeChoice,
   ReservationStartInterval,
+  useCreateStaffReservationMutation,
+  useCreateRecurringReservationMutation,
 } from "@gql/gql-types";
 import type { UseFormReturn } from "react-hook-form";
 import type { RecurringReservationForm } from "app/schemas";
@@ -34,13 +34,9 @@ import {
 import { generateReservations } from "./generateReservations";
 import { useNotification } from "@/context/NotificationContext";
 import { RECURRING_RESERVATION_UNIT_QUERY } from "../queries";
-import {
-  GET_RESERVATIONS_IN_INTERVAL,
-  CREATE_RECURRING_RESERVATION,
-} from "./queries";
+import { GET_RESERVATIONS_IN_INTERVAL } from "./queries";
 import { NewReservationListItem } from "../../ReservationsList";
 import { convertToDate } from "./utils";
-import { CREATE_STAFF_RESERVATION } from "../create-reservation/queries";
 import { ReservationMade } from "./RecurringReservationDone";
 import { flattenMetadata } from "../create-reservation/utils";
 import {
@@ -251,19 +247,13 @@ const myDateTime = (date: Date, time: string) => {
 };
 
 export const useCreateRecurringReservation = () => {
-  const [create] = useMutation<
-    { createRecurringReservation: RecurringReservationCreateMutationPayload },
-    { input: RecurringReservationCreateMutationInput }
-  >(CREATE_RECURRING_RESERVATION);
+  const [create] = useCreateRecurringReservationMutation();
 
   const createRecurringReservation = (
     input: RecurringReservationCreateMutationInput
   ) => create({ variables: { input } });
 
-  const [createReservationMutation] = useMutation<
-    { createStaffReservation: ReservationStaffCreateMutationPayload },
-    { input: ReservationStaffCreateMutationInput }
-  >(CREATE_STAFF_RESERVATION);
+  const [createReservationMutation] = useCreateStaffReservationMutation();
 
   const createStaffReservation = (input: ReservationStaffCreateMutationInput) =>
     createReservationMutation({ variables: { input } });
@@ -328,7 +318,7 @@ export const useCreateRecurringReservation = () => {
 
       return {
         ...common,
-        reservationPk: response.pk ?? undefined,
+        reservationPk: response?.pk ?? undefined,
         error: undefined,
       };
     } catch (e) {

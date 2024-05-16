@@ -1,16 +1,11 @@
-import { useMutation } from "@apollo/client";
-import type {
-  Mutation,
-  MutationUpdateApplicationArgs,
-  ApplicationUpdateMutationInput,
+import {
+  type ApplicationUpdateMutationInput,
+  useUpdateApplicationMutation,
 } from "@gql/gql-types";
-import { UPDATE_APPLICATION_MUTATION } from "@/modules/queries/application";
 
 export function useApplicationUpdate() {
-  const [mutate, { error, loading: isLoading }] = useMutation<
-    Mutation,
-    MutationUpdateApplicationArgs
-  >(UPDATE_APPLICATION_MUTATION);
+  const [mutate, { error, loading: isLoading }] =
+    useUpdateApplicationMutation();
 
   const update = async (
     input: ApplicationUpdateMutationInput
