@@ -6,24 +6,15 @@ import {
   type Query,
   type ReservationUnitNode,
   type QueryReservationUnitArgs,
-  type ReservationNode,
   CustomerTypeChoice,
   ReservationTypeChoice,
+  useReservationUnitsByUnitQuery,
 } from "@gql/gql-types";
 import { toApiDate } from "common/src/common/util";
-import {
-  base64encode,
-  concatAffectedReservations,
-  filterNonNullable,
-} from "common/src/helpers";
+import { base64encode, filterNonNullable } from "common/src/helpers";
 import { useNotification } from "@/context/NotificationContext";
-import {
-  OPTIONS_QUERY,
-  RESERVATION_UNITS_BY_UNIT,
-  RESERVATION_UNIT_QUERY,
-} from "./queries";
+import { OPTIONS_QUERY, RESERVATION_UNIT_QUERY } from "./queries";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
-import { ReservationUnitWithAffectingArgs } from "common/src/queries/fragments";
 import { containsField } from "common/src/metaFieldsHelpers";
 
 export const useApplicationFields = (
@@ -113,28 +104,27 @@ export function useUnitResources(
   const { notifyError } = useNotification();
 
   const id = base64encode(`UnitNode:${unitPk}`);
-  const { data, ...rest } = useQuery<Query, ReservationUnitWithAffectingArgs>(
-    RESERVATION_UNITS_BY_UNIT,
-    {
-      skip:
-        unitPk === "" || Number.isNaN(Number(unitPk)) || Number(unitPk) === 0,
-      variables: {
-        id,
-        pk: Number(unitPk),
-        beginDate: toApiDate(begin) ?? "",
-        // TODO should this be +1 day? or is it already inclusive? seems to be inclusive
-        endDate: toApiDate(begin) ?? "",
-        state: RELATED_RESERVATION_STATES,
-      },
-      onError: () => {
-        notifyError("Varauksia ei voitu hakea");
-      },
-    }
-  );
+  const { data, ...rest } = useReservationUnitsByUnitQuery({
+    skip: unitPk === "" || Number.isNaN(Number(unitPk)) || Number(unitPk) === 0,
+    variables: {
+      id,
+      pk: Number(unitPk),
+      beginDate: toApiDate(begin) ?? "",
+      // TODO should this be +1 day? or is it already inclusive? seems to be inclusive
+      endDate: toApiDate(begin) ?? "",
+      state: RELATED_RESERVATION_STATES,
+    },
+    onError: () => {
+      notifyError("Varauksia ei voitu hakea");
+    },
+  });
 
   const { affectingReservations } = data ?? {};
+  const reservationunitSet = filterNonNullable(data?.unit?.reservationunitSet);
 
-  function convertToEvent(y: ReservationNode, x: ReservationUnitNode) {
+  type ReservationType = NonNullable<typeof affectingReservations>[0];
+  type ReservationUnitType = NonNullable<typeof reservationunitSet>[0];
+  function convertToEvent(y: ReservationType, x: ReservationUnitType) {
     return {
       ...y,
       ...(y.type !== ReservationTypeChoice.Blocked
@@ -146,29 +136,43 @@ export function useUnitResources(
     };
   }
 
-  const resources = filterNonNullable(data?.unit?.reservationunitSet)
+  // copy from concatAffectedReservations in helpers.ts because of types
+  function doesReservationAffectReservationUnit(
+    reservation: ReservationType,
+    reservationUnitPk: number
+  ) {
+    return reservation.affectedReservationUnits?.some(
+      (pk) => pk === reservationUnitPk
+    );
+  }
+
+  const resources = reservationunitSet
     .filter(
       (x) =>
         !reservationUnitTypes?.length ||
         (x.reservationUnitType?.pk != null &&
           reservationUnitTypes.includes(x.reservationUnitType.pk))
     )
-    .map((x) => ({
-      title: x.nameFi ?? "",
-      url: String(x.pk || 0),
-      isDraft: x.isDraft,
-      pk: x.pk ?? 0,
-      events: concatAffectedReservations(
-        filterNonNullable(x.reservationSet),
-        filterNonNullable(affectingReservations),
-        x.pk ?? 0
-      ).map((y) => ({
-        event: convertToEvent(y, x),
-        title: y.name ?? "",
-        start: new Date(y.begin),
-        end: new Date(y.end),
-      })),
-    }));
+    .map((x) => {
+      const affecting = affectingReservations?.filter((y) =>
+        doesReservationAffectReservationUnit(y, x.pk ?? 0)
+      );
+      const _events = x.reservationSet?.concat(affecting ?? []);
+      const events = filterNonNullable(_events);
+
+      return {
+        title: x.nameFi ?? "",
+        url: String(x.pk || 0),
+        isDraft: x.isDraft,
+        pk: x.pk ?? 0,
+        events: events.map((y) => ({
+          event: convertToEvent(y, x),
+          title: y.name ?? "",
+          start: new Date(y.begin),
+          end: new Date(y.end),
+        })),
+      };
+    });
 
   return { ...rest, resources };
 }

@@ -4,6 +4,7 @@ import type {
   ReservationNode,
   ApplicationRoundQuery,
   CurrentUserQuery,
+  ReservationUnitReservationsFragment,
 } from "@gql/gql-types";
 import {
   hasPermission as baseHasPermission,
@@ -38,7 +39,7 @@ const hasUnitPermission = (
 
 const hasPermission = (
   user: CurrentUserQuery["currentUser"] | undefined,
-  reservation: ReservationNode,
+  reservation: ReservationNode | ReservationUnitReservationsFragment,
   permissionName: Permission,
   includeOwn = true
 ) => {
@@ -106,7 +107,7 @@ const usePermission = () => {
   return {
     user,
     hasPermission: (
-      reservation: ReservationNode,
+      reservation: ReservationNode | ReservationUnitReservationsFragment,
       permissionName: Permission,
       includeOwn = true
     ) => hasPermission(user, reservation, permissionName, includeOwn),

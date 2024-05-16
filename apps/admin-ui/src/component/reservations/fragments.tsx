@@ -99,6 +99,7 @@ export const RESERVATION_RECURRING_FRAGMENT = gql`
 
 export const RESERVATION_COMMON_FRAGMENT = gql`
   fragment ReservationCommon on ReservationNode {
+    id
     pk
     begin
     end
@@ -132,11 +133,13 @@ export const RESERVATIONUNIT_RESERVATIONS_FRAGMENT = gql`
     numPersons
     calendarUrl
     reservationUnit {
+      id
       pk
       nameFi
       bufferTimeBefore
       bufferTimeAfter
       unit {
+        id
         pk
         serviceSectors {
           pk
@@ -144,6 +147,7 @@ export const RESERVATIONUNIT_RESERVATIONS_FRAGMENT = gql`
       }
     }
     user {
+      id
       firstName
       lastName
       email

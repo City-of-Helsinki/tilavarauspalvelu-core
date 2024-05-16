@@ -17,7 +17,10 @@ import React, {
 } from "react";
 import Popup from "reactjs-popup";
 import styled, { css } from "styled-components";
-import { type ReservationNode, ReservationTypeChoice } from "@gql/gql-types";
+import {
+  ReservationTypeChoice,
+  type ReservationUnitReservationsFragment,
+} from "@gql/gql-types";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { POST_PAUSE, PRE_PAUSE } from "@/common/calendarStyling";
@@ -29,12 +32,13 @@ import resourceEventStyleGetter from "./eventStyleGetter";
 import { getReserveeName } from "../reservations/requested/util";
 import CreateReservationModal from "./create-reservation/CreateReservationModal";
 
+type CalendarEventType = CalendarEvent<ReservationUnitReservationsFragment>;
 type Resource = {
   title: string;
   pk: number;
   url: string;
   isDraft: boolean;
-  events: CalendarEvent<ReservationNode>[];
+  events: CalendarEventType[];
 };
 
 const CELL_HEIGHT = 50;
@@ -50,7 +54,7 @@ const TemplateProps: CSSProperties = {
   position: "absolute",
 };
 
-type EventStyleGetter = ({ event }: CalendarEvent<ReservationNode>) => {
+type EventStyleGetter = ({ event }: CalendarEventType) => {
   style: React.CSSProperties;
   className?: string;
 };
@@ -244,7 +248,7 @@ const PreBuffer = ({
   left,
   style,
 }: {
-  event: CalendarEvent<ReservationNode>;
+  event: CalendarEventType;
   hourPercent: number;
   left: string;
   style?: CSSProperties;
@@ -276,7 +280,7 @@ const PostBuffer = ({
   right,
   style,
 }: {
-  event: CalendarEvent<ReservationNode>;
+  event: CalendarEventType;
   hourPercent: number;
   right: string;
   style?: CSSProperties;
@@ -306,7 +310,7 @@ function getEventTitle({
   reservation: { title, event },
   t,
 }: {
-  reservation: CalendarEvent<ReservationNode>;
+  reservation: CalendarEventType;
   t: TFunction;
 }) {
   if (event?.type === ReservationTypeChoice.Blocked) {
@@ -345,7 +349,7 @@ const Events = ({
   numHours,
 }: {
   firstHour: number;
-  events: CalendarEvent<ReservationNode>[];
+  events: CalendarEventType[];
   eventStyleGetter: EventStyleGetter;
   numHours: number;
 }) => {

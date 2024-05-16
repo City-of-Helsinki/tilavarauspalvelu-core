@@ -1,15 +1,13 @@
 import React, { useState } from "react";
-import { useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import { type TFunction } from "i18next";
 import styled from "styled-components";
 import { Button } from "hds-react";
-import { BANNER_NOTIFICATIONS_ADMIN_LIST } from "common/src/components/BannerNotificationsQuery";
 import {
   type BannerNotificationNode,
-  type Query,
-  type QueryBannerNotificationsArgs,
   BannerNotificationOrderingChoices,
+  useBannerNotificationsAdminListQuery,
+  BannerNotificationsAdminFragmentFragment,
 } from "@gql/gql-types";
 import { H1 } from "common/src/common/typography";
 import { Container } from "@/styles/layout";
@@ -95,7 +93,7 @@ function NotificationsTable({
   sort,
   isLoading,
 }: {
-  notifications: BannerNotificationNode[];
+  notifications: BannerNotificationsAdminFragmentFragment[];
   onSortChanged: (key: string) => void;
   sort: string;
   isLoading: boolean;
@@ -132,15 +130,12 @@ function Page() {
     loading: isLoading,
     previousData,
     fetchMore,
-  } = useQuery<Query, QueryBannerNotificationsArgs>(
-    BANNER_NOTIFICATIONS_ADMIN_LIST,
-    {
-      variables: {
-        first: GQL_MAX_RESULTS_PER_QUERY,
-        orderBy,
-      },
-    }
-  );
+  } = useBannerNotificationsAdminListQuery({
+    variables: {
+      first: GQL_MAX_RESULTS_PER_QUERY,
+      orderBy,
+    },
+  });
 
   const { bannerNotifications } = data ?? previousData ?? {};
   const notifications = filterNonNullable(

@@ -1,8 +1,8 @@
-import { CalendarEvent } from "common/src/calendar/Calendar";
+import { type CalendarEvent } from "common/src/calendar/Calendar";
 import {
   State,
-  type ReservationNode,
   ReservationTypeChoice,
+  type ReservationUnitReservationsFragment,
 } from "@gql/gql-types";
 import {
   CLOSED,
@@ -64,11 +64,12 @@ export const legend: EventStyle[] = [
   },
 ];
 
+type CalendarEventType = CalendarEvent<ReservationUnitReservationsFragment>;
 const eventStyleGetter =
   (currentReservationUnitPk: number) =>
   ({
     event,
-  }: CalendarEvent<ReservationNode>): {
+  }: CalendarEventType): {
     style: React.CSSProperties;
     className?: string;
   } => {

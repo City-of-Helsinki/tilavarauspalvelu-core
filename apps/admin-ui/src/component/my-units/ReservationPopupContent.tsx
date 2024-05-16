@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import type { ReservationNode } from "@gql/gql-types";
+import type { ReservationUnitReservationsFragment } from "@gql/gql-types";
 import { Permission } from "@/modules/permissionHelper";
 import { reservationUrl } from "@/common/urls";
 import { formatTime } from "@/common/util";
@@ -40,7 +40,7 @@ const WorkingMemo = styled.div`
 export function ReservationPopupContent({
   reservation,
 }: {
-  reservation: ReservationNode;
+  reservation: ReservationUnitReservationsFragment;
 }): JSX.Element {
   const { t } = useTranslation();
   const eventName = getReserveeName(reservation, t, 22) || "-";

@@ -16,6 +16,7 @@ import {
   PricingType,
   type ReservationUnitNode,
   ReservationTypeChoice,
+  type ReservationCommonFragment,
 } from "@gql/gql-types";
 import { formatDuration, fromApiDate } from "common/src/common/util";
 import { toMondayFirst } from "common/src/helpers";

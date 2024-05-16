@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 
 export const SPACE_COMMON_FRAGMENT = gql`
   fragment SpaceCommonFields on SpaceNode {
+    id
     pk
     nameFi
     parent {
@@ -15,6 +16,7 @@ export const SPACE_COMMON_FRAGMENT = gql`
 
 export const RESOURCE_FRAGMENT = gql`
   fragment ResourceFields on ResourceNode {
+    id
     pk
     nameFi
     space {
@@ -44,6 +46,7 @@ export const SPACE_FRAGMENT = gql`
 
 export const RESERVATION_UNIT_COMMON_FRAGMENT = gql`
   fragment ReservationUnitCommonFields on ReservationUnitNode {
+    id
     pk
     nameFi
     maxPersons
@@ -56,6 +59,7 @@ export const RESERVATION_UNIT_COMMON_FRAGMENT = gql`
 
 export const UNIT_NAME_FRAGMENT = gql`
   fragment UnitNameFields on UnitNode {
+    id
     pk
     nameFi
     serviceSectors {

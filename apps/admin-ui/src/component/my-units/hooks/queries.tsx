@@ -58,7 +58,7 @@ export const UNIT_VIEW_QUERY = gql`
 
 export const RESERVATION_UNITS_BY_UNIT = gql`
   ${RESERVATIONUNIT_RESERVATIONS_FRAGMENT}
-  query reservationUnitsByUnit(
+  query ReservationUnitsByUnit(
     $id: ID!
     $pk: Int!
     $state: [String]
@@ -66,7 +66,9 @@ export const RESERVATION_UNITS_BY_UNIT = gql`
     $endDate: Date
   ) {
     unit(id: $id) {
+      id
       reservationunitSet {
+        id
         pk
         nameFi
         spaces {

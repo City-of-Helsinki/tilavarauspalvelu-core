@@ -6349,6 +6349,7 @@ export type TermsOfUseQuery = {
 
 export type SpaceCommonFieldsFragment = {
   __typename?: "SpaceNode";
+  id: string;
   pk?: number | null;
   nameFi?: string | null;
   surfaceArea?: number | null;
@@ -6362,6 +6363,7 @@ export type SpaceCommonFieldsFragment = {
 
 export type ResourceFieldsFragment = {
   __typename?: "ResourceNode";
+  id: string;
   pk?: number | null;
   nameFi?: string | null;
   space?: {
@@ -6378,12 +6380,14 @@ export type ResourceFieldsFragment = {
 export type SpaceFieldsFragment = {
   __typename?: "SpaceNode";
   code: string;
+  id: string;
   pk?: number | null;
   nameFi?: string | null;
   surfaceArea?: number | null;
   maxPersons?: number | null;
   resourceSet: Array<{
     __typename?: "ResourceNode";
+    id: string;
     pk?: number | null;
     nameFi?: string | null;
     space?: {
@@ -6406,6 +6410,7 @@ export type SpaceFieldsFragment = {
 
 export type ReservationUnitCommonFieldsFragment = {
   __typename?: "ReservationUnitNode";
+  id: string;
   pk?: number | null;
   nameFi?: string | null;
   maxPersons?: number | null;
@@ -6418,6 +6423,7 @@ export type ReservationUnitCommonFieldsFragment = {
 
 export type UnitNameFieldsFragment = {
   __typename?: "UnitNode";
+  id: string;
   pk?: number | null;
   nameFi?: string | null;
   serviceSectors: Array<{
@@ -6437,6 +6443,7 @@ export type SpacesQuery = {
       __typename?: "SpaceNodeEdge";
       node?: {
         __typename?: "SpaceNode";
+        id: string;
         pk?: number | null;
         nameFi?: string | null;
         surfaceArea?: number | null;
@@ -6467,6 +6474,7 @@ export type ResourcesQuery = {
       node?: {
         __typename?: "ResourceNode";
         locationType?: ResourceLocationType | null;
+        id: string;
         pk?: number | null;
         nameFi?: string | null;
         space?: {
@@ -6511,6 +6519,7 @@ export type UnitQuery = {
       __typename?: "ReservationUnitNode";
       isArchived: boolean;
       isDraft: boolean;
+      id: string;
       pk?: number | null;
       nameFi?: string | null;
       maxPersons?: number | null;
@@ -6537,12 +6546,14 @@ export type UnitQuery = {
     spaces: Array<{
       __typename?: "SpaceNode";
       code: string;
+      id: string;
       pk?: number | null;
       nameFi?: string | null;
       surfaceArea?: number | null;
       maxPersons?: number | null;
       resourceSet: Array<{
         __typename?: "ResourceNode";
+        id: string;
         pk?: number | null;
         nameFi?: string | null;
         space?: {
@@ -6585,6 +6596,7 @@ export type UnitWithSpacesAndResourcesQuery = {
     nameFi?: string | null;
     spaces: Array<{
       __typename?: "SpaceNode";
+      id: string;
       pk?: number | null;
       nameFi?: string | null;
       surfaceArea?: number | null;
@@ -6768,6 +6780,7 @@ export type SpaceQuery = {
     nameSv?: string | null;
     nameEn?: string | null;
     code: string;
+    id: string;
     pk?: number | null;
     nameFi?: string | null;
     surfaceArea?: number | null;
@@ -7024,6 +7037,7 @@ export type UnitViewQuery = {
   __typename?: "Query";
   unit?: {
     __typename?: "UnitNode";
+    id: string;
     pk?: number | null;
     nameFi?: string | null;
     location?: {
@@ -7061,8 +7075,10 @@ export type ReservationUnitsByUnitQuery = {
   __typename?: "Query";
   unit?: {
     __typename?: "UnitNode";
+    id: string;
     reservationunitSet: Array<{
       __typename?: "ReservationUnitNode";
+      id: string;
       pk?: number | null;
       nameFi?: string | null;
       bufferTimeBefore: number;
@@ -7080,6 +7096,7 @@ export type ReservationUnitsByUnitQuery = {
         numPersons?: number | null;
         calendarUrl?: string | null;
         affectedReservationUnits?: Array<number | null> | null;
+        id: string;
         pk?: number | null;
         begin: string;
         end: string;
@@ -7093,12 +7110,14 @@ export type ReservationUnitsByUnitQuery = {
         bufferTimeAfter: number;
         reservationUnit?: Array<{
           __typename?: "ReservationUnitNode";
+          id: string;
           pk?: number | null;
           nameFi?: string | null;
           bufferTimeBefore: number;
           bufferTimeAfter: number;
           unit?: {
             __typename?: "UnitNode";
+            id: string;
             pk?: number | null;
             serviceSectors: Array<{
               __typename?: "ServiceSectorNode";
@@ -7108,6 +7127,7 @@ export type ReservationUnitsByUnitQuery = {
         }> | null;
         user?: {
           __typename?: "UserNode";
+          id: string;
           firstName: string;
           lastName: string;
           email: string;
@@ -7126,6 +7146,7 @@ export type ReservationUnitsByUnitQuery = {
     numPersons?: number | null;
     calendarUrl?: string | null;
     affectedReservationUnits?: Array<number | null> | null;
+    id: string;
     pk?: number | null;
     begin: string;
     end: string;
@@ -7139,12 +7160,14 @@ export type ReservationUnitsByUnitQuery = {
     bufferTimeAfter: number;
     reservationUnit?: Array<{
       __typename?: "ReservationUnitNode";
+      id: string;
       pk?: number | null;
       nameFi?: string | null;
       bufferTimeBefore: number;
       bufferTimeAfter: number;
       unit?: {
         __typename?: "UnitNode";
+        id: string;
         pk?: number | null;
         serviceSectors: Array<{
           __typename?: "ServiceSectorNode";
@@ -7154,6 +7177,7 @@ export type ReservationUnitsByUnitQuery = {
     }> | null;
     user?: {
       __typename?: "UserNode";
+      id: string;
       firstName: string;
       lastName: string;
       email: string;
@@ -7184,6 +7208,7 @@ export type ReservationUnitsQuery = {
     termsOfUseFi?: string | null;
     unit?: {
       __typename?: "UnitNode";
+      id: string;
       pk?: number | null;
       nameFi?: string | null;
       serviceSectors: Array<{
@@ -7270,6 +7295,7 @@ export type ReservationUnitCalendarQuery = {
       numPersons?: number | null;
       calendarUrl?: string | null;
       affectedReservationUnits?: Array<number | null> | null;
+      id: string;
       pk?: number | null;
       begin: string;
       end: string;
@@ -7283,12 +7309,14 @@ export type ReservationUnitCalendarQuery = {
       bufferTimeAfter: number;
       reservationUnit?: Array<{
         __typename?: "ReservationUnitNode";
+        id: string;
         pk?: number | null;
         nameFi?: string | null;
         bufferTimeBefore: number;
         bufferTimeAfter: number;
         unit?: {
           __typename?: "UnitNode";
+          id: string;
           pk?: number | null;
           serviceSectors: Array<{
             __typename?: "ServiceSectorNode";
@@ -7298,6 +7326,7 @@ export type ReservationUnitCalendarQuery = {
       }> | null;
       user?: {
         __typename?: "UserNode";
+        id: string;
         firstName: string;
         lastName: string;
         email: string;
@@ -7315,6 +7344,7 @@ export type ReservationUnitCalendarQuery = {
     numPersons?: number | null;
     calendarUrl?: string | null;
     affectedReservationUnits?: Array<number | null> | null;
+    id: string;
     pk?: number | null;
     begin: string;
     end: string;
@@ -7328,12 +7358,14 @@ export type ReservationUnitCalendarQuery = {
     bufferTimeAfter: number;
     reservationUnit?: Array<{
       __typename?: "ReservationUnitNode";
+      id: string;
       pk?: number | null;
       nameFi?: string | null;
       bufferTimeBefore: number;
       bufferTimeAfter: number;
       unit?: {
         __typename?: "UnitNode";
+        id: string;
         pk?: number | null;
         serviceSectors: Array<{
           __typename?: "ServiceSectorNode";
@@ -7343,6 +7375,7 @@ export type ReservationUnitCalendarQuery = {
     }> | null;
     user?: {
       __typename?: "UserNode";
+      id: string;
       firstName: string;
       lastName: string;
       email: string;
@@ -7548,6 +7581,7 @@ export type ReservationUnitFragment = {
   termsOfUseFi?: string | null;
   unit?: {
     __typename?: "UnitNode";
+    id: string;
     pk?: number | null;
     nameFi?: string | null;
     serviceSectors: Array<{
@@ -7605,6 +7639,7 @@ export type ReservationRecurringFragment = {
 
 export type ReservationCommonFragment = {
   __typename?: "ReservationNode";
+  id: string;
   pk?: number | null;
   begin: string;
   end: string;
@@ -7633,6 +7668,7 @@ export type ReservationUnitReservationsFragment = {
   numPersons?: number | null;
   calendarUrl?: string | null;
   affectedReservationUnits?: Array<number | null> | null;
+  id: string;
   pk?: number | null;
   begin: string;
   end: string;
@@ -7646,12 +7682,14 @@ export type ReservationUnitReservationsFragment = {
   bufferTimeAfter: number;
   reservationUnit?: Array<{
     __typename?: "ReservationUnitNode";
+    id: string;
     pk?: number | null;
     nameFi?: string | null;
     bufferTimeBefore: number;
     bufferTimeAfter: number;
     unit?: {
       __typename?: "UnitNode";
+      id: string;
       pk?: number | null;
       serviceSectors: Array<{
         __typename?: "ServiceSectorNode";
@@ -7661,6 +7699,7 @@ export type ReservationUnitReservationsFragment = {
   }> | null;
   user?: {
     __typename?: "UserNode";
+    id: string;
     firstName: string;
     lastName: string;
     email: string;
@@ -7746,6 +7785,7 @@ export type ReservationsQuery = {
       node?: {
         __typename?: "ReservationNode";
         name?: string | null;
+        id: string;
         pk?: number | null;
         begin: string;
         end: string;
@@ -7895,6 +7935,7 @@ export type ReservationQuery = {
   __typename?: "Query";
   reservation?: {
     __typename?: "ReservationNode";
+    id: string;
     pk?: number | null;
     begin: string;
     end: string;
@@ -7945,6 +7986,7 @@ export type ReservationQuery = {
       termsOfUseFi?: string | null;
       unit?: {
         __typename?: "UnitNode";
+        id: string;
         pk?: number | null;
         nameFi?: string | null;
         serviceSectors: Array<{
@@ -9630,6 +9672,7 @@ export const LocationFieldsI18nFragmentDoc = gql`
 `;
 export const SpaceCommonFieldsFragmentDoc = gql`
   fragment SpaceCommonFields on SpaceNode {
+    id
     pk
     nameFi
     parent {
@@ -9642,6 +9685,7 @@ export const SpaceCommonFieldsFragmentDoc = gql`
 `;
 export const ResourceFieldsFragmentDoc = gql`
   fragment ResourceFields on ResourceNode {
+    id
     pk
     nameFi
     space {
@@ -9669,6 +9713,7 @@ export const SpaceFieldsFragmentDoc = gql`
 `;
 export const ReservationUnitCommonFieldsFragmentDoc = gql`
   fragment ReservationUnitCommonFields on ReservationUnitNode {
+    id
     pk
     nameFi
     maxPersons
@@ -9764,6 +9809,7 @@ export const ReservationUnitPricingFragmentDoc = gql`
 `;
 export const UnitNameFieldsFragmentDoc = gql`
   fragment UnitNameFields on UnitNode {
+    id
     pk
     nameFi
     serviceSectors {
@@ -9827,6 +9873,7 @@ export const ReservationRecurringFragmentDoc = gql`
 `;
 export const ReservationCommonFragmentDoc = gql`
   fragment ReservationCommon on ReservationNode {
+    id
     pk
     begin
     end
@@ -9854,11 +9901,13 @@ export const ReservationUnitReservationsFragmentDoc = gql`
     numPersons
     calendarUrl
     reservationUnit {
+      id
       pk
       nameFi
       bufferTimeBefore
       bufferTimeAfter
       unit {
+        id
         pk
         serviceSectors {
           pk
@@ -9866,6 +9915,7 @@ export const ReservationUnitReservationsFragmentDoc = gql`
       }
     }
     user {
+      id
       firstName
       lastName
       email
@@ -12167,7 +12217,7 @@ export type UnitViewQueryResult = Apollo.QueryResult<
   UnitViewQueryVariables
 >;
 export const ReservationUnitsByUnitDocument = gql`
-  query reservationUnitsByUnit(
+  query ReservationUnitsByUnit(
     $id: ID!
     $pk: Int!
     $state: [String]
@@ -12175,7 +12225,9 @@ export const ReservationUnitsByUnitDocument = gql`
     $endDate: Date
   ) {
     unit(id: $id) {
+      id
       reservationunitSet {
+        id
         pk
         nameFi
         spaces {
