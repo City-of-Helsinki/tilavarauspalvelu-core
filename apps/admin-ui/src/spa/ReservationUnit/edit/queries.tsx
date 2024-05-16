@@ -145,7 +145,7 @@ export const CREATE_RESERVATION_UNIT = gql`
 
 // TODO this allows for a pk input (is it for a change? i.e. not needing to delete and create a new one)
 export const CREATE_IMAGE = gql`
-  mutation createReservationUnitImage(
+  mutation createImage(
     $image: Upload!
     $reservationUnit: Int!
     $imageType: ImageType!
@@ -179,7 +179,7 @@ export const UPDATE_IMAGE_TYPE = gql`
 `;
 
 export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
-  query reservation_unit_editor_parameters {
+  query ReservationUnitEditorParameters {
     equipments {
       edges {
         node {

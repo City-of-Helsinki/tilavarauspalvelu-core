@@ -2,23 +2,17 @@ import React, { useRef } from "react";
 import { trim } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import {
-  type FetchResult,
-  useMutation,
-  type ApolloQueryResult,
-} from "@apollo/client";
+import { type ApolloQueryResult, } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
-import type {
-  Maybe,
-  Query,
-  ResourceDeleteMutationInput,
-  ResourceDeleteMutationPayload,
-  ResourceNode,
-  UnitNode,
+import {
+  useDeleteResourceMutation,
+  type Maybe,
+  type Query,
+  type ResourceNode,
+  type UnitNode,
 } from "@gql/gql-types";
 import { PopupMenu } from "@/component/PopupMenu";
 import ConfirmationDialog, { ModalRef } from "../ConfirmationDialog";
-import { DELETE_RESOURCE } from "@/common/queries";
 import { getResourceUrl } from "@/common/urls";
 import { CustomTable, TableLink } from "../Table";
 import { useNotification } from "@/context/NotificationContext";
@@ -48,14 +42,9 @@ export function ResourcesTable({
   unit,
   refetch,
 }: IProps): JSX.Element {
-  const [deleteResourceMutation] = useMutation<
-    { deleteSpace: ResourceDeleteMutationPayload },
-    { input: ResourceDeleteMutationInput }
-  >(DELETE_RESOURCE);
+  const [deleteResourceMutation] = useDeleteResourceMutation()
 
-  const deleteResource = (
-    pk: number
-  ): Promise<FetchResult<{ deleteSpace: ResourceDeleteMutationPayload }>> =>
+  const deleteResource = (pk: number) =>
     deleteResourceMutation({ variables: { input: { pk: String(pk) } } });
 
   const { t } = useTranslation();

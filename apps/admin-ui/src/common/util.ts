@@ -1,7 +1,7 @@
 import { format, parseISO } from "date-fns";
 import i18next from "i18next";
 import { set, get, trim } from "lodash";
-import type { LocationNode, Query } from "@gql/gql-types";
+import type { LocationFieldsFragment, Query } from "@gql/gql-types";
 import { NUMBER_OF_DECIMALS } from "./const";
 import type { TFunction } from "next-i18next";
 
@@ -140,14 +140,18 @@ export const parseAgeGroups = (ageGroups: IAgeGroups): string => {
   })}`;
 };
 
-export const parseAddress = (location: LocationNode): string => {
+// TODO rename to print or format
+export function parseAddress(location: LocationFieldsFragment | null | undefined): string {
+  if (!location) {
+    return "";
+  }
   return trim(
     `${location.addressStreetFi ?? ""}, ${location.addressZip} ${
       location.addressCityFi ?? ""
     }`,
     ", "
   );
-};
+}
 
 export const combineResults = (
   previousResult: Query,

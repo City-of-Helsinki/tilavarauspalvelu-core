@@ -8379,13 +8379,13 @@ export type CreateReservationUnitMutation = {
   } | null;
 };
 
-export type CreateReservationUnitImageMutationVariables = Exact<{
+export type CreateImageMutationVariables = Exact<{
   image: Scalars["Upload"]["input"];
   reservationUnit: Scalars["Int"]["input"];
   imageType: ImageType;
 }>;
 
-export type CreateReservationUnitImageMutation = {
+export type CreateImageMutation = {
   __typename?: "Mutation";
   createReservationUnitImage?: {
     __typename?: "ReservationUnitImageCreateMutationPayload";
@@ -8418,11 +8418,11 @@ export type UpdateImageMutation = {
   } | null;
 };
 
-export type Reservation_Unit_Editor_ParametersQueryVariables = Exact<{
+export type ReservationUnitEditorParametersQueryVariables = Exact<{
   [key: string]: never;
 }>;
 
-export type Reservation_Unit_Editor_ParametersQuery = {
+export type ReservationUnitEditorParametersQuery = {
   __typename?: "Query";
   equipments?: {
     __typename?: "EquipmentNodeConnection";
@@ -14197,8 +14197,8 @@ export type CreateReservationUnitMutationOptions = Apollo.BaseMutationOptions<
   CreateReservationUnitMutation,
   CreateReservationUnitMutationVariables
 >;
-export const CreateReservationUnitImageDocument = gql`
-  mutation createReservationUnitImage(
+export const CreateImageDocument = gql`
+  mutation createImage(
     $image: Upload!
     $reservationUnit: Int!
     $imageType: ImageType!
@@ -14214,23 +14214,23 @@ export const CreateReservationUnitImageDocument = gql`
     }
   }
 `;
-export type CreateReservationUnitImageMutationFn = Apollo.MutationFunction<
-  CreateReservationUnitImageMutation,
-  CreateReservationUnitImageMutationVariables
+export type CreateImageMutationFn = Apollo.MutationFunction<
+  CreateImageMutation,
+  CreateImageMutationVariables
 >;
 
 /**
- * __useCreateReservationUnitImageMutation__
+ * __useCreateImageMutation__
  *
- * To run a mutation, you first call `useCreateReservationUnitImageMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateReservationUnitImageMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useCreateImageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateImageMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [createReservationUnitImageMutation, { data, loading, error }] = useCreateReservationUnitImageMutation({
+ * const [createImageMutation, { data, loading, error }] = useCreateImageMutation({
  *   variables: {
  *      image: // value for 'image'
  *      reservationUnit: // value for 'reservationUnit'
@@ -14238,28 +14238,27 @@ export type CreateReservationUnitImageMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useCreateReservationUnitImageMutation(
+export function useCreateImageMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    CreateReservationUnitImageMutation,
-    CreateReservationUnitImageMutationVariables
+    CreateImageMutation,
+    CreateImageMutationVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    CreateReservationUnitImageMutation,
-    CreateReservationUnitImageMutationVariables
-  >(CreateReservationUnitImageDocument, options);
+  return Apollo.useMutation<CreateImageMutation, CreateImageMutationVariables>(
+    CreateImageDocument,
+    options
+  );
 }
-export type CreateReservationUnitImageMutationHookResult = ReturnType<
-  typeof useCreateReservationUnitImageMutation
+export type CreateImageMutationHookResult = ReturnType<
+  typeof useCreateImageMutation
 >;
-export type CreateReservationUnitImageMutationResult =
-  Apollo.MutationResult<CreateReservationUnitImageMutation>;
-export type CreateReservationUnitImageMutationOptions =
-  Apollo.BaseMutationOptions<
-    CreateReservationUnitImageMutation,
-    CreateReservationUnitImageMutationVariables
-  >;
+export type CreateImageMutationResult =
+  Apollo.MutationResult<CreateImageMutation>;
+export type CreateImageMutationOptions = Apollo.BaseMutationOptions<
+  CreateImageMutation,
+  CreateImageMutationVariables
+>;
 export const DeleteImageDocument = gql`
   mutation deleteImage($pk: ID!) {
     deleteReservationUnitImage(input: { pk: $pk }) {
@@ -14361,8 +14360,8 @@ export type UpdateImageMutationOptions = Apollo.BaseMutationOptions<
   UpdateImageMutation,
   UpdateImageMutationVariables
 >;
-export const Reservation_Unit_Editor_ParametersDocument = gql`
-  query reservation_unit_editor_parameters {
+export const ReservationUnitEditorParametersDocument = gql`
+  query ReservationUnitEditorParameters {
     equipments {
       edges {
         node {
@@ -14432,67 +14431,68 @@ export const Reservation_Unit_Editor_ParametersDocument = gql`
 `;
 
 /**
- * __useReservation_Unit_Editor_ParametersQuery__
+ * __useReservationUnitEditorParametersQuery__
  *
- * To run a query within a React component, call `useReservation_Unit_Editor_ParametersQuery` and pass it any options that fit your needs.
- * When your component renders, `useReservation_Unit_Editor_ParametersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useReservationUnitEditorParametersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationUnitEditorParametersQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useReservation_Unit_Editor_ParametersQuery({
+ * const { data, loading, error } = useReservationUnitEditorParametersQuery({
  *   variables: {
  *   },
  * });
  */
-export function useReservation_Unit_Editor_ParametersQuery(
+export function useReservationUnitEditorParametersQuery(
   baseOptions?: Apollo.QueryHookOptions<
-    Reservation_Unit_Editor_ParametersQuery,
-    Reservation_Unit_Editor_ParametersQueryVariables
+    ReservationUnitEditorParametersQuery,
+    ReservationUnitEditorParametersQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
-    Reservation_Unit_Editor_ParametersQuery,
-    Reservation_Unit_Editor_ParametersQueryVariables
-  >(Reservation_Unit_Editor_ParametersDocument, options);
+    ReservationUnitEditorParametersQuery,
+    ReservationUnitEditorParametersQueryVariables
+  >(ReservationUnitEditorParametersDocument, options);
 }
-export function useReservation_Unit_Editor_ParametersLazyQuery(
+export function useReservationUnitEditorParametersLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    Reservation_Unit_Editor_ParametersQuery,
-    Reservation_Unit_Editor_ParametersQueryVariables
+    ReservationUnitEditorParametersQuery,
+    ReservationUnitEditorParametersQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
-    Reservation_Unit_Editor_ParametersQuery,
-    Reservation_Unit_Editor_ParametersQueryVariables
-  >(Reservation_Unit_Editor_ParametersDocument, options);
+    ReservationUnitEditorParametersQuery,
+    ReservationUnitEditorParametersQueryVariables
+  >(ReservationUnitEditorParametersDocument, options);
 }
-export function useReservation_Unit_Editor_ParametersSuspenseQuery(
+export function useReservationUnitEditorParametersSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<
-    Reservation_Unit_Editor_ParametersQuery,
-    Reservation_Unit_Editor_ParametersQueryVariables
+    ReservationUnitEditorParametersQuery,
+    ReservationUnitEditorParametersQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<
-    Reservation_Unit_Editor_ParametersQuery,
-    Reservation_Unit_Editor_ParametersQueryVariables
-  >(Reservation_Unit_Editor_ParametersDocument, options);
+    ReservationUnitEditorParametersQuery,
+    ReservationUnitEditorParametersQueryVariables
+  >(ReservationUnitEditorParametersDocument, options);
 }
-export type Reservation_Unit_Editor_ParametersQueryHookResult = ReturnType<
-  typeof useReservation_Unit_Editor_ParametersQuery
+export type ReservationUnitEditorParametersQueryHookResult = ReturnType<
+  typeof useReservationUnitEditorParametersQuery
 >;
-export type Reservation_Unit_Editor_ParametersLazyQueryHookResult = ReturnType<
-  typeof useReservation_Unit_Editor_ParametersLazyQuery
+export type ReservationUnitEditorParametersLazyQueryHookResult = ReturnType<
+  typeof useReservationUnitEditorParametersLazyQuery
 >;
-export type Reservation_Unit_Editor_ParametersSuspenseQueryHookResult =
-  ReturnType<typeof useReservation_Unit_Editor_ParametersSuspenseQuery>;
-export type Reservation_Unit_Editor_ParametersQueryResult = Apollo.QueryResult<
-  Reservation_Unit_Editor_ParametersQuery,
-  Reservation_Unit_Editor_ParametersQueryVariables
+export type ReservationUnitEditorParametersSuspenseQueryHookResult = ReturnType<
+  typeof useReservationUnitEditorParametersSuspenseQuery
+>;
+export type ReservationUnitEditorParametersQueryResult = Apollo.QueryResult<
+  ReservationUnitEditorParametersQuery,
+  ReservationUnitEditorParametersQueryVariables
 >;
 export const ApplicationAdminDocument = gql`
   query ApplicationAdmin($id: ID!) {

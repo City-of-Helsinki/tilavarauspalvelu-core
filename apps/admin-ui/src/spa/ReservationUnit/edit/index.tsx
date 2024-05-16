@@ -25,18 +25,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   type Query,
   type QueryReservationUnitArgs,
-  type QueryUnitArgs,
   type Mutation,
   ReservationStartInterval,
   type ReservationUnitImageCreateMutationInput,
   Authentication,
-  type UnitNode,
   type ReservationState,
   type ReservationUnitState,
   TermsType,
   Status,
   type ReservationUnitNode,
-  type SpaceNode,
   type ReservationUnitTypeNode,
   type EquipmentNode,
   type MutationCreateReservationUnitArgs,
@@ -44,14 +41,15 @@ import {
   type PurposeNode,
   type QualifierNode,
   ImageType,
-  ReservationUnitImageUpdateMutationInput,
-  ReservationUnitImageDeleteMutationInput,
+  useUnitWithSpacesAndResourcesQuery,
+  useDeleteImageMutation,
+  useUpdateImageMutation,
+  UnitWithSpacesAndResourcesQuery,
 } from "@gql/gql-types";
 import { DateTimeInput } from "common/src/components/form/DateTimeInput";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { H1, H4, fontBold } from "common/src/common/typography";
 import { breakpoints } from "common";
-import { UNIT_WITH_SPACES_AND_RESOURCES } from "@/common/queries";
 import {
   ContainerMedium,
   DenseVerticalFlex,
@@ -73,10 +71,8 @@ import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import {
   CREATE_IMAGE,
   CREATE_RESERVATION_UNIT,
-  DELETE_IMAGE,
   RESERVATIONUNIT_QUERY,
   RESERVATION_UNIT_EDITOR_PARAMETERS,
-  UPDATE_IMAGE_TYPE,
   UPDATE_RESERVATION_UNIT,
 } from "./queries";
 import { ControlledNumberInput } from "common/src/components/form/ControlledNumberInput";
@@ -435,10 +431,18 @@ function DisplayUnit({
   reservationState,
 }: {
   heading: string;
-  unit?: UnitNode;
+  unit?: UnitWithSpacesAndResourcesQuery['unit']; /*{
+    nameFi: string | null | undefined;
+    location: {
+      addressStreetFi?: string | null;
+      addressZip: string;
+      addressCityFi?: string | null;
+      } | null | undefined;
+    }; */
   unitState?: ReservationUnitState;
   reservationState?: ReservationState;
 }): JSX.Element {
+  const location = unit?.location;
   return (
     <DisplayUnitWrapper>
       <TitleSectionWithTags>
@@ -450,7 +454,7 @@ function DisplayUnit({
       </TitleSectionWithTags>
       <UnitInformationWrapper>
         <div>{unit?.nameFi ?? "-"}</div>
-        <div>{unit?.location ? parseAddress(unit.location) : "-"}</div>
+        <div>{location != null ? parseAddress(location) : "-"}</div>
       </UnitInformationWrapper>
     </DisplayUnitWrapper>
   );
@@ -462,14 +466,14 @@ const useImageMutations = () => {
     ReservationUnitImageCreateMutationInput
   >(CREATE_IMAGE);
 
-  const [delImage] = useMutation<
+  const [delImage] = useDeleteImageMutation();/* useMutation<
     Mutation,
     ReservationUnitImageDeleteMutationInput
-  >(DELETE_IMAGE);
-  const [updateImagetype] = useMutation<
+  >(DELETE_IMAGE); */
+  const [updateImagetype] = useUpdateImageMutation() /* useMutation<
     Mutation,
     ReservationUnitImageUpdateMutationInput
-  >(UPDATE_IMAGE_TYPE);
+  >(UPDATE_IMAGE_TYPE);*/
 
   const reconcileImageChanges = async (
     resUnitPk: number,
@@ -516,7 +520,7 @@ const useImageMutations = () => {
           return updateImagetype({
             variables: {
               pk: image.pk ?? 0,
-              imageType: image.imageType,
+              imageType: image.imageType ?? ImageType.Other,
             },
           });
         });
@@ -560,13 +564,13 @@ const getTranslatedTooltipTex = (t: TFunction, fieldName: string) => {
 };
 
 // default is 20 if no spaces selected
-const getMaxPersons = (spaceList: NonNullable<SpaceNode>[]) => {
+const getMaxPersons = (spaceList: Array<{ maxPersons?: number | null | undefined }>) => {
   const persons =
     spaceList.map((s) => s.maxPersons ?? 0).reduce((a, x) => a + x, 0) || 20;
   return Math.floor(persons);
 };
 // default is 1 if no spaces selected
-const getMinSurfaceArea = (spaceList: NonNullable<SpaceNode>[]) => {
+const getMinSurfaceArea = (spaceList: Array<{ surfaceArea?: number | null | undefined }>) => {
   const area =
     spaceList.map((s) => s.surfaceArea ?? 0).reduce((a, x) => a + x, 0) || 1;
   return Math.floor(area);
@@ -619,26 +623,27 @@ function CustomNumberInput({
 
 function BasicSection({
   form,
-  spaces,
+  unit,
 }: {
   form: UseFormReturn<ReservationUnitEditFormValues>;
-  spaces: SpaceNode[];
+  unit: UnitWithSpacesAndResourcesQuery["unit"]
 }) {
   const { t } = useTranslation();
   const { control, formState, register, watch, setValue } = form;
   const { errors } = formState;
+  const { spaces } = unit ?? {};
 
-  const spaceOptions = spaces.map((s) => ({
+  const spaceOptions = spaces?.map((s) => ({
     label: String(s?.nameFi),
     value: Number(s?.pk),
-  }));
+  })) ?? [];
   const resourceOptions = filterNonNullable(
-    spaces.flatMap((s) => s?.resourceSet)
+    spaces?.flatMap((s) => s?.resourceSet)
   ).map((r) => ({ label: String(r?.nameFi), value: Number(r?.pk) }));
 
   const spacePks = watch("spaces");
   const selectedSpaces = filterNonNullable(
-    spacePks.map((pk) => spaces.find((s) => s.pk === pk))
+    spacePks.map((pk) => spaces?.find((s) => s.pk === pk))
   );
   const minSurfaceArea = getMinSurfaceArea(selectedSpaces);
   const maxPersons = getMaxPersons(selectedSpaces);
@@ -726,7 +731,7 @@ function BasicSection({
                 // recalculate the min surface area and max persons after update
                 const sPks = vals.map((y) => y.value);
                 const sspaces = filterNonNullable(
-                  sPks.map((pk) => spaces.find((s) => s.pk === pk))
+                  sPks.map((pk) => spaces?.find((s) => s.pk === pk))
                 );
                 onChange(sPks);
                 const minArea = getMinSurfaceArea(sspaces);
@@ -1891,18 +1896,15 @@ const ReservationUnitEditor = ({
   >(CREATE_RESERVATION_UNIT);
 
   const id = base64encode(`UnitNode:${unitPk}`);
-  const { data: unitResourcesData } = useQuery<Query, QueryUnitArgs>(
-    UNIT_WITH_SPACES_AND_RESOURCES,
-    {
-      skip: !unitPk,
-      variables: { id },
-      onError: (e) => {
-        // eslint-disable-next-line no-console
-        console.error(e);
-        notifyError(t("errors.errorFetchingData"));
-      },
-    }
-  );
+  const { data: unitResourcesData } = useUnitWithSpacesAndResourcesQuery({
+    skip: !unitPk,
+    variables: { id },
+    onError: (e) => {
+      // eslint-disable-next-line no-console
+      console.error(e);
+      notifyError(t("errors.errorFetchingData"));
+    },
+  });
 
   const { data: parametersData } = useQuery<Query>(
     RESERVATION_UNIT_EDITOR_PARAMETERS,
@@ -1943,7 +1945,6 @@ const ReservationUnitEditor = ({
   );
 
   const { unit } = unitResourcesData ?? {};
-  const spaces = filterNonNullable(unit?.spaces);
   const equipments = filterNonNullable(
     parametersData?.equipments?.edges?.map((e) => e?.node)
   );
@@ -2138,7 +2139,7 @@ const ReservationUnitEditor = ({
           unitState={reservationUnit?.state ?? undefined}
         />
         <ErrorInfo form={form} />
-        <BasicSection form={form} spaces={spaces} />
+        <BasicSection form={form} unit={unit} />
         <DescriptionSection
           form={form}
           equipments={equipments}

@@ -3,17 +3,15 @@ import { IconGroup } from "hds-react";
 import { trim } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { type ApolloQueryResult, useMutation } from "@apollo/client";
+import { type ApolloQueryResult } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
-import type {
-  Maybe,
-  SpaceDeleteMutationInput,
-  SpaceDeleteMutationPayload,
-  SpaceNode,
-  UnitNode,
-  Query,
+import {
+  type Maybe,
+  type SpaceNode,
+  type UnitNode,
+  type Query,
+  useDeleteSpaceMutation,
 } from "@gql/gql-types";
-import { DELETE_SPACE } from "@/common/queries";
 import { PopupMenu } from "@/component/PopupMenu";
 import Modal, { useModal as useHDSModal } from "../HDSModal";
 import { NewSpaceModal } from "../Spaces/space-editor/new-space-modal/NewSpaceModal";
@@ -66,10 +64,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
     modalContent,
   } = useHDSModal();
 
-  const [deleteSpaceMutation] = useMutation<
-    { deleteSpace: SpaceDeleteMutationPayload },
-    { input: SpaceDeleteMutationInput }
-  >(DELETE_SPACE);
+  const [deleteSpaceMutation] = useDeleteSpaceMutation();
 
   const { notifyError } = useNotification();
 
@@ -81,7 +76,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
       const res = await deleteSpaceMutation({
         variables: { input: { pk: String(pk) } },
       });
-      if (res.data?.deleteSpace.deleted) {
+      if (res.data?.deleteSpace?.deleted) {
         refetch();
       } else {
         // TODO missing translation
