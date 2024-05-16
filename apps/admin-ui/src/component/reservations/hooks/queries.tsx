@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 export const UPDATE_STAFF_RESERVATION = gql`
-  mutation staffReservationModify(
+  mutation updateStaffReservation(
     $input: ReservationStaffModifyMutationInput!
     $workingMemo: ReservationWorkingMemoMutationInput!
   ) {

@@ -8,9 +8,8 @@ import { useNavigate } from "react-router-dom";
 import {
   type Maybe,
   type SpaceNode,
-  type UnitNode,
-  type Query,
   useDeleteSpaceMutation,
+  UnitQuery,
 } from "@gql/gql-types";
 import { PopupMenu } from "@/component/PopupMenu";
 import Modal, { useModal as useHDSModal } from "../HDSModal";
@@ -23,8 +22,8 @@ import { truncate } from "common/src/helpers";
 import { MAX_NAME_LENGTH } from "@/common/const";
 
 interface IProps {
-  unit: UnitNode;
-  refetch: () => Promise<ApolloQueryResult<Query>>;
+  unit: UnitQuery["unit"];
+  refetch: () => Promise<ApolloQueryResult<UnitQuery>>;
 }
 
 const Prop = styled.div`
@@ -136,7 +135,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
   }
 
   function handleEditSpace(space: SpaceNode) {
-    const link = getSpaceUrl(space.pk, unit.pk);
+    const link = getSpaceUrl(space.pk, unit?.pk);
     if (link === "") {
       return;
     }
@@ -150,7 +149,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
       key: "nameFi",
       transform: (space: SpaceNode) => {
         const { pk, nameFi } = space;
-        const link = getSpaceUrl(pk, unit.pk);
+        const link = getSpaceUrl(pk, unit?.pk);
         const name = nameFi != null && nameFi.length > 0 ? nameFi : "-";
         return (
           <TableLink href={link}>
@@ -218,7 +217,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
 
   const ref = useRef(null);
 
-  const rows = unit.spaces;
+  const rows = unit?.spaces ?? [];
 
   // TODO add if no spaces => "Unit.noSpaces"
   return (

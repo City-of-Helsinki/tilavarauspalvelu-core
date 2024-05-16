@@ -1,7 +1,7 @@
 import React from "react";
 import { Button, Dialog, IconArrowRight, IconCheck } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { type UnitNode } from "@gql/gql-types";
+import { type UnitQuery } from "@gql/gql-types";
 import { parseAddress } from "@/common/util";
 import { CustomDialogHeader } from "@/component/CustomDialogHeader";
 import { ParentSelector } from "../ParentSelector";
@@ -24,7 +24,7 @@ export function Page1({
   form,
   onNextPage,
 }: {
-  unit: UnitNode;
+  unit: UnitQuery["unit"];
   closeModal: () => void;
   hasFixedParent: boolean;
   form: UseFormReturn<SpaceUpdateForm>;
@@ -34,7 +34,9 @@ export function Page1({
   const { control, watch } = form;
 
   const parentPk = watch("parent") ?? null;
-  const parentName = unit.spaces.find((space) => space.pk === parentPk)?.nameFi;
+  const parentName = unit?.spaces.find(
+    (space) => space.pk === parentPk
+  )?.nameFi;
   return (
     <>
       <CustomDialogHeader
@@ -54,11 +56,11 @@ export function Page1({
         <UnitInfo>
           <IconCheck />
           <div>
-            <Name>{unit.nameFi}</Name>
+            <Name>{unit?.nameFi}</Name>
             <Parent>{parentName}</Parent>
           </div>
-          {unit.location ? (
-            <Address>{parseAddress(unit.location)}</Address>
+          {unit?.location ? (
+            <Address>{parseAddress(unit?.location)}</Address>
           ) : null}
         </UnitInfo>
         {!hasFixedParent ? <Title>{t("SpaceModal.page1.title")}</Title> : null}
@@ -69,7 +71,7 @@ export function Page1({
             render={({ field: { onChange, value } }) => (
               <ParentSelector
                 label={t("SpaceModal.page1.parentLabel")}
-                unitPk={unit.pk ?? 0}
+                unitPk={unit?.pk ?? 0}
                 value={value}
                 onChange={(parent) => onChange(parent)}
               />

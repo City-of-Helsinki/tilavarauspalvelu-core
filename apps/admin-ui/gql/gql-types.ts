@@ -7670,12 +7670,12 @@ export type ReservationUnitReservationsFragment = {
   } | null;
 };
 
-export type StaffReservationModifyMutationVariables = Exact<{
+export type UpdateStaffReservationMutationVariables = Exact<{
   input: ReservationStaffModifyMutationInput;
   workingMemo: ReservationWorkingMemoMutationInput;
 }>;
 
-export type StaffReservationModifyMutation = {
+export type UpdateStaffReservationMutation = {
   __typename?: "Mutation";
   staffReservationModify?: {
     __typename?: "ReservationStaffModifyMutationPayload";
@@ -11112,7 +11112,7 @@ export type UpdateResourceMutationOptions = Apollo.BaseMutationOptions<
   UpdateResourceMutationVariables
 >;
 export const ResourceDocument = gql`
-  query resource($id: ID!) {
+  query Resource($id: ID!) {
     resource(id: $id) {
       pk
       nameFi
@@ -12936,8 +12936,8 @@ export type SearchReservationUnitsQueryResult = Apollo.QueryResult<
   SearchReservationUnitsQuery,
   SearchReservationUnitsQueryVariables
 >;
-export const StaffReservationModifyDocument = gql`
-  mutation staffReservationModify(
+export const UpdateStaffReservationDocument = gql`
+  mutation updateStaffReservation(
     $input: ReservationStaffModifyMutationInput!
     $workingMemo: ReservationWorkingMemoMutationInput!
   ) {
@@ -12949,49 +12949,49 @@ export const StaffReservationModifyDocument = gql`
     }
   }
 `;
-export type StaffReservationModifyMutationFn = Apollo.MutationFunction<
-  StaffReservationModifyMutation,
-  StaffReservationModifyMutationVariables
+export type UpdateStaffReservationMutationFn = Apollo.MutationFunction<
+  UpdateStaffReservationMutation,
+  UpdateStaffReservationMutationVariables
 >;
 
 /**
- * __useStaffReservationModifyMutation__
+ * __useUpdateStaffReservationMutation__
  *
- * To run a mutation, you first call `useStaffReservationModifyMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useStaffReservationModifyMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useUpdateStaffReservationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateStaffReservationMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [staffReservationModifyMutation, { data, loading, error }] = useStaffReservationModifyMutation({
+ * const [updateStaffReservationMutation, { data, loading, error }] = useUpdateStaffReservationMutation({
  *   variables: {
  *      input: // value for 'input'
  *      workingMemo: // value for 'workingMemo'
  *   },
  * });
  */
-export function useStaffReservationModifyMutation(
+export function useUpdateStaffReservationMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    StaffReservationModifyMutation,
-    StaffReservationModifyMutationVariables
+    UpdateStaffReservationMutation,
+    UpdateStaffReservationMutationVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
-    StaffReservationModifyMutation,
-    StaffReservationModifyMutationVariables
-  >(StaffReservationModifyDocument, options);
+    UpdateStaffReservationMutation,
+    UpdateStaffReservationMutationVariables
+  >(UpdateStaffReservationDocument, options);
 }
-export type StaffReservationModifyMutationHookResult = ReturnType<
-  typeof useStaffReservationModifyMutation
+export type UpdateStaffReservationMutationHookResult = ReturnType<
+  typeof useUpdateStaffReservationMutation
 >;
-export type StaffReservationModifyMutationResult =
-  Apollo.MutationResult<StaffReservationModifyMutation>;
-export type StaffReservationModifyMutationOptions = Apollo.BaseMutationOptions<
-  StaffReservationModifyMutation,
-  StaffReservationModifyMutationVariables
+export type UpdateStaffReservationMutationResult =
+  Apollo.MutationResult<UpdateStaffReservationMutation>;
+export type UpdateStaffReservationMutationOptions = Apollo.BaseMutationOptions<
+  UpdateStaffReservationMutation,
+  UpdateStaffReservationMutationVariables
 >;
 export const UpdateRecurringReservationDocument = gql`
   mutation updateRecurringReservation(

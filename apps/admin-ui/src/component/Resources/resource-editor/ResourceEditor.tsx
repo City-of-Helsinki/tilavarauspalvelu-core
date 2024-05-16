@@ -1,17 +1,17 @@
 import React, { useEffect } from "react";
 import { Button } from "hds-react";
-import { useMutation, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  type Mutation,
   type Query,
   type ResourceUpdateMutationInput,
   type QueryUnitArgs,
-  type QueryResourceArgs,
   LocationType,
+  useUpdateResourceMutation,
+  useResourceQuery,
 } from "@gql/gql-types";
 import { base64encode } from "common/src/helpers";
 import { UNIT_WITH_SPACES_AND_RESOURCES } from "@/common/queries";
@@ -20,14 +20,13 @@ import { ButtonContainer, Container, IngressContainer } from "@/styles/layout";
 import { SubPageHead } from "@/component/Unit/SubPageHead";
 import { useNotification } from "@/context/NotificationContext";
 import { FormErrorSummary } from "@/common/FormErrorSummary";
-import { RESOURCE_QUERY, UPDATE_RESOURCE } from "./queries";
 import {
   Editor,
   ResourceUpdateSchema,
   type ResourceUpdateForm,
 } from "./modules/resourceEditor";
 import { ResourceEditorFields } from "./EditForm";
-import BreadcrumbWrapper from "app/component/BreadcrumbWrapper";
+import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 
 type Props = {
   resourcePk?: number;
@@ -54,7 +53,7 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
     data,
     loading: isSpaceLoading,
     refetch,
-  } = useQuery<Query, QueryResourceArgs>(RESOURCE_QUERY, {
+  } = useResourceQuery({
     variables: { id: base64encode(`ResourceNode:${resourcePk}`) },
     skip: !resourcePk || Number.isNaN(resourcePk),
     onError: (e) => {
@@ -64,7 +63,7 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
 
   const isLoading = isUnitLoading || isSpaceLoading;
 
-  const [mutation] = useMutation<Mutation>(UPDATE_RESOURCE);
+  const [mutation] = useUpdateResourceMutation();
 
   const updateResource = async (input: ResourceUpdateMutationInput) => {
     const res = await mutation({ variables: { input } });

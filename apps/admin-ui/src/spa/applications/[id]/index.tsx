@@ -12,28 +12,24 @@ import {
   Tag,
 } from "hds-react";
 import { isEqual, trim } from "lodash";
-import { type ApolloQueryResult, useMutation, useQuery } from "@apollo/client";
+import { type ApolloQueryResult } from "@apollo/client";
 import { type TFunction } from "i18next";
 import { H2, H4, H5, Strong } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { getValidationErrors } from "common/src/apolloUtils";
 import {
-  type Query,
   ApplicationStatusChoice,
-  type ApplicationSectionNode,
-  type ApplicationNode,
   ApplicantTypeChoice,
-  type SuitableTimeRangeNode,
   Priority,
-  type QueryApplicationArgs,
-  type MutationUpdateReservationUnitOptionArgs,
-  type ReservationUnitOptionNode,
   type Maybe,
-  type MutationRejectAllSectionOptionsArgs,
-  type MutationRestoreAllSectionOptionsArgs,
-  type MutationRejectAllApplicationOptionsArgs,
-  type MutationRestoreAllApplicationOptionsArgs,
+  useRestoreAllApplicationOptionsMutation,
+  useRejectAllApplicationOptionsMutation,
+  useRestoreAllSectionOptionsMutation,
+  useRejectAllSectionOptionsMutation,
+  useApplicationAdminQuery,
+  ApplicationAdminQuery,
+  useRejectRestMutation,
 } from "@gql/gql-types";
 import { formatDuration } from "common/src/common/util";
 import { convertWeekday, type Day } from "common/src/conversion";
@@ -53,20 +49,22 @@ import { BirthDate } from "@/component/BirthDate";
 import { Container } from "@/styles/layout";
 import { ValueBox } from "../ValueBox";
 import { TimeSelector } from "../TimeSelector";
-import {
-  APPLICATION_ADMIN_QUERY,
-  REJECT_ALL_SECTION_OPTIONS,
-  REJECT_APPLICATION,
-  RESTORE_ALL_SECTION_OPTIONS,
-  RESTORE_APPLICATION,
-} from "../queries";
 import { getApplicantName, getApplicationStatusColor } from "@/helpers";
-// TODO move
-import { UPDATE_RESERVATION_UNIT_OPTION } from "@/spa/recurring-reservations/application-rounds/[id]/allocation/queries";
 import Error404 from "@/common/Error404";
 
+type ApplicationType = NonNullable<ApplicationAdminQuery["application"]>;
+type ApplicationSectionType = NonNullable<
+  ApplicationType["applicationSections"]
+>[0];
+type ReservationUnitOptionType = NonNullable<
+  ApplicationSectionType["reservationUnitOptions"]
+>[0];
+type SuitableTimeRangeType = NonNullable<
+  ApplicationSectionType["suitableTimeRanges"]
+>[0];
+
 function printSuitableTimes(
-  timeRanges: SuitableTimeRangeNode[],
+  timeRanges: SuitableTimeRangeType[],
   day: Day,
   priority: Priority
 ): string {
@@ -321,7 +319,7 @@ function SchedulesContent({
   as,
   priority,
 }: {
-  as: ApplicationSectionNode;
+  as: ApplicationSectionType;
   priority: Priority;
 }): JSX.Element {
   const { t } = useTranslation();
@@ -353,14 +351,11 @@ function RejectOptionButton({
   applicationStatus,
   refetch,
 }: {
-  option: ReservationUnitOptionNode;
+  option: ReservationUnitOptionType;
   applicationStatus: ApplicationStatusChoice;
-  refetch: () => Promise<ApolloQueryResult<Query>>;
+  refetch: () => Promise<ApolloQueryResult<ApplicationAdminQuery>>;
 }) {
-  const [mutation, { loading }] = useMutation<
-    Query,
-    MutationUpdateReservationUnitOptionArgs
-  >(UPDATE_RESERVATION_UNIT_OPTION);
+  const [mutation, { loading }] = useRejectRestMutation();
 
   const { notifyError } = useNotification();
   const { t } = useTranslation();
@@ -446,21 +441,17 @@ function RejectAllOptionsButton({
   applicationStatus,
   refetch,
 }: {
-  section: ApplicationSectionNode;
+  section: ApplicationSectionType;
   applicationStatus: ApplicationStatusChoice;
-  refetch: () => Promise<ApolloQueryResult<Query>>;
+  refetch: () => Promise<ApolloQueryResult<ApplicationAdminQuery>>;
 }) {
   const { t } = useTranslation();
 
-  const [rejectMutation, { loading: rejectLoading }] = useMutation<
-    Query,
-    MutationRejectAllSectionOptionsArgs
-  >(REJECT_ALL_SECTION_OPTIONS);
+  const [rejectMutation, { loading: rejectLoading }] =
+    useRejectAllSectionOptionsMutation();
 
-  const [restoreMutation, { loading: restoreLoading }] = useMutation<
-    Query,
-    MutationRestoreAllSectionOptionsArgs
-  >(RESTORE_ALL_SECTION_OPTIONS);
+  const [restoreMutation, { loading: restoreLoading }] =
+    useRestoreAllSectionOptionsMutation();
 
   const { notifyError } = useNotification();
 
@@ -540,7 +531,7 @@ function RejectAllOptionsButton({
   );
 }
 
-interface DataType extends ReservationUnitOptionNode {
+interface DataType extends ReservationUnitOptionType {
   index: number;
 }
 type ColumnType = {
@@ -553,9 +544,9 @@ function ApplicationSectionDetails({
   application,
   refetch,
 }: {
-  section: ApplicationSectionNode;
-  application: ApplicationNode;
-  refetch: () => Promise<ApolloQueryResult<Query>>;
+  section: ApplicationSectionType;
+  application: ApplicationType;
+  refetch: () => Promise<ApolloQueryResult<ApplicationAdminQuery>>;
 }): JSX.Element {
   const { t } = useTranslation();
 
@@ -563,7 +554,7 @@ function ApplicationSectionDetails({
   const maxDuration = section?.reservationMaxDuration ?? undefined;
   const duration = appEventDuration(minDuration, maxDuration, t);
   const hash = section?.pk?.toString() ?? "";
-  const heading = `${application.pk}-${section.pk} ${section.name}`;
+  const heading = `${application?.pk}-${section.pk} ${section.name}`;
 
   // TODO use a function for this
   const dates =
@@ -580,17 +571,17 @@ function ApplicationSectionDetails({
     },
     {
       key: "unit",
-      transform: (reservationUnitOption: ReservationUnitOptionNode) =>
+      transform: (reservationUnitOption: ReservationUnitOptionType) =>
         reservationUnitOption?.reservationUnit?.unit?.nameFi ?? "-",
     },
     {
       key: "name",
-      transform: (reservationUnitOption: ReservationUnitOptionNode) =>
+      transform: (reservationUnitOption: ReservationUnitOptionType) =>
         reservationUnitOption?.reservationUnit?.nameFi ?? "-",
     },
     {
       key: "status",
-      transform: (reservationUnitOption: ReservationUnitOptionNode) => {
+      transform: (reservationUnitOption: ReservationUnitOptionType) => {
         if (reservationUnitOption.rejected) {
           return (
             <DeclinedTag>
@@ -603,7 +594,7 @@ function ApplicationSectionDetails({
     },
     {
       key: "reject",
-      transform: (reservationUnitOption: ReservationUnitOptionNode) => {
+      transform: (reservationUnitOption: ReservationUnitOptionType) => {
         // TODO button should only be visible if user has "can_handle_applications" permission
         // the application is visible to the user if they have "can_view_application" permission
         // but they aren't allowed to reject it
@@ -612,7 +603,7 @@ function ApplicationSectionDetails({
           <RejectOptionButton
             option={reservationUnitOption}
             applicationStatus={
-              application.status ?? ApplicationStatusChoice.Draft
+              application?.status ?? ApplicationStatusChoice.Draft
             }
             refetch={refetch}
           />
@@ -668,7 +659,7 @@ function ApplicationSectionDetails({
             section={section}
             refetch={refetch}
             applicationStatus={
-              application.status ?? ApplicationStatusChoice.Draft
+              application?.status ?? ApplicationStatusChoice.Draft
             }
           />
         </HeadingContainer>
@@ -707,21 +698,17 @@ function RejectApplicationButton({
   application,
   refetch,
 }: {
-  application: ApplicationNode;
-  refetch: () => Promise<ApolloQueryResult<Query>>;
-}): JSX.Element {
+  application: ApplicationType;
+  refetch: () => Promise<ApolloQueryResult<ApplicationAdminQuery>>;
+}): JSX.Element | null {
   const { t } = useTranslation();
   const { notifyError } = useNotification();
 
-  const [rejectionMutation, { loading: isRejectionLoading }] = useMutation<
-    Query,
-    MutationRejectAllApplicationOptionsArgs
-  >(REJECT_APPLICATION);
+  const [rejectionMutation, { loading: isRejectionLoading }] =
+    useRejectAllApplicationOptionsMutation();
 
-  const [restoreMutation, { loading: isRestoreLoading }] = useMutation<
-    Query,
-    MutationRestoreAllApplicationOptionsArgs
-  >(RESTORE_APPLICATION);
+  const [restoreMutation, { loading: isRestoreLoading }] =
+    useRestoreAllApplicationOptionsMutation();
 
   const isLoading = isRejectionLoading || isRestoreLoading;
 
@@ -766,6 +753,17 @@ function RejectApplicationButton({
       }
     }
   };
+
+  if (application?.applicationSections == null) {
+    // eslint-disable-next-line no-console
+    console.warn("application.applicationSections is null", application);
+  }
+
+  if (application?.pk == null) {
+    // eslint-disable-next-line no-console
+    console.warn("application.pk is null", application);
+    return null;
+  }
 
   const handleRejectAll = async () => {
     updateApplication(application.pk, true);
@@ -829,8 +827,8 @@ function ApplicationDetails({
     loading: isLoading,
     refetch,
     error,
-  } = useQuery<Query, QueryApplicationArgs>(APPLICATION_ADMIN_QUERY, {
-    skip: applicationPk === 0,
+  } = useApplicationAdminQuery({
+    skip: !(applicationPk > 0),
     variables: { id },
     onError: () => {
       notifyError(t("errors.errorFetchingApplication"));

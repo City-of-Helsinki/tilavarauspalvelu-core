@@ -17,7 +17,7 @@ export const UPDATE_RESOURCE = gql`
 `;
 
 export const RESOURCE_QUERY = gql`
-  query resource($id: ID!) {
+  query Resource($id: ID!) {
     resource(id: $id) {
       pk
       nameFi

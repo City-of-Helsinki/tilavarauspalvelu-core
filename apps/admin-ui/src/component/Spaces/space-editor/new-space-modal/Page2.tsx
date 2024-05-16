@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Button, Dialog, IconArrowLeft, IconCheck } from "hds-react";
-import type { UnitNode } from "@gql/gql-types";
+import type { UnitQuery } from "@gql/gql-types";
 import { CustomDialogHeader } from "@/component/CustomDialogHeader";
 import {
   Address,
@@ -17,7 +17,7 @@ import { UseFormReturn } from "react-hook-form";
 import { DialogActionsButtons } from "@/styles/util";
 
 type Props = {
-  unit: UnitNode;
+  unit: UnitQuery["unit"];
   closeModal: () => void;
   hasFixedParent: boolean;
   onPrevPage: () => void;
@@ -36,7 +36,9 @@ export function Page2({
   const { errors, isDirty } = formState;
 
   const parentPk = watch("parent") ?? null;
-  const parentName = unit.spaces.find((space) => space.pk === parentPk)?.nameFi;
+  const parentName = unit?.spaces.find(
+    (space) => space.pk === parentPk
+  )?.nameFi;
 
   return (
     <>
@@ -61,11 +63,11 @@ export function Page2({
         <UnitInfo>
           <IconCheck />
           <div>
-            <Name>{unit.nameFi}</Name>
+            <Name>{unit?.nameFi}</Name>
             <Parent>{parentName}</Parent>
           </div>
-          {unit.location != null && (
-            <Address>{parseAddress(unit.location)}</Address>
+          {unit?.location != null && (
+            <Address>{parseAddress(unit?.location)}</Address>
           )}
         </UnitInfo>
         <div>

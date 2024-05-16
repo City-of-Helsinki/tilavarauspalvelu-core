@@ -1,19 +1,16 @@
 import React from "react";
 import { Button, Dialog, IconCheck } from "hds-react";
 import styled from "styled-components";
-import { type ApolloQueryResult, useMutation } from "@apollo/client";
+import { type ApolloQueryResult } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import {
   LocationType,
-  type Query,
-  type Mutation,
-  type MutationCreateResourceArgs,
   type ResourceCreateMutationInput,
-  type UnitNode,
+  useCreateResourceMutation,
+  type UnitQuery,
 } from "@gql/gql-types";
 import { parseAddress } from "@/common/util";
 import { CustomDialogHeader } from "@/component/CustomDialogHeader";
-import { CREATE_RESOURCE } from "./queries";
 import { useNotification } from "@/context/NotificationContext";
 import {
   Editor,
@@ -27,10 +24,10 @@ import { ResourceEditorFields } from "./EditForm";
 import { DialogActionsButtons } from "@/styles/util";
 
 interface IProps {
-  unit: UnitNode;
+  unit: UnitQuery["unit"];
   spacePk: number;
   closeModal: () => void;
-  refetch: () => Promise<ApolloQueryResult<Query>>;
+  refetch: () => Promise<ApolloQueryResult<UnitQuery>>;
 }
 
 const UnitInfo = styled.div`
@@ -53,10 +50,8 @@ export function NewResourceModal({
 
   const { notifyError } = useNotification();
 
-  const [createResourceMutation, { loading: isMutationLoading }] = useMutation<
-    Mutation,
-    MutationCreateResourceArgs
-  >(CREATE_RESOURCE);
+  const [createResourceMutation, { loading: isMutationLoading }] =
+    useCreateResourceMutation();
 
   const createResource = (input: ResourceCreateMutationInput) =>
     createResourceMutation({ variables: { input } });
@@ -103,15 +98,15 @@ export function NewResourceModal({
         <UnitInfo>
           <IconCheck />
           <div>
-            <span>{unit.nameFi}</span>
+            <span>{unit?.nameFi}</span>
           </div>
-          {unit.location ? (
+          {unit?.location ? (
             <Address>{parseAddress(unit.location)}</Address>
           ) : null}
         </UnitInfo>
         <FormErrorSummary errors={errors} />
         <Editor>
-          <ResourceEditorFields form={form} unitPk={unit.pk ?? 0} />
+          <ResourceEditorFields form={form} unitPk={unit?.pk ?? 0} />
         </Editor>
       </Dialog.Content>
       <DialogActionsButtons>

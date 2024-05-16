@@ -1,18 +1,14 @@
 import React, { useState } from "react";
 import { Button, TextArea } from "hds-react";
 import styled from "styled-components";
-import { FetchResult, useMutation } from "@apollo/client";
+import { type FetchResult } from "@apollo/client";
 import {
-  type ApplicationUpdateMutationInput,
+  useUpdateApplicationWorkingMemoMutation,
+  useUpdateReservationWorkingMemoMutation,
   type Mutation,
-  type ReservationWorkingMemoMutationInput,
 } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { useNotification } from "@/context/NotificationContext";
-import {
-  UPDATE_RESERVATION_WORKING_MEMO,
-  UPDATE_APPLICATION_WORKING_MEMO,
-} from "./queries";
 
 const ButtonContainer = styled.div`
   display: flex;
@@ -102,10 +98,7 @@ export function ReservationWorkingMemo({
   refetch: () => void;
   initialValue: string;
 }) {
-  const [updateWorkingMemo] = useMutation<
-    Mutation,
-    ReservationWorkingMemoMutationInput
-  >(UPDATE_RESERVATION_WORKING_MEMO);
+  const [updateWorkingMemo] = useUpdateReservationWorkingMemoMutation();
 
   const updateMemo = (memo: string) =>
     updateWorkingMemo({
@@ -130,10 +123,7 @@ export function ApplicationWorkingMemo({
   refetch: () => void;
   initialValue: string;
 }) {
-  const [updateWorkingMemo] = useMutation<
-    Mutation,
-    ApplicationUpdateMutationInput
-  >(UPDATE_APPLICATION_WORKING_MEMO);
+  const [updateWorkingMemo] = useUpdateApplicationWorkingMemoMutation();
 
   const updateMemo = (memo: string) =>
     updateWorkingMemo({

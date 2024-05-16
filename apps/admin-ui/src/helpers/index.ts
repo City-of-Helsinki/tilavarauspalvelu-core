@@ -3,9 +3,9 @@ import {
   type ReservationNode,
   ReservationTypeChoice,
   ApplicantTypeChoice,
-  type ApplicationNode,
   ApplicationSectionStatusChoice,
   ApplicationStatusChoice,
+  type PersonNode,
 } from "@gql/gql-types";
 import { addSeconds } from "date-fns";
 
@@ -66,7 +66,17 @@ export const reservationToInterval = (
   };
 };
 
-export function getApplicantName(app: ApplicationNode): string {
+type Application = {
+  applicantType?: ApplicantTypeChoice | null;
+  contactPerson?: Pick<PersonNode, "firstName" | "lastName"> | null;
+  organisation?: {
+    name?: string | null;
+  } | null;
+};
+export function getApplicantName(app?: Application | undefined | null): string {
+  if (!app) {
+    return "-";
+  }
   if (app.applicantType === ApplicantTypeChoice.Individual) {
     const { firstName, lastName } = app.contactPerson || {};
     return `${firstName || "-"} ${lastName || "-"}`;

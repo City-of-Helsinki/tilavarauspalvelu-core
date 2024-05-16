@@ -2,13 +2,12 @@ import React, { useEffect } from "react";
 import { useForm, FormProvider, UseFormReturn } from "react-hook-form";
 import { Button, Dialog, Notification } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { useMutation } from "@apollo/client";
 import {
   type ReservationStaffCreateMutationInput,
-  type ReservationStaffCreateMutationPayload,
   type ReservationUnitNode,
   ReservationStartInterval,
   ReservationTypeChoice,
+  useCreateStaffReservationMutation,
 } from "@gql/gql-types";
 import styled from "styled-components";
 import { get } from "lodash";
@@ -25,7 +24,6 @@ import { useCheckCollisions } from "@/component/reservations/requested/hooks";
 import Loader from "@/component/Loader";
 import { dateTime, parseDateTimeSafe } from "@/helpers";
 import { useModal } from "@/context/ModalContext";
-import { CREATE_STAFF_RESERVATION } from "./queries";
 import { useNotification } from "@/context/NotificationContext";
 import { flattenMetadata } from "./utils";
 import { useReservationUnitQuery } from "../hooks";
@@ -253,10 +251,7 @@ const DialogContent = ({
     }
   }, [startTime, trigger, getFieldState]);
 
-  const [create] = useMutation<
-    { createStaffReservation: ReservationStaffCreateMutationPayload },
-    { input: ReservationStaffCreateMutationInput }
-  >(CREATE_STAFF_RESERVATION);
+  const [create] = useCreateStaffReservationMutation();
 
   const createStaffReservation = (input: ReservationStaffCreateMutationInput) =>
     create({ variables: { input } });

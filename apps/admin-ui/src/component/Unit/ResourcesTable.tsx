@@ -7,9 +7,8 @@ import { useNavigate } from "react-router-dom";
 import {
   useDeleteResourceMutation,
   type Maybe,
-  type Query,
   type ResourceNode,
-  type UnitNode,
+  type UnitQuery,
 } from "@gql/gql-types";
 import { PopupMenu } from "@/component/PopupMenu";
 import ConfirmationDialog, { ModalRef } from "../ConfirmationDialog";
@@ -20,9 +19,8 @@ import { truncate } from "common/src/helpers";
 import { MAX_NAME_LENGTH } from "@/common/const";
 
 interface IProps {
-  resources: ResourceNode[];
-  unit: UnitNode;
-  refetch: () => Promise<ApolloQueryResult<Query>>;
+  unit: UnitQuery["unit"];
+  refetch: () => Promise<ApolloQueryResult<UnitQuery>>;
 }
 
 const ResourceNodeContainer = styled.div`
@@ -37,11 +35,9 @@ type ResourcesTableColumn = {
   transform?: (space: ResourceNode) => JSX.Element | string;
 };
 
-export function ResourcesTable({
-  resources,
-  unit,
-  refetch,
-}: IProps): JSX.Element {
+export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
+  const resources = unit?.spaces?.flatMap((s) => s?.resourceSet);
+
   const [deleteResourceMutation] = useDeleteResourceMutation();
 
   const deleteResource = (pk: number) =>
@@ -55,7 +51,7 @@ export function ResourcesTable({
   const { notifyError, notifySuccess } = useNotification();
 
   function handleEditResource(pk: Maybe<number> | undefined) {
-    if (pk == null || unit.pk == null) {
+    if (pk == null || unit?.pk == null) {
       return;
     }
     history(getResourceUrl(pk, unit.pk));
@@ -94,7 +90,7 @@ export function ResourcesTable({
       headerName: t("ResourceTable.headings.name"),
       key: `nameFi`,
       transform: ({ pk, nameFi }: ResourceNode) => {
-        const link = getResourceUrl(pk, unit.pk);
+        const link = getResourceUrl(pk, unit?.pk);
         const name = nameFi != null && nameFi.length > 0 ? nameFi : "-";
         return (
           <TableLink href={link}>

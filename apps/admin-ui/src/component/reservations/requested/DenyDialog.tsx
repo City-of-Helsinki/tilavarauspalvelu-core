@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { useMutation } from "@apollo/client";
 import {
   Button,
   Dialog,
@@ -10,15 +9,13 @@ import {
   TextArea,
 } from "hds-react";
 import {
-  type Mutation,
-  type MutationDenyReservationArgs,
-  type MutationRefundReservationArgs,
   type ReservationDenyMutationInput,
   type ReservationRefundMutationInput,
   type ReservationNode,
+  useDenyReservationMutation,
+  useRefundReservationMutation,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
-import { DENY_RESERVATION, REFUND_RESERVATION } from "./queries";
 import { useNotification } from "@/context/NotificationContext";
 import Loader from "@/component/Loader";
 import { Select } from "@/component/Select";
@@ -140,18 +137,12 @@ const DialogContent = ({
   onClose: () => void;
   onReject: () => void;
 }) => {
-  const [denyReservationMutation] = useMutation<
-    Mutation,
-    MutationDenyReservationArgs
-  >(DENY_RESERVATION);
+  const [denyReservationMutation] = useDenyReservationMutation();
 
   const { notifyError, notifySuccess } = useNotification();
   const { t } = useTranslation();
 
-  const [refundReservationMutation] = useMutation<
-    Mutation,
-    MutationRefundReservationArgs
-  >(REFUND_RESERVATION, {
+  const [refundReservationMutation] = useRefundReservationMutation({
     onCompleted: () => {
       notifySuccess(
         t("RequestedReservation.DenyDialog.refund.mutationSuccess")

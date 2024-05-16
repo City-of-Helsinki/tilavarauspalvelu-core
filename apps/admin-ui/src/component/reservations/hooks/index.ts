@@ -1,20 +1,13 @@
 import { useTranslation } from "react-i18next";
 import { useNotification } from "app/context/NotificationContext";
-import { useMutation } from "@apollo/client";
 import {
   State,
-  type RecurringReservationUpdateMutationInput,
-  type RecurringReservationUpdateMutationPayload,
   type ReservationStaffModifyMutationInput,
   type ReservationNode,
-  type ReservationWorkingMemoMutationInput,
-  type Mutation,
+  useUpdateRecurringReservationMutation,
+  useUpdateStaffReservationMutation,
 } from "@gql/gql-types";
 import { useRecurringReservations } from "../requested/hooks";
-import {
-  UPDATE_STAFF_RECURRING_RESERVATION,
-  UPDATE_STAFF_RESERVATION,
-} from "./queries";
 
 export type MutationInputParams = ReservationStaffModifyMutationInput & {
   seriesName?: string;
@@ -31,24 +24,13 @@ export function useStaffReservationMutation({
 }) {
   const { t } = useTranslation();
   const { notifyError, notifySuccess } = useNotification();
-  const [mutation] = useMutation<
-    Mutation,
-    {
-      input: ReservationStaffModifyMutationInput;
-      workingMemo: ReservationWorkingMemoMutationInput;
-    }
-  >(UPDATE_STAFF_RESERVATION);
+  const [mutation] = useUpdateStaffReservationMutation();
 
   const { reservations } = useRecurringReservations(
     reservation.recurringReservation?.pk ?? undefined
   );
 
-  const [recurringMutation] = useMutation<
-    { staffReservationModify: RecurringReservationUpdateMutationPayload },
-    {
-      input: RecurringReservationUpdateMutationInput;
-    }
-  >(UPDATE_STAFF_RECURRING_RESERVATION);
+  const [recurringMutation] = useUpdateRecurringReservationMutation();
 
   const handleSuccess = (isRecurring: boolean) => {
     const trKey = `Reservation.EditPage.${

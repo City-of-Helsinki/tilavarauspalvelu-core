@@ -3,8 +3,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
-import { useQuery } from "@apollo/client";
-import type { Query, QueryUnitArgs } from "@gql/gql-types";
+import { useUnitQuery } from "@gql/gql-types";
 import { Container } from "@/styles/layout";
 import Loader from "../Loader";
 import { ResourcesTable } from "./ResourcesTable";
@@ -13,7 +12,6 @@ import { SubPageHead } from "./SubPageHead";
 import Modal, { useModal } from "../HDSModal";
 import { NewSpaceModal } from "../Spaces/space-editor/new-space-modal/NewSpaceModal";
 import { NewResourceModal } from "../Resources/resource-editor/NewResourceModal";
-import { UNIT_QUERY } from "@/common/queries";
 import { base64encode } from "common/src/helpers";
 import { useNotification } from "@/context/NotificationContext";
 import Error404 from "@/common/Error404";
@@ -60,7 +58,7 @@ function SpacesResources(): JSX.Element {
     data,
     refetch,
     loading: isLoading,
-  } = useQuery<Query, QueryUnitArgs>(UNIT_QUERY, {
+  } = useUnitQuery({
     variables: { id },
     fetchPolicy: "network-only",
     onError: () => {
@@ -89,8 +87,6 @@ function SpacesResources(): JSX.Element {
   if (unit == null) {
     return <Error404 />;
   }
-
-  const resources = unit.spaces?.flatMap((s) => s?.resourceSet);
 
   return (
     <>
@@ -141,7 +137,7 @@ function SpacesResources(): JSX.Element {
             {t("Unit.addResource")}
           </ActionButton>
         </TableHead>
-        <ResourcesTable unit={unit} resources={resources} refetch={refetch} />
+        <ResourcesTable unit={unit} refetch={refetch} />
         <Modal
           id="resource-modal"
           open={isNewResourceModalOpen}

@@ -2,11 +2,7 @@ import React from "react";
 import styled, { css } from "styled-components";
 import { useTranslation } from "react-i18next";
 import { breakpoints } from "common/src/common/style";
-import {
-  type ApplicationSectionNode,
-  type SuitableTimeRangeNode,
-  Priority,
-} from "@gql/gql-types";
+import { Priority, type ApplicationAdminQuery } from "@gql/gql-types";
 import { convertWeekday } from "common/src/conversion";
 import { filterNonNullable } from "common/src/helpers";
 import { WEEKDAYS } from "common/src/const";
@@ -18,11 +14,22 @@ type Cell = {
   key: string;
 };
 
+type ApplicationType = NonNullable<ApplicationAdminQuery["application"]>;
+type ApplicationSectionType = NonNullable<
+  ApplicationType["applicationSections"]
+>[0];
+type SuitableTimeRangeType = NonNullable<
+  ApplicationSectionType["suitableTimeRanges"]
+>[0];
+type TimeSelectorProps = {
+  applicationSection: ApplicationSectionType;
+};
+
 function cellLabel(row: number): string {
   return `${row} - ${row + 1}`;
 }
 
-function timeRangeToCell(timeRanges: SuitableTimeRangeNode[]): Cell[][] {
+function timeRangeToCell(timeRanges: SuitableTimeRangeType[]): Cell[][] {
   const firstSlotStart = 7;
   const lastSlotStart = 23;
 
@@ -241,10 +248,6 @@ const LegendLabel = styled.div`
 const Wrapper = styled.div`
   display: grid;
 `;
-
-type TimeSelectorProps = {
-  applicationSection: ApplicationSectionNode;
-};
 
 export function TimeSelector({
   applicationSection,

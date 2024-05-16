@@ -3,12 +3,12 @@ import React from "react";
 import { H1, fontMedium } from "common/src/common/typography";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { type UnitNode } from "@gql/gql-types";
+import { type UnitQuery } from "@gql/gql-types";
 import { parseAddress } from "../../common/util";
 
 interface IProps {
   title: string;
-  unit: UnitNode;
+  unit: UnitQuery["unit"];
 }
 
 const Wrapper = styled.div`
@@ -50,9 +50,9 @@ export function SubPageHead({ title, unit }: IProps): JSX.Element {
       <AddressSection>
         <LocationIcon />
         <div>
-          <Name>{unit.nameFi}</Name>
+          <Name>{unit?.nameFi}</Name>
           <Label>{t("Unit.address")}</Label>:{" "}
-          {unit.location ? (
+          {unit?.location ? (
             <Address>{parseAddress(unit.location)}</Address>
           ) : null}
         </div>

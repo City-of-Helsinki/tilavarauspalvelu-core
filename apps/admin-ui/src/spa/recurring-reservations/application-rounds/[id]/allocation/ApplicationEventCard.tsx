@@ -2,13 +2,13 @@ import { IconAngleDown, IconAngleUp, Link, RadioButton } from "hds-react";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled, { css } from "styled-components";
-import type {
-  AllocatedTimeSlotNode,
-  ApplicationSectionNode,
-  Maybe,
-  MutationUpdateReservationUnitOptionArgs,
-  Query,
-  ReservationUnitNode,
+import {
+  useRejectRestMutation,
+  type AllocatedTimeSlotNode,
+  type ApplicationSectionNode,
+  type Maybe,
+  type Query,
+  type ReservationUnitNode,
 } from "@gql/gql-types";
 import { SemiBold, fontMedium } from "common";
 import { ageGroup } from "@/component/reservations/requested/util";
@@ -20,10 +20,9 @@ import {
 } from "./modules/applicationRoundAllocation";
 import { useFocusAllocatedSlot, useFocusApplicationEvent } from "./hooks";
 import { PopupMenu } from "@/component/PopupMenu";
-import { type ApolloQueryResult, useMutation } from "@apollo/client";
+import { type ApolloQueryResult } from "@apollo/client";
 import { getApplicationSectionUrl } from "@/common/urls";
 import { useNotification } from "@/context/NotificationContext";
-import { UPDATE_RESERVATION_UNIT_OPTION } from "./queries";
 import { getApplicantName } from "@/helpers";
 
 export type AllocationApplicationSectionCardType =
@@ -289,10 +288,7 @@ function SchedulesList({
     (a, b) => convertWeekday(a.dayOfTheWeek) - convertWeekday(b.dayOfTheWeek)
   );
 
-  const [mutation, { loading }] = useMutation<
-    Query,
-    MutationUpdateReservationUnitOptionArgs
-  >(UPDATE_RESERVATION_UNIT_OPTION);
+  const [mutation, { loading }] = useRejectRestMutation();
 
   const thisOption = section.reservationUnitOptions?.find(
     (ruo) => ruo.reservationUnit?.pk === currentReservationUnit.pk

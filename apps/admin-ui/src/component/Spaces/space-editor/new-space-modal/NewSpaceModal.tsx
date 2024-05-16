@@ -1,13 +1,11 @@
 import React, { useState } from "react";
-import { type ApolloQueryResult, useMutation } from "@apollo/client";
-import type {
-  Query,
-  SpaceCreateMutationInput,
-  SpaceCreateMutationPayload,
-  SpaceNode,
-  UnitNode,
+import { type ApolloQueryResult } from "@apollo/client";
+import {
+  useCreateSpaceMutation,
+  type SpaceCreateMutationInput,
+  type SpaceNode,
+  type UnitQuery,
 } from "@gql/gql-types";
-import { CREATE_SPACE } from "../queries";
 import { Page1 } from "./Page1";
 import { Page2 } from "./Page2";
 import { useForm } from "react-hook-form";
@@ -17,10 +15,10 @@ import { useNotification } from "app/context/NotificationContext";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 type Props = {
-  unit: UnitNode;
+  unit: UnitQuery["unit"];
   parentSpace?: SpaceNode;
   closeModal: () => void;
-  refetch: () => Promise<ApolloQueryResult<Query>>;
+  refetch: () => Promise<ApolloQueryResult<UnitQuery>>;
 };
 
 export function NewSpaceModal({
@@ -29,10 +27,7 @@ export function NewSpaceModal({
   refetch,
   parentSpace,
 }: Props): JSX.Element | null {
-  const [mutation] = useMutation<
-    { createSpace: SpaceCreateMutationPayload },
-    { input: SpaceCreateMutationInput }
-  >(CREATE_SPACE);
+  const [mutation] = useCreateSpaceMutation();
 
   const createSpace = (input: SpaceCreateMutationInput) =>
     mutation({ variables: { input } });
@@ -44,7 +39,7 @@ export function NewSpaceModal({
   const form = useForm<SpaceUpdateForm>({
     resolver: zodResolver(SpaceUpdateSchema),
     values: {
-      unit: unit.pk ?? 0,
+      unit: unit?.pk ?? 0,
       nameFi: "",
       nameSv: "",
       nameEn: "",
