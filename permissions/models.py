@@ -275,6 +275,13 @@ class UnitPermissionChoices(models.TextChoices):
         _("Can comment reservations in the unit"),
     )
 
+    @classproperty
+    def handle_or_validate_applications(cls) -> list[str]:
+        return [
+            cls.CAN_HANDLE_APPLICATIONS,
+            cls.CAN_VALIDATE_APPLICATIONS,
+        ]
+
 
 class UnitRoleChoice(models.Model):
     code = models.CharField(verbose_name=_("Code"), max_length=50, primary_key=True)

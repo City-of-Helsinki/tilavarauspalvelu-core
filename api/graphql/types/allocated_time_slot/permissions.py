@@ -7,12 +7,11 @@ from api.graphql.extensions import error_codes
 from applications.models import AllocatedTimeSlot, ReservationUnitOption
 from common.typing import AnyUser
 from permissions.helpers import has_general_permission, has_unit_permission
+from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
 
 __all__ = [
     "AllocatedTimeSlotPermission",
 ]
-
-from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
 
 
 class AllocatedTimeSlotPermission(BasePermission):

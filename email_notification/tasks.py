@@ -8,6 +8,7 @@ from email_notification.exceptions import SendEmailNotificationError
 from email_notification.helpers.email_sender import EmailNotificationSender
 from email_notification.models import EmailType
 from permissions.helpers import has_unit_permission
+from permissions.models import UnitPermissionChoices
 from reservations.models import Reservation
 from spaces.models import Unit
 from tilavarauspalvelu.celery import app
@@ -68,7 +69,7 @@ def _get_reservation_staff_notification_recipients(
     users = User.objects.filter(unit_roles__isnull=False).exclude(reservation_notification="NONE")
     for user in users:
         # Skip users who don't have the correct unit role
-        if not has_unit_permission(user, "can_manage_reservations", units):
+        if not has_unit_permission(user, UnitPermissionChoices.CAN_MANAGE_RESERVATIONS, units):
             continue
 
         # Skip users who don't have the correct notification setting

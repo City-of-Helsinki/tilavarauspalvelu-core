@@ -19,10 +19,6 @@ __all__ = [
 
 class UserPermission(BasePermission):
     @classmethod
-    def has_permission(cls, user: AnyUser) -> bool:
-        return can_view_users(user)
-
-    @classmethod
     def has_node_permission(cls, instance: User, user: AnyUser, filters: dict[str, Any]) -> bool:
         if user.is_anonymous:
             return False

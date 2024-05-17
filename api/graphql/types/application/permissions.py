@@ -2,16 +2,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from django.db.models import Prefetch
 from graphene_django_extensions.permissions import BasePermission
 
-from applications.models import ReservationUnitOption
 from permissions.helpers import (
     can_modify_application,
     can_read_application,
     has_general_permission,
     has_unit_permission,
 )
+from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
 
 if TYPE_CHECKING:
     from applications.models import Application
@@ -39,17 +38,11 @@ class UpdateAllApplicationOptionsPermission(BasePermission):
             return False
         if user.is_superuser:
             return True
-        if has_general_permission(user, required_permission="can_handle_applications"):
+
+        if has_general_permission(user, GeneralPermissionChoices.CAN_HANDLE_APPLICATIONS):
             return True
 
-        units = [
-            unit_id
-            for section in instance.application_sections.all().prefetch_related(
-                Prefetch(
-                    "reservation_unit_options",
-                    ReservationUnitOption.objects.all().select_related("reservation_unit__unit"),
-                )
-            )
-            for unit_id in section.reservation_unit_options.all().values_list("reservation_unit__unit__id", flat=True)
-        ]
-        return all(has_unit_permission(user, "can_handle_applications", [unit]) for unit in units)
+        return all(
+            has_unit_permission(user, UnitPermissionChoices.CAN_HANDLE_APPLICATIONS, [unit_id])  #
+            for unit_id in instance.units.values_list("pk", flat=True)
+        )
