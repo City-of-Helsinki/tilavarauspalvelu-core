@@ -5,6 +5,7 @@ from graphene_django_extensions.permissions import BasePermission
 from applications.models import ApplicationRound
 from common.typing import AnyUser
 from permissions.helpers import has_general_permission, has_unit_permission
+from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
 from spaces.models import Unit
 
 
@@ -23,10 +24,10 @@ class ApplicationRoundPermission(BasePermission):
             return False
         if user.is_superuser:
             return True
-        if has_general_permission(user, "can_handle_applications"):
+        if has_general_permission(user, GeneralPermissionChoices.CAN_HANDLE_APPLICATIONS):
             return True
 
         units = (
             Unit.objects.filter(reservationunit__application_rounds=instance).distinct().values_list("pk", flat=True)
         )
-        return all(has_unit_permission(user, "can_handle_applications", [unit]) for unit in units)
+        return all(has_unit_permission(user, UnitPermissionChoices.CAN_HANDLE_APPLICATIONS, [unit]) for unit in units)

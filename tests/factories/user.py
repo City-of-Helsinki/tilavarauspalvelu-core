@@ -58,7 +58,7 @@ class UserFactory(GenericDjangoModelFactory[User]):
     @classmethod
     def create_staff_user(cls, **kwargs: Any) -> User:
         # User considered staff user if they have any role
-        return cls.create_with_general_permissions(perms=["can_manage_general_roles"], **kwargs)
+        return cls.create_with_general_permissions(perms=[GeneralPermissionChoices.CAN_MANAGE_GENERAL_ROLES], **kwargs)
 
     @classmethod
     def create_with_general_permissions(

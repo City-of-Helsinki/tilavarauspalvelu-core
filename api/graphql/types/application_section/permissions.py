@@ -7,6 +7,7 @@ from api.graphql.extensions import error_codes
 from applications.models import Application, ApplicationSection
 from common.typing import AnyUser
 from permissions.helpers import can_modify_application, has_general_permission, has_unit_permission
+from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
 
 __all__ = [
     "ApplicationSectionPermission",
@@ -49,8 +50,9 @@ class UpdateAllSectionOptionsPermission(BasePermission):
             return False
         if user.is_superuser:
             return True
-        if has_general_permission(user, required_permission="can_handle_applications"):
+
+        if has_general_permission(user, GeneralPermissionChoices.CAN_HANDLE_APPLICATIONS):
             return True
 
-        units = list(instance.reservation_unit_options.all().values_list("reservation_unit__unit__id", flat=True))
-        return all(has_unit_permission(user, "can_handle_applications", [unit]) for unit in units)
+        units = instance.reservation_unit_options.all().values_list("reservation_unit__unit__id", flat=True).distinct()
+        return all(has_unit_permission(user, UnitPermissionChoices.CAN_HANDLE_APPLICATIONS, [unit]) for unit in units)
