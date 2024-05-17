@@ -4,10 +4,11 @@ import { Button, Dialog, Notification } from "hds-react";
 import { useTranslation } from "react-i18next";
 import {
   type ReservationStaffCreateMutationInput,
-  type ReservationUnitNode,
+  type ReservationUnitQuery,
   ReservationStartInterval,
   ReservationTypeChoice,
   useCreateStaffReservationMutation,
+  useReservationUnitQuery,
 } from "@gql/gql-types";
 import styled from "styled-components";
 import { get } from "lodash";
@@ -26,11 +27,12 @@ import { dateTime, parseDateTimeSafe } from "@/helpers";
 import { useModal } from "@/context/ModalContext";
 import { useNotification } from "@/context/NotificationContext";
 import { flattenMetadata } from "./utils";
-import { useReservationUnitQuery } from "../hooks";
 import ReservationTypeForm from "../ReservationTypeForm";
 import ControlledTimeInput from "../components/ControlledTimeInput";
 import ControlledDateInput from "../components/ControlledDateInput";
-import { filterNonNullable } from "common/src/helpers";
+import { base64encode, filterNonNullable } from "common/src/helpers";
+
+type ReservationUnitType = NonNullable<ReservationUnitQuery["reservationUnit"]>;
 
 // NOTE HDS forces buttons over each other on mobile, we want them side-by-side
 const ActionButtons = styled(Dialog.ActionButtons)`
@@ -83,7 +85,7 @@ const useCheckFormCollisions = ({
   reservationUnit,
 }: {
   form: UseFormReturn<FormValueType>;
-  reservationUnit: ReservationUnitNode;
+  reservationUnit: ReservationUnitType;
 }) => {
   const { watch } = form;
 
@@ -126,7 +128,7 @@ const CollisionWarning = ({
   reservationUnit,
 }: {
   form: UseFormReturn<FormValueType>;
-  reservationUnit: ReservationUnitNode;
+  reservationUnit: ReservationUnitType;
 }) => {
   const { t } = useTranslation();
   const { hasCollisions } = useCheckFormCollisions({ form, reservationUnit });
@@ -149,7 +151,7 @@ const ActionContainer = ({
   onSubmit,
 }: {
   form: UseFormReturn<FormValueType>;
-  reservationUnit: ReservationUnitNode;
+  reservationUnit: ReservationUnitType;
   onCancel: () => void;
   onSubmit: (values: FormValueType) => void;
 }) => {
@@ -189,7 +191,7 @@ const DialogContent = ({
   start,
 }: {
   onClose: () => void;
-  reservationUnit: ReservationUnitNode;
+  reservationUnit: ReservationUnitType;
   start: Date;
 }) => {
   const { t, i18n } = useTranslation();
@@ -349,19 +351,25 @@ const DialogContent = ({
 };
 
 function CreateReservationModal({
-  reservationUnitId,
+  reservationUnitPk: pk,
   start,
   onClose,
 }: {
-  reservationUnitId: number;
+  reservationUnitPk: number;
   start: Date;
   onClose: () => void;
 }): JSX.Element {
   const { isOpen } = useModal();
   const { t } = useTranslation();
 
-  const { reservationUnit, loading } =
-    useReservationUnitQuery(reservationUnitId);
+  const isPkValid = pk > 0;
+  const id = base64encode(`ReservationUnitNode:${pk}`);
+  const { data, loading } = useReservationUnitQuery({
+    variables: { id },
+    skip: !isPkValid,
+  });
+
+  const { reservationUnit } = data ?? {};
 
   if (loading) {
     return <Loader />;

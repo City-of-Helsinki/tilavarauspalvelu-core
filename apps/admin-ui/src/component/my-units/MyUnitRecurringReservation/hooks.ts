@@ -2,7 +2,6 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import get from "lodash/get";
 import type {
-  ReservationUnitNode,
   RecurringReservationCreateMutationInput,
   ReservationStaffCreateMutationInput,
   Maybe,
@@ -40,13 +39,17 @@ import { flattenMetadata } from "../create-reservation/utils";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 
+type ReservationUnitBufferType = {
+  bufferTimeBefore?: number;
+  bufferTimeAfter?: number;
+};
 export const useMultipleReservation = ({
   form,
   reservationUnit,
   interval = ReservationStartInterval.Interval_15Mins,
 }: {
   form: UseFormReturn<RecurringReservationForm>;
-  reservationUnit?: Maybe<ReservationUnitNode>;
+  reservationUnit?: Maybe<ReservationUnitBufferType>;
   interval?: ReservationStartInterval;
 }) => {
   const { watch } = form;

@@ -223,7 +223,7 @@ const Cells = ({
       e.preventDefault();
       setModalContent(
         <CreateReservationModal
-          reservationUnitId={reservationUnitPk}
+          reservationUnitPk={reservationUnitPk}
           start={addMinutes(new Date(date), offset * 30)}
           onClose={() => {
             setModalContent(null);

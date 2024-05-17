@@ -110,7 +110,7 @@ export const RESERVATION_UNITS_BY_UNIT = gql`
 
 export const RESERVATION_UNIT_QUERY = gql`
   ${RESERVATION_UNIT_FRAGMENT}
-  query reservationUnits($id: ID!) {
+  query ReservationUnit($id: ID!) {
     reservationUnit(id: $id) {
       ...ReservationUnit
     }

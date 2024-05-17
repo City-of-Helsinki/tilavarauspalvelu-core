@@ -161,11 +161,12 @@ export function useDenyReasonOptions() {
     },
   });
   const { reservationDenyReasons } = data ?? {};
-  const denyReasonOptions = filterNonNullable(reservationDenyReasons?.edges.map((x) => x?.node))
-    .map((dr) => ({
-      value: dr?.pk ?? 0,
-      label: dr?.reasonFi ?? "",
-    }))
+  const denyReasonOptions = filterNonNullable(
+    reservationDenyReasons?.edges.map((x) => x?.node)
+  ).map((dr) => ({
+    value: dr?.pk ?? 0,
+    label: dr?.reasonFi ?? "",
+  }));
 
   return { options: denyReasonOptions, loading };
 }
@@ -178,11 +179,11 @@ export function useDenyReasonOptions() {
 export const useReservationEditData = (pk?: string) => {
   const typename = "ReservationNode";
   const id = base64encode(`${typename}:${pk}`);
-  const { data, loading, refetch } = useReservationQuery( {
-      skip: !pk,
-      fetchPolicy: "no-cache",
-      variables: { id },
-    });
+  const { data, loading, refetch } = useReservationQuery({
+    skip: !pk,
+    fetchPolicy: "no-cache",
+    variables: { id },
+  });
 
   const recurringPk = data?.reservation?.recurringReservation?.pk ?? undefined;
   const { reservations: recurringReservations } =
@@ -198,13 +199,14 @@ export const useReservationEditData = (pk?: string) => {
   const nextRecurranceId = base64encode(
     `${typename}:${possibleReservations?.at(0)?.pk}` ?? 0
   );
-  const { data: nextRecurrance, loading: nextReservationLoading } = useReservationQuery({
-    skip: !possibleReservations?.at(0)?.pk,
-    fetchPolicy: "no-cache",
-    variables: {
-      id: nextRecurranceId,
-    },
-  });
+  const { data: nextRecurrance, loading: nextReservationLoading } =
+    useReservationQuery({
+      skip: !possibleReservations?.at(0)?.pk,
+      fetchPolicy: "no-cache",
+      variables: {
+        id: nextRecurranceId,
+      },
+    });
 
   const reservation = recurringPk
     ? nextRecurrance?.reservation

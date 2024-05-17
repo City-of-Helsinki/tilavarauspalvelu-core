@@ -40,7 +40,7 @@ export type ReservationUnitWithMetadataType = {
   metadataSet?: ReservationMetadataSetNode | null;
   minPersons?: number | null;
   maxPersons?: number | null;
-}
+};
 type Field = string;
 type Props = CommonProps & {
   reservationUnit: ReservationUnitWithMetadataType;
@@ -214,7 +214,7 @@ export const ReservationMetaFields = ({
   noHeadingMarginal,
 }: {
   fields: string[];
-  reservationUnit: ReservationUnitWithMetadataType
+  reservationUnit: ReservationUnitWithMetadataType;
   options: Record<string, OptionType[]>;
   data?: {
     termsForDiscount?: JSX.Element | string;

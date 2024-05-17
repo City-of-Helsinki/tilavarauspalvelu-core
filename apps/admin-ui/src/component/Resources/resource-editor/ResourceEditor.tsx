@@ -35,13 +35,14 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
   const { t } = useTranslation();
   const { notifySuccess, notifyError } = useNotification();
 
-  const { data: unitData, loading: isUnitLoading } = useUnitWithSpacesAndResourcesQuery({
-    variables: { id: base64encode(`UnitNode:${unitPk}`) },
-    skip: !unitPk || Number.isNaN(unitPk),
-    onError: (e) => {
-      notifyError(t("errors.errorFetchingData", { error: e }));
-    },
-  });
+  const { data: unitData, loading: isUnitLoading } =
+    useUnitWithSpacesAndResourcesQuery({
+      variables: { id: base64encode(`UnitNode:${unitPk}`) },
+      skip: !unitPk || Number.isNaN(unitPk),
+      onError: (e) => {
+        notifyError(t("errors.errorFetchingData", { error: e }));
+      },
+    });
 
   const {
     data,

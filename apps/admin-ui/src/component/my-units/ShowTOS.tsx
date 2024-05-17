@@ -34,7 +34,7 @@ type ReservationUnitProps = {
   paymentTerms?: { textFi?: string | null } | null;
   pricingTerms?: { textFi?: string | null } | null;
   cancellationTerms?: { textFi?: string | null } | null;
-}
+};
 
 const ShowTOS = ({
   reservationUnit,

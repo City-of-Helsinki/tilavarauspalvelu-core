@@ -1,18 +1,15 @@
 import { useMemo } from "react";
 import { sortBy } from "lodash";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
-import { useQuery } from "@apollo/client";
 import {
-  type Query,
-  type QueryReservationUnitArgs,
   CustomerTypeChoice,
   ReservationTypeChoice,
   useReservationUnitsByUnitQuery,
+  useOptionsQuery,
 } from "@gql/gql-types";
 import { toApiDate } from "common/src/common/util";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { useNotification } from "@/context/NotificationContext";
-import { OPTIONS_QUERY, RESERVATION_UNIT_QUERY } from "./queries";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { containsField } from "common/src/metaFieldsHelpers";
 import { type ReservationUnitWithMetadataType } from "common/src/reservation-form/MetaFields";
@@ -53,7 +50,7 @@ export function useGeneralFields(
 }
 
 export const useOptions = () => {
-  const { data: optionsData } = useQuery<Query>(OPTIONS_QUERY);
+  const { data: optionsData } = useOptionsQuery();
 
   const purpose = sortBy(
     optionsData?.reservationPurposes?.edges || [],
@@ -80,23 +77,6 @@ export const useOptions = () => {
 
   return { ageGroup, purpose, homeCity };
 };
-
-// TODO this should be combined with the code in CreateReservationModal (duplicated for now)
-export function useReservationUnitQuery(pk?: number) {
-  const typename = "ReservationUnitNode";
-  const id = base64encode(`${typename}:${pk}`);
-  const { data, loading } = useQuery<Query, QueryReservationUnitArgs>(
-    RESERVATION_UNIT_QUERY,
-    {
-      variables: { id },
-      skip: pk == null || pk === 0,
-    }
-  );
-
-  const { reservationUnit } = data ?? {};
-
-  return { reservationUnit, loading };
-}
 
 export function useUnitResources(
   begin: Date,

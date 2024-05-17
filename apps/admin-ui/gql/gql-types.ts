@@ -7239,11 +7239,11 @@ export type ReservationUnitsByUnitQuery = {
   }> | null;
 };
 
-export type ReservationUnitsQueryVariables = Exact<{
+export type ReservationUnitQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
 
-export type ReservationUnitsQuery = {
+export type ReservationUnitQuery = {
   __typename?: "Query";
   reservationUnit?: {
     __typename?: "ReservationUnitNode";
@@ -12465,8 +12465,8 @@ export type ReservationUnitsByUnitQueryResult = Apollo.QueryResult<
   ReservationUnitsByUnitQuery,
   ReservationUnitsByUnitQueryVariables
 >;
-export const ReservationUnitsDocument = gql`
-  query reservationUnits($id: ID!) {
+export const ReservationUnitDocument = gql`
+  query ReservationUnit($id: ID!) {
     reservationUnit(id: $id) {
       ...ReservationUnit
     }
@@ -12475,73 +12475,73 @@ export const ReservationUnitsDocument = gql`
 `;
 
 /**
- * __useReservationUnitsQuery__
+ * __useReservationUnitQuery__
  *
- * To run a query within a React component, call `useReservationUnitsQuery` and pass it any options that fit your needs.
- * When your component renders, `useReservationUnitsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useReservationUnitQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationUnitQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useReservationUnitsQuery({
+ * const { data, loading, error } = useReservationUnitQuery({
  *   variables: {
  *      id: // value for 'id'
  *   },
  * });
  */
-export function useReservationUnitsQuery(
+export function useReservationUnitQuery(
   baseOptions: Apollo.QueryHookOptions<
-    ReservationUnitsQuery,
-    ReservationUnitsQueryVariables
+    ReservationUnitQuery,
+    ReservationUnitQueryVariables
   > &
     (
-      | { variables: ReservationUnitsQueryVariables; skip?: boolean }
+      | { variables: ReservationUnitQueryVariables; skip?: boolean }
       | { skip: boolean }
     )
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<ReservationUnitsQuery, ReservationUnitsQueryVariables>(
-    ReservationUnitsDocument,
+  return Apollo.useQuery<ReservationUnitQuery, ReservationUnitQueryVariables>(
+    ReservationUnitDocument,
     options
   );
 }
-export function useReservationUnitsLazyQuery(
+export function useReservationUnitLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    ReservationUnitsQuery,
-    ReservationUnitsQueryVariables
+    ReservationUnitQuery,
+    ReservationUnitQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
-    ReservationUnitsQuery,
-    ReservationUnitsQueryVariables
-  >(ReservationUnitsDocument, options);
+    ReservationUnitQuery,
+    ReservationUnitQueryVariables
+  >(ReservationUnitDocument, options);
 }
-export function useReservationUnitsSuspenseQuery(
+export function useReservationUnitSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<
-    ReservationUnitsQuery,
-    ReservationUnitsQueryVariables
+    ReservationUnitQuery,
+    ReservationUnitQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<
-    ReservationUnitsQuery,
-    ReservationUnitsQueryVariables
-  >(ReservationUnitsDocument, options);
+    ReservationUnitQuery,
+    ReservationUnitQueryVariables
+  >(ReservationUnitDocument, options);
 }
-export type ReservationUnitsQueryHookResult = ReturnType<
-  typeof useReservationUnitsQuery
+export type ReservationUnitQueryHookResult = ReturnType<
+  typeof useReservationUnitQuery
 >;
-export type ReservationUnitsLazyQueryHookResult = ReturnType<
-  typeof useReservationUnitsLazyQuery
+export type ReservationUnitLazyQueryHookResult = ReturnType<
+  typeof useReservationUnitLazyQuery
 >;
-export type ReservationUnitsSuspenseQueryHookResult = ReturnType<
-  typeof useReservationUnitsSuspenseQuery
+export type ReservationUnitSuspenseQueryHookResult = ReturnType<
+  typeof useReservationUnitSuspenseQuery
 >;
-export type ReservationUnitsQueryResult = Apollo.QueryResult<
-  ReservationUnitsQuery,
-  ReservationUnitsQueryVariables
+export type ReservationUnitQueryResult = Apollo.QueryResult<
+  ReservationUnitQuery,
+  ReservationUnitQueryVariables
 >;
 export const RecurringReservationUnitDocument = gql`
   query RecurringReservationUnit($id: ID!) {

@@ -17,7 +17,10 @@ import { HR } from "@/component/Table";
 
 // TODO use a fragment
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
-type ReservationUnitType = NonNullable<ReservationType["reservationUnit"]>[0];
+type ReservationUnitType = Omit<
+  NonNullable<ReservationType["reservationUnit"]>[0],
+  "pricings"
+>;
 
 const CommentsTextArea = styled(TextArea)`
   grid-column: 1 / -1;

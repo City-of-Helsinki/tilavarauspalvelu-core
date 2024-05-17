@@ -3,6 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ReservationStartInterval,
   ReservationTypeChoice,
+  useReservationUnitQuery,
 } from "@gql/gql-types";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -28,12 +29,11 @@ import {
   useFilteredReservationList,
   useMultipleReservation,
 } from "./hooks";
-import { useReservationUnitQuery } from "../hooks";
 import ReservationTypeForm from "../ReservationTypeForm";
 import ControlledTimeInput from "../components/ControlledTimeInput";
 import ReservationListButton from "../../ReservationListButton";
 import ControlledDateInput from "../components/ControlledDateInput";
-import { filterNonNullable } from "common/src/helpers";
+import { base64encode, filterNonNullable } from "common/src/helpers";
 
 const Label = styled.p<{ $bold?: boolean }>`
   font-family: var(--fontsize-body-m);
@@ -167,11 +167,13 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
 
   const selectedReservationUnit = watch("reservationUnit");
 
-  const unit = selectedReservationUnit?.value;
-
-  const { reservationUnit } = useReservationUnitQuery(
-    unit ? Number(unit) : undefined
-  );
+  const reservationUnitPk = selectedReservationUnit?.value;
+  const id = base64encode(`ReservationUnit:${reservationUnitPk}`);
+  const { data: queryData } = useReservationUnitQuery({
+    variables: { id },
+    skip: !(reservationUnitPk > 0),
+  });
+  const { reservationUnit } = queryData ?? {};
 
   // Reset removed when time change (infi loop if array is unwrapped)
   const [startTime, endTime] = watch(["startTime", "endTime"]);
