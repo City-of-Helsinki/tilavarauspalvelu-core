@@ -7,6 +7,7 @@ from applications.models import ApplicationRound
 from common.date_utils import local_datetime
 from common.typing import AnyUser
 from permissions.helpers import has_general_permission
+from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
 
 
 class ApplicationRoundFilterSet(ModelFilterSet):
@@ -39,20 +40,20 @@ class ApplicationRoundFilterSet(ModelFilterSet):
         if request_user.is_superuser:
             return queryset
 
-        required_permissions = ["can_validate_applications", "can_handle_applications"]
-
-        if any(has_general_permission(request_user, perm) for perm in required_permissions):
+        general_permissions = GeneralPermissionChoices.handle_or_validate_applications
+        if any(has_general_permission(request_user, perm) for perm in general_permissions):
             return queryset
 
+        unit_permissions = UnitPermissionChoices.handle_or_validate_applications
         units: list[int] = [
             unit_id
             for unit_id, unit_perms in request_user.unit_permissions.items()
-            if any(perm in required_permissions for perm in unit_perms)
+            if any(perm in unit_permissions for perm in unit_perms)
         ]
         unit_groups: list[int] = [
             unit_group_id
             for unit_group_id, unit_group_perms in request_user.unit_group_permissions.items()
-            if any(perm in required_permissions for perm in unit_group_perms)
+            if any(perm in unit_permissions for perm in unit_group_perms)
         ]
 
         return queryset.filter(

@@ -8,7 +8,8 @@ from query_optimizer.typing import GraphQLFilterInfo
 from api.graphql.extensions import error_codes
 from common.typing import AnyUser
 from merchants.models import PaymentOrder
-from permissions.helpers import can_handle_reservation, can_refresh_order
+from permissions.helpers import can_handle_reservation, has_general_permission
+from permissions.models import GeneralPermissionChoices
 
 __all__ = [
     "OrderRefreshPermission",
@@ -25,7 +26,17 @@ class OrderRefreshPermission(BasePermission):
             raise GQLCodeError(msg, code=error_codes.REQUIRED_FIELD_MISSING)
 
         payment_order = PaymentOrder.objects.filter(remote_id=remote_id).first()
-        return can_refresh_order(user, payment_order)
+        if payment_order is None:
+            msg = f"Payment order with remote_id '{remote_id}' not found."
+            raise GQLCodeError(msg, code=error_codes.REQUIRED_FIELD_MISSING)
+
+        if user.is_anonymous:
+            return False
+        if user.is_superuser:
+            return True
+        if has_general_permission(user, GeneralPermissionChoices.CAN_MANAGE_RESERVATIONS):
+            return True
+        return user.uuid == payment_order.reservation_user_uuid
 
 
 class PaymentOrderPermission(BasePermission):
