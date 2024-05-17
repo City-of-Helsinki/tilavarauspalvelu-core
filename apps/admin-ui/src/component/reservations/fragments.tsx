@@ -46,6 +46,7 @@ export const RESERVATION_UNIT_PRICING_FRAGMENT = gql`
 export const RESERVATION_UNIT_FRAGMENT = gql`
   ${UNIT_NAME_FRAGMENT}
   fragment ReservationUnit on ReservationUnitNode {
+    id
     pk
     nameFi
     maxPersons
@@ -57,15 +58,19 @@ export const RESERVATION_UNIT_FRAGMENT = gql`
       ...UnitNameFields
     }
     metadataSet {
+      id
       name
       supportedFields {
+        id
         fieldName
       }
       requiredFields {
+        id
         fieldName
       }
     }
     cancellationTerms {
+      id
       textFi
       nameFi
     }

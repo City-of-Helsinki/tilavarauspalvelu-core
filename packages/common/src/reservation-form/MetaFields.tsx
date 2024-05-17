@@ -17,7 +17,6 @@ import { camelCase } from "lodash";
 import {
   type ReservationMetadataSetNode,
   CustomerTypeChoice,
-  type ReservationUnitNode,
 } from "../../gql/gql-types";
 import ReservationFormField from "./ReservationFormField";
 import { Inputs, Reservation } from "./types";
@@ -36,9 +35,15 @@ type CommonProps = {
   };
 };
 
+// TODO use a fragment
+export type ReservationUnitWithMetadataType = {
+  metadataSet?: ReservationMetadataSetNode | null;
+  minPersons?: number | null;
+  maxPersons?: number | null;
+}
 type Field = string;
 type Props = CommonProps & {
-  reservationUnit: ReservationUnitNode;
+  reservationUnit: ReservationUnitWithMetadataType;
   generalFields: Field[];
   reservationApplicationFields: Field[];
 };
@@ -209,7 +214,7 @@ export const ReservationMetaFields = ({
   noHeadingMarginal,
 }: {
   fields: string[];
-  reservationUnit: ReservationUnitNode;
+  reservationUnit: ReservationUnitWithMetadataType
   options: Record<string, OptionType[]>;
   data?: {
     termsForDiscount?: JSX.Element | string;
@@ -294,7 +299,7 @@ export const ReserverMetaFields = ({
 }: {
   // TODO should not be arbitary strings
   fields: string[];
-  reservationUnit: ReservationUnitNode;
+  reservationUnit: ReservationUnitWithMetadataType;
   options: Record<string, OptionType[]>;
   data?: {
     termsForDiscount?: JSX.Element | string;

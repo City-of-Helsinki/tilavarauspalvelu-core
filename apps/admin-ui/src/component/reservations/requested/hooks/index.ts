@@ -1,12 +1,11 @@
-import { useState } from "react";
 import {
   type Query,
   type ReservationNode,
   State,
-  type QueryReservationDenyReasonsArgs,
-  type QueryReservationArgs,
   type QueryRecurringReservationArgs,
   ReservationTypeChoice,
+  useReservationQuery,
+  useReservationDenyReasonsQuery,
 } from "@gql/gql-types";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@apollo/client";
@@ -14,11 +13,8 @@ import { toApiDate } from "common/src/common/util";
 import {
   RECURRING_RESERVATION_QUERY,
   RESERVATIONS_BY_RESERVATIONUNITS,
-  SINGLE_RESERVATION_QUERY,
 } from "./queries";
 import { useNotification } from "@/context/NotificationContext";
-import { RESERVATION_DENY_REASONS } from "../queries";
-import { OptionType } from "@/common/types";
 import {
   base64encode,
   concatAffectedReservations,
@@ -155,37 +151,24 @@ export function useRecurringReservations(recurringPk?: number) {
 // TODO this has the same useState being local problems as useRecurringReservations
 // used to have but it's not obvious because we don't mutate / refetch this.
 // Cache it in Apollo InMemory cache instead.
-export const useDenyReasonOptions = () => {
-  const [denyReasonOptions, setDenyReasonOptions] = useState<OptionType[]>([]);
+export function useDenyReasonOptions() {
   const { notifyError } = useNotification();
   const { t } = useTranslation();
 
-  const { loading } = useQuery<Query, QueryReservationDenyReasonsArgs>(
-    RESERVATION_DENY_REASONS,
-    {
-      // TODO remove state
-      onCompleted: ({ reservationDenyReasons }) => {
-        if (reservationDenyReasons) {
-          setDenyReasonOptions(
-            filterNonNullable(
-              reservationDenyReasons.edges.map((x) => x?.node)
-            ).map(
-              (dr): OptionType => ({
-                value: dr?.pk ?? 0,
-                label: dr?.reasonFi ?? "",
-              })
-            )
-          );
-        }
-      },
-      onError: () => {
-        notifyError(t("errors.errorFetchingData"));
-      },
-    }
-  );
+  const { data, loading } = useReservationDenyReasonsQuery({
+    onError: () => {
+      notifyError(t("errors.errorFetchingData"));
+    },
+  });
+  const { reservationDenyReasons } = data ?? {};
+  const denyReasonOptions = filterNonNullable(reservationDenyReasons?.edges.map((x) => x?.node))
+    .map((dr) => ({
+      value: dr?.pk ?? 0,
+      label: dr?.reasonFi ?? "",
+    }))
 
   return { options: denyReasonOptions, loading };
-};
+}
 
 /// @param id fetch reservation related to this pk
 /// Overly complex because editing DENIED or past reservations is not allowed
@@ -195,14 +178,11 @@ export const useDenyReasonOptions = () => {
 export const useReservationEditData = (pk?: string) => {
   const typename = "ReservationNode";
   const id = base64encode(`${typename}:${pk}`);
-  const { data, loading, refetch } = useQuery<Query, QueryReservationArgs>(
-    SINGLE_RESERVATION_QUERY,
-    {
+  const { data, loading, refetch } = useReservationQuery( {
       skip: !pk,
       fetchPolicy: "no-cache",
       variables: { id },
-    }
-  );
+    });
 
   const recurringPk = data?.reservation?.recurringReservation?.pk ?? undefined;
   const { reservations: recurringReservations } =
@@ -218,10 +198,7 @@ export const useReservationEditData = (pk?: string) => {
   const nextRecurranceId = base64encode(
     `${typename}:${possibleReservations?.at(0)?.pk}` ?? 0
   );
-  const { data: nextRecurrance, loading: nextReservationLoading } = useQuery<
-    Query,
-    QueryReservationArgs
-  >(SINGLE_RESERVATION_QUERY, {
+  const { data: nextRecurrance, loading: nextReservationLoading } = useReservationQuery({
     skip: !possibleReservations?.at(0)?.pk,
     fetchPolicy: "no-cache",
     variables: {

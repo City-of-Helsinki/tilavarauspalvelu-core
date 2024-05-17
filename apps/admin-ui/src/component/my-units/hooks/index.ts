@@ -4,7 +4,6 @@ import { getReservationApplicationFields } from "common/src/reservation-form/uti
 import { useQuery } from "@apollo/client";
 import {
   type Query,
-  type ReservationUnitNode,
   type QueryReservationUnitArgs,
   CustomerTypeChoice,
   ReservationTypeChoice,
@@ -16,9 +15,10 @@ import { useNotification } from "@/context/NotificationContext";
 import { OPTIONS_QUERY, RESERVATION_UNIT_QUERY } from "./queries";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { containsField } from "common/src/metaFieldsHelpers";
+import { type ReservationUnitWithMetadataType } from "common/src/reservation-form/MetaFields";
 
 export const useApplicationFields = (
-  reservationUnit: ReservationUnitNode,
+  reservationUnit: ReservationUnitWithMetadataType,
   reserveeType?: CustomerTypeChoice
 ) => {
   return useMemo(() => {
@@ -38,7 +38,9 @@ export const useApplicationFields = (
   }, [reservationUnit.metadataSet?.supportedFields, reserveeType]);
 };
 
-export const useGeneralFields = (reservationUnit: ReservationUnitNode) => {
+export function useGeneralFields(
+  reservationUnit: ReservationUnitWithMetadataType
+) {
   return useMemo(() => {
     const fields = filterNonNullable(
       reservationUnit.metadataSet?.supportedFields
@@ -48,7 +50,7 @@ export const useGeneralFields = (reservationUnit: ReservationUnitNode) => {
       reserveeType: "common",
     }).filter((n) => n !== "reserveeType");
   }, [reservationUnit.metadataSet?.supportedFields]);
-};
+}
 
 export const useOptions = () => {
   const { data: optionsData } = useQuery<Query>(OPTIONS_QUERY);

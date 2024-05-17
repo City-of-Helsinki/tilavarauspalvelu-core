@@ -1,7 +1,6 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { type ReservationUnitNode } from "@gql/gql-types";
 import { useGenericTerms } from "common/src/hooks/useGenericTerms";
 
 // NOTE This is partial duplicate from ui/application/Preview.tsx
@@ -29,10 +28,18 @@ const TOSElement = ({ title, text }: { title: string; text: string }) => (
   </Terms>
 );
 
+// TODO use a fragment
+type ReservationUnitProps = {
+  serviceSpecificTerms?: { textFi?: string | null } | null;
+  paymentTerms?: { textFi?: string | null } | null;
+  pricingTerms?: { textFi?: string | null } | null;
+  cancellationTerms?: { textFi?: string | null } | null;
+}
+
 const ShowTOS = ({
   reservationUnit,
 }: {
-  reservationUnit: ReservationUnitNode;
+  reservationUnit: ReservationUnitProps;
 }) => {
   const { t } = useTranslation();
 

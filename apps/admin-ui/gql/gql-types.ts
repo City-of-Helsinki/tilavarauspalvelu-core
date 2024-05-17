@@ -6531,6 +6531,7 @@ export type UnitQuery = {
   __typename?: "Query";
   unit?: {
     __typename?: "UnitNode";
+    id: string;
     pk?: number | null;
     nameFi?: string | null;
     tprekId?: string | null;
@@ -6620,6 +6621,7 @@ export type UnitWithSpacesAndResourcesQuery = {
   __typename?: "Query";
   unit?: {
     __typename?: "UnitNode";
+    id: string;
     pk?: number | null;
     nameFi?: string | null;
     spaces: Array<{
@@ -7245,6 +7247,7 @@ export type ReservationUnitsQuery = {
   __typename?: "Query";
   reservationUnit?: {
     __typename?: "ReservationUnitNode";
+    id: string;
     pk?: number | null;
     nameFi?: string | null;
     maxPersons?: number | null;
@@ -7267,18 +7270,22 @@ export type ReservationUnitsQuery = {
     } | null;
     metadataSet?: {
       __typename?: "ReservationMetadataSetNode";
+      id: string;
       name: string;
       supportedFields: Array<{
         __typename?: "ReservationMetadataFieldNode";
+        id: string;
         fieldName: string;
       }>;
       requiredFields: Array<{
         __typename?: "ReservationMetadataFieldNode";
+        id: string;
         fieldName: string;
       }>;
     } | null;
     cancellationTerms?: {
       __typename?: "TermsOfUseNode";
+      id: string;
       textFi?: string | null;
       nameFi?: string | null;
     } | null;
@@ -7620,6 +7627,7 @@ export type ReservationUnitPricingFragment = {
 
 export type ReservationUnitFragment = {
   __typename?: "ReservationUnitNode";
+  id: string;
   pk?: number | null;
   nameFi?: string | null;
   maxPersons?: number | null;
@@ -7642,18 +7650,22 @@ export type ReservationUnitFragment = {
   } | null;
   metadataSet?: {
     __typename?: "ReservationMetadataSetNode";
+    id: string;
     name: string;
     supportedFields: Array<{
       __typename?: "ReservationMetadataFieldNode";
+      id: string;
       fieldName: string;
     }>;
     requiredFields: Array<{
       __typename?: "ReservationMetadataFieldNode";
+      id: string;
       fieldName: string;
     }>;
   } | null;
   cancellationTerms?: {
     __typename?: "TermsOfUseNode";
+    id: string;
     textFi?: string | null;
     nameFi?: string | null;
   } | null;
@@ -8026,6 +8038,7 @@ export type ReservationQuery = {
     billingAddressZip?: string | null;
     reservationUnit?: Array<{
       __typename?: "ReservationUnitNode";
+      id: string;
       pk?: number | null;
       nameFi?: string | null;
       maxPersons?: number | null;
@@ -8048,18 +8061,22 @@ export type ReservationQuery = {
       } | null;
       metadataSet?: {
         __typename?: "ReservationMetadataSetNode";
+        id: string;
         name: string;
         supportedFields: Array<{
           __typename?: "ReservationMetadataFieldNode";
+          id: string;
           fieldName: string;
         }>;
         requiredFields: Array<{
           __typename?: "ReservationMetadataFieldNode";
+          id: string;
           fieldName: string;
         }>;
       } | null;
       cancellationTerms?: {
         __typename?: "TermsOfUseNode";
+        id: string;
         textFi?: string | null;
         nameFi?: string | null;
       } | null;
@@ -8228,6 +8245,7 @@ export type ReservationDenyReasonsQuery = {
       __typename?: "ReservationDenyReasonNodeEdge";
       node?: {
         __typename?: "ReservationDenyReasonNode";
+        id: string;
         pk?: number | null;
         reasonFi?: string | null;
       } | null;
@@ -8313,6 +8331,7 @@ export type ReservationUnitEditQuery = {
   __typename?: "Query";
   reservationUnit?: {
     __typename?: "ReservationUnitNode";
+    id: string;
     pk?: number | null;
     state?: ReservationUnitState | null;
     reservationState?: ReservationState | null;
@@ -9903,6 +9922,7 @@ export const UnitNameFieldsFragmentDoc = gql`
 `;
 export const ReservationUnitFragmentDoc = gql`
   fragment ReservationUnit on ReservationUnitNode {
+    id
     pk
     nameFi
     maxPersons
@@ -9914,15 +9934,19 @@ export const ReservationUnitFragmentDoc = gql`
       ...UnitNameFields
     }
     metadataSet {
+      id
       name
       supportedFields {
+        id
         fieldName
       }
       requiredFields {
+        id
         fieldName
       }
     }
     cancellationTerms {
+      id
       textFi
       nameFi
     }
@@ -10690,6 +10714,7 @@ export type DeleteSpaceMutationOptions = Apollo.BaseMutationOptions<
 export const UnitDocument = gql`
   query Unit($id: ID!) {
     unit(id: $id) {
+      id
       pk
       nameFi
       tprekId
@@ -10775,6 +10800,7 @@ export type UnitQueryResult = Apollo.QueryResult<UnitQuery, UnitQueryVariables>;
 export const UnitWithSpacesAndResourcesDocument = gql`
   query UnitWithSpacesAndResources($id: ID!) {
     unit(id: $id) {
+      id
       pk
       nameFi
       spaces {
@@ -13881,10 +13907,11 @@ export type RequireHandlingMutationOptions = Apollo.BaseMutationOptions<
   RequireHandlingMutationVariables
 >;
 export const ReservationDenyReasonsDocument = gql`
-  query reservationDenyReasons {
+  query ReservationDenyReasons {
     reservationDenyReasons {
       edges {
         node {
+          id
           pk
           reasonFi
         }
@@ -14077,6 +14104,7 @@ export type CurrentUserQueryResult = Apollo.QueryResult<
 export const ReservationUnitEditDocument = gql`
   query ReservationUnitEdit($id: ID!) {
     reservationUnit(id: $id) {
+      id
       pk
       state
       reservationState

@@ -1,20 +1,17 @@
 import React, { useEffect } from "react";
 import { Button } from "hds-react";
-import { useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  type Query,
   type ResourceUpdateMutationInput,
-  type QueryUnitArgs,
   LocationType,
   useUpdateResourceMutation,
   useResourceQuery,
+  useUnitWithSpacesAndResourcesQuery,
 } from "@gql/gql-types";
 import { base64encode } from "common/src/helpers";
-import { UNIT_WITH_SPACES_AND_RESOURCES } from "@/common/queries";
 import Loader from "@/component/Loader";
 import { ButtonContainer, Container, IngressContainer } from "@/styles/layout";
 import { SubPageHead } from "@/component/Unit/SubPageHead";
@@ -38,10 +35,7 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
   const { t } = useTranslation();
   const { notifySuccess, notifyError } = useNotification();
 
-  const { data: unitData, loading: isUnitLoading } = useQuery<
-    Query,
-    QueryUnitArgs
-  >(UNIT_WITH_SPACES_AND_RESOURCES, {
+  const { data: unitData, loading: isUnitLoading } = useUnitWithSpacesAndResourcesQuery({
     variables: { id: base64encode(`UnitNode:${unitPk}`) },
     skip: !unitPk || Number.isNaN(unitPk),
     onError: (e) => {

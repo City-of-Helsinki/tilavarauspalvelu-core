@@ -1,15 +1,15 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import type { Reservation } from "common/src/reservation-form/types";
-import type { ReservationUnitNode } from "@gql/gql-types";
 import {
   ReserverMetaFields,
   ReservationMetaFields,
+  type ReservationUnitWithMetadataType,
 } from "common/src/reservation-form/MetaFields";
 import { useApplicationFields, useGeneralFields, useOptions } from "./hooks";
 
 type Props = {
-  reservationUnit: ReservationUnitNode;
+  reservationUnit: ReservationUnitWithMetadataType;
 };
 
 export const ReservationMetadataSetForm = ({

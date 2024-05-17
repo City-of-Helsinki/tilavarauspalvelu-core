@@ -1,7 +1,7 @@
 import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { Notification, RadioButton, SelectionGroup, TextArea } from "hds-react";
-import { Authentication, type ReservationUnitNode } from "@gql/gql-types";
+import { Authentication, type ReservationQuery } from "@gql/gql-types";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { type ReservationFormType, ReservationTypes } from "@/schemas";
@@ -14,6 +14,10 @@ import { BufferToggles } from "./BufferToggles";
 import { Element } from "./MyUnitRecurringReservation/commonStyling";
 import ShowTOS from "./ShowTOS";
 import { HR } from "@/component/Table";
+
+// TODO use a fragment
+type ReservationType = NonNullable<ReservationQuery["reservation"]>;
+type ReservationUnitType = NonNullable<ReservationType["reservationUnit"]>[0];
 
 const CommentsTextArea = styled(TextArea)`
   grid-column: 1 / -1;
@@ -29,7 +33,7 @@ const StyledShowAllContainer = styled(ShowAllContainer)`
 const TypeSelect = ({
   reservationUnit,
 }: {
-  reservationUnit: ReservationUnitNode;
+  reservationUnit: ReservationUnitType;
 }) => {
   const {
     watch,
@@ -81,7 +85,7 @@ const ReservationTypeForm = ({
   children,
   disableBufferToggle,
 }: {
-  reservationUnit: ReservationUnitNode;
+  reservationUnit: ReservationUnitType;
   children?: React.ReactNode;
   disableBufferToggle?: boolean;
 }) => {

@@ -3,7 +3,7 @@ import { useNotification } from "app/context/NotificationContext";
 import {
   State,
   type ReservationStaffModifyMutationInput,
-  type ReservationNode,
+  type ReservationQuery,
   useUpdateRecurringReservationMutation,
   useUpdateStaffReservationMutation,
 } from "@gql/gql-types";
@@ -13,13 +13,14 @@ export type MutationInputParams = ReservationStaffModifyMutationInput & {
   seriesName?: string;
   workingMemo?: string;
 };
+type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 
 /// Combines regular and recurring reservation change mutation
 export function useStaffReservationMutation({
   reservation,
   onSuccess,
 }: {
-  reservation: ReservationNode;
+  reservation: ReservationType;
   onSuccess: () => void;
 }) {
   const { t } = useTranslation();

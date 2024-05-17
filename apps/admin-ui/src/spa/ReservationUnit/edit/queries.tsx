@@ -6,6 +6,7 @@ export const RESERVATIONUNIT_QUERY = gql`
   ${PRICING_FRAGMENT}
   query ReservationUnitEdit($id: ID!) {
     reservationUnit(id: $id) {
+      id
       pk
       state
       reservationState

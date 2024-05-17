@@ -36,10 +36,11 @@ export const REQUIRE_HANDLING_RESERVATION = gql`
 `;
 
 export const RESERVATION_DENY_REASONS = gql`
-  query reservationDenyReasons {
+  query ReservationDenyReasons {
     reservationDenyReasons {
       edges {
         node {
+          id
           pk
           reasonFi
         }

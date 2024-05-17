@@ -56,6 +56,7 @@ export const UNIT_QUERY = gql`
   ${LOCATION_FRAGMENT}
   query Unit($id: ID!) {
     unit(id: $id) {
+      id
       pk
       nameFi
       tprekId
@@ -92,6 +93,7 @@ export const UNIT_WITH_SPACES_AND_RESOURCES = gql`
   ${LOCATION_FRAGMENT}
   query UnitWithSpacesAndResources($id: ID!) {
     unit(id: $id) {
+      id
       pk
       nameFi
       spaces {

@@ -3,12 +3,14 @@ import React from "react";
 import { H1, fontMedium } from "common/src/common/typography";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { type UnitQuery } from "@gql/gql-types";
+import { type UnitWithSpacesAndResourcesQuery } from "@gql/gql-types";
 import { parseAddress } from "../../common/util";
 
+// TODO should use a fragment that is shared by both UnitQuery and UnitWithSpacesAndResourcesQuery
+type UnitType = NonNullable<UnitWithSpacesAndResourcesQuery["unit"]>;
 interface IProps {
   title: string;
-  unit: UnitQuery["unit"];
+  unit: UnitType;
 }
 
 const Wrapper = styled.div`

@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { ReservationNode, ReservationUnitNode } from "@gql/gql-types";
+import type { ReservationQuery } from "@gql/gql-types";
 import { Button, TextInput } from "hds-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
@@ -24,6 +24,8 @@ import { useReservationEditData } from "./requested/hooks";
 import { useStaffReservationMutation } from "./hooks";
 import { filterNonNullable } from "common/src/helpers";
 
+type ReservationType = NonNullable<ReservationQuery["reservation"]>;
+type ReservationUnitType = NonNullable<ReservationType["reservationUnit"]>[0];
 type FormValueType = ReservationChangeFormType & ReservationFormMeta;
 
 type PossibleOptions = {
@@ -39,7 +41,7 @@ const ButtonContainer = styled.div`
   border-top-width: 2px;
 `;
 
-const noSeparateBillingDefined = (reservation: ReservationNode): boolean =>
+const noSeparateBillingDefined = (reservation: ReservationType): boolean =>
   !reservation.billingAddressCity &&
   !reservation.billingAddressStreet &&
   !reservation.billingAddressZip &&
@@ -67,8 +69,8 @@ function EditReservation({
   onSuccess,
 }: {
   onCancel: () => void;
-  reservation: ReservationNode;
-  reservationUnit: ReservationUnitNode;
+  reservation: ReservationType;
+  reservationUnit: ReservationUnitType;
   options: PossibleOptions;
   onSuccess: () => void;
 }) {
