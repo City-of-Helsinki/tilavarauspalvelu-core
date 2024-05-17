@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
-const APPLICATION_ROUND_ADMIN_FRAGMENT = gql`
-  fragment ApplicationRoundAdminFragment on ApplicationRoundNode {
+const APPLICATION_ROUND_BASE_FRAGMENT = gql`
+  fragment ApplicationRoundBase on ApplicationRoundNode {
     pk
     nameFi
     status
@@ -11,12 +11,12 @@ const APPLICATION_ROUND_ADMIN_FRAGMENT = gql`
 `;
 
 export const APPLICATION_ROUNDS_QUERY = gql`
-  ${APPLICATION_ROUND_ADMIN_FRAGMENT}
+  ${APPLICATION_ROUND_BASE_FRAGMENT}
   query ApplicationRounds {
     applicationRounds {
       edges {
         node {
-          ...ApplicationRoundAdminFragment
+          ...ApplicationRoundBase
           reservationPeriodBegin
           reservationPeriodEnd
           applicationsCount
@@ -28,20 +28,28 @@ export const APPLICATION_ROUNDS_QUERY = gql`
   }
 `;
 
+const APPLICATION_ROUND_ADMIN_FRAGMENT = gql`
+  ${APPLICATION_ROUND_BASE_FRAGMENT}
+  fragment ApplicationRoundAdminFragment on ApplicationRoundNode {
+    id
+    ...ApplicationRoundBase
+    applicationsCount
+    reservationUnits {
+      pk
+      nameFi
+      unit {
+        pk
+        nameFi
+      }
+    }
+  }
+`;
+
 export const APPLICATION_ROUND_QUERY = gql`
   ${APPLICATION_ROUND_ADMIN_FRAGMENT}
   query ApplicationRound($id: ID!) {
     applicationRound(id: $id) {
       ...ApplicationRoundAdminFragment
-      applicationsCount
-      reservationUnits {
-        pk
-        nameFi
-        unit {
-          pk
-          nameFi
-        }
-      }
     }
   }
 `;

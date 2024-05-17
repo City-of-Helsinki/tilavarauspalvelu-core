@@ -87,7 +87,7 @@ export const SINGLE_RESERVATION_QUERY = gql`
   ${RESERVATION_COMMON_FRAGMENT}
   ${RESERVATION_RECURRING_FRAGMENT}
   ${SPECIALISED_SINGLE_RESERVATION_FRAGMENT}
-  query reservation($id: ID!) {
+  query Reservation($id: ID!) {
     reservation(id: $id) {
       ...ReservationCommon
       ...ReservationRecurring

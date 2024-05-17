@@ -1,14 +1,13 @@
 import { useMemo } from "react";
-import { useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import get from "lodash/get";
 import type {
-  Query,
   ReservationUnitNode,
   RecurringReservationCreateMutationInput,
   ReservationStaffCreateMutationInput,
   Maybe,
   ReservationMetadataFieldNode,
+  ReservationsInIntervalFragment,
 } from "@gql/gql-types";
 import {
   ReservationTypeChoice,
@@ -16,6 +15,7 @@ import {
   useCreateStaffReservationMutation,
   useCreateRecurringReservationMutation,
   useRecurringReservationUnitQuery,
+  useReservationTimesInReservationUnitQuery,
 } from "@gql/gql-types";
 import type { UseFormReturn } from "react-hook-form";
 import type { RecurringReservationForm } from "app/schemas";
@@ -33,18 +33,12 @@ import {
 } from "@/helpers";
 import { generateReservations } from "./generateReservations";
 import { useNotification } from "@/context/NotificationContext";
-import { GET_RESERVATIONS_IN_INTERVAL } from "./queries";
 import { NewReservationListItem } from "../../ReservationsList";
 import { convertToDate } from "./utils";
 import { ReservationMade } from "./RecurringReservationDone";
 import { flattenMetadata } from "../create-reservation/utils";
-import {
-  base64encode,
-  concatAffectedReservations,
-  filterNonNullable,
-} from "common/src/helpers";
+import { base64encode, filterNonNullable } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
-import { ReservationUnitWithAffectingArgs } from "common/src/queries/fragments";
 
 export const useMultipleReservation = ({
   form,
@@ -128,10 +122,7 @@ const useReservationsInInterval = ({
   const id = base64encode(`${typename}:${reservationUnitPk}`);
   // NOTE unlike array fetches this fetches a single element with an included array
   // so it doesn't have the 100 limitation of array fetch nor does it have pagination
-  const { loading, data, refetch } = useQuery<
-    Query,
-    ReservationUnitWithAffectingArgs
-  >(GET_RESERVATIONS_IN_INTERVAL, {
+  const { loading, data, refetch } = useReservationTimesInReservationUnitQuery({
     skip:
       !reservationUnitPk ||
       Number.isNaN(reservationUnitPk) ||
@@ -149,15 +140,23 @@ const useReservationsInInterval = ({
       notifyError(err.message);
     },
   });
+  function doesReservationAffectReservationUnit(
+    reservation: ReservationsInIntervalFragment,
+    resUnitPk: number
+  ) {
+    return reservation.affectedReservationUnits?.some((pk) => pk === resUnitPk);
+  }
 
   const reservationSet = filterNonNullable(
     data?.reservationUnit?.reservationSet
   );
   const affectingReservations = filterNonNullable(data?.affectingReservations);
-  const reservations = concatAffectedReservations(
-    reservationSet,
-    affectingReservations,
-    reservationUnitPk ?? 0
+  const reservations = filterNonNullable(
+    reservationSet?.concat(
+      affectingReservations?.filter((y) =>
+        doesReservationAffectReservationUnit(y, reservationUnitPk ?? 0)
+      ) ?? []
+    )
   )
     .map((x) => reservationToInterval(x, reservationType))
     .filter((x): x is CollisionInterval => x != null);

@@ -15,9 +15,7 @@ import { ReservationUnitCalendarView } from "./ReservationUnitCalendarView";
 import UnitReservationsView from "./UnitReservationsView";
 import { TabHeader, Tabs } from "../Tabs";
 import { useNotification } from "@/context/NotificationContext";
-import { useQuery } from "@apollo/client";
-import type { Query, QueryUnitArgs } from "@gql/gql-types";
-import { UNIT_VIEW_QUERY } from "./hooks/queries";
+import { useUnitViewQuery } from "@gql/gql-types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 
 type Params = {
@@ -72,9 +70,9 @@ function MyUnitView() {
 
   const { notifyError } = useNotification();
 
-  const isPkValid = pk != null && !Number.isNaN(Number(pk));
+  const isPkValid = pk != null && Number(pk) > 0;
   const id = base64encode(`UnitNode:${pk}`);
-  const { loading, data } = useQuery<Query, QueryUnitArgs>(UNIT_VIEW_QUERY, {
+  const { loading, data } = useUnitViewQuery({
     skip: !isPkValid,
     variables: { id },
     onError: (err) => {

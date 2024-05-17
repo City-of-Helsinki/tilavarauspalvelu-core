@@ -3,21 +3,21 @@ import { useTranslation } from "react-i18next";
 import { Button, Dialog, IconInfoCircle } from "hds-react";
 import {
   type ReservationRequiresHandlingMutationInput,
-  type ReservationNode,
+  type ReservationQuery,
   useRequireHandlingMutation,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
 import { useNotification } from "@/context/NotificationContext";
 
-const DialogContent = ({
-  reservation,
-  onClose,
-  onAccept,
-}: {
-  reservation: ReservationNode;
+// TODO use a fragment
+type ReservationType = NonNullable<ReservationQuery["reservation"]>;
+type Props = {
+  reservation: ReservationType;
   onClose: () => void;
   onAccept: () => void;
-}) => {
+};
+
+const DialogContent = ({ reservation, onClose, onAccept }: Props) => {
   const { notifyError, notifySuccess } = useNotification();
   const { t, i18n } = useTranslation();
 
@@ -76,12 +76,7 @@ const ReturnToRequiredHandlingDialog = ({
   reservation,
   onClose,
   onAccept,
-}: {
-  reservation: ReservationNode;
-
-  onClose: () => void;
-  onAccept: () => void;
-}): JSX.Element => {
+}: Props): JSX.Element => {
   const { isOpen } = useModal();
   const { t } = useTranslation();
 

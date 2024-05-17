@@ -1,5 +1,5 @@
 import React from "react";
-import { type ReservationNode, State } from "@gql/gql-types";
+import { State, type ReservationQuery } from "@gql/gql-types";
 import { useTranslation } from "react-i18next";
 import { Button } from "hds-react";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
@@ -14,6 +14,16 @@ import {
   isPossibleToReturn,
 } from "./reservationModificationRules";
 
+type ReservationType = NonNullable<ReservationQuery["reservation"]>;
+type Props = {
+  reservation: ReservationType;
+  state: State;
+  isFree: boolean;
+  handleClose: () => void;
+  handleAccept: () => void;
+  disableNonEssentialButtons?: boolean;
+};
+
 const ApprovalButtons = ({
   state,
   isFree,
@@ -21,14 +31,7 @@ const ApprovalButtons = ({
   handleClose,
   handleAccept,
   disableNonEssentialButtons,
-}: {
-  state: State;
-  isFree: boolean;
-  reservation: ReservationNode;
-  handleClose: () => void;
-  handleAccept: () => void;
-  disableNonEssentialButtons?: boolean;
-}) => {
+}: Props) => {
   const { setModalContent } = useModal();
   const { t } = useTranslation();
 

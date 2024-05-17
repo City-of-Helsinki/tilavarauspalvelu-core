@@ -1,8 +1,8 @@
 import type { CalendarEvent } from "common/src/calendar/Calendar";
 import {
   State,
-  type ReservationNode,
   ReservationTypeChoice,
+  type ReservationQuery,
 } from "@gql/gql-types";
 import {
   COMMON_LEGEND,
@@ -38,15 +38,17 @@ export const legend = [
   },
 ];
 
+type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 // TODO combine with the eventStyleGetter in my-units/eventStyleGetter.ts
 const eventStyleGetter =
   (
-    currentReservation?: ReservationNode,
-    selectedReservation?: ReservationNode
+    currentReservation?: ReservationType,
+    selectedReservation?: ReservationType
   ) =>
   ({
     event,
-  }: CalendarEvent<ReservationNode>): {
+    // TODO use a fragment
+  }: CalendarEvent<ReservationType>): {
     style: React.CSSProperties;
     className?: string;
   } => {

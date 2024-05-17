@@ -8,10 +8,8 @@ import { type Maybe } from "graphql/jsutils/Maybe";
 import { H2 } from "common/src/common/typography";
 import { filterNonNullable } from "common/src/helpers";
 import {
-  type ApplicationRoundNode,
   ApplicationRoundStatusChoice,
-  type ReservationUnitNode,
-  type UnitNode,
+  type ApplicationRoundAdminFragmentFragment,
 } from "@gql/gql-types";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { Container, TabWrapper } from "@/styles/layout";
@@ -47,21 +45,16 @@ const StyledH2 = styled(H2)`
   margin-top: 1.5rem;
 `;
 
-function getUnitOptions(resUnits: ReservationUnitNode[]) {
-  const opts = resUnits.map((x) => x?.unit).map((x) => unitToOption(x));
+function getUnitOptions(
+  resUnits: ApplicationRoundAdminFragmentFragment["reservationUnits"]
+) {
+  const opts = resUnits.map((x) => x?.unit).map((x) => toOption(x));
   return filterNonNullable(opts);
 }
 
-// TODO these to toOption functions are identical, can they be combined (bit of type magic)?
-function unitToOption(unit: Maybe<UnitNode>) {
-  if (unit?.pk == null || unit.nameFi == null) {
-    return null;
-  }
-  const { nameFi, pk } = unit;
-  return { nameFi, pk };
-}
-
-function resUnitsToOption(resUnit: Maybe<ReservationUnitNode>) {
+function toOption(
+  resUnit: Maybe<{ nameFi?: string | null; pk?: number | null }>
+) {
   if (resUnit?.pk == null || resUnit.nameFi == null) {
     return null;
   }
@@ -70,7 +63,7 @@ function resUnitsToOption(resUnit: Maybe<ReservationUnitNode>) {
 }
 
 type ReviewProps = {
-  applicationRound: ApplicationRoundNode;
+  applicationRound: ApplicationRoundAdminFragmentFragment;
 };
 
 export function Review({ applicationRound }: ReviewProps): JSX.Element {
@@ -103,7 +96,7 @@ export function Review({ applicationRound }: ReviewProps): JSX.Element {
     selectedTab === "events" ? 1 : selectedTab === "allocated" ? 2 : 0;
 
   const reseevationUnitOptions = filterNonNullable(
-    resUnits.map((x) => resUnitsToOption(x))
+    resUnits.map((x) => toOption(x))
   );
 
   return (

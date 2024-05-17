@@ -2,7 +2,11 @@ import React from "react";
 import { H6 } from "common/src/common/typography";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
-import { State, type ReservationNode, type Query } from "@gql/gql-types";
+import {
+  State,
+  type ReservationNode,
+  type ReservationQuery,
+} from "@gql/gql-types";
 import { type ApolloQueryResult } from "@apollo/client";
 import { useRecurringReservations } from "./hooks";
 import { ReservationList } from "@/component/ReservationsList";
@@ -19,7 +23,7 @@ function RecurringReservationsView({
 }: {
   recurringPk: number;
   onSelect?: (selected: ReservationNode) => void;
-  onChange?: () => Promise<ApolloQueryResult<Query>>;
+  onChange?: () => Promise<ApolloQueryResult<ReservationQuery>>;
   onReservationUpdated?: () => void;
 }) {
   const { t } = useTranslation();

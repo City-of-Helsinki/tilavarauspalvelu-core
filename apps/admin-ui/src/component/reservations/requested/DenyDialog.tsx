@@ -11,9 +11,9 @@ import {
 import {
   type ReservationDenyMutationInput,
   type ReservationRefundMutationInput,
-  type ReservationNode,
   useDenyReservationMutation,
   useRefundReservationMutation,
+  type ReservationQuery,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
 import { useNotification } from "@/context/NotificationContext";
@@ -27,6 +27,14 @@ import { filterNonNullable } from "common/src/helpers";
 const ActionButtons = styled(Dialog.ActionButtons)`
   justify-content: end;
 `;
+
+// TODO use a fragment
+type ReservationType = NonNullable<ReservationQuery["reservation"]>;
+type Props = {
+  reservations: ReservationType[];
+  onClose: () => void;
+  onReject: () => void;
+};
 
 type ReturnAllowedState =
   // state selection
@@ -53,7 +61,9 @@ function isPriceReturnable(x: {
   );
 }
 
-function findPrice(reservations: ReservationNode[]): number {
+function findPrice(
+  reservations: Array<{ price?: string | null | undefined }>
+): number {
   const fp = reservations
     .map((x) => x.price)
     .map(Number)
@@ -62,7 +72,7 @@ function findPrice(reservations: ReservationNode[]): number {
 }
 
 function convertToReturnState(
-  reservations: ReservationNode[]
+  reservations: ReservationType[]
 ): ReturnAllowedState {
   const payed = reservations
     .map(({ price, order }) => ({
@@ -132,11 +142,7 @@ const DialogContent = ({
   reservations,
   onClose,
   onReject,
-}: {
-  reservations: ReservationNode[];
-  onClose: () => void;
-  onReject: () => void;
-}) => {
+}: Props): JSX.Element => {
   const [denyReservationMutation] = useDenyReservationMutation();
 
   const { notifyError, notifySuccess } = useNotification();
@@ -282,12 +288,7 @@ function DenyDialog({
   onClose,
   onReject,
   title,
-}: {
-  reservations: ReservationNode[];
-  onClose: () => void;
-  onReject: () => void;
-  title?: string;
-}): JSX.Element {
+}: Props & { title?: string }): JSX.Element {
   const { isOpen } = useModal();
   const { t } = useTranslation();
 

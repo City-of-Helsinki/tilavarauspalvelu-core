@@ -1,4 +1,4 @@
-import { type ApolloQueryResult, useQuery } from "@apollo/client";
+import { type ApolloQueryResult } from "@apollo/client";
 import { trim } from "lodash";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -9,12 +9,11 @@ import { add, startOfISOWeek } from "date-fns";
 import { breakpoints } from "common/src/common/style";
 import {
   type Maybe,
-  type Query,
-  type QueryReservationArgs,
-  type ReservationNode,
+  type ReservationQuery,
   CustomerTypeChoice,
   PricingType,
   State,
+  useReservationQuery,
 } from "@gql/gql-types";
 import { Permission } from "@/modules/permissionHelper";
 import { useNotification } from "@/context/NotificationContext";
@@ -42,8 +41,9 @@ import RecurringReservationsView from "./RecurringReservationsView";
 import { useRecurringReservations, useReservationData } from "./hooks";
 import ApprovalButtonsRecurring from "./ApprovalButtonsRecurring";
 import ReservationTitleSection from "./ReservationTitleSection";
-import { SINGLE_RESERVATION_QUERY } from "./hooks/queries";
 import { base64encode } from "common/src/helpers";
+
+type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 
 const ApplicationDatas = styled.div`
   display: grid;
@@ -120,7 +120,7 @@ function ButtonsWithPermChecks({
   onReservationUpdated,
   disableNonEssentialButtons,
 }: {
-  reservation: ReservationNode;
+  reservation: ReservationType;
   isFree: boolean;
   onReservationUpdated: () => void;
   disableNonEssentialButtons?: boolean;
@@ -163,22 +163,22 @@ function ButtonsWithPermChecks({
   );
 }
 
-const translateType = (res: ReservationNode, t: TFunction) => {
+function translateType(res: ReservationType, t: TFunction): string {
   const [part1, part2] = getTranslationKeyForCustomerTypeChoice(
     res.type ?? undefined,
     res.reserveeType ?? undefined,
     res.reserveeIsUnregisteredAssociation ?? false
   );
   return `${t(part1)}${part2 ? ` ${t(part2)}` : ""}`;
-};
+}
 
-const ReservationSummary = ({
+function ReservationSummary({
   reservation,
   isFree,
 }: {
-  reservation: ReservationNode;
+  reservation: ReservationType;
   isFree: boolean;
-}) => {
+}) {
   const { t } = useTranslation();
 
   const type =
@@ -274,7 +274,7 @@ const ReservationSummary = ({
       ))}
     </Summary>
   );
-};
+}
 
 const maybeStringToDate: (s?: string) => Date | undefined = (str) =>
   str ? new Date(str) : undefined;
@@ -282,14 +282,14 @@ const maybeStringToDate: (s?: string) => Date | undefined = (str) =>
 const onlyFutureDates: (d?: Date) => Date | undefined = (d) =>
   d && d > new Date() ? d : undefined;
 
-const TimeBlock = ({
+function TimeBlock({
   reservation,
   onReservationUpdated,
 }: {
-  reservation: ReservationNode;
-  onReservationUpdated: () => Promise<ApolloQueryResult<Query>>;
-}) => {
-  const [selected, setSelected] = useState<ReservationNode | undefined>(
+  reservation: ReservationType;
+  onReservationUpdated: () => Promise<ApolloQueryResult<ReservationQuery>>;
+}): JSX.Element {
+  const [selected, setSelected] = useState<ReservationType | undefined>(
     undefined
   );
 
@@ -335,7 +335,9 @@ const TimeBlock = ({
     }
   }, [reservation, calendarRefetch]);
 
-  const handleChanged = async (): Promise<ApolloQueryResult<Query>> => {
+  const handleChanged = async (): Promise<
+    ApolloQueryResult<ReservationQuery>
+  > => {
     // TODO use allSettled
     await calendarRefetch();
     return onReservationUpdated();
@@ -376,25 +378,21 @@ const TimeBlock = ({
       </Accordion>
     </>
   );
-};
+}
 
-const RequestedReservation = ({
+function RequestedReservation({
   reservation,
   refetch,
 }: {
-  reservation: ReservationNode;
-  refetch: () => Promise<ApolloQueryResult<Query>>;
-}): JSX.Element | null => {
+  reservation: NonNullable<ReservationQuery["reservation"]>;
+  refetch: () => Promise<ApolloQueryResult<ReservationQuery>>;
+}): JSX.Element | null {
   const { t } = useTranslation();
 
   const ref = useRef<HTMLHeadingElement>(null);
 
-  const pricing = reservation?.reservationUnit?.[0]
-    ? getReservatinUnitPricing(
-        reservation?.reservationUnit?.[0],
-        reservation.begin
-      )
-    : undefined;
+  const resUnit = reservation?.reservationUnit?.[0];
+  const pricing = getReservatinUnitPricing(resUnit, reservation.begin);
 
   const isNonFree =
     pricing?.pricingType === PricingType.Paid &&
@@ -617,25 +615,23 @@ const RequestedReservation = ({
       </Container>
     </>
   );
-};
+}
 
 function PermissionWrappedReservation() {
   const { id: pk } = useParams() as { id: string };
   const { t } = useTranslation();
   const { notifyError } = useNotification();
   const typename = "ReservationNode";
+  const isPkValid = Number(pk) > 0;
   const id = base64encode(`${typename}:${pk}`);
-  const { data, loading, refetch } = useQuery<Query, QueryReservationArgs>(
-    SINGLE_RESERVATION_QUERY,
-    {
-      skip: !pk || Number.isNaN(Number(pk)),
-      fetchPolicy: "no-cache",
-      variables: { id },
-      onError: () => {
-        notifyError(t("errors.errorFetchingData"));
-      },
-    }
-  );
+  const { data, loading, refetch } = useReservationQuery({
+    skip: !isPkValid,
+    fetchPolicy: "no-cache",
+    variables: { id },
+    onError: () => {
+      notifyError(t("errors.errorFetchingData"));
+    },
+  });
 
   const { reservation } = data ?? {};
 

@@ -1,10 +1,8 @@
 import React from "react";
-import {
-  ReservationUnitReservationsFragment,
-  type ReservationNode,
-} from "@gql/gql-types";
 import { Permission } from "app/modules/permissionHelper";
-import usePermission from "app/hooks/usePermission";
+import usePermission, {
+  type ReservationPermissionType,
+} from "app/hooks/usePermission";
 
 const VisibleIfPermission = ({
   reservation,
@@ -12,7 +10,7 @@ const VisibleIfPermission = ({
   children,
   otherwise,
 }: {
-  reservation: ReservationNode | ReservationUnitReservationsFragment;
+  reservation: ReservationPermissionType;
   permission: Permission;
   children: React.ReactNode;
   otherwise?: React.ReactNode;

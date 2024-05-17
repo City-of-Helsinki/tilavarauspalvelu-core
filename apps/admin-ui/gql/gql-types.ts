@@ -6963,6 +6963,7 @@ export type CreateRecurringReservationMutation = {
 
 export type ReservationsInIntervalFragment = {
   __typename?: "ReservationNode";
+  id: string;
   begin: string;
   end: string;
   bufferTimeBefore: number;
@@ -6988,6 +6989,7 @@ export type ReservationTimesInReservationUnitQuery = {
     __typename?: "ReservationUnitNode";
     reservationSet?: Array<{
       __typename?: "ReservationNode";
+      id: string;
       begin: string;
       end: string;
       bufferTimeBefore: number;
@@ -6998,6 +7000,7 @@ export type ReservationTimesInReservationUnitQuery = {
   } | null;
   affectingReservations?: Array<{
     __typename?: "ReservationNode";
+    id: string;
     begin: string;
     end: string;
     bufferTimeBefore: number;
@@ -7604,6 +7607,7 @@ export type ReservationUnitPricingFragment = {
   __typename?: "ReservationUnitNode";
   pricings: Array<{
     __typename?: "ReservationUnitPricingNode";
+    id: string;
     begins: string;
     priceUnit: PriceUnit;
     pricingType?: PricingType | null;
@@ -8076,6 +8080,7 @@ export type ReservationQuery = {
       } | null;
       pricings: Array<{
         __typename?: "ReservationUnitPricingNode";
+        id: string;
         begins: string;
         priceUnit: PriceUnit;
         pricingType?: PricingType | null;
@@ -9350,7 +9355,7 @@ export type GetAllocatedTimeSlotsQuery = {
   } | null;
 };
 
-export type ApplicationRoundAdminFragmentFragment = {
+export type ApplicationRoundBaseFragment = {
   __typename?: "ApplicationRoundNode";
   pk?: number | null;
   nameFi?: string | null;
@@ -9389,6 +9394,27 @@ export type ApplicationRoundsQuery = {
   } | null;
 };
 
+export type ApplicationRoundAdminFragmentFragment = {
+  __typename?: "ApplicationRoundNode";
+  id: string;
+  applicationsCount?: number | null;
+  pk?: number | null;
+  nameFi?: string | null;
+  status?: ApplicationRoundStatusChoice | null;
+  applicationPeriodBegin: string;
+  applicationPeriodEnd: string;
+  reservationUnits: Array<{
+    __typename?: "ReservationUnitNode";
+    pk?: number | null;
+    nameFi?: string | null;
+    unit?: {
+      __typename?: "UnitNode";
+      pk?: number | null;
+      nameFi?: string | null;
+    } | null;
+  }>;
+};
+
 export type ApplicationRoundQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -9397,6 +9423,7 @@ export type ApplicationRoundQuery = {
   __typename?: "Query";
   applicationRound?: {
     __typename?: "ApplicationRoundNode";
+    id: string;
     applicationsCount?: number | null;
     pk?: number | null;
     nameFi?: string | null;
@@ -9778,6 +9805,7 @@ export const ReservationUnitCommonFieldsFragmentDoc = gql`
 `;
 export const ReservationsInIntervalFragmentDoc = gql`
   fragment ReservationsInInterval on ReservationNode {
+    id
     begin
     end
     bufferTimeBefore
@@ -9855,6 +9883,7 @@ export const PricingFieldsFragmentDoc = gql`
 export const ReservationUnitPricingFragmentDoc = gql`
   fragment ReservationUnitPricing on ReservationUnitNode {
     pricings {
+      id
       ...PricingFields
     }
   }
@@ -10022,14 +10051,30 @@ export const ReservationSpecialisationFragmentDoc = gql`
     bufferTimeAfter
   }
 `;
-export const ApplicationRoundAdminFragmentFragmentDoc = gql`
-  fragment ApplicationRoundAdminFragment on ApplicationRoundNode {
+export const ApplicationRoundBaseFragmentDoc = gql`
+  fragment ApplicationRoundBase on ApplicationRoundNode {
     pk
     nameFi
     status
     applicationPeriodBegin
     applicationPeriodEnd
   }
+`;
+export const ApplicationRoundAdminFragmentFragmentDoc = gql`
+  fragment ApplicationRoundAdminFragment on ApplicationRoundNode {
+    id
+    ...ApplicationRoundBase
+    applicationsCount
+    reservationUnits {
+      pk
+      nameFi
+      unit {
+        pk
+        nameFi
+      }
+    }
+  }
+  ${ApplicationRoundBaseFragmentDoc}
 `;
 export const BannerNotificationsAdminDocument = gql`
   query BannerNotificationsAdmin($id: ID!) {
@@ -13456,7 +13501,7 @@ export type ReservationsByReservationUnitQueryResult = Apollo.QueryResult<
   ReservationsByReservationUnitQueryVariables
 >;
 export const ReservationDocument = gql`
-  query reservation($id: ID!) {
+  query Reservation($id: ID!) {
     reservation(id: $id) {
       ...ReservationCommon
       ...ReservationRecurring
@@ -16020,7 +16065,7 @@ export const ApplicationRoundsDocument = gql`
     applicationRounds {
       edges {
         node {
-          ...ApplicationRoundAdminFragment
+          ...ApplicationRoundBase
           reservationPeriodBegin
           reservationPeriodEnd
           applicationsCount
@@ -16034,7 +16079,7 @@ export const ApplicationRoundsDocument = gql`
       }
     }
   }
-  ${ApplicationRoundAdminFragmentFragmentDoc}
+  ${ApplicationRoundBaseFragmentDoc}
 `;
 
 /**
@@ -16105,15 +16150,6 @@ export const ApplicationRoundDocument = gql`
   query ApplicationRound($id: ID!) {
     applicationRound(id: $id) {
       ...ApplicationRoundAdminFragment
-      applicationsCount
-      reservationUnits {
-        pk
-        nameFi
-        unit {
-          pk
-          nameFi
-        }
-      }
     }
   }
   ${ApplicationRoundAdminFragmentFragmentDoc}

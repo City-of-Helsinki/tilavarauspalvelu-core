@@ -5,10 +5,10 @@ import { Button, Dialog, Notification } from "hds-react";
 import { z } from "zod";
 import { type TFunction } from "i18next";
 import {
-  type ReservationNode,
   ReservationStartInterval,
   ReservationTypeChoice,
   useStaffAdjustReservationTimeMutation,
+  type ReservationQuery,
 } from "@gql/gql-types";
 import { FormProvider, useForm } from "react-hook-form";
 import { differenceInMinutes, format } from "date-fns";
@@ -33,8 +33,10 @@ const StyledForm = styled.form`
   gap: var(--spacing-s);
 `;
 
+// TODO use a fragment
+type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
-  reservation: ReservationNode;
+  reservation: ReservationType;
   onAccept: () => void;
   onClose: () => void;
 };

@@ -571,9 +571,16 @@ export const doBuffersCollide = (
   );
 };
 
-export const getEventBuffers = (
-  events: (PendingReservation | ReservationNode)[]
-): CalendarEventBuffer[] => {
+// TODO use a fragment
+type ReservationEventType = {
+  begin: string;
+  end: string;
+  bufferTimeBefore?: number;
+  bufferTimeAfter?: number;
+};
+export function getEventBuffers(
+  events: ReservationEventType[]
+): CalendarEventBuffer[] {
   const buffers: CalendarEventBuffer[] = [];
   for (const event of events) {
     if (!event.begin || !event.end) {
@@ -600,7 +607,7 @@ export const getEventBuffers = (
   }
 
   return buffers;
-};
+}
 
 export const isReservationUnitReservable = (
   reservationUnit?: ReservationUnitNode | null

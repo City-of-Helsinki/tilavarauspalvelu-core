@@ -1,10 +1,8 @@
 import { useSession } from "app/hooks/auth";
 import type {
   UnitNode,
-  ReservationNode,
   ApplicationRoundQuery,
   CurrentUserQuery,
-  ReservationUnitReservationsFragment,
 } from "@gql/gql-types";
 import {
   hasPermission as baseHasPermission,
@@ -37,9 +35,29 @@ const hasUnitPermission = (
   return permission;
 };
 
+// TODO replace with a permission fragment (so the type is auto generated)
+export type ReservationPermissionType = {
+  reservationUnit?:
+    | {
+        unit?:
+          | {
+              pk?: number | undefined | null;
+              serviceSectors?:
+                | { pk?: number | undefined | null }[]
+                | null
+                | undefined;
+            }
+          | undefined
+          | null;
+      }[]
+    | null
+    | undefined;
+  user?: { pk?: number | undefined | null } | null | undefined;
+};
+
 const hasPermission = (
   user: CurrentUserQuery["currentUser"] | undefined,
-  reservation: ReservationNode | ReservationUnitReservationsFragment,
+  reservation: ReservationPermissionType | null | undefined,
   permissionName: Permission,
   includeOwn = true
 ) => {
@@ -107,7 +125,7 @@ const usePermission = () => {
   return {
     user,
     hasPermission: (
-      reservation: ReservationNode | ReservationUnitReservationsFragment,
+      reservation: ReservationPermissionType,
       permissionName: Permission,
       includeOwn = true
     ) => hasPermission(user, reservation, permissionName, includeOwn),
@@ -139,7 +157,7 @@ const usePermissionSuspended = () => {
   return {
     user,
     hasPermission: (
-      reservation: ReservationNode,
+      reservation: ReservationPermissionType,
       permissionName: Permission,
       includeOwn = true
     ) => hasPermission(user, reservation, permissionName, includeOwn),

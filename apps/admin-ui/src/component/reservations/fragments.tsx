@@ -37,6 +37,7 @@ export const RESERVATION_UNIT_PRICING_FRAGMENT = gql`
   ${PRICING_FRAGMENT}
   fragment ReservationUnitPricing on ReservationUnitNode {
     pricings {
+      id
       ...PricingFields
     }
   }

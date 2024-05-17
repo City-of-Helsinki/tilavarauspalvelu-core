@@ -13,6 +13,7 @@ export const CREATE_RECURRING_RESERVATION = gql`
 // TODO there is multiples of these fragments (for each Calendar), should be unified
 const RESERVATIONS_IN_INTERVAL_FRAGMENT = gql`
   fragment ReservationsInInterval on ReservationNode {
+    id
     begin
     end
     bufferTimeBefore

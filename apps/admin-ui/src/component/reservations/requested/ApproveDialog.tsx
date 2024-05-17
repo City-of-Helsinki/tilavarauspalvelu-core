@@ -13,7 +13,7 @@ import {
 import {
   useApproveReservationMutation,
   type ReservationApproveMutationInput,
-  type ReservationNode,
+  type ReservationQuery,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
 import { useNotification } from "@/context/NotificationContext";
@@ -41,17 +41,21 @@ const calcPriceNet = (price: number, taxPercentageValue?: number | null) => {
   return Number(priceNet.toFixed(2));
 };
 
+// TODO use a fragment for the reservation type
+type ReservationType = NonNullable<ReservationQuery["reservation"]>;
+type Props = {
+  reservation: ReservationType;
+  isFree: boolean;
+  onClose: () => void;
+  onAccept: () => void;
+};
+
 const DialogContent = ({
   reservation,
   isFree: isReservationUnitFree,
   onClose,
   onAccept,
-}: {
-  reservation: ReservationNode;
-  isFree: boolean;
-  onClose: () => void;
-  onAccept: () => void;
-}) => {
+}: Props) => {
   const { notifyError, notifySuccess } = useNotification();
   const { t, i18n } = useTranslation();
 
@@ -199,12 +203,7 @@ const ApproveDialog = ({
   isFree,
   onClose,
   onAccept,
-}: {
-  reservation: ReservationNode;
-  isFree: boolean;
-  onClose: () => void;
-  onAccept: () => void;
-}): JSX.Element => {
+}: Props): JSX.Element => {
   const { isOpen } = useModal();
   const { t } = useTranslation();
 

@@ -4,10 +4,9 @@ import { type TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { H1, Strong } from "common/src/common/typography";
-import { useQuery, type ApolloError } from "@apollo/client";
-import type { Query, QuerySpacesArgs, SpaceNode } from "@gql/gql-types";
+import { type ApolloError } from "@apollo/client";
+import { useSpacesQuery, type SpaceNode } from "@gql/gql-types";
 import Loader from "../Loader";
-import { SPACES_QUERY } from "@/common/queries";
 import { useNotification } from "@/context/NotificationContext";
 import { Container } from "@/styles/layout";
 import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
@@ -93,14 +92,11 @@ function SpacesList(): JSX.Element {
   const { notifyError } = useNotification();
   const { t } = useTranslation();
 
-  const { data, loading: isLoading } = useQuery<Query, QuerySpacesArgs>(
-    SPACES_QUERY,
-    {
-      onError: (err: ApolloError) => {
-        notifyError(err.message);
-      },
-    }
-  );
+  const { data, loading: isLoading } = useSpacesQuery({
+    onError: (err: ApolloError) => {
+      notifyError(err.message);
+    },
+  });
 
   if (isLoading) {
     return <Loader />;

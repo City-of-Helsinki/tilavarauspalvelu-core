@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { H1 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import type { ReservationNode } from "@gql/gql-types";
+import type { ReservationQuery } from "@gql/gql-types";
 import { getName } from "./util";
 import { HorisontalFlex } from "@/styles/layout";
 import { formatDateTime } from "@/common/util";
@@ -54,8 +54,9 @@ const DateTime = styled.div`
   font-size: var(--fontsize-body-s);
 `;
 
+type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
-  reservation: ReservationNode;
+  reservation: ReservationType;
   tagline: string;
   overrideTitle?: string;
 };
