@@ -1,14 +1,7 @@
-import React, { useState } from "react";
-import { useQuery } from "@apollo/client";
+import React from "react";
 import { useTranslation } from "react-i18next";
-import type {
-  Query,
-  QueryReservationUnitsArgs,
-  ReservationUnitNode,
-} from "@gql/gql-types";
+import { useReservationUnitsFilterParamsQuery } from "@gql/gql-types";
 import { SortedSelect } from "@/component/SortedSelect";
-import { GQL_MAX_RESULTS_PER_QUERY } from "@/common/const";
-import { RESERVATION_UNITS_FILTER_PARAMS_QUERY } from "./queries";
 import { filterNonNullable } from "common/src/helpers";
 
 type OptionType = {
@@ -30,29 +23,15 @@ type Props = {
 // watch the backend break.
 const ReservationUnitFilter = ({ onChange, value }: Props): JSX.Element => {
   const { t } = useTranslation();
-  const [resUnits, setResUnits] = useState<ReservationUnitNode[]>([]);
 
   // TODO this request is rerun whenever the selection changes (it'll return 0 every time)
-  const offset = resUnits.length > 0 ? resUnits.length : undefined;
-  const { loading } = useQuery<Query, QueryReservationUnitsArgs>(
-    RESERVATION_UNITS_FILTER_PARAMS_QUERY,
-    {
-      // breaks the cache
-      fetchPolicy: "no-cache",
-      variables: { offset, first: GQL_MAX_RESULTS_PER_QUERY },
-      onCompleted: ({ reservationUnits }) => {
-        if (
-          reservationUnits != null &&
-          reservationUnits.totalCount &&
-          reservationUnits.edges.length > 0
-        ) {
-          const ds = filterNonNullable(
-            reservationUnits?.edges.map((x) => x?.node)
-          );
-          setResUnits([...resUnits, ...ds]);
-        }
-      },
-    }
+  const { data, loading } = useReservationUnitsFilterParamsQuery({
+    // breaks the cache
+    fetchPolicy: "no-cache",
+  });
+
+  const resUnits = filterNonNullable(
+    data?.reservationUnits?.edges.map((x) => x?.node)
   );
 
   const opts = resUnits.map((reservationUnit) => ({
