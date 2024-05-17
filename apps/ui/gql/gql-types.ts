@@ -5394,9 +5394,9 @@ export enum Weekday {
   Wednesday = "WEDNESDAY",
 }
 
-export type ParamsQueryVariables = Exact<{ [key: string]: never }>;
+export type OptionsQueryVariables = Exact<{ [key: string]: never }>;
 
-export type ParamsQuery = {
+export type OptionsQuery = {
   __typename?: "Query";
   reservationUnitTypes?: {
     __typename?: "ReservationUnitTypeNodeConnection";
@@ -8567,8 +8567,8 @@ export const TermsOfUseFieldsFragmentDoc = gql`
   ${TermsOfUseNameFieldsFragmentDoc}
   ${TermsOfUseTextFieldsFragmentDoc}
 `;
-export const ParamsDocument = gql`
-  query Params {
+export const OptionsDocument = gql`
+  query Options {
     reservationUnitTypes {
       edges {
         node {
@@ -8632,58 +8632,58 @@ export const ParamsDocument = gql`
 `;
 
 /**
- * __useParamsQuery__
+ * __useOptionsQuery__
  *
- * To run a query within a React component, call `useParamsQuery` and pass it any options that fit your needs.
- * When your component renders, `useParamsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useOptionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useOptionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useParamsQuery({
+ * const { data, loading, error } = useOptionsQuery({
  *   variables: {
  *   },
  * });
  */
-export function useParamsQuery(
-  baseOptions?: Apollo.QueryHookOptions<ParamsQuery, ParamsQueryVariables>
+export function useOptionsQuery(
+  baseOptions?: Apollo.QueryHookOptions<OptionsQuery, OptionsQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<ParamsQuery, ParamsQueryVariables>(
-    ParamsDocument,
+  return Apollo.useQuery<OptionsQuery, OptionsQueryVariables>(
+    OptionsDocument,
     options
   );
 }
-export function useParamsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<ParamsQuery, ParamsQueryVariables>
+export function useOptionsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<OptionsQuery, OptionsQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<ParamsQuery, ParamsQueryVariables>(
-    ParamsDocument,
+  return Apollo.useLazyQuery<OptionsQuery, OptionsQueryVariables>(
+    OptionsDocument,
     options
   );
 }
-export function useParamsSuspenseQuery(
+export function useOptionsSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<
-    ParamsQuery,
-    ParamsQueryVariables
+    OptionsQuery,
+    OptionsQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<ParamsQuery, ParamsQueryVariables>(
-    ParamsDocument,
+  return Apollo.useSuspenseQuery<OptionsQuery, OptionsQueryVariables>(
+    OptionsDocument,
     options
   );
 }
-export type ParamsQueryHookResult = ReturnType<typeof useParamsQuery>;
-export type ParamsLazyQueryHookResult = ReturnType<typeof useParamsLazyQuery>;
-export type ParamsSuspenseQueryHookResult = ReturnType<
-  typeof useParamsSuspenseQuery
+export type OptionsQueryHookResult = ReturnType<typeof useOptionsQuery>;
+export type OptionsLazyQueryHookResult = ReturnType<typeof useOptionsLazyQuery>;
+export type OptionsSuspenseQueryHookResult = ReturnType<
+  typeof useOptionsSuspenseQuery
 >;
-export type ParamsQueryResult = Apollo.QueryResult<
-  ParamsQuery,
-  ParamsQueryVariables
+export type OptionsQueryResult = Apollo.QueryResult<
+  OptionsQuery,
+  OptionsQueryVariables
 >;
 export const ApplicationsDocument = gql`
   query Applications(

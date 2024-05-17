@@ -28,7 +28,6 @@ import { ApplicationFormValues } from "./Form";
 type OptionTypes = {
   ageGroupOptions: OptionType[];
   purposeOptions: OptionType[];
-  abilityGroupOptions: OptionType[];
   reservationUnitTypeOptions: OptionType[];
   participantCountOptions: OptionType[];
   unitOptions: OptionType[];

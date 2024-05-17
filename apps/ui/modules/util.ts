@@ -79,30 +79,31 @@ type ParameterType =
     }
   | { pk: number; name: string };
 
-const getLabel = (
-  parameter: ParameterType | AgeGroupNode,
+function getLabel(
+  parameter:
+    | ParameterType
+    | { minimum?: number | null; maximum?: number | null },
   lang: LocalizationLanguages = "fi"
-): string => {
+): string {
   if ("minimum" in parameter) {
     return `${parameter.minimum || ""} - ${parameter.maximum || ""}`;
   }
   if ("name" in parameter) {
     return parameter.name;
   }
-  if (parameter.nameFi && lang === "fi") {
-    return parameter.nameFi;
-  }
-  if (parameter.nameEn && lang === "en") {
+  if ("nameEn" in parameter && parameter.nameEn != null && lang === "en") {
     return parameter.nameEn;
   }
-  if (parameter.nameSv && lang === "sv") {
+  if ("nameSv" in parameter && parameter.nameSv != null && lang === "sv") {
     return parameter.nameSv;
   }
-  if (parameter.nameFi) {
+  if ("nameFi" in parameter) {
     return parameter.nameFi;
   }
   return "no label";
-};
+}
+
+export { getLabel as getParameterLabel };
 
 /// @deprecated - OptionType is dangerous, union types break type safety in comparisons
 export const mapOptions = (
