@@ -11,6 +11,7 @@ export const OPTIONS_QUERY = gql`
     reservationPurposes {
       edges {
         node {
+          id
           pk
           nameFi
         }
@@ -19,6 +20,7 @@ export const OPTIONS_QUERY = gql`
     ageGroups {
       edges {
         node {
+          id
           pk
           minimum
           maximum
@@ -28,6 +30,7 @@ export const OPTIONS_QUERY = gql`
     cities {
       edges {
         node {
+          id
           nameFi
           pk
         }
@@ -46,9 +49,11 @@ export const UNIT_VIEW_QUERY = gql`
         ...LocationFields
       }
       reservationunitSet {
+        id
         pk
         nameFi
         spaces {
+          id
           pk
         }
       }
@@ -72,9 +77,11 @@ export const RESERVATION_UNITS_BY_UNIT = gql`
         pk
         nameFi
         spaces {
+          id
           pk
         }
         reservationUnitType {
+          id
           pk
         }
         bufferTimeBefore

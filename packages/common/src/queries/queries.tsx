@@ -7,6 +7,7 @@ export const TERMS_OF_USE_QUERY = gql`
     termsOfUse(termsType: $termsType) {
       edges {
         node {
+          id
           ...TermsOfUseFields
         }
       }

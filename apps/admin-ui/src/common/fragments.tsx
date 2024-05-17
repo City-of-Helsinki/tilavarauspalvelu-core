@@ -6,6 +6,7 @@ export const SPACE_COMMON_FRAGMENT = gql`
     pk
     nameFi
     parent {
+      id
       pk
       nameFi
     }
@@ -20,8 +21,10 @@ export const RESOURCE_FRAGMENT = gql`
     pk
     nameFi
     space {
+      id
       nameFi
       unit {
+        id
         nameFi
         pk
       }
@@ -39,6 +42,7 @@ export const SPACE_FRAGMENT = gql`
       ...ResourceFields
     }
     children {
+      id
       pk
     }
   }
@@ -52,6 +56,7 @@ export const RESERVATION_UNIT_COMMON_FRAGMENT = gql`
     maxPersons
     surfaceArea
     reservationUnitType {
+      id
       nameFi
     }
   }
@@ -63,6 +68,7 @@ export const UNIT_NAME_FRAGMENT = gql`
     pk
     nameFi
     serviceSectors {
+      id
       pk
       nameFi
     }

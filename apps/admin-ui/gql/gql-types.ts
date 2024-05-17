@@ -5396,6 +5396,7 @@ export enum Weekday {
 
 export type BannerNotificationCommonFragment = {
   __typename?: "BannerNotificationNode";
+  id: string;
   level: BannerNotificationLevel;
   activeFrom?: string | null;
   message: string;
@@ -5412,6 +5413,7 @@ export type BannerNotificationsAdminFragmentFragment = {
   activeUntil?: string | null;
   draft: boolean;
   state?: BannerNotificationState | null;
+  id: string;
   level: BannerNotificationLevel;
   activeFrom?: string | null;
   message: string;
@@ -5434,6 +5436,7 @@ export type BannerNotificationsAdminQuery = {
     activeUntil?: string | null;
     draft: boolean;
     state?: BannerNotificationState | null;
+    id: string;
     level: BannerNotificationLevel;
     activeFrom?: string | null;
     message: string;
@@ -5467,6 +5470,7 @@ export type BannerNotificationsAdminListQuery = {
         activeUntil?: string | null;
         draft: boolean;
         state?: BannerNotificationState | null;
+        id: string;
         level: BannerNotificationLevel;
         activeFrom?: string | null;
         message: string;
@@ -6334,6 +6338,7 @@ export type TermsOfUseQuery = {
       __typename?: "TermsOfUseNodeEdge";
       node?: {
         __typename?: "TermsOfUseNode";
+        id: string;
         pk?: string | null;
         termsType: TermsType;
         nameFi?: string | null;
@@ -6356,6 +6361,7 @@ export type SpaceCommonFieldsFragment = {
   maxPersons?: number | null;
   parent?: {
     __typename?: "SpaceNode";
+    id: string;
     pk?: number | null;
     nameFi?: string | null;
   } | null;
@@ -6368,9 +6374,11 @@ export type ResourceFieldsFragment = {
   nameFi?: string | null;
   space?: {
     __typename?: "SpaceNode";
+    id: string;
     nameFi?: string | null;
     unit?: {
       __typename?: "UnitNode";
+      id: string;
       nameFi?: string | null;
       pk?: number | null;
     } | null;
@@ -6392,17 +6400,24 @@ export type SpaceFieldsFragment = {
     nameFi?: string | null;
     space?: {
       __typename?: "SpaceNode";
+      id: string;
       nameFi?: string | null;
       unit?: {
         __typename?: "UnitNode";
+        id: string;
         nameFi?: string | null;
         pk?: number | null;
       } | null;
     } | null;
   }>;
-  children?: Array<{ __typename?: "SpaceNode"; pk?: number | null }> | null;
+  children?: Array<{
+    __typename?: "SpaceNode";
+    id: string;
+    pk?: number | null;
+  }> | null;
   parent?: {
     __typename?: "SpaceNode";
+    id: string;
     pk?: number | null;
     nameFi?: string | null;
   } | null;
@@ -6417,6 +6432,7 @@ export type ReservationUnitCommonFieldsFragment = {
   surfaceArea?: number | null;
   reservationUnitType?: {
     __typename?: "ReservationUnitTypeNode";
+    id: string;
     nameFi?: string | null;
   } | null;
 };
@@ -6428,6 +6444,7 @@ export type UnitNameFieldsFragment = {
   nameFi?: string | null;
   serviceSectors: Array<{
     __typename?: "ServiceSectorNode";
+    id: string;
     pk?: number | null;
     nameFi?: string | null;
   }>;
@@ -6455,6 +6472,7 @@ export type SpacesQuery = {
         } | null;
         parent?: {
           __typename?: "SpaceNode";
+          id: string;
           pk?: number | null;
           nameFi?: string | null;
         } | null;
@@ -6479,9 +6497,11 @@ export type ResourcesQuery = {
         nameFi?: string | null;
         space?: {
           __typename?: "SpaceNode";
+          id: string;
           nameFi?: string | null;
           unit?: {
             __typename?: "UnitNode";
+            id: string;
             nameFi?: string | null;
             pk?: number | null;
           } | null;
@@ -6540,6 +6560,7 @@ export type UnitQuery = {
       }>;
       reservationUnitType?: {
         __typename?: "ReservationUnitTypeNode";
+        id: string;
         nameFi?: string | null;
       } | null;
     }>;
@@ -6558,17 +6579,24 @@ export type UnitQuery = {
         nameFi?: string | null;
         space?: {
           __typename?: "SpaceNode";
+          id: string;
           nameFi?: string | null;
           unit?: {
             __typename?: "UnitNode";
+            id: string;
             nameFi?: string | null;
             pk?: number | null;
           } | null;
         } | null;
       }>;
-      children?: Array<{ __typename?: "SpaceNode"; pk?: number | null }> | null;
+      children?: Array<{
+        __typename?: "SpaceNode";
+        id: string;
+        pk?: number | null;
+      }> | null;
       parent?: {
         __typename?: "SpaceNode";
+        id: string;
         pk?: number | null;
         nameFi?: string | null;
       } | null;
@@ -6608,6 +6636,7 @@ export type UnitWithSpacesAndResourcesQuery = {
       }>;
       parent?: {
         __typename?: "SpaceNode";
+        id: string;
         pk?: number | null;
         nameFi?: string | null;
       } | null;
@@ -6804,6 +6833,7 @@ export type SpaceQuery = {
     } | null;
     parent?: {
       __typename?: "SpaceNode";
+      id: string;
       pk?: number | null;
       nameFi?: string | null;
       parent?: {
@@ -6999,6 +7029,7 @@ export type OptionsQuery = {
       __typename?: "ReservationPurposeNodeEdge";
       node?: {
         __typename?: "ReservationPurposeNode";
+        id: string;
         pk?: number | null;
         nameFi?: string | null;
       } | null;
@@ -7010,6 +7041,7 @@ export type OptionsQuery = {
       __typename?: "AgeGroupNodeEdge";
       node?: {
         __typename?: "AgeGroupNode";
+        id: string;
         pk?: number | null;
         minimum: number;
         maximum?: number | null;
@@ -7022,6 +7054,7 @@ export type OptionsQuery = {
       __typename?: "CityNodeEdge";
       node?: {
         __typename?: "CityNode";
+        id: string;
         nameFi?: string | null;
         pk?: number | null;
       } | null;
@@ -7048,12 +7081,18 @@ export type UnitViewQuery = {
     } | null;
     reservationunitSet: Array<{
       __typename?: "ReservationUnitNode";
+      id: string;
       pk?: number | null;
       nameFi?: string | null;
-      spaces: Array<{ __typename?: "SpaceNode"; pk?: number | null }>;
+      spaces: Array<{
+        __typename?: "SpaceNode";
+        id: string;
+        pk?: number | null;
+      }>;
     }>;
     serviceSectors: Array<{
       __typename?: "ServiceSectorNode";
+      id: string;
       pk?: number | null;
       nameFi?: string | null;
     }>;
@@ -7085,9 +7124,14 @@ export type ReservationUnitsByUnitQuery = {
       bufferTimeAfter: number;
       isDraft: boolean;
       authentication: Authentication;
-      spaces: Array<{ __typename?: "SpaceNode"; pk?: number | null }>;
+      spaces: Array<{
+        __typename?: "SpaceNode";
+        id: string;
+        pk?: number | null;
+      }>;
       reservationUnitType?: {
         __typename?: "ReservationUnitTypeNode";
+        id: string;
         pk?: number | null;
       } | null;
       reservationSet?: Array<{
@@ -7213,6 +7257,7 @@ export type ReservationUnitsQuery = {
       nameFi?: string | null;
       serviceSectors: Array<{
         __typename?: "ServiceSectorNode";
+        id: string;
         pk?: number | null;
         nameFi?: string | null;
       }>;
@@ -7586,6 +7631,7 @@ export type ReservationUnitFragment = {
     nameFi?: string | null;
     serviceSectors: Array<{
       __typename?: "ServiceSectorNode";
+      id: string;
       pk?: number | null;
       nameFi?: string | null;
     }>;
@@ -7991,6 +8037,7 @@ export type ReservationQuery = {
         nameFi?: string | null;
         serviceSectors: Array<{
           __typename?: "ServiceSectorNode";
+          id: string;
           pk?: number | null;
           nameFi?: string | null;
         }>;
@@ -9371,6 +9418,7 @@ export type ApplicationRoundQuery = {
 
 export const BannerNotificationCommonFragmentDoc = gql`
   fragment BannerNotificationCommon on BannerNotificationNode {
+    id
     level
     activeFrom
     message
@@ -9676,6 +9724,7 @@ export const SpaceCommonFieldsFragmentDoc = gql`
     pk
     nameFi
     parent {
+      id
       pk
       nameFi
     }
@@ -9689,8 +9738,10 @@ export const ResourceFieldsFragmentDoc = gql`
     pk
     nameFi
     space {
+      id
       nameFi
       unit {
+        id
         nameFi
         pk
       }
@@ -9705,6 +9756,7 @@ export const SpaceFieldsFragmentDoc = gql`
       ...ResourceFields
     }
     children {
+      id
       pk
     }
   }
@@ -9719,6 +9771,7 @@ export const ReservationUnitCommonFieldsFragmentDoc = gql`
     maxPersons
     surfaceArea
     reservationUnitType {
+      id
       nameFi
     }
   }
@@ -9813,6 +9866,7 @@ export const UnitNameFieldsFragmentDoc = gql`
     pk
     nameFi
     serviceSectors {
+      id
       pk
       nameFi
     }
@@ -10149,7 +10203,6 @@ export const BannerNotificationsListDocument = gql`
     bannerNotifications(isVisible: true, target: $target) {
       edges {
         node {
-          id
           ...BannerNotificationCommon
         }
       }
@@ -10157,7 +10210,6 @@ export const BannerNotificationsListDocument = gql`
     bannerNotificationsAll: bannerNotifications(isVisible: true, target: ALL) {
       edges {
         node {
-          id
           ...BannerNotificationCommon
         }
       }
@@ -10324,6 +10376,7 @@ export const TermsOfUseDocument = gql`
     termsOfUse(termsType: $termsType) {
       edges {
         node {
+          id
           ...TermsOfUseFields
         }
       }
@@ -12056,6 +12109,7 @@ export const OptionsDocument = gql`
     reservationPurposes {
       edges {
         node {
+          id
           pk
           nameFi
         }
@@ -12064,6 +12118,7 @@ export const OptionsDocument = gql`
     ageGroups {
       edges {
         node {
+          id
           pk
           minimum
           maximum
@@ -12073,6 +12128,7 @@ export const OptionsDocument = gql`
     cities {
       edges {
         node {
+          id
           nameFi
           pk
         }
@@ -12143,9 +12199,11 @@ export const UnitViewDocument = gql`
         ...LocationFields
       }
       reservationunitSet {
+        id
         pk
         nameFi
         spaces {
+          id
           pk
         }
       }
@@ -12231,9 +12289,11 @@ export const ReservationUnitsByUnitDocument = gql`
         pk
         nameFi
         spaces {
+          id
           pk
         }
         reservationUnitType {
+          id
           pk
         }
         bufferTimeBefore

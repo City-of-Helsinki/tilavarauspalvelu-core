@@ -5396,6 +5396,7 @@ export enum Weekday {
 
 export type BannerNotificationCommonFragment = {
   __typename?: "BannerNotificationNode";
+  id: string;
   level: BannerNotificationLevel;
   activeFrom?: string | null;
   message: string;
@@ -5412,6 +5413,7 @@ export type BannerNotificationsAdminFragmentFragment = {
   activeUntil?: string | null;
   draft: boolean;
   state?: BannerNotificationState | null;
+  id: string;
   level: BannerNotificationLevel;
   activeFrom?: string | null;
   message: string;
@@ -5434,6 +5436,7 @@ export type BannerNotificationsAdminQuery = {
     activeUntil?: string | null;
     draft: boolean;
     state?: BannerNotificationState | null;
+    id: string;
     level: BannerNotificationLevel;
     activeFrom?: string | null;
     message: string;
@@ -5467,6 +5470,7 @@ export type BannerNotificationsAdminListQuery = {
         activeUntil?: string | null;
         draft: boolean;
         state?: BannerNotificationState | null;
+        id: string;
         level: BannerNotificationLevel;
         activeFrom?: string | null;
         message: string;
@@ -6334,6 +6338,7 @@ export type TermsOfUseQuery = {
       __typename?: "TermsOfUseNodeEdge";
       node?: {
         __typename?: "TermsOfUseNode";
+        id: string;
         pk?: string | null;
         termsType: TermsType;
         nameFi?: string | null;
@@ -6349,6 +6354,7 @@ export type TermsOfUseQuery = {
 
 export const BannerNotificationCommonFragmentDoc = gql`
   fragment BannerNotificationCommon on BannerNotificationNode {
+    id
     level
     activeFrom
     message
@@ -6860,7 +6866,6 @@ export const BannerNotificationsListDocument = gql`
     bannerNotifications(isVisible: true, target: $target) {
       edges {
         node {
-          id
           ...BannerNotificationCommon
         }
       }
@@ -6868,7 +6873,6 @@ export const BannerNotificationsListDocument = gql`
     bannerNotificationsAll: bannerNotifications(isVisible: true, target: ALL) {
       edges {
         node {
-          id
           ...BannerNotificationCommon
         }
       }
@@ -7035,6 +7039,7 @@ export const TermsOfUseDocument = gql`
     termsOfUse(termsType: $termsType) {
       edges {
         node {
+          id
           ...TermsOfUseFields
         }
       }

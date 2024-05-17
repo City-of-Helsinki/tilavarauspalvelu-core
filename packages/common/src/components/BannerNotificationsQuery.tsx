@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 
 export const BANNER_NOTIFICATION_COMMON = gql`
   fragment BannerNotificationCommon on BannerNotificationNode {
+    id
     level
     activeFrom
     message
@@ -68,7 +69,6 @@ export const BANNER_NOTIFICATIONS_LIST = gql`
     bannerNotifications(isVisible: true, target: $target) {
       edges {
         node {
-          id
           ...BannerNotificationCommon
         }
       }
@@ -76,7 +76,6 @@ export const BANNER_NOTIFICATIONS_LIST = gql`
     bannerNotificationsAll: bannerNotifications(isVisible: true, target: ALL) {
       edges {
         node {
-          id
           ...BannerNotificationCommon
         }
       }

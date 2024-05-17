@@ -16,6 +16,16 @@ const RESERVATION_UNIT_TYPE_FRAGMENT = gql`
   }
 `;
 
+const RESERVATION_UNIT_NAME_FRAGMENT = gql`
+  fragment ReservationUnitNameFields on ReservationUnitNode {
+    id
+    pk
+    nameFi
+    nameEn
+    nameSv
+  }
+`;
+
 const RESERVATION_UNIT_PAGE_FRAGMENT = gql`
   ${IMAGE_FRAGMENT}
   ${RESERVATION_UNIT_FRAGMENT}
@@ -134,6 +144,7 @@ export const RESERVATION_UNITS = gql`
   ${IMAGE_FRAGMENT}
   ${UNIT_NAME_FRAGMENT_I18N}
   ${RESERVATION_UNIT_TYPE_FRAGMENT}
+  ${RESERVATION_UNIT_NAME_FRAGMENT}
   query SearchReservationUnits(
     $textSearch: String
     $pk: [Int]
@@ -187,11 +198,7 @@ export const RESERVATION_UNITS = gql`
     ) {
       edges {
         node {
-          id
-          pk
-          nameFi
-          nameEn
-          nameSv
+          ...ReservationUnitNameFields
           reservationBegins
           reservationEnds
           isClosed
@@ -227,6 +234,7 @@ export const RELATED_RESERVATION_UNITS = gql`
   ${PRICING_FRAGMENT}
   ${IMAGE_FRAGMENT}
   ${RESERVATION_UNIT_TYPE_FRAGMENT}
+  ${RESERVATION_UNIT_NAME_FRAGMENT}
   query RelatedReservationUnits(
     $unit: [Int]!
     $isDraft: Boolean
@@ -235,11 +243,7 @@ export const RELATED_RESERVATION_UNITS = gql`
     reservationUnits(unit: $unit, isDraft: $isDraft, isVisible: $isVisible) {
       edges {
         node {
-          id
-          pk
-          nameFi
-          nameEn
-          nameSv
+          ...ReservationUnitNameFields
           images {
             ...ImageFragment
           }

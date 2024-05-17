@@ -162,6 +162,7 @@ export const GET_RESERVATION = gql`
   ${RESERVATION_INFO_FRAGMENT}
   query Reservation($id: ID!) {
     reservation(id: $id) {
+      id
       pk
       name
       ...ReserveeNameFields
@@ -171,6 +172,7 @@ export const GET_RESERVATION = gql`
       end
       calendarUrl
       user {
+        id
         email
         pk
       }
@@ -179,10 +181,12 @@ export const GET_RESERVATION = gql`
       priceNet
       taxPercentageValue
       order {
+        id
         orderUuid
         status
       }
       reservationUnit {
+        id
         ...ReservationUnitFields
         ...CancellationRuleFields
       }
@@ -199,6 +203,7 @@ export const GET_RESERVATION_CANCEL_REASONS = gql`
     reservationCancelReasons {
       edges {
         node {
+          id
           pk
           reasonFi
           reasonEn
@@ -223,6 +228,7 @@ export const ADJUST_RESERVATION_TIME = gql`
 export const GET_ORDER = gql`
   query order($orderUuid: String!) {
     order(orderUuid: $orderUuid) {
+      id
       reservationPk
       status
       paymentType

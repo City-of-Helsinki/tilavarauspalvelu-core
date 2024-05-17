@@ -6069,6 +6069,7 @@ export type ReservationQuery = {
   __typename?: "Query";
   reservation?: {
     __typename?: "ReservationNode";
+    id: string;
     pk?: number | null;
     name?: string | null;
     bufferTimeBefore: number;
@@ -6092,11 +6093,13 @@ export type ReservationQuery = {
     numPersons?: number | null;
     user?: {
       __typename?: "UserNode";
+      id: string;
       email: string;
       pk?: number | null;
     } | null;
     order?: {
       __typename?: "PaymentOrderNode";
+      id: string;
       orderUuid?: string | null;
       status?: OrderStatus | null;
     } | null;
@@ -6241,6 +6244,7 @@ export type GetReservationCancelReasonsQuery = {
       __typename?: "ReservationCancelReasonNodeEdge";
       node?: {
         __typename?: "ReservationCancelReasonNode";
+        id: string;
         pk?: number | null;
         reasonFi?: string | null;
         reasonEn?: string | null;
@@ -6273,6 +6277,7 @@ export type OrderQuery = {
   __typename?: "Query";
   order?: {
     __typename?: "PaymentOrderNode";
+    id: string;
     reservationPk?: string | null;
     status?: OrderStatus | null;
     paymentType: PaymentType;
@@ -6296,6 +6301,15 @@ export type RefreshOrderMutation = {
 
 export type ReservationUnitTypeFieldsFragment = {
   __typename?: "ReservationUnitTypeNode";
+  pk?: number | null;
+  nameFi?: string | null;
+  nameEn?: string | null;
+  nameSv?: string | null;
+};
+
+export type ReservationUnitNameFieldsFragment = {
+  __typename?: "ReservationUnitNode";
+  id: string;
   pk?: number | null;
   nameFi?: string | null;
   nameEn?: string | null;
@@ -6882,16 +6896,16 @@ export type SearchReservationUnitsQuery = {
       __typename?: "ReservationUnitNodeEdge";
       node?: {
         __typename?: "ReservationUnitNode";
-        id: string;
-        pk?: number | null;
-        nameFi?: string | null;
-        nameEn?: string | null;
-        nameSv?: string | null;
         reservationBegins?: string | null;
         reservationEnds?: string | null;
         isClosed?: boolean | null;
         firstReservableDatetime?: string | null;
         maxPersons?: number | null;
+        id: string;
+        pk?: number | null;
+        nameFi?: string | null;
+        nameEn?: string | null;
+        nameSv?: string | null;
         reservationUnitType?: {
           __typename?: "ReservationUnitTypeNode";
           pk?: number | null;
@@ -6961,13 +6975,13 @@ export type RelatedReservationUnitsQuery = {
       __typename?: "ReservationUnitNodeEdge";
       node?: {
         __typename?: "ReservationUnitNode";
+        maxPersons?: number | null;
+        isDraft: boolean;
         id: string;
         pk?: number | null;
         nameFi?: string | null;
         nameEn?: string | null;
         nameSv?: string | null;
-        maxPersons?: number | null;
-        isDraft: boolean;
         images: Array<{
           __typename?: "ReservationUnitImageNode";
           imageUrl?: string | null;
@@ -7032,6 +7046,7 @@ export type GetCurrentUserQuery = {
 
 export type BannerNotificationCommonFragment = {
   __typename?: "BannerNotificationNode";
+  id: string;
   level: BannerNotificationLevel;
   activeFrom?: string | null;
   message: string;
@@ -7048,6 +7063,7 @@ export type BannerNotificationsAdminFragmentFragment = {
   activeUntil?: string | null;
   draft: boolean;
   state?: BannerNotificationState | null;
+  id: string;
   level: BannerNotificationLevel;
   activeFrom?: string | null;
   message: string;
@@ -7070,6 +7086,7 @@ export type BannerNotificationsAdminQuery = {
     activeUntil?: string | null;
     draft: boolean;
     state?: BannerNotificationState | null;
+    id: string;
     level: BannerNotificationLevel;
     activeFrom?: string | null;
     message: string;
@@ -7103,6 +7120,7 @@ export type BannerNotificationsAdminListQuery = {
         activeUntil?: string | null;
         draft: boolean;
         state?: BannerNotificationState | null;
+        id: string;
         level: BannerNotificationLevel;
         activeFrom?: string | null;
         message: string;
@@ -7970,6 +7988,7 @@ export type TermsOfUseQuery = {
       __typename?: "TermsOfUseNodeEdge";
       node?: {
         __typename?: "TermsOfUseNode";
+        id: string;
         pk?: string | null;
         termsType: TermsType;
         nameFi?: string | null;
@@ -8034,6 +8053,15 @@ export const ReservationInfoFragmentFragmentDoc = gql`
       name
     }
     numPersons
+  }
+`;
+export const ReservationUnitNameFieldsFragmentDoc = gql`
+  fragment ReservationUnitNameFields on ReservationUnitNode {
+    id
+    pk
+    nameFi
+    nameEn
+    nameSv
   }
 `;
 export const LocationFieldsFragmentDoc = gql`
@@ -8252,6 +8280,7 @@ export const BlockingReservationFieldsFragmentDoc = gql`
 `;
 export const BannerNotificationCommonFragmentDoc = gql`
   fragment BannerNotificationCommon on BannerNotificationNode {
+    id
     level
     activeFrom
     message
@@ -9677,6 +9706,7 @@ export type ReservationsQueryResult = Apollo.QueryResult<
 export const ReservationDocument = gql`
   query Reservation($id: ID!) {
     reservation(id: $id) {
+      id
       pk
       name
       ...ReserveeNameFields
@@ -9686,6 +9716,7 @@ export const ReservationDocument = gql`
       end
       calendarUrl
       user {
+        id
         email
         pk
       }
@@ -9694,10 +9725,12 @@ export const ReservationDocument = gql`
       priceNet
       taxPercentageValue
       order {
+        id
         orderUuid
         status
       }
       reservationUnit {
+        id
         ...ReservationUnitFields
         ...CancellationRuleFields
       }
@@ -9783,6 +9816,7 @@ export const GetReservationCancelReasonsDocument = gql`
     reservationCancelReasons {
       edges {
         node {
+          id
           pk
           reasonFi
           reasonEn
@@ -9913,6 +9947,7 @@ export type AdjustReservationTimeMutationOptions = Apollo.BaseMutationOptions<
 export const OrderDocument = gql`
   query order($orderUuid: String!) {
     order(orderUuid: $orderUuid) {
+      id
       reservationPk
       status
       paymentType
@@ -10262,11 +10297,7 @@ export const SearchReservationUnitsDocument = gql`
     ) {
       edges {
         node {
-          id
-          pk
-          nameFi
-          nameEn
-          nameSv
+          ...ReservationUnitNameFields
           reservationBegins
           reservationEnds
           isClosed
@@ -10293,6 +10324,7 @@ export const SearchReservationUnitsDocument = gql`
       totalCount
     }
   }
+  ${ReservationUnitNameFieldsFragmentDoc}
   ${ReservationUnitTypeFieldsFragmentDoc}
   ${UnitNameFieldsI18NFragmentDoc}
   ${ImageFragmentFragmentDoc}
@@ -10394,11 +10426,7 @@ export const RelatedReservationUnitsDocument = gql`
     reservationUnits(unit: $unit, isDraft: $isDraft, isVisible: $isVisible) {
       edges {
         node {
-          id
-          pk
-          nameFi
-          nameEn
-          nameSv
+          ...ReservationUnitNameFields
           images {
             ...ImageFragment
           }
@@ -10417,6 +10445,7 @@ export const RelatedReservationUnitsDocument = gql`
       }
     }
   }
+  ${ReservationUnitNameFieldsFragmentDoc}
   ${ImageFragmentFragmentDoc}
   ${UnitNameFieldsI18NFragmentDoc}
   ${ReservationUnitTypeFieldsFragmentDoc}
@@ -10742,7 +10771,6 @@ export const BannerNotificationsListDocument = gql`
     bannerNotifications(isVisible: true, target: $target) {
       edges {
         node {
-          id
           ...BannerNotificationCommon
         }
       }
@@ -10750,7 +10778,6 @@ export const BannerNotificationsListDocument = gql`
     bannerNotificationsAll: bannerNotifications(isVisible: true, target: ALL) {
       edges {
         node {
-          id
           ...BannerNotificationCommon
         }
       }
@@ -10917,6 +10944,7 @@ export const TermsOfUseDocument = gql`
     termsOfUse(termsType: $termsType) {
       edges {
         node {
+          id
           ...TermsOfUseFields
         }
       }
