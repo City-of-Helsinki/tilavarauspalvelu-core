@@ -9,7 +9,7 @@ import {
   type Query,
   ApplicationSectionStatusChoice,
   type AllocatedTimeSlotNode,
-  type ReservationUnitNode,
+  type ApplicationRoundFilterQuery,
 } from "@gql/gql-types";
 import { breakpoints } from "common";
 import { Accordion } from "@/component/Accordion";
@@ -23,6 +23,11 @@ import { useFocusApplicationEvent } from "./hooks";
 import { ApolloQueryResult } from "@apollo/client";
 import { filterNonNullable } from "common/src/helpers";
 import { getRelatedTimeSlots } from "./modules/applicationRoundAllocation";
+
+type ApplicationRoundFilterQueryType =
+  NonNullable<ApplicationRoundFilterQuery>["applicationRound"];
+type ReservationUnitFilterQueryType =
+  NonNullable<ApplicationRoundFilterQueryType>["reservationUnits"][0];
 
 // TODO max-width for the grid columns (315px, 480px, 332px)
 // TODO not perfect (aligment issues with the last columns and grid end),
@@ -86,7 +91,7 @@ function EventGroupList({
   refetch,
 }: {
   applicationSections: ApplicationSectionNode[];
-  reservationUnit: ReservationUnitNode;
+  reservationUnit: NonNullable<ReservationUnitFilterQueryType>;
   type: AllocationApplicationSectionCardType;
   refetch: () => Promise<ApolloQueryResult<Query>>;
 }): JSX.Element {
@@ -112,7 +117,7 @@ function EventGroupList({
 // TODO combine this with the AllocationColumn Props type (it's more or less just passing it through)
 type ApplicationEventsProps = {
   applicationSections: ApplicationSectionNode[] | null;
-  reservationUnit: ReservationUnitNode;
+  reservationUnit: NonNullable<ReservationUnitFilterQueryType>;
   refetchApplicationEvents: () => Promise<ApolloQueryResult<Query>>;
   applicationRoundStatus: ApplicationRoundStatusChoice;
   relatedAllocations: AllocatedTimeSlotNode[];

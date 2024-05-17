@@ -10,13 +10,11 @@ import { ShowAllContainer } from "common/src/components";
 import {
   type Query,
   type QueryApplicationSectionsArgs,
-  type UnitNode,
   ApplicantTypeChoice,
   ApplicationRoundStatusChoice,
-  type QueryApplicationRoundArgs,
   type QueryAffectingAllocatedTimeSlotsArgs,
-  type ApplicationRoundNode,
-  type ReservationUnitNode,
+  type ApplicationRoundFilterQuery,
+  useApplicationRoundFilterQuery,
 } from "@gql/gql-types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { SearchTags } from "@/component/SearchTags";
@@ -38,12 +36,12 @@ import { Permission } from "@/modules/permissionHelper";
 import { truncate } from "@/helpers";
 import {
   ALL_EVENTS_PER_UNIT_QUERY,
-  APPLICATION_ROUND_FILTER_OPTIONS,
   APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY,
 } from "./queries";
 import { AllocationPageContent } from "./ApplicationEvents";
 import { ComboboxFilter, SearchFilter } from "@/component/QueryParamFilters";
 import { convertPriorityFilter } from "./modules/applicationRoundAllocation";
+import { ApplicationRoundNode } from "common/gql/gql-types";
 
 const MAX_RES_UNIT_NAME_LENGTH = 35;
 
@@ -133,7 +131,7 @@ function Filters({
   purposeOptions,
   ageGroupOptions,
 }: {
-  units: UnitNode[];
+  units: UnitFilterQueryType[];
   priorityOptions: PriorityFilterOptions[];
   orderOptions: PkFilterOptions[];
   cityOptions: PkFilterOptions[];
@@ -150,8 +148,8 @@ function Filters({
     })
   );
   const unitOptions = units.map((unit) => ({
-    value: unit.pk ?? 0,
-    label: unit.nameFi ?? "",
+    value: unit?.pk ?? 0,
+    label: unit?.nameFi ?? "",
   }));
 
   const unitFilter = searchParams.get("unit");
@@ -165,7 +163,7 @@ function Filters({
 
   useEffect(() => {
     if (units.length > 0 && unitFilter == null) {
-      setUnitFilter(units[0].pk ?? 0);
+      setUnitFilter(units[0]?.pk ?? 0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- this is the correct list, but should be refactored
   }, [units]);
@@ -196,6 +194,11 @@ function Filters({
   );
 }
 
+type ApplicationRoundFilterQueryType =
+  NonNullable<ApplicationRoundFilterQuery>["applicationRound"];
+type ReservationUnitFilterQueryType =
+  NonNullable<ApplicationRoundFilterQueryType>["reservationUnits"][0];
+type UnitFilterQueryType = NonNullable<ReservationUnitFilterQueryType>["unit"];
 function ApplicationRoundAllocation({
   applicationRound,
   applicationRoundPk,
@@ -204,12 +207,11 @@ function ApplicationRoundAllocation({
   roundName,
   applicationRoundStatus,
 }: {
-  // TODO don't like the undefined, but I hate spinners
-  applicationRound?: ApplicationRoundNode;
+  applicationRound: ApplicationRoundFilterQueryType;
   // TODO refactor the others to use the RoundNode
   applicationRoundPk: number;
-  units: UnitNode[];
-  reservationUnits: ReservationUnitNode[];
+  units: UnitFilterQueryType[];
+  reservationUnits: ReservationUnitFilterQueryType[];
   // TODO do we want to prop drill these? or include it in every application event?
   roundName: string;
   applicationRoundStatus: ApplicationRoundStatusChoice;
@@ -577,15 +579,10 @@ function AllocationWrapper({
 }): JSX.Element {
   const typename = "ApplicationRoundNode";
   const id = base64encode(`${typename}:${applicationRoundPk}`);
-  const { loading, error, data } = useQuery<Query, QueryApplicationRoundArgs>(
-    APPLICATION_ROUND_FILTER_OPTIONS,
-    {
-      skip: !applicationRoundPk,
-      variables: {
-        id,
-      },
-    }
-  );
+  const { loading, error, data } = useApplicationRoundFilterQuery({
+    skip: !applicationRoundPk,
+    variables: { id },
+  });
 
   const { t } = useTranslation();
   const { hasUnitPermission } = usePermission();
@@ -610,7 +607,7 @@ function AllocationWrapper({
   const canManage =
     applicationRound != null
       ? hasApplicationRoundPermission(
-          applicationRound,
+          applicationRound as ApplicationRoundNode,
           Permission.CAN_MANAGE_APPLICATIONS
         )
       : false;

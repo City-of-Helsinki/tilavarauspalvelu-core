@@ -12,7 +12,7 @@ import {
   type AllocatedTimeSlotNode,
   type SuitableTimeRangeNode,
   ApplicationSectionStatusChoice,
-  type ReservationUnitNode,
+  ApplicationRoundFilterQuery,
 } from "@gql/gql-types";
 import { ShowAllContainer } from "common/src/components/";
 import { transformWeekday, type Day } from "common/src/conversion";
@@ -26,9 +26,13 @@ import {
 import { AllocatedCard, SuitableTimeCard } from "./AllocationCard";
 import { useSlotSelection } from "./hooks";
 
+type ApplicationRoundFilterQueryType =
+  NonNullable<ApplicationRoundFilterQuery>["applicationRound"];
+type ReservationUnitFilterQueryType =
+  NonNullable<ApplicationRoundFilterQueryType>["reservationUnits"][0];
 type Props = {
   applicationSections: ApplicationSectionNode[] | null;
-  reservationUnit?: ReservationUnitNode;
+  reservationUnit?: ReservationUnitFilterQueryType;
   refetchApplicationEvents: () => Promise<ApolloQueryResult<Query>>;
   applicationRoundStatus: ApplicationRoundStatusChoice;
   relatedAllocations: RelatedSlot[][];

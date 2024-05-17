@@ -12,10 +12,17 @@ import {
 } from "@/modules/permissionHelper";
 import { filterNonNullable } from "common/src/helpers";
 
+export type UnitPermissionFragment =
+  | {
+      pk?: number | null | undefined;
+      serviceSectors?: { pk?: number | null | undefined }[] | null | undefined;
+    }
+  | null
+  | undefined;
 const hasUnitPermission = (
   user: CurrentUserQuery["currentUser"],
   permissionName: Permission,
-  unit: UnitNode | undefined
+  unit: UnitPermissionFragment
 ): boolean => {
   if (user == null || unit?.pk == null) {
     return false;
@@ -131,7 +138,7 @@ const usePermission = () => {
     ) => hasPermission(user, reservation, permissionName, includeOwn),
     hasSomePermission,
     hasAnyPermission,
-    hasUnitPermission: (permission: Permission, unit: UnitNode) =>
+    hasUnitPermission: (permission: Permission, unit: UnitPermissionFragment) =>
       hasUnitPermission(user, permission, unit),
     hasApplicationRoundPermission,
   };

@@ -119,7 +119,6 @@ export function useOptions() {
   const { i18n } = useTranslation();
 
   const { data, loading: isLoading } = useOptionsQuery();
-  // useQuery<Query>(OPTIONS_QUERY);
   const ageGroups = filterNonNullable(
     data?.ageGroups?.edges?.map((edge) => edge?.node)
   );

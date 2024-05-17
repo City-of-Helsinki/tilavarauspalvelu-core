@@ -8,7 +8,7 @@ import {
   type ApplicationSectionNode,
   type Maybe,
   type Query,
-  type ReservationUnitNode,
+  type ApplicationRoundFilterQuery,
 } from "@gql/gql-types";
 import { SemiBold, fontMedium } from "common";
 import { ageGroup } from "@/component/reservations/requested/util";
@@ -25,6 +25,10 @@ import { getApplicationSectionUrl } from "@/common/urls";
 import { useNotification } from "@/context/NotificationContext";
 import { getApplicantName } from "@/helpers";
 
+type ApplicationRoundFilterQueryType =
+  NonNullable<ApplicationRoundFilterQuery>["applicationRound"];
+type ReservationUnitFilterQueryType =
+  NonNullable<ApplicationRoundFilterQueryType>["reservationUnits"][0];
 export type AllocationApplicationSectionCardType =
   | "unallocated"
   | "allocated"
@@ -33,7 +37,7 @@ export type AllocationApplicationSectionCardType =
 
 type Props = {
   applicationSection: ApplicationSectionNode;
-  reservationUnit: ReservationUnitNode;
+  reservationUnit: NonNullable<ReservationUnitFilterQueryType>;
   type: AllocationApplicationSectionCardType;
   refetch: () => Promise<ApolloQueryResult<Query>>;
 };
@@ -260,7 +264,7 @@ function SchedulesList({
   eventsPerWeek,
   refetch,
 }: {
-  currentReservationUnit: ReservationUnitNode;
+  currentReservationUnit: ReservationUnitFilterQueryType;
   section: ApplicationSectionNode;
   eventsPerWeek: number;
   refetch: () => Promise<ApolloQueryResult<Query>>;
@@ -379,7 +383,7 @@ function AllocatedScheduleSection({
   currentReservationUnit,
 }: {
   allocatedTimeSlot: AllocatedTimeSlotNode;
-  currentReservationUnit: ReservationUnitNode;
+  currentReservationUnit: ReservationUnitFilterQueryType;
 }): JSX.Element {
   const { t } = useTranslation();
 
