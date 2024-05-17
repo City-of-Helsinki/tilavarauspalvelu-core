@@ -1,17 +1,20 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { memoize } from "lodash";
-import type { UnitNode } from "@gql/gql-types";
+import type { UnitsQuery } from "@gql/gql-types";
 import type { TFunction } from "i18next";
 import { truncate } from "@/helpers";
 import { myUnitUrl, unitUrl } from "@/common/urls";
 import { CustomTable, TableLink } from "@/component/Table";
 import { MAX_UNIT_NAME_LENGTH } from "@/common/const";
 
+type UnitType = NonNullable<
+  NonNullable<NonNullable<UnitsQuery["units"]>["edges"][0]>["node"]
+>;
 type Props = {
   sort: string;
   sortChanged: (field: string) => void;
-  units: UnitNode[];
+  units: UnitType[];
   isMyUnits?: boolean;
   isLoading?: boolean;
 };
@@ -19,7 +22,7 @@ type Props = {
 type ColumnType = {
   headerName: string;
   key: string;
-  transform?: (unit: UnitNode) => JSX.Element | string;
+  transform?: (unit: UnitType) => JSX.Element | string;
   width: string;
   isSortable: boolean;
 };
@@ -29,7 +32,7 @@ function getColConfig(t: TFunction, isMyUnits?: boolean): ColumnType[] {
     {
       headerName: t("Units.headings.name"),
       key: "nameFi",
-      transform: ({ nameFi, pk }: UnitNode) => (
+      transform: ({ nameFi, pk }: UnitType) => (
         <TableLink href={isMyUnits ? myUnitUrl(pk ?? 0) : unitUrl(pk ?? 0)}>
           {truncate(nameFi ?? "-", MAX_UNIT_NAME_LENGTH)}
         </TableLink>
@@ -41,7 +44,7 @@ function getColConfig(t: TFunction, isMyUnits?: boolean): ColumnType[] {
       headerName: t("Units.headings.reservationUnitCount"),
       key: "typeFi",
       isSortable: false,
-      transform: (unit: UnitNode) => (
+      transform: (unit: UnitType) => (
         <> {unit?.reservationunitSet?.length ?? 0} </>
       ),
       width: "25%",

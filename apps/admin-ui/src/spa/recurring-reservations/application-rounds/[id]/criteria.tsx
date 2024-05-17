@@ -1,12 +1,12 @@
 import React from "react";
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import { H1, H2, H3, Strong } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { type Query } from "@gql/gql-types";
-import { filterNonNullable } from "common/src/helpers";
+import { useApplicationRoundCriteriaQuery } from "@gql/gql-types";
+import { base64encode, filterNonNullable } from "common/src/helpers";
 import { Container } from "@/styles/layout";
 import { formatDate } from "@/common/util";
 import { useNotification } from "@/context/NotificationContext";
@@ -92,29 +92,29 @@ const ReservationUnit = styled.div`
   }
 `;
 
-// TODO change to non-list query. requires backend to add relay to applicationRounds query
-const APPLICATION_ROUND_QUERY = gql`
-  query ApplicationRoundCriteria($pk: [Int]!) {
-    applicationRounds(pk: $pk) {
-      edges {
-        node {
-          pk
+// export so it doesn't get removed (codegen makes a copy of it)
+export const APPLICATION_ROUND_QUERY = gql`
+  query ApplicationRoundCriteria($id: ID!) {
+    applicationRound(id: $id) {
+      id
+      pk
+      nameFi
+      reservationUnitCount
+      applicationPeriodBegin
+      applicationPeriodEnd
+      reservationPeriodBegin
+      reservationPeriodEnd
+      reservationUnits {
+        id
+        pk
+        nameFi
+        spaces {
+          id
           nameFi
-          reservationUnitCount
-          applicationPeriodBegin
-          applicationPeriodEnd
-          reservationPeriodBegin
-          reservationPeriodEnd
-          reservationUnits {
-            pk
-            nameFi
-            spaces {
-              nameFi
-            }
-            unit {
-              nameFi
-            }
-          }
+        }
+        unit {
+          id
+          nameFi
         }
       }
     }
@@ -129,24 +129,20 @@ function Criteria({
   const { t } = useTranslation();
   const { notifyError } = useNotification();
 
-  const { data: applicationRoundData, loading: isLoading } = useQuery<Query>(
-    APPLICATION_ROUND_QUERY,
-    {
-      variables: { pk: [applicationRoundPk] },
-      onError: () => {
-        notifyError(t("errors.errorFetchingData"));
-      },
-    }
-  );
-  const applicationRounds = filterNonNullable(
-    applicationRoundData?.applicationRounds?.edges?.map((edge) => edge?.node)
-  );
-  const applicationRound = applicationRounds[0];
+  const id = base64encode(`ApplicationRoundNode:${applicationRoundPk}`);
+  const { data, loading } = useApplicationRoundCriteriaQuery({
+    variables: { id },
+    skip: !applicationRoundPk,
+    onError: () => {
+      notifyError(t("errors.errorFetchingData"));
+    },
+  });
+  const { applicationRound } = data ?? {};
   const reservationUnits = filterNonNullable(
     applicationRound?.reservationUnits
   );
 
-  if (isLoading) {
+  if (loading) {
     return <Loader />;
   }
   if (applicationRound == null) {

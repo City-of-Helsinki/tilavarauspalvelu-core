@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import { type ApolloError, useQuery } from "@apollo/client";
+import { type ApolloError } from "@apollo/client";
 import {
-  type Query,
-  type QueryReservationUnitsArgs,
   ReservationUnitOrderingChoices,
+  useSearchReservationUnitsQuery,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { LARGE_LIST_PAGE_SIZE } from "@/common/const";
@@ -11,7 +10,6 @@ import { useNotification } from "@/context/NotificationContext";
 import Loader from "@/component/Loader";
 import { More } from "@/component/More";
 import { ReservationUnitsTable } from "./ReservationUnitsTable";
-import { SEARCH_RESERVATION_UNITS_QUERY } from "./queries";
 import { FilterArguments } from "./Filters";
 
 type Props = {
@@ -94,20 +92,18 @@ export function ReservationUnitsDataReader({ filters }: Props): JSX.Element {
   };
 
   const orderBy = transformSortString(sort);
-  const { fetchMore, loading, data, previousData } = useQuery<
-    Query,
-    QueryReservationUnitsArgs
-  >(SEARCH_RESERVATION_UNITS_QUERY, {
-    variables: {
-      orderBy,
-      first: LARGE_LIST_PAGE_SIZE,
-      ...mapFilterParams(filters),
-    },
-    onError: (err: ApolloError) => {
-      notifyError(err.message);
-    },
-    fetchPolicy: "cache-and-network",
-  });
+  const { fetchMore, loading, data, previousData } =
+    useSearchReservationUnitsQuery({
+      variables: {
+        orderBy,
+        first: LARGE_LIST_PAGE_SIZE,
+        ...mapFilterParams(filters),
+      },
+      onError: (err: ApolloError) => {
+        notifyError(err.message);
+      },
+      fetchPolicy: "cache-and-network",
+    });
 
   const { reservationUnits } = data ?? previousData ?? {};
   const resUnits = filterNonNullable(

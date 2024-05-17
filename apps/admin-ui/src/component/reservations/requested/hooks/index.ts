@@ -1,55 +1,52 @@
 import {
-  type Query,
-  type ReservationNode,
+  type CalendarReservationFragment,
   State,
-  type QueryRecurringReservationArgs,
   ReservationTypeChoice,
   useReservationQuery,
   useReservationDenyReasonsQuery,
+  useReservationsByReservationUnitQuery,
+  useRecurringReservationQuery,
 } from "@gql/gql-types";
 import { useTranslation } from "react-i18next";
-import { useQuery } from "@apollo/client";
 import { toApiDate } from "common/src/common/util";
-import {
-  RECURRING_RESERVATION_QUERY,
-  RESERVATIONS_BY_RESERVATIONUNITS,
-} from "./queries";
 import { useNotification } from "@/context/NotificationContext";
-import {
-  base64encode,
-  concatAffectedReservations,
-  filterNonNullable,
-} from "common/src/helpers";
-import { ReservationUnitWithAffectingArgs } from "common/src/queries/fragments";
+import { base64encode, filterNonNullable } from "common/src/helpers";
 
 export { default as useCheckCollisions } from "./useCheckCollisions";
 
 const getEventName = (
-  eventType?: ReservationTypeChoice,
+  eventType?: ReservationTypeChoice | null,
   title?: string,
   blockedName?: string
 ) =>
   eventType === ReservationTypeChoice.Blocked ? blockedName : title?.trim();
 
-const getReservationTitle = (r: ReservationNode) => r.reserveeName ?? "";
+const getReservationTitle = (r: CalendarReservationFragment) =>
+  r.reserveeName ?? "";
 
-const convertReservationToCalendarEvent = (
-  r: ReservationNode,
+function convertReservationToCalendarEvent(
+  r: CalendarReservationFragment,
   blockedName: string
-) => ({
-  title: getEventName(r.type ?? undefined, getReservationTitle(r), blockedName),
-  event: {
-    ...r,
-    name: r.name?.trim() !== "" ? r.name : "No name",
-  },
-  // TODO use zod for datetime conversions
-  start: new Date(r.begin),
-  end: new Date(r.end),
-});
+) {
+  const title = getEventName(r.type, getReservationTitle(r), blockedName);
+  return {
+    title,
+    event: {
+      ...r,
+      name: r.name?.trim() !== "" ? r.name : "No name",
+    },
+    // TODO use zod for datetime conversions
+    start: new Date(r.begin),
+    end: new Date(r.end),
+  };
+}
 
 // TODO This would be better if we combined two GQL queries, one for the reservation itself
 // and other that includes the states (now we are fetching a lot of things we don't need)
-const shouldBeShownInTheCalendar = (r: ReservationNode, ownPk?: number) =>
+const shouldBeShownInTheCalendar = (
+  r: CalendarReservationFragment,
+  ownPk?: number
+) =>
   r.state === State.Confirmed ||
   r.state === State.RequiresHandling ||
   r.pk === ownPk;
@@ -70,41 +67,46 @@ export function useReservationData(
 
   const typename = "ReservationUnitNode";
   const id = base64encode(`${typename}:${reservationUnitPk}`);
-  const { data, ...rest } = useQuery<Query, ReservationUnitWithAffectingArgs>(
-    RESERVATIONS_BY_RESERVATIONUNITS,
-    {
-      fetchPolicy: "no-cache",
-      skip: !reservationUnitPk,
-      variables: {
-        id,
-        pk: reservationUnitPk ?? 0,
-        beginDate: toApiDate(begin ?? today) ?? "",
-        endDate: toApiDate(end ?? today) ?? "",
-        // NOTE we need denied to show the past reservations
-        state: [
-          State.Confirmed,
-          State.RequiresHandling,
-          State.Denied,
-          State.WaitingForPayment,
-        ],
-      },
-      onError: () => {
-        notifyError("Varauksia ei voitu hakea");
-      },
-    }
-  );
+  const { data, ...rest } = useReservationsByReservationUnitQuery({
+    fetchPolicy: "no-cache",
+    skip: !reservationUnitPk,
+    variables: {
+      id,
+      pk: reservationUnitPk ?? 0,
+      beginDate: toApiDate(begin ?? today) ?? "",
+      endDate: toApiDate(end ?? today) ?? "",
+      // NOTE we need denied to show the past reservations
+      state: [
+        State.Confirmed,
+        State.RequiresHandling,
+        State.Denied,
+        State.WaitingForPayment,
+      ],
+    },
+    onError: () => {
+      notifyError("Varauksia ei voitu hakea");
+    },
+  });
 
   const blockedName = t("ReservationUnits.reservationState.RESERVATION_CLOSED");
 
+  function doesReservationAffectReservationUnit(
+    reservation: CalendarReservationFragment,
+    resUnitPk: number
+  ) {
+    return reservation.affectedReservationUnits?.some((pk) => pk === resUnitPk);
+  }
   const reservationSet = filterNonNullable(
     data?.reservationUnit?.reservationSet
   );
   // NOTE we could use a recular concat here (we only have single reservationUnit here)
   const affectingReservations = filterNonNullable(data?.affectingReservations);
-  const reservations = concatAffectedReservations(
-    reservationSet,
-    affectingReservations,
-    reservationUnitPk ?? 0
+  const reservations = filterNonNullable(
+    reservationSet?.concat(
+      affectingReservations?.filter((y) =>
+        doesReservationAffectReservationUnit(y, reservationUnitPk ?? 0)
+      ) ?? []
+    )
   );
 
   const events =
@@ -123,10 +125,7 @@ export function useRecurringReservations(recurringPk?: number) {
   const { t } = useTranslation();
 
   const id = base64encode(`RecurringReservationNode:${recurringPk}`);
-  const { data, loading, refetch } = useQuery<
-    Query,
-    QueryRecurringReservationArgs
-  >(RECURRING_RESERVATION_QUERY, {
+  const { data, loading, refetch } = useRecurringReservationQuery({
     skip: !recurringPk,
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",

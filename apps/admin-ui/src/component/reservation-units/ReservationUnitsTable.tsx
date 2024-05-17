@@ -1,12 +1,18 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
-import type { ReservationUnitNode } from "@gql/gql-types";
+import type { SearchReservationUnitsQuery } from "@gql/gql-types";
 import { truncate } from "@/helpers";
 import { reservationUnitUrl } from "@/common/urls";
 import { CustomTable, TableLink } from "@/component/Table";
 import { MAX_NAME_LENGTH } from "@/common/const";
 
+type ReservationUnitList = NonNullable<
+  SearchReservationUnitsQuery["reservationUnits"]
+>;
+type ReservationUnitNode = NonNullable<
+  NonNullable<ReservationUnitList["edges"][0]>["node"]
+>;
 type Props = {
   sort: string;
   sortChanged: (field: string) => void;

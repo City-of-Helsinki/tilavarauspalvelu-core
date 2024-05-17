@@ -6687,11 +6687,11 @@ export type HandlingDataQuery = {
   } | null;
 };
 
-export type GetReservationDateOfBirthQueryVariables = Exact<{
+export type ReservationDateOfBirthQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
 
-export type GetReservationDateOfBirthQuery = {
+export type ReservationDateOfBirthQuery = {
   __typename?: "Query";
   reservation?: {
     __typename?: "ReservationNode";
@@ -6703,11 +6703,11 @@ export type GetReservationDateOfBirthQuery = {
   } | null;
 };
 
-export type GetApplicationDateOfBirthQueryVariables = Exact<{
+export type ApplicationDateOfBirthQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
 
-export type GetApplicationDateOfBirthQuery = {
+export type ApplicationDateOfBirthQuery = {
   __typename?: "Query";
   application?: {
     __typename?: "ApplicationNode";
@@ -7900,6 +7900,7 @@ export type StaffAdjustReservationTimeMutation = {
 
 export type CalendarReservationFragment = {
   __typename?: "ReservationNode";
+  id: string;
   name?: string | null;
   reserveeName?: string | null;
   pk?: number | null;
@@ -7910,7 +7911,7 @@ export type CalendarReservationFragment = {
   bufferTimeBefore: number;
   bufferTimeAfter: number;
   affectedReservationUnits?: Array<number | null> | null;
-  user?: { __typename?: "UserNode"; email: string } | null;
+  user?: { __typename?: "UserNode"; id: string; email: string } | null;
 };
 
 export type ReservationsByReservationUnitQueryVariables = Exact<{
@@ -7928,8 +7929,10 @@ export type ReservationsByReservationUnitQuery = {
   __typename?: "Query";
   reservationUnit?: {
     __typename?: "ReservationUnitNode";
+    id: string;
     reservationSet?: Array<{
       __typename?: "ReservationNode";
+      id: string;
       name?: string | null;
       reserveeName?: string | null;
       pk?: number | null;
@@ -7940,11 +7943,12 @@ export type ReservationsByReservationUnitQuery = {
       bufferTimeBefore: number;
       bufferTimeAfter: number;
       affectedReservationUnits?: Array<number | null> | null;
-      user?: { __typename?: "UserNode"; email: string } | null;
+      user?: { __typename?: "UserNode"; id: string; email: string } | null;
     }> | null;
   } | null;
   affectingReservations?: Array<{
     __typename?: "ReservationNode";
+    id: string;
     name?: string | null;
     reserveeName?: string | null;
     pk?: number | null;
@@ -7955,7 +7959,7 @@ export type ReservationsByReservationUnitQuery = {
     bufferTimeBefore: number;
     bufferTimeAfter: number;
     affectedReservationUnits?: Array<number | null> | null;
-    user?: { __typename?: "UserNode"; email: string } | null;
+    user?: { __typename?: "UserNode"; id: string; email: string } | null;
   }> | null;
 };
 
@@ -8164,18 +8168,21 @@ export type RecurringReservationQuery = {
   __typename?: "Query";
   recurringReservation?: {
     __typename?: "RecurringReservationNode";
+    id: string;
     pk?: number | null;
     weekdays?: Array<number | null> | null;
     beginDate?: string | null;
     endDate?: string | null;
     reservations: Array<{
       __typename?: "ReservationNode";
+      id: string;
       pk?: number | null;
       begin: string;
       end: string;
       state: State;
       reservationUnit?: Array<{
         __typename?: "ReservationUnitNode";
+        id: string;
         pk?: number | null;
       }> | null;
     }>;
@@ -9066,35 +9073,37 @@ export type RejectRestMutation = {
 };
 
 export type ApplicationRoundCriteriaQueryVariables = Exact<{
-  pk:
-    | Array<InputMaybe<Scalars["Int"]["input"]>>
-    | InputMaybe<Scalars["Int"]["input"]>;
+  id: Scalars["ID"]["input"];
 }>;
 
 export type ApplicationRoundCriteriaQuery = {
   __typename?: "Query";
-  applicationRounds?: {
-    __typename?: "ApplicationRoundNodeConnection";
-    edges: Array<{
-      __typename?: "ApplicationRoundNodeEdge";
-      node?: {
-        __typename?: "ApplicationRoundNode";
-        pk?: number | null;
+  applicationRound?: {
+    __typename?: "ApplicationRoundNode";
+    id: string;
+    pk?: number | null;
+    nameFi?: string | null;
+    reservationUnitCount?: number | null;
+    applicationPeriodBegin: string;
+    applicationPeriodEnd: string;
+    reservationPeriodBegin: string;
+    reservationPeriodEnd: string;
+    reservationUnits: Array<{
+      __typename?: "ReservationUnitNode";
+      id: string;
+      pk?: number | null;
+      nameFi?: string | null;
+      spaces: Array<{
+        __typename?: "SpaceNode";
+        id: string;
         nameFi?: string | null;
-        reservationUnitCount?: number | null;
-        applicationPeriodBegin: string;
-        applicationPeriodEnd: string;
-        reservationPeriodBegin: string;
-        reservationPeriodEnd: string;
-        reservationUnits: Array<{
-          __typename?: "ReservationUnitNode";
-          pk?: number | null;
-          nameFi?: string | null;
-          spaces: Array<{ __typename?: "SpaceNode"; nameFi?: string | null }>;
-          unit?: { __typename?: "UnitNode"; nameFi?: string | null } | null;
-        }>;
+      }>;
+      unit?: {
+        __typename?: "UnitNode";
+        id: string;
+        nameFi?: string | null;
       } | null;
-    } | null>;
+    }>;
   } | null;
 };
 
@@ -10034,7 +10043,9 @@ export const ReservationUnitReservationsFragmentDoc = gql`
 `;
 export const CalendarReservationFragmentDoc = gql`
   fragment CalendarReservation on ReservationNode {
+    id
     user {
+      id
       email
     }
     name
@@ -11031,8 +11042,8 @@ export type HandlingDataQueryResult = Apollo.QueryResult<
   HandlingDataQuery,
   HandlingDataQueryVariables
 >;
-export const GetReservationDateOfBirthDocument = gql`
-  query getReservationDateOfBirth($id: ID!) {
+export const ReservationDateOfBirthDocument = gql`
+  query ReservationDateOfBirth($id: ID!) {
     reservation(id: $id) {
       user {
         pk
@@ -11043,76 +11054,76 @@ export const GetReservationDateOfBirthDocument = gql`
 `;
 
 /**
- * __useGetReservationDateOfBirthQuery__
+ * __useReservationDateOfBirthQuery__
  *
- * To run a query within a React component, call `useGetReservationDateOfBirthQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetReservationDateOfBirthQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useReservationDateOfBirthQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationDateOfBirthQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetReservationDateOfBirthQuery({
+ * const { data, loading, error } = useReservationDateOfBirthQuery({
  *   variables: {
  *      id: // value for 'id'
  *   },
  * });
  */
-export function useGetReservationDateOfBirthQuery(
+export function useReservationDateOfBirthQuery(
   baseOptions: Apollo.QueryHookOptions<
-    GetReservationDateOfBirthQuery,
-    GetReservationDateOfBirthQueryVariables
+    ReservationDateOfBirthQuery,
+    ReservationDateOfBirthQueryVariables
   > &
     (
-      | { variables: GetReservationDateOfBirthQueryVariables; skip?: boolean }
+      | { variables: ReservationDateOfBirthQueryVariables; skip?: boolean }
       | { skip: boolean }
     )
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
-    GetReservationDateOfBirthQuery,
-    GetReservationDateOfBirthQueryVariables
-  >(GetReservationDateOfBirthDocument, options);
+    ReservationDateOfBirthQuery,
+    ReservationDateOfBirthQueryVariables
+  >(ReservationDateOfBirthDocument, options);
 }
-export function useGetReservationDateOfBirthLazyQuery(
+export function useReservationDateOfBirthLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    GetReservationDateOfBirthQuery,
-    GetReservationDateOfBirthQueryVariables
+    ReservationDateOfBirthQuery,
+    ReservationDateOfBirthQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
-    GetReservationDateOfBirthQuery,
-    GetReservationDateOfBirthQueryVariables
-  >(GetReservationDateOfBirthDocument, options);
+    ReservationDateOfBirthQuery,
+    ReservationDateOfBirthQueryVariables
+  >(ReservationDateOfBirthDocument, options);
 }
-export function useGetReservationDateOfBirthSuspenseQuery(
+export function useReservationDateOfBirthSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<
-    GetReservationDateOfBirthQuery,
-    GetReservationDateOfBirthQueryVariables
+    ReservationDateOfBirthQuery,
+    ReservationDateOfBirthQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<
-    GetReservationDateOfBirthQuery,
-    GetReservationDateOfBirthQueryVariables
-  >(GetReservationDateOfBirthDocument, options);
+    ReservationDateOfBirthQuery,
+    ReservationDateOfBirthQueryVariables
+  >(ReservationDateOfBirthDocument, options);
 }
-export type GetReservationDateOfBirthQueryHookResult = ReturnType<
-  typeof useGetReservationDateOfBirthQuery
+export type ReservationDateOfBirthQueryHookResult = ReturnType<
+  typeof useReservationDateOfBirthQuery
 >;
-export type GetReservationDateOfBirthLazyQueryHookResult = ReturnType<
-  typeof useGetReservationDateOfBirthLazyQuery
+export type ReservationDateOfBirthLazyQueryHookResult = ReturnType<
+  typeof useReservationDateOfBirthLazyQuery
 >;
-export type GetReservationDateOfBirthSuspenseQueryHookResult = ReturnType<
-  typeof useGetReservationDateOfBirthSuspenseQuery
+export type ReservationDateOfBirthSuspenseQueryHookResult = ReturnType<
+  typeof useReservationDateOfBirthSuspenseQuery
 >;
-export type GetReservationDateOfBirthQueryResult = Apollo.QueryResult<
-  GetReservationDateOfBirthQuery,
-  GetReservationDateOfBirthQueryVariables
+export type ReservationDateOfBirthQueryResult = Apollo.QueryResult<
+  ReservationDateOfBirthQuery,
+  ReservationDateOfBirthQueryVariables
 >;
-export const GetApplicationDateOfBirthDocument = gql`
-  query getApplicationDateOfBirth($id: ID!) {
+export const ApplicationDateOfBirthDocument = gql`
+  query ApplicationDateOfBirth($id: ID!) {
     application(id: $id) {
       user {
         pk
@@ -11123,73 +11134,73 @@ export const GetApplicationDateOfBirthDocument = gql`
 `;
 
 /**
- * __useGetApplicationDateOfBirthQuery__
+ * __useApplicationDateOfBirthQuery__
  *
- * To run a query within a React component, call `useGetApplicationDateOfBirthQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetApplicationDateOfBirthQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useApplicationDateOfBirthQuery` and pass it any options that fit your needs.
+ * When your component renders, `useApplicationDateOfBirthQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetApplicationDateOfBirthQuery({
+ * const { data, loading, error } = useApplicationDateOfBirthQuery({
  *   variables: {
  *      id: // value for 'id'
  *   },
  * });
  */
-export function useGetApplicationDateOfBirthQuery(
+export function useApplicationDateOfBirthQuery(
   baseOptions: Apollo.QueryHookOptions<
-    GetApplicationDateOfBirthQuery,
-    GetApplicationDateOfBirthQueryVariables
+    ApplicationDateOfBirthQuery,
+    ApplicationDateOfBirthQueryVariables
   > &
     (
-      | { variables: GetApplicationDateOfBirthQueryVariables; skip?: boolean }
+      | { variables: ApplicationDateOfBirthQueryVariables; skip?: boolean }
       | { skip: boolean }
     )
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
-    GetApplicationDateOfBirthQuery,
-    GetApplicationDateOfBirthQueryVariables
-  >(GetApplicationDateOfBirthDocument, options);
+    ApplicationDateOfBirthQuery,
+    ApplicationDateOfBirthQueryVariables
+  >(ApplicationDateOfBirthDocument, options);
 }
-export function useGetApplicationDateOfBirthLazyQuery(
+export function useApplicationDateOfBirthLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    GetApplicationDateOfBirthQuery,
-    GetApplicationDateOfBirthQueryVariables
+    ApplicationDateOfBirthQuery,
+    ApplicationDateOfBirthQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
-    GetApplicationDateOfBirthQuery,
-    GetApplicationDateOfBirthQueryVariables
-  >(GetApplicationDateOfBirthDocument, options);
+    ApplicationDateOfBirthQuery,
+    ApplicationDateOfBirthQueryVariables
+  >(ApplicationDateOfBirthDocument, options);
 }
-export function useGetApplicationDateOfBirthSuspenseQuery(
+export function useApplicationDateOfBirthSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<
-    GetApplicationDateOfBirthQuery,
-    GetApplicationDateOfBirthQueryVariables
+    ApplicationDateOfBirthQuery,
+    ApplicationDateOfBirthQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<
-    GetApplicationDateOfBirthQuery,
-    GetApplicationDateOfBirthQueryVariables
-  >(GetApplicationDateOfBirthDocument, options);
+    ApplicationDateOfBirthQuery,
+    ApplicationDateOfBirthQueryVariables
+  >(ApplicationDateOfBirthDocument, options);
 }
-export type GetApplicationDateOfBirthQueryHookResult = ReturnType<
-  typeof useGetApplicationDateOfBirthQuery
+export type ApplicationDateOfBirthQueryHookResult = ReturnType<
+  typeof useApplicationDateOfBirthQuery
 >;
-export type GetApplicationDateOfBirthLazyQueryHookResult = ReturnType<
-  typeof useGetApplicationDateOfBirthLazyQuery
+export type ApplicationDateOfBirthLazyQueryHookResult = ReturnType<
+  typeof useApplicationDateOfBirthLazyQuery
 >;
-export type GetApplicationDateOfBirthSuspenseQueryHookResult = ReturnType<
-  typeof useGetApplicationDateOfBirthSuspenseQuery
+export type ApplicationDateOfBirthSuspenseQueryHookResult = ReturnType<
+  typeof useApplicationDateOfBirthSuspenseQuery
 >;
-export type GetApplicationDateOfBirthQueryResult = Apollo.QueryResult<
-  GetApplicationDateOfBirthQuery,
-  GetApplicationDateOfBirthQueryVariables
+export type ApplicationDateOfBirthQueryResult = Apollo.QueryResult<
+  ApplicationDateOfBirthQuery,
+  ApplicationDateOfBirthQueryVariables
 >;
 export const CreateResourceDocument = gql`
   mutation createResource($input: ResourceCreateMutationInput!) {
@@ -13236,7 +13247,7 @@ export type UpdateRecurringReservationMutationOptions =
     UpdateRecurringReservationMutationVariables
   >;
 export const ReservationsDocument = gql`
-  query reservations(
+  query Reservations(
     $after: String
     $unit: [ID]
     $reservationUnitType: [ID]
@@ -13434,6 +13445,7 @@ export const ReservationsByReservationUnitDocument = gql`
     $state: [String]
   ) {
     reservationUnit(id: $id) {
+      id
       reservationSet(state: $state, beginDate: $beginDate, endDate: $endDate) {
         ...CalendarReservation
       }
@@ -13615,18 +13627,21 @@ export type ReservationQueryResult = Apollo.QueryResult<
   ReservationQueryVariables
 >;
 export const RecurringReservationDocument = gql`
-  query recurringReservation($id: ID!) {
+  query RecurringReservation($id: ID!) {
     recurringReservation(id: $id) {
+      id
       pk
       weekdays
       beginDate
       endDate
       reservations {
+        id
         pk
         begin
         end
         state
         reservationUnit {
+          id
           pk
         }
       }
@@ -15581,27 +15596,27 @@ export type RejectRestMutationOptions = Apollo.BaseMutationOptions<
   RejectRestMutationVariables
 >;
 export const ApplicationRoundCriteriaDocument = gql`
-  query ApplicationRoundCriteria($pk: [Int]!) {
-    applicationRounds(pk: $pk) {
-      edges {
-        node {
-          pk
+  query ApplicationRoundCriteria($id: ID!) {
+    applicationRound(id: $id) {
+      id
+      pk
+      nameFi
+      reservationUnitCount
+      applicationPeriodBegin
+      applicationPeriodEnd
+      reservationPeriodBegin
+      reservationPeriodEnd
+      reservationUnits {
+        id
+        pk
+        nameFi
+        spaces {
+          id
           nameFi
-          reservationUnitCount
-          applicationPeriodBegin
-          applicationPeriodEnd
-          reservationPeriodBegin
-          reservationPeriodEnd
-          reservationUnits {
-            pk
-            nameFi
-            spaces {
-              nameFi
-            }
-            unit {
-              nameFi
-            }
-          }
+        }
+        unit {
+          id
+          nameFi
         }
       }
     }
@@ -15620,7 +15635,7 @@ export const ApplicationRoundCriteriaDocument = gql`
  * @example
  * const { data, loading, error } = useApplicationRoundCriteriaQuery({
  *   variables: {
- *      pk: // value for 'pk'
+ *      id: // value for 'id'
  *   },
  * });
  */

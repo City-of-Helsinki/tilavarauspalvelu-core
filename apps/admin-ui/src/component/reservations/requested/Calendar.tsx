@@ -11,7 +11,11 @@ import EditTimeModal from "../EditTimeModal";
 import { isPossibleToEdit } from "./reservationModificationRules";
 import { getEventBuffers } from "common/src/calendar/util";
 
-type ReservationType = NonNullable<ReservationQuery["reservation"]>;
+// TODO fragment
+type ReservationType = Omit<
+  NonNullable<ReservationQuery["reservation"]>,
+  "user"
+>;
 
 type Props = {
   reservation: ReservationType;

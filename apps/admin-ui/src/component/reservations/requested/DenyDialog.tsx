@@ -29,7 +29,11 @@ const ActionButtons = styled(Dialog.ActionButtons)`
 `;
 
 // TODO use a fragment
-type ReservationType = NonNullable<ReservationQuery["reservation"]>;
+type ReservationType = Pick<
+  NonNullable<ReservationQuery["reservation"]>,
+  "pk" | "handlingDetails" | "price" | "order"
+>;
+
 type Props = {
   reservations: ReservationType[];
   onClose: () => void;

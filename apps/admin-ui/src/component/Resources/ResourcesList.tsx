@@ -2,12 +2,11 @@ import React from "react";
 import { type TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { useQuery, type ApolloError } from "@apollo/client";
+import { type ApolloError } from "@apollo/client";
 import { H1, Strong } from "common/src/common/typography";
-import type { Query, ResourceNode } from "@gql/gql-types";
+import { useResourcesQuery, type ResourceNode } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import Loader from "@/component/Loader";
-import { RESOURCES_QUERY } from "@/common/queries";
 import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import { useNotification } from "@/context/NotificationContext";
 import { Container } from "@/styles/layout";
@@ -73,7 +72,7 @@ function ResourcesList(): JSX.Element {
   const { notifyError } = useNotification();
   const { t } = useTranslation();
 
-  const { data, loading: isLoading } = useQuery<Query>(RESOURCES_QUERY, {
+  const { data, loading: isLoading } = useResourcesQuery({
     onError: (err: ApolloError) => {
       notifyError(err.message);
     },

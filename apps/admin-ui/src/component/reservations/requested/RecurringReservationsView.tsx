@@ -4,8 +4,8 @@ import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import {
   State,
-  type ReservationNode,
   type ReservationQuery,
+  RecurringReservationQuery,
 } from "@gql/gql-types";
 import { type ApolloQueryResult } from "@apollo/client";
 import { useRecurringReservations } from "./hooks";
@@ -15,6 +15,11 @@ import DenyDialog from "./DenyDialog";
 import { useModal } from "@/context/ModalContext";
 import EditTimeModal from "../EditTimeModal";
 
+type RecurringReservationType = NonNullable<
+  RecurringReservationQuery["recurringReservation"]
+>;
+type ReservationType = NonNullable<RecurringReservationType["reservations"]>[0];
+
 function RecurringReservationsView({
   recurringPk,
   onSelect,
@@ -22,7 +27,7 @@ function RecurringReservationsView({
   onReservationUpdated,
 }: {
   recurringPk: number;
-  onSelect?: (selected: ReservationNode) => void;
+  onSelect?: (selected: ReservationType) => void;
   onChange?: () => Promise<ApolloQueryResult<ReservationQuery>>;
   onReservationUpdated?: () => void;
 }) {
@@ -44,10 +49,14 @@ function RecurringReservationsView({
     }
   };
 
-  const handleChange = (res: ReservationNode) => {
+  type ReservationEditType = NonNullable<ReservationQuery["reservation"]>;
+  const handleChange = (res: (typeof reservations)[0]) => {
     setModalContent(
       <EditTimeModal
-        reservation={res}
+        // TODO this was here already (so probably uses the undefineds on purpose)
+        // The correct way to deal with this would be either split
+        // the Edit modal into two parts or do a query using id inside it (if we need all the data).
+        reservation={res as ReservationEditType}
         onAccept={() => handleChangeSuccess()}
         onClose={() => setModalContent(null)}
       />,
@@ -59,7 +68,7 @@ function RecurringReservationsView({
     setModalContent(null);
   };
 
-  const handleRemove = (res: ReservationNode) => {
+  const handleRemove = (res: (typeof reservations)[0]) => {
     setModalContent(
       <DenyDialog
         reservations={[res]}

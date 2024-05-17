@@ -1,13 +1,13 @@
-import React, { useState } from "react";
-import { gql, useQuery } from "@apollo/client";
+import React from "react";
+import { gql } from "@apollo/client";
 import { useTranslation } from "react-i18next";
-import type { Query, QueryUnitsArgs, UnitNode } from "@gql/gql-types";
+import { useUnitsFilterQuery } from "@gql/gql-types";
 import type { OptionType } from "@/common/types";
 import { SortedSelect } from "@/component/SortedSelect";
-import { GQL_MAX_RESULTS_PER_QUERY } from "@/common/const";
 import { filterNonNullable } from "common/src/helpers";
 
-const UNITS_QUERY = gql`
+// exporting so it doesn't get removed
+export const UNITS_QUERY = gql`
   query UnitsFilter($offset: Int, $first: Int) {
     units(onlyWithPermission: true, offset: $offset, first: $first) {
       edges {
@@ -28,20 +28,11 @@ type Props = {
 
 const UnitFilter = ({ onChange, value }: Props): JSX.Element => {
   const { t } = useTranslation();
-  const [units, setUnits] = useState<UnitNode[]>([]);
 
   // Copy-paste from ReservationUnitFilter (same issues etc.)
-  const offset = units.length > 0 ? units.length : undefined;
-  const { loading } = useQuery<Query, QueryUnitsArgs>(UNITS_QUERY, {
-    variables: { offset, first: GQL_MAX_RESULTS_PER_QUERY },
-    onCompleted: (data) => {
-      const qd = data?.units;
-      if (qd?.edges.length != null && qd?.totalCount && qd?.edges.length > 0) {
-        const ds = filterNonNullable(qd?.edges.map((x) => x?.node));
-        setUnits([...units, ...ds]);
-      }
-    },
-  });
+  const { data, loading } = useUnitsFilterQuery();
+
+  const units = filterNonNullable(data?.units?.edges.map((x) => x?.node));
 
   const opts: OptionType[] = units.map((unit) => ({
     label: unit?.nameFi ?? "",

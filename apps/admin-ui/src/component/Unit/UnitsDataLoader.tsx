@@ -1,19 +1,13 @@
 import React, { useState } from "react";
-import { type ApolloError, useQuery } from "@apollo/client";
-import {
-  type Query,
-  type QueryUnitsArgs,
-  UnitOrderingChoices,
-} from "@gql/gql-types";
+import { type ApolloError } from "@apollo/client";
+import { UnitOrderingChoices, useUnitsQuery } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { useNotification } from "@/context/NotificationContext";
 import { LARGE_LIST_PAGE_SIZE } from "@/common/const";
-import { combineResults } from "@/common/util";
 import { More } from "@/component/More";
 import { FilterArguments } from "./Filters";
 import Loader from "../Loader";
 import { UnitsTable } from "./UnitsTable";
-import { UNITS_QUERY } from "./queries";
 
 type Props = {
   filters: FilterArguments;
@@ -23,17 +17,6 @@ type Props = {
 const mapFilterParams = (params: FilterArguments) => ({
   nameFi: params.nameFi,
 });
-
-function updateQuery(
-  previousResult: Query,
-  { fetchMoreResult }: { fetchMoreResult: Query }
-): Query {
-  if (!fetchMoreResult) {
-    return previousResult;
-  }
-
-  return combineResults(previousResult, fetchMoreResult, "units");
-}
 
 export function UnitsDataLoader({ filters, isMyUnits }: Props): JSX.Element {
   const { notifyError } = useNotification();
@@ -49,10 +32,7 @@ export function UnitsDataLoader({ filters, isMyUnits }: Props): JSX.Element {
 
   const orderBy = transformSortString(sort);
 
-  const { fetchMore, loading, data, previousData } = useQuery<
-    Query,
-    QueryUnitsArgs
-  >(UNITS_QUERY, {
+  const { fetchMore, loading, data, previousData } = useUnitsQuery({
     variables: {
       orderBy,
       first: LARGE_LIST_PAGE_SIZE,
@@ -88,7 +68,6 @@ export function UnitsDataLoader({ filters, isMyUnits }: Props): JSX.Element {
         fetchMore={() =>
           fetchMore({
             variables: { offset },
-            updateQuery,
           })
         }
       />

@@ -1,16 +1,19 @@
 import React, { useState } from "react";
-import { gql, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
-import type { Query, QueryUserArgs } from "@gql/gql-types";
+import {
+  useReservationDateOfBirthQuery,
+  useApplicationDateOfBirthQuery,
+} from "@gql/gql-types";
 import { formatDate } from "@/common/util";
 import { HorisontalFlex } from "@/styles/layout";
 import { base64encode } from "common/src/helpers";
 
 // NOTE separate query because all requests for dateOfBirth are logged
 // so don't make them automatically or inside other queries
-const RESERVATION_DATE_OF_BIRTH_QUERY = gql`
-  query getReservationDateOfBirth($id: ID!) {
+export const RESERVATION_DATE_OF_BIRTH_QUERY = gql`
+  query ReservationDateOfBirth($id: ID!) {
     reservation(id: $id) {
       user {
         pk
@@ -20,8 +23,8 @@ const RESERVATION_DATE_OF_BIRTH_QUERY = gql`
   }
 `;
 
-const APPLICATION_DATE_OF_BIRTH_QUERY = gql`
-  query getApplicationDateOfBirth($id: ID!) {
+export const APPLICATION_DATE_OF_BIRTH_QUERY = gql`
+  query ApplicationDateOfBirth($id: ID!) {
     application(id: $id) {
       user {
         pk
@@ -63,7 +66,7 @@ export function BirthDate(props: Props): JSX.Element {
     data: dataReservation,
     loading: isReservationLoading,
     error: errorReservation,
-  } = useQuery<Query, QueryUserArgs>(RESERVATION_DATE_OF_BIRTH_QUERY, {
+  } = useReservationDateOfBirthQuery({
     variables: {
       id: base64encode(`ReservationNode:${reservationPk}`),
     },
@@ -75,7 +78,7 @@ export function BirthDate(props: Props): JSX.Element {
     data: dataApplication,
     loading: isApplicationLoading,
     error: errorApplication,
-  } = useQuery<Query, QueryUserArgs>(APPLICATION_DATE_OF_BIRTH_QUERY, {
+  } = useApplicationDateOfBirthQuery({
     variables: {
       id: base64encode(`ApplicationNode:${applicationPk}`),
     },
@@ -90,7 +93,20 @@ export function BirthDate(props: Props): JSX.Element {
     "reservationPk" in props ? isReservationLoading : isApplicationLoading;
   const error = "reservationPk" in props ? errorReservation : errorApplication;
 
-  const user = data?.reservation?.user || data?.application?.user;
+  function getUser(d: typeof data) {
+    if (d == null) {
+      return null;
+    }
+    if ("reservation" in d) {
+      return d.reservation?.user;
+    }
+    if ("application" in d) {
+      return d.application?.user;
+    }
+    return null;
+  }
+
+  const user = getUser(data);
   const dateOfBirth = user?.dateOfBirth;
 
   const hideLabel = t("RequestedReservation.hideBirthDate");

@@ -349,7 +349,9 @@ function TimeBlock({
         <Accordion heading={t("RequestedReservation.recurring")}>
           <RecurringReservationsView
             recurringPk={reservation.recurringReservation.pk}
-            onSelect={setSelected}
+            // TODO check how this works and fix types
+            // e.g. find the least common denominator between the two types and fragment that
+            onSelect={(r) => setSelected(r as ReservationType)}
             onReservationUpdated={handleChanged}
             onChange={handleChanged}
           />

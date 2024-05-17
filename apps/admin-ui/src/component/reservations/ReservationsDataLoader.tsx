@@ -1,17 +1,16 @@
 import React, { useState } from "react";
-import { type ApolloError, useQuery } from "@apollo/client";
+import { type ApolloError } from "@apollo/client";
 import { values } from "lodash";
 import {
-  type Query,
   type QueryReservationsArgs,
   ReservationOrderingChoices,
+  useReservationsQuery,
 } from "@gql/gql-types";
 import { More } from "@/component/More";
 import { LIST_PAGE_SIZE } from "@/common/const";
 import { useNotification } from "@/context/NotificationContext";
 import Loader from "../Loader";
 import { FilterArguments } from "./Filters";
-import { RESERVATIONS_QUERY } from "./queries";
 import { ReservationsTable } from "./ReservationsTable";
 import { fromUIDate, toApiDate } from "common/src/common/util";
 import { filterNonNullable } from "common/src/helpers";
@@ -69,10 +68,7 @@ function useReservations(
   const { notifyError } = useNotification();
 
   const orderBy = transformSortString(sort);
-  const { fetchMore, loading, data, previousData } = useQuery<
-    Query,
-    QueryReservationsArgs
-  >(RESERVATIONS_QUERY, {
+  const { fetchMore, loading, data, previousData } = useReservationsQuery({
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
     errorPolicy: "all",

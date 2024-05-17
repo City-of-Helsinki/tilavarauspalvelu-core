@@ -17,6 +17,7 @@ import type {
   ReservationNodeConnection,
   BannerNotificationNodeConnection,
   ReservationUnitNodeConnection,
+  UnitNodeConnection,
 } from "@gql/gql-types";
 import { buildGraphQLUrl } from "common/src/urlBuilder";
 import { env } from "@/env.mjs";
@@ -208,6 +209,21 @@ function createClient(apiBaseUrl: string) {
               incoming: ReservationNodeConnection
             ) {
               // TODO this should be optimized using both spread and uniqBy creates a lot of copies
+              return {
+                ...incoming,
+                edges: uniqBy(
+                  [...(existing?.edges ?? []), ...incoming.edges],
+                  (x) => x?.node?.pk
+                ),
+              };
+            },
+          },
+          units: {
+            keyArgs: ["orderBy", "nameFi"],
+            read(existing: UnitNodeConnection) {
+              return existing;
+            },
+            merge(existing: UnitNodeConnection, incoming: UnitNodeConnection) {
               return {
                 ...incoming,
                 edges: uniqBy(

@@ -9,7 +9,9 @@ import {
 
 const CALENDAR_RESERVATION_FRAGMENT = gql`
   fragment CalendarReservation on ReservationNode {
+    id
     user {
+      id
       email
     }
     name
@@ -37,6 +39,7 @@ export const RESERVATIONS_BY_RESERVATIONUNITS = gql`
     $state: [String]
   ) {
     reservationUnit(id: $id) {
+      id
       reservationSet(state: $state, beginDate: $beginDate, endDate: $endDate) {
         ...CalendarReservation
       }
@@ -104,18 +107,21 @@ export const SINGLE_RESERVATION_QUERY = gql`
 // TODO do we need orderBy? orderBy: "begin" (for reservations)
 // TODO do we need $state: [String]?
 export const RECURRING_RESERVATION_QUERY = gql`
-  query recurringReservation($id: ID!) {
+  query RecurringReservation($id: ID!) {
     recurringReservation(id: $id) {
+      id
       pk
       weekdays
       beginDate
       endDate
       reservations {
+        id
         pk
         begin
         end
         state
         reservationUnit {
+          id
           pk
         }
       }

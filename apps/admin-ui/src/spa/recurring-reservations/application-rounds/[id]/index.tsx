@@ -1,10 +1,7 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import {
-  useApplicationRoundQuery,
-  ApplicationRoundNode
-} from "@gql/gql-types";
+import { useApplicationRoundQuery } from "@gql/gql-types";
 import { useNotification } from "@/context/NotificationContext";
 import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import Loader from "@/component/Loader";
@@ -68,7 +65,7 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
   return (
     <>
       <BreadcrumbWrapper route={route} />
-      <Review applicationRound={applicationRound as ApplicationRoundNode} />
+      <Review applicationRound={applicationRound} />
     </>
   );
 }

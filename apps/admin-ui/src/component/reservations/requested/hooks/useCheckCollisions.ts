@@ -1,16 +1,13 @@
-import { type Query, ReservationTypeChoice } from "@gql/gql-types";
-import { useQuery } from "@apollo/client";
+import {
+  type CalendarReservationFragment,
+  ReservationTypeChoice,
+  useReservationsByReservationUnitQuery,
+} from "@gql/gql-types";
 import { useNotification } from "@/context/NotificationContext";
 import { doesIntervalCollide, reservationToInterval } from "@/helpers";
-import { RESERVATIONS_BY_RESERVATIONUNITS } from "./queries";
-import {
-  base64encode,
-  concatAffectedReservations,
-  filterNonNullable,
-} from "common/src/helpers";
+import { base64encode, filterNonNullable } from "common/src/helpers";
 import { toApiDate } from "common/src/common/util";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
-import { ReservationUnitWithAffectingArgs } from "common/src/queries/fragments";
 
 function useCheckCollisions({
   reservationPk,
@@ -36,32 +33,40 @@ function useCheckCollisions({
 
   const typename = "ReservationUnitNode";
   const id = base64encode(`${typename}:${reservationUnitPk}`);
-  const { data, loading } = useQuery<Query, ReservationUnitWithAffectingArgs>(
-    RESERVATIONS_BY_RESERVATIONUNITS,
-    {
-      fetchPolicy: "no-cache",
-      skip: !reservationUnitPk || !start || !end,
-      variables: {
-        id,
-        pk: reservationUnitPk,
-        beginDate: toApiDate(start ?? today) ?? "",
-        endDate: toApiDate(end ?? today) ?? "",
-        state: RELATED_RESERVATION_STATES,
-      },
-      onError: () => {
-        notifyError("Varauksia ei voitu hakea");
-      },
-    }
-  );
 
+  const { data, loading } = useReservationsByReservationUnitQuery({
+    fetchPolicy: "no-cache",
+    skip: !reservationUnitPk || !start || !end,
+    variables: {
+      id,
+      pk: reservationUnitPk,
+      beginDate: toApiDate(start ?? today) ?? "",
+      endDate: toApiDate(end ?? today) ?? "",
+      state: RELATED_RESERVATION_STATES,
+    },
+    onError: () => {
+      notifyError("Varauksia ei voitu hakea");
+    },
+  });
+
+  // TODO: copy paste from requested/hooks/index.ts
+  function doesReservationAffectReservationUnit(
+    reservation: CalendarReservationFragment,
+    resUnitPk: number
+  ) {
+    return reservation.affectedReservationUnits?.some((pk) => pk === resUnitPk);
+  }
   const reservationSet = filterNonNullable(
     data?.reservationUnit?.reservationSet
   );
+  // NOTE we could use a recular concat here (we only have single reservationUnit here)
   const affectingReservations = filterNonNullable(data?.affectingReservations);
-  const reservations = concatAffectedReservations(
-    reservationSet,
-    affectingReservations,
-    reservationUnitPk ?? 0
+  const reservations = filterNonNullable(
+    reservationSet?.concat(
+      affectingReservations?.filter((y) =>
+        doesReservationAffectReservationUnit(y, reservationUnitPk ?? 0)
+      ) ?? []
+    )
   );
 
   const collisions = reservations

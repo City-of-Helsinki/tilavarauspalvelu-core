@@ -1,5 +1,5 @@
 import React from "react";
-import { ApolloError, useQuery } from "@apollo/client";
+import { type ApolloError } from "@apollo/client";
 import { orderBy } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
@@ -7,7 +7,8 @@ import { H1 } from "common/src/common/typography";
 import {
   ApplicationRoundStatusChoice,
   type ApplicationRoundNode,
-  type Query,
+  type ApplicationRoundsQuery,
+  useApplicationRoundsQuery,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { applicationRoundUrl } from "@/common/urls";
@@ -21,7 +22,6 @@ import Loader from "@/component/Loader";
 import { ApplicationRoundCard } from "./ApplicationRoundCard";
 import { TableLink } from "@/component/Table";
 import { StyledHDSTable } from "./CustomTable";
-import { APPLICATION_ROUNDS_QUERY } from "./queries";
 
 const AccordionContainer = styled.div`
   display: flex;
@@ -36,23 +36,28 @@ const StyledAccordion = styled(Accordion)`
   }
 `;
 
-const RoundsAccordion = ({
+type ApplicationRoundListType = NonNullable<
+  ApplicationRoundsQuery["applicationRounds"]
+>;
+type ApplicationRoundType = NonNullable<
+  NonNullable<ApplicationRoundListType["edges"]>[0]
+>["node"];
+
+function RoundsAccordion({
   rounds,
-  hideIfEmpty,
   name,
+  hideIfEmpty = false,
   initiallyOpen,
   emptyContent,
 }: {
-  rounds?: ApplicationRoundNode[];
+  rounds: NonNullable<ApplicationRoundType>[];
   hideIfEmpty?: boolean;
   name: string;
   initiallyOpen?: boolean;
   emptyContent?: JSX.Element;
-}): JSX.Element | null => {
-  if (!rounds || rounds.length === 0) {
-    if (hideIfEmpty) {
-      return null;
-    }
+}): JSX.Element | null {
+  if (rounds.length === 0 && hideIfEmpty) {
+    return null;
   }
 
   return (
@@ -61,19 +66,22 @@ const RoundsAccordion = ({
         {!rounds || rounds.length === 0
           ? emptyContent || <span>no data {name}</span>
           : rounds?.map((round) => (
-              <ApplicationRoundCard key={round.pk} applicationRound={round} />
+              <ApplicationRoundCard
+                key={round?.pk ?? 0}
+                applicationRound={round}
+              />
             ))}
       </AccordionContainer>
     </Accordion>
   );
-};
+}
 
 function AllApplicationRounds(): JSX.Element | null {
   const { t } = useTranslation();
   const { notifyError } = useNotification();
 
   // TODO pagination
-  const { data, loading } = useQuery<Query>(APPLICATION_ROUNDS_QUERY, {
+  const { data, loading } = useApplicationRoundsQuery({
     onError: (err: ApolloError) => {
       notifyError(err.message);
     },

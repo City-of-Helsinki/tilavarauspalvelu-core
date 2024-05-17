@@ -1,15 +1,14 @@
 import React from "react";
 import { toApiDate } from "common/src/common/util";
 import CommonCalendar from "common/src/calendar/Calendar";
-import { useQuery } from "@apollo/client";
 import { get } from "lodash";
 import { addDays, endOfISOWeek, startOfISOWeek } from "date-fns";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import {
-  type Query,
-  type ReservationNode,
   ReservationTypeChoice,
+  useReservationUnitCalendarQuery,
+  type ReservationUnitCalendarQuery,
 } from "@gql/gql-types";
 import { Permission } from "@/modules/permissionHelper";
 import usePermission from "@/hooks/usePermission";
@@ -17,17 +16,11 @@ import { getEventBuffers } from "common/src/calendar/util";
 import { reservationUrl } from "@/common/urls";
 import { useNotification } from "@/context/NotificationContext";
 import Legend from "../reservations/requested/Legend";
-import { RESERVATION_UNIT_CALENDAR_QUERY } from "./queries";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
 import { PUBLIC_URL } from "@/common/const";
 import { getReserveeName } from "../reservations/requested/util";
-import {
-  base64encode,
-  concatAffectedReservations,
-  filterNonNullable,
-} from "common/src/helpers";
+import { base64encode, filterNonNullable } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
-import { ReservationUnitWithAffectingArgs } from "common/src/queries/fragments";
 import { TFunction } from "next-i18next";
 
 type Props = {
@@ -48,15 +41,22 @@ const Container = styled.div`
   }
 `;
 
-const getEventTitle = ({
+type ReservationUnitType = NonNullable<
+  ReservationUnitCalendarQuery["reservationUnit"]
+>;
+type ReservationType = NonNullable<
+  NonNullable<ReservationUnitType["reservationSet"]>[0]
+>;
+
+function getEventTitle({
   reservationUnitPk,
   reservation,
   t,
 }: {
   reservationUnitPk: number;
-  reservation: ReservationNode;
+  reservation: ReservationType;
   t: TFunction;
-}) => {
+}) {
   const reservationUnit = reservation.reservationUnit?.[0];
   const isOtherReservationUnit = reservationUnitPk !== reservationUnit?.pk;
 
@@ -68,13 +68,13 @@ const getEventTitle = ({
   }
 
   return [reserveeName, ""];
-};
+}
 
-const constructEventTitle = (
-  res: ReservationNode,
+function constructEventTitle(
+  res: ReservationType,
   resUnitPk: number,
   t: TFunction
-) => {
+) {
   const [reservee, unit] = getEventTitle({
     reservationUnitPk: resUnitPk,
     reservation: res,
@@ -84,7 +84,7 @@ const constructEventTitle = (
     return `${reservee} (${unit})`;
   }
   return reservee;
-};
+}
 
 // TODO this is a copy of the RequestedReservationCalendar
 export function ReservationUnitCalendar({
@@ -101,10 +101,7 @@ export function ReservationUnitCalendar({
 
   const typename = "ReservationUnitNode";
   const id = base64encode(`${typename}:${reservationUnitPk}`);
-  const { data, loading: isLoading } = useQuery<
-    Query,
-    ReservationUnitWithAffectingArgs
-  >(RESERVATION_UNIT_CALENDAR_QUERY, {
+  const { data, loading: isLoading } = useReservationUnitCalendarQuery({
     fetchPolicy: "network-only",
     skip: reservationUnitPk === 0,
     variables: {
@@ -119,14 +116,23 @@ export function ReservationUnitCalendar({
     },
   });
 
+  function doesReservationAffectReservationUnit(
+    reservation: ReservationType,
+    resUnitPk: number
+  ) {
+    return reservation.affectedReservationUnits?.some((pk) => pk === resUnitPk);
+  }
+
   const reservationSet = filterNonNullable(
     data?.reservationUnit?.reservationSet
   );
-  const affecting = filterNonNullable(data?.affectingReservations);
-  const reservations = concatAffectedReservations(
-    reservationSet,
-    affecting,
-    reservationUnitPk
+  const affectingReservations = filterNonNullable(data?.affectingReservations);
+  const reservations = filterNonNullable(
+    reservationSet?.concat(
+      affectingReservations?.filter((y) =>
+        doesReservationAffectReservationUnit(y, reservationUnitPk ?? 0)
+      ) ?? []
+    )
   );
 
   const events = reservations.map((reservation) => {

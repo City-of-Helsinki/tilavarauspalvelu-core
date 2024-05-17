@@ -3,7 +3,7 @@ import { RESERVATION_COMMON_FRAGMENT } from "./fragments";
 
 export const RESERVATIONS_QUERY = gql`
   ${RESERVATION_COMMON_FRAGMENT}
-  query reservations(
+  query Reservations(
     $after: String
     $unit: [ID]
     $reservationUnitType: [ID]

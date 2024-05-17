@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Card, IconArrowRight, IconCalendar } from "hds-react";
-import { type ApplicationRoundNode } from "@gql/gql-types";
+import { type ApplicationRoundsQuery } from "@gql/gql-types";
 import { breakpoints } from "common/src/common/style";
 import { formatDate } from "@/common/util";
 import { applicationRoundUrl } from "@/common/urls";
@@ -10,8 +10,15 @@ import { ApplicationRoundStatusTag } from "./ApplicationRoundStatusTag";
 import TimeframeStatus from "./TimeframeStatus";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 
+type ApplicationRoundListType = NonNullable<
+  ApplicationRoundsQuery["applicationRounds"]
+>;
+type ApplicationRoundType = NonNullable<
+  NonNullable<ApplicationRoundListType["edges"]>[0]
+>["node"];
+
 interface IProps {
-  applicationRound: ApplicationRoundNode;
+  applicationRound: NonNullable<ApplicationRoundType>;
 }
 
 const Layout = styled.div`
