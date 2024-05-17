@@ -216,15 +216,14 @@ def test_reservation__filter__by_only_with_permission__unit_group_admin(graphql)
 def test_reservation__filter__by_only_with_handling_permission__regular_user(graphql):
     user = graphql.login_user_based_on_type(UserType.REGULAR)
 
-    reservation = ReservationFactory.create(user=user)
-    ReservationFactory.create()
+    ReservationFactory.create(user=user)  # Own reservation
+    ReservationFactory.create()  # Other user's reservation
 
     query = reservations_query(only_with_handling_permission=True)
     response = graphql(query)
 
     assert response.has_errors is False, response
-    assert len(response.edges) == 1
-    assert response.node(0) == {"pk": reservation.pk}
+    assert len(response.edges) == 0
 
 
 def test_reservation__filter__by_only_with_handling_permission__unit_admin(graphql):
@@ -237,9 +236,9 @@ def test_reservation__filter__by_only_with_handling_permission__unit_admin(graph
     add_unit_permissions(user=admin, unit=unit_2, perms=["can_view_reservations"], code="unit_view")
 
     # Reservation for the admin
-    reservation_1 = ReservationFactory.create(user=admin)
+    ReservationFactory.create(user=admin)
     # Reservation for the unit the admin has manage permissions for
-    reservation_2 = ReservationFactory.create(reservation_unit=[reservation_unit_1])
+    reservation = ReservationFactory.create(reservation_unit=[reservation_unit_1])
     # Reservation for the unit the admin has view permissions for
     ReservationFactory.create(reservation_unit=[reservation_unit_2])
     # Reservation for another unit
@@ -250,9 +249,8 @@ def test_reservation__filter__by_only_with_handling_permission__unit_admin(graph
     response = graphql(query)
 
     assert response.has_errors is False, response
-    assert len(response.edges) == 2
-    assert response.node(0) == {"pk": reservation_1.pk}
-    assert response.node(1) == {"pk": reservation_2.pk}
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": reservation.pk}
 
 
 def test_reservation__filter__by_only_with_handling_permission__unit_group_admin(graphql):
@@ -276,9 +274,9 @@ def test_reservation__filter__by_only_with_handling_permission__unit_group_admin
     )
 
     # Reservation for the admin
-    reservation_1 = ReservationFactory.create(user=admin)
+    ReservationFactory.create(user=admin)
     # Reservation for the unit group the admin has manage permissions for
-    reservation_2 = ReservationFactory.create(reservation_unit=[reservation_unit_1])
+    reservation = ReservationFactory.create(reservation_unit=[reservation_unit_1])
     # Reservation for the unit group the admin has view permissions for
     ReservationFactory.create(reservation_unit=[reservation_unit_2])
     # Reservation for another unit
@@ -289,9 +287,8 @@ def test_reservation__filter__by_only_with_handling_permission__unit_group_admin
     response = graphql(query)
 
     assert response.has_errors is False, response
-    assert len(response.edges) == 2
-    assert response.node(0) == {"pk": reservation_1.pk}
-    assert response.node(1) == {"pk": reservation_2.pk}
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": reservation.pk}
 
 
 def test_reservation__filter__by_user(graphql):
