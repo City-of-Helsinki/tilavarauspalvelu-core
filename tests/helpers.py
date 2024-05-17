@@ -13,6 +13,7 @@ __all__ = [
     "UserType",
 ]
 
+from permissions.models import GeneralPermissionChoices
 
 TNamedTuple = TypeVar("TNamedTuple", bound=NamedTuple)
 
@@ -44,7 +45,9 @@ class GraphQLClient(BaseGraphQLClient):
             case UserType.SUPERUSER:
                 user = UserFactory.create_superuser()
             case UserType.NOTIFICATION_MANAGER:
-                user = UserFactory.create_with_general_permissions(perms=["can_manage_notifications"])
+                user = UserFactory.create_with_general_permissions(
+                    perms=[GeneralPermissionChoices.CAN_MANAGE_NOTIFICATIONS],
+                )
             case _:
                 raise ValueError(f"Unknown user type: {user_type}")
 

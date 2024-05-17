@@ -22,10 +22,11 @@ pytestmark = [
 def test_refresh_order__order_not_found(graphql):
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
-    data = {"orderUuid": str(uuid.uuid4())}
+    remote_id = str(uuid.uuid4())
+    data = {"orderUuid": remote_id}
     response = graphql(REFRESH_MUTATION, input_data=data)
 
-    assert response.error_message() == "Order not found"
+    assert response.error_message() == f"Payment order with remote_id '{remote_id}' not found."
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment, return_value=None)
