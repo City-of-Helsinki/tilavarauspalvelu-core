@@ -5552,6 +5552,7 @@ export type ApplicationSectionDurationFragmentFragment = {
 
 export type ApplicationSectionCommonFragmentFragment = {
   __typename?: "ApplicationSectionNode";
+  id: string;
   pk?: number | null;
   name: string;
   status?: ApplicationSectionStatusChoice | null;
@@ -5563,12 +5564,14 @@ export type ApplicationSectionCommonFragmentFragment = {
   reservationMinDuration: number;
   ageGroup?: {
     __typename?: "AgeGroupNode";
+    id: string;
     pk?: number | null;
     minimum: number;
     maximum?: number | null;
   } | null;
   reservationUnitOptions: Array<{
     __typename?: "ReservationUnitOptionNode";
+    id: string;
     pk?: number | null;
     preferredOrder: number;
   }>;
@@ -5576,6 +5579,7 @@ export type ApplicationSectionCommonFragmentFragment = {
 
 export type ApplicationSectionFragmentFragment = {
   __typename?: "ApplicationSectionNode";
+  id: string;
   pk?: number | null;
   name: string;
   status?: ApplicationSectionStatusChoice | null;
@@ -5608,6 +5612,7 @@ export type ApplicationSectionFragmentFragment = {
   };
   reservationUnitOptions: Array<{
     __typename?: "ReservationUnitOptionNode";
+    id: string;
     pk?: number | null;
     preferredOrder: number;
     reservationUnit: {
@@ -5623,6 +5628,7 @@ export type ApplicationSectionFragmentFragment = {
   }>;
   ageGroup?: {
     __typename?: "AgeGroupNode";
+    id: string;
     pk?: number | null;
     minimum: number;
     maximum?: number | null;
@@ -5631,6 +5637,7 @@ export type ApplicationSectionFragmentFragment = {
 
 export type ApplicationSectionUiFragmentFragment = {
   __typename?: "ApplicationSectionNode";
+  id: string;
   pk?: number | null;
   name: string;
   status?: ApplicationSectionStatusChoice | null;
@@ -5642,6 +5649,8 @@ export type ApplicationSectionUiFragmentFragment = {
   reservationMinDuration: number;
   suitableTimeRanges: Array<{
     __typename?: "SuitableTimeRangeNode";
+    id: string;
+    pk?: number | null;
     beginTime: string;
     endTime: string;
     dayOfTheWeek: Weekday;
@@ -5649,6 +5658,7 @@ export type ApplicationSectionUiFragmentFragment = {
   }>;
   purpose?: {
     __typename?: "ReservationPurposeNode";
+    id: string;
     pk?: number | null;
     nameFi?: string | null;
     nameSv?: string | null;
@@ -5656,16 +5666,19 @@ export type ApplicationSectionUiFragmentFragment = {
   } | null;
   reservationUnitOptions: Array<{
     __typename?: "ReservationUnitOptionNode";
+    id: string;
     pk?: number | null;
     preferredOrder: number;
     reservationUnit: {
       __typename?: "ReservationUnitNode";
+      id: string;
       pk?: number | null;
       nameFi?: string | null;
       nameEn?: string | null;
       nameSv?: string | null;
       unit?: {
         __typename?: "UnitNode";
+        id: string;
         pk?: number | null;
         nameFi?: string | null;
         nameEn?: string | null;
@@ -5673,7 +5686,9 @@ export type ApplicationSectionUiFragmentFragment = {
       } | null;
       applicationRoundTimeSlots: Array<{
         __typename?: "ApplicationRoundTimeSlotNode";
+        id: string;
         weekday: number;
+        closed: boolean;
         reservableTimes?: Array<{
           __typename?: "TimeSlotType";
           begin: string;
@@ -5684,6 +5699,7 @@ export type ApplicationSectionUiFragmentFragment = {
   }>;
   ageGroup?: {
     __typename?: "AgeGroupNode";
+    id: string;
     pk?: number | null;
     minimum: number;
     maximum?: number | null;
@@ -5696,6 +5712,7 @@ export type ApplicantFragmentFragment = {
   additionalInformation?: string | null;
   contactPerson?: {
     __typename?: "PersonNode";
+    id: string;
     pk?: number | null;
     firstName: string;
     lastName: string;
@@ -5704,13 +5721,17 @@ export type ApplicantFragmentFragment = {
   } | null;
   organisation?: {
     __typename?: "OrganisationNode";
+    id: string;
     pk?: number | null;
     name: string;
     identifier?: string | null;
     organisationType: OrganizationTypeChoice;
     coreBusiness: string;
+    yearEstablished?: number | null;
     address?: {
       __typename?: "AddressNode";
+      id: string;
+      pk?: number | null;
       postCode: string;
       streetAddress: string;
       city: string;
@@ -5718,6 +5739,7 @@ export type ApplicantFragmentFragment = {
   } | null;
   homeCity?: {
     __typename?: "CityNode";
+    id: string;
     pk?: number | null;
     nameFi?: string | null;
     nameEn?: string | null;
@@ -5725,6 +5747,7 @@ export type ApplicantFragmentFragment = {
   } | null;
   billingAddress?: {
     __typename?: "AddressNode";
+    id: string;
     pk?: number | null;
     postCode: string;
     streetAddress: string;
@@ -5732,6 +5755,7 @@ export type ApplicantFragmentFragment = {
   } | null;
   user?: {
     __typename?: "ApplicantNode";
+    id: string;
     name?: string | null;
     email: string;
     pk?: number | null;
@@ -5740,6 +5764,7 @@ export type ApplicantFragmentFragment = {
 
 export type ApplicationRoundFragmentFragment = {
   __typename?: "ApplicationRoundNode";
+  id: string;
   pk?: number | null;
   nameFi?: string | null;
   nameSv?: string | null;
@@ -5759,6 +5784,7 @@ export type ApplicationRoundFragmentFragment = {
   } | null;
   reservationUnits: Array<{
     __typename?: "ReservationUnitNode";
+    id: string;
     pk?: number | null;
     nameFi?: string | null;
     nameSv?: string | null;
@@ -5775,6 +5801,7 @@ export type ApplicationRoundFragmentFragment = {
     }>;
     unit?: {
       __typename?: "UnitNode";
+      id: string;
       pk?: number | null;
       nameFi?: string | null;
       nameSv?: string | null;
@@ -5798,6 +5825,7 @@ export type ApplicationAdminFragmentFragment = {
   };
   applicationSections?: Array<{
     __typename?: "ApplicationSectionNode";
+    id: string;
     allocations?: number | null;
     pk?: number | null;
     name: string;
@@ -5810,6 +5838,7 @@ export type ApplicationAdminFragmentFragment = {
     reservationMinDuration: number;
     reservationUnitOptions: Array<{
       __typename?: "ReservationUnitOptionNode";
+      id: string;
       rejected: boolean;
       pk?: number | null;
       preferredOrder: number;
@@ -5820,12 +5849,14 @@ export type ApplicationAdminFragmentFragment = {
       }>;
       reservationUnit: {
         __typename?: "ReservationUnitNode";
+        id: string;
         pk?: number | null;
         nameFi?: string | null;
         nameEn?: string | null;
         nameSv?: string | null;
         unit?: {
           __typename?: "UnitNode";
+          id: string;
           pk?: number | null;
           nameFi?: string | null;
           nameEn?: string | null;
@@ -5833,7 +5864,9 @@ export type ApplicationAdminFragmentFragment = {
         } | null;
         applicationRoundTimeSlots: Array<{
           __typename?: "ApplicationRoundTimeSlotNode";
+          id: string;
           weekday: number;
+          closed: boolean;
           reservableTimes?: Array<{
             __typename?: "TimeSlotType";
             begin: string;
@@ -5844,6 +5877,8 @@ export type ApplicationAdminFragmentFragment = {
     }>;
     suitableTimeRanges: Array<{
       __typename?: "SuitableTimeRangeNode";
+      id: string;
+      pk?: number | null;
       beginTime: string;
       endTime: string;
       dayOfTheWeek: Weekday;
@@ -5851,6 +5886,7 @@ export type ApplicationAdminFragmentFragment = {
     }>;
     purpose?: {
       __typename?: "ReservationPurposeNode";
+      id: string;
       pk?: number | null;
       nameFi?: string | null;
       nameSv?: string | null;
@@ -5858,6 +5894,7 @@ export type ApplicationAdminFragmentFragment = {
     } | null;
     ageGroup?: {
       __typename?: "AgeGroupNode";
+      id: string;
       pk?: number | null;
       minimum: number;
       maximum?: number | null;
@@ -5865,6 +5902,7 @@ export type ApplicationAdminFragmentFragment = {
   }> | null;
   contactPerson?: {
     __typename?: "PersonNode";
+    id: string;
     pk?: number | null;
     firstName: string;
     lastName: string;
@@ -5873,13 +5911,17 @@ export type ApplicationAdminFragmentFragment = {
   } | null;
   organisation?: {
     __typename?: "OrganisationNode";
+    id: string;
     pk?: number | null;
     name: string;
     identifier?: string | null;
     organisationType: OrganizationTypeChoice;
     coreBusiness: string;
+    yearEstablished?: number | null;
     address?: {
       __typename?: "AddressNode";
+      id: string;
+      pk?: number | null;
       postCode: string;
       streetAddress: string;
       city: string;
@@ -5887,6 +5929,7 @@ export type ApplicationAdminFragmentFragment = {
   } | null;
   homeCity?: {
     __typename?: "CityNode";
+    id: string;
     pk?: number | null;
     nameFi?: string | null;
     nameEn?: string | null;
@@ -5894,6 +5937,7 @@ export type ApplicationAdminFragmentFragment = {
   } | null;
   billingAddress?: {
     __typename?: "AddressNode";
+    id: string;
     pk?: number | null;
     postCode: string;
     streetAddress: string;
@@ -5901,6 +5945,7 @@ export type ApplicationAdminFragmentFragment = {
   } | null;
   user?: {
     __typename?: "ApplicantNode";
+    id: string;
     name?: string | null;
     email: string;
     pk?: number | null;
@@ -5909,6 +5954,7 @@ export type ApplicationAdminFragmentFragment = {
 
 export type ApplicationCommonFragment = {
   __typename?: "ApplicationNode";
+  id: string;
   pk?: number | null;
   status?: ApplicationStatusChoice | null;
   lastModifiedDate: string;
@@ -5916,6 +5962,7 @@ export type ApplicationCommonFragment = {
   additionalInformation?: string | null;
   applicationRound: {
     __typename?: "ApplicationRoundNode";
+    id: string;
     pk?: number | null;
     nameFi?: string | null;
     nameSv?: string | null;
@@ -5935,6 +5982,7 @@ export type ApplicationCommonFragment = {
     } | null;
     reservationUnits: Array<{
       __typename?: "ReservationUnitNode";
+      id: string;
       pk?: number | null;
       nameFi?: string | null;
       nameSv?: string | null;
@@ -5951,6 +5999,7 @@ export type ApplicationCommonFragment = {
       }>;
       unit?: {
         __typename?: "UnitNode";
+        id: string;
         pk?: number | null;
         nameFi?: string | null;
         nameSv?: string | null;
@@ -5960,6 +6009,7 @@ export type ApplicationCommonFragment = {
   };
   applicationSections?: Array<{
     __typename?: "ApplicationSectionNode";
+    id: string;
     pk?: number | null;
     name: string;
     status?: ApplicationSectionStatusChoice | null;
@@ -5971,6 +6021,8 @@ export type ApplicationCommonFragment = {
     reservationMinDuration: number;
     suitableTimeRanges: Array<{
       __typename?: "SuitableTimeRangeNode";
+      id: string;
+      pk?: number | null;
       beginTime: string;
       endTime: string;
       dayOfTheWeek: Weekday;
@@ -5978,6 +6030,7 @@ export type ApplicationCommonFragment = {
     }>;
     purpose?: {
       __typename?: "ReservationPurposeNode";
+      id: string;
       pk?: number | null;
       nameFi?: string | null;
       nameSv?: string | null;
@@ -5985,16 +6038,19 @@ export type ApplicationCommonFragment = {
     } | null;
     reservationUnitOptions: Array<{
       __typename?: "ReservationUnitOptionNode";
+      id: string;
       pk?: number | null;
       preferredOrder: number;
       reservationUnit: {
         __typename?: "ReservationUnitNode";
+        id: string;
         pk?: number | null;
         nameFi?: string | null;
         nameEn?: string | null;
         nameSv?: string | null;
         unit?: {
           __typename?: "UnitNode";
+          id: string;
           pk?: number | null;
           nameFi?: string | null;
           nameEn?: string | null;
@@ -6002,7 +6058,9 @@ export type ApplicationCommonFragment = {
         } | null;
         applicationRoundTimeSlots: Array<{
           __typename?: "ApplicationRoundTimeSlotNode";
+          id: string;
           weekday: number;
+          closed: boolean;
           reservableTimes?: Array<{
             __typename?: "TimeSlotType";
             begin: string;
@@ -6013,6 +6071,7 @@ export type ApplicationCommonFragment = {
     }>;
     ageGroup?: {
       __typename?: "AgeGroupNode";
+      id: string;
       pk?: number | null;
       minimum: number;
       maximum?: number | null;
@@ -6020,6 +6079,7 @@ export type ApplicationCommonFragment = {
   }> | null;
   contactPerson?: {
     __typename?: "PersonNode";
+    id: string;
     pk?: number | null;
     firstName: string;
     lastName: string;
@@ -6028,13 +6088,17 @@ export type ApplicationCommonFragment = {
   } | null;
   organisation?: {
     __typename?: "OrganisationNode";
+    id: string;
     pk?: number | null;
     name: string;
     identifier?: string | null;
     organisationType: OrganizationTypeChoice;
     coreBusiness: string;
+    yearEstablished?: number | null;
     address?: {
       __typename?: "AddressNode";
+      id: string;
+      pk?: number | null;
       postCode: string;
       streetAddress: string;
       city: string;
@@ -6042,6 +6106,7 @@ export type ApplicationCommonFragment = {
   } | null;
   homeCity?: {
     __typename?: "CityNode";
+    id: string;
     pk?: number | null;
     nameFi?: string | null;
     nameEn?: string | null;
@@ -6049,6 +6114,7 @@ export type ApplicationCommonFragment = {
   } | null;
   billingAddress?: {
     __typename?: "AddressNode";
+    id: string;
     pk?: number | null;
     postCode: string;
     streetAddress: string;
@@ -6056,20 +6122,22 @@ export type ApplicationCommonFragment = {
   } | null;
   user?: {
     __typename?: "ApplicantNode";
+    id: string;
     name?: string | null;
     email: string;
     pk?: number | null;
   } | null;
 };
 
-export type GetApplicationQueryVariables = Exact<{
+export type ApplicationQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
 
-export type GetApplicationQuery = {
+export type ApplicationQuery = {
   __typename?: "Query";
   application?: {
     __typename?: "ApplicationNode";
+    id: string;
     pk?: number | null;
     status?: ApplicationStatusChoice | null;
     lastModifiedDate: string;
@@ -6077,6 +6145,7 @@ export type GetApplicationQuery = {
     additionalInformation?: string | null;
     applicationRound: {
       __typename?: "ApplicationRoundNode";
+      id: string;
       pk?: number | null;
       nameFi?: string | null;
       nameSv?: string | null;
@@ -6107,6 +6176,7 @@ export type GetApplicationQuery = {
       } | null;
       reservationUnits: Array<{
         __typename?: "ReservationUnitNode";
+        id: string;
         pk?: number | null;
         nameFi?: string | null;
         nameSv?: string | null;
@@ -6123,6 +6193,7 @@ export type GetApplicationQuery = {
         }>;
         unit?: {
           __typename?: "UnitNode";
+          id: string;
           pk?: number | null;
           nameFi?: string | null;
           nameSv?: string | null;
@@ -6132,6 +6203,7 @@ export type GetApplicationQuery = {
     };
     applicationSections?: Array<{
       __typename?: "ApplicationSectionNode";
+      id: string;
       pk?: number | null;
       name: string;
       status?: ApplicationSectionStatusChoice | null;
@@ -6143,6 +6215,8 @@ export type GetApplicationQuery = {
       reservationMinDuration: number;
       suitableTimeRanges: Array<{
         __typename?: "SuitableTimeRangeNode";
+        id: string;
+        pk?: number | null;
         beginTime: string;
         endTime: string;
         dayOfTheWeek: Weekday;
@@ -6150,6 +6224,7 @@ export type GetApplicationQuery = {
       }>;
       purpose?: {
         __typename?: "ReservationPurposeNode";
+        id: string;
         pk?: number | null;
         nameFi?: string | null;
         nameSv?: string | null;
@@ -6157,16 +6232,19 @@ export type GetApplicationQuery = {
       } | null;
       reservationUnitOptions: Array<{
         __typename?: "ReservationUnitOptionNode";
+        id: string;
         pk?: number | null;
         preferredOrder: number;
         reservationUnit: {
           __typename?: "ReservationUnitNode";
+          id: string;
           pk?: number | null;
           nameFi?: string | null;
           nameEn?: string | null;
           nameSv?: string | null;
           unit?: {
             __typename?: "UnitNode";
+            id: string;
             pk?: number | null;
             nameFi?: string | null;
             nameEn?: string | null;
@@ -6174,7 +6252,9 @@ export type GetApplicationQuery = {
           } | null;
           applicationRoundTimeSlots: Array<{
             __typename?: "ApplicationRoundTimeSlotNode";
+            id: string;
             weekday: number;
+            closed: boolean;
             reservableTimes?: Array<{
               __typename?: "TimeSlotType";
               begin: string;
@@ -6185,6 +6265,7 @@ export type GetApplicationQuery = {
       }>;
       ageGroup?: {
         __typename?: "AgeGroupNode";
+        id: string;
         pk?: number | null;
         minimum: number;
         maximum?: number | null;
@@ -6192,6 +6273,7 @@ export type GetApplicationQuery = {
     }> | null;
     contactPerson?: {
       __typename?: "PersonNode";
+      id: string;
       pk?: number | null;
       firstName: string;
       lastName: string;
@@ -6200,13 +6282,17 @@ export type GetApplicationQuery = {
     } | null;
     organisation?: {
       __typename?: "OrganisationNode";
+      id: string;
       pk?: number | null;
       name: string;
       identifier?: string | null;
       organisationType: OrganizationTypeChoice;
       coreBusiness: string;
+      yearEstablished?: number | null;
       address?: {
         __typename?: "AddressNode";
+        id: string;
+        pk?: number | null;
         postCode: string;
         streetAddress: string;
         city: string;
@@ -6214,6 +6300,7 @@ export type GetApplicationQuery = {
     } | null;
     homeCity?: {
       __typename?: "CityNode";
+      id: string;
       pk?: number | null;
       nameFi?: string | null;
       nameEn?: string | null;
@@ -6221,6 +6308,7 @@ export type GetApplicationQuery = {
     } | null;
     billingAddress?: {
       __typename?: "AddressNode";
+      id: string;
       pk?: number | null;
       postCode: string;
       streetAddress: string;
@@ -6228,6 +6316,7 @@ export type GetApplicationQuery = {
     } | null;
     user?: {
       __typename?: "ApplicantNode";
+      id: string;
       name?: string | null;
       email: string;
       pk?: number | null;
@@ -8449,10 +8538,12 @@ export type ReservationUnitEditQuery = {
     } | null;
     metadataSet?: {
       __typename?: "ReservationMetadataSetNode";
+      id: string;
       pk?: number | null;
     } | null;
     pricings: Array<{
       __typename?: "ReservationUnitPricingNode";
+      id: string;
       lowestPriceNet?: string | null;
       highestPriceNet?: string | null;
       pk?: number | null;
@@ -8470,6 +8561,7 @@ export type ReservationUnitEditQuery = {
     }>;
     applicationRoundTimeSlots: Array<{
       __typename?: "ApplicationRoundTimeSlotNode";
+      id: string;
       pk?: number | null;
       closed: boolean;
       weekday: number;
@@ -8664,6 +8756,7 @@ export type ApplicationAdminQuery = {
     };
     applicationSections?: Array<{
       __typename?: "ApplicationSectionNode";
+      id: string;
       allocations?: number | null;
       pk?: number | null;
       name: string;
@@ -8676,6 +8769,7 @@ export type ApplicationAdminQuery = {
       reservationMinDuration: number;
       reservationUnitOptions: Array<{
         __typename?: "ReservationUnitOptionNode";
+        id: string;
         rejected: boolean;
         pk?: number | null;
         preferredOrder: number;
@@ -8686,12 +8780,14 @@ export type ApplicationAdminQuery = {
         }>;
         reservationUnit: {
           __typename?: "ReservationUnitNode";
+          id: string;
           pk?: number | null;
           nameFi?: string | null;
           nameEn?: string | null;
           nameSv?: string | null;
           unit?: {
             __typename?: "UnitNode";
+            id: string;
             pk?: number | null;
             nameFi?: string | null;
             nameEn?: string | null;
@@ -8699,7 +8795,9 @@ export type ApplicationAdminQuery = {
           } | null;
           applicationRoundTimeSlots: Array<{
             __typename?: "ApplicationRoundTimeSlotNode";
+            id: string;
             weekday: number;
+            closed: boolean;
             reservableTimes?: Array<{
               __typename?: "TimeSlotType";
               begin: string;
@@ -8710,6 +8808,8 @@ export type ApplicationAdminQuery = {
       }>;
       suitableTimeRanges: Array<{
         __typename?: "SuitableTimeRangeNode";
+        id: string;
+        pk?: number | null;
         beginTime: string;
         endTime: string;
         dayOfTheWeek: Weekday;
@@ -8717,6 +8817,7 @@ export type ApplicationAdminQuery = {
       }>;
       purpose?: {
         __typename?: "ReservationPurposeNode";
+        id: string;
         pk?: number | null;
         nameFi?: string | null;
         nameSv?: string | null;
@@ -8724,6 +8825,7 @@ export type ApplicationAdminQuery = {
       } | null;
       ageGroup?: {
         __typename?: "AgeGroupNode";
+        id: string;
         pk?: number | null;
         minimum: number;
         maximum?: number | null;
@@ -8731,6 +8833,7 @@ export type ApplicationAdminQuery = {
     }> | null;
     contactPerson?: {
       __typename?: "PersonNode";
+      id: string;
       pk?: number | null;
       firstName: string;
       lastName: string;
@@ -8739,13 +8842,17 @@ export type ApplicationAdminQuery = {
     } | null;
     organisation?: {
       __typename?: "OrganisationNode";
+      id: string;
       pk?: number | null;
       name: string;
       identifier?: string | null;
       organisationType: OrganizationTypeChoice;
       coreBusiness: string;
+      yearEstablished?: number | null;
       address?: {
         __typename?: "AddressNode";
+        id: string;
+        pk?: number | null;
         postCode: string;
         streetAddress: string;
         city: string;
@@ -8753,6 +8860,7 @@ export type ApplicationAdminQuery = {
     } | null;
     homeCity?: {
       __typename?: "CityNode";
+      id: string;
       pk?: number | null;
       nameFi?: string | null;
       nameEn?: string | null;
@@ -8760,6 +8868,7 @@ export type ApplicationAdminQuery = {
     } | null;
     billingAddress?: {
       __typename?: "AddressNode";
+      id: string;
       pk?: number | null;
       postCode: string;
       streetAddress: string;
@@ -8767,6 +8876,7 @@ export type ApplicationAdminQuery = {
     } | null;
     user?: {
       __typename?: "ApplicantNode";
+      id: string;
       name?: string | null;
       email: string;
       pk?: number | null;
@@ -8956,6 +9066,7 @@ export type ApplicationSectionAllocationsQuery = {
       node?: {
         __typename?: "ApplicationSectionNode";
         allocations?: number | null;
+        id: string;
         pk?: number | null;
         name: string;
         status?: ApplicationSectionStatusChoice | null;
@@ -8977,6 +9088,7 @@ export type ApplicationSectionAllocationsQuery = {
           __typename?: "ReservationUnitOptionNode";
           locked: boolean;
           rejected: boolean;
+          id: string;
           pk?: number | null;
           preferredOrder: number;
           allocatedTimeSlots: Array<{
@@ -9027,6 +9139,7 @@ export type ApplicationSectionAllocationsQuery = {
         };
         ageGroup?: {
           __typename?: "AgeGroupNode";
+          id: string;
           pk?: number | null;
           minimum: number;
           maximum?: number | null;
@@ -9233,6 +9346,7 @@ export type ApplicationSectionsQuery = {
       node?: {
         __typename?: "ApplicationSectionNode";
         allocations?: number | null;
+        id: string;
         pk?: number | null;
         name: string;
         status?: ApplicationSectionStatusChoice | null;
@@ -9244,6 +9358,7 @@ export type ApplicationSectionsQuery = {
         reservationMinDuration: number;
         reservationUnitOptions: Array<{
           __typename?: "ReservationUnitOptionNode";
+          id: string;
           pk?: number | null;
           preferredOrder: number;
           allocatedTimeSlots: Array<{
@@ -9294,6 +9409,7 @@ export type ApplicationSectionsQuery = {
         };
         ageGroup?: {
           __typename?: "AgeGroupNode";
+          id: string;
           pk?: number | null;
           minimum: number;
           maximum?: number | null;
@@ -9504,18 +9620,21 @@ export const ApplicationSectionDurationFragmentFragmentDoc = gql`
 `;
 export const ApplicationSectionCommonFragmentFragmentDoc = gql`
   fragment ApplicationSectionCommonFragment on ApplicationSectionNode {
+    id
     pk
     name
     status
     ...ApplicationSectionDurationFragment
     reservationMaxDuration
     ageGroup {
+      id
       pk
       minimum
       maximum
     }
     numPersons
     reservationUnitOptions {
+      id
       pk
       preferredOrder
     }
@@ -9565,6 +9684,7 @@ export const ApplicantFragmentFragmentDoc = gql`
   fragment ApplicantFragment on ApplicationNode {
     applicantType
     contactPerson {
+      id
       pk
       firstName
       lastName
@@ -9573,30 +9693,37 @@ export const ApplicantFragmentFragmentDoc = gql`
     }
     additionalInformation
     organisation {
+      id
       pk
       name
       identifier
       organisationType
       coreBusiness
+      yearEstablished
       address {
+        id
+        pk
         postCode
         streetAddress
         city
       }
     }
     homeCity {
+      id
       pk
       nameFi
       nameEn
       nameSv
     }
     billingAddress {
+      id
       pk
       postCode
       streetAddress
       city
     }
     user {
+      id
       name
       email
       pk
@@ -9607,31 +9734,39 @@ export const ApplicationSectionUiFragmentFragmentDoc = gql`
   fragment ApplicationSectionUIFragment on ApplicationSectionNode {
     ...ApplicationSectionCommonFragment
     suitableTimeRanges {
+      id
+      pk
       beginTime
       endTime
       dayOfTheWeek
       priority
     }
     purpose {
+      id
       pk
       nameFi
       nameSv
       nameEn
     }
     reservationUnitOptions {
+      id
       reservationUnit {
+        id
         pk
         nameFi
         nameEn
         nameSv
         unit {
+          id
           pk
           nameFi
           nameEn
           nameSv
         }
         applicationRoundTimeSlots {
+          id
           weekday
+          closed
           reservableTimes {
             begin
             end
@@ -9654,9 +9789,11 @@ export const ApplicationAdminFragmentFragmentDoc = gql`
       nameFi
     }
     applicationSections {
+      id
       ...ApplicationSectionUIFragment
       allocations
       reservationUnitOptions {
+        id
         rejected
         allocatedTimeSlots {
           pk
@@ -9679,6 +9816,7 @@ export const ImageFragmentFragmentDoc = gql`
 `;
 export const ApplicationRoundFragmentFragmentDoc = gql`
   fragment ApplicationRoundFragment on ApplicationRoundNode {
+    id
     pk
     nameFi
     nameSv
@@ -9688,6 +9826,7 @@ export const ApplicationRoundFragmentFragmentDoc = gql`
       nameFi
     }
     reservationUnits {
+      id
       pk
       nameFi
       nameSv
@@ -9698,6 +9837,7 @@ export const ApplicationRoundFragmentFragmentDoc = gql`
         ...ImageFragment
       }
       unit {
+        id
         pk
         nameFi
         nameSv
@@ -9717,6 +9857,7 @@ export const ApplicationRoundFragmentFragmentDoc = gql`
 `;
 export const ApplicationCommonFragmentDoc = gql`
   fragment ApplicationCommon on ApplicationNode {
+    id
     pk
     status
     lastModifiedDate
@@ -10367,8 +10508,8 @@ export type BannerNotificationsListQueryResult = Apollo.QueryResult<
   BannerNotificationsListQuery,
   BannerNotificationsListQueryVariables
 >;
-export const GetApplicationDocument = gql`
-  query getApplication($id: ID!) {
+export const ApplicationDocument = gql`
+  query Application($id: ID!) {
     application(id: $id) {
       ...ApplicationCommon
       applicationRound {
@@ -10383,73 +10524,71 @@ export const GetApplicationDocument = gql`
 `;
 
 /**
- * __useGetApplicationQuery__
+ * __useApplicationQuery__
  *
- * To run a query within a React component, call `useGetApplicationQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetApplicationQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useApplicationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useApplicationQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetApplicationQuery({
+ * const { data, loading, error } = useApplicationQuery({
  *   variables: {
  *      id: // value for 'id'
  *   },
  * });
  */
-export function useGetApplicationQuery(
+export function useApplicationQuery(
   baseOptions: Apollo.QueryHookOptions<
-    GetApplicationQuery,
-    GetApplicationQueryVariables
+    ApplicationQuery,
+    ApplicationQueryVariables
   > &
     (
-      | { variables: GetApplicationQueryVariables; skip?: boolean }
+      | { variables: ApplicationQueryVariables; skip?: boolean }
       | { skip: boolean }
     )
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GetApplicationQuery, GetApplicationQueryVariables>(
-    GetApplicationDocument,
+  return Apollo.useQuery<ApplicationQuery, ApplicationQueryVariables>(
+    ApplicationDocument,
     options
   );
 }
-export function useGetApplicationLazyQuery(
+export function useApplicationLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    GetApplicationQuery,
-    GetApplicationQueryVariables
+    ApplicationQuery,
+    ApplicationQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<GetApplicationQuery, GetApplicationQueryVariables>(
-    GetApplicationDocument,
+  return Apollo.useLazyQuery<ApplicationQuery, ApplicationQueryVariables>(
+    ApplicationDocument,
     options
   );
 }
-export function useGetApplicationSuspenseQuery(
+export function useApplicationSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<
-    GetApplicationQuery,
-    GetApplicationQueryVariables
+    ApplicationQuery,
+    ApplicationQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    GetApplicationQuery,
-    GetApplicationQueryVariables
-  >(GetApplicationDocument, options);
+  return Apollo.useSuspenseQuery<ApplicationQuery, ApplicationQueryVariables>(
+    ApplicationDocument,
+    options
+  );
 }
-export type GetApplicationQueryHookResult = ReturnType<
-  typeof useGetApplicationQuery
+export type ApplicationQueryHookResult = ReturnType<typeof useApplicationQuery>;
+export type ApplicationLazyQueryHookResult = ReturnType<
+  typeof useApplicationLazyQuery
 >;
-export type GetApplicationLazyQueryHookResult = ReturnType<
-  typeof useGetApplicationLazyQuery
+export type ApplicationSuspenseQueryHookResult = ReturnType<
+  typeof useApplicationSuspenseQuery
 >;
-export type GetApplicationSuspenseQueryHookResult = ReturnType<
-  typeof useGetApplicationSuspenseQuery
->;
-export type GetApplicationQueryResult = Apollo.QueryResult<
-  GetApplicationQuery,
-  GetApplicationQueryVariables
+export type ApplicationQueryResult = Apollo.QueryResult<
+  ApplicationQuery,
+  ApplicationQueryVariables
 >;
 export const TermsOfUseDocument = gql`
   query TermsOfUse($termsType: TermsType) {
@@ -14217,9 +14356,11 @@ export const ReservationUnitEditDocument = gql`
       publishEnds
       maxReservationsPerUser
       metadataSet {
+        id
         pk
       }
       pricings {
+        id
         ...PricingFields
         lowestPriceNet
         highestPriceNet
@@ -14229,6 +14370,7 @@ export const ReservationUnitEditDocument = gql`
         pk
       }
       applicationRoundTimeSlots {
+        id
         pk
         closed
         weekday

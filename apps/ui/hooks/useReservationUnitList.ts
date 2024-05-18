@@ -1,5 +1,5 @@
 import { useSessionStorage } from "react-use";
-import type { ApplicationRoundNode, ReservationUnitNode } from "@gql/gql-types";
+import type { ApplicationQuery, ReservationUnitNode } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 
 type ReservationUnitList = {
@@ -10,12 +10,12 @@ type ReservationUnitList = {
   clearSelections: () => void;
 };
 
+type Node = NonNullable<ApplicationQuery["application"]>;
+type AppRoundNode = NonNullable<Node["applicationRound"]>;
 /// @param round filter the reservation units by the application round
 /// Problem with this is that the current system is not based on around requiring an application round
 /// but the actual use case is, so have to do filtering case by case.
-const useReservationUnitsList = (
-  round?: ApplicationRoundNode
-): ReservationUnitList => {
+const useReservationUnitsList = (round?: AppRoundNode): ReservationUnitList => {
   const [reservationUnits, setReservationUnits] = useSessionStorage<
     ReservationUnitNode[]
   >("reservationUnitList", []);

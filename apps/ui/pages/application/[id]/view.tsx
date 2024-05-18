@@ -10,19 +10,28 @@ import { ApplicationPageWrapper } from "@/components/application/ApplicationPage
 import { createApolloClient } from "@/modules/apolloClient";
 import { ViewInner } from "@/components/application/ViewInner";
 import { ButtonContainer, CenterSpinner } from "@/components/common/common";
-import { useApplicationQuery } from "@/hooks/useApplicationQuery";
 import {
   getCommonServerSideProps,
   getGenericTerms,
 } from "@/modules/serverUtils";
+import { base64encode } from "common/src/helpers";
+import { useApplicationQuery } from "@/gql/gql-types";
 
-const View = ({ id, tos }: Props): JSX.Element => {
+const View = ({ id: pk, tos }: Props): JSX.Element => {
   const { t } = useTranslation();
 
   const router = useRouter();
-  const { application, error, isLoading } = useApplicationQuery(
-    id ?? undefined
-  );
+
+  const id = base64encode(`ApplicationNode:${pk}`);
+  const {
+    data,
+    error,
+    loading: isLoading,
+  } = useApplicationQuery({
+    variables: { id },
+    skip: !pk,
+  });
+  const { application } = data ?? {};
 
   if (id == null) {
     return <Error statusCode={404} />;

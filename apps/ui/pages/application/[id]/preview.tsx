@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
-import { useSendApplicationMutation } from "@gql/gql-types";
+import {
+  useApplicationQuery,
+  useSendApplicationMutation,
+} from "@gql/gql-types";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Error from "next/error";
@@ -10,12 +13,12 @@ import { ButtonContainer, CenterSpinner } from "@/components/common/common";
 import { ViewInner } from "@/components/application/ViewInner";
 import { createApolloClient } from "@/modules/apolloClient";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
-import { useApplicationQuery } from "@/hooks/useApplicationQuery";
 import { ErrorToast } from "@/components/common/ErrorToast";
 import {
   getCommonServerSideProps,
   getGenericTerms,
 } from "@/modules/serverUtils";
+import { base64encode } from "common/src/helpers";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -26,9 +29,16 @@ type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 function Preview(props: PropsNarrowed): JSX.Element {
   const { pk, tos } = props;
 
-  const { application, error, isLoading } = useApplicationQuery(
-    pk ?? undefined
-  );
+  const id = base64encode(`ApplicationNode:${pk}`);
+  const {
+    data,
+    error,
+    loading: isLoading,
+  } = useApplicationQuery({
+    variables: { id },
+    skip: !pk,
+  });
+  const { application } = data ?? {};
 
   const [acceptTermsOfUse, setAcceptTermsOfUse] = useState(false);
   const router = useRouter();
@@ -48,7 +58,7 @@ function Preview(props: PropsNarrowed): JSX.Element {
       console.error("no pk in values");
       return;
     }
-    const { data, errors } = await send({
+    const { data: mutData, errors } = await send({
       variables: {
         input: {
           pk,
@@ -62,7 +72,7 @@ function Preview(props: PropsNarrowed): JSX.Element {
       return;
     }
 
-    const { pk: resPk } = data?.sendApplication ?? {};
+    const { pk: resPk } = mutData?.sendApplication ?? {};
 
     if (resPk != null) {
       // TODO use an urlbuilder

@@ -6,7 +6,7 @@ import { useTranslation } from "next-i18next";
 import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
 import { OptionType } from "common/types/common";
-import type { ApplicationRoundNode } from "@gql/gql-types";
+import type { ApplicationQuery } from "@gql/gql-types";
 import { fontRegular, H5 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { CheckboxWrapper } from "common/src/reservation-form/components";
@@ -25,6 +25,8 @@ import ConfirmationModal, { ModalRef } from "../common/ConfirmationModal";
 import { MediumButton } from "@/styles/util";
 import { ApplicationFormValues } from "./Form";
 
+type Node = NonNullable<ApplicationQuery["application"]>;
+type AppRoundNode = NonNullable<Node["applicationRound"]>;
 type OptionTypes = {
   ageGroupOptions: OptionType[];
   purposeOptions: OptionType[];
@@ -35,7 +37,7 @@ type OptionTypes = {
 
 type Props = {
   index: number;
-  applicationRound: ApplicationRoundNode;
+  applicationRound: AppRoundNode;
   optionTypes: OptionTypes;
   isVisible: boolean;
   onToggleAccordion: () => void;

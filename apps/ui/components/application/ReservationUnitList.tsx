@@ -5,9 +5,8 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import type { OptionType } from "common/types/common";
 import type {
-  ApplicationRoundNode,
-  ReservationUnitNode,
-  SearchReservationUnitsQuery,
+  ApplicationQuery,
+  ReservationUnitCardFieldsFragment,
 } from "@gql/gql-types";
 import { IconButton } from "common/src/components";
 import { filterNonNullable } from "common/src/helpers";
@@ -16,11 +15,10 @@ import ReservationUnitModal from "../reservation-unit/ReservationUnitModal";
 import ReservationUnitCard from "../reservation-unit/ReservationUnitCard";
 import type { ApplicationFormValues } from "./Form";
 
-type ReservationUnitType = NonNullable<
-  NonNullable<
-    NonNullable<SearchReservationUnitsQuery["reservationUnits"]>["edges"][0]
-  >["node"]
->;
+type Node = NonNullable<ApplicationQuery["application"]>;
+type AppRoundNode = NonNullable<Node["applicationRound"]>;
+type ReservationUnitType = ReservationUnitCardFieldsFragment;
+
 type OptionTypes = {
   purposeOptions: OptionType[];
   reservationUnitTypeOptions: OptionType[];
@@ -30,7 +28,7 @@ type OptionTypes = {
 
 type Props = {
   index: number;
-  applicationRound: ApplicationRoundNode;
+  applicationRound: AppRoundNode;
   options: OptionTypes;
   minSize?: number;
 };
@@ -52,12 +50,12 @@ const Notification = styled(HDSNotification)`
 
 // selected reservation units are applicationEvent.eventReservationUnits
 // available reservation units are applicationRound.reservationUnits
-const ReservationUnitList = ({
+export function ReservationUnitList({
   index,
   applicationRound,
   options,
   minSize,
-}: Props): JSX.Element => {
+}: Props): JSX.Element {
   const { t } = useTranslation();
   const [showModal, setShowModal] = useState(false);
 
@@ -65,7 +63,9 @@ const ReservationUnitList = ({
   const { clearErrors, setError, watch, setValue, formState } = form;
   const { errors } = formState;
 
-  const isValid = (units: ReservationUnitNode[]) => {
+  const isValid = (
+    units: Array<{ maxPersons?: number | undefined | null }>
+  ) => {
     const error = units
       .map(
         (resUnit) =>
@@ -86,13 +86,9 @@ const ReservationUnitList = ({
 
   // TODO these could be prefiltered on the Page level similar to the addition of a new application section
   // but requires a bit different mechanic because forms are separate from the selected resservation units hook that uses session storage
-  const availableReservationUnits = filterNonNullable(
-    applicationRound.reservationUnits
-  );
+  const avail = filterNonNullable(applicationRound.reservationUnits);
   const currentReservationUnits = filterNonNullable(
-    reservationUnits.map((pk) =>
-      availableReservationUnits.find((ru) => ru.pk === pk)
-    )
+    reservationUnits.map((pk) => avail.find((ru) => ru.pk === pk))
   );
 
   useEffect(() => {
@@ -202,6 +198,4 @@ const ReservationUnitList = ({
       </Modal>
     </MainContainer>
   );
-};
-
-export { ReservationUnitList };
+}

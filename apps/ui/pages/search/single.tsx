@@ -18,7 +18,7 @@ import {
 import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
 import { isBrowser } from "@/modules/const";
-import { RESERVATION_UNITS } from "@/modules/queries/reservationUnit";
+import { SEARCH_RESERVATION_UNITS } from "@/modules/queries/reservationUnit";
 import { SingleSearchForm } from "@/components/search/SingleSearchForm";
 import Sorting from "@/components/form/Sorting";
 import ListWithPagination from "@/components/common/ListWithPagination";
@@ -78,7 +78,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     ReservationKind.Direct
   );
   const { data } = await apolloClient.query<Query, QueryReservationUnitsArgs>({
-    query: RESERVATION_UNITS,
+    query: SEARCH_RESERVATION_UNITS,
     fetchPolicy: "no-cache",
     variables,
   });
@@ -180,7 +180,7 @@ function SearchSingle({
   const { data, fetchMore, error, loading, networkStatus } = useQuery<
     Query,
     QueryReservationUnitsArgs
-  >(RESERVATION_UNITS, {
+  >(SEARCH_RESERVATION_UNITS, {
     variables: vars,
     fetchPolicy: "network-only",
     // Why?

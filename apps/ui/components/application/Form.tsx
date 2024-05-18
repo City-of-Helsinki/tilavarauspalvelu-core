@@ -2,17 +2,13 @@ import { startOfDay } from "date-fns";
 import { filterNonNullable } from "common/src/helpers";
 import {
   ApplicantTypeChoice,
-  type ApplicationSectionNode,
-  type AddressNode,
   type PersonNode,
-  type OrganisationNode,
-  type ApplicationNode,
   type ApplicationUpdateMutationInput,
-  type SuitableTimeRangeNode,
   Weekday,
   Priority,
   type UpdateApplicationSectionForApplicationSerializerInput,
   type ReservationUnitNode,
+  type ApplicationQuery,
 } from "@gql/gql-types";
 import { type Maybe } from "graphql/jsutils/Maybe";
 import { z } from "zod";
@@ -23,6 +19,9 @@ import {
   lessThanMaybeDate,
 } from "common/src/schemas/schemaCommon";
 
+type Node = NonNullable<ApplicationQuery["application"]>;
+type Organisation = Node["organisation"];
+type Address = NonNullable<Organisation>["address"];
 // NOTE the zod schemas have a lot of undefineds because the form is split into four pages
 // so you can't trust some of the zod validation (e.g. mandatory fields)
 // real solution is to split the forms per page so we have four schemas
@@ -99,8 +98,9 @@ export type ApplicationSectionFormValue = z.infer<
   typeof ApplicationSectionFormValueSchema
 >;
 
+type SectionType = NonNullable<Node["applicationSections"]>[0];
 function transformApplicationSectionToForm(
-  section: ApplicationSectionNode
+  section: SectionType
 ): ApplicationSectionFormValue {
   return {
     pk: section.pk ?? undefined,
@@ -137,7 +137,7 @@ function transformApplicationSectionToForm(
 }
 
 function convertTimeRange(
-  timeRange: SuitableTimeRangeNode
+  timeRange: NonNullable<SectionType["suitableTimeRanges"][0]>
 ): SuitableTimeRangeFormValues {
   return {
     pk: timeRange.pk ?? undefined,
@@ -193,7 +193,7 @@ export const convertPerson = (p: Maybe<PersonNode>): PersonFormValues => ({
 });
 
 // TODO are these converters the wrong way around? (not input, but output)
-export const convertAddress = (a: Maybe<AddressNode>): AddressFormValues => ({
+export const convertAddress = (a: Address): AddressFormValues => ({
   pk: a?.pk ?? undefined,
   streetAddress: a?.streetAddress ?? "",
   city: a?.city ?? "",
@@ -201,7 +201,7 @@ export const convertAddress = (a: Maybe<AddressNode>): AddressFormValues => ({
 });
 
 export const convertOrganisation = (
-  o: Maybe<OrganisationNode>
+  o: Organisation
 ): OrganisationFormValues => ({
   pk: o?.pk ?? undefined,
   name: o?.name ?? "",
@@ -408,7 +408,7 @@ export const transformApplication = (
 };
 
 export function convertApplication(
-  app: Maybe<ApplicationNode> | undefined,
+  app: Node,
   reservationUnits: ReservationUnitNode[]
 ): ApplicationFormValues {
   const formAes = filterNonNullable(app?.applicationSections).map((ae) =>

@@ -5,7 +5,11 @@ import { useRouter } from "next/router";
 import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
 import type { ApplicationEventSchedulePriority } from "common/types/common";
-import { Priority, type ApplicationNode } from "@gql/gql-types";
+import {
+  Priority,
+  type ApplicationQuery,
+  type ApplicationRoundTimeSlotNode,
+} from "@gql/gql-types";
 import {
   filterNonNullable,
   getLocalizationLang,
@@ -29,8 +33,9 @@ import { AccordionWithState as Accordion } from "../common/Accordion";
 import { TimeSelector } from "./TimeSelector";
 import { ButtonContainer } from "../common/common";
 
+type Node = NonNullable<ApplicationQuery["application"]>;
 type Props = {
-  application: ApplicationNode;
+  application: Node;
   onNext: (appToSave: ApplicationFormValues) => void;
 };
 
@@ -39,13 +44,10 @@ type OpeningHourPeriod = {
   end: string;
 } | null;
 
-type DailyOpeningHours =
-  | {
-      weekday: number;
-      closed: boolean;
-      reservableTimes?: OpeningHourPeriod[] | null;
-    }[]
-  | null;
+type DailyOpeningHours = Pick<
+  ApplicationRoundTimeSlotNode,
+  "weekday" | "closed" | "reservableTimes"
+>[];
 
 // Mobile layout breaks if the select options are too long
 const MAX_SELECT_OPTION_LENGTH = 28;
@@ -82,7 +84,7 @@ function getOpeningHours(
   return dayOpeningHours.reservableTimes ?? null;
 }
 
-function applicationEventSchedulesToCells(
+function aesToCells(
   schedule: ApplicationEventScheduleFormType[],
   openingHours?: DailyOpeningHours
 ): Cell[][] {
@@ -240,7 +242,7 @@ const getApplicationEventsWhichMinDurationsIsNotFulfilled = (
   );
 };
 
-const Page2 = ({ application, onNext }: Props): JSX.Element => {
+function Page2({ application, onNext }: Props): JSX.Element {
   const { t, i18n } = useTranslation();
   const [reservationUnitPk, setReservationUnitPk] = useState<number>(
     application?.applicationSections?.[0]?.reservationUnitOptions?.[0]
@@ -294,7 +296,7 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
     );
   };
   const selectorData = applicationSections.map((ae) =>
-    applicationEventSchedulesToCells(convertToSchedule(ae), openingHours)
+    aesToCells(convertToSchedule(ae), openingHours)
   );
   const setSelectorData = (selected: typeof selectorData) => {
     // So this returns them as:
@@ -515,6 +517,6 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
       </ButtonContainer>
     </form>
   );
-};
+}
 
 export default Page2;

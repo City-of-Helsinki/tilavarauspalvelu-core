@@ -1,16 +1,17 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { type ApplicationNode, ApplicantTypeChoice } from "@gql/gql-types";
+import { ApplicantTypeChoice, type ApplicationQuery } from "@gql/gql-types";
 import { getTranslation } from "common/src/common/util";
 import { SpanTwoColumns, TwoColumnContainer } from "../common/common";
 import Address from "./AddressPreview";
 import { StyledLabelValue } from "./styled";
 
-const ApplicantInfoPreview = ({
+type Node = NonNullable<ApplicationQuery["application"]>;
+export function ApplicantInfoPreview({
   application,
 }: {
-  application: ApplicationNode;
-}): JSX.Element => {
+  application: Node;
+}): JSX.Element {
   const { t } = useTranslation();
 
   return (
@@ -82,6 +83,4 @@ const ApplicantInfoPreview = ({
       ) : null}
     </TwoColumnContainer>
   );
-};
-
-export { ApplicantInfoPreview };
+}

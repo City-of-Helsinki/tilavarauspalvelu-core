@@ -137,14 +137,31 @@ export const RESERVATION_UNIT_PAGE_QUERY = gql`
   }
 `;
 
-// TODO why is ids remapped to pk here? that breaks all queries that use it
-// TODO why isDraft and isVisible are options here?
-export const RESERVATION_UNITS = gql`
-  ${PRICING_FRAGMENT}
+export const RESERVATOION_UNIT_CARD_FRAGMENT = gql`
   ${IMAGE_FRAGMENT}
   ${UNIT_NAME_FRAGMENT_I18N}
   ${RESERVATION_UNIT_TYPE_FRAGMENT}
   ${RESERVATION_UNIT_NAME_FRAGMENT}
+  fragment ReservationUnitCardFields on ReservationUnitNode {
+    ...ReservationUnitNameFields
+    unit {
+      ...UnitNameFieldsI18N
+    }
+    reservationUnitType {
+      ...ReservationUnitTypeFields
+    }
+    images {
+      ...ImageFragment
+    }
+    maxPersons
+  }
+`;
+
+// TODO why is ids remapped to pk here? that breaks all queries that use it
+// TODO why isDraft and isVisible are options here?
+export const SEARCH_RESERVATION_UNITS = gql`
+  ${PRICING_FRAGMENT}
+  ${RESERVATOION_UNIT_CARD_FRAGMENT}
   query SearchReservationUnits(
     $textSearch: String
     $pk: [Int]
@@ -198,21 +215,11 @@ export const RESERVATION_UNITS = gql`
     ) {
       edges {
         node {
-          ...ReservationUnitNameFields
+          ...ReservationUnitCardFields
           reservationBegins
           reservationEnds
           isClosed
           firstReservableDatetime
-          reservationUnitType {
-            ...ReservationUnitTypeFields
-          }
-          unit {
-            ...UnitNameFieldsI18N
-          }
-          maxPersons
-          images {
-            ...ImageFragment
-          }
           pricings {
             ...PricingFields
           }

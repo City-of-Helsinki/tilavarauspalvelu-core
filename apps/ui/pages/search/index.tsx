@@ -21,7 +21,7 @@ import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
 import { SeasonalSearchForm } from "@/components/search/SeasonalSearchForm";
 import { HeroSubheading } from "@/modules/style/typography";
-import { RESERVATION_UNITS } from "@/modules/queries/reservationUnit";
+import { SEARCH_RESERVATION_UNITS } from "@/modules/queries/reservationUnit";
 import Sorting from "@/components/form/Sorting";
 import { createApolloClient } from "@/modules/apolloClient";
 import { APPLICATION_ROUNDS } from "@/modules/queries/applicationRound";
@@ -65,7 +65,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     Query,
     QueryReservationUnitsArgs
   >({
-    query: RESERVATION_UNITS,
+    query: SEARCH_RESERVATION_UNITS,
     fetchPolicy: "no-cache",
     variables: processVariables(values, locale ?? "fi", ReservationKind.Season),
   });
@@ -193,7 +193,7 @@ function SeasonalSearch({
     error,
     loading: isLoading,
     networkStatus,
-  } = useQuery<Query, QueryReservationUnitsArgs>(RESERVATION_UNITS, {
+  } = useQuery<Query, QueryReservationUnitsArgs>(SEARCH_RESERVATION_UNITS, {
     variables: processVariables(
       searchValues,
       i18n.language,

@@ -5,15 +5,16 @@ import { breakpoints } from "common/src/common/style";
 import { Container } from "common";
 import {
   ApplicantTypeChoice,
-  type ApplicationNode,
   ApplicationStatusChoice,
+  type ApplicationQuery,
 } from "@gql/gql-types";
 import { useRouter } from "next/router";
 import Head from "./Head";
 import Stepper, { StepperProps } from "./Stepper";
 
+type Node = NonNullable<ApplicationQuery["application"]>;
 type ApplicationPageProps = {
-  application: ApplicationNode | null;
+  application: Node;
   translationKeyPrefix: string;
   overrideText?: string;
   isDirty?: boolean;
@@ -48,7 +49,7 @@ const Main = styled.div`
 `;
 
 // TODO this should have more complete checks (but we are thinking of splitting the form anyway)
-const calculateCompletedStep = (values: ApplicationNode): 0 | 1 | 2 | 3 | 4 => {
+function calculateCompletedStep(values: Node): 0 | 1 | 2 | 3 | 4 {
   const { status } = values;
   // 4 should only be returned if the application state === Received
   if (status === ApplicationStatusChoice.Received) {
@@ -84,16 +85,16 @@ const calculateCompletedStep = (values: ApplicationNode): 0 | 1 | 2 | 3 | 4 => {
     return 1;
   }
   return 0;
-};
+}
 
-const ApplicationPageWrapper = ({
+export function ApplicationPageWrapper({
   application,
   translationKeyPrefix,
   headContent,
   overrideText,
   isDirty,
   children,
-}: ApplicationPageProps): JSX.Element => {
+}: ApplicationPageProps): JSX.Element {
   const { t } = useTranslation();
   const router = useRouter();
 
@@ -122,6 +123,4 @@ const ApplicationPageWrapper = ({
       </StyledContainer>
     </>
   );
-};
-
-export { ApplicationPageWrapper };
+}

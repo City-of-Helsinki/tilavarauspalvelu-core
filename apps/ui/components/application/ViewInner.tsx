@@ -1,7 +1,7 @@
 import React from "react";
 import { Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
-import type { ApplicationNode, TermsOfUseNode } from "@gql/gql-types";
+import type { ApplicationQuery, TermsOfUseNode } from "@gql/gql-types";
 import { getTranslation } from "@/modules/util";
 import { ApplicantInfoPreview } from "./ApplicantInfoPreview";
 import { CheckboxContainer, StyledNotification } from "./styled";
@@ -10,13 +10,14 @@ import { ApplicationEventList } from "./ApplicationEventList";
 import TermsBox from "common/src/termsbox/TermsBox";
 import Sanitize from "../common/Sanitize";
 
+type Node = NonNullable<ApplicationQuery["application"]>;
 export function ViewInner({
   application,
   tos,
   acceptTermsOfUse,
   setAcceptTermsOfUse,
 }: {
-  application: ApplicationNode;
+  application: Node;
   tos: TermsOfUseNode | null;
   acceptTermsOfUse?: boolean;
   setAcceptTermsOfUse?: (value: boolean) => void;

@@ -1,25 +1,28 @@
 import { IconArrowRight, IconPlusCircle } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { useQuery } from "@apollo/client";
 import { uniq } from "lodash";
-import { type Query, type ApplicationRoundNode } from "@gql/gql-types";
+import {
+  type ApplicationQuery,
+  useSearchFormParamsUnitQuery,
+} from "@gql/gql-types";
 import { useFormContext } from "react-hook-form";
 import { filterNonNullable } from "common/src/helpers";
 import { getTranslation, mapOptions } from "@/modules/util";
 import { MediumButton } from "@/styles/util";
 import { useOptions } from "@/hooks/useOptions";
-import { SEARCH_FORM_PARAMS_UNIT } from "@/modules/queries/params";
 import { ButtonContainer } from "../common/common";
 import { ApplicationEvent } from "./ApplicationEvent";
 import { type ApplicationFormValues } from "./Form";
 import useReservationUnitsList from "@/hooks/useReservationUnitList";
 
+type Node = NonNullable<ApplicationQuery["application"]>;
+type AppRoundNode = NonNullable<Node["applicationRound"]>;
 type Props = {
   // TODO break application round down to smaller pieces (only the required props)
   // mostly we need periodBegin and periodEnd here (that should be Dates not strings)
   // we also need applicationRound.reservationUnits for ReservationUnitList
-  applicationRound: ApplicationRoundNode;
+  applicationRound: AppRoundNode;
   onNext: (formValues: ApplicationFormValues) => void;
 };
 
@@ -31,8 +34,8 @@ export function Page1({ applicationRound, onNext }: Props): JSX.Element | null {
     (resUnit) => resUnit?.unit?.pk
   );
   const unitsInApplicationRound = filterNonNullable(uniq(resUnitPks));
-  const { data: unitData } = useQuery<Query>(SEARCH_FORM_PARAMS_UNIT);
-  const units = filterNonNullable(unitData?.units?.edges?.map((e) => e?.node))
+  const { data } = useSearchFormParamsUnitQuery();
+  const units = filterNonNullable(data?.units?.edges?.map((e) => e?.node))
     .filter((u) => u.pk != null && unitsInApplicationRound.includes(u.pk))
     .map((u) => ({
       pk: u.pk ?? 0,
@@ -108,8 +111,8 @@ export function Page1({ applicationRound, onNext }: Props): JSX.Element | null {
   const submitDisabled =
     applicationSections == null || applicationSections.length === 0;
 
-  const onSubmit = (data: ApplicationFormValues) => {
-    onNext(data);
+  const onSubmit = (values: ApplicationFormValues) => {
+    onNext(values);
   };
 
   return (

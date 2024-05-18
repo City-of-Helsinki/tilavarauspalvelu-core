@@ -3,7 +3,7 @@ import type { TFunction } from "i18next";
 import { useTranslation } from "next-i18next";
 import {
   type AgeGroupNode,
-  type ApplicationNode,
+  type ApplicationQuery,
   type Maybe,
   type SuitableTimeRangeNode,
   Priority,
@@ -16,12 +16,17 @@ import { TwoColumnContainer, FormSubHeading } from "../common/common";
 import { AccordionWithState as Accordion } from "../common/Accordion";
 import { UnitList } from "./UnitList";
 
-const filterPrimary = (n: SuitableTimeRangeNode) =>
+const filterPrimary = (n: { priority: Priority }) =>
   n.priority === Priority.Primary;
-const filterSecondary = (n: SuitableTimeRangeNode) =>
+const filterSecondary = (n: { priority: Priority }) =>
   n.priority === Priority.Secondary;
 
-const convertApplicationSchedule = (aes: SuitableTimeRangeNode) => ({
+const convertApplicationSchedule = (
+  aes: Pick<
+    SuitableTimeRangeNode,
+    "beginTime" | "endTime" | "dayOfTheWeek" | "priority"
+  >
+) => ({
   begin: aes.beginTime,
   end: aes.endTime,
   day: convertWeekday(aes.dayOfTheWeek),
@@ -54,11 +59,8 @@ const ageGroupToString = (ag: Maybe<AgeGroupNode> | undefined): string => {
 
 // NOTE: used by Preview and View
 // No form context unlike the edit pages, use application query result
-const ApplicationEventList = ({
-  application,
-}: {
-  application: ApplicationNode;
-}) => {
+type Node = NonNullable<ApplicationQuery["application"]>;
+export function ApplicationEventList({ application }: { application: Node }) {
   const { t } = useTranslation();
 
   const aes = application.applicationSections ?? [];
@@ -158,6 +160,4 @@ const ApplicationEventList = ({
       ))}
     </>
   );
-};
-
-export { ApplicationEventList };
+}

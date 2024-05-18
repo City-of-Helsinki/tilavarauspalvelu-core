@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { IMAGE_FRAGMENT, TERMS_OF_USE_FRAGMENT } from "./fragments";
+import { IMAGE_FRAGMENT, LOCATION_FRAGMENT_I18N, TERMS_OF_USE_FRAGMENT } from "./fragments";
 
 export const APPLICANT_NAME_FRAGMENT = gql`
   fragment ApplicationNameFragment on ApplicationNode {
@@ -27,18 +27,21 @@ export const APPLICATION_SECTION_DURATION_FRAGMENT = gql`
 const APPLICATION_SECTION_COMMON_FRAGMENT = gql`
   ${APPLICATION_SECTION_DURATION_FRAGMENT}
   fragment ApplicationSectionCommonFragment on ApplicationSectionNode {
+    id
     pk
     name
     status
     ...ApplicationSectionDurationFragment
     reservationMaxDuration
     ageGroup {
+      id
       pk
       minimum
       maximum
     }
     numPersons
     reservationUnitOptions {
+      id
       pk
       preferredOrder
     }
@@ -79,31 +82,39 @@ const APPLICATION_SECTION_UI_FRAGMENT = gql`
   fragment ApplicationSectionUIFragment on ApplicationSectionNode {
     ...ApplicationSectionCommonFragment
     suitableTimeRanges {
+      id
+      pk
       beginTime
       endTime
       dayOfTheWeek
       priority
     }
     purpose {
+      id
       pk
       nameFi
       nameSv
       nameEn
     }
     reservationUnitOptions {
+      id
       reservationUnit {
+        id
         pk
         nameFi
         nameEn
         nameSv
         unit {
+          id
           pk
           nameFi
           nameEn
           nameSv
         }
         applicationRoundTimeSlots {
+          id
           weekday
+          closed
           reservableTimes {
             begin
             end
@@ -118,6 +129,7 @@ const APPLICANT_FRAGMENT = gql`
   fragment ApplicantFragment on ApplicationNode {
     applicantType
     contactPerson {
+      id
       pk
       firstName
       lastName
@@ -126,30 +138,37 @@ const APPLICANT_FRAGMENT = gql`
     }
     additionalInformation
     organisation {
+      id
       pk
       name
       identifier
       organisationType
       coreBusiness
+      yearEstablished
       address {
+        id
+        pk
         postCode
         streetAddress
         city
       }
     }
     homeCity {
+      id
       pk
       nameFi
       nameEn
       nameSv
     }
     billingAddress {
+      id
       pk
       postCode
       streetAddress
       city
     }
     user {
+      id
       name
       email
       pk
@@ -160,6 +179,7 @@ const APPLICANT_FRAGMENT = gql`
 const APPLICATION_ROUND_FRAGMENT = gql`
   ${IMAGE_FRAGMENT}
   fragment ApplicationRoundFragment on ApplicationRoundNode {
+    id
     pk
     nameFi
     nameSv
@@ -169,6 +189,7 @@ const APPLICATION_ROUND_FRAGMENT = gql`
       nameFi
     }
     reservationUnits {
+      id
       pk
       nameFi
       nameSv
@@ -179,6 +200,7 @@ const APPLICATION_ROUND_FRAGMENT = gql`
         ...ImageFragment
       }
       unit {
+        id
         pk
         nameFi
         nameSv
@@ -211,9 +233,11 @@ export const APPLICATION_ADMIN_FRAGMENT = gql`
       nameFi
     }
     applicationSections {
+      id
       ...ApplicationSectionUIFragment
       allocations
       reservationUnitOptions {
+        id
         rejected
         allocatedTimeSlots {
           pk
@@ -229,6 +253,7 @@ export const APPLICATION_FRAGMENT = gql`
   ${APPLICANT_FRAGMENT}
   ${APPLICATION_ROUND_FRAGMENT}
   fragment ApplicationCommon on ApplicationNode {
+    id
     pk
     status
     lastModifiedDate
@@ -246,7 +271,7 @@ export const APPLICATION_FRAGMENT = gql`
 export const APPLICATION_QUERY = gql`
   ${APPLICATION_FRAGMENT}
   ${TERMS_OF_USE_FRAGMENT}
-  query getApplication($id: ID!) {
+  query Application($id: ID!) {
     application(id: $id) {
       ...ApplicationCommon
       applicationRound {

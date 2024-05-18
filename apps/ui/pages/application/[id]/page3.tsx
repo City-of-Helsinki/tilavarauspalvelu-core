@@ -2,7 +2,8 @@ import React, { useEffect } from "react";
 import styled from "styled-components";
 import {
   ApplicantTypeChoice,
-  type ApplicationNode,
+  type ApplicationQuery,
+  useApplicationQuery,
   type ApplicationUpdateMutationInput,
 } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
@@ -28,11 +29,11 @@ import {
   type OrganisationFormValues,
 } from "@/components/application/Form";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
-import { useApplicationQuery } from "@/hooks/useApplicationQuery";
 import { useApplicationUpdate } from "@/hooks/useApplicationUpdate";
 import { CenterSpinner } from "@/components/common/common";
 import { ErrorToast } from "@/components/common/ErrorToast";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { base64encode } from "common/src/helpers";
 
 const Form = styled.form`
   margin-bottom: var(--spacing-layout-l);
@@ -49,6 +50,7 @@ function transformPerson(person?: PersonFormValues) {
   };
 }
 
+type Node = NonNullable<ApplicationQuery["application"]>;
 function isAddressValid(address?: AddressFormValues) {
   const { streetAddress, postCode, city } = address || {};
   return (
@@ -72,7 +74,7 @@ function transformAddress(address?: AddressFormValues) {
 
 // Filter out any empty strings from the object (otherwise the mutation fails)
 // remove the identifier if it's empty (otherwise the mutation fails)
-function transformOrganisation(org?: OrganisationFormValues) {
+function transformOrganisation(org: OrganisationFormValues) {
   return {
     name: org?.name || undefined,
     identifier: org?.identifier || undefined,
@@ -84,7 +86,7 @@ function transformOrganisation(org?: OrganisationFormValues) {
 }
 
 function convertApplicationToForm(
-  app?: Maybe<ApplicationNode>
+  app?: Maybe<Node>
 ): ApplicationFormPage3Values {
   return {
     pk: app?.pk ?? 0,
@@ -150,15 +152,20 @@ function Page3(): JSX.Element | null {
 }
 
 function Page3Wrapped(props: Props): JSX.Element | null {
-  const { id } = props;
+  const { id: appPk } = props;
   const router = useRouter();
-  const {
-    application,
-    error: queryError,
-    isLoading,
-  } = useApplicationQuery(id ?? undefined);
 
-  const applicationRound = application?.applicationRound ?? undefined;
+  const id = base64encode(`ApplicationNode:${appPk}`);
+  const {
+    data,
+    error: queryError,
+    loading: isLoading,
+  } = useApplicationQuery({
+    variables: { id },
+    skip: appPk == null || !(appPk > 0),
+  });
+  const { application } = data ?? {};
+  const { applicationRound } = application ?? {};
 
   const form = useForm<ApplicationFormPage3Values>({
     mode: "onChange",
@@ -197,8 +204,8 @@ function Page3Wrapped(props: Props): JSX.Element | null {
     return pk;
   };
 
-  const onSubmit = async (data: ApplicationFormPage3Values) => {
-    const pk = await handleSave(data);
+  const onSubmit = async (values: ApplicationFormPage3Values) => {
+    const pk = await handleSave(values);
     if (pk === 0) {
       return;
     }

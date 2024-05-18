@@ -16,11 +16,10 @@ import type { OptionType } from "common/types/common";
 import { fontMedium } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
-  type ApplicationRoundNode,
-  type ReservationUnitNode,
   ReservationUnitOrderingChoices,
   useSearchReservationUnitsQuery,
-  type SearchReservationUnitsQuery,
+  type ReservationUnitCardFieldsFragment,
+  type ApplicationQuery,
 } from "@gql/gql-types";
 import { filterNonNullable, getImageSource } from "common/src/helpers";
 import { reservationUnitPath } from "@/modules/const";
@@ -126,12 +125,7 @@ const LinkText = styled.span`
   margin-left: var(--spacing-xs);
 `;
 
-type ReservationUnitType = NonNullable<
-  NonNullable<
-    NonNullable<SearchReservationUnitsQuery["reservationUnits"]>["edges"][0]
-  >["node"]
->;
-const ReservationUnitCard = ({
+function ReservationUnitCard({
   reservationUnit,
   handleAdd,
   handleRemove,
@@ -141,7 +135,7 @@ const ReservationUnitCard = ({
   isSelected: boolean;
   handleAdd: (ru: ReservationUnitType) => void;
   handleRemove: (ru: ReservationUnitType) => void;
-}) => {
+}) {
   const { t } = useTranslation();
 
   const handle = () =>
@@ -209,7 +203,7 @@ const ReservationUnitCard = ({
       </Actions>
     </Container>
   );
-};
+}
 
 const MainContainer = styled.div`
   overflow-y: auto;
@@ -275,6 +269,9 @@ const Results = styled.div`
 
 const StyledLoadingSpinner = styled(LoadingSpinner).attrs({ small: true })``;
 
+type Node = NonNullable<ApplicationQuery["application"]>;
+type AppRoundNode = NonNullable<Node["applicationRound"]>;
+type ReservationUnitType = ReservationUnitCardFieldsFragment;
 type OptionsType = {
   purposeOptions: OptionType[];
   reservationUnitTypeOptions: OptionType[];
@@ -286,19 +283,19 @@ const emptyOption = {
   label: "",
 };
 
-const ReservationUnitModal = ({
+function ReservationUnitModal({
   applicationRound,
   handleAdd,
   handleRemove,
   currentReservationUnits,
   options,
 }: {
-  applicationRound: ApplicationRoundNode;
+  applicationRound: AppRoundNode;
   handleAdd: (ru: ReservationUnitType) => void;
   handleRemove: (ru: ReservationUnitType) => void;
-  currentReservationUnits: ReservationUnitNode[];
+  currentReservationUnits: Array<{ pk?: number | null | undefined }>;
   options: OptionsType;
-}): JSX.Element => {
+}): JSX.Element {
   const [searchTerm, setSearchTerm] = useState<string | undefined>(undefined);
   const [reservationUnitType, setReservationUnitType] = useState<
     OptionType | undefined
@@ -414,6 +411,6 @@ const ReservationUnitModal = ({
       </Results>
     </MainContainer>
   );
-};
+}
 
 export default ReservationUnitModal;
