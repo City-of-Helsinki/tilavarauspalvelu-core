@@ -1,6 +1,5 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { type ReservationUnitNode } from "@gql/gql-types";
 import { GenericDialog } from "./GenericDialog";
 
 export function ArchiveDialog({
@@ -8,7 +7,9 @@ export function ArchiveDialog({
   onClose,
   onAccept,
 }: {
-  reservationUnit: ReservationUnitNode;
+  reservationUnit: {
+    nameFi?: string | null;
+  };
   onClose: () => void;
   onAccept: () => void;
 }): JSX.Element {
@@ -20,7 +21,7 @@ export function ArchiveDialog({
       onClose={onClose}
       description={t("ArchiveReservationUnitDialog.description")}
       title={t("ArchiveReservationUnitDialog.title", {
-        name: reservationUnit.nameFi as string,
+        name: reservationUnit.nameFi ?? "-",
       })}
       acceptLabel={t("ArchiveReservationUnitDialog.archive")}
     />

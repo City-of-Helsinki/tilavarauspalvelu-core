@@ -14,8 +14,7 @@ import {
   PriceUnit,
   type ReservationUnitPricingNode,
   ImageType,
-  type ReservationUnitImageNode,
-  type ReservationUnitNode,
+  type ReservationUnitEditQuery,
 } from "@gql/gql-types";
 import { addDays, format } from "date-fns";
 import { z } from "zod";
@@ -27,6 +26,9 @@ import { constructApiDate } from "@/helpers";
 import { intervalToNumber } from "@/schemas/utils";
 
 export const PaymentTypes = ["ONLINE", "INVOICE", "ON_SITE"] as const;
+
+type QueryData = ReservationUnitEditQuery["reservationUnit"];
+type Node = NonNullable<QueryData>;
 
 const PricingFormSchema = z.object({
   // pk === 0 means new pricing good decission?
@@ -682,26 +684,27 @@ export type ReservationUnitEditFormValues = z.infer<
 >;
 
 // NOTE decimal type is incorrectly typed as number in codegen
-const convertMaybeDecimal = (value?: unknown) => {
+function convertMaybeDecimal(value?: unknown) {
   if (value == null || value === "") {
     return undefined;
   }
   return Number(value);
-};
+}
 
-const convertPricing = (p?: ReservationUnitPricingNode): PricingFormValues => {
-  const convertBegins = (begins?: string, status?: Status) => {
-    const d = begins != null && begins !== "" ? fromApiDate(begins) : undefined;
-    const today = new Date();
-    if (d != null) {
-      return toUIDate(d);
-    }
-    if (status === Status.Future) {
-      return toUIDate(addDays(today, 1));
-    }
-    return toUIDate(today);
-  };
+function convertBegins(begins?: string, status?: Status) {
+  const d = begins != null && begins !== "" ? fromApiDate(begins) : undefined;
+  const today = new Date();
+  if (d != null) {
+    return toUIDate(d);
+  }
+  if (status === Status.Future) {
+    return toUIDate(addDays(today, 1));
+  }
+  return toUIDate(today);
+}
 
+type PricingNode = NonNullable<Node["pricings"]>[0];
+function convertPricing(p?: PricingNode): PricingFormValues {
   return {
     pk: p?.pk ?? 0,
     taxPercentage: {
@@ -717,18 +720,14 @@ const convertPricing = (p?: ReservationUnitPricingNode): PricingFormValues => {
     status: p?.status ?? Status.Active,
     begins: convertBegins(p?.begins, p?.status),
   };
-};
+}
 
 // Don't return past pricings (they can't be saved to backend)
 // Always return one active pricing and one future pricing
 // the boolean toggle in the form decides if the future one is shown or saved
-const convertPricingList = (
-  pricings: ReservationUnitPricingNode[]
-): PricingFormValues[] => {
-  const isActive = (p?: ReservationUnitPricingNode) =>
-    p?.status === Status.Active;
-  const isFuture = (p?: ReservationUnitPricingNode) =>
-    p?.status === Status.Future;
+function convertPricingList(pricings: PricingNode[]): PricingFormValues[] {
+  const isActive = (p?: (typeof pricings)[0]) => p?.status === Status.Active;
+  const isFuture = (p?: (typeof pricings)[0]) => p?.status === Status.Future;
 
   const active = pricings.find(isActive);
   // NOTE using casting here because we only need the status to be set for the next step
@@ -740,9 +739,9 @@ const convertPricingList = (
 
   // allow undefined's here so we create two default values always
   return [active, future].map(convertPricing);
-};
+}
 
-const convertImage = (image?: ReservationUnitImageNode): ImageFormType => {
+function convertImage(image?: Node["images"][0]): ImageFormType {
   return {
     pk: image?.pk ?? 0,
     imageUrl: image?.imageUrl ?? undefined,
@@ -751,7 +750,7 @@ const convertImage = (image?: ReservationUnitImageNode): ImageFormType => {
     originalImageType: image?.imageType ?? undefined,
     bytes: undefined,
   };
-};
+}
 
 /// Primary use case is to clip out seconds from backend time strings
 /// Assumed only to be used for backend time strings which are in format HH:MM or HH:MM:SS
@@ -769,7 +768,7 @@ const convertTime = (t?: string) => {
 // Always return all 7 days
 // Always return at least one reservableTime
 function convertSeasonalList(
-  data: NonNullable<ReservationUnitNode["applicationRoundTimeSlots"]>
+  data: NonNullable<Node["applicationRoundTimeSlots"]>
 ): ReservationUnitEditFormValues["seasons"] {
   const days = [0, 1, 2, 3, 4, 5, 6];
   return days.map((d) => {
@@ -788,9 +787,9 @@ function convertSeasonalList(
   });
 }
 
-export const convertReservationUnit = (
-  data?: ReservationUnitNode
-): ReservationUnitEditFormValues => {
+export function convertReservationUnit(
+  data?: Node
+): ReservationUnitEditFormValues {
   return {
     reservationBlockWholeDay:
       data?.reservationBlockWholeDay === true
@@ -906,7 +905,7 @@ export const convertReservationUnit = (
     hasBufferTimeAfter: !!data?.bufferTimeAfter,
     hasCancellationRule: data?.cancellationRule != null,
   };
-};
+}
 
 export function transformReservationUnit(
   values: ReservationUnitEditFormValues

@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { PRICING_FRAGMENT, IMAGE_FRAGMENT } from "common/src/queries/fragments";
 
-export const RESERVATIONUNIT_QUERY = gql`
+export const RESERVATION_UNIT_EDIT_QUERY = gql`
   ${IMAGE_FRAGMENT}
   ${PRICING_FRAGMENT}
   query ReservationUnitEdit($id: ID!) {
@@ -104,9 +104,11 @@ export const RESERVATIONUNIT_QUERY = gql`
       publishEnds
       maxReservationsPerUser
       metadataSet {
+        id
         pk
       }
       pricings {
+        id
         ...PricingFields
         lowestPriceNet
         highestPriceNet
@@ -116,6 +118,7 @@ export const RESERVATIONUNIT_QUERY = gql`
         pk
       }
       applicationRoundTimeSlots {
+        id
         pk
         closed
         weekday

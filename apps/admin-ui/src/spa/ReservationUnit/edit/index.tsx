@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import { useQuery } from "@apollo/client";
 import {
   Button,
   Checkbox,
@@ -23,25 +22,24 @@ import { Controller, UseFormReturn, useForm } from "react-hook-form";
 import type { TFunction } from "next-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  type Query,
-  type QueryReservationUnitArgs,
   ReservationStartInterval,
   Authentication,
   type ReservationState,
   type ReservationUnitState,
   TermsType,
   Status,
-  type ReservationUnitNode,
   ImageType,
   useUnitWithSpacesAndResourcesQuery,
   useDeleteImageMutation,
   useUpdateImageMutation,
-  UnitWithSpacesAndResourcesQuery,
+  type UnitWithSpacesAndResourcesQuery,
   useReservationUnitEditorParametersQuery,
-  ReservationUnitEditorParametersQuery,
+  type ReservationUnitEditorParametersQuery,
+  type ReservationUnitEditQuery,
   useCreateImageMutation,
   useCreateReservationUnitMutation,
   useUpdateReservationUnitMutation,
+  useReservationUnitEditQuery,
 } from "@gql/gql-types";
 import { DateTimeInput } from "common/src/components/form/DateTimeInput";
 import { base64encode, filterNonNullable } from "common/src/helpers";
@@ -65,7 +63,6 @@ import { parseAddress, getTranslatedError } from "@/common/util";
 import Error404 from "@/common/Error404";
 import { Accordion } from "@/component/Accordion";
 import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
-import { RESERVATIONUNIT_QUERY } from "./queries";
 import { ControlledNumberInput } from "common/src/components/form/ControlledNumberInput";
 import { ArchiveDialog } from "./ArchiveDialog";
 import { ReservationStateTag, ReservationUnitStateTag } from "./tags";
@@ -90,6 +87,9 @@ const RichTextInput = dynamic(
     ssr: false,
   }
 );
+
+type QueryData = ReservationUnitEditQuery["reservationUnit"];
+type Node = NonNullable<QueryData>;
 
 // Override the Accordion style: force border even if the accordion is open
 // because the last section is not an accordion but a button and it looks funny otherwise
@@ -1561,7 +1561,7 @@ function OpeningHoursSection({
   previewUrlPrefix,
 }: {
   // TODO can we simplify this by passing the hauki url only?
-  reservationUnit: ReservationUnitNode | undefined;
+  reservationUnit: Node | undefined;
   previewUrlPrefix: string;
 }) {
   const { t } = useTranslation();
@@ -1853,19 +1853,19 @@ function ErrorInfo({
   );
 }
 
-const ReservationUnitEditor = ({
+function ReservationUnitEditor({
   reservationUnit,
   unitPk,
   form,
   refetch,
   previewUrlPrefix,
 }: {
-  reservationUnit?: ReservationUnitNode;
+  reservationUnit?: Node;
   unitPk: number;
   form: UseFormReturn<ReservationUnitEditFormValues>;
   refetch: () => void;
   previewUrlPrefix: string;
-}): JSX.Element | null => {
+}): JSX.Element | null {
   // ----------------------------- State and Hooks ----------------------------
   const { t } = useTranslation();
   const history = useNavigate();
@@ -2199,7 +2199,7 @@ const ReservationUnitEditor = ({
       </ButtonsStripe>
     </form>
   );
-};
+}
 
 type IRouterProps = {
   reservationUnitPk?: string;
@@ -2214,10 +2214,10 @@ function EditorWrapper({ previewUrlPrefix }: { previewUrlPrefix: string }) {
   const typename = "ReservationUnitNode";
   const id = base64encode(`${typename}:${reservationUnitPk}`);
   const {
-    data: reservationUnitData,
+    data,
     loading: isLoading,
     refetch,
-  } = useQuery<Query, QueryReservationUnitArgs>(RESERVATIONUNIT_QUERY, {
+  } = useReservationUnitEditQuery({
     variables: { id },
     skip:
       !reservationUnitPk ||
@@ -2225,7 +2225,7 @@ function EditorWrapper({ previewUrlPrefix }: { previewUrlPrefix: string }) {
       Number.isNaN(Number(reservationUnitPk)),
   });
 
-  const reservationUnit = reservationUnitData?.reservationUnit ?? undefined;
+  const reservationUnit = data?.reservationUnit ?? undefined;
 
   const form = useForm<ReservationUnitEditFormValues>({
     mode: "onBlur",
@@ -2240,12 +2240,12 @@ function EditorWrapper({ previewUrlPrefix }: { previewUrlPrefix: string }) {
   });
   const { reset } = form;
   useEffect(() => {
-    if (reservationUnitData?.reservationUnit != null) {
+    if (data?.reservationUnit != null) {
       reset({
-        ...convertReservationUnit(reservationUnitData.reservationUnit),
+        ...convertReservationUnit(data.reservationUnit),
       });
     }
-  }, [reservationUnitData, reset]);
+  }, [data, reset]);
 
   if (isLoading) {
     return <Loader />;
