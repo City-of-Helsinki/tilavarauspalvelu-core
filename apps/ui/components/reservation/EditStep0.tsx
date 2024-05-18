@@ -9,6 +9,7 @@ import { breakpoints } from "common/src/common/style";
 import type { PendingReservation } from "common/types/common";
 import type {
   ApplicationRoundNode,
+  ListReservationsQuery,
   ReservationNode,
   ReservationUnitNode,
 } from "@gql/gql-types";
@@ -44,10 +45,14 @@ import { type UseFormReturn } from "react-hook-form";
 import { type PendingReservationFormType } from "@/components/reservation-unit/schema";
 import { fromUIDate, isValidDate, toUIDate } from "common/src/common/util";
 
+type QueryData = NonNullable<ListReservationsQuery["reservations"]>;
+type Node = NonNullable<
+  NonNullable<NonNullable<QueryData["edges"]>[0]>["node"]
+>;
 type Props = {
   reservation: ReservationNode;
   reservationUnit: ReservationUnitNode;
-  userReservations: ReservationNode[];
+  userReservations: Node[];
   reservationForm: UseFormReturn<PendingReservationFormType>;
   activeApplicationRounds: ApplicationRoundNode[];
   setErrorMsg: React.Dispatch<React.SetStateAction<string | null>>;

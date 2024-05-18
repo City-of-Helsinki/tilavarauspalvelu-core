@@ -74,7 +74,7 @@ export const LIST_RESERVATIONS = gql`
   ${IMAGE_FRAGMENT}
   ${UNIT_NAME_FRAGMENT_I18N}
   ${CANCELLATION_RULE_FRAGMENT}
-  query Reservations(
+  query ListReservations(
     $beginDate: Date
     $endDate: Date
     $state: [String]
@@ -93,6 +93,7 @@ export const LIST_RESERVATIONS = gql`
     ) {
       edges {
         node {
+          id
           pk
           name
           begin
@@ -102,11 +103,13 @@ export const LIST_RESERVATIONS = gql`
           bufferTimeBefore
           bufferTimeAfter
           order {
+            id
             orderUuid
             expiresInMinutes
           }
           isBlocked
           reservationUnit {
+            id
             pk
             nameFi
             nameEn

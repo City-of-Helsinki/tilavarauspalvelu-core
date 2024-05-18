@@ -5945,7 +5945,7 @@ export type CancellationRuleFieldsFragment = {
   } | null;
 };
 
-export type ReservationsQueryVariables = Exact<{
+export type ListReservationsQueryVariables = Exact<{
   beginDate?: InputMaybe<Scalars["Date"]["input"]>;
   endDate?: InputMaybe<Scalars["Date"]["input"]>;
   state?: InputMaybe<
@@ -5963,7 +5963,7 @@ export type ReservationsQueryVariables = Exact<{
   >;
 }>;
 
-export type ReservationsQuery = {
+export type ListReservationsQuery = {
   __typename?: "Query";
   reservations?: {
     __typename?: "ReservationNodeConnection";
@@ -5971,6 +5971,7 @@ export type ReservationsQuery = {
       __typename?: "ReservationNodeEdge";
       node?: {
         __typename?: "ReservationNode";
+        id: string;
         pk?: number | null;
         name?: string | null;
         begin: string;
@@ -5982,10 +5983,12 @@ export type ReservationsQuery = {
         isBlocked?: boolean | null;
         order?: {
           __typename?: "PaymentOrderNode";
+          id: string;
           orderUuid?: string | null;
         } | null;
         reservationUnit?: Array<{
           __typename?: "ReservationUnitNode";
+          id: string;
           pk?: number | null;
           nameFi?: string | null;
           nameEn?: string | null;
@@ -9571,8 +9574,8 @@ export type ConfirmReservationMutationOptions = Apollo.BaseMutationOptions<
   ConfirmReservationMutation,
   ConfirmReservationMutationVariables
 >;
-export const ReservationsDocument = gql`
-  query Reservations(
+export const ListReservationsDocument = gql`
+  query ListReservations(
     $beginDate: Date
     $endDate: Date
     $state: [String]
@@ -9591,6 +9594,7 @@ export const ReservationsDocument = gql`
     ) {
       edges {
         node {
+          id
           pk
           name
           begin
@@ -9600,10 +9604,12 @@ export const ReservationsDocument = gql`
           bufferTimeBefore
           bufferTimeAfter
           order {
+            id
             orderUuid
           }
           isBlocked
           reservationUnit {
+            id
             pk
             nameFi
             nameEn
@@ -9630,16 +9636,16 @@ export const ReservationsDocument = gql`
 `;
 
 /**
- * __useReservationsQuery__
+ * __useListReservationsQuery__
  *
- * To run a query within a React component, call `useReservationsQuery` and pass it any options that fit your needs.
- * When your component renders, `useReservationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useListReservationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useListReservationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useReservationsQuery({
+ * const { data, loading, error } = useListReservationsQuery({
  *   variables: {
  *      beginDate: // value for 'beginDate'
  *      endDate: // value for 'endDate'
@@ -9650,58 +9656,58 @@ export const ReservationsDocument = gql`
  *   },
  * });
  */
-export function useReservationsQuery(
+export function useListReservationsQuery(
   baseOptions: Apollo.QueryHookOptions<
-    ReservationsQuery,
-    ReservationsQueryVariables
+    ListReservationsQuery,
+    ListReservationsQueryVariables
   > &
     (
-      | { variables: ReservationsQueryVariables; skip?: boolean }
+      | { variables: ListReservationsQueryVariables; skip?: boolean }
       | { skip: boolean }
     )
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<ReservationsQuery, ReservationsQueryVariables>(
-    ReservationsDocument,
+  return Apollo.useQuery<ListReservationsQuery, ListReservationsQueryVariables>(
+    ListReservationsDocument,
     options
   );
 }
-export function useReservationsLazyQuery(
+export function useListReservationsLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    ReservationsQuery,
-    ReservationsQueryVariables
+    ListReservationsQuery,
+    ListReservationsQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<ReservationsQuery, ReservationsQueryVariables>(
-    ReservationsDocument,
-    options
-  );
+  return Apollo.useLazyQuery<
+    ListReservationsQuery,
+    ListReservationsQueryVariables
+  >(ListReservationsDocument, options);
 }
-export function useReservationsSuspenseQuery(
+export function useListReservationsSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<
-    ReservationsQuery,
-    ReservationsQueryVariables
+    ListReservationsQuery,
+    ListReservationsQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<ReservationsQuery, ReservationsQueryVariables>(
-    ReservationsDocument,
-    options
-  );
+  return Apollo.useSuspenseQuery<
+    ListReservationsQuery,
+    ListReservationsQueryVariables
+  >(ListReservationsDocument, options);
 }
-export type ReservationsQueryHookResult = ReturnType<
-  typeof useReservationsQuery
+export type ListReservationsQueryHookResult = ReturnType<
+  typeof useListReservationsQuery
 >;
-export type ReservationsLazyQueryHookResult = ReturnType<
-  typeof useReservationsLazyQuery
+export type ListReservationsLazyQueryHookResult = ReturnType<
+  typeof useListReservationsLazyQuery
 >;
-export type ReservationsSuspenseQueryHookResult = ReturnType<
-  typeof useReservationsSuspenseQuery
+export type ListReservationsSuspenseQueryHookResult = ReturnType<
+  typeof useListReservationsSuspenseQuery
 >;
-export type ReservationsQueryResult = Apollo.QueryResult<
-  ReservationsQuery,
-  ReservationsQueryVariables
+export type ListReservationsQueryResult = Apollo.QueryResult<
+  ListReservationsQuery,
+  ListReservationsQueryVariables
 >;
 export const ReservationDocument = gql`
   query Reservation($id: ID!) {

@@ -5,11 +5,10 @@ import {
   type Mutation,
   type MutationAdjustReservationTimeArgs,
   type Query,
-  type QueryReservationsArgs,
   type ReservationNode,
   type ReservationUnitNode,
-  ReservationTypeChoice,
   useAdjustReservationTimeMutation,
+  useListReservationsQuery,
 } from "@gql/gql-types";
 import { useRouter } from "next/router";
 import { Stepper } from "hds-react";
@@ -22,7 +21,6 @@ import { Subheading } from "common/src/reservation-form/styles";
 import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
 import { useCurrentUser } from "@/hooks/user";
-import { LIST_RESERVATIONS } from "@/modules/queries/reservation";
 import { getTranslation } from "../../modules/util";
 import Sanitize from "../common/Sanitize";
 import ReservationInfoCard from "./ReservationInfoCard";
@@ -195,26 +193,20 @@ export function ReservationEdit({
   const now = useMemo(() => new Date(), []);
   const { currentUser } = useCurrentUser();
 
-  const { data: userReservationsData } = useQuery<Query, QueryReservationsArgs>(
-    LIST_RESERVATIONS,
-    {
-      fetchPolicy: "no-cache",
-      skip: !currentUser || !reservationUnit,
-      variables: {
-        beginDate: toApiDate(now),
-        user: currentUser?.pk?.toString(),
-        reservationUnit: [reservationUnit?.pk?.toString() ?? ""],
-        state: RELATED_RESERVATION_STATES,
-      },
-    }
-  );
+  const { data } = useListReservationsQuery({
+    fetchPolicy: "no-cache",
+    skip: !currentUser || !reservationUnit,
+    variables: {
+      beginDate: toApiDate(now),
+      user: currentUser?.pk?.toString() ?? "",
+      reservationUnit: [reservationUnit?.pk?.toString() ?? ""],
+      state: RELATED_RESERVATION_STATES,
+    },
+  });
 
   const userReservations = filterNonNullable(
-    userReservationsData?.reservations?.edges?.map((e) => e?.node)
-  )
-    .filter((n) => n.type === ReservationTypeChoice.Normal)
-    // why? the filter is already done in the query
-    .filter((n) => RELATED_RESERVATION_STATES.includes(n.state));
+    data?.reservations?.edges?.map((e) => e?.node)
+  );
 
   // TODO this should be redundant, use the reservationUnit.applicationRounds instead
   // TODO this is bad, we can get the application rounds from the reservationUnit
