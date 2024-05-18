@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { memoize } from "lodash";
 import { IconLinkExternal } from "hds-react";
-import type { AllocatedTimeSlotNode } from "@gql/gql-types";
+import type { AllocatedTimeSlotsQuery } from "@gql/gql-types";
 import { convertWeekday } from "common/src/conversion";
 import { PUBLIC_URL } from "@/common/const";
 import { getApplicantName, truncate } from "@/helpers";
@@ -14,10 +14,13 @@ import { TimeSlotStatusCell } from "./StatusCell";
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
 
+type QueryData = NonNullable<AllocatedTimeSlotsQuery["allocatedTimeSlots"]>;
+type Edge = NonNullable<QueryData["edges"]>[0];
+type Node = NonNullable<NonNullable<Edge>["node"]>;
 type Props = {
   sort: string | null;
   sortChanged: (field: string) => void;
-  schedules: AllocatedTimeSlotNode[];
+  schedules: Node[];
   isLoading?: boolean;
 };
 
@@ -33,10 +36,7 @@ type ApplicationScheduleView = {
   statusView: JSX.Element;
 };
 
-function timeSlotMapper(
-  t: TFunction,
-  slot: AllocatedTimeSlotNode
-): ApplicationScheduleView {
+function timeSlotMapper(t: TFunction, slot: Node): ApplicationScheduleView {
   const allocatedReservationUnit = slot.reservationUnitOption?.reservationUnit;
   const allocatedReservationUnitName = allocatedReservationUnit?.nameFi ?? "-";
   const allocatedUnit = allocatedReservationUnit?.unit?.nameFi ?? "-";

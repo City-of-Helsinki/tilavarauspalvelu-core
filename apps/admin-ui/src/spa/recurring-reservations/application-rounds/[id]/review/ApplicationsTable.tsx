@@ -3,7 +3,10 @@ import { useTranslation } from "react-i18next";
 import { memoize, orderBy, uniqBy } from "lodash";
 import type { TFunction } from "i18next";
 import { IconLinkExternal } from "hds-react";
-import type { ApplicationNode, ApplicationStatusChoice } from "@gql/gql-types";
+import type {
+  ApplicationStatusChoice,
+  ApplicationsQuery,
+} from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { PUBLIC_URL } from "@/common/const";
 import { applicationDetailsUrl } from "@/common/urls";
@@ -18,6 +21,9 @@ import {
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
 
+type QueryData = NonNullable<ApplicationsQuery["applications"]>;
+type Edge = NonNullable<QueryData["edges"]>[0];
+type Node = NonNullable<NonNullable<Edge>["node"]>;
 type UnitType = {
   pk: number;
   name: string;
@@ -107,7 +113,7 @@ const getColConfig = (t: TFunction) =>
   }));
 export const SORT_KEYS = COLS.filter((c) => c.isSortable).map((c) => c.key);
 
-function appMapper(app: ApplicationNode, t: TFunction): ApplicationView {
+function appMapper(app: Node, t: TFunction): ApplicationView {
   const applicationEvents = (app.applicationSections || [])
     .flatMap((ae) => ae?.reservationUnitOptions)
     .flatMap((eru) => ({
@@ -157,7 +163,7 @@ function appMapper(app: ApplicationNode, t: TFunction): ApplicationView {
 type ApplicationsTableProps = {
   sort: string | null;
   sortChanged: (field: string) => void;
-  applications: ApplicationNode[];
+  applications: Node[];
   isLoading?: boolean;
 };
 

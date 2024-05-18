@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { memoize, orderBy, uniqBy } from "lodash";
 import { IconLinkExternal } from "hds-react";
-import type { ApplicationSectionNode } from "@gql/gql-types";
+import type { ApplicationSectionsQuery } from "@gql/gql-types";
 import { MAX_APPLICATION_ROUND_NAME_LENGTH, PUBLIC_URL } from "@/common/const";
 import { getApplicantName, truncate } from "@/helpers";
 import { applicationDetailsUrl } from "@/common/urls";
@@ -17,10 +17,13 @@ import {
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
 
+type QueryDate = NonNullable<ApplicationSectionsQuery["applicationSections"]>;
+type Edge = NonNullable<QueryDate["edges"]>[0];
+type Node = NonNullable<NonNullable<Edge>["node"]>;
 type Props = {
   sort: string | null;
   sortChanged: (field: string) => void;
-  applicationSections: ApplicationSectionNode[];
+  applicationSections: Node[];
   isLoading?: boolean;
 };
 
@@ -38,9 +41,7 @@ type ApplicationEventView = {
   applicationCount: string;
 };
 
-function appEventMapper(
-  appEvent: ApplicationSectionNode
-): ApplicationEventView {
+function appEventMapper(appEvent: Node): ApplicationEventView {
   // TODO why is this modified?
   const resUnits = appEvent.reservationUnitOptions?.flatMap((eru) => ({
     ...eru?.reservationUnit?.unit,

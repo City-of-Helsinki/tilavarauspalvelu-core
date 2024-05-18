@@ -1,11 +1,10 @@
 import React from "react";
-import { type ApolloError, useQuery } from "@apollo/client";
+import { type ApolloError } from "@apollo/client";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "next-i18next";
 import {
   ApplicationOrderingChoices,
-  type Query,
-  type QueryApplicationsArgs,
+  useApplicationsQuery,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { LIST_PAGE_SIZE } from "@/common/const";
@@ -13,7 +12,6 @@ import { useNotification } from "@/context/NotificationContext";
 import Loader from "@/component/Loader";
 import { More } from "@/component/More";
 import { useSort } from "@/hooks/useSort";
-import { APPLICATIONS_QUERY } from "./queries";
 import { ApplicationsTable, SORT_KEYS } from "./ApplicationsTable";
 import { transformApplicantType, transformApplicationStatuses } from "./utils";
 
@@ -34,10 +32,7 @@ export function ApplicationDataLoader({
   const applicantFilter = searchParams.getAll("applicant");
   const nameFilter = searchParams.get("search");
 
-  const { fetchMore, previousData, loading, data } = useQuery<
-    Query,
-    QueryApplicationsArgs
-  >(APPLICATIONS_QUERY, {
+  const { fetchMore, previousData, loading, data } = useApplicationsQuery({
     skip: !applicationRoundPk,
     variables: {
       first: LIST_PAGE_SIZE,

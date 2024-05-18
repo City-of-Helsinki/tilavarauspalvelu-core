@@ -1,16 +1,14 @@
 import React from "react";
-import { type ApolloError, useQuery } from "@apollo/client";
+import { type ApolloError } from "@apollo/client";
 import {
-  type Query,
-  type QueryAllocatedTimeSlotsArgs,
   ApplicationSectionStatusChoice,
   AllocatedTimeSlotOrderingChoices,
+  useAllocatedTimeSlotsQuery,
 } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { filterNonNullable } from "common/src/helpers";
 import { LIST_PAGE_SIZE } from "@/common/const";
 import { useNotification } from "@/context/NotificationContext";
-import { ALLOCATED_TIME_SLOTS_QUERY } from "./queries";
 import Loader from "@/component/Loader";
 import { More } from "@/component/More";
 import { useSort } from "@/hooks/useSort";
@@ -37,16 +35,7 @@ export function AllocatedEventDataLoader({
   const weekDayFilter = searchParams.getAll("weekday");
   const reservationUnitFilter = searchParams.getAll("reservationUnit");
 
-  /* TODO this is "declined" / "approved" filter but there is no decline functionality
-   * so disabled
-  const appEventStatusFilter = searchParams.getAll("eventStatus");
-  const aesFilter = transformApplicationSectionStatus(appEventStatusFilter);
-  */
-
-  const { fetchMore, previousData, loading, data } = useQuery<
-    Query,
-    QueryAllocatedTimeSlotsArgs
-  >(ALLOCATED_TIME_SLOTS_QUERY, {
+  const query = useAllocatedTimeSlotsQuery({
     skip: !applicationRoundPk,
     variables: {
       allocatedUnit: unitFilter.map(Number).filter(Number.isFinite),
@@ -56,7 +45,6 @@ export function AllocatedEventDataLoader({
         ApplicationSectionStatusChoice.Handled,
         ApplicationSectionStatusChoice.InAllocation,
       ],
-      // applicationSectionStatus: appEventStatusFilter
       dayOfTheWeek: weekDayFilter
         .map(Number)
         .filter(Number.isFinite)
@@ -75,6 +63,8 @@ export function AllocatedEventDataLoader({
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
   });
+
+  const { fetchMore, previousData, loading, data } = query;
 
   const { t } = useTranslation();
 

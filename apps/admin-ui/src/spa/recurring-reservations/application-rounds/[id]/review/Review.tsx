@@ -9,7 +9,7 @@ import { H2 } from "common/src/common/typography";
 import { filterNonNullable } from "common/src/helpers";
 import {
   ApplicationRoundStatusChoice,
-  type ApplicationRoundAdminFragmentFragment,
+  type ApplicationRoundAdminFragment,
 } from "@gql/gql-types";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { Container, TabWrapper } from "@/styles/layout";
@@ -46,7 +46,7 @@ const StyledH2 = styled(H2)`
 `;
 
 function getUnitOptions(
-  resUnits: ApplicationRoundAdminFragmentFragment["reservationUnits"]
+  resUnits: ApplicationRoundAdminFragment["reservationUnits"]
 ) {
   const opts = resUnits.map((x) => x?.unit).map((x) => toOption(x));
   return filterNonNullable(opts);
@@ -63,7 +63,7 @@ function toOption(
 }
 
 type ReviewProps = {
-  applicationRound: ApplicationRoundAdminFragmentFragment;
+  applicationRound: ApplicationRoundAdminFragment;
 };
 
 export function Review({ applicationRound }: ReviewProps): JSX.Element {

@@ -9107,7 +9107,7 @@ export type ApplicationRoundCriteriaQuery = {
   } | null;
 };
 
-export type GetApplicationsQueryVariables = Exact<{
+export type ApplicationsQueryVariables = Exact<{
   applicationRound: Scalars["Int"]["input"];
   unit?: InputMaybe<
     | Array<InputMaybe<Scalars["Int"]["input"]>>
@@ -9128,7 +9128,7 @@ export type GetApplicationsQueryVariables = Exact<{
   offset?: InputMaybe<Scalars["Int"]["input"]>;
 }>;
 
-export type GetApplicationsQuery = {
+export type ApplicationsQuery = {
   __typename?: "Query";
   applications?: {
     __typename?: "ApplicationNodeConnection";
@@ -9303,7 +9303,7 @@ export type ApplicationSectionsQuery = {
   } | null;
 };
 
-export type GetAllocatedTimeSlotsQueryVariables = Exact<{
+export type AllocatedTimeSlotsQueryVariables = Exact<{
   applicationRound: Scalars["Int"]["input"];
   allocatedUnit?: InputMaybe<
     | Array<InputMaybe<Scalars["Int"]["input"]>>
@@ -9330,7 +9330,7 @@ export type GetAllocatedTimeSlotsQueryVariables = Exact<{
   offset?: InputMaybe<Scalars["Int"]["input"]>;
 }>;
 
-export type GetAllocatedTimeSlotsQuery = {
+export type AllocatedTimeSlotsQuery = {
   __typename?: "Query";
   allocatedTimeSlots?: {
     __typename?: "AllocatedTimeSlotNodeConnection";
@@ -9422,7 +9422,7 @@ export type ApplicationRoundsQuery = {
   } | null;
 };
 
-export type ApplicationRoundAdminFragmentFragment = {
+export type ApplicationRoundAdminFragment = {
   __typename?: "ApplicationRoundNode";
   id: string;
   applicationsCount?: number | null;
@@ -10095,8 +10095,8 @@ export const ApplicationRoundBaseFragmentDoc = gql`
     applicationPeriodEnd
   }
 `;
-export const ApplicationRoundAdminFragmentFragmentDoc = gql`
-  fragment ApplicationRoundAdminFragment on ApplicationRoundNode {
+export const ApplicationRoundAdminFragmentDoc = gql`
+  fragment ApplicationRoundAdmin on ApplicationRoundNode {
     id
     ...ApplicationRoundBase
     applicationsCount
@@ -15692,8 +15692,8 @@ export type ApplicationRoundCriteriaQueryResult = Apollo.QueryResult<
   ApplicationRoundCriteriaQuery,
   ApplicationRoundCriteriaQueryVariables
 >;
-export const GetApplicationsDocument = gql`
-  query getApplications(
+export const ApplicationsDocument = gql`
+  query Applications(
     $applicationRound: Int!
     $unit: [Int]
     $applicantType: [ApplicantTypeChoice]
@@ -15742,16 +15742,16 @@ export const GetApplicationsDocument = gql`
 `;
 
 /**
- * __useGetApplicationsQuery__
+ * __useApplicationsQuery__
  *
- * To run a query within a React component, call `useGetApplicationsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetApplicationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useApplicationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useApplicationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetApplicationsQuery({
+ * const { data, loading, error } = useApplicationsQuery({
  *   variables: {
  *      applicationRound: // value for 'applicationRound'
  *      unit: // value for 'unit'
@@ -15764,58 +15764,58 @@ export const GetApplicationsDocument = gql`
  *   },
  * });
  */
-export function useGetApplicationsQuery(
+export function useApplicationsQuery(
   baseOptions: Apollo.QueryHookOptions<
-    GetApplicationsQuery,
-    GetApplicationsQueryVariables
+    ApplicationsQuery,
+    ApplicationsQueryVariables
   > &
     (
-      | { variables: GetApplicationsQueryVariables; skip?: boolean }
+      | { variables: ApplicationsQueryVariables; skip?: boolean }
       | { skip: boolean }
     )
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<GetApplicationsQuery, GetApplicationsQueryVariables>(
-    GetApplicationsDocument,
+  return Apollo.useQuery<ApplicationsQuery, ApplicationsQueryVariables>(
+    ApplicationsDocument,
     options
   );
 }
-export function useGetApplicationsLazyQuery(
+export function useApplicationsLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    GetApplicationsQuery,
-    GetApplicationsQueryVariables
+    ApplicationsQuery,
+    ApplicationsQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    GetApplicationsQuery,
-    GetApplicationsQueryVariables
-  >(GetApplicationsDocument, options);
+  return Apollo.useLazyQuery<ApplicationsQuery, ApplicationsQueryVariables>(
+    ApplicationsDocument,
+    options
+  );
 }
-export function useGetApplicationsSuspenseQuery(
+export function useApplicationsSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<
-    GetApplicationsQuery,
-    GetApplicationsQueryVariables
+    ApplicationsQuery,
+    ApplicationsQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    GetApplicationsQuery,
-    GetApplicationsQueryVariables
-  >(GetApplicationsDocument, options);
+  return Apollo.useSuspenseQuery<ApplicationsQuery, ApplicationsQueryVariables>(
+    ApplicationsDocument,
+    options
+  );
 }
-export type GetApplicationsQueryHookResult = ReturnType<
-  typeof useGetApplicationsQuery
+export type ApplicationsQueryHookResult = ReturnType<
+  typeof useApplicationsQuery
 >;
-export type GetApplicationsLazyQueryHookResult = ReturnType<
-  typeof useGetApplicationsLazyQuery
+export type ApplicationsLazyQueryHookResult = ReturnType<
+  typeof useApplicationsLazyQuery
 >;
-export type GetApplicationsSuspenseQueryHookResult = ReturnType<
-  typeof useGetApplicationsSuspenseQuery
+export type ApplicationsSuspenseQueryHookResult = ReturnType<
+  typeof useApplicationsSuspenseQuery
 >;
-export type GetApplicationsQueryResult = Apollo.QueryResult<
-  GetApplicationsQuery,
-  GetApplicationsQueryVariables
+export type ApplicationsQueryResult = Apollo.QueryResult<
+  ApplicationsQuery,
+  ApplicationsQueryVariables
 >;
 export const ApplicationSectionsDocument = gql`
   query ApplicationSections(
@@ -15963,8 +15963,8 @@ export type ApplicationSectionsQueryResult = Apollo.QueryResult<
   ApplicationSectionsQuery,
   ApplicationSectionsQueryVariables
 >;
-export const GetAllocatedTimeSlotsDocument = gql`
-  query getAllocatedTimeSlots(
+export const AllocatedTimeSlotsDocument = gql`
+  query AllocatedTimeSlots(
     $applicationRound: Int!
     $allocatedUnit: [Int]
     $applicantType: [ApplicantTypeChoice]
@@ -16026,16 +16026,16 @@ export const GetAllocatedTimeSlotsDocument = gql`
 `;
 
 /**
- * __useGetAllocatedTimeSlotsQuery__
+ * __useAllocatedTimeSlotsQuery__
  *
- * To run a query within a React component, call `useGetAllocatedTimeSlotsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetAllocatedTimeSlotsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useAllocatedTimeSlotsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAllocatedTimeSlotsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetAllocatedTimeSlotsQuery({
+ * const { data, loading, error } = useAllocatedTimeSlotsQuery({
  *   variables: {
  *      applicationRound: // value for 'applicationRound'
  *      allocatedUnit: // value for 'allocatedUnit'
@@ -16050,58 +16050,58 @@ export const GetAllocatedTimeSlotsDocument = gql`
  *   },
  * });
  */
-export function useGetAllocatedTimeSlotsQuery(
+export function useAllocatedTimeSlotsQuery(
   baseOptions: Apollo.QueryHookOptions<
-    GetAllocatedTimeSlotsQuery,
-    GetAllocatedTimeSlotsQueryVariables
+    AllocatedTimeSlotsQuery,
+    AllocatedTimeSlotsQueryVariables
   > &
     (
-      | { variables: GetAllocatedTimeSlotsQueryVariables; skip?: boolean }
+      | { variables: AllocatedTimeSlotsQueryVariables; skip?: boolean }
       | { skip: boolean }
     )
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
-    GetAllocatedTimeSlotsQuery,
-    GetAllocatedTimeSlotsQueryVariables
-  >(GetAllocatedTimeSlotsDocument, options);
+    AllocatedTimeSlotsQuery,
+    AllocatedTimeSlotsQueryVariables
+  >(AllocatedTimeSlotsDocument, options);
 }
-export function useGetAllocatedTimeSlotsLazyQuery(
+export function useAllocatedTimeSlotsLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    GetAllocatedTimeSlotsQuery,
-    GetAllocatedTimeSlotsQueryVariables
+    AllocatedTimeSlotsQuery,
+    AllocatedTimeSlotsQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
-    GetAllocatedTimeSlotsQuery,
-    GetAllocatedTimeSlotsQueryVariables
-  >(GetAllocatedTimeSlotsDocument, options);
+    AllocatedTimeSlotsQuery,
+    AllocatedTimeSlotsQueryVariables
+  >(AllocatedTimeSlotsDocument, options);
 }
-export function useGetAllocatedTimeSlotsSuspenseQuery(
+export function useAllocatedTimeSlotsSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<
-    GetAllocatedTimeSlotsQuery,
-    GetAllocatedTimeSlotsQueryVariables
+    AllocatedTimeSlotsQuery,
+    AllocatedTimeSlotsQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<
-    GetAllocatedTimeSlotsQuery,
-    GetAllocatedTimeSlotsQueryVariables
-  >(GetAllocatedTimeSlotsDocument, options);
+    AllocatedTimeSlotsQuery,
+    AllocatedTimeSlotsQueryVariables
+  >(AllocatedTimeSlotsDocument, options);
 }
-export type GetAllocatedTimeSlotsQueryHookResult = ReturnType<
-  typeof useGetAllocatedTimeSlotsQuery
+export type AllocatedTimeSlotsQueryHookResult = ReturnType<
+  typeof useAllocatedTimeSlotsQuery
 >;
-export type GetAllocatedTimeSlotsLazyQueryHookResult = ReturnType<
-  typeof useGetAllocatedTimeSlotsLazyQuery
+export type AllocatedTimeSlotsLazyQueryHookResult = ReturnType<
+  typeof useAllocatedTimeSlotsLazyQuery
 >;
-export type GetAllocatedTimeSlotsSuspenseQueryHookResult = ReturnType<
-  typeof useGetAllocatedTimeSlotsSuspenseQuery
+export type AllocatedTimeSlotsSuspenseQueryHookResult = ReturnType<
+  typeof useAllocatedTimeSlotsSuspenseQuery
 >;
-export type GetAllocatedTimeSlotsQueryResult = Apollo.QueryResult<
-  GetAllocatedTimeSlotsQuery,
-  GetAllocatedTimeSlotsQueryVariables
+export type AllocatedTimeSlotsQueryResult = Apollo.QueryResult<
+  AllocatedTimeSlotsQuery,
+  AllocatedTimeSlotsQueryVariables
 >;
 export const ApplicationRoundsDocument = gql`
   query ApplicationRounds {
@@ -16192,10 +16192,10 @@ export type ApplicationRoundsQueryResult = Apollo.QueryResult<
 export const ApplicationRoundDocument = gql`
   query ApplicationRound($id: ID!) {
     applicationRound(id: $id) {
-      ...ApplicationRoundAdminFragment
+      ...ApplicationRoundAdmin
     }
   }
-  ${ApplicationRoundAdminFragmentFragmentDoc}
+  ${ApplicationRoundAdminFragmentDoc}
 `;
 
 /**

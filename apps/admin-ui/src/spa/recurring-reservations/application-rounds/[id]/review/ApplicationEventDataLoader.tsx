@@ -1,10 +1,9 @@
 import React from "react";
-import { ApolloError, useQuery } from "@apollo/client";
+import { type ApolloError } from "@apollo/client";
 import { useSearchParams } from "react-router-dom";
 import {
   ApplicationSectionOrderingChoices,
-  type Query,
-  type QueryApplicationSectionsArgs,
+  useApplicationSectionsQuery,
 } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { filterNonNullable } from "common/src/helpers";
@@ -16,7 +15,6 @@ import { useNotification } from "@/context/NotificationContext";
 import Loader from "@/component/Loader";
 import { More } from "@/component/More";
 import { useSort } from "@/hooks/useSort";
-import { APPLICATIONS_EVENTS_QUERY } from "./queries";
 import { ApplicationEventsTable, SORT_KEYS } from "./ApplicationEventsTable";
 import {
   transformApplicantType,
@@ -41,10 +39,7 @@ export function ApplicationEventDataLoader({
   const eventStatusFilter = searchParams.getAll("eventStatus");
 
   // TODO rename the query (section)
-  const { fetchMore, previousData, loading, data } = useQuery<
-    Query,
-    QueryApplicationSectionsArgs
-  >(APPLICATIONS_EVENTS_QUERY, {
+  const query = useApplicationSectionsQuery({
     skip: !applicationRoundPk,
     variables: {
       first: LIST_PAGE_SIZE,
@@ -62,6 +57,8 @@ export function ApplicationEventDataLoader({
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
   });
+
+  const { fetchMore, previousData, loading, data } = query;
 
   const { t } = useTranslation();
 

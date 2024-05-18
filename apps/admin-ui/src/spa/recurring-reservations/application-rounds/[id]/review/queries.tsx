@@ -8,7 +8,7 @@ import {
 export const APPLICATIONS_QUERY = gql`
   ${APPLICANT_NAME_FRAGMENT}
   ${APPLICATION_SECTION_DURATION_FRAGMENT}
-  query getApplications(
+  query Applications(
     $applicationRound: Int!
     $unit: [Int]
     $applicantType: [ApplicantTypeChoice]
@@ -122,7 +122,7 @@ export const APPLICATIONS_EVENTS_QUERY = gql`
 
 export const ALLOCATED_TIME_SLOTS_QUERY = gql`
   ${APPLICANT_NAME_FRAGMENT}
-  query getAllocatedTimeSlots(
+  query AllocatedTimeSlots(
     $applicationRound: Int!
     $allocatedUnit: [Int]
     $applicantType: [ApplicantTypeChoice]

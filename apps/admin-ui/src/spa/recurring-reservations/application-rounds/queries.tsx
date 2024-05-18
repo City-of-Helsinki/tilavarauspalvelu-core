@@ -30,7 +30,7 @@ export const APPLICATION_ROUNDS_QUERY = gql`
 
 const APPLICATION_ROUND_ADMIN_FRAGMENT = gql`
   ${APPLICATION_ROUND_BASE_FRAGMENT}
-  fragment ApplicationRoundAdminFragment on ApplicationRoundNode {
+  fragment ApplicationRoundAdmin on ApplicationRoundNode {
     id
     ...ApplicationRoundBase
     applicationsCount
@@ -49,7 +49,7 @@ export const APPLICATION_ROUND_QUERY = gql`
   ${APPLICATION_ROUND_ADMIN_FRAGMENT}
   query ApplicationRound($id: ID!) {
     applicationRound(id: $id) {
-      ...ApplicationRoundAdminFragment
+      ...ApplicationRoundAdmin
     }
   }
 `;
