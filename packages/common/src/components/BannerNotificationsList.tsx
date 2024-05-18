@@ -2,20 +2,16 @@ import React from "react";
 import { NotificationType } from "hds-react";
 import styled from "styled-components";
 import { useLocalStorage } from "react-use";
-import { useQuery } from "@apollo/client";
 import { t } from "i18next";
 import NotificationWrapper from "./NotificationWrapper";
 import { getTranslation } from "../common/util";
 import { breakpoints } from "../common/style";
 import {
-  type BannerNotificationNode,
-  type Query,
-  type QueryBannerNotificationsArgs,
-  type BannerNotificationNodeConnection,
-  type Maybe,
   BannerNotificationTarget,
+  useBannerNotificationsListQuery,
+  type BannerNotificationCommonFragment,
 } from "../../gql/gql-types";
-import { BANNER_NOTIFICATIONS_LIST } from "./BannerNotificationsQuery";
+import { filterNonNullable } from "../helpers";
 
 type BannerNotificationListProps = {
   target: BannerNotificationTarget;
@@ -24,7 +20,7 @@ type BannerNotificationListProps = {
 };
 
 type BannerNotificationItemProps = {
-  notification: BannerNotificationNode;
+  notification: BannerNotificationCommonFragment;
   closeFn: React.Dispatch<React.SetStateAction<string[] | undefined>>;
   closedArray: string[];
   centered?: boolean;
@@ -121,23 +117,19 @@ const BannerNotificationsList = ({
 }: BannerNotificationListProps) => {
   // no-cache is required because admin is caching bannerNotifications query and
   // there is no key setup for this so this query returns garbage from the admin cache.
-  const { data: notificationData } = useQuery<
-    Query,
-    QueryBannerNotificationsArgs
-  >(BANNER_NOTIFICATIONS_LIST, {
+  const { data } = useBannerNotificationsListQuery({
     variables: {
       target,
     },
     fetchPolicy: "no-cache",
   });
-  const notificationsTarget = notificationData?.bannerNotifications;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dirty way to deal with gql alias
-  const notificationsAll = (notificationData as any)
-    ?.bannerNotificationsAll as Maybe<BannerNotificationNodeConnection>;
-  const notificationsList =
-    [...(notificationsAll?.edges ?? []), ...(notificationsTarget?.edges ?? [])]
-      .map((edge) => edge?.node)
-      .filter((x): x is BannerNotificationNode => x != null) ?? [];
+  const notificationsTarget = data?.bannerNotifications;
+  const notificationsAll = data?.bannerNotificationsAll;
+  const comb = [
+    ...(notificationsAll?.edges ?? []),
+    ...(notificationsTarget?.edges ?? []),
+  ];
+  const notificationsList = filterNonNullable(comb.map((edge) => edge?.node));
 
   const [closedNotificationsList, setClosedNotificationsList] = useLocalStorage<
     string[]
