@@ -3,18 +3,19 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { H4 } from "common/src/common/typography";
 import type {
-  LocationNode,
   Maybe,
   UnitNode,
-  ReservationUnitNode,
+  LocationFieldsI18nFragment,
+  ReservationUnitPageQuery,
 } from "@gql/gql-types";
 import { IconLinkExternal } from "hds-react";
 import { IconButton } from "common/src/components";
 import { mapUrlPrefix } from "@/modules/const";
 import { getTranslation } from "@/modules/util";
 
+type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
 type Props = {
-  reservationUnit: ReservationUnitNode;
+  reservationUnit: QueryT;
 };
 
 const Container = styled.div`
@@ -49,7 +50,7 @@ type UrlReturn = string;
 
 function createHslUrl(
   locale: string,
-  location?: Maybe<LocationNode>
+  location?: Maybe<LocationFieldsI18nFragment>
 ): UrlReturn {
   if (!location) {
     return "";
@@ -69,7 +70,7 @@ function createHslUrl(
 
 function createGoogleUrl(
   locale: string,
-  location?: Maybe<LocationNode>
+  location?: Maybe<LocationFieldsI18nFragment>
 ): UrlReturn {
   if (!location) {
     return "";
@@ -87,7 +88,10 @@ function createGoogleUrl(
   return `https://www.google.com/maps/dir/?api=1&hl=${locale}&destination=${destination}`;
 }
 
-function createMapUrl(locale: string, unit?: Maybe<UnitNode>): string {
+function createMapUrl(
+  locale: string,
+  unit?: Maybe<Pick<UnitNode, "tprekId">>
+): string {
   if (!unit?.tprekId) {
     return "";
   }
@@ -97,7 +101,7 @@ function createMapUrl(locale: string, unit?: Maybe<UnitNode>): string {
 
 function createAccessibilityUrl(
   locale: string,
-  unit?: Maybe<UnitNode>
+  unit?: Maybe<Pick<UnitNode, "tprekId">>
 ): UrlReturn {
   if (!unit?.tprekId) {
     return "";

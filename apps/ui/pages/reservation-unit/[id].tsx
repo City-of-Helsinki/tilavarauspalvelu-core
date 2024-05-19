@@ -8,7 +8,6 @@ import React, {
 } from "react";
 import type { GetServerSidePropsContext } from "next";
 import { Trans, useTranslation } from "next-i18next";
-import { useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
@@ -47,16 +46,20 @@ import {
   type ApplicationRoundTimeSlotNode,
   PricingType,
   type Query,
-  type QueryReservationsArgs,
   type QueryReservationUnitsArgs,
   type ReservationCreateMutationInput,
   type ReservationNode,
   type ReservationUnitNode,
   useCreateReservationMutation,
+  useListReservationsQuery,
+  type ApplicationRoundPeriodsQuery,
+  ApplicationRoundPeriodsDocument,
+  type ReservationUnitPageQuery,
+  type ReservationUnitPageQueryVariables,
+  ReservationUnitPageDocument,
 } from "@gql/gql-types";
 import {
   base64encode,
-  concatAffectedReservations,
   filterNonNullable,
   fromMondayFirstUnsafe,
   getLocalizationLang,
@@ -79,12 +82,7 @@ import {
   isTouchDevice,
   printErrorMessages,
 } from "@/modules/util";
-import {
-  RELATED_RESERVATION_UNITS,
-  RESERVATION_UNIT_PAGE_QUERY,
-  type ReservationUnitWithAffectingArgs,
-} from "@/modules/queries/reservationUnit";
-import { LIST_RESERVATIONS } from "@/modules/queries/reservation";
+import { RELATED_RESERVATION_UNITS } from "@/modules/queries/reservationUnit";
 import {
   getFuturePricing,
   getPossibleTimesForDay,
@@ -120,7 +118,6 @@ import QuickReservation, {
 } from "@/components/reservation-unit/QuickReservation";
 import ReservationInfoContainer from "@/components/reservation-unit/ReservationInfoContainer";
 import { useCurrentUser } from "@/hooks/user";
-import { APPLICATION_ROUNDS_PERIODS } from "@/modules/queries/applicationRound";
 import { CenterSpinner } from "@/components/common/common";
 import {
   getCommonServerSideProps,
@@ -152,8 +149,8 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
   // TODO does this return only possible rounds or do we need to do frontend filtering on them?
-  const { data } = await apolloClient.query<Query>({
-    query: APPLICATION_ROUNDS_PERIODS,
+  const { data } = await apolloClient.query<ApplicationRoundPeriodsQuery>({
+    query: ApplicationRoundPeriodsDocument,
   });
   const activeApplicationRounds = filterNonNullable(
     data?.applicationRounds?.edges?.map((e) => e?.node)
@@ -169,10 +166,10 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     const typename = "ReservationUnitNode";
     const id = base64encode(`${typename}:${pk}`);
     const { data: reservationUnitData } = await apolloClient.query<
-      Query,
-      ReservationUnitWithAffectingArgs
+      ReservationUnitPageQuery,
+      ReservationUnitPageQueryVariables
     >({
-      query: RESERVATION_UNIT_PAGE_QUERY,
+      query: ReservationUnitPageDocument,
       fetchPolicy: "no-cache",
       variables: {
         id,
@@ -247,16 +244,27 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       ? null
       : Number(queryParams.get("duration"));
 
-    const reservations = filterNonNullable(
-      reservationUnitData?.reservationUnit?.reservationSet
-    );
     const affectingReservations = filterNonNullable(
       reservationUnitData?.affectingReservations
     );
-    const reservationSet = concatAffectedReservations(
-      reservations,
-      affectingReservations,
-      pk
+    const reservationSet = filterNonNullable(
+      reservationUnitData?.reservationUnit?.reservationSet
+    );
+    const doesReservationAffectReservationUnit = (
+      reservation: (typeof affectingReservations)[0],
+      resUnitPk: number
+    ) => {
+      return reservation.affectedReservationUnits?.some(
+        (affectedPk) => affectedPk === resUnitPk
+      );
+    };
+
+    const reservations = filterNonNullable(
+      reservationSet?.concat(
+        affectingReservations?.filter((y) =>
+          doesReservationAffectReservationUnit(y, pk)
+        ) ?? []
+      )
     );
 
     return {
@@ -268,7 +276,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
         reservationUnit: {
           ...reservationUnit,
           reservableTimeSpans,
-          reservationSet,
+          reservationSet: reservations,
         },
         relatedReservationUnits,
         activeApplicationRounds,
@@ -345,12 +353,11 @@ const SubmitButton = styled(MediumButton)`
 `;
 
 // Returns an element for a weekday in the application round timetable, with up to two timespans
-const ApplicationRoundScheduleDay = ({
-  weekday,
-  closed,
-  reservableTimes,
-}: ApplicationRoundTimeSlotNode) => {
+function ApplicationRoundScheduleDay(
+  props: Omit<ApplicationRoundTimeSlotNode, "id" | "pk">
+) {
   const { t } = useTranslation();
+  const { weekday, reservableTimes, closed } = props;
   const noSeconds = (time: string) => time.split(":").slice(0, 2).join(":");
   const timeSlotString = (idx: number): string =>
     reservableTimes?.[idx]?.begin && reservableTimes?.[idx]?.end
@@ -377,7 +384,7 @@ const ApplicationRoundScheduleDay = ({
       {/* eslint-enable react/no-unknown-property */}
     </StyledApplicationRoundScheduleDay>
   );
-};
+}
 
 const TouchCellWrapper = ({
   children,
@@ -566,22 +573,19 @@ const ReservationUnit = ({
 
   // TODO add pagination
   // TODO also combine with other instances of LIST_RESERVATIONS
-  const { data: userReservationsData } = useQuery<Query, QueryReservationsArgs>(
-    LIST_RESERVATIONS,
-    {
-      fetchPolicy: "no-cache",
-      skip: !currentUser || !reservationUnit?.pk,
-      variables: {
-        beginDate: toApiDate(now),
-        user: currentUser?.pk?.toString(),
-        reservationUnit: [reservationUnit?.pk?.toString() ?? ""],
-        state: RELATED_RESERVATION_STATES,
-      },
-    }
-  );
+  const { data } = useListReservationsQuery({
+    fetchPolicy: "no-cache",
+    skip: !currentUser || !reservationUnit?.pk,
+    variables: {
+      beginDate: toApiDate(now),
+      user: currentUser?.pk?.toString() ?? "",
+      reservationUnit: [reservationUnit?.pk?.toString() ?? ""],
+      state: RELATED_RESERVATION_STATES,
+    },
+  });
 
   const userReservations = filterNonNullable(
-    userReservationsData?.reservations?.edges?.map((e) => e?.node)
+    data?.reservations?.edges?.map((e) => e?.node)
   );
 
   const slotPropGetter = useMemo(() => {

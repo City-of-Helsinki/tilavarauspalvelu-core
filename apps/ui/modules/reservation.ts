@@ -8,6 +8,7 @@ import {
   CustomerTypeChoice,
   type ReservationMetadataFieldNode,
   type Maybe,
+  type ReservationUnitPageQuery,
 } from "@gql/gql-types";
 import {
   type RoundPeriod,
@@ -215,6 +216,14 @@ export const getNormalizedReservationOrderStatus = (
 
   return null;
 };
+type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
+type ReservationUnitReservableProps = {
+  reservationUnit: QueryT;
+  activeApplicationRounds: RoundPeriod[];
+  start: Date;
+  end: Date;
+  skipLengthCheck: boolean;
+};
 
 /// NOTE don't return [boolean, string] causes issues in TS / JS
 /// instead break this function into cleaner separate functions
@@ -224,13 +233,7 @@ export function isReservationReservable({
   start,
   end,
   skipLengthCheck = false,
-}: {
-  reservationUnit: ReservationUnitNode | null;
-  activeApplicationRounds: RoundPeriod[];
-  start: Date;
-  end: Date;
-  skipLengthCheck: boolean;
-}): boolean {
+}: ReservationUnitReservableProps): boolean {
   if (!reservationUnit) {
     return false;
   }

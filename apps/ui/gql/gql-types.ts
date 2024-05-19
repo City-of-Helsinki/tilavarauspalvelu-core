@@ -5810,10 +5810,12 @@ export type ReservationUnitFieldsFragment = {
     pk?: number | null;
     supportedFields: Array<{
       __typename?: "ReservationMetadataFieldNode";
+      id: string;
       fieldName: string;
     }>;
     requiredFields: Array<{
       __typename?: "ReservationMetadataFieldNode";
+      id: string;
       fieldName: string;
     }>;
   } | null;
@@ -6201,10 +6203,12 @@ export type ReservationQuery = {
         pk?: number | null;
         supportedFields: Array<{
           __typename?: "ReservationMetadataFieldNode";
+          id: string;
           fieldName: string;
         }>;
         requiredFields: Array<{
           __typename?: "ReservationMetadataFieldNode";
+          id: string;
           fieldName: string;
         }>;
       } | null;
@@ -6319,6 +6323,22 @@ export type ReservationUnitNameFieldsFragment = {
   nameSv?: string | null;
 };
 
+export type EquipmentFieldsFragment = {
+  __typename?: "EquipmentNode";
+  id: string;
+  pk?: number | null;
+  nameFi?: string | null;
+  nameEn?: string | null;
+  nameSv?: string | null;
+  category: {
+    __typename?: "EquipmentCategoryNode";
+    id: string;
+    nameFi?: string | null;
+    nameEn?: string | null;
+    nameSv?: string | null;
+  };
+};
+
 export type ReservationUnitPageFieldsFragment = {
   __typename?: "ReservationUnitNode";
   isDraft: boolean;
@@ -6387,12 +6407,14 @@ export type ReservationUnitPageFieldsFragment = {
   } | null;
   equipments: Array<{
     __typename?: "EquipmentNode";
+    id: string;
     pk?: number | null;
     nameFi?: string | null;
     nameEn?: string | null;
     nameSv?: string | null;
     category: {
       __typename?: "EquipmentCategoryNode";
+      id: string;
       nameFi?: string | null;
       nameEn?: string | null;
       nameSv?: string | null;
@@ -6463,10 +6485,12 @@ export type ReservationUnitPageFieldsFragment = {
     pk?: number | null;
     supportedFields: Array<{
       __typename?: "ReservationMetadataFieldNode";
+      id: string;
       fieldName: string;
     }>;
     requiredFields: Array<{
       __typename?: "ReservationMetadataFieldNode";
+      id: string;
       fieldName: string;
     }>;
   } | null;
@@ -6560,12 +6584,14 @@ export type ReservationUnitQuery = {
     } | null;
     equipments: Array<{
       __typename?: "EquipmentNode";
+      id: string;
       pk?: number | null;
       nameFi?: string | null;
       nameEn?: string | null;
       nameSv?: string | null;
       category: {
         __typename?: "EquipmentCategoryNode";
+        id: string;
         nameFi?: string | null;
         nameEn?: string | null;
         nameSv?: string | null;
@@ -6636,10 +6662,12 @@ export type ReservationUnitQuery = {
       pk?: number | null;
       supportedFields: Array<{
         __typename?: "ReservationMetadataFieldNode";
+        id: string;
         fieldName: string;
       }>;
       requiredFields: Array<{
         __typename?: "ReservationMetadataFieldNode";
+        id: string;
         fieldName: string;
       }>;
     } | null;
@@ -6745,12 +6773,14 @@ export type ReservationUnitPageQuery = {
     } | null;
     equipments: Array<{
       __typename?: "EquipmentNode";
+      id: string;
       pk?: number | null;
       nameFi?: string | null;
       nameEn?: string | null;
       nameSv?: string | null;
       category: {
         __typename?: "EquipmentCategoryNode";
+        id: string;
         nameFi?: string | null;
         nameEn?: string | null;
         nameSv?: string | null;
@@ -6821,10 +6851,12 @@ export type ReservationUnitPageQuery = {
       pk?: number | null;
       supportedFields: Array<{
         __typename?: "ReservationMetadataFieldNode";
+        id: string;
         fieldName: string;
       }>;
       requiredFields: Array<{
         __typename?: "ReservationMetadataFieldNode";
+        id: string;
         fieldName: string;
       }>;
     } | null;
@@ -8315,9 +8347,11 @@ export const ReservationUnitFieldsFragmentDoc = gql`
       name
       pk
       supportedFields {
+        id
         fieldName
       }
       requiredFields {
+        id
         fieldName
       }
     }
@@ -8336,6 +8370,21 @@ export const ReservationUnitTypeFieldsFragmentDoc = gql`
     nameFi
     nameEn
     nameSv
+  }
+`;
+export const EquipmentFieldsFragmentDoc = gql`
+  fragment EquipmentFields on EquipmentNode {
+    id
+    pk
+    nameFi
+    nameEn
+    nameSv
+    category {
+      id
+      nameFi
+      nameEn
+      nameSv
+    }
   }
 `;
 export const ReservationUnitPageFieldsFragmentDoc = gql`
@@ -8375,20 +8424,13 @@ export const ReservationUnitPageFieldsFragmentDoc = gql`
     reservationsMaxDaysBefore
     requireReservationHandling
     equipments {
-      pk
-      nameFi
-      nameEn
-      nameSv
-      category {
-        nameFi
-        nameEn
-        nameSv
-      }
+      ...EquipmentFields
     }
   }
   ${ReservationUnitFieldsFragmentDoc}
   ${ImageFragmentFragmentDoc}
   ${ReservationUnitTypeFieldsFragmentDoc}
+  ${EquipmentFieldsFragmentDoc}
 `;
 export const BlockingReservationFieldsFragmentDoc = gql`
   fragment BlockingReservationFields on ReservationNode {

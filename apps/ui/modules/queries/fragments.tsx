@@ -90,9 +90,11 @@ export const RESERVATION_UNIT_FRAGMENT = gql`
       name
       pk
       supportedFields {
+        id
         fieldName
       }
       requiredFields {
+        id
         fieldName
       }
     }

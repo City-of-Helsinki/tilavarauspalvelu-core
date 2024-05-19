@@ -271,10 +271,10 @@ export const isRangeReservable = ({
   return range.every((slot) => isSlotReservable(slot));
 };
 
-export const doReservationsCollide = (
+export function doReservationsCollide(
   newReservation: { start: Date; end: Date },
-  reservations: ReservationNode[] = []
-): boolean => {
+  reservations: Pick<ReservationNode, "begin" | "end">[] = []
+): boolean {
   const { start, end } = newReservation;
   return reservations.some((reservation) =>
     areIntervalsOverlapping(
@@ -285,7 +285,7 @@ export const doReservationsCollide = (
       { start, end }
     )
   );
-};
+}
 
 export const getDayIntervals = (
   startTime: string,
@@ -511,8 +511,12 @@ export const getBufferedEventTimes = (
   return { start: before, end: after };
 };
 
-export const doesBufferCollide = (
-  reservation: ReservationNode,
+type BufferCollideCheckReservation = Pick<
+  ReservationNode,
+  "begin" | "end" | "isBlocked" | "bufferTimeBefore" | "bufferTimeAfter"
+>;
+export function doesBufferCollide(
+  reservation: BufferCollideCheckReservation,
   newReservation: {
     start: Date;
     end: Date;
@@ -520,7 +524,7 @@ export const doesBufferCollide = (
     bufferTimeBefore?: number;
     bufferTimeAfter?: number;
   }
-): boolean => {
+): boolean {
   if (newReservation.isBlocked) return false;
 
   const newReservationStartBuffer =
@@ -554,9 +558,9 @@ export const doesBufferCollide = (
       };
 
   return areIntervalsOverlapping(reservationInterval, newReservationInterval);
-};
+}
 
-export const doBuffersCollide = (
+export function doBuffersCollide(
   newReservation: {
     start: Date;
     end: Date;
@@ -564,12 +568,12 @@ export const doBuffersCollide = (
     bufferTimeBefore?: number;
     bufferTimeAfter?: number;
   },
-  reservations: ReservationNode[] = []
-): boolean => {
+  reservations: BufferCollideCheckReservation[] = []
+): boolean {
   return reservations.some((reservation) =>
     doesBufferCollide(reservation, newReservation)
   );
-};
+}
 
 // TODO use a fragment
 type ReservationEventType = {
@@ -609,9 +613,21 @@ export function getEventBuffers(
   return buffers;
 }
 
-export const isReservationUnitReservable = (
-  reservationUnit?: ReservationUnitNode | null
-): [false, string] | [true] => {
+export function isReservationUnitReservable(
+  // TODO use a fragment
+  reservationUnit?: Pick<
+    ReservationUnitNode,
+    | "reservationState"
+    | "metadataSet"
+    | "reservableTimeSpans"
+    | "reservationBegins"
+    | "minReservationDuration"
+    | "maxReservationDuration"
+    | "reservationKind"
+    | "reservationsMaxDaysBefore"
+    | "reservationsMinDaysBefore"
+  > | null
+): [false, string] | [true] {
   if (!reservationUnit) {
     return [false, "reservationUnit is null"];
   }
@@ -655,20 +671,24 @@ export const isReservationUnitReservable = (
     default:
       return [false, "reservationUnit is not reservable"];
   }
-};
+}
 
-export const isReservationStartInFuture = (
-  reservationUnit: ReservationUnitNode,
+export function isReservationStartInFuture(
+  reservationUnit: Pick<
+    ReservationUnitNode,
+    "reservationBegins" | "reservationsMaxDaysBefore"
+  >,
   now = new Date()
-): boolean => {
-  const bufferDays = reservationUnit.reservationsMaxDaysBefore ?? 0;
+): boolean {
+  const { reservationBegins, reservationsMaxDaysBefore } = reservationUnit;
+  const bufferDays = reservationsMaxDaysBefore ?? 0;
   const negativeBuffer = Math.abs(bufferDays) * -1;
 
   return (
-    !!reservationUnit.reservationBegins &&
-    now < addDays(new Date(reservationUnit.reservationBegins), negativeBuffer)
+    !!reservationBegins &&
+    now < addDays(new Date(reservationBegins), negativeBuffer)
   );
-};
+}
 
 export const getNormalizedReservationBeginTime = (
   reservationUnit: ReservationUnitNode
@@ -697,15 +717,18 @@ export const getOpenDays = (reservationUnit: ReservationUnitNode): Date[] => {
   return openDays.sort((a, b) => a.getTime() - b.getTime());
 };
 
-export const getNewReservation = ({
+export function getNewReservation({
   start,
   end,
   reservationUnit,
 }: {
-  reservationUnit: ReservationUnitNode;
+  reservationUnit: Pick<
+    ReservationUnitNode,
+    "minReservationDuration" | "reservationStartInterval"
+  >;
   start: Date;
   end: Date;
-}): PendingReservation => {
+}): PendingReservation {
   const { minReservationDuration, reservationStartInterval } = reservationUnit;
 
   const { end: minEnd } = getMinReservation({
@@ -729,4 +752,4 @@ export const getNewReservation = ({
     begin: start.toISOString(),
     end: normalizedEnd.toISOString(),
   };
-};
+}

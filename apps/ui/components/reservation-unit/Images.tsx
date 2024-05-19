@@ -3,13 +3,13 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import dynamic from "next/dynamic";
 import { breakpoints } from "common/src/common/style";
-import type { ReservationUnitImageNode } from "@gql/gql-types";
+import type { ImageFragmentFragment } from "@gql/gql-types";
 import Carousel from "../Carousel";
 import { getImageSource } from "common/src/helpers";
 
 const Modal = dynamic(() => import("../common/Modal"));
 type Props = {
-  images: ReservationUnitImageNode[];
+  images: ImageFragmentFragment[];
   contextName?: string;
 };
 
@@ -95,7 +95,7 @@ const LargeImage = styled.img`
 export function Images({ images, contextName }: Props): JSX.Element {
   const { t } = useTranslation();
   const [showModal, setShowModal] = useState(false);
-  const [currentImage, setCurrentImage] = useState<ReservationUnitImageNode>();
+  const [currentImage, setCurrentImage] = useState<ImageFragmentFragment>();
 
   if (images?.length === 0) {
     return <div />;

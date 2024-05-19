@@ -26,10 +26,27 @@ const RESERVATION_UNIT_NAME_FRAGMENT = gql`
   }
 `;
 
+const EQUIPMENT_FRAGMENT = gql`
+  fragment EquipmentFields on EquipmentNode {
+    id
+    pk
+    nameFi
+    nameEn
+    nameSv
+    category {
+      id
+      nameFi
+      nameEn
+      nameSv
+    }
+  }
+`;
+
 const RESERVATION_UNIT_PAGE_FRAGMENT = gql`
   ${IMAGE_FRAGMENT}
   ${RESERVATION_UNIT_FRAGMENT}
   ${RESERVATION_UNIT_TYPE_FRAGMENT}
+  ${EQUIPMENT_FRAGMENT}
   fragment ReservationUnitPageFields on ReservationUnitNode {
     ...ReservationUnitFields
     isDraft
@@ -66,15 +83,7 @@ const RESERVATION_UNIT_PAGE_FRAGMENT = gql`
     reservationsMaxDaysBefore
     requireReservationHandling
     equipments {
-      pk
-      nameFi
-      nameEn
-      nameSv
-      category {
-        nameFi
-        nameEn
-        nameSv
-      }
+      ...EquipmentFields
     }
   }
 `;

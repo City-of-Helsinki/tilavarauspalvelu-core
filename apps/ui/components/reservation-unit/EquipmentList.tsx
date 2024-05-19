@@ -2,12 +2,12 @@ import React, { useMemo } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
-import type { EquipmentNode } from "@gql/gql-types";
+import type { EquipmentFieldsFragment } from "@gql/gql-types";
 import { ShowAllContainer } from "common/src/components";
 import { getEquipmentList } from "../../modules/reservationUnit";
 
 type Props = {
-  equipment: EquipmentNode[];
+  equipment: EquipmentFieldsFragment[];
   itemsToShow?: number;
 };
 
@@ -30,7 +30,7 @@ const EquipmentItem = styled.li`
   font-size: var(--fontsize-body-l);
 `;
 
-const EquipmentList = ({ equipment, itemsToShow = 6 }: Props): JSX.Element => {
+function EquipmentList({ equipment, itemsToShow = 6 }: Props): JSX.Element {
   const { t } = useTranslation();
 
   const equipmentList = useMemo(() => {
@@ -50,6 +50,6 @@ const EquipmentList = ({ equipment, itemsToShow = 6 }: Props): JSX.Element => {
       ))}
     </EquipmentContainer>
   );
-};
+}
 
 export default EquipmentList;

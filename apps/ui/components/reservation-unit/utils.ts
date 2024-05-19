@@ -3,6 +3,7 @@ import { addDays, addMinutes, isAfter, isBefore, set } from "date-fns";
 import type {
   ReservableTimeSpanType,
   ReservationUnitNode,
+  ReservationUnitPageQuery,
 } from "@gql/gql-types";
 import {
   getPossibleTimesForDay,
@@ -39,9 +40,12 @@ const dayMax = (days: Array<Date | undefined>): Date | undefined => {
 };
 
 // Returns the last possible reservation date for the given reservation unit
-export const getLastPossibleReservationDate = (
-  reservationUnit?: ReservationUnitNode
-): Date | null => {
+export function getLastPossibleReservationDate(
+  reservationUnit?: Pick<
+    ReservationUnitNode,
+    "reservationsMaxDaysBefore" | "reservableTimeSpans" | "reservationEnds"
+  >
+): Date | null {
   if (!reservationUnit) {
     return null;
   }
@@ -67,12 +71,13 @@ export const getLastPossibleReservationDate = (
       lastOpeningDate,
     ]) ?? null
   );
-};
+}
 
+type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
 type AvailableTimesProps = {
   start: Date;
   duration: number;
-  reservationUnit: ReservationUnitNode;
+  reservationUnit: QueryT;
   slots: ReservableTimeSpanType[];
   activeApplicationRounds: RoundPeriod[];
   fromStartOfDay?: boolean;

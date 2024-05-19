@@ -12,7 +12,6 @@ import {
   fromUIDate,
 } from "common/src/common/util";
 import type {
-  ReservationUnitImageNode,
   AgeGroupNode,
   ImageFragmentFragment,
   LocationFieldsI18nFragment,
@@ -201,9 +200,9 @@ export const getMainImage = (ru?: {
   return images[0];
 };
 
-export const orderImages = (
-  images: ReservationUnitImageNode[]
-): ReservationUnitImageNode[] => {
+export function orderImages(
+  images: ImageFragmentFragment[]
+): ImageFragmentFragment[] {
   if (!images || images.length === 0) {
     return [];
   }
@@ -214,7 +213,7 @@ export const orderImages = (
   });
 
   return result;
-};
+}
 
 export const getAddressAlt = (ru: {
   unit?: {

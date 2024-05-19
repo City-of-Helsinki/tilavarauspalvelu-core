@@ -1,18 +1,33 @@
 import React from "react";
 import { formatDuration } from "common/src/common/util";
-import { type ReservationUnitNode } from "@gql/gql-types";
+import { type ReservationUnitPageQuery } from "@gql/gql-types";
 import ClientOnly from "common/src/ClientOnly";
 import { Trans, useTranslation } from "next-i18next";
 import { daysByMonths } from "@/modules/const";
 import { formatDate } from "@/modules/util";
 import { Content, Subheading } from "./ReservationUnitStyles";
 
+// TODO use a fragment instead of Pick
+type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
+type NodeT = Pick<
+  QueryT,
+  | "reservationBegins"
+  | "reservationEnds"
+  | "reservationsMaxDaysBefore"
+  | "reservationsMinDaysBefore"
+  | "minReservationDuration"
+  | "maxReservationDuration"
+  | "maxReservationsPerUser"
+>;
+
 type Props = {
-  reservationUnit: ReservationUnitNode;
+  reservationUnit: NodeT;
   reservationUnitIsReservable: boolean;
 };
 
-function getStatus(reservationUnit: ReservationUnitNode) {
+function getStatus(
+  reservationUnit: Pick<NodeT, "reservationBegins" | "reservationEnds">
+): string | null {
   const now = new Date().toISOString();
   const { reservationBegins, reservationEnds } = reservationUnit;
 
@@ -33,10 +48,10 @@ function getStatus(reservationUnit: ReservationUnitNode) {
   return null;
 }
 
-const ReservationInfoContainer = ({
+function ReservationInfoContainer({
   reservationUnit,
   reservationUnitIsReservable,
-}: Props): JSX.Element => {
+}: Props): JSX.Element {
   const { t } = useTranslation();
 
   const reservationStatus = getStatus(reservationUnit);
@@ -199,7 +214,7 @@ const ReservationInfoContainer = ({
       </Content>
     </>
   );
-};
+}
 
 // Hack to deal with translations causing hydration errors
 // TODO can we remove this now that we got rid of the useMemo?

@@ -7,7 +7,7 @@ import { isReservationStartInFuture } from "common/src/calendar/util";
 import { formatDuration } from "common/src/common/util";
 import { fontRegular, H2, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { ReservationKind, type ReservationUnitNode } from "@gql/gql-types";
+import { ReservationKind, type ReservationUnitPageQuery } from "@gql/gql-types";
 import { Container } from "common";
 import {
   formatDate,
@@ -25,8 +25,9 @@ import {
 } from "@/modules/reservationUnit";
 import BreadcrumbWrapper from "../common/BreadcrumbWrapper";
 
+type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
 interface PropsType {
-  reservationUnit: ReservationUnitNode;
+  reservationUnit: QueryT;
   reservationUnitIsReservable?: boolean;
   subventionSuffix?: JSX.Element;
 }
@@ -108,11 +109,11 @@ const UnitName = styled(H3).attrs({ as: "h2" })`
   }
 `;
 
-const NonReservableNotification = ({
+function NonReservableNotification({
   reservationUnit,
 }: {
-  reservationUnit: ReservationUnitNode;
-}) => {
+  reservationUnit: QueryT;
+}) {
   const { t } = useTranslation();
   let returnText = t("reservationUnit:notifications.notReservable");
   const futureOpeningText = t("reservationUnit:notifications.futureOpening", {
@@ -135,7 +136,7 @@ const NonReservableNotification = ({
       {returnText}
     </Wrapper>
   );
-};
+}
 
 function Head({
   reservationUnit,

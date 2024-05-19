@@ -9,14 +9,14 @@ import {
   isSlotWithinReservationTime,
 } from "common/src/calendar/util";
 import {
-  type EquipmentNode,
   ReservationUnitState,
   type ReservationUnitNode,
   State,
   PricingType,
   PriceUnit,
   Status,
-  type ReservationUnitPricingNode,
+  type ReservationUnitPageQuery,
+  type EquipmentFieldsFragment,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { capitalize, getTranslation } from "./util";
@@ -30,9 +30,9 @@ export const getTimeString = (date = new Date()): string => {
   return `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
 };
 
-export const isReservationUnitPublished = (
-  reservationUnit?: ReservationUnitNode
-): boolean => {
+export function isReservationUnitPublished(
+  reservationUnit?: Pick<ReservationUnitNode, "state"> | null
+): boolean {
   if (!reservationUnit) {
     return false;
   }
@@ -45,7 +45,7 @@ export const isReservationUnitPublished = (
     default:
       return false;
   }
-};
+}
 
 const equipmentCategoryOrder = [
   "Huonekalut",
@@ -57,13 +57,12 @@ const equipmentCategoryOrder = [
   "Muu",
 ];
 
-export const getEquipmentCategories = (
-  equipment: EquipmentNode[]
-): string[] => {
+export function getEquipmentCategories(
+  equipment: Pick<EquipmentFieldsFragment, "category">[]
+): string[] {
   if (!equipment || equipment.length === 0) {
     return [];
   }
-
   const categories: string[] = [...equipment].map((n) =>
     n.category?.nameFi && equipmentCategoryOrder.includes(n.category?.nameFi)
       ? n.category?.nameFi
@@ -77,33 +76,36 @@ export const getEquipmentCategories = (
   });
 
   return uniq(categories);
-};
+}
 
-export const getEquipmentList = (equipment: EquipmentNode[]): string[] => {
+// Why are we doing complex frontend sorting? and always in finnish?
+export function getEquipmentList(
+  equipment: EquipmentFieldsFragment[]
+): string[] {
   if (!equipment || equipment.length === 0) {
     return [];
   }
 
   const categories = getEquipmentCategories(equipment);
 
-  const sortedEquipment: EquipmentNode[] = flatten(
-    categories.map((category) => {
-      const eq: EquipmentNode[] = [...equipment].filter(
-        (n) =>
-          n.category?.nameFi === category ||
-          (category === "Muu" &&
-            n.category?.nameFi &&
-            !equipmentCategoryOrder.includes(n.category?.nameFi))
-      );
-      eq.sort((a, b) =>
-        a.nameFi && b.nameFi ? a.nameFi.localeCompare(b.nameFi) : 0
-      );
-      return eq;
-    })
+  const sortedEquipment = flatten(
+    categories.map((category) =>
+      [...equipment]
+        .filter(
+          (n) =>
+            n.category?.nameFi === category ||
+            (category === "Muu" &&
+              n.category?.nameFi &&
+              !equipmentCategoryOrder.includes(n.category?.nameFi))
+        )
+        .sort((a, b) =>
+          a.nameFi && b.nameFi ? a.nameFi.localeCompare(b.nameFi) : 0
+        )
+    )
   );
 
   return sortedEquipment.map((n) => getTranslation(n, "name"));
-};
+}
 
 export const getReservationUnitName = (
   // TODO use a fragment for ReservationUnitName
@@ -313,7 +315,7 @@ export function getReservationUnitPrice(
 }
 
 export const isReservationUnitPaidInFuture = (
-  pricings: ReservationUnitPricingNode[]
+  pricings: PricingFieldsFragment[]
 ): boolean => {
   return pricings
     .filter(
@@ -345,6 +347,8 @@ export function isInTimeSpan(
   return true;
 }
 
+// TODO this should be a fragment
+type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
 // Returns an timeslot array (in HH:mm format) with the time-slots that are
 // available for reservation on the given date
 // TODO should rewrite the timespans to be NonNullable and dates (and do the conversion early, not on each component render)
@@ -352,7 +356,7 @@ export function getPossibleTimesForDay(
   reservableTimeSpans: ReservationUnitNode["reservableTimeSpans"],
   reservationStartInterval: ReservationUnitNode["reservationStartInterval"],
   date: Date,
-  reservationUnit: ReservationUnitNode,
+  reservationUnit: QueryT,
   activeApplicationRounds: RoundPeriod[],
   durationValue: number
 ): { label: string; value: string }[] {
