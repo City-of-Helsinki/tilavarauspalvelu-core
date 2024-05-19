@@ -18,9 +18,6 @@ export const UNITS_QUERY = gql`
         node {
           nameFi
           pk
-          serviceSectors {
-            nameFi
-          }
           reservationunitSet {
             pk
           }

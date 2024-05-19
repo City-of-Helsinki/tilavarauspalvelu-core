@@ -34,18 +34,8 @@ function getColConfig(t: TFunction, isMyUnits?: boolean): ColumnType[] {
           {truncate(nameFi ?? "-", MAX_UNIT_NAME_LENGTH)}
         </TableLink>
       ),
-      width: "50%",
+      width: "75%",
       isSortable: true,
-    },
-    {
-      headerName: t("Units.headings.serviceSector"),
-      key: "serviceSector",
-      isSortable: false,
-      transform: (unit: UnitNode) =>
-        (unit?.serviceSectors || [])
-          .map((serviceSector) => serviceSector?.nameFi)
-          .join(","),
-      width: "25%",
     },
     {
       headerName: t("Units.headings.reservationUnitCount"),
