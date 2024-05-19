@@ -1,14 +1,14 @@
-import { type FetchResult, useQuery } from "@apollo/client";
+import { type FetchResult } from "@apollo/client";
 import { breakpoints } from "common/src/common/style";
 import { H2 } from "common/src/common/typography";
 import {
   type Mutation,
   type MutationAdjustReservationTimeArgs,
-  type Query,
   type ReservationNode,
   type ReservationUnitNode,
   useAdjustReservationTimeMutation,
   useListReservationsQuery,
+  useApplicationRoundsUiQuery,
 } from "@gql/gql-types";
 import { useRouter } from "next/router";
 import { Stepper } from "hds-react";
@@ -24,10 +24,9 @@ import { useCurrentUser } from "@/hooks/user";
 import { getTranslation } from "../../modules/util";
 import Sanitize from "../common/Sanitize";
 import ReservationInfoCard from "./ReservationInfoCard";
-import EditStep0 from "./EditStep0";
-import EditStep1 from "./EditStep1";
+import { EditStep0 } from "./EditStep0";
+import { EditStep1 } from "./EditStep1";
 import { reservationsPrefix } from "@/modules/const";
-import { APPLICATION_ROUNDS } from "@/modules/queries/applicationRound";
 import { Toast } from "@/styles/util";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -210,7 +209,7 @@ export function ReservationEdit({
 
   // TODO this should be redundant, use the reservationUnit.applicationRounds instead
   // TODO this is bad, we can get the application rounds from the reservationUnit
-  const { data: applicationRoundsData } = useQuery<Query>(APPLICATION_ROUNDS, {
+  const { data: applicationRoundsData } = useApplicationRoundsUiQuery({
     fetchPolicy: "no-cache",
   });
   const activeApplicationRounds = filterNonNullable(

@@ -8,7 +8,7 @@ import {
 import { breakpoints } from "common/src/common/style";
 import type { PendingReservation } from "common/types/common";
 import type {
-  ApplicationRoundNode,
+  ApplicationRoundFieldsFragment,
   ListReservationsQuery,
   ReservationNode,
   ReservationUnitNode,
@@ -54,7 +54,7 @@ type Props = {
   reservationUnit: ReservationUnitNode;
   userReservations: Node[];
   reservationForm: UseFormReturn<PendingReservationFormType>;
-  activeApplicationRounds: ApplicationRoundNode[];
+  activeApplicationRounds: ApplicationRoundFieldsFragment[];
   setErrorMsg: React.Dispatch<React.SetStateAction<string | null>>;
   nextStep: () => void;
   apiBaseUrl: string;
@@ -163,7 +163,7 @@ function calculateFocusSlot(
   };
 }
 
-const EditStep0 = ({
+export function EditStep0({
   reservation,
   reservationUnit,
   userReservations,
@@ -172,7 +172,7 @@ const EditStep0 = ({
   setErrorMsg,
   nextStep,
   isLoading,
-}: Props): JSX.Element => {
+}: Props): JSX.Element {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
@@ -515,6 +515,4 @@ const EditStep0 = ({
       </form>
     </>
   );
-};
-
-export default EditStep0;
+}

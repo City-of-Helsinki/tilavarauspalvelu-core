@@ -4,14 +4,10 @@ import { differenceInMinutes, parseISO } from "date-fns";
 import { trim } from "lodash";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import {
-  getReservationPrice,
-  formatters as getFormatters,
-  type PendingReservation,
-} from "common";
+import { getReservationPrice, formatters as getFormatters } from "common";
 import { breakpoints } from "common/src/common/style";
 import { H4, Strong } from "common/src/common/typography";
-import type { ReservationUnitNode, ReservationNode } from "@gql/gql-types";
+import type { ReservationQuery } from "@gql/gql-types";
 import { getReservationUnitPrice } from "@/modules/reservationUnit";
 import {
   capitalize,
@@ -24,9 +20,10 @@ import { getImageSource } from "common/src/helpers";
 
 type Type = "pending" | "confirmed" | "complete";
 
+type Node = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
-  reservation: ReservationNode | PendingReservation;
-  reservationUnit: ReservationUnitNode | null;
+  reservation: Node;
+  reservationUnit: NonNullable<Node["reservationUnit"]>[0] | null;
   type: Type;
   shouldDisplayReservationUnitPrice?: boolean;
 };
@@ -76,12 +73,12 @@ const Subheading = styled(Value)`
   margin-bottom: var(--spacing-xs);
 `;
 
-const ReservationInfoCard = ({
+function ReservationInfoCard({
   reservation,
   reservationUnit,
   type,
   shouldDisplayReservationUnitPrice = false,
-}: Props): JSX.Element | null => {
+}: Props): JSX.Element | null {
   const { t, i18n } = useTranslation();
 
   const { begin, end } = reservation || {};
@@ -202,6 +199,6 @@ const ReservationInfoCard = ({
       </Content>
     </Wrapper>
   );
-};
+}
 
 export default ReservationInfoCard;

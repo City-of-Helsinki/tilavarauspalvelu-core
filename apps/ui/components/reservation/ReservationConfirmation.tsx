@@ -12,9 +12,8 @@ import styled from "styled-components";
 import { fontRegular, H2 } from "common/src/common/typography";
 import {
   type PaymentOrderNode,
-  type ReservationNode,
-  type ReservationUnitNode,
   State,
+  type ReservationQuery,
 } from "@gql/gql-types";
 import { Subheading } from "common/src/reservation-form/styles";
 import { breakpoints } from "common/src/common/style";
@@ -26,9 +25,10 @@ import { Paragraph } from "./styles";
 import { reservationUnitPath } from "../../modules/const";
 import { signOut } from "@/hooks/auth";
 
+type Node = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
-  reservation: ReservationNode;
-  reservationUnit: ReservationUnitNode;
+  reservation: Node;
+  reservationUnit: NonNullable<Node["reservationUnit"]>[0];
   apiBaseUrl: string;
   order?: PaymentOrderNode;
 };
@@ -101,12 +101,12 @@ const ReturnLinkList = ({
   );
 };
 
-const ReservationConfirmation = ({
+function ReservationConfirmation({
   reservation,
   reservationUnit,
   apiBaseUrl,
   order,
-}: Props): JSX.Element => {
+}: Props): JSX.Element {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
@@ -183,6 +183,6 @@ const ReservationConfirmation = ({
       />
     </Wrapper>
   );
-};
+}
 
 export default ReservationConfirmation;

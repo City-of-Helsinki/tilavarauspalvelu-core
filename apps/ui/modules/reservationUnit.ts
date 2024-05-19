@@ -172,11 +172,16 @@ export function getActivePricing(reservationUnit: {
   return pricings.find((pricing) => pricing?.status === "ACTIVE");
 }
 
+type GetPriceReservationUnitFragment = {
+  pricings: PricingFieldsFragment[];
+  reservationBegins?: string | null;
+  reservationEnds?: string | null;
+};
 export const getFuturePricing = (
-  reservationUnit: ReservationUnitNode,
+  reservationUnit: GetPriceReservationUnitFragment,
   applicationRounds: RoundPeriod[] = [],
   reservationDate?: Date
-): ReservationUnitPricingNode | undefined => {
+): PricingFieldsFragment | undefined => {
   const { pricings, reservationBegins, reservationEnds } = reservationUnit;
 
   if (!pricings || pricings.length === 0) {
@@ -269,16 +274,16 @@ export const getPrice = (props: GetPriceType): string => {
 };
 
 type GetReservationUnitPriceProps = {
-  reservationUnit?: ReservationUnitNode | null;
+  reservationUnit?: GetPriceReservationUnitFragment | null;
   pricingDate?: Date;
   minutes?: number;
   trailingZeros?: boolean;
   asNumeral?: boolean;
 };
 
-export const getReservationUnitPrice = (
+export function getReservationUnitPrice(
   props: GetReservationUnitPriceProps
-): string | undefined => {
+): string | undefined {
   const {
     reservationUnit: ru,
     pricingDate,
@@ -287,7 +292,7 @@ export const getReservationUnitPrice = (
     asNumeral = false,
   } = props;
 
-  if (!ru) {
+  if (ru == null) {
     return undefined;
   }
 
@@ -295,15 +300,17 @@ export const getReservationUnitPrice = (
     ? getFuturePricing(ru, [], pricingDate) || getActivePricing(ru)
     : getActivePricing(ru);
 
-  return pricing
-    ? getPrice({
-        pricing,
-        minutes,
-        trailingZeros,
-        asNumeral,
-      })
-    : undefined;
-};
+  if (pricing == null) {
+    return undefined;
+  }
+
+  return getPrice({
+    pricing,
+    minutes,
+    trailingZeros,
+    asNumeral,
+  });
+}
 
 export const isReservationUnitPaidInFuture = (
   pricings: ReservationUnitPricingNode[]

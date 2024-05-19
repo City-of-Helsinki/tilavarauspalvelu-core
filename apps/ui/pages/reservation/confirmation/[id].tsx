@@ -1,8 +1,7 @@
 import React from "react";
-import { useQuery } from "@apollo/client";
 import { breakpoints } from "common/src/common/style";
 import { H2 } from "common/src/common/typography";
-import type { Query, QueryReservationArgs } from "@gql/gql-types";
+import { useReservationQuery } from "@gql/gql-types";
 import { LoadingSpinner } from "hds-react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -12,7 +11,6 @@ import { Container } from "common";
 import ReservationConfirmation from "@/components/reservation/ReservationConfirmation";
 import ReservationInfoCard from "@/components/reservation/ReservationInfoCard";
 import { Paragraph } from "@/components/reservation/styles";
-import { GET_RESERVATION } from "@/modules/queries/reservation";
 import { useOrder } from "@/hooks/reservation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { base64encode } from "common/src/helpers";
@@ -65,7 +63,7 @@ const ReservationSuccess = ({ reservationPk, apiBaseUrl }: Props) => {
     data,
     loading: isReservationLoading,
     error: isError,
-  } = useQuery<Query, QueryReservationArgs>(GET_RESERVATION, {
+  } = useReservationQuery({
     skip: !reservationPk,
     fetchPolicy: "no-cache",
     variables: { id },

@@ -70,14 +70,14 @@ const PreviewValue = styled.span`
   font-size: var(--fontsize-body-l);
 `;
 
-const EditStep1 = ({
+export function EditStep1({
   reservation,
   reservationUnit,
   setErrorMsg,
   setStep,
   handleSubmit,
   isSubmitting,
-}: Props): JSX.Element => {
+}: Props): JSX.Element {
   const { t } = useTranslation();
   const router = useRouter();
 
@@ -351,6 +351,4 @@ const EditStep1 = ({
       </form>
     </Wrapper>
   );
-};
-
-export default EditStep1;
+}
