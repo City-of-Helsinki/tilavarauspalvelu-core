@@ -1,6 +1,5 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { Card, IconArrowRight, IconCalendar } from "hds-react";
 import { ApplicationRoundNode } from "common/types/gql-types";
@@ -9,6 +8,7 @@ import { formatDate } from "@/common/util";
 import { applicationRoundUrl } from "@/common/urls";
 import { ApplicationRoundStatusTag } from "./ApplicationRoundStatusTag";
 import TimeframeStatus from "./TimeframeStatus";
+import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 
 interface IProps {
   applicationRound: ApplicationRoundNode;
@@ -38,7 +38,7 @@ const TitleContainer = styled.div`
 
 const Name = styled.span`
   font-size: var(--fontsize-heading-s);
-  font-family: var(--font-medium);
+  font-family: var(--font-medium), serif;
   margin-bottom: var(--spacing-2-xs);
   order: 1;
 `;
@@ -53,6 +53,13 @@ const Times = styled.div`
   @media (width > ${breakpoints.s}) {
     flex-direction: row;
     gap: var(--spacing-l);
+  }
+`;
+
+const ButtonLink = styled(ButtonLikeLink)`
+  font-weight: bold;
+  span {
+    margin-right: var(--spacing-xs);
   }
 `;
 
@@ -129,7 +136,6 @@ export function ApplicationRoundCard({
     <StyledCard>
       <Layout>
         <TitleContainer>
-          <div>{applicationRound.serviceSector?.nameFi}</div>
           <Name>{applicationRound.nameFi}</Name>
         </TitleContainer>
         <Times>
@@ -162,9 +168,10 @@ export function ApplicationRoundCard({
               })}
             />
           </Stats>
-          <Link to={applicationRoundUrl(String(applicationRound.pk))}>
-            <IconArrowRight size="l" style={{ color: "var(--color-black)" }} />
-          </Link>
+          <ButtonLink to={applicationRoundUrl(String(applicationRound.pk))}>
+            <span>{t("common.view")}</span>
+            <IconArrowRight size="l" />
+          </ButtonLink>
         </BottomContainer>
       </Layout>
     </StyledCard>

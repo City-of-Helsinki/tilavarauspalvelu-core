@@ -82,6 +82,7 @@ const translations: ITranslations = {
   common: {
     week: ["Viikko"],
     showMore: ["Näytä lisää"],
+    view: ["Näytä"],
     clearAllSelections: ["Tyhjennä valinnat"],
     clear: ["Tyhjennä"],
     removeValue: ["Poista arvo"],

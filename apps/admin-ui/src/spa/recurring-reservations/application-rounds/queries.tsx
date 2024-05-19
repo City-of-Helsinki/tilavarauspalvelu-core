@@ -22,10 +22,6 @@ export const APPLICATION_ROUNDS_QUERY = gql`
           applicationsCount
           reservationUnitCount
           statusTimestamp
-          serviceSector {
-            pk
-            nameFi
-          }
         }
       }
     }
