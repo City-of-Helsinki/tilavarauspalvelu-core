@@ -6,7 +6,10 @@ import NextImage from "next/image";
 import styled from "styled-components";
 import { H5 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import type { ReservationUnitNode } from "@gql/gql-types";
+import type {
+  ReservationUnitNode,
+  SearchReservationUnitsQuery,
+} from "@gql/gql-types";
 import { format, isToday, isTomorrow } from "date-fns";
 import { toUIDate } from "common/src/common/util";
 import { getMainImage, getTranslation } from "@/modules/util";
@@ -23,8 +26,11 @@ import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import { useSearchParams } from "next/navigation";
 import { getImageSource, isBrowser } from "common/src/helpers";
 
+type QueryT = NonNullable<SearchReservationUnitsQuery["reservationUnits"]>;
+type Edge = NonNullable<NonNullable<QueryT["edges"]>[0]>;
+type Node = NonNullable<Edge["node"]>;
 interface PropsT {
-  reservationUnit: ReservationUnitNode;
+  reservationUnit: Node;
 }
 
 const Container = styled.div`
@@ -222,7 +228,9 @@ const StatusTag = (ru: {
 };
 
 // TODO SSR version (and remove the use hook)
-function useConstrucLink(reservationUnit: ReservationUnitNode): string {
+function useConstrucLink(
+  reservationUnit: Pick<ReservationUnitNode, "pk">
+): string {
   const params = useSearchParams();
   const date = params.get("startDate");
   const time = params.get("timeBegin");
@@ -247,7 +255,7 @@ function useConstrucLink(reservationUnit: ReservationUnitNode): string {
   return link;
 }
 
-const ReservationUnitCard = ({ reservationUnit }: PropsT): JSX.Element => {
+function ReservationUnitCard({ reservationUnit }: PropsT): JSX.Element {
   const { t } = useTranslation();
   const name = getReservationUnitName(reservationUnit);
 
@@ -335,6 +343,6 @@ const ReservationUnitCard = ({ reservationUnit }: PropsT): JSX.Element => {
       </MainContent>
     </Container>
   );
-};
+}
 
 export default ReservationUnitCard;

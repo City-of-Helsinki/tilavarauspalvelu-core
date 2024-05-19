@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { useTranslation } from "next-i18next";
-import { NetworkStatus, useQuery } from "@apollo/client";
+import { NetworkStatus } from "@apollo/client";
 import type { GetServerSidePropsContext } from "next";
 import styled from "styled-components";
 import { useRouter } from "next/router";
@@ -10,15 +10,20 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { breakpoints } from "common/src/common/style";
 import { H2 } from "common/src/common/typography";
 import {
-  type Query,
-  type QueryReservationUnitsArgs,
-  type QueryUnitsArgs,
   ReservationKind,
+  useSearchReservationUnitsQuery,
+  OptionsDocument,
+  type OptionsQuery,
+  SearchReservationUnitsDocument,
+  type SearchReservationUnitsQueryVariables,
+  type SearchReservationUnitsQuery,
+  type SearchFormParamsUnitQuery,
+  type SearchFormParamsUnitQueryVariables,
+  SearchFormParamsUnitDocument,
 } from "@gql/gql-types";
 import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
 import { isBrowser } from "@/modules/const";
-import { SEARCH_RESERVATION_UNITS } from "@/modules/queries/reservationUnit";
 import { SingleSearchForm } from "@/components/search/SingleSearchForm";
 import Sorting from "@/components/form/Sorting";
 import ListWithPagination from "@/components/common/ListWithPagination";
@@ -28,8 +33,6 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import { processVariables } from "@/modules/search";
 import { useSearchValues } from "@/hooks/useSearchValues";
-import { OPTIONS_QUERY } from "@/hooks/useOptions";
-import { SEARCH_FORM_PARAMS_UNIT } from "@/modules/queries/params";
 import { getUnitName } from "@/modules/reservationUnit";
 import {
   convertLanguageCode,
@@ -77,15 +80,18 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     locale ?? "fi",
     ReservationKind.Direct
   );
-  const { data } = await apolloClient.query<Query, QueryReservationUnitsArgs>({
-    query: SEARCH_RESERVATION_UNITS,
+  const { data } = await apolloClient.query<
+    SearchReservationUnitsQuery,
+    SearchReservationUnitsQueryVariables
+  >({
+    query: SearchReservationUnitsDocument,
     fetchPolicy: "no-cache",
     variables,
   });
 
   // TODO this is copy pasta from search.tsx (combine into a single function)
-  const { data: optionsData } = await apolloClient.query<Query>({
-    query: OPTIONS_QUERY,
+  const { data: optionsData } = await apolloClient.query<OptionsQuery>({
+    query: OptionsDocument,
   });
   const reservationUnitTypes = filterNonNullable(
     optionsData?.reservationUnitTypes?.edges?.map((edge) => edge?.node)
@@ -110,8 +116,11 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     label: getTranslationSafe(n, "name", convertLanguageCode(locale ?? "")),
   }));
 
-  const { data: unitData } = await apolloClient.query<Query, QueryUnitsArgs>({
-    query: SEARCH_FORM_PARAMS_UNIT,
+  const { data: unitData } = await apolloClient.query<
+    SearchFormParamsUnitQuery,
+    SearchFormParamsUnitQueryVariables
+  >({
+    query: SearchFormParamsUnitDocument,
     variables: {
       publishedReservationUnits: true,
     },
@@ -177,10 +186,7 @@ function SearchSingle({
     ReservationKind.Direct
   );
   // TODO should really hydrate the ApolloClient from SSR
-  const { data, fetchMore, error, loading, networkStatus } = useQuery<
-    Query,
-    QueryReservationUnitsArgs
-  >(SEARCH_RESERVATION_UNITS, {
+  const query = useSearchReservationUnitsQuery({
     variables: vars,
     fetchPolicy: "network-only",
     // Why?
@@ -190,6 +196,7 @@ function SearchSingle({
       // eslint-disable-next-line no-console
       console.warn(error1, vars),
   });
+  const { data, loading, error, fetchMore, networkStatus } = query;
 
   const currData = data ?? initialData;
   const reservationUnits = filterNonNullable(

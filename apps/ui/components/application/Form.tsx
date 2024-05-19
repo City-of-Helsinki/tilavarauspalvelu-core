@@ -409,7 +409,7 @@ export const transformApplication = (
 
 export function convertApplication(
   app: Node,
-  reservationUnits: ReservationUnitNode[]
+  reservationUnits: Pick<ReservationUnitNode, "pk">[]
 ): ApplicationFormValues {
   const formAes = filterNonNullable(app?.applicationSections).map((ae) =>
     transformApplicationSectionToForm(ae)

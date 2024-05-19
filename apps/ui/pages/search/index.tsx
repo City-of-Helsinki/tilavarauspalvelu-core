@@ -5,38 +5,42 @@ import type { GetServerSidePropsContext } from "next";
 import { Notification } from "hds-react";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { NetworkStatus, useQuery } from "@apollo/client";
+import { NetworkStatus } from "@apollo/client";
 import { H2 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
   ApplicationRoundStatusChoice,
-  type Query,
-  type QueryApplicationRoundsArgs,
-  type QueryReservationUnitsArgs,
-  type QueryUnitsArgs,
   ReservationKind,
   ApplicationRoundOrderingChoices,
+  type SearchReservationUnitsQuery,
+  type SearchReservationUnitsQueryVariables,
+  SearchReservationUnitsDocument,
+  type ApplicationRoundsUiQuery,
+  type ApplicationRoundsUiQueryVariables,
+  ApplicationRoundsUiDocument,
+  useSearchReservationUnitsQuery,
+  type OptionsQuery,
+  OptionsDocument,
+  SearchFormParamsUnitDocument,
+  type SearchFormParamsUnitQueryVariables,
+  type SearchFormParamsUnitQuery,
 } from "@gql/gql-types";
 import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
 import { SeasonalSearchForm } from "@/components/search/SeasonalSearchForm";
 import { HeroSubheading } from "@/modules/style/typography";
-import { SEARCH_RESERVATION_UNITS } from "@/modules/queries/reservationUnit";
 import Sorting from "@/components/form/Sorting";
 import { createApolloClient } from "@/modules/apolloClient";
-import { APPLICATION_ROUNDS } from "@/modules/queries/applicationRound";
 import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
-import ReservationUnitCard from "@/components/search/ReservationUnitCard";
+import { ReservationUnitCard } from "@/components/search/ReservationUnitCard";
 import useReservationUnitsList from "@/hooks/useReservationUnitList";
 import ListWithPagination from "@/components/common/ListWithPagination";
 import StartApplicationBar from "@/components/common/StartApplicationBar";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { processVariables } from "@/modules/search";
 import { useSearchValues } from "@/hooks/useSearchValues";
-import { SEARCH_FORM_PARAMS_UNIT } from "@/modules/queries/params";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getUnitName } from "@/modules/reservationUnit";
-import { OPTIONS_QUERY } from "@/hooks/useOptions";
 import {
   convertLanguageCode,
   getTranslationSafe,
@@ -49,9 +53,12 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
-  const { data } = await apolloClient.query<Query, QueryApplicationRoundsArgs>({
+  const { data } = await apolloClient.query<
+    ApplicationRoundsUiQuery,
+    ApplicationRoundsUiQueryVariables
+  >({
     fetchPolicy: "no-cache",
-    query: APPLICATION_ROUNDS,
+    query: ApplicationRoundsUiDocument,
     variables: {
       orderBy: [ApplicationRoundOrderingChoices.PkAsc],
     },
@@ -62,17 +69,17 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   const values = query;
   const { data: searchData } = await apolloClient.query<
-    Query,
-    QueryReservationUnitsArgs
+    SearchReservationUnitsQuery,
+    SearchReservationUnitsQueryVariables
   >({
-    query: SEARCH_RESERVATION_UNITS,
+    query: SearchReservationUnitsDocument,
     fetchPolicy: "no-cache",
     variables: processVariables(values, locale ?? "fi", ReservationKind.Season),
   });
 
   // TODO this is copy pasta from search/single.tsx (combine into a single function)
-  const { data: optionsData } = await apolloClient.query<Query>({
-    query: OPTIONS_QUERY,
+  const { data: optionsData } = await apolloClient.query<OptionsQuery>({
+    query: OptionsDocument,
   });
   const reservationUnitTypes = filterNonNullable(
     optionsData?.reservationUnitTypes?.edges?.map((edge) => edge?.node)
@@ -90,8 +97,11 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     label: getTranslationSafe(n, "name", convertLanguageCode(locale ?? "")),
   }));
 
-  const { data: unitData } = await apolloClient.query<Query, QueryUnitsArgs>({
-    query: SEARCH_FORM_PARAMS_UNIT,
+  const { data: unitData } = await apolloClient.query<
+    SearchFormParamsUnitQuery,
+    SearchFormParamsUnitQueryVariables
+  >({
+    query: SearchFormParamsUnitDocument,
     variables: {
       publishedReservationUnits: true,
     },
@@ -193,7 +203,7 @@ function SeasonalSearch({
     error,
     loading: isLoading,
     networkStatus,
-  } = useQuery<Query, QueryReservationUnitsArgs>(SEARCH_RESERVATION_UNITS, {
+  } = useSearchReservationUnitsQuery({
     variables: processVariables(
       searchValues,
       i18n.language,

@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { IMAGE_FRAGMENT, LOCATION_FRAGMENT_I18N, TERMS_OF_USE_FRAGMENT } from "./fragments";
+import { IMAGE_FRAGMENT, TERMS_OF_USE_FRAGMENT } from "./fragments";
 
 export const APPLICANT_NAME_FRAGMENT = gql`
   fragment ApplicationNameFragment on ApplicationNode {

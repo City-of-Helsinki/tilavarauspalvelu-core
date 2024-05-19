@@ -32,7 +32,6 @@ const defaultProps: Props = {
   pageInfo: {
     endCursor: "endCursor",
     hasNextPage: true,
-    hasPreviousPage: false,
   },
   loadingMore: false,
 };
@@ -73,7 +72,7 @@ describe("ListWithPagination", () => {
       items: getItems(itemCount),
       totalCount: itemCount,
       className: "test-hooky-2",
-      pageInfo: { hasNextPage: false, hasPreviousPage: false },
+      pageInfo: { hasNextPage: false },
     });
 
     expect(document.querySelector(".test-hooky-2")).toBeInTheDocument();

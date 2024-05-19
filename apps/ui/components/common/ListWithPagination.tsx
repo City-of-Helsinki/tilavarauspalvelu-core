@@ -8,7 +8,7 @@ import type { PageInfo } from "@gql/gql-types";
 export type Props = {
   items: JSX.Element[];
   fetchMore: (arg: string) => void;
-  pageInfo?: PageInfo;
+  pageInfo?: Pick<PageInfo, "hasNextPage" | "endCursor">;
   totalCount?: number;
   loadingMore: boolean;
   sortingComponent?: React.ReactNode;

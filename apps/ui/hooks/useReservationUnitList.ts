@@ -1,59 +1,64 @@
 import { useSessionStorage } from "react-use";
-import type { ApplicationQuery, ReservationUnitNode } from "@gql/gql-types";
+import type { ReservationUnitNode } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 
+type NodeList = Pick<ReservationUnitNode, "pk">[];
+type Node = NonNullable<NodeList>[0];
 type ReservationUnitList = {
-  reservationUnits: ReservationUnitNode[];
-  selectReservationUnit: (ru: ReservationUnitNode) => void;
-  containsReservationUnit: (ru: ReservationUnitNode) => boolean;
-  removeReservationUnit: (ru: ReservationUnitNode) => void;
+  reservationUnits: Node[];
+  selectReservationUnit: (ru: Node) => void;
+  containsReservationUnit: (ru: Node) => boolean;
+  removeReservationUnit: (ru: Node) => void;
   clearSelections: () => void;
 };
 
-type Node = NonNullable<ApplicationQuery["application"]>;
-type AppRoundNode = NonNullable<Node["applicationRound"]>;
+type HookVars = {
+  reservationUnits?: NodeList;
+};
+
 /// @param round filter the reservation units by the application round
 /// Problem with this is that the current system is not based on around requiring an application round
 /// but the actual use case is, so have to do filtering case by case.
-const useReservationUnitsList = (round?: AppRoundNode): ReservationUnitList => {
-  const [reservationUnits, setReservationUnits] = useSessionStorage<
-    ReservationUnitNode[]
-  >("reservationUnitList", []);
+function useReservationUnitsList(
+  round: HookVars | undefined
+): ReservationUnitList {
+  const [list, setList] = useSessionStorage<NodeList>(
+    "reservationUnitList",
+    []
+  );
 
-  const selectReservationUnit = (reservationUnit: ReservationUnitNode) => {
-    setReservationUnits([...reservationUnits, reservationUnit]);
+  const selectReservationUnit = (ru: Node) => {
+    setList([...list, ru]);
   };
 
-  const removeReservationUnit = (reservationUnit: ReservationUnitNode) => {
-    if (!reservationUnits) {
+  const removeReservationUnit = (ru: Node) => {
+    if (!list) {
       return;
     }
-    setReservationUnits(
-      reservationUnits.filter((unit) => unit.pk !== reservationUnit.pk)
-    );
+    setList(list.filter((x) => x.pk !== ru.pk));
   };
 
   const clearSelections = () => {
-    setReservationUnits([]);
+    setList([]);
   };
 
-  const containsReservationUnit = (
-    reservationUnit: ReservationUnitNode
-  ): boolean =>
-    reservationUnits
-      ? reservationUnits.some((ru) => ru.pk === reservationUnit.pk)
-      : false;
+  const containsReservationUnit = (ru: Node): boolean => {
+    if (!list) {
+      return false;
+    }
+    return list.some((x) => x.pk === ru.pk);
+  };
 
   const getReservationUnits = () => {
     if (round) {
       const roundRuPks = filterNonNullable(
         round.reservationUnits?.map((ru) => ru.pk)
       );
-      return reservationUnits.filter(
+      return list.filter(
         (ru) => ru.pk != null && roundRuPks.find((x) => x === ru.pk) != null
       );
     }
-    return reservationUnits;
+    return list;
   };
 
   return {
@@ -63,6 +68,6 @@ const useReservationUnitsList = (round?: AppRoundNode): ReservationUnitList => {
     removeReservationUnit,
     reservationUnits: getReservationUnits(),
   };
-};
+}
 
 export default useReservationUnitsList;

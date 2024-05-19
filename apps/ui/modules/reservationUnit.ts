@@ -21,6 +21,7 @@ import {
 import { filterNonNullable } from "common/src/helpers";
 import { capitalize, getTranslation } from "./util";
 import { isReservationReservable } from "@/modules/reservation";
+import { type PricingFieldsFragment } from "common/gql/gql-types";
 
 export const getTimeString = (date = new Date()): string => {
   if (Number.isNaN(date.getTime())) {
@@ -149,9 +150,7 @@ export const getUnitName = (
   return unit.nameFi ?? "-";
 };
 
-export const getReservationUnitInstructionsKey = (
-  state: State
-): string | null => {
+export function getReservationUnitInstructionsKey(state: State): string | null {
   switch (state) {
     case State.Created:
     case State.RequiresHandling:
@@ -164,19 +163,14 @@ export const getReservationUnitInstructionsKey = (
     default:
       return null;
   }
-};
+}
 
-export const getActivePricing = (
-  reservationUnit: ReservationUnitNode
-): ReservationUnitPricingNode | undefined => {
+export function getActivePricing(reservationUnit: {
+  pricings: PricingFieldsFragment[];
+}): PricingFieldsFragment | undefined {
   const { pricings } = reservationUnit;
-
-  if (!pricings || pricings.length === 0) {
-    return undefined;
-  }
-
-  return pricings.find((pricing) => pricing?.status === "ACTIVE") ?? undefined;
-};
+  return pricings.find((pricing) => pricing?.status === "ACTIVE");
+}
 
 export const getFuturePricing = (
   reservationUnit: ReservationUnitNode,
@@ -243,7 +237,7 @@ function formatPrice(
 }
 
 type GetPriceType = {
-  pricing: ReservationUnitPricingNode;
+  pricing: PricingFieldsFragment;
   minutes?: number; // additional minutes for total price calculation
   trailingZeros?: boolean;
   asNumeral?: boolean; // return a string of numbers ("0" instead of e.g. "free" when the price is 0)
@@ -297,7 +291,7 @@ export const getReservationUnitPrice = (
     return undefined;
   }
 
-  const pricing: ReservationUnitPricingNode | undefined = pricingDate
+  const pricing = pricingDate
     ? getFuturePricing(ru, [], pricingDate) || getActivePricing(ru)
     : getActivePricing(ru);
 

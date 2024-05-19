@@ -11,7 +11,7 @@ import NextImage from "next/image";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { H5, fontMedium } from "common/src/common/typography";
-import type { ReservationUnitNode } from "@gql/gql-types";
+import type { ReservationUnitCardFieldsFragment } from "@gql/gql-types";
 import { getMainImage, getTranslation } from "@/modules/util";
 import IconWithText from "@/components/common/IconWithText";
 import { truncatedText } from "@/styles/util";
@@ -19,11 +19,12 @@ import { reservationUnitPrefix } from "@/modules/const";
 import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
 import { getImageSource } from "common/src/helpers";
 
+type Node = ReservationUnitCardFieldsFragment;
 interface IProps {
-  reservationUnit: ReservationUnitNode;
-  selectReservationUnit: (reservationUnit: ReservationUnitNode) => void;
-  containsReservationUnit: (reservationUnit: ReservationUnitNode) => boolean;
-  removeReservationUnit: (reservationUnit: ReservationUnitNode) => void;
+  reservationUnit: Node;
+  selectReservationUnit: (reservationUnit: Node) => void;
+  containsReservationUnit: (reservationUnit: Node) => boolean;
+  removeReservationUnit: (reservationUnit: Node) => void;
 }
 
 const Container = styled.div`
@@ -147,12 +148,12 @@ const StyledButton = styled(Button).attrs({ size: "small" })`
   }
 `;
 
-const ReservationUnitCard = ({
+export function ReservationUnitCard({
   reservationUnit,
   selectReservationUnit,
   containsReservationUnit,
   removeReservationUnit,
-}: IProps): JSX.Element => {
+}: IProps): JSX.Element {
   const { t, i18n } = useTranslation();
 
   const name = getReservationUnitName(reservationUnit);
@@ -242,6 +243,4 @@ const ReservationUnitCard = ({
       </MainContent>
     </Container>
   );
-};
-
-export default ReservationUnitCard;
+}
