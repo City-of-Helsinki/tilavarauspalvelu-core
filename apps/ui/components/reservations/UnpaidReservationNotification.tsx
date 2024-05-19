@@ -4,22 +4,24 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import {
-  type ReservationNode,
   State,
   ReservationOrderingChoices,
+  useListReservationsQuery,
+  type ListReservationsQuery,
 } from "@gql/gql-types";
 import NotificationWrapper from "common/src/components/NotificationWrapper";
 import { useCurrentUser } from "@/hooks/user";
 import { BlackButton, Toast } from "@/styles/util";
-import {
-  useReservations,
-  useOrder,
-  useDeleteReservation,
-} from "@/hooks/reservation";
+import { useOrder, useDeleteReservation } from "@/hooks/reservation";
 import { getCheckoutUrl } from "@/modules/reservation";
 import { filterNonNullable } from "common/src/helpers";
 import { reservationUnitPrefix } from "@/modules/const";
 import { ApolloError } from "@apollo/client";
+import { toApiDate } from "common/src/common/util";
+
+type QueryT = NonNullable<ListReservationsQuery["reservations"]>;
+type EdgeT = NonNullable<QueryT["edges"][number]>;
+type NodeT = NonNullable<EdgeT["node"]>;
 
 const NotificationContent = styled.div`
   display: flex;
@@ -72,7 +74,7 @@ function ReservationNotification({
 }: {
   onDelete: () => void;
   onNext: () => void;
-  reservation: ReservationNode;
+  reservation: NodeT;
   disabled?: boolean;
   isLoading?: boolean;
 }) {
@@ -155,11 +157,20 @@ function ReservationNotification({
 export function InProgressReservationNotification() {
   const { t, i18n } = useTranslation();
   const { currentUser } = useCurrentUser();
-  const { reservations } = useReservations({
-    currentUser,
-    states: [State.WaitingForPayment, State.Created],
-    orderBy: ReservationOrderingChoices.PkDesc,
+  const { data } = useListReservationsQuery({
+    skip: !currentUser?.pk,
+    variables: {
+      state: [State.WaitingForPayment, State.Created],
+      orderBy: ReservationOrderingChoices.PkDesc,
+      user: currentUser?.pk?.toString() ?? "",
+      beginDate: toApiDate(new Date()),
+    },
+    fetchPolicy: "no-cache",
   });
+
+  const reservations = filterNonNullable(
+    data?.reservations?.edges.map((e) => e?.node)
+  );
 
   // Hide on some routes
   // We want to filter these two routes for
@@ -211,7 +222,7 @@ export function InProgressReservationNotification() {
   // NOTE don't need to invalidate the cache on reservations list page because Created is not shown on it.
   // how about WaitingForPayment?
   // it would still be proper to invalidate the cache so if there is such a page, it would show the correct data.
-  const handleDelete = async (reservation?: ReservationNode) => {
+  const handleDelete = async (reservation?: NodeT) => {
     // If we are on the page for the reservation we are deleting, we should redirect to the front page.
     // The funnel page: reservation-unit/:pk/reservation/:pk should not show this notification at all.
 
@@ -261,7 +272,7 @@ export function InProgressReservationNotification() {
     }
   };
 
-  const handleContinue = (reservation?: ReservationNode) => {
+  const handleContinue = (reservation?: NodeT) => {
     // TODO add an url builder for this
     // - reuse the url builder in [...params].tsx
     const reservationUnit = reservation?.reservationUnit?.find(() => true);

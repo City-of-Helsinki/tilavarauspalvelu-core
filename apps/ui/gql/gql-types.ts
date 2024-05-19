@@ -139,6 +139,7 @@ export type AllocatedTimeSlotNode = Node & {
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   pk?: Maybe<Scalars["Int"]["output"]>;
+  recurringReservation?: Maybe<RecurringReservationNode>;
   reservationUnitOption: ReservationUnitOptionNode;
 };
 
@@ -296,6 +297,7 @@ export type ApplicationNodeApplicationSectionsArgs = {
   application?: InputMaybe<Scalars["Int"]["input"]>;
   applicationRound?: InputMaybe<Scalars["Int"]["input"]>;
   applicationStatus?: InputMaybe<Array<InputMaybe<ApplicationStatusChoice>>>;
+  hasAllocations?: InputMaybe<Scalars["Boolean"]["input"]>;
   homeCity?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   includePreferredOrder10OrHigher?: InputMaybe<Scalars["Boolean"]["input"]>;
   name?: InputMaybe<Scalars["String"]["input"]>;
@@ -609,12 +611,16 @@ export type ApplicationSectionNodeEdge = {
 
 /** Ordering fields for the 'ApplicationSection' model. */
 export enum ApplicationSectionOrderingChoices {
+  AllocationsAsc = "allocationsAsc",
+  AllocationsDesc = "allocationsDesc",
   ApplicantAsc = "applicantAsc",
   ApplicantDesc = "applicantDesc",
   ApplicationPkAsc = "applicationPkAsc",
   ApplicationPkDesc = "applicationPkDesc",
   ApplicationStatusAsc = "applicationStatusAsc",
   ApplicationStatusDesc = "applicationStatusDesc",
+  HasAllocationsAsc = "hasAllocationsAsc",
+  HasAllocationsDesc = "hasAllocationsDesc",
   NameAsc = "nameAsc",
   NameDesc = "nameDesc",
   PkAsc = "pkAsc",
@@ -923,59 +929,6 @@ export enum CustomerTypeChoice {
   Individual = "INDIVIDUAL",
   Nonprofit = "NONPROFIT",
 }
-
-/** Debugging information for the current query. */
-export type DjangoDebug = {
-  __typename?: "DjangoDebug";
-  /** Raise exceptions for this API query. */
-  exceptions?: Maybe<Array<Maybe<DjangoDebugException>>>;
-  /** Executed SQL queries for this API query. */
-  sql?: Maybe<Array<Maybe<DjangoDebugSql>>>;
-};
-
-/** Represents a single exception raised. */
-export type DjangoDebugException = {
-  __typename?: "DjangoDebugException";
-  /** The class of the exception */
-  excType: Scalars["String"]["output"];
-  /** The message of the exception */
-  message: Scalars["String"]["output"];
-  /** The stack trace */
-  stack: Scalars["String"]["output"];
-};
-
-/** Represents a single database query made to a Django managed DB. */
-export type DjangoDebugSql = {
-  __typename?: "DjangoDebugSQL";
-  /** The Django database alias (e.g. 'default'). */
-  alias: Scalars["String"]["output"];
-  /** Duration of this database query in seconds. */
-  duration: Scalars["Float"]["output"];
-  /** Postgres connection encoding if available. */
-  encoding?: Maybe<Scalars["String"]["output"]>;
-  /** Whether this database query was a SELECT. */
-  isSelect: Scalars["Boolean"]["output"];
-  /** Whether this database query took more than 10 seconds. */
-  isSlow: Scalars["Boolean"]["output"];
-  /** Postgres isolation level if available. */
-  isoLevel?: Maybe<Scalars["String"]["output"]>;
-  /** JSON encoded database query parameters. */
-  params: Scalars["String"]["output"];
-  /** The raw SQL of this query, without params. */
-  rawSql: Scalars["String"]["output"];
-  /** The actual SQL sent to this database. */
-  sql?: Maybe<Scalars["String"]["output"]>;
-  /** Start time of this database query. */
-  startTime: Scalars["Float"]["output"];
-  /** Stop time of this database query. */
-  stopTime: Scalars["Float"]["output"];
-  /** Postgres transaction ID if available. */
-  transId?: Maybe<Scalars["String"]["output"]>;
-  /** Postgres transaction status if available. */
-  transStatus?: Maybe<Scalars["String"]["output"]>;
-  /** The type of database being used (e.g. postrgesql, mysql, sqlite). */
-  vendor: Scalars["String"]["output"];
-};
 
 export type EquipmentCategoryCreateMutationInput = {
   name: Scalars["String"]["input"];
@@ -1393,6 +1346,7 @@ export type Mutation = {
   createPurpose?: Maybe<PurposeCreateMutationPayload>;
   createRecurringReservation?: Maybe<RecurringReservationCreateMutationPayload>;
   createReservation?: Maybe<ReservationCreateMutationPayload>;
+  createReservationSeries?: Maybe<ReservationSeriesCreateMutationPayload>;
   createReservationUnit?: Maybe<ReservationUnitCreateMutationPayload>;
   createReservationUnitImage?: Maybe<ReservationUnitImageCreateMutationPayload>;
   createResource?: Maybe<ResourceCreateMutationPayload>;
@@ -1416,6 +1370,7 @@ export type Mutation = {
   restoreAllApplicationOptions?: Maybe<RestoreAllApplicationOptionsMutationPayload>;
   restoreAllSectionOptions?: Maybe<RestoreAllSectionOptionsMutationPayload>;
   sendApplication?: Maybe<ApplicationSendMutationPayload>;
+  setApplicationRoundHandled?: Maybe<SetApplicationRoundHandledMutationPayload>;
   staffAdjustReservationTime?: Maybe<ReservationStaffAdjustTimeMutationPayload>;
   staffReservationModify?: Maybe<ReservationStaffModifyMutationPayload>;
   updateApplication?: Maybe<ApplicationUpdateMutationPayload>;
@@ -1490,6 +1445,10 @@ export type MutationCreateRecurringReservationArgs = {
 
 export type MutationCreateReservationArgs = {
   input: ReservationCreateMutationInput;
+};
+
+export type MutationCreateReservationSeriesArgs = {
+  input: ReservationSeriesCreateMutationInput;
 };
 
 export type MutationCreateReservationUnitArgs = {
@@ -1582,6 +1541,10 @@ export type MutationRestoreAllSectionOptionsArgs = {
 
 export type MutationSendApplicationArgs = {
   input: ApplicationSendMutationInput;
+};
+
+export type MutationSetApplicationRoundHandledArgs = {
+  input: SetApplicationRoundHandledMutationInput;
 };
 
 export type MutationStaffAdjustReservationTimeArgs = {
@@ -1949,7 +1912,6 @@ export enum QualifierOrderingChoices {
 
 export type Query = {
   __typename?: "Query";
-  _debug?: Maybe<DjangoDebug>;
   /** Return all allocations that affect allocations for given reservation unit (through space hierarchy or common resource) during the given time period. */
   affectingAllocatedTimeSlots?: Maybe<Array<AllocatedTimeSlotNode>>;
   /** Find all reservations that affect other reservations through the space hierarchy or a common resource. */
@@ -2080,6 +2042,7 @@ export type QueryApplicationRoundsArgs = {
   last?: InputMaybe<Scalars["Int"]["input"]>;
   name?: InputMaybe<Scalars["String"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
+  onlyWithPermissions?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<ApplicationRoundOrderingChoices>>>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
 };
@@ -2093,6 +2056,7 @@ export type QueryApplicationSectionsArgs = {
   applicationStatus?: InputMaybe<Array<InputMaybe<ApplicationStatusChoice>>>;
   before?: InputMaybe<Scalars["String"]["input"]>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
+  hasAllocations?: InputMaybe<Scalars["Boolean"]["input"]>;
   homeCity?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   includePreferredOrder10OrHigher?: InputMaybe<Scalars["Boolean"]["input"]>;
   last?: InputMaybe<Scalars["Int"]["input"]>;
@@ -2578,17 +2542,16 @@ export type QueryUserArgs = {
 export type RecurringReservationCreateMutationInput = {
   abilityGroup?: InputMaybe<Scalars["Int"]["input"]>;
   ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
-  beginDate?: InputMaybe<Scalars["Date"]["input"]>;
-  beginTime?: InputMaybe<Scalars["Time"]["input"]>;
+  beginDate: Scalars["Date"]["input"];
+  beginTime: Scalars["Time"]["input"];
   description?: InputMaybe<Scalars["String"]["input"]>;
-  endDate?: InputMaybe<Scalars["Date"]["input"]>;
-  endTime?: InputMaybe<Scalars["Time"]["input"]>;
+  endDate: Scalars["Date"]["input"];
+  endTime: Scalars["Time"]["input"];
   name?: InputMaybe<Scalars["String"]["input"]>;
   pk?: InputMaybe<Scalars["Int"]["input"]>;
-  recurrenceInDays?: InputMaybe<Scalars["Int"]["input"]>;
+  recurrenceInDays: Scalars["Int"]["input"];
   reservationUnit: Scalars["Int"]["input"];
-  user?: InputMaybe<Scalars["Int"]["input"]>;
-  weekdays?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  weekdays: Array<InputMaybe<Scalars["Int"]["input"]>>;
 };
 
 export type RecurringReservationCreateMutationPayload = {
@@ -2604,7 +2567,6 @@ export type RecurringReservationCreateMutationPayload = {
   pk?: Maybe<Scalars["Int"]["output"]>;
   recurrenceInDays?: Maybe<Scalars["Int"]["output"]>;
   reservationUnit?: Maybe<Scalars["Int"]["output"]>;
-  user?: Maybe<Scalars["Int"]["output"]>;
   weekdays?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
 };
 
@@ -2715,7 +2677,6 @@ export type RecurringReservationUpdateMutationInput = {
   pk: Scalars["Int"]["input"];
   recurrenceInDays?: InputMaybe<Scalars["Int"]["input"]>;
   reservationUnit?: InputMaybe<Scalars["Int"]["input"]>;
-  user?: InputMaybe<Scalars["Int"]["input"]>;
   weekdays?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
@@ -2732,7 +2693,6 @@ export type RecurringReservationUpdateMutationPayload = {
   pk?: Maybe<Scalars["Int"]["output"]>;
   recurrenceInDays?: Maybe<Scalars["Int"]["output"]>;
   reservationUnit?: Maybe<Scalars["Int"]["output"]>;
-  user?: Maybe<Scalars["Int"]["output"]>;
   weekdays?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
 };
 
@@ -3317,6 +3277,77 @@ export type ReservationRequiresHandlingMutationPayload = {
   state?: Maybe<State>;
 };
 
+export type ReservationSeriesCreateMutationInput = {
+  abilityGroup?: InputMaybe<Scalars["Int"]["input"]>;
+  ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
+  beginDate: Scalars["Date"]["input"];
+  beginTime: Scalars["Time"]["input"];
+  checkOpeningHours?: InputMaybe<Scalars["Boolean"]["input"]>;
+  description?: InputMaybe<Scalars["String"]["input"]>;
+  endDate: Scalars["Date"]["input"];
+  endTime: Scalars["Time"]["input"];
+  name?: InputMaybe<Scalars["String"]["input"]>;
+  pk?: InputMaybe<Scalars["Int"]["input"]>;
+  recurrenceInDays: Scalars["Int"]["input"];
+  reservationDetails: ReservationSeriesReservationSerializerInput;
+  reservationUnit: Scalars["Int"]["input"];
+  skipDates?: InputMaybe<Array<InputMaybe<Scalars["Date"]["input"]>>>;
+  weekdays: Array<InputMaybe<Scalars["Int"]["input"]>>;
+};
+
+export type ReservationSeriesCreateMutationPayload = {
+  __typename?: "ReservationSeriesCreateMutationPayload";
+  abilityGroup?: Maybe<Scalars["Int"]["output"]>;
+  ageGroup?: Maybe<Scalars["Int"]["output"]>;
+  beginDate?: Maybe<Scalars["Date"]["output"]>;
+  beginTime?: Maybe<Scalars["Time"]["output"]>;
+  description?: Maybe<Scalars["String"]["output"]>;
+  endDate?: Maybe<Scalars["Date"]["output"]>;
+  endTime?: Maybe<Scalars["Time"]["output"]>;
+  name?: Maybe<Scalars["String"]["output"]>;
+  pk?: Maybe<Scalars["Int"]["output"]>;
+  recurrenceInDays?: Maybe<Scalars["Int"]["output"]>;
+  reservationUnit?: Maybe<Scalars["Int"]["output"]>;
+  weekdays?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
+};
+
+export type ReservationSeriesReservationSerializerInput = {
+  applyingForFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
+  billingAddressCity?: InputMaybe<Scalars["String"]["input"]>;
+  billingAddressStreet?: InputMaybe<Scalars["String"]["input"]>;
+  billingAddressZip?: InputMaybe<Scalars["String"]["input"]>;
+  billingEmail?: InputMaybe<Scalars["String"]["input"]>;
+  billingFirstName?: InputMaybe<Scalars["String"]["input"]>;
+  billingLastName?: InputMaybe<Scalars["String"]["input"]>;
+  billingPhone?: InputMaybe<Scalars["String"]["input"]>;
+  bufferTimeAfter?: InputMaybe<Scalars["Duration"]["input"]>;
+  bufferTimeBefore?: InputMaybe<Scalars["Duration"]["input"]>;
+  confirmedAt?: InputMaybe<Scalars["DateTime"]["input"]>;
+  description?: InputMaybe<Scalars["String"]["input"]>;
+  freeOfChargeReason?: InputMaybe<Scalars["String"]["input"]>;
+  handledAt?: InputMaybe<Scalars["DateTime"]["input"]>;
+  homeCity?: InputMaybe<Scalars["Int"]["input"]>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
+  numPersons?: InputMaybe<Scalars["Int"]["input"]>;
+  purpose?: InputMaybe<Scalars["Int"]["input"]>;
+  reserveeAddressCity?: InputMaybe<Scalars["String"]["input"]>;
+  reserveeAddressStreet?: InputMaybe<Scalars["String"]["input"]>;
+  reserveeAddressZip?: InputMaybe<Scalars["String"]["input"]>;
+  reserveeEmail?: InputMaybe<Scalars["String"]["input"]>;
+  reserveeFirstName?: InputMaybe<Scalars["String"]["input"]>;
+  reserveeId?: InputMaybe<Scalars["String"]["input"]>;
+  reserveeIsUnregisteredAssociation?: InputMaybe<Scalars["Boolean"]["input"]>;
+  reserveeLanguage?: InputMaybe<ReserveeLanguage>;
+  reserveeLastName?: InputMaybe<Scalars["String"]["input"]>;
+  reserveeOrganisationName?: InputMaybe<Scalars["String"]["input"]>;
+  reserveePhone?: InputMaybe<Scalars["String"]["input"]>;
+  reserveeType?: InputMaybe<ReserveeType>;
+  state?: InputMaybe<State>;
+  type: Type;
+  user: Scalars["Int"]["input"];
+  workingMemo?: InputMaybe<Scalars["String"]["input"]>;
+};
+
 export type ReservationStaffAdjustTimeMutationInput = {
   begin?: InputMaybe<Scalars["DateTime"]["input"]>;
   /** Can be a number of seconds or timespan in format HH:MM:SS. Null/undefined value means buffer from reservation unit is used. */
@@ -3547,6 +3578,7 @@ export enum ReservationTypeChoice {
   Behalf = "BEHALF",
   Blocked = "BLOCKED",
   Normal = "NORMAL",
+  Seasonal = "SEASONAL",
   Staff = "STAFF",
 }
 
@@ -3887,6 +3919,7 @@ export type ReservationUnitNode = Node & {
 export type ReservationUnitNodeApplicationRoundsArgs = {
   active?: InputMaybe<Scalars["Boolean"]["input"]>;
   name?: InputMaybe<Scalars["String"]["input"]>;
+  onlyWithPermissions?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<ApplicationRoundOrderingChoices>>>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
 };
@@ -4446,6 +4479,27 @@ export type ReservationWorkingMemoMutationPayload = {
   workingMemo?: Maybe<Scalars["String"]["output"]>;
 };
 
+/** An enumeration. */
+export enum ReserveeLanguage {
+  A = "A_",
+  /** Englanti */
+  En = "EN",
+  /** Suomi */
+  Fi = "FI",
+  /** Ruotsi */
+  Sv = "SV",
+}
+
+/** An enumeration. */
+export enum ReserveeType {
+  /** Yritys */
+  Business = "BUSINESS",
+  /** Yksittäinen */
+  Individual = "INDIVIDUAL",
+  /** Yhdistys */
+  Nonprofit = "NONPROFIT",
+}
+
 export type ResourceCreateMutationInput = {
   bufferTimeAfter?: InputMaybe<Scalars["Duration"]["input"]>;
   bufferTimeBefore?: InputMaybe<Scalars["Duration"]["input"]>;
@@ -4668,6 +4722,15 @@ export enum ServiceType {
   /** Perehdytys */
   Introduction = "INTRODUCTION",
 }
+
+export type SetApplicationRoundHandledMutationInput = {
+  pk: Scalars["Int"]["input"];
+};
+
+export type SetApplicationRoundHandledMutationPayload = {
+  __typename?: "SetApplicationRoundHandledMutationPayload";
+  pk?: Maybe<Scalars["Int"]["output"]>;
+};
 
 export type SpaceCreateMutationInput = {
   building?: InputMaybe<Scalars["Int"]["input"]>;
@@ -4970,6 +5033,16 @@ export type TimeSlotType = {
   begin: Scalars["Time"]["output"];
   end: Scalars["Time"]["output"];
 };
+
+/** An enumeration. */
+export enum Type {
+  /** behalf */
+  Behalf = "BEHALF",
+  /** blocked */
+  Blocked = "BLOCKED",
+  /** staff */
+  Staff = "STAFF",
+}
 
 export type UnitGroupNode = Node & {
   __typename?: "UnitGroupNode";
@@ -5987,6 +6060,8 @@ export type ListReservationsQuery = {
           __typename?: "PaymentOrderNode";
           id: string;
           orderUuid?: string | null;
+          expiresInMinutes?: number | null;
+          status?: OrderStatus | null;
         } | null;
         reservationUnit?: Array<{
           __typename?: "ReservationUnitNode";
@@ -6048,6 +6123,7 @@ export type ReservationInfoFragmentFragment = {
   numPersons?: number | null;
   purpose?: {
     __typename?: "ReservationPurposeNode";
+    id: string;
     pk?: number | null;
     nameFi?: string | null;
     nameEn?: string | null;
@@ -6055,12 +6131,14 @@ export type ReservationInfoFragmentFragment = {
   } | null;
   ageGroup?: {
     __typename?: "AgeGroupNode";
+    id: string;
     pk?: number | null;
     minimum: number;
     maximum?: number | null;
   } | null;
   homeCity?: {
     __typename?: "CityNode";
+    id: string;
     pk?: number | null;
     name: string;
   } | null;
@@ -6077,6 +6155,7 @@ export type ReservationQuery = {
     id: string;
     pk?: number | null;
     name?: string | null;
+    applyingForFreeOfCharge?: boolean | null;
     bufferTimeBefore: number;
     bufferTimeAfter: number;
     begin: string;
@@ -6094,6 +6173,17 @@ export type ReservationQuery = {
     reserveeType?: CustomerTypeChoice | null;
     reserveeOrganisationName?: string | null;
     reserveeId?: string | null;
+    reserveeIsUnregisteredAssociation?: boolean | null;
+    reserveeAddressStreet?: string | null;
+    reserveeAddressCity?: string | null;
+    reserveeAddressZip?: string | null;
+    billingFirstName?: string | null;
+    billingLastName?: string | null;
+    billingPhone?: string | null;
+    billingEmail?: string | null;
+    billingAddressStreet?: string | null;
+    billingAddressCity?: string | null;
+    billingAddressZip?: string | null;
     description?: string | null;
     numPersons?: number | null;
     user?: {
@@ -6220,6 +6310,7 @@ export type ReservationQuery = {
     }> | null;
     purpose?: {
       __typename?: "ReservationPurposeNode";
+      id: string;
       pk?: number | null;
       nameFi?: string | null;
       nameEn?: string | null;
@@ -6227,12 +6318,14 @@ export type ReservationQuery = {
     } | null;
     ageGroup?: {
       __typename?: "AgeGroupNode";
+      id: string;
       pk?: number | null;
       minimum: number;
       maximum?: number | null;
     } | null;
     homeCity?: {
       __typename?: "CityNode";
+      id: string;
       pk?: number | null;
       name: string;
     } | null;
@@ -8205,17 +8298,20 @@ export const ReservationInfoFragmentFragmentDoc = gql`
   fragment ReservationInfoFragment on ReservationNode {
     description
     purpose {
+      id
       pk
       nameFi
       nameEn
       nameSv
     }
     ageGroup {
+      id
       pk
       minimum
       maximum
     }
     homeCity {
+      id
       pk
       name
     }
@@ -9824,6 +9920,8 @@ export const ListReservationsDocument = gql`
           order {
             id
             orderUuid
+            expiresInMinutes
+            status
           }
           isBlocked
           reservationUnit {
@@ -9934,6 +10032,8 @@ export const ReservationDocument = gql`
       pk
       name
       ...ReserveeNameFields
+      ...ReserveeBillingFields
+      applyingForFreeOfCharge
       bufferTimeBefore
       bufferTimeAfter
       begin
@@ -9963,6 +10063,7 @@ export const ReservationDocument = gql`
     }
   }
   ${ReserveeNameFieldsFragmentDoc}
+  ${ReserveeBillingFieldsFragmentDoc}
   ${ReservationUnitFieldsFragmentDoc}
   ${CancellationRuleFieldsFragmentDoc}
   ${ReservationInfoFragmentFragmentDoc}

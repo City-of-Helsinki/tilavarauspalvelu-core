@@ -7,6 +7,7 @@ import {
   type ReservationUnitNode,
   type ReservationNode,
   type TermsOfUseNode,
+  type ReservationQuery,
 } from "@gql/gql-types";
 import TermsBox from "common/src/termsbox/TermsBox";
 import {
@@ -33,8 +34,9 @@ type OptionType = {
 };
 type OptionsRecord = Record<"purpose" | "ageGroup" | "homeCity", OptionType[]>;
 
+type NodeT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
-  reservation: ReservationNode;
+  reservation: NodeT;
   reservationUnit: ReservationUnitNode;
   handleSubmit: () => void;
   generalFields: string[];
@@ -87,7 +89,8 @@ const scrollToBox = (id: string): void => {
 /// TODO this is pretty awful (dynamic type checking) but requires refactoring metafields more
 function convertMaybeOptionValue(
   key: keyof ReservationNode,
-  reservation: ReservationNode,
+  // TODO use proper fieldNames (string literals or enums), the Record is a hack around required fields
+  reservation: Record<string, unknown>,
   options: OptionsRecord,
   t: TFunction
 ): string {
@@ -133,7 +136,8 @@ function convertMaybeOptionValue(
 
 function isNotEmpty(
   key: keyof ReservationNode,
-  reservation: ReservationNode
+  // TODO use proper fieldNames (string literals or enums), the Record is a hack around required fields
+  reservation: Record<string, unknown>
 ): boolean {
   const rawValue = reservation[key];
   if (

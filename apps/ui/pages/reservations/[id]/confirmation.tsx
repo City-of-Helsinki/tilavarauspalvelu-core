@@ -1,6 +1,5 @@
 import React from "react";
-import { useQuery } from "@apollo/client";
-import type { Query, QueryReservationArgs } from "@gql/gql-types";
+import { useReservationQuery } from "@gql/gql-types";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { breakpoints, Container } from "common";
@@ -9,7 +8,6 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import type { GetServerSidePropsContext } from "next";
 import ReservationInfoCard from "@/components/reservation/ReservationInfoCard";
 import ReservationConfirmation from "@/components/reservation/ReservationConfirmation";
-import { GET_RESERVATION } from "@/modules/queries/reservation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { base64encode } from "common/src/helpers";
 import { CenterSpinner } from "@/components/common/common";
@@ -53,7 +51,7 @@ function Confirmation({ apiBaseUrl }: Props) {
     data,
     loading: isLoading,
     error,
-  } = useQuery<Query, QueryReservationArgs>(GET_RESERVATION, {
+  } = useReservationQuery({
     variables: { id },
     skip: !pk || Number.isNaN(Number(pk)),
     onError: () => {},

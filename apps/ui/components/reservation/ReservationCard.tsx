@@ -6,7 +6,7 @@ import styled from "styled-components";
 import { getReservationPrice } from "common";
 import { trim } from "lodash";
 import { breakpoints } from "common/src/common/style";
-import { type ReservationNode, State } from "@gql/gql-types";
+import { State, type ListReservationsQuery } from "@gql/gql-types";
 import {
   capitalize,
   getMainImage,
@@ -30,11 +30,6 @@ import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import { getImageSource } from "common/src/helpers";
 
 type CardType = "upcoming" | "past" | "cancelled";
-
-interface PropsT {
-  reservation: ReservationNode;
-  type?: CardType;
-}
 
 const Container = styled.div`
   display: block;
@@ -149,7 +144,16 @@ const Image = styled.img`
   }
 `;
 
-const ReservationCard = ({ reservation, type }: PropsT): JSX.Element => {
+// TODO use a fragment
+type QueryT = NonNullable<ListReservationsQuery["reservations"]>;
+type EdgeT = NonNullable<QueryT["edges"][0]>;
+type NodeT = NonNullable<EdgeT["node"]>;
+interface PropsT {
+  reservation: NodeT;
+  type?: CardType;
+}
+
+function ReservationCard({ reservation, type }: PropsT): JSX.Element {
   const { t, i18n } = useTranslation();
 
   const reservationUnit = reservation.reservationUnit?.[0] ?? undefined;
@@ -292,6 +296,6 @@ const ReservationCard = ({ reservation, type }: PropsT): JSX.Element => {
       </MainContent>
     </Container>
   );
-};
+}
 
 export default ReservationCard;

@@ -9,6 +9,8 @@ import {
   type ReservationMetadataFieldNode,
   type Maybe,
   type ReservationUnitPageQuery,
+  type PaymentOrderNode,
+  type ListReservationsQuery,
 } from "@gql/gql-types";
 import {
   type RoundPeriod,
@@ -97,9 +99,12 @@ export const isReservationInThePast = (
   return !isAfter(new Date(reservation.begin).setSeconds(0, 0), now);
 };
 
-const isReservationWithinCancellationPeriod = (
-  reservation: ReservationNode
-): boolean => {
+type ReservationQueryT = NonNullable<ListReservationsQuery["reservations"]>;
+type ReservationEdgeT = NonNullable<ReservationQueryT["edges"]>[0];
+type ReservationNodeT = NonNullable<ReservationEdgeT>["node"];
+function isReservationWithinCancellationPeriod(
+  reservation: NonNullable<ReservationNodeT>
+): boolean {
   const reservationUnit = reservation.reservationUnit?.[0];
   const begin = new Date(reservation.begin);
 
@@ -108,12 +113,12 @@ const isReservationWithinCancellationPeriod = (
   const cancelLatest = addSeconds(new Date(), minutesBeforeCancel);
 
   return cancelLatest > begin;
-};
+}
 
-export const canUserCancelReservation = (
-  reservation: ReservationNode,
+export function canUserCancelReservation(
+  reservation: NonNullable<ReservationNodeT>,
   skipTimeCheck = false
-): boolean => {
+): boolean {
   const reservationUnit = reservation.reservationUnit?.[0];
   if (reservation.state !== State.Confirmed) return false;
   if (!reservationUnit?.cancellationRule) return false;
@@ -122,7 +127,7 @@ export const canUserCancelReservation = (
     return false;
 
   return true;
-};
+}
 
 export const getReservationApplicationMutationValues = (
   // TODO don't use Records to avoid proper typing
@@ -192,33 +197,36 @@ export const getReservationCancellationReason = (
   return null;
 };
 
-export const getNormalizedReservationOrderStatus = (
-  reservation: ReservationNode
-): string | null => {
+function shouldShowOrderStatus(state: State) {
+  if (
+    state === State.Created ||
+    state === State.WaitingForPayment ||
+    state === State.RequiresHandling
+  ) {
+    return false;
+  }
+  return true;
+}
+
+export function getNormalizedReservationOrderStatus(
+  reservation: Pick<ReservationNode, "state"> & {
+    order?: Pick<PaymentOrderNode, "status"> | null | undefined;
+  }
+): string | null {
   if (!reservation) {
     return null;
   }
-
-  const shouldShowOrderStatus = (state: State) => {
-    if (
-      state === State.Created ||
-      state === State.WaitingForPayment ||
-      state === State.RequiresHandling
-    ) {
-      return false;
-    }
-    return true;
-  };
 
   if (shouldShowOrderStatus(reservation.state)) {
     return reservation.order?.status ?? null;
   }
 
   return null;
-};
-type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
+}
+
+type NodeT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
 type ReservationUnitReservableProps = {
-  reservationUnit: QueryT;
+  reservationUnit: NodeT;
   activeApplicationRounds: RoundPeriod[];
   start: Date;
   end: Date;

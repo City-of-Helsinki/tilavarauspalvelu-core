@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useQuery } from "@apollo/client";
 import { Tabs, TabList, Tab, TabPanel } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
@@ -9,16 +8,14 @@ import { useRouter } from "next/router";
 import { fontMedium } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
-  type Query,
-  type QueryReservationsArgs,
   State,
   ReservationOrderingChoices,
+  useListReservationsQuery,
 } from "@gql/gql-types";
 import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
 import { useSession } from "@/hooks/auth";
 import { Toast } from "@/styles/util";
-import { LIST_RESERVATIONS } from "@/modules/queries/reservation";
 import ReservationCard from "@/components/reservation/ReservationCard";
 import Head from "@/components/reservations/Head";
 import { CenterSpinner } from "@/components/common/common";
@@ -95,7 +92,7 @@ const Reservations = (): JSX.Element | null => {
     data,
     loading: isLoading,
     error,
-  } = useQuery<Query, QueryReservationsArgs>(LIST_RESERVATIONS, {
+  } = useListReservationsQuery({
     skip: !currentUser?.pk,
     variables: {
       state:
@@ -111,7 +108,7 @@ const Reservations = (): JSX.Element | null => {
         tab === "upcoming"
           ? [ReservationOrderingChoices.BeginAsc]
           : [ReservationOrderingChoices.BeginDesc],
-      user: currentUser?.pk?.toString(),
+      user: currentUser?.pk?.toString() ?? "",
       // NOTE today's reservations are always shown in upcoming (even when they are in the past)
       beginDate: tab === "upcoming" ? toApiDate(today) : undefined,
       endDate: tab === "past" ? toApiDate(addDays(today, -1)) : undefined,

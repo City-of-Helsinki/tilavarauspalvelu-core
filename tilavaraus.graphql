@@ -115,6 +115,7 @@ type AllocatedTimeSlotNode implements Node {
   """
   id: ID!
   pk: Int
+  recurringReservation: RecurringReservationNode
   reservationUnitOption: ReservationUnitOptionNode!
 }
 
@@ -267,6 +268,7 @@ type ApplicationNode implements Node {
     application: Int
     applicationRound: Int
     applicationStatus: [ApplicationStatusChoice]
+    hasAllocations: Boolean
     homeCity: [Int]
     includePreferredOrder10OrHigher: Boolean
     name: String
@@ -633,12 +635,16 @@ type ApplicationSectionNodeEdge {
 Ordering fields for the 'ApplicationSection' model.
 """
 enum ApplicationSectionOrderingChoices {
+  allocationsAsc
+  allocationsDesc
   applicantAsc
   applicantDesc
   applicationPkAsc
   applicationPkDesc
   applicationStatusAsc
   applicationStatusDesc
+  hasAllocationsAsc
+  hasAllocationsDesc
   nameAsc
   nameDesc
   pkAsc
@@ -1004,100 +1010,6 @@ scalar DateTime
 The `Decimal` scalar type represents a python Decimal.
 """
 scalar Decimal
-
-"""
-Debugging information for the current query.
-"""
-type DjangoDebug {
-  """
-  Raise exceptions for this API query.
-  """
-  exceptions: [DjangoDebugException]
-  """
-  Executed SQL queries for this API query.
-  """
-  sql: [DjangoDebugSQL]
-}
-
-"""
-Represents a single exception raised.
-"""
-type DjangoDebugException {
-  """
-  The class of the exception
-  """
-  excType: String!
-  """
-  The message of the exception
-  """
-  message: String!
-  """
-  The stack trace
-  """
-  stack: String!
-}
-
-"""
-Represents a single database query made to a Django managed DB.
-"""
-type DjangoDebugSQL {
-  """
-  The Django database alias (e.g. 'default').
-  """
-  alias: String!
-  """
-  Duration of this database query in seconds.
-  """
-  duration: Float!
-  """
-  Postgres connection encoding if available.
-  """
-  encoding: String
-  """
-  Whether this database query was a SELECT.
-  """
-  isSelect: Boolean!
-  """
-  Whether this database query took more than 10 seconds.
-  """
-  isSlow: Boolean!
-  """
-  Postgres isolation level if available.
-  """
-  isoLevel: String
-  """
-  JSON encoded database query parameters.
-  """
-  params: String!
-  """
-  The raw SQL of this query, without params.
-  """
-  rawSql: String!
-  """
-  The actual SQL sent to this database.
-  """
-  sql: String
-  """
-  Start time of this database query.
-  """
-  startTime: Float!
-  """
-  Stop time of this database query.
-  """
-  stopTime: Float!
-  """
-  Postgres transaction ID if available.
-  """
-  transId: String
-  """
-  Postgres transaction status if available.
-  """
-  transStatus: String
-  """
-  The type of database being used (e.g. postrgesql, mysql, sqlite).
-  """
-  vendor: String!
-}
 
 """
 Represents a DurationField value as an integer in seconds.
@@ -1619,6 +1531,9 @@ type Mutation {
   createReservation(
     input: ReservationCreateMutationInput!
   ): ReservationCreateMutationPayload
+  createReservationSeries(
+    input: ReservationSeriesCreateMutationInput!
+  ): ReservationSeriesCreateMutationPayload
   createReservationUnit(
     input: ReservationUnitCreateMutationInput!
   ): ReservationUnitCreateMutationPayload
@@ -1682,6 +1597,9 @@ type Mutation {
   sendApplication(
     input: ApplicationSendMutationInput!
   ): ApplicationSendMutationPayload
+  setApplicationRoundHandled(
+    input: SetApplicationRoundHandledMutationInput!
+  ): SetApplicationRoundHandledMutationPayload
   staffAdjustReservationTime(
     input: ReservationStaffAdjustTimeMutationInput!
   ): ReservationStaffAdjustTimeMutationPayload
@@ -2114,7 +2032,6 @@ enum QualifierOrderingChoices {
 }
 
 type Query {
-  _debug: DjangoDebug
   """
   Return all allocations that affect allocations for given reservation unit (through space hierarchy or common resource) during the given time period.
   """
@@ -2211,6 +2128,7 @@ type Query {
     last: Int
     name: String
     offset: Int
+    onlyWithPermissions: Boolean
     """
     Järjestä
     """
@@ -2226,6 +2144,7 @@ type Query {
     applicationStatus: [ApplicationStatusChoice]
     before: String
     first: Int
+    hasAllocations: Boolean
     homeCity: [Int]
     includePreferredOrder10OrHigher: Boolean
     last: Int
@@ -2774,17 +2693,16 @@ type Query {
 input RecurringReservationCreateMutationInput {
   abilityGroup: Int
   ageGroup: Int
-  beginDate: Date
-  beginTime: Time
+  beginDate: Date!
+  beginTime: Time!
   description: String
-  endDate: Date
-  endTime: Time
+  endDate: Date!
+  endTime: Time!
   name: String
   pk: Int
-  recurrenceInDays: Int
+  recurrenceInDays: Int!
   reservationUnit: Int!
-  user: Int
-  weekdays: [Int]
+  weekdays: [Int]!
 }
 
 type RecurringReservationCreateMutationPayload {
@@ -2799,7 +2717,6 @@ type RecurringReservationCreateMutationPayload {
   pk: Int
   recurrenceInDays: Int
   reservationUnit: Int
-  user: Int
   weekdays: [Int]
 }
 
@@ -2925,7 +2842,6 @@ input RecurringReservationUpdateMutationInput {
   pk: Int!
   recurrenceInDays: Int
   reservationUnit: Int
-  user: Int
   weekdays: [Int]
 }
 
@@ -2941,7 +2857,6 @@ type RecurringReservationUpdateMutationPayload {
   pk: Int
   recurrenceInDays: Int
   reservationUnit: Int
-  user: Int
   weekdays: [Int]
 }
 
@@ -3587,6 +3502,76 @@ type ReservationRequiresHandlingMutationPayload {
   state: State
 }
 
+input ReservationSeriesCreateMutationInput {
+  abilityGroup: Int
+  ageGroup: Int
+  beginDate: Date!
+  beginTime: Time!
+  checkOpeningHours: Boolean
+  description: String
+  endDate: Date!
+  endTime: Time!
+  name: String
+  pk: Int
+  recurrenceInDays: Int!
+  reservationDetails: ReservationSeriesReservationSerializerInput!
+  reservationUnit: Int!
+  skipDates: [Date]
+  weekdays: [Int]!
+}
+
+type ReservationSeriesCreateMutationPayload {
+  abilityGroup: Int
+  ageGroup: Int
+  beginDate: Date
+  beginTime: Time
+  description: String
+  endDate: Date
+  endTime: Time
+  name: String
+  pk: Int
+  recurrenceInDays: Int
+  reservationUnit: Int
+  weekdays: [Int]
+}
+
+input ReservationSeriesReservationSerializerInput {
+  applyingForFreeOfCharge: Boolean
+  billingAddressCity: String
+  billingAddressStreet: String
+  billingAddressZip: String
+  billingEmail: String
+  billingFirstName: String
+  billingLastName: String
+  billingPhone: String
+  bufferTimeAfter: Duration
+  bufferTimeBefore: Duration
+  confirmedAt: DateTime
+  description: String
+  freeOfChargeReason: String
+  handledAt: DateTime
+  homeCity: Int
+  name: String
+  numPersons: Int
+  purpose: Int
+  reserveeAddressCity: String
+  reserveeAddressStreet: String
+  reserveeAddressZip: String
+  reserveeEmail: String
+  reserveeFirstName: String
+  reserveeId: String
+  reserveeIsUnregisteredAssociation: Boolean
+  reserveeLanguage: ReserveeLanguage
+  reserveeLastName: String
+  reserveeOrganisationName: String
+  reserveePhone: String
+  reserveeType: ReserveeType
+  state: State
+  type: Type!
+  user: Int!
+  workingMemo: String
+}
+
 input ReservationStaffAdjustTimeMutationInput {
   begin: DateTime
   """
@@ -3860,6 +3845,7 @@ enum ReservationTypeChoice {
   BEHALF
   BLOCKED
   NORMAL
+  SEASONAL
   STAFF
 }
 
@@ -4116,6 +4102,7 @@ type ReservationUnitNode implements Node {
   applicationRounds(
     active: Boolean
     name: String
+    onlyWithPermissions: Boolean
     """
     Järjestä
     """
@@ -4821,6 +4808,43 @@ type ReservationWorkingMemoMutationPayload {
   workingMemo: String
 }
 
+"""
+An enumeration.
+"""
+enum ReserveeLanguage {
+  A_
+  """
+  Englanti
+  """
+  EN
+  """
+  Suomi
+  """
+  FI
+  """
+  Ruotsi
+  """
+  SV
+}
+
+"""
+An enumeration.
+"""
+enum ReserveeType {
+  """
+  Yritys
+  """
+  BUSINESS
+  """
+  Yksittäinen
+  """
+  INDIVIDUAL
+  """
+  Yhdistys
+  """
+  NONPROFIT
+}
+
 input ResourceCreateMutationInput {
   bufferTimeAfter: Duration
   bufferTimeBefore: Duration
@@ -5073,6 +5097,14 @@ enum ServiceType {
   Perehdytys
   """
   INTRODUCTION
+}
+
+input SetApplicationRoundHandledMutationInput {
+  pk: Int!
+}
+
+type SetApplicationRoundHandledMutationPayload {
+  pk: Int
 }
 
 input SpaceCreateMutationInput {
@@ -5460,6 +5492,24 @@ input TimeSlotSerializerInput {
 type TimeSlotType {
   begin: Time!
   end: Time!
+}
+
+"""
+An enumeration.
+"""
+enum Type {
+  """
+  behalf
+  """
+  BEHALF
+  """
+  blocked
+  """
+  BLOCKED
+  """
+  staff
+  """
+  STAFF
 }
 
 """

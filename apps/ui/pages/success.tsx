@@ -4,12 +4,13 @@ import type { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
-import { State } from "@gql/gql-types";
+import { State, useReservationQuery } from "@gql/gql-types";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { Container } from "common";
-import { useOrder, useReservation } from "@/hooks/reservation";
+import { useOrder } from "@/hooks/reservation";
 import ReservationFail from "@/components/reservation/ReservationFail";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { base64encode } from "common/src/helpers";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
@@ -54,15 +55,16 @@ const ReservationSuccess = ({ apiBaseUrl }: Props) => {
     called: orderCalled,
   } = useOrder({ orderUuid: orderId });
 
-  const {
-    reservation,
-    error: reservationError,
-    loading: reservationLoading,
-  } = useReservation({
-    reservationPk: order?.reservationPk
-      ? parseInt(order?.reservationPk, 10)
-      : 0,
+  const pk = order?.reservationPk ? parseInt(order?.reservationPk, 10) : 0;
+  const typename = "ReservationNode";
+  const id = base64encode(`${typename}:${pk}`);
+  const { data, error, loading } = useReservationQuery({
+    fetchPolicy: "no-cache",
+    variables: { id },
+    skip: !pk,
   });
+
+  const reservation = data?.reservation ?? undefined;
 
   useEffect(() => {
     if (order && !isOrderLoading) {
@@ -100,10 +102,10 @@ const ReservationSuccess = ({ apiBaseUrl }: Props) => {
 
   const isOrderFetched = orderCalled && order && !orderError;
   const isOrderValid = isOrderFetched && order?.status === "PAID";
-  const isReservationValid = !reservationError && !isReservationInvalid;
+  const isReservationValid = !error && !isReservationInvalid;
 
   useEffect(() => {
-    if (!reservation?.state || !isOrderValid || reservationError) return;
+    if (!reservation?.state || !isOrderValid || error) return;
 
     const { state } = reservation;
 
@@ -117,9 +119,9 @@ const ReservationSuccess = ({ apiBaseUrl }: Props) => {
       default:
         router.replace(`/reservation/confirmation/${reservation.pk}`);
     }
-  }, [orderId, reservation, router, isOrderValid, reservationError]);
+  }, [orderId, reservation, router, isOrderValid, error]);
 
-  if (isOrderLoading || reservationLoading) {
+  if (isOrderLoading || loading) {
     return (
       <StyledContainer>
         <LoadingSpinner />

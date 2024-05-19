@@ -1,25 +1,12 @@
 import { useState } from "react";
-import { type ApolloError, useQuery } from "@apollo/client";
+import { type ApolloError } from "@apollo/client";
 import {
   type PaymentOrderNode,
-  type Query,
-  type QueryOrderArgs,
-  type QueryReservationArgs,
-  type QueryReservationsArgs,
-  type ReservationNode,
-  State,
   OrderStatus,
-  ReservationOrderingChoices,
   useDeleteReservationMutation,
   useRefreshOrderMutation,
+  useOrderQuery,
 } from "@gql/gql-types";
-import {
-  GET_ORDER,
-  GET_RESERVATION,
-  LIST_RESERVATIONS,
-} from "../modules/queries/reservation";
-import { toApiDate } from "common/src/common/util";
-import { base64encode, filterNonNullable } from "common/src/helpers";
 
 function convertOrderStatus(status: string): OrderStatus | undefined {
   switch (status) {
@@ -44,34 +31,29 @@ type UseOrderProps = {
   orderUuid?: string;
 };
 
-export const useOrder = ({
-  orderUuid,
-}: UseOrderProps): {
+export function useOrder({ orderUuid }: UseOrderProps): {
   order?: PaymentOrderNode;
   isError: boolean;
   refreshError?: ApolloError;
   isLoading: boolean;
   refresh: () => void;
   called: boolean;
-} => {
+} {
   const [data, setData] = useState<PaymentOrderNode | undefined>(undefined);
   const [called, setCalled] = useState(false);
 
-  const { error, loading: orderLoading } = useQuery<Query, QueryOrderArgs>(
-    GET_ORDER,
-    {
-      fetchPolicy: "no-cache",
-      skip: !orderUuid,
-      variables: { orderUuid: orderUuid ?? "" },
-      onCompleted: (res) => {
-        setCalled(true);
-        setData(res?.order ?? undefined);
-      },
-      onError: () => {
-        setCalled(true);
-      },
-    }
-  );
+  const { error, loading: orderLoading } = useOrderQuery({
+    fetchPolicy: "no-cache",
+    skip: !orderUuid,
+    variables: { orderUuid: orderUuid ?? "" },
+    onCompleted: (res) => {
+      setCalled(true);
+      setData(res?.order ?? undefined);
+    },
+    onError: () => {
+      setCalled(true);
+    },
+  });
 
   const [refresh, { error: refreshError, loading: refreshLoading }] =
     useRefreshOrderMutation({
@@ -98,11 +80,7 @@ export const useOrder = ({
     refresh,
     called,
   };
-};
-
-type UseReservationProps = {
-  reservationPk: number;
-};
+}
 
 export function useDeleteReservation() {
   const [mutation, { data, error, loading }] = useDeleteReservationMutation();
@@ -114,77 +92,5 @@ export function useDeleteReservation() {
     error,
     isLoading: loading,
     deleted,
-  };
-}
-
-export function useReservation({ reservationPk }: UseReservationProps): {
-  reservation?: ReservationNode;
-  error?: ApolloError;
-  loading: boolean;
-} {
-  // TODO typesafe way to get typename
-  const typename = "ReservationNode";
-  const id = base64encode(`${typename}:${reservationPk}`);
-  const { data, error, loading } = useQuery<Query, QueryReservationArgs>(
-    GET_RESERVATION,
-    {
-      fetchPolicy: "no-cache",
-      variables: { id },
-      skip: !reservationPk,
-    }
-  );
-
-  const reservation = data?.reservation ?? undefined;
-
-  return {
-    reservation,
-    error,
-    loading,
-  };
-}
-
-type UseReservationsProps = {
-  currentUser?:
-    | {
-        pk?: number | null | undefined;
-      }
-    | null
-    | undefined;
-  states?: State[];
-  orderBy?: ReservationOrderingChoices;
-};
-
-// Only used by InProgressReservationNotification
-export function useReservations({
-  currentUser,
-  states,
-  orderBy,
-}: UseReservationsProps): {
-  reservations: ReservationNode[];
-  error?: ApolloError;
-  loading: boolean;
-} {
-  const { data, error, loading } = useQuery<Query, QueryReservationsArgs>(
-    LIST_RESERVATIONS,
-    {
-      skip: !currentUser?.pk,
-      variables: {
-        ...(states != null && states?.length > 0 && { state: states }),
-        ...(orderBy && { orderBy: [orderBy] }),
-        user: currentUser?.pk?.toString(),
-        beginDate: toApiDate(new Date()),
-      },
-      fetchPolicy: "no-cache",
-    }
-  );
-
-  const reservations = filterNonNullable(
-    data?.reservations?.edges.map((e) => e?.node)
-  );
-
-  return {
-    reservations,
-    error,
-    loading,
   };
 }

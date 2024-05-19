@@ -4,6 +4,7 @@ import {
   RESERVEE_NAME_FRAGMENT,
   IMAGE_FRAGMENT,
   PRICING_FRAGMENT,
+  RESERVEE_BILLING_FRAGMENT,
 } from "common/src/queries/fragments";
 import {
   RESERVATION_UNIT_FRAGMENT,
@@ -106,6 +107,7 @@ export const LIST_RESERVATIONS = gql`
             id
             orderUuid
             expiresInMinutes
+            status
           }
           isBlocked
           reservationUnit {
@@ -136,17 +138,20 @@ const RESERVATION_INFO_FRAGMENT = gql`
   fragment ReservationInfoFragment on ReservationNode {
     description
     purpose {
+      id
       pk
       nameFi
       nameEn
       nameSv
     }
     ageGroup {
+      id
       pk
       minimum
       maximum
     }
     homeCity {
+      id
       pk
       name
     }
@@ -160,6 +165,7 @@ const RESERVATION_INFO_FRAGMENT = gql`
 // TODO why pricing fields? instead of asking the reservation price info? lets say the unit is normally paid only but you made the reservation free
 export const GET_RESERVATION = gql`
   ${RESERVEE_NAME_FRAGMENT}
+  ${RESERVEE_BILLING_FRAGMENT}
   ${RESERVATION_UNIT_FRAGMENT}
   ${CANCELLATION_RULE_FRAGMENT}
   ${RESERVATION_INFO_FRAGMENT}
@@ -169,6 +175,8 @@ export const GET_RESERVATION = gql`
       pk
       name
       ...ReserveeNameFields
+      ...ReserveeBillingFields
+      applyingForFreeOfCharge
       bufferTimeBefore
       bufferTimeAfter
       begin

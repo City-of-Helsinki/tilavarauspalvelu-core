@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { type FetchResult, useQuery } from "@apollo/client";
+import { type FetchResult } from "@apollo/client";
 import { useRouter } from "next/router";
 import { useLocalStorage } from "react-use";
 import { Stepper } from "hds-react";
@@ -12,14 +12,14 @@ import { breakpoints } from "common/src/common/style";
 import { fontRegular, H2 } from "common/src/common/typography";
 import {
   type Query,
-  type QueryReservationArgs,
   type QueryReservationUnitArgs,
-  type ReservationNode,
   CustomerTypeChoice,
   State,
   useConfirmReservationMutation,
   useUpdateReservationMutation,
   useDeleteReservationMutation,
+  useReservationQuery,
+  ReservationQuery,
 } from "@gql/gql-types";
 import { Inputs } from "common/src/reservation-form/types";
 import { Subheading } from "common/src/reservation-form/styles";
@@ -29,7 +29,6 @@ import { createApolloClient } from "@/modules/apolloClient";
 import { isBrowser, reservationUnitPrefix } from "@/modules/const";
 import { getTranslation, reservationsUrl } from "@/modules/util";
 import { RESERVATION_UNIT_PARAMS_PAGE_QUERY } from "@/modules/queries/reservationUnit";
-import { GET_RESERVATION } from "@/modules/queries/reservation";
 import Sanitize from "@/components/common/Sanitize";
 import { getReservationUnitPrice } from "@/modules/reservationUnit";
 import {
@@ -178,6 +177,7 @@ const useRemoveStoredReservation = () => {
   }, [storedReservation, removeStoredReservation]);
 };
 
+type NodeT = NonNullable<ReservationQuery["reservation"]>;
 // NOTE back / forward buttons (browser) do NOT work properly
 // router.beforePopState could be used to handle them but it's super hackish
 // the correct solution is to create separate pages (files) for each step (then next-router does this for free)
@@ -197,8 +197,8 @@ function ReservationUnitReservationWithReservationProp({
   termsOfUse,
   refetch,
 }: PropsNarrowed & {
-  reservation: ReservationNode;
-  refetch: () => Promise<FetchResult<Query>>;
+  reservation: NodeT;
+  refetch: () => Promise<FetchResult<ReservationQuery>>;
 }): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const router = useRouter();
@@ -576,10 +576,7 @@ function ReservationUnitReservation(props: PropsNarrowed) {
   // TODO find a typesafe way to do this
   const typename = "ReservationNode";
   const id = base64encode(`${typename}:${reservationPk}`);
-  const { data, loading, error, refetch } = useQuery<
-    Query,
-    QueryReservationArgs
-  >(GET_RESERVATION, {
+  const { data, loading, error, refetch } = useReservationQuery({
     variables: { id },
     skip: !reservationPk,
   });
