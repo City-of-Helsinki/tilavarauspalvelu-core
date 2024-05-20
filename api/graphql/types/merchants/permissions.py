@@ -7,8 +7,8 @@ from query_optimizer.typing import GraphQLFilterInfo
 from api.graphql.extensions import error_codes
 from common.typing import AnyUser
 from merchants.models import PaymentOrder
-from permissions.helpers import can_handle_reservation, has_general_permission
-from permissions.models import GeneralPermissionChoices
+from permissions.helpers import can_handle_reservation, has_general_permission, has_unit_permission_to_any_unit
+from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
 
 if TYPE_CHECKING:
     import uuid
@@ -36,8 +36,14 @@ class OrderRefreshPermission(BasePermission):
             return False
         if user.is_superuser:
             return True
+
         if has_general_permission(user, GeneralPermissionChoices.CAN_MANAGE_RESERVATIONS):
             return True
+
+        units: list[int] = list(payment_order.reservation.reservation_unit.values_list("unit", flat=True).distinct())
+        if has_unit_permission_to_any_unit(user, UnitPermissionChoices.CAN_MANAGE_RESERVATIONS, units):
+            return True
+
         return user.uuid == payment_order.reservation_user_uuid
 
 

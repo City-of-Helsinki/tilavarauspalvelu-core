@@ -4,6 +4,8 @@ from graphene_django_extensions import DjangoNode
 from common.typing import GQLInfo
 from reservation_units.models import ReservationUnitImage
 
+from .permissions import ReservationUnitImagePermission
+
 
 class ReservationUnitImageNode(DjangoNode):
     image_url = graphene.String()
@@ -21,6 +23,7 @@ class ReservationUnitImageNode(DjangoNode):
             "small_url",
             "image_type",
         ]
+        permission_classes = [ReservationUnitImagePermission]
 
     def resolve_image_url(root: ReservationUnitImage, info: GQLInfo) -> str | None:
         if not root.image:
