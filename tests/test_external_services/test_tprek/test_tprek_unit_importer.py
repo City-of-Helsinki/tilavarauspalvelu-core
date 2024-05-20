@@ -1,4 +1,5 @@
 import datetime
+import re
 
 import pytest
 from django.utils.timezone import get_default_timezone
@@ -27,7 +28,8 @@ def test_TprekUnitImporter__unit_tprek_id_missing():
     unit = UnitFactory.create(tprek_id=None)
 
     importer = TprekUnitImporter()
-    with pytest.raises(ValueError, match=f"Unit TPREK ID is None: {unit.pk}"):
+    msg = f"Unit TPREK ID is None: {unit.pk}"
+    with pytest.raises(ValueError, match=re.escape(msg)):
         importer.update_unit_from_tprek([unit])
 
     assert importer.updated_units_count == 0
