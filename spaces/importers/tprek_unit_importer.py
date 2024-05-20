@@ -19,7 +19,6 @@ class TprekUnitImporter:
         self.updated_units_count = 0
         self.units_for_hauki_import = []
 
-    @atomic
     def update_unit_from_tprek(self, units: list[Unit] | QuerySet[Unit], force_update: bool = False) -> None:
         """
         Get the data for each unit from TPREK API, and update the corresponding unit in the database
@@ -54,6 +53,7 @@ class TprekUnitImporter:
             tprek_hauki_resource_importer = TprekUnitHaukiResourceIdImporter()
             tprek_hauki_resource_importer.import_hauki_resources_for_units(self.units_for_hauki_import)
 
+    @atomic
     def _update_unit(self, unit: Unit, tprek_unit_data: TprekUnitData, tprek_location_data: TprekLocationData) -> None:
         """Updates a Unit and its location from the given TPREK data."""
         for field, value in asdict(tprek_unit_data).items():
@@ -69,7 +69,6 @@ class TprekUnitImporter:
 
 class TprekUnitHaukiResourceIdImporter:
     @classmethod
-    @atomic
     def import_hauki_resources_for_units(cls, units: list[Unit]) -> None:
         hauki_resource_id_map = cls._fetch_hauki_resource_ids(units)
 
@@ -95,13 +94,13 @@ class TprekUnitHaukiResourceIdImporter:
     @classmethod
     def _fetch_hauki_resource_ids(cls, units: list[Unit]) -> dict[str, str]:
         # Fetch only units that don't have a Hauki resource yet
-        tprek_ids: list[str] = [unit.tprek_id for unit in units if unit.origin_hauki_resource is None]
+        tprek_ids: list[str] = [f"tprek:{unit.tprek_id}" for unit in units if unit.origin_hauki_resource is None]
 
-        if not len(tprek_ids):
+        if not tprek_ids:
             return {}
 
         hauki_resources: list[HaukiAPIResource] = HaukiAPIClient.get_resources_all_pages(
-            hauki_resource_ids=[f"tprek:{tprek_id}" for tprek_id in tprek_ids],
+            hauki_resource_ids=tprek_ids,
             data_source="tprek",
             origin_id_exists=True,
             page_size=50000,
