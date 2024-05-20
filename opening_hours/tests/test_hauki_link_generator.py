@@ -13,7 +13,7 @@ ORGANIZATION = "parent-organisation"
 
 @freeze_time("2021-01-01 12:00:00", tz_offset=2)
 def test__hauki__link_generation__signature():
-    link = generate_hauki_link(uuid="123", username="foo@bar.com", organization_id=ORGANIZATION)
+    link = generate_hauki_link(reservation_unit_uuid="123", username="foo@bar.com", organization_id=ORGANIZATION)
     params = dict(parse.parse_qsl(link))
 
     assert hmac.compare_digest(VALID_SIGNATURE, params["hsa_signature"]) is True
@@ -21,14 +21,14 @@ def test__hauki__link_generation__signature():
 
 @freeze_time("2021-01-01 14:00:00", tz_offset=2)
 def test__hauki__link_generation__signature_with_incorrect_datetime():
-    link = generate_hauki_link(uuid="123", username="foo@bar.com", organization_id=ORGANIZATION)
+    link = generate_hauki_link(reservation_unit_uuid="123", username="foo@bar.com", organization_id=ORGANIZATION)
     params = dict(parse.parse_qsl(link))
 
     assert hmac.compare_digest(VALID_SIGNATURE, params["hsa_signature"]) is False
 
 
 def test__hauki__link_generation__params():
-    link = generate_hauki_link(uuid="123", username="foo@bar.com", organization_id=ORGANIZATION)
+    link = generate_hauki_link(reservation_unit_uuid="123", username="foo@bar.com", organization_id=ORGANIZATION)
     params = dict(parse.parse_qsl(link))
 
     assert params["hsa_organization"] == settings.HAUKI_ORGANISATION_ID
@@ -40,12 +40,12 @@ def test__hauki__link_generation__params():
 def test__hauki__link_generation__missing_settings_values(setting):
     setattr(settings, setting, None)
 
-    link = generate_hauki_link(uuid="123", username="foo@bar.com", organization_id=ORGANIZATION)
+    link = generate_hauki_link(reservation_unit_uuid="123", username="foo@bar.com", organization_id=ORGANIZATION)
 
     assert link is None
 
 
 def test__hauki__link_generation__organization_none():
-    link = generate_hauki_link(uuid="123", username="foo@bar.com", organization_id=None)
+    link = generate_hauki_link(reservation_unit_uuid="123", username="foo@bar.com", organization_id=None)
 
     assert link is None

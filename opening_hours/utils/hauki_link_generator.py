@@ -1,4 +1,3 @@
-import datetime
 import hashlib
 import hmac
 import uuid
@@ -6,15 +5,11 @@ from datetime import timedelta
 from urllib.parse import quote_plus, urlencode
 
 from django.conf import settings
-from django.utils.timezone import get_default_timezone
+
+from common.date_utils import local_datetime
 
 
-def generate_hauki_link(
-    uuid: uuid.UUID,
-    username: str,
-    organization_id: str,
-    target_resources: list[uuid.UUID] | None = None,
-) -> None | str:
+def generate_hauki_link(reservation_unit_uuid: uuid.UUID | str, username: str, organization_id: str) -> None | str:
     if not (
         settings.HAUKI_ADMIN_UI_URL
         and settings.HAUKI_SECRET
@@ -24,8 +19,7 @@ def generate_hauki_link(
     ):
         return None
 
-    now = datetime.datetime.now(tz=get_default_timezone())
-
+    now = local_datetime()
     hauki_expire_time_minutes = 30
 
     get_parameters_dict = {
@@ -34,7 +28,7 @@ def generate_hauki_link(
         "hsa_organization": organization_id,
         "hsa_created_at": now.isoformat(),
         "hsa_valid_until": (now + timedelta(minutes=hauki_expire_time_minutes)).isoformat(),
-        "hsa_resource": f"{settings.HAUKI_ORIGIN_ID}:{uuid}",
+        "hsa_resource": f"{settings.HAUKI_ORIGIN_ID}:{reservation_unit_uuid}",
         "hsa_has_organization_rights": "true",
     }
 
@@ -58,12 +52,7 @@ def generate_hauki_link(
 
     get_parameters_dict["hsa_signature"] = calculated_signature
 
-    if target_resources:
-        target_resources = [f"{settings.HAUKI_ORIGIN_ID}:{uuid}" for uuid in target_resources]
-        target_resources = ",".join(target_resources)
-        get_parameters_dict["target_resources"] = target_resources
-
     parameters = urlencode(get_parameters_dict)
     base_url = f"{settings.HAUKI_ADMIN_UI_URL}/resource"
-    resource_url = quote_plus(f"{settings.HAUKI_ORIGIN_ID}:{uuid}")
+    resource_url = quote_plus(f"{settings.HAUKI_ORIGIN_ID}:{reservation_unit_uuid}")
     return f"{base_url}/{resource_url}/?{parameters}"
