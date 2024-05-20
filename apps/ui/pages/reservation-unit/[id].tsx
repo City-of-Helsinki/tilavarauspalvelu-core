@@ -1091,8 +1091,7 @@ const ReservationUnit = ({
                             isReservationQuotaReached ? "Full" : ""
                           }`,
                           {
-                            count:
-                              reservationUnit.numActiveUserReservations ?? 0,
+                            count: userReservations?.length,
                             total: reservationUnit.maxReservationsPerUser,
                           }
                         )}
