@@ -47,6 +47,33 @@ def test_order_refund_webhook__success(api_client, settings):
     assert payment_order.processed_at is not None
 
 
+@patch_method(VerkkokauppaAPIClient.get_refund_status)
+def test_order_refund_webhook__order_already_refunded_with_different_refund_id(api_client, settings):
+    order_id = uuid.uuid4()
+    refund_id = uuid.uuid4()
+    payment_order = PaymentOrderFactory.create(
+        remote_id=order_id,
+        refund_id=uuid.uuid4(),
+        status=OrderStatus.PAID,
+        processed_at=None,
+    )
+
+    data = {
+        "orderId": str(order_id),
+        "refundId": str(refund_id),
+        "refundPaymentId": f"{uuid.uuid4()}_at_20231101-083021",
+        "namespace": settings.VERKKOKAUPPA_NAMESPACE,
+        "eventType": "REFUND_PAID",
+    }
+    url = reverse("refund-list")
+
+    VerkkokauppaAPIClient.get_refund_status.return_value = get_mock_order_refund_api(order_id, refund_id)
+    response = api_client.post(url, data=data, format="json")
+
+    assert response.status_code == 400, response.data
+    assert response.data == {"message": f"Refund ID mismatch: expected {payment_order.refund_id}, got {refund_id}"}
+
+
 @pytest.mark.parametrize(
     "status",
     [
@@ -185,7 +212,7 @@ def test_order_refund_webhook__payment_order_not_found(api_client, settings):
     response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 404, response.data
-    assert response.data == {"message": f"Payment order {order_id=!s} & {refund_id=!s} not found"}
+    assert response.data == {"message": f"Payment order {order_id=!s} not found"}
 
 
 @patch_method(VerkkokauppaAPIClient.get_refund_status, side_effect=GetRefundStatusError("Mock error"))
