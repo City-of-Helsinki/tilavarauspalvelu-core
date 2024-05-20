@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { addDays, formatISO, startOfDay, subDays } from "date-fns";
 import { AutoGrid, HorisontalFlex } from "@/styles/layout";
 import { ReservationUnitCalendar } from "./ReservationUnitCalendar";
@@ -19,9 +19,14 @@ export function ReservationUnitCalendarView({
   const [reservationUnitPk, setReservationUnitPk] = useState(-1);
 
   const valueOption =
-    reservationUnitOptions.find((o) => o.value === reservationUnitPk) ??
-    reservationUnitOptions[0] ??
-    null;
+    reservationUnitOptions.find((o) => o.value === reservationUnitPk) ?? null;
+
+  // Set the first reservation unit as the default
+  useEffect(() => {
+    if (reservationUnitOptions.length > 0) {
+      setReservationUnitPk(reservationUnitOptions[0].value);
+    }
+  }, [reservationUnitOptions]);
 
   const onChange = (reservationUnits: { label: string; value: number }) => {
     setReservationUnitPk(reservationUnits.value);
