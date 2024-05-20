@@ -2,7 +2,7 @@ from common.date_utils import local_datetime
 from spaces.importers.tprek_api_client import TprekAPIClient
 from tests.helpers import patch_method
 from tests.mocks import MockResponse
-from tests.test_external_services.test_tprek.conftest import SINGLE_TPREK_UNIT_JSON
+from tests.test_external_services.test_tprek.helpers import SINGLE_TPREK_UNIT_JSON
 
 
 @patch_method(
