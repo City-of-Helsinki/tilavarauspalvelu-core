@@ -3,14 +3,32 @@ import {
   type SuitableTimeRangeNode,
   type ApplicationSectionNode,
   Priority,
-  type AllocatedTimeSlotNode,
   Weekday,
+  ApplicationSectionAllocationsQuery,
+  ApplicationRoundFilterQuery,
 } from "@gql/gql-types";
 import i18next from "i18next";
 import { type TFunction } from "next-i18next";
 import { filterNonNullable } from "common/src/helpers";
 import { formatDuration } from "common/src/common/util";
 import { Day, convertWeekday, transformWeekday } from "common/src/conversion";
+
+type QueryT = NonNullable<
+  ApplicationSectionAllocationsQuery["applicationSections"]
+>;
+type EdgeT = NonNullable<QueryT["edges"][0]>;
+export type SectionNodeT = NonNullable<EdgeT["node"]>;
+export type SuitableTimeRangeNodeT = SectionNodeT["suitableTimeRanges"][0];
+export type AllocatedTimeSlotNodeT =
+  SectionNodeT["reservationUnitOptions"][0]["allocatedTimeSlots"][0];
+export type ReservationUnitOptionNodeT = NonNullable<
+  SectionNodeT["reservationUnitOptions"]
+>[0];
+
+type ApplicationRoundFilterQueryT =
+  NonNullable<ApplicationRoundFilterQuery>["applicationRound"];
+export type ReservationUnitFilterQueryT =
+  NonNullable<ApplicationRoundFilterQueryT>["reservationUnits"][0];
 
 export type RelatedSlot = {
   day: number;
@@ -153,7 +171,9 @@ export const getTimeSeries = (
 };
 
 // TODO is this parse? or format? it looks like a format
-function formatTimeRange(range: SuitableTimeRangeNode): string {
+function formatTimeRange(
+  range: Pick<SuitableTimeRangeNode, "dayOfTheWeek" | "beginTime" | "endTime">
+): string {
   // TODO convert the day of the week
   const day = convertWeekday(range.dayOfTheWeek);
   const weekday = i18next.t(`dayShort.${day}`);
@@ -164,12 +184,15 @@ function formatTimeRange(range: SuitableTimeRangeNode): string {
 }
 
 export function formatTimeRangeList(
-  aes: SuitableTimeRangeNode[],
+  aes: Pick<
+    SuitableTimeRangeNode,
+    "dayOfTheWeek" | "beginTime" | "endTime" | "priority"
+  >[],
   priority: Priority
 ): string {
   const schedules = sortBy(
     aes?.filter((s) => s?.priority === priority),
-    ["day", "begin"]
+    ["dayOfTheWeek", "beginTime"]
   );
 
   return filterNonNullable(schedules)
@@ -204,7 +227,10 @@ export function formatTime(time?: string) {
 }
 
 export function createDurationString(
-  section: ApplicationSectionNode,
+  section: Pick<
+    ApplicationSectionNode,
+    "reservationMinDuration" | "reservationMaxDuration"
+  >,
   t: TFunction
 ) {
   const minDuration = section.reservationMinDuration;
@@ -222,7 +248,10 @@ export function createDurationString(
 }
 
 export function getRelatedTimeSlots(
-  allocations: AllocatedTimeSlotNode[]
+  allocations: Pick<
+    AllocatedTimeSlotNodeT,
+    "endTime" | "beginTime" | "dayOfTheWeek"
+  >[]
 ): RelatedSlot[][] {
   const relatedSpacesTimeSlots = allocations;
 

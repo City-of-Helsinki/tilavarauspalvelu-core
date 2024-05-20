@@ -5,11 +5,8 @@ import styled from "styled-components";
 import { Strong, fontMedium } from "common/src/common/typography";
 import { ApolloQueryResult } from "@apollo/client";
 import {
-  type ApplicationSectionNode,
-  type Query,
   Priority,
-  type SuitableTimeRangeNode,
-  type AllocatedTimeSlotNode,
+  type ApplicationSectionAllocationsQuery,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { NotificationInline } from "common/src/components/NotificationInline";
@@ -23,6 +20,9 @@ import {
   parseApiTime,
   createDurationString,
   decodeTimeSlot,
+  type SectionNodeT,
+  type SuitableTimeRangeNodeT,
+  type AllocatedTimeSlotNodeT,
 } from "./modules/applicationRoundAllocation";
 import {
   useAcceptSlotMutation,
@@ -32,16 +32,18 @@ import {
 import { getApplicantName } from "@/helpers";
 
 type Props = {
-  applicationSection: ApplicationSectionNode;
+  applicationSection: SectionNodeT;
   reservationUnitOptionPk: number;
   selection: string[];
   isAllocationEnabled: boolean;
   // TODO better solution would be to have a query key (similar to tanstack/react-query) and invalidate the key
   // so we don't have to prop drill the refetch
-  refetchApplicationEvents: () => Promise<ApolloQueryResult<Query>>;
+  refetchApplicationEvents: () => Promise<
+    ApolloQueryResult<ApplicationSectionAllocationsQuery>
+  >;
   // TODO these should be mandatory (but requires refactoring the parent component a bit)
-  timeSlot: SuitableTimeRangeNode | null;
-  allocatedTimeSlot: AllocatedTimeSlotNode | null;
+  timeSlot: SuitableTimeRangeNodeT;
+  allocatedTimeSlot: AllocatedTimeSlotNodeT;
 };
 
 const Wrapper = styled.div`
@@ -230,7 +232,7 @@ export function AllocatedCard({
 
 // TODO this seems very similar to the AllocationCard and Column filter functions
 function isOutsideOfRequestedTimes(
-  time: SuitableTimeRangeNode | AllocatedTimeSlotNode | null,
+  time: SuitableTimeRangeNodeT | AllocatedTimeSlotNodeT | null,
   beginHours: number,
   endHours: number
 ) {
@@ -367,8 +369,8 @@ function AllocatedDetails({
   section,
   allocatedTimeSlot,
 }: {
-  section: ApplicationSectionNode;
-  allocatedTimeSlot: AllocatedTimeSlotNode;
+  section: SectionNodeT;
+  allocatedTimeSlot: AllocatedTimeSlotNodeT;
 }) {
   const { t } = useTranslation();
   const { beginTime, endTime, dayOfTheWeek } = allocatedTimeSlot;
@@ -403,7 +405,7 @@ function AllocatedDetails({
 function TimeRequested({
   applicationSection,
 }: {
-  applicationSection: ApplicationSectionNode;
+  applicationSection: SectionNodeT;
 }) {
   const { t } = useTranslation();
   const { appliedReservationsPerWeek } = applicationSection;

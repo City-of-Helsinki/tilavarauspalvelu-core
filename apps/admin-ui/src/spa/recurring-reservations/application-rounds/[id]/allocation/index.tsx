@@ -12,9 +12,9 @@ import {
   type QueryApplicationSectionsArgs,
   ApplicantTypeChoice,
   ApplicationRoundStatusChoice,
-  type QueryAffectingAllocatedTimeSlotsArgs,
   type ApplicationRoundFilterQuery,
   useApplicationRoundFilterQuery,
+  useApplicationSectionAllocationsQuery,
 } from "@gql/gql-types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { SearchTags } from "@/component/SearchTags";
@@ -34,10 +34,7 @@ import {
 import usePermission from "@/hooks/usePermission";
 import { Permission } from "@/modules/permissionHelper";
 import { truncate } from "@/helpers";
-import {
-  ALL_EVENTS_PER_UNIT_QUERY,
-  APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY,
-} from "./queries";
+import { ALL_EVENTS_PER_UNIT_QUERY } from "./queries";
 import { AllocationPageContent } from "./ApplicationEvents";
 import { ComboboxFilter, SearchFilter } from "@/component/QueryParamFilters";
 import { convertPriorityFilter } from "./modules/applicationRoundAllocation";
@@ -285,13 +282,7 @@ function ApplicationRoundAllocation({
       ? orderFilter.filter((x) => Number(x) > 10).length > 0
       : null;
 
-  const { data, refetch, previousData } = useQuery<
-    Query,
-    // NOTE specialised variation of the query so the params don't match the generate types
-    Omit<QueryApplicationSectionsArgs, "reservationUnit"> & {
-      reservationUnit: number;
-    } & QueryAffectingAllocatedTimeSlotsArgs
-  >(APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY, {
+  const query = useApplicationSectionAllocationsQuery({
     // On purpose skip if the reservation unit is not selected (it is required)
     skip: !applicationRoundPk || reservationUnitFilterQuery == null,
     pollInterval: ALLOCATION_POLL_INTERVAL,
@@ -317,6 +308,7 @@ function ApplicationRoundAllocation({
       notifyError(t("errors.errorFetchingData"));
     },
   });
+  const { data, refetch, previousData } = query;
 
   if (
     reservationUnitFilterQuery == null ||

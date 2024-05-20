@@ -4,12 +4,9 @@ import styled from "styled-components";
 import { useSearchParams } from "react-router-dom";
 import { H4, fontMedium } from "common/src/common/typography";
 import {
-  type ApplicationSectionNode,
   type ApplicationRoundStatusChoice,
-  type Query,
   ApplicationSectionStatusChoice,
-  type AllocatedTimeSlotNode,
-  type ApplicationRoundFilterQuery,
+  type ApplicationSectionAllocationsQuery,
 } from "@gql/gql-types";
 import { breakpoints } from "common";
 import { Accordion } from "@/component/Accordion";
@@ -20,14 +17,14 @@ import {
   ApplicationSectionCard,
 } from "./ApplicationEventCard";
 import { useFocusApplicationEvent } from "./hooks";
-import { ApolloQueryResult } from "@apollo/client";
+import { type ApolloQueryResult } from "@apollo/client";
 import { filterNonNullable } from "common/src/helpers";
-import { getRelatedTimeSlots } from "./modules/applicationRoundAllocation";
-
-type ApplicationRoundFilterQueryType =
-  NonNullable<ApplicationRoundFilterQuery>["applicationRound"];
-type ReservationUnitFilterQueryType =
-  NonNullable<ApplicationRoundFilterQueryType>["reservationUnits"][0];
+import {
+  type AllocatedTimeSlotNodeT,
+  getRelatedTimeSlots,
+  type ReservationUnitFilterQueryT,
+  type SectionNodeT,
+} from "./modules/applicationRoundAllocation";
 
 // TODO max-width for the grid columns (315px, 480px, 332px)
 // TODO not perfect (aligment issues with the last columns and grid end),
@@ -90,10 +87,10 @@ function EventGroupList({
   type,
   refetch,
 }: {
-  applicationSections: ApplicationSectionNode[];
-  reservationUnit: NonNullable<ReservationUnitFilterQueryType>;
+  applicationSections: SectionNodeT[];
+  reservationUnit: NonNullable<ReservationUnitFilterQueryT>;
   type: AllocationApplicationSectionCardType;
-  refetch: () => Promise<ApolloQueryResult<Query>>;
+  refetch: () => Promise<ApolloQueryResult<ApplicationSectionAllocationsQuery>>;
 }): JSX.Element {
   if (applicationSections.length < 1) {
     return <div>-</div>;
@@ -116,11 +113,16 @@ function EventGroupList({
 
 // TODO combine this with the AllocationColumn Props type (it's more or less just passing it through)
 type ApplicationEventsProps = {
-  applicationSections: ApplicationSectionNode[] | null;
-  reservationUnit: NonNullable<ReservationUnitFilterQueryType>;
-  refetchApplicationEvents: () => Promise<ApolloQueryResult<Query>>;
+  applicationSections: SectionNodeT[] | null;
+  reservationUnit: NonNullable<ReservationUnitFilterQueryT>;
+  refetchApplicationEvents: () => Promise<
+    ApolloQueryResult<ApplicationSectionAllocationsQuery>
+  >;
   applicationRoundStatus: ApplicationRoundStatusChoice;
-  relatedAllocations: AllocatedTimeSlotNode[];
+  relatedAllocations: Pick<
+    AllocatedTimeSlotNodeT,
+    "dayOfTheWeek" | "beginTime" | "endTime"
+  >[];
 };
 
 /// TODO rename to something more descriptive
@@ -207,29 +209,29 @@ function ApplicationSectionColumn({
 >): JSX.Element {
   const { t } = useTranslation();
 
+  const sections = filterNonNullable(applicationSections);
+
   // allocations are not specific to the reservation unit
-  const isAllocated = (as: ApplicationSectionNode) =>
+  const isAllocated = (as: (typeof sections)[0]) =>
     as.allocations != null && as.allocations > 0;
 
-  const isAllocatedToThisUnit = (as: ApplicationSectionNode) =>
+  const isAllocatedToThisUnit = (as: (typeof sections)[0]) =>
     as.reservationUnitOptions
       .filter((ruo) => ruo.reservationUnit.pk === reservationUnit.pk)
       ?.map((ruo) => ruo.allocatedTimeSlots.length > 0)
       .some(Boolean);
 
   // Locked is specific to this reservation unit
-  const isLocked = (as: ApplicationSectionNode) =>
+  const isLocked = (as: (typeof sections)[0]) =>
     as.reservationUnitOptions
       .filter((ruo) => ruo.reservationUnit.pk === reservationUnit.pk)
       ?.map((ruo) => ruo.locked)
       .some(Boolean);
-  const isRejected = (as: ApplicationSectionNode) =>
+  const isRejected = (as: (typeof sections)[0]) =>
     as.reservationUnitOptions
       .filter((ruo) => ruo.reservationUnit.pk === reservationUnit.pk)
       ?.map((ruo) => ruo.rejected)
       .some(Boolean);
-
-  const sections = filterNonNullable(applicationSections);
 
   // one of:
   // - handled or
@@ -240,7 +242,7 @@ function ApplicationSectionColumn({
       (isAllocated(as) && isAllocatedToThisUnit(as) && isLocked(as))
   );
 
-  const isPartiallyAllocated = (as: ApplicationSectionNode) =>
+  const isPartiallyAllocated = (as: (typeof sections)[0]) =>
     as.status !== ApplicationSectionStatusChoice.Handled &&
     isAllocated(as) &&
     !isLocked(as) &&

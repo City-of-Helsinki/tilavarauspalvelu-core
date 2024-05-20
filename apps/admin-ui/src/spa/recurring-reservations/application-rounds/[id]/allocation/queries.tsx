@@ -117,6 +117,7 @@ export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
           ...ApplicationSectionFragment
           allocations
           suitableTimeRanges(fulfilled: false) {
+            id
             beginTime
             endTime
             dayOfTheWeek
@@ -124,14 +125,18 @@ export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
             fulfilled
           }
           reservationUnitOptions {
+            id
+            pk
             locked
             rejected
             allocatedTimeSlots {
+              id
               pk
               dayOfTheWeek
               beginTime
               endTime
               reservationUnitOption {
+                pk
                 applicationSection {
                   pk
                 }
@@ -147,6 +152,7 @@ export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
       beginDate: $beginDate
       endDate: $endDate
     ) {
+      id
       beginTime
       dayOfTheWeek
       endTime

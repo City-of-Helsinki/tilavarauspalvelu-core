@@ -5,10 +5,7 @@ import styled, { css } from "styled-components";
 import { fontMedium } from "common/src/common/typography";
 import { filterNonNullable } from "common/src/helpers";
 import {
-  type ApplicationSectionNode,
-  type ReservationUnitOptionNode,
   ApplicationSectionStatusChoice,
-  type AllocatedTimeSlotNode,
   type SuitableTimeRangeNode,
 } from "@gql/gql-types";
 import { breakpoints } from "common";
@@ -26,6 +23,8 @@ import {
   type RelatedSlot,
   isInsideCell,
   convertPriorityFilter,
+  type SectionNodeT,
+  ReservationUnitOptionNodeT,
 } from "./modules/applicationRoundAllocation";
 import {
   useFocusAllocatedSlot,
@@ -35,7 +34,7 @@ import {
 import { useSearchParams } from "react-router-dom";
 
 type Props = {
-  applicationSections: ApplicationSectionNode[] | null;
+  applicationSections: SectionNodeT[];
   relatedAllocations: RelatedSlot[][];
 };
 
@@ -238,7 +237,7 @@ function addTimeSlotToArray(
 }
 
 function generateAllocatedSlots(
-  allocated: ReservationUnitOptionNode[],
+  allocated: ReservationUnitOptionNodeT[],
   day: Day
 ): Slot[] {
   const arr: Slot[] = [];
@@ -253,16 +252,16 @@ function generateAllocatedSlots(
   return arr;
 }
 
-function isDay(slot: AllocatedTimeSlotNode | SuitableTimeRangeNode, day: Day) {
+function isDay(slot: Pick<SuitableTimeRangeNode, "dayOfTheWeek">, day: Day) {
   return slot.dayOfTheWeek === transformWeekday(day);
 }
 
 /// We have to have all allocated slots for the event in the original data
 /// at some point (either here or in the draw function) those other days have to be removed
 function removeOtherAllocatedDays(
-  a: ReservationUnitOptionNode,
+  a: ReservationUnitOptionNodeT,
   day: Day
-): ReservationUnitOptionNode {
+): ReservationUnitOptionNodeT {
   return {
     ...a,
     allocatedTimeSlots: a.allocatedTimeSlots?.filter((ts) => isDay(ts, day)),
@@ -270,10 +269,7 @@ function removeOtherAllocatedDays(
 }
 
 // Generate the focused slots for a selected application section
-function generateFocusedSlots(
-  focusedAes: ApplicationSectionNode,
-  day: Day
-): Slot[] {
+function generateFocusedSlots(focusedAes: SectionNodeT, day: Day): Slot[] {
   const focusedTimeSlots = focusedAes?.suitableTimeRanges?.filter((ts) =>
     isDay(ts, day)
   );
@@ -291,12 +287,12 @@ function generateFocusedSlots(
   return focusedSlots.concat(generateAllocatedSlots(tmp, day));
 }
 
-function isInRange(ae: ApplicationSectionNode, cell: Cell, day: Day): boolean {
+function isInRange(ae: SectionNodeT, cell: Cell, day: Day): boolean {
   return ae.suitableTimeRanges?.some((tr) => isInsideCell(day, cell, tr));
 }
 
 function isAllocated(
-  ae: ReservationUnitOptionNode,
+  ae: ReservationUnitOptionNodeT,
   cell: Cell,
   day: Day
 ): boolean {
@@ -340,7 +336,7 @@ export function AllocationCalendar({
   const [focusedAllocated] = useFocusAllocatedSlot();
 
   const data = WEEKDAYS.map((day) => {
-    const isNotHandled = (ae: ApplicationSectionNode) =>
+    const isNotHandled = (ae: (typeof aes)[0]) =>
       ae.status !== ApplicationSectionStatusChoice.Handled;
 
     // Only show allocated that match the unit and day
@@ -438,8 +434,8 @@ function CalendarDay({
   focusedSlots,
   relatedTimeSpans,
 }: {
-  allocated: ReservationUnitOptionNode[];
-  suitable: ApplicationSectionNode[];
+  allocated: ReservationUnitOptionNodeT[];
+  suitable: SectionNodeT[];
   day: Day;
   cells: Cell[];
   focusedSlots: Slot[];

@@ -5664,11 +5664,13 @@ export type ApplicationSectionFragmentFragment = {
   reservationMinDuration: number;
   purpose?: {
     __typename?: "ReservationPurposeNode";
+    id: string;
     pk?: number | null;
     nameFi?: string | null;
   } | null;
   application: {
     __typename?: "ApplicationNode";
+    id: string;
     pk?: number | null;
     status?: ApplicationStatusChoice | null;
     applicantType?: ApplicantTypeChoice | null;
@@ -5690,6 +5692,7 @@ export type ApplicationSectionFragmentFragment = {
     preferredOrder: number;
     reservationUnit: {
       __typename?: "ReservationUnitNode";
+      id: string;
       pk?: number | null;
       nameFi?: string | null;
       unit?: {
@@ -6585,16 +6588,19 @@ export const ApplicationSectionFragmentFragmentDoc = gql`
   fragment ApplicationSectionFragment on ApplicationSectionNode {
     ...ApplicationSectionCommonFragment
     purpose {
+      id
       pk
       nameFi
     }
     application {
+      id
       pk
       status
       ...ApplicationNameFragment
     }
     reservationUnitOptions {
       reservationUnit {
+        id
         pk
         nameFi
         unit {

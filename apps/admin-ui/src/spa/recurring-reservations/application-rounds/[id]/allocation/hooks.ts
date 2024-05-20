@@ -1,22 +1,24 @@
 import { ApolloError, type ApolloQueryResult } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import {
-  type ApplicationSectionNode,
-  type Query,
-  type SuitableTimeRangeNode,
   type AllocatedTimeSlotCreateMutationInput,
-  type AllocatedTimeSlotNode,
   useCreateAllocatedTimeSlotMutation,
   useDeleteAllocatedTimeSlotMutation,
+  type ApplicationSectionAllocationsQuery,
 } from "@gql/gql-types";
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useNotification } from "@/context/NotificationContext";
-import { timeSlotKeyToScheduleTime } from "./modules/applicationRoundAllocation";
+import {
+  type AllocatedTimeSlotNodeT,
+  type SectionNodeT,
+  type SuitableTimeRangeNodeT,
+  timeSlotKeyToScheduleTime,
+} from "./modules/applicationRoundAllocation";
 
 export function useFocusApplicationEvent(): [
   number | undefined,
-  (aes?: ApplicationSectionNode) => void,
+  (aes?: SectionNodeT) => void,
 ] {
   const [params, setParams] = useSearchParams();
 
@@ -24,7 +26,7 @@ export function useFocusApplicationEvent(): [
     ? Number(params.get("aes"))
     : undefined;
 
-  const setFocused = (aes?: ApplicationSectionNode) => {
+  const setFocused = (aes?: SectionNodeT) => {
     // TODO ?? if the applicationEvent is completely allocated => remove the selection
     if (aes?.pk != null) {
       const p = new URLSearchParams(params);
@@ -44,7 +46,7 @@ export function useFocusApplicationEvent(): [
 /// Mutaully exclusive with useFocusApplicationEvent
 export function useFocusAllocatedSlot(): [
   number | undefined,
-  (allocated?: AllocatedTimeSlotNode) => void,
+  (allocated?: { pk?: number | null | undefined }) => void,
 ] {
   const [params, setParams] = useSearchParams();
 
@@ -52,7 +54,7 @@ export function useFocusAllocatedSlot(): [
     ? Number(params.get("allocated"))
     : undefined;
 
-  const setAllocated = (allocated?: AllocatedTimeSlotNode) => {
+  const setAllocated = (allocated?: { pk?: number | null | undefined }) => {
     if (allocated?.pk != null) {
       const p = new URLSearchParams(params);
       p.set("allocated", allocated.pk.toString());
@@ -137,7 +139,9 @@ export function useSlotSelection(): [string[], (slots: string[]) => void] {
 
 // side effects that should happen when a modification is made
 export function useRefreshApplications(
-  fetchCallback: () => Promise<ApolloQueryResult<Query>>
+  fetchCallback: () => Promise<
+    ApolloQueryResult<ApplicationSectionAllocationsQuery>
+  >
 ): [(clearSelection?: boolean) => Promise<void>, boolean] {
   const [, setSelection] = useSlotSelection();
   const [isRefetchLoading, setIsRefetchLoading] = useState(false);
@@ -157,10 +161,10 @@ export function useRefreshApplications(
 }
 
 type AcceptSlotMutationProps = {
-  applicationSection: ApplicationSectionNode;
+  applicationSection: SectionNodeT;
   reservationUnitOptionPk: number;
   selection: string[];
-  timeRange: SuitableTimeRangeNode | null;
+  timeRange: SuitableTimeRangeNodeT | null;
   refresh: (clearSelection?: boolean) => void;
 };
 
@@ -324,8 +328,8 @@ export function useRemoveAllocation({
   applicationSection,
   refresh,
 }: {
-  allocatedTimeSlot: AllocatedTimeSlotNode | null;
-  applicationSection: ApplicationSectionNode;
+  allocatedTimeSlot: AllocatedTimeSlotNodeT | null;
+  applicationSection: SectionNodeT;
   refresh: (clearSelection?: boolean) => void;
 }): HookReturnValue {
   const { notifySuccess, notifyError } = useNotification();

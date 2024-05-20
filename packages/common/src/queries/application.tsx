@@ -56,16 +56,19 @@ export const APPLICATION_SECTION_ADMIN_FRAGMENT = gql`
   fragment ApplicationSectionFragment on ApplicationSectionNode {
     ...ApplicationSectionCommonFragment
     purpose {
+      id
       pk
       nameFi
     }
     application {
+      id
       pk
       status
       ...ApplicationNameFragment
     }
     reservationUnitOptions {
       reservationUnit {
+        id
         pk
         nameFi
         unit {

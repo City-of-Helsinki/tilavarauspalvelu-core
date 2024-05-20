@@ -6,13 +6,10 @@ import { fontMedium } from "common/src/common/typography";
 import { type ApolloQueryResult } from "@apollo/client";
 import styled from "styled-components";
 import {
-  type ApplicationSectionNode,
   ApplicationRoundStatusChoice,
-  type Query,
-  type AllocatedTimeSlotNode,
-  type SuitableTimeRangeNode,
   ApplicationSectionStatusChoice,
-  ApplicationRoundFilterQuery,
+  type ApplicationSectionAllocationsQuery,
+  Weekday,
 } from "@gql/gql-types";
 import { ShowAllContainer } from "common/src/components/";
 import { transformWeekday, type Day } from "common/src/conversion";
@@ -22,18 +19,20 @@ import {
   decodeTimeSlot,
   getTimeSlotOptions,
   isInsideSelection,
+  SectionNodeT,
+  ReservationUnitFilterQueryT,
+  AllocatedTimeSlotNodeT,
+  SuitableTimeRangeNodeT,
 } from "./modules/applicationRoundAllocation";
 import { AllocatedCard, SuitableTimeCard } from "./AllocationCard";
 import { useSlotSelection } from "./hooks";
 
-type ApplicationRoundFilterQueryType =
-  NonNullable<ApplicationRoundFilterQuery>["applicationRound"];
-type ReservationUnitFilterQueryType =
-  NonNullable<ApplicationRoundFilterQueryType>["reservationUnits"][0];
 type Props = {
-  applicationSections: ApplicationSectionNode[] | null;
-  reservationUnit?: ReservationUnitFilterQueryType;
-  refetchApplicationEvents: () => Promise<ApolloQueryResult<Query>>;
+  applicationSections: SectionNodeT[] | null;
+  reservationUnit?: ReservationUnitFilterQueryT;
+  refetchApplicationEvents: () => Promise<
+    ApolloQueryResult<ApplicationSectionAllocationsQuery>
+  >;
   applicationRoundStatus: ApplicationRoundStatusChoice;
   relatedAllocations: RelatedSlot[][];
 };
@@ -213,9 +212,9 @@ function TimeSelection(): JSX.Element {
 }
 
 function getAllocatedTimeSlot(
-  section: ApplicationSectionNode,
+  section: SectionNodeT,
   selection: { day: Day; startHour: number; endHour: number }
-): AllocatedTimeSlotNode | null {
+): AllocatedTimeSlotNodeT | null {
   const { day, startHour, endHour } = selection;
   return (
     section.reservationUnitOptions
@@ -227,9 +226,9 @@ function getAllocatedTimeSlot(
 }
 
 function getSuitableTimeSlot(
-  section: ApplicationSectionNode,
+  section: SectionNodeT,
   selection: { day: Day; startHour: number; endHour: number }
-): SuitableTimeRangeNode | null {
+): SuitableTimeRangeNodeT | null {
   const { day, startHour, endHour } = selection;
   return (
     section.suitableTimeRanges?.find((tr) => {
@@ -264,7 +263,7 @@ export function AllocationColumn({
   // - the selected time slot / allocation (this is used for the mutation pk)
   // NOTE we show Handled for already allocated, but not for suitable that have already been allocated.
   const selected = { day, start: startHour, end: endHour };
-  const isDay = (ts: SuitableTimeRangeNode | AllocatedTimeSlotNode) =>
+  const isDay = (ts: { dayOfTheWeek: Weekday }) =>
     ts.dayOfTheWeek === transformWeekday(day);
 
   const timeslots = aes
@@ -306,14 +305,42 @@ export function AllocationColumn({
     allocatedSections.length === 0 && !doesCollideToOtherAllocations;
   const canAllocate = hasSelection && canAllocateSelection && isRoundAllocable;
 
-  const suitableTimeSlot = (
-    as: ApplicationSectionNode
-  ): SuitableTimeRangeNode | null =>
-    getSuitableTimeSlot(as, { day, startHour, endHour });
-  const allocatedTimeSlot = (
-    as: ApplicationSectionNode
-  ): AllocatedTimeSlotNode | null =>
-    getAllocatedTimeSlot(as, { day, startHour, endHour });
+  const allocatedData = allocatedSections
+    .map((as) => {
+      const allocatedTimeSlot = getAllocatedTimeSlot(as, {
+        day,
+        startHour,
+        endHour,
+      });
+      if (allocatedTimeSlot != null) {
+        return {
+          key: as.pk,
+          applicationSection: as,
+          allocatedTimeSlot,
+        };
+      }
+      return null;
+    })
+    .filter((as): as is NonNullable<typeof as> => as != null);
+
+  const suitableData = timeslots
+    .map((as) => {
+      const timeSlot = getSuitableTimeSlot(as, { day, startHour, endHour });
+      if (timeSlot != null) {
+        const reservationUnitOptionPk =
+          as.reservationUnitOptions?.find(
+            (ruo) => ruo.reservationUnit?.pk === reservationUnit?.pk
+          )?.pk ?? 0;
+        return {
+          key: as.pk,
+          applicationSection: as,
+          timeSlot,
+          reservationUnitOptionPk,
+        };
+      }
+      return null;
+    })
+    .filter((as): as is NonNullable<typeof as> => as != null);
 
   // TODO empty state when no selection (current is ok placeholder), don't remove from DOM
   return (
@@ -328,27 +355,20 @@ export function AllocationColumn({
       >
         <TimeSelection />
       </StyledShowAllContainer>
-      {allocatedSections.map((as) => (
+      {allocatedData.map((props) => (
         <AllocatedCard
-          key={as.pk}
-          applicationSection={as}
+          {...props}
+          key={props.key}
           refetchApplicationEvents={refetchApplicationEvents}
-          allocatedTimeSlot={allocatedTimeSlot(as)}
         />
       ))}
-      {timeslots.map((as) => (
+      {suitableData.map((props) => (
         <SuitableTimeCard
-          key={as.pk}
-          applicationSection={as}
-          reservationUnitOptionPk={
-            as.reservationUnitOptions?.find(
-              (ruo) => ruo.reservationUnit?.pk === reservationUnit?.pk
-            )?.pk ?? 0
-          }
+          {...props}
+          key={props.key}
           selection={selection ?? []}
           isAllocationEnabled={canAllocate}
           refetchApplicationEvents={refetchApplicationEvents}
-          timeSlot={suitableTimeSlot(as)}
         />
       ))}
       {timeslots.length + allocated.length === 0 && (

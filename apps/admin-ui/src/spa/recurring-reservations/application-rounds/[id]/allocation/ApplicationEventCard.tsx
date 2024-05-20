@@ -4,19 +4,19 @@ import { useTranslation } from "react-i18next";
 import styled, { css } from "styled-components";
 import {
   useRejectRestMutation,
-  type AllocatedTimeSlotNode,
-  type ApplicationSectionNode,
   type Maybe,
-  type Query,
-  type ApplicationRoundFilterQuery,
+  type ApplicationSectionAllocationsQuery,
 } from "@gql/gql-types";
 import { SemiBold, fontMedium } from "common";
 import { ageGroup } from "@/component/reservations/requested/util";
 import { filterNonNullable } from "common/src/helpers";
 import { convertWeekday } from "common/src/conversion";
 import {
+  type ReservationUnitFilterQueryT,
+  type SectionNodeT,
   createDurationString,
   formatTime,
+  AllocatedTimeSlotNodeT,
 } from "./modules/applicationRoundAllocation";
 import { useFocusAllocatedSlot, useFocusApplicationEvent } from "./hooks";
 import { PopupMenu } from "@/component/PopupMenu";
@@ -25,10 +25,6 @@ import { getApplicationSectionUrl } from "@/common/urls";
 import { useNotification } from "@/context/NotificationContext";
 import { getApplicantName } from "@/helpers";
 
-type ApplicationRoundFilterQueryType =
-  NonNullable<ApplicationRoundFilterQuery>["applicationRound"];
-type ReservationUnitFilterQueryType =
-  NonNullable<ApplicationRoundFilterQueryType>["reservationUnits"][0];
 export type AllocationApplicationSectionCardType =
   | "unallocated"
   | "allocated"
@@ -36,10 +32,10 @@ export type AllocationApplicationSectionCardType =
   | "declined";
 
 type Props = {
-  applicationSection: ApplicationSectionNode;
-  reservationUnit: NonNullable<ReservationUnitFilterQueryType>;
+  applicationSection: SectionNodeT;
+  reservationUnit: NonNullable<ReservationUnitFilterQueryT>;
   type: AllocationApplicationSectionCardType;
-  refetch: () => Promise<ApolloQueryResult<Query>>;
+  refetch: () => Promise<ApolloQueryResult<ApplicationSectionAllocationsQuery>>;
 };
 
 const borderCss = css<{ $type: AllocationApplicationSectionCardType }>`
@@ -264,10 +260,10 @@ function SchedulesList({
   eventsPerWeek,
   refetch,
 }: {
-  currentReservationUnit: ReservationUnitFilterQueryType;
-  section: ApplicationSectionNode;
+  currentReservationUnit: ReservationUnitFilterQueryT;
+  section: SectionNodeT;
   eventsPerWeek: number;
-  refetch: () => Promise<ApolloQueryResult<Query>>;
+  refetch: () => Promise<ApolloQueryResult<ApplicationSectionAllocationsQuery>>;
 }): JSX.Element {
   const { t } = useTranslation();
 
@@ -378,12 +374,17 @@ const ScheduleCard = styled.div`
   text-align: left;
 `;
 
+// frontend modified the gql type so we have to do this magic
+// better would be to use fragments that are precise not the query types
+type AllocatedT = Omit<AllocatedTimeSlotNodeT, "reservationUnitOption"> & {
+  reservationUnitOption: NonNullable<SectionNodeT["reservationUnitOptions"]>[0];
+};
 function AllocatedScheduleSection({
   allocatedTimeSlot,
   currentReservationUnit,
 }: {
-  allocatedTimeSlot: AllocatedTimeSlotNode;
-  currentReservationUnit: ReservationUnitFilterQueryType;
+  allocatedTimeSlot: AllocatedT;
+  currentReservationUnit: ReservationUnitFilterQueryT;
 }): JSX.Element {
   const { t } = useTranslation();
 

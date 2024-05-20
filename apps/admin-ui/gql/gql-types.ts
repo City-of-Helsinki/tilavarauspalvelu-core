@@ -5664,11 +5664,13 @@ export type ApplicationSectionFragmentFragment = {
   reservationMinDuration: number;
   purpose?: {
     __typename?: "ReservationPurposeNode";
+    id: string;
     pk?: number | null;
     nameFi?: string | null;
   } | null;
   application: {
     __typename?: "ApplicationNode";
+    id: string;
     pk?: number | null;
     status?: ApplicationStatusChoice | null;
     applicantType?: ApplicantTypeChoice | null;
@@ -5690,6 +5692,7 @@ export type ApplicationSectionFragmentFragment = {
     preferredOrder: number;
     reservationUnit: {
       __typename?: "ReservationUnitNode";
+      id: string;
       pk?: number | null;
       nameFi?: string | null;
       unit?: {
@@ -9147,6 +9150,7 @@ export type ApplicationSectionAllocationsQuery = {
         reservationMinDuration: number;
         suitableTimeRanges: Array<{
           __typename?: "SuitableTimeRangeNode";
+          id: string;
           beginTime: string;
           endTime: string;
           dayOfTheWeek: Weekday;
@@ -9155,19 +9159,21 @@ export type ApplicationSectionAllocationsQuery = {
         }>;
         reservationUnitOptions: Array<{
           __typename?: "ReservationUnitOptionNode";
-          locked: boolean;
-          rejected: boolean;
           id: string;
           pk?: number | null;
+          locked: boolean;
+          rejected: boolean;
           preferredOrder: number;
           allocatedTimeSlots: Array<{
             __typename?: "AllocatedTimeSlotNode";
+            id: string;
             pk?: number | null;
             dayOfTheWeek: Weekday;
             beginTime: string;
             endTime: string;
             reservationUnitOption: {
               __typename?: "ReservationUnitOptionNode";
+              pk?: number | null;
               applicationSection: {
                 __typename?: "ApplicationSectionNode";
                 pk?: number | null;
@@ -9176,6 +9182,7 @@ export type ApplicationSectionAllocationsQuery = {
           }>;
           reservationUnit: {
             __typename?: "ReservationUnitNode";
+            id: string;
             pk?: number | null;
             nameFi?: string | null;
             unit?: {
@@ -9187,11 +9194,13 @@ export type ApplicationSectionAllocationsQuery = {
         }>;
         purpose?: {
           __typename?: "ReservationPurposeNode";
+          id: string;
           pk?: number | null;
           nameFi?: string | null;
         } | null;
         application: {
           __typename?: "ApplicationNode";
+          id: string;
           pk?: number | null;
           status?: ApplicationStatusChoice | null;
           applicantType?: ApplicantTypeChoice | null;
@@ -9218,6 +9227,7 @@ export type ApplicationSectionAllocationsQuery = {
   } | null;
   affectingAllocatedTimeSlots?: Array<{
     __typename?: "AllocatedTimeSlotNode";
+    id: string;
     beginTime: string;
     dayOfTheWeek: Weekday;
     endTime: string;
@@ -9446,6 +9456,7 @@ export type ApplicationSectionsQuery = {
           }>;
           reservationUnit: {
             __typename?: "ReservationUnitNode";
+            id: string;
             pk?: number | null;
             nameFi?: string | null;
             unit?: {
@@ -9457,11 +9468,13 @@ export type ApplicationSectionsQuery = {
         }>;
         purpose?: {
           __typename?: "ReservationPurposeNode";
+          id: string;
           pk?: number | null;
           nameFi?: string | null;
         } | null;
         application: {
           __typename?: "ApplicationNode";
+          id: string;
           pk?: number | null;
           status?: ApplicationStatusChoice | null;
           applicantType?: ApplicantTypeChoice | null;
@@ -9722,16 +9735,19 @@ export const ApplicationSectionFragmentFragmentDoc = gql`
   fragment ApplicationSectionFragment on ApplicationSectionNode {
     ...ApplicationSectionCommonFragment
     purpose {
+      id
       pk
       nameFi
     }
     application {
+      id
       pk
       status
       ...ApplicationNameFragment
     }
     reservationUnitOptions {
       reservationUnit {
+        id
         pk
         nameFi
         unit {
@@ -15534,6 +15550,7 @@ export const ApplicationSectionAllocationsDocument = gql`
           ...ApplicationSectionFragment
           allocations
           suitableTimeRanges(fulfilled: false) {
+            id
             beginTime
             endTime
             dayOfTheWeek
@@ -15541,14 +15558,18 @@ export const ApplicationSectionAllocationsDocument = gql`
             fulfilled
           }
           reservationUnitOptions {
+            id
+            pk
             locked
             rejected
             allocatedTimeSlots {
+              id
               pk
               dayOfTheWeek
               beginTime
               endTime
               reservationUnitOption {
+                pk
                 applicationSection {
                   pk
                 }
@@ -15564,6 +15585,7 @@ export const ApplicationSectionAllocationsDocument = gql`
       beginDate: $beginDate
       endDate: $endDate
     ) {
+      id
       beginTime
       dayOfTheWeek
       endTime
