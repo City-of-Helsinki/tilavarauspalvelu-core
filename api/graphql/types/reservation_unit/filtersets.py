@@ -114,7 +114,9 @@ class ReservationUnitFilterSet(ModelFilterSet):
 
     @staticmethod
     def get_text_search(qs: ReservationUnitQuerySet, name: str, value: str) -> QuerySet:
-        query_str = build_elastic_query_str(value)
+        query_str = build_elastic_query_str(search_words=value)
+        if not query_str:
+            return qs
         sq = SearchQuery.do_search("reservation_units", {"query_string": {"query": query_str}})
         return qs.from_search_results(sq)
 
