@@ -130,12 +130,16 @@ class WebhookRefundViewSet(viewsets.ViewSet):
         order_id: uuid.UUID = serializer.validated_data["orderId"]
         refund_id: uuid.UUID = serializer.validated_data["refundId"]
 
-        payment_order: PaymentOrder | None
-        payment_order = PaymentOrder.objects.filter(remote_id=order_id, refund_id=refund_id).first()
+        payment_order: PaymentOrder | None = PaymentOrder.objects.filter(remote_id=order_id).first()
         if payment_order is None:
-            msg = f"Payment order {order_id=!s} & {refund_id=!s} not found"
+            msg = f"Payment order {order_id=!s} not found"
             SentryLogger.log_message(f"Verkkokauppa: {msg}", details=serializer.validated_data)
             return Response(data={"message": msg}, status=404)
+
+        if payment_order.refund_id is not None and payment_order.refund_id != refund_id:
+            msg = f"Refund ID mismatch: expected {payment_order.refund_id}, got {refund_id}"
+            SentryLogger.log_message(f"Verkkokauppa: {msg}", details=serializer.validated_data)
+            return Response(data={"message": msg}, status=400)
 
         if payment_order.status != OrderStatus.PAID:
             msg = f"Order '{order_id}' is already in a state where no updates are needed"
@@ -158,6 +162,7 @@ class WebhookRefundViewSet(viewsets.ViewSet):
             SentryLogger.log_message(f"Verkkokauppa: {msg}", details=serializer.validated_data)
             return Response(data={"message": msg}, status=400)
 
+        payment_order.refund_id = refund_id
         payment_order.status = OrderStatus.REFUNDED
         payment_order.processed_at = local_datetime()
         payment_order.save()
