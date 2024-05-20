@@ -9,7 +9,7 @@ from django.utils.timezone import get_default_timezone
 from requests import Response
 
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
-from utils.external_service.errors import ExternalServiceRequestError
+from utils.external_service.errors import ExternalServiceError, ExternalServiceRequestError
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
@@ -116,6 +116,9 @@ class TprekAPIClient(BaseExternalServiceClient):
 
     @staticmethod
     def _build_url(endpoint: str) -> str:
+        if not settings.TPREK_UNIT_URL:
+            raise ExternalServiceError("'TPREK_UNIT_URL' environment variable must to be configured.")
+
         tprek_api_url_base = settings.TPREK_UNIT_URL.removesuffix("/")
         return f"{tprek_api_url_base}/{endpoint}"
 
