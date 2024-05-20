@@ -85,24 +85,15 @@ def test_application__unit_admin(graphql):
 
 
 def test_application__unit_admin__other_units(graphql):
-    # given:
-    # - There is an application event in an application with an event reservation unit
-    # - A unit admin for some other unit is using the system
+    unit = UnitFactory.create(name="foo")
     ApplicationSectionFactory.create_in_status_unallocated(
-        reservation_unit_options__reservation_unit__unit__name="foo",
+        reservation_unit_options__reservation_unit__unit__name="bar",
     )
-    admin = UserFactory.create_with_unit_permissions(
-        unit=UnitFactory.create(name="bar"),
-        perms=["can_validate_applications"],
-    )
+    admin = UserFactory.create_with_unit_permissions(unit=unit, perms=["can_validate_applications"])
     graphql.force_login(admin)
 
-    # when:
-    # - User tries to search for applications
     response = graphql(applications_query())
 
-    # then:
-    # - The response has no errors, but is empty
     assert response.has_errors is False, response
     assert response.edges == []
 

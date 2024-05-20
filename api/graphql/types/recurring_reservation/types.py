@@ -5,8 +5,7 @@ from graphene_django_extensions import DjangoNode
 from api.graphql.types.recurring_reservation.filtersets import RecurringReservationFilterSet
 from api.graphql.types.recurring_reservation.permissions import RecurringReservationPermission
 from common.typing import GQLInfo
-from permissions.helpers import can_view_recurring_reservation, has_general_permission
-from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
+from permissions.helpers import can_view_recurring_reservation
 from reservations.models import RecurringReservation
 
 __all__ = [
@@ -37,7 +36,9 @@ class RecurringReservationNode(DjangoNode):
             "reservations",
         ]
         restricted_fields = {
-            "user": lambda user, instance: can_view_recurring_reservation(user, instance),
+            "name": can_view_recurring_reservation,
+            "description": can_view_recurring_reservation,
+            "user": can_view_recurring_reservation,
         }
         filterset_class = RecurringReservationFilterSet
         permission_classes = [RecurringReservationPermission]
@@ -48,20 +49,9 @@ class RecurringReservationNode(DjangoNode):
 
         if user.is_anonymous:
             return queryset.none()
-        if user.is_superuser:
-            return queryset
-        if has_general_permission(user, GeneralPermissionChoices.CAN_VIEW_RESERVATIONS):
-            return queryset
-
-        unit_permission = UnitPermissionChoices.CAN_VIEW_RESERVATIONS.value
-        unit_ids = [pk for pk, perms in user.unit_permissions.items() if unit_permission in perms]
-        unit_group_ids = [pk for pk, perms in user.unit_group_permissions.items() if unit_permission in perms]
-
-        return queryset.filter(
-            models.Q(user=user)
-            | models.Q(reservation_unit__unit__in=unit_ids)
-            | models.Q(reservation_unit__unit__unit_groups__in=unit_group_ids)
-        ).distinct()
+        if not user.has_staff_permissions:
+            return queryset.filter(user=user)
+        return queryset
 
     def resolve_weekdays(root: RecurringReservation, info: GQLInfo) -> list[int]:
         if root.weekdays:

@@ -3,6 +3,7 @@ import datetime
 import graphene
 from graphene_django_extensions.errors import GQLNodePermissionDeniedError
 from graphql import GraphQLError
+from lookup_property import L
 from query_optimizer.selections import get_field_selections
 
 from api.graphql.extensions import error_codes
@@ -91,7 +92,15 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
 
     @classmethod
     def get_user_from_application(cls, application_id: int, info: GQLInfo) -> User:
-        application: Application | None = Application.objects.select_related("user").filter(pk=application_id).first()
+        application: Application | None = (
+            Application.objects.select_related("user")
+            .annotate(
+                unit_ids_for_perms=L("unit_ids_for_perms"),
+                unit_group_ids_for_perms=L("unit_group_ids_for_perms"),
+            )
+            .filter(pk=application_id)
+            .first()
+        )
         if application is None:
             msg = f"Application with id {application_id} not found."
             extensions = {"code": error_codes.HELSINKI_PROFILE_APPLICATION_USER_NOT_FOUND}

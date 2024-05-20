@@ -15,6 +15,7 @@ from applications.choices import (
 )
 from applications.querysets.application import ApplicationQuerySet
 from common.connectors import ApplicationActionsConnector
+from common.db import SubqueryArray
 from common.fields.model import StrChoiceField
 
 __all__ = [
@@ -283,5 +284,36 @@ class Application(SerializableMixin, models.Model):
 
         from .reservation_unit_option import ReservationUnitOption
 
-        ids = ReservationUnitOption.objects.filter(application_section__application=self).values("reservation_unit")
+        qs = ReservationUnitOption.objects.filter(application_section__application=self)
+        ids = qs.values("reservation_unit")
         return Unit.objects.filter(reservationunit__in=models.Subquery(ids))
+
+    @lookup_property(joins=["application_sections"], skip_codegen=True)
+    def unit_ids_for_perms() -> list[int]:
+        from spaces.models import Unit
+
+        ref = "application_sections__reservation_unit_options__reservation_unit"
+        expr = SubqueryArray(Unit.objects.filter(reservationunit__in=models.OuterRef(ref)).values("id"), agg_field="id")
+        return expr  # type: ignore[return-value]
+
+    @unit_ids_for_perms.override
+    def _(self) -> list[int]:
+        return [unit.id for unit in self.units]
+
+    @lookup_property(joins=["application_sections"], skip_codegen=True)
+    def unit_group_ids_for_perms() -> list[int]:
+        from spaces.models import UnitGroup
+
+        ref = "application_sections__reservation_unit_options__reservation_unit__unit"
+        expr = SubqueryArray(UnitGroup.objects.filter(units__in=models.OuterRef(ref)).values("id"), agg_field="id")
+        return expr  # type: ignore[return-value]
+
+    @unit_group_ids_for_perms.override
+    def _(self) -> list[int]:
+        from spaces.models import UnitGroup
+
+        from .reservation_unit_option import ReservationUnitOption
+
+        qs = ReservationUnitOption.objects.filter(application_section__application=self)
+        ids = qs.values("reservation_unit__unit")
+        return list(UnitGroup.objects.filter(units__in=models.Subquery(ids)).values_list("id", flat=True))
