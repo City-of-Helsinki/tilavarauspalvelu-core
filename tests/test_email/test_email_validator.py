@@ -1,3 +1,4 @@
+import re
 from unittest import mock
 
 import pytest
@@ -14,7 +15,7 @@ def test_email_validator__raises__validation_error_on_invalid_file_extension():
     mock_field_file.size = settings.EMAIL_HTML_MAX_FILE_SIZE
 
     msg = "Unsupported file extension .jpg. Only .html files are allowed"
-    with pytest.raises(ValidationError, match=msg):
+    with pytest.raises(ValidationError, match=re.escape(msg)):
         EmailTemplateValidator(ReservationEmailContext.from_mock_data()).validate_html_file(mock_field_file)
 
 
@@ -24,7 +25,7 @@ def test_email_validator__raises__validation_error_on_zero_size_file():
     mock_field_file.size = 0
 
     msg = f"Invalid HTML file size. Allowed file size: 1-{settings.EMAIL_HTML_MAX_FILE_SIZE} bytes."
-    with pytest.raises(ValidationError, match=msg):
+    with pytest.raises(ValidationError, match=re.escape(msg)):
         EmailTemplateValidator(ReservationEmailContext.from_mock_data()).validate_html_file(mock_field_file)
 
 
@@ -34,7 +35,7 @@ def test_email_validator__raises__validation_error_on_big_file():
     mock_field_file.size = settings.EMAIL_HTML_MAX_FILE_SIZE + 1
 
     msg = f"Invalid HTML file size. Allowed file size: 1-{settings.EMAIL_HTML_MAX_FILE_SIZE} bytes."
-    with pytest.raises(ValidationError, match=msg):
+    with pytest.raises(ValidationError, match=re.escape(msg)):
         EmailTemplateValidator(ReservationEmailContext.from_mock_data()).validate_html_file(mock_field_file)
 
 
@@ -48,7 +49,7 @@ def test_email_validator__raises__validation_error_on_unsupported_tag():
     mock_field_file.open.return_value = mock_file
 
     msg = "Tag 'invalid_tag' is not supported"
-    with pytest.raises(ValidationError, match=msg):
+    with pytest.raises(ValidationError, match=re.escape(msg)):
         EmailTemplateValidator(ReservationEmailContext.from_mock_data()).validate_html_file(mock_field_file)
 
 
@@ -62,7 +63,7 @@ def test_email_validator__raises__validation_error_on_illegal_tag():
     mock_field_file.open.return_value = mock_file
 
     msg = "Illegal tags found: tag was 'invalid_tag'"
-    with pytest.raises(ValidationError, match=msg):
+    with pytest.raises(ValidationError, match=re.escape(msg)):
         EmailTemplateValidator(ReservationEmailContext.from_mock_data()).validate_html_file(mock_field_file)
 
 
