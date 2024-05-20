@@ -95,3 +95,12 @@ def test_order_from_json__missing_fields__subscription_id():
     order = Order.from_json(data)
 
     assert order.subscription_id is None
+
+
+def test_order_from_json__created_at_no_milliseconds():
+    """Verkkokauppa API does not return milliseconds in the createdAt field, if the seconds is zero."""
+    data = order_json.copy()
+    data["createdAt"] = "2021-02-25T10:23:00"
+    order = Order.from_json(data)
+
+    assert order.created_at == datetime(2021, 2, 25, 10, 23, 0, tzinfo=settings.VERKKOKAUPPA_TIMEZONE)
