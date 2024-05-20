@@ -10,7 +10,7 @@ from spaces.models import Location
 from tests.factories import UnitFactory
 from tests.helpers import patch_method
 from tests.mocks import MockResponse
-from tests.test_external_services.test_tprek.conftest import SINGLE_TPREK_UNIT_JSON
+from tests.test_external_services.test_tprek.helpers import SINGLE_TPREK_UNIT_JSON
 from utils.sentry import SentryLogger
 
 # Applied to all tests
