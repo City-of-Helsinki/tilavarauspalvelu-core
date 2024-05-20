@@ -17,7 +17,7 @@ __all__ = [
 class ReservationUnitImagePermission(BasePermission):
     @classmethod
     def has_permission(cls, user: AnyUser) -> bool:
-        return False
+        return True
 
     @classmethod
     def has_create_permission(cls, user: AnyUser, input_data: dict[str, Any]) -> bool:

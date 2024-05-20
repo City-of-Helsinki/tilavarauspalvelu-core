@@ -50,6 +50,20 @@ class AllocatedTimeSlotPermission(BasePermission):
         return has_unit_permission(user, perm, [option.reservation_unit.unit.id])
 
     @classmethod
+    def has_update_permission(cls, instance: AllocatedTimeSlot, user: AnyUser, input_data: dict[str, Any]) -> bool:
+        if user.is_anonymous:
+            return False
+        if user.is_superuser:
+            return True
+        if not user.has_staff_permissions:
+            return False
+        if has_general_permission(user, GeneralPermissionChoices.CAN_HANDLE_APPLICATIONS):
+            return True
+
+        perm = UnitPermissionChoices.CAN_HANDLE_APPLICATIONS
+        return has_unit_permission(user, perm, [instance.reservation_unit_option.reservation_unit.unit.id])
+
+    @classmethod
     def has_delete_permission(cls, instance: AllocatedTimeSlot, user: AnyUser, input_data: dict[str, Any]) -> bool:
         if user.is_anonymous:
             return False

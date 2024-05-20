@@ -33,17 +33,35 @@ def has_all_general_permissions(user: AnyUser, permissions: Iterable[GeneralPerm
     return all(permission in user.general_permissions for permission in permissions)
 
 
-def has_unit_permission(user: AnyUser, required_permission: UnitPermissionChoices, units: list[int]) -> bool:
+def has_unit_permission(user: AnyUser, permission: UnitPermissionChoices, units: list[int]) -> bool:
     from spaces.models import UnitGroup
 
     if user.is_anonymous:
         return False
     for unit in units:
-        if required_permission in user.unit_permissions.get(unit, []):
+        if permission in user.unit_permissions.get(unit, []):
             return True
 
     unit_groups: list[int] = list(UnitGroup.objects.filter(units__in=units).values_list("pk", flat=True).distinct())
-    return has_unit_group_permission(user, required_permission, unit_groups)
+    return has_unit_group_permission(user, permission, unit_groups)
+
+
+def has_unit_permission_to_any_unit(user: AnyUser, permission: UnitPermissionChoices, units: list[int]) -> bool:
+    return any(has_unit_permission(user, permission, [unit]) for unit in units)
+
+
+def has_unit_or_group_permission(
+    user: AnyUser,
+    required_permission: UnitPermissionChoices,
+    units: list[int],
+    unit_groups: list[int],
+) -> bool:
+    if user.is_anonymous:
+        return False
+    for unit in units:
+        if required_permission in user.unit_permissions.get(unit, []):
+            return True
+    return any(required_permission in user.unit_group_permissions.get(unit_group, []) for unit_group in unit_groups)
 
 
 def has_unit_group_permission(
@@ -119,16 +137,15 @@ def can_read_application(user: AnyUser, application: Application) -> bool:
     if application.user == user:
         return True
 
-    if has_general_permission(user, GeneralPermissionChoices.CAN_HANDLE_APPLICATIONS):
-        return True
-    if has_general_permission(user, GeneralPermissionChoices.CAN_VALIDATE_APPLICATIONS):
+    if has_any_general_permission(user, GeneralPermissionChoices.handle_or_validate_applications):
         return True
 
-    units: list[int] = list(application.units.values_list("pk", flat=True))
-    if has_unit_permission(user, UnitPermissionChoices.CAN_HANDLE_APPLICATIONS, units):
+    unit_ids = application.unit_ids_for_perms
+    unit_group_ids = application.unit_group_ids_for_perms
+    if has_unit_or_group_permission(user, UnitPermissionChoices.CAN_HANDLE_APPLICATIONS, unit_ids, unit_group_ids):
         return True
 
-    return has_unit_permission(user, UnitPermissionChoices.CAN_VALIDATE_APPLICATIONS, units)
+    return has_unit_or_group_permission(user, UnitPermissionChoices.CAN_VALIDATE_APPLICATIONS, unit_ids, unit_group_ids)
 
 
 def can_access_application_private_fields(user: AnyUser, application: Application) -> bool:
@@ -146,8 +163,9 @@ def can_view_reservation(user: AnyUser, reservation: Reservation, needs_staff_pe
     if has_general_permission(user, GeneralPermissionChoices.CAN_VIEW_RESERVATIONS):
         return True
 
-    units = list(reservation.reservation_unit.values_list("unit", flat=True).distinct())
-    return has_unit_permission(user, UnitPermissionChoices.CAN_VIEW_RESERVATIONS, units)
+    unit_ids = reservation.unit_ids_for_perms
+    unit_group_ids = reservation.unit_group_ids_for_perms
+    return has_unit_or_group_permission(user, UnitPermissionChoices.CAN_VIEW_RESERVATIONS, unit_ids, unit_group_ids)
 
 
 def can_modify_reservation(user: AnyUser, reservation: Reservation) -> bool:
@@ -201,7 +219,7 @@ def can_view_recurring_reservation(user: AnyUser, recurring_reservation: Recurri
     if has_general_permission(user, GeneralPermissionChoices.CAN_VIEW_RESERVATIONS):
         return True
 
-    units = list(recurring_reservation.reservations.values_list("reservation_unit__unit", flat=True).distinct())
+    units = [recurring_reservation.reservation_unit.unit.pk]
     return has_unit_permission(user, UnitPermissionChoices.CAN_VIEW_RESERVATIONS, units)
 
 
@@ -263,10 +281,8 @@ def can_create_staff_reservation(user: AnyUser, units: list[int]) -> bool:
 
 
 def can_manage_banner_notifications(user: AnyUser) -> bool:
-    general_permission = GeneralPermissionChoices.CAN_MANAGE_NOTIFICATIONS
-
     if user.is_anonymous:
         return False
     if user.is_superuser:
         return True
-    return has_general_permission(user, general_permission)
+    return has_general_permission(user, GeneralPermissionChoices.CAN_MANAGE_NOTIFICATIONS)

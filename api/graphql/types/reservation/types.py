@@ -1,6 +1,8 @@
 import graphene
+from django.db import models
 from django.db.models import OuterRef
 from graphene_django_extensions import DjangoNode
+from lookup_property import L
 from query_optimizer import AnnotatedField, DjangoListField
 from rest_framework.reverse import reverse
 
@@ -172,62 +174,45 @@ class ReservationNode(DjangoNode):
             "calendar_url",
         ]
         restricted_fields = {
-            #
-            "name": private_field_check,
-            "description": private_field_check,
-            "num_persons": private_field_check,
-            "type": staff_field_check,
-            "cancel_details": private_field_check,
-            "handling_details": staff_field_check,
-            "working_memo": staff_field_check,
-            #
-            "handled_at": staff_field_check,
-            "created_at": private_field_check,
-            #
-            "price": private_field_check,
-            "price_net": private_field_check,
-            "unit_price": private_field_check,
-            "tax_percentage_value": private_field_check,
-            #
-            "applying_for_free_of_charge": private_field_check,
-            "free_of_charge_reason": private_field_check,
-            #
-            "reservee_id": private_field_check,
-            "reservee_name": private_field_check,
-            "reservee_first_name": private_field_check,
-            "reservee_last_name": private_field_check,
-            "reservee_email": private_field_check,
-            "reservee_phone": private_field_check,
-            "reservee_organisation_name": private_field_check,
-            "reservee_address_street": private_field_check,
-            "reservee_address_city": private_field_check,
-            "reservee_address_zip": private_field_check,
-            "reservee_is_unregistered_association": private_field_check,
-            "reservee_type": private_field_check,
-            #
-            "billing_first_name": private_field_check,
-            "billing_last_name": private_field_check,
-            "billing_email": private_field_check,
-            "billing_phone": private_field_check,
-            "billing_address_street": private_field_check,
-            "billing_address_city": private_field_check,
-            "billing_address_zip": private_field_check,
-            #
-            "user": private_field_check,
-            "deny_reason": private_field_check,
-            "cancel_reason": private_field_check,
-            "purpose": private_field_check,
-            "home_city": private_field_check,
-            "age_group": private_field_check,
-            #
-            "is_handled": private_field_check,
-            "order": private_field_check,
-            "staff_event": staff_field_check,
-            "calendar_url": private_field_check,
+            field: (
+                staff_field_check
+                if field
+                in [
+                    # STAFF FIELDS
+                    "type",
+                    "handling_details",
+                    "working_memo",
+                    "handled_at",
+                    "staff_event",
+                ]
+                # FIELDS ARE PRIVATE BY DEFAULT
+                else private_field_check
+            )
+            for field in fields
+            if field
+            not in [
+                # PUBLIC FIELDS
+                "pk",
+                "state",
+                "begin",
+                "end",
+                "buffer_time_before",
+                "buffer_time_after",
+                "reservation_unit",
+                "is_blocked",
+            ]
         }
         max_complexity = 20
         filterset_class = ReservationFilterSet
         permission_classes = [ReservationPermission]
+
+    @classmethod
+    def filter_queryset(cls, queryset: models.QuerySet, info: GQLInfo) -> models.QuerySet:
+        return queryset.annotate(
+            # Annotate for field permission checks
+            unit_ids_for_perms=L("unit_ids_for_perms"),
+            unit_group_ids_for_perms=L("unit_group_ids_for_perms"),
+        )
 
     def resolve_order(root: Reservation, info: GQLInfo) -> PaymentOrder | None:
         return root.payment_order.first()

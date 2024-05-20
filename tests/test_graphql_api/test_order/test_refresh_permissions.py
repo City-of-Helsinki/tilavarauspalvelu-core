@@ -2,7 +2,7 @@ import pytest
 
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tests.factories import UserFactory
-from tests.helpers import UserType, patch_method
+from tests.helpers import patch_method
 
 from .helpers import REFRESH_MUTATION, get_order
 
@@ -14,7 +14,6 @@ pytestmark = [
 
 def test_refresh_order__anonymous_user(graphql):
     order = get_order()
-    graphql.login_user_based_on_type(UserType.ANONYMOUS)
 
     data = {"orderUuid": str(order.remote_id)}
     response = graphql(REFRESH_MUTATION, input_data=data)
@@ -24,7 +23,8 @@ def test_refresh_order__anonymous_user(graphql):
 
 def test_refresh_order__regular_user(graphql):
     order = get_order()
-    graphql.login_user_based_on_type(UserType.REGULAR)
+
+    graphql.login_with_regular_user()
 
     data = {"orderUuid": str(order.remote_id)}
     response = graphql(REFRESH_MUTATION, input_data=data)
@@ -34,7 +34,7 @@ def test_refresh_order__regular_user(graphql):
 
 @patch_method(VerkkokauppaAPIClient.get_payment, return_value=None)
 def test_refresh_order__order_owner(graphql):
-    user = graphql.login_user_based_on_type(UserType.REGULAR)
+    user = graphql.login_with_regular_user()
     order = get_order(user=user)
 
     data = {"orderUuid": str(order.remote_id)}

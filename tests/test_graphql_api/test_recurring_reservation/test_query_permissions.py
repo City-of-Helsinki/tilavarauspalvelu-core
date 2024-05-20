@@ -1,7 +1,6 @@
 import pytest
 
 from tests.factories import RecurringReservationFactory, ReservationUnitFactory, UserFactory
-from tests.helpers import UserType
 
 from .helpers import recurring_reservations_query
 
@@ -12,7 +11,7 @@ pytestmark = [
 
 
 def test_recurring_reservations__query__regular_user__can_only_see_own(graphql):
-    user = graphql.login_user_based_on_type(UserType.REGULAR)
+    user = graphql.login_with_regular_user()
 
     recurring_reservation = RecurringReservationFactory.create(user=user)
     RecurringReservationFactory.create()
@@ -26,7 +25,7 @@ def test_recurring_reservations__query__regular_user__can_only_see_own(graphql):
     assert response.node(0) == {"pk": recurring_reservation.pk}
 
 
-def test_recurring_reservations__query__general_admin__can_see_all(graphql):
+def test_recurring_reservations__query__general_admin(graphql):
     user = UserFactory.create_with_general_permissions(perms=["can_view_reservations"])
     recurring_reservation_1 = RecurringReservationFactory.create(name="1", user=user)
     recurring_reservation_2 = RecurringReservationFactory.create(name="2")
@@ -43,13 +42,13 @@ def test_recurring_reservations__query__general_admin__can_see_all(graphql):
     assert response.node(1) == {"pk": recurring_reservation_2.pk}
 
 
-def test_recurring_reservations__query__unit_admin__can_only_see_in_own_unit_from_others(graphql):
+def test_recurring_reservations__query__unit_admin(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
     user = UserFactory.create_with_unit_permissions(unit=reservation_unit.unit, perms=["can_view_reservations"])
     recurring_reservation_1 = RecurringReservationFactory.create(name="1", user=user)
     recurring_reservation_2 = RecurringReservationFactory.create(name="2", reservation_unit=reservation_unit)
-    RecurringReservationFactory.create()
+    recurring_reservation_3 = RecurringReservationFactory.create(name="3")
 
     graphql.force_login(user)
 
@@ -58,6 +57,7 @@ def test_recurring_reservations__query__unit_admin__can_only_see_in_own_unit_fro
 
     assert response.has_errors is False
 
-    assert len(response.edges) == 2
+    assert len(response.edges) == 3
     assert response.node(0) == {"pk": recurring_reservation_1.pk}
     assert response.node(1) == {"pk": recurring_reservation_2.pk}
+    assert response.node(2) == {"pk": recurring_reservation_3.pk}
