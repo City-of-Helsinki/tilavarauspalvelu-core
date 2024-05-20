@@ -8,20 +8,11 @@ import {
 import { createUploadLink } from "apollo-upload-client";
 import { getCookie } from "typescript-cookie";
 import { onError } from "@apollo/client/link/error";
-import { uniqBy } from "lodash";
 import { GraphQLError } from "graphql/error/GraphQLError";
-import type {
-  ApplicationNodeConnection,
-  ApplicationSectionNodeConnection,
-  AllocatedTimeSlotNodeConnection,
-  ReservationNodeConnection,
-  BannerNotificationNodeConnection,
-  ReservationUnitNodeConnection,
-  UnitNodeConnection,
-} from "@gql/gql-types";
 import { buildGraphQLUrl } from "common/src/urlBuilder";
 import { env } from "@/env.mjs";
 import { isBrowser } from "./const";
+import { relayStylePagination } from "@apollo/client/utilities";
 
 const authLink = new ApolloLink((operation, forward) => {
   // TODO this doesn't work with SSR (use the ui implementation when we add SSR requests)
@@ -70,207 +61,22 @@ function createClient(apiBaseUrl: string) {
   const uploadLink: ApolloLink = createUploadLink(uploadLinkOptions);
   const httpLink = new HttpLink({ uri, credentials: "include" });
 
-  const cache = new InMemoryCache({
-    typePolicies: {
-      Query: {
-        fields: {
-          bannerNotifications: {
-            keyArgs: ["orderBy"],
-            read(existing: BannerNotificationNodeConnection) {
-              return existing;
-            },
-            merge(
-              existing: BannerNotificationNodeConnection,
-              incoming: BannerNotificationNodeConnection
-            ) {
-              // TODO this should be optimized; using both spread and uniqBy creates a lot of copies
-              const merged = {
-                ...existing,
-                ...incoming,
-                edges: uniqBy(
-                  [...(existing?.edges ?? []), ...incoming.edges],
-                  (x) => x?.node?.pk
-                ),
-              };
-              return merged;
-            },
-          },
-          allocatedTimeSlots: {
-            keyArgs: [
-              "applicationRound",
-              "allocatedUnit",
-              "applicantType",
-              "applicationSectionStatus",
-              "allocatedReservationUnit",
-              "dayOfTheWeek",
-              "textSearch",
-              "orderBy",
-            ],
-            read(existing: AllocatedTimeSlotNodeConnection) {
-              return existing;
-            },
-            merge(
-              existing: AllocatedTimeSlotNodeConnection,
-              incoming: AllocatedTimeSlotNodeConnection
-            ) {
-              return {
-                ...incoming,
-                edges: uniqBy(
-                  [...(existing?.edges ?? []), ...incoming.edges],
-                  (x) => x?.node?.pk
-                ),
-              };
-            },
-          },
-          applicationSections: {
-            keyArgs: [
-              "applicationRound",
-              "applicationStatus",
-              "status",
-              "unit",
-              "applicantType",
-              "preferredOrder",
-              "textSearch",
-              "priority",
-              "purpose",
-              "reservationUnit",
-              "ageGroup",
-              "homeCity",
-              "includePreferredOrder10OrHigher",
-              "orderBy",
-            ],
-            read(existing: ApplicationSectionNodeConnection) {
-              return existing;
-            },
-            merge(
-              existing: ApplicationSectionNodeConnection,
-              incoming: ApplicationSectionNodeConnection
-            ) {
-              return {
-                ...incoming,
-                edges: uniqBy(
-                  [...(existing?.edges ?? []), ...incoming.edges],
-                  (x) => x?.node?.pk
-                ),
-              };
-            },
-          },
-          applications: {
-            keyArgs: [
-              "applicationRound",
-              "unit",
-              "status",
-              "applicantType",
-              "textSearch",
-              "orderBy",
-            ],
-            read(existing: ApplicationNodeConnection) {
-              return existing;
-            },
-            merge(
-              existing: ApplicationNodeConnection,
-              incoming: ApplicationNodeConnection
-            ) {
-              return {
-                ...incoming,
-                edges: uniqBy(
-                  [...(existing?.edges ?? []), ...incoming.edges],
-                  (x) => x?.node?.pk
-                ),
-              };
-            },
-          },
-          reservations: {
-            // Separate caches for all query params
-            // causes a full refetch when anything changes which is bad (e.g. sorting)
-            // but otherwise we get weird UI behaviour: "Load more" button loads
-            // new elements into positions 20 - 40 while it's own position is after 200+ list elements
-            // primary usecase is that recurringReservation loading 2000 reservations needs to be cached
-            // added benefit is that it allows fast swapping between the same query param values
-            keyArgs: [
-              "recurringReservation",
-              "unit",
-              "state",
-              "orderBy",
-              "reservationUnitType",
-              "reservationUnit",
-              "textSearch",
-              "beginDate",
-              "endDate",
-              "priceGte",
-              "priceLte",
-              "orderStatus",
-            ],
-            read(existing: ReservationNodeConnection) {
-              return existing;
-            },
-            merge(
-              existing: ReservationNodeConnection,
-              incoming: ReservationNodeConnection
-            ) {
-              // TODO this should be optimized using both spread and uniqBy creates a lot of copies
-              return {
-                ...incoming,
-                edges: uniqBy(
-                  [...(existing?.edges ?? []), ...incoming.edges],
-                  (x) => x?.node?.pk
-                ),
-              };
-            },
-          },
-          units: {
-            keyArgs: ["orderBy", "nameFi"],
-            read(existing: UnitNodeConnection) {
-              return existing;
-            },
-            merge(existing: UnitNodeConnection, incoming: UnitNodeConnection) {
-              return {
-                ...incoming,
-                edges: uniqBy(
-                  [...(existing?.edges ?? []), ...incoming.edges],
-                  (x) => x?.node?.pk
-                ),
-              };
-            },
-          },
-          reservationUnits: {
-            keyArgs: [
-              "nameFi",
-              "maxPersonsGte",
-              "minPersonsGte",
-              "maxPersonsLte",
-              "minPersonsLte",
-              "surfaceAreaGte",
-              "surfaceAreaLte",
-              "unit",
-              "reservationUnitType",
-              "state",
-              "textSearch",
-              "orderBy",
-            ],
-            read(existing: ReservationUnitNodeConnection) {
-              return existing;
-            },
-            merge(
-              existing: ReservationUnitNodeConnection,
-              incoming: ReservationUnitNodeConnection
-            ) {
-              return {
-                ...incoming,
-                edges: uniqBy(
-                  [...(existing?.edges ?? []), ...incoming.edges],
-                  (x) => x?.node?.pk
-                ),
-              };
-            },
+  return new ApolloClient({
+    cache: new InMemoryCache({
+      typePolicies: {
+        Query: {
+          fields: {
+            reservationUnits: relayStylePagination(),
+            units: relayStylePagination(),
+            reservations: relayStylePagination(),
+            applications: relayStylePagination(),
+            applicationSections: relayStylePagination(),
+            allocatedTimeSlots: relayStylePagination(),
+            bannerNotifications: relayStylePagination(),
           },
         },
       },
-    },
-  });
-
-  return new ApolloClient({
-    cache,
+    }),
     link: isBrowser
       ? from([authLink, errorLink, uploadLink])
       : from([authLink, errorLink, httpLink]),

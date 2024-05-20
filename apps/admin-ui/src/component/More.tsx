@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { Button } from "hds-react";
 import { useTranslation } from "react-i18next";
 import type { ApolloQueryResult } from "@apollo/client";
-import type { Query } from "@gql/gql-types";
+import type { PageInfo, Query } from "@gql/gql-types";
 
 const Wrapper = styled.div`
   display: flex;
@@ -17,16 +17,24 @@ const Counts = styled.div`
 type Props = {
   count: number;
   totalCount: number;
-  fetchMore: () => Promise<ApolloQueryResult<Query>>;
+  pageInfo: Pick<PageInfo, "hasNextPage" | "endCursor"> | undefined;
+  fetchMore: (cursor: string) => Promise<ApolloQueryResult<Query>>;
 };
 
-export function More({ count, totalCount, fetchMore }: Props): JSX.Element {
+// TODO refactor count and totalCount to use pageInfo
+export function More({
+  count,
+  totalCount,
+  pageInfo,
+  fetchMore,
+}: Props): JSX.Element {
   const { t } = useTranslation();
   const [isFetching, setIsFetching] = React.useState(false);
 
   const handleClick = async () => {
+    const endCursor = pageInfo?.endCursor;
     setIsFetching(true);
-    await fetchMore();
+    await fetchMore(endCursor ?? "");
     setIsFetching(false);
   };
 

@@ -61,6 +61,7 @@ export function AllocatedEventDataLoader({
       notifyError(err.message);
     },
     fetchPolicy: "cache-and-network",
+    // TODO enable or no?
     nextFetchPolicy: "cache-first",
   });
 
@@ -94,13 +95,8 @@ export function AllocatedEventDataLoader({
       <More
         totalCount={totalCount}
         count={aes.length}
-        fetchMore={() =>
-          fetchMore({
-            variables: {
-              offset: data?.allocatedTimeSlots?.edges.length ?? 0,
-            },
-          })
-        }
+        pageInfo={dataToUse?.allocatedTimeSlots?.pageInfo}
+        fetchMore={(after) => fetchMore({ variables: { after } })}
       />
     </>
   );

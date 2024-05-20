@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { type TFunction } from "i18next";
 import styled from "styled-components";
-import { Button } from "hds-react";
 import {
   type BannerNotificationNode,
   BannerNotificationOrderingChoices,
@@ -18,6 +17,7 @@ import { valueForDateInput, valueForTimeInput } from "@/helpers";
 import { GQL_MAX_RESULTS_PER_QUERY } from "@/common/const";
 import { CustomTable, TableLink } from "@/component/Table";
 import { filterNonNullable } from "common/src/helpers";
+import { More } from "../More";
 
 const notificationUrl = (pk: number) => `/messaging/notifications/${pk}`;
 
@@ -125,23 +125,19 @@ function Page() {
   const [sort, setSort] = useState<string>("state");
   const orderBy = transformSortString(sort);
 
-  const {
-    data,
-    loading: isLoading,
-    previousData,
-    fetchMore,
-  } = useBannerNotificationsAdminListQuery({
-    variables: {
-      first: GQL_MAX_RESULTS_PER_QUERY,
-      orderBy,
-    },
-  });
+  const { data, loading, previousData, fetchMore } =
+    useBannerNotificationsAdminListQuery({
+      variables: {
+        first: GQL_MAX_RESULTS_PER_QUERY,
+        orderBy,
+      },
+      fetchPolicy: "cache-and-network",
+    });
 
   const { bannerNotifications } = data ?? previousData ?? {};
   const notifications = filterNonNullable(
     bannerNotifications?.edges?.map((edge) => edge?.node)
   );
-  const totalCount = data?.bannerNotifications?.totalCount ?? 0;
 
   const { t } = useTranslation();
 
@@ -166,7 +162,7 @@ function Page() {
         </ButtonLikeLink>
       </HeaderContainer>
       <p>{t("Notifications.pageDescription")}</p>
-      {isLoading && notifications.length === 0 ? (
+      {loading && notifications.length === 0 ? (
         <Loader />
       ) : (
         <>
@@ -174,22 +170,14 @@ function Page() {
             notifications={notifications}
             onSortChanged={handleSortChange}
             sort={sort}
-            isLoading={isLoading}
+            isLoading={loading}
           />
-          {totalCount > notifications.length && (
-            <Button
-              variant="secondary"
-              onClick={() => {
-                fetchMore({
-                  variables: {
-                    offset: notifications.length + 1,
-                  },
-                });
-              }}
-            >
-              {t("Notifications.loadMore")}
-            </Button>
-          )}
+          <More
+            totalCount={data?.bannerNotifications?.totalCount ?? 0}
+            pageInfo={data?.bannerNotifications?.pageInfo}
+            count={notifications.length}
+            fetchMore={(after) => fetchMore({ variables: { after } })}
+          />
         </>
       )}
     </>

@@ -5467,99 +5467,6 @@ export enum Weekday {
   Wednesday = "WEDNESDAY",
 }
 
-export type BannerNotificationCommonFragment = {
-  __typename?: "BannerNotificationNode";
-  id: string;
-  level: BannerNotificationLevel;
-  activeFrom?: string | null;
-  message: string;
-  messageEn?: string | null;
-  messageFi?: string | null;
-  messageSv?: string | null;
-};
-
-export type BannerNotificationsAdminFragmentFragment = {
-  __typename?: "BannerNotificationNode";
-  pk?: number | null;
-  name: string;
-  target: BannerNotificationTarget;
-  activeUntil?: string | null;
-  draft: boolean;
-  state?: BannerNotificationState | null;
-  id: string;
-  level: BannerNotificationLevel;
-  activeFrom?: string | null;
-  message: string;
-  messageEn?: string | null;
-  messageFi?: string | null;
-  messageSv?: string | null;
-};
-
-export type BannerNotificationsAdminQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-}>;
-
-export type BannerNotificationsAdminQuery = {
-  __typename?: "Query";
-  bannerNotification?: {
-    __typename?: "BannerNotificationNode";
-    pk?: number | null;
-    name: string;
-    target: BannerNotificationTarget;
-    activeUntil?: string | null;
-    draft: boolean;
-    state?: BannerNotificationState | null;
-    id: string;
-    level: BannerNotificationLevel;
-    activeFrom?: string | null;
-    message: string;
-    messageEn?: string | null;
-    messageFi?: string | null;
-    messageSv?: string | null;
-  } | null;
-};
-
-export type BannerNotificationsAdminListQueryVariables = Exact<{
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  offset?: InputMaybe<Scalars["Int"]["input"]>;
-  orderBy?: InputMaybe<
-    | Array<InputMaybe<BannerNotificationOrderingChoices>>
-    | InputMaybe<BannerNotificationOrderingChoices>
-  >;
-}>;
-
-export type BannerNotificationsAdminListQuery = {
-  __typename?: "Query";
-  bannerNotifications?: {
-    __typename?: "BannerNotificationNodeConnection";
-    totalCount?: number | null;
-    edges: Array<{
-      __typename?: "BannerNotificationNodeEdge";
-      node?: {
-        __typename?: "BannerNotificationNode";
-        pk?: number | null;
-        name: string;
-        target: BannerNotificationTarget;
-        activeUntil?: string | null;
-        draft: boolean;
-        state?: BannerNotificationState | null;
-        id: string;
-        level: BannerNotificationLevel;
-        activeFrom?: string | null;
-        message: string;
-        messageEn?: string | null;
-        messageFi?: string | null;
-        messageSv?: string | null;
-      } | null;
-    } | null>;
-    pageInfo: {
-      __typename?: "PageInfo";
-      endCursor?: string | null;
-      hasNextPage: boolean;
-    };
-  } | null;
-};
-
 export type BannerNotificationsListQueryVariables = Exact<{
   target: BannerNotificationTarget;
 }>;
@@ -6491,6 +6398,17 @@ export type LocationFieldsI18nFragment = {
   addressCityFi?: string | null;
 };
 
+export type BannerNotificationCommonFragment = {
+  __typename?: "BannerNotificationNode";
+  id: string;
+  level: BannerNotificationLevel;
+  activeFrom?: string | null;
+  message: string;
+  messageEn?: string | null;
+  messageFi?: string | null;
+  messageSv?: string | null;
+};
+
 export type TermsOfUseQueryVariables = Exact<{
   termsType?: InputMaybe<TermsType>;
 }>;
@@ -6852,6 +6770,88 @@ export type HandlingDataQuery = {
   } | null;
 };
 
+export type BannerNotificationsAdminFragmentFragment = {
+  __typename?: "BannerNotificationNode";
+  pk?: number | null;
+  name: string;
+  target: BannerNotificationTarget;
+  activeUntil?: string | null;
+  draft: boolean;
+  state?: BannerNotificationState | null;
+  id: string;
+  level: BannerNotificationLevel;
+  activeFrom?: string | null;
+  message: string;
+  messageEn?: string | null;
+  messageFi?: string | null;
+  messageSv?: string | null;
+};
+
+export type BannerNotificationsAdminQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type BannerNotificationsAdminQuery = {
+  __typename?: "Query";
+  bannerNotification?: {
+    __typename?: "BannerNotificationNode";
+    pk?: number | null;
+    name: string;
+    target: BannerNotificationTarget;
+    activeUntil?: string | null;
+    draft: boolean;
+    state?: BannerNotificationState | null;
+    id: string;
+    level: BannerNotificationLevel;
+    activeFrom?: string | null;
+    message: string;
+    messageEn?: string | null;
+    messageFi?: string | null;
+    messageSv?: string | null;
+  } | null;
+};
+
+export type BannerNotificationsAdminListQueryVariables = Exact<{
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  orderBy?: InputMaybe<
+    | Array<InputMaybe<BannerNotificationOrderingChoices>>
+    | InputMaybe<BannerNotificationOrderingChoices>
+  >;
+}>;
+
+export type BannerNotificationsAdminListQuery = {
+  __typename?: "Query";
+  bannerNotifications?: {
+    __typename?: "BannerNotificationNodeConnection";
+    totalCount?: number | null;
+    edges: Array<{
+      __typename?: "BannerNotificationNodeEdge";
+      node?: {
+        __typename?: "BannerNotificationNode";
+        pk?: number | null;
+        name: string;
+        target: BannerNotificationTarget;
+        activeUntil?: string | null;
+        draft: boolean;
+        state?: BannerNotificationState | null;
+        id: string;
+        level: BannerNotificationLevel;
+        activeFrom?: string | null;
+        message: string;
+        messageEn?: string | null;
+        messageFi?: string | null;
+        messageSv?: string | null;
+      } | null;
+    } | null>;
+    pageInfo: {
+      __typename?: "PageInfo";
+      endCursor?: string | null;
+      hasNextPage: boolean;
+    };
+  } | null;
+};
+
 export type ReservationDateOfBirthQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -7014,7 +7014,7 @@ export type SpaceQuery = {
 
 export type UnitsQueryVariables = Exact<{
   first?: InputMaybe<Scalars["Int"]["input"]>;
-  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
   orderBy?: InputMaybe<
     Array<InputMaybe<UnitOrderingChoices>> | InputMaybe<UnitOrderingChoices>
   >;
@@ -7038,6 +7038,11 @@ export type UnitsQuery = {
         }>;
       } | null;
     } | null>;
+    pageInfo: {
+      __typename?: "PageInfo";
+      endCursor?: string | null;
+      hasNextPage: boolean;
+    };
   } | null;
 };
 
@@ -7669,6 +7674,8 @@ export type UpdateApplicationWorkingMemoMutation = {
 };
 
 export type SearchReservationUnitsQueryVariables = Exact<{
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
   nameFi?: InputMaybe<Scalars["String"]["input"]>;
   maxPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   maxPersonsLte?: InputMaybe<Scalars["Decimal"]["input"]>;
@@ -7686,8 +7693,6 @@ export type SearchReservationUnitsQueryVariables = Exact<{
     | Array<InputMaybe<ReservationUnitOrderingChoices>>
     | InputMaybe<ReservationUnitOrderingChoices>
   >;
-  offset?: InputMaybe<Scalars["Int"]["input"]>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
   state?: InputMaybe<
     | Array<InputMaybe<Scalars["String"]["input"]>>
     | InputMaybe<Scalars["String"]["input"]>
@@ -7964,6 +7969,7 @@ export type UpdateRecurringReservationMutation = {
 };
 
 export type ReservationsQueryVariables = Exact<{
+  first?: InputMaybe<Scalars["Int"]["input"]>;
   after?: InputMaybe<Scalars["String"]["input"]>;
   unit?: InputMaybe<
     | Array<InputMaybe<Scalars["ID"]["input"]>>
@@ -7977,8 +7983,6 @@ export type ReservationsQueryVariables = Exact<{
     | Array<InputMaybe<ReservationOrderingChoices>>
     | InputMaybe<ReservationOrderingChoices>
   >;
-  offset?: InputMaybe<Scalars["Int"]["input"]>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
   state?: InputMaybe<
     | Array<InputMaybe<Scalars["String"]["input"]>>
     | InputMaybe<Scalars["String"]["input"]>
@@ -9317,7 +9321,7 @@ export type ApplicationsQueryVariables = Exact<{
     | InputMaybe<ApplicationOrderingChoices>
   >;
   first?: InputMaybe<Scalars["Int"]["input"]>;
-  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
 }>;
 
 export type ApplicationsQuery = {
@@ -9365,6 +9369,11 @@ export type ApplicationsQuery = {
         } | null;
       } | null;
     } | null>;
+    pageInfo: {
+      __typename?: "PageInfo";
+      endCursor?: string | null;
+      hasNextPage: boolean;
+    };
   } | null;
 };
 
@@ -9412,7 +9421,7 @@ export type ApplicationSectionsQueryVariables = Exact<{
     | InputMaybe<ApplicationSectionOrderingChoices>
   >;
   first?: InputMaybe<Scalars["Int"]["input"]>;
-  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
 }>;
 
 export type ApplicationSectionsQuery = {
@@ -9498,6 +9507,11 @@ export type ApplicationSectionsQuery = {
         } | null;
       } | null;
     } | null>;
+    pageInfo: {
+      __typename?: "PageInfo";
+      endCursor?: string | null;
+      hasNextPage: boolean;
+    };
   } | null;
 };
 
@@ -9524,8 +9538,8 @@ export type AllocatedTimeSlotsQueryVariables = Exact<{
     | Array<InputMaybe<AllocatedTimeSlotOrderingChoices>>
     | InputMaybe<AllocatedTimeSlotOrderingChoices>
   >;
+  after?: InputMaybe<Scalars["String"]["input"]>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
-  offset?: InputMaybe<Scalars["Int"]["input"]>;
 }>;
 
 export type AllocatedTimeSlotsQuery = {
@@ -9578,6 +9592,11 @@ export type AllocatedTimeSlotsQuery = {
         };
       } | null;
     } | null>;
+    pageInfo: {
+      __typename?: "PageInfo";
+      endCursor?: string | null;
+      hasNextPage: boolean;
+    };
   } | null;
 };
 
@@ -9664,29 +9683,6 @@ export type ApplicationRoundQuery = {
   } | null;
 };
 
-export const BannerNotificationCommonFragmentDoc = gql`
-  fragment BannerNotificationCommon on BannerNotificationNode {
-    id
-    level
-    activeFrom
-    message
-    messageEn
-    messageFi
-    messageSv
-  }
-`;
-export const BannerNotificationsAdminFragmentFragmentDoc = gql`
-  fragment BannerNotificationsAdminFragment on BannerNotificationNode {
-    pk
-    ...BannerNotificationCommon
-    name
-    target
-    activeUntil
-    draft
-    state
-  }
-  ${BannerNotificationCommonFragmentDoc}
-`;
 export const ApplicationSectionDurationFragmentFragmentDoc = gql`
   fragment ApplicationSectionDurationFragment on ApplicationSectionNode {
     reservationsEndDate
@@ -10052,6 +10048,29 @@ export const ReservationUnitCommonFieldsFragmentDoc = gql`
     }
   }
 `;
+export const BannerNotificationCommonFragmentDoc = gql`
+  fragment BannerNotificationCommon on BannerNotificationNode {
+    id
+    level
+    activeFrom
+    message
+    messageEn
+    messageFi
+    messageSv
+  }
+`;
+export const BannerNotificationsAdminFragmentFragmentDoc = gql`
+  fragment BannerNotificationsAdminFragment on BannerNotificationNode {
+    pk
+    ...BannerNotificationCommon
+    name
+    target
+    activeUntil
+    draft
+    state
+  }
+  ${BannerNotificationCommonFragmentDoc}
+`;
 export const ReservationsInIntervalFragmentDoc = gql`
   fragment ReservationsInInterval on ReservationNode {
     id
@@ -10332,173 +10351,6 @@ export const ApplicationRoundAdminFragmentDoc = gql`
   }
   ${ApplicationRoundBaseFragmentDoc}
 `;
-export const BannerNotificationsAdminDocument = gql`
-  query BannerNotificationsAdmin($id: ID!) {
-    bannerNotification(id: $id) {
-      ...BannerNotificationsAdminFragment
-    }
-  }
-  ${BannerNotificationsAdminFragmentFragmentDoc}
-`;
-
-/**
- * __useBannerNotificationsAdminQuery__
- *
- * To run a query within a React component, call `useBannerNotificationsAdminQuery` and pass it any options that fit your needs.
- * When your component renders, `useBannerNotificationsAdminQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useBannerNotificationsAdminQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useBannerNotificationsAdminQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    BannerNotificationsAdminQuery,
-    BannerNotificationsAdminQueryVariables
-  > &
-    (
-      | { variables: BannerNotificationsAdminQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    )
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    BannerNotificationsAdminQuery,
-    BannerNotificationsAdminQueryVariables
-  >(BannerNotificationsAdminDocument, options);
-}
-export function useBannerNotificationsAdminLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    BannerNotificationsAdminQuery,
-    BannerNotificationsAdminQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    BannerNotificationsAdminQuery,
-    BannerNotificationsAdminQueryVariables
-  >(BannerNotificationsAdminDocument, options);
-}
-export function useBannerNotificationsAdminSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    BannerNotificationsAdminQuery,
-    BannerNotificationsAdminQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    BannerNotificationsAdminQuery,
-    BannerNotificationsAdminQueryVariables
-  >(BannerNotificationsAdminDocument, options);
-}
-export type BannerNotificationsAdminQueryHookResult = ReturnType<
-  typeof useBannerNotificationsAdminQuery
->;
-export type BannerNotificationsAdminLazyQueryHookResult = ReturnType<
-  typeof useBannerNotificationsAdminLazyQuery
->;
-export type BannerNotificationsAdminSuspenseQueryHookResult = ReturnType<
-  typeof useBannerNotificationsAdminSuspenseQuery
->;
-export type BannerNotificationsAdminQueryResult = Apollo.QueryResult<
-  BannerNotificationsAdminQuery,
-  BannerNotificationsAdminQueryVariables
->;
-export const BannerNotificationsAdminListDocument = gql`
-  query BannerNotificationsAdminList(
-    $first: Int
-    $offset: Int
-    $orderBy: [BannerNotificationOrderingChoices]
-  ) {
-    bannerNotifications(first: $first, offset: $offset, orderBy: $orderBy) {
-      edges {
-        node {
-          ...BannerNotificationsAdminFragment
-        }
-      }
-      pageInfo {
-        endCursor
-        hasNextPage
-      }
-      totalCount
-    }
-  }
-  ${BannerNotificationsAdminFragmentFragmentDoc}
-`;
-
-/**
- * __useBannerNotificationsAdminListQuery__
- *
- * To run a query within a React component, call `useBannerNotificationsAdminListQuery` and pass it any options that fit your needs.
- * When your component renders, `useBannerNotificationsAdminListQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useBannerNotificationsAdminListQuery({
- *   variables: {
- *      first: // value for 'first'
- *      offset: // value for 'offset'
- *      orderBy: // value for 'orderBy'
- *   },
- * });
- */
-export function useBannerNotificationsAdminListQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    BannerNotificationsAdminListQuery,
-    BannerNotificationsAdminListQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    BannerNotificationsAdminListQuery,
-    BannerNotificationsAdminListQueryVariables
-  >(BannerNotificationsAdminListDocument, options);
-}
-export function useBannerNotificationsAdminListLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    BannerNotificationsAdminListQuery,
-    BannerNotificationsAdminListQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    BannerNotificationsAdminListQuery,
-    BannerNotificationsAdminListQueryVariables
-  >(BannerNotificationsAdminListDocument, options);
-}
-export function useBannerNotificationsAdminListSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    BannerNotificationsAdminListQuery,
-    BannerNotificationsAdminListQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    BannerNotificationsAdminListQuery,
-    BannerNotificationsAdminListQueryVariables
-  >(BannerNotificationsAdminListDocument, options);
-}
-export type BannerNotificationsAdminListQueryHookResult = ReturnType<
-  typeof useBannerNotificationsAdminListQuery
->;
-export type BannerNotificationsAdminListLazyQueryHookResult = ReturnType<
-  typeof useBannerNotificationsAdminListLazyQuery
->;
-export type BannerNotificationsAdminListSuspenseQueryHookResult = ReturnType<
-  typeof useBannerNotificationsAdminListSuspenseQuery
->;
-export type BannerNotificationsAdminListQueryResult = Apollo.QueryResult<
-  BannerNotificationsAdminListQuery,
-  BannerNotificationsAdminListQueryVariables
->;
 export const BannerNotificationsListDocument = gql`
   query BannerNotificationsList($target: BannerNotificationTarget!) {
     bannerNotifications(isVisible: true, target: $target) {
@@ -11261,6 +11113,173 @@ export type HandlingDataQueryResult = Apollo.QueryResult<
   HandlingDataQuery,
   HandlingDataQueryVariables
 >;
+export const BannerNotificationsAdminDocument = gql`
+  query BannerNotificationsAdmin($id: ID!) {
+    bannerNotification(id: $id) {
+      ...BannerNotificationsAdminFragment
+    }
+  }
+  ${BannerNotificationsAdminFragmentFragmentDoc}
+`;
+
+/**
+ * __useBannerNotificationsAdminQuery__
+ *
+ * To run a query within a React component, call `useBannerNotificationsAdminQuery` and pass it any options that fit your needs.
+ * When your component renders, `useBannerNotificationsAdminQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useBannerNotificationsAdminQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useBannerNotificationsAdminQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    BannerNotificationsAdminQuery,
+    BannerNotificationsAdminQueryVariables
+  > &
+    (
+      | { variables: BannerNotificationsAdminQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    BannerNotificationsAdminQuery,
+    BannerNotificationsAdminQueryVariables
+  >(BannerNotificationsAdminDocument, options);
+}
+export function useBannerNotificationsAdminLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    BannerNotificationsAdminQuery,
+    BannerNotificationsAdminQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    BannerNotificationsAdminQuery,
+    BannerNotificationsAdminQueryVariables
+  >(BannerNotificationsAdminDocument, options);
+}
+export function useBannerNotificationsAdminSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<
+    BannerNotificationsAdminQuery,
+    BannerNotificationsAdminQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    BannerNotificationsAdminQuery,
+    BannerNotificationsAdminQueryVariables
+  >(BannerNotificationsAdminDocument, options);
+}
+export type BannerNotificationsAdminQueryHookResult = ReturnType<
+  typeof useBannerNotificationsAdminQuery
+>;
+export type BannerNotificationsAdminLazyQueryHookResult = ReturnType<
+  typeof useBannerNotificationsAdminLazyQuery
+>;
+export type BannerNotificationsAdminSuspenseQueryHookResult = ReturnType<
+  typeof useBannerNotificationsAdminSuspenseQuery
+>;
+export type BannerNotificationsAdminQueryResult = Apollo.QueryResult<
+  BannerNotificationsAdminQuery,
+  BannerNotificationsAdminQueryVariables
+>;
+export const BannerNotificationsAdminListDocument = gql`
+  query BannerNotificationsAdminList(
+    $first: Int
+    $after: String
+    $orderBy: [BannerNotificationOrderingChoices]
+  ) {
+    bannerNotifications(first: $first, after: $after, orderBy: $orderBy) {
+      edges {
+        node {
+          ...BannerNotificationsAdminFragment
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+      totalCount
+    }
+  }
+  ${BannerNotificationsAdminFragmentFragmentDoc}
+`;
+
+/**
+ * __useBannerNotificationsAdminListQuery__
+ *
+ * To run a query within a React component, call `useBannerNotificationsAdminListQuery` and pass it any options that fit your needs.
+ * When your component renders, `useBannerNotificationsAdminListQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useBannerNotificationsAdminListQuery({
+ *   variables: {
+ *      first: // value for 'first'
+ *      after: // value for 'after'
+ *      orderBy: // value for 'orderBy'
+ *   },
+ * });
+ */
+export function useBannerNotificationsAdminListQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    BannerNotificationsAdminListQuery,
+    BannerNotificationsAdminListQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    BannerNotificationsAdminListQuery,
+    BannerNotificationsAdminListQueryVariables
+  >(BannerNotificationsAdminListDocument, options);
+}
+export function useBannerNotificationsAdminListLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    BannerNotificationsAdminListQuery,
+    BannerNotificationsAdminListQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    BannerNotificationsAdminListQuery,
+    BannerNotificationsAdminListQueryVariables
+  >(BannerNotificationsAdminListDocument, options);
+}
+export function useBannerNotificationsAdminListSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<
+    BannerNotificationsAdminListQuery,
+    BannerNotificationsAdminListQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    BannerNotificationsAdminListQuery,
+    BannerNotificationsAdminListQueryVariables
+  >(BannerNotificationsAdminListDocument, options);
+}
+export type BannerNotificationsAdminListQueryHookResult = ReturnType<
+  typeof useBannerNotificationsAdminListQuery
+>;
+export type BannerNotificationsAdminListLazyQueryHookResult = ReturnType<
+  typeof useBannerNotificationsAdminListLazyQuery
+>;
+export type BannerNotificationsAdminListSuspenseQueryHookResult = ReturnType<
+  typeof useBannerNotificationsAdminListSuspenseQuery
+>;
+export type BannerNotificationsAdminListQueryResult = Apollo.QueryResult<
+  BannerNotificationsAdminListQuery,
+  BannerNotificationsAdminListQueryVariables
+>;
 export const ReservationDateOfBirthDocument = gql`
   query ReservationDateOfBirth($id: ID!) {
     reservation(id: $id) {
@@ -11866,13 +11885,13 @@ export type SpaceQueryResult = Apollo.QueryResult<
 export const UnitsDocument = gql`
   query Units(
     $first: Int
-    $offset: Int
+    $after: String
     $orderBy: [UnitOrderingChoices]
     $nameFi: String
   ) {
     units(
       first: $first
-      offset: $offset
+      after: $after
       orderBy: $orderBy
       nameFi: $nameFi
       onlyWithPermission: true
@@ -11885,6 +11904,10 @@ export const UnitsDocument = gql`
             pk
           }
         }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
       }
       totalCount
     }
@@ -11904,7 +11927,7 @@ export const UnitsDocument = gql`
  * const { data, loading, error } = useUnitsQuery({
  *   variables: {
  *      first: // value for 'first'
- *      offset: // value for 'offset'
+ *      after: // value for 'after'
  *      orderBy: // value for 'orderBy'
  *      nameFi: // value for 'nameFi'
  *   },
@@ -13223,6 +13246,8 @@ export type UpdateApplicationWorkingMemoMutationOptions =
   >;
 export const SearchReservationUnitsDocument = gql`
   query SearchReservationUnits(
+    $after: String
+    $first: Int
     $nameFi: String
     $maxPersonsGte: Decimal
     $maxPersonsLte: Decimal
@@ -13231,13 +13256,11 @@ export const SearchReservationUnitsDocument = gql`
     $unit: [Int]
     $reservationUnitType: [Int]
     $orderBy: [ReservationUnitOrderingChoices]
-    $offset: Int
-    $first: Int
     $state: [String]
   ) {
     reservationUnits(
       first: $first
-      offset: $offset
+      after: $after
       orderBy: $orderBy
       nameFi: $nameFi
       maxPersonsGte: $maxPersonsGte
@@ -13289,6 +13312,8 @@ export const SearchReservationUnitsDocument = gql`
  * @example
  * const { data, loading, error } = useSearchReservationUnitsQuery({
  *   variables: {
+ *      after: // value for 'after'
+ *      first: // value for 'first'
  *      nameFi: // value for 'nameFi'
  *      maxPersonsGte: // value for 'maxPersonsGte'
  *      maxPersonsLte: // value for 'maxPersonsLte'
@@ -13297,8 +13322,6 @@ export const SearchReservationUnitsDocument = gql`
  *      unit: // value for 'unit'
  *      reservationUnitType: // value for 'reservationUnitType'
  *      orderBy: // value for 'orderBy'
- *      offset: // value for 'offset'
- *      first: // value for 'first'
  *      state: // value for 'state'
  *   },
  * });
@@ -13464,12 +13487,11 @@ export type UpdateRecurringReservationMutationOptions =
   >;
 export const ReservationsDocument = gql`
   query Reservations(
+    $first: Int
     $after: String
     $unit: [ID]
     $reservationUnitType: [ID]
     $orderBy: [ReservationOrderingChoices]
-    $offset: Int
-    $first: Int
     $state: [String]
     $textSearch: String
     $priceGte: Decimal
@@ -13481,9 +13503,8 @@ export const ReservationsDocument = gql`
   ) {
     reservations(
       first: $first
-      offset: $offset
-      orderBy: $orderBy
       after: $after
+      orderBy: $orderBy
       unit: $unit
       reservationUnit: $reservationUnit
       reservationUnitType: $reservationUnitType
@@ -13530,12 +13551,11 @@ export const ReservationsDocument = gql`
  * @example
  * const { data, loading, error } = useReservationsQuery({
  *   variables: {
+ *      first: // value for 'first'
  *      after: // value for 'after'
  *      unit: // value for 'unit'
  *      reservationUnitType: // value for 'reservationUnitType'
  *      orderBy: // value for 'orderBy'
- *      offset: // value for 'offset'
- *      first: // value for 'first'
  *      state: // value for 'state'
  *      textSearch: // value for 'textSearch'
  *      priceGte: // value for 'priceGte'
@@ -15926,7 +15946,7 @@ export const ApplicationsDocument = gql`
     $textSearch: String
     $orderBy: [ApplicationOrderingChoices]
     $first: Int
-    $offset: Int
+    $after: String
   ) {
     applications(
       applicationRound: $applicationRound
@@ -15936,7 +15956,7 @@ export const ApplicationsDocument = gql`
       textSearch: $textSearch
       orderBy: $orderBy
       first: $first
-      offset: $offset
+      after: $after
     ) {
       edges {
         node {
@@ -15958,6 +15978,10 @@ export const ApplicationsDocument = gql`
             }
           }
         }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
       }
       totalCount
     }
@@ -15985,7 +16009,7 @@ export const ApplicationsDocument = gql`
  *      textSearch: // value for 'textSearch'
  *      orderBy: // value for 'orderBy'
  *      first: // value for 'first'
- *      offset: // value for 'offset'
+ *      after: // value for 'after'
  *   },
  * });
  */
@@ -16059,7 +16083,7 @@ export const ApplicationSectionsDocument = gql`
     $includePreferredOrder10OrHigher: Boolean
     $orderBy: [ApplicationSectionOrderingChoices]
     $first: Int
-    $offset: Int
+    $after: String
   ) {
     applicationSections(
       applicationRound: $applicationRound
@@ -16077,7 +16101,7 @@ export const ApplicationSectionsDocument = gql`
       includePreferredOrder10OrHigher: $includePreferredOrder10OrHigher
       orderBy: $orderBy
       first: $first
-      offset: $offset
+      after: $after
     ) {
       edges {
         node {
@@ -16097,6 +16121,10 @@ export const ApplicationSectionsDocument = gql`
             }
           }
         }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
       }
       totalCount
     }
@@ -16131,7 +16159,7 @@ export const ApplicationSectionsDocument = gql`
  *      includePreferredOrder10OrHigher: // value for 'includePreferredOrder10OrHigher'
  *      orderBy: // value for 'orderBy'
  *      first: // value for 'first'
- *      offset: // value for 'offset'
+ *      after: // value for 'after'
  *   },
  * });
  */
@@ -16198,10 +16226,12 @@ export const AllocatedTimeSlotsDocument = gql`
     $dayOfTheWeek: [Weekday]
     $textSearch: String
     $orderBy: [AllocatedTimeSlotOrderingChoices]
+    $after: String
     $first: Int
-    $offset: Int
   ) {
     allocatedTimeSlots(
+      after: $after
+      first: $first
       applicationRound: $applicationRound
       allocatedUnit: $allocatedUnit
       applicantType: $applicantType
@@ -16210,8 +16240,6 @@ export const AllocatedTimeSlotsDocument = gql`
       dayOfTheWeek: $dayOfTheWeek
       textSearch: $textSearch
       orderBy: $orderBy
-      first: $first
-      offset: $offset
     ) {
       edges {
         node {
@@ -16244,6 +16272,10 @@ export const AllocatedTimeSlotsDocument = gql`
           }
         }
       }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
       totalCount
     }
   }
@@ -16270,8 +16302,8 @@ export const AllocatedTimeSlotsDocument = gql`
  *      dayOfTheWeek: // value for 'dayOfTheWeek'
  *      textSearch: // value for 'textSearch'
  *      orderBy: // value for 'orderBy'
+ *      after: // value for 'after'
  *      first: // value for 'first'
- *      offset: // value for 'offset'
  *   },
  * });
  */

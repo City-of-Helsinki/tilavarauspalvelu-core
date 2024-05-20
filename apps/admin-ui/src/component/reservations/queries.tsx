@@ -4,12 +4,11 @@ import { RESERVATION_COMMON_FRAGMENT } from "./fragments";
 export const RESERVATIONS_QUERY = gql`
   ${RESERVATION_COMMON_FRAGMENT}
   query Reservations(
+    $first: Int
     $after: String
     $unit: [ID]
     $reservationUnitType: [ID]
     $orderBy: [ReservationOrderingChoices]
-    $offset: Int
-    $first: Int
     $state: [String]
     $textSearch: String
     $priceGte: Decimal
@@ -21,9 +20,8 @@ export const RESERVATIONS_QUERY = gql`
   ) {
     reservations(
       first: $first
-      offset: $offset
-      orderBy: $orderBy
       after: $after
+      orderBy: $orderBy
       unit: $unit
       reservationUnit: $reservationUnit
       reservationUnitType: $reservationUnitType

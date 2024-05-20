@@ -5467,99 +5467,6 @@ export enum Weekday {
   Wednesday = "WEDNESDAY",
 }
 
-export type BannerNotificationCommonFragment = {
-  __typename?: "BannerNotificationNode";
-  id: string;
-  level: BannerNotificationLevel;
-  activeFrom?: string | null;
-  message: string;
-  messageEn?: string | null;
-  messageFi?: string | null;
-  messageSv?: string | null;
-};
-
-export type BannerNotificationsAdminFragmentFragment = {
-  __typename?: "BannerNotificationNode";
-  pk?: number | null;
-  name: string;
-  target: BannerNotificationTarget;
-  activeUntil?: string | null;
-  draft: boolean;
-  state?: BannerNotificationState | null;
-  id: string;
-  level: BannerNotificationLevel;
-  activeFrom?: string | null;
-  message: string;
-  messageEn?: string | null;
-  messageFi?: string | null;
-  messageSv?: string | null;
-};
-
-export type BannerNotificationsAdminQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-}>;
-
-export type BannerNotificationsAdminQuery = {
-  __typename?: "Query";
-  bannerNotification?: {
-    __typename?: "BannerNotificationNode";
-    pk?: number | null;
-    name: string;
-    target: BannerNotificationTarget;
-    activeUntil?: string | null;
-    draft: boolean;
-    state?: BannerNotificationState | null;
-    id: string;
-    level: BannerNotificationLevel;
-    activeFrom?: string | null;
-    message: string;
-    messageEn?: string | null;
-    messageFi?: string | null;
-    messageSv?: string | null;
-  } | null;
-};
-
-export type BannerNotificationsAdminListQueryVariables = Exact<{
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  offset?: InputMaybe<Scalars["Int"]["input"]>;
-  orderBy?: InputMaybe<
-    | Array<InputMaybe<BannerNotificationOrderingChoices>>
-    | InputMaybe<BannerNotificationOrderingChoices>
-  >;
-}>;
-
-export type BannerNotificationsAdminListQuery = {
-  __typename?: "Query";
-  bannerNotifications?: {
-    __typename?: "BannerNotificationNodeConnection";
-    totalCount?: number | null;
-    edges: Array<{
-      __typename?: "BannerNotificationNodeEdge";
-      node?: {
-        __typename?: "BannerNotificationNode";
-        pk?: number | null;
-        name: string;
-        target: BannerNotificationTarget;
-        activeUntil?: string | null;
-        draft: boolean;
-        state?: BannerNotificationState | null;
-        id: string;
-        level: BannerNotificationLevel;
-        activeFrom?: string | null;
-        message: string;
-        messageEn?: string | null;
-        messageFi?: string | null;
-        messageSv?: string | null;
-      } | null;
-    } | null>;
-    pageInfo: {
-      __typename?: "PageInfo";
-      endCursor?: string | null;
-      hasNextPage: boolean;
-    };
-  } | null;
-};
-
 export type BannerNotificationsListQueryVariables = Exact<{
   target: BannerNotificationTarget;
 }>;
@@ -6491,6 +6398,17 @@ export type LocationFieldsI18nFragment = {
   addressCityFi?: string | null;
 };
 
+export type BannerNotificationCommonFragment = {
+  __typename?: "BannerNotificationNode";
+  id: string;
+  level: BannerNotificationLevel;
+  activeFrom?: string | null;
+  message: string;
+  messageEn?: string | null;
+  messageFi?: string | null;
+  messageSv?: string | null;
+};
+
 export type TermsOfUseQueryVariables = Exact<{
   termsType?: InputMaybe<TermsType>;
 }>;
@@ -6517,29 +6435,6 @@ export type TermsOfUseQuery = {
   } | null;
 };
 
-export const BannerNotificationCommonFragmentDoc = gql`
-  fragment BannerNotificationCommon on BannerNotificationNode {
-    id
-    level
-    activeFrom
-    message
-    messageEn
-    messageFi
-    messageSv
-  }
-`;
-export const BannerNotificationsAdminFragmentFragmentDoc = gql`
-  fragment BannerNotificationsAdminFragment on BannerNotificationNode {
-    pk
-    ...BannerNotificationCommon
-    name
-    target
-    activeUntil
-    draft
-    state
-  }
-  ${BannerNotificationCommonFragmentDoc}
-`;
 export const ApplicationSectionDurationFragmentFragmentDoc = gql`
   fragment ApplicationSectionDurationFragment on ApplicationSectionNode {
     reservationsEndDate
@@ -6887,173 +6782,17 @@ export const LocationFieldsI18nFragmentDoc = gql`
   }
   ${LocationFieldsFragmentDoc}
 `;
-export const BannerNotificationsAdminDocument = gql`
-  query BannerNotificationsAdmin($id: ID!) {
-    bannerNotification(id: $id) {
-      ...BannerNotificationsAdminFragment
-    }
+export const BannerNotificationCommonFragmentDoc = gql`
+  fragment BannerNotificationCommon on BannerNotificationNode {
+    id
+    level
+    activeFrom
+    message
+    messageEn
+    messageFi
+    messageSv
   }
-  ${BannerNotificationsAdminFragmentFragmentDoc}
 `;
-
-/**
- * __useBannerNotificationsAdminQuery__
- *
- * To run a query within a React component, call `useBannerNotificationsAdminQuery` and pass it any options that fit your needs.
- * When your component renders, `useBannerNotificationsAdminQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useBannerNotificationsAdminQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useBannerNotificationsAdminQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    BannerNotificationsAdminQuery,
-    BannerNotificationsAdminQueryVariables
-  > &
-    (
-      | { variables: BannerNotificationsAdminQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    )
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    BannerNotificationsAdminQuery,
-    BannerNotificationsAdminQueryVariables
-  >(BannerNotificationsAdminDocument, options);
-}
-export function useBannerNotificationsAdminLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    BannerNotificationsAdminQuery,
-    BannerNotificationsAdminQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    BannerNotificationsAdminQuery,
-    BannerNotificationsAdminQueryVariables
-  >(BannerNotificationsAdminDocument, options);
-}
-export function useBannerNotificationsAdminSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    BannerNotificationsAdminQuery,
-    BannerNotificationsAdminQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    BannerNotificationsAdminQuery,
-    BannerNotificationsAdminQueryVariables
-  >(BannerNotificationsAdminDocument, options);
-}
-export type BannerNotificationsAdminQueryHookResult = ReturnType<
-  typeof useBannerNotificationsAdminQuery
->;
-export type BannerNotificationsAdminLazyQueryHookResult = ReturnType<
-  typeof useBannerNotificationsAdminLazyQuery
->;
-export type BannerNotificationsAdminSuspenseQueryHookResult = ReturnType<
-  typeof useBannerNotificationsAdminSuspenseQuery
->;
-export type BannerNotificationsAdminQueryResult = Apollo.QueryResult<
-  BannerNotificationsAdminQuery,
-  BannerNotificationsAdminQueryVariables
->;
-export const BannerNotificationsAdminListDocument = gql`
-  query BannerNotificationsAdminList(
-    $first: Int
-    $offset: Int
-    $orderBy: [BannerNotificationOrderingChoices]
-  ) {
-    bannerNotifications(first: $first, offset: $offset, orderBy: $orderBy) {
-      edges {
-        node {
-          ...BannerNotificationsAdminFragment
-        }
-      }
-      pageInfo {
-        endCursor
-        hasNextPage
-      }
-      totalCount
-    }
-  }
-  ${BannerNotificationsAdminFragmentFragmentDoc}
-`;
-
-/**
- * __useBannerNotificationsAdminListQuery__
- *
- * To run a query within a React component, call `useBannerNotificationsAdminListQuery` and pass it any options that fit your needs.
- * When your component renders, `useBannerNotificationsAdminListQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useBannerNotificationsAdminListQuery({
- *   variables: {
- *      first: // value for 'first'
- *      offset: // value for 'offset'
- *      orderBy: // value for 'orderBy'
- *   },
- * });
- */
-export function useBannerNotificationsAdminListQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    BannerNotificationsAdminListQuery,
-    BannerNotificationsAdminListQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    BannerNotificationsAdminListQuery,
-    BannerNotificationsAdminListQueryVariables
-  >(BannerNotificationsAdminListDocument, options);
-}
-export function useBannerNotificationsAdminListLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    BannerNotificationsAdminListQuery,
-    BannerNotificationsAdminListQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    BannerNotificationsAdminListQuery,
-    BannerNotificationsAdminListQueryVariables
-  >(BannerNotificationsAdminListDocument, options);
-}
-export function useBannerNotificationsAdminListSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    BannerNotificationsAdminListQuery,
-    BannerNotificationsAdminListQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    BannerNotificationsAdminListQuery,
-    BannerNotificationsAdminListQueryVariables
-  >(BannerNotificationsAdminListDocument, options);
-}
-export type BannerNotificationsAdminListQueryHookResult = ReturnType<
-  typeof useBannerNotificationsAdminListQuery
->;
-export type BannerNotificationsAdminListLazyQueryHookResult = ReturnType<
-  typeof useBannerNotificationsAdminListLazyQuery
->;
-export type BannerNotificationsAdminListSuspenseQueryHookResult = ReturnType<
-  typeof useBannerNotificationsAdminListSuspenseQuery
->;
-export type BannerNotificationsAdminListQueryResult = Apollo.QueryResult<
-  BannerNotificationsAdminListQuery,
-  BannerNotificationsAdminListQueryVariables
->;
 export const BannerNotificationsListDocument = gql`
   query BannerNotificationsList($target: BannerNotificationTarget!) {
     bannerNotifications(isVisible: true, target: $target) {

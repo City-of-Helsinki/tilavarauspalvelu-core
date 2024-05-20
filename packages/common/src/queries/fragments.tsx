@@ -101,6 +101,18 @@ export const LOCATION_FRAGMENT_I18N = gql`
   }
 `;
 
+export const BANNER_NOTIFICATION_COMMON_FRAGMENT = gql`
+  fragment BannerNotificationCommon on BannerNotificationNode {
+    id
+    level
+    activeFrom
+    message
+    messageEn
+    messageFi
+    messageSv
+  }
+`;
+
 // NOTE custom filtering and we don't have codegen for queries / fragments
 // TODO move the query fragment also here (at least the common parts)
 export type ReservationUnitWithAffectingArgs = {

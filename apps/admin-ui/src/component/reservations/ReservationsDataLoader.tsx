@@ -60,12 +60,19 @@ function mapFilterParams(
   };
 }
 
-function useReservations(
-  filters: FilterArguments,
-  defaultFiltering: QueryReservationsArgs,
-  sort: string
-) {
+export function ReservationsDataLoader({
+  filters,
+  defaultFiltering,
+}: Props): JSX.Element {
   const { notifyError } = useNotification();
+  const [sort, setSort] = useState<string>("-state");
+  const onSortChanged = (sortField: string) => {
+    if (sort === sortField) {
+      setSort(`-${sortField}`);
+    } else {
+      setSort(sortField);
+    }
+  };
 
   const orderBy = transformSortString(sort);
   const { fetchMore, loading, data, previousData } = useReservationsQuery({
@@ -82,55 +89,30 @@ function useReservations(
     },
   });
 
+  const totalCount = data?.reservations?.totalCount;
+
   const currData = data ?? previousData;
   const reservations = filterNonNullable(
     currData?.reservations?.edges.map((edge) => edge?.node)
   );
 
-  return {
-    fetchMore,
-    loading,
-    data: reservations,
-    totalCount: data?.reservations?.totalCount,
-    offset: data?.reservations?.edges?.length,
-  };
-}
-
-export function ReservationsDataLoader({
-  filters,
-  defaultFiltering,
-}: Props): JSX.Element {
-  const [sort, setSort] = useState<string>("-state");
-  const onSortChanged = (sortField: string) => {
-    if (sort === sortField) {
-      setSort(`-${sortField}`);
-    } else {
-      setSort(sortField);
-    }
-  };
-
-  const { fetchMore, loading, data, totalCount, offset } = useReservations(
-    filters,
-    defaultFiltering,
-    sort
-  );
-
-  if (loading && data.length === 0) {
+  if (loading && reservations.length === 0) {
     return <Loader />;
   }
 
   return (
     <>
       <ReservationsTable
-        reservations={data}
+        reservations={reservations}
         sort={sort}
         sortChanged={onSortChanged}
         isLoading={loading}
       />
       <More
         totalCount={totalCount ?? 0}
-        count={data.length}
-        fetchMore={() => fetchMore({ variables: { offset } })}
+        count={reservations.length}
+        pageInfo={data?.reservations?.pageInfo}
+        fetchMore={(after) => fetchMore({ variables: { after } })}
       />
     </>
   );

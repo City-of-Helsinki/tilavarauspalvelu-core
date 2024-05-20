@@ -10,6 +10,7 @@ const useHandling = () => {
   const today = useMemo(() => startOfDay(new Date()), []);
   const { data, refetch } = useHandlingDataQuery({
     skip: !isAuthenticated,
+    fetchPolicy: "no-cache",
     variables: {
       beginDate: toApiDate(today) ?? "",
     },

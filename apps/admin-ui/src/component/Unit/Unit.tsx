@@ -11,11 +11,11 @@ import { useNotification } from "@/context/NotificationContext";
 import { Container } from "@/styles/layout";
 import { BasicLink } from "@/styles/util";
 import Loader from "../Loader";
-import { ReservationUnitList } from "./ReservationUnitList";
 import ExternalLink from "./ExternalLink";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import Error404 from "@/common/Error404";
+import { ReservationUnitList } from "./ReservationUnitList";
 
 interface IProps {
   [key: string]: string;

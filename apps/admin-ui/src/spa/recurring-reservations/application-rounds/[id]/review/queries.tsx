@@ -16,7 +16,7 @@ export const APPLICATIONS_QUERY = gql`
     $textSearch: String
     $orderBy: [ApplicationOrderingChoices]
     $first: Int
-    $offset: Int
+    $after: String
   ) {
     applications(
       applicationRound: $applicationRound
@@ -26,7 +26,7 @@ export const APPLICATIONS_QUERY = gql`
       textSearch: $textSearch
       orderBy: $orderBy
       first: $first
-      offset: $offset
+      after: $after
     ) {
       edges {
         node {
@@ -48,6 +48,10 @@ export const APPLICATIONS_QUERY = gql`
             }
           }
         }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
       }
       totalCount
     }
@@ -76,7 +80,7 @@ export const APPLICATIONS_EVENTS_QUERY = gql`
     $includePreferredOrder10OrHigher: Boolean
     $orderBy: [ApplicationSectionOrderingChoices]
     $first: Int
-    $offset: Int
+    $after: String
   ) {
     applicationSections(
       applicationRound: $applicationRound
@@ -94,7 +98,7 @@ export const APPLICATIONS_EVENTS_QUERY = gql`
       includePreferredOrder10OrHigher: $includePreferredOrder10OrHigher
       orderBy: $orderBy
       first: $first
-      offset: $offset
+      after: $after
     ) {
       edges {
         node {
@@ -115,6 +119,10 @@ export const APPLICATIONS_EVENTS_QUERY = gql`
           }
         }
       }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
       totalCount
     }
   }
@@ -131,10 +139,12 @@ export const ALLOCATED_TIME_SLOTS_QUERY = gql`
     $dayOfTheWeek: [Weekday]
     $textSearch: String
     $orderBy: [AllocatedTimeSlotOrderingChoices]
+    $after: String
     $first: Int
-    $offset: Int
   ) {
     allocatedTimeSlots(
+      after: $after
+      first: $first
       applicationRound: $applicationRound
       allocatedUnit: $allocatedUnit
       applicantType: $applicantType
@@ -143,8 +153,6 @@ export const ALLOCATED_TIME_SLOTS_QUERY = gql`
       dayOfTheWeek: $dayOfTheWeek
       textSearch: $textSearch
       orderBy: $orderBy
-      first: $first
-      offset: $offset
     ) {
       edges {
         node {
@@ -176,6 +184,10 @@ export const ALLOCATED_TIME_SLOTS_QUERY = gql`
             }
           }
         }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
       }
       totalCount
     }

@@ -19,12 +19,11 @@ import {
   BannerNotificationState,
   BannerNotificationLevel,
   BannerNotificationTarget,
-  type BannerNotificationNodeConnection,
   useBannerNotificationDeleteMutation,
   useBannerNotificationUpdateMutation,
   useBannerNotificationCreateMutation,
   useBannerNotificationsAdminQuery,
-  BannerNotificationsAdminQuery,
+  type BannerNotificationsAdminQuery,
 } from "@gql/gql-types";
 import { H1 } from "common/src/common/typography";
 import { fromUIDate } from "common/src/common/util";
@@ -261,21 +260,6 @@ const GridForm = styled.form`
   gap: var(--spacing-l);
 `;
 
-// @brief inefficient way to destroy caches, normal INVALIDATE doesn't remove keys
-// @param cache is the apollo cache
-// @param matcher is the query name to destroy
-// Some other alternatives is to update cache based on mutation payload
-// only invalidate cache keys if needed (do a find on every key to check)
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const deleteQueryFromCache = (cache: any, matcher: string | RegExp): void => {
-  const rootQuery = cache.data.data.ROOT_QUERY;
-  Object.keys(rootQuery).forEach((key) => {
-    if (key.match(matcher)) {
-      cache.evict({ id: "ROOT_QUERY", fieldName: key });
-    }
-  });
-};
-
 /// @brief This is the create / edit page for a single notification.
 const NotificationForm = ({
   notification,
@@ -328,18 +312,8 @@ const NotificationForm = ({
     },
   });
 
-  const [createMutation] = useBannerNotificationCreateMutation({
-    update(cache) {
-      deleteQueryFromCache(cache, "bannerNotifications");
-      deleteQueryFromCache(cache, "bannerNotification");
-    },
-  });
-  const [updateMutation] = useBannerNotificationUpdateMutation({
-    update(cache) {
-      deleteQueryFromCache(cache, "bannerNotifications");
-      deleteQueryFromCache(cache, "bannerNotification");
-    },
-  });
+  const [createMutation] = useBannerNotificationCreateMutation();
+  const [updateMutation] = useBannerNotificationUpdateMutation();
 
   const { notifyError, notifySuccess } = useNotification();
 
@@ -674,26 +648,7 @@ const useRemoveNotification = ({
     notifyError(t("Notifications.error.deleteFailed.generic"));
   };
 
-  // TODO remove cache modifications
-  const [removeMutation] = useBannerNotificationDeleteMutation({
-    update(cache, { data: newData }) {
-      cache.modify({
-        fields: {
-          // @ts-expect-error; TODO: typecheck broke after updating Apollo or Typescript
-          bannerNotifications(existing: BannerNotificationNodeConnection) {
-            const res = newData?.deleteBannerNotification;
-            const pkToDelete = notification?.pk;
-            if (!pkToDelete || !res?.deleted) {
-              return existing;
-            }
-            return existing.edges.filter(
-              (x) => x?.node && x.node.pk !== pkToDelete
-            );
-          },
-        },
-      });
-    },
-  });
+  const [removeMutation] = useBannerNotificationDeleteMutation();
 
   const navigate = useNavigate();
 

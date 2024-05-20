@@ -47,6 +47,7 @@ export function ApplicationDataLoader({
       notifyError(err.message);
     },
     fetchPolicy: "cache-and-network",
+    // TODO enable or no?
     nextFetchPolicy: "cache-first",
   });
 
@@ -76,13 +77,8 @@ export function ApplicationDataLoader({
       <More
         totalCount={totalCount}
         count={applications.length}
-        fetchMore={() =>
-          fetchMore({
-            variables: {
-              offset: data?.applications?.edges.length,
-            },
-          })
-        }
+        pageInfo={dataToUse?.applications?.pageInfo}
+        fetchMore={(after) => fetchMore({ variables: { after } })}
       />
     </>
   );

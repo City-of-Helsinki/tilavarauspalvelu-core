@@ -51,8 +51,6 @@ export function UnitsDataLoader({ filters, isMyUnits }: Props): JSX.Element {
     return <Loader />;
   }
 
-  const offset = data?.units?.edges.length;
-
   return (
     <>
       <UnitsTable
@@ -65,11 +63,8 @@ export function UnitsDataLoader({ filters, isMyUnits }: Props): JSX.Element {
       <More
         totalCount={data?.units?.totalCount ?? 0}
         count={unitsArr.length}
-        fetchMore={() =>
-          fetchMore({
-            variables: { offset },
-          })
-        }
+        pageInfo={data?.units?.pageInfo}
+        fetchMore={(after) => fetchMore({ variables: { after } })}
       />
     </>
   );

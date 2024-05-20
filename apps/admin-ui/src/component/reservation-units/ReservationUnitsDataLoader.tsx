@@ -103,6 +103,8 @@ export function ReservationUnitsDataReader({ filters }: Props): JSX.Element {
         notifyError(err.message);
       },
       fetchPolicy: "cache-and-network",
+      // TODO enable or no?
+      nextFetchPolicy: "cache-first",
     });
 
   const { reservationUnits } = data ?? previousData ?? {};
@@ -114,7 +116,6 @@ export function ReservationUnitsDataReader({ filters }: Props): JSX.Element {
     return <Loader />;
   }
 
-  const offset = data?.reservationUnits?.edges.length;
   return (
     <>
       <ReservationUnitsTable
@@ -124,10 +125,10 @@ export function ReservationUnitsDataReader({ filters }: Props): JSX.Element {
         isLoading={loading}
       />
       <More
-        key={resUnits.length}
         totalCount={data?.reservationUnits?.totalCount ?? 0}
+        pageInfo={data?.reservationUnits?.pageInfo}
         count={resUnits.length}
-        fetchMore={() => fetchMore({ variables: { offset } })}
+        fetchMore={(after) => fetchMore({ variables: { after } })}
       />
     </>
   );

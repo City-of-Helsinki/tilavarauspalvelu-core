@@ -3,13 +3,13 @@ import { gql } from "@apollo/client";
 export const UNITS_QUERY = gql`
   query Units(
     $first: Int
-    $offset: Int
+    $after: String
     $orderBy: [UnitOrderingChoices]
     $nameFi: String
   ) {
     units(
       first: $first
-      offset: $offset
+      after: $after
       orderBy: $orderBy
       nameFi: $nameFi
       onlyWithPermission: true
@@ -22,6 +22,10 @@ export const UNITS_QUERY = gql`
             pk
           }
         }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
       }
       totalCount
     }
