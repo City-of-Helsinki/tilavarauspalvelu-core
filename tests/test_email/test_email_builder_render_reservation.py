@@ -1,4 +1,5 @@
 import datetime
+import re
 import urllib.parse
 from decimal import Decimal
 
@@ -49,7 +50,7 @@ def test_email_builder__raises__on_invalid_tag_in_text_content(email_template, r
     context = ReservationEmailContext.from_reservation(reservation)
 
     msg = "Tag 'invalid_tag' is not supported"
-    with pytest.raises(EmailTemplateValidationError, match=msg):
+    with pytest.raises(EmailTemplateValidationError, match=re.escape(msg)):
         ReservationEmailBuilder(template=email_template, context=context)
 
 
@@ -59,7 +60,7 @@ def test_email_builder__raises__on_invalid_tag_in_html_content(email_template, r
     context = ReservationEmailContext.from_reservation(reservation)
 
     msg = "Tag 'invalid_tag' is not supported"
-    with pytest.raises(EmailTemplateValidationError, match=msg):
+    with pytest.raises(EmailTemplateValidationError, match=re.escape(msg)):
         ReservationEmailBuilder(template=email_template, context=context)
 
 
@@ -69,7 +70,7 @@ def test_email_builder__raises__on_illegal_tag_in_text_content(email_template, r
     context = ReservationEmailContext.from_reservation(reservation)
 
     msg = "Illegal tags found: tag was 'foo'"
-    with pytest.raises(EmailTemplateValidationError, match=msg):
+    with pytest.raises(EmailTemplateValidationError, match=re.escape(msg)):
         ReservationEmailBuilder(template=email_template, context=context)
 
 
@@ -195,7 +196,7 @@ def test_email_builder__get_content__for_loop_not_supported(email_template, rese
     """
 
     msg = "Illegal tags found: tag was 'for'"
-    with pytest.raises(EmailTemplateValidationError, match=msg):
+    with pytest.raises(EmailTemplateValidationError, match=re.escape(msg)):
         ReservationEmailBuilder.from_reservation(template=email_template, reservation=reservation)
 
 

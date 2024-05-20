@@ -270,7 +270,7 @@ def test_date_utils__combine():
     assert dt == datetime.datetime.now(tz=datetime.UTC)
 
     msg = "Must give `tzinfo` or time must be timezone-aware using `zoneinfo.ZoneInfo` objects or `datetime.UTC`."
-    with pytest.raises(ValueError, match=msg):
+    with pytest.raises(ValueError, match=re.escape(msg)):
         combine(utc_date(), datetime.time.min)
 
     dt = combine(utc_date(), datetime.time.min, tzinfo=datetime.UTC)
