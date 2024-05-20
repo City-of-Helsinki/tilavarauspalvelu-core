@@ -7,8 +7,10 @@ from django.db import models
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
+from lookup_property import lookup_property
 
 from common.connectors import ReservationActionsConnector
+from common.db import SubqueryArray
 from reservations.choices import (
     RESERVEE_LANGUAGE_CHOICES,
     CustomerTypeChoice,
@@ -295,6 +297,34 @@ class Reservation(SerializableMixin, models.Model):
             f"{', '.join(unit_names)}\n"
             f"{self.reservation_unit.unit if hasattr(self.reservation_unit, 'unit') else ''}"
         )
+
+    @lookup_property(joins=["reservation_unit"], skip_codegen=True)
+    def unit_ids_for_perms() -> list[int]:
+        from spaces.models import Unit
+
+        expr = SubqueryArray(
+            Unit.objects.filter(reservationunit__in=models.OuterRef("reservation_unit")).values("id"),
+            agg_field="id",
+        )
+        return expr  # type: ignore[return-value]
+
+    @unit_ids_for_perms.override
+    def _(self) -> list[int]:
+        return list(self.reservation_unit.select_related("unit").values_list("unit", flat=True).distinct())
+
+    @lookup_property(joins=["reservation_unit"], skip_codegen=True)
+    def unit_group_ids_for_perms() -> list[int]:
+        from spaces.models import UnitGroup
+
+        expr = SubqueryArray(
+            UnitGroup.objects.filter(units__in=models.OuterRef("reservation_unit__unit")).values("id"),
+            agg_field="id",
+        )
+        return expr  # type: ignore[return-value]
+
+    @unit_group_ids_for_perms.override
+    def _(self) -> list[int]:
+        return list(self.reservation_unit.values_list("unit__unit_groups", flat=True).distinct())
 
 
 AuditLogger.register(Reservation)

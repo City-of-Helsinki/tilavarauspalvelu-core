@@ -1,5 +1,6 @@
 import graphene
 from django.db import models
+from django.db.models import Q
 from graphene_django_extensions import DjangoNode
 from lookup_property import L
 from query_optimizer import AnnotatedField
@@ -12,12 +13,11 @@ from applications.choices import ApplicationStatusChoice
 from applications.models import Application
 from common.typing import GQLInfo
 from permissions.helpers import can_access_application_private_fields, has_any_general_permission
+from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
 
 __all__ = [
     "ApplicationNode",
 ]
-
-from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
 
 
 class ApplicationNode(DjangoNode):
@@ -56,7 +56,6 @@ class ApplicationNode(DjangoNode):
     @classmethod
     def filter_queryset(cls, queryset: models.QuerySet, info: GQLInfo) -> models.QuerySet:
         user = info.context.user
-
         if user.is_anonymous:
             return queryset.none()
         if user.is_superuser:
@@ -64,14 +63,27 @@ class ApplicationNode(DjangoNode):
         if has_any_general_permission(user, GeneralPermissionChoices.handle_or_validate_applications):
             return queryset
 
-        unit_permission = UnitPermissionChoices.CAN_VALIDATE_APPLICATIONS.value
-        unit_ids = [pk for pk, perms in user.unit_permissions.items() if unit_permission in perms]
-        unit_group_ids = [pk for pk, perms in user.unit_group_permissions.items() if unit_permission in perms]
+        u_ids = [
+            pk
+            for pk, perms in user.unit_permissions.items()  #
+            if any(p in perms for p in UnitPermissionChoices.handle_or_validate_applications)
+        ]
+        g_ids = [
+            pk
+            for pk, perms in user.unit_group_permissions.items()  #
+            if any(p in perms for p in UnitPermissionChoices.handle_or_validate_applications)
+        ]
 
-        return queryset.filter(
-            models.Q(user=user)
-            | models.Q(application_sections__reservation_unit_options__reservation_unit__unit__in=unit_ids)
-            | models.Q(
-                application_sections__reservation_unit_options__reservation_unit__unit__unit_groups__in=unit_group_ids
+        return (
+            queryset.annotate(
+                # Annotations ard used later in permission checks
+                unit_ids_for_perms=L("unit_ids_for_perms"),
+                unit_group_ids_for_perms=L("unit_group_ids_for_perms"),
             )
-        ).distinct()
+            .filter(
+                Q(user=user)
+                | Q(application_sections__reservation_unit_options__reservation_unit__unit__in=u_ids)
+                | Q(application_sections__reservation_unit_options__reservation_unit__unit__unit_groups__in=g_ids)
+            )
+            .distinct()
+        )

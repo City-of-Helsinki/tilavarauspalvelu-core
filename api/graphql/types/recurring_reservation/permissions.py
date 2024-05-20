@@ -6,7 +6,7 @@ from query_optimizer.typing import GraphQLFilterInfo
 
 from api.graphql.extensions import error_codes
 from common.typing import AnyUser
-from permissions.helpers import can_create_staff_reservation, can_view_recurring_reservation
+from permissions.helpers import can_create_staff_reservation
 from reservation_units.models import ReservationUnit
 from reservations.models import RecurringReservation
 
@@ -22,7 +22,13 @@ class RecurringReservationPermission(BasePermission):
 
     @classmethod
     def has_node_permission(cls, instance: RecurringReservation, user: AnyUser, filters: GraphQLFilterInfo) -> bool:
-        return can_view_recurring_reservation(user, instance)
+        if user.is_anonymous:
+            return False
+        if user.is_superuser:
+            return True
+        if instance.user == user:
+            return True
+        return user.has_staff_permissions
 
     @classmethod
     def has_mutation_permission(cls, user: AnyUser, input_data: dict[str, Any]) -> bool:
