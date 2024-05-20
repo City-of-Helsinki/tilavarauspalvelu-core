@@ -917,6 +917,59 @@ export enum CustomerTypeChoice {
   Nonprofit = "NONPROFIT",
 }
 
+/** Debugging information for the current query. */
+export type DjangoDebug = {
+  __typename?: "DjangoDebug";
+  /** Raise exceptions for this API query. */
+  exceptions?: Maybe<Array<Maybe<DjangoDebugException>>>;
+  /** Executed SQL queries for this API query. */
+  sql?: Maybe<Array<Maybe<DjangoDebugSql>>>;
+};
+
+/** Represents a single exception raised. */
+export type DjangoDebugException = {
+  __typename?: "DjangoDebugException";
+  /** The class of the exception */
+  excType: Scalars["String"]["output"];
+  /** The message of the exception */
+  message: Scalars["String"]["output"];
+  /** The stack trace */
+  stack: Scalars["String"]["output"];
+};
+
+/** Represents a single database query made to a Django managed DB. */
+export type DjangoDebugSql = {
+  __typename?: "DjangoDebugSQL";
+  /** The Django database alias (e.g. 'default'). */
+  alias: Scalars["String"]["output"];
+  /** Duration of this database query in seconds. */
+  duration: Scalars["Float"]["output"];
+  /** Postgres connection encoding if available. */
+  encoding?: Maybe<Scalars["String"]["output"]>;
+  /** Whether this database query was a SELECT. */
+  isSelect: Scalars["Boolean"]["output"];
+  /** Whether this database query took more than 10 seconds. */
+  isSlow: Scalars["Boolean"]["output"];
+  /** Postgres isolation level if available. */
+  isoLevel?: Maybe<Scalars["String"]["output"]>;
+  /** JSON encoded database query parameters. */
+  params: Scalars["String"]["output"];
+  /** The raw SQL of this query, without params. */
+  rawSql: Scalars["String"]["output"];
+  /** The actual SQL sent to this database. */
+  sql?: Maybe<Scalars["String"]["output"]>;
+  /** Start time of this database query. */
+  startTime: Scalars["Float"]["output"];
+  /** Stop time of this database query. */
+  stopTime: Scalars["Float"]["output"];
+  /** Postgres transaction ID if available. */
+  transId?: Maybe<Scalars["String"]["output"]>;
+  /** Postgres transaction status if available. */
+  transStatus?: Maybe<Scalars["String"]["output"]>;
+  /** The type of database being used (e.g. postrgesql, mysql, sqlite). */
+  vendor: Scalars["String"]["output"];
+};
+
 export type EquipmentCategoryCreateMutationInput = {
   name: Scalars["String"]["input"];
   nameEn?: InputMaybe<Scalars["String"]["input"]>;
@@ -1889,6 +1942,7 @@ export enum QualifierOrderingChoices {
 
 export type Query = {
   __typename?: "Query";
+  _debug?: Maybe<DjangoDebug>;
   /**
    * Return all allocations that affect allocations for given reservation unit
    * (through space hierarchy or common resource) during the given time period.

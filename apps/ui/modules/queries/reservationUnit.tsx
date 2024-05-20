@@ -53,7 +53,6 @@ const RESERVATION_UNIT_PAGE_FRAGMENT = gql`
     minReservationDuration
     maxReservationDuration
     maxReservationsPerUser
-    numActiveUserReservations
     reservationsMinDaysBefore
     reservationsMaxDaysBefore
     requireReservationHandling
