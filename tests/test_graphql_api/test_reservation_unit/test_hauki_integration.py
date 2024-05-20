@@ -103,9 +103,11 @@ def test_reservation_unit__query__hauki_url__regular_user(graphql):
 def test_reservation_unit__query__hauki_url__superuser(graphql, settings):
     user = graphql.login_with_superuser()
 
+    origin_hauki_resource = OriginHaukiResourceFactory.create(id="987")
     reservation_unit = ReservationUnitFactory.create(
         unit__tprek_department_id="ORGANISATION",
         uuid="3774af34-9916-40f2-acc7-68db5a627710",
+        origin_hauki_resource=origin_hauki_resource,
     )
 
     global_id = to_global_id("ReservationUnitNode", reservation_unit.pk)
@@ -131,3 +133,19 @@ def test_reservation_unit__query__hauki_url__superuser(graphql, settings):
     )
 
     assert response.first_query_object == {"haukiUrl": url}
+
+
+def test_reservation_unit__query__hauki_url__superuser__no_hauki_resource(graphql):
+    reservation_unit = ReservationUnitFactory.create(
+        unit__tprek_department_id="ORGANISATION",
+        uuid="3774af34-9916-40f2-acc7-68db5a627710",
+        origin_hauki_resource=None,
+    )
+
+    global_id = to_global_id("ReservationUnitNode", reservation_unit.pk)
+    query = reservation_unit_query(fields="haukiUrl", id=global_id)
+    graphql.login_with_superuser()
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert response.first_query_object == {"haukiUrl": None}
