@@ -25,7 +25,8 @@ from utils.decimal_utils import round_decimal
 def parse_datetime(string: str | None) -> datetime | None:
     if string is None:
         return None
-    return datetime.strptime(string, "%Y-%m-%dT%H:%M:%S.%f").astimezone(settings.VERKKOKAUPPA_TIMEZONE)
+
+    return datetime.fromisoformat(string).astimezone(settings.VERKKOKAUPPA_TIMEZONE)
 
 
 def get_formatted_reservation_time(reservation: Reservation) -> str:
@@ -124,7 +125,7 @@ def get_verkkokauppa_order_params(reservation: Reservation) -> CreateOrderParams
             phone="",
         ),
         last_valid_purchase_datetime=(
-            datetime.now(tz=get_default_timezone()) + timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
+            local_datetime() + timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
         ),
     )
 
