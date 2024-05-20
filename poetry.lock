@@ -665,28 +665,28 @@ test = ["coverage", "django_webtest", "factory-boy", "pdbpp", "pyquery", "pytest
 
 [[package]]
 name = "django-admin-rangefilter"
-version = "0.12.4"
+version = "0.12.5"
 description = "django-admin-rangefilter app, add the filter by a custom date range on the admin UI."
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 files = [
-    {file = "django-admin-rangefilter-0.12.4.tar.gz", hash = "sha256:963df82cc948f938bd437df27db4b2649688034ae3045d748bbaf7686f712a70"},
-    {file = "django_admin_rangefilter-0.12.4-py2.py3-none-any.whl", hash = "sha256:1a86deda4331ee56ccec85ece2fdc166619fcf0b336195ac340b40c6f15844a4"},
+    {file = "django_admin_rangefilter-0.12.5-py2.py3-none-any.whl", hash = "sha256:c2be9ca82115cadb5b5ea04b20bbe96a8aa6935b8921972cd797c2893d272c5d"},
+    {file = "django_admin_rangefilter-0.12.5.tar.gz", hash = "sha256:57970e7714f14f2a9b14619143b3695f6c727fa8fad50352ecf4286ec77a1d25"},
 ]
 
 [[package]]
 name = "django-admin-sortable2"
-version = "2.1.10"
+version = "2.2.1"
 description = "Generic drag-and-drop sorting for the List, the Stacked- and the Tabular-Inlines Views in the Django Admin"
 optional = false
 python-versions = "*"
 files = [
-    {file = "django-admin-sortable2-2.1.10.tar.gz", hash = "sha256:3756b02c7d09c5b37efe657718d5aae2b75f46fd01bbfe1c39d4e60651019d79"},
-    {file = "django_admin_sortable2-2.1.10-py3-none-any.whl", hash = "sha256:98d1c8d268398c3c3aff4752f766b2c307a5bd97174938c29f818d8a4697854d"},
+    {file = "django_admin_sortable2-2.2.1-py3-none-any.whl", hash = "sha256:ae7ec1f0974202e27748fb618b13f23d1b1d44764374b09ad0a9a763f30b054f"},
+    {file = "django_admin_sortable2-2.2.1.tar.gz", hash = "sha256:30a9527f93fc61b7a2c5954db57d8428931e37f462c3b46cb101053dc5f51751"},
 ]
 
 [package.dependencies]
-Django = ">=4.0"
+Django = ">=4.2"
 
 [[package]]
 name = "django-auditlog"
@@ -880,13 +880,13 @@ test = ["black", "codecov", "cryptography", "flake8", "isort", "pytest", "pytest
 
 [[package]]
 name = "django-helusers"
-version = "0.11.0"
+version = "0.12.0"
 description = "Django app for the user infrastructure of the City of Helsinki"
 optional = false
 python-versions = "*"
 files = [
-    {file = "django-helusers-0.11.0.tar.gz", hash = "sha256:80ee5a19ce3dbaa44a849b2014f9c4b03309dbaa027b64e06710851ad526c4df"},
-    {file = "django_helusers-0.11.0-py3-none-any.whl", hash = "sha256:4688178a09f3d09c183c7abbe22194d1ef7d740af535d776bfe5f40055a60dc0"},
+    {file = "django_helusers-0.12.0-py3-none-any.whl", hash = "sha256:2a5fbb5367017387da53c0d3b7f9fbb151e6cd07e25aa6772219316a1b5dec91"},
+    {file = "django_helusers-0.12.0.tar.gz", hash = "sha256:415e395803bc6cfc483d3c6184c63be05d902cf62f4e5dd8aa64bdffe712958d"},
 ]
 
 [package.dependencies]
@@ -898,13 +898,13 @@ requests = "*"
 
 [[package]]
 name = "django-import-export"
-version = "4.0.1"
+version = "4.0.3"
 description = "Django application and library for importing and exporting data with included admin integration."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "django_import_export-4.0.1-py3-none-any.whl", hash = "sha256:fe1e260a421ff22900841a634e891af73dc1f1350c558e2e116a834c1d134b4d"},
-    {file = "django_import_export-4.0.1.tar.gz", hash = "sha256:50535a5f8e690559a937ee1fcc137e920da9deba8e9945f5472ca600ca5a2b71"},
+    {file = "django_import_export-4.0.3-py3-none-any.whl", hash = "sha256:d55193414cb86994a2dfef47670c6887ee1ab8e5efab4ff0a7335c9cad6418c0"},
+    {file = "django_import_export-4.0.3.tar.gz", hash = "sha256:9762babf66e34da194f96ada2d133585f25c065d237d749a424319a0ddef7e23"},
 ]
 
 [package.dependencies]
@@ -954,18 +954,17 @@ Django = ">=4.2"
 
 [[package]]
 name = "django-modeltranslation"
-version = "0.18.11"
+version = "0.18.13"
 description = "Translates Django models using a registration approach."
 optional = false
 python-versions = "*"
 files = [
-    {file = "django-modeltranslation-0.18.11.tar.gz", hash = "sha256:a6e2c459e3b31852287d030bc6e29fa28576db97455dccd399fe08ac8e9223b9"},
-    {file = "django_modeltranslation-0.18.11-py3-none-any.whl", hash = "sha256:81b68e4dc806a3b779ac88babe1cbd99d5318d374a43b3737a65fb0f4c1cffe8"},
+    {file = "django_modeltranslation-0.18.13-py3-none-any.whl", hash = "sha256:5da153f8eb08adbd63d2d41be7aa15aa250adec8034b0553eea6e6746bfcd3c9"},
+    {file = "django_modeltranslation-0.18.13.tar.gz", hash = "sha256:4665ff19617e3a868f4c8173fe1b359d6a50362552165e665a0d32f78edafddd"},
 ]
 
 [package.dependencies]
-Django = ">=3.2"
-typing-extensions = "*"
+Django = ">=4.2"
 
 [[package]]
 name = "django-mptt"
@@ -2063,13 +2062,13 @@ tests = ["coverage[toml] (==5.0.4)", "pytest (>=6.0.0,<7.0.0)"]
 
 [[package]]
 name = "pytest"
-version = "8.2.0"
+version = "8.2.1"
 description = "pytest: simple powerful testing with Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pytest-8.2.0-py3-none-any.whl", hash = "sha256:1733f0620f6cda4095bbf0d9ff8022486e91892245bb9e7d5542c018f612f233"},
-    {file = "pytest-8.2.0.tar.gz", hash = "sha256:d507d4482197eac0ba2bae2e9babf0672eb333017bcedaa5fb1a3d42c1174b3f"},
+    {file = "pytest-8.2.1-py3-none-any.whl", hash = "sha256:faccc5d332b8c3719f40283d0d44aa5cf101cec36f88cde9ed8f2bc0538612b1"},
+    {file = "pytest-8.2.1.tar.gz", hash = "sha256:5046e5b46d8e4cac199c373041f26be56fdb81eb4e67dc11d4e10811fc3408fd"},
 ]
 
 [package.dependencies]
@@ -2536,13 +2535,13 @@ dev = ["mypy (==1.4.1)", "pip-tools (>=6.13.0,<7.0.0)", "pytest (>=7.3.1,<8.0.0)
 
 [[package]]
 name = "sentry-sdk"
-version = "2.1.1"
+version = "2.2.0"
 description = "Python client for Sentry (https://sentry.io)"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "sentry_sdk-2.1.1-py2.py3-none-any.whl", hash = "sha256:99aeb78fb76771513bd3b2829d12613130152620768d00cd3e45ac00cb17950f"},
-    {file = "sentry_sdk-2.1.1.tar.gz", hash = "sha256:95d8c0bb41c8b0bc37ab202c2c4a295bb84398ee05f4cdce55051cd75b926ec1"},
+    {file = "sentry_sdk-2.2.0-py2.py3-none-any.whl", hash = "sha256:674f58da37835ea7447fe0e34c57b4a4277fad558b0a7cb4a6c83bcb263086be"},
+    {file = "sentry_sdk-2.2.0.tar.gz", hash = "sha256:70eca103cf4c6302365a9d7cf522e7ed7720828910eb23d43ada8e50d1ecda9d"},
 ]
 
 [package.dependencies]
@@ -2925,4 +2924,4 @@ brotli = ["Brotli"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.12,<3.13"
-content-hash = "3c6ff55511e0fd9209f052012cdf35b3eb529fca7244640dbdd961d18888694a"
+content-hash = "f63bc83627af869896dff6ca3c097472e69f94ec613aacb6623b887dc62a1d0a"
