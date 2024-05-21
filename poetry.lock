@@ -813,13 +813,13 @@ testing = ["coverage[toml] (>=5.0a4)", "pytest (>=4.6.11)"]
 
 [[package]]
 name = "django-environment-config"
-version = "0.0.4"
+version = "0.0.5"
 description = "Configure django settings for multiple environments."
 optional = false
 python-versions = "<4,>=3.10"
 files = [
-    {file = "django_environment_config-0.0.4-py3-none-any.whl", hash = "sha256:07020f699a803954884ead35c681f9a87bf7e499b5c9c52ea76833e67b9bcc63"},
-    {file = "django_environment_config-0.0.4.tar.gz", hash = "sha256:9aa93c16492c05d05a5de0865254cb7b3dd748c04ddc2f0552407b6633c3708d"},
+    {file = "django_environment_config-0.0.5-py3-none-any.whl", hash = "sha256:24e1655101344a52cae589a2f1763a1dacb4b84359c8ebbf1def89be4fcedbbf"},
+    {file = "django_environment_config-0.0.5.tar.gz", hash = "sha256:5163a4fd7f45037ef69710202c4c8f9ec24c9c7fb5d73da8791123f9aa6a0d56"},
 ]
 
 [package.dependencies]
@@ -2973,4 +2973,4 @@ brotli = ["Brotli"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.12,<3.13"
-content-hash = "567f38c9f36b04db5116a9e60e49a810544a2fedd77ebb60d09504ee8dc53ccb"
+content-hash = "93ca92a55550892892c288f0699333a4a84e02597857476cb657196595019907"

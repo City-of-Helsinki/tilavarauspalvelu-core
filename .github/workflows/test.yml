@@ -106,21 +106,17 @@ jobs:
       - name: "Test for migration issues"
         run: poetry run python manage.py makemigrations --check --no-color --no-input --dry-run
         env:
-          DJANGO_SETTINGS_ENVIRONMENT: Build
+          DJANGO_SETTINGS_ENVIRONMENT: CI
 
       - name: "Test for missing translation"
         run: poetry run python -m tilavarauspalvelu.hooks.translations_done
         env:
-          DJANGO_SETTINGS_ENVIRONMENT: Build
+          DJANGO_SETTINGS_ENVIRONMENT: CI
 
       - name: "Run pytest with coverage"
         run: poetry run pytest --cov=. --cov-report=xml --cov-branch --disable-warnings
         env:
           DJANGO_SETTINGS_ENVIRONMENT: AutomatedTests
-          CACHE_LOCATION: redis://localhost:6379/0
-          DATABASE_URL: postgis://tvp:tvp@localhost/tvp
-          DEBUG: true
-          SECRET_KEY: build_secret
 
       # Without this workaround, SonarCloud reports a warning about an incorrect source path
       - name: "Override coverage report source path for SonarCloud"
