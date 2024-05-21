@@ -133,7 +133,7 @@ class Common(Environment):
 
     USE_X_FORWARDED_HOST = values.BooleanValue(default=False, env_name="TRUST_X_FORWARDED_HOST")
     MULTI_PROXY_HEADERS = values.BooleanValue(default=False)
-    SECURE_PROXY_SSL_HEADER = values.TupleValue(default=None, nullable=True)
+    SECURE_PROXY_SSL_HEADER = values.TupleValue(default=None)
 
     # --- Database settings ------------------------------------------------------------------------------------------
 
@@ -198,7 +198,7 @@ class Common(Environment):
 
     # --- Email settings ---------------------------------------------------------------------------------------------
 
-    EMAIL_HOST = values.StringValue(default=None, nullable=True)
+    EMAIL_HOST = values.StringValue(default=None)
     EMAIL_PORT = values.IntegerValue(default=25)
     EMAIL_USE_TLS = values.BooleanValue(default=True)
     EMAIL_MAX_RECIPIENTS = values.IntegerValue(default=100)
@@ -208,8 +208,8 @@ class Common(Environment):
     SEND_RESERVATION_NOTIFICATION_EMAILS = values.BooleanValue(default=False)
     EMAIL_HTML_MAX_FILE_SIZE = values.IntegerValue(default=150_000)
     EMAIL_HTML_TEMPLATES_ROOT = "email_html_templates"
-    EMAIL_VARAAMO_EXT_LINK = values.StringValue(default=None, nullable=True)
-    EMAIL_FEEDBACK_EXT_LINK = values.StringValue(default=None, nullable=True)
+    EMAIL_VARAAMO_EXT_LINK = values.StringValue(default=None)
+    EMAIL_FEEDBACK_EXT_LINK = values.StringValue(default=None)
 
     # ----- Logging settings -----------------------------------------------------------------------------------------
 
@@ -482,7 +482,7 @@ class Common(Environment):
             },
         }
 
-    # ----- Misc. settings -------------------------------------------------------------------------------------------
+    # --- Misc settings ----------------------------------------------------------------------------------------------
 
     RESERVATION_UNIT_IMAGES_ROOT = "reservation_unit_images"
     RESERVATION_UNIT_PURPOSE_IMAGES_ROOT = "reservation_unit_purpose_images"
@@ -580,9 +580,18 @@ class Local(LocalMixin, Common):
 
     DATABASES = values.DatabaseURLValue(default="postgis://tvp:tvp@127.0.0.1:5432/tvp")
 
-    # ----- Logging settings -----------------------------------------------------------------------------------------
+    # --- Static file settings ---------------------------------------------------------------------------------------
+
+    STATIC_ROOT = values.PathValue(default="staticroot", create_if_missing=True)
+    MEDIA_ROOT = values.PathValue(default="media", create_if_missing=True)
+
+    # --- Logging settings -------------------------------------------------------------------------------------------
 
     APP_LOGGING_LEVEL = values.StringValue(default="INFO")
+
+    # --- (H)Aukiolosovellus settings --------------------------------------------------------------------------------
+
+    HAUKI_API_KEY = values.StringValue(default=None)
 
     # --- Graphene settings ------------------------------------------------------------------------------------------
 
@@ -615,10 +624,10 @@ class Local(LocalMixin, Common):
         search_settings["settings"]["mappings_dir"] = str(Common.BASE_DIR / "elastic_django")
         return search_settings
 
-    # ----- Misc -------------------------------------------------------------------------------------------
+    # --- Misc settings-----------------------------------------------------------------------------------------------
 
     GRAPHQL_CODEGEN_ENABLED = values.BooleanValue(default=False)
-    ICAL_HASH_SECRET = ""  # nosec # NOSONAR
+    ICAL_HASH_SECRET = values.StringValue(default="")  # nosec # NOSONAR
 
 
 class Docker(DockerMixin, Common):
@@ -635,12 +644,20 @@ class Docker(DockerMixin, Common):
     STATIC_ROOT = "/srv/static"
     MEDIA_ROOT = "/media"
 
-    DATABASES = {"default": dj_database_url.parse(url="postgis://tvp:tvp@db/tvp")}
-    REDIS_URL = "redis://redis:6379/0"
-    ELASTICSEARCH_URL = "http://elastic:9200"
+    DATABASES = values.ParentValue(
+        values.DatabaseURLValue(),
+        default="postgis://tvp:tvp@db/tvp",
+        env_name="DATABASE_URL",
+        check_limit=1,
+    )
+
+    REDIS_URL = values.ParentValue(default="redis://redis:6379/0", check_limit=1)
+    ELASTICSEARCH_URL = values.ParentValue(default="http://elastic:9200", check_limit=1)
+
+    HAUKI_API_KEY = values.StringValue(default=None)
 
     GRAPHQL_CODEGEN_ENABLED = values.BooleanValue(default=False)
-    ICAL_HASH_SECRET = ""  # nosec # NOSONAR
+    ICAL_HASH_SECRET = values.StringValue(default="")  # nosec # NOSONAR
 
 
 class AutomatedTests(AutomatedTestMixin, EmptyDefaults, Common, dotenv_path=None):
@@ -652,18 +669,28 @@ class AutomatedTests(AutomatedTestMixin, EmptyDefaults, Common, dotenv_path=None
 
     # --- Database settings ------------------------------------------------------------------------------------------
 
-    DATABASES = {"default": dj_database_url.parse(url="postgis://tvp:tvp@localhost:5432/tvp")}
+    DATABASES = values.ParentValue(
+        values.DatabaseURLValue(),
+        default="postgis://tvp:tvp@localhost:5432/tvp",
+        env_name="DATABASE_URL",
+        check_limit=1,
+    )
 
-    # ----- Logging settings -----------------------------------------------------------------------------------------
+    # --- Logging settings -------------------------------------------------------------------------------------------
 
-    APP_LOGGING_LEVEL = "INFO"
+    APP_LOGGING_LEVEL = values.ParentValue(default="INFO", check_limit=1)
+    AUDIT_LOGGING_ENABLED = False
 
     # --- Email settings ---------------------------------------------------------------------------------------------
 
     EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
-    SEND_RESERVATION_NOTIFICATION_EMAILS = False
 
-    # --- Helsinki profile -------------------------------------------------------------------------------------------
+    SEND_RESERVATION_NOTIFICATION_EMAILS = False
+    EMAIL_HTML_MAX_FILE_SIZE = 150_000
+    EMAIL_VARAAMO_EXT_LINK = "https://fake.varaamo.hel.fi"
+    EMAIL_FEEDBACK_EXT_LINK = "https://fake.varaamo.hel.fi/feedback"
+
+    # --- Helsinki profile settings ----------------------------------------------------------------------------------
 
     OPEN_CITY_PROFILE_GRAPHQL_API = "https://fake.test.profile.api.com"
     OPEN_CITY_PROFILE_SCOPE = "https://fake.api.hel.fi/auth/helsinkiprofile"
@@ -698,6 +725,11 @@ class AutomatedTests(AutomatedTestMixin, EmptyDefaults, Common, dotenv_path=None
         },
     }
 
+    IMAGE_CACHE_ENABLED = False
+    IMAGE_CACHE_VARNISH_HOST = "https://fake.test.url"
+    IMAGE_CACHE_PURGE_KEY = "test-purge-key"
+    IMAGE_CACHE_HOST_HEADER = "test.tilavaraus.url"
+
     # --- Internationalization settings ------------------------------------------------------------------------------
 
     LOCALE_PATHS = []  # Translations are not needed in tests
@@ -722,6 +754,9 @@ class AutomatedTests(AutomatedTestMixin, EmptyDefaults, Common, dotenv_path=None
     VERKKOKAUPPA_ORDER_API_URL = "https://fake.test-order:1234"
     VERKKOKAUPPA_PAYMENT_API_URL = "https://fake.test-payment:1234"
     VERKKOKAUPPA_PRODUCT_API_URL = "https://fake.test-product:1234"
+    VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = 5
+    UPDATE_PRODUCT_MAPPING = False
+    UPDATE_ACCOUNTING = False
 
     MOCK_VERKKOKAUPPA_API_ENABLED = False
     MOCK_VERKKOKAUPPA_FRONTEND_URL = "https://mock-verkkokauppa.com"
@@ -729,11 +764,11 @@ class AutomatedTests(AutomatedTestMixin, EmptyDefaults, Common, dotenv_path=None
 
     # --- Redis settings ---------------------------------------------------------------------------------------------
 
-    REDIS_URL = "redis://localhost:6379/0"
+    REDIS_URL = values.ParentValue(default="redis://localhost:6379/0", check_limit=1)
 
     # --- Elasticsearch settings -------------------------------------------------------------------------------------
 
-    ELASTICSEARCH_URL = "http://localhost:9200"
+    ELASTICSEARCH_URL = values.ParentValue(default="http://localhost:9200", check_limit=1)
 
     @classmethod
     @property
@@ -743,9 +778,10 @@ class AutomatedTests(AutomatedTestMixin, EmptyDefaults, Common, dotenv_path=None
         search_settings["settings"]["auto_sync"] = False
         return search_settings
 
-    # ----- Misc -------------------------------------------------------------------------------------------
+    # --- Misc settings ----------------------------------------------------------------------------------------------
 
     TPREK_UNIT_URL = "https://fake.test.tprek.com"
+    ICAL_HASH_SECRET = "qhoew923uqqwee"  # nosec # NOSONAR
 
 
 class Build(EmptyDefaults, Common, use_environ=True):
