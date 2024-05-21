@@ -12,6 +12,7 @@ export const UNITS_QUERY = gql`
     units(onlyWithPermission: true, offset: $offset, first: $first) {
       edges {
         node {
+          id
           nameFi
           pk
         }

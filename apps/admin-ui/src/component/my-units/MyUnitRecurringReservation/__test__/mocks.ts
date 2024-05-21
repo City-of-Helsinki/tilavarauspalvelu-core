@@ -15,7 +15,6 @@ import {
   GET_RESERVATIONS_IN_INTERVAL,
 } from "../queries";
 import { base64encode } from "common/src/helpers";
-import { ReservationUnitWithAffectingArgs } from "common/src/queries/fragments";
 
 const unitCommon = {
   allowReservationsWithoutOpeningHours: true,
@@ -253,7 +252,7 @@ export const mocks = [
         pk: 1,
         beginDate: `${YEAR}-01-01`,
         endDate: `${YEAR + 1}-01-01`,
-      } as ReservationUnitWithAffectingArgs,
+      },
     },
     result: {
       data: {

@@ -37,13 +37,15 @@ export const RESERVATIONS_QUERY = gql`
       edges {
         node {
           ...ReservationCommon
+          name
           reservationUnit {
+            id
             nameFi
             unit {
+              id
               nameFi
             }
           }
-          name
         }
       }
       pageInfo {

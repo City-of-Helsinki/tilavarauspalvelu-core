@@ -19,6 +19,7 @@ export const SPACES_QUERY = gql`
         node {
           ...SpaceCommonFields
           unit {
+            id
             pk
             nameFi
           }
@@ -66,10 +67,12 @@ export const UNIT_QUERY = gql`
         ...ReservationUnitCommonFields
         isArchived
         resources {
+          id
           pk
         }
         isDraft
         purposes {
+          id
           pk
           nameFi
         }
@@ -100,6 +103,7 @@ export const UNIT_WITH_SPACES_AND_RESOURCES = gql`
       spaces {
         ...SpaceCommonFields
         resourceSet {
+          id
           pk
           nameFi
         }
@@ -129,14 +133,15 @@ export const HANDLING_COUNT_QUERY = gql`
     ) {
       edges {
         node {
+          id
           pk
         }
       }
     }
-
     units(onlyWithPermission: true) {
       edges {
         node {
+          id
           pk
         }
       }

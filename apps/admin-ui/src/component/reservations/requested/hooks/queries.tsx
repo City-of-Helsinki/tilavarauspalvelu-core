@@ -1,11 +1,44 @@
 import { gql } from "@apollo/client";
 import {
   RESERVATION_COMMON_FRAGMENT,
-  RESERVATION_META_FRAGMENT,
   RESERVATION_RECURRING_FRAGMENT,
   RESERVATION_UNIT_FRAGMENT,
   RESERVATION_UNIT_PRICING_FRAGMENT,
 } from "../../fragments";
+import {
+  RESERVEE_BILLING_FRAGMENT,
+  RESERVEE_NAME_FRAGMENT,
+} from "common/src/queries/fragments";
+
+const RESERVATION_META_FRAGMENT = gql`
+  ${RESERVEE_NAME_FRAGMENT}
+  ${RESERVEE_BILLING_FRAGMENT}
+  fragment ReservationMetaFields on ReservationNode {
+    ageGroup {
+      id
+      minimum
+      maximum
+      pk
+    }
+    purpose {
+      id
+      nameFi
+      pk
+    }
+    homeCity {
+      id
+      nameFi
+      pk
+    }
+    numPersons
+    name
+    description
+    ...ReserveeNameFields
+    ...ReserveeBillingFields
+    freeOfChargeReason
+    applyingForFreeOfCharge
+  }
+`;
 
 const CALENDAR_RESERVATION_FRAGMENT = gql`
   fragment CalendarReservation on ReservationNode {
@@ -62,17 +95,21 @@ const SPECIALISED_SINGLE_RESERVATION_FRAGMENT = gql`
     price
     taxPercentageValue
     order {
+      id
       orderUuid
       refundUuid
     }
     cancelReason {
+      id
       reasonFi
     }
     denyReason {
+      id
       reasonFi
     }
     handlingDetails
     user {
+      id
       firstName
       lastName
       email

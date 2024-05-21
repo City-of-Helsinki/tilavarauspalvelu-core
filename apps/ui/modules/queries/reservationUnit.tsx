@@ -9,6 +9,7 @@ export { TERMS_OF_USE_QUERY as TERMS_OF_USE } from "common/src/queries/queries";
 
 const RESERVATION_UNIT_TYPE_FRAGMENT = gql`
   fragment ReservationUnitTypeFields on ReservationUnitTypeNode {
+    id
     pk
     nameFi
     nameEn
@@ -54,6 +55,7 @@ const RESERVATION_UNIT_PAGE_FRAGMENT = gql`
       ...ImageFragment
     }
     applicationRoundTimeSlots {
+      id
       closed
       weekday
       reservableTimes {
@@ -83,6 +85,7 @@ const RESERVATION_UNIT_PAGE_FRAGMENT = gql`
     reservationsMaxDaysBefore
     requireReservationHandling
     equipments {
+      id
       ...EquipmentFields
     }
   }
@@ -91,6 +94,7 @@ const RESERVATION_UNIT_PAGE_FRAGMENT = gql`
 const BLOCKING_RESERVATION_FRAGMENT = gql`
   fragment BlockingReservationFields on ReservationNode {
     pk
+    id
     state
     isBlocked
     begin
@@ -111,8 +115,6 @@ export const RESERVATION_UNIT_PARAMS_PAGE_QUERY = gql`
     }
   }
 `;
-
-export { type ReservationUnitWithAffectingArgs } from "common/src/queries/fragments";
 
 // Combined version for the reservation-unit/[id] page so we can show the Calendar and check for collisions
 export const RESERVATION_UNIT_PAGE_QUERY = gql`

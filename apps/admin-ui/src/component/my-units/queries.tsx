@@ -4,9 +4,11 @@ import { RESERVATIONUNIT_RESERVATIONS_FRAGMENT } from "../reservations/fragments
 export const RECURRING_RESERVATION_UNIT_QUERY = gql`
   query RecurringReservationUnit($id: ID!) {
     unit(id: $id) {
+      id
       nameFi
       pk
       reservationunitSet {
+        id
         pk
         nameFi
         reservationStartInterval
@@ -29,6 +31,7 @@ export const RESERVATION_UNIT_CALENDAR_QUERY = gql`
     $endDate: Date
   ) {
     reservationUnit(id: $id) {
+      id
       pk
       reservationSet(state: $state, beginDate: $beginDate, endDate: $endDate) {
         ...ReservationUnitReservations

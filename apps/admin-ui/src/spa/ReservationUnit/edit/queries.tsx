@@ -16,6 +16,7 @@ export const RESERVATION_UNIT_EDIT_QUERY = gql`
       }
       haukiUrl
       cancellationRule {
+        id
         pk
       }
       requireReservationHandling
@@ -25,24 +26,30 @@ export const RESERVATION_UNIT_EDIT_QUERY = gql`
       isDraft
       authentication
       spaces {
+        id
         pk
         nameFi
       }
       resources {
+        id
         pk
         nameFi
       }
       purposes {
+        id
         pk
         nameFi
       }
       paymentTypes {
+        id
         code
       }
       pricingTerms {
+        id
         pk
       }
       reservationUnitType {
+        id
         pk
         nameFi
       }
@@ -68,14 +75,17 @@ export const RESERVATION_UNIT_EDIT_QUERY = gql`
       reservationsMinDaysBefore
       reservationsMaxDaysBefore
       equipments {
+        id
         pk
         nameFi
       }
       qualifiers {
+        id
         pk
         nameFi
       }
       unit {
+        id
         pk
         nameFi
       }
@@ -86,12 +96,15 @@ export const RESERVATION_UNIT_EDIT_QUERY = gql`
       descriptionSv
       descriptionEn
       paymentTerms {
+        id
         pk
       }
       cancellationTerms {
+        id
         pk
       }
       serviceSpecificTerms {
+        id
         pk
       }
       reservationBlockWholeDay
@@ -108,14 +121,10 @@ export const RESERVATION_UNIT_EDIT_QUERY = gql`
         pk
       }
       pricings {
-        id
+        pk
         ...PricingFields
         lowestPriceNet
         highestPriceNet
-        taxPercentage {
-          pk
-        }
-        pk
       }
       applicationRoundTimeSlots {
         id
@@ -187,6 +196,7 @@ export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
     equipments {
       edges {
         node {
+          id
           nameFi
           pk
         }
@@ -195,61 +205,62 @@ export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
     taxPercentages {
       edges {
         node {
+          id
           pk
           value
         }
       }
     }
-
     purposes {
       edges {
         node {
+          id
           pk
           nameFi
         }
       }
     }
-
     reservationUnitTypes {
       edges {
         node {
+          id
           nameFi
           pk
         }
       }
     }
-
     termsOfUse {
       edges {
         node {
+          id
           pk
           nameFi
           termsType
         }
       }
     }
-
     reservationUnitCancellationRules {
       edges {
         node {
+          id
           nameFi
           pk
         }
       }
     }
-
     metadataSets {
       edges {
         node {
+          id
           name
           pk
         }
       }
     }
-
     qualifiers {
       edges {
         node {
+          id
           nameFi
           pk
         }

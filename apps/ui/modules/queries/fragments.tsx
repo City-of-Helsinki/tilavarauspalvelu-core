@@ -30,6 +30,7 @@ const UNIT_FRAGMENT = gql`
     id
     tprekId
     location {
+      id
       latitude
       longitude
     }

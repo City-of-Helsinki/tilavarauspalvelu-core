@@ -8,14 +8,17 @@ import { APPLICATION_SECTION_ADMIN_FRAGMENT } from "common/src/queries/applicati
 export const APPLICATION_ROUND_FILTER_OPTIONS = gql`
   query ApplicationRoundFilter($id: ID!) {
     applicationRound(id: $id) {
+      id
       nameFi
       status
       reservationPeriodBegin
       reservationPeriodEnd
       reservationUnits {
+        id
         pk
         nameFi
         unit {
+          id
           pk
           nameFi
         }
@@ -40,8 +43,11 @@ export const ALL_EVENTS_PER_UNIT_QUERY = gql`
     ) {
       edges {
         node {
+          id
           reservationUnitOptions {
+            id
             reservationUnit {
+              id
               pk
               nameFi
             }
@@ -77,11 +83,21 @@ export const DELETE_ALLOCATED_TIME_SLOT = gql`
   }
 `;
 
+const ALLOCATED_TIME_SLOT_FRAGMENT = gql`
+  fragment AllocatedTimeSlot on AllocatedTimeSlotNode {
+    id
+    beginTime
+    endTime
+    dayOfTheWeek
+  }
+`;
+
 /// NOTE have to design a separate query for allocation page (a bit different data than the listing page)
 /// primarily we need to define reservationUnit parameter as a singular pk instead of array (because of the related allocated time slots)
 /// NOTE Requires higher backend optimizer complexity limit (14 works, lower doesn't)
 export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
   ${APPLICATION_SECTION_ADMIN_FRAGMENT}
+  ${ALLOCATED_TIME_SLOT_FRAGMENT}
   query ApplicationSectionAllocations(
     $applicationRound: Int!
     $applicationStatus: [ApplicationStatusChoice]!
@@ -130,14 +146,13 @@ export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
             locked
             rejected
             allocatedTimeSlots {
-              id
               pk
-              dayOfTheWeek
-              beginTime
-              endTime
+              ...AllocatedTimeSlot
               reservationUnitOption {
+                id
                 pk
                 applicationSection {
+                  id
                   pk
                 }
               }
@@ -152,28 +167,7 @@ export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
       beginDate: $beginDate
       endDate: $endDate
     ) {
-      id
-      beginTime
-      dayOfTheWeek
-      endTime
-    }
-  }
-`;
-
-export const AFFECTING_ALLOCATED_TIME_SLOTS_QUERY = gql`
-  query getAffectingAllocations(
-    $reservationUnit: Int!
-    $beginDate: Date!
-    $endDate: Date!
-  ) {
-    affectingAllocatedTimeSlots(
-      reservationUnit: $reservationUnit
-      beginDate: $beginDate
-      endDate: $endDate
-    ) {
-      beginTime
-      dayOfTheWeek
-      endTime
+      ...AllocatedTimeSlot
     }
   }
 `;

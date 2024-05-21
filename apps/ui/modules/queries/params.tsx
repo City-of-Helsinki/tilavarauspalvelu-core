@@ -13,6 +13,7 @@ export const SEARCH_FORM_PARAMS_UNIT = gql`
     ) {
       edges {
         node {
+          id
           pk
           nameFi
           nameEn
@@ -28,6 +29,7 @@ export const RESERVATION_UNIT_PURPOSES = gql`
     purposes(orderBy: $orderBy) {
       edges {
         node {
+          id
           pk
           nameFi
           nameEn

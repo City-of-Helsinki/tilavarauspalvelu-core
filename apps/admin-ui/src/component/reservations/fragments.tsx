@@ -1,37 +1,6 @@
 import { gql } from "@apollo/client";
 import { UNIT_NAME_FRAGMENT } from "app/common/fragments";
-import {
-  RESERVEE_NAME_FRAGMENT,
-  RESERVEE_BILLING_FRAGMENT,
-  PRICING_FRAGMENT,
-} from "common/src/queries/fragments";
-
-export const RESERVATION_META_FRAGMENT = gql`
-  ${RESERVEE_NAME_FRAGMENT}
-  ${RESERVEE_BILLING_FRAGMENT}
-  fragment ReservationMetaFields on ReservationNode {
-    ageGroup {
-      minimum
-      maximum
-      pk
-    }
-    purpose {
-      nameFi
-      pk
-    }
-    homeCity {
-      nameFi
-      pk
-    }
-    numPersons
-    name
-    description
-    ...ReserveeNameFields
-    ...ReserveeBillingFields
-    freeOfChargeReason
-    applyingForFreeOfCharge
-  }
-`;
+import { PRICING_FRAGMENT } from "common/src/queries/fragments";
 
 export const RESERVATION_UNIT_PRICING_FRAGMENT = gql`
   ${PRICING_FRAGMENT}
@@ -75,15 +44,18 @@ export const RESERVATION_UNIT_FRAGMENT = gql`
       nameFi
     }
     paymentTerms {
+      id
       textFi
       nameFi
     }
     pricingTerms {
+      id
       textFi
       nameFi
     }
     termsOfUseFi
     serviceSpecificTerms {
+      id
       textFi
       nameFi
     }
@@ -93,6 +65,7 @@ export const RESERVATION_UNIT_FRAGMENT = gql`
 export const RESERVATION_RECURRING_FRAGMENT = gql`
   fragment ReservationRecurring on ReservationNode {
     recurringReservation {
+      id
       pk
       beginDate
       endDate
@@ -116,9 +89,11 @@ export const RESERVATION_COMMON_FRAGMENT = gql`
     workingMemo
     reserveeName
     order {
+      id
       status
     }
     user {
+      id
       firstName
       lastName
     }
@@ -148,6 +123,7 @@ export const RESERVATIONUNIT_RESERVATIONS_FRAGMENT = gql`
         id
         pk
         serviceSectors {
+          id
           pk
         }
       }

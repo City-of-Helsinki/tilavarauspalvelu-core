@@ -3,6 +3,7 @@ import { gql } from "@apollo/client";
 export const APPLICATION_ROUND_FRAGMENT = gql`
   fragment ApplicationRoundFields on ApplicationRoundNode {
     pk
+    id
     nameFi
     nameEn
     nameSv
@@ -17,8 +18,10 @@ export const APPLICATION_ROUND_FRAGMENT = gql`
     criteriaEn
     criteriaSv
     reservationUnits {
+      id
       pk
       unit {
+        id
         pk
       }
     }
@@ -32,12 +35,14 @@ export const APPLICATION_ROUNDS_PERIODS = gql`
     applicationRounds {
       edges {
         node {
+          id
           pk
           reservationPeriodBegin
           reservationPeriodEnd
           applicationPeriodBegin
           status
           reservationUnits {
+            id
             pk
           }
         }

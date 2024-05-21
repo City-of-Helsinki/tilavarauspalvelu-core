@@ -15,7 +15,9 @@ import { base64encode } from "common/src/helpers";
 export const RESERVATION_DATE_OF_BIRTH_QUERY = gql`
   query ReservationDateOfBirth($id: ID!) {
     reservation(id: $id) {
+      id
       user {
+        id
         pk
         dateOfBirth
       }
@@ -26,7 +28,9 @@ export const RESERVATION_DATE_OF_BIRTH_QUERY = gql`
 export const APPLICATION_DATE_OF_BIRTH_QUERY = gql`
   query ApplicationDateOfBirth($id: ID!) {
     application(id: $id) {
+      id
       user {
+        id
         pk
         dateOfBirth
       }

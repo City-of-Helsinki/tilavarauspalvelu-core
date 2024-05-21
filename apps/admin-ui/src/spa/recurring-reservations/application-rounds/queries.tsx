@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 
 const APPLICATION_ROUND_BASE_FRAGMENT = gql`
   fragment ApplicationRoundBase on ApplicationRoundNode {
+    id
     pk
     nameFi
     status
@@ -31,13 +32,14 @@ export const APPLICATION_ROUNDS_QUERY = gql`
 const APPLICATION_ROUND_ADMIN_FRAGMENT = gql`
   ${APPLICATION_ROUND_BASE_FRAGMENT}
   fragment ApplicationRoundAdmin on ApplicationRoundNode {
-    id
     ...ApplicationRoundBase
     applicationsCount
     reservationUnits {
+      id
       pk
       nameFi
       unit {
+        id
         pk
         nameFi
       }

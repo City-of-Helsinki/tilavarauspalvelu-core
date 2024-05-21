@@ -5512,11 +5512,13 @@ export type ApplicationNameFragmentFragment = {
   applicantType?: ApplicantTypeChoice | null;
   organisation?: {
     __typename?: "OrganisationNode";
+    id: string;
     name: string;
     organisationType: OrganizationTypeChoice;
   } | null;
   contactPerson?: {
     __typename?: "PersonNode";
+    id: string;
     lastName: string;
     firstName: string;
   } | null;
@@ -5583,11 +5585,13 @@ export type ApplicationSectionFragmentFragment = {
     applicantType?: ApplicantTypeChoice | null;
     organisation?: {
       __typename?: "OrganisationNode";
+      id: string;
       name: string;
       organisationType: OrganizationTypeChoice;
     } | null;
     contactPerson?: {
       __typename?: "PersonNode";
+      id: string;
       lastName: string;
       firstName: string;
     } | null;
@@ -5604,6 +5608,7 @@ export type ApplicationSectionFragmentFragment = {
       nameFi?: string | null;
       unit?: {
         __typename?: "UnitNode";
+        id: string;
         pk?: number | null;
         nameFi?: string | null;
       } | null;
@@ -5762,6 +5767,7 @@ export type ApplicationRoundFragmentFragment = {
   statusTimestamp?: string | null;
   serviceSector?: {
     __typename?: "ServiceSectorNode";
+    id: string;
     pk?: number | null;
     nameFi?: string | null;
   } | null;
@@ -5776,6 +5782,7 @@ export type ApplicationRoundFragmentFragment = {
     maxPersons?: number | null;
     images: Array<{
       __typename?: "ReservationUnitImageNode";
+      id: string;
       imageUrl?: string | null;
       largeUrl?: string | null;
       mediumUrl?: string | null;
@@ -5803,6 +5810,7 @@ export type ApplicationAdminFragmentFragment = {
   additionalInformation?: string | null;
   applicationRound: {
     __typename?: "ApplicationRoundNode";
+    id: string;
     pk?: number | null;
     nameFi?: string | null;
   };
@@ -5960,6 +5968,7 @@ export type ApplicationCommonFragment = {
     statusTimestamp?: string | null;
     serviceSector?: {
       __typename?: "ServiceSectorNode";
+      id: string;
       pk?: number | null;
       nameFi?: string | null;
     } | null;
@@ -5974,6 +5983,7 @@ export type ApplicationCommonFragment = {
       maxPersons?: number | null;
       images: Array<{
         __typename?: "ReservationUnitImageNode";
+        id: string;
         imageUrl?: string | null;
         largeUrl?: string | null;
         mediumUrl?: string | null;
@@ -6143,6 +6153,7 @@ export type ApplicationQuery = {
       statusTimestamp?: string | null;
       termsOfUse?: {
         __typename?: "TermsOfUseNode";
+        id: string;
         pk?: string | null;
         termsType: TermsType;
         nameFi?: string | null;
@@ -6154,6 +6165,7 @@ export type ApplicationQuery = {
       } | null;
       serviceSector?: {
         __typename?: "ServiceSectorNode";
+        id: string;
         pk?: number | null;
         nameFi?: string | null;
       } | null;
@@ -6168,6 +6180,7 @@ export type ApplicationQuery = {
         maxPersons?: number | null;
         images: Array<{
           __typename?: "ReservationUnitImageNode";
+          id: string;
           imageUrl?: string | null;
           largeUrl?: string | null;
           mediumUrl?: string | null;
@@ -6343,6 +6356,7 @@ export type TermsOfUseNameFieldsFragment = {
 
 export type TermsOfUseTextFieldsFragment = {
   __typename?: "TermsOfUseNode";
+  id: string;
   textFi?: string | null;
   textEn?: string | null;
   textSv?: string | null;
@@ -6355,6 +6369,7 @@ export type TermsOfUseFieldsFragment = {
   nameFi?: string | null;
   nameEn?: string | null;
   nameSv?: string | null;
+  id: string;
   textFi?: string | null;
   textEn?: string | null;
   textSv?: string | null;
@@ -6362,17 +6377,24 @@ export type TermsOfUseFieldsFragment = {
 
 export type PricingFieldsFragment = {
   __typename?: "ReservationUnitPricingNode";
+  id: string;
   begins: string;
   priceUnit: PriceUnit;
   pricingType?: PricingType | null;
   lowestPrice: string;
   highestPrice: string;
   status: Status;
-  taxPercentage: { __typename?: "TaxPercentageNode"; value: string };
+  taxPercentage: {
+    __typename?: "TaxPercentageNode";
+    id: string;
+    pk?: number | null;
+    value: string;
+  };
 };
 
 export type ImageFragmentFragment = {
   __typename?: "ReservationUnitImageNode";
+  id: string;
   imageUrl?: string | null;
   largeUrl?: string | null;
   mediumUrl?: string | null;
@@ -6382,6 +6404,7 @@ export type ImageFragmentFragment = {
 
 export type LocationFieldsFragment = {
   __typename?: "LocationNode";
+  id: string;
   addressStreetFi?: string | null;
   addressZip: string;
   addressCityFi?: string | null;
@@ -6393,6 +6416,7 @@ export type LocationFieldsI18nFragment = {
   addressStreetSv?: string | null;
   addressCityEn?: string | null;
   addressCitySv?: string | null;
+  id: string;
   addressStreetFi?: string | null;
   addressZip: string;
   addressCityFi?: string | null;
@@ -6470,10 +6494,12 @@ export const ApplicationNameFragmentFragmentDoc = gql`
   fragment ApplicationNameFragment on ApplicationNode {
     applicantType
     organisation {
+      id
       name
       organisationType
     }
     contactPerson {
+      id
       lastName
       firstName
     }
@@ -6494,11 +6520,13 @@ export const ApplicationSectionFragmentFragmentDoc = gql`
       ...ApplicationNameFragment
     }
     reservationUnitOptions {
+      id
       reservationUnit {
         id
         pk
         nameFi
         unit {
+          id
           pk
           nameFi
         }
@@ -6613,6 +6641,7 @@ export const ApplicationAdminFragmentFragmentDoc = gql`
     lastModifiedDate
     ...ApplicantFragment
     applicationRound {
+      id
       pk
       nameFi
     }
@@ -6635,6 +6664,7 @@ export const ApplicationAdminFragmentFragmentDoc = gql`
 `;
 export const ImageFragmentFragmentDoc = gql`
   fragment ImageFragment on ReservationUnitImageNode {
+    id
     imageUrl
     largeUrl
     mediumUrl
@@ -6650,6 +6680,7 @@ export const ApplicationRoundFragmentFragmentDoc = gql`
     nameSv
     nameEn
     serviceSector {
+      id
       pk
       nameFi
     }
@@ -6737,6 +6768,7 @@ export const TermsOfUseNameFieldsFragmentDoc = gql`
 `;
 export const TermsOfUseTextFieldsFragmentDoc = gql`
   fragment TermsOfUseTextFields on TermsOfUseNode {
+    id
     textFi
     textEn
     textSv
@@ -6754,12 +6786,15 @@ export const TermsOfUseFieldsFragmentDoc = gql`
 `;
 export const PricingFieldsFragmentDoc = gql`
   fragment PricingFields on ReservationUnitPricingNode {
+    id
     begins
     priceUnit
     pricingType
     lowestPrice
     highestPrice
     taxPercentage {
+      id
+      pk
       value
     }
     status
@@ -6767,6 +6802,7 @@ export const PricingFieldsFragmentDoc = gql`
 `;
 export const LocationFieldsFragmentDoc = gql`
   fragment LocationFields on LocationNode {
+    id
     addressStreetFi
     addressZip
     addressCityFi
@@ -6887,7 +6923,9 @@ export const ApplicationDocument = gql`
     application(id: $id) {
       ...ApplicationCommon
       applicationRound {
+        id
         termsOfUse {
+          id
           ...TermsOfUseFields
         }
       }

@@ -18,11 +18,13 @@ export const APPLICATIONS = gql`
     applications(user: $user, status: $status, orderBy: $orderBy) {
       edges {
         node {
+          id
           pk
           applicationRound {
             ...ApplicationRoundFields
           }
           user {
+            id
             name
           }
           status

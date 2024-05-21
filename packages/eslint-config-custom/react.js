@@ -22,8 +22,6 @@ module.exports = defineConfig({
       rules: {
         // old incorrect naming should be migrated
         "@graphql-eslint/naming-convention": "off",
-        // need to check why we are not querying ids
-        "@graphql-eslint/require-id-when-available": "off",
       },
       parserOptions: {
         schema: SCHEMA_PATH,

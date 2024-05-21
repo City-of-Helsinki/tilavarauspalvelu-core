@@ -12,6 +12,7 @@ export const OPTIONS_QUERY = gql`
     reservationUnitTypes {
       edges {
         node {
+          id
           pk
           nameFi
           nameEn
@@ -22,6 +23,7 @@ export const OPTIONS_QUERY = gql`
     purposes {
       edges {
         node {
+          id
           pk
           nameFi
           nameEn
@@ -32,6 +34,7 @@ export const OPTIONS_QUERY = gql`
     reservationPurposes {
       edges {
         node {
+          id
           pk
           nameFi
           nameEn
@@ -42,6 +45,7 @@ export const OPTIONS_QUERY = gql`
     ageGroups {
       edges {
         node {
+          id
           pk
           minimum
           maximum
@@ -51,6 +55,7 @@ export const OPTIONS_QUERY = gql`
     cities {
       edges {
         node {
+          id
           pk
           nameFi
           nameEn
@@ -61,6 +66,7 @@ export const OPTIONS_QUERY = gql`
     equipments {
       edges {
         node {
+          id
           pk
           nameFi
           nameEn

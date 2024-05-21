@@ -5,10 +5,12 @@ export const APPLICANT_NAME_FRAGMENT = gql`
   fragment ApplicationNameFragment on ApplicationNode {
     applicantType
     organisation {
+      id
       name
       organisationType
     }
     contactPerson {
+      id
       lastName
       firstName
     }
@@ -67,11 +69,13 @@ export const APPLICATION_SECTION_ADMIN_FRAGMENT = gql`
       ...ApplicationNameFragment
     }
     reservationUnitOptions {
+      id
       reservationUnit {
         id
         pk
         nameFi
         unit {
+          id
           pk
           nameFi
         }
@@ -188,6 +192,7 @@ const APPLICATION_ROUND_FRAGMENT = gql`
     nameSv
     nameEn
     serviceSector {
+      id
       pk
       nameFi
     }
@@ -232,6 +237,7 @@ export const APPLICATION_ADMIN_FRAGMENT = gql`
     lastModifiedDate
     ...ApplicantFragment
     applicationRound {
+      id
       pk
       nameFi
     }
@@ -278,7 +284,9 @@ export const APPLICATION_QUERY = gql`
     application(id: $id) {
       ...ApplicationCommon
       applicationRound {
+        id
         termsOfUse {
+          id
           ...TermsOfUseFields
         }
       }

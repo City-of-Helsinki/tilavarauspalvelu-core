@@ -32,13 +32,16 @@ export const SEARCH_RESERVATION_UNITS_QUERY = gql`
     ) {
       edges {
         node {
+          id
           pk
           nameFi
           unit {
+            id
             nameFi
             pk
           }
           reservationUnitType {
+            id
             nameFi
           }
           maxPersons

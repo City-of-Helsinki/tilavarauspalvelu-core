@@ -19,11 +19,13 @@ export const UPDATE_RESOURCE = gql`
 export const RESOURCE_QUERY = gql`
   query Resource($id: ID!) {
     resource(id: $id) {
+      id
       pk
       nameFi
       nameSv
       nameEn
       space {
+        id
         pk
       }
     }

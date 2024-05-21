@@ -21,10 +21,13 @@ export const UPDATE_SPACE = gql`
 export const SPACE_HIERARCHY_QUERY = gql`
   query UnitSpaces($id: ID!) {
     unit(id: $id) {
+      id
       spaces {
+        id
         pk
         nameFi
         parent {
+          id
           pk
         }
       }
@@ -43,6 +46,7 @@ export const SPACE_QUERY = gql`
       nameEn
       code
       unit {
+        id
         pk
         nameFi
         descriptionFi
@@ -50,14 +54,18 @@ export const SPACE_QUERY = gql`
           ...LocationFields
         }
         spaces {
+          id
           pk
           nameFi
         }
       }
       parent {
+        id
         parent {
+          id
           nameFi
           parent {
+            id
             nameFi
           }
         }

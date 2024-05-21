@@ -40,6 +40,7 @@ export const TERMS_OF_USE_NAME_FRAGMENT = gql`
 
 export const TERMS_OF_USE_TEXT_FRAGMENT = gql`
   fragment TermsOfUseTextFields on TermsOfUseNode {
+    id
     textFi
     textEn
     textSv
@@ -59,12 +60,15 @@ export const TERMS_OF_USE_FRAGMENT = gql`
 
 export const PRICING_FRAGMENT = gql`
   fragment PricingFields on ReservationUnitPricingNode {
+    id
     begins
     priceUnit
     pricingType
     lowestPrice
     highestPrice
     taxPercentage {
+      id
+      pk
       value
     }
     status
@@ -74,6 +78,7 @@ export const PRICING_FRAGMENT = gql`
 // TODO could split it into MEDIUM, LARGE, SMALL fragments (the imageUrl is required for all)
 export const IMAGE_FRAGMENT = gql`
   fragment ImageFragment on ReservationUnitImageNode {
+    id
     imageUrl
     largeUrl
     mediumUrl
@@ -84,6 +89,7 @@ export const IMAGE_FRAGMENT = gql`
 
 export const LOCATION_FRAGMENT = gql`
   fragment LocationFields on LocationNode {
+    id
     addressStreetFi
     addressZip
     addressCityFi

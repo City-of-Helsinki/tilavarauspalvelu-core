@@ -5477,6 +5477,7 @@ export type OptionsQuery = {
       __typename?: "ReservationUnitTypeNodeEdge";
       node?: {
         __typename?: "ReservationUnitTypeNode";
+        id: string;
         pk?: number | null;
         nameFi?: string | null;
         nameEn?: string | null;
@@ -5490,6 +5491,7 @@ export type OptionsQuery = {
       __typename?: "PurposeNodeEdge";
       node?: {
         __typename?: "PurposeNode";
+        id: string;
         pk?: number | null;
         nameFi?: string | null;
         nameEn?: string | null;
@@ -5503,6 +5505,7 @@ export type OptionsQuery = {
       __typename?: "ReservationPurposeNodeEdge";
       node?: {
         __typename?: "ReservationPurposeNode";
+        id: string;
         pk?: number | null;
         nameFi?: string | null;
         nameEn?: string | null;
@@ -5516,6 +5519,7 @@ export type OptionsQuery = {
       __typename?: "AgeGroupNodeEdge";
       node?: {
         __typename?: "AgeGroupNode";
+        id: string;
         pk?: number | null;
         minimum: number;
         maximum?: number | null;
@@ -5528,6 +5532,7 @@ export type OptionsQuery = {
       __typename?: "CityNodeEdge";
       node?: {
         __typename?: "CityNode";
+        id: string;
         pk?: number | null;
         nameFi?: string | null;
         nameEn?: string | null;
@@ -5541,6 +5546,7 @@ export type OptionsQuery = {
       __typename?: "EquipmentNodeEdge";
       node?: {
         __typename?: "EquipmentNode";
+        id: string;
         pk?: number | null;
         nameFi?: string | null;
         nameEn?: string | null;
@@ -5569,6 +5575,7 @@ export type ApplicationsQuery = {
       __typename?: "ApplicationNodeEdge";
       node?: {
         __typename?: "ApplicationNode";
+        id: string;
         pk?: number | null;
         status?: ApplicationStatusChoice | null;
         lastModifiedDate: string;
@@ -5576,6 +5583,7 @@ export type ApplicationsQuery = {
         applicationRound: {
           __typename?: "ApplicationRoundNode";
           pk?: number | null;
+          id: string;
           nameFi?: string | null;
           nameEn?: string | null;
           nameSv?: string | null;
@@ -5591,18 +5599,29 @@ export type ApplicationsQuery = {
           criteriaSv?: string | null;
           reservationUnits: Array<{
             __typename?: "ReservationUnitNode";
+            id: string;
             pk?: number | null;
-            unit?: { __typename?: "UnitNode"; pk?: number | null } | null;
+            unit?: {
+              __typename?: "UnitNode";
+              id: string;
+              pk?: number | null;
+            } | null;
           }>;
         };
-        user?: { __typename?: "ApplicantNode"; name?: string | null } | null;
+        user?: {
+          __typename?: "ApplicantNode";
+          id: string;
+          name?: string | null;
+        } | null;
         organisation?: {
           __typename?: "OrganisationNode";
+          id: string;
           name: string;
           organisationType: OrganizationTypeChoice;
         } | null;
         contactPerson?: {
           __typename?: "PersonNode";
+          id: string;
           lastName: string;
           firstName: string;
         } | null;
@@ -5662,6 +5681,7 @@ export type CancelApplicationMutation = {
 export type ApplicationRoundFieldsFragment = {
   __typename?: "ApplicationRoundNode";
   pk?: number | null;
+  id: string;
   nameFi?: string | null;
   nameEn?: string | null;
   nameSv?: string | null;
@@ -5677,8 +5697,9 @@ export type ApplicationRoundFieldsFragment = {
   criteriaSv?: string | null;
   reservationUnits: Array<{
     __typename?: "ReservationUnitNode";
+    id: string;
     pk?: number | null;
-    unit?: { __typename?: "UnitNode"; pk?: number | null } | null;
+    unit?: { __typename?: "UnitNode"; id: string; pk?: number | null } | null;
   }>;
 };
 
@@ -5694,6 +5715,7 @@ export type ApplicationRoundPeriodsQuery = {
       __typename?: "ApplicationRoundNodeEdge";
       node?: {
         __typename?: "ApplicationRoundNode";
+        id: string;
         pk?: number | null;
         reservationPeriodBegin: string;
         reservationPeriodEnd: string;
@@ -5701,6 +5723,7 @@ export type ApplicationRoundPeriodsQuery = {
         status?: ApplicationRoundStatusChoice | null;
         reservationUnits: Array<{
           __typename?: "ReservationUnitNode";
+          id: string;
           pk?: number | null;
         }>;
       } | null;
@@ -5724,6 +5747,7 @@ export type ApplicationRoundsUiQuery = {
       node?: {
         __typename?: "ApplicationRoundNode";
         pk?: number | null;
+        id: string;
         nameFi?: string | null;
         nameEn?: string | null;
         nameSv?: string | null;
@@ -5739,8 +5763,13 @@ export type ApplicationRoundsUiQuery = {
         criteriaSv?: string | null;
         reservationUnits: Array<{
           __typename?: "ReservationUnitNode";
+          id: string;
           pk?: number | null;
-          unit?: { __typename?: "UnitNode"; pk?: number | null } | null;
+          unit?: {
+            __typename?: "UnitNode";
+            id: string;
+            pk?: number | null;
+          } | null;
         }>;
       } | null;
     } | null>;
@@ -5760,6 +5789,7 @@ export type UnitNameFieldsI18NFragment = {
     addressStreetSv?: string | null;
     addressCityEn?: string | null;
     addressCitySv?: string | null;
+    id: string;
     addressStreetFi?: string | null;
     addressZip: string;
     addressCityFi?: string | null;
@@ -5776,6 +5806,7 @@ export type UnitFieldsFragment = {
   nameSv?: string | null;
   location?: {
     __typename?: "LocationNode";
+    id: string;
     latitude?: string | null;
     longitude?: string | null;
     addressStreetEn?: string | null;
@@ -5820,6 +5851,7 @@ export type ReservationUnitFieldsFragment = {
     nameSv?: string | null;
     location?: {
       __typename?: "LocationNode";
+      id: string;
       latitude?: string | null;
       longitude?: string | null;
       addressStreetEn?: string | null;
@@ -5833,18 +5865,21 @@ export type ReservationUnitFieldsFragment = {
   } | null;
   serviceSpecificTerms?: {
     __typename?: "TermsOfUseNode";
+    id: string;
     textFi?: string | null;
     textEn?: string | null;
     textSv?: string | null;
   } | null;
   cancellationTerms?: {
     __typename?: "TermsOfUseNode";
+    id: string;
     textFi?: string | null;
     textEn?: string | null;
     textSv?: string | null;
   } | null;
   paymentTerms?: {
     __typename?: "TermsOfUseNode";
+    id: string;
     textFi?: string | null;
     textEn?: string | null;
     textSv?: string | null;
@@ -5854,22 +5889,30 @@ export type ReservationUnitFieldsFragment = {
     nameFi?: string | null;
     nameEn?: string | null;
     nameSv?: string | null;
+    id: string;
     textFi?: string | null;
     textEn?: string | null;
     textSv?: string | null;
   } | null;
   pricings: Array<{
     __typename?: "ReservationUnitPricingNode";
+    id: string;
     begins: string;
     priceUnit: PriceUnit;
     pricingType?: PricingType | null;
     lowestPrice: string;
     highestPrice: string;
     status: Status;
-    taxPercentage: { __typename?: "TaxPercentageNode"; value: string };
+    taxPercentage: {
+      __typename?: "TaxPercentageNode";
+      id: string;
+      pk?: number | null;
+      value: string;
+    };
   }>;
   images: Array<{
     __typename?: "ReservationUnitImageNode";
+    id: string;
     imageUrl?: string | null;
     largeUrl?: string | null;
     mediumUrl?: string | null;
@@ -5910,6 +5953,7 @@ export type SearchFormParamsUnitQuery = {
       __typename?: "UnitNodeEdge";
       node?: {
         __typename?: "UnitNode";
+        id: string;
         pk?: number | null;
         nameFi?: string | null;
         nameEn?: string | null;
@@ -5934,6 +5978,7 @@ export type ReservationUnitPurposesQuery = {
       __typename?: "PurposeNodeEdge";
       node?: {
         __typename?: "PurposeNode";
+        id: string;
         pk?: number | null;
         nameFi?: string | null;
         nameEn?: string | null;
@@ -6006,6 +6051,7 @@ export type ConfirmReservationMutation = {
     state?: string | null;
     order?: {
       __typename?: "PaymentOrderNode";
+      id: string;
       checkoutUrl?: string | null;
     } | null;
   } | null;
@@ -6015,6 +6061,7 @@ export type CancellationRuleFieldsFragment = {
   __typename?: "ReservationUnitNode";
   cancellationRule?: {
     __typename?: "ReservationUnitCancellationRuleNode";
+    id: string;
     canBeCancelledTimeBefore?: number | null;
     needsHandling: boolean;
   } | null;
@@ -6083,6 +6130,7 @@ export type ListReservationsQuery = {
               addressStreetSv?: string | null;
               addressCityEn?: string | null;
               addressCitySv?: string | null;
+              id: string;
               addressStreetFi?: string | null;
               addressZip: string;
               addressCityFi?: string | null;
@@ -6090,6 +6138,7 @@ export type ListReservationsQuery = {
           } | null;
           images: Array<{
             __typename?: "ReservationUnitImageNode";
+            id: string;
             imageUrl?: string | null;
             largeUrl?: string | null;
             mediumUrl?: string | null;
@@ -6098,16 +6147,23 @@ export type ListReservationsQuery = {
           }>;
           pricings: Array<{
             __typename?: "ReservationUnitPricingNode";
+            id: string;
             begins: string;
             priceUnit: PriceUnit;
             pricingType?: PricingType | null;
             lowestPrice: string;
             highestPrice: string;
             status: Status;
-            taxPercentage: { __typename?: "TaxPercentageNode"; value: string };
+            taxPercentage: {
+              __typename?: "TaxPercentageNode";
+              id: string;
+              pk?: number | null;
+              value: string;
+            };
           }>;
           cancellationRule?: {
             __typename?: "ReservationUnitCancellationRuleNode";
+            id: string;
             canBeCancelledTimeBefore?: number | null;
             needsHandling: boolean;
           } | null;
@@ -6230,6 +6286,7 @@ export type ReservationQuery = {
         nameSv?: string | null;
         location?: {
           __typename?: "LocationNode";
+          id: string;
           latitude?: string | null;
           longitude?: string | null;
           addressStreetEn?: string | null;
@@ -6243,18 +6300,21 @@ export type ReservationQuery = {
       } | null;
       serviceSpecificTerms?: {
         __typename?: "TermsOfUseNode";
+        id: string;
         textFi?: string | null;
         textEn?: string | null;
         textSv?: string | null;
       } | null;
       cancellationTerms?: {
         __typename?: "TermsOfUseNode";
+        id: string;
         textFi?: string | null;
         textEn?: string | null;
         textSv?: string | null;
       } | null;
       paymentTerms?: {
         __typename?: "TermsOfUseNode";
+        id: string;
         textFi?: string | null;
         textEn?: string | null;
         textSv?: string | null;
@@ -6264,22 +6324,30 @@ export type ReservationQuery = {
         nameFi?: string | null;
         nameEn?: string | null;
         nameSv?: string | null;
+        id: string;
         textFi?: string | null;
         textEn?: string | null;
         textSv?: string | null;
       } | null;
       pricings: Array<{
         __typename?: "ReservationUnitPricingNode";
+        id: string;
         begins: string;
         priceUnit: PriceUnit;
         pricingType?: PricingType | null;
         lowestPrice: string;
         highestPrice: string;
         status: Status;
-        taxPercentage: { __typename?: "TaxPercentageNode"; value: string };
+        taxPercentage: {
+          __typename?: "TaxPercentageNode";
+          id: string;
+          pk?: number | null;
+          value: string;
+        };
       }>;
       images: Array<{
         __typename?: "ReservationUnitImageNode";
+        id: string;
         imageUrl?: string | null;
         largeUrl?: string | null;
         mediumUrl?: string | null;
@@ -6304,6 +6372,7 @@ export type ReservationQuery = {
       } | null;
       cancellationRule?: {
         __typename?: "ReservationUnitCancellationRuleNode";
+        id: string;
         canBeCancelledTimeBefore?: number | null;
         needsHandling: boolean;
       } | null;
@@ -6401,6 +6470,7 @@ export type RefreshOrderMutation = {
 
 export type ReservationUnitTypeFieldsFragment = {
   __typename?: "ReservationUnitTypeNode";
+  id: string;
   pk?: number | null;
   nameFi?: string | null;
   nameEn?: string | null;
@@ -6475,6 +6545,7 @@ export type ReservationUnitPageFieldsFragment = {
   maxPersons?: number | null;
   images: Array<{
     __typename?: "ReservationUnitImageNode";
+    id: string;
     imageUrl?: string | null;
     largeUrl?: string | null;
     mediumUrl?: string | null;
@@ -6483,6 +6554,7 @@ export type ReservationUnitPageFieldsFragment = {
   }>;
   applicationRoundTimeSlots: Array<{
     __typename?: "ApplicationRoundTimeSlotNode";
+    id: string;
     closed: boolean;
     weekday: number;
     reservableTimes?: Array<{
@@ -6493,6 +6565,7 @@ export type ReservationUnitPageFieldsFragment = {
   }>;
   reservationUnitType?: {
     __typename?: "ReservationUnitTypeNode";
+    id: string;
     pk?: number | null;
     nameFi?: string | null;
     nameEn?: string | null;
@@ -6523,6 +6596,7 @@ export type ReservationUnitPageFieldsFragment = {
     nameSv?: string | null;
     location?: {
       __typename?: "LocationNode";
+      id: string;
       latitude?: string | null;
       longitude?: string | null;
       addressStreetEn?: string | null;
@@ -6536,18 +6610,21 @@ export type ReservationUnitPageFieldsFragment = {
   } | null;
   serviceSpecificTerms?: {
     __typename?: "TermsOfUseNode";
+    id: string;
     textFi?: string | null;
     textEn?: string | null;
     textSv?: string | null;
   } | null;
   cancellationTerms?: {
     __typename?: "TermsOfUseNode";
+    id: string;
     textFi?: string | null;
     textEn?: string | null;
     textSv?: string | null;
   } | null;
   paymentTerms?: {
     __typename?: "TermsOfUseNode";
+    id: string;
     textFi?: string | null;
     textEn?: string | null;
     textSv?: string | null;
@@ -6557,19 +6634,26 @@ export type ReservationUnitPageFieldsFragment = {
     nameFi?: string | null;
     nameEn?: string | null;
     nameSv?: string | null;
+    id: string;
     textFi?: string | null;
     textEn?: string | null;
     textSv?: string | null;
   } | null;
   pricings: Array<{
     __typename?: "ReservationUnitPricingNode";
+    id: string;
     begins: string;
     priceUnit: PriceUnit;
     pricingType?: PricingType | null;
     lowestPrice: string;
     highestPrice: string;
     status: Status;
-    taxPercentage: { __typename?: "TaxPercentageNode"; value: string };
+    taxPercentage: {
+      __typename?: "TaxPercentageNode";
+      id: string;
+      pk?: number | null;
+      value: string;
+    };
   }>;
   metadataSet?: {
     __typename?: "ReservationMetadataSetNode";
@@ -6592,6 +6676,7 @@ export type ReservationUnitPageFieldsFragment = {
 export type BlockingReservationFieldsFragment = {
   __typename?: "ReservationNode";
   pk?: number | null;
+  id: string;
   state: State;
   isBlocked?: boolean | null;
   begin: string;
@@ -6652,6 +6737,7 @@ export type ReservationUnitQuery = {
     maxPersons?: number | null;
     images: Array<{
       __typename?: "ReservationUnitImageNode";
+      id: string;
       imageUrl?: string | null;
       largeUrl?: string | null;
       mediumUrl?: string | null;
@@ -6660,6 +6746,7 @@ export type ReservationUnitQuery = {
     }>;
     applicationRoundTimeSlots: Array<{
       __typename?: "ApplicationRoundTimeSlotNode";
+      id: string;
       closed: boolean;
       weekday: number;
       reservableTimes?: Array<{
@@ -6670,6 +6757,7 @@ export type ReservationUnitQuery = {
     }>;
     reservationUnitType?: {
       __typename?: "ReservationUnitTypeNode";
+      id: string;
       pk?: number | null;
       nameFi?: string | null;
       nameEn?: string | null;
@@ -6700,6 +6788,7 @@ export type ReservationUnitQuery = {
       nameSv?: string | null;
       location?: {
         __typename?: "LocationNode";
+        id: string;
         latitude?: string | null;
         longitude?: string | null;
         addressStreetEn?: string | null;
@@ -6713,18 +6802,21 @@ export type ReservationUnitQuery = {
     } | null;
     serviceSpecificTerms?: {
       __typename?: "TermsOfUseNode";
+      id: string;
       textFi?: string | null;
       textEn?: string | null;
       textSv?: string | null;
     } | null;
     cancellationTerms?: {
       __typename?: "TermsOfUseNode";
+      id: string;
       textFi?: string | null;
       textEn?: string | null;
       textSv?: string | null;
     } | null;
     paymentTerms?: {
       __typename?: "TermsOfUseNode";
+      id: string;
       textFi?: string | null;
       textEn?: string | null;
       textSv?: string | null;
@@ -6734,19 +6826,26 @@ export type ReservationUnitQuery = {
       nameFi?: string | null;
       nameEn?: string | null;
       nameSv?: string | null;
+      id: string;
       textFi?: string | null;
       textEn?: string | null;
       textSv?: string | null;
     } | null;
     pricings: Array<{
       __typename?: "ReservationUnitPricingNode";
+      id: string;
       begins: string;
       priceUnit: PriceUnit;
       pricingType?: PricingType | null;
       lowestPrice: string;
       highestPrice: string;
       status: Status;
-      taxPercentage: { __typename?: "TaxPercentageNode"; value: string };
+      taxPercentage: {
+        __typename?: "TaxPercentageNode";
+        id: string;
+        pk?: number | null;
+        value: string;
+      };
     }>;
     metadataSet?: {
       __typename?: "ReservationMetadataSetNode";
@@ -6829,6 +6928,7 @@ export type ReservationUnitPageQuery = {
     reservationSet?: Array<{
       __typename?: "ReservationNode";
       pk?: number | null;
+      id: string;
       state: State;
       isBlocked?: boolean | null;
       begin: string;
@@ -6841,6 +6941,7 @@ export type ReservationUnitPageQuery = {
     }> | null;
     images: Array<{
       __typename?: "ReservationUnitImageNode";
+      id: string;
       imageUrl?: string | null;
       largeUrl?: string | null;
       mediumUrl?: string | null;
@@ -6849,6 +6950,7 @@ export type ReservationUnitPageQuery = {
     }>;
     applicationRoundTimeSlots: Array<{
       __typename?: "ApplicationRoundTimeSlotNode";
+      id: string;
       closed: boolean;
       weekday: number;
       reservableTimes?: Array<{
@@ -6859,6 +6961,7 @@ export type ReservationUnitPageQuery = {
     }>;
     reservationUnitType?: {
       __typename?: "ReservationUnitTypeNode";
+      id: string;
       pk?: number | null;
       nameFi?: string | null;
       nameEn?: string | null;
@@ -6889,6 +6992,7 @@ export type ReservationUnitPageQuery = {
       nameSv?: string | null;
       location?: {
         __typename?: "LocationNode";
+        id: string;
         latitude?: string | null;
         longitude?: string | null;
         addressStreetEn?: string | null;
@@ -6902,18 +7006,21 @@ export type ReservationUnitPageQuery = {
     } | null;
     serviceSpecificTerms?: {
       __typename?: "TermsOfUseNode";
+      id: string;
       textFi?: string | null;
       textEn?: string | null;
       textSv?: string | null;
     } | null;
     cancellationTerms?: {
       __typename?: "TermsOfUseNode";
+      id: string;
       textFi?: string | null;
       textEn?: string | null;
       textSv?: string | null;
     } | null;
     paymentTerms?: {
       __typename?: "TermsOfUseNode";
+      id: string;
       textFi?: string | null;
       textEn?: string | null;
       textSv?: string | null;
@@ -6923,19 +7030,26 @@ export type ReservationUnitPageQuery = {
       nameFi?: string | null;
       nameEn?: string | null;
       nameSv?: string | null;
+      id: string;
       textFi?: string | null;
       textEn?: string | null;
       textSv?: string | null;
     } | null;
     pricings: Array<{
       __typename?: "ReservationUnitPricingNode";
+      id: string;
       begins: string;
       priceUnit: PriceUnit;
       pricingType?: PricingType | null;
       lowestPrice: string;
       highestPrice: string;
       status: Status;
-      taxPercentage: { __typename?: "TaxPercentageNode"; value: string };
+      taxPercentage: {
+        __typename?: "TaxPercentageNode";
+        id: string;
+        pk?: number | null;
+        value: string;
+      };
     }>;
     metadataSet?: {
       __typename?: "ReservationMetadataSetNode";
@@ -6957,6 +7071,7 @@ export type ReservationUnitPageQuery = {
   affectingReservations?: Array<{
     __typename?: "ReservationNode";
     pk?: number | null;
+    id: string;
     state: State;
     isBlocked?: boolean | null;
     begin: string;
@@ -6990,6 +7105,7 @@ export type ReservationUnitCardFieldsFragment = {
       addressStreetSv?: string | null;
       addressCityEn?: string | null;
       addressCitySv?: string | null;
+      id: string;
       addressStreetFi?: string | null;
       addressZip: string;
       addressCityFi?: string | null;
@@ -6997,6 +7113,7 @@ export type ReservationUnitCardFieldsFragment = {
   } | null;
   reservationUnitType?: {
     __typename?: "ReservationUnitTypeNode";
+    id: string;
     pk?: number | null;
     nameFi?: string | null;
     nameEn?: string | null;
@@ -7004,6 +7121,7 @@ export type ReservationUnitCardFieldsFragment = {
   } | null;
   images: Array<{
     __typename?: "ReservationUnitImageNode";
+    id: string;
     imageUrl?: string | null;
     largeUrl?: string | null;
     mediumUrl?: string | null;
@@ -7079,13 +7197,19 @@ export type SearchReservationUnitsQuery = {
         nameSv?: string | null;
         pricings: Array<{
           __typename?: "ReservationUnitPricingNode";
+          id: string;
           begins: string;
           priceUnit: PriceUnit;
           pricingType?: PricingType | null;
           lowestPrice: string;
           highestPrice: string;
           status: Status;
-          taxPercentage: { __typename?: "TaxPercentageNode"; value: string };
+          taxPercentage: {
+            __typename?: "TaxPercentageNode";
+            id: string;
+            pk?: number | null;
+            value: string;
+          };
         }>;
         unit?: {
           __typename?: "UnitNode";
@@ -7100,6 +7224,7 @@ export type SearchReservationUnitsQuery = {
             addressStreetSv?: string | null;
             addressCityEn?: string | null;
             addressCitySv?: string | null;
+            id: string;
             addressStreetFi?: string | null;
             addressZip: string;
             addressCityFi?: string | null;
@@ -7107,6 +7232,7 @@ export type SearchReservationUnitsQuery = {
         } | null;
         reservationUnitType?: {
           __typename?: "ReservationUnitTypeNode";
+          id: string;
           pk?: number | null;
           nameFi?: string | null;
           nameEn?: string | null;
@@ -7114,6 +7240,7 @@ export type SearchReservationUnitsQuery = {
         } | null;
         images: Array<{
           __typename?: "ReservationUnitImageNode";
+          id: string;
           imageUrl?: string | null;
           largeUrl?: string | null;
           mediumUrl?: string | null;
@@ -7155,6 +7282,7 @@ export type RelatedReservationUnitsQuery = {
         nameSv?: string | null;
         images: Array<{
           __typename?: "ReservationUnitImageNode";
+          id: string;
           imageUrl?: string | null;
           largeUrl?: string | null;
           mediumUrl?: string | null;
@@ -7174,6 +7302,7 @@ export type RelatedReservationUnitsQuery = {
             addressStreetSv?: string | null;
             addressCityEn?: string | null;
             addressCitySv?: string | null;
+            id: string;
             addressStreetFi?: string | null;
             addressZip: string;
             addressCityFi?: string | null;
@@ -7181,6 +7310,7 @@ export type RelatedReservationUnitsQuery = {
         } | null;
         reservationUnitType?: {
           __typename?: "ReservationUnitTypeNode";
+          id: string;
           pk?: number | null;
           nameFi?: string | null;
           nameEn?: string | null;
@@ -7188,13 +7318,19 @@ export type RelatedReservationUnitsQuery = {
         } | null;
         pricings: Array<{
           __typename?: "ReservationUnitPricingNode";
+          id: string;
           begins: string;
           priceUnit: PriceUnit;
           pricingType?: PricingType | null;
           lowestPrice: string;
           highestPrice: string;
           status: Status;
-          taxPercentage: { __typename?: "TaxPercentageNode"; value: string };
+          taxPercentage: {
+            __typename?: "TaxPercentageNode";
+            id: string;
+            pk?: number | null;
+            value: string;
+          };
         }>;
       } | null;
     } | null>;
@@ -7207,6 +7343,7 @@ export type GetCurrentUserQuery = {
   __typename?: "Query";
   currentUser?: {
     __typename?: "UserNode";
+    id: string;
     pk?: number | null;
     firstName: string;
     lastName: string;
@@ -7260,11 +7397,13 @@ export type ApplicationNameFragmentFragment = {
   applicantType?: ApplicantTypeChoice | null;
   organisation?: {
     __typename?: "OrganisationNode";
+    id: string;
     name: string;
     organisationType: OrganizationTypeChoice;
   } | null;
   contactPerson?: {
     __typename?: "PersonNode";
+    id: string;
     lastName: string;
     firstName: string;
   } | null;
@@ -7331,11 +7470,13 @@ export type ApplicationSectionFragmentFragment = {
     applicantType?: ApplicantTypeChoice | null;
     organisation?: {
       __typename?: "OrganisationNode";
+      id: string;
       name: string;
       organisationType: OrganizationTypeChoice;
     } | null;
     contactPerson?: {
       __typename?: "PersonNode";
+      id: string;
       lastName: string;
       firstName: string;
     } | null;
@@ -7352,6 +7493,7 @@ export type ApplicationSectionFragmentFragment = {
       nameFi?: string | null;
       unit?: {
         __typename?: "UnitNode";
+        id: string;
         pk?: number | null;
         nameFi?: string | null;
       } | null;
@@ -7510,6 +7652,7 @@ export type ApplicationRoundFragmentFragment = {
   statusTimestamp?: string | null;
   serviceSector?: {
     __typename?: "ServiceSectorNode";
+    id: string;
     pk?: number | null;
     nameFi?: string | null;
   } | null;
@@ -7524,6 +7667,7 @@ export type ApplicationRoundFragmentFragment = {
     maxPersons?: number | null;
     images: Array<{
       __typename?: "ReservationUnitImageNode";
+      id: string;
       imageUrl?: string | null;
       largeUrl?: string | null;
       mediumUrl?: string | null;
@@ -7551,6 +7695,7 @@ export type ApplicationAdminFragmentFragment = {
   additionalInformation?: string | null;
   applicationRound: {
     __typename?: "ApplicationRoundNode";
+    id: string;
     pk?: number | null;
     nameFi?: string | null;
   };
@@ -7708,6 +7853,7 @@ export type ApplicationCommonFragment = {
     statusTimestamp?: string | null;
     serviceSector?: {
       __typename?: "ServiceSectorNode";
+      id: string;
       pk?: number | null;
       nameFi?: string | null;
     } | null;
@@ -7722,6 +7868,7 @@ export type ApplicationCommonFragment = {
       maxPersons?: number | null;
       images: Array<{
         __typename?: "ReservationUnitImageNode";
+        id: string;
         imageUrl?: string | null;
         largeUrl?: string | null;
         mediumUrl?: string | null;
@@ -7891,6 +8038,7 @@ export type ApplicationQuery = {
       statusTimestamp?: string | null;
       termsOfUse?: {
         __typename?: "TermsOfUseNode";
+        id: string;
         pk?: string | null;
         termsType: TermsType;
         nameFi?: string | null;
@@ -7902,6 +8050,7 @@ export type ApplicationQuery = {
       } | null;
       serviceSector?: {
         __typename?: "ServiceSectorNode";
+        id: string;
         pk?: number | null;
         nameFi?: string | null;
       } | null;
@@ -7916,6 +8065,7 @@ export type ApplicationQuery = {
         maxPersons?: number | null;
         images: Array<{
           __typename?: "ReservationUnitImageNode";
+          id: string;
           imageUrl?: string | null;
           largeUrl?: string | null;
           mediumUrl?: string | null;
@@ -8091,6 +8241,7 @@ export type TermsOfUseNameFieldsFragment = {
 
 export type TermsOfUseTextFieldsFragment = {
   __typename?: "TermsOfUseNode";
+  id: string;
   textFi?: string | null;
   textEn?: string | null;
   textSv?: string | null;
@@ -8103,6 +8254,7 @@ export type TermsOfUseFieldsFragment = {
   nameFi?: string | null;
   nameEn?: string | null;
   nameSv?: string | null;
+  id: string;
   textFi?: string | null;
   textEn?: string | null;
   textSv?: string | null;
@@ -8110,17 +8262,24 @@ export type TermsOfUseFieldsFragment = {
 
 export type PricingFieldsFragment = {
   __typename?: "ReservationUnitPricingNode";
+  id: string;
   begins: string;
   priceUnit: PriceUnit;
   pricingType?: PricingType | null;
   lowestPrice: string;
   highestPrice: string;
   status: Status;
-  taxPercentage: { __typename?: "TaxPercentageNode"; value: string };
+  taxPercentage: {
+    __typename?: "TaxPercentageNode";
+    id: string;
+    pk?: number | null;
+    value: string;
+  };
 };
 
 export type ImageFragmentFragment = {
   __typename?: "ReservationUnitImageNode";
+  id: string;
   imageUrl?: string | null;
   largeUrl?: string | null;
   mediumUrl?: string | null;
@@ -8130,6 +8289,7 @@ export type ImageFragmentFragment = {
 
 export type LocationFieldsFragment = {
   __typename?: "LocationNode";
+  id: string;
   addressStreetFi?: string | null;
   addressZip: string;
   addressCityFi?: string | null;
@@ -8141,6 +8301,7 @@ export type LocationFieldsI18nFragment = {
   addressStreetSv?: string | null;
   addressCityEn?: string | null;
   addressCitySv?: string | null;
+  id: string;
   addressStreetFi?: string | null;
   addressZip: string;
   addressCityFi?: string | null;
@@ -8186,6 +8347,7 @@ export type TermsOfUseQuery = {
 export const ApplicationRoundFieldsFragmentDoc = gql`
   fragment ApplicationRoundFields on ApplicationRoundNode {
     pk
+    id
     nameFi
     nameEn
     nameSv
@@ -8200,8 +8362,10 @@ export const ApplicationRoundFieldsFragmentDoc = gql`
     criteriaEn
     criteriaSv
     reservationUnits {
+      id
       pk
       unit {
+        id
         pk
       }
     }
@@ -8210,6 +8374,7 @@ export const ApplicationRoundFieldsFragmentDoc = gql`
 export const CancellationRuleFieldsFragmentDoc = gql`
   fragment CancellationRuleFields on ReservationUnitNode {
     cancellationRule {
+      id
       canBeCancelledTimeBefore
       needsHandling
     }
@@ -8241,6 +8406,7 @@ export const ReservationInfoFragmentFragmentDoc = gql`
 `;
 export const LocationFieldsFragmentDoc = gql`
   fragment LocationFields on LocationNode {
+    id
     addressStreetFi
     addressZip
     addressCityFi
@@ -8275,6 +8441,7 @@ export const UnitFieldsFragmentDoc = gql`
     id
     tprekId
     location {
+      id
       latitude
       longitude
     }
@@ -8283,6 +8450,7 @@ export const UnitFieldsFragmentDoc = gql`
 `;
 export const TermsOfUseTextFieldsFragmentDoc = gql`
   fragment TermsOfUseTextFields on TermsOfUseNode {
+    id
     textFi
     textEn
     textSv
@@ -8297,12 +8465,15 @@ export const TermsOfUseNameFieldsFragmentDoc = gql`
 `;
 export const PricingFieldsFragmentDoc = gql`
   fragment PricingFields on ReservationUnitPricingNode {
+    id
     begins
     priceUnit
     pricingType
     lowestPrice
     highestPrice
     taxPercentage {
+      id
+      pk
       value
     }
     status
@@ -8310,6 +8481,7 @@ export const PricingFieldsFragmentDoc = gql`
 `;
 export const ImageFragmentFragmentDoc = gql`
   fragment ImageFragment on ReservationUnitImageNode {
+    id
     imageUrl
     largeUrl
     mediumUrl
@@ -8383,6 +8555,7 @@ export const ReservationUnitFieldsFragmentDoc = gql`
 `;
 export const ReservationUnitTypeFieldsFragmentDoc = gql`
   fragment ReservationUnitTypeFields on ReservationUnitTypeNode {
+    id
     pk
     nameFi
     nameEn
@@ -8412,6 +8585,7 @@ export const ReservationUnitPageFieldsFragmentDoc = gql`
       ...ImageFragment
     }
     applicationRoundTimeSlots {
+      id
       closed
       weekday
       reservableTimes {
@@ -8441,6 +8615,7 @@ export const ReservationUnitPageFieldsFragmentDoc = gql`
     reservationsMaxDaysBefore
     requireReservationHandling
     equipments {
+      id
       ...EquipmentFields
     }
   }
@@ -8452,6 +8627,7 @@ export const ReservationUnitPageFieldsFragmentDoc = gql`
 export const BlockingReservationFieldsFragmentDoc = gql`
   fragment BlockingReservationFields on ReservationNode {
     pk
+    id
     state
     isBlocked
     begin
@@ -8526,10 +8702,12 @@ export const ApplicationNameFragmentFragmentDoc = gql`
   fragment ApplicationNameFragment on ApplicationNode {
     applicantType
     organisation {
+      id
       name
       organisationType
     }
     contactPerson {
+      id
       lastName
       firstName
     }
@@ -8550,11 +8728,13 @@ export const ApplicationSectionFragmentFragmentDoc = gql`
       ...ApplicationNameFragment
     }
     reservationUnitOptions {
+      id
       reservationUnit {
         id
         pk
         nameFi
         unit {
+          id
           pk
           nameFi
         }
@@ -8669,6 +8849,7 @@ export const ApplicationAdminFragmentFragmentDoc = gql`
     lastModifiedDate
     ...ApplicantFragment
     applicationRound {
+      id
       pk
       nameFi
     }
@@ -8697,6 +8878,7 @@ export const ApplicationRoundFragmentFragmentDoc = gql`
     nameSv
     nameEn
     serviceSector {
+      id
       pk
       nameFi
     }
@@ -8801,6 +8983,7 @@ export const OptionsDocument = gql`
     reservationUnitTypes {
       edges {
         node {
+          id
           pk
           nameFi
           nameEn
@@ -8811,6 +8994,7 @@ export const OptionsDocument = gql`
     purposes {
       edges {
         node {
+          id
           pk
           nameFi
           nameEn
@@ -8821,6 +9005,7 @@ export const OptionsDocument = gql`
     reservationPurposes {
       edges {
         node {
+          id
           pk
           nameFi
           nameEn
@@ -8831,6 +9016,7 @@ export const OptionsDocument = gql`
     ageGroups {
       edges {
         node {
+          id
           pk
           minimum
           maximum
@@ -8840,6 +9026,7 @@ export const OptionsDocument = gql`
     cities {
       edges {
         node {
+          id
           pk
           nameFi
           nameEn
@@ -8850,6 +9037,7 @@ export const OptionsDocument = gql`
     equipments {
       edges {
         node {
+          id
           pk
           nameFi
           nameEn
@@ -8923,11 +9111,13 @@ export const ApplicationsDocument = gql`
     applications(user: $user, status: $status, orderBy: $orderBy) {
       edges {
         node {
+          id
           pk
           applicationRound {
             ...ApplicationRoundFields
           }
           user {
+            id
             name
           }
           status
@@ -9217,12 +9407,14 @@ export const ApplicationRoundPeriodsDocument = gql`
     applicationRounds {
       edges {
         node {
+          id
           pk
           reservationPeriodBegin
           reservationPeriodEnd
           applicationPeriodBegin
           status
           reservationUnits {
+            id
             pk
           }
         }
@@ -9386,6 +9578,7 @@ export const SearchFormParamsUnitDocument = gql`
     ) {
       edges {
         node {
+          id
           pk
           nameFi
           nameEn
@@ -9468,6 +9661,7 @@ export const ReservationUnitPurposesDocument = gql`
     purposes(orderBy: $orderBy) {
       edges {
         node {
+          id
           pk
           nameFi
           nameEn
@@ -9752,6 +9946,7 @@ export const ConfirmReservationDocument = gql`
       pk
       state
       order {
+        id
         checkoutUrl
       }
     }
@@ -9945,6 +10140,7 @@ export const ReservationDocument = gql`
       name
       ...ReserveeNameFields
       ...ReserveeBillingFields
+      ...ReservationInfoFragment
       applyingForFreeOfCharge
       bufferTimeBefore
       bufferTimeAfter
@@ -9970,15 +10166,14 @@ export const ReservationDocument = gql`
         ...ReservationUnitFields
         ...CancellationRuleFields
       }
-      ...ReservationInfoFragment
       isHandled
     }
   }
   ${ReserveeNameFieldsFragmentDoc}
   ${ReserveeBillingFieldsFragmentDoc}
+  ${ReservationInfoFragmentFragmentDoc}
   ${ReservationUnitFieldsFragmentDoc}
   ${CancellationRuleFieldsFragmentDoc}
-  ${ReservationInfoFragmentFragmentDoc}
 `;
 
 /**
@@ -10750,6 +10945,7 @@ export type RelatedReservationUnitsQueryResult = Apollo.QueryResult<
 export const GetCurrentUserDocument = gql`
   query GetCurrentUser {
     currentUser {
+      id
       pk
       firstName
       lastName
@@ -10917,7 +11113,9 @@ export const ApplicationDocument = gql`
     application(id: $id) {
       ...ApplicationCommon
       applicationRound {
+        id
         termsOfUse {
+          id
           ...TermsOfUseFields
         }
       }

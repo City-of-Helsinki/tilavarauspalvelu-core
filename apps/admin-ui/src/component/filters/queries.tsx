@@ -5,6 +5,7 @@ export const RESERVATION_UNIT_TYPES_QUERY = gql`
     reservationUnitTypes(offset: $offset, first: $first) {
       edges {
         node {
+          id
           pk
           nameFi
         }
@@ -30,6 +31,7 @@ export const RESERVATION_UNITS_FILTER_PARAMS_QUERY = gql`
     ) {
       edges {
         node {
+          id
           nameFi
           pk
         }

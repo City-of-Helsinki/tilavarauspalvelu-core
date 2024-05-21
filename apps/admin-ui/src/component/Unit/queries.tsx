@@ -16,9 +16,11 @@ export const UNITS_QUERY = gql`
     ) {
       edges {
         node {
+          id
           nameFi
           pk
           reservationunitSet {
+            id
             pk
           }
         }

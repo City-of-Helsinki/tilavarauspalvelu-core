@@ -51,6 +51,7 @@ export const CONFIRM_RESERVATION = gql`
       pk
       state
       order {
+        id
         checkoutUrl
       }
     }
@@ -60,6 +61,7 @@ export const CONFIRM_RESERVATION = gql`
 const CANCELLATION_RULE_FRAGMENT = gql`
   fragment CancellationRuleFields on ReservationUnitNode {
     cancellationRule {
+      id
       canBeCancelledTimeBefore
       needsHandling
     }
@@ -176,6 +178,7 @@ export const GET_RESERVATION = gql`
       name
       ...ReserveeNameFields
       ...ReserveeBillingFields
+      ...ReservationInfoFragment
       applyingForFreeOfCharge
       bufferTimeBefore
       bufferTimeAfter
@@ -201,7 +204,6 @@ export const GET_RESERVATION = gql`
         ...ReservationUnitFields
         ...CancellationRuleFields
       }
-      ...ReservationInfoFragment
       isHandled
     }
   }

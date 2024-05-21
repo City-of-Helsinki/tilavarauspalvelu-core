@@ -30,17 +30,22 @@ export const APPLICATIONS_QUERY = gql`
     ) {
       edges {
         node {
+          id
           pk
           status
           ...ApplicationNameFragment
           applicationSections {
-            name
+            id
             pk
+            name
             ...ApplicationSectionDurationFragment
             reservationUnitOptions {
+              id
               preferredOrder
               reservationUnit {
+                id
                 unit {
+                  id
                   pk
                   nameFi
                 }
@@ -105,13 +110,17 @@ export const APPLICATIONS_EVENTS_QUERY = gql`
           ...ApplicationSectionFragment
           allocations
           reservationUnitOptions {
+            id
             allocatedTimeSlots {
+              id
               pk
               dayOfTheWeek
               beginTime
               endTime
               reservationUnitOption {
+                id
                 applicationSection {
+                  id
                   pk
                 }
               }
@@ -156,15 +165,18 @@ export const ALLOCATED_TIME_SLOTS_QUERY = gql`
     ) {
       edges {
         node {
+          id
           pk
           dayOfTheWeek
           endTime
           beginTime
           reservationUnitOption {
+            id
             rejected
             locked
             preferredOrder
             applicationSection {
+              id
               pk
               name
               reservationsEndDate
@@ -173,12 +185,15 @@ export const ALLOCATED_TIME_SLOTS_QUERY = gql`
               reservationMaxDuration
               application {
                 pk
+                id
                 ...ApplicationNameFragment
               }
             }
             reservationUnit {
+              id
               nameFi
               unit {
+                id
                 nameFi
               }
             }
