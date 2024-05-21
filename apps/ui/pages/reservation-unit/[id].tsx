@@ -45,11 +45,8 @@ import {
   ApplicationRoundStatusChoice,
   type ApplicationRoundTimeSlotNode,
   PricingType,
-  type Query,
-  type QueryReservationUnitsArgs,
   type ReservationCreateMutationInput,
   type ReservationNode,
-  type ReservationUnitNode,
   useCreateReservationMutation,
   useListReservationsQuery,
   type ApplicationRoundPeriodsQuery,
@@ -57,6 +54,9 @@ import {
   type ReservationUnitPageQuery,
   type ReservationUnitPageQueryVariables,
   ReservationUnitPageDocument,
+  RelatedReservationUnitsDocument,
+  type RelatedReservationUnitsQuery,
+  type RelatedReservationUnitsQueryVariables,
 } from "@gql/gql-types";
 import {
   base64encode,
@@ -67,7 +67,9 @@ import {
 import Head from "@/components/reservation-unit/Head";
 import { AddressSection } from "@/components/reservation-unit/Address";
 import Sanitize from "@/components/common/Sanitize";
-import RelatedUnits from "@/components/reservation-unit/RelatedUnits";
+import RelatedUnits, {
+  type RelatedNodeT,
+} from "@/components/reservation-unit/RelatedUnits";
 import { AccordionWithState as Accordion } from "@/components/common/Accordion";
 import { createApolloClient } from "@/modules/apolloClient";
 import { Map } from "@/components/Map";
@@ -82,7 +84,6 @@ import {
   isTouchDevice,
   printErrorMessages,
 } from "@/modules/util";
-import { RELATED_RESERVATION_UNITS } from "@/modules/queries/reservationUnit";
 import {
   getFuturePricing,
   getPossibleTimesForDay,
@@ -206,13 +207,13 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 
     const bookingTerms = await getGenericTerms(apolloClient);
 
-    let relatedReservationUnits: ReservationUnitNode[] = [];
+    let relatedReservationUnits: RelatedNodeT[] = [];
     if (reservationUnit?.unit?.pk) {
       const { data: relatedData } = await apolloClient.query<
-        Query,
-        QueryReservationUnitsArgs
+        RelatedReservationUnitsQuery,
+        RelatedReservationUnitsQueryVariables
       >({
-        query: RELATED_RESERVATION_UNITS,
+        query: RelatedReservationUnitsDocument,
         variables: {
           unit: [reservationUnit.unit.pk],
           isVisible: true,

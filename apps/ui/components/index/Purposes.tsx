@@ -15,7 +15,10 @@ import { anchorStyles, focusStyles } from "common/styles/cssFragments";
 import { pixel } from "@/styles/util";
 
 type Props = {
-  purposes: PurposeNode[];
+  purposes: Pick<
+    PurposeNode,
+    "pk" | "nameFi" | "nameEn" | "nameSv" | "smallUrl" | "imageUrl"
+  >[];
 };
 
 const mobileBreakpoint = "450px";
@@ -100,7 +103,7 @@ const Purposes = ({ purposes }: Props): JSX.Element => {
 
   const itemLimit = useMemo(() => (isMobile ? 4 : 8), [isMobile]);
 
-  const getImg = (item: PurposeNode) => {
+  const getImg = (item: Pick<PurposeNode, "smallUrl" | "imageUrl">) => {
     return item.smallUrl || item.imageUrl || pixel;
   };
 

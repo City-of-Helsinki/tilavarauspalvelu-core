@@ -24,7 +24,11 @@ import { ErrorToast } from "@/components/common/ErrorToast";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { base64encode } from "common/src/helpers";
 import { createApolloClient } from "@/modules/apolloClient";
-import { ApplicationDocument, type ApplicationQuery, type ApplicationQueryVariables } from "common/gql/gql-types";
+import {
+  ApplicationDocument,
+  type ApplicationQuery,
+  type ApplicationQueryVariables,
+} from "common/gql/gql-types";
 
 // TODO move this to a shared file
 // and combine all the separate error handling functions to one
@@ -114,7 +118,10 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   const client = createApolloClient(commonProps.apiBaseUrl, ctx);
   const typename = "ApplicationNode";
-  const { data } = await client.query<ApplicationQuery, ApplicationQueryVariables>({
+  const { data } = await client.query<
+    ApplicationQuery,
+    ApplicationQueryVariables
+  >({
     query: ApplicationDocument,
     variables: {
       id: base64encode(`${typename}:${pk}`),
@@ -123,7 +130,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   // Pass the application and round as props because we don't need to hydrate
   // and our codegen would allow undefineds if we passed data instead.
-  const { application } = data
+  const { application } = data;
 
   const applicationRound = application?.applicationRound ?? undefined;
   if (application == null || applicationRound == null) {

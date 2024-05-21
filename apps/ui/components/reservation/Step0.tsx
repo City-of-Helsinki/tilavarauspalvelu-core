@@ -23,12 +23,12 @@ import {
   Subheading,
 } from "../reservation-unit/ReservationUnitStyles";
 import Sanitize from "../common/Sanitize";
-import type { ReservationUnitNode } from "@gql/gql-types";
+import type { ReservationUnitPageFieldsFragment } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { containsField } from "common/src/metaFieldsHelpers";
 
 type Props = {
-  reservationUnit: ReservationUnitNode;
+  reservationUnit: ReservationUnitPageFieldsFragment;
   handleSubmit: () => void;
   generalFields: string[];
   reservationApplicationFields: string[];

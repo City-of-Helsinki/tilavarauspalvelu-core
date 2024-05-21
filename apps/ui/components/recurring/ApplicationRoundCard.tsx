@@ -8,7 +8,7 @@ import { breakpoints } from "common/src/common/style";
 import { H4 } from "common/src/common/typography";
 import ClientOnly from "common/src/ClientOnly";
 import {
-  type ApplicationRoundNode,
+  type ApplicationRoundFieldsFragment,
   ApplicationRoundStatusChoice,
 } from "@gql/gql-types";
 import { IconButton } from "common/src/components";
@@ -17,7 +17,7 @@ import { MediumButton } from "@/styles/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 
 interface Props {
-  applicationRound: ApplicationRoundNode;
+  applicationRound: ApplicationRoundFieldsFragment;
 }
 
 const StyledCard = styled(Card)`

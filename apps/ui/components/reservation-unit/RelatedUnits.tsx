@@ -7,7 +7,7 @@ import Link from "next/link";
 import styled from "styled-components";
 import { useMedia } from "react-use";
 import { breakpoints } from "common/src/common/style";
-import type { ReservationUnitNode } from "@gql/gql-types";
+import type { RelatedReservationUnitsQuery } from "@gql/gql-types";
 import { reservationUnitPath } from "@/modules/const";
 import { getMainImage, getTranslation } from "@/modules/util";
 import IconWithText from "../common/IconWithText";
@@ -21,8 +21,13 @@ import {
 import { SupplementaryButton, truncatedText } from "@/styles/util";
 import { getImageSource } from "common/src/helpers";
 
+type RelatedQueryResT = NonNullable<
+  NonNullable<RelatedReservationUnitsQuery["reservationUnits"]>
+>;
+type RelatedEdgeT = NonNullable<RelatedQueryResT>["edges"][0];
+export type RelatedNodeT = NonNullable<NonNullable<RelatedEdgeT>["node"]>;
 type PropsType = {
-  units: ReservationUnitNode[];
+  units: RelatedNodeT[];
 };
 
 const Wrapper = styled.div`
@@ -101,7 +106,7 @@ const LinkButton = styled(SupplementaryButton)`
   }
 `;
 
-const RelatedUnits = ({ units }: PropsType): JSX.Element | null => {
+function RelatedUnits({ units }: PropsType): JSX.Element | null {
   const { t } = useTranslation();
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
   const isWideMobile = useMedia(`(max-width: ${breakpoints.l})`, false);
@@ -203,6 +208,6 @@ const RelatedUnits = ({ units }: PropsType): JSX.Element | null => {
       </StyledCarousel>
     </Wrapper>
   );
-};
+}
 
 export default RelatedUnits;

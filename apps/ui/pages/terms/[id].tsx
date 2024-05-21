@@ -4,13 +4,13 @@ import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
 import {
-  type QueryTermsOfUseArgs,
-  type Query,
   TermsType,
+  TermsOfUseDocument,
+  type TermsOfUseQuery,
+  type TermsOfUseQueryVariables,
 } from "@gql/gql-types";
 import { H2 } from "common/src/common/typography";
 import { Container } from "common";
-import { TERMS_OF_USE } from "@/modules/queries/reservationUnit";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import Sanitize from "@/components/common/Sanitize";
@@ -27,16 +27,16 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
   const genericTermsId = params?.id;
-  const { data: genericTermsData } = await apolloClient.query<
-    Query,
-    QueryTermsOfUseArgs
+  const { data } = await apolloClient.query<
+    TermsOfUseQuery,
+    TermsOfUseQueryVariables
   >({
-    query: TERMS_OF_USE,
+    query: TermsOfUseDocument,
     variables: {
       termsType: TermsType.GenericTerms,
     },
   });
-  const genericTerms = genericTermsData.termsOfUse?.edges
+  const genericTerms = data.termsOfUse?.edges
     ?.map((n) => n?.node)
     .find((n) => n?.pk === genericTermsId);
   if (genericTerms == null) {

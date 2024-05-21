@@ -3,13 +3,16 @@ import { useTranslation } from "next-i18next";
 import type { GetServerSidePropsContext } from "next";
 import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import type { Query, QueryApplicationRoundsArgs } from "@gql/gql-types";
+import {
+  ApplicationRoundsUiDocument,
+  type ApplicationRoundsUiQuery,
+  type ApplicationRoundsUiQueryVariables,
+} from "@gql/gql-types";
 import { Container } from "common";
 import { createApolloClient } from "@/modules/apolloClient";
 import Sanitize from "@/components/common/Sanitize";
 import KorosDefault from "@/components/common/KorosDefault";
 import { getTranslation } from "@/modules/util";
-import { APPLICATION_ROUNDS } from "@/modules/queries/applicationRound";
 import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
@@ -22,9 +25,12 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
-  const { data } = await apolloClient.query<Query, QueryApplicationRoundsArgs>({
+  const { data } = await apolloClient.query<
+    ApplicationRoundsUiQuery,
+    ApplicationRoundsUiQueryVariables
+  >({
     fetchPolicy: "no-cache",
-    query: APPLICATION_ROUNDS,
+    query: ApplicationRoundsUiDocument,
   });
   const applicationRound =
     data?.applicationRounds?.edges

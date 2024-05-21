@@ -10,6 +10,7 @@ import {
   type PaymentOrderNode,
   type ListReservationsQuery,
   IsReservableFieldsFragment,
+  ReservationUnitNode,
 } from "@gql/gql-types";
 import {
   type RoundPeriod,
@@ -100,9 +101,33 @@ export function isReservationInThePast(
 
 type ReservationQueryT = NonNullable<ListReservationsQuery["reservations"]>;
 type ReservationEdgeT = NonNullable<ReservationQueryT["edges"]>[0];
-type ReservationNodeT = NonNullable<ReservationEdgeT>["node"];
+type ReservationNodeT = NonNullable<NonNullable<ReservationEdgeT>["node"]>;
+
+type IsWithinCancellationPeriodReservationT = Pick<
+  ReservationNodeT,
+  "begin"
+> & {
+  reservationUnit?: Array<{
+    cancellationRule?: Pick<
+      NonNullable<ReservationUnitNode["cancellationRule"]>,
+      "canBeCancelledTimeBefore"
+    > | null;
+  }> | null;
+};
+type GetReservationCancellationReasonReservationT = Pick<
+  ReservationNodeT,
+  "begin"
+> & {
+  reservationUnit?: Array<{
+    cancellationRule?: Pick<
+      NonNullable<ReservationUnitNode["cancellationRule"]>,
+      "canBeCancelledTimeBefore" | "needsHandling"
+    > | null;
+  }> | null;
+};
+
 function isReservationWithinCancellationPeriod(
-  reservation: Pick<NonNullable<ReservationNodeT>, "begin" | "reservationUnit">
+  reservation: IsWithinCancellationPeriodReservationT
 ): boolean {
   const reservationUnit = reservation.reservationUnit?.[0];
   const begin = new Date(reservation.begin);
@@ -172,9 +197,9 @@ type ReservationCancellationReason =
   | "REQUIRES_HANDLING"
   | "BUFFER";
 
-export const getReservationCancellationReason = (
-  reservation: ReservationNode
-): ReservationCancellationReason | null => {
+export function getReservationCancellationReason(
+  reservation: GetReservationCancellationReasonReservationT
+): ReservationCancellationReason | null {
   const reservationUnit = reservation.reservationUnit?.[0];
 
   if (isReservationInThePast(reservation)) {
@@ -197,7 +222,7 @@ export const getReservationCancellationReason = (
   }
 
   return null;
-};
+}
 
 function shouldShowOrderStatus(state: State) {
   if (
@@ -417,6 +442,7 @@ export const canReservationTimeBeChanged = ({
   return [true];
 };
 
+// FIXME this is awful: we don't use the Node type anymore, this is not type safe, it's not intuative what this does and why
 export const getReservationValue = (
   reservation: ReservationNode,
   key: string

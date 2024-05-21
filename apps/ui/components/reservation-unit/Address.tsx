@@ -14,8 +14,9 @@ import { mapUrlPrefix } from "@/modules/const";
 import { getTranslation } from "@/modules/util";
 
 type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
+type NodeT = Pick<QueryT, "unit">;
 type Props = {
-  reservationUnit: QueryT;
+  reservationUnit: NodeT;
 };
 
 const Container = styled.div`
@@ -113,7 +114,7 @@ function createAccessibilityUrl(
 export function AddressSection({ reservationUnit }: Props): JSX.Element {
   const { t, i18n } = useTranslation();
 
-  const location = reservationUnit.unit?.location;
+  const { location } = reservationUnit.unit ?? {};
   const addressStreet =
     (location && getTranslation(location, "addressStreet")) ||
     location?.addressStreetFi;

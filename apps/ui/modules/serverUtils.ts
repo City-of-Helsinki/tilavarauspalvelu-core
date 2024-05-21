@@ -1,11 +1,11 @@
 import { env } from "@/env.mjs";
 import { type ApolloClient } from "@apollo/client";
 import {
-  type Query,
-  type QueryTermsOfUseArgs,
   TermsType,
+  TermsOfUseDocument,
+  type TermsOfUseQuery,
+  type TermsOfUseQueryVariables,
 } from "@gql/gql-types";
-import { TERMS_OF_USE } from "./queries/reservationUnit";
 import { genericTermsVariant } from "./const";
 
 export function getCommonServerSideProps() {
@@ -30,10 +30,10 @@ export function getCommonServerSideProps() {
 
 export async function getGenericTerms(apolloClient: ApolloClient<unknown>) {
   const { data: tosData } = await apolloClient.query<
-    Query,
-    QueryTermsOfUseArgs
+    TermsOfUseQuery,
+    TermsOfUseQueryVariables
   >({
-    query: TERMS_OF_USE,
+    query: TermsOfUseDocument,
     variables: {
       termsType: TermsType.GenericTerms,
     },

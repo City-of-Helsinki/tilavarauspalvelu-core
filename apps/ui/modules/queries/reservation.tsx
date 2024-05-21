@@ -201,6 +201,7 @@ export const GET_RESERVATION = gql`
       }
       reservationUnit {
         id
+        canApplyFreeOfCharge
         ...ReservationUnitFields
         ...CancellationRuleFields
       }
@@ -212,7 +213,7 @@ export const GET_RESERVATION = gql`
 // TODO combine these into params query (similarly to as in admin-ui)
 // where are they even used?
 export const GET_RESERVATION_CANCEL_REASONS = gql`
-  query getReservationCancelReasons {
+  query ReservationCancelReasons {
     reservationCancelReasons {
       edges {
         node {

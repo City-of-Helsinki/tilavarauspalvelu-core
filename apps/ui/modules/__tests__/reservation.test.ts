@@ -465,7 +465,6 @@ describe("getReservationCancellationReason", () => {
         ...reservation,
         // duplicating these to be explicit what is tested
         begin: addHours(startOfToday(), 34).toISOString(),
-        end: addHours(startOfToday(), 35).toISOString(),
         reservationUnit: [resUnit],
       })
     ).toBe(null);
@@ -484,7 +483,6 @@ describe("getReservationCancellationReason", () => {
       getReservationCancellationReason({
         ...reservation,
         begin: addHours(new Date(), 12).toISOString(),
-        end: addHours(new Date(), 13).toISOString(),
         reservationUnit: [resUnit],
       })
     ).toBe("BUFFER");

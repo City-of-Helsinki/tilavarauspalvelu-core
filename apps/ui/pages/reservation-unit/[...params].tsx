@@ -11,15 +11,19 @@ import { useTranslation } from "next-i18next";
 import { breakpoints } from "common/src/common/style";
 import { fontRegular, H2 } from "common/src/common/typography";
 import {
-  type Query,
-  type QueryReservationUnitArgs,
   CustomerTypeChoice,
   State,
   useConfirmReservationMutation,
   useUpdateReservationMutation,
   useDeleteReservationMutation,
   useReservationQuery,
-  ReservationQuery,
+  type ReservationQuery,
+  ReservationUnitDocument,
+  type ReservationUnitQuery,
+  type ReservationUnitQueryVariables,
+  OptionsDocument,
+  OptionsQuery,
+  OptionsQueryVariables,
 } from "@gql/gql-types";
 import { Inputs } from "common/src/reservation-form/types";
 import { Subheading } from "common/src/reservation-form/styles";
@@ -28,7 +32,6 @@ import { Container } from "common";
 import { createApolloClient } from "@/modules/apolloClient";
 import { isBrowser, reservationUnitPrefix } from "@/modules/const";
 import { getTranslation, reservationsUrl } from "@/modules/util";
-import { RESERVATION_UNIT_PARAMS_PAGE_QUERY } from "@/modules/queries/reservationUnit";
 import Sanitize from "@/components/common/Sanitize";
 import { getReservationUnitPrice } from "@/modules/reservationUnit";
 import {
@@ -47,7 +50,6 @@ import {
   getCommonServerSideProps,
   getGenericTerms,
 } from "@/modules/serverUtils";
-import { OPTIONS_QUERY } from "@/hooks/useOptions";
 import { useConfirmNavigation } from "@/hooks/useConfirmNavigation";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import Error from "next/error";
@@ -66,18 +68,22 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   if (Number.isFinite(Number(reservationUnitPk)) && path === "reservation") {
     const typename = "ReservationUnitNode";
     const id = base64encode(`${typename}:${reservationUnitPk}`);
-    const { data: reservationUnitData } = await apolloClient.query<
-      Query,
-      QueryReservationUnitArgs
+    const { data } = await apolloClient.query<
+      ReservationUnitQuery,
+      ReservationUnitQueryVariables
     >({
-      query: RESERVATION_UNIT_PARAMS_PAGE_QUERY,
+      query: ReservationUnitDocument,
       variables: { id },
       fetchPolicy: "no-cache",
     });
+    const { reservationUnit } = data || {};
 
     const genericTerms = await getGenericTerms(apolloClient);
-    const { data: paramsData } = await apolloClient.query<Query>({
-      query: OPTIONS_QUERY,
+    const { data: paramsData } = await apolloClient.query<
+      OptionsQuery,
+      OptionsQueryVariables
+    >({
+      query: OptionsDocument,
       fetchPolicy: "no-cache",
     });
 
@@ -97,7 +103,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
         key: `${reservationUnitPk}${locale}`,
         // TODO check for NaN
         reservationPk: Number(reservationPk),
-        reservationUnit: reservationUnitData.reservationUnit ?? null,
+        reservationUnit,
         reservationPurposes,
         ageGroups,
         cities,

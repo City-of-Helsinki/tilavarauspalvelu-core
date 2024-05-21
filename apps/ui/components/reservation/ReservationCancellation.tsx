@@ -10,8 +10,8 @@ import NotificationBox from "common/src/common/NotificationBox";
 import { fontMedium, H2 } from "common/src/common/typography";
 import {
   useCancelReservationMutation,
-  type ReservationCancelReasonNode,
-  type ReservationNode,
+  type ReservationQuery,
+  type ReservationCancelReasonsQuery,
 } from "@gql/gql-types";
 import { Container as CommonContainer } from "common";
 import { IconButton, ShowAllContainer } from "common/src/components";
@@ -24,10 +24,18 @@ import ReservationInfoCard from "./ReservationInfoCard";
 import { Paragraph } from "./styles";
 import { signOut } from "@/hooks/auth";
 
+type CancelReasonsQ = NonNullable<
+  ReservationCancelReasonsQuery["reservationCancelReasons"]
+>;
+type CancelReasonsEdge = NonNullable<CancelReasonsQ["edges"]>;
+type CancelReasonsNode = NonNullable<
+  NonNullable<CancelReasonsEdge[number]>["node"]
+>;
+type NodeT = ReservationQuery["reservation"];
 type Props = {
   apiBaseUrl: string;
-  reasons: ReservationCancelReasonNode[];
-  reservation: ReservationNode;
+  reasons: CancelReasonsNode[];
+  reservation: NodeT;
 };
 
 const Spinner = styled(CenterSpinner)`

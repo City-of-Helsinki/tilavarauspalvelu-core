@@ -14,12 +14,15 @@ import { useTranslation } from "next-i18next";
 import { H2, H4, fontRegular } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
-  type Query,
-  type QueryReservationArgs,
   CustomerTypeChoice,
   State,
   type ReservationNode,
   type ReservationMetadataFieldNode,
+  ReservationDocument,
+  type ReservationQuery,
+  type ReservationQueryVariables,
+  GetCurrentUserDocument,
+  type GetCurrentUserQuery,
 } from "@gql/gql-types";
 import Link from "next/link";
 import { Container } from "common";
@@ -53,14 +56,14 @@ import {
   getCommonServerSideProps,
   getGenericTerms,
 } from "@/modules/serverUtils";
-import { GET_RESERVATION } from "@/modules/queries/reservation";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { fromApiDate } from "common/src/common/util";
 import { containsField, containsNameField } from "common/src/metaFieldsHelpers";
-import { CURRENT_USER } from "@/modules/queries/user";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
+
+type NodeT = NonNullable<ReservationQuery["reservation"]>;
 
 // TODO this should return 500 if the backend query fails (not 404), or 400 if the query is incorrect etc.
 // typically 500 would be MAX_COMPLEXITY issue (could also make it 400 but 400 should be invalid query, not too complex)
@@ -77,16 +80,16 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     // NOTE errors will fallback to 404
     const id = base64encode(`ReservationNode:${pk}`);
     const { data, error } = await apolloClient.query<
-      Query,
-      QueryReservationArgs
+      ReservationQuery,
+      ReservationQueryVariables
     >({
-      query: GET_RESERVATION,
+      query: ReservationDocument,
       fetchPolicy: "no-cache",
       variables: { id },
     });
 
-    const { data: userData } = await apolloClient.query<Query>({
-      query: CURRENT_USER,
+    const { data: userData } = await apolloClient.query<GetCurrentUserQuery>({
+      query: GetCurrentUserDocument,
       fetchPolicy: "no-cache",
     });
     const user = userData?.currentUser;
@@ -291,7 +294,7 @@ function ReserveeInfo({
   reservation,
   supportedFields,
 }: {
-  reservation: ReservationNode;
+  reservation: NodeT;
   supportedFields: ReservationMetadataFieldNode[];
 }) {
   const { t } = useTranslation();
@@ -383,7 +386,7 @@ function ReservationInfo({
   reservation,
   supportedFields,
 }: {
-  reservation: ReservationNode;
+  reservation: NodeT;
   supportedFields: ReservationMetadataFieldNode[];
 }) {
   const { t } = useTranslation();
@@ -398,7 +401,8 @@ function ReservationInfo({
         <ParagraphAlt key={field}>
           {t(`reservationApplication:label.common.${field}`)}:{" "}
           <span data-testid={`reservation__${field}`}>
-            {getReservationValue(reservation, field) || "-"}
+            {/* FIXME remove the value function */}
+            {getReservationValue(reservation as ReservationNode, field) || "-"}
           </span>
         </ParagraphAlt>
       ))}

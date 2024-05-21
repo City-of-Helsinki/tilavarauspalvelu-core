@@ -10,13 +10,13 @@ import { filterNonNullable } from "common/src/helpers";
 import {
   ApplicationRoundStatusChoice,
   type ApplicationCreateMutationInput,
-  type Query,
-  type QueryApplicationRoundsArgs,
   useCreateApplicationMutation,
+  ApplicationRoundsUiDocument,
+  type ApplicationRoundsUiQuery,
+  type ApplicationRoundsUiQueryVariables,
 } from "@gql/gql-types";
 import { MediumButton } from "@/styles/util";
 import Head from "@/components/application/Head";
-import { APPLICATION_ROUNDS } from "@/modules/queries/applicationRound";
 import { CenterSpinner } from "@/components/common/common";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
@@ -29,8 +29,11 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
-  const { data } = await apolloClient.query<Query, QueryApplicationRoundsArgs>({
-    query: APPLICATION_ROUNDS,
+  const { data } = await apolloClient.query<
+    ApplicationRoundsUiQuery,
+    ApplicationRoundsUiQueryVariables
+  >({
+    query: ApplicationRoundsUiDocument,
     fetchPolicy: "no-cache",
   });
 

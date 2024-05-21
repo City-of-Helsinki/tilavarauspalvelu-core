@@ -2,13 +2,12 @@ import React from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import {
-  GET_RESERVATION,
-  GET_RESERVATION_CANCEL_REASONS,
-} from "@/modules/queries/reservation";
-import type {
-  Query,
-  QueryReservationArgs,
-  QueryReservationCancelReasonsArgs,
+  ReservationCancelReasonsDocument,
+  type ReservationCancelReasonsQuery,
+  type ReservationCancelReasonsQueryVariables,
+  ReservationDocument,
+  type ReservationQuery,
+  type ReservationQueryVariables,
 } from "@gql/gql-types";
 import Error from "next/error";
 import ReservationCancellation from "@/components/reservation/ReservationCancellation";
@@ -30,20 +29,20 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     const typename = "ReservationNode";
     const id = base64encode(`${typename}:${pk}`);
     const { data: reservationData } = await client.query<
-      Query,
-      QueryReservationArgs
+      ReservationQuery,
+      ReservationQueryVariables
     >({
-      query: GET_RESERVATION,
+      query: ReservationDocument,
       fetchPolicy: "no-cache",
       variables: { id },
     });
     const { reservation } = reservationData || {};
 
     const { data: cancelReasonsData } = await client.query<
-      Query,
-      QueryReservationCancelReasonsArgs
+      ReservationCancelReasonsQuery,
+      ReservationCancelReasonsQueryVariables
     >({
-      query: GET_RESERVATION_CANCEL_REASONS,
+      query: ReservationCancelReasonsDocument,
       fetchPolicy: "no-cache",
     });
 

@@ -5,9 +5,12 @@ import { useTranslation } from "next-i18next";
 import {
   PurposeOrderingChoices,
   UnitOrderingChoices,
-  type Query,
-  type QueryPurposesArgs,
-  type QueryUnitsArgs,
+  SearchFormParamsUnitDocument,
+  type SearchFormParamsUnitQuery,
+  type SearchFormParamsUnitQueryVariables,
+  ReservationUnitPurposesDocument,
+  type ReservationUnitPurposesQuery,
+  type ReservationUnitPurposesQueryVariables,
 } from "@gql/gql-types";
 import { Container } from "common";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
@@ -16,10 +19,6 @@ import SearchGuides from "@/components/index/SearchGuides";
 import Purposes from "@/components/index/Purposes";
 import Units from "@/components/index/Units";
 import { createApolloClient } from "@/modules/apolloClient";
-import {
-  RESERVATION_UNIT_PURPOSES,
-  SEARCH_FORM_PARAMS_UNIT,
-} from "@/modules/queries/params";
 import { filterNonNullable } from "common/src/helpers";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
@@ -45,10 +44,10 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   // TODO change these to use the new Documents
   // TODO combine the queries
   const { data: purposeData } = await apolloClient.query<
-    Query,
-    QueryPurposesArgs
+    ReservationUnitPurposesQuery,
+    ReservationUnitPurposesQueryVariables
   >({
-    query: RESERVATION_UNIT_PURPOSES,
+    query: ReservationUnitPurposesDocument,
     fetchPolicy: "no-cache",
     variables: {
       orderBy: [PurposeOrderingChoices.RankAsc],
@@ -58,8 +57,11 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     purposeData?.purposes?.edges.map((edge) => edge?.node)
   );
 
-  const { data: unitData } = await apolloClient.query<Query, QueryUnitsArgs>({
-    query: SEARCH_FORM_PARAMS_UNIT,
+  const { data: unitData } = await apolloClient.query<
+    SearchFormParamsUnitQuery,
+    SearchFormParamsUnitQueryVariables
+  >({
+    query: SearchFormParamsUnitDocument,
     fetchPolicy: "no-cache",
     variables: {
       publishedReservationUnits: true,

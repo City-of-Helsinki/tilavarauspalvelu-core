@@ -174,7 +174,7 @@ export function getActivePricing(reservationUnit: {
   return pricings.find((pricing) => pricing?.status === "ACTIVE");
 }
 
-type GetPriceReservationUnitFragment = {
+export type GetPriceReservationUnitFragment = {
   pricings: PricingFieldsFragment[];
   reservationBegins?: string | null;
   reservationEnds?: string | null;

@@ -6257,6 +6257,7 @@ export type ReservationQuery = {
     reservationUnit?: Array<{
       __typename?: "ReservationUnitNode";
       id: string;
+      canApplyFreeOfCharge: boolean;
       pk?: number | null;
       uuid: string;
       nameFi?: string | null;
@@ -6401,11 +6402,11 @@ export type ReservationQuery = {
   } | null;
 };
 
-export type GetReservationCancelReasonsQueryVariables = Exact<{
+export type ReservationCancelReasonsQueryVariables = Exact<{
   [key: string]: never;
 }>;
 
-export type GetReservationCancelReasonsQuery = {
+export type ReservationCancelReasonsQuery = {
   __typename?: "Query";
   reservationCancelReasons?: {
     __typename?: "ReservationCancelReasonNodeConnection";
@@ -10216,6 +10217,7 @@ export const ReservationDocument = gql`
       }
       reservationUnit {
         id
+        canApplyFreeOfCharge
         ...ReservationUnitFields
         ...CancellationRuleFields
       }
@@ -10296,8 +10298,8 @@ export type ReservationQueryResult = Apollo.QueryResult<
   ReservationQuery,
   ReservationQueryVariables
 >;
-export const GetReservationCancelReasonsDocument = gql`
-  query getReservationCancelReasons {
+export const ReservationCancelReasonsDocument = gql`
+  query ReservationCancelReasons {
     reservationCancelReasons {
       edges {
         node {
@@ -10313,68 +10315,68 @@ export const GetReservationCancelReasonsDocument = gql`
 `;
 
 /**
- * __useGetReservationCancelReasonsQuery__
+ * __useReservationCancelReasonsQuery__
  *
- * To run a query within a React component, call `useGetReservationCancelReasonsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetReservationCancelReasonsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useReservationCancelReasonsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationCancelReasonsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetReservationCancelReasonsQuery({
+ * const { data, loading, error } = useReservationCancelReasonsQuery({
  *   variables: {
  *   },
  * });
  */
-export function useGetReservationCancelReasonsQuery(
+export function useReservationCancelReasonsQuery(
   baseOptions?: Apollo.QueryHookOptions<
-    GetReservationCancelReasonsQuery,
-    GetReservationCancelReasonsQueryVariables
+    ReservationCancelReasonsQuery,
+    ReservationCancelReasonsQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
-    GetReservationCancelReasonsQuery,
-    GetReservationCancelReasonsQueryVariables
-  >(GetReservationCancelReasonsDocument, options);
+    ReservationCancelReasonsQuery,
+    ReservationCancelReasonsQueryVariables
+  >(ReservationCancelReasonsDocument, options);
 }
-export function useGetReservationCancelReasonsLazyQuery(
+export function useReservationCancelReasonsLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    GetReservationCancelReasonsQuery,
-    GetReservationCancelReasonsQueryVariables
+    ReservationCancelReasonsQuery,
+    ReservationCancelReasonsQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
-    GetReservationCancelReasonsQuery,
-    GetReservationCancelReasonsQueryVariables
-  >(GetReservationCancelReasonsDocument, options);
+    ReservationCancelReasonsQuery,
+    ReservationCancelReasonsQueryVariables
+  >(ReservationCancelReasonsDocument, options);
 }
-export function useGetReservationCancelReasonsSuspenseQuery(
+export function useReservationCancelReasonsSuspenseQuery(
   baseOptions?: Apollo.SuspenseQueryHookOptions<
-    GetReservationCancelReasonsQuery,
-    GetReservationCancelReasonsQueryVariables
+    ReservationCancelReasonsQuery,
+    ReservationCancelReasonsQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<
-    GetReservationCancelReasonsQuery,
-    GetReservationCancelReasonsQueryVariables
-  >(GetReservationCancelReasonsDocument, options);
+    ReservationCancelReasonsQuery,
+    ReservationCancelReasonsQueryVariables
+  >(ReservationCancelReasonsDocument, options);
 }
-export type GetReservationCancelReasonsQueryHookResult = ReturnType<
-  typeof useGetReservationCancelReasonsQuery
+export type ReservationCancelReasonsQueryHookResult = ReturnType<
+  typeof useReservationCancelReasonsQuery
 >;
-export type GetReservationCancelReasonsLazyQueryHookResult = ReturnType<
-  typeof useGetReservationCancelReasonsLazyQuery
+export type ReservationCancelReasonsLazyQueryHookResult = ReturnType<
+  typeof useReservationCancelReasonsLazyQuery
 >;
-export type GetReservationCancelReasonsSuspenseQueryHookResult = ReturnType<
-  typeof useGetReservationCancelReasonsSuspenseQuery
+export type ReservationCancelReasonsSuspenseQueryHookResult = ReturnType<
+  typeof useReservationCancelReasonsSuspenseQuery
 >;
-export type GetReservationCancelReasonsQueryResult = Apollo.QueryResult<
-  GetReservationCancelReasonsQuery,
-  GetReservationCancelReasonsQueryVariables
+export type ReservationCancelReasonsQueryResult = Apollo.QueryResult<
+  ReservationCancelReasonsQuery,
+  ReservationCancelReasonsQueryVariables
 >;
 export const AdjustReservationTimeDocument = gql`
   mutation adjustReservationTime($input: ReservationAdjustTimeMutationInput!) {

@@ -7,8 +7,17 @@ import styled from "styled-components";
 import { getReservationPrice, formatters as getFormatters } from "common";
 import { breakpoints } from "common/src/common/style";
 import { H4, Strong } from "common/src/common/typography";
-import type { ReservationQuery } from "@gql/gql-types";
-import { getReservationUnitPrice } from "@/modules/reservationUnit";
+import type {
+  ImageFragmentFragment,
+  Maybe,
+  ReservationQuery,
+  ReservationUnitPageFieldsFragment,
+  UnitNode,
+} from "@gql/gql-types";
+import {
+  GetPriceReservationUnitFragment,
+  getReservationUnitPrice,
+} from "@/modules/reservationUnit";
 import {
   capitalize,
   formatDuration,
@@ -20,10 +29,19 @@ import { getImageSource } from "common/src/helpers";
 
 type Type = "pending" | "confirmed" | "complete";
 
-type Node = NonNullable<ReservationQuery["reservation"]>;
+type NodeT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
-  reservation: Node;
-  reservationUnit: NonNullable<Node["reservationUnit"]>[0] | null;
+  reservation: NodeT;
+  // TODO fragment
+  reservationUnit?: Maybe<
+    Pick<
+      ReservationUnitPageFieldsFragment,
+      "pk" | "nameFi" | "nameEn" | "nameSv"
+    > &
+      GetPriceReservationUnitFragment & { images: ImageFragmentFragment[] } & {
+        unit?: Maybe<Pick<UnitNode, "nameFi" | "nameEn" | "nameSv">>;
+      }
+  >;
   type: Type;
   shouldDisplayReservationUnitPrice?: boolean;
 };

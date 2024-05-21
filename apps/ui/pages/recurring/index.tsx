@@ -8,15 +8,15 @@ import { breakpoints } from "common/src/common/style";
 import {
   ApplicationRoundOrderingChoices,
   ApplicationRoundStatusChoice,
-  type Query,
-  type QueryApplicationRoundsArgs,
+  ApplicationRoundsUiDocument,
+  type ApplicationRoundsUiQuery,
+  type ApplicationRoundsUiQueryVariables,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { HeroSubheading } from "@/modules/style/typography";
 import ApplicationRoundCard from "@/components/recurring/ApplicationRoundCard";
 import KorosDefault from "@/components/common/KorosDefault";
 import { createApolloClient } from "@/modules/apolloClient";
-import { APPLICATION_ROUNDS } from "@/modules/queries/applicationRound";
 import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 
@@ -28,8 +28,11 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
-  const { data } = await apolloClient.query<Query, QueryApplicationRoundsArgs>({
-    query: APPLICATION_ROUNDS,
+  const { data } = await apolloClient.query<
+    ApplicationRoundsUiQuery,
+    ApplicationRoundsUiQueryVariables
+  >({
+    query: ApplicationRoundsUiDocument,
     fetchPolicy: "no-cache",
     variables: {
       orderBy: [ApplicationRoundOrderingChoices.PkAsc],

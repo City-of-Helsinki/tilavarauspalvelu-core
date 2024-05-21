@@ -4,10 +4,10 @@ import styled from "styled-components";
 import { IconArrowLeft, IconArrowRight } from "hds-react";
 import {
   CustomerTypeChoice,
-  type ReservationUnitNode,
   type ReservationNode,
-  type TermsOfUseNode,
+  type TermsOfUseTextFieldsFragment,
   type ReservationQuery,
+  type ReservationUnitPageFieldsFragment,
 } from "@gql/gql-types";
 import TermsBox from "common/src/termsbox/TermsBox";
 import {
@@ -37,7 +37,7 @@ type OptionsRecord = Record<"purpose" | "ageGroup" | "homeCity", OptionType[]>;
 type NodeT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
   reservation: NodeT;
-  reservationUnit: ReservationUnitNode;
+  reservationUnit: ReservationUnitPageFieldsFragment;
   handleSubmit: () => void;
   generalFields: string[];
   reservationApplicationFields: string[];
@@ -45,7 +45,7 @@ type Props = {
   reserveeType: CustomerTypeChoice;
   requiresHandling: boolean;
   setStep: React.Dispatch<React.SetStateAction<number>>;
-  genericTerms: TermsOfUseNode | null;
+  genericTerms: TermsOfUseTextFieldsFragment | null;
 };
 
 const Form = styled.form`

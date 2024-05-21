@@ -57,7 +57,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { data: appData } = await client.query<
     ApplicationsQuery,
     ApplicationsQueryVariables
->({
+  >({
     query: ApplicationsDocument,
     fetchPolicy: "no-cache",
     variables: {

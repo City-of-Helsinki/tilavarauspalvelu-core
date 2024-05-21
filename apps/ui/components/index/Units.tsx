@@ -12,7 +12,7 @@ import { getTranslation } from "../../modules/util";
 import { anchorStyles, focusStyles } from "common/styles/cssFragments";
 
 type Props = {
-  units: UnitNode[];
+  units: Pick<UnitNode, "pk" | "nameFi" | "nameEn" | "nameSv">[];
 };
 
 const itemLimit = 8;
