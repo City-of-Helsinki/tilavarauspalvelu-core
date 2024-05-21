@@ -4,17 +4,19 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { ReservationEdit } from "@/components/reservation/ReservationEdit";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
-import type { Query, QueryReservationArgs } from "@gql/gql-types";
+import {
+  ReservationUnitPageDocument,
+  type ReservationUnitPageQuery,
+  type ReservationUnitPageQueryVariables,
+  ReservationDocument,
+  type ReservationQuery,
+  type ReservationQueryVariables,
+} from "@gql/gql-types";
 import {
   base64encode,
   concatAffectedReservations,
   filterNonNullable,
 } from "common/src/helpers";
-import {
-  RESERVATION_UNIT_PAGE_QUERY,
-  type ReservationUnitWithAffectingArgs,
-} from "@/modules/queries/reservationUnit";
-import { GET_RESERVATION } from "@/modules/queries/reservation";
 import { toApiDate } from "common/src/common/util";
 import { addYears } from "date-fns";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
@@ -32,8 +34,11 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   if (Number.isFinite(Number(pk))) {
     // TODO why are we doing two separate queries? the linked reservationUnit should be part of the reservation query
     const resId = base64encode(`ReservationNode:${pk}`);
-    const { data } = await client.query<Query, QueryReservationArgs>({
-      query: GET_RESERVATION,
+    const { data } = await client.query<
+      ReservationQuery,
+      ReservationQueryVariables
+    >({
+      query: ReservationDocument,
       fetchPolicy: "no-cache",
       variables: { id: resId },
     });
@@ -49,10 +54,10 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       ? base64encode(`ReservationUnitNode:${resUnitPk}`)
       : "";
     const { data: reservationUnitData } = await client.query<
-      Query,
-      ReservationUnitWithAffectingArgs
+      ReservationUnitPageQuery,
+      ReservationUnitPageQueryVariables
     >({
-      query: RESERVATION_UNIT_PAGE_QUERY,
+      query: ReservationUnitPageDocument,
       fetchPolicy: "no-cache",
       variables: {
         id,

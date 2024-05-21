@@ -11,7 +11,8 @@ import type {
   ApplicationRoundFieldsFragment,
   ListReservationsQuery,
   ReservationNode,
-  ReservationUnitNode,
+  ReservationQuery,
+  ReservationUnitPageQuery,
 } from "@gql/gql-types";
 import { addMinutes, addSeconds, differenceInMinutes } from "date-fns";
 import classNames from "classnames";
@@ -49,9 +50,13 @@ type QueryData = NonNullable<ListReservationsQuery["reservations"]>;
 type Node = NonNullable<
   NonNullable<NonNullable<QueryData["edges"]>[0]>["node"]
 >;
+type ReservationUnitNodeT = NonNullable<
+  ReservationUnitPageQuery["reservationUnit"]
+>;
+type ReservationNodeT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
-  reservation: ReservationNode;
-  reservationUnit: ReservationUnitNode;
+  reservation: ReservationNodeT;
+  reservationUnit: ReservationUnitNodeT;
   userReservations: Node[];
   reservationForm: UseFormReturn<PendingReservationFormType>;
   activeApplicationRounds: ApplicationRoundFieldsFragment[];
@@ -122,9 +127,9 @@ any): JSX.Element => {
 /// The check functions use the reservationUnit instead of a list of other reservations
 /// so have to do some questionable edits.
 function getWithoutThisReservation(
-  reservationUnit: ReservationUnitNode,
-  reservation: ReservationNode
-): ReservationUnitNode {
+  reservationUnit: ReservationUnitNodeT,
+  reservation: ReservationNodeT
+): ReservationUnitNodeT {
   const otherReservations = filterNonNullable(
     reservationUnit?.reservationSet?.filter((n) => n?.pk !== reservation.pk)
   );

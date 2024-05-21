@@ -118,15 +118,3 @@ export const BANNER_NOTIFICATION_COMMON_FRAGMENT = gql`
     messageSv
   }
 `;
-
-// NOTE custom filtering and we don't have codegen for queries / fragments
-// TODO move the query fragment also here (at least the common parts)
-export type ReservationUnitWithAffectingArgs = {
-  // base64 encoded id
-  id: string;
-  // reservation unit pk
-  pk: number;
-  beginDate: string;
-  endDate: string;
-  state?: string[];
-};

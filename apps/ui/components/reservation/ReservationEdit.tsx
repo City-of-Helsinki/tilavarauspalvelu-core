@@ -4,11 +4,11 @@ import { H2 } from "common/src/common/typography";
 import {
   type Mutation,
   type MutationAdjustReservationTimeArgs,
-  type ReservationNode,
-  type ReservationUnitNode,
   useAdjustReservationTimeMutation,
   useListReservationsQuery,
   useApplicationRoundsUiQuery,
+  ReservationUnitPageQuery,
+  ReservationQuery,
 } from "@gql/gql-types";
 import { useRouter } from "next/router";
 import { Stepper } from "hds-react";
@@ -37,9 +37,13 @@ import { getTimeString } from "@/modules/reservationUnit";
 import { UseFormReturn, useForm } from "react-hook-form";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 
+type ReservationUnitNodeT = NonNullable<
+  ReservationUnitPageQuery["reservationUnit"]
+>;
+type ReservationNodeT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
-  reservation: ReservationNode;
-  reservationUnit: ReservationUnitNode;
+  reservation: ReservationNodeT;
+  reservationUnit: ReservationUnitNodeT;
   apiBaseUrl: string;
   logout?: () => void;
 };
@@ -143,8 +147,8 @@ function BylineContent({
   form,
   step,
 }: {
-  reservation: ReservationNode;
-  reservationUnit: ReservationUnitNode;
+  reservation: ReservationNodeT;
+  reservationUnit: ReservationUnitNodeT;
   form: UseFormReturn<PendingReservationFormType>;
   step: number;
 }) {
@@ -165,7 +169,7 @@ function BylineContent({
   );
 }
 function convertReservationEdit(
-  reservation?: ReservationNode
+  reservation?: ReservationNodeT
 ): PendingReservationFormType {
   const originalBegin = new Date(reservation?.begin ?? "");
   const originalEnd = new Date(reservation?.end ?? "");

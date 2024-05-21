@@ -1,7 +1,7 @@
 import {
-  type ReservationNode,
-  type ReservationUnitNode,
   CustomerTypeChoice,
+  type ReservationQuery,
+  type ReservationUnitPageQuery,
 } from "@gql/gql-types";
 import { IconArrowLeft, IconCross, LoadingSpinner } from "hds-react";
 import { get } from "lodash";
@@ -24,9 +24,13 @@ import { filterNonNullable } from "common/src/helpers";
 import { useGenericTerms } from "common/src/hooks/useGenericTerms";
 import { containsField } from "common/src/metaFieldsHelpers";
 
+type ReservationUnitNodeT = NonNullable<
+  ReservationUnitPageQuery["reservationUnit"]
+>;
+type ReservationNodeT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
-  reservation: ReservationNode;
-  reservationUnit: ReservationUnitNode;
+  reservation: ReservationNodeT;
+  reservationUnit: ReservationUnitNodeT;
   setErrorMsg: React.Dispatch<React.SetStateAction<string | null>>;
   setStep: React.Dispatch<React.SetStateAction<number>>;
   handleSubmit: () => void;

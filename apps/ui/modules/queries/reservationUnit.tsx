@@ -43,6 +43,7 @@ const EQUIPMENT_FRAGMENT = gql`
   }
 `;
 
+// TODO remove extra fields that are in the IS_RESERVABLE_FRAGMENT
 const RESERVATION_UNIT_PAGE_FRAGMENT = gql`
   ${IMAGE_FRAGMENT}
   ${RESERVATION_UNIT_FRAGMENT}
@@ -116,10 +117,33 @@ export const RESERVATION_UNIT_PARAMS_PAGE_QUERY = gql`
   }
 `;
 
+const IS_RESERVABLE_FRAGMENT = gql`
+  ${BLOCKING_RESERVATION_FRAGMENT}
+  fragment IsReservableFields on ReservationUnitNode {
+    reservationSet {
+      ...BlockingReservationFields
+    }
+    bufferTimeBefore
+    bufferTimeAfter
+    reservableTimeSpans(startDate: $beginDate, endDate: $endDate) {
+      startDatetime
+      endDatetime
+    }
+    maxReservationDuration
+    minReservationDuration
+    reservationStartInterval
+    reservationsMaxDaysBefore
+    reservationsMinDaysBefore
+    reservationBegins
+    reservationEnds
+  }
+`;
+
 // Combined version for the reservation-unit/[id] page so we can show the Calendar and check for collisions
 export const RESERVATION_UNIT_PAGE_QUERY = gql`
   ${RESERVATION_UNIT_PAGE_FRAGMENT}
   ${BLOCKING_RESERVATION_FRAGMENT}
+  ${IS_RESERVABLE_FRAGMENT}
   query ReservationUnitPage(
     $id: ID!
     $pk: Int!
@@ -129,13 +153,7 @@ export const RESERVATION_UNIT_PAGE_QUERY = gql`
   ) {
     reservationUnit(id: $id) {
       ...ReservationUnitPageFields
-      reservableTimeSpans(startDate: $beginDate, endDate: $endDate) {
-        startDatetime
-        endDatetime
-      }
-      reservationSet(state: $state) {
-        ...BlockingReservationFields
-      }
+      ...IsReservableFields
     }
     affectingReservations(
       forReservationUnits: [$pk]

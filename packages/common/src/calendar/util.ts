@@ -613,20 +613,22 @@ export function getEventBuffers(
   return buffers;
 }
 
+export type IsReservableReservationUnitType = Pick<
+  ReservationUnitNode,
+  | "reservationState"
+  | "metadataSet"
+  | "reservableTimeSpans"
+  | "reservationBegins"
+  | "minReservationDuration"
+  | "maxReservationDuration"
+  | "reservationKind"
+  | "reservationsMaxDaysBefore"
+  | "reservationsMinDaysBefore"
+>;
+
 export function isReservationUnitReservable(
   // TODO use a fragment
-  reservationUnit?: Pick<
-    ReservationUnitNode,
-    | "reservationState"
-    | "metadataSet"
-    | "reservableTimeSpans"
-    | "reservationBegins"
-    | "minReservationDuration"
-    | "maxReservationDuration"
-    | "reservationKind"
-    | "reservationsMaxDaysBefore"
-    | "reservationsMinDaysBefore"
-  > | null
+  reservationUnit?: IsReservableReservationUnitType | null
 ): [false, string] | [true] {
   if (!reservationUnit) {
     return [false, "reservationUnit is null"];

@@ -6866,6 +6866,38 @@ export type ReservationUnitQuery = {
   } | null;
 };
 
+export type IsReservableFieldsFragment = {
+  __typename?: "ReservationUnitNode";
+  bufferTimeBefore: number;
+  bufferTimeAfter: number;
+  maxReservationDuration?: number | null;
+  minReservationDuration?: number | null;
+  reservationStartInterval: ReservationStartInterval;
+  reservationsMaxDaysBefore?: number | null;
+  reservationsMinDaysBefore?: number | null;
+  reservationBegins?: string | null;
+  reservationEnds?: string | null;
+  reservationSet?: Array<{
+    __typename?: "ReservationNode";
+    pk?: number | null;
+    id: string;
+    state: State;
+    isBlocked?: boolean | null;
+    begin: string;
+    end: string;
+    numPersons?: number | null;
+    calendarUrl?: string | null;
+    bufferTimeBefore: number;
+    bufferTimeAfter: number;
+    affectedReservationUnits?: Array<number | null> | null;
+  }> | null;
+  reservableTimeSpans?: Array<{
+    __typename?: "ReservableTimeSpanType";
+    startDatetime?: string | null;
+    endDatetime?: string | null;
+  } | null> | null;
+};
+
 export type ReservationUnitPageQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
   pk: Scalars["Int"]["input"];
@@ -6920,25 +6952,6 @@ export type ReservationUnitPageQuery = {
     termsOfUseSv?: string | null;
     minPersons?: number | null;
     maxPersons?: number | null;
-    reservableTimeSpans?: Array<{
-      __typename?: "ReservableTimeSpanType";
-      startDatetime?: string | null;
-      endDatetime?: string | null;
-    } | null> | null;
-    reservationSet?: Array<{
-      __typename?: "ReservationNode";
-      pk?: number | null;
-      id: string;
-      state: State;
-      isBlocked?: boolean | null;
-      begin: string;
-      end: string;
-      numPersons?: number | null;
-      calendarUrl?: string | null;
-      bufferTimeBefore: number;
-      bufferTimeAfter: number;
-      affectedReservationUnits?: Array<number | null> | null;
-    }> | null;
     images: Array<{
       __typename?: "ReservationUnitImageNode";
       id: string;
@@ -6982,6 +6995,25 @@ export type ReservationUnitPageQuery = {
         nameSv?: string | null;
       };
     }>;
+    reservationSet?: Array<{
+      __typename?: "ReservationNode";
+      pk?: number | null;
+      id: string;
+      state: State;
+      isBlocked?: boolean | null;
+      begin: string;
+      end: string;
+      numPersons?: number | null;
+      calendarUrl?: string | null;
+      bufferTimeBefore: number;
+      bufferTimeAfter: number;
+      affectedReservationUnits?: Array<number | null> | null;
+    }> | null;
+    reservableTimeSpans?: Array<{
+      __typename?: "ReservableTimeSpanType";
+      startDatetime?: string | null;
+      endDatetime?: string | null;
+    } | null> | null;
     unit?: {
       __typename?: "UnitNode";
       id: string;
@@ -8638,6 +8670,27 @@ export const BlockingReservationFieldsFragmentDoc = gql`
     bufferTimeAfter
     affectedReservationUnits
   }
+`;
+export const IsReservableFieldsFragmentDoc = gql`
+  fragment IsReservableFields on ReservationUnitNode {
+    reservationSet {
+      ...BlockingReservationFields
+    }
+    bufferTimeBefore
+    bufferTimeAfter
+    reservableTimeSpans(startDate: $beginDate, endDate: $endDate) {
+      startDatetime
+      endDatetime
+    }
+    maxReservationDuration
+    minReservationDuration
+    reservationStartInterval
+    reservationsMaxDaysBefore
+    reservationsMinDaysBefore
+    reservationBegins
+    reservationEnds
+  }
+  ${BlockingReservationFieldsFragmentDoc}
 `;
 export const ReservationUnitNameFieldsFragmentDoc = gql`
   fragment ReservationUnitNameFields on ReservationUnitNode {
@@ -10581,13 +10634,7 @@ export const ReservationUnitPageDocument = gql`
   ) {
     reservationUnit(id: $id) {
       ...ReservationUnitPageFields
-      reservableTimeSpans(startDate: $beginDate, endDate: $endDate) {
-        startDatetime
-        endDatetime
-      }
-      reservationSet(state: $state) {
-        ...BlockingReservationFields
-      }
+      ...IsReservableFields
     }
     affectingReservations(
       forReservationUnits: [$pk]
@@ -10599,6 +10646,7 @@ export const ReservationUnitPageDocument = gql`
     }
   }
   ${ReservationUnitPageFieldsFragmentDoc}
+  ${IsReservableFieldsFragmentDoc}
   ${BlockingReservationFieldsFragmentDoc}
 `;
 

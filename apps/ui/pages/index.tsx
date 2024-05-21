@@ -42,6 +42,8 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
+  // TODO change these to use the new Documents
+  // TODO combine the queries
   const { data: purposeData } = await apolloClient.query<
     Query,
     QueryPurposesArgs

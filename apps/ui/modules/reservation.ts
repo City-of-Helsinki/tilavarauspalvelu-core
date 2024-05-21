@@ -3,14 +3,13 @@ import type { PendingReservation } from "common/types/common";
 import {
   State,
   type ReservationNode,
-  type ReservationUnitNode,
   ReservationStartInterval,
   CustomerTypeChoice,
   type ReservationMetadataFieldNode,
   type Maybe,
-  type ReservationUnitPageQuery,
   type PaymentOrderNode,
   type ListReservationsQuery,
+  IsReservableFieldsFragment,
 } from "@gql/gql-types";
 import {
   type RoundPeriod,
@@ -88,22 +87,22 @@ export function getDurationOptions(
   return durationOptions;
 }
 
-export const isReservationInThePast = (
-  reservation: ReservationNode
-): boolean => {
+export function isReservationInThePast(
+  reservation: Pick<ReservationNode, "begin">
+): boolean {
   if (!reservation?.begin) {
     return false;
   }
 
   const now = new Date().setSeconds(0, 0);
   return !isAfter(new Date(reservation.begin).setSeconds(0, 0), now);
-};
+}
 
 type ReservationQueryT = NonNullable<ListReservationsQuery["reservations"]>;
 type ReservationEdgeT = NonNullable<ReservationQueryT["edges"]>[0];
 type ReservationNodeT = NonNullable<ReservationEdgeT>["node"];
 function isReservationWithinCancellationPeriod(
-  reservation: NonNullable<ReservationNodeT>
+  reservation: Pick<NonNullable<ReservationNodeT>, "begin" | "reservationUnit">
 ): boolean {
   const reservationUnit = reservation.reservationUnit?.[0];
   const begin = new Date(reservation.begin);
@@ -116,7 +115,10 @@ function isReservationWithinCancellationPeriod(
 }
 
 export function canUserCancelReservation(
-  reservation: NonNullable<ReservationNodeT>,
+  reservation: Pick<
+    NonNullable<ReservationNodeT>,
+    "state" | "reservationUnit" | "begin"
+  >,
   skipTimeCheck = false
 ): boolean {
   const reservationUnit = reservation.reservationUnit?.[0];
@@ -224,9 +226,8 @@ export function getNormalizedReservationOrderStatus(
   return null;
 }
 
-type NodeT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
 type ReservationUnitReservableProps = {
-  reservationUnit: NodeT;
+  reservationUnit: IsReservableFieldsFragment;
   activeApplicationRounds: RoundPeriod[];
   start: Date;
   end: Date;
@@ -330,17 +331,20 @@ export function isReservationReservable({
   return true;
 }
 
-const isReservationConfirmed = (reservation: ReservationNode): boolean =>
+const isReservationConfirmed = (reservation: { state: State }): boolean =>
   reservation.state === State.Confirmed;
 
 const isReservationFreeOfCharge = (
-  reservation: ReservationNode | PendingReservation
+  reservation: Pick<ReservationNode, "price">
 ): boolean => parseInt(String(reservation.price), 10) === 0;
 
 export type CanReservationBeChangedProps = {
-  reservation?: ReservationNode;
+  reservation?: Pick<
+    ReservationNode,
+    "begin" | "end" | "isHandled" | "state" | "price"
+  >;
   newReservation?: ReservationNode | PendingReservation;
-  reservationUnit?: ReservationUnitNode;
+  reservationUnit?: IsReservableFieldsFragment;
   activeApplicationRounds?: RoundPeriod[];
 };
 
