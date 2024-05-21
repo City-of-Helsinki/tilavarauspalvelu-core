@@ -7,13 +7,13 @@ import {
   TermsOfUseNode,
   TermsType,
   ReservationTypeChoice,
+  CreateStaffReservationDocument,
+  CreateRecurringReservationDocument,
+  ReservationTimesInReservationUnitDocument,
+  ReservationTimesInReservationUnitQuery,
+  ReservationUnitDocument,
+  ReservationUnitQuery,
 } from "@gql/gql-types";
-import { RESERVATION_UNIT_QUERY } from "../../hooks/queries";
-import { CREATE_STAFF_RESERVATION } from "../../create-reservation/queries";
-import {
-  CREATE_RECURRING_RESERVATION,
-  GET_RESERVATIONS_IN_INTERVAL,
-} from "../queries";
 import { base64encode } from "common/src/helpers";
 
 const unitCommon = {
@@ -224,29 +224,31 @@ const reservationsByUnitResponse = mondayMorningReservations
   // we could also randomize the array so blocking times are neither at the start nor the end
   .sort((x, y) => x.begin.getTime() - y.begin.getTime())
   .map((x) => ({
+    __typename: "ReservationNode",
+    id: base64encode(`ReservationNode:${1}`),
     begin: x.begin.toUTCString(),
     end: x.end.toUTCString(),
     bufferTimeBefore: 0,
     bufferTimeAfter: 0,
     type: ReservationTypeChoice.Normal,
-    __typename: "ReservationNode",
+    affectedReservationUnits: [],
   }));
 
 export const mocks = [
   {
     request: {
-      query: RESERVATION_UNIT_QUERY,
+      query: ReservationUnitDocument,
       variables: { id: base64encode(`ReservationUnitNode:${1}`) },
     },
     result: {
       data: {
         reservationUnit: unitResponse,
-      },
+      } as ReservationUnitQuery,
     },
   },
   {
     request: {
-      query: GET_RESERVATIONS_IN_INTERVAL,
+      query: ReservationTimesInReservationUnitDocument,
       variables: {
         id: base64encode(`ReservationUnitNode:${1}`),
         pk: 1,
@@ -257,15 +259,16 @@ export const mocks = [
     result: {
       data: {
         reservationUnit: {
+          id: base64encode(`ReservationUnitNode:${1}`),
           reservationSet: reservationsByUnitResponse,
-        } as ReservationUnitNode,
+        },
         affectingReservations: reservationsByUnitResponse,
-      },
+      } as ReservationTimesInReservationUnitQuery,
     },
   },
   {
     request: {
-      query: CREATE_STAFF_RESERVATION,
+      query: CreateStaffReservationDocument,
     },
     result: {
       data: {
@@ -275,7 +278,7 @@ export const mocks = [
   },
   {
     request: {
-      query: CREATE_RECURRING_RESERVATION,
+      query: CreateRecurringReservationDocument,
     },
     result: {
       data: {

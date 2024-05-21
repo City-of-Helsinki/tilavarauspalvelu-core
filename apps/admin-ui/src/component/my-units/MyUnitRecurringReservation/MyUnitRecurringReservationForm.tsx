@@ -168,10 +168,11 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
   const selectedReservationUnit = watch("reservationUnit");
 
   const reservationUnitPk = selectedReservationUnit?.value;
-  const id = base64encode(`ReservationUnit:${reservationUnitPk}`);
+  const id = base64encode(`ReservationUnitNode:${reservationUnitPk}`);
+  const isValid = reservationUnitPk > 0;
   const { data: queryData } = useReservationUnitQuery({
     variables: { id },
-    skip: !(reservationUnitPk > 0),
+    skip: !isValid,
   });
   const { reservationUnit } = queryData ?? {};
 
