@@ -114,7 +114,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     query: SEARCH_FORM_PARAMS_UNIT,
     variables: {
       publishedReservationUnits: true,
-      onlyDirectBookable: true,
     },
   });
 

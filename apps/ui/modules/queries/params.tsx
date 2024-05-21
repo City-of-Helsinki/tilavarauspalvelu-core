@@ -4,15 +4,11 @@ export const SEARCH_FORM_PARAMS_UNIT = gql`
   query SearchFormParamsUnit(
     $publishedReservationUnits: Boolean
     $ownReservations: Boolean
-    $onlyDirectBookable: Boolean
-    $onlySeasonalBookable: Boolean
     $orderBy: [UnitOrderingChoices]
   ) {
     units(
       publishedReservationUnits: $publishedReservationUnits
       ownReservations: $ownReservations
-      onlyDirectBookable: $onlyDirectBookable
-      onlySeasonalBookable: $onlySeasonalBookable
       orderBy: $orderBy
     ) {
       edges {
