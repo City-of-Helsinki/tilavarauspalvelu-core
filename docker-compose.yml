@@ -64,9 +64,9 @@ services:
       REDIS_URL: redis://redis:6379/0
       DATABASE_URL: postgis://tvp:tvp@db/tvp
       ELASTICSEARCH_URL: http://elastic:9200
+      DJANGO_SETTINGS_ENVIRONMENT: Docker
     ports:
-      - "127.0.0.1:8000:8000"  # django
-      - "127.0.0.1:1717:1717"  # uwsgi stats
+      - "127.0.0.1:8000:8000"
     entrypoint: /tvp/docker/entrypoint_dev.sh
 
 volumes:

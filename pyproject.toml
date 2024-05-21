@@ -54,6 +54,7 @@ redis = "5.0.4"
 sentry-sdk = "2.3.1"
 social-auth-app-django = "5.4.1"
 whitenoise = "6.6.0"
+django-environment-config = {version = "0.0.4", extras = ["db"]}
 
 [tool.poetry.dependencies.uWSGI]
 version = "2.0.23"
@@ -298,6 +299,7 @@ skips = [
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "tilavarauspalvelu.settings"
+DJANGO_SETTINGS_ENVIRONMENT = "AutomatedTests"
 python_files = [
     "tests.py",
     "test_*.py",

@@ -1,601 +1,797 @@
+# ruff: noqa: N802
+import os
 import zoneinfo
 from pathlib import Path
 
-import environ
-import graphql
-import sentry_sdk
-from django.conf import global_settings
-from django.utils.translation import gettext_lazy as _
-from helusers import defaults
-from sentry_sdk.integrations.django import DjangoIntegration
+from django.utils.translation import gettext_lazy
+from dotenv.main import StrPath
+from env_config import Environment, values
+from helusers.defaults import SOCIAL_AUTH_PIPELINE
 
-# This is a temporary fix for graphene_permissions to avoid ImportError when importing ResolveInfo
-# This can be removed when graphene_permissions is updated to import ResolveInfo from the correct package.
-graphql.ResolveInfo = graphql.GraphQLResolveInfo
+try:
+    from local_settings import AutomatedTestMixin, LocalMixin
+except ImportError:
+
+    class LocalMixin: ...
+
+    class AutomatedTestMixin: ...
 
 
-# ----- ENV Setup --------------------------------------------------------------------------------------
+class Common(Environment):
+    """Common settings for all environments."""
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-root = environ.Path(BASE_DIR)
+    BASE_DIR = Path(__file__).resolve().parent.parent
 
-env = environ.Env(
-    ADMINS=(list, []),
-    ALLOWED_HOSTS=(list, []),
-    APP_LOGGING_LEVEL=(str, "WARNING"),
-    AUDIT_LOGGING_ENABLED=(bool, False),
-    CELERY_BROKER_URL=(str, "filesystem://"),
-    CELERY_CACHE_BACKEND=(str, "django-cache"),
-    CELERY_ENABLED=(bool, True),
-    CELERY_FILESYSTEM_BACKEND=(bool, True),
-    CELERY_LOG_FILE=(str, "./broker/worker.log"),
-    CELERY_LOG_LEVEL=(str, "INFO"),
-    CELERY_PROCESSED_FOLDER=(str, "./broker/processed/"),
-    CELERY_QUEUE_FOLDER_IN=(str, "./broker/queue/"),
-    CELERY_QUEUE_FOLDER_OUT=(str, "./broker/queue/"),
-    CELERY_RESULT_BACKEND=(str, "django-db"),
-    CELERY_TASK_TIME_LIMIT=(int, 5 * 60),
-    CELERY_TASK_TRACK_STARTED=(bool, False),
-    CELERY_TIMEZONE=(str, "Europe/Helsinki"),
-    CONN_MAX_AGE=(int, 0),
-    CORS_ALLOWED_ORIGINS=(list, []),
-    CSRF_TRUSTED_ORIGINS=(list, []),
-    DATABASE_URL=(str, "sqlite:../db.sqlite3"),
-    DEBUG=(bool, False),
-    DEFAULT_FROM_EMAIL=(str, global_settings.DEFAULT_FROM_EMAIL),
-    DJANGO_LOG_LEVEL=(str, "DEBUG"),
-    ELASTICSEARCH_URL=(str, "http://localhost:9200"),
-    EMAIL_FEEDBACK_EXT_LINK=(str, None),
-    EMAIL_HOST=(str, None),
-    EMAIL_HTML_MAX_FILE_SIZE=(int, 150000),
-    EMAIL_MAX_RECIPIENTS=(int, 100),
-    EMAIL_PORT=(str, global_settings.EMAIL_PORT),
-    EMAIL_USE_TLS=(bool, True),
-    EMAIL_VARAAMO_EXT_LINK=(str, None),
-    GDPR_API_DELETE_SCOPE=(str, ""),
-    GDPR_API_QUERY_SCOPE=(str, ""),
-    GRAPHQL_CODEGEN_ENABLED=(bool, False),
-    HAUKI_ADMIN_UI_URL=(str, None),
-    HAUKI_API_KEY=(str, None),
-    HAUKI_API_URL=(str, None),
-    HAUKI_EXPORTS_ENABLED=(bool, False),
-    HAUKI_ORGANISATION_ID=(str, None),
-    HAUKI_ORIGIN_ID=(str, "tvp"),
-    HAUKI_SECRET=(str, None),
-    HELSINKI_PROFILE_TOKEN_EXPIRATION_LEEWAY_SECONDS=(int, 60),
-    ICAL_HASH_SECRET=(str, ""),
-    IMAGE_CACHE_ENABLED=(bool, False),
-    IMAGE_CACHE_HOST_HEADER=(str, ""),
-    IMAGE_CACHE_PURGE_KEY=(str, ""),
-    IMAGE_CACHE_VARNISH_HOST=(str, ""),
-    IPWARE_META_PRECEDENCE_ORDER=(str, "HTTP_X_FORWARDED_FOR"),
-    LOGIN_ERROR_URL=(str, "/admin/"),
-    MAIL_MAILGUN_API=(str, ""),
-    MAIL_MAILGUN_DOMAIN=(str, ""),
-    MAIL_MAILGUN_KEY=(str, ""),
-    MEDIA_ROOT=(root, root("media")),
-    MEDIA_URL=(str, "/media/"),
-    MOCK_VERKKOKAUPPA_API_ENABLED=(bool, False),
-    MOCK_VERKKOKAUPPA_BACKEND_URL=(str, ""),
-    MOCK_VERKKOKAUPPA_FRONTEND_URL=(str, ""),
-    MULTI_PROXY_HEADERS=(bool, False),
-    OIDC_LEEWAY=(int, 3600),
-    OPEN_CITY_PROFILE_GRAPHQL_API=(str, "https://profile-api.test.hel.ninja/graphql/"),
-    OPEN_CITY_PROFILE_SCOPE=(str, "https://api.hel.fi/auth/helsinkiprofile"),
-    PREFILL_RESERVATION_WITH_PROFILE_DATA=(bool, False),
-    PRIMARY_MUNICIPALITY_NAME=(str, "Helsinki"),
-    PRIMARY_MUNICIPALITY_NUMBER=(str, "091"),
-    QUERY_LOGGING_ENABLED=(bool, False),
-    QUERY_LOGGING_SKIP_ROUTES=(list, []),
-    REDIS_MASTER=(str, None),
-    REDIS_PASSWORD=(str, None),
-    REDIS_SENTINEL_SERVICE=(str, None),
-    REDIS_URL=(str, None),
-    RESOURCE_DEFAULT_TIMEZONE=(str, "Europe/Helsinki"),
-    SECONDARY_MUNICIPALITY_NAME=(str, "Other"),
-    SECRET_KEY=(str, ""),  # NOSONAR
-    SECURE_PROXY_SSL_HEADER=(tuple, None),
-    SEND_RESERVATION_NOTIFICATION_EMAILS=(str, False),
-    SENTRY_DSN=(str, ""),
-    SENTRY_ENVIRONMENT=(str, "development"),
-    SESSION_COOKIE_DOMAIN=(str, None),
-    SOURCE_BRANCH_NAME=(str, ""),
-    SOURCE_VERSION=(str, ""),
-    STATIC_ROOT=(root, root("staticroot")),
-    STATIC_URL=(str, "/static/"),
-    TOKEN_AUTH_ACCEPTED_AUDIENCE=(str, ""),
-    TOKEN_AUTH_SHARED_SECRET=(str, ""),
-    TPREK_UNIT_URL=(str, "https://www.hel.fi/palvelukarttaws/rest/v4/unit/"),
-    TRUST_X_FORWARDED_HOST=(bool, True),
-    TUNNISTAMO_ADMIN_KEY=(str, "tilavaraus-dev"),
-    TUNNISTAMO_ADMIN_SECRET=(str, None),
-    TUNNISTAMO_ALLOWED_REDIRECT_HOSTS=(list, []),
-    TUNNISTAMO_BASE_URL=(str, "https://tunnistamo.test.hel.ninja"),
-    TUNNISTAMO_JWT_AUDIENCE=(str, "https://api.hel.fi/auth/tilavarausapidev"),
-    TUNNISTAMO_JWT_ISSUER=(str, "https://tunnistamo.test.hel.ninja/openid"),
-    UPDATE_ACCOUNTING=(bool, False),
-    UPDATE_PRODUCT_MAPPING=(bool, False),
-    VERKKOKAUPPA_API_KEY=(str, None),
-    VERKKOKAUPPA_MERCHANT_API_URL=(str, ""),
-    VERKKOKAUPPA_NAMESPACE=(str, None),
-    VERKKOKAUPPA_NEW_LOGIN=(bool, True),
-    VERKKOKAUPPA_ORDER_API_URL=(str, ""),
-    VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES=(int, 10),
-    VERKKOKAUPPA_PAYMENT_API_URL=(str, ""),
-    VERKKOKAUPPA_PRODUCT_API_URL=(str, ""),
-    VERKKOKAUPPA_TIMEZONE=(str, "Europe/Helsinki"),
-)
-environ.Env.read_env(BASE_DIR / ".env")
+    # --- Basic settings ---------------------------------------------------------------------------------------------
 
-# ----- Basic settings  --------------------------------------------------------------------------------
+    WSGI_APPLICATION = "tilavarauspalvelu.wsgi.application"
+    ROOT_URLCONF = "tilavarauspalvelu.urls"
+    AUTH_USER_MODEL = "users.User"
+    DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+    SECRET_KEY = values.StringValue()
+    ADMIN = values.ListValue()
+    ALLOWED_HOSTS = values.ListValue()
 
-DEBUG = env("DEBUG")
-ALLOWED_HOSTS = env("ALLOWED_HOSTS")
-WSGI_APPLICATION = "tilavarauspalvelu.wsgi.application"
-ROOT_URLCONF = "tilavarauspalvelu.urls"
-AUTH_USER_MODEL = "users.User"
-DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
-ADMINS = env("ADMINS")
+    INSTALLED_APPS = [
+        # Load order important
+        "modeltranslation",
+        "helusers.apps.HelusersConfig",
+        "helusers.apps.HelusersAdminConfig",
+        # Django builtins
+        "django.contrib.auth",
+        "django.contrib.contenttypes",
+        "django.contrib.sessions",
+        "django.contrib.messages",
+        "django.contrib.postgres",
+        "django.contrib.gis",
+        #  Load order important
+        "whitenoise.runserver_nostatic",
+        "django.contrib.staticfiles",
+        #  Third party apps
+        "admin_extra_buttons",
+        "adminsortable2",
+        "auditlog",
+        "corsheaders",
+        "django_celery_beat",
+        "django_celery_results",
+        "django_extensions",
+        "django_filters",
+        "drf_spectacular",
+        "easy_thumbnails",
+        "elasticsearch_django",
+        "graphene_django",
+        "import_export",
+        "mptt",
+        "rangefilter",
+        "rest_framework",
+        "social_django",
+        "tinymce",
+        "subforms",
+        # Our apps
+        "common",
+        "users",
+        "applications",
+        "email_notification",
+        "merchants",
+        "opening_hours",
+        "permissions",
+        "reservation_units",
+        "reservations",
+        "resources",
+        "services",
+        "spaces",
+        "terms_of_use",
+        "api",
+    ]
 
-# Either the release tag or git short hash (or "local" if running locally)
-APP_VERSION = env("SOURCE_BRANCH_NAME").replace("main", "") or env("SOURCE_VERSION")[:8] or "local"
+    MIDDLEWARE = [
+        "tilavarauspalvelu.middleware.QueryLoggingMiddleware",
+        "tilavarauspalvelu.middleware.MultipleProxyMiddleware",
+        "corsheaders.middleware.CorsMiddleware",
+        "django.middleware.security.SecurityMiddleware",
+        # Keep this after security middleware, correct place according to whitenoise documentation
+        "whitenoise.middleware.WhiteNoiseMiddleware",
+        "django.contrib.sessions.middleware.SessionMiddleware",
+        "django.middleware.common.CommonMiddleware",
+        "django.middleware.csrf.CsrfViewMiddleware",
+        "django.contrib.auth.middleware.AuthenticationMiddleware",
+        "django.contrib.messages.middleware.MessageMiddleware",
+        "django.middleware.clickjacking.XFrameOptionsMiddleware",
+        "auditlog.middleware.AuditlogMiddleware",
+        "social_django.middleware.SocialAuthExceptionMiddleware",
+    ]
 
-SECRET_KEY = env("SECRET_KEY")  # NOSONAR
-if DEBUG is True and not SECRET_KEY:
-    SECRET_KEY = "example_secret"  # nosec # noqa: S105
+    # --- Versioning settings ----------------------------------------------------------------------------------------
 
-# ----- CORS and CSRF settings -------------------------------------------------------------------------
+    SOURCE_BRANCH_NAME: str = values.StringValue(default="")
+    SOURCE_VERSION: str = values.StringValue(default="")
 
-CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS")
-CSRF_TRUSTED_ORIGINS = env("CSRF_TRUSTED_ORIGINS")
-CORS_ALLOW_CREDENTIALS = True
+    @classmethod
+    @property
+    def APP_VERSION(cls) -> str:
+        """Either the release tag or git short hash (or "local" if running locally)"""
+        return cls.SOURCE_BRANCH_NAME.replace("main", "") or cls.SOURCE_VERSION[:8] or "local"
 
-# Whether to trust X-Forwarded-Host headers for all purposes
-# where Django would need to make use of its own hostname
-# fe. generating absolute URLs pointing to itself
-# Most often used in reverse proxy setups
-USE_X_FORWARDED_HOST = env("TRUST_X_FORWARDED_HOST")
-MULTI_PROXY_HEADERS = env("MULTI_PROXY_HEADERS")
-SECURE_PROXY_SSL_HEADER = env("SECURE_PROXY_SSL_HEADER")
-IPWARE_META_PRECEDENCE_ORDER = ("HTTP_X_FORWARDED_FOR",)
+    # --- CORS and CSRF settings -------------------------------------------------------------------------------------
 
-# ----- Installed apps ---------------------------------------------------------------------------------
+    CORS_ALLOWED_ORIGINS = values.ListValue()
+    CSRF_TRUSTED_ORIGINS = values.ListValue()
+    CORS_ALLOW_CREDENTIALS = True
 
-INSTALLED_APPS = [
-    # -- Load order important ---
-    "modeltranslation",
-    "helusers.apps.HelusersConfig",
-    "helusers.apps.HelusersAdminConfig",
-    # ---Django builtins --------
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    "django.contrib.postgres",
-    "django.contrib.gis",
-    # -- Load order important ---
-    "whitenoise.runserver_nostatic",
-    "django.contrib.staticfiles",
-    # -- Third party apps -------
-    "admin_extra_buttons",
-    "adminsortable2",
-    "auditlog",
-    "corsheaders",
-    "django_celery_beat",
-    "django_celery_results",
-    "django_extensions",
-    "django_filters",
-    "drf_spectacular",
-    "easy_thumbnails",
-    "elasticsearch_django",
-    "graphene_django",
-    "import_export",
-    "mptt",
-    "rangefilter",
-    "rest_framework",
-    "social_django",
-    "tinymce",
-    "subforms",
-    # -- Our apps ------------
-    "common",
-    "users",
-    "applications",
-    "email_notification",
-    "merchants",
-    "opening_hours",
-    "permissions",
-    "reservation_units",
-    "reservations",
-    "resources",
-    "services",
-    "spaces",
-    "terms_of_use",
-    "api",
-]
+    # --- Proxy settings ---------------------------------------------------------------------------------------------
 
-# ----- Middleware -------------------------------------------------------------------------------------
+    USE_X_FORWARDED_HOST = values.BooleanValue(default=False, env_name="TRUST_X_FORWARDED_HOST")
+    MULTI_PROXY_HEADERS = values.BooleanValue(default=False)
+    SECURE_PROXY_SSL_HEADER = values.TupleValue(default=None, nullable=True)
 
-MIDDLEWARE = [
-    "tilavarauspalvelu.middleware.QueryLoggingMiddleware",
-    "tilavarauspalvelu.middleware.MultipleProxyMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
-    "django.middleware.security.SecurityMiddleware",
-    # Keep this after security middleware, correct place according to whitenoise documentation
-    "whitenoise.middleware.WhiteNoiseMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "auditlog.middleware.AuditlogMiddleware",
-    "social_django.middleware.SocialAuthExceptionMiddleware",
-]
+    # --- Database settings ------------------------------------------------------------------------------------------
 
-# ----- Database ---------------------------------------------------------------------------------------
+    CONN_MAX_AGE = values.IntegerValue(default=0)
+    DATABASES = values.DatabaseURLValue(conn_max_age=CONN_MAX_AGE, late_binding=True)
 
-DATABASES = {"default": env.db()}
-DATABASES["default"]["CONN_MAX_AGE"] = env("CONN_MAX_AGE")
+    # --- Template settings ------------------------------------------------------------------------------------------
 
-# ----- Templates --------------------------------------------------------------------------------------
-
-TEMPLATES = [
-    {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-                "helusers.context_processors.settings",
-            ],
+    TEMPLATES = [
+        {
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "DIRS": [BASE_DIR / "templates"],
+            "APP_DIRS": True,
+            "OPTIONS": {
+                "context_processors": [
+                    "django.template.context_processors.debug",
+                    "django.template.context_processors.request",
+                    "django.contrib.auth.context_processors.auth",
+                    "django.contrib.messages.context_processors.messages",
+                    "helusers.context_processors.settings",
+                ],
+            },
         },
-    },
-]
+    ]
 
-# ----- Static files -----------------------------------------------------------------------------------
+    # --- Static file settings ---------------------------------------------------------------------------------------
 
-STATIC_ROOT = env("STATIC_ROOT")
-MEDIA_ROOT = env("MEDIA_ROOT")
+    STATIC_ROOT = values.PathValue(default="staticroot")
+    MEDIA_ROOT = values.PathValue(default="media")
 
-STATIC_URL = env("STATIC_URL")
-MEDIA_URL = env("MEDIA_URL")
+    STATIC_URL = values.StringValue(default="/static/")
+    MEDIA_URL = values.StringValue(default="/media/")
 
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
 
-THUMBNAIL_ALIASES = {
-    "": {
-        # Currently, all custom sized images are wanted to be cropped.
-        "small": {"size": (250, 250), "crop": True},
-        "medium": {"size": (384, 384), "crop": True},
-        "large": {"size": (0, 728), "crop": False},
-        "purpose_image": {"size": (390, 245), "crop": True},
-    },
-}
-IMAGE_CACHE_ENABLED = env("IMAGE_CACHE_ENABLED")
-IMAGE_CACHE_VARNISH_HOST = env("IMAGE_CACHE_VARNISH_HOST")
-IMAGE_CACHE_PURGE_KEY = env("IMAGE_CACHE_PURGE_KEY")
-IMAGE_CACHE_HOST_HEADER = env("IMAGE_CACHE_HOST_HEADER")
+    THUMBNAIL_ALIASES = {
+        "": {
+            # Currently, all custom sized images are wanted to be cropped.
+            "small": {"size": (250, 250), "crop": True},
+            "medium": {"size": (384, 384), "crop": True},
+            "large": {"size": (0, 728), "crop": False},
+            "purpose_image": {"size": (390, 245), "crop": True},
+        },
+    }
 
-# Do not try to chmod when uploading images.
-# Our environments use persistent storage for media and operation will not be permitted.
-# https://dev.azure.com/City-of-Helsinki/devops-guides/_git/devops-handbook?path=/storage.md&_a=preview&anchor=operation-not-permitted
-FILE_UPLOAD_PERMISSIONS = None
+    IMAGE_CACHE_ENABLED = values.BooleanValue(default=False)
+    IMAGE_CACHE_VARNISH_HOST = values.StringValue(default="")
+    IMAGE_CACHE_PURGE_KEY = values.StringValue(default="")
+    IMAGE_CACHE_HOST_HEADER = values.StringValue(default="")
 
-# ----- Email ------------------------------------------------------------------------------------------
+    # Do not try to chmod when uploading images.
+    # Our environments use persistent storage for media and operation will not be permitted.
+    # https://dev.azure.com/City-of-Helsinki/devops-guides/_git/devops-handbook?path=/storage.md&_a=preview&anchor=operation-not-permitted
+    FILE_UPLOAD_PERMISSIONS = None
 
-EMAIL_HOST = env("EMAIL_HOST")
-EMAIL_PORT = env("EMAIL_PORT")
-EMAIL_USE_TLS = env("EMAIL_USE_TLS")
-EMAIL_MAX_RECIPIENTS = env("EMAIL_MAX_RECIPIENTS")
-DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
+    # --- Email settings ---------------------------------------------------------------------------------------------
 
-if DEBUG is True and EMAIL_HOST is None:
+    EMAIL_HOST = values.StringValue(default=None, nullable=True)
+    EMAIL_PORT = values.IntegerValue(default=25)
+    EMAIL_USE_TLS = values.BooleanValue(default=True)
+    EMAIL_MAX_RECIPIENTS = values.IntegerValue(default=100)
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+    DEFAULT_FROM_EMAIL = values.StringValue(default="tilavarauspalvelu@localhost")
 
+    SEND_RESERVATION_NOTIFICATION_EMAILS = values.BooleanValue(default=False)
+    EMAIL_HTML_MAX_FILE_SIZE = values.IntegerValue(default=150_000)
+    EMAIL_HTML_TEMPLATES_ROOT = "email_html_templates"
+    EMAIL_VARAAMO_EXT_LINK = values.StringValue(default=None, nullable=True)
+    EMAIL_FEEDBACK_EXT_LINK = values.StringValue(default=None, nullable=True)
 
-SEND_RESERVATION_NOTIFICATION_EMAILS = env("SEND_RESERVATION_NOTIFICATION_EMAILS")
-EMAIL_HTML_MAX_FILE_SIZE = env("EMAIL_HTML_MAX_FILE_SIZE")
-EMAIL_HTML_TEMPLATES_ROOT = "email_html_templates"
-EMAIL_VARAAMO_EXT_LINK = env("EMAIL_VARAAMO_EXT_LINK")
-EMAIL_FEEDBACK_EXT_LINK = env("EMAIL_FEEDBACK_EXT_LINK")
+    # ----- Logging settings -----------------------------------------------------------------------------------------
 
-# ----- Logging ----------------------------------------------------------------------------------------
+    APP_LOGGING_LEVEL = values.StringValue(default="WARNING")
 
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "filters": {},
-    "formatters": {
-        "common": {
-            "()": "tilavarauspalvelu.logging.TVPFormatter",
-            "format": (
-                "Time: {asctime} "
-                "| Level: {levelname} "
-                "| Location: {dotpath}.{funcName}:{lineno} "
-                "| Message: {message} "
-                # These will be filled if the request is added as an extra to the logging function:
-                # > logger.info("message", extra={"request": request})
-                # `django.utils.log.log_response` will add these automatically for failing requests.
-                "| URL: {url} "
-                "| Headers: {headers} "
-                "| User: {user_id}"
-            ),
-            "datefmt": "%Y-%m-%dT%H:%M:%S%z",
-            "style": "{",
-        },
-    },
-    "handlers": {
-        "stdout": {
-            "class": "logging.StreamHandler",
-            "formatter": "common",
-        },
-    },
-    "root": {
-        "level": env("APP_LOGGING_LEVEL"),
-        "handlers": ["stdout"],
-    },
-}
+    @classmethod
+    @property
+    def LOGGING(cls):
+        return {
+            "version": 1,
+            "disable_existing_loggers": False,
+            "filters": {},
+            "formatters": {
+                "common": {
+                    "()": "tilavarauspalvelu.logging.TVPFormatter",
+                    "format": (
+                        "Time: {asctime} "
+                        "| Level: {levelname} "
+                        "| Location: {dotpath}.{funcName}:{lineno} "
+                        "| Message: {message} "
+                        # These will be filled if the request is added as an extra to the logging function:
+                        # > logger.info("message", extra={"request": request})
+                        # `django.utils.log.log_response` will add this automatically for failing requests.
+                        "| URL: {url} "
+                        "| Headers: {headers} "
+                        "| User: {user_id}"
+                    ),
+                    "datefmt": "%Y-%m-%dT%H:%M:%S%z",
+                    "style": "{",
+                },
+            },
+            "handlers": {
+                "stdout": {
+                    "class": "logging.StreamHandler",
+                    "formatter": "common",
+                },
+            },
+            "root": {
+                "level": cls.APP_LOGGING_LEVEL,
+                "handlers": ["stdout"],
+            },
+        }
 
-AUDIT_LOGGING_ENABLED = env("AUDIT_LOGGING_ENABLED")
-QUERY_LOGGING_ENABLED = env("QUERY_LOGGING_ENABLED")
-QUERY_LOGGING_SKIP_ROUTES = env("QUERY_LOGGING_SKIP_ROUTES")
+    AUDIT_LOGGING_ENABLED = values.BooleanValue(default=False)
+    QUERY_LOGGING_ENABLED = values.BooleanValue(default=False)
+    QUERY_LOGGING_SKIP_ROUTES = values.ListValue(default=[])
 
-if env("SENTRY_DSN"):
-    sentry_sdk.init(
-        dsn=env("SENTRY_DSN"),
-        environment=env("SENTRY_ENVIRONMENT"),
-        release=APP_VERSION,
-        integrations=[DjangoIntegration()],
+    # --- Internationalization settings ------------------------------------------------------------------------------
+
+    LANGUAGE_CODE = "fi"
+    LANGUAGES = [
+        ("fi", gettext_lazy("Finnish")),
+        ("en", gettext_lazy("English")),
+        ("sv", gettext_lazy("Swedish")),
+    ]
+    LOCALE_PATHS = [
+        BASE_DIR / "locale",
+    ]
+    TIME_ZONE = "Europe/Helsinki"
+    USE_I18N = True
+    USE_TZ = True
+
+    # --- Authentication settings ------------------------------------------------------------------------------------
+
+    AUTHENTICATION_BACKENDS = [
+        "tilavarauspalvelu.auth.ProxyTunnistamoOIDCAuthBackend",
+        "tilavarauspalvelu.auth.ProxyModelBackend",
+    ]
+
+    AUTH_PASSWORD_VALIDATORS = [
+        {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+        {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+        {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+        {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+    ]
+
+    LOGIN_REDIRECT_URL = "/admin/"
+    LOGOUT_REDIRECT_URL = "/admin/"
+
+    SESSION_SERIALIZER = "helusers.sessions.TunnistamoOIDCSerializer"
+    SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+    SESSION_CACHE_ALIAS = "default"
+
+    # --- Helsinki profile settings ----------------------------------------------------------------------------------
+
+    OPEN_CITY_PROFILE_SCOPE = values.StringValue()
+    OPEN_CITY_PROFILE_GRAPHQL_API = values.StringValue()
+    PREFILL_RESERVATION_WITH_PROFILE_DATA = values.BooleanValue(default=False)
+    HELSINKI_PROFILE_TOKEN_EXPIRATION_LEEWAY_SECONDS = values.IntegerValue(default=60)
+
+    # Defaults when fetching profile data
+    PRIMARY_MUNICIPALITY_NUMBER = values.StringValue(default="091")
+    PRIMARY_MUNICIPALITY_NAME = values.StringValue(default="Helsinki")
+    SECONDARY_MUNICIPALITY_NAME = values.StringValue(default="Other")
+
+    # --- Tunnistamo / Social Auth settings --------------------------------------------------------------------------
+
+    OIDC_LEEWAY = values.IntegerValue(default=3600)
+    TUNNISTAMO_BASE_URL = values.StringValue()
+    TUNNISTAMO_JWT_AUDIENCE = values.StringValue()
+    TUNNISTAMO_JWT_ISSUER = values.StringValue()
+
+    SOCIAL_AUTH_TUNNISTAMO_KEY = values.StringValue(env_name="TUNNISTAMO_ADMIN_KEY")
+    SOCIAL_AUTH_TUNNISTAMO_SECRET = values.StringValue(env_name="TUNNISTAMO_ADMIN_SECRET")
+    SOCIAL_AUTH_TUNNISTAMO_LOGIN_ERROR_URL = "/admin/"
+    SOCIAL_AUTH_TUNNISTAMO_PIPELINE = (
+        *SOCIAL_AUTH_PIPELINE,
+        "users.helauth.pipeline.fetch_additional_info_for_user_from_helsinki_profile",
     )
 
-# ----- Internationalization ---------------------------------------------------------------------------
+    @classmethod
+    @property
+    def OIDC_AUTH(cls):
+        # See 'oidc_auth/settings.py'
+        return {
+            "OIDC_LEEWAY": cls.OIDC_LEEWAY,
+        }
 
-LANGUAGE_CODE = "fi"
-LANGUAGES = (("fi", _("Finnish")), ("en", _("English")), ("sv", _("Swedish")))
-LOCALE_PATHS = [BASE_DIR / "locale"]
-TIME_ZONE = "Europe/Helsinki"
-USE_I18N = True
-USE_TZ = True
+    @classmethod
+    @property
+    def OIDC_API_TOKEN_AUTH(cls):
+        # See 'helusers/settings.py'
+        return {
+            "AUDIENCE": cls.TUNNISTAMO_JWT_AUDIENCE,
+            "ISSUER": cls.TUNNISTAMO_JWT_ISSUER,
+        }
 
-# ----- Authentication settings ------------------------------------------------------------------------
+    @classmethod
+    @property
+    def SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT(cls):
+        return f"{cls.TUNNISTAMO_BASE_URL}/openid"
 
-AUTHENTICATION_BACKENDS = [
-    "tilavarauspalvelu.auth.ProxyTunnistamoOIDCAuthBackend",
-    "tilavarauspalvelu.auth.ProxyModelBackend",
-]
+    @classmethod
+    @property
+    def SOCIAL_AUTH_TUNNISTAMO_SCOPE(cls):
+        return [
+            cls.OPEN_CITY_PROFILE_SCOPE,
+        ]
 
-LOGIN_REDIRECT_URL = "/admin/"
-LOGOUT_REDIRECT_URL = "/admin/"
-SESSION_SERIALIZER = "helusers.sessions.TunnistamoOIDCSerializer"
+    # --- GDPR settings ----------------------------------------------------------------------------------------------
 
-# See 'oidc_auth/settings.py'
-OIDC_AUTH = {
-    "OIDC_LEEWAY": env("OIDC_LEEWAY"),
-}
+    GDPR_API_MODEL = "users.ProfileUser"
+    GDPR_API_QUERY_SCOPE = values.StringValue(default="")
+    GDPR_API_DELETE_SCOPE = values.StringValue(default="")
 
-# See 'helusers/settings.py'
-OIDC_API_TOKEN_AUTH = {
-    "AUDIENCE": env("TUNNISTAMO_JWT_AUDIENCE"),
-    "ISSUER": env("TUNNISTAMO_JWT_ISSUER"),
-}
+    # --- (H)Aukiolosovellus settings --------------------------------------------------------------------------------
 
-TUNNISTAMO_BASE_URL = env("TUNNISTAMO_BASE_URL")
+    HAUKI_API_URL = values.StringValue()
+    HAUKI_ADMIN_UI_URL = values.StringValue()
+    HAUKI_ORIGIN_ID = values.StringValue()
+    HAUKI_ORGANISATION_ID = values.StringValue()
+    HAUKI_EXPORTS_ENABLED = values.BooleanValue(default=False)
+    HAUKI_SECRET = values.StringValue()
+    HAUKI_API_KEY = values.StringValue()
 
-# Url where user is redirected after login error or cancellation
-SOCIAL_AUTH_LOGIN_ERROR_URL = env("LOGIN_ERROR_URL")
+    # --- Verkkokauppa settings --------------------------------------------------------------------------------------
 
-SOCIAL_AUTH_TUNNISTAMO_KEY = env("TUNNISTAMO_ADMIN_KEY")
-SOCIAL_AUTH_TUNNISTAMO_SECRET = env("TUNNISTAMO_ADMIN_SECRET")
-SOCIAL_AUTH_TUNNISTAMO_SCOPE = [env("OPEN_CITY_PROFILE_SCOPE")]
-SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT = f"{TUNNISTAMO_BASE_URL}/openid"
-SOCIAL_AUTH_TUNNISTAMO_ALLOWED_REDIRECT_HOSTS = env("TUNNISTAMO_ALLOWED_REDIRECT_HOSTS")
-SOCIAL_AUTH_TUNNISTAMO_PIPELINE = (
-    *defaults.SOCIAL_AUTH_PIPELINE,
-    "users.helauth.pipeline.fetch_additional_info_for_user_from_helsinki_profile",
-)
+    VERKKOKAUPPA_PRODUCT_API_URL = values.StringValue()
+    VERKKOKAUPPA_ORDER_API_URL = values.StringValue()
+    VERKKOKAUPPA_PAYMENT_API_URL = values.StringValue()
+    VERKKOKAUPPA_MERCHANT_API_URL = values.StringValue()
+    VERKKOKAUPPA_NAMESPACE = values.StringValue()
+    VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = values.IntegerValue(default=10)
+    VERKKOKAUPPA_NEW_LOGIN = values.BooleanValue(default=True)
+    VERKKOKAUPPA_TIMEZONE = zoneinfo.ZoneInfo("Europe/Helsinki")
+    VERKKOKAUPPA_API_KEY = values.StringValue()
 
-HELUSERS_PASSWORD_LOGIN_DISABLED = False
-HELUSERS_BACK_CHANNEL_LOGOUT_ENABLED = False
+    MOCK_VERKKOKAUPPA_API_ENABLED = values.BooleanValue(default=False)
+    MOCK_VERKKOKAUPPA_FRONTEND_URL = values.StringValue()
+    MOCK_VERKKOKAUPPA_BACKEND_URL = values.StringValue()
+    UPDATE_PRODUCT_MAPPING = values.BooleanValue(default=False)
+    UPDATE_ACCOUNTING = values.BooleanValue(default=False)
 
-# Open city profile confs
-OPEN_CITY_PROFILE_GRAPHQL_API = env("OPEN_CITY_PROFILE_GRAPHQL_API")
-OPEN_CITY_PROFILE_SCOPE = env("OPEN_CITY_PROFILE_SCOPE")
-PREFILL_RESERVATION_WITH_PROFILE_DATA = env("PREFILL_RESERVATION_WITH_PROFILE_DATA")
-HELSINKI_PROFILE_TOKEN_EXPIRATION_LEEWAY_SECONDS = env("HELSINKI_PROFILE_TOKEN_EXPIRATION_LEEWAY_SECONDS")
+    # --- Graphene settings ------------------------------------------------------------------------------------------
 
-# GDPR API settings
-GDPR_API_MODEL = "users.ProfileUser"
-GDPR_API_QUERY_SCOPE = env("GDPR_API_QUERY_SCOPE")
-GDPR_API_DELETE_SCOPE = env("GDPR_API_DELETE_SCOPE")
-
-AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
-]
-
-# ----- 'Aukiolosovellus' settings ---------------------------------------------------------------------
-
-HAUKI_API_URL = env("HAUKI_API_URL")
-HAUKI_ORIGIN_ID = env("HAUKI_ORIGIN_ID")
-HAUKI_SECRET = env("HAUKI_SECRET")
-HAUKI_ORGANISATION_ID = env("HAUKI_ORGANISATION_ID")
-HAUKI_ADMIN_UI_URL = env("HAUKI_ADMIN_UI_URL")
-HAUKI_EXPORTS_ENABLED = env("HAUKI_EXPORTS_ENABLED")
-HAUKI_API_KEY = env("HAUKI_API_KEY")
-
-# ----- 'Verkkokauppa' settings ------------------------------------------------------------------------
-
-VERKKOKAUPPA_API_KEY = env("VERKKOKAUPPA_API_KEY")
-VERKKOKAUPPA_PRODUCT_API_URL = env("VERKKOKAUPPA_PRODUCT_API_URL").removesuffix("/")
-VERKKOKAUPPA_ORDER_API_URL = env("VERKKOKAUPPA_ORDER_API_URL").removesuffix("/")
-VERKKOKAUPPA_PAYMENT_API_URL = env("VERKKOKAUPPA_PAYMENT_API_URL").removesuffix("/")
-VERKKOKAUPPA_MERCHANT_API_URL = env("VERKKOKAUPPA_MERCHANT_API_URL").removesuffix("/")
-VERKKOKAUPPA_NAMESPACE = env("VERKKOKAUPPA_NAMESPACE")
-VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES = env("VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES")
-VERKKOKAUPPA_TIMEZONE = zoneinfo.ZoneInfo(env("VERKKOKAUPPA_TIMEZONE"))
-VERKKOKAUPPA_NEW_LOGIN = env("VERKKOKAUPPA_NEW_LOGIN")
-MOCK_VERKKOKAUPPA_API_ENABLED = env("MOCK_VERKKOKAUPPA_API_ENABLED")
-MOCK_VERKKOKAUPPA_FRONTEND_URL = env("MOCK_VERKKOKAUPPA_FRONTEND_URL")
-MOCK_VERKKOKAUPPA_BACKEND_URL = env("MOCK_VERKKOKAUPPA_BACKEND_URL")
-UPDATE_PRODUCT_MAPPING = env("UPDATE_PRODUCT_MAPPING")
-UPDATE_ACCOUNTING = env("UPDATE_ACCOUNTING")
-
-# ----- Graphene settings ------------------------------------------------------------------------------
-
-GRAPHENE = {
-    "SCHEMA": "api.graphql.schema.schema",
-    "MIDDLEWARE": [
-        "graphql_jwt.middleware.JSONWebTokenMiddleware",
-        "tilavarauspalvelu.middleware.GraphQLSentryMiddleware",
-    ],
-    "TESTING_ENDPOINT": "/graphql/",
-}
-
-GRAPHQL_JWT = {"JWT_AUTH_HEADER_PREFIX": "Bearer"}
-
-# ----- Django Rest Framework --------------------------------------------------------------------------
-
-REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": [
-        "helusers.oidc.ApiTokenAuthentication",
-        "rest_framework.authentication.SessionAuthentication",
-        "rest_framework.authentication.BasicAuthentication",
-    ],
-}
-
-# ----- Celery settings --------------------------------------------------------------------------------
-
-CELERY_ENABLED = env("CELERY_ENABLED")
-CELERY_LOG_LEVEL = env("CELERY_LOG_LEVEL")
-CELERY_LOG_FILE = env("CELERY_LOG_FILE")
-CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND")
-CELERY_CACHE_BACKEND = env("CELERY_CACHE_BACKEND")
-CELERY_TIMEZONE = env("CELERY_TIMEZONE")
-CELERY_TASK_TRACK_STARTED = env("CELERY_TASK_TRACK_STARTED")
-CELERY_TASK_TIME_LIMIT = env("CELERY_TASK_TIME_LIMIT")
-CELERY_BROKER_URL = env("CELERY_BROKER_URL")
-CELERY_FILESYSTEM_BACKEND = env("CELERY_FILESYSTEM_BACKEND")
-
-if CELERY_FILESYSTEM_BACKEND:
-    CELERY_QUEUE_FOLDER_OUT = env("CELERY_QUEUE_FOLDER_OUT")
-    CELERY_QUEUE_FOLDER_IN = env("CELERY_QUEUE_FOLDER_IN")
-    CELERY_PROCESSED_FOLDER = env("CELERY_PROCESSED_FOLDER")
-
-    CELERY_BROKER_TRANSPORT_OPTIONS = {
-        "data_folder_out": CELERY_QUEUE_FOLDER_OUT,
-        "data_folder_in": CELERY_QUEUE_FOLDER_IN,
-        "processed_folder": CELERY_PROCESSED_FOLDER,
-        "store_processed": True,
+    GRAPHENE = {
+        "SCHEMA": "api.graphql.schema.schema",
+        "MIDDLEWARE": [
+            "tilavarauspalvelu.middleware.GraphQLSentryMiddleware",
+        ],
     }
 
-# Use redis as broker if redis url is set
-elif env("REDIS_SENTINEL_SERVICE") and env("REDIS_MASTER") and env("REDIS_PASSWORD"):
-    CELERY_BROKER_URL = f"sentinel://:{env('REDIS_PASSWORD')}@{env('REDIS_SENTINEL_SERVICE')}"
-    CELERY_BROKER_TRANSPORT_OPTIONS = {
-        "master_name": env("REDIS_MASTER").removeprefix("redis://"),
-        "sentinel_kwargs": {
-            "password": env("REDIS_PASSWORD"),
+    # --- Django REST Framework settings -----------------------------------------------------------------------------
+
+    REST_FRAMEWORK = {
+        "DEFAULT_AUTHENTICATION_CLASSES": [
+            "rest_framework.authentication.SessionAuthentication",
+            "rest_framework.authentication.BasicAuthentication",
+        ],
+    }
+
+    # --- Celery settings --------------------------------------------------------------------------------------------
+
+    CELERY_ENABLED = values.BooleanValue(default=True)
+    CELERY_LOG_LEVEL = values.StringValue(default="INFO")
+    CELERY_LOG_FILE = values.StringValue(default="/broker/worker.log")
+    CELERY_RESULT_BACKEND = "django-db"
+    CELERY_CACHE_BACKEND = "django-cache"
+    CELERY_TIMEZONE = "Europe/Helsinki"
+    CELERY_TASK_TRACK_STARTED = False
+    CELERY_TASK_TIME_LIMIT = values.IntegerValue(default=5 * 60)  # 5 minutes
+
+    CELERY_QUEUE_FOLDER_OUT = values.StringValue(default="/broker/processed/")
+    CELERY_QUEUE_FOLDER_IN = values.StringValue(default="/broker/processed/")
+    CELERY_PROCESSED_FOLDER = values.StringValue(default="/broker/processed/")
+
+    @classmethod
+    @property
+    def CELERY_BROKER_URL(cls):
+        return "filesystem://"
+
+    @classmethod
+    @property
+    def CELERY_BROKER_TRANSPORT_OPTIONS(cls):
+        # Use filesystem as message broker
+        return {
+            "data_folder_out": cls.CELERY_QUEUE_FOLDER_OUT,
+            "data_folder_in": cls.CELERY_QUEUE_FOLDER_IN,
+            "processed_folder": cls.CELERY_PROCESSED_FOLDER,
+            "store_processed": True,
+        }
+
+    # --- Redis settings ---------------------------------------------------------------------------------------------
+
+    REDIS_URL = values.StringValue()
+
+    @classmethod
+    @property
+    def CACHES(cls):
+        return {
+            "default": {
+                "BACKEND": "django_redis.cache.RedisCache",
+                "LOCATION": cls.REDIS_URL,
+                "OPTIONS": {
+                    "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                },
+            }
+        }
+
+    # --- Elasticsearch settings -------------------------------------------------------------------------------------
+
+    ELASTICSEARCH_URL = values.StringValue()
+
+    @classmethod
+    @property
+    def SEARCH_SETTINGS(cls):
+        return {
+            "connections": {
+                "default": cls.ELASTICSEARCH_URL,
+            },
+            "indexes": {
+                "reservation_units": {
+                    "models": [
+                        "reservation_units.ReservationUnit",
+                    ]
+                }
+            },
+            "settings": {
+                # batch size for ES bulk api operations
+                "chunk_size": 500,
+                # default page size for search results
+                "page_size": 10000,
+                # set to True to connect post_save/delete signals
+                "auto_sync": True,
+                # List of models which will never auto_sync even if auto_sync is True
+                "never_auto_sync": [],
+                # if true, then indexes must have mapping files
+                "strict_validation": False,
+                "mappings_dir": "elastic_django",
+            },
+        }
+
+    # ----- Misc. settings -------------------------------------------------------------------------------------------
+
+    RESERVATION_UNIT_IMAGES_ROOT = "reservation_unit_images"
+    RESERVATION_UNIT_PURPOSE_IMAGES_ROOT = "reservation_unit_purpose_images"
+    TPREK_UNIT_URL = values.URLValue()
+    GRAPHQL_CODEGEN_ENABLED = False
+
+    PRUNE_RESERVATIONS_OLDER_THAN_MINUTES = 20
+    REMOVE_RESERVATION_STATS_OLDER_THAN_YEARS = 5
+    REMOVE_RECURRING_RESERVATIONS_OLDER_THAN_DAYS = 1
+
+    ICAL_HASH_SECRET = values.StringValue(default="")  # TODO: Only used in tests?
+
+
+class Local(LocalMixin, Common):
+    """Settings for local development."""
+
+    # --- Basic settings ---------------------------------------------------------------------------------------------
+
+    DEBUG = True
+    SECRET_KEY = "secret"  # noqa: S105 # nosec # NOSONAR
+    ALLOWED_HOSTS = ["*"]
+    ADMIN = []
+
+    INSTALLED_APPS = [
+        *Common.INSTALLED_APPS,
+        "debug_toolbar",
+        "graphiql_debug_toolbar",
+    ]
+
+    MIDDLEWARE = [
+        "graphiql_debug_toolbar.middleware.DebugToolbarMiddleware",
+        *Common.MIDDLEWARE,
+    ]
+
+    # Hardcode to internal IPs as debug toolbar will expose internal information
+    INTERNAL_IPS = ["127.0.0.1", "localhost"]
+
+    # --- CORS and CSRF settings -------------------------------------------------------------------------------------
+
+    CORS_ALLOWED_ORIGINS = []
+    CSRF_TRUSTED_ORIGINS = []
+
+    # --- Database settings ------------------------------------------------------------------------------------------
+
+    DATABASES = values.DatabaseURLValue(default="postgis://tvp:tvp@127.0.0.1:5432/tvp")
+
+    # ----- Logging settings -----------------------------------------------------------------------------------------
+
+    APP_LOGGING_LEVEL = values.StringValue(default="INFO")
+
+    # --- Graphene settings ------------------------------------------------------------------------------------------
+
+    GRAPHENE = {
+        "SCHEMA": Common.GRAPHENE["SCHEMA"],
+        "MIDDLEWARE": [
+            "graphene_django.debug.DjangoDebugMiddleware",
+        ],
+    }
+
+    # --- Celery settings --------------------------------------------------------------------------------------------
+
+    CELERY_LOG_FILE = values.StringValue(default="./broker/worker.log")
+    CELERY_QUEUE_FOLDER_OUT = values.StringValue(default="./broker/processed/")
+    CELERY_QUEUE_FOLDER_IN = values.StringValue(default="./broker/processed/")
+    CELERY_PROCESSED_FOLDER = values.StringValue(default="./broker/processed/")
+
+    # --- Redis settings ---------------------------------------------------------------------------------------------
+
+    REDIS_URL = values.StringValue(default="redis://127.0.0.1:6379/0")
+
+    # --- Elasticsearch settings -------------------------------------------------------------------------------------
+
+    ELASTICSEARCH_URL = values.StringValue(default="http://localhost:9200")
+
+    @classmethod
+    @property
+    def SEARCH_SETTINGS(cls):
+        search_settings = super().SEARCH_SETTINGS
+        search_settings["settings"]["mappings_dir"] = str(Common.BASE_DIR / "elastic_django")
+        return search_settings
+
+    # ----- Misc -------------------------------------------------------------------------------------------
+
+    GRAPHQL_CODEGEN_ENABLED = values.BooleanValue(default=False)
+
+
+class Docker(Common):
+    """Settings for local Docker development."""
+
+    # --- Basic settings ---------------------------------------------------------------------------------------------
+
+    DEBUG = True
+    SECRET_KEY = "secret"  # noqa: S105 # nosec # NOSONAR
+    ALLOWED_HOSTS = ["*"]
+    ADMIN = []
+
+    # --- CORS and CSRF settings -------------------------------------------------------------------------------------
+
+    CORS_ALLOWED_ORIGINS = []
+    CSRF_TRUSTED_ORIGINS = []
+
+    # --- Database settings ------------------------------------------------------------------------------------------
+
+    DATABASES = values.DatabaseURLValue(default="postgis://tvp:tvp@127.0.0.1:5555/tvp")
+
+    # --- Redis settings ---------------------------------------------------------------------------------------------
+
+    REDIS_URL = values.StringValue(default="redis://127.0.0.1:6379/0")
+
+    # --- Elasticsearch settings -------------------------------------------------------------------------------------
+
+    ELASTICSEARCH_URL = values.StringValue(default="http://localhost:9200")
+
+    # ----- Misc -------------------------------------------------------------------------------------------
+
+    GRAPHQL_CODEGEN_ENABLED = values.BooleanValue(default=False)
+
+
+class AutomatedTests(AutomatedTestMixin, Common, dotenv_path=None):  # Do not load .env file when running tests
+    """Settings when running automated tests."""
+
+    # --- Basic settings ---------------------------------------------------------------------------------------------
+
+    DEBUG = False
+    SECRET_KEY = "secret"  # noqa: S105 # nosec # NOSONAR
+    ALLOWED_HOSTS = ["*"]
+    ADMIN = []
+
+    # --- CORS and CSRF settings -------------------------------------------------------------------------------------
+
+    CORS_ALLOWED_ORIGINS = []
+    CSRF_TRUSTED_ORIGINS = []
+
+    # ----- Logging settings -----------------------------------------------------------------------------------------
+
+    APP_LOGGING_LEVEL = "INFO"
+
+    # --- Email settings ---------------------------------------------------------------------------------------------
+
+    EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+    SEND_RESERVATION_NOTIFICATION_EMAILS = False
+
+    # --- Helsinki profile -------------------------------------------------------------------------------------------
+
+    OPEN_CITY_PROFILE_GRAPHQL_API = "https://fake.test.profile.api.com"
+    OPEN_CITY_PROFILE_SCOPE = "https://fake.api.hel.fi/auth/helsinkiprofile"
+
+    # --- Tunnistamo / Social Auth -----------------------------------------------------------------------------------
+
+    TUNNISTAMO_BASE_URL = "https://fake.test.tunnistamo.com"
+    SOCIAL_AUTH_TUNNISTAMO_SECRET = "SOCIAL_AUTH_TUNNISTAMO_SECRET"  # noqa: S105 # nosec # NOSONAR
+    SOCIAL_AUTH_TUNNISTAMO_KEY = "SOCIAL_AUTH_TUNNISTAMO_KEY"
+    TUNNISTAMO_JWT_AUDIENCE = "TUNNISTAMO_JWT_AUDIENCE"
+    TUNNISTAMO_JWT_ISSUER = "TUNNISTAMO_JWT_ISSUER"
+
+    # --- Celery settings --------------------------------------------------------------------------------------------
+
+    CELERY_TASK_ALWAYS_EAGER = True
+
+    # --- Graphene settings ------------------------------------------------------------------------------------------
+
+    GRAPHENE = {
+        "SCHEMA": Common.GRAPHENE["SCHEMA"],
+        "TESTING_ENDPOINT": "/graphql/",
+    }
+
+    # --- Static file settings ---------------------------------------------------------------------------------------
+
+    STATIC_ROOT = Common.BASE_DIR / "staticroot"
+    MEDIA_ROOT = Common.BASE_DIR / "media"
+
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.memory.InMemoryStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.core.files.storage.memory.InMemoryStorage",
         },
     }
 
-# ----- Redis settings ---------------------------------------------------------------------------------
+    # --- Internationalization settings ------------------------------------------------------------------------------
 
-# Configure Redis cache for local dev environment
-if env("REDIS_URL"):
-    SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-    SESSION_CACHE_ALIAS = "default"
-    CACHES = {
-        "default": {
-            "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": env("REDIS_URL"),
-            "OPTIONS": {
-                "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            },
-        }
-    }
+    LOCALE_PATHS = []
+    USE_I18N = False
+    MODELTRANSLATION_ENABLE_REGISTRATIONS = True  # Modeltranslation should still be enabled
 
-# Configure Redis cache for production OpenShift environment
-elif env("REDIS_SENTINEL_SERVICE") and env("REDIS_MASTER") and env("REDIS_PASSWORD"):
-    sentinel_host, sentinel_port = env("REDIS_SENTINEL_SERVICE").split(":")
-    SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-    SESSION_CACHE_ALIAS = "default"
+    # --- (H)Aukiolosovellus settings --------------------------------------------------------------------------------
+
+    HAUKI_API_URL = "https://fake.test.hauki.api.com"
+    HAUKI_ADMIN_UI_URL = "https://fake.test.hauki.admin.com"
+    HAUKI_EXPORTS_ENABLED = False
+    HAUKI_ORIGIN_ID = "test-origin"
+    HAUKI_ORGANISATION_ID = "test-org:965b1630-6e5a-41f9-ab19-217d90e9729b"
+    HAUKI_SECRET = "HAUKI_SECRET"  # noqa: S105 # nosec # NOSONAR
+    HAUKI_API_KEY = "HAUKI_API_KEY"
+
+    # --- Verkkokauppa settings --------------------------------------------------------------------------------------
+
+    VERKKOKAUPPA_API_KEY = "test-api-key"
+    VERKKOKAUPPA_NAMESPACE = "tilanvaraus"
+    VERKKOKAUPPA_MERCHANT_API_URL = "https://fake.test-merchant:1234"
+    VERKKOKAUPPA_ORDER_API_URL = "https://fake.test-order:1234"
+    VERKKOKAUPPA_PAYMENT_API_URL = "https://fake.test-payment:1234"
+    VERKKOKAUPPA_PRODUCT_API_URL = "https://fake.test-product:1234"
+
+    MOCK_VERKKOKAUPPA_API_ENABLED = False
+    MOCK_VERKKOKAUPPA_FRONTEND_URL = "https://mock-verkkokauppa.com"
+    MOCK_VERKKOKAUPPA_BACKEND_URL = "https://mock-verkkokauppa.com"
+
+    # --- Elasticsearch settings -------------------------------------------------------------------------------------
+
+    ELASTICSEARCH_URL = "http://localhost:9200"
+
+    @classmethod
+    @property
+    def SEARCH_SETTINGS(cls):
+        search_settings = super().SEARCH_SETTINGS
+        search_settings["settings"]["mappings_dir"] = str(Common.BASE_DIR / "elastic_django")
+        search_settings["settings"]["auto_sync"] = False
+        return search_settings
+
+    # ----- Misc -------------------------------------------------------------------------------------------
+
+    TPREK_UNIT_URL = "https://fake.test.tprek.com"
+
+
+class Platta(Common):
+    """Settings for platta environments."""
+
+    def load_dotenv(*, dotenv_path: StrPath | None = None) -> dict[str, str]:
+        # In platta, we don't have a .env file. Instead, use the container environment variables.
+        return os.environ.copy()
+
+    # --- Email settings ---------------------------------------------------------------------------------------------
+
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+    # --- Sentry -----------------------------------------------------------------------------------------------------
+
+    SENTRY_DSN: str = values.StringValue()
+    SENTRY_ENVIRONMENT: str = values.StringValue()
+
+    # --- Redis settings ---------------------------------------------------------------------------------------------
+
+    REDIS_URL = ""  # Not used in Platta environments
+    REDIS_SENTINEL_SERVICE: str = values.StringValue()
+    REDIS_MASTER: str = values.StringValue()
+    REDIS_PASSWORD: str = values.StringValue()
+
     DJANGO_REDIS_CONNECTION_FACTORY = "django_redis.pool.SentinelConnectionFactory"
-    CACHES = {
-        "default": {
-            "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": env("REDIS_MASTER"),
-            "OPTIONS": {
-                "CLIENT_CLASS": "django_redis.client.SentinelClient",
-                "SENTINELS": [(sentinel_host, sentinel_port)],
-                "SENTINEL_KWARGS": {"password": env("REDIS_PASSWORD")},
-                "PASSWORD": env("REDIS_PASSWORD"),
+
+    @classmethod
+    @property
+    def CACHES(cls):
+        sentinel_host, sentinel_port = cls.REDIS_SENTINEL_SERVICE.split(":")
+        return {
+            "default": {
+                "BACKEND": "django_redis.cache.RedisCache",
+                "LOCATION": cls.REDIS_MASTER,
+                "OPTIONS": {
+                    "CLIENT_CLASS": "django_redis.client.SentinelClient",
+                    "SENTINELS": [(sentinel_host, sentinel_port)],
+                    "SENTINEL_KWARGS": {"password": cls.REDIS_PASSWORD},
+                    "PASSWORD": cls.REDIS_PASSWORD,
+                },
+            }
+        }
+
+    # --- Celery settings --------------------------------------------------------------------------------------------
+
+    @classmethod
+    @property
+    def CELERY_BROKER_URL(cls):
+        return f"sentinel://:{cls.REDIS_PASSWORD}@{cls.REDIS_SENTINEL_SERVICE}"
+
+    @classmethod
+    @property
+    def CELERY_BROKER_TRANSPORT_OPTIONS(cls):
+        # Use redis as message broker
+        return {
+            "master_name": cls.REDIS_MASTER.removeprefix("redis://"),
+            "sentinel_kwargs": {
+                "password": cls.REDIS_PASSWORD,
             },
         }
-    }
 
-# ----- Elasticsearch settings -------------------------------------------------------------------------
+    # ----------------------------------------------------------------------------------------------------------------
 
-SEARCH_SETTINGS = {
-    "connections": {
-        "default": env("ELASTICSEARCH_URL"),
-    },
-    "indexes": {
-        "reservation_units": {
-            "models": [
-                "reservation_units.ReservationUnit",
-            ]
-        }
-    },
-    "settings": {
-        # batch size for ES bulk api operations
-        "chunk_size": 500,
-        # default page size for search results
-        "page_size": 10000,
-        # set to True to connect post_save/delete signals
-        "auto_sync": True,
-        # List of models which will never auto_sync even if auto_sync is True
-        "never_auto_sync": [],
-        # if true, then indexes must have mapping files
-        "strict_validation": False,
-        "mappings_dir": "elastic_django",
-    },
-}
+    @classmethod
+    def post_setup(cls) -> None:
+        import sentry_sdk
+        from sentry_sdk.integrations.django import DjangoIntegration
 
-# ----- Misc -------------------------------------------------------------------------------------------
-
-RESERVATION_UNIT_IMAGES_ROOT = "reservation_unit_images"
-RESERVATION_UNIT_PURPOSE_IMAGES_ROOT = "reservation_unit_purpose_images"
-
-ICAL_HASH_SECRET = env("ICAL_HASH_SECRET")
-
-PRIMARY_MUNICIPALITY_NUMBER = env("PRIMARY_MUNICIPALITY_NUMBER")
-PRIMARY_MUNICIPALITY_NAME = env("PRIMARY_MUNICIPALITY_NAME")
-SECONDARY_MUNICIPALITY_NAME = env("SECONDARY_MUNICIPALITY_NAME")
-
-TPREK_UNIT_URL = env("TPREK_UNIT_URL")
-
-# Turns off csrf protection for the graphql view for frontend codegen
-GRAPHQL_CODEGEN_ENABLED = env("GRAPHQL_CODEGEN_ENABLED")
+        sentry_sdk.init(
+            dsn=cls.SENTRY_DSN,
+            environment=cls.SENTRY_ENVIRONMENT,
+            release=cls.APP_VERSION,  # type: ignore
+            integrations=[DjangoIntegration()],
+        )
 
 
-# ----- Pruning -----------------------------------------------------------------------------------------
+class Development(Platta):
+    """Settings for the Development environment on Platta."""
 
-# Reservations older than PRUNE_OLDER_THAN_MINUTES will be deleted when the task is run
-PRUNE_OLDER_THAN_MINUTES = 20
-REMOVE_STATS_OLDER_THAN_YEARS = 5
-REMOVE_RECURRINGS_OLDER_THAN_DAYS = 1
+    DEBUG = True
 
 
-# ----- Local settings ---------------------------------------------------------------------------------
+class Testing(Platta):
+    """Settings for the Testing environment on Platta."""
 
-local_settings_path = BASE_DIR / "local_settings.py"
-if local_settings_path.exists():
-    with open(local_settings_path) as fp:
-        code = compile(fp.read(), local_settings_path, "exec")
-    exec(code, globals(), locals())  # nosec # noqa: S102 RUF100
+    DEBUG = True
+
+
+class Staging(Platta):
+    """Settings for the Staging environment on Platta."""
+
+    DEBUG = False
+
+
+class Production(Platta):
+    """Settings for the Production environment on Platta."""
+
+    DEBUG = False
