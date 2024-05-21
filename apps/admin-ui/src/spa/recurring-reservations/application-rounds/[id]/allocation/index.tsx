@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import { useQuery } from "@apollo/client";
 import { Select, Tabs } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { uniqBy } from "lodash";
@@ -8,13 +7,12 @@ import styled from "styled-components";
 import { H1, fontBold, fontMedium } from "common/src/common/typography";
 import { ShowAllContainer } from "common/src/components";
 import {
-  type Query,
-  type QueryApplicationSectionsArgs,
   ApplicantTypeChoice,
   ApplicationRoundStatusChoice,
   type ApplicationRoundFilterQuery,
   useApplicationRoundFilterQuery,
   useApplicationSectionAllocationsQuery,
+  useAllApplicationEventsQuery,
 } from "@gql/gql-types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { SearchTags } from "@/component/SearchTags";
@@ -34,7 +32,6 @@ import {
 import usePermission from "@/hooks/usePermission";
 import { Permission } from "@/modules/permissionHelper";
 import { truncate } from "@/helpers";
-import { ALL_EVENTS_PER_UNIT_QUERY } from "./queries";
 import { AllocationPageContent } from "./ApplicationEvents";
 import { ComboboxFilter, SearchFilter } from "@/component/QueryParamFilters";
 import { convertPriorityFilter } from "./modules/applicationRoundAllocation";
@@ -327,21 +324,18 @@ function ApplicationRoundAllocation({
 
   // NOTE get the count of all application sections for the selected reservation unit
   // TODO this can be combined with the above query (but requires casting the alias)
-  const { data: allEventsData } = useQuery<Query, QueryApplicationSectionsArgs>(
-    ALL_EVENTS_PER_UNIT_QUERY,
-    {
-      skip: !applicationRoundPk || !selectedReservationUnit || !unitFilter,
-      variables: {
-        applicationRound: applicationRoundPk,
-        // cast constructor is ok because of the skip
-        reservationUnit: [Number(selectedReservationUnit)],
-        unit: [Number(unitFilter)],
-        applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
-      },
-      // NOTE returns incorrectly filtered data if we enable cache
-      fetchPolicy: "no-cache",
-    }
-  );
+  const { data: allEventsData } = useAllApplicationEventsQuery({
+    skip: !applicationRoundPk || !selectedReservationUnit || !unitFilter,
+    variables: {
+      applicationRound: applicationRoundPk,
+      // cast constructor is ok because of the skip
+      reservationUnit: [Number(selectedReservationUnit)],
+      unit: [Number(unitFilter)],
+      applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
+    },
+    // NOTE returns incorrectly filtered data if we enable cache
+    fetchPolicy: "no-cache",
+  });
 
   // NOTE totalCount is fine, but we need to query the things we want to count otherwise it's off by a mile.
   // default to zero because filter returns empty array if no data
