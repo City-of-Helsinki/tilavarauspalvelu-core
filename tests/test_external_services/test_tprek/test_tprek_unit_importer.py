@@ -5,7 +5,7 @@ from django.utils.timezone import get_default_timezone
 
 from common.date_utils import local_datetime
 from spaces.importers.tprek_api_client import TprekAPIClient
-from spaces.importers.tprek_unit_importer import TprekUnitImporter
+from spaces.importers.tprek_unit_importer import TprekUnitHaukiResourceIdImporter, TprekUnitImporter
 from spaces.models import Location
 from tests.factories import UnitFactory
 from tests.helpers import patch_method
@@ -46,6 +46,7 @@ def test_TprekUnitImporter__unit_not_found_in_tprek():
 
 
 @patch_method(TprekAPIClient.get, return_value=MockResponse(status_code=200, json=SINGLE_TPREK_UNIT_JSON))
+@patch_method(TprekUnitHaukiResourceIdImporter.import_hauki_resources_for_units)
 def test_TprekUnitImporter__update_unit_data_from_tprek__no_last_modified_set__update():
     unit = UnitFactory.create(name="Original name", name_sv=None, tprek_id="999", tprek_last_modified=None)
 
@@ -84,6 +85,7 @@ def test_TprekUnitImporter__update_unit_data_from_tprek__no_last_modified_set__u
 
 
 @patch_method(TprekAPIClient.get, return_value=MockResponse(status_code=200, json=SINGLE_TPREK_UNIT_JSON))
+@patch_method(TprekUnitHaukiResourceIdImporter.import_hauki_resources_for_units)
 def test_TprekUnitImporter__update_unit_data_from_tprek__saved_last_modified_is_older__update():
     modified = datetime.datetime.fromisoformat(SINGLE_TPREK_UNIT_JSON["modified_time"]).replace(tzinfo=DEFAULT_TIMEZONE)
     modified -= datetime.timedelta(days=1)
@@ -113,6 +115,7 @@ def test_TprekUnitImporter__update_unit_data_from_tprek__saved_last_modified_is_
 
 
 @patch_method(TprekAPIClient.get, return_value=MockResponse(status_code=200, json=SINGLE_TPREK_UNIT_JSON))
+@patch_method(TprekUnitHaukiResourceIdImporter.import_hauki_resources_for_units)
 def test_TprekUnitImporter__update_unit_data_from_tprek__saved_last_modified_is_the_same__force_update():
     modified = datetime.datetime.fromisoformat(SINGLE_TPREK_UNIT_JSON["modified_time"]).replace(tzinfo=DEFAULT_TIMEZONE)
     unit = UnitFactory.create(name="Original name", tprek_id="999", tprek_last_modified=modified)
