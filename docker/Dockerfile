@@ -93,7 +93,6 @@ FROM base AS build-static
 # Old variables need to be redeclared after "from" statements so that defaults can be used.
 ARG PROJECT_ROOT=/tvp
 ARG VENV_ROOT=$PROJECT_ROOT/venv
-ARG STATIC_ROOT=/srv/static
 
 # Change working directory to project directory.
 WORKDIR $PROJECT_ROOT
@@ -108,7 +107,6 @@ ENV PATH=$VENV_ROOT/bin:$PATH \
 
 # Collect static files.
 RUN \
-    STATIC_ROOT="$STATIC_ROOT" \
     DJANGO_SETTINGS_ENVIRONMENT="Build" \
     python manage.py collectstatic --clear --no-input --verbosity=2
 

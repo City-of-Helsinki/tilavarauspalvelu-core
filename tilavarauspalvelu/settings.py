@@ -1,19 +1,19 @@
 # ruff: noqa: N802
-import os
 import zoneinfo
 from pathlib import Path
 
 import dj_database_url
 from django.utils.translation import gettext_lazy
-from dotenv.main import StrPath
 from env_config import Environment, values
 from helusers.defaults import SOCIAL_AUTH_PIPELINE
 
 try:
-    from local_settings import AutomatedTestMixin, LocalMixin
+    from local_settings import AutomatedTestMixin, DockerMixin, LocalMixin
 except ImportError:
 
     class LocalMixin: ...
+
+    class DockerMixin: ...
 
     class AutomatedTestMixin: ...
 
@@ -128,7 +128,7 @@ class Common(Environment):
     # --- Database settings ------------------------------------------------------------------------------------------
 
     CONN_MAX_AGE = values.IntegerValue(default=0)
-    DATABASES = values.DatabaseURLValue(conn_max_age=CONN_MAX_AGE, late_binding=True)
+    DATABASES = values.DatabaseURLValue(conn_max_age=CONN_MAX_AGE)
 
     # --- Template settings ------------------------------------------------------------------------------------------
 
@@ -486,6 +486,56 @@ class Common(Environment):
     ICAL_HASH_SECRET = values.StringValue(default="")  # TODO: Only used in tests?
 
 
+class EmptyDefaults:
+    """
+    A mixin-class that gives 'empty' default values for all settings that would otherwise
+    require an environment variable. This is used to populate settings with default values
+    in environments that might not care about specific variables to do their job (e.g. Ci environment),
+    but allows other environments to still require them (e.g. production environments).
+    """
+
+    # Don't set default for DEBUG, so that it's clear which environment is in debug mode and which isn't.
+    SECRET_KEY = "secret"  # noqa: S105 # nosec # NOSONAR
+    ALLOWED_HOSTS = ["*"]
+    ADMIN = []
+
+    CORS_ALLOWED_ORIGINS = []
+    CSRF_TRUSTED_ORIGINS = []
+
+    DATABASES = {}
+    REDIS_URL = ""
+    ELASTICSEARCH_URL = ""
+
+    STATIC_ROOT = Common.BASE_DIR / "staticroot"
+    MEDIA_ROOT = Common.BASE_DIR / "media"
+
+    HAUKI_API_URL = ""
+    HAUKI_ADMIN_UI_URL = ""
+    HAUKI_ORIGIN_ID = ""
+    HAUKI_ORGANISATION_ID = ""
+    HAUKI_SECRET = ""  # nosec # NOSONAR
+    HAUKI_API_KEY = ""
+
+    VERKKOKAUPPA_PRODUCT_API_URL = ""
+    VERKKOKAUPPA_ORDER_API_URL = ""
+    VERKKOKAUPPA_PAYMENT_API_URL = ""
+    VERKKOKAUPPA_MERCHANT_API_URL = ""
+    VERKKOKAUPPA_NAMESPACE = ""
+    VERKKOKAUPPA_API_KEY = ""
+
+    TUNNISTAMO_BASE_URL = ""
+    TUNNISTAMO_JWT_AUDIENCE = ""
+    TUNNISTAMO_JWT_ISSUER = ""
+
+    SOCIAL_AUTH_TUNNISTAMO_KEY = ""
+    SOCIAL_AUTH_TUNNISTAMO_SECRET = ""  # nosec # NOSONAR
+
+    OPEN_CITY_PROFILE_SCOPE = ""
+    OPEN_CITY_PROFILE_GRAPHQL_API = ""
+
+    TPREK_UNIT_URL = ""
+
+
 class Local(LocalMixin, Common):
     """Settings for local development."""
 
@@ -559,7 +609,7 @@ class Local(LocalMixin, Common):
     GRAPHQL_CODEGEN_ENABLED = values.BooleanValue(default=False)
 
 
-class Docker(Common):
+class Docker(DockerMixin, Common):
     """Settings for local Docker development."""
 
     DEBUG = True
@@ -580,20 +630,16 @@ class Docker(Common):
     GRAPHQL_CODEGEN_ENABLED = values.BooleanValue(default=False)
 
 
-class AutomatedTests(AutomatedTestMixin, Common, dotenv_path=None):  # Do not load .env file when running tests
+class AutomatedTests(AutomatedTestMixin, EmptyDefaults, Common, dotenv_path=None):
     """Settings when running automated tests."""
 
     # --- Basic settings ---------------------------------------------------------------------------------------------
 
     DEBUG = False
-    SECRET_KEY = "secret"  # noqa: S105 # nosec # NOSONAR
-    ALLOWED_HOSTS = ["*"]
-    ADMIN = []
 
-    # --- CORS and CSRF settings -------------------------------------------------------------------------------------
+    # --- Database settings ------------------------------------------------------------------------------------------
 
-    CORS_ALLOWED_ORIGINS = []
-    CSRF_TRUSTED_ORIGINS = []
+    DATABASES = {"default": dj_database_url.parse(url="postgis://tvp:tvp@localhost:5432/tvp")}
 
     # ----- Logging settings -----------------------------------------------------------------------------------------
 
@@ -630,9 +676,6 @@ class AutomatedTests(AutomatedTestMixin, Common, dotenv_path=None):  # Do not lo
 
     # --- Static file settings ---------------------------------------------------------------------------------------
 
-    STATIC_ROOT = Common.BASE_DIR / "staticroot"
-    MEDIA_ROOT = Common.BASE_DIR / "media"
-
     STORAGES = {
         "default": {
             "BACKEND": "django.core.files.storage.memory.InMemoryStorage",
@@ -644,8 +687,8 @@ class AutomatedTests(AutomatedTestMixin, Common, dotenv_path=None):  # Do not lo
 
     # --- Internationalization settings ------------------------------------------------------------------------------
 
-    LOCALE_PATHS = []
-    USE_I18N = False
+    LOCALE_PATHS = []  # Translations are not needed in tests
+    USE_I18N = False  # In fact, turn off whole translation system
     MODELTRANSLATION_ENABLE_REGISTRATIONS = True  # Modeltranslation should still be enabled
 
     # --- (H)Aukiolosovellus settings --------------------------------------------------------------------------------
@@ -671,6 +714,10 @@ class AutomatedTests(AutomatedTestMixin, Common, dotenv_path=None):  # Do not lo
     MOCK_VERKKOKAUPPA_FRONTEND_URL = "https://mock-verkkokauppa.com"
     MOCK_VERKKOKAUPPA_BACKEND_URL = "https://mock-verkkokauppa.com"
 
+    # --- Redis settings ---------------------------------------------------------------------------------------------
+
+    REDIS_URL = "redis://localhost:6379/0"
+
     # --- Elasticsearch settings -------------------------------------------------------------------------------------
 
     ELASTICSEARCH_URL = "http://localhost:9200"
@@ -688,58 +735,26 @@ class AutomatedTests(AutomatedTestMixin, Common, dotenv_path=None):  # Do not lo
     TPREK_UNIT_URL = "https://fake.test.tprek.com"
 
 
-class Build(Common):
-    """Settings when building docker image."""
-
-    def load_dotenv(*, dotenv_path: StrPath | None = None) -> dict[str, str]:
-        # During build, we should not have a .env file, so use environment variables instead.
-        return os.environ.copy()
+class Build(EmptyDefaults, Common, use_environ=True):
+    """Settings when building the docker image."""
 
     DEBUG = True
-    SECRET_KEY = "secret"  # noqa: S105 # nosec # NOSONAR
-    ALLOWED_HOSTS = ["*"]
-    ADMIN = []
 
-    CORS_ALLOWED_ORIGINS = []
-    CSRF_TRUSTED_ORIGINS = []
-
-    DATABASES = {}
-    REDIS_URL = ""
-    ELASTICSEARCH_URL = ""
-
-    HAUKI_API_URL = ""
-    HAUKI_ADMIN_UI_URL = ""
-    HAUKI_ORIGIN_ID = ""
-    HAUKI_ORGANISATION_ID = ""
-    HAUKI_SECRET = ""  # nosec # NOSONAR
-    HAUKI_API_KEY = ""
-
-    VERKKOKAUPPA_PRODUCT_API_URL = ""
-    VERKKOKAUPPA_ORDER_API_URL = ""
-    VERKKOKAUPPA_PAYMENT_API_URL = ""
-    VERKKOKAUPPA_MERCHANT_API_URL = ""
-    VERKKOKAUPPA_NAMESPACE = ""
-    VERKKOKAUPPA_API_KEY = ""
-
-    TUNNISTAMO_BASE_URL = ""
-    TUNNISTAMO_JWT_AUDIENCE = ""
-    TUNNISTAMO_JWT_ISSUER = ""
-
-    SOCIAL_AUTH_TUNNISTAMO_KEY = ""
-    SOCIAL_AUTH_TUNNISTAMO_SECRET = ""  # nosec # NOSONAR
-
-    OPEN_CITY_PROFILE_SCOPE = ""
-    OPEN_CITY_PROFILE_GRAPHQL_API = ""
-
-    TPREK_UNIT_URL = ""
+    STATIC_ROOT = "/srv/static"
+    MEDIA_ROOT = "/media"
 
 
-class Platta(Common):
-    """Settings for platta environments."""
+class CI(EmptyDefaults, Common, use_environ=True):
+    """Settings for non-test commands in GitHub Actions CI environment."""
 
-    def load_dotenv(*, dotenv_path: StrPath | None = None) -> dict[str, str]:
-        # In platta, we don't have a .env file. Instead, use the container environment variables.
-        return os.environ.copy()
+    DEBUG = True
+
+    # Migration check requires the database
+    DATABASES = {"default": dj_database_url.parse(url="postgis://tvp:tvp@localhost:5432/tvp")}
+
+
+class Platta(Common, use_environ=True):
+    """Common settings for platta environments. Not to be used directly."""
 
     # --- Email settings ---------------------------------------------------------------------------------------------
 
@@ -809,25 +824,25 @@ class Platta(Common):
         )
 
 
-class Development(Platta):
+class Development(Platta, use_environ=True):
     """Settings for the Development environment on Platta."""
 
     DEBUG = True
 
 
-class Testing(Platta):
+class Testing(Platta, use_environ=True):
     """Settings for the Testing environment on Platta."""
 
     DEBUG = True
 
 
-class Staging(Platta):
+class Staging(Platta, use_environ=True):
     """Settings for the Staging environment on Platta."""
 
     DEBUG = False
 
 
-class Production(Platta):
+class Production(Platta, use_environ=True):
     """Settings for the Production environment on Platta."""
 
     DEBUG = False
