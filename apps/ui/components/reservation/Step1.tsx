@@ -151,15 +151,17 @@ function LabelValuePair({
   label,
   value,
   isWide,
+  testIdKey,
 }: {
   label: string;
   value: string;
   isWide?: boolean;
+  testIdKey: keyof ReservationNode;
 }) {
   return (
     <ParagraphAlt $isWide={isWide}>
       <PreviewLabel>{label}</PreviewLabel>
-      <PreviewValue>{value}</PreviewValue>
+      <PreviewValue data-testid={`confirm_${testIdKey}`}>{value}</PreviewValue>
     </ParagraphAlt>
   );
 }
@@ -266,6 +268,7 @@ function Step1({
                     key={key}
                     label={label}
                     value={value}
+                    testIdKey={key}
                     isWide={isWide}
                   />
                 );
@@ -297,7 +300,14 @@ function Step1({
               reserveeType?.toLocaleLowerCase() || "individual";
             const labelKey = `reservationApplication:label.${typeNamespace}.${key}`;
             const label = t(labelKey);
-            return <LabelValuePair key={key} label={label} value={value} />;
+            return (
+              <LabelValuePair
+                key={key}
+                label={label}
+                value={value}
+                testIdKey={key}
+              />
+            );
           })}
         </>
       </TwoColumnContainer>
