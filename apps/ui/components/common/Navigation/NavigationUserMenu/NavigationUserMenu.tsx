@@ -134,51 +134,54 @@ export function NavigationUserMenu({
   const showProfileLink =
     !!profileLink && isAuthenticated && !isAdAuthenticated;
   return (
-    <StyledUserMenu
-      userName={userName}
-      authenticated={isAuthenticated}
-      label={t("common:login")}
-      onSignIn={() => signIn(apiBaseUrl)}
-      closeOnItemClick
-      $active={isActive}
-    >
-      <NavigationUserMenuUserCard
-        user={{ name: userName, email: user?.email }}
-      />
-      {showProfileLink && (
-        <NavigationUserMenuItem
-          href={profileLink}
-          icon={<IconLinkExternal aria-hidden />}
-          label={t("navigation:profileLinkLabel")}
-          data-testid="navigation__user-profile-link"
-          target="_blank"
-          rel="noopener noreferrer"
-          $divider
-          $dividerAfter
+    // hack to deal with hds navigation eating data-testids
+    <div data-testid="navigation__user-menu">
+      <StyledUserMenu
+        userName={userName}
+        authenticated={isAuthenticated}
+        label={t("common:login")}
+        onSignIn={() => signIn(apiBaseUrl)}
+        closeOnItemClick
+        $active={isActive}
+      >
+        <NavigationUserMenuUserCard
+          user={{ name: userName, email: user?.email }}
         />
-      )}
-      {userMenuItems.map((item) => (
+        {showProfileLink && (
+          <NavigationUserMenuItem
+            href={profileLink}
+            icon={<IconLinkExternal aria-hidden />}
+            label={t("navigation:profileLinkLabel")}
+            data-testid="navigation__user-profile-link"
+            target="_blank"
+            rel="noopener noreferrer"
+            $divider
+            $dividerAfter
+          />
+        )}
+        {userMenuItems.map((item) => (
+          <NavigationUserMenuItem
+            href={item.path}
+            key={item.path}
+            onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
+              // TODO cmd / shift + click doesn't open link in new tab (would require replacing with Link component)
+              e.preventDefault();
+              router.push(item.path, item.path, { locale: router.locale });
+            }}
+            data-testid={`navigation__user-${item.title}`}
+          >
+            {t(`navigation:Item.${item.title}`)}
+          </NavigationUserMenuItem>
+        ))}
         <NavigationUserMenuItem
-          href={item.path}
-          key={item.path}
-          onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
-            // TODO cmd / shift + click doesn't open link in new tab (would require replacing with Link component)
-            e.preventDefault();
-            router.push(item.path, item.path, { locale: router.locale });
-          }}
-          data-testid={`navigation__user-${item.title}`}
-        >
-          {t(`navigation:Item.${item.title}`)}
-        </NavigationUserMenuItem>
-      ))}
-      <NavigationUserMenuItem
-        href="#"
-        onClick={() => signOut(apiBaseUrl)}
-        icon={<IconSignout aria-hidden />}
-        label={t("common:logout")}
-        data-testid="navigation__user-logout"
-        $divider
-      />
-    </StyledUserMenu>
+          href="#"
+          onClick={() => signOut(apiBaseUrl)}
+          icon={<IconSignout aria-hidden />}
+          label={t("common:logout")}
+          data-testid="navigation__user-logout"
+          $divider
+        />
+      </StyledUserMenu>
+    </div>
   );
 }
