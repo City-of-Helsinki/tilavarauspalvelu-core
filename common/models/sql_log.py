@@ -28,7 +28,15 @@ class RequestLog(models.Model):
         verbose_name_plural = _("Request logs")
 
     def __str__(self) -> str:
-        return _("Request log") + f" '{self.request_id}' ({self.duration_ms:_} ms)"
+        return _("Request log") + f" '{self.request_id}' ({self.duration_str} ms)"
+
+    @property
+    def duration_str(self) -> str:
+        if self.duration_ms:
+            return f"{self.duration_ms:_.2f}".replace("_", " ")
+
+        value = self.sql_logs.aggregate(total=models.Sum("duration_ns"))["total"] / 1_000_000
+        return f"~{value:_.2f}".replace("_", " ")
 
 
 class SQLLog(models.Model):
@@ -46,4 +54,9 @@ class SQLLog(models.Model):
         verbose_name_plural = _("SQL logs")
 
     def __str__(self) -> str:
-        return _("SQL log") + f" ({self.duration_ns:_} ns)"
+        return _("SQL log") + f" (~{self.duration_str} ms)"
+
+    @property
+    def duration_str(self) -> str:
+        value = self.duration_ns / 1_000_000
+        return f"{value:_.2f}".replace("_", " ")
