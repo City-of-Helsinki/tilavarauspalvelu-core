@@ -168,7 +168,7 @@ class ReservationFilterSet(ModelFilterSet):
             return qs.filter(query)
         return qs.exclude(query)
 
-    def get_reservation_unit(self, qs, property, value):
+    def get_reservation_unit(self, qs: QuerySet, name, value) -> QuerySet:
         if not value:
             return qs
 
