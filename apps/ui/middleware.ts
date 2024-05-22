@@ -42,6 +42,11 @@ async function isLoggedIn(req: NextRequest) {
   newHeaders.append("Cookie", `sessionid=${sessionid.value}`);
   newHeaders.append("Cookie", `csrftoken=${csrfToken.value}`);
 
+  const proto = headers.get("x-forwarded-proto") ?? "http";
+  const hostname = headers.get("x-forwarded-host") ?? headers.get("host") ?? "";
+  const requestUrl = new URL(req.url).pathname;
+  const referer = `${proto}://${hostname}${requestUrl}`;
+  newHeaders.append("Referer", referer);
   // Use of fetch requires a string body (vs. gql query object)
   // the request returns either a valid user (e.g. pk) or null if user was not found
   const body: string = JSON.stringify({
