@@ -47,9 +47,9 @@ class MultipleProxyMiddleware:
 
 
 class GraphQLSentryMiddleware:
-    def resolve(self, next, root, info, **kwargs):
+    def resolve(self, next_, root, info, **kwargs):
         try:
-            return next(root, info, **kwargs)
+            return next_(root, info, **kwargs)
         except Exception as err:
             logger.info(traceback.format_exc())
             SentryLogger.log_exception(err, "Error in GraphQL query")
