@@ -169,9 +169,7 @@ const unitResponse: ReservationUnitNode = {
       fieldName: x,
       id: x,
     })),
-    __typename: "ReservationMetadataSetNode",
   },
-  __typename: "ReservationUnitNode",
 };
 
 // First monday off the month has reservation from 9:00 - 12:00

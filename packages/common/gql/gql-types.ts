@@ -38,7 +38,6 @@ export type Scalars = {
 };
 
 export type AbilityGroupNode = Node & {
-  __typename?: "AbilityGroupNode";
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
@@ -49,7 +48,6 @@ export type AbilityGroupNode = Node & {
 };
 
 export type AddressNode = Node & {
-  __typename?: "AddressNode";
   city: Scalars["String"]["output"];
   cityEn?: Maybe<Scalars["String"]["output"]>;
   cityFi?: Maybe<Scalars["String"]["output"]>;
@@ -78,7 +76,6 @@ export type AddressSerializerInput = {
 };
 
 export type AgeGroupNode = Node & {
-  __typename?: "AgeGroupNode";
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   maximum?: Maybe<Scalars["Int"]["output"]>;
@@ -87,7 +84,6 @@ export type AgeGroupNode = Node & {
 };
 
 export type AgeGroupNodeConnection = {
-  __typename?: "AgeGroupNodeConnection";
   /** Contains the nodes in this connection. */
   edges: Array<Maybe<AgeGroupNodeEdge>>;
   /** Pagination data for this connection. */
@@ -97,7 +93,6 @@ export type AgeGroupNodeConnection = {
 
 /** A Relay edge containing a `AgeGroupNode` and its cursor. */
 export type AgeGroupNodeEdge = {
-  __typename?: "AgeGroupNodeEdge";
   /** A cursor for use in pagination */
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
@@ -114,7 +109,6 @@ export type AllocatedTimeSlotCreateMutationInput = {
 };
 
 export type AllocatedTimeSlotCreateMutationPayload = {
-  __typename?: "AllocatedTimeSlotCreateMutationPayload";
   beginTime?: Maybe<Scalars["Time"]["output"]>;
   dayOfTheWeek?: Maybe<Weekday>;
   endTime?: Maybe<Scalars["Time"]["output"]>;
@@ -127,12 +121,10 @@ export type AllocatedTimeSlotDeleteMutationInput = {
 };
 
 export type AllocatedTimeSlotDeleteMutationPayload = {
-  __typename?: "AllocatedTimeSlotDeleteMutationPayload";
   deleted?: Maybe<Scalars["Boolean"]["output"]>;
 };
 
 export type AllocatedTimeSlotNode = Node & {
-  __typename?: "AllocatedTimeSlotNode";
   beginTime: Scalars["Time"]["output"];
   dayOfTheWeek: Weekday;
   endTime: Scalars["Time"]["output"];
@@ -144,7 +136,6 @@ export type AllocatedTimeSlotNode = Node & {
 };
 
 export type AllocatedTimeSlotNodeConnection = {
-  __typename?: "AllocatedTimeSlotNodeConnection";
   /** Contains the nodes in this connection. */
   edges: Array<Maybe<AllocatedTimeSlotNodeEdge>>;
   /** Pagination data for this connection. */
@@ -154,7 +145,6 @@ export type AllocatedTimeSlotNodeConnection = {
 
 /** A Relay edge containing a `AllocatedTimeSlotNode` and its cursor. */
 export type AllocatedTimeSlotNodeEdge = {
-  __typename?: "AllocatedTimeSlotNodeEdge";
   /** A cursor for use in pagination */
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
@@ -196,7 +186,6 @@ export enum AllocatedTimeSlotOrderingChoices {
 }
 
 export type ApplicantNode = Node & {
-  __typename?: "ApplicantNode";
   dateOfBirth?: Maybe<Scalars["Date"]["output"]>;
   email: Scalars["String"]["output"];
   firstName: Scalars["String"]["output"];
@@ -231,7 +220,6 @@ export type ApplicationCancelMutationInput = {
 };
 
 export type ApplicationCancelMutationPayload = {
-  __typename?: "ApplicationCancelMutationPayload";
   pk?: Maybe<Scalars["Int"]["output"]>;
 };
 
@@ -252,7 +240,6 @@ export type ApplicationCreateMutationInput = {
 };
 
 export type ApplicationCreateMutationPayload = {
-  __typename?: "ApplicationCreateMutationPayload";
   additionalInformation?: Maybe<Scalars["String"]["output"]>;
   applicantType?: Maybe<ApplicantTypeChoice>;
   applicationRound?: Maybe<Scalars["Int"]["output"]>;
@@ -270,7 +257,6 @@ export type ApplicationCreateMutationPayload = {
 };
 
 export type ApplicationNode = Node & {
-  __typename?: "ApplicationNode";
   additionalInformation?: Maybe<Scalars["String"]["output"]>;
   applicantType?: Maybe<ApplicantTypeChoice>;
   applicationRound: ApplicationRoundNode;
@@ -314,7 +300,6 @@ export type ApplicationNodeApplicationSectionsArgs = {
 };
 
 export type ApplicationNodeConnection = {
-  __typename?: "ApplicationNodeConnection";
   /** Contains the nodes in this connection. */
   edges: Array<Maybe<ApplicationNodeEdge>>;
   /** Pagination data for this connection. */
@@ -324,7 +309,6 @@ export type ApplicationNodeConnection = {
 
 /** A Relay edge containing a `ApplicationNode` and its cursor. */
 export type ApplicationNodeEdge = {
-  __typename?: "ApplicationNodeEdge";
   /** A cursor for use in pagination */
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
@@ -350,7 +334,6 @@ export enum ApplicationOrderingChoices {
 }
 
 export type ApplicationRoundNode = Node & {
-  __typename?: "ApplicationRoundNode";
   applicationPeriodBegin: Scalars["DateTime"]["output"];
   applicationPeriodEnd: Scalars["DateTime"]["output"];
   applicationsCount?: Maybe<Scalars["Int"]["output"]>;
@@ -447,7 +430,6 @@ export type ApplicationRoundNodeReservationUnitsArgs = {
 };
 
 export type ApplicationRoundNodeConnection = {
-  __typename?: "ApplicationRoundNodeConnection";
   /** Contains the nodes in this connection. */
   edges: Array<Maybe<ApplicationRoundNodeEdge>>;
   /** Pagination data for this connection. */
@@ -457,7 +439,6 @@ export type ApplicationRoundNodeConnection = {
 
 /** A Relay edge containing a `ApplicationRoundNode` and its cursor. */
 export type ApplicationRoundNodeEdge = {
-  __typename?: "ApplicationRoundNodeEdge";
   /** A cursor for use in pagination */
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
@@ -480,7 +461,6 @@ export enum ApplicationRoundStatusChoice {
 }
 
 export type ApplicationRoundTimeSlotNode = Node & {
-  __typename?: "ApplicationRoundTimeSlotNode";
   closed: Scalars["Boolean"]["output"];
   /** The ID of the object */
   id: Scalars["ID"]["output"];
@@ -514,7 +494,6 @@ export type ApplicationSectionCreateMutationInput = {
 };
 
 export type ApplicationSectionCreateMutationPayload = {
-  __typename?: "ApplicationSectionCreateMutationPayload";
   ageGroup?: Maybe<Scalars["Int"]["output"]>;
   application?: Maybe<Scalars["Int"]["output"]>;
   appliedReservationsPerWeek?: Maybe<Scalars["Int"]["output"]>;
@@ -535,7 +514,6 @@ export type ApplicationSectionDeleteMutationInput = {
 };
 
 export type ApplicationSectionDeleteMutationPayload = {
-  __typename?: "ApplicationSectionDeleteMutationPayload";
   deleted?: Maybe<Scalars["Boolean"]["output"]>;
 };
 
@@ -557,7 +535,6 @@ export type ApplicationSectionForApplicationSerializerInput = {
 };
 
 export type ApplicationSectionNode = Node & {
-  __typename?: "ApplicationSectionNode";
   ageGroup?: Maybe<AgeGroupNode>;
   allocations?: Maybe<Scalars["Int"]["output"]>;
   application: ApplicationNode;
@@ -592,7 +569,6 @@ export type ApplicationSectionNodeSuitableTimeRangesArgs = {
 };
 
 export type ApplicationSectionNodeConnection = {
-  __typename?: "ApplicationSectionNodeConnection";
   /** Contains the nodes in this connection. */
   edges: Array<Maybe<ApplicationSectionNodeEdge>>;
   /** Pagination data for this connection. */
@@ -602,7 +578,6 @@ export type ApplicationSectionNodeConnection = {
 
 /** A Relay edge containing a `ApplicationSectionNode` and its cursor. */
 export type ApplicationSectionNodeEdge = {
-  __typename?: "ApplicationSectionNodeEdge";
   /** A cursor for use in pagination */
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
@@ -665,7 +640,6 @@ export type ApplicationSectionUpdateMutationInput = {
 };
 
 export type ApplicationSectionUpdateMutationPayload = {
-  __typename?: "ApplicationSectionUpdateMutationPayload";
   ageGroup?: Maybe<Scalars["Int"]["output"]>;
   application?: Maybe<Scalars["Int"]["output"]>;
   appliedReservationsPerWeek?: Maybe<Scalars["Int"]["output"]>;
@@ -686,7 +660,6 @@ export type ApplicationSendMutationInput = {
 };
 
 export type ApplicationSendMutationPayload = {
-  __typename?: "ApplicationSendMutationPayload";
   pk?: Maybe<Scalars["Int"]["output"]>;
 };
 
@@ -719,7 +692,6 @@ export type ApplicationUpdateMutationInput = {
 };
 
 export type ApplicationUpdateMutationPayload = {
-  __typename?: "ApplicationUpdateMutationPayload";
   additionalInformation?: Maybe<Scalars["String"]["output"]>;
   applicantType?: Maybe<ApplicantTypeChoice>;
   applicationRound?: Maybe<Scalars["Int"]["output"]>;
@@ -760,7 +732,6 @@ export type BannerNotificationCreateMutationInput = {
 };
 
 export type BannerNotificationCreateMutationPayload = {
-  __typename?: "BannerNotificationCreateMutationPayload";
   activeFrom?: Maybe<Scalars["DateTime"]["output"]>;
   activeUntil?: Maybe<Scalars["DateTime"]["output"]>;
   draft?: Maybe<Scalars["Boolean"]["output"]>;
@@ -779,7 +750,6 @@ export type BannerNotificationDeleteMutationInput = {
 };
 
 export type BannerNotificationDeleteMutationPayload = {
-  __typename?: "BannerNotificationDeleteMutationPayload";
   deleted?: Maybe<Scalars["Boolean"]["output"]>;
 };
 
@@ -794,7 +764,6 @@ export enum BannerNotificationLevel {
 }
 
 export type BannerNotificationNode = Node & {
-  __typename?: "BannerNotificationNode";
   activeFrom?: Maybe<Scalars["DateTime"]["output"]>;
   activeUntil?: Maybe<Scalars["DateTime"]["output"]>;
   draft: Scalars["Boolean"]["output"];
@@ -812,7 +781,6 @@ export type BannerNotificationNode = Node & {
 };
 
 export type BannerNotificationNodeConnection = {
-  __typename?: "BannerNotificationNodeConnection";
   /** Contains the nodes in this connection. */
   edges: Array<Maybe<BannerNotificationNodeEdge>>;
   /** Pagination data for this connection. */
@@ -822,7 +790,6 @@ export type BannerNotificationNodeConnection = {
 
 /** A Relay edge containing a `BannerNotificationNode` and its cursor. */
 export type BannerNotificationNodeEdge = {
-  __typename?: "BannerNotificationNodeEdge";
   /** A cursor for use in pagination */
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
@@ -879,7 +846,6 @@ export type BannerNotificationUpdateMutationInput = {
 };
 
 export type BannerNotificationUpdateMutationPayload = {
-  __typename?: "BannerNotificationUpdateMutationPayload";
   activeFrom?: Maybe<Scalars["DateTime"]["output"]>;
   activeUntil?: Maybe<Scalars["DateTime"]["output"]>;
   draft?: Maybe<Scalars["Boolean"]["output"]>;
@@ -894,7 +860,6 @@ export type BannerNotificationUpdateMutationPayload = {
 };
 
 export type CityNode = Node & {
-  __typename?: "CityNode";
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   municipalityCode: Scalars["String"]["output"];
@@ -906,7 +871,6 @@ export type CityNode = Node & {
 };
 
 export type CityNodeConnection = {
-  __typename?: "CityNodeConnection";
   /** Contains the nodes in this connection. */
   edges: Array<Maybe<CityNodeEdge>>;
   /** Pagination data for this connection. */
@@ -916,7 +880,6 @@ export type CityNodeConnection = {
 
 /** A Relay edge containing a `CityNode` and its cursor. */
 export type CityNodeEdge = {
-  __typename?: "CityNodeEdge";
   /** A cursor for use in pagination */
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
@@ -939,7 +902,6 @@ export type EquipmentCategoryCreateMutationInput = {
 };
 
 export type EquipmentCategoryCreateMutationPayload = {
-  __typename?: "EquipmentCategoryCreateMutationPayload";
   name?: Maybe<Scalars["String"]["output"]>;
   nameEn?: Maybe<Scalars["String"]["output"]>;
   nameFi?: Maybe<Scalars["String"]["output"]>;
@@ -952,12 +914,10 @@ export type EquipmentCategoryDeleteMutationInput = {
 };
 
 export type EquipmentCategoryDeleteMutationPayload = {
-  __typename?: "EquipmentCategoryDeleteMutationPayload";
   deleted?: Maybe<Scalars["Boolean"]["output"]>;
 };
 
 export type EquipmentCategoryNode = Node & {
-  __typename?: "EquipmentCategoryNode";
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
@@ -968,7 +928,6 @@ export type EquipmentCategoryNode = Node & {
 };
 
 export type EquipmentCategoryNodeConnection = {
-  __typename?: "EquipmentCategoryNodeConnection";
   /** Contains the nodes in this connection. */
   edges: Array<Maybe<EquipmentCategoryNodeEdge>>;
   /** Pagination data for this connection. */
@@ -978,7 +937,6 @@ export type EquipmentCategoryNodeConnection = {
 
 /** A Relay edge containing a `EquipmentCategoryNode` and its cursor. */
 export type EquipmentCategoryNodeEdge = {
-  __typename?: "EquipmentCategoryNodeEdge";
   /** A cursor for use in pagination */
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
@@ -1000,7 +958,6 @@ export type EquipmentCategoryUpdateMutationInput = {
 };
 
 export type EquipmentCategoryUpdateMutationPayload = {
-  __typename?: "EquipmentCategoryUpdateMutationPayload";
   name?: Maybe<Scalars["String"]["output"]>;
   nameEn?: Maybe<Scalars["String"]["output"]>;
   nameFi?: Maybe<Scalars["String"]["output"]>;
@@ -1018,7 +975,6 @@ export type EquipmentCreateMutationInput = {
 };
 
 export type EquipmentCreateMutationPayload = {
-  __typename?: "EquipmentCreateMutationPayload";
   category?: Maybe<Scalars["Int"]["output"]>;
   name?: Maybe<Scalars["String"]["output"]>;
   nameEn?: Maybe<Scalars["String"]["output"]>;
@@ -1032,12 +988,10 @@ export type EquipmentDeleteMutationInput = {
 };
 
 export type EquipmentDeleteMutationPayload = {
-  __typename?: "EquipmentDeleteMutationPayload";
   deleted?: Maybe<Scalars["Boolean"]["output"]>;
 };
 
 export type EquipmentNode = Node & {
-  __typename?: "EquipmentNode";
   category: EquipmentCategoryNode;
   /** The ID of the object */
   id: Scalars["ID"]["output"];
@@ -1049,7 +1003,6 @@ export type EquipmentNode = Node & {
 };
 
 export type EquipmentNodeConnection = {
-  __typename?: "EquipmentNodeConnection";
   /** Contains the nodes in this connection. */
   edges: Array<Maybe<EquipmentNodeEdge>>;
   /** Pagination data for this connection. */
@@ -1059,7 +1012,6 @@ export type EquipmentNodeConnection = {
 
 /** A Relay edge containing a `EquipmentNode` and its cursor. */
 export type EquipmentNodeEdge = {
-  __typename?: "EquipmentNodeEdge";
   /** A cursor for use in pagination */
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
@@ -1084,7 +1036,6 @@ export type EquipmentUpdateMutationInput = {
 };
 
 export type EquipmentUpdateMutationPayload = {
-  __typename?: "EquipmentUpdateMutationPayload";
   category?: Maybe<Scalars["Int"]["output"]>;
   name?: Maybe<Scalars["String"]["output"]>;
   nameEn?: Maybe<Scalars["String"]["output"]>;
@@ -1123,7 +1074,6 @@ export enum GeneralPermissionChoices {
 }
 
 export type GeneralRoleChoiceNode = Node & {
-  __typename?: "GeneralRoleChoiceNode";
   code: Scalars["String"]["output"];
   /** The ID of the object */
   id: Scalars["ID"]["output"];
@@ -1135,7 +1085,6 @@ export type GeneralRoleChoiceNode = Node & {
 };
 
 export type GeneralRoleNode = Node & {
-  __typename?: "GeneralRoleNode";
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   pk?: Maybe<Scalars["Int"]["output"]>;
@@ -1143,7 +1092,6 @@ export type GeneralRoleNode = Node & {
 };
 
 export type GeneralRolePermissionNode = Node & {
-  __typename?: "GeneralRolePermissionNode";
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   permission?: Maybe<GeneralPermissionChoices>;
@@ -1151,7 +1099,6 @@ export type GeneralRolePermissionNode = Node & {
 };
 
 export type HelsinkiProfileDataNode = {
-  __typename?: "HelsinkiProfileDataNode";
   birthday?: Maybe<Scalars["Date"]["output"]>;
   city?: Maybe<Scalars["String"]["output"]>;
   email?: Maybe<Scalars["String"]["output"]>;
@@ -1181,7 +1128,6 @@ export enum ImageType {
 }
 
 export type KeywordCategoryNode = Node & {
-  __typename?: "KeywordCategoryNode";
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   keywordGroups: Array<KeywordGroupNode>;
@@ -1201,7 +1147,6 @@ export type KeywordCategoryNodeKeywordGroupsArgs = {
 };
 
 export type KeywordCategoryNodeConnection = {
-  __typename?: "KeywordCategoryNodeConnection";
   /** Contains the nodes in this connection. */
   edges: Array<Maybe<KeywordCategoryNodeEdge>>;
   /** Pagination data for this connection. */
@@ -1211,7 +1156,6 @@ export type KeywordCategoryNodeConnection = {
 
 /** A Relay edge containing a `KeywordCategoryNode` and its cursor. */
 export type KeywordCategoryNodeEdge = {
-  __typename?: "KeywordCategoryNodeEdge";
   /** A cursor for use in pagination */
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
@@ -1219,7 +1163,6 @@ export type KeywordCategoryNodeEdge = {
 };
 
 export type KeywordGroupNode = Node & {
-  __typename?: "KeywordGroupNode";
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   keywords: Array<KeywordNode>;
@@ -1239,7 +1182,6 @@ export type KeywordGroupNodeKeywordsArgs = {
 };
 
 export type KeywordGroupNodeConnection = {
-  __typename?: "KeywordGroupNodeConnection";
   /** Contains the nodes in this connection. */
   edges: Array<Maybe<KeywordGroupNodeEdge>>;
   /** Pagination data for this connection. */
@@ -1249,7 +1191,6 @@ export type KeywordGroupNodeConnection = {
 
 /** A Relay edge containing a `KeywordGroupNode` and its cursor. */
 export type KeywordGroupNodeEdge = {
-  __typename?: "KeywordGroupNodeEdge";
   /** A cursor for use in pagination */
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
@@ -1263,7 +1204,6 @@ export enum KeywordGroupOrderingChoices {
 }
 
 export type KeywordNode = Node & {
-  __typename?: "KeywordNode";
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
@@ -1274,7 +1214,6 @@ export type KeywordNode = Node & {
 };
 
 export type KeywordNodeConnection = {
-  __typename?: "KeywordNodeConnection";
   /** Contains the nodes in this connection. */
   edges: Array<Maybe<KeywordNodeEdge>>;
   /** Pagination data for this connection. */
@@ -1284,7 +1223,6 @@ export type KeywordNodeConnection = {
 
 /** A Relay edge containing a `KeywordNode` and its cursor. */
 export type KeywordNodeEdge = {
-  __typename?: "KeywordNodeEdge";
   /** A cursor for use in pagination */
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
@@ -1298,7 +1236,6 @@ export enum KeywordOrderingChoices {
 }
 
 export type LocationNode = Node & {
-  __typename?: "LocationNode";
   addressCity: Scalars["String"]["output"];
   addressCityEn?: Maybe<Scalars["String"]["output"]>;
   addressCityFi?: Maybe<Scalars["String"]["output"]>;
@@ -1331,7 +1268,6 @@ export enum LoginMethod {
 }
 
 export type Mutation = {
-  __typename?: "Mutation";
   adjustReservationTime?: Maybe<ReservationAdjustTimeMutationPayload>;
   approveReservation?: Maybe<ReservationApproveMutationPayload>;
   cancelApplication?: Maybe<ApplicationCancelMutationPayload>;
@@ -1636,7 +1572,6 @@ export enum OrderStatus {
 }
 
 export type OrganisationNode = Node & {
-  __typename?: "OrganisationNode";
   activeMembers?: Maybe<Scalars["Int"]["output"]>;
   address?: Maybe<AddressNode>;
   coreBusiness: Scalars["String"]["output"];
@@ -1692,7 +1627,6 @@ export enum OrganizationTypeChoice {
 
 /** The Relay compliant `PageInfo` type, containing data necessary to paginate this connection. */
 export type PageInfo = {
-  __typename?: "PageInfo";
   /** When paginating forwards, the cursor to continue. */
   endCursor?: Maybe<Scalars["String"]["output"]>;
   /** When paginating forwards, are there more items? */
@@ -1704,7 +1638,6 @@ export type PageInfo = {
 };
 
 export type PaymentMerchantNode = Node & {
-  __typename?: "PaymentMerchantNode";
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
@@ -1712,7 +1645,6 @@ export type PaymentMerchantNode = Node & {
 };
 
 export type PaymentOrderNode = Node & {
-  __typename?: "PaymentOrderNode";
   checkoutUrl?: Maybe<Scalars["String"]["output"]>;
   expiresInMinutes?: Maybe<Scalars["Int"]["output"]>;
   /** The ID of the object */
@@ -1727,7 +1659,6 @@ export type PaymentOrderNode = Node & {
 };
 
 export type PaymentProductNode = Node & {
-  __typename?: "PaymentProductNode";
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   /** Merchant used for payments */
@@ -1746,7 +1677,6 @@ export enum PaymentType {
 }
 
 export type PersonNode = Node & {
-  __typename?: "PersonNode";
   email?: Maybe<Scalars["String"]["output"]>;
   firstName: Scalars["String"]["output"];
   /** The ID of the object */
@@ -1805,7 +1735,6 @@ export type PurposeCreateMutationInput = {
 };
 
 export type PurposeCreateMutationPayload = {
-  __typename?: "PurposeCreateMutationPayload";
   name?: Maybe<Scalars["String"]["output"]>;
   nameEn?: Maybe<Scalars["String"]["output"]>;
   nameFi?: Maybe<Scalars["String"]["output"]>;
@@ -1814,7 +1743,6 @@ export type PurposeCreateMutationPayload = {
 };
 
 export type PurposeNode = Node & {
-  __typename?: "PurposeNode";
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   imageUrl?: Maybe<Scalars["String"]["output"]>;
@@ -1829,7 +1757,6 @@ export type PurposeNode = Node & {
 };
 
 export type PurposeNodeConnection = {
-  __typename?: "PurposeNodeConnection";
   /** Contains the nodes in this connection. */
   edges: Array<Maybe<PurposeNodeEdge>>;
   /** Pagination data for this connection. */
@@ -1839,7 +1766,6 @@ export type PurposeNodeConnection = {
 
 /** A Relay edge containing a `PurposeNode` and its cursor. */
 export type PurposeNodeEdge = {
-  __typename?: "PurposeNodeEdge";
   /** A cursor for use in pagination */
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
@@ -1867,7 +1793,6 @@ export type PurposeUpdateMutationInput = {
 };
 
 export type PurposeUpdateMutationPayload = {
-  __typename?: "PurposeUpdateMutationPayload";
   name?: Maybe<Scalars["String"]["output"]>;
   nameEn?: Maybe<Scalars["String"]["output"]>;
   nameFi?: Maybe<Scalars["String"]["output"]>;
@@ -1876,7 +1801,6 @@ export type PurposeUpdateMutationPayload = {
 };
 
 export type QualifierNode = Node & {
-  __typename?: "QualifierNode";
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
@@ -1887,7 +1811,6 @@ export type QualifierNode = Node & {
 };
 
 export type QualifierNodeConnection = {
-  __typename?: "QualifierNodeConnection";
   /** Contains the nodes in this connection. */
   edges: Array<Maybe<QualifierNodeEdge>>;
   /** Pagination data for this connection. */
@@ -1897,7 +1820,6 @@ export type QualifierNodeConnection = {
 
 /** A Relay edge containing a `QualifierNode` and its cursor. */
 export type QualifierNodeEdge = {
-  __typename?: "QualifierNodeEdge";
   /** A cursor for use in pagination */
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
@@ -1911,7 +1833,6 @@ export enum QualifierOrderingChoices {
 }
 
 export type Query = {
-  __typename?: "Query";
   /** Return all allocations that affect allocations for given reservation unit (through space hierarchy or common resource) during the given time period. */
   affectingAllocatedTimeSlots?: Maybe<Array<AllocatedTimeSlotNode>>;
   /** Find all reservations that affect other reservations through the space hierarchy or a common resource. */
@@ -2555,7 +2476,6 @@ export type RecurringReservationCreateMutationInput = {
 };
 
 export type RecurringReservationCreateMutationPayload = {
-  __typename?: "RecurringReservationCreateMutationPayload";
   abilityGroup?: Maybe<Scalars["Int"]["output"]>;
   ageGroup?: Maybe<Scalars["Int"]["output"]>;
   beginDate?: Maybe<Scalars["Date"]["output"]>;
@@ -2571,7 +2491,6 @@ export type RecurringReservationCreateMutationPayload = {
 };
 
 export type RecurringReservationNode = Node & {
-  __typename?: "RecurringReservationNode";
   abilityGroup?: Maybe<AbilityGroupNode>;
   ageGroup?: Maybe<AgeGroupNode>;
   beginDate?: Maybe<Scalars["Date"]["output"]>;
@@ -2618,7 +2537,6 @@ export type RecurringReservationNodeReservationsArgs = {
 };
 
 export type RecurringReservationNodeConnection = {
-  __typename?: "RecurringReservationNodeConnection";
   /** Contains the nodes in this connection. */
   edges: Array<Maybe<RecurringReservationNodeEdge>>;
   /** Pagination data for this connection. */
@@ -2628,7 +2546,6 @@ export type RecurringReservationNodeConnection = {
 
 /** A Relay edge containing a `RecurringReservationNode` and its cursor. */
 export type RecurringReservationNodeEdge = {
-  __typename?: "RecurringReservationNodeEdge";
   /** A cursor for use in pagination */
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
@@ -2681,7 +2598,6 @@ export type RecurringReservationUpdateMutationInput = {
 };
 
 export type RecurringReservationUpdateMutationPayload = {
-  __typename?: "RecurringReservationUpdateMutationPayload";
   abilityGroup?: Maybe<Scalars["Int"]["output"]>;
   ageGroup?: Maybe<Scalars["Int"]["output"]>;
   beginDate?: Maybe<Scalars["Date"]["output"]>;
@@ -2701,7 +2617,6 @@ export type RefreshOrderMutationInput = {
 };
 
 export type RefreshOrderMutationPayload = {
-  __typename?: "RefreshOrderMutationPayload";
   orderUuid?: Maybe<Scalars["String"]["output"]>;
   reservationPk?: Maybe<Scalars["Int"]["output"]>;
   status?: Maybe<Scalars["String"]["output"]>;
@@ -2712,7 +2627,6 @@ export type RejectAllApplicationOptionsMutationInput = {
 };
 
 export type RejectAllApplicationOptionsMutationPayload = {
-  __typename?: "RejectAllApplicationOptionsMutationPayload";
   pk?: Maybe<Scalars["Int"]["output"]>;
 };
 
@@ -2721,12 +2635,10 @@ export type RejectAllSectionOptionsMutationInput = {
 };
 
 export type RejectAllSectionOptionsMutationPayload = {
-  __typename?: "RejectAllSectionOptionsMutationPayload";
   pk?: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type ReservableTimeSpanType = {
-  __typename?: "ReservableTimeSpanType";
   endDatetime?: Maybe<Scalars["DateTime"]["output"]>;
   startDatetime?: Maybe<Scalars["DateTime"]["output"]>;
 };
@@ -2739,7 +2651,6 @@ export type ReservationAdjustTimeMutationInput = {
 };
 
 export type ReservationAdjustTimeMutationPayload = {
-  __typename?: "ReservationAdjustTimeMutationPayload";
   begin?: Maybe<Scalars["DateTime"]["output"]>;
   end?: Maybe<Scalars["DateTime"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
@@ -2754,7 +2665,6 @@ export type ReservationApproveMutationInput = {
 };
 
 export type ReservationApproveMutationPayload = {
-  __typename?: "ReservationApproveMutationPayload";
   handledAt?: Maybe<Scalars["DateTime"]["output"]>;
   handlingDetails?: Maybe<Scalars["String"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
@@ -2764,7 +2674,6 @@ export type ReservationApproveMutationPayload = {
 };
 
 export type ReservationCancelReasonNode = Node & {
-  __typename?: "ReservationCancelReasonNode";
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   pk?: Maybe<Scalars["Int"]["output"]>;
@@ -2775,7 +2684,6 @@ export type ReservationCancelReasonNode = Node & {
 };
 
 export type ReservationCancelReasonNodeConnection = {
-  __typename?: "ReservationCancelReasonNodeConnection";
   /** Contains the nodes in this connection. */
   edges: Array<Maybe<ReservationCancelReasonNodeEdge>>;
   /** Pagination data for this connection. */
@@ -2785,7 +2693,6 @@ export type ReservationCancelReasonNodeConnection = {
 
 /** A Relay edge containing a `ReservationCancelReasonNode` and its cursor. */
 export type ReservationCancelReasonNodeEdge = {
-  __typename?: "ReservationCancelReasonNodeEdge";
   /** A cursor for use in pagination */
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
@@ -2799,7 +2706,6 @@ export type ReservationCancellationMutationInput = {
 };
 
 export type ReservationCancellationMutationPayload = {
-  __typename?: "ReservationCancellationMutationPayload";
   cancelDetails?: Maybe<Scalars["String"]["output"]>;
   cancelReason?: Maybe<Scalars["Int"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
@@ -2813,7 +2719,6 @@ export type ReservationConfirmMutationInput = {
 };
 
 export type ReservationConfirmMutationPayload = {
-  __typename?: "ReservationConfirmMutationPayload";
   ageGroupPk?: Maybe<Scalars["Int"]["output"]>;
   applyingForFreeOfCharge?: Maybe<Scalars["Boolean"]["output"]>;
   begin?: Maybe<Scalars["DateTime"]["output"]>;
@@ -2897,7 +2802,6 @@ export type ReservationCreateMutationInput = {
 };
 
 export type ReservationCreateMutationPayload = {
-  __typename?: "ReservationCreateMutationPayload";
   ageGroupPk?: Maybe<Scalars["Int"]["output"]>;
   applyingForFreeOfCharge?: Maybe<Scalars["Boolean"]["output"]>;
   begin?: Maybe<Scalars["DateTime"]["output"]>;
@@ -2946,7 +2850,6 @@ export type ReservationDeleteMutationInput = {
 };
 
 export type ReservationDeleteMutationPayload = {
-  __typename?: "ReservationDeleteMutationPayload";
   deleted?: Maybe<Scalars["Boolean"]["output"]>;
 };
 
@@ -2957,7 +2860,6 @@ export type ReservationDenyMutationInput = {
 };
 
 export type ReservationDenyMutationPayload = {
-  __typename?: "ReservationDenyMutationPayload";
   denyReason?: Maybe<Scalars["Int"]["output"]>;
   handledAt?: Maybe<Scalars["DateTime"]["output"]>;
   handlingDetails?: Maybe<Scalars["String"]["output"]>;
@@ -2966,7 +2868,6 @@ export type ReservationDenyMutationPayload = {
 };
 
 export type ReservationDenyReasonNode = Node & {
-  __typename?: "ReservationDenyReasonNode";
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   pk?: Maybe<Scalars["Int"]["output"]>;
@@ -2977,7 +2878,6 @@ export type ReservationDenyReasonNode = Node & {
 };
 
 export type ReservationDenyReasonNodeConnection = {
-  __typename?: "ReservationDenyReasonNodeConnection";
   /** Contains the nodes in this connection. */
   edges: Array<Maybe<ReservationDenyReasonNodeEdge>>;
   /** Pagination data for this connection. */
@@ -2987,7 +2887,6 @@ export type ReservationDenyReasonNodeConnection = {
 
 /** A Relay edge containing a `ReservationDenyReasonNode` and its cursor. */
 export type ReservationDenyReasonNodeEdge = {
-  __typename?: "ReservationDenyReasonNodeEdge";
   /** A cursor for use in pagination */
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
@@ -3011,7 +2910,6 @@ export enum ReservationKind {
 }
 
 export type ReservationMetadataFieldNode = Node & {
-  __typename?: "ReservationMetadataFieldNode";
   fieldName: Scalars["String"]["output"];
   /** The ID of the object */
   id: Scalars["ID"]["output"];
@@ -3019,7 +2917,6 @@ export type ReservationMetadataFieldNode = Node & {
 };
 
 export type ReservationMetadataSetNode = Node & {
-  __typename?: "ReservationMetadataSetNode";
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
@@ -3029,7 +2926,6 @@ export type ReservationMetadataSetNode = Node & {
 };
 
 export type ReservationMetadataSetNodeConnection = {
-  __typename?: "ReservationMetadataSetNodeConnection";
   /** Contains the nodes in this connection. */
   edges: Array<Maybe<ReservationMetadataSetNodeEdge>>;
   /** Pagination data for this connection. */
@@ -3039,7 +2935,6 @@ export type ReservationMetadataSetNodeConnection = {
 
 /** A Relay edge containing a `ReservationMetadataSetNode` and its cursor. */
 export type ReservationMetadataSetNodeEdge = {
-  __typename?: "ReservationMetadataSetNodeEdge";
   /** A cursor for use in pagination */
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
@@ -3047,7 +2942,6 @@ export type ReservationMetadataSetNodeEdge = {
 };
 
 export type ReservationNode = Node & {
-  __typename?: "ReservationNode";
   /** Which reservation units' reserveability is affected by this reservation? */
   affectedReservationUnits?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
   ageGroup?: Maybe<AgeGroupNode>;
@@ -3162,7 +3056,6 @@ export type ReservationNodeReservationUnitArgs = {
 };
 
 export type ReservationNodeConnection = {
-  __typename?: "ReservationNodeConnection";
   /** Contains the nodes in this connection. */
   edges: Array<Maybe<ReservationNodeEdge>>;
   /** Pagination data for this connection. */
@@ -3172,7 +3065,6 @@ export type ReservationNodeConnection = {
 
 /** A Relay edge containing a `ReservationNode` and its cursor. */
 export type ReservationNodeEdge = {
-  __typename?: "ReservationNodeEdge";
   /** A cursor for use in pagination */
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
@@ -3224,7 +3116,6 @@ export enum ReservationOrderingChoices {
 }
 
 export type ReservationPurposeNode = Node & {
-  __typename?: "ReservationPurposeNode";
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
@@ -3235,7 +3126,6 @@ export type ReservationPurposeNode = Node & {
 };
 
 export type ReservationPurposeNodeConnection = {
-  __typename?: "ReservationPurposeNodeConnection";
   /** Contains the nodes in this connection. */
   edges: Array<Maybe<ReservationPurposeNodeEdge>>;
   /** Pagination data for this connection. */
@@ -3245,7 +3135,6 @@ export type ReservationPurposeNodeConnection = {
 
 /** A Relay edge containing a `ReservationPurposeNode` and its cursor. */
 export type ReservationPurposeNodeEdge = {
-  __typename?: "ReservationPurposeNodeEdge";
   /** A cursor for use in pagination */
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
@@ -3263,7 +3152,6 @@ export type ReservationRefundMutationInput = {
 };
 
 export type ReservationRefundMutationPayload = {
-  __typename?: "ReservationRefundMutationPayload";
   pk?: Maybe<Scalars["Int"]["output"]>;
 };
 
@@ -3272,7 +3160,6 @@ export type ReservationRequiresHandlingMutationInput = {
 };
 
 export type ReservationRequiresHandlingMutationPayload = {
-  __typename?: "ReservationRequiresHandlingMutationPayload";
   pk?: Maybe<Scalars["Int"]["output"]>;
   state?: Maybe<State>;
 };
@@ -3296,7 +3183,6 @@ export type ReservationSeriesCreateMutationInput = {
 };
 
 export type ReservationSeriesCreateMutationPayload = {
-  __typename?: "ReservationSeriesCreateMutationPayload";
   abilityGroup?: Maybe<Scalars["Int"]["output"]>;
   ageGroup?: Maybe<Scalars["Int"]["output"]>;
   beginDate?: Maybe<Scalars["Date"]["output"]>;
@@ -3360,7 +3246,6 @@ export type ReservationStaffAdjustTimeMutationInput = {
 };
 
 export type ReservationStaffAdjustTimeMutationPayload = {
-  __typename?: "ReservationStaffAdjustTimeMutationPayload";
   begin?: Maybe<Scalars["DateTime"]["output"]>;
   /** Can be a number of seconds or timespan in format HH:MM:SS. Null/undefined value means buffer from reservation unit is used. */
   bufferTimeAfter?: Maybe<Scalars["String"]["output"]>;
@@ -3414,7 +3299,6 @@ export type ReservationStaffCreateMutationInput = {
 };
 
 export type ReservationStaffCreateMutationPayload = {
-  __typename?: "ReservationStaffCreateMutationPayload";
   ageGroupPk?: Maybe<Scalars["Int"]["output"]>;
   applyingForFreeOfCharge?: Maybe<Scalars["Boolean"]["output"]>;
   begin?: Maybe<Scalars["DateTime"]["output"]>;
@@ -3495,7 +3379,6 @@ export type ReservationStaffModifyMutationInput = {
 };
 
 export type ReservationStaffModifyMutationPayload = {
-  __typename?: "ReservationStaffModifyMutationPayload";
   ageGroupPk?: Maybe<Scalars["Int"]["output"]>;
   applyingForFreeOfCharge?: Maybe<Scalars["Boolean"]["output"]>;
   begin?: Maybe<Scalars["DateTime"]["output"]>;
@@ -3583,7 +3466,6 @@ export enum ReservationTypeChoice {
 }
 
 export type ReservationUnitCancellationRuleNode = Node & {
-  __typename?: "ReservationUnitCancellationRuleNode";
   /** Seconds before reservations related to this cancellation rule can be cancelled without handling. */
   canBeCancelledTimeBefore?: Maybe<Scalars["Duration"]["output"]>;
   /** The ID of the object */
@@ -3597,7 +3479,6 @@ export type ReservationUnitCancellationRuleNode = Node & {
 };
 
 export type ReservationUnitCancellationRuleNodeConnection = {
-  __typename?: "ReservationUnitCancellationRuleNodeConnection";
   /** Contains the nodes in this connection. */
   edges: Array<Maybe<ReservationUnitCancellationRuleNodeEdge>>;
   /** Pagination data for this connection. */
@@ -3607,7 +3488,6 @@ export type ReservationUnitCancellationRuleNodeConnection = {
 
 /** A Relay edge containing a `ReservationUnitCancellationRuleNode` and its cursor. */
 export type ReservationUnitCancellationRuleNodeEdge = {
-  __typename?: "ReservationUnitCancellationRuleNodeEdge";
   /** A cursor for use in pagination */
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
@@ -3700,7 +3580,6 @@ export type ReservationUnitCreateMutationInput = {
 };
 
 export type ReservationUnitCreateMutationPayload = {
-  __typename?: "ReservationUnitCreateMutationPayload";
   allowReservationsWithoutOpeningHours?: Maybe<Scalars["Boolean"]["output"]>;
   applicationRoundTimeSlots?: Maybe<Array<Maybe<ApplicationRoundTimeSlotNode>>>;
   authentication?: Maybe<Authentication>;
@@ -3781,7 +3660,6 @@ export type ReservationUnitImageCreateMutationInput = {
 };
 
 export type ReservationUnitImageCreateMutationPayload = {
-  __typename?: "ReservationUnitImageCreateMutationPayload";
   imageType?: Maybe<ImageType>;
   pk?: Maybe<Scalars["Int"]["output"]>;
   reservationUnit?: Maybe<Scalars["Int"]["output"]>;
@@ -3792,7 +3670,6 @@ export type ReservationUnitImageDeleteMutationInput = {
 };
 
 export type ReservationUnitImageDeleteMutationPayload = {
-  __typename?: "ReservationUnitImageDeleteMutationPayload";
   deleted?: Maybe<Scalars["Boolean"]["output"]>;
 };
 
@@ -3805,7 +3682,6 @@ export type ReservationUnitImageFieldSerializerInput = {
 };
 
 export type ReservationUnitImageNode = Node & {
-  __typename?: "ReservationUnitImageNode";
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   imageType: ImageType;
@@ -3822,13 +3698,11 @@ export type ReservationUnitImageUpdateMutationInput = {
 };
 
 export type ReservationUnitImageUpdateMutationPayload = {
-  __typename?: "ReservationUnitImageUpdateMutationPayload";
   imageType?: Maybe<ImageType>;
   pk?: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type ReservationUnitNode = Node & {
-  __typename?: "ReservationUnitNode";
   allowReservationsWithoutOpeningHours: Scalars["Boolean"]["output"];
   applicationRoundTimeSlots: Array<ApplicationRoundTimeSlotNode>;
   applicationRounds: Array<ApplicationRoundNode>;
@@ -4021,7 +3895,6 @@ export type ReservationUnitNodeSpacesArgs = {
 };
 
 export type ReservationUnitNodeConnection = {
-  __typename?: "ReservationUnitNodeConnection";
   /** Contains the nodes in this connection. */
   edges: Array<Maybe<ReservationUnitNodeEdge>>;
   /** Pagination data for this connection. */
@@ -4031,7 +3904,6 @@ export type ReservationUnitNodeConnection = {
 
 /** A Relay edge containing a `ReservationUnitNode` and its cursor. */
 export type ReservationUnitNodeEdge = {
-  __typename?: "ReservationUnitNodeEdge";
   /** A cursor for use in pagination */
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
@@ -4045,7 +3917,6 @@ export type ReservationUnitOptionApplicantSerializerInput = {
 };
 
 export type ReservationUnitOptionNode = Node & {
-  __typename?: "ReservationUnitOptionNode";
   allocatedTimeSlots: Array<AllocatedTimeSlotNode>;
   applicationSection: ApplicationSectionNode;
   /** The ID of the object */
@@ -4086,7 +3957,6 @@ export type ReservationUnitOptionUpdateMutationInput = {
 };
 
 export type ReservationUnitOptionUpdateMutationPayload = {
-  __typename?: "ReservationUnitOptionUpdateMutationPayload";
   locked?: Maybe<Scalars["Boolean"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
   rejected?: Maybe<Scalars["Boolean"]["output"]>;
@@ -4125,14 +3995,12 @@ export enum ReservationUnitOrderingChoices {
 }
 
 export type ReservationUnitPaymentTypeNode = Node & {
-  __typename?: "ReservationUnitPaymentTypeNode";
   code: Scalars["String"]["output"];
   /** The ID of the object */
   id: Scalars["ID"]["output"];
 };
 
 export type ReservationUnitPricingNode = Node & {
-  __typename?: "ReservationUnitPricingNode";
   /** When pricing is activated */
   begins: Scalars["Date"]["output"];
   /** Maximum price of the reservation unit including VAT */
@@ -4186,7 +4054,6 @@ export enum ReservationUnitState {
 }
 
 export type ReservationUnitTypeNode = Node & {
-  __typename?: "ReservationUnitTypeNode";
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
@@ -4199,7 +4066,6 @@ export type ReservationUnitTypeNode = Node & {
 };
 
 export type ReservationUnitTypeNodeConnection = {
-  __typename?: "ReservationUnitTypeNodeConnection";
   /** Contains the nodes in this connection. */
   edges: Array<Maybe<ReservationUnitTypeNodeEdge>>;
   /** Pagination data for this connection. */
@@ -4209,7 +4075,6 @@ export type ReservationUnitTypeNodeConnection = {
 
 /** A Relay edge containing a `ReservationUnitTypeNode` and its cursor. */
 export type ReservationUnitTypeNodeEdge = {
-  __typename?: "ReservationUnitTypeNodeEdge";
   /** A cursor for use in pagination */
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
@@ -4308,7 +4173,6 @@ export type ReservationUnitUpdateMutationInput = {
 };
 
 export type ReservationUnitUpdateMutationPayload = {
-  __typename?: "ReservationUnitUpdateMutationPayload";
   allowReservationsWithoutOpeningHours?: Maybe<Scalars["Boolean"]["output"]>;
   applicationRoundTimeSlots?: Maybe<Array<Maybe<ApplicationRoundTimeSlotNode>>>;
   authentication?: Maybe<Authentication>;
@@ -4421,7 +4285,6 @@ export type ReservationUpdateMutationInput = {
 };
 
 export type ReservationUpdateMutationPayload = {
-  __typename?: "ReservationUpdateMutationPayload";
   ageGroupPk?: Maybe<Scalars["Int"]["output"]>;
   applyingForFreeOfCharge?: Maybe<Scalars["Boolean"]["output"]>;
   begin?: Maybe<Scalars["DateTime"]["output"]>;
@@ -4473,7 +4336,6 @@ export type ReservationWorkingMemoMutationInput = {
 };
 
 export type ReservationWorkingMemoMutationPayload = {
-  __typename?: "ReservationWorkingMemoMutationPayload";
   /** Primary key of the reservation */
   pk?: Maybe<Scalars["Int"]["output"]>;
   workingMemo?: Maybe<Scalars["String"]["output"]>;
@@ -4513,7 +4375,6 @@ export type ResourceCreateMutationInput = {
 };
 
 export type ResourceCreateMutationPayload = {
-  __typename?: "ResourceCreateMutationPayload";
   bufferTimeAfter?: Maybe<Scalars["Duration"]["output"]>;
   bufferTimeBefore?: Maybe<Scalars["Duration"]["output"]>;
   locationType?: Maybe<LocationType>;
@@ -4530,7 +4391,6 @@ export type ResourceDeleteMutationInput = {
 };
 
 export type ResourceDeleteMutationPayload = {
-  __typename?: "ResourceDeleteMutationPayload";
   deleted?: Maybe<Scalars["Boolean"]["output"]>;
 };
 
@@ -4541,7 +4401,6 @@ export enum ResourceLocationType {
 }
 
 export type ResourceNode = Node & {
-  __typename?: "ResourceNode";
   bufferTimeAfter?: Maybe<Scalars["Duration"]["output"]>;
   bufferTimeBefore?: Maybe<Scalars["Duration"]["output"]>;
   /** The ID of the object */
@@ -4556,7 +4415,6 @@ export type ResourceNode = Node & {
 };
 
 export type ResourceNodeConnection = {
-  __typename?: "ResourceNodeConnection";
   /** Contains the nodes in this connection. */
   edges: Array<Maybe<ResourceNodeEdge>>;
   /** Pagination data for this connection. */
@@ -4566,7 +4424,6 @@ export type ResourceNodeConnection = {
 
 /** A Relay edge containing a `ResourceNode` and its cursor. */
 export type ResourceNodeEdge = {
-  __typename?: "ResourceNodeEdge";
   /** A cursor for use in pagination */
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
@@ -4592,7 +4449,6 @@ export type ResourceUpdateMutationInput = {
 };
 
 export type ResourceUpdateMutationPayload = {
-  __typename?: "ResourceUpdateMutationPayload";
   bufferTimeAfter?: Maybe<Scalars["Duration"]["output"]>;
   bufferTimeBefore?: Maybe<Scalars["Duration"]["output"]>;
   locationType?: Maybe<LocationType>;
@@ -4609,7 +4465,6 @@ export type RestoreAllApplicationOptionsMutationInput = {
 };
 
 export type RestoreAllApplicationOptionsMutationPayload = {
-  __typename?: "RestoreAllApplicationOptionsMutationPayload";
   pk?: Maybe<Scalars["Int"]["output"]>;
 };
 
@@ -4618,12 +4473,10 @@ export type RestoreAllSectionOptionsMutationInput = {
 };
 
 export type RestoreAllSectionOptionsMutationPayload = {
-  __typename?: "RestoreAllSectionOptionsMutationPayload";
   pk?: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type ServiceNode = Node & {
-  __typename?: "ServiceNode";
   bufferTimeAfter?: Maybe<Scalars["Duration"]["output"]>;
   bufferTimeBefore?: Maybe<Scalars["Duration"]["output"]>;
   /** The ID of the object */
@@ -4637,7 +4490,6 @@ export type ServiceNode = Node & {
 };
 
 export type ServiceSectorNode = Node & {
-  __typename?: "ServiceSectorNode";
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
@@ -4648,7 +4500,6 @@ export type ServiceSectorNode = Node & {
 };
 
 export type ServiceSectorNodeConnection = {
-  __typename?: "ServiceSectorNodeConnection";
   /** Contains the nodes in this connection. */
   edges: Array<Maybe<ServiceSectorNodeEdge>>;
   /** Pagination data for this connection. */
@@ -4658,7 +4509,6 @@ export type ServiceSectorNodeConnection = {
 
 /** A Relay edge containing a `ServiceSectorNode` and its cursor. */
 export type ServiceSectorNodeEdge = {
-  __typename?: "ServiceSectorNodeEdge";
   /** A cursor for use in pagination */
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
@@ -4685,7 +4535,6 @@ export enum ServiceSectorPermissionsChoices {
 }
 
 export type ServiceSectorRoleChoiceNode = Node & {
-  __typename?: "ServiceSectorRoleChoiceNode";
   code: Scalars["String"]["output"];
   /** The ID of the object */
   id: Scalars["ID"]["output"];
@@ -4697,7 +4546,6 @@ export type ServiceSectorRoleChoiceNode = Node & {
 };
 
 export type ServiceSectorRoleNode = Node & {
-  __typename?: "ServiceSectorRoleNode";
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   pk?: Maybe<Scalars["Int"]["output"]>;
@@ -4706,7 +4554,6 @@ export type ServiceSectorRoleNode = Node & {
 };
 
 export type ServiceSectorRolePermissionNode = Node & {
-  __typename?: "ServiceSectorRolePermissionNode";
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   permission?: Maybe<ServiceSectorPermissionsChoices>;
@@ -4728,7 +4575,6 @@ export type SetApplicationRoundHandledMutationInput = {
 };
 
 export type SetApplicationRoundHandledMutationPayload = {
-  __typename?: "SetApplicationRoundHandledMutationPayload";
   pk?: Maybe<Scalars["Int"]["output"]>;
 };
 
@@ -4747,7 +4593,6 @@ export type SpaceCreateMutationInput = {
 };
 
 export type SpaceCreateMutationPayload = {
-  __typename?: "SpaceCreateMutationPayload";
   building?: Maybe<Scalars["Int"]["output"]>;
   code?: Maybe<Scalars["String"]["output"]>;
   maxPersons?: Maybe<Scalars["Int"]["output"]>;
@@ -4766,12 +4611,10 @@ export type SpaceDeleteMutationInput = {
 };
 
 export type SpaceDeleteMutationPayload = {
-  __typename?: "SpaceDeleteMutationPayload";
   deleted?: Maybe<Scalars["Boolean"]["output"]>;
 };
 
 export type SpaceNode = Node & {
-  __typename?: "SpaceNode";
   children?: Maybe<Array<SpaceNode>>;
   code: Scalars["String"]["output"];
   /** The ID of the object */
@@ -4819,7 +4662,6 @@ export type SpaceNodeResourceSetArgs = {
 };
 
 export type SpaceNodeConnection = {
-  __typename?: "SpaceNodeConnection";
   /** Contains the nodes in this connection. */
   edges: Array<Maybe<SpaceNodeEdge>>;
   /** Pagination data for this connection. */
@@ -4829,7 +4671,6 @@ export type SpaceNodeConnection = {
 
 /** A Relay edge containing a `SpaceNode` and its cursor. */
 export type SpaceNodeEdge = {
-  __typename?: "SpaceNodeEdge";
   /** A cursor for use in pagination */
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
@@ -4857,7 +4698,6 @@ export type SpaceUpdateMutationInput = {
 };
 
 export type SpaceUpdateMutationPayload = {
-  __typename?: "SpaceUpdateMutationPayload";
   building?: Maybe<Scalars["Int"]["output"]>;
   code?: Maybe<Scalars["String"]["output"]>;
   maxPersons?: Maybe<Scalars["Int"]["output"]>;
@@ -4898,7 +4738,6 @@ export enum Status {
 }
 
 export type SuitableTimeRangeNode = Node & {
-  __typename?: "SuitableTimeRangeNode";
   applicationSection: ApplicationSectionNode;
   beginTime: Scalars["Time"]["output"];
   dayOfTheWeek: Weekday;
@@ -4935,7 +4774,6 @@ export enum TargetGroup {
 }
 
 export type TaxPercentageNode = Node & {
-  __typename?: "TaxPercentageNode";
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   pk?: Maybe<Scalars["Int"]["output"]>;
@@ -4944,7 +4782,6 @@ export type TaxPercentageNode = Node & {
 };
 
 export type TaxPercentageNodeConnection = {
-  __typename?: "TaxPercentageNodeConnection";
   /** Contains the nodes in this connection. */
   edges: Array<Maybe<TaxPercentageNodeEdge>>;
   /** Pagination data for this connection. */
@@ -4954,7 +4791,6 @@ export type TaxPercentageNodeConnection = {
 
 /** A Relay edge containing a `TaxPercentageNode` and its cursor. */
 export type TaxPercentageNodeEdge = {
-  __typename?: "TaxPercentageNodeEdge";
   /** A cursor for use in pagination */
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
@@ -4968,7 +4804,6 @@ export enum TaxPercentageOrderingChoices {
 }
 
 export type TermsOfUseNode = Node & {
-  __typename?: "TermsOfUseNode";
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   name?: Maybe<Scalars["String"]["output"]>;
@@ -4984,7 +4819,6 @@ export type TermsOfUseNode = Node & {
 };
 
 export type TermsOfUseNodeConnection = {
-  __typename?: "TermsOfUseNodeConnection";
   /** Contains the nodes in this connection. */
   edges: Array<Maybe<TermsOfUseNodeEdge>>;
   /** Pagination data for this connection. */
@@ -4994,7 +4828,6 @@ export type TermsOfUseNodeConnection = {
 
 /** A Relay edge containing a `TermsOfUseNode` and its cursor. */
 export type TermsOfUseNodeEdge = {
-  __typename?: "TermsOfUseNodeEdge";
   /** A cursor for use in pagination */
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
@@ -5029,7 +4862,6 @@ export type TimeSlotSerializerInput = {
 };
 
 export type TimeSlotType = {
-  __typename?: "TimeSlotType";
   begin: Scalars["Time"]["output"];
   end: Scalars["Time"]["output"];
 };
@@ -5045,7 +4877,6 @@ export enum Type {
 }
 
 export type UnitGroupNode = Node & {
-  __typename?: "UnitGroupNode";
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
@@ -5077,7 +4908,6 @@ export type UnitGroupNodeUnitsArgs = {
 };
 
 export type UnitNode = Node & {
-  __typename?: "UnitNode";
   description: Scalars["String"]["output"];
   descriptionEn?: Maybe<Scalars["String"]["output"]>;
   descriptionFi?: Maybe<Scalars["String"]["output"]>;
@@ -5173,7 +5003,6 @@ export type UnitNodeSpacesArgs = {
 };
 
 export type UnitNodeConnection = {
-  __typename?: "UnitNodeConnection";
   /** Contains the nodes in this connection. */
   edges: Array<Maybe<UnitNodeEdge>>;
   /** Pagination data for this connection. */
@@ -5183,7 +5012,6 @@ export type UnitNodeConnection = {
 
 /** A Relay edge containing a `UnitNode` and its cursor. */
 export type UnitNodeEdge = {
-  __typename?: "UnitNodeEdge";
   /** A cursor for use in pagination */
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
@@ -5224,7 +5052,6 @@ export enum UnitPermissionChoices {
 }
 
 export type UnitRoleChoiceNode = Node & {
-  __typename?: "UnitRoleChoiceNode";
   code: Scalars["String"]["output"];
   /** The ID of the object */
   id: Scalars["ID"]["output"];
@@ -5236,7 +5063,6 @@ export type UnitRoleChoiceNode = Node & {
 };
 
 export type UnitRoleNode = Node & {
-  __typename?: "UnitRoleNode";
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   pk?: Maybe<Scalars["Int"]["output"]>;
@@ -5266,7 +5092,6 @@ export type UnitRoleNodeUnitArgs = {
 };
 
 export type UnitRolePermissionNode = Node & {
-  __typename?: "UnitRolePermissionNode";
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   permission?: Maybe<UnitPermissionChoices>;
@@ -5294,7 +5119,6 @@ export type UnitUpdateMutationInput = {
 };
 
 export type UnitUpdateMutationPayload = {
-  __typename?: "UnitUpdateMutationPayload";
   description?: Maybe<Scalars["String"]["output"]>;
   descriptionEn?: Maybe<Scalars["String"]["output"]>;
   descriptionFi?: Maybe<Scalars["String"]["output"]>;
@@ -5421,7 +5245,6 @@ export type UpdateSuitableTimeRangeSerializerInput = {
 };
 
 export type UserNode = Node & {
-  __typename?: "UserNode";
   dateOfBirth?: Maybe<Scalars["Date"]["output"]>;
   email: Scalars["String"]["output"];
   firstName: Scalars["String"]["output"];
@@ -5450,7 +5273,6 @@ export type UserUpdateMutationInput = {
 };
 
 export type UserUpdateMutationPayload = {
-  __typename?: "UserUpdateMutationPayload";
   pk?: Maybe<Scalars["Int"]["output"]>;
   /** When user wants to receive reservation notification emails. */
   reservationNotification?: Maybe<ReservationNotification>;
@@ -5472,13 +5294,9 @@ export type BannerNotificationsListQueryVariables = Exact<{
 }>;
 
 export type BannerNotificationsListQuery = {
-  __typename?: "Query";
   bannerNotifications?: {
-    __typename?: "BannerNotificationNodeConnection";
     edges: Array<{
-      __typename?: "BannerNotificationNodeEdge";
       node?: {
-        __typename?: "BannerNotificationNode";
         id: string;
         level: BannerNotificationLevel;
         activeFrom?: string | null;
@@ -5490,11 +5308,8 @@ export type BannerNotificationsListQuery = {
     } | null>;
   } | null;
   bannerNotificationsAll?: {
-    __typename?: "BannerNotificationNodeConnection";
     edges: Array<{
-      __typename?: "BannerNotificationNodeEdge";
       node?: {
-        __typename?: "BannerNotificationNode";
         id: string;
         level: BannerNotificationLevel;
         activeFrom?: string | null;
@@ -5508,24 +5323,16 @@ export type BannerNotificationsListQuery = {
 };
 
 export type ApplicationNameFragmentFragment = {
-  __typename?: "ApplicationNode";
   applicantType?: ApplicantTypeChoice | null;
   organisation?: {
-    __typename?: "OrganisationNode";
     id: string;
     name: string;
     organisationType: OrganizationTypeChoice;
   } | null;
-  contactPerson?: {
-    __typename?: "PersonNode";
-    id: string;
-    lastName: string;
-    firstName: string;
-  } | null;
+  contactPerson?: { id: string; lastName: string; firstName: string } | null;
 };
 
 export type ApplicationSectionDurationFragmentFragment = {
-  __typename?: "ApplicationSectionNode";
   reservationsEndDate: string;
   reservationsBeginDate: string;
   appliedReservationsPerWeek: number;
@@ -5533,7 +5340,6 @@ export type ApplicationSectionDurationFragmentFragment = {
 };
 
 export type ApplicationSectionCommonFragmentFragment = {
-  __typename?: "ApplicationSectionNode";
   id: string;
   pk?: number | null;
   name: string;
@@ -5545,14 +5351,12 @@ export type ApplicationSectionCommonFragmentFragment = {
   appliedReservationsPerWeek: number;
   reservationMinDuration: number;
   ageGroup?: {
-    __typename?: "AgeGroupNode";
     id: string;
     pk?: number | null;
     minimum: number;
     maximum?: number | null;
   } | null;
   reservationUnitOptions: Array<{
-    __typename?: "ReservationUnitOptionNode";
     id: string;
     pk?: number | null;
     preferredOrder: number;
@@ -5560,7 +5364,6 @@ export type ApplicationSectionCommonFragmentFragment = {
 };
 
 export type ApplicationSectionFragmentFragment = {
-  __typename?: "ApplicationSectionNode";
   id: string;
   pk?: number | null;
   name: string;
@@ -5571,51 +5374,31 @@ export type ApplicationSectionFragmentFragment = {
   reservationsBeginDate: string;
   appliedReservationsPerWeek: number;
   reservationMinDuration: number;
-  purpose?: {
-    __typename?: "ReservationPurposeNode";
-    id: string;
-    pk?: number | null;
-    nameFi?: string | null;
-  } | null;
+  purpose?: { id: string; pk?: number | null; nameFi?: string | null } | null;
   application: {
-    __typename?: "ApplicationNode";
     id: string;
     pk?: number | null;
     status?: ApplicationStatusChoice | null;
     applicantType?: ApplicantTypeChoice | null;
     organisation?: {
-      __typename?: "OrganisationNode";
       id: string;
       name: string;
       organisationType: OrganizationTypeChoice;
     } | null;
-    contactPerson?: {
-      __typename?: "PersonNode";
-      id: string;
-      lastName: string;
-      firstName: string;
-    } | null;
+    contactPerson?: { id: string; lastName: string; firstName: string } | null;
   };
   reservationUnitOptions: Array<{
-    __typename?: "ReservationUnitOptionNode";
     id: string;
     pk?: number | null;
     preferredOrder: number;
     reservationUnit: {
-      __typename?: "ReservationUnitNode";
       id: string;
       pk?: number | null;
       nameFi?: string | null;
-      unit?: {
-        __typename?: "UnitNode";
-        id: string;
-        pk?: number | null;
-        nameFi?: string | null;
-      } | null;
+      unit?: { id: string; pk?: number | null; nameFi?: string | null } | null;
     };
   }>;
   ageGroup?: {
-    __typename?: "AgeGroupNode";
     id: string;
     pk?: number | null;
     minimum: number;
@@ -5624,7 +5407,6 @@ export type ApplicationSectionFragmentFragment = {
 };
 
 export type ApplicationSectionUiFragmentFragment = {
-  __typename?: "ApplicationSectionNode";
   id: string;
   pk?: number | null;
   name: string;
@@ -5636,7 +5418,6 @@ export type ApplicationSectionUiFragmentFragment = {
   appliedReservationsPerWeek: number;
   reservationMinDuration: number;
   suitableTimeRanges: Array<{
-    __typename?: "SuitableTimeRangeNode";
     id: string;
     pk?: number | null;
     beginTime: string;
@@ -5645,7 +5426,6 @@ export type ApplicationSectionUiFragmentFragment = {
     priority: Priority;
   }>;
   purpose?: {
-    __typename?: "ReservationPurposeNode";
     id: string;
     pk?: number | null;
     nameFi?: string | null;
@@ -5653,19 +5433,16 @@ export type ApplicationSectionUiFragmentFragment = {
     nameEn?: string | null;
   } | null;
   reservationUnitOptions: Array<{
-    __typename?: "ReservationUnitOptionNode";
     id: string;
     pk?: number | null;
     preferredOrder: number;
     reservationUnit: {
-      __typename?: "ReservationUnitNode";
       id: string;
       pk?: number | null;
       nameFi?: string | null;
       nameEn?: string | null;
       nameSv?: string | null;
       unit?: {
-        __typename?: "UnitNode";
         id: string;
         pk?: number | null;
         nameFi?: string | null;
@@ -5673,20 +5450,14 @@ export type ApplicationSectionUiFragmentFragment = {
         nameSv?: string | null;
       } | null;
       applicationRoundTimeSlots: Array<{
-        __typename?: "ApplicationRoundTimeSlotNode";
         id: string;
         weekday: number;
         closed: boolean;
-        reservableTimes?: Array<{
-          __typename?: "TimeSlotType";
-          begin: string;
-          end: string;
-        } | null> | null;
+        reservableTimes?: Array<{ begin: string; end: string } | null> | null;
       }>;
     };
   }>;
   ageGroup?: {
-    __typename?: "AgeGroupNode";
     id: string;
     pk?: number | null;
     minimum: number;
@@ -5695,11 +5466,9 @@ export type ApplicationSectionUiFragmentFragment = {
 };
 
 export type ApplicantFragmentFragment = {
-  __typename?: "ApplicationNode";
   applicantType?: ApplicantTypeChoice | null;
   additionalInformation?: string | null;
   contactPerson?: {
-    __typename?: "PersonNode";
     id: string;
     pk?: number | null;
     firstName: string;
@@ -5708,7 +5477,6 @@ export type ApplicantFragmentFragment = {
     phoneNumber?: string | null;
   } | null;
   organisation?: {
-    __typename?: "OrganisationNode";
     id: string;
     pk?: number | null;
     name: string;
@@ -5717,7 +5485,6 @@ export type ApplicantFragmentFragment = {
     coreBusiness: string;
     yearEstablished?: number | null;
     address?: {
-      __typename?: "AddressNode";
       id: string;
       pk?: number | null;
       postCode: string;
@@ -5726,7 +5493,6 @@ export type ApplicantFragmentFragment = {
     } | null;
   } | null;
   homeCity?: {
-    __typename?: "CityNode";
     id: string;
     pk?: number | null;
     nameFi?: string | null;
@@ -5734,7 +5500,6 @@ export type ApplicantFragmentFragment = {
     nameSv?: string | null;
   } | null;
   billingAddress?: {
-    __typename?: "AddressNode";
     id: string;
     pk?: number | null;
     postCode: string;
@@ -5742,7 +5507,6 @@ export type ApplicantFragmentFragment = {
     city: string;
   } | null;
   user?: {
-    __typename?: "ApplicantNode";
     id: string;
     name?: string | null;
     email: string;
@@ -5751,7 +5515,6 @@ export type ApplicantFragmentFragment = {
 };
 
 export type ApplicationRoundFragmentFragment = {
-  __typename?: "ApplicationRoundNode";
   id: string;
   pk?: number | null;
   nameFi?: string | null;
@@ -5766,13 +5529,11 @@ export type ApplicationRoundFragmentFragment = {
   reservationUnitCount?: number | null;
   statusTimestamp?: string | null;
   serviceSector?: {
-    __typename?: "ServiceSectorNode";
     id: string;
     pk?: number | null;
     nameFi?: string | null;
   } | null;
   reservationUnits: Array<{
-    __typename?: "ReservationUnitNode";
     id: string;
     pk?: number | null;
     nameFi?: string | null;
@@ -5781,7 +5542,6 @@ export type ApplicationRoundFragmentFragment = {
     minPersons?: number | null;
     maxPersons?: number | null;
     images: Array<{
-      __typename?: "ReservationUnitImageNode";
       id: string;
       imageUrl?: string | null;
       largeUrl?: string | null;
@@ -5790,7 +5550,6 @@ export type ApplicationRoundFragmentFragment = {
       imageType: ImageType;
     }>;
     unit?: {
-      __typename?: "UnitNode";
       id: string;
       pk?: number | null;
       nameFi?: string | null;
@@ -5801,21 +5560,14 @@ export type ApplicationRoundFragmentFragment = {
 };
 
 export type ApplicationAdminFragmentFragment = {
-  __typename?: "ApplicationNode";
   pk?: number | null;
   id: string;
   status?: ApplicationStatusChoice | null;
   lastModifiedDate: string;
   applicantType?: ApplicantTypeChoice | null;
   additionalInformation?: string | null;
-  applicationRound: {
-    __typename?: "ApplicationRoundNode";
-    id: string;
-    pk?: number | null;
-    nameFi?: string | null;
-  };
+  applicationRound: { id: string; pk?: number | null; nameFi?: string | null };
   applicationSections?: Array<{
-    __typename?: "ApplicationSectionNode";
     id: string;
     allocations?: number | null;
     pk?: number | null;
@@ -5828,25 +5580,18 @@ export type ApplicationAdminFragmentFragment = {
     appliedReservationsPerWeek: number;
     reservationMinDuration: number;
     reservationUnitOptions: Array<{
-      __typename?: "ReservationUnitOptionNode";
       id: string;
       rejected: boolean;
       pk?: number | null;
       preferredOrder: number;
-      allocatedTimeSlots: Array<{
-        __typename?: "AllocatedTimeSlotNode";
-        pk?: number | null;
-        id: string;
-      }>;
+      allocatedTimeSlots: Array<{ pk?: number | null; id: string }>;
       reservationUnit: {
-        __typename?: "ReservationUnitNode";
         id: string;
         pk?: number | null;
         nameFi?: string | null;
         nameEn?: string | null;
         nameSv?: string | null;
         unit?: {
-          __typename?: "UnitNode";
           id: string;
           pk?: number | null;
           nameFi?: string | null;
@@ -5854,20 +5599,14 @@ export type ApplicationAdminFragmentFragment = {
           nameSv?: string | null;
         } | null;
         applicationRoundTimeSlots: Array<{
-          __typename?: "ApplicationRoundTimeSlotNode";
           id: string;
           weekday: number;
           closed: boolean;
-          reservableTimes?: Array<{
-            __typename?: "TimeSlotType";
-            begin: string;
-            end: string;
-          } | null> | null;
+          reservableTimes?: Array<{ begin: string; end: string } | null> | null;
         }>;
       };
     }>;
     suitableTimeRanges: Array<{
-      __typename?: "SuitableTimeRangeNode";
       id: string;
       pk?: number | null;
       beginTime: string;
@@ -5876,7 +5615,6 @@ export type ApplicationAdminFragmentFragment = {
       priority: Priority;
     }>;
     purpose?: {
-      __typename?: "ReservationPurposeNode";
       id: string;
       pk?: number | null;
       nameFi?: string | null;
@@ -5884,7 +5622,6 @@ export type ApplicationAdminFragmentFragment = {
       nameEn?: string | null;
     } | null;
     ageGroup?: {
-      __typename?: "AgeGroupNode";
       id: string;
       pk?: number | null;
       minimum: number;
@@ -5892,7 +5629,6 @@ export type ApplicationAdminFragmentFragment = {
     } | null;
   }> | null;
   contactPerson?: {
-    __typename?: "PersonNode";
     id: string;
     pk?: number | null;
     firstName: string;
@@ -5901,7 +5637,6 @@ export type ApplicationAdminFragmentFragment = {
     phoneNumber?: string | null;
   } | null;
   organisation?: {
-    __typename?: "OrganisationNode";
     id: string;
     pk?: number | null;
     name: string;
@@ -5910,7 +5645,6 @@ export type ApplicationAdminFragmentFragment = {
     coreBusiness: string;
     yearEstablished?: number | null;
     address?: {
-      __typename?: "AddressNode";
       id: string;
       pk?: number | null;
       postCode: string;
@@ -5919,7 +5653,6 @@ export type ApplicationAdminFragmentFragment = {
     } | null;
   } | null;
   homeCity?: {
-    __typename?: "CityNode";
     id: string;
     pk?: number | null;
     nameFi?: string | null;
@@ -5927,7 +5660,6 @@ export type ApplicationAdminFragmentFragment = {
     nameSv?: string | null;
   } | null;
   billingAddress?: {
-    __typename?: "AddressNode";
     id: string;
     pk?: number | null;
     postCode: string;
@@ -5935,7 +5667,6 @@ export type ApplicationAdminFragmentFragment = {
     city: string;
   } | null;
   user?: {
-    __typename?: "ApplicantNode";
     id: string;
     name?: string | null;
     email: string;
@@ -5944,7 +5675,6 @@ export type ApplicationAdminFragmentFragment = {
 };
 
 export type ApplicationCommonFragment = {
-  __typename?: "ApplicationNode";
   id: string;
   pk?: number | null;
   status?: ApplicationStatusChoice | null;
@@ -5952,7 +5682,6 @@ export type ApplicationCommonFragment = {
   applicantType?: ApplicantTypeChoice | null;
   additionalInformation?: string | null;
   applicationRound: {
-    __typename?: "ApplicationRoundNode";
     id: string;
     pk?: number | null;
     nameFi?: string | null;
@@ -5967,13 +5696,11 @@ export type ApplicationCommonFragment = {
     reservationUnitCount?: number | null;
     statusTimestamp?: string | null;
     serviceSector?: {
-      __typename?: "ServiceSectorNode";
       id: string;
       pk?: number | null;
       nameFi?: string | null;
     } | null;
     reservationUnits: Array<{
-      __typename?: "ReservationUnitNode";
       id: string;
       pk?: number | null;
       nameFi?: string | null;
@@ -5982,7 +5709,6 @@ export type ApplicationCommonFragment = {
       minPersons?: number | null;
       maxPersons?: number | null;
       images: Array<{
-        __typename?: "ReservationUnitImageNode";
         id: string;
         imageUrl?: string | null;
         largeUrl?: string | null;
@@ -5991,7 +5717,6 @@ export type ApplicationCommonFragment = {
         imageType: ImageType;
       }>;
       unit?: {
-        __typename?: "UnitNode";
         id: string;
         pk?: number | null;
         nameFi?: string | null;
@@ -6001,7 +5726,6 @@ export type ApplicationCommonFragment = {
     }>;
   };
   applicationSections?: Array<{
-    __typename?: "ApplicationSectionNode";
     id: string;
     pk?: number | null;
     name: string;
@@ -6013,7 +5737,6 @@ export type ApplicationCommonFragment = {
     appliedReservationsPerWeek: number;
     reservationMinDuration: number;
     suitableTimeRanges: Array<{
-      __typename?: "SuitableTimeRangeNode";
       id: string;
       pk?: number | null;
       beginTime: string;
@@ -6022,7 +5745,6 @@ export type ApplicationCommonFragment = {
       priority: Priority;
     }>;
     purpose?: {
-      __typename?: "ReservationPurposeNode";
       id: string;
       pk?: number | null;
       nameFi?: string | null;
@@ -6030,19 +5752,16 @@ export type ApplicationCommonFragment = {
       nameEn?: string | null;
     } | null;
     reservationUnitOptions: Array<{
-      __typename?: "ReservationUnitOptionNode";
       id: string;
       pk?: number | null;
       preferredOrder: number;
       reservationUnit: {
-        __typename?: "ReservationUnitNode";
         id: string;
         pk?: number | null;
         nameFi?: string | null;
         nameEn?: string | null;
         nameSv?: string | null;
         unit?: {
-          __typename?: "UnitNode";
           id: string;
           pk?: number | null;
           nameFi?: string | null;
@@ -6050,20 +5769,14 @@ export type ApplicationCommonFragment = {
           nameSv?: string | null;
         } | null;
         applicationRoundTimeSlots: Array<{
-          __typename?: "ApplicationRoundTimeSlotNode";
           id: string;
           weekday: number;
           closed: boolean;
-          reservableTimes?: Array<{
-            __typename?: "TimeSlotType";
-            begin: string;
-            end: string;
-          } | null> | null;
+          reservableTimes?: Array<{ begin: string; end: string } | null> | null;
         }>;
       };
     }>;
     ageGroup?: {
-      __typename?: "AgeGroupNode";
       id: string;
       pk?: number | null;
       minimum: number;
@@ -6071,7 +5784,6 @@ export type ApplicationCommonFragment = {
     } | null;
   }> | null;
   contactPerson?: {
-    __typename?: "PersonNode";
     id: string;
     pk?: number | null;
     firstName: string;
@@ -6080,7 +5792,6 @@ export type ApplicationCommonFragment = {
     phoneNumber?: string | null;
   } | null;
   organisation?: {
-    __typename?: "OrganisationNode";
     id: string;
     pk?: number | null;
     name: string;
@@ -6089,7 +5800,6 @@ export type ApplicationCommonFragment = {
     coreBusiness: string;
     yearEstablished?: number | null;
     address?: {
-      __typename?: "AddressNode";
       id: string;
       pk?: number | null;
       postCode: string;
@@ -6098,7 +5808,6 @@ export type ApplicationCommonFragment = {
     } | null;
   } | null;
   homeCity?: {
-    __typename?: "CityNode";
     id: string;
     pk?: number | null;
     nameFi?: string | null;
@@ -6106,7 +5815,6 @@ export type ApplicationCommonFragment = {
     nameSv?: string | null;
   } | null;
   billingAddress?: {
-    __typename?: "AddressNode";
     id: string;
     pk?: number | null;
     postCode: string;
@@ -6114,7 +5822,6 @@ export type ApplicationCommonFragment = {
     city: string;
   } | null;
   user?: {
-    __typename?: "ApplicantNode";
     id: string;
     name?: string | null;
     email: string;
@@ -6127,9 +5834,7 @@ export type ApplicationQueryVariables = Exact<{
 }>;
 
 export type ApplicationQuery = {
-  __typename?: "Query";
   application?: {
-    __typename?: "ApplicationNode";
     id: string;
     pk?: number | null;
     status?: ApplicationStatusChoice | null;
@@ -6137,7 +5842,6 @@ export type ApplicationQuery = {
     applicantType?: ApplicantTypeChoice | null;
     additionalInformation?: string | null;
     applicationRound: {
-      __typename?: "ApplicationRoundNode";
       id: string;
       pk?: number | null;
       nameFi?: string | null;
@@ -6152,7 +5856,6 @@ export type ApplicationQuery = {
       reservationUnitCount?: number | null;
       statusTimestamp?: string | null;
       termsOfUse?: {
-        __typename?: "TermsOfUseNode";
         id: string;
         pk?: string | null;
         termsType: TermsType;
@@ -6164,13 +5867,11 @@ export type ApplicationQuery = {
         textSv?: string | null;
       } | null;
       serviceSector?: {
-        __typename?: "ServiceSectorNode";
         id: string;
         pk?: number | null;
         nameFi?: string | null;
       } | null;
       reservationUnits: Array<{
-        __typename?: "ReservationUnitNode";
         id: string;
         pk?: number | null;
         nameFi?: string | null;
@@ -6179,7 +5880,6 @@ export type ApplicationQuery = {
         minPersons?: number | null;
         maxPersons?: number | null;
         images: Array<{
-          __typename?: "ReservationUnitImageNode";
           id: string;
           imageUrl?: string | null;
           largeUrl?: string | null;
@@ -6188,7 +5888,6 @@ export type ApplicationQuery = {
           imageType: ImageType;
         }>;
         unit?: {
-          __typename?: "UnitNode";
           id: string;
           pk?: number | null;
           nameFi?: string | null;
@@ -6198,7 +5897,6 @@ export type ApplicationQuery = {
       }>;
     };
     applicationSections?: Array<{
-      __typename?: "ApplicationSectionNode";
       id: string;
       pk?: number | null;
       name: string;
@@ -6210,7 +5908,6 @@ export type ApplicationQuery = {
       appliedReservationsPerWeek: number;
       reservationMinDuration: number;
       suitableTimeRanges: Array<{
-        __typename?: "SuitableTimeRangeNode";
         id: string;
         pk?: number | null;
         beginTime: string;
@@ -6219,7 +5916,6 @@ export type ApplicationQuery = {
         priority: Priority;
       }>;
       purpose?: {
-        __typename?: "ReservationPurposeNode";
         id: string;
         pk?: number | null;
         nameFi?: string | null;
@@ -6227,19 +5923,16 @@ export type ApplicationQuery = {
         nameEn?: string | null;
       } | null;
       reservationUnitOptions: Array<{
-        __typename?: "ReservationUnitOptionNode";
         id: string;
         pk?: number | null;
         preferredOrder: number;
         reservationUnit: {
-          __typename?: "ReservationUnitNode";
           id: string;
           pk?: number | null;
           nameFi?: string | null;
           nameEn?: string | null;
           nameSv?: string | null;
           unit?: {
-            __typename?: "UnitNode";
             id: string;
             pk?: number | null;
             nameFi?: string | null;
@@ -6247,12 +5940,10 @@ export type ApplicationQuery = {
             nameSv?: string | null;
           } | null;
           applicationRoundTimeSlots: Array<{
-            __typename?: "ApplicationRoundTimeSlotNode";
             id: string;
             weekday: number;
             closed: boolean;
             reservableTimes?: Array<{
-              __typename?: "TimeSlotType";
               begin: string;
               end: string;
             } | null> | null;
@@ -6260,7 +5951,6 @@ export type ApplicationQuery = {
         };
       }>;
       ageGroup?: {
-        __typename?: "AgeGroupNode";
         id: string;
         pk?: number | null;
         minimum: number;
@@ -6268,7 +5958,6 @@ export type ApplicationQuery = {
       } | null;
     }> | null;
     contactPerson?: {
-      __typename?: "PersonNode";
       id: string;
       pk?: number | null;
       firstName: string;
@@ -6277,7 +5966,6 @@ export type ApplicationQuery = {
       phoneNumber?: string | null;
     } | null;
     organisation?: {
-      __typename?: "OrganisationNode";
       id: string;
       pk?: number | null;
       name: string;
@@ -6286,7 +5974,6 @@ export type ApplicationQuery = {
       coreBusiness: string;
       yearEstablished?: number | null;
       address?: {
-        __typename?: "AddressNode";
         id: string;
         pk?: number | null;
         postCode: string;
@@ -6295,7 +5982,6 @@ export type ApplicationQuery = {
       } | null;
     } | null;
     homeCity?: {
-      __typename?: "CityNode";
       id: string;
       pk?: number | null;
       nameFi?: string | null;
@@ -6303,7 +5989,6 @@ export type ApplicationQuery = {
       nameSv?: string | null;
     } | null;
     billingAddress?: {
-      __typename?: "AddressNode";
       id: string;
       pk?: number | null;
       postCode: string;
@@ -6311,7 +5996,6 @@ export type ApplicationQuery = {
       city: string;
     } | null;
     user?: {
-      __typename?: "ApplicantNode";
       id: string;
       name?: string | null;
       email: string;
@@ -6321,7 +6005,6 @@ export type ApplicationQuery = {
 };
 
 export type ReserveeNameFieldsFragment = {
-  __typename?: "ReservationNode";
   reserveeFirstName?: string | null;
   reserveeLastName?: string | null;
   reserveeEmail?: string | null;
@@ -6332,7 +6015,6 @@ export type ReserveeNameFieldsFragment = {
 };
 
 export type ReserveeBillingFieldsFragment = {
-  __typename?: "ReservationNode";
   reserveeId?: string | null;
   reserveeIsUnregisteredAssociation?: boolean | null;
   reserveeAddressStreet?: string | null;
@@ -6348,14 +6030,12 @@ export type ReserveeBillingFieldsFragment = {
 };
 
 export type TermsOfUseNameFieldsFragment = {
-  __typename?: "TermsOfUseNode";
   nameFi?: string | null;
   nameEn?: string | null;
   nameSv?: string | null;
 };
 
 export type TermsOfUseTextFieldsFragment = {
-  __typename?: "TermsOfUseNode";
   id: string;
   textFi?: string | null;
   textEn?: string | null;
@@ -6363,7 +6043,6 @@ export type TermsOfUseTextFieldsFragment = {
 };
 
 export type TermsOfUseFieldsFragment = {
-  __typename?: "TermsOfUseNode";
   pk?: string | null;
   termsType: TermsType;
   nameFi?: string | null;
@@ -6376,7 +6055,6 @@ export type TermsOfUseFieldsFragment = {
 };
 
 export type PricingFieldsFragment = {
-  __typename?: "ReservationUnitPricingNode";
   id: string;
   begins: string;
   priceUnit: PriceUnit;
@@ -6384,16 +6062,10 @@ export type PricingFieldsFragment = {
   lowestPrice: string;
   highestPrice: string;
   status: Status;
-  taxPercentage: {
-    __typename?: "TaxPercentageNode";
-    id: string;
-    pk?: number | null;
-    value: string;
-  };
+  taxPercentage: { id: string; pk?: number | null; value: string };
 };
 
 export type ImageFragmentFragment = {
-  __typename?: "ReservationUnitImageNode";
   id: string;
   imageUrl?: string | null;
   largeUrl?: string | null;
@@ -6403,7 +6075,6 @@ export type ImageFragmentFragment = {
 };
 
 export type LocationFieldsFragment = {
-  __typename?: "LocationNode";
   id: string;
   addressStreetFi?: string | null;
   addressZip: string;
@@ -6411,7 +6082,6 @@ export type LocationFieldsFragment = {
 };
 
 export type LocationFieldsI18nFragment = {
-  __typename?: "LocationNode";
   addressStreetEn?: string | null;
   addressStreetSv?: string | null;
   addressCityEn?: string | null;
@@ -6423,7 +6093,6 @@ export type LocationFieldsI18nFragment = {
 };
 
 export type BannerNotificationCommonFragment = {
-  __typename?: "BannerNotificationNode";
   id: string;
   level: BannerNotificationLevel;
   activeFrom?: string | null;
@@ -6438,13 +6107,9 @@ export type TermsOfUseQueryVariables = Exact<{
 }>;
 
 export type TermsOfUseQuery = {
-  __typename?: "Query";
   termsOfUse?: {
-    __typename?: "TermsOfUseNodeConnection";
     edges: Array<{
-      __typename?: "TermsOfUseNodeEdge";
       node?: {
-        __typename?: "TermsOfUseNode";
         id: string;
         pk?: string | null;
         termsType: TermsType;

@@ -139,7 +139,7 @@ const usePermission = () => {
     hasSomePermission,
     hasAnyPermission,
     hasUnitPermission: (permission: Permission, unit: UnitPermissionFragment) =>
-      hasUnitPermission(user, permission, unit),
+      user != null && hasUnitPermission(user, permission, unit),
     hasApplicationRoundPermission,
   };
 };

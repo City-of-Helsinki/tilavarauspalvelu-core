@@ -18,6 +18,7 @@ export const RESERVATION_UNIT_FRAGMENT = gql`
     id
     pk
     nameFi
+    minPersons
     maxPersons
     bufferTimeBefore
     bufferTimeAfter

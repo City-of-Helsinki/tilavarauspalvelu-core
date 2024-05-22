@@ -5,7 +5,8 @@ import { type FetchResult } from "@apollo/client";
 import {
   useUpdateApplicationWorkingMemoMutation,
   useUpdateReservationWorkingMemoMutation,
-  type Mutation,
+  type UpdateReservationWorkingMemoMutation,
+  type UpdateApplicationWorkingMemoMutation,
 } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { useNotification } from "@/context/NotificationContext";
@@ -23,7 +24,14 @@ function WorkingMemo({
   onSuccess,
 }: {
   initialValue: string;
-  onMutate: (memo: string) => Promise<FetchResult<Mutation>>;
+  onMutate: (
+    memo: string
+  ) => Promise<
+    FetchResult<
+      | UpdateReservationWorkingMemoMutation
+      | UpdateApplicationWorkingMemoMutation
+    >
+  >;
   onSuccess: () => void;
 }) {
   const [workingMemo, setWorkingMemo] = useState<string>(initialValue);
@@ -39,10 +47,16 @@ function WorkingMemo({
         throw new Error(res.errors[0].message);
       }
       const { data } = res;
-      if (
-        data?.updateReservationWorkingMemo == null &&
-        data?.updateApplication == null
-      ) {
+      if (data == null) {
+        throw new Error("No data returned");
+      }
+      const mutRes =
+        "updateReservationWorkingMemo" in data
+          ? data.updateReservationWorkingMemo
+          : "updateApplication" in data
+            ? data.updateApplication
+            : null;
+      if (mutRes?.pk == null) {
         throw new Error("No data returned");
       }
       notifySuccess(t("RequestedReservation.savedWorkingMemo"));

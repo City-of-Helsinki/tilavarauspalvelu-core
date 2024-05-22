@@ -11,7 +11,7 @@ export function flattenMetadata(
     | ReservationFormType
     | RecurringReservationForm
     | ReservationChangeFormType,
-  metadataSetFields: ReservationMetadataFieldNode[]
+  metadataSetFields: Pick<ReservationMetadataFieldNode, "fieldName">[]
 ) {
   const fieldNames = metadataSetFields.map((f) => f.fieldName).map(camelCase);
   // TODO don't use pick
