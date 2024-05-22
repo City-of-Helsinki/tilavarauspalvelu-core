@@ -7,6 +7,7 @@ from django.db import models
 from django.http import FileResponse
 from django.utils.safestring import SafeString, mark_safe
 from django.utils.translation import gettext_lazy as _
+from rangefilter.filters import DateTimeRangeFilter
 
 from common.admin.forms import SQLLogAdminForm
 from common.admin.forms.sql_log import RequestLogAdminForm, SQLLogAdminInlineForm
@@ -34,6 +35,7 @@ class SQLLogAdmin(admin.ModelAdmin):
     list_filter = [
         "request_log__path",
         "succeeded",
+        ("request_log__created", DateTimeRangeFilter),
     ]
     search_fields = [
         "sql",
@@ -110,6 +112,7 @@ class RequestLogAdmin(admin.ModelAdmin):
     ]
     list_filter = [
         "path",
+        ("created", DateTimeRangeFilter),
     ]
     search_fields = [
         "request_id",
