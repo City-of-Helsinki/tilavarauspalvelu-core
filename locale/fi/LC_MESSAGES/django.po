@@ -758,7 +758,7 @@ msgstr "Pyydetty aloitusaika allokaatioille."
 msgid "Requested end time for allocations."
 msgstr "Pyydetty lopetusaika allokaatioille."
 
-#: applications/apps.py applications/tasks.py
+#: applications/apps.py
 msgid "Seasonal Booking"
 msgstr "Kausivaraus"
 
@@ -1104,11 +1104,11 @@ msgstr "Rajapintakyselyn ID"
 msgid "Path"
 msgstr "Polku"
 
-#: common/admin/forms/sql_log.py
+#: common/admin/forms/sql_log.py common/admin/sql_log.py
 msgid "Body"
 msgstr "Sisältö"
 
-#: common/admin/forms/sql_log.py
+#: common/admin/forms/sql_log.py common/admin/sql_log.py
 msgid "Duration (ms)"
 msgstr "Kesto (ms)"
 
@@ -1142,6 +1142,10 @@ msgstr "Milloin SQL-kysely suoritettiin."
 #: common/admin/sql_log.py
 msgid "Queries"
 msgstr "Tietokantakyselyjä"
+
+#: common/admin/sql_log.py
+msgid "Export rows to CSV"
+msgstr "Vie lokit CSV tiedostoon"
 
 #: common/choices/banner_notification.py
 msgid "Exception"
