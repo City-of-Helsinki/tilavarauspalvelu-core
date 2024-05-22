@@ -21,7 +21,7 @@ import {
   type ReservationNode,
   type ReservationUnitNode,
   ReservationKind,
-  type ReservationStartInterval,
+  ReservationStartInterval,
 } from "../../types/gql-types";
 import {
   type CalendarEventBuffer,
@@ -230,7 +230,6 @@ export const isRangeReservable = ({
   reservationsMinDaysBefore = 0,
   reservationsMaxDaysBefore = 0,
   activeApplicationRounds = [],
-  reservationStartInterval,
 }: {
   range: Date[];
   reservableTimeSpans: ReservableTimeSpanType[];
@@ -239,9 +238,12 @@ export const isRangeReservable = ({
   reservationBegins?: Date;
   reservationEnds?: Date;
   activeApplicationRounds: RoundPeriod[];
-  reservationStartInterval: ReservationStartInterval;
 }): boolean => {
-  const slots = generateSlots(range[0], range[1], reservationStartInterval);
+  const slots = generateSlots(
+    range[0],
+    range[1],
+    ReservationStartInterval.Interval_15Mins
+  );
 
   if (
     !slots.every((slot) =>

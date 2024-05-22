@@ -294,7 +294,6 @@ export function isReservationReservable({
       reservationsMaxDaysBefore: reservationsMaxDaysBefore ?? 0,
       reservationsMinDaysBefore: reservationsMinDaysBefore ?? 0,
       activeApplicationRounds,
-      reservationStartInterval,
     })
   ) {
     return false;
