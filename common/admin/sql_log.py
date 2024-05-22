@@ -1,16 +1,19 @@
 import uuid
 
 import sqlparse
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.core.handlers.wsgi import WSGIRequest
 from django.db import models
+from django.http import FileResponse
 from django.utils.safestring import SafeString, mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from common.admin.forms import SQLLogAdminForm
 from common.admin.forms.sql_log import RequestLogAdminForm, SQLLogAdminInlineForm
+from common.exporter.sql_log_exporter import SQLLogCSVExporter
 from common.models import RequestLog, SQLLog
 from common.querysets.sql_log import RequestLogQuerySet, SQLLogQuerySet
+from utils.sentry import SentryLogger
 
 
 @admin.register(SQLLog)
@@ -113,6 +116,9 @@ class RequestLogAdmin(admin.ModelAdmin):
         "path",
         "body",
     ]
+    actions = [
+        "export_results_to_csv",
+    ]
 
     @admin.display(description=_("Queries"), ordering="queries")
     def num_of_sql_logs(self, obj: RequestLog) -> int:
@@ -146,3 +152,18 @@ class RequestLogAdmin(admin.ModelAdmin):
 
     def has_change_permission(self, request: WSGIRequest, obj: SQLLog | None = None) -> bool:
         return False
+
+    @admin.action(description=_("Export rows to CSV"))
+    def export_results_to_csv(self, request: WSGIRequest, queryset: RequestLogQuerySet) -> FileResponse | None:
+        exporter = SQLLogCSVExporter(queryset=queryset)
+        try:
+            response = exporter.export_as_file_response()
+        except Exception as err:
+            self.message_user(request, f"Error while exporting results: {err}", level=messages.ERROR)
+            SentryLogger.log_exception(err, "Error while exporting SQL log results")
+            return None
+
+        if not response:
+            self.message_user(request, "No data to export.", level=messages.WARNING)
+
+        return response
