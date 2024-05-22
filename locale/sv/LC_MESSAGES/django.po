@@ -721,7 +721,7 @@ msgstr ""
 msgid "Requested end time for allocations."
 msgstr ""
 
-#: applications/apps.py applications/tasks.py
+#: applications/apps.py
 msgid "Seasonal Booking"
 msgstr ""
 
@@ -1050,11 +1050,11 @@ msgstr ""
 msgid "Path"
 msgstr ""
 
-#: common/admin/forms/sql_log.py
+#: common/admin/forms/sql_log.py common/admin/sql_log.py
 msgid "Body"
 msgstr ""
 
-#: common/admin/forms/sql_log.py
+#: common/admin/forms/sql_log.py common/admin/sql_log.py
 msgid "Duration (ms)"
 msgstr ""
 
@@ -1085,6 +1085,10 @@ msgstr ""
 
 #: common/admin/sql_log.py
 msgid "Queries"
+msgstr ""
+
+#: common/admin/sql_log.py
+msgid "Export rows to CSV"
 msgstr ""
 
 #: common/choices/banner_notification.py
