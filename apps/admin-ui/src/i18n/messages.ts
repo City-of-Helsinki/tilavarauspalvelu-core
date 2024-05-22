@@ -920,12 +920,12 @@ const translations: ITranslations = {
     descriptionLinkHref: ["https://asiointi.hel.fi/tprperhe/etusivu/"],
     filters: {
       nameLabel: ["Toimipisteen nimi"],
-      serviceSector: ["Palvelu"],
-      serviceSectorTag: ["Palvelu: {{value}}"],
+      unitGroup: ["Toimipisteryhmä"],
+      unitGroupTag: ["Toimipisteryhmä: {{value}}"],
     },
     headings: {
       name: ["Toimipisteen nimi"],
-      serviceSector: ["Palvelu"],
+      unitGroup: ["Toimipisteryhmä"],
       reservationUnitCount: ["Varausyksiköitä"],
     },
   },

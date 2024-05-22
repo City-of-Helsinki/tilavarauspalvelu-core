@@ -1880,6 +1880,7 @@ export type Query = {
   taxPercentages?: Maybe<TaxPercentageNodeConnection>;
   termsOfUse?: Maybe<TermsOfUseNodeConnection>;
   unit?: Maybe<UnitNode>;
+  unitGroups?: Maybe<UnitGroupNodeConnection>;
   units?: Maybe<UnitNodeConnection>;
   user?: Maybe<UserNode>;
 };
@@ -2429,6 +2430,14 @@ export type QueryTermsOfUseArgs = {
 
 export type QueryUnitArgs = {
   id: Scalars["ID"]["input"];
+};
+
+export type QueryUnitGroupsArgs = {
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  last?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type QueryUnitsArgs = {
@@ -4907,6 +4916,22 @@ export type UnitGroupNodeUnitsArgs = {
   serviceSector?: InputMaybe<Scalars["Decimal"]["input"]>;
 };
 
+export type UnitGroupNodeConnection = {
+  /** Contains the nodes in this connection. */
+  edges: Array<Maybe<UnitGroupNodeEdge>>;
+  /** Pagination data for this connection. */
+  pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]["output"]>;
+};
+
+/** A Relay edge containing a `UnitGroupNode` and its cursor. */
+export type UnitGroupNodeEdge = {
+  /** A cursor for use in pagination */
+  cursor: Scalars["String"]["output"];
+  /** The item at the end of the edge */
+  node?: Maybe<UnitGroupNode>;
+};
+
 export type UnitNode = Node & {
   description: Scalars["String"]["output"];
   descriptionEn?: Maybe<Scalars["String"]["output"]>;
@@ -4931,6 +4956,7 @@ export type UnitNode = Node & {
   shortDescriptionSv?: Maybe<Scalars["String"]["output"]>;
   spaces: Array<SpaceNode>;
   tprekId?: Maybe<Scalars["String"]["output"]>;
+  unitGroups: Array<UnitGroupNode>;
   webPage: Scalars["String"]["output"];
 };
 
@@ -5032,6 +5058,10 @@ export enum UnitOrderingChoices {
   RankDesc = "rankDesc",
   ReservationCountAsc = "reservationCountAsc",
   ReservationCountDesc = "reservationCountDesc",
+  ReservationUnitsCountAsc = "reservationUnitsCountAsc",
+  ReservationUnitsCountDesc = "reservationUnitsCountDesc",
+  UnitGroupNameAsc = "unitGroupNameAsc",
+  UnitGroupNameDesc = "unitGroupNameDesc",
 }
 
 /** An enumeration. */

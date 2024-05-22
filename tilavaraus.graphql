@@ -2655,6 +2655,13 @@ type Query {
     """
     id: ID!
   ): UnitNode
+  unitGroups(
+    after: String
+    before: String
+    first: Int
+    last: Int
+    offset: Int
+  ): UnitGroupNodeConnection
   units(
     after: String
     before: String
@@ -5552,6 +5559,32 @@ type UnitGroupNode implements Node {
   ): [UnitNode!]!
 }
 
+type UnitGroupNodeConnection {
+  """
+  Contains the nodes in this connection.
+  """
+  edges: [UnitGroupNodeEdge]!
+  """
+  Pagination data for this connection.
+  """
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+"""
+A Relay edge containing a `UnitGroupNode` and its cursor.
+"""
+type UnitGroupNodeEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+  """
+  The item at the end of the edge
+  """
+  node: UnitGroupNode
+}
+
 type UnitNode implements Node {
   description: String!
   descriptionEn: String
@@ -5648,6 +5681,7 @@ type UnitNode implements Node {
     pk: [Int]
   ): [SpaceNode!]!
   tprekId: String
+  unitGroups: [UnitGroupNode!]!
   webPage: String!
 }
 
@@ -5693,6 +5727,10 @@ enum UnitOrderingChoices {
   rankDesc
   reservationCountAsc
   reservationCountDesc
+  reservationUnitsCountAsc
+  reservationUnitsCountDesc
+  unitGroupNameAsc
+  unitGroupNameDesc
 }
 
 """

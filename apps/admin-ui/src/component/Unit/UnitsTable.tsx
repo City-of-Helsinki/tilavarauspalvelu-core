@@ -43,10 +43,20 @@ function getColConfig(t: TFunction, isMyUnits?: boolean): ColumnType[] {
     {
       headerName: t("Units.headings.reservationUnitCount"),
       key: "typeFi",
-      isSortable: false,
+      isSortable: true,
       transform: (unit: UnitType) => (
         <> {unit?.reservationunitSet?.length ?? 0} </>
       ),
+      width: "25%",
+    },
+    {
+      headerName: t("Units.headings.unitGroup"),
+      key: "unitGroup",
+      isSortable: true,
+      transform: (unit: UnitType) =>
+        (unit?.unitGroups || [])
+          .map((unitGroup) => unitGroup?.nameFi)
+          .join(","),
       width: "25%",
     },
   ];

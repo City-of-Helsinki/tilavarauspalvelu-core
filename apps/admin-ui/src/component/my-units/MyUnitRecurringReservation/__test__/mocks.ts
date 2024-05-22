@@ -121,6 +121,15 @@ const unitResponse: ReservationUnitNode = {
         name: "service sector",
       },
     ],
+    unitGroups: [
+      {
+        id: "1",
+        pk: 1,
+        name: "unit group",
+        nameFi: "Unit group",
+        units: [],
+      },
+    ],
   },
   metadataSet: {
     id: "1",

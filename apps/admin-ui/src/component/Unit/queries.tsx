@@ -19,6 +19,10 @@ export const UNITS_QUERY = gql`
           id
           nameFi
           pk
+          unitGroups {
+            id
+            nameFi
+          }
           reservationunitSet {
             id
             pk
