@@ -1,6 +1,5 @@
 import uuid
 
-from assertpy import assert_that
 from django.test import override_settings
 from django.test.testcases import TestCase
 
@@ -57,9 +56,9 @@ class UnitMerchantUpdateTestCase(TestCase):
         reservation_unit_2.refresh_from_db()
         reservation_unit_3.refresh_from_db()
 
-        assert_that(reservation_unit_1.payment_product).is_not_none()
-        assert_that(reservation_unit_2.payment_product).is_none()
-        assert_that(reservation_unit_3.payment_product).is_not_none()
+        assert reservation_unit_1.payment_product is not None
+        assert reservation_unit_2.payment_product is None
+        assert reservation_unit_3.payment_product is not None
 
         product_id_1 = reservation_unit_1.payment_product.pk
         product_id_3 = reservation_unit_3.payment_product.pk
@@ -71,8 +70,8 @@ class UnitMerchantUpdateTestCase(TestCase):
         reservation_unit_2.refresh_from_db()
         reservation_unit_3.refresh_from_db()
 
-        assert_that(reservation_unit_1.payment_product).is_not_none()
-        assert_that(reservation_unit_1.payment_product.pk).is_not_equal_to(product_id_1)
-        assert_that(reservation_unit_2.payment_product).is_none()
-        assert_that(reservation_unit_3.payment_product).is_not_none()
-        assert_that(reservation_unit_3.payment_product.pk).is_equal_to(product_id_3)
+        assert reservation_unit_1.payment_product is not None
+        assert reservation_unit_1.payment_product.pk != product_id_1
+        assert reservation_unit_2.payment_product is None
+        assert reservation_unit_3.payment_product is not None
+        assert reservation_unit_3.payment_product.pk == product_id_3

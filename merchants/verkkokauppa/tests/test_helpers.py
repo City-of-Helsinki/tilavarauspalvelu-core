@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 
 import pytest
-from assertpy import assert_that
 from django.test import TestCase
 from django.utils import timezone
 from freezegun import freeze_time
@@ -40,25 +39,25 @@ class HelpersTestCase(TestCase):
         self.reservation.save()
 
         date = get_formatted_reservation_time(self.reservation)
-        assert_that(date).is_equal_to("La 5.11.2022 10:00-12:00")
+        assert date == "La 5.11.2022 10:00-12:00"
 
     def test_get_formatted_reservation_time_sv(self):
         self.reservation.reservee_language = "sv"
         self.reservation.save()
 
         date = get_formatted_reservation_time(self.reservation)
-        assert_that(date).is_equal_to("Lö 5.11.2022 10:00-12:00")
+        assert date == "Lö 5.11.2022 10:00-12:00"
 
     def test_get_formatted_reservation_time_en(self):
         self.reservation.reservee_language = "en"
         self.reservation.save()
 
         date = get_formatted_reservation_time(self.reservation)
-        assert_that(date).is_equal_to("Sa 5.11.2022 10:00-12:00")
+        assert date == "Sa 5.11.2022 10:00-12:00"
 
     def test_get_formatted_reservation_time_fi_fallback(self):
         date = get_formatted_reservation_time(self.reservation)
-        assert_that(date).is_equal_to("La 5.11.2022 10:00-12:00")
+        assert date == "La 5.11.2022 10:00-12:00"
 
     @patch_method(VerkkokauppaAPIClient.create_order)
     def test_get_verkkokauppa_order_params_respect_reservee_language(self):
@@ -97,10 +96,10 @@ class HelpersTestCase(TestCase):
     def test_get_meta_label_returns_label_with_supported_key(self):
         period_label = get_meta_label("reservationPeriod", self.reservation)
         number_label = get_meta_label("reservationNumber", self.reservation)
-        assert_that(period_label).is_equal_to("Varausaika")
-        assert_that(number_label).is_equal_to("Varausnumero")
+        assert period_label == "Varausaika"
+        assert number_label == "Varausnumero"
 
     def test_get_meta_label_raises_exception_with_unsupported_key(self):
         with pytest.raises(UnsupportedMetaKeyError) as err:
             get_meta_label("unsupported", self.reservation)
-        assert_that(str(err.value)).is_equal_to("Invalid meta label key 'unsupported'")
+        assert str(err.value) == "Invalid meta label key 'unsupported'"

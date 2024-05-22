@@ -1,7 +1,6 @@
 import datetime
 from decimal import Decimal
 
-from assertpy import assert_that
 from django.test import TestCase
 from django.utils.timezone import get_default_timezone
 
@@ -56,74 +55,70 @@ class ReservationStatisticsCreateTestCase(TestCase):
 
     def test_statistics_create_on_creation(self):
         self.reservation.save()
-        assert_that(ReservationStatistic.objects.count()).is_equal_to(1)
+        assert ReservationStatistic.objects.count() == 1
 
         stat = ReservationStatistic.objects.first()
-        assert_that(stat.reservation).is_equal_to(self.reservation)
-        assert_that(stat.reservation_created_at).is_equal_to(self.reservation.created_at)
-        assert_that(stat.reservation_handled_at).is_equal_to(self.reservation.handled_at)
-        assert_that(stat.reservation_confirmed_at).is_equal_to(self.reservation.confirmed_at)
-        assert_that(stat.reservee_type).is_equal_to(self.reservation.reservee_type)
-        assert_that(stat.applying_for_free_of_charge).is_equal_to(self.reservation.applying_for_free_of_charge)
-        assert_that(stat.reservee_language).is_equal_to(self.reservation.reservee_language)
-        assert_that(stat.num_persons).is_equal_to(self.reservation.num_persons)
-        assert_that(stat.home_city).is_equal_to(self.reservation.home_city)
-        assert_that(stat.home_city_name).is_equal_to(self.reservation.home_city.name)
-        assert_that(stat.home_city_municipality_code).is_equal_to(self.reservation.home_city.municipality_code)
-        assert_that(stat.purpose).is_equal_to(self.reservation.purpose)
-        assert_that(stat.purpose_name).is_equal_to(self.reservation.purpose.name)
-        assert_that(stat.age_group).is_equal_to(self.reservation.age_group)
-        assert_that(stat.age_group_name).is_equal_to(str(self.reservation.age_group))
-        assert_that(stat.is_applied).is_false()
-        assert_that(stat.ability_group).is_not_none()
-        assert_that(stat.begin).is_equal_to(self.reservation.begin)
-        assert_that(stat.end).is_equal_to(self.reservation.end)
-        assert_that(stat.duration_minutes).is_equal_to(120)
-        assert_that(stat.reservation_type).is_equal_to(self.reservation.type)
-        assert_that(stat.state).is_equal_to(self.reservation.state)
-        assert_that(stat.cancel_reason).is_equal_to(self.reservation.cancel_reason)
-        assert_that(stat.cancel_reason_text).is_equal_to("")
-        assert_that(stat.deny_reason).is_equal_to(self.reservation.deny_reason)
-        assert_that(stat.deny_reason_text).is_equal_to("")
-        assert_that(stat.price).is_equal_to(self.reservation.price)
-        assert_that(stat.tax_percentage_value).is_equal_to(self.reservation.tax_percentage_value)
-        assert_that(stat.reservation_stats_reservation_units.first().reservation_unit).is_equal_to(
-            self.reservation_unit
-        )
-        assert_that(stat.reservation_stats_reservation_units.count()).is_equal_to(1)
-        assert_that(stat.primary_reservation_unit_name).is_equal_to(self.reservation_unit.name)
-        assert_that(stat.primary_unit_name).is_equal_to(self.reservation_unit.unit.name)
-        assert_that(stat.primary_reservation_unit).is_equal_to(self.reservation_unit)
-        assert_that(stat.primary_unit_tprek_id).is_equal_to(self.reservation_unit.unit.tprek_id)
-        assert_that(stat.ability_group_name).is_empty()
-        assert_that(stat.is_subsidised).is_true()
-        assert_that(stat.non_subsidised_price).is_equal_to(self.reservation.non_subsidised_price)
-        assert_that(stat.non_subsidised_price_net).is_equal_to(self.reservation.non_subsidised_price_net)
-        assert_that(stat.is_recurring).is_true()
-        assert_that(stat.recurrence_begin_date).is_equal_to(self.recurring.begin_date)
-        assert_that(stat.recurrence_end_date).is_equal_to(self.recurring.end_date)
-        assert_that(stat.recurrence_uuid).is_equal_to(str(self.recurring.uuid))
-        assert_that(stat.reservee_uuid).is_equal_to(str(self.reservation.user.tvp_uuid))
-        assert_that(stat.price_net).is_equal_to(self.reservation.price_net)
-        assert_that(stat.reservee_is_unregistered_association).is_equal_to(
-            self.reservation.reservee_is_unregistered_association
-        )
-        assert_that(stat.buffer_time_before).is_equal_to(self.reservation.buffer_time_before)
-        assert_that(stat.buffer_time_after).is_equal_to(self.reservation.buffer_time_after)
+        assert stat.reservation == self.reservation
+        assert stat.reservation_created_at == self.reservation.created_at
+        assert stat.reservation_handled_at == self.reservation.handled_at
+        assert stat.reservation_confirmed_at == self.reservation.confirmed_at
+        assert stat.reservee_type == self.reservation.reservee_type
+        assert stat.applying_for_free_of_charge == self.reservation.applying_for_free_of_charge
+        assert stat.reservee_language == self.reservation.reservee_language
+        assert stat.num_persons == self.reservation.num_persons
+        assert stat.home_city == self.reservation.home_city
+        assert stat.home_city_name == self.reservation.home_city.name
+        assert stat.home_city_municipality_code == self.reservation.home_city.municipality_code
+        assert stat.purpose == self.reservation.purpose
+        assert stat.purpose_name == self.reservation.purpose.name
+        assert stat.age_group == self.reservation.age_group
+        assert stat.age_group_name == str(self.reservation.age_group)
+        assert stat.is_applied is False
+        assert stat.ability_group is not None
+        assert stat.begin == self.reservation.begin
+        assert stat.end == self.reservation.end
+        assert stat.duration_minutes == 120
+        assert stat.reservation_type == self.reservation.type
+        assert stat.state == self.reservation.state
+        assert stat.cancel_reason == self.reservation.cancel_reason
+        assert stat.cancel_reason_text == ""
+        assert stat.deny_reason == self.reservation.deny_reason
+        assert stat.deny_reason_text == ""
+        assert stat.price == self.reservation.price
+        assert stat.tax_percentage_value == self.reservation.tax_percentage_value
+        assert stat.reservation_stats_reservation_units.first().reservation_unit == self.reservation_unit
+        assert stat.reservation_stats_reservation_units.count() == 1
+        assert stat.primary_reservation_unit_name == self.reservation_unit.name
+        assert stat.primary_unit_name == self.reservation_unit.unit.name
+        assert stat.primary_reservation_unit == self.reservation_unit
+        assert stat.primary_unit_tprek_id == self.reservation_unit.unit.tprek_id
+        assert not stat.ability_group_name
+        assert stat.is_subsidised is True
+        assert stat.non_subsidised_price == self.reservation.non_subsidised_price
+        assert stat.non_subsidised_price_net == self.reservation.non_subsidised_price_net
+        assert stat.is_recurring is True
+        assert stat.recurrence_begin_date == self.recurring.begin_date
+        assert stat.recurrence_end_date == self.recurring.end_date
+        assert stat.recurrence_uuid == str(self.recurring.uuid)
+        assert stat.reservee_uuid == str(self.reservation.user.tvp_uuid)
+        assert stat.price_net == self.reservation.price_net
+        assert stat.reservee_is_unregistered_association == self.reservation.reservee_is_unregistered_association
+        assert stat.buffer_time_before == self.reservation.buffer_time_before
+        assert stat.buffer_time_after == self.reservation.buffer_time_after
 
     def test_statistics_update_on_when_updating(self):
         self.reservation.purpose = ReservationPurposeFactory(name="Syy")
         self.reservation.save()
 
         stat = ReservationStatistic.objects.first()
-        assert_that(stat.purpose).is_equal_to(self.reservation.purpose)
+        assert stat.purpose == self.reservation.purpose
 
     def test_cancel_reason_text(self):
         self.reservation.cancel_reason = ReservationCancelReasonFactory(reason="cancel")
         self.reservation.save()
 
         stat = ReservationStatistic.objects.first()
-        assert_that(stat.cancel_reason_text).is_equal_to("cancel")
+        assert stat.cancel_reason_text == "cancel"
 
     def test_reservation_units_removed(self):
         self.reservation.reservation_unit.remove(self.reservation_unit)
@@ -132,9 +127,9 @@ class ReservationStatisticsCreateTestCase(TestCase):
         self.reservation.save()
 
         stat = ReservationStatistic.objects.first()
-        assert_that(stat.reservation_stats_reservation_units.count()).is_equal_to(1)
-        assert_that(stat.reservation_stats_reservation_units.first().reservation_unit).is_equal_to(resu)
-        assert_that(stat.primary_reservation_unit_name).is_equal_to(resu.name)
-        assert_that(stat.primary_unit_name).is_equal_to(resu.unit.name)
-        assert_that(stat.primary_reservation_unit).is_equal_to(resu)
-        assert_that(stat.primary_unit_tprek_id).is_equal_to(resu.unit.tprek_id)
+        assert stat.reservation_stats_reservation_units.count() == 1
+        assert stat.reservation_stats_reservation_units.first().reservation_unit == resu
+        assert stat.primary_reservation_unit_name == resu.name
+        assert stat.primary_unit_name == resu.unit.name
+        assert stat.primary_reservation_unit == resu
+        assert stat.primary_unit_tprek_id == resu.unit.tprek_id

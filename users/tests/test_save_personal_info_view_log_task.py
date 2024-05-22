@@ -1,4 +1,3 @@
-from assertpy import assert_that
 from django.test import TestCase
 
 from tests.factories import UserFactory
@@ -19,7 +18,7 @@ class SavePersonalInfoViewLogTaskTestCase(TestCase):
     def test_save_personal_info_view_log_as_own_user_does_not_save(self):
         save_personal_info_view_log(self.user.id, self.user.id, "first_name")
 
-        assert_that(PersonalInfoViewLog.objects.exists()).is_false()
+        assert PersonalInfoViewLog.objects.exists() is False
 
     def test_save_personal_info_view_log_as_other_user_saves(self):
         other = UserFactory.create(
@@ -31,11 +30,11 @@ class SavePersonalInfoViewLogTaskTestCase(TestCase):
 
         save_personal_info_view_log(self.user.id, other.id, "first_name")
 
-        assert_that(PersonalInfoViewLog.objects.exists()).is_true()
+        assert PersonalInfoViewLog.objects.exists() is True
         view_log = PersonalInfoViewLog.objects.first()
 
-        assert_that(view_log.user).is_equal_to(self.user)
-        assert_that(view_log.viewer_user).is_equal_to(other)
-        assert_that(view_log.viewer_username).is_equal_to(other.username)
-        assert_that(view_log.field).is_equal_to("first_name")
-        assert_that(view_log.viewer_user_full_name).is_equal_to(other.get_full_name())
+        assert view_log.user == self.user
+        assert view_log.viewer_user == other
+        assert view_log.viewer_username == other.username
+        assert view_log.field == "first_name"
+        assert view_log.viewer_user_full_name == other.get_full_name()

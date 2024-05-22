@@ -1,4 +1,3 @@
-from assertpy import assert_that
 from django.test.testcases import TestCase
 
 from reservations.models import ReservationStatistic
@@ -16,14 +15,14 @@ class ReservationSignalTestCase(TestCase):
         reservation = ReservationFactory(name="Test reservation", reservation_unit=[self.reservation_unit])
         statistics = ReservationStatistic.objects.first()
 
-        assert_that(reservation).is_not_none()
-        assert_that(statistics).is_not_none()
+        assert reservation is not None
+        assert statistics is not None
 
-        assert_that(statistics.reservation).is_equal_to(reservation)
-        assert_that(statistics.primary_reservation_unit).is_equal_to(self.reservation_unit)
-        assert_that(statistics.primary_reservation_unit_name).is_equal_to(self.reservation_unit.name)
-        assert_that(statistics.primary_unit_name).is_equal_to(self.unit.name)
-        assert_that(statistics.primary_unit_tprek_id).is_none()
+        assert statistics.reservation == reservation
+        assert statistics.primary_reservation_unit == self.reservation_unit
+        assert statistics.primary_reservation_unit_name == self.reservation_unit.name
+        assert statistics.primary_unit_name == self.unit.name
+        assert statistics.primary_unit_tprek_id is None
 
     def test_updating_reservation_updates_statistics(self):
         new_unit = UnitFactory(name="Another unit")
@@ -35,11 +34,11 @@ class ReservationSignalTestCase(TestCase):
 
         statistics = ReservationStatistic.objects.first()
 
-        assert_that(reservation).is_not_none()
-        assert_that(statistics).is_not_none()
+        assert reservation is not None
+        assert statistics is not None
 
-        assert_that(statistics.reservation).is_equal_to(reservation)
-        assert_that(statistics.primary_reservation_unit).is_equal_to(new_reservation_unit)
-        assert_that(statistics.primary_reservation_unit_name).is_equal_to(new_reservation_unit.name)
-        assert_that(statistics.primary_unit_name).is_equal_to(new_unit.name)
-        assert_that(statistics.primary_unit_tprek_id).is_none()
+        assert statistics.reservation == reservation
+        assert statistics.primary_reservation_unit == new_reservation_unit
+        assert statistics.primary_reservation_unit_name == new_reservation_unit.name
+        assert statistics.primary_unit_name == new_unit.name
+        assert statistics.primary_unit_tprek_id is None
