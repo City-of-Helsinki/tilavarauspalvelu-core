@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from assertpy import assert_that
+import pytest
 from django.conf import settings
 from django.test.testcases import TestCase
 
@@ -75,7 +75,7 @@ class MerchantTypesTestCase(MerchantTypesBaseTestCase):
             shop_id="test-shop-id",
         )
         actual = MerchantInfo.from_json(self.get_merchant_response)
-        assert_that(actual).is_equal_to(expected)
+        assert actual == expected
 
     def test_merchant_from_json(self):
         expected = Merchant(
@@ -95,7 +95,7 @@ class MerchantTypesTestCase(MerchantTypesBaseTestCase):
             shop_id="test-shop-id",
         )
         actual = Merchant.from_json(self.mutation_merchant_response)
-        assert_that(expected).is_equal_to(actual)
+        assert expected == actual
 
     def test_merchant_from_json_empty_configurations(self):
         expected = Merchant(
@@ -118,12 +118,13 @@ class MerchantTypesTestCase(MerchantTypesBaseTestCase):
         response["configurations"] = []
 
         actual = Merchant.from_json(response)
-        assert_that(expected).is_equal_to(actual)
+        assert expected == actual
 
     def test_merchant_from_json_missing_field(self):
         response = self.mutation_merchant_response.copy()
         response.pop("merchantId")
-        assert_that(Merchant.from_json).raises(ParseMerchantError).when_called_with(response)
+        with pytest.raises(ParseMerchantError):
+            Merchant.from_json(response)
 
     def test_create_merchant_params_to_json(self):
         params = CreateMerchantParams(
@@ -154,7 +155,7 @@ class MerchantTypesTestCase(MerchantTypesBaseTestCase):
             "merchantShopId": "test-shop-id",
         }
 
-        assert_that(params.to_json()).is_equal_to(expected)
+        assert params.to_json() == expected
 
     def test_update_merchant_params_to_json(self):
         params = UpdateMerchantParams(
@@ -183,4 +184,4 @@ class MerchantTypesTestCase(MerchantTypesBaseTestCase):
             "merchantShopId": "test-shop-id",
         }
 
-        assert_that(params.to_json()).is_equal_to(expected)
+        assert params.to_json() == expected

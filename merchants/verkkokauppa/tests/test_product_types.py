@@ -1,7 +1,6 @@
 import uuid
 
 import pytest
-from assertpy import assert_that
 from django.test.testcases import TestCase
 
 from merchants.verkkokauppa.product.exceptions import ParseAccountingError, ParseProductError
@@ -26,7 +25,7 @@ class ProductTypesTestCase(TestCase):
             "namespaceEntityId": params.namespace_entity_id,
             "merchantId": str(params.merchant_id),
         }
-        assert_that(json).is_equal_to(expected)
+        assert json == expected
 
     def test_product_from_json(self):
         json = {
@@ -42,7 +41,7 @@ class ProductTypesTestCase(TestCase):
             namespace_entity_id=json["namespaceEntityId"],
             merchant_id=uuid.UUID(json["merchantId"]),
         )
-        assert_that(product).is_equal_to(expected)
+        assert product == expected
 
     def test_product_from_json_raises_exception_if_key_is_missing(self):
         with pytest.raises(ParseProductError):
@@ -85,7 +84,7 @@ class ProductTypesTestCase(TestCase):
             "mainLedgerAccount": params.main_ledger_account,
             "balanceProfitCenter": "2983300",
         }
-        assert_that(json).is_equal_to(expected)
+        assert json == expected
 
     def test_create_or_update_accounting_params_to_json_drops_null_fields(self):
         params = CreateOrUpdateAccountingParams(
@@ -106,7 +105,7 @@ class ProductTypesTestCase(TestCase):
             "mainLedgerAccount": params.main_ledger_account,
             "balanceProfitCenter": "2983300",
         }
-        assert_that(json).is_equal_to(expected)
+        assert json == expected
 
     def test_accounting_from_json(self):
         json = {
@@ -132,7 +131,7 @@ class ProductTypesTestCase(TestCase):
             main_ledger_account=json["mainLedgerAccount"],
             balance_profit_center=json["balanceProfitCenter"],
         )
-        assert_that(accounting).is_equal_to(expected)
+        assert accounting == expected
 
     def test_accounting_from_json_raises_exception_if_key_is_missing(self):
         with pytest.raises(ParseAccountingError):

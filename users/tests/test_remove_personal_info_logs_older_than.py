@@ -1,4 +1,3 @@
-from assertpy import assert_that
 from django.test import TestCase
 from freezegun import freeze_time
 
@@ -33,16 +32,16 @@ class RemovePersonalInfoViewLogsOlderThanTestCase(TestCase):
     def test_remove_personal_info_view_logs_older_than_removes_older_than_two_years(
         self,
     ):
-        assert_that(PersonalInfoViewLog.objects.exists()).is_true()
+        assert PersonalInfoViewLog.objects.exists() is True
 
         remove_personal_info_view_logs_older_than()
 
-        assert_that(PersonalInfoViewLog.objects.exists()).is_false()
+        assert PersonalInfoViewLog.objects.exists() is False
 
     @freeze_time("2023-02-22 06:00")
     def test_remove_old_personal_info_view_logs_task_removes_older_than_two_years(self):
-        assert_that(PersonalInfoViewLog.objects.exists()).is_true()
+        assert PersonalInfoViewLog.objects.exists() is True
 
         remove_old_personal_info_view_logs()
 
-        assert_that(PersonalInfoViewLog.objects.exists()).is_false()
+        assert PersonalInfoViewLog.objects.exists() is False

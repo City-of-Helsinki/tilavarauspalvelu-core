@@ -2,7 +2,6 @@ import datetime
 import io
 
 import pytest
-from assertpy import assert_that
 from rest_framework.reverse import reverse
 
 from api.legacy_rest_api.utils import hmac_signature
@@ -24,10 +23,10 @@ def test_getting_reservation_calendar(user_api_client, reservation, reservation_
     expected_start = f"DTSTART:{reservation.begin.astimezone(datetime.UTC).strftime('%Y%m%dT%H%M%SZ')}"
     unexpected_start = f"DTSTART:{reservation_in_second_unit.begin.astimezone(datetime.UTC).strftime('%Y%m%dT%H%M%SZ')}"
 
-    assert_that(zip_content).contains(expected_summary)
-    assert_that(zip_content).contains(expected_description)
-    assert_that(zip_content).contains(expected_start)
-    assert_that(zip_content).does_not_contain(unexpected_start)
+    assert expected_summary in zip_content
+    assert expected_description in zip_content
+    assert expected_start in zip_content
+    assert unexpected_start not in zip_content
 
 
 def test_getting_reservation_calendar_without_hash(user_api_client, reservation):
