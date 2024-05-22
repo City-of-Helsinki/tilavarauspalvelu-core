@@ -1,8 +1,10 @@
 import uuid
 
+import sqlparse
 from django.contrib import admin
 from django.core.handlers.wsgi import WSGIRequest
 from django.db import models
+from django.utils.safestring import SafeString, mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from common.admin.forms import SQLLogAdminForm
@@ -18,13 +20,12 @@ class SQLLogAdmin(admin.ModelAdmin):
         "_sql",
         "_path",
         "_request_id",
-        "duration_ns",
-        "succeeded",
+        "_duration_ms",
     ]
     readonly_fields = [
-        "sql",
+        "_sql",
         "request_log",
-        "duration_ns",
+        "_duration_ms",
         "succeeded",
     ]
     list_filter = [
@@ -42,9 +43,9 @@ class SQLLogAdmin(admin.ModelAdmin):
         return super().get_queryset(request).select_related("request_log")
 
     @admin.display(description=_("SQL"), ordering="sql")
-    def _sql(self, obj: SQLLog) -> str:
-        length = 97
-        return obj.sql[:length] + ("..." if len(obj.sql) > length else "")
+    def _sql(self, obj: SQLLog) -> SafeString:
+        sql = sqlparse.format(obj.sql, reindent=True, keyword_case="upper")
+        return mark_safe(f"<pre>{sql}</pre>")  # noqa: S308  # nosec  # NOSONAR
 
     @admin.display(description=_("Path"), ordering="request_log__path")
     def _path(self, obj: SQLLog) -> str:
@@ -53,6 +54,11 @@ class SQLLogAdmin(admin.ModelAdmin):
     @admin.display(description=_("Request ID"), ordering="request_log__request_id")
     def _request_id(self, obj: SQLLog) -> uuid.UUID:
         return obj.request_log.request_id
+
+    @admin.display(description=_("Duration (ms)"), ordering="duration_ns")
+    def _duration_ms(self, obj: SQLLog) -> str:
+        value = obj.duration_ns / 1_000_000
+        return f"~{value:_.2f}".replace("_", " ")
 
     def has_add_permission(self, request: WSGIRequest) -> bool:
         return False
@@ -64,9 +70,15 @@ class SQLLogAdmin(admin.ModelAdmin):
 class SQLLogAdminInline(admin.TabularInline):
     model = SQLLog
     form = SQLLogAdminInlineForm
-    readonly_fields = ["sql", "duration_ns", "succeeded"]
+    readonly_fields = ["_sql"]
     extra = 0
     can_delete = False
+    show_change_link = True
+
+    @admin.display(description=_("SQL"), ordering="sql")
+    def _sql(self, obj: SQLLog) -> SafeString:
+        sql = sqlparse.format(obj.sql, reindent=True, keyword_case="upper")
+        return mark_safe(f"<pre>{sql}</pre>")  # noqa: S308  # nosec  # NOSONAR
 
     def has_add_permission(self, request: WSGIRequest, obj: SQLLog) -> bool:
         return False
@@ -83,14 +95,14 @@ class RequestLogAdmin(admin.ModelAdmin):
         "request_id",
         "path",
         "num_of_sql_logs",
-        "duration_ms",
+        "_duration_ms",
         "created",
     ]
     readonly_fields = [
         "request_id",
         "path",
-        "body",
-        "duration_ms",
+        "_body",
+        "_duration_ms",
         "created",
     ]
     list_filter = [
@@ -106,8 +118,28 @@ class RequestLogAdmin(admin.ModelAdmin):
     def num_of_sql_logs(self, obj: RequestLog) -> int:
         return getattr(obj, "queries", -1)
 
+    @admin.display(description=_("Duration (ms)"), ordering="total_duration")
+    def _duration_ms(self, obj: RequestLog) -> str:
+        if obj.duration_ms:
+            return f"{obj.duration_ms:_.2f}".replace("_", " ")
+
+        value = getattr(obj, "total_duration", 0) / 1_000_000
+        return f"~{value:_.2f}".replace("_", " ")
+
+    @admin.display(description=_("Body"), ordering="body")
+    def _body(self, obj: RequestLog) -> SafeString:
+        return mark_safe(f"<pre>{obj.body}</pre>")  # noqa: S308  # nosec  # NOSONAR
+
     def get_queryset(self, request: WSGIRequest) -> RequestLogQuerySet:
-        return super().get_queryset(request).prefetch_related("sql_logs").annotate(queries=models.Count("sql_logs"))
+        return (
+            super()
+            .get_queryset(request)
+            .prefetch_related("sql_logs")
+            .annotate(
+                queries=models.Count("sql_logs"),
+                total_duration=models.Sum("sql_logs__duration_ns"),
+            )
+        )
 
     def has_add_permission(self, request: WSGIRequest) -> bool:
         return False
