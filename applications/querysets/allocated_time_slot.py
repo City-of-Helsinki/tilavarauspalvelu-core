@@ -6,7 +6,6 @@ from django.db import models
 from lookup_property import L
 
 from common.date_utils import TimeSlot, merge_time_slots
-from common.db import ArrayUnnest
 
 if TYPE_CHECKING:
     import datetime
@@ -90,18 +89,13 @@ class AllocatedTimeSlotQuerySet(models.QuerySet):
         return (
             self.distinct()
             .alias(
-                _affecting_ids=models.Subquery(
-                    queryset=(
-                        ReservationUnit.objects.filter(id=reservation_unit)
-                        .with_reservation_unit_ids_affecting_reservations()
-                        .annotate(_found_ids=ArrayUnnest("reservation_units_affecting_reservations"))
-                        .values("_found_ids")
-                    )
-                )
+                affected_reservation_unit_ids=models.Subquery(
+                    queryset=ReservationUnit.objects.filter(id=reservation_unit).affected_reservation_unit_ids,
+                ),
             )
             .filter(
                 # Allocated to any reservation unit in the given one's "space hierarchy".
-                reservation_unit_option__reservation_unit__id__in=models.F("_affecting_ids"),
+                reservation_unit_option__reservation_unit__id__in=models.F("affected_reservation_unit_ids"),
                 # Allocation period overlaps with the given period.
                 reservation_unit_option__application_section__reservations_begin_date__lte=end_date,
                 reservation_unit_option__application_section__reservations_end_date__gte=begin_date,
