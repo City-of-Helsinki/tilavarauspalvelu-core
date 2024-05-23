@@ -188,11 +188,15 @@ const DialogContent = ({
         throw new Error("Deny PK undefined");
       }
 
+      const pks = filterNonNullable(reservations.map((x) => x.pk));
+      if (pks.length === 0) {
+        throw new Error("No reservation PKs found");
+      }
       setInProgress(true);
-      const denyPromises = reservations.map((x) =>
+      const denyPromises = pks.map((pk) =>
         denyReservation({
-          pk: x.pk,
-          denyReasonPk,
+          pk,
+          denyReason: denyReasonPk,
           handlingDetails,
         })
       );

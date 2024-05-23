@@ -92,11 +92,14 @@ const DialogContent = ({
   const priceIsValid = !hasPrice || !Number.isNaN(price);
 
   const handleApprove = () => {
+    if (reservation.pk == null) {
+      throw new Error("Reservation pk is missing");
+    }
     const taxP = reservation.taxPercentageValue ?? "0";
     approveReservation({
       pk: reservation.pk,
-      price: Number(price),
-      priceNet: calcPriceNet(Number(price), parseFloat(taxP)),
+      price: price.toString(),
+      priceNet: calcPriceNet(Number(price), parseFloat(taxP)).toString(),
       handlingDetails,
     });
   };

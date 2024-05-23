@@ -159,6 +159,34 @@ enum AllocatedTimeSlotOrderingChoices {
   applicationSectionStatusDesc
 }
 
+type ApplicantNode implements Node {
+  """
+  Antaa käyttäjälle kaikki oikeudet ilman, että niitä täytyy erikseen luetella.
+  """
+  isSuperuser: Boolean!
+
+  """
+  Vaaditaan. Enintään 150 merkkiä. Vain kirjaimet, numerot ja @/./+/-/_ ovat sallittuja.
+  """
+  username: String!
+  firstName: String!
+  lastName: String!
+  email: String!
+  uuid: UUID!
+  reservationNotification: String
+  dateOfBirth: Date
+  generalRoles: [GeneralRoleNode!]!
+  unitRoles: [UnitRoleNode!]!
+  serviceSectorRoles: [ServiceSectorRoleNode!]!
+
+  """The ID of the object"""
+  id: ID!
+  name: String
+  isAdAuthenticated: Boolean
+  isStronglyAuthenticated: Boolean
+  pk: Int
+}
+
 """An enumeration."""
 enum ApplicantTypeChoice {
   INDIVIDUAL
@@ -217,7 +245,7 @@ type ApplicationNode implements Node {
   applicationRound: ApplicationRoundNode!
   organisation: OrganisationNode
   contactPerson: PersonNode
-  user: UserNode
+  user: ApplicantNode
   billingAddress: AddressNode
   homeCity: CityNode
   applicationSections(
@@ -2490,42 +2518,30 @@ type ReservationAdjustTimeMutationPayload {
 }
 
 input ReservationApproveMutationInput {
-  pk: Int
-
-  """Additional information for approval."""
+  pk: Int!
+  price: Decimal!
+  priceNet: Decimal!
   handlingDetails: String!
-  price: Float!
-  priceNet: Float!
 }
 
 type ReservationApproveMutationPayload {
   pk: Int
-  state: State
-
-  """Additional information for approval."""
+  price: Decimal
+  priceNet: Decimal
   handlingDetails: String
+  state: State
   handledAt: DateTime
-  price: Float
-  priceNet: Float
 }
 
 input ReservationCancellationMutationInput {
   pk: Int!
-
-  """Primary key for the pre-defined cancel reason."""
-  cancelReasonPk: Int!
-
-  """Additional information for the cancellation."""
+  cancelReason: Int!
   cancelDetails: String
 }
 
 type ReservationCancellationMutationPayload {
   pk: Int
-
-  """Primary key for the pre-defined cancel reason."""
-  cancelReasonPk: Int
-
-  """Additional information for the cancellation."""
+  cancelReason: Int
   cancelDetails: String
   state: State
 }
@@ -2707,25 +2723,17 @@ type ReservationDeleteMutationPayload {
 }
 
 input ReservationDenyMutationInput {
-  pk: Int
-
-  """Additional information for denying."""
-  handlingDetails: String
-
-  """Primary key for the pre-defined deny reason."""
-  denyReasonPk: Int!
+  pk: Int!
+  denyReason: Int!
+  handlingDetails: String!
 }
 
 type ReservationDenyMutationPayload {
   pk: Int
-  state: State
-
-  """Additional information for denying."""
+  denyReason: Int
   handlingDetails: String
+  state: State
   handledAt: DateTime
-
-  """Primary key for the pre-defined deny reason."""
-  denyReasonPk: Int
 }
 
 type ReservationDenyReasonNode implements Node {
@@ -3036,7 +3044,7 @@ type ReservationRefundMutationPayload {
 }
 
 input ReservationRequiresHandlingMutationInput {
-  pk: Int
+  pk: Int!
 }
 
 type ReservationRequiresHandlingMutationPayload {

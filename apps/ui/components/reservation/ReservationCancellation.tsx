@@ -214,7 +214,7 @@ function ReservationCancellation(props: Props): JSX.Element {
         variables: {
           input: {
             pk: reservation.pk,
-            cancelReasonPk: reason,
+            cancelReason: reason,
             cancelDetails: description,
           },
         },

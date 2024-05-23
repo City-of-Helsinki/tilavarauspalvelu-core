@@ -54,6 +54,9 @@ const DialogContent = ({
   ) => backToRequireHandlingMutation({ variables: { input } });
 
   const handleClick = () => {
+    if (!reservation.pk) {
+      throw new Error("Reservation pk is missing");
+    }
     backToRequireHandling({ pk: reservation.pk });
   };
 

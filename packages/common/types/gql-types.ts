@@ -210,6 +210,29 @@ export enum AllocatedTimeSlotOrderingChoices {
   PkDesc = "pkDesc",
 }
 
+export type ApplicantNode = Node & {
+  __typename?: "ApplicantNode";
+  dateOfBirth?: Maybe<Scalars["Date"]["output"]>;
+  email: Scalars["String"]["output"];
+  firstName: Scalars["String"]["output"];
+  generalRoles: Array<GeneralRoleNode>;
+  /** The ID of the object */
+  id: Scalars["ID"]["output"];
+  isAdAuthenticated?: Maybe<Scalars["Boolean"]["output"]>;
+  isStronglyAuthenticated?: Maybe<Scalars["Boolean"]["output"]>;
+  /** Antaa käyttäjälle kaikki oikeudet ilman, että niitä täytyy erikseen luetella. */
+  isSuperuser: Scalars["Boolean"]["output"];
+  lastName: Scalars["String"]["output"];
+  name?: Maybe<Scalars["String"]["output"]>;
+  pk?: Maybe<Scalars["Int"]["output"]>;
+  reservationNotification?: Maybe<Scalars["String"]["output"]>;
+  serviceSectorRoles: Array<ServiceSectorRoleNode>;
+  unitRoles: Array<UnitRoleNode>;
+  /** Vaaditaan. Enintään 150 merkkiä. Vain kirjaimet, numerot ja @/./+/-/_ ovat sallittuja. */
+  username: Scalars["String"]["output"];
+  uuid: Scalars["UUID"]["output"];
+};
+
 /** An enumeration. */
 export enum ApplicantTypeChoice {
   Association = "ASSOCIATION",
@@ -279,7 +302,7 @@ export type ApplicationNode = Node & {
   pk?: Maybe<Scalars["Int"]["output"]>;
   sentDate?: Maybe<Scalars["DateTime"]["output"]>;
   status?: Maybe<ApplicationStatusChoice>;
-  user?: Maybe<UserNode>;
+  user?: Maybe<ApplicantNode>;
   workingMemo: Scalars["String"]["output"];
 };
 
@@ -2783,21 +2806,19 @@ export type ReservationAdjustTimeMutationPayload = {
 };
 
 export type ReservationApproveMutationInput = {
-  /** Additional information for approval. */
   handlingDetails: Scalars["String"]["input"];
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
-  price: Scalars["Float"]["input"];
-  priceNet: Scalars["Float"]["input"];
+  pk: Scalars["Int"]["input"];
+  price: Scalars["Decimal"]["input"];
+  priceNet: Scalars["Decimal"]["input"];
 };
 
 export type ReservationApproveMutationPayload = {
   __typename?: "ReservationApproveMutationPayload";
   handledAt?: Maybe<Scalars["DateTime"]["output"]>;
-  /** Additional information for approval. */
   handlingDetails?: Maybe<Scalars["String"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
-  price?: Maybe<Scalars["Float"]["output"]>;
-  priceNet?: Maybe<Scalars["Float"]["output"]>;
+  price?: Maybe<Scalars["Decimal"]["output"]>;
+  priceNet?: Maybe<Scalars["Decimal"]["output"]>;
   state?: Maybe<State>;
 };
 
@@ -2831,19 +2852,15 @@ export type ReservationCancelReasonNodeEdge = {
 };
 
 export type ReservationCancellationMutationInput = {
-  /** Additional information for the cancellation. */
   cancelDetails?: InputMaybe<Scalars["String"]["input"]>;
-  /** Primary key for the pre-defined cancel reason. */
-  cancelReasonPk: Scalars["Int"]["input"];
+  cancelReason: Scalars["Int"]["input"];
   pk: Scalars["Int"]["input"];
 };
 
 export type ReservationCancellationMutationPayload = {
   __typename?: "ReservationCancellationMutationPayload";
-  /** Additional information for the cancellation. */
   cancelDetails?: Maybe<Scalars["String"]["output"]>;
-  /** Primary key for the pre-defined cancel reason. */
-  cancelReasonPk?: Maybe<Scalars["Int"]["output"]>;
+  cancelReason?: Maybe<Scalars["Int"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
   state?: Maybe<State>;
 };
@@ -2996,19 +3013,15 @@ export type ReservationDeleteMutationPayload = {
 };
 
 export type ReservationDenyMutationInput = {
-  /** Primary key for the pre-defined deny reason. */
-  denyReasonPk: Scalars["Int"]["input"];
-  /** Additional information for denying. */
-  handlingDetails?: InputMaybe<Scalars["String"]["input"]>;
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
+  denyReason: Scalars["Int"]["input"];
+  handlingDetails: Scalars["String"]["input"];
+  pk: Scalars["Int"]["input"];
 };
 
 export type ReservationDenyMutationPayload = {
   __typename?: "ReservationDenyMutationPayload";
-  /** Primary key for the pre-defined deny reason. */
-  denyReasonPk?: Maybe<Scalars["Int"]["output"]>;
+  denyReason?: Maybe<Scalars["Int"]["output"]>;
   handledAt?: Maybe<Scalars["DateTime"]["output"]>;
-  /** Additional information for denying. */
   handlingDetails?: Maybe<Scalars["String"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
   state?: Maybe<State>;
@@ -3317,7 +3330,7 @@ export type ReservationRefundMutationPayload = {
 };
 
 export type ReservationRequiresHandlingMutationInput = {
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
+  pk: Scalars["Int"]["input"];
 };
 
 export type ReservationRequiresHandlingMutationPayload = {
