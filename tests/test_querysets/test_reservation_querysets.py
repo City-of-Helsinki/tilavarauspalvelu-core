@@ -5,6 +5,7 @@ from django.utils.timezone import get_current_timezone
 
 from opening_hours.utils.time_span_element import TimeSpanElement
 from reservation_units.models import ReservationUnit
+from reservation_units.utils.affecting_reservations_helper import AffectingReservationHelper
 from reservations.choices import ReservationStateChoice, ReservationTypeChoice
 from reservations.models import Reservation
 from tests.factories import ReservationFactory, ReservationUnitFactory, ResourceFactory, SpaceFactory, UnitFactory
@@ -43,7 +44,7 @@ def _create_test_reservations_for_all_reservation_units() -> None:
 
 
 def _validate_time_spans(
-    all_closed_time_spans: dict[int, list[TimeSpanElement]],
+    all_closed_time_spans: dict[int, set[TimeSpanElement]],
     reservation_unit_id: int,
     related_reservation_unit_ids: list[int],
 ) -> None:
@@ -87,11 +88,10 @@ def test__get_affecting_reservations__only_resources():
 
     _create_test_reservations_for_all_reservation_units()
 
-    all_closed_time_spans, _ = Reservation.objects.get_affecting_reservations_as_closed_time_spans(
-        reservation_unit_queryset=ReservationUnit.objects.all(),
+    all_closed_time_spans, _ = AffectingReservationHelper(
         start_date=_datetime(month=1).date(),
         end_date=_datetime(month=12).date(),
-    )
+    ).get_affecting_time_spans()
 
     _validate_time_spans(all_closed_time_spans, reservation_unit_1.pk, [reservation_unit_2.pk])
     _validate_time_spans(all_closed_time_spans, reservation_unit_2.pk, [reservation_unit_1.pk])
@@ -130,11 +130,10 @@ def test__get_affecting_reservations__only_spaces():
 
     _create_test_reservations_for_all_reservation_units()
 
-    all_closed_time_spans, _ = Reservation.objects.get_affecting_reservations_as_closed_time_spans(
-        reservation_unit_queryset=ReservationUnit.objects.all(),
+    all_closed_time_spans, _ = AffectingReservationHelper(
         start_date=_datetime(month=1).date(),
         end_date=_datetime(month=12).date(),
-    )
+    ).get_affecting_time_spans()
 
     _validate_time_spans(
         all_closed_time_spans,
@@ -242,11 +241,10 @@ def test__get_affecting_reservations__resources_and_spaces():
 
     _create_test_reservations_for_all_reservation_units()
 
-    all_closed_time_spans, _ = Reservation.objects.get_affecting_reservations_as_closed_time_spans(
-        reservation_unit_queryset=ReservationUnit.objects.all(),
+    all_closed_time_spans, _ = AffectingReservationHelper(
         start_date=_datetime(month=1).date(),
         end_date=_datetime(month=12).date(),
-    )
+    ).get_affecting_time_spans()
 
     _validate_time_spans(
         all_closed_time_spans,
