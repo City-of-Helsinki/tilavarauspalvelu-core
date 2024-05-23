@@ -15,16 +15,15 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
   const { t } = useTranslation();
 
   const id = base64encode(`ApplicationRoundNode:${pk}`);
+  const isValid = pk > 0;
   const { data, loading: isLoading } = useApplicationRoundQuery({
-    skip: !pk,
+    skip: !isValid,
     variables: { id },
     onError: () => {
       notifyError(t("errors.errorFetchingData"));
     },
   });
-
   const { applicationRound } = data ?? {};
-
   const { hasApplicationRoundPermission } = usePermission();
 
   if (isLoading) {
