@@ -32,11 +32,7 @@ class RequestLog(models.Model):
 
     @property
     def duration_str(self) -> str:
-        if self.duration_ms:
-            return f"{self.duration_ms:_.2f}".replace("_", " ")
-
-        value = self.sql_logs.aggregate(total=models.Sum("duration_ns"))["total"] / 1_000_000
-        return f"~{value:_.2f}".replace("_", " ")
+        return f"~{self.duration_ms:_.2f}".replace("_", " ")
 
 
 class SQLLog(models.Model):
@@ -59,4 +55,4 @@ class SQLLog(models.Model):
     @property
     def duration_str(self) -> str:
         value = self.duration_ns / 1_000_000
-        return f"{value:_.2f}".replace("_", " ")
+        return f"~{value:_.2f}".replace("_", " ")
