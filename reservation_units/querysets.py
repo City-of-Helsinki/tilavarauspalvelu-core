@@ -46,22 +46,57 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
         helper.calculate_all_first_reservable_times()
         return helper.get_annotated_queryset()
 
+    @property
+    def _related_space_ids(self) -> models.QuerySet[dict[str, int]]:
+        return (
+            Space.objects.filter(reservation_units__id=models.OuterRef("id"))
+            .with_family(include_self=True)
+            .annotate(all_families=ArrayUnnest("family"))
+            .values("all_families")
+        )
+
+    def with_affecting_spaces(self) -> Self:
+        """
+        Annotate the queryset with a list of distinct space ids of all spaces
+        that are either direct spaces of the reservation unit, or are
+        in the same space hierarchy with one of those spaces.
+        """
+        return self.annotate(
+            spaces_affecting_reservations=SubqueryArray(
+                queryset=self._related_space_ids,
+                agg_field="all_families",
+                distinct=True,
+            ),
+        )
+
     def with_affecting_spaces_alias(self) -> Self:
         return self.alias(
             spaces_affecting_reservations=models.Subquery(
-                queryset=(
-                    Space.objects.filter(reservation_units__id=models.OuterRef("id"))
-                    .with_family(include_self=True)
-                    .annotate(all_families=ArrayUnnest("family"))
-                    .values("all_families")
-                ),
+                queryset=self._related_space_ids,
+            ),
+        )
+
+    @property
+    def _related_resource_ids(self) -> models.QuerySet[dict[str, int]]:
+        return Resource.objects.filter(reservation_units__id=models.OuterRef("id")).values("id")
+
+    def with_affecting_resources(self) -> Self:
+        """
+        Annotate the queryset with a list of distinct resource ids of all resources
+        that are linked to the reservation unit.
+        """
+        return self.annotate(
+            resources_affecting_reservations=SubqueryArray(
+                queryset=self._related_resource_ids,
+                agg_field="id",
+                distinct=True,
             ),
         )
 
     def with_affecting_resources_alias(self) -> Self:
         return self.alias(
             resources_affecting_reservations=models.Subquery(
-                queryset=Resource.objects.filter(reservation_units__id=models.OuterRef("id")).values("id"),
+                queryset=self._related_resource_ids,
             ),
         )
 
@@ -77,7 +112,8 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
                     queryset=(
                         ReservationUnit.objects.distinct()
                         .filter(
-                            Q(spaces__in=models.OuterRef("spaces_affecting_reservations"))
+                            Q(id=models.OuterRef("id"))
+                            | Q(spaces__in=models.OuterRef("spaces_affecting_reservations"))
                             | Q(resources__in=models.OuterRef("resources_affecting_reservations"))
                         )
                         .values("id")
@@ -87,6 +123,14 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
             )
         )
 
+    @property
+    def related_reservation_unit_ids(self) -> models.QuerySet[dict[str, int]]:
+        return (
+            self.with_reservation_unit_ids_affecting_reservations()
+            .annotate(_found_ids=ArrayUnnest("reservation_units_affecting_reservations"))
+            .values("_found_ids")
+        )
+
     def reservation_units_with_common_hierarchy(self) -> Self:
         """
         Get a new queryset of reservation units that share a common hierarchy
@@ -94,12 +138,5 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
         """
         from reservation_units.models import ReservationUnit
 
-        return ReservationUnit.objects.alias(
-            _ids=models.Subquery(
-                queryset=(
-                    self.with_reservation_unit_ids_affecting_reservations()
-                    .annotate(_found_ids=ArrayUnnest("reservation_units_affecting_reservations"))
-                    .values("_found_ids")
-                )
-            )
-        ).filter(pk__in=models.F("_ids"))
+        ids = models.Subquery(self.related_reservation_unit_ids)
+        return ReservationUnit.objects.alias(ids=ids).filter(pk__in=models.F("ids"))
