@@ -39,7 +39,7 @@ import {
   getReservationApplicationMutationValues,
 } from "@/modules/reservation";
 import { ReservationProps } from "@/context/DataContext";
-import ReservationInfoCard from "@/components/reservation/ReservationInfoCard";
+import { ReservationInfoCard } from "@/components/reservation/ReservationInfoCard";
 import Step0 from "@/components/reservation/Step0";
 import Step1 from "@/components/reservation/Step1";
 import { ReservationStep } from "@/modules/types";
@@ -475,13 +475,17 @@ function ReservationUnitReservationWithReservationProp({
     return null;
   }
 
+  const infoReservation = {
+    ...reservation,
+    reservationUnit: reservationUnit != null ? [reservationUnit] : [],
+  };
+
   return (
     <StyledContainer>
       <Columns>
         <div>
           <ReservationInfoCard
-            reservation={reservation}
-            reservationUnit={reservationUnit}
+            reservation={infoReservation}
             type="pending"
             shouldDisplayReservationUnitPrice={
               shouldDisplayReservationUnitPrice

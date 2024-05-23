@@ -9,7 +9,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Container } from "common";
 import ReservationConfirmation from "@/components/reservation/ReservationConfirmation";
-import ReservationInfoCard from "@/components/reservation/ReservationInfoCard";
+import { ReservationInfoCard } from "@/components/reservation/ReservationInfoCard";
 import { Paragraph } from "@/components/reservation/styles";
 import { useOrder } from "@/hooks/reservation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
@@ -102,26 +102,17 @@ const ReservationSuccess = ({ reservationPk, apiBaseUrl }: Props) => {
     );
   }
 
-  const reservationUnit = reservation?.reservationUnit?.[0] ?? null;
-
   return (
     <StyledContainer size="s">
       <Columns>
         <div>
-          <ReservationInfoCard
-            reservation={reservation}
-            reservationUnit={reservationUnit}
-            type="confirmed"
-          />
+          <ReservationInfoCard reservation={reservation} type="confirmed" />
         </div>
-        {reservationUnit ? (
-          <ReservationConfirmation
-            apiBaseUrl={apiBaseUrl}
-            reservation={reservation}
-            reservationUnit={reservationUnit}
-            order={order}
-          />
-        ) : null}
+        <ReservationConfirmation
+          apiBaseUrl={apiBaseUrl}
+          reservation={reservation}
+          order={order}
+        />
       </Columns>
     </StyledContainer>
   );

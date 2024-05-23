@@ -23,7 +23,7 @@ import { filterNonNullable } from "common/src/helpers";
 import { useCurrentUser } from "@/hooks/user";
 import { getTranslation } from "../../modules/util";
 import Sanitize from "../common/Sanitize";
-import ReservationInfoCard from "./ReservationInfoCard";
+import { ReservationInfoCard } from "./ReservationInfoCard";
 import { EditStep0 } from "./EditStep0";
 import { EditStep1 } from "./EditStep1";
 import { reservationsPrefix } from "@/modules/const";
@@ -160,13 +160,14 @@ function BylineContent({
   const times = convertFormToApi(formValues);
   const modifiedReservation =
     times && step !== 0 ? { ...reservation, ...times } : reservation;
-  return (
-    <ReservationInfoCard
-      reservation={modifiedReservation}
-      reservationUnit={reservationUnit}
-      type="confirmed"
-    />
-  );
+
+  // NOTE have to do this manipualtion because the queries are separate in the SSR
+  // could fix it by combining them and querying reservation.reservationUnit instead
+  const info = {
+    ...modifiedReservation,
+    reservationUnit: [reservationUnit],
+  };
+  return <ReservationInfoCard reservation={info} type="confirmed" />;
 }
 function convertReservationEdit(
   reservation?: ReservationNodeT

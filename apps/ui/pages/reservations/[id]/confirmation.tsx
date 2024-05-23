@@ -6,7 +6,7 @@ import { breakpoints, Container } from "common";
 import ClientOnly from "common/src/ClientOnly";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import type { GetServerSidePropsContext } from "next";
-import ReservationInfoCard from "@/components/reservation/ReservationInfoCard";
+import { ReservationInfoCard } from "@/components/reservation/ReservationInfoCard";
 import ReservationConfirmation from "@/components/reservation/ReservationConfirmation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { base64encode } from "common/src/helpers";
@@ -58,7 +58,6 @@ function Confirmation({ apiBaseUrl }: Props) {
   });
 
   const { reservation } = data ?? {};
-  const reservationUnit = reservation?.reservationUnit?.[0] ?? undefined;
 
   if (isLoading) {
     return <CenterSpinner />;
@@ -71,22 +70,17 @@ function Confirmation({ apiBaseUrl }: Props) {
   }
 
   // TODO show an error page instead of returning null
-  if (reservation == null || reservationUnit == null) {
+  if (reservation == null) {
     return <Error statusCode={404} />;
   }
 
   return (
     <StyledContainer>
       <Columns>
-        <ReservationInfoCard
-          reservation={reservation}
-          reservationUnit={reservationUnit}
-          type="confirmed"
-        />
+        <ReservationInfoCard reservation={reservation} type="confirmed" />
         <ReservationConfirmation
           apiBaseUrl={apiBaseUrl}
           reservation={reservation}
-          reservationUnit={reservationUnit}
         />
       </Columns>
     </StyledContainer>

@@ -28,7 +28,6 @@ import { signOut } from "@/hooks/auth";
 type Node = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
   reservation: Node;
-  reservationUnit: NonNullable<Node["reservationUnit"]>[0];
   apiBaseUrl: string;
   order?: PaymentOrderNode;
 };
@@ -103,13 +102,13 @@ const ReturnLinkList = ({
 
 function ReservationConfirmation({
   reservation,
-  reservationUnit,
   apiBaseUrl,
   order,
 }: Props): JSX.Element {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
+  const reservationUnit = reservation.reservationUnit?.[0];
   const instructionsKey = getReservationUnitInstructionsKey(reservation?.state);
   const requiresHandling = reservation.state === State.RequiresHandling;
   const heading = t(
@@ -166,21 +165,27 @@ function ReservationConfirmation({
           )}
         </ActionContainer1>
       )}
-      {getTranslation(reservationUnit, String(instructionsKey)) && (
+      {reservationUnit != null && instructionsKey != null && (
         <>
-          <Subheading>{t("reservations:reservationInfo")}</Subheading>
-          <Paragraph style={{ margin: "var(--spacing-xl) 0" }}>
-            {getTranslation(reservationUnit, String(instructionsKey))}
-          </Paragraph>
+          {getTranslation(reservationUnit, String(instructionsKey)) && (
+            <>
+              <Subheading>{t("reservations:reservationInfo")}</Subheading>
+              <Paragraph style={{ margin: "var(--spacing-xl) 0" }}>
+                {getTranslation(reservationUnit, String(instructionsKey))}
+              </Paragraph>
+            </>
+          )}
+          <ReturnLinkList
+            reservationUnitHome={reservationUnitPath(
+              Number(reservationUnit?.pk)
+            )}
+            apiBaseUrl={apiBaseUrl}
+            style={{
+              marginTop: "var(--spacing-3-xl)",
+            }}
+          />
         </>
       )}
-      <ReturnLinkList
-        reservationUnitHome={reservationUnitPath(Number(reservationUnit.pk))}
-        apiBaseUrl={apiBaseUrl}
-        style={{
-          marginTop: "var(--spacing-3-xl)",
-        }}
-      />
     </Wrapper>
   );
 }

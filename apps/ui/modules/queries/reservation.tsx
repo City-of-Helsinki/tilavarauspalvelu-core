@@ -96,12 +96,8 @@ export const LIST_RESERVATIONS = gql`
       edges {
         node {
           id
-          pk
+          ...ReservationInfoCard
           name
-          begin
-          end
-          state
-          price
           bufferTimeBefore
           bufferTimeAfter
           order {
@@ -113,20 +109,7 @@ export const LIST_RESERVATIONS = gql`
           isBlocked
           reservationUnit {
             id
-            pk
-            nameFi
-            nameEn
-            nameSv
-            unit {
-              ...UnitNameFieldsI18N
-            }
             ...CancellationRuleFields
-            images {
-              ...Image
-            }
-            pricings {
-              ...PricingFields
-            }
           }
         }
       }

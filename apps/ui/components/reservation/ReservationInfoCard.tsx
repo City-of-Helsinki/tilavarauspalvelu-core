@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import Link from "next/link";
+import { gql } from "@apollo/client";
 import { differenceInMinutes, parseISO } from "date-fns";
 import { trim } from "lodash";
 import { useTranslation } from "next-i18next";
@@ -7,17 +8,8 @@ import styled from "styled-components";
 import { getReservationPrice, formatters as getFormatters } from "common";
 import { breakpoints } from "common/src/common/style";
 import { H4, Strong } from "common/src/common/typography";
-import type {
-  ImageFragment,
-  Maybe,
-  ReservationQuery,
-  ReservationUnitPageFieldsFragment,
-  UnitNode,
-} from "@gql/gql-types";
-import {
-  GetPriceReservationUnitFragment,
-  getReservationUnitPrice,
-} from "@/modules/reservationUnit";
+import type { ReservationInfoCardFragment } from "@gql/gql-types";
+import { getReservationUnitPrice } from "@/modules/reservationUnit";
 import {
   capitalize,
   formatDuration,
@@ -29,19 +21,36 @@ import { getImageSource } from "common/src/helpers";
 
 type Type = "pending" | "confirmed" | "complete";
 
-type NodeT = NonNullable<ReservationQuery["reservation"]>;
-type Props = {
-  reservation: NodeT;
-  // TODO fragment
-  reservationUnit?: Maybe<
-    Pick<
-      ReservationUnitPageFieldsFragment,
-      "pk" | "nameFi" | "nameEn" | "nameSv"
-    > &
-      GetPriceReservationUnitFragment & { images: ImageFragment[] } & {
-        unit?: Maybe<Pick<UnitNode, "nameFi" | "nameEn" | "nameSv">>;
+export const RESERVATION_INFO_CARD_FRAGMENT = gql`
+  fragment ReservationInfoCard on ReservationNode {
+    pk
+    taxPercentageValue
+    begin
+    end
+    state
+    price
+    reservationUnit {
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
+      ...PriceReservationUnit
+      images {
+        ...Image
       }
-  >;
+      unit {
+        id
+        nameFi
+        nameEn
+        nameSv
+      }
+    }
+  }
+`;
+
+type Props = {
+  reservation: ReservationInfoCardFragment;
   type: Type;
   shouldDisplayReservationUnitPrice?: boolean;
 };
@@ -91,20 +100,17 @@ const Subheading = styled(Value)`
   margin-bottom: var(--spacing-xs);
 `;
 
-function ReservationInfoCard({
+export function ReservationInfoCard({
   reservation,
-  reservationUnit,
   type,
   shouldDisplayReservationUnitPrice = false,
 }: Props): JSX.Element | null {
   const { t, i18n } = useTranslation();
+  const reservationUnit = reservation.reservationUnit?.[0];
 
   const { begin, end } = reservation || {};
   // NOTE can be removed after this has been refactored not to be used for PendingReservation
-  const taxPercentageValue =
-    "taxPercentageValue" in reservation
-      ? reservation.taxPercentageValue
-      : undefined;
+  const taxPercentageValue = reservation.taxPercentageValue;
 
   const beginDate = t("common:dateWithWeekday", {
     date: begin && parseISO(begin),
@@ -218,5 +224,3 @@ function ReservationInfoCard({
     </Wrapper>
   );
 }
-
-export default ReservationInfoCard;

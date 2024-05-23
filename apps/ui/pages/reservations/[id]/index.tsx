@@ -50,7 +50,7 @@ import {
 import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 import { ReservationStatus } from "@/components/reservation/ReservationStatus";
 import { AddressSection } from "@/components/reservation-unit/Address";
-import ReservationInfoCard from "@/components/reservation/ReservationInfoCard";
+import { ReservationInfoCard } from "@/components/reservation/ReservationInfoCard";
 import { ReservationOrderStatus } from "@/components/reservation/ReservationOrderStatus";
 import {
   getCommonServerSideProps,
@@ -570,11 +570,7 @@ function Reservation({
             </StatusContainer>
           </div>
           <div style={{ gridRowEnd: "span 3" }}>
-            <ReservationInfoCard
-              reservation={reservation}
-              reservationUnit={reservationUnit}
-              type="complete"
-            />
+            <ReservationInfoCard reservation={reservation} type="complete" />
             <SecondaryActions>
               {reservation.state === State.Confirmed && (
                 <BlackButton

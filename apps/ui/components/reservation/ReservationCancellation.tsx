@@ -20,7 +20,7 @@ import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
 import { getSelectedOption, getTranslation } from "@/modules/util";
 import { CenterSpinner } from "../common/common";
 import { BlackButton, MediumButton, Toast } from "@/styles/util";
-import ReservationInfoCard from "./ReservationInfoCard";
+import { ReservationInfoCard } from "./ReservationInfoCard";
 import { Paragraph } from "./styles";
 import { signOut } from "@/hooks/auth";
 
@@ -184,24 +184,20 @@ function ReservationCancellation(props: Props): JSX.Element {
   }, [register]);
 
   const { reservation } = props;
-  const reservationUnit = reservation?.reservationUnit?.[0] ?? null;
 
   const bylineContent = useMemo(() => {
     return (
       reservation && (
-        <ReservationInfoCard
-          reservation={reservation}
-          reservationUnit={reservationUnit}
-          type="confirmed"
-        />
+        <ReservationInfoCard reservation={reservation} type="confirmed" />
       )
     );
-  }, [reservation, reservationUnit]);
+  }, [reservation]);
 
   if (!reservation) {
     return <Spinner />;
   }
 
+  const reservationUnit = reservation?.reservationUnit?.[0] ?? null;
   const instructions = reservationUnit
     ? getTranslation(reservationUnit, "reservationCancelledInstructions")
     : undefined;

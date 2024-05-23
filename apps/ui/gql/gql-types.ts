@@ -5289,6 +5289,48 @@ export enum Weekday {
   Wednesday = "WEDNESDAY",
 }
 
+export type ReservationInfoCardFragment = {
+  pk?: number | null;
+  taxPercentageValue?: string | null;
+  begin: string;
+  end: string;
+  state: State;
+  price?: string | null;
+  reservationUnit?: Array<{
+    id: string;
+    pk?: number | null;
+    nameFi?: string | null;
+    nameEn?: string | null;
+    nameSv?: string | null;
+    reservationBegins?: string | null;
+    reservationEnds?: string | null;
+    images: Array<{
+      id: string;
+      imageUrl?: string | null;
+      largeUrl?: string | null;
+      mediumUrl?: string | null;
+      smallUrl?: string | null;
+      imageType: ImageType;
+    }>;
+    unit?: {
+      id: string;
+      nameFi?: string | null;
+      nameEn?: string | null;
+      nameSv?: string | null;
+    } | null;
+    pricings: Array<{
+      id: string;
+      begins: string;
+      priceUnit: PriceUnit;
+      pricingType?: PricingType | null;
+      lowestPrice: string;
+      highestPrice: string;
+      status: Status;
+      taxPercentage: { id: string; pk?: number | null; value: string };
+    }>;
+  }> | null;
+};
+
 export type OptionsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type OptionsQuery = {
@@ -5779,15 +5821,16 @@ export type ListReservationsQuery = {
     edges: Array<{
       node?: {
         id: string;
-        pk?: number | null;
         name?: string | null;
+        bufferTimeBefore: number;
+        bufferTimeAfter: number;
+        isBlocked?: boolean | null;
+        pk?: number | null;
+        taxPercentageValue?: string | null;
         begin: string;
         end: string;
         state: State;
         price?: string | null;
-        bufferTimeBefore: number;
-        bufferTimeAfter: number;
-        isBlocked?: boolean | null;
         order?: {
           id: string;
           orderUuid?: string | null;
@@ -5800,23 +5843,8 @@ export type ListReservationsQuery = {
           nameFi?: string | null;
           nameEn?: string | null;
           nameSv?: string | null;
-          unit?: {
-            id: string;
-            pk?: number | null;
-            nameFi?: string | null;
-            nameEn?: string | null;
-            nameSv?: string | null;
-            location?: {
-              addressStreetEn?: string | null;
-              addressStreetSv?: string | null;
-              addressCityEn?: string | null;
-              addressCitySv?: string | null;
-              id: string;
-              addressStreetFi?: string | null;
-              addressZip: string;
-              addressCityFi?: string | null;
-            } | null;
-          } | null;
+          reservationBegins?: string | null;
+          reservationEnds?: string | null;
           images: Array<{
             id: string;
             imageUrl?: string | null;
@@ -5825,6 +5853,17 @@ export type ListReservationsQuery = {
             smallUrl?: string | null;
             imageType: ImageType;
           }>;
+          unit?: {
+            id: string;
+            nameFi?: string | null;
+            nameEn?: string | null;
+            nameSv?: string | null;
+          } | null;
+          cancellationRule?: {
+            id: string;
+            canBeCancelledTimeBefore?: number | null;
+            needsHandling: boolean;
+          } | null;
           pricings: Array<{
             id: string;
             begins: string;
@@ -5835,11 +5874,6 @@ export type ListReservationsQuery = {
             status: Status;
             taxPercentage: { id: string; pk?: number | null; value: string };
           }>;
-          cancellationRule?: {
-            id: string;
-            canBeCancelledTimeBefore?: number | null;
-            needsHandling: boolean;
-          } | null;
         }> | null;
       } | null;
     } | null>;
@@ -6845,6 +6879,21 @@ export type CurrentUserQuery = {
   } | null;
 };
 
+export type PriceReservationUnitFragment = {
+  reservationBegins?: string | null;
+  reservationEnds?: string | null;
+  pricings: Array<{
+    id: string;
+    begins: string;
+    priceUnit: PriceUnit;
+    pricingType?: PricingType | null;
+    lowestPrice: string;
+    highestPrice: string;
+    status: Status;
+    taxPercentage: { id: string; pk?: number | null; value: string };
+  }>;
+};
+
 export type BannerNotificationsListQueryVariables = Exact<{
   target: BannerNotificationTarget;
 }>;
@@ -7533,6 +7582,71 @@ export type TermsOfUseQuery = {
   } | null;
 };
 
+export const PricingFieldsFragmentDoc = gql`
+  fragment PricingFields on ReservationUnitPricingNode {
+    id
+    begins
+    priceUnit
+    pricingType
+    lowestPrice
+    highestPrice
+    taxPercentage {
+      id
+      pk
+      value
+    }
+    status
+  }
+`;
+export const PriceReservationUnitFragmentDoc = gql`
+  fragment PriceReservationUnit on ReservationUnitNode {
+    pricings {
+      ...PricingFields
+    }
+    reservationBegins
+    reservationEnds
+  }
+  ${PricingFieldsFragmentDoc}
+`;
+export const ImageFragmentDoc = gql`
+  fragment Image on ReservationUnitImageNode {
+    id
+    imageUrl
+    largeUrl
+    mediumUrl
+    smallUrl
+    imageType
+  }
+`;
+export const ReservationInfoCardFragmentDoc = gql`
+  fragment ReservationInfoCard on ReservationNode {
+    pk
+    taxPercentageValue
+    begin
+    end
+    state
+    price
+    reservationUnit {
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
+      ...PriceReservationUnit
+      images {
+        ...Image
+      }
+      unit {
+        id
+        nameFi
+        nameEn
+        nameSv
+      }
+    }
+  }
+  ${PriceReservationUnitFragmentDoc}
+  ${ImageFragmentDoc}
+`;
 export const ApplicationRoundFieldsFragmentDoc = gql`
   fragment ApplicationRoundFields on ApplicationRoundNode {
     pk
@@ -7650,32 +7764,6 @@ export const TermsOfUseNameFieldsFragmentDoc = gql`
     nameFi
     nameEn
     nameSv
-  }
-`;
-export const PricingFieldsFragmentDoc = gql`
-  fragment PricingFields on ReservationUnitPricingNode {
-    id
-    begins
-    priceUnit
-    pricingType
-    lowestPrice
-    highestPrice
-    taxPercentage {
-      id
-      pk
-      value
-    }
-    status
-  }
-`;
-export const ImageFragmentDoc = gql`
-  fragment Image on ReservationUnitImageNode {
-    id
-    imageUrl
-    largeUrl
-    mediumUrl
-    smallUrl
-    imageType
   }
 `;
 export const MetadataSetsFragmentDoc = gql`
@@ -9171,12 +9259,8 @@ export const ListReservationsDocument = gql`
       edges {
         node {
           id
-          pk
+          ...ReservationInfoCard
           name
-          begin
-          end
-          state
-          price
           bufferTimeBefore
           bufferTimeAfter
           order {
@@ -9188,29 +9272,14 @@ export const ListReservationsDocument = gql`
           isBlocked
           reservationUnit {
             id
-            pk
-            nameFi
-            nameEn
-            nameSv
-            unit {
-              ...UnitNameFieldsI18N
-            }
             ...CancellationRuleFields
-            images {
-              ...Image
-            }
-            pricings {
-              ...PricingFields
-            }
           }
         }
       }
     }
   }
-  ${UnitNameFieldsI18NFragmentDoc}
+  ${ReservationInfoCardFragmentDoc}
   ${CancellationRuleFieldsFragmentDoc}
-  ${ImageFragmentDoc}
-  ${PricingFieldsFragmentDoc}
 `;
 
 /**

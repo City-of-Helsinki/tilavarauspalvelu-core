@@ -17,11 +17,13 @@ import {
   Status,
   type ReservationUnitPageQuery,
   type EquipmentFieldsFragment,
+  type PriceReservationUnitFragment,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { capitalize, getTranslation } from "./util";
 import { isReservationReservable } from "@/modules/reservation";
 import { type PricingFieldsFragment } from "common/gql/gql-types";
+import { gql } from "@apollo/client";
 
 export const getTimeString = (date = new Date()): string => {
   if (Number.isNaN(date.getTime())) {
@@ -174,16 +176,21 @@ export function getActivePricing(reservationUnit: {
   return pricings.find((pricing) => pricing?.status === "ACTIVE");
 }
 
-export type GetPriceReservationUnitFragment = {
-  pricings: PricingFieldsFragment[];
-  reservationBegins?: string | null;
-  reservationEnds?: string | null;
-};
-export const getFuturePricing = (
-  reservationUnit: GetPriceReservationUnitFragment,
+export const RESERVATION_INFO_CARD_FRAGMENT = gql`
+  fragment PriceReservationUnit on ReservationUnitNode {
+    pricings {
+      ...PricingFields
+    }
+    reservationBegins
+    reservationEnds
+  }
+`;
+
+export function getFuturePricing(
+  reservationUnit: PriceReservationUnitFragment,
   applicationRounds: RoundPeriod[] = [],
   reservationDate?: Date
-): PricingFieldsFragment | undefined => {
+): PricingFieldsFragment | undefined {
   const { pricings, reservationBegins, reservationEnds } = reservationUnit;
 
   if (!pricings || pricings.length === 0) {
@@ -229,7 +236,7 @@ export const getFuturePricing = (
         return n.begins <= toUIDate(new Date(reservationDate), "yyyy-MM-dd");
       })
     : futurePricings[0];
-};
+}
 
 function formatPrice(
   price: number,
@@ -276,7 +283,7 @@ export const getPrice = (props: GetPriceType): string => {
 };
 
 type GetReservationUnitPriceProps = {
-  reservationUnit?: GetPriceReservationUnitFragment | null;
+  reservationUnit?: PriceReservationUnitFragment | null;
   pricingDate?: Date;
   minutes?: number;
   trailingZeros?: boolean;
