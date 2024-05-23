@@ -53,15 +53,9 @@ class ReservationNode(DjangoNode):
         description="Which reservation units' reserveability is affected by this reservation?",
         expression=(
             SubqueryArray(
-                queryset=(
-                    # Double OuterRef is needed, since `reservation_units_with_common_hierarchy`
-                    # creates another subquery from ReservationUnit queryset before it was called,
-                    # and we want the OuterRef to point to the Reservation queryset.
-                    ReservationUnit.objects.filter(reservation=OuterRef(OuterRef("id")))
-                    .reservation_units_with_common_hierarchy()
-                    .values_list("id", flat=True)
-                ),
-                agg_field="id",
+                queryset=ReservationUnit.objects.filter(reservation=OuterRef("id")).affected_reservation_unit_ids,
+                agg_field="ids",
+                distinct=True,
             )
         ),
     )

@@ -110,25 +110,36 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
             .annotate(
                 reservation_units_affecting_reservations=SubqueryArray(
                     queryset=(
-                        ReservationUnit.objects.distinct()
-                        .filter(
+                        ReservationUnit.objects.filter(
                             Q(id=models.OuterRef("id"))
                             | Q(spaces__in=models.OuterRef("spaces_affecting_reservations"))
                             | Q(resources__in=models.OuterRef("resources_affecting_reservations"))
-                        )
-                        .values("id")
+                        ).values("id")
                     ),
                     agg_field="id",
+                    distinct=True,
                 ),
             )
         )
 
     @property
-    def related_reservation_unit_ids(self) -> models.QuerySet[dict[str, int]]:
+    def affected_reservation_unit_ids(self) -> models.QuerySet[dict[str, int]]:
+        """
+        Get a "values" queryset of reservation unit ids that affect a given reservation unit in the queryset.
+        This can be used in two ways:
+
+        >>> sq = ReservationUnit.objects.filter(...)
+        >>>
+        >>> # 1
+        >>> qs.filter(reservation_units__in=Subquery(sq.affected_reservation_unit_ids))
+        >>>
+        >>> # 2
+        >>> qs.annotate(affected=SubqueryArray(sq.affected_reservation_unit_ids, agg_field="ids", distinct=True))
+        """
         return (
             self.with_reservation_unit_ids_affecting_reservations()
-            .annotate(_found_ids=ArrayUnnest("reservation_units_affecting_reservations"))
-            .values("_found_ids")
+            .annotate(ids=ArrayUnnest("reservation_units_affecting_reservations"))
+            .values("ids")
         )
 
     def reservation_units_with_common_hierarchy(self) -> Self:
@@ -138,5 +149,5 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
         """
         from reservation_units.models import ReservationUnit
 
-        ids = models.Subquery(self.related_reservation_unit_ids)
+        ids = models.Subquery(self.affected_reservation_unit_ids)
         return ReservationUnit.objects.alias(ids=ids).filter(pk__in=models.F("ids"))

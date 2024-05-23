@@ -112,9 +112,7 @@ class ReservationQuerySet(models.QuerySet):
             qs = qs.filter(pk__in=reservation_units)
 
         return self.filter(
-            reservation_unit__in=models.Subquery(
-                queryset=qs.reservation_units_with_common_hierarchy().values_list("pk", flat=True),
-            ),
+            reservation_unit__in=models.Subquery(qs.affected_reservation_unit_ids),
         ).exclude(
             # Cancelled or denied reservations never affect any reservations
             state__in=[

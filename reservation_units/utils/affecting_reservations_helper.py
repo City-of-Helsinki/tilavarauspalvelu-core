@@ -53,7 +53,7 @@ class AffectingReservationHelper:
         self.reservation_queryset = (
             Reservation.objects.filter_buffered_reservations_period(start_date=start_date, end_date=end_date)
             .going_to_occur()
-            .filter(reservation_unit__in=models.Subquery(self.reservation_unit_queryset.related_reservation_unit_ids))
+            .filter(reservation_unit__in=models.Subquery(self.reservation_unit_queryset.affected_reservation_unit_ids))
             .prefetch_related(
                 Prefetch(
                     "reservation_unit",
