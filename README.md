@@ -42,15 +42,6 @@ Install deps
 pnpm i
 ```
 
-Update GraphQL schema and types.
-``` sh
-# all apps
-pnpm codegen
-# individual app
-pnpm codegen:ui
-# or
-pnpm codegen:admin
-```
 
 Update email templates
 ``` sh
@@ -160,10 +151,23 @@ New api changes require updating the schema and typescript types.
 
 Update the version backend version in `http://localhost:8000` using git and rebuild it (follow the backend README).
 
-```sh
-# in repo root
+Update GraphQL schema and types.
+``` sh
+# all apps
 pnpm codegen
+# individual app
+pnpm codegen:ui
+# or
+pnpm codegen:admin
 ```
+
+Run in watch mode (all apps)
+``` sh
+pnpm codegen:watch
+```
+Watch mode has some issues with changes in packages/common are not propagated to the other packages,
+but common fragments should be pretty stable (and if they are not they should be moved to the app).
+In those cases better to run `pnpm codegen` in the root.
 
 ## FAQ
 
