@@ -1,7 +1,9 @@
+from typing import Any
+
 from django.conf import settings
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 from easy_thumbnails.fields import ThumbnailerImageField
+from easy_thumbnails.files import ThumbnailFile
 
 from reservation_units.enums import ReservationUnitImageType
 from reservation_units.tasks import update_urls
@@ -14,20 +16,18 @@ __all__ = [
 
 
 class ReservationUnitImage(models.Model, PurgeImageCacheMixin):
-    image_type = models.CharField(max_length=20, verbose_name=_("Type"), choices=ReservationUnitImageType.choices)
-
     reservation_unit = models.ForeignKey(
         "reservation_units.ReservationUnit",
-        verbose_name=_("Reservation unit image"),
         related_name="images",
         on_delete=models.CASCADE,
     )
 
-    image = ThumbnailerImageField(upload_to=settings.RESERVATION_UNIT_IMAGES_ROOT, null=True)
+    image: ThumbnailFile | None = ThumbnailerImageField(upload_to=settings.RESERVATION_UNIT_IMAGES_ROOT, null=True)
+    image_type: str = models.CharField(max_length=20, choices=ReservationUnitImageType.choices)
 
-    large_url = models.URLField(null=False, blank=True, max_length=255, default="")
-    medium_url = models.URLField(null=False, blank=True, max_length=255, default="")
-    small_url = models.URLField(null=False, blank=True, max_length=255, default="")
+    large_url: str = models.URLField(max_length=255, default="", blank=True)
+    medium_url: str = models.URLField(max_length=255, default="", blank=True)
+    small_url: str = models.URLField(max_length=255, default="", blank=True)
 
     class Meta:
         db_table = "reservation_unit_image"
@@ -39,20 +39,7 @@ class ReservationUnitImage(models.Model, PurgeImageCacheMixin):
     def __str__(self) -> str:
         return f"{self.reservation_unit.name} ({self.get_image_type_display()})"
 
-    def save(
-        self,
-        force_insert=False,
-        force_update=False,
-        using=None,
-        update_fields=None,
-        update_urls=True,
-    ) -> None:
+    def save(self, *args: Any, **kwargs: Any) -> None:
         self.purge_previous_image_cache()
-
-        super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
-
-        if update_urls:
-            self.update_image_urls()
-
-    def update_image_urls(self) -> None:
+        super().save(*args, **kwargs)
         update_urls.delay(self.pk)
