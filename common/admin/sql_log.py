@@ -7,7 +7,7 @@ from django.db import models
 from django.http import FileResponse
 from django.utils.safestring import SafeString, mark_safe
 from django.utils.translation import gettext_lazy as _
-from rangefilter.filters import DateTimeRangeFilter
+from rangefilter.filters import DateTimeRangeFilter, DateTimeRangeFilterBuilder, NumericRangeFilterBuilder
 
 from common.admin.forms import SQLLogAdminForm
 from common.admin.forms.sql_log import RequestLogAdminForm, SQLLogAdminInlineForm
@@ -112,7 +112,8 @@ class RequestLogAdmin(admin.ModelAdmin):
     ]
     list_filter = [
         "path",
-        ("created", DateTimeRangeFilter),
+        ("created", DateTimeRangeFilterBuilder(title=_("Created"))),
+        ("duration_ms", NumericRangeFilterBuilder(title=_("Duration (ms)"))),
     ]
     search_fields = [
         "request_id",
@@ -127,13 +128,9 @@ class RequestLogAdmin(admin.ModelAdmin):
     def num_of_sql_logs(self, obj: RequestLog) -> int:
         return getattr(obj, "queries", -1)
 
-    @admin.display(description=_("Duration (ms)"), ordering="total_duration")
+    @admin.display(description=_("Duration (ms)"), ordering="duration_ms")
     def _duration_ms(self, obj: RequestLog) -> str:
-        if obj.duration_ms:
-            return f"{obj.duration_ms:_.2f}".replace("_", " ")
-
-        value = getattr(obj, "total_duration", 0) / 1_000_000
-        return f"~{value:_.2f}".replace("_", " ")
+        return obj.duration_str
 
     @admin.display(description=_("Body"), ordering="body")
     def _body(self, obj: RequestLog) -> SafeString:
@@ -146,7 +143,6 @@ class RequestLogAdmin(admin.ModelAdmin):
             .prefetch_related("sql_logs")
             .annotate(
                 queries=models.Count("sql_logs"),
-                total_duration=models.Sum("sql_logs__duration_ns"),
             )
         )
 
