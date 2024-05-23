@@ -1,105 +1,80 @@
 from datetime import datetime, timedelta
 
 import pytest
-from django.test import TestCase
-from django.utils import timezone
+from django.utils.timezone import get_default_timezone
 from freezegun import freeze_time
 
 from merchants.verkkokauppa.exceptions import UnsupportedMetaKeyError
 from merchants.verkkokauppa.helpers import get_formatted_reservation_time, get_meta_label, get_verkkokauppa_order_params
-from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.choices import CustomerTypeChoice
 from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory, UserFactory
-from tests.helpers import patch_method
+
+# Applied to all tests
+pytestmark = [
+    pytest.mark.django_db,
+]
 
 
+@pytest.mark.parametrize(
+    ("language", "result"),
+    [
+        ("", "La 5.11.2022 10:00-12:00"),
+        ("fi", "La 5.11.2022 10:00-12:00"),
+        ("sv", "Lö 5.11.2022 10:00-12:00"),
+        ("en", "Sa 5.11.2022 10:00-12:00"),
+    ],
+)
 @freeze_time("2022-11-05T10:00:00")
-class HelpersTestCase(TestCase):
-    def setUp(self):
-        super().setUp()
-        self.user = UserFactory.create(
-            username="test_user",
-            first_name="First",
-            last_name="Last",
-            email="first.last@foo.com",
-        )
-        self.reservation_unit = ReservationUnitFactory(name_fi="Suomeksi", name_sv="Ruotsiksi", name_en="Englanniksi")
+def test_get_formatted_reservation_time(language, result):
+    begin = datetime.now().astimezone(tz=get_default_timezone())
+    end = begin + timedelta(hours=2)
+    reservation = ReservationFactory.create(begin=begin, end=end, reservee_language=language)
+    date = get_formatted_reservation_time(reservation)
+    assert date == result
 
-        begin = datetime.now().astimezone(timezone.get_default_timezone())
-        end = begin + timedelta(hours=2)
-        self.reservation = ReservationFactory(
-            reservation_unit=[self.reservation_unit],
-            user=self.user,
-            begin=begin,
-            end=end,
-        )
 
-    def test_get_formatted_reservation_time_fi(self):
-        self.reservation.reservee_language = "fi"
-        self.reservation.save()
+def test_get_verkkokauppa_order_params__respect_reservee_language():
+    user = UserFactory.create()
+    payment_product = PaymentProductFactory.create()
+    runit = ReservationUnitFactory.create(
+        payment_product=payment_product,
+        name_fi="Nimi",
+        name_en="Name",
+        name_sv="Namn",
+    )
 
-        date = get_formatted_reservation_time(self.reservation)
-        assert date == "La 5.11.2022 10:00-12:00"
+    reservation_en = ReservationFactory.create(
+        reservation_unit=[runit],
+        user=user,
+        reservee_type=CustomerTypeChoice.INDIVIDUAL,
+        reservee_language="en",
+    )
+    order_params = get_verkkokauppa_order_params(reservation_en)
+    assert order_params.items[0].product_name == "Name"
 
-    def test_get_formatted_reservation_time_sv(self):
-        self.reservation.reservee_language = "sv"
-        self.reservation.save()
+    reservation_sv = ReservationFactory.create(
+        reservation_unit=[runit],
+        user=user,
+        reservee_type=CustomerTypeChoice.INDIVIDUAL,
+        reservee_language="sv",
+    )
+    order_params = get_verkkokauppa_order_params(reservation_sv)
+    assert order_params.items[0].product_name == "Namn"
 
-        date = get_formatted_reservation_time(self.reservation)
-        assert date == "Lö 5.11.2022 10:00-12:00"
 
-    def test_get_formatted_reservation_time_en(self):
-        self.reservation.reservee_language = "en"
-        self.reservation.save()
+def test_get_meta_label():
+    reservation = ReservationFactory.create()
 
-        date = get_formatted_reservation_time(self.reservation)
-        assert date == "Sa 5.11.2022 10:00-12:00"
+    period_label = get_meta_label("reservationPeriod", reservation)
+    assert period_label == "Varausaika"
 
-    def test_get_formatted_reservation_time_fi_fallback(self):
-        date = get_formatted_reservation_time(self.reservation)
-        assert date == "La 5.11.2022 10:00-12:00"
+    number_label = get_meta_label("reservationNumber", reservation)
+    assert number_label == "Varausnumero"
 
-    @patch_method(VerkkokauppaAPIClient.create_order)
-    def test_get_verkkokauppa_order_params_respect_reservee_language(self):
-        user = UserFactory.create(
-            username="testuser",
-            first_name="Test",
-            last_name="User",
-            email="test.user@example.com",
-        )
-        payment_product = PaymentProductFactory()
-        runit = ReservationUnitFactory(
-            payment_product=payment_product,
-            name_fi="Nimi",
-            name_en="Name",
-            name_sv="Namn",
-        )
-        reservation_en = ReservationFactory(
-            reservation_unit=[runit],
-            user=user,
-            reservee_type=CustomerTypeChoice.INDIVIDUAL,
-            reservee_language="en",
-        )
-        reservation_sv = ReservationFactory(
-            reservation_unit=[runit],
-            user=user,
-            reservee_type=CustomerTypeChoice.INDIVIDUAL,
-            reservee_language="sv",
-        )
 
-        order_params = get_verkkokauppa_order_params(reservation_en)
-        assert order_params.items[0].product_name == "Name"
+def test_get_meta_label__raises_exception_with_unsupported_key():
+    reservation = ReservationFactory.create()
 
-        order_params = get_verkkokauppa_order_params(reservation_sv)
-        assert order_params.items[0].product_name == "Namn"
-
-    def test_get_meta_label_returns_label_with_supported_key(self):
-        period_label = get_meta_label("reservationPeriod", self.reservation)
-        number_label = get_meta_label("reservationNumber", self.reservation)
-        assert period_label == "Varausaika"
-        assert number_label == "Varausnumero"
-
-    def test_get_meta_label_raises_exception_with_unsupported_key(self):
-        with pytest.raises(UnsupportedMetaKeyError) as err:
-            get_meta_label("unsupported", self.reservation)
-        assert str(err.value) == "Invalid meta label key 'unsupported'"
+    with pytest.raises(UnsupportedMetaKeyError) as err:
+        get_meta_label("unsupported", reservation)
+    assert str(err.value) == "Invalid meta label key 'unsupported'"

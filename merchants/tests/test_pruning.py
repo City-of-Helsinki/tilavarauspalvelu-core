@@ -1,186 +1,135 @@
-import uuid
-from datetime import datetime, timedelta
+from datetime import timedelta
 
-from django.test import TestCase
-from django.utils.timezone import get_default_timezone
+import pytest
 from freezegun import freeze_time
 
+from common.date_utils import local_datetime
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from merchants.models import OrderStatus
 from merchants.pruning import update_expired_orders
 from merchants.verkkokauppa.order.exceptions import CancelOrderError
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
-from merchants.verkkokauppa.payment.types import PaymentStatus as WebShopPaymentStatus
+from merchants.verkkokauppa.payment.types import PaymentStatus
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.choices import ReservationStateChoice
 from tests.factories import PaymentFactory, PaymentOrderFactory, ReservationFactory
 from tests.helpers import patch_method
 from utils.sentry import SentryLogger
 
-DEFAULT_TIMEZONE = get_default_timezone()
+# Applied to all tests
+pytestmark = [
+    pytest.mark.django_db,
+]
 
 
-@freeze_time(datetime(2022, 11, 28, 10, 10, 0, tzinfo=DEFAULT_TIMEZONE))
-class UpdateExpiredOrderTestCase(TestCase):
-    def setUp(self) -> None:
-        self.reservation = ReservationFactory.create(state=ReservationStateChoice.WAITING_FOR_PAYMENT)
-        return super().setUp()
+@pytest.fixture()
+def order():
+    reservation = ReservationFactory.create(state=ReservationStateChoice.WAITING_FOR_PAYMENT)
+    return PaymentOrderFactory.create(created_at=local_datetime(), reservation=reservation, status=OrderStatus.DRAFT)
 
-    @patch_method(VerkkokauppaAPIClient.get_payment)
-    def test_handle_cancelled_orders(self):
-        VerkkokauppaAPIClient.get_payment.return_value = PaymentFactory(status=WebShopPaymentStatus.CANCELLED.value)
 
-        six_minutes_ago = datetime.now(tz=DEFAULT_TIMEZONE) - timedelta(minutes=6)
-        order = PaymentOrderFactory.create(
-            status=OrderStatus.DRAFT,
-            created_at=six_minutes_ago,
-            reservation=self.reservation,
-            remote_id=uuid.uuid4(),
-        )
+@patch_method(VerkkokauppaAPIClient.get_payment)
+def test_verkkokauppa_pruning__update_expired_orders__handle_cancelled_orders(order):
+    VerkkokauppaAPIClient.get_payment.return_value = PaymentFactory.create(status=PaymentStatus.CANCELLED.value)
 
-        with freeze_time(datetime(2022, 11, 28, 10, 15, 0, tzinfo=DEFAULT_TIMEZONE)):
-            update_expired_orders()
+    with freeze_time(order.created_at + timedelta(minutes=6)):
+        update_expired_orders()
 
-        order.refresh_from_db()
-        assert order.status == OrderStatus.CANCELLED
+    order.refresh_from_db()
+    assert order.status == OrderStatus.CANCELLED
+    assert VerkkokauppaAPIClient.get_payment.called is True
 
-    @patch_method(ReservationEmailNotificationSender.send_confirmation_email)
-    @patch_method(VerkkokauppaAPIClient.get_payment)
-    def test_handle_paid_orders(self):
-        VerkkokauppaAPIClient.get_payment.return_value = PaymentFactory(status=WebShopPaymentStatus.PAID_ONLINE.value)
 
-        six_minutes_ago = datetime.now() - timedelta(minutes=6)
-        order = PaymentOrderFactory.create(
-            status=OrderStatus.DRAFT,
-            created_at=six_minutes_ago,
-            reservation=self.reservation,
-            remote_id=uuid.uuid4(),
-        )
+@patch_method(VerkkokauppaAPIClient.get_payment)
+@patch_method(VerkkokauppaAPIClient.cancel_order)
+def test_verkkokauppa_pruning__update_expired_orders__handle_expired_orders(order):
+    VerkkokauppaAPIClient.get_payment.return_value = PaymentFactory.create(
+        status=PaymentStatus.CREATED.value,
+        timestamp=order.created_at,
+    )
 
-        with freeze_time(datetime(2022, 11, 28, 10, 15, 0, tzinfo=DEFAULT_TIMEZONE)):
-            update_expired_orders()
+    with freeze_time(order.created_at + timedelta(minutes=6)):
+        update_expired_orders()
 
-        order.refresh_from_db()
-        assert order.status == OrderStatus.PAID
+    order.refresh_from_db()
+    assert order.status == OrderStatus.EXPIRED
+    assert VerkkokauppaAPIClient.get_payment.called is True
+    assert VerkkokauppaAPIClient.cancel_order.called is True
 
-        self.reservation.refresh_from_db()
-        assert self.reservation.state == ReservationStateChoice.CONFIRMED
 
-        assert ReservationEmailNotificationSender.send_confirmation_email.called is True
+@patch_method(ReservationEmailNotificationSender.send_confirmation_email)
+@patch_method(VerkkokauppaAPIClient.get_payment)
+def test_verkkokauppa_pruning__update_expired_orders__handle_paid_orders(order):
+    VerkkokauppaAPIClient.get_payment.return_value = PaymentFactory.create(status=PaymentStatus.PAID_ONLINE.value)
 
-    @patch_method(VerkkokauppaAPIClient.get_payment)
-    @patch_method(VerkkokauppaAPIClient.cancel_order)
-    def test_handle_expired_orders(self):
-        six_minutes_ago = datetime.now(tz=DEFAULT_TIMEZONE) - timedelta(minutes=6)
+    with freeze_time(order.created_at + timedelta(minutes=6)):
+        update_expired_orders()
 
-        VerkkokauppaAPIClient.get_payment.return_value = PaymentFactory(
-            status=WebShopPaymentStatus.CREATED.value,
-            timestamp=six_minutes_ago,
-        )
+    order.refresh_from_db()
+    assert order.status == OrderStatus.PAID
 
-        order = PaymentOrderFactory.create(
-            status=OrderStatus.DRAFT,
-            created_at=six_minutes_ago,
-            reservation=self.reservation,
-            remote_id=uuid.uuid4(),
-        )
+    order.reservation.refresh_from_db()
+    assert order.reservation.state == ReservationStateChoice.CONFIRMED
+    assert VerkkokauppaAPIClient.get_payment.called is True
+    assert ReservationEmailNotificationSender.send_confirmation_email.called is True
 
-        with freeze_time(datetime(2022, 11, 28, 10, 15, 0, tzinfo=DEFAULT_TIMEZONE)):
-            update_expired_orders()
 
-        assert VerkkokauppaAPIClient.cancel_order.called is True
+@patch_method(VerkkokauppaAPIClient.get_payment, return_value=None)
+@patch_method(VerkkokauppaAPIClient.cancel_order)
+def test_verkkokauppa_pruning__update_expired_orders__handle_missing_payment(order):
+    with freeze_time(order.created_at + timedelta(minutes=6)):
+        update_expired_orders()
 
-        order.refresh_from_db()
-        assert order.status == OrderStatus.EXPIRED
+    order.refresh_from_db()
+    assert order.status == OrderStatus.EXPIRED
+    assert VerkkokauppaAPIClient.get_payment.called is True
+    assert VerkkokauppaAPIClient.cancel_order.called is True
 
-    @patch_method(VerkkokauppaAPIClient.get_payment)
-    @patch_method(VerkkokauppaAPIClient.cancel_order)
-    def test_handle_missing_payment(self):
-        VerkkokauppaAPIClient.get_payment.return_value = None
 
-        six_minutes_ago = datetime.now() - timedelta(minutes=6)
-        order = PaymentOrderFactory.create(
-            status=OrderStatus.DRAFT.value,
-            created_at=six_minutes_ago,
-            reservation=self.reservation,
-            remote_id=uuid.uuid4(),
-        )
+@patch_method(SentryLogger.log_exception)
+@patch_method(VerkkokauppaAPIClient.get_payment, side_effect=GetPaymentError("mock-error"))
+def test_verkkokauppa_pruning__update_expired_orders__get_payment_errors_are_logged(order):
+    with freeze_time(order.created_at + timedelta(minutes=6)):
+        update_expired_orders()
 
-        with freeze_time(datetime(2022, 11, 28, 10, 15, 0, tzinfo=DEFAULT_TIMEZONE)):
-            update_expired_orders()
+    order.refresh_from_db()
+    assert order.status == OrderStatus.DRAFT
+    assert VerkkokauppaAPIClient.get_payment.called is True
+    assert SentryLogger.log_exception.called is True
 
-        assert VerkkokauppaAPIClient.cancel_order.called is True
 
-        order.refresh_from_db()
-        assert order.status == OrderStatus.EXPIRED
+@patch_method(SentryLogger.log_exception)
+@patch_method(VerkkokauppaAPIClient.get_payment)
+@patch_method(VerkkokauppaAPIClient.cancel_order, side_effect=CancelOrderError("mock-error"))
+def test_verkkokauppa_pruning__update_expired_orders__cancel_error_errors_are_logged(order):
+    VerkkokauppaAPIClient.get_payment.return_value = PaymentFactory.create(
+        status=PaymentStatus.CREATED.value,
+        timestamp=order.created_at,
+    )
 
-    @patch_method(SentryLogger.log_exception)
-    @patch_method(VerkkokauppaAPIClient.get_payment)
-    def test_get_payment_errors_are_logged(self):
-        VerkkokauppaAPIClient.get_payment.side_effect = GetPaymentError("mock-error")
+    with freeze_time(order.created_at + timedelta(minutes=6)):
+        update_expired_orders()
 
-        six_minutes_ago = datetime.now() - timedelta(minutes=6)
-        order = PaymentOrderFactory.create(
-            status=OrderStatus.DRAFT.value,
-            created_at=six_minutes_ago,
-            reservation=self.reservation,
-            remote_id=uuid.uuid4(),
-        )
+    order.refresh_from_db()
+    assert order.status == OrderStatus.DRAFT
+    assert VerkkokauppaAPIClient.get_payment.called is True
+    assert VerkkokauppaAPIClient.cancel_order.called is True
+    assert SentryLogger.log_exception.called is True
 
-        with freeze_time(datetime(2022, 11, 28, 10, 15, 0, tzinfo=DEFAULT_TIMEZONE)):
-            update_expired_orders()
 
-        order.refresh_from_db()
-        assert order.status == OrderStatus.DRAFT
-        assert SentryLogger.log_exception.called is True
+@patch_method(VerkkokauppaAPIClient.get_payment)
+@patch_method(VerkkokauppaAPIClient.cancel_order)
+def test_verkkokauppa_pruning__update_expired_orders__give_more_time_if_user_entered_to_payment_phase(order):
+    VerkkokauppaAPIClient.get_payment.return_value = PaymentFactory.create(
+        status=PaymentStatus.CREATED.value,
+        timestamp=order.created_at + timedelta(minutes=4),
+    )
 
-    @patch_method(SentryLogger.log_exception)
-    @patch_method(VerkkokauppaAPIClient.get_payment)
-    @patch_method(VerkkokauppaAPIClient.cancel_order, side_effect=CancelOrderError("mock-error"))
-    def test_cancel_error_errors_are_logged(self):
-        six_minutes_ago = datetime.now(tz=DEFAULT_TIMEZONE) - timedelta(minutes=6)
-        VerkkokauppaAPIClient.get_payment.return_value = PaymentFactory(
-            status=WebShopPaymentStatus.CREATED.value,
-            timestamp=six_minutes_ago,
-        )
+    with freeze_time(order.created_at + timedelta(minutes=6)):
+        update_expired_orders()
 
-        order = PaymentOrderFactory.create(
-            status=OrderStatus.DRAFT,
-            created_at=six_minutes_ago,
-            reservation=self.reservation,
-            remote_id=uuid.uuid4(),
-        )
+    assert VerkkokauppaAPIClient.get_payment.called is True
+    assert VerkkokauppaAPIClient.cancel_order.called is False
 
-        with freeze_time(datetime(2022, 11, 28, 10, 15, 0, tzinfo=DEFAULT_TIMEZONE)):
-            update_expired_orders()
-
-        order.refresh_from_db()
-        assert order.status == OrderStatus.DRAFT
-        assert SentryLogger.log_exception.called is True
-
-    @patch_method(VerkkokauppaAPIClient.get_payment)
-    @patch_method(VerkkokauppaAPIClient.cancel_order)
-    def test_give_more_time_if_user_entered_to_payment_phase(self):
-        four_minutes_in_the_future = datetime.now(tz=DEFAULT_TIMEZONE) + timedelta(minutes=4)
-        six_minutes_ago = datetime.now(tz=DEFAULT_TIMEZONE) - timedelta(minutes=6)
-
-        VerkkokauppaAPIClient.get_payment.return_value = PaymentFactory(
-            status=WebShopPaymentStatus.CREATED.value,
-            timestamp=four_minutes_in_the_future,
-        )
-
-        order = PaymentOrderFactory.create(
-            status=OrderStatus.DRAFT,
-            created_at=six_minutes_ago,
-            reservation=self.reservation,
-            remote_id=uuid.uuid4(),
-        )
-
-        with freeze_time(datetime(2022, 11, 28, 10, 15, 0, tzinfo=DEFAULT_TIMEZONE)):
-            update_expired_orders()
-
-        assert VerkkokauppaAPIClient.get_payment.called is True
-        assert VerkkokauppaAPIClient.cancel_order.called is False
-
-        order.refresh_from_db()
-        assert order.status == OrderStatus.DRAFT
+    order.refresh_from_db()
+    assert order.status == OrderStatus.DRAFT
