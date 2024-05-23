@@ -14,6 +14,7 @@ from opening_hours.models import ReservableTimeSpan
 from opening_hours.utils.reservable_time_span_client import override_reservable_with_closed_time_spans
 from opening_hours.utils.time_span_element import TimeSpanElement
 from reservation_units.enums import ReservationStartInterval
+from reservation_units.utils.affecting_reservations_helper import AffectingReservationHelper
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -125,8 +126,6 @@ class FirstReservableTimeHelper:
         filter_time_end: time | None = None,
         minimum_duration_minutes: float | Decimal | None = None,
     ) -> None:
-        from reservations.models import Reservation
-
         now = local_datetime()
         today = now.date()
         two_years_from_now = today + timedelta(days=731)  # 2 years + 1 day as a buffer
@@ -184,11 +183,13 @@ class FirstReservableTimeHelper:
         self.reservation_unit_queryset = reservation_unit_queryset
         self.reservation_units_with_prefetched_related_objects = self._get_reservation_unit_queryset_with_prefetches()
 
-        reservations, blocking_reservations = Reservation.objects.get_affecting_reservations_as_closed_time_spans(
-            reservation_unit_queryset=reservation_unit_queryset.exclude(origin_hauki_resource__isnull=True),
+        helper = AffectingReservationHelper(
             start_date=filter_date_start,
             end_date=filter_date_end,
+            reservation_unit_queryset=reservation_unit_queryset.exclude(origin_hauki_resource__isnull=True),
         )
+        reservations, blocking_reservations = helper.get_affecting_time_spans()
+
         self.reservation_closed_time_spans_map = reservations
         self.blocking_reservation_closed_time_spans_map = blocking_reservations
         ##################################
