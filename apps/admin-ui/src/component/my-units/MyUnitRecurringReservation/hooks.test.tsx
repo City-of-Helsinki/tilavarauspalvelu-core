@@ -8,11 +8,11 @@ import type { NewReservationListItem } from "@/component/ReservationsList";
 import { useCreateRecurringReservation } from "./hooks";
 import { mocks } from "./__test__/mocks";
 import type { ReservationMade } from "./RecurringReservationDone";
-import { CREATE_RECURRING_RESERVATION } from "./queries";
-import { CREATE_STAFF_RESERVATION } from "../create-reservation/queries";
-import type {
-  RecurringReservationCreateMutationInput,
-  RecurringReservationCreateMutationPayload,
+import {
+  CreateRecurringReservationDocument,
+  CreateStaffReservationDocument,
+  type RecurringReservationCreateMutationInput,
+  type RecurringReservationCreateMutationPayload,
 } from "@gql/gql-types";
 
 const N_DAYS = 10;
@@ -37,7 +37,7 @@ const createRecurringMock = (
 ) => [
   {
     request: {
-      query: CREATE_RECURRING_RESERVATION,
+      query: CreateRecurringReservationDocument,
       variables: {
         input: {
           beginDate: format(startingDate, "yyyy-MM-dd"),
@@ -68,7 +68,7 @@ const createRecurringMock = (
     (_, i) => i
   ).map(() => ({
     request: {
-      query: CREATE_STAFF_RESERVATION,
+      query: CreateStaffReservationDocument,
       variables: {
         input: {
           begin: add(startingDate, { days: FAIL_INDEX }).toISOString(),
@@ -86,7 +86,7 @@ const createRecurringMock = (
   })),
   ...Array.from({ length: N_DAYS }, (_, i) => i).map((i) => ({
     request: {
-      query: CREATE_STAFF_RESERVATION,
+      query: CreateStaffReservationDocument,
       variables: {
         input: {
           begin: add(startingDate, { days: i }).toISOString(),

@@ -5322,7 +5322,7 @@ export type BannerNotificationsListQuery = {
   } | null;
 };
 
-export type ApplicationNameFragmentFragment = {
+export type ApplicationNameFragment = {
   applicantType?: ApplicantTypeChoice | null;
   organisation?: {
     id: string;
@@ -5332,14 +5332,14 @@ export type ApplicationNameFragmentFragment = {
   contactPerson?: { id: string; lastName: string; firstName: string } | null;
 };
 
-export type ApplicationSectionDurationFragmentFragment = {
+export type ApplicationSectionDurationFragment = {
   reservationsEndDate: string;
   reservationsBeginDate: string;
   appliedReservationsPerWeek: number;
   reservationMinDuration: number;
 };
 
-export type ApplicationSectionCommonFragmentFragment = {
+export type ApplicationSectionCommonFragment = {
   id: string;
   pk?: number | null;
   name: string;
@@ -5363,50 +5363,7 @@ export type ApplicationSectionCommonFragmentFragment = {
   }>;
 };
 
-export type ApplicationSectionFragmentFragment = {
-  id: string;
-  pk?: number | null;
-  name: string;
-  status?: ApplicationSectionStatusChoice | null;
-  reservationMaxDuration: number;
-  numPersons: number;
-  reservationsEndDate: string;
-  reservationsBeginDate: string;
-  appliedReservationsPerWeek: number;
-  reservationMinDuration: number;
-  purpose?: { id: string; pk?: number | null; nameFi?: string | null } | null;
-  application: {
-    id: string;
-    pk?: number | null;
-    status?: ApplicationStatusChoice | null;
-    applicantType?: ApplicantTypeChoice | null;
-    organisation?: {
-      id: string;
-      name: string;
-      organisationType: OrganizationTypeChoice;
-    } | null;
-    contactPerson?: { id: string; lastName: string; firstName: string } | null;
-  };
-  reservationUnitOptions: Array<{
-    id: string;
-    pk?: number | null;
-    preferredOrder: number;
-    reservationUnit: {
-      id: string;
-      pk?: number | null;
-      nameFi?: string | null;
-      unit?: { id: string; pk?: number | null; nameFi?: string | null } | null;
-    };
-  }>;
-  ageGroup?: {
-    id: string;
-    pk?: number | null;
-    minimum: number;
-    maximum?: number | null;
-  } | null;
-};
-
-export type ApplicationSectionUiFragmentFragment = {
+export type ApplicationSectionUiFragment = {
   id: string;
   pk?: number | null;
   name: string;
@@ -5465,7 +5422,7 @@ export type ApplicationSectionUiFragmentFragment = {
   } | null;
 };
 
-export type ApplicantFragmentFragment = {
+export type ApplicantFragment = {
   applicantType?: ApplicantTypeChoice | null;
   additionalInformation?: string | null;
   contactPerson?: {
@@ -5514,7 +5471,7 @@ export type ApplicantFragmentFragment = {
   } | null;
 };
 
-export type ApplicationRoundFragmentFragment = {
+export type ApplicationRoundFragment = {
   id: string;
   pk?: number | null;
   nameFi?: string | null;
@@ -5557,121 +5514,6 @@ export type ApplicationRoundFragmentFragment = {
       nameEn?: string | null;
     } | null;
   }>;
-};
-
-export type ApplicationAdminFragmentFragment = {
-  pk?: number | null;
-  id: string;
-  status?: ApplicationStatusChoice | null;
-  lastModifiedDate: string;
-  applicantType?: ApplicantTypeChoice | null;
-  additionalInformation?: string | null;
-  applicationRound: { id: string; pk?: number | null; nameFi?: string | null };
-  applicationSections?: Array<{
-    id: string;
-    allocations?: number | null;
-    pk?: number | null;
-    name: string;
-    status?: ApplicationSectionStatusChoice | null;
-    reservationMaxDuration: number;
-    numPersons: number;
-    reservationsEndDate: string;
-    reservationsBeginDate: string;
-    appliedReservationsPerWeek: number;
-    reservationMinDuration: number;
-    reservationUnitOptions: Array<{
-      id: string;
-      rejected: boolean;
-      pk?: number | null;
-      preferredOrder: number;
-      allocatedTimeSlots: Array<{ pk?: number | null; id: string }>;
-      reservationUnit: {
-        id: string;
-        pk?: number | null;
-        nameFi?: string | null;
-        nameEn?: string | null;
-        nameSv?: string | null;
-        unit?: {
-          id: string;
-          pk?: number | null;
-          nameFi?: string | null;
-          nameEn?: string | null;
-          nameSv?: string | null;
-        } | null;
-        applicationRoundTimeSlots: Array<{
-          id: string;
-          weekday: number;
-          closed: boolean;
-          reservableTimes?: Array<{ begin: string; end: string } | null> | null;
-        }>;
-      };
-    }>;
-    suitableTimeRanges: Array<{
-      id: string;
-      pk?: number | null;
-      beginTime: string;
-      endTime: string;
-      dayOfTheWeek: Weekday;
-      priority: Priority;
-    }>;
-    purpose?: {
-      id: string;
-      pk?: number | null;
-      nameFi?: string | null;
-      nameSv?: string | null;
-      nameEn?: string | null;
-    } | null;
-    ageGroup?: {
-      id: string;
-      pk?: number | null;
-      minimum: number;
-      maximum?: number | null;
-    } | null;
-  }> | null;
-  contactPerson?: {
-    id: string;
-    pk?: number | null;
-    firstName: string;
-    lastName: string;
-    email?: string | null;
-    phoneNumber?: string | null;
-  } | null;
-  organisation?: {
-    id: string;
-    pk?: number | null;
-    name: string;
-    identifier?: string | null;
-    organisationType: OrganizationTypeChoice;
-    coreBusiness: string;
-    yearEstablished?: number | null;
-    address?: {
-      id: string;
-      pk?: number | null;
-      postCode: string;
-      streetAddress: string;
-      city: string;
-    } | null;
-  } | null;
-  homeCity?: {
-    id: string;
-    pk?: number | null;
-    nameFi?: string | null;
-    nameEn?: string | null;
-    nameSv?: string | null;
-  } | null;
-  billingAddress?: {
-    id: string;
-    pk?: number | null;
-    postCode: string;
-    streetAddress: string;
-    city: string;
-  } | null;
-  user?: {
-    id: string;
-    name?: string | null;
-    email: string;
-    pk?: number | null;
-  } | null;
 };
 
 export type ApplicationCommonFragment = {
@@ -6065,7 +5907,7 @@ export type PricingFieldsFragment = {
   taxPercentage: { id: string; pk?: number | null; value: string };
 };
 
-export type ImageFragmentFragment = {
+export type ImageFragment = {
   id: string;
   imageUrl?: string | null;
   largeUrl?: string | null;
@@ -6183,6 +6025,164 @@ export type UnitNameFieldsFragment = {
     pk?: number | null;
     nameFi?: string | null;
   }>;
+};
+
+export type ApplicationSectionFragment = {
+  id: string;
+  pk?: number | null;
+  name: string;
+  status?: ApplicationSectionStatusChoice | null;
+  reservationMaxDuration: number;
+  numPersons: number;
+  reservationsEndDate: string;
+  reservationsBeginDate: string;
+  appliedReservationsPerWeek: number;
+  reservationMinDuration: number;
+  purpose?: { id: string; pk?: number | null; nameFi?: string | null } | null;
+  application: {
+    id: string;
+    pk?: number | null;
+    status?: ApplicationStatusChoice | null;
+    applicantType?: ApplicantTypeChoice | null;
+    organisation?: {
+      id: string;
+      name: string;
+      organisationType: OrganizationTypeChoice;
+    } | null;
+    contactPerson?: { id: string; lastName: string; firstName: string } | null;
+  };
+  reservationUnitOptions: Array<{
+    id: string;
+    pk?: number | null;
+    preferredOrder: number;
+    reservationUnit: {
+      id: string;
+      pk?: number | null;
+      nameFi?: string | null;
+      unit?: { id: string; pk?: number | null; nameFi?: string | null } | null;
+    };
+  }>;
+  ageGroup?: {
+    id: string;
+    pk?: number | null;
+    minimum: number;
+    maximum?: number | null;
+  } | null;
+};
+
+export type ApplicationAdminFragment = {
+  pk?: number | null;
+  id: string;
+  status?: ApplicationStatusChoice | null;
+  lastModifiedDate: string;
+  applicantType?: ApplicantTypeChoice | null;
+  additionalInformation?: string | null;
+  applicationRound: { id: string; pk?: number | null; nameFi?: string | null };
+  applicationSections?: Array<{
+    id: string;
+    allocations?: number | null;
+    pk?: number | null;
+    name: string;
+    status?: ApplicationSectionStatusChoice | null;
+    reservationMaxDuration: number;
+    numPersons: number;
+    reservationsEndDate: string;
+    reservationsBeginDate: string;
+    appliedReservationsPerWeek: number;
+    reservationMinDuration: number;
+    reservationUnitOptions: Array<{
+      id: string;
+      rejected: boolean;
+      pk?: number | null;
+      preferredOrder: number;
+      allocatedTimeSlots: Array<{ pk?: number | null; id: string }>;
+      reservationUnit: {
+        id: string;
+        pk?: number | null;
+        nameFi?: string | null;
+        nameEn?: string | null;
+        nameSv?: string | null;
+        unit?: {
+          id: string;
+          pk?: number | null;
+          nameFi?: string | null;
+          nameEn?: string | null;
+          nameSv?: string | null;
+        } | null;
+        applicationRoundTimeSlots: Array<{
+          id: string;
+          weekday: number;
+          closed: boolean;
+          reservableTimes?: Array<{ begin: string; end: string } | null> | null;
+        }>;
+      };
+    }>;
+    suitableTimeRanges: Array<{
+      id: string;
+      pk?: number | null;
+      beginTime: string;
+      endTime: string;
+      dayOfTheWeek: Weekday;
+      priority: Priority;
+    }>;
+    purpose?: {
+      id: string;
+      pk?: number | null;
+      nameFi?: string | null;
+      nameSv?: string | null;
+      nameEn?: string | null;
+    } | null;
+    ageGroup?: {
+      id: string;
+      pk?: number | null;
+      minimum: number;
+      maximum?: number | null;
+    } | null;
+  }> | null;
+  contactPerson?: {
+    id: string;
+    pk?: number | null;
+    firstName: string;
+    lastName: string;
+    email?: string | null;
+    phoneNumber?: string | null;
+  } | null;
+  organisation?: {
+    id: string;
+    pk?: number | null;
+    name: string;
+    identifier?: string | null;
+    organisationType: OrganizationTypeChoice;
+    coreBusiness: string;
+    yearEstablished?: number | null;
+    address?: {
+      id: string;
+      pk?: number | null;
+      postCode: string;
+      streetAddress: string;
+      city: string;
+    } | null;
+  } | null;
+  homeCity?: {
+    id: string;
+    pk?: number | null;
+    nameFi?: string | null;
+    nameEn?: string | null;
+    nameSv?: string | null;
+  } | null;
+  billingAddress?: {
+    id: string;
+    pk?: number | null;
+    postCode: string;
+    streetAddress: string;
+    city: string;
+  } | null;
+  user?: {
+    id: string;
+    name?: string | null;
+    email: string;
+    pk?: number | null;
+  } | null;
 };
 
 export type SpacesQueryVariables = Exact<{ [key: string]: never }>;
@@ -6374,7 +6374,7 @@ export type HandlingDataQuery = {
   } | null;
 };
 
-export type BannerNotificationsAdminFragmentFragment = {
+export type BannerNotificationsAdminFragment = {
   pk?: number | null;
   name: string;
   target: BannerNotificationTarget;
@@ -8708,85 +8708,8 @@ export type ApplicationRoundQuery = {
   } | null;
 };
 
-export const ApplicationSectionDurationFragmentFragmentDoc = gql`
-  fragment ApplicationSectionDurationFragment on ApplicationSectionNode {
-    reservationsEndDate
-    reservationsBeginDate
-    appliedReservationsPerWeek
-    reservationMinDuration
-  }
-`;
-export const ApplicationSectionCommonFragmentFragmentDoc = gql`
-  fragment ApplicationSectionCommonFragment on ApplicationSectionNode {
-    id
-    pk
-    name
-    status
-    ...ApplicationSectionDurationFragment
-    reservationMaxDuration
-    ageGroup {
-      id
-      pk
-      minimum
-      maximum
-    }
-    numPersons
-    reservationUnitOptions {
-      id
-      pk
-      preferredOrder
-    }
-  }
-  ${ApplicationSectionDurationFragmentFragmentDoc}
-`;
-export const ApplicationNameFragmentFragmentDoc = gql`
-  fragment ApplicationNameFragment on ApplicationNode {
-    applicantType
-    organisation {
-      id
-      name
-      organisationType
-    }
-    contactPerson {
-      id
-      lastName
-      firstName
-    }
-  }
-`;
-export const ApplicationSectionFragmentFragmentDoc = gql`
-  fragment ApplicationSectionFragment on ApplicationSectionNode {
-    ...ApplicationSectionCommonFragment
-    purpose {
-      id
-      pk
-      nameFi
-    }
-    application {
-      id
-      pk
-      status
-      ...ApplicationNameFragment
-    }
-    reservationUnitOptions {
-      id
-      reservationUnit {
-        id
-        pk
-        nameFi
-        unit {
-          id
-          pk
-          nameFi
-        }
-      }
-    }
-  }
-  ${ApplicationSectionCommonFragmentFragmentDoc}
-  ${ApplicationNameFragmentFragmentDoc}
-`;
-export const ApplicantFragmentFragmentDoc = gql`
-  fragment ApplicantFragment on ApplicationNode {
+export const ApplicantFragmentDoc = gql`
+  fragment Applicant on ApplicationNode {
     applicantType
     contactPerson {
       id
@@ -8835,9 +8758,92 @@ export const ApplicantFragmentFragmentDoc = gql`
     }
   }
 `;
-export const ApplicationSectionUiFragmentFragmentDoc = gql`
-  fragment ApplicationSectionUIFragment on ApplicationSectionNode {
-    ...ApplicationSectionCommonFragment
+export const ImageFragmentDoc = gql`
+  fragment Image on ReservationUnitImageNode {
+    id
+    imageUrl
+    largeUrl
+    mediumUrl
+    smallUrl
+    imageType
+  }
+`;
+export const ApplicationRoundFragmentDoc = gql`
+  fragment ApplicationRound on ApplicationRoundNode {
+    id
+    pk
+    nameFi
+    nameSv
+    nameEn
+    serviceSector {
+      id
+      pk
+      nameFi
+    }
+    reservationUnits {
+      id
+      pk
+      nameFi
+      nameSv
+      nameEn
+      minPersons
+      maxPersons
+      images {
+        ...Image
+      }
+      unit {
+        id
+        pk
+        nameFi
+        nameSv
+        nameEn
+      }
+    }
+    applicationPeriodBegin
+    applicationPeriodEnd
+    reservationPeriodBegin
+    reservationPeriodEnd
+    status
+    applicationsCount
+    reservationUnitCount
+    statusTimestamp
+  }
+  ${ImageFragmentDoc}
+`;
+export const ApplicationSectionDurationFragmentDoc = gql`
+  fragment ApplicationSectionDuration on ApplicationSectionNode {
+    reservationsEndDate
+    reservationsBeginDate
+    appliedReservationsPerWeek
+    reservationMinDuration
+  }
+`;
+export const ApplicationSectionCommonFragmentDoc = gql`
+  fragment ApplicationSectionCommon on ApplicationSectionNode {
+    id
+    pk
+    name
+    status
+    ...ApplicationSectionDuration
+    reservationMaxDuration
+    ageGroup {
+      id
+      pk
+      minimum
+      maximum
+    }
+    numPersons
+    reservationUnitOptions {
+      id
+      pk
+      preferredOrder
+    }
+  }
+  ${ApplicationSectionDurationFragmentDoc}
+`;
+export const ApplicationSectionUiFragmentDoc = gql`
+  fragment ApplicationSectionUI on ApplicationSectionNode {
+    ...ApplicationSectionCommon
     suitableTimeRanges {
       id
       pk
@@ -8880,88 +8886,7 @@ export const ApplicationSectionUiFragmentFragmentDoc = gql`
       }
     }
   }
-  ${ApplicationSectionCommonFragmentFragmentDoc}
-`;
-export const ApplicationAdminFragmentFragmentDoc = gql`
-  fragment ApplicationAdminFragment on ApplicationNode {
-    pk
-    id
-    status
-    lastModifiedDate
-    ...ApplicantFragment
-    applicationRound {
-      id
-      pk
-      nameFi
-    }
-    applicationSections {
-      id
-      ...ApplicationSectionUIFragment
-      allocations
-      reservationUnitOptions {
-        id
-        rejected
-        allocatedTimeSlots {
-          pk
-          id
-        }
-      }
-    }
-  }
-  ${ApplicantFragmentFragmentDoc}
-  ${ApplicationSectionUiFragmentFragmentDoc}
-`;
-export const ImageFragmentFragmentDoc = gql`
-  fragment ImageFragment on ReservationUnitImageNode {
-    id
-    imageUrl
-    largeUrl
-    mediumUrl
-    smallUrl
-    imageType
-  }
-`;
-export const ApplicationRoundFragmentFragmentDoc = gql`
-  fragment ApplicationRoundFragment on ApplicationRoundNode {
-    id
-    pk
-    nameFi
-    nameSv
-    nameEn
-    serviceSector {
-      id
-      pk
-      nameFi
-    }
-    reservationUnits {
-      id
-      pk
-      nameFi
-      nameSv
-      nameEn
-      minPersons
-      maxPersons
-      images {
-        ...ImageFragment
-      }
-      unit {
-        id
-        pk
-        nameFi
-        nameSv
-        nameEn
-      }
-    }
-    applicationPeriodBegin
-    applicationPeriodEnd
-    reservationPeriodBegin
-    reservationPeriodEnd
-    status
-    applicationsCount
-    reservationUnitCount
-    statusTimestamp
-  }
-  ${ImageFragmentFragmentDoc}
+  ${ApplicationSectionCommonFragmentDoc}
 `;
 export const ApplicationCommonFragmentDoc = gql`
   fragment ApplicationCommon on ApplicationNode {
@@ -8969,17 +8894,17 @@ export const ApplicationCommonFragmentDoc = gql`
     pk
     status
     lastModifiedDate
-    ...ApplicantFragment
+    ...Applicant
     applicationRound {
-      ...ApplicationRoundFragment
+      ...ApplicationRound
     }
     applicationSections {
-      ...ApplicationSectionUIFragment
+      ...ApplicationSectionUI
     }
   }
-  ${ApplicantFragmentFragmentDoc}
-  ${ApplicationRoundFragmentFragmentDoc}
-  ${ApplicationSectionUiFragmentFragmentDoc}
+  ${ApplicantFragmentDoc}
+  ${ApplicationRoundFragmentDoc}
+  ${ApplicationSectionUiFragmentDoc}
 `;
 export const TermsOfUseNameFieldsFragmentDoc = gql`
   fragment TermsOfUseNameFields on TermsOfUseNode {
@@ -9082,6 +9007,81 @@ export const ReservationUnitCommonFieldsFragmentDoc = gql`
     }
   }
 `;
+export const ApplicationNameFragmentDoc = gql`
+  fragment ApplicationName on ApplicationNode {
+    applicantType
+    organisation {
+      id
+      name
+      organisationType
+    }
+    contactPerson {
+      id
+      lastName
+      firstName
+    }
+  }
+`;
+export const ApplicationSectionFragmentDoc = gql`
+  fragment ApplicationSection on ApplicationSectionNode {
+    ...ApplicationSectionCommon
+    purpose {
+      id
+      pk
+      nameFi
+    }
+    application {
+      id
+      pk
+      status
+      ...ApplicationName
+    }
+    reservationUnitOptions {
+      id
+      reservationUnit {
+        id
+        pk
+        nameFi
+        unit {
+          id
+          pk
+          nameFi
+        }
+      }
+    }
+  }
+  ${ApplicationSectionCommonFragmentDoc}
+  ${ApplicationNameFragmentDoc}
+`;
+export const ApplicationAdminFragmentDoc = gql`
+  fragment ApplicationAdmin on ApplicationNode {
+    pk
+    id
+    status
+    lastModifiedDate
+    ...Applicant
+    applicationRound {
+      id
+      pk
+      nameFi
+    }
+    applicationSections {
+      id
+      ...ApplicationSectionUI
+      allocations
+      reservationUnitOptions {
+        id
+        rejected
+        allocatedTimeSlots {
+          pk
+          id
+        }
+      }
+    }
+  }
+  ${ApplicantFragmentDoc}
+  ${ApplicationSectionUiFragmentDoc}
+`;
 export const BannerNotificationCommonFragmentDoc = gql`
   fragment BannerNotificationCommon on BannerNotificationNode {
     id
@@ -9093,8 +9093,8 @@ export const BannerNotificationCommonFragmentDoc = gql`
     messageSv
   }
 `;
-export const BannerNotificationsAdminFragmentFragmentDoc = gql`
-  fragment BannerNotificationsAdminFragment on BannerNotificationNode {
+export const BannerNotificationsAdminFragmentDoc = gql`
+  fragment BannerNotificationsAdmin on BannerNotificationNode {
     pk
     ...BannerNotificationCommon
     name
@@ -9880,7 +9880,7 @@ export const UnitDocument = gql`
           nameFi
         }
         images {
-          ...ImageFragment
+          ...Image
         }
       }
       spaces {
@@ -9894,7 +9894,7 @@ export const UnitDocument = gql`
     }
   }
   ${ReservationUnitCommonFieldsFragmentDoc}
-  ${ImageFragmentFragmentDoc}
+  ${ImageFragmentDoc}
   ${SpaceFieldsFragmentDoc}
   ${LocationFieldsFragmentDoc}
 `;
@@ -10186,10 +10186,10 @@ export type HandlingDataQueryResult = Apollo.QueryResult<
 export const BannerNotificationsAdminDocument = gql`
   query BannerNotificationsAdmin($id: ID!) {
     bannerNotification(id: $id) {
-      ...BannerNotificationsAdminFragment
+      ...BannerNotificationsAdmin
     }
   }
-  ${BannerNotificationsAdminFragmentFragmentDoc}
+  ${BannerNotificationsAdminFragmentDoc}
 `;
 
 /**
@@ -10270,7 +10270,7 @@ export const BannerNotificationsAdminListDocument = gql`
     bannerNotifications(first: $first, after: $after, orderBy: $orderBy) {
       edges {
         node {
-          ...BannerNotificationsAdminFragment
+          ...BannerNotificationsAdmin
         }
       }
       pageInfo {
@@ -10280,7 +10280,7 @@ export const BannerNotificationsAdminListDocument = gql`
       totalCount
     }
   }
-  ${BannerNotificationsAdminFragmentFragmentDoc}
+  ${BannerNotificationsAdminFragmentDoc}
 `;
 
 /**
@@ -10515,7 +10515,7 @@ export type ApplicationDateOfBirthQueryResult = Apollo.QueryResult<
   ApplicationDateOfBirthQueryVariables
 >;
 export const CreateResourceDocument = gql`
-  mutation createResource($input: ResourceCreateMutationInput!) {
+  mutation CreateResource($input: ResourceCreateMutationInput!) {
     createResource(input: $input) {
       pk
     }
@@ -10565,7 +10565,7 @@ export type CreateResourceMutationOptions = Apollo.BaseMutationOptions<
   CreateResourceMutationVariables
 >;
 export const UpdateResourceDocument = gql`
-  mutation updateResource($input: ResourceUpdateMutationInput!) {
+  mutation UpdateResource($input: ResourceUpdateMutationInput!) {
     updateResource(input: $input) {
       pk
     }
@@ -10692,7 +10692,7 @@ export type ResourceQueryResult = Apollo.QueryResult<
   ResourceQueryVariables
 >;
 export const CreateSpaceDocument = gql`
-  mutation createSpace($input: SpaceCreateMutationInput!) {
+  mutation CreateSpace($input: SpaceCreateMutationInput!) {
     createSpace(input: $input) {
       pk
     }
@@ -10742,7 +10742,7 @@ export type CreateSpaceMutationOptions = Apollo.BaseMutationOptions<
   CreateSpaceMutationVariables
 >;
 export const UpdateSpaceDocument = gql`
-  mutation updateSpace($input: SpaceUpdateMutationInput!) {
+  mutation UpdateSpace($input: SpaceUpdateMutationInput!) {
     updateSpace(input: $input) {
       pk
     }
@@ -11310,7 +11310,7 @@ export type ReservationUnitsFilterParamsQueryResult = Apollo.QueryResult<
   ReservationUnitsFilterParamsQueryVariables
 >;
 export const CreateRecurringReservationDocument = gql`
-  mutation createRecurringReservation(
+  mutation CreateRecurringReservation(
     $input: RecurringReservationCreateMutationInput!
   ) {
     createRecurringReservation(input: $input) {
@@ -11464,7 +11464,7 @@ export type ReservationTimesInReservationUnitQueryResult = Apollo.QueryResult<
   ReservationTimesInReservationUnitQueryVariables
 >;
 export const CreateStaffReservationDocument = gql`
-  mutation createStaffReservation(
+  mutation CreateStaffReservation(
     $input: ReservationStaffCreateMutationInput!
   ) {
     createStaffReservation(input: $input) {
@@ -11516,7 +11516,7 @@ export type CreateStaffReservationMutationOptions = Apollo.BaseMutationOptions<
   CreateStaffReservationMutationVariables
 >;
 export const OptionsDocument = gql`
-  query options {
+  query Options {
     reservationPurposes {
       edges {
         node {
@@ -12230,7 +12230,7 @@ export type BannerNotificationDeleteMutationOptions =
     BannerNotificationDeleteMutationVariables
   >;
 export const UpdateReservationWorkingMemoDocument = gql`
-  mutation updateReservationWorkingMemo($pk: Int!, $workingMemo: String!) {
+  mutation UpdateReservationWorkingMemo($pk: Int!, $workingMemo: String!) {
     updateReservationWorkingMemo(
       input: { pk: $pk, workingMemo: $workingMemo }
     ) {
@@ -12285,7 +12285,7 @@ export type UpdateReservationWorkingMemoMutationOptions =
     UpdateReservationWorkingMemoMutationVariables
   >;
 export const UpdateApplicationWorkingMemoDocument = gql`
-  mutation updateApplicationWorkingMemo($pk: Int!, $workingMemo: String!) {
+  mutation UpdateApplicationWorkingMemo($pk: Int!, $workingMemo: String!) {
     updateApplication(input: { pk: $pk, workingMemo: $workingMemo }) {
       pk
       workingMemo
@@ -12472,7 +12472,7 @@ export type SearchReservationUnitsQueryResult = Apollo.QueryResult<
   SearchReservationUnitsQueryVariables
 >;
 export const UpdateStaffReservationDocument = gql`
-  mutation updateStaffReservation(
+  mutation UpdateStaffReservation(
     $input: ReservationStaffModifyMutationInput!
     $workingMemo: ReservationWorkingMemoMutationInput!
   ) {
@@ -12529,7 +12529,7 @@ export type UpdateStaffReservationMutationOptions = Apollo.BaseMutationOptions<
   UpdateStaffReservationMutationVariables
 >;
 export const UpdateRecurringReservationDocument = gql`
-  mutation updateRecurringReservation(
+  mutation UpdateRecurringReservation(
     $input: RecurringReservationUpdateMutationInput!
   ) {
     updateRecurringReservation(input: $input) {
@@ -12715,7 +12715,7 @@ export type ReservationsQueryResult = Apollo.QueryResult<
   ReservationsQueryVariables
 >;
 export const StaffAdjustReservationTimeDocument = gql`
-  mutation staffAdjustReservationTime(
+  mutation StaffAdjustReservationTime(
     $input: ReservationStaffAdjustTimeMutationInput!
   ) {
     staffAdjustReservationTime(input: $input) {
@@ -13053,7 +13053,7 @@ export type RecurringReservationQueryResult = Apollo.QueryResult<
   RecurringReservationQueryVariables
 >;
 export const ApproveReservationDocument = gql`
-  mutation approveReservation($input: ReservationApproveMutationInput!) {
+  mutation ApproveReservation($input: ReservationApproveMutationInput!) {
     approveReservation(input: $input) {
       pk
       state
@@ -13104,7 +13104,7 @@ export type ApproveReservationMutationOptions = Apollo.BaseMutationOptions<
   ApproveReservationMutationVariables
 >;
 export const DenyReservationDocument = gql`
-  mutation denyReservation($input: ReservationDenyMutationInput!) {
+  mutation DenyReservation($input: ReservationDenyMutationInput!) {
     denyReservation(input: $input) {
       pk
       state
@@ -13155,7 +13155,7 @@ export type DenyReservationMutationOptions = Apollo.BaseMutationOptions<
   DenyReservationMutationVariables
 >;
 export const RefundReservationDocument = gql`
-  mutation refundReservation($input: ReservationRefundMutationInput!) {
+  mutation RefundReservation($input: ReservationRefundMutationInput!) {
     refundReservation(input: $input) {
       pk
     }
@@ -13205,7 +13205,7 @@ export type RefundReservationMutationOptions = Apollo.BaseMutationOptions<
   RefundReservationMutationVariables
 >;
 export const RequireHandlingDocument = gql`
-  mutation requireHandling($input: ReservationRequiresHandlingMutationInput!) {
+  mutation RequireHandling($input: ReservationRequiresHandlingMutationInput!) {
     requireHandlingForReservation(input: $input) {
       pk
       state
@@ -13473,7 +13473,7 @@ export const ReservationUnitEditDocument = gql`
       reservationState
       images {
         pk
-        ...ImageFragment
+        ...Image
       }
       haukiUrl
       cancellationRule {
@@ -13599,7 +13599,7 @@ export const ReservationUnitEditDocument = gql`
       }
     }
   }
-  ${ImageFragmentFragmentDoc}
+  ${ImageFragmentDoc}
   ${PricingFieldsFragmentDoc}
 `;
 
@@ -13673,7 +13673,7 @@ export type ReservationUnitEditQueryResult = Apollo.QueryResult<
   ReservationUnitEditQueryVariables
 >;
 export const UpdateReservationUnitDocument = gql`
-  mutation updateReservationUnit($input: ReservationUnitUpdateMutationInput!) {
+  mutation UpdateReservationUnit($input: ReservationUnitUpdateMutationInput!) {
     updateReservationUnit(input: $input) {
       pk
     }
@@ -13723,7 +13723,7 @@ export type UpdateReservationUnitMutationOptions = Apollo.BaseMutationOptions<
   UpdateReservationUnitMutationVariables
 >;
 export const CreateReservationUnitDocument = gql`
-  mutation createReservationUnit($input: ReservationUnitCreateMutationInput!) {
+  mutation CreateReservationUnit($input: ReservationUnitCreateMutationInput!) {
     createReservationUnit(input: $input) {
       pk
     }
@@ -13773,7 +13773,7 @@ export type CreateReservationUnitMutationOptions = Apollo.BaseMutationOptions<
   CreateReservationUnitMutationVariables
 >;
 export const CreateImageDocument = gql`
-  mutation createImage(
+  mutation CreateImage(
     $image: Upload!
     $reservationUnit: Int!
     $imageType: ImageType!
@@ -13835,7 +13835,7 @@ export type CreateImageMutationOptions = Apollo.BaseMutationOptions<
   CreateImageMutationVariables
 >;
 export const DeleteImageDocument = gql`
-  mutation deleteImage($pk: ID!) {
+  mutation DeleteImage($pk: ID!) {
     deleteReservationUnitImage(input: { pk: $pk }) {
       deleted
     }
@@ -13885,7 +13885,7 @@ export type DeleteImageMutationOptions = Apollo.BaseMutationOptions<
   DeleteImageMutationVariables
 >;
 export const UpdateImageDocument = gql`
-  mutation updateImage($pk: Int!, $imageType: ImageType!) {
+  mutation UpdateImage($pk: Int!, $imageType: ImageType!) {
     updateReservationUnitImage(input: { pk: $pk, imageType: $imageType }) {
       pk
     }
@@ -14080,11 +14080,11 @@ export type ReservationUnitEditorParametersQueryResult = Apollo.QueryResult<
 export const ApplicationAdminDocument = gql`
   query ApplicationAdmin($id: ID!) {
     application(id: $id) {
-      ...ApplicationAdminFragment
+      ...ApplicationAdmin
       workingMemo
     }
   }
-  ${ApplicationAdminFragmentFragmentDoc}
+  ${ApplicationAdminFragmentDoc}
 `;
 
 /**
@@ -14157,7 +14157,7 @@ export type ApplicationAdminQueryResult = Apollo.QueryResult<
   ApplicationAdminQueryVariables
 >;
 export const RejectAllSectionOptionsDocument = gql`
-  mutation rejectAllSectionOptions(
+  mutation RejectAllSectionOptions(
     $input: RejectAllSectionOptionsMutationInput!
   ) {
     rejectAllSectionOptions(input: $input) {
@@ -14209,7 +14209,7 @@ export type RejectAllSectionOptionsMutationOptions = Apollo.BaseMutationOptions<
   RejectAllSectionOptionsMutationVariables
 >;
 export const RestoreAllSectionOptionsDocument = gql`
-  mutation restoreAllSectionOptions(
+  mutation RestoreAllSectionOptions(
     $input: RestoreAllSectionOptionsMutationInput!
   ) {
     restoreAllSectionOptions(input: $input) {
@@ -14262,7 +14262,7 @@ export type RestoreAllSectionOptionsMutationOptions =
     RestoreAllSectionOptionsMutationVariables
   >;
 export const RejectAllApplicationOptionsDocument = gql`
-  mutation rejectAllApplicationOptions(
+  mutation RejectAllApplicationOptions(
     $input: RejectAllApplicationOptionsMutationInput!
   ) {
     rejectAllApplicationOptions(input: $input) {
@@ -14315,7 +14315,7 @@ export type RejectAllApplicationOptionsMutationOptions =
     RejectAllApplicationOptionsMutationVariables
   >;
 export const RestoreAllApplicationOptionsDocument = gql`
-  mutation restoreAllApplicationOptions(
+  mutation RestoreAllApplicationOptions(
     $input: RestoreAllApplicationOptionsMutationInput!
   ) {
     restoreAllApplicationOptions(input: $input) {
@@ -14702,7 +14702,7 @@ export const ApplicationSectionAllocationsDocument = gql`
     ) {
       edges {
         node {
-          ...ApplicationSectionFragment
+          ...ApplicationSection
           allocations
           suitableTimeRanges(fulfilled: false) {
             id
@@ -14742,7 +14742,7 @@ export const ApplicationSectionAllocationsDocument = gql`
       ...AllocatedTimeSlot
     }
   }
-  ${ApplicationSectionFragmentFragmentDoc}
+  ${ApplicationSectionFragmentDoc}
   ${AllocatedTimeSlotFragmentDoc}
 `;
 
@@ -15006,12 +15006,12 @@ export const ApplicationsDocument = gql`
           id
           pk
           status
-          ...ApplicationNameFragment
+          ...ApplicationName
           applicationSections {
             id
             pk
             name
-            ...ApplicationSectionDurationFragment
+            ...ApplicationSectionDuration
             reservationUnitOptions {
               id
               preferredOrder
@@ -15034,8 +15034,8 @@ export const ApplicationsDocument = gql`
       totalCount
     }
   }
-  ${ApplicationNameFragmentFragmentDoc}
-  ${ApplicationSectionDurationFragmentFragmentDoc}
+  ${ApplicationNameFragmentDoc}
+  ${ApplicationSectionDurationFragmentDoc}
 `;
 
 /**
@@ -15153,7 +15153,7 @@ export const ApplicationSectionsDocument = gql`
     ) {
       edges {
         node {
-          ...ApplicationSectionFragment
+          ...ApplicationSection
           allocations
           reservationUnitOptions {
             id
@@ -15181,7 +15181,7 @@ export const ApplicationSectionsDocument = gql`
       totalCount
     }
   }
-  ${ApplicationSectionFragmentFragmentDoc}
+  ${ApplicationSectionFragmentDoc}
 `;
 
 /**
@@ -15316,7 +15316,7 @@ export const AllocatedTimeSlotsDocument = gql`
               application {
                 pk
                 id
-                ...ApplicationNameFragment
+                ...ApplicationName
               }
             }
             reservationUnit {
@@ -15337,7 +15337,7 @@ export const AllocatedTimeSlotsDocument = gql`
       totalCount
     }
   }
-  ${ApplicationNameFragmentFragmentDoc}
+  ${ApplicationNameFragmentDoc}
 `;
 
 /**

@@ -5,7 +5,7 @@ import { MemoryRouter, Route, Routes, generatePath } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 // @ts-expect-error -- FIXME
 import * as router from "react-router";
-import { CustomerTypeChoice } from "@gql/gql-types";
+import { CustomerTypeChoice, ReservationDocument } from "@gql/gql-types";
 import NotificationContextMock, {
   notifySuccess,
 } from "app/__mocks__/NotificationContextMock";
@@ -16,7 +16,7 @@ import {
   mockReservation,
   mocks,
 } from "./hooks/__test__/mocks";
-import { SINGLE_RESERVATION_QUERY } from "./requested/hooks/queries";
+import { base64encode } from "common/src/helpers";
 
 const extendedReservation = {
   ...mockReservation,
@@ -94,8 +94,8 @@ const extendedMocks = [
   ...mocks,
   {
     request: {
-      query: SINGLE_RESERVATION_QUERY,
-      variables: { pk: 1 },
+      query: ReservationDocument,
+      variables: { id: base64encode("ReservationNode:1") },
     },
     result: {
       data: {

@@ -7,12 +7,10 @@ import {
   ReservationStartInterval,
   State,
   type ReservationUnitNode,
+  UpdateStaffReservationDocument,
+  RecurringReservationDocument,
+  UpdateRecurringReservationDocument,
 } from "@gql/gql-types";
-import {
-  UPDATE_STAFF_RECURRING_RESERVATION,
-  UPDATE_STAFF_RESERVATION,
-} from "../queries";
-import { RECURRING_RESERVATION_QUERY } from "../../requested/hooks/queries";
 import { base64encode } from "common/src/helpers";
 
 export const CHANGED_WORKING_MEMO = "Sisaisen kommentti";
@@ -107,7 +105,7 @@ const correctRecurringReservationQueryResult = (
 ) => [
   {
     request: {
-      query: RECURRING_RESERVATION_QUERY,
+      query: RecurringReservationDocument,
       variables: {
         id: base64encode(`RecurringReservationNode:${recurringPk}`),
       },
@@ -126,7 +124,7 @@ const correctRecurringReservationQueryResult = (
   },
   {
     request: {
-      query: UPDATE_STAFF_RECURRING_RESERVATION,
+      query: UpdateRecurringReservationDocument,
       variables: {
         input: {
           name: "Modify recurring name",
@@ -146,7 +144,7 @@ const correctRecurringReservationQueryResult = (
   },
   {
     request: {
-      query: UPDATE_STAFF_RESERVATION,
+      query: UpdateStaffReservationDocument,
       variables: {
         input: { ...MUTATION_DATA.input, pk: startingPk },
         workingMemo: { ...MUTATION_DATA.workingMemo, pk: startingPk },
@@ -168,7 +166,7 @@ const correctRecurringReservationQueryResult = (
     { fail: options?.shouldFailAll ?? false },
   ].map(({ fail }) => ({
     request: {
-      query: UPDATE_STAFF_RESERVATION,
+      query: UpdateStaffReservationDocument,
       variables: {
         input: { ...MUTATION_DATA.input, pk: startingPk + 1 },
         workingMemo: { ...MUTATION_DATA.workingMemo, pk: startingPk + 1 },
@@ -194,7 +192,7 @@ export const mocks = [
   // single reservation success
   {
     request: {
-      query: UPDATE_STAFF_RESERVATION,
+      query: UpdateStaffReservationDocument,
       variables: MUTATION_DATA,
     },
     result: {
@@ -210,7 +208,7 @@ export const mocks = [
   // single reservation Failure mocks: networkError once then succceed
   ...[{ fail: true }, { fail: false }].map(({ fail }) => ({
     request: {
-      query: UPDATE_STAFF_RESERVATION,
+      query: UpdateStaffReservationDocument,
       variables: {
         input: { ...MUTATION_DATA.input, pk: 101 },
         workingMemo: { ...MUTATION_DATA.workingMemo, pk: 101 },
@@ -232,7 +230,7 @@ export const mocks = [
   // networkError twice
   ...[1, 2].map(() => ({
     request: {
-      query: UPDATE_STAFF_RESERVATION,
+      query: UpdateStaffReservationDocument,
       variables: {
         input: { ...MUTATION_DATA.input, pk: 102 },
         workingMemo: { ...MUTATION_DATA.workingMemo, pk: 102 },
@@ -243,7 +241,7 @@ export const mocks = [
   // graphQLError
   {
     request: {
-      query: UPDATE_STAFF_RESERVATION,
+      query: UpdateStaffReservationDocument,
       variables: {
         input: { ...MUTATION_DATA.input, pk: 111 },
         workingMemo: { ...MUTATION_DATA.workingMemo, pk: 111 },

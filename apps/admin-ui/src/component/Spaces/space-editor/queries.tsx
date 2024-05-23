@@ -3,7 +3,7 @@ import { SPACE_COMMON_FRAGMENT } from "@/common/fragments";
 import { LOCATION_FRAGMENT } from "common/src/queries/fragments";
 
 export const CREATE_SPACE = gql`
-  mutation createSpace($input: SpaceCreateMutationInput!) {
+  mutation CreateSpace($input: SpaceCreateMutationInput!) {
     createSpace(input: $input) {
       pk
     }
@@ -11,7 +11,7 @@ export const CREATE_SPACE = gql`
 `;
 
 export const UPDATE_SPACE = gql`
-  mutation updateSpace($input: SpaceUpdateMutationInput!) {
+  mutation UpdateSpace($input: SpaceUpdateMutationInput!) {
     updateSpace(input: $input) {
       pk
     }

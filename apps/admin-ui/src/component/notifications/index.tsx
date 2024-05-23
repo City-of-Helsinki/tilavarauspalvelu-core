@@ -6,7 +6,7 @@ import {
   type BannerNotificationNode,
   BannerNotificationOrderingChoices,
   useBannerNotificationsAdminListQuery,
-  BannerNotificationsAdminFragmentFragment,
+  BannerNotificationsAdminFragment,
 } from "@gql/gql-types";
 import { H1 } from "common/src/common/typography";
 import { Container } from "@/styles/layout";
@@ -93,7 +93,7 @@ function NotificationsTable({
   sort,
   isLoading,
 }: {
-  notifications: BannerNotificationsAdminFragmentFragment[];
+  notifications: BannerNotificationsAdminFragment[];
   onSortChanged: (key: string) => void;
   sort: string;
   isLoading: boolean;

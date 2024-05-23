@@ -13,7 +13,7 @@ import {
 } from "common/src/common/util";
 import type {
   AgeGroupNode,
-  ImageFragmentFragment,
+  ImageFragment,
   LocationFieldsI18nFragment,
 } from "@gql/gql-types";
 import {
@@ -186,8 +186,8 @@ const imagePriority = ["main", "map", "ground_plan", "other"].map((n) =>
 );
 
 export const getMainImage = (ru?: {
-  images: ImageFragmentFragment[];
-}): ImageFragmentFragment | null => {
+  images: ImageFragment[];
+}): ImageFragment | null => {
   if (!ru || !ru.images || ru.images.length === 0) {
     return null;
   }
@@ -200,9 +200,7 @@ export const getMainImage = (ru?: {
   return images[0];
 };
 
-export function orderImages(
-  images: ImageFragmentFragment[]
-): ImageFragmentFragment[] {
+export function orderImages(images: ImageFragment[]): ImageFragment[] {
   if (!images || images.length === 0) {
     return [];
   }

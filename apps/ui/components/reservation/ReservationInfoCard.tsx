@@ -8,7 +8,7 @@ import { getReservationPrice, formatters as getFormatters } from "common";
 import { breakpoints } from "common/src/common/style";
 import { H4, Strong } from "common/src/common/typography";
 import type {
-  ImageFragmentFragment,
+  ImageFragment,
   Maybe,
   ReservationQuery,
   ReservationUnitPageFieldsFragment,
@@ -38,7 +38,7 @@ type Props = {
       ReservationUnitPageFieldsFragment,
       "pk" | "nameFi" | "nameEn" | "nameSv"
     > &
-      GetPriceReservationUnitFragment & { images: ImageFragmentFragment[] } & {
+      GetPriceReservationUnitFragment & { images: ImageFragment[] } & {
         unit?: Maybe<Pick<UnitNode, "nameFi" | "nameEn" | "nameSv">>;
       }
   >;

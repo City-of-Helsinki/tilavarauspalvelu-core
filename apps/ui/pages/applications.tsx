@@ -10,8 +10,8 @@ import {
   useApplicationsLazyQuery,
   ApplicationsDocument,
   type ApplicationsQueryVariables,
-  GetCurrentUserDocument,
-  type GetCurrentUserQuery,
+  CurrentUserDocument,
+  type CurrentUserQuery,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import Head from "@/components/applications/Head";
@@ -37,8 +37,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const commonProps = getCommonServerSideProps();
   const client = createApolloClient(commonProps.apiBaseUrl, ctx);
 
-  const { data: userData } = await client.query<GetCurrentUserQuery>({
-    query: GetCurrentUserDocument,
+  const { data: userData } = await client.query<CurrentUserQuery>({
+    query: CurrentUserDocument,
   });
 
   const { currentUser: user } = userData;

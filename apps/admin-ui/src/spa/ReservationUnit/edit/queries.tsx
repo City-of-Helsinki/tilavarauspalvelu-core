@@ -12,7 +12,7 @@ export const RESERVATION_UNIT_EDIT_QUERY = gql`
       reservationState
       images {
         pk
-        ...ImageFragment
+        ...Image
       }
       haukiUrl
       cancellationRule {
@@ -141,7 +141,7 @@ export const RESERVATION_UNIT_EDIT_QUERY = gql`
 `;
 
 export const UPDATE_RESERVATION_UNIT = gql`
-  mutation updateReservationUnit($input: ReservationUnitUpdateMutationInput!) {
+  mutation UpdateReservationUnit($input: ReservationUnitUpdateMutationInput!) {
     updateReservationUnit(input: $input) {
       pk
     }
@@ -149,7 +149,7 @@ export const UPDATE_RESERVATION_UNIT = gql`
 `;
 
 export const CREATE_RESERVATION_UNIT = gql`
-  mutation createReservationUnit($input: ReservationUnitCreateMutationInput!) {
+  mutation CreateReservationUnit($input: ReservationUnitCreateMutationInput!) {
     createReservationUnit(input: $input) {
       pk
     }
@@ -158,7 +158,7 @@ export const CREATE_RESERVATION_UNIT = gql`
 
 // TODO this allows for a pk input (is it for a change? i.e. not needing to delete and create a new one)
 export const CREATE_IMAGE = gql`
-  mutation createImage(
+  mutation CreateImage(
     $image: Upload!
     $reservationUnit: Int!
     $imageType: ImageType!
@@ -176,7 +176,7 @@ export const CREATE_IMAGE = gql`
 `;
 
 export const DELETE_IMAGE = gql`
-  mutation deleteImage($pk: ID!) {
+  mutation DeleteImage($pk: ID!) {
     deleteReservationUnitImage(input: { pk: $pk }) {
       deleted
     }
@@ -184,7 +184,7 @@ export const DELETE_IMAGE = gql`
 `;
 
 export const UPDATE_IMAGE_TYPE = gql`
-  mutation updateImage($pk: Int!, $imageType: ImageType!) {
+  mutation UpdateImage($pk: Int!, $imageType: ImageType!) {
     updateReservationUnitImage(input: { pk: $pk, imageType: $imageType }) {
       pk
     }

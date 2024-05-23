@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
+import { APPLICATION_SECTION_ADMIN_FRAGMENT } from "@/common/fragments";
 import {
   APPLICANT_NAME_FRAGMENT,
   APPLICATION_SECTION_DURATION_FRAGMENT,
-  APPLICATION_SECTION_ADMIN_FRAGMENT,
 } from "common/src/queries/application";
 
 export const APPLICATIONS_QUERY = gql`
@@ -33,12 +33,12 @@ export const APPLICATIONS_QUERY = gql`
           id
           pk
           status
-          ...ApplicationNameFragment
+          ...ApplicationName
           applicationSections {
             id
             pk
             name
-            ...ApplicationSectionDurationFragment
+            ...ApplicationSectionDuration
             reservationUnitOptions {
               id
               preferredOrder
@@ -107,7 +107,7 @@ export const APPLICATIONS_EVENTS_QUERY = gql`
     ) {
       edges {
         node {
-          ...ApplicationSectionFragment
+          ...ApplicationSection
           allocations
           reservationUnitOptions {
             id
@@ -186,7 +186,7 @@ export const ALLOCATED_TIME_SLOTS_QUERY = gql`
               application {
                 pk
                 id
-                ...ApplicationNameFragment
+                ...ApplicationName
               }
             }
             reservationUnit {

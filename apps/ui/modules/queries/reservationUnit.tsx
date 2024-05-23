@@ -53,7 +53,7 @@ const RESERVATION_UNIT_PAGE_FRAGMENT = gql`
     ...ReservationUnitFields
     isDraft
     images {
-      ...ImageFragment
+      ...Image
     }
     applicationRoundTimeSlots {
       id
@@ -180,7 +180,7 @@ export const RESERVATOION_UNIT_CARD_FRAGMENT = gql`
       ...ReservationUnitTypeFields
     }
     images {
-      ...ImageFragment
+      ...Image
     }
     maxPersons
   }
@@ -281,7 +281,7 @@ export const RELATED_RESERVATION_UNITS = gql`
         node {
           ...ReservationUnitNameFields
           images {
-            ...ImageFragment
+            ...Image
           }
           unit {
             ...UnitNameFieldsI18N

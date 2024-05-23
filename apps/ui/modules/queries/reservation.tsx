@@ -12,7 +12,7 @@ import {
 } from "./fragments";
 
 export const CREATE_RESERVATION = gql`
-  mutation createReservation($input: ReservationCreateMutationInput!) {
+  mutation CreateReservation($input: ReservationCreateMutationInput!) {
     createReservation(input: $input) {
       pk
       price
@@ -21,7 +21,7 @@ export const CREATE_RESERVATION = gql`
 `;
 
 export const UPDATE_RESERVATION = gql`
-  mutation updateReservation($input: ReservationUpdateMutationInput!) {
+  mutation UpdateReservation($input: ReservationUpdateMutationInput!) {
     updateReservation(input: $input) {
       pk
       state
@@ -123,7 +123,7 @@ export const LIST_RESERVATIONS = gql`
             }
             ...CancellationRuleFields
             images {
-              ...ImageFragment
+              ...Image
             }
             pricings {
               ...PricingFields
@@ -137,7 +137,7 @@ export const LIST_RESERVATIONS = gql`
 
 // NOTE this is used to display some general info about the reservation (on /reservation/:id page)
 const RESERVATION_INFO_FRAGMENT = gql`
-  fragment ReservationInfoFragment on ReservationNode {
+  fragment ReservationInfo on ReservationNode {
     description
     purpose {
       id
@@ -178,7 +178,7 @@ export const GET_RESERVATION = gql`
       name
       ...ReserveeNameFields
       ...ReserveeBillingFields
-      ...ReservationInfoFragment
+      ...ReservationInfo
       applyingForFreeOfCharge
       bufferTimeBefore
       bufferTimeAfter
@@ -229,7 +229,7 @@ export const GET_RESERVATION_CANCEL_REASONS = gql`
 `;
 
 export const ADJUST_RESERVATION_TIME = gql`
-  mutation adjustReservationTime($input: ReservationAdjustTimeMutationInput!) {
+  mutation AdjustReservationTime($input: ReservationAdjustTimeMutationInput!) {
     adjustReservationTime(input: $input) {
       pk
       state
@@ -240,7 +240,7 @@ export const ADJUST_RESERVATION_TIME = gql`
 `;
 
 export const GET_ORDER = gql`
-  query order($orderUuid: String!) {
+  query Order($orderUuid: String!) {
     order(orderUuid: $orderUuid) {
       id
       reservationPk
@@ -253,7 +253,7 @@ export const GET_ORDER = gql`
 `;
 
 export const REFRESH_ORDER = gql`
-  mutation refreshOrder($input: RefreshOrderMutationInput!) {
+  mutation RefreshOrder($input: RefreshOrderMutationInput!) {
     refreshOrder(input: $input) {
       orderUuid
       status

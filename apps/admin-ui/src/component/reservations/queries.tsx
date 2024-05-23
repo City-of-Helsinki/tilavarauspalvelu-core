@@ -58,7 +58,7 @@ export const RESERVATIONS_QUERY = gql`
 `;
 
 export const CHANGE_RESERVATION_TIME = gql`
-  mutation staffAdjustReservationTime(
+  mutation StaffAdjustReservationTime(
     $input: ReservationStaffAdjustTimeMutationInput!
   ) {
     staffAdjustReservationTime(input: $input) {

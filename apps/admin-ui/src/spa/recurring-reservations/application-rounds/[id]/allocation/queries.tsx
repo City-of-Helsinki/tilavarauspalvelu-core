@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { APPLICATION_SECTION_ADMIN_FRAGMENT } from "common/src/queries/application";
+import { APPLICATION_SECTION_ADMIN_FRAGMENT } from "@/common/fragments";
 
 /* minimal query for allocation page to populate the unit filter and reservation-units tabs
  * only needs to be done once when landing on the page
@@ -130,7 +130,7 @@ export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
     ) {
       edges {
         node {
-          ...ApplicationSectionFragment
+          ...ApplicationSection
           allocations
           suitableTimeRanges(fulfilled: false) {
             id

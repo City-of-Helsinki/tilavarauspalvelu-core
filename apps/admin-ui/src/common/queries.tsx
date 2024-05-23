@@ -77,7 +77,7 @@ export const UNIT_QUERY = gql`
           nameFi
         }
         images {
-          ...ImageFragment
+          ...Image
         }
       }
       spaces {
@@ -155,7 +155,7 @@ export const HANDLING_COUNT_QUERY = gql`
 // so no draft or message*
 const BANNER_NOTIFICATION_ADMIN_FRAGMENT = gql`
   ${BANNER_NOTIFICATION_COMMON_FRAGMENT}
-  fragment BannerNotificationsAdminFragment on BannerNotificationNode {
+  fragment BannerNotificationsAdmin on BannerNotificationNode {
     pk
     ...BannerNotificationCommon
     name
@@ -170,7 +170,7 @@ export const BANNER_NOTIFICATIONS_ADMIN = gql`
   ${BANNER_NOTIFICATION_ADMIN_FRAGMENT}
   query BannerNotificationsAdmin($id: ID!) {
     bannerNotification(id: $id) {
-      ...BannerNotificationsAdminFragment
+      ...BannerNotificationsAdmin
     }
   }
 `;
@@ -185,7 +185,7 @@ export const BANNER_NOTIFICATIONS_ADMIN_LIST = gql`
     bannerNotifications(first: $first, after: $after, orderBy: $orderBy) {
       edges {
         node {
-          ...BannerNotificationsAdminFragment
+          ...BannerNotificationsAdmin
         }
       }
       pageInfo {

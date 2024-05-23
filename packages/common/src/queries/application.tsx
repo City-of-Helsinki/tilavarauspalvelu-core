@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 import { IMAGE_FRAGMENT, TERMS_OF_USE_FRAGMENT } from "./fragments";
 
 export const APPLICANT_NAME_FRAGMENT = gql`
-  fragment ApplicationNameFragment on ApplicationNode {
+  fragment ApplicationName on ApplicationNode {
     applicantType
     organisation {
       id
@@ -18,7 +18,7 @@ export const APPLICANT_NAME_FRAGMENT = gql`
 `;
 
 export const APPLICATION_SECTION_DURATION_FRAGMENT = gql`
-  fragment ApplicationSectionDurationFragment on ApplicationSectionNode {
+  fragment ApplicationSectionDuration on ApplicationSectionNode {
     reservationsEndDate
     reservationsBeginDate
     appliedReservationsPerWeek
@@ -26,14 +26,14 @@ export const APPLICATION_SECTION_DURATION_FRAGMENT = gql`
   }
 `;
 
-const APPLICATION_SECTION_COMMON_FRAGMENT = gql`
+export const APPLICATION_SECTION_COMMON_FRAGMENT = gql`
   ${APPLICATION_SECTION_DURATION_FRAGMENT}
-  fragment ApplicationSectionCommonFragment on ApplicationSectionNode {
+  fragment ApplicationSectionCommon on ApplicationSectionNode {
     id
     pk
     name
     status
-    ...ApplicationSectionDurationFragment
+    ...ApplicationSectionDuration
     reservationMaxDuration
     ageGroup {
       id
@@ -50,44 +50,10 @@ const APPLICATION_SECTION_COMMON_FRAGMENT = gql`
   }
 `;
 
-// NOTE this is for allocation only (it includes the application name)
-// for regular application queries we don't need to query the name through the application relation
-export const APPLICATION_SECTION_ADMIN_FRAGMENT = gql`
-  ${APPLICANT_NAME_FRAGMENT}
+export const APPLICATION_SECTION_UI_FRAGMENT = gql`
   ${APPLICATION_SECTION_COMMON_FRAGMENT}
-  fragment ApplicationSectionFragment on ApplicationSectionNode {
-    ...ApplicationSectionCommonFragment
-    purpose {
-      id
-      pk
-      nameFi
-    }
-    application {
-      id
-      pk
-      status
-      ...ApplicationNameFragment
-    }
-    reservationUnitOptions {
-      id
-      reservationUnit {
-        id
-        pk
-        nameFi
-        unit {
-          id
-          pk
-          nameFi
-        }
-      }
-    }
-  }
-`;
-
-const APPLICATION_SECTION_UI_FRAGMENT = gql`
-  ${APPLICATION_SECTION_COMMON_FRAGMENT}
-  fragment ApplicationSectionUIFragment on ApplicationSectionNode {
-    ...ApplicationSectionCommonFragment
+  fragment ApplicationSectionUI on ApplicationSectionNode {
+    ...ApplicationSectionCommon
     suitableTimeRanges {
       id
       pk
@@ -132,8 +98,8 @@ const APPLICATION_SECTION_UI_FRAGMENT = gql`
   }
 `;
 
-const APPLICANT_FRAGMENT = gql`
-  fragment ApplicantFragment on ApplicationNode {
+export const APPLICANT_FRAGMENT = gql`
+  fragment Applicant on ApplicationNode {
     applicantType
     contactPerson {
       id
@@ -185,7 +151,7 @@ const APPLICANT_FRAGMENT = gql`
 
 const APPLICATION_ROUND_FRAGMENT = gql`
   ${IMAGE_FRAGMENT}
-  fragment ApplicationRoundFragment on ApplicationRoundNode {
+  fragment ApplicationRound on ApplicationRoundNode {
     id
     pk
     nameFi
@@ -205,7 +171,7 @@ const APPLICATION_ROUND_FRAGMENT = gql`
       minPersons
       maxPersons
       images {
-        ...ImageFragment
+        ...Image
       }
       unit {
         id
@@ -226,37 +192,6 @@ const APPLICATION_ROUND_FRAGMENT = gql`
   }
 `;
 
-// TODO what does admin side require from UIFragment?
-export const APPLICATION_ADMIN_FRAGMENT = gql`
-  ${APPLICANT_FRAGMENT}
-  ${APPLICATION_SECTION_UI_FRAGMENT}
-  fragment ApplicationAdminFragment on ApplicationNode {
-    pk
-    id
-    status
-    lastModifiedDate
-    ...ApplicantFragment
-    applicationRound {
-      id
-      pk
-      nameFi
-    }
-    applicationSections {
-      id
-      ...ApplicationSectionUIFragment
-      allocations
-      reservationUnitOptions {
-        id
-        rejected
-        allocatedTimeSlots {
-          pk
-          id
-        }
-      }
-    }
-  }
-`;
-
 export const APPLICATION_FRAGMENT = gql`
   ${APPLICATION_SECTION_UI_FRAGMENT}
   ${APPLICANT_FRAGMENT}
@@ -266,12 +201,12 @@ export const APPLICATION_FRAGMENT = gql`
     pk
     status
     lastModifiedDate
-    ...ApplicantFragment
+    ...Applicant
     applicationRound {
-      ...ApplicationRoundFragment
+      ...ApplicationRound
     }
     applicationSections {
-      ...ApplicationSectionUIFragment
+      ...ApplicationSectionUI
     }
   }
 `;

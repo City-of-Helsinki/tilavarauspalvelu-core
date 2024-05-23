@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 export const APPROVE_RESERVATION = gql`
-  mutation approveReservation($input: ReservationApproveMutationInput!) {
+  mutation ApproveReservation($input: ReservationApproveMutationInput!) {
     approveReservation(input: $input) {
       pk
       state
@@ -10,7 +10,7 @@ export const APPROVE_RESERVATION = gql`
 `;
 
 export const DENY_RESERVATION = gql`
-  mutation denyReservation($input: ReservationDenyMutationInput!) {
+  mutation DenyReservation($input: ReservationDenyMutationInput!) {
     denyReservation(input: $input) {
       pk
       state
@@ -19,7 +19,7 @@ export const DENY_RESERVATION = gql`
 `;
 
 export const REFUND_RESERVATION = gql`
-  mutation refundReservation($input: ReservationRefundMutationInput!) {
+  mutation RefundReservation($input: ReservationRefundMutationInput!) {
     refundReservation(input: $input) {
       pk
     }
@@ -27,7 +27,7 @@ export const REFUND_RESERVATION = gql`
 `;
 
 export const REQUIRE_HANDLING_RESERVATION = gql`
-  mutation requireHandling($input: ReservationRequiresHandlingMutationInput!) {
+  mutation RequireHandling($input: ReservationRequiresHandlingMutationInput!) {
     requireHandlingForReservation(input: $input) {
       pk
       state

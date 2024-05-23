@@ -7,7 +7,7 @@ import { LOCATION_FRAGMENT } from "common/src/queries/fragments";
 import { UNIT_NAME_FRAGMENT } from "@/common/fragments";
 
 export const OPTIONS_QUERY = gql`
-  query options {
+  query Options {
     reservationPurposes {
       edges {
         node {

@@ -28,7 +28,7 @@ export const APPLICATIONS = gql`
             name
           }
           status
-          ...ApplicationNameFragment
+          ...ApplicationName
           lastModifiedDate
         }
       }

@@ -1,8 +1,4 @@
-import type {
-  ImageFragmentFragment,
-  Maybe,
-  ReservationNode,
-} from "../gql/gql-types";
+import type { ImageFragment, Maybe, ReservationNode } from "../gql/gql-types";
 import { pixel } from "./common/style";
 
 export function filterNonNullable<T>(
@@ -65,7 +61,7 @@ export function truncate(val: string, maxLen: number): string {
 /// On development we don't have image cache so we return the full image url
 /// If image is null or undefined returns a static pixel
 export function getImageSource(
-  image: ImageFragmentFragment | null,
+  image: ImageFragment | null,
   size: "small" | "large" | "medium" | "full" = "medium"
 ): string {
   if (!image) {
@@ -75,7 +71,7 @@ export function getImageSource(
 }
 
 function getImageSourceWithoutDefault(
-  image: ImageFragmentFragment,
+  image: ImageFragment,
   size: "small" | "large" | "medium" | "full"
 ): string | null {
   switch (size) {

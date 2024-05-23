@@ -19,10 +19,6 @@ module.exports = defineConfig({
       "plugins": ["@graphql-eslint"],
       // operations is the client side queries
       "extends": "plugin:@graphql-eslint/operations-recommended",
-      rules: {
-        // old incorrect naming should be migrated
-        "@graphql-eslint/naming-convention": "off",
-      },
       parserOptions: {
         schema: SCHEMA_PATH,
         // monorepo paths... should use a find root function

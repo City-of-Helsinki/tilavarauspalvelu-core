@@ -1,19 +1,19 @@
 import { gql } from "@apollo/client";
-import { APPLICATION_ADMIN_FRAGMENT } from "common/src/queries/application";
+import { APPLICATION_ADMIN_FRAGMENT } from "app/common/fragments";
 
 /// NOTE Requires higher backend optimizer complexity limit (21 works)
 export const APPLICATION_ADMIN_QUERY = gql`
   ${APPLICATION_ADMIN_FRAGMENT}
   query ApplicationAdmin($id: ID!) {
     application(id: $id) {
-      ...ApplicationAdminFragment
+      ...ApplicationAdmin
       workingMemo
     }
   }
 `;
 
 export const REJECT_ALL_SECTION_OPTIONS = gql`
-  mutation rejectAllSectionOptions(
+  mutation RejectAllSectionOptions(
     $input: RejectAllSectionOptionsMutationInput!
   ) {
     rejectAllSectionOptions(input: $input) {
@@ -23,7 +23,7 @@ export const REJECT_ALL_SECTION_OPTIONS = gql`
 `;
 
 export const RESTORE_ALL_SECTION_OPTIONS = gql`
-  mutation restoreAllSectionOptions(
+  mutation RestoreAllSectionOptions(
     $input: RestoreAllSectionOptionsMutationInput!
   ) {
     restoreAllSectionOptions(input: $input) {
@@ -33,7 +33,7 @@ export const RESTORE_ALL_SECTION_OPTIONS = gql`
 `;
 
 export const REJECT_APPLICATION = gql`
-  mutation rejectAllApplicationOptions(
+  mutation RejectAllApplicationOptions(
     $input: RejectAllApplicationOptionsMutationInput!
   ) {
     rejectAllApplicationOptions(input: $input) {
@@ -43,7 +43,7 @@ export const REJECT_APPLICATION = gql`
 `;
 
 export const RESTORE_APPLICATION = gql`
-  mutation restoreAllApplicationOptions(
+  mutation RestoreAllApplicationOptions(
     $input: RestoreAllApplicationOptionsMutationInput!
   ) {
     restoreAllApplicationOptions(input: $input) {

@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 export const CREATE_RESOURCE = gql`
-  mutation createResource($input: ResourceCreateMutationInput!) {
+  mutation CreateResource($input: ResourceCreateMutationInput!) {
     createResource(input: $input) {
       pk
     }
@@ -9,7 +9,7 @@ export const CREATE_RESOURCE = gql`
 `;
 
 export const UPDATE_RESOURCE = gql`
-  mutation updateResource($input: ResourceUpdateMutationInput!) {
+  mutation UpdateResource($input: ResourceUpdateMutationInput!) {
     updateResource(input: $input) {
       pk
     }

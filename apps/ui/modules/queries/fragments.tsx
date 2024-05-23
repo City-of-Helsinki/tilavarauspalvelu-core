@@ -84,7 +84,7 @@ export const RESERVATION_UNIT_FRAGMENT = gql`
       ...PricingFields
     }
     images {
-      ...ImageFragment
+      ...Image
     }
     metadataSet {
       id

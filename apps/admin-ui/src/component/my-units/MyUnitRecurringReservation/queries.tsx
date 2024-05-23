@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 export const CREATE_RECURRING_RESERVATION = gql`
-  mutation createRecurringReservation(
+  mutation CreateRecurringReservation(
     $input: RecurringReservationCreateMutationInput!
   ) {
     createRecurringReservation(input: $input) {

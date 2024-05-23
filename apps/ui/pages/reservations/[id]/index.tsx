@@ -21,8 +21,8 @@ import {
   ReservationDocument,
   type ReservationQuery,
   type ReservationQueryVariables,
-  GetCurrentUserDocument,
-  type GetCurrentUserQuery,
+  CurrentUserDocument,
+  type CurrentUserQuery,
 } from "@gql/gql-types";
 import Link from "next/link";
 import { Container } from "common";
@@ -88,8 +88,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       variables: { id },
     });
 
-    const { data: userData } = await apolloClient.query<GetCurrentUserQuery>({
-      query: GetCurrentUserDocument,
+    const { data: userData } = await apolloClient.query<CurrentUserQuery>({
+      query: CurrentUserDocument,
       fetchPolicy: "no-cache",
     });
     const user = userData?.currentUser;
