@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 from easy_thumbnails.fields import ThumbnailerImageField
+from easy_thumbnails.files import ThumbnailFile
 
 from ._mixins import PurgeImageCacheMixin
 
@@ -13,14 +13,12 @@ __all__ = [
 class Purpose(models.Model, PurgeImageCacheMixin):
     name = models.CharField(max_length=200)
 
-    image = ThumbnailerImageField(upload_to=settings.RESERVATION_UNIT_PURPOSE_IMAGES_ROOT, null=True)
-
-    rank = models.PositiveIntegerField(
-        blank=True,
+    image: ThumbnailFile | None = ThumbnailerImageField(
+        upload_to=settings.RESERVATION_UNIT_PURPOSE_IMAGES_ROOT,
         null=True,
-        verbose_name=_("Order number"),
-        help_text=_("Order number to be used in api sorting."),
     )
+
+    rank: int | None = models.PositiveIntegerField(blank=True, null=True)
 
     # Translated field hints
     name_fi: str | None
