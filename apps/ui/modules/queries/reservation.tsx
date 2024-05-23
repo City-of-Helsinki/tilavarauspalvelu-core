@@ -1,5 +1,4 @@
 import { gql } from "@apollo/client";
-import { ReservationTypeChoice } from "@gql/gql-types";
 import {
   RESERVEE_NAME_FRAGMENT,
   IMAGE_FRAGMENT,
@@ -92,7 +91,7 @@ export const LIST_RESERVATIONS = gql`
       user: $user
       reservationUnit: $reservationUnit
       orderBy: $orderBy
-      reservationType: "${ReservationTypeChoice.Normal.toLowerCase()}"
+      reservationType: "normal"
     ) {
       edges {
         node {

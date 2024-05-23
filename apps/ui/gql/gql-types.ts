@@ -9160,7 +9160,7 @@ export const ListReservationsDocument = gql`
       user: $user
       reservationUnit: $reservationUnit
       orderBy: $orderBy
-      reservationType: ""
+      reservationType: "normal"
     ) {
       edges {
         node {
