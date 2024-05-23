@@ -156,12 +156,12 @@ export function canUserCancelReservation(
   return true;
 }
 
-export const getReservationApplicationMutationValues = (
+export function getReservationApplicationMutationValues(
   // TODO don't use Records to avoid proper typing
   payload: Record<string, string | number | boolean>,
-  supportedFields: ReservationMetadataFieldNode[],
+  supportedFields: Pick<ReservationMetadataFieldNode, "fieldName">[],
   reserveeType: CustomerTypeChoice
-): Record<string, string | number | boolean> => {
+): Record<string, string | number | boolean> {
   const result: typeof payload = { reserveeType };
   const intValues = ["numPersons"];
   const changes = [
@@ -189,7 +189,7 @@ export const getReservationApplicationMutationValues = (
   result.reserveeType = reserveeType;
 
   return result;
-};
+}
 
 type ReservationCancellationReason =
   | "PAST"

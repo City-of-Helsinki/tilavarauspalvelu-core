@@ -6,18 +6,18 @@ import {
   ReservationTypeChoice,
   useReservationUnitsByUnitQuery,
   useOptionsQuery,
+  type MetadataSetsFragment,
 } from "@gql/gql-types";
 import { toApiDate } from "common/src/common/util";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { useNotification } from "@/context/NotificationContext";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { containsField } from "common/src/metaFieldsHelpers";
-import { type ReservationUnitWithMetadataType } from "common/src/reservation-form/MetaFields";
 
-export const useApplicationFields = (
-  reservationUnit: ReservationUnitWithMetadataType,
+export function useApplicationFields(
+  reservationUnit: MetadataSetsFragment,
   reserveeType?: CustomerTypeChoice
-) => {
+) {
   return useMemo(() => {
     const fields = filterNonNullable(
       reservationUnit.metadataSet?.supportedFields
@@ -33,11 +33,9 @@ export const useApplicationFields = (
       reserveeType: type,
     });
   }, [reservationUnit.metadataSet?.supportedFields, reserveeType]);
-};
+}
 
-export function useGeneralFields(
-  reservationUnit: ReservationUnitWithMetadataType
-) {
+export function useGeneralFields(reservationUnit: MetadataSetsFragment) {
   return useMemo(() => {
     const fields = filterNonNullable(
       reservationUnit.metadataSet?.supportedFields

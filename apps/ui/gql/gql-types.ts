@@ -5655,10 +5655,8 @@ export type ReservationUnitFieldsFragment = {
   }>;
   metadataSet?: {
     id: string;
-    name: string;
-    pk?: number | null;
-    supportedFields: Array<{ id: string; fieldName: string }>;
     requiredFields: Array<{ id: string; fieldName: string }>;
+    supportedFields: Array<{ id: string; fieldName: string }>;
   } | null;
 };
 
@@ -6000,17 +5998,15 @@ export type ReservationQuery = {
         smallUrl?: string | null;
         imageType: ImageType;
       }>;
-      metadataSet?: {
-        id: string;
-        name: string;
-        pk?: number | null;
-        supportedFields: Array<{ id: string; fieldName: string }>;
-        requiredFields: Array<{ id: string; fieldName: string }>;
-      } | null;
       cancellationRule?: {
         id: string;
         canBeCancelledTimeBefore?: number | null;
         needsHandling: boolean;
+      } | null;
+      metadataSet?: {
+        id: string;
+        requiredFields: Array<{ id: string; fieldName: string }>;
+        supportedFields: Array<{ id: string; fieldName: string }>;
       } | null;
     }> | null;
     purpose?: {
@@ -6247,10 +6243,8 @@ export type ReservationUnitPageFieldsFragment = {
   }>;
   metadataSet?: {
     id: string;
-    name: string;
-    pk?: number | null;
-    supportedFields: Array<{ id: string; fieldName: string }>;
     requiredFields: Array<{ id: string; fieldName: string }>;
+    supportedFields: Array<{ id: string; fieldName: string }>;
   } | null;
 };
 
@@ -6406,10 +6400,8 @@ export type ReservationUnitQuery = {
     }>;
     metadataSet?: {
       id: string;
-      name: string;
-      pk?: number | null;
-      supportedFields: Array<{ id: string; fieldName: string }>;
       requiredFields: Array<{ id: string; fieldName: string }>;
+      supportedFields: Array<{ id: string; fieldName: string }>;
     } | null;
   } | null;
 };
@@ -6605,10 +6597,8 @@ export type ReservationUnitPageQuery = {
     }>;
     metadataSet?: {
       id: string;
-      name: string;
-      pk?: number | null;
-      supportedFields: Array<{ id: string; fieldName: string }>;
       requiredFields: Array<{ id: string; fieldName: string }>;
+      supportedFields: Array<{ id: string; fieldName: string }>;
     } | null;
   } | null;
   affectingReservations?: Array<{
@@ -7510,6 +7500,17 @@ export type BannerNotificationCommonFragment = {
   messageSv?: string | null;
 };
 
+export type MetadataSetsFragment = {
+  id: string;
+  minPersons?: number | null;
+  maxPersons?: number | null;
+  metadataSet?: {
+    id: string;
+    requiredFields: Array<{ id: string; fieldName: string }>;
+    supportedFields: Array<{ id: string; fieldName: string }>;
+  } | null;
+};
+
 export type TermsOfUseQueryVariables = Exact<{
   termsType?: InputMaybe<TermsType>;
 }>;
@@ -7677,6 +7678,24 @@ export const ImageFragmentDoc = gql`
     imageType
   }
 `;
+export const MetadataSetsFragmentDoc = gql`
+  fragment MetadataSets on ReservationUnitNode {
+    id
+    minPersons
+    maxPersons
+    metadataSet {
+      id
+      requiredFields {
+        id
+        fieldName
+      }
+      supportedFields {
+        id
+        fieldName
+      }
+    }
+  }
+`;
 export const ReservationUnitFieldsFragmentDoc = gql`
   fragment ReservationUnitFields on ReservationUnitNode {
     unit {
@@ -7719,27 +7738,14 @@ export const ReservationUnitFieldsFragmentDoc = gql`
     images {
       ...Image
     }
-    metadataSet {
-      id
-      name
-      pk
-      supportedFields {
-        id
-        fieldName
-      }
-      requiredFields {
-        id
-        fieldName
-      }
-    }
-    minPersons
-    maxPersons
+    ...MetadataSets
   }
   ${UnitFieldsFragmentDoc}
   ${TermsOfUseTextFieldsFragmentDoc}
   ${TermsOfUseNameFieldsFragmentDoc}
   ${PricingFieldsFragmentDoc}
   ${ImageFragmentDoc}
+  ${MetadataSetsFragmentDoc}
 `;
 export const ReservationUnitTypeFieldsFragmentDoc = gql`
   fragment ReservationUnitTypeFields on ReservationUnitTypeNode {

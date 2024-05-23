@@ -5,6 +5,7 @@ import {
   TERMS_OF_USE_TEXT_FRAGMENT,
   IMAGE_FRAGMENT,
   LOCATION_FRAGMENT_I18N,
+  METADATA_SETS_FRAGMENT,
 } from "common/src/queries/fragments";
 
 // TODO improve naming of the fragments to match the purpose or use case
@@ -45,6 +46,7 @@ export const RESERVATION_UNIT_FRAGMENT = gql`
   ${TERMS_OF_USE_TEXT_FRAGMENT}
   ${TERMS_OF_USE_NAME_FRAGMENT}
   ${PRICING_FRAGMENT}
+  ${METADATA_SETS_FRAGMENT}
   fragment ReservationUnitFields on ReservationUnitNode {
     unit {
       ...UnitFields
@@ -86,20 +88,6 @@ export const RESERVATION_UNIT_FRAGMENT = gql`
     images {
       ...Image
     }
-    metadataSet {
-      id
-      name
-      pk
-      supportedFields {
-        id
-        fieldName
-      }
-      requiredFields {
-        id
-        fieldName
-      }
-    }
-    minPersons
-    maxPersons
+    ...MetadataSets
   }
 `;

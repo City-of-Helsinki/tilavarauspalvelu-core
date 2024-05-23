@@ -27,18 +27,7 @@ export const RESERVATION_UNIT_FRAGMENT = gql`
     unit {
       ...UnitNameFields
     }
-    metadataSet {
-      id
-      name
-      supportedFields {
-        id
-        fieldName
-      }
-      requiredFields {
-        id
-        fieldName
-      }
-    }
+    ...MetadataSets
     cancellationTerms {
       id
       textFi

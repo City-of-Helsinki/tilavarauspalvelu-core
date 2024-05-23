@@ -295,7 +295,7 @@ function ReserveeInfo({
   supportedFields,
 }: {
   reservation: NodeT;
-  supportedFields: ReservationMetadataFieldNode[];
+  supportedFields: Pick<ReservationMetadataFieldNode, "fieldName">[];
 }) {
   const { t } = useTranslation();
   if (
@@ -387,7 +387,7 @@ function ReservationInfo({
   supportedFields,
 }: {
   reservation: NodeT;
-  supportedFields: ReservationMetadataFieldNode[];
+  supportedFields: Pick<ReservationMetadataFieldNode, "fieldName">[];
 }) {
   const { t } = useTranslation();
   const POSSIBLE_FIELDS = ["purpose", "numPersons", "ageGroup", "description"];

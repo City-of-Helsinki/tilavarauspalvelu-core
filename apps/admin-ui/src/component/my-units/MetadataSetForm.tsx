@@ -4,12 +4,12 @@ import type { Reservation } from "common/src/reservation-form/types";
 import {
   ReserverMetaFields,
   ReservationMetaFields,
-  type ReservationUnitWithMetadataType,
 } from "common/src/reservation-form/MetaFields";
 import { useApplicationFields, useGeneralFields, useOptions } from "./hooks";
+import { type MetadataSetsFragment } from "@gql/gql-types";
 
 type Props = {
-  reservationUnit: ReservationUnitWithMetadataType;
+  reservationUnit: MetadataSetsFragment;
 };
 
 export const ReservationMetadataSetForm = ({

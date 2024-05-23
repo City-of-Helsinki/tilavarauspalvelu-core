@@ -22,6 +22,7 @@ import {
   type ReservationUnitNode,
   ReservationKind,
   ReservationStartInterval,
+  type MetadataSetsFragment,
 } from "../../gql/gql-types";
 import {
   type CalendarEventBuffer,
@@ -616,7 +617,6 @@ export function getEventBuffers(
 export type IsReservableReservationUnitType = Pick<
   ReservationUnitNode,
   | "reservationState"
-  | "metadataSet"
   | "reservableTimeSpans"
   | "reservationBegins"
   | "minReservationDuration"
@@ -624,7 +624,8 @@ export type IsReservableReservationUnitType = Pick<
   | "reservationKind"
   | "reservationsMaxDaysBefore"
   | "reservationsMinDaysBefore"
->;
+> &
+  MetadataSetsFragment;
 
 export function isReservationUnitReservable(
   // TODO use a fragment

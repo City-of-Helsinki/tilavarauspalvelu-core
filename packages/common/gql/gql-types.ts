@@ -5944,6 +5944,17 @@ export type BannerNotificationCommonFragment = {
   messageSv?: string | null;
 };
 
+export type MetadataSetsFragment = {
+  id: string;
+  minPersons?: number | null;
+  maxPersons?: number | null;
+  metadataSet?: {
+    id: string;
+    requiredFields: Array<{ id: string; fieldName: string }>;
+    supportedFields: Array<{ id: string; fieldName: string }>;
+  } | null;
+};
+
 export type TermsOfUseQueryVariables = Exact<{
   termsType?: InputMaybe<TermsType>;
 }>;
@@ -6274,6 +6285,24 @@ export const BannerNotificationCommonFragmentDoc = gql`
     messageEn
     messageFi
     messageSv
+  }
+`;
+export const MetadataSetsFragmentDoc = gql`
+  fragment MetadataSets on ReservationUnitNode {
+    id
+    minPersons
+    maxPersons
+    metadataSet {
+      id
+      requiredFields {
+        id
+        fieldName
+      }
+      supportedFields {
+        id
+        fieldName
+      }
+    }
   }
 `;
 export const BannerNotificationsListDocument = gql`

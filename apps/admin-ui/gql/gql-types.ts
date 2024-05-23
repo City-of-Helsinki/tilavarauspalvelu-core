@@ -5944,6 +5944,17 @@ export type BannerNotificationCommonFragment = {
   messageSv?: string | null;
 };
 
+export type MetadataSetsFragment = {
+  id: string;
+  minPersons?: number | null;
+  maxPersons?: number | null;
+  metadataSet?: {
+    id: string;
+    requiredFields: Array<{ id: string; fieldName: string }>;
+    supportedFields: Array<{ id: string; fieldName: string }>;
+  } | null;
+};
+
 export type TermsOfUseQueryVariables = Exact<{
   termsType?: InputMaybe<TermsType>;
 }>;
@@ -6897,12 +6908,6 @@ export type ReservationUnitQuery = {
         nameFi?: string | null;
       }>;
     } | null;
-    metadataSet?: {
-      id: string;
-      name: string;
-      supportedFields: Array<{ id: string; fieldName: string }>;
-      requiredFields: Array<{ id: string; fieldName: string }>;
-    } | null;
     cancellationTerms?: {
       id: string;
       textFi?: string | null;
@@ -6922,6 +6927,11 @@ export type ReservationUnitQuery = {
       id: string;
       textFi?: string | null;
       nameFi?: string | null;
+    } | null;
+    metadataSet?: {
+      id: string;
+      requiredFields: Array<{ id: string; fieldName: string }>;
+      supportedFields: Array<{ id: string; fieldName: string }>;
     } | null;
   } | null;
 };
@@ -7172,12 +7182,6 @@ export type ReservationUnitFragment = {
       nameFi?: string | null;
     }>;
   } | null;
-  metadataSet?: {
-    id: string;
-    name: string;
-    supportedFields: Array<{ id: string; fieldName: string }>;
-    requiredFields: Array<{ id: string; fieldName: string }>;
-  } | null;
   cancellationTerms?: {
     id: string;
     textFi?: string | null;
@@ -7197,6 +7201,11 @@ export type ReservationUnitFragment = {
     id: string;
     textFi?: string | null;
     nameFi?: string | null;
+  } | null;
+  metadataSet?: {
+    id: string;
+    requiredFields: Array<{ id: string; fieldName: string }>;
+    supportedFields: Array<{ id: string; fieldName: string }>;
   } | null;
 };
 
@@ -7547,12 +7556,6 @@ export type ReservationQuery = {
           nameFi?: string | null;
         }>;
       } | null;
-      metadataSet?: {
-        id: string;
-        name: string;
-        supportedFields: Array<{ id: string; fieldName: string }>;
-        requiredFields: Array<{ id: string; fieldName: string }>;
-      } | null;
       cancellationTerms?: {
         id: string;
         textFi?: string | null;
@@ -7583,6 +7586,11 @@ export type ReservationQuery = {
         status: Status;
         taxPercentage: { id: string; pk?: number | null; value: string };
       }>;
+      metadataSet?: {
+        id: string;
+        requiredFields: Array<{ id: string; fieldName: string }>;
+        supportedFields: Array<{ id: string; fieldName: string }>;
+      } | null;
     }> | null;
     order?: {
       id: string;
@@ -9153,6 +9161,24 @@ export const UnitNameFieldsFragmentDoc = gql`
     }
   }
 `;
+export const MetadataSetsFragmentDoc = gql`
+  fragment MetadataSets on ReservationUnitNode {
+    id
+    minPersons
+    maxPersons
+    metadataSet {
+      id
+      requiredFields {
+        id
+        fieldName
+      }
+      supportedFields {
+        id
+        fieldName
+      }
+    }
+  }
+`;
 export const ReservationUnitFragmentDoc = gql`
   fragment ReservationUnit on ReservationUnitNode {
     id
@@ -9167,18 +9193,7 @@ export const ReservationUnitFragmentDoc = gql`
     unit {
       ...UnitNameFields
     }
-    metadataSet {
-      id
-      name
-      supportedFields {
-        id
-        fieldName
-      }
-      requiredFields {
-        id
-        fieldName
-      }
-    }
+    ...MetadataSets
     cancellationTerms {
       id
       textFi
@@ -9202,6 +9217,7 @@ export const ReservationUnitFragmentDoc = gql`
     }
   }
   ${UnitNameFieldsFragmentDoc}
+  ${MetadataSetsFragmentDoc}
 `;
 export const ReservationRecurringFragmentDoc = gql`
   fragment ReservationRecurring on ReservationNode {

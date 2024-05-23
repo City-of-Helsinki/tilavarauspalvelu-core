@@ -14,11 +14,7 @@ import styled from "styled-components";
 import { Controller, useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { camelCase } from "lodash";
-import {
-  CustomerTypeChoice,
-  type Maybe,
-  type ReservationMetadataFieldNode,
-} from "../../gql/gql-types";
+import { CustomerTypeChoice, MetadataSetsFragment } from "../../gql/gql-types";
 import ReservationFormField from "./ReservationFormField";
 import { Inputs, Reservation } from "./types";
 import RadioButtonWithImage from "./RadioButtonWithImage";
@@ -36,22 +32,9 @@ type CommonProps = {
   };
 };
 
-// TODO use a fragment
-export type ReservationUnitWithMetadataType = {
-  metadataSet?: Maybe<{
-    requiredFields?: Maybe<
-      Array<Pick<ReservationMetadataFieldNode, "fieldName">>
-    >;
-    supportedFields?: Maybe<
-      Array<Pick<ReservationMetadataFieldNode, "fieldName">>
-    >;
-  }>;
-  minPersons?: Maybe<number>;
-  maxPersons?: Maybe<number>;
-};
 type Field = string;
 type Props = CommonProps & {
-  reservationUnit: ReservationUnitWithMetadataType;
+  reservationUnit: MetadataSetsFragment;
   generalFields: Field[];
   reservationApplicationFields: Field[];
 };
@@ -169,7 +152,7 @@ const ReservationFormFields = ({
   fields: Field[];
   headingKey?: CustomerTypeChoice | "COMMON";
   hasSubheading?: boolean;
-  metadata: ReservationUnitWithMetadataType["metadataSet"];
+  metadata: MetadataSetsFragment["metadataSet"];
   params?: { numPersons: { min?: number; max?: number } };
 }) => {
   const { getValues } = useFormContext<Reservation>();
@@ -222,7 +205,7 @@ export const ReservationMetaFields = ({
   noHeadingMarginal,
 }: {
   fields: string[];
-  reservationUnit: ReservationUnitWithMetadataType;
+  reservationUnit: MetadataSetsFragment;
   options: Record<string, OptionType[]>;
   data?: {
     termsForDiscount?: JSX.Element | string;
@@ -307,7 +290,7 @@ export const ReserverMetaFields = ({
 }: {
   // TODO should not be arbitary strings
   fields: string[];
-  reservationUnit: ReservationUnitWithMetadataType;
+  reservationUnit: MetadataSetsFragment;
   options: Record<string, OptionType[]>;
   data?: {
     termsForDiscount?: JSX.Element | string;
