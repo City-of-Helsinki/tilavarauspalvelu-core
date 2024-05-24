@@ -21,10 +21,10 @@ import {
 import { SupplementaryButton, truncatedText } from "@/styles/util";
 import { getImageSource } from "common/src/helpers";
 
-type RelatedQueryResT = NonNullable<
-  NonNullable<RelatedReservationUnitsQuery["reservationUnits"]>
+type RelatedQueryT = NonNullable<
+  RelatedReservationUnitsQuery["reservationUnits"]
 >;
-type RelatedEdgeT = NonNullable<RelatedQueryResT>["edges"][0];
+type RelatedEdgeT = NonNullable<RelatedQueryT>["edges"][0];
 export type RelatedNodeT = NonNullable<NonNullable<RelatedEdgeT>["node"]>;
 type PropsType = {
   units: RelatedNodeT[];

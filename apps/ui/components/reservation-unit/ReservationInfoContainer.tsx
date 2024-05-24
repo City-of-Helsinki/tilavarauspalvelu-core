@@ -1,25 +1,26 @@
 import React from "react";
+import { gql } from "@apollo/client";
 import { formatDuration } from "common/src/common/util";
-import { type ReservationUnitPageQuery } from "@gql/gql-types";
+import { type ReservationInfoContainerFragment } from "@gql/gql-types";
 import ClientOnly from "common/src/ClientOnly";
 import { Trans, useTranslation } from "next-i18next";
 import { daysByMonths } from "@/modules/const";
 import { formatDate } from "@/modules/util";
 import { Content, Subheading } from "./ReservationUnitStyles";
 
-// TODO use a fragment instead of Pick
-type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
-type NodeT = Pick<
-  QueryT,
-  | "reservationBegins"
-  | "reservationEnds"
-  | "reservationsMaxDaysBefore"
-  | "reservationsMinDaysBefore"
-  | "minReservationDuration"
-  | "maxReservationDuration"
-  | "maxReservationsPerUser"
->;
+export const RESERVATION_INFO_CONTAINER_FRAGMENT = gql`
+  fragment ReservationInfoContainer on ReservationUnitNode {
+    reservationBegins
+    reservationEnds
+    reservationsMaxDaysBefore
+    reservationsMinDaysBefore
+    minReservationDuration
+    maxReservationDuration
+    maxReservationsPerUser
+  }
+`;
 
+type NodeT = ReservationInfoContainerFragment;
 type Props = {
   reservationUnit: NodeT;
   reservationUnitIsReservable: boolean;

@@ -5289,6 +5289,16 @@ export enum Weekday {
   Wednesday = "WEDNESDAY",
 }
 
+export type ReservationInfoContainerFragment = {
+  reservationBegins?: string | null;
+  reservationEnds?: string | null;
+  reservationsMaxDaysBefore?: number | null;
+  reservationsMinDaysBefore?: number | null;
+  minReservationDuration?: number | null;
+  maxReservationDuration?: number | null;
+  maxReservationsPerUser?: number | null;
+};
+
 export type ReservationInfoCardFragment = {
   pk?: number | null;
   taxPercentageValue?: string | null;
@@ -6153,16 +6163,9 @@ export type ReservationUnitPageFieldsFragment = {
   bufferTimeBefore: number;
   bufferTimeAfter: number;
   reservationStartInterval: ReservationStartInterval;
-  reservationBegins?: string | null;
-  reservationEnds?: string | null;
   canApplyFreeOfCharge: boolean;
   state?: ReservationUnitState | null;
   reservationState?: ReservationState | null;
-  minReservationDuration?: number | null;
-  maxReservationDuration?: number | null;
-  maxReservationsPerUser?: number | null;
-  reservationsMinDaysBefore?: number | null;
-  reservationsMaxDaysBefore?: number | null;
   requireReservationHandling: boolean;
   id: string;
   pk?: number | null;
@@ -6182,6 +6185,13 @@ export type ReservationUnitPageFieldsFragment = {
   termsOfUseFi?: string | null;
   termsOfUseEn?: string | null;
   termsOfUseSv?: string | null;
+  reservationBegins?: string | null;
+  reservationEnds?: string | null;
+  reservationsMaxDaysBefore?: number | null;
+  reservationsMinDaysBefore?: number | null;
+  minReservationDuration?: number | null;
+  maxReservationDuration?: number | null;
+  maxReservationsPerUser?: number | null;
   minPersons?: number | null;
   maxPersons?: number | null;
   images: Array<{
@@ -6310,16 +6320,9 @@ export type ReservationUnitQuery = {
     bufferTimeBefore: number;
     bufferTimeAfter: number;
     reservationStartInterval: ReservationStartInterval;
-    reservationBegins?: string | null;
-    reservationEnds?: string | null;
     canApplyFreeOfCharge: boolean;
     state?: ReservationUnitState | null;
     reservationState?: ReservationState | null;
-    minReservationDuration?: number | null;
-    maxReservationDuration?: number | null;
-    maxReservationsPerUser?: number | null;
-    reservationsMinDaysBefore?: number | null;
-    reservationsMaxDaysBefore?: number | null;
     requireReservationHandling: boolean;
     id: string;
     pk?: number | null;
@@ -6339,6 +6342,13 @@ export type ReservationUnitQuery = {
     termsOfUseFi?: string | null;
     termsOfUseEn?: string | null;
     termsOfUseSv?: string | null;
+    reservationBegins?: string | null;
+    reservationEnds?: string | null;
+    reservationsMaxDaysBefore?: number | null;
+    reservationsMinDaysBefore?: number | null;
+    minReservationDuration?: number | null;
+    maxReservationDuration?: number | null;
+    maxReservationsPerUser?: number | null;
     minPersons?: number | null;
     maxPersons?: number | null;
     images: Array<{
@@ -6490,17 +6500,16 @@ export type ReservationUnitPageQuery = {
     bufferTimeBefore: number;
     bufferTimeAfter: number;
     reservationStartInterval: ReservationStartInterval;
-    reservationBegins?: string | null;
-    reservationEnds?: string | null;
     canApplyFreeOfCharge: boolean;
     state?: ReservationUnitState | null;
     reservationState?: ReservationState | null;
-    minReservationDuration?: number | null;
-    maxReservationDuration?: number | null;
-    maxReservationsPerUser?: number | null;
-    reservationsMinDaysBefore?: number | null;
-    reservationsMaxDaysBefore?: number | null;
     requireReservationHandling: boolean;
+    maxReservationDuration?: number | null;
+    minReservationDuration?: number | null;
+    reservationsMaxDaysBefore?: number | null;
+    reservationsMinDaysBefore?: number | null;
+    reservationBegins?: string | null;
+    reservationEnds?: string | null;
     id: string;
     pk?: number | null;
     uuid: string;
@@ -6519,6 +6528,7 @@ export type ReservationUnitPageQuery = {
     termsOfUseFi?: string | null;
     termsOfUseEn?: string | null;
     termsOfUseSv?: string | null;
+    maxReservationsPerUser?: number | null;
     minPersons?: number | null;
     maxPersons?: number | null;
     images: Array<{
@@ -7844,6 +7854,17 @@ export const ReservationUnitTypeFieldsFragmentDoc = gql`
     nameSv
   }
 `;
+export const ReservationInfoContainerFragmentDoc = gql`
+  fragment ReservationInfoContainer on ReservationUnitNode {
+    reservationBegins
+    reservationEnds
+    reservationsMaxDaysBefore
+    reservationsMinDaysBefore
+    minReservationDuration
+    maxReservationDuration
+    maxReservationsPerUser
+  }
+`;
 export const EquipmentFieldsFragmentDoc = gql`
   fragment EquipmentFields on EquipmentNode {
     id
@@ -7882,19 +7903,13 @@ export const ReservationUnitPageFieldsFragmentDoc = gql`
     bufferTimeBefore
     bufferTimeAfter
     reservationStartInterval
-    reservationBegins
-    reservationEnds
     canApplyFreeOfCharge
     state
     reservationState
     reservationUnitType {
       ...ReservationUnitTypeFields
     }
-    minReservationDuration
-    maxReservationDuration
-    maxReservationsPerUser
-    reservationsMinDaysBefore
-    reservationsMaxDaysBefore
+    ...ReservationInfoContainer
     requireReservationHandling
     equipments {
       id
@@ -7904,6 +7919,7 @@ export const ReservationUnitPageFieldsFragmentDoc = gql`
   ${ReservationUnitFieldsFragmentDoc}
   ${ImageFragmentDoc}
   ${ReservationUnitTypeFieldsFragmentDoc}
+  ${ReservationInfoContainerFragmentDoc}
   ${EquipmentFieldsFragmentDoc}
 `;
 export const BlockingReservationFieldsFragmentDoc = gql`

@@ -71,19 +71,13 @@ const RESERVATION_UNIT_PAGE_FRAGMENT = gql`
     bufferTimeBefore
     bufferTimeAfter
     reservationStartInterval
-    reservationBegins
-    reservationEnds
     canApplyFreeOfCharge
     state
     reservationState
     reservationUnitType {
       ...ReservationUnitTypeFields
     }
-    minReservationDuration
-    maxReservationDuration
-    maxReservationsPerUser
-    reservationsMinDaysBefore
-    reservationsMaxDaysBefore
+    ...ReservationInfoContainer
     requireReservationHandling
     equipments {
       id
