@@ -46,7 +46,7 @@ export function useFocusApplicationEvent(): [
 /// Mutaully exclusive with useFocusApplicationEvent
 export function useFocusAllocatedSlot(): [
   number | undefined,
-  (allocated?: { pk?: number | null | undefined }) => void,
+  (allocated?: Pick<AllocatedTimeSlotNodeT, "pk">) => void,
 ] {
   const [params, setParams] = useSearchParams();
 
@@ -54,7 +54,8 @@ export function useFocusAllocatedSlot(): [
     ? Number(params.get("allocated"))
     : undefined;
 
-  const setAllocated = (allocated?: { pk?: number | null | undefined }) => {
+  // { pk?: number | null | undefined }) => {
+  const setAllocated = (allocated?: Pick<AllocatedTimeSlotNodeT, "pk">) => {
     if (allocated?.pk != null) {
       const p = new URLSearchParams(params);
       p.set("allocated", allocated.pk.toString());

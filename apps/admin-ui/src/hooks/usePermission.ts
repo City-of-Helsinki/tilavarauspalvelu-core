@@ -19,6 +19,7 @@ export type UnitPermissionFragment =
     }
   | null
   | undefined;
+
 const hasUnitPermission = (
   user: CurrentUserQuery["currentUser"],
   permissionName: Permission,

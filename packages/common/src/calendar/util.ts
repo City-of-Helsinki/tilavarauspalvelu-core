@@ -17,12 +17,9 @@ import {
 import { TFunction } from "next-i18next";
 import {
   type ReservableTimeSpanType,
-  ReservationState,
   type ReservationNode,
   type ReservationUnitNode,
-  ReservationKind,
   ReservationStartInterval,
-  type MetadataSetsFragment,
 } from "../../gql/gql-types";
 import {
   type CalendarEventBuffer,
@@ -577,7 +574,7 @@ export function doBuffersCollide(
 }
 
 // TODO use a fragment
-type ReservationEventType = {
+export type ReservationEventType = {
   begin: string;
   end: string;
   bufferTimeBefore?: number;
@@ -612,68 +609,6 @@ export function getEventBuffers(
   }
 
   return buffers;
-}
-
-export type IsReservableReservationUnitType = Pick<
-  ReservationUnitNode,
-  | "reservationState"
-  | "reservableTimeSpans"
-  | "reservationBegins"
-  | "minReservationDuration"
-  | "maxReservationDuration"
-  | "reservationKind"
-  | "reservationsMaxDaysBefore"
-  | "reservationsMinDaysBefore"
-> &
-  MetadataSetsFragment;
-
-export function isReservationUnitReservable(
-  // TODO use a fragment
-  reservationUnit?: IsReservableReservationUnitType | null
-): [false, string] | [true] {
-  if (!reservationUnit) {
-    return [false, "reservationUnit is null"];
-  }
-  const {
-    reservationState,
-    minReservationDuration,
-    maxReservationDuration,
-    reservationKind,
-  } = reservationUnit;
-
-  switch (reservationState) {
-    case ReservationState.Reservable:
-    case ReservationState.ScheduledClosing: {
-      const resBegins = reservationUnit.reservationBegins
-        ? new Date(reservationUnit.reservationBegins)
-        : null;
-      const hasSupportedFields =
-        (reservationUnit.metadataSet?.supportedFields?.length ?? 0) > 0;
-      const hasReservableTimes =
-        (reservationUnit.reservableTimeSpans?.length ?? 0) > 0;
-      if (!hasSupportedFields) {
-        return [false, "reservationUnit has no supported fields"];
-      }
-      if (!hasReservableTimes) {
-        return [false, "reservationUnit has no reservable times"];
-      }
-      if (resBegins && resBegins > new Date()) {
-        return [false, "reservationUnit reservation begins in future"];
-      }
-      if (!minReservationDuration || !maxReservationDuration) {
-        return [false, "reservationUnit has no min/max reservation duration"];
-      }
-      if (reservationKind === ReservationKind.Season) {
-        return [
-          false,
-          "reservationUnit is only available for seasonal booking",
-        ];
-      }
-      return [true];
-    }
-    default:
-      return [false, "reservationUnit is not reservable"];
-  }
 }
 
 export function isReservationStartInFuture(

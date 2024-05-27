@@ -84,8 +84,9 @@ export function useUnitResources(
   const { notifyError } = useNotification();
 
   const id = base64encode(`UnitNode:${unitPk}`);
+  const isValid = Number(unitPk) > 0;
   const { data, ...rest } = useReservationUnitsByUnitQuery({
-    skip: unitPk === "" || Number.isNaN(Number(unitPk)) || Number(unitPk) === 0,
+    skip: !isValid,
     variables: {
       id,
       pk: Number(unitPk),

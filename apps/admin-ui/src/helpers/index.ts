@@ -6,6 +6,7 @@ import {
   ApplicationStatusChoice,
   type PersonNode,
   type ReservationsInIntervalFragment,
+  ApplicationNode,
 } from "@gql/gql-types";
 import { addSeconds } from "date-fns";
 
@@ -67,11 +68,14 @@ export const reservationToInterval = (
 };
 
 type Application = {
-  applicantType?: ApplicantTypeChoice | null;
+  applicantType?:
+    | Pick<ApplicationNode, "applicantType">["applicantType"]
+    | null;
   contactPerson?: Pick<PersonNode, "firstName" | "lastName"> | null;
-  organisation?: {
-    name?: string | null;
-  } | null;
+  organisation?: Pick<
+    NonNullable<Pick<ApplicationNode, "organisation">["organisation"]>,
+    "name"
+  > | null;
 };
 export function getApplicantName(app?: Application | undefined | null): string {
   if (!app) {

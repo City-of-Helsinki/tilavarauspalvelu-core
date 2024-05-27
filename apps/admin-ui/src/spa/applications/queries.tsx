@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { APPLICATION_ADMIN_FRAGMENT } from "app/common/fragments";
+import { APPLICATION_ADMIN_FRAGMENT } from "@/common/fragments";
 
 /// NOTE Requires higher backend optimizer complexity limit (21 works)
 export const APPLICATION_ADMIN_QUERY = gql`

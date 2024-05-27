@@ -1,8 +1,8 @@
 import React from "react";
-import { Permission } from "app/modules/permissionHelper";
+import { Permission } from "@/modules/permissionHelper";
 import usePermission, {
   type ReservationPermissionType,
-} from "app/hooks/usePermission";
+} from "@/hooks/usePermission";
 
 const VisibleIfPermission = ({
   reservation,

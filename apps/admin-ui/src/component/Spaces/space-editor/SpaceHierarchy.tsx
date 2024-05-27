@@ -2,8 +2,9 @@ import React from "react";
 import styled from "styled-components";
 import type { SpaceQuery } from "@gql/gql-types";
 
+type Node = SpaceQuery["space"];
 type Props = {
-  space: SpaceQuery["space"];
+  space: Node;
 };
 
 const Tree = styled.div`
@@ -12,11 +13,7 @@ const Tree = styled.div`
   margin-bottom: var(--spacing-xs);
 `;
 
-type SpaceNode = {
-  pk?: number | null;
-  nameFi?: string | null;
-  parent?: SpaceNode | null;
-};
+type SpaceNode = Pick<NonNullable<Node>, "pk" | "nameFi" | "parent">;
 
 function getParents(
   root?: SpaceNode | null | undefined,

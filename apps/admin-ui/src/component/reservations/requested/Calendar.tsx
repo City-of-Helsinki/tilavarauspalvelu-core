@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import CommonCalendar from "common/src/calendar/Calendar";
+import CommonCalendar, { CalendarEvent } from "common/src/calendar/Calendar";
 import { Toolbar } from "common/src/calendar/Toolbar";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
@@ -10,6 +10,7 @@ import Legend from "./Legend";
 import EditTimeModal from "../EditTimeModal";
 import { isPossibleToEdit } from "./reservationModificationRules";
 import { getEventBuffers } from "common/src/calendar/util";
+import { filterNonNullable } from "common/src/helpers";
 
 // TODO fragment
 type ReservationType = Omit<
@@ -17,18 +18,13 @@ type ReservationType = Omit<
   "user"
 >;
 
+type CalendarEventType = CalendarEvent<ReservationType>;
 type Props = {
   reservation: ReservationType;
   refetch: (focusDate?: Date) => void;
   selected?: ReservationType;
   focusDate: Date;
-  // TODO this is probably the CalendarEventType (created using a fragment)
-  events: Array<{
-    event: ReservationType;
-    title?: string;
-    start: Date;
-    end: Date;
-  }>;
+  events: Array<CalendarEventType>;
 };
 
 const Legends = styled.div`
@@ -93,9 +89,11 @@ function Calendar({
 
   const eventBuffers = events
     ? getEventBuffers(
-        events
-          .map((e) => e.event)
-          .filter((e) => e?.type !== ReservationTypeChoice.Blocked)
+        filterNonNullable(
+          events
+            .map((e) => e.event)
+            .filter((e) => e?.type !== ReservationTypeChoice.Blocked)
+        )
       )
     : [];
 

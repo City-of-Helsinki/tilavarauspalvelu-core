@@ -63,9 +63,7 @@ export function ReservationUnitList({
   const { clearErrors, setError, watch, setValue, formState } = form;
   const { errors } = formState;
 
-  const isValid = (
-    units: Array<{ maxPersons?: number | undefined | null }>
-  ) => {
+  const isValid = (units: typeof applicationRound.reservationUnits) => {
     const error = units
       .map(
         (resUnit) =>

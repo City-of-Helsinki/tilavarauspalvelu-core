@@ -18,6 +18,10 @@ import {
   type ReservationUnitPageQuery,
   type EquipmentFieldsFragment,
   type PriceReservationUnitFragment,
+  type UnitNode,
+  ReservationState,
+  type MetadataSetsFragment,
+  ReservationKind,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { capitalize, getTranslation } from "./util";
@@ -109,15 +113,14 @@ export function getEquipmentList(
   return sortedEquipment.map((n) => getTranslation(n, "name"));
 }
 
-export const getReservationUnitName = (
+export function getReservationUnitName(
   // TODO use a fragment for ReservationUnitName
-  reservationUnit?: {
-    nameFi?: string | null;
-    nameSv?: string | null;
-    nameEn?: string | null;
-  } | null,
+  reservationUnit?: Pick<
+    ReservationUnitNode,
+    "nameFi" | "nameSv" | "nameEn"
+  > | null,
   language: string = i18n?.language ?? "fi"
-): string | undefined => {
+): string | undefined {
   if (!reservationUnit) {
     return undefined;
   }
@@ -130,16 +133,12 @@ export const getReservationUnitName = (
     }
   }
   return reservationUnit.nameFi ?? "-";
-};
+}
 
-export const getUnitName = (
-  unit?: {
-    nameFi?: string | null;
-    nameSv?: string | null;
-    nameEn?: string | null;
-  } | null,
+export function getUnitName(
+  unit?: Pick<UnitNode, "nameFi" | "nameSv" | "nameEn"> | null,
   language: string = i18n?.language ?? "fi"
-): string | undefined => {
+): string | undefined {
   if (unit == null) {
     return undefined;
   }
@@ -152,7 +151,7 @@ export const getUnitName = (
     }
   }
   return unit.nameFi ?? "-";
-};
+}
 
 export function getReservationUnitInstructionsKey(state: State): string | null {
   switch (state) {
@@ -405,4 +404,66 @@ export function getPossibleTimesForDay(
       return slotDate >= new Date() && isReservable;
     })
     .map((time) => ({ label: time, value: time }));
+}
+
+// TODO use a fragment
+type IsReservableReservationUnitType = Pick<
+  ReservationUnitNode,
+  | "reservationState"
+  | "reservableTimeSpans"
+  | "reservationBegins"
+  | "minReservationDuration"
+  | "maxReservationDuration"
+  | "reservationKind"
+  | "reservationsMaxDaysBefore"
+  | "reservationsMinDaysBefore"
+> &
+  MetadataSetsFragment;
+
+export function isReservationUnitReservable(
+  reservationUnit?: IsReservableReservationUnitType | null
+): [false, string] | [true] {
+  if (!reservationUnit) {
+    return [false, "reservationUnit is null"];
+  }
+  const {
+    reservationState,
+    minReservationDuration,
+    maxReservationDuration,
+    reservationKind,
+  } = reservationUnit;
+
+  switch (reservationState) {
+    case ReservationState.Reservable:
+    case ReservationState.ScheduledClosing: {
+      const resBegins = reservationUnit.reservationBegins
+        ? new Date(reservationUnit.reservationBegins)
+        : null;
+      const hasSupportedFields =
+        (reservationUnit.metadataSet?.supportedFields?.length ?? 0) > 0;
+      const hasReservableTimes =
+        (reservationUnit.reservableTimeSpans?.length ?? 0) > 0;
+      if (!hasSupportedFields) {
+        return [false, "reservationUnit has no supported fields"];
+      }
+      if (!hasReservableTimes) {
+        return [false, "reservationUnit has no reservable times"];
+      }
+      if (resBegins && resBegins > new Date()) {
+        return [false, "reservationUnit reservation begins in future"];
+      }
+      if (!minReservationDuration || !maxReservationDuration) {
+        return [false, "reservationUnit has no min/max reservation duration"];
+      }
+      if (reservationKind === ReservationKind.Season) {
+        return [
+          false,
+          "reservationUnit is only available for seasonal booking",
+        ];
+      }
+      return [true];
+    }
+    default:
+      return [false, "reservationUnit is not reservable"];
+  }
 }

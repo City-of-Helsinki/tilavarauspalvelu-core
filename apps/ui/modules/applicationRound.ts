@@ -1,12 +1,8 @@
+import { type ApplicationRoundNode } from "common/gql/gql-types";
 import { getTranslation } from "./util";
 
-export const getApplicationRoundName = (
-  // TODO should use the ApplicationRoundName fragment
-  applicationRound: {
-    nameFi?: string | null;
-    nameSv?: string | null;
-    nameEn?: string | null;
-  }
-): string => {
+export function getApplicationRoundName(
+  applicationRound: Pick<ApplicationRoundNode, "nameFi" | "nameSv" | "nameEn">
+): string {
   return getTranslation(applicationRound, "name");
-};
+}

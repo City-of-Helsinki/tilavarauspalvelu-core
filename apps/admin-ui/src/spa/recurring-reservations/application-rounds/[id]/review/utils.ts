@@ -5,6 +5,7 @@ import {
   ApplicantTypeChoice,
   ApplicationStatusChoice,
   ApplicationSectionStatusChoice,
+  ApplicationSectionNode,
 } from "@gql/gql-types";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import { formatNumber } from "@/common/util";
@@ -79,12 +80,15 @@ export function transformApplicantType(
 
 const formatters = getFormatters("fi");
 
-export function calculateAppliedReservationTime(ae: {
-  reservationsBeginDate: string | null | undefined;
-  reservationsEndDate: string | null | undefined;
-  appliedReservationsPerWeek: number | null | undefined;
-  reservationMinDuration: number | null | undefined;
-}): {
+export function calculateAppliedReservationTime(
+  ae: Pick<
+    ApplicationSectionNode,
+    | "reservationsBeginDate"
+    | "reservationsEndDate"
+    | "appliedReservationsPerWeek"
+    | "reservationMinDuration"
+  >
+): {
   count: number;
   hours: number;
 } {

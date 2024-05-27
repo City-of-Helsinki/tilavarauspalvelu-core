@@ -160,7 +160,7 @@ export const RESERVATION_UNIT_PAGE_QUERY = gql`
   }
 `;
 
-export const RESERVATOION_UNIT_CARD_FRAGMENT = gql`
+export const RESERVATION_UNIT_CARD_FRAGMENT = gql`
   ${IMAGE_FRAGMENT}
   ${UNIT_NAME_FRAGMENT_I18N}
   ${RESERVATION_UNIT_TYPE_FRAGMENT}
@@ -184,7 +184,7 @@ export const RESERVATOION_UNIT_CARD_FRAGMENT = gql`
 // TODO why isDraft and isVisible are options here?
 export const SEARCH_RESERVATION_UNITS = gql`
   ${PRICING_FRAGMENT}
-  ${RESERVATOION_UNIT_CARD_FRAGMENT}
+  ${RESERVATION_UNIT_CARD_FRAGMENT}
   query SearchReservationUnits(
     $textSearch: String
     $pk: [Int]

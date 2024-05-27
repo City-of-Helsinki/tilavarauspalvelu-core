@@ -32,7 +32,6 @@ import {
   getSlotPropGetter,
   getTimeslots,
   isReservationStartInFuture,
-  isReservationUnitReservable,
 } from "common/src/calendar/util";
 import { Container, formatters as getFormatters } from "common";
 import { useLocalStorage, useMedia } from "react-use";
@@ -91,6 +90,7 @@ import {
   getTimeString,
   isReservationUnitPaidInFuture,
   isReservationUnitPublished,
+  isReservationUnitReservable,
 } from "@/modules/reservationUnit";
 import EquipmentList from "@/components/reservation-unit/EquipmentList";
 import { JustForDesktop, JustForMobile } from "@/modules/style/layout";

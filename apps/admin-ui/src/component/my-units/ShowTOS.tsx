@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useGenericTerms } from "common/src/hooks/useGenericTerms";
+import { Maybe, type TermsOfUseNode } from "@gql/gql-types";
 
 // NOTE This is partial duplicate from ui/application/Preview.tsx
 // see if we can combine them (and other Terms later with parameters)
@@ -29,18 +30,15 @@ const TOSElement = ({ title, text }: { title: string; text: string }) => (
 );
 
 // TODO use a fragment
-type ReservationUnitProps = {
-  serviceSpecificTerms?: { textFi?: string | null } | null;
-  paymentTerms?: { textFi?: string | null } | null;
-  pricingTerms?: { textFi?: string | null } | null;
-  cancellationTerms?: { textFi?: string | null } | null;
+type TOSNode = Pick<TermsOfUseNode, "textFi">;
+type Node = {
+  serviceSpecificTerms?: Maybe<TOSNode>;
+  paymentTerms?: Maybe<TOSNode>;
+  pricingTerms?: Maybe<TOSNode>;
+  cancellationTerms?: Maybe<TOSNode>;
 };
 
-const ShowTOS = ({
-  reservationUnit,
-}: {
-  reservationUnit: ReservationUnitProps;
-}) => {
+const ShowTOS = ({ reservationUnit }: { reservationUnit: Node }) => {
   const { t } = useTranslation();
 
   const serviceTerms = reservationUnit.serviceSpecificTerms;

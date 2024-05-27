@@ -156,10 +156,9 @@ export function getReservationPriceDetails(
 
 export const ageGroup = (
   group:
-    | Maybe<{
-        minimum?: number | null;
-        maximum?: number | null;
-      }>
+    | Maybe<
+        Pick<NonNullable<ReservationType["ageGroup"]>, "minimum" | "maximum">
+      >
     | undefined
 ): string | null => (group ? `${group.minimum}-${group.maximum || ""}` : null);
 

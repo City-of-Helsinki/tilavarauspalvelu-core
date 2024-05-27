@@ -293,7 +293,7 @@ function ReservationUnitModal({
   applicationRound: AppRoundNode;
   handleAdd: (ru: ReservationUnitType) => void;
   handleRemove: (ru: ReservationUnitType) => void;
-  currentReservationUnits: Array<{ pk?: number | null | undefined }>;
+  currentReservationUnits: Pick<ReservationUnitType, "pk">[];
   options: OptionsType;
 }): JSX.Element {
   const [searchTerm, setSearchTerm] = useState<string | undefined>(undefined);

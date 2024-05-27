@@ -165,26 +165,24 @@ function ReservationConfirmation({
           )}
         </ActionContainer1>
       )}
-      {reservationUnit != null && instructionsKey != null && (
-        <>
-          {getTranslation(reservationUnit, String(instructionsKey)) && (
-            <>
-              <Subheading>{t("reservations:reservationInfo")}</Subheading>
-              <Paragraph style={{ margin: "var(--spacing-xl) 0" }}>
-                {getTranslation(reservationUnit, String(instructionsKey))}
-              </Paragraph>
-            </>
-          )}
-          <ReturnLinkList
-            reservationUnitHome={reservationUnitPath(
-              Number(reservationUnit?.pk)
-            )}
-            apiBaseUrl={apiBaseUrl}
-            style={{
-              marginTop: "var(--spacing-3-xl)",
-            }}
-          />
-        </>
+      {reservationUnit != null &&
+        instructionsKey != null &&
+        getTranslation(reservationUnit, String(instructionsKey)) && (
+          <>
+            <Subheading>{t("reservations:reservationInfo")}</Subheading>
+            <Paragraph style={{ margin: "var(--spacing-xl) 0" }}>
+              {getTranslation(reservationUnit, String(instructionsKey))}
+            </Paragraph>
+          </>
+        )}
+      {reservationUnit != null && (
+        <ReturnLinkList
+          reservationUnitHome={reservationUnitPath(Number(reservationUnit?.pk))}
+          apiBaseUrl={apiBaseUrl}
+          style={{
+            marginTop: "var(--spacing-3-xl)",
+          }}
+        />
       )}
     </Wrapper>
   );

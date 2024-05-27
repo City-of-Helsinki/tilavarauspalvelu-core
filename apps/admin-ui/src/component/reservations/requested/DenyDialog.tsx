@@ -34,12 +34,6 @@ type ReservationType = Pick<
   "pk" | "handlingDetails" | "price" | "order"
 >;
 
-type Props = {
-  reservations: ReservationType[];
-  onClose: () => void;
-  onReject: () => void;
-};
-
 type ReturnAllowedState =
   // state selection
   | "refund"
@@ -65,9 +59,7 @@ function isPriceReturnable(x: {
   );
 }
 
-function findPrice(
-  reservations: Array<{ price?: string | null | undefined }>
-): number {
+function findPrice(reservations: Pick<ReservationType, "price">[]): number {
   const fp = reservations
     .map((x) => x.price)
     .map(Number)
@@ -140,6 +132,12 @@ const ReturnMoney = ({
         </SelectionGroup>
       );
   }
+};
+
+type Props = {
+  reservations: ReservationType[];
+  onClose: () => void;
+  onReject: () => void;
 };
 
 const DialogContent = ({

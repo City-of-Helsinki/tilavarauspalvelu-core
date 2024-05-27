@@ -538,21 +538,18 @@ const getTranslatedTooltipTex = (t: TFunction, fieldName: string) => {
 };
 
 // default is 20 if no spaces selected
-const getMaxPersons = (
-  spaceList: Array<{ maxPersons?: number | null | undefined }>
-) => {
+function getMaxPersons(spaceList: Pick<Node, "maxPersons">[]) {
   const persons =
     spaceList.map((s) => s.maxPersons ?? 0).reduce((a, x) => a + x, 0) || 20;
   return Math.floor(persons);
-};
+}
+
 // default is 1 if no spaces selected
-const getMinSurfaceArea = (
-  spaceList: Array<{ surfaceArea?: number | null | undefined }>
-) => {
+function getMinSurfaceArea(spaceList: Pick<Node, "surfaceArea">[]) {
   const area =
     spaceList.map((s) => s.surfaceArea ?? 0).reduce((a, x) => a + x, 0) || 1;
   return Math.floor(area);
-};
+}
 
 function CustomNumberInput({
   name,
@@ -1956,9 +1953,19 @@ function ReservationUnitEditor({
         return undefined;
       }
 
-      const upPk =
-        // @ts-expect-error - FIXME (type issues in switching between create and update)
-        data?.updateReservationUnit?.pk ?? data?.createReservationUnit?.pk;
+      const getPk = (d: typeof data) => {
+        if (d == null) {
+          return null;
+        }
+        if ("updateReservationUnit" in d) {
+          return d.updateReservationUnit?.pk ?? null;
+        }
+        if ("createReservationUnit" in d) {
+          return d.createReservationUnit?.pk ?? null;
+        }
+        return null;
+      };
+      const upPk = getPk(data);
 
       if (upPk) {
         const { images } = formValues;

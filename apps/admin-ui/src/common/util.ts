@@ -1,7 +1,7 @@
 import { format, parseISO } from "date-fns";
 import i18next from "i18next";
-import { set, get, trim } from "lodash";
-import type { LocationFieldsFragment, Query } from "@gql/gql-types";
+import { trim } from "lodash";
+import type { LocationFieldsFragment } from "@gql/gql-types";
 import { NUMBER_OF_DECIMALS } from "./const";
 import type { TFunction } from "next-i18next";
 
@@ -154,22 +154,6 @@ export function parseAddress(
     ", "
   );
 }
-
-export const combineResults = (
-  previousResult: Query,
-  fetchMoreResult: Query,
-  arg2: string
-): Query => {
-  const combined = { ...previousResult };
-  set(combined, arg2, {
-    ...get(previousResult, arg2),
-    edges: get(previousResult, arg2).edges.concat(
-      get(fetchMoreResult, arg2).edges
-    ),
-  });
-
-  return combined;
-};
 
 export const sortByName = (a?: string, b?: string): number =>
   a && b ? a.toLowerCase().localeCompare(b.toLowerCase()) : !a ? 1 : -1;
