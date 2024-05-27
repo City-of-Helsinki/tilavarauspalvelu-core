@@ -1,4 +1,5 @@
 from _decimal import Decimal
+
 from factory.fuzzy import FuzzyChoice
 
 from reservation_units.models import TaxPercentage
