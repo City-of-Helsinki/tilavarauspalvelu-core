@@ -1,5 +1,5 @@
+import pytest
 from auditlog.models import LogEntry
-from django.test import TestCase
 
 from permissions.models import (
     GeneralRole,
@@ -28,161 +28,189 @@ from users.anonymisation import (
 )
 from users.models import ReservationNotification
 
+# Applied to all tests
+pytestmark = [
+    pytest.mark.django_db,
+]
 
-class AnonymizationTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.mr_anonymous = UserFactory.create_superuser(
-            username="anonym",
-            first_name="anony",
-            last_name="mous",
-            email="anony.mous@foo.com",
-            reservation_notification=ReservationNotification.ALL,
-        )
 
-        general_role_choice = GeneralRoleChoice.objects.create(code="general_role")
-        GeneralRole.objects.create(role=general_role_choice, user=cls.mr_anonymous)
+def test_anonymization__user():
+    mr_anonymous = UserFactory.create_superuser(
+        username="anonym",
+        first_name="anony",
+        last_name="mous",
+        email="anony.mous@foo.com",
+        reservation_notification=ReservationNotification.ALL,
+    )
 
-        service_sector = ServiceSectorFactory(name="Role testing sector")
-        service_sector_role_choice = ServiceSectorRoleChoice.objects.create(code="service_sector_role")
-        ServiceSectorRole.objects.create(
-            role=service_sector_role_choice,
-            service_sector=service_sector,
-            user=cls.mr_anonymous,
-        )
+    # Add general role
+    general_role_choice = GeneralRoleChoice.objects.create(code="general_role")
+    GeneralRole.objects.create(role=general_role_choice, user=mr_anonymous)
 
-        unit = UnitFactory(name="Role testing unit")
-        unit_role_choice = UnitRoleChoice.objects.create(code="unit_role")
-        unit_role = UnitRole.objects.create(role=unit_role_choice, user=cls.mr_anonymous)
-        unit_role.unit.add(unit)
+    # Add service sector role
+    service_sector = ServiceSectorFactory(name="Role testing sector")
+    service_sector_role_choice = ServiceSectorRoleChoice.objects.create(code="service_sector_role")
+    ServiceSectorRole.objects.create(
+        role=service_sector_role_choice,
+        service_sector=service_sector,
+        user=mr_anonymous,
+    )
 
-        cls.reservation = ReservationFactory.create(
-            user=cls.mr_anonymous,
-            reservee_address_zip="0100",
-            reservee_address_city="Helsinki",
-            reservee_address_street="Test Address 1",
-            billing_address_zip="01000",
-            billing_address_city="Helsinki",
-            billing_address_street="Test Address 1",
-            free_of_charge_reason="Test reason",
-            cancel_details="Test cancel details",
-            handling_details="Test handling details",
-        )
-        billing_address = AddressFactory()
-        cls.application = ApplicationFactory.create(user=cls.mr_anonymous, billing_address=billing_address)
-        cls.app_section = ApplicationSectionFactory.create(application=cls.application)
+    # Add unit role
+    unit = UnitFactory(name="Role testing unit")
+    unit_role_choice = UnitRoleChoice.objects.create(code="unit_role")
+    unit_role = UnitRole.objects.create(role=unit_role_choice, user=mr_anonymous)
+    unit_role.unit.add(unit)
 
-    def test_user_anonymization(self):
-        user_data = self.mr_anonymous.__dict__.copy()
-        anonymize_user(self.mr_anonymous)
-        self.mr_anonymous.refresh_from_db()
-        assert self.mr_anonymous.username == f"anonymized-{self.mr_anonymous.uuid}"
-        assert self.mr_anonymous.first_name == "ANON"
-        assert self.mr_anonymous.last_name == "ANONYMIZED"
-        assert self.mr_anonymous.email == f"{self.mr_anonymous.first_name}.{self.mr_anonymous.last_name}@anonymized.net"
-        assert self.mr_anonymous.uuid != user_data["uuid"]
-        assert self.mr_anonymous.reservation_notification == ReservationNotification.NONE
-        assert self.mr_anonymous.is_active is False
-        assert self.mr_anonymous.is_superuser is False
-        assert self.mr_anonymous.is_staff is False
+    old_user_uuid = mr_anonymous.uuid
 
-        assert GeneralRole.objects.filter(user=self.mr_anonymous).count() == 0
-        assert ServiceSectorRole.objects.filter(user=self.mr_anonymous).count() == 0
-        assert UnitRole.objects.filter(user=self.mr_anonymous).count() == 0
+    anonymize_user(mr_anonymous)
+    mr_anonymous.refresh_from_db()
 
-    def test_application_anonymization(self):
-        anonymize_user_applications(self.mr_anonymous)
-        self.app_section.refresh_from_db()
+    assert mr_anonymous.username == f"anonymized-{mr_anonymous.uuid}"
+    assert mr_anonymous.first_name == "ANON"
+    assert mr_anonymous.last_name == "ANONYMIZED"
+    assert mr_anonymous.email == f"{mr_anonymous.first_name}.{mr_anonymous.last_name}@anonymized.net"
+    assert mr_anonymous.uuid != old_user_uuid
+    assert mr_anonymous.reservation_notification == ReservationNotification.NONE
+    assert mr_anonymous.is_active is False
+    assert mr_anonymous.is_superuser is False
+    assert mr_anonymous.is_staff is False
 
-        # Section
-        assert self.app_section.name == SENSITIVE_APPLICATION
+    assert GeneralRole.objects.filter(user=mr_anonymous).count() == 0
+    assert ServiceSectorRole.objects.filter(user=mr_anonymous).count() == 0
+    assert UnitRole.objects.filter(user=mr_anonymous).count() == 0
 
-        # Actual application
-        self.application.refresh_from_db()
-        assert self.application.additional_information == SENSITIVE_APPLICATION
-        assert self.application.working_memo == SENSITIVE_APPLICATION
 
-        # Application billing address
-        assert self.application.billing_address.post_code == "99999"
-        assert self.application.billing_address.street_address == ANONYMIZED
-        assert self.application.billing_address.street_address_fi == ANONYMIZED
-        assert self.application.billing_address.street_address_en == ANONYMIZED
-        assert self.application.billing_address.street_address_sv == ANONYMIZED
-        assert self.application.billing_address.city == ANONYMIZED
-        assert self.application.billing_address.city_fi == ANONYMIZED
-        assert self.application.billing_address.city_en == ANONYMIZED
-        assert self.application.billing_address.city_sv == ANONYMIZED
+def test_anonymization__application():
+    mr_anonymous = UserFactory.create_superuser(
+        username="anonym",
+        first_name="anony",
+        last_name="mous",
+        email="anony.mous@foo.com",
+        reservation_notification=ReservationNotification.ALL,
+    )
+    billing_address = AddressFactory()
+    application = ApplicationFactory.create(user=mr_anonymous, billing_address=billing_address)
+    app_section = ApplicationSectionFactory.create(application=application)
 
-        # Contact person
-        assert self.application.contact_person.first_name == self.mr_anonymous.first_name
-        assert self.application.contact_person.last_name == self.mr_anonymous.last_name
-        assert self.application.contact_person.email == self.mr_anonymous.email
-        assert self.application.contact_person.phone_number == ""
+    anonymize_user_applications(mr_anonymous)
+    app_section.refresh_from_db()
 
-        # Organisation data should not be anonymized
-        assert self.application.organisation.name != ANONYMIZED
-        assert self.application.organisation.identifier != "1234567-2"
-        assert self.application.organisation.email != self.mr_anonymous.email
-        assert self.application.organisation.core_business != ANONYMIZED
-        assert self.application.organisation.core_business_fi != ANONYMIZED
-        assert self.application.organisation.core_business_en != ANONYMIZED
-        assert self.application.organisation.core_business_sv != ANONYMIZED
+    # Section
+    assert app_section.name == SENSITIVE_APPLICATION
 
-        # Organisation address should not be anonymized
-        assert self.application.organisation.address.post_code != "99999"
-        assert self.application.organisation.address.street_address != ANONYMIZED
-        assert self.application.organisation.address.street_address_fi != ANONYMIZED
-        assert self.application.organisation.address.street_address_en != ANONYMIZED
-        assert self.application.organisation.address.street_address_sv != ANONYMIZED
-        assert self.application.organisation.address.city != ANONYMIZED
-        assert self.application.organisation.address.city_fi != ANONYMIZED
-        assert self.application.organisation.address.city_en != ANONYMIZED
-        assert self.application.organisation.address.city_sv != ANONYMIZED
+    # Actual application
+    application.refresh_from_db()
+    assert application.additional_information == SENSITIVE_APPLICATION
+    assert application.working_memo == SENSITIVE_APPLICATION
 
-    def test_reservation_anonymization(self):
-        """Test also that the audit logger instances gets anonymized"""
-        anonymize_user_reservations(self.mr_anonymous)
-        self.reservation.refresh_from_db()
+    # Application billing address
+    assert application.billing_address.post_code == "99999"
+    assert application.billing_address.street_address == ANONYMIZED
+    assert application.billing_address.street_address_fi == ANONYMIZED
+    assert application.billing_address.street_address_en == ANONYMIZED
+    assert application.billing_address.street_address_sv == ANONYMIZED
+    assert application.billing_address.city == ANONYMIZED
+    assert application.billing_address.city_fi == ANONYMIZED
+    assert application.billing_address.city_en == ANONYMIZED
+    assert application.billing_address.city_sv == ANONYMIZED
 
-        assert self.reservation.name == ANONYMIZED
-        assert self.reservation.description == ANONYMIZED
-        assert self.reservation.reservee_first_name == self.mr_anonymous.first_name
-        assert self.reservation.reservee_last_name == self.mr_anonymous.last_name
-        assert self.reservation.reservee_email == self.mr_anonymous.email
-        assert self.reservation.reservee_phone == ""
-        assert self.reservation.reservee_address_zip == "999999"
-        assert self.reservation.reservee_address_city == ANONYMIZED
-        assert self.reservation.reservee_address_street == ANONYMIZED
-        assert self.reservation.billing_first_name == self.mr_anonymous.first_name
-        assert self.reservation.billing_last_name == self.mr_anonymous.last_name
-        assert self.reservation.billing_email == self.mr_anonymous.email
-        assert self.reservation.billing_phone == ""
-        assert self.reservation.billing_address_zip == "99999"
-        assert self.reservation.billing_address_city == ANONYMIZED
-        assert self.reservation.billing_address_street == ANONYMIZED
+    # Contact person
+    assert application.contact_person.first_name == mr_anonymous.first_name
+    assert application.contact_person.last_name == mr_anonymous.last_name
+    assert application.contact_person.email == mr_anonymous.email
+    assert application.contact_person.phone_number == ""
 
-        # Reservee_id and organisation name should not be anonymized
-        assert self.reservation.reservee_id != "1234567-2"
-        assert self.reservation.reservee_organisation_name != ANONYMIZED
+    # Organisation data should not be anonymized
+    assert application.organisation.name != ANONYMIZED
+    assert application.organisation.identifier != "1234567-2"
+    assert application.organisation.email != mr_anonymous.email
+    assert application.organisation.core_business != ANONYMIZED
+    assert application.organisation.core_business_fi != ANONYMIZED
+    assert application.organisation.core_business_en != ANONYMIZED
+    assert application.organisation.core_business_sv != ANONYMIZED
 
-        assert self.reservation.working_memo == ""
-        assert self.reservation.free_of_charge_reason == SENSITIVE_RESERVATION
-        assert self.reservation.cancel_details == SENSITIVE_RESERVATION
-        assert self.reservation.handling_details == SENSITIVE_RESERVATION
+    # Organisation address should not be anonymized
+    assert application.organisation.address.post_code != "99999"
+    assert application.organisation.address.street_address != ANONYMIZED
+    assert application.organisation.address.street_address_fi != ANONYMIZED
+    assert application.organisation.address.street_address_en != ANONYMIZED
+    assert application.organisation.address.street_address_sv != ANONYMIZED
+    assert application.organisation.address.city != ANONYMIZED
+    assert application.organisation.address.city_fi != ANONYMIZED
+    assert application.organisation.address.city_en != ANONYMIZED
+    assert application.organisation.address.city_sv != ANONYMIZED
 
-        # Test that auditlog entries are wiped.
-        assert LogEntry.objects.get_for_object(self.reservation).count() == 0
 
-    def test_reservation_anonymization_does_change_empty_values(self):
-        """Test also that the audit logger instances gets anonymized"""
-        self.reservation.name = ""
-        self.reservation.description = ""
-        self.reservation.free_of_charge_reason = None
-        self.reservation.save()
+def test_anonymization__reservation():
+    """Test also that the audit logger instances gets anonymized"""
+    mr_anonymous = UserFactory.create_superuser(
+        username="anonym",
+        first_name="anony",
+        last_name="mous",
+        email="anony.mous@foo.com",
+        reservation_notification=ReservationNotification.ALL,
+    )
+    reservation = ReservationFactory.create(
+        user=mr_anonymous,
+        reservee_address_zip="0100",
+        reservee_address_city="Helsinki",
+        reservee_address_street="Test Address 1",
+        billing_address_zip="01000",
+        billing_address_city="Helsinki",
+        billing_address_street="Test Address 1",
+        free_of_charge_reason="Test reason",
+        cancel_details="Test cancel details",
+        handling_details="Test handling details",
+    )
 
-        anonymize_user_reservations(self.mr_anonymous)
-        self.reservation.refresh_from_db()
+    anonymize_user_reservations(mr_anonymous)
+    reservation.refresh_from_db()
 
-        assert self.reservation.name == ""
-        assert self.reservation.description == ""
-        assert self.reservation.free_of_charge_reason is None
+    assert reservation.name == ANONYMIZED
+    assert reservation.description == ANONYMIZED
+    assert reservation.reservee_first_name == mr_anonymous.first_name
+    assert reservation.reservee_last_name == mr_anonymous.last_name
+    assert reservation.reservee_email == mr_anonymous.email
+    assert reservation.reservee_phone == ""
+    assert reservation.reservee_address_zip == "999999"
+    assert reservation.reservee_address_city == ANONYMIZED
+    assert reservation.reservee_address_street == ANONYMIZED
+    assert reservation.billing_first_name == mr_anonymous.first_name
+    assert reservation.billing_last_name == mr_anonymous.last_name
+    assert reservation.billing_email == mr_anonymous.email
+    assert reservation.billing_phone == ""
+    assert reservation.billing_address_zip == "99999"
+    assert reservation.billing_address_city == ANONYMIZED
+    assert reservation.billing_address_street == ANONYMIZED
+
+    # Reservee_id and organisation name should not be anonymized
+    assert reservation.reservee_id != "1234567-2"
+    assert reservation.reservee_organisation_name != ANONYMIZED
+
+    assert reservation.working_memo == ""
+    assert reservation.free_of_charge_reason == SENSITIVE_RESERVATION
+    assert reservation.cancel_details == SENSITIVE_RESERVATION
+    assert reservation.handling_details == SENSITIVE_RESERVATION
+
+    # Test that auditlog entries are wiped.
+    assert LogEntry.objects.get_for_object(reservation).count() == 0
+
+
+def test_anonymization__reservation__empty_values():
+    """Test also that the audit logger instances gets anonymized"""
+    mr_anonymous = UserFactory.create_superuser()
+    reservation = ReservationFactory.create(
+        user=mr_anonymous,
+        name="",
+        description="",
+        free_of_charge_reason=None,
+    )
+
+    anonymize_user_reservations(mr_anonymous)
+    reservation.refresh_from_db()
+
+    assert reservation.name == ""
+    assert reservation.description == ""
+    assert reservation.free_of_charge_reason is None
