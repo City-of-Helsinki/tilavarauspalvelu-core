@@ -7037,13 +7037,13 @@ export type ReservationUnitQuery = {
     id: string;
     pk?: number | null;
     nameFi?: string | null;
-    minPersons?: number | null;
     maxPersons?: number | null;
     bufferTimeBefore: number;
     bufferTimeAfter: number;
     reservationStartInterval: ReservationStartInterval;
     authentication: Authentication;
     termsOfUseFi?: string | null;
+    minPersons?: number | null;
     unit?: {
       id: string;
       pk?: number | null;
@@ -7311,13 +7311,13 @@ export type ReservationUnitFragment = {
   id: string;
   pk?: number | null;
   nameFi?: string | null;
-  minPersons?: number | null;
   maxPersons?: number | null;
   bufferTimeBefore: number;
   bufferTimeAfter: number;
   reservationStartInterval: ReservationStartInterval;
   authentication: Authentication;
   termsOfUseFi?: string | null;
+  minPersons?: number | null;
   unit?: {
     id: string;
     pk?: number | null;
@@ -7708,13 +7708,13 @@ export type ReservationQuery = {
       id: string;
       pk?: number | null;
       nameFi?: string | null;
-      minPersons?: number | null;
       maxPersons?: number | null;
       bufferTimeBefore: number;
       bufferTimeAfter: number;
       reservationStartInterval: ReservationStartInterval;
       authentication: Authentication;
       termsOfUseFi?: string | null;
+      minPersons?: number | null;
       unit?: {
         id: string;
         pk?: number | null;
@@ -9448,7 +9448,6 @@ export const ReservationUnitFragmentDoc = gql`
     id
     pk
     nameFi
-    minPersons
     maxPersons
     bufferTimeBefore
     bufferTimeAfter
