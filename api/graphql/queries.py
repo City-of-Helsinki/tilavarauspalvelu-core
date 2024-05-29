@@ -37,6 +37,7 @@ from .types.person.types import PersonNode
 from .types.purpose.types import PurposeNode
 from .types.qualifier.types import QualifierNode
 from .types.recurring_reservation.types import RecurringReservationNode
+from .types.rejected_occurrence.types import RejectedOccurrenceNode
 from .types.reservation.types import ReservationNode
 from .types.reservation_cancel_reason.types import ReservationCancelReasonNode
 from .types.reservation_deny_reason.types import ReservationDenyReasonNode
@@ -90,6 +91,7 @@ __all__ = [
     "PurposeNode",
     "QualifierNode",
     "RecurringReservationNode",
+    "RejectedOccurrenceNode",
     "ReservationCancelReasonNode",
     "ReservationDenyReasonNode",
     "ReservationMetadataFieldNode",

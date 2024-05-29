@@ -34,6 +34,7 @@ class RecurringReservationNode(DjangoNode):
             "weekdays",
             "created",
             "reservations",
+            "rejected_occurrences",
         ]
         restricted_fields = {
             "user": lambda user, instance: can_view_recurring_reservation(user, instance),

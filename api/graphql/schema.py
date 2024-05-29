@@ -97,6 +97,7 @@ from .queries import (
     PurposeNode,
     QualifierNode,
     RecurringReservationNode,
+    RejectedOccurrenceNode,
     ReservationCancelReasonNode,
     ReservationDenyReasonNode,
     ReservationMetadataSetNode,
@@ -184,6 +185,8 @@ class Query(graphene.ObjectType):
     )
     recurring_reservation = RecurringReservationNode.Node()
     recurring_reservations = RecurringReservationNode.Connection()
+    rejected_occurrence = RejectedOccurrenceNode.Node()
+    rejected_occurrences = RejectedOccurrenceNode.Connection()
     reservation_cancel_reasons = ReservationCancelReasonNode.Connection()
     reservation_deny_reasons = ReservationDenyReasonNode.Connection()
     reservation_purposes = ReservationPurposeNode.Connection()
