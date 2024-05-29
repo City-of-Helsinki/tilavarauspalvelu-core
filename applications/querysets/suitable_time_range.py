@@ -1,15 +1,16 @@
 from __future__ import annotations
 
-import datetime
 from typing import TYPE_CHECKING, Self
 
 from django.db import models
 from lookup_property import L
 
-from applications.choices import Weekday
 from common.date_utils import TimeSlot, merge_time_slots
 
 if TYPE_CHECKING:
+    import datetime
+
+    from applications.choices import Weekday
     from applications.models import ApplicationSection
 
 

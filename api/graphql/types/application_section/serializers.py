@@ -1,5 +1,4 @@
-import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from django.db import models
 from graphene_django_extensions import NestingModelSerializer
@@ -11,6 +10,9 @@ from api.graphql.types.reservation_unit_option.serializers import ReservationUni
 from api.graphql.types.suitable_time_range.serializers import SuitableTimeRangeSerializer
 from applications.models import AllocatedTimeSlot, Application, ApplicationRound, ApplicationSection
 from common.utils import comma_sep_str
+
+if TYPE_CHECKING:
+    import datetime
 
 __all__ = [
     "ApplicationSectionSerializer",

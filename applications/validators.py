@@ -8,10 +8,8 @@ from django.utils import formats
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from applications.typing import TimeSlot
-
 if TYPE_CHECKING:
-    pass
+    from applications.typing import TimeSlot
 
 __all__ = [
     "validate_reservable_times",

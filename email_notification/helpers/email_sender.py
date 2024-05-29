@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections.abc import Iterable
 from copy import copy
 from itertools import batched
 from typing import TYPE_CHECKING
@@ -8,18 +7,20 @@ from typing import TYPE_CHECKING
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 
-from applications.models import Application
 from common.utils import safe_getattr
 from email_notification.exceptions import SendEmailNotificationError
 from email_notification.helpers.email_builder_application import ApplicationEmailBuilder
-from email_notification.helpers.email_builder_base import BaseEmailBuilder
 from email_notification.helpers.email_builder_reservation import ReservationEmailBuilder
 from email_notification.models import EmailTemplate, EmailType
-from reservations.models import Reservation
-from tilavarauspalvelu.utils.commons import LanguageType
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+    from applications.models import Application
     from email_notification.admin.email_tester import EmailTemplateTesterForm
+    from email_notification.helpers.email_builder_base import BaseEmailBuilder
+    from reservations.models import Reservation
+    from tilavarauspalvelu.utils.commons import LanguageType
 
 
 class EmailNotificationSender:

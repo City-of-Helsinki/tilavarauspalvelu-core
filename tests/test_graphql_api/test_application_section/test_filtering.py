@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING
+
 import pytest
 
 from applications.choices import (
@@ -7,7 +9,6 @@ from applications.choices import (
     Priority,
     Weekday,
 )
-from applications.models import ReservationUnitOption
 from tests.factories import (
     AgeGroupFactory,
     ApplicationFactory,
@@ -18,6 +19,9 @@ from tests.factories import (
 )
 from tests.helpers import UserType
 from tests.test_graphql_api.test_application_section.helpers import sections_query
+
+if TYPE_CHECKING:
+    from applications.models import ReservationUnitOption
 
 # Applied to all tests
 pytestmark = [

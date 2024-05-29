@@ -1,4 +1,5 @@
 import datetime
+from typing import TYPE_CHECKING
 from unittest import mock
 
 import pytest
@@ -10,11 +11,13 @@ from applications.exporter.application_round_applications_exporter import (
     ApplicationExportRow,
     ApplicationRoundApplicationsCSVExporter,
 )
-from applications.models import ApplicationSection
 from common.date_utils import local_date_string, local_timedelta_string
 from tests.factories import ApplicationFactory, ApplicationRoundFactory
 
 from .helpers import Missing, MissingParams, get_writes
+
+if TYPE_CHECKING:
+    from applications.models import ApplicationSection
 
 # Applied to all tests
 pytestmark = [

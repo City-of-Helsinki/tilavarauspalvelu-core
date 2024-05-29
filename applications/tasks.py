@@ -1,4 +1,5 @@
 import datetime
+from typing import TYPE_CHECKING
 
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
@@ -8,11 +9,13 @@ from applications.choices import ApplicantTypeChoice, Weekday
 from applications.models import AllocatedTimeSlot
 from common.utils import translate_for_user
 from opening_hours.utils.reservable_time_span_client import ReservableTimeSpanClient
-from opening_hours.utils.time_span_element import TimeSpanElement
 from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import RecurringReservation
 from tilavarauspalvelu.celery import app
 from utils.sentry import SentryLogger
+
+if TYPE_CHECKING:
+    from opening_hours.utils.time_span_element import TimeSpanElement
 
 
 @app.task(name="generate_reservation_series_from_allocations")

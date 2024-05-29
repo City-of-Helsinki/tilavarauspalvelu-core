@@ -4,12 +4,10 @@ import base64
 import json
 from typing import TYPE_CHECKING, Any
 
-from django.core.handlers.wsgi import WSGIRequest
-
-from users.helauth.typing import SessionData
-
 if TYPE_CHECKING:
-    pass
+    from django.core.handlers.wsgi import WSGIRequest
+
+    from users.helauth.typing import SessionData
 
 
 __all__ = [

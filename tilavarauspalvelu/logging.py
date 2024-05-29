@@ -1,8 +1,10 @@
 import json
 import logging
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-from django.core.handlers.wsgi import WSGIRequest
+if TYPE_CHECKING:
+    from django.core.handlers.wsgi import WSGIRequest
 
 BASE_PATH = str(Path(__file__).resolve().parent.parent)
 

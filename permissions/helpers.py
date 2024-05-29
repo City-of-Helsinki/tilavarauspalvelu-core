@@ -5,11 +5,11 @@ from typing import TYPE_CHECKING
 from django.db import models
 
 from common.date_utils import local_datetime
-from common.typing import AnyUser
 from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
 
 if TYPE_CHECKING:
     from applications.models import Application
+    from common.typing import AnyUser
     from merchants.models import PaymentOrder
     from reservation_units.models import ReservationUnit
     from reservations.models import RecurringReservation, Reservation

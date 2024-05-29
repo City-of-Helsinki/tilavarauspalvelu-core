@@ -6,7 +6,6 @@ from django.db.models import Prefetch
 from graphene_django_extensions.permissions import BasePermission
 
 from applications.models import ReservationUnitOption
-from common.typing import AnyUser
 from permissions.helpers import (
     can_modify_application,
     can_read_application,
@@ -16,6 +15,7 @@ from permissions.helpers import (
 
 if TYPE_CHECKING:
     from applications.models import Application
+    from common.typing import AnyUser
 
 
 class ApplicationPermission(BasePermission):

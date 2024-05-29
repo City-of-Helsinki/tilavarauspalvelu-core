@@ -1,5 +1,6 @@
 import datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 import pytest
 from django.test import override_settings
@@ -8,9 +9,11 @@ from email_notification.admin.email_tester import EmailTemplateTesterForm
 from email_notification.helpers.email_sender import EmailNotificationSender
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from email_notification.models import EmailTemplate, EmailType
-from reservations.models import Reservation
 from tests.factories import EmailTemplateFactory, ReservationFactory, UserFactory
 from users.models import ReservationNotification
+
+if TYPE_CHECKING:
+    from reservations.models import Reservation
 
 # Applied to all tests
 pytestmark = [

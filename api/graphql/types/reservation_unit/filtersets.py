@@ -1,8 +1,6 @@
 import operator
-from datetime import date, time
-from decimal import Decimal
 from functools import reduce
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import django_filters
 from django.db.models import Expression, F, Q, QuerySet
@@ -17,6 +15,10 @@ from reservation_units.models import ReservationUnit
 from reservation_units.querysets import ReservationUnitQuerySet
 from reservation_units.utils.reservation_unit_reservation_state_helper import ReservationUnitReservationStateHelper
 from reservation_units.utils.reservation_unit_state_helper import ReservationUnitStateHelper
+
+if TYPE_CHECKING:
+    from datetime import date, time
+    from decimal import Decimal
 
 __all__ = [
     "ReservationUnitFilterSet",

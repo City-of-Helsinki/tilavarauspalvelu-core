@@ -1,11 +1,11 @@
 import datetime
+from typing import TYPE_CHECKING
 
 import freezegun
 import pytest
 from graphql_relay import to_global_id
 
 from reservations.choices import CustomerTypeChoice, ReservationTypeChoice
-from reservations.models import Reservation
 from tests.factories import (
     PaymentOrderFactory,
     ReservationFactory,
@@ -18,6 +18,9 @@ from tests.helpers import UserType
 from users.models import PersonalInfoViewLog
 
 from .helpers import reservation_query, reservations_query
+
+if TYPE_CHECKING:
+    from reservations.models import Reservation
 
 # Applied to all tests
 pytestmark = [

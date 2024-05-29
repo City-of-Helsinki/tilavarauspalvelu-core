@@ -1,4 +1,5 @@
 import datetime
+from typing import TYPE_CHECKING
 from unittest import mock
 
 import pytest
@@ -8,7 +9,6 @@ from applications.exporter.application_round_result_exporter import (
     ApplicationRoundResultCSVExporter,
     ApplicationSectionExportRow,
 )
-from applications.models import AllocatedTimeSlot, ApplicationSection
 from common.date_utils import local_date_string, local_timedelta_string
 from tests.factories import (
     AllocatedTimeSlotFactory,
@@ -19,6 +19,9 @@ from tests.factories import (
 )
 
 from .helpers import get_writes
+
+if TYPE_CHECKING:
+    from applications.models import AllocatedTimeSlot, ApplicationSection
 
 # Applied to all tests
 pytestmark = [

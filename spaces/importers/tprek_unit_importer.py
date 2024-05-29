@@ -1,15 +1,18 @@
 import logging
 from dataclasses import asdict
+from typing import TYPE_CHECKING
 
 from django.db.models import QuerySet
 from django.db.transaction import atomic
 
 from opening_hours.models import OriginHaukiResource
 from opening_hours.utils.hauki_api_client import HaukiAPIClient
-from opening_hours.utils.hauki_api_types import HaukiAPIResource
 from spaces.importers.tprek_api_client import TprekAPIClient, TprekLocationData, TprekUnitData
 from spaces.models import Location, Unit
 from utils.sentry import SentryLogger
+
+if TYPE_CHECKING:
+    from opening_hours.utils.hauki_api_types import HaukiAPIResource
 
 logger = logging.getLogger(__name__)
 

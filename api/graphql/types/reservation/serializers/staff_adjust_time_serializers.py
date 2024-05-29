@@ -1,4 +1,5 @@
 import datetime
+from typing import TYPE_CHECKING
 
 from django.utils.timezone import get_default_timezone
 
@@ -7,9 +8,11 @@ from api.graphql.extensions.validation_errors import ValidationErrorCodes, Valid
 from api.graphql.types.reservation.serializers.mixins import ReservationSchedulingMixin
 from common.date_utils import local_datetime
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
-from reservation_units.models import ReservationUnit
 from reservations.choices import ReservationStateChoice, ReservationTypeChoice
 from reservations.models import Reservation
+
+if TYPE_CHECKING:
+    from reservation_units.models import ReservationUnit
 
 DEFAULT_TIMEZONE = get_default_timezone()
 

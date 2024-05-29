@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import datetime
 import zoneinfo
-from collections.abc import Generator
-from typing import Generic, TypedDict, TypeVar
+from typing import TYPE_CHECKING, Generic, TypedDict, TypeVar
 
 from django.utils.timezone import get_default_timezone
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
 
 __all__ = [
     "DEFAULT_TIMEZONE",

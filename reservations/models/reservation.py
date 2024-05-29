@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-from decimal import Decimal
 from typing import TYPE_CHECKING
 
 from django.db import models
@@ -20,6 +19,8 @@ from reservations.querysets import ReservationQuerySet
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 
 if TYPE_CHECKING:
+    from decimal import Decimal
+
     from applications.models import City
     from reservations.models import (
         AgeGroup,

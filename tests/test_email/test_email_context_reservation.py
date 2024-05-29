@@ -1,9 +1,10 @@
+from typing import TYPE_CHECKING
+
 import pytest
 from django.utils.timezone import get_default_timezone
 
 from common.utils import get_attr_by_language
 from email_notification.helpers.email_builder_reservation import ReservationEmailContext
-from reservation_units.models import ReservationUnit
 from reservations.choices import CustomerTypeChoice
 from reservations.models import Reservation
 from spaces.models import Location
@@ -15,6 +16,9 @@ from tests.factories import (
     ReservationUnitFactory,
     UserFactory,
 )
+
+if TYPE_CHECKING:
+    from reservation_units.models import ReservationUnit
 
 pytestmark = [
     pytest.mark.django_db,

@@ -1,5 +1,4 @@
-import uuid
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from graphene_django_extensions.errors import GQLCodeError
 from graphene_django_extensions.permissions import BasePermission
@@ -9,6 +8,9 @@ from api.graphql.extensions import error_codes
 from common.typing import AnyUser
 from merchants.models import PaymentOrder
 from permissions.helpers import can_handle_reservation, can_refresh_order
+
+if TYPE_CHECKING:
+    import uuid
 
 __all__ = [
     "OrderRefreshPermission",

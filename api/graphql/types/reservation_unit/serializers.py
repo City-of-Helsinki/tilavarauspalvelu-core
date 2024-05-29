@@ -1,5 +1,4 @@
-from datetime import timedelta
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from auditlog.models import LogEntry
 from django.conf import settings
@@ -18,6 +17,9 @@ from reservation_units.enums import PricingStatus, ReservationStartInterval
 from reservation_units.models import ReservationUnit, ReservationUnitPricing
 from reservation_units.utils.reservation_unit_pricing_helper import ReservationUnitPricingHelper
 from utils.external_service.errors import ExternalServiceError
+
+if TYPE_CHECKING:
+    from datetime import timedelta
 
 __all__ = [
     "ReservationUnitSerializer",
