@@ -1,15 +1,12 @@
 import datetime
-from collections.abc import Iterable
-from typing import Any
 
 import factory
 from factory import fuzzy
 
 from common.date_utils import DEFAULT_TIMEZONE
-from reservations.models import RecurringReservation, Reservation
+from reservations.models import RecurringReservation
 
-from ._base import GenericDjangoModelFactory
-from .reservation import ReservationFactory
+from ._base import GenericDjangoModelFactory, OneToManyFactory
 
 __all__ = [
     "RecurringReservationFactory",
@@ -41,13 +38,5 @@ class RecurringReservationFactory(GenericDjangoModelFactory[RecurringReservation
     ability_group = factory.SubFactory("tests.factories.AbilityGroupFactory")
     allocated_time_slot = factory.SubFactory("tests.factories.AllocatedTimeSlotFactory")
 
-    @factory.post_generation
-    def reservations(self, create: bool, reservations: Iterable[Reservation] | None, **kwargs: Any):
-        if not create:
-            return
-
-        if not reservations and kwargs:
-            self.reservations.add(ReservationFactory.create(**kwargs))
-
-        for reservation in reservations or []:
-            self.reservations.add(reservation)
+    rejected_occurrences = OneToManyFactory("tests.factories.RejectedOccurrenceFactory")
+    reservations = OneToManyFactory("tests.factories.ReservationFactory")

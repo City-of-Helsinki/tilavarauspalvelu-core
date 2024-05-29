@@ -6,7 +6,7 @@ from freezegun import freeze_time
 from common.date_utils import local_datetime
 from reservations.models import RecurringReservation
 from reservations.pruning import prune_recurring_reservations
-from tests.factories import RecurringReservationFactory, ReservationFactory
+from tests.factories import RecurringReservationFactory
 
 # Applied to all tests
 pytestmark = [
@@ -25,7 +25,7 @@ def test_prune_recurring_reservations__recurring_reservations_without_reservatio
 
 def test_prune_recurring_reservations__recurring_reservations_with_reservations_are_not_deleted():
     with freeze_time(local_datetime() - timedelta(days=1)):
-        RecurringReservationFactory.create(reservations=[ReservationFactory.create()])
+        RecurringReservationFactory.create(reservations__name="foo")
 
     prune_recurring_reservations()
 

@@ -1,6 +1,7 @@
 import freezegun
 import pytest
 
+from reservations.choices import RejectionReadinessChoice
 from tests.factories import RecurringReservationFactory
 from tests.helpers import UserType
 
@@ -13,8 +14,11 @@ pytestmark = [
 
 
 def test_recurring_reservations__query(graphql):
-    recurring_reservation = RecurringReservationFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    recurring_reservation = RecurringReservationFactory.create(
+        reservations__name="foo",
+        rejected_occurrences__rejection_reason=RejectionReadinessChoice.INTERVAL_NOT_ALLOWED,
+    )
+    graphql.login_with_superuser()
 
     fields = """
         pk
@@ -40,11 +44,25 @@ def test_recurring_reservations__query(graphql):
         reservationUnit {
             nameFi
         }
+        reservations {
+            pk
+            name
+        }
+        rejectedOccurrences {
+            pk
+            beginDatetime
+            endDatetime
+            rejectionReason
+            createdAt
+        }
     """
     query = recurring_reservations_query(fields=fields)
     response = graphql(query)
 
     assert response.has_errors is False
+
+    reservation = recurring_reservation.reservations.first()
+    occurrence = recurring_reservation.rejected_occurrences.first()
 
     assert len(response.edges) == 1
     assert response.node(0) == {
@@ -71,6 +89,21 @@ def test_recurring_reservations__query(graphql):
         "reservationUnit": {
             "nameFi": recurring_reservation.reservation_unit.name_fi,
         },
+        "reservations": [
+            {
+                "pk": reservation.pk,
+                "name": reservation.name,
+            }
+        ],
+        "rejectedOccurrences": [
+            {
+                "pk": occurrence.pk,
+                "beginDatetime": occurrence.begin_datetime.isoformat(),
+                "endDatetime": occurrence.end_datetime.isoformat(),
+                "rejectionReason": occurrence.rejection_reason,
+                "createdAt": occurrence.created_at.isoformat(),
+            }
+        ],
     }
 
 
