@@ -24,7 +24,7 @@ from reservation_units.models import (
     ReservationUnitPaymentType,
     TaxPercentage,
 )
-from reservations.models import AbilityGroup, RecurringReservation, ReservationMetadataField
+from reservations.models import AbilityGroup, RecurringReservation, RejectedOccurrence, ReservationMetadataField
 from spaces.models import Building, RealEstate
 from users.models import PersonalInfoViewLog
 
@@ -72,6 +72,7 @@ models_that_should_be_empty: list[type[models.Model]] = [
     PersonalInfoViewLog,
     RealEstate,
     RecurringReservation,
+    RejectedOccurrence,
     ReservationUnitImage,
     SQLLog,
 ]

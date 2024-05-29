@@ -619,8 +619,8 @@ def test_reservation__filter__by_text_search__user_last_name(graphql):
 
 
 def test_reservation__filter__by_text_search__recurring_reservation_name(graphql):
-    reservation = ReservationFactory.create()
-    recurring_reservation = RecurringReservationFactory.create(reservations=[reservation], name="foo")
+    reservation = ReservationFactory.create(recurring_reservation__name="foo")
+    recurring_reservation = reservation.recurring_reservation
 
     graphql.login_user_based_on_type(UserType.SUPERUSER)
     query = reservations_query(text_search=recurring_reservation.name)
