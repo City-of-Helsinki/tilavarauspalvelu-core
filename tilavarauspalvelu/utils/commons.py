@@ -12,7 +12,7 @@ class LANGUAGES:
     EN: str
 
 
-def _build_languages():
+def _build_languages() -> None:
     for lang in settings.LANGUAGES:
         setattr(LANGUAGES, lang[0].upper(), lang[0])
 

@@ -23,7 +23,7 @@ class MultipleProxyMiddleware:
         "HTTP_X_FORWARDED_SERVER",
     ]
 
-    def __init__(self, get_response):
+    def __init__(self, get_response) -> None:
         self.get_response = get_response
 
     def __call__(self, request: WSGIRequest) -> HttpResponse:

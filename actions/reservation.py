@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 
 class ReservationActions:
-    def __init__(self, reservation: Reservation):
+    def __init__(self, reservation: Reservation) -> None:
         self.reservation = reservation
 
     def get_actual_before_buffer(self) -> datetime.timedelta:

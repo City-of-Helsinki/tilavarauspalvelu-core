@@ -88,7 +88,7 @@ class StaffReservationModifySerializer(OldPrimaryKeyUpdateSerializer, Reservatio
             "type",
         ]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.fields["reservation_unit_pks"].write_only = True
         self.fields["confirmed_at"].read_only = True

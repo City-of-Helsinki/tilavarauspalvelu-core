@@ -264,7 +264,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
         )
     )
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer) -> None:
         serializer.save(user_id=self.request.user.pk)
 
     def get_queryset(self):

@@ -84,7 +84,7 @@ class ReservationUnitAdmin(SortableAdminMixin, admin.ModelAdmin):
             # Should fix the exporter to use an in-memory stream instead of writing to a file.
             return FileResponse(open(path, "rb"))  # noqa: SIM115
 
-    def save_model(self, request, obj, form, change):
+    def save_model(self, request, obj, form, change) -> None:
         super().save_model(request, obj, form, change)
 
         # Update ReservableTimeSpans for HaukiResource when ReservationUnit is saved

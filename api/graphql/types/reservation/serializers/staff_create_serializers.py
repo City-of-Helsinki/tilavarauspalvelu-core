@@ -86,7 +86,7 @@ class ReservationStaffCreateSerializer(OldPrimaryKeySerializer, ReservationSched
             "recurring_reservation_pk",
         ]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
         self.fields["state"].read_only = True

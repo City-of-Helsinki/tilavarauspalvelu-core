@@ -28,7 +28,7 @@ class EquipmentCategory(models.Model):
             "pk",
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -54,5 +54,5 @@ class Equipment(models.Model):
             "pk",
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name

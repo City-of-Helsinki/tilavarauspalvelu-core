@@ -32,7 +32,7 @@ class PaymentMerchantForm(forms.ModelForm):
     url = forms.CharField(label=_("URL"), max_length=256, required=True)
     tos_url = forms.CharField(label=_("Terms of service URL"), max_length=256, required=True)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         instance: PaymentMerchant | None = kwargs.get("instance", None)
         if instance and instance.id:

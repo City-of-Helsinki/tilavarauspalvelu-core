@@ -42,5 +42,5 @@ class Address(SerializableMixin, models.Model):
         {"name": "city_sv"},
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.street_address}, {self.post_code}, {self.city}"

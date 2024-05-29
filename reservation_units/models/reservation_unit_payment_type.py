@@ -16,5 +16,5 @@ class ReservationUnitPaymentType(models.Model):
             "pk",
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.code

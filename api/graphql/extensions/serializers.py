@@ -5,7 +5,7 @@ from rest_framework.exceptions import ErrorDetail
 
 
 class OldPrimaryKeySerializerBase(serializers.ModelSerializer):
-    def _check_id_list(self, id_list, field_name):
+    def _check_id_list(self, id_list, field_name) -> None:
         for identifier in id_list:
             try:
                 int(identifier)

@@ -107,7 +107,7 @@ class ReservationDetails(TypedDict, total=False):
 
 
 class RecurringReservationActions:
-    def __init__(self, recurring_reservation: RecurringReservation):
+    def __init__(self, recurring_reservation: RecurringReservation) -> None:
         self.recurring_reservation = recurring_reservation
 
     def pre_calculate_slots(

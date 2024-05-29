@@ -29,7 +29,7 @@ class StaffReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reserv
             "buffer_time_after",
         ]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.fields["state"].readonly = True
         self.fields["buffer_time_before"].help_text = (

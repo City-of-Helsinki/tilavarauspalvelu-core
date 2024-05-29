@@ -87,7 +87,7 @@ class BaseEmailBuilder:
     email_template_types: list[EmailType]
 
     # Init methods
-    def __init__(self, *, template: EmailTemplate, context: BaseEmailContext):
+    def __init__(self, *, template: EmailTemplate, context: BaseEmailContext) -> None:
         self.template = template
         self.context = context
 

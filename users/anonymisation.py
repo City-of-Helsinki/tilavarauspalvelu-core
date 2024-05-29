@@ -104,7 +104,7 @@ def anonymize_user_applications(user: User) -> None:
     )
 
 
-def anonymize_user_data(user: User):
+def anonymize_user_data(user: User) -> None:
     anonymize_user(user)
     anonymize_user_applications(user)
     anonymize_user_reservations(user)

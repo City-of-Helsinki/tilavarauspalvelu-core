@@ -241,7 +241,7 @@ def _rename_empty_units(units: list[Unit]) -> None:
     text_entering="Flushing database...",
     text_exiting="Database flushed!",
 )
-def _clear_database():
+def _clear_database() -> None:
     call_command("flush", "--noinput")
 
 
@@ -2445,7 +2445,7 @@ def _create_banner_notifications():
     text_entering="Creating periodic tasks...",
     text_exiting="Periodic tasks created!",
 )
-def _create_periodic_tasks():
+def _create_periodic_tasks() -> None:
     even_5_minute = CrontabSchedule.objects.create(
         minute="0,5,10,15,20,25,30,35,40,45,50,55",
         timezone=DEFAULT_TIMEZONE,

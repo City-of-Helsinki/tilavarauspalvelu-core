@@ -41,5 +41,5 @@ class Service(models.Model):
             "pk",
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} ({self.service_type})"

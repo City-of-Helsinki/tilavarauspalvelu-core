@@ -97,7 +97,7 @@ lint.explicit-preview-rules = true
 lint.preview = true
 lint.select = [
     "A",        # flake8-builtins
-    #"ANN",     # flake8-annotations  # TODO: Enable this and fix (5400) issues
+    #"ANN",     # flake8-annotations  # TODO: Enable this and fix (401) issues
     #"ARG",     # flake8-unused-arguments # TODO: Enable this and fix (353) issues
     "B",        # flake8-bugbear
     #"BLE",     # flake8-blind-except  # TODO: Enable this and fix (7) issues
@@ -182,6 +182,13 @@ lint.ignore = [
     # Allow longer error messages in raised exceptions
     "TRY003",   # raise-vanilla-args
 
+    # Missing type annotation for `self` in method
+    "ANN101",   # missing-type-self
+    # Missing type annotation for `cls` in method
+    "ANN102",   # missing-type-cls
+    # Any-typing allowed
+    "ANN401",   # any-type
+
     # To be enabled in the future
     "DJ001",    # Allow `null=True` in text-based fields TODO: Remove this ignore once the issues are fixed.
     "PLR2004",  # magic-value-comparison
@@ -205,6 +212,7 @@ lint.ignore = [
     "ERA001",   # Commented code is fine here.
 ]
 "test_*.py" = [
+    "ANN",      # No need to annotate tests
     "S101",     # Obviousle asserts are fine in tests
     "S105",     # Hardcoded passwords are fine in tests
     "S106",     # Hardcoded passwords are fine in tests
@@ -216,6 +224,7 @@ lint.ignore = [
     "N806",     # Allow whatever variable names in tests
 ]
 "*tests/*.py" = [
+    "ANN",      # No need to annotate tests
     "N801",     # Allow whatever class names in tests
     "N802",     # Allow whatever function names in tests
     "N815",     # Allow whatever variable names in tests

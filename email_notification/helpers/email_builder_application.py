@@ -58,7 +58,7 @@ class ApplicationEmailBuilder(BaseEmailBuilder):
         EmailType.APPLICATION_RECEIVED,
     ]
 
-    def __init__(self, template: EmailTemplate, context: ApplicationEmailContext):
+    def __init__(self, template: EmailTemplate, context: ApplicationEmailContext) -> None:
         super().__init__(template=template, context=context)
 
     @classmethod

@@ -26,7 +26,7 @@ class OldTranslatedFieldSerializer(serializers.Serializer):
     and written to the model as `name_fi`, `name_en`, `name_sv`.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         original_field_name = kwargs.pop("source", None)
         original_field_class = kwargs.pop("field_class", None)
         if original_field_name is None:
@@ -52,7 +52,7 @@ class OldTranslatedModelSerializer(serializers.ModelSerializer):
     and nests them in an object under the original field name.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.model_translatable_fields = get_translatable_fields_for_model(self.Meta.model) or []
 

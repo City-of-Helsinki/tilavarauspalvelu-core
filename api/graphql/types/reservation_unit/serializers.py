@@ -299,7 +299,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
                 raise GraphQLError("Sending reservation unit as resource to HAUKI failed.") from err
 
     @staticmethod
-    def handle_pricings(pricings: list[dict[Any, Any]], reservation_unit):
+    def handle_pricings(pricings: list[dict[Any, Any]], reservation_unit) -> None:
         # Delete pricings that are not in the payload
         if not ReservationUnitPricingHelper.contains_status(PricingStatus.PRICING_STATUS_ACTIVE, pricings):
             ReservationUnitPricing.objects.filter(

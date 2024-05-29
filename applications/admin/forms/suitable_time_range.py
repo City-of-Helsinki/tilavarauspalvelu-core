@@ -20,7 +20,7 @@ class SuitableTimeRangeInlineAdminForm(forms.ModelForm):
         ),
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         instance: SuitableTimeRange | None = kwargs.get("instance", None)
         if instance:
             kwargs.setdefault("initial", {})

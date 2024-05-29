@@ -21,7 +21,7 @@ class ReservationUnitInline(admin.TabularInline):
     can_delete = False
     extra = 0
 
-    def has_add_permission(self, request, obj=None):
+    def has_add_permission(self, request, obj=None) -> bool:
         return False
 
     def reservation_unit_link(self, obj):
@@ -38,7 +38,7 @@ class ReservableTimeSpanInline(admin.TabularInline):
     can_delete = False
     extra = 0
 
-    def has_add_permission(self, request, obj=None):
+    def has_add_permission(self, request, obj=None) -> bool:
         return False
 
     def time_span_str(self, obj: ReservableTimeSpan) -> str:
@@ -46,7 +46,7 @@ class ReservableTimeSpanInline(admin.TabularInline):
 
 
 class OriginHaukiResourceAdminForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         if self.instance.opening_hours_hash == NEVER_ANY_OPENING_HOURS_HASH:
             self.Meta.help_texts["opening_hours_hash"] += " " + _(
@@ -70,7 +70,7 @@ class OriginHaukiResourceAdminForm(forms.ModelForm):
         }
 
 
-def _update_reservable_time_spans_action(modeladmin, request, queryset: QuerySet[OriginHaukiResource]):
+def _update_reservable_time_spans_action(modeladmin, request, queryset: QuerySet[OriginHaukiResource]) -> None:
     ids: list[int] = queryset.values_list("id", flat=True)
     HaukiResourceHashUpdater(ids).run(force_refetch=True)
     modeladmin.message_user(request, _("Reservable Time Spans updated."))
@@ -117,11 +117,11 @@ class OriginHaukiResourceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         return ", ".join(obj.reservation_units.values_list("name_fi", flat=True))
 
     @button(label="Update All Reservable Time Spans", change_list=True)
-    def update_all_hauki_resources_reservable_time_spans(self, request, extra_context=None):
+    def update_all_hauki_resources_reservable_time_spans(self, request, extra_context=None) -> None:
         HaukiResourceHashUpdater().run(force_refetch=True)
         self.message_user(request, _("Reservable Time Spans updated."))
 
     @button(label="Update Reservable Time Spans", change_form=True)
-    def update_single_hauki_resource_reservable_times_pans(self, request, pk, extra_context=None):
+    def update_single_hauki_resource_reservable_times_pans(self, request, pk, extra_context=None) -> None:
         HaukiResourceHashUpdater([pk]).run(force_refetch=True)
         self.message_user(request, _("Reservable Time Spans updated."))

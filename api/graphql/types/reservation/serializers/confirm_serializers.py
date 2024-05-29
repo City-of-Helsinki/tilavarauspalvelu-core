@@ -34,7 +34,7 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
         ),
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         # All fields should be read-only, except for the lookup
         # field (PK) which should be included in the input

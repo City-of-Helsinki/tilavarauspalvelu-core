@@ -37,14 +37,14 @@ class ReservationUnitPricingHelper:
         return pricing.get("status") == PricingStatus.PRICING_STATUS_FUTURE
 
     @classmethod
-    def check_pricing_required(cls, is_draft: bool, data: dict[str, Any]):
+    def check_pricing_required(cls, is_draft: bool, data: dict[str, Any]) -> None:
         pricings = data.get("pricings", [])
 
         if not is_draft and not pricings:
             raise GraphQLError("pricings is required and must have one ACTIVE and one optional FUTURE pricing")
 
     @classmethod
-    def check_pricing_dates(cls, data: dict[str, Any]):
+    def check_pricing_dates(cls, data: dict[str, Any]) -> None:
         pricings = data.get("pricings", [])
         for pricing in pricings:
             if cls.is_active(pricing):
@@ -54,7 +54,7 @@ class ReservationUnitPricingHelper:
                 raise GraphQLError("FUTURE pricing must be in the future")
 
     @classmethod
-    def check_pricing_counts(cls, is_draft: bool, data: dict[str, Any]):
+    def check_pricing_counts(cls, is_draft: bool, data: dict[str, Any]) -> None:
         pricings = data.get("pricings", [])
 
         active_count = 0

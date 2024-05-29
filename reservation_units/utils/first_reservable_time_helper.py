@@ -124,7 +124,7 @@ class FirstReservableTimeHelper:
         filter_time_start: time | None = None,
         filter_time_end: time | None = None,
         minimum_duration_minutes: float | Decimal | None = None,
-    ):
+    ) -> None:
         from reservations.models import Reservation
 
         now = local_datetime()
@@ -325,7 +325,7 @@ class ReservationUnitFirstReservableTimeHelper:
 
     is_reservation_unit_max_duration_invalid: bool
 
-    def __init__(self, parent: FirstReservableTimeHelper, reservation_unit: ReservationUnit):
+    def __init__(self, parent: FirstReservableTimeHelper, reservation_unit: ReservationUnit) -> None:
         self.parent = parent
         self.reservation_unit = reservation_unit
 
@@ -480,7 +480,11 @@ class ReservableTimeSpanFirstReservableTimeHelper:
     parent: ReservationUnitFirstReservableTimeHelper
     reservable_time_span: ReservableTimeSpan
 
-    def __init__(self, parent: ReservationUnitFirstReservableTimeHelper, reservable_time_span: ReservableTimeSpan):
+    def __init__(
+        self,
+        parent: ReservationUnitFirstReservableTimeHelper,
+        reservable_time_span: ReservableTimeSpan,
+    ) -> None:
         self.parent = parent
         self.reservable_time_span = reservable_time_span
 

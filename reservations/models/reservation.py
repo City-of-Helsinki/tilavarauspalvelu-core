@@ -246,7 +246,7 @@ class Reservation(SerializableMixin, models.Model):
 
         return ""
 
-    def get_location_string(self):
+    def get_location_string(self) -> str:
         locations = []
         for reservation_unit in self.reservation_unit.all():
             location = reservation_unit.actions.get_location()
@@ -261,7 +261,7 @@ class Reservation(SerializableMixin, models.Model):
             return self.recurring_reservation.application_event.name
         return ""
 
-    def get_ical_description(self):
+    def get_ical_description(self) -> str:
         reservation_units = self.reservation_unit.all()
         unit_names = [
             reservation_unit.unit.name for reservation_unit in reservation_units if hasattr(reservation_unit, "unit")

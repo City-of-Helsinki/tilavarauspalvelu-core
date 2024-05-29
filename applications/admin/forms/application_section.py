@@ -41,7 +41,7 @@ class ApplicationSectionAdminForm(forms.ModelForm):
         },
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         instance: ApplicationSection | None = kwargs.get("instance", None)
         if instance:
             kwargs.setdefault("initial", {})
@@ -92,7 +92,7 @@ class ApplicationSectionInlineAdminForm(forms.ModelForm):
     status = EnumChoiceField(enum=ApplicationSectionStatusChoice, required=False, disabled=True)
     suitable_days_of_the_week = forms.CharField()
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         instance: ApplicationSection | None = kwargs.get("instance", None)
         if instance:
             kwargs.setdefault("initial", {})

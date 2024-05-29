@@ -36,7 +36,7 @@ class ReservationUnitImage(models.Model, PurgeImageCacheMixin):
             "pk",
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.reservation_unit.name} ({self.get_image_type_display()})"
 
     def save(
@@ -46,7 +46,7 @@ class ReservationUnitImage(models.Model, PurgeImageCacheMixin):
         using=None,
         update_fields=None,
         update_urls=True,
-    ):
+    ) -> None:
         self.purge_previous_image_cache()
 
         super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
@@ -54,5 +54,5 @@ class ReservationUnitImage(models.Model, PurgeImageCacheMixin):
         if update_urls:
             self.update_image_urls()
 
-    def update_image_urls(self):
+    def update_image_urls(self) -> None:
         update_urls.delay(self.pk)

@@ -72,7 +72,7 @@ class Space(MPTTModel):
             value += f", {self.unit!s}"
         return value
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> None:
         super().save(*args, **kwargs)
 
         tree_id = self.parent.tree_id if self.parent else self.tree_id
