@@ -35,7 +35,7 @@ class SpaceFilterSet(ModelFilterSet):
 
         if user.is_anonymous:
             return qs.none()
-        elif user.is_superuser or can_manage_spaces(user):
+        if user.is_superuser or can_manage_spaces(user):
             return qs
 
         units = get_units_with_permission(user, "can_manage_spaces")

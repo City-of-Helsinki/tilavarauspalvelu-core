@@ -75,7 +75,7 @@ def reservation_unit() -> ReservationUnit:
         opening_hours_hash="test_hash",
         latest_fetched_date=date(2024, 12, 31),
     )
-    reservation_unit = ReservationUnitFactory.create(
+    return ReservationUnitFactory.create(
         origin_hauki_resource=origin_hauki_resource,
         reservation_start_interval=ReservationStartInterval.INTERVAL_15_MINUTES.value,
         reservation_begins=None,
@@ -87,7 +87,6 @@ def reservation_unit() -> ReservationUnit:
         buffer_time_before=timedelta(),
         buffer_time_after=timedelta(),
     )
-    return reservation_unit
 
 
 def create_child_for_reservation_unit(reservation_unit: ReservationUnit) -> ReservationUnit:

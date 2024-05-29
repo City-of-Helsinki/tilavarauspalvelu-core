@@ -20,8 +20,7 @@ class TimezoneAwareDateField(forms.DateField):
 
         if self.use_end_of_day:
             return local_end_of_day(value)
-        else:
-            return local_start_of_day(value)
+        return local_start_of_day(value)
 
 
 class TimezoneAwareDateFilter(django_filters.DateFilter):

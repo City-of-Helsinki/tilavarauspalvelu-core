@@ -59,10 +59,9 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
 
         if payment_types.count() == 1:
             return payment_types.first().code
-        elif payment_types.filter(code__in=[PaymentType.INVOICE, PaymentType.ON_SITE]).count() == payment_types.count():
+        if payment_types.filter(code__in=[PaymentType.INVOICE, PaymentType.ON_SITE]).count() == payment_types.count():
             return PaymentType.INVOICE
-        else:
-            return PaymentType.ONLINE
+        return PaymentType.ONLINE
 
     def validate(self, data, prefill_from_profile=False):
         data = super().validate(data)
@@ -73,7 +72,7 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
                 ValidationErrorCodes.CHANGES_NOT_ALLOWED,
             )
 
-        elif self.instance.reservation_unit.count() > 1:
+        if self.instance.reservation_unit.count() > 1:
             raise ValidationErrorWithCode(
                 "Reservations with multiple reservation units are not supported.",
                 ValidationErrorCodes.MULTIPLE_RESERVATION_UNITS,

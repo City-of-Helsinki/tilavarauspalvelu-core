@@ -61,7 +61,7 @@ class ApplicationExportRow(BaseExportRow):
             raise ValueError(f"Key {key} not found in {self.__class__.__name__}")
         # If the value is already set, append the new time range to the end of the string.
         # Time ranges should be in chronological order.
-        elif current_value:
+        if current_value:
             setattr(self, key, f"{current_value}, {new_value}")
         else:
             setattr(self, key, new_value)

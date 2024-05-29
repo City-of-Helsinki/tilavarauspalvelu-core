@@ -168,8 +168,7 @@ class Application(SerializableMixin, models.Model):
         if self.sent_date is None:
             if self.application_round.status.is_allocation_upcoming:
                 return ApplicationStatusChoice.DRAFT
-            else:
-                return ApplicationStatusChoice.EXPIRED
+            return ApplicationStatusChoice.EXPIRED
 
         match self.application_round.status:
             case ApplicationRoundStatusChoice.UPCOMING | ApplicationRoundStatusChoice.OPEN:
@@ -190,7 +189,7 @@ class Application(SerializableMixin, models.Model):
     def all_sections_allocated() -> bool:
         from applications.models import ApplicationSection
 
-        exists = ~models.Exists(
+        return ~models.Exists(  # type: ignore[return-value]
             ApplicationSection.objects.alias(status=L("status")).filter(
                 application=models.OuterRef("pk"),
                 status__in=[
@@ -199,7 +198,6 @@ class Application(SerializableMixin, models.Model):
                 ],
             )
         )
-        return exists  # type: ignore[return-value]
 
     @all_sections_allocated.override
     def _(self) -> bool:
@@ -216,7 +214,7 @@ class Application(SerializableMixin, models.Model):
 
     @lookup_property(joins=["organisation", "contact_person", "user"], skip_codegen=True)
     def applicant() -> str:
-        applicant = models.Case(
+        return models.Case(  # type: ignore[return-value]
             models.When(
                 models.Q(organisation__isnull=False),
                 then=models.F("organisation__name"),
@@ -240,15 +238,14 @@ class Application(SerializableMixin, models.Model):
             default=models.Value(""),
             output_field=models.CharField(),
         )
-        return applicant  # type: ignore[return-value]
 
     @applicant.override
     def _(self) -> str:
         if self.organisation is not None:
             return self.organisation.name
-        elif self.contact_person is not None:
+        if self.contact_person is not None:
             return f"{self.contact_person.first_name} {self.contact_person.last_name}"
-        elif self.user is not None:
+        if self.user is not None:
             return f"{self.user.first_name} {self.user.last_name}"
         return ""
 

@@ -39,7 +39,7 @@ class ReservableTimeSpanClient:
                 f"{self.origin_hauki_resource} does not have opening_hours_hash set."
             )
         # If the resource has never any opening hours, we can raise an error
-        elif self.origin_hauki_resource.opening_hours_hash == NEVER_ANY_OPENING_HOURS_HASH:
+        if self.origin_hauki_resource.opening_hours_hash == NEVER_ANY_OPENING_HOURS_HASH:
             raise ReservableTimeSpanClientNothingToDoError(f"{self.origin_hauki_resource} never has any opening hours.")
 
     def run(self) -> list[ReservableTimeSpan]:
@@ -267,7 +267,7 @@ def override_reservable_with_closed_time_spans(
             # │  ██     ->  ██     │ reservable time span is split in three.       │
             # │     ██  ->     ██  │ (in different loops)                          │
             # └────────────────────┴───────────────────────────────────────────────┘
-            elif closed_time_span.fully_inside_of(reservable_time_span):
+            if closed_time_span.fully_inside_of(reservable_time_span):
                 new_reservable_time_span = copy(reservable_time_span)
                 reservable_time_spans.append(new_reservable_time_span)
                 # Split the reservable time span in two

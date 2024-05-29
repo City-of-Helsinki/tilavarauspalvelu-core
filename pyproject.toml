@@ -133,8 +133,7 @@ lint.select = [
     "PYI",      # flake8-pyi
     "Q",        # flake8-quotes
     #"R",       # Refactor  # TODO: Enable this and fix (51) issues
-    "RET502",   # flake8-return: Do not implicitly return None in function able to return non-None value
-    "RET503",   # flake8-return: Missing explicit return at the end of function able to return non-None value
+    "RET",      # flake8-return
     "RSE",      # flake8-raise
     "RUF",      # ruff-specific rules
     "S",        # flake8-bandit

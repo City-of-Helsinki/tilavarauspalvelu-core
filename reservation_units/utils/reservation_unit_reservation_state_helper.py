@@ -132,8 +132,7 @@ class ReservationUnitReservationStateHelper:
         if active_price.pricing_type == PricingType.FREE:
             return True
         # Pricing is PAID and there is a payment product
-        else:
-            return reservation_unit.payment_product is not None
+        return reservation_unit.payment_product is not None
 
     @classmethod
     def __has_valid_pricing_query(cls) -> Q:
@@ -194,9 +193,8 @@ class ReservationUnitReservationStateHelper:
         if reservation_unit.reservation_ends is None:
             # Or reservations begin in the future
             return reservation_unit.reservation_begins <= now
-        else:
-            # Reservations have already begun and end in the past, but begin after they end
-            return reservation_unit.reservation_ends < reservation_unit.reservation_begins <= now
+        # Reservations have already begun and end in the past, but begin after they end
+        return reservation_unit.reservation_ends < reservation_unit.reservation_begins <= now
 
     @classmethod
     def __is_reservable_period_query(cls) -> Q:
@@ -359,13 +357,13 @@ class ReservationUnitReservationStateHelper:
         state = ReservationState(state)
         if state == ReservationState.SCHEDULED_RESERVATION:
             return cls.__get_is_scheduled_reservation_query()
-        elif state == ReservationState.SCHEDULED_PERIOD:
+        if state == ReservationState.SCHEDULED_PERIOD:
             return cls.__get_is_scheduled_period_query()
-        elif state == ReservationState.RESERVABLE:
+        if state == ReservationState.RESERVABLE:
             return cls.__get_is_reservable_query()
-        elif state == ReservationState.SCHEDULED_CLOSING:
+        if state == ReservationState.SCHEDULED_CLOSING:
             return cls.__get_is_scheduled_closing_query()
-        elif state == ReservationState.RESERVATION_CLOSED:
+        if state == ReservationState.RESERVATION_CLOSED:
             return cls.__get_is_reservation_closed_query()
 
         raise ValueError(f"Unknown reservation state: {state}")

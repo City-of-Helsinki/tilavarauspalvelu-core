@@ -72,7 +72,7 @@ class SuitableTimeRange(models.Model):
     def fulfilled() -> bool:
         from .allocated_time_slot import AllocatedTimeSlot
 
-        fulfilled = models.Case(
+        return models.Case(  # type: ignore[return-value]
             models.When(
                 ~models.Q(
                     L(
@@ -92,7 +92,6 @@ class SuitableTimeRange(models.Model):
             ),
             output_field=models.BooleanField(),
         )
-        return fulfilled  # type: ignore[return-value]
 
     @fulfilled.override
     def _(self) -> bool:

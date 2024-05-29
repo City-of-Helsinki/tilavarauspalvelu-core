@@ -151,12 +151,11 @@ def reservation_unit(resource, space, unit):
 
 @pytest.fixture()
 def reservation_unit_too(resource, unit_too):
-    reservation_unit = ReservationUnit.objects.create(
+    return ReservationUnit.objects.create(
         name_en="Test reservation unit too",
         require_introduction=False,
         unit=unit_too,
     )
-    return reservation_unit
 
 
 @pytest.fixture()
@@ -380,26 +379,24 @@ def billing_address() -> Address:
 
 @pytest.fixture()
 def application(purpose, organisation, person, application_round, user, billing_address) -> Application:
-    application = Application.objects.create(
+    return Application.objects.create(
         organisation=organisation,
         contact_person=person,
         application_round=application_round,
         user=user,
         billing_address=billing_address,
     )
-    return application
 
 
 @pytest.fixture()
 def application2(purpose, organisation, person, application_round, user, billing_address) -> Application:
-    application = Application.objects.create(
+    return Application.objects.create(
         organisation=organisation,
         contact_person=person,
         application_round=application_round,
         user=user,
         billing_address=billing_address,
     )
-    return application
 
 
 @pytest.fixture()
@@ -760,8 +757,7 @@ def general_admin_api_client(general_admin):
 
 @pytest.fixture()
 def unauthenticated_api_client():
-    api_client = APIClient()
-    return api_client
+    return APIClient()
 
 
 @pytest.fixture()

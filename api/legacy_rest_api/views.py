@@ -143,7 +143,7 @@ class ReservationUnitViewSet(viewsets.ModelViewSet):
     permission_classes = [ReservationUnitPermission]
 
     def get_queryset(self):
-        qs = (
+        return (
             ReservationUnit.objects.annotate(max_persons_sum=Sum("spaces__max_persons"))
             .all()
             .select_related("reservation_unit_type", "unit")
@@ -160,7 +160,6 @@ class ReservationUnitViewSet(viewsets.ModelViewSet):
                 Prefetch("resources", queryset=Resource.objects.all().select_related("space")),
             )
         )
-        return qs
 
     @action(detail=False, methods=["get"])
     def capacity(self, request, pk=None):

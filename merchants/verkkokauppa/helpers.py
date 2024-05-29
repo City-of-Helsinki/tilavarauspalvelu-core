@@ -110,7 +110,7 @@ def get_verkkokauppa_order_params(reservation: Reservation) -> CreateOrderParams
             ],
         )
     ]
-    order_params = CreateOrderParams(
+    return CreateOrderParams(
         namespace=settings.VERKKOKAUPPA_NAMESPACE,
         user=reservation.user.uuid,
         language=reservation.reservee_language or "fi",
@@ -128,8 +128,6 @@ def get_verkkokauppa_order_params(reservation: Reservation) -> CreateOrderParams
             local_datetime() + timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
         ),
     )
-
-    return order_params
 
 
 def create_mock_verkkokauppa_order(reservation: Reservation) -> Order:

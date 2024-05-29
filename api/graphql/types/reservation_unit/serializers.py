@@ -224,15 +224,14 @@ class ReservationUnitSerializer(NestingModelSerializer):
             ):
                 raise GraphQLError("ACTIVE pricing is already defined. Only one ACTIVE pricing is allowed")
 
-            elif (
+            if (
                 ReservationUnitPricingHelper.is_future(pricing)
                 and current_future_pricing
                 and current_future_pricing.pk != pricing.get("pk", 0)
             ):
                 raise GraphQLError("FUTURE pricing is already defined. Only one FUTURE pricing is allowed")
 
-        data = ReservationUnitPricingHelper.calculate_vat_prices(data)
-        return data
+        return ReservationUnitPricingHelper.calculate_vat_prices(data)
 
     @staticmethod
     def validate_application_round_time_slots(timeslots: list[dict[str, Any]]) -> list[dict[str, Any]]:

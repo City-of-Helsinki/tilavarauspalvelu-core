@@ -144,7 +144,7 @@ class ApplicationSection(SerializableMixin, models.Model):
 
     @lookup_property(joins=["reservation_unit_options", "application"], skip_codegen=True)
     def status() -> ApplicationSectionStatusChoice:
-        status = models.Case(
+        return models.Case(  # type: ignore[return-value]
             models.When(
                 # The application round has not yet moved to the allocation stage
                 models.Q(application__application_round__application_period_end__gte=Now()),
@@ -165,7 +165,6 @@ class ApplicationSection(SerializableMixin, models.Model):
             default=models.Value(ApplicationSectionStatusChoice.IN_ALLOCATION.value),
             output_field=models.CharField(),
         )
-        return status  # type: ignore[return-value]
 
     @status.override
     def _(self) -> ApplicationSectionStatusChoice:
@@ -196,7 +195,7 @@ class ApplicationSection(SerializableMixin, models.Model):
     def allocations() -> int:
         from .allocated_time_slot import AllocatedTimeSlot
 
-        allocations = Coalesce(
+        return Coalesce(  # type: ignore[return-value]
             SubqueryCount(
                 queryset=(
                     AllocatedTimeSlot.objects.filter(
@@ -206,7 +205,6 @@ class ApplicationSection(SerializableMixin, models.Model):
             ),
             models.Value(0),
         )
-        return allocations  # type: ignore[return-value]
 
     @allocations.override
     def _(self) -> int:
@@ -223,7 +221,7 @@ class ApplicationSection(SerializableMixin, models.Model):
     def usable_reservation_unit_options() -> int:
         from .reservation_unit_option import ReservationUnitOption
 
-        usable_reservation_unit_options = Coalesce(
+        return Coalesce(  # type: ignore[return-value]
             SubqueryCount(
                 queryset=(
                     ReservationUnitOption.objects.filter(application_section=models.OuterRef("pk"))
@@ -233,7 +231,6 @@ class ApplicationSection(SerializableMixin, models.Model):
             ),
             models.Value(0),
         )
-        return usable_reservation_unit_options  # type: ignore[return-value]
 
     @usable_reservation_unit_options.override
     def _(self) -> int:
@@ -241,7 +238,7 @@ class ApplicationSection(SerializableMixin, models.Model):
 
     @lookup_property
     def status_sort_order() -> int:
-        status_sort_order = models.Case(
+        return models.Case(  # type: ignore[return-value]
             models.When(
                 models.Q(L(status=ApplicationSectionStatusChoice.UNALLOCATED.value)),
                 then=models.Value(1),
@@ -265,4 +262,3 @@ class ApplicationSection(SerializableMixin, models.Model):
             default=models.Value(6),
             output_field=models.IntegerField(),
         )
-        return status_sort_order  # type: ignore[return-value]
