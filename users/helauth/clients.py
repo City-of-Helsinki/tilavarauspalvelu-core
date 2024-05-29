@@ -6,31 +6,32 @@ import time
 from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
-from django.core.handlers.wsgi import WSGIRequest
 from django.utils.functional import classproperty
 from graphene_django_extensions.utils import get_nested
 from requests import HTTPError, Response
 from social_django.models import DjangoStorage
 from social_django.strategy import DjangoStrategy
 
-from common.typing import AnyUser
 from tilavarauspalvelu.auth import ProxyTunnistamoOIDCAuthBackend
 from users.helauth.parsers import ProfileDataParser
-from users.helauth.typing import (
-    BirthdayInfo,
-    ExtraData,
-    ProfileData,
-    ProfileTokenPayload,
-    RefreshResponse,
-    ReservationPrefillInfo,
-    UserProfileInfo,
-)
 from users.helauth.utils import get_jwt_payload, get_session_data
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 from utils.external_service.errors import ExternalServiceError, ExternalServiceRequestError
 from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
+    from django.core.handlers.wsgi import WSGIRequest
+
+    from common.typing import AnyUser
+    from users.helauth.typing import (
+        BirthdayInfo,
+        ExtraData,
+        ProfileData,
+        ProfileTokenPayload,
+        RefreshResponse,
+        ReservationPrefillInfo,
+        UserProfileInfo,
+    )
     from users.models import User
 
 

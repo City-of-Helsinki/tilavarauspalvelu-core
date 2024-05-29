@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING
+
 from django.conf import settings
 
 from api.graphql.extensions.fields import OldChoiceCharField
@@ -7,7 +9,6 @@ from email_notification.helpers.reservation_email_notification_sender import Res
 from merchants.models import Language, OrderStatus, PaymentOrder
 from merchants.verkkokauppa.helpers import create_mock_verkkokauppa_order, get_verkkokauppa_order_params
 from merchants.verkkokauppa.order.exceptions import CreateOrderError
-from merchants.verkkokauppa.order.types import CreateOrderParams, Order
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservation_units.enums import PaymentType, PricingType
 from reservation_units.utils.reservation_unit_pricing_helper import ReservationUnitPricingHelper
@@ -15,6 +16,9 @@ from reservations.choices import ReservationStateChoice
 from reservations.models import Reservation
 from utils.decimal_utils import round_decimal
 from utils.sentry import SentryLogger
+
+if TYPE_CHECKING:
+    from merchants.verkkokauppa.order.types import CreateOrderParams, Order
 
 
 class ReservationConfirmSerializer(ReservationUpdateSerializer):

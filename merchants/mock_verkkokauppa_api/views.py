@@ -1,4 +1,5 @@
 import uuid
+from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -10,7 +11,9 @@ from django.views.generic import TemplateView
 from common.date_utils import local_datetime
 from merchants.models import OrderStatus, PaymentOrder
 from reservations.choices import ReservationStateChoice
-from reservations.models import Reservation
+
+if TYPE_CHECKING:
+    from reservations.models import Reservation
 
 
 class MockVerkkokauppaView(TemplateView):

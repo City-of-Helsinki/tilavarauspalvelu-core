@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import datetime
 from typing import TYPE_CHECKING
 
 from django.db import models
@@ -15,6 +14,8 @@ from common.connectors import AllocatedTimeSlotActionsConnector
 from common.fields.model import StrChoiceField
 
 if TYPE_CHECKING:
+    import datetime
+
     from applications.models import ReservationUnitOption
 
 

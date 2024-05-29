@@ -1,5 +1,4 @@
-import uuid
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from rest_framework import viewsets
 from rest_framework.request import Request
@@ -13,11 +12,15 @@ from merchants.verkkokauppa.payment.exceptions import GetPaymentError, GetRefund
 from merchants.verkkokauppa.payment.types import PaymentStatus, RefundStatus
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.choices import ReservationStateChoice
-from reservations.models import Reservation
 from utils.sentry import SentryLogger
 
 from .permissions import WebhookPermission
 from .serializers import WebhookOrderCancelSerializer, WebhookPaymentSerializer, WebhookRefundSerializer
+
+if TYPE_CHECKING:
+    import uuid
+
+    from reservations.models import Reservation
 
 
 class WebhookOrderPaidViewSet(viewsets.GenericViewSet):

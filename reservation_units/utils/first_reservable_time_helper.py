@@ -1,13 +1,10 @@
 from __future__ import annotations
 
 import math
-from collections.abc import Iterable
 from datetime import date, datetime, time, timedelta
-from decimal import Decimal
 from typing import TYPE_CHECKING, NamedTuple
 
 from django.db import models
-from django.db.models import QuerySet, When
 from lookup_property import L
 
 from applications.choices import ApplicationRoundStatusChoice
@@ -19,6 +16,11 @@ from opening_hours.utils.time_span_element import TimeSpanElement
 from reservation_units.enums import ReservationStartInterval
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from decimal import Decimal
+
+    from django.db.models import QuerySet, When
+
     from reservation_units.models import ReservationUnit
     from reservation_units.querysets import ReservationUnitQuerySet
 

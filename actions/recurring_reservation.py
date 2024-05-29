@@ -2,22 +2,23 @@ from __future__ import annotations
 
 import dataclasses
 import datetime
-from collections.abc import Collection, Iterable
 from itertools import chain
 from typing import TYPE_CHECKING, Any, TypedDict
 
-from django.db import models
-
 from common.date_utils import DEFAULT_TIMEZONE, combine, get_periods_between
-from opening_hours.models import ReservableTimeSpan
 from opening_hours.utils.reservable_time_span_client import merge_overlapping_time_span_elements
 from opening_hours.utils.time_span_element import TimeSpanElement
 from reservation_units.models import ReservationUnit
-from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import RecurringReservation, Reservation, ReservationPurpose
 
 if TYPE_CHECKING:
+    from collections.abc import Collection, Iterable
+
+    from django.db import models
+
     from applications.models import City
+    from opening_hours.models import ReservableTimeSpan
+    from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
     from users.models import User
 
 

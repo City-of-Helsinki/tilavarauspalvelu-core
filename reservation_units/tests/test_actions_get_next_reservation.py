@@ -1,12 +1,15 @@
 from datetime import UTC, datetime, timedelta
+from typing import TYPE_CHECKING
 
 import pytest
 from freezegun import freeze_time
 
-from reservation_units.models import ReservationUnit
 from reservations.choices import ReservationStateChoice, ReservationTypeChoice
-from spaces.models import Space
 from tests.factories import ReservationFactory, ReservationUnitFactory, SpaceFactory
+
+if TYPE_CHECKING:
+    from reservation_units.models import ReservationUnit
+    from spaces.models import Space
 
 # Applied to all tests
 pytestmark = [

@@ -1,11 +1,15 @@
+from typing import TYPE_CHECKING
+
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 from reservation_units.enums import ReservationUnitImageType
-from reservation_units.models import ReservationUnitImage
 from tests.factories import ReservationUnitFactory
 
 from .helpers import CREATE_MUTATION
+
+if TYPE_CHECKING:
+    from reservation_units.models import ReservationUnitImage
 
 # Applied to all tests
 pytestmark = [

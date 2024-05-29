@@ -3,9 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from django.contrib import admin
-from django.core.handlers.wsgi import WSGIRequest
 from django.db import models
-from django.db.models import QuerySet
 from django.db.models.functions import Concat
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
@@ -14,6 +12,9 @@ from applications.choices import ApplicationRoundStatusChoice, ApplicationSectio
 from reservations.models import AgeGroup, ReservationPurpose
 
 if TYPE_CHECKING:
+    from django.core.handlers.wsgi import WSGIRequest
+    from django.db.models import QuerySet
+
     from applications.admin import ApplicationSectionAdmin
 
 

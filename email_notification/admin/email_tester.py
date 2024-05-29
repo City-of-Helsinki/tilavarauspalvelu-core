@@ -6,7 +6,6 @@ from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
 from django import forms
-from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 
@@ -14,10 +13,12 @@ from email_notification.helpers.email_builder_reservation import ReservationEmai
 from email_notification.helpers.email_sender import EmailNotificationSender
 from email_notification.models import EmailTemplate
 from reservation_units.models import ReservationUnit
-from spaces.models import Location
 
 if TYPE_CHECKING:
+    from django.http import HttpResponseRedirect
+
     from email_notification.admin import EmailTemplateAdmin
+    from spaces.models import Location
 
 
 def _get_email_template_tester_form_initial_values(request) -> dict[str, Any]:

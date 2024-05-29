@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import datetime
 import uuid as uuid_
 from typing import TYPE_CHECKING
 
@@ -13,6 +12,8 @@ from reservations.querysets.recurring_reservation import RecurringReservationQue
 from tilavarauspalvelu.utils.commons import WEEKDAYS
 
 if TYPE_CHECKING:
+    import datetime
+
     from applications.models import AllocatedTimeSlot
     from reservation_units.models import ReservationUnit
     from reservations.models import AbilityGroup, AgeGroup

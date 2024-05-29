@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from django.contrib import admin
-from django.core.handlers.wsgi import WSGIRequest
 from django.db.models import Q, QuerySet
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
@@ -12,6 +11,8 @@ from applications.choices import ApplicationRoundStatusChoice, ApplicationStatus
 from applications.models import ApplicationRound
 
 if TYPE_CHECKING:
+    from django.core.handlers.wsgi import WSGIRequest
+
     from applications.admin import ApplicationAdmin
 
 

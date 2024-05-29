@@ -1,11 +1,14 @@
 import datetime
+from typing import TYPE_CHECKING
 
 import pytest
 
 from reservation_units.enums import PricingType, ReservationState
-from reservation_units.models import ReservationUnit
 from reservation_units.utils.reservation_unit_reservation_state_helper import ReservationUnitReservationStateHelper
 from tests.factories import PaymentProductFactory, ReservationUnitFactory, ReservationUnitPricingFactory
+
+if TYPE_CHECKING:
+    from reservation_units.models import ReservationUnit
 
 pytestmark = [
     pytest.mark.django_db,

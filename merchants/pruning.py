@@ -1,4 +1,5 @@
 from datetime import timedelta
+from typing import TYPE_CHECKING
 
 from django.conf import settings
 
@@ -10,8 +11,10 @@ from merchants.verkkokauppa.payment.exceptions import GetPaymentError
 from merchants.verkkokauppa.payment.types import PaymentStatus as WebShopPaymentStatus
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.choices import ReservationStateChoice
-from reservations.models import Reservation
 from utils.sentry import SentryLogger
+
+if TYPE_CHECKING:
+    from reservations.models import Reservation
 
 
 def update_expired_orders() -> None:

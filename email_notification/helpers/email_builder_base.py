@@ -2,17 +2,20 @@ from __future__ import annotations
 
 import datetime
 from dataclasses import asdict, dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from urllib.parse import urlencode, urljoin
 
 from django.conf import settings
-from django.db.models.fields.files import FieldFile
 from django.utils.timezone import get_default_timezone
 
 from email_notification.exceptions import EmailBuilderConfigurationError
 from email_notification.helpers.email_validator import EmailTemplateValidator
-from email_notification.models import EmailTemplate, EmailType
-from tilavarauspalvelu.utils.commons import LanguageType
+
+if TYPE_CHECKING:
+    from django.db.models.fields.files import FieldFile
+
+    from email_notification.models import EmailTemplate, EmailType
+    from tilavarauspalvelu.utils.commons import LanguageType
 
 
 @dataclass

@@ -2,7 +2,6 @@ import calendar
 import datetime
 import zoneinfo
 from copy import copy
-from typing import TYPE_CHECKING
 
 from django.conf import settings
 
@@ -13,10 +12,6 @@ from opening_hours.models import OriginHaukiResource, ReservableTimeSpan
 from opening_hours.utils.hauki_api_client import HaukiAPIClient
 from opening_hours.utils.hauki_api_types import HaukiAPIOpeningHoursResponseItem
 from opening_hours.utils.time_span_element import TimeSpanElement
-
-if TYPE_CHECKING:
-    pass
-
 
 # Hash value for when there are never any opening hours
 # See https://github.com/City-of-Helsinki/hauki `hours.models.Resource._get_date_periods_as_hash`

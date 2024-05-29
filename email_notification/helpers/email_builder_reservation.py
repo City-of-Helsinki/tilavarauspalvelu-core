@@ -13,12 +13,12 @@ from common.utils import get_attr_by_language
 from email_notification.helpers.email_builder_base import BaseEmailBuilder, BaseEmailContext
 from email_notification.models import EmailTemplate, EmailType
 from reservations.choices import CustomerTypeChoice
-from reservations.models import Reservation
-from spaces.models import Location
-from tilavarauspalvelu.utils.commons import LanguageType
 
 if TYPE_CHECKING:
     from email_notification.admin.email_tester import EmailTemplateTesterForm
+    from reservations.models import Reservation
+    from spaces.models import Location
+    from tilavarauspalvelu.utils.commons import LanguageType
 
 type InstructionNameType = Literal["confirmed", "pending", "cancelled"]
 

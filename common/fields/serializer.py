@@ -2,11 +2,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from graphene_django_extensions.typing import AnyUser
-from rest_framework import serializers
 from rest_framework.fields import Field, SkipField
 
 if TYPE_CHECKING:
+    from graphene_django_extensions.typing import AnyUser
+    from rest_framework import serializers
+
     from users.models import User
 
 

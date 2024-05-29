@@ -1,10 +1,12 @@
-from typing import Self
+from typing import TYPE_CHECKING, Self
 
 from django.db.models import OuterRef, Q
-from mptt.models import MPTTOptions
 from mptt.querysets import TreeQuerySet
 
 from common.db import SubqueryArray
+
+if TYPE_CHECKING:
+    from mptt.models import MPTTOptions
 
 
 class ExtendedTreeQuerySet(TreeQuerySet):

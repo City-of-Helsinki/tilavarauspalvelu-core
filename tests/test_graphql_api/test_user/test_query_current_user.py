@@ -1,10 +1,14 @@
+from typing import TYPE_CHECKING
+
 import pytest
 
-from permissions.models import GeneralRole, ServiceSectorRole, UnitRole
 from tests.factories import ServiceSectorFactory, UnitFactory, UserFactory, UserSocialAuthFactory
 from tests.helpers import UserType
 
 from .helpers import current_user_query
+
+if TYPE_CHECKING:
+    from permissions.models import GeneralRole, ServiceSectorRole, UnitRole
 
 # Applied to all tests
 pytestmark = [

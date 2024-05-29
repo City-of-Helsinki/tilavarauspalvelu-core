@@ -1,15 +1,18 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 from urllib.parse import urljoin
 
 from django.conf import settings
 
-from applications.models import Application
 from common.utils import safe_getattr
 from email_notification.helpers.email_builder_base import BaseEmailBuilder, BaseEmailContext
 from email_notification.models import EmailTemplate, EmailType
-from tilavarauspalvelu.utils.commons import LanguageType
+
+if TYPE_CHECKING:
+    from applications.models import Application
+    from tilavarauspalvelu.utils.commons import LanguageType
 
 
 @dataclass

@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-import datetime
 import enum
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Literal, TypedDict
 
 if TYPE_CHECKING:
+    import datetime
+
     from applications.models import City
 
 

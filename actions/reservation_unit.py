@@ -1,10 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from collections.abc import Iterable
 from typing import TYPE_CHECKING, Any
-
-from django.db import models
 
 from common.date_utils import DEFAULT_TIMEZONE, time_as_timedelta
 from opening_hours.errors import HaukiAPIError
@@ -15,6 +12,10 @@ from reservation_units.enums import ReservationStartInterval
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+    from django.db import models
+
     from reservation_units.models import ReservationUnit
     from reservations.models import Reservation
     from spaces.models import Building, Location

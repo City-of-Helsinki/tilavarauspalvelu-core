@@ -1,18 +1,21 @@
 import datetime
 import uuid
+from typing import TYPE_CHECKING
 
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from django.utils import timezone
 
-from applications.models import Application, ApplicationSection
 from merchants.models import OrderStatus
 from reservations.choices import ReservationStateChoice
-from reservations.models import Reservation
 from tests.factories import ApplicationFactory, PaymentOrderFactory, ReservationFactory, UserFactory
 from tests.test_helauth.helpers import get_gdpr_auth_header, patch_oidc_config
-from users.models import User
+
+if TYPE_CHECKING:
+    from applications.models import Application, ApplicationSection
+    from reservations.models import Reservation
+    from users.models import User
 
 # Applied to all tests
 pytestmark = [

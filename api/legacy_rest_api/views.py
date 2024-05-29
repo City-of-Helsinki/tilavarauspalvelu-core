@@ -1,6 +1,6 @@
-import datetime
 import hmac
 import io
+from typing import TYPE_CHECKING
 
 from dateutil.parser import parse
 from django.conf import settings
@@ -29,6 +29,9 @@ from spaces.models import Space
 from .filtersets import RecurringReservationFilter, ReservationFilter, ReservationUnitFilter
 from .serializers import RecurringReservationSerializer, ReservationSerializer, ReservationUnitSerializer
 from .utils import export_reservation_events, get_host, hmac_signature, reservation_unit_calendar
+
+if TYPE_CHECKING:
+    import datetime
 
 
 class ReservationIcalViewset(ViewSet):
