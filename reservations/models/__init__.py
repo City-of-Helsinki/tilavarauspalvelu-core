@@ -1,6 +1,7 @@
 from .ability_group import AbilityGroup
 from .age_group import AgeGroup
 from .recurring_reservation import RecurringReservation
+from .rejected_occurrence import RejectedOccurrence
 from .reservation import Reservation
 from .reservation_cancel_reason import ReservationCancelReason
 from .reservation_deny_reason import ReservationDenyReason
@@ -12,6 +13,7 @@ __all__ = [
     "AbilityGroup",
     "AgeGroup",
     "RecurringReservation",
+    "RejectedOccurrence",
     "Reservation",
     "ReservationCancelReason",
     "ReservationDenyReason",
