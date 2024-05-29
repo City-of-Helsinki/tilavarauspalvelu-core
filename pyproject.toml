@@ -82,6 +82,7 @@ ruff = "^0.4.9"
 
 [tool.ruff]
 fix = true
+unsafe-fixes = true
 line-length = 120
 target-version = "py312"
 extend-exclude = [
