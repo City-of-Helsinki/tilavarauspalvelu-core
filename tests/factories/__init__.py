@@ -28,6 +28,7 @@ from .purpose import PurposeFactory
 from .qualifier import QualifierFactory
 from .real_estate import RealEstateFactory
 from .recurring_reservation import RecurringReservationFactory
+from .rejected_occurrence import RejectedOccurrenceFactory
 from .reservation import ReservationFactory
 from .reservation_cancel_reason import ReservationCancelReasonFactory
 from .reservation_deny_reason import ReservationDenyReasonFactory
@@ -104,6 +105,7 @@ __all__ = [
     "QualifierFactory",
     "RealEstateFactory",
     "RecurringReservationFactory",
+    "RejectedOccurrenceFactory",
     "ReservableTimeSpanFactory",
     "ReservationCancelReasonFactory",
     "ReservationDenyReasonFactory",
