@@ -36,7 +36,7 @@ class ApplicationAdminForm(forms.ModelForm):
         },
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         instance: Application | None = kwargs.get("instance", None)
         if instance is not None:
             kwargs.setdefault("initial", {})

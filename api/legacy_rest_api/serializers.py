@@ -119,7 +119,7 @@ class AgeGroupSerializer(serializers.ModelSerializer):
             },
         }
 
-    def __init__(self, *args, display=False, **kwargs):
+    def __init__(self, *args, display=False, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         if display:
             self.fields.pop("id")
@@ -320,7 +320,7 @@ class ReservationUnitSerializer(OldTranslatedModelSerializer):
             },
         }
 
-    def __init__(self, *args, display=False, **kwargs):
+    def __init__(self, *args, display=False, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         if display:
             self.fields.pop("id")

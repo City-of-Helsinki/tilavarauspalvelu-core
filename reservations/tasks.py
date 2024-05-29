@@ -22,12 +22,12 @@ def prune_reservations_task() -> None:
 
 
 @app.task(name="update_expired_orders")
-def update_expired_orders_task():
+def update_expired_orders_task() -> None:
     update_expired_orders()
 
 
 @app.task(name="prune_reservation_statistics")
-def prune_reservation_statistics_task():
+def prune_reservation_statistics_task() -> None:
     prune_reservation_statistics()
 
 

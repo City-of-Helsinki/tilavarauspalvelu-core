@@ -97,7 +97,7 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
             "type",
         ]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.fields["state"].read_only = True
         self.fields["reservation_unit_pks"].write_only = True
@@ -237,7 +237,7 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
                 if value is not None:
                     data[key] = value
 
-    def check_sku(self, current_sku, new_sku):
+    def check_sku(self, current_sku, new_sku) -> None:
         if current_sku is not None and current_sku != new_sku:
             raise ValidationErrorWithCode(
                 "An ambiguous SKU cannot be assigned for this reservation.",
@@ -261,14 +261,14 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
                 ValidationErrorCodes.MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED,
             )
 
-    def check_reservation_kind(self, reservation_unit):
+    def check_reservation_kind(self, reservation_unit) -> None:
         if reservation_unit.reservation_kind == ReservationKind.SEASON:
             raise ValidationErrorWithCode(
                 "Reservation unit is only available or seasonal booking.",
                 ValidationErrorCodes.RESERVATION_UNIT_TYPE_IS_SEASON,
             )
 
-    def check_reservation_type(self, user, reservation_unit_ids: list[int], reservation_type: str | None):
+    def check_reservation_type(self, user, reservation_unit_ids: list[int], reservation_type: str | None) -> None:
         if reservation_type is None or can_handle_reservation_with_units(user, reservation_unit_ids):
             return
 

@@ -55,6 +55,6 @@ class UserAdmin(admin.ModelAdmin):
     actions = ["anonymize_user_data"]
 
     @admin.action
-    def anonymize_user_data(self, request, queryset):
+    def anonymize_user_data(self, request, queryset) -> None:
         for user in queryset.all():
             anonymize_user_data(user)

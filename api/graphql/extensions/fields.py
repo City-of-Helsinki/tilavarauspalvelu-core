@@ -63,7 +63,7 @@ class ValidatingListField(serializers.ListField):
     before default implementation and provides better error messages
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
     def run_child_validation(self, data):
@@ -84,7 +84,7 @@ class OldChoiceValidator:
     message = _('Choice "%(choice)s" is not allowed. Allowed choices are: %(allowed_choices)s.')
     code = "invalid_choice"
 
-    def __init__(self, allowed_choices):
+    def __init__(self, allowed_choices) -> None:
         if len(allowed_choices) > 0 and isinstance(allowed_choices[0][0], int):
             self.allowed_choices = [choice[0] for choice in allowed_choices]
         else:
@@ -107,7 +107,7 @@ class OldChoiceValidator:
 
 
 class OldChoiceCharField(serializers.CharField):
-    def __init__(self, choices, **kwargs):
+    def __init__(self, choices, **kwargs) -> None:
         super().__init__(**kwargs)
         choice_validator = OldChoiceValidator(choices)
         self.validators.append(choice_validator)
@@ -127,7 +127,7 @@ class OldChoiceCharField(serializers.CharField):
 class OldChoiceIntegerField(serializers.IntegerField):
     choices = None
 
-    def __init__(self, choices, **kwargs):
+    def __init__(self, choices, **kwargs) -> None:
         super().__init__(**kwargs)
         choice_validator = OldChoiceValidator(choices)
         self.validators.append(choice_validator)

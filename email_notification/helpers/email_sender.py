@@ -33,7 +33,7 @@ class EmailNotificationSender:
     email_template: EmailTemplate
     recipients: list[str] | None
 
-    def __init__(self, *, email_type: EmailType, recipients: list[str] | None = None):
+    def __init__(self, *, email_type: EmailType, recipients: list[str] | None = None) -> None:
         self.email_template = EmailTemplate.objects.filter(type=email_type).first()
 
         # Manually defined recipients, if the notification should be sent to a specific list of email addresses.
@@ -44,7 +44,7 @@ class EmailNotificationSender:
             msg = f"Unable to send '{email_type}' notification, there is no EmailTemplate defined for it."
             raise SendEmailNotificationError(msg)
 
-    def send_reservation_email(self, *, reservation: Reservation, forced_language: LanguageType | None = None):
+    def send_reservation_email(self, *, reservation: Reservation, forced_language: LanguageType | None = None) -> None:
         if self.recipients is None:
             # Get recipients from the reservation
             self.recipients = []
@@ -62,7 +62,7 @@ class EmailNotificationSender:
 
         self._send_email(message_builder)
 
-    def send_test_reservation_email(self, *, form: EmailTemplateTesterForm):
+    def send_test_reservation_email(self, *, form: EmailTemplateTesterForm) -> None:
         self.recipients = [form.cleaned_data["recipient"]]
 
         language: LanguageType
@@ -74,7 +74,7 @@ class EmailNotificationSender:
             )
             self._send_email(message_builder)
 
-    def send_application_email(self, *, application: Application, forced_language: LanguageType | None = None):
+    def send_application_email(self, *, application: Application, forced_language: LanguageType | None = None) -> None:
         # Get recipients from the application
         if self.recipients is None:
             self.recipients = []
@@ -92,7 +92,7 @@ class EmailNotificationSender:
 
         self._send_email(message_builder)
 
-    def send_batch_application_emails(self, *, applications: Iterable[Application]):
+    def send_batch_application_emails(self, *, applications: Iterable[Application]) -> None:
         # Sort recipients by language, so that we can batch send the emails in the correct language
         # and avoid sending the same email to the same recipient multiple times.
         all_recipients: set[str] = set()
@@ -117,7 +117,7 @@ class EmailNotificationSender:
             message_builder = ApplicationEmailBuilder.build(template=self.email_template, language=language)
             self._send_email(message_builder)
 
-    def send_test_application_email(self, *, form: EmailTemplateTesterForm):
+    def send_test_application_email(self, *, form: EmailTemplateTesterForm) -> None:
         self.recipients = [form.cleaned_data["recipient"]]
 
         language: LanguageType

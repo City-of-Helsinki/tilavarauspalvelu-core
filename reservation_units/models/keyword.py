@@ -23,7 +23,7 @@ class KeywordCategory(models.Model):
             "pk",
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name}"
 
 
@@ -51,7 +51,7 @@ class KeywordGroup(models.Model):
             "pk",
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name}"
 
 
@@ -79,5 +79,5 @@ class Keyword(models.Model):
             "pk",
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name}"

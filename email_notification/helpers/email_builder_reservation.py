@@ -239,7 +239,7 @@ class ReservationEmailBuilder(BaseEmailBuilder):
         EmailType.STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING,
     ]
 
-    def __init__(self, *, template: EmailTemplate, context: ReservationEmailContext):
+    def __init__(self, *, template: EmailTemplate, context: ReservationEmailContext) -> None:
         super().__init__(template=template, context=context)
 
     @classmethod

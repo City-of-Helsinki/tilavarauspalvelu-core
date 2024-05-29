@@ -190,6 +190,6 @@ class ReservationUnitExporter:
         return None
 
     @staticmethod
-    def _write_header_row(reservations_writer):
+    def _write_header_row(reservations_writer) -> None:
         # Write header rows
         reservations_writer.writerow(HEADER_ROW)

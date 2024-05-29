@@ -27,5 +27,5 @@ class ReservationUnitType(models.Model):
             "rank",
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name

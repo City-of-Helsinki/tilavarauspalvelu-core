@@ -1,7 +1,7 @@
 from reservations.models import Reservation, ReservationStatistic, ReservationStatisticsReservationUnit
 
 
-def create_or_update_reservation_statistics(reservation_pk: Reservation):
+def create_or_update_reservation_statistics(reservation_pk: Reservation) -> None:
     reservation = Reservation.objects.get(pk=reservation_pk)
     recurring = getattr(reservation, "recurring_reservation", None)
     stat, _ = ReservationStatistic.objects.update_or_create(

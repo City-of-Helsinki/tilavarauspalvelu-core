@@ -34,5 +34,5 @@ class ReservationUnitCancellationRule(models.Model):
             "pk",
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name

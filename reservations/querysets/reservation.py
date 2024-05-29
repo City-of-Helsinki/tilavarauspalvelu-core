@@ -26,7 +26,7 @@ class ReservationUnitInfo:
     space_ids: set[SpacePK]
     resource_ids: set[ResourcePK]
 
-    def __init__(self, reservation_unit_values: dict[str, Any]):
+    def __init__(self, reservation_unit_values: dict[str, Any]) -> None:
         self.pk = reservation_unit_values["pk"]
         self.space_ids = set(reservation_unit_values["space_ids"])
         self.resource_ids = set(reservation_unit_values["resource_ids"])
@@ -40,7 +40,7 @@ class ReservationInfo:
     space_ids: set[SpacePK]
     resource_ids: set[ResourcePK]
 
-    def __init__(self, reservation_values: dict[str, Any]):
+    def __init__(self, reservation_values: dict[str, Any]) -> None:
         # BLOCKED-type reservations should be treated differently than normal reservations.
         # They are not reservable, they don't have a buffer time, and other reservation buffer times can overlap them.
         self.is_blocking_reservation = reservation_values["type"] == ReservationTypeChoice.BLOCKED.value
@@ -123,7 +123,10 @@ class ReservationQuerySet(QuerySet):
         reservation_time_spans: dict[ReservationUnitPK, set[TimeSpanElement]] = {}
         blocked_time_spans: dict[ReservationUnitPK, set[TimeSpanElement]] = {}
 
-        def _use_reservation_time_span(reservation_unit_id: ReservationUnitPK, reservation_info: ReservationInfo):
+        def _use_reservation_time_span(
+            reservation_unit_id: ReservationUnitPK,
+            reservation_info: ReservationInfo,
+        ) -> None:
             """Add the reservation time span to the correct dictionary."""
             if reservation_info.is_blocking_reservation:
                 blocked_time_spans.setdefault(reservation_unit_id, set())

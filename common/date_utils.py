@@ -52,11 +52,11 @@ DEFAULT_TIMEZONE = get_default_timezone()
 
 
 class _TZComparator(Generic[TCanHaveTZ, TValid]):  # noqa: N801, RUF100
-    def __init__(self, _input_1: TCanHaveTZ, _input_2: TCanHaveTZ):
+    def __init__(self, _input_1: TCanHaveTZ, _input_2: TCanHaveTZ) -> None:
         self._input_1 = self._validate_input(_input_1, name="Input 1")
         self._input_2 = self._validate_input(_input_2, name="Input 2")
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         msg = f"Cannot compare '{self.__class__.__name__}' object directly. Did you forget to call a comparison method?"
         raise RuntimeError(msg)
 

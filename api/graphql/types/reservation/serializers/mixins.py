@@ -223,7 +223,7 @@ class ReservationSchedulingMixin:
         reservation_unit: ReservationUnit,
         begin: datetime.datetime,
         end: datetime.datetime,
-    ):
+    ) -> None:
         is_open = reservation_unit.actions.is_open(begin, end)
         if not reservation_unit.allow_reservations_without_opening_hours and not is_open:
             raise ValidationErrorWithCode(

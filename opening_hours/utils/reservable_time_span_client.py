@@ -25,7 +25,7 @@ class ReservableTimeSpanClient:
     start_date: datetime.date
     end_date: datetime.date
 
-    def __init__(self, origin_hauki_resource: OriginHaukiResource):
+    def __init__(self, origin_hauki_resource: OriginHaukiResource) -> None:
         self.origin_hauki_resource = origin_hauki_resource
 
         # If the resource does not have a hash set, we should raise an error.
@@ -68,7 +68,7 @@ class ReservableTimeSpanClient:
         parsed_time_spans = self._parse_opening_hours(opening_hours_response)
         return self._merge_overlapping_closed_time_spans(parsed_time_spans)
 
-    def _init_date_range(self):
+    def _init_date_range(self) -> None:
         today = local_date()
         if self.origin_hauki_resource.latest_fetched_date:
             # Start fetching from the next day after the latest fetched date.

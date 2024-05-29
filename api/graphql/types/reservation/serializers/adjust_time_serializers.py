@@ -26,7 +26,7 @@ class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reservation
             "state",
         ]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.fields["state"].readonly = True
 
@@ -84,7 +84,7 @@ class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reservation
 
         return data
 
-    def check_begin(self, begin, end):
+    def check_begin(self, begin, end) -> None:
         if begin > end:
             raise ValidationErrorWithCode(
                 "End cannot be before begin",
@@ -126,7 +126,7 @@ class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reservation
                 ValidationErrorCodes.CANCELLATION_NOT_ALLOWED,
             )
 
-    def check_and_handle_pricing(self, data):
+    def check_and_handle_pricing(self, data) -> None:
         if self.instance.price_net > 0:
             raise ValidationErrorWithCode(
                 "Reservation time cannot be changed due to its price",

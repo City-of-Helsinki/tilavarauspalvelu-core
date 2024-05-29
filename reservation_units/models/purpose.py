@@ -34,7 +34,7 @@ class Purpose(models.Model, PurgeImageCacheMixin):
             "rank",
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
     def save(self, *args, **kwargs) -> None:

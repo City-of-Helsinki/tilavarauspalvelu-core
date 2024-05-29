@@ -81,7 +81,7 @@ class ApplicationRoundApplicationsCSVExporter(BaseCSVExporter):
     max_options: int
     options_part_template: list[str]
 
-    def __init__(self, application_round_id: int):
+    def __init__(self, application_round_id: int) -> None:
         self.application_round_id = application_round_id
         self.max_options = 0
         self.options_part_template = []

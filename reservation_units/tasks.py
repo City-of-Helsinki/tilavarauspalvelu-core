@@ -111,7 +111,7 @@ def refresh_reservation_unit_accounting(reservation_unit_pk) -> None:
 
 
 @app.task(name="update_reservation_unit_image_urls")
-def update_urls(pk: int | None = None):
+def update_urls(pk: int | None = None) -> None:
     from reservation_units.models import ReservationUnitImage
 
     images = ReservationUnitImage.objects.filter(image__isnull=False)
@@ -131,5 +131,5 @@ def update_urls(pk: int | None = None):
 
 
 @app.task(name="purge_image_cache")
-def purge_image_cache(image_path: str):
+def purge_image_cache(image_path: str) -> None:
     purge(image_path)

@@ -25,7 +25,7 @@ class HaukiResourceHashUpdater:
     # Resources that have had their opening hours (hash) changed
     resources_updated: list[OriginHaukiResource]
 
-    def __init__(self, hauki_resource_ids: list[int] | None = None):
+    def __init__(self, hauki_resource_ids: list[int] | None = None) -> None:
         self.hauki_resource_ids = hauki_resource_ids
 
         if self.hauki_resource_ids is None:
@@ -37,7 +37,7 @@ class HaukiResourceHashUpdater:
         self.fetched_hauki_resources = []
         self.resources_updated = []
 
-    def run(self, *, force_refetch: bool = False):
+    def run(self, *, force_refetch: bool = False) -> None:
         self._fetch_hauki_resources()
 
         if not self.fetched_hauki_resources:
@@ -62,7 +62,7 @@ class HaukiResourceHashUpdater:
         )
         logger.info(f"Fetched {len(self.fetched_hauki_resources)} hauki resources in total.")
 
-    def _update_origin_hauki_resource_hashes(self, force_refetch: bool = False):
+    def _update_origin_hauki_resource_hashes(self, force_refetch: bool = False) -> None:
         """Update hashes for OriginHaukiResources that have had their opening hours changed."""
         cutoff_date = timezone.now().date()
 

@@ -139,7 +139,7 @@ class ReservationDeleteMutation(DeleteMutation):
         permission_classes = [ReservationPermission]
 
     @classmethod
-    def validate_deletion(cls, instance: Reservation, user: AnyUser):
+    def validate_deletion(cls, instance: Reservation, user: AnyUser) -> None:
         if instance.state not in (
             ReservationStateChoice.CREATED.value,
             ReservationStateChoice.WAITING_FOR_PAYMENT.value,

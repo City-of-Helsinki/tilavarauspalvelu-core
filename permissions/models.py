@@ -142,7 +142,7 @@ class GeneralRoleChoice(models.Model):
             "pk",
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.verbose_name
 
 
@@ -190,7 +190,7 @@ class GeneralRole(BaseRole):
             "pk",
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.role.verbose_name} ({self.user.email})"
 
 
@@ -268,7 +268,7 @@ class UnitRoleChoice(models.Model):
             "pk",
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.verbose_name
 
 
@@ -325,7 +325,7 @@ class UnitRole(BaseRole):
             "pk",
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.role.verbose_name} ({self.user.email})"
 
 
@@ -411,7 +411,7 @@ class ServiceSectorRoleChoice(models.Model):
             "pk",
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.verbose_name
 
 
@@ -463,5 +463,5 @@ class ServiceSectorRole(BaseRole):
             "pk",
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.role.verbose_name} ({self.user.email})"

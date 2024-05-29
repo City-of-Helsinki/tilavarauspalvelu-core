@@ -31,7 +31,7 @@ from terms_of_use.models import TermsOfUse
     text_entering="Creating specific reservation units...",
     text_exiting="Specific reservation units created!",
 )
-def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]):
+def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
     """Create the caisa unit from testing server"""
     caisa = Unit.objects.create(
         tprek_id="7256",

@@ -79,7 +79,7 @@ class EmailTemplateValidator:
         except TemplateError as e:
             raise EmailTemplateValidationError(e) from e
 
-    def validate_string(self, string: str):
+    def validate_string(self, string: str) -> None:
         self._validate_illegals(string)
         self._validate_tags(string)
         self.render_string(string)

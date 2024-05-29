@@ -25,5 +25,5 @@ class Introduction(models.Model):
         db_table = "introduction"
         base_manager_name = "objects"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Introduction - {self.user}, {self.reservation_unit} ({self.completed_at})"

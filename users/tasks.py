@@ -6,7 +6,7 @@ from users.models import PersonalInfoViewLog
 
 
 @app.task(name="save_personal_info_view_log")
-def save_personal_info_view_log(user_id: int, viewer_user_id: int, field: str):
+def save_personal_info_view_log(user_id: int, viewer_user_id: int, field: str) -> None:
     user = get_user_model().objects.filter(id=user_id).first()
     viewer_user = get_user_model().objects.filter(id=viewer_user_id).first()
 
@@ -25,13 +25,13 @@ def save_personal_info_view_log(user_id: int, viewer_user_id: int, field: str):
 
 
 @app.task(name="remove_old_personal_info_view_logs")
-def remove_old_personal_info_view_logs():
+def remove_old_personal_info_view_logs() -> None:
     remove_personal_info_view_logs_older_than()
 
 
 REMOVE_OLDER_THAN_DAYS = 365 * 2
 
 
-def remove_personal_info_view_logs_older_than(days: int = REMOVE_OLDER_THAN_DAYS):
+def remove_personal_info_view_logs_older_than(days: int = REMOVE_OLDER_THAN_DAYS) -> None:
     remove_lt = timezone.now() - timezone.timedelta(days=days)
     PersonalInfoViewLog.objects.filter(access_time__lt=remove_lt).delete()

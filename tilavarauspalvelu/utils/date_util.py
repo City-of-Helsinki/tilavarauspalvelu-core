@@ -5,7 +5,7 @@ class InvalidWeekdayError(Exception):
     pass
 
 
-def validate_weekday(weekday: int):
+def validate_weekday(weekday: int) -> None:
     if weekday < 0 or weekday > 6:
         raise InvalidWeekdayError("Not a valid weekday")
 
