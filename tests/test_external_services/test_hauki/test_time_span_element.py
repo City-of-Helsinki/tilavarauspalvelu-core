@@ -6,9 +6,9 @@ from django.utils.timezone import get_default_timezone
 from graphene_django_extensions.testing.utils import parametrize_helper
 
 from opening_hours.enums import HaukiResourceState
-from opening_hours.tests.test_reservable_time_spans_client import _get_date
 from opening_hours.utils.hauki_api_types import HaukiAPIOpeningHoursResponseTime
 from opening_hours.utils.time_span_element import TimeSpanElement
+from tests.test_external_services.test_hauki.test_reservable_time_spans_client import _get_date
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
