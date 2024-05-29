@@ -41,4 +41,4 @@ class UnitNode(DjangoNode):
         }
         filterset_class = UnitFilterSet
         permission_classes = [UnitPermission]
-        max_complexity = 11
+        max_complexity = 12
