@@ -55,6 +55,11 @@ def test_recurring_reservations__query(graphql):
             rejectionReason
             createdAt
         }
+        allocatedTimeSlot {
+            pk
+            beginTime
+            endTime
+        }
     """
     query = recurring_reservations_query(fields=fields)
     response = graphql(query)
@@ -104,6 +109,11 @@ def test_recurring_reservations__query(graphql):
                 "createdAt": occurrence.created_at.isoformat(),
             }
         ],
+        "allocatedTimeSlot": {
+            "pk": recurring_reservation.allocated_time_slot.pk,
+            "beginTime": recurring_reservation.allocated_time_slot.begin_time.isoformat(),
+            "endTime": recurring_reservation.allocated_time_slot.end_time.isoformat(),
+        },
     }
 
 
