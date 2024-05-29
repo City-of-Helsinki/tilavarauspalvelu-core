@@ -226,7 +226,7 @@ class ReservationFilterSet(ModelFilterSet):
                 .order_by("-text_search_rank")  # most relevant first
             )
 
-        elif value.isnumeric():
+        if value.isnumeric():
             return qs.filter(pk=int(value))
 
         return qs

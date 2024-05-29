@@ -220,7 +220,7 @@ class Reservation(SerializableMixin, models.Model):
             return _("Closed")
 
         # Internal reservations created by STAFF
-        elif self.type == ReservationTypeChoice.STAFF.value:
+        if self.type == ReservationTypeChoice.STAFF.value:
             if self.recurring_reservation is not None and self.recurring_reservation.name:
                 return self.recurring_reservation.name
             if self.name:

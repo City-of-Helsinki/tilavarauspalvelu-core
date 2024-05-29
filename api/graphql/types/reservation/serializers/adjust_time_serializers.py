@@ -132,7 +132,7 @@ class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reservation
                 "Reservation time cannot be changed due to its price",
                 ValidationErrorCodes.CANCELLATION_NOT_ALLOWED,
             )
-        elif self.requires_price_calculation(data):
+        if self.requires_price_calculation(data):
             pricing = self.calculate_price(data["begin"], data["end"], self.instance.reservation_unit.all())
 
             if pricing.reservation_price_net > 0:

@@ -67,7 +67,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
 
             if response.status_code == 404:
                 raise GetOrderError(f"Order not found: {response_json.get('errors')}")
-            elif response.status_code != 200:
+            if response.status_code != 200:
                 raise GetOrderError(f"{action_fail}: {response_json.get('errors')}")
 
             return Order.from_json(response_json)
@@ -111,7 +111,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
 
             if response.status_code == 404:
                 return None
-            elif response.status_code != 200:
+            if response.status_code != 200:
                 raise CancelOrderError(f"{action_fail}: {response_json.get('errors')}")
 
             return Order.from_json(response_json["order"])
@@ -193,13 +193,12 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             refund_count = len(response_json["refunds"]) if "refunds" in response_json else 0
             if refund_count == 1:
                 return Refund.from_json(response_json["refunds"][0])
-            else:
-                SentryLogger.log_message(
-                    message="Call to Payment Experience API refund endpoint failed, too many refunds in response.",
-                    details=f"Response contains {refund_count} refunds instead of one. Response body: {response.text}",
-                    level="error",
-                )
-                raise RefundPaymentError(f"Refund response refund count expected to be 1 but was {refund_count}")
+            SentryLogger.log_message(
+                message="Call to Payment Experience API refund endpoint failed, too many refunds in response.",
+                details=f"Response contains {refund_count} refunds instead of one. Response body: {response.text}",
+                level="error",
+            )
+            raise RefundPaymentError(f"Refund response refund count expected to be 1 but was {refund_count}")
 
         except (RequestException, ExternalServiceError, ParseRefundError) as err:
             SentryLogger.log_exception(err, details=action_fail, order_id=order_uuid)

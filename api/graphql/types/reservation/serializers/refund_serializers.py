@@ -49,8 +49,7 @@ class ReservationRefundSerializer(OldPrimaryKeySerializer):
                 ValidationErrorCodes.REFUND_NOT_ALLOWED,
             )
 
-        data = super().validate(data)
-        return data
+        return super().validate(data)
 
     def save(self, **kwargs):
         instance = super().save(**kwargs)

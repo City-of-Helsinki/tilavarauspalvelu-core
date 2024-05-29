@@ -75,8 +75,7 @@ class ValidatingListField(serializers.ListField):
                         raise ValidationError(
                             f"{value} is not a valid value. Allowed values: {', '.join(allowed_values)}."
                         )
-                    else:
-                        raise ValidationError(f"{value} is not a valid value.")
+                    raise ValidationError(f"{value} is not a valid value.")
         return super().run_child_validation(data)
 
 

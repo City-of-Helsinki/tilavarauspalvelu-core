@@ -84,7 +84,7 @@ class UnitFilterSet(ModelFilterSet):
 
         if user.is_anonymous:
             return qs.none()
-        elif user.is_superuser or user.general_roles.exists():
+        if user.is_superuser or user.general_roles.exists():
             return qs
 
         return qs.filter(

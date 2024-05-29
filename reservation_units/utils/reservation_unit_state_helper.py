@@ -179,18 +179,17 @@ class ReservationUnitStateHelper:
         """Figure out the state of the Reservation Unit"""
         if cls.__is_archived(reservation_unit):
             return ReservationUnitState.ARCHIVED
-        elif cls.__is_draft(reservation_unit):
+        if cls.__is_draft(reservation_unit):
             return ReservationUnitState.DRAFT
-        elif cls.__is_scheduled_publishing(reservation_unit):
+        if cls.__is_scheduled_publishing(reservation_unit):
             return ReservationUnitState.SCHEDULED_PUBLISHING
-        elif cls.__is_hidden(reservation_unit):
+        if cls.__is_hidden(reservation_unit):
             return ReservationUnitState.HIDDEN
-        elif cls.__is_scheduled_hiding(reservation_unit):
+        if cls.__is_scheduled_hiding(reservation_unit):
             return ReservationUnitState.SCHEDULED_HIDING
-        elif cls.__is_scheduled_period(reservation_unit):
+        if cls.__is_scheduled_period(reservation_unit):
             return ReservationUnitState.SCHEDULED_PERIOD
-        else:
-            return ReservationUnitState.PUBLISHED
+        return ReservationUnitState.PUBLISHED
 
     @classmethod
     def get_state_query(cls, state: str) -> Q:
@@ -198,15 +197,14 @@ class ReservationUnitStateHelper:
         state = ReservationUnitState(state)
         if state == ReservationUnitState.ARCHIVED:
             return cls.__get_is_archived_query()
-        elif state == ReservationUnitState.DRAFT:
+        if state == ReservationUnitState.DRAFT:
             return cls.__get_is_draft_query()
-        elif state == ReservationUnitState.SCHEDULED_PUBLISHING:
+        if state == ReservationUnitState.SCHEDULED_PUBLISHING:
             return cls.__get_is_scheduled_publishing_query()
-        elif state == ReservationUnitState.SCHEDULED_HIDING:
+        if state == ReservationUnitState.SCHEDULED_HIDING:
             return cls.__get_is_scheduled_hiding_query()
-        elif state == ReservationUnitState.HIDDEN:
+        if state == ReservationUnitState.HIDDEN:
             return cls.__get_is_hidden_query()
-        elif state == ReservationUnitState.SCHEDULED_PERIOD:
+        if state == ReservationUnitState.SCHEDULED_PERIOD:
             return cls.__get_is_scheduled_period_query()
-        else:
-            return cls.__get_is_published_query()
+        return cls.__get_is_published_query()

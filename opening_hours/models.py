@@ -79,8 +79,7 @@ class ReservableTimeSpan(models.Model):
 
         if start.date() == end.date():
             return f"{start.strftime(strformat)}-{end.strftime('%H:%M')}"
-        else:
-            return f"{start.strftime(strformat)}-{end.strftime(strformat)}"
+        return f"{start.strftime(strformat)}-{end.strftime(strformat)}"
 
     def as_time_span_element(self) -> TimeSpanElement:
         return TimeSpanElement(

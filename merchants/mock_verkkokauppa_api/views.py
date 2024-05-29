@@ -54,7 +54,7 @@ class MockVerkkokauppaView(TemplateView):
         if "payment_success" in request.POST:
             self.handle_payment_success(payment_order=payment_order)
             return HttpResponseRedirect(f"{frontend_url}/success?orderId={payment_order.remote_id}")
-        elif "payment_cancelled" in request.POST:
+        if "payment_cancelled" in request.POST:
             # Return user to cancel page on the Frontend, which then sends a GQL request to cancel the reservation.
             return HttpResponseRedirect(f"{frontend_url}/reservation/cancel?orderId={payment_order.remote_id}")
 
