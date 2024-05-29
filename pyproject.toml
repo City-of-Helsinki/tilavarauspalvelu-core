@@ -132,7 +132,7 @@ lint.select = [
     #"PTH",     # flake8-use-pathlib  # TODO: Enable this and fix (6) issues
     "PYI",      # flake8-pyi
     "Q",        # flake8-quotes
-    #"R",       # Refactor  # TODO: Enable this and fix (51) issues
+    "R",        # Refactor
     "RET",      # flake8-return
     "RSE",      # flake8-raise
     "RUF",      # ruff-specific rules
