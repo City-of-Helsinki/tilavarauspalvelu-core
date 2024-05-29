@@ -1863,6 +1863,8 @@ export type Query = {
   qualifiers?: Maybe<QualifierNodeConnection>;
   recurringReservation?: Maybe<RecurringReservationNode>;
   recurringReservations?: Maybe<RecurringReservationNodeConnection>;
+  rejectedOccurrence?: Maybe<RejectedOccurrenceNode>;
+  rejectedOccurrences?: Maybe<RejectedOccurrenceNodeConnection>;
   reservation?: Maybe<ReservationNode>;
   reservationCancelReasons?: Maybe<ReservationCancelReasonNodeConnection>;
   reservationDenyReasons?: Maybe<ReservationDenyReasonNodeConnection>;
@@ -2186,6 +2188,25 @@ export type QueryRecurringReservationsArgs = {
   user?: InputMaybe<Scalars["ID"]["input"]>;
 };
 
+export type QueryRejectedOccurrenceArgs = {
+  id: Scalars["ID"]["input"];
+};
+
+export type QueryRejectedOccurrencesArgs = {
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  applicationRound?: InputMaybe<Scalars["Int"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  last?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  orderBy?: InputMaybe<Array<InputMaybe<RejectedOccurrenceOrderingChoices>>>;
+  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  recurringReservation?: InputMaybe<Scalars["Int"]["input"]>;
+  reservationUnit?: InputMaybe<Scalars["Int"]["input"]>;
+  textSearch?: InputMaybe<Scalars["String"]["input"]>;
+  unit?: InputMaybe<Scalars["Int"]["input"]>;
+};
+
 export type QueryReservationArgs = {
   id: Scalars["ID"]["input"];
 };
@@ -2502,6 +2523,7 @@ export type RecurringReservationCreateMutationPayload = {
 export type RecurringReservationNode = Node & {
   abilityGroup?: Maybe<AbilityGroupNode>;
   ageGroup?: Maybe<AgeGroupNode>;
+  allocatedTimeSlot?: Maybe<AllocatedTimeSlotNode>;
   beginDate?: Maybe<Scalars["Date"]["output"]>;
   beginTime?: Maybe<Scalars["Time"]["output"]>;
   created: Scalars["DateTime"]["output"];
@@ -2513,10 +2535,21 @@ export type RecurringReservationNode = Node & {
   name: Scalars["String"]["output"];
   pk?: Maybe<Scalars["Int"]["output"]>;
   recurrenceInDays?: Maybe<Scalars["Int"]["output"]>;
+  rejectedOccurrences: Array<RejectedOccurrenceNode>;
   reservationUnit: ReservationUnitNode;
   reservations: Array<ReservationNode>;
   user?: Maybe<UserNode>;
   weekdays?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
+};
+
+export type RecurringReservationNodeRejectedOccurrencesArgs = {
+  applicationRound?: InputMaybe<Scalars["Int"]["input"]>;
+  orderBy?: InputMaybe<Array<InputMaybe<RejectedOccurrenceOrderingChoices>>>;
+  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  recurringReservation?: InputMaybe<Scalars["Int"]["input"]>;
+  reservationUnit?: InputMaybe<Scalars["Int"]["input"]>;
+  textSearch?: InputMaybe<Scalars["String"]["input"]>;
+  unit?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type RecurringReservationNodeReservationsArgs = {
@@ -2646,6 +2679,67 @@ export type RejectAllSectionOptionsMutationInput = {
 export type RejectAllSectionOptionsMutationPayload = {
   pk?: Maybe<Scalars["Int"]["output"]>;
 };
+
+export type RejectedOccurrenceNode = Node & {
+  beginDatetime: Scalars["DateTime"]["output"];
+  createdAt: Scalars["DateTime"]["output"];
+  endDatetime: Scalars["DateTime"]["output"];
+  /** The ID of the object */
+  id: Scalars["ID"]["output"];
+  pk?: Maybe<Scalars["Int"]["output"]>;
+  recurringReservation: RecurringReservationNode;
+  rejectionReason: RejectionReadinessChoice;
+};
+
+export type RejectedOccurrenceNodeConnection = {
+  /** Contains the nodes in this connection. */
+  edges: Array<Maybe<RejectedOccurrenceNodeEdge>>;
+  /** Pagination data for this connection. */
+  pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]["output"]>;
+};
+
+/** A Relay edge containing a `RejectedOccurrenceNode` and its cursor. */
+export type RejectedOccurrenceNodeEdge = {
+  /** A cursor for use in pagination */
+  cursor: Scalars["String"]["output"];
+  /** The item at the end of the edge */
+  node?: Maybe<RejectedOccurrenceNode>;
+};
+
+/** Ordering fields for the 'RejectedOccurrence' model. */
+export enum RejectedOccurrenceOrderingChoices {
+  ApplicantAsc = "applicantAsc",
+  ApplicantDesc = "applicantDesc",
+  ApplicationPkAsc = "applicationPkAsc",
+  ApplicationPkDesc = "applicationPkDesc",
+  ApplicationSectionNameAsc = "applicationSectionNameAsc",
+  ApplicationSectionNameDesc = "applicationSectionNameDesc",
+  ApplicationSectionPkAsc = "applicationSectionPkAsc",
+  ApplicationSectionPkDesc = "applicationSectionPkDesc",
+  BeginDatetimeAsc = "beginDatetimeAsc",
+  BeginDatetimeDesc = "beginDatetimeDesc",
+  EndDatetimeAsc = "endDatetimeAsc",
+  EndDatetimeDesc = "endDatetimeDesc",
+  PkAsc = "pkAsc",
+  PkDesc = "pkDesc",
+  RejectionReasonAsc = "rejectionReasonAsc",
+  RejectionReasonDesc = "rejectionReasonDesc",
+  ReservationUnitPkAsc = "reservationUnitPkAsc",
+  ReservationUnitPkDesc = "reservationUnitPkDesc",
+  UnitPkAsc = "unitPkAsc",
+  UnitPkDesc = "unitPkDesc",
+}
+
+/** An enumeration. */
+export enum RejectionReadinessChoice {
+  /** Aloitusaika ei sallittu */
+  IntervalNotAllowed = "INTERVAL_NOT_ALLOWED",
+  /** Päällekkäisiä varauksia */
+  OverlappingReservations = "OVERLAPPING_RESERVATIONS",
+  /** Varausyksikkö suljettu */
+  ReservationUnitClosed = "RESERVATION_UNIT_CLOSED",
+}
 
 export type ReservableTimeSpanType = {
   endDatetime?: Maybe<Scalars["DateTime"]["output"]>;

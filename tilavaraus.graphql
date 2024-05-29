@@ -2377,6 +2377,29 @@ type Query {
     unit: [ID]
     user: ID
   ): RecurringReservationNodeConnection
+  rejectedOccurrence(
+    """
+    The ID of the object
+    """
+    id: ID!
+  ): RejectedOccurrenceNode
+  rejectedOccurrences(
+    after: String
+    applicationRound: Int
+    before: String
+    first: Int
+    last: Int
+    offset: Int
+    """
+    Järjestä
+    """
+    orderBy: [RejectedOccurrenceOrderingChoices]
+    pk: [Int]
+    recurringReservation: Int
+    reservationUnit: Int
+    textSearch: String
+    unit: Int
+  ): RejectedOccurrenceNodeConnection
   reservation(
     """
     The ID of the object
@@ -2730,6 +2753,7 @@ type RecurringReservationCreateMutationPayload {
 type RecurringReservationNode implements Node {
   abilityGroup: AbilityGroupNode
   ageGroup: AgeGroupNode
+  allocatedTimeSlot: AllocatedTimeSlotNode
   beginDate: Date
   beginTime: Time
   created: DateTime!
@@ -2743,6 +2767,18 @@ type RecurringReservationNode implements Node {
   name: String!
   pk: Int
   recurrenceInDays: Int
+  rejectedOccurrences(
+    applicationRound: Int
+    """
+    Järjestä
+    """
+    orderBy: [RejectedOccurrenceOrderingChoices]
+    pk: [Int]
+    recurringReservation: Int
+    reservationUnit: Int
+    textSearch: String
+    unit: Int
+  ): [RejectedOccurrenceNode!]!
   reservationUnit: ReservationUnitNode!
   reservations(
     begin: DateTime
@@ -2891,6 +2927,89 @@ input RejectAllSectionOptionsMutationInput {
 
 type RejectAllSectionOptionsMutationPayload {
   pk: Int
+}
+
+type RejectedOccurrenceNode implements Node {
+  beginDatetime: DateTime!
+  createdAt: DateTime!
+  endDatetime: DateTime!
+  """
+  The ID of the object
+  """
+  id: ID!
+  pk: Int
+  recurringReservation: RecurringReservationNode!
+  rejectionReason: RejectionReadinessChoice!
+}
+
+type RejectedOccurrenceNodeConnection {
+  """
+  Contains the nodes in this connection.
+  """
+  edges: [RejectedOccurrenceNodeEdge]!
+  """
+  Pagination data for this connection.
+  """
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+"""
+A Relay edge containing a `RejectedOccurrenceNode` and its cursor.
+"""
+type RejectedOccurrenceNodeEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+  """
+  The item at the end of the edge
+  """
+  node: RejectedOccurrenceNode
+}
+
+"""
+Ordering fields for the 'RejectedOccurrence' model.
+"""
+enum RejectedOccurrenceOrderingChoices {
+  applicantAsc
+  applicantDesc
+  applicationPkAsc
+  applicationPkDesc
+  applicationSectionNameAsc
+  applicationSectionNameDesc
+  applicationSectionPkAsc
+  applicationSectionPkDesc
+  beginDatetimeAsc
+  beginDatetimeDesc
+  endDatetimeAsc
+  endDatetimeDesc
+  pkAsc
+  pkDesc
+  rejectionReasonAsc
+  rejectionReasonDesc
+  reservationUnitPkAsc
+  reservationUnitPkDesc
+  unitPkAsc
+  unitPkDesc
+}
+
+"""
+An enumeration.
+"""
+enum RejectionReadinessChoice {
+  """
+  Aloitusaika ei sallittu
+  """
+  INTERVAL_NOT_ALLOWED
+  """
+  Päällekkäisiä varauksia
+  """
+  OVERLAPPING_RESERVATIONS
+  """
+  Varausyksikkö suljettu
+  """
+  RESERVATION_UNIT_CLOSED
 }
 
 type ReservableTimeSpanType {
