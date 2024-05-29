@@ -28,20 +28,20 @@ def _get_dt(*, month=1, day=1, hour=None, minute=0) -> datetime.datetime:
 
 @pytest.fixture()
 def reservation_unit() -> ReservationUnit:
-    origin_hauki_resource = OriginHaukiResourceFactory(id="999")
-    reservation_unit = ReservationUnitFactory(
+    origin_hauki_resource = OriginHaukiResourceFactory.create(id="999")
+    reservation_unit = ReservationUnitFactory.create(
         origin_hauki_resource=origin_hauki_resource,
-        spaces=[SpaceFactory()],
+        spaces=[SpaceFactory.create()],
     )
 
-    ApplicationRoundFactory(
+    ApplicationRoundFactory.create(
         reservation_units=[reservation_unit],
         reservation_period_begin=_get_date(month=8, day=1),
         reservation_period_end=_get_date(month=12, day=31),
         application_period_begin=_get_dt(month=4, day=1, hour=9),
         application_period_end=_get_dt(month=4, day=30, hour=16),
     )
-    ReservationFactory(
+    ReservationFactory.create(
         begin=_get_dt(month=4, day=15, hour=12),
         end=_get_dt(month=4, day=15, hour=14),
         reservation_unit=[reservation_unit],
@@ -54,17 +54,17 @@ def reservation_unit() -> ReservationUnit:
 @pytest.mark.django_db()
 @freeze_time("2022-01-01")
 def test__reservation_unit_reservation_scheduler__get_reservation_unit_possible_start_times(reservation_unit):
-    ReservableTimeSpanFactory(
+    ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_get_dt(month=1, day=1, hour=10),
         end_datetime=_get_dt(month=1, day=1, hour=22),
     )
-    ReservableTimeSpanFactory(
+    ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_get_dt(month=1, day=2, hour=10),
         end_datetime=_get_dt(month=1, day=2, hour=22),
     )
-    ReservableTimeSpanFactory(
+    ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_get_dt(month=7, day=1, hour=10),
         end_datetime=_get_dt(month=7, day=1, hour=22),
