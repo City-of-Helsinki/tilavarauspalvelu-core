@@ -758,7 +758,7 @@ msgstr "Pyydetty aloitusaika allokaatioille."
 msgid "Requested end time for allocations."
 msgstr "Pyydetty lopetusaika allokaatioille."
 
-#: applications/apps.py
+#: applications/apps.py applications/tasks.py
 msgid "Seasonal Booking"
 msgstr "Kausivaraus"
 
@@ -2759,6 +2759,26 @@ msgstr "Puolesta"
 #: reservations/choices.py
 msgid "Seasonal"
 msgstr "Kausi"
+
+#: reservations/choices.py
+msgid "Interval not allowed"
+msgstr "Aloitusaika ei sallittu"
+
+#: reservations/choices.py
+msgid "Overlapping reservations"
+msgstr "Päällekkäisiä varauksia"
+
+#: reservations/choices.py
+msgid "Reservation unit closed"
+msgstr "Varausyksikkö suljettu"
+
+#: reservations/models/rejected_occurrence.py
+msgid "Rejected occurrence"
+msgstr "Hylätty ajankohta"
+
+#: reservations/models/rejected_occurrence.py
+msgid "Rejected occurrences"
+msgstr "Hylätyt ajankohdat"
 
 #: reservations/models/reservation.py
 msgid "Closed"

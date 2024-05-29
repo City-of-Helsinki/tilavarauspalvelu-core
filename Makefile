@@ -106,7 +106,7 @@ check-translations:
 translations:
 	@echo ""
 	@echo Making translations...
-	@python manage.py maketranslations -l fi -l sv --no-obsolete --omit-header --add-location file
+	@python manage.py maketranslations -l fi --no-obsolete --omit-header --add-location file
 	@echo ""
 	@echo Done!
 

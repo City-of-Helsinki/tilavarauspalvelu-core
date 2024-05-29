@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import datetime
 from typing import TYPE_CHECKING
 
 from django.db import models
@@ -12,6 +11,8 @@ from reservations.choices import RejectionReadinessChoice
 from reservations.querysets import RejectedOccurrenceQuerySet
 
 if TYPE_CHECKING:
+    import datetime
+
     from reservations.models import RecurringReservation
 
 
