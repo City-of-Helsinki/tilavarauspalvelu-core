@@ -65,3 +65,9 @@ class ReservationTypeChoice(models.TextChoices):
 
 
 RESERVEE_LANGUAGE_CHOICES = (*settings.LANGUAGES, ("", ""))
+
+
+class RejectionReadinessChoice(models.TextChoices):
+    INTERVAL_NOT_ALLOWED = "INTERVAL_NOT_ALLOWED", _("Interval not allowed")
+    OVERLAPPING_RESERVATIONS = "OVERLAPPING_RESERVATIONS", _("Overlapping reservations")
+    RESERVATION_UNIT_CLOSED = "RESERVATION_UNIT_CLOSED", _("Reservation unit closed")

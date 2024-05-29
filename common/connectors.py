@@ -93,3 +93,11 @@ class RecurringReservationActionsConnector:
         from actions.recurring_reservation import RecurringReservationActions
 
         return RecurringReservationActions(instance)
+
+
+class RejectedOccurrenceActionsConnector:
+    def __get__(self, instance, _):
+        _raise_if_accessed_on_class(instance)
+        from actions.rejected_occurrence import RejectedOccurrenceActions
+
+        return RejectedOccurrenceActions(instance)
