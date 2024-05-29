@@ -8,5 +8,6 @@
     "past": "Haku sulkeutui {{closingDate, d.M.yyyy 'klo' H.mm}}",
     "reservationPeriod": "Tilat varattavissa ajalle {{reservationPeriodBegin, d.M.yyyy}} - {{reservationPeriodEnd, d.M.yyyy}}"
   },
-  "criteria": "hakuehdot"
+  "criteria": "hakuehdot",
+  "notesWhenApplying": "Huomioi hakiessa"
 }

@@ -8,5 +8,6 @@
     "past": "Application round closed {{closingDate, d.M.yyyy',' H.mm}}",
     "reservationPeriod": "Spaces can be booked for the period {{reservationPeriodBegin, d.M.yyyy}} - {{reservationPeriodEnd, d.M.yyyy}}"
   },
-  "criteria": "application criteria"
+  "criteria": "application criteria",
+  "notesWhenApplying": "Please note when applying"
 }

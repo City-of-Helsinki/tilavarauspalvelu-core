@@ -215,6 +215,9 @@ export const APPLICATION_QUERY = gql`
       ...ApplicationCommon
       applicationRound {
         id
+        notesWhenApplyingFi
+        notesWhenApplyingEn
+        notesWhenApplyingSv
         termsOfUse {
           id
           ...TermsOfUseFields

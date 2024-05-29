@@ -17,6 +17,9 @@ export const APPLICATION_ROUND_FRAGMENT = gql`
     criteriaFi
     criteriaEn
     criteriaSv
+    notesWhenApplyingFi
+    notesWhenApplyingEn
+    notesWhenApplyingSv
     reservationUnits {
       id
       pk

@@ -8,7 +8,7 @@ import {
   type ApplicationRoundsUiQuery,
   type ApplicationRoundsUiQueryVariables,
 } from "@gql/gql-types";
-import { Container } from "common";
+import { breakpoints, Container } from "common";
 import { createApolloClient } from "@/modules/apolloClient";
 import Sanitize from "@/components/common/Sanitize";
 import KorosDefault from "@/components/common/KorosDefault";
@@ -16,6 +16,7 @@ import { getTranslation } from "@/modules/util";
 import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
+import NotesWhenApplying from "@/components/application/NotesWhenApplying";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
@@ -64,10 +65,22 @@ const H1 = styled.h1`
   font-size: var(--fontsize-heading-l);
 `;
 
+const ContentWrapper = styled.div`
+  display: flex;
+  gap: var(--spacing-m);
+  @media (max-width: ${breakpoints.m}) {
+    flex-flow: column-reverse;
+  }
+`;
+
 const Content = styled.div`
   max-width: var(--container-width-l);
   font-family: var(--font-regular);
   font-size: var(--fontsize-body-l);
+`;
+
+const NotesWrapper = styled.div`
+  flex-grow: 1;
 `;
 
 const Criteria = ({ applicationRound }: Props): JSX.Element | null => {
@@ -91,9 +104,16 @@ const Criteria = ({ applicationRound }: Props): JSX.Element | null => {
         <KorosDefault />
       </Head>
       <Container>
-        <Content>
-          <Sanitize html={getTranslation(applicationRound, "criteria") || ""} />
-        </Content>
+        <ContentWrapper>
+          <Content>
+            <Sanitize
+              html={getTranslation(applicationRound, "criteria") || ""}
+            />
+          </Content>
+          <NotesWrapper>
+            <NotesWhenApplying applicationRound={applicationRound} />
+          </NotesWrapper>
+        </ContentWrapper>
       </Container>
     </>
   );

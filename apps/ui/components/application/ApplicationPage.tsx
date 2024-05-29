@@ -11,16 +11,7 @@ import {
 import { useRouter } from "next/router";
 import Head from "./Head";
 import Stepper, { StepperProps } from "./Stepper";
-
-type Node = NonNullable<ApplicationQuery["application"]>;
-type ApplicationPageProps = {
-  application: Node;
-  translationKeyPrefix: string;
-  overrideText?: string;
-  isDirty?: boolean;
-  children?: React.ReactNode;
-  headContent?: React.ReactNode;
-};
+import NotesWhenApplying from "@/components/application/NotesWhenApplying";
 
 const StyledContainer = styled(Container)`
   background-color: var(--color-white);
@@ -44,8 +35,12 @@ const Main = styled.div`
   margin-top: var(--spacing-s);
 
   @media (max-width: ${breakpoints.s}) {
-    width: calc (100vw - 3 * var(--spacing-xs));
+    width: calc(100vw - 3 * var(--spacing-xs));
   }
+`;
+
+const NotesWrapper = styled.div`
+  margin-bottom: var(--spacing-m);
 `;
 
 // TODO this should have more complete checks (but we are thinking of splitting the form anyway)
@@ -87,6 +82,16 @@ function calculateCompletedStep(values: Node): 0 | 1 | 2 | 3 | 4 {
   return 0;
 }
 
+type Node = NonNullable<ApplicationQuery["application"]>;
+type ApplicationPageProps = {
+  application: Node;
+  translationKeyPrefix: string;
+  overrideText?: string;
+  isDirty?: boolean;
+  children?: React.ReactNode;
+  headContent?: React.ReactNode;
+};
+
 export function ApplicationPageWrapper({
   application,
   translationKeyPrefix,
@@ -118,7 +123,14 @@ export function ApplicationPageWrapper({
       <StyledContainer>
         <InnerContainer $hideStepper={hideStepper}>
           {hideStepper ? <div /> : <Stepper {...steps} />}
-          <Main>{children}</Main>
+          <Main>
+            <NotesWrapper>
+              <NotesWhenApplying
+                applicationRound={application?.applicationRound ?? null}
+              />
+            </NotesWrapper>
+            {children}
+          </Main>
         </InnerContainer>
       </StyledContainer>
     </>
