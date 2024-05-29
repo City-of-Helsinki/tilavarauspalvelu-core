@@ -35,9 +35,11 @@ class RecurringReservationNode(DjangoNode):
             "created",
             "reservations",
             "rejected_occurrences",
+            "allocated_time_slot",
         ]
         restricted_fields = {
-            "user": lambda user, instance: can_view_recurring_reservation(user, instance),
+            "user": can_view_recurring_reservation,
+            "allocated_time_slot": can_view_recurring_reservation,
         }
         filterset_class = RecurringReservationFilterSet
         permission_classes = [RecurringReservationPermission]
