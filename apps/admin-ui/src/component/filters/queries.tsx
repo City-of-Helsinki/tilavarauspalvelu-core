@@ -17,17 +17,15 @@ export const RESERVATION_UNIT_TYPES_QUERY = gql`
 
 export const RESERVATION_UNITS_FILTER_PARAMS_QUERY = gql`
   query ReservationUnitsFilterParams(
-    $offset: Int
+    $after: String
     $unit: [Int]
-    $first: Int
     $orderBy: [ReservationUnitOrderingChoices]
   ) {
     reservationUnits(
-      offset: $offset
+      after: $after
       onlyWithPermission: true
       unit: $unit
       orderBy: $orderBy
-      first: $first
     ) {
       edges {
         node {
@@ -35,6 +33,10 @@ export const RESERVATION_UNITS_FILTER_PARAMS_QUERY = gql`
           nameFi
           pk
         }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
       }
       totalCount
     }

@@ -1,12 +1,22 @@
+import { useEffect } from "react";
 import { useReservationUnitsFilterParamsQuery } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 
 export function useReservationUnitOptions() {
-  // TODO this request is rerun whenever the selection changes (it'll return 0 every time)
-  const { data, loading } = useReservationUnitsFilterParamsQuery({
-    // breaks the cache (testing removal)
-    // fetchPolicy: "no-cache",
-  });
+  const { data, loading, fetchMore } = useReservationUnitsFilterParamsQuery();
+
+  // auto fetch more (there is no limit, expect number of them would be a few hundred, but in theory this might cause problems)
+  // NOTE have to useEffect, onComplete stops at 200 items
+  useEffect(() => {
+    const { pageInfo } = data?.reservationUnits ?? {};
+    if (pageInfo?.hasNextPage) {
+      fetchMore({
+        variables: {
+          after: pageInfo.endCursor,
+        },
+      });
+    }
+  }, [data, fetchMore]);
 
   const resUnits = filterNonNullable(
     data?.reservationUnits?.edges.map((x) => x?.node)

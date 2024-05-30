@@ -6760,8 +6760,7 @@ export type UnitsQuery = {
 };
 
 export type UnitsFilterQueryVariables = Exact<{
-  offset?: InputMaybe<Scalars["Int"]["input"]>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
 }>;
 
 export type UnitsFilterQuery = {
@@ -6770,6 +6769,7 @@ export type UnitsFilterQuery = {
     edges: Array<{
       node?: { id: string; nameFi?: string | null; pk?: number | null } | null;
     } | null>;
+    pageInfo: { endCursor?: string | null; hasNextPage: boolean };
   } | null;
 };
 
@@ -6788,12 +6788,11 @@ export type ReservationUnitTypesFilterQuery = {
 };
 
 export type ReservationUnitsFilterParamsQueryVariables = Exact<{
-  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
   unit?: InputMaybe<
     | Array<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
   orderBy?: InputMaybe<
     | Array<InputMaybe<ReservationUnitOrderingChoices>>
     | InputMaybe<ReservationUnitOrderingChoices>
@@ -6806,6 +6805,7 @@ export type ReservationUnitsFilterParamsQuery = {
     edges: Array<{
       node?: { id: string; nameFi?: string | null; pk?: number | null } | null;
     } | null>;
+    pageInfo: { endCursor?: string | null; hasNextPage: boolean };
   } | null;
 };
 
@@ -11411,14 +11411,18 @@ export type UnitsQueryResult = Apollo.QueryResult<
   UnitsQueryVariables
 >;
 export const UnitsFilterDocument = gql`
-  query UnitsFilter($offset: Int, $first: Int) {
-    units(onlyWithPermission: true, offset: $offset, first: $first) {
+  query UnitsFilter($after: String) {
+    units(onlyWithPermission: true, after: $after) {
       edges {
         node {
           id
           nameFi
           pk
         }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
       }
       totalCount
     }
@@ -11437,8 +11441,7 @@ export const UnitsFilterDocument = gql`
  * @example
  * const { data, loading, error } = useUnitsFilterQuery({
  *   variables: {
- *      offset: // value for 'offset'
- *      first: // value for 'first'
+ *      after: // value for 'after'
  *   },
  * });
  */
@@ -11572,17 +11575,15 @@ export type ReservationUnitTypesFilterQueryResult = Apollo.QueryResult<
 >;
 export const ReservationUnitsFilterParamsDocument = gql`
   query ReservationUnitsFilterParams(
-    $offset: Int
+    $after: String
     $unit: [Int]
-    $first: Int
     $orderBy: [ReservationUnitOrderingChoices]
   ) {
     reservationUnits(
-      offset: $offset
+      after: $after
       onlyWithPermission: true
       unit: $unit
       orderBy: $orderBy
-      first: $first
     ) {
       edges {
         node {
@@ -11590,6 +11591,10 @@ export const ReservationUnitsFilterParamsDocument = gql`
           nameFi
           pk
         }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
       }
       totalCount
     }
@@ -11608,9 +11613,8 @@ export const ReservationUnitsFilterParamsDocument = gql`
  * @example
  * const { data, loading, error } = useReservationUnitsFilterParamsQuery({
  *   variables: {
- *      offset: // value for 'offset'
+ *      after: // value for 'after'
  *      unit: // value for 'unit'
- *      first: // value for 'first'
  *      orderBy: // value for 'orderBy'
  *   },
  * });
