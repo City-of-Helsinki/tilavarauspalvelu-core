@@ -15,7 +15,7 @@ import {
   getGenericTerms,
 } from "@/modules/serverUtils";
 import { base64encode } from "common/src/helpers";
-import { useApplicationQuery } from "@/gql/gql-types";
+import { useApplicationQuery } from "@gql/gql-types";
 
 const View = ({ id: pk, tos }: Props): JSX.Element => {
   const { t } = useTranslation();

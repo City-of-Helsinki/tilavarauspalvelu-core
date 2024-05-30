@@ -1,5 +1,11 @@
 import React from "react";
-import { useReservationQuery } from "@gql/gql-types";
+import {
+  CurrentUserQuery,
+  ReservationDocument,
+  type ReservationQuery,
+  type ReservationQueryVariables,
+  useReservationQuery,
+} from "@gql/gql-types";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { breakpoints, Container } from "common";
@@ -12,6 +18,8 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { base64encode } from "common/src/helpers";
 import { CenterSpinner } from "@/components/common/common";
 import Error from "next/error";
+import { CURRENT_USER } from "@/modules/queries/user";
+import { createApolloClient } from "@/modules/apolloClient";
 
 // TODO styles are copies from [...params].tsx
 const StyledContainer = styled(Container)`
@@ -90,12 +98,47 @@ function Confirmation({ apiBaseUrl }: Props) {
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  const { locale } = ctx;
+  const { locale, params } = ctx;
+  const pk = params?.id;
 
+  const commonProps = getCommonServerSideProps();
+  const client = createApolloClient(commonProps.apiBaseUrl, ctx);
+
+  if (Number.isFinite(Number(pk))) {
+    const typename = "ReservationNode";
+    const id = base64encode(`${typename}:${pk}`);
+
+    const { data: reservationData } = await client.query<
+      ReservationQuery,
+      ReservationQueryVariables
+    >({
+      query: ReservationDocument,
+      fetchPolicy: "no-cache",
+      variables: { id },
+    });
+    const { reservation } = reservationData || {};
+
+    const { data: userData } = await client.query<CurrentUserQuery>({
+      query: CURRENT_USER,
+      fetchPolicy: "no-cache",
+    });
+    const user = userData?.currentUser;
+
+    if (user != null && user.pk === reservation?.user?.pk) {
+      return {
+        props: {
+          ...getCommonServerSideProps(),
+          ...(await serverSideTranslations(locale ?? "fi")),
+        },
+      };
+    }
+  }
   return {
     props: {
-      ...getCommonServerSideProps(),
+      notFound: true,
+      ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
+      key: `${pk}-confirmation-${locale}`,
     },
   };
 };

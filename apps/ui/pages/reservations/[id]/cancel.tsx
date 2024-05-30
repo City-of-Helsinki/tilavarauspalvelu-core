@@ -2,6 +2,7 @@ import React from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import {
+  CurrentUserQuery,
   ReservationCancelReasonsDocument,
   type ReservationCancelReasonsQuery,
   type ReservationCancelReasonsQueryVariables,
@@ -15,9 +16,16 @@ import { createApolloClient } from "@/modules/apolloClient";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { canUserCancelReservation } from "@/modules/reservation";
 import { reservationsPrefix } from "@/modules/const";
+import { CURRENT_USER } from "@/modules/queries/user";
+
+type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
+
+function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
+  const { reservation } = props;
+  return <ReservationCancellation {...props} reservation={reservation} />;
+}
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
-type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, params } = ctx;
@@ -39,6 +47,12 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     });
     const { reservation } = reservationData || {};
 
+    const { data: userData } = await client.query<CurrentUserQuery>({
+      query: CURRENT_USER,
+      fetchPolicy: "no-cache",
+    });
+    const user = userData?.currentUser;
+
     const { data: cancelReasonsData } = await client.query<
       ReservationCancelReasonsQuery,
       ReservationCancelReasonsQueryVariables
@@ -53,6 +67,16 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       )
     );
 
+    if (reservation?.user?.pk !== user?.pk) {
+      return {
+        notFound: true,
+        props: {
+          notFound: true,
+          ...commonProps,
+          ...(await serverSideTranslations(locale ?? "fi")),
+        },
+      };
+    }
     const canCancel =
       reservation != null && canUserCancelReservation(reservation);
     if (canCancel) {
@@ -85,11 +109,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
-}
-
-function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
-  const { reservation } = props;
-  return <ReservationCancellation {...props} reservation={reservation} />;
 }
 
 export default ReservationCancelPage;

@@ -64,77 +64,7 @@ import {
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { containsField, containsNameField } from "common/src/metaFieldsHelpers";
 
-type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
-
-type NodeT = NonNullable<ReservationQuery["reservation"]>;
-
-// TODO this should return 500 if the backend query fails (not 404), or 400 if the query is incorrect etc.
-// typically 500 would be MAX_COMPLEXITY issue (could also make it 400 but 400 should be invalid query, not too complex)
-// 500 should not be if the backend is down (which one is that?)
-export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const { locale, params } = ctx;
-  const pk = Number(params?.id);
-  const commonProps = getCommonServerSideProps();
-  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
-
-  if (Number.isFinite(pk)) {
-    const bookingTerms = await getGenericTerms(apolloClient);
-
-    // NOTE errors will fallback to 404
-    const id = base64encode(`ReservationNode:${pk}`);
-    const { data, error } = await apolloClient.query<
-      ReservationQuery,
-      ReservationQueryVariables
-    >({
-      query: ReservationDocument,
-      fetchPolicy: "no-cache",
-      variables: { id },
-    });
-
-    const { data: userData } = await apolloClient.query<CurrentUserQuery>({
-      query: CurrentUserDocument,
-      fetchPolicy: "no-cache",
-    });
-    const user = userData?.currentUser;
-
-    if (error) {
-      // eslint-disable-next-line no-console
-      console.error("Error while fetching reservation", error);
-    }
-
-    const { reservation } = data ?? {};
-    // Return 404 for unauthorized access
-    if (
-      reservation != null &&
-      user != null &&
-      reservation.user?.pk === user.pk
-    ) {
-      return {
-        props: {
-          ...commonProps,
-          key: `${id}-${locale}`,
-          ...(await serverSideTranslations(locale ?? "fi")),
-          overrideBackgroundColor: "var(--tilavaraus-white)",
-          reservation,
-          termsOfUse: {
-            genericTerms: bookingTerms ?? null,
-          },
-        },
-      };
-    }
-  }
-
-  return {
-    notFound: true,
-    props: {
-      // have to double up notFound inside the props to get TS types dynamically
-      notFound: true,
-      ...commonProps,
-      ...(await serverSideTranslations(locale ?? "fi")),
-    },
-  };
-}
 
 // TODO this has margin issues on mobile, there is zero margin on top because some element (breadcrumbs?) is removed on mobile
 const Heading = styled(H2).attrs({ as: "h1" })`
@@ -748,6 +678,77 @@ function Reservation({
       </Container>
     </>
   );
+}
+
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+
+type NodeT = NonNullable<ReservationQuery["reservation"]>;
+
+// TODO this should return 500 if the backend query fails (not 404), or 400 if the query is incorrect etc.
+// typically 500 would be MAX_COMPLEXITY issue (could also make it 400 but 400 should be invalid query, not too complex)
+// 500 should not be if the backend is down (which one is that?)
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+  const { locale, params } = ctx;
+  const pk = Number(params?.id);
+  const commonProps = getCommonServerSideProps();
+  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
+
+  if (isFinite(pk)) {
+    const bookingTerms = await getGenericTerms(apolloClient);
+
+    // NOTE errors will fallback to 404
+    const id = base64encode(`ReservationNode:${pk}`);
+    const { data, error } = await apolloClient.query<
+      ReservationQuery,
+      ReservationQueryVariables
+    >({
+      query: ReservationDocument,
+      fetchPolicy: "no-cache",
+      variables: { id },
+    });
+
+    const { data: userData } = await apolloClient.query<CurrentUserQuery>({
+      query: CurrentUserDocument,
+      fetchPolicy: "no-cache",
+    });
+    const user = userData?.currentUser;
+
+    if (error) {
+      // eslint-disable-next-line no-console
+      console.error("Error while fetching reservation", error);
+    }
+
+    const { reservation } = data ?? {};
+    // Return 404 for unauthorized access
+    if (
+      reservation != null &&
+      user != null &&
+      reservation.user?.pk === user.pk
+    ) {
+      return {
+        props: {
+          ...commonProps,
+          key: `${id}-${locale}`,
+          ...(await serverSideTranslations(locale ?? "fi")),
+          overrideBackgroundColor: "var(--tilavaraus-white)",
+          reservation,
+          termsOfUse: {
+            genericTerms: bookingTerms ?? null,
+          },
+        },
+      };
+    }
+  }
+
+  return {
+    notFound: true,
+    props: {
+      // have to double up notFound inside the props to get TS types dynamically
+      notFound: true,
+      ...commonProps,
+      ...(await serverSideTranslations(locale ?? "fi")),
+    },
+  };
 }
 
 export default Reservation;
