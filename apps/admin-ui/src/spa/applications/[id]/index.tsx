@@ -419,7 +419,9 @@ function RejectOptionButton({
     console.warn("no allocatedTimeSlots", option);
   }
 
-  const canReject = applicationStatus === ApplicationStatusChoice.InAllocation;
+  const canReject =
+    applicationStatus === ApplicationStatusChoice.InAllocation ||
+    applicationStatus === ApplicationStatusChoice.Handled;
   const isDisabled = !canReject || option.allocatedTimeSlots?.length > 0;
   return (
     <Button
@@ -518,7 +520,8 @@ function RejectAllOptionsButton({
   }
 
   const inAllocation =
-    applicationStatus === ApplicationStatusChoice.InAllocation;
+    applicationStatus === ApplicationStatusChoice.InAllocation ||
+    applicationStatus === ApplicationStatusChoice.Handled;
   const isRejected = section.reservationUnitOptions.every((x) => x.rejected);
   const hasAllocations = section.allocations != null && section.allocations > 0;
   const canReject = inAllocation && !hasAllocations;
@@ -783,7 +786,8 @@ function RejectApplicationButton({
   }
 
   const isInAllocation =
-    application.status === ApplicationStatusChoice.InAllocation;
+    application.status === ApplicationStatusChoice.InAllocation ||
+    application.status === ApplicationStatusChoice.Handled;
   const hasBeenAllocated =
     application.applicationSections?.some((section) =>
       section.reservationUnitOptions.some(
