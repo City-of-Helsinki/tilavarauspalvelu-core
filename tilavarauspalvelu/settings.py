@@ -40,7 +40,6 @@ class Common(Environment):
     AUTH_USER_MODEL = "users.User"
     DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
     SECRET_KEY = values.StringValue()
-    ADMIN = values.ListValue()
     ALLOWED_HOSTS = values.ListValue()
 
     INSTALLED_APPS = [
@@ -507,7 +506,6 @@ class EmptyDefaults:
     # Don't set default for DEBUG, so that it's clear which environment is in debug mode and which isn't.
     SECRET_KEY = "secret"  # noqa: S105 # nosec # NOSONAR
     ALLOWED_HOSTS = ["*"]
-    ADMIN = []
 
     CORS_ALLOWED_ORIGINS = []
     CSRF_TRUSTED_ORIGINS = []
@@ -555,7 +553,6 @@ class Local(LocalMixin, Common):
     DEBUG = True
     SECRET_KEY = "secret"  # noqa: S105 # nosec # NOSONAR
     ALLOWED_HOSTS = ["*"]
-    ADMIN = []
 
     INSTALLED_APPS = [
         *Common.INSTALLED_APPS,
@@ -636,7 +633,6 @@ class Docker(DockerMixin, Common):
     DEBUG = True
     SECRET_KEY = "secret"  # noqa: S105 # nosec # NOSONAR
     ALLOWED_HOSTS = ["*"]
-    ADMIN = []
 
     CORS_ALLOWED_ORIGINS = values.ListValue(default=[])
     CSRF_TRUSTED_ORIGINS = values.ListValue(default=[])
