@@ -35,7 +35,7 @@ def test_recurring_reservations__create__full_data(graphql):
     recurring_reservation = RecurringReservation.objects.get(pk=response.first_query_object["pk"])
     assert recurring_reservation.name == "foo"
     assert recurring_reservation.description == "bar"
-    assert recurring_reservation.weekdays == "0"
+    assert recurring_reservation.weekdays == "6"
     assert recurring_reservation.begin_date == datetime.date(2023, 1, 1)
     assert recurring_reservation.end_date == datetime.date(2023, 1, 1)
     assert recurring_reservation.begin_time == datetime.time(10, 0, 0)
