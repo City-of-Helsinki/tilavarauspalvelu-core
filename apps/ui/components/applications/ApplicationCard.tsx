@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useState } from "react";
 import { useTranslation, type TFunction } from "next-i18next";
 import styled from "styled-components";
 import {
@@ -20,11 +20,9 @@ import {
 import { applicationUrl } from "@/modules/util";
 import { BlackButton } from "@/styles/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
-import ConfirmationModal, {
-  ModalRef,
-} from "@/components/common/ConfirmationModal";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import ClientOnly from "common/src/ClientOnly";
+import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 
 const Card = styled(HdsCard)`
   border-width: 0;
@@ -201,7 +199,7 @@ function getApplicationStatusColour(
 
 function ApplicationCard({ application, actionCallback }: Props): JSX.Element {
   const { t } = useTranslation();
-  const modal = useRef<ModalRef>();
+  const [isWaitingForDelete, setIsWaitingForDelete] = useState(false);
 
   const [mutation, { loading: isLoading }] = useCancelApplicationMutation({
     variables: {
@@ -217,8 +215,9 @@ function ApplicationCard({ application, actionCallback }: Props): JSX.Element {
     },
   });
 
-  const cancel = () => {
-    mutation();
+  const cancel = async () => {
+    await mutation();
+    setIsWaitingForDelete(false);
   };
 
   const { applicationRound } = application;
@@ -253,10 +252,7 @@ function ApplicationCard({ application, actionCallback }: Props): JSX.Element {
       <Buttons>
         <StyledButton
           aria-label={t("applicationCard:cancel")}
-          onClick={() => {
-            // TODO modal.open scrolls the page to the top
-            modal?.current?.open();
-          }}
+          onClick={() => setIsWaitingForDelete(true)}
           isLoading={isLoading}
           disabled={!editable}
           iconRight={<IconCross aria-hidden />}
@@ -288,14 +284,19 @@ function ApplicationCard({ application, actionCallback }: Props): JSX.Element {
           <IconArrowRight aria-hidden />
         </ButtonLikeLink>
       </Buttons>
-      <ConfirmationModal
-        id="application-card-modal"
-        heading={t("applicationCard:cancelHeading")}
-        content={t("applicationCard:cancelContent")}
-        ref={modal}
-        onOk={cancel}
-        cancelLabel={t("common:close")}
-      />
+      {isWaitingForDelete && (
+        <ConfirmationDialog
+          isOpen
+          id="application-card-modal"
+          heading={t("applicationCard:cancelHeading")}
+          content={t("applicationCard:cancelContent")}
+          onAccept={cancel}
+          onCancel={() => setIsWaitingForDelete(false)}
+          cancelLabel={t("common:close")}
+          acceptLabel={t("common:ok")}
+          variant="danger"
+        />
+      )}
     </Card>
   );
 }

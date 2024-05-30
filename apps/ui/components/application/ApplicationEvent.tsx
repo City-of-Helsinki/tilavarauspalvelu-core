@@ -1,6 +1,6 @@
 // TODO this file should be moved to application/ since the only user is Page1
 // also remove default export
-import React, { useRef } from "react";
+import React, { useState } from "react";
 import { Checkbox, DateInput, NumberInput, Select, TextInput } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { Controller, useFormContext } from "react-hook-form";
@@ -21,7 +21,7 @@ import {
 import { ApplicationEventSummary } from "./ApplicationEventSummary";
 import Accordion from "../common/Accordion";
 import { getDurationOptions } from "@/modules/const";
-import ConfirmationModal, { ModalRef } from "../common/ConfirmationModal";
+import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import { MediumButton } from "@/styles/util";
 import { ApplicationFormValues } from "./Form";
 
@@ -128,6 +128,7 @@ function ApplicationEventInner({
     watch,
   } = form;
 
+  const [isWaitingForDelete, setIsWaitingForDelete] = useState(false);
   const periodStartDate = formatApiDate(
     applicationRound.reservationPeriodBegin
   );
@@ -144,7 +145,6 @@ function ApplicationEventInner({
   const applicationPeriodBegin = watch(`applicationSections.${index}.begin`);
   const applicationPeriodEnd = watch(`applicationSections.${index}.end`);
   const numPersons = watch(`applicationSections.${index}.numPersons`);
-  const modalRef = useRef<ModalRef>();
 
   const selectDefaultPeriod = (): void => {
     const begin = periodStartDate ? apiDateToUIDate(periodStartDate) : "";
@@ -420,22 +420,23 @@ function ApplicationEventInner({
           type="button"
           variant="secondary"
           id={`applicationSections[${index}].delete`}
-          onClick={() => {
-            modalRef?.current?.open();
-          }}
+          onClick={() => setIsWaitingForDelete(true)}
         >
           {t("application:Page1.deleteEvent")}
         </Button>
-        <ConfirmationModal
-          id="application-event-confirmation"
-          okLabel="application:Page1.deleteEvent"
-          cancelLabel="application:Page1.deleteEventCancel"
-          heading={t("application:Page1.deleteEventHeading")}
-          content={t("application:Page1.deleteEventContent")}
-          onOk={del}
-          ref={modalRef}
-          type="confirm"
-        />
+        {isWaitingForDelete && (
+          <ConfirmationDialog
+            id="application-event-confirmation"
+            isOpen
+            acceptLabel="application:Page1.deleteEvent"
+            cancelLabel="application:Page1.deleteEventCancel"
+            heading={t("application:Page1.deleteEventHeading")}
+            content={t("application:Page1.deleteEventContent")}
+            onAccept={del}
+            onCancel={() => setIsWaitingForDelete(false)}
+            variant="danger"
+          />
+        )}
       </ActionContainer>
     </>
   );

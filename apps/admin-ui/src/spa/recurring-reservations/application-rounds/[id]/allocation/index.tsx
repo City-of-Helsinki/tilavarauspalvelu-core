@@ -473,6 +473,8 @@ function ApplicationRoundAllocation({
   };
 
   const handleRefetchApplicationEvents = () => {
+    // TODO should invalidate appllicationRound(id: $id) cache
+    // otherwise pressing back button to the applicationRound page doesn't allow instantly ending the round when all allocations are done
     return refetch();
   };
 

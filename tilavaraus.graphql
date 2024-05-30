@@ -363,6 +363,7 @@ type ApplicationRoundNode implements Node {
   The ID of the object
   """
   id: ID!
+  isSettingHandledAllowed: Boolean
   name: String!
   nameEn: String
   nameFi: String
@@ -384,6 +385,7 @@ type ApplicationRoundNode implements Node {
     orderBy: [ReservationPurposeOrderingChoices]
     pk: [Int]
   ): [ReservationPurposeNode!]!
+  reservationCreationStatus: ApplicationRoundReservationCreationStatusChoice
   reservationPeriodBegin: Date!
   reservationPeriodEnd: Date!
   reservationUnitCount: Int
@@ -482,6 +484,15 @@ Ordering fields for the 'ApplicationRound' model.
 enum ApplicationRoundOrderingChoices {
   pkAsc
   pkDesc
+}
+
+"""
+An enumeration.
+"""
+enum ApplicationRoundReservationCreationStatusChoice {
+  COMPLETED
+  FAILED
+  NOT_COMPLETED
 }
 
 """

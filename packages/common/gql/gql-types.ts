@@ -344,6 +344,7 @@ export type ApplicationRoundNode = Node & {
   handledDate?: Maybe<Scalars["DateTime"]["output"]>;
   /** The ID of the object */
   id: Scalars["ID"]["output"];
+  isSettingHandledAllowed?: Maybe<Scalars["Boolean"]["output"]>;
   name: Scalars["String"]["output"];
   nameEn?: Maybe<Scalars["String"]["output"]>;
   nameFi?: Maybe<Scalars["String"]["output"]>;
@@ -356,6 +357,7 @@ export type ApplicationRoundNode = Node & {
   publicDisplayBegin: Scalars["DateTime"]["output"];
   publicDisplayEnd: Scalars["DateTime"]["output"];
   purposes: Array<ReservationPurposeNode>;
+  reservationCreationStatus?: Maybe<ApplicationRoundReservationCreationStatusChoice>;
   reservationPeriodBegin: Scalars["Date"]["output"];
   reservationPeriodEnd: Scalars["Date"]["output"];
   reservationUnitCount?: Maybe<Scalars["Int"]["output"]>;
@@ -449,6 +451,13 @@ export type ApplicationRoundNodeEdge = {
 export enum ApplicationRoundOrderingChoices {
   PkAsc = "pkAsc",
   PkDesc = "pkDesc",
+}
+
+/** An enumeration. */
+export enum ApplicationRoundReservationCreationStatusChoice {
+  Completed = "COMPLETED",
+  Failed = "FAILED",
+  NotCompleted = "NOT_COMPLETED",
 }
 
 /** An enumeration. */

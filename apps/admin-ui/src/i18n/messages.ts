@@ -64,6 +64,7 @@ const translations: ITranslations = {
     BLOCKED: ["Suljettu"],
     BEHALF: ["Asiakkaan puolesta"],
     STAFF: ["Sisäinen varaus"],
+    SEASONAL: ["Kausivaraus"],
   },
   paymentType: {
     INVOICE: ["Laskutus"],
@@ -203,6 +204,13 @@ const translations: ITranslations = {
     noPermission: ["Sinulla ei ole käyttöoikeutta."],
     mutationNoDataReturned: ["Odottamaton vastaus."],
     cantRejectAlreadyAllocated: ["Jo jaettua vuoroa ei voi hylätä."],
+    errorEndingAllocation: ["Virhe käsittelyn päättämisessä"],
+    errorEndingAllocationUnhandledApplications: [
+      "Käsittelyssä on vielä käsittelemättömiä hakemuksia.",
+    ],
+    errorEndingAllocationNotInAllocation: [
+      "Käsittelyä ei ole aloitettu tai se on jo päättynyt.",
+    ],
     formValidationError: ["Lomakkeessa on virheitä. {{ message }}"],
     descriptive: {
       "Reservation overlaps with reservation before due to buffer time.": [
@@ -515,6 +523,34 @@ const translations: ITranslations = {
     },
     errors: {
       noApplicationRound: ["Hakukierrosta ei löytynyt"],
+    },
+    info: {
+      loadingText: ["Varauksia luodaan..."],
+      allocatedBody: [
+        "Kausivaraukset on jaettu, mutta varauksia ei ole tehty eikä vahvistettu asiakkaille.",
+      ],
+      handledBody: [
+        "Kausivaraukset on tarkistettu ja varausvahvistukset lähetetään asiakkaille.",
+      ],
+      resultsSentBody: [
+        "Kausivaraukset on tarkistettu ja varausvahvistukset on lähetetty asiakkaille.",
+      ],
+      createBtn: ["Päätä käsittely"],
+      sendResultsBtn: ["Lähetä varausvahvistukset"],
+      failedBtn: ["Varausten luonti epäonnistui"],
+    },
+    confirmation: {
+      endAllocationTitle: ["Oletko varma, että haluat päättää käsittelyn"],
+      endAllocationMessage: [
+        "Kun kierros on päätetty, jattuihin vuoroihin ei voida tehdä muutoksia. Huomaathan, että jaetuista vuoroista tehdään samalla toistuvat varaukset.",
+      ],
+      endAllocationAccept: ["Päätä käsittely ja luo varaukset"],
+      endAllocationCancel: ["Peruuta"],
+      sendResultsTitle: ["Lähetä varausvahvistukset"],
+      sendResultsMessage: [
+        "Sähköpostiviesti käsittelyn valmistumisesta lähtee heti tiedoksi asiakkaalle, kun painat Lähetä varausvahvistukset -painiketta. Varausvahvistukset näkyvät asiakkaalle Omat hakemukset -sivulla ja tehdyt varaukset Omat kausivaraukset- sivulla.",
+      ],
+      sendResultsAccept: ["Lähetä varausvahvistukset"],
     },
     description: [
       "Alla näet kaikki hakukierrokset, joihin sinulla on käsittelyoikeus. Noudata kausivarausten käsittelyssä palvelukohtaisia käsittelyperiaatteita ja -aikatauluja.",

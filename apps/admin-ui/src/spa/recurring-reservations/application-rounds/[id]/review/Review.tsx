@@ -1,5 +1,5 @@
-import React from "react";
-import { Button, Tabs } from "hds-react";
+import React, { useState } from "react";
+import { Button, Notification, Tabs } from "hds-react";
 import { uniqBy } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
@@ -7,9 +7,13 @@ import { Link, useSearchParams } from "react-router-dom";
 import { type Maybe } from "graphql/jsutils/Maybe";
 import { H2 } from "common/src/common/typography";
 import { filterNonNullable } from "common/src/helpers";
+import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import {
   ApplicationRoundStatusChoice,
   type ApplicationRoundAdminFragment,
+  useEndAllocationMutation,
+  ApplicationRoundReservationCreationStatusChoice,
+  type ApplicationRoundQuery,
 } from "@gql/gql-types";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { Container, TabWrapper } from "@/styles/layout";
@@ -19,19 +23,29 @@ import { ApplicationDataLoader } from "./ApplicationDataLoader";
 import { Filters } from "./Filters";
 import { ApplicationEventDataLoader } from "./ApplicationEventDataLoader";
 import { TimeSlotDataLoader } from "./AllocatedEventDataLoader";
+import { ApolloQueryResult, gql } from "@apollo/client";
+import { useNotification } from "@/context/NotificationContext";
+import { getValidationErrors } from "common/src/apolloUtils";
+import usePermission from "@/hooks/usePermission";
+import { Permission } from "@/modules/permissionHelper";
+import { isApplicationRoundInProgress } from "@/helpers";
 
-const Header = styled.div`
-  margin-top: var(--spacing-s);
-`;
-
-const SpaceBetweenContainer = styled.div`
+const HeadingContainer = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
 `;
 
-const AlignEndContainer = styled(SpaceBetweenContainer)`
+const LinkContainer = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  gap: var(--spacing-m);
+`;
+
+const AlignEndContainer = styled.div`
+  display: flex;
+  justify-content: end;
   align-items: end;
-  justify-content: flex-end;
 `;
 
 const TabContent = styled.div`
@@ -41,8 +55,10 @@ const TabContent = styled.div`
   line-height: 1;
 `;
 
-const StyledH2 = styled(H2)`
-  margin-top: 1.5rem;
+const StyledNotification = styled(Notification)`
+  margin-bottom: var(--spacing-m);
+  margin-top: var(--spacing-m);
+  max-width: 852px;
 `;
 
 function getUnitOptions(
@@ -64,9 +80,133 @@ function toOption(
 
 type ReviewProps = {
   applicationRound: ApplicationRoundAdminFragment;
+  refetch: () => Promise<ApolloQueryResult<ApplicationRoundQuery>>;
 };
 
-export function Review({ applicationRound }: ReviewProps): JSX.Element {
+export const END_ALLOCATION_MUTATION = gql`
+  mutation EndAllocation($pk: Int!) {
+    setApplicationRoundHandled(input: { pk: $pk }) {
+      pk
+    }
+  }
+`;
+
+function EndAllocation({
+  applicationRound,
+  refetch,
+}: ReviewProps): JSX.Element {
+  const [waitingForHandle, setWaitingForHandle] = useState(false);
+
+  const isInProgress = isApplicationRoundInProgress(applicationRound);
+
+  const { t } = useTranslation();
+  const { notifyError } = useNotification();
+  const [mutation] = useEndAllocationMutation();
+
+  const handleEndAllocation = async () => {
+    try {
+      const res = await mutation({
+        variables: { pk: applicationRound.pk ?? 0 },
+      });
+      if (res.data?.setApplicationRoundHandled?.pk) {
+        setWaitingForHandle(false);
+      }
+    } catch (err) {
+      const errors = getValidationErrors(err);
+      if (errors.length > 0) {
+        const unhandledCode = "APPLICATION_ROUND_HAS_UNHANDLED_APPLICATIONS";
+        const notInAllocationCode = "APPLICATION_ROUND_NOT_IN_ALLOCATION";
+        if (errors.some((e) => e.code === unhandledCode)) {
+          notifyError(t("errors.errorEndingAllocationUnhandledApplications"));
+        } else if (errors.some((e) => e.code === notInAllocationCode)) {
+          notifyError(t("errors.errorEndingAllocationNotInAllocation"));
+        } else {
+          notifyError(t("errors.errorEndingAllocation"));
+        }
+      } else {
+        notifyError(t("errors.errorEndingAllocation"));
+      }
+    }
+    // refetch even on errors (if somebody else has ended the allocation)
+    refetch();
+  };
+
+  const handleSendResults = () => {
+    notifyError("TODO: not implemented handleSendResults");
+  };
+
+  const hasFailed =
+    applicationRound.reservationCreationStatus ===
+    ApplicationRoundReservationCreationStatusChoice.Failed;
+
+  const isHandled =
+    applicationRound.status === ApplicationRoundStatusChoice.Handled;
+  const isResultsSent =
+    applicationRound.status === ApplicationRoundStatusChoice.ResultsSent;
+
+  const showSendResults = isHandled && !isInProgress;
+  // TODO futher work: (separate spec)
+  // - what if results are sent? what should we show or not show?
+  const modalTitle = showSendResults
+    ? t("ApplicationRound.confirmation.sendResultsTitle")
+    : t("ApplicationRound.confirmation.endAllocationTitle");
+  const modalContent = showSendResults
+    ? t("ApplicationRound.confirmation.sendResultsMessage")
+    : t("ApplicationRound.confirmation.endAllocationMessage");
+  const modalAcceptLabel = showSendResults
+    ? t("ApplicationRound.confirmation.sendResultsAccept")
+    : t("ApplicationRound.confirmation.endAllocationAccept");
+  const moddalCancelLabel = t(
+    "ApplicationRound.confirmation.endAllocationCancel"
+  );
+
+  // TODO add resultsSentBody
+  // requires refoctoring this a bit so we don't do multiple ternaries
+  const infoBody = showSendResults
+    ? t("ApplicationRound.info.handledBody")
+    : t("ApplicationRound.info.allocatedBody");
+  const infoButton = hasFailed
+    ? t("ApplicationRound.info.failedBtn")
+    : showSendResults
+      ? t("ApplicationRound.info.sendResultsBtn")
+      : t("ApplicationRound.info.createBtn");
+
+  // NOTE the permission check is somewhat redundant because the backend variable is already checked
+  const { hasApplicationRoundPermission } = usePermission();
+  const canEndAllocation = hasApplicationRoundPermission(
+    applicationRound,
+    Permission.CAN_MANAGE_APPLICATIONS
+  );
+
+  return (
+    <StyledNotification type={hasFailed ? "error" : "info"} label={infoBody}>
+      <Button
+        isLoading={isInProgress}
+        loadingText={t("ApplicationRound.info.loadingText")}
+        onClick={() => setWaitingForHandle(true)}
+        disabled={hasFailed || isResultsSent || !canEndAllocation}
+      >
+        {infoButton}
+      </Button>
+      {waitingForHandle && (
+        <ConfirmationDialog
+          isOpen={waitingForHandle}
+          onAccept={showSendResults ? handleSendResults : handleEndAllocation}
+          onCancel={() => setWaitingForHandle(false)}
+          heading={modalTitle}
+          content={modalContent}
+          acceptLabel={modalAcceptLabel}
+          cancelLabel={moddalCancelLabel}
+        />
+      )}
+    </StyledNotification>
+  );
+}
+
+export function Review({
+  applicationRound,
+  refetch,
+}: ReviewProps): JSX.Element {
   const { t } = useTranslation();
 
   const [searchParams, setParams] = useSearchParams();
@@ -96,6 +236,14 @@ export function Review({ applicationRound }: ReviewProps): JSX.Element {
     applicationRound.status === ApplicationRoundStatusChoice.Handled ||
     applicationRound.status === ApplicationRoundStatusChoice.ResultsSent;
 
+  // isHandled means that the reservations are created
+  // isSettingHandledAllowed means that we are allowed to create the reservations
+  // i.e. state.InAllocation -> isSettingHandledAllowed -> state.Handled -> state.ResultsSent
+  const isHandled =
+    applicationRound.status === ApplicationRoundStatusChoice.Handled;
+
+  const isEndingAllowed = applicationRound.isSettingHandledAllowed;
+
   const activeTabIndex =
     selectedTab === "events" ? 1 : selectedTab === "allocated" ? 2 : 0;
 
@@ -105,30 +253,42 @@ export function Review({ applicationRound }: ReviewProps): JSX.Element {
 
   return (
     <Container>
-      <Header>
-        <SpaceBetweenContainer>
-          {applicationRound.status != null && (
-            <ApplicationRoundStatusTag status={applicationRound.status} />
-          )}
+      <>
+        <HeadingContainer>
+          <H2 as="h1" $legacy style={{ marginBottom: 0 }}>
+            {applicationRound.nameFi}
+          </H2>
+          <ApplicationRoundStatusTag status={applicationRound.status} />
+        </HeadingContainer>
+        <LinkContainer>
+          <TimeframeStatus
+            applicationPeriodBegin={applicationRound.applicationPeriodBegin}
+            applicationPeriodEnd={applicationRound.applicationPeriodEnd}
+          />
           <Link to="criteria">{t("ApplicationRound.roundCriteria")}</Link>
-        </SpaceBetweenContainer>
-        <StyledH2>{applicationRound.nameFi}</StyledH2>
-        <TimeframeStatus
-          applicationPeriodBegin={applicationRound.applicationPeriodBegin}
-          applicationPeriodEnd={applicationRound.applicationPeriodEnd}
-        />
-        <AlignEndContainer>
-          {isAllocationEnabled ? (
-            <ButtonLikeLink to="allocation" variant="primary" size="large">
-              {t("ApplicationRound.allocate")}
-            </ButtonLikeLink>
-          ) : (
-            <Button variant="primary" disabled>
-              {t("ApplicationRound.allocate")}
-            </Button>
-          )}
-        </AlignEndContainer>
-      </Header>
+        </LinkContainer>
+        {/* NOTE this check blocks users that don't have permissions to end the allocation
+         * so for them it's always showing the allocation tool
+         */}
+        {isEndingAllowed || isHandled ? (
+          <EndAllocation
+            applicationRound={applicationRound}
+            refetch={refetch}
+          />
+        ) : (
+          <AlignEndContainer>
+            {isAllocationEnabled ? (
+              <ButtonLikeLink to="allocation" variant="primary" size="large">
+                {t("ApplicationRound.allocate")}
+              </ButtonLikeLink>
+            ) : (
+              <Button variant="primary" disabled>
+                {t("ApplicationRound.allocate")}
+              </Button>
+            )}
+          </AlignEndContainer>
+        )}
+      </>
       <TabWrapper>
         <Tabs initiallyActiveTab={activeTabIndex}>
           <Tabs.TabList>

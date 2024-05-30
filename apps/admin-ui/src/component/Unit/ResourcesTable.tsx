@@ -1,9 +1,10 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { trim } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { type ApolloQueryResult } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
+import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import {
   useDeleteResourceMutation,
   type Maybe,
@@ -11,7 +12,6 @@ import {
   type UnitQuery,
 } from "@gql/gql-types";
 import { PopupMenu } from "@/component/PopupMenu";
-import ConfirmationDialog, { ModalRef } from "../ConfirmationDialog";
 import { getResourceUrl } from "@/common/urls";
 import { CustomTable, TableLink } from "../Table";
 import { useNotification } from "@/context/NotificationContext";
@@ -45,10 +45,12 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
 
   const { t } = useTranslation();
 
-  const modal = useRef<ModalRef>();
   const history = useNavigate();
 
   const { notifyError, notifySuccess } = useNotification();
+
+  const [resourceWaitingForDelete, setResourceWaitingForDelete] =
+    useState<ResourceNode | null>(null);
 
   function handleEditResource(pk: Maybe<number> | undefined) {
     if (pk == null || unit?.pk == null) {
@@ -57,32 +59,11 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
     history(getResourceUrl(pk, unit.pk));
   }
 
-  function handleDeleteResource(
-    pk: Maybe<number> | undefined,
-    name: Maybe<string> | undefined
-  ) {
-    if (pk == null) {
+  function handleDeleteResource(resource: ResourceNode) {
+    if (resource.pk == null) {
       return;
     }
-    modal.current?.open({
-      id: "confirmation-modal",
-      open: true,
-      heading: t("ResourceTable.removeConfirmationTitle", {
-        name,
-      }),
-      content: t("ResourceTable.removeConfirmationMessage"),
-      acceptLabel: t("ResourceTable.removeConfirmationAccept"),
-      cancelLabel: t("ResourceTable.removeConfirmationCancel"),
-      onAccept: async () => {
-        try {
-          await deleteResource(pk);
-          notifySuccess(t("ResourceTable.removeSuccess"));
-          refetch();
-        } catch (error) {
-          notifyError(t("ResourceTable.removeFailed"));
-        }
-      },
-    });
+    setResourceWaitingForDelete(resource);
   }
 
   const cols: ResourcesTableColumn[] = [
@@ -114,7 +95,7 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
         <ResourceMenu
           {...resource}
           onEdit={() => handleEditResource(resource.pk)}
-          onDelete={() => handleDeleteResource(resource.pk, resource.nameFi)}
+          onDelete={() => handleDeleteResource(resource)}
         />
       ),
       isSortable: false,
@@ -130,7 +111,32 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
     // has to be a grid otherwise inner table breaks
     <div style={{ display: "grid" }}>
       <CustomTable indexKey="pk" rows={rows} cols={cols} />
-      <ConfirmationDialog open={false} id="confirmation-dialog" ref={modal} />
+      {resourceWaitingForDelete && (
+        <ConfirmationDialog
+          isOpen
+          variant="danger"
+          heading={t("ResourceTable.removeConfirmationTitle", {
+            name: resourceWaitingForDelete.nameFi,
+          })}
+          content={t("ResourceTable.removeConfirmationMessage")}
+          acceptLabel={t("ResourceTable.removeConfirmationAccept")}
+          cancelLabel={t("ResourceTable.removeConfirmationCancel")}
+          onCancel={() => setResourceWaitingForDelete(null)}
+          onAccept={async () => {
+            if (resourceWaitingForDelete.pk == null) {
+              return;
+            }
+            try {
+              await deleteResource(resourceWaitingForDelete.pk);
+              notifySuccess(t("ResourceTable.removeSuccess"));
+              setResourceWaitingForDelete(null);
+              refetch();
+            } catch (error) {
+              notifyError(t("ResourceTable.removeFailed"));
+            }
+          }}
+        />
+      )}
     </div>
   );
 }

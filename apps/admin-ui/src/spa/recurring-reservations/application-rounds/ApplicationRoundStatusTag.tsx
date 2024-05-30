@@ -1,7 +1,7 @@
 import { Tag } from "hds-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { ApplicationRoundStatusChoice } from "@gql/gql-types";
+import { ApplicationRoundStatusChoice, type Maybe } from "@gql/gql-types";
 
 type RoundStatus = {
   color: string;
@@ -50,7 +50,7 @@ const getApplicationRoundStatus = (
 export function ApplicationRoundStatusTag({
   status,
 }: {
-  status: ApplicationRoundStatusChoice;
+  status: Maybe<ApplicationRoundStatusChoice> | undefined;
 }): JSX.Element {
   const { t } = useTranslation();
   if (!status) {

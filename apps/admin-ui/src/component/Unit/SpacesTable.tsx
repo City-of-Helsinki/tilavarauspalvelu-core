@@ -1,10 +1,11 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { IconGroup } from "hds-react";
 import { trim } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { type ApolloQueryResult } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
+import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import {
   type Maybe,
   type SpaceNode,
@@ -14,7 +15,6 @@ import {
 import { PopupMenu } from "@/component/PopupMenu";
 import Modal, { useModal as useHDSModal } from "../HDSModal";
 import { NewSpaceModal } from "../Spaces/space-editor/new-space-modal/NewSpaceModal";
-import ConfirmationDialog, { ModalRef } from "../ConfirmationDialog";
 import { useNotification } from "@/context/NotificationContext";
 import { CustomTable, TableLink } from "@/component/Table";
 import { getSpaceUrl } from "@/common/urls";
@@ -76,6 +76,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
         variables: { input: { pk: String(pk) } },
       });
       if (res.data?.deleteSpace?.deleted) {
+        setSpaceWaitingForDelete(null);
         refetch();
       } else {
         // TODO missing translation
@@ -96,9 +97,10 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
     }
   }
 
-  const modal = useRef<ModalRef>();
-
   const history = useNavigate();
+
+  const [spaceWaitingForDelete, setSpaceWaitingForDelete] =
+    useState<SpaceNode | null>(null);
 
   function handleRemoveSpace(space: SpaceNode) {
     if (space && space.resourceSet && space?.resourceSet.length > 0) {
@@ -108,19 +110,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
       );
       return;
     }
-    modal.current?.open({
-      id: "confirmation-modal",
-      open: true,
-      heading: t("SpaceTable.removeConfirmationTitle", {
-        name: space.nameFi,
-      }),
-      content: t("SpaceTable.removeConfirmationMessage"),
-      acceptLabel: t("SpaceTable.removeConfirmationAccept"),
-      cancelLabel: t("SpaceTable.removeConfirmationCancel"),
-      onAccept: () => {
-        deleteSpace(space.pk);
-      },
-    });
+    setSpaceWaitingForDelete(space);
   }
 
   function handeAddSubSpace(space: SpaceNode) {
@@ -237,7 +227,22 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
       >
         {modalContent}
       </Modal>
-      <ConfirmationDialog open={false} id="confirmation-dialog" ref={modal} />
+      {spaceWaitingForDelete && (
+        <ConfirmationDialog
+          isOpen
+          variant="danger"
+          heading={t("SpaceTable.removeConfirmationTitle", {
+            name: spaceWaitingForDelete.nameFi,
+          })}
+          content={t("SpaceTable.removeConfirmationMessage")}
+          acceptLabel={t("SpaceTable.removeConfirmationAccept")}
+          cancelLabel={t("SpaceTable.removeConfirmationCancel")}
+          onCancel={() => setSpaceWaitingForDelete(null)}
+          onAccept={() => {
+            deleteSpace(spaceWaitingForDelete.pk);
+          }}
+        />
+      )}
     </div>
   );
 }

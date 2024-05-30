@@ -344,6 +344,7 @@ export type ApplicationRoundNode = Node & {
   handledDate?: Maybe<Scalars["DateTime"]["output"]>;
   /** The ID of the object */
   id: Scalars["ID"]["output"];
+  isSettingHandledAllowed?: Maybe<Scalars["Boolean"]["output"]>;
   name: Scalars["String"]["output"];
   nameEn?: Maybe<Scalars["String"]["output"]>;
   nameFi?: Maybe<Scalars["String"]["output"]>;
@@ -356,6 +357,7 @@ export type ApplicationRoundNode = Node & {
   publicDisplayBegin: Scalars["DateTime"]["output"];
   publicDisplayEnd: Scalars["DateTime"]["output"];
   purposes: Array<ReservationPurposeNode>;
+  reservationCreationStatus?: Maybe<ApplicationRoundReservationCreationStatusChoice>;
   reservationPeriodBegin: Scalars["Date"]["output"];
   reservationPeriodEnd: Scalars["Date"]["output"];
   reservationUnitCount?: Maybe<Scalars["Int"]["output"]>;
@@ -449,6 +451,13 @@ export type ApplicationRoundNodeEdge = {
 export enum ApplicationRoundOrderingChoices {
   PkAsc = "pkAsc",
   PkDesc = "pkDesc",
+}
+
+/** An enumeration. */
+export enum ApplicationRoundReservationCreationStatusChoice {
+  Completed = "COMPLETED",
+  Failed = "FAILED",
+  NotCompleted = "NOT_COMPLETED",
 }
 
 /** An enumeration. */
@@ -8545,6 +8554,14 @@ export type ApplicationRoundCriteriaQuery = {
   } | null;
 };
 
+export type EndAllocationMutationVariables = Exact<{
+  pk: Scalars["Int"]["input"];
+}>;
+
+export type EndAllocationMutation = {
+  setApplicationRoundHandled?: { pk?: number | null } | null;
+};
+
 export type ApplicationsQueryVariables = Exact<{
   applicationRound: Scalars["Int"]["input"];
   unit?: InputMaybe<
@@ -8850,6 +8867,8 @@ export type ApplicationRoundsQuery = {
 
 export type ApplicationRoundAdminFragment = {
   applicationsCount?: number | null;
+  isSettingHandledAllowed?: boolean | null;
+  reservationCreationStatus?: ApplicationRoundReservationCreationStatusChoice | null;
   id: string;
   pk?: number | null;
   nameFi?: string | null;
@@ -8871,6 +8890,8 @@ export type ApplicationRoundQueryVariables = Exact<{
 export type ApplicationRoundQuery = {
   applicationRound?: {
     applicationsCount?: number | null;
+    isSettingHandledAllowed?: boolean | null;
+    reservationCreationStatus?: ApplicationRoundReservationCreationStatusChoice | null;
     id: string;
     pk?: number | null;
     nameFi?: string | null;
@@ -9586,6 +9607,8 @@ export const ApplicationRoundAdminFragmentDoc = gql`
   fragment ApplicationRoundAdmin on ApplicationRoundNode {
     ...ApplicationRoundBase
     applicationsCount
+    isSettingHandledAllowed
+    reservationCreationStatus
     reservationUnits {
       id
       pk
@@ -15338,6 +15361,56 @@ export type ApplicationRoundCriteriaSuspenseQueryHookResult = ReturnType<
 export type ApplicationRoundCriteriaQueryResult = Apollo.QueryResult<
   ApplicationRoundCriteriaQuery,
   ApplicationRoundCriteriaQueryVariables
+>;
+export const EndAllocationDocument = gql`
+  mutation EndAllocation($pk: Int!) {
+    setApplicationRoundHandled(input: { pk: $pk }) {
+      pk
+    }
+  }
+`;
+export type EndAllocationMutationFn = Apollo.MutationFunction<
+  EndAllocationMutation,
+  EndAllocationMutationVariables
+>;
+
+/**
+ * __useEndAllocationMutation__
+ *
+ * To run a mutation, you first call `useEndAllocationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useEndAllocationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [endAllocationMutation, { data, loading, error }] = useEndAllocationMutation({
+ *   variables: {
+ *      pk: // value for 'pk'
+ *   },
+ * });
+ */
+export function useEndAllocationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    EndAllocationMutation,
+    EndAllocationMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    EndAllocationMutation,
+    EndAllocationMutationVariables
+  >(EndAllocationDocument, options);
+}
+export type EndAllocationMutationHookResult = ReturnType<
+  typeof useEndAllocationMutation
+>;
+export type EndAllocationMutationResult =
+  Apollo.MutationResult<EndAllocationMutation>;
+export type EndAllocationMutationOptions = Apollo.BaseMutationOptions<
+  EndAllocationMutation,
+  EndAllocationMutationVariables
 >;
 export const ApplicationsDocument = gql`
   query Applications(

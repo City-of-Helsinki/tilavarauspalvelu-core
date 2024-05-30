@@ -34,6 +34,8 @@ const APPLICATION_ROUND_ADMIN_FRAGMENT = gql`
   fragment ApplicationRoundAdmin on ApplicationRoundNode {
     ...ApplicationRoundBase
     applicationsCount
+    isSettingHandledAllowed
+    reservationCreationStatus
     reservationUnits {
       id
       pk

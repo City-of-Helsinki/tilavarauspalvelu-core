@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useApplicationRoundQuery } from "@gql/gql-types";
@@ -9,16 +9,20 @@ import { Review } from "./review/Review";
 import usePermission from "@/hooks/usePermission";
 import { Permission } from "@/modules/permissionHelper";
 import { base64encode } from "common/src/helpers";
+import { isApplicationRoundInProgress } from "@/helpers";
 
 function ApplicationRound({ pk }: { pk: number }): JSX.Element {
   const { notifyError } = useNotification();
   const { t } = useTranslation();
+  const [isInProgress, setIsInProgress] = useState(false);
 
   const id = base64encode(`ApplicationRoundNode:${pk}`);
   const isValid = pk > 0;
-  const { data, loading: isLoading } = useApplicationRoundQuery({
+
+  const { data, loading, refetch } = useApplicationRoundQuery({
     skip: !isValid,
     variables: { id },
+    pollInterval: isInProgress ? 10000 : 0,
     onError: () => {
       notifyError(t("errors.errorFetchingData"));
     },
@@ -26,7 +30,18 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
   const { applicationRound } = data ?? {};
   const { hasApplicationRoundPermission } = usePermission();
 
-  if (isLoading) {
+  // NOTE: useEffect works, onCompleted does not work with refetch
+  useEffect(() => {
+    if (data) {
+      if (isApplicationRoundInProgress(data.applicationRound)) {
+        setIsInProgress(true);
+      } else {
+        setIsInProgress(false);
+      }
+    }
+  }, [data]);
+
+  if (loading) {
     return <Loader />;
   }
 
@@ -64,7 +79,7 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
   return (
     <>
       <BreadcrumbWrapper route={route} />
-      <Review applicationRound={applicationRound} />
+      <Review applicationRound={applicationRound} refetch={refetch} />
     </>
   );
 }

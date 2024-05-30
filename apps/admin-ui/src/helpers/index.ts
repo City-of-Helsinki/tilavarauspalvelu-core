@@ -7,6 +7,10 @@ import {
   type PersonNode,
   type ReservationsInIntervalFragment,
   ApplicationNode,
+  ApplicationRoundReservationCreationStatusChoice,
+  ApplicationRoundStatusChoice,
+  type ApplicationRoundNode,
+  type Maybe,
 } from "@gql/gql-types";
 import { addSeconds } from "date-fns";
 
@@ -128,4 +132,19 @@ export function getApplicationSectiontatusColor(
     default:
       return "var(--color-error)";
   }
+}
+
+export function isApplicationRoundInProgress(
+  round:
+    | Maybe<Pick<ApplicationRoundNode, "status" | "reservationCreationStatus">>
+    | undefined
+): boolean {
+  if (!round) {
+    return false;
+  }
+  return (
+    round.reservationCreationStatus ===
+      ApplicationRoundReservationCreationStatusChoice.NotCompleted &&
+    round.status === ApplicationRoundStatusChoice.Handled
+  );
 }

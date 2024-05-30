@@ -179,11 +179,11 @@ const reserveeTypeToTranslationKey = (
   }
 };
 
-export const getTranslationKeyForCustomerTypeChoice = (
+export function getTranslationKeyForCustomerTypeChoice(
   reservationType?: ReservationTypeChoice,
   reserveeType?: CustomerTypeChoice,
   isUnregisteredAssociation?: boolean
-): string[] => {
+): string[] {
   if (!reservationType) {
     return ["errors.missingReservationNode"];
   }
@@ -198,7 +198,7 @@ export const getTranslationKeyForCustomerTypeChoice = (
       )
     : "";
   return [`ReservationType.${reservationType}`, reserveeTypeTranslationKey];
-};
+}
 
 export function getReserveeName(
   reservation: ReservationCommonFragment,
