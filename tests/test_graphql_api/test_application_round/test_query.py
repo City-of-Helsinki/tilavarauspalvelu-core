@@ -1,6 +1,7 @@
 import pytest
 
-from tests.factories import ApplicationFactory, ApplicationRoundFactory
+from applications.choices import ApplicationRoundStatusChoice, ApplicationStatusChoice
+from tests.factories import ApplicationFactory, ApplicationRoundFactory, ReservationUnitFactory
 from tests.helpers import UserType
 from tests.test_graphql_api.test_application_round.helpers import rounds_query
 
@@ -10,7 +11,7 @@ pytestmark = [
 ]
 
 
-def test_can_query_application_rounds__all_fields(graphql):
+def test_application_round_query__all_fields(graphql):
     # given:
     # - There are two application rounds
     # - A superuser is using the system
@@ -53,6 +54,7 @@ def test_can_query_application_rounds__all_fields(graphql):
         statusTimestamp
         applicationsCount
         reservationUnitCount
+        isSettingHandledAllowed
     """
 
     # when:
@@ -89,10 +91,11 @@ def test_can_query_application_rounds__all_fields(graphql):
         "statusTimestamp": application_round.status_timestamp.isoformat(),
         "applicationsCount": 0,
         "reservationUnitCount": 0,
+        "isSettingHandledAllowed": False,
     }
 
 
-def test_applications_count_does_not_include_draft_applications(graphql):
+def test_application_round_query__applications_count_does_not_include_draft_applications(graphql):
     # given:
     # - There is a single application round with two applications, one of which is a draft
     application_round = ApplicationRoundFactory.create_in_status_open()
@@ -110,7 +113,7 @@ def test_applications_count_does_not_include_draft_applications(graphql):
     assert response.node(0) == {"applicationsCount": 1}
 
 
-def test_applications_count_does_not_include_expired_applications(graphql):
+def test_application_round_query__applications_count_does_not_include_expired_applications(graphql):
     # given:
     # - There is a single application round with two applications, one of which is expired
     application_round = ApplicationRoundFactory.create_in_status_handled()
@@ -128,7 +131,7 @@ def test_applications_count_does_not_include_expired_applications(graphql):
     assert response.node(0) == {"applicationsCount": 1}
 
 
-def test_applications_count_does_not_include_cancelled_applications(graphql):
+def test_application_round_query__applications_count_does_not_include_cancelled_applications(graphql):
     # given:
     # - There is a single application round with two applications, one of which is cancelled
     application_round = ApplicationRoundFactory.create_in_status_handled()
@@ -144,3 +147,50 @@ def test_applications_count_does_not_include_cancelled_applications(graphql):
     # - The applications count does not include the cancelled application
     assert len(response.edges) == 1, response
     assert response.node(0) == {"applicationsCount": 1}
+
+
+def test_application_round_query__is_setting_handled_allowed__no_permissions__false(graphql):
+    reservation_unit = ReservationUnitFactory.create()
+    application_round = ApplicationRoundFactory.create_in_status_in_allocation(reservation_units=[reservation_unit])
+    assert application_round.status == ApplicationRoundStatusChoice.IN_ALLOCATION
+
+    ApplicationFactory.create_in_status_handled(application_round=application_round)
+
+    graphql.login_with_regular_user()
+    response = graphql(rounds_query(fields="isSettingHandledAllowed"))
+
+    assert response.node() == {"isSettingHandledAllowed": False}
+
+
+def test_application_round_query__is_setting_handled_allowed__application_in_allocation__false(graphql):
+    application_round = ApplicationRoundFactory.create_in_status_in_allocation()
+    assert application_round.status == ApplicationRoundStatusChoice.IN_ALLOCATION
+
+    ApplicationFactory.create_in_status_in_allocation(application_round=application_round)
+    ApplicationFactory.create_in_status_handled(application_round=application_round)
+
+    graphql.login_with_superuser()
+    response = graphql(rounds_query(fields="isSettingHandledAllowed"))
+
+    assert response.node() == {"isSettingHandledAllowed": False}
+
+
+@pytest.mark.parametrize(
+    "application_status",
+    [
+        ApplicationStatusChoice.DRAFT,
+        ApplicationStatusChoice.HANDLED,
+        ApplicationStatusChoice.EXPIRED,
+        ApplicationStatusChoice.CANCELLED,
+    ],
+)
+def test_application_round_query__is_setting_handled_allowed__application_status__true(graphql, application_status):
+    application_round = ApplicationRoundFactory.create_in_status_in_allocation()
+    assert application_round.status == ApplicationRoundStatusChoice.IN_ALLOCATION
+
+    ApplicationFactory.create_in_status(status=application_status, application_round=application_round)
+
+    graphql.login_with_superuser()
+    response = graphql(rounds_query(fields="isSettingHandledAllowed"))
+
+    assert response.node() == {"isSettingHandledAllowed": True}
