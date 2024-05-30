@@ -28,7 +28,10 @@ const NotesBoxHeading = styled.h3`
 `;
 
 type NotesWhenApplyingProps = {
-  applicationRound: ApplicationRoundNode | null;
+  applicationRound: Pick<
+    ApplicationRoundNode,
+    "notesWhenApplyingFi" | "notesWhenApplyingSv" | "notesWhenApplyingEn"
+  > | null;
 };
 
 const NotesWhenApplying = ({ applicationRound }: NotesWhenApplyingProps) => {
