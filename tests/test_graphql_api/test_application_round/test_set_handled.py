@@ -1,7 +1,13 @@
 import pytest
 
-from applications.choices import ApplicationRoundStatusChoice
-from tests.factories import ApplicationRoundFactory, ReservationUnitFactory, UserFactory, add_unit_permissions
+from applications.choices import ApplicationRoundStatusChoice, ApplicationStatusChoice
+from tests.factories import (
+    ApplicationFactory,
+    ApplicationRoundFactory,
+    ReservationUnitFactory,
+    UserFactory,
+    add_unit_permissions,
+)
 
 from .helpers import SET_HANDLED_MUTATION, disable_reservation_generation
 
@@ -15,12 +21,14 @@ def test_application_round__set_handled(graphql):
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
     assert application_round.status == ApplicationRoundStatusChoice.IN_ALLOCATION
 
+    ApplicationFactory.create_in_status_handled(application_round=application_round)
+
     graphql.login_with_superuser()
 
-    with disable_reservation_generation() as mock:
+    with disable_reservation_generation() as mock_disable_reservation_generation:
         response = graphql(SET_HANDLED_MUTATION, input_data={"pk": application_round.pk})
 
-    assert len(mock.method_calls) == 1
+    assert len(mock_disable_reservation_generation.method_calls) == 1
 
     assert response.has_errors is False, response.errors
 
@@ -47,7 +55,7 @@ def test_application_round__set_handled__wrong_status(graphql, status):
         response = graphql(SET_HANDLED_MUTATION, input_data={"pk": application_round.pk})
 
     assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Application round is not in allocation state."]
+    assert response.field_error_messages() == ["Application round is not in allocation status."]
 
 
 def test_application_round__set_handled__general_admin(graphql):
@@ -124,3 +132,37 @@ def test_application_round__set_handled__unit_admin__has_perms_to_all_units(grap
 
     application_round.refresh_from_db()
     assert application_round.status == ApplicationRoundStatusChoice.HANDLED
+
+
+@pytest.mark.parametrize(
+    ("application_status", "raises_error"),
+    [
+        # ApplicationStatusChoice.DRAFT is an impossible status when  ApplicationRound status is not UPCOMING or OPEN
+        # ApplicationStatusChoice.RECEIVED is an impossible status if ApplicationRound status is IN_ALLOCATION
+        (ApplicationStatusChoice.IN_ALLOCATION, True),
+        (ApplicationStatusChoice.HANDLED, False),
+        # ApplicationStatusChoice.RESULTS_SENT is an impossible status if ApplicationRound status is IN_ALLOCATION
+        (ApplicationStatusChoice.EXPIRED, False),
+        (ApplicationStatusChoice.CANCELLED, False),
+    ],
+)
+def test_application_round__set_handled__error__has_applications_in_status(graphql, application_status, raises_error):
+    application_round = ApplicationRoundFactory.create_in_status_in_allocation()
+    assert application_round.status == ApplicationRoundStatusChoice.IN_ALLOCATION
+
+    application = ApplicationFactory.create_in_status(status=application_status, application_round=application_round)
+    assert application.status == application_status
+
+    graphql.login_with_superuser()
+
+    with disable_reservation_generation():
+        response = graphql(SET_HANDLED_MUTATION, input_data={"pk": application_round.pk})
+
+    if raises_error:
+        assert response.has_errors is True, response.errors
+        assert response.error_message() == "Mutation was unsuccessful."
+        assert response.field_error_messages() == ["Application round has applications still in allocation."]
+    else:
+        assert response.has_errors is False, response.errors
+        application_round.refresh_from_db()
+        assert application_round.status == ApplicationRoundStatusChoice.HANDLED
