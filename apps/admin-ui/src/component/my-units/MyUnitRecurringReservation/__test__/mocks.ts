@@ -114,13 +114,7 @@ const unitResponse: ReservationUnitNode = {
     spaces: [],
     webPage: "",
     reservationunitSet: [],
-    serviceSectors: [
-      {
-        id: "1",
-        pk: 1,
-        name: "service sector",
-      },
-    ],
+    serviceSectors: [],
     unitGroups: [
       {
         id: "1",

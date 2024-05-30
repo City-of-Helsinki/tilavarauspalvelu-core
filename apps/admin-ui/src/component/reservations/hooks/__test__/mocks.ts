@@ -317,5 +317,6 @@ export const mockRecurringReservation: ReservationNode = {
     id: base64encode("RecurringReservationNode:1"),
     name: "recurring",
     reservationUnit,
+    rejectedOccurrences: [],
   },
 };
