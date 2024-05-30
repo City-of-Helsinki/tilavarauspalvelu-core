@@ -5,7 +5,7 @@ from query_optimizer import AnnotatedField
 
 from api.graphql.types.application_round.filtersets import ApplicationRoundFilterSet
 from api.graphql.types.application_round.permissions import ApplicationRoundPermission
-from applications.choices import ApplicationRoundStatusChoice
+from applications.choices import ApplicationRoundStatusChoice, ApplicationStatusChoice
 from applications.models import ApplicationRound
 from common.typing import GQLInfo
 
@@ -16,6 +16,7 @@ class ApplicationRoundNode(DjangoNode):
 
     applications_count = graphene.Int()
     reservation_unit_count = graphene.Int()
+    is_setting_handled_allowed = graphene.Boolean()
 
     class Meta:
         model = ApplicationRound
@@ -41,6 +42,7 @@ class ApplicationRoundNode(DjangoNode):
             "status_timestamp",
             "applications_count",
             "reservation_unit_count",
+            "is_setting_handled_allowed",
         ]
         filterset_class = ApplicationRoundFilterSet
         permission_classes = [ApplicationRoundPermission]
@@ -50,3 +52,12 @@ class ApplicationRoundNode(DjangoNode):
 
     def resolve_reservation_unit_count(root: ApplicationRound, info: GQLInfo) -> int:
         return root.reservation_units.all().count()
+
+    def resolve_is_setting_handled_allowed(root: ApplicationRound, info: GQLInfo) -> bool:
+        if root.status != ApplicationRoundStatusChoice.IN_ALLOCATION:
+            return False
+
+        if root.applications.filter(L(status=ApplicationStatusChoice.IN_ALLOCATION)).exists():
+            return False
+
+        return ApplicationRoundPermission.has_update_permission(root, info.context.user, {})
