@@ -170,6 +170,14 @@ export const ALLOCATED_TIME_SLOTS_QUERY = gql`
           dayOfTheWeek
           endTime
           beginTime
+          recurringReservation {
+            id
+            pk
+            reservations {
+              id
+              pk
+            }
+          }
           reservationUnitOption {
             id
             rejected

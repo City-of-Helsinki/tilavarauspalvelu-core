@@ -94,10 +94,9 @@ export function Filters({
   ).filter((x) => x !== ApplicationSectionStatusChoice.Failed);
   // TODO these are "declined" / "approved" but the decline functionality is not implemented
   // so disabling the filter for now (there is no backend filter for it nor can it be tested)
-  const eventStatusArrayShort: string[] = [];
 
   const eventStatusOptions = (
-    statusOption === "eventShort" ? eventStatusArrayShort : eventStatusArrayLong
+    statusOption === "eventShort" ? [] : eventStatusArrayLong
   ).map((status) => ({
     label: t(`ApplicationSectionStatusChoice.${status}`),
     value: status,
@@ -107,7 +106,9 @@ export function Filters({
     <AutoGrid>
       <MultiSelectFilter name="unit" options={unitOptions} />
       {statusOption !== "application" ? (
-        <MultiSelectFilter name="eventStatus" options={eventStatusOptions} />
+        eventStatusOptions.length > 0 ? (
+          <MultiSelectFilter name="eventStatus" options={eventStatusOptions} />
+        ) : null
       ) : (
         <MultiSelectFilter name="status" options={statusOptions} />
       )}

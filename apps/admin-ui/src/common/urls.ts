@@ -13,8 +13,27 @@ export const applicationRoundUrl = (
 ): string =>
   `${prefixes.recurringReservations}/application-rounds/${applicationRoundId}`;
 
+export function getReservationUrl(pk: Maybe<number> | undefined): string {
+  if (pk == null || !(pk > 0)) {
+    return "";
+  }
+  return `${PUBLIC_URL}/${prefixes.reservations}/${pk}`;
+}
 export const reservationUrl = (reservationId: number | string): string =>
   `${prefixes.reservations}/${reservationId}`;
+
+export function getApplicationUrl(
+  pk: Maybe<number> | undefined,
+  sectionPk?: Maybe<number> | undefined
+): string {
+  if (pk == null || !(pk > 0)) {
+    return "";
+  }
+  if (sectionPk == null || !(sectionPk > 0)) {
+    return `${prefixes.applications}/${pk}`;
+  }
+  return `${PUBLIC_URL}/${prefixes.applications}/${pk}/details#${sectionPk}`;
+}
 
 export const applicationDetailsUrl = (applicationId: number | string): string =>
   `${prefixes.applications}/${applicationId}/details`;

@@ -1,6 +1,6 @@
 import React, { type ReactNode } from "react";
 import styled, { css } from "styled-components";
-import { IconCheckCircleFill, IconCrossCircleFill } from "hds-react";
+import { IconCheckCircleFill } from "hds-react";
 import { useTranslation } from "react-i18next";
 import {
   ApplicationSectionStatusChoice,
@@ -122,26 +122,4 @@ export function ApplicationSectionStatusCell({
       icon={<ApplicationSectionStatusIcon status={status} />}
     />
   );
-}
-
-export function TimeSlotStatusCell({
-  status,
-}: {
-  status: "declined" | "approved";
-}): JSX.Element {
-  const text = `TimeSlotStatusCell.${status}`;
-  const icon =
-    status === "approved" ? (
-      <IconCheckCircleFill
-        aria-hidden
-        style={{ color: "var(--color-success)" }}
-      />
-    ) : (
-      <IconCrossCircleFill
-        aria-hidden
-        style={{ color: "var(--color-danger)" }}
-      />
-    );
-
-  return <StatusCell text={text} icon={icon} />;
 }

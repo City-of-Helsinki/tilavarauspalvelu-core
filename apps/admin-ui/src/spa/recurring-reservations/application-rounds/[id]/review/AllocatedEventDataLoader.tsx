@@ -21,10 +21,7 @@ type Props = {
   applicationRoundPk: number;
 };
 
-// TODO rename the component TimeSlotDataLoader
-export function AllocatedEventDataLoader({
-  applicationRoundPk,
-}: Props): JSX.Element {
+export function TimeSlotDataLoader({ applicationRoundPk }: Props): JSX.Element {
   const { notifyError } = useNotification();
   const [orderBy, handleSortChanged] = useSort(SORT_KEYS);
 

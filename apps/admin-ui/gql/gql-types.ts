@@ -8742,6 +8742,11 @@ export type AllocatedTimeSlotsQuery = {
         dayOfTheWeek: Weekday;
         endTime: string;
         beginTime: string;
+        recurringReservation?: {
+          id: string;
+          pk?: number | null;
+          reservations: Array<{ id: string; pk?: number | null }>;
+        } | null;
         reservationUnitOption: {
           id: string;
           rejected: boolean;
@@ -15526,6 +15531,14 @@ export const AllocatedTimeSlotsDocument = gql`
           dayOfTheWeek
           endTime
           beginTime
+          recurringReservation {
+            id
+            pk
+            reservations {
+              id
+              pk
+            }
+          }
           reservationUnitOption {
             id
             rejected

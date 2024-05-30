@@ -5,11 +5,9 @@ import { memoize } from "lodash";
 import { IconLinkExternal } from "hds-react";
 import type { AllocatedTimeSlotsQuery } from "@gql/gql-types";
 import { convertWeekday } from "common/src/conversion";
-import { PUBLIC_URL } from "@/common/const";
 import { getApplicantName, truncate } from "@/helpers";
-import { applicationDetailsUrl } from "@/common/urls";
+import { getApplicationUrl, getReservationUrl } from "@/common/urls";
 import { CustomTable, ExternalTableLink } from "@/component/Table";
-import { TimeSlotStatusCell } from "./StatusCell";
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
@@ -33,7 +31,7 @@ type ApplicationScheduleView = {
   unitName?: string;
   allocatedReservationUnitName?: string;
   time: string;
-  statusView: JSX.Element;
+  link: string;
 };
 
 function timeSlotMapper(t: TFunction, slot: Node): ApplicationScheduleView {
@@ -47,7 +45,6 @@ function timeSlotMapper(t: TFunction, slot: Node): ApplicationScheduleView {
 
   // TODO should this check the state directly?
   const isAllocated = !slot.reservationUnitOption.rejected;
-  const isDeclined = slot.reservationUnitOption.rejected;
 
   const day = slot?.dayOfTheWeek ? convertWeekday(slot?.dayOfTheWeek) : 0;
   const begin = slot?.beginTime ?? "";
@@ -58,6 +55,8 @@ function timeSlotMapper(t: TFunction, slot: Node): ApplicationScheduleView {
   const name = slot.reservationUnitOption.applicationSection.name ?? "-";
 
   const applicationPk = application.pk ?? 0;
+  const reservationPk = slot.recurringReservation?.reservations[0]?.pk ?? null;
+  const link = getReservationUrl(reservationPk);
   return {
     key: `${applicationPk}-${slot.pk}`,
     applicationPk,
@@ -67,9 +66,7 @@ function timeSlotMapper(t: TFunction, slot: Node): ApplicationScheduleView {
     unitName: allocatedUnit,
     time: timeString,
     name,
-    statusView: (
-      <TimeSlotStatusCell status={isDeclined ? "declined" : "approved"} />
-    ),
+    link,
   };
 }
 
@@ -91,10 +88,7 @@ const COLS = [
       pk,
     }: ApplicationScheduleView) => (
       <ExternalTableLink
-        // TODO use url builder
-        href={`${PUBLIC_URL}${applicationDetailsUrl(applicationPk ?? 0)}#${
-          pk ?? 0
-        }`}
+        href={getApplicationUrl(applicationPk, pk)}
         target="_blank"
         rel="noopener noreferrer"
       >
@@ -135,13 +129,12 @@ const COLS = [
     headerTKey: "ApplicationEventSchedules.headings.time",
     isSortable: true,
     key: "allocated_time_of_week",
-    transform: ({ time }: ApplicationScheduleView) => time,
-  },
-  {
-    headerTKey: "ApplicationEvent.headings.phase",
-    isSortable: true,
-    key: "application_event_status",
-    transform: ({ statusView }: ApplicationScheduleView) => statusView,
+    transform: ({ time, link }: ApplicationScheduleView) => {
+      if (link !== "") {
+        return <ExternalTableLink href={link}>{time}</ExternalTableLink>;
+      }
+      return <span>{time}</span>;
+    },
   },
 ];
 

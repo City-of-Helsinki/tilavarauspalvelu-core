@@ -18,7 +18,7 @@ import TimeframeStatus from "../../TimeframeStatus";
 import { ApplicationDataLoader } from "./ApplicationDataLoader";
 import { Filters } from "./Filters";
 import { ApplicationEventDataLoader } from "./ApplicationEventDataLoader";
-import { AllocatedEventDataLoader } from "./AllocatedEventDataLoader";
+import { TimeSlotDataLoader } from "./AllocatedEventDataLoader";
 
 const Header = styled.div`
   margin-top: var(--spacing-s);
@@ -163,7 +163,7 @@ export function Review({ applicationRound }: ReviewProps): JSX.Element {
                 enableReservationUnit
                 statusOption="eventShort"
               />
-              <AllocatedEventDataLoader
+              <TimeSlotDataLoader
                 applicationRoundPk={applicationRound.pk ?? 0}
               />
             </TabContent>
