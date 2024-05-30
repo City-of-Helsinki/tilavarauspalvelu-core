@@ -9,6 +9,7 @@ from rest_framework.exceptions import ValidationError
 
 from actions.recurring_reservation import ReservationDetails
 from api.graphql.extensions import error_codes
+from applications.choices import WeekdayChoice
 from common.date_utils import local_date
 from common.fields.serializer import CurrentUserDefaultNullable, input_only_field
 from opening_hours.utils.reservable_time_span_client import ReservableTimeSpanClient
@@ -78,7 +79,7 @@ class RecurringReservationCreateSerializer(NestingModelSerializer):
 
     def validate_weekdays(self, weekdays: list[int]) -> str:
         for weekday in weekdays:
-            if weekday not in range(6):
+            if weekday not in WeekdayChoice.values:
                 msg = f"Invalid weekday: {weekday}."
                 raise ValidationError(msg, code=error_codes.RESERVATION_SERIES_INVALID_WEEKDAY)
 

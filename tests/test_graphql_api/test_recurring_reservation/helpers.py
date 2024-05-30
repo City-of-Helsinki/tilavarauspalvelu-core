@@ -17,7 +17,7 @@ CREATE_SERIES_MUTATION = build_mutation("createReservationSeries", "ReservationS
 
 def get_minimal_create_date(reservation_unit: ReservationUnit, **overrides: Any) -> dict[str, Any]:
     return {
-        "weekdays": [0],
+        "weekdays": [6],  # Sun
         "beginDate": datetime.date(2023, 1, 1).isoformat(),
         "endDate": datetime.date(2023, 1, 1).isoformat(),
         "beginTime": datetime.time(10, 0, 0).isoformat(),
