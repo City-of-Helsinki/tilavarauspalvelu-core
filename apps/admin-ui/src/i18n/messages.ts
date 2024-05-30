@@ -520,6 +520,7 @@ const translations: ITranslations = {
     applicants: ["Hakukierroksen hakijat"],
     listHandlingTitle: ["Käsittely"],
     appliedReservations: ["Haetut vuorot"],
+    madeReservations: ["Varatut vuorot"],
     allocatedReservations: ["Jaetut vuorot"],
     applications: ["Hakemukset"],
     roundCriteria: ["Kierroksen kriteerit"],

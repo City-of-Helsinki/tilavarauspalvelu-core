@@ -92,6 +92,10 @@ export function Review({ applicationRound }: ReviewProps): JSX.Element {
     applicationRound.applicationsCount != null &&
     applicationRound.applicationsCount > 0;
 
+  const isApplicationRoundEnded =
+    applicationRound.status === ApplicationRoundStatusChoice.Handled ||
+    applicationRound.status === ApplicationRoundStatusChoice.ResultsSent;
+
   const activeTabIndex =
     selectedTab === "events" ? 1 : selectedTab === "allocated" ? 2 : 0;
 
@@ -135,7 +139,9 @@ export function Review({ applicationRound }: ReviewProps): JSX.Element {
               {t("ApplicationRound.appliedReservations")}
             </Tabs.Tab>
             <Tabs.Tab onClick={() => handleTabChange("allocated")}>
-              {t("ApplicationRound.allocatedReservations")}
+              {isApplicationRoundEnded
+                ? t("ApplicationRound.madeReservations")
+                : t("ApplicationRound.allocatedReservations")}
             </Tabs.Tab>
           </Tabs.TabList>
           <Tabs.TabPanel>
