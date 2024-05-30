@@ -2,6 +2,7 @@ import datetime
 
 import pytest
 
+from reservations.choices import RejectionReadinessChoice
 from tests.factories import RejectedOccurrenceFactory
 
 from .helpers import rejected_occurrence_query
@@ -231,6 +232,33 @@ def test_rejected_recurrence__order__by_end_datetime(graphql):
     assert response.node(2) == {"pk": occurrence_3.pk}
 
     query = rejected_occurrence_query(order_by="endDatetimeDesc")
+    response = graphql(query)
+
+    assert response.has_errors is False
+
+    assert len(response.edges) == 3
+    assert response.node(0) == {"pk": occurrence_3.pk}
+    assert response.node(1) == {"pk": occurrence_2.pk}
+    assert response.node(2) == {"pk": occurrence_1.pk}
+
+
+def test_rejected_recurrence__order__by_rejection_reason(graphql):
+    occurrence_1 = RejectedOccurrenceFactory.create(rejection_reason=RejectionReadinessChoice.INTERVAL_NOT_ALLOWED)
+    occurrence_2 = RejectedOccurrenceFactory.create(rejection_reason=RejectionReadinessChoice.OVERLAPPING_RESERVATIONS)
+    occurrence_3 = RejectedOccurrenceFactory.create(rejection_reason=RejectionReadinessChoice.RESERVATION_UNIT_CLOSED)
+
+    graphql.login_with_superuser()
+    query = rejected_occurrence_query(order_by="rejectionReasonAsc")
+    response = graphql(query)
+
+    assert response.has_errors is False
+
+    assert len(response.edges) == 3
+    assert response.node(0) == {"pk": occurrence_1.pk}
+    assert response.node(1) == {"pk": occurrence_2.pk}
+    assert response.node(2) == {"pk": occurrence_3.pk}
+
+    query = rejected_occurrence_query(order_by="rejectionReasonDesc")
     response = graphql(query)
 
     assert response.has_errors is False

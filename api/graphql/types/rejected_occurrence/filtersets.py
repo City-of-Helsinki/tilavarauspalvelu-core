@@ -38,6 +38,7 @@ class RejectedOccurrenceFilterSet(ModelFilterSet):
             "pk",
             "begin_datetime",
             "end_datetime",
+            "rejection_reason",
             (
                 (
                     "recurring_reservation"
@@ -98,3 +99,6 @@ class RejectedOccurrenceFilterSet(ModelFilterSet):
     @staticmethod
     def order_by_applicant(qs: RejectedOccurrenceQuerySet, desc: bool) -> models.QuerySet:
         return qs.order_by_applicant(desc=desc)
+
+    def order_by_rejection_reason(self, qs: RejectedOccurrenceQuerySet, desc: bool) -> models.QuerySet:
+        return qs.order_by_rejection_reason(desc=desc)
