@@ -11,7 +11,7 @@ import { useNotification } from "@/context/NotificationContext";
 import { Container } from "@/styles/layout";
 import { BasicLink } from "@/styles/util";
 import Loader from "../Loader";
-import ExternalLink from "./ExternalLink";
+import { ExternalLink } from "@/component/ExternalLink";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import Error404 from "@/common/Error404";

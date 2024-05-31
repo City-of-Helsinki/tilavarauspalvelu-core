@@ -7509,6 +7509,29 @@ export type StaffAdjustReservationTimeMutation = {
   } | null;
 };
 
+export type ReservationApplicationLinkQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ReservationApplicationLinkQuery = {
+  recurringReservation?: {
+    id: string;
+    allocatedTimeSlot?: {
+      id: string;
+      pk?: number | null;
+      reservationUnitOption: {
+        id: string;
+        pk?: number | null;
+        applicationSection: {
+          id: string;
+          pk?: number | null;
+          application: { id: string; pk?: number | null };
+        };
+      };
+    } | null;
+  } | null;
+};
+
 export type ReservationMetaFieldsFragment = {
   numPersons?: number | null;
   name?: string | null;
@@ -13001,6 +13024,99 @@ export type StaffAdjustReservationTimeMutationOptions =
     StaffAdjustReservationTimeMutation,
     StaffAdjustReservationTimeMutationVariables
   >;
+export const ReservationApplicationLinkDocument = gql`
+  query ReservationApplicationLink($id: ID!) {
+    recurringReservation(id: $id) {
+      id
+      allocatedTimeSlot {
+        id
+        pk
+        reservationUnitOption {
+          id
+          pk
+          applicationSection {
+            id
+            pk
+            application {
+              id
+              pk
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useReservationApplicationLinkQuery__
+ *
+ * To run a query within a React component, call `useReservationApplicationLinkQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationApplicationLinkQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReservationApplicationLinkQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useReservationApplicationLinkQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ReservationApplicationLinkQuery,
+    ReservationApplicationLinkQueryVariables
+  > &
+    (
+      | { variables: ReservationApplicationLinkQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ReservationApplicationLinkQuery,
+    ReservationApplicationLinkQueryVariables
+  >(ReservationApplicationLinkDocument, options);
+}
+export function useReservationApplicationLinkLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ReservationApplicationLinkQuery,
+    ReservationApplicationLinkQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ReservationApplicationLinkQuery,
+    ReservationApplicationLinkQueryVariables
+  >(ReservationApplicationLinkDocument, options);
+}
+export function useReservationApplicationLinkSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<
+    ReservationApplicationLinkQuery,
+    ReservationApplicationLinkQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ReservationApplicationLinkQuery,
+    ReservationApplicationLinkQueryVariables
+  >(ReservationApplicationLinkDocument, options);
+}
+export type ReservationApplicationLinkQueryHookResult = ReturnType<
+  typeof useReservationApplicationLinkQuery
+>;
+export type ReservationApplicationLinkLazyQueryHookResult = ReturnType<
+  typeof useReservationApplicationLinkLazyQuery
+>;
+export type ReservationApplicationLinkSuspenseQueryHookResult = ReturnType<
+  typeof useReservationApplicationLinkSuspenseQuery
+>;
+export type ReservationApplicationLinkQueryResult = Apollo.QueryResult<
+  ReservationApplicationLinkQuery,
+  ReservationApplicationLinkQueryVariables
+>;
 export const ReservationsByReservationUnitDocument = gql`
   query ReservationsByReservationUnit(
     $id: ID!

@@ -1821,6 +1821,7 @@ const translations: ITranslations = {
       CREATED: ["Luonnos"],
       WAITING_FOR_PAYMENT: ["Odottaa maksua"],
     },
+    applicationLink: ["Avaa hakemus"],
     approve: ["Hyväksy"],
     reject: ["Hylkää"],
     returnToHandling: ["Palauta käsiteltäväksi"],

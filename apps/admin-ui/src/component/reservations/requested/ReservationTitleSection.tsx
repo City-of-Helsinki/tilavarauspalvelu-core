@@ -2,12 +2,18 @@ import React, { forwardRef } from "react";
 import { Tag } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { H1 } from "common/src/common/typography";
+import { H1, fontMedium } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import type { ReservationQuery } from "@gql/gql-types";
+import {
+  useReservationApplicationLinkQuery,
+  type ReservationQuery,
+} from "@gql/gql-types";
 import { getName } from "./util";
 import { HorisontalFlex } from "@/styles/layout";
 import { formatDateTime } from "@/common/util";
+import { getApplicationUrl } from "@/common/urls";
+import { gql } from "@apollo/client";
+import { ExternalLink } from "@/component/ExternalLink";
 
 const Dot = styled.div`
   display: inline-block;
@@ -51,7 +57,11 @@ const Tagline = styled.div`
 
 const DateTime = styled.div`
   margin-bottom: var(--spacing-s);
-  font-size: var(--fontsize-body-s);
+  display: flex;
+  gap: var(--spacing-xs);
+  > a {
+    ${fontMedium}
+  }
 `;
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
@@ -61,9 +71,49 @@ type Props = {
   overrideTitle?: string;
 };
 
+export const APPLICATION_LINK_QUERY = gql`
+  query ReservationApplicationLink($id: ID!) {
+    recurringReservation(id: $id) {
+      id
+      allocatedTimeSlot {
+        id
+        pk
+        reservationUnitOption {
+          id
+          pk
+          applicationSection {
+            id
+            pk
+            application {
+              id
+              pk
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
   ({ reservation, tagline, overrideTitle }: Props, ref) => {
     const { t } = useTranslation();
+
+    // ignore error on purpose because this is going to fail with permission error
+    const { data, error: _err } = useReservationApplicationLinkQuery({
+      variables: { id: reservation.recurringReservation?.id ?? "" },
+      skip: !reservation.recurringReservation?.id,
+    });
+
+    const applicationPk =
+      data?.recurringReservation?.allocatedTimeSlot?.reservationUnitOption
+        ?.applicationSection?.application?.pk;
+    const sectionPk =
+      data?.recurringReservation?.allocatedTimeSlot?.reservationUnitOption
+        ?.applicationSection?.pk;
+    const applicationLink = applicationPk
+      ? getApplicationUrl(applicationPk, sectionPk)
+      : null;
 
     return (
       <div>
@@ -95,6 +145,9 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
         <DateTime>
           {t("RequestedReservation.createdAt")}{" "}
           {formatDateTime(reservation.createdAt ?? "")}
+          <ExternalLink to={applicationLink} size="s">
+            {`${t("RequestedReservation.applicationLink")}: ${applicationPk}-${sectionPk}`}
+          </ExternalLink>
         </DateTime>
       </div>
     );
