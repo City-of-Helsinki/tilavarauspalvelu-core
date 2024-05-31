@@ -1,12 +1,18 @@
 import logging
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
+from django.conf import settings
 from django.db import models
 from django.db.models.functions import Now
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L, lookup_property
 
-from applications.choices import ApplicationRoundStatusChoice, ApplicationStatusChoice, TargetGroupChoice
+from applications.choices import (
+    ApplicationRoundReservationCreationStatusChoice,
+    ApplicationRoundStatusChoice,
+    ApplicationStatusChoice,
+    TargetGroupChoice,
+)
 from applications.querysets.application_round import ApplicationRoundQuerySet
 from common.connectors import ApplicationRoundActionsConnector
 from common.date_utils import local_datetime
@@ -185,3 +191,52 @@ class ApplicationRound(models.Model):
             return False
 
         return not self.applications.filter(L(status=ApplicationStatusChoice.IN_ALLOCATION)).exists()
+
+    @lookup_property(skip_codegen=True)
+    def reservation_creation_status() -> ApplicationRoundReservationCreationStatusChoice:
+        from reservations.models import RecurringReservation
+
+        timeout = timedelta(minutes=settings.APPLICATION_ROUND_RESERVATION_CREATION_TIMEOUT_MINUTES)
+
+        return models.Case(  # type: ignore[return-value]
+            models.When(
+                models.Q(handled_date__isnull=True),
+                then=models.Value(ApplicationRoundReservationCreationStatusChoice.NOT_COMPLETED.value),
+            ),
+            models.When(
+                models.Exists(
+                    RecurringReservation.objects.filter(
+                        allocated_time_slot__reservation_unit_option__application_section__application__application_round=models.OuterRef(
+                            "id"
+                        )
+                    )
+                ),
+                then=models.Value(ApplicationRoundReservationCreationStatusChoice.COMPLETED.value),
+            ),
+            models.When(
+                models.Q(handled_date__lte=Now() - timeout),
+                then=models.Value(ApplicationRoundReservationCreationStatusChoice.FAILED.value),
+            ),
+            default=models.Value(ApplicationRoundReservationCreationStatusChoice.NOT_COMPLETED.value),
+            output_field=models.CharField(),
+        )
+
+    @reservation_creation_status.override
+    def _(self) -> ApplicationRoundReservationCreationStatusChoice:
+        from reservations.models import RecurringReservation
+
+        now = local_datetime()
+        timeout = timedelta(minutes=settings.APPLICATION_ROUND_RESERVATION_CREATION_TIMEOUT_MINUTES)
+
+        if self.handled_date is None:
+            return ApplicationRoundReservationCreationStatusChoice.NOT_COMPLETED
+
+        if RecurringReservation.objects.filter(
+            allocated_time_slot__reservation_unit_option__application_section__application__application_round=self
+        ).exists():
+            return ApplicationRoundReservationCreationStatusChoice.COMPLETED
+
+        if self.handled_date < now - timeout:
+            return ApplicationRoundReservationCreationStatusChoice.FAILED
+
+        return ApplicationRoundReservationCreationStatusChoice.NOT_COMPLETED
