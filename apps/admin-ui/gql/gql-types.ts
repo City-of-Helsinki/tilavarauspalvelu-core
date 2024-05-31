@@ -7801,6 +7801,12 @@ export type RecurringReservationQuery = {
     weekdays?: Array<number | null> | null;
     beginDate?: string | null;
     endDate?: string | null;
+    rejectedOccurrences: Array<{
+      id: string;
+      beginDatetime: string;
+      endDatetime: string;
+      rejectionReason: RejectionReadinessChoice;
+    }>;
     reservations: Array<{
       id: string;
       pk?: number | null;
@@ -13315,6 +13321,12 @@ export const RecurringReservationDocument = gql`
       weekdays
       beginDate
       endDate
+      rejectedOccurrences {
+        id
+        beginDatetime
+        endDatetime
+        rejectionReason
+      }
       reservations {
         id
         pk

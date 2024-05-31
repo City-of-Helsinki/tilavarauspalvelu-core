@@ -5,15 +5,21 @@ import { format } from "date-fns";
 import {
   State,
   type ReservationQuery,
-  RecurringReservationQuery,
+  type RecurringReservationQuery,
+  useRecurringReservationQuery,
 } from "@gql/gql-types";
 import { type ApolloQueryResult } from "@apollo/client";
-import { useRecurringReservations } from "./hooks";
-import { ReservationList } from "@/component/ReservationsList";
+import {
+  NewReservationListItem,
+  ReservationList,
+} from "@/component/ReservationsList";
 import ReservationListButton from "@/component/ReservationListButton";
 import DenyDialog from "./DenyDialog";
 import { useModal } from "@/context/ModalContext";
 import EditTimeModal from "../EditTimeModal";
+import { base64encode, filterNonNullable } from "common/src/helpers";
+import { useNotification } from "app/context/NotificationContext";
+import { LoadingSpinner } from "hds-react";
 
 type RecurringReservationType = NonNullable<
   RecurringReservationQuery["recurringReservation"]
@@ -33,20 +39,30 @@ function RecurringReservationsView({
 }) {
   const { t } = useTranslation();
   const { setModalContent } = useModal();
+  const { notifyError } = useNotification();
 
-  const { loading, reservations, refetch } =
-    useRecurringReservations(recurringPk);
+  const id = base64encode(`RecurringReservationNode:${recurringPk}`);
+  const { data, loading, refetch } = useRecurringReservationQuery({
+    skip: !recurringPk,
+    fetchPolicy: "cache-and-network",
+    nextFetchPolicy: "cache-first",
+    variables: { id },
+    onError: () => {
+      notifyError(t("errors.errorFetchingData"));
+    },
+  });
+
+  const { recurringReservation } = data ?? {};
+  const reservations = filterNonNullable(recurringReservation?.reservations);
 
   if (loading) {
-    return <div>Loading</div>;
+    return <LoadingSpinner />;
   }
 
   const handleChangeSuccess = () => {
     setModalContent(null);
     refetch();
-    if (onChange) {
-      onChange();
-    }
+    onChange?.();
   };
 
   type ReservationEditType = NonNullable<ReservationQuery["reservation"]>;
@@ -74,9 +90,7 @@ function RecurringReservationsView({
         reservations={[res]}
         onReject={() => {
           refetch();
-          if (onReservationUpdated) {
-            onReservationUpdated();
-          }
+          onReservationUpdated?.();
           handleCloseRemoveDialog();
         }}
         onClose={handleCloseRemoveDialog}
@@ -85,7 +99,22 @@ function RecurringReservationsView({
     );
   };
 
-  const forDisplay = reservations.map((x) => {
+  const { rejectedOccurrences } = recurringReservation ?? {};
+  const rejected: NewReservationListItem[] =
+    rejectedOccurrences?.map((x) => {
+      const startDate = new Date(x.beginDatetime);
+      const endDate = new Date(x.endDatetime);
+      return {
+        date: startDate,
+        startTime: format(startDate, "H:mm"),
+        endTime: format(endDate, "H:mm"),
+        isRemoved: true,
+        reason: x.rejectionReason,
+        buttons: [],
+      };
+    }) ?? [];
+
+  const forDisplay: NewReservationListItem[] = reservations.map((x) => {
     const buttons = [];
     const startDate = new Date(x.begin);
     const endDate = new Date(x.end);
@@ -124,6 +153,7 @@ function RecurringReservationsView({
         );
       }
     }
+
     return {
       date: startDate,
       startTime: format(startDate, "H:mm"),
@@ -133,10 +163,14 @@ function RecurringReservationsView({
     };
   });
 
+  const items = forDisplay
+    .concat(rejected)
+    .sort((a, b) => a.date.getTime() - b.date.getTime());
+
   return (
     <ReservationList
       header={<H6 as="h3">{t("RecurringReservationsView.Heading")}</H6>}
-      items={forDisplay}
+      items={items}
     />
   );
 }

@@ -376,6 +376,12 @@ const translations: ITranslations = {
         failureInfoSecondParagraph: [
           "Voit halutessasi etsiä näille toistoille uuden ajan varauksen sivulta.",
         ],
+        // TODO these should be in the common translations (enum)
+        RejectionReadinessChoice: {
+          INTERVAL_NOT_ALLOWED: ["Aloitusaika ei sallittu"],
+          OVERLAPPING_RESERVATIONS: ["Päivämäärä ei saatavilla"],
+          RESERVATION_UNIT_CLOSED: ["Suljettu"],
+        },
         failureMessages: {
           reservationInPast: ["Aika menneisyydessä"],
           overlap: ["Päällekkäinen varaus"],

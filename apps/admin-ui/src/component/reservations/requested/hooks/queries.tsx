@@ -151,6 +151,12 @@ export const RECURRING_RESERVATION_QUERY = gql`
       weekdays
       beginDate
       endDate
+      rejectedOccurrences {
+        id
+        beginDatetime
+        endDatetime
+        rejectionReason
+      }
       reservations {
         id
         pk

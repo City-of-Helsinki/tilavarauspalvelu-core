@@ -2,12 +2,13 @@ import React from "react";
 import { toUIDate } from "common/src/common/util";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { Button } from "hds-react";
+import { RejectionReadinessChoice } from "@gql/gql-types";
 
 export type NewReservationListItem = {
   date: Date;
   startTime: string;
   endTime: string;
+  reason?: RejectionReadinessChoice;
   error?: string;
   reservationPk?: number;
   buttons?: React.ReactNode;
@@ -23,8 +24,6 @@ type Props = {
   header?: React.ReactNode;
   items: NewReservationListItem[];
   hasPadding?: boolean;
-  onLoadMore?: () => void;
-  hasMore?: boolean;
 };
 
 // In the UI spec parent container max height is 22rem, but overflow forces us to define child max-height
@@ -74,20 +73,23 @@ const ErrorLabel = styled.div<{ $isError: boolean }>`
   }
 `;
 
-const CenterContent = styled.div`
-  display: flex;
-  justify-content: center;
-  margin: 1rem 0;
-`;
-
 const stripTimeZeros = (time: string) =>
   time.startsWith("0") ? time.substring(1) : time;
 
-const getStatus = (x: NewReservationListItem) => {
+// TODO this function should be refactored
+// all the messages and label types should be enum -> object mapping (or similar)
+// and they should be stored in a single field in the ListItem object
+function getStatus(x: NewReservationListItem) {
   if (x.isOverlapping) {
     return {
       isError: true,
       msg: "overlapping",
+    };
+  }
+  if (x.reason) {
+    return {
+      isError: true,
+      msg: `RejectionReadinessChoice.${x.reason}`,
     };
   }
   if (x.isRemoved) {
@@ -119,9 +121,9 @@ const getStatus = (x: NewReservationListItem) => {
     };
   }
   return undefined;
-};
+}
 
-const StatusElement = ({ item }: { item: NewReservationListItem }) => {
+function StatusElement({ item }: { item: NewReservationListItem }) {
   const { t } = useTranslation("translation", {
     keyPrefix: "MyUnits.RecurringReservation.Confirmation",
   });
@@ -138,20 +140,14 @@ const StatusElement = ({ item }: { item: NewReservationListItem }) => {
       <span>{t(msg)}</span>
     </ErrorLabel>
   );
-};
+}
 
 /// Used by the RecurringReservation pages to show a list of reservations
 /// TODO should be renamed / moved to signify that this is only for recurring reservations
-export function ReservationList({
-  header,
-  items,
-  hasPadding,
-  onLoadMore,
-  hasMore,
-}: Props) {
-  const { t } = useTranslation();
-
-  if (!items.length) return null;
+export function ReservationList({ header, items, hasPadding }: Props) {
+  if (items.length === 0) {
+    return null;
+  }
 
   return (
     <ListWrapper data-testid="reservations-list">
@@ -174,18 +170,6 @@ export function ReservationList({
             <div>{item.buttons}</div>
           </StyledListItem>
         ))}
-        {hasMore && onLoadMore && (
-          <CenterContent>
-            <Button
-              variant="secondary"
-              size="small"
-              type="button"
-              onClick={onLoadMore}
-            >
-              {t("common.showMore")}
-            </Button>
-          </CenterContent>
-        )}
       </StyledList>
     </ListWrapper>
   );
