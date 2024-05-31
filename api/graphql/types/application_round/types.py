@@ -5,7 +5,7 @@ from query_optimizer import AnnotatedField
 
 from api.graphql.types.application_round.filtersets import ApplicationRoundFilterSet
 from api.graphql.types.application_round.permissions import ApplicationRoundPermission
-from applications.choices import ApplicationRoundStatusChoice
+from applications.choices import ApplicationRoundReservationCreationStatusChoice, ApplicationRoundStatusChoice
 from applications.models import ApplicationRound
 from common.typing import GQLInfo
 
@@ -13,6 +13,10 @@ from common.typing import GQLInfo
 class ApplicationRoundNode(DjangoNode):
     status = AnnotatedField(graphene.Enum.from_enum(ApplicationRoundStatusChoice), expression=L("status"))
     status_timestamp = graphene.DateTime()
+    reservation_creation_status = AnnotatedField(
+        graphene.Enum.from_enum(ApplicationRoundReservationCreationStatusChoice),
+        expression=L("reservation_creation_status"),
+    )
 
     applications_count = graphene.Int()
     reservation_unit_count = graphene.Int()
@@ -45,6 +49,7 @@ class ApplicationRoundNode(DjangoNode):
             "status_timestamp",
             "applications_count",
             "reservation_unit_count",
+            "reservation_creation_status",
             "is_setting_handled_allowed",
         ]
         filterset_class = ApplicationRoundFilterSet
