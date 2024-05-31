@@ -16026,7 +16026,7 @@ export type AllocatedTimeSlotsQueryResult = Apollo.QueryResult<
 >;
 export const ApplicationRoundsDocument = gql`
   query ApplicationRounds {
-    applicationRounds {
+    applicationRounds(onlyWithPermissions: true) {
       edges {
         node {
           ...ApplicationRoundBase

@@ -14,7 +14,7 @@ const APPLICATION_ROUND_BASE_FRAGMENT = gql`
 export const APPLICATION_ROUNDS_QUERY = gql`
   ${APPLICATION_ROUND_BASE_FRAGMENT}
   query ApplicationRounds {
-    applicationRounds {
+    applicationRounds(onlyWithPermissions: true) {
       edges {
         node {
           ...ApplicationRoundBase
