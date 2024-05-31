@@ -1,7 +1,14 @@
+import datetime
+
 import pytest
 
-from applications.choices import ApplicationRoundStatusChoice, ApplicationStatusChoice
-from tests.factories import ApplicationFactory, ApplicationRoundFactory, ReservationUnitFactory
+from applications.choices import (
+    ApplicationRoundReservationCreationStatusChoice,
+    ApplicationRoundStatusChoice,
+    ApplicationStatusChoice,
+)
+from common.date_utils import local_datetime
+from tests.factories import ApplicationFactory, ApplicationRoundFactory, ReservationFactory, ReservationUnitFactory
 from tests.helpers import UserType
 from tests.test_graphql_api.test_application_round.helpers import rounds_query
 
@@ -197,3 +204,77 @@ def test_application_round_query__is_setting_handled_allowed__application_status
 
     assert application_round.is_setting_handled_allowed is True
     assert response.node() == {"isSettingHandledAllowed": True}
+
+
+def test_application_round_query__reservation_creation_status__NOT_COMPLETED__not_set_as_handled(graphql):
+    application_round = ApplicationRoundFactory.create_in_status_handled(handled_date=None)
+    ApplicationFactory.create_in_status_handled(application_round=application_round)
+
+    graphql.login_with_superuser()
+    response = graphql(rounds_query(fields="reservationCreationStatus"))
+
+    state = ApplicationRoundReservationCreationStatusChoice.NOT_COMPLETED
+    assert application_round.reservation_creation_status == state
+    assert response.node() == {"reservationCreationStatus": state}
+
+
+def test_application_round_query__reservation_creation_status__NOT_COMPLETED__before_timeout(graphql):
+    application_round = ApplicationRoundFactory.create_in_status_handled(
+        handled_date=local_datetime() - datetime.timedelta(minutes=9)
+    )
+    ApplicationFactory.create_in_status_handled(application_round=application_round)
+
+    graphql.login_with_superuser()
+    response = graphql(rounds_query(fields="reservationCreationStatus"))
+
+    state = ApplicationRoundReservationCreationStatusChoice.NOT_COMPLETED
+    assert application_round.reservation_creation_status == state
+    assert response.node() == {"reservationCreationStatus": state}
+
+
+def test_application_round_query__reservation_creation_status__FAILED__after_timeout(graphql):
+    application_round = ApplicationRoundFactory.create_in_status_handled(
+        handled_date=local_datetime() - datetime.timedelta(minutes=11)
+    )
+    ApplicationFactory.create_in_status_handled(application_round=application_round)
+
+    graphql.login_with_superuser()
+    response = graphql(rounds_query(fields="reservationCreationStatus"))
+
+    state = ApplicationRoundReservationCreationStatusChoice.FAILED
+    assert application_round.reservation_creation_status == state
+    assert response.node() == {"reservationCreationStatus": state}
+
+
+def test_application_round_query__reservation_creation_status__COMPLETED__before_timeout(graphql):
+    application_round = ApplicationRoundFactory.create_in_status_handled(
+        handled_date=local_datetime() - datetime.timedelta(minutes=9)
+    )
+    application = ApplicationFactory.create_in_status_handled(application_round=application_round)
+    ReservationFactory(
+        recurring_reservation__allocated_time_slot__reservation_unit_option__application_section__application=application
+    )
+
+    graphql.login_with_superuser()
+    response = graphql(rounds_query(fields="reservationCreationStatus"))
+
+    state = ApplicationRoundReservationCreationStatusChoice.COMPLETED
+    assert application_round.reservation_creation_status == state
+    assert response.node() == {"reservationCreationStatus": state}
+
+
+def test_application_round_query__reservation_creation_status__COMPLETED__after_timeout(graphql):
+    application_round = ApplicationRoundFactory.create_in_status_handled(
+        handled_date=local_datetime() - datetime.timedelta(minutes=11)
+    )
+    application = ApplicationFactory.create_in_status_handled(application_round=application_round)
+    ReservationFactory(
+        recurring_reservation__allocated_time_slot__reservation_unit_option__application_section__application=application
+    )
+
+    graphql.login_with_superuser()
+    response = graphql(rounds_query(fields="reservationCreationStatus"))
+
+    state = ApplicationRoundReservationCreationStatusChoice.COMPLETED
+    assert application_round.reservation_creation_status == state
+    assert response.node() == {"reservationCreationStatus": state}

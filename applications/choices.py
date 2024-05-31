@@ -171,6 +171,17 @@ class ApplicationRoundStatusChoice(models.TextChoices):
         ]
 
 
+class ApplicationRoundReservationCreationStatusChoice(models.TextChoices):
+    NOT_COMPLETED = "NOT_COMPLETED", _("Not completed")
+    """The ApplicationRound has not been marked as completed yet or the reservations have not been created yet"""
+
+    COMPLETED = "COMPLETED", _("Completed")
+    """All reservations for the ApplicationRound have been created successfully"""
+
+    FAILED = "FAILED", _("Failed")
+    """Reservations for the ApplicationRound could not be created successfully or reservation creation has timed out"""
+
+
 class ApplicationStatusChoice(models.TextChoices):
     DRAFT = "DRAFT", _("Draft")
     """Application started but not ready"""
