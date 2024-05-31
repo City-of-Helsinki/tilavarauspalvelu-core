@@ -4,9 +4,9 @@ from datetime import date, datetime
 from django.db import models
 from django.db.models.functions import Now
 from django.utils.translation import gettext_lazy as _
-from lookup_property import lookup_property
+from lookup_property import L, lookup_property
 
-from applications.choices import ApplicationRoundStatusChoice, TargetGroupChoice
+from applications.choices import ApplicationRoundStatusChoice, ApplicationStatusChoice, TargetGroupChoice
 from applications.querysets.application_round import ApplicationRoundQuerySet
 from common.connectors import ApplicationRoundActionsConnector
 from common.date_utils import local_datetime
@@ -14,7 +14,6 @@ from common.date_utils import local_datetime
 __all__ = [
     "ApplicationRound",
 ]
-
 
 logger = logging.getLogger(__name__)
 
@@ -145,3 +144,44 @@ class ApplicationRound(models.Model):
                 return self.handled_date
             case ApplicationRoundStatusChoice.RESULTS_SENT:
                 return self.sent_date
+
+    @lookup_property(skip_codegen=True)
+    def is_setting_handled_allowed() -> bool:
+        """
+        Can this Application Round be set to HANDLED?
+
+        Note: As lookup_properties are stateless, we can only check for statuses.
+        The user permissions must also be checked: ApplicationRoundPermission.has_update_permission(root, user, {})
+        """
+        from applications.models import Application
+
+        return models.Case(  # type: ignore[return-value]
+            models.When(
+                ~models.Q(L(status=ApplicationRoundStatusChoice.IN_ALLOCATION)),
+                then=False,
+            ),
+            models.When(
+                models.Exists(
+                    Application.objects.filter(
+                        models.Q(application_round=models.OuterRef("id")),
+                        models.Q(L(status=ApplicationStatusChoice.IN_ALLOCATION)),
+                    )
+                ),
+                then=False,
+            ),
+            default=True,
+            output_field=models.BooleanField(),
+        )
+
+    @is_setting_handled_allowed.override
+    def _(self) -> bool:
+        """
+        Can this Application Round be set to HANDLED?
+
+        Note: As lookup_properties are stateless, we can only check for statuses.
+        The user permissions must also be checked: ApplicationRoundPermission.has_update_permission(root, user, {})
+        """
+        if self.status != ApplicationRoundStatusChoice.IN_ALLOCATION:
+            return False
+
+        return not self.applications.filter(L(status=ApplicationStatusChoice.IN_ALLOCATION)).exists()
