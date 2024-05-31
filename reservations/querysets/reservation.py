@@ -1,19 +1,24 @@
+from __future__ import annotations
+
 import datetime
 from dataclasses import dataclass
-from typing import Annotated, Any, Self
+from typing import TYPE_CHECKING, Annotated, Any, Self
 
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models import F, Q, QuerySet, Subquery, Sum
 
-from applications.models import ApplicationRound
 from common.date_utils import local_datetime
 from common.db import ArrayRemove
 from merchants.models import OrderStatus
 from opening_hours.utils.time_span_element import TimeSpanElement
 from reservation_units.models import ReservationUnit
-from reservation_units.querysets import ReservationUnitQuerySet
 from reservations.choices import ReservationStateChoice, ReservationTypeChoice
+
+if TYPE_CHECKING:
+    from applications.models import ApplicationRound
+    from reservation_units.querysets import ReservationUnitQuerySet
+
 
 ReservationUnitPK = Annotated[int, "ReservationUnit PK"]
 SpacePK = Annotated[int, "Space PK"]
