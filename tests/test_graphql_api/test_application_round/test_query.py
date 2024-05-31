@@ -159,6 +159,7 @@ def test_application_round_query__is_setting_handled_allowed__no_permissions__fa
     graphql.login_with_regular_user()
     response = graphql(rounds_query(fields="isSettingHandledAllowed"))
 
+    assert application_round.is_setting_handled_allowed is True  # lookup_property does not check for permissions
     assert response.node() == {"isSettingHandledAllowed": False}
 
 
@@ -172,6 +173,7 @@ def test_application_round_query__is_setting_handled_allowed__application_in_all
     graphql.login_with_superuser()
     response = graphql(rounds_query(fields="isSettingHandledAllowed"))
 
+    assert application_round.is_setting_handled_allowed is False
     assert response.node() == {"isSettingHandledAllowed": False}
 
 
@@ -193,4 +195,5 @@ def test_application_round_query__is_setting_handled_allowed__application_status
     graphql.login_with_superuser()
     response = graphql(rounds_query(fields="isSettingHandledAllowed"))
 
+    assert application_round.is_setting_handled_allowed is True
     assert response.node() == {"isSettingHandledAllowed": True}
