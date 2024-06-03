@@ -32,6 +32,7 @@ def save_sql_queries_from_request(queries: list[QueryInfo], path: str, body: byt
             sql=query["sql"],
             succeeded=query["succeeded"],
             duration_ns=query["duration_ns"],
+            stack_info=query["stack_info"],
         )
         for query in queries
     ]
