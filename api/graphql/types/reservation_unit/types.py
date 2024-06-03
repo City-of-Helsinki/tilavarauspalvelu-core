@@ -278,8 +278,9 @@ class ReservationUnitNode(DjangoNode):
                 parent=optimizer,
             ),
         )
+        optimizer.related_fields.append("origin_hauki_resource_id")
 
-        # Fetch `unit` and `hauki_department_id` if not fetched yet.
+        # Fetch `unit` and `tprek_department_id` if not fetched yet.
         unit_optimizer = optimizer.get_or_set_child_optimizer(
             name="unit",
             optimizer=QueryOptimizer(
@@ -289,7 +290,8 @@ class ReservationUnitNode(DjangoNode):
                 parent=optimizer,
             ),
         )
-        unit_optimizer.only_fields.append("hauki_department_id")
+        optimizer.related_fields.append("unit_id")
+        unit_optimizer.only_fields.append("tprek_department_id")
 
         return queryset
 
@@ -320,6 +322,9 @@ class ReservationUnitNode(DjangoNode):
 
     @staticmethod
     def optimize_num_active_user_reservations(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
+        if optimizer.info.context.user.is_anonymous:
+            return queryset.annotate(num_active_user_reservations=models.Value(0))
+
         return queryset.annotate(
             num_active_user_reservations=SubqueryCount(
                 Reservation.objects.filter(
@@ -337,6 +342,4 @@ class ReservationUnitNode(DjangoNode):
         Number of active reservations made by the user to this ReservationUnit.
         This is used to determine if the user can make a new reservation based on the max_reservations_per_user.
         """
-        if not info.context.user.is_authenticated:
-            return 0
         return getattr(root, "num_active_user_reservations", 0)
