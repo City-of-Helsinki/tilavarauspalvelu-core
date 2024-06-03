@@ -48,6 +48,7 @@ from .utils import with_logs
 
 
 @with_logs("Starting test data creation...", "Test data created!")
+@ReservationUnitHierarchy.delay_refresh()
 def create_test_data(flush: bool = True) -> None:
     if flush:
         _clear_database()
@@ -123,8 +124,6 @@ def create_test_data(flush: bool = True) -> None:
     )
     _create_banner_notifications()
     _create_periodic_tasks()
-
-    ReservationUnitHierarchy.refresh()
 
 
 @with_logs("Flushing database...", "Database flushed!")
