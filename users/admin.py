@@ -32,6 +32,7 @@ class UserAdmin(admin.ModelAdmin):
         "ad_groups",
         "has_staff_permissions",
         "id_token",
+        "groups",
     ]
     readonly_fields = [
         "last_login",
@@ -51,6 +52,7 @@ class UserAdmin(admin.ModelAdmin):
     ordering = [
         "username",
     ]
+    filter_horizontal = ["groups"]
 
     actions = ["anonymize_user_data"]
 
