@@ -834,6 +834,18 @@ msgstr "Käsitelty"
 msgid "Results Sent"
 msgstr "Päätökset lähetetty"
 
+#: applications/choices.py
+msgid "Not completed"
+msgstr "Ei valmis"
+
+#: applications/choices.py
+msgid "Completed"
+msgstr "Valmis"
+
+#: applications/choices.py
+msgid "Failed"
+msgstr "Epäonnistunut"
+
 #: applications/choices.py common/choices/banner_notification.py
 #: merchants/models.py
 msgid "Draft"
@@ -858,10 +870,6 @@ msgstr "Vastaanotettu"
 #: applications/choices.py
 msgid "Reserved"
 msgstr "Varattu"
-
-#: applications/choices.py
-msgid "Failed"
-msgstr "Varaus epäonnistunut"
 
 #: applications/choices.py
 msgid "Internal"
