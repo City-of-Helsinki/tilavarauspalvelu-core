@@ -4,6 +4,7 @@ from django.db.models import Q
 from graphene_django_extensions import DjangoNode
 from lookup_property import L
 from query_optimizer import AnnotatedField
+from query_optimizer.optimizer import QueryOptimizer
 
 from api.graphql.types.application.filtersets import ApplicationFilterSet
 from api.graphql.types.application.permissions import ApplicationPermission
@@ -14,6 +15,7 @@ from applications.models import Application
 from common.typing import GQLInfo
 from permissions.helpers import can_access_application_private_fields, has_any_general_permission
 from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
+from users.models import User
 
 __all__ = [
     "ApplicationNode",
@@ -54,8 +56,28 @@ class ApplicationNode(DjangoNode):
         max_complexity = 22
 
     @classmethod
+    def pre_optimization_hook(cls, queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
+        # Add unit ids for permission checks
+        optimizer.annotations["unit_ids_for_perms"] = L("unit_ids_for_perms")
+        optimizer.annotations["unit_group_ids_for_perms"] = L("unit_group_ids_for_perms")
+
+        # Add user id for permission checks
+        user_optimizer = optimizer.get_or_set_child_optimizer(
+            "user",
+            QueryOptimizer(
+                User,
+                info=optimizer.info,
+                name="user",
+                parent=optimizer,
+            ),
+        )
+        user_optimizer.only_fields.append("id")
+        return queryset
+
+    @classmethod
     def filter_queryset(cls, queryset: models.QuerySet, info: GQLInfo) -> models.QuerySet:
         user = info.context.user
+
         if user.is_anonymous:
             return queryset.none()
         if user.is_superuser:
@@ -74,16 +96,8 @@ class ApplicationNode(DjangoNode):
             if any(p in perms for p in UnitPermissionChoices.handle_or_validate_applications)
         ]
 
-        return (
-            queryset.annotate(
-                # Annotations ard used later in permission checks
-                unit_ids_for_perms=L("unit_ids_for_perms"),
-                unit_group_ids_for_perms=L("unit_group_ids_for_perms"),
-            )
-            .filter(
-                Q(user=user)
-                | Q(application_sections__reservation_unit_options__reservation_unit__unit__in=u_ids)
-                | Q(application_sections__reservation_unit_options__reservation_unit__unit__unit_groups__in=g_ids)
-            )
-            .distinct()
-        )
+        return queryset.filter(
+            Q(user=user)
+            | Q(application_sections__reservation_unit_options__reservation_unit__unit__in=u_ids)
+            | Q(application_sections__reservation_unit_options__reservation_unit__unit__unit_groups__in=g_ids)
+        ).distinct()

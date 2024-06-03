@@ -19,7 +19,6 @@ from api.legacy_rest_api.permissions import (
     ReservationPermission,
     ReservationUnitPermission,
 )
-from common.typing import AnyUser
 from opening_hours.utils.summaries import get_resources_total_hours_per_resource
 from permissions.helpers import has_general_permission
 from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
@@ -35,8 +34,12 @@ from .utils import export_reservation_events, get_host, hmac_signature, reservat
 if TYPE_CHECKING:
     import datetime
 
+    from common.typing import AnyUser
+
 
 class ReservationIcalViewset(ViewSet):
+    # Used by ReservationNode.resolve_calendar_url!
+
     queryset = Reservation.objects.all()
 
     def get_object(self):
