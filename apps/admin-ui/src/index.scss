@@ -1,13 +1,6 @@
 @import "font";
 @import "variables";
 
-html,
-body,
-#__next {
-  height: 100%;
-  margin: 0;
-}
-
 /* hack to deal with iPhone user agent overriding inherited colours with apple-system-blue */
 input:is([type="button"], [type="submit"], [type="reset"]),
 input[type="file"]::file-selector-button,
