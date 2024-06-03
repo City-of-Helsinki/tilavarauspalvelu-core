@@ -410,8 +410,8 @@ class Common(Environment):
     CELERY_TASK_TRACK_STARTED = False
     CELERY_TASK_TIME_LIMIT = values.IntegerValue(default=5 * 60)  # 5 minutes
 
-    CELERY_QUEUE_FOLDER_OUT = values.StringValue(default="/broker/processed/")
-    CELERY_QUEUE_FOLDER_IN = values.StringValue(default="/broker/processed/")
+    CELERY_QUEUE_FOLDER_OUT = values.StringValue(default="/broker/queue/")
+    CELERY_QUEUE_FOLDER_IN = values.StringValue(default="/broker/queue/")
     CELERY_PROCESSED_FOLDER = values.StringValue(default="/broker/processed/")
 
     @classmethod
@@ -603,8 +603,8 @@ class Local(LocalMixin, Common):
     # --- Celery settings --------------------------------------------------------------------------------------------
 
     CELERY_LOG_FILE = values.StringValue(default="./broker/worker.log")
-    CELERY_QUEUE_FOLDER_OUT = values.StringValue(default="./broker/processed/")
-    CELERY_QUEUE_FOLDER_IN = values.StringValue(default="./broker/processed/")
+    CELERY_QUEUE_FOLDER_OUT = values.StringValue(default="./broker/queue/")
+    CELERY_QUEUE_FOLDER_IN = values.StringValue(default="./broker/queue/")
     CELERY_PROCESSED_FOLDER = values.StringValue(default="./broker/processed/")
 
     # --- Redis settings ---------------------------------------------------------------------------------------------
@@ -719,6 +719,9 @@ class AutomatedTests(AutomatedTestMixin, EmptyDefaults, Common, dotenv_path=None
     GRAPHENE = {
         "SCHEMA": Common.GRAPHENE["SCHEMA"],
         "TESTING_ENDPOINT": "/graphql/",
+        "MIDDLEWARE": [
+            "tilavarauspalvelu.middleware.GraphQLErrorLoggingMiddleware",
+        ],
     }
 
     # --- Static file settings ---------------------------------------------------------------------------------------
@@ -788,7 +791,7 @@ class AutomatedTests(AutomatedTestMixin, EmptyDefaults, Common, dotenv_path=None
     # --- Misc settings ----------------------------------------------------------------------------------------------
 
     TPREK_UNIT_URL = "https://fake.test.tprek.com"
-    ICAL_HASH_SECRET = "qhoew923uqqwee"  # nosec # NOSONAR
+    ICAL_HASH_SECRET = "qhoew923uqqwee"  # noqa: S105 # nosec # NOSONAR
 
 
 class Build(EmptyDefaults, Common, use_environ=True):
