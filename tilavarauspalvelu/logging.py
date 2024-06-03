@@ -16,7 +16,9 @@ class TVPFormatter(logging.Formatter):
             request: WSGIRequest = record.request
             extra["url"] = request.path
             extra["headers"] = json.dumps(dict(request.headers))
-            extra["user_id"] = "Anonymous" if request.user.is_anonymous else request.user.id
+            user = getattr(request, "user", None)
+            if user is not None:
+                extra["user_id"] = "Anonymous" if getattr(user, "is_anonymous", False) else user.id
 
         self._style._defaults = extra
         return super().format(record)
