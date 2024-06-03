@@ -70,14 +70,16 @@ export const H2 = styled.h2<{ $legacy?: boolean }>`
   }
 `;
 
-export const H3 = styled.h3`
-  font-size: var(--fontsize-heading-m);
+export const H3 = styled.h3<{ $legacy?: boolean }>`
+  font-size: ${({ $legacy }) =>
+    $legacy ? `var(--fontsize-heading-s)` : `var(--fontsize-heading-m)`};
   ${fontRegular}
   line-height: 2rem;
   margin-bottom: var(--spacing-m);
 
   @media (min-width: ${breakpoints.s}) {
-    font-size: 2rem;
+    font-size: ${({ $legacy }) =>
+      $legacy ? `var(--fontsize-heading-xs)` : `var(--fontsize-heading-s)`};
   }
 `;
 

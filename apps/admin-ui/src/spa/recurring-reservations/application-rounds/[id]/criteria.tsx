@@ -3,7 +3,7 @@ import { gql } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
-import { H1, H2, H3, Strong } from "common/src/common/typography";
+import { H2, H3, SemiBold, Strong } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { useApplicationRoundCriteriaQuery } from "@gql/gql-types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
@@ -20,57 +20,15 @@ interface IRouteParams {
   applicationRoundId: string;
 }
 
-const Details = styled.div`
-  max-width: ${breakpoints.l};
+const HeadContainer = styled.div`
+  display: flex;
+  gap: var(--spacing-s);
+  flex-direction: column;
+  justify-content: space-between;
 
-  > div {
-    &.block {
-      @media (min-width: ${breakpoints.l}) {
-        display: block;
-      }
-    }
-
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-s);
-    margin-bottom: var(--spacing-m);
-
-    ${Strong} {
-      font-size: var(--fontsize-heading-xs);
-    }
+  @media (min-width: ${breakpoints.s}) {
+    flex-direction: row;
   }
-
-  @media (min-width: ${breakpoints.l}) {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: var(--spacing-m);
-  }
-`;
-
-const ReservationUnitCount = styled(H2).attrs({
-  as: "div",
-  $legacy: true,
-})`
-  margin-bottom: var(--spacing-3-xs);
-`;
-
-const StyledAccordion = styled(Accordion)`
-  h2.heading {
-    padding: 0 var(--spacing-m);
-  }
-`;
-
-const TitleBox = styled.div`
-  ${H3} {
-    margin-bottom: var(--spacing-2-xs);
-  }
-
-  div {
-    margin-bottom: var(--spacing-2-xs);
-  }
-
-  margin-bottom: var(--spacing-layout-l);
 `;
 
 const ReservationUnits = styled.div`
@@ -173,27 +131,25 @@ function Criteria({
     <>
       <BreadcrumbWrapper route={route} />
       <Container>
-        <H1 $legacy>{applicationRound.nameFi}</H1>
-        <Details>
-          <div>
-            <TimeframeStatus
-              applicationPeriodBegin={applicationRound.applicationPeriodBegin}
-              applicationPeriodEnd={applicationRound.applicationPeriodEnd}
-            />
-          </div>
-          <div>
-            <ReservationUnitCount>
-              {applicationRound.reservationUnitCount}
-            </ReservationUnitCount>
-            <div>{t("ApplicationRound.attachedReservationUnits")}</div>
-          </div>
-        </Details>
-        <StyledAccordion
+        <H2 as="h1" $legacy>
+          {applicationRound.nameFi}
+        </H2>
+        <HeadContainer>
+          <TimeframeStatus
+            applicationPeriodBegin={applicationRound.applicationPeriodBegin}
+            applicationPeriodEnd={applicationRound.applicationPeriodEnd}
+          />
+          <span>
+            <SemiBold>{applicationRound.reservationUnitCount}</SemiBold>{" "}
+            <span>{t("ApplicationRound.attachedReservationUnits")}</span>
+          </span>
+        </HeadContainer>
+        <Accordion
           heading={t("ApplicationRound.searchAndUsageTimeRanges")}
           initiallyOpen
         >
-          <TitleBox>
-            <H3>{t("ApplicationRound.applicationPeriodTitle")}</H3>
+          <div>
+            <H3 $legacy>{t("ApplicationRound.applicationPeriodTitle")}</H3>
             <div>
               {t("common.begins")}{" "}
               {formatDate(applicationRound.applicationPeriodBegin)}
@@ -202,8 +158,8 @@ function Criteria({
               {t("common.ends")}{" "}
               {formatDate(applicationRound.applicationPeriodEnd)}
             </div>
-          </TitleBox>
-          <TitleBox>
+          </div>
+          <div>
             <H3>{t("ApplicationRound.reservationPeriodTitle")}</H3>
             <div>
               {t("common.begins")}{" "}
@@ -213,9 +169,9 @@ function Criteria({
               {t("common.ends")}{" "}
               {formatDate(applicationRound.reservationPeriodEnd)}
             </div>
-          </TitleBox>
-        </StyledAccordion>
-        <StyledAccordion
+          </div>
+        </Accordion>
+        <Accordion
           heading={t("ApplicationRound.usedReservationUnits")}
           initiallyOpen
         >
@@ -230,7 +186,7 @@ function Criteria({
               </ReservationUnit>
             ))}
           </ReservationUnits>
-        </StyledAccordion>
+        </Accordion>
       </Container>
     </>
   );
