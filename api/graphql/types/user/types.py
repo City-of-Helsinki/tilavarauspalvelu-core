@@ -1,7 +1,10 @@
 import datetime
 
 import graphene
+from django.db.models import Value
+from django.db.models.functions import Concat, Trim
 from graphene_django_extensions import DjangoNode
+from query_optimizer import AnnotatedField
 
 from api.graphql.types.user.permissions import UserPermission
 from common.typing import GQLInfo
@@ -34,7 +37,8 @@ _FIELDS = [
 
 
 class UserNode(DjangoNode):
-    name = graphene.String()
+    name = AnnotatedField(graphene.String, expression=Trim(Concat("first_name", Value(" "), "last_name")))
+
     is_ad_authenticated = graphene.Boolean()
     is_strongly_authenticated = graphene.Boolean()
     reservation_notification = graphene.String()
@@ -48,9 +52,6 @@ class UserNode(DjangoNode):
         if root.has_staff_permissions:
             return root.reservation_notification
         return None
-
-    def resolve_name(root: User, info: GQLInfo) -> str | None:
-        return root.get_full_name()
 
     def resolve_date_of_birth(root: User, info: GQLInfo) -> datetime.date | None:
         save_personal_info_view_log.delay(root.pk, info.context.user.id, "User.date_of_birth")

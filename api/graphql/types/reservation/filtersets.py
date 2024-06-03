@@ -1,6 +1,7 @@
 import operator
 import re
 from functools import reduce
+from typing import TYPE_CHECKING
 
 import django_filters
 from django.contrib.postgres.search import SearchRank, SearchVector
@@ -10,7 +11,6 @@ from graphene_django_extensions import ModelFilterSet
 
 from api.graphql.extensions.filters import TimezoneAwareDateFilter
 from common.db import raw_prefixed_query
-from common.typing import AnyUser
 from merchants.models import OrderStatus
 from permissions.helpers import has_general_permission
 from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
@@ -19,6 +19,9 @@ from reservations.choices import CustomerTypeChoice, ReservationStateChoice, Res
 from reservations.models import RecurringReservation, Reservation
 from spaces.models import Unit
 from users.models import User
+
+if TYPE_CHECKING:
+    from common.typing import AnyUser
 
 EMAIL_DOMAIN_PATTERN = re.compile(r"^@\w[.\w]{0,254}$")
 """

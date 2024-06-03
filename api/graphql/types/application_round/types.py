@@ -1,4 +1,5 @@
 import graphene
+from django.db import models
 from graphene_django_extensions import DjangoNode
 from lookup_property import L
 from query_optimizer import AnnotatedField
@@ -11,18 +12,32 @@ from common.typing import GQLInfo
 
 
 class ApplicationRoundNode(DjangoNode):
-    status = AnnotatedField(graphene.Enum.from_enum(ApplicationRoundStatusChoice), expression=L("status"))
-    status_timestamp = graphene.DateTime()
+    status = AnnotatedField(
+        graphene.Enum.from_enum(ApplicationRoundStatusChoice),
+        expression=L("status"),
+    )
+    status_timestamp = AnnotatedField(
+        graphene.DateTime,
+        expression=L("status_timestamp"),
+    )
     reservation_creation_status = AnnotatedField(
         graphene.Enum.from_enum(ApplicationRoundReservationCreationStatusChoice),
         expression=L("reservation_creation_status"),
     )
-
-    applications_count = graphene.Int()
-    reservation_unit_count = graphene.Int()
     is_setting_handled_allowed = AnnotatedField(
         graphene.Boolean,
         expression=L("is_setting_handled_allowed"),
+    )
+    applications_count = AnnotatedField(
+        graphene.Int,
+        expression=models.Count(
+            "applications",
+            filter=models.Q(applications__cancelled_date__isnull=True, applications__sent_date__isnull=False),
+        ),
+    )
+    reservation_unit_count = AnnotatedField(
+        graphene.Int,
+        expression=models.Count("reservation_units"),
     )
 
     class Meta:
@@ -54,12 +69,6 @@ class ApplicationRoundNode(DjangoNode):
         ]
         filterset_class = ApplicationRoundFilterSet
         permission_classes = [ApplicationRoundPermission]
-
-    def resolve_applications_count(root: ApplicationRound, info: GQLInfo) -> int:
-        return root.applications.all().reached_allocation().count()
-
-    def resolve_reservation_unit_count(root: ApplicationRound, info: GQLInfo) -> int:
-        return root.reservation_units.all().count()
 
     def resolve_is_setting_handled_allowed(root: ApplicationRound, info: GQLInfo) -> bool:
         if not ApplicationRoundPermission.has_update_permission(root, info.context.user, {}):
