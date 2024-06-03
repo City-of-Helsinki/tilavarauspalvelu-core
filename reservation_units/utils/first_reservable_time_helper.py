@@ -11,7 +11,10 @@ from applications.choices import ApplicationRoundStatusChoice
 from applications.models import ApplicationRound
 from common.date_utils import local_datetime, local_datetime_max, local_datetime_min, local_start_of_day
 from opening_hours.models import ReservableTimeSpan
-from opening_hours.utils.reservable_time_span_client import override_reservable_with_closed_time_spans
+from opening_hours.utils.reservable_time_span_client import (
+    merge_overlapping_time_span_elements,
+    override_reservable_with_closed_time_spans,
+)
 from opening_hours.utils.time_span_element import TimeSpanElement
 from reservation_units.enums import ReservationStartInterval
 from reservation_units.utils.affecting_reservations_helper import AffectingReservationHelper
@@ -345,13 +348,16 @@ class ReservationUnitFirstReservableTimeHelper:
 
         self.hard_closed_time_spans = self._get_hard_closed_time_spans()
         self.hard_closed_time_spans += parent.shared_hard_closed_time_spans
+        self.hard_closed_time_spans = self._merge_time_spans(self.hard_closed_time_spans)
 
         self.reservation_closed_time_spans = self._get_reservation_closed_time_spans()
+        self.reservation_closed_time_spans = self._merge_time_spans(self.reservation_closed_time_spans)
         self.blocking_reservation_closed_time_spans = self._get_blocking_reservation_closed_time_spans()
 
         self.soft_closed_time_spans = self._get_soft_closed_time_spans()
         self.soft_closed_time_spans += self.reservation_closed_time_spans
         self.soft_closed_time_spans += self.blocking_reservation_closed_time_spans
+        self.soft_closed_time_spans = self._merge_time_spans(self.soft_closed_time_spans)
 
         start_interval_minutes = ReservationStartInterval(reservation_unit.reservation_start_interval).as_number
 
@@ -371,6 +377,10 @@ class ReservationUnitFirstReservableTimeHelper:
             # Check if the ReservationUnits Maximum Reservation Duration is at least as long as the minimum duration.
             # Note that we still need to check if the ReservationUnit is considered Open, so we can't return early here.
             self.is_reservation_unit_max_duration_invalid = maximum_duration_minutes < self.minimum_duration_minutes
+
+    @staticmethod
+    def _merge_time_spans(time_spans) -> list[TimeSpanElement]:
+        return merge_overlapping_time_span_elements(sorted(time_spans, key=lambda time_span: time_span.start_datetime))
 
     def calculate_first_reservable_time(self) -> ReservableTimeOutput:
         is_closed = True
