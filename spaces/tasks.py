@@ -7,8 +7,11 @@ from tilavarauspalvelu.celery import app
 
 @app.task(name="rebuild_space_tree_hierarchy")
 def rebuild_space_tree_hierarchy() -> None:
+    from reservation_units.models import ReservationUnitHierarchy
+
     with atomic():
         Space.objects.rebuild()
+        ReservationUnitHierarchy.refresh()
 
 
 @app.task(name="update_units_from_tprek")

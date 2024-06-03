@@ -137,9 +137,9 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
         >>> qs.annotate(affected=SubqueryArray(sq.affected_reservation_unit_ids, agg_field="ids", distinct=True))
         """
         return (
-            self.with_reservation_unit_ids_affecting_reservations()
-            .annotate(ids=ArrayUnnest("reservation_units_affecting_reservations"))
+            self.annotate(ids=ArrayUnnest("reservation_unit_hierarchy__related_reservation_unit_ids"))
             .values("ids")
+            .distinct()
         )
 
     def reservation_units_with_common_hierarchy(self) -> Self:

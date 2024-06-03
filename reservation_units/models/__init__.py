@@ -5,6 +5,7 @@ from .purpose import Purpose
 from .qualifier import Qualifier
 from .reservation_unit import ReservationUnit
 from .reservation_unit_cancellation_rule import ReservationUnitCancellationRule
+from .reservation_unit_hierarchy import ReservationUnitHierarchy
 from .reservation_unit_image import ReservationUnitImage
 from .reservation_unit_payment_type import ReservationUnitPaymentType
 from .reservation_unit_pricing import ReservationUnitPricing
@@ -22,6 +23,7 @@ __all__ = [
     "Qualifier",
     "ReservationUnit",
     "ReservationUnitCancellationRule",
+    "ReservationUnitHierarchy",
     "ReservationUnitImage",
     "ReservationUnitPaymentType",
     "ReservationUnitPricing",
