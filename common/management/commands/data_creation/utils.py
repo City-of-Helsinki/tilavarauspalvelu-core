@@ -1,11 +1,22 @@
+# ruff: noqa: S311
+
 import random
 from collections.abc import Callable, Generator, Sequence
 from enum import StrEnum
 from functools import wraps
 from types import DynamicClassAttribute
-from typing import Any, NamedTuple, ParamSpec, TypeVar
+from typing import Any, NamedTuple, ParamSpec, TypedDict, TypeVar
 
 from faker import Faker
+
+from permissions.models import (
+    GeneralRoleChoice,
+    GeneralRolePermission,
+    ServiceSectorRoleChoice,
+    ServiceSectorRolePermission,
+    UnitRoleChoice,
+    UnitRolePermission,
+)
 
 T = TypeVar("T")
 P = ParamSpec("P")
@@ -63,11 +74,16 @@ def weighted_choice(choices: Sequence[T], weights: list[int]) -> T:
     return random.choices(choices, weights=weights)[0]
 
 
-def with_logs(
-    text_entering: str,
-    text_exiting: str,
-) -> Callable[[Callable[P, T]], Callable[P, T]]:
+def with_logs(text_entering: str = "", text_exiting: str = "") -> Callable[[Callable[P, T]], Callable[P, T]]:
     def decorator(func: Callable[P, T]) -> Callable[P, T]:
+        nonlocal text_entering, text_exiting
+
+        entity = func.__name__.removeprefix("_create_").replace("_", " ").title()
+        if not text_entering:
+            text_entering = f"Creating {entity}..."
+        if not text_exiting:
+            text_exiting = f"{entity} created!"
+
         @wraps(func)
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
             print(text_entering)  # noqa: T201, RUF100
@@ -96,3 +112,37 @@ class SetName(StrEnum):
     @DynamicClassAttribute
     def for_applying_free_of_charge(self) -> bool:
         return self in self.applying_free_of_charge()
+
+
+RoleChoice = TypeVar(
+    "RoleChoice",
+    UnitRoleChoice,
+    ServiceSectorRoleChoice,
+    GeneralRoleChoice,
+)
+RolePermission = TypeVar(
+    "RolePermission",
+    UnitRolePermission,
+    ServiceSectorRolePermission,
+    GeneralRolePermission,
+)
+
+
+class UserType(StrEnum):
+    reserver = "Varaaja"
+    viewer = "Katselija"
+    handler = "Käsittelijä"
+    admin = "Pääkäyttäjä"
+    product_owner = "Tuoteomistaja"
+    all = "Ylläpitäjä"
+
+
+class FieldCombination(NamedTuple):
+    supported: list[str]
+    required: list[str]
+
+
+class Roles(TypedDict):
+    general: dict[str, GeneralRoleChoice]
+    unit: dict[str, UnitRoleChoice]
+    service_sector: dict[str, ServiceSectorRoleChoice]
