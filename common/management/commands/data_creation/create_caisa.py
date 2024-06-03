@@ -1,6 +1,5 @@
 from datetime import date, timedelta
 
-from common.management.commands._utils import SetName, with_logs
 from merchants.models import PaymentAccounting, PaymentMerchant, PaymentProduct
 from opening_hours.models import OriginHaukiResource
 from reservation_units.enums import (
@@ -26,11 +25,10 @@ from reservations.models import ReservationMetadataSet
 from spaces.models import Space, Unit
 from terms_of_use.models import TermsOfUse
 
+from .utils import SetName, with_logs
 
-@with_logs(
-    text_entering="Creating specific reservation units...",
-    text_exiting="Specific reservation units created!",
-)
+
+@with_logs("Creating the caisa reservation unit...", "Caisa created!")
 def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
     """Create the caisa unit from testing server"""
     caisa = Unit.objects.create(
