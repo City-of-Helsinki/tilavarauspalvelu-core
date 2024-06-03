@@ -3,6 +3,7 @@ from .keyword import KeywordAdmin, KeywordCategoryAdmin, KeywordGroupAdmin
 from .purpose import PurposeAdmin
 from .reservation_unit import ReservationUnitAdmin
 from .reservation_unit_cancellation_rule import ReservationUnitCancellationRuleAdmin
+from .reservation_unit_hierarchy import ReservationUnitHierarchyAdmin
 from .reservation_unit_image import ReservationUnitImageAdmin
 from .reservation_unit_pricing import ReservationUnitPricingAdmin
 from .reservation_unit_type import ReservationUnitTypeAdmin
@@ -17,6 +18,7 @@ __all__ = [
     "PurposeAdmin",
     "ReservationUnitAdmin",
     "ReservationUnitCancellationRuleAdmin",
+    "ReservationUnitHierarchyAdmin",
     "ReservationUnitImageAdmin",
     "ReservationUnitPricingAdmin",
     "ReservationUnitTypeAdmin",
