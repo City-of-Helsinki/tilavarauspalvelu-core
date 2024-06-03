@@ -28,6 +28,7 @@ def purge(path: str) -> None:
             "X-VC-Purge-Key": settings.IMAGE_CACHE_PURGE_KEY,
             "Host": settings.IMAGE_CACHE_HOST_HEADER,
         },
+        timeout=60,
     )
 
     if response.status_code != 200:

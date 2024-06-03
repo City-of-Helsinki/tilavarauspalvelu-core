@@ -45,6 +45,7 @@ class ImageCacheTestCase(TestCase):
             "PURGE",
             "https://test.url/foo/bar.jpg",
             headers={"X-VC-Purge-Key": "test-purge-key", "Host": "test.tilavaraus.url"},
+            timeout=60,
         )
         assert SentryLogger.log_message.called is False
 
