@@ -77,8 +77,9 @@ requests-mock = "1.12.1"
 
 [tool.poetry.group.lint.dependencies]
 pre-commit = "3.7.1"
+ruff = "0.4.9"
 ruff-lsp = "0.0.53"
-ruff = "^0.4.9"
+pyinstrument = "4.6.2"
 
 [tool.ruff]
 fix = true
