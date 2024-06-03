@@ -9,6 +9,7 @@ from common.date_utils import DEFAULT_TIMEZONE, combine, get_periods_between
 from opening_hours.utils.reservable_time_span_client import merge_overlapping_time_span_elements
 from opening_hours.utils.time_span_element import TimeSpanElement
 from reservation_units.models import ReservationUnit
+from reservation_units.utils.affecting_reservations_helper import AffectingReservationHelper
 from reservations.models import RecurringReservation, Reservation, ReservationPurpose
 
 if TYPE_CHECKING:
@@ -133,11 +134,14 @@ class RecurringReservationActions:
         :param buffer_time_after: Used buffer time after the reservation.
         """
         pk = self.recurring_reservation.reservation_unit.pk
-        closed, blocked = Reservation.objects.get_affecting_reservations_as_closed_time_spans(
-            reservation_unit_queryset=ReservationUnit.objects.filter(pk=pk),
+
+        helper = AffectingReservationHelper(
             start_date=self.recurring_reservation.begin_date,
             end_date=self.recurring_reservation.end_date,
+            reservation_unit_queryset=ReservationUnit.objects.filter(pk=pk).prefetch_related("spaces", "resources"),
         )
+        closed, blocked = helper.get_affecting_time_spans()
+
         sorted_closed = sorted(closed.get(pk, []), key=lambda x: x.buffered_start_datetime)
         sorted_blocked = sorted(blocked.get(pk, []), key=lambda x: x.buffered_start_datetime)
         closed_timespans = merge_overlapping_time_span_elements(sorted_closed)

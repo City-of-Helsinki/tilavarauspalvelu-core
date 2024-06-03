@@ -20,30 +20,32 @@ class ApplicationQuerySet(models.QuerySet):
         from applications.models import ApplicationSection, ReservationUnitOption
 
         return self.alias(
-            preferred_unit_name=Subquery(
-                queryset=(
-                    ApplicationSection.objects.annotate(
-                        preferred_unit_name=Subquery(
-                            queryset=(
-                                ReservationUnitOption.objects.filter(
-                                    application_section=models.OuterRef("pk"),
-                                    preferred_order=0,
-                                ).values(f"reservation_unit__unit__name_{lang}")[:1]
-                            ),
-                            output_field=models.CharField(),
+            **{
+                f"preferred_unit_name_{lang}": Subquery(
+                    queryset=(
+                        ApplicationSection.objects.annotate(
+                            preferred_unit_name=Subquery(
+                                queryset=(
+                                    ReservationUnitOption.objects.filter(
+                                        application_section=models.OuterRef("pk"),
+                                        preferred_order=0,
+                                    ).values(f"reservation_unit__unit__name_{lang}")[:1]
+                                ),
+                                output_field=models.CharField(),
+                            )
                         )
-                    )
-                    .filter(application=models.OuterRef("pk"))
-                    .order_by("pk")
-                    .values("preferred_unit_name")[:1]
-                ),
-                output_field=models.CharField(),
-            ),
+                        .filter(application=models.OuterRef("pk"))
+                        .order_by("pk")
+                        .values("preferred_unit_name")[:1]
+                    ),
+                    output_field=models.CharField(),
+                )
+            }
         )
 
     def order_by_preferred_unit_name(self, *, lang: Literal["fi", "en", "sv"], desc: bool = False) -> Self:
         return self.preferred_unit_name_alias(lang=lang).order_by(
-            models.OrderBy(models.F("preferred_unit_name"), descending=desc),
+            models.OrderBy(models.F(f"preferred_unit_name_{lang}"), descending=desc),
         )
 
     def order_by_status(self, *, desc: bool = False) -> Self:
