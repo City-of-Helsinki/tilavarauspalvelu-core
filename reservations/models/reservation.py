@@ -335,8 +335,8 @@ class Reservation(SerializableMixin, models.Model):
     def unit_ids_for_perms() -> list[int]:
         from spaces.models import Unit
 
-        return SubqueryArray(
-            Unit.objects.filter(reservationunit__in=models.OuterRef("reservation_unit")).values("id"),
+        return SubqueryArray(  # type: ignore[return-value]
+            queryset=Unit.objects.filter(reservationunit__in=models.OuterRef("reservation_unit")).values("id"),
             agg_field="id",
         )
 
@@ -348,8 +348,8 @@ class Reservation(SerializableMixin, models.Model):
     def unit_group_ids_for_perms() -> list[int]:
         from spaces.models import UnitGroup
 
-        return SubqueryArray(
-            UnitGroup.objects.filter(units__in=models.OuterRef("reservation_unit__unit")).values("id"),
+        return SubqueryArray(  # type: ignore[return-value]
+            queryset=UnitGroup.objects.filter(units__in=models.OuterRef("reservation_unit__unit")).values("id"),
             agg_field="id",
         )
 

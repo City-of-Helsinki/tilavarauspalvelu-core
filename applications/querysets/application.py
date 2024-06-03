@@ -36,7 +36,7 @@ class ApplicationQuerySet(models.QuerySet):
 
     def order_by_preferred_unit_name(self, *, lang: Literal["fi", "en", "sv"], desc: bool = False) -> Self:
         return self.preferred_unit_name_alias(lang=lang).order_by(
-            models.OrderBy(models.F("preferred_unit_name"), descending=desc),
+            models.OrderBy(models.F(f"preferred_unit_name_{lang}"), descending=desc),
         )
 
     def order_by_status(self, *, desc: bool = False) -> Self:

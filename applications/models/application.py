@@ -285,23 +285,45 @@ class Application(SerializableMixin, models.Model):
         ids = qs.values("reservation_unit")
         return Unit.objects.filter(reservationunit__in=models.Subquery(ids))
 
-    @lookup_property(joins=["application_sections"], skip_codegen=True)
+    @lookup_property(skip_codegen=True)
     def unit_ids_for_perms() -> list[int]:
-        from spaces.models import Unit
+        from applications.models import ReservationUnitOption
 
-        ref = "application_sections__reservation_unit_options__reservation_unit"
-        return SubqueryArray(Unit.objects.filter(reservationunit__in=models.OuterRef(ref)).values("id"), agg_field="id")
+        return SubqueryArray(  # type: ignore[return-value]
+            queryset=(
+                ReservationUnitOption.objects.distinct()
+                .filter(application_section__application=models.OuterRef("pk"))
+                .annotate(unit_id=models.F("reservation_unit__unit"))
+                .values("unit_id")
+            ),
+            agg_field="unit_id",
+        )
 
     @unit_ids_for_perms.override
     def _(self) -> list[int]:
         return [unit.id for unit in self.units]
 
-    @lookup_property(joins=["application_sections"], skip_codegen=True)
+    @lookup_property(skip_codegen=True)
     def unit_group_ids_for_perms() -> list[int]:
+        from applications.models import ReservationUnitOption
         from spaces.models import UnitGroup
 
-        ref = "application_sections__reservation_unit_options__reservation_unit__unit"
-        return SubqueryArray(UnitGroup.objects.filter(units__in=models.OuterRef(ref)).values("id"), agg_field="id")
+        return SubqueryArray(  # type: ignore[return-value]
+            queryset=(
+                UnitGroup.objects.distinct()
+                .alias(
+                    unit_ids=models.Subquery(
+                        ReservationUnitOption.objects.filter(
+                            application_section__application=models.OuterRef(models.OuterRef("pk")),
+                        )
+                        .annotate(unit_id=models.F("reservation_unit__unit"))
+                        .values("unit_id")
+                    )
+                )
+                .filter(units__in=models.F("unit_ids"))
+            ),
+            agg_field="id",
+        )
 
     @unit_group_ids_for_perms.override
     def _(self) -> list[int]:
@@ -311,4 +333,4 @@ class Application(SerializableMixin, models.Model):
 
         qs = ReservationUnitOption.objects.filter(application_section__application=self)
         ids = qs.values("reservation_unit__unit")
-        return list(UnitGroup.objects.filter(units__in=models.Subquery(ids)).values_list("id", flat=True))
+        return list(UnitGroup.objects.distinct().filter(units__in=models.Subquery(ids)).values_list("id", flat=True))
