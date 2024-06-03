@@ -13,18 +13,21 @@ class SQLLogAdminForm(forms.ModelForm):
             "sql",
             "duration_ns",
             "succeeded",
+            "stack_info",
         ]
         labels = {
             "request_log": _("Request log"),
             "sql": _("SQL"),
             "duration_ns": _("Duration (ns)"),
             "succeeded": _("Succeeded"),
+            "stack_info": _("Stack Info"),
         }
         help_texts = {
             "request_log": _("Request log"),
             "sql": _("SQL that was executed (without params)."),
             "duration_ns": _("Duration of the SQL query in nanoseconds."),
             "succeeded": _("Whether the SQL query succeeded or not."),
+            "stack_info": _("Stack trace where the SQL query was executed."),
         }
 
 

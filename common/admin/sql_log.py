@@ -1,9 +1,10 @@
+import re
 import uuid
 
-import sqlparse
 from django.contrib import admin, messages
 from django.core.handlers.wsgi import WSGIRequest
 from django.db import models
+from django.db.models.functions import Coalesce
 from django.http import FileResponse
 from django.utils.safestring import SafeString, mark_safe
 from django.utils.translation import gettext_lazy as _
@@ -21,7 +22,7 @@ from utils.sentry import SentryLogger
 class SQLLogAdmin(admin.ModelAdmin):
     form = SQLLogAdminForm
     list_display = [
-        "_sql",
+        "_sql_display",
         "_path",
         "_request_id",
         "_duration_ms",
@@ -31,6 +32,7 @@ class SQLLogAdmin(admin.ModelAdmin):
         "request_log",
         "_duration_ms",
         "succeeded",
+        "_stack_info",
     ]
     list_filter = [
         "request_log__path",
@@ -48,9 +50,19 @@ class SQLLogAdmin(admin.ModelAdmin):
         return super().get_queryset(request).select_related("request_log")
 
     @admin.display(description=_("SQL"), ordering="sql")
+    def _sql_display(self, obj: SQLLog) -> SafeString:
+        return mark_safe(f"<pre>{obj.sql_formatted}</pre>")  # noqa: S308  # nosec  # NOSONAR
+
+    @admin.display(description=_("SQL"), ordering="sql")
     def _sql(self, obj: SQLLog) -> SafeString:
-        sql = sqlparse.format(obj.sql, reindent=True, keyword_case="upper")
-        return mark_safe(f"<pre>{sql}</pre>")  # noqa: S308  # nosec  # NOSONAR
+        title = "Show query"
+        val = f"""
+        <details>
+          <summary style="cursor: pointer">{title}</summary>
+          <pre>{obj.sql_formatted}</pre>
+        </details>
+        """
+        return mark_safe(val)  # noqa: S308  # nosec  # NOSONAR
 
     @admin.display(description=_("Path"), ordering="request_log__path")
     def _path(self, obj: SQLLog) -> str:
@@ -65,6 +77,10 @@ class SQLLogAdmin(admin.ModelAdmin):
         value = obj.duration_ns / 1_000_000
         return f"~{value:_.2f}".replace("_", " ")
 
+    @admin.display(description=_("Stack Info"), ordering="stack_info")
+    def _stack_info(self, obj: SQLLog) -> SafeString:
+        return mark_safe(f"<pre>{obj.stack_info}</pre>")  # noqa: S308  # nosec  # NOSONAR
+
     def has_add_permission(self, request: WSGIRequest) -> bool:
         return False
 
@@ -72,18 +88,28 @@ class SQLLogAdmin(admin.ModelAdmin):
         return False
 
 
-class SQLLogAdminInline(admin.TabularInline):
+class SQLLogAdminInline(admin.StackedInline):
     model = SQLLog
     form = SQLLogAdminInlineForm
-    readonly_fields = ["_sql"]
+    readonly_fields = ["_sql", "_stack_info"]
     extra = 0
     can_delete = False
     show_change_link = True
 
     @admin.display(description=_("SQL"), ordering="sql")
     def _sql(self, obj: SQLLog) -> SafeString:
-        sql = sqlparse.format(obj.sql, reindent=True, keyword_case="upper")
-        return mark_safe(f"<pre>{sql}</pre>")  # noqa: S308  # nosec  # NOSONAR
+        title = "Show query"
+        val = f"""
+        <details>
+          <summary style="cursor: pointer">{title}</summary>
+          <pre>{obj.sql_formatted}</pre>
+        </details>
+        """
+        return mark_safe(val)  # noqa: S308  # nosec  # NOSONAR
+
+    @admin.display(description=_("Stack Info"), ordering="stack_info")
+    def _stack_info(self, obj: SQLLog) -> SafeString:
+        return mark_safe(f"<pre>{obj.stack_info}</pre>")  # noqa: S308  # nosec  # NOSONAR
 
     def has_add_permission(self, request: WSGIRequest, obj: SQLLog) -> bool:
         return False
@@ -99,7 +125,8 @@ class RequestLogAdmin(admin.ModelAdmin):
     list_display = [
         "request_id",
         "path",
-        "num_of_sql_logs",
+        "_num_of_sql_logs",
+        "_duration_sql",
         "_duration_ms",
         "created",
     ]
@@ -107,6 +134,8 @@ class RequestLogAdmin(admin.ModelAdmin):
         "request_id",
         "path",
         "_body",
+        "_num_of_sql_logs",
+        "_duration_sql",
         "_duration_ms",
         "created",
     ]
@@ -123,18 +152,37 @@ class RequestLogAdmin(admin.ModelAdmin):
     actions = [
         "export_results_to_csv",
     ]
+    ordering = [
+        "-created",
+    ]
 
     @admin.display(description=_("Queries"), ordering="queries")
-    def num_of_sql_logs(self, obj: RequestLog) -> int:
+    def _num_of_sql_logs(self, obj: RequestLog) -> int:
         return getattr(obj, "queries", -1)
 
-    @admin.display(description=_("Duration (ms)"), ordering="duration_ms")
+    @admin.display(description=_("Duration Total (ms)"), ordering="duration_ms")
     def _duration_ms(self, obj: RequestLog) -> str:
         return obj.duration_str
 
+    @admin.display(description=_("Duration SQL (ms)"), ordering="duration_sql")
+    def _duration_sql(self, obj: RequestLog) -> str:
+        value = getattr(obj, "duration_sql", -1) / 1_000_000
+        return f"~{value:_.2f}".replace("_", " ")
+
     @admin.display(description=_("Body"), ordering="body")
     def _body(self, obj: RequestLog) -> SafeString:
-        return mark_safe(f"<pre>{obj.body}</pre>")  # noqa: S308  # nosec  # NOSONAR
+        match = re.search(r"query (?P<title>\w+)\(", obj.body)
+        title = "Show query"
+        if match is not None:
+            title += f" for '{match.group('title')}'"
+
+        val = f"""
+        <details>
+          <summary style="cursor: pointer">{title}</summary>
+          <pre>{obj.body}</pre>
+        </details>
+        """
+        return mark_safe(val)  # noqa: S308  # nosec  # NOSONAR
 
     def get_queryset(self, request: WSGIRequest) -> RequestLogQuerySet:
         return (
@@ -143,6 +191,7 @@ class RequestLogAdmin(admin.ModelAdmin):
             .prefetch_related("sql_logs")
             .annotate(
                 queries=models.Count("sql_logs"),
+                duration_sql=Coalesce(models.Sum("sql_logs__duration_ns"), 0),
             )
         )
 
