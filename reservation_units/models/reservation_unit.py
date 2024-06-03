@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import datetime
 import uuid
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
-from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from elasticsearch_django.models import SearchDocumentManagerMixin, SearchDocumentMixin
@@ -18,7 +17,6 @@ from reservation_units.enums import (
     ReservationUnitState,
 )
 from reservation_units.querysets import ReservationUnitQuerySet
-from reservation_units.tasks import refresh_reservation_unit_product_mapping
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 
 if TYPE_CHECKING:
@@ -268,11 +266,6 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
 
     def __str__(self) -> str:
         return f"{self.name}, {getattr(self.unit, 'name', '')}"
-
-    def save(self, *args: Any, **kwargs: Any) -> None:
-        super().save(*args, **kwargs)
-        if settings.UPDATE_PRODUCT_MAPPING:
-            refresh_reservation_unit_product_mapping.delay(self.pk)
 
     @property
     def state(self) -> ReservationUnitState:
