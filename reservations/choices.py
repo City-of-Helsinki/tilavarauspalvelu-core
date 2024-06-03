@@ -17,6 +17,13 @@ class CustomerTypeChoice(models.TextChoices):
     NONPROFIT = "nonprofit", _("Nonprofit")
     INDIVIDUAL = "individual", _("Individual")
 
+    @classproperty
+    def organisation(self) -> list[str]:
+        return [  # type: ignore[return-value]
+            CustomerTypeChoice.BUSINESS.value,
+            CustomerTypeChoice.NONPROFIT.value,
+        ]
+
 
 class ReservationStateChoice(models.TextChoices):
     CREATED = "created", _("Created")
@@ -27,17 +34,26 @@ class ReservationStateChoice(models.TextChoices):
     DENIED = "denied", _("Denied")
 
     @classproperty
-    def states_that_can_change_to_handling(self) -> list[ReservationStateChoice]:
-        return [
-            ReservationStateChoice.CONFIRMED,
-            ReservationStateChoice.DENIED,
+    def states_going_to_occur(self) -> list[str]:
+        return [  # type: ignore[return-type]
+            ReservationStateChoice.CREATED.value,
+            ReservationStateChoice.CONFIRMED.value,
+            ReservationStateChoice.WAITING_FOR_PAYMENT.value,
+            ReservationStateChoice.REQUIRES_HANDLING.value,
         ]
 
     @classproperty
-    def states_that_can_change_to_deny(self) -> list[ReservationStateChoice]:
-        return [
-            ReservationStateChoice.REQUIRES_HANDLING,
-            ReservationStateChoice.CONFIRMED,
+    def states_that_can_change_to_handling(self) -> list[str]:
+        return [  # type: ignore[return-type]
+            ReservationStateChoice.CONFIRMED.value,
+            ReservationStateChoice.DENIED.value,
+        ]
+
+    @classproperty
+    def states_that_can_change_to_deny(self) -> list[str]:
+        return [  # type: ignore[return-type]
+            ReservationStateChoice.REQUIRES_HANDLING.value,
+            ReservationStateChoice.CONFIRMED.value,
         ]
 
 

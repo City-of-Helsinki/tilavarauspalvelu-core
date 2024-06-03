@@ -103,7 +103,7 @@ class ApplicationRound(models.Model):
 
     @lookup_property(skip_codegen=True)
     def status() -> ApplicationRoundStatusChoice:
-        return models.Case(  # type: ignore[return-value]
+        return models.Case(
             models.When(
                 models.Q(sent_date__isnull=False),
                 then=models.Value(ApplicationRoundStatusChoice.RESULTS_SENT.value),
@@ -137,8 +137,31 @@ class ApplicationRound(models.Model):
             return ApplicationRoundStatusChoice.OPEN
         return ApplicationRoundStatusChoice.IN_ALLOCATION
 
-    @property
-    def status_timestamp(self) -> datetime:
+    @lookup_property(skip_codegen=True)
+    def status_timestamp() -> datetime:
+        return models.Case(
+            models.When(
+                models.Q(sent_date__isnull=False),  # RESULTS_SENT
+                then=models.F("sent_date"),
+            ),
+            models.When(
+                models.Q(handled_date__isnull=False),  # HANDLED
+                then=models.F("handled_date"),
+            ),
+            models.When(
+                models.Q(application_period_begin__gt=Now()),  # UPCOMING
+                then=models.F("public_display_begin"),
+            ),
+            models.When(
+                models.Q(application_period_end__gt=Now()),  # OPEN
+                then=models.F("application_period_begin"),
+            ),
+            default=models.F("application_period_end"),  # IN_ALLOCATION
+            output_field=models.DateTimeField(),
+        )
+
+    @status_timestamp.override
+    def _(self) -> datetime:
         match self.status:
             case ApplicationRoundStatusChoice.UPCOMING:
                 return self.public_display_begin
