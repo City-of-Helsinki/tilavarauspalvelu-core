@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import datetime
 from collections import defaultdict
 from typing import TYPE_CHECKING, Literal
 
@@ -11,6 +10,8 @@ from opening_hours.utils.time_span_element import TimeSpanElement
 from reservations.choices import ReservationTypeChoice
 
 if TYPE_CHECKING:
+    import datetime
+
     from reservation_units.querysets import ReservationUnitQuerySet
 
 
@@ -48,7 +49,7 @@ class AffectingReservationHelper:
 
         self.reservation_unit_queryset: ReservationUnitQuerySet = reservation_unit_queryset
         if self.reservation_unit_queryset is None:
-            self.reservation_unit_queryset = ReservationUnit.objects.all()
+            self.reservation_unit_queryset = ReservationUnit.objects.all().prefetch_related("spaces", "resources")
 
         self.reservation_queryset = (
             Reservation.objects.filter_buffered_reservations_period(start_date=start_date, end_date=end_date)
@@ -90,7 +91,7 @@ class AffectingReservationHelper:
         reservation_time_spans: TimeSpanMap = defaultdict(set)
         blocked_time_spans: TimeSpanMap = defaultdict(set)
 
-        for reservation_unit in self.reservation_unit_queryset.prefetch_related("spaces", "resources"):
+        for reservation_unit in self.reservation_unit_queryset:
             non_blocking = self.time_spans["non_blocking"]
             blocking = self.time_spans["blocking"]
 

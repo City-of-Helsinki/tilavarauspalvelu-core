@@ -186,7 +186,7 @@ class FirstReservableTimeHelper:
         helper = AffectingReservationHelper(
             start_date=filter_date_start,
             end_date=filter_date_end,
-            reservation_unit_queryset=reservation_unit_queryset.exclude(origin_hauki_resource__isnull=True),
+            reservation_unit_queryset=self.reservation_units_with_prefetched_related_objects,
         )
         reservations, blocking_reservations = helper.get_affecting_time_spans()
 
@@ -241,28 +241,41 @@ class FirstReservableTimeHelper:
 
     def _get_reservation_unit_queryset_with_prefetches(self) -> ReservationUnitQuerySet:
         """
-        Prefetch ReservableTimeSpans and ApplicationRounds for each ReservationUnit and filter them by date range
+        Queryset with required information for calculating first reservable time.
+        - Prefetch Spaces and Resources for finding affected reservations.
+        - Prefetch ReservableTimeSpans and ApplicationRounds for each ReservationUnit and filter them by date range
 
         When `reservation_unit.origin_hauki_resource.reservable_time_spans` or `reservation_unit.application_rounds`
         are accessed later, they are already filtered by date range, so we don't need to query the database again.
         """
-        return self.reservation_unit_queryset.exclude(
-            origin_hauki_resource__isnull=True,
-        ).prefetch_related(
-            models.Prefetch(
-                "origin_hauki_resource__reservable_time_spans",
-                ReservableTimeSpan.objects.overlapping_with_period(
-                    start=self.filter_date_start,
-                    end=self.filter_date_end,
-                ).order_by("start_datetime"),
-            ),
-            models.Prefetch(
-                "application_rounds",
-                ApplicationRound.objects.filter(
-                    reservation_period_begin__lte=self.filter_date_end,
-                    reservation_period_end__gte=self.filter_date_start,
-                ).exclude(L(status=ApplicationRoundStatusChoice.RESULTS_SENT.value)),
-            ),
+        return (
+            # "Reset" queryset by removing prefetch_related, select_related, and deferred fields
+            # added by the optimizer. Leaves any filters and ordering intact.
+            self.reservation_unit_queryset.defer(None)
+            .select_related(None)
+            .prefetch_related(None)
+            # ReservationUnits are not reservable without a HaukiResource
+            .exclude(origin_hauki_resource__isnull=True)
+            .prefetch_related(
+                # Required for affecting reservations
+                "spaces",
+                "resources",
+                # Required for calculating first reservable time
+                models.Prefetch(
+                    "origin_hauki_resource__reservable_time_spans",
+                    ReservableTimeSpan.objects.overlapping_with_period(
+                        start=self.filter_date_start,
+                        end=self.filter_date_end,
+                    ).order_by("start_datetime"),
+                ),
+                models.Prefetch(
+                    "application_rounds",
+                    ApplicationRound.objects.filter(
+                        reservation_period_begin__lte=self.filter_date_end,
+                        reservation_period_end__gte=self.filter_date_start,
+                    ).exclude(L(status=ApplicationRoundStatusChoice.RESULTS_SENT.value)),
+                ),
+            )
         )
 
     def _get_shared_hard_closed_time_spans(self) -> list[TimeSpanElement]:
