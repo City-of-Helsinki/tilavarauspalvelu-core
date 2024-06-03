@@ -1,9 +1,11 @@
 from typing import TYPE_CHECKING, Optional
 
 from django.db import models
+from lookup_property import lookup_property
 from mptt.managers import TreeManager
 from mptt.models import MPTTModel, TreeForeignKey
 
+from common.db import SubqueryArray
 from spaces.querysets.space import SpaceQuerySet
 
 if TYPE_CHECKING:
@@ -72,13 +74,24 @@ class Space(MPTTModel):
             value += f", {self.unit!s}"
         return value
 
-    def save(self, *args, **kwargs) -> None:
-        super().save(*args, **kwargs)
+    @lookup_property(skip_codegen=True)
+    def family() -> list[int]:
+        """Return space ids of all spaces that are either the space itself, its descendants or its ancestors."""
+        ancestors = models.Q(
+            lft__lte=models.OuterRef("lft"),
+            rght__gte=models.OuterRef("rght"),
+            tree_id=models.OuterRef("tree_id"),
+        )
+        descendants = models.Q(
+            lft__gte=models.OuterRef("lft"),
+            rght__lte=models.OuterRef("rght"),
+            tree_id=models.OuterRef("tree_id"),
+        )
+        return SubqueryArray(  # type: ignore[return-value]
+            queryset=Space.objects.filter(ancestors | descendants).values("id"),
+            agg_field="id",
+        )
 
-        tree_id = self.parent.tree_id if self.parent else self.tree_id
-        try:
-            self.__class__.objects.partial_rebuild(tree_id)
-        except RuntimeError:
-            # If the tree now has more than one root node,
-            # we need to rebuild the whole tree.
-            self.__class__.objects.rebuild()
+    @family.override
+    def _(self) -> list[int]:
+        return self.get_family().values_list("id", flat=True)
