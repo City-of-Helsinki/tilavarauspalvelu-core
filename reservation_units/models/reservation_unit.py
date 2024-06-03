@@ -71,10 +71,10 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
 
     # Datetime
 
-    reservation_begins: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
-    reservation_ends: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
-    publish_begins: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
-    publish_ends: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
+    reservation_begins: datetime.datetime | None = models.DateTimeField(null=True, blank=True, db_index=True)
+    reservation_ends: datetime.datetime | None = models.DateTimeField(null=True, blank=True, db_index=True)
+    publish_begins: datetime.datetime | None = models.DateTimeField(null=True, blank=True, db_index=True)
+    publish_ends: datetime.datetime | None = models.DateTimeField(null=True, blank=True, db_index=True)
     min_reservation_duration: datetime.timedelta | None = models.DurationField(null=True, blank=True)
     max_reservation_duration: datetime.timedelta | None = models.DurationField(null=True, blank=True)
     buffer_time_before: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
@@ -106,6 +106,7 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
         max_length=20,
         choices=ReservationKind.choices,
         default=ReservationKind.DIRECT_AND_SEASON.value,
+        db_index=True,
     )
 
     # Many-to-One related
@@ -271,6 +272,8 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
     def state(self) -> ReservationUnitState:
         from reservation_units.utils.reservation_unit_state_helper import ReservationUnitStateHelper
 
+        # TODO: This is bad or performance, since it creates from 1 up to 6 queries
+        #  for each reservation unit. Should be replaced with a lookup-property.
         return ReservationUnitStateHelper.get_state(self)
 
     @property
@@ -279,6 +282,8 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
             ReservationUnitReservationStateHelper,
         )
 
+        # TODO: This is bad or performance, since it creates from 1 up to 5 queries
+        #  for each reservation unit. Should be replaced with a lookup-property.
         return ReservationUnitReservationStateHelper.get_state(self)
 
     # ElasticSearch
