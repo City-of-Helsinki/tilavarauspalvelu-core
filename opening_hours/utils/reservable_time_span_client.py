@@ -187,34 +187,85 @@ def merge_overlapping_time_span_elements(time_span_elements: list[TimeSpanElemen
 
         # If the selected_list contains a time span that overlaps with the current time span, combine them.
         # The only time span that can overlap with the current time span is the last time span in the list.
-        # ┌───────────────────────────────────────────────────────────────────┐
-        # │ █ = Closed Time Span                                              │
-        # │ ▁ = Reservable Time Span                                          │
-        # ├────────────────────────┬──────────────────────────────────────────┤
+        # ┌────────────────────────┐
+        # │ LEGEND                 │
+        # │ █ = Reservation        │
+        # │ ▄ = Reservation Buffer │
+        # │ ▁ = Reservable         │
+        # ├────────────────────────┼──────────────────────────────────────────┐
         # │  ████     ->  ███████  │ Overlapping                              │
         # │    █████  ->           │ The last time span is extended           │
         # ├────────────────────────┼──────────────────────────────────────────┤
-        # │  ████     ->  ███████  │ Current ends at the same time last ends  │
-        # │      ███  ->           │ The last time span is extended           │
+        # │  ████     ->  ███████  │ Current time span ends at the same time  │
+        # │      ███  ->           │ as the last last time span ends.         │
+        # │                        │ The last time span is extended           │
+        # │  ▄▄██▄▄   ->  ▄▄████▄  │                                          │
+        # │    ▄▄██▄  ->           │ Time span will override any buffer times │
+        # │                        │                                          │
+        # │  ▄▄██▄▄▄  ->  ▄▄████▄  │ The 'before buffer' start time and       │
+        # │  ▄▄▄███   ->           │ the 'after buffer' end time              │
+        # │                        │ should not be changed                    │
+        # │   ▄██▄▄▄  ->  ▄▄███▄▄  │                                          │
+        # │  ▄▄▄██▄▄  ->           │                                          │
         # ├────────────────────────┼──────────────────────────────────────────┤
         # │  ███████  ->  ███████  │ Time span is fully inside the last one   │
         # │    ███    ->           │                                          │
+        # │                        │ The buffered start/end times are kept    │
+        # │   █████   ->  ▄█████▄  │                                          │
+        # │  ▄▄███▄▄  ->           │                                          │
         # └────────────────────────┴──────────────────────────────────────────┘
         last_time_span = merged_time_span_elements[-1]
-        # Last time span can maybe be extended
+
+        # Last time span overlaps with the current time span, combine them.
         if last_time_span.end_datetime >= current_time_span.start_datetime:
-            # Last time span fully contains this time span, skip it.
+            # This time span is fully inside the last one.
             if last_time_span.end_datetime > current_time_span.end_datetime:
+                # Even with after buffers, this time span is fully inside the last one, so it can be skipped.
+                if last_time_span.buffered_end_datetime > current_time_span.buffered_end_datetime:
+                    continue
+
+                # Current time span's buffer ends after the last's buffer ends, so we can extend the last's buffer.
+                buffer_delta = last_time_span.buffered_end_datetime - current_time_span.buffered_end_datetime
+                last_time_span.buffer_time_after += buffer_delta
                 continue
-            # Last time span is expanded
+
+            # Extend the last time span's before buffer.
+            min_buffered_dt = min(last_time_span.buffered_start_datetime, current_time_span.buffered_start_datetime)
+            last_time_span.buffer_time_before = last_time_span.start_datetime - min_buffered_dt
+
+            # Extend the last time span and it's after buffer.
+            # The buffered end datetime should stay the same.
+            max_buffered_dt = max(last_time_span.buffered_end_datetime, current_time_span.buffered_end_datetime)
             last_time_span.end_datetime = current_time_span.end_datetime
+            last_time_span.buffer_time_after = max_buffered_dt - last_time_span.end_datetime
             continue
 
-        # No overlapping time spans, add the current time span to the list.
-        # ┌────────────────────────┬─────────────────────────────────────┐
-        # │  ████     ->  ████     │ Not overlapping                     │
-        # │       ██  ->       ██  │ Current time span is added to list  │
-        # └────────────────────────┴─────────────────────────────────────┘
+        # No overlapping time spans, check for overlapping buffers and add the current time span to the merged list.
+        # ┌────────────────────────┬──────────────────────────────────────────┐
+        # │  ████     ->  ████     │ Not overlapping                          │
+        # │       ██  ->       ██  │ Current time span is added to list       │
+        # ├────────────────────────┼──────────────────────────────────────────┤
+        # │  ██▄▄     ->  ██▄▄     │ Don't combine                            │
+        # │    ▄▄███  ->    ▄▄███  │                                          │
+        # ├────────────────────────┼──────────────────────────────────────────┤
+        # │   ██      ->   ██      │ Don't combine                            │
+        # │  ▄▄▄▄▄██  ->  ▄▄▄▄▄██  │                                          │
+        # ├────────────────────────┼──────────────────────────────────────────┤
+        # │  ██       ->  ██       │ Reservation shortens later buffer        │
+        # │   ▄▄▄███  ->    ▄▄███  │                                          │
+        # │                        │                                          │
+        # │  ██▄▄▄    ->  ██▄▄     │ Reservation shortens earlier buffer      │
+        # │      ███  ->      ███  │                                          │
+        # └────────────────────────┴──────────────────────────────────────────┘
+
+        # Last time span shortens current time span's buffer
+        if last_time_span.end_datetime > current_time_span.buffered_start_datetime >= last_time_span.start_datetime:
+            current_time_span.buffer_time_before = current_time_span.start_datetime - last_time_span.end_datetime
+
+        # Current time span shortens last time span's buffer
+        if current_time_span.start_datetime < last_time_span.buffered_end_datetime <= current_time_span.end_datetime:
+            last_time_span.buffer_time_after = current_time_span.start_datetime - last_time_span.end_datetime
+
         merged_time_span_elements.append(current_time_span)
 
     return merged_time_span_elements
