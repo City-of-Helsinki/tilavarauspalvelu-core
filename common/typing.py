@@ -28,3 +28,4 @@ class QueryInfo(TypedDict):
     sql: str
     duration_ns: int
     succeeded: bool
+    stack_info: str

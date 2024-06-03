@@ -4,6 +4,7 @@ import time
 import traceback
 from collections.abc import Callable, Generator
 from functools import partial
+from pathlib import Path
 from typing import Any
 
 from django.conf import settings
@@ -71,6 +72,9 @@ class GraphQLErrorLoggingMiddleware:
 class QueryLoggingMiddleware:
     """Middleware that logs SQL queries made during the duration of a request."""
 
+    # Middlewares in this path are not relevant for debugging.
+    THIS_FILE = str(Path(__file__).resolve())
+
     def __init__(self, get_response: Callable[[WSGIRequest], HttpResponse]) -> None:
         self.get_response = get_response
 
@@ -113,7 +117,7 @@ class QueryLoggingMiddleware:
         context: dict[str, Any],
         query_log: list[QueryInfo],
     ) -> Any:
-        query_info = QueryInfo(sql=sql, duration_ns=0, succeeded=True)
+        query_info = QueryInfo(sql=sql, duration_ns=0, succeeded=True, stack_info=self.get_stack_info())
         query_log.append(query_info)
 
         start = time.perf_counter_ns()
@@ -126,6 +130,20 @@ class QueryLoggingMiddleware:
             query_info["duration_ns"] = time.perf_counter_ns() - start
 
         return result
+
+    def get_stack_info(self) -> str:
+        frame: traceback.FrameSummary | None = None
+
+        for frame in reversed(traceback.extract_stack()):
+            if frame.filename == self.THIS_FILE:
+                continue
+            is_own_file = frame.filename.startswith(str(settings.BASE_DIR))
+            if is_own_file:
+                return "".join(traceback.StackSummary.from_list([frame]).format())
+
+        if frame is None:
+            return "No info"
+        return "Likely fetched through the optimizer"
 
 
 class ProfilerMiddleware:
