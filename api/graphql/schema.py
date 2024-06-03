@@ -7,8 +7,9 @@ from django.conf import settings
 from django.db import models
 from graphene import Field
 from graphene_django.debug import DjangoDebug
-from query_optimizer import DjangoListField
-from rest_framework.generics import get_object_or_404
+from graphene_django_extensions.errors import GQLNotFoundError
+from query_optimizer import DjangoListField, optimize_single
+from query_optimizer.compiler import optimize
 
 from applications.models import AllocatedTimeSlot
 from common.models import BannerNotification
@@ -220,7 +221,7 @@ class Query(graphene.ObjectType):
             return None
 
         HelsinkiProfileClient.ensure_token_valid(info.context)
-        return get_object_or_404(User, pk=info.context.user.pk)
+        return optimize_single(User.objects.all(), info, max_complexity=15, pk=info.context.user.pk)
 
     def resolve_profile_data(root: None, info: GQLInfo, **kwargs: Any) -> UserProfileInfo:
         reservation_id: int | None = kwargs.get("reservation_id")
@@ -228,7 +229,12 @@ class Query(graphene.ObjectType):
         return HelsinkiProfileDataNode.get_data(info, application_id=application_id, reservation_id=reservation_id)
 
     def resolve_order(root: None, info: GQLInfo, *, order_uuid: str, **kwargs: Any):
-        order = get_object_or_404(PaymentOrder, remote_id=order_uuid)
+        queryset = optimize(PaymentOrder.objects.filter(remote_id=order_uuid), info)
+        order = next(iter(queryset), None)  # Avoids adding additional ordering.
+        if order is None:
+            msg = f"PaymentOrder-object with orderUuid='{order_uuid}' does not exist."
+            raise GQLNotFoundError(msg)
+
         if PaymentOrderPermission.has_node_permission(order, info.context.user, {}):
             return order
         return None

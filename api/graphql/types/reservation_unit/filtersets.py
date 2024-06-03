@@ -19,7 +19,7 @@ from reservation_units.utils.reservation_unit_reservation_state_helper import Re
 from reservation_units.utils.reservation_unit_state_helper import ReservationUnitStateHelper
 
 if TYPE_CHECKING:
-    from datetime import date, time
+    import datetime
     from decimal import Decimal
 
     from common.typing import AnyUser
@@ -216,10 +216,10 @@ class ReservationUnitFilterSet(ModelFilterSet):
         if not calculate_first_reservable_time:
             return qs
 
-        date_start: date | None = value["reservable_date_start"]
-        date_end: date | None = value["reservable_date_end"]
-        time_start: time | None = value["reservable_time_start"]
-        time_end: time | None = value["reservable_time_end"]
+        date_start: datetime.date | None = value["reservable_date_start"]
+        date_end: datetime.date | None = value["reservable_date_end"]
+        time_start: datetime.time | None = value["reservable_time_start"]
+        time_end: datetime.time | None = value["reservable_time_end"]
         minimum_duration_minutes: Decimal | None = value["reservable_minimum_duration_minutes"]
 
         # Annotate all ReservationUnits with `first_reservable_datetime` since we need the info in the GraphQL object.

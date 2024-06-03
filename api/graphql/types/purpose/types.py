@@ -16,8 +16,7 @@ __all__ = [
 
 class PurposeNode(DjangoNode):
     image_url = AnnotatedField(graphene.String, expression=models.F("image"))
-
-    small_url = graphene.String()
+    small_url = AnnotatedField(graphene.String, expression=models.F("image"))
 
     class Meta:
         model = Purpose
@@ -42,7 +41,9 @@ class PurposeNode(DjangoNode):
         return info.context.build_absolute_uri(url)
 
     def resolve_small_url(root: Purpose, info: GQLInfo) -> str | None:
-        if not root.image:
+        image_name: str | None = getattr(root, "image_url", None)
+        if not image_name:
             return None
-        url = get_thumbnailer(root.image)["purpose_image"].url
+
+        url = get_thumbnailer(image_name)["purpose_image"].url
         return info.context.build_absolute_uri(url)

@@ -8,10 +8,6 @@ from applications.choices import ApplicationStatusChoice
 
 
 class ApplicationQuerySet(models.QuerySet):
-    def reached_allocation(self) -> Self:
-        """How many applications in this application round reached allocation stage?"""
-        return self.filter(cancelled_date__isnull=True, sent_date__isnull=False)
-
     def has_status(self, status: ApplicationStatusChoice) -> Self:
         return self.filter(L(status=status.value))
 

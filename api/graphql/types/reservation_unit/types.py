@@ -7,20 +7,24 @@ from django.db.models import Sum
 from django.utils.timezone import get_default_timezone
 from graphene_django_extensions import DjangoNode
 from graphql import GraphQLError
-from query_optimizer import AnnotatedField, DjangoListField
+from query_optimizer import AnnotatedField, DjangoListField, ManuallyOptimizedField
+from query_optimizer.optimizer import QueryOptimizer
 
 from api.graphql.types.location.types import LocationNode
 from api.graphql.types.reservation.types import ReservationNode
 from api.graphql.types.reservation_unit.filtersets import ReservationUnitFilterSet
 from api.graphql.types.reservation_unit.permissions import ReservationUnitPermission
+from common.db import SubqueryCount
 from common.typing import GQLInfo
 from merchants.models import PaymentMerchant
+from opening_hours.models import OriginHaukiResource
 from opening_hours.utils.hauki_link_generator import generate_hauki_link
 from permissions.helpers import can_manage_units, can_modify_reservation_unit
 from reservation_units.enums import ReservationState, ReservationUnitState
 from reservation_units.models import ReservationUnit
 from reservations.choices import ReservationTypeChoice
-from spaces.models import Location
+from reservations.models import Reservation
+from spaces.models import Location, Space, Unit
 
 __all__ = [
     "ReservationUnitNode",
@@ -41,12 +45,12 @@ class ReservationUnitNode(DjangoNode):
     state = graphene.Field(graphene.Enum.from_enum(ReservationUnitState))
     reservation_state = graphene.Field(graphene.Enum.from_enum(ReservationState))
 
-    location = graphene.Field(LocationNode)
+    location = ManuallyOptimizedField(LocationNode)
 
     is_closed = graphene.Boolean()
     first_reservable_datetime = graphene.DateTime()
 
-    hauki_url = graphene.String()
+    hauki_url = ManuallyOptimizedField(graphene.String)
 
     reservable_time_spans = graphene.List(
         ReservableTimeSpanType,
@@ -56,7 +60,7 @@ class ReservationUnitNode(DjangoNode):
 
     reservation_set = DjangoListField(ReservationNode)
 
-    num_active_user_reservations = graphene.Int()
+    num_active_user_reservations = ManuallyOptimizedField(graphene.Int)
 
     calculated_surface_area = AnnotatedField(graphene.Int, expression=Sum("surface_area"))
 
@@ -149,6 +153,7 @@ class ReservationUnitNode(DjangoNode):
             "reservable_time_spans",
             "is_closed",
             "first_reservable_datetime",
+            # "first_reservable_time_info",
             "num_active_user_reservations",
         ]
         restricted_fields = {
@@ -171,17 +176,85 @@ class ReservationUnitNode(DjangoNode):
         if hasattr(root, "is_closed"):
             return root.is_closed
 
-        raise GraphQLError("Unexpected error: 'is_closed' should have been calculated but wasn't.")
+        msg = (
+            "Unexpected error: 'isClosed' should have been calculated but wasn't. "
+            "Did you forget to set `calculateFirstReservableTime:true`?"
+        )
+        raise GraphQLError(msg)
 
     def resolve_first_reservable_datetime(root: ReservationUnit, info: GQLInfo) -> datetime.datetime | None:
         # 'first_reservable_datetime' is annotated by ReservationUnitFilterSet
         if hasattr(root, "first_reservable_datetime"):
             return root.first_reservable_datetime
 
-        raise GraphQLError("Unexpected error: 'first_reservable_datetime' should have been calculated but wasn't.")
+        msg = (
+            "Unexpected error: 'firstReservableDatetime' should have been calculated but wasn't. "
+            "Did you forget to set `calculateFirstReservableTime:true`?"
+        )
+        raise GraphQLError(msg)
+
+    @staticmethod
+    def optimize_location(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
+        # Fetch `space` and space's `location` if not fetched yet.
+        space_optimizer = optimizer.get_or_set_child_optimizer(
+            name="spaces",
+            optimizer=QueryOptimizer(
+                Space,
+                optimizer.info,
+                name="spaces",
+                parent=optimizer,
+            ),
+            set_as="prefetch_related",
+        )
+        space_optimizer.get_or_set_child_optimizer(
+            name="location",
+            optimizer=QueryOptimizer(
+                Location,
+                optimizer.info,
+                name="location",
+                parent=space_optimizer,
+            ),
+        )
+
+        return queryset
 
     def resolve_location(root: ReservationUnit, info: GQLInfo) -> Location:
         return root.actions.get_location()
+
+    @staticmethod
+    def optimize_payment_merchant(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
+        # Fetch `payment_merchant` if not fetched yet.
+        optimizer.get_or_set_child_optimizer(
+            name="payment_merchant",
+            optimizer=QueryOptimizer(
+                PaymentMerchant,
+                optimizer.info,
+                name="payment_merchant",
+                parent=optimizer,
+            ),
+        )
+
+        # Fetch `unit` and unit's `payment_merchant` if not fetched yet.
+        unit_optimizer = optimizer.get_or_set_child_optimizer(
+            name="unit",
+            optimizer=QueryOptimizer(
+                Unit,
+                optimizer.info,
+                name="unit",
+                parent=optimizer,
+            ),
+        )
+        unit_optimizer.get_or_set_child_optimizer(
+            name="payment_merchant",
+            optimizer=QueryOptimizer(
+                PaymentMerchant,
+                optimizer.info,
+                name="payment_merchant",
+                parent=unit_optimizer,
+            ),
+        )
+
+        return queryset
 
     def resolve_payment_merchant(root: ReservationUnit, info: GQLInfo) -> PaymentMerchant | None:
         if root.payment_merchant is not None:
@@ -189,6 +262,36 @@ class ReservationUnitNode(DjangoNode):
         if root.unit is not None and root.unit.payment_merchant is not None:
             return root.unit.payment_merchant
         return None
+
+    @staticmethod
+    def optimize_hauki_url(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
+        # Fetch `uuid` if not fetched yet.
+        optimizer.only_fields.append("uuid")
+
+        # Fetch `origin_hauki_resource` if not fetched yet.
+        optimizer.get_or_set_child_optimizer(
+            name="origin_hauki_resource",
+            optimizer=QueryOptimizer(
+                OriginHaukiResource,
+                optimizer.info,
+                name="origin_hauki_resource",
+                parent=optimizer,
+            ),
+        )
+
+        # Fetch `unit` and `hauki_department_id` if not fetched yet.
+        unit_optimizer = optimizer.get_or_set_child_optimizer(
+            name="unit",
+            optimizer=QueryOptimizer(
+                Unit,
+                optimizer.info,
+                name="unit",
+                parent=optimizer,
+            ),
+        )
+        unit_optimizer.only_fields.append("hauki_department_id")
+
+        return queryset
 
     def resolve_hauki_url(root: ReservationUnit, info: GQLInfo) -> str | None:
         if root.origin_hauki_resource is None:
@@ -215,6 +318,20 @@ class ReservationUnitNode(DjangoNode):
             )
         ]
 
+    @staticmethod
+    def optimize_num_active_user_reservations(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
+        return queryset.annotate(
+            num_active_user_reservations=SubqueryCount(
+                Reservation.objects.filter(
+                    reservation_unit=models.OuterRef("id"),
+                    user=optimizer.info.context.user,
+                )
+                .exclude(type=ReservationTypeChoice.SEASONAL.value)
+                .active()
+                .values("id")
+            )
+        )
+
     def resolve_num_active_user_reservations(root: ReservationUnit, info: GQLInfo) -> int:
         """
         Number of active reservations made by the user to this ReservationUnit.
@@ -222,9 +339,4 @@ class ReservationUnitNode(DjangoNode):
         """
         if not info.context.user.is_authenticated:
             return 0
-        return (
-            root.reservation_set.filter(user=info.context.user)
-            .exclude(type=ReservationTypeChoice.SEASONAL)
-            .active()
-            .count()
-        )
+        return getattr(root, "num_active_user_reservations", 0)

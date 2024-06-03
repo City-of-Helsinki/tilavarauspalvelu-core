@@ -3,7 +3,8 @@ from django.db import models
 from django.db.models import OuterRef
 from graphene_django_extensions import DjangoNode
 from lookup_property import L
-from query_optimizer import AnnotatedField, DjangoListField
+from query_optimizer import AnnotatedField
+from query_optimizer.optimizer import QueryOptimizer
 from rest_framework.reverse import reverse
 
 from api.graphql.types.merchants.types import PaymentOrderNode
@@ -37,16 +38,20 @@ def staff_field_check(user: User, reservation: Reservation) -> bool | None:
 
 
 class ReservationNode(DjangoNode):
-    order = PaymentOrderNode.Field()
-    reservee_name = graphene.String()
-    is_blocked = graphene.Boolean()
-    is_handled = graphene.Boolean()
-    staff_event = graphene.Boolean(deprecation_reason="Please refer to type.")
-    calendar_url = graphene.String()
+    order = PaymentOrderNode.Field(deprecation_reason="Please use to 'paymentOrder' instead.")
 
-    # Needs to be singular since the many-to-many field is also singular,
-    # and otherwise the optimizer cannot optimize this properly.
-    reservation_unit = DjangoListField("api.graphql.types.reservation_unit.types.ReservationUnitNode")
+    reservee_name = AnnotatedField(graphene.String, expression=L("reservee_name"))
+
+    is_blocked = AnnotatedField(graphene.Boolean, expression=models.Q(type=ReservationTypeField.BLOCKED.value))
+    is_handled = AnnotatedField(graphene.Boolean, expression=models.Q(handled_at__isnull=False))
+
+    staff_event = AnnotatedField(
+        graphene.Boolean,
+        expression=models.Q(type=ReservationTypeField.STAFF.value),
+        deprecation_reason="Please use to 'type' instead.",
+    )
+
+    calendar_url = graphene.String()
 
     affected_reservation_units = AnnotatedField(
         graphene.List(graphene.Int),
@@ -164,6 +169,7 @@ class ReservationNode(DjangoNode):
             "is_blocked",
             "is_handled",
             "order",
+            "payment_order",
             "staff_event",
             "calendar_url",
         ]
@@ -201,24 +207,28 @@ class ReservationNode(DjangoNode):
         permission_classes = [ReservationPermission]
 
     @classmethod
-    def filter_queryset(cls, queryset: models.QuerySet, info: GQLInfo) -> models.QuerySet:
-        return queryset.annotate(
-            # Annotate for field permission checks
-            unit_ids_for_perms=L("unit_ids_for_perms"),
-            unit_group_ids_for_perms=L("unit_group_ids_for_perms"),
+    def pre_optimization_hook(cls, queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
+        # Add annotations for field permission checks
+        optimizer.annotations["unit_ids_for_perms"] = L("unit_ids_for_perms")
+        optimizer.annotations["unit_group_ids_for_perms"] = L("unit_group_ids_for_perms")
+
+        # Add user id for permission checks
+        user_optimizer = optimizer.get_or_set_child_optimizer(
+            "user",
+            QueryOptimizer(
+                User,
+                info=optimizer.info,
+                name="user",
+                parent=optimizer,
+            ),
         )
+        user_optimizer.only_fields.append("id")
+        return queryset
 
     def resolve_order(root: Reservation, info: GQLInfo) -> PaymentOrder | None:
+        # TODO: This should be removed, since it breaks optimization.
+        #  Should use 'payment_order' instead.
         return root.payment_order.first()
-
-    def resolve_is_blocked(root: Reservation, info: GQLInfo) -> bool | None:
-        return root.type == ReservationTypeField.BLOCKED
-
-    def resolve_is_handled(root: Reservation, info: GQLInfo) -> bool | None:
-        return root.handled_at is not None
-
-    def resolve_staff_event(root: Reservation, info: GQLInfo) -> bool | None:
-        return root.type == ReservationTypeField.STAFF
 
     def resolve_calendar_url(root: Reservation, info: GQLInfo) -> str:
         scheme = info.context.scheme

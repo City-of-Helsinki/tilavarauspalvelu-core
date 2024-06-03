@@ -149,8 +149,17 @@ def can_read_application(user: AnyUser, application: Application) -> bool:
 
 
 def can_access_application_private_fields(user: AnyUser, application: Application) -> bool:
-    units = list(application.units.values_list("pk", flat=True))
-    return can_validate_unit_applications(user, units)
+    if user.is_anonymous:
+        return False
+    if user.is_superuser:
+        return True
+    if has_general_permission(user, GeneralPermissionChoices.CAN_VALIDATE_APPLICATIONS):
+        return True
+
+    unit_ids = application.unit_ids_for_perms
+    unit_group_ids = application.unit_group_ids_for_perms
+
+    return has_unit_or_group_permission(user, UnitPermissionChoices.CAN_VALIDATE_APPLICATIONS, unit_ids, unit_group_ids)
 
 
 def can_view_reservation(user: AnyUser, reservation: Reservation, needs_staff_permissions: bool = False) -> bool:
