@@ -19,4 +19,4 @@ def space_modify(instance: Space, *args: Any, **kwargs: Any):
     # Refresh the reservation unit hierarchy since spaces have changed.
     from reservation_units.models import ReservationUnitHierarchy
 
-    ReservationUnitHierarchy.refresh()
+    ReservationUnitHierarchy.refresh(kwargs.get("using"))
