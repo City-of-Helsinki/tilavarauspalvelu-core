@@ -67,14 +67,7 @@ class ReservationQuerySet(models.QuerySet):
         )
 
     def going_to_occur(self: Self):
-        return self.filter(
-            state__in=(
-                ReservationStateChoice.CREATED,
-                ReservationStateChoice.CONFIRMED,
-                ReservationStateChoice.WAITING_FOR_PAYMENT,
-                ReservationStateChoice.REQUIRES_HANDLING,
-            )
-        )
+        return self.filter(state__in=ReservationStateChoice.states_going_to_occur)
 
     def active(self: Self) -> Self:
         """

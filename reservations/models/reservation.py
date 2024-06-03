@@ -4,6 +4,8 @@ import datetime
 from typing import TYPE_CHECKING
 
 from django.db import models
+from django.db.models.functions import Concat
+from django.db.models.functions.text import Trim
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
@@ -67,8 +69,8 @@ class Reservation(SerializableMixin, models.Model):
     working_memo: str = models.TextField(null=True, blank=True, default="")
 
     # Time information
-    begin: datetime.datetime = models.DateTimeField()
-    end: datetime.datetime = models.DateTimeField()
+    begin: datetime.datetime = models.DateTimeField(db_index=True)
+    end: datetime.datetime = models.DateTimeField(db_index=True)
     buffer_time_before: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
     buffer_time_after: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
     handled_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
@@ -210,43 +212,74 @@ class Reservation(SerializableMixin, models.Model):
     def __str__(self) -> str:
         return f"{self.name} ({self.type})"
 
+    @lookup_property(joins=["recurring_reservation", "user"])
+    def reservee_name() -> str:
+        return models.Case(  # type: ignore[return-value]
+            # Blocking reservation
+            models.When(
+                condition=(
+                    models.Q(type=ReservationTypeChoice.BLOCKED.value)  #
+                ),
+                then=models.Value(str(_("Closed"))),
+            ),
+            # Internal reservations created by STAFF
+            models.When(
+                condition=(
+                    models.Q(type=ReservationTypeChoice.STAFF.value)  #
+                    & models.Q(recurring_reservation__isnull=False)
+                    & ~models.Q(recurring_reservation__name="")
+                ),
+                then=models.F("recurring_reservation__name"),
+            ),
+            models.When(
+                condition=(
+                    models.Q(type=ReservationTypeChoice.STAFF.value)  #
+                    & (models.Q(recurring_reservation__isnull=True) | models.Q(recurring_reservation__name=""))
+                    & ~models.Q(name="")
+                ),
+                then=models.F("name"),
+            ),
+            # Organisation reservee
+            models.When(
+                condition=(
+                    models.Q(reservee_type__in=CustomerTypeChoice.organisation)  #
+                    & ~models.Q(reservee_organisation_name="")
+                ),
+                then=models.F("reservee_organisation_name"),
+            ),
+            # Individual reservee
+            models.When(
+                condition=(
+                    ~models.Q(reservee_type__in=CustomerTypeChoice.organisation)  #
+                    & (~models.Q(reservee_first_name="") | ~models.Q(reservee_last_name=""))
+                ),
+                then=Trim(Concat("reservee_first_name", models.Value(" "), "reservee_last_name")),
+            ),
+            # Use reservation name when reservee name as first fallback
+            models.When(
+                condition=~models.Q(name=""),
+                then=models.F("name"),
+            ),
+            # Use the name of the User who made the reservation as the last fallback
+            models.When(
+                condition=(
+                    models.Q(user__isnull=False)  #
+                    & (
+                        ~models.Q(user__first_name="")  #
+                        | ~models.Q(user__last_name="")
+                    )
+                ),
+                then=Trim(Concat("user__first_name", models.Value(" "), "user__last_name")),
+            ),
+            default=models.Value(""),
+            output_field=models.CharField(),
+        )
+
     @property
     def requires_handling(self) -> bool:
         return (
             self.reservation_unit.filter(require_reservation_handling=True).exists() or self.applying_for_free_of_charge
         )
-
-    @property
-    def reservee_name(self) -> str:
-        # Blocking reservation
-        if self.type == ReservationTypeChoice.BLOCKED.value:
-            return _("Closed")
-
-        # Internal reservations created by STAFF
-        if self.type == ReservationTypeChoice.STAFF.value:
-            if self.recurring_reservation is not None and self.recurring_reservation.name:
-                return self.recurring_reservation.name
-            if self.name:
-                return self.name
-
-        # Organisation reservee
-        is_organization = self.reservee_type in [CustomerTypeChoice.BUSINESS.value, CustomerTypeChoice.NONPROFIT.value]
-        if is_organization:
-            if self.reservee_organisation_name:
-                return self.reservee_organisation_name
-        # Individual reservee
-        elif individual_full_name := f"{self.reservee_first_name} {self.reservee_last_name}".strip():
-            return individual_full_name
-
-        # Use reservation name when reservee name as first fallback
-        if self.name:
-            return self.name
-
-        # Use the name of the User who made the reservation as the last fallback
-        if self.user is not None and (user_display_name := self.user.get_display_name().strip()):
-            return user_display_name
-
-        return ""
 
     def get_location_string(self) -> str:
         locations = []
@@ -302,11 +335,10 @@ class Reservation(SerializableMixin, models.Model):
     def unit_ids_for_perms() -> list[int]:
         from spaces.models import Unit
 
-        expr = SubqueryArray(
+        return SubqueryArray(
             Unit.objects.filter(reservationunit__in=models.OuterRef("reservation_unit")).values("id"),
             agg_field="id",
         )
-        return expr  # type: ignore[return-value]
 
     @unit_ids_for_perms.override
     def _(self) -> list[int]:
@@ -316,11 +348,10 @@ class Reservation(SerializableMixin, models.Model):
     def unit_group_ids_for_perms() -> list[int]:
         from spaces.models import UnitGroup
 
-        expr = SubqueryArray(
+        return SubqueryArray(
             UnitGroup.objects.filter(units__in=models.OuterRef("reservation_unit__unit")).values("id"),
             agg_field="id",
         )
-        return expr  # type: ignore[return-value]
 
     @unit_group_ids_for_perms.override
     def _(self) -> list[int]:
