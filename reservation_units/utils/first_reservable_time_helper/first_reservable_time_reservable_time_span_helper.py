@@ -4,7 +4,7 @@ import math
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
-from opening_hours.utils.reservable_time_span_client import override_reservable_with_closed_time_spans
+from opening_hours.utils.time_span_element_utils import override_reservable_with_closed_time_spans
 from reservation_units.enums import ReservationStartInterval
 from reservation_units.utils.first_reservable_time_helper.utils import ReservableTimeOutput
 
