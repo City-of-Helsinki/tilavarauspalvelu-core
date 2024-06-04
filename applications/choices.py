@@ -252,12 +252,6 @@ class ApplicationSectionStatusChoice(models.TextChoices):
     HANDLED = "HANDLED", _("Handled")
     """Application section has been handled fully in the allocation process"""
 
-    RESERVED = "RESERVED", _("Reserved")
-    """All reservations for the application section have been created successfully"""
-
-    FAILED = "FAILED", _("Failed")
-    """Some or all reservations for the application section could not be created successfully"""
-
     @DynamicClassAttribute
     def can_allocate(self) -> bool:
         return self in [
