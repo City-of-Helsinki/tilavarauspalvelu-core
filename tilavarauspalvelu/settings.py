@@ -2,7 +2,6 @@
 import zoneinfo
 from pathlib import Path
 
-import dj_database_url
 from django.utils.translation import gettext_lazy
 from env_config import Environment, values
 from helusers.defaults import SOCIAL_AUTH_PIPELINE
@@ -790,12 +789,12 @@ class Build(EmptyDefaults, Common, use_environ=True):
 
 
 class CI(EmptyDefaults, Common, use_environ=True):
-    """Settings for non-test commands in GitHub Actions CI environment."""
+    """Settings for commands in GitHub Actions and Azure Pipelines CI environment."""
 
-    DEBUG = True
+    DEBUG = False
 
-    # Migration check requires the database
-    DATABASES = {"default": dj_database_url.parse(url="postgis://tvp:tvp@localhost:5432/tvp")}
+    # Migrations require the database
+    DATABASES = values.DatabaseURLValue()
 
 
 class Platta(Common, use_environ=True):

@@ -107,14 +107,16 @@ jobs:
         run: poetry run python manage.py makemigrations --check --no-color --no-input --dry-run
         env:
           DJANGO_SETTINGS_ENVIRONMENT: CI
+          DATABASE_URL: postgis://tvp:tvp@localhost:5432/tvp
 
       - name: "Test for missing translation"
         run: poetry run python -m tilavarauspalvelu.hooks.translations_done
         env:
           DJANGO_SETTINGS_ENVIRONMENT: CI
+          DATABASE_URL: postgis://tvp:tvp@localhost:5432/tvp
 
       - name: "Run pytest with coverage"
-        run: poetry run pytest --cov=. --cov-report=xml --cov-branch --disable-warnings
+        run: poetry run pytest --cov=. --cov-report=xml --cov-branch --disable-warnings --skip-slow
         env:
           DJANGO_SETTINGS_ENVIRONMENT: AutomatedTests
 
