@@ -96,6 +96,9 @@ updates:
       # fails typescript lint
       - dependency-name: "date-fns"
         update-types: ["version-update:semver-major"]
+      # requires an upstream upgrade of vercel-style-guide to support a flat config
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
     # NOTE can't do a single group for all it will fail to update
     # either just accept multiple PRs or do fine grained groups manually
     groups:
