@@ -1,7 +1,7 @@
 from datetime import timedelta
 
-from opening_hours.utils.reservable_time_span_client import merge_overlapping_time_span_elements
 from opening_hours.utils.time_span_element import TimeSpanElement
+from opening_hours.utils.time_span_element_utils import merge_overlapping_time_span_elements
 from tests.test_external_services.test_hauki.test_reservable_time_spans_client import _get_date
 
 # No buffers

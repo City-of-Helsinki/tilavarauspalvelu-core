@@ -6,8 +6,8 @@ from itertools import chain
 from typing import TYPE_CHECKING, Any, TypedDict
 
 from common.date_utils import DEFAULT_TIMEZONE, combine, get_periods_between
-from opening_hours.utils.reservable_time_span_client import merge_overlapping_time_span_elements
 from opening_hours.utils.time_span_element import TimeSpanElement
+from opening_hours.utils.time_span_element_utils import merge_overlapping_time_span_elements
 from reservation_units.models import ReservationUnit
 from reservation_units.utils.affecting_reservations_helper import AffectingReservationHelper
 from reservations.choices import RejectionReadinessChoice
