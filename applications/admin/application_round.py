@@ -50,7 +50,7 @@ class ApplicationRoundAdmin(ExtraButtonsMixin, TranslationAdmin):
         return str(obj)
 
     @button(label="Export applications to CSV")
-    def export_applications_to_csv(self, request, extra_context=None) -> FileResponse | None:
+    def export_applications_to_csv(self, request) -> FileResponse | None:
         application_round_id: int | None = request.resolver_match.kwargs.get("extra_context")
 
         exporter = ApplicationRoundApplicationsCSVExporter(application_round_id=application_round_id)
@@ -67,7 +67,7 @@ class ApplicationRoundAdmin(ExtraButtonsMixin, TranslationAdmin):
         return response
 
     @button(label="Export results to CSV")
-    def export_results_to_csv(self, request, extra_context=None) -> FileResponse | None:
+    def export_results_to_csv(self, request) -> FileResponse | None:
         application_round_id: int | None = request.resolver_match.kwargs.get("extra_context")
 
         exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round_id)
