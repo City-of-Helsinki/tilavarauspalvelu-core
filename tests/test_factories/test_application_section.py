@@ -15,8 +15,6 @@ pytestmark = [
         ApplicationSectionStatusChoice.UNALLOCATED,
         ApplicationSectionStatusChoice.IN_ALLOCATION,
         ApplicationSectionStatusChoice.HANDLED,
-        # TODO: ApplicationSectionStatusChoice.RESERVED,
-        # TODO: ApplicationSectionStatusChoice.FAILED,
     ],
 )
 def test_application_section_factory_create_in_status(status):

@@ -251,14 +251,6 @@ class ApplicationSection(SerializableMixin, models.Model):
                 models.Q(L(status=ApplicationSectionStatusChoice.HANDLED.value)),
                 then=models.Value(3),
             ),
-            models.When(
-                models.Q(L(status=ApplicationSectionStatusChoice.FAILED.value)),
-                then=models.Value(4),
-            ),
-            models.When(
-                models.Q(L(status=ApplicationSectionStatusChoice.RESERVED.value)),
-                then=models.Value(5),
-            ),
             default=models.Value(6),
             output_field=models.IntegerField(),
         )
