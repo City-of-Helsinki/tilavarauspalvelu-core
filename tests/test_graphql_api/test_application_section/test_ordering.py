@@ -328,14 +328,14 @@ def test_application_section__order__by_preferred_unit_name__desc(graphql, lang)
     # - There are two application sections in the system
     # - The application sections have a variety of reservation unit options
     # - A superuser is using the system
-    section_1 = ApplicationSectionFactory.create_in_status_unallocated()
+    section_1 = ApplicationSectionFactory.create_in_status_unallocated(reservation_unit_options=None)
     ReservationUnitOptionFactory.create(
         application_section=section_1,
         preferred_order=0,
         **{f"reservation_unit__unit__name_{lang}": "C unit"},
     )
 
-    section_2 = ApplicationSectionFactory.create_in_status_unallocated()
+    section_2 = ApplicationSectionFactory.create_in_status_unallocated(reservation_unit_options=None)
     ReservationUnitOptionFactory.create(
         application_section=section_2,
         preferred_order=0,
@@ -350,7 +350,7 @@ def test_application_section__order__by_preferred_unit_name__desc(graphql, lang)
 
     # Section doesn't have reservation unit options with preferred order 0
     # -> preferred_unit_name is None -> ordered first
-    section_3 = ApplicationSectionFactory.create_in_status_unallocated()
+    section_3 = ApplicationSectionFactory.create_in_status_unallocated(reservation_unit_options=None)
     ReservationUnitOptionFactory.create(
         application_section=section_3,
         preferred_order=1,
@@ -359,7 +359,7 @@ def test_application_section__order__by_preferred_unit_name__desc(graphql, lang)
 
     # Section doesn't have reservation unit options at all
     # -> preferred_unit_name is None -> ordered first
-    section_4 = ApplicationSectionFactory.create_in_status_unallocated()
+    section_4 = ApplicationSectionFactory.create_in_status_unallocated(reservation_unit_options=None)
 
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
