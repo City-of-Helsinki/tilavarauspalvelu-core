@@ -1,4 +1,5 @@
 # ruff: noqa: N802
+import os
 import zoneinfo
 from pathlib import Path
 
@@ -135,8 +136,7 @@ class Common(Environment):
 
     # --- Database settings ------------------------------------------------------------------------------------------
 
-    CONN_MAX_AGE = values.IntegerValue(default=0)
-    DATABASES = values.DatabaseURLValue(conn_max_age=CONN_MAX_AGE)
+    DATABASES = values.DatabaseURLValue(conn_max_age=int(os.getenv("CONN_MAX_AGE", "0")))
 
     # --- Template settings ------------------------------------------------------------------------------------------
 
