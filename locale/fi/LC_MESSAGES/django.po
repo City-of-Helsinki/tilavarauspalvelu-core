@@ -758,7 +758,7 @@ msgstr "Pyydetty aloitusaika allokaatioille."
 msgid "Requested end time for allocations."
 msgstr "Pyydetty lopetusaika allokaatioille."
 
-#: applications/apps.py
+#: applications/apps.py applications/tasks.py
 msgid "Seasonal Booking"
 msgstr "Kausivaraus"
 
@@ -1084,6 +1084,10 @@ msgstr "Kesto (ns)"
 msgid "Succeeded"
 msgstr "Onnistunut"
 
+#: common/admin/forms/sql_log.py common/admin/sql_log.py
+msgid "Stack Info"
+msgstr "Stack Info"
+
 #: common/admin/forms/sql_log.py
 msgid "SQL that was executed (without params)."
 msgstr "Suoritettu SQL (ilman parametreja)."
@@ -1095,6 +1099,10 @@ msgstr "SQL-kyselyn kesto nanosekunteina."
 #: common/admin/forms/sql_log.py
 msgid "Whether the SQL query succeeded or not."
 msgstr "Onnistuiko SQL-kysely vai ei."
+
+#: common/admin/forms/sql_log.py
+msgid "Stack trace where the SQL query was executed."
+msgstr "Stack trace siellä missä SQL-kysely suoritettiin."
 
 #: common/admin/forms/sql_log.py common/admin/sql_log.py
 msgid "Request ID"
@@ -1112,8 +1120,8 @@ msgstr "Sisältö"
 msgid "Duration (ms)"
 msgstr "Kesto (ms)"
 
-#: common/admin/forms/sql_log.py permissions/base_models.py
-#: reservations/choices.py
+#: common/admin/forms/sql_log.py common/admin/sql_log.py
+#: permissions/base_models.py reservations/choices.py
 msgid "Created"
 msgstr "Luotu"
 
@@ -1142,6 +1150,14 @@ msgstr "Milloin SQL-kysely suoritettiin."
 #: common/admin/sql_log.py
 msgid "Queries"
 msgstr "Tietokantakyselyjä"
+
+#: common/admin/sql_log.py
+msgid "Duration Total (ms)"
+msgstr "Kesto yhteensä (ms)"
+
+#: common/admin/sql_log.py
+msgid "Duration SQL (ms)"
+msgstr "Kyselyn kesto (ms)"
 
 #: common/admin/sql_log.py
 msgid "Export rows to CSV"
@@ -2087,7 +2103,7 @@ msgid "Is archived"
 msgstr "Arkistoitu"
 
 #: reservation_units/admin/forms/reservation_unit.py
-#: reservation_units/models/equipment.py reservation_units/models/purpose.py
+#: reservation_units/models/equipment.py
 #: reservation_units/models/reservation_unit_type.py
 msgid "Order number"
 msgstr "Järjestysnumero"
@@ -2382,7 +2398,7 @@ msgstr "Kartta"
 msgid "Other"
 msgstr "Muu"
 
-#: reservation_units/models/equipment.py reservation_units/models/purpose.py
+#: reservation_units/models/equipment.py
 #: reservation_units/models/reservation_unit_type.py
 msgid "Order number to be used in api sorting."
 msgstr "Järjestysnumero, jota käytetään rajapinnan järjestämisessä."
@@ -2423,13 +2439,13 @@ msgstr "Aika, jota ennen käyttäjä voi perua tämän varausyksikön varauksia"
 msgid "Will the cancellation need manual staff handling"
 msgstr "Tarvitseeko peruminen manuaalisen käsittelyn"
 
-#: reservation_units/models/reservation_unit_image.py
-msgid "Type"
-msgstr "Tyyppi"
+#: reservation_units/models/reservation_unit_hierarchy.py
+msgid "reservation unit hierarchy"
+msgstr "varausyksiköiden hierarkia"
 
-#: reservation_units/models/reservation_unit_image.py
-msgid "Reservation unit image"
-msgstr "Varausyksikön kuva"
+#: reservation_units/models/reservation_unit_hierarchy.py
+msgid "reservation unit hierarchies"
+msgstr "varausyksiköiden hierarkiat"
 
 #: reservation_units/models/reservation_unit_pricing.py
 msgid "Date when price is activated"
