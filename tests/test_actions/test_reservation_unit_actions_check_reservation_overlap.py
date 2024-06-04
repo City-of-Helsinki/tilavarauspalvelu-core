@@ -3,6 +3,7 @@ from datetime import timedelta
 import pytest
 
 from common.date_utils import local_datetime
+from reservation_units.models import ReservationUnitHierarchy
 from reservations.choices import ReservationStateChoice
 from tests.factories import ReservationFactory, ReservationUnitFactory, ServiceFactory, SpaceFactory
 
@@ -62,6 +63,9 @@ def test_reservation_unit__check_reservation_overlap__same_space__same_time__ove
         end=end,
         state=ReservationStateChoice.CREATED,
     )
+
+    ReservationUnitHierarchy.refresh()
+
     assert res_unit_parent.actions.check_reservation_overlap(begin, end)
 
 
@@ -78,6 +82,9 @@ def test_reservation_unit__check_reservation_overlap__child__same_time__overlaps
         end=end,
         state=ReservationStateChoice.CREATED,
     )
+
+    ReservationUnitHierarchy.refresh()
+
     assert res_unit_parent.actions.check_reservation_overlap(begin, end)
 
 
@@ -110,6 +117,9 @@ def test_reservation_unit__check_reservation_overlap__same_space__partly_same_ti
         end=end,
         state=ReservationStateChoice.CREATED,
     )
+
+    ReservationUnitHierarchy.refresh()
+
     assert res_unit_parent.actions.check_reservation_overlap(begin, end)
 
 
@@ -126,6 +136,9 @@ def test_reservation_unit__check_reservation_overlap__child__partly_same_time__o
         end=end,
         state=ReservationStateChoice.CREATED,
     )
+
+    ReservationUnitHierarchy.refresh()
+
     assert res_unit_parent.actions.check_reservation_overlap(begin, end)
 
 
@@ -142,6 +155,9 @@ def test_reservation_unit__check_reservation_overlap__child_of_child__same_time_
         end=end,
         state=ReservationStateChoice.CREATED,
     )
+
+    ReservationUnitHierarchy.refresh()
+
     assert res_unit_parent.actions.check_reservation_overlap(begin, end)
 
 
@@ -174,4 +190,7 @@ def test_reservation_unit__check_reservation_overlap__child_parent__same_time__o
         end=end,
         state=ReservationStateChoice.CREATED,
     )
+
+    ReservationUnitHierarchy.refresh()
+
     assert res_unit_child_2_child.actions.check_reservation_overlap(begin, end)

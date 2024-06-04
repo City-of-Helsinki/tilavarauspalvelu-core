@@ -9,6 +9,7 @@ from django.utils.timezone import get_default_timezone
 from common.date_utils import local_date, local_datetime
 from email_notification.models import EmailType
 from reservation_units.enums import ReservationStartInterval
+from reservation_units.models import ReservationUnitHierarchy
 from reservations.choices import ReservationStateChoice
 from reservations.models import Reservation
 from tests.factories import (
@@ -193,6 +194,9 @@ def test_reservation__adjust_time__new_time_overlaps_another_reservation(graphql
         begin=overlapping.begin.isoformat(),
         end=overlapping.end.isoformat(),
     )
+
+    ReservationUnitHierarchy.refresh()
+
     response = graphql(ADJUST_MUTATION, input_data=data)
 
     assert response.error_message() == "Overlapping reservations are not allowed."
@@ -235,6 +239,9 @@ def test_reservation__adjust_time__overlaps_with_buffer_time(graphql):
 
     graphql.login_with_superuser()
     data = get_adjust_data(reservation)
+
+    ReservationUnitHierarchy.refresh()
+
     response = graphql(ADJUST_MUTATION, input_data=data)
 
     assert response.error_message() == "Reservation overlaps with reservation after due to buffer time."

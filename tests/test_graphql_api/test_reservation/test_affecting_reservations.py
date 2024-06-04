@@ -5,6 +5,7 @@ import pytest
 from django.utils.timezone import get_default_timezone
 from graphene_django_extensions.testing import build_query
 
+from reservation_units.models import ReservationUnitHierarchy
 from reservations.choices import ReservationStateChoice
 from tests.factories import ReservationFactory, ReservationUnitFactory, SpaceFactory, UnitFactory
 
@@ -75,6 +76,8 @@ def test_reservation__affecting__time_and_state(graphql):
 
     graphql.login_with_superuser()
 
+    ReservationUnitHierarchy.refresh()
+
     query = affecting_reservations_query(
         for_units=[unit.pk],
         begin_date=start_date.isoformat(),
@@ -143,6 +146,8 @@ def test_reservation__affecting__for_unit(graphql):
 
     graphql.login_with_superuser()
 
+    ReservationUnitHierarchy.refresh()
+
     query = affecting_reservations_query(for_units=[unit.pk])
     response = graphql(query)
 
@@ -193,6 +198,8 @@ def test_reservation__affecting__for_reservation_unit(graphql):
 
     graphql.login_with_superuser()
 
+    ReservationUnitHierarchy.refresh()
+
     query = affecting_reservations_query(for_reservation_units=[reservation_unit_1.pk])
     response = graphql(query)
 
@@ -224,6 +231,8 @@ def test_reservation__affecting__affected_reservation_units(graphql):
         reservation_unit=[reservation_unit_3],
         state=ReservationStateChoice.CREATED,
     )
+
+    ReservationUnitHierarchy.refresh()
 
     graphql.login_with_superuser()
 

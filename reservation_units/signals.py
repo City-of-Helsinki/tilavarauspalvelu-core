@@ -15,22 +15,23 @@ def reservation_unit_saved(instance: ReservationUnit, created: bool, *args: Any,
     if settings.UPDATE_PRODUCT_MAPPING:
         refresh_reservation_unit_product_mapping.delay(instance.pk)
 
-    if created:
+    if settings.UPDATE_RESERVATION_UNIT_HIERARCHY and created:
         ReservationUnitHierarchy.refresh(kwargs.get("using"))
 
 
 @receiver(post_delete, sender=ReservationUnit, dispatch_uid="reservation_unit_deleted")
 def reservation_unit_deleted(*args: Any, **kwargs: Any):
-    ReservationUnitHierarchy.refresh(kwargs.get("using"))
+    if settings.UPDATE_RESERVATION_UNIT_HIERARCHY:
+        ReservationUnitHierarchy.refresh(kwargs.get("using"))
 
 
 @receiver(m2m_changed, sender=ReservationUnit.spaces.through, dispatch_uid="reservation_unit_spaces_modified")
 def reservation_unit_spaces_modified(action: Action, *args: Any, **kwargs: Any):
-    if action in ["post_add", "post_remove", "post_clear"]:
+    if settings.UPDATE_RESERVATION_UNIT_HIERARCHY and action in ["post_add", "post_remove", "post_clear"]:
         ReservationUnitHierarchy.refresh(kwargs.get("using"))
 
 
 @receiver(m2m_changed, sender=ReservationUnit.resources.through, dispatch_uid="reservation_unit_resources_modified")
 def reservation_unit_resources_modified(action: Action, *args: Any, **kwargs: Any):
-    if action in ["post_add", "post_remove", "post_clear"]:
+    if settings.UPDATE_RESERVATION_UNIT_HIERARCHY and action in ["post_add", "post_remove", "post_clear"]:
         ReservationUnitHierarchy.refresh(kwargs.get("using"))

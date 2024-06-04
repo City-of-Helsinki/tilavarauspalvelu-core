@@ -16,6 +16,7 @@ from opening_hours.utils.hauki_api_types import (
     HaukiAPIOpeningHoursResponseTime,
     HaukiTranslatedField,
 )
+from reservation_units.models import ReservationUnitHierarchy
 from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import RecurringReservation, Reservation
 from tests.factories import AllocatedTimeSlotFactory, ReservationFactory
@@ -227,6 +228,8 @@ def test_generate_reservation_series_from_allocations__overlapping_reservation()
         begin=combine(application_round.reservation_period_begin, slot.begin_time),
         end=combine(application_round.reservation_period_begin, slot.end_time),
     )
+
+    ReservationUnitHierarchy.refresh()
 
     generate_reservation_series_from_allocations(application_round_id=application_round.id)
 

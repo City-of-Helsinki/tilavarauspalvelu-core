@@ -29,6 +29,14 @@ def _enable_elasticsearch(request, settings):
     settings.SEARCH_SETTINGS["settings"]["auto_sync"] = use_elasticsearch
 
 
+@pytest.fixture(autouse=True)
+def _enable_hierarchy_refresh(request, settings):
+    """Enable refreshing the reservation unit hierarchy for the duration of the test."""
+    use_elasticsearch = "enable_hierarchy_refresh" in request.keywords
+
+    settings.UPDATE_RESERVATION_UNIT_HIERARCHY = use_elasticsearch
+
+
 @pytest.fixture()
 def outbox() -> list[EmailMessage]:
     from django.core import mail

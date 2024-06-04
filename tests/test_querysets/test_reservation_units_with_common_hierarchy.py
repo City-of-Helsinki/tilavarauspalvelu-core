@@ -1,6 +1,6 @@
 import pytest
 
-from reservation_units.models import ReservationUnit
+from reservation_units.models import ReservationUnit, ReservationUnitHierarchy
 from tests.factories import ReservationUnitFactory, SpaceFactory
 
 # Applied to all tests
@@ -32,6 +32,8 @@ def test_reservation_units_with_common_hierarchy__queryset(query_counter):
     res_5 = ReservationUnitFactory.create(spaces=[space_5])
     res_6 = ReservationUnitFactory.create(spaces=[space_6])
     res_7 = ReservationUnitFactory.create(spaces=[space_7])
+
+    ReservationUnitHierarchy.refresh()
 
     def get_affecting(pks: list[int]) -> list[int]:
         with query_counter() as counter:
@@ -80,6 +82,8 @@ def test_reservation_units_with_common_hierarchy__model(query_counter):
     res_5: ReservationUnit = ReservationUnitFactory.create(spaces=[space_5])
     res_6: ReservationUnit = ReservationUnitFactory.create(spaces=[space_6])
     res_7: ReservationUnit = ReservationUnitFactory.create(spaces=[space_7])
+
+    ReservationUnitHierarchy.refresh()
 
     def get_affecting(ru: ReservationUnit) -> list[int]:
         with query_counter() as counter:

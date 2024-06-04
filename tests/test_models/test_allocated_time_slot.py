@@ -4,6 +4,7 @@ import pytest
 
 from applications.choices import Weekday
 from applications.models import AllocatedTimeSlot
+from reservation_units.models import ReservationUnitHierarchy
 from tests.factories import AllocatedTimeSlotFactory, ReservationUnitFactory, ReservationUnitOptionFactory, SpaceFactory
 
 # Applied to all tests
@@ -109,6 +110,8 @@ def test_allocated_time_slot__affecting_allocations(query_counter):
         reservation_unit_option__application_section__reservations_begin_date=datetime.date(2023, 12, 1),
         reservation_unit_option__application_section__reservations_end_date=datetime.date(2024, 1, 1),
     )
+
+    ReservationUnitHierarchy.refresh()
 
     with query_counter() as counter:
         allocations = AllocatedTimeSlot.objects.affecting_allocations(
