@@ -54,6 +54,8 @@ class ReservationUnitFirstReservableTimeHelper:
 
     is_reservation_unit_max_duration_invalid: bool
 
+    is_reservation_unit_closed: bool
+
     def __init__(self, parent: FirstReservableTimeHelper, reservation_unit: ReservationUnit) -> None:
         self.parent = parent
         self.reservation_unit = reservation_unit
@@ -95,7 +97,7 @@ class ReservationUnitFirstReservableTimeHelper:
         return merge_overlapping_time_span_elements(sorted(time_spans, key=lambda time_span: time_span.start_datetime))
 
     def calculate_first_reservable_time(self) -> ReservableTimeOutput:
-        is_closed = True
+        self.is_reservation_unit_closed = True
 
         # Go through each ReservableTimeSpan individually one-by-one until a suitable time span is found.
         for reservable_time_span in self.reservation_unit.origin_hauki_resource.reservable_time_spans.all():
@@ -104,13 +106,18 @@ class ReservationUnitFirstReservableTimeHelper:
 
             # The ReservationUnit is not closed. Save the value in case we don't find a first reservable time.
             if output.is_closed is False:
-                is_closed = False
+                self.is_reservation_unit_closed = False
+
+                # Now that we know that the ReservationUnit is not closed,
+                # we can exit early if the maximum duration is invalid.
+                if self.is_reservation_unit_max_duration_invalid:
+                    return output
 
             # If we have found a first reservable time, we can return early
             if output.first_reservable_time is not None:
                 return output
 
-        return ReservableTimeOutput(is_closed=is_closed, first_reservable_time=None)
+        return ReservableTimeOutput(is_closed=self.is_reservation_unit_closed, first_reservable_time=None)
 
     def _get_hard_closed_time_spans(self) -> list[TimeSpanElement]:
         """
