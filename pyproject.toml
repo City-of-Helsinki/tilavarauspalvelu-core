@@ -312,7 +312,6 @@ DJANGO_SETTINGS_ENVIRONMENT = "AutomatedTests"
 markers = [
     "slow: Marks a test that takes a long time to run.",
     "enable_elasticsearch: Mark a test that should be run with Elasticsearch enabled.",
-    "enable_hierarchy_refresh: Mark a test that should be run with the reservation unit hierarchy refreshed.",
 ]
 python_files = [
     "tests.py",
