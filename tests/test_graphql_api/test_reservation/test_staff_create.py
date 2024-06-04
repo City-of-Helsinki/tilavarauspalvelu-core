@@ -5,6 +5,7 @@ import pytest
 from django.utils.timezone import get_default_timezone
 
 from common.date_utils import local_datetime, next_hour, timedelta_to_json
+from reservation_units.models import ReservationUnitHierarchy
 from reservations.choices import ReservationStateChoice, ReservationTypeChoice
 from reservations.models import Reservation
 from tests.factories import (
@@ -328,6 +329,9 @@ def test_reservation__staff_create__reservation_overlapping_fails(graphql):
 
     graphql.login_with_superuser()
     data = get_staff_create_data(reservation_unit, begin=begin, end=end)
+
+    ReservationUnitHierarchy.refresh()
+
     response = graphql(CREATE_STAFF_MUTATION, input_data=data)
 
     assert response.error_message() == "Overlapping reservations are not allowed."
@@ -350,6 +354,9 @@ def test_reservation__staff_create__buffer_times_cause_overlap_fails(graphql):
 
     graphql.login_with_superuser()
     data = get_staff_create_data(reservation_unit, begin=begin, end=end)
+
+    ReservationUnitHierarchy.refresh()
+
     response = graphql(CREATE_STAFF_MUTATION, input_data=data)
 
     assert response.error_message() == "Reservation overlaps with reservation after due to buffer time."
@@ -376,6 +383,9 @@ def test_reservation__staff_create__buffer_times_cause_overlap_fails_with_buffer
         end=end + datetime.timedelta(hours=1),
         bufferTimeBefore="00:01:00",
     )
+
+    ReservationUnitHierarchy.refresh()
+
     response = graphql(CREATE_STAFF_MUTATION, input_data=data)
 
     assert response.error_message() == "Reservation overlaps with reservation before due to buffer time."
@@ -402,6 +412,9 @@ def test_reservation__staff_create__buffer_times_cause_overlap_fails_with_buffer
         end=end,
         bufferTimeAfter="00:01:00",
     )
+
+    ReservationUnitHierarchy.refresh()
+
     response = graphql(CREATE_STAFF_MUTATION, input_data=data)
 
     assert response.error_message() == "Reservation overlaps with reservation after due to buffer time."

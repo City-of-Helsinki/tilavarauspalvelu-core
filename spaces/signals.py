@@ -1,5 +1,6 @@
 from typing import Any
 
+from django.conf import settings
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 
@@ -17,6 +18,7 @@ def space_modify(instance: Space, *args: Any, **kwargs: Any):
         instance.__class__.objects.rebuild()
 
     # Refresh the reservation unit hierarchy since spaces have changed.
-    from reservation_units.models import ReservationUnitHierarchy
+    if settings.UPDATE_RESERVATION_UNIT_HIERARCHY:
+        from reservation_units.models import ReservationUnitHierarchy
 
-    ReservationUnitHierarchy.refresh(kwargs.get("using"))
+        ReservationUnitHierarchy.refresh(kwargs.get("using"))

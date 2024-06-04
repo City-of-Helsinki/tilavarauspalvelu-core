@@ -4,7 +4,7 @@ import pytest
 from django.utils.timezone import get_current_timezone
 
 from opening_hours.utils.time_span_element import TimeSpanElement
-from reservation_units.models import ReservationUnit
+from reservation_units.models import ReservationUnit, ReservationUnitHierarchy
 from reservation_units.utils.affecting_reservations_helper import AffectingReservationHelper
 from reservations.choices import ReservationStateChoice, ReservationTypeChoice
 from reservations.models import Reservation
@@ -88,6 +88,8 @@ def test__get_affecting_reservations__only_resources():
 
     _create_test_reservations_for_all_reservation_units()
 
+    ReservationUnitHierarchy.refresh()
+
     all_closed_time_spans, _ = AffectingReservationHelper(
         start_date=_datetime(month=1).date(),
         end_date=_datetime(month=12).date(),
@@ -129,6 +131,8 @@ def test__get_affecting_reservations__only_spaces():
     reservation_unit_8 = ReservationUnitFactory.create(unit=unit_2, spaces=[space_1])
 
     _create_test_reservations_for_all_reservation_units()
+
+    ReservationUnitHierarchy.refresh()
 
     all_closed_time_spans, _ = AffectingReservationHelper(
         start_date=_datetime(month=1).date(),
@@ -240,6 +244,8 @@ def test__get_affecting_reservations__resources_and_spaces():
     reservation_unit_8 = ReservationUnitFactory.create(unit=unit, spaces=[], resources=[])
 
     _create_test_reservations_for_all_reservation_units()
+
+    ReservationUnitHierarchy.refresh()
 
     all_closed_time_spans, _ = AffectingReservationHelper(
         start_date=_datetime(month=1).date(),

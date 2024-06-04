@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 import pytest
 from freezegun import freeze_time
 
+from reservation_units.models import ReservationUnitHierarchy
 from reservations.choices import ReservationStateChoice, ReservationTypeChoice
 from tests.factories import ReservationFactory, ReservationUnitFactory, SpaceFactory
 
@@ -37,6 +38,8 @@ def test_reservation_unit__get_next_reservation():
         reservation_unit=[reservation_unit],
         state=ReservationStateChoice.CONFIRMED,
     )
+
+    ReservationUnitHierarchy.refresh()
 
     next_reservation = reservation_unit.actions.get_next_reservation(now)
     assert next_reservation is not None

@@ -3,6 +3,7 @@ import datetime
 import pytest
 
 from common.date_utils import DEFAULT_TIMEZONE, local_end_of_day, local_start_of_day
+from reservation_units.models import ReservationUnitHierarchy
 from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import RecurringReservation, Reservation
 from tests.factories import (
@@ -535,6 +536,8 @@ def test_recurring_reservations__create_series__overlapping_reservations(graphql
         end=datetime.datetime(2024, 1, 8, 12, 0, 0, tzinfo=DEFAULT_TIMEZONE),
         state=ReservationStateChoice.CONFIRMED,
     )
+
+    ReservationUnitHierarchy.refresh()
 
     end = datetime.date(2024, 1, 8).isoformat()
     data = get_minimal_series_data(reservation_unit, user, endDate=end)

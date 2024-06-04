@@ -3,6 +3,7 @@ from datetime import UTC, datetime, timedelta
 import pytest
 from freezegun import freeze_time
 
+from reservation_units.models import ReservationUnitHierarchy
 from reservations.choices import ReservationStateChoice, ReservationTypeChoice
 from tests.factories import ReservationFactory, ReservationUnitFactory, SpaceFactory
 
@@ -31,6 +32,8 @@ def test_reservation_unit__get_previous_reservation():
         reservation_unit=[reservation_unit],
         state=ReservationStateChoice.CONFIRMED,
     )
+
+    ReservationUnitHierarchy.refresh()
 
     previous_reservation = reservation_unit.actions.get_previous_reservation(NOW)
     assert previous_reservation is not None

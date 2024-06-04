@@ -4,6 +4,7 @@ from typing import Any
 import pytest
 from django.urls import reverse
 
+from reservation_units.models import ReservationUnitHierarchy
 from reservations.models import Reservation
 
 
@@ -22,6 +23,7 @@ def test_reservation_overlapping(user_api_client, reservation, valid_reservation
     Reservation begins 5 minutes before the initial reservation ends,
     so this should return an error
     """
+    ReservationUnitHierarchy.refresh()
     valid_reservation_data["begin"] = reservation.end - datetime.timedelta(minutes=5)
     valid_reservation_data["end"] = reservation.end + datetime.timedelta(hours=1)
     response = user_api_client.post(reverse("reservation-list"), data=valid_reservation_data, format="json")
@@ -39,6 +41,7 @@ def test_reservation_overlapping_with_child_space(
     Reservation begins 5 minutes before the initial reservation ends,
     so this should return an error
     """
+    ReservationUnitHierarchy.refresh()
     valid_reservation_data["begin"] = confirmed_reservation.end - datetime.timedelta(minutes=5)
     valid_reservation_data["end"] = confirmed_reservation.end + datetime.timedelta(hours=1)
     valid_reservation_data["reservation_unit"] = [reservation_unit_with_child_space.pk]
@@ -57,6 +60,7 @@ def test_reservation_overlapping_with_parent_space(
     Reservation begins 5 minutes before the initial reservation ends,
     so this should return an error
     """
+    ReservationUnitHierarchy.refresh()
     valid_reservation_data["begin"] = confirmed_reservation.end - datetime.timedelta(minutes=5)
     valid_reservation_data["end"] = confirmed_reservation.end + datetime.timedelta(hours=1)
     valid_reservation_data["reservation_unit"] = [reservation_unit_with_parent_space.pk]
@@ -75,6 +79,7 @@ def test_reservation_overlapping_with_same_resource(
     Reservation begins 5 minutes before the initial reservation ends,
     so this should return an error
     """
+    ReservationUnitHierarchy.refresh()
     valid_reservation_data["begin"] = confirmed_reservation.end - datetime.timedelta(minutes=5)
     valid_reservation_data["end"] = confirmed_reservation.end + datetime.timedelta(hours=1)
     valid_reservation_data["reservation_unit"] = [reservation_unit_with_resource.pk]
