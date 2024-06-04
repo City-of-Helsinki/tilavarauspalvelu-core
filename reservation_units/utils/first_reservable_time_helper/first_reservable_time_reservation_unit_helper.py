@@ -60,18 +60,18 @@ class ReservationUnitFirstReservableTimeHelper:
         self.parent = parent
         self.reservation_unit = reservation_unit
 
-        self.hard_closed_time_spans = self._get_hard_closed_time_spans()
-        self.hard_closed_time_spans += parent.shared_hard_closed_time_spans
-        self.hard_closed_time_spans = self._merge_time_spans(self.hard_closed_time_spans)
+        self.hard_closed_time_spans = self._merge_time_spans(
+            self._get_hard_closed_time_spans() + parent.shared_hard_closed_time_spans
+        )
 
-        self.reservation_closed_time_spans = self._get_reservation_closed_time_spans()
-        self.reservation_closed_time_spans = self._merge_time_spans(self.reservation_closed_time_spans)
+        self.reservation_closed_time_spans = self._merge_time_spans(self._get_reservation_closed_time_spans())
         self.blocking_reservation_closed_time_spans = self._get_blocking_reservation_closed_time_spans()
 
-        self.soft_closed_time_spans = self._get_soft_closed_time_spans()
-        self.soft_closed_time_spans += self.reservation_closed_time_spans
-        self.soft_closed_time_spans += self.blocking_reservation_closed_time_spans
-        self.soft_closed_time_spans = self._merge_time_spans(self.soft_closed_time_spans)
+        self.soft_closed_time_spans = self._merge_time_spans(
+            self._get_soft_closed_time_spans()
+            + self.reservation_closed_time_spans
+            + self.blocking_reservation_closed_time_spans
+        )
 
         start_interval_minutes = ReservationStartInterval(reservation_unit.reservation_start_interval).as_number
 

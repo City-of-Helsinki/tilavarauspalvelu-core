@@ -65,14 +65,12 @@ class ReservableTimeSpanFirstReservableTimeHelper:
 
     def _hard_normalise_time_span(self, current_time_span: TimeSpanElement) -> list[TimeSpanElement]:
         """Remove Hard-Closed time spans from a TimeSpanElement."""
-        combined_hard_closed_time_spans: list[TimeSpanElement] = []
-
-        # Add hard closed time spans from the ReservationUnit
-        combined_hard_closed_time_spans += self.parent.hard_closed_time_spans
-        # Add hard closed time spans from the ReservableTimeSpan
-        combined_hard_closed_time_spans += current_time_span.generate_closed_time_spans_outside_filter(
-            filter_time_start=self.parent.parent.filter_time_start,
-            filter_time_end=self.parent.parent.filter_time_end,
+        combined_hard_closed_time_spans: list[TimeSpanElement] = (
+            self.parent.hard_closed_time_spans
+            + current_time_span.generate_closed_time_spans_outside_filter(
+                filter_time_start=self.parent.parent.filter_time_start,
+                filter_time_end=self.parent.parent.filter_time_end,
+            )
         )
 
         return override_reservable_with_closed_time_spans(
