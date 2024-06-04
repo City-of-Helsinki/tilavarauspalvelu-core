@@ -20,11 +20,19 @@ from reservation_units.models import (
     Keyword,
     KeywordCategory,
     KeywordGroup,
+    ReservationUnitHierarchy,
     ReservationUnitImage,
     ReservationUnitPaymentType,
     TaxPercentage,
 )
-from reservations.models import AbilityGroup, RecurringReservation, RejectedOccurrence, ReservationMetadataField
+from reservations.models import (
+    AbilityGroup,
+    RecurringReservation,
+    RejectedOccurrence,
+    ReservationMetadataField,
+    ReservationStatistic,
+    ReservationStatisticsReservationUnit,
+)
 from spaces.models import Building, RealEstate
 from users.models import PersonalInfoViewLog
 
@@ -73,9 +81,11 @@ models_that_should_be_empty: list[type[models.Model]] = [
     RealEstate,
     RecurringReservation,
     RejectedOccurrence,
+    RequestLog,
+    ReservationStatistic,
+    ReservationStatisticsReservationUnit,
     ReservationUnitImage,
     SQLLog,
-    RequestLog,
 ]
 
 
@@ -93,6 +103,9 @@ def test_create_test_data():
         assert not model.objects.exists(), f"Model {model.__name__} is not empty"
 
     create_test_data(flush=False)
+
+    # Call refresh at the end, since signals for it are disabled.
+    ReservationUnitHierarchy.refresh()
 
     for model in all_models:
         if model in models_that_should_be_empty:
