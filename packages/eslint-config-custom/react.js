@@ -64,6 +64,7 @@ module.exports = defineConfig({
   },
   rules: {
     // TODO temp rules from migrating from airbnb to vercel style-guide
+    "@typescript-eslint/prefer-nullish-coalescing": 0,
     "unicorn/filename-case": 0,
     "@typescript-eslint/no-unsafe-enum-comparison": 0,
     "@typescript-eslint/explicit-function-return-type": 0,

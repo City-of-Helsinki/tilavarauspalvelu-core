@@ -465,7 +465,7 @@ export function ApplicationEvent(props: Props): JSX.Element {
       <Accordion
         onToggle={onToggleAccordion}
         open={isVisible || hasErrors}
-        heading={`${eventName}` || t("application:Page1.applicationEventName")}
+        heading={eventName || t("application:Page1.applicationEventName")}
         theme="thin"
       >
         {/* Accordion doesn't remove from DOM on hide, but this is too slow if it's visible */}

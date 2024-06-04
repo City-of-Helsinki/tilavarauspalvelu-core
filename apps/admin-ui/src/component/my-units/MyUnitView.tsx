@@ -60,11 +60,11 @@ function MyUnitView() {
   const TabHeaders: TabHeader[] = [
     {
       key: "unit-reservations",
-      label: `${t("MyUnits.Calendar.Tabs.byReservationUnit")}`,
+      label: t("MyUnits.Calendar.Tabs.byReservationUnit"),
     },
     {
       key: "reservation-unit",
-      label: `${t("MyUnits.Calendar.Tabs.byUnit")}`,
+      label: t("MyUnits.Calendar.Tabs.byUnit"),
     },
   ];
 

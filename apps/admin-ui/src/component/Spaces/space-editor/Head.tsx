@@ -84,11 +84,9 @@ export function Head({
             <IconGroup /> {maxPersons || t("SpaceEditor.noMaxPersons")}
           </Prop>
           <Prop $disabled={!surfaceArea}>
-            {`${
-              surfaceArea
-                ? t("SpaceEditor.area", { surfaceArea })
-                : t("SpaceEditor.noSurfaceArea")
-            }`}
+            {surfaceArea
+              ? t("SpaceEditor.area", { surfaceArea })
+              : t("SpaceEditor.noSurfaceArea")}
           </Prop>
         </Props>
       </div>

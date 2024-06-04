@@ -164,7 +164,7 @@ describe("ReservationsList", () => {
 
     const screen = render(<ReservationList items={items} />);
 
-    const dstring = `${toUIDate(today)}`;
+    const dstring = toUIDate(today);
     expect(await screen.findByText(/19:00/)).toBeInTheDocument();
     expect(await screen.findByText(/20:00/)).toBeInTheDocument();
     expect(await screen.findByText(RegExp(dstring))).toBeInTheDocument();
@@ -180,7 +180,7 @@ describe("ReservationsList", () => {
 
     const screen = render(<ReservationList items={items} />);
 
-    const dstring = `${toUIDate(today)}`;
+    const dstring = toUIDate(today);
     expect(await screen.findAllByText(/19:00/)).toHaveLength(N_DAYS);
     expect(await screen.findAllByText(/20:00/)).toHaveLength(N_DAYS);
     expect(await screen.findByText(RegExp(dstring))).toBeInTheDocument();

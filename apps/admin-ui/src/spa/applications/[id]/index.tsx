@@ -634,10 +634,7 @@ function ApplicationSectionDetails({
           )}
           <ValueBox
             label={t("ApplicationEvent.groupSize")}
-            value={`${formatNumber(
-              section.numPersons,
-              t("common.membersSuffix")
-            )}`}
+            value={formatNumber(section.numPersons, t("common.membersSuffix"))}
           />
           <ValueBox
             label={t("ApplicationEvent.purpose")}

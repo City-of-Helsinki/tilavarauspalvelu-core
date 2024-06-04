@@ -5,7 +5,7 @@
   "private": true,
   "devDependencies": {
     "@graphql-eslint/eslint-plugin": "^3.20.1",
-    "@vercel/style-guide": "^5.1.0",
+    "@vercel/style-guide": "^6.0.0",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-config-turbo": "^1.13.2",

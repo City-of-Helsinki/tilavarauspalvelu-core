@@ -421,7 +421,7 @@ function ApplicationRoundAllocation({
     .concat([
       {
         value: 11,
-        label: `${t("filters.reservationUnitApplicationOthers")}`,
+        label: t("filters.reservationUnitApplicationOthers"),
       },
     ]);
 

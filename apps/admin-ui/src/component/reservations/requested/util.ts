@@ -217,7 +217,7 @@ export function getReserveeName(
   ) {
     prefix = t ? t("Reservations.prefixes.staff") : "";
   }
-  return truncate(prefix + reservation.reserveeName, length);
+  return truncate(prefix + (reservation.reserveeName ?? "-"), length);
 }
 
 export function getName(
@@ -256,11 +256,11 @@ export function createTagString(
     ?.map(reservationUnitName)
     .join(", ");
 
-  const singleDateTimeTag = `${reservationDateTimeString(
+  const singleDateTimeTag = reservationDateTimeString(
     reservation.begin,
     reservation.end,
     t
-  )}`;
+  );
 
   const weekDayTag = reservation.recurringReservation?.weekdays
     ?.sort()
@@ -275,11 +275,11 @@ export function createTagString(
         )}`
       : "";
 
-  const durationTag = `${reservationDurationString(
+  const durationTag = reservationDurationString(
     reservation.begin,
     reservation.end,
     t
-  )}`;
+  );
 
   const reservationTagline = `${
     reservation.recurringReservation ? recurringDateTag : singleDateTimeTag

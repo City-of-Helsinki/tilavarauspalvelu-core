@@ -246,11 +246,10 @@ export function EditStep0({
     return [...otherReservations, currentReservation].map((n) => {
       const suffix = n.state === "INITIAL" ? dur : "";
       const event = {
-        title: `${
+        title:
           n.state === "CANCELLED"
             ? `${t("reservationCalendar:prefixForCancelled")}: `
-            : suffix
-        }`,
+            : suffix,
         start: n.begin ? new Date(n.begin) : new Date(),
         end: n.end ? new Date(n.end) : new Date(),
         allDay: false,

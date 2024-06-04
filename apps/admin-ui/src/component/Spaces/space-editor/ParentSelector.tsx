@@ -17,7 +17,7 @@ function spacesAsHierarchy(unit: UnitSpacesQuery["unit"], paddingChar: string) {
   ): SpaceNode[] {
     const newParent = {
       ...parent,
-      nameFi: "".padStart(depth, pad) + parent.nameFi,
+      nameFi: "".padStart(depth, pad) + (parent.nameFi ?? "-"),
     };
 
     const children = spaces.filter((e) => e.parent?.pk === parent.pk);

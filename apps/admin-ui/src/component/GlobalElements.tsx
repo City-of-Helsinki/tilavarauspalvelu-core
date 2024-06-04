@@ -24,7 +24,7 @@ const GlobalElements = (): JSX.Element => {
           type={notification.type}
           label={notification.title}
           position="top-center"
-          closeButtonLabelText={`${t("common.close")}`}
+          closeButtonLabelText={t("common.close")}
           onClose={clearNotification}
           dismissible
           // NOTE: there is something funny with the HDS notification styling so forcing it

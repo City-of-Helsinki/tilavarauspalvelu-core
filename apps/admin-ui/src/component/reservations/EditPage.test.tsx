@@ -3,7 +3,7 @@ import { MockedProvider } from "@apollo/client/testing";
 import { act, render, waitFor, within } from "@testing-library/react";
 import { MemoryRouter, Route, Routes, generatePath } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
-// @ts-expect-error -- FIXME
+// @ts-expect-error -- FIXME react-router typing
 import * as router from "react-router";
 import { CustomerTypeChoice, ReservationDocument } from "@gql/gql-types";
 import NotificationContextMock, {

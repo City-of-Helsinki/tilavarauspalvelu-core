@@ -178,7 +178,7 @@ function ReservationCard({ reservation, type }: PropsT): JSX.Element {
 
     return capitalize(
       `${beginDate} ${beginTime} -${
-        endDate !== beginDate ? `${endDate}` : ""
+        endDate !== beginDate ? endDate : ""
       } ${endTime}`
     );
   }, [reservation, t]);

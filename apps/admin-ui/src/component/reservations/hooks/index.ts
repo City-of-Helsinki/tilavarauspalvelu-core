@@ -90,6 +90,7 @@ export function useStaffReservationMutation({
             });
             return Promise.resolve(res3);
           }
+          // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
           return Promise.reject(err);
         }
       };

@@ -59,7 +59,7 @@ export const units: ReservationUnitNode[] = [
     ...unitCommon,
     ...arrays,
     pk: 1,
-    id: base64encode(`ReservationUnitNode:${1}`),
+    id: base64encode(`ReservationUnitNode:1`),
     nameFi: "Unit",
     name: "Unit",
   },
@@ -67,7 +67,7 @@ export const units: ReservationUnitNode[] = [
     ...unitCommon,
     ...arrays,
     pk: 2,
-    id: base64encode(`ReservationUnitNode:${2}`),
+    id: base64encode(`ReservationUnitNode:2`),
     nameFi: "Absolute",
     name: "Absolute",
   },
@@ -92,7 +92,7 @@ const unitResponse: ReservationUnitNode = {
   nameFi: "Studiohuone 1 + soittimet",
   name: "Studiohuone 1 + soittimet",
   pk: 1,
-  id: base64encode(`ReservationUnitNode:${1}`),
+  id: base64encode(`ReservationUnitNode:1`),
   maxPersons: null,
   bufferTimeBefore: 0,
   bufferTimeAfter: 0,
@@ -103,7 +103,7 @@ const unitResponse: ReservationUnitNode = {
   serviceSpecificTerms: emptyTerms,
   termsOfUseFi: "",
   unit: {
-    id: base64encode(`UnitNode:${1}`),
+    id: base64encode(`UnitNode:1`),
     pk: 1,
     nameFi: "unit name",
     name: "unit name",
@@ -223,7 +223,7 @@ const reservationsByUnitResponse = mondayMorningReservations
   .sort((x, y) => x.begin.getTime() - y.begin.getTime())
   .map((x) => ({
     __typename: "ReservationNode",
-    id: base64encode(`ReservationNode:${1}`),
+    id: base64encode(`ReservationNode:1`),
     begin: x.begin.toUTCString(),
     end: x.end.toUTCString(),
     bufferTimeBefore: 0,
@@ -236,7 +236,7 @@ export const mocks = [
   {
     request: {
       query: ReservationUnitDocument,
-      variables: { id: base64encode(`ReservationUnitNode:${1}`) },
+      variables: { id: base64encode(`ReservationUnitNode:1`) },
     },
     result: {
       data: {
@@ -248,7 +248,7 @@ export const mocks = [
     request: {
       query: ReservationTimesInReservationUnitDocument,
       variables: {
-        id: base64encode(`ReservationUnitNode:${1}`),
+        id: base64encode(`ReservationUnitNode:1`),
         pk: 1,
         beginDate: `${YEAR}-01-01`,
         endDate: `${YEAR + 1}-01-01`,
@@ -257,7 +257,7 @@ export const mocks = [
     result: {
       data: {
         reservationUnit: {
-          id: base64encode(`ReservationUnitNode:${1}`),
+          id: base64encode(`ReservationUnitNode:1`),
           reservationSet: reservationsByUnitResponse,
         },
         affectingReservations: reservationsByUnitResponse,

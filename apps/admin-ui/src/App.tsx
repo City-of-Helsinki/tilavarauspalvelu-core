@@ -138,7 +138,7 @@ const PremisesRouter = ({
       )}
     />
     <Route
-      path={`${prefixes.reservationUnits}`}
+      path={prefixes.reservationUnits}
       element={withAuthorization(
         <ReservationUnits />,
         apiBaseUrl,

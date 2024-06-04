@@ -38,7 +38,7 @@ const UnitList = ({ units }: { units: UnitDisplayType[] }) => {
       {elems.map((ru, index) => (
         <UnitName key={ru?.pk}>
           <div>{index + 1}</div>
-          <div>{`${getTranslation(ru ?? {}, "name").trim()}`}</div>
+          <div>{getTranslation(ru ?? {}, "name").trim()}</div>
         </UnitName>
       ))}
     </UnitListWrapper>

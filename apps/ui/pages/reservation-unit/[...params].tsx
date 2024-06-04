@@ -52,7 +52,7 @@ import {
 } from "@/modules/serverUtils";
 import { useConfirmNavigation } from "@/hooks/useConfirmNavigation";
 import { base64encode, filterNonNullable } from "common/src/helpers";
-import Error from "next/error";
+import NextError from "next/error";
 import { CenterSpinner } from "@/components/common/common";
 import { containsField } from "common/src/metaFieldsHelpers";
 
@@ -396,7 +396,7 @@ function ReservationUnitReservationWithReservationProp({
   const onSubmitStep0 = async (payload: any): Promise<void> => {
     const hasReserveeTypeField = containsField(supportedFields, "reserveeType");
     if (hasReserveeTypeField && !reserveeType) {
-      return Promise.reject();
+      throw new Error("Reservee type is required");
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: type the form
@@ -592,7 +592,7 @@ function ReservationUnitReservation(props: PropsNarrowed) {
   });
 
   if (error != null) {
-    return <Error statusCode={500} />;
+    return <NextError statusCode={500} />;
   }
 
   // TODO errors vs loading
@@ -600,14 +600,14 @@ function ReservationUnitReservation(props: PropsNarrowed) {
     return <CenterSpinner />;
   }
   if (data == null || data.reservation == null) {
-    return <Error statusCode={400} />;
+    return <NextError statusCode={400} />;
   }
 
   const { reservation } = data;
 
   // it should be Created only here otherwise it's a client error (should redirect to /reservation/:pk page)
   if (reservation.state !== State.Created) {
-    return <Error statusCode={400} />;
+    return <NextError statusCode={400} />;
   }
 
   return (

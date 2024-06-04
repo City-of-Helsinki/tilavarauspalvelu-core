@@ -298,6 +298,7 @@ export const useCreateRecurringReservation = () => {
             const res3 = await createStaffReservation(variables);
             return Promise.resolve(res3);
           }
+          // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
           return Promise.reject(err);
         }
       };

@@ -135,9 +135,9 @@ interface IAgeGroups {
 
 // TODO rename to print or format
 export const parseAgeGroups = (ageGroups: IAgeGroups): string => {
-  return `${i18next.t("common.agesSuffix", {
+  return i18next.t("common.agesSuffix", {
     range: trim(`${ageGroups.minimum || ""}-${ageGroups.maximum || ""}`, "-"),
-  })}`;
+  });
 };
 
 // TODO rename to print or format

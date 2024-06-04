@@ -198,9 +198,9 @@ const ReservationFormField = ({
   const isFreeOfChargeReasonRequired =
     field === "freeOfChargeReason" && watch("applyingForFreeOfCharge") === true;
 
-  const label = `${t(
+  const label = t(
     `reservationApplication:label.${lowerCaseTranslationKey}.${field}`
-  )}`;
+  );
 
   const minValue =
     get(params, field)?.min != null && !Number.isNaN(get(params, field).min)
@@ -305,7 +305,7 @@ const ReservationFormField = ({
   if (isNumField)
     return (
       <NumberInput
-        label={`${label}`}
+        label={label}
         id={field}
         {...register(field, {
           valueAsNumber: true,

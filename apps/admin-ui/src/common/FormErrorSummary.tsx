@@ -58,7 +58,7 @@ export function FormErrorSummary<T extends FieldValues>({
               <li key={keys[index]}>
                 <span>{label}</span>
                 {": "}
-                {t(`${fieldName}`)}
+                {t(fieldName)}
               </li>
             );
           })}

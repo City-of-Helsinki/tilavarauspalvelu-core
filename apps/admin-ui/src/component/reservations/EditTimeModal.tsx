@@ -76,14 +76,14 @@ const recurringReservationInfoText = ({
   end?: Date;
   t: TFunction;
 }) => {
-  return `${t("Reservation.EditTime.recurringInfoTimes", {
+  return t("Reservation.EditTime.recurringInfoTimes", {
     weekdays: weekdays
       .sort((a, b) => a - b)
       .map((weekday) => t(`dayShort.${weekday}`))
       .join(", "),
     begin: begin && toUIDate(begin),
     end: end && toUIDate(end),
-  })}`;
+  });
 };
 
 type FormValueType = z.infer<typeof TimeFormSchema>;
