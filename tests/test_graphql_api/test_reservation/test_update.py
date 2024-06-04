@@ -5,6 +5,7 @@ import pytest
 
 from common.date_utils import local_datetime
 from reservation_units.enums import PriceUnit, PricingStatus
+from reservation_units.models import ReservationUnitHierarchy
 from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from tests.factories import (
     ApplicationRoundFactory,
@@ -71,6 +72,9 @@ def test_reservation__update__overlaps_with_another_reservation(graphql):
 
     graphql.login_with_superuser()
     data = get_update_data(reservation, begin=new_begin.isoformat(), end=new_end.isoformat())
+
+    ReservationUnitHierarchy.refresh()
+
     response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.error_message() == "Overlapping reservations are not allowed."
@@ -105,6 +109,9 @@ def test_reservation__update__overlaps_with_reservation_before_due_to_its_buffer
 
     graphql.login_with_superuser()
     data = get_update_data(reservation, begin=new_begin.isoformat(), end=new_end.isoformat())
+
+    ReservationUnitHierarchy.refresh()
+
     response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.error_message() == "Reservation overlaps with reservation before due to buffer time."
@@ -139,6 +146,9 @@ def test_reservation__update__overlaps_with_reservation_after_due_to_its_buffer(
 
     graphql.login_with_superuser()
     data = get_update_data(reservation, begin=new_begin.isoformat(), end=new_end.isoformat())
+
+    ReservationUnitHierarchy.refresh()
+
     response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.error_message() == "Reservation overlaps with reservation after due to buffer time."
@@ -182,6 +192,9 @@ def test_reservation__update__overlaps_with_reservation_before_due_to_own_buffer
         end=new_end.isoformat(),
         # Cannot set buffer time on update!
     )
+
+    ReservationUnitHierarchy.refresh()
+
     response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.error_message() == "Reservation overlaps with reservation before due to buffer time."
@@ -225,6 +238,9 @@ def test_reservation__update__overlaps_with_reservation_after_due_to_own_buffer(
         end=new_end.isoformat(),
         # Cannot set buffer time on update!
     )
+
+    ReservationUnitHierarchy.refresh()
+
     response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.error_message() == "Reservation overlaps with reservation after due to buffer time."

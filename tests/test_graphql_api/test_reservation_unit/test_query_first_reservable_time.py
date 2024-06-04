@@ -11,7 +11,7 @@ from graphene_django_extensions.testing.utils import parametrize_helper
 from applications.choices import ApplicationRoundStatusChoice
 from common.date_utils import DEFAULT_TIMEZONE
 from reservation_units.enums import ReservationStartInterval
-from reservation_units.models import ReservationUnit
+from reservation_units.models import ReservationUnit, ReservationUnitHierarchy
 from reservations.choices import ReservationStateChoice, ReservationTypeChoice
 from tests.factories import (
     ApplicationRoundFactory,
@@ -1103,6 +1103,8 @@ def test__query_reservation_unit__first_reservable_time__reservations__own_reser
         end=_datetime(hour=12),
     )
 
+    ReservationUnitHierarchy.refresh()
+
     response = graphql(reservation_units_reservable_query())
 
     assert response.has_errors is False, response
@@ -1256,6 +1258,8 @@ def test__query_reservation_unit__first_reservable_time__reservations__date_filt
         end=_datetime(hour=17),
     )
 
+    ReservationUnitHierarchy.refresh()
+
     response = graphql(
         reservation_units_reservable_query(
             reservable_date_start="2024-01-01",
@@ -1310,6 +1314,8 @@ def test__query_reservation_unit__first_reservable_time__reservations__filter_st
         begin=_datetime(hour=14),
         end=_datetime(hour=15, minute=30),
     )
+
+    ReservationUnitHierarchy.refresh()
 
     response = graphql(
         reservation_units_reservable_query(
@@ -1373,6 +1379,8 @@ def test__query_reservation_unit__first_reservable_time__reservations__in_common
         end=_datetime(hour=12),
     )
 
+    ReservationUnitHierarchy.refresh()
+
     response = graphql(reservation_units_reservable_query(fields="pk isClosed firstReservableDatetime"))
 
     assert response.has_errors is False, response
@@ -1434,6 +1442,8 @@ def test__query_reservation_unit__first_reservable_time__reservations__in_common
         begin=_datetime(hour=10),
         end=_datetime(hour=12),
     )
+
+    ReservationUnitHierarchy.refresh()
 
     response = graphql(reservation_units_reservable_query(fields="pk isClosed firstReservableDatetime"))
 
@@ -1502,6 +1512,8 @@ def test__query_reservation_unit__first_reservable_time__reservations__in_common
         begin=_datetime(hour=10),
         end=_datetime(hour=12),
     )
+
+    ReservationUnitHierarchy.refresh()
 
     response = graphql(reservation_units_reservable_query(fields="pk isClosed firstReservableDatetime"))
 
@@ -1642,6 +1654,8 @@ def test__query_reservation_unit__first_reservable_time__buffers__different_leng
         end=_datetime(hour=15, minute=30),
     )
 
+    ReservationUnitHierarchy.refresh()
+
     response = graphql(reservation_units_reservable_query(fields="pk isClosed firstReservableDatetime"))
 
     assert response.has_errors is False, response
@@ -1723,6 +1737,8 @@ def test__query_reservation_unit__first_reservable_time__buffers__start_and_end_
         begin=_datetime(hour=10),
         end=_datetime(hour=11, minute=30),
     )
+
+    ReservationUnitHierarchy.refresh()
 
     response = graphql(reservation_units_reservable_query(fields="pk isClosed firstReservableDatetime"))
 
@@ -1816,6 +1832,8 @@ def test__query_reservation_unit__first_reservable_time__buffers__different_befo
         begin=_datetime(hour=12),
         end=_datetime(hour=13),
     )
+
+    ReservationUnitHierarchy.refresh()
 
     response = graphql(reservation_units_reservable_query(fields="pk isClosed firstReservableDatetime"))
 
@@ -2002,6 +2020,8 @@ def test__query_reservation_unit__first_reservable_time__extra_long_interval(gra
         end=_datetime(hour=16),
     )
 
+    ReservationUnitHierarchy.refresh()
+
     # Query without any filters.
     # The first reservable time should be the beginning of the Reservable Time Span
     response = graphql(reservation_units_reservable_query())
@@ -2080,6 +2100,8 @@ def test__query_reservation_unit__first_reservable_time__blocked_type_reservatio
         type=ReservationTypeChoice.BLOCKED,
         state=ReservationStateChoice.CONFIRMED,
     )
+
+    ReservationUnitHierarchy.refresh()
 
     # Buffer does not overlap with BLOCKED reservation at all
     response = graphql(reservation_units_reservable_query(reservable_time_start=time(hour=10).isoformat()))
@@ -2179,6 +2201,8 @@ def test_reservation_unit__first_reservable_time__duration_exactly_min_but_buffe
         reservation_unit=[reservation_unit],
         state=ReservationStateChoice.CREATED,
     )
+
+    ReservationUnitHierarchy.refresh()
 
     response = graphql(reservation_units_reservable_query())
 

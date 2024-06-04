@@ -9,6 +9,7 @@ from graphene_django_extensions.testing import parametrize_helper
 
 from common.date_utils import local_datetime, local_end_of_day, local_start_of_day, next_hour
 from reservation_units.enums import PriceUnit, PricingStatus, ReservationKind
+from reservation_units.models import ReservationUnitHierarchy
 from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import Reservation
 from tests.factories import (
@@ -180,6 +181,9 @@ def test_reservation__create__overlapping_reservation(graphql):
 
     graphql.login_with_superuser()
     data = get_create_data(reservation_unit, begin=begin, end=end)
+
+    ReservationUnitHierarchy.refresh()
+
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.error_message() == "Overlapping reservations are not allowed."
@@ -251,6 +255,9 @@ def test_reservation__create__overlaps_with_reservation_buffer_before_or_after(
 
     graphql.login_with_superuser()
     data = get_create_data(reservation_unit, begin=begin, end=end)
+
+    ReservationUnitHierarchy.refresh()
+
     response = graphql(CREATE_MUTATION, input_data=data)
 
     if reservation_type == ReservationTypeChoice.BLOCKED:
@@ -1117,6 +1124,8 @@ def test_reservation__create__reservation_block_whole_day__blocks_reserving_for_
         "end": (end + new_reservation_begin_delta).isoformat(),
         "reservationUnitPks": [reservation_unit.pk],
     }
+
+    ReservationUnitHierarchy.refresh()
 
     response = graphql(CREATE_MUTATION, input_data=input_data)
     assert response.error_message() == error_message

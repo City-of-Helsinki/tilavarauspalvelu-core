@@ -1,6 +1,7 @@
 import pytest
 from graphene_django_extensions.testing import build_query
 
+from reservation_units.models import ReservationUnitHierarchy
 from tests.factories import AllocatedTimeSlotFactory, RecurringReservationFactory, ReservationUnitFactory, SpaceFactory
 from tests.helpers import UserType
 
@@ -80,6 +81,8 @@ def test_affecting_allocated_time_slots__query(graphql):
     space = SpaceFactory.create()
     reservation_unit = ReservationUnitFactory.create(spaces=[space])
     allocation = AllocatedTimeSlotFactory.create(reservation_unit_option__reservation_unit=reservation_unit)
+    ReservationUnitHierarchy.refresh()
+
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     fields = """

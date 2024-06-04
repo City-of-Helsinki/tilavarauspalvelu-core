@@ -6,6 +6,7 @@ import pytest
 from common.date_utils import DEFAULT_TIMEZONE, local_datetime, next_hour
 from email_notification.models import EmailType
 from reservation_units.enums import ReservationStartInterval
+from reservation_units.models import ReservationUnitHierarchy
 from reservations.choices import ReservationStateChoice, ReservationTypeChoice
 from tests.factories import EmailTemplateFactory, ReservationFactory, UserFactory
 
@@ -214,6 +215,9 @@ def test_reservation__staff_adjust_time__overlaps_with_another_reservation(graph
 
     graphql.login_with_superuser()
     data = get_staff_adjust_data(reservation, begin=new_begin, end=new_end)
+
+    ReservationUnitHierarchy.refresh()
+
     response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
 
     assert response.error_message() == "Overlapping reservations are not allowed."
@@ -248,6 +252,9 @@ def test_reservation__staff_adjust_time__overlaps_with_reservation_before_due_to
 
     graphql.login_with_superuser()
     data = get_staff_adjust_data(reservation, begin=new_begin, end=new_end)
+
+    ReservationUnitHierarchy.refresh()
+
     response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
 
     assert response.error_message() == "Reservation overlaps with reservation before due to buffer time."
@@ -282,6 +289,9 @@ def test_reservation__staff_adjust_time__overlaps_with_reservation_after_due_to_
 
     graphql.login_with_superuser()
     data = get_staff_adjust_data(reservation, begin=new_begin, end=new_end)
+
+    ReservationUnitHierarchy.refresh()
+
     response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
 
     assert response.error_message() == "Reservation overlaps with reservation after due to buffer time."
@@ -315,6 +325,9 @@ def test_reservation__staff_adjust_time__overlaps_with_reservation_before_due_to
 
     graphql.login_with_superuser()
     data = get_staff_adjust_data(reservation, begin=new_begin, end=new_end, bufferTimeBefore="00:01:00")
+
+    ReservationUnitHierarchy.refresh()
+
     response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
 
     assert response.error_message() == "Reservation overlaps with reservation before due to buffer time."
@@ -348,6 +361,9 @@ def test_reservation__staff_adjust_time__overlaps_with_reservation_after_due_to_
 
     graphql.login_with_superuser()
     data = get_staff_adjust_data(reservation, begin=new_begin, end=new_end, bufferTimeAfter="00:01:00")
+
+    ReservationUnitHierarchy.refresh()
+
     response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
 
     assert response.error_message() == "Reservation overlaps with reservation after due to buffer time."

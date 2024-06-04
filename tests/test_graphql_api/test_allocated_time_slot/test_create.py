@@ -4,6 +4,7 @@ import pytest
 from django.utils.timezone import get_default_timezone
 
 from applications.choices import ApplicationSectionStatusChoice, ApplicationStatusChoice, Weekday
+from reservation_units.models import ReservationUnitHierarchy
 from tests.factories import (
     AllocatedTimeSlotFactory,
     ApplicationFactory,
@@ -452,6 +453,7 @@ def test_allocated_time_slot__create__overlapping_with_another_allocation_for_sa
     option = section.reservation_unit_options.first()
 
     ApplicationFactory.create_application_ready_for_allocation(reservation_unit=reservation_unit, pre_allocated=True)
+    ReservationUnitHierarchy.refresh()
 
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
@@ -506,6 +508,8 @@ def test_allocated_time_slot__create__overlapping_in_related_reservation_unit(gr
     section = application.application_sections.first()
     option = section.reservation_unit_options.first()
     ApplicationFactory.create_application_ready_for_allocation(reservation_unit=child_unit, pre_allocated=True)
+    ReservationUnitHierarchy.refresh()
+
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     # when:
