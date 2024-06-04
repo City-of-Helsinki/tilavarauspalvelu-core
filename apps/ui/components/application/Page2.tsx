@@ -171,7 +171,8 @@ function cellsToApplicationEventSchedules(
   if (cells.length > 7) {
     throw new Error("Too many days");
   }
-  for (let day: Day = 0; day < cells.length; day += 1) {
+  const range = [0, 1, 2, 3, 4, 5, 6] as const;
+  for (const day of range) {
     const dayCells = cells[day];
     dayCells
       .filter((cell) => cell.state)
