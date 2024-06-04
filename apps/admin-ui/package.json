@@ -62,7 +62,6 @@
     "styled-components": "5.3.11",
     "tsconfig": "workspace:*",
     "typescript-cookie": "^1.0.6",
-    "viewport-mercator-project": "^7.0.4",
     "zod": "^3.22.4"
   },
   "devDependencies": {
