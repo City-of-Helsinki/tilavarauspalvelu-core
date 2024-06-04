@@ -103,7 +103,6 @@ export function createApolloClient(
     uri,
     // TODO this might be useless
     credentials: "include",
-    // @ts-expect-error: node-fetch is a subset of fetch API
     fetch: enchancedFetch,
   });
 
