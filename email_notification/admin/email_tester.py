@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import contextlib
 from datetime import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
@@ -21,13 +20,12 @@ if TYPE_CHECKING:
     from spaces.models import Location
 
 
-def _get_email_template_tester_form_initial_values(request) -> dict[str, Any]:
+def _get_email_template_tester_form_initial_values(request, template_pk: int | None = None) -> dict[str, Any]:
     recipient = request.user.email if request.user else ""
     initial_values = {"recipient": recipient}
 
-    with contextlib.suppress(AttributeError):
-        # Select the template that user navigated from
-        initial_values["template"] = request.resolver_match.kwargs.get("extra_context")
+    if template_pk is not None:
+        initial_values["template"] = template_pk  # Select the template that user navigated from
 
     reservation_unit_pk = request.GET.get("reservation_unit", None)
     if not reservation_unit_pk:
@@ -115,6 +113,7 @@ class EmailTemplateTesterForm(forms.Form):
 def email_template_tester_admin_view(
     email_template_admin: EmailTemplateAdmin,
     request,
+    template_pk: int,
 ) -> TemplateResponse | HttpResponseRedirect:
     if request.method == "POST":
         form = EmailTemplateTesterForm(request.POST)
@@ -129,7 +128,7 @@ def email_template_tester_admin_view(
 
             email_template_admin.message_user(request, _("Test Email '%s' successfully sent.") % template.name)
     else:
-        initial_values = _get_email_template_tester_form_initial_values(request)
+        initial_values = _get_email_template_tester_form_initial_values(request, template_pk)
         form = EmailTemplateTesterForm(initial=initial_values)
 
     context = email_template_admin.admin_site.each_context(request)
