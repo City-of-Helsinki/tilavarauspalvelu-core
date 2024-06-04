@@ -97,5 +97,5 @@ class EmailTemplateAdmin(ExtraButtonsMixin, TranslationAdmin):
     form = EmailTemplateAdminForm
 
     @button(label="Email Template Testing")
-    def template_tester(self, request, extra_context=None) -> TemplateResponse | HttpResponseRedirect:
-        return email_template_tester_admin_view(self, request)
+    def template_tester(self, request, pk) -> TemplateResponse | HttpResponseRedirect:
+        return email_template_tester_admin_view(self, request, pk)
