@@ -9,9 +9,11 @@ from graphene_django_extensions.testing.utils import parametrize_helper
 from opening_hours.utils.time_span_element import TimeSpanElement
 from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import ReservationUnit
-from reservation_units.utils.first_reservable_time_helper import (
-    FirstReservableTimeHelper,
+from reservation_units.utils.first_reservable_time_helper.first_reservable_time_helper import FirstReservableTimeHelper
+from reservation_units.utils.first_reservable_time_helper.first_reservable_time_reservable_time_span_helper import (
     ReservableTimeSpanFirstReservableTimeHelper,
+)
+from reservation_units.utils.first_reservable_time_helper.first_reservable_time_reservation_unit_helper import (
     ReservationUnitFirstReservableTimeHelper,
 )
 from tests.factories import OriginHaukiResourceFactory, ReservableTimeSpanFactory, ReservationUnitFactory
