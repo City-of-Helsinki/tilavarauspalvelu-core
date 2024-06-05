@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { type FetchResult } from "@apollo/client";
 import { useRouter } from "next/router";
 import { useLocalStorage } from "react-use";
 import { Stepper } from "hds-react";
@@ -16,7 +15,6 @@ import {
   useConfirmReservationMutation,
   useUpdateReservationMutation,
   useDeleteReservationMutation,
-  useReservationQuery,
   type ReservationQuery,
   ReservationUnitDocument,
   type ReservationUnitQuery,
@@ -24,13 +22,16 @@ import {
   OptionsDocument,
   OptionsQuery,
   OptionsQueryVariables,
+  ReservationDocument,
+  ReservationQueryVariables,
+  useReservationLazyQuery,
 } from "@gql/gql-types";
 import { Inputs } from "common/src/reservation-form/types";
 import { Subheading } from "common/src/reservation-form/styles";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
 import { Container } from "common";
 import { createApolloClient } from "@/modules/apolloClient";
-import { isBrowser, reservationUnitPrefix } from "@/modules/const";
+import { reservationUnitPrefix, reservationsPrefix } from "@/modules/const";
 import { getTranslation, reservationsUrl } from "@/modules/util";
 import Sanitize from "@/components/common/Sanitize";
 import { getReservationUnitPrice } from "@/modules/reservationUnit";
@@ -52,77 +53,7 @@ import {
 } from "@/modules/serverUtils";
 import { useConfirmNavigation } from "@/hooks/useConfirmNavigation";
 import { base64encode, filterNonNullable } from "common/src/helpers";
-import NextError from "next/error";
-import { CenterSpinner } from "@/components/common/common";
 import { containsField } from "common/src/metaFieldsHelpers";
-
-type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
-type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
-
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  const { locale, params } = ctx;
-  const [reservationUnitPk, path, reservationPk] = params?.params ?? [];
-  const commonProps = getCommonServerSideProps();
-  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
-
-  if (Number.isFinite(Number(reservationUnitPk)) && path === "reservation") {
-    const typename = "ReservationUnitNode";
-    const id = base64encode(`${typename}:${reservationUnitPk}`);
-    const { data } = await apolloClient.query<
-      ReservationUnitQuery,
-      ReservationUnitQueryVariables
-    >({
-      query: ReservationUnitDocument,
-      variables: { id },
-      fetchPolicy: "no-cache",
-    });
-    const { reservationUnit } = data || {};
-
-    const genericTerms = await getGenericTerms(apolloClient);
-    const { data: paramsData } = await apolloClient.query<
-      OptionsQuery,
-      OptionsQueryVariables
-    >({
-      query: OptionsDocument,
-      fetchPolicy: "no-cache",
-    });
-
-    const reservationPurposes = filterNonNullable(
-      paramsData.reservationPurposes?.edges?.map((e) => e?.node)
-    );
-    const ageGroups = filterNonNullable(
-      paramsData.ageGroups?.edges?.map((e) => e?.node)
-    );
-    const cities = filterNonNullable(
-      paramsData.cities?.edges?.map((e) => e?.node)
-    );
-
-    return {
-      props: {
-        ...commonProps,
-        key: `${reservationUnitPk}${locale}`,
-        // TODO check for NaN
-        reservationPk: Number(reservationPk),
-        reservationUnit,
-        reservationPurposes,
-        ageGroups,
-        cities,
-        termsOfUse: { genericTerms },
-        ...(await serverSideTranslations(locale ?? "fi")),
-      },
-    };
-  }
-
-  return {
-    props: {
-      // have to double up notFound inside the props to get TS types dynamically
-      notFound: true,
-      ...commonProps,
-      ...(await serverSideTranslations(locale ?? "fi")),
-    },
-    notFound: true,
-  };
-};
 
 const StyledContainer = styled(Container)`
   padding-top: var(--spacing-m);
@@ -183,7 +114,6 @@ const useRemoveStoredReservation = () => {
   }, [storedReservation, removeStoredReservation]);
 };
 
-type NodeT = NonNullable<ReservationQuery["reservation"]>;
 // NOTE back / forward buttons (browser) do NOT work properly
 // router.beforePopState could be used to handle them but it's super hackish
 // the correct solution is to create separate pages (files) for each step (then next-router does this for free)
@@ -194,20 +124,32 @@ type NodeT = NonNullable<ReservationQuery["reservation"]>;
 // - using back multiple times breaks the confirmation hook (bypassing it or blocking the navigation while deleting the reservation)
 // - requires complex logic to handle the steps and keep the url in sync with what's on the page
 // - forward / backward navigation work differently
-function ReservationUnitReservationWithReservationProp({
-  reservation,
-  reservationUnit,
-  reservationPurposes,
-  ageGroups,
-  cities,
-  termsOfUse,
-  refetch,
-}: PropsNarrowed & {
-  reservation: NodeT;
-  refetch: () => Promise<FetchResult<ReservationQuery>>;
-}): JSX.Element | null {
+function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const router = useRouter();
+
+  const {
+    reservationUnit,
+    reservationPurposes,
+    ageGroups,
+    cities,
+    termsOfUse,
+  } = props;
+
+  const [refetch, { data: resData }] = useReservationLazyQuery({
+    variables: { id: props.reservation.id },
+    fetchPolicy: "no-cache",
+  });
+
+  const reservation = resData?.reservation ?? props.reservation;
+  // it should be Created only here (SSR should have redirected)
+  if (reservation.state !== State.Created) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      "should NOT be here when reservation state is ",
+      reservation.state
+    );
+  }
 
   useRemoveStoredReservation();
 
@@ -471,10 +413,6 @@ function ReservationUnitReservationWithReservationProp({
       ? getTranslation(reservationUnit, "termsOfUse")
       : null;
 
-  if (!isBrowser) {
-    return null;
-  }
-
   const infoReservation = {
     ...reservation,
     reservationUnit: reservationUnit != null ? [reservationUnit] : [],
@@ -577,46 +515,100 @@ function ReservationUnitReservationWithReservationProp({
   );
 }
 
-// TODO this is wrong. Use getServerSideProps and export the Page component directly without this wrapper
-function ReservationUnitReservation(props: PropsNarrowed) {
-  const { reservationPk } = props;
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
-  // TODO show an error if this fails
-  // TODO show an error if the pk is not a number
-  // TODO find a typesafe way to do this
-  const typename = "ReservationNode";
-  const id = base64encode(`${typename}:${reservationPk}`);
-  const { data, loading, error, refetch } = useReservationQuery({
-    variables: { id },
-    skip: !reservationPk,
-  });
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+  const { locale, params } = ctx;
+  const [reservationUnitPk, path, reservationPk] = params?.params ?? [];
+  const commonProps = getCommonServerSideProps();
+  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
-  if (error != null) {
-    return <NextError statusCode={500} />;
+  const resUnitPk = Number(reservationUnitPk);
+  const resPk = Number(reservationPk);
+  if (resUnitPk > 0 && resPk > 0 && path === "reservation") {
+    const id = base64encode(`ReservationUnitNode:${resUnitPk}`);
+    const { data } = await apolloClient.query<
+      ReservationUnitQuery,
+      ReservationUnitQueryVariables
+    >({
+      query: ReservationUnitDocument,
+      variables: { id },
+      fetchPolicy: "no-cache",
+    });
+    const { reservationUnit } = data || {};
+
+    const genericTerms = await getGenericTerms(apolloClient);
+    const { data: paramsData } = await apolloClient.query<
+      OptionsQuery,
+      OptionsQueryVariables
+    >({
+      query: OptionsDocument,
+      fetchPolicy: "no-cache",
+    });
+
+    const { data: resData } = await apolloClient.query<
+      ReservationQuery,
+      ReservationQueryVariables
+    >({
+      query: ReservationDocument,
+      variables: { id: base64encode(`ReservationNode:${resPk}`) },
+      fetchPolicy: "no-cache",
+    });
+
+    const reservationPurposes = filterNonNullable(
+      paramsData.reservationPurposes?.edges?.map((e) => e?.node)
+    );
+    const ageGroups = filterNonNullable(
+      paramsData.ageGroups?.edges?.map((e) => e?.node)
+    );
+    const cities = filterNonNullable(
+      paramsData.cities?.edges?.map((e) => e?.node)
+    );
+
+    const { reservation } = resData;
+
+    if (
+      reservation?.pk != null &&
+      reservation.pk > 0 &&
+      reservation?.state !== State.Created
+    ) {
+      return {
+        redirect: {
+          permanent: false,
+          destination: `${reservationsPrefix}/${reservation.pk}`,
+        },
+        props: {
+          notFound: true, // for prop narrowing
+        },
+      };
+    }
+
+    if (reservation != null && reservationUnit != null) {
+      return {
+        props: {
+          ...commonProps,
+          reservation,
+          reservationUnit,
+          reservationPurposes,
+          ageGroups,
+          cities,
+          termsOfUse: { genericTerms },
+          ...(await serverSideTranslations(locale ?? "fi")),
+        },
+      };
+    }
   }
 
-  // TODO errors vs loading
-  if (loading) {
-    return <CenterSpinner />;
-  }
-  if (data == null || data.reservation == null) {
-    return <NextError statusCode={400} />;
-  }
-
-  const { reservation } = data;
-
-  // it should be Created only here otherwise it's a client error (should redirect to /reservation/:pk page)
-  if (reservation.state !== State.Created) {
-    return <NextError statusCode={400} />;
-  }
-
-  return (
-    <ReservationUnitReservationWithReservationProp
-      {...props}
-      reservation={reservation}
-      refetch={refetch}
-    />
-  );
+  return {
+    props: {
+      // have to double up notFound inside the props to get TS types dynamically
+      notFound: true,
+      ...commonProps,
+      ...(await serverSideTranslations(locale ?? "fi")),
+    },
+    notFound: true,
+  };
 }
 
 export default ReservationUnitReservation;

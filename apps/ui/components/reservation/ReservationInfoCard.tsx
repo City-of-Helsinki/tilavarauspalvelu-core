@@ -18,6 +18,7 @@ import {
 } from "@/modules/util";
 import { reservationUnitPath } from "@/modules/const";
 import { getImageSource } from "common/src/helpers";
+import ClientOnly from "common/src/ClientOnly";
 
 type Type = "pending" | "confirmed" | "complete";
 
@@ -180,47 +181,50 @@ export function ReservationInfoCard({
     ? reservationUnitPath(reservationUnit.pk)
     : "";
 
+  // Have to make client only because date formatting doesn't work on server side
   return (
-    <Wrapper $type={type}>
-      <MainImage src={imgSrc} alt={name} />
-      <Content data-testid="reservation__reservation-info-card__content">
-        <Heading>
-          <StyledLink
-            data-testid="reservation__reservation-info-card__reservationUnit"
-            href={link}
-          >
-            {name}
-          </StyledLink>
-        </Heading>
-        {["confirmed", "complete"].includes(type) && (
+    <ClientOnly>
+      <Wrapper $type={type}>
+        <MainImage src={imgSrc} alt={name} />
+        <Content data-testid="reservation__reservation-info-card__content">
+          <Heading>
+            <StyledLink
+              data-testid="reservation__reservation-info-card__reservationUnit"
+              href={link}
+            >
+              {name}
+            </StyledLink>
+          </Heading>
+          {["confirmed", "complete"].includes(type) && (
+            <Subheading>
+              {t("reservations:reservationNumber")}:{" "}
+              <span data-testid="reservation__reservation-info-card__reservationNumber">
+                {reservation.pk ?? "-"}
+              </span>
+            </Subheading>
+          )}
           <Subheading>
-            {t("reservations:reservationNumber")}:{" "}
-            <span data-testid="reservation__reservation-info-card__reservationNumber">
-              {reservation.pk ?? "-"}
-            </span>
+            {reservationUnit.unit != null
+              ? getTranslation(reservationUnit.unit, "name")
+              : "-"}
           </Subheading>
-        )}
-        <Subheading>
-          {reservationUnit.unit != null
-            ? getTranslation(reservationUnit.unit, "name")
-            : "-"}
-        </Subheading>
-        <Value data-testid="reservation__reservation-info-card__duration">
-          <Strong>
-            {capitalize(timeString)}, {formatDuration(duration, t)}
-          </Strong>
-        </Value>
-        <Value data-testid="reservation__reservation-info-card__price">
-          {t("reservationUnit:price")}: <Strong>{price}</Strong>{" "}
-          {taxPercentageValue &&
-            shouldDisplayTaxPercentage &&
-            `(${t("common:inclTax", {
-              taxPercentage: formatters.strippedDecimal.format(
-                parseFloat(taxPercentageValue)
-              ),
-            })})`}
-        </Value>
-      </Content>
-    </Wrapper>
+          <Value data-testid="reservation__reservation-info-card__duration">
+            <Strong>
+              {capitalize(timeString)}, {formatDuration(duration, t)}
+            </Strong>
+          </Value>
+          <Value data-testid="reservation__reservation-info-card__price">
+            {t("reservationUnit:price")}: <Strong>{price}</Strong>{" "}
+            {taxPercentageValue &&
+              shouldDisplayTaxPercentage &&
+              `(${t("common:inclTax", {
+                taxPercentage: formatters.strippedDecimal.format(
+                  parseFloat(taxPercentageValue)
+                ),
+              })})`}
+          </Value>
+        </Content>
+      </Wrapper>
+    </ClientOnly>
   );
 }
