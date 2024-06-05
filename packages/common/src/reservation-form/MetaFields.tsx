@@ -12,7 +12,7 @@ import { IconGroup, IconUser } from "hds-react";
 import React, { Fragment } from "react";
 import styled from "styled-components";
 import { Controller, useFormContext } from "react-hook-form";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { camelCase } from "lodash";
 import { CustomerTypeChoice, MetadataSetsFragment } from "../../gql/gql-types";
 import ReservationFormField from "./ReservationFormField";

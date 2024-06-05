@@ -7,7 +7,7 @@ import {
   FieldValues,
   useFormContext,
 } from "react-hook-form";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { fontMedium, fontRegular, Strongish } from "../common/typography";
 import { CustomerTypeChoice } from "../../gql/gql-types";

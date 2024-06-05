@@ -6,7 +6,7 @@ import {
   type UseControllerProps,
   useController,
 } from "react-hook-form";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 
 interface ControllerProps<T extends FieldValues> extends UseControllerProps<T> {
   error?: string;
