@@ -33,7 +33,7 @@
     "lodash": "^4.17.21",
     "next": "14.2.3",
     "next-compose-plugins": "^2.2.1",
-    "next-i18next": "^15.2.0",
+    "next-i18next": "^15.3.0",
     "next-transpile-modules": "^10.0.1",
     "nuka-carousel": "^7.0.0",
     "query-string": "9.0.0",

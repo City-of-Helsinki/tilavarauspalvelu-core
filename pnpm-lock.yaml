@@ -96,8 +96,8 @@ importers:
         specifier: 14.2.3
         version: 14.2.3(@babel/core@7.24.6)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)(sass@1.74.1)
       next-i18next:
-        specifier: ^15.2.0
-        version: 15.2.0(i18next@23.10.1)(next@14.2.3(@babel/core@7.24.6)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)(sass@1.74.1))(react-i18next@14.1.2(i18next@23.10.1)(react-dom@18.3.1(react@18.2.0))(react-native@0.74.1(@babel/core@7.24.6)(@babel/preset-env@7.24.6(@babel/core@7.24.6))(@types/react@18.0.27)(react@18.2.0))(react@18.2.0))(react@18.2.0)
+        specifier: ^15.3.0
+        version: 15.3.0(i18next@23.10.1)(next@14.2.3(@babel/core@7.24.6)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)(sass@1.74.1))(react-i18next@14.1.2(i18next@23.10.1)(react-dom@18.3.1(react@18.2.0))(react-native@0.74.1(@babel/core@7.24.6)(@babel/preset-env@7.24.6(@babel/core@7.24.6))(@types/react@18.0.27)(react@18.2.0))(react@18.2.0))(react@18.2.0)
       query-string:
         specifier: 9.0.0
         version: 9.0.0
@@ -277,8 +277,8 @@ importers:
         specifier: ^2.2.1
         version: 2.2.1
       next-i18next:
-        specifier: ^15.2.0
-        version: 15.2.0(i18next@23.10.1)(next@14.2.3(@babel/core@7.24.6)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)(sass@1.74.1))(react-i18next@14.1.2(i18next@23.10.1)(react-dom@18.3.1(react@18.2.0))(react-native@0.74.1(@babel/core@7.24.6)(@babel/preset-env@7.24.6(@babel/core@7.24.6))(@types/react@18.0.27)(react@18.2.0))(react@18.2.0))(react@18.2.0)
+        specifier: ^15.3.0
+        version: 15.3.0(i18next@23.10.1)(next@14.2.3(@babel/core@7.24.6)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)(sass@1.74.1))(react-i18next@14.1.2(i18next@23.10.1)(react-dom@18.3.1(react@18.2.0))(react-native@0.74.1(@babel/core@7.24.6)(@babel/preset-env@7.24.6(@babel/core@7.24.6))(@types/react@18.0.27)(react@18.2.0))(react@18.2.0))(react@18.2.0)
       next-transpile-modules:
         specifier: ^10.0.1
         version: 10.0.1
@@ -434,8 +434,8 @@ importers:
         specifier: 14.2.3
         version: 14.2.3(@babel/core@7.24.6)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)(sass@1.74.1)
       next-i18next:
-        specifier: ^15.2.0
-        version: 15.2.0(i18next@23.10.1)(next@14.2.3(@babel/core@7.24.6)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)(sass@1.74.1))(react-i18next@14.1.2(i18next@23.10.1)(react-dom@18.3.1(react@18.2.0))(react-native@0.74.1(@babel/core@7.24.6)(@babel/preset-env@7.24.6(@babel/core@7.24.6))(@types/react@18.0.27)(react@18.2.0))(react@18.2.0))(react@18.2.0)
+        specifier: ^15.3.0
+        version: 15.3.0(i18next@23.10.1)(next@14.2.3(@babel/core@7.24.6)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)(sass@1.74.1))(react-i18next@14.1.2(i18next@23.10.1)(react-dom@18.3.1(react@18.2.0))(react-native@0.74.1(@babel/core@7.24.6)(@babel/preset-env@7.24.6(@babel/core@7.24.6))(@types/react@18.0.27)(react@18.2.0))(react@18.2.0))(react@18.2.0)
       react:
         specifier: ^18.2.0
         version: 18.2.0
@@ -6585,8 +6585,8 @@ packages:
   next-compose-plugins@2.2.1:
     resolution: {integrity: sha512-OjJ+fV15FXO2uQXQagLD4C0abYErBjyjE0I0FHpOEIB8upw0hg1ldFP6cqHTJBH1cZqy96OeR3u1dJ+Ez2D4Bg==}
 
-  next-i18next@15.2.0:
-    resolution: {integrity: sha512-Rl5yZ4oGffsB0AjRykZ5PzNQ2M6am54MaMayldGmH/UKZisrIxk2SKEPJvaHhKlWe1qgdNi2FkodwK8sEjfEmg==}
+  next-i18next@15.3.0:
+    resolution: {integrity: sha512-bq7Cc9XJFcmGOCLnyEtHaeJ3+JJNsI/8Pkj9BaHAnhm4sZ9vNNC4ZsaqYnlRZ7VH5ypSo73fEqLK935jLsmCvQ==}
     engines: {node: '>=14'}
     peerDependencies:
       i18next: '>= 23.7.13'
@@ -16719,9 +16719,9 @@ snapshots:
 
   next-compose-plugins@2.2.1: {}
 
-  next-i18next@15.2.0(i18next@23.10.1)(next@14.2.3(@babel/core@7.24.6)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)(sass@1.74.1))(react-i18next@14.1.2(i18next@23.10.1)(react-dom@18.3.1(react@18.2.0))(react-native@0.74.1(@babel/core@7.24.6)(@babel/preset-env@7.24.6(@babel/core@7.24.6))(@types/react@18.0.27)(react@18.2.0))(react@18.2.0))(react@18.2.0):
+  next-i18next@15.3.0(i18next@23.10.1)(next@14.2.3(@babel/core@7.24.6)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)(sass@1.74.1))(react-i18next@14.1.2(i18next@23.10.1)(react-dom@18.3.1(react@18.2.0))(react-native@0.74.1(@babel/core@7.24.6)(@babel/preset-env@7.24.6(@babel/core@7.24.6))(@types/react@18.0.27)(react@18.2.0))(react@18.2.0))(react@18.2.0):
     dependencies:
-      '@babel/runtime': 7.23.7
+      '@babel/runtime': 7.24.6
       '@types/hoist-non-react-statics': 3.3.5
       core-js: 3.35.0
       hoist-non-react-statics: 3.3.2

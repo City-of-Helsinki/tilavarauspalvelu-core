@@ -28,7 +28,7 @@
     "lodash": "^4.17.21",
     "mjml": "^4.15.3",
     "next": "14.2.3",
-    "next-i18next": "^15.2.0",
+    "next-i18next": "^15.3.0",
     "react": "^18.2.0",
     "react-big-calendar": "^1.8.6",
     "react-dom": "^18.3.1",
