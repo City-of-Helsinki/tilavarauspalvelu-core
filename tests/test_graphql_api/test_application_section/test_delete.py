@@ -16,6 +16,7 @@ pytestmark = [
     [
         ApplicationSectionStatusChoice.IN_ALLOCATION,
         ApplicationSectionStatusChoice.HANDLED,
+        ApplicationSectionStatusChoice.REJECTED,
     ],
 )
 def test_cannot_delete_application_event_not_unallocated(graphql, status):

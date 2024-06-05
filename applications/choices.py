@@ -252,6 +252,9 @@ class ApplicationSectionStatusChoice(models.TextChoices):
     HANDLED = "HANDLED", _("Handled")
     """Application section has been handled fully in the allocation process"""
 
+    REJECTED = "REJECTED", _("Rejected")
+    """All applied slots for this application section have been locked or rejected."""
+
     @DynamicClassAttribute
     def can_allocate(self) -> bool:
         return self in [

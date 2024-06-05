@@ -502,24 +502,20 @@ msgstr "Teksti, joka näytetään hakijoille heidän täyttäessään hakemuksia
 msgid "Application this section is in."
 msgstr "Hakemus jolle tämä osa kuuluu."
 
-#: applications/admin/forms/application_section.py
-#, python-format
 msgid ""
 "%(unallocated)s: Section has been created, but application round is still "
 "open. <br>%(in_allocation)s: Application round has closed, but the section "
 "is not fully allocated. <br>%(handled)s: Application round is no longer in "
 "allocation, section's applied reservations per week has been fulfilled, or "
-"all reservation unit options rejected or locked. <br>%(failed)s: At least "
-"one reservation was not possible for some allocation. <br>%(reserved)s: All "
-"allocations have successful reservations. <br>"
+"all reservation unit options rejected or locked. <br>%(rejected)s: All "
+"applied slots for this application section have been locked or rejected. <br>"
 msgstr ""
 "%(unallocated)s: Hakemuksen osa luotu, mutta kausivarauskierroksen hakuaika "
 "on vielä auki. <br>%(in_allocation)s: Hakuaika on sulkeutunut, mutta osaa ei "
 "ole vielä kokonaan käsitelty. <br>%(handled)s: Kausivarauskierros on "
 "käsitelty, tai osan toistokerrat on täytetty, tai kaikki varausyksikkö-"
-"vaihtoehdot on hylätty tai lukittu. <br>%(failed)s: Ainakin yhtä varausta ei "
-"ollut mahdollista luoda jollekin vuorolle. <br>%(reserved)s: Kaikki "
-"varaukset jaetuille vuoroille on luotu. <br>"
+"vaihtoehdot on hylätty tai lukittu. <br>%(rejected)s: Kaikki "
+"haetut toistokerrat tälle hakemuksen osalle ovat lukittu tai hylätty. <br>"
 
 #: applications/admin/forms/application_section.py reservations/admin.py
 #: reservations/models/reservation_statistic.py
@@ -709,7 +705,7 @@ msgstr "Varausyksikkö tälle vaihtoehdolle."
 msgid "Preferred order"
 msgstr "Suosittu järjestys"
 
-#: applications/admin/forms/reservation_unit_option.py
+#: applications/admin/forms/reservation_unit_option.py applications/choices.py
 msgid "Rejected"
 msgstr "Hylätty"
 
@@ -870,10 +866,6 @@ msgstr "Peruttu"
 #: applications/choices.py
 msgid "Unallocated"
 msgstr "Vastaanotettu"
-
-#: applications/choices.py
-msgid "Reserved"
-msgstr "Varattu"
 
 #: applications/choices.py
 msgid "Internal"

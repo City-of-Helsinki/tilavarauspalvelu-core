@@ -29,11 +29,13 @@ class ApplicationSectionAdminForm(forms.ModelForm):
             "%(in_allocation)s: Application round has closed, but the section is not fully allocated. <br>"
             "%(handled)s: Application round is no longer in allocation, section's applied reservations "
             "per week has been fulfilled, or all reservation unit options rejected or locked. <br>"
+            "%(rejected)s: All applied slots for this application section have been locked or rejected. <br>"
         )
         % {
             "unallocated": ApplicationSectionStatusChoice.UNALLOCATED.label,
             "in_allocation": ApplicationSectionStatusChoice.IN_ALLOCATION.label,
             "handled": ApplicationSectionStatusChoice.HANDLED.label,
+            "rejected": ApplicationSectionStatusChoice.REJECTED.label,
         },
     )
 

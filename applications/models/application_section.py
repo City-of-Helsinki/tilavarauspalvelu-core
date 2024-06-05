@@ -152,12 +152,27 @@ class ApplicationSection(SerializableMixin, models.Model):
             ),
             models.When(
                 # Application round has moved to handled stage
+                #  AND there are no allocated reservation unit options
+                # OR Application round has NOT moved to rejected stage
+                #  AND all reservation unit options have been locked or rejected
+                condition=(
+                    models.Q(
+                        models.Q(application__application_round__handled_date__isnull=False)
+                        & models.Q(L(allocations=0))
+                    )
+                    | models.Q(
+                        models.Q(application__application_round__handled_date__isnull=True)
+                        & models.Q(L(usable_reservation_unit_options=0))
+                    )
+                ),
+                then=models.Value(ApplicationSectionStatusChoice.REJECTED.value),
+            ),
+            models.When(
+                # Application round has moved to handled stage
                 # OR number of allocations equals the number of applied reservations per week
-                # OR all reservation unit options have been locked or rejected
                 condition=(
                     models.Q(application__application_round__handled_date__isnull=False)
                     | models.Q(L(allocations__gte=models.F("applied_reservations_per_week")))
-                    | models.Q(L(usable_reservation_unit_options=0))
                 ),
                 then=models.Value(ApplicationSectionStatusChoice.HANDLED.value),
             ),
@@ -182,12 +197,15 @@ class ApplicationSection(SerializableMixin, models.Model):
         total_allocations = sum(option.num_of_allocations for option in reservation_unit_options)
         all_locked_or_rejected = all(option.locked or option.rejected for option in reservation_unit_options)
 
-        if self.application.application_round.status.past_allocation:
-            return ApplicationSectionStatusChoice.HANDLED
         if total_allocations >= self.applied_reservations_per_week:
             return ApplicationSectionStatusChoice.HANDLED
         if all_locked_or_rejected:
-            return ApplicationSectionStatusChoice.HANDLED
+            return ApplicationSectionStatusChoice.REJECTED
+
+        if self.application.application_round.status.past_allocation:
+            if total_allocations >= 1:
+                return ApplicationSectionStatusChoice.HANDLED
+            return ApplicationSectionStatusChoice.REJECTED
 
         return ApplicationSectionStatusChoice.IN_ALLOCATION
 
@@ -248,9 +266,13 @@ class ApplicationSection(SerializableMixin, models.Model):
                 then=models.Value(2),
             ),
             models.When(
-                models.Q(L(status=ApplicationSectionStatusChoice.HANDLED.value)),
+                models.Q(L(status=ApplicationSectionStatusChoice.REJECTED.value)),
                 then=models.Value(3),
             ),
-            default=models.Value(6),
+            models.When(
+                models.Q(L(status=ApplicationSectionStatusChoice.HANDLED.value)),
+                then=models.Value(4),
+            ),
+            default=models.Value(5),
             output_field=models.IntegerField(),
         )
