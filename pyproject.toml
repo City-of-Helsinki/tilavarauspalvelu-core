@@ -229,6 +229,7 @@ lint.ignore = [
     "N801",     # Allow whatever class names in tests
     "N802",     # Allow whatever function names in tests
     "N815",     # Allow whatever variable names in tests
+    "S311",     # Pseudo-random generators are fine here.
 ]
 
 [tool.ruff.lint.isort]

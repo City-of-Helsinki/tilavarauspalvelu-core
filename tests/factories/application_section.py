@@ -1,4 +1,5 @@
 import datetime
+import random
 from collections.abc import Iterable
 from typing import Any
 
@@ -47,6 +48,8 @@ class ApplicationSectionFactory(GenericDjangoModelFactory[ApplicationSection]):
                 return cls.create_in_status_in_allocation(**kwargs)
             case ApplicationSectionStatusChoice.HANDLED:
                 return cls.create_in_status_handled(**kwargs)
+            case ApplicationSectionStatusChoice.REJECTED:
+                return cls.create_in_status_rejected(**kwargs)
 
     @classmethod
     def create_in_status_unallocated(cls, **kwargs: Any) -> ApplicationSection:
@@ -108,6 +111,31 @@ class ApplicationSectionFactory(GenericDjangoModelFactory[ApplicationSection]):
 
         if not cls.has_sub_kwargs("reservation_unit_options", kwargs):
             kwargs["reservation_unit_options__allocated_time_slots__day_of_the_week"] = Weekday.MONDAY
+
+        return cls.create(**kwargs)
+
+    @classmethod
+    def create_in_status_rejected(cls, **kwargs: Any) -> ApplicationSection:
+        """
+        Create a rejected application section:
+        - in an application in allocation
+        - in an application round in allocation
+        - without any allocated reservation unit options
+        """
+        from .application import ApplicationFactory
+
+        kwargs["applied_reservations_per_week"] = 1
+
+        if "application" not in kwargs:
+            sub_kwargs = cls.pop_sub_kwargs("application", kwargs)
+            sub_kwargs["application_sections"] = []
+            kwargs["application"] = ApplicationFactory.create_in_status_in_allocation(**sub_kwargs)
+
+        if not cls.has_sub_kwargs("reservation_unit_options", kwargs):
+            # All options are either locked or rejected
+            is_rejected = random.choice([True, False])
+            kwargs["reservation_unit_options__rejected"] = is_rejected
+            kwargs["reservation_unit_options__locked"] = not is_rejected
 
         return cls.create(**kwargs)
 

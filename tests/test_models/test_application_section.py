@@ -54,16 +54,16 @@ def test_application_section__status():
     # All reservation unit options have been locked -> status is HANDLED
     option.locked = True
     option.save()
-    assert section.status == ApplicationSectionStatusChoice.HANDLED
-    assert ApplicationSection.objects.filter(L(status=ApplicationSectionStatusChoice.HANDLED)).exists()
+    assert section.status == ApplicationSectionStatusChoice.REJECTED
+    assert ApplicationSection.objects.filter(L(status=ApplicationSectionStatusChoice.REJECTED)).exists()
     option.locked = False
     option.save()
 
     # All reservation unit options have been rejected -> status is HANDLED
     option.rejected = True
     option.save()
-    assert section.status == ApplicationSectionStatusChoice.HANDLED
-    assert ApplicationSection.objects.filter(L(status=ApplicationSectionStatusChoice.HANDLED)).exists()
+    assert section.status == ApplicationSectionStatusChoice.REJECTED
+    assert ApplicationSection.objects.filter(L(status=ApplicationSectionStatusChoice.REJECTED)).exists()
     option.rejected = False
     option.save()
 
