@@ -10,7 +10,8 @@ from opening_hours.utils.reservable_time_span_client import merge_overlapping_ti
 from opening_hours.utils.time_span_element import TimeSpanElement
 from reservation_units.models import ReservationUnit
 from reservation_units.utils.affecting_reservations_helper import AffectingReservationHelper
-from reservations.models import RecurringReservation, Reservation, ReservationPurpose
+from reservations.choices import RejectionReadinessChoice
+from reservations.models import RecurringReservation, RejectedOccurrence, Reservation, ReservationPurpose
 
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable
@@ -284,3 +285,41 @@ class RecurringReservationActions:
         reservations = Reservation.objects.bulk_create(reservations)
         ThroughModel.objects.bulk_create(through_models)
         return reservations
+
+    def bulk_create_rejected_occurrences_for_periods(
+        self,
+        overlapping: Iterable[ReservationPeriod],
+        not_reservable: Iterable[ReservationPeriod],
+        invalid_start_interval: Iterable[ReservationPeriod],
+    ) -> list[RejectedOccurrence]:
+        occurrences: list[RejectedOccurrence] = (
+            [
+                RejectedOccurrence(
+                    begin_datetime=period["begin"],
+                    end_datetime=period["end"],
+                    rejection_reason=RejectionReadinessChoice.OVERLAPPING_RESERVATIONS,
+                    recurring_reservation=self.recurring_reservation,
+                )
+                for period in overlapping
+            ]
+            + [
+                RejectedOccurrence(
+                    begin_datetime=period["begin"],
+                    end_datetime=period["end"],
+                    rejection_reason=RejectionReadinessChoice.RESERVATION_UNIT_CLOSED,
+                    recurring_reservation=self.recurring_reservation,
+                )
+                for period in not_reservable
+            ]
+            + [
+                RejectedOccurrence(
+                    begin_datetime=period["begin"],
+                    end_datetime=period["end"],
+                    rejection_reason=RejectionReadinessChoice.INTERVAL_NOT_ALLOWED,
+                    recurring_reservation=self.recurring_reservation,
+                )
+                for period in invalid_start_interval
+            ]
+        )
+
+        return RejectedOccurrence.objects.bulk_create(occurrences)

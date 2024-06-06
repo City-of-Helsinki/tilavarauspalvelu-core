@@ -126,3 +126,9 @@ def generate_reservation_series_from_allocations(application_round_id: int) -> N
                 periods=slots.possible,
                 reservation_details=reservation_details,
             )
+
+            recurring_reservation.actions.bulk_create_rejected_occurrences_for_periods(
+                overlapping=slots.overlapping,
+                not_reservable=slots.not_reservable,
+                invalid_start_interval=slots.invalid_start_interval,
+            )
