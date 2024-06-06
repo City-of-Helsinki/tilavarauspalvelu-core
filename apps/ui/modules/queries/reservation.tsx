@@ -162,6 +162,7 @@ export const GET_RESERVATION = gql`
       ...ReserveeBillingFields
       ...ReservationInfo
       applyingForFreeOfCharge
+      freeOfChargeReason
       bufferTimeBefore
       bufferTimeAfter
       begin

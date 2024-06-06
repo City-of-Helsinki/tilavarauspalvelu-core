@@ -5919,6 +5919,7 @@ export type ReservationQuery = {
     pk?: number | null;
     name?: string | null;
     applyingForFreeOfCharge?: boolean | null;
+    freeOfChargeReason?: string | null;
     bufferTimeBefore: number;
     bufferTimeAfter: number;
     begin: string;
@@ -9382,6 +9383,7 @@ export const ReservationDocument = gql`
       ...ReserveeBillingFields
       ...ReservationInfo
       applyingForFreeOfCharge
+      freeOfChargeReason
       bufferTimeBefore
       bufferTimeAfter
       begin
