@@ -17,8 +17,13 @@ from opening_hours.utils.hauki_api_types import (
     HaukiTranslatedField,
 )
 from reservation_units.models import ReservationUnitHierarchy
-from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
-from reservations.models import RecurringReservation, Reservation
+from reservations.choices import (
+    CustomerTypeChoice,
+    RejectionReadinessChoice,
+    ReservationStateChoice,
+    ReservationTypeChoice,
+)
+from reservations.models import RecurringReservation, RejectedOccurrence, Reservation
 from tests.factories import AllocatedTimeSlotFactory, ReservationFactory
 from tests.helpers import patch_method
 from utils.sentry import SentryLogger
@@ -97,6 +102,8 @@ def test_generate_reservation_series_from_allocations():
 
     assert local_iso_format(reservations[2].begin) == local_datetime(2024, 1, 15, 12).isoformat()
     assert local_iso_format(reservations[2].end) == local_datetime(2024, 1, 15, 14).isoformat()
+
+    assert RejectedOccurrence.objects.count() == 0
 
 
 @patch_method(HaukiAPIClient.get_resource_opening_hours, return_value=EMPTY_RESPONSE)
@@ -216,6 +223,13 @@ def test_generate_reservation_series_from_allocations__invalid_start_interval():
     reservations: list[Reservation] = list(series[0].reservations.all())
     assert len(reservations) == 0
 
+    rejected = list(RejectedOccurrence.objects.all())
+    assert len(rejected) == 1
+
+    assert rejected[0].rejection_reason == RejectionReadinessChoice.INTERVAL_NOT_ALLOWED
+    assert local_iso_format(rejected[0].begin_datetime) == local_datetime(2024, 1, 1, hour=12, minute=1).isoformat()
+    assert local_iso_format(rejected[0].end_datetime) == local_datetime(2024, 1, 1, hour=14).isoformat()
+
 
 @patch_method(HaukiAPIClient.get_resource_opening_hours, return_value=EMPTY_RESPONSE)
 @freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=DEFAULT_TIMEZONE))
@@ -240,6 +254,13 @@ def test_generate_reservation_series_from_allocations__overlapping_reservation()
     assert len(reservations) == 1
 
     assert reservations[0].state == ReservationStateChoice.CONFIRMED.value
+
+    rejected = list(RejectedOccurrence.objects.all())
+    assert len(rejected) == 1
+
+    assert rejected[0].rejection_reason == RejectionReadinessChoice.OVERLAPPING_RESERVATIONS
+    assert local_iso_format(rejected[0].begin_datetime) == local_datetime(2024, 1, 1, hour=12).isoformat()
+    assert local_iso_format(rejected[0].end_datetime) == local_datetime(2024, 1, 1, hour=14).isoformat()
 
 
 @patch_method(HaukiAPIClient.get_resource_opening_hours)
@@ -280,3 +301,10 @@ def test_generate_reservation_series_from_allocations__explicitly_closed_opening
 
     reservations: list[Reservation] = list(series[0].reservations.all())
     assert len(reservations) == 0
+
+    rejected = list(RejectedOccurrence.objects.all())
+    assert len(rejected) == 1
+
+    assert rejected[0].rejection_reason == RejectionReadinessChoice.RESERVATION_UNIT_CLOSED
+    assert local_iso_format(rejected[0].begin_datetime) == local_datetime(2024, 1, 1, hour=12).isoformat()
+    assert local_iso_format(rejected[0].end_datetime) == local_datetime(2024, 1, 1, hour=14).isoformat()
