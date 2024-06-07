@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { gql } from "@apollo/client";
-import { useUnitsFilterQuery } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
+import { useUnitsFilterQuery } from "@gql/gql-types";
 
 // exporting so it doesn't get removed
 // TODO combine with other options queries so we only make a single request for all of them
@@ -24,7 +24,7 @@ export const UNITS_QUERY = gql`
   }
 `;
 
-export function useUnitFilterOptions() {
+export function useUnitOptions() {
   const { data, loading, fetchMore } = useUnitsFilterQuery();
 
   // auto fetch more (there is no limit, expect number of them would be a few hundred, but in theory this might cause problems)

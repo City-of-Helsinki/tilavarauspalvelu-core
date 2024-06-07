@@ -1,7 +1,22 @@
-import { useReservationUnitTypesFilterQuery } from "@gql/gql-types";
+import { gql } from "@apollo/client";
 import { filterNonNullable } from "common/src/helpers";
+import { useReservationUnitTypesFilterQuery } from "@gql/gql-types";
 
-// TODO move
+export const RESERVATION_UNIT_TYPES_QUERY = gql`
+  query ReservationUnitTypesFilter($offset: Int, $first: Int) {
+    reservationUnitTypes(offset: $offset, first: $first) {
+      edges {
+        node {
+          id
+          pk
+          nameFi
+        }
+      }
+      totalCount
+    }
+  }
+`;
+
 export function useReservationUnitTypes() {
   const { data, loading } = useReservationUnitTypesFilterQuery();
 

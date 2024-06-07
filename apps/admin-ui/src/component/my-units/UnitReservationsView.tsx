@@ -7,7 +7,7 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useLocation } from "react-use";
 import styled from "styled-components";
 import { AutoGrid, VerticalFlex } from "@/styles/layout";
-import { useReservationUnitTypes } from "../filters/ReservationUnitTypeFilter";
+import { useReservationUnitTypes } from "@/hooks";
 import DayNavigation from "./DayNavigation";
 import { UnitReservations } from "./UnitReservations";
 import { HR } from "@/component/Table";

@@ -3,9 +3,11 @@ import { DateInput } from "hds-react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import ShowAllContainer from "common/src/components/ShowAllContainer";
-import { useReservationUnitTypes } from "../filters/ReservationUnitTypeFilter";
-import { useUnitFilterOptions } from "../filters/UnitFilter";
-import { useReservationUnitOptions } from "../filters/ReservationUnitFilter";
+import {
+  useReservationUnitTypes,
+  useUnitOptions,
+  useReservationUnitOptions,
+} from "@/hooks";
 import { AutoGrid } from "@/styles/layout";
 import {
   MultiSelectFilter,
@@ -81,7 +83,7 @@ export function Filters({
     label: t(`Payment.status.${s}`),
   }));
 
-  const { options: unitOptions } = useUnitFilterOptions();
+  const { options: unitOptions } = useUnitOptions();
   const { options: reservationUnitOptions } = useReservationUnitOptions();
 
   // TODO unkown parameters should be null right? not empty string? or does it matter

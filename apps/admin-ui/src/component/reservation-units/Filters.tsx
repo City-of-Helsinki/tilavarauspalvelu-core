@@ -2,9 +2,8 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import ShowAllContainer from "common/src/components/ShowAllContainer";
-import { useUnitFilterOptions } from "../filters/UnitFilter";
 import { AutoGrid } from "@/styles/layout";
-import { useReservationUnitTypes } from "../filters/ReservationUnitTypeFilter";
+import { useReservationUnitTypes, useUnitOptions } from "@/hooks";
 import { ReservationUnitState } from "@gql/gql-types";
 import {
   MultiSelectFilter,
@@ -38,7 +37,7 @@ function Filters(): JSX.Element {
       label: t(`ReservationUnits.state.${s}`),
     }));
 
-  const { options: unitOptions } = useUnitFilterOptions();
+  const { options: unitOptions } = useUnitOptions();
   const { options: reservationUnitTypeOptions } = useReservationUnitTypes();
 
   function translateTag(tag: string, val: string): string {
