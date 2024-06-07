@@ -8425,6 +8425,7 @@ export type ApplicationSectionAllocationsQueryVariables = Exact<{
     | InputMaybe<Scalars["Int"]["input"]>
   >;
   includePreferredOrder10OrHigher?: InputMaybe<Scalars["Boolean"]["input"]>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
 }>;
 
 export type ApplicationSectionAllocationsQuery = {
@@ -8509,6 +8510,7 @@ export type ApplicationSectionAllocationsQuery = {
         } | null;
       } | null;
     } | null>;
+    pageInfo: { endCursor?: string | null; hasNextPage: boolean };
   } | null;
   affectingAllocatedTimeSlots?: Array<{
     id: string;
@@ -15067,6 +15069,7 @@ export const ApplicationSectionAllocationsDocument = gql`
     $ageGroup: [Int]
     $homeCity: [Int]
     $includePreferredOrder10OrHigher: Boolean
+    $after: String
   ) {
     applicationSections(
       applicationRound: $applicationRound
@@ -15081,6 +15084,7 @@ export const ApplicationSectionAllocationsDocument = gql`
       ageGroup: $ageGroup
       homeCity: $homeCity
       includePreferredOrder10OrHigher: $includePreferredOrder10OrHigher
+      after: $after
     ) {
       edges {
         node {
@@ -15113,6 +15117,10 @@ export const ApplicationSectionAllocationsDocument = gql`
             }
           }
         }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
       }
       totalCount
     }
@@ -15154,6 +15162,7 @@ export const ApplicationSectionAllocationsDocument = gql`
  *      ageGroup: // value for 'ageGroup'
  *      homeCity: // value for 'homeCity'
  *      includePreferredOrder10OrHigher: // value for 'includePreferredOrder10OrHigher'
+ *      after: // value for 'after'
  *   },
  * });
  */

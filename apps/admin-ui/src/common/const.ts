@@ -27,7 +27,7 @@ export const NUMBER_OF_DECIMALS = 6;
 /// TODO if this is left enabled it should be moved to env (so we can disable without recompiling).
 /// NOTE seems to work fine without backoff logic (the next query is run after the previous one is finished)
 /// better solution would be to use subscriptions (i.e. drive updates from the backend).
-export const ALLOCATION_POLL_INTERVAL = 10000;
+export const ALLOCATION_POLL_INTERVAL = 20000;
 
 // This is a backend (or library) limit based on testing
 export const GQL_MAX_RESULTS_PER_QUERY = 100;

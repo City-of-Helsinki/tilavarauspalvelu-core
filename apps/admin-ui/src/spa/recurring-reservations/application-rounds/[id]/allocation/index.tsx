@@ -305,7 +305,20 @@ function ApplicationRoundAllocation({
       notifyError(t("errors.errorFetchingData"));
     },
   });
-  const { data, refetch, previousData } = query;
+  const { data, refetch, previousData, fetchMore } = query;
+
+  // NOTE onComplete isn't called more than once
+  // how this interacts with the polling is unknown
+  useEffect(() => {
+    const { pageInfo } = data?.applicationSections ?? {};
+    if (pageInfo?.hasNextPage) {
+      fetchMore({
+        variables: {
+          after: pageInfo.endCursor,
+        },
+      });
+    }
+  }, [data, fetchMore]);
 
   if (
     reservationUnitFilterQuery == null ||
@@ -472,9 +485,11 @@ function ApplicationRoundAllocation({
     setParams(newParams, { replace: true });
   };
 
-  const handleRefetchApplicationEvents = () => {
-    // TODO should invalidate appllicationRound(id: $id) cache
-    // otherwise pressing back button to the applicationRound page doesn't allow instantly ending the round when all allocations are done
+  const handleRefetchApplicationEvents = async () => {
+    const id = base64encode(`ApplicationRoundNode:${applicationRoundPk}`);
+    await query.client.refetchQueries({
+      include: ["ApplicationRound", id],
+    });
     return refetch();
   };
 

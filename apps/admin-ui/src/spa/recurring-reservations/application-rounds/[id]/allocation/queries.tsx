@@ -113,6 +113,7 @@ export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
     $ageGroup: [Int]
     $homeCity: [Int]
     $includePreferredOrder10OrHigher: Boolean
+    $after: String
   ) {
     applicationSections(
       applicationRound: $applicationRound
@@ -127,6 +128,7 @@ export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
       ageGroup: $ageGroup
       homeCity: $homeCity
       includePreferredOrder10OrHigher: $includePreferredOrder10OrHigher
+      after: $after
     ) {
       edges {
         node {
@@ -159,6 +161,10 @@ export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
             }
           }
         }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
       }
       totalCount
     }
