@@ -1,6 +1,5 @@
 import { type FetchResult } from "@apollo/client";
 import { breakpoints } from "common/src/common/style";
-import { H2 } from "common/src/common/typography";
 import {
   type Mutation,
   type MutationAdjustReservationTimeArgs,
@@ -18,7 +17,6 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { fromUIDate, toApiDate, toUIDate } from "common/src/common/util";
 import { Subheading } from "common/src/reservation-form/styles";
-import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
 import { useCurrentUser } from "@/hooks/user";
 import { getTranslation } from "../../modules/util";
@@ -36,6 +34,12 @@ import {
 import { getTimeString } from "@/modules/reservationUnit";
 import { UseFormReturn, useForm } from "react-hook-form";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
+import {
+  BylineSection,
+  Heading,
+  HeadingSection,
+  ReservationPageWrapper,
+} from "../reservations/styles";
 
 type ReservationUnitNodeT = NonNullable<
   ReservationUnitPageQuery["reservationUnit"]
@@ -47,27 +51,6 @@ type Props = {
   apiBaseUrl: string;
   logout?: () => void;
 };
-
-/* TODO margins should be in page layout component, not custom for every page */
-const Content = styled(Container)`
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: repeat(4, auto);
-  grid-gap: var(--spacing-m);
-  justify-content: space-between;
-  margin-top: var(--spacing-l);
-
-  @media (width > ${breakpoints.m}) {
-    margin-top: var(--spacing-2-xl);
-    grid-template-columns: repeat(6, 1fr);
-  }
-`;
-
-/* There is no breadcrumbs on this page so remove the margin */
-const Heading = styled(H2).attrs({ as: "h1" })`
-  grid-column: 1 / -1;
-  margin-top: 0;
-`;
 
 const StyledStepper = styled(Stepper)`
   margin: var(--spacing-layout-m) 0 var(--spacing-layout-m);
@@ -87,25 +70,6 @@ const PinkBox = styled.div`
     grid-row: unset;
   }
   @media (min-width: ${breakpoints.l}) {
-    grid-column: -3 / span 2;
-  }
-`;
-
-const HeadingSection = styled.div`
-  grid-column: 1 / -1;
-  grid-row: 1;
-  @media (min-width: ${breakpoints.l}) {
-    grid-column: 1 / span 4;
-  }
-`;
-
-const BylineSection = styled.div`
-  grid-row: 2;
-  @media (min-width: ${breakpoints.m}) {
-    grid-column: span 3;
-  }
-  @media (min-width: ${breakpoints.l}) {
-    grid-row: 1 / span 2;
     grid-column: -3 / span 2;
   }
 `;
@@ -307,7 +271,7 @@ export function ReservationEdit({
 
   return (
     <>
-      <Content>
+      <ReservationPageWrapper>
         <HeadingSection>
           <Heading>{t(title)}</Heading>
           <StyledStepper
@@ -367,7 +331,7 @@ export function ReservationEdit({
             />
           )}
         </EditCalendarSection>
-      </Content>
+      </ReservationPageWrapper>
       {errorMsg && (
         <Toast
           type="error"

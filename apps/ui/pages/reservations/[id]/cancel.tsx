@@ -9,11 +9,11 @@ import {
   type ReservationQuery,
   type ReservationQueryVariables,
 } from "@gql/gql-types";
-import Error from "next/error";
-import ReservationCancellation from "@/components/reservation/ReservationCancellation";
+import { ReservationCancellation } from "@/components/reservation/ReservationCancellation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import { base64encode, filterNonNullable } from "common/src/helpers";
+import { canUserCancelReservation } from "@/modules/reservation";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -52,16 +52,18 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       )
     );
 
-    // TODO check for null and return notFound
-    return {
-      props: {
-        ...commonProps,
-        ...(await serverSideTranslations(locale ?? "fi")),
-        key: `${pk}-cancel-{locale}`,
-        reservation: reservation ?? null,
-        reasons,
-      },
-    };
+    const canCancel =
+      reservation != null && canUserCancelReservation(reservation);
+    if (canCancel) {
+      return {
+        props: {
+          ...commonProps,
+          ...(await serverSideTranslations(locale ?? "fi")),
+          reservation: reservation ?? null,
+          reasons,
+        },
+      };
+    }
   }
 
   return {
@@ -70,18 +72,12 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       notFound: true,
       ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
-      key: `${pk}-cancel-${locale}`,
     },
   };
 }
 
 function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
-  // TODO can be removed if SSR returns notFound for nulls
   const { reservation } = props;
-  if (reservation == null) {
-    return <Error statusCode={404} />;
-  }
-
   return <ReservationCancellation {...props} reservation={reservation} />;
 }
 
