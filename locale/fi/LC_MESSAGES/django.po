@@ -51,9 +51,9 @@ msgstr "Nollaa hakemuksen allokoinnit"
 msgid "Are you sure?"
 msgstr "Oletko varma?"
 
-#: applications/admin/application.py applications/admin/application_round.py
-msgid "Are you sure you want reset allocations?"
-msgstr "Oletko varma, että haluat nollata allokoinnit?"
+#: applications/admin/application.py
+msgid "Are you sure you want reset allocations for these applications?"
+msgstr "Oletko varma, että haluat nollata näiden hakemusten allokoinnit?"
 
 #: applications/admin/application_round.py
 #: applications/admin/filters/allocated_time_slot.py
@@ -63,8 +63,12 @@ msgid "Application Round"
 msgstr "Kausivarauskierros"
 
 #: applications/admin/application_round.py
-msgid "Reset application round allocations"
-msgstr "Nollaa kausivarauskierroksen allokoinnit"
+msgid "Reset application round"
+msgstr "Nollaa kausivarauskierros"
+
+#: applications/admin/application_round.py
+msgid "Are you sure you want to reset these application rounds?"
+msgstr "Oletko varma, että haluat nollata nämä kausivarauskierrokset?"
 
 #: applications/admin/filters/allocated_time_slot.py
 #: applications/admin/filters/application.py
