@@ -33,7 +33,7 @@ class MissingTranslations:
 
 
 def main() -> int:
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "tilavarauspalvelu.settings")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
     django.setup()
 
     items = _get_current_translations()

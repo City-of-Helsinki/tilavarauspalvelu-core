@@ -13,6 +13,7 @@ from lookup_property import lookup_property
 
 from common.connectors import ReservationActionsConnector
 from common.db import SubqueryArray
+from config.utils.auditlog_util import AuditLogger
 from reservations.choices import (
     RESERVEE_LANGUAGE_CHOICES,
     CustomerTypeChoice,
@@ -20,7 +21,6 @@ from reservations.choices import (
     ReservationTypeChoice,
 )
 from reservations.querysets import ReservationQuerySet
-from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 
 if TYPE_CHECKING:
     from decimal import Decimal

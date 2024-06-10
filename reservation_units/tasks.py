@@ -4,13 +4,13 @@ from datetime import date
 from django.conf import settings
 from easy_thumbnails.exceptions import InvalidImageFormatError
 
+from config.celery import app
 from merchants.models import PaymentProduct
 from merchants.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
 from merchants.verkkokauppa.product.types import CreateOrUpdateAccountingParams, CreateProductParams
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservation_units.pricing_updates import update_reservation_unit_pricings
 from reservation_units.utils.reservation_unit_payment_helper import ReservationUnitPaymentHelper
-from tilavarauspalvelu.celery import app
 from utils.image_cache import purge
 from utils.sentry import SentryLogger
 

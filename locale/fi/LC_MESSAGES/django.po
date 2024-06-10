@@ -757,31 +757,31 @@ msgstr "Pyydetty lopetusaika allokaatioille."
 msgid "Seasonal Booking"
 msgstr "Kausivaraus"
 
-#: applications/choices.py tilavarauspalvelu/utils/commons.py
+#: applications/choices.py config/utils/commons.py
 msgid "Monday"
 msgstr "Maanantai"
 
-#: applications/choices.py tilavarauspalvelu/utils/commons.py
+#: applications/choices.py config/utils/commons.py
 msgid "Tuesday"
 msgstr "Tiistai"
 
-#: applications/choices.py tilavarauspalvelu/utils/commons.py
+#: applications/choices.py config/utils/commons.py
 msgid "Wednesday"
 msgstr "Keskiviikko"
 
-#: applications/choices.py tilavarauspalvelu/utils/commons.py
+#: applications/choices.py config/utils/commons.py
 msgid "Thursday"
 msgstr "Torstai"
 
-#: applications/choices.py tilavarauspalvelu/utils/commons.py
+#: applications/choices.py config/utils/commons.py
 msgid "Friday"
 msgstr "Perjantai"
 
-#: applications/choices.py tilavarauspalvelu/utils/commons.py
+#: applications/choices.py config/utils/commons.py
 msgid "Saturday"
 msgstr "Lauantai"
 
-#: applications/choices.py tilavarauspalvelu/utils/commons.py
+#: applications/choices.py config/utils/commons.py
 msgid "Sunday"
 msgstr "Sunnuntai"
 
@@ -1210,6 +1210,18 @@ msgstr "SQL loki"
 #: common/models/sql_log.py
 msgid "SQL logs"
 msgstr "SQL lokit"
+
+#: config/settings.py merchants/models.py
+msgid "Finnish"
+msgstr "Suomi"
+
+#: config/settings.py merchants/models.py
+msgid "English"
+msgstr "Englanti"
+
+#: config/settings.py merchants/models.py
+msgid "Swedish"
+msgstr "Ruotsi"
 
 #: email_notification/admin/email_tester.py
 #, python-format

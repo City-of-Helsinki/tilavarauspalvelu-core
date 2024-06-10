@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext_lazy
 
-from tilavarauspalvelu.utils.auditlog_util import AuditLogger
+from config.utils.auditlog_util import AuditLogger
 
 __all__ = [
     "TermsOfUse",

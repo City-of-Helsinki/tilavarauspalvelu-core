@@ -35,8 +35,8 @@ class Common(Environment):
 
     # --- Basic settings ---------------------------------------------------------------------------------------------
 
-    WSGI_APPLICATION = "tilavarauspalvelu.wsgi.application"
-    ROOT_URLCONF = "tilavarauspalvelu.urls"
+    WSGI_APPLICATION = "config.wsgi.application"
+    ROOT_URLCONF = "config.urls"
     AUTH_USER_MODEL = "users.User"
     DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
     SECRET_KEY = values.StringValue()
@@ -95,8 +95,8 @@ class Common(Environment):
     ]
 
     MIDDLEWARE = [
-        "tilavarauspalvelu.middleware.QueryLoggingMiddleware",
-        "tilavarauspalvelu.middleware.MultipleProxyMiddleware",
+        "config.middleware.QueryLoggingMiddleware",
+        "config.middleware.MultipleProxyMiddleware",
         "corsheaders.middleware.CorsMiddleware",
         "django.middleware.security.SecurityMiddleware",
         # Keep this after security middleware, correct place according to whitenoise documentation
@@ -222,7 +222,7 @@ class Common(Environment):
             "filters": {},
             "formatters": {
                 "common": {
-                    "()": "tilavarauspalvelu.logging.TVPFormatter",
+                    "()": "config.logging.TVPFormatter",
                     "format": (
                         "Time: {asctime} "
                         "| Level: {levelname} "
@@ -277,8 +277,8 @@ class Common(Environment):
     # --- Authentication settings ------------------------------------------------------------------------------------
 
     AUTHENTICATION_BACKENDS = [
-        "tilavarauspalvelu.auth.ProxyTunnistamoOIDCAuthBackend",
-        "tilavarauspalvelu.auth.ProxyModelBackend",
+        "config.auth.ProxyTunnistamoOIDCAuthBackend",
+        "config.auth.ProxyModelBackend",
     ]
 
     AUTH_PASSWORD_VALIDATORS = [
@@ -390,7 +390,7 @@ class Common(Environment):
     GRAPHENE = {
         "SCHEMA": "api.graphql.schema.schema",
         "MIDDLEWARE": [
-            "tilavarauspalvelu.middleware.GraphQLSentryMiddleware",
+            "config.middleware.GraphQLSentryMiddleware",
         ],
     }
 
@@ -738,7 +738,7 @@ class AutomatedTests(AutomatedTestMixin, EmptyDefaults, Common, dotenv_path=None
         "SCHEMA": Common.GRAPHENE["SCHEMA"],
         "TESTING_ENDPOINT": "/graphql/",
         "MIDDLEWARE": [
-            "tilavarauspalvelu.middleware.GraphQLErrorLoggingMiddleware",
+            "config.middleware.GraphQLErrorLoggingMiddleware",
         ],
     }
 

@@ -1,7 +1,7 @@
 from django.conf import settings
 from elasticsearch_django.index import create_index, delete_index, update_index
 
-from tilavarauspalvelu.celery import app
+from config.celery import app
 
 
 @app.task(name="Update ReservationUnit Elastic index")

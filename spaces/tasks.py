@@ -1,8 +1,8 @@
 from django.db.transaction import atomic
 
+from config.celery import app
 from spaces.importers.tprek_unit_importer import TprekUnitImporter
 from spaces.models import Space, Unit
-from tilavarauspalvelu.celery import app
 
 
 @app.task(name="rebuild_space_tree_hierarchy")

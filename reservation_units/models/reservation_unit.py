@@ -12,6 +12,7 @@ from elasticsearch_django.models import SearchDocumentManagerMixin, SearchDocume
 from lookup_property import L, lookup_property
 
 from common.connectors import ReservationUnitActionsConnector
+from config.utils.auditlog_util import AuditLogger
 from reservation_units.enums import (
     AuthenticationType,
     PricingStatus,
@@ -22,7 +23,6 @@ from reservation_units.enums import (
     ReservationUnitReservationState,
 )
 from reservation_units.querysets import ReservationUnitQuerySet
-from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 
 if TYPE_CHECKING:
     from merchants.models import PaymentAccounting, PaymentMerchant, PaymentProduct
