@@ -6,7 +6,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from applications.querysets.reservation_unit_option import ReservationUnitOptionQuerySet
-from common.connectors import ReservationUnitOptionActionsConnector
+from tilavarauspalvelu.actions.connectors import ReservationUnitOptionActionsConnector
 
 if TYPE_CHECKING:
     from applications.models import ApplicationSection

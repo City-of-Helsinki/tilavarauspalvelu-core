@@ -10,8 +10,8 @@ from lookup_property import L, lookup_property
 
 from applications.enums import Weekday
 from applications.querysets.allocated_time_slot import AllocatedTimeSlotQuerySet
-from common.connectors import AllocatedTimeSlotActionsConnector
 from common.fields.model import StrChoiceField
+from tilavarauspalvelu.actions.connectors import AllocatedTimeSlotActionsConnector
 
 if TYPE_CHECKING:
     import datetime

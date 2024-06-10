@@ -8,8 +8,8 @@ from lookup_property import L, lookup_property
 
 from applications.enums import ApplicationSectionStatusChoice, Priority, Weekday
 from applications.querysets.suitable_time_range import SuitableTimeRangeQuerySet
-from common.connectors import SuitableTimeRangeActionsConnector
 from common.fields.model import StrChoiceField
+from tilavarauspalvelu.actions.connectors import SuitableTimeRangeActionsConnector
 
 if TYPE_CHECKING:
     import datetime

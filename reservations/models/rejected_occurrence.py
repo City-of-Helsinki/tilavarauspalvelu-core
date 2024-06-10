@@ -6,9 +6,9 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from graphene_django_extensions.fields.model import StrChoiceField
 
-from common.connectors import RejectedOccurrenceActionsConnector
 from reservations.enums import RejectionReadinessChoice
 from reservations.querysets import RejectedOccurrenceQuerySet
+from tilavarauspalvelu.actions.connectors import RejectedOccurrenceActionsConnector
 
 if TYPE_CHECKING:
     import datetime

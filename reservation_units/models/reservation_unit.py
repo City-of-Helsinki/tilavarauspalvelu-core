@@ -8,7 +8,6 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from elasticsearch_django.models import SearchDocumentManagerMixin, SearchDocumentMixin
 
-from common.connectors import ReservationUnitActionsConnector
 from config.utils.auditlog_util import AuditLogger
 from reservation_units.enums import (
     AuthenticationType,
@@ -18,6 +17,7 @@ from reservation_units.enums import (
     ReservationUnitState,
 )
 from reservation_units.querysets import ReservationUnitQuerySet
+from tilavarauspalvelu.actions.connectors import ReservationUnitActionsConnector
 
 if TYPE_CHECKING:
     from merchants.models import PaymentAccounting, PaymentMerchant, PaymentProduct

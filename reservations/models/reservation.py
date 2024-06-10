@@ -11,7 +11,6 @@ from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 from lookup_property import lookup_property
 
-from common.connectors import ReservationActionsConnector
 from common.db import SubqueryArray
 from config.utils.auditlog_util import AuditLogger
 from reservations.enums import (
@@ -21,6 +20,7 @@ from reservations.enums import (
     ReservationTypeChoice,
 )
 from reservations.querysets import ReservationQuerySet
+from tilavarauspalvelu.actions.connectors import ReservationActionsConnector
 
 if TYPE_CHECKING:
     from decimal import Decimal

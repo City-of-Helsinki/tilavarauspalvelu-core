@@ -92,7 +92,7 @@ class Common(Environment):
         "services",
         "spaces",
         "terms_of_use",
-        "api",
+        "tilavarauspalvelu",
     ]
 
     MIDDLEWARE = [
@@ -389,7 +389,7 @@ class Common(Environment):
     # --- Graphene settings ------------------------------------------------------------------------------------------
 
     GRAPHENE = {
-        "SCHEMA": "api.graphql.schema.schema",
+        "SCHEMA": "tilavarauspalvelu.api.graphql.schema.schema",
         "MIDDLEWARE": [
             "config.middleware.GraphQLSentryMiddleware",
         ],
