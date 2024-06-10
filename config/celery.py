@@ -7,7 +7,7 @@ from celery import Celery
 from celery.app.log import Logging
 
 # Set the default Django settings module for the 'celery' program.
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "tilavarauspalvelu.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 
 broker_url = os.getenv("CELERY_BROKER_URL", "filesystem://")
 broker_options = os.getenv("CELERY_BROKER_TRANSPORT_OPTIONS", {})  # noqa: PLW1508

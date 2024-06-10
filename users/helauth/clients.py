@@ -12,7 +12,7 @@ from requests import HTTPError, Response
 from social_django.models import DjangoStorage
 from social_django.strategy import DjangoStrategy
 
-from tilavarauspalvelu.auth import ProxyTunnistamoOIDCAuthBackend
+from config.auth import ProxyTunnistamoOIDCAuthBackend
 from users.helauth.parsers import ProfileDataParser
 from users.helauth.utils import get_jwt_payload, get_session_data
 from utils.external_service.base_external_service_client import BaseExternalServiceClient

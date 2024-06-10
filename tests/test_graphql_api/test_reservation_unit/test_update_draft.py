@@ -2,11 +2,11 @@ import pytest
 from auditlog.models import LogEntry
 from django.contrib.contenttypes.models import ContentType
 
+from config.utils.auditlog_util import AuditLogger
 from reservation_units.enums import AuthenticationType
 from reservation_units.models import ReservationUnit
 from terms_of_use.models import TermsOfUse
 from tests.factories import ReservationMetadataSetFactory, ReservationUnitFactory, TermsOfUseFactory
-from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 
 from .helpers import UPDATE_MUTATION, get_draft_update_input_data
 

@@ -15,10 +15,10 @@ from email_notification.models import EmailTemplate, EmailType
 from reservations.enums import CustomerTypeChoice
 
 if TYPE_CHECKING:
+    from config.utils.commons import LanguageType
     from email_notification.admin.email_template_tester import EmailTemplateTesterForm
     from reservations.models import Reservation
     from spaces.models import Location
-    from tilavarauspalvelu.utils.commons import LanguageType
 
 type InstructionNameType = Literal["confirmed", "pending", "cancelled"]
 

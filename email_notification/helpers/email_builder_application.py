@@ -12,7 +12,7 @@ from email_notification.models import EmailTemplate, EmailType
 
 if TYPE_CHECKING:
     from applications.models import Application
-    from tilavarauspalvelu.utils.commons import LanguageType
+    from config.utils.commons import LanguageType
 
 
 @dataclass
