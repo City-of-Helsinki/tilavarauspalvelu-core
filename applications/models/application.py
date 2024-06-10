@@ -14,9 +14,9 @@ from applications.choices import (
     ApplicationStatusChoice,
 )
 from applications.querysets.application import ApplicationQuerySet
-from common.connectors import ApplicationActionsConnector
 from common.db import SubqueryArray
 from common.fields.model import StrChoiceField
+from tilavarauspalvelu.actions.connectors import ApplicationActionsConnector
 
 __all__ = [
     "Application",

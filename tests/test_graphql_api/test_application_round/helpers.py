@@ -14,6 +14,8 @@ SET_HANDLED_MUTATION = build_mutation(
 
 @contextlib.contextmanager
 def disable_reservation_generation():
-    path = "api.graphql.types.application_round.serializers.generate_reservation_series_from_allocations"
+    path = (
+        "tilavarauspalvelu.api.graphql.types.application_round.serializers.generate_reservation_series_from_allocations"
+    )
     with patch(path, return_value=None) as mock:
         yield mock

@@ -14,8 +14,8 @@ from applications.choices import (
     TargetGroupChoice,
 )
 from applications.querysets.application_round import ApplicationRoundQuerySet
-from common.connectors import ApplicationRoundActionsConnector
 from common.date_utils import local_datetime
+from tilavarauspalvelu.actions.connectors import ApplicationRoundActionsConnector
 
 __all__ = [
     "ApplicationRound",

@@ -8,8 +8,8 @@ from django.urls import include, path, reverse
 from django.views.decorators.csrf import csrf_exempt
 from graphene_django_extensions import FileUploadGraphQLView
 
-from api.legacy_rest_api.urls import legacy_outer
-from api.webhooks.urls import webhook_router
+from tilavarauspalvelu.api.legacy_rest_api.urls import legacy_outer
+from tilavarauspalvelu.api.webhooks.urls import webhook_router
 
 # Mock the `each_context` method to add some custom context variables.
 original_each_context = admin.site.each_context
@@ -56,8 +56,8 @@ urlpatterns = [
     path("v1/", include(legacy_outer.urls)),
     path("v1/webhook/", include(webhook_router.urls)),
     path("pysocial/", include("social_django.urls", namespace="social")),
-    path("helauth/", include("api.helauth.urls")),
-    path("gdpr/v1/", include("api.gdpr.urls")),
+    path("helauth/", include("tilavarauspalvelu.api.helauth.urls")),
+    path("gdpr/v1/", include("tilavarauspalvelu.api.gdpr.urls")),
     path("tinymce/", include("tinymce.urls")),
     path("csrf/", csrf_view),
 ]

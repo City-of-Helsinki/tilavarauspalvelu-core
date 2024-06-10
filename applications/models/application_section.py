@@ -13,9 +13,9 @@ from lookup_property import L, lookup_property
 
 from applications.choices import ApplicationSectionStatusChoice, Weekday
 from applications.querysets.application_section import ApplicationSectionQuerySet
-from common.connectors import ApplicationSectionActionsConnector
 from common.date_utils import local_datetime
 from common.db import SubqueryCount
+from tilavarauspalvelu.actions.connectors import ApplicationSectionActionsConnector
 
 if TYPE_CHECKING:
     from applications.models import Application

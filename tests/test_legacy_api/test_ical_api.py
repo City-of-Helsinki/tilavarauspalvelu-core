@@ -4,7 +4,7 @@ import io
 import pytest
 from rest_framework.reverse import reverse
 
-from api.legacy_rest_api.utils import hmac_signature
+from tilavarauspalvelu.api.legacy_rest_api.utils import hmac_signature
 
 pytestmark = [
     pytest.mark.django_db,

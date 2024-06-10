@@ -3,10 +3,10 @@ from decimal import Decimal
 
 import pytest
 
-from api.graphql.types.reservation.serializers.mixins import ReservationPriceMixin
 from common.date_utils import local_datetime
 from reservation_units.enums import PriceUnit
 from tests.factories import ReservationUnitPricingFactory
+from tilavarauspalvelu.api.graphql.types.reservation.serializers.mixins import ReservationPriceMixin
 from utils.decimal_utils import round_decimal
 
 # Applied to all tests
