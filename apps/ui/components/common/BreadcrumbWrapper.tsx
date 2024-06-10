@@ -25,9 +25,7 @@ const Wrapper = styled.div`
 
 // Breadcrumbs are shared with admin ui which uses react-router which requires an anchor elem
 const LinkWrapper = (props: LinkProps & { children?: React.ReactNode }) => (
-  <Link legacyBehavior {...props}>
-    {props.children}
-  </Link>
+  <Link {...props}>{props.children}</Link>
 );
 
 const BreadcrumbWrapper = ({

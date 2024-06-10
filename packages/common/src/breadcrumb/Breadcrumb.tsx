@@ -52,7 +52,7 @@ const Item = styled.div`
   max-width: 100%;
 `;
 
-const Anchor = styled.a<{ $current?: boolean; $isMobile?: boolean }>`
+const Anchor = styled.span<{ $current?: boolean; $isMobile?: boolean }>`
   &&& {
     ${({ $current }) => {
       switch ($current) {
