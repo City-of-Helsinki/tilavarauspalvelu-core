@@ -25,7 +25,10 @@ import { ApplicationEventDataLoader } from "./ApplicationEventDataLoader";
 import { TimeSlotDataLoader } from "./AllocatedEventDataLoader";
 import { ApolloQueryResult, gql } from "@apollo/client";
 import { useNotification } from "@/context/NotificationContext";
-import { getValidationErrors } from "common/src/apolloUtils";
+import {
+  getPermissionErrors,
+  getValidationErrors,
+} from "common/src/apolloUtils";
 import usePermission from "@/hooks/usePermission";
 import { Permission } from "@/modules/permissionHelper";
 import { isApplicationRoundInProgress } from "@/helpers";
@@ -127,7 +130,9 @@ function EndAllocation({
       }
     } catch (err) {
       const errors = getValidationErrors(err);
-      if (errors.length > 0) {
+      if (getPermissionErrors(err).length > 0) {
+        notifyError(t("errors.noPermission"));
+      } else if (errors.length > 0) {
         const unhandledCode = "APPLICATION_ROUND_HAS_UNHANDLED_APPLICATIONS";
         const notInAllocationCode = "APPLICATION_ROUND_NOT_IN_ALLOCATION";
         if (errors.some((e) => e.code === unhandledCode)) {

@@ -17,7 +17,10 @@ import { type TFunction } from "i18next";
 import { H2, H4, H5, Strong } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { base64encode, filterNonNullable } from "common/src/helpers";
-import { getValidationErrors } from "common/src/apolloUtils";
+import {
+  getPermissionErrors,
+  getValidationErrors,
+} from "common/src/apolloUtils";
 import {
   ApplicationStatusChoice,
   ApplicantTypeChoice,
@@ -379,7 +382,9 @@ function RejectOptionButton({
       refetch();
     } catch (err) {
       const mutationErrors = getValidationErrors(err);
-      if (mutationErrors.length > 0) {
+      if (getPermissionErrors(err).length > 0) {
+        notifyError(t("errors.noPermission"));
+      } else if (mutationErrors.length > 0) {
         // TODO handle other codes also
         const isInvalidState = mutationErrors.find(
           (e) => e.code === "invalid" && e.field === "rejected"
@@ -393,6 +398,7 @@ function RejectOptionButton({
           notifyError(t("errors.formValidationError", { message }));
         }
       } else {
+        // TODO this translation is missing
         notifyError(t("errors.errorRejectingOption"));
       }
     }
@@ -477,7 +483,9 @@ function RejectAllOptionsButton({
       refetch();
     } catch (err) {
       const mutationErrors = getValidationErrors(err);
-      if (mutationErrors.length > 0) {
+      if (getPermissionErrors(err).length > 0) {
+        notifyError(t("errors.noPermission"));
+      } else if (mutationErrors.length > 0) {
         // TODO handle other codes also
         const isInvalidState = mutationErrors.find(
           (e) => e.code === "CANNOT_REJECT_SECTION_OPTIONS"
@@ -491,6 +499,7 @@ function RejectAllOptionsButton({
           notifyError(t("errors.formValidationError", { message }));
         }
       } else {
+        // TODO this translation is missing
         notifyError(t("errors.errorRejectingOption"));
       }
     }
@@ -732,7 +741,9 @@ function RejectApplicationButton({
       refetch();
     } catch (err) {
       const mutationErrors = getValidationErrors(err);
-      if (mutationErrors.length > 0) {
+      if (getPermissionErrors(err).length > 0) {
+        notifyError(t("errors.noPermission"));
+      } else if (mutationErrors.length > 0) {
         // TODO handle other codes also
         const isInvalidState = mutationErrors.find(
           (e) => e.code === "CANNOT_REJECT_APPLICATION_OPTIONS"
