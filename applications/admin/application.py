@@ -104,7 +104,7 @@ class ApplicationAdmin(admin.ModelAdmin):
         context = {
             **self.admin_site.each_context(request),
             "title": _("Are you sure?"),
-            "subtitle": _("Are you sure you want reset allocations?"),
+            "subtitle": _("Are you sure you want reset allocations for these applications?"),
             "queryset": queryset,
             "opts": self.model._meta,
             "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
