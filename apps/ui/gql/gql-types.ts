@@ -7940,7 +7940,7 @@ export const BlockingReservationFieldsFragmentDoc = gql`
 `;
 export const IsReservableFieldsFragmentDoc = gql`
   fragment IsReservableFields on ReservationUnitNode {
-    reservationSet {
+    reservationSet(state: $state) {
       ...BlockingReservationFields
     }
     bufferTimeBefore
