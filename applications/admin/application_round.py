@@ -83,7 +83,7 @@ class ApplicationRoundAdmin(ExtraButtonsMixin, TranslationAdmin):
 
         return response
 
-    @admin.action(description=_("Reset application round allocations"))
+    @admin.action(description=_("Reset application round"))
     def reset_application_rounds(self, request: WSGIRequest, queryset: QuerySet) -> TemplateResponse | None:
         # Coming from confirmation page, perform the action
         if request.POST.get("confirmed"):
@@ -113,7 +113,7 @@ class ApplicationRoundAdmin(ExtraButtonsMixin, TranslationAdmin):
         context = {
             **self.admin_site.each_context(request),
             "title": _("Are you sure?"),
-            "subtitle": _("Are you sure you want reset allocations?"),
+            "subtitle": _("Are you sure you want to reset these application rounds?"),
             "queryset": queryset,
             "opts": self.model._meta,
             "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
