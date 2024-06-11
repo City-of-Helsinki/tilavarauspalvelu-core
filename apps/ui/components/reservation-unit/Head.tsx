@@ -3,7 +3,6 @@ import React from "react";
 import NextImage from "next/image";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { isReservationStartInFuture } from "common/src/calendar/util";
 import { formatDuration } from "common/src/common/util";
 import { fontRegular, H2, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
@@ -24,6 +23,7 @@ import {
   getUnitName,
 } from "@/modules/reservationUnit";
 import BreadcrumbWrapper from "../common/BreadcrumbWrapper";
+import { isReservationStartInFuture } from "@/modules/reservation";
 
 type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
 interface PropsType {

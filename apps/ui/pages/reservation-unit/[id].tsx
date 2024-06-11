@@ -26,13 +26,7 @@ import {
   toApiDate,
   toUIDate,
 } from "common/src/common/util";
-import {
-  getEventBuffers,
-  getNewReservation,
-  getSlotPropGetter,
-  getTimeslots,
-  isReservationStartInFuture,
-} from "common/src/calendar/util";
+import { getEventBuffers } from "common/src/calendar/util";
 import { Container, formatters as getFormatters } from "common";
 import { useLocalStorage, useMedia } from "react-use";
 import { breakpoints } from "common/src/common/style";
@@ -71,7 +65,7 @@ import RelatedUnits, {
 } from "@/components/reservation-unit/RelatedUnits";
 import { AccordionWithState as Accordion } from "@/components/common/Accordion";
 import { createApolloClient } from "@/modules/apolloClient";
-import { Map } from "@/components/Map";
+import { Map as MapComponent } from "@/components/Map";
 import Legend from "@/components/calendar/Legend";
 import ReservationCalendarControls, {
   type FocusTimeSlot,
@@ -95,8 +89,12 @@ import {
 import EquipmentList from "@/components/reservation-unit/EquipmentList";
 import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
 import {
+  SLOTS_EVERY_HOUR,
   getDurationOptions,
+  getNewReservation,
+  getSlotPropGetter,
   isReservationReservable,
+  isReservationStartInFuture,
 } from "@/modules/reservation";
 import SubventionSuffix from "@/components/reservation/SubventionSuffix";
 import InfoDialog from "@/components/common/InfoDialog";
@@ -137,13 +135,14 @@ import LoginFragment from "@/components/LoginFragment";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { ErrorToast } from "@/components/common/ErrorToast";
 import { ReservationTypeChoice } from "common/gql/gql-types";
+import { useReservableTimes } from "@/hooks/useReservableTimes";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 type WeekOptions = "day" | "week" | "month";
 
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { params, query, locale } = ctx;
   const pk = Number(params?.id);
   const uuid = query.ru;
@@ -301,7 +300,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     },
     notFound: true,
   };
-};
+}
 
 const Columns = styled(TwoColumnLayout)`
   > div:first-of-type {
@@ -457,8 +456,6 @@ const ReservationUnit = ({
 
   const hash = router.asPath.split("#")[1];
 
-  const reservableTimeSpans = reservationUnit?.reservableTimeSpans;
-
   const durationOptions = getDurationOptions(reservationUnit, t);
 
   // technically these can be left empty (backend allows it)
@@ -531,6 +528,8 @@ const ReservationUnit = ({
     createReservation(input);
   };
 
+  const reservableTimes = useReservableTimes(reservationUnit);
+
   // TODO the use of focusSlot is weird it double's up for both
   // calendar focus date and the reservation slot which causes issues
   // the calendar focus date should always be defined but the form values should not have valid default values
@@ -540,6 +539,7 @@ const ReservationUnit = ({
     const end = addMinutes(start, durationValue);
     const isReservable = isReservationReservable({
       reservationUnit,
+      reservableTimes,
       activeApplicationRounds,
       start,
       end,
@@ -552,11 +552,17 @@ const ReservationUnit = ({
       isReservable,
       durationMinutes: durationValue,
     };
-  }, [focusDate, durationValue, reservationUnit, activeApplicationRounds]);
+  }, [
+    focusDate,
+    durationValue,
+    reservableTimes,
+    reservationUnit,
+    activeApplicationRounds,
+  ]);
 
   const startingTimeOptions = useMemo(() => {
     return getPossibleTimesForDay(
-      reservableTimeSpans,
+      reservableTimes,
       reservationUnit?.reservationStartInterval,
       focusDate,
       reservationUnit,
@@ -564,7 +570,7 @@ const ReservationUnit = ({
       durationValue
     );
   }, [
-    reservableTimeSpans,
+    reservableTimes,
     reservationUnit,
     activeApplicationRounds,
     focusDate,
@@ -593,7 +599,7 @@ const ReservationUnit = ({
 
   const slotPropGetter = useMemo(() => {
     return getSlotPropGetter({
-      reservableTimeSpans,
+      reservableTimes,
       activeApplicationRounds,
       reservationBegins: reservationUnit?.reservationBegins
         ? new Date(reservationUnit.reservationBegins)
@@ -607,7 +613,7 @@ const ReservationUnit = ({
         reservationUnit?.reservationsMaxDaysBefore ?? 0,
     });
   }, [
-    reservableTimeSpans,
+    reservableTimes,
     activeApplicationRounds,
     reservationUnit?.reservationBegins,
     reservationUnit?.reservationEnds,
@@ -663,6 +669,7 @@ const ReservationUnit = ({
 
       const isReservable = isReservationReservable({
         reservationUnit,
+        reservableTimes,
         activeApplicationRounds,
         start,
         end: newEnd,
@@ -675,14 +682,14 @@ const ReservationUnit = ({
 
       // Limit the duration to the max reservation duration
       // TODO should be replaced with a utility function that is properly named
-      const newReservation = getNewReservation({
+      const { begin } = getNewReservation({
         start,
         end: newEnd,
         reservationUnit,
       });
 
-      const newDate = toUIDate(new Date(newReservation.begin));
-      const newTime = getTimeString(new Date(newReservation.begin));
+      const newDate = toUIDate(begin);
+      const newTime = getTimeString(begin);
       setValue("date", newDate);
       setValue("time", newTime);
       setValue("duration", differenceInMinutes(end, start));
@@ -695,6 +702,7 @@ const ReservationUnit = ({
     },
     [
       isReservationQuotaReached,
+      reservableTimes,
       reservationUnit,
       activeApplicationRounds,
       setValue,
@@ -722,6 +730,7 @@ const ReservationUnit = ({
 
       const isReservable = isReservationReservable({
         reservationUnit,
+        reservableTimes,
         activeApplicationRounds,
         start,
         end: normalizedEnd,
@@ -731,14 +740,14 @@ const ReservationUnit = ({
         return false;
       }
 
-      const newReservation = getNewReservation({
+      const { begin } = getNewReservation({
         start: new Date(start),
         end: normalizedEnd,
         reservationUnit,
       });
 
-      const newDate = toUIDate(new Date(newReservation.begin));
-      const newTime = getTimeString(new Date(newReservation.begin));
+      const newDate = toUIDate(begin);
+      const newTime = getTimeString(begin);
       // click doesn't change the duration
       setValue("date", newDate);
       setValue("time", newTime);
@@ -747,6 +756,7 @@ const ReservationUnit = ({
     },
     [
       isReservationQuotaReached,
+      reservableTimes,
       reservationUnit,
       activeApplicationRounds,
       setValue,
@@ -771,6 +781,7 @@ const ReservationUnit = ({
     };
     const isReservable = isReservationReservable({
       reservationUnit,
+      reservableTimes,
       activeApplicationRounds,
       start,
       end,
@@ -800,7 +811,7 @@ const ReservationUnit = ({
 
         return event;
       });
-  }, [reservationUnit, activeApplicationRounds, t, focusSlot]);
+  }, [reservationUnit, reservableTimes, activeApplicationRounds, t, focusSlot]);
 
   // TODO should be combined with calendar events
   const eventBuffers = useMemo(() => {
@@ -990,7 +1001,7 @@ const ReservationUnit = ({
 
   const nextAvailableTime = getNextAvailableTime({
     start: focusDate,
-    slots: reservableTimeSpans,
+    reservableTimes,
     duration: durationValue,
     reservationUnit,
     activeApplicationRounds,
@@ -1150,9 +1161,7 @@ const ReservationUnit = ({
                       event?.state?.toString() === "INITIAL"
                     }
                     step={30}
-                    timeslots={getTimeslots(
-                      reservationUnit.reservationStartInterval
-                    )}
+                    timeslots={SLOTS_EVERY_HOUR}
                     culture={getLocalizationLang(i18n.language)}
                     aria-hidden
                     longPressThreshold={100}
@@ -1240,7 +1249,7 @@ const ReservationUnit = ({
                   <AddressSection reservationUnit={reservationUnit} />
                 </JustForMobile>
                 <MapWrapper>
-                  <Map tprekId={reservationUnit.unit?.tprekId ?? ""} />
+                  <MapComponent tprekId={reservationUnit.unit?.tprekId ?? ""} />
                 </MapWrapper>
               </Accordion>
             )}

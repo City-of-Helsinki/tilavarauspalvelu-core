@@ -9,8 +9,8 @@ import {
   PricingType,
   ReservationUnitState,
   type ReservationUnitNode,
-  type UnitNode,
   Status,
+  PricingFieldsFragment,
 } from "@gql/gql-types";
 import {
   getEquipmentCategories,
@@ -25,7 +25,7 @@ import {
   isReservationUnitPublished,
 } from "../reservationUnit";
 import mockTranslations from "../../public/locales/fi/prices.json";
-import { RoundPeriod } from "common/src/calendar/util";
+import { type RoundPeriod } from "../reservation";
 
 jest.mock("next-i18next", () => ({
   i18n: {
@@ -37,205 +37,212 @@ jest.mock("next-i18next", () => ({
   },
 }));
 
+const pricingBase: PricingFieldsFragment = {
+  id: "1",
+  begins: "",
+  taxPercentage: {
+    id: "1",
+    pk: 1,
+    value: "24",
+  },
+  status: Status.Active,
+  lowestPrice: "0",
+  highestPrice: "60.5",
+  priceUnit: PriceUnit.PerHour,
+  pricingType: PricingType.Paid,
+};
+
+// Turn into describe block and spec the tests
+test.todo("getNextAvailableTime");
+
 describe("getPrice", () => {
   test("price range", () => {
-    const pricing = {
-      lowestPrice: 10,
-      highestPrice: 50.5,
-      priceUnit: "PER_15_MINS",
-      pricingType: "PAID",
-    } as unknown as ReservationUnitPricingNode;
+    const pricing: PricingFieldsFragment = {
+      ...pricingBase,
+      lowestPrice: "10",
+      highestPrice: "50.5",
+      priceUnit: PriceUnit.Per_15Mins,
+    };
 
     expect(getPrice({ pricing })).toBe("10 - 50,5 € / 15 min");
   });
 
   test("price range with no min", () => {
-    const pricing = {
-      lowestPrice: 0.0,
-      highestPrice: 50.5,
-      priceUnit: "PER_15_MINS",
-      pricingType: "PAID",
-    } as unknown as ReservationUnitPricingNode;
+    const pricing: PricingFieldsFragment = {
+      ...pricingBase,
+      lowestPrice: "0.0",
+      highestPrice: "50.5",
+      priceUnit: PriceUnit.Per_15Mins,
+    };
 
     expect(getPrice({ pricing })).toBe("0 - 50,5 € / 15 min");
   });
 
   test("price range with minutes", () => {
-    const pricing = {
-      lowestPrice: 0,
-      highestPrice: 60.5,
-      priceUnit: "PER_HOUR",
-      pricingType: "PAID",
-    } as unknown as ReservationUnitPricingNode;
+    const pricing: PricingFieldsFragment = {
+      ...pricingBase,
+      lowestPrice: "0",
+      highestPrice: "60.5",
+      priceUnit: PriceUnit.PerHour,
+    };
 
     expect(getPrice({ pricing, minutes: 60 })).toBe("0 - 60,5 €");
   });
 
   test("price range with minutes", () => {
-    const pricing = {
-      lowestPrice: 0,
-      highestPrice: "60.5",
-      priceUnit: "PER_HOUR",
-      pricingType: "PAID",
-    } as unknown as ReservationUnitPricingNode;
+    const pricing: PricingFieldsFragment = {
+      ...pricingBase,
+    };
 
     expect(getPrice({ pricing, minutes: 61 })).toBe("0 - 75,63 €");
   });
 
   test("price range with minutes", () => {
-    const pricing = {
-      lowestPrice: 0,
+    const pricing: PricingFieldsFragment = {
+      ...pricingBase,
+      lowestPrice: "0",
       highestPrice: "100",
-      priceUnit: "PER_HOUR",
-      pricingType: "PAID",
-    } as unknown as ReservationUnitPricingNode;
+    };
 
     expect(getPrice({ pricing, minutes: 61 })).toBe("0 - 125 €");
   });
 
   test("price range with minutes", () => {
-    const pricing = {
-      lowestPrice: 0,
+    const pricing: PricingFieldsFragment = {
+      ...pricingBase,
+      lowestPrice: "0",
       highestPrice: "100",
-      priceUnit: "PER_HOUR",
-      pricingType: "PAID",
-    } as unknown as ReservationUnitPricingNode;
+    };
 
     expect(getPrice({ pricing, minutes: 90 })).toBe("0 - 150 €");
   });
 
   test("price range with minutes", () => {
-    const pricing = {
-      lowestPrice: 0,
+    const pricing: PricingFieldsFragment = {
+      ...pricingBase,
+      lowestPrice: "0",
       highestPrice: "100",
-      priceUnit: "PER_HOUR",
-      pricingType: "PAID",
-    } as unknown as ReservationUnitPricingNode;
+    };
 
     expect(getPrice({ pricing, minutes: 91 })).toBe("0 - 175 €");
   });
 
   test("price range with minutes", () => {
-    const pricing = {
-      lowestPrice: 0,
+    const pricing: PricingFieldsFragment = {
+      ...pricingBase,
+      lowestPrice: "0",
       highestPrice: "30",
-      priceUnit: "PER_15_MINS",
-      pricingType: "PAID",
-    } as unknown as ReservationUnitPricingNode;
+      priceUnit: PriceUnit.Per_15Mins,
+    };
 
     expect(getPrice({ pricing, minutes: 60 })).toBe("0 - 120 €");
   });
 
   test("price range with minutes", () => {
-    const pricing = {
-      lowestPrice: 0,
+    const pricing: PricingFieldsFragment = {
+      ...pricingBase,
+      lowestPrice: "0",
       highestPrice: "30",
-      priceUnit: "PER_30_MINS",
-      pricingType: "PAID",
-    } as unknown as ReservationUnitPricingNode;
+      priceUnit: PriceUnit.Per_30Mins,
+    };
 
     expect(getPrice({ pricing, minutes: 60 })).toBe("0 - 60 €");
   });
 
   test("price range with minutes", () => {
-    const pricing = {
-      lowestPrice: 0,
+    const pricing: PricingFieldsFragment = {
+      ...pricingBase,
+      lowestPrice: "0",
       highestPrice: "30",
-      priceUnit: "PER_30_MINS",
-      pricingType: "PAID",
-    } as unknown as ReservationUnitPricingNode;
+      priceUnit: PriceUnit.Per_30Mins,
+    };
 
     expect(getPrice({ pricing, minutes: 61 })).toBe("0 - 75 €");
   });
 
   test("price range with minutes and fixed unit", () => {
-    const pricing = {
+    const pricing: PricingFieldsFragment = {
+      ...pricingBase,
       lowestPrice: "10",
       highestPrice: "100",
-      priceUnit: "PER_HALF_DAY",
-      pricingType: "PAID",
-    } as unknown as ReservationUnitPricingNode;
+      priceUnit: PriceUnit.PerHalfDay,
+    };
 
     expect(getPrice({ pricing, minutes: 61 })).toBe("10 - 100 €");
   });
 
   test("price range with minutes and fixed unit", () => {
-    const pricing = {
+    const pricing: PricingFieldsFragment = {
+      ...pricingBase,
       lowestPrice: "10",
       highestPrice: "100",
-      priceUnit: "PER_DAY",
-      pricingType: "PAID",
-    } as unknown as ReservationUnitPricingNode;
+      priceUnit: PriceUnit.PerDay,
+    };
 
     expect(getPrice({ pricing, minutes: 1234 })).toBe("10 - 100 €");
   });
 
   test("price range with minutes and fixed unit", () => {
-    const pricing = {
+    const pricing: PricingFieldsFragment = {
+      ...pricingBase,
       lowestPrice: "10",
       highestPrice: "100",
-      priceUnit: "PER_WEEK",
-      pricingType: "PAID",
-    } as unknown as ReservationUnitPricingNode;
+      priceUnit: PriceUnit.PerWeek,
+    };
 
     expect(getPrice({ pricing, minutes: 1234 })).toBe("10 - 100 €");
   });
 
   test("fixed price", () => {
-    const pricing = {
-      lowestPrice: 50,
-      highestPrice: 50,
-      priceUnit: "FIXED",
-      pricingType: "PAID",
-    } as unknown as ReservationUnitPricingNode;
+    const pricing: PricingFieldsFragment = {
+      ...pricingBase,
+      lowestPrice: "50",
+      highestPrice: "50",
+      priceUnit: PriceUnit.Fixed,
+    };
 
     expect(getPrice({ pricing })).toBe("50 €");
   });
 
   test("fixed price with decimals", () => {
-    const pricing = {
-      lowestPrice: 50,
-      highestPrice: 50,
-      priceUnit: "FIXED",
-      pricingType: "PAID",
-    } as unknown as ReservationUnitPricingNode;
+    const pricing: PricingFieldsFragment = {
+      ...pricingBase,
+      lowestPrice: "50",
+      highestPrice: "50",
+      priceUnit: PriceUnit.Fixed,
+    };
 
     expect(getPrice({ pricing, trailingZeros: true })).toBe("50,00 €");
   });
 
   test("no price", () => {
-    const pricing = {
-      begins: "",
-      status: "ACTIVE",
+    const pricing: PricingFieldsFragment = {
+      ...pricingBase,
       lowestPrice: "0",
       highestPrice: "0",
-      priceUnit: "PER_HOUR",
-      pricingType: "PAID",
-    } as ReservationUnitPricingNode;
+    };
 
     expect(getPrice({ pricing })).toBe("Maksuton");
   });
 
   test("total price with minutes", () => {
-    const pricing = {
+    const pricing: PricingFieldsFragment = {
+      ...pricingBase,
       lowestPrice: "0.0",
       highestPrice: "50.5",
-      priceUnit: "PER_15_MINS",
-      pricingType: "PAID",
-      status: "ACTIVE",
-    } as ReservationUnitPricingNode;
+      priceUnit: PriceUnit.Per_15Mins,
+    };
 
     expect(getPrice({ pricing, minutes: 180 })).toBe("0 - 606 €");
   });
 
   test("total price with minutes and decimals", () => {
-    const pricing = {
+    const pricing: PricingFieldsFragment = {
+      ...pricingBase,
       lowestPrice: "0.0",
       highestPrice: "50.5",
-      priceUnit: "PER_15_MINS",
-      pricingType: "PAID",
-      status: "ACTIVE",
-    } as ReservationUnitPricingNode;
+      priceUnit: PriceUnit.Per_15Mins,
+    };
 
     expect(getPrice({ pricing, minutes: 180, trailingZeros: true })).toBe(
       "0 - 606,00 €"
@@ -250,47 +257,39 @@ describe("isReservationUnitPublished", () => {
 
   test("with valid states", () => {
     expect(
-      isReservationUnitPublished({
-        state: ReservationUnitState.Published,
-      } as unknown as ReservationUnitNode)
+      isReservationUnitPublished({ state: ReservationUnitState.Published })
     ).toBe(true);
 
     expect(
       isReservationUnitPublished({
         state: ReservationUnitState.ScheduledHiding,
-      } as unknown as ReservationUnitNode)
+      })
     ).toBe(true);
   });
 
   test("with invalid states", () => {
     expect(
-      isReservationUnitPublished({
-        state: ReservationUnitState.Archived,
-      } as unknown as ReservationUnitNode)
+      isReservationUnitPublished({ state: ReservationUnitState.Archived })
     ).toBe(false);
 
     expect(
-      isReservationUnitPublished({
-        state: ReservationUnitState.Draft,
-      } as unknown as ReservationUnitNode)
+      isReservationUnitPublished({ state: ReservationUnitState.Draft })
     ).toBe(false);
 
     expect(
-      isReservationUnitPublished({
-        state: ReservationUnitState.Hidden,
-      } as unknown as ReservationUnitNode)
+      isReservationUnitPublished({ state: ReservationUnitState.Hidden })
     ).toBe(false);
 
     expect(
       isReservationUnitPublished({
         state: ReservationUnitState.ScheduledPeriod,
-      } as unknown as ReservationUnitNode)
+      })
     ).toBe(false);
 
     expect(
       isReservationUnitPublished({
         state: ReservationUnitState.ScheduledPublishing,
-      } as unknown as ReservationUnitNode)
+      })
     ).toBe(false);
   });
 });
@@ -609,7 +608,7 @@ describe("getReservationUnitName", () => {
       nameFi: "Unit 1 FI",
       nameEn: "",
       nameSv: "",
-    } as ReservationUnitNode;
+    };
 
     expect(getReservationUnitName(reservationUnit, "sv")).toEqual("Unit 1 FI");
   });
@@ -617,7 +616,7 @@ describe("getReservationUnitName", () => {
   it("should return the name of the unit in the default language", () => {
     const reservationUnit = {
       nameFi: "Unit 1 FI",
-    } as ReservationUnitNode;
+    };
 
     expect(getReservationUnitName(reservationUnit, "sv")).toEqual("Unit 1 FI");
   });
@@ -627,7 +626,7 @@ describe("getReservationUnitName", () => {
       nameFi: "Unit 1 FI",
       nameEn: null,
       nameSv: null,
-    } as ReservationUnitNode;
+    };
 
     expect(getReservationUnitName(reservationUnit, "sv")).toEqual("Unit 1 FI");
   });
@@ -639,7 +638,7 @@ describe("getUnitName", () => {
       nameFi: "Unit 1 FI",
       nameEn: "Unit 1 EN",
       nameSv: "Unit 1 SV",
-    } as UnitNode;
+    };
 
     expect(getUnitName(unit)).toEqual("Unit 1 FI");
   });
@@ -649,7 +648,7 @@ describe("getUnitName", () => {
       nameFi: "Unit 1 FI",
       nameEn: "Unit 1 EN",
       nameSv: "Unit 1 SV",
-    } as UnitNode;
+    };
 
     expect(getUnitName(unit, "sv")).toEqual("Unit 1 SV");
   });
@@ -659,7 +658,7 @@ describe("getUnitName", () => {
       nameFi: "Unit 1 FI",
       nameEn: "",
       nameSv: "",
-    } as UnitNode;
+    };
 
     expect(getUnitName(unit, "sv")).toEqual("Unit 1 FI");
   });
@@ -667,7 +666,7 @@ describe("getUnitName", () => {
   it("should return the name of the unit in the default language", () => {
     const unit = {
       nameFi: "Unit 1 FI",
-    } as UnitNode;
+    };
 
     expect(getUnitName(unit, "sv")).toEqual("Unit 1 FI");
   });
@@ -677,7 +676,7 @@ describe("getUnitName", () => {
       nameFi: "Unit 1 FI",
       nameEn: null,
       nameSv: null,
-    } as UnitNode;
+    };
 
     expect(getUnitName(unit, "sv")).toEqual("Unit 1 FI");
   });
@@ -886,71 +885,75 @@ describe("getFuturePricing", () => {
 });
 
 describe("getReservationUnitPrice", () => {
-  const reservationUnit: ReservationUnitNode = {
+  const reservationUnit = {
     id: "testing",
     pricings: [
       {
+        id: "1",
         pk: 1,
         begins: toUIDate(addDays(new Date(), 10), "yyyy-MM-dd"),
         pricingType: PricingType.Paid,
         priceUnit: PriceUnit.PerHour,
-        lowestPrice: 10,
-        lowestPriceNet: 10,
-        highestPrice: 20,
-        highestPriceNet: 20,
+        lowestPrice: "10",
+        lowestPriceNet: "10",
+        highestPrice: "20",
+        highestPriceNet: "20",
         taxPercentage: {
           id: "1",
-          value: 24,
+          value: "24",
         },
         status: Status.Future,
       },
       {
+        id: "2",
         pk: 2,
         begins: toUIDate(addDays(new Date(), 20), "yyyy-MM-dd"),
         pricingType: PricingType.Paid,
         priceUnit: PriceUnit.PerHour,
-        lowestPrice: 20,
-        lowestPriceNet: 20,
-        highestPrice: 30,
-        highestPriceNet: 30,
+        lowestPrice: "20",
+        lowestPriceNet: "20",
+        highestPrice: "30",
+        highestPriceNet: "30",
         taxPercentage: {
           id: "1",
-          value: 24,
+          value: "24",
         },
         status: Status.Future,
       },
       {
+        id: "3",
         pk: 3,
         begins: toUIDate(addDays(new Date(), 5), "yyyy-MM-dd"),
         pricingType: PricingType.Paid,
         priceUnit: PriceUnit.PerHour,
-        lowestPrice: 40,
-        lowestPriceNet: 40,
-        highestPrice: 50,
-        highestPriceNet: 50,
+        lowestPrice: "40",
+        lowestPriceNet: "40",
+        highestPrice: "50",
+        highestPriceNet: "50",
         taxPercentage: {
           id: "1",
-          value: 24,
+          value: "24",
         },
         status: Status.Future,
       },
       {
+        id: "4",
         pk: 4,
         begins: toUIDate(addDays(new Date(), 5), "yyyy-MM-dd"),
         pricingType: PricingType.Paid,
         priceUnit: PriceUnit.PerHour,
-        lowestPrice: 0,
-        lowestPriceNet: 0,
-        highestPrice: 10,
-        highestPriceNet: 10,
+        lowestPrice: "0",
+        lowestPriceNet: "0",
+        highestPrice: "10",
+        highestPriceNet: "10",
         taxPercentage: {
           id: "1",
-          value: 24,
+          value: "24",
         },
         status: Status.Active,
       },
     ],
-  } as unknown as ReservationUnitNode;
+  };
 
   it("returns future data based on date lookup", () => {
     const data = cloneDeep(reservationUnit);

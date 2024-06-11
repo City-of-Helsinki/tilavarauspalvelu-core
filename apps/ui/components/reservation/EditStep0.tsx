@@ -1,10 +1,5 @@
 import Calendar, { CalendarEvent } from "common/src/calendar/Calendar";
-import {
-  getEventBuffers,
-  getNewReservation,
-  getSlotPropGetter,
-  getTimeslots,
-} from "common/src/calendar/util";
+import { getEventBuffers } from "common/src/calendar/util";
 import { breakpoints } from "common/src/common/style";
 import type { PendingReservation } from "common/types/common";
 import type {
@@ -25,8 +20,11 @@ import styled from "styled-components";
 import { Toolbar } from "common/src/calendar/Toolbar";
 import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
 import {
+  SLOTS_EVERY_HOUR,
   canReservationTimeBeChanged,
   getDurationOptions,
+  getNewReservation,
+  getSlotPropGetter,
   isReservationReservable,
 } from "@/modules/reservation";
 import {
@@ -45,6 +43,7 @@ import { eventStyleGetter } from "@/components/common/calendarUtils";
 import { type UseFormReturn } from "react-hook-form";
 import { type PendingReservationFormType } from "@/components/reservation-unit/schema";
 import { fromUIDate, isValidDate, toUIDate } from "common/src/common/util";
+import { useReservableTimes } from "@/hooks/useReservableTimes";
 
 type QueryData = NonNullable<ListReservationsQuery["reservations"]>;
 type Node = NonNullable<
@@ -174,7 +173,6 @@ export function EditStep0({
   userReservations,
   activeApplicationRounds,
   reservationForm,
-  setErrorMsg,
   nextStep,
   isLoading,
 }: Props): JSX.Element {
@@ -193,31 +191,29 @@ export function EditStep0({
   const { isDirty } = formState;
 
   const [focusDate, setFocusDate] = useState<Date>(originalBegin);
+  const reservableTimes = useReservableTimes(reservationUnit);
 
   const isSlotAvailable = useCallback(
     (start: Date, end: Date, skipLengthCheck = false): boolean => {
       const resUnit = getWithoutThisReservation(reservationUnit, reservation);
       return isReservationReservable({
         reservationUnit: resUnit,
+        reservableTimes,
         activeApplicationRounds,
         start,
         end,
         skipLengthCheck,
       });
     },
-    [reservationUnit, reservation, activeApplicationRounds]
+    [reservationUnit, reservableTimes, reservation, activeApplicationRounds]
   );
 
   const durationOptions = getDurationOptions(reservationUnit, t);
 
-  const reservableTimeSpans = filterNonNullable(
-    reservationUnit?.reservableTimeSpans
-  );
-
   const duration =
     watch("duration") ?? differenceInMinutes(originalBegin, originalEnd);
   const startingTimeOptions = getPossibleTimesForDay(
-    reservableTimeSpans,
+    reservableTimes,
     reservationUnit?.reservationStartInterval,
     fromUIDate(watch("date") ?? "") ?? new Date(),
     reservationUnit,
@@ -297,7 +293,7 @@ export function EditStep0({
       return undefined;
     }
     return getSlotPropGetter({
-      reservableTimeSpans,
+      reservableTimes,
       activeApplicationRounds,
       reservationBegins: reservationUnit.reservationBegins
         ? new Date(reservationUnit.reservationBegins)
@@ -309,12 +305,7 @@ export function EditStep0({
       reservationsMaxDaysBefore: reservationUnit.reservationsMaxDaysBefore ?? 0,
       customValidation: (date) => isSlotFree(date),
     });
-  }, [
-    activeApplicationRounds,
-    reservationUnit,
-    isSlotFree,
-    reservableTimeSpans,
-  ]);
+  }, [activeApplicationRounds, reservationUnit, isSlotFree, reservableTimes]);
 
   // TODO submit should be completely unnecessary
   // just disable nextStep button if the form is invalid
@@ -336,17 +327,20 @@ export function EditStep0({
 
     const resUnit = getWithoutThisReservation(reservationUnit, reservation);
 
-    const [isNewReservationValid, validationError] =
-      canReservationTimeBeChanged({
-        reservation,
-        newReservation,
-        reservationUnit: resUnit,
-        activeApplicationRounds,
-      });
+    const isNewReservationValid = canReservationTimeBeChanged({
+      reservation,
+      newReservation,
+      reservableTimes,
+      reservationUnit: resUnit,
+      activeApplicationRounds,
+    });
 
+    /*
     if (validationError) {
       setErrorMsg(t(`reservations:modifyTimeReasons.${validationError}`));
-    } else if (isNewReservationValid) {
+    }
+    */
+    if (isNewReservationValid) {
       nextStep();
     }
   };
@@ -360,9 +354,9 @@ export function EditStep0({
         return false;
       }
 
-      const newReservation = getNewReservation({ start, end, reservationUnit });
-      const newDate = toUIDate(new Date(newReservation.begin));
-      const newTime = getTimeString(new Date(newReservation.begin));
+      const { begin } = getNewReservation({ start, end, reservationUnit });
+      const newDate = toUIDate(begin);
+      const newTime = getTimeString(begin);
       setValue("date", newDate, { shouldDirty: true });
       setValue("time", newTime, { shouldDirty: true });
       setValue("duration", differenceInMinutes(end, start), {
@@ -402,18 +396,19 @@ export function EditStep0({
           ? addSeconds(start, reservationUnit?.minReservationDuration ?? 0)
           : new Date(end);
 
-      const newReservation = getNewReservation({
+      const { begin } = getNewReservation({
         start,
         end: normalizedEnd,
         reservationUnit,
       });
 
+      // TODO why isn't this normalizedEnd?
       if (!isSlotAvailable(start, end, skipLengthCheck)) {
         return false;
       }
 
-      const newDate = toUIDate(new Date(newReservation.begin));
-      const newTime = getTimeString(new Date(newReservation.begin));
+      const newDate = toUIDate(new Date(begin));
+      const newTime = getTimeString(new Date(begin));
       // click doesn't change the duration
       setValue("date", newDate, { shouldDirty: true });
       setValue("time", newTime, { shouldDirty: true });
@@ -467,7 +462,7 @@ export function EditStep0({
               event?.state ? event?.state?.toString() === "INITIAL" : false
             }
             step={30}
-            timeslots={getTimeslots(reservationUnit.reservationStartInterval)}
+            timeslots={SLOTS_EVERY_HOUR}
             culture={getLocalizationLang(i18n.language)}
             aria-hidden
             longPressThreshold={100}

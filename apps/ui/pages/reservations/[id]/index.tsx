@@ -40,12 +40,12 @@ import { CenterSpinner } from "@/components/common/common";
 import Sanitize from "@/components/common/Sanitize";
 import { AccordionWithState as Accordion } from "@/components/common/Accordion";
 import {
-  canReservationTimeBeChanged,
   canUserCancelReservation,
   getCheckoutUrl,
   getNormalizedReservationOrderStatus,
   getReservationCancellationReason,
   getReservationValue,
+  isReservationEditable,
 } from "@/modules/reservation";
 import {
   getReservationUnitInstructionsKey,
@@ -467,9 +467,7 @@ function Reservation({
       ? getTranslation(reservationUnit?.serviceSpecificTerms, "text")
       : undefined;
 
-  const [canTimeBeModified, modifyTimeReason] = canReservationTimeBeChanged({
-    reservation,
-  });
+  const canTimeBeModified = isReservationEditable({ reservation });
 
   const cancellationReason = useMemo(() => {
     const reason = getReservationCancellationReason(reservation);
@@ -644,6 +642,7 @@ function Reservation({
               )}
             </Actions>
             <Reasons>
+              {/* TODO add back or remove completely?
               {modifyTimeReason && (
                 <ReasonText>
                   {t(`reservations:modifyTimeReasons:${modifyTimeReason}`)}
@@ -654,8 +653,8 @@ function Reservation({
                       "reservations:modifyTimeReasons:RESERVATION_MODIFICATION_NOT_ALLOWED_SUFFIX"
                     )}`}
                 </ReasonText>
-              )}
-              {cancellationReason && !modifyTimeReason && (
+              )*/}
+              {cancellationReason && (
                 <ReasonText>
                   {t(`reservations:cancellationReasons:${cancellationReason}`)}
                 </ReasonText>

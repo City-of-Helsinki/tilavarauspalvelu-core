@@ -4,11 +4,6 @@ import { addMinutes, isAfter, isBefore, isSameDay, set } from "date-fns";
 import { i18n } from "next-i18next";
 import { toUIDate } from "common/src/common/util";
 import {
-  type RoundPeriod,
-  getDayIntervals,
-  isSlotWithinReservationTime,
-} from "common/src/calendar/util";
-import {
   ReservationUnitState,
   type ReservationUnitNode,
   PricingType,
@@ -23,9 +18,14 @@ import {
   ReservationKind,
   ReservationStateChoice,
 } from "@gql/gql-types";
-import { filterNonNullable } from "common/src/helpers";
-import { capitalize, getTranslation } from "./util";
-import { isReservationReservable } from "@/modules/reservation";
+import { capitalize, getDayIntervals, getTranslation } from "./util";
+import {
+  type ReservableMap,
+  type RoundPeriod,
+  isReservationReservable,
+  isSlotWithinReservationTime,
+  dateToKey,
+} from "@/modules/reservation";
 import { type PricingFieldsFragment } from "common/gql/gql-types";
 import { gql } from "@apollo/client";
 
@@ -361,7 +361,8 @@ type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
 // available for reservation on the given date
 // TODO should rewrite the timespans to be NonNullable and dates (and do the conversion early, not on each component render)
 export function getPossibleTimesForDay(
-  reservableTimeSpans: ReservationUnitNode["reservableTimeSpans"],
+  // reservableTimeSpans: ReservationUnitNode["reservableTimeSpans"],
+  reservableTimes: ReservableMap,
   reservationStartInterval: ReservationUnitNode["reservationStartInterval"],
   date: Date,
   reservationUnit: QueryT,
@@ -369,43 +370,46 @@ export function getPossibleTimesForDay(
   durationValue: number
 ): { label: string; value: string }[] {
   const allTimes: string[] = [];
-  filterNonNullable(reservableTimeSpans)
-    .filter((x) => isInTimeSpan(date, x))
-    .forEach((rts) => {
-      if (!rts?.startDatetime || !rts?.endDatetime) return;
-      const startDate = new Date(rts.startDatetime);
-      const endDate = new Date(rts.endDatetime);
-      const begin = isSameDay(startDate, date)
-        ? startDate
-        : set(date, { hours: 0, minutes: 0 });
-      const end = isSameDay(endDate, date)
-        ? endDate
-        : set(date, { hours: 23, minutes: 59 });
-      // TODO I hate this function, don't use strings for durations
-      // wasteful because we do date -> string -> object -> number -> string
-      // the numbers are what we compare but all the scaffolding to mess with memory alloc
-      const intervals = getDayIntervals(
-        getTimeString(begin),
-        getTimeString(end),
-        reservationStartInterval
-      ).map((i) => i.substring(0, 5));
-      allTimes.push(...intervals);
-    });
-  return allTimes
+  const slotsForDay = reservableTimes.get(dateToKey(date)) ?? [];
+  for (const slot of slotsForDay) {
+    const startDate = slot.start;
+    const endDate = slot.end; // new Date(rts.endDatetime);
+    const begin = isSameDay(startDate, date)
+      ? startDate
+      : set(date, { hours: 0, minutes: 0 });
+    const end = isSameDay(endDate, date)
+      ? endDate
+      : set(date, { hours: 23, minutes: 59 });
+    // TODO I hate this function, don't use strings for durations
+    // wasteful because we do date -> string -> object -> number -> string
+    // the numbers are what we compare but all the scaffolding to mess with memory alloc
+    const intervals = getDayIntervals(
+      getTimeString(begin),
+      getTimeString(end),
+      reservationStartInterval
+    ).map((i) => i.substring(0, 5));
+    allTimes.push(...intervals);
+  }
+  const times = allTimes
     .filter((span) => {
       const [slotH, slotM] = span.split(":").map(Number);
       const slotDate = new Date(date);
       slotDate.setHours(slotH, slotM, 0, 0);
+      if (slotDate < new Date()) {
+        return false;
+      }
       const isReservable = isReservationReservable({
         reservationUnit,
+        reservableTimes,
         activeApplicationRounds,
         start: slotDate,
         end: addMinutes(slotDate, durationValue),
         skipLengthCheck: false,
       });
-      return slotDate >= new Date() && isReservable;
+      return isReservable;
     })
     .map((time) => ({ label: time, value: time }));
+  return times;
 }
 
 // TODO use a fragment

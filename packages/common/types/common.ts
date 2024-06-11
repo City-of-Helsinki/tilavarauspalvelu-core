@@ -8,11 +8,6 @@ export type CalendarEventBuffer = {
   event: CalendarBufferEvent;
 };
 
-export type SlotProps = {
-  className?: string;
-  style?: React.CSSProperties;
-};
-
 export type DAY = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 export type ApplicationEventSchedulePriority = number;

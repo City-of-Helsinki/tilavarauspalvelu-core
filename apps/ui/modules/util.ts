@@ -10,11 +10,14 @@ import {
   getTranslation,
   fromApiDate as fromAPIDate,
   fromUIDate,
+  convertHMSToSeconds,
+  secondsToHms,
 } from "common/src/common/util";
 import type {
   AgeGroupNode,
   ImageFragment,
   LocationFieldsI18nFragment,
+  ReservationStartInterval,
 } from "@gql/gql-types";
 import {
   searchPrefix,
@@ -280,7 +283,7 @@ export const printErrorMessages = (error: ApolloError): string => {
 export const isTouchDevice = (): boolean =>
   isBrowser && window?.matchMedia("(any-hover: none)").matches;
 
-export const getPostLoginUrl = () => {
+export function getPostLoginUrl() {
   if (!isBrowser) {
     return undefined;
   }
@@ -288,7 +291,7 @@ export const getPostLoginUrl = () => {
   const params = new URLSearchParams(searchParams);
   params.set("isPostLogin", "true");
   return `${origin}${pathname}?${params.toString()}`;
-};
+}
 
 // TODO move to common and combine with admin (requires i18n changes: replace messages.ts with json)
 export function formatTimeRange(
@@ -325,4 +328,67 @@ export function formatDateTime(t: TFunction, date: Date): string {
     date,
   });
   return `${dateStr} ${timeStr}`;
+}
+
+// TODO refactor
+export function getDayIntervals(
+  startTime: string,
+  endTime: string,
+  interval: ReservationStartInterval
+): string[] {
+  // normalize end time to allow comparison
+  const normalizedEndTime = endTime === "00:00" ? "23:59" : endTime;
+
+  // FIXME don't use HMS
+  const start = convertHMSToSeconds(startTime?.substring(0, 5));
+  const end = convertHMSToSeconds(normalizedEndTime?.substring(0, 5));
+  const intervals: string[] = [];
+
+  let intervalSeconds = 0;
+  switch (interval) {
+    case "INTERVAL_15_MINS":
+      intervalSeconds = 15 * 60;
+      break;
+    case "INTERVAL_30_MINS":
+      intervalSeconds = 30 * 60;
+      break;
+    case "INTERVAL_60_MINS":
+      intervalSeconds = 60 * 60;
+      break;
+    case "INTERVAL_90_MINS":
+      intervalSeconds = 90 * 60;
+      break;
+    case "INTERVAL_120_MINS":
+      intervalSeconds = 120 * 60;
+      break;
+    case "INTERVAL_180_MINS":
+      intervalSeconds = 180 * 60;
+      break;
+    case "INTERVAL_240_MINS":
+      intervalSeconds = 240 * 60;
+      break;
+    case "INTERVAL_300_MINS":
+      intervalSeconds = 300 * 60;
+      break;
+    case "INTERVAL_360_MINS":
+      intervalSeconds = 360 * 60;
+      break;
+    case "INTERVAL_420_MINS":
+      intervalSeconds = 420 * 60;
+      break;
+    default:
+  }
+
+  if (!intervalSeconds || start == null || !end || start >= end) return [];
+
+  for (let i = start; i <= end; i += intervalSeconds) {
+    const { h, m, s } = secondsToHms(i);
+    intervals.push(
+      `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s
+        .toString()
+        .padStart(2, "0")}`
+    );
+  }
+
+  return intervals.filter((n) => n.substring(0, 5) !== normalizedEndTime);
 }
