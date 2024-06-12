@@ -1,9 +1,15 @@
+from reservations.enums import CustomerTypeChoice
 from reservations.models import Reservation, ReservationStatistic, ReservationStatisticsReservationUnit
 
 
 def create_or_update_reservation_statistics(reservation_pk: Reservation) -> None:
     reservation = Reservation.objects.get(pk=reservation_pk)
     recurring = getattr(reservation, "recurring_reservation", None)
+    requires_org_name = reservation.reservee_type != CustomerTypeChoice.INDIVIDUAL
+    requires_org_id = not reservation.reservee_is_unregistered_association and requires_org_name
+
+    by_profile_user = bool(getattr(reservation.user, "profile_id", ""))
+
     stat, _ = ReservationStatistic.objects.update_or_create(
         reservation=reservation,
         defaults={
@@ -41,8 +47,11 @@ def create_or_update_reservation_statistics(reservation_pk: Reservation) -> None
             "reservation_created_at": reservation.created_at,
             "reservation_handled_at": reservation.handled_at,
             "reservation_type": reservation.type,
+            "reservee_address_zip": reservation.reservee_address_zip if by_profile_user else "",
+            "reservee_id": reservation.reservee_id if requires_org_id else "",
             "reservee_is_unregistered_association": reservation.reservee_is_unregistered_association,
             "reservee_language": reservation.reservee_language,
+            "reservee_organisation_name": reservation.reservee_organisation_name if requires_org_name else "",
             "reservee_type": reservation.reservee_type,
             "reservee_uuid": str(reservation.user.tvp_uuid) if reservation.user else "",
             "state": reservation.state,
