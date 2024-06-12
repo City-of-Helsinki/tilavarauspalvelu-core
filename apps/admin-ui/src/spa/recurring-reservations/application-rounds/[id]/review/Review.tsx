@@ -29,6 +29,7 @@ import { getValidationErrors } from "common/src/apolloUtils";
 import usePermission from "@/hooks/usePermission";
 import { Permission } from "@/modules/permissionHelper";
 import { isApplicationRoundInProgress } from "@/helpers";
+import { breakpoints } from "common";
 
 const HeadingContainer = styled.div`
   display: flex;
@@ -42,10 +43,22 @@ const LinkContainer = styled.div`
   gap: var(--spacing-m);
 `;
 
-const AlignEndContainer = styled.div`
+const AllocationButtonsContainer = styled.div`
   display: flex;
-  justify-content: end;
+  flex-direction: column;
   align-items: end;
+  gap: 1rem;
+  justify-content: space-between;
+
+  @media (min-width: ${breakpoints.s}) {
+    flex-direction: row;
+    align-items: center;
+  }
+`;
+
+const AllocationButtonContainer = styled.div`
+  flex-shrink: 0;
+  margin-left: auto;
 `;
 
 const TabContent = styled.div`
@@ -270,24 +283,29 @@ export function Review({
         {/* NOTE this check blocks users that don't have permissions to end the allocation
          * so for them it's always showing the allocation tool
          */}
-        {isEndingAllowed || isHandled ? (
-          <EndAllocation
-            applicationRound={applicationRound}
-            refetch={refetch}
-          />
-        ) : (
-          <AlignEndContainer>
-            {isAllocationEnabled ? (
-              <ButtonLikeLink to="allocation" variant="primary" size="large">
-                {t("ApplicationRound.allocate")}
-              </ButtonLikeLink>
-            ) : (
-              <Button variant="primary" disabled>
-                {t("ApplicationRound.allocate")}
-              </Button>
-            )}
-          </AlignEndContainer>
-        )}
+        <AllocationButtonsContainer>
+          {isEndingAllowed || isHandled ? (
+            <div>
+              <EndAllocation
+                applicationRound={applicationRound}
+                refetch={refetch}
+              />
+            </div>
+          ) : null}
+          {!isHandled && (
+            <AllocationButtonContainer>
+              {isAllocationEnabled ? (
+                <ButtonLikeLink to="allocation" variant="primary" size="large">
+                  {t("ApplicationRound.allocate")}
+                </ButtonLikeLink>
+              ) : (
+                <Button variant="primary" disabled>
+                  {t("ApplicationRound.allocate")}
+                </Button>
+              )}
+            </AllocationButtonContainer>
+          )}
+        </AllocationButtonsContainer>
       </>
       <TabWrapper>
         <Tabs initiallyActiveTab={activeTabIndex}>
