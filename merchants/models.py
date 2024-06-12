@@ -95,6 +95,20 @@ class OrderStatus(models.TextChoices):
         ]
 
 
+class OrderStatusWithFree(models.TextChoices):
+    """Same as OrderStatus, but includes the 'FREE' option used for filtering reservations without payments."""
+
+    # Note: Enums cannot be subclassed, so we have to redefine all "original" members.
+    DRAFT = "DRAFT", _("Draft")
+    EXPIRED = "EXPIRED", _("Expired")
+    CANCELLED = "CANCELLED", _("Cancelled")
+    PAID = "PAID", _("Paid")
+    PAID_MANUALLY = "PAID_MANUALLY", _("Paid manually")
+    REFUNDED = "REFUNDED", _("Refunded")
+
+    FREE = "FREE", _("Free")
+
+
 class Language(models.TextChoices):
     FI = "fi", _("Finnish")
     SV = "sv", _("Swedish")

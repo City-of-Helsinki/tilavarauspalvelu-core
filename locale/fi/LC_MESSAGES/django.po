@@ -1348,6 +1348,10 @@ msgstr "Maksettu manuaalisesti"
 msgid "Refunded"
 msgstr "Palautettu"
 
+#: merchants/models.py
+msgid "Free"
+msgstr "Maksuton"
+
 #: merchants/models.py tilavarauspalvelu/settings.py
 msgid "Finnish"
 msgstr "Suomi"
