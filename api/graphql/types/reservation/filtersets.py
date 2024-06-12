@@ -1,24 +1,21 @@
-import operator
 import re
-from functools import reduce
 from typing import TYPE_CHECKING
 
 import django_filters
 from django.contrib.postgres.search import SearchRank, SearchVector
+from django.db import models
 from django.db.models import Case, CharField, F, Q, QuerySet, Value, When
 from django.db.models.functions import Concat
 from graphene_django_extensions import ModelFilterSet
+from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntMultipleChoiceFilter
 
 from api.graphql.extensions.filters import TimezoneAwareDateFilter
 from common.db import raw_prefixed_query
-from merchants.enums import OrderStatus
+from merchants.enums import OrderStatusWithFree
 from permissions.helpers import has_general_permission
 from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
-from reservation_units.models import ReservationUnit, ReservationUnitType
 from reservations.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
-from reservations.models import RecurringReservation, Reservation
-from spaces.models import Unit
-from users.models import User
+from reservations.models import Reservation
 
 if TYPE_CHECKING:
     from common.typing import AnyUser
@@ -33,74 +30,39 @@ Matches email domains like:
 
 
 class ReservationFilterSet(ModelFilterSet):
+    reservation_unit = IntMultipleChoiceFilter(field_name="reservation_unit")
+    unit = IntMultipleChoiceFilter(field_name="reservation_unit__unit")
+    user = IntMultipleChoiceFilter(field_name="user")
+    reservation_unit_type = IntMultipleChoiceFilter(field_name="reservation_unit__reservation_unit_type")
+    recurring_reservation = IntMultipleChoiceFilter(field_name="recurring_reservation")
+
+    reservation_unit_name_fi = django_filters.CharFilter(method="filter_by_reservation_unit_name")
+    reservation_unit_name_en = django_filters.CharFilter(method="filter_by_reservation_unit_name")
+    reservation_unit_name_sv = django_filters.CharFilter(method="filter_by_reservation_unit_name")
+
     begin_date = TimezoneAwareDateFilter(field_name="end", lookup_expr="gte", use_end_of_day=False)
     end_date = TimezoneAwareDateFilter(field_name="begin", lookup_expr="lte", use_end_of_day=True)
 
-    only_with_permission = django_filters.BooleanFilter(method="get_only_with_permission")
-    only_with_handling_permission = django_filters.BooleanFilter(method="get_only_with_handling_permission")
-
-    order_status = django_filters.MultipleChoiceFilter(
-        field_name="payment_order__status",
-        lookup_expr="iexact",
-        choices=tuple(
-            (
-                key,
-                value,
-            )
-            for key, value in OrderStatus.choices
-        ),
-        label=f"PaymentOrder's statuses; {", ".join([k for k, v in OrderStatus.choices])}",
-    )
+    created_at_gte = TimezoneAwareDateFilter(field_name="created_at", lookup_expr="gte", use_end_of_day=False)
+    created_at_lte = TimezoneAwareDateFilter(field_name="created_at", lookup_expr="lte", use_end_of_day=True)
 
     price_gte = django_filters.NumberFilter(field_name="price", lookup_expr="gte")
     price_lte = django_filters.NumberFilter(field_name="price", lookup_expr="lte")
 
-    recurring_reservation = django_filters.ModelChoiceFilter(
-        field_name="recurring_reservation", queryset=RecurringReservation.objects.all()
-    )
+    applying_for_free_of_charge = django_filters.BooleanFilter(field_name="applying_for_free_of_charge")
+    is_recurring = django_filters.BooleanFilter(field_name="recurring_reservation", lookup_expr="isnull", exclude=True)
+    requested = django_filters.BooleanFilter(method="filter_by_requested")
+    only_with_permission = django_filters.BooleanFilter(method="filter_by_only_with_permission")
+    only_with_handling_permission = django_filters.BooleanFilter(method="filter_by_only_with_handling_permission")
 
-    # Filter for displaying reservations which requires or had required handling.
-    requested = django_filters.BooleanFilter(method="get_requested")
+    state = EnumMultipleChoiceFilter(field_name="state", enum=ReservationStateChoice)
+    reservation_type = EnumMultipleChoiceFilter(field_name="type", enum=ReservationTypeChoice)
+    order_status = EnumMultipleChoiceFilter(enum=OrderStatusWithFree, method="filter_by_order_status")
 
-    reservation_unit = django_filters.ModelMultipleChoiceFilter(
-        method="get_reservation_unit", queryset=ReservationUnit.objects.all()
-    )
-
-    reservation_type = django_filters.MultipleChoiceFilter(
-        field_name="type",
-        choices=ReservationTypeChoice.choices,
-    )
-
-    reservation_unit_name_fi = django_filters.CharFilter(method="get_reservation_unit_name")
-    reservation_unit_name_en = django_filters.CharFilter(method="get_reservation_unit_name")
-    reservation_unit_name_sv = django_filters.CharFilter(method="get_reservation_unit_name")
-
-    reservation_unit_type = django_filters.ModelMultipleChoiceFilter(
-        method="get_reservation_unit_type", queryset=ReservationUnitType.objects.all()
-    )
-
-    state = django_filters.MultipleChoiceFilter(
-        field_name="state",
-        lookup_expr="iexact",
-        choices=tuple(
-            (
-                key.upper(),  # Must use upper case characters to comply with GraphQL Enum
-                value,
-            )
-            for key, value in ReservationStateChoice.choices
-        ),
-    )
-
-    unit = django_filters.ModelMultipleChoiceFilter(method="get_unit", queryset=Unit.objects.all())
-    user = django_filters.ModelChoiceFilter(field_name="user", queryset=User.objects.all())
-    text_search = django_filters.CharFilter(method="get_text_search")
+    text_search = django_filters.CharFilter(method="filter_by_text_search")
 
     class Meta:
         model = Reservation
-        fields = {
-            "state": ["exact"],
-            "begin": ["exact", "gte", "lte"],
-        }
         order_by = [
             "pk",
             "name",
@@ -119,33 +81,7 @@ class ReservationFilterSet(ModelFilterSet):
             ("payment_order__status", "order_status"),
         ]
 
-    def filter_queryset(self, queryset: QuerySet) -> QuerySet:
-        queryset = queryset.alias(
-            reservee_name=Case(
-                When(
-                    reservee_type=CustomerTypeChoice.BUSINESS,
-                    then=F("reservee_organisation_name"),
-                ),
-                When(
-                    reservee_type=CustomerTypeChoice.NONPROFIT,
-                    then=F("reservee_organisation_name"),
-                ),
-                When(
-                    reservee_type=CustomerTypeChoice.INDIVIDUAL,
-                    then=Concat(
-                        "reservee_first_name",
-                        Value(" "),
-                        "reservee_last_name",
-                    ),
-                ),
-                default=Value(""),
-                output_field=CharField(),
-            )
-        )
-
-        return super().filter_queryset(queryset)
-
-    def get_only_with_permission(self, qs: QuerySet, name: str, value: bool) -> QuerySet:
+    def filter_by_only_with_permission(self, qs: QuerySet, name: str, value: bool) -> QuerySet:
         if not value:
             return qs
 
@@ -166,7 +102,7 @@ class ReservationFilterSet(ModelFilterSet):
             | Q(reservation_unit__unit__unit_groups__in=unit_group_ids)
         )
 
-    def get_only_with_handling_permission(self, qs: QuerySet, name: str, value: bool) -> QuerySet:
+    def filter_by_only_with_handling_permission(self, qs: QuerySet, name: str, value: bool) -> QuerySet:
         if not value:
             return qs
 
@@ -188,40 +124,32 @@ class ReservationFilterSet(ModelFilterSet):
             | Q(reservation_unit__unit__unit_groups__in=unit_group_ids)
         )
 
-    def get_requested(self, qs: QuerySet, name, value: str) -> QuerySet:
+    @staticmethod
+    def filter_by_requested(qs: QuerySet, name, value: str) -> QuerySet:
+        """Filter for displaying reservations which requires or had required handling."""
         query = Q(state=ReservationStateChoice.REQUIRES_HANDLING) | Q(handled_at__isnull=False)
         if value:
             return qs.filter(query)
         return qs.exclude(query)
 
-    def get_reservation_unit(self, qs: QuerySet, name, value) -> QuerySet:
-        if not value:
-            return qs
-
-        return qs.filter(reservation_unit__in=value)
-
-    def get_reservation_unit_name(self, qs: QuerySet, name: str, value: str) -> QuerySet:
+    @staticmethod
+    def filter_by_reservation_unit_name(qs: QuerySet, name: str, value: str) -> QuerySet:
         language = name[-2:]
         words = value.split(",")
-        queries = []
+        q = Q()
         for word in words:
             word = word.strip()
             if language == "en":
-                queries.append(Q(reservation_unit__name_en__istartswith=word))
+                q |= Q(reservation_unit__name_en__istartswith=word)
             elif language == "sv":
-                queries.append(Q(reservation_unit__name_sv__istartswith=word))
+                q |= Q(reservation_unit__name_sv__istartswith=word)
             else:
-                queries.append(Q(reservation_unit__name_fi__istartswith=word))
+                q |= Q(reservation_unit__name_fi__istartswith=word)
 
-        query = reduce(operator.or_, (query for query in queries))
-        return qs.filter(query).distinct()
+        return qs.filter(q).distinct()
 
-    def get_reservation_unit_type(self, qs: QuerySet, name: str, value: list[str]) -> QuerySet:
-        if not value:
-            return qs
-        return qs.filter(reservation_unit__reservation_unit_type__in=value)
-
-    def get_text_search(self, qs: QuerySet, name: str, value: str) -> QuerySet:
+    @staticmethod
+    def filter_by_text_search(qs: QuerySet, name: str, value: str) -> QuerySet:
         value = value.strip()
         if not value:
             return qs
@@ -257,8 +185,37 @@ class ReservationFilterSet(ModelFilterSet):
 
         return qs
 
-    def get_unit(self, qs: QuerySet, name: str, value: list[int]) -> QuerySet:
-        if not value:
-            return qs
+    @staticmethod
+    def filter_by_order_status(qs: QuerySet, name: str, value: list[str]) -> QuerySet:
+        q = Q()
+        if OrderStatusWithFree.FREE.value in value:
+            value.remove(OrderStatusWithFree.FREE.value)
+            q |= Q(payment_order__isnull=True)
+        if value:
+            q |= Q(payment_order__status__in=value)
+        return qs.filter(q)
 
-        return qs.filter(reservation_unit__unit__in=value)
+    @staticmethod
+    def order_by_reservee_name(qs: QuerySet, desc: bool) -> QuerySet:
+        return qs.alias(
+            reservee_name=Case(
+                When(
+                    reservee_type=CustomerTypeChoice.BUSINESS,
+                    then=F("reservee_organisation_name"),
+                ),
+                When(
+                    reservee_type=CustomerTypeChoice.NONPROFIT,
+                    then=F("reservee_organisation_name"),
+                ),
+                When(
+                    reservee_type=CustomerTypeChoice.INDIVIDUAL,
+                    then=Concat(
+                        "reservee_first_name",
+                        Value(" "),
+                        "reservee_last_name",
+                    ),
+                ),
+                default=Value(""),
+                output_field=CharField(),
+            )
+        ).order_by(models.OrderBy(models.F("reservee_name"), descending=desc))

@@ -1544,7 +1544,9 @@ msgstr "Saatavilla vain, kun maksu on palautettu"
 msgid ""
 "Search by Payment Order ID, Reservation ID, Remote Order ID, Reservation "
 "name, or Reservation Unit name"
-msgstr "Etsi maksutunnuksella, varauksen tunnuksella, verkkokaupan tunnuksella, varauksen nimellä tai varausyksikön nimellä"
+msgstr ""
+"Etsi maksutunnuksella, varauksen tunnuksella, verkkokaupan tunnuksella, "
+"varauksen nimellä tai varausyksikön nimellä"
 
 #: merchants/enums.py tilavarauspalvelu/settings.py
 msgid "Finnish"
