@@ -23,6 +23,7 @@ RUN echo "Install common dependencies" \
       libpq5 \
       postgresql-client \
       make \
+      rsync \
     && apt-get clean \
     && echo "Create project directory" \
     && mkdir -p "$PROJECT_ROOT" \
