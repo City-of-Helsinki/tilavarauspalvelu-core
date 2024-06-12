@@ -28,26 +28,29 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
     reservation_unit = ReservationUnitFactory.create(name="resu", unit=UnitFactory(name="mesta", tprek_id="1234"))
     recurring = RecurringReservationFactory.create(application_event_schedule=None)
     reservation = ReservationFactory.create(
-        reservation_unit=[reservation_unit],
-        reservee_type=CustomerTypeChoice.INDIVIDUAL,
-        reservee_is_unregistered_association=False,
-        home_city=City.objects.create(name="Test", municipality_code="1234"),
-        applying_for_free_of_charge=True,
-        free_of_charge_reason="This is some reason.",
         age_group=AgeGroup.objects.create(minimum=18, maximum=30),
-        name="movies",
-        description="movies&popcorn",
+        applying_for_free_of_charge=True,
         begin=datetime.datetime(2020, 1, 1, 12, 0, tzinfo=get_default_timezone()),
+        description="movies&popcorn",
         end=datetime.datetime(2020, 1, 1, 14, 0, tzinfo=get_default_timezone()),
-        state=ReservationStateChoice.CREATED.value,
-        purpose=ReservationPurposeFactory(name="PurpleChoice"),
-        unit_price=10,
-        tax_percentage_value=24,
-        price=10,
-        working_memo="its like that",
+        free_of_charge_reason="This is some reason.",
+        home_city=City.objects.create(name="Test", municipality_code="1234"),
+        name="movies",
         non_subsidised_price=Decimal("11.00"),
         non_subsidised_price_net=Decimal("8.87"),
+        price=10,
+        purpose=ReservationPurposeFactory(name="PurpleChoice"),
         recurring_reservation=recurring,
+        reservation_unit=[reservation_unit],
+        reservee_address_zip="12345",
+        reservee_id="123456789",
+        reservee_is_unregistered_association=False,
+        reservee_organisation_name="Test organisation",
+        reservee_type=CustomerTypeChoice.INDIVIDUAL,
+        state=ReservationStateChoice.CREATED.value,
+        tax_percentage_value=24,
+        unit_price=10,
+        working_memo="its like that",
     )
 
     reservation_unit = reservation.reservation_unit.first()
@@ -97,12 +100,84 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
     assert stat.reservation_stats_reservation_units.count() == 1
     assert stat.reservation_stats_reservation_units.first().reservation_unit == reservation_unit
     assert stat.reservation_type == reservation.type
+    assert stat.reservee_address_zip == ""
+    assert stat.reservee_id == ""
     assert stat.reservee_is_unregistered_association == reservation.reservee_is_unregistered_association
     assert stat.reservee_language == reservation.reservee_language
+    assert stat.reservee_organisation_name == ""
     assert stat.reservee_type == reservation.reservee_type
     assert stat.reservee_uuid == str(reservation.user.tvp_uuid)
     assert stat.state == reservation.state
     assert stat.tax_percentage_value == reservation.tax_percentage_value
+
+
+def test_statistics__update__reservee_address_zip__has_profile_id(settings):
+    settings.SAVE_RESERVATION_STATISTICS = True
+
+    reservation = ReservationFactory.create(
+        user__profile_id="123456789",
+        reservee_address_zip="12345",
+    )
+
+    stat = ReservationStatistic.objects.first()
+    assert stat.reservee_address_zip == reservation.reservee_address_zip
+
+
+def test_statistics__update__reservee_address_zip__no_profile_id(settings):
+    settings.SAVE_RESERVATION_STATISTICS = True
+
+    ReservationFactory.create(
+        user__profile_id="",
+        reservee_address_zip="12345",
+    )
+
+    stat = ReservationStatistic.objects.first()
+    assert stat.reservee_address_zip == ""
+
+
+def test_statistics__update__org_info_for_unregistered_organisation(settings):
+    settings.SAVE_RESERVATION_STATISTICS = True
+
+    reservation = ReservationFactory.create(
+        reservee_is_unregistered_association=True,
+        reservee_type=CustomerTypeChoice.BUSINESS,
+        reservee_organisation_name="Test organisation",
+        reservee_id="123456789",
+    )
+
+    stat = ReservationStatistic.objects.first()
+    assert stat.reservee_organisation_name == reservation.reservee_organisation_name
+    assert stat.reservee_id == ""
+
+
+def test_statistics__update__org_info_for_registered_organisation(settings):
+    settings.SAVE_RESERVATION_STATISTICS = True
+
+    reservation = ReservationFactory.create(
+        reservee_is_unregistered_association=False,
+        reservee_type=CustomerTypeChoice.BUSINESS,
+        reservee_organisation_name="Test organisation",
+        reservee_id="123456789",
+    )
+
+    stat = ReservationStatistic.objects.first()
+    assert stat.reservee_organisation_name == reservation.reservee_organisation_name
+    assert stat.reservee_id == reservation.reservee_id
+
+
+def test_statistics__update__no_org_info_for_individual(settings):
+    settings.SAVE_RESERVATION_STATISTICS = True
+
+    ReservationFactory.create(
+        reservee_is_unregistered_association=True,
+        reservee_type=CustomerTypeChoice.INDIVIDUAL,
+        reservee_organisation_name="Test organisation",
+        reservee_id="123456789",
+    )
+
+    stat = ReservationStatistic.objects.first()
+    assert stat.reservee_organisation_name == ""
+    assert stat.reservee_id == ""
 
 
 def test_statistics__update__purpose(settings):
