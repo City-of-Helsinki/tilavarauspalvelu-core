@@ -502,6 +502,8 @@ msgstr "Teksti, joka näytetään hakijoille heidän täyttäessään hakemuksia
 msgid "Application this section is in."
 msgstr "Hakemus jolle tämä osa kuuluu."
 
+#: applications/admin/forms/application_section.py
+#, python-format
 msgid ""
 "%(unallocated)s: Section has been created, but application round is still "
 "open. <br>%(in_allocation)s: Application round has closed, but the section "
@@ -514,8 +516,8 @@ msgstr ""
 "on vielä auki. <br>%(in_allocation)s: Hakuaika on sulkeutunut, mutta osaa ei "
 "ole vielä kokonaan käsitelty. <br>%(handled)s: Kausivarauskierros on "
 "käsitelty, tai osan toistokerrat on täytetty, tai kaikki varausyksikkö-"
-"vaihtoehdot on hylätty tai lukittu. <br>%(rejected)s: Kaikki "
-"haetut toistokerrat tälle hakemuksen osalle ovat lukittu tai hylätty. <br>"
+"vaihtoehdot on hylätty tai lukittu. <br>%(rejected)s: Kaikki haetut "
+"toistokerrat tälle hakemuksen osalle ovat lukittu tai hylätty. <br>"
 
 #: applications/admin/forms/application_section.py reservations/admin.py
 #: reservations/models/reservation_statistic.py
@@ -1341,6 +1343,10 @@ msgstr "Maksettu manuaalisesti"
 #: merchants/models.py
 msgid "Refunded"
 msgstr "Palautettu"
+
+#: merchants/models.py
+msgid "Free"
+msgstr "Maksuton"
 
 #: merchants/models.py tilavarauspalvelu/settings.py
 msgid "Finnish"
