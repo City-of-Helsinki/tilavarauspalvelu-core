@@ -56,6 +56,9 @@ type Props = TableProps & {
 // TODO overlay and spinner for loading would be preferable over colour switching
 export const CustomTable = ({ isLoading, ...props }: Props): JSX.Element => (
   <StyledTable
+    // NOTE have to unmount on data changes because there is a bug in the Table component
+    // removing this and using sort leaves ghost elements in the table.
+    key={JSON.stringify(props.rows)}
     $headingBackground={
       isLoading ? "var(--color-black-20)" : "var(--color-black-10)"
     }
