@@ -6,7 +6,7 @@ from django.utils.timezone import get_default_timezone
 
 from common.date_utils import local_datetime, next_hour, timedelta_to_json
 from reservation_units.models import ReservationUnitHierarchy
-from reservations.choices import ReservationStateChoice, ReservationTypeChoice
+from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import Reservation
 from tests.factories import (
     AgeGroupFactory,
@@ -243,7 +243,7 @@ def test_reservation__staff_create__optional_fields(graphql):
     data = get_staff_create_data(
         reservation_unit,
         type=ReservationTypeChoice.BLOCKED,
-        reserveeType="individual",
+        reserveeType=CustomerTypeChoice.INDIVIDUAL,
         reserveeFirstName="John",
         reserveeLastName="Doe",
         reserveeOrganisationName="Test Organisation ry",
@@ -281,7 +281,7 @@ def test_reservation__staff_create__optional_fields(graphql):
 
     reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
     assert reservation.type == ReservationTypeChoice.BLOCKED
-    assert reservation.reservee_type == "individual"
+    assert reservation.reservee_type == "INDIVIDUAL"
     assert reservation.reservee_first_name == "John"
     assert reservation.reservee_last_name == "Doe"
     assert reservation.reservee_organisation_name == "Test Organisation ry"
@@ -441,7 +441,7 @@ def test_reservation__staff_create__reservation_type_normal_not_accepted(graphql
     response = graphql(CREATE_STAFF_MUTATION, input_data=data)
 
     assert response.error_message() == (
-        "Reservation type normal is not allowed in this mutation. Allowed choices are blocked, staff, behalf."
+        "Reservation type NORMAL is not allowed in this mutation. Allowed choices are BLOCKED, STAFF, BEHALF."
     )
 
 

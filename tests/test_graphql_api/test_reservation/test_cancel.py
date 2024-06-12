@@ -60,7 +60,7 @@ def test_reservation__cancel__fails_if_state_is_not_confirmed(graphql):
 
     assert response.error_message() == "Mutation was unsuccessful."
     assert response.field_error_messages() == [
-        "Only reservations with state 'confirmed' can be cancelled.",
+        "Only reservations with state 'CONFIRMED' can be cancelled.",
     ]
 
     reservation.refresh_from_db()

@@ -71,7 +71,9 @@ def test_reservation__refund__invalid_state__ends_in_the_future(graphql):
     input_data = get_refund_data(reservation)
     response = graphql(REFUND_MUTATION, input_data=input_data)
 
-    assert response.error_message() == "Only reservations in the past or in state CANCELLED or DENIED can be refunded."
+    assert response.error_message() == (
+        "Only reservations in the past or in state 'CANCELLED' or 'DENIED' can be refunded."
+    )
 
     assert VerkkokauppaAPIClient.refund_order.called is False
     payment_order.refresh_from_db()

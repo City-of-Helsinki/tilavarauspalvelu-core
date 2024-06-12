@@ -206,7 +206,7 @@ def test_reservation__query__fields_requiring_staff_permissions__superuser(graph
     assert response.node(0) == {
         "pk": reservation.pk,
         "staffEvent": True,
-        "type": ReservationTypeChoice.STAFF.value.upper(),
+        "type": ReservationTypeChoice.STAFF.value,
         "workingMemo": reservation.working_memo,
         "handlingDetails": reservation.handling_details,
         "handledAt": reservation.handled_at.isoformat(),

@@ -46,19 +46,19 @@ class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reservation
 
         if self.instance.state != ReservationStateChoice.CONFIRMED.value:
             raise ValidationErrorWithCode(
-                "Only reservations in confirmed state can be rescheduled.",
+                "Only reservations in 'CONFIRMED' state can be rescheduled.",
                 ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED,
             )
 
         if self.instance.type not in ReservationTypeChoice.allowed_for_user_time_adjust:
             raise ValidationErrorWithCode(
-                "Only reservations of type 'normal' or 'behalf' can be rescheduled.",
+                "Only reservations of type 'NORMAL' or 'BEHALF' can be rescheduled.",
                 ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED,
             )
 
         if self.instance.handled_at:
             raise ValidationErrorWithCode(
-                "Reservation has gone through handling and it cannot be changed anymore.",
+                "Reservation has gone through handling and cannot be changed anymore.",
                 ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED,
             )
 

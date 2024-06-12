@@ -5,6 +5,7 @@ from django.utils.timezone import get_default_timezone
 
 from api.graphql.extensions.serializers import OldPrimaryKeySerializer
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
+from common.utils import comma_sep_str
 from merchants.models import OrderStatus, PaymentOrder
 from reservations.choices import ReservationStateChoice
 from reservations.models import Reservation
@@ -28,13 +29,12 @@ class ReservationRefundSerializer(OldPrimaryKeySerializer):
                 ValidationErrorCodes.REFUND_NOT_ALLOWED,
             )
 
-        valid_states: list[ReservationStateChoice]
-        valid_states = sorted([ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED])
+        valid_states = [ReservationStateChoice.CANCELLED.value, ReservationStateChoice.DENIED.value]
 
         if self.instance.state not in valid_states and self.instance.end >= now:
+            values = comma_sep_str(valid_states, last_sep="or", quote=True)
             raise ValidationErrorWithCode(
-                f"Only reservations in the past or in state "
-                f"{' or '.join(choice.value.upper() for choice in valid_states)} can be refunded.",
+                f"Only reservations in the past or in state {values} can be refunded.",
                 ValidationErrorCodes.REFUND_NOT_ALLOWED,
             )
 

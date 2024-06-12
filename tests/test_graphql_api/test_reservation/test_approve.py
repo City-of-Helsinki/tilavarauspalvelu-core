@@ -90,7 +90,7 @@ def test_reservation__approve__cant_approve_if_status_not_requires_handling(grap
 
     assert response.error_message() == "Mutation was unsuccessful."
     assert response.field_error_messages() == [
-        "Only reservations with state 'requires_handling' can be approved.",
+        "Only reservations with state 'REQUIRES_HANDLING' can be approved.",
     ]
 
     reservation.refresh_from_db()
