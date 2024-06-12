@@ -85,7 +85,7 @@
     "lint-staged": "^15.2.2",
     "postcss-scss": "^4.0.9",
     "postcss-styled-syntax": "^0.6.4",
-    "prettier": "^3.3.0",
+    "prettier": "^3.3.2",
     "stylelint": "^16.2.1",
     "stylelint-config-standard": "^36.0.0",
     "stylelint-config-styled-components": "^0.1.1",
