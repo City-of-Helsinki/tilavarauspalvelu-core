@@ -487,6 +487,7 @@ class Common(Environment):
     TPREK_UNIT_URL = values.URLValue()
     GRAPHQL_CODEGEN_ENABLED = False
     UPDATE_RESERVATION_UNIT_HIERARCHY = True
+    SAVE_RESERVATION_STATISTICS = True
 
     PRUNE_RESERVATIONS_OLDER_THAN_MINUTES = 20
     REMOVE_RESERVATION_STATS_OLDER_THAN_YEARS = 5
@@ -797,6 +798,8 @@ class AutomatedTests(AutomatedTestMixin, EmptyDefaults, Common, dotenv_path=None
     # Turn off reservation unit hierarchy updates from signals during tests,
     # since they slow them down a lot in CI. Refresh should be called manually when needed.
     UPDATE_RESERVATION_UNIT_HIERARCHY = False
+    # Turn off statistics saving during tests for performance reasons
+    SAVE_RESERVATION_STATISTICS = False
 
 
 class Build(EmptyDefaults, Common, use_environ=True):

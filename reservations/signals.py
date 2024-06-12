@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db.models.signals import m2m_changed, post_save
 from django.dispatch import receiver
 
@@ -7,6 +8,9 @@ from reservations.statistic_utils import create_or_update_reservation_statistics
 
 @receiver(post_save, sender=Reservation, dispatch_uid="update_reservation_statistics_on_save")
 def update_reservation_statistics_on_save(sender, instance=None, raw=False, **kwargs) -> None:
+    if not settings.SAVE_RESERVATION_STATISTICS:
+        return
+
     if raw:
         return
 
@@ -30,6 +34,9 @@ def update_reservation_statistics_on_save(sender, instance=None, raw=False, **kw
     dispatch_uid="update_reservation_statistics_on_runit_change",
 )
 def update_reservation_statistics_on_runit_change(sender, instance=None, action="", reverse=False, **kwargs) -> None:
+    if not settings.SAVE_RESERVATION_STATISTICS:
+        return
+
     raw = kwargs.get("raw", False)
     if action == "post_add" and reverse is False and raw is False:
         create_or_update_reservation_statistics(instance.pk)

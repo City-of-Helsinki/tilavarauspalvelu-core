@@ -12,7 +12,9 @@ pytestmark = [
 ]
 
 
-def test_prune_reservation_statistics__deletes_in_the_given_time():
+def test_prune_reservation_statistics__deletes_in_the_given_time(settings):
+    settings.SAVE_RESERVATION_STATISTICS = True
+
     five_years_ago = local_datetime() - relativedelta(years=5)
     four_years_ago = local_datetime() - relativedelta(years=4)
 
