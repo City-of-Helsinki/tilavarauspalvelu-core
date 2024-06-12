@@ -6,7 +6,8 @@ __all__ = [
 
 
 class ReservationDenyReason(models.Model):
-    reason = models.CharField(max_length=255, null=False, blank=False)
+    rank: int | None = models.PositiveBigIntegerField(null=True, blank=True, db_index=True)
+    reason: str = models.CharField(max_length=255)
 
     # Translated field hints
     reason_fi: str | None
@@ -17,7 +18,7 @@ class ReservationDenyReason(models.Model):
         db_table = "reservation_deny_reason"
         base_manager_name = "objects"
         ordering = [
-            "pk",
+            "rank",
         ]
 
     def __str__(self) -> str:
