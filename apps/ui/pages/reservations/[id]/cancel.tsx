@@ -14,6 +14,7 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { canUserCancelReservation } from "@/modules/reservation";
+import { reservationsPrefix } from "@/modules/const";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -61,6 +62,16 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
           ...(await serverSideTranslations(locale ?? "fi")),
           reservation: reservation ?? null,
           reasons,
+        },
+      };
+    } else if (reservation != null) {
+      return {
+        redirect: {
+          permanent: true,
+          destination: `${reservationsPrefix}/${reservation.pk}`,
+        },
+        props: {
+          notFound: true, // for prop narrowing
         },
       };
     }
