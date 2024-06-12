@@ -1565,7 +1565,7 @@ function OpeningHoursSection({
 
   const previewUrl = `${previewUrlPrefix}/${reservationUnit?.pk}?ru=${reservationUnit?.uuid}#calendar`;
   const previewDisabled =
-    previewUrlPrefix !== "" || !reservationUnit?.pk || !reservationUnit?.uuid;
+    previewUrlPrefix === "" || !reservationUnit?.pk || !reservationUnit?.uuid;
 
   // TODO refactor this to inner wrapper (so we don't have a ternary in the middle)
   return (
@@ -2095,8 +2095,9 @@ function ReservationUnitEditor({
   const previewDisabled =
     isSaving ||
     !reservationUnit?.pk ||
-    !reservationUnit?.uuid ||
-    previewUrlPrefix !== "";
+    !reservationUnit.uuid ||
+    previewUrlPrefix === "";
+
   const draftEnabled = hasChanges || !watch("isDraft");
   const publishEnabled = hasChanges || watch("isDraft");
   const archiveEnabled = watch("pk") !== 0 && !watch("isArchived");
@@ -2288,6 +2289,8 @@ function EditorWrapper({ previewUrlPrefix }: { previewUrlPrefix: string }) {
   ];
   const backLink = reservationUnitPk == null ? `/unit/${unitPk}` : undefined;
 
+  const cleanPreviewUrlPrefix = previewUrlPrefix.replace(/\/$/, "");
+
   return (
     <Wrapper>
       <BreadcrumbWrapper route={route} backLink={backLink} />
@@ -2296,7 +2299,7 @@ function EditorWrapper({ previewUrlPrefix }: { previewUrlPrefix: string }) {
         form={form}
         unitPk={unitPk}
         refetch={refetch}
-        previewUrlPrefix={previewUrlPrefix}
+        previewUrlPrefix={cleanPreviewUrlPrefix}
       />
     </Wrapper>
   );
