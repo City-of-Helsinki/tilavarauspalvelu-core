@@ -1,8 +1,8 @@
 from typing import TYPE_CHECKING
 
 from django.conf import settings
+from graphene_django_extensions.fields import EnumFriendlyChoiceField
 
-from api.graphql.extensions.fields import OldChoiceCharField
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from api.graphql.types.reservation.serializers.update_serializers import ReservationUpdateSerializer
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
@@ -24,14 +24,11 @@ if TYPE_CHECKING:
 class ReservationConfirmSerializer(ReservationUpdateSerializer):
     instance: Reservation
 
-    payment_type = OldChoiceCharField(
+    payment_type = EnumFriendlyChoiceField(
         choices=PaymentType.choices,
+        enum=PaymentType,
         required=False,
         write_only=True,
-        help_text=(
-            "Type of the payment. "
-            f"Possible values are {', '.join(value[0].upper() for value in PaymentType.choices)}."
-        ),
     )
 
     def __init__(self, *args, **kwargs) -> None:

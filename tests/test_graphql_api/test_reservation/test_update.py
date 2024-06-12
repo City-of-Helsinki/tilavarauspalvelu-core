@@ -359,7 +359,7 @@ def test_reservation__update__confirm(graphql):
     graphql.login_with_superuser()
     response = graphql(UPDATE_MUTATION, input_data=input_data)
 
-    assert response.error_message() == "Setting the reservation state to 'confirmed' is not allowed."
+    assert response.error_message() == "Setting the reservation state to 'CONFIRMED' is not allowed."
 
 
 def test_reservation__update__all_required_fields_are_filled(graphql):

@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from django.utils.timezone import get_default_timezone
-from graphene_django_extensions.fields import IntegerPrimaryKeyField
+from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPrimaryKeyField
 from graphql import GraphQLError
 from rest_framework import serializers
 
@@ -36,7 +36,6 @@ DEFAULT_TIMEZONE = get_default_timezone()
 
 
 class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin, ReservationSchedulingMixin):
-    state = OldChoiceCharField(choices=ReservationStateChoice.choices)
     reservation_unit_pks = serializers.ListField(
         child=IntegerPrimaryKeyField(queryset=ReservationUnit.objects.all()),
         source="reservation_unit",
@@ -44,11 +43,14 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
     purpose_pk = IntegerPrimaryKeyField(queryset=ReservationPurpose.objects.all(), source="purpose", allow_null=True)
     home_city_pk = IntegerPrimaryKeyField(queryset=City.objects.all(), source="home_city", allow_null=True)
     age_group_pk = IntegerPrimaryKeyField(queryset=AgeGroup.objects.all(), source="age_group", allow_null=True)
-    reservee_type = OldChoiceCharField(choices=CustomerTypeChoice.choices)
-    reservee_language = OldChoiceCharField(choices=RESERVEE_LANGUAGE_CHOICES, required=False, default="")
+
     buffer_time_before = DurationField(required=False)
     buffer_time_after = DurationField(required=False)
-    type = OldChoiceCharField(required=False, choices=ReservationTypeChoice.choices)
+
+    state = EnumFriendlyChoiceField(choices=ReservationStateChoice.choices, enum=ReservationStateChoice)
+    reservee_type = EnumFriendlyChoiceField(choices=CustomerTypeChoice.choices, enum=CustomerTypeChoice)
+    type = EnumFriendlyChoiceField(choices=ReservationTypeChoice.choices, enum=ReservationTypeChoice, required=False)
+    reservee_language = OldChoiceCharField(choices=RESERVEE_LANGUAGE_CHOICES, default="", required=False)
 
     class Meta:
         model = Reservation

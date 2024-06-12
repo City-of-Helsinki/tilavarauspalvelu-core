@@ -16,10 +16,6 @@ class ReservationUpdateSerializer(OldPrimaryKeyUpdateSerializer, ReservationCrea
         super().__init__(*args, **kwargs)
         self.fields["state"].read_only = False
         self.fields["state"].required = False
-        self.fields["state"].help_text = (
-            "String value for ReservationType's ReservationState enum. "
-            f"Possible values are {', '.join(value.upper() for value in ReservationStateChoice.values)}."
-        )
         self.fields["reservee_first_name"].required = False
         self.fields["reservee_last_name"].required = False
         self.fields["reservee_phone"].required = False
@@ -87,7 +83,7 @@ class ReservationUpdateSerializer(OldPrimaryKeyUpdateSerializer, ReservationCrea
         required_fields = metadata_set.required_fields.order_by("field_name").all() if metadata_set else []
 
         reservee_type = data.get("reservee_type", getattr(self.instance, "reservee_type", None))
-        if required_fields and reservee_type == CustomerTypeChoice.INDIVIDUAL.value.lower():
+        if required_fields and reservee_type == CustomerTypeChoice.INDIVIDUAL:
             required_fields = metadata_set.required_fields.exclude(field_name__in=non_mandatory_fields_for_person)
 
         for required_field in required_fields:

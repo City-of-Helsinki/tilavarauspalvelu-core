@@ -37,8 +37,7 @@ class ReservationApproveSerializer(NestingModelSerializer):
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         if self.instance.state != ReservationStateChoice.REQUIRES_HANDLING:
-            state = str(ReservationStateChoice.REQUIRES_HANDLING)
-            msg = f"Only reservations with state {state!r} can be approved."
+            msg = "Only reservations with state 'REQUIRES_HANDLING' can be approved."
             raise ValidationError(msg, code=error_codes.RESERVATION_APPROVING_NOT_ALLOWED)
 
         return data
