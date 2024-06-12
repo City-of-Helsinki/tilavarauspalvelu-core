@@ -33,6 +33,9 @@ class ReservationStatistic(models.Model):
 
     applying_for_free_of_charge: bool = models.BooleanField(default=False, blank=True)
 
+    reservee_id: str = models.CharField(max_length=255, blank=True, default="")
+    reservee_organisation_name: str = models.CharField(max_length=255, blank=True, default="")
+    reservee_address_zip: str = models.CharField(max_length=255, blank=True, default="")
     reservee_is_unregistered_association: bool = models.BooleanField(null=True, default=False, blank=True)
     reservee_language: str = models.CharField(max_length=255, blank=True, default="")
     reservee_type: str | None = models.CharField(max_length=255, null=True, blank=True)
