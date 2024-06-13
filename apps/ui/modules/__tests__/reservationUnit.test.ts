@@ -11,6 +11,10 @@ import {
   type ReservationUnitNode,
   Status,
   PricingFieldsFragment,
+  Authentication,
+  ReservationKind,
+  ReservationStartInterval,
+  ReservationState,
 } from "@gql/gql-types";
 import {
   getEquipmentCategories,
@@ -23,6 +27,7 @@ import {
   getUnitName,
   isReservationUnitPaidInFuture,
   isReservationUnitPublished,
+  isReservationUnitReservable,
 } from "../reservationUnit";
 import mockTranslations from "../../public/locales/fi/prices.json";
 import { type RoundPeriod } from "../reservation";
@@ -1090,5 +1095,214 @@ describe("isReservationUnitPaidInFuture", () => {
     ] as ReservationUnitPricingNode[];
 
     expect(isReservationUnitPaidInFuture(pricings)).toBe(false);
+  });
+});
+
+describe("isReservationUnitReservable", () => {
+  const date = new Date().toISOString().split("T")[0];
+  const reservationUnit: ReservationUnitNode = {
+    id: "1234",
+    allowReservationsWithoutOpeningHours: false,
+    authentication: Authentication.Strong,
+    canApplyFreeOfCharge: false,
+    contactInformation: "",
+    isArchived: false,
+    isDraft: false,
+    requireIntroduction: false,
+    requireReservationHandling: false,
+    ReservationKind: ReservationKind.Direct,
+    reservationStartInterval: ReservationStartInterval.Interval_15Mins,
+    uuid: "1234",
+    images: [],
+    reservableTimeSpans: [
+      {
+        startDatetime: `${date}T04:00:00+00:00`,
+        endDatetime: `${date}T20:00:00+00:00`,
+      },
+    ],
+  } as unknown as ReservationUnitNode;
+
+  test("returns true for a unit that is reservable", () => {
+    const [res1] = isReservationUnitReservable({
+      ...reservationUnit,
+      minReservationDuration: 3600,
+      maxReservationDuration: 3600,
+      metadataSet: {
+        id: "1234",
+        supportedFields: [
+          {
+            id: "1234",
+            fieldName: "name",
+          },
+        ],
+        requiredFields: [],
+      },
+      reservationState: ReservationState.Reservable,
+    });
+    expect(res1).toBe(true);
+
+    const [res2] = isReservationUnitReservable({
+      ...reservationUnit,
+      minReservationDuration: 3600,
+      maxReservationDuration: 3600,
+      metadataSet: {
+        id: "1234",
+        supportedFields: [
+          {
+            id: "1234",
+            fieldName: "name",
+          },
+        ],
+        requiredFields: [],
+      },
+      reservationState: ReservationState.ScheduledClosing,
+    });
+    expect(res2).toBe(true);
+  });
+
+  test("returns false for a unit that is not reservable", () => {
+    const [res1] = isReservationUnitReservable({
+      ...reservationUnit,
+      minReservationDuration: 3600,
+      maxReservationDuration: 3600,
+      reservableTimeSpans: undefined,
+      metadataSet: {
+        id: "1234",
+        supportedFields: [
+          {
+            id: "1234",
+            fieldName: "name",
+          },
+        ],
+        requiredFields: [],
+      },
+      reservationState: ReservationState.ReservationClosed,
+    });
+    expect(res1).toBe(false);
+
+    const [res2] = isReservationUnitReservable({
+      ...reservationUnit,
+      metadataSet: {
+        id: "1234",
+        supportedFields: [
+          {
+            id: "1234",
+            fieldName: "name",
+          },
+        ],
+        requiredFields: [],
+      },
+      reservationState: ReservationState.ReservationClosed,
+    });
+    expect(res2).toBe(false);
+
+    const [res3] = isReservationUnitReservable({
+      ...reservationUnit,
+      minReservationDuration: 3600,
+      metadataSet: {
+        id: "1234",
+        supportedFields: [
+          {
+            id: "1234",
+            fieldName: "name",
+          },
+        ],
+        requiredFields: [],
+      },
+      reservationState: ReservationState.Reservable,
+    });
+    expect(res3).toBe(false);
+
+    const [res4] = isReservationUnitReservable({
+      ...reservationUnit,
+      maxReservationDuration: 3600,
+      metadataSet: {
+        id: "1234",
+        supportedFields: [
+          {
+            id: "1234",
+            fieldName: "name",
+          },
+        ],
+        requiredFields: [],
+      },
+      reservationState: ReservationState.Reservable,
+    });
+    expect(res4).toBe(false);
+
+    const [res5] = isReservationUnitReservable({
+      ...reservationUnit,
+      minReservationDuration: 3600,
+      maxReservationDuration: 3600,
+      metadataSet: {
+        id: "1234",
+        supportedFields: [
+          {
+            id: "1234",
+            fieldName: "name",
+          },
+        ],
+        requiredFields: [],
+      },
+      reservationState: ReservationState.ScheduledReservation,
+    });
+    expect(res5).toBe(false);
+
+    const [res6] = isReservationUnitReservable({
+      ...reservationUnit,
+      minReservationDuration: 3600,
+      maxReservationDuration: 3600,
+      metadataSet: {
+        id: "1234",
+        supportedFields: [
+          {
+            id: "1234",
+            fieldName: "name",
+          },
+        ],
+        requiredFields: [],
+      },
+      reservationState: ReservationState.ScheduledPeriod,
+    });
+    expect(res6).toBe(false);
+  });
+
+  test("returns correct value with buffer days", () => {
+    const [res1] = isReservationUnitReservable({
+      ...reservationUnit,
+      minReservationDuration: 3600,
+      maxReservationDuration: 3600,
+      reservationBegins: addDays(new Date(), 5).toISOString(),
+      reservationsMaxDaysBefore: 5,
+      metadataSet: {
+        id: "1234",
+        supportedFields: [
+          {
+            id: "1234",
+            fieldName: "name",
+          },
+        ],
+        requiredFields: [],
+      },
+    });
+    expect(res1).toBe(false);
+
+    const [res2] = isReservationUnitReservable({
+      ...reservationUnit,
+      reservationBegins: addDays(new Date(), 5).toISOString(),
+      reservationsMaxDaysBefore: 4,
+      reservableTimeSpans: undefined,
+      metadataSet: {
+        id: "1234",
+        supportedFields: [
+          {
+            id: "1234",
+            fieldName: "name",
+          },
+        ],
+        requiredFields: [],
+      },
+    });
+    expect(res2).toBe(false);
   });
 });

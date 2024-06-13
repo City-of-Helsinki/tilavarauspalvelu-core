@@ -1,21 +1,19 @@
 import {
-  ReservableTimeSpanType,
-  ReservationUnitsReservationUnitReservationStartIntervalChoices,
+  type ReservationNode,
+  ReservationStartInterval,
 } from "../../../gql/gql-types";
-import {
-  areReservableTimesAvailable,
-  getIntervalMinutes,
-  getMinReservation,
-  getValidEndingTime,
-} from "../../calendar/util";
-import { convertHMSToSeconds, formatDuration, secondsToHms } from "../util";
+import { getEventBuffers } from "../../calendar/util";
+import { convertHMSToSeconds, secondsToHms } from "../util";
+import { getIntervalMinutes } from "../../helpers";
+
+const tfunction = (str: string, options: { count: number }) => {
+  const countStr = options?.count > 1 ? "plural" : "singular";
+  return options?.count ? `${options.count} ${countStr}` : str;
+};
 
 jest.mock("next-i18next", () => ({
   i18n: {
-    t: (str: string, options: { count: number }) => {
-      const countStr = options?.count > 1 ? "plural" : "singular";
-      return options?.count ? `${options.count} ${countStr}` : str;
-    },
+    t: (str: string, options: { count: number }) => tfunction(str, options),
   },
 }));
 
@@ -33,235 +31,58 @@ test("convertHMSToSeconds", () => {
   expect(convertHMSToSeconds("")).toBe(null);
 });
 
-test("formatDuration", () => {
-  expect(formatDuration("1:30:00")).toEqual("1 singular 30 plural");
-  expect(formatDuration("2:00:00")).toEqual("2 plural");
-  expect(formatDuration("foo")).toEqual("-");
-  expect(formatDuration("")).toEqual("-");
-});
-
 test("getIntervalMinutes", () => {
-  expect(
-    getIntervalMinutes(
-      0 as unknown as ReservationUnitsReservationUnitReservationStartIntervalChoices
-    )
-  ).toBe(0);
-
-  expect(
-    getIntervalMinutes(
-      undefined as unknown as ReservationUnitsReservationUnitReservationStartIntervalChoices
-    )
-  ).toBe(0);
-
-  expect(
-    getIntervalMinutes(
-      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
-    )
-  ).toBe(15);
-
-  expect(
-    getIntervalMinutes(
-      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_30Mins
-    )
-  ).toBe(30);
-
-  expect(
-    getIntervalMinutes(
-      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_60Mins
-    )
-  ).toBe(60);
-
-  expect(
-    getIntervalMinutes(
-      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_90Mins
-    )
-  ).toBe(90);
+  expect(getIntervalMinutes(ReservationStartInterval.Interval_15Mins)).toBe(15);
+  expect(getIntervalMinutes(ReservationStartInterval.Interval_30Mins)).toBe(30);
+  expect(getIntervalMinutes(ReservationStartInterval.Interval_60Mins)).toBe(60);
+  expect(getIntervalMinutes(ReservationStartInterval.Interval_90Mins)).toBe(90);
 });
 
-describe("getMinReservation", () => {
-  test("should return correct times", () => {
-    const begin = new Date("2021-01-01T10:00:00.000Z");
-    const minReservationDuration = 3600;
-    const reservationStartInterval =
-      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_90Mins;
-
-    expect(
-      getMinReservation({
-        begin,
-        minReservationDuration,
-        reservationStartInterval,
-      })
-    ).toEqual({
-      begin: new Date("2021-01-01T10:00:00.000Z"),
-      end: new Date("2021-01-01T11:30:00.000Z"),
-    });
-  });
-
-  test("should return correct times", () => {
-    const begin = new Date("2021-01-01T10:00:00.000Z");
-    const minReservationDuration = 3600;
-    const reservationStartInterval =
-      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_30Mins;
-
-    expect(
-      getMinReservation({
-        begin,
-        minReservationDuration,
-        reservationStartInterval,
-      })
-    ).toEqual({
-      begin: new Date("2021-01-01T10:00:00.000Z"),
-      end: new Date("2021-01-01T11:00:00.000Z"),
-    });
-  });
-});
-
-describe("getValidEndingTime", () => {
-  test("should return original end time", () => {
-    const start = new Date("2021-01-01T10:00:00.000Z");
-    const end = new Date("2021-01-01T12:00:00.000Z");
-    const reservationStartInterval =
-      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_60Mins;
-
-    expect(
-      getValidEndingTime({ start, end, reservationStartInterval })
-    ).toEqual(end);
-  });
-
-  test("should return previous fitting end time", () => {
-    const start = new Date("2021-01-01T10:00:00.000Z");
-    const end = new Date("2021-01-01T12:00:00.000Z");
-    const reservationStartInterval =
-      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_90Mins;
-
-    expect(
-      getValidEndingTime({ start, end, reservationStartInterval })
-    ).toEqual(new Date("2021-01-01T11:30:00.000Z"));
-  });
-
-  test("should return previous fitting end time", () => {
-    const start = new Date("2021-01-01T10:00:00.000Z");
-    const end = new Date("2021-01-01T14:00:00.000Z");
-    const reservationStartInterval =
-      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_90Mins;
-
-    expect(
-      getValidEndingTime({
-        start,
-        end,
-        reservationStartInterval,
-      })
-    ).toEqual(new Date("2021-01-01T13:00:00.000Z"));
-  });
-
-  test("should return previous fitting end time", () => {
-    const start = new Date("2021-01-01T10:00:00.000Z");
-    const end = new Date("2021-01-01T12:00:00.000Z");
-    const reservationStartInterval =
-      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_90Mins;
-
-    expect(
-      getValidEndingTime({
-        start,
-        end,
-        reservationStartInterval,
-      })
-    ).toEqual(new Date("2021-01-01T11:30:00.000Z"));
-  });
-});
-
-describe("areOpeningTimesAvailable", () => {
-  test("should return true if opening times are available", () => {
-    const openingHours: ReservableTimeSpanType[] = [
+describe("getEventBuffers", () => {
+  test("outputs correct buffers", () => {
+    const events = [
       {
-        startDatetime: "2022-02-02T10:00:00+00:00",
-        endDatetime: "2022-02-02T12:00:00+00:00",
-      },
-    ];
-
-    expect(
-      areReservableTimesAvailable(
-        openingHours,
-        new Date("2022-02-02T10:00:00+00:00")
-      )
-    ).toBe(true);
-  });
-
-  test("should return true if opening times are available", () => {
-    const openingHours: ReservableTimeSpanType[] = [
-      {
-        startDatetime: "2022-02-02T10:00:00+00:00",
-        endDatetime: "2022-02-02T12:00:00+00:00",
-      },
-    ];
-
-    expect(
-      areReservableTimesAvailable(
-        openingHours,
-        new Date("2022-02-02T12:00:00+00:00")
-      )
-    ).toBe(false);
-  });
-
-  test("should return true if opening times are available", () => {
-    const openingHours: ReservableTimeSpanType[] = [
-      {
-        startDatetime: "2022-02-02T10:00:00+00:00",
-        endDatetime: "2022-02-02T12:00:00+00:00",
-      },
-    ];
-
-    expect(
-      areReservableTimesAvailable(
-        openingHours,
-        new Date("2022-02-02T12:00:00+00:00"),
-        true
-      )
-    ).toBe(true);
-  });
-
-  test("should work for multiday", () => {
-    const openingHours: ReservableTimeSpanType[] = [
-      {
-        startDatetime: "2022-02-02T10:00:00+00:00",
-        endDatetime: "2022-02-02T12:00:00+00:00",
+        id: "1234",
+        begin: new Date("2019-09-22T12:00:00+00:00").toString(),
+        end: new Date("2019-09-22T13:00:00+00:00").toString(),
+        bufferTimeBefore: 3600,
+        bufferTimeAfter: 5400,
       },
       {
-        startDatetime: "2022-02-02T10:00:00+00:00",
-        endDatetime: "2022-02-02T12:00:00+00:00",
+        id: "3456",
+        begin: new Date("2019-09-22T15:00:00+00:00").toString(),
+        end: new Date("2019-09-22T16:00:00+00:00").toString(),
+        bufferTimeBefore: null,
+        bufferTimeAfter: 9000,
       },
-    ];
+    ] as ReservationNode[];
 
-    expect(
-      areReservableTimesAvailable(
-        openingHours,
-        new Date("2022-02-02T22:00:00+00:00"),
-        true
-      )
-    ).toBe(true);
-
-    expect(
-      areReservableTimesAvailable(
-        openingHours,
-        new Date("2022-02-02T22:30:00+00:00"),
-        true
-      )
-    ).toBe(false);
-
-    expect(
-      areReservableTimesAvailable(
-        openingHours,
-        new Date("2022-02-03T06:30:00+00:00"),
-        true
-      )
-    ).toBe(false);
-
-    expect(
-      areReservableTimesAvailable(
-        openingHours,
-        new Date("2022-02-03T07:00:00+00:00"),
-        true
-      )
-    ).toBe(true);
+    expect(getEventBuffers([])).toEqual([]);
+    expect(getEventBuffers(events)).toEqual([
+      {
+        start: new Date("2019-09-22T11:00:00+00:00"),
+        end: new Date("2019-09-22T12:00:00+00:00"),
+        event: {
+          ...events[0],
+          state: "BUFFER",
+        },
+      },
+      {
+        start: new Date("2019-09-22T13:00:00+00:00"),
+        end: new Date("2019-09-22T14:30:00+00:00"),
+        event: {
+          ...events[0],
+          state: "BUFFER",
+        },
+      },
+      {
+        start: new Date("2019-09-22T16:00:00+00:00"),
+        end: new Date("2019-09-22T18:30:00+00:00"),
+        event: {
+          ...events[1],
+          state: "BUFFER",
+        },
+      },
+    ]);
   });
 });

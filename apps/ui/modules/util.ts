@@ -24,7 +24,10 @@ import {
   reservationsPrefix,
   isBrowser,
 } from "./const";
-import type { LocalizationLanguages } from "common/src/helpers";
+import {
+  type LocalizationLanguages,
+  getIntervalMinutes,
+} from "common/src/helpers";
 
 export { formatDuration } from "common/src/common/util";
 export { fromAPIDate, fromUIDate };
@@ -326,35 +329,6 @@ export function formatDateTime(t: TFunction, date: Date): string {
     date,
   });
   return `${dateStr} ${timeStr}`;
-}
-
-export function getIntervalMinutes(
-  reservationStartInterval: ReservationStartInterval
-): number {
-  switch (reservationStartInterval) {
-    case "INTERVAL_15_MINS":
-      return 15;
-    case "INTERVAL_30_MINS":
-      return 30;
-    case "INTERVAL_60_MINS":
-      return 60;
-    case "INTERVAL_90_MINS":
-      return 90;
-    case "INTERVAL_120_MINS":
-      return 120;
-    case "INTERVAL_180_MINS":
-      return 180;
-    case "INTERVAL_240_MINS":
-      return 240;
-    case "INTERVAL_300_MINS":
-      return 300;
-    case "INTERVAL_360_MINS":
-      return 360;
-    case "INTERVAL_420_MINS":
-      return 420;
-    default:
-      throw new Error("Invalid reservation start interval");
-  }
 }
 
 export function getDayIntervals(

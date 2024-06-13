@@ -1,4 +1,8 @@
-import type { ImageFragment, Maybe } from "../gql/gql-types";
+import type {
+  ImageFragment,
+  Maybe,
+  ReservationStartInterval,
+} from "../gql/gql-types";
 import { pixel } from "./common/style";
 
 export function filterNonNullable<T>(
@@ -102,5 +106,33 @@ function getImageSourceWithoutDefault(
       return image.imageUrl ?? null;
     default:
       return null;
+  }
+}
+export function getIntervalMinutes(
+  reservationStartInterval: ReservationStartInterval
+): number {
+  switch (reservationStartInterval) {
+    case "INTERVAL_15_MINS":
+      return 15;
+    case "INTERVAL_30_MINS":
+      return 30;
+    case "INTERVAL_60_MINS":
+      return 60;
+    case "INTERVAL_90_MINS":
+      return 90;
+    case "INTERVAL_120_MINS":
+      return 120;
+    case "INTERVAL_180_MINS":
+      return 180;
+    case "INTERVAL_240_MINS":
+      return 240;
+    case "INTERVAL_300_MINS":
+      return 300;
+    case "INTERVAL_360_MINS":
+      return 360;
+    case "INTERVAL_420_MINS":
+      return 420;
+    default:
+      throw new Error("Invalid reservation start interval");
   }
 }

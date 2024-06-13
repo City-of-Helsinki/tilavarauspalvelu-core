@@ -31,8 +31,8 @@ import {
   ReservableTimeSpanType,
 } from "@gql/gql-types";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
-import { filterNonNullable } from "common/src/helpers";
-import { getDayIntervals, getIntervalMinutes, getTranslation } from "./util";
+import { filterNonNullable, getIntervalMinutes } from "common/src/helpers";
+import { getDayIntervals, getTranslation } from "./util";
 import type { TFunction } from "i18next";
 import { type SlotProps } from "common/src/calendar/Calendar";
 
@@ -716,7 +716,7 @@ function doesSlotCollideWithApplicationRounds(
   );
 }
 
-export function areSlotsReservable(
+function areSlotsReservable(
   slots: Date[],
   reservableTimes: ReservableMap,
   // reservableTimeSpans: ReservableTimeSpanType[],
@@ -855,7 +855,7 @@ function doesBufferCollide(
   return areIntervalsOverlapping(reservationInterval, newReservationInterval);
 }
 
-export function doReservationsCollide(
+function doReservationsCollide(
   newReservation: { start: Date; end: Date },
   reservations: Pick<ReservationNode, "begin" | "end">[] = []
 ): boolean {
