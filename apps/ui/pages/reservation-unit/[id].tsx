@@ -464,9 +464,24 @@ const ReservationUnit = ({
     ? reservationUnit.maxReservationDuration / 60
     : Number.MAX_SAFE_INTEGER;
 
-  const initialDuration = Math.max(
-    minReservationDurationMinutes,
-    durationOptions[0]?.value ?? 0
+  // Duration needs to always be within the bounds of the reservation unit
+  // and be defined otherwise the Duration select breaks (visual bugs)
+  const clampDuration = useCallback(
+    (duration: number): number => {
+      const initialDuration = Math.max(
+        minReservationDurationMinutes,
+        durationOptions[0]?.value ?? 0
+      );
+      return Math.min(
+        Math.max(duration, initialDuration),
+        maxReservationDurationMinutes
+      );
+    },
+    [
+      durationOptions,
+      minReservationDurationMinutes,
+      maxReservationDurationMinutes,
+    ]
   );
 
   const searchUIDate = fromUIDate(searchDate ?? "");
@@ -479,10 +494,7 @@ const ReservationUnit = ({
       searchUIDate != null && isValidDate(searchUIDate)
         ? searchDate ?? ""
         : defaultDateString,
-    duration: Math.min(
-      Math.max(searchDuration ?? 0, initialDuration),
-      maxReservationDurationMinutes
-    ),
+    duration: clampDuration(searchDuration ?? 0),
     time: searchTime ?? getTimeString(defaultDate),
     isControlsVisible: true,
   };
@@ -686,9 +698,12 @@ const ReservationUnit = ({
 
       const newDate = toUIDate(begin);
       const newTime = getTimeString(begin);
+      // duration should never be smaller than the minimum duration option
+      const originalDuration = differenceInMinutes(end, start);
+      const duration = clampDuration(originalDuration);
       setValue("date", newDate);
+      setValue("duration", duration);
       setValue("time", newTime);
-      setValue("duration", differenceInMinutes(end, start));
 
       if (isTouchDevice()) {
         // TODO test: does setValue work?
@@ -698,6 +713,7 @@ const ReservationUnit = ({
       return true;
     },
     [
+      clampDuration,
       isReservationQuotaReached,
       reservableTimes,
       reservationUnit,
@@ -812,8 +828,8 @@ const ReservationUnit = ({
 
   // TODO should be combined with calendar events
   const eventBuffers = useMemo(() => {
-    const bufferTimeBefore = reservationUnit.bufferTimeBefore ?? 0;
-    const bufferTimeAfter = reservationUnit.bufferTimeAfter ?? 0;
+    const bufferTimeBefore = reservationUnit.bufferTimeBefore;
+    const bufferTimeAfter = reservationUnit.bufferTimeAfter;
     const evts = calendarEvents
       .flatMap((e) => e.event)
       .filter((n): n is NonNullable<typeof n> => n != null);
@@ -926,6 +942,7 @@ const ReservationUnit = ({
     const beginDate = new Date(begin);
     const endDate = new Date(end);
 
+    // TODO why? can't we set it using the form or can we make an intermediate reset function
     handleCalendarEventChange({
       start: beginDate,
       end: endDate,
@@ -1133,9 +1150,6 @@ const ReservationUnit = ({
                         setCalendarViewType(n);
                       }
                     }}
-                    onSelecting={(event: CalendarEvent<ReservationNode>) =>
-                      handleCalendarEventChange(event)
-                    }
                     min={dayStartTime}
                     showToolbar
                     reservable={!isReservationQuotaReached}
@@ -1147,9 +1161,10 @@ const ReservationUnit = ({
                     // NOTE there was logic here to disable dragging on mobile
                     // it breaks SSR render because it swaps the whole Calendar component
                     draggable
+                    onSelectSlot={handleSlotClick}
                     onEventDrop={handleCalendarEventChange}
                     onEventResize={handleCalendarEventChange}
-                    onSelectSlot={handleSlotClick}
+                    onSelecting={handleCalendarEventChange}
                     draggableAccessor={({ event }) =>
                       event?.state?.toString() === "INITIAL"
                     }

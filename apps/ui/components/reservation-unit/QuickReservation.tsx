@@ -44,6 +44,11 @@ const Wrapper = styled.form`
   margin-bottom: var(--spacing-l);
   padding: var(--spacing-m);
   max-width: 400px;
+
+  /* hack for page jumping when the size of the component changes */
+  @media (min-width: ${breakpoints.s}) {
+    height: 391.797px;
+  }
 `;
 
 const Heading = styled(H4).attrs({ as: "h3" })`
@@ -154,7 +159,7 @@ const ActionWrapper = styled.div`
   justify-content: space-between;
 `;
 
-const QuickReservation = ({
+function QuickReservation({
   reservationUnit,
   subventionSuffix,
   reservationForm,
@@ -164,7 +169,7 @@ const QuickReservation = ({
   nextAvailableTime,
   submitReservation,
   LoginAndSubmit,
-}: Props): JSX.Element | null => {
+}: Props): JSX.Element | null {
   const { t } = useTranslation();
   const { control, setValue, watch, handleSubmit } = reservationForm;
   const formDate = watch("date");
@@ -309,6 +314,6 @@ const QuickReservation = ({
       </ActionWrapper>
     </Wrapper>
   );
-};
+}
 
 export default QuickReservation;

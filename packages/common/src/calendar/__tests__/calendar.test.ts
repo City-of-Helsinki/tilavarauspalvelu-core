@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { addDays, format, addMinutes } from "date-fns";
-import { getEventBuffers, } from "../util";
+import { getEventBuffers } from "../util";
 import {
   ReservableTimeSpanType,
   ReservationNode,
