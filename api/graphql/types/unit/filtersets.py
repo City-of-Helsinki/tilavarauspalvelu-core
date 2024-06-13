@@ -1,12 +1,15 @@
 import django_filters
 from django.db import models
-from django.db.models import Count, Q
+from django.db.models import Q
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import IntMultipleChoiceFilter
 
 from api.graphql.types.unit.types import Unit
 from common.date_utils import local_datetime
+from common.db import SubqueryCount
 from reservation_units.enums import ReservationKind
+from reservation_units.models import ReservationUnit
+from reservations.models import Reservation
 
 __all__ = [
     "UnitFilterSet",
@@ -22,12 +25,12 @@ class UnitFilterSet(ModelFilterSet):
 
     service_sector = django_filters.NumberFilter(field_name="service_sectors__pk")
 
-    only_with_permission = django_filters.BooleanFilter(method="get_only_with_permission")
-    published_reservation_units = django_filters.BooleanFilter(method="get_published_reservation_units")
-    own_reservations = django_filters.BooleanFilter(method="get_own_reservations")
+    only_with_permission = django_filters.BooleanFilter(method="filter_by_only_with_permission")
+    published_reservation_units = django_filters.BooleanFilter(method="filter_by_published_reservation_units")
+    own_reservations = django_filters.BooleanFilter(method="filter_by_own_reservations")
 
-    only_direct_bookable = django_filters.BooleanFilter(method="get_only_direct_bookable")
-    only_seasonal_bookable = django_filters.BooleanFilter(method="get_only_seasonal_bookable")
+    only_direct_bookable = django_filters.BooleanFilter(method="filter_by_only_direct_bookable")
+    only_seasonal_bookable = django_filters.BooleanFilter(method="filter_by_only_seasonal_bookable")
 
     class Meta:
         model = Unit
@@ -47,21 +50,7 @@ class UnitFilterSet(ModelFilterSet):
             ("unit_groups__name", "unit_group_name"),
         ]
 
-    def filter_queryset(self, queryset):
-        queryset = queryset.annotate(
-            reservation_count=Count("reservationunit__reservation"),
-            reservation_units_count=Count("reservationunit"),
-        )
-
-        return super().filter_queryset(queryset)
-
-    def filter_by_pk(self, qs, name, value):
-        if value:
-            return qs.filter(id__in=[model.id for model in value])
-
-        return qs
-
-    def get_only_with_permission(self, qs, name, value):
+    def filter_by_only_with_permission(self, qs: models.QuerySet, name: str, value: bool) -> models.QuerySet:
         """Returns units where the user has any kind of permissions"""
         if not value:
             return qs
@@ -78,7 +67,21 @@ class UnitFilterSet(ModelFilterSet):
             | Q(unit_groups__in=user.unit_roles.values_list("unit_group", flat=True))
         ).distinct()
 
-    def get_published_reservation_units(self, qs, name, value):
+    def filter_by_own_reservations(self, qs: models.QuerySet, name: str, value: bool) -> models.QuerySet:
+        user = self.request.user
+
+        if user.is_anonymous:
+            return qs.none()
+
+        units_with_reservations = Q(reservationunit__reservation__user=user)
+
+        if value:
+            return qs.filter(units_with_reservations).distinct()
+
+        return qs.exclude(units_with_reservations).distinct()
+
+    @staticmethod
+    def filter_by_published_reservation_units(qs: models.QuerySet, name: str, value: bool) -> models.QuerySet:
         now = local_datetime()
 
         if value:
@@ -106,20 +109,8 @@ class UnitFilterSet(ModelFilterSet):
 
         return qs.filter(query)
 
-    def get_own_reservations(self, qs, name, value):
-        user = self.request.user
-
-        if user.is_anonymous:
-            return qs.none()
-
-        units_with_reservations = Q(reservationunit__reservation__user=user)
-
-        if value:
-            return qs.filter(units_with_reservations)
-
-        return qs.exclude(units_with_reservations)
-
-    def get_only_direct_bookable(self, qs: models.QuerySet, name: str, value: bool) -> models.QuerySet:
+    @staticmethod
+    def filter_by_only_direct_bookable(qs: models.QuerySet, name: str, value: bool) -> models.QuerySet:
         if value:
             return qs.filter(
                 reservationunit__reservation_kind__in=[
@@ -129,7 +120,8 @@ class UnitFilterSet(ModelFilterSet):
             )
         return qs
 
-    def get_only_seasonal_bookable(self, qs: models.QuerySet, name: str, value: bool) -> models.QuerySet:
+    @staticmethod
+    def filter_by_only_seasonal_bookable(qs: models.QuerySet, name: str, value: bool) -> models.QuerySet:
         if value:
             return qs.filter(
                 reservationunit__reservation_kind__in=[
@@ -138,3 +130,19 @@ class UnitFilterSet(ModelFilterSet):
                 ],
             )
         return qs
+
+    @staticmethod
+    def order_by_reservation_units_count(qs: models.QuerySet, desc: bool) -> models.QuerySet:
+        return qs.alias(
+            reservation_units_count=SubqueryCount(
+                ReservationUnit.objects.filter(unit=models.OuterRef("pk")).values("id"),
+            ),
+        ).order_by(models.OrderBy(models.F("reservation_units_count"), descending=desc))
+
+    @staticmethod
+    def order_by_reservation_count(qs: models.QuerySet, desc: bool) -> models.QuerySet:
+        return qs.alias(
+            reservation_count=SubqueryCount(
+                Reservation.objects.filter(reservation_unit__unit=models.OuterRef("pk")).values("id"),
+            ),
+        ).order_by(models.OrderBy(models.F("reservation_count"), descending=desc))
