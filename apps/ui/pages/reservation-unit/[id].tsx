@@ -454,8 +454,6 @@ const ReservationUnit = ({
 
   const calendarRef = useRef<HTMLDivElement>(null);
 
-  const hash = router.asPath.split("#")[1];
-
   const durationOptions = getDurationOptions(reservationUnit, t);
 
   // technically these can be left empty (backend allows it)
@@ -486,6 +484,7 @@ const ReservationUnit = ({
       maxReservationDurationMinutes
     ),
     time: searchTime ?? getTimeString(defaultDate),
+    isControlsVisible: true,
   };
 
   const reservationForm = useForm<PendingReservationFormType>({
@@ -649,9 +648,6 @@ const ReservationUnit = ({
     );
   }, [reservationUnit?.canApplyFreeOfCharge, reservationUnit?.pricings]);
 
-  const [shouldCalendarControlsBeVisible, setShouldCalendarControlsBeVisible] =
-    useState(false);
-
   const handleCalendarEventChange = useCallback(
     ({ start, end }: CalendarEvent<ReservationNode>): boolean => {
       if (!reservationUnit) {
@@ -695,7 +691,8 @@ const ReservationUnit = ({
       setValue("duration", differenceInMinutes(end, start));
 
       if (isTouchDevice()) {
-        setShouldCalendarControlsBeVisible(true);
+        // TODO test: does setValue work?
+        setValue("isControlsVisible", true);
       }
 
       return true;
@@ -985,6 +982,7 @@ const ReservationUnit = ({
   }, []);
 
   useEffect(() => {
+    const hash = router.asPath.split("#")[1];
     const scrollToCalendar = () => {
       if (calendarRef?.current?.parentElement?.offsetTop != null) {
         window.scroll({
@@ -996,8 +994,7 @@ const ReservationUnit = ({
     if (hash === "calendar" && focusSlot) {
       scrollToCalendar();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [focusSlot]);
+  }, [focusSlot, router]);
 
   const nextAvailableTime = getNextAvailableTime({
     start: focusDate,
@@ -1024,7 +1021,6 @@ const ReservationUnit = ({
   if (reservationUnit == null) {
     return <CenterSpinner />;
   }
-
   const reservationControlProps = {
     reservationUnit,
     reservationForm,
@@ -1175,12 +1171,6 @@ const ReservationUnit = ({
                       <ReservationCalendarControls
                         {...reservationControlProps}
                         mode="create"
-                        shouldCalendarControlsBeVisible={
-                          shouldCalendarControlsBeVisible
-                        }
-                        setShouldCalendarControlsBeVisible={
-                          setShouldCalendarControlsBeVisible
-                        }
                         isAnimated={isMobile}
                       />
                     </CalendarFooter>

@@ -118,10 +118,7 @@ function BylineContent({
   step: number;
 }) {
   const { watch } = form;
-  const date = watch("date");
-  const time = watch("time");
-  const duration = watch("duration");
-  const formValues = { date, time, duration };
+  const formValues = watch();
   const times = convertFormToApi(formValues);
   const modifiedReservation =
     times && step !== 0 ? { ...reservation, ...times } : reservation;
@@ -143,6 +140,7 @@ function convertReservationEdit(
     date: toUIDate(originalBegin),
     duration: differenceInMinutes(originalEnd, originalBegin),
     time: getTimeString(originalBegin),
+    isControlsVisible: false,
   };
 }
 

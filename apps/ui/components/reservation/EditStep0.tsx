@@ -181,9 +181,6 @@ export function EditStep0({
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
   const [calendarViewType, setCalendarViewType] = useState<WeekOptions>("week");
 
-  const [shouldCalendarControlsBeVisible, setShouldCalendarControlsBeVisible] =
-    useState(false);
-
   const originalBegin = new Date(reservation.begin);
   const originalEnd = new Date(reservation.end);
 
@@ -365,7 +362,8 @@ export function EditStep0({
 
       const isClientATouchDevice = isTouchDevice();
       if (isClientATouchDevice) {
-        setShouldCalendarControlsBeVisible(true);
+        // TODO test: does setValue work?
+        setValue("isControlsVisible", true);
       }
 
       return true;
@@ -472,10 +470,6 @@ export function EditStep0({
           <ReservationCalendarControls
             reservationUnit={reservationUnit}
             mode="edit"
-            shouldCalendarControlsBeVisible={shouldCalendarControlsBeVisible}
-            setShouldCalendarControlsBeVisible={
-              setShouldCalendarControlsBeVisible
-            }
             isAnimated={isMobile}
             reservationForm={reservationForm}
             durationOptions={durationOptions}

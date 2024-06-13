@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { useTranslation, type TFunction } from "next-i18next";
 import styled from "styled-components";
 import { Button, IconAngleDown, IconAngleUp, IconCross } from "hds-react";
@@ -19,11 +19,12 @@ import {
   formatDateTimeRange,
   getSelectedOption,
 } from "@/modules/util";
-import type {
-  Control,
-  FieldValues,
-  SubmitHandler,
-  UseFormReturn,
+import {
+  Controller,
+  type Control,
+  type FieldValues,
+  type SubmitHandler,
+  type UseFormReturn,
 } from "react-hook-form";
 import type { TimeRange } from "@/components/reservation-unit/QuickReservation";
 import { PendingReservationFormType } from "@/components/reservation-unit/schema";
@@ -39,8 +40,6 @@ type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
 type Props = {
   reservationUnit: QueryT;
   mode: string;
-  shouldCalendarControlsBeVisible?: boolean;
-  setShouldCalendarControlsBeVisible?: (value: boolean) => void;
   isAnimated?: boolean;
   reservationForm: UseFormReturn<PendingReservationFormType>;
   durationOptions: { label: string; value: number }[];
@@ -249,7 +248,7 @@ const StyledControlledSelect = styled(ControlledSelect)`
   }
 `;
 
-const TogglerLabelContent = ({
+function TogglerLabelContent({
   areControlsVisible,
   togglerLabel,
   t,
@@ -259,8 +258,10 @@ const TogglerLabelContent = ({
   togglerLabel: string;
   t: TFunction;
   price?: string;
-}) => {
-  if (areControlsVisible) return <div>&nbsp;</div>;
+}) {
+  if (areControlsVisible) {
+    return <div>&nbsp;</div>;
+  }
   return (
     <>
       <TogglerDate>{togglerLabel}</TogglerDate>
@@ -269,13 +270,11 @@ const TogglerLabelContent = ({
       </TogglerPrice>
     </>
   );
-};
+}
 
-const ReservationCalendarControls = ({
+function ReservationCalendarControls({
   reservationUnit,
   mode,
-  shouldCalendarControlsBeVisible,
-  setShouldCalendarControlsBeVisible,
   isAnimated = false,
   reservationForm,
   durationOptions,
@@ -283,9 +282,9 @@ const ReservationCalendarControls = ({
   startingTimeOptions,
   submitReservation,
   LoginAndSubmit,
-}: Props): JSX.Element => {
+}: Props): JSX.Element {
   const { t } = useTranslation();
-  const { control, watch, handleSubmit } = reservationForm;
+  const { control, watch, handleSubmit, setValue } = reservationForm;
   const formDate = watch("date");
   const formDuration = watch("duration");
   const date = new Date(formDate ?? "");
@@ -293,13 +292,6 @@ const ReservationCalendarControls = ({
   const duration = !Number.isNaN(Number(formDuration))
     ? Number(formDuration)
     : reservationUnit.minReservationDuration ?? 0;
-  const [areControlsVisible, setAreControlsVisible] = useState(false);
-
-  useEffect(() => {
-    if (setShouldCalendarControlsBeVisible) {
-      setAreControlsVisible(shouldCalendarControlsBeVisible ?? false);
-    }
-  }, [setShouldCalendarControlsBeVisible, shouldCalendarControlsBeVisible]);
 
   const togglerLabel = (() => {
     const dateStr = capitalize(
@@ -328,43 +320,45 @@ const ReservationCalendarControls = ({
     (n) => n?.endDatetime
   );
 
+  const areControlsVisible = watch("isControlsVisible");
+
   return (
     <Wrapper data-testid="reservation-unit__reservation-controls--wrapper">
       <form noValidate onSubmit={handleSubmit(submitReservation)}>
         <TogglerTop>
-          <ToggleControls>
-            <TogglerLabel>
-              {focusSlot.isReservable ? (
-                <TogglerLabelContent
-                  areControlsVisible={areControlsVisible}
-                  togglerLabel={togglerLabel}
-                  t={t}
-                  price={price}
-                />
-              ) : (
-                t("reservationCalendar:selectTime")
-              )}
-            </TogglerLabel>
-            <ToggleButton
-              onClick={() => {
-                setAreControlsVisible(!areControlsVisible);
-                if (
-                  shouldCalendarControlsBeVisible &&
-                  setShouldCalendarControlsBeVisible != null
-                ) {
-                  setShouldCalendarControlsBeVisible(!areControlsVisible);
-                }
-              }}
-              data-testid="reservation-unit__reservation-controls--toggle-button"
-              type="button"
-            >
-              {areControlsVisible ? (
-                <IconAngleDown aria-label={t("common:showLess")} size="m" />
-              ) : (
-                <IconAngleUp aria-label={t("common:showMore")} size="m" />
-              )}
-            </ToggleButton>
-          </ToggleControls>
+          <Controller
+            name="isControlsVisible"
+            control={control}
+            render={({ field }) => (
+              <ToggleControls>
+                <TogglerLabel>
+                  {focusSlot.isReservable ? (
+                    <TogglerLabelContent
+                      areControlsVisible={field.value}
+                      togglerLabel={togglerLabel}
+                      t={t}
+                      price={price}
+                    />
+                  ) : (
+                    t("reservationCalendar:selectTime")
+                  )}
+                </TogglerLabel>
+                <ToggleButton
+                  onClick={() => {
+                    field.onChange(!field.value);
+                  }}
+                  data-testid="reservation-unit__reservation-controls--toggle-button"
+                  type="button"
+                >
+                  {field.value ? (
+                    <IconAngleDown aria-label={t("common:showLess")} size="m" />
+                  ) : (
+                    <IconAngleUp aria-label={t("common:showMore")} size="m" />
+                  )}
+                </ToggleButton>
+              </ToggleControls>
+            )}
+          />
         </TogglerTop>
         <TogglerBottom>
           {focusSlot.isReservable && !areControlsVisible && LoginAndSubmit}
@@ -425,7 +419,17 @@ const ReservationCalendarControls = ({
               </ResetButton>
               {mode === "edit" && (
                 <SelectButton
-                  onClick={() => setAreControlsVisible(false)}
+                  onClick={() => {
+                    /* FIXME setValue doesn't work for some reason
+                     * controllers do work
+                     * */
+                    const value = !areControlsVisible;
+                    setValue("isControlsVisible", value, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                      shouldTouch: true,
+                    });
+                  }}
                   disabled={!focusSlot.isReservable}
                   data-testid="reservation__button--select-time"
                 >
@@ -441,6 +445,6 @@ const ReservationCalendarControls = ({
       </form>
     </Wrapper>
   );
-};
+}
 
 export default ReservationCalendarControls;
