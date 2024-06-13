@@ -73,11 +73,6 @@ export const UNIT_NAME_FRAGMENT = gql`
     id
     pk
     nameFi
-    serviceSectors {
-      id
-      pk
-      nameFi
-    }
   }
 `;
 

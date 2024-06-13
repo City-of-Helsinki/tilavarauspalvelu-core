@@ -7261,11 +7261,6 @@ export type ApplicationRoundFragment = {
   applicationsCount?: number | null;
   reservationUnitCount?: number | null;
   statusTimestamp?: string | null;
-  serviceSector?: {
-    id: string;
-    pk?: number | null;
-    nameFi?: string | null;
-  } | null;
   reservationUnits: Array<{
     id: string;
     pk?: number | null;
@@ -7313,11 +7308,6 @@ export type ApplicationCommonFragment = {
     applicationsCount?: number | null;
     reservationUnitCount?: number | null;
     statusTimestamp?: string | null;
-    serviceSector?: {
-      id: string;
-      pk?: number | null;
-      nameFi?: string | null;
-    } | null;
     reservationUnits: Array<{
       id: string;
       pk?: number | null;
@@ -7483,11 +7473,6 @@ export type ApplicationQuery = {
         textFi?: string | null;
         textEn?: string | null;
         textSv?: string | null;
-      } | null;
-      serviceSector?: {
-        id: string;
-        pk?: number | null;
-        nameFi?: string | null;
       } | null;
       reservationUnits: Array<{
         id: string;
@@ -8229,11 +8214,6 @@ export const ApplicationRoundFragmentDoc = gql`
     nameFi
     nameSv
     nameEn
-    serviceSector {
-      id
-      pk
-      nameFi
-    }
     reservationUnits {
       id
       pk

@@ -47,12 +47,8 @@ const extendedReservation = {
       unit: {
         pk: 101,
         nameFi: "unitName",
-        serviceSectors: [
-          {
-            pk: 201,
-          },
-        ],
       },
+      serviceSectors: [],
       reservationStartInterval: "INTERVAL_15_MINS",
       metadataSet: {
         name: "metadata",

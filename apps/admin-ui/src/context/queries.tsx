@@ -36,22 +36,6 @@ export const CURRENT_USER = gql`
           }
         }
       }
-      serviceSectorRoles {
-        id
-        pk
-        serviceSector {
-          id
-          pk
-          nameFi
-        }
-        role {
-          id
-          permissions {
-            id
-            permission
-          }
-        }
-      }
       generalRoles {
         id
         pk

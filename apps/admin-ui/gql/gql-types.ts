@@ -5626,11 +5626,6 @@ export type ApplicationRoundFragment = {
   applicationsCount?: number | null;
   reservationUnitCount?: number | null;
   statusTimestamp?: string | null;
-  serviceSector?: {
-    id: string;
-    pk?: number | null;
-    nameFi?: string | null;
-  } | null;
   reservationUnits: Array<{
     id: string;
     pk?: number | null;
@@ -5678,11 +5673,6 @@ export type ApplicationCommonFragment = {
     applicationsCount?: number | null;
     reservationUnitCount?: number | null;
     statusTimestamp?: string | null;
-    serviceSector?: {
-      id: string;
-      pk?: number | null;
-      nameFi?: string | null;
-    } | null;
     reservationUnits: Array<{
       id: string;
       pk?: number | null;
@@ -5848,11 +5838,6 @@ export type ApplicationQuery = {
         textFi?: string | null;
         textEn?: string | null;
         textSv?: string | null;
-      } | null;
-      serviceSector?: {
-        id: string;
-        pk?: number | null;
-        nameFi?: string | null;
       } | null;
       reservationUnits: Array<{
         id: string;
@@ -6172,11 +6157,6 @@ export type UnitNameFieldsFragment = {
   id: string;
   pk?: number | null;
   nameFi?: string | null;
-  serviceSectors: Array<{
-    id: string;
-    pk?: number | null;
-    nameFi?: string | null;
-  }>;
 };
 
 export type ApplicationSectionFragment = {
@@ -6865,11 +6845,6 @@ export type UnitViewQuery = {
       nameFi?: string | null;
       spaces: Array<{ id: string; pk?: number | null }>;
     }>;
-    serviceSectors: Array<{
-      id: string;
-      pk?: number | null;
-      nameFi?: string | null;
-    }>;
   } | null;
 };
 
@@ -6920,11 +6895,7 @@ export type ReservationUnitsByUnitQuery = {
           nameFi?: string | null;
           bufferTimeBefore: number;
           bufferTimeAfter: number;
-          unit?: {
-            id: string;
-            pk?: number | null;
-            serviceSectors: Array<{ id: string; pk?: number | null }>;
-          } | null;
+          unit?: { id: string; pk?: number | null } | null;
         }>;
         user?: {
           id: string;
@@ -6960,11 +6931,7 @@ export type ReservationUnitsByUnitQuery = {
       nameFi?: string | null;
       bufferTimeBefore: number;
       bufferTimeAfter: number;
-      unit?: {
-        id: string;
-        pk?: number | null;
-        serviceSectors: Array<{ id: string; pk?: number | null }>;
-      } | null;
+      unit?: { id: string; pk?: number | null } | null;
     }>;
     user?: {
       id: string;
@@ -6993,16 +6960,7 @@ export type ReservationUnitQuery = {
     authentication: Authentication;
     termsOfUseFi?: string | null;
     minPersons?: number | null;
-    unit?: {
-      id: string;
-      pk?: number | null;
-      nameFi?: string | null;
-      serviceSectors: Array<{
-        id: string;
-        pk?: number | null;
-        nameFi?: string | null;
-      }>;
-    } | null;
+    unit?: { id: string; pk?: number | null; nameFi?: string | null } | null;
     cancellationTerms?: {
       id: string;
       textFi?: string | null;
@@ -7089,11 +7047,7 @@ export type ReservationUnitCalendarQuery = {
         nameFi?: string | null;
         bufferTimeBefore: number;
         bufferTimeAfter: number;
-        unit?: {
-          id: string;
-          pk?: number | null;
-          serviceSectors: Array<{ id: string; pk?: number | null }>;
-        } | null;
+        unit?: { id: string; pk?: number | null } | null;
       }>;
       user?: {
         id: string;
@@ -7128,11 +7082,7 @@ export type ReservationUnitCalendarQuery = {
       nameFi?: string | null;
       bufferTimeBefore: number;
       bufferTimeAfter: number;
-      unit?: {
-        id: string;
-        pk?: number | null;
-        serviceSectors: Array<{ id: string; pk?: number | null }>;
-      } | null;
+      unit?: { id: string; pk?: number | null } | null;
     }>;
     user?: {
       id: string;
@@ -7266,16 +7216,7 @@ export type ReservationUnitFragment = {
   authentication: Authentication;
   termsOfUseFi?: string | null;
   minPersons?: number | null;
-  unit?: {
-    id: string;
-    pk?: number | null;
-    nameFi?: string | null;
-    serviceSectors: Array<{
-      id: string;
-      pk?: number | null;
-      nameFi?: string | null;
-    }>;
-  } | null;
+  unit?: { id: string; pk?: number | null; nameFi?: string | null } | null;
   cancellationTerms?: {
     id: string;
     textFi?: string | null;
@@ -7355,11 +7296,7 @@ export type ReservationUnitReservationsFragment = {
     nameFi?: string | null;
     bufferTimeBefore: number;
     bufferTimeAfter: number;
-    unit?: {
-      id: string;
-      pk?: number | null;
-      serviceSectors: Array<{ id: string; pk?: number | null }>;
-    } | null;
+    unit?: { id: string; pk?: number | null } | null;
   }>;
   user?: {
     id: string;
@@ -7669,16 +7606,7 @@ export type ReservationQuery = {
       authentication: Authentication;
       termsOfUseFi?: string | null;
       minPersons?: number | null;
-      unit?: {
-        id: string;
-        pk?: number | null;
-        nameFi?: string | null;
-        serviceSectors: Array<{
-          id: string;
-          pk?: number | null;
-          nameFi?: string | null;
-        }>;
-      } | null;
+      unit?: { id: string; pk?: number | null; nameFi?: string | null } | null;
       cancellationTerms?: {
         id: string;
         textFi?: string | null;
@@ -7872,18 +7800,6 @@ export type CurrentUserQuery = {
           nameFi?: string | null;
         }>;
       }>;
-    }>;
-    serviceSectorRoles: Array<{
-      id: string;
-      pk?: number | null;
-      serviceSector: { id: string; pk?: number | null; nameFi?: string | null };
-      role: {
-        id: string;
-        permissions?: Array<{
-          id: string;
-          permission?: ServiceSectorPermissionsChoices | null;
-        }> | null;
-      };
     }>;
     generalRoles: Array<{
       id: string;
@@ -9063,11 +8979,6 @@ export const ApplicationRoundFragmentDoc = gql`
     nameFi
     nameSv
     nameEn
-    serviceSector {
-      id
-      pk
-      nameFi
-    }
     reservationUnits {
       id
       pk
@@ -9434,11 +9345,6 @@ export const UnitNameFieldsFragmentDoc = gql`
     id
     pk
     nameFi
-    serviceSectors {
-      id
-      pk
-      nameFi
-    }
   }
 `;
 export const MetadataSetsFragmentDoc = gql`
@@ -9551,10 +9457,6 @@ export const ReservationUnitReservationsFragmentDoc = gql`
       unit {
         id
         pk
-        serviceSectors {
-          id
-          pk
-        }
       }
     }
     user {
@@ -13602,22 +13504,6 @@ export const CurrentUserDocument = gql`
             id
             pk
             nameFi
-          }
-        }
-      }
-      serviceSectorRoles {
-        id
-        pk
-        serviceSector {
-          id
-          pk
-          nameFi
-        }
-        role {
-          id
-          permissions {
-            id
-            permission
           }
         }
       }

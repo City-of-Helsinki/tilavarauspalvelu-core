@@ -2,7 +2,6 @@ import { filterNonNullable } from "common/src/helpers";
 import {
   GeneralPermissionChoices,
   type CurrentUserQuery,
-  ServiceSectorPermissionsChoices,
   UnitPermissionChoices,
 } from "@gql/gql-types";
 
@@ -62,38 +61,10 @@ function hasUnitPermission(
   return false;
 }
 
-function hasServiceSectorPermission(
-  permissionName: Permission,
-  serviceSectorPks: number[],
-  user: UserNode
-): boolean {
-  const roles = filterNonNullable(user?.serviceSectorRoles);
-  for (const role of roles) {
-    const perms = filterNonNullable(
-      role.role.permissions?.flatMap((x) => x.permission)
-    );
-    if (perms.find((x) => x.toString() === permissionName) == null) {
-      continue;
-    }
-
-    if (
-      role.serviceSector?.pk &&
-      serviceSectorPks.includes(role.serviceSector.pk)
-    ) {
-      return true;
-    }
-  }
-  return false;
-}
-
 /// Returns true if the user is allowed to perform operation for a specific unit or service sector
 export const hasPermission =
   (user: CurrentUserQuery["currentUser"]) =>
-  (
-    permissionName: Permission,
-    unitPk?: number,
-    serviceSectorPk?: number[]
-  ): boolean => {
+  (permissionName: Permission, unitPk?: number): boolean => {
     if (!user) {
       return false;
     }
@@ -108,20 +79,10 @@ export const hasPermission =
       return true;
     }
 
-    if (
-      serviceSectorPk &&
-      hasServiceSectorPermission(permissionName, serviceSectorPk, user)
-    ) {
-      return true;
-    }
-
     return false;
   };
 
-type PermissionType =
-  | GeneralPermissionChoices
-  | UnitPermissionChoices
-  | ServiceSectorPermissionsChoices;
+type PermissionType = GeneralPermissionChoices | UnitPermissionChoices;
 type RoleType = {
   role:
     | {
@@ -152,17 +113,12 @@ export function hasSomePermission(
   const someUnitRoles =
     user?.unitRoles?.some((role) => hasPerm(role, permission)) ?? false;
 
-  const someSectorRoles =
-    user?.serviceSectorRoles?.some((role) =>
-      hasPerm(role ?? undefined, permission)
-    ) ?? false;
-
   const someGeneralRoles =
     user?.generalRoles?.some((role) =>
       hasPerm(role ?? undefined, permission)
     ) ?? false;
 
-  return someUnitRoles || someSectorRoles || someGeneralRoles;
+  return someUnitRoles || someGeneralRoles;
 }
 
 /// Returns true if the user has any kind of access to the system
@@ -180,12 +136,8 @@ export function hasAnyPermission(user: UserNode): boolean {
   const someUnitRoles =
     user?.unitRoles?.some((role) => hasAnyPerm(role ?? undefined)) ?? false;
 
-  const someSectorRoles =
-    user?.serviceSectorRoles?.some((role) => hasAnyPerm(role ?? undefined)) ??
-    false;
-
   const someGeneralRoles =
     user?.generalRoles?.some((role) => hasAnyPerm(role ?? undefined)) ?? false;
 
-  return someUnitRoles || someSectorRoles || someGeneralRoles;
+  return someUnitRoles || someGeneralRoles;
 }

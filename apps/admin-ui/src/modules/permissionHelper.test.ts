@@ -17,7 +17,6 @@ const userCommon = {
   isSuperuser: false,
   unitRoles: [],
   generalRoles: [],
-  serviceSectorRoles: [],
 };
 
 const unitRole: UnitRoleNode = {
@@ -45,8 +44,9 @@ const unitRole: UnitRoleNode = {
       description: "",
       shortDescription: "",
       reservationunitSet: [],
-      serviceSectors: [],
       spaces: [],
+      serviceSectors: [],
+      unitGroups: [],
     } as UnitNode,
   ],
 };

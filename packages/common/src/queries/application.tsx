@@ -157,11 +157,6 @@ const APPLICATION_ROUND_FRAGMENT = gql`
     nameFi
     nameSv
     nameEn
-    serviceSector {
-      id
-      pk
-      nameFi
-    }
     reservationUnits {
       id
       pk

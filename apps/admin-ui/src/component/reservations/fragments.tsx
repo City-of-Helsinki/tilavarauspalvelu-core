@@ -94,7 +94,6 @@ export const RESERVATION_COMMON_FRAGMENT = gql`
 // TODO ReservationCommon has extra fields: [order, createdAt]
 // TODO do we still need the user here?
 // TODO what is the reservation name vs. reserveeName?
-// TODO why do we need the pk of the unit and serviceSector
 export const RESERVATIONUNIT_RESERVATIONS_FRAGMENT = gql`
   ${RESERVATION_COMMON_FRAGMENT}
   fragment ReservationUnitReservations on ReservationNode {
@@ -111,10 +110,6 @@ export const RESERVATIONUNIT_RESERVATIONS_FRAGMENT = gql`
       unit {
         id
         pk
-        serviceSectors {
-          id
-          pk
-        }
       }
     }
     user {

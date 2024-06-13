@@ -34,6 +34,10 @@ const StyledAccordion = styled(Accordion)`
   & > div > div {
     display: grid;
   }
+  {/* This is to give more space to the name-column in the previous rounds table */}
+  &.previous-rounds td:first-child {
+    width: 50%;
+  }
 `;
 
 type ApplicationRoundListType = NonNullable<
@@ -172,6 +176,7 @@ function AllApplicationRounds(): JSX.Element | null {
         />
         <StyledAccordion
           heading={t("ApplicationRound.groupLabel.previousRounds")}
+          className="previous-rounds"
         >
           <StyledHDSTable
             ariaLabelSortButtonAscending="Sorted in ascending order"
@@ -188,17 +193,11 @@ function AllApplicationRounds(): JSX.Element | null {
                     href={applicationRoundUrl(Number(applicationRound.pk))}
                   >
                     <span title={applicationRound.nameFi ?? ""}>
-                      {truncate(applicationRound.nameFi ?? "", 20)}
+                      {truncate(applicationRound.nameFi ?? "", 50)}
                     </span>
                   </TableLink>
                 ),
                 key: "nameFi",
-              },
-              {
-                headerName: t("ApplicationRound.headings.service"),
-                transform: (applicationRound: ApplicationRoundNode) =>
-                  applicationRound.serviceSector?.nameFi ?? "",
-                key: "serviceSectorName",
               },
               {
                 isSortable: true,

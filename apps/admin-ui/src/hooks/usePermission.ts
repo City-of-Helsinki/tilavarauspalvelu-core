@@ -15,7 +15,6 @@ import { filterNonNullable } from "common/src/helpers";
 export type UnitPermissionFragment =
   | {
       pk?: number | null | undefined;
-      serviceSectors?: { pk?: number | null | undefined }[] | null | undefined;
     }
   | null
   | undefined;
@@ -29,16 +28,7 @@ const hasUnitPermission = (
     return false;
   }
 
-  const serviceSectorPks =
-    unit?.serviceSectors
-      ?.map((x) => x?.pk)
-      ?.filter((x): x is number => x != null) ?? [];
-
-  const permission = baseHasPermission(user)(
-    permissionName,
-    unit.pk,
-    serviceSectorPks
-  );
+  const permission = baseHasPermission(user)(permissionName, unit.pk);
 
   return permission;
 };
@@ -50,10 +40,6 @@ export type ReservationPermissionType = {
         unit?:
           | {
               pk?: number | undefined | null;
-              serviceSectors?:
-                | { pk?: number | undefined | null }[]
-                | null
-                | undefined;
             }
           | undefined
           | null;
@@ -74,24 +60,17 @@ const hasPermission = (
   }
 
   const { unit } = reservation?.reservationUnit?.[0] ?? {};
-  const serviceSectorPks = filterNonNullable(
-    unit?.serviceSectors?.map((x) => x?.pk)
-  );
 
   const unitPk = unit?.pk ?? undefined;
 
   const permissionCheck = baseHasPermission(user);
-  const permission = permissionCheck(permissionName, unitPk, serviceSectorPks);
+  const permission = permissionCheck(permissionName, unitPk);
 
   const isUsersOwnReservation = reservation?.user?.pk === user?.pk;
 
   const ownPermissions =
     includeOwn && isUsersOwnReservation
-      ? permissionCheck(
-          Permission.CAN_CREATE_STAFF_RESERVATIONS,
-          unitPk,
-          serviceSectorPks
-        )
+      ? permissionCheck(Permission.CAN_CREATE_STAFF_RESERVATIONS, unitPk)
       : false;
 
   return permission || ownPermissions;
