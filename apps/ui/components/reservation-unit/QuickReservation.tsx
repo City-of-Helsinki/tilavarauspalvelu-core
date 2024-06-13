@@ -41,9 +41,12 @@ type Props = {
 
 const Wrapper = styled.form`
   background-color: var(--color-gold-light);
-  margin-bottom: var(--spacing-l);
   padding: var(--spacing-m);
   max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-m);
+  justify-content: space-between;
 
   /* hack for page jumping when the size of the component changes */
   @media (min-width: ${breakpoints.s}) {
@@ -52,7 +55,7 @@ const Wrapper = styled.form`
 `;
 
 const Heading = styled(H4).attrs({ as: "h3" })`
-  margin: var(--spacing-3-xs) 0 var(--spacing-l) 0;
+  margin: 0;
 `;
 
 const Price = styled.div`
@@ -74,7 +77,6 @@ const Selects = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-m);
-  margin-bottom: var(--spacing-l);
 
   label {
     white-space: nowrap;
@@ -97,12 +99,6 @@ const PriceValue = styled.div`
 const Subheading = styled.div`
   font-size: var(--fontsize-heading-xs);
 `;
-
-const Times = styled.div`
-  margin: var(--spacing-s) 0 var(--spacing-l);
-`;
-
-const Slots = styled.div``;
 
 const SlotGroup = styled.ul`
   list-style: none;
@@ -248,9 +244,9 @@ function QuickReservation({
       <Subheading>
         {t("reservationCalendar:quickReservation.subheading")}
       </Subheading>
-      <Times>
+      <div>
         {startingTimeOptions.length > 0 ? (
-          <Slots>
+          <div>
             <Carousel
               hideCenterControls
               wrapAround={false}
@@ -272,7 +268,7 @@ function QuickReservation({
                 </SlotGroup>
               ))}
             </Carousel>
-          </Slots>
+          </div>
         ) : (
           <NoTimes>
             <span>
@@ -299,7 +295,7 @@ function QuickReservation({
             )}
           </NoTimes>
         )}
-      </Times>
+      </div>
       <ActionWrapper>
         <Price data-testid="quick-reservation-price">
           {focusSlot?.isReservable && (
