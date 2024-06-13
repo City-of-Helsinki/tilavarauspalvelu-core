@@ -10,10 +10,10 @@ import {
   isValid,
   addDays,
   format,
-  isSameDay,
-  set,
   roundToNearestMinutes,
   differenceInMinutes,
+  getHours,
+  getMinutes,
 } from "date-fns";
 import type { PendingReservation } from "common/types/common";
 import {
@@ -32,10 +32,9 @@ import {
 } from "@gql/gql-types";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
 import { filterNonNullable } from "common/src/helpers";
-import { getDayIntervals, getTranslation } from "./util";
+import { getDayIntervals, getIntervalMinutes, getTranslation } from "./util";
 import type { TFunction } from "i18next";
 import { type SlotProps } from "common/src/calendar/Calendar";
-import { toUIDate } from "common/src/common/util";
 
 // TimeSlots change the Calendar view. How many intervals are shown i.e. every half an hour, every hour
 // we use every hour only => 2
@@ -323,9 +322,7 @@ export function isReservationReservable({
     return false;
   }
 
-  if (
-    !isStartTimeWithinInterval(start, reservableTimes, reservationStartInterval)
-  ) {
+  if (!isDateInsideInterval(start, reservableTimes, reservationStartInterval)) {
     return false;
   }
 
@@ -423,48 +420,43 @@ export function generateReservableMap(
   return map;
 }
 
-/// TODO this function is still a performance problem (looking at the flame graph)
-/// The filtering helps, but the real solution would be to refactor the TimeSpan construction
-/// to the Page load: do 7 / 30 days at a time, not all intervals (2 years)
-// Refactor to take in the array of pre created slots (not intervals)
-function isStartTimeWithinInterval(
-  start: Date,
+// checks that the start time is valid for the interval of the reservation unit
+function isDateInsideInterval(
+  date: Date,
   timeSlots: ReservableMap,
   interval: ReservationStartInterval
 ): boolean {
-  if (timeSlots.size < 1) {
-    return false;
-  }
-
-  const slotsForDay = timeSlots.get(dateToKey(start));
+  const slotsForDay = timeSlots.get(dateToKey(date));
   if (slotsForDay == null) {
     return false;
   }
 
   const timeframe = slotsForDay.reduce<TimeFrameSlot | null>((acc, curr) => {
-    const begin = isSameDay(new Date(curr.start), start)
-      ? new Date(curr.start)
-      : set(start, { hours: 0, minutes: 0 });
-    const end = isSameDay(new Date(curr.end), start)
-      ? new Date(curr.end)
-      : set(start, { hours: 23, minutes: 59 });
+    const begin = new Date(curr.start);
+    const end = new Date(curr.end);
     return {
       start: acc?.start && acc.start < begin ? acc.start : begin,
       end: acc?.end && acc.end > end ? acc.end : end,
     };
   }, null);
 
-  if (timeframe?.start == null || timeframe.end == null) {
+  const { start, end } = timeframe ?? {};
+  if (start == null || end == null) {
     return false;
   }
 
-  // TODO refactor (don't string convert, use numbers or dates)
-  const startHMS = `${toUIDate(start, "HH:mm")}:00`;
-  return getDayIntervals(
-    format(timeframe.start, "HH:mm"),
-    format(timeframe.end, "HH:mm"),
-    interval
-  ).includes(startHMS);
+  const s: { h: number; m: number } = {
+    h: getHours(start),
+    m: getMinutes(start),
+  };
+  const e: { h: number; m: number } = { h: getHours(end), m: getMinutes(end) };
+  const intervals = getDayIntervals(s, e, interval);
+  for (const i of intervals) {
+    if (i.h === s.h && i.m === s.m) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function isReservationConfirmed(reservation: {
@@ -993,35 +985,6 @@ function getValidEndingTime({
   }
 
   return end;
-}
-
-function getIntervalMinutes(
-  reservationStartInterval: ReservationStartInterval
-): number {
-  switch (reservationStartInterval) {
-    case "INTERVAL_15_MINS":
-      return 15;
-    case "INTERVAL_30_MINS":
-      return 30;
-    case "INTERVAL_60_MINS":
-      return 60;
-    case "INTERVAL_90_MINS":
-      return 90;
-    case "INTERVAL_120_MINS":
-      return 120;
-    case "INTERVAL_180_MINS":
-      return 180;
-    case "INTERVAL_240_MINS":
-      return 240;
-    case "INTERVAL_300_MINS":
-      return 300;
-    case "INTERVAL_360_MINS":
-      return 360;
-    case "INTERVAL_420_MINS":
-      return 420;
-    default:
-      throw new Error("Invalid reservation start interval");
-  }
 }
 
 function getBufferedEventTimes(

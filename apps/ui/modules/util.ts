@@ -10,8 +10,6 @@ import {
   getTranslation,
   fromApiDate as fromAPIDate,
   fromUIDate,
-  convertHMSToSeconds,
-  secondsToHms,
 } from "common/src/common/util";
 import type {
   AgeGroupNode,
@@ -330,65 +328,59 @@ export function formatDateTime(t: TFunction, date: Date): string {
   return `${dateStr} ${timeStr}`;
 }
 
-// TODO refactor
-export function getDayIntervals(
-  startTime: string,
-  endTime: string,
-  interval: ReservationStartInterval
-): string[] {
-  // normalize end time to allow comparison
-  const normalizedEndTime = endTime === "00:00" ? "23:59" : endTime;
-
-  // FIXME don't use HMS
-  const start = convertHMSToSeconds(startTime?.substring(0, 5));
-  const end = convertHMSToSeconds(normalizedEndTime?.substring(0, 5));
-  const intervals: string[] = [];
-
-  let intervalSeconds = 0;
-  switch (interval) {
+export function getIntervalMinutes(
+  reservationStartInterval: ReservationStartInterval
+): number {
+  switch (reservationStartInterval) {
     case "INTERVAL_15_MINS":
-      intervalSeconds = 15 * 60;
-      break;
+      return 15;
     case "INTERVAL_30_MINS":
-      intervalSeconds = 30 * 60;
-      break;
+      return 30;
     case "INTERVAL_60_MINS":
-      intervalSeconds = 60 * 60;
-      break;
+      return 60;
     case "INTERVAL_90_MINS":
-      intervalSeconds = 90 * 60;
-      break;
+      return 90;
     case "INTERVAL_120_MINS":
-      intervalSeconds = 120 * 60;
-      break;
+      return 120;
     case "INTERVAL_180_MINS":
-      intervalSeconds = 180 * 60;
-      break;
+      return 180;
     case "INTERVAL_240_MINS":
-      intervalSeconds = 240 * 60;
-      break;
+      return 240;
     case "INTERVAL_300_MINS":
-      intervalSeconds = 300 * 60;
-      break;
+      return 300;
     case "INTERVAL_360_MINS":
-      intervalSeconds = 360 * 60;
-      break;
+      return 360;
     case "INTERVAL_420_MINS":
-      intervalSeconds = 420 * 60;
-      break;
+      return 420;
     default:
+      throw new Error("Invalid reservation start interval");
+  }
+}
+
+export function getDayIntervals(
+  startTime: { h: number; m: number },
+  endTime: { h: number; m: number },
+  interval: ReservationStartInterval
+): { h: number; m: number }[] {
+  // normalize end time to allow comparison
+  const nEnd = endTime.h === 0 && endTime.m === 0 ? { h: 23, m: 59 } : endTime;
+  const intervalSeconds = getIntervalMinutes(interval) * 60;
+
+  const start = startTime;
+  const end = nEnd;
+
+  const startSeconds = start.h * 3600 + start.m * 60;
+  const endSeconds = end.h * 3600 + end.m * 60;
+  if (endSeconds <= startSeconds) {
+    return [];
   }
 
-  if (!intervalSeconds || start == null || !end || start >= end) return [];
-
-  for (let i = start; i <= end; i += intervalSeconds) {
-    const { h, m, s } = secondsToHms(i);
-    intervals.push(
-      `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s
-        .toString()
-        .padStart(2, "0")}`
-    );
+  const intervals: Array<{ h: number; m: number }> = [];
+  // TODO test the edge case of 23:59 (it should not be returned) neither should 00:00
+  for (let i = startSeconds; i <= endSeconds; i += intervalSeconds) {
+    const m = i % 3600;
+    const h = (i - m) / 3600;
+    intervals.push({ h, m: m / 60 });
   }
-
-  return intervals.filter((n) => n.substring(0, 5) !== normalizedEndTime);
+  return intervals;
 }

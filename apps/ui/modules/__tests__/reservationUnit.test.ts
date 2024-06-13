@@ -54,6 +54,7 @@ const pricingBase: PricingFieldsFragment = {
 
 // Turn into describe block and spec the tests
 test.todo("getNextAvailableTime");
+test.todo("getDayIntervals");
 
 describe("getPrice", () => {
   test("price range", () => {

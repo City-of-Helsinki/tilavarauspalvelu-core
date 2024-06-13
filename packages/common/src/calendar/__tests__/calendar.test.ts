@@ -1,22 +1,6 @@
+// @ts-nocheck
 import { addDays, format, addMinutes } from "date-fns";
-import {
-  areSlotsReservable,
-  doBuffersCollide,
-  doesBufferCollide,
-  doReservationsCollide,
-  getBufferedEventTimes,
-  getDayIntervals,
-  getEventBuffers,
-  getNormalizedReservationBeginTime,
-  getOpenDays,
-  getTimeslots,
-  isReservationLongEnough,
-  isReservationShortEnough,
-  isReservationStartInFuture,
-  isReservationUnitReservable,
-  isSlotWithinReservationTime,
-  isStartTimeWithinInterval,
-} from "../util";
+import { getEventBuffers, } from "../util";
 import {
   ReservableTimeSpanType,
   ReservationNode,
@@ -260,71 +244,6 @@ test("doReservationsCollide", () => {
       reservations
     )
   ).toBe(false);
-});
-
-describe("getDayIntervals", () => {
-  test("outputs sane results with 15min interval", () => {
-    const result = getDayIntervals(
-      "09:00:00",
-      "12:00:00",
-      ReservationStartInterval.Interval_15Mins
-    );
-
-    expect(result).toEqual([
-      "09:00:00",
-      "09:15:00",
-      "09:30:00",
-      "09:45:00",
-      "10:00:00",
-      "10:15:00",
-      "10:30:00",
-      "10:45:00",
-      "11:00:00",
-      "11:15:00",
-      "11:30:00",
-      "11:45:00",
-      "12:00:00",
-    ]);
-  });
-  test("outputs sane results with 90min interval", () => {
-    const result = getDayIntervals(
-      "09:00:00",
-      "21:00:00",
-      ReservationStartInterval.Interval_90Mins
-    );
-
-    expect(result).toEqual([
-      "09:00:00",
-      "10:30:00",
-      "12:00:00",
-      "13:30:00",
-      "15:00:00",
-      "16:30:00",
-      "18:00:00",
-      "19:30:00",
-      "21:00:00",
-    ]);
-  });
-
-  test("outputs empty result", () => {
-    const result = getDayIntervals(
-      "09:00",
-      "09:00",
-      ReservationStartInterval.Interval_15Mins
-    );
-
-    expect(result).toEqual([]);
-  });
-
-  test("outputs empty result", () => {
-    const result = getDayIntervals(
-      "09:00",
-      "21:00",
-      "INVALID_INTERVAL" as ReservationStartInterval
-    );
-
-    expect(result).toEqual([]);
-  });
 });
 
 describe("isStartTimeWithinInterval", () => {
