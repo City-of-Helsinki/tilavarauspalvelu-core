@@ -621,10 +621,9 @@ export enum ApplicationSectionOrderingChoices {
 
 /** An enumeration. */
 export enum ApplicationSectionStatusChoice {
-  Failed = "FAILED",
   Handled = "HANDLED",
   InAllocation = "IN_ALLOCATION",
-  Reserved = "RESERVED",
+  Rejected = "REJECTED",
   Unallocated = "UNALLOCATED",
 }
 
@@ -1760,7 +1759,6 @@ export type PurposeNode = Node & {
   nameFi?: Maybe<Scalars["String"]["output"]>;
   nameSv?: Maybe<Scalars["String"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
-  /** Järjestysnumero, jota käytetään rajapinnan järjestämisessä. */
   rank?: Maybe<Scalars["Int"]["output"]>;
   smallUrl?: Maybe<Scalars["String"]["output"]>;
 };
@@ -3085,13 +3083,16 @@ export type ReservationNode = Node & {
   isHandled?: Maybe<Scalars["Boolean"]["output"]>;
   name?: Maybe<Scalars["String"]["output"]>;
   numPersons?: Maybe<Scalars["Int"]["output"]>;
+  /** @deprecated Please use to 'paymentOrder' instead. */
   order?: Maybe<PaymentOrderNode>;
+  /** Reservation this order is based on */
+  paymentOrder: Array<PaymentOrderNode>;
   pk?: Maybe<Scalars["Int"]["output"]>;
   price?: Maybe<Scalars["Decimal"]["output"]>;
   priceNet?: Maybe<Scalars["Decimal"]["output"]>;
   purpose?: Maybe<ReservationPurposeNode>;
   recurringReservation?: Maybe<RecurringReservationNode>;
-  reservationUnit?: Maybe<Array<ReservationUnitNode>>;
+  reservationUnit: Array<ReservationUnitNode>;
   reserveeAddressCity?: Maybe<Scalars["String"]["output"]>;
   reserveeAddressStreet?: Maybe<Scalars["String"]["output"]>;
   reserveeAddressZip?: Maybe<Scalars["String"]["output"]>;
@@ -3104,7 +3105,7 @@ export type ReservationNode = Node & {
   reserveeOrganisationName?: Maybe<Scalars["String"]["output"]>;
   reserveePhone?: Maybe<Scalars["String"]["output"]>;
   reserveeType?: Maybe<CustomerTypeChoice>;
-  /** @deprecated Please refer to type. */
+  /** @deprecated Please use to 'type' instead. */
   staffEvent?: Maybe<Scalars["Boolean"]["output"]>;
   state: State;
   taxPercentageValue?: Maybe<Scalars["Decimal"]["output"]>;

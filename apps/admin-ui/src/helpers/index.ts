@@ -122,13 +122,12 @@ export function getApplicationSectiontatusColor(
   status: ApplicationSectionStatusChoice
 ): string {
   switch (status) {
-    case ApplicationSectionStatusChoice.Reserved:
     case ApplicationSectionStatusChoice.Unallocated:
     case ApplicationSectionStatusChoice.InAllocation:
       return "var(--color-alert-dark)";
     case ApplicationSectionStatusChoice.Handled:
       return "var(--color-success)";
-    case ApplicationSectionStatusChoice.Failed:
+    case ApplicationSectionStatusChoice.Rejected:
     default:
       return "var(--color-error)";
   }

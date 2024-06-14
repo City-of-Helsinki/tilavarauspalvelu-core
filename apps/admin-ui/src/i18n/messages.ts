@@ -606,11 +606,10 @@ const translations: ITranslations = {
     },
   },
   ApplicationSectionStatusChoice: {
-    FAILED: ["Epäonnistunut"],
     HANDLED: ["Hyväksytty"],
     IN_ALLOCATION: ["Käsittelyssä"],
-    RESERVED: ["Varattu"],
     UNALLOCATED: ["Vastaanotettu"],
+    REJECTED: ["Hylätty"],
   },
   TimeSlotStatusCell: {
     declined: ["Hylätty"],

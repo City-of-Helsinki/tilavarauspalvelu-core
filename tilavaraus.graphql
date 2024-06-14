@@ -674,10 +674,9 @@ enum ApplicationSectionOrderingChoices {
 An enumeration.
 """
 enum ApplicationSectionStatusChoice {
-  FAILED
   HANDLED
   IN_ALLOCATION
-  RESERVED
+  REJECTED
   UNALLOCATED
 }
 
@@ -1933,9 +1932,6 @@ type PurposeNode implements Node {
   nameFi: String
   nameSv: String
   pk: Int
-  """
-  Järjestysnumero, jota käytetään rajapinnan järjestämisessä.
-  """
   rank: Int
   smallUrl: String
 }
@@ -3415,6 +3411,11 @@ type ReservationNode implements Node {
   name: String
   numPersons: Int
   order: PaymentOrderNode
+    @deprecated(reason: "Please use to 'paymentOrder' instead.")
+  """
+  Reservation this order is based on
+  """
+  paymentOrder: [PaymentOrderNode!]!
   pk: Int
   price: Decimal
   priceNet: Decimal
@@ -3474,7 +3475,7 @@ type ReservationNode implements Node {
     typeRankGte: Decimal
     typeRankLte: Decimal
     unit: [Int]
-  ): [ReservationUnitNode!]
+  ): [ReservationUnitNode!]!
   reserveeAddressCity: String
   reserveeAddressStreet: String
   reserveeAddressZip: String
@@ -3487,7 +3488,7 @@ type ReservationNode implements Node {
   reserveeOrganisationName: String
   reserveePhone: String
   reserveeType: CustomerTypeChoice
-  staffEvent: Boolean @deprecated(reason: "Please refer to type.")
+  staffEvent: Boolean @deprecated(reason: "Please use to 'type' instead.")
   state: State!
   taxPercentageValue: Decimal
   type: ReservationTypeChoice

@@ -621,10 +621,9 @@ export enum ApplicationSectionOrderingChoices {
 
 /** An enumeration. */
 export enum ApplicationSectionStatusChoice {
-  Failed = "FAILED",
   Handled = "HANDLED",
   InAllocation = "IN_ALLOCATION",
-  Reserved = "RESERVED",
+  Rejected = "REJECTED",
   Unallocated = "UNALLOCATED",
 }
 
@@ -1760,7 +1759,6 @@ export type PurposeNode = Node & {
   nameFi?: Maybe<Scalars["String"]["output"]>;
   nameSv?: Maybe<Scalars["String"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
-  /** Järjestysnumero, jota käytetään rajapinnan järjestämisessä. */
   rank?: Maybe<Scalars["Int"]["output"]>;
   smallUrl?: Maybe<Scalars["String"]["output"]>;
 };
@@ -3085,13 +3083,16 @@ export type ReservationNode = Node & {
   isHandled?: Maybe<Scalars["Boolean"]["output"]>;
   name?: Maybe<Scalars["String"]["output"]>;
   numPersons?: Maybe<Scalars["Int"]["output"]>;
+  /** @deprecated Please use to 'paymentOrder' instead. */
   order?: Maybe<PaymentOrderNode>;
+  /** Reservation this order is based on */
+  paymentOrder: Array<PaymentOrderNode>;
   pk?: Maybe<Scalars["Int"]["output"]>;
   price?: Maybe<Scalars["Decimal"]["output"]>;
   priceNet?: Maybe<Scalars["Decimal"]["output"]>;
   purpose?: Maybe<ReservationPurposeNode>;
   recurringReservation?: Maybe<RecurringReservationNode>;
-  reservationUnit?: Maybe<Array<ReservationUnitNode>>;
+  reservationUnit: Array<ReservationUnitNode>;
   reserveeAddressCity?: Maybe<Scalars["String"]["output"]>;
   reserveeAddressStreet?: Maybe<Scalars["String"]["output"]>;
   reserveeAddressZip?: Maybe<Scalars["String"]["output"]>;
@@ -3104,7 +3105,7 @@ export type ReservationNode = Node & {
   reserveeOrganisationName?: Maybe<Scalars["String"]["output"]>;
   reserveePhone?: Maybe<Scalars["String"]["output"]>;
   reserveeType?: Maybe<CustomerTypeChoice>;
-  /** @deprecated Please refer to type. */
+  /** @deprecated Please use to 'type' instead. */
   staffEvent?: Maybe<Scalars["Boolean"]["output"]>;
   state: State;
   taxPercentageValue?: Maybe<Scalars["Decimal"]["output"]>;
@@ -6964,7 +6965,7 @@ export type ReservationUnitsByUnitQuery = {
         reserveeName?: string | null;
         bufferTimeBefore: number;
         bufferTimeAfter: number;
-        reservationUnit?: Array<{
+        reservationUnit: Array<{
           id: string;
           pk?: number | null;
           nameFi?: string | null;
@@ -6975,7 +6976,7 @@ export type ReservationUnitsByUnitQuery = {
             pk?: number | null;
             serviceSectors: Array<{ id: string; pk?: number | null }>;
           } | null;
-        }> | null;
+        }>;
         user?: {
           id: string;
           firstName: string;
@@ -7004,7 +7005,7 @@ export type ReservationUnitsByUnitQuery = {
     reserveeName?: string | null;
     bufferTimeBefore: number;
     bufferTimeAfter: number;
-    reservationUnit?: Array<{
+    reservationUnit: Array<{
       id: string;
       pk?: number | null;
       nameFi?: string | null;
@@ -7015,7 +7016,7 @@ export type ReservationUnitsByUnitQuery = {
         pk?: number | null;
         serviceSectors: Array<{ id: string; pk?: number | null }>;
       } | null;
-    }> | null;
+    }>;
     user?: {
       id: string;
       firstName: string;
@@ -7133,7 +7134,7 @@ export type ReservationUnitCalendarQuery = {
       reserveeName?: string | null;
       bufferTimeBefore: number;
       bufferTimeAfter: number;
-      reservationUnit?: Array<{
+      reservationUnit: Array<{
         id: string;
         pk?: number | null;
         nameFi?: string | null;
@@ -7144,7 +7145,7 @@ export type ReservationUnitCalendarQuery = {
           pk?: number | null;
           serviceSectors: Array<{ id: string; pk?: number | null }>;
         } | null;
-      }> | null;
+      }>;
       user?: {
         id: string;
         firstName: string;
@@ -7172,7 +7173,7 @@ export type ReservationUnitCalendarQuery = {
     reserveeName?: string | null;
     bufferTimeBefore: number;
     bufferTimeAfter: number;
-    reservationUnit?: Array<{
+    reservationUnit: Array<{
       id: string;
       pk?: number | null;
       nameFi?: string | null;
@@ -7183,7 +7184,7 @@ export type ReservationUnitCalendarQuery = {
         pk?: number | null;
         serviceSectors: Array<{ id: string; pk?: number | null }>;
       } | null;
-    }> | null;
+    }>;
     user?: {
       id: string;
       firstName: string;
@@ -7400,7 +7401,7 @@ export type ReservationUnitReservationsFragment = {
   reserveeName?: string | null;
   bufferTimeBefore: number;
   bufferTimeAfter: number;
-  reservationUnit?: Array<{
+  reservationUnit: Array<{
     id: string;
     pk?: number | null;
     nameFi?: string | null;
@@ -7411,7 +7412,7 @@ export type ReservationUnitReservationsFragment = {
       pk?: number | null;
       serviceSectors: Array<{ id: string; pk?: number | null }>;
     } | null;
-  }> | null;
+  }>;
   user?: {
     id: string;
     firstName: string;
@@ -7492,11 +7493,11 @@ export type ReservationsQuery = {
         reserveeName?: string | null;
         bufferTimeBefore: number;
         bufferTimeAfter: number;
-        reservationUnit?: Array<{
+        reservationUnit: Array<{
           id: string;
           nameFi?: string | null;
           unit?: { id: string; nameFi?: string | null } | null;
-        }> | null;
+        }>;
         order?: { id: string; status?: OrderStatus | null } | null;
         user?: { id: string; firstName: string; lastName: string } | null;
       } | null;
@@ -7703,7 +7704,7 @@ export type ReservationQuery = {
     billingAddressStreet?: string | null;
     billingAddressCity?: string | null;
     billingAddressZip?: string | null;
-    reservationUnit?: Array<{
+    reservationUnit: Array<{
       id: string;
       pk?: number | null;
       nameFi?: string | null;
@@ -7759,7 +7760,7 @@ export type ReservationQuery = {
         requiredFields: Array<{ id: string; fieldName: string }>;
         supportedFields: Array<{ id: string; fieldName: string }>;
       } | null;
-    }> | null;
+    }>;
     order?: {
       id: string;
       status?: OrderStatus | null;
@@ -7822,7 +7823,7 @@ export type RecurringReservationQuery = {
       begin: string;
       end: string;
       state: State;
-      reservationUnit?: Array<{ id: string; pk?: number | null }> | null;
+      reservationUnit: Array<{ id: string; pk?: number | null }>;
     }>;
   } | null;
 };

@@ -621,10 +621,9 @@ export enum ApplicationSectionOrderingChoices {
 
 /** An enumeration. */
 export enum ApplicationSectionStatusChoice {
-  Failed = "FAILED",
   Handled = "HANDLED",
   InAllocation = "IN_ALLOCATION",
-  Reserved = "RESERVED",
+  Rejected = "REJECTED",
   Unallocated = "UNALLOCATED",
 }
 
@@ -1760,7 +1759,6 @@ export type PurposeNode = Node & {
   nameFi?: Maybe<Scalars["String"]["output"]>;
   nameSv?: Maybe<Scalars["String"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
-  /** Järjestysnumero, jota käytetään rajapinnan järjestämisessä. */
   rank?: Maybe<Scalars["Int"]["output"]>;
   smallUrl?: Maybe<Scalars["String"]["output"]>;
 };
@@ -3085,13 +3083,16 @@ export type ReservationNode = Node & {
   isHandled?: Maybe<Scalars["Boolean"]["output"]>;
   name?: Maybe<Scalars["String"]["output"]>;
   numPersons?: Maybe<Scalars["Int"]["output"]>;
+  /** @deprecated Please use to 'paymentOrder' instead. */
   order?: Maybe<PaymentOrderNode>;
+  /** Reservation this order is based on */
+  paymentOrder: Array<PaymentOrderNode>;
   pk?: Maybe<Scalars["Int"]["output"]>;
   price?: Maybe<Scalars["Decimal"]["output"]>;
   priceNet?: Maybe<Scalars["Decimal"]["output"]>;
   purpose?: Maybe<ReservationPurposeNode>;
   recurringReservation?: Maybe<RecurringReservationNode>;
-  reservationUnit?: Maybe<Array<ReservationUnitNode>>;
+  reservationUnit: Array<ReservationUnitNode>;
   reserveeAddressCity?: Maybe<Scalars["String"]["output"]>;
   reserveeAddressStreet?: Maybe<Scalars["String"]["output"]>;
   reserveeAddressZip?: Maybe<Scalars["String"]["output"]>;
@@ -3104,7 +3105,7 @@ export type ReservationNode = Node & {
   reserveeOrganisationName?: Maybe<Scalars["String"]["output"]>;
   reserveePhone?: Maybe<Scalars["String"]["output"]>;
   reserveeType?: Maybe<CustomerTypeChoice>;
-  /** @deprecated Please refer to type. */
+  /** @deprecated Please use to 'type' instead. */
   staffEvent?: Maybe<Scalars["Boolean"]["output"]>;
   state: State;
   taxPercentageValue?: Maybe<Scalars["Decimal"]["output"]>;
@@ -5443,7 +5444,7 @@ export type ReservationInfoCardFragment = {
   end: string;
   state: State;
   price?: string | null;
-  reservationUnit?: Array<{
+  reservationUnit: Array<{
     id: string;
     pk?: number | null;
     nameFi?: string | null;
@@ -5475,7 +5476,7 @@ export type ReservationInfoCardFragment = {
       status: Status;
       taxPercentage: { id: string; pk?: number | null; value: string };
     }>;
-  }> | null;
+  }>;
 };
 
 export type OptionsQueryVariables = Exact<{ [key: string]: never }>;
@@ -5984,7 +5985,7 @@ export type ListReservationsQuery = {
           expiresInMinutes?: number | null;
           status?: OrderStatus | null;
         } | null;
-        reservationUnit?: Array<{
+        reservationUnit: Array<{
           id: string;
           pk?: number | null;
           nameFi?: string | null;
@@ -6021,7 +6022,7 @@ export type ListReservationsQuery = {
             status: Status;
             taxPercentage: { id: string; pk?: number | null; value: string };
           }>;
-        }> | null;
+        }>;
       } | null;
     } | null>;
   } | null;
@@ -6093,7 +6094,7 @@ export type ReservationQuery = {
       orderUuid?: string | null;
       status?: OrderStatus | null;
     } | null;
-    reservationUnit?: Array<{
+    reservationUnit: Array<{
       id: string;
       canApplyFreeOfCharge: boolean;
       pk?: number | null;
@@ -6190,7 +6191,7 @@ export type ReservationQuery = {
         requiredFields: Array<{ id: string; fieldName: string }>;
         supportedFields: Array<{ id: string; fieldName: string }>;
       } | null;
-    }> | null;
+    }>;
     purpose?: {
       id: string;
       pk?: number | null;
