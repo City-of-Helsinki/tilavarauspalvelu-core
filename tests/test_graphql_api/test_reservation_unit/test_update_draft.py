@@ -159,7 +159,15 @@ def test_reservation_unit__update__errors_with_empty_name(graphql):
 
 def test_reservation_unit__update__archiving_removes_contact_information_and_audit_logs(graphql, settings):
     settings.AUDIT_LOGGING_ENABLED = True
-    AuditLogger.register(ReservationUnit)
+    AuditLogger.register(
+        ReservationUnit,
+        # Exclude lookup properties, since they are calculated values.
+        exclude_fields=[
+            "_publishing_state",
+            "_reservation_state",
+            "_active_pricing_type",
+        ],
+    )
 
     graphql.login_with_superuser()
 

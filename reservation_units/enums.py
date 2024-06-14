@@ -1,7 +1,4 @@
-from enum import Enum
-
 from django.db import models
-from django.db.models import TextChoices
 from django.utils.functional import classproperty
 from django.utils.translation import gettext_lazy as _
 
@@ -13,30 +10,30 @@ __all__ = [
     "PricingType",
     "ReservationKind",
     "ReservationStartInterval",
-    "ReservationState",
-    "ReservationUnitState",
+    "ReservationUnitPublishingState",
+    "ReservationUnitReservationState",
 ]
 
 
-class ReservationUnitState(Enum):
-    DRAFT = "DRAFT"
-    SCHEDULED_PUBLISHING = "SCHEDULED_PUBLISHING"
-    SCHEDULED_HIDING = "SCHEDULED_HIDING"
-    SCHEDULED_PERIOD = "SCHEDULED_PERIOD"
-    HIDDEN = "HIDDEN"
-    PUBLISHED = "PUBLISHED"
-    ARCHIVED = "ARCHIVED"
+class ReservationUnitPublishingState(models.TextChoices):
+    DRAFT = "DRAFT", _("Draft")
+    SCHEDULED_PUBLISHING = "SCHEDULED_PUBLISHING", _("Scheduled publishing")
+    SCHEDULED_HIDING = "SCHEDULED_HIDING", _("Scheduled hiding")
+    SCHEDULED_PERIOD = "SCHEDULED_PERIOD", _("Scheduled period")
+    HIDDEN = "HIDDEN", _("Hidden")
+    PUBLISHED = "PUBLISHED", _("Published")
+    ARCHIVED = "ARCHIVED", _("Archived")
 
 
-class ReservationState(Enum):
-    SCHEDULED_RESERVATION = "SCHEDULED_RESERVATION"
-    SCHEDULED_PERIOD = "SCHEDULED_PERIOD"
-    RESERVABLE = "RESERVABLE"
-    SCHEDULED_CLOSING = "SCHEDULED_CLOSING"
-    RESERVATION_CLOSED = "RESERVATION_CLOSED"
+class ReservationUnitReservationState(models.TextChoices):
+    SCHEDULED_RESERVATION = "SCHEDULED_RESERVATION", _("Scheduled reservation")
+    SCHEDULED_PERIOD = "SCHEDULED_PERIOD", _("Scheduled period")
+    RESERVABLE = "RESERVABLE", _("Reservable")
+    SCHEDULED_CLOSING = "SCHEDULED_CLOSING", _("Scheduled closing")
+    RESERVATION_CLOSED = "RESERVATION_CLOSED", _("Reservation closed")
 
 
-class ReservationStartInterval(TextChoices):
+class ReservationStartInterval(models.TextChoices):
     INTERVAL_15_MINUTES = "interval_15_mins", _("15 minutes")
     INTERVAL_30_MINUTES = "interval_30_mins", _("30 minutes")
     INTERVAL_60_MINUTES = "interval_60_mins", _("60 minutes")

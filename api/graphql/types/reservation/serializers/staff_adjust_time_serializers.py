@@ -18,6 +18,8 @@ DEFAULT_TIMEZONE = get_default_timezone()
 
 
 class StaffReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, ReservationSchedulingMixin):
+    instance: Reservation
+
     class Meta:
         model = Reservation
         fields = [

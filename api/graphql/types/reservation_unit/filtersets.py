@@ -1,22 +1,19 @@
-import operator
-from functools import reduce
 from typing import TYPE_CHECKING, Any
 
 import django_filters
-from django.db.models import Expression, F, Q, QuerySet
+from django.db import models
+from django.db.models import F, Q, QuerySet
 from elasticsearch_django.models import SearchQuery
 from graphene_django_extensions import ModelFilterSet
-from graphene_django_extensions.filters import IntMultipleChoiceFilter
+from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntMultipleChoiceFilter
 
 from common.date_utils import local_datetime
 from elastic_django.reservation_units.query_builder import build_elastic_query_str
 from permissions.helpers import has_any_general_permission
 from permissions.models import GeneralPermissionChoices
-from reservation_units.enums import ReservationKind, ReservationState, ReservationUnitState
+from reservation_units.enums import ReservationKind, ReservationUnitPublishingState, ReservationUnitReservationState
 from reservation_units.models import ReservationUnit
 from reservation_units.querysets import ReservationUnitQuerySet
-from reservation_units.utils.reservation_unit_reservation_state_helper import ReservationUnitReservationStateHelper
-from reservation_units.utils.reservation_unit_state_helper import ReservationUnitStateHelper
 
 if TYPE_CHECKING:
     import datetime
@@ -68,14 +65,13 @@ class ReservationUnitFilterSet(ModelFilterSet):
 
     reservation_kind = django_filters.CharFilter(field_name="reservation_kind", method="get_reservation_kind")
 
-    state = django_filters.MultipleChoiceFilter(
-        method="get_state",
-        choices=tuple((state.value, state.value) for state in ReservationUnitState),
+    publishing_state = EnumMultipleChoiceFilter(
+        method="filter_by_publishing_state",
+        enum=ReservationUnitPublishingState,
     )
-
-    reservation_state = django_filters.MultipleChoiceFilter(
-        method="get_reservation_state",
-        choices=tuple((state.name, state.value) for state in ReservationState),
+    reservation_state = EnumMultipleChoiceFilter(
+        method="filter_by_reservation_state",
+        enum=ReservationUnitReservationState,
     )
 
     only_with_permission = django_filters.BooleanFilter(method="get_only_with_permission")
@@ -168,20 +164,12 @@ class ReservationUnitFilterSet(ModelFilterSet):
         return qs.filter(reservation_kind__icontains=value)
 
     @staticmethod
-    def get_state(qs: ReservationUnitQuerySet, name: str, value: list[str]):
-        queries = [ReservationUnitStateHelper.get_state_query(state) for state in value]
-        query = reduce(operator.or_, (query for query in queries))
-        return qs.filter(query).distinct()
+    def filter_by_publishing_state(qs: ReservationUnitQuerySet, name: str, value: list[str]) -> models.QuerySet:
+        return qs.with_publishing_state_in(value)
 
     @staticmethod
-    def get_reservation_state(qs: ReservationUnitQuerySet, name: str, value: list[str]) -> QuerySet:
-        query: Q = Q()
-        aliases: dict[str, Expression | F] = {}
-        for state in value:
-            query_state = ReservationUnitReservationStateHelper.get_state_query(state)
-            query |= query_state.filters
-            aliases |= query_state.aliases
-        return qs.alias(**aliases).filter(query).distinct()
+    def filter_by_reservation_state(qs: ReservationUnitQuerySet, name: str, value: list[str]) -> models.QuerySet:
+        return qs.with_reservation_state_in(value)
 
     def get_only_with_permission(self, qs: ReservationUnitQuerySet, name: str, value: bool) -> QuerySet:
         """Returns reservation units where the user has any kind of permissions in its unit"""

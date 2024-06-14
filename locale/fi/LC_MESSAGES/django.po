@@ -95,12 +95,10 @@ msgstr "Viikonpäivä"
 
 #: applications/admin/filters/application_section.py
 #: applications/admin/forms/application_section.py reservations/admin.py
-#: reservations/models/reservation_statistic.py
 msgid "Age group"
 msgstr "Ikäryhmä"
 
 #: applications/admin/filters/application_section.py reservations/admin.py
-#: reservations/models/reservation_statistic.py
 msgid "Reservation purpose"
 msgstr "Varaustarkoitukset"
 
@@ -126,13 +124,11 @@ msgstr "Varausyksikkövaihtoehto tälle allokoinnille."
 
 #: applications/admin/forms/allocated_time_slot.py
 #: applications/admin/forms/suitable_time_range.py reservations/admin.py
-#: reservations/models/reservation_statistic.py
 msgid "Begin time"
 msgstr "Aloitusaika"
 
 #: applications/admin/forms/allocated_time_slot.py
 #: applications/admin/forms/suitable_time_range.py reservations/admin.py
-#: reservations/models/reservation_statistic.py
 msgid "End time"
 msgstr "Lopetusaika"
 
@@ -196,7 +192,6 @@ msgid "Billing address"
 msgstr "Laskutusosoite"
 
 #: applications/admin/forms/application.py reservations/admin.py
-#: reservations/models/reservation_statistic.py
 msgid "Home city"
 msgstr "Kotikunta"
 
@@ -327,8 +322,7 @@ msgstr "Kausivarauskierroksen sopimusehdot."
 #: reservation_units/admin/forms/reservation_unit.py
 #: reservation_units/models/equipment.py reservation_units/models/keyword.py
 #: reservation_units/models/reservation_unit_type.py reservations/admin.py
-#: reservations/models/reservation_metadata.py
-#: reservations/models/reservation_statistic.py resources/models.py
+#: reservations/models/reservation_metadata.py resources/models.py
 #: services/models.py terms_of_use/models.py
 msgid "Name"
 msgstr "Nimi"
@@ -520,7 +514,6 @@ msgstr ""
 "toistokerrat tälle hakemuksen osalle ovat lukittu tai hylätty. <br>"
 
 #: applications/admin/forms/application_section.py reservations/admin.py
-#: reservations/models/reservation_statistic.py
 msgid "Number of persons"
 msgstr "Henkilömäärä"
 
@@ -849,7 +842,7 @@ msgid "Failed"
 msgstr "Epäonnistunut"
 
 #: applications/choices.py common/choices/banner_notification.py
-#: merchants/models.py
+#: merchants/models.py reservation_units/enums.py
 msgid "Draft"
 msgstr "Luonnos"
 
@@ -1409,7 +1402,6 @@ msgid "Total amount"
 msgstr "Kokonaismäärä"
 
 #: merchants/models.py reservations/admin.py
-#: reservations/models/reservation_statistic.py
 msgid "Created at"
 msgstr "Luotu"
 
@@ -2016,14 +2008,12 @@ msgid "Surface area"
 msgstr "Pinta-ala"
 
 #: reservation_units/admin/forms/reservation_unit.py reservations/admin.py
-#: reservations/models/reservation_statistic.py resources/models.py
-#: services/models.py
+#: resources/models.py services/models.py
 msgid "Buffer time before"
 msgstr "Tauko ennen varausta"
 
 #: reservation_units/admin/forms/reservation_unit.py reservations/admin.py
-#: reservations/models/reservation_statistic.py resources/models.py
-#: services/models.py
+#: resources/models.py services/models.py
 msgid "Buffer time after"
 msgstr "Tauko varauksen jälkeen"
 
@@ -2297,6 +2287,46 @@ msgid "Product used for payments"
 msgstr "Tuote, jota käytetään maksuihin"
 
 #: reservation_units/enums.py
+msgid "Scheduled publishing"
+msgstr "Julkaisu ajastettu"
+
+#: reservation_units/enums.py
+msgid "Scheduled hiding"
+msgstr "Piilotus ajastettu"
+
+#: reservation_units/enums.py
+msgid "Scheduled period"
+msgstr "Julkaisuväli ajastettu"
+
+#: reservation_units/enums.py
+msgid "Hidden"
+msgstr "Piilotettu"
+
+#: reservation_units/enums.py
+msgid "Published"
+msgstr "Julkaistu"
+
+#: reservation_units/enums.py
+msgid "Archived"
+msgstr "Arkistoitu"
+
+#: reservation_units/enums.py
+msgid "Scheduled reservation"
+msgstr "Varaus ajastettu"
+
+#: reservation_units/enums.py
+msgid "Reservable"
+msgstr "Varattavissa"
+
+#: reservation_units/enums.py
+msgid "Scheduled closing"
+msgstr "Sulku ajastettu"
+
+#: reservation_units/enums.py
+msgid "Reservation closed"
+msgstr "Suljettu"
+
+#: reservation_units/enums.py
 msgid "15 minutes"
 msgstr "15 minuuttia"
 
@@ -2474,7 +2504,7 @@ msgstr "Ylin hinta"
 msgid "Tax percentage"
 msgstr "Veroprosentti"
 
-#: reservations/admin.py reservations/models/reservation_statistic.py
+#: reservations/admin.py
 msgid "State"
 msgstr "Tila"
 
@@ -2490,19 +2520,19 @@ msgstr "Perumistiedot"
 msgid "Handling details"
 msgstr "Käsittelytiedot"
 
-#: reservations/admin.py reservations/models/reservation_statistic.py
+#: reservations/admin.py
 msgid "Handled at"
 msgstr "Käsitelty"
 
-#: reservations/admin.py reservations/models/reservation_statistic.py
+#: reservations/admin.py
 msgid "Confirmed at"
 msgstr "Vahvistettu"
 
-#: reservations/admin.py reservations/models/reservation_statistic.py
+#: reservations/admin.py
 msgid "Price"
 msgstr "Hinta"
 
-#: reservations/admin.py reservations/models/reservation_statistic.py
+#: reservations/admin.py
 msgid "Price net"
 msgstr "Nettohinta"
 
@@ -2518,7 +2548,7 @@ msgstr "Subventoimaton nettohinta"
 msgid "Unit price"
 msgstr "Yksikköhinta"
 
-#: reservations/admin.py reservations/models/reservation_statistic.py
+#: reservations/admin.py
 msgid "Tax percentage value"
 msgstr "Veroprosentti"
 
@@ -2566,11 +2596,11 @@ msgstr "Varaajan kaupunki"
 msgid "Reservee address zip code"
 msgstr "Varaajan postinumero"
 
-#: reservations/admin.py reservations/models/reservation_statistic.py
+#: reservations/admin.py
 msgid "Reservee is an unregistered association"
 msgstr "Varaaja on rekisteröimätön yhdistys"
 
-#: reservations/admin.py reservations/models/reservation_statistic.py
+#: reservations/admin.py
 msgid "Preferred language of reservee"
 msgstr "Varaajan kieli"
 
@@ -2610,11 +2640,11 @@ msgstr "Varauksen maksajan postinumero"
 msgid "Recurring reservation"
 msgstr "Toistuva varaus"
 
-#: reservations/admin.py reservations/models/reservation_statistic.py
+#: reservations/admin.py
 msgid "Reason for deny"
 msgstr "Syy hylkäämiselle"
 
-#: reservations/admin.py reservations/models/reservation_statistic.py
+#: reservations/admin.py
 msgid "Reason for cancellation"
 msgstr "Syy perumiselle"
 
@@ -2698,7 +2728,7 @@ msgstr "Varauksen yksikköhinta"
 msgid "The value of the tax percentage for this particular reservation"
 msgstr "ALV:n prosenttiosuus tässä varauksessa"
 
-#: reservations/admin.py reservations/models/reservation_statistic.py
+#: reservations/admin.py
 msgid "Reservee is applying for a free-of-charge reservation"
 msgstr "Varaaja hakee alennuskelpoisuutta"
 
@@ -2857,50 +2887,6 @@ msgstr "Vaaditut kentät"
 #: reservations/models/reservation_metadata.py
 msgid "Reservation metadata sets"
 msgstr "Varauslomakkeen kenttäkokonaisuus"
-
-#: reservations/models/reservation_statistic.py
-msgid "Statistics updated at"
-msgstr "Tilastot päivitetty"
-
-#: reservations/models/reservation_statistic.py
-msgid "Home city name"
-msgstr "Kotikunnan nimi"
-
-#: reservations/models/reservation_statistic.py
-msgid "Home city municipality code"
-msgstr "Kotikunnan kuntanumero"
-
-#: reservations/models/reservation_statistic.py
-msgid "Is the reservation done through application process."
-msgstr "Onko varaus tehty hakuprosessin kautta."
-
-#: reservations/models/reservation_statistic.py
-msgid "Ability group"
-msgstr "Kykyryhmä"
-
-#: reservations/models/reservation_statistic.py
-msgid "Reservation duration in minutes"
-msgstr "Varauksen kesto minuutteina"
-
-#: reservations/models/reservation_statistic.py
-msgid "The reason text of the cancel reason"
-msgstr "Perumisen syyn kuvaus"
-
-#: reservations/models/reservation_statistic.py
-msgid "The reason text of the deny reason"
-msgstr "Hylkäämisen syyn kuvaus"
-
-#: reservations/models/reservation_statistic.py
-msgid "Non subsidised price"
-msgstr "Subventoimaton hinta"
-
-#: reservations/models/reservation_statistic.py
-msgid "Non subsidised net price"
-msgstr "Subventoimaton nettohinta"
-
-#: reservations/models/reservation_statistic.py
-msgid "TPREK id"
-msgstr "Toimipisterekisterin tunniste"
 
 #: resources/choices.py
 msgid "Fixed"
