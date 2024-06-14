@@ -6,7 +6,7 @@ from graphql_relay import to_global_id
 
 from applications.enums import WeekdayChoice
 from common.date_utils import local_datetime, next_hour
-from reservation_units.enums import PricingType, ReservationUnitState
+from reservation_units.enums import PricingType, ReservationUnitPublishingState
 from reservations.enums import ReservationStateChoice, ReservationTypeChoice
 from terms_of_use.models import TermsOfUse
 from tests.factories import (
@@ -145,7 +145,7 @@ def test_reservation_unit__query__all_fields(graphql):
         authentication
         reservationStartInterval
         reservationKind
-        state
+        publishingState
         reservationState
     """
 
@@ -222,8 +222,8 @@ def test_reservation_unit__query__all_fields(graphql):
         "authentication": reservation_unit.authentication.upper(),
         "reservationStartInterval": reservation_unit.reservation_start_interval.upper(),
         "reservationKind": reservation_unit.reservation_kind.upper(),
-        "state": reservation_unit.state.value,
-        "reservationState": reservation_unit.reservation_state.value,
+        "publishingState": reservation_unit.publishing_state,
+        "reservationState": reservation_unit.reservation_state,
     }
 
 
@@ -485,12 +485,12 @@ def test_reservation_unit__query__hide_archived(graphql):
 def test_reservation_unit__query__state__draft(graphql):
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
 
-    query = reservation_units_query(fields="state", pk=reservation_unit.pk)
+    query = reservation_units_query(fields="publishingState", pk=reservation_unit.pk)
     response = graphql(query)
 
     assert response.has_errors is False, response.errors
     assert len(response.edges) == 1
-    assert response.node(0) == {"state": ReservationUnitState.DRAFT.value}
+    assert response.node(0) == {"publishingState": ReservationUnitPublishingState.DRAFT.value}
 
 
 def test_reservation_unit__query__state__scheduled_publishing(graphql):
@@ -500,12 +500,12 @@ def test_reservation_unit__query__state__scheduled_publishing(graphql):
         publish_ends=None,
     )
 
-    query = reservation_units_query(fields="state", pk=reservation_unit.pk)
+    query = reservation_units_query(fields="publishingState", pk=reservation_unit.pk)
     response = graphql(query)
 
     assert response.has_errors is False, response.errors
     assert len(response.edges) == 1
-    assert response.node(0) == {"state": ReservationUnitState.SCHEDULED_PUBLISHING.value}
+    assert response.node(0) == {"publishingState": ReservationUnitPublishingState.SCHEDULED_PUBLISHING.value}
 
 
 def test_reservation_unit__query__state__scheduled_hiding(graphql):
@@ -515,12 +515,12 @@ def test_reservation_unit__query__state__scheduled_hiding(graphql):
         publish_ends=now + datetime.timedelta(days=2),
     )
 
-    query = reservation_units_query(fields="state", pk=reservation_unit.pk)
+    query = reservation_units_query(fields="publishingState", pk=reservation_unit.pk)
     response = graphql(query)
 
     assert response.has_errors is False, response.errors
     assert len(response.edges) == 1
-    assert response.node(0) == {"state": ReservationUnitState.SCHEDULED_HIDING.value}
+    assert response.node(0) == {"publishingState": ReservationUnitPublishingState.SCHEDULED_HIDING.value}
 
 
 def test_reservation_unit__query__state__hidden(graphql):
@@ -530,12 +530,12 @@ def test_reservation_unit__query__state__hidden(graphql):
         publish_ends=now - datetime.timedelta(days=1),
     )
 
-    query = reservation_units_query(fields="state", pk=reservation_unit.pk)
+    query = reservation_units_query(fields="publishingState", pk=reservation_unit.pk)
     response = graphql(query)
 
     assert response.has_errors is False, response.errors
     assert len(response.edges) == 1
-    assert response.node(0) == {"state": ReservationUnitState.HIDDEN.value}
+    assert response.node(0) == {"publishingState": ReservationUnitPublishingState.HIDDEN.value}
 
 
 def test_reservation_unit__query__state__scheduled_period(graphql):
@@ -545,12 +545,12 @@ def test_reservation_unit__query__state__scheduled_period(graphql):
         publish_ends=now + datetime.timedelta(days=3),
     )
 
-    query = reservation_units_query(fields="state", pk=reservation_unit.pk)
+    query = reservation_units_query(fields="publishingState", pk=reservation_unit.pk)
     response = graphql(query)
 
     assert response.has_errors is False, response.errors
     assert len(response.edges) == 1
-    assert response.node(0) == {"state": ReservationUnitState.SCHEDULED_PERIOD.value}
+    assert response.node(0) == {"publishingState": ReservationUnitPublishingState.SCHEDULED_PERIOD.value}
 
 
 def test_reservation_unit__query__state__published(graphql):
@@ -561,12 +561,12 @@ def test_reservation_unit__query__state__published(graphql):
         reservation_ends=None,
     )
 
-    query = reservation_units_query(fields="state", pk=reservation_unit.pk)
+    query = reservation_units_query(fields="publishingState", pk=reservation_unit.pk)
     response = graphql(query)
 
     assert response.has_errors is False, response.errors
     assert len(response.edges) == 1
-    assert response.node(0) == {"state": ReservationUnitState.PUBLISHED.value}
+    assert response.node(0) == {"publishingState": ReservationUnitPublishingState.PUBLISHED.value}
 
 
 def test_reservation_unit__query__reservation_blocks_whole_day(graphql):

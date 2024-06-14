@@ -182,8 +182,8 @@ class ReservationUnitExporter:
                             ", ".join(reservation_unit.purposes.all().values_list("name_fi", flat=True)),
                             reservation_unit.require_introduction,
                             ", ".join(reservation_unit.equipments.all().values_list("name_fi", flat=True)),
-                            reservation_unit.state.value,
-                            reservation_unit.reservation_state.value,
+                            reservation_unit.publishing_state,
+                            reservation_unit.reservation_state,
                         ]
                     )
             return path / file_name
