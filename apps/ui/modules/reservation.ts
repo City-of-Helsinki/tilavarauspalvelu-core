@@ -96,7 +96,7 @@ export function getDurationOptions(
   return durationOptions;
 }
 
-export function isReservationInThePast(
+function isReservationInThePast(
   reservation: Pick<ReservationNode, "begin">
 ): boolean {
   if (!reservation?.begin) {
@@ -350,33 +350,27 @@ export function canReservationTimeBeChanged({
   if (isReservationEditable({ reservation })) {
     return false;
   }
-  if (newReservation) {
-    //  new reservation is free
-    if (!isReservationFreeOfCharge(newReservation)) {
-      return false;
-    }
 
-    if (reservationUnit == null) {
-      return false;
-    }
-
-    //  new reservation is valid
-    const isReservable = isRangeReservable({
-      range: {
-        start: new Date(newReservation.begin),
-        end: new Date(newReservation.end),
-      },
-      reservationUnit,
-      reservableTimes,
-      activeApplicationRounds,
-      skipLengthCheck: false,
-    });
-    if (!isReservable) {
-      return false;
-    }
+  //  new reservation is free
+  if (!isReservationFreeOfCharge(newReservation)) {
+    return false;
   }
 
-  return true;
+  if (reservationUnit == null) {
+    return false;
+  }
+
+  //  new reservation is valid
+  return isRangeReservable({
+    range: {
+      start: new Date(newReservation.begin),
+      end: new Date(newReservation.end),
+    },
+    reservationUnit,
+    reservableTimes,
+    activeApplicationRounds,
+    skipLengthCheck: false,
+  });
 }
 
 // FIXME this is awful: we don't use the Node type anymore, this is not type safe, it's not intuative what this does and why

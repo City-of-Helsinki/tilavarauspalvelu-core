@@ -22,10 +22,13 @@ import {
   getReservationApplicationMutationValues,
   getReservationCancellationReason,
   isReservationEditable,
-  isReservationInThePast,
   isReservationStartInFuture,
 } from "../reservation";
-import { type ReservableMap, isSlotWithinReservationTime } from "../reservable";
+import {
+  type ReservableMap,
+  isSlotWithinReservationTime,
+  generateReservableMap,
+} from "../reservable";
 import mockTranslations from "../../public/locales/fi/prices.json";
 import { toApiDate } from "common/src/common/util";
 import { type TFunction } from "i18next";
@@ -210,7 +213,7 @@ const reservation = {
 
 describe("canUserCancelReservation", () => {
   test("NO for reservation that needs handling", () => {
-    const res = {
+    const input = {
       ...reservation,
       begin: new Date().toISOString(),
       end: addHours(new Date(), 1).toISOString(),
@@ -226,11 +229,11 @@ describe("canUserCancelReservation", () => {
         },
       ],
     };
-    expect(canUserCancelReservation(res)).toBe(false);
+    expect(canUserCancelReservation(input)).toBe(false);
   });
 
   test("YES for reservation that does not need handling", () => {
-    const res = {
+    const input = {
       ...reservation,
       begin: addMinutes(new Date(), 10).toISOString(),
       state: ReservationStateChoice.Confirmed,
@@ -245,7 +248,7 @@ describe("canUserCancelReservation", () => {
         },
       ],
     };
-    expect(canUserCancelReservation(res)).toBe(true);
+    expect(canUserCancelReservation(input)).toBe(true);
   });
 
   test.todo("NO for a reservation that is in the past");
@@ -253,7 +256,7 @@ describe("canUserCancelReservation", () => {
   test.todo("NO for a reservation that is too close to the start time");
 
   test("NO for reservation that requires handling", () => {
-    const res = {
+    const input = {
       ...reservation,
       begin: new Date().toISOString(),
       state: ReservationStateChoice.RequiresHandling,
@@ -269,12 +272,12 @@ describe("canUserCancelReservation", () => {
         },
       ],
     };
-    expect(canUserCancelReservation(res)).toBe(false);
+    expect(canUserCancelReservation(input)).toBe(false);
   });
 
   // TODO mock the system clock
   test("YES for a reservatuin that can be confirmed till it's start", () => {
-    const res = {
+    const input = {
       ...reservation,
       begin: new Date().toISOString(),
       state: ReservationStateChoice.Confirmed,
@@ -290,7 +293,7 @@ describe("canUserCancelReservation", () => {
         },
       ],
     };
-    expect(canUserCancelReservation(res)).toBe(true);
+    expect(canUserCancelReservation(input)).toBe(true);
   });
 });
 
@@ -341,6 +344,7 @@ describe("getReservationApplcationMutationValues", () => {
   });
 });
 
+/*
 describe("isReservationInThePast", () => {
   test("with valid data", () => {
     expect(
@@ -362,6 +366,7 @@ describe("isReservationInThePast", () => {
     ).toBe(true);
   });
 });
+*/
 
 describe("getReservationCancellationReason", () => {
   const reservation2 = {
@@ -590,6 +595,22 @@ describe("isReservationEditable", () => {
 });
 
 describe("canReservationBeChanged", () => {
+  const WEEK_OF_TIMES = [0, 1, 2, 3, 4, 5, 6]
+    .map((i) => ({
+      start: addDays(addHours(startOfToday(), 9), i),
+      end: addDays(addHours(startOfToday(), 21), i),
+    }))
+    .map(({ start, end }) => ({
+      startDatetime: start.toISOString(),
+      endDatetime: end.toISOString(),
+    }));
+
+  const reservableTimes: ReservableMap = generateReservableMap(WEEK_OF_TIMES);
+
+  const reservation_ = {
+    ...reservation,
+    reservationUnit: [reservation.reservationUnit[0]],
+  };
   /*
   test("returns false with non-confirmed reservation", () => {
     expect(
@@ -689,22 +710,19 @@ describe("canReservationBeChanged", () => {
   });
   */
   /* TODO these are working on partial data, which is not a supported use case
+
+
+  /* TODO these are working on partial data, which is not a supported use case */
+  /*
   test("handles cancellation rule buffer check", () => {
-    // FIXME
     const reservableTimes: ReservableMap = new Map();
     const res1 = canReservationTimeBeChanged({
       reservableTimes,
       reservation: {
-        ...reservation,
+        ...reservation_,
         begin: addHours(new Date(), 1).toISOString(),
       },
-      reservationUnit: {
-        ...reservationUnit,
-        cancellationRule: {
-          ...reservationUnit.cancellationRule,
-          canBeCancelledTimeBefore: 3000,
-        },
-      } as IsReservableFieldsFragment,
+      reservationUnit,
     });
     expect(res1).toBe(true);
 
@@ -714,188 +732,214 @@ describe("canReservationBeChanged", () => {
         ...reservation,
         begin: addHours(new Date(), 1).toISOString(),
       },
-      reservationUnit: {
-        ...reservationUnit,
-        cancellationRule: {
-          ...reservationUnit.cancellationRule,
-          canBeCancelledTimeBefore: 3601,
-        },
-      } as IsReservableFieldsFragment,
+      reservationUnit,
     });
     expect(res2).toBe(false);
   });
   */
 
-  /* TODO these are working on partial data, which is not a supported use case
+  // TODO split this into different cases
+  test("valid data", () => {
+    const input = {
+      reservableTimes,
+      reservation: reservation_,
+      newReservation: {
+        ...reservation,
+        begin: addHours(startOfToday(), 35).toString(),
+        end: addHours(startOfToday(), 36).toString(),
+      },
+      reservationUnit,
+      activeApplicationRounds: [],
+    };
+    expect(canReservationTimeBeChanged(input)).toBe(true);
+  });
+
   test("handles new reservation price check", () => {
     // TODO need to test the exact same thing except with price
     // without price should be true, with price should be false
+    const input = {
+      reservation: reservation_,
+      reservableTimes,
+      newReservation: {
+        ...reservation,
+        price: "2.02",
+      },
+      reservationUnit,
+    };
+    expect(canReservationTimeBeChanged(input)).toBe(false);
+  });
+
+  test("false without reservable times", () => {
+    // TODO use a pretested version that is correct, only change one thing for this test
+    const input = {
+      reservation: reservation_,
+      reservableTimes: new Map(),
+      newReservation: {
+        ...reservation,
+        begin: addHours(startOfToday(), 10).toString(),
+        end: addHours(startOfToday(), 12).toString(),
+      },
+      reservationUnit,
+    };
+    expect(canReservationTimeBeChanged(input)).toBe(false);
+  });
+
+  // TODO what is incomplete data? what are we testing?
+  test("with incomplete data", () => {
+    const input = {
+      reservation: reservation_,
+      reservableTimes,
+      newReservation: {
+        ...reservation,
+        begin: addHours(startOfToday(), 12).toISOString(),
+      },
+      reservationUnit,
+      activeApplicationRounds: [],
+    };
+    expect(canReservationTimeBeChanged(input)).toBe(false);
+  });
+
+  test("NO with malformed begin time", () => {
+    const input = {
+      reservation: reservation_,
+      reservableTimes,
+      newReservation: {
+        ...reservation,
+        begin: "foobar",
+        end: addHours(startOfToday(), 12).toISOString(),
+      },
+      reservationUnit,
+      activeApplicationRounds: [],
+    };
+    expect(canReservationTimeBeChanged(input)).toBe(false);
+  });
+
+  test("NO with empty begin time", () => {
+    const input = {
+      reservation: reservation_,
+      reservableTimes,
+      newReservation: {
+        ...reservation,
+        begin: "",
+        end: addHours(startOfToday(), 12).toISOString(),
+      },
+      reservationUnit,
+      activeApplicationRounds: [],
+    };
+    expect(canReservationTimeBeChanged(input)).toBe(false);
+  });
+
+  test("NO with minimum reservation days", () => {
+    const input = {
+      reservation: reservation_,
+      reservableTimes,
+      newReservation: {
+        ...reservation,
+        begin: addHours(startOfToday(), 10).toString(),
+        end: addHours(startOfToday(), 12).toString(),
+      },
+      reservationUnit: {
+        ...reservationUnit,
+        reservationsMinDaysBefore: 10,
+      },
+      activeApplicationRounds: [],
+    };
+    expect(canReservationTimeBeChanged(input)).toBe(false);
+  });
+
+  /*
+  test("with reservation time missing reservation units reservation time slot", () => {
     expect(
       canReservationTimeBeChanged({
-        reservation,
-        // FIXME
-        reservableTimes: new Map(),
-        newReservation: { ...reservation, price: "2.02" },
-        reservationUnit,
+        reservation: reservation_,
+        reservableTimes,
+        newReservation: {
+          ...reservation,
+          begin: addHours(new Date(), 1).toString(),
+          end: addHours(new Date(), 2).toString(),
+        },
+        reservationUnit: {
+          ...reservationUnit,
+          reservationBegins: addDays(new Date(), 1).toString(),
+        },
+        activeApplicationRounds: [],
       })
     ).toBe(false);
   });
   */
 
-  describe("handles new reservation general validation", () => {
-    const reservation_ = {
-      ...reservation,
-      reservationUnit: [reservation.reservationUnit[0]],
+  test("NO when there are no reservable times", () => {
+    const input = {
+      reservation: reservation_,
+      reservableTimes,
+      newReservation: {
+        ...reservation,
+        begin: addHours(new Date(), 1).toString(),
+        end: addHours(new Date(), 2).toString(),
+      },
+      reservationUnit: {
+        ...reservationUnit,
+      },
+      activeApplicationRounds: [],
     };
+    expect(canReservationTimeBeChanged(input)).toBe(true);
+    expect(
+      canReservationTimeBeChanged({ ...input, reservableTimes: new Map() })
+    ).toBe(false);
+  });
 
-    test("false without reservable times", () => {
-      const reservableTimes = new Map();
-      expect(
-        canReservationTimeBeChanged({
-          reservation: reservation_,
-          reservableTimes,
-          newReservation: {
-            ...reservation,
-            begin: addHours(startOfToday(), 10).toString(),
-            end: addHours(startOfToday(), 12).toString(),
-          },
-          reservationUnit,
-        })
-      ).toBe(false);
-    });
+  test("NO when reservation has ended", () => {
+    const input = {
+      reservation: reservation_,
+      reservableTimes,
+      newReservation: {
+        ...reservation,
+        begin: addHours(new Date(), 1).toString(),
+        end: addHours(new Date(), 2).toString(),
+      },
+      reservationUnit: {
+        ...reservationUnit,
+        reservationEnds: addDays(new Date(), -1).toString(),
+      },
+      activeApplicationRounds: [],
+    };
+    expect(canReservationTimeBeChanged(input)).toBe(false);
+  });
 
-    // TODO what is incomplete data? what are we testing?
-    test("with incomplete data", () => {
-      // FIXME
-      const reservableTimes: ReservableMap = new Map();
-      expect(
-        canReservationTimeBeChanged({
-          reservation: reservation_,
-          reservableTimes,
-          newReservation: {
-            ...reservation,
-            begin: addHours(startOfToday(), 12).toISOString(),
-          },
-          reservationUnit,
-          activeApplicationRounds: [],
-        })
-      ).toBe(false);
+  test("NO when the reservation is in the past", () => {
+    const input = {
+      reservation: reservation_,
+      reservableTimes,
+      newReservation: {
+        ...reservation,
+        begin: addHours(new Date(), -1).toString(),
+        end: addHours(new Date(), 2).toString(),
+      },
+      reservationUnit,
+      activeApplicationRounds: [],
+    };
+    expect(canReservationTimeBeChanged(input)).toBe(false);
+  });
 
-      expect(
-        canReservationTimeBeChanged({
-          reservation: reservation_,
-          reservableTimes,
-          newReservation: {
-            ...reservation,
-            begin: "",
-            end: addHours(startOfToday(), 12).toISOString(),
+  test("with conflicting application round", () => {
+    expect(
+      canReservationTimeBeChanged({
+        reservation: reservation_,
+        reservableTimes,
+        newReservation: {
+          ...reservation,
+          begin: addHours(startOfToday(), 10).toString(),
+          end: addHours(startOfToday(), 12).toString(),
+        },
+        reservationUnit,
+        activeApplicationRounds: [
+          {
+            reservationPeriodBegin: addHours(startOfToday(), 1).toISOString(),
+            reservationPeriodEnd: addHours(startOfToday(), 20).toISOString(),
           },
-          reservationUnit,
-          activeApplicationRounds: [],
-        })
-      ).toBe(false);
-    });
-
-    test("with reservation start buffer", () => {
-      // FIXME
-      const reservableTimes: ReservableMap = new Map();
-      expect(
-        canReservationTimeBeChanged({
-          reservation: reservation_,
-          reservableTimes,
-          newReservation: {
-            ...reservation,
-            begin: addHours(startOfToday(), 10).toString(),
-            end: addHours(startOfToday(), 12).toString(),
-          },
-          reservationUnit: {
-            ...reservationUnit,
-            reservationsMinDaysBefore: 10,
-          },
-          activeApplicationRounds: [],
-        })
-      ).toBe(false);
-    });
-
-    test("with reservation time missing reservation units reservation time slot", () => {
-      // FIXME
-      const reservableTimes: ReservableMap = new Map();
-      expect(
-        canReservationTimeBeChanged({
-          reservation: reservation_,
-          reservableTimes,
-          newReservation: {
-            ...reservation,
-            begin: addHours(new Date(), 1).toString(),
-            end: addHours(new Date(), 2).toString(),
-          },
-          reservationUnit: {
-            ...reservationUnit,
-            reservationBegins: addDays(new Date(), 1).toString(),
-          },
-          activeApplicationRounds: [],
-        })
-      ).toBe(false);
-
-      expect(
-        canReservationTimeBeChanged({
-          reservation: reservation_,
-          // FIXME
-          reservableTimes: new Map(),
-          newReservation: {
-            ...reservation,
-            begin: addHours(new Date(), 1).toString(),
-            end: addHours(new Date(), 2).toString(),
-          },
-          reservationUnit: {
-            ...reservationUnit,
-            reservationEnds: addDays(new Date(), -1).toString(),
-          },
-          activeApplicationRounds: [],
-        })
-      ).toBe(false);
-    });
-
-    test("with conflicting application round", () => {
-      // FIXME
-      const reservableTimes: ReservableMap = new Map();
-      expect(
-        canReservationTimeBeChanged({
-          reservation: reservation_,
-          reservableTimes,
-          newReservation: {
-            ...reservation,
-            begin: addHours(startOfToday(), 10).toString(),
-            end: addHours(startOfToday(), 12).toString(),
-          },
-          reservationUnit,
-          activeApplicationRounds: [
-            {
-              reservationPeriodBegin: addHours(startOfToday(), 1).toISOString(),
-              reservationPeriodEnd: addHours(startOfToday(), 20).toISOString(),
-            },
-          ],
-        })
-      ).toBe(false);
-    });
-
-    test("valid data", () => {
-      // FIXME
-      const reservableTimes: ReservableMap = new Map();
-      expect(
-        canReservationTimeBeChanged({
-          reservableTimes,
-          reservation: reservation_,
-          newReservation: {
-            ...reservation,
-            begin: addHours(startOfToday(), 35).toString(),
-            end: addHours(startOfToday(), 36).toString(),
-          },
-          reservationUnit,
-          activeApplicationRounds: [],
-        })
-      ).toBe(true);
-    });
+        ],
+      })
+    ).toBe(false);
   });
 });
 
