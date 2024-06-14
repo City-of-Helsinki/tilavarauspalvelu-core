@@ -358,4 +358,12 @@ class Reservation(SerializableMixin, models.Model):
         return list(self.reservation_unit.values_list("unit__unit_groups", flat=True).distinct())
 
 
-AuditLogger.register(Reservation)
+AuditLogger.register(
+    Reservation,
+    # Exclude lookup properties, since they are calculated values.
+    exclude_fields=[
+        "_reservee_name",
+        "_unit_ids_for_perms",
+        "_unit_group_ids_for_perms",
+    ],
+)
