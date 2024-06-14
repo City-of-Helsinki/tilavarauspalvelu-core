@@ -1,5 +1,5 @@
 import { Control, FieldValues, Path, useController } from "react-hook-form";
-import { MultiSelectDropdown } from "../form";
+import { Combobox } from "hds-react";
 
 export function ControlledMultiSelect<T extends FieldValues>({
   name,
@@ -18,19 +18,22 @@ export function ControlledMultiSelect<T extends FieldValues>({
     field: { value, onChange },
   } = useController({ control, name });
 
-  // TODO replace with HDS ComboBox
+  // FIXME
+  // const placeholder = t(`filters.placeholder.${name}`);
+  const placeholder = label;
   return (
-    <MultiSelectDropdown
-      id={`${name}Filter`}
-      checkboxName={`${name}Filter`}
-      name={name}
-      onChange={(selection): void => {
-        onChange(selection.filter((n) => n !== "").join(","));
-      }}
+    <Combobox<(typeof options)[0]>
+      label={label}
+      multiselect
+      placeholder={placeholder}
+      clearable
       options={options}
-      showSearch
-      title={label}
-      value={value?.split(",") ?? [""]}
+      disabled={options.length === 0}
+      value={options.filter((v) => value.includes(v.value.toString())) ?? null}
+      // @ts-expect-error -- multiselect problems
+      onChange={(val?: typeof options) =>
+        onChange(val?.map((x) => x.value.toString()) ?? null)
+      }
     />
   );
 }
