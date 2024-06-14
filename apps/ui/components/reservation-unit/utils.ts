@@ -39,12 +39,14 @@ const dayMax = (days: Array<Date | undefined>): Date | undefined => {
   }, undefined);
 };
 
+type LastPossibleReservationDateProps = Pick<
+  ReservationUnitNode,
+  "reservationsMaxDaysBefore" | "reservableTimeSpans" | "reservationEnds"
+>;
+
 // Returns the last possible reservation date for the given reservation unit
 export function getLastPossibleReservationDate(
-  reservationUnit?: Pick<
-    ReservationUnitNode,
-    "reservationsMaxDaysBefore" | "reservableTimeSpans" | "reservationEnds"
-  >
+  reservationUnit?: LastPossibleReservationDateProps
 ): Date | null {
   if (!reservationUnit) {
     return null;
@@ -62,6 +64,7 @@ export function getLastPossibleReservationDate(
   const reservationUnitNotReservable = reservationEnds
     ? new Date(reservationEnds)
     : undefined;
+  // Why does this return now instead of null if there are no reservableTimeSpans?
   const endDateTime = reservableTimeSpans.at(-1)?.endDatetime ?? undefined;
   const lastOpeningDate = endDateTime ? new Date(endDateTime) : new Date();
   return (
@@ -143,12 +146,30 @@ export function getNextAvailableTime(props: AvailableTimesProps): Date | null {
   const possibleEndDay = getLastPossibleReservationDate(reservationUnit);
   const endDay = possibleEndDay ? addDays(possibleEndDay, 1) : undefined;
   const minDay = dayMax([today, start]) ?? today;
+
   // Find the first possible day
-  // FIXME use the end date to iterate till we find a day
-  const openTimes = reservableTimes.get(dateToKey(minDay));
-  if (openTimes == null) {
+  let openTimes = reservableTimes.get(dateToKey(minDay));
+  const it = reservableTimes.entries();
+  while (openTimes == null || openTimes.length === 0) {
+    const result = it.next();
+    if (result.done) {
+      return null;
+    }
+    const {
+      value: [_key, value],
+    } = result;
+    if (endDay && isAfter(minDay, endDay)) {
+      return null;
+    }
+    if (value.length > 0) {
+      minDay.setDate(value[0].start.getDate());
+      openTimes = reservableTimes.get(dateToKey(minDay));
+    }
+  }
+  if (openTimes == null || openTimes.length === 0) {
     return null;
   }
+
   const interval = openTimes[0];
   const startDay = dayMax([new Date(interval.start), minDay]) ?? minDay;
 

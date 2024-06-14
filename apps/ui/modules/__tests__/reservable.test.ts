@@ -18,17 +18,14 @@ describe("generateReservableMap", () => {
     };
   }
 
-  //
   // - the easy one: all ranges in the future, one week of ranges (7 days) (from today ->)
   //   all ranges are 09:00-21:00
   test("7 days single range per day", () => {
-    const data = [0, 1, 2, 3, 4, 5, 6]
-      .map((i) => ({
-        start: addDays(addHours(startOfToday(), 9), i),
-        end: addDays(addHours(startOfToday(), 21), i),
-      }))
-      .map(toRange);
-    const times = generateReservableMap(data);
+    const data = [0, 1, 2, 3, 4, 5, 6].map((i) => ({
+      start: addDays(addHours(startOfToday(), 9), i),
+      end: addDays(addHours(startOfToday(), 21), i),
+    }));
+    const times = generateReservableMap(data.map(toRange));
     expect(times.size).toBe(7);
     for (const [key, value] of times) {
       expect(value.length).toBe(1);
