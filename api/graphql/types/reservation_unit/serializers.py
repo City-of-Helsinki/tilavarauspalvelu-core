@@ -81,7 +81,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
             "authentication",
             "reservation_start_interval",
             "reservation_kind",
-            "state",
+            "publishing_state",
             #
             # Forward many-to-one related
             "unit",

@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Self
 from django.db import connections, models
 from django.db.models import Q, prefetch_related_objects
 from elasticsearch_django.models import SearchResultsQuerySet
+from lookup_property import L
 
 from common.date_utils import local_datetime
 from common.db import ArrayUnnest, SubqueryArray
@@ -184,3 +185,9 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
             prefetch_related_objects(results, *self._prefetch_related_lookups)
             hook(results)
             yield from results
+
+    def with_publishing_state_in(self, states: list[str]) -> Self:
+        return self.filter(L(publishing_state__in=states))
+
+    def with_reservation_state_in(self, states: list[str]) -> Self:
+        return self.filter(L(reservation_state__in=states))

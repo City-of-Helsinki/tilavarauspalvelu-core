@@ -57,7 +57,7 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
 
     assert ReservationStatistic.objects.count() == 1
 
-    stat = ReservationStatistic.objects.first()
+    stat: ReservationStatistic | None = ReservationStatistic.objects.first()
     assert stat.ability_group is not None
     assert stat.ability_group_name == reservation.recurring_reservation.ability_group.name
     assert stat.age_group == reservation.age_group

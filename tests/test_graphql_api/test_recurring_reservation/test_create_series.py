@@ -125,7 +125,7 @@ def test_recurring_reservations__create_series__reservation_details(graphql):
     assert response.has_errors is False
 
     recurring_reservation = RecurringReservation.objects.get(pk=response.first_query_object["pk"])
-    reservations = list(recurring_reservation.reservations.order_by("begin").all())
+    reservations: list[Reservation] = list(recurring_reservation.reservations.order_by("begin").all())
     assert len(reservations) == 1
 
     begin = datetime.datetime(2024, 1, 1, 10, 0, 0, tzinfo=DEFAULT_TIMEZONE)

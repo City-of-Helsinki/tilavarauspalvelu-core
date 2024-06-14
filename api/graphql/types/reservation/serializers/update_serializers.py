@@ -7,11 +7,14 @@ from api.graphql.extensions.serializers import OldPrimaryKeyUpdateSerializer
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from api.graphql.types.reservation.serializers.create_serializers import ReservationCreateSerializer
 from reservations.enums import CustomerTypeChoice, ReservationStateChoice
+from reservations.models import Reservation
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
 
 class ReservationUpdateSerializer(OldPrimaryKeyUpdateSerializer, ReservationCreateSerializer):
+    instance: Reservation
+
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.fields["state"].read_only = False

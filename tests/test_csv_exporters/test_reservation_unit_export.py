@@ -129,8 +129,8 @@ def test_reservation_unit_export_multiple():
     assert row_2[next(index)] == reservation_unit_1.purposes.first().name_fi
     assert row_2[next(index)] == reservation_unit_1.require_introduction
     assert row_2[next(index)] == reservation_unit_1.equipments.first().name_fi
-    assert row_2[next(index)] == reservation_unit_1.state.value
-    assert row_2[next(index)] == reservation_unit_1.reservation_state.value
+    assert row_2[next(index)] == reservation_unit_1.publishing_state
+    assert row_2[next(index)] == reservation_unit_1.reservation_state
 
     # No need to test the second item so thoroughly
     assert writes[2][0] == reservation_units[1].id

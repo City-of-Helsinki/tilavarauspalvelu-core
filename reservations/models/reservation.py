@@ -363,4 +363,12 @@ class Reservation(SerializableMixin, models.Model):
         self._units_for_permissions = value
 
 
-AuditLogger.register(Reservation)
+AuditLogger.register(
+    Reservation,
+    # Exclude lookup properties, since they are calculated values.
+    exclude_fields=[
+        "_reservee_name",
+        "_unit_ids_for_perms",
+        "_unit_group_ids_for_perms",
+    ],
+)
