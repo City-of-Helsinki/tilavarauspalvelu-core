@@ -148,7 +148,6 @@ describe("getDurationOptions", () => {
   });
 });
 
-// TODO replace with const instead of typing it
 const reservationUnit: ReservationUnitNode = {
   authentication: Authentication.Weak,
   bufferTimeBefore: 0,
@@ -197,7 +196,7 @@ const reservationUnit: ReservationUnitNode = {
   reservationBlockWholeDay: false,
 };
 
-const reservation: ReservationNode = {
+const reservation = {
   id: "123f4w90",
   state: ReservationStateChoice.Confirmed,
   price: "0",
@@ -208,11 +207,11 @@ const reservation: ReservationNode = {
   end: addHours(startOfToday(), 35).toISOString(),
   reservationUnit: [reservationUnit],
   handlingDetails: "",
-};
+} as const;
 
 describe("canUserCancelReservation", () => {
   test("NO for reservation that needs handling", () => {
-    const res: ReservationNode = {
+    const res = {
       ...reservation,
       begin: new Date().toISOString(),
       end: addHours(new Date(), 1).toISOString(),
@@ -232,7 +231,7 @@ describe("canUserCancelReservation", () => {
   });
 
   test("YES for reservation that does not need handling", () => {
-    const res: ReservationNode = {
+    const res = {
       ...reservation,
       begin: addMinutes(new Date(), 10).toISOString(),
       state: ReservationStateChoice.Confirmed,
@@ -366,7 +365,7 @@ describe("isReservationInThePast", () => {
 });
 
 describe("getReservationCancellationReason", () => {
-  const reservation2: ReservationNode = {
+  const reservation2 = {
     ...reservation,
     begin: addMinutes(new Date(), 60).toISOString(),
     reservationUnit: [
@@ -392,7 +391,7 @@ describe("getReservationCancellationReason", () => {
   });
 
   test("with no cancellation rule", () => {
-    const resUnit: ReservationUnitNode = {
+    const resUnit = {
       ...reservationUnit,
       cancellationRule: null,
     };
@@ -406,7 +405,7 @@ describe("getReservationCancellationReason", () => {
   });
 
   test("with required handling", () => {
-    const resUnit: ReservationUnitNode = {
+    const resUnit = {
       ...reservationUnit,
       cancellationRule: {
         ...reservationUnit.cancellationRule,
@@ -424,7 +423,11 @@ describe("getReservationCancellationReason", () => {
   });
 
   test("with cancellation period", () => {
-    expect(getReservationCancellationReason({ ...reservation })).toBe(null);
+    const res = {
+      ...reservation,
+      reservationUnit: [reservation.reservationUnit[0]],
+    };
+    expect(getReservationCancellationReason(res)).toBe(null);
   });
 
   // TODO this looks sketchy unless there is something that overrides system clock
@@ -449,7 +452,7 @@ describe("getReservationCancellationReason", () => {
   });
 
   test("can't cancel if the reservation is too close to the start time", () => {
-    const resUnit: ReservationUnitNode = {
+    const resUnit = {
       ...reservationUnit,
       cancellationRule: {
         ...reservationUnit.cancellationRule,
@@ -561,24 +564,29 @@ describe("isReservationEditable", () => {
       reservation: {
         ...reservation,
         state: ReservationStateChoice.Created,
+        reservationUnit: [reservation.reservationUnit[0]],
       },
     });
     expect(res).toBe(false);
   });
   test("handles past reservation check", () => {
-    const res = isReservationEditable({
-      reservation: {
-        ...reservation,
-        begin: addHours(new Date(), -1).toISOString(),
-      },
-    });
-    expect(res).toBe(false);
+    const res = {
+      ...reservation,
+      reservationUnit: [reservation.reservationUnit[0]],
+      begin: addHours(new Date(), -1).toISOString(),
+    };
+    expect(isReservationEditable({ reservation: res })).toBe(false);
   });
 
   test("handles situation when reservation has been handled", () => {
+    const res = {
+      ...reservation,
+      reservationUnit: [reservation.reservationUnit[0]],
+      isHandled: true,
+    };
     expect(
       isReservationEditable({
-        reservation: { ...reservation, isHandled: true },
+        reservation: res,
       })
     ).toBe(false);
   });
@@ -738,11 +746,16 @@ describe("canReservationBeChanged", () => {
   */
 
   describe("handles new reservation general validation", () => {
+    const reservation_ = {
+      ...reservation,
+      reservationUnit: [reservation.reservationUnit[0]],
+    };
+
     test("false without reservable times", () => {
       const reservableTimes = new Map();
       expect(
         canReservationTimeBeChanged({
-          reservation,
+          reservation: reservation_,
           reservableTimes,
           newReservation: {
             ...reservation,
@@ -760,7 +773,7 @@ describe("canReservationBeChanged", () => {
       const reservableTimes: ReservableMap = new Map();
       expect(
         canReservationTimeBeChanged({
-          reservation,
+          reservation: reservation_,
           reservableTimes,
           newReservation: {
             ...reservation,
@@ -773,7 +786,7 @@ describe("canReservationBeChanged", () => {
 
       expect(
         canReservationTimeBeChanged({
-          reservation,
+          reservation: reservation_,
           reservableTimes,
           newReservation: {
             ...reservation,
@@ -791,7 +804,7 @@ describe("canReservationBeChanged", () => {
       const reservableTimes: ReservableMap = new Map();
       expect(
         canReservationTimeBeChanged({
-          reservation,
+          reservation: reservation_,
           reservableTimes,
           newReservation: {
             ...reservation,
@@ -812,7 +825,7 @@ describe("canReservationBeChanged", () => {
       const reservableTimes: ReservableMap = new Map();
       expect(
         canReservationTimeBeChanged({
-          reservation,
+          reservation: reservation_,
           reservableTimes,
           newReservation: {
             ...reservation,
@@ -829,7 +842,7 @@ describe("canReservationBeChanged", () => {
 
       expect(
         canReservationTimeBeChanged({
-          reservation,
+          reservation: reservation_,
           // FIXME
           reservableTimes: new Map(),
           newReservation: {
@@ -851,7 +864,7 @@ describe("canReservationBeChanged", () => {
       const reservableTimes: ReservableMap = new Map();
       expect(
         canReservationTimeBeChanged({
-          reservation,
+          reservation: reservation_,
           reservableTimes,
           newReservation: {
             ...reservation,
@@ -875,7 +888,7 @@ describe("canReservationBeChanged", () => {
       expect(
         canReservationTimeBeChanged({
           reservableTimes,
-          reservation,
+          reservation: reservation_,
           newReservation: {
             ...reservation,
             begin: addHours(startOfToday(), 35).toString(),
@@ -934,34 +947,32 @@ describe("isReservationStartInFuture", () => {
   test("returns false for a reservation that starts in the past", () => {
     expect(
       isReservationStartInFuture({
-        reservationBegins: addMinutes(new Date(), -10),
-      } as unknown as ReservationUnitNode)
+        reservationBegins: addMinutes(new Date(), -10).toISOString(),
+      })
     ).toBe(false);
 
     expect(
       isReservationStartInFuture({
-        reservationBegins: new Date(),
-      } as unknown as ReservationUnitNode)
+        reservationBegins: new Date().toISOString(),
+      })
     ).toBe(false);
 
-    expect(
-      isReservationStartInFuture({} as unknown as ReservationUnitNode)
-    ).toBe(false);
+    expect(isReservationStartInFuture({})).toBe(false);
   });
 
   test("returns correct value with buffer days", () => {
     expect(
       isReservationStartInFuture({
-        reservationBegins: addDays(new Date(), 10),
+        reservationBegins: addDays(new Date(), 10).toISOString(),
         reservationsMaxDaysBefore: 9,
-      } as unknown as ReservationUnitNode)
+      })
     ).toBe(true);
 
     expect(
       isReservationStartInFuture({
-        reservationBegins: addDays(new Date(), 10),
+        reservationBegins: addDays(new Date(), 10).toISOString(),
         reservationsMaxDaysBefore: 10,
-      } as unknown as ReservationUnitNode)
+      })
     ).toBe(false);
   });
 });

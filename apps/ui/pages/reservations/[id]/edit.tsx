@@ -82,10 +82,12 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       reservationUnitData?.affectingReservations
     );
 
-    const reservations = reservationSet?.concat(
-      affectingReservations?.filter((y) =>
-        doesReservationAffectReservationUnit(y, resUnitPk ?? 0)
-      ) ?? []
+    const reservations = filterNonNullable(
+      reservationSet?.concat(
+        affectingReservations?.filter((y) =>
+          doesReservationAffectReservationUnit(y, resUnitPk ?? 0)
+        ) ?? []
+      )
     );
 
     // TODO check for nulls and return notFound if necessary

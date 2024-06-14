@@ -15,7 +15,6 @@ import {
   getHours,
   getMinutes,
 } from "date-fns";
-import type { PendingReservation } from "common/types/common";
 import {
   type ReservationNode,
   ReservationStartInterval,
@@ -29,12 +28,14 @@ import {
   OrderStatus,
   type ReservationOrderStatusFragment,
   ReservableTimeSpanType,
+  CancellationRuleFieldsFragment,
 } from "@gql/gql-types";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
 import { filterNonNullable, getIntervalMinutes } from "common/src/helpers";
 import { getDayIntervals, getTranslation } from "./util";
 import type { TFunction } from "i18next";
 import { type SlotProps } from "common/src/calendar/Calendar";
+import { PendingReservation } from "common";
 
 // TimeSlots change the Calendar view. How many intervals are shown i.e. every half an hour, every hour
 // we use every hour only => 2
@@ -152,9 +153,14 @@ function isReservationWithinCancellationPeriod(
   return cancelLatest > begin;
 }
 
+type CanUserCancelReservationProps = Pick<
+  NonNullable<ReservationNodeT>,
+  "state" | "begin"
+> & {
+  reservationUnit?: Maybe<Array<CancellationRuleFieldsFragment>> | undefined;
+};
 export function canUserCancelReservation(
-  reservation: IsWithinCancellationPeriodReservationT &
-    Pick<NonNullable<ReservationNodeT>, "state">,
+  reservation: CanUserCancelReservationProps,
   skipTimeCheck = false
 ): boolean {
   const reservationUnit = reservation.reservationUnit?.[0];
@@ -475,9 +481,10 @@ export type CanReservationBeChangedProps = {
   reservation: Pick<
     ReservationNode,
     "begin" | "end" | "isHandled" | "state" | "price"
-  >;
+  > &
+    CanUserCancelReservationProps;
   reservableTimes: ReservableMap;
-  newReservation: ReservationNode | PendingReservation;
+  newReservation: PendingReservation;
   reservationUnit: IsReservableFieldsFragment;
   activeApplicationRounds?: RoundPeriod[];
 };
@@ -524,6 +531,7 @@ export function isReservationEditable(
 /// ![false] === ![true] === false, with no type errors
 /// either refactor the return value or add lint rules to disable ! operator
 /// TODO disable undefined from reservation and reservationUnit
+/// Only called from the reservation edit page
 export function canReservationTimeBeChanged({
   reservation,
   newReservation,
