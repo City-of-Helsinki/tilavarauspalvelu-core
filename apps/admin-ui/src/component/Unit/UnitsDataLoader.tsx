@@ -84,9 +84,9 @@ function transformSortString(orderBy: string | null): UnitOrderingChoices[] {
     case "-reservationUnitCount":
       return [UnitOrderingChoices.ReservationUnitsCountDesc];
     case "unitGroup":
-      return [UnitOrderingChoices.UnitGroupNameAsc];
+      return [UnitOrderingChoices.UnitGroupNameFiAsc];
     case "-unitGroup":
-      return [UnitOrderingChoices.UnitGroupNameDesc];
+      return [UnitOrderingChoices.UnitGroupNameFiDesc];
     default:
       return [];
   }

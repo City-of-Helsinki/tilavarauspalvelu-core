@@ -5060,8 +5060,12 @@ export enum UnitOrderingChoices {
   ReservationCountDesc = "reservationCountDesc",
   ReservationUnitsCountAsc = "reservationUnitsCountAsc",
   ReservationUnitsCountDesc = "reservationUnitsCountDesc",
-  UnitGroupNameAsc = "unitGroupNameAsc",
-  UnitGroupNameDesc = "unitGroupNameDesc",
+  UnitGroupNameEnAsc = "unitGroupNameEnAsc",
+  UnitGroupNameEnDesc = "unitGroupNameEnDesc",
+  UnitGroupNameFiAsc = "unitGroupNameFiAsc",
+  UnitGroupNameFiDesc = "unitGroupNameFiDesc",
+  UnitGroupNameSvAsc = "unitGroupNameSvAsc",
+  UnitGroupNameSvDesc = "unitGroupNameSvDesc",
 }
 
 /** An enumeration. */

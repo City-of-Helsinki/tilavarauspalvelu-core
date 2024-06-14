@@ -5729,8 +5729,12 @@ enum UnitOrderingChoices {
   reservationCountDesc
   reservationUnitsCountAsc
   reservationUnitsCountDesc
-  unitGroupNameAsc
-  unitGroupNameDesc
+  unitGroupNameEnAsc
+  unitGroupNameEnDesc
+  unitGroupNameFiAsc
+  unitGroupNameFiDesc
+  unitGroupNameSvAsc
+  unitGroupNameSvDesc
 }
 
 """
