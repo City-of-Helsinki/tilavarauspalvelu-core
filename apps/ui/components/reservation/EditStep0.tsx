@@ -1,7 +1,7 @@
 import Calendar, { CalendarEvent } from "common/src/calendar/Calendar";
 import { getEventBuffers } from "common/src/calendar/util";
 import { breakpoints } from "common/src/common/style";
-import type { PendingReservation } from "common/types/common";
+import type { PendingReservation } from "@/modules/types";
 import type {
   ApplicationRoundFieldsFragment,
   ListReservationsQuery,

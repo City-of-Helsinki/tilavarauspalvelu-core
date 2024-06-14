@@ -24,7 +24,7 @@ import { getReservationApplicationFields } from "common/src/reservation-form/uti
 import { getIntervalMinutes } from "common/src/helpers";
 import { getTranslation } from "./util";
 import { type TFunction } from "i18next";
-import { type PendingReservation } from "common";
+import { type PendingReservation } from "@/modules/types";
 import {
   type ReservableMap,
   type RoundPeriod,

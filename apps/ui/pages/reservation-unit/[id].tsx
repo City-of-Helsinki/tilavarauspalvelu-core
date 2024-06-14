@@ -33,7 +33,7 @@ import { breakpoints } from "common/src/common/style";
 import Calendar, { type CalendarEvent } from "common/src/calendar/Calendar";
 import { Toolbar } from "common/src/calendar/Toolbar";
 import classNames from "classnames";
-import { type PendingReservation } from "common/types/common";
+import { type PendingReservation } from "@/modules/types";
 import {
   ApplicationRoundStatusChoice,
   type ApplicationRoundTimeSlotNode,

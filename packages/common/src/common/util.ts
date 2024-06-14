@@ -10,7 +10,6 @@ import {
 import { fi } from "date-fns/locale";
 import { capitalize } from "lodash";
 import { type TFunction, i18n } from "next-i18next";
-import { HMS } from "../../types/common";
 
 export const parseDate = (date: string): Date => parseISO(date);
 
@@ -24,17 +23,6 @@ export const startOfWeek = (d: Date): Date =>
 
 export const endOfWeek = (d: Date): Date =>
   dateFnsEndOfWeek(d, { weekStartsOn: 1 });
-
-export const secondsToHms = (
-  duration: number | null
-): HMS | Record<string, number> => {
-  if (duration == null || duration < 0) return {};
-  const h = Math.floor(duration / 3600);
-  const m = Math.floor((duration % 3600) / 60);
-  const s = Math.floor((duration % 3600) % 60);
-
-  return { h, m, s };
-};
 
 export function formatDuration(
   durationMinutes: number,
