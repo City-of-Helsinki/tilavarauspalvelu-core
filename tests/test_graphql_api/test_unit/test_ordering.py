@@ -93,33 +93,50 @@ def test_units__order__by_reservation_units_count(graphql):
     assert response.node(3) == {"pk": unit_4.pk}
 
 
-def test_units__order__unit_group_name(graphql):
-    unit_1 = UnitFactory.create(name="1")
-    unit_2 = UnitFactory.create(name="2")
-    unit_3 = UnitFactory.create(name="3")
-    unit_4 = UnitFactory.create(name="4")
+@pytest.mark.parametrize(
+    ("language", "order"),
+    [
+        ("fi", [0, 1, 3, 2]),
+        ("en", [0, 2, 1, 3]),
+        ("sv", [0, 1, 2, 3]),
+    ],
+)
+def test_units__order__unit_group_name(graphql, language, order):
+    units = {
+        0: UnitFactory.create(name="0"),
+        1: UnitFactory.create(name="1"),
+        2: UnitFactory.create(name="2"),
+        3: UnitFactory.create(name="3"),
+    }
 
-    UnitGroupFactory.create(name="AAA", units=[unit_1, unit_2])
-    UnitGroupFactory.create(name="BBB", units=[unit_4])
-    UnitGroupFactory.create(name="CCC", units=[unit_3, unit_1])
+    UnitGroupFactory.create(name="AAA", name_en="BBB", name_sv="AAA", units=[units[0], units[1]])
+    UnitGroupFactory.create(name="BBB", name_en="CCC", name_sv="CCC", units=[units[3]])
+    UnitGroupFactory.create(name="CCC", name_en="AAA", name_sv="BBB", units=[units[0], units[2]])
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
-    response = graphql(units_query(order_by=["unitGroupNameAsc", "pkDesc"]))
+    graphql.login_with_superuser()
 
-    assert response.has_errors is False, response.errors
+    query_1 = units_query(order_by=[f"unitGroupName{language.capitalize()}Asc", "pkAsc"])
+    response_1 = graphql(query_1)
 
-    assert len(response.edges) == 4
-    assert response.node(0) == {"pk": unit_2.pk}
-    assert response.node(1) == {"pk": unit_1.pk}
-    assert response.node(2) == {"pk": unit_4.pk}
-    assert response.node(3) == {"pk": unit_3.pk}
+    assert response_1.has_errors is False, response_1.errors
 
-    response = graphql(units_query(order_by=["unitGroupNameDesc", "pkDesc"]))
+    assert len(response_1.edges) == 4
 
-    assert response.has_errors is False, response.errors
+    asc_order = iter(order)
+    assert response_1.node(0) == {"pk": units[next(asc_order)].pk}
+    assert response_1.node(1) == {"pk": units[next(asc_order)].pk}
+    assert response_1.node(2) == {"pk": units[next(asc_order)].pk}
+    assert response_1.node(3) == {"pk": units[next(asc_order)].pk}
 
-    assert len(response.edges) == 4
-    assert response.node(0) == {"pk": unit_3.pk}
-    assert response.node(1) == {"pk": unit_1.pk}
-    assert response.node(2) == {"pk": unit_4.pk}
-    assert response.node(3) == {"pk": unit_2.pk}
+    query_2 = units_query(order_by=[f"unitGroupName{language.capitalize()}Desc", "pkDesc"])
+    response_2 = graphql(query_2)
+
+    assert response_2.has_errors is False, response_2.errors
+
+    assert len(response_2.edges) == 4
+
+    desc_order = reversed(order)
+    assert response_2.node(0) == {"pk": units[next(desc_order)].pk}
+    assert response_2.node(1) == {"pk": units[next(desc_order)].pk}
+    assert response_2.node(2) == {"pk": units[next(desc_order)].pk}
+    assert response_2.node(3) == {"pk": units[next(desc_order)].pk}

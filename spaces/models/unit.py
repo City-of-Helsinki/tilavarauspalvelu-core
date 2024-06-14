@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.db import models
 
+from spaces.querysets.unit import UnitQuerySet
+
 __all__ = [
     "Unit",
     "UnitGroup",
@@ -46,6 +48,8 @@ class Unit(models.Model):
         null=True,
         blank=True,
     )
+
+    objects = UnitQuerySet.as_manager()
 
     name_fi: str | None
     name_en: str | None

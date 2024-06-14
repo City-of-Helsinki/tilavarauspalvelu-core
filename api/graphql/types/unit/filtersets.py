@@ -10,6 +10,7 @@ from common.db import SubqueryCount
 from reservation_units.enums import ReservationKind
 from reservation_units.models import ReservationUnit
 from reservations.models import Reservation
+from spaces.querysets.unit import UnitQuerySet
 
 __all__ = [
     "UnitFilterSet",
@@ -47,7 +48,9 @@ class UnitFilterSet(ModelFilterSet):
             "rank",
             "reservation_count",
             "reservation_units_count",
-            ("unit_groups__name", "unit_group_name"),
+            "unit_group_name_fi",
+            "unit_group_name_en",
+            "unit_group_name_sv",
         ]
 
     def filter_by_only_with_permission(self, qs: models.QuerySet, name: str, value: bool) -> models.QuerySet:
@@ -146,3 +149,15 @@ class UnitFilterSet(ModelFilterSet):
                 Reservation.objects.filter(reservation_unit__unit=models.OuterRef("pk")).values("id"),
             ),
         ).order_by(models.OrderBy(models.F("reservation_count"), descending=desc))
+
+    @staticmethod
+    def order_by_unit_group_name_fi(qs: UnitQuerySet, desc: bool) -> models.QuerySet:
+        return qs.order_by_unit_group_name(language="fi", desc=desc)
+
+    @staticmethod
+    def order_by_unit_group_name_en(qs: UnitQuerySet, desc: bool) -> models.QuerySet:
+        return qs.order_by_unit_group_name(language="en", desc=desc)
+
+    @staticmethod
+    def order_by_unit_group_name_sv(qs: UnitQuerySet, desc: bool) -> models.QuerySet:
+        return qs.order_by_unit_group_name(language="sv", desc=desc)
