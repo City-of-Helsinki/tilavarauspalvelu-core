@@ -7,6 +7,7 @@ from django.db.models import Sum
 from django.utils.timezone import get_default_timezone
 from graphene_django_extensions import DjangoNode
 from graphql import GraphQLError
+from lookup_property import L
 from query_optimizer import AnnotatedField, DjangoListField, ManuallyOptimizedField
 from query_optimizer.optimizer import QueryOptimizer
 
@@ -19,7 +20,7 @@ from common.typing import GQLInfo
 from merchants.models import PaymentMerchant
 from opening_hours.models import OriginHaukiResource
 from opening_hours.utils.hauki_link_generator import generate_hauki_link
-from reservation_units.enums import ReservationState, ReservationUnitState
+from reservation_units.enums import ReservationUnitPublishingState, ReservationUnitReservationState
 from reservation_units.models import ReservationUnit
 from reservations.enums import ReservationTypeChoice
 from reservations.models import Reservation
@@ -41,8 +42,14 @@ class ReservableTimeSpanType(graphene.ObjectType):
 
 
 class ReservationUnitNode(DjangoNode):
-    state = graphene.Field(graphene.Enum.from_enum(ReservationUnitState))
-    reservation_state = graphene.Field(graphene.Enum.from_enum(ReservationState))
+    publishing_state = AnnotatedField(
+        graphene.Enum.from_enum(ReservationUnitPublishingState),
+        expression=L("publishing_state"),
+    )
+    reservation_state = AnnotatedField(
+        graphene.Enum.from_enum(ReservationUnitReservationState),
+        expression=L("reservation_state"),
+    )
 
     location = ManuallyOptimizedField(LocationNode)
 
@@ -113,7 +120,7 @@ class ReservationUnitNode(DjangoNode):
             "authentication",
             "reservation_start_interval",
             "reservation_kind",
-            "state",
+            "publishing_state",
             "reservation_state",
             #
             # Forward many-to-one related

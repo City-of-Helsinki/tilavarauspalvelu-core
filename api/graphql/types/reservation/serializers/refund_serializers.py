@@ -16,6 +16,8 @@ DEFAULT_TIMEZONE = get_default_timezone()
 
 
 class ReservationRefundSerializer(OldPrimaryKeySerializer):
+    instance: Reservation
+
     class Meta:
         model = Reservation
         fields = [

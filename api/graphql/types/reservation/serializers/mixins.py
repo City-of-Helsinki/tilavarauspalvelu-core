@@ -10,7 +10,7 @@ from django.utils.timezone import get_default_timezone
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from api.graphql.types.reservation.types import ReservationNode
 from common.date_utils import local_datetime, local_start_of_day
-from reservation_units.enums import PriceUnit, PricingType, ReservationStartInterval, ReservationUnitState
+from reservation_units.enums import PriceUnit, PricingType, ReservationStartInterval, ReservationUnitPublishingState
 from reservation_units.models import ReservationUnit, ReservationUnitPricing
 from reservation_units.utils.reservation_unit_pricing_helper import ReservationUnitPricingHelper
 from reservations.enums import ReservationTypeChoice
@@ -171,10 +171,10 @@ class ReservationSchedulingMixin:
         return reservation_in_reservations_closed_period or reservation_in_non_published_reservation_unit
 
     def check_reservation_time(self, reservation_unit: ReservationUnit) -> None:
-        state = reservation_unit.state
-        if state in (ReservationUnitState.DRAFT, ReservationUnitState.ARCHIVED):
+        state = reservation_unit.publishing_state
+        if state in [ReservationUnitPublishingState.DRAFT.value, ReservationUnitPublishingState.ARCHIVED.value]:
             raise ValidationErrorWithCode(
-                f"Reservation unit is not reservable due to its status: '{state.value}'.",
+                f"Reservation unit is not reservable due to its status: '{state}'.",
                 ValidationErrorCodes.RESERVATION_UNIT_NOT_RESERVABLE,
             )
 

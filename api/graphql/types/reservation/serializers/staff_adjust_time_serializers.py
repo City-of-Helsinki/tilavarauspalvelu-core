@@ -19,6 +19,8 @@ DEFAULT_TIMEZONE = get_default_timezone()
 
 
 class StaffReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, ReservationSchedulingMixin):
+    instance: Reservation
+
     state = EnumFriendlyChoiceField(
         choices=ReservationStateChoice.choices,
         enum=ReservationStateChoice,

@@ -286,7 +286,7 @@ def test_reservation__create__reservation_unit_closed__allow_reservations_withou
 
     assert response.has_errors is False, response.errors
 
-    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+    reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
     assert reservation.state == ReservationStateChoice.CREATED
 
 
@@ -344,7 +344,7 @@ def test_reservation__create__start_time_does_not_match_reservation_start_interv
     if allow_reservations_without_opening_hours:
         # Reservation should be allowed regardless of if the start time matches the interval
         assert response.has_errors is False, response.errors
-        reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+        reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
         assert reservation.state == ReservationStateChoice.CREATED
     else:
         assert response.error_message() == "Reservation start time does not match the allowed interval of 15 minutes."
@@ -418,7 +418,7 @@ def test_reservation__create__reservation_unit_reservation_and_publish_in_the_pa
         assert response.error_message() == "Reservation unit is not reservable at current time."
     else:
         assert response.has_errors is False, response.errors
-        reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+        reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
         assert reservation.state == ReservationStateChoice.CREATED
 
 
@@ -511,7 +511,7 @@ def test_reservation__create__max_reservations_per_user__past_reservations(graph
 
     assert response.has_errors is False, response.errors
 
-    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+    reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
     assert reservation.state == ReservationStateChoice.CREATED
 
     assert Reservation.objects.count() == 2
@@ -538,7 +538,7 @@ def test_reservation__create__max_reservations_per_user__reservations_for_other_
 
     assert response.has_errors is False, response.errors
 
-    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+    reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
     assert reservation.state == ReservationStateChoice.CREATED
 
     assert Reservation.objects.count() == 2
@@ -573,7 +573,7 @@ def test_reservation__create__max_reservations_per_user__reservations_for_other_
 
     assert response.has_errors is False, response.errors
 
-    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+    reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
     assert reservation.state == ReservationStateChoice.CREATED
 
     assert Reservation.objects.count() == 2
@@ -660,7 +660,7 @@ def test_reservation__create__reservation_unit_reservations_min_and_max_days_bef
         assert response.error_message() == error_message
     else:
         assert response.has_errors is False, response.errors
-        reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+        reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
         assert reservation.state == ReservationStateChoice.CREATED
 
 
