@@ -31,7 +31,6 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import { processVariables } from "@/modules/search";
 import { useSearchValues } from "@/hooks/useSearchValues";
-import { getUnitName } from "@/modules/reservationUnit";
 import {
   convertLanguageCode,
   getTranslationSafe,
@@ -129,13 +128,12 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const unitOptions = filterNonNullable(
     unitData?.units?.edges?.map((e) => e?.node)
   )
+    .filter((node) => node?.pk != null)
     .map((node) => ({
-      pk: node.pk ?? 0,
-      name: getUnitName(node, locale) ?? "",
-    }))
-    .map((node) => ({
-      value: node.pk,
-      label: node.name,
+      value: node.pk ?? 0,
+      label:
+        getTranslationSafe(node, "name", convertLanguageCode(locale ?? "")) ??
+        "",
     }));
 
   return {

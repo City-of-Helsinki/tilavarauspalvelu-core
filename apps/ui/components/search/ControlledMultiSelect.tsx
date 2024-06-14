@@ -1,5 +1,6 @@
 import { Control, FieldValues, Path, useController } from "react-hook-form";
 import { Combobox } from "hds-react";
+import { useTranslation } from "next-i18next";
 
 export function ControlledMultiSelect<T extends FieldValues>({
   name,
@@ -17,10 +18,9 @@ export function ControlledMultiSelect<T extends FieldValues>({
   const {
     field: { value, onChange },
   } = useController({ control, name });
+  const { t } = useTranslation();
 
-  // FIXME
-  // const placeholder = t(`filters.placeholder.${name}`);
-  const placeholder = label;
+  const placeholder = t("common:select");
   return (
     <Combobox<(typeof options)[0]>
       label={label}
