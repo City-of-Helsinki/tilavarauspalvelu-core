@@ -1,19 +1,10 @@
 import {
   addMinutes,
-  isWithinInterval,
-  isBefore,
-  startOfDay,
-  areIntervalsOverlapping,
   addSeconds,
-  differenceInSeconds,
   isAfter,
-  isValid,
   addDays,
-  format,
   roundToNearestMinutes,
   differenceInMinutes,
-  getHours,
-  getMinutes,
 } from "date-fns";
 import {
   type ReservationNode,
@@ -23,19 +14,22 @@ import {
   type Maybe,
   type ListReservationsQuery,
   type IsReservableFieldsFragment,
-  type ReservationUnitNode,
   ReservationStateChoice,
+  type ReservationUnitNode,
   OrderStatus,
   type ReservationOrderStatusFragment,
-  ReservableTimeSpanType,
-  CancellationRuleFieldsFragment,
+  type CancellationRuleFieldsFragment,
 } from "@gql/gql-types";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
-import { filterNonNullable, getIntervalMinutes } from "common/src/helpers";
-import { getDayIntervals, getTranslation } from "./util";
-import type { TFunction } from "i18next";
-import { type SlotProps } from "common/src/calendar/Calendar";
-import { PendingReservation } from "common";
+import { getIntervalMinutes } from "common/src/helpers";
+import { getTranslation } from "./util";
+import { type TFunction } from "i18next";
+import { type PendingReservation } from "common";
+import {
+  type ReservableMap,
+  type RoundPeriod,
+  isRangeReservable,
+} from "./reservable";
 
 // TimeSlots change the Calendar view. How many intervals are shown i.e. every half an hour, every hour
 // we use every hour only => 2
@@ -271,200 +265,6 @@ export function getNormalizedReservationOrderStatus(
   return null;
 }
 
-export type TimeFrameSlot = { start: Date; end: Date };
-type ReservationUnitReservableProps = {
-  reservationUnit: Omit<IsReservableFieldsFragment, "reservableTimeSpans">;
-  // pregenerated open slots
-  reservableTimes: ReservableMap;
-  activeApplicationRounds: RoundPeriod[];
-  start: Date;
-  end: Date;
-  skipLengthCheck: boolean;
-};
-
-/// NOTE don't return [boolean, string] causes issues in TS / JS
-/// instead break this function into cleaner separate functions
-/// FIXME this function is getting called 100s or 1000s times when dragging a calendar event
-/// when moving with a click this is called 20+ times
-/// time change using the form elements also 20+ times
-export function isReservationReservable({
-  reservationUnit,
-  activeApplicationRounds,
-  reservableTimes,
-  start,
-  end,
-  skipLengthCheck = false,
-}: ReservationUnitReservableProps): boolean {
-  const {
-    reservationSet,
-    bufferTimeBefore,
-    bufferTimeAfter,
-    maxReservationDuration,
-    minReservationDuration,
-    reservationStartInterval,
-    reservationsMaxDaysBefore,
-    reservationsMinDaysBefore,
-    reservationBegins,
-    reservationEnds,
-  } = reservationUnit;
-
-  if (!isValid(start) || !isValid(end)) {
-    return false;
-  }
-  const normalizedEnd = addMinutes(end, -1);
-
-  const reservationsArr = filterNonNullable(reservationSet);
-  const reservation = {
-    start,
-    end,
-    bufferTimeBefore,
-    bufferTimeAfter,
-  };
-  const isBufferCollision = reservationsArr.some((r) =>
-    doesBufferCollide(r, reservation)
-  );
-
-  if (isBufferCollision) {
-    return false;
-  }
-
-  if (!isDateInsideInterval(start, reservableTimes, reservationStartInterval)) {
-    return false;
-  }
-
-  if (
-    !isRangeReservable({
-      range: [new Date(start), normalizedEnd],
-      reservableTimes,
-      reservationBegins: reservationBegins
-        ? new Date(reservationBegins)
-        : undefined,
-      reservationEnds: reservationEnds ? new Date(reservationEnds) : undefined,
-      reservationsMaxDaysBefore: reservationsMaxDaysBefore ?? 0,
-      reservationsMinDaysBefore: reservationsMinDaysBefore ?? 0,
-      activeApplicationRounds,
-    })
-  ) {
-    return false;
-  }
-
-  if (!skipLengthCheck) {
-    if (minReservationDuration) {
-      const dur = differenceInSeconds(new Date(end), new Date(start));
-      if (!(dur >= minReservationDuration)) {
-        return false;
-      }
-    }
-    if (maxReservationDuration) {
-      const dur = differenceInSeconds(new Date(end), new Date(start));
-      if (!(dur <= maxReservationDuration)) {
-        return false;
-      }
-    }
-  }
-
-  if (doReservationsCollide({ start, end }, reservationsArr)) {
-    return false;
-  }
-
-  return true;
-}
-
-export function dateToKey(date: Date): ReservableMapKey {
-  return format(date, "yyyy-MM-dd");
-}
-
-// TODO sub classing Map and overriding get would be a lot cleaner
-// because of the way get compares (===) the keys we have to serialize keys to strings
-// which removes all type information (and allows empty strings or malformed keys)
-// we want the key to be { year, month, day } and not a string
-// for now using "yyyy-mm-dd" as the key to test it, refactor later (using a subclass).
-// TODO values should be { hour, minute } not Date objects
-// TODO provide serialization and deserialization functions (that have format checkers)
-export type ReservableMapKey = string; // format: "yyyy-mm-dd"
-export type ReservableMap = Map<
-  ReservableMapKey,
-  Array<{ start: Date; end: Date }>
->;
-/// This function converts a time span array into a map of days with the time spans
-// Cases:
-// - multiple time spans on the same day
-// - single time span spanning multiple days
-// - a time span that starts on the previous day and ends on the next day
-// TODO (later) this should reduce the amount of memory we use by
-// - storing only the times not date (and constructing the date from the key)
-// - store a smaller interval (like a month at a time, not the whole 2 years)
-// TODO splitting Date into actual Date and Time would make this a lot easier
-// because the key should only care about the Date part and we don't want
-// make stupid mistakes by using Map.get(new Date()) instead of Map.get(startOfDay(new Date()))
-export function generateReservableMap(
-  reservableTimeSpans: ReservableTimeSpanType[]
-): ReservableMap {
-  const converted = reservableTimeSpans
-    .map((n) =>
-      n.startDatetime != null && n.endDatetime != null
-        ? { start: new Date(n.startDatetime), end: new Date(n.endDatetime) }
-        : null
-    )
-    .filter((n): n is NonNullable<typeof n> => n != null);
-
-  const map = new Map<string, Array<{ start: Date; end: Date }>>();
-  for (const n of converted) {
-    // the simplest case is when the start and end are on the same day
-    const day = dateToKey(new Date(n.start));
-    if (map.has(day)) {
-      const arr = map.get(day) ?? [];
-      arr.push(n);
-      map.set(day, arr);
-      continue;
-    } else {
-      map.set(day, [n]);
-    }
-    // TODO the more complex cases (spans multiple days)
-  }
-
-  return map;
-}
-
-// checks that the start time is valid for the interval of the reservation unit
-function isDateInsideInterval(
-  date: Date,
-  timeSlots: ReservableMap,
-  interval: ReservationStartInterval
-): boolean {
-  const slotsForDay = timeSlots.get(dateToKey(date));
-  if (slotsForDay == null) {
-    return false;
-  }
-
-  const timeframe = slotsForDay.reduce<TimeFrameSlot | null>((acc, curr) => {
-    const begin = new Date(curr.start);
-    const end = new Date(curr.end);
-    return {
-      start: acc?.start && acc.start < begin ? acc.start : begin,
-      end: acc?.end && acc.end > end ? acc.end : end,
-    };
-  }, null);
-
-  const { start, end } = timeframe ?? {};
-  if (start == null || end == null) {
-    return false;
-  }
-
-  const s: { h: number; m: number } = {
-    h: getHours(start),
-    m: getMinutes(start),
-  };
-  const e: { h: number; m: number } = { h: getHours(end), m: getMinutes(end) };
-  const intervals = getDayIntervals(s, e, interval);
-  for (const i of intervals) {
-    if (i.h === s.h && i.m === s.m) {
-      return true;
-    }
-  }
-  return false;
-}
-
 function isReservationConfirmed(reservation: {
   state?: Maybe<ReservationStateChoice> | undefined;
 }): boolean {
@@ -561,12 +361,14 @@ export function canReservationTimeBeChanged({
     }
 
     //  new reservation is valid
-    const isReservable = isReservationReservable({
+    const isReservable = isRangeReservable({
+      range: {
+        start: new Date(newReservation.begin),
+        end: new Date(newReservation.end),
+      },
       reservationUnit,
       reservableTimes,
       activeApplicationRounds,
-      start: new Date(newReservation.begin),
-      end: new Date(newReservation.end),
       skipLengthCheck: false,
     });
     if (!isReservable) {
@@ -634,271 +436,6 @@ export function getCheckoutUrl(
     console.error(e);
   }
   return undefined;
-}
-
-function generateSlots(
-  start: Date,
-  end: Date,
-  reservationStartInterval: ReservationStartInterval
-): Date[] {
-  if (!start || !end || !reservationStartInterval) return [];
-
-  const slots = [];
-  const intervalMinutes = getIntervalMinutes(reservationStartInterval);
-
-  for (let i = new Date(start); i <= end; i = addMinutes(i, intervalMinutes)) {
-    slots.push(i);
-  }
-
-  return slots;
-}
-
-function isRangeReservable({
-  range,
-  reservableTimes,
-  reservationBegins,
-  reservationEnds,
-  reservationsMinDaysBefore = 0,
-  reservationsMaxDaysBefore = 0,
-  activeApplicationRounds = [],
-}: {
-  range: Date[];
-  reservableTimes: ReservableMap;
-  reservationsMinDaysBefore: number;
-  reservationsMaxDaysBefore: number;
-  reservationBegins?: Date;
-  reservationEnds?: Date;
-  activeApplicationRounds: RoundPeriod[];
-}): boolean {
-  // eslint-disable-next-line no-console
-  console.assert(range.length === 2, "Invalid range", range);
-  // FIXME this is not good
-  // we should be able to check the range without generating all the slots
-  const slots = generateSlots(
-    range[0],
-    range[1],
-    ReservationStartInterval.Interval_15Mins
-  );
-
-  if (
-    !slots.every((slot) =>
-      areReservableTimesAvailable(reservableTimes, slot, true)
-    )
-  ) {
-    return false;
-  }
-
-  const isSlotReservable = (slot: Date) => {
-    const isInFrame = isSlotWithinTimeframe(
-      slot,
-      reservationsMinDaysBefore,
-      reservationsMaxDaysBefore,
-      reservationBegins,
-      reservationEnds
-    );
-    const collides = doesSlotCollideWithApplicationRounds(
-      slot,
-      activeApplicationRounds
-    );
-    return isInFrame && !collides;
-  };
-
-  return range.every((slot) => isSlotReservable(slot));
-}
-
-export type RoundPeriod = {
-  reservationPeriodBegin: string;
-  reservationPeriodEnd: string;
-};
-function doesSlotCollideWithApplicationRounds(
-  slot: Date,
-  rounds: RoundPeriod[]
-): boolean {
-  if (rounds.length < 1) return false;
-
-  return rounds.some((round) =>
-    isWithinInterval(slot, {
-      start: new Date(round.reservationPeriodBegin),
-      end: new Date(round.reservationPeriodEnd).setHours(23, 59, 59),
-    })
-  );
-}
-
-function areSlotsReservable(
-  slots: Date[],
-  reservableTimes: ReservableMap,
-  // reservableTimeSpans: ReservableTimeSpanType[],
-  reservationsMinDaysBefore: number,
-  reservationsMaxDaysBefore: number,
-  reservationBegins?: Date,
-  reservationEnds?: Date,
-  activeApplicationRounds: RoundPeriod[] = []
-): boolean {
-  return slots.every(
-    (slotDate) =>
-      // NOTE seems that the order of checks improves performance
-      isSlotWithinTimeframe(
-        slotDate,
-        reservationsMinDaysBefore,
-        reservationsMaxDaysBefore,
-        reservationBegins,
-        reservationEnds
-      ) &&
-      areReservableTimesAvailable(reservableTimes, slotDate, true) &&
-      !doesSlotCollideWithApplicationRounds(slotDate, activeApplicationRounds)
-  );
-}
-
-export function isSlotWithinReservationTime(
-  start: Date,
-  reservationBegins?: Date,
-  reservationEnds?: Date
-): boolean {
-  return (
-    (!reservationBegins || isAfter(start, new Date(reservationBegins))) &&
-    (!reservationEnds || isBefore(start, new Date(reservationEnds)))
-  );
-}
-
-function isSlotWithinTimeframe(
-  start: Date,
-  minDaysBefore: number,
-  maxDaysBefore: number,
-  reservationBegins?: Date,
-  reservationEnds?: Date
-) {
-  const isLegalTimeframe =
-    isAfter(start, new Date()) &&
-    isSlotWithinReservationTime(start, reservationBegins, reservationEnds);
-  const maxDay = addDays(new Date(), maxDaysBefore);
-  // if max days === 0 => latest = today
-  const isBeforeMaxDaysBefore = maxDaysBefore === 0 || !isAfter(start, maxDay);
-  const minDay = addDays(new Date(), minDaysBefore);
-  const isAfterMinDaysBefore = !isBefore(start, startOfDay(minDay));
-  return isLegalTimeframe && isAfterMinDaysBefore && isBeforeMaxDaysBefore;
-}
-
-type PropGetterProps = {
-  reservableTimes: ReservableMap;
-  activeApplicationRounds: RoundPeriod[];
-  reservationsMinDaysBefore: number;
-  reservationsMaxDaysBefore: number;
-  customValidation?: (arg: Date) => boolean;
-  reservationBegins?: Date;
-  reservationEnds?: Date;
-};
-export const getSlotPropGetter =
-  ({
-    reservableTimes,
-    activeApplicationRounds,
-    reservationBegins,
-    reservationEnds,
-    reservationsMinDaysBefore,
-    reservationsMaxDaysBefore,
-    customValidation,
-  }: PropGetterProps) =>
-  (date: Date): SlotProps => {
-    if (
-      areSlotsReservable(
-        [date],
-        reservableTimes,
-        reservationsMinDaysBefore,
-        reservationsMaxDaysBefore,
-        reservationBegins,
-        reservationEnds,
-        activeApplicationRounds
-      ) &&
-      (customValidation ? customValidation(date) : true)
-    ) {
-      return {};
-    }
-
-    return {
-      className: "rbc-timeslot-inactive",
-    };
-  };
-
-type BufferCollideCheckReservation = Pick<
-  ReservationNode,
-  "begin" | "end" | "isBlocked" | "bufferTimeBefore" | "bufferTimeAfter"
->;
-
-function doesBufferCollide(
-  reservation: BufferCollideCheckReservation,
-  newReservation: {
-    start: Date;
-    end: Date;
-    bufferTimeBefore: number;
-    bufferTimeAfter: number;
-  }
-): boolean {
-  const newReservationStartBuffer =
-    reservation.bufferTimeAfter > newReservation.bufferTimeBefore
-      ? reservation.bufferTimeAfter
-      : newReservation.bufferTimeBefore;
-  const newReservationEndBuffer =
-    reservation.bufferTimeBefore > newReservation.bufferTimeAfter
-      ? reservation.bufferTimeBefore
-      : newReservation.bufferTimeAfter;
-
-  const bufferedNewReservation = getBufferedEventTimes(
-    newReservation.start,
-    newReservation.end,
-    newReservationStartBuffer,
-    newReservationEndBuffer
-  );
-
-  const reservationInterval = {
-    start: new Date(reservation.begin),
-    end: new Date(reservation.end),
-  };
-
-  const newReservationInterval = reservation.isBlocked
-    ? { start: newReservation.start, end: newReservation.end }
-    : {
-        start: bufferedNewReservation.start,
-        end: bufferedNewReservation.end,
-      };
-
-  return areIntervalsOverlapping(reservationInterval, newReservationInterval);
-}
-
-function doReservationsCollide(
-  newReservation: { start: Date; end: Date },
-  reservations: Pick<ReservationNode, "begin" | "end">[] = []
-): boolean {
-  const { start, end } = newReservation;
-  return reservations.some((reservation) =>
-    areIntervalsOverlapping(
-      {
-        start: new Date(reservation.begin),
-        end: new Date(reservation.end),
-      },
-      { start, end }
-    )
-  );
-}
-
-function areReservableTimesAvailable(
-  reservableTimes: ReservableMap,
-  slotDate: Date,
-  validateEnding = false
-): boolean {
-  // TODO this should be done differently slots is kinda bad
-  const day = startOfDay(slotDate);
-  const reservableTimesForDay = reservableTimes.get(dateToKey(day));
-  if (reservableTimesForDay == null) {
-    return false;
-  }
-  return reservableTimesForDay.some((slot) => {
-    const startDate = slot.start;
-    const endDate = slot.end;
-
-    if (validateEnding) {
-      return startDate <= slotDate && endDate > slotDate;
-    }
-    return startDate <= slotDate;
-  });
 }
 
 export function isReservationStartInFuture(
@@ -993,15 +530,4 @@ function getValidEndingTime({
   }
 
   return end;
-}
-
-function getBufferedEventTimes(
-  start: Date,
-  end: Date,
-  bufferTimeBefore?: number,
-  bufferTimeAfter?: number
-): { start: Date; end: Date } {
-  const before = addSeconds(start, -1 * (bufferTimeBefore ?? 0));
-  const after = addSeconds(end, bufferTimeAfter ?? 0);
-  return { start: before, end: after };
 }

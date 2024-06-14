@@ -30,10 +30,10 @@ import { capitalize, getDayIntervals, getTranslation } from "./util";
 import {
   type ReservableMap,
   type RoundPeriod,
-  isReservationReservable,
   isSlotWithinReservationTime,
   dateToKey,
-} from "@/modules/reservation";
+  isRangeReservable,
+} from "@/modules/reservable";
 import { type PricingFieldsFragment } from "common/gql/gql-types";
 import { gql } from "@apollo/client";
 
@@ -413,12 +413,14 @@ export function getPossibleTimesForDay(
       if (slotDate < new Date()) {
         return false;
       }
-      const isReservable = isReservationReservable({
+      const isReservable = isRangeReservable({
+        range: {
+          start: slotDate,
+          end: addMinutes(slotDate, durationValue),
+        },
         reservationUnit,
         reservableTimes,
         activeApplicationRounds,
-        start: slotDate,
-        end: addMinutes(slotDate, durationValue),
         skipLengthCheck: false,
       });
       return isReservable;

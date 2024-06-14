@@ -24,9 +24,8 @@ import {
   canReservationTimeBeChanged,
   getDurationOptions,
   getNewReservation,
-  getSlotPropGetter,
-  isReservationReservable,
 } from "@/modules/reservation";
+import { getSlotPropGetter, isRangeReservable } from "@/modules/reservable";
 import {
   getPossibleTimesForDay,
   getReservationUnitPrice,
@@ -193,12 +192,14 @@ export function EditStep0({
   const isSlotAvailable = useCallback(
     (start: Date, end: Date, skipLengthCheck = false): boolean => {
       const resUnit = getWithoutThisReservation(reservationUnit, reservation);
-      return isReservationReservable({
+      return isRangeReservable({
+        range: {
+          start,
+          end,
+        },
         reservationUnit: resUnit,
         reservableTimes,
         activeApplicationRounds,
-        start,
-        end,
         skipLengthCheck,
       });
     },

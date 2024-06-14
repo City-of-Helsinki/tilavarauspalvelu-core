@@ -30,7 +30,7 @@ import {
   isReservationUnitReservable,
 } from "../reservationUnit";
 import mockTranslations from "../../public/locales/fi/prices.json";
-import { type RoundPeriod } from "../reservation";
+import { type RoundPeriod } from "../reservable";
 
 jest.mock("next-i18next", () => ({
   i18n: {

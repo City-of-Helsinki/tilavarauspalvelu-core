@@ -7,10 +7,10 @@ import type {
 import { getPossibleTimesForDay } from "@/modules/reservationUnit";
 import {
   type RoundPeriod,
-  isReservationReservable,
-  ReservableMap,
+  type ReservableMap,
   dateToKey,
-} from "@/modules/reservation";
+  isRangeReservable,
+} from "@/modules/reservable";
 
 function pickMaybeDay(
   a: Date | undefined,
@@ -114,12 +114,14 @@ function getAvailableTimesForDay({
       const endDate = addMinutes(startDate, duration ?? 0);
       const startTime = new Date(start);
       startTime.setHours(timeHours, timeMinutes, 0, 0);
-      const isReservable = isReservationReservable({
+      const isReservable = isRangeReservable({
+        range: {
+          start: startDate,
+          end: endDate,
+        },
         reservationUnit,
         reservableTimes,
         activeApplicationRounds,
-        start: startDate,
-        end: endDate,
         skipLengthCheck: false,
       });
 

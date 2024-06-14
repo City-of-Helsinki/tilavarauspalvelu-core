@@ -14,7 +14,6 @@ import {
   PaymentType,
 } from "@gql/gql-types";
 import {
-  type ReservableMap,
   canReservationTimeBeChanged,
   canUserCancelReservation,
   getCheckoutUrl,
@@ -25,8 +24,8 @@ import {
   isReservationEditable,
   isReservationInThePast,
   isReservationStartInFuture,
-  isSlotWithinReservationTime,
 } from "../reservation";
+import { type ReservableMap, isSlotWithinReservationTime } from "../reservable";
 import mockTranslations from "../../public/locales/fi/prices.json";
 import { toApiDate } from "common/src/common/util";
 import { type TFunction } from "i18next";
@@ -555,8 +554,6 @@ describe("getNormalizedReservationOrderStatus", () => {
     ).toBe(null);
   });
 });
-
-test.todo("isReservationReservable");
 
 describe("isReservationEditable", () => {
   test("returns false with non-confirmed reservation", () => {

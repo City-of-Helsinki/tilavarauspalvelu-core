@@ -2,7 +2,7 @@ import { ReservationUnitNode } from "@/gql/gql-types";
 import {
   generateReservableMap,
   type ReservableMap,
-} from "@/modules/reservation";
+} from "@/modules/reservable";
 import { filterNonNullable } from "common/src/helpers";
 import { useMemo } from "react";
 
