@@ -13,11 +13,6 @@ import { type TFunction, i18n } from "next-i18next";
 
 export const parseDate = (date: string): Date => parseISO(date);
 
-export const convertHMSToSeconds = (input: string): number | null => {
-  const result = Number(new Date(`1970-01-01T${input}Z`).getTime() / 1000);
-  return Number.isNaN(result) ? null : result;
-};
-
 export const startOfWeek = (d: Date): Date =>
   dateFnsStartOfWeek(d, { weekStartsOn: 1 });
 

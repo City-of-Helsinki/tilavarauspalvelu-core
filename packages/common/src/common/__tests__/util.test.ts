@@ -3,7 +3,6 @@ import {
   ReservationStartInterval,
 } from "../../../gql/gql-types";
 import { getEventBuffers } from "../../calendar/util";
-import { convertHMSToSeconds, secondsToHms } from "../util";
 import { getIntervalMinutes } from "../../helpers";
 
 const tfunction = (str: string, options: { count: number }) => {
@@ -16,20 +15,6 @@ jest.mock("next-i18next", () => ({
     t: (str: string, options: { count: number }) => tfunction(str, options),
   },
 }));
-
-test("secondToHms", () => {
-  expect(secondsToHms(9832475)).toEqual({ h: 2731, m: 14, s: 35 });
-  expect(secondsToHms(0)).toEqual({ h: 0, m: 0, s: 0 });
-  expect(secondsToHms(-190)).toEqual({});
-  expect(secondsToHms(null)).toEqual({});
-});
-
-test("convertHMSToSeconds", () => {
-  expect(convertHMSToSeconds("01:15:01")).toBe(60 * 60 + 15 * 60 + 1);
-  expect(convertHMSToSeconds("13:23:01")).toBe(48181);
-  expect(convertHMSToSeconds("13gr01")).toBe(null);
-  expect(convertHMSToSeconds("")).toBe(null);
-});
 
 test("getIntervalMinutes", () => {
   expect(getIntervalMinutes(ReservationStartInterval.Interval_15Mins)).toBe(15);

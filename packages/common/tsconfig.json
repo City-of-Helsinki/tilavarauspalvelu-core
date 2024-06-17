@@ -1,6 +1,7 @@
 {
   "extends": "tsconfig/nextjs.json",
   "compilerOptions": {
+    "jsx": "react",
     "plugins": [{ "name": "next" }]
   },
   "exclude": ["node_modules/"],
@@ -11,7 +12,7 @@
     "types/**/*.d.ts",
     ".eslintrc.js",
     "stylelint.config.js",
-    "jest.setup.cjs",
+    "jest.setup.ts",
     "jest.config.cjs"
   ]
 }

@@ -1,8 +1,7 @@
-// Add any custom config to be passed to Jest
-/** @type {import('jest').Config} */
+// @ts-check
+/** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
   preset: 'ts-jest',
-  setupFilesAfterEnv: ["<rootDir>/jest.setup.cjs"],
-  moduleDirectories: ["node_modules", "<rootDir>/"],
-  testEnvironment: 'jsdom',
-};
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
+  testEnvironment: "jest-environment-jsdom",
+}

@@ -11,7 +11,11 @@ describe("getReservationApplicationFields", () => {
     ).toEqual([]);
   });
 
-  const fields = ["reservee_id", "reservee_organisation_name", "name"];
+  const fields = ["reservee_id", "reservee_organisation_name", "name"].map(
+    (field) => ({
+      fieldName: field,
+    })
+  );
 
   test("with individual input", () => {
     expect(
