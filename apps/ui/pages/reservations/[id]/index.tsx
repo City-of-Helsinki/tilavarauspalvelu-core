@@ -43,8 +43,8 @@ import {
   canUserCancelReservation,
   getCheckoutUrl,
   getNormalizedReservationOrderStatus,
-  getReservationCancellationReason,
   getReservationValue,
+  getWhyReservationCantBeCancelled,
   isReservationEditable,
 } from "@/modules/reservation";
 import {
@@ -470,7 +470,7 @@ function Reservation({
   const canTimeBeModified = isReservationEditable({ reservation });
 
   const cancellationReason = useMemo(() => {
-    const reason = getReservationCancellationReason(reservation);
+    const reason = getWhyReservationCantBeCancelled(reservation);
     switch (reason) {
       case "NO_CANCELLATION_RULE":
       case "REQUIRES_HANDLING":

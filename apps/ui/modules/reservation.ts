@@ -134,17 +134,17 @@ type GetReservationCancellationReasonReservationT = Pick<
   }> | null;
 };
 
-function isReservationWithinCancellationPeriod(
+function isTooCloseToCancel(
   reservation: IsWithinCancellationPeriodReservationT
 ): boolean {
   const reservationUnit = reservation.reservationUnit?.[0];
   const begin = new Date(reservation.begin);
 
-  const minutesBeforeCancel =
-    reservationUnit?.cancellationRule?.canBeCancelledTimeBefore ?? 0;
-  const cancelLatest = addSeconds(new Date(), minutesBeforeCancel);
+  const { canBeCancelledTimeBefore } = reservationUnit?.cancellationRule ?? {};
+  const cancelLatest = addSeconds(begin, -(canBeCancelledTimeBefore ?? 0));
+  const now = new Date();
 
-  return cancelLatest > begin;
+  return cancelLatest < now;
 }
 
 type CanUserCancelReservationProps = Pick<
@@ -158,10 +158,14 @@ export function canUserCancelReservation(
   skipTimeCheck = false
 ): boolean {
   const reservationUnit = reservation.reservationUnit?.[0];
+  if (!reservationUnit) return false;
+  // TODO why isn't user allowed to cancel waiting for payment?
+  // TODO why can't user cancel if the reservation is waiting for handling?
   if (reservation.state !== ReservationStateChoice.Confirmed) return false;
-  if (!reservationUnit?.cancellationRule) return false;
-  if (reservationUnit?.cancellationRule?.needsHandling) return false;
-  if (!skipTimeCheck && !isReservationWithinCancellationPeriod(reservation)) {
+  if (reservationUnit.cancellationRule == null) return false;
+  // TODO why isn't the user allowed to cancel if the reservation has been handled?
+  if (reservationUnit.cancellationRule.needsHandling) return false;
+  if (!skipTimeCheck && isTooCloseToCancel(reservation)) {
     return false;
   }
 
@@ -210,7 +214,7 @@ type ReservationCancellationReason =
   | "REQUIRES_HANDLING"
   | "BUFFER";
 
-export function getReservationCancellationReason(
+export function getWhyReservationCantBeCancelled(
   reservation: GetReservationCancellationReasonReservationT
 ): ReservationCancellationReason | null {
   const reservationUnit = reservation.reservationUnit?.[0];
@@ -219,7 +223,7 @@ export function getReservationCancellationReason(
     return "PAST";
   }
 
-  if (!reservationUnit?.cancellationRule) {
+  if (reservationUnit?.cancellationRule == null) {
     return "NO_CANCELLATION_RULE";
   }
 
@@ -227,10 +231,7 @@ export function getReservationCancellationReason(
     return "REQUIRES_HANDLING";
   }
 
-  if (
-    reservationUnit.cancellationRule?.canBeCancelledTimeBefore &&
-    isReservationWithinCancellationPeriod(reservation)
-  ) {
+  if (isTooCloseToCancel(reservation)) {
     return "BUFFER";
   }
 
@@ -347,11 +348,11 @@ export function canReservationTimeBeChanged({
     return false;
   }
 
-  if (isReservationEditable({ reservation })) {
+  if (!isReservationEditable({ reservation })) {
     return false;
   }
 
-  //  new reservation is free
+  // New reservation would require payment
   if (!isReservationFreeOfCharge(newReservation)) {
     return false;
   }
