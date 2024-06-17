@@ -27,9 +27,31 @@ class UnitFilterSet(ModelFilterSet):
     service_sector = django_filters.NumberFilter(field_name="service_sectors__pk")
 
     only_with_permission = django_filters.BooleanFilter(method="filter_by_only_with_permission")
+
+    # These filters use information across the relationship between Unit and ReservationUnit.
+    # FilterSets apply individual filters in separate `queryset.filter(...)` calls.
+    #
+    # Due to how Django works when spanning `to-many` relationships in qs.filter(...) calls,
+    # (see https://docs.djangoproject.com/en/5.0/topics/db/queries/#spanning-multi-valued-relationships),
+    # this means that using a combination of these filters would result in a queryset where
+    # ANY of their conditions are true for ANY ReservationUnit linked to a given Unit.
+    #     e.g. using `published_reservation_units=True` and `only_direct_bookable=True`
+    #     would return all Units where ANY of their ReservationUnit are EITHER published OR directly bookable.
+    #
+    # In this case, this is incorrect, since we want less permissive behavior:
+    #     e.g. the aforementioned filter should return all Units where ANY of their ReservationUnit are
+    #     BOTH published AND directly bookable.
+    #
+    # The incorrect behavior also has the side effect of adding multiple SQL joins to the
+    # many-to-many though table between Unit and ReservationUnit, which makes the query
+    # slower, since more duplication is needed.
+    #
+    # To prevent this, we need these filters to execute in order, and set `queryset.query.filter_is_sticky = True`
+    # to indicate to the queryset that it should reuse joins it found from one filter to the next.
+    # Note that this only applies until the next time the queryset is cloned, (e.g. when using
+    # `queryset.filter(...)` or `.distinct()`) and thus needs to be reapplied between them.
     published_reservation_units = django_filters.BooleanFilter(method="filter_by_published_reservation_units")
     own_reservations = django_filters.BooleanFilter(method="filter_by_own_reservations")
-
     only_direct_bookable = django_filters.BooleanFilter(method="filter_by_only_direct_bookable")
     only_seasonal_bookable = django_filters.BooleanFilter(method="filter_by_only_seasonal_bookable")
 
@@ -76,12 +98,11 @@ class UnitFilterSet(ModelFilterSet):
         if user.is_anonymous:
             return qs.none()
 
-        units_with_reservations = Q(reservationunit__reservation__user=user)
-
-        if value:
-            return qs.filter(units_with_reservations).distinct()
-
-        return qs.exclude(units_with_reservations).distinct()
+        # Prevent multiple joins, see explanation above.
+        qs.query.filter_is_sticky = True
+        qs = qs.filter(Q(reservationunit__reservation__user=user, _negated=not value))
+        qs.query.filter_is_sticky = True
+        return qs.distinct()
 
     @staticmethod
     def filter_by_published_reservation_units(qs: models.QuerySet, name: str, value: bool) -> models.QuerySet:
@@ -110,29 +131,33 @@ class UnitFilterSet(ModelFilterSet):
                 | (Q(reservationunit__reservation_ends__gt=now))
             )
 
-        return qs.filter(query)
+        # Prevent multiple joins, see explanation above.
+        qs.query.filter_is_sticky = True
+        qs = qs.filter(query)
+        qs.query.filter_is_sticky = True
+        return qs.distinct()
 
     @staticmethod
     def filter_by_only_direct_bookable(qs: models.QuerySet, name: str, value: bool) -> models.QuerySet:
-        if value:
-            return qs.filter(
-                reservationunit__reservation_kind__in=[
-                    ReservationKind.DIRECT,
-                    ReservationKind.DIRECT_AND_SEASON,
-                ],
-            )
-        return qs
+        if not value:
+            return qs
+
+        # Prevent multiple joins, see explanation above.
+        qs.query.filter_is_sticky = True
+        qs = qs.filter(reservationunit__reservation_kind__in=ReservationKind.allows_direct)
+        qs.query.filter_is_sticky = True
+        return qs.distinct()
 
     @staticmethod
     def filter_by_only_seasonal_bookable(qs: models.QuerySet, name: str, value: bool) -> models.QuerySet:
-        if value:
-            return qs.filter(
-                reservationunit__reservation_kind__in=[
-                    ReservationKind.SEASON,
-                    ReservationKind.DIRECT_AND_SEASON,
-                ],
-            )
-        return qs
+        if not value:
+            return qs
+
+        # Prevent multiple joins, see explanation above.
+        qs.query.filter_is_sticky = True
+        qs = qs.filter(reservationunit__reservation_kind__in=ReservationKind.allows_season)
+        qs.query.filter_is_sticky = True
+        return qs.distinct()
 
     @staticmethod
     def order_by_reservation_units_count(qs: models.QuerySet, desc: bool) -> models.QuerySet:

@@ -2,6 +2,7 @@ from enum import Enum
 
 from django.db import models
 from django.db.models import TextChoices
+from django.utils.functional import classproperty
 from django.utils.translation import gettext_lazy as _
 
 __all__ = [
@@ -56,6 +57,14 @@ class ReservationKind(models.TextChoices):
     DIRECT = "direct"
     SEASON = "season"
     DIRECT_AND_SEASON = "direct_and_season"
+
+    @classproperty
+    def allows_direct(cls) -> list[str]:
+        return [cls.DIRECT.value, cls.DIRECT_AND_SEASON.value]
+
+    @classproperty
+    def allows_season(cls) -> list[str]:
+        return [cls.SEASON.value, cls.DIRECT_AND_SEASON.value]
 
 
 class PricingType(models.TextChoices):
