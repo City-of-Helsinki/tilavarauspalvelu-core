@@ -2,10 +2,19 @@ import {
   addDays,
   addHours,
   endOfDay,
+  format,
   startOfDay,
   startOfToday,
 } from "date-fns";
-import { generateReservableMap } from "../reservable";
+import {
+  ReservableMap,
+  generateReservableMap,
+  isRangeReservable,
+} from "../reservable";
+import {
+  IsReservableFieldsFragment,
+  ReservationStartInterval,
+} from "@/gql/gql-types";
 
 describe("generateReservableMap", () => {
   beforeAll(() => {
@@ -180,14 +189,137 @@ describe("generateReservableMap", () => {
     }
   });
 
-  // TODO
-  // - normal case: 2 years of ranges (from today -> 2 years in the future)
-  //   - multiple ranges per day
-  test.todo("30 days with gaps");
-  test.todo("30 days a year from now");
+  test("two days with a gap adds only two days", () => {
+    const data = [
+      { start: addDays(startOfToday(), 0), end: addDays(startOfToday(), 1) },
+      { start: addDays(startOfToday(), 2), end: addDays(startOfToday(), 3) },
+    ];
+    const times = generateReservableMap(data.map(toRange));
+    expect(times.size).toBe(2);
+    for (const [key, value] of times) {
+      expect(value.length).toBe(1);
+      const [y, m, d] = key.split("-").map(Number);
+      // eslint-disable-next-line no-console
+      console.assert(y > 0 && m > 0 && d > 0);
+      // TODO what is the logic here and is it sound?
+      const date = new Date(y, m - 1, d, 0, 0, 0);
+      const start = value[0].start;
+      const end = value[0].end;
+      if (start.getDate() === date.getDate()) {
+        expect(start).toStrictEqual(date);
+        expect(end).toStrictEqual(endOfDay(date));
+      } else {
+        expect(start).toStrictEqual(date);
+        expect(end).toStrictEqual(endOfDay(date));
+      }
+    }
+  });
+
+  test("30 days a year from now", () => {
+    const start = addDays(startOfToday(), 365);
+    const end = addDays(startOfToday(), 395);
+    const data = [{ start, end }];
+    const times = generateReservableMap(data.map(toRange));
+    expect(times.size).toBe(30);
+    for (const [key, value] of times) {
+      expect(value.length).toBe(1);
+      const [y, m, d] = key.split("-").map(Number);
+      // eslint-disable-next-line no-console
+      console.assert(y > 0 && m > 0 && d > 0);
+      const date = new Date(y, m - 1, d, 0, 0, 0);
+      expect(value[0].start).toStrictEqual(date);
+      expect(value[0].end).toStrictEqual(endOfDay(date));
+    }
+  });
+
   test.todo("common use case: 2 years of ranges, multiple ranges per day");
 });
 
 describe("isRangeReservable", () => {
-  test.todo("isRangeReservable");
+  function mockReservableTimes(): ReservableMap {
+    const map: ReservableMap = new Map();
+    for (let i = 0; i < 30; i++) {
+      const date = addDays(startOfToday(), i);
+      const key = format(date, "yyyy-MM-dd");
+      const value = [{ start: startOfDay(date), end: endOfDay(date) }];
+      map.set(key, value);
+    }
+    return map;
+  }
+  function createInput({
+    start,
+    end,
+    reservableTimes,
+  }: {
+    start: Date;
+    end: Date;
+    reservableTimes?: ReservableMap;
+  }) {
+    const reservationUnit: Omit<
+      IsReservableFieldsFragment,
+      "reservableTimeSpans"
+    > = {
+      reservationSet: [],
+      bufferTimeBefore: 0,
+      bufferTimeAfter: 0,
+      maxReservationDuration: 0,
+      minReservationDuration: 0,
+      reservationStartInterval: ReservationStartInterval.Interval_15Mins,
+      reservationsMaxDaysBefore: null,
+      reservationsMinDaysBefore: 0,
+      reservationBegins: addDays(new Date(), -1).toISOString(),
+      reservationEnds: addDays(new Date(), 180).toISOString(),
+    };
+    return {
+      range: {
+        start,
+        end,
+      },
+      reservationUnit,
+      activeApplicationRounds: [],
+      reservableTimes: reservableTimes ?? mockReservableTimes(),
+    };
+  }
+
+  test("YES for the base case", () => {
+    const input = createInput({
+      start: addHours(new Date(), 1),
+      end: addHours(new Date(), 2),
+    });
+    expect(isRangeReservable(input)).toBe(true);
+  });
+
+  test("NO for starting in the past", () => {
+    const input = createInput({
+      start: addHours(new Date(), -1),
+      end: addHours(new Date(), 2),
+    });
+    expect(isRangeReservable(input)).toBe(false);
+  });
+
+  test("NO if end < start", () => {
+    const input = createInput({
+      start: addHours(new Date(), 2),
+      end: addHours(new Date(), 1),
+    });
+    expect(isRangeReservable(input)).toBe(false);
+  });
+
+  test("YES for a 12h case", () => {
+    const date = startOfDay(addDays(new Date(), 1));
+    const input = createInput({
+      start: addHours(date, 9),
+      end: addHours(date, 21),
+    });
+    expect(isRangeReservable(input)).toBe(true);
+  });
+
+  test.todo("NO if the range is shorter than minimum interval");
+  test.todo("NO if the range is longer than maximum interval");
+  test.todo("NO if the range is not within the reservable times");
+  test.todo("NO if the range is not within the active application rounds");
+  test.todo("NO if the range contains a reservation");
+  test.todo("NO if the range is before the minimum reservation date");
+  test.todo("NO if the range is after the maximum reservation date");
+  test.todo("NO if the reservation unit is not reservable");
 });

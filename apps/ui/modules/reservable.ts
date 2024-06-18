@@ -88,7 +88,6 @@ export function generateReservableMap(
       if (isBefore(end, new Date())) {
         return null;
       }
-      // TODO clean this bit
       if (isBefore(start, startOfDay(new Date()))) {
         start.setTime(startOfDay(new Date()).getTime());
       }
@@ -169,7 +168,7 @@ type ReservationUnitReservableProps = {
   // pregenerated open slots
   reservableTimes: ReservableMap;
   activeApplicationRounds: RoundPeriod[];
-  skipLengthCheck: boolean;
+  skipLengthCheck?: boolean;
 };
 
 /// NOTE don't return [boolean, string] causes issues in TS / JS
@@ -204,7 +203,11 @@ export function isRangeReservable({
   if (!isValid(start) || !isValid(end)) {
     return false;
   }
-  const normalizedEnd = addMinutes(end, -1);
+  if (isBefore(end, start)) {
+    return false;
+  }
+
+  const normalizedEnd = addMilliseconds(end, -1);
 
   const reservationsArr = filterNonNullable(reservationSet);
   const reservation = {
