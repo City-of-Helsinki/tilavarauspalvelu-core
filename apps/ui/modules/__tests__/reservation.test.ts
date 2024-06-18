@@ -3,7 +3,6 @@ import { addDays, addHours, addMinutes, startOfToday } from "date-fns";
 import {
   type PaymentOrderNode,
   ReservationStateChoice,
-  type ReservationNode,
   ReservationStartInterval,
   Authentication,
   ReservationKind,
@@ -514,11 +513,7 @@ describe("getNormalizedReservationOrderStatus", () => {
     ).toBe(OrderStatus.PaidManually);
   });
 
-  test("return null", () => {
-    expect(getNormalizedReservationOrderStatus({} as ReservationNode)).toBe(
-      null
-    );
-
+  test("null if created", () => {
     expect(
       getNormalizedReservationOrderStatus({
         state: ReservationStateChoice.Created,
@@ -530,7 +525,9 @@ describe("getNormalizedReservationOrderStatus", () => {
         ],
       })
     ).toBe(null);
+  });
 
+  test("null if Waiting for Payment", () => {
     expect(
       getNormalizedReservationOrderStatus({
         state: ReservationStateChoice.WaitingForPayment,
@@ -542,7 +539,9 @@ describe("getNormalizedReservationOrderStatus", () => {
         ],
       })
     ).toBe(null);
+  });
 
+  test("null if Requires Handling", () => {
     expect(
       getNormalizedReservationOrderStatus({
         state: ReservationStateChoice.RequiresHandling,
@@ -558,36 +557,58 @@ describe("getNormalizedReservationOrderStatus", () => {
 });
 
 describe("isReservationEditable", () => {
-  test("returns false with non-confirmed reservation", () => {
-    const res = isReservationEditable({
+  function constructInput({
+    state,
+    begin,
+    isHandled,
+  }: {
+    state: ReservationStateChoice;
+    begin: Date;
+    isHandled?: boolean;
+  }) {
+    return {
       reservation: {
         ...reservation,
-        state: ReservationStateChoice.Created,
+        state,
+        begin: begin.toISOString(),
+        end: addHours(begin, 1).toISOString(),
         reservationUnit: [reservation.reservationUnit[0]],
+        isHandled: isHandled ?? false,
       },
-    });
-    expect(res).toBe(false);
-  });
-  test("handles past reservation check", () => {
-    const res = {
-      ...reservation,
-      reservationUnit: [reservation.reservationUnit[0]],
-      begin: addHours(new Date(), -1).toISOString(),
     };
-    expect(isReservationEditable({ reservation: res })).toBe(false);
+  }
+
+  test("true for confirmed reservation in the future", () => {
+    const input = constructInput({
+      state: ReservationStateChoice.Confirmed,
+      begin: addHours(new Date(), 24),
+    });
+    expect(isReservationEditable(input)).toBe(true);
+  });
+
+  test("returns false with non-confirmed reservation", () => {
+    const input = constructInput({
+      state: ReservationStateChoice.Created,
+      begin: addHours(new Date(), 24),
+    });
+    expect(isReservationEditable(input)).toBe(false);
+  });
+
+  test("handles past reservation check", () => {
+    const input = constructInput({
+      state: ReservationStateChoice.Confirmed,
+      begin: addHours(new Date(), -1),
+    });
+    expect(isReservationEditable(input)).toBe(false);
   });
 
   test("handles situation when reservation has been handled", () => {
-    const res = {
-      ...reservation,
-      reservationUnit: [reservation.reservationUnit[0]],
+    const input = constructInput({
+      state: ReservationStateChoice.Confirmed,
+      begin: addHours(new Date(), 24),
       isHandled: true,
-    };
-    expect(
-      isReservationEditable({
-        reservation: res,
-      })
-    ).toBe(false);
+    });
+    expect(isReservationEditable(input)).toBe(false);
   });
 });
 
@@ -712,11 +733,13 @@ describe("canReservationBeChanged", () => {
     price,
     reservableTimes: reservableTimes_,
     reservationsMinDaysBefore,
+    reservationEnds,
   }: {
     begin: Date;
     price?: string;
     reservableTimes?: ReservableMap;
     reservationsMinDaysBefore?: number;
+    reservationEnds?: Date;
   }) {
     return {
       reservableTimes: reservableTimes_ ?? reservableTimes,
@@ -730,6 +753,8 @@ describe("canReservationBeChanged", () => {
       reservationUnit: {
         ...reservationUnit,
         reservationsMinDaysBefore: reservationsMinDaysBefore ?? 0,
+        reservationEnds:
+          reservationEnds?.toISOString() ?? reservationUnit.reservationEnds,
       },
       activeApplicationRounds: [],
     };
@@ -801,18 +826,10 @@ describe("canReservationBeChanged", () => {
 
   test("NO when the reservation unit has been closed for reservations", () => {
     const input = {
-      reservation: reservation_,
-      reservableTimes,
-      newReservation: {
-        ...reservation,
-        begin: addHours(new Date(), 1).toString(),
-        end: addHours(new Date(), 2).toString(),
-      },
-      reservationUnit: {
-        ...reservationUnit,
-        reservationEnds: addDays(new Date(), -1).toString(),
-      },
-      activeApplicationRounds: [],
+      ...constructInput({
+        begin: addHours(new Date(), 24),
+        reservationEnds: addDays(new Date(), -1),
+      }),
     };
     expect(canReservationTimeBeChanged(input)).toBe(false);
   });
@@ -874,38 +891,33 @@ describe("getCheckoutUrl", () => {
 });
 
 describe("isReservationStartInFuture", () => {
-  test("returns true for a reservation that starts in the future", () => {
-    expect(
-      isReservationStartInFuture({
-        reservationBegins: addMinutes(new Date(), 10),
-      } as unknown as ReservationUnitNode)
-    ).toBe(true);
+  test("YES for a reservation that starts in the future", () => {
+    const reservationBegins = addMinutes(new Date(), 10).toISOString();
+    expect(isReservationStartInFuture({ reservationBegins })).toBe(true);
   });
 
-  test("returns false for a reservation that starts in the past", () => {
-    expect(
-      isReservationStartInFuture({
-        reservationBegins: addMinutes(new Date(), -10).toISOString(),
-      })
-    ).toBe(false);
+  test("NO for a reservation that starts in the past", () => {
+    const reservationBegins = addMinutes(new Date(), -10).toISOString();
+    expect(isReservationStartInFuture({ reservationBegins })).toBe(false);
+  });
 
-    expect(
-      isReservationStartInFuture({
-        reservationBegins: new Date().toISOString(),
-      })
-    ).toBe(false);
-
+  test("NO for a reservation that now", () => {
+    const reservationBegins = new Date().toISOString();
+    expect(isReservationStartInFuture({ reservationBegins })).toBe(false);
     expect(isReservationStartInFuture({})).toBe(false);
   });
 
-  test("returns correct value with buffer days", () => {
+  // Why? the name of the function doesn't make sense here
+  test("YES if start < buffer days", () => {
     expect(
       isReservationStartInFuture({
         reservationBegins: addDays(new Date(), 10).toISOString(),
         reservationsMaxDaysBefore: 9,
       })
     ).toBe(true);
+  });
 
+  test("NO if start === buffer days", () => {
     expect(
       isReservationStartInFuture({
         reservationBegins: addDays(new Date(), 10).toISOString(),
