@@ -8,6 +8,7 @@ import { getTranslation } from "../common/util";
 import { breakpoints } from "../common/style";
 import {
   BannerNotificationTarget,
+  useBannerNotificationsListAllQuery,
   useBannerNotificationsListQuery,
   type BannerNotificationCommonFragment,
 } from "../../gql/gql-types";
@@ -123,8 +124,11 @@ const BannerNotificationsList = ({
     },
     fetchPolicy: "no-cache",
   });
+  const { data: dataAll } = useBannerNotificationsListAllQuery({
+    fetchPolicy: "no-cache",
+  });
   const notificationsTarget = data?.bannerNotifications;
-  const notificationsAll = data?.bannerNotificationsAll;
+  const notificationsAll = dataAll?.bannerNotifications;
   const comb = [
     ...(notificationsAll?.edges ?? []),
     ...(notificationsTarget?.edges ?? []),

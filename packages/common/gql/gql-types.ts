@@ -5323,11 +5323,11 @@ export enum Weekday {
   Wednesday = "WEDNESDAY",
 }
 
-export type BannerNotificationsListQueryVariables = Exact<{
-  target: BannerNotificationTarget;
+export type BannerNotificationsListAllQueryVariables = Exact<{
+  [key: string]: never;
 }>;
 
-export type BannerNotificationsListQuery = {
+export type BannerNotificationsListAllQuery = {
   bannerNotifications?: {
     edges: Array<{
       node?: {
@@ -5341,7 +5341,14 @@ export type BannerNotificationsListQuery = {
       } | null;
     } | null>;
   } | null;
-  bannerNotificationsAll?: {
+};
+
+export type BannerNotificationsListQueryVariables = Exact<{
+  target: BannerNotificationTarget;
+}>;
+
+export type BannerNotificationsListQuery = {
+  bannerNotifications?: {
     edges: Array<{
       node?: {
         id: string;
@@ -6339,16 +6346,86 @@ export const MetadataSetsFragmentDoc = gql`
     }
   }
 `;
-export const BannerNotificationsListDocument = gql`
-  query BannerNotificationsList($target: BannerNotificationTarget!) {
-    bannerNotifications(isVisible: true, target: $target) {
+export const BannerNotificationsListAllDocument = gql`
+  query BannerNotificationsListAll {
+    bannerNotifications(isVisible: true, target: ALL) {
       edges {
         node {
           ...BannerNotificationCommon
         }
       }
     }
-    bannerNotificationsAll: bannerNotifications(isVisible: true, target: ALL) {
+  }
+  ${BannerNotificationCommonFragmentDoc}
+`;
+
+/**
+ * __useBannerNotificationsListAllQuery__
+ *
+ * To run a query within a React component, call `useBannerNotificationsListAllQuery` and pass it any options that fit your needs.
+ * When your component renders, `useBannerNotificationsListAllQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useBannerNotificationsListAllQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useBannerNotificationsListAllQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    BannerNotificationsListAllQuery,
+    BannerNotificationsListAllQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    BannerNotificationsListAllQuery,
+    BannerNotificationsListAllQueryVariables
+  >(BannerNotificationsListAllDocument, options);
+}
+export function useBannerNotificationsListAllLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    BannerNotificationsListAllQuery,
+    BannerNotificationsListAllQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    BannerNotificationsListAllQuery,
+    BannerNotificationsListAllQueryVariables
+  >(BannerNotificationsListAllDocument, options);
+}
+export function useBannerNotificationsListAllSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<
+    BannerNotificationsListAllQuery,
+    BannerNotificationsListAllQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    BannerNotificationsListAllQuery,
+    BannerNotificationsListAllQueryVariables
+  >(BannerNotificationsListAllDocument, options);
+}
+export type BannerNotificationsListAllQueryHookResult = ReturnType<
+  typeof useBannerNotificationsListAllQuery
+>;
+export type BannerNotificationsListAllLazyQueryHookResult = ReturnType<
+  typeof useBannerNotificationsListAllLazyQuery
+>;
+export type BannerNotificationsListAllSuspenseQueryHookResult = ReturnType<
+  typeof useBannerNotificationsListAllSuspenseQuery
+>;
+export type BannerNotificationsListAllQueryResult = Apollo.QueryResult<
+  BannerNotificationsListAllQuery,
+  BannerNotificationsListAllQueryVariables
+>;
+export const BannerNotificationsListDocument = gql`
+  query BannerNotificationsList($target: BannerNotificationTarget!) {
+    bannerNotifications(isVisible: true, target: $target) {
       edges {
         node {
           ...BannerNotificationCommon

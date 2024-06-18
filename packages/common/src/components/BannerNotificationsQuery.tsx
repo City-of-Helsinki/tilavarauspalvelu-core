@@ -5,17 +5,23 @@ import { BANNER_NOTIFICATION_COMMON_FRAGMENT } from "../queries/fragments";
 // has to be done like this because target is a single option (not an array)
 // and we can't filter on the frontend because target is not allowed in the query for unauthorized users
 // query alias breaks typescript typing (refactor later if possible).
-export const BANNER_NOTIFICATIONS_LIST = gql`
+export const BANNER_NOTIFICATIONS_LIST_ALL = gql`
   ${BANNER_NOTIFICATION_COMMON_FRAGMENT}
-  query BannerNotificationsList($target: BannerNotificationTarget!) {
-    bannerNotifications(isVisible: true, target: $target) {
+  query BannerNotificationsListAll {
+    bannerNotifications(isVisible: true, target: ALL) {
       edges {
         node {
           ...BannerNotificationCommon
         }
       }
     }
-    bannerNotificationsAll: bannerNotifications(isVisible: true, target: ALL) {
+  }
+`;
+
+export const BANNER_NOTIFICATIONS_LIST_TARGET = gql`
+  ${BANNER_NOTIFICATION_COMMON_FRAGMENT}
+  query BannerNotificationsList($target: BannerNotificationTarget!) {
+    bannerNotifications(isVisible: true, target: $target) {
       edges {
         node {
           ...BannerNotificationCommon
