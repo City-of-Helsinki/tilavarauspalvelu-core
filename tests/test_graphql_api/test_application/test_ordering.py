@@ -150,57 +150,69 @@ def test_application__order__by_status(graphql):
     assert response.node(6) == {"pk": application_2.pk}
 
 
-@pytest.mark.parametrize("lang", ["fi", "en", "sv"])
-def test_application__order__by_preferred_unit_name(graphql, lang):
-    # given:
-    # - There are two applications in the system
-    # - The applications have a variety of application sections and reservation units options
-    # - A superuser is using the system
-    application_1 = ApplicationFactory.create_in_status_draft_no_sections()
-    ReservationUnitOptionFactory.create(
-        application_section__application=application_1,
-        preferred_order=0,
-        **{f"reservation_unit__unit__name_{lang}": "C unit"},
-    )
-    # Not counted since not on the first application section of the application
-    ReservationUnitOptionFactory.create(
-        application_section__application=application_1,
-        preferred_order=0,
-        **{f"reservation_unit__unit__name_{lang}": "A unit"},
-    )
+@pytest.mark.parametrize(
+    ("lang", "order"),
+    [
+        ("fi", [0, 1, 2, 3]),
+        ("sv", [0, 1, 2, 3]),
+        ("en", [1, 0, 2, 3]),
+    ],
+)
+@pytest.mark.parametrize("direction", ["asc", "desc"])
+def test_application__order__by_preferred_unit_name(graphql, lang, order, direction):
+    order = list(reversed(order)) if direction == "desc" else order
 
-    application_2 = ApplicationFactory.create_in_status_draft_no_sections()
-    section = ApplicationSectionFactory.create(application=application_2)
+    applications = {
+        0: ApplicationFactory.create_in_status_draft_no_sections(),
+        1: ApplicationFactory.create_in_status_draft_no_sections(),
+        2: ApplicationFactory.create_in_status_draft_no_sections(),
+        3: ApplicationFactory.create_in_status_draft_no_sections(),
+    }
+
+    section_1 = ApplicationSectionFactory.create(application=applications[0])
+    section_2 = ApplicationSectionFactory.create(application=applications[1])
+    section_3 = ApplicationSectionFactory.create(application=applications[2])
+
     ReservationUnitOptionFactory.create(
-        application_section=section,
+        application_section=section_1,
         preferred_order=0,
-        **{f"reservation_unit__unit__name_{lang}": "B unit"},
+        reservation_unit__unit__name="A",
+        reservation_unit__unit__name_fi="A",
+        reservation_unit__unit__name_sv="A",
+        reservation_unit__unit__name_en="B",
+    )
+    ReservationUnitOptionFactory.create(
+        application_section=section_2,
+        preferred_order=0,
+        reservation_unit__unit__name="B",
+        reservation_unit__unit__name_fi="B",
+        reservation_unit__unit__name_sv="B",
+        reservation_unit__unit__name_en="A",
     )
     # Not counted since preferred order not 0
     ReservationUnitOptionFactory.create(
-        application_section=section,
+        application_section=section_3,
         preferred_order=1,
-        **{f"reservation_unit__unit__name_{lang}": "A unit"},
+        reservation_unit__unit__name="A",
+        reservation_unit__unit__name_fi="A",
+        reservation_unit__unit__name_sv="A",
+        reservation_unit__unit__name_en="A",
     )
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
-    # when:
-    # - User tries to search for applications ordered by preferred unit name in the given language ascending
-    response = graphql(applications_query(order_by=f"preferredUnitName{lang.capitalize()}Asc"))
+    query = applications_query(
+        order_by=[
+            f"preferredUnitName{lang.capitalize()}{direction.capitalize()}",
+            f"pk{direction.capitalize()}",
+        ]
+    )
+    response = graphql(query)
 
-    # then:
-    # - The response contains the application in the wanted order
-    assert len(response.edges) == 2
-    assert response.node(0) == {"pk": application_2.pk}
-    assert response.node(1) == {"pk": application_1.pk}
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 4
 
-    # when:
-    # - User tries to search for applications ordered by preferred unit name in the given language descending
-    response = graphql(applications_query(order_by=f"preferredUnitName{lang.capitalize()}Desc"))
-
-    # then:
-    # - The response contains the application in the wanted order
-    assert len(response.edges) == 2
-    assert response.node(0) == {"pk": application_1.pk}
-    assert response.node(1) == {"pk": application_2.pk}
+    assert response.node(0) == {"pk": applications[order[0]].pk}
+    assert response.node(1) == {"pk": applications[order[1]].pk}
+    assert response.node(2) == {"pk": applications[order[2]].pk}
+    assert response.node(3) == {"pk": applications[order[3]].pk}
