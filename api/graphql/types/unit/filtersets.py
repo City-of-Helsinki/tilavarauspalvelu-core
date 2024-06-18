@@ -8,12 +8,9 @@ from graphene_django_extensions.filters import IntMultipleChoiceFilter
 
 from api.graphql.types.unit.types import Unit
 from common.date_utils import local_datetime
-from common.db import SubqueryCount
 from permissions.helpers import has_any_general_permission
 from permissions.models import GeneralPermissionChoices
 from reservation_units.enums import ReservationKind
-from reservation_units.models import ReservationUnit
-from reservations.models import Reservation
 from spaces.querysets.unit import UnitQuerySet
 
 if TYPE_CHECKING:
@@ -166,20 +163,12 @@ class UnitFilterSet(ModelFilterSet):
         return qs.distinct()
 
     @staticmethod
-    def order_by_reservation_units_count(qs: models.QuerySet, desc: bool) -> models.QuerySet:
-        return qs.alias(
-            reservation_units_count=SubqueryCount(
-                ReservationUnit.objects.filter(unit=models.OuterRef("pk")).values("id"),
-            ),
-        ).order_by(models.OrderBy(models.F("reservation_units_count"), descending=desc))
+    def order_by_reservation_units_count(qs: UnitQuerySet, desc: bool) -> models.QuerySet:
+        return qs.order_by_reservation_units_count(desc=desc)
 
     @staticmethod
-    def order_by_reservation_count(qs: models.QuerySet, desc: bool) -> models.QuerySet:
-        return qs.alias(
-            reservation_count=SubqueryCount(
-                Reservation.objects.filter(reservation_unit__unit=models.OuterRef("pk")).values("id"),
-            ),
-        ).order_by(models.OrderBy(models.F("reservation_count"), descending=desc))
+    def order_by_reservation_count(qs: UnitQuerySet, desc: bool) -> models.QuerySet:
+        return qs.order_by_reservation_count(desc=desc)
 
     @staticmethod
     def order_by_unit_group_name_fi(qs: UnitQuerySet, desc: bool) -> models.QuerySet:

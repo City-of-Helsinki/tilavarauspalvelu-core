@@ -266,116 +266,77 @@ def test_application_section__order__by_application_status__desc(graphql):
     assert response.node(6) == {"pk": pk_draft}
 
 
-@pytest.mark.parametrize("lang", ["fi", "en", "sv"])
-def test_application_section__order__by_preferred_unit_name__asc(graphql, lang):
-    # given:
-    # - There are two application sections in the system
-    # - The application sections have a variety of reservation unit options
-    # - A superuser is using the system
-    section_1 = ApplicationSectionFactory.create_in_status_unallocated()
+@pytest.mark.parametrize(
+    ("lang", "order"),
+    [
+        ("fi", [0, 1, 2, 3]),
+        ("sv", [0, 1, 2, 3]),
+        ("en", [1, 0, 2, 3]),
+    ],
+)
+@pytest.mark.parametrize("direction", ["asc", "desc"])
+def test_application_section__order__by_preferred_unit_name(graphql, lang, order, direction):
+    order = list(reversed(order)) if direction == "desc" else order
+
+    sections = {
+        0: ApplicationSectionFactory.create_in_status_unallocated(reservation_unit_options=None),
+        1: ApplicationSectionFactory.create_in_status_unallocated(reservation_unit_options=None),
+        2: ApplicationSectionFactory.create_in_status_unallocated(reservation_unit_options=None),
+        3: ApplicationSectionFactory.create_in_status_unallocated(reservation_unit_options=None),
+    }
+
     ReservationUnitOptionFactory.create(
-        application_section=section_1,
+        application_section=sections[0],
         preferred_order=0,
-        **{f"reservation_unit__unit__name_{lang}": "C unit"},
+        reservation_unit__unit__name="A",
+        reservation_unit__unit__name_fi="A",
+        reservation_unit__unit__name_sv="A",
+        reservation_unit__unit__name_en="B",
     )
-
-    section_2 = ApplicationSectionFactory.create_in_status_unallocated()
     ReservationUnitOptionFactory.create(
-        application_section=section_2,
+        application_section=sections[1],
         preferred_order=0,
-        **{f"reservation_unit__unit__name_{lang}": "B unit"},
+        reservation_unit__unit__name="B",
+        reservation_unit__unit__name_fi="B",
+        reservation_unit__unit__name_sv="B",
+        reservation_unit__unit__name_en="A",
     )
-    # Not counted since not preferred order not 0
+    # Shouldn't be counted, since preferred order not 0
     ReservationUnitOptionFactory.create(
-        application_section=section_2,
+        application_section=sections[2],
         preferred_order=1,
-        **{f"reservation_unit__unit__name_{lang}": "A unit"},
+        reservation_unit__unit__name="C",
+        reservation_unit__unit__name_fi="C",
+        reservation_unit__unit__name_sv="X",
+        reservation_unit__unit__name_en="A",
     )
-
-    # Section doesn't have reservation unit options with preferred order 0
-    # -> preferred_unit_name is None -> ordered last
-    section_3 = ApplicationSectionFactory.create_in_status_unallocated()
+    # Shouldn't be counted, since preferred order not 0
     ReservationUnitOptionFactory.create(
-        application_section=section_3,
+        application_section=sections[3],
         preferred_order=1,
-        **{f"reservation_unit__unit__name_{lang}": "A unit"},
+        reservation_unit__unit__name="A",
+        reservation_unit__unit__name_fi="A",
+        reservation_unit__unit__name_sv="X",
+        reservation_unit__unit__name_en="X",
     )
 
-    # Section doesn't have reservation unit options at all
-    # -> preferred_unit_name is None -> ordered last
-    section_4 = ApplicationSectionFactory.create_in_status_unallocated()
+    graphql.login_with_superuser()
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
-
-    # when:
-    # - User tries to search for application sections ordered
-    #   by preferred unit name in the given language, ascending
-    query = sections_query(order_by=f"preferredUnitName{lang.capitalize()}Asc")
+    query = sections_query(
+        order_by=[
+            f"preferredUnitName{lang.capitalize()}{direction.capitalize()}",
+            f"pk{direction.capitalize()}",
+        ]
+    )
     response = graphql(query)
 
-    # then:
-    # - The response contains the application in the wanted order
+    assert response.has_errors is False, response.errors
     assert len(response.edges) == 4
-    assert response.node(0) == {"pk": section_2.pk}
-    assert response.node(1) == {"pk": section_1.pk}
-    assert response.node(2) == {"pk": section_3.pk}
-    assert response.node(3) == {"pk": section_4.pk}
 
-
-@pytest.mark.parametrize("lang", ["fi", "en", "sv"])
-def test_application_section__order__by_preferred_unit_name__desc(graphql, lang):
-    # given:
-    # - There are two application sections in the system
-    # - The application sections have a variety of reservation unit options
-    # - A superuser is using the system
-    section_1 = ApplicationSectionFactory.create_in_status_unallocated(reservation_unit_options=None)
-    ReservationUnitOptionFactory.create(
-        application_section=section_1,
-        preferred_order=0,
-        **{f"reservation_unit__unit__name_{lang}": "C unit"},
-    )
-
-    section_2 = ApplicationSectionFactory.create_in_status_unallocated(reservation_unit_options=None)
-    ReservationUnitOptionFactory.create(
-        application_section=section_2,
-        preferred_order=0,
-        **{f"reservation_unit__unit__name_{lang}": "B unit"},
-    )
-    # Not counted since not preferred order not 0
-    ReservationUnitOptionFactory.create(
-        application_section=section_2,
-        preferred_order=1,
-        **{f"reservation_unit__unit__name_{lang}": "A unit"},
-    )
-
-    # Section doesn't have reservation unit options with preferred order 0
-    # -> preferred_unit_name is None -> ordered first
-    section_3 = ApplicationSectionFactory.create_in_status_unallocated(reservation_unit_options=None)
-    ReservationUnitOptionFactory.create(
-        application_section=section_3,
-        preferred_order=1,
-        **{f"reservation_unit__unit__name_{lang}": "A unit"},
-    )
-
-    # Section doesn't have reservation unit options at all
-    # -> preferred_unit_name is None -> ordered first
-    section_4 = ApplicationSectionFactory.create_in_status_unallocated(reservation_unit_options=None)
-
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
-
-    # when:
-    # - User tries to search for application sections ordered
-    #   by preferred unit name in the given language, descending
-    query = sections_query(order_by=f"preferredUnitName{lang.capitalize()}Desc")
-    response = graphql(query)
-
-    # then:
-    # - The response contains the application in the wanted order
-    assert len(response.edges) == 4
-    assert response.node(0) == {"pk": section_3.pk}
-    assert response.node(1) == {"pk": section_4.pk}
-    assert response.node(2) == {"pk": section_1.pk}
-    assert response.node(3) == {"pk": section_2.pk}
+    assert response.node(0) == {"pk": sections[order[0]].pk}
+    assert response.node(1) == {"pk": sections[order[1]].pk}
+    assert response.node(2) == {"pk": sections[order[2]].pk}
+    assert response.node(3) == {"pk": sections[order[3]].pk}
 
 
 def test_application_section__order__by_has_allocations__asc(graphql):

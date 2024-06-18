@@ -11,7 +11,7 @@ pytestmark = [
 ]
 
 
-def test_units__order_by__name_fi(graphql):
+def test_units__order__by_name_fi(graphql):
     unit_1 = UnitFactory.create(name_fi="Unit 1")
     unit_2 = UnitFactory.create(name_fi="Unit 2")
     unit_3 = UnitFactory.create(name_fi="Unit 3")
@@ -37,60 +37,154 @@ def test_units__order_by__name_fi(graphql):
     assert response.node(2) == {"pk": unit_1.pk}
 
 
-def test_units__order__by_own_reservations_count(graphql):
-    unit_1 = UnitFactory.create(name="1")
-    unit_2 = UnitFactory.create(name="2")
-    unit_3 = UnitFactory.create(name="3")
-    unit_4 = UnitFactory.create(name="4")
+def test_units__order__by_reservations_count(graphql):
+    units = {
+        0: UnitFactory.create(name="1"),  # 4 Reservations in 2 ReservationUnits
+        1: UnitFactory.create(name="2"),  # 2 Reservations in 1 ReservationUnit
+        2: UnitFactory.create(name="3"),  # 3 Reservations in 1 ReservationUnit
+        3: UnitFactory.create(name="4"),  # 2 Reservations in 2 ReservationUnits
+    }
 
-    res_unit_1 = ReservationUnitFactory.create(unit=unit_1)
-    res_unit_2 = ReservationUnitFactory.create(unit=unit_2)
-    res_unit_3 = ReservationUnitFactory.create(unit=unit_3)
-    res_unit_4 = ReservationUnitFactory.create(unit=unit_4)
+    res_unit_1 = ReservationUnitFactory.create(unit=units[0])
+    res_unit_2 = ReservationUnitFactory.create(unit=units[0])
+    res_unit_3 = ReservationUnitFactory.create(unit=units[1])
+    res_unit_4 = ReservationUnitFactory.create(unit=units[2])
+    res_unit_5 = ReservationUnitFactory.create(unit=units[3])
+    res_unit_6 = ReservationUnitFactory.create(unit=units[3])
 
-    user_1 = UserFactory.create()
-    user_2 = UserFactory.create()
+    ReservationFactory.create_batch(3, reservation_unit=[res_unit_1])
+    ReservationFactory.create_batch(1, reservation_unit=[res_unit_2])
+    ReservationFactory.create_batch(2, reservation_unit=[res_unit_3])
+    ReservationFactory.create_batch(3, reservation_unit=[res_unit_4])
+    ReservationFactory.create_batch(1, reservation_unit=[res_unit_5])
+    ReservationFactory.create_batch(1, reservation_unit=[res_unit_6])
 
-    ReservationFactory.create_batch(4, reservation_unit=[res_unit_1], user=user_1)
-    ReservationFactory.create(reservation_unit=[res_unit_2], user=user_1)
-    ReservationFactory.create_batch(3, reservation_unit=[res_unit_3], user=user_1)
-    ReservationFactory.create(reservation_unit=[res_unit_4], user=user_2)
+    # Descending
+    query_1 = units_query(order_by=["reservationCountDesc", "pkDesc"])
+    response_1 = graphql(query_1)
 
-    graphql.force_login(user_1)
-    response = graphql(units_query(own_reservations=True, order_by="reservationCountDesc"))
+    assert response_1.has_errors is False, response_1.errors
+    assert len(response_1.edges) == 4
 
-    assert response.has_errors is False
+    expected_order = [0, 2, 3, 1]
 
-    assert len(response.edges) == 3
-    assert response.node(0) == {"pk": unit_1.pk}
-    assert response.node(1) == {"pk": unit_3.pk}
-    assert response.node(2) == {"pk": unit_2.pk}
+    assert response_1.node(0) == {"pk": units[expected_order[0]].pk}
+    assert response_1.node(1) == {"pk": units[expected_order[1]].pk}
+    assert response_1.node(2) == {"pk": units[expected_order[2]].pk}
+    assert response_1.node(3) == {"pk": units[expected_order[3]].pk}
+
+    # Ascending
+    query_2 = units_query(order_by=["reservationCountAsc", "pkAsc"])
+    response_2 = graphql(query_2)
+
+    assert response_2.has_errors is False, response_2.errors
+    assert len(response_2.edges) == 4
+
+    expected_order.reverse()
+
+    assert response_2.node(0) == {"pk": units[expected_order[0]].pk}
+    assert response_2.node(1) == {"pk": units[expected_order[1]].pk}
+    assert response_2.node(2) == {"pk": units[expected_order[2]].pk}
+    assert response_2.node(3) == {"pk": units[expected_order[3]].pk}
+
+
+def test_units__order__by_reservations_count__only_own_reservations(graphql):
+    units = {
+        0: UnitFactory.create(name="1"),  # 3 Reservations for user (total 4)
+        1: UnitFactory.create(name="2"),  # 2 Reservations for user (total 2)
+        2: UnitFactory.create(name="3"),  # 0 Reservations for user (total 3)
+        3: UnitFactory.create(name="4"),  # 1 Reservation for user (total 2)
+    }
+
+    res_unit_1 = ReservationUnitFactory.create(unit=units[0])
+    res_unit_2 = ReservationUnitFactory.create(unit=units[0])
+    res_unit_3 = ReservationUnitFactory.create(unit=units[1])
+    res_unit_4 = ReservationUnitFactory.create(unit=units[2])
+    res_unit_5 = ReservationUnitFactory.create(unit=units[3])
+    res_unit_6 = ReservationUnitFactory.create(unit=units[3])
+
+    user = UserFactory.create()
+
+    ReservationFactory.create_batch(3, reservation_unit=[res_unit_1], user=user)
+    ReservationFactory.create_batch(1, reservation_unit=[res_unit_2])
+    ReservationFactory.create_batch(2, reservation_unit=[res_unit_3], user=user)
+    ReservationFactory.create_batch(3, reservation_unit=[res_unit_4])
+    ReservationFactory.create_batch(1, reservation_unit=[res_unit_5], user=user)
+    ReservationFactory.create_batch(1, reservation_unit=[res_unit_6])
+
+    graphql.force_login(user)
+
+    # Descending
+    query_1 = units_query(own_reservations=True, order_by=["reservationCountDesc", "pkDesc"])
+    response_1 = graphql(query_1)
+
+    assert response_1.has_errors is False, response_1.errors
+    assert len(response_1.edges) == 3
+
+    # Order determined by total reservation count, not just user's.
+    # 3 before 1 since using pkDesc order if reservation count is the same.
+    expected_order = [0, 3, 1]
+
+    assert response_1.node(0) == {"pk": units[expected_order[0]].pk}
+    assert response_1.node(1) == {"pk": units[expected_order[1]].pk}
+    assert response_1.node(2) == {"pk": units[expected_order[2]].pk}
+
+    # Ascending
+    query_2 = units_query(own_reservations=True, order_by=["reservationCountAsc", "pkAsc"])
+    response_2 = graphql(query_2)
+
+    assert response_2.has_errors is False, response_2.errors
+    assert len(response_2.edges) == 3
+
+    expected_order.reverse()
+
+    assert response_2.node(0) == {"pk": units[expected_order[0]].pk}
+    assert response_2.node(1) == {"pk": units[expected_order[1]].pk}
+    assert response_2.node(2) == {"pk": units[expected_order[2]].pk}
 
 
 def test_units__order__by_reservation_units_count(graphql):
-    unit_1 = UnitFactory.create(name="1")
-    unit_2 = UnitFactory.create(name="2")
-    unit_3 = UnitFactory.create(name="3")
-    unit_4 = UnitFactory.create(name="4")
+    units = {
+        0: UnitFactory.create(name="1"),  # 4 ReservationUnits
+        1: UnitFactory.create(name="2"),  # 2 ReservationUnits
+        2: UnitFactory.create(name="3"),  # 3 ReservationUnits
+        3: UnitFactory.create(name="4"),  # 0 ReservationUnits
+        4: UnitFactory.create(name="5"),  # 0 ReservationUnits
+    }
 
-    for _ in range(4):
-        ReservationUnitFactory.create(unit=unit_1)
+    ReservationUnitFactory.create_batch(4, unit=units[0])
+    ReservationUnitFactory.create_batch(2, unit=units[1])
+    ReservationUnitFactory.create_batch(3, unit=units[2])
 
-    for _ in range(2):
-        ReservationUnitFactory.create(unit=unit_2)
+    # Descending
+    query_1 = units_query(order_by=["reservationUnitsCountDesc", "pkDesc"])
+    response_1 = graphql(query_1)
 
-    for _ in range(3):
-        ReservationUnitFactory.create(unit=unit_3)
+    assert response_1.has_errors is False, response_1.errors
+    assert len(response_1.edges) == 5
 
-    response = graphql(units_query(order_by="reservationUnitsCountDesc"))
+    expected_order = [0, 2, 1, 4, 3]
 
-    assert response.has_errors is False, response.errors
+    assert response_1.node(0) == {"pk": units[expected_order[0]].pk}
+    assert response_1.node(1) == {"pk": units[expected_order[1]].pk}
+    assert response_1.node(2) == {"pk": units[expected_order[2]].pk}
+    assert response_1.node(3) == {"pk": units[expected_order[3]].pk}
+    assert response_1.node(4) == {"pk": units[expected_order[4]].pk}
 
-    assert len(response.edges) == 4
-    assert response.node(0) == {"pk": unit_1.pk}
-    assert response.node(1) == {"pk": unit_3.pk}
-    assert response.node(2) == {"pk": unit_2.pk}
-    assert response.node(3) == {"pk": unit_4.pk}
+    # Ascending
+    query_2 = units_query(order_by=["reservationUnitsCountAsc", "pkAsc"])
+    response_2 = graphql(query_2)
+
+    assert response_2.has_errors is False, response_2.errors
+    assert len(response_2.edges) == 5
+
+    expected_order.reverse()
+
+    assert response_2.node(0) == {"pk": units[expected_order[0]].pk}
+    assert response_2.node(1) == {"pk": units[expected_order[1]].pk}
+    assert response_2.node(2) == {"pk": units[expected_order[2]].pk}
+    assert response_2.node(3) == {"pk": units[expected_order[3]].pk}
+    assert response_2.node(4) == {"pk": units[expected_order[4]].pk}
 
 
 @pytest.mark.parametrize(

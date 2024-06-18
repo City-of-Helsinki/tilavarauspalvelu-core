@@ -17,30 +17,21 @@ class ApplicationQuerySet(models.QuerySet):
     def preferred_unit_name_alias(self, *, lang: Literal["fi", "en", "sv"]) -> Self:
         # Name of the unit of the most preferred reservation unit
         # of the first event created for this application
-        from applications.models import ApplicationSection, ReservationUnitOption
+        from applications.models import ApplicationSection
 
         return self.alias(
             **{
                 f"preferred_unit_name_{lang}": Subquery(
                     queryset=(
-                        ApplicationSection.objects.annotate(
-                            preferred_unit_name=Subquery(
-                                queryset=(
-                                    ReservationUnitOption.objects.filter(
-                                        application_section=models.OuterRef("pk"),
-                                        preferred_order=0,
-                                    ).values(f"reservation_unit__unit__name_{lang}")[:1]
-                                ),
-                                output_field=models.CharField(),
-                            )
-                        )
+                        ApplicationSection.objects.preferred_unit_name_alias(lang=lang)
+                        .annotate(preferred_unit_name=models.F(f"preferred_unit_name_{lang}"))
                         .filter(application=models.OuterRef("pk"))
                         .order_by("pk")
                         .values("preferred_unit_name")[:1]
                     ),
                     output_field=models.CharField(),
-                )
-            }
+                ),
+            },
         )
 
     def order_by_preferred_unit_name(self, *, lang: Literal["fi", "en", "sv"], desc: bool = False) -> Self:
