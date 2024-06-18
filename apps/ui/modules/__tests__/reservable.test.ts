@@ -1,7 +1,22 @@
-import { addDays, addHours, startOfToday } from "date-fns";
+import {
+  addDays,
+  addHours,
+  endOfDay,
+  startOfDay,
+  startOfToday,
+} from "date-fns";
 import { generateReservableMap } from "../reservable";
 
 describe("generateReservableMap", () => {
+  beforeAll(() => {
+    jest.useFakeTimers({
+      now: new Date(2024, 0, 1, 9, 0, 0),
+    });
+  });
+  afterAll(() => {
+    jest.useRealTimers();
+  });
+
   // Range format: { start: Date, end: Date }
   // the backend returns N of these ranges
   // they are always disjoint
@@ -71,17 +86,105 @@ describe("generateReservableMap", () => {
     }
   });
 
-  // Test cases:
-  //
+  test("day range continues to next day", () => {
+    const start = addDays(addHours(startOfToday(), 9), 0);
+    const end = addDays(addHours(startOfToday(), 21), 1);
+    const data = [{ start, end }];
+    const times = generateReservableMap(data.map(toRange));
+    expect(times.size).toBe(2);
+    for (const [key, value] of times) {
+      expect(value.length).toBe(1);
+      const [y, m, d] = key.split("-").map(Number);
+      // eslint-disable-next-line no-console
+      console.assert(y > 0 && m > 0 && d > 0);
+      const date = new Date(y, m - 1, d, 9, 0, 0);
+      const s =
+        value[0].start.getDate() === start.getDate() ? date : startOfDay(date);
+      const e =
+        value[0].end.getDate() === start.getDate() ? endOfDay(start) : end;
+      expect(value[0].start).toStrictEqual(s);
+      expect(value[0].end).toStrictEqual(e);
+    }
+  });
+
+  // TODO test with same time range but different days
+  test("24h day range continues to next day", () => {
+    const start = addDays(addHours(startOfToday(), 9), 0);
+    const end = addDays(addHours(startOfToday(), 9), 1);
+    const data = [{ start, end }];
+    const times = generateReservableMap(data.map(toRange));
+    expect(times.size).toBe(2);
+    for (const [key, value] of times) {
+      expect(value.length).toBe(1);
+      const [y, m, d] = key.split("-").map(Number);
+      // eslint-disable-next-line no-console
+      console.assert(y > 0 && m > 0 && d > 0);
+      const date = new Date(y, m - 1, d, 9, 0, 0);
+      const s =
+        value[0].start.getDate() === start.getDate() ? date : startOfDay(date);
+      const e =
+        value[0].end.getDate() === start.getDate() ? endOfDay(start) : end;
+      expect(value[0].start).toStrictEqual(s);
+      expect(value[0].end).toStrictEqual(e);
+    }
+  });
+
+  test("00:00-00:00 24h day range, should be a single day", () => {
+    const start = addDays(startOfToday(), 0);
+    const end = addDays(startOfToday(), 1);
+    const data = [{ start, end }];
+    const times = generateReservableMap(data.map(toRange));
+    expect(times.size).toBe(1);
+    for (const [key, value] of times) {
+      expect(value.length).toBe(1);
+      const [y, m, d] = key.split("-").map(Number);
+      // eslint-disable-next-line no-console
+      console.assert(y > 0 && m > 0 && d > 0);
+      const date = new Date(y, m - 1, d, 0, 0, 0);
+      expect(value[0].start).toStrictEqual(date);
+      expect(value[0].end).toStrictEqual(endOfDay(date));
+    }
+  });
+
+  test("single range covering a full year from today", () => {
+    const start = addDays(startOfToday(), 0);
+    const end = addDays(startOfToday(), 365);
+    const data = [{ start, end }];
+    const times = generateReservableMap(data.map(toRange));
+    expect(times.size).toBe(365);
+    for (const [key, value] of times) {
+      expect(value.length).toBe(1);
+      const [y, m, d] = key.split("-").map(Number);
+      // eslint-disable-next-line no-console
+      console.assert(y > 0 && m > 0 && d > 0);
+      const date = new Date(y, m - 1, d, 0, 0, 0);
+      expect(value[0].start).toStrictEqual(date);
+      expect(value[0].end).toStrictEqual(endOfDay(date));
+    }
+  });
+
+  test("single range covering two years starting from a year ago has only future days", () => {
+    const start = addDays(startOfToday(), -365);
+    const end = addDays(startOfToday(), 365);
+    const data = [{ start, end }];
+    const times = generateReservableMap(data.map(toRange));
+    expect(times.size).toBe(365);
+    for (const [key, value] of times) {
+      expect(value.length).toBe(1);
+      const [y, m, d] = key.split("-").map(Number);
+      // eslint-disable-next-line no-console
+      console.assert(y > 0 && m > 0 && d > 0);
+      const date = new Date(y, m - 1, d, 0, 0, 0);
+      expect(value[0].start).toStrictEqual(date);
+      expect(value[0].end).toStrictEqual(endOfDay(date));
+    }
+  });
+
+  // TODO
   // - normal case: 2 years of ranges (from today -> 2 years in the future)
   //   - multiple ranges per day
-  // - long running range (a year in the past -> a year in the future)
-  test.todo("7 days range continues to next day");
-  test.todo("30 days a year from now");
-  test.todo("single range covering a full year from today");
-  test.todo("single range covering two years starting from a year ago");
-
   test.todo("30 days with gaps");
+  test.todo("30 days a year from now");
   test.todo("common use case: 2 years of ranges, multiple ranges per day");
 });
 

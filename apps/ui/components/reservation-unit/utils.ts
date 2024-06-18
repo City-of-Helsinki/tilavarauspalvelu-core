@@ -1,4 +1,3 @@
-import { filterNonNullable } from "common/src/helpers";
 import { addDays, addMinutes, isAfter, isBefore, set } from "date-fns";
 import type {
   ReservationUnitNode,
@@ -11,33 +10,7 @@ import {
   dateToKey,
   isRangeReservable,
 } from "@/modules/reservable";
-
-function pickMaybeDay(
-  a: Date | undefined,
-  b: Date | undefined,
-  compF: (a: Date, b: Date) => boolean
-): Date | undefined {
-  if (!a) {
-    return b;
-  }
-  if (!b) {
-    return a;
-  }
-  return compF(a, b) ? a : b;
-}
-
-// Returns a Date object with the first day of the given array of Dates
-const dayMin = (days: Array<Date | undefined>): Date | undefined => {
-  return filterNonNullable(days).reduce<Date | undefined>((acc, day) => {
-    return pickMaybeDay(acc, day, isBefore);
-  }, undefined);
-};
-
-const dayMax = (days: Array<Date | undefined>): Date | undefined => {
-  return filterNonNullable(days).reduce<Date | undefined>((acc, day) => {
-    return pickMaybeDay(acc, day, isAfter);
-  }, undefined);
-};
+import { dayMax, dayMin } from "common/src/helpers";
 
 type LastPossibleReservationDateProps = Pick<
   ReservationUnitNode,

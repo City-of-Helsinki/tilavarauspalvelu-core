@@ -4,7 +4,12 @@ import {
   type IsReservableFieldsFragment,
   type ReservableTimeSpanType,
 } from "@/gql/gql-types";
-import { filterNonNullable, getIntervalMinutes } from "common/src/helpers";
+import {
+  dayMax,
+  dayMin,
+  filterNonNullable,
+  getIntervalMinutes,
+} from "common/src/helpers";
 import {
   differenceInSeconds,
   isValid,
@@ -19,6 +24,9 @@ import {
   isBefore,
   isWithinInterval,
   addSeconds,
+  endOfDay,
+  isSameDay,
+  addMilliseconds,
 } from "date-fns";
 import { getDayIntervals } from "./util";
 import { type SlotProps } from "common/src/calendar/Calendar";
@@ -64,28 +72,78 @@ export function generateReservableMap(
   reservableTimeSpans: ReservableTimeSpanType[]
 ): ReservableMap {
   const converted = reservableTimeSpans
-    .map((n) =>
-      n.startDatetime != null && n.endDatetime != null
-        ? { start: new Date(n.startDatetime), end: new Date(n.endDatetime) }
-        : null
-    )
+    .map((n) => {
+      if (n.startDatetime == null || n.endDatetime == null) {
+        return null;
+      }
+      const end = new Date(n.endDatetime);
+      const start = new Date(n.startDatetime);
+      if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+        return null;
+      }
+      if (isBefore(end, start)) {
+        return null;
+      }
+      // remove all days that are in the past
+      if (isBefore(end, new Date())) {
+        return null;
+      }
+      // TODO clean this bit
+      if (isBefore(start, startOfDay(new Date()))) {
+        start.setTime(startOfDay(new Date()).getTime());
+      }
+      if (end.getTime() === startOfDay(end).getTime()) {
+        end.setTime(addMilliseconds(end, -1).getTime());
+      }
+      return { start, end };
+    })
     .filter((n): n is NonNullable<typeof n> => n != null);
+
   // eslint-disable-next-line no-console -- should enforce that input type is never null instead
   console.assert(converted.length === reservableTimeSpans.length);
 
   const map = new Map<string, Array<{ start: Date; end: Date }>>();
   for (const n of converted) {
-    // the simplest case is when the start and end are on the same day
-    const day = dateToKey(new Date(n.start));
-    if (map.has(day)) {
-      const arr = map.get(day) ?? [];
-      arr.push(n);
-      map.set(day, arr);
-      continue;
+    if (!isSameDay(n.start, n.end)) {
+      const start = startOfDay(n.start);
+      const end = endOfDay(n.end);
+      for (let i = start; i < end; i = addDays(i, 1)) {
+        const day = dateToKey(i);
+        const start_ = dayMax([n.start, i]);
+        const end_ = dayMin([n.end, endOfDay(i)]);
+        // eslint-disable-next-line no-console
+        console.assert(start_ != null && end_ != null);
+        if (start_ == null || end_ == null) {
+          continue;
+        }
+        const val = {
+          start: start_,
+          end: end_,
+        };
+        // eslint-disable-next-line no-console
+        console.assert(val.start.getDate() === val.end.getDate());
+        if (map.has(day)) {
+          const arr = map.get(day) ?? [];
+          arr.push(val);
+          // TODO isn't this superfluous?
+          map.set(day, arr);
+        } else {
+          map.set(day, [val]);
+        }
+      }
     } else {
-      map.set(day, [n]);
+      // the simplest case is when the start and end are on the same day
+      const day = dateToKey(new Date(n.start));
+      if (map.has(day)) {
+        const arr = map.get(day) ?? [];
+        arr.push(n);
+        // TODO isn't this superfluous?
+        map.set(day, arr);
+        continue;
+      } else {
+        map.set(day, [n]);
+      }
     }
-    // TODO the more complex cases (spans multiple days)
   }
 
   return map;
@@ -169,7 +227,7 @@ export function isRangeReservable({
 
   if (
     !isRangeReservable_({
-      range: [new Date(start), normalizedEnd],
+      range: [start, normalizedEnd],
       reservableTimes,
       reservationBegins: reservationBegins
         ? new Date(reservationBegins)
