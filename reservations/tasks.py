@@ -54,7 +54,7 @@ def refund_paid_reservation_task(reservation_pk: int) -> None:
     if not settings.MOCK_VERKKOKAUPPA_API_ENABLED:
         refund = VerkkokauppaAPIClient.refund_order(order_uuid=payment_order.remote_id)
         payment_order.refund_id = refund.refund_id
-        payment_order.save()
+        payment_order.save(update_fields=["refund_id"])
     else:
         payment_order.refund_id = uuid.uuid4()
-        payment_order.save()
+        payment_order.save(update_fields=["refund_id"])

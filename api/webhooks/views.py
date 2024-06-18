@@ -65,12 +65,12 @@ class WebhookOrderPaidViewSet(viewsets.GenericViewSet):
         payment_order.status = OrderStatus.PAID
         payment_order.payment_id = payment_id
         payment_order.processed_at = local_datetime()
-        payment_order.save()
+        payment_order.save(update_fields=["status", "payment_id", "processed_at"])
 
         reservation: Reservation | None = payment_order.reservation
         if reservation is not None and reservation.state == ReservationStateChoice.WAITING_FOR_PAYMENT:
             reservation.state = ReservationStateChoice.CONFIRMED
-            reservation.save()
+            reservation.save(update_fields=["state"])
             ReservationEmailNotificationSender.send_confirmation_email(reservation=reservation)
 
         return Response(data={"message": "Order payment completed successfully"}, status=200)
@@ -116,7 +116,7 @@ class WebhookOrderCancelViewSet(viewsets.ViewSet):
 
         payment_order.status = OrderStatus.CANCELLED
         payment_order.processed_at = local_datetime()
-        payment_order.save()
+        payment_order.save(update_fields=["status", "processed_at"])
 
         return Response(data={"message": "Order cancellation completed successfully"}, status=200)
 
@@ -168,6 +168,6 @@ class WebhookRefundViewSet(viewsets.ViewSet):
         payment_order.refund_id = refund_id
         payment_order.status = OrderStatus.REFUNDED
         payment_order.processed_at = local_datetime()
-        payment_order.save()
+        payment_order.save(update_fields=["refund_id", "status", "processed_at"])
 
         return Response(data={"message": "Order refund completed successfully"}, status=200)

@@ -46,13 +46,13 @@ def update_expired_orders() -> None:
                 VerkkokauppaAPIClient.cancel_order(order_uuid=order.remote_id, user_uuid=order.reservation_user_uuid)
 
             order.processed_at = local_datetime()
-            order.save()
+            order.save(update_fields=["status", "processed_at"])
 
             # Confirm the reservation and send confirmation email
             reservation: Reservation = order.reservation
             if order.status == OrderStatus.PAID and reservation.state == ReservationStateChoice.WAITING_FOR_PAYMENT:
                 reservation.state = ReservationStateChoice.CONFIRMED
-                reservation.save()
+                reservation.save(update_fields=["state"])
                 ReservationEmailNotificationSender.send_confirmation_email(reservation=reservation)
 
         except GetPaymentError as err:
