@@ -41,9 +41,9 @@ class PurposeNode(DjangoNode):
         return info.context.build_absolute_uri(url)
 
     def resolve_small_url(root: Purpose, info: GQLInfo) -> str | None:
-        image_name: str | None = getattr(root, "image_url", None)
-        if not image_name:
+        small_url: str | None = getattr(root, "small_url", None)
+        if not small_url:
             return None
 
-        url = get_thumbnailer(image_name)["purpose_image"].url
+        url = get_thumbnailer(small_url)["purpose_image"].url
         return info.context.build_absolute_uri(url)
