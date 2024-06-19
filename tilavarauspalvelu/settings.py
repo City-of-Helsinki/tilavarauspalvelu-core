@@ -252,8 +252,12 @@ class Common(Environment):
         }
 
     AUDIT_LOGGING_ENABLED = values.BooleanValue(default=False)
+
     QUERY_LOGGING_ENABLED = values.BooleanValue(default=False)
     QUERY_LOGGING_SKIP_ROUTES = values.ListValue(default=[])
+    QUERY_LOGGING_DURATION_MS_THRESHOLD = values.IntegerValue(default=5_000)
+    QUERY_LOGGING_QUERY_COUNT_THRESHOLD = values.IntegerValue(default=100)
+    QUERY_LOGGING_BODY_LENGTH_THRESHOLD = values.IntegerValue(default=50_000)
 
     # --- Internationalization settings ------------------------------------------------------------------------------
 

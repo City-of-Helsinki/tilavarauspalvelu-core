@@ -12,6 +12,9 @@ pytestmark = [
 
 def test_query_logging_middleware(graphql, settings):
     settings.QUERY_LOGGING_ENABLED = True
+    settings.QUERY_LOGGING_DURATION_MS_THRESHOLD = 0
+    settings.QUERY_LOGGING_QUERY_COUNT_THRESHOLD = 0
+    settings.QUERY_LOGGING_BODY_LENGTH_THRESHOLD = 0
 
     SpaceFactory.create()
 

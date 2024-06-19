@@ -95,14 +95,20 @@ class QueryLoggingMiddleware:
             try:
                 from common.tasks import save_sql_queries_from_request
 
-                # TODO: instead of saving all queries to graphql, only save when optimizer
-                #  counted different number of queries than what was actually executed.
-                save_sql_queries_from_request.delay(
-                    queries=query_log,
-                    path=request.path,
-                    body=request.body,
-                    duration_ms=(time.perf_counter_ns() - start) // 1_000_000,
-                )
+                total_duration_ms = (time.perf_counter_ns() - start) // 1_000_000
+
+                # TODO: Only save when optimizer counted different number of queries than what was actually executed.
+                if (
+                    total_duration_ms >= settings.QUERY_LOGGING_DURATION_MS_THRESHOLD
+                    or len(query_log) >= settings.QUERY_LOGGING_QUERY_COUNT_THRESHOLD
+                    or (request.body and len(request.body) >= settings.QUERY_LOGGING_BODY_LENGTH_THRESHOLD)
+                ):
+                    save_sql_queries_from_request.delay(
+                        queries=query_log,
+                        path=request.path,
+                        body=request.body,
+                        duration_ms=total_duration_ms,
+                    )
             except Exception as error:
                 SentryLogger.log_exception(error, "Error in QueryLoggingMiddleware")
 
