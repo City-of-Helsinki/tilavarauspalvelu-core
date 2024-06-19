@@ -26,7 +26,7 @@ export const RESERVATION_UNIT_CALENDAR_QUERY = gql`
   query ReservationUnitCalendar(
     $id: ID!
     $pk: Int!
-    $state: [String]
+    $state: [ReservationStateChoice]
     $beginDate: Date
     $endDate: Date
   ) {

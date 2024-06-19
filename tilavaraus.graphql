@@ -1682,6 +1682,19 @@ enum OrderStatus {
   REFUNDED
 }
 
+"""
+Same as OrderStatus, but includes the 'FREE' option used for filtering reservations without payments.
+"""
+enum OrderStatusWithFree {
+  CANCELLED
+  DRAFT
+  EXPIRED
+  FREE
+  PAID
+  PAID_MANUALLY
+  REFUNDED
+}
+
 type OrganisationNode implements Node {
   activeMembers: Int
   address: AddressNode
@@ -2051,10 +2064,10 @@ type Query {
   Find all reservations that affect other reservations through the space hierarchy or a common resource.
   """
   affectingReservations(
-    begin: DateTime
+    applyingForFreeOfCharge: Boolean
     beginDate: Date
-    begin_Gte: DateTime
-    begin_Lte: DateTime
+    createdAtGte: Date
+    createdAtLte: Date
     endDate: Date
     """
     Reservations should contain at least one these reservation units.
@@ -2064,30 +2077,28 @@ type Query {
     Reservations should contain at least one reservation unit that belongs to any of these units.
     """
     forUnits: [Int] = []
+    isRecurring: Boolean
     onlyWithHandlingPermission: Boolean
     onlyWithPermission: Boolean
     """
     Järjestä
     """
     orderBy: [ReservationOrderingChoices]
-    """
-    PaymentOrder's statuses; DRAFT, EXPIRED, CANCELLED, PAID, PAID_MANUALLY, REFUNDED
-    """
-    orderStatus: [String]
+    orderStatus: [OrderStatusWithFree]
     priceGte: Decimal
     priceLte: Decimal
-    recurringReservation: ID
+    recurringReservation: [Int]
     requested: Boolean
-    reservationType: [String]
-    reservationUnit: [ID]
+    reservationType: [ReservationTypeChoice]
+    reservationUnit: [Int]
     reservationUnitNameEn: String
     reservationUnitNameFi: String
     reservationUnitNameSv: String
-    reservationUnitType: [ID]
-    state: [String]
+    reservationUnitType: [Int]
+    state: [ReservationStateChoice]
     textSearch: String
-    unit: [ID]
-    user: ID
+    unit: [Int]
+    user: [Int]
   ): [ReservationNode!]
   ageGroups(
     after: String
@@ -2556,13 +2567,14 @@ type Query {
   ): ReservationUnitNodeConnection
   reservations(
     after: String
+    applyingForFreeOfCharge: Boolean
     before: String
-    begin: DateTime
     beginDate: Date
-    begin_Gte: DateTime
-    begin_Lte: DateTime
+    createdAtGte: Date
+    createdAtLte: Date
     endDate: Date
     first: Int
+    isRecurring: Boolean
     last: Int
     offset: Int
     onlyWithHandlingPermission: Boolean
@@ -2571,24 +2583,21 @@ type Query {
     Järjestä
     """
     orderBy: [ReservationOrderingChoices]
-    """
-    PaymentOrder's statuses; DRAFT, EXPIRED, CANCELLED, PAID, PAID_MANUALLY, REFUNDED
-    """
-    orderStatus: [String]
+    orderStatus: [OrderStatusWithFree]
     priceGte: Decimal
     priceLte: Decimal
-    recurringReservation: ID
+    recurringReservation: [Int]
     requested: Boolean
-    reservationType: [String]
-    reservationUnit: [ID]
+    reservationType: [ReservationTypeChoice]
+    reservationUnit: [Int]
     reservationUnitNameEn: String
     reservationUnitNameFi: String
     reservationUnitNameSv: String
-    reservationUnitType: [ID]
-    state: [String]
+    reservationUnitType: [Int]
+    state: [ReservationStateChoice]
     textSearch: String
-    unit: [ID]
-    user: ID
+    unit: [Int]
+    user: [Int]
   ): ReservationNodeConnection
   resource(
     """
@@ -2788,35 +2797,33 @@ type RecurringReservationNode implements Node {
   ): [RejectedOccurrenceNode!]!
   reservationUnit: ReservationUnitNode!
   reservations(
-    begin: DateTime
+    applyingForFreeOfCharge: Boolean
     beginDate: Date
-    begin_Gte: DateTime
-    begin_Lte: DateTime
+    createdAtGte: Date
+    createdAtLte: Date
     endDate: Date
+    isRecurring: Boolean
     onlyWithHandlingPermission: Boolean
     onlyWithPermission: Boolean
     """
     Järjestä
     """
     orderBy: [ReservationOrderingChoices]
-    """
-    PaymentOrder's statuses; DRAFT, EXPIRED, CANCELLED, PAID, PAID_MANUALLY, REFUNDED
-    """
-    orderStatus: [String]
+    orderStatus: [OrderStatusWithFree]
     priceGte: Decimal
     priceLte: Decimal
-    recurringReservation: ID
+    recurringReservation: [Int]
     requested: Boolean
-    reservationType: [String]
-    reservationUnit: [ID]
+    reservationType: [ReservationTypeChoice]
+    reservationUnit: [Int]
     reservationUnitNameEn: String
     reservationUnitNameFi: String
     reservationUnitNameSv: String
-    reservationUnitType: [ID]
-    state: [String]
+    reservationUnitType: [Int]
+    state: [ReservationStateChoice]
     textSearch: String
-    unit: [ID]
-    user: ID
+    unit: [Int]
+    user: [Int]
   ): [ReservationNode!]!
   user: UserNode
   weekdays: [Int]
@@ -3106,10 +3113,7 @@ type ReservationCancellationMutationPayload {
 }
 
 input ReservationConfirmMutationInput {
-  """
-  Type of the payment. Possible values are ONLINE, INVOICE, ON_SITE.
-  """
-  paymentType: String
+  paymentType: PaymentType
   pk: Int!
 }
 
@@ -3151,13 +3155,10 @@ type ReservationConfirmMutationPayload {
   reserveeLastName: String
   reserveeOrganisationName: String
   reserveePhone: String
-  reserveeType: String
-  """
-  String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, REQUIRES_HANDLING, WAITING_FOR_PAYMENT, CONFIRMED, DENIED.
-  """
-  state: String
+  reserveeType: CustomerTypeChoice
+  state: ReservationStateChoice
   taxPercentageValue: Decimal
-  type: String
+  type: ReservationTypeChoice
   unitPrice: Decimal
 }
 
@@ -3194,8 +3195,8 @@ input ReservationCreateMutationInput {
   reserveeLastName: String
   reserveeOrganisationName: String
   reserveePhone: String
-  reserveeType: String
-  type: String
+  reserveeType: CustomerTypeChoice
+  type: ReservationTypeChoice
 }
 
 type ReservationCreateMutationPayload {
@@ -3235,10 +3236,10 @@ type ReservationCreateMutationPayload {
   reserveeLastName: String
   reserveeOrganisationName: String
   reserveePhone: String
-  reserveeType: String
-  state: String
+  reserveeType: CustomerTypeChoice
+  state: ReservationStateChoice
   taxPercentageValue: Decimal
-  type: String
+  type: ReservationTypeChoice
   unitPrice: Decimal
 }
 
@@ -3780,8 +3781,8 @@ input ReservationStaffCreateMutationInput {
   reserveeLastName: String
   reserveeOrganisationName: String
   reserveePhone: String
-  reserveeType: String
-  type: String!
+  reserveeType: CustomerTypeChoice
+  type: ReservationTypeChoice!
   unitPrice: Decimal
   workingMemo: String
 }
@@ -3828,9 +3829,9 @@ type ReservationStaffCreateMutationPayload {
   reserveeLastName: String
   reserveeOrganisationName: String
   reserveePhone: String
-  reserveeType: String
+  reserveeType: CustomerTypeChoice
   state: State
-  type: String
+  type: ReservationTypeChoice
   unitPrice: Decimal
   workingMemo: String
 }
@@ -3860,16 +3861,16 @@ input ReservationStaffModifyMutationInput {
   reserveeFirstName: String
   reserveeId: String
   reserveeIsUnregisteredAssociation: Boolean
-  reserveeLanguage: String
+  reserveeLanguage: ReserveeLanguage
   reserveeLastName: String
   reserveeOrganisationName: String
   reserveePhone: String
-  reserveeType: String
+  reserveeType: CustomerTypeChoice
   """
   String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, REQUIRES_HANDLING, WAITING_FOR_PAYMENT, CONFIRMED, DENIED.
   """
-  state: String
-  type: String
+  state: State
+  type: Type
 }
 
 type ReservationStaffModifyMutationPayload {
@@ -3905,17 +3906,17 @@ type ReservationStaffModifyMutationPayload {
   reserveeFirstName: String
   reserveeId: String
   reserveeIsUnregisteredAssociation: Boolean
-  reserveeLanguage: String
+  reserveeLanguage: ReserveeLanguage
   reserveeLastName: String
   reserveeOrganisationName: String
   reserveePhone: String
-  reserveeType: String
+  reserveeType: CustomerTypeChoice
   """
   String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, REQUIRES_HANDLING, WAITING_FOR_PAYMENT, CONFIRMED, DENIED.
   """
-  state: String
+  state: State
   taxPercentageValue: Decimal
-  type: String
+  type: Type
   unitPrice: Decimal
 }
 
@@ -3974,6 +3975,18 @@ enum ReservationState {
   SCHEDULED_CLOSING
   SCHEDULED_PERIOD
   SCHEDULED_RESERVATION
+}
+
+"""
+An enumeration.
+"""
+enum ReservationStateChoice {
+  CANCELLED
+  CONFIRMED
+  CREATED
+  DENIED
+  REQUIRES_HANDLING
+  WAITING_FOR_PAYMENT
 }
 
 """
@@ -4355,35 +4368,33 @@ type ReservationUnitNode implements Node {
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsSv: String
   reservationSet(
-    begin: DateTime
+    applyingForFreeOfCharge: Boolean
     beginDate: Date
-    begin_Gte: DateTime
-    begin_Lte: DateTime
+    createdAtGte: Date
+    createdAtLte: Date
     endDate: Date
+    isRecurring: Boolean
     onlyWithHandlingPermission: Boolean
     onlyWithPermission: Boolean
     """
     Järjestä
     """
     orderBy: [ReservationOrderingChoices]
-    """
-    PaymentOrder's statuses; DRAFT, EXPIRED, CANCELLED, PAID, PAID_MANUALLY, REFUNDED
-    """
-    orderStatus: [String]
+    orderStatus: [OrderStatusWithFree]
     priceGte: Decimal
     priceLte: Decimal
-    recurringReservation: ID
+    recurringReservation: [Int]
     requested: Boolean
-    reservationType: [String]
-    reservationUnit: [ID]
+    reservationType: [ReservationTypeChoice]
+    reservationUnit: [Int]
     reservationUnitNameEn: String
     reservationUnitNameFi: String
     reservationUnitNameSv: String
-    reservationUnitType: [ID]
-    state: [String]
+    reservationUnitType: [Int]
+    state: [ReservationStateChoice]
     textSearch: String
-    unit: [ID]
-    user: ID
+    unit: [Int]
+    user: [Int]
   ): [ReservationNode!]
   reservationStartInterval: ReservationStartInterval!
   reservationState: ReservationState
@@ -4875,12 +4886,9 @@ input ReservationUpdateMutationInput {
   reserveeLastName: String
   reserveeOrganisationName: String
   reserveePhone: String
-  reserveeType: String
-  """
-  String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, REQUIRES_HANDLING, WAITING_FOR_PAYMENT, CONFIRMED, DENIED.
-  """
-  state: String
-  type: String
+  reserveeType: CustomerTypeChoice
+  state: ReservationStateChoice
+  type: ReservationTypeChoice
 }
 
 type ReservationUpdateMutationPayload {
@@ -4920,13 +4928,10 @@ type ReservationUpdateMutationPayload {
   reserveeLastName: String
   reserveeOrganisationName: String
   reserveePhone: String
-  reserveeType: String
-  """
-  String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, REQUIRES_HANDLING, WAITING_FOR_PAYMENT, CONFIRMED, DENIED.
-  """
-  state: String
+  reserveeType: CustomerTypeChoice
+  state: ReservationStateChoice
   taxPercentageValue: Decimal
-  type: String
+  type: ReservationTypeChoice
   unitPrice: Decimal
 }
 
@@ -5637,15 +5642,23 @@ An enumeration.
 """
 enum Type {
   """
-  behalf
+  Puolesta
   """
   BEHALF
   """
-  blocked
+  Estetty
   """
   BLOCKED
   """
-  staff
+  Normaali
+  """
+  NORMAL
+  """
+  Kausi
+  """
+  SEASONAL
+  """
+  Henkilökunta
   """
   STAFF
 }

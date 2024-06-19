@@ -125,9 +125,9 @@ export const DELETE_RESOURCE = gql`
 
 // TODO backend should add: onlyWithHandlingPermission parameter for this query (replaces the onlyWithPermission)
 export const HANDLING_COUNT_QUERY = gql`
-  query HandlingData($beginDate: Date!) {
+  query HandlingData($beginDate: Date!, $state: [ReservationStateChoice]!) {
     reservations(
-      state: "REQUIRES_HANDLING"
+      state: $state
       beginDate: $beginDate
       onlyWithPermission: true
     ) {

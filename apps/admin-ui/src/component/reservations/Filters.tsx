@@ -1,5 +1,4 @@
 import React from "react";
-import { DateInput } from "hds-react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import ShowAllContainer from "common/src/components/ShowAllContainer";
@@ -10,13 +9,19 @@ import {
 } from "@/hooks";
 import { AutoGrid } from "@/styles/layout";
 import {
+  CheckboxFilter,
+  DateRangeFilter,
   MultiSelectFilter,
   RangeNumberFilter,
   SearchFilter,
+  SelectFilter,
 } from "../QueryParamFilters";
-import { useSearchParams } from "react-router-dom";
 import { SearchTags } from "../SearchTags";
-import { OrderStatus, State } from "@gql/gql-types";
+import {
+  OrderStatusWithFree,
+  ReservationTypeChoice,
+  State,
+} from "@gql/gql-types";
 import { fromUIDate, isValidDate } from "common/src/common/util";
 
 const Wrapper = styled.div`
@@ -26,43 +31,12 @@ const Wrapper = styled.div`
 `;
 
 const MoreWrapper = styled(ShowAllContainer)`
+  margin-top: var(--spacing-s);
   .ShowAllContainer__ToggleButton {
     color: var(--color-bus);
+    margin-top: var(--spacing-s);
   }
 `;
-
-function DateInputFilter({ name }: { name: string }) {
-  const { t } = useTranslation();
-  const [searchParams, setParams] = useSearchParams();
-
-  const filter = searchParams.get(name);
-
-  const handleChange = (val: string) => {
-    const params = new URLSearchParams(searchParams);
-    if (val.length > 0) {
-      params.set(name, val);
-      setParams(params, { replace: true });
-    } else {
-      setParams(params, { replace: true });
-    }
-  };
-
-  const label = t(`filters.label.${name}`);
-  // TODO make the translation empty. no placeholder on purpose
-  const placeholder = t(`filters.placeholder.${name}`);
-  return (
-    <DateInput
-      language="fi"
-      // TODO ids should be unique and the name nor the tr key is not
-      id={name}
-      label={label}
-      placeholder={placeholder}
-      disableConfirmation
-      onChange={(val: string) => handleChange(val)}
-      value={filter ?? ""}
-    />
-  );
-}
 
 export function Filters({
   defaultFilters = [],
@@ -72,32 +46,50 @@ export function Filters({
   const { t } = useTranslation();
 
   const { options: reservationUnitTypeOptions } = useReservationUnitTypes();
-  // TODO is there some states that should not be available in the filters?
-  const stateOptions = Object.values(State).map((s) => ({
-    value: s,
-    label: t(`RequestedReservation.state.${s}`),
-  }));
-  // TODO is there some states that should not be available in the filters?
-  const paymentStatusOptions = Object.values(OrderStatus).map((s) => ({
-    value: s,
-    label: t(`Payment.status.${s}`),
-  }));
+
+  const stateOptions = Object.values(State)
+    .filter((s) => s !== State.Created)
+    .map((s) => ({
+      value: s,
+      label: t(`RequestedReservation.state.${s}`),
+    }));
+
+  const paymentStatusOptions = Object.values(OrderStatusWithFree)
+    .filter((s) => s !== OrderStatusWithFree.Expired)
+    .map((s) => ({
+      value: s,
+      label: t(`orderStatus.${s}`),
+    }));
+
+  const reservationTypeOptions = Object.values(ReservationTypeChoice).map(
+    (s) => ({
+      value: s,
+      label: t(`filters.reservationTypeChoice.${s}`),
+    })
+  );
 
   const { options: unitOptions } = useUnitOptions();
   const { options: reservationUnitOptions } = useReservationUnitOptions();
+  const recurringOptions = [
+    { value: "only", label: t("filters.label.onlyRecurring") },
+    { value: "onlyNot", label: t("filters.label.onlyNotRecurring") },
+  ];
 
-  // TODO unkown parameters should be null right? not empty string? or does it matter
   function translateTag(tag: string, val: string): string {
     switch (tag) {
+      case "reservationType":
+        return t(`filters.tag.reservationType`, {
+          type: t(`filters.reservationTypeChoice.${val}`),
+        });
       case "reservationUnitType":
-        return (
-          reservationUnitTypeOptions.find((x) => x.value === Number(val))
-            ?.label ?? ""
-        );
+        return t("filters.tag.reservationUnitType", {
+          type: reservationUnitTypeOptions.find((x) => x.value === Number(val))
+            ?.label,
+        });
       case "state":
-        return stateOptions.find((x) => x.value === val)?.label ?? "";
-      case "paymentStatus":
-        return paymentStatusOptions.find((x) => x.value === val)?.label ?? "";
+        return t("filters.tag.state", {
+          state: stateOptions.find((x) => x.value === val)?.label ?? "",
+        });
       case "reservationUnit":
         return (
           reservationUnitOptions.find((x) => x.value === Number(val))?.label ??
@@ -106,23 +98,50 @@ export function Filters({
       case "unit":
         return unitOptions.find((x) => x.value === Number(val))?.label ?? "";
       case "minPrice":
-        return `${t("filters.label.minPrice")} ${val} €`;
+        return t("filters.tag.minPrice", { price: val });
       case "maxPrice":
-        return `${t("filters.label.maxPrice")} ${val} €`;
-      case "begin": {
+        return t("filters.tag.maxPrice", { price: val });
+      case "dateGte": {
         const d = fromUIDate(val);
         if (d == null || !isValidDate(d)) {
           return "";
         }
-        return `${t("filters.label.begin")} ${val}`;
+        return t("filters.tag.dateGte", { date: val });
       }
-      case "end": {
+      case "dateLte": {
         const d = fromUIDate(val);
         if (d == null || !isValidDate(d)) {
           return "";
         }
-        return `${t("filters.label.end")} ${val}`;
+        return t("filters.tag.dateLte", { date: val });
       }
+      case "createdAtGte": {
+        const d = fromUIDate(val);
+        if (d == null || !isValidDate(d)) {
+          return "";
+        }
+        return t("filters.tag.createdAtGte", { date: val });
+      }
+      case "createdAtLte": {
+        const d = fromUIDate(val);
+        if (d == null || !isValidDate(d)) {
+          return "";
+        }
+        return t("filters.tag.createdAtLte", { date: val });
+      }
+      case "orderStatus":
+        if (val === "-") {
+          return t("filters.noPaymentStatus");
+        }
+        return t("filters.tag.orderStatus", {
+          status: t(`orderStatus.${val}`),
+        });
+      case "recurring":
+        return t(`filters.label.${val}Recurring`);
+      case "freeOfCharge":
+        return t("filters.label.freeOfCharge");
+      case "search":
+        return t("filters.tag.search", { search: val });
       default:
         return val;
     }
@@ -132,22 +151,15 @@ export function Filters({
     <Wrapper>
       <AutoGrid>
         <MultiSelectFilter
-          options={reservationUnitTypeOptions}
-          name="reservationUnitType"
+          options={reservationTypeOptions}
+          name="reservationType"
         />
         <MultiSelectFilter options={stateOptions} name="state" />
-        <MultiSelectFilter options={unitOptions} name="unit" />
-        <SearchFilter name="search" labelKey="searchReservation" />
-        <MultiSelectFilter
-          options={paymentStatusOptions}
-          name="paymentStatus"
-        />
         <MultiSelectFilter
           options={reservationUnitOptions}
           name="reservationUnit"
         />
-        <DateInputFilter name="begin" />
-        <DateInputFilter name="end" />
+        <SearchFilter name="search" labelKey="searchReservation" />
       </AutoGrid>
       <MoreWrapper
         showAllLabel={t("ReservationUnitsSearch.moreFilters")}
@@ -155,11 +167,29 @@ export function Filters({
         maximumNumber={0}
       >
         <AutoGrid>
+          <DateRangeFilter name="date" />
+          <MultiSelectFilter options={unitOptions} name="unit" />
+          <MultiSelectFilter
+            options={reservationUnitTypeOptions}
+            name="reservationUnitType"
+          />
           <RangeNumberFilter
             label={t("filters.label.price")}
             minName="minPrice"
             maxName="maxPrice"
           />
+          <MultiSelectFilter
+            name="orderStatus"
+            options={paymentStatusOptions}
+          />
+          <DateRangeFilter name="createdAt" />
+          <SelectFilter
+            name="recurring"
+            label={t("filters.label.isRecurring")}
+            options={recurringOptions}
+            clearable
+          />
+          <CheckboxFilter name="freeOfCharge" />
         </AutoGrid>
       </MoreWrapper>
       <SearchTags translateTag={translateTag} defaultTags={defaultFilters} />

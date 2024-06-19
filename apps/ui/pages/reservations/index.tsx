@@ -11,6 +11,7 @@ import {
   State,
   ReservationOrderingChoices,
   useListReservationsQuery,
+  ReservationTypeChoice,
 } from "@gql/gql-types";
 import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
@@ -112,6 +113,7 @@ function Reservations(): JSX.Element | null {
       // NOTE today's reservations are always shown in upcoming (even when they are in the past)
       beginDate: tab === "upcoming" ? toApiDate(today) : undefined,
       endDate: tab === "past" ? toApiDate(addDays(today, -1)) : undefined,
+      reservationType: ReservationTypeChoice.Normal,
     },
   });
 

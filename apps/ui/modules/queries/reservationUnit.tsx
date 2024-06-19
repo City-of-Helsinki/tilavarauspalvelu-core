@@ -143,7 +143,7 @@ export const RESERVATION_UNIT_PAGE_QUERY = gql`
     $pk: Int!
     $beginDate: Date!
     $endDate: Date!
-    $state: [String]
+    $state: [ReservationStateChoice]
   ) {
     reservationUnit(id: $id) {
       ...ReservationUnitPageFields

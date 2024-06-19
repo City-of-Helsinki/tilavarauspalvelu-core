@@ -1579,6 +1579,17 @@ export enum OrderStatus {
   Refunded = "REFUNDED",
 }
 
+/** Same as OrderStatus, but includes the 'FREE' option used for filtering reservations without payments. */
+export enum OrderStatusWithFree {
+  Cancelled = "CANCELLED",
+  Draft = "DRAFT",
+  Expired = "EXPIRED",
+  Free = "FREE",
+  Paid = "PAID",
+  PaidManually = "PAID_MANUALLY",
+  Refunded = "REFUNDED",
+}
+
 export type OrganisationNode = Node & {
   activeMembers?: Maybe<Scalars["Int"]["output"]>;
   address?: Maybe<AddressNode>;
@@ -1901,31 +1912,32 @@ export type QueryAffectingAllocatedTimeSlotsArgs = {
 };
 
 export type QueryAffectingReservationsArgs = {
-  begin?: InputMaybe<Scalars["DateTime"]["input"]>;
+  applyingForFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
   beginDate?: InputMaybe<Scalars["Date"]["input"]>;
-  begin_Gte?: InputMaybe<Scalars["DateTime"]["input"]>;
-  begin_Lte?: InputMaybe<Scalars["DateTime"]["input"]>;
+  createdAtGte?: InputMaybe<Scalars["Date"]["input"]>;
+  createdAtLte?: InputMaybe<Scalars["Date"]["input"]>;
   endDate?: InputMaybe<Scalars["Date"]["input"]>;
   forReservationUnits?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   forUnits?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  isRecurring?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyWithHandlingPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<ReservationOrderingChoices>>>;
-  orderStatus?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
+  orderStatus?: InputMaybe<Array<InputMaybe<OrderStatusWithFree>>>;
   priceGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   priceLte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  recurringReservation?: InputMaybe<Scalars["ID"]["input"]>;
+  recurringReservation?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   requested?: InputMaybe<Scalars["Boolean"]["input"]>;
-  reservationType?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
-  reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["ID"]["input"]>>>;
+  reservationType?: InputMaybe<Array<InputMaybe<ReservationTypeChoice>>>;
+  reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   reservationUnitNameEn?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameFi?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameSv?: InputMaybe<Scalars["String"]["input"]>;
-  reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["ID"]["input"]>>>;
-  state?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
+  reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  state?: InputMaybe<Array<InputMaybe<ReservationStateChoice>>>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
-  unit?: InputMaybe<Array<InputMaybe<Scalars["ID"]["input"]>>>;
-  user?: InputMaybe<Scalars["ID"]["input"]>;
+  unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  user?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type QueryAgeGroupsArgs = {
@@ -2349,33 +2361,34 @@ export type QueryReservationUnitsArgs = {
 
 export type QueryReservationsArgs = {
   after?: InputMaybe<Scalars["String"]["input"]>;
+  applyingForFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
   before?: InputMaybe<Scalars["String"]["input"]>;
-  begin?: InputMaybe<Scalars["DateTime"]["input"]>;
   beginDate?: InputMaybe<Scalars["Date"]["input"]>;
-  begin_Gte?: InputMaybe<Scalars["DateTime"]["input"]>;
-  begin_Lte?: InputMaybe<Scalars["DateTime"]["input"]>;
+  createdAtGte?: InputMaybe<Scalars["Date"]["input"]>;
+  createdAtLte?: InputMaybe<Scalars["Date"]["input"]>;
   endDate?: InputMaybe<Scalars["Date"]["input"]>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
+  isRecurring?: InputMaybe<Scalars["Boolean"]["input"]>;
   last?: InputMaybe<Scalars["Int"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   onlyWithHandlingPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<ReservationOrderingChoices>>>;
-  orderStatus?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
+  orderStatus?: InputMaybe<Array<InputMaybe<OrderStatusWithFree>>>;
   priceGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   priceLte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  recurringReservation?: InputMaybe<Scalars["ID"]["input"]>;
+  recurringReservation?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   requested?: InputMaybe<Scalars["Boolean"]["input"]>;
-  reservationType?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
-  reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["ID"]["input"]>>>;
+  reservationType?: InputMaybe<Array<InputMaybe<ReservationTypeChoice>>>;
+  reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   reservationUnitNameEn?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameFi?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameSv?: InputMaybe<Scalars["String"]["input"]>;
-  reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["ID"]["input"]>>>;
-  state?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
+  reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  state?: InputMaybe<Array<InputMaybe<ReservationStateChoice>>>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
-  unit?: InputMaybe<Array<InputMaybe<Scalars["ID"]["input"]>>>;
-  user?: InputMaybe<Scalars["ID"]["input"]>;
+  unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  user?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type QueryResourceArgs = {
@@ -2560,29 +2573,30 @@ export type RecurringReservationNodeRejectedOccurrencesArgs = {
 };
 
 export type RecurringReservationNodeReservationsArgs = {
-  begin?: InputMaybe<Scalars["DateTime"]["input"]>;
+  applyingForFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
   beginDate?: InputMaybe<Scalars["Date"]["input"]>;
-  begin_Gte?: InputMaybe<Scalars["DateTime"]["input"]>;
-  begin_Lte?: InputMaybe<Scalars["DateTime"]["input"]>;
+  createdAtGte?: InputMaybe<Scalars["Date"]["input"]>;
+  createdAtLte?: InputMaybe<Scalars["Date"]["input"]>;
   endDate?: InputMaybe<Scalars["Date"]["input"]>;
+  isRecurring?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyWithHandlingPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<ReservationOrderingChoices>>>;
-  orderStatus?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
+  orderStatus?: InputMaybe<Array<InputMaybe<OrderStatusWithFree>>>;
   priceGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   priceLte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  recurringReservation?: InputMaybe<Scalars["ID"]["input"]>;
+  recurringReservation?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   requested?: InputMaybe<Scalars["Boolean"]["input"]>;
-  reservationType?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
-  reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["ID"]["input"]>>>;
+  reservationType?: InputMaybe<Array<InputMaybe<ReservationTypeChoice>>>;
+  reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   reservationUnitNameEn?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameFi?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameSv?: InputMaybe<Scalars["String"]["input"]>;
-  reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["ID"]["input"]>>>;
-  state?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
+  reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  state?: InputMaybe<Array<InputMaybe<ReservationStateChoice>>>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
-  unit?: InputMaybe<Array<InputMaybe<Scalars["ID"]["input"]>>>;
-  user?: InputMaybe<Scalars["ID"]["input"]>;
+  unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  user?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type RecurringReservationNodeConnection = {
@@ -2823,8 +2837,7 @@ export type ReservationCancellationMutationPayload = {
 };
 
 export type ReservationConfirmMutationInput = {
-  /** Type of the payment. Possible values are ONLINE, INVOICE, ON_SITE. */
-  paymentType?: InputMaybe<Scalars["String"]["input"]>;
+  paymentType?: InputMaybe<PaymentType>;
   pk: Scalars["Int"]["input"];
 };
 
@@ -2866,11 +2879,10 @@ export type ReservationConfirmMutationPayload = {
   reserveeLastName?: Maybe<Scalars["String"]["output"]>;
   reserveeOrganisationName?: Maybe<Scalars["String"]["output"]>;
   reserveePhone?: Maybe<Scalars["String"]["output"]>;
-  reserveeType?: Maybe<Scalars["String"]["output"]>;
-  /** String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, REQUIRES_HANDLING, WAITING_FOR_PAYMENT, CONFIRMED, DENIED. */
-  state?: Maybe<Scalars["String"]["output"]>;
+  reserveeType?: Maybe<CustomerTypeChoice>;
+  state?: Maybe<ReservationStateChoice>;
   taxPercentageValue?: Maybe<Scalars["Decimal"]["output"]>;
-  type?: Maybe<Scalars["String"]["output"]>;
+  type?: Maybe<ReservationTypeChoice>;
   unitPrice?: Maybe<Scalars["Decimal"]["output"]>;
 };
 
@@ -2907,8 +2919,8 @@ export type ReservationCreateMutationInput = {
   reserveeLastName?: InputMaybe<Scalars["String"]["input"]>;
   reserveeOrganisationName?: InputMaybe<Scalars["String"]["input"]>;
   reserveePhone?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeType?: InputMaybe<Scalars["String"]["input"]>;
-  type?: InputMaybe<Scalars["String"]["input"]>;
+  reserveeType?: InputMaybe<CustomerTypeChoice>;
+  type?: InputMaybe<ReservationTypeChoice>;
 };
 
 export type ReservationCreateMutationPayload = {
@@ -2948,10 +2960,10 @@ export type ReservationCreateMutationPayload = {
   reserveeLastName?: Maybe<Scalars["String"]["output"]>;
   reserveeOrganisationName?: Maybe<Scalars["String"]["output"]>;
   reserveePhone?: Maybe<Scalars["String"]["output"]>;
-  reserveeType?: Maybe<Scalars["String"]["output"]>;
-  state?: Maybe<Scalars["String"]["output"]>;
+  reserveeType?: Maybe<CustomerTypeChoice>;
+  state?: Maybe<ReservationStateChoice>;
   taxPercentageValue?: Maybe<Scalars["Decimal"]["output"]>;
-  type?: Maybe<Scalars["String"]["output"]>;
+  type?: Maybe<ReservationTypeChoice>;
   unitPrice?: Maybe<Scalars["Decimal"]["output"]>;
 };
 
@@ -3405,8 +3417,8 @@ export type ReservationStaffCreateMutationInput = {
   reserveeLastName?: InputMaybe<Scalars["String"]["input"]>;
   reserveeOrganisationName?: InputMaybe<Scalars["String"]["input"]>;
   reserveePhone?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeType?: InputMaybe<Scalars["String"]["input"]>;
-  type: Scalars["String"]["input"];
+  reserveeType?: InputMaybe<CustomerTypeChoice>;
+  type: ReservationTypeChoice;
   unitPrice?: InputMaybe<Scalars["Decimal"]["input"]>;
   workingMemo?: InputMaybe<Scalars["String"]["input"]>;
 };
@@ -3449,9 +3461,9 @@ export type ReservationStaffCreateMutationPayload = {
   reserveeLastName?: Maybe<Scalars["String"]["output"]>;
   reserveeOrganisationName?: Maybe<Scalars["String"]["output"]>;
   reserveePhone?: Maybe<Scalars["String"]["output"]>;
-  reserveeType?: Maybe<Scalars["String"]["output"]>;
+  reserveeType?: Maybe<CustomerTypeChoice>;
   state?: Maybe<State>;
-  type?: Maybe<Scalars["String"]["output"]>;
+  type?: Maybe<ReservationTypeChoice>;
   unitPrice?: Maybe<Scalars["Decimal"]["output"]>;
   workingMemo?: Maybe<Scalars["String"]["output"]>;
 };
@@ -3481,14 +3493,14 @@ export type ReservationStaffModifyMutationInput = {
   reserveeFirstName?: InputMaybe<Scalars["String"]["input"]>;
   reserveeId?: InputMaybe<Scalars["String"]["input"]>;
   reserveeIsUnregisteredAssociation?: InputMaybe<Scalars["Boolean"]["input"]>;
-  reserveeLanguage?: InputMaybe<Scalars["String"]["input"]>;
+  reserveeLanguage?: InputMaybe<ReserveeLanguage>;
   reserveeLastName?: InputMaybe<Scalars["String"]["input"]>;
   reserveeOrganisationName?: InputMaybe<Scalars["String"]["input"]>;
   reserveePhone?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeType?: InputMaybe<Scalars["String"]["input"]>;
+  reserveeType?: InputMaybe<CustomerTypeChoice>;
   /** String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, REQUIRES_HANDLING, WAITING_FOR_PAYMENT, CONFIRMED, DENIED. */
-  state?: InputMaybe<Scalars["String"]["input"]>;
-  type?: InputMaybe<Scalars["String"]["input"]>;
+  state?: InputMaybe<State>;
+  type?: InputMaybe<Type>;
 };
 
 export type ReservationStaffModifyMutationPayload = {
@@ -3524,15 +3536,15 @@ export type ReservationStaffModifyMutationPayload = {
   reserveeFirstName?: Maybe<Scalars["String"]["output"]>;
   reserveeId?: Maybe<Scalars["String"]["output"]>;
   reserveeIsUnregisteredAssociation?: Maybe<Scalars["Boolean"]["output"]>;
-  reserveeLanguage?: Maybe<Scalars["String"]["output"]>;
+  reserveeLanguage?: Maybe<ReserveeLanguage>;
   reserveeLastName?: Maybe<Scalars["String"]["output"]>;
   reserveeOrganisationName?: Maybe<Scalars["String"]["output"]>;
   reserveePhone?: Maybe<Scalars["String"]["output"]>;
-  reserveeType?: Maybe<Scalars["String"]["output"]>;
+  reserveeType?: Maybe<CustomerTypeChoice>;
   /** String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, REQUIRES_HANDLING, WAITING_FOR_PAYMENT, CONFIRMED, DENIED. */
-  state?: Maybe<Scalars["String"]["output"]>;
+  state?: Maybe<State>;
   taxPercentageValue?: Maybe<Scalars["Decimal"]["output"]>;
-  type?: Maybe<Scalars["String"]["output"]>;
+  type?: Maybe<Type>;
   unitPrice?: Maybe<Scalars["Decimal"]["output"]>;
 };
 
@@ -3567,6 +3579,16 @@ export enum ReservationState {
   ScheduledClosing = "SCHEDULED_CLOSING",
   ScheduledPeriod = "SCHEDULED_PERIOD",
   ScheduledReservation = "SCHEDULED_RESERVATION",
+}
+
+/** An enumeration. */
+export enum ReservationStateChoice {
+  Cancelled = "CANCELLED",
+  Confirmed = "CONFIRMED",
+  Created = "CREATED",
+  Denied = "DENIED",
+  RequiresHandling = "REQUIRES_HANDLING",
+  WaitingForPayment = "WAITING_FOR_PAYMENT",
 }
 
 /** An enumeration. */
@@ -3952,29 +3974,30 @@ export type ReservationUnitNodeReservableTimeSpansArgs = {
 };
 
 export type ReservationUnitNodeReservationSetArgs = {
-  begin?: InputMaybe<Scalars["DateTime"]["input"]>;
+  applyingForFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
   beginDate?: InputMaybe<Scalars["Date"]["input"]>;
-  begin_Gte?: InputMaybe<Scalars["DateTime"]["input"]>;
-  begin_Lte?: InputMaybe<Scalars["DateTime"]["input"]>;
+  createdAtGte?: InputMaybe<Scalars["Date"]["input"]>;
+  createdAtLte?: InputMaybe<Scalars["Date"]["input"]>;
   endDate?: InputMaybe<Scalars["Date"]["input"]>;
+  isRecurring?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyWithHandlingPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<ReservationOrderingChoices>>>;
-  orderStatus?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
+  orderStatus?: InputMaybe<Array<InputMaybe<OrderStatusWithFree>>>;
   priceGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   priceLte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  recurringReservation?: InputMaybe<Scalars["ID"]["input"]>;
+  recurringReservation?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   requested?: InputMaybe<Scalars["Boolean"]["input"]>;
-  reservationType?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
-  reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["ID"]["input"]>>>;
+  reservationType?: InputMaybe<Array<InputMaybe<ReservationTypeChoice>>>;
+  reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   reservationUnitNameEn?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameFi?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameSv?: InputMaybe<Scalars["String"]["input"]>;
-  reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["ID"]["input"]>>>;
-  state?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
+  reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  state?: InputMaybe<Array<InputMaybe<ReservationStateChoice>>>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
-  unit?: InputMaybe<Array<InputMaybe<Scalars["ID"]["input"]>>>;
-  user?: InputMaybe<Scalars["ID"]["input"]>;
+  unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  user?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type ReservationUnitNodeResourcesArgs = {
@@ -4391,10 +4414,9 @@ export type ReservationUpdateMutationInput = {
   reserveeLastName?: InputMaybe<Scalars["String"]["input"]>;
   reserveeOrganisationName?: InputMaybe<Scalars["String"]["input"]>;
   reserveePhone?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeType?: InputMaybe<Scalars["String"]["input"]>;
-  /** String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, REQUIRES_HANDLING, WAITING_FOR_PAYMENT, CONFIRMED, DENIED. */
-  state?: InputMaybe<Scalars["String"]["input"]>;
-  type?: InputMaybe<Scalars["String"]["input"]>;
+  reserveeType?: InputMaybe<CustomerTypeChoice>;
+  state?: InputMaybe<ReservationStateChoice>;
+  type?: InputMaybe<ReservationTypeChoice>;
 };
 
 export type ReservationUpdateMutationPayload = {
@@ -4434,11 +4456,10 @@ export type ReservationUpdateMutationPayload = {
   reserveeLastName?: Maybe<Scalars["String"]["output"]>;
   reserveeOrganisationName?: Maybe<Scalars["String"]["output"]>;
   reserveePhone?: Maybe<Scalars["String"]["output"]>;
-  reserveeType?: Maybe<Scalars["String"]["output"]>;
-  /** String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, REQUIRES_HANDLING, WAITING_FOR_PAYMENT, CONFIRMED, DENIED. */
-  state?: Maybe<Scalars["String"]["output"]>;
+  reserveeType?: Maybe<CustomerTypeChoice>;
+  state?: Maybe<ReservationStateChoice>;
   taxPercentageValue?: Maybe<Scalars["Decimal"]["output"]>;
-  type?: Maybe<Scalars["String"]["output"]>;
+  type?: Maybe<ReservationTypeChoice>;
   unitPrice?: Maybe<Scalars["Decimal"]["output"]>;
 };
 
@@ -4981,11 +5002,15 @@ export type TimeSlotType = {
 
 /** An enumeration. */
 export enum Type {
-  /** behalf */
+  /** Puolesta */
   Behalf = "BEHALF",
-  /** blocked */
+  /** Estetty */
   Blocked = "BLOCKED",
-  /** staff */
+  /** Normaali */
+  Normal = "NORMAL",
+  /** Kausi */
+  Seasonal = "SEASONAL",
+  /** Henkilökunta */
   Staff = "STAFF",
 }
 
@@ -6518,6 +6543,9 @@ export type DeleteResourceMutation = {
 
 export type HandlingDataQueryVariables = Exact<{
   beginDate: Scalars["Date"]["input"];
+  state:
+    | Array<InputMaybe<ReservationStateChoice>>
+    | InputMaybe<ReservationStateChoice>;
 }>;
 
 export type HandlingDataQuery = {
@@ -6783,8 +6811,8 @@ export type ReservationTimesInReservationUnitQueryVariables = Exact<{
   beginDate?: InputMaybe<Scalars["Date"]["input"]>;
   endDate?: InputMaybe<Scalars["Date"]["input"]>;
   state?: InputMaybe<
-    | Array<InputMaybe<Scalars["String"]["input"]>>
-    | InputMaybe<Scalars["String"]["input"]>
+    | Array<InputMaybe<ReservationStateChoice>>
+    | InputMaybe<ReservationStateChoice>
   >;
 }>;
 
@@ -6878,8 +6906,8 @@ export type ReservationUnitsByUnitQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
   pk: Scalars["Int"]["input"];
   state?: InputMaybe<
-    | Array<InputMaybe<Scalars["String"]["input"]>>
-    | InputMaybe<Scalars["String"]["input"]>
+    | Array<InputMaybe<ReservationStateChoice>>
+    | InputMaybe<ReservationStateChoice>
   >;
   beginDate?: InputMaybe<Scalars["Date"]["input"]>;
   endDate?: InputMaybe<Scalars["Date"]["input"]>;
@@ -7056,8 +7084,8 @@ export type ReservationUnitCalendarQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
   pk: Scalars["Int"]["input"];
   state?: InputMaybe<
-    | Array<InputMaybe<Scalars["String"]["input"]>>
-    | InputMaybe<Scalars["String"]["input"]>
+    | Array<InputMaybe<ReservationStateChoice>>
+    | InputMaybe<ReservationStateChoice>
   >;
   beginDate?: InputMaybe<Scalars["Date"]["input"]>;
   endDate?: InputMaybe<Scalars["Date"]["input"]>;
@@ -7394,35 +7422,37 @@ export type UpdateRecurringReservationMutation = {
 export type ReservationsQueryVariables = Exact<{
   first?: InputMaybe<Scalars["Int"]["input"]>;
   after?: InputMaybe<Scalars["String"]["input"]>;
-  unit?: InputMaybe<
-    | Array<InputMaybe<Scalars["ID"]["input"]>>
-    | InputMaybe<Scalars["ID"]["input"]>
-  >;
-  reservationUnitType?: InputMaybe<
-    | Array<InputMaybe<Scalars["ID"]["input"]>>
-    | InputMaybe<Scalars["ID"]["input"]>
-  >;
   orderBy?: InputMaybe<
     | Array<InputMaybe<ReservationOrderingChoices>>
     | InputMaybe<ReservationOrderingChoices>
   >;
-  state?: InputMaybe<
-    | Array<InputMaybe<Scalars["String"]["input"]>>
-    | InputMaybe<Scalars["String"]["input"]>
+  unit?: InputMaybe<
+    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | InputMaybe<Scalars["Int"]["input"]>
   >;
-  textSearch?: InputMaybe<Scalars["String"]["input"]>;
-  priceGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  priceLte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  beginDate?: InputMaybe<Scalars["Date"]["input"]>;
-  endDate?: InputMaybe<Scalars["Date"]["input"]>;
   reservationUnit?: InputMaybe<
-    | Array<InputMaybe<Scalars["ID"]["input"]>>
-    | InputMaybe<Scalars["ID"]["input"]>
+    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | InputMaybe<Scalars["Int"]["input"]>
+  >;
+  reservationUnitType?: InputMaybe<
+    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | InputMaybe<Scalars["Int"]["input"]>
+  >;
+  state?: InputMaybe<
+    | Array<InputMaybe<ReservationStateChoice>>
+    | InputMaybe<ReservationStateChoice>
   >;
   orderStatus?: InputMaybe<
-    | Array<InputMaybe<Scalars["String"]["input"]>>
-    | InputMaybe<Scalars["String"]["input"]>
+    Array<InputMaybe<OrderStatusWithFree>> | InputMaybe<OrderStatusWithFree>
   >;
+  textSearch?: InputMaybe<Scalars["String"]["input"]>;
+  priceLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  priceGte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  beginDate?: InputMaybe<Scalars["Date"]["input"]>;
+  endDate?: InputMaybe<Scalars["Date"]["input"]>;
+  createdAtGte?: InputMaybe<Scalars["Date"]["input"]>;
+  createdAtLte?: InputMaybe<Scalars["Date"]["input"]>;
+  applyingForFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
 }>;
 
 export type ReservationsQuery = {
@@ -7547,8 +7577,8 @@ export type ReservationsByReservationUnitQueryVariables = Exact<{
   beginDate?: InputMaybe<Scalars["Date"]["input"]>;
   endDate?: InputMaybe<Scalars["Date"]["input"]>;
   state?: InputMaybe<
-    | Array<InputMaybe<Scalars["String"]["input"]>>
-    | InputMaybe<Scalars["String"]["input"]>
+    | Array<InputMaybe<ReservationStateChoice>>
+    | InputMaybe<ReservationStateChoice>
   >;
 }>;
 
@@ -10440,9 +10470,9 @@ export type DeleteResourceMutationOptions = Apollo.BaseMutationOptions<
   DeleteResourceMutationVariables
 >;
 export const HandlingDataDocument = gql`
-  query HandlingData($beginDate: Date!) {
+  query HandlingData($beginDate: Date!, $state: [ReservationStateChoice]!) {
     reservations(
-      state: "REQUIRES_HANDLING"
+      state: $state
       beginDate: $beginDate
       onlyWithPermission: true
     ) {
@@ -10478,6 +10508,7 @@ export const HandlingDataDocument = gql`
  * const { data, loading, error } = useHandlingDataQuery({
  *   variables: {
  *      beginDate: // value for 'beginDate'
+ *      state: // value for 'state'
  *   },
  * });
  */
@@ -11469,7 +11500,7 @@ export const ReservationTimesInReservationUnitDocument = gql`
     $pk: Int!
     $beginDate: Date
     $endDate: Date
-    $state: [String]
+    $state: [ReservationStateChoice]
   ) {
     reservationUnit(id: $id) {
       id
@@ -11790,7 +11821,7 @@ export const ReservationUnitsByUnitDocument = gql`
   query ReservationUnitsByUnit(
     $id: ID!
     $pk: Int!
-    $state: [String]
+    $state: [ReservationStateChoice]
     $beginDate: Date
     $endDate: Date
   ) {
@@ -12075,7 +12106,7 @@ export const ReservationUnitCalendarDocument = gql`
   query ReservationUnitCalendar(
     $id: ID!
     $pk: Int!
-    $state: [String]
+    $state: [ReservationStateChoice]
     $beginDate: Date
     $endDate: Date
   ) {
@@ -12686,17 +12717,20 @@ export const ReservationsDocument = gql`
   query Reservations(
     $first: Int
     $after: String
-    $unit: [ID]
-    $reservationUnitType: [ID]
     $orderBy: [ReservationOrderingChoices]
-    $state: [String]
+    $unit: [Int]
+    $reservationUnit: [Int]
+    $reservationUnitType: [Int]
+    $state: [ReservationStateChoice]
+    $orderStatus: [OrderStatusWithFree]
     $textSearch: String
-    $priceGte: Decimal
     $priceLte: Decimal
+    $priceGte: Decimal
     $beginDate: Date
     $endDate: Date
-    $reservationUnit: [ID]
-    $orderStatus: [String]
+    $createdAtGte: Date
+    $createdAtLte: Date
+    $applyingForFreeOfCharge: Boolean
   ) {
     reservations(
       first: $first
@@ -12712,6 +12746,9 @@ export const ReservationsDocument = gql`
       priceGte: $priceGte
       beginDate: $beginDate
       endDate: $endDate
+      createdAtGte: $createdAtGte
+      createdAtLte: $createdAtLte
+      applyingForFreeOfCharge: $applyingForFreeOfCharge
       onlyWithPermission: true
     ) {
       edges {
@@ -12752,17 +12789,20 @@ export const ReservationsDocument = gql`
  *   variables: {
  *      first: // value for 'first'
  *      after: // value for 'after'
- *      unit: // value for 'unit'
- *      reservationUnitType: // value for 'reservationUnitType'
  *      orderBy: // value for 'orderBy'
+ *      unit: // value for 'unit'
+ *      reservationUnit: // value for 'reservationUnit'
+ *      reservationUnitType: // value for 'reservationUnitType'
  *      state: // value for 'state'
+ *      orderStatus: // value for 'orderStatus'
  *      textSearch: // value for 'textSearch'
- *      priceGte: // value for 'priceGte'
  *      priceLte: // value for 'priceLte'
+ *      priceGte: // value for 'priceGte'
  *      beginDate: // value for 'beginDate'
  *      endDate: // value for 'endDate'
- *      reservationUnit: // value for 'reservationUnit'
- *      orderStatus: // value for 'orderStatus'
+ *      createdAtGte: // value for 'createdAtGte'
+ *      createdAtLte: // value for 'createdAtLte'
+ *      applyingForFreeOfCharge: // value for 'applyingForFreeOfCharge'
  *   },
  * });
  */
@@ -12970,7 +13010,7 @@ export const ReservationsByReservationUnitDocument = gql`
     $pk: Int!
     $beginDate: Date
     $endDate: Date
-    $state: [String]
+    $state: [ReservationStateChoice]
   ) {
     reservationUnit(id: $id) {
       id

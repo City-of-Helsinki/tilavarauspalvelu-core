@@ -8,6 +8,7 @@ import {
   useApplicationRoundsUiQuery,
   ReservationUnitPageQuery,
   ReservationQuery,
+  ReservationTypeChoice,
 } from "@gql/gql-types";
 import { useRouter } from "next/router";
 import { Stepper } from "hds-react";
@@ -169,6 +170,7 @@ export function ReservationEdit({
       user: currentUser?.pk?.toString() ?? "",
       reservationUnit: [reservationUnit?.pk?.toString() ?? ""],
       state: RELATED_RESERVATION_STATES,
+      reservationType: ReservationTypeChoice.Normal,
     },
   });
 

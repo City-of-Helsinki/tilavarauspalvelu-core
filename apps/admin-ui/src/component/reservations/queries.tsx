@@ -6,17 +6,21 @@ export const RESERVATIONS_QUERY = gql`
   query Reservations(
     $first: Int
     $after: String
-    $unit: [ID]
-    $reservationUnitType: [ID]
     $orderBy: [ReservationOrderingChoices]
-    $state: [String]
+    $unit: [Int]
+    $reservationUnit: [Int]
+    $reservationUnitType: [Int]
+    $state: [ReservationStateChoice]
+    $orderStatus: [OrderStatusWithFree]
     $textSearch: String
-    $priceGte: Decimal
     $priceLte: Decimal
+    $priceGte: Decimal
     $beginDate: Date
     $endDate: Date
-    $reservationUnit: [ID]
-    $orderStatus: [String]
+    $createdAtGte: Date
+    $createdAtLte: Date
+    $applyingForFreeOfCharge: Boolean
+    $isRecurring: Boolean
   ) {
     reservations(
       first: $first
@@ -32,6 +36,10 @@ export const RESERVATIONS_QUERY = gql`
       priceGte: $priceGte
       beginDate: $beginDate
       endDate: $endDate
+      createdAtGte: $createdAtGte
+      createdAtLte: $createdAtLte
+      isRecurring: $isRecurring
+      applyingForFreeOfCharge: $applyingForFreeOfCharge
       onlyWithPermission: true
     ) {
       edges {

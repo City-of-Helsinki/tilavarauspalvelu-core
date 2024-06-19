@@ -25,7 +25,7 @@ function AllReservations(): JSX.Element {
   const today = useMemo(() => new Date(), []);
   const defaultFilters = [
     {
-      key: "begin",
+      key: "dateGte",
       value: toUIDate(today),
     },
   ];

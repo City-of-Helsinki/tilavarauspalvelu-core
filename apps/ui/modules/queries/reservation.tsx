@@ -79,10 +79,11 @@ export const LIST_RESERVATIONS = gql`
   query ListReservations(
     $beginDate: Date
     $endDate: Date
-    $state: [String]
-    $user: ID!
-    $reservationUnit: [ID]
+    $state: [ReservationStateChoice]
+    $user: [Int]
+    $reservationUnit: [Int]
     $orderBy: [ReservationOrderingChoices]
+    $reservationType: [ReservationTypeChoice]!
   ) {
     reservations(
       beginDate: $beginDate
@@ -91,7 +92,7 @@ export const LIST_RESERVATIONS = gql`
       user: $user
       reservationUnit: $reservationUnit
       orderBy: $orderBy
-      reservationType: "normal"
+      reservationType: $reservationType
     ) {
       edges {
         node {

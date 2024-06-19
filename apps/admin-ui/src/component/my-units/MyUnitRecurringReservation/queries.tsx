@@ -31,7 +31,7 @@ export const GET_RESERVATIONS_IN_INTERVAL = gql`
     $pk: Int!
     $beginDate: Date
     $endDate: Date
-    $state: [String]
+    $state: [ReservationStateChoice]
   ) {
     reservationUnit(id: $id) {
       id

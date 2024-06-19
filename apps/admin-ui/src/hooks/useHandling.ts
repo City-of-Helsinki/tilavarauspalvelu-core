@@ -3,6 +3,7 @@ import { startOfDay } from "date-fns";
 import { useSession } from "@/hooks/auth";
 import { useHandlingDataQuery } from "@gql/gql-types";
 import { toApiDate } from "common/src/common/util";
+import { ReservationStateChoice } from "common/gql/gql-types";
 
 const useHandling = () => {
   const { isAuthenticated } = useSession();
@@ -13,6 +14,7 @@ const useHandling = () => {
     fetchPolicy: "no-cache",
     variables: {
       beginDate: toApiDate(today) ?? "",
+      state: ReservationStateChoice.RequiresHandling,
     },
   });
 

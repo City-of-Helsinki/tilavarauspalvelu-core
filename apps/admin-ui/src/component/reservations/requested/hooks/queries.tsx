@@ -69,7 +69,7 @@ export const RESERVATIONS_BY_RESERVATIONUNITS = gql`
     $pk: Int!
     $beginDate: Date
     $endDate: Date
-    $state: [String]
+    $state: [ReservationStateChoice]
   ) {
     reservationUnit(id: $id) {
       id

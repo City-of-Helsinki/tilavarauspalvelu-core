@@ -66,7 +66,7 @@ export const RESERVATION_UNITS_BY_UNIT = gql`
   query ReservationUnitsByUnit(
     $id: ID!
     $pk: Int!
-    $state: [String]
+    $state: [ReservationStateChoice]
     $beginDate: Date
     $endDate: Date
   ) {
