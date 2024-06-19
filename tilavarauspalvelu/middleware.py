@@ -11,8 +11,6 @@ from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
 from django.db import connection
 from django.http import HttpResponse
-from pyinstrument import Profiler
-from pyinstrument.renderers import HTMLRenderer, SpeedscopeRenderer
 
 from common.date_utils import local_datetime
 from common.typing import QueryInfo
@@ -151,6 +149,9 @@ class ProfilerMiddleware:
         self.get_response = get_response
 
     def __call__(self, request: WSGIRequest) -> HttpResponse:
+        from pyinstrument import Profiler
+        from pyinstrument.renderers import HTMLRenderer, SpeedscopeRenderer
+
         if not request.path.startswith("/graphql") or not bool(request.headers.get("X-Profiler", "")):
             return self.get_response(request)
 
