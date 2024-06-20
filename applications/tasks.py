@@ -6,8 +6,9 @@ from django.utils.translation import gettext_lazy as _
 
 from actions.recurring_reservation import ReservationDetails
 from applications.choices import ApplicantTypeChoice, Weekday
-from applications.models import AllocatedTimeSlot
+from applications.models import Address, AllocatedTimeSlot, Organisation, Person
 from common.utils import translate_for_user
+from opening_hours.errors import ReservableTimeSpanClientError
 from opening_hours.utils.reservable_time_span_client import ReservableTimeSpanClient
 from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import RecurringReservation
@@ -19,8 +20,8 @@ if TYPE_CHECKING:
 
 
 @app.task(name="generate_reservation_series_from_allocations")
-@SentryLogger.log_if_raises("Failed to generate reservation series from allocations", re_raise=True)
-def generate_reservation_series_from_allocations(application_round_id: int) -> None:
+@SentryLogger.log_if_raises("Failed to generate reservation series from allocations")
+def generate_reservation_series_from_allocations(application_round_id: int) -> None:  # noqa: PLR0915
     allocations = AllocatedTimeSlot.objects.filter(
         reservation_unit_option__application_section__application__application_round=application_round_id,
     ).select_related(
@@ -39,7 +40,16 @@ def generate_reservation_series_from_allocations(application_round_id: int) -> N
             continue
 
         application_round = allocation.reservation_unit_option.application_section.application.application_round
-        closed_time_spans[resource.id] = ReservableTimeSpanClient(resource).get_closed_time_spans(
+        try:
+            client = ReservableTimeSpanClient(resource)
+        except ReservableTimeSpanClientError:
+            # Skip fetching opening hours if the resource indicates that it never has any opening hours.
+            # There is a slight chance that someone has updated the resource recently,
+            # and it didn't have any opening hour rules previously,
+            # but since there is a performance penalty, we still skip fetching for now.
+            continue
+
+        closed_time_spans[resource.id] = client.get_closed_time_spans(
             start_date=application_round.reservation_period_begin,
             end_date=application_round.reservation_period_end,
         )
@@ -80,6 +90,25 @@ def generate_reservation_series_from_allocations(application_round_id: int) -> N
             application = application_section.application
             application_round = application.application_round
 
+            contact_person: Person | None = getattr(application, "contact_person", None)
+            reservee_first_name: str = getattr(contact_person, "first_name", "")
+            reservee_last_name: str = getattr(contact_person, "last_name", "")
+            reservee_email: str = getattr(contact_person, "email", "")
+            reservee_phone: str = getattr(contact_person, "phone_number", "")
+
+            billing_address: Address | None = getattr(application, "billing_address", None)
+            billing_address_street: str = getattr(billing_address, "street_address", "")
+            billing_address_city: str = getattr(billing_address, "city", "")
+            billing_address_zip: str = getattr(billing_address, "post_code", "")
+
+            organisation: Organisation | None = getattr(application, "organisation", None)
+            organisation_name: str = getattr(organisation, "name", "")
+            organisation_identifier: str | None = getattr(organisation, "identifier", None)
+            organisation_address: Address | None = getattr(organisation, "address", None)
+            organisation_address_street: str = getattr(organisation_address, "street_address", "")
+            organisation_address_city: str = getattr(organisation_address, "city", "")
+            organisation_address_zip: str = getattr(organisation_address, "post_code", "")
+
             reservation_details = ReservationDetails(
                 name=recurring_reservation.name,
                 description=application.additional_information,
@@ -90,13 +119,13 @@ def generate_reservation_series_from_allocations(application_round_id: int) -> N
                 num_persons=application_section.num_persons,
                 buffer_time_before=datetime.timedelta(0),
                 buffer_time_after=datetime.timedelta(0),
-                reservee_first_name=application.contact_person.first_name,
-                reservee_last_name=application.contact_person.last_name,
-                reservee_email=application.contact_person.email,
-                reservee_phone=application.contact_person.phone_number,
-                billing_address_street=application.billing_address.street_address,
-                billing_address_city=application.billing_address.city,
-                billing_address_zip=application.billing_address.post_code,
+                reservee_first_name=reservee_first_name,
+                reservee_last_name=reservee_last_name,
+                reservee_email=reservee_email,
+                reservee_phone=reservee_phone,
+                billing_address_street=billing_address_street,
+                billing_address_city=billing_address_city,
+                billing_address_zip=billing_address_zip,
             )
 
             reservation_details["reservee_type"] = (
@@ -108,19 +137,17 @@ def generate_reservation_series_from_allocations(application_round_id: int) -> N
             )
 
             if reservation_details["reservee_type"] == CustomerTypeChoice.INDIVIDUAL:
-                reservation_details["reservee_address_street"] = application.billing_address.street_address
-                reservation_details["reservee_address_city"] = application.billing_address.city
-                reservation_details["reservee_address_zip"] = application.billing_address.post_code
+                reservation_details["reservee_address_street"] = billing_address_street
+                reservation_details["reservee_address_city"] = billing_address_city
+                reservation_details["reservee_address_zip"] = billing_address_zip
 
             else:
-                reservation_details["reservee_organisation_name"] = application.organisation.name
-                reservation_details["reservee_id"] = application.organisation.identifier
-                reservation_details["reservee_is_unregistered_association"] = (
-                    application.organisation.identifier is None
-                )
-                reservation_details["reservee_address_street"] = application.organisation.address.street_address
-                reservation_details["reservee_address_city"] = application.organisation.address.city
-                reservation_details["reservee_address_zip"] = application.organisation.address.post_code
+                reservation_details["reservee_organisation_name"] = organisation_name
+                reservation_details["reservee_id"] = organisation_identifier
+                reservation_details["reservee_is_unregistered_association"] = organisation_identifier is None
+                reservation_details["reservee_address_street"] = organisation_address_street
+                reservation_details["reservee_address_city"] = organisation_address_city
+                reservation_details["reservee_address_zip"] = organisation_address_zip
 
             recurring_reservation.actions.bulk_create_reservation_for_periods(
                 periods=slots.possible,

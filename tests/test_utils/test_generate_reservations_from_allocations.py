@@ -1,5 +1,4 @@
 import datetime
-import re
 
 import freezegun
 import pytest
@@ -200,9 +199,8 @@ def test_generate_reservation_series_from_allocations__error_handling():
     slot = AllocatedTimeSlotFactory.create_ready_for_reservation()
     application_round = slot.reservation_unit_option.application_section.application.application_round
 
-    msg = "Test error"
-    with pytest.raises(ValueError, match=re.escape(msg)):
-        generate_reservation_series_from_allocations(application_round_id=application_round.id)
+    # Errors are not raised, but logged to Sentry.
+    generate_reservation_series_from_allocations(application_round_id=application_round.id)
 
     assert SentryLogger.log_exception.call_count == 1
 
