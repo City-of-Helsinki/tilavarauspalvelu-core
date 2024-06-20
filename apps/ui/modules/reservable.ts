@@ -184,6 +184,7 @@ export function isRangeReservable({
   reservationUnit,
   activeApplicationRounds,
   reservableTimes,
+  // TODO what is the use case for skipping the length check?
   skipLengthCheck = false,
 }: ReservationUnitReservableProps): boolean {
   const {
@@ -203,11 +204,33 @@ export function isRangeReservable({
   if (!isValid(start) || !isValid(end)) {
     return false;
   }
-  if (isBefore(end, start)) {
+
+  const normalizedEnd = addMilliseconds(end, -1);
+  if (isBefore(normalizedEnd, start)) {
     return false;
   }
 
-  const normalizedEnd = addMilliseconds(end, -1);
+  // check interval length
+  // can't use normalized end because that would make the interval 1ms shorter
+  const intervalMinutes = getIntervalMinutes(reservationStartInterval);
+  if (differenceInSeconds(end, start) % (intervalMinutes * 60) !== 0) {
+    return false;
+  }
+
+  if (!skipLengthCheck) {
+    if (minReservationDuration) {
+      const dur = differenceInSeconds(new Date(end), new Date(start));
+      if (!(dur >= minReservationDuration)) {
+        return false;
+      }
+    }
+    if (maxReservationDuration) {
+      const dur = differenceInSeconds(new Date(end), new Date(start));
+      if (!(dur <= maxReservationDuration)) {
+        return false;
+      }
+    }
+  }
 
   const reservationsArr = filterNonNullable(reservationSet);
   const reservation = {
@@ -242,21 +265,6 @@ export function isRangeReservable({
     })
   ) {
     return false;
-  }
-
-  if (!skipLengthCheck) {
-    if (minReservationDuration) {
-      const dur = differenceInSeconds(new Date(end), new Date(start));
-      if (!(dur >= minReservationDuration)) {
-        return false;
-      }
-    }
-    if (maxReservationDuration) {
-      const dur = differenceInSeconds(new Date(end), new Date(start));
-      if (!(dur <= maxReservationDuration)) {
-        return false;
-      }
-    }
   }
 
   if (doReservationsCollide({ start, end }, reservationsArr)) {
@@ -376,6 +384,8 @@ function isRangeReservable_({
   return range.every((slot) => isSlotReservable(slot));
 }
 
+// TODO is this buffer collision check? or is this overlapping reservation check?
+// it does handle buffers if the reservations have them, but doesn't it check all colllisions?
 function doesBufferCollide(
   reservation: BufferCollideCheckReservation,
   newReservation: {

@@ -14,6 +14,7 @@ import {
 import {
   IsReservableFieldsFragment,
   ReservationStartInterval,
+  ReservationStateChoice,
 } from "@/gql/gql-types";
 
 describe("generateReservableMap", () => {
@@ -236,6 +237,7 @@ describe("generateReservableMap", () => {
 });
 
 describe("isRangeReservable", () => {
+  // one month of reservable times
   function mockReservableTimes(): ReservableMap {
     const map: ReservableMap = new Map();
     for (let i = 0; i < 30; i++) {
@@ -246,25 +248,35 @@ describe("isRangeReservable", () => {
     }
     return map;
   }
+
   function createInput({
     start,
     end,
     reservableTimes,
+    reservationSet,
+    interval,
+    maxReservationDuration,
+    minReservationDuration,
   }: {
     start: Date;
     end: Date;
     reservableTimes?: ReservableMap;
+    reservationSet?: IsReservableFieldsFragment["reservationSet"];
+    interval?: ReservationStartInterval;
+    maxReservationDuration?: IsReservableFieldsFragment["maxReservationDuration"];
+    minReservationDuration?: IsReservableFieldsFragment["minReservationDuration"];
   }) {
     const reservationUnit: Omit<
       IsReservableFieldsFragment,
       "reservableTimeSpans"
     > = {
-      reservationSet: [],
+      reservationSet: reservationSet ?? [],
       bufferTimeBefore: 0,
       bufferTimeAfter: 0,
-      maxReservationDuration: 0,
-      minReservationDuration: 0,
-      reservationStartInterval: ReservationStartInterval.Interval_15Mins,
+      maxReservationDuration: maxReservationDuration ?? 0,
+      minReservationDuration: minReservationDuration ?? 0,
+      reservationStartInterval:
+        interval ?? ReservationStartInterval.Interval_15Mins,
       reservationsMaxDaysBefore: null,
       reservationsMinDaysBefore: 0,
       reservationBegins: addDays(new Date(), -1).toISOString(),
@@ -314,12 +326,131 @@ describe("isRangeReservable", () => {
     expect(isRangeReservable(input)).toBe(true);
   });
 
-  test.todo("NO if the range is shorter than minimum interval");
-  test.todo("NO if the range is longer than maximum interval");
-  test.todo("NO if the range is not within the reservable times");
-  test.todo("NO if the range is not within the active application rounds");
-  test.todo("NO if the range contains a reservation");
+  test("NO if the range is shorter than interval", () => {
+    const date = startOfDay(addDays(new Date(), 1));
+    const input = createInput({
+      start: addHours(date, 9),
+      end: addHours(date, 10),
+      interval: ReservationStartInterval.Interval_120Mins,
+    });
+    expect(isRangeReservable(input)).toBe(false);
+  });
+
+  test("YES if the range is exactly an interval", () => {
+    const date = startOfDay(addDays(new Date(), 1));
+    const input = createInput({
+      start: addHours(date, 9),
+      end: addHours(date, 11),
+      interval: ReservationStartInterval.Interval_120Mins,
+    });
+    expect(isRangeReservable(input)).toBe(true);
+  });
+
+  test("NO if the range is not divisible with interval", () => {
+    const date = startOfDay(addDays(new Date(), 1));
+    const input = createInput({
+      start: addHours(date, 9),
+      end: addHours(date, 12),
+      interval: ReservationStartInterval.Interval_120Mins,
+    });
+    expect(isRangeReservable(input)).toBe(false);
+  });
+
+  test("NO if the range is longer than maximum reservation length", () => {
+    const date = startOfDay(addDays(new Date(), 1));
+    const input = createInput({
+      start: addHours(date, 9),
+      end: addHours(date, 21),
+      maxReservationDuration: 60,
+    });
+    expect(isRangeReservable(input)).toBe(false);
+  });
+
+  test("NO if the range is shorter than minimum reservation length", () => {
+    const date = startOfDay(addDays(new Date(), 1));
+    const input = createInput({
+      start: addHours(date, 9),
+      end: addHours(date, 21),
+      maxReservationDuration: 60,
+    });
+    expect(isRangeReservable(input)).toBe(false);
+  });
+
+  test("NO if the range is not within the reservable times", () => {
+    const date = startOfDay(addDays(new Date(), 31));
+    const input = createInput({
+      start: addHours(date, 9),
+      end: addHours(date, 11),
+    });
+    expect(isRangeReservable(input)).toBe(false);
+  });
+
   test.todo("NO if the range is before the minimum reservation date");
   test.todo("NO if the range is after the maximum reservation date");
   test.todo("NO if the reservation unit is not reservable");
+
+  describe("collisions with other reservations", () => {
+    function createMockReservation({
+      start,
+      end,
+      state,
+      bufferTimeAfter,
+      bufferTimeBefore,
+    }: {
+      start: Date;
+      end: Date;
+      state?: ReservationStateChoice;
+      bufferTimeAfter?: number;
+      bufferTimeBefore?: number;
+    }) {
+      return {
+        pk: 1,
+        id: "1",
+        bufferTimeAfter: bufferTimeAfter ?? 0,
+        bufferTimeBefore: bufferTimeBefore ?? 0,
+        state: state ?? ReservationStateChoice.Confirmed,
+        begin: start.toISOString(),
+        end: end.toISOString(),
+      };
+    }
+
+    test("NO if there is a collision with another reservation", () => {
+      const date = startOfDay(addDays(new Date(), 1));
+      const input = createInput({
+        start: addHours(date, 9),
+        end: addHours(date, 11),
+        reservationSet: [
+          createMockReservation({
+            start: addHours(date, 8),
+            end: addHours(date, 12),
+          }),
+        ],
+      });
+      expect(isRangeReservable(input)).toBe(false);
+    });
+    //
+    test.todo(
+      "NO if there is a collision with another reservation in Created state"
+    );
+    test.todo(
+      "NO if there is a collision with another reservation in WaitingForPayment state"
+    );
+    test.todo(
+      "YES if there is a collision with another reservation in Cancelled state"
+    );
+    test.todo(
+      "YES if there is a collision with another reservation in Rejected state"
+    );
+    test.todo(
+      "NO if there is a collision with another reservation in the buffer time"
+    );
+    test.todo("NO if the buffer would collide with another reservation");
+  });
+
+  // TODO these have complex rules: states of the application rounds, times
+  // an application round should only block within reservable times
+  // an application round should only block if it's state is active (what are these states)
+  // an application round that has been finalized should not block (it's converted into reservations)
+  test.todo("NO if the reservation would overlap with an application round");
+  test.todo("NO if the range is not within the active application rounds");
 });

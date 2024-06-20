@@ -9,7 +9,13 @@ import type {
   ReservationQuery,
   ReservationUnitPageQuery,
 } from "@gql/gql-types";
-import { addMinutes, addSeconds, differenceInMinutes } from "date-fns";
+import {
+  addMinutes,
+  addSeconds,
+  differenceInMinutes,
+  set,
+  startOfDay,
+} from "date-fns";
 import classNames from "classnames";
 import { IconArrowRight, IconCross } from "hds-react";
 import { useRouter } from "next/router";
@@ -18,7 +24,12 @@ import { useTranslation } from "next-i18next";
 import { useMedia } from "react-use";
 import styled from "styled-components";
 import { Toolbar } from "common/src/calendar/Toolbar";
-import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
+import {
+  dayMax,
+  filterNonNullable,
+  getIntervalMinutes,
+  getLocalizationLang,
+} from "common/src/helpers";
 import {
   SLOTS_EVERY_HOUR,
   canReservationTimeBeChanged,
@@ -343,21 +354,77 @@ export function EditStep0({
     }
   };
 
+  // TODO this is copy pasta from reservation-unit/[id]
+  const clampDuration = useCallback(
+    (d: number): number => {
+      const { minReservationDuration, maxReservationDuration } =
+        reservationUnit;
+      const minReservationDurationMinutes = minReservationDuration
+        ? minReservationDuration / 60
+        : 30;
+      const maxReservationDurationMinutes = maxReservationDuration
+        ? maxReservationDuration / 60
+        : Number.MAX_SAFE_INTEGER;
+      const initialDuration = Math.max(
+        minReservationDurationMinutes,
+        durationOptions[0]?.value ?? 0
+      );
+      return Math.min(
+        Math.max(d, initialDuration),
+        maxReservationDurationMinutes
+      );
+    },
+    [durationOptions, reservationUnit]
+  );
+
+  // FIXME this allows too long / too short reservation selects
+  // unlike reservation-unit/[id] the clamp doesn't work here (in the calendar view)
   const handleCalendarEventChange = useCallback(
     (
       { start, end }: CalendarEvent<ReservationNode>,
       skipLengthCheck = false
     ): boolean => {
-      if (!isSlotAvailable(start, end, skipLengthCheck)) {
+      const { minReservationDuration } = reservationUnit;
+      const minEnd = addSeconds(start, minReservationDuration ?? 0);
+      // TODO this is copy pasta from reservation-unit/[id]
+      // start time and duration needs to be snapped to the nearest interval
+      // i.e. case where the options are 60 mins apart but the drag and drop allows 30 mins increments
+      // this causes backend validation errors
+      const interval = getIntervalMinutes(
+        reservationUnit.reservationStartInterval
+      );
+      const originalDuration = differenceInMinutes(end, start);
+      let dayTime = start.getHours() * 60 + start.getMinutes();
+      if (dayTime % interval !== 0) {
+        dayTime = Math.ceil(dayTime / interval) * interval;
+      }
+      const newStart = set(startOfDay(start), {
+        hours: dayTime / 60,
+        minutes: dayTime % 60,
+      });
+      let dur = clampDuration(originalDuration);
+      if (dur % interval !== 0) {
+        dur = Math.ceil(duration / interval) * interval;
+      }
+      const newEnd = dayMax([end, minEnd, addMinutes(newStart, duration)]);
+      if (newEnd == null) {
         return false;
       }
 
-      const { begin } = getNewReservation({ start, end, reservationUnit });
+      if (!isSlotAvailable(newStart, newEnd, skipLengthCheck)) {
+        return false;
+      }
+
+      const { begin } = getNewReservation({
+        start: newStart,
+        end: newEnd,
+        reservationUnit,
+      });
       const newDate = toUIDate(begin);
       const newTime = getTimeString(begin);
       setValue("date", newDate, { shouldDirty: true });
       setValue("time", newTime, { shouldDirty: true });
-      setValue("duration", differenceInMinutes(end, start), {
+      setValue("duration", differenceInMinutes(newEnd, newStart), {
         shouldDirty: true,
       });
 
@@ -369,19 +436,20 @@ export function EditStep0({
 
       return true;
     },
-    [isSlotAvailable, reservationUnit, setValue]
+    [isSlotAvailable, clampDuration, reservationUnit, setValue]
   );
 
   // FIXME some issues still moving a reservation (requires multiple clicks at times)
   const handleSlotClick = useCallback(
     (
-      {
-        start,
-        end,
-        action,
-      }: { start: Date; end: Date; action: "select" | "click" | "doubleClick" },
+      props: {
+        start: Date;
+        end: Date;
+        action: "select" | "click" | "doubleClick";
+      },
       skipLengthCheck = false
     ): boolean => {
+      const { start, end, action } = props;
       const isClientATouchDevice = isTouchDevice();
       const isTouchClick = action === "select" && isClientATouchDevice;
 
