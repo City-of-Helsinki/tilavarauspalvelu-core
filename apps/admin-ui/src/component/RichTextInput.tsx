@@ -7,19 +7,6 @@ import "react-quill/dist/quill.snow.css";
 import styled from "styled-components";
 import { HorisontalFlex } from "../styles/layout";
 
-type Props = {
-  required?: boolean;
-  disabled?: boolean;
-  label?: string;
-  value: string;
-  id: string;
-  onChange: (v: string) => void;
-  errorText?: string;
-  tooltipText?: string;
-  style?: React.CSSProperties;
-  className?: string;
-};
-
 const Container = styled.div<{ $disabled: boolean }>`
   .ql-toolbar {
     border: none !important;
@@ -81,7 +68,18 @@ const modules = {
   toolbar: [["bold"], ["link"]],
 };
 
-const RichTextInput = ({
+type Props = {
+  required?: boolean;
+  disabled?: boolean;
+  label?: string;
+  value: string;
+  id: string;
+  onChange: (v: string) => void;
+  errorText?: string;
+  tooltipText?: string;
+} & React.HTMLAttributes<HTMLDivElement>;
+
+function RichTextInput({
   value,
   required = false,
   disabled = false,
@@ -90,16 +88,10 @@ const RichTextInput = ({
   errorText,
   tooltipText,
   onChange,
-  style,
-  className,
-}: Props): JSX.Element => {
+  ...rest
+}: Props): JSX.Element {
   return (
-    <Container
-      style={style}
-      className={className}
-      $disabled={disabled}
-      id={`${id}-container`}
-    >
+    <Container {...rest} $disabled={disabled} id={`${id}-container`}>
       <HorisontalFlex style={{ justifyContent: "space-between" }}>
         <Label htmlFor={id}>
           {label} {required ? <Asterix>*</Asterix> : null}
@@ -124,6 +116,6 @@ const RichTextInput = ({
       )}
     </Container>
   );
-};
+}
 
 export default RichTextInput;

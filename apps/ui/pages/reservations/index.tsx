@@ -75,7 +75,7 @@ const EmptyMessage = styled.div`
   margin-left: var(--spacing-xl);
 `;
 
-const Reservations = (): JSX.Element | null => {
+function Reservations(): JSX.Element | null {
   const router = useRouter();
   const { t } = useTranslation();
   const { isAuthenticated, user: currentUser } = useSession();
@@ -128,7 +128,7 @@ const Reservations = (): JSX.Element | null => {
     <>
       <Head />
       <Container>
-        <Heading>
+        <Heading data-testid="Reservations--page__tab_container">
           <Tabs>
             <StyledTabList>
               <StyledTab onClick={() => setTab("upcoming")}>
@@ -217,6 +217,6 @@ const Reservations = (): JSX.Element | null => {
       </Container>
     </>
   );
-};
+}
 
 export default Reservations;

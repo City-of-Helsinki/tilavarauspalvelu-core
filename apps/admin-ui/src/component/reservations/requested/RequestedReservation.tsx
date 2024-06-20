@@ -42,6 +42,7 @@ import { useRecurringReservations, useReservationData } from "./hooks";
 import ApprovalButtonsRecurring from "./ApprovalButtonsRecurring";
 import ReservationTitleSection from "./ReservationTitleSection";
 import { base64encode } from "common/src/helpers";
+import { fontMedium } from "common";
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 
@@ -66,7 +67,11 @@ const Summary = styled(ApplicationDatas)`
   }
 `;
 
-const ApplicationProp = ({
+const PropValue = styled.span`
+  white-space: pre-wrap;
+  ${fontMedium}
+`;
+function ApplicationProp({
   label,
   data,
   wide,
@@ -74,12 +79,19 @@ const ApplicationProp = ({
   label: string;
   data?: Maybe<string> | number;
   wide?: boolean;
-}) =>
-  data ? (
+}) {
+  if (data == null) {
+    return null;
+  }
+  return (
     <div style={{ gridColumn: wide ? "1 / -1" : "" }}>
-      {label}: <strong style={{ whiteSpace: "pre-wrap" }}>{data}</strong>
+      {label}:{" "}
+      <PropValue data-testid={`reservation__summary--${label}`}>
+        {data}
+      </PropValue>
     </div>
-  ) : null;
+  );
+}
 
 // Need to set max-width otherwise word-break doesn't work, different max-width because of the side menu.
 const KVPair = styled.div<{ $wide?: boolean }>`

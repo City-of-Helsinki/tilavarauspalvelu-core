@@ -59,12 +59,12 @@ const BannerNotificationText = styled.div`
   }
 `;
 
-const NotificationsListItem = ({
+function NotificationsListItem({
   notification,
   closeFn,
   closedArray,
   centered,
-}: BannerNotificationItemProps) => {
+}: BannerNotificationItemProps) {
   let notificationType: NotificationType;
   switch (notification.level) {
     case "EXCEPTION":
@@ -83,6 +83,7 @@ const NotificationsListItem = ({
         centered={centered}
         dismissible
         closeButtonLabelText={t("common:close")}
+        data-testid="BannerNotificationList__Notitification"
         onClose={() =>
           closeFn([
             ...closedArray,
@@ -102,7 +103,7 @@ const NotificationsListItem = ({
       </NotificationWrapper>
     </BannerNotificationBackground>
   );
-};
+}
 
 /// @brief List of banner notifications
 /// @param displayAmount {number} - the amount of notifications to display at one time

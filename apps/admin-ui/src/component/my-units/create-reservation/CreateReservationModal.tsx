@@ -144,7 +144,7 @@ const CollisionWarning = ({
   ) : null;
 };
 
-const ActionContainer = ({
+function ActionContainer({
   form,
   reservationUnit,
   onCancel,
@@ -154,7 +154,7 @@ const ActionContainer = ({
   reservationUnit: ReservationUnitType;
   onCancel: () => void;
   onSubmit: (values: FormValueType) => void;
-}) => {
+}) {
   const { t } = useTranslation();
   const {
     handleSubmit,
@@ -168,7 +168,13 @@ const ActionContainer = ({
   return (
     <ActionButtons>
       <CollisionWarning form={form} reservationUnit={reservationUnit} />
-      <Button size="small" variant="secondary" onClick={onCancel} theme="black">
+      <Button
+        size="small"
+        variant="secondary"
+        onClick={onCancel}
+        theme="black"
+        data-testid="CreateReservationModal__cancel-reservation"
+      >
         {t("common.cancel")}
       </Button>
       <Button
@@ -178,12 +184,13 @@ const ActionContainer = ({
         onClick={() => {
           handleSubmit(onSubmit)();
         }}
+        data-testid="CreateReservationModal__accept-reservation"
       >
         {t("ReservationDialog.accept")}
       </Button>
     </ActionButtons>
   );
-};
+}
 
 const DialogContent = ({
   onClose,

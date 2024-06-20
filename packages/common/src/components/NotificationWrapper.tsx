@@ -15,25 +15,28 @@ const Wrapper = styled.div<{ $centerContent?: boolean }>`
   }
 `;
 
-const NotificationWrapper = (
+function NotificationWrapper(
   props: NotificationPropsWithCentering
-): JSX.Element | null => {
+): JSX.Element | null {
   const [isVisible, setIsVisible] = React.useState(true);
 
   // data-testid passed to the HDS component is not passed to the DOM
   // pass it to the div wrapper instead
   const testId = props["data-testid"];
-  return isVisible ? (
+  if (!isVisible) {
+    return null;
+  }
+  return (
     <Wrapper $centerContent={props.centered} data-testid={testId}>
       <Notification
         {...props}
         onClose={() => {
           setIsVisible(false);
-          if (props.onClose) props.onClose();
+          props.onClose?.();
         }}
       />
     </Wrapper>
-  ) : null;
-};
+  );
+}
 
 export default NotificationWrapper;

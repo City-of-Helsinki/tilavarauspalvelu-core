@@ -199,7 +199,7 @@ const Container = styled.div<{ $height: number }>`
   height: ${({ $height }) => $height}px;
 `;
 
-const Cells = ({
+function Cells({
   cols,
   reservationUnitPk,
   date,
@@ -211,7 +211,7 @@ const Cells = ({
   date: Date;
   setModalContent: (content: JSX.Element | null, isHds?: boolean) => void;
   onComplete: () => void;
-}) => {
+}) {
   const now = new Date();
 
   const isPast = (index: number) => {
@@ -234,14 +234,21 @@ const Cells = ({
       );
     };
 
+  const testId = `UnitCalendar__RowCalendar--cells-${reservationUnitPk}`;
+  const cellTestId = `UnitCalendar__RowCalendar--cell-${reservationUnitPk}`;
   return (
-    <CellContent $numCols={cols}>
+    <CellContent $numCols={cols} data-testid={testId}>
       {Array.from(Array(cols).keys()).map((i) => (
-        <Cell key={i} onClick={onClick(i)} $isPast={isPast(i)} />
+        <Cell
+          key={i}
+          onClick={onClick(i)}
+          $isPast={isPast(i)}
+          data-testid={`${cellTestId}-${i}`}
+        />
       ))}
     </CellContent>
   );
-};
+}
 const PreBuffer = ({
   event,
   hourPercent,
@@ -274,7 +281,7 @@ const PreBuffer = ({
   return null;
 };
 
-const PostBuffer = ({
+function PostBuffer({
   event,
   hourPercent,
   right,
@@ -284,27 +291,28 @@ const PostBuffer = ({
   hourPercent: number;
   right: string;
   style?: CSSProperties;
-}): JSX.Element | null => {
+}): JSX.Element | null {
   const buffer = event.event?.bufferTimeAfter;
   const { t } = useTranslation();
 
-  if (buffer) {
-    const width = `calc(${(hourPercent * buffer) / 3600}% - 1px)`;
-    return (
-      <div
-        style={{
-          ...POST_PAUSE.style,
-          ...style,
-          left: right,
-          width,
-        }}
-        title={t("MyUnits.Calendar.legend.pause")}
-        key={`${event.event?.pk}-post`}
-      />
-    );
+  if (buffer == null) {
+    return null;
   }
-  return null;
-};
+
+  const width = `calc(${(hourPercent * buffer) / 3600}% - 1px)`;
+  return (
+    <div
+      style={{
+        ...POST_PAUSE.style,
+        ...style,
+        left: right,
+        width,
+      }}
+      title={t("MyUnits.Calendar.legend.pause")}
+      key={`${event.event?.pk}-post`}
+    />
+  );
+}
 
 function getEventTitle({
   reservation: { title, event },
@@ -342,7 +350,7 @@ const EventContainer = styled.div`
   left: 0;
 `;
 
-const Events = ({
+function Events({
   firstHour,
   events,
   eventStyleGetter,
@@ -352,10 +360,10 @@ const Events = ({
   events: CalendarEventType[];
   eventStyleGetter: EventStyleGetter;
   numHours: number;
-}) => {
+}) {
   const { t } = useTranslation();
   return (
-    <EventContainer>
+    <EventContainer data-testid="UnitCalendar__RowCalendar--events">
       {events.map((e) => {
         const title = getEventTitle({ reservation: e, t });
         const startDate = new Date(e.start);
@@ -377,6 +385,7 @@ const Events = ({
           100 / numHours
         }% + 1px)`;
 
+        const testId = `UnitCalendar__RowCalendar--event-${e.event?.pk}`;
         return (
           <Fragment key={`${title}-${startDate.toISOString()}`}>
             <PreBuffer
@@ -395,7 +404,10 @@ const Events = ({
                 zIndex: 5,
               }}
             >
-              <EventContent style={{ ...eventStyleGetter(e).style }}>
+              <EventContent
+                style={{ ...eventStyleGetter(e).style }}
+                data-testid={testId}
+              >
                 <p>{title}</p>
                 {/* NOTE don't set position on Popup it breaks responsiveness */}
                 <Popup trigger={EventTriggerButton}>
@@ -414,16 +426,16 @@ const Events = ({
       })}
     </EventContainer>
   );
-};
+}
 
-const sortByDraftStatusAndTitle = (resources: Resource[]) => {
+function sortByDraftStatusAndTitle(resources: Resource[]) {
   return resources.sort((a, b) => {
     const draftComparison: number = Number(a.isDraft) - Number(b.isDraft);
     const titleComparison = sortByName(a.title, b.title);
 
     return draftComparison || titleComparison;
   });
-};
+}
 
 function UnitCalendar({ date, resources, refetch }: Props): JSX.Element {
   const calendarRef = useRef<HTMLDivElement>(null);

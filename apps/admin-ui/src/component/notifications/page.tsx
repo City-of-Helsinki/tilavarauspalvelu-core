@@ -50,7 +50,7 @@ import ControlledDateInput from "../my-units/components/ControlledDateInput";
 import ControlledTimeInput from "../my-units/components/ControlledTimeInput";
 import { base64encode } from "common/src/helpers";
 
-const RichTextInput = dynamic(() => import("app/component/RichTextInput"), {
+const RichTextInput = dynamic(() => import("@/component/RichTextInput"), {
   ssr: false,
 });
 
@@ -494,6 +494,7 @@ const NotificationForm = ({
         label={t("headings.name")}
         style={{ gridColumn: "1 / -1" }}
         errorText={translateError(errors.name?.message)}
+        data-testid="Notification__Page--name-input"
       />
       <Controller
         control={control}
@@ -555,6 +556,7 @@ const NotificationForm = ({
                 : undefined
             }
             required
+            data-testid="Notification__Page--message-fi-input"
           />
         )}
       />
@@ -568,6 +570,7 @@ const NotificationForm = ({
             style={{ gridColumn: "1 / -1" }}
             onChange={(val) => onChange(val)}
             value={value}
+            data-testid="Notification__Page--message-en-input"
           />
         )}
       />
@@ -581,6 +584,7 @@ const NotificationForm = ({
             style={{ gridColumn: "1 / -1" }}
             onChange={(val) => onChange(val)}
             value={value}
+            data-testid="Notification__Page--message-sv-input"
           />
         )}
       />
@@ -591,6 +595,7 @@ const NotificationForm = ({
             size="large"
             to=".."
             style={{ marginRight: "auto" }}
+            data-testid="Notification__Page--cancel-button"
           >
             {t("form.cancel")}
           </ButtonLikeLink>
@@ -602,12 +607,17 @@ const NotificationForm = ({
               setValue("isDraft", true);
               handleSubmit(onSubmit)();
             }}
+            data-testid="Notification__Page--save-draft-button"
           >
             {t("form.saveDraft")}
           </Button>
         </InnerButtons>
         <div>
-          <Button style={{ marginLeft: "auto" }} type="submit">
+          <Button
+            style={{ marginLeft: "auto" }}
+            type="submit"
+            data-testid="Notification__Page--publish-button"
+          >
             {t("form.save")}
           </Button>
         </div>
