@@ -26,6 +26,9 @@ module.exports = defineConfig({
         // our graphql codegen config is old and has issues disable it and use the above
         skipGraphQLConfig: true
      },
+      rules: {
+        "@graphql-eslint/no-deprecated": "warn",
+      },
     },
   ],
   root: true,

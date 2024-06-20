@@ -6,11 +6,13 @@ import {
   useReservationDenyReasonsQuery,
   useReservationsByReservationUnitQuery,
   useRecurringReservationQuery,
+  ReservationUnitNode,
 } from "@gql/gql-types";
 import { useTranslation } from "react-i18next";
 import { toApiDate } from "common/src/common/util";
 import { useNotification } from "@/context/NotificationContext";
 import { base64encode, filterNonNullable } from "common/src/helpers";
+import { type CalendarEventType } from "../Calendar";
 
 export { default as useCheckCollisions } from "./useCheckCollisions";
 
@@ -25,15 +27,24 @@ const getReservationTitle = (r: CalendarReservationFragment) =>
   r.reserveeName ?? "";
 
 function convertReservationToCalendarEvent(
-  r: CalendarReservationFragment,
+  // NOTE funky because we are converting affectedReservations also and they don't have reservationUnit
+  // but these are passed to event handlers that allow changing the reservation that requires a reservationUnit
+  // affected don't have event handlers so empty reservationUnit is fine
+  r: CalendarReservationFragment & { reservationUnit?: ReservationUnitNode[] },
   blockedName: string
-) {
+): CalendarEventType {
   const title = getEventName(r.type, getReservationTitle(r), blockedName);
+
+  const reservationUnit =
+    "reservationUnit" in r && r.reservationUnit != null
+      ? r.reservationUnit
+      : [];
   return {
     title,
     event: {
       ...r,
       name: r.name?.trim() !== "" ? r.name : "No name",
+      reservationUnit,
     },
     // TODO use zod for datetime conversions
     start: new Date(r.begin),

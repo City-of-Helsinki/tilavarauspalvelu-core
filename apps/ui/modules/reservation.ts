@@ -110,7 +110,7 @@ type IsWithinCancellationPeriodReservationT = Pick<
   reservationUnit?: Array<{
     cancellationRule?: Pick<
       NonNullable<ReservationUnitNode["cancellationRule"]>,
-      "canBeCancelledTimeBefore"
+      "canBeCancelledTimeBefore" | "needsHandling"
     > | null;
   }> | null;
 };
@@ -140,10 +140,8 @@ function isReservationWithinCancellationPeriod(
 }
 
 export function canUserCancelReservation(
-  reservation: Pick<
-    NonNullable<ReservationNodeT>,
-    "state" | "reservationUnit" | "begin"
-  >,
+  reservation: IsWithinCancellationPeriodReservationT &
+    Pick<NonNullable<ReservationNodeT>, "state">,
   skipTimeCheck = false
 ): boolean {
   const reservationUnit = reservation.reservationUnit?.[0];
@@ -383,7 +381,7 @@ export const canReservationTimeBeChanged = ({
   reservationUnit,
   activeApplicationRounds = [],
 }: CanReservationBeChangedProps): [boolean, string?] => {
-  if (reservation == null) {
+  if (reservation == null || reservationUnit == null) {
     return [false];
   }
   // existing reservation state is not CONFIRMED

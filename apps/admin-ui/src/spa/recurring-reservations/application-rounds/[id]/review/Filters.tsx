@@ -89,9 +89,7 @@ export function Filters({
   }));
 
   // event status is shared on two tabs, but allocated only has two options
-  const eventStatusArrayLong = Object.values(
-    ApplicationSectionStatusChoice
-  ).filter((x) => x !== ApplicationSectionStatusChoice.Failed);
+  const eventStatusArrayLong = Object.values(ApplicationSectionStatusChoice);
   // TODO these are "declined" / "approved" but the decline functionality is not implemented
   // so disabling the filter for now (there is no backend filter for it nor can it be tested)
 

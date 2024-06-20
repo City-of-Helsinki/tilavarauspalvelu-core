@@ -12,11 +12,7 @@ import {
   type ReservationQuery,
   type ReservationQueryVariables,
 } from "@gql/gql-types";
-import {
-  base64encode,
-  concatAffectedReservations,
-  filterNonNullable,
-} from "common/src/helpers";
+import { base64encode, filterNonNullable } from "common/src/helpers";
 import { toApiDate } from "common/src/common/util";
 import { addYears } from "date-fns";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
@@ -71,16 +67,25 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
     const timespans = filterNonNullable(reservationUnit?.reservableTimeSpans);
     const reservableTimeSpans = timespans;
+    const doesReservationAffectReservationUnit = (
+      res: (typeof affectingReservations)[0],
+      reservationUnitPk: number
+    ) => {
+      return res.affectedReservationUnits?.some(
+        (pk_) => pk_ === reservationUnitPk
+      );
+    };
     const reservationSet = filterNonNullable(
       reservationUnitData?.reservationUnit?.reservationSet
     );
     const affectingReservations = filterNonNullable(
       reservationUnitData?.affectingReservations
     );
-    const reservations = concatAffectedReservations(
-      reservationSet,
-      affectingReservations,
-      resUnitPk ?? 0
+
+    const reservations = reservationSet?.concat(
+      affectingReservations?.filter((y) =>
+        doesReservationAffectReservationUnit(y, resUnitPk ?? 0)
+      ) ?? []
     );
 
     // TODO check for nulls and return notFound if necessary

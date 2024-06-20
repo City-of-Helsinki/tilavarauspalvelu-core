@@ -202,6 +202,7 @@ const reservation: ReservationNode = {
   price: "0",
   bufferTimeBefore: 0,
   bufferTimeAfter: 0,
+  paymentOrder: [],
   begin: addHours(startOfToday(), 34).toISOString(),
   end: addHours(startOfToday(), 35).toISOString(),
   reservationUnit: [reservationUnit],
@@ -559,7 +560,12 @@ describe("canReservationBeChanged", () => {
   });
 
   test("returns true with default data", () => {
-    expect(canReservationTimeBeChanged({ reservation })).toStrictEqual([true]);
+    expect(
+      canReservationTimeBeChanged({
+        reservation,
+        reservationUnit,
+      })
+    ).toStrictEqual([true]);
   });
 
   test("returns false with non-confirmed reservation", () => {
@@ -569,6 +575,7 @@ describe("canReservationBeChanged", () => {
           ...reservation,
           state: State.Created,
         },
+        reservationUnit,
       })
     ).toStrictEqual([false, "RESERVATION_MODIFICATION_NOT_ALLOWED"]);
   });
@@ -580,76 +587,81 @@ describe("canReservationBeChanged", () => {
           ...reservation,
           begin: addHours(new Date(), -1).toISOString(),
         },
+        reservationUnit,
       } as CanReservationBeChangedProps)
     ).toStrictEqual([false, "RESERVATION_BEGIN_IN_PAST"]);
   });
 
   test("handles cancellation rule check", () => {
+    const reservationUnit1: ReservationUnitNode = {
+      ...reservationUnit,
+      cancellationRule: null,
+    };
     expect(
       canReservationTimeBeChanged({
         reservation: {
           ...reservation,
-          reservationUnit: [
-            {
-              ...reservationUnit,
-              cancellationRule: null,
-            },
-          ],
+          reservationUnit: [reservationUnit1],
         },
+        reservationUnit: reservationUnit1,
       } as CanReservationBeChangedProps)
     ).toStrictEqual([false, "RESERVATION_MODIFICATION_NOT_ALLOWED"]);
 
+    const reservationUnit2: ReservationUnitNode = {
+      ...reservationUnit,
+      cancellationRule: {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        ...reservationUnit.cancellationRule!,
+        needsHandling: true,
+      },
+    };
     expect(
       canReservationTimeBeChanged({
         reservation: {
           ...reservation,
-          reservationUnit: [
-            {
-              ...reservationUnit,
-              cancellationRule: {
-                needsHandling: true,
-              },
-            },
-          ],
+          reservationUnit: [reservationUnit2],
         },
+        reservationUnit: reservationUnit2,
       } as CanReservationBeChangedProps)
     ).toStrictEqual([false, "RESERVATION_MODIFICATION_NOT_ALLOWED"]);
   });
 
   test("handles cancellation rule buffer check", () => {
+    const reservationUnit1: ReservationUnitNode = {
+      ...reservationUnit,
+      cancellationRule: {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        ...reservationUnit.cancellationRule!,
+        canBeCancelledTimeBefore: 3000,
+      },
+    };
     expect(
       canReservationTimeBeChanged({
         reservation: {
           ...reservation,
           begin: addHours(new Date(), 1).toISOString(),
-          reservationUnit: [
-            {
-              ...reservationUnit,
-              cancellationRule: {
-                ...reservationUnit.cancellationRule,
-                canBeCancelledTimeBefore: 3000,
-              },
-            },
-          ],
+          reservationUnit: [reservationUnit1],
         },
+        reservationUnit: reservationUnit1,
       } as CanReservationBeChangedProps)
     ).toStrictEqual([true]);
 
+    const reservationUnit2: ReservationUnitNode = {
+      ...reservationUnit,
+      cancellationRule: {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        ...reservationUnit.cancellationRule!,
+        canBeCancelledTimeBefore: 3601,
+      },
+    };
     expect(
       canReservationTimeBeChanged({
         reservation: {
           ...reservation,
           begin: addHours(new Date(), 1).toISOString(),
-          reservationUnit: [
-            {
-              ...reservationUnit,
-              cancellationRule: {
-                ...reservationUnit.cancellationRule,
-                canBeCancelledTimeBefore: 3601,
-              },
-            },
-          ],
+          reservationUnit: [reservationUnit2],
         },
+        reservationUnit: reservationUnit2,
       } as CanReservationBeChangedProps)
     ).toStrictEqual([false, "CANCELLATION_TIME_PAST"]);
   });
@@ -658,6 +670,7 @@ describe("canReservationBeChanged", () => {
     expect(
       canReservationTimeBeChanged({
         reservation: { ...reservation, isHandled: true },
+        reservationUnit,
       } as CanReservationBeChangedProps)
     ).toStrictEqual([false, "RESERVATION_MODIFICATION_NOT_ALLOWED"]);
   });
@@ -667,6 +680,7 @@ describe("canReservationBeChanged", () => {
       canReservationTimeBeChanged({
         reservation,
         newReservation: { ...reservation, price: "2.02" },
+        reservationUnit,
       } as CanReservationBeChangedProps)
     ).toStrictEqual([false, "RESERVATION_MODIFICATION_NOT_ALLOWED"]);
   });

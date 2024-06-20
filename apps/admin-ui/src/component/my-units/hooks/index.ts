@@ -117,7 +117,6 @@ export function useUnitResources(
     };
   }
 
-  // copy from concatAffectedReservations in helpers.ts because of types
   function doesReservationAffectReservationUnit(
     reservation: ReservationType,
     reservationUnitPk: number

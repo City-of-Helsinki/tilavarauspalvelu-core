@@ -265,6 +265,8 @@ export const mockReservation: ReservationNode = {
   bufferTimeBefore: 0,
   state: State.Confirmed,
   id: base64encode("ReservationNode:1"),
+  reservationUnit: [],
+  paymentOrder: [],
   workingMemo: "empty",
   handlingDetails: "",
 };

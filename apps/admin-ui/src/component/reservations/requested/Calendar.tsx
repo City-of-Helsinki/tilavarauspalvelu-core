@@ -18,7 +18,7 @@ type ReservationType = Omit<
   "user"
 >;
 
-type CalendarEventType = CalendarEvent<ReservationType>;
+export type CalendarEventType = CalendarEvent<ReservationType>;
 type Props = {
   reservation: ReservationType;
   refetch: (focusDate?: Date) => void;
