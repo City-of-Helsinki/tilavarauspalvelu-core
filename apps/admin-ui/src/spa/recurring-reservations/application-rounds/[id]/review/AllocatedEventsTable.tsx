@@ -166,6 +166,7 @@ export function AllocatedEventsTable({
   const sortDirection = sort?.startsWith("-") ? "desc" : "asc";
   return (
     <CustomTable
+      disableKey
       setSort={onSortChanged}
       indexKey="key"
       isLoading={isLoading}

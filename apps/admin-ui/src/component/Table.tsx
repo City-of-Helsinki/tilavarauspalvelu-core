@@ -50,15 +50,22 @@ const StyledTable = styled(Table)<TableWrapperProps>`
 type Props = TableProps & {
   setSort?: (col: string) => void;
   isLoading?: boolean;
+  // hack to avoid circular key error
+  // TODO should fix the bug in the Table component
+  disableKey?: boolean;
 };
 
 // @param isLoading - if true, table is rendered with a loading overlay
 // TODO overlay and spinner for loading would be preferable over colour switching
-export const CustomTable = ({ isLoading, ...props }: Props): JSX.Element => (
+export const CustomTable = ({
+  isLoading,
+  disableKey,
+  ...props
+}: Props): JSX.Element => (
   <StyledTable
     // NOTE have to unmount on data changes because there is a bug in the Table component
     // removing this and using sort leaves ghost elements in the table.
-    key={JSON.stringify(props.rows)}
+    key={!disableKey ? JSON.stringify(props.rows) : undefined}
     $headingBackground={
       isLoading ? "var(--color-black-20)" : "var(--color-black-10)"
     }
