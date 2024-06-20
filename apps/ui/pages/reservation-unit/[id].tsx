@@ -53,8 +53,10 @@ import {
 } from "@gql/gql-types";
 import {
   base64encode,
+  dayMax,
   filterNonNullable,
   fromMondayFirstUnsafe,
+  getIntervalMinutes,
   getLocalizationLang,
 } from "common/src/helpers";
 import Head from "@/components/reservation-unit/Head";
@@ -679,11 +681,35 @@ const ReservationUnit = ({
       // the next check is going to systematically fail unless the times are at least minReservationDuration apart
       const { minReservationDuration } = reservationUnit;
       const minEnd = addSeconds(start, minReservationDuration ?? 0);
-      const newEnd = new Date(Math.max(end.getTime(), minEnd.getTime()));
+      // duration should never be smaller than the minimum duration option
+      const originalDuration = differenceInMinutes(end, start);
+
+      // start time and duration needs to be snapped to the nearest interval
+      // i.e. case where the options are 60 mins apart but the drag and drop allows 30 mins increments
+      // this causes backend validation errors
+      const interval = getIntervalMinutes(
+        reservationUnit.reservationStartInterval
+      );
+      let dayTime = start.getHours() * 60 + start.getMinutes();
+      if (dayTime % interval !== 0) {
+        dayTime = Math.ceil(dayTime / interval) * interval;
+      }
+      const newStart = set(startOfDay(start), {
+        hours: dayTime / 60,
+        minutes: dayTime % 60,
+      });
+      let duration = clampDuration(originalDuration);
+      if (duration % interval !== 0) {
+        duration = Math.ceil(duration / interval) * interval;
+      }
+      const newEnd = dayMax([end, minEnd, addMinutes(newStart, duration)]);
+      if (newEnd == null) {
+        return false;
+      }
 
       const isReservable = isRangeReservable({
         range: {
-          start,
+          start: newStart,
           end: newEnd,
         },
         reservationUnit,
@@ -698,17 +724,16 @@ const ReservationUnit = ({
 
       // Limit the duration to the max reservation duration
       // TODO should be replaced with a utility function that is properly named
+      // TODO this can be removed? or at least we should calculate the new times before doing isReservable check
       const { begin } = getNewReservation({
-        start,
+        start: newStart,
         end: newEnd,
         reservationUnit,
       });
 
       const newDate = toUIDate(begin);
       const newTime = getTimeString(begin);
-      // duration should never be smaller than the minimum duration option
-      const originalDuration = differenceInMinutes(end, start);
-      const duration = clampDuration(originalDuration);
+
       setValue("date", newDate);
       setValue("duration", duration);
       setValue("time", newTime);
@@ -730,9 +755,15 @@ const ReservationUnit = ({
     ]
   );
 
+  // TODO combine the logic of this and the handleCalendarEventChange
+  // e.g. the reservability and time validation
   const handleSlotClick = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO Calendar prop typing
-    ({ start, end, action }: any): boolean => {
+    (props: {
+      start: Date;
+      end: Date;
+      action: "select" | "click" | "doubleClick";
+    }): boolean => {
+      const { start, end, action } = props;
       const isTouchClick = action === "select" && isTouchDevice();
 
       if (
@@ -743,6 +774,19 @@ const ReservationUnit = ({
         return false;
       }
 
+      const interval = getIntervalMinutes(
+        reservationUnit.reservationStartInterval
+      );
+      let dayTime = start.getHours() * 60 + start.getMinutes();
+      if (dayTime % interval !== 0) {
+        dayTime = Math.ceil(dayTime / interval) * interval;
+      }
+      const newStart = set(startOfDay(start), {
+        hours: dayTime / 60,
+        minutes: dayTime % 60,
+      });
+
+      // TODO the end time should be snapped to the nearest interval instead of this
       const normalizedEnd =
         action === "click" ||
         (isTouchClick && differenceInMinutes(end, start) <= 30)
@@ -751,7 +795,7 @@ const ReservationUnit = ({
 
       const isReservable = isRangeReservable({
         range: {
-          start,
+          start: newStart,
           end: normalizedEnd,
         },
         reservationUnit,
@@ -763,8 +807,9 @@ const ReservationUnit = ({
         return false;
       }
 
+      // TODO this can be removed? or at least we should calculate the new times before doing isReservable check
       const { begin } = getNewReservation({
-        start: new Date(start),
+        start: new Date(newStart),
         end: normalizedEnd,
         reservationUnit,
       });
