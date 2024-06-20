@@ -74,9 +74,10 @@ const ReservationSuccess = ({ reservationPk, apiBaseUrl }: Props) => {
     order,
     isError: orderError,
     isLoading: orderLoading,
-  } = useOrder({ orderUuid: reservation?.order?.orderUuid ?? "" });
+  } = useOrder({ orderUuid: reservation?.paymentOrder[0]?.orderUuid ?? "" });
 
-  const isOrderUuidMissing = reservation && !reservation.order?.orderUuid;
+  const isOrderUuidMissing =
+    reservation && !reservation.paymentOrder[0]?.orderUuid;
 
   // TODO display error if the orderUuid is missing or the pk is invalid
   if (isError || orderError || isOrderUuidMissing) {

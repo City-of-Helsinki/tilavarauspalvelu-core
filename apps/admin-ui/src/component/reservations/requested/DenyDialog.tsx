@@ -31,7 +31,7 @@ const ActionButtons = styled(Dialog.ActionButtons)`
 // TODO use a fragment
 type ReservationType = Pick<
   NonNullable<ReservationQuery["reservation"]>,
-  "pk" | "handlingDetails" | "price" | "order"
+  "pk" | "handlingDetails" | "price" | "paymentOrder"
 >;
 
 type ReturnAllowedState =
@@ -71,12 +71,15 @@ function convertToReturnState(
   reservations: ReservationType[]
 ): ReturnAllowedState {
   const payed = reservations
-    .map(({ price, order }) => ({
-      price: price ? Number(price) : 0,
-      orderStatus: order?.status ?? null,
-      orderUuid: order?.orderUuid ?? null,
-      refundUuid: order?.refundUuid ?? null,
-    }))
+    .map(({ price, paymentOrder }) => {
+      const order = paymentOrder[0] ?? null;
+      return {
+        price: price ? Number(price) : 0,
+        orderStatus: order?.status ?? null,
+        orderUuid: order?.orderUuid ?? null,
+        refundUuid: order?.refundUuid ?? null,
+      };
+    })
     .filter((x) => isPriceReturnable(x));
 
   // multiple reservations shouldn't be paid and are not tested

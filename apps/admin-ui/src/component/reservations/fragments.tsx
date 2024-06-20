@@ -78,7 +78,7 @@ export const RESERVATION_COMMON_FRAGMENT = gql`
     isBlocked
     workingMemo
     reserveeName
-    order {
+    paymentOrder {
       id
       status
     }

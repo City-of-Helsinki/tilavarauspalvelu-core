@@ -6984,7 +6984,7 @@ export type ReservationUnitsByUnitQuery = {
           email: string;
           pk?: number | null;
         } | null;
-        order?: { id: string; status?: OrderStatus | null } | null;
+        paymentOrder: Array<{ id: string; status?: OrderStatus | null }>;
       }> | null;
     }>;
   } | null;
@@ -7024,7 +7024,7 @@ export type ReservationUnitsByUnitQuery = {
       email: string;
       pk?: number | null;
     } | null;
-    order?: { id: string; status?: OrderStatus | null } | null;
+    paymentOrder: Array<{ id: string; status?: OrderStatus | null }>;
   }> | null;
 };
 
@@ -7153,7 +7153,7 @@ export type ReservationUnitCalendarQuery = {
         email: string;
         pk?: number | null;
       } | null;
-      order?: { id: string; status?: OrderStatus | null } | null;
+      paymentOrder: Array<{ id: string; status?: OrderStatus | null }>;
     }> | null;
   } | null;
   affectingReservations?: Array<{
@@ -7192,7 +7192,7 @@ export type ReservationUnitCalendarQuery = {
       email: string;
       pk?: number | null;
     } | null;
-    order?: { id: string; status?: OrderStatus | null } | null;
+    paymentOrder: Array<{ id: string; status?: OrderStatus | null }>;
   }> | null;
 };
 
@@ -7380,7 +7380,7 @@ export type ReservationCommonFragment = {
   reserveeName?: string | null;
   bufferTimeBefore: number;
   bufferTimeAfter: number;
-  order?: { id: string; status?: OrderStatus | null } | null;
+  paymentOrder: Array<{ id: string; status?: OrderStatus | null }>;
   user?: { id: string; firstName: string; lastName: string } | null;
 };
 
@@ -7420,7 +7420,7 @@ export type ReservationUnitReservationsFragment = {
     email: string;
     pk?: number | null;
   } | null;
-  order?: { id: string; status?: OrderStatus | null } | null;
+  paymentOrder: Array<{ id: string; status?: OrderStatus | null }>;
 };
 
 export type UpdateStaffReservationMutationVariables = Exact<{
@@ -7498,7 +7498,7 @@ export type ReservationsQuery = {
           nameFi?: string | null;
           unit?: { id: string; nameFi?: string | null } | null;
         }>;
-        order?: { id: string; status?: OrderStatus | null } | null;
+        paymentOrder: Array<{ id: string; status?: OrderStatus | null }>;
         user?: { id: string; firstName: string; lastName: string } | null;
       } | null;
     } | null>;
@@ -7643,11 +7643,11 @@ export type ReservationSpecialisationFragment = {
   handlingDetails?: string | null;
   bufferTimeBefore: number;
   bufferTimeAfter: number;
-  order?: {
+  paymentOrder: Array<{
     id: string;
     orderUuid?: string | null;
     refundUuid?: string | null;
-  } | null;
+  }>;
   cancelReason?: { id: string; reasonFi?: string | null } | null;
   denyReason?: { id: string; reasonFi?: string | null } | null;
   user?: {
@@ -7761,12 +7761,12 @@ export type ReservationQuery = {
         supportedFields: Array<{ id: string; fieldName: string }>;
       } | null;
     }>;
-    order?: {
+    paymentOrder: Array<{
       id: string;
       status?: OrderStatus | null;
       orderUuid?: string | null;
       refundUuid?: string | null;
-    } | null;
+    }>;
     user?: {
       id: string;
       firstName: string;
@@ -7823,6 +7823,7 @@ export type RecurringReservationQuery = {
       begin: string;
       end: string;
       state: State;
+      paymentOrder: Array<{ id: string; status?: OrderStatus | null }>;
       reservationUnit: Array<{ id: string; pk?: number | null }>;
     }>;
   } | null;
@@ -9507,7 +9508,7 @@ export const ReservationCommonFragmentDoc = gql`
     isBlocked
     workingMemo
     reserveeName
-    order {
+    paymentOrder {
       id
       status
     }
@@ -9632,7 +9633,7 @@ export const ReservationSpecialisationFragmentDoc = gql`
     calendarUrl
     price
     taxPercentageValue
-    order {
+    paymentOrder {
       id
       orderUuid
       refundUuid
@@ -13428,6 +13429,10 @@ export const RecurringReservationDocument = gql`
         begin
         end
         state
+        paymentOrder {
+          id
+          status
+        }
         reservationUnit {
           id
           pk

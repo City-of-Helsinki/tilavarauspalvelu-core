@@ -115,19 +115,20 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
       ? getApplicationUrl(applicationPk, sectionPk)
       : null;
 
+    const order = reservation.paymentOrder[0];
     return (
       <div>
         <NameState ref={ref}>
           <H1 $legacy>{overrideTitle ?? getName(reservation, t)}</H1>
           <HorisontalFlex>
             <AlignVertically>
-              {reservation.order?.status && (
+              {order?.status != null && (
                 <Tag
                   theme={{ "--tag-background": "var(--color-engel-light)" }}
                   data-testid="reservation_title_section__order_status"
                   id="reservation-order_status"
                 >
-                  {t(`Payment.status.${reservation.order?.status}`)}
+                  {t(`Payment.status.${order?.status}`)}
                 </Tag>
               )}
             </AlignVertically>

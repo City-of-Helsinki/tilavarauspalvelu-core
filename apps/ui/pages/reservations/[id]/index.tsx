@@ -423,7 +423,7 @@ function Reservation({
 
   // TODO this should be moved to SSR also
   const { order, isLoading: orderLoading } = useOrder({
-    orderUuid: reservation.order?.orderUuid ?? "",
+    orderUuid: reservation.paymentOrder[0]?.orderUuid ?? "",
   });
 
   const reservationUnit = reservation.reservationUnit?.[0] ?? null;

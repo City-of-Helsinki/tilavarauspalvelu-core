@@ -5979,12 +5979,12 @@ export type ListReservationsQuery = {
         end: string;
         state: State;
         price?: string | null;
-        order?: {
+        paymentOrder: Array<{
           id: string;
           orderUuid?: string | null;
           expiresInMinutes?: number | null;
           status?: OrderStatus | null;
-        } | null;
+        }>;
         reservationUnit: Array<{
           id: string;
           pk?: number | null;
@@ -6089,11 +6089,11 @@ export type ReservationQuery = {
     description?: string | null;
     numPersons?: number | null;
     user?: { id: string; email: string; pk?: number | null } | null;
-    order?: {
+    paymentOrder: Array<{
       id: string;
       orderUuid?: string | null;
       status?: OrderStatus | null;
-    } | null;
+    }>;
     reservationUnit: Array<{
       id: string;
       canApplyFreeOfCharge: boolean;
@@ -9425,7 +9425,7 @@ export const ListReservationsDocument = gql`
           name
           bufferTimeBefore
           bufferTimeAfter
-          order {
+          paymentOrder {
             id
             orderUuid
             expiresInMinutes
@@ -9543,7 +9543,7 @@ export const ReservationDocument = gql`
       price
       priceNet
       taxPercentageValue
-      order {
+      paymentOrder {
         id
         orderUuid
         status

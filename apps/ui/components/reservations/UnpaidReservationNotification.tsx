@@ -78,7 +78,7 @@ function ReservationNotification({
   disabled?: boolean;
   isLoading?: boolean;
 }) {
-  const startRemainingMinutes = reservation.order?.expiresInMinutes;
+  const startRemainingMinutes = reservation.paymentOrder[0]?.expiresInMinutes;
   const [remainingMinutes, setRemainingMinutes] = useState(
     startRemainingMinutes
   );
@@ -203,7 +203,7 @@ export function InProgressReservationNotification() {
   } = useDeleteReservation();
 
   const { order } = useOrder({
-    orderUuid: unpaidReservation?.order?.orderUuid ?? undefined,
+    orderUuid: unpaidReservation?.paymentOrder[0]?.orderUuid ?? undefined,
   });
   const checkoutUrl = getCheckoutUrl(order, i18n.language);
 

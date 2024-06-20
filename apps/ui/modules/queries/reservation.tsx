@@ -100,7 +100,7 @@ export const LIST_RESERVATIONS = gql`
           name
           bufferTimeBefore
           bufferTimeAfter
-          order {
+          paymentOrder {
             id
             orderUuid
             expiresInMinutes
@@ -177,7 +177,7 @@ export const GET_RESERVATION = gql`
       price
       priceNet
       taxPercentageValue
-      order {
+      paymentOrder {
         id
         orderUuid
         status

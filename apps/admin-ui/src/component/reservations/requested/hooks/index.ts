@@ -7,6 +7,7 @@ import {
   useReservationsByReservationUnitQuery,
   useRecurringReservationQuery,
   ReservationUnitNode,
+  ReservationNode,
 } from "@gql/gql-types";
 import { useTranslation } from "react-i18next";
 import { toApiDate } from "common/src/common/util";
@@ -30,7 +31,9 @@ function convertReservationToCalendarEvent(
   // NOTE funky because we are converting affectedReservations also and they don't have reservationUnit
   // but these are passed to event handlers that allow changing the reservation that requires a reservationUnit
   // affected don't have event handlers so empty reservationUnit is fine
-  r: CalendarReservationFragment & { reservationUnit?: ReservationUnitNode[] },
+  r: CalendarReservationFragment & {
+    reservationUnit?: ReservationUnitNode[];
+  } & Partial<Pick<ReservationNode, "paymentOrder">>,
   blockedName: string
 ): CalendarEventType {
   const title = getEventName(r.type, getReservationTitle(r), blockedName);
@@ -39,12 +42,14 @@ function convertReservationToCalendarEvent(
     "reservationUnit" in r && r.reservationUnit != null
       ? r.reservationUnit
       : [];
+  const paymentOrder = "paymentOrder" in r ? r.paymentOrder ?? [] : [];
   return {
     title,
     event: {
       ...r,
       name: r.name?.trim() !== "" ? r.name : "No name",
       reservationUnit,
+      paymentOrder,
     },
     // TODO use zod for datetime conversions
     start: new Date(r.begin),

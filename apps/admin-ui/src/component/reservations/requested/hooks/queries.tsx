@@ -94,7 +94,7 @@ const SPECIALISED_SINGLE_RESERVATION_FRAGMENT = gql`
     calendarUrl
     price
     taxPercentageValue
-    order {
+    paymentOrder {
       id
       orderUuid
       refundUuid
@@ -163,6 +163,10 @@ export const RECURRING_RESERVATION_QUERY = gql`
         begin
         end
         state
+        paymentOrder {
+          id
+          status
+        }
         reservationUnit {
           id
           pk
