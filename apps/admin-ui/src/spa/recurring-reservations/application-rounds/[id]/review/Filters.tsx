@@ -18,6 +18,7 @@ type UnitPkName = {
 type Props = {
   units: UnitPkName[];
   statusOption?: "application" | "event" | "eventShort";
+  enableApplicant?: boolean;
   enableWeekday?: boolean;
   enableReservationUnit?: boolean;
   reservationUnits?: UnitPkName[];
@@ -26,6 +27,7 @@ type Props = {
 export function Filters({
   units,
   statusOption = "application",
+  enableApplicant = false,
   enableWeekday = false,
   enableReservationUnit = false,
   reservationUnits = [],
@@ -110,7 +112,9 @@ export function Filters({
       ) : (
         <MultiSelectFilter name="status" options={statusOptions} />
       )}
-      <MultiSelectFilter name="applicant" options={applicantOptions} />
+      {enableApplicant && (
+        <MultiSelectFilter name="applicant" options={applicantOptions} />
+      )}
       {enableWeekday && (
         <MultiSelectFilter name="weekday" options={weekdayOptions} />
       )}

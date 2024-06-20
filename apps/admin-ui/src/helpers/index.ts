@@ -127,7 +127,7 @@ export function getApplicationSectiontatusColor(
       return "var(--color-alert-dark)";
     case ApplicationSectionStatusChoice.Handled:
       return "var(--color-success)";
-    case ApplicationSectionStatusChoice.Rejected:
+    case ApplicationSectionStatusChoice.Failed:
     default:
       return "var(--color-error)";
   }

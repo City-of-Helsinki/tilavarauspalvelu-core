@@ -621,9 +621,10 @@ export enum ApplicationSectionOrderingChoices {
 
 /** An enumeration. */
 export enum ApplicationSectionStatusChoice {
+  Failed = "FAILED",
   Handled = "HANDLED",
   InAllocation = "IN_ALLOCATION",
-  Rejected = "REJECTED",
+  Reserved = "RESERVED",
   Unallocated = "UNALLOCATED",
 }
 

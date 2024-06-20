@@ -674,9 +674,10 @@ enum ApplicationSectionOrderingChoices {
 An enumeration.
 """
 enum ApplicationSectionStatusChoice {
+  FAILED
   HANDLED
   IN_ALLOCATION
-  REJECTED
+  RESERVED
   UNALLOCATED
 }
 

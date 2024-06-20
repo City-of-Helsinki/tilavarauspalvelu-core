@@ -621,9 +621,10 @@ export enum ApplicationSectionOrderingChoices {
 
 /** An enumeration. */
 export enum ApplicationSectionStatusChoice {
+  Failed = "FAILED",
   Handled = "HANDLED",
   InAllocation = "IN_ALLOCATION",
-  Rejected = "REJECTED",
+  Reserved = "RESERVED",
   Unallocated = "UNALLOCATED",
 }
 
@@ -8557,6 +8558,68 @@ export type ApplicationRoundCriteriaQuery = {
   } | null;
 };
 
+export type RejectedOccurrencesQueryVariables = Exact<{
+  applicationRound?: InputMaybe<Scalars["Int"]["input"]>;
+  unit?: InputMaybe<Scalars["Int"]["input"]>;
+  reservationUnit?: InputMaybe<Scalars["Int"]["input"]>;
+  orderBy?: InputMaybe<
+    | Array<InputMaybe<RejectedOccurrenceOrderingChoices>>
+    | InputMaybe<RejectedOccurrenceOrderingChoices>
+  >;
+  textSearch?: InputMaybe<Scalars["String"]["input"]>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+}>;
+
+export type RejectedOccurrencesQuery = {
+  rejectedOccurrences?: {
+    pageInfo: { hasNextPage: boolean; endCursor?: string | null };
+    edges: Array<{
+      node?: {
+        id: string;
+        pk?: number | null;
+        beginDatetime: string;
+        endDatetime: string;
+        rejectionReason: RejectionReadinessChoice;
+        recurringReservation: {
+          id: string;
+          allocatedTimeSlot?: {
+            id: string;
+            pk?: number | null;
+            dayOfTheWeek: Weekday;
+            beginTime: string;
+            endTime: string;
+            reservationUnitOption: {
+              id: string;
+              applicationSection: {
+                id: string;
+                name: string;
+                application: {
+                  id: string;
+                  pk?: number | null;
+                  applicantType?: ApplicantTypeChoice | null;
+                  contactPerson?: {
+                    id: string;
+                    firstName: string;
+                    lastName: string;
+                  } | null;
+                };
+              };
+              reservationUnit: {
+                id: string;
+                nameFi?: string | null;
+                pk?: number | null;
+                unit?: { id: string; nameFi?: string | null } | null;
+              };
+            };
+          } | null;
+          reservations: Array<{ id: string; pk?: number | null }>;
+        };
+      } | null;
+    } | null>;
+  } | null;
+};
+
 export type EndAllocationMutationVariables = Exact<{
   pk: Scalars["Int"]["input"];
 }>;
@@ -15371,6 +15434,153 @@ export type ApplicationRoundCriteriaSuspenseQueryHookResult = ReturnType<
 export type ApplicationRoundCriteriaQueryResult = Apollo.QueryResult<
   ApplicationRoundCriteriaQuery,
   ApplicationRoundCriteriaQueryVariables
+>;
+export const RejectedOccurrencesDocument = gql`
+  query RejectedOccurrences(
+    $applicationRound: Int
+    $unit: Int
+    $reservationUnit: Int
+    $orderBy: [RejectedOccurrenceOrderingChoices]
+    $textSearch: String
+    $after: String
+    $first: Int
+  ) {
+    rejectedOccurrences(
+      applicationRound: $applicationRound
+      unit: $unit
+      reservationUnit: $reservationUnit
+      orderBy: $orderBy
+      textSearch: $textSearch
+      after: $after
+      first: $first
+    ) {
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      edges {
+        node {
+          id
+          pk
+          beginDatetime
+          endDatetime
+          rejectionReason
+          recurringReservation {
+            id
+            allocatedTimeSlot {
+              id
+              pk
+              dayOfTheWeek
+              beginTime
+              endTime
+              reservationUnitOption {
+                id
+                applicationSection {
+                  id
+                  name
+                  application {
+                    id
+                    pk
+                    applicantType
+                    contactPerson {
+                      id
+                      firstName
+                      lastName
+                    }
+                  }
+                }
+                reservationUnit {
+                  id
+                  nameFi
+                  pk
+                  unit {
+                    id
+                    nameFi
+                  }
+                }
+              }
+            }
+            reservations {
+              id
+              pk
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useRejectedOccurrencesQuery__
+ *
+ * To run a query within a React component, call `useRejectedOccurrencesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useRejectedOccurrencesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useRejectedOccurrencesQuery({
+ *   variables: {
+ *      applicationRound: // value for 'applicationRound'
+ *      unit: // value for 'unit'
+ *      reservationUnit: // value for 'reservationUnit'
+ *      orderBy: // value for 'orderBy'
+ *      textSearch: // value for 'textSearch'
+ *      after: // value for 'after'
+ *      first: // value for 'first'
+ *   },
+ * });
+ */
+export function useRejectedOccurrencesQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    RejectedOccurrencesQuery,
+    RejectedOccurrencesQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    RejectedOccurrencesQuery,
+    RejectedOccurrencesQueryVariables
+  >(RejectedOccurrencesDocument, options);
+}
+export function useRejectedOccurrencesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    RejectedOccurrencesQuery,
+    RejectedOccurrencesQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    RejectedOccurrencesQuery,
+    RejectedOccurrencesQueryVariables
+  >(RejectedOccurrencesDocument, options);
+}
+export function useRejectedOccurrencesSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<
+    RejectedOccurrencesQuery,
+    RejectedOccurrencesQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    RejectedOccurrencesQuery,
+    RejectedOccurrencesQueryVariables
+  >(RejectedOccurrencesDocument, options);
+}
+export type RejectedOccurrencesQueryHookResult = ReturnType<
+  typeof useRejectedOccurrencesQuery
+>;
+export type RejectedOccurrencesLazyQueryHookResult = ReturnType<
+  typeof useRejectedOccurrencesLazyQuery
+>;
+export type RejectedOccurrencesSuspenseQueryHookResult = ReturnType<
+  typeof useRejectedOccurrencesSuspenseQuery
+>;
+export type RejectedOccurrencesQueryResult = Apollo.QueryResult<
+  RejectedOccurrencesQuery,
+  RejectedOccurrencesQueryVariables
 >;
 export const EndAllocationDocument = gql`
   mutation EndAllocation($pk: Int!) {

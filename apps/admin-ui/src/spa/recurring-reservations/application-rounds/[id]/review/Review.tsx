@@ -30,6 +30,7 @@ import usePermission from "@/hooks/usePermission";
 import { Permission } from "@/modules/permissionHelper";
 import { isApplicationRoundInProgress } from "@/helpers";
 import { breakpoints } from "common";
+import RejectedOccurrencesDataLoader from "./RejectedOccurrencesDataLoader";
 
 const HeadingContainer = styled.div`
   display: flex;
@@ -260,7 +261,7 @@ export function Review({
   const activeTabIndex =
     selectedTab === "events" ? 1 : selectedTab === "allocated" ? 2 : 0;
 
-  const reseevationUnitOptions = filterNonNullable(
+  const reservationUnitOptions = filterNonNullable(
     resUnits.map((x) => toOption(x))
   );
 
@@ -321,10 +322,15 @@ export function Review({
                 ? t("ApplicationRound.madeReservations")
                 : t("ApplicationRound.allocatedReservations")}
             </Tabs.Tab>
+            {isApplicationRoundEnded && (
+              <Tabs.Tab onClick={() => handleTabChange("rejected")}>
+                {t("ApplicationRound.rejectedOccurrences")}
+              </Tabs.Tab>
+            )}
           </Tabs.TabList>
           <Tabs.TabPanel>
             <TabContent>
-              <Filters units={unitPks} />
+              <Filters units={unitPks} enableApplicant />
               <ApplicationDataLoader
                 applicationRoundPk={applicationRound.pk ?? 0}
               />
@@ -332,7 +338,7 @@ export function Review({
           </Tabs.TabPanel>
           <Tabs.TabPanel>
             <TabContent>
-              <Filters units={unitPks} statusOption="event" />
+              <Filters units={unitPks} statusOption="event" enableApplicant />
               <ApplicationEventDataLoader
                 applicationRoundPk={applicationRound.pk ?? 0}
               />
@@ -342,7 +348,8 @@ export function Review({
             <TabContent>
               <Filters
                 units={unitPks}
-                reservationUnits={reseevationUnitOptions}
+                reservationUnits={reservationUnitOptions}
+                enableApplicant
                 enableWeekday
                 enableReservationUnit
                 statusOption="eventShort"
@@ -352,6 +359,21 @@ export function Review({
               />
             </TabContent>
           </Tabs.TabPanel>
+          {isApplicationRoundEnded && (
+            <Tabs.TabPanel>
+              <TabContent>
+                <Filters
+                  units={unitPks}
+                  reservationUnits={reservationUnitOptions}
+                  enableReservationUnit
+                  statusOption="eventShort"
+                />
+                <RejectedOccurrencesDataLoader
+                  applicationRoundPk={applicationRound.pk ?? 0}
+                />
+              </TabContent>
+            </Tabs.TabPanel>
+          )}
         </Tabs>
       </TabWrapper>
     </Container>

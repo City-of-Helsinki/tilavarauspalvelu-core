@@ -564,6 +564,7 @@ const translations: ITranslations = {
     appliedReservations: ["Haetut vuorot"],
     madeReservations: ["Varatut vuorot"],
     allocatedReservations: ["Jaetut vuorot"],
+    rejectedOccurrences: ["Hylätyt ajankohdat"],
     applications: ["Hakemukset"],
     roundCriteria: ["Kierroksen kriteerit"],
     // TODO this is used in Criteria page
@@ -603,6 +604,8 @@ const translations: ITranslations = {
       reservationUnit: ["Varausyksikkö"],
       eventName: ["Varauksen nimi"],
       time: ["Vuoro"],
+      occurrenceTime: ["Aika"],
+      reason: ["Syy"],
     },
   },
   ApplicationSectionStatusChoice: {
@@ -652,6 +655,7 @@ const translations: ITranslations = {
       customer: ["Hakija"],
       name: ["Varauksen nimi"],
       unit: ["Toimipiste"],
+      reason: ["Syy"],
       stats: ["Haettu"],
       phase: ["Vaihe"],
     },

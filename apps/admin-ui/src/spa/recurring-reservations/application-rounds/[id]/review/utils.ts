@@ -22,8 +22,10 @@ export function transformApplicationSectionStatus(
           return ApplicationSectionStatusChoice.Unallocated;
         case ApplicationSectionStatusChoice.InAllocation:
           return ApplicationSectionStatusChoice.InAllocation;
-        case ApplicationSectionStatusChoice.Rejected:
-          return ApplicationSectionStatusChoice.Rejected;
+        case ApplicationSectionStatusChoice.Reserved:
+          return ApplicationSectionStatusChoice.Reserved;
+        case ApplicationSectionStatusChoice.Failed:
+          return ApplicationSectionStatusChoice.Failed;
         default:
           return undefined;
       }

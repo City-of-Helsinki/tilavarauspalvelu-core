@@ -28,6 +28,7 @@ module.exports = defineConfig({
      },
       rules: {
         "@graphql-eslint/no-deprecated": "warn",
+        "@graphql-eslint/selection-set-depth": ["error", { maxDepth: 10 }],
       },
     },
   ],
