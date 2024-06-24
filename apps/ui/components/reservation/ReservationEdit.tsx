@@ -41,6 +41,7 @@ import {
   HeadingSection,
   ReservationPageWrapper,
 } from "../reservations/styles";
+import ClientOnly from "common/src/ClientOnly";
 
 type ReservationUnitNodeT = NonNullable<
   ReservationUnitPageQuery["reservationUnit"]
@@ -306,31 +307,33 @@ export function ReservationEdit({
             <Sanitize html={termsOfUse} />
           </PinkBox>
         )}
-        <EditCalendarSection>
-          {step === 0 && (
-            <EditStep0
-              reservation={reservation}
-              reservationUnit={reservationUnit}
-              userReservations={userReservations}
-              activeApplicationRounds={activeApplicationRounds}
-              reservationForm={reservationForm}
-              setErrorMsg={setErrorMsg}
-              nextStep={() => setStep(1)}
-              apiBaseUrl={apiBaseUrl}
-              isLoading={false}
-            />
-          )}
-          {step === 1 && (
-            <EditStep1
-              reservation={reservation}
-              reservationUnit={reservationUnit}
-              setErrorMsg={setErrorMsg}
-              setStep={setStep}
-              handleSubmit={handleSubmit}
-              isSubmitting={isLoading}
-            />
-          )}
-        </EditCalendarSection>
+        <ClientOnly>
+          <EditCalendarSection>
+            {step === 0 && (
+              <EditStep0
+                reservation={reservation}
+                reservationUnit={reservationUnit}
+                userReservations={userReservations}
+                activeApplicationRounds={activeApplicationRounds}
+                reservationForm={reservationForm}
+                setErrorMsg={setErrorMsg}
+                nextStep={() => setStep(1)}
+                apiBaseUrl={apiBaseUrl}
+                isLoading={false}
+              />
+            )}
+            {step === 1 && (
+              <EditStep1
+                reservation={reservation}
+                reservationUnit={reservationUnit}
+                setErrorMsg={setErrorMsg}
+                setStep={setStep}
+                handleSubmit={handleSubmit}
+                isSubmitting={isLoading}
+              />
+            )}
+          </EditCalendarSection>
+        </ClientOnly>
       </ReservationPageWrapper>
       {errorMsg && (
         <Toast
