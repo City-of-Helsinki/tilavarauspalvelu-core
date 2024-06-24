@@ -7,6 +7,8 @@ import {
   type ReservationNode,
   type IsReservableFieldsFragment,
   type ReservableTimeSpanType,
+  ReservationStateChoice,
+  type Maybe,
 } from "@/gql/gql-types";
 import {
   dayMax,
@@ -234,17 +236,23 @@ export function isRangeReservable({
     }
   }
 
-  const reservationsArr = filterNonNullable(reservationSet);
+  const shouldReservationBlock = (r: Pick<ReservationNode, "state">) => {
+    return (
+      r.state !== ReservationStateChoice.Denied &&
+      r.state !== ReservationStateChoice.Cancelled
+    );
+  };
+  const others = filterNonNullable(reservationSet).filter(
+    shouldReservationBlock
+  );
   const reservation = {
     start,
     end,
     bufferTimeBefore,
     bufferTimeAfter,
   };
-  const isBufferCollision = reservationsArr.some((r) =>
-    doesBufferCollide(r, reservation)
-  );
 
+  const isBufferCollision = others.some((r) => hasCollisions(r, reservation));
   if (isBufferCollision) {
     return false;
   }
@@ -253,6 +261,7 @@ export function isRangeReservable({
     return false;
   }
 
+  // TODO what does this do?
   if (
     !isRangeReservable_({
       range: [start, normalizedEnd],
@@ -266,10 +275,6 @@ export function isRangeReservable({
       activeApplicationRounds,
     })
   ) {
-    return false;
-  }
-
-  if (doReservationsCollide({ start, end }, reservationsArr)) {
     return false;
   }
 
@@ -314,22 +319,6 @@ function isDateInsideInterval(
     }
   }
   return false;
-}
-
-function doReservationsCollide(
-  newReservation: { start: Date; end: Date },
-  reservations: Pick<ReservationNode, "begin" | "end">[] = []
-): boolean {
-  const { start, end } = newReservation;
-  return reservations.some((reservation) =>
-    areIntervalsOverlapping(
-      {
-        start: new Date(reservation.begin),
-        end: new Date(reservation.end),
-      },
-      { start, end }
-    )
-  );
 }
 
 // TODO rename and rework this function
@@ -386,9 +375,9 @@ function isRangeReservable_({
   return range.every((slot) => isSlotReservable(slot));
 }
 
-// TODO is this buffer collision check? or is this overlapping reservation check?
-// it does handle buffers if the reservations have them, but doesn't it check all colllisions?
-function doesBufferCollide(
+// TODO this is a bad name
+// it does handle buffer check but also checks against all reservations
+function hasCollisions(
   reservation: BufferCollideCheckReservation,
   newReservation: {
     start: Date;
@@ -397,35 +386,36 @@ function doesBufferCollide(
     bufferTimeAfter: number;
   }
 ): boolean {
-  const newReservationStartBuffer =
-    reservation.bufferTimeAfter > newReservation.bufferTimeBefore
-      ? reservation.bufferTimeAfter
-      : newReservation.bufferTimeBefore;
-  const newReservationEndBuffer =
-    reservation.bufferTimeBefore > newReservation.bufferTimeAfter
-      ? reservation.bufferTimeBefore
-      : newReservation.bufferTimeAfter;
+  function getBufferedEventTimes(
+    start: Date,
+    end: Date,
+    bufferTimeBefore: number,
+    bufferTimeAfter: number,
+    isBlocked?: Maybe<boolean> | undefined
+  ): { start: Date; end: Date } {
+    if (isBlocked) {
+      return { start, end };
+    }
+    return {
+      start: addSeconds(start, -bufferTimeBefore),
+      end: addSeconds(end, bufferTimeAfter),
+    };
+  }
 
+  const bufferedReservation = getBufferedEventTimes(
+    new Date(reservation.begin),
+    new Date(reservation.end),
+    reservation.bufferTimeBefore,
+    reservation.bufferTimeAfter,
+    reservation.isBlocked
+  );
   const bufferedNewReservation = getBufferedEventTimes(
     newReservation.start,
     newReservation.end,
-    newReservationStartBuffer,
-    newReservationEndBuffer
+    newReservation.bufferTimeBefore,
+    newReservation.bufferTimeAfter
   );
-
-  const reservationInterval = {
-    start: new Date(reservation.begin),
-    end: new Date(reservation.end),
-  };
-
-  const newReservationInterval = reservation.isBlocked
-    ? { start: newReservation.start, end: newReservation.end }
-    : {
-        start: bufferedNewReservation.start,
-        end: bufferedNewReservation.end,
-      };
-
-  return areIntervalsOverlapping(reservationInterval, newReservationInterval);
+  return areIntervalsOverlapping(bufferedReservation, bufferedNewReservation);
 }
 
 function generateSlots(
@@ -497,17 +487,6 @@ function doesSlotCollideWithApplicationRounds(
       end: new Date(round.reservationPeriodEnd).setHours(23, 59, 59),
     })
   );
-}
-
-function getBufferedEventTimes(
-  start: Date,
-  end: Date,
-  bufferTimeBefore?: number,
-  bufferTimeAfter?: number
-): { start: Date; end: Date } {
-  const before = addSeconds(start, -1 * (bufferTimeBefore ?? 0));
-  const after = addSeconds(end, bufferTimeAfter ?? 0);
-  return { start: before, end: after };
 }
 
 function areSlotsReservable(

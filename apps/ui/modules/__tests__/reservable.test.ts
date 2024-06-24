@@ -7,12 +7,13 @@ import {
   startOfToday,
 } from "date-fns";
 import {
-  ReservableMap,
+  type ReservableMap,
+  type RoundPeriod,
   generateReservableMap,
   isRangeReservable,
 } from "../reservable";
 import {
-  IsReservableFieldsFragment,
+  type IsReservableFieldsFragment,
   ReservationStartInterval,
   ReservationStateChoice,
 } from "@/gql/gql-types";
@@ -252,33 +253,43 @@ describe("isRangeReservable", () => {
   function createInput({
     start,
     end,
+    bufferTimeBefore,
+    bufferTimeAfter,
     reservableTimes,
     reservationSet,
     interval,
     maxReservationDuration,
     minReservationDuration,
+    activeApplicationRounds,
+    reservationsMinDaysBefore,
+    reservationsMaxDaysBefore,
   }: {
     start: Date;
     end: Date;
+    bufferTimeBefore?: number;
+    bufferTimeAfter?: number;
     reservableTimes?: ReservableMap;
     reservationSet?: IsReservableFieldsFragment["reservationSet"];
     interval?: ReservationStartInterval;
     maxReservationDuration?: IsReservableFieldsFragment["maxReservationDuration"];
     minReservationDuration?: IsReservableFieldsFragment["minReservationDuration"];
+    activeApplicationRounds?: RoundPeriod[];
+    reservationsMinDaysBefore?: number;
+    reservationsMaxDaysBefore?: number;
   }) {
     const reservationUnit: Omit<
       IsReservableFieldsFragment,
       "reservableTimeSpans"
     > = {
       reservationSet: reservationSet ?? [],
-      bufferTimeBefore: 0,
-      bufferTimeAfter: 0,
+      bufferTimeBefore: 60 * 60 * (bufferTimeBefore ?? 0),
+      bufferTimeAfter: 60 * 60 * (bufferTimeAfter ?? 0),
       maxReservationDuration: maxReservationDuration ?? 0,
       minReservationDuration: minReservationDuration ?? 0,
       reservationStartInterval:
         interval ?? ReservationStartInterval.Interval_15Mins,
-      reservationsMaxDaysBefore: null,
-      reservationsMinDaysBefore: 0,
+      reservationsMaxDaysBefore: reservationsMaxDaysBefore ?? null,
+      reservationsMinDaysBefore: reservationsMinDaysBefore ?? 0,
       reservationBegins: addDays(new Date(), -1).toISOString(),
       reservationEnds: addDays(new Date(), 180).toISOString(),
     };
@@ -288,7 +299,7 @@ describe("isRangeReservable", () => {
         end,
       },
       reservationUnit,
-      activeApplicationRounds: [],
+      activeApplicationRounds: activeApplicationRounds ?? [],
       reservableTimes: reservableTimes ?? mockReservableTimes(),
     };
   }
@@ -385,8 +396,27 @@ describe("isRangeReservable", () => {
     expect(isRangeReservable(input)).toBe(false);
   });
 
-  test.todo("NO if the range is before the minimum reservation date");
-  test.todo("NO if the range is after the maximum reservation date");
+  test("NO if the range is before the minimum reservation date", () => {
+    const date = startOfDay(addDays(new Date(), 1));
+    const input = createInput({
+      start: addHours(date, 9),
+      end: addHours(date, 11),
+      reservationsMinDaysBefore: 2,
+    });
+    expect(isRangeReservable(input)).toBe(false);
+  });
+
+  test("NO if the range is after the maximum reservation date", () => {
+    const date = startOfDay(addDays(new Date(), 10));
+    const input = createInput({
+      start: addHours(date, 9),
+      end: addHours(date, 11),
+      reservationsMaxDaysBefore: 9,
+    });
+    expect(isRangeReservable(input)).toBe(false);
+  });
+
+  // what is not reservable? that would be no reservable times or something else?
   test.todo("NO if the reservation unit is not reservable");
 
   describe("collisions with other reservations", () => {
@@ -396,21 +426,24 @@ describe("isRangeReservable", () => {
       state,
       bufferTimeAfter,
       bufferTimeBefore,
+      isBlocked,
     }: {
       start: Date;
       end: Date;
       state?: ReservationStateChoice;
       bufferTimeAfter?: number;
       bufferTimeBefore?: number;
+      isBlocked?: boolean;
     }) {
       return {
         pk: 1,
         id: "1",
-        bufferTimeAfter: bufferTimeAfter ?? 0,
-        bufferTimeBefore: bufferTimeBefore ?? 0,
+        bufferTimeAfter: 60 * 60 * (bufferTimeAfter ?? 0),
+        bufferTimeBefore: 60 * 60 * (bufferTimeBefore ?? 0),
         state: state ?? ReservationStateChoice.Confirmed,
         begin: start.toISOString(),
         end: end.toISOString(),
+        isBlocked: isBlocked ?? false,
       };
     }
 
@@ -428,29 +461,208 @@ describe("isRangeReservable", () => {
       });
       expect(isRangeReservable(input)).toBe(false);
     });
-    //
-    test.todo(
-      "NO if there is a collision with another reservation in Created state"
-    );
-    test.todo(
-      "NO if there is a collision with another reservation in WaitingForPayment state"
-    );
-    test.todo(
-      "YES if there is a collision with another reservation in Cancelled state"
-    );
-    test.todo(
-      "YES if there is a collision with another reservation in Rejected state"
-    );
-    test.todo(
-      "NO if there is a collision with another reservation in the buffer time"
-    );
-    test.todo("NO if the buffer would collide with another reservation");
+
+    test("NO if colliding to Created state", () => {
+      const date = startOfDay(addDays(new Date(), 1));
+      const input = createInput({
+        start: addHours(date, 9),
+        end: addHours(date, 11),
+        reservationSet: [
+          createMockReservation({
+            start: addHours(date, 8),
+            end: addHours(date, 12),
+            state: ReservationStateChoice.Created,
+          }),
+        ],
+      });
+      expect(isRangeReservable(input)).toBe(false);
+    });
+
+    test("NO if colliding to WaitingForPayment state", () => {
+      const date = startOfDay(addDays(new Date(), 1));
+      const input = createInput({
+        start: addHours(date, 9),
+        end: addHours(date, 11),
+        reservationSet: [
+          createMockReservation({
+            start: addHours(date, 8),
+            end: addHours(date, 12),
+            state: ReservationStateChoice.WaitingForPayment,
+          }),
+        ],
+      });
+      expect(isRangeReservable(input)).toBe(false);
+    });
+
+    test("YES if colliding to Cancelled state", () => {
+      const date = startOfDay(addDays(new Date(), 1));
+      const input = createInput({
+        start: addHours(date, 9),
+        end: addHours(date, 11),
+        reservationSet: [
+          createMockReservation({
+            start: addHours(date, 8),
+            end: addHours(date, 12),
+            state: ReservationStateChoice.Cancelled,
+          }),
+        ],
+      });
+      expect(isRangeReservable(input)).toBe(true);
+    });
+
+    test("YES if colliding to Denied state", () => {
+      const date = startOfDay(addDays(new Date(), 1));
+      const input = createInput({
+        start: addHours(date, 9),
+        end: addHours(date, 11),
+        reservationSet: [
+          createMockReservation({
+            start: addHours(date, 8),
+            end: addHours(date, 12),
+            state: ReservationStateChoice.Denied,
+          }),
+        ],
+      });
+      expect(isRangeReservable(input)).toBe(true);
+    });
+
+    test("YES if buffer time is after the other reservation", () => {
+      const date = startOfDay(addDays(new Date(), 1));
+      const input = createInput({
+        start: addHours(date, 10),
+        end: addHours(date, 11),
+        reservationSet: [
+          createMockReservation({
+            start: addHours(date, 8),
+            end: addHours(date, 9),
+            bufferTimeAfter: 1,
+            bufferTimeBefore: 1,
+          }),
+        ],
+      });
+      expect(isRangeReservable(input)).toBe(true);
+    });
+
+    test("YES if buffer time is before the other reservation", () => {
+      const date = startOfDay(addDays(new Date(), 1));
+      const input = createInput({
+        start: addHours(date, 8),
+        end: addHours(date, 9),
+        reservationSet: [
+          createMockReservation({
+            start: addHours(date, 10),
+            end: addHours(date, 11),
+            bufferTimeAfter: 1,
+            bufferTimeBefore: 1,
+          }),
+        ],
+      });
+      expect(isRangeReservable(input)).toBe(true);
+    });
+
+    test("NO colliding to anothers before buffer time", () => {
+      const date = startOfDay(addDays(new Date(), 1));
+      const input = createInput({
+        start: addHours(date, 8),
+        end: addHours(date, 10),
+        reservationSet: [
+          createMockReservation({
+            start: addHours(date, 10),
+            end: addHours(date, 11),
+            bufferTimeAfter: 1,
+            bufferTimeBefore: 1,
+          }),
+        ],
+      });
+      expect(isRangeReservable(input)).toBe(false);
+    });
+
+    test("NO our buffer time would collide with another", () => {
+      const date = startOfDay(addDays(new Date(), 1));
+      const input = createInput({
+        start: addHours(date, 9),
+        end: addHours(date, 11),
+        bufferTimeAfter: 1,
+        bufferTimeBefore: 1,
+        reservationSet: [
+          createMockReservation({
+            start: addHours(date, 8),
+            end: addHours(date, 12),
+          }),
+        ],
+      });
+      expect(isRangeReservable(input)).toBe(false);
+    });
+
+    test("should pick the larger buffer time of the two", () => {
+      const date = startOfDay(addDays(new Date(), 1));
+      const input = createInput({
+        start: addHours(date, 9),
+        end: addHours(date, 11),
+        bufferTimeAfter: 1,
+        bufferTimeBefore: 1,
+        reservationSet: [
+          createMockReservation({
+            start: addHours(date, 12),
+            end: addHours(date, 13),
+            bufferTimeBefore: 2,
+          }),
+        ],
+      });
+      expect(isRangeReservable(input)).toBe(false);
+    });
+
+    test("YES if colliding to Blocked reservations buffer time", () => {
+      const date = startOfDay(addDays(new Date(), 1));
+      const input = createInput({
+        start: addHours(date, 9),
+        end: addHours(date, 11),
+        bufferTimeAfter: 1,
+        bufferTimeBefore: 1,
+        reservationSet: [
+          createMockReservation({
+            start: addHours(date, 12),
+            end: addHours(date, 13),
+            bufferTimeBefore: 2,
+            isBlocked: true,
+          }),
+        ],
+      });
+      expect(isRangeReservable(input)).toBe(true);
+    });
   });
 
   // TODO these have complex rules: states of the application rounds, times
   // an application round should only block within reservable times
   // an application round should only block if it's state is active (what are these states)
   // an application round that has been finalized should not block (it's converted into reservations)
-  test.todo("NO if the reservation would overlap with an application round");
-  test.todo("NO if the range is not within the active application rounds");
+  // But they can't be checked here because the state of the application rounds is not known.
+  test("NO if the reservation would overlap with an application round", () => {
+    const date = startOfDay(addDays(new Date(), 1));
+    const input = createInput({
+      start: addHours(date, 9),
+      end: addHours(date, 11),
+      activeApplicationRounds: [
+        {
+          reservationPeriodBegin: addDays(date, -10).toISOString(),
+          reservationPeriodEnd: addDays(date, 10).toISOString(),
+        },
+      ],
+    });
+    expect(isRangeReservable(input)).toBe(false);
+  });
+  test("YES if not overlapping with an application round", () => {
+    const date = startOfDay(addDays(new Date(), 1));
+    const input = createInput({
+      start: addHours(date, 9),
+      end: addHours(date, 11),
+      activeApplicationRounds: [
+        {
+          reservationPeriodBegin: addDays(date, 2).toISOString(),
+          reservationPeriodEnd: addDays(date, 20).toISOString(),
+        },
+      ],
+    });
+    expect(isRangeReservable(input)).toBe(true);
+  });
 });
