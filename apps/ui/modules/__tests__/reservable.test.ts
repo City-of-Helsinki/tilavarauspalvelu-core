@@ -17,6 +17,7 @@ import {
   ReservationStartInterval,
   ReservationStateChoice,
 } from "@/gql/gql-types";
+import { createMockReservationUnit } from "@/test/testUtils";
 
 describe("generateReservableMap", () => {
   beforeAll(() => {
@@ -233,8 +234,6 @@ describe("generateReservableMap", () => {
       expect(value[0].end).toStrictEqual(endOfDay(date));
     }
   });
-
-  test.todo("common use case: 2 years of ranges, multiple ranges per day");
 });
 
 describe("isRangeReservable", () => {
@@ -253,16 +252,9 @@ describe("isRangeReservable", () => {
   function createInput({
     start,
     end,
-    bufferTimeBefore,
-    bufferTimeAfter,
     reservableTimes,
-    reservationSet,
-    interval,
-    maxReservationDuration,
-    minReservationDuration,
     activeApplicationRounds,
-    reservationsMinDaysBefore,
-    reservationsMaxDaysBefore,
+    ...rest
   }: {
     start: Date;
     end: Date;
@@ -277,28 +269,12 @@ describe("isRangeReservable", () => {
     reservationsMinDaysBefore?: number;
     reservationsMaxDaysBefore?: number;
   }) {
-    const reservationUnit: Omit<
-      IsReservableFieldsFragment,
-      "reservableTimeSpans"
-    > = {
-      reservationSet: reservationSet ?? [],
-      bufferTimeBefore: 60 * 60 * (bufferTimeBefore ?? 0),
-      bufferTimeAfter: 60 * 60 * (bufferTimeAfter ?? 0),
-      maxReservationDuration: maxReservationDuration ?? 0,
-      minReservationDuration: minReservationDuration ?? 0,
-      reservationStartInterval:
-        interval ?? ReservationStartInterval.Interval_15Mins,
-      reservationsMaxDaysBefore: reservationsMaxDaysBefore ?? null,
-      reservationsMinDaysBefore: reservationsMinDaysBefore ?? 0,
-      reservationBegins: addDays(new Date(), -1).toISOString(),
-      reservationEnds: addDays(new Date(), 180).toISOString(),
-    };
     return {
       range: {
         start,
         end,
       },
-      reservationUnit,
+      reservationUnit: createMockReservationUnit(rest),
       activeApplicationRounds: activeApplicationRounds ?? [],
       reservableTimes: reservableTimes ?? mockReservableTimes(),
     };
@@ -415,9 +391,6 @@ describe("isRangeReservable", () => {
     });
     expect(isRangeReservable(input)).toBe(false);
   });
-
-  // what is not reservable? that would be no reservable times or something else?
-  test.todo("NO if the reservation unit is not reservable");
 
   describe("collisions with other reservations", () => {
     function createMockReservation({

@@ -75,14 +75,14 @@ function getAvailableTimesForDay({
 
   const timeMinutes = timeMinutesRaw > 59 ? 59 : timeMinutesRaw;
   const { reservationStartInterval: interval } = reservationUnit;
-  return getPossibleTimesForDay(
+  return getPossibleTimesForDay({
     reservableTimes,
     interval,
-    start,
+    date: start,
     reservationUnit,
     activeApplicationRounds,
-    duration
-  )
+    durationValue: duration,
+  })
     .map((n) => {
       const [slotHours, slotMinutes] = n.label.split(":").map(Number);
       const startDate = new Date(start);

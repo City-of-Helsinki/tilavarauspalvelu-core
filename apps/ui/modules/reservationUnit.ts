@@ -17,7 +17,6 @@ import {
   PricingType,
   PriceUnit,
   Status,
-  type ReservationUnitPageQuery,
   type EquipmentFieldsFragment,
   type PriceReservationUnitFragment,
   type UnitNode,
@@ -25,6 +24,7 @@ import {
   type MetadataSetsFragment,
   ReservationKind,
   ReservationStateChoice,
+  type IsReservableFieldsFragment,
 } from "@gql/gql-types";
 import { capitalize, getDayIntervals, getTranslation } from "./util";
 import {
@@ -368,19 +368,24 @@ export function isInTimeSpan(
   return true;
 }
 
-// TODO this should be a fragment
-type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
 // Returns an timeslot array (in HH:mm format) with the time-slots that are
 // available for reservation on the given date
 // TODO should rewrite the timespans to be NonNullable and dates (and do the conversion early, not on each component render)
-export function getPossibleTimesForDay(
-  reservableTimes: ReservableMap,
-  interval: ReservationUnitNode["reservationStartInterval"],
-  date: Date,
-  reservationUnit: QueryT,
-  activeApplicationRounds: RoundPeriod[],
-  durationValue: number
-): { label: string; value: string }[] {
+export function getPossibleTimesForDay({
+  reservableTimes,
+  interval,
+  date,
+  reservationUnit,
+  activeApplicationRounds,
+  durationValue,
+}: {
+  reservableTimes: ReservableMap;
+  interval: ReservationUnitNode["reservationStartInterval"];
+  date: Date;
+  reservationUnit: Omit<IsReservableFieldsFragment, "reservableTimeSpans">;
+  activeApplicationRounds: readonly RoundPeriod[];
+  durationValue: number;
+}): { label: string; value: string }[] {
   const allTimes: Array<{ h: number; m: number }> = [];
   const slotsForDay = reservableTimes.get(dateToKey(date)) ?? [];
   for (const slot of slotsForDay) {

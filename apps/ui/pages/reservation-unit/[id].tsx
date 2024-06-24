@@ -568,14 +568,14 @@ function ReservationUnit({
   ]);
 
   const startingTimeOptions = useMemo(() => {
-    return getPossibleTimesForDay(
+    return getPossibleTimesForDay({
       reservableTimes,
-      reservationUnit?.reservationStartInterval,
-      focusDate,
+      interval: reservationUnit?.reservationStartInterval,
+      date: focusDate,
       reservationUnit,
       activeApplicationRounds,
-      durationValue
-    );
+      durationValue,
+    });
   }, [
     reservableTimes,
     reservationUnit,

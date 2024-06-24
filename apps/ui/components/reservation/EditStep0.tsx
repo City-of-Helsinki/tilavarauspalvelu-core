@@ -216,14 +216,14 @@ export function EditStep0({
 
   const duration =
     watch("duration") ?? differenceInMinutes(originalBegin, originalEnd);
-  const startingTimeOptions = getPossibleTimesForDay(
+  const startingTimeOptions = getPossibleTimesForDay({
     reservableTimes,
-    reservationUnit?.reservationStartInterval,
-    fromUIDate(watch("date") ?? "") ?? new Date(),
+    interval: reservationUnit?.reservationStartInterval,
+    date: fromUIDate(watch("date") ?? "") ?? new Date(),
     reservationUnit,
     activeApplicationRounds,
-    duration
-  );
+    durationValue: duration,
+  });
 
   const focusSlot = calculateFocusSlot(
     watch("date") ?? "",

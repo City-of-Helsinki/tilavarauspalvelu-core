@@ -1,5 +1,13 @@
 import { cloneDeep, get as mockGet } from "lodash";
-import { addDays } from "date-fns";
+import {
+  addDays,
+  addHours,
+  endOfDay,
+  format,
+  getHours,
+  startOfDay,
+  startOfToday,
+} from "date-fns";
 import { toUIDate } from "common/src/common/util";
 import {
   type EquipmentNode,
@@ -20,6 +28,7 @@ import {
   getEquipmentCategories,
   getEquipmentList,
   getFuturePricing,
+  getPossibleTimesForDay,
   getPrice,
   getReservationUnitInstructionsKey,
   getReservationUnitName,
@@ -30,7 +39,8 @@ import {
   isReservationUnitReservable,
 } from "../reservationUnit";
 import mockTranslations from "../../public/locales/fi/prices.json";
-import { type RoundPeriod } from "../reservable";
+import { type ReservableMap, dateToKey, type RoundPeriod } from "../reservable";
+import { createMockReservationUnit } from "@/test/testUtils";
 
 jest.mock("next-i18next", () => ({
   i18n: {
@@ -58,7 +68,137 @@ const pricingBase: PricingFieldsFragment = {
 };
 
 // Turn into describe block and spec the tests
-test.todo("getPossibleTimesForDay");
+describe("getPossibleTimesForDay", () => {
+  beforeAll(() => {
+    jest.useFakeTimers({
+      // use two numbers for hour so we don't need to pad with 0
+      now: new Date(2024, 0, 1, 10, 0, 0),
+    });
+  });
+  afterAll(() => {
+    jest.useRealTimers();
+  });
+
+  function mockReservableTimes(): ReservableMap {
+    const map: ReservableMap = new Map();
+    for (let i = 0; i < 30; i++) {
+      const date = addDays(startOfToday(), i);
+      const key = format(date, "yyyy-MM-dd");
+      const value = [{ start: startOfDay(date), end: endOfDay(date) }];
+      map.set(key, value);
+    }
+    return map;
+  }
+
+  function createInput({
+    date,
+    interval,
+    duration,
+    reservableTimes,
+  }: {
+    date: Date;
+    interval?: ReservationStartInterval;
+    duration?: number;
+    bufferTimeBefore?: number;
+    bufferTimeAfter?: number;
+    reservableTimes?: ReservableMap;
+  }) {
+    const reservationUnit = createMockReservationUnit({});
+    return {
+      date,
+      interval: interval ?? ReservationStartInterval.Interval_30Mins,
+      reservationUnit,
+      activeApplicationRounds: [] as const,
+      reservableTimes: reservableTimes ?? mockReservableTimes(),
+      durationValue: duration ?? 30,
+    };
+  }
+
+  // Doesn't care about the time (outside of can't be in the past) only the day
+  test("returns a list of possible times for today in the future", () => {
+    const date = startOfToday();
+    const hour = getHours(new Date());
+    const input = createInput({ date });
+    const output: { label: string; value: string }[] = [];
+    for (let i = hour; i < 24; i++) {
+      // now is not in the set
+      if (i !== hour) {
+        output.push({ label: `${i}:00`, value: `${i}:00` });
+      }
+      output.push({ label: `${i}:30`, value: `${i}:30` });
+    }
+    expect(getPossibleTimesForDay(input)).toStrictEqual(output);
+  });
+
+  test("interval is 60 mins", () => {
+    const date = startOfToday();
+    const hour = getHours(new Date()) + 1;
+    const input = createInput({
+      date,
+      interval: ReservationStartInterval.Interval_60Mins,
+    });
+    const output: { label: string; value: string }[] = [];
+    for (let i = hour; i < 24; i++) {
+      output.push({ label: `${i}:00`, value: `${i}:00` });
+    }
+    expect(getPossibleTimesForDay(input)).toStrictEqual(output);
+  });
+
+  test("interval is 120 mins", () => {
+    const date = startOfToday();
+    const hour = getHours(new Date()) + 2;
+    const input = createInput({
+      date,
+      interval: ReservationStartInterval.Interval_120Mins,
+    });
+    const output: { label: string; value: string }[] = [];
+    for (let i = hour; i < 24; i += 2) {
+      output.push({ label: `${i}:00`, value: `${i}:00` });
+    }
+    expect(getPossibleTimesForDay(input)).toStrictEqual(output);
+  });
+
+  test("no ranges for past days", () => {
+    const date = addDays(startOfToday(), -1);
+    const input = createInput({ date });
+    expect(getPossibleTimesForDay(input)).toStrictEqual([]);
+  });
+
+  test("no reservable times for the date", () => {
+    const date = startOfToday();
+    const reservableTimes = mockReservableTimes();
+    reservableTimes.delete(dateToKey(date));
+    const input = createInput({ date, reservableTimes });
+    expect(getPossibleTimesForDay(input)).toStrictEqual([]);
+  });
+
+  test("multiple reservable times for the date", () => {
+    const date = startOfToday();
+    const reservableTimes = mockReservableTimes();
+    reservableTimes.set(dateToKey(date), [
+      { start: addHours(date, 12), end: addHours(date, 14) },
+      { start: addHours(date, 16), end: addHours(date, 17) },
+    ]);
+    const input = createInput({ date, reservableTimes });
+    const output = ["12:00", "12:30", "13:00", "13:30", "16:00", "16:30"].map(
+      (label) => ({ label, value: label })
+    );
+    expect(getPossibleTimesForDay(input)).toStrictEqual(output);
+  });
+
+  test("duration is longer than the available times", () => {
+    const date = startOfToday();
+    const reservableTimes = mockReservableTimes();
+    reservableTimes.set(dateToKey(date), [
+      { start: addHours(date, 10), end: addHours(date, 11) },
+      { start: addHours(date, 12), end: addHours(date, 14) },
+      { start: addHours(date, 16), end: addHours(date, 18) },
+      { start: addHours(date, 19), end: addHours(date, 20) },
+    ]);
+    const input = createInput({ date, duration: 150, reservableTimes });
+    expect(getPossibleTimesForDay(input)).toStrictEqual([]);
+  });
+});
 
 describe("getPrice", () => {
   test("price range", () => {

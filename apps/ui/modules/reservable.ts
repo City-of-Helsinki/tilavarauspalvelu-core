@@ -176,7 +176,7 @@ type ReservationUnitReservableProps = {
   reservationUnit: Omit<IsReservableFieldsFragment, "reservableTimeSpans">;
   // pregenerated open slots
   reservableTimes: ReservableMap;
-  activeApplicationRounds: RoundPeriod[];
+  activeApplicationRounds: readonly RoundPeriod[];
 };
 
 /// NOTE don't return [boolean, string] causes issues in TS / JS
@@ -337,7 +337,7 @@ function isRangeReservable_({
   reservationsMaxDaysBefore: number;
   reservationBegins?: Date;
   reservationEnds?: Date;
-  activeApplicationRounds: RoundPeriod[];
+  activeApplicationRounds: readonly RoundPeriod[];
 }): boolean {
   // eslint-disable-next-line no-console
   console.assert(range.length === 2, "Invalid range", range);
@@ -477,7 +477,7 @@ function isSlotWithinTimeframe(
 
 function doesSlotCollideWithApplicationRounds(
   slot: Date,
-  rounds: RoundPeriod[]
+  rounds: readonly RoundPeriod[]
 ): boolean {
   if (rounds.length < 1) return false;
 
