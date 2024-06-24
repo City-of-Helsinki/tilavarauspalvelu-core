@@ -1,3 +1,7 @@
+/** Common functions for checking if a reservation is valid
+ *  If it can be made, or if it can be changed
+ *  Used by both new reservations and editing existing ones.
+ */
 import {
   ReservationStartInterval,
   type ReservationNode,
@@ -11,6 +15,7 @@ import {
   getIntervalMinutes,
 } from "common/src/helpers";
 import {
+  set,
   differenceInSeconds,
   isValid,
   format,
@@ -27,9 +32,11 @@ import {
   endOfDay,
   isSameDay,
   addMilliseconds,
+  differenceInMinutes,
 } from "date-fns";
 import { getDayIntervals } from "./util";
 import { type SlotProps } from "common/src/calendar/Calendar";
+import { type ReservationUnitNode } from "common/gql/gql-types";
 
 export type RoundPeriod = {
   reservationPeriodBegin: string;
@@ -168,7 +175,6 @@ type ReservationUnitReservableProps = {
   // pregenerated open slots
   reservableTimes: ReservableMap;
   activeApplicationRounds: RoundPeriod[];
-  skipLengthCheck?: boolean;
 };
 
 /// NOTE don't return [boolean, string] causes issues in TS / JS
@@ -184,8 +190,6 @@ export function isRangeReservable({
   reservationUnit,
   activeApplicationRounds,
   reservableTimes,
-  // TODO what is the use case for skipping the length check?
-  skipLengthCheck = false,
 }: ReservationUnitReservableProps): boolean {
   const {
     reservationSet,
@@ -217,18 +221,16 @@ export function isRangeReservable({
     return false;
   }
 
-  if (!skipLengthCheck) {
-    if (minReservationDuration) {
-      const dur = differenceInSeconds(new Date(end), new Date(start));
-      if (!(dur >= minReservationDuration)) {
-        return false;
-      }
+  if (minReservationDuration) {
+    const dur = differenceInSeconds(new Date(end), new Date(start));
+    if (!(dur >= minReservationDuration)) {
+      return false;
     }
-    if (maxReservationDuration) {
-      const dur = differenceInSeconds(new Date(end), new Date(start));
-      if (!(dur <= maxReservationDuration)) {
-        return false;
-      }
+  }
+  if (maxReservationDuration) {
+    const dur = differenceInSeconds(new Date(end), new Date(start));
+    if (!(dur <= maxReservationDuration)) {
+      return false;
     }
   }
 
@@ -572,3 +574,96 @@ export const getSlotPropGetter =
       className: "rbc-timeslot-inactive",
     };
   };
+
+/// Clamp the user selected start time and duration to the nearest interval
+/// TODO should this also do range check?
+export function getBoundCheckedReservation({
+  start,
+  end,
+  reservationUnit,
+  durationOptions,
+}: {
+  start: Date;
+  end: Date;
+  reservationUnit: Pick<
+    ReservationUnitNode,
+    | "minReservationDuration"
+    | "maxReservationDuration"
+    | "reservationStartInterval"
+  >;
+  durationOptions: { label: string; value: number }[];
+}): { start: Date; end: Date } | null {
+  // the next check is going to systematically fail unless the times are at least minReservationDuration apart
+  const { minReservationDuration, reservationStartInterval } = reservationUnit;
+  const minReservationDurationMinutes =
+    getMinReservationDuration(reservationUnit);
+  const maxReservationDurationMinutes =
+    getMaxReservationDuration(reservationUnit);
+
+  const minEnd = addSeconds(start, minReservationDuration ?? 0);
+  // duration should never be smaller than the minimum duration option
+  const originalDuration = differenceInMinutes(end, start);
+
+  // start time and duration needs to be snapped to the nearest interval
+  // i.e. case where the options are 60 mins apart but the drag and drop allows 30 mins increments
+  // this causes backend validation errors
+  const interval = getIntervalMinutes(reservationStartInterval);
+  let dayTime = start.getHours() * 60 + start.getMinutes();
+  if (dayTime % interval !== 0) {
+    dayTime = Math.ceil(dayTime / interval) * interval;
+  }
+  const newStart = set(startOfDay(start), {
+    hours: dayTime / 60,
+    minutes: dayTime % 60,
+  });
+  let duration = clampDuration(
+    originalDuration,
+    minReservationDurationMinutes,
+    maxReservationDurationMinutes,
+    durationOptions
+  );
+  if (duration % interval !== 0) {
+    duration = Math.ceil(duration / interval) * interval;
+  }
+  const newEnd = dayMax([end, minEnd, addMinutes(newStart, duration)]);
+  if (newEnd == null || newStart == null) {
+    return null;
+  }
+  return { start: newStart, end: newEnd };
+}
+
+// technically can be left empty (backend allows it)
+export function getMinReservationDuration(
+  reservationUnit: Pick<ReservationUnitNode, "minReservationDuration">
+): number {
+  return reservationUnit.minReservationDuration
+    ? reservationUnit.minReservationDuration / 60
+    : 30;
+}
+
+// technically can be left empty (backend allows it)
+export function getMaxReservationDuration(
+  reservationUnit: Pick<ReservationUnitNode, "maxReservationDuration">
+): number {
+  return reservationUnit.maxReservationDuration
+    ? reservationUnit.maxReservationDuration / 60
+    : Number.MAX_SAFE_INTEGER;
+}
+
+// Duration needs to always be within the bounds of the reservation unit
+// and be defined otherwise the Duration select breaks (visual bugs)
+export function clampDuration(
+  duration: number,
+  minReservationDurationMinutes: number,
+  maxReservationDurationMinutes: number,
+  durationOptions: { label: string; value: number }[]
+): number {
+  const initialDuration = Math.max(
+    minReservationDurationMinutes,
+    durationOptions[0]?.value ?? 0
+  );
+  return Math.min(
+    Math.max(duration, initialDuration),
+    maxReservationDurationMinutes
+  );
+}

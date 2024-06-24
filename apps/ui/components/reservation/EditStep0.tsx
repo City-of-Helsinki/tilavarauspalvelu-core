@@ -1,4 +1,7 @@
-import Calendar, { CalendarEvent } from "common/src/calendar/Calendar";
+import Calendar, {
+  type CalendarEvent,
+  type SlotClickProps,
+} from "common/src/calendar/Calendar";
 import { getEventBuffers } from "common/src/calendar/util";
 import { breakpoints } from "common/src/common/style";
 import type { PendingReservation } from "@/modules/types";
@@ -9,13 +12,7 @@ import type {
   ReservationQuery,
   ReservationUnitPageQuery,
 } from "@gql/gql-types";
-import {
-  addMinutes,
-  addSeconds,
-  differenceInMinutes,
-  set,
-  startOfDay,
-} from "date-fns";
+import { addMinutes, differenceInMinutes } from "date-fns";
 import classNames from "classnames";
 import { IconArrowRight, IconCross } from "hds-react";
 import { useRouter } from "next/router";
@@ -24,19 +21,18 @@ import { useTranslation } from "next-i18next";
 import { useMedia } from "react-use";
 import styled from "styled-components";
 import { Toolbar } from "common/src/calendar/Toolbar";
-import {
-  dayMax,
-  filterNonNullable,
-  getIntervalMinutes,
-  getLocalizationLang,
-} from "common/src/helpers";
+import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
 import {
   SLOTS_EVERY_HOUR,
   canReservationTimeBeChanged,
   getDurationOptions,
   getNewReservation,
 } from "@/modules/reservation";
-import { getSlotPropGetter, isRangeReservable } from "@/modules/reservable";
+import {
+  getBoundCheckedReservation,
+  getSlotPropGetter,
+  isRangeReservable,
+} from "@/modules/reservable";
 import {
   getPossibleTimesForDay,
   getReservationUnitPrice,
@@ -201,7 +197,7 @@ export function EditStep0({
   const reservableTimes = useReservableTimes(reservationUnit);
 
   const isSlotAvailable = useCallback(
-    (start: Date, end: Date, skipLengthCheck = false): boolean => {
+    (start: Date, end: Date): boolean => {
       const resUnit = getWithoutThisReservation(reservationUnit, reservation);
       return isRangeReservable({
         range: {
@@ -211,7 +207,6 @@ export function EditStep0({
         reservationUnit: resUnit,
         reservableTimes,
         activeApplicationRounds,
-        skipLengthCheck,
       });
     },
     [reservationUnit, reservableTimes, reservation, activeApplicationRounds]
@@ -354,64 +349,23 @@ export function EditStep0({
     }
   };
 
-  // TODO this is copy pasta from reservation-unit/[id]
-  const clampDuration = useCallback(
-    (d: number): number => {
-      const { minReservationDuration, maxReservationDuration } =
-        reservationUnit;
-      const minReservationDurationMinutes = minReservationDuration
-        ? minReservationDuration / 60
-        : 30;
-      const maxReservationDurationMinutes = maxReservationDuration
-        ? maxReservationDuration / 60
-        : Number.MAX_SAFE_INTEGER;
-      const initialDuration = Math.max(
-        minReservationDurationMinutes,
-        durationOptions[0]?.value ?? 0
-      );
-      return Math.min(
-        Math.max(d, initialDuration),
-        maxReservationDurationMinutes
-      );
-    },
-    [durationOptions, reservationUnit]
-  );
-
-  // FIXME this allows too long / too short reservation selects
-  // unlike reservation-unit/[id] the clamp doesn't work here (in the calendar view)
+  // TODO skip length check is weird, why was it needed here?
+  // it allows selecting too long reservations and disables the next button
   const handleCalendarEventChange = useCallback(
-    (
-      { start, end }: CalendarEvent<ReservationNode>,
-      skipLengthCheck = false
-    ): boolean => {
-      const { minReservationDuration } = reservationUnit;
-      const minEnd = addSeconds(start, minReservationDuration ?? 0);
-      // TODO this is copy pasta from reservation-unit/[id]
-      // start time and duration needs to be snapped to the nearest interval
-      // i.e. case where the options are 60 mins apart but the drag and drop allows 30 mins increments
-      // this causes backend validation errors
-      const interval = getIntervalMinutes(
-        reservationUnit.reservationStartInterval
-      );
-      const originalDuration = differenceInMinutes(end, start);
-      let dayTime = start.getHours() * 60 + start.getMinutes();
-      if (dayTime % interval !== 0) {
-        dayTime = Math.ceil(dayTime / interval) * interval;
-      }
-      const newStart = set(startOfDay(start), {
-        hours: dayTime / 60,
-        minutes: dayTime % 60,
-      });
-      let dur = clampDuration(originalDuration);
-      if (dur % interval !== 0) {
-        dur = Math.ceil(duration / interval) * interval;
-      }
-      const newEnd = dayMax([end, minEnd, addMinutes(newStart, duration)]);
-      if (newEnd == null) {
+    ({ start, end }: CalendarEvent<ReservationNode>): boolean => {
+      const { start: newStart, end: newEnd } =
+        getBoundCheckedReservation({
+          start,
+          end,
+          reservationUnit,
+          durationOptions,
+        }) ?? {};
+
+      if (newStart == null || newEnd == null) {
         return false;
       }
 
-      if (!isSlotAvailable(newStart, newEnd, skipLengthCheck)) {
+      if (!isSlotAvailable(newStart, newEnd)) {
         return false;
       }
 
@@ -436,53 +390,57 @@ export function EditStep0({
 
       return true;
     },
-    [isSlotAvailable, clampDuration, reservationUnit, setValue]
+    [isSlotAvailable, reservationUnit, setValue, durationOptions]
   );
 
-  // FIXME some issues still moving a reservation (requires multiple clicks at times)
+  // compared to handleDragEvent, this doesn't allow changing the duration (only the start time)
+  // if the duration is not possible, the event is not moved
   const handleSlotClick = useCallback(
-    (
-      props: {
-        start: Date;
-        end: Date;
-        action: "select" | "click" | "doubleClick";
-      },
-      skipLengthCheck = false
-    ): boolean => {
+    (props: SlotClickProps): boolean => {
       const { start, end, action } = props;
-      const isClientATouchDevice = isTouchDevice();
-      const isTouchClick = action === "select" && isClientATouchDevice;
+      // const isTouchClick = action === "select" && isClientATouchDevice;
 
-      if (action === "select" && !isClientATouchDevice) {
+      // why?
+      if (action === "select" && !isTouchDevice()) {
         return false;
       }
 
-      const normalizedEnd =
-        action === "click" ||
-        (isTouchClick && differenceInMinutes(end, start) <= 30)
-          ? addSeconds(start, reservationUnit?.minReservationDuration ?? 0)
-          : new Date(end);
+      // need to check the start time is valid
+      // ignore end time because the duration is fixed
+      const { start: newStart } =
+        getBoundCheckedReservation({
+          start,
+          end,
+          reservationUnit,
+          durationOptions,
+        }) ?? {};
 
+      if (newStart == null) {
+        return false;
+      }
+
+      // onClick should not change the duration
+      const realEnd = addMinutes(newStart, duration);
+      if (!isSlotAvailable(newStart, realEnd)) {
+        return false;
+      }
+
+      // TODO this seems superfluous
       const { begin } = getNewReservation({
-        start,
-        end: normalizedEnd,
+        start: newStart,
+        end: realEnd,
         reservationUnit,
       });
 
-      // TODO why isn't this normalizedEnd?
-      if (!isSlotAvailable(start, end, skipLengthCheck)) {
-        return false;
-      }
-
-      const newDate = toUIDate(new Date(begin));
-      const newTime = getTimeString(new Date(begin));
+      const uiDate = toUIDate(begin);
+      const uiTime = getTimeString(begin);
       // click doesn't change the duration
-      setValue("date", newDate, { shouldDirty: true });
-      setValue("time", newTime, { shouldDirty: true });
+      setValue("date", uiDate, { shouldDirty: true });
+      setValue("time", uiTime, { shouldDirty: true });
 
       return true;
     },
-    [reservationUnit, isSlotAvailable, setValue]
+    [reservationUnit, isSlotAvailable, setValue, durationOptions, duration]
   );
 
   const events = [...calendarEvents, ...eventBuffers];
@@ -509,7 +467,7 @@ export function EditStep0({
                 setCalendarViewType(str);
               }
             }}
-            onSelecting={(event) => handleCalendarEventChange(event, true)}
+            onSelecting={handleCalendarEventChange}
             // TODO what is the purpose of this?
             // min={addHours(startOfDay(focusDate), 6)}
             showToolbar

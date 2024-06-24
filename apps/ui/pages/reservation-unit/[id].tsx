@@ -14,7 +14,6 @@ import styled from "styled-components";
 import {
   addHours,
   addMinutes,
-  addSeconds,
   addYears,
   differenceInMinutes,
   set,
@@ -30,7 +29,10 @@ import { getEventBuffers } from "common/src/calendar/util";
 import { Container, formatters as getFormatters } from "common";
 import { useLocalStorage, useMedia } from "react-use";
 import { breakpoints } from "common/src/common/style";
-import Calendar, { type CalendarEvent } from "common/src/calendar/Calendar";
+import Calendar, {
+  type SlotClickProps,
+  type CalendarEvent,
+} from "common/src/calendar/Calendar";
 import { Toolbar } from "common/src/calendar/Toolbar";
 import classNames from "classnames";
 import { type PendingReservation } from "@/modules/types";
@@ -53,10 +55,8 @@ import {
 } from "@gql/gql-types";
 import {
   base64encode,
-  dayMax,
   filterNonNullable,
   fromMondayFirstUnsafe,
-  getIntervalMinutes,
   getLocalizationLang,
 } from "common/src/helpers";
 import Head from "@/components/reservation-unit/Head";
@@ -96,7 +96,14 @@ import {
   getNewReservation,
   isReservationStartInFuture,
 } from "@/modules/reservation";
-import { getSlotPropGetter, isRangeReservable } from "@/modules/reservable";
+import {
+  clampDuration,
+  getBoundCheckedReservation,
+  getMaxReservationDuration,
+  getMinReservationDuration,
+  getSlotPropGetter,
+  isRangeReservable,
+} from "@/modules/reservable";
 import SubventionSuffix from "@/components/reservation/SubventionSuffix";
 import InfoDialog from "@/components/common/InfoDialog";
 import {
@@ -438,7 +445,7 @@ function SubmitFragment(
   );
 }
 
-const ReservationUnit = ({
+function ReservationUnit({
   reservationUnit,
   relatedReservationUnits,
   activeApplicationRounds,
@@ -448,7 +455,7 @@ const ReservationUnit = ({
   searchDuration,
   searchDate,
   searchTime,
-}: PropsNarrowed): JSX.Element | null => {
+}: PropsNarrowed): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const now = useMemo(() => new Date(), []);
@@ -462,33 +469,10 @@ const ReservationUnit = ({
 
   const durationOptions = getDurationOptions(reservationUnit, t);
 
-  // technically these can be left empty (backend allows it)
-  const minReservationDurationMinutes = reservationUnit.minReservationDuration
-    ? reservationUnit.minReservationDuration / 60
-    : 30;
-  const maxReservationDurationMinutes = reservationUnit.maxReservationDuration
-    ? reservationUnit.maxReservationDuration / 60
-    : Number.MAX_SAFE_INTEGER;
-
-  // Duration needs to always be within the bounds of the reservation unit
-  // and be defined otherwise the Duration select breaks (visual bugs)
-  const clampDuration = useCallback(
-    (duration: number): number => {
-      const initialDuration = Math.max(
-        minReservationDurationMinutes,
-        durationOptions[0]?.value ?? 0
-      );
-      return Math.min(
-        Math.max(duration, initialDuration),
-        maxReservationDurationMinutes
-      );
-    },
-    [
-      durationOptions,
-      minReservationDurationMinutes,
-      maxReservationDurationMinutes,
-    ]
-  );
+  const minReservationDurationMinutes =
+    getMinReservationDuration(reservationUnit);
+  const maxReservationDurationMinutes =
+    getMaxReservationDuration(reservationUnit);
 
   const searchUIDate = fromUIDate(searchDate ?? "");
   // TODO should be the first reservable day (the reservableTimeSpans logic is too complex and needs refactoring)
@@ -500,7 +484,12 @@ const ReservationUnit = ({
       searchUIDate != null && isValidDate(searchUIDate)
         ? searchDate ?? ""
         : defaultDateString,
-    duration: clampDuration(searchDuration ?? 0),
+    duration: clampDuration(
+      searchDuration ?? 0,
+      minReservationDurationMinutes,
+      maxReservationDurationMinutes,
+      durationOptions
+    ),
     time: searchTime ?? getTimeString(defaultDate),
     isControlsVisible: true,
   };
@@ -562,7 +551,6 @@ const ReservationUnit = ({
       reservationUnit,
       reservableTimes,
       activeApplicationRounds,
-      skipLengthCheck: false,
     });
 
     return {
@@ -678,34 +666,18 @@ const ReservationUnit = ({
         return false;
       }
 
-      // the next check is going to systematically fail unless the times are at least minReservationDuration apart
-      const { minReservationDuration } = reservationUnit;
-      const minEnd = addSeconds(start, minReservationDuration ?? 0);
-      // duration should never be smaller than the minimum duration option
-      const originalDuration = differenceInMinutes(end, start);
+      const { start: newStart, end: newEnd } =
+        getBoundCheckedReservation({
+          start,
+          end,
+          reservationUnit,
+          durationOptions,
+        }) ?? {};
 
-      // start time and duration needs to be snapped to the nearest interval
-      // i.e. case where the options are 60 mins apart but the drag and drop allows 30 mins increments
-      // this causes backend validation errors
-      const interval = getIntervalMinutes(
-        reservationUnit.reservationStartInterval
-      );
-      let dayTime = start.getHours() * 60 + start.getMinutes();
-      if (dayTime % interval !== 0) {
-        dayTime = Math.ceil(dayTime / interval) * interval;
-      }
-      const newStart = set(startOfDay(start), {
-        hours: dayTime / 60,
-        minutes: dayTime % 60,
-      });
-      let duration = clampDuration(originalDuration);
-      if (duration % interval !== 0) {
-        duration = Math.ceil(duration / interval) * interval;
-      }
-      const newEnd = dayMax([end, minEnd, addMinutes(newStart, duration)]);
-      if (newEnd == null) {
+      if (newEnd == null || newStart == null) {
         return false;
       }
+      const duration = differenceInMinutes(newEnd, newStart);
 
       const isReservable = isRangeReservable({
         range: {
@@ -715,7 +687,6 @@ const ReservationUnit = ({
         reservationUnit,
         reservableTimes,
         activeApplicationRounds,
-        skipLengthCheck: false,
       });
 
       if (!isReservable) {
@@ -746,25 +717,22 @@ const ReservationUnit = ({
       return true;
     },
     [
-      clampDuration,
       isReservationQuotaReached,
       reservableTimes,
       reservationUnit,
       activeApplicationRounds,
+      durationOptions,
       setValue,
     ]
   );
 
   // TODO combine the logic of this and the handleCalendarEventChange
-  // e.g. the reservability and time validation
+  // compared to handleDragEvent, this doesn't allow changing the duration (only the start time)
+  // if the duration is not possible, the event is not moved
   const handleSlotClick = useCallback(
-    (props: {
-      start: Date;
-      end: Date;
-      action: "select" | "click" | "doubleClick";
-    }): boolean => {
+    (props: SlotClickProps): boolean => {
       const { start, end, action } = props;
-      const isTouchClick = action === "select" && isTouchDevice();
+      // const isTouchClick = action === "select" && isTouchDevice();
 
       if (
         (action === "select" && !isTouchDevice()) ||
@@ -774,51 +742,46 @@ const ReservationUnit = ({
         return false;
       }
 
-      const interval = getIntervalMinutes(
-        reservationUnit.reservationStartInterval
-      );
-      let dayTime = start.getHours() * 60 + start.getMinutes();
-      if (dayTime % interval !== 0) {
-        dayTime = Math.ceil(dayTime / interval) * interval;
-      }
-      const newStart = set(startOfDay(start), {
-        hours: dayTime / 60,
-        minutes: dayTime % 60,
-      });
+      const { end: newEnd, start: newStart } =
+        getBoundCheckedReservation({
+          start,
+          end,
+          reservationUnit,
+          durationOptions,
+        }) ?? {};
 
-      // TODO the end time should be snapped to the nearest interval instead of this
-      const normalizedEnd =
-        action === "click" ||
-        (isTouchClick && differenceInMinutes(end, start) <= 30)
-          ? addSeconds(start, reservationUnit?.minReservationDuration ?? 0)
-          : new Date(end);
+      if (newEnd == null || newStart == null) {
+        return false;
+      }
+
+      // onClick should not change the duration
+      const realEnd = addMinutes(newStart, watch("duration"));
 
       const isReservable = isRangeReservable({
         range: {
           start: newStart,
-          end: normalizedEnd,
+          end: realEnd,
         },
         reservationUnit,
         reservableTimes,
         activeApplicationRounds,
-        skipLengthCheck: false,
       });
       if (!isReservable) {
         return false;
       }
 
-      // TODO this can be removed? or at least we should calculate the new times before doing isReservable check
+      // TODO this seems superfluous
       const { begin } = getNewReservation({
-        start: new Date(newStart),
-        end: normalizedEnd,
+        start: newStart,
+        end: realEnd,
         reservationUnit,
       });
 
-      const newDate = toUIDate(begin);
-      const newTime = getTimeString(begin);
+      const uiDate = toUIDate(begin);
+      const uiTime = getTimeString(begin);
       // click doesn't change the duration
-      setValue("date", newDate);
-      setValue("time", newTime);
+      setValue("date", uiDate);
+      setValue("time", uiTime);
 
       return true;
     },
@@ -828,6 +791,8 @@ const ReservationUnit = ({
       reservationUnit,
       activeApplicationRounds,
       setValue,
+      watch,
+      durationOptions,
     ]
   );
 
@@ -855,7 +820,6 @@ const ReservationUnit = ({
       reservationUnit,
       reservableTimes,
       activeApplicationRounds,
-      skipLengthCheck: false,
     });
 
     const shouldDisplayFocusSlot = isReservable;
@@ -1395,6 +1359,6 @@ const ReservationUnit = ({
       )}
     </Wrapper>
   );
-};
+}
 
 export default ReservationUnit;

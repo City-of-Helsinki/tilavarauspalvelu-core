@@ -45,6 +45,12 @@ export type SlotProps = {
   style?: React.CSSProperties;
 };
 
+export type SlotClickProps = {
+  start: Date;
+  end: Date;
+  action: "select" | "click" | "doubleClick";
+};
+
 type Props<T> = {
   events: (CalendarEvent<T> | CalendarEventBuffer)[];
   begin: Date;

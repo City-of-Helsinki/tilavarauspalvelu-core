@@ -98,7 +98,6 @@ function getAvailableTimesForDay({
         reservationUnit,
         reservableTimes,
         activeApplicationRounds,
-        skipLengthCheck: false,
       });
 
       return isReservable && !isBefore(startDate, startTime) ? n.label : null;

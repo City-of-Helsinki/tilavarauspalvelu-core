@@ -421,7 +421,6 @@ export function getPossibleTimesForDay(
         reservationUnit,
         reservableTimes,
         activeApplicationRounds,
-        skipLengthCheck: false,
       });
       return isReservable;
     })
