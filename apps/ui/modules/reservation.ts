@@ -381,7 +381,7 @@ export const canReservationTimeBeChanged = ({
   reservationUnit,
   activeApplicationRounds = [],
 }: CanReservationBeChangedProps): [boolean, string?] => {
-  if (reservation == null || reservationUnit == null) {
+  if (reservation == null) {
     return [false];
   }
   // existing reservation state is not CONFIRMED
