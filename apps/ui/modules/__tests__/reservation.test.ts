@@ -629,144 +629,71 @@ describe("canReservationBeChanged", () => {
     ...reservation,
     reservationUnit: [reservation.reservationUnit[0]],
   };
-  /*
-  test("returns false with non-confirmed reservation", () => {
-    expect(
-      canReservationTimeBeChanged({
-        reservation: {
-          ...reservation,
-          state: ReservationStateChoice.Created,
-        },
-        reservationUnit,
-      })
-    ).toBe(false);
-  });
-
-  test("handles past reservation check", () => {
-    expect(
-      canReservationTimeBeChanged({
-        reservation: {
-          ...reservation,
-          begin: addHours(new Date(), -1).toISOString(),
-        },
-        reservationUnit,
-      })
-    ).toBe(false);
-  });
-
-  test("handles cancellation rule check", () => {
-    const reservationUnit1: ReservationUnitNode = {
-      ...reservationUnit,
-      cancellationRule: null,
-    };
-    expect(
-      canReservationTimeBeChanged({
-        reservation: {
-          ...reservation,
-          reservationUnit: [reservationUnit1],
-        },
-        reservationUnit: reservationUnit1,
-      })
-    ).toStrictEqual(false);
-
-    const reservationUnit2: ReservationUnitNode = {
-      ...reservationUnit,
-      cancellationRule: {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        ...reservationUnit.cancellationRule!,
-        needsHandling: true,
-      },
-    };
-    expect(
-      canReservationTimeBeChanged({
-        reservation: {
-          ...reservation,
-          reservationUnit: [reservationUnit2],
-        },
-        reservationUnit: reservationUnit2,
-      })
-    ).toStrictEqual(false);
-  })
-  test("handles cancellation rule buffer check", () => {
-    const reservationUnit1: ReservationUnitNode = {
-      ...reservationUnit,
-      cancellationRule: {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        ...reservationUnit.cancellationRule!,
-        canBeCancelledTimeBefore: 3000,
-      },
-    };
-    expect(
-      canReservationTimeBeChanged({
-        reservation: {
-          ...reservation,
-          begin: addHours(new Date(), 1).toISOString(),
-          reservationUnit: [reservationUnit1],
-        },
-        reservationUnit: reservationUnit1,
-      })
-    ).toBe(true);
-
-    const reservationUnit2: ReservationUnitNode = {
-      ...reservationUnit,
-      cancellationRule: {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        ...reservationUnit.cancellationRule!,
-        canBeCancelledTimeBefore: 3601,
-      },
-    };
-    expect(
-      canReservationTimeBeChanged({
-        reservation: {
-          ...reservation,
-          begin: addHours(new Date(), 1).toISOString(),
-          reservationUnit: [reservationUnit2],
-        },
-        reservationUnit: reservationUnit2,
-      })
-    ).toBe(false);
-  });
-  */
 
   function constructInput({
     begin,
+    oldBegin,
     price,
     reservableTimes: reservableTimes_,
     reservationsMinDaysBefore,
     reservationEnds,
+    state,
+    cancellationBuffer,
   }: {
     begin: Date;
+    oldBegin?: Date;
     price?: string;
     reservableTimes?: ReservableMap;
     reservationsMinDaysBefore?: number;
     reservationEnds?: Date;
+    state?: ReservationStateChoice;
+    cancellationBuffer?: number;
   }) {
+    const cancellationRule = {
+      ...reservationUnit.cancellationRule,
+      canBeCancelledTimeBefore: cancellationBuffer ?? 0,
+    } as ReservationUnitNode["cancellationRule"];
+    const reservationUnit_ = {
+      ...reservationUnit,
+      reservationsMinDaysBefore: reservationsMinDaysBefore ?? 0,
+      reservationEnds:
+        reservationEnds?.toISOString() ?? reservationUnit.reservationEnds,
+      cancellationRule,
+    } as ReservationUnitNode;
     return {
       reservableTimes: reservableTimes_ ?? reservableTimes,
-      reservation: reservation_,
+      reservation: {
+        ...reservation_,
+        begin: oldBegin?.toISOString() ?? reservation.begin,
+        end: addHours(oldBegin ?? reservation.begin, 1).toISOString(),
+        reservationUnit: [reservationUnit_],
+        state: state ?? ReservationStateChoice.Confirmed,
+      },
       newReservation: {
         ...reservation,
         begin: begin.toISOString(),
         end: addHours(begin, 1).toISOString(),
         price: price ?? "0",
       },
-      reservationUnit: {
-        ...reservationUnit,
-        reservationsMinDaysBefore: reservationsMinDaysBefore ?? 0,
-        reservationEnds:
-          reservationEnds?.toISOString() ?? reservationUnit.reservationEnds,
-      },
+      reservationUnit: reservationUnit_,
       activeApplicationRounds: [],
     };
   }
 
-  // TODO split this into different cases
   // TODO add mock timers (this flakes at certain times, probably because something is in UTC and something in local time)
   test("YES for a reservation tomorrow", () => {
     const input = constructInput({
       begin: addHours(new Date(), 24),
     });
     expect(canReservationTimeBeChanged(input)).toBe(true);
+  });
+
+  test("NO with non-confirmed reservation", () => {
+    const input = constructInput({
+      begin: addHours(new Date(), 24),
+      state: ReservationStateChoice.Created,
+    });
+    expect(canReservationTimeBeChanged(input)).toBe(false);
   });
 
   test("NO if the reservation would require payment", () => {
@@ -786,7 +713,7 @@ describe("canReservationBeChanged", () => {
   });
 
   // TODO what is incomplete data? what are we testing?
-  test("with incomplete data", () => {
+  test("NO with incomplete data", () => {
     const input = {
       reservation: reservation_,
       reservableTimes,
@@ -834,6 +761,43 @@ describe("canReservationBeChanged", () => {
     expect(canReservationTimeBeChanged(input)).toBe(false);
   });
 
+  test("NO without a cancellation rule", () => {
+    const reservationUnit1: ReservationUnitNode = {
+      ...reservationUnit,
+      cancellationRule: null,
+    };
+    const input = {
+      ...constructInput({
+        begin: addHours(new Date(), 24),
+        reservationEnds: addDays(new Date(), -1),
+      }),
+      reservation: {
+        ...reservation,
+        reservationUnit: [reservationUnit1],
+      },
+      reservationUnit: reservationUnit1,
+    };
+    expect(canReservationTimeBeChanged(input)).toBe(false);
+  });
+
+  test("YES if outside cancellation buffer", () => {
+    const input = constructInput({
+      begin: addHours(new Date(), 24),
+      oldBegin: addHours(new Date(), 2),
+      cancellationBuffer: 60 * 60,
+    });
+    expect(canReservationTimeBeChanged(input)).toBe(true);
+  });
+
+  test("NO if inside cancellation buffer", () => {
+    const input = constructInput({
+      begin: addHours(new Date(), 24),
+      oldBegin: addHours(new Date(), 2),
+      cancellationBuffer: 2 * 60 * 60 + 1,
+    });
+    expect(canReservationTimeBeChanged(input)).toBe(false);
+  });
+
   test("NO when the reservation is in the past", () => {
     const input = constructInput({
       begin: addHours(new Date(), -1),
@@ -841,7 +805,7 @@ describe("canReservationBeChanged", () => {
     expect(canReservationTimeBeChanged(input)).toBe(false);
   });
 
-  test("with conflicting application round", () => {
+  test("NO with conflicting application round", () => {
     const input = {
       ...constructInput({
         begin: addHours(new Date(), 24),

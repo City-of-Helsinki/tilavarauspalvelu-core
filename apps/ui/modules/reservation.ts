@@ -154,8 +154,7 @@ type CanUserCancelReservationProps = Pick<
   reservationUnit?: Maybe<Array<CancellationRuleFieldsFragment>> | undefined;
 };
 export function canUserCancelReservation(
-  reservation: CanUserCancelReservationProps,
-  skipTimeCheck = false
+  reservation: CanUserCancelReservationProps
 ): boolean {
   const reservationUnit = reservation.reservationUnit?.[0];
   if (!reservationUnit) return false;
@@ -165,7 +164,7 @@ export function canUserCancelReservation(
   if (reservationUnit.cancellationRule == null) return false;
   // TODO why isn't the user allowed to cancel if the reservation has been handled?
   if (reservationUnit.cancellationRule.needsHandling) return false;
-  if (!skipTimeCheck && isTooCloseToCancel(reservation)) {
+  if (isTooCloseToCancel(reservation)) {
     return false;
   }
 
@@ -306,11 +305,6 @@ export function isReservationEditable(
 
   // existing reservation is free
   if (!isReservationFreeOfCharge(reservation)) {
-    return false;
-  }
-
-  // existing reservation has valid cancellation rule that does not require handling
-  if (!canUserCancelReservation(reservation, true)) {
     return false;
   }
 
