@@ -603,6 +603,43 @@ describe("isRangeReservable", () => {
       });
       expect(isRangeReservable(input)).toBe(true);
     });
+
+    test("YES if buffers would collide with each other (new before)", () => {
+      const date = startOfDay(addDays(new Date(), 1));
+      const input = createInput({
+        start: addHours(date, 9),
+        end: addHours(date, 11),
+        bufferTimeAfter: 1,
+        bufferTimeBefore: 1,
+        reservationSet: [
+          createMockReservation({
+            start: addHours(date, 12),
+            end: addHours(date, 13),
+            bufferTimeAfter: 1,
+            bufferTimeBefore: 1,
+          }),
+        ],
+      });
+      expect(isRangeReservable(input)).toBe(true);
+    });
+    test("YES if buffers would collide with each other (new after)", () => {
+      const date = startOfDay(addDays(new Date(), 1));
+      const input = createInput({
+        start: addHours(date, 14),
+        end: addHours(date, 15),
+        bufferTimeAfter: 1,
+        bufferTimeBefore: 1,
+        reservationSet: [
+          createMockReservation({
+            start: addHours(date, 12),
+            end: addHours(date, 13),
+            bufferTimeAfter: 1,
+            bufferTimeBefore: 1,
+          }),
+        ],
+      });
+      expect(isRangeReservable(input)).toBe(true);
+    });
   });
 
   // TODO these have complex rules: states of the application rounds, times

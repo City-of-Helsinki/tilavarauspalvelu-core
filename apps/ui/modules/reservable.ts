@@ -375,8 +375,8 @@ function isRangeReservable_({
   return range.every((slot) => isSlotReservable(slot));
 }
 
-// TODO this is a bad name
-// it does handle buffer check but also checks against all reservations
+/// check if a reservation or it's buffer would collide with a new reservation
+/// buffer overlap is allowed but neither buffer can overlap with another reservation
 function hasCollisions(
   reservation: BufferCollideCheckReservation,
   newReservation: {
@@ -402,6 +402,22 @@ function hasCollisions(
     };
   }
 
+  const unbuf = {
+    start: new Date(reservation.begin),
+    end: new Date(reservation.end),
+  };
+  if (areIntervalsOverlapping(unbuf, newReservation)) {
+    return true;
+  }
+  const bufferedNewReservation = getBufferedEventTimes(
+    newReservation.start,
+    newReservation.end,
+    newReservation.bufferTimeBefore,
+    newReservation.bufferTimeAfter
+  );
+  if (areIntervalsOverlapping(unbuf, bufferedNewReservation)) {
+    return true;
+  }
   const bufferedReservation = getBufferedEventTimes(
     new Date(reservation.begin),
     new Date(reservation.end),
@@ -409,13 +425,7 @@ function hasCollisions(
     reservation.bufferTimeAfter,
     reservation.isBlocked
   );
-  const bufferedNewReservation = getBufferedEventTimes(
-    newReservation.start,
-    newReservation.end,
-    newReservation.bufferTimeBefore,
-    newReservation.bufferTimeAfter
-  );
-  return areIntervalsOverlapping(bufferedReservation, bufferedNewReservation);
+  return areIntervalsOverlapping(bufferedReservation, newReservation);
 }
 
 function generateSlots(
