@@ -26,13 +26,14 @@ import {
   ReservationStateChoice,
   type IsReservableFieldsFragment,
 } from "@gql/gql-types";
-import { capitalize, getDayIntervals, getTranslation } from "./util";
+import { capitalize, getTranslation } from "./util";
 import {
   type ReservableMap,
   type RoundPeriod,
   isSlotWithinReservationTime,
   dateToKey,
   isRangeReservable,
+  getDayIntervals,
 } from "@/modules/reservable";
 import { type PricingFieldsFragment } from "common/gql/gql-types";
 import { gql } from "@apollo/client";

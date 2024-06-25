@@ -15,7 +15,6 @@ import type {
   AgeGroupNode,
   ImageFragment,
   LocationFieldsI18nFragment,
-  ReservationStartInterval,
 } from "@gql/gql-types";
 import {
   searchPrefix,
@@ -24,10 +23,7 @@ import {
   reservationsPrefix,
   isBrowser,
 } from "./const";
-import {
-  type LocalizationLanguages,
-  getIntervalMinutes,
-} from "common/src/helpers";
+import { type LocalizationLanguages } from "common/src/helpers";
 
 export { formatDuration } from "common/src/common/util";
 export { fromAPIDate, fromUIDate };
@@ -329,32 +325,4 @@ export function formatDateTime(t: TFunction, date: Date): string {
     date,
   });
   return `${dateStr} ${timeStr}`;
-}
-
-export function getDayIntervals(
-  startTime: { h: number; m: number },
-  endTime: { h: number; m: number },
-  interval: ReservationStartInterval
-): { h: number; m: number }[] {
-  // normalize end time to allow comparison
-  const nEnd = endTime.h === 0 && endTime.m === 0 ? { h: 23, m: 59 } : endTime;
-  const intervalSeconds = getIntervalMinutes(interval) * 60;
-
-  const start = startTime;
-  const end = nEnd;
-
-  const startSeconds = start.h * 3600 + start.m * 60;
-  const endSeconds = end.h * 3600 + end.m * 60;
-  if (endSeconds <= startSeconds) {
-    return [];
-  }
-
-  const intervals: Array<{ h: number; m: number }> = [];
-  // TODO test the edge case of 23:59 (it should not be returned) neither should 00:00
-  for (let i = startSeconds; i <= endSeconds; i += intervalSeconds) {
-    const m = i % 3600;
-    const h = (i - m) / 3600;
-    intervals.push({ h, m: m / 60 });
-  }
-  return intervals;
 }

@@ -14,10 +14,6 @@ jest.mock("next-i18next", () => ({
   },
 }));
 
-describe("getDayIntervals", () => {
-  test.todo("getDayIntervals");
-});
-
 test("getComboboxValues", () => {
   const optionsAbc = [
     { label: "a", value: "a" },

@@ -11,6 +11,7 @@ import {
   type RoundPeriod,
   generateReservableMap,
   isRangeReservable,
+  getDayIntervals,
 } from "../reservable";
 import {
   type IsReservableFieldsFragment,
@@ -674,5 +675,113 @@ describe("isRangeReservable", () => {
       ],
     });
     expect(isRangeReservable(input)).toBe(true);
+  });
+});
+
+describe("getDayIntervals", () => {
+  test("getDayIntervals from 9 to 17 with 30 min interval", () => {
+    const input = {
+      startTime: { h: 9, m: 0 },
+      endTime: { h: 17, m: 0 },
+      interval: ReservationStartInterval.Interval_30Mins,
+    };
+    const output: { h: number; m: number }[] = [];
+    for (let i = 9; i < 17; i++) {
+      output.push({ h: i, m: 0 });
+      output.push({ h: i, m: 30 });
+    }
+    const res = getDayIntervals(input.startTime, input.endTime, input.interval);
+    expect(res).toEqual(output);
+  });
+  test("getDayIntervals from 9 to 17 with 15 min interval", () => {
+    const input = {
+      startTime: { h: 9, m: 0 },
+      endTime: { h: 17, m: 0 },
+      interval: ReservationStartInterval.Interval_15Mins,
+    };
+    const output: { h: number; m: number }[] = [];
+    for (let i = 9; i < 17; i++) {
+      output.push({ h: i, m: 0 });
+      output.push({ h: i, m: 15 });
+      output.push({ h: i, m: 30 });
+      output.push({ h: i, m: 45 });
+    }
+    const res = getDayIntervals(input.startTime, input.endTime, input.interval);
+    expect(res).toEqual(output);
+  });
+  test("getDayIntervals from 9 to 17 with 60 min interval", () => {
+    const input = {
+      startTime: { h: 9, m: 0 },
+      endTime: { h: 17, m: 0 },
+      interval: ReservationStartInterval.Interval_60Mins,
+    };
+    const output: { h: number; m: number }[] = [];
+    for (let i = 9; i < 17; i++) {
+      output.push({ h: i, m: 0 });
+    }
+    const res = getDayIntervals(input.startTime, input.endTime, input.interval);
+    expect(res).toEqual(output);
+  });
+  test("getDayIntervals from 0 to 24 with 30 min interval", () => {
+    const input = {
+      startTime: { h: 0, m: 0 },
+      endTime: { h: 24, m: 0 },
+      interval: ReservationStartInterval.Interval_30Mins,
+    };
+    const output: { h: number; m: number }[] = [];
+    for (let i = 0; i < 24; i++) {
+      output.push({ h: i, m: 0 });
+      output.push({ h: i, m: 30 });
+    }
+    const res = getDayIntervals(input.startTime, input.endTime, input.interval);
+    expect(res).toEqual(output);
+  });
+  test("getDayIntervals with invalid range", () => {
+    const input = {
+      startTime: { h: 17, m: 0 },
+      endTime: { h: 9, m: 0 },
+      interval: ReservationStartInterval.Interval_30Mins,
+    };
+    const res = getDayIntervals(input.startTime, input.endTime, input.interval);
+    expect(res).toEqual([]);
+  });
+  test("getDayIntervals with 0 size range", () => {
+    const input = {
+      startTime: { h: 17, m: 0 },
+      endTime: { h: 17, m: 0 },
+      interval: ReservationStartInterval.Interval_30Mins,
+    };
+    const res = getDayIntervals(input.startTime, input.endTime, input.interval);
+    expect(res).toEqual([]);
+  });
+  test("getDayIntervals with uneven times", () => {
+    const input = {
+      startTime: { h: 9, m: 20 },
+      endTime: { h: 17, m: 20 },
+      interval: ReservationStartInterval.Interval_30Mins,
+    };
+    const output: { h: number; m: number }[] = [];
+    for (let i = 9; i < 17; i++) {
+      output.push({ h: i, m: 20 });
+      output.push({ h: i, m: 50 });
+    }
+    const res = getDayIntervals(input.startTime, input.endTime, input.interval);
+    expect(res).toEqual(output);
+  });
+  test("getDayIntervals with uneven times", () => {
+    const input = {
+      startTime: { h: 9, m: 20 },
+      endTime: { h: 17, m: 0 },
+      interval: ReservationStartInterval.Interval_30Mins,
+    };
+    const output: { h: number; m: number }[] = [];
+    for (let i = 9; i < 17; i++) {
+      output.push({ h: i, m: 20 });
+      if (i < 16) {
+        output.push({ h: i, m: 50 });
+      }
+    }
+    const res = getDayIntervals(input.startTime, input.endTime, input.interval);
+    expect(res).toEqual(output);
   });
 });

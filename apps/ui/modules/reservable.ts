@@ -36,7 +36,6 @@ import {
   addMilliseconds,
   differenceInMinutes,
 } from "date-fns";
-import { getDayIntervals } from "./util";
 import { type SlotProps } from "common/src/calendar/Calendar";
 import { type ReservationUnitNode } from "common/gql/gql-types";
 
@@ -655,4 +654,32 @@ export function clampDuration(
     Math.max(duration, initialDuration),
     maxReservationDurationMinutes
   );
+}
+
+/// Generate a list of intervals for a day
+export function getDayIntervals(
+  startTime: { h: number; m: number },
+  endTime: { h: number; m: number },
+  interval: ReservationStartInterval
+): { h: number; m: number }[] {
+  // normalize end time to allow comparison
+  const nEnd = endTime.h === 0 && endTime.m === 0 ? { h: 23, m: 59 } : endTime;
+  const iMins = getIntervalMinutes(interval);
+
+  const start = startTime;
+  const end = nEnd;
+
+  const startMins = start.h * 60 + start.m;
+  const endMins = end.h * 60 + end.m;
+
+  const intervals: Array<{ h: number; m: number }> = [];
+  for (let i = startMins; i < endMins; i += iMins) {
+    if (i + iMins > endMins) {
+      break;
+    }
+    const m = i % 60;
+    const h = (i - m) / 60;
+    intervals.push({ h, m });
+  }
+  return intervals;
 }
