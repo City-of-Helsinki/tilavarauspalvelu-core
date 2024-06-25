@@ -32,6 +32,99 @@ import mockTranslations from "../../public/locales/fi/prices.json";
 import { toApiDate } from "common/src/common/util";
 import { type TFunction } from "i18next";
 
+function createMockReservationUnit({
+  reservationsMinDaysBefore,
+  reservationEnds,
+  canBeCancelledTimeBefore,
+  needsHandling,
+}: {
+  reservationsMinDaysBefore?: number;
+  reservationEnds?: Date;
+  canBeCancelledTimeBefore?: number;
+  needsHandling?: boolean;
+}): ReservationUnitNode {
+  const cancellationRule = {
+    canBeCancelledTimeBefore: canBeCancelledTimeBefore ?? 0,
+    id: "fr8ejifod",
+    name: "Cancellation rule",
+    needsHandling: needsHandling ?? false,
+  };
+  return {
+    authentication: Authentication.Weak,
+    bufferTimeBefore: 0,
+    bufferTimeAfter: 0,
+    canApplyFreeOfCharge: false,
+    contactInformation: "",
+    description: "",
+    name: "Reservation unit",
+    id: "123f4w90",
+    uuid: "123f4w90",
+    images: [],
+    isArchived: false,
+    isDraft: false,
+    requireIntroduction: false,
+    reservationKind: ReservationKind.Direct,
+    reservationStartInterval: ReservationStartInterval.Interval_15Mins,
+    reservationBegins: addDays(new Date(), -1).toISOString(),
+    reservationsMinDaysBefore: reservationsMinDaysBefore ?? 0,
+    reservationEnds: reservationEnds?.toISOString() ?? undefined,
+    reservableTimeSpans: Array.from(Array(100)).map((_val, index) => {
+      return {
+        startDatetime: `${toApiDate(addDays(new Date(), index))}T07:00:00+00:00`,
+        endDatetime: `${toApiDate(addDays(new Date(), index))}T20:00:00+00:00`,
+      };
+    }),
+    reservationConfirmedInstructions: "",
+    reservationPendingInstructions: "",
+    reservationCancelledInstructions: "",
+    applicationRounds: [],
+    purposes: [],
+    applicationRoundTimeSlots: [],
+    paymentTypes: [],
+    pricings: [],
+    qualifiers: [],
+    equipments: [],
+    resources: [],
+    services: [],
+    spaces: [],
+    cancellationRule,
+    reservationSet: [],
+    allowReservationsWithoutOpeningHours: false,
+    requireReservationHandling: false,
+    reservationBlockWholeDay: false,
+  };
+}
+
+function createMockReservation({
+  begin,
+  price,
+  state,
+  reservationUnit,
+  isHandled,
+}: {
+  begin?: Date;
+  price?: string;
+  state?: ReservationStateChoice;
+  reservationUnit?: ReservationUnitNode;
+  isHandled?: boolean;
+}) {
+  const start = begin ?? addHours(startOfToday(), 34);
+  const end = addHours(start, 1);
+  return {
+    id: "123f4w90",
+    state: state ?? ReservationStateChoice.Confirmed,
+    price: price ?? "0",
+    bufferTimeBefore: 0,
+    bufferTimeAfter: 0,
+    paymentOrder: [],
+    begin: start.toISOString(),
+    end: end.toISOString(),
+    reservationUnit: [reservationUnit ?? createMockReservationUnit({})],
+    handlingDetails: "",
+    isHandled,
+  };
+}
+
 jest.mock("next-i18next", () => ({
   i18n: {
     t: (str: string) => {
@@ -43,6 +136,7 @@ jest.mock("next-i18next", () => ({
 }));
 
 const mockT = ((x: string) => x) as TFunction;
+
 describe("getDurationOptions", () => {
   test("empty inputs", () => {
     const interval90 = ReservationStartInterval.Interval_90Mins;
@@ -149,67 +243,6 @@ describe("getDurationOptions", () => {
   });
 });
 
-const reservationUnit: ReservationUnitNode = {
-  authentication: Authentication.Weak,
-  bufferTimeBefore: 0,
-  bufferTimeAfter: 0,
-  canApplyFreeOfCharge: false,
-  contactInformation: "",
-  description: "",
-  name: "Reservation unit",
-  id: "123f4w90",
-  uuid: "123f4w90",
-  images: [],
-  isArchived: false,
-  isDraft: false,
-  requireIntroduction: false,
-  reservationKind: ReservationKind.Direct,
-  reservationStartInterval: ReservationStartInterval.Interval_15Mins,
-  reservationBegins: addDays(new Date(), -1).toISOString(),
-  reservationEnds: undefined, // addDays(new Date(), 200).toISOString(),
-  reservableTimeSpans: Array.from(Array(100)).map((_val, index) => {
-    return {
-      startDatetime: `${toApiDate(addDays(new Date(), index))}T07:00:00+00:00`,
-      endDatetime: `${toApiDate(addDays(new Date(), index))}T20:00:00+00:00`,
-    };
-  }),
-  reservationConfirmedInstructions: "",
-  reservationPendingInstructions: "",
-  reservationCancelledInstructions: "",
-  applicationRounds: [],
-  purposes: [],
-  applicationRoundTimeSlots: [],
-  paymentTypes: [],
-  pricings: [],
-  qualifiers: [],
-  equipments: [],
-  resources: [],
-  services: [],
-  spaces: [],
-  cancellationRule: {
-    id: "fr8ejifod",
-    name: "Cancellation rule",
-    needsHandling: false,
-  },
-  reservationSet: [],
-  allowReservationsWithoutOpeningHours: false,
-  requireReservationHandling: false,
-  reservationBlockWholeDay: false,
-};
-
-const reservation = {
-  id: "123f4w90",
-  state: ReservationStateChoice.Confirmed,
-  price: "0",
-  bufferTimeBefore: 0,
-  bufferTimeAfter: 0,
-  paymentOrder: [],
-  begin: addHours(startOfToday(), 34).toISOString(),
-  end: addHours(startOfToday(), 35).toISOString(),
-  reservationUnit: [reservationUnit],
-  handlingDetails: "",
-} as const;
-
 describe("canUserCancelReservation", () => {
   beforeAll(() => {
     jest.useFakeTimers({
@@ -232,21 +265,14 @@ describe("canUserCancelReservation", () => {
     canBeCancelledTimeBefore?: number; // in seconds
   }) {
     return {
-      ...reservation,
-      begin: begin.toISOString(),
-      end: addHours(begin, 1).toISOString(),
-      state: state ?? ReservationStateChoice.Confirmed,
-      reservationUnit: [
-        {
-          ...reservationUnit,
-          cancellationRule: {
-            id: "fr8ejifod",
-            name: "",
-            needsHandling: needsHandling ?? false,
-            canBeCancelledTimeBefore: canBeCancelledTimeBefore ?? 0,
-          },
-        },
-      ],
+      ...createMockReservation({
+        begin,
+        state: state ?? ReservationStateChoice.Confirmed,
+        reservationUnit: createMockReservationUnit({
+          needsHandling: needsHandling ?? false,
+          canBeCancelledTimeBefore: canBeCancelledTimeBefore ?? 0,
+        }),
+      }),
     };
   }
 
@@ -395,20 +421,13 @@ describe("getWhyReservationCantBeCancelled", () => {
     canBeCancelledTimeBefore?: number; // in seconds
   }) {
     return {
-      ...reservation,
-      begin: begin.toISOString(),
-      end: addHours(begin, 1).toISOString(),
-      reservationUnit: [
-        {
-          ...reservationUnit,
-          cancellationRule: {
-            id: "fr8ejifod",
-            name: "",
-            canBeCancelledTimeBefore: canBeCancelledTimeBefore ?? 0,
-            needsHandling: needsHandling ?? false,
-          },
-        },
-      ],
+      ...createMockReservation({
+        begin,
+        reservationUnit: createMockReservationUnit({
+          needsHandling,
+          canBeCancelledTimeBefore,
+        }),
+      }),
     };
   }
 
@@ -426,7 +445,7 @@ describe("getWhyReservationCantBeCancelled", () => {
 
   test("with no cancellation rule", () => {
     const resUnit = {
-      ...reservationUnit,
+      ...createMockReservationUnit({}),
       cancellationRule: null,
     };
     const input = {
@@ -567,14 +586,11 @@ describe("isReservationEditable", () => {
     isHandled?: boolean;
   }) {
     return {
-      reservation: {
-        ...reservation,
+      reservation: createMockReservation({
         state,
-        begin: begin.toISOString(),
-        end: addHours(begin, 1).toISOString(),
-        reservationUnit: [reservation.reservationUnit[0]],
+        begin,
         isHandled: isHandled ?? false,
-      },
+      }),
     };
   }
 
@@ -613,28 +629,34 @@ describe("isReservationEditable", () => {
 });
 
 describe("canReservationBeChanged", () => {
-  const WEEK_OF_TIMES = [0, 1, 2, 3, 4, 5, 6]
-    .map((i) => ({
-      start: addDays(addHours(startOfToday(), 5), i),
-      end: addDays(addHours(startOfToday(), 21), i),
-    }))
-    .map(({ start, end }) => ({
-      startDatetime: start.toISOString(),
-      endDatetime: end.toISOString(),
-    }));
+  beforeAll(() => {
+    jest.useFakeTimers({
+      now: new Date(2024, 0, 1, 9, 0, 0),
+    });
+  });
+  afterAll(() => {
+    jest.useRealTimers();
+  });
 
-  const reservableTimes: ReservableMap = generateReservableMap(WEEK_OF_TIMES);
-
-  const reservation_ = {
-    ...reservation,
-    reservationUnit: [reservation.reservationUnit[0]],
-  };
+  let mockReservableTimes: ReservableMap;
+  beforeEach(() => {
+    const WEEK_OF_TIMES = [0, 1, 2, 3, 4, 5, 6]
+      .map((i) => ({
+        start: addDays(addHours(startOfToday(), 5), i),
+        end: addDays(addHours(startOfToday(), 21), i),
+      }))
+      .map(({ start, end }) => ({
+        startDatetime: start.toISOString(),
+        endDatetime: end.toISOString(),
+      }));
+    mockReservableTimes = generateReservableMap(WEEK_OF_TIMES);
+  });
 
   function constructInput({
     begin,
     oldBegin,
     price,
-    reservableTimes: reservableTimes_,
+    reservableTimes,
     reservationsMinDaysBefore,
     reservationEnds,
     state,
@@ -649,38 +671,31 @@ describe("canReservationBeChanged", () => {
     state?: ReservationStateChoice;
     cancellationBuffer?: number;
   }) {
-    const cancellationRule = {
-      ...reservationUnit.cancellationRule,
+    const baseUnit = createMockReservationUnit({
       canBeCancelledTimeBefore: cancellationBuffer ?? 0,
-    } as ReservationUnitNode["cancellationRule"];
-    const reservationUnit_ = {
-      ...reservationUnit,
       reservationsMinDaysBefore: reservationsMinDaysBefore ?? 0,
-      reservationEnds:
-        reservationEnds?.toISOString() ?? reservationUnit.reservationEnds,
-      cancellationRule,
-    } as ReservationUnitNode;
+      reservationEnds,
+    });
+    const baseReservation = createMockReservation({
+      reservationUnit: baseUnit,
+      begin: oldBegin,
+      state: state ?? ReservationStateChoice.Confirmed,
+    });
     return {
-      reservableTimes: reservableTimes_ ?? reservableTimes,
-      reservation: {
-        ...reservation_,
-        begin: oldBegin?.toISOString() ?? reservation.begin,
-        end: addHours(oldBegin ?? reservation.begin, 1).toISOString(),
-        reservationUnit: [reservationUnit_],
-        state: state ?? ReservationStateChoice.Confirmed,
-      },
+      reservableTimes: reservableTimes ?? mockReservableTimes,
+      reservation: baseReservation,
       newReservation: {
-        ...reservation,
         begin: begin.toISOString(),
         end: addHours(begin, 1).toISOString(),
         price: price ?? "0",
+        bufferTimeBefore: baseReservation.bufferTimeBefore,
+        bufferTimeAfter: baseReservation.bufferTimeAfter,
       },
-      reservationUnit: reservationUnit_,
+      reservationUnit: baseUnit,
       activeApplicationRounds: [],
     };
   }
 
-  // TODO add mock timers (this flakes at certain times, probably because something is in UTC and something in local time)
   test("YES for a reservation tomorrow", () => {
     const input = constructInput({
       begin: addHours(new Date(), 24),
@@ -709,21 +724,6 @@ describe("canReservationBeChanged", () => {
       begin: addHours(new Date(), 24),
       reservableTimes: new Map(),
     });
-    expect(canReservationTimeBeChanged(input)).toBe(false);
-  });
-
-  // TODO what is incomplete data? what are we testing?
-  test("NO with incomplete data", () => {
-    const input = {
-      reservation: reservation_,
-      reservableTimes,
-      newReservation: {
-        ...reservation,
-        begin: addHours(startOfToday(), 12).toISOString(),
-      },
-      reservationUnit,
-      activeApplicationRounds: [],
-    };
     expect(canReservationTimeBeChanged(input)).toBe(false);
   });
 
@@ -762,8 +762,9 @@ describe("canReservationBeChanged", () => {
   });
 
   test("NO without a cancellation rule", () => {
+    const baseUnit = createMockReservationUnit({});
     const reservationUnit1: ReservationUnitNode = {
-      ...reservationUnit,
+      ...baseUnit,
       cancellationRule: null,
     };
     const input = {
@@ -771,10 +772,9 @@ describe("canReservationBeChanged", () => {
         begin: addHours(new Date(), 24),
         reservationEnds: addDays(new Date(), -1),
       }),
-      reservation: {
-        ...reservation,
-        reservationUnit: [reservationUnit1],
-      },
+      reservation: createMockReservation({
+        reservationUnit: reservationUnit1,
+      }),
       reservationUnit: reservationUnit1,
     };
     expect(canReservationTimeBeChanged(input)).toBe(false);
@@ -828,21 +828,31 @@ describe("getCheckoutUrl", () => {
     paymentType: PaymentType.Online,
   };
 
-  test("returns checkout url", () => {
+  test("returns checkout url with lang sv", () => {
     expect(getCheckoutUrl(order, "sv")).toBe(
       "https://checkout.url/path/paymentmethod?user=1111-2222-3333-4444&lang=sv"
     );
+  });
 
+  test("returns checkout url with lang fi", () => {
     expect(getCheckoutUrl(order, "fi")).toBe(
       "https://checkout.url/path/paymentmethod?user=1111-2222-3333-4444&lang=fi"
     );
   });
 
-  test("returns undefined with falsy input", () => {
+  test("returns checkout url with lang en", () => {
+    expect(getCheckoutUrl(order, "en")).toBe(
+      "https://checkout.url/path/paymentmethod?user=1111-2222-3333-4444&lang=en"
+    );
+  });
+
+  test("returns undefined if checkoutUrl is not defined", () => {
     expect(
       getCheckoutUrl({ ...order, checkoutUrl: undefined })
     ).not.toBeDefined();
+  });
 
+  test("returns undefined if checkoutUrl is not an url", () => {
     // we are expecting console.errors => suppress
     jest.spyOn(console, "error").mockImplementation(jest.fn());
     expect(
@@ -873,21 +883,19 @@ describe("isReservationStartInFuture", () => {
 
   // Why? the name of the function doesn't make sense here
   test("YES if start < buffer days", () => {
-    expect(
-      isReservationStartInFuture({
-        reservationBegins: addDays(new Date(), 10).toISOString(),
-        reservationsMaxDaysBefore: 9,
-      })
-    ).toBe(true);
+    const input = {
+      reservationBegins: addDays(new Date(), 10).toISOString(),
+      reservationsMaxDaysBefore: 9,
+    };
+    expect(isReservationStartInFuture(input)).toBe(true);
   });
 
   test("NO if start === buffer days", () => {
-    expect(
-      isReservationStartInFuture({
-        reservationBegins: addDays(new Date(), 10).toISOString(),
-        reservationsMaxDaysBefore: 10,
-      })
-    ).toBe(false);
+    const input = {
+      reservationBegins: addDays(new Date(), 10).toISOString(),
+      reservationsMaxDaysBefore: 10,
+    };
+    expect(isReservationStartInFuture(input)).toBe(false);
   });
 });
 
