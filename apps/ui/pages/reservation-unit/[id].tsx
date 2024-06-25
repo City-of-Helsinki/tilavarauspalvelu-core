@@ -567,23 +567,6 @@ function ReservationUnit({
     activeApplicationRounds,
   ]);
 
-  const startingTimeOptions = useMemo(() => {
-    return getPossibleTimesForDay({
-      reservableTimes,
-      interval: reservationUnit?.reservationStartInterval,
-      date: focusDate,
-      reservationUnit,
-      activeApplicationRounds,
-      durationValue,
-    });
-  }, [
-    reservableTimes,
-    reservationUnit,
-    activeApplicationRounds,
-    focusDate,
-    durationValue,
-  ]);
-
   const { currentUser } = useCurrentUser();
 
   // TODO add pagination
@@ -1034,14 +1017,6 @@ function ReservationUnit({
     }
   }, [focusSlot, router]);
 
-  const nextAvailableTime = getNextAvailableTime({
-    start: focusDate,
-    reservableTimes,
-    duration: durationValue,
-    reservationUnit,
-    activeApplicationRounds,
-  });
-
   const LoginAndSubmit = useMemo(
     () => (
       <SubmitFragment
@@ -1059,6 +1034,22 @@ function ReservationUnit({
   if (reservationUnit == null) {
     return <CenterSpinner />;
   }
+  const startingTimeOptions = getPossibleTimesForDay({
+    reservableTimes,
+    interval: reservationUnit?.reservationStartInterval,
+    date: focusDate,
+    reservationUnit,
+    activeApplicationRounds,
+    durationValue,
+  });
+  const nextAvailableTime = getNextAvailableTime({
+    start: focusDate,
+    reservableTimes,
+    duration: durationValue,
+    reservationUnit,
+    activeApplicationRounds,
+  });
+
   const reservationControlProps = {
     reservationUnit,
     reservationForm,
