@@ -78,23 +78,6 @@ describe("getLastPossibleReservationDate", () => {
   });
 });
 
-const reservationUnit: ReservationUnitPageQuery["reservationUnit"] = {
-  id: "123",
-  pk: 123,
-  isDraft: false,
-  reservationKind: ReservationKind.Direct,
-  bufferTimeBefore: 0,
-  bufferTimeAfter: 0,
-  requireReservationHandling: false,
-  canApplyFreeOfCharge: false,
-  reservationStartInterval: ReservationStartInterval.Interval_30Mins,
-  uuid: "123",
-  images: [],
-  applicationRoundTimeSlots: [],
-  equipments: [],
-  pricings: [],
-};
-
 function constructDate(d: Date, hours: number, minutes: number) {
   return set(d, { hours, minutes, seconds: 0, milliseconds: 0 });
 }
@@ -117,6 +100,7 @@ describe("getNextAvailableTime", () => {
   afterAll(() => {
     jest.useRealTimers();
   });
+
   let reservableTimes: ReservableMap;
   beforeEach(() => {
     const today = new Date();
@@ -135,17 +119,54 @@ describe("getNextAvailableTime", () => {
     ]);
   });
 
-  test("finds the next available time for today", () => {
-    const today = new Date();
-    const input = {
-      start: new Date(),
-      duration: 60,
+  function createInput({
+    start,
+    duration,
+    reservationsMinDaysBefore,
+    reservationsMaxDaysBefore,
+  }: {
+    start: Date;
+    duration: number;
+    reservationsMinDaysBefore?: number;
+    reservationsMaxDaysBefore?: number;
+  }) {
+    const reservationUnit: NonNullable<
+      ReservationUnitPageQuery["reservationUnit"]
+    > = {
+      id: "123",
+      pk: 123,
+      isDraft: false,
+      reservationKind: ReservationKind.Direct,
+      bufferTimeBefore: 0,
+      bufferTimeAfter: 0,
+      requireReservationHandling: false,
+      canApplyFreeOfCharge: false,
+      reservationStartInterval: ReservationStartInterval.Interval_30Mins,
+      uuid: "123",
+      images: [],
+      applicationRoundTimeSlots: [],
+      equipments: [],
+      pricings: [],
+    };
+    return {
+      start,
+      duration,
       reservationUnit: {
         ...reservationUnit,
+        reservationsMinDaysBefore,
+        reservationsMaxDaysBefore,
       },
       reservableTimes,
-      activeApplicationRounds: [],
+      activeApplicationRounds: [] as const,
     };
+  }
+
+  test("finds the next available time for today", () => {
+    const today = new Date();
+    const input = createInput({
+      start: today,
+      duration: 60,
+    });
     const val = getNextAvailableTime(input);
     expect(val).toBeInstanceOf(Date);
     expect(val!.getDate()).toBe(today.getDate());
@@ -155,15 +176,10 @@ describe("getNextAvailableTime", () => {
   // there is earlier times available but they are too short
   test("finds the first long enough time today", () => {
     const today = new Date();
-    const input = {
-      start: new Date(),
+    const input = createInput({
+      start: today,
       duration: 90,
-      reservationUnit: {
-        ...reservationUnit,
-      },
-      reservableTimes,
-      activeApplicationRounds: [],
-    };
+    });
     const val = getNextAvailableTime(input);
     expect(val).toBeInstanceOf(Date);
     expect(val!.getHours()).toBe(13);
@@ -172,31 +188,23 @@ describe("getNextAvailableTime", () => {
 
   // today is reservable, has available times but they are too short
   test("looking for tomorrow finds the correct length time", () => {
-    const input = {
-      start: addDays(new Date(), 1),
+    const start = addDays(new Date(), 1);
+    const input = createInput({
+      start,
       duration: 90,
-      reservationUnit: {
-        ...reservationUnit,
-      },
-      reservableTimes,
-      activeApplicationRounds: [],
-    };
+    });
     const val = getNextAvailableTime(input);
     expect(val).toBeInstanceOf(Date);
     expect(val!.getHours()).toBe(10);
-    expect(val!.getDate()).toBe(addDays(new Date(), 1).getDate());
+    expect(val!.getDate()).toBe(start.getDate());
   });
 
   test("finds the next available time tomorrow when today has too short times", () => {
-    const input = {
-      start: new Date(),
+    const start = new Date();
+    const input = createInput({
+      start,
       duration: 300,
-      reservationUnit: {
-        ...reservationUnit,
-      },
-      reservableTimes,
-      activeApplicationRounds: [],
-    };
+    });
     const val = getNextAvailableTime(input);
     expect(val).toBeInstanceOf(Date);
     expect(val!.getHours()).toBe(10);
@@ -215,15 +223,10 @@ describe("getNextAvailableTime", () => {
         shortTimes
       );
     }
-    const input = {
-      start: new Date(),
+    const input = createInput({
+      start: today,
       duration: 160,
-      reservationUnit: {
-        ...reservationUnit,
-      },
-      reservableTimes,
-      activeApplicationRounds: [],
-    };
+    });
     const val = getNextAvailableTime(input);
     expect(val).toBeNull();
   });
@@ -233,24 +236,20 @@ describe("getNextAvailableTime", () => {
     for (let i = 0; i < 7; i++) {
       reservableTimes.set(format(addDays(today, i), "yyyy-MM-dd"), []);
     }
-    reservableTimes.set(format(addDays(today, 7), "yyyy-MM-dd"), [
+    const date = addDays(today, 7);
+    reservableTimes.set(format(date, "yyyy-MM-dd"), [
       {
-        start: constructDate(addDays(today, 7), 10, 0),
-        end: constructDate(addDays(today, 7), 15, 0),
+        start: constructDate(date, 10, 0),
+        end: constructDate(date, 15, 0),
       },
     ]);
-    const input = {
-      start: new Date(),
+    const input = createInput({
+      start: today,
       duration: 30,
-      reservationUnit: {
-        ...reservationUnit,
-      },
-      reservableTimes,
-      activeApplicationRounds: [],
-    };
+    });
     const val = getNextAvailableTime(input);
     expect(val).toBeInstanceOf(Date);
-    expect(val!.getDate()).toBe(addDays(today, 7).getDate());
+    expect(val!.getDate()).toBe(date.getDate());
     expect(val!.getHours()).toBe(10);
   });
 
@@ -265,16 +264,11 @@ describe("getNextAvailableTime", () => {
           },
         ]);
       }
-      const input = {
-        start: new Date(),
+      const input = createInput({
+        start: today,
         duration: 60,
-        reservationUnit: {
-          ...reservationUnit,
-          reservationsMinDaysBefore: 7,
-        },
-        reservableTimes,
-        activeApplicationRounds: [],
-      };
+        reservationsMinDaysBefore: 7,
+      });
       const val = getNextAvailableTime(input);
       expect(val).toBeInstanceOf(Date);
       expect(val!.getDate()).toBe(addDays(today, 7).getDate());
@@ -291,16 +285,11 @@ describe("getNextAvailableTime", () => {
           },
         ]);
       }
-      const input = {
-        start: new Date(),
+      const input = createInput({
+        start: today,
         duration: 60,
-        reservationUnit: {
-          ...reservationUnit,
-          reservationsMinDaysBefore: 7,
-        },
-        reservableTimes,
-        activeApplicationRounds: [],
-      };
+        reservationsMinDaysBefore: 7,
+      });
       const val = getNextAvailableTime(input);
       expect(val).toBeNull();
     });
@@ -310,16 +299,11 @@ describe("getNextAvailableTime", () => {
     test("NO times if times are only available after reservationsMaxDaysBefore", () => {
       const today = new Date();
       reservableTimes.set(format(today, "yyyy-MM-dd"), []);
-      const input = {
-        start: new Date(),
+      const input = createInput({
+        start: today,
         duration: 30,
-        reservationUnit: {
-          ...reservationUnit,
-          reservationsMaxDaysBefore: 1,
-        },
-        reservableTimes,
-        activeApplicationRounds: [],
-      };
+        reservationsMaxDaysBefore: 1,
+      });
       const val = getNextAvailableTime(input);
       expect(val).toBeNull();
     });

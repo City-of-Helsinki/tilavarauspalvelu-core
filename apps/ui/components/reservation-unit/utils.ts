@@ -55,7 +55,7 @@ type AvailableTimesProps = {
   duration: number;
   reservationUnit: QueryT;
   reservableTimes: ReservableMap;
-  activeApplicationRounds: RoundPeriod[];
+  activeApplicationRounds: readonly RoundPeriod[];
   fromStartOfDay?: boolean;
 };
 
