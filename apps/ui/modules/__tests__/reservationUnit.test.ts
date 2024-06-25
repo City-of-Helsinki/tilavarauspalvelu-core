@@ -52,21 +52,6 @@ jest.mock("next-i18next", () => ({
   },
 }));
 
-const pricingBase: PricingFieldsFragment = {
-  id: "1",
-  begins: "",
-  taxPercentage: {
-    id: "1",
-    pk: 1,
-    value: "24",
-  },
-  status: Status.Active,
-  lowestPrice: "0",
-  highestPrice: "60.5",
-  priceUnit: PriceUnit.PerHour,
-  pricingType: PricingType.Paid,
-};
-
 // Turn into describe block and spec the tests
 describe("getPossibleTimesForDay", () => {
   beforeAll(() => {
@@ -201,173 +186,184 @@ describe("getPossibleTimesForDay", () => {
 });
 
 describe("getPrice", () => {
-  test("price range", () => {
-    const pricing: PricingFieldsFragment = {
-      ...pricingBase,
-      lowestPrice: "10",
-      highestPrice: "50.5",
-      priceUnit: PriceUnit.Per_15Mins,
-    };
+  const pricingBase: PricingFieldsFragment = {
+    id: "1",
+    begins: "",
+    taxPercentage: {
+      id: "1",
+      pk: 1,
+      value: "24",
+    },
+    status: Status.Active,
+    lowestPrice: "0",
+    highestPrice: "60.5",
+    priceUnit: PriceUnit.PerHour,
+    pricingType: PricingType.Paid,
+  };
 
-    expect(getPrice({ pricing })).toBe("10 - 50,5 € / 15 min");
+  function constructInput({
+    lowestPrice,
+    highestPrice,
+    priceUnit,
+    minutes,
+  }: {
+    lowestPrice?: number;
+    highestPrice?: number;
+    priceUnit?: PriceUnit;
+    minutes?: number;
+  }) {
+    return {
+      pricing: {
+        ...pricingBase,
+        lowestPrice: lowestPrice?.toString() ?? "0",
+        highestPrice: highestPrice?.toString() ?? "60.5",
+        priceUnit: priceUnit ?? PriceUnit.PerHour,
+      },
+      minutes: minutes ?? undefined,
+    };
+  }
+
+  test("price range", () => {
+    const input = constructInput({
+      lowestPrice: 10,
+      highestPrice: 50.5,
+      priceUnit: PriceUnit.Per_15Mins,
+    });
+
+    expect(getPrice(input)).toBe("10 - 50,5 € / 15 min");
   });
 
   test("price range with no min", () => {
-    const pricing: PricingFieldsFragment = {
-      ...pricingBase,
-      lowestPrice: "0.0",
-      highestPrice: "50.5",
+    const input = constructInput({
+      lowestPrice: 0.0,
+      highestPrice: 50.5,
       priceUnit: PriceUnit.Per_15Mins,
-    };
-
-    expect(getPrice({ pricing })).toBe("0 - 50,5 € / 15 min");
+    });
+    expect(getPrice(input)).toBe("0 - 50,5 € / 15 min");
   });
 
   test("price range with minutes", () => {
-    const pricing: PricingFieldsFragment = {
-      ...pricingBase,
-      lowestPrice: "0",
-      highestPrice: "60.5",
-      priceUnit: PriceUnit.PerHour,
-    };
-
-    expect(getPrice({ pricing, minutes: 60 })).toBe("0 - 60,5 €");
+    const input = constructInput({
+      minutes: 60,
+    });
+    expect(getPrice(input)).toBe("0 - 60,5 €");
   });
 
   test("price range with minutes", () => {
-    const pricing: PricingFieldsFragment = {
-      ...pricingBase,
-    };
-
-    expect(getPrice({ pricing, minutes: 61 })).toBe("0 - 75,63 €");
+    const input = constructInput({
+      minutes: 61,
+    });
+    expect(getPrice(input)).toBe("0 - 75,63 €");
   });
 
   test("price range with minutes", () => {
-    const pricing: PricingFieldsFragment = {
-      ...pricingBase,
-      lowestPrice: "0",
-      highestPrice: "100",
-    };
-
-    expect(getPrice({ pricing, minutes: 61 })).toBe("0 - 125 €");
+    const input = constructInput({
+      highestPrice: 100,
+      minutes: 61,
+    });
+    expect(getPrice(input)).toBe("0 - 125 €");
   });
 
   test("price range with minutes", () => {
-    const pricing: PricingFieldsFragment = {
-      ...pricingBase,
-      lowestPrice: "0",
-      highestPrice: "100",
-    };
-
-    expect(getPrice({ pricing, minutes: 90 })).toBe("0 - 150 €");
+    const input = constructInput({
+      highestPrice: 100,
+      minutes: 90,
+    });
+    expect(getPrice(input)).toBe("0 - 150 €");
   });
 
   test("price range with minutes", () => {
-    const pricing: PricingFieldsFragment = {
-      ...pricingBase,
-      lowestPrice: "0",
-      highestPrice: "100",
-    };
-
-    expect(getPrice({ pricing, minutes: 91 })).toBe("0 - 175 €");
+    const input = constructInput({
+      highestPrice: 100,
+      minutes: 91,
+    });
+    expect(getPrice(input)).toBe("0 - 175 €");
   });
 
   test("price range with minutes", () => {
-    const pricing: PricingFieldsFragment = {
-      ...pricingBase,
-      lowestPrice: "0",
-      highestPrice: "30",
+    const input = constructInput({
+      highestPrice: 30,
+      minutes: 60,
       priceUnit: PriceUnit.Per_15Mins,
-    };
-
-    expect(getPrice({ pricing, minutes: 60 })).toBe("0 - 120 €");
+    });
+    expect(getPrice(input)).toBe("0 - 120 €");
   });
 
   test("price range with minutes", () => {
-    const pricing: PricingFieldsFragment = {
-      ...pricingBase,
-      lowestPrice: "0",
-      highestPrice: "30",
+    const input = constructInput({
+      highestPrice: 30,
+      minutes: 60,
       priceUnit: PriceUnit.Per_30Mins,
-    };
-
-    expect(getPrice({ pricing, minutes: 60 })).toBe("0 - 60 €");
+    });
+    expect(getPrice(input)).toBe("0 - 60 €");
   });
 
   test("price range with minutes", () => {
-    const pricing: PricingFieldsFragment = {
-      ...pricingBase,
-      lowestPrice: "0",
-      highestPrice: "30",
+    const input = constructInput({
+      highestPrice: 30,
+      minutes: 61,
       priceUnit: PriceUnit.Per_30Mins,
-    };
-
-    expect(getPrice({ pricing, minutes: 61 })).toBe("0 - 75 €");
+    });
+    expect(getPrice(input)).toBe("0 - 75 €");
   });
 
   test("price range with minutes and fixed unit", () => {
-    const pricing: PricingFieldsFragment = {
-      ...pricingBase,
-      lowestPrice: "10",
-      highestPrice: "100",
+    const input = constructInput({
+      lowestPrice: 10,
+      highestPrice: 100,
+      minutes: 61,
       priceUnit: PriceUnit.PerHalfDay,
-    };
-
-    expect(getPrice({ pricing, minutes: 61 })).toBe("10 - 100 €");
+    });
+    expect(getPrice(input)).toBe("10 - 100 €");
   });
 
   test("price range with minutes and fixed unit", () => {
-    const pricing: PricingFieldsFragment = {
-      ...pricingBase,
-      lowestPrice: "10",
-      highestPrice: "100",
+    const input = constructInput({
+      lowestPrice: 10,
+      highestPrice: 100,
+      minutes: 1234,
       priceUnit: PriceUnit.PerDay,
-    };
-
-    expect(getPrice({ pricing, minutes: 1234 })).toBe("10 - 100 €");
+    });
+    expect(getPrice(input)).toBe("10 - 100 €");
   });
 
   test("price range with minutes and fixed unit", () => {
-    const pricing: PricingFieldsFragment = {
-      ...pricingBase,
-      lowestPrice: "10",
-      highestPrice: "100",
+    const input = constructInput({
+      lowestPrice: 10,
+      highestPrice: 100,
+      minutes: 1234,
       priceUnit: PriceUnit.PerWeek,
-    };
+    });
 
-    expect(getPrice({ pricing, minutes: 1234 })).toBe("10 - 100 €");
+    expect(getPrice(input)).toBe("10 - 100 €");
   });
 
   test("fixed price", () => {
-    const pricing: PricingFieldsFragment = {
-      ...pricingBase,
-      lowestPrice: "50",
-      highestPrice: "50",
+    const input = constructInput({
+      lowestPrice: 50,
+      highestPrice: 50,
       priceUnit: PriceUnit.Fixed,
-    };
+    });
 
-    expect(getPrice({ pricing })).toBe("50 €");
+    expect(getPrice(input)).toBe("50 €");
   });
 
   test("fixed price with decimals", () => {
-    const pricing: PricingFieldsFragment = {
-      ...pricingBase,
-      lowestPrice: "50",
-      highestPrice: "50",
+    const input = constructInput({
+      lowestPrice: 50,
+      highestPrice: 50,
       priceUnit: PriceUnit.Fixed,
-    };
+    });
 
-    expect(getPrice({ pricing, trailingZeros: true })).toBe("50,00 €");
+    expect(getPrice({ ...input, trailingZeros: true })).toBe("50,00 €");
   });
 
   test("no price", () => {
-    const pricing: PricingFieldsFragment = {
-      ...pricingBase,
-      lowestPrice: "0",
-      highestPrice: "0",
-    };
-
-    expect(getPrice({ pricing })).toBe("Maksuton");
+    const input = constructInput({
+      lowestPrice: 0,
+      highestPrice: 0,
+    });
+    expect(getPrice(input)).toBe("Maksuton");
   });
 
   test("total price with minutes", () => {

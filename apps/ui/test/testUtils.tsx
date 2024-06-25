@@ -43,6 +43,7 @@ type MockReservationUnitProps = {
   reservationsMinDaysBefore?: number;
   reservationsMaxDaysBefore?: number;
 };
+/// create a mock for IsReservableFragment (not a full reservation unit)
 export function createMockReservationUnit({
   bufferTimeBefore,
   bufferTimeAfter,
