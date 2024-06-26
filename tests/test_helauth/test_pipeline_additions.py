@@ -1,3 +1,4 @@
+import re
 from datetime import date
 from typing import Any, NamedTuple
 
@@ -8,6 +9,7 @@ from tests.helpers import ResponseMock, patch_method
 from users.helauth.clients import HelsinkiProfileClient
 from users.helauth.parsers import ssn_to_date
 from users.helauth.pipeline import update_user_from_profile
+from utils.external_service.errors import ExternalServiceError
 from utils.sentry import SentryLogger
 
 from .helpers import mock_request
@@ -76,19 +78,13 @@ def test_update_user_from_profile_logs_to_sentry_if_unsuccessful():
 @patch_method(HelsinkiProfileClient.get_token, return_value="token")
 @patch_method(HelsinkiProfileClient.generic, return_value=ResponseMock(json_data={"errors": [{"message": "foo"}]}))
 def test_update_user_from_profile_logs_to_sentry_if_raises():
-    # given:
-    # - There is a user without profile info
     user = UserFactory.create(profile_id="", date_of_birth=None)
 
-    # when:
-    # - This user's info is updated from profile
-    update_user_from_profile(request=mock_request(user))
+    msg = "Helsinki profile: Response contains errors."
+    with pytest.raises(ExternalServiceError, match=re.escape(msg)):
+        update_user_from_profile(request=mock_request(user))
 
     assert SentryLogger.log_exception.call_count == 1
-    log_message = SentryLogger.log_exception.mock_calls[0][1][1]
-    assert log_message == "Helsinki profile: Failed to update user from profile"
-    log_message = SentryLogger.log_exception.mock_calls[0][1][0].args[0]
-    assert log_message == "Helsinki profile: Response contains errors."
 
 
 @pytest.mark.parametrize(

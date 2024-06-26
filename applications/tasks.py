@@ -111,7 +111,6 @@ def generate_reservation_series_from_allocations(application_round_id: int) -> N
 
             reservation_details = ReservationDetails(
                 name=recurring_reservation.name,
-                description=application.additional_information,
                 type=ReservationTypeChoice.SEASONAL,
                 state=ReservationStateChoice.CONFIRMED,
                 user=recurring_reservation.user,
@@ -126,6 +125,8 @@ def generate_reservation_series_from_allocations(application_round_id: int) -> N
                 billing_address_street=billing_address_street,
                 billing_address_city=billing_address_city,
                 billing_address_zip=billing_address_zip,
+                purpose=application_section.purpose,
+                home_city=application.home_city,
             )
 
             reservation_details["reservee_type"] = (
@@ -134,6 +135,16 @@ def generate_reservation_series_from_allocations(application_round_id: int) -> N
                 else CustomerTypeChoice.BUSINESS
                 if application.applicant_type == ApplicantTypeChoice.COMPANY
                 else CustomerTypeChoice.NONPROFIT
+            )
+
+            reservation_details["description"] = (
+                application.additional_information
+                if reservation_details["reservee_type"] == CustomerTypeChoice.INDIVIDUAL
+                else (
+                    translate_for_user(_("Core business"), application.user)
+                    + ": "
+                    + application.organisation.core_business
+                )
             )
 
             if reservation_details["reservee_type"] == CustomerTypeChoice.INDIVIDUAL:

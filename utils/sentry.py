@@ -2,6 +2,7 @@ from collections.abc import Callable
 from functools import wraps
 from typing import Any, Literal
 
+from django.conf import settings
 from sentry_sdk import capture_exception, capture_message, push_scope
 
 LogLevelStr = Literal["fatal", "critical", "error", "warning", "info", "debug"]
@@ -47,7 +48,8 @@ class SentryLogger:
                         raise
 
                     SentryLogger.log_exception(err, details)
-                    if re_raise:
+                    # For local development, we should always re-raise an error for better debugging.
+                    if re_raise or settings.SENTRY_LOGGER_ALWAYS_RE_RAISE:
                         raise
 
             return wrapper

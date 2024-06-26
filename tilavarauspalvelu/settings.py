@@ -491,6 +491,7 @@ class Common(Environment):
     TPREK_UNIT_URL = values.URLValue()
     GRAPHQL_CODEGEN_ENABLED = False
     UPDATE_RESERVATION_UNIT_HIERARCHY = True
+    SENTRY_LOGGER_ALWAYS_RE_RAISE = False
 
     PRUNE_RESERVATIONS_OLDER_THAN_MINUTES = 20
     REMOVE_RESERVATION_STATS_OLDER_THAN_YEARS = 5
@@ -629,6 +630,7 @@ class Local(LocalMixin, Common):
 
     # --- Misc settings-----------------------------------------------------------------------------------------------
 
+    SENTRY_LOGGER_ALWAYS_RE_RAISE = True
     GRAPHQL_CODEGEN_ENABLED = values.BooleanValue(default=False)
     ICAL_HASH_SECRET = values.StringValue(default="")  # nosec # NOSONAR
 
@@ -801,6 +803,7 @@ class AutomatedTests(AutomatedTestMixin, EmptyDefaults, Common, dotenv_path=None
     # Turn off reservation unit hierarchy updates from signals during tests,
     # since they slow them down a lot in CI. Refresh should be called manually when needed.
     UPDATE_RESERVATION_UNIT_HIERARCHY = False
+    SENTRY_LOGGER_ALWAYS_RE_RAISE = True
 
 
 class Build(EmptyDefaults, Common, use_environ=True):
