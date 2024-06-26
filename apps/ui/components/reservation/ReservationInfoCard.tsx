@@ -1,8 +1,7 @@
 import React, { useMemo } from "react";
 import Link from "next/link";
 import { gql } from "@apollo/client";
-import { differenceInMinutes, parseISO } from "date-fns";
-import { trim } from "lodash";
+import { differenceInMinutes } from "date-fns";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { getReservationPrice, formatters as getFormatters } from "common";
@@ -15,6 +14,7 @@ import {
   formatDuration,
   getMainImage,
   getTranslation,
+  formatDateTimeRange,
 } from "@/modules/util";
 import { reservationUnitPath } from "@/modules/const";
 import { getImageSource } from "common/src/helpers";
@@ -113,30 +113,11 @@ export function ReservationInfoCard({
   // NOTE can be removed after this has been refactored not to be used for PendingReservation
   const taxPercentageValue = reservation.taxPercentageValue;
 
-  const beginDate = t("common:dateWithWeekday", {
-    date: begin && parseISO(begin),
-  });
-
-  const beginTime = t("common:timeWithPrefixInForm", {
-    date: begin && parseISO(begin),
-  });
-
-  const endDate = t("common:dateWithWeekday", {
-    date: end && parseISO(end),
-  });
-
-  const endTime = t("common:timeInForm", {
-    date: end && parseISO(end),
-  });
-
   const duration = differenceInMinutes(new Date(end), new Date(begin));
-
-  const timeString = trim(
-    `${beginDate} ${beginTime}-${
-      endDate !== beginDate ? endDate : ""
-    }${endTime}`,
-    " - "
+  const timeString = capitalize(
+    formatDateTimeRange(t, new Date(begin), new Date(end))
   );
+
   const formatters = useMemo(
     () => getFormatters(i18n.language),
     [i18n.language]
@@ -195,7 +176,7 @@ export function ReservationInfoCard({
               {name}
             </StyledLink>
           </Heading>
-          {["confirmed", "complete"].includes(type) && (
+          {(type === "confirmed" || type === "complete") && (
             <Subheading>
               {t("reservations:reservationNumber")}:{" "}
               <span data-testid="reservation__reservation-info-card__reservationNumber">

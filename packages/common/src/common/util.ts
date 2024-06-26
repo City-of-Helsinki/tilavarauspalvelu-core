@@ -65,11 +65,11 @@ export function formatDuration(
   return p.join(" ");
 }
 
-export const addYears = (date: Date, years: number): Date => {
+export function addYears(date: Date, years: number): Date {
   const newDate = new Date(date);
   newDate.setFullYear(newDate.getFullYear() + years);
   return newDate;
-};
+}
 
 // Returns a string in specified format (default: "yyyy-MM-dd") from a Date object,
 // pass a format string as a second parameter to change the format

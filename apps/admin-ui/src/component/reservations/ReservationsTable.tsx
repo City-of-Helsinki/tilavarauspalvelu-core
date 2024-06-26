@@ -5,9 +5,9 @@ import { memoize } from "lodash";
 import type { ReservationsQuery } from "@gql/gql-types";
 import { truncate } from "@/helpers";
 import { reservationUrl } from "@/common/urls";
-import { formatDateTime } from "@/common/util";
+import { formatDateTime, formatDateTimeRange } from "@/common/util";
 import { CustomTable, TableLink } from "@/component/Table";
-import { getReserveeName, reservationDateTimeString } from "./requested/util";
+import { getReserveeName } from "./requested/util";
 import { MAX_NAME_LENGTH } from "@/common/const";
 
 type ReservationTableColumn = {
@@ -70,7 +70,7 @@ const getColConfig = (t: TFunction): ReservationTableColumn[] => [
     key: "begin",
     isSortable: true,
     transform: ({ begin, end }: ReservationType) =>
-      reservationDateTimeString(begin, end, t),
+      formatDateTimeRange(t, new Date(begin), new Date(end)),
   },
   {
     headerName: t("Reservations.headings.createdAt"),

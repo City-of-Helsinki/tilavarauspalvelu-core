@@ -1,9 +1,10 @@
-import { format, parseISO } from "date-fns";
+import { format, getDay, isSameDay, parseISO } from "date-fns";
 import i18next from "i18next";
 import { trim } from "lodash";
 import type { LocationFieldsFragment } from "@gql/gql-types";
 import { NUMBER_OF_DECIMALS } from "./const";
 import type { TFunction } from "next-i18next";
+import { toMondayFirstUnsafe } from "common/src/helpers";
 
 export { formatDuration } from "common/src/common/util";
 
@@ -12,22 +13,45 @@ export const DATE_FORMAT_SHORT = "d.M.";
 
 /// @deprecated use format directly
 /// why convert date -> string -> date?
-export const formatDate = (
+export function formatDate(
   date: string | null,
   outputFormat = DATE_FORMAT
-): string | null => {
+): string | null {
   return date ? format(parseISO(date), outputFormat) : null;
-};
+}
 
-export const formatTime = (
+export function formatTime(
   date: string | null,
   outputFormat = "HH:mm"
-): string | null => {
+): string | null {
   return date ? format(parseISO(date), outputFormat) : null;
-};
+}
 
-export const formatDateTime = (date: string): string =>
-  `${formatDate(date)} ${formatTime(date)}`;
+// TODO why is this taking in a string?
+export function formatDateTime(date: string): string {
+  return `${formatDate(date)} ${formatTime(date)}`;
+}
+
+// TODO move to common and combine with ui (requires i18n changes: replace messages.ts with json)
+export function formatDateTimeRange(
+  t: TFunction,
+  start: Date,
+  end: Date
+): string {
+  const startDay = t(`dayShort.${toMondayFirstUnsafe(getDay(start))}`);
+
+  if (isSameDay(start, end)) {
+    return `${startDay} ${format(start, DATE_FORMAT)} ${format(
+      start,
+      "HH:mm"
+    )}–${format(end, "HH:mm")}`;
+  }
+
+  return `${format(start, DATE_FORMAT)} ${format(start, "HH:mm")}–${format(
+    end,
+    "HH:mm"
+  )} ${format(end, "HH:mm")}`;
+}
 
 export const formatNumber = (
   input?: number | null,

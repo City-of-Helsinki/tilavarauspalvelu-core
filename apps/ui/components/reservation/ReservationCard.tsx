@@ -1,7 +1,7 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { IconGlyphEuro, IconCross, IconArrowRight } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { differenceInMinutes, parseISO } from "date-fns";
+import { differenceInMinutes } from "date-fns";
 import styled from "styled-components";
 import { getReservationPrice } from "common";
 import { trim } from "lodash";
@@ -12,6 +12,7 @@ import {
   getMainImage,
   getTranslation,
   reservationsUrl,
+  formatDateTimeRange,
 } from "@/modules/util";
 import {
   canUserCancelReservation,
@@ -159,29 +160,10 @@ function ReservationCard({ reservation, type }: PropsT): JSX.Element {
   const reservationUnit = reservation.reservationUnit?.[0] ?? undefined;
   const link = reservation.pk ? `/reservations/${reservation.pk}` : "";
 
-  const timeStripContent = useMemo(() => {
-    const beginDate = t("common:dateWithWeekday", {
-      date: reservation.begin && parseISO(reservation.begin),
-    });
-
-    const beginTime = t("common:timeWithPrefix", {
-      date: reservation.begin && parseISO(reservation.begin),
-    });
-
-    const endDate = t("common:dateWithWeekday", {
-      date: reservation.end && parseISO(reservation.end),
-    });
-
-    const endTime = t("common:time", {
-      date: reservation.end && parseISO(reservation.end),
-    });
-
-    return capitalize(
-      `${beginDate} ${beginTime} -${
-        endDate !== beginDate ? endDate : ""
-      } ${endTime}`
-    );
-  }, [reservation, t]);
+  const { begin, end } = reservation;
+  const timeString = capitalize(
+    formatDateTimeRange(t, new Date(begin), new Date(end))
+  );
 
   const title = trim(
     `${getReservationUnitName(reservationUnit)}, ${getUnitName(
@@ -254,7 +236,7 @@ function ReservationCard({ reservation, type }: PropsT): JSX.Element {
         <Bottom>
           <Props>
             <TimeStrip data-testid="reservation-card__time">
-              {timeStripContent}
+              {timeString}
             </TimeStrip>
             <JustForMobile
               customBreakpoint={breakpoints.l}

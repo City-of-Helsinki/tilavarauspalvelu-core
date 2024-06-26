@@ -19,12 +19,12 @@ import { useNotification } from "app/context/NotificationContext";
 import { useModal } from "app/context/ModalContext";
 import { TimeChangeFormSchemaRefined, TimeFormSchema } from "app/schemas";
 import ControlledTimeInput from "../my-units/components/ControlledTimeInput";
-import { reservationDateTime } from "./requested/util";
 import ControlledDateInput from "../my-units/components/ControlledDateInput";
 import { BufferToggles } from "../my-units/BufferToggles";
 import { useCheckCollisions } from "./requested/hooks";
 import { filterNonNullable } from "common/src/helpers";
 import { parseDateTimeSafe } from "@/helpers";
+import { formatDateTimeRange } from "@/common/util";
 
 const StyledForm = styled.form`
   margin-top: var(--spacing-m);
@@ -88,13 +88,12 @@ const recurringReservationInfoText = ({
 
 type FormValueType = z.infer<typeof TimeFormSchema>;
 
-function formatDateInterval(begin: Date, end: Date, t: TFunction) {
-  return `${reservationDateTime(
-    begin,
-    end,
-    t
-  )}, ${formatDuration(differenceInMinutes(end, begin), t)}`;
+function formatDateInterval(t: TFunction, begin: Date, end: Date) {
+  const dateString = formatDateTimeRange(t, begin, end);
+  const durationString = formatDuration(differenceInMinutes(end, begin), t);
+  return `${dateString} (${durationString})`;
 }
+
 const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
   const { t, i18n } = useTranslation();
   const { notifyError, notifySuccess } = useNotification();
@@ -216,8 +215,8 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
   const translateError = (errorMsg?: string) =>
     errorMsg ? t(`reservationForm:errors.${errorMsg}`) : "";
 
-  const newTimeString = start && end ? formatDateInterval(start, end, t) : "";
-  const originalTime = formatDateInterval(startDateTime, endDateTime, t);
+  const newTimeString = start && end ? formatDateInterval(t, start, end) : "";
+  const originalTime = formatDateInterval(t, startDateTime, endDateTime);
 
   return (
     <Dialog.Content>

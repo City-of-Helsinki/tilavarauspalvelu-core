@@ -289,3 +289,40 @@ export const getPostLoginUrl = () => {
   params.set("isPostLogin", "true");
   return `${origin}${pathname}?${params.toString()}`;
 };
+
+// TODO move to common and combine with admin (requires i18n changes: replace messages.ts with json)
+export function formatTimeRange(
+  t: TFunction,
+  beginDate: Date,
+  endDate: Date
+): string {
+  const beginTime = t("common:timeWithPrefixInForm", { date: beginDate });
+  const endTime = t("common:timeInForm", { date: endDate });
+  return `${beginTime}–${endTime}`;
+}
+export function formatDateTimeRange(
+  t: TFunction,
+  begin: Date,
+  end: Date
+): string {
+  const beginDate = t("common:dateWithWeekday", { date: begin });
+  const beginTime = t("common:timeWithPrefixInForm", { date: begin });
+  const endDate = t("common:dateWithWeekday", { date: end });
+  const endTime = t("common:timeInForm", { date: end });
+
+  return trim(
+    `${beginDate} ${beginTime}–${
+      endDate !== beginDate ? endDate : ""
+    }${endTime}`,
+    " – "
+  );
+}
+export function formatDateTime(t: TFunction, date: Date): string {
+  const dateStr = t("common:dateWithWeekday", {
+    date,
+  });
+  const timeStr = t("common:time", {
+    date,
+  });
+  return `${dateStr} ${timeStr}`;
+}

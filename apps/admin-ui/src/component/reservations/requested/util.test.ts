@@ -57,7 +57,7 @@ function constructReservation(
         pricings,
       } as ReservationUnitNode,
     ],
-  };
+  } as ReservationNode;
 }
 
 describe("pricingDetails", () => {
@@ -134,9 +134,9 @@ describe("createTag", () => {
     const mockT = ((x: string) => x) as TFunction;
     const tag = createTagString(res, mockT);
     expect(tag).toContain(
-      "dayShort.0, dayShort.1, dayShort.3 12:00-14:00, common:abbreviations.hour"
+      "dayShort.0, dayShort.1, dayShort.3 12:00–14:00, common:abbreviations.hour"
     );
-    expect(tag).toContain("1.4.2023-1.7.2023");
+    expect(tag).toContain("1.4.2023–1.7.2023");
     expect(tag).toContain("Foobar");
   });
 
@@ -151,7 +151,7 @@ describe("createTag", () => {
     const tag = createTagString(res, mockT);
     expect(tag).not.toContain("dayShort.0, dayShort.1, dayShort.3");
     expect(tag).toContain("1.4.2023");
-    expect(tag).toContain("12:00-14:00, common:abbreviations.hour");
+    expect(tag).toContain("12:00–14:00, common:abbreviations.hour");
     expect(tag).toContain("dayShort.5");
     expect(tag).toContain("Foobar");
   });

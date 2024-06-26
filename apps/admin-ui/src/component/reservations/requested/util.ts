@@ -1,4 +1,4 @@
-import { differenceInMinutes, format, getDay, isSameDay } from "date-fns";
+import { differenceInMinutes, format } from "date-fns";
 import type { TFunction } from "i18next";
 import { trim } from "lodash";
 import {
@@ -17,63 +17,19 @@ import {
   type ReservationQuery,
 } from "@gql/gql-types";
 import { formatDuration, fromApiDate } from "common/src/common/util";
-import { toMondayFirstUnsafe } from "common/src/helpers";
 import { truncate } from "@/helpers";
-import { DATE_FORMAT, formatDate, formatTime } from "@/common/util";
+import { formatDateTimeRange, formatDate } from "@/common/util";
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 type ReservationUnitType = NonNullable<ReservationType["reservationUnit"]>[0];
 
-export function reservationDateTime(
-  start: Date,
-  end: Date,
-  t: TFunction
-): string {
-  const startDay = t(`dayShort.${toMondayFirstUnsafe(getDay(start))}`);
-
-  if (isSameDay(start, end)) {
-    return `${startDay} ${format(start, DATE_FORMAT)} ${format(
-      start,
-      "HH:mm"
-    )}-${format(end, "HH:mm")}`;
-  }
-
-  return `${format(start, DATE_FORMAT)} ${format(start, "HH:mm")}-${format(
-    end,
-    "HH:mm"
-  )} ${format(end, "HH:mm")}`;
-}
-
-export function reservationDateTimeString(
-  start: string,
-  end: string,
-  t: TFunction
-): string {
-  const startDate = new Date(start);
-  const endDate = new Date(end);
-
-  return reservationDateTime(startDate, endDate, t);
-}
-
-function reservationDurationString(
-  start: string,
-  end: string,
-  t: TFunction
-): string {
-  const startDate = new Date(start);
-  const endDate = new Date(end);
-
-  const durMinutes = differenceInMinutes(endDate, startDate);
-  const abbreviated = true;
-  return formatDuration(durMinutes, t, abbreviated);
-}
-
-const reservationUnitName = (
+function reservationUnitName(
   reservationUnit: Maybe<ReservationUnitType>
-): string =>
-  reservationUnit
+): string {
+  return reservationUnit
     ? `${reservationUnit.nameFi}, ${reservationUnit.unit?.nameFi || ""}`
     : "-";
+}
 
 export function reservationPrice(
   reservation: ReservationType,
@@ -245,7 +201,7 @@ export function createTagString(
   t: TFunction
 ): string {
   const createRecurringTag = (begin?: string, end?: string) =>
-    begin && end ? `${formatDate(begin)}-${formatDate(end)}` : "";
+    begin && end ? `${formatDate(begin)}–${formatDate(end)}` : "";
 
   const recurringTag = createRecurringTag(
     reservation.recurringReservation?.beginDate ?? undefined,
@@ -256,30 +212,20 @@ export function createTagString(
     ?.map(reservationUnitName)
     .join(", ");
 
-  const singleDateTimeTag = reservationDateTimeString(
-    reservation.begin,
-    reservation.end,
-    t
-  );
+  const begin = new Date(reservation.begin);
+  const end = new Date(reservation.end);
+  const singleDateTimeTag = formatDateTimeRange(t, begin, end);
 
   const weekDayTag = reservation.recurringReservation?.weekdays
     ?.sort()
     ?.map((x) => t(`dayShort.${x}`))
     ?.reduce((agv, x) => `${agv}${agv.length > 0 ? "," : ""} ${x}`, "");
 
-  const recurringDateTag =
-    reservation.begin && reservation.end
-      ? `${weekDayTag} ${formatTime(reservation.begin, "HH:mm")}-${formatTime(
-          reservation.end,
-          "HH:mm"
-        )}`
-      : "";
+  const recurringDateTag = `${weekDayTag} ${format(begin, "HH:mm")}–${format(end, "HH:mm")}`;
 
-  const durationTag = reservationDurationString(
-    reservation.begin,
-    reservation.end,
-    t
-  );
+  const durMinutes = differenceInMinutes(end, begin);
+  const abbreviated = true;
+  const durationTag = formatDuration(durMinutes, t, abbreviated);
 
   const reservationTagline = `${
     reservation.recurringReservation ? recurringDateTag : singleDateTimeTag
