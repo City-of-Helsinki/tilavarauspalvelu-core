@@ -365,7 +365,7 @@ export function Review({
                 <Filters
                   units={unitPks}
                   reservationUnits={reservationUnitOptions}
-                  enableReservationUnit
+                  // enableReservationUnit TODO: enable this when the API is updated
                   statusOption="eventShort"
                 />
                 <RejectedOccurrencesDataLoader
