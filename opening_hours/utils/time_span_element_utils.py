@@ -15,15 +15,13 @@ def merge_overlapping_time_span_elements(time_span_elements: list[TimeSpanElemen
 
     merged_time_span_elements: list[TimeSpanElement] = []
     for current_time_span in time_span_elements:
-        # If the `merged_time_span_elements` list is empty, simply append the current time span
+        # If the selected_list is empty, simply append the current time span
         if not merged_time_span_elements:
             merged_time_span_elements.append(current_time_span)
             continue
 
-        # If the `merged_time_span_elements` contains a time span that overlaps with the current time span, combine them
+        # If the selected_list contains a time span that overlaps with the current time span, combine them.
         # The only time span that can overlap with the current time span is the last time span in the list.
-        last_time_span = merged_time_span_elements[-1]
-
         # ┌────────────────────────┐
         # │ LEGEND                 │
         # │ █ = Reservation        │
@@ -32,7 +30,7 @@ def merge_overlapping_time_span_elements(time_span_elements: list[TimeSpanElemen
         # ├────────────────────────┼──────────────────────────────────────────┐
         # │  ████     ->  ███████  │ Overlapping                              │
         # │    █████  ->           │ The last time span is extended           │
-        # │                        │                                          │
+        # ├────────────────────────┼──────────────────────────────────────────┤
         # │  ████     ->  ███████  │ Current time span ends at the same time  │
         # │      ███  ->           │ as the last last time span ends.         │
         # │                        │ The last time span is extended           │
@@ -46,25 +44,35 @@ def merge_overlapping_time_span_elements(time_span_elements: list[TimeSpanElemen
         # │  ▄▄▄██▄▄  ->           │                                          │
         # ├────────────────────────┼──────────────────────────────────────────┤
         # │  ███████  ->  ███████  │ Time span is fully inside the last one   │
-        # │    ███    ->           │ Later can be skipped                     │
-        # │                        │                                          │
-        # │   █████   ->  ▄█████▄  │ Buffers extend outside earlier time span │
-        # │  ▄▄███▄▄  ->           │ The buffered start/end times are kept    │
+        # │    ███    ->           │                                          │
+        # │                        │ The buffered start/end times are kept    │
+        # │   █████   ->  ▄█████▄  │                                          │
+        # │  ▄▄███▄▄  ->           │                                          │
         # └────────────────────────┴──────────────────────────────────────────┘
-        # Last time span overlaps with the current time span, so they can be merged.
+        last_time_span = merged_time_span_elements[-1]
+
+        # Last time span overlaps with the current time span, combine them.
         if last_time_span.end_datetime >= current_time_span.start_datetime:
-            # Adjust the before buffer of the last time span
-            if current_time_span.buffer_time_before:
-                min_buffered_dt = min(last_time_span.buffered_start_datetime, current_time_span.buffered_start_datetime)
-                last_time_span.buffer_time_before = last_time_span.start_datetime - min_buffered_dt
+            # This time span is fully inside the last one.
+            if last_time_span.end_datetime > current_time_span.end_datetime:
+                # Even with after buffers, this time span is fully inside the last one, so it can be skipped.
+                if last_time_span.buffered_end_datetime > current_time_span.buffered_end_datetime:
+                    continue
 
-            # Adjust the after buffer of the last time span
-            # If the current time span ends after the last time span ends, extend the last time span's end datetime.
+                # Current time span's buffer ends after the last's buffer ends, so we can extend the last's buffer.
+                buffer_delta = last_time_span.buffered_end_datetime - current_time_span.buffered_end_datetime
+                last_time_span.buffer_time_after += buffer_delta
+                continue
+
+            # Extend the last time span's before buffer.
+            min_buffered_dt = min(last_time_span.buffered_start_datetime, current_time_span.buffered_start_datetime)
+            last_time_span.buffer_time_before = last_time_span.start_datetime - min_buffered_dt
+
+            # Extend the last time span and it's after buffer.
+            # The buffered end datetime should stay the same.
             max_buffered_dt = max(last_time_span.buffered_end_datetime, current_time_span.buffered_end_datetime)
-            last_time_span.end_datetime = max(last_time_span.end_datetime, current_time_span.end_datetime)
+            last_time_span.end_datetime = current_time_span.end_datetime
             last_time_span.buffer_time_after = max_buffered_dt - last_time_span.end_datetime
-
-            # The current time span is discarded after the above adjustments.
             continue
 
         # No overlapping time spans, check for overlapping buffers and add the current time span to the merged list.

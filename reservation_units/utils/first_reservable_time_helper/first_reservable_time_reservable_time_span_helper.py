@@ -43,16 +43,14 @@ class ReservableTimeSpanFirstReservableTimeHelper:
         if not normalised_time_spans:
             return ReservableTimeOutput(is_closed=True, first_reservable_time=None)
 
-        # For minimal performance gains this should only be run once; the first time we know the ReservationUnit is open
-        if self.parent.is_reservation_unit_closed:
-            # At this point we know that the ReservationUnit is OPEN.
-            # Now that we know if the ReservationUnit is OPEN, Validate `reservation_unit.max_reservation_duration`.
-            if self.parent.is_reservation_unit_max_duration_invalid:
-                return ReservableTimeOutput(is_closed=False, first_reservable_time=None)
+        # At this point we know that the ReservationUnit is OPEN.
+        # Now that we know if the ReservationUnit is OPEN, Validate `reservation_unit.max_reservation_duration`.
+        if self.parent.is_reservation_unit_max_duration_invalid:
+            return ReservableTimeOutput(is_closed=False, first_reservable_time=None)
 
-            normalised_time_spans = self._soft_normalise_time_span(normalised_time_spans)
-            if not normalised_time_spans:
-                return ReservableTimeOutput(is_closed=False, first_reservable_time=None)
+        normalised_time_spans = self._soft_normalise_time_span(normalised_time_spans)
+        if not normalised_time_spans:
+            return ReservableTimeOutput(is_closed=False, first_reservable_time=None)
 
         # At this point we have removed all the closed time spans from the reservable time span.
         # Finally, try to find the first reservable time span from the left over reservable time spans.
@@ -65,12 +63,14 @@ class ReservableTimeSpanFirstReservableTimeHelper:
 
     def _hard_normalise_time_span(self, current_time_span: TimeSpanElement) -> list[TimeSpanElement]:
         """Remove Hard-Closed time spans from a TimeSpanElement."""
-        combined_hard_closed_time_spans: list[TimeSpanElement] = (
-            self.parent.hard_closed_time_spans
-            + current_time_span.generate_closed_time_spans_outside_filter(
-                filter_time_start=self.parent.parent.filter_time_start,
-                filter_time_end=self.parent.parent.filter_time_end,
-            )
+        combined_hard_closed_time_spans: list[TimeSpanElement] = []
+
+        # Add hard closed time spans from the ReservationUnit
+        combined_hard_closed_time_spans += self.parent.hard_closed_time_spans
+        # Add hard closed time spans from the ReservableTimeSpan
+        combined_hard_closed_time_spans += current_time_span.generate_closed_time_spans_outside_filter(
+            filter_time_start=self.parent.parent.filter_time_start,
+            filter_time_end=self.parent.parent.filter_time_end,
         )
 
         return override_reservable_with_closed_time_spans(

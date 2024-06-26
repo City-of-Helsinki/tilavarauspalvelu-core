@@ -54,24 +54,22 @@ class ReservationUnitFirstReservableTimeHelper:
 
     is_reservation_unit_max_duration_invalid: bool
 
-    is_reservation_unit_closed: bool
-
     def __init__(self, parent: FirstReservableTimeHelper, reservation_unit: ReservationUnit) -> None:
         self.parent = parent
         self.reservation_unit = reservation_unit
 
-        self.hard_closed_time_spans = self._merge_time_spans(
-            self._get_hard_closed_time_spans() + parent.shared_hard_closed_time_spans
-        )
+        self.hard_closed_time_spans = self._get_hard_closed_time_spans()
+        self.hard_closed_time_spans += parent.shared_hard_closed_time_spans
+        self.hard_closed_time_spans = self._merge_time_spans(self.hard_closed_time_spans)
 
-        self.reservation_closed_time_spans = self._merge_time_spans(self._get_reservation_closed_time_spans())
+        self.reservation_closed_time_spans = self._get_reservation_closed_time_spans()
+        self.reservation_closed_time_spans = self._merge_time_spans(self.reservation_closed_time_spans)
         self.blocking_reservation_closed_time_spans = self._get_blocking_reservation_closed_time_spans()
 
-        self.soft_closed_time_spans = self._merge_time_spans(
-            self._get_soft_closed_time_spans()
-            + self.reservation_closed_time_spans
-            + self.blocking_reservation_closed_time_spans
-        )
+        self.soft_closed_time_spans = self._get_soft_closed_time_spans()
+        self.soft_closed_time_spans += self.reservation_closed_time_spans
+        self.soft_closed_time_spans += self.blocking_reservation_closed_time_spans
+        self.soft_closed_time_spans = self._merge_time_spans(self.soft_closed_time_spans)
 
         start_interval_minutes = ReservationStartInterval(reservation_unit.reservation_start_interval).as_number
 
@@ -97,35 +95,22 @@ class ReservationUnitFirstReservableTimeHelper:
         return merge_overlapping_time_span_elements(sorted(time_spans, key=lambda time_span: time_span.start_datetime))
 
     def calculate_first_reservable_time(self) -> ReservableTimeOutput:
-        self.is_reservation_unit_closed = True
+        is_closed = True
 
         # Go through each ReservableTimeSpan individually one-by-one until a suitable time span is found.
         for reservable_time_span in self.reservation_unit.origin_hauki_resource.reservable_time_spans.all():
             helper = ReservableTimeSpanFirstReservableTimeHelper(parent=self, reservable_time_span=reservable_time_span)
             output = helper.calculate_first_reservable_time()
 
+            # The ReservationUnit is not closed. Save the value in case we don't find a first reservable time.
+            if output.is_closed is False:
+                is_closed = False
+
             # If we have found a first reservable time, we can return early
             if output.first_reservable_time is not None:
                 return output
 
-            # The ReservationUnit is not closed. Save the value in case we don't find a first reservable time.
-            if not output.is_closed and self.is_reservation_unit_closed:
-                self.is_reservation_unit_closed = False
-
-                # Now that we know that the ReservationUnit is not closed,
-                # we can exit early if the maximum duration is invalid.
-                if self.is_reservation_unit_max_duration_invalid:
-                    return output
-
-                # We don't have a first reservable time, but we know that the ReservationUnit is not closed.
-                # Merge the soft closed time spans with the hard closed time spans, so that all future time spans are
-                # faster to find as we hopefully have less overlapping closed time spans that need to be looped through.
-                self.hard_closed_time_spans = self._merge_time_spans(
-                    self.hard_closed_time_spans + self.soft_closed_time_spans
-                )
-                self.soft_closed_time_spans = []
-
-        return ReservableTimeOutput(is_closed=self.is_reservation_unit_closed, first_reservable_time=None)
+        return ReservableTimeOutput(is_closed=is_closed, first_reservable_time=None)
 
     def _get_hard_closed_time_spans(self) -> list[TimeSpanElement]:
         """
