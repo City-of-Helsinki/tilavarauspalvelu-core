@@ -156,6 +156,10 @@ def test_units__order__by_reservation_units_count(graphql):
     ReservationUnitFactory.create_batch(2, unit=units[1])
     ReservationUnitFactory.create_batch(3, unit=units[2])
 
+    # Not counted since archived
+    ReservationUnitFactory.create(unit=units[2], is_archived=True)
+    ReservationUnitFactory.create(unit=units[3], is_archived=True)
+
     # Descending
     query_1 = units_query(order_by=["reservationUnitsCountDesc", "pkDesc"])
     response_1 = graphql(query_1)

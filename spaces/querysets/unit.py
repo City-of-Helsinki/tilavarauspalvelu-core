@@ -27,7 +27,7 @@ class UnitQuerySet(models.QuerySet):
 
         return self.alias(
             reservation_units_count=SubqueryCount(
-                ReservationUnit.objects.filter(unit=models.OuterRef("pk")).values("id"),
+                ReservationUnit.objects.filter(unit=models.OuterRef("pk"), is_archived=False).values("id"),
             ),
         ).order_by(models.OrderBy(models.F("reservation_units_count"), descending=desc))
 
