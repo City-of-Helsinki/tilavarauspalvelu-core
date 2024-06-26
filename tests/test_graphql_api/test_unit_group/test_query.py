@@ -11,8 +11,8 @@ pytestmark = [
 
 
 def test_unit_groups__query(graphql):
-    unit_1 = UnitFactory.create()
-    unit_2 = UnitFactory.create()
+    unit_1 = UnitFactory.create(rank=1)
+    unit_2 = UnitFactory.create(rank=2)
     unit_group = UnitGroupFactory.create(units=[unit_1, unit_2])
 
     graphql.login_user_based_on_type(UserType.STAFF)
