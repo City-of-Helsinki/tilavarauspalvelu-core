@@ -129,27 +129,16 @@ export function generateReservableMap(
         };
         // eslint-disable-next-line no-console
         console.assert(val.start.getDate() === val.end.getDate());
-        if (map.has(day)) {
-          const arr = map.get(day) ?? [];
-          arr.push(val);
-          // TODO isn't this superfluous?
-          map.set(day, arr);
-        } else {
-          map.set(day, [val]);
-        }
+        const arr = map.get(day) ?? [];
+        arr.push(val);
+        map.set(day, arr);
       }
     } else {
       // the simplest case is when the start and end are on the same day
       const day = dateToKey(new Date(n.start));
-      if (map.has(day)) {
-        const arr = map.get(day) ?? [];
-        arr.push(n);
-        // TODO isn't this superfluous?
-        map.set(day, arr);
-        continue;
-      } else {
-        map.set(day, [n]);
-      }
+      const arr = map.get(day) ?? [];
+      arr.push(n);
+      map.set(day, arr);
     }
   }
 
