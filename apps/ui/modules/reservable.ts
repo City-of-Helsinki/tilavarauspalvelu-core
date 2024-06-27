@@ -663,7 +663,8 @@ export function getDayIntervals(
 
   const intervals: Array<{ h: number; m: number }> = [];
   for (let i = startMins; i < endMins; i += iMins) {
-    if (i + iMins > endMins) {
+    // don't allow interval overflow but handle 0:00 as 23:59
+    if (i + iMins > endMins + 1) {
       break;
     }
     const m = i % 60;
