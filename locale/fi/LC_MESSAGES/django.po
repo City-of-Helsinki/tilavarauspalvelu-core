@@ -1022,7 +1022,7 @@ msgstr "Alku- ja lopetusaikojen tulee olla 60 minuutin monikertoja."
 
 #: applications/tasks.py
 msgid "Core business"
-msgstr "Ydinliiketoiminta"
+msgstr "Ydintoiminta"
 
 #: applications/validators.py
 msgid "This field is required."
