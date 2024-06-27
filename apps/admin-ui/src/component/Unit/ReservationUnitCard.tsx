@@ -14,6 +14,7 @@ import { ImageType, type UnitQuery } from "@gql/gql-types";
 import { BasicLink } from "@/styles/util";
 import IconDraft from "@/images/icon_draft.svg";
 import { getImageSource } from "common/src/helpers";
+import { NoWrap } from "common/styles/util";
 
 type UnitType = NonNullable<UnitQuery["unit"]>;
 type ReservationUnitType = NonNullable<UnitType["reservationunitSet"]>[0];
@@ -97,10 +98,6 @@ const Prop = styled.div<{ $disabled?: boolean }>`
 const Published = styled(Tag)`
   background-color: var(--color-success);
   color: var(--color-white);
-`;
-
-const NoWrap = styled.span`
-  white-space: nowrap;
 `;
 
 export function ReservationUnitCard({

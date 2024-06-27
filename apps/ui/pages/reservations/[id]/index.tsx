@@ -13,6 +13,7 @@ import {
 import { useTranslation } from "next-i18next";
 import { H2, H4, fontRegular } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
+import { NoWrap } from "common/styles/util";
 import {
   CustomerTypeChoice,
   ReservationStateChoice,
@@ -480,7 +481,7 @@ function Reservation({
               >
                 {getReservationUnitName(reservationUnit)}
               </Link>
-              <span data-testid="reservation__time">{timeString}</span>
+              <NoWrap data-testid="reservation__time">{timeString}</NoWrap>
             </SubHeading>
             <StatusContainer>
               <ReservationStatus
