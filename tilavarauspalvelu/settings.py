@@ -454,6 +454,7 @@ class Common(Environment):
     # --- Elasticsearch settings -------------------------------------------------------------------------------------
 
     ELASTICSEARCH_URL = values.StringValue()
+    DISABLE_ELASTICSEARCH_INDEXES = values.BooleanValue(default=False)
 
     @classmethod
     @property
@@ -462,13 +463,17 @@ class Common(Environment):
             "connections": {
                 "default": cls.ELASTICSEARCH_URL,
             },
-            "indexes": {
-                "reservation_units": {
-                    "models": [
-                        "reservation_units.ReservationUnit",
-                    ]
+            "indexes": (
+                {}
+                if cls.DISABLE_ELASTICSEARCH_INDEXES
+                else {
+                    "reservation_units": {
+                        "models": [
+                            "reservation_units.ReservationUnit",
+                        ]
+                    }
                 }
-            },
+            ),
             "settings": {
                 # batch size for ES bulk api operations
                 "chunk_size": 500,
@@ -491,6 +496,8 @@ class Common(Environment):
     TPREK_UNIT_URL = values.URLValue()
     GRAPHQL_CODEGEN_ENABLED = False
     UPDATE_RESERVATION_UNIT_HIERARCHY = True
+    SAVE_RESERVATION_STATISTICS = True
+    REBUILD_SPACE_HIERARCHY = True
     SENTRY_LOGGER_ALWAYS_RE_RAISE = False
 
     PRUNE_RESERVATIONS_OLDER_THAN_MINUTES = 20
@@ -603,6 +610,7 @@ class Local(LocalMixin, Common):
         "SCHEMA": Common.GRAPHENE["SCHEMA"],
         "MIDDLEWARE": [
             "graphene_django.debug.DjangoDebugMiddleware",
+            "tilavarauspalvelu.middleware.GraphQLErrorLoggingMiddleware",
         ],
     }
 
@@ -633,6 +641,9 @@ class Local(LocalMixin, Common):
     SENTRY_LOGGER_ALWAYS_RE_RAISE = True
     GRAPHQL_CODEGEN_ENABLED = values.BooleanValue(default=False)
     ICAL_HASH_SECRET = values.StringValue(default="")  # nosec # NOSONAR
+    UPDATE_RESERVATION_UNIT_HIERARCHY = values.BooleanValue(default=True)
+    SAVE_RESERVATION_STATISTICS = values.BooleanValue(default=True)
+    REBUILD_SPACE_HIERARCHY = values.BooleanValue(default=True)
 
 
 class Docker(DockerMixin, Common):
@@ -803,6 +814,9 @@ class AutomatedTests(AutomatedTestMixin, EmptyDefaults, Common, dotenv_path=None
     # Turn off reservation unit hierarchy updates from signals during tests,
     # since they slow them down a lot in CI. Refresh should be called manually when needed.
     UPDATE_RESERVATION_UNIT_HIERARCHY = False
+    # Turn off statistics saving during tests for performance reasons
+    SAVE_RESERVATION_STATISTICS = False
+    # Always re-raise silenced Sentry errors during testing for better debugging
     SENTRY_LOGGER_ALWAYS_RE_RAISE = True
 
 

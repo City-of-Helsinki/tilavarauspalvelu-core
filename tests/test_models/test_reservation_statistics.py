@@ -22,7 +22,9 @@ pytestmark = [
 ]
 
 
-def test_statistics__create__reservation_creation_creates_statistics():
+def test_statistics__create__reservation_creation_creates_statistics(settings):
+    settings.SAVE_RESERVATION_STATISTICS = True
+
     reservation_unit = ReservationUnitFactory.create(name="resu", unit=UnitFactory(name="mesta", tprek_id="1234"))
     recurring = RecurringReservationFactory.create(application_event_schedule=None)
     reservation = ReservationFactory.create(
@@ -103,7 +105,9 @@ def test_statistics__create__reservation_creation_creates_statistics():
     assert stat.buffer_time_after == reservation.buffer_time_after
 
 
-def test_statistics__update__purpose():
+def test_statistics__update__purpose(settings):
+    settings.SAVE_RESERVATION_STATISTICS = True
+
     reservation = ReservationFactory.create()
 
     stat = ReservationStatistic.objects.first()
@@ -116,7 +120,9 @@ def test_statistics__update__purpose():
     assert stat.purpose == reservation.purpose
 
 
-def test_statistics__update__cancel_reason_text():
+def test_statistics__update__cancel_reason_text(settings):
+    settings.SAVE_RESERVATION_STATISTICS = True
+
     reservation = ReservationFactory.create()
 
     stat = ReservationStatistic.objects.first()
@@ -129,7 +135,9 @@ def test_statistics__update__cancel_reason_text():
     assert stat.cancel_reason_text == "cancel"
 
 
-def test_statistics__update__reservation_unit_updates_statistics():
+def test_statistics__update__reservation_unit_updates_statistics(settings):
+    settings.SAVE_RESERVATION_STATISTICS = True
+
     reservation_unit = ReservationUnitFactory.create(name="Test reservation unit", unit__name="Test unit")
     reservation = ReservationFactory.create(name="Test reservation", reservation_unit=[reservation_unit])
 
