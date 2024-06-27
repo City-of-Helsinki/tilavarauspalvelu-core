@@ -1,4 +1,4 @@
-import { addDays, addMinutes, isAfter, isBefore, set } from "date-fns";
+import { addDays, addMinutes, isAfter, isBefore, set, startOfDay } from "date-fns";
 import type {
   ReservationUnitNode,
   ReservationUnitPageQuery,
@@ -68,7 +68,7 @@ function getAvailableTimesForDay({
   reservableTimes,
   activeApplicationRounds,
 }: AvailableTimesProps): string[] {
-  if (!reservationUnit || !activeApplicationRounds) {
+  if (!reservationUnit) {
     return [];
   }
   const [timeHours, timeMinutesRaw] = [0, 0];
@@ -117,7 +117,27 @@ export function getNextAvailableTime(props: AvailableTimesProps): Date | null {
   const today = addDays(new Date(), reservationsMinDaysBefore ?? 0);
   const possibleEndDay = getLastPossibleReservationDate(reservationUnit);
   const endDay = possibleEndDay ? addDays(possibleEndDay, 1) : undefined;
-  const minDay = dayMax([today, start]) ?? today;
+  // NOTE there is still a case where application rounds have a hole but there are no reservable times
+  // this is not a real use case but technically possible
+  const openAfterRound: Date | undefined = props.activeApplicationRounds.reduce<Date | undefined>((acc, round) => {
+    if (round.reservationPeriodEnd == null) {
+      return acc;
+    }
+    const end = new Date(round.reservationPeriodEnd);
+    const begin = new Date(round.reservationPeriodBegin);
+    if (isBefore(end, today)) {
+      return acc;
+    }
+    if (acc == null) {
+      return end;
+    }
+    // skip non-overlapping ranges
+    if (startOfDay(begin) > startOfDay(acc)) {
+      return acc;
+    }
+    return dayMax([acc, new Date(round.reservationPeriodEnd)]);
+  }, undefined);
+  const minDay = dayMax([today, start, openAfterRound]) ?? today;
 
   // Find the first possible day
   let openTimes = reservableTimes.get(dateToKey(minDay));
@@ -130,7 +150,7 @@ export function getNextAvailableTime(props: AvailableTimesProps): Date | null {
     const {
       value: [_key, value],
     } = result;
-    if (endDay && isAfter(minDay, endDay)) {
+    if (endDay != null && isAfter(minDay, endDay)) {
       return null;
     }
     if (value.length > 0) {
