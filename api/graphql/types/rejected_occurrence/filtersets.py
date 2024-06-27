@@ -7,12 +7,11 @@ from lookup_property import L
 
 from common.db import raw_prefixed_query
 from reservations.models import RejectedOccurrence
+from reservations.querysets import RejectedOccurrenceQuerySet
 
 __all__ = [
     "RejectedOccurrenceFilterSet",
 ]
-
-from reservations.querysets import RejectedOccurrenceQuerySet
 
 
 class RejectedOccurrenceFilterSet(ModelFilterSet):
@@ -28,8 +27,8 @@ class RejectedOccurrenceFilterSet(ModelFilterSet):
             "__application_round"
         )
     )
-    reservation_unit = IntChoiceFilter(field_name="recurring_reservation__reservation_unit")
-    unit = IntChoiceFilter(field_name="recurring_reservation__reservation_unit__unit")
+    reservation_unit = IntMultipleChoiceFilter(field_name="recurring_reservation__reservation_unit")
+    unit = IntMultipleChoiceFilter(field_name="recurring_reservation__reservation_unit__unit")
     text_search = django_filters.CharFilter(method="filter_text_search")
 
     class Meta:
