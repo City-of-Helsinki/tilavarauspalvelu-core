@@ -1,9 +1,16 @@
 from __future__ import annotations
 
+import datetime
 from datetime import timedelta
 from typing import TYPE_CHECKING
 
-from common.date_utils import local_datetime, local_datetime_max, local_datetime_min, local_start_of_day
+from common.date_utils import (
+    local_datetime,
+    local_datetime_max,
+    local_datetime_min,
+    local_start_of_day,
+    timedelta_from_json,
+)
 from opening_hours.utils.time_span_element import TimeSpanElement
 from opening_hours.utils.time_span_element_utils import merge_overlapping_time_span_elements
 from reservation_units.enums import ReservationStartInterval
@@ -13,7 +20,7 @@ from reservation_units.utils.first_reservable_time_helper.first_reservable_time_
 from reservation_units.utils.first_reservable_time_helper.utils import ReservableTimeOutput
 
 if TYPE_CHECKING:
-    from reservation_units.models import ReservationUnit
+    from reservation_units.models.reservation_unit import ReservationUnitWithAffected
     from reservation_units.utils.first_reservable_time_helper.first_reservable_time_helper import (
         FirstReservableTimeHelper,
     )
@@ -27,7 +34,7 @@ class ReservationUnitFirstReservableTimeHelper:
     """
 
     parent: FirstReservableTimeHelper
-    reservation_unit: ReservationUnit
+    reservation_unit: ReservationUnitWithAffected
 
     # Hard Closed Time Spans
     # [x] Affects closed status
@@ -52,9 +59,11 @@ class ReservationUnitFirstReservableTimeHelper:
     # Minimum duration in minutes for the ReservationUnit
     minimum_duration_minutes: int
 
-    is_reservation_unit_max_duration_invalid: bool
+    is_reservation_unit_max_duration_too_short: bool
 
-    def __init__(self, parent: FirstReservableTimeHelper, reservation_unit: ReservationUnit) -> None:
+    is_reservation_unit_closed: bool
+
+    def __init__(self, parent: FirstReservableTimeHelper, reservation_unit: ReservationUnitWithAffected) -> None:
         self.parent = parent
         self.reservation_unit = reservation_unit
 
@@ -63,8 +72,9 @@ class ReservationUnitFirstReservableTimeHelper:
             parent.shared_hard_closed_time_spans,
         )
 
-        self.reservation_closed_time_spans = self._get_reservation_closed_time_spans()
-        self.blocking_reservation_closed_time_spans = self._get_blocking_reservation_closed_time_spans()
+        self.reservation_closed_time_spans, self.blocking_reservation_closed_time_spans = (
+            self._split_closed_and_blocking_reservations()
+        )
 
         self.soft_closed_time_spans = merge_overlapping_time_span_elements(
             self._get_soft_closed_time_spans(),
@@ -80,34 +90,50 @@ class ReservationUnitFirstReservableTimeHelper:
             start_interval_minutes,  # Minimum duration must be at least as long as the start interval
         )
 
-        if reservation_unit.max_reservation_duration is None:
-            self.is_reservation_unit_max_duration_invalid = False
-        else:
+        self.is_reservation_unit_max_duration_too_short = False
+        if reservation_unit.max_reservation_duration is not None:
             maximum_duration_minutes = reservation_unit.max_reservation_duration.total_seconds() / 60
             # Ensure that the maximum duration is a multiple of the start interval
             if maximum_duration_minutes % start_interval_minutes != 0:
                 maximum_duration_minutes -= maximum_duration_minutes % start_interval_minutes
-            # Check if the ReservationUnits Maximum Reservation Duration is at least as long as the minimum duration.
-            # Note that we still need to check if the ReservationUnit is considered Open, so we can't return early here.
-            self.is_reservation_unit_max_duration_invalid = maximum_duration_minutes < self.minimum_duration_minutes
+
+            # Check if the ReservationUnit's maximum Reservation duration is at least
+            # as long as the minimum duration. Note that we still need to check if the
+            # ReservationUnit is considered Open, so we can't return early here.
+            self.is_reservation_unit_max_duration_too_short = maximum_duration_minutes < self.minimum_duration_minutes
 
     def calculate_first_reservable_time(self) -> ReservableTimeOutput:
-        is_closed = True
+        self.is_reservation_unit_closed = True
 
         # Go through each ReservableTimeSpan individually one-by-one until a suitable time span is found.
         for reservable_time_span in self.reservation_unit.origin_hauki_resource.reservable_time_spans.all():
             helper = ReservableTimeSpanFirstReservableTimeHelper(parent=self, reservable_time_span=reservable_time_span)
             output = helper.calculate_first_reservable_time()
 
-            # The ReservationUnit is not closed. Save the value in case we don't find a first reservable time.
-            if output.is_closed is False:
-                is_closed = False
-
             # If we have found a first reservable time, we can return early
             if output.first_reservable_time is not None:
                 return output
 
-        return ReservableTimeOutput(is_closed=is_closed, first_reservable_time=None)
+            # The ReservationUnit is not closed. Save the value in case we don't find a first reservable time.
+            if not output.is_closed and self.is_reservation_unit_closed:
+                self.is_reservation_unit_closed = False
+
+                # Now that we know that the ReservationUnit is not closed,
+                # we can exit early if the maximum duration is invalid.
+                if self.is_reservation_unit_max_duration_too_short:
+                    return output
+
+                # We don't have a first reservable time, but we know that the ReservationUnit is not closed.
+                # Since soft-closed time spans don't affect the closed status, we can merge them with the
+                # hard closed time spans, so that all future time span operations are faster, as we hopefully have
+                # less overlapping closed time spans that need to be looped through.
+                self.hard_closed_time_spans = merge_overlapping_time_span_elements(
+                    self.hard_closed_time_spans,
+                    self.soft_closed_time_spans,
+                )
+                self.soft_closed_time_spans = []
+
+        return ReservableTimeOutput(is_closed=self.is_reservation_unit_closed, first_reservable_time=None)
 
     def _get_hard_closed_time_spans(self) -> list[TimeSpanElement]:
         """
@@ -194,12 +220,25 @@ class ReservationUnitFirstReservableTimeHelper:
 
         return reservation_unit_closed_time_spans
 
-    def _get_reservation_closed_time_spans(self) -> list[TimeSpanElement]:
-        """Get a list of closed time spans from Reservations of the ReservationUnit"""
-        return merge_overlapping_time_span_elements(
-            list(self.parent.reservation_closed_time_spans_map.get(self.reservation_unit.pk, set()))
-        )
+    def _split_closed_and_blocking_reservations(self) -> tuple[list[TimeSpanElement], list[TimeSpanElement]]:
+        """Get a list of closed and blocked time spans from Reservations for any affecting ReservationUnit"""
+        closed: list[TimeSpanElement] = []
+        blocking: list[TimeSpanElement] = []
 
-    def _get_blocking_reservation_closed_time_spans(self) -> list[TimeSpanElement]:
-        """Get a list of closed time spans from Reservations of the ReservationUnit"""
-        return list(self.parent.blocking_reservation_closed_time_spans_map.get(self.reservation_unit.pk, set()))
+        for timespan in self.reservation_unit.affected_time_spans:
+            time_span_element = TimeSpanElement(
+                start_datetime=datetime.datetime.fromisoformat(timespan["start_datetime"]),
+                end_datetime=datetime.datetime.fromisoformat(timespan["end_datetime"]),
+                is_reservable=False,
+                # Buffers are ignored for blocking reservation even if set.
+                buffer_time_before=(
+                    None if timespan["is_blocking"] else timedelta_from_json(timespan["buffer_time_before"])
+                ),
+                buffer_time_after=(
+                    None if timespan["is_blocking"] else timedelta_from_json(timespan["buffer_time_after"])
+                ),
+            )
+            choice = blocking if timespan["is_blocking"] else closed
+            choice.append(time_span_element)
+
+        return merge_overlapping_time_span_elements(closed), blocking

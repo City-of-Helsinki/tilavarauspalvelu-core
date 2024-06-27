@@ -1,13 +1,13 @@
+from collections import defaultdict
 from datetime import UTC, datetime
 
 import pytest
-from django.utils.timezone import get_current_timezone
 
+from common.date_utils import DEFAULT_TIMEZONE, local_date
 from opening_hours.utils.time_span_element import TimeSpanElement
 from reservation_units.models import ReservationUnit, ReservationUnitHierarchy
-from reservation_units.utils.affecting_reservations_helper import AffectingReservationHelper
 from reservations.enums import ReservationStateChoice, ReservationTypeChoice
-from reservations.models import Reservation
+from reservations.models import AffectingTimeSpan, Reservation
 from tests.factories import ReservationFactory, ReservationUnitFactory, ResourceFactory, SpaceFactory, UnitFactory
 
 # Applied to all tests
@@ -15,10 +15,10 @@ pytestmark = [
     pytest.mark.django_db,
 ]
 
-DEFAULT_TIMEZONE = get_current_timezone()
+NEXT_YEAR = local_date().year + 1
 
 
-def _datetime(year=2023, month=5, day=1, hour=0, minute=0) -> datetime:
+def _datetime(year=NEXT_YEAR, month=5, day=1, hour=0, minute=0) -> datetime:
     # Convert to UTC to match timezone returned by GQL endpoint
     return datetime(year, month, day, hour, minute, tzinfo=DEFAULT_TIMEZONE).astimezone(UTC)
 
@@ -89,11 +89,13 @@ def test__get_affecting_reservations__only_resources():
     _create_test_reservations_for_all_reservation_units()
 
     ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
 
-    all_closed_time_spans, _ = AffectingReservationHelper(
-        start_date=_datetime(month=1).date(),
-        end_date=_datetime(month=12).date(),
-    ).get_affecting_time_spans()
+    all_closed_time_spans: dict[int, set[TimeSpanElement]] = defaultdict(set)
+    for timespan in AffectingTimeSpan.objects.all():
+        element = timespan.as_time_span_element()
+        for reservation_unit_id in timespan.affected_reservation_unit_ids:
+            all_closed_time_spans[reservation_unit_id].add(element)
 
     _validate_time_spans(all_closed_time_spans, reservation_unit_1.pk, [reservation_unit_2.pk])
     _validate_time_spans(all_closed_time_spans, reservation_unit_2.pk, [reservation_unit_1.pk])
@@ -133,11 +135,13 @@ def test__get_affecting_reservations__only_spaces():
     _create_test_reservations_for_all_reservation_units()
 
     ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
 
-    all_closed_time_spans, _ = AffectingReservationHelper(
-        start_date=_datetime(month=1).date(),
-        end_date=_datetime(month=12).date(),
-    ).get_affecting_time_spans()
+    all_closed_time_spans: dict[int, set[TimeSpanElement]] = defaultdict(set)
+    for timespan in AffectingTimeSpan.objects.all():
+        element = timespan.as_time_span_element()
+        for reservation_unit_id in timespan.affected_reservation_unit_ids:
+            all_closed_time_spans[reservation_unit_id].add(element)
 
     _validate_time_spans(
         all_closed_time_spans,
@@ -246,11 +250,13 @@ def test__get_affecting_reservations__resources_and_spaces():
     _create_test_reservations_for_all_reservation_units()
 
     ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
 
-    all_closed_time_spans, _ = AffectingReservationHelper(
-        start_date=_datetime(month=1).date(),
-        end_date=_datetime(month=12).date(),
-    ).get_affecting_time_spans()
+    all_closed_time_spans: dict[int, set[TimeSpanElement]] = defaultdict(set)
+    for timespan in AffectingTimeSpan.objects.all():
+        element = timespan.as_time_span_element()
+        for reservation_unit_id in timespan.affected_reservation_unit_ids:
+            all_closed_time_spans[reservation_unit_id].add(element)
 
     _validate_time_spans(
         all_closed_time_spans,

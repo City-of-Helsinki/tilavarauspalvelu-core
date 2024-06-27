@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import uuid
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypedDict
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -324,6 +324,22 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
             }
 
         return None
+
+
+class AffectedTimeSpan(TypedDict):
+    start_datetime: str
+    end_datetime: str
+    buffer_time_before: str
+    buffer_time_after: str
+    is_blocking: bool
+
+
+# Only for typing.
+class ReservationUnitWithAffected(ReservationUnit):
+    affected_time_spans: list[AffectedTimeSpan]
+
+    class Meta:
+        abstract = True
 
 
 AuditLogger.register(ReservationUnit)

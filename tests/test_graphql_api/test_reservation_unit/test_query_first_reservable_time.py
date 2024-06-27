@@ -9,10 +9,11 @@ from graphene_django_extensions.testing.client import GQLResponse
 from graphene_django_extensions.testing.utils import parametrize_helper
 
 from applications.enums import ApplicationRoundStatusChoice
-from common.date_utils import DEFAULT_TIMEZONE
+from common.date_utils import DEFAULT_TIMEZONE, local_date
 from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import ReservationUnit, ReservationUnitHierarchy
 from reservations.enums import ReservationStateChoice, ReservationTypeChoice
+from reservations.models import AffectingTimeSpan
 from tests.factories import (
     ApplicationRoundFactory,
     OriginHaukiResourceFactory,
@@ -35,14 +36,15 @@ reservation_units_reservable_query = partial(
     fields="isClosed firstReservableDatetime",
     calculate_first_reservable_time=True,
 )
+NEXT_YEAR = local_date().year + 1
 
 
-def _datetime(year=2024, month=1, day=1, hour=0, minute=0) -> datetime:
+def _datetime(year=NEXT_YEAR, month=1, day=1, hour=0, minute=0) -> datetime:
     # Convert to UTC to match timezone returned by GQL endpoint
     return datetime(year, month, day, hour, minute).astimezone(DEFAULT_TIMEZONE).astimezone(UTC)
 
 
-def _date(year=2024, month=1, day=1) -> date:
+def _date(year=NEXT_YEAR, month=1, day=1) -> date:
     return date(year, month, day)
 
 
@@ -59,21 +61,20 @@ def frt(response: GQLResponse, *, node: int = 0) -> str | None:
     return datetime.fromisoformat(first_reservable_time).astimezone(DEFAULT_TIMEZONE).isoformat(timespec="seconds")
 
 
-def dt(*, year: int = 2024, month: int = 1, day: int = 1, hour: int = 0, minute: int = 0) -> str:
+def dt(*, year: int = NEXT_YEAR, month: int = 1, day: int = 1, hour: int = 0, minute: int = 0) -> str:
     """Get time in local timezone as ISO 8601 string"""
     return datetime(year, month, day, hour, minute, tzinfo=DEFAULT_TIMEZONE).isoformat(timespec="seconds")
 
 
 NOW = _datetime()
-YESTERDAY = _datetime(year=2023, month=12, day=31)
 
 
-@pytest.fixture
+@pytest.fixture()
 def reservation_unit() -> ReservationUnit:
     origin_hauki_resource = OriginHaukiResourceFactory(
         id="999",
         opening_hours_hash="test_hash",
-        latest_fetched_date=date(2024, 12, 31),
+        latest_fetched_date=_date() - timedelta(days=1),
     )
     return ReservationUnitFactory.create(
         origin_hauki_resource=origin_hauki_resource,
@@ -169,12 +170,8 @@ class ApplicationStatusParams:
 
 @dataclass
 class ReservableNode:
-    is_closed: bool | None
-    first_reservable_datetime: str | None
-
-    def __init__(self, is_closed: bool | None = None, first_reservable_datetime: datetime | None = None):
-        self.is_closed = is_closed
-        self.first_reservable_datetime = first_reservable_datetime.isoformat() if first_reservable_datetime else None
+    is_closed: bool
+    first_reservable_datetime: str | None = None
 
 
 class ReservableParams(NamedTuple):
@@ -223,27 +220,41 @@ def test__query_reservation_unit__first_reservable_time__no_results_time_spans_d
     **parametrize_helper(
         {
             "Date Start is in the past": ReservableParams(
-                filters=ReservableFilters(date_start=(NOW - timedelta(days=1)).date()),
+                filters=ReservableFilters(
+                    date_start=(NOW - timedelta(days=1)).date(),
+                ),
                 result="'reservable_date_start' must be not be in the past.",
             ),
             "Date End is in the past": ReservableParams(
-                filters=ReservableFilters(date_end=(NOW - timedelta(days=1)).date()),
+                filters=ReservableFilters(
+                    date_end=(NOW - timedelta(days=1)).date(),
+                ),
                 result="'reservable_date_end' must be not be in the past.",
             ),
             "Date End is before Date Start": ReservableParams(
-                filters=ReservableFilters(date_start=_date(day=10), date_end=_date(day=9)),
+                filters=ReservableFilters(
+                    date_start=_date(day=10),
+                    date_end=_date(day=9),
+                ),
                 result="'reservable_date_start' must be before 'reservable_date_end'.",
             ),
             "Time Start and End filters exact start time": ReservableParams(
-                filters=ReservableFilters(time_start=time(hour=15), time_end=time(hour=15)),
+                filters=ReservableFilters(
+                    time_start=time(hour=15),
+                    time_end=time(hour=15),
+                ),
                 result="'reservable_time_start' must be before 'reservable_time_end'.",
             ),
             "Minimum duration minutes is zero": ReservableParams(
-                filters=ReservableFilters(minimum_duration_minutes=0),
+                filters=ReservableFilters(
+                    minimum_duration_minutes=0,
+                ),
                 result="'minimum_duration_minutes' can not be less than '15'.",
             ),
             "Minimum duration minutes less than 15": ReservableParams(
-                filters=ReservableFilters(minimum_duration_minutes=14),
+                filters=ReservableFilters(
+                    minimum_duration_minutes=14,
+                ),
                 result="'minimum_duration_minutes' can not be less than '15'.",
             ),
         }
@@ -267,35 +278,52 @@ def test__query_reservation_unit__first_reservable_time__filters__invalid_values
     **parametrize_helper(
         {
             "No Results | Date Start is after the last reservable time": ReservableParams(
-                filters=ReservableFilters(date_start=_date(day=3)),
+                filters=ReservableFilters(
+                    date_start=_date(day=3),
+                ),
                 result=ReservableNode(is_closed=True),
             ),
             "No Results | Date End is before next reservable time": ReservableParams(
-                filters=ReservableFilters(date_end=_date(day=1)),
+                filters=ReservableFilters(
+                    date_end=_date(day=1),
+                ),
                 result=ReservableNode(is_closed=True),
             ),
             "No Results | Time Start is when time span ends": ReservableParams(
-                filters=ReservableFilters(time_start=time(hour=19)),
+                filters=ReservableFilters(
+                    time_start=time(hour=19),
+                ),
                 result=ReservableNode(is_closed=True),
             ),
             "No Results | Time Start is after all reservable times have ended": ReservableParams(
-                filters=ReservableFilters(time_start=time(hour=19, minute=1)),
+                filters=ReservableFilters(
+                    time_start=time(hour=19, minute=1),
+                ),
                 result=ReservableNode(is_closed=True),
             ),
             "No Results | Time End is when time span starts": ReservableParams(
-                filters=ReservableFilters(time_end=time(hour=15)),
+                filters=ReservableFilters(
+                    time_end=time(hour=15),
+                ),
                 result=ReservableNode(is_closed=True),
             ),
             "No Results | Time End is before any reservable time begins": ReservableParams(
-                filters=ReservableFilters(time_end=time(hour=14, minute=59)),
+                filters=ReservableFilters(
+                    time_end=time(hour=14, minute=59),
+                ),
                 result=ReservableNode(is_closed=True),
             ),
             "No Results | Minimum Duration Minutes is longer than reservable time span": ReservableParams(
-                filters=ReservableFilters(minimum_duration_minutes=241),  # 4 hours + 1 minute
+                filters=ReservableFilters(
+                    minimum_duration_minutes=241,  # 4 hours + 1 minute
+                ),
                 result=ReservableNode(is_closed=False),
             ),
             "No Results | Time Start and Minimum duration cause reservable time to be too short": ReservableParams(
-                filters=ReservableFilters(time_start=time(hour=18, minute=1), minimum_duration_minutes=60),
+                filters=ReservableFilters(
+                    time_start=time(hour=18, minute=1),
+                    minimum_duration_minutes=60,
+                ),
                 result=ReservableNode(is_closed=False),
             ),
         }
@@ -314,10 +342,10 @@ def test__query_reservation_unit__first_reservable_time__filters__too_strict_cau
     │ ▁ = Reservable                                     │
     ├────────────────────────────────────────────────────┤
     │   0   2   4   6   8   10  12  14  16  18  20  22   │
-    │ 1 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▁▁▁▁▁▁▁▁░░░░░░░░░░ │
+    │ 2 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▁▁▁▁▁▁▁▁░░░░░░░░░░ │
     └────────────────────────────────────────────────────┘
     """
-    # 2024-01-01 15:00 - 19:00 (4h)
+    # 2nd Jan 15:00 - 19:00 (4h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(day=2, hour=15),
@@ -327,10 +355,8 @@ def test__query_reservation_unit__first_reservable_time__filters__too_strict_cau
     response = graphql(reservation_units_reservable_query(**asdict(filters)))
 
     assert response.has_errors is False, response
-    assert response.node(0) == {
-        "isClosed": result.is_closed,
-        "firstReservableDatetime": None,
-    }
+    assert frt(response) is None
+    assert is_closed(response) is result.is_closed
 
 
 ########################################################################################################################
@@ -339,28 +365,60 @@ def test__query_reservation_unit__first_reservable_time__filters__too_strict_cau
 @pytest.mark.parametrize(
     **parametrize_helper(
         {
-            "Basic | No filters": ReservableParams(filters=ReservableFilters()),
-            "Basic | Only Date Start": ReservableParams(filters=ReservableFilters(date_start=_date())),
-            "Basic | Only Date End": ReservableParams(filters=ReservableFilters(date_end=_date(day=31))),
-            "Basic | Start & End Date | Filters same as time span": ReservableParams(
-                filters=ReservableFilters(date_start=_date(), date_end=_date()),
+            "Basic | No filters": ReservableParams(
+                filters=ReservableFilters(),
             ),
-            "Basic | Only Time Start": ReservableParams(filters=ReservableFilters(time_start=time(hour=13))),
-            "Basic | Only Time End": ReservableParams(filters=ReservableFilters(time_end=time(hour=14))),
+            "Basic | Only Date Start": ReservableParams(
+                filters=ReservableFilters(
+                    date_start=_date(),
+                ),
+            ),
+            "Basic | Only Date End": ReservableParams(
+                filters=ReservableFilters(
+                    date_end=_date(day=31),
+                ),
+            ),
+            "Basic | Start & End Date | Filters same as time span": ReservableParams(
+                filters=ReservableFilters(
+                    date_start=_date(),
+                    date_end=_date(),
+                ),
+            ),
+            "Basic | Only Time Start": ReservableParams(
+                filters=ReservableFilters(
+                    time_start=time(hour=13),
+                ),
+            ),
+            "Basic | Only Time End": ReservableParams(
+                filters=ReservableFilters(
+                    time_end=time(hour=14),
+                ),
+            ),
             "Basic | Start & End Time | Filters same as time span": ReservableParams(
-                filters=ReservableFilters(time_start=time(hour=13), time_end=time(hour=14)),
+                filters=ReservableFilters(
+                    time_start=time(hour=13),
+                    time_end=time(hour=14),
+                ),
             ),
             "Basic | Only reservable_minimum_duration_minutes| Shorter than time span": ReservableParams(
-                filters=ReservableFilters(minimum_duration_minutes=30)
+                filters=ReservableFilters(
+                    minimum_duration_minutes=30,
+                )
             ),
             "Basic | Only reservable_minimum_duration_minutes | Same length as time span": ReservableParams(
-                filters=ReservableFilters(minimum_duration_minutes=60),
+                filters=ReservableFilters(
+                    minimum_duration_minutes=60,
+                ),
             ),
             "Basic | Only show_only_reservable True": ReservableParams(
-                filters=ReservableFilters(show_only_reservable=True),
+                filters=ReservableFilters(
+                    show_only_reservable=True,
+                ),
             ),
             "Basic | Only show_only_reservable False": ReservableParams(
-                filters=ReservableFilters(show_only_reservable=False),
+                filters=ReservableFilters(
+                    show_only_reservable=False,
+                ),
             ),
             "Basic | All filters": ReservableParams(
                 filters=ReservableFilters(
@@ -392,14 +450,14 @@ def test__query_reservation_unit_reservable__filters__should_not_exclude_time_sp
     └────────────────────────────────────────────────────┘
     """
     # Reservable Time Span is in the past, should never be returned
-    # 2023-12-31 13:00 - 14:00 (1h)
+    # 31st Dec 13:00 - 14:00 (1h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
-        start_datetime=YESTERDAY + timedelta(hours=13),
-        end_datetime=YESTERDAY + timedelta(hours=14),
+        start_datetime=_datetime(hour=13) - timedelta(days=1),
+        end_datetime=_datetime(hour=14) - timedelta(days=1),
     )
     # Next available Reservable Time Span
-    # 2024-01-01 13:00 - 14:00 (1h)
+    # 1st Jan 13:00 - 14:00 (1h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(hour=13),
@@ -409,10 +467,8 @@ def test__query_reservation_unit_reservable__filters__should_not_exclude_time_sp
     response = graphql(reservation_units_reservable_query(**asdict(filters)))
 
     assert response.has_errors is False, response
-    assert response.node(0) == {
-        "isClosed": False,
-        "firstReservableDatetime": _datetime(hour=13).isoformat(),
-    }
+    assert frt(response) == dt(hour=13)
+    assert is_closed(response) is False
 
 
 ########################################################################################################################
@@ -422,44 +478,99 @@ def test__query_reservation_unit_reservable__filters__should_not_exclude_time_sp
     **parametrize_helper(
         {
             "Simple | Date Start in the future": ReservableParams(
-                filters=ReservableFilters(date_start=_date(day=10)),
-                result=ReservableNode(first_reservable_datetime=_datetime(day=10, hour=16)),
+                filters=ReservableFilters(
+                    date_start=_date(day=10),
+                ),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=10, hour=16),
+                ),
             ),
             "Simple | Time End filter is early in the morning": ReservableParams(
-                filters=ReservableFilters(time_end=time(hour=9)),
-                result=ReservableNode(first_reservable_datetime=_datetime(day=5, hour=7)),
+                filters=ReservableFilters(
+                    time_end=time(hour=9),
+                ),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=5, hour=7),
+                ),
             ),
             "Simple | Minimum Duration Minutes matches time span duration exactly": ReservableParams(
-                filters=ReservableFilters(minimum_duration_minutes=240),
-                result=ReservableNode(first_reservable_datetime=_datetime(day=10, hour=16)),
+                filters=ReservableFilters(
+                    minimum_duration_minutes=240,
+                ),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=10, hour=16),
+                ),
             ),
             "Simple | Time Start is after Time Span start time, return valid next interval": ReservableParams(
-                filters=ReservableFilters(time_start=time(hour=12, minute=1)),
-                result=ReservableNode(first_reservable_datetime=_datetime(day=1, hour=12, minute=15)),
+                filters=ReservableFilters(
+                    time_start=time(hour=12, minute=1),
+                ),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=1, hour=12, minute=15),
+                ),
             ),
             "Simple | Time Start filter is at next interval, since it's valid it should be returned": ReservableParams(
-                filters=ReservableFilters(time_start=time(hour=12, minute=1)),
-                result=ReservableNode(first_reservable_datetime=_datetime(day=1, hour=12, minute=15)),
+                filters=ReservableFilters(
+                    time_start=time(hour=12, minute=1),
+                ),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=1, hour=12, minute=15),
+                ),
             ),
             "Simple | Time Start and End filters together match time span exactly": ReservableParams(
-                filters=ReservableFilters(time_start=time(hour=16), time_end=time(hour=20)),
-                result=ReservableNode(first_reservable_datetime=_datetime(day=10, hour=16)),
+                filters=ReservableFilters(
+                    time_start=time(hour=16),
+                    time_end=time(hour=20),
+                ),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=10, hour=16),
+                ),
             ),
             "Simple | Time Start and End only partially contain the ReservableTimeSpan from start": ReservableParams(
-                filters=ReservableFilters(time_start=time(hour=16, minute=1), time_end=time(hour=20)),
-                result=ReservableNode(first_reservable_datetime=_datetime(day=10, hour=16, minute=15)),
+                filters=ReservableFilters(
+                    time_start=time(hour=16, minute=1),
+                    time_end=time(hour=20),
+                ),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=10, hour=16, minute=15),
+                ),
             ),
             "Simple | Time Start and End only partially contain the ReservableTimeSpan from end": ReservableParams(
-                filters=ReservableFilters(time_start=time(hour=16), time_end=time(hour=19, minute=59)),
-                result=ReservableNode(first_reservable_datetime=_datetime(day=10, hour=16)),
+                filters=ReservableFilters(
+                    time_start=time(hour=16),
+                    time_end=time(hour=19, minute=59),
+                ),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=10, hour=16),
+                ),
             ),
             "Simple | Time Start late at night, reservation ends at midnight": ReservableParams(
-                filters=ReservableFilters(time_start=time(hour=22), minimum_duration_minutes=120),
-                result=ReservableNode(first_reservable_datetime=_datetime(day=15, hour=22)),
+                filters=ReservableFilters(
+                    time_start=time(hour=22),
+                    minimum_duration_minutes=120,
+                ),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=15, hour=22),
+                ),
             ),
             "Simple | Time Start is at midnight on time spans second day": ReservableParams(
-                filters=ReservableFilters(date_start=_date(day=16), time_start=time(hour=0)),
-                result=ReservableNode(first_reservable_datetime=_datetime(day=16, hour=0)),
+                filters=ReservableFilters(
+                    date_start=_date(day=16),
+                    time_start=time(hour=0),
+                ),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=16, hour=0),
+                ),
             ),
         }
     )
@@ -481,25 +592,25 @@ def test__query_reservation_unit__first_reservable_time__filters__simple(graphql
     │16 ▁▁▁▁░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ │
     └────────────────────────────────────────────────────┘
     """
-    # 2024-01-01 12:00 - 13:00 (1h)
+    # 1st Jan 12:00 - 13:00 (1h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(day=1, hour=12),
         end_datetime=_datetime(day=1, hour=13),
     )
-    # 2024-01-05 07:00 - 09:00 (2h)
+    # 5th Jan 07:00 - 09:00 (2h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(day=5, hour=7),
         end_datetime=_datetime(day=5, hour=9),
     )
-    # 2024-01-10 16:00 - 20:00 (4h)
+    # 10th Jan 16:00 - 20:00 (4h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(day=10, hour=16),
         end_datetime=_datetime(day=10, hour=20),
     )
-    # 2024-01-15 22:00 - 2024-01-16 02:00 (4h)
+    # 15th Jan 22:00 - 16th Jan 02:00 (4h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(day=15, hour=22),
@@ -509,10 +620,8 @@ def test__query_reservation_unit__first_reservable_time__filters__simple(graphql
     response = graphql(reservation_units_reservable_query(**asdict(filters)))
 
     assert response.has_errors is False, response
-    assert response.node(0) == {
-        "isClosed": False,
-        "firstReservableDatetime": result.first_reservable_datetime,
-    }
+    assert frt(response) == result.first_reservable_datetime
+    assert is_closed(response) is result.is_closed
 
 
 ########################################################################################################################
@@ -522,16 +631,32 @@ def test__query_reservation_unit__first_reservable_time__filters__simple(graphql
     **parametrize_helper(
         {
             "Same day timespans | Time Start is after first time span": ReservableParams(
-                filters=ReservableFilters(time_start=time(hour=14)),
-                result=ReservableNode(first_reservable_datetime=_datetime(hour=16)),
+                filters=ReservableFilters(
+                    time_start=time(hour=14),
+                ),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(hour=16),
+                ),
             ),
             "Same day timespans | Time start in the middle of first time span": ReservableParams(
-                filters=ReservableFilters(time_start=time(hour=11)),
-                result=ReservableNode(first_reservable_datetime=_datetime(hour=11)),
+                filters=ReservableFilters(
+                    time_start=time(hour=11),
+                ),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(hour=11),
+                ),
             ),
             "Same day timespans | Time start in the middle of first time span, minimum duration": ReservableParams(
-                filters=ReservableFilters(time_start=time(hour=11), minimum_duration_minutes=120),
-                result=ReservableNode(first_reservable_datetime=_datetime(hour=16)),
+                filters=ReservableFilters(
+                    time_start=time(hour=11),
+                    minimum_duration_minutes=120,
+                ),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(hour=16),
+                ),
             ),
             "Same day timespans | Time start in first time span, ends in last last, minimum duration": ReservableParams(
                 filters=ReservableFilters(
@@ -539,7 +664,10 @@ def test__query_reservation_unit__first_reservable_time__filters__simple(graphql
                     time_end=time(hour=17),
                     minimum_duration_minutes=120,
                 ),
-                result=ReservableNode(first_reservable_datetime=None),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=None,
+                ),
             ),
         }
     )
@@ -559,13 +687,13 @@ def test__query_reservation_unit__first_reservable_time__filters__multiple_time_
     │ 1 ░░░░░░░░░░░░░░░░░░░░▁▁▁▁░░░░░░░░▁▁▁▁▁▁▁▁░░░░░░░░ │
     └────────────────────────────────────────────────────┘
     """
-    # 2024-01-01 10:00 - 12:00 (2h)
+    # 1st Jan 10:00 - 12:00 (2h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(hour=10),
         end_datetime=_datetime(hour=12),
     )
-    # 2024-01-01 16:00 - 20:00 (4h)
+    # 1st Jan 16:00 - 20:00 (4h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(hour=16),
@@ -575,10 +703,8 @@ def test__query_reservation_unit__first_reservable_time__filters__multiple_time_
     response = graphql(reservation_units_reservable_query(**asdict(filters)))
 
     assert response.has_errors is False, response
-    assert response.node(0) == {
-        "isClosed": False,
-        "firstReservableDatetime": result.first_reservable_datetime,
-    }
+    assert frt(response) == result.first_reservable_datetime
+    assert is_closed(response) is result.is_closed
 
 
 ########################################################################################################################
@@ -593,7 +719,10 @@ def test__query_reservation_unit__first_reservable_time__filters__multiple_time_
                     time_start=time(hour=14),
                     time_end=time(hour=16),
                 ),
-                result=ReservableNode(is_closed=False, first_reservable_datetime=_datetime(day=1, hour=14)),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=1, hour=14),
+                ),
             ),
             "Multi-day | Time on the second day": ReservableParams(
                 filters=ReservableFilters(
@@ -601,15 +730,28 @@ def test__query_reservation_unit__first_reservable_time__filters__multiple_time_
                     time_start=time(hour=14),
                     time_end=time(hour=16),
                 ),
-                result=ReservableNode(is_closed=False, first_reservable_datetime=_datetime(day=2, hour=14)),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=2, hour=14),
+                ),
             ),
             "Multi-day | Time End filter causes midnight of second day to be returned": ReservableParams(
-                filters=ReservableFilters(time_end=time(hour=12, minute=59)),
-                result=ReservableNode(is_closed=False, first_reservable_datetime=_datetime(day=2, hour=0)),
+                filters=ReservableFilters(
+                    time_end=time(hour=12, minute=59),
+                ),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=2, hour=0),
+                ),
             ),
             "Multi-day | Minimum duration is 25 hours": ReservableParams(
-                filters=ReservableFilters(minimum_duration_minutes=60 * 25),
-                result=ReservableNode(is_closed=False, first_reservable_datetime=_datetime(day=1, hour=13)),
+                filters=ReservableFilters(
+                    minimum_duration_minutes=60 * 25,
+                ),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=1, hour=13),
+                ),
             ),
         }
     )
@@ -634,7 +776,7 @@ def test__query_reservation_unit__first_reservable_time__filters__multiple_days_
     └────────────────────────────────────────────────────┘
     """
     # Super long time span that lasts many days
-    # 2024-01-01 13:00 - 2024-01-05 13:00 (4 days)
+    # 1st Jan 13:00 - 5th Jan 13:00 (4 days)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(day=1, hour=13),
@@ -644,10 +786,8 @@ def test__query_reservation_unit__first_reservable_time__filters__multiple_days_
     response = graphql(reservation_units_reservable_query(**asdict(filters)))
 
     assert response.has_errors is False, response
-    assert response.node(0) == {
-        "isClosed": result.is_closed,
-        "firstReservableDatetime": result.first_reservable_datetime,
-    }
+    assert frt(response) == result.first_reservable_datetime
+    assert is_closed(response) is result.is_closed
 
 
 ########################################################################################################################
@@ -660,61 +800,91 @@ def test__query_reservation_unit__first_reservable_time__filters__multiple_days_
                 reservation_unit_settings=ReservationUnitOverrides(
                     reservation_begins=_datetime(day=20, hour=17),
                 ),
-                result=ReservableNode(is_closed=False, first_reservable_datetime=_datetime(day=20, hour=17)),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=20, hour=17),
+                ),
             ),
             "ReservationUnit Settings | reservation_begins in the middle of time span": RU_ReservableParams(
                 reservation_unit_settings=ReservationUnitOverrides(
                     reservation_begins=_datetime(day=20, hour=18, minute=1),
                 ),
-                result=ReservableNode(is_closed=False, first_reservable_datetime=_datetime(day=20, hour=18, minute=15)),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=20, hour=18, minute=15),
+                ),
             ),
             "ReservationUnit Settings | reservation_ends causes no results": RU_ReservableParams(
                 reservation_unit_settings=ReservationUnitOverrides(
                     reservation_ends=_datetime(day=11),
                 ),
-                result=ReservableNode(is_closed=True, first_reservable_datetime=None),
+                result=ReservableNode(
+                    is_closed=True,
+                    first_reservable_datetime=None,
+                ),
             ),
             "ReservationUnit Settings | publish_ends causes no results": RU_ReservableParams(
                 reservation_unit_settings=ReservationUnitOverrides(
                     publish_ends=_datetime(day=11, hour=13),
                 ),
-                result=ReservableNode(is_closed=True, first_reservable_datetime=None),
+                result=ReservableNode(
+                    is_closed=True,
+                    first_reservable_datetime=None,
+                ),
             ),
             "ReservationUnit Settings | reservations_min_days_before": RU_ReservableParams(
                 reservation_unit_settings=ReservationUnitOverrides(
-                    reservations_min_days_before=19,  # 2024-01-20
+                    reservations_min_days_before=19,  # Blocks Jan 1st to 19th
                 ),
-                result=ReservableNode(is_closed=False, first_reservable_datetime=_datetime(day=20, hour=17)),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=20, hour=17),
+                ),
             ),
             "ReservationUnit Settings | reservations_min_days_before uses beginning of the day": RU_ReservableParams(
                 reservation_unit_settings=ReservationUnitOverrides(
-                    reservations_min_days_before=20,  # 2024-01-21
+                    reservations_min_days_before=20,  # Blocks Jan 1st to 20th
                 ),
-                result=ReservableNode(is_closed=False, first_reservable_datetime=_datetime(day=21, hour=0)),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=21, hour=0),
+                ),
             ),
             "ReservationUnit Settings | reservations_max_days_before": RU_ReservableParams(
                 reservation_unit_settings=ReservationUnitOverrides(
-                    reservations_max_days_before=12,  # 2024-01-13
+                    reservations_max_days_before=12,  # Blocks days from Jan 13th onwards
                 ),
-                result=ReservableNode(is_closed=False, first_reservable_datetime=_datetime(day=12, hour=13)),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=12, hour=13),
+                ),
             ),
             "ReservationUnit Settings | reservations_max_days_before uses beginning of the day": RU_ReservableParams(
                 reservation_unit_settings=ReservationUnitOverrides(
-                    reservations_max_days_before=11,  # 2024-01-12
+                    reservations_max_days_before=11,  # Blocks days from Jan 12th onwards
                 ),
-                result=ReservableNode(is_closed=False, first_reservable_datetime=None),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=None,
+                ),
             ),
             "ReservationUnit Settings | min_reservation_duration": RU_ReservableParams(
                 reservation_unit_settings=ReservationUnitOverrides(
                     min_reservation_duration=timedelta(hours=2),
                 ),
-                result=ReservableNode(is_closed=False, first_reservable_datetime=_datetime(day=20, hour=17)),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=20, hour=17),
+                ),
             ),
             "ReservationUnit Settings | max_reservation_duration": RU_ReservableParams(
                 reservation_unit_settings=ReservationUnitOverrides(
                     max_reservation_duration=timedelta(hours=2),
                 ),
-                result=ReservableNode(is_closed=False, first_reservable_datetime=_datetime(day=12, hour=13)),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=12, hour=13),
+                ),
             ),
         }
     )
@@ -738,13 +908,13 @@ def test__query_reservation_unit__first_reservable_time__reservation_unit_settin
     """
     apply_reservation_unit_override_settings(reservation_unit, reservation_unit_settings)
 
-    # 2024-01-12 13:00 - 14:00 (1h)
+    # 12th Jan 13:00 - 14:00 (1h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(day=12, hour=13),
         end_datetime=_datetime(day=12, hour=14),
     )
-    # 2024-01-20 17:00 - 2024-01-21 21:00 (1d 4h)
+    # 20 Jan 17:00 - 21st Jan 21:00 (1d 4h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(day=20, hour=17),
@@ -754,10 +924,8 @@ def test__query_reservation_unit__first_reservable_time__reservation_unit_settin
     response = graphql(reservation_units_reservable_query())
 
     assert response.has_errors is False, response
-    assert response.node(0) == {
-        "isClosed": result.is_closed,
-        "firstReservableDatetime": result.first_reservable_datetime,
-    }
+    assert frt(response) == result.first_reservable_datetime
+    assert is_closed(response) is result.is_closed
 
 
 ########################################################################################################################
@@ -768,52 +936,90 @@ def test__query_reservation_unit__first_reservable_time__reservation_unit_settin
         {
             "Advanced | Min duration is longer than Max duration allowed by reservation unit": RU_ReservableParams(
                 reservation_unit_settings=ReservationUnitOverrides(
-                    max_reservation_duration=timedelta(minutes=120),
+                    max_reservation_duration=timedelta(
+                        minutes=120,
+                    ),
                 ),
-                filters=ReservableFilters(minimum_duration_minutes=121),
-                result=ReservableNode(first_reservable_datetime=None),
+                filters=ReservableFilters(
+                    minimum_duration_minutes=121,
+                ),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=None,
+                ),
             ),
             "Advanced | Greater minimum durations is used > min_reservation_duration": RU_ReservableParams(
                 reservation_unit_settings=ReservationUnitOverrides(
                     min_reservation_duration=timedelta(minutes=61),
                 ),
-                filters=ReservableFilters(minimum_duration_minutes=60),
-                result=ReservableNode(first_reservable_datetime=_datetime(day=20, hour=17)),
+                filters=ReservableFilters(
+                    minimum_duration_minutes=60,
+                ),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=20, hour=17),
+                ),
             ),
             "Advanced | Greater minimum durations is used > reservable_minimum_duration_minutes": RU_ReservableParams(
                 reservation_unit_settings=ReservationUnitOverrides(
                     min_reservation_duration=timedelta(minutes=60),
                 ),
-                filters=ReservableFilters(minimum_duration_minutes=61),
-                result=ReservableNode(first_reservable_datetime=_datetime(day=20, hour=17)),
+                filters=ReservableFilters(
+                    minimum_duration_minutes=61,
+                ),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=20, hour=17),
+                ),
             ),
             "Advanced | Next interval is a non-default value": RU_ReservableParams(
                 reservation_unit_settings=ReservationUnitOverrides(
                     reservation_start_interval=ReservationStartInterval.INTERVAL_30_MINUTES.value,
                 ),
-                filters=ReservableFilters(time_start=time(hour=13, minute=1)),
-                result=ReservableNode(first_reservable_datetime=_datetime(day=12, hour=13, minute=30)),
+                filters=ReservableFilters(
+                    time_start=time(hour=13, minute=1),
+                ),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=12, hour=13, minute=30),
+                ),
             ),
             "Advanced | Next interval doesn't leave enough duration for the minimum duration": RU_ReservableParams(
                 reservation_unit_settings=ReservationUnitOverrides(
                     reservation_start_interval=ReservationStartInterval.INTERVAL_30_MINUTES.value,
                 ),
-                filters=ReservableFilters(time_start=time(hour=13, minute=1), minimum_duration_minutes=31),
-                result=ReservableNode(first_reservable_datetime=_datetime(day=20, hour=17)),
+                filters=ReservableFilters(
+                    time_start=time(hour=13, minute=1),
+                    minimum_duration_minutes=31,
+                ),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=20, hour=17),
+                ),
             ),
             "Advanced | Next interval is at the end of the time span": RU_ReservableParams(
                 reservation_unit_settings=ReservationUnitOverrides(
                     reservation_start_interval=ReservationStartInterval.INTERVAL_60_MINUTES.value,
                 ),
-                filters=ReservableFilters(time_start=time(hour=13, minute=1)),
-                result=ReservableNode(first_reservable_datetime=_datetime(day=20, hour=17)),
+                filters=ReservableFilters(
+                    time_start=time(hour=13, minute=1),
+                ),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=20, hour=17),
+                ),
             ),
             "Advanced | Next interval is outside time span": RU_ReservableParams(
                 reservation_unit_settings=ReservationUnitOverrides(
                     reservation_start_interval=ReservationStartInterval.INTERVAL_90_MINUTES.value,
                 ),
-                filters=ReservableFilters(time_start=time(hour=13, minute=1)),
-                result=ReservableNode(first_reservable_datetime=_datetime(day=20, hour=17)),
+                filters=ReservableFilters(
+                    time_start=time(hour=13, minute=1),
+                ),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=20, hour=17),
+                ),
             ),
         }
     )
@@ -837,13 +1043,13 @@ def test__query_reservation_unit__first_reservable_time__filters_and_reservation
     """
     apply_reservation_unit_override_settings(reservation_unit, reservation_unit_settings)
 
-    # 2024-01-12 13:00 - 14:00 (1h)
+    # 12th Jan 13:00 - 14:00 (1h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(day=12, hour=13),
         end_datetime=_datetime(day=12, hour=14),
     )
-    # 2024-01-20 17:00 - 21:00 (4h)
+    # 20th Jan 17:00 - 21:00 (4h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(day=20, hour=17),
@@ -853,10 +1059,8 @@ def test__query_reservation_unit__first_reservable_time__filters_and_reservation
     response = graphql(reservation_units_reservable_query(**asdict(filters)))
 
     assert response.has_errors is False, response
-    assert response.node(0) == {
-        "isClosed": False,
-        "firstReservableDatetime": result.first_reservable_datetime,
-    }
+    assert frt(response) == result.first_reservable_datetime
+    assert is_closed(response) is result.is_closed
 
 
 ########################################################################################################################
@@ -873,7 +1077,10 @@ def test__query_reservation_unit__first_reservable_time__filters_and_reservation
                     reservation_units=[],
                 ),
                 filters=ReservableFilters(),
-                result=ReservableNode(is_closed=False, first_reservable_datetime=_datetime(day=15, hour=12)),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=15, hour=12),
+                ),
             ),
             "ApplicationRound | Period overlaps, STATUS=UPCOMING": AR_ReservableParams(
                 application_round_params=ApplicationStatusParams(
@@ -882,7 +1089,10 @@ def test__query_reservation_unit__first_reservable_time__filters_and_reservation
                     reservation_period_end=_date(day=20),
                 ),
                 filters=ReservableFilters(),
-                result=ReservableNode(is_closed=True, first_reservable_datetime=None),
+                result=ReservableNode(
+                    is_closed=True,
+                    first_reservable_datetime=None,
+                ),
             ),
             "ApplicationRound | Period overlaps, Status=OPEN": AR_ReservableParams(
                 application_round_params=ApplicationStatusParams(
@@ -891,7 +1101,10 @@ def test__query_reservation_unit__first_reservable_time__filters_and_reservation
                     reservation_period_end=_date(day=20),
                 ),
                 filters=ReservableFilters(),
-                result=ReservableNode(is_closed=True, first_reservable_datetime=None),
+                result=ReservableNode(
+                    is_closed=True,
+                    first_reservable_datetime=None,
+                ),
             ),
             "ApplicationRound | Period overlaps, Status=IN_ALLOCATION": AR_ReservableParams(
                 application_round_params=ApplicationStatusParams(
@@ -900,7 +1113,10 @@ def test__query_reservation_unit__first_reservable_time__filters_and_reservation
                     reservation_period_end=_date(day=20),
                 ),
                 filters=ReservableFilters(),
-                result=ReservableNode(is_closed=True, first_reservable_datetime=None),
+                result=ReservableNode(
+                    is_closed=True,
+                    first_reservable_datetime=None,
+                ),
             ),
             "ApplicationRound | Period overlaps, Status=HANDLED": AR_ReservableParams(
                 application_round_params=ApplicationStatusParams(
@@ -909,7 +1125,10 @@ def test__query_reservation_unit__first_reservable_time__filters_and_reservation
                     reservation_period_end=_date(day=20),
                 ),
                 filters=ReservableFilters(),
-                result=ReservableNode(is_closed=True, first_reservable_datetime=None),
+                result=ReservableNode(
+                    is_closed=True,
+                    first_reservable_datetime=None,
+                ),
             ),
             "ApplicationRound | Period overlaps, Status=RESULTS_SENT": AR_ReservableParams(
                 application_round_params=ApplicationStatusParams(
@@ -918,7 +1137,10 @@ def test__query_reservation_unit__first_reservable_time__filters_and_reservation
                     reservation_period_end=_date(day=20),
                 ),
                 filters=ReservableFilters(),
-                result=ReservableNode(is_closed=False, first_reservable_datetime=_datetime(day=15, hour=12)),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=15, hour=12),
+                ),
             ),
             "ApplicationRound | Not overlapping, Period in the past, Status=UPCOMING": AR_ReservableParams(
                 application_round_params=ApplicationStatusParams(
@@ -927,7 +1149,10 @@ def test__query_reservation_unit__first_reservable_time__filters_and_reservation
                     reservation_period_end=_date(day=10),
                 ),
                 filters=ReservableFilters(),
-                result=ReservableNode(is_closed=False, first_reservable_datetime=_datetime(day=15, hour=12)),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=15, hour=12),
+                ),
             ),
             "ApplicationRound | Not overlapping, Period in the future, Status=OPEN": AR_ReservableParams(
                 application_round_params=ApplicationStatusParams(
@@ -936,7 +1161,10 @@ def test__query_reservation_unit__first_reservable_time__filters_and_reservation
                     reservation_period_end=_date(day=30),
                 ),
                 filters=ReservableFilters(),
-                result=ReservableNode(is_closed=False, first_reservable_datetime=_datetime(day=15, hour=12)),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=15, hour=12),
+                ),
             ),
             "ApplicationRound | Period partially overlaps, Status=OPEN": AR_ReservableParams(
                 application_round_params=ApplicationStatusParams(
@@ -945,7 +1173,10 @@ def test__query_reservation_unit__first_reservable_time__filters_and_reservation
                     reservation_period_end=_date(day=15),
                 ),
                 filters=ReservableFilters(),
-                result=ReservableNode(is_closed=False, first_reservable_datetime=_datetime(day=16, hour=0)),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(day=16, hour=0),
+                ),
             ),
             "ApplicationRound | Period partially overlaps, Status=OPEN, Min duration too long": AR_ReservableParams(
                 application_round_params=ApplicationStatusParams(
@@ -956,7 +1187,10 @@ def test__query_reservation_unit__first_reservable_time__filters_and_reservation
                 filters=ReservableFilters(
                     minimum_duration_minutes=61,
                 ),
-                result=ReservableNode(is_closed=False, first_reservable_datetime=None),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=None,
+                ),
             ),
             "ApplicationRound | Period ends on the day of time span, STATUS=OPEN": AR_ReservableParams(
                 application_round_params=ApplicationStatusParams(
@@ -965,7 +1199,10 @@ def test__query_reservation_unit__first_reservable_time__filters_and_reservation
                     reservation_period_end=_date(day=16),
                 ),
                 filters=ReservableFilters(),
-                result=ReservableNode(is_closed=True, first_reservable_datetime=None),
+                result=ReservableNode(
+                    is_closed=True,
+                    first_reservable_datetime=None,
+                ),
             ),
         }
     )
@@ -993,7 +1230,7 @@ def test__query_reservation_unit__first_reservable_time__application_rounds(
         **{k: v for k, v in asdict(application_round_params).items() if v is not None}
     )
 
-    # 2024-01-15 12:00 - 2024-01-16 01:00 (13h)
+    # 15th Jan 12:00 - 16th Jan 01:00 (13h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(day=15, hour=12),
@@ -1003,10 +1240,8 @@ def test__query_reservation_unit__first_reservable_time__application_rounds(
     response = graphql(reservation_units_reservable_query(**asdict(filters)))
 
     assert response.has_errors is False, response
-    assert response.node(0) == {
-        "isClosed": result.is_closed,
-        "firstReservableDatetime": result.first_reservable_datetime,
-    }
+    assert frt(response) == result.first_reservable_datetime
+    assert is_closed(response) is result.is_closed
 
 
 ########################################################################################################################
@@ -1037,19 +1272,19 @@ def test__query_reservation_unit__first_reservable_time__filters__application_ro
         reservation_period_end=_date(day=30),
     )
 
-    # 2024-01-29 11:00 - 12:00 (1h)
+    # 29th Jan 11:00 - 12:00 (1h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(day=29, hour=11),
         end_datetime=_datetime(day=29, hour=12),
     )
-    # 2024-01-30 11:00 - 12:00 (1h)
+    # 30th Jan 11:00 - 12:00 (1h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(day=30, hour=11),
         end_datetime=_datetime(day=30, hour=12),
     )
-    # 2024-01-31 11:00 - 12:00 (1h)
+    # 31st Jan 11:00 - 12:00 (1h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(day=31, hour=11),
@@ -1058,16 +1293,14 @@ def test__query_reservation_unit__first_reservable_time__filters__application_ro
 
     response = graphql(
         reservation_units_reservable_query(
-            reservable_date_start="2024-01-30",
-            reservable_date_end="2024-01-31",
+            reservable_date_start=_date(month=1, day=30).isoformat(),
+            reservable_date_end=_date(month=1, day=31).isoformat(),
         )
     )
 
     assert response.has_errors is False, response
-    assert response.node(0) == {
-        "isClosed": False,
-        "firstReservableDatetime": _datetime(day=31, hour=11).isoformat(),
-    }
+    assert frt(response) == dt(day=31, hour=11)
+    assert is_closed(response) is False
 
 
 ########################################################################################################################
@@ -1089,14 +1322,14 @@ def test__query_reservation_unit__first_reservable_time__reservations__own_reser
     │20 ░░░░░░░░░░░░░░░░░░░░████░░░░░░░░░░░░░░░░░░░░░░░░ │
     └────────────────────────────────────────────────────┘
     """
-    # 2024-01-20 10:00 - 12:00 (2h)
+    # 1st Jan 10:00 - 12:00 (2h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(hour=10),
         end_datetime=_datetime(hour=12),
     )
 
-    # 2024-01-01 10:00 - 12:00 (2h)
+    # 1st Jan 10:00 - 12:00 (2h)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
         begin=_datetime(hour=10),
@@ -1104,14 +1337,13 @@ def test__query_reservation_unit__first_reservable_time__reservations__own_reser
     )
 
     ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
 
     response = graphql(reservation_units_reservable_query())
 
     assert response.has_errors is False, response
-    assert response.node(0) == {
-        "isClosed": False,
-        "firstReservableDatetime": None,
-    }
+    assert frt(response) is None
+    assert is_closed(response) is False
 
 
 ########################################################################################################################
@@ -1140,14 +1372,14 @@ def test__query_reservation_unit__first_reservable_time__reservations__unrelated
     """
     reservation_unit_2: ReservationUnit = ReservationUnitFactory()
 
-    # 2024-01-01 10:00 - 12:00 (2h)
+    # 1st Jan 10:00 - 12:00 (2h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(hour=10),
         end_datetime=_datetime(hour=12),
     )
 
-    # 2024-01-01 10:00 - 12:00 (2h)
+    # 1st Jan 10:00 - 12:00 (2h)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit_2,
         begin=_datetime(hour=10),
@@ -1157,10 +1389,8 @@ def test__query_reservation_unit__first_reservable_time__reservations__unrelated
     response = graphql(reservation_units_reservable_query())
 
     assert response.has_errors is False, response
-    assert response.node(0) == {
-        "isClosed": False,
-        "firstReservableDatetime": _datetime(hour=10).isoformat(),
-    }
+    assert frt(response) == dt(hour=10)
+    assert is_closed(response) is False
 
 
 ########################################################################################################################
@@ -1186,21 +1416,21 @@ def test__query_reservation_unit__first_reservable_time__reservations__dont_incl
     reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_30_MINUTES.value
     reservation_unit.save()
 
-    # 2024-01-01 10:00 - 20:00 (12h)
+    # 1st Jan 10:00 - 20:00 (12h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(hour=10),
         end_datetime=_datetime(hour=20),
     )
 
-    # 2024-01-01 10:00 - 12:00 (2h)
+    # 1st Jan 10:00 - 12:00 (2h)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
         begin=_datetime(hour=10),
         end=_datetime(hour=12),
         state=ReservationStateChoice.CANCELLED,
     )
-    # 2024-01-01 10:00 - 12:00 (2h)
+    # 1st Jan 10:00 - 12:00 (2h)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
         begin=_datetime(hour=10),
@@ -1210,16 +1440,14 @@ def test__query_reservation_unit__first_reservable_time__reservations__dont_incl
 
     response = graphql(
         reservation_units_reservable_query(
-            reservable_date_start="2024-01-01",
-            reservable_date_end="2024-01-01",
+            reservable_date_start=_date(month=1, day=1).isoformat(),
+            reservable_date_end=_date(month=1, day=1).isoformat(),
         )
     )
 
     assert response.has_errors is False, response
-    assert response.node(0) == {
-        "isClosed": False,
-        "firstReservableDatetime": _datetime(hour=10).isoformat(),
-    }
+    assert frt(response) == dt(hour=10)
+    assert is_closed(response) is False
 
 
 ########################################################################################################################
@@ -1244,14 +1472,14 @@ def test__query_reservation_unit__first_reservable_time__reservations__date_filt
     │ 1 ░░░░░░░░░░░░░░░░▁▁▁▁▁▁▁▁██████████▁▁▁▁▁▁░░░░░░░░ │
     └────────────────────────────────────────────────────┘
     """
-    # 2024-01-01 08:00 - 20:00 (12h)
+    # 1st Jan 08:00 - 20:00 (12h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(hour=8),
         end_datetime=_datetime(hour=20),
     )
 
-    # 2024-01-01 12:00 - 17:00 (5h)
+    # 1st Jan 12:00 - 17:00 (5h)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
         begin=_datetime(hour=12),
@@ -1259,21 +1487,20 @@ def test__query_reservation_unit__first_reservable_time__reservations__date_filt
     )
 
     ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
 
     response = graphql(
         reservation_units_reservable_query(
-            reservable_date_start="2024-01-01",
-            reservable_date_end="2024-01-01",
+            reservable_date_start=_date(month=1, day=1).isoformat(),
+            reservable_date_end=_date(month=1, day=1).isoformat(),
             reservable_time_start="12:00:00",
             reservable_time_end="17:00:00",
         )
     )
 
     assert response.has_errors is False, response
-    assert response.node(0) == {
-        "isClosed": False,
-        "firstReservableDatetime": None,
-    }
+    assert frt(response) is None
+    assert is_closed(response) is False
 
 
 ########################################################################################################################
@@ -1301,14 +1528,14 @@ def test__query_reservation_unit__first_reservable_time__reservations__filter_st
     reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_30_MINUTES.value
     reservation_unit.save()
 
-    # 2024-01-01 08:00 - 20:30 (12h 30min)
+    # 1st Jan 08:00 - 20:30 (12h 30min)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(hour=8),
         end_datetime=_datetime(hour=20, minute=30),
     )
 
-    # 2024-01-01 14:00 - 15:30 (1h 30min)
+    # 1st Jan 14:00 - 15:30 (1h 30min)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
         begin=_datetime(hour=14),
@@ -1316,6 +1543,7 @@ def test__query_reservation_unit__first_reservable_time__reservations__filter_st
     )
 
     ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
 
     response = graphql(
         reservation_units_reservable_query(
@@ -1326,10 +1554,8 @@ def test__query_reservation_unit__first_reservable_time__reservations__filter_st
     )
 
     assert response.has_errors is False, response
-    assert response.node(0) == {
-        "isClosed": False,
-        "firstReservableDatetime": _datetime(hour=15, minute=30).isoformat(),
-    }
+    assert frt(response) == dt(hour=15, minute=30)
+    assert is_closed(response) is False
 
 
 ########################################################################################################################
@@ -1365,14 +1591,14 @@ def test__query_reservation_unit__first_reservable_time__reservations__in_common
     reservation_unit.spaces.set(reservation_unit_2.spaces.all())
     reservation_unit.save()
 
-    # 2024-01-01 10:00 - 12:00 (2h)
+    # 1st Jan 10:00 - 12:00 (2h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(hour=10),
         end_datetime=_datetime(hour=12),
     )
 
-    # 2024-01-01 10:00 - 12:00 (2h)
+    # 1st Jan 10:00 - 12:00 (2h)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit_2,
         begin=_datetime(hour=10),
@@ -1380,20 +1606,19 @@ def test__query_reservation_unit__first_reservable_time__reservations__in_common
     )
 
     ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
 
     response = graphql(reservation_units_reservable_query(fields="pk isClosed firstReservableDatetime"))
 
     assert response.has_errors is False, response
-    assert response.node(0) == {
-        "pk": reservation_unit.pk,
-        "isClosed": False,
-        "firstReservableDatetime": None,
-    }
-    assert response.node(1) == {
-        "pk": reservation_unit_2.pk,
-        "isClosed": False,
-        "firstReservableDatetime": None,
-    }
+
+    assert response.node(0)["pk"] == reservation_unit.pk
+    assert frt(response, node=0) is None
+    assert is_closed(response, node=0) is False
+
+    assert response.node(1)["pk"] == reservation_unit_2.pk
+    assert frt(response, node=1) is None
+    assert is_closed(response, node=1) is False
 
 
 ########################################################################################################################
@@ -1429,14 +1654,14 @@ def test__query_reservation_unit__first_reservable_time__reservations__in_common
     reservation_unit.resources.set(reservation_unit_2.resources.all())
     reservation_unit.save()
 
-    # 2024-01-01 10:00 - 12:00 (2h)
+    # 1st Jan 10:00 - 12:00 (2h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(hour=10),
         end_datetime=_datetime(hour=12),
     )
 
-    # 2024-01-01 10:00 - 12:00 (2h)
+    # 1st Jan 10:00 - 12:00 (2h)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit_2,
         begin=_datetime(hour=10),
@@ -1444,20 +1669,19 @@ def test__query_reservation_unit__first_reservable_time__reservations__in_common
     )
 
     ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
 
     response = graphql(reservation_units_reservable_query(fields="pk isClosed firstReservableDatetime"))
 
     assert response.has_errors is False, response
-    assert response.node(0) == {
-        "pk": reservation_unit.pk,
-        "isClosed": False,
-        "firstReservableDatetime": None,
-    }
-    assert response.node(1) == {
-        "pk": reservation_unit_2.pk,
-        "isClosed": False,
-        "firstReservableDatetime": None,
-    }
+
+    assert response.node(0)["pk"] == reservation_unit.pk
+    assert frt(response, node=0) is None
+    assert is_closed(response, node=0) is False
+
+    assert response.node(1)["pk"] == reservation_unit_2.pk
+    assert frt(response, node=1) is None
+    assert is_closed(response, node=1) is False
 
 
 ########################################################################################################################
@@ -1499,14 +1723,14 @@ def test__query_reservation_unit__first_reservable_time__reservations__in_common
         origin_hauki_resource=reservation_unit.origin_hauki_resource,
     )
 
-    # 2024-01-01 10:00 - 12:00 (2h)
+    # 1st Jan 10:00 - 12:00 (2h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(hour=10),
         end_datetime=_datetime(hour=12),
     )
 
-    # 2024-01-01 10:00 - 12:00 (2h)
+    # 1st Jan 10:00 - 12:00 (2h)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit_2,
         begin=_datetime(hour=10),
@@ -1514,20 +1738,19 @@ def test__query_reservation_unit__first_reservable_time__reservations__in_common
     )
 
     ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
 
     response = graphql(reservation_units_reservable_query(fields="pk isClosed firstReservableDatetime"))
 
     assert response.has_errors is False, response
-    assert response.node(0) == {
-        "pk": reservation_unit.pk,
-        "isClosed": False,
-        "firstReservableDatetime": None,
-    }
-    assert response.node(1) == {
-        "pk": reservation_unit_2.pk,
-        "isClosed": False,
-        "firstReservableDatetime": None,
-    }
+
+    assert response.node(0)["pk"] == reservation_unit.pk
+    assert frt(response, node=0) is None
+    assert is_closed(response, node=0) is False
+
+    assert response.node(1)["pk"] == reservation_unit_2.pk
+    assert frt(response, node=1) is None
+    assert is_closed(response, node=1) is False
 
 
 ########################################################################################################################
@@ -1556,7 +1779,7 @@ def test__query_reservation_unit__first_reservable_time__buffers__goes_over_clos
     reservation_unit.min_reservation_duration = timedelta(minutes=30)
     reservation_unit.save()
 
-    # 2024-01-01 10:00 - 12:00 (2h)
+    # 1st Jan 10:00 - 12:00 (2h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(hour=10),
@@ -1566,10 +1789,8 @@ def test__query_reservation_unit__first_reservable_time__buffers__goes_over_clos
     response = graphql(reservation_units_reservable_query())
 
     assert response.has_errors is False, response
-    assert response.node(0) == {
-        "isClosed": False,
-        "firstReservableDatetime": _datetime(hour=10).isoformat(),
-    }
+    assert frt(response) == dt(hour=10)
+    assert is_closed(response) is False
 
 
 ########################################################################################################################
@@ -1583,14 +1804,20 @@ def test__query_reservation_unit__first_reservable_time__buffers__goes_over_clos
                     buffer_time_before=timedelta(minutes=60),
                     buffer_time_after=timedelta(minutes=60),
                 ),
-                result=ReservableNode(first_reservable_datetime=_datetime(hour=16, minute=30)),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(hour=16, minute=30),
+                ),
             ),
             "Buffers | Asymmetric different length buffers are overlapping": RU_ReservableParams(
                 reservation_unit_settings=ReservationUnitOverrides(
                     buffer_time_before=timedelta(),
                     buffer_time_after=timedelta(minutes=60),
                 ),
-                result=ReservableNode(first_reservable_datetime=_datetime(hour=16)),
+                result=ReservableNode(
+                    is_closed=False,
+                    first_reservable_datetime=dt(hour=16),
+                ),
             ),
         }
     )
@@ -1634,20 +1861,20 @@ def test__query_reservation_unit__first_reservable_time__buffers__different_leng
     reservation_unit_60: ReservationUnit = create_child_for_reservation_unit(reservation_unit)
     apply_reservation_unit_override_settings(reservation_unit_60, reservation_unit_settings)
 
-    # 2024-01-01 10:00 - 20:00 (10h)
+    # 1st Jan 10:00 - 20:00 (10h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(hour=10),
         end_datetime=_datetime(hour=20),
     )
 
-    # 2024-01-01 10:00 - 11:30 (1h 30min) | Buffer: 9:30-10:00 + 11:30-12:00
+    # 1st Jan 10:00 - 11:30 (1h 30min) | Buffer: 9:30-10:00 + 11:30-12:00
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
         begin=_datetime(hour=10),
         end=_datetime(hour=11, minute=30),
     )
-    # 2024-01-01 13:00 - 15:30 (1h 30min) | Buffer: (?) + 15:30-16:00
+    # 1st Jan 13:00 - 15:30 (1h 30min) | Buffer: (?) + 15:30-16:00
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
         begin=_datetime(hour=13),
@@ -1655,20 +1882,19 @@ def test__query_reservation_unit__first_reservable_time__buffers__different_leng
     )
 
     ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
 
     response = graphql(reservation_units_reservable_query(fields="pk isClosed firstReservableDatetime"))
 
     assert response.has_errors is False, response
-    assert response.node(0) == {
-        "pk": reservation_unit.pk,
-        "isClosed": False,
-        "firstReservableDatetime": _datetime(hour=12).isoformat(),
-    }
-    assert response.node(1) == {
-        "pk": reservation_unit_60.pk,
-        "isClosed": False,
-        "firstReservableDatetime": result.first_reservable_datetime,
-    }
+
+    assert response.node(0)["pk"] == reservation_unit.pk
+    assert frt(response, node=0) == dt(hour=12)
+    assert is_closed(response, node=0) is False
+
+    assert response.node(1)["pk"] == reservation_unit_60.pk
+    assert frt(response, node=1) == result.first_reservable_datetime
+    assert is_closed(response, node=1) is False
 
 
 ########################################################################################################################
@@ -1718,20 +1944,20 @@ def test__query_reservation_unit__first_reservable_time__buffers__start_and_end_
     reservation_unit_60.buffer_time_after = timedelta(minutes=60)
     reservation_unit_60.save()
 
-    # 2024-01-01 10:00 - 20:00 (10h)
+    # 1st Jan 10:00 - 20:00 (10h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(hour=10),
         end_datetime=_datetime(hour=20),
     )
 
-    # 2024-01-01 10:00 - 11:30 (1h 30min) | Buffer: 11:30-12:00
+    # 1st Jan 10:00 - 11:30 (1h 30min) | Buffer: 11:30-12:00
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit_30,
         begin=_datetime(hour=10),
         end=_datetime(hour=11, minute=30),
     )
-    # 2024-01-01 10:00 - 11:30 (1h 30min) | Buffer: 11:30-12:30
+    # 1st Jan 10:00 - 11:30 (1h 30min) | Buffer: 11:30-12:30
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit_60,
         begin=_datetime(hour=10),
@@ -1739,25 +1965,23 @@ def test__query_reservation_unit__first_reservable_time__buffers__start_and_end_
     )
 
     ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
 
     response = graphql(reservation_units_reservable_query(fields="pk isClosed firstReservableDatetime"))
 
     assert response.has_errors is False, response
-    assert response.node(0) == {
-        "pk": reservation_unit.pk,
-        "isClosed": False,
-        "firstReservableDatetime": _datetime(hour=12, minute=30).isoformat(),
-    }
-    assert response.node(1) == {
-        "pk": reservation_unit_30.pk,
-        "isClosed": False,
-        "firstReservableDatetime": _datetime(hour=12).isoformat(),
-    }
-    assert response.node(2) == {
-        "pk": reservation_unit_60.pk,
-        "isClosed": False,
-        "firstReservableDatetime": _datetime(hour=12, minute=30).isoformat(),
-    }
+
+    assert response.node(0)["pk"] == reservation_unit.pk
+    assert frt(response, node=0) == dt(hour=12, minute=30)
+    assert is_closed(response, node=0) is False
+
+    assert response.node(1)["pk"] == reservation_unit_30.pk
+    assert frt(response, node=1) == dt(hour=12)
+    assert is_closed(response, node=1) is False
+
+    assert response.node(2)["pk"] == reservation_unit_60.pk
+    assert frt(response, node=2) == dt(hour=12, minute=30)
+    assert is_closed(response, node=2) is False
 
 
 ########################################################################################################################
@@ -1807,26 +2031,26 @@ def test__query_reservation_unit__first_reservable_time__buffers__different_befo
     reservation_unit_60.buffer_time_after = timedelta()
     reservation_unit_60.save()
 
-    # 2024-01-01 10:00 - 20:00 (10h)
+    # 1st Jan 10:00 - 20:00 (10h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(hour=10),
         end_datetime=_datetime(hour=20),
     )
 
-    # 2024-01-01 10:00 - 10:30 (30min)
+    # 1st Jan 10:00 - 10:30 (30min)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
         begin=_datetime(hour=10),
         end=_datetime(hour=10, minute=30),
     )
-    # 2024-01-01 12:00 - 13:00 (1h) | Buffer: 11:30-12:00
+    # 1st Jan 12:00 - 13:00 (1h) | Buffer: 11:30-12:00
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit_30,
         begin=_datetime(hour=12),
         end=_datetime(hour=13),
     )
-    # 2024-01-01 12:00 - 13:00 (1h) | Buffer: 11:00-12:00
+    # 1st Jan 12:00 - 13:00 (1h) | Buffer: 11:00-12:00
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit_60,
         begin=_datetime(hour=12),
@@ -1834,25 +2058,23 @@ def test__query_reservation_unit__first_reservable_time__buffers__different_befo
     )
 
     ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
 
     response = graphql(reservation_units_reservable_query(fields="pk isClosed firstReservableDatetime"))
 
     assert response.has_errors is False, response
-    assert response.node(0) == {
-        "pk": reservation_unit.pk,
-        "isClosed": False,
-        "firstReservableDatetime": _datetime(hour=10, minute=30).isoformat(),
-    }
-    assert response.node(1) == {
-        "pk": reservation_unit_30.pk,
-        "isClosed": False,
-        "firstReservableDatetime": _datetime(hour=11).isoformat(),
-    }
-    assert response.node(2) == {
-        "pk": reservation_unit_60.pk,
-        "isClosed": False,
-        "firstReservableDatetime": _datetime(hour=14).isoformat(),
-    }
+
+    assert response.node(0)["pk"] == reservation_unit.pk
+    assert frt(response, node=0) == dt(hour=10, minute=30)
+    assert is_closed(response, node=0) is False
+
+    assert response.node(1)["pk"] == reservation_unit_30.pk
+    assert frt(response, node=1) == dt(hour=11)
+    assert is_closed(response, node=1) is False
+
+    assert response.node(2)["pk"] == reservation_unit_60.pk
+    assert frt(response, node=2) == dt(hour=14)
+    assert is_closed(response, node=2) is False
 
 
 ########################################################################################################################
@@ -1902,21 +2124,21 @@ def test__query_reservation_unit__first_reservable_time__buffers__different_befo
     reservation_unit_60.buffer_time_after = timedelta()
     reservation_unit_60.save()
 
-    # 2024-01-01 10:30-20:00 (9h 30min)
+    # 1st Jan 10:30-20:00 (9h 30min)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(hour=10, minute=30),
         end_datetime=_datetime(hour=20),
     )
 
-    # 2024-01-01 12:00-13:00 (1h) | Buffer: 11:30-12:00
+    # 1st Jan 12:00-13:00 (1h) | Buffer: 11:30-12:00
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit_30,
         begin=_datetime(hour=12),
         end=_datetime(hour=13),
     )
 
-    # 2024-01-01 12:00-13:00 (1h) | Buffer: 11:00-12:00
+    # 1st Jan 12:00-13:00 (1h) | Buffer: 11:00-12:00
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit_60,
         begin=_datetime(hour=12),
@@ -1926,27 +2148,24 @@ def test__query_reservation_unit__first_reservable_time__buffers__different_befo
     response = graphql(reservation_units_reservable_query(fields="pk isClosed firstReservableDatetime"))
 
     assert response.has_errors is False, response
-    assert response.node(0) == {
-        "pk": reservation_unit.pk,
-        "isClosed": False,
-        "firstReservableDatetime": _datetime(hour=10, minute=30).isoformat(),
-    }
-    assert response.node(1) == {
-        "pk": reservation_unit_30.pk,
-        "isClosed": False,
-        "firstReservableDatetime": _datetime(hour=10, minute=30).isoformat(),
-    }
-    assert response.node(2) == {
-        "pk": reservation_unit_60.pk,
-        "isClosed": False,
-        "firstReservableDatetime": _datetime(hour=10, minute=30).isoformat(),
-    }
+
+    assert response.node(0)["pk"] == reservation_unit.pk
+    assert frt(response, node=0) == dt(hour=10, minute=30)
+    assert is_closed(response, node=0) is False
+
+    assert response.node(1)["pk"] == reservation_unit_30.pk
+    assert frt(response, node=1) == dt(hour=10, minute=30)
+    assert is_closed(response, node=1) is False
+
+    assert response.node(2)["pk"] == reservation_unit_60.pk
+    assert frt(response, node=2) == dt(hour=10, minute=30)
+    assert is_closed(response, node=2) is False
 
 
 ########################################################################################################################
 
 
-@freezegun.freeze_time(datetime(2024, 1, 1, 10, 0, microsecond=1).astimezone(DEFAULT_TIMEZONE))
+@freezegun.freeze_time(datetime(NEXT_YEAR, 1, 1, 10, microsecond=1).astimezone(DEFAULT_TIMEZONE))
 def test__query_reservation_unit__first_reservable_time__round_current_time_to_the_next_minute(
     graphql, reservation_unit
 ):
@@ -1963,7 +2182,7 @@ def test__query_reservation_unit__first_reservable_time__round_current_time_to_t
     │ 1 ░░░░░░░░░░░░░░░░░░░░▁▁▁▁░░░░░░░░░░░░░░░░░░░░░░░░ │
     └────────────────────────────────────────────────────┘
     """
-    # 2024-01-01 10:00 - 12:00 (2h)
+    # 1st Jan 10:00 - 12:00 (2h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(hour=10),
@@ -1973,10 +2192,8 @@ def test__query_reservation_unit__first_reservable_time__round_current_time_to_t
     response = graphql(reservation_units_reservable_query())
 
     assert response.has_errors is False, response
-    assert response.node(0) == {
-        "isClosed": False,
-        "firstReservableDatetime": _datetime(hour=10, minute=15).isoformat(),
-    }
+    assert frt(response) == dt(hour=10, minute=15)
+    assert is_closed(response) is False
 
 
 ########################################################################################################################
@@ -2006,14 +2223,14 @@ def test__query_reservation_unit__first_reservable_time__extra_long_interval(gra
     reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_120_MINUTES.value
     reservation_unit.save()
 
-    # 2024-01-01 9:00 - 19:00 (8h)
+    # 1st Jan 9:00 - 19:00 (8h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(hour=9),
         end_datetime=_datetime(hour=19),
     )
 
-    # 2024-01-01 13:00 - 16:00 (3h)
+    # 1st Jan 13:00 - 16:00 (3h)
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
         begin=_datetime(hour=13),
@@ -2021,33 +2238,28 @@ def test__query_reservation_unit__first_reservable_time__extra_long_interval(gra
     )
 
     ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
 
     # Query without any filters.
     # The first reservable time should be the beginning of the Reservable Time Span
     response = graphql(reservation_units_reservable_query())
     assert response.has_errors is False, response
-    assert response.node(0) == {
-        "isClosed": False,
-        "firstReservableDatetime": _datetime(hour=9).isoformat(),
-    }
+    assert frt(response) == dt(hour=9)
+    assert is_closed(response) is False
 
     # Query one minute after beginning of the Reservable Time Span
     # The next interval is at 11:00.
     response = graphql(reservation_units_reservable_query(reservable_time_start="09:01"))
     assert response.has_errors is False, response
-    assert response.node(0) == {
-        "isClosed": False,
-        "firstReservableDatetime": _datetime(hour=11).isoformat(),
-    }
+    assert frt(response) == dt(hour=11)
+    assert is_closed(response) is False
 
     # Query one minute after the last interval
     # Next interval are at 13:00 and 15:00, but the reservation ends at 16:00, so the next valid time is at 17:00
     response = graphql(reservation_units_reservable_query(reservable_time_start="11:01"))
     assert response.has_errors is False, response
-    assert response.node(0) == {
-        "isClosed": False,
-        "firstReservableDatetime": _datetime(hour=17).isoformat(),
-    }
+    assert frt(response) == dt(hour=17)
+    assert is_closed(response) is False
 
 
 ########################################################################################################################
@@ -2083,14 +2295,14 @@ def test__query_reservation_unit__first_reservable_time__blocked_type_reservatio
     reservation_unit.buffer_time_after = timedelta(minutes=60)
     reservation_unit.save()
 
-    # 2024-01-01 10:00 - 16:00 (6h)
+    # 1st Jan 10:00 - 16:00 (6h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(hour=10),
         end_datetime=_datetime(hour=16),
     )
 
-    # 2024-01-01 12:00 - 14:00 (2h)
+    # 1st Jan 12:00 - 14:00 (2h)
     ReservationFactory.create(
         reservation_unit=[reservation_unit],
         begin=_datetime(hour=12),
@@ -2102,30 +2314,25 @@ def test__query_reservation_unit__first_reservable_time__blocked_type_reservatio
     )
 
     ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
 
     # Buffer does not overlap with BLOCKED reservation at all
     response = graphql(reservation_units_reservable_query(reservable_time_start=time(hour=10).isoformat()))
     assert response.has_errors is False, response
-    assert response.node(0) == {
-        "isClosed": False,
-        "firstReservableDatetime": _datetime(hour=10).isoformat(),
-    }
+    assert frt(response) == dt(hour=10)
+    assert is_closed(response) is False
 
     # Buffer overlaps with BLOCKED reservation from the end, which should be allowed
     response = graphql(reservation_units_reservable_query(reservable_time_start=time(hour=11).isoformat()))
     assert response.has_errors is False, response
-    assert response.node(0) == {
-        "isClosed": False,
-        "firstReservableDatetime": _datetime(hour=11).isoformat(),
-    }
+    assert frt(response) == dt(hour=11)
+    assert is_closed(response) is False
 
     # Buffer overlaps with BLOCKED reservation from the start, which should be allowed
     response = graphql(reservation_units_reservable_query(reservable_time_start=time(hour=12).isoformat()))
     assert response.has_errors is False, response
-    assert response.node(0) == {
-        "isClosed": False,
-        "firstReservableDatetime": _datetime(hour=14).isoformat(),
-    }
+    assert frt(response) == dt(hour=14)
+    assert is_closed(response) is False
 
 
 ########################################################################################################################
@@ -2165,14 +2372,14 @@ def test_reservation_unit__first_reservable_time__duration_exactly_min_but_buffe
     reservation_unit.buffer_time_after = timedelta(minutes=15)
     reservation_unit.save()
 
-    # 2024-01-01 17:00 - 22:00 (5h)
+    # 1st Jan 17:00 - 22:00 (5h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(hour=17),
         end_datetime=_datetime(hour=22),
     )
 
-    # 2024-01-01 17:00-18:00 (1h) | Buffer: none
+    # 1st Jan 17:00-18:00 (1h) | Buffer: none
     ReservationFactory.create(
         begin=_datetime(hour=17),
         end=_datetime(hour=18),
@@ -2182,7 +2389,7 @@ def test_reservation_unit__first_reservable_time__duration_exactly_min_but_buffe
         state=ReservationStateChoice.CREATED,
     )
 
-    # 2024-01-01 18:30-19:30 (1h) | Buffer: none
+    # 1st Jan 18:30-19:30 (1h) | Buffer: none
     ReservationFactory.create(
         begin=_datetime(hour=18, minute=30),
         end=_datetime(hour=19, minute=30),
@@ -2192,7 +2399,7 @@ def test_reservation_unit__first_reservable_time__duration_exactly_min_but_buffe
         state=ReservationStateChoice.CREATED,
     )
 
-    # 2024-01-01 20:00-21:00 (1h) | Buffer: 19:45-21:30
+    # 1st Jan 20:00-21:00 (1h) | Buffer: 19:45-21:30
     ReservationFactory.create(
         begin=_datetime(hour=20),
         end=_datetime(hour=21),
@@ -2203,9 +2410,9 @@ def test_reservation_unit__first_reservable_time__duration_exactly_min_but_buffe
     )
 
     ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
 
     response = graphql(reservation_units_reservable_query())
-
     assert response.has_errors is False, response
     assert is_closed(response) is False
     assert frt(response) == dt(hour=21, minute=30)

@@ -4,6 +4,7 @@ import os
 from django.core.management import call_command
 
 from reservation_units.models import ReservationUnitHierarchy
+from reservations.models import AffectingTimeSpan
 
 from .create_caisa import _create_caisa
 from .create_misc import _create_banner_notifications, _create_periodic_tasks
@@ -49,6 +50,7 @@ from .utils import with_logs
 
 
 @with_logs("Starting test data creation...", "Test data created!")
+@AffectingTimeSpan.refresh_at_the_end()
 @ReservationUnitHierarchy.delay_refresh()
 def create_test_data(flush: bool = True) -> None:
     if flush:

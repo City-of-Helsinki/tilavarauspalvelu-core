@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
-from typing import NamedTuple
+from types import SimpleNamespace
+from typing import NamedTuple, cast
 
 import pytest
 from django.utils.timezone import get_default_timezone
@@ -238,13 +239,10 @@ def test__find_first_reservable_time_span_for_reservation_unit__different_buffer
         ),
     ]
 
-    helper = FirstReservableTimeHelper(ReservationUnit.objects.none(), minimum_duration_minutes=30)
-    reservation_unit_helper = ReservationUnitFirstReservableTimeHelper(helper, reservation_unit)
-    reservable_time_span_helper = ReservableTimeSpanFirstReservableTimeHelper(
-        reservation_unit_helper,
-        original_reservable_time_span,
-    )
-    result = reservable_time_span_helper._find_first_reservable_time_span(
+    parent = SimpleNamespace(reservation_unit=reservation_unit, minimum_duration_minutes=30)
+    parent = cast(ReservationUnitFirstReservableTimeHelper, parent)
+    helper = ReservableTimeSpanFirstReservableTimeHelper(parent, original_reservable_time_span)
+    result = helper._find_first_reservable_time_span(
         normalised_reservable_time_spans=reservable_time_spans,
         reservation_time_spans=reservation_time_spans,
     )
@@ -294,13 +292,10 @@ def test__find_first_reservable_time_span_for_reservation_unit__buffer_goes_thro
         ),
     ]
 
-    helper = FirstReservableTimeHelper(ReservationUnit.objects.none(), minimum_duration_minutes=30)
-    reservation_unit_helper = ReservationUnitFirstReservableTimeHelper(helper, reservation_unit)
-    reservable_time_span_helper = ReservableTimeSpanFirstReservableTimeHelper(
-        reservation_unit_helper,
-        original_reservable_time_span,
-    )
-    result = reservable_time_span_helper._find_first_reservable_time_span(
+    parent = SimpleNamespace(reservation_unit=reservation_unit, minimum_duration_minutes=30)
+    parent = cast(ReservationUnitFirstReservableTimeHelper, parent)
+    helper = ReservableTimeSpanFirstReservableTimeHelper(parent, original_reservable_time_span)
+    result = helper._find_first_reservable_time_span(
         normalised_reservable_time_spans=reservable_time_spans,
         reservation_time_spans=reservation_time_spans,
     )
@@ -321,6 +316,7 @@ def test__find_first_reservable_time_span_for_reservation_unit__interval_is_long
         min_reservation_duration=timedelta(minutes=15),
         reservation_start_interval=ReservationStartInterval.INTERVAL_120_MINUTES.value,
     )
+    reservation_unit.affected_time_spans = []
 
     reservable_time_spans = [
         TimeSpanElement(start_datetime=_time(hour=3), end_datetime=_time(hour=4), is_reservable=True),
@@ -364,12 +360,14 @@ def test__find_first_reservable_time_span_for_reservation_unit__max_duration_is_
         max_reservation_duration=timedelta(minutes=200),
         reservation_start_interval=ReservationStartInterval.INTERVAL_120_MINUTES.value,
     )
+    reservation_unit.affected_time_spans = []
 
     helper = FirstReservableTimeHelper(ReservationUnit.objects.none())
     reservation_unit_helper = ReservationUnitFirstReservableTimeHelper(helper, reservation_unit)
 
     # Minimum duration is longer than interval, so it is kept as-is
     assert reservation_unit_helper.minimum_duration_minutes == 140
+
     # Maximum is not a multiple of interval, so it is rounded down to the last multiple of the interval, which is 120
     # causing the maximum duration to be less than the minimum duration
-    assert reservation_unit_helper.is_reservation_unit_max_duration_invalid is True
+    assert reservation_unit_helper.is_reservation_unit_max_duration_too_short is True
