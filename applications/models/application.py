@@ -186,7 +186,7 @@ class Application(SerializableMixin, models.Model):
             case ApplicationRoundStatusChoice.RESULTS_SENT:
                 return ApplicationStatusChoice.RESULTS_SENT
 
-    @lookup_property(joins=["application_sections"], skip_codegen=True)
+    @lookup_property(skip_codegen=True)
     def all_sections_allocated() -> bool:
         from applications.models import ApplicationSection
 

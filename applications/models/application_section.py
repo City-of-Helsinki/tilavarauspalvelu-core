@@ -142,7 +142,7 @@ class ApplicationSection(SerializableMixin, models.Model):
         )
         return [Weekday(day) for day in suitable]
 
-    @lookup_property(joins=["reservation_unit_options", "application"], skip_codegen=True)
+    @lookup_property(joins=["application"], skip_codegen=True)
     def status() -> ApplicationSectionStatusChoice:
         return models.Case(  # type: ignore[return-value]
             models.When(
@@ -151,20 +151,8 @@ class ApplicationSection(SerializableMixin, models.Model):
                 then=models.Value(ApplicationSectionStatusChoice.UNALLOCATED.value),
             ),
             models.When(
-                # Application round has moved to handled stage
-                #  AND there are no allocated reservation unit options
-                # OR Application round has NOT moved to rejected stage
-                #  AND all reservation unit options have been locked or rejected
-                condition=(
-                    models.Q(
-                        models.Q(application__application_round__handled_date__isnull=False)
-                        & models.Q(L(allocations=0))
-                    )
-                    | models.Q(
-                        models.Q(application__application_round__handled_date__isnull=True)
-                        & models.Q(L(usable_reservation_unit_options=0))
-                    )
-                ),
+                # All section's reservation unit options are locked or rejected
+                condition=L(usable_reservation_unit_options=0),
                 then=models.Value(ApplicationSectionStatusChoice.REJECTED.value),
             ),
             models.When(
@@ -197,15 +185,14 @@ class ApplicationSection(SerializableMixin, models.Model):
         total_allocations = sum(option.num_of_allocations for option in reservation_unit_options)
         all_locked_or_rejected = all(option.locked or option.rejected for option in reservation_unit_options)
 
-        if total_allocations >= self.applied_reservations_per_week:
-            return ApplicationSectionStatusChoice.HANDLED
         if all_locked_or_rejected:
             return ApplicationSectionStatusChoice.REJECTED
 
-        if self.application.application_round.status.past_allocation:
-            if total_allocations >= 1:
-                return ApplicationSectionStatusChoice.HANDLED
-            return ApplicationSectionStatusChoice.REJECTED
+        if (
+            self.application.application_round.handled_date is not None
+            or total_allocations >= self.applied_reservations_per_week
+        ):
+            return ApplicationSectionStatusChoice.HANDLED
 
         return ApplicationSectionStatusChoice.IN_ALLOCATION
 

@@ -135,6 +135,7 @@ def test_allocated_time_slot__create__application_not_in_allocation_anymore__HAN
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     assert application.status == ApplicationStatusChoice.HANDLED
+    assert section.status == ApplicationSectionStatusChoice.HANDLED
 
     # when:
     # - The user tries to make an allocation for a reservation unit option
@@ -154,9 +155,12 @@ def test_allocated_time_slot__create__application_not_in_allocation_anymore__REJ
     application = ApplicationFactory.create_application_ready_for_allocation(application_round)
     section = application.application_sections.first()
     option = section.reservation_unit_options.first()
+    option.rejected = True
+    option.save()
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     assert application.status == ApplicationStatusChoice.HANDLED
+    assert section.status == ApplicationSectionStatusChoice.REJECTED
 
     # when:
     # - The user tries to make an allocation for a reservation unit option
