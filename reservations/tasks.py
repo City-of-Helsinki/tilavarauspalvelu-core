@@ -5,7 +5,7 @@ from django.conf import settings
 from merchants.models import PaymentOrder
 from merchants.pruning import update_expired_orders
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from reservations.models import Reservation
+from reservations.models import AffectingTimeSpan, Reservation
 from reservations.pruning import (
     prune_inactive_reservations,
     prune_recurring_reservations,
@@ -58,3 +58,8 @@ def refund_paid_reservation_task(reservation_pk: int) -> None:
     else:
         payment_order.refund_id = uuid.uuid4()
         payment_order.save(update_fields=["refund_id"])
+
+
+@app.task(name="update_affecting_time_spans")
+def update_affecting_time_spans_task() -> None:
+    AffectingTimeSpan.refresh()
