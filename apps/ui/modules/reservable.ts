@@ -103,9 +103,6 @@ export function generateReservableMap(
     })
     .filter((n): n is NonNullable<typeof n> => n != null);
 
-  // eslint-disable-next-line no-console -- should enforce that input type is never null instead
-  console.assert(converted.length === reservableTimeSpans.length);
-
   const map = new Map<string, Array<{ start: Date; end: Date }>>();
   for (const n of converted) {
     if (!isSameDay(n.start, n.end)) {
