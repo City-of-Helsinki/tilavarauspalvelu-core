@@ -22,6 +22,8 @@ if TYPE_CHECKING:
     import datetime
     from decimal import Decimal
 
+    from query_optimizer.validators import PaginationArgs
+
     from common.typing import AnyUser
 
 __all__ = [
@@ -199,8 +201,7 @@ class ReservationUnitFilterSet(ModelFilterSet):
 
         return qs.filter(Q(unit_id__in=unit_ids) | Q(unit__unit_groups__in=unit_group_ids)).distinct()
 
-    @staticmethod
-    def get_filter_reservable(qs: ReservationUnitQuerySet, name: str, value: dict[str, Any]) -> QuerySet:
+    def get_filter_reservable(self, qs: ReservationUnitQuerySet, name: str, value: dict[str, Any]) -> QuerySet:
         """
         Filter reservation units by their reservability.
 
@@ -216,11 +217,19 @@ class ReservationUnitFilterSet(ModelFilterSet):
         if not calculate_first_reservable_time:
             return qs
 
+        # Fetch the pagination information from the request.
+        # This is set by the 'DjangoConnectionField' for each connection field in the request.
+        # In this case, we want the 'reservation_units' entrypoints connection field pagination args,
+        # so that we can limit the number of reservation units that we calculate the 'first_reservable_time' for.
+        pagination_info: dict[str, PaginationArgs] | None = getattr(self.request, "optimizer_pagination", None)
+        pagination_args = pagination_info.get("reservation_units") if pagination_info is not None else None
+
         date_start: datetime.date | None = value["reservable_date_start"]
         date_end: datetime.date | None = value["reservable_date_end"]
         time_start: datetime.time | None = value["reservable_time_start"]
         time_end: datetime.time | None = value["reservable_time_end"]
         minimum_duration_minutes: Decimal | None = value["reservable_minimum_duration_minutes"]
+        show_only_reservable: bool = value.get("show_only_reservable", False)
 
         # Annotate all ReservationUnits with `first_reservable_datetime` since we need the info in the GraphQL object.
         # If the GQL field is not selected for the query, then this is unnecessary, but if we do not annotate the info
@@ -231,10 +240,11 @@ class ReservationUnitFilterSet(ModelFilterSet):
             filter_time_start=time_start,
             filter_time_end=time_end,
             minimum_duration_minutes=minimum_duration_minutes,
+            show_only_reservable=show_only_reservable,
+            pagination_args=pagination_args,
         )
 
-        show_everything: bool = not value.get("show_only_reservable", True)
-        if show_everything:
+        if not show_only_reservable:
             return qs
 
         return qs.exclude(first_reservable_datetime=None)

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import zoneinfo
-from typing import TYPE_CHECKING, Generic, TypedDict, TypeVar
+from typing import TYPE_CHECKING, Generic, Literal, TypedDict, TypeVar
 
 from django.utils.timezone import get_default_timezone
 
@@ -367,8 +367,11 @@ def combine(
     return datetime.datetime.combine(date, time, tzinfo=time.tzinfo or tzinfo)
 
 
-def timedelta_to_json(delta: datetime.timedelta) -> str:
-    return str(delta).zfill(8)
+def timedelta_to_json(delta: datetime.timedelta, *, timespec: Literal["minutes", "seconds"] = "seconds") -> str:
+    result = str(delta).zfill(8)
+    if timespec == "minutes":
+        return result[:5]
+    return result
 
 
 def timedelta_from_json(delta: str) -> datetime.timedelta:
