@@ -3,7 +3,7 @@ import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import router from "next/router";
-import { capitalize, isFinite, trim } from "lodash";
+import { capitalize } from "lodash";
 import {
   IconArrowRight,
   IconCalendar,
@@ -29,7 +29,11 @@ import { Container } from "common";
 import { useOrder } from "@/hooks/reservation";
 import { reservationUnitPath } from "@/modules/const";
 import { createApolloClient } from "@/modules/apolloClient";
-import { getTranslation, reservationsUrl } from "@/modules/util";
+import {
+  formatDateTimeRange,
+  getTranslation,
+  reservationsUrl,
+} from "@/modules/util";
 import { BlackButton } from "@/styles/util";
 import { CenterSpinner } from "@/components/common/common";
 import Sanitize from "@/components/common/Sanitize";
@@ -57,7 +61,6 @@ import {
   getGenericTerms,
 } from "@/modules/serverUtils";
 import { base64encode, filterNonNullable } from "common/src/helpers";
-import { fromApiDate } from "common/src/common/util";
 import { containsField, containsNameField } from "common/src/metaFieldsHelpers";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
@@ -74,7 +77,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
-  if (isFinite(pk)) {
+  if (Number.isFinite(pk)) {
     const bookingTerms = await getGenericTerms(apolloClient);
 
     // NOTE errors will fallback to 404
@@ -493,21 +496,8 @@ function Reservation({
   }
 
   const { begin, end } = reservation;
-
-  const beginDate = t("common:dateWithWeekday", { date: fromApiDate(begin) });
-  const beginTime = t("common:timeWithPrefixInForm", {
-    date: fromApiDate(begin),
-  });
-  const endDate = t("common:dateWithWeekday", { date: fromApiDate(end) });
-  const endTime = t("common:timeInForm", { date: fromApiDate(end) });
-
   const timeString = capitalize(
-    trim(
-      `${beginDate} ${beginTime}-${
-        endDate !== beginDate ? endDate : ""
-      }${endTime}`,
-      " - "
-    )
+    formatDateTimeRange(t, new Date(begin), new Date(end))
   );
 
   const supportedFields = filterNonNullable(

@@ -2,8 +2,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation, type TFunction } from "next-i18next";
 import styled from "styled-components";
 import { Button, IconAngleDown, IconAngleUp, IconCross } from "hds-react";
-import { maxBy, trim } from "lodash";
-import { fromUIDate, toUIDate } from "common/src/common/util";
+import { maxBy } from "lodash";
+import { fromUIDate } from "common/src/common/util";
 import { Transition } from "react-transition-group";
 import {
   fontBold,
@@ -13,11 +13,12 @@ import {
 import { breakpoints } from "common/src/common/style";
 import type { ReservationUnitPageQuery } from "@gql/gql-types";
 import { truncatedText } from "@/styles/util";
+import { getReservationUnitPrice } from "@/modules/reservationUnit";
 import {
-  getReservationUnitPrice,
-  getTimeString,
-} from "@/modules/reservationUnit";
-import { capitalize, getSelectedOption } from "@/modules/util";
+  capitalize,
+  formatDateTimeRange,
+  getSelectedOption,
+} from "@/modules/util";
 import type {
   Control,
   FieldValues,
@@ -285,19 +286,13 @@ const ReservationCalendarControls = ({
 }: Props): JSX.Element => {
   const { t } = useTranslation();
   const { control, watch, handleSubmit } = reservationForm;
-  const { start, end } = focusSlot ?? {};
   const formDate = watch("date");
   const formDuration = watch("duration");
   const date = new Date(formDate ?? "");
   const dateValue = useMemo(() => fromUIDate(formDate ?? ""), [formDate]);
-  const focusDate = useMemo(
-    () => focusSlot?.start ?? dateValue,
-    [focusSlot, dateValue]
-  );
   const duration = !Number.isNaN(Number(formDuration))
     ? Number(formDuration)
     : reservationUnit.minReservationDuration ?? 0;
-  const time = watch("time") ?? getTimeString(focusDate);
   const [areControlsVisible, setAreControlsVisible] = useState(false);
 
   useEffect(() => {
@@ -306,28 +301,9 @@ const ReservationCalendarControls = ({
     }
   }, [setShouldCalendarControlsBeVisible, shouldCalendarControlsBeVisible]);
 
-  const startDate = t("common:dateWithWeekday", {
-    date: start && toUIDate(start),
-  });
-
-  const startTime = t("common:timeInForm", {
-    date: time,
-  });
-
-  const endDate = t("common:dateWithWeekday", {
-    date: end && toUIDate(end),
-  });
-
-  const endTime = t("common:timeInForm", {
-    date: end && getTimeString(end),
-  });
-
   const togglerLabel = (() => {
-    const dateStr = trim(
-      `${capitalize(startDate)} ${startTime}${
-        endDate !== startDate ? ` - ${capitalize(endDate)} ` : "-"
-      }${endTime}`,
-      "-"
+    const dateStr = capitalize(
+      formatDateTimeRange(t, focusSlot.start, focusSlot.end)
     );
     const durationStr =
       duration != null
