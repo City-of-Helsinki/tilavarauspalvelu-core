@@ -163,9 +163,6 @@ class ReservableTimeSpanClient:
         return ReservableTimeSpan.objects.bulk_create(reservable_time_spans)
 
     def _merge_overlapping_closed_time_spans(self, parsed_time_spans: list[TimeSpanElement]) -> list[TimeSpanElement]:
-        closed_time_spans: list[TimeSpanElement] = [
-            timespan
-            for timespan in sorted(parsed_time_spans, key=lambda x: x.start_datetime)
-            if not timespan.is_reservable
-        ]
-        return merge_overlapping_time_span_elements(closed_time_spans)
+        return merge_overlapping_time_span_elements(
+            timespan for timespan in parsed_time_spans if not timespan.is_reservable
+        )
