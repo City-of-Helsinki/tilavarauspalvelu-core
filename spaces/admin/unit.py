@@ -62,6 +62,6 @@ class UnitAdmin(SortableAdminMixin, ExtraButtonsMixin, TranslationAdmin):
                     msg += f" Skipped {not_updated_count} units."
                 self.message_user(request, msg, level=messages.SUCCESS)
 
-    @button(label="Update from TPREK")
+    @button(label="Update from TPREK", change_form=True)
     def update_from_tprek_button(self, request: WSGIRequest, pk: int) -> None:
         self.update_from_tprek(request, Unit.objects.filter(pk=pk))

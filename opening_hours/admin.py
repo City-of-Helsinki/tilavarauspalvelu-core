@@ -2,6 +2,7 @@ from admin_extra_buttons.decorators import button
 from admin_extra_buttons.mixins import ExtraButtonsMixin
 from django import forms
 from django.contrib import admin
+from django.core.handlers.wsgi import WSGIRequest
 from django.db.models import Count, QuerySet
 from django.urls import reverse
 from django.utils.html import format_html
@@ -93,7 +94,7 @@ class OriginHaukiResourceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         ReservableTimeSpanInline,
     ]
 
-    def get_queryset(self, request):
+    def get_queryset(self, request: WSGIRequest) -> QuerySet:
         return (
             super()
             .get_queryset(request)
@@ -105,23 +106,23 @@ class OriginHaukiResourceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
             )
         )
 
-    def get_readonly_fields(self, request, obj=None):
+    def get_readonly_fields(self, request: WSGIRequest, obj: OriginHaukiResource | None = None) -> list[str]:
         if obj:
             return ["id", *self.readonly_fields]
         return self.readonly_fields
 
-    def reservable_time_spans_count(self, obj):
-        return obj.reservable_time_spans_count
+    def reservable_time_spans_count(self, obj: OriginHaukiResource) -> int:
+        return getattr(obj, "reservable_time_spans_count", -1)
 
-    def linked_reservation_units(self, obj):
+    def linked_reservation_units(self, obj: OriginHaukiResource) -> str:
         return ", ".join(obj.reservation_units.values_list("name_fi", flat=True))
 
     @button(label="Update All Reservable Time Spans", change_list=True)
-    def update_all_hauki_resources_reservable_time_spans(self, request) -> None:
+    def update_all_hauki_resources_reservable_time_spans(self, request: WSGIRequest) -> None:
         HaukiResourceHashUpdater().run(force_refetch=True)
         self.message_user(request, _("Reservable Time Spans updated."))
 
     @button(label="Update Reservable Time Spans", change_form=True)
-    def update_single_hauki_resource_reservable_times_pans(self, request, pk) -> None:
+    def update_single_hauki_resource_reservable_times_pans(self, request: WSGIRequest, pk: int) -> None:
         HaukiResourceHashUpdater([pk]).run(force_refetch=True)
         self.message_user(request, _("Reservable Time Spans updated."))

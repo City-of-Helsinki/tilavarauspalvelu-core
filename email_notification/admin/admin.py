@@ -1,6 +1,7 @@
 from admin_extra_buttons.api import ExtraButtonsMixin, button
 from django.contrib import admin
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.handlers.wsgi import WSGIRequest
 from django.db.models.fields.files import FieldFile
 from django.forms import ModelForm, ValidationError
 from django.http import HttpResponseRedirect
@@ -96,6 +97,6 @@ class EmailTemplateAdmin(ExtraButtonsMixin, TranslationAdmin):
     model = EmailTemplate
     form = EmailTemplateAdminForm
 
-    @button(label="Email Template Testing")
-    def template_tester(self, request, pk) -> TemplateResponse | HttpResponseRedirect:
+    @button(label="Email Template Testing", change_form=True)
+    def template_tester(self, request: WSGIRequest, pk: int) -> TemplateResponse | HttpResponseRedirect:
         return email_template_tester_admin_view(self, request, pk)
