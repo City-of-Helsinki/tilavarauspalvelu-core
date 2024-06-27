@@ -56,6 +56,7 @@ jest.mock("next-i18next", () => ({
 describe("getPossibleTimesForDay", () => {
   beforeAll(() => {
     jest.useFakeTimers({
+      doNotFake: ["performance"],
       // use two numbers for hour so we don't need to pad with 0
       now: new Date(2024, 0, 1, 10, 0, 0),
     });
@@ -182,6 +183,24 @@ describe("getPossibleTimesForDay", () => {
     ]);
     const input = createInput({ date, duration: 150, reservableTimes });
     expect(getPossibleTimesForDay(input)).toStrictEqual([]);
+  });
+
+  // getPossibleTimesForDay does multiple calls to isRangeReservable which is heavy
+  // a lot of array copying / generation
+  test("performance", () => {
+    const date = startOfToday();
+    const reservableTimes = mockReservableTimes();
+    reservableTimes.set(dateToKey(date), [
+      { start: addHours(date, 10), end: addHours(date, 11) },
+      { start: addHours(date, 12), end: addHours(date, 14) },
+      { start: addHours(date, 16), end: addHours(date, 18) },
+      { start: addHours(date, 19), end: addHours(date, 20) },
+    ]);
+    const input = createInput({ date, reservableTimes });
+    const start = performance.now();
+    getPossibleTimesForDay(input);
+    const end = performance.now();
+    expect(end - start).toBeLessThan(20);
   });
 });
 

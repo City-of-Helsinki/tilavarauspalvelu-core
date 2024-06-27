@@ -126,7 +126,7 @@ function constructDate(d: Date, hours: number, minutes: number) {
 describe("getNextAvailableTime", () => {
   beforeAll(() => {
     jest.useFakeTimers({
-      doNotFake: ['performance'],
+      doNotFake: ["performance"],
       // There is some weird time zone issues (this seems to work)
       now: new Date(2024, 0, 1, 9, 0, 0),
     });
@@ -153,14 +153,21 @@ describe("getNextAvailableTime", () => {
     ]);
   });
 
-  function mockOpenTimes(start: Date, days: number, data?: Array<{ start: Date; end: Date }>) {
+  function mockOpenTimes(
+    start: Date,
+    days: number,
+    data?: Array<{ start: Date; end: Date }>
+  ) {
     for (let i = 0; i < days; i++) {
-      reservableTimes.set(dateToKey(addDays(start, i)), data ?? [
-        {
-          start: constructDate(addDays(start, i), 10, 0),
-          end: constructDate(addDays(start, i), 15, 0),
-        },
-      ]);
+      reservableTimes.set(
+        dateToKey(addDays(start, i)),
+        data ?? [
+          {
+            start: constructDate(addDays(start, i), 10, 0),
+            end: constructDate(addDays(start, i), 15, 0),
+          },
+        ]
+      );
     }
   }
 
@@ -169,7 +176,7 @@ describe("getNextAvailableTime", () => {
     duration,
     reservationsMinDaysBefore,
     reservationsMaxDaysBefore,
-    activeApplicationRounds
+    activeApplicationRounds,
   }: {
     start: Date;
     duration: number;
@@ -296,7 +303,7 @@ describe("getNextAvailableTime", () => {
   describe("reservationsMinDaysBefore check", () => {
     test("finds the next available time a week from now", () => {
       const today = new Date();
-      mockOpenTimes(today, 2*7);
+      mockOpenTimes(today, 2 * 7);
       const input = createInput({
         start: today,
         duration: 60,
@@ -340,10 +347,12 @@ describe("getNextAvailableTime", () => {
       const today = new Date();
       mockOpenTimes(today, 30);
       const end = addDays(today, 7);
-      const activeApplicationRounds: RoundPeriod[] = [{
-        reservationPeriodBegin: addDays(today, -7).toISOString(),
-        reservationPeriodEnd: end.toISOString(),
-      }];
+      const activeApplicationRounds: RoundPeriod[] = [
+        {
+          reservationPeriodBegin: addDays(today, -7).toISOString(),
+          reservationPeriodEnd: end.toISOString(),
+        },
+      ];
       const input = createInput({
         start: today,
         duration: 60,
@@ -353,7 +362,7 @@ describe("getNextAvailableTime", () => {
       expect(val).toBeInstanceOf(Date);
       expect(val!.getDate()).toBe(addDays(end, 1).getDate());
       expect(val!.getHours()).toBe(10);
-    })
+    });
 
     test("multiple overlapping activeApplicationRounds", () => {
       const today = new Date();
@@ -378,7 +387,7 @@ describe("getNextAvailableTime", () => {
       expect(val).toBeInstanceOf(Date);
       expect(val!.getDate()).toBe(addDays(end, 3).getDate());
       expect(val!.getHours()).toBe(10);
-    })
+    });
 
     test("finds a time between non-overlapping activeApplicationRounds", () => {
       const today = new Date();
@@ -409,10 +418,12 @@ describe("getNextAvailableTime", () => {
       const today = new Date();
       mockOpenTimes(today, 30);
       const end = addDays(today, 31);
-      const activeApplicationRounds: RoundPeriod[] = [{
-        reservationPeriodBegin: addDays(today, -7).toISOString(),
-        reservationPeriodEnd: end.toISOString(),
-      }];
+      const activeApplicationRounds: RoundPeriod[] = [
+        {
+          reservationPeriodBegin: addDays(today, -7).toISOString(),
+          reservationPeriodEnd: end.toISOString(),
+        },
+      ];
       const input = createInput({
         start: addDays(end, 1),
         duration: 60,
@@ -420,16 +431,18 @@ describe("getNextAvailableTime", () => {
       });
       const val = getNextAvailableTime(input);
       expect(val).toBeNull();
-    })
+    });
 
     // TODO add more tests for application round
     // block 12 months using activeApplicationRounds, measure the time it takes
     test("performance: finds the next available time after a long application round", () => {
       mockOpenTimes(new Date(), 2 * 365);
-      const activeApplicationRounds: RoundPeriod[] = [{
-        reservationPeriodBegin: new Date().toISOString(),
-        reservationPeriodEnd: addDays(new Date(), 365).toISOString(),
-      }];
+      const activeApplicationRounds: RoundPeriod[] = [
+        {
+          reservationPeriodBegin: new Date().toISOString(),
+          reservationPeriodEnd: addDays(new Date(), 365).toISOString(),
+        },
+      ];
       const today = new Date();
       const input = createInput({
         start: today,
@@ -442,7 +455,7 @@ describe("getNextAvailableTime", () => {
       const perfTime = perfEnd - perfStart;
       expect(val).toBeInstanceOf(Date);
       expect(perfTime).toBeLessThan(100);
-    })
+    });
   });
 });
 /* eslint-enable @typescript-eslint/no-non-null-assertion */

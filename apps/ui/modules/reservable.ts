@@ -17,12 +17,9 @@ import {
   getIntervalMinutes,
 } from "common/src/helpers";
 import {
-  set,
   differenceInSeconds,
   isValid,
   format,
-  getHours,
-  getMinutes,
   addMinutes,
   areIntervalsOverlapping,
   startOfDay,
@@ -245,14 +242,14 @@ export function isRangeReservable({
     return false;
   }
 
-  if (!isDateInsideInterval(start, reservableTimes, reservationStartInterval)) {
+  if (!isStartTimeValid(start, reservableTimes, reservationStartInterval)) {
     return false;
   }
 
   // TODO what does this do?
   if (
     !isRangeReservable_({
-      range: [start, normalizedEnd],
+      range: [start, end],
       reservableTimes,
       reservationBegins: reservationBegins
         ? new Date(reservationBegins)
@@ -271,7 +268,8 @@ export function isRangeReservable({
 
 export type TimeFrameSlot = { start: Date; end: Date };
 // checks that the start time is valid for the interval of the reservation unit
-function isDateInsideInterval(
+// TODO should this be doing any checks for the date? or just the start time?
+export function isStartTimeValid(
   date: Date,
   timeSlots: ReservableMap,
   interval: ReservationStartInterval
@@ -280,33 +278,10 @@ function isDateInsideInterval(
   if (slotsForDay == null) {
     return false;
   }
-
-  const timeframe = slotsForDay.reduce<TimeFrameSlot | null>((acc, curr) => {
-    const begin = new Date(curr.start);
-    const end = new Date(curr.end);
-    return {
-      start: acc?.start && acc.start < begin ? acc.start : begin,
-      end: acc?.end && acc.end > end ? acc.end : end,
-    };
-  }, null);
-
-  const { start, end } = timeframe ?? {};
-  if (start == null || end == null) {
-    return false;
-  }
-
-  const s: { h: number; m: number } = {
-    h: getHours(start),
-    m: getMinutes(start),
-  };
-  const e: { h: number; m: number } = { h: getHours(end), m: getMinutes(end) };
-  const intervals = getDayIntervals(s, e, interval);
-  for (const i of intervals) {
-    if (i.h === s.h && i.m === s.m) {
-      return true;
-    }
-  }
-  return false;
+  const intervalMins = getIntervalMinutes(interval);
+  return slotsForDay
+    .filter((x) => x.start <= date && x.end > date)
+    .some((x) => differenceInMinutes(date, x.start) % intervalMins === 0);
 }
 
 // TODO rename and rework this function
@@ -337,11 +312,10 @@ function isRangeReservable_({
     ReservationStartInterval.Interval_15Mins
   );
 
-  if (
-    !slots.every((slot) =>
-      areReservableTimesAvailable(reservableTimes, slot, true)
-    )
-  ) {
+  const res = slots.map((slot) =>
+    areReservableTimesAvailable(reservableTimes, slot)
+  );
+  if (!res.every((val) => val)) {
     return false;
   }
 
@@ -426,7 +400,9 @@ function generateSlots(
   const slots = [];
   const intervalMinutes = getIntervalMinutes(reservationStartInterval);
 
-  for (let i = new Date(start); i <= end; i = addMinutes(i, intervalMinutes)) {
+  // TODO is there a reason to generate the last slot? if yes then we need to normalize it so it's 1ms before the actual end
+  // otherwise another check will fail
+  for (let i = new Date(start); i < end; i = addMinutes(i, intervalMinutes)) {
     slots.push(i);
   }
 
@@ -435,23 +411,17 @@ function generateSlots(
 
 function areReservableTimesAvailable(
   reservableTimes: ReservableMap,
-  slotDate: Date,
-  validateEnding = false
+  slotDate: Date
 ): boolean {
   // TODO this should be done differently slots is kinda bad
-  const day = startOfDay(slotDate);
-  const reservableTimesForDay = reservableTimes.get(dateToKey(day));
+  const reservableTimesForDay = reservableTimes.get(dateToKey(slotDate));
   if (reservableTimesForDay == null) {
     return false;
   }
   return reservableTimesForDay.some((slot) => {
     const startDate = slot.start;
     const endDate = slot.end;
-
-    if (validateEnding) {
-      return startDate <= slotDate && endDate > slotDate;
-    }
-    return startDate <= slotDate;
+    return startDate <= slotDate && endDate > slotDate;
   });
 }
 
@@ -506,7 +476,7 @@ function areSlotsReservable(
         reservationBegins,
         reservationEnds
       ) &&
-      areReservableTimesAvailable(reservableTimes, slotDate, true) &&
+      areReservableTimesAvailable(reservableTimes, slotDate) &&
       !doesSlotCollideWithApplicationRounds(slotDate, activeApplicationRounds)
   );
 }
@@ -584,15 +554,10 @@ export function getBoundCheckedReservation({
   // start time and duration needs to be snapped to the nearest interval
   // i.e. case where the options are 60 mins apart but the drag and drop allows 30 mins increments
   // this causes backend validation errors
+  // TODO need to redo the start snapping function
+  // needs to use isStartTimeValid or a similar method (that calculates the distance from reservableTimes)
   const interval = getIntervalMinutes(reservationStartInterval);
-  let dayTime = start.getHours() * 60 + start.getMinutes();
-  if (dayTime % interval !== 0) {
-    dayTime = Math.ceil(dayTime / interval) * interval;
-  }
-  const newStart = set(startOfDay(start), {
-    hours: dayTime / 60,
-    minutes: dayTime % 60,
-  });
+  const newStart = start;
   let duration = clampDuration(
     originalDuration,
     minReservationDurationMinutes,
@@ -646,6 +611,7 @@ export function clampDuration(
 }
 
 /// Generate a list of intervals for a day
+// TODO this can be moved to reservationUnit (not used here anymore)
 export function getDayIntervals(
   startTime: { h: number; m: number },
   endTime: { h: number; m: number },

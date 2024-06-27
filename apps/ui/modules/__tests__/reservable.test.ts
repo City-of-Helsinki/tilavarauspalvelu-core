@@ -12,6 +12,7 @@ import {
   generateReservableMap,
   isRangeReservable,
   getDayIntervals,
+  isStartTimeValid,
 } from "../reservable";
 import {
   type IsReservableFieldsFragment,
@@ -237,7 +238,67 @@ describe("generateReservableMap", () => {
   });
 });
 
+describe("isStartTimeValid", () => {
+  function mockReservableTimes(): ReservableMap {
+    const map: ReservableMap = new Map();
+    for (let i = 0; i < 30; i++) {
+      const date = addDays(startOfToday(), i);
+      const key = format(date, "yyyy-MM-dd");
+      // TODO need to have holes in this
+      const value = [{ start: startOfDay(date), end: endOfDay(date) }];
+      map.set(key, value);
+    }
+    return map;
+  }
+  // TODO fuzzy this
+  test("YES for 15 min intervals", () => {
+    const date = startOfDay(addDays(new Date(), 1));
+    const start = addHours(date, 9);
+    const interval = ReservationStartInterval.Interval_15Mins;
+    const reservableTimes = mockReservableTimes();
+    expect(isStartTimeValid(start, reservableTimes, interval)).toBe(true);
+  });
+  // TODO fuzzy
+  test("YES for 30 min intervals", () => {
+    const date = startOfDay(addDays(new Date(), 1));
+    const start = addHours(date, 9);
+    const interval = ReservationStartInterval.Interval_30Mins;
+    const reservableTimes = mockReservableTimes();
+    expect(isStartTimeValid(start, reservableTimes, interval)).toBe(true);
+  });
+  test("YES for 60 min intervals", () => {
+    const date = startOfDay(addDays(new Date(), 1));
+    const start = addHours(date, 9);
+    const interval = ReservationStartInterval.Interval_60Mins;
+    const reservableTimes = mockReservableTimes();
+    expect(isStartTimeValid(start, reservableTimes, interval)).toBe(true);
+  });
+  test("NO for 60 min intervals", () => {
+    const date = startOfDay(addDays(new Date(), 1));
+    const start = addHours(date, 9.5);
+    const interval = ReservationStartInterval.Interval_60Mins;
+    const reservableTimes = mockReservableTimes();
+    expect(isStartTimeValid(start, reservableTimes, interval)).toBe(false);
+  });
+  test("YES for 120 min intervals", () => {
+    const date = startOfDay(addDays(new Date(), 1));
+    const start = addHours(date, 10);
+    const interval = ReservationStartInterval.Interval_120Mins;
+    const reservableTimes = mockReservableTimes();
+    expect(isStartTimeValid(start, reservableTimes, interval)).toBe(true);
+  });
+  test("NO for 120 min intervals", () => {
+    const date = startOfDay(addDays(new Date(), 1));
+    const start = addHours(date, 9);
+    const interval = ReservationStartInterval.Interval_120Mins;
+    const reservableTimes = mockReservableTimes();
+    expect(isStartTimeValid(start, reservableTimes, interval)).toBe(false);
+  });
+});
+
 describe("isRangeReservable", () => {
+  // TODO mock time
+
   // one month of reservable times
   function mockReservableTimes(): ReservableMap {
     const map: ReservableMap = new Map();
@@ -282,25 +343,29 @@ describe("isRangeReservable", () => {
   }
 
   test("YES for the base case", () => {
+    const start = addHours(startOfDay(addDays(new Date(), 1)), 10);
     const input = createInput({
-      start: addHours(new Date(), 1),
-      end: addHours(new Date(), 2),
+      start,
+      end: addHours(start, 2),
     });
     expect(isRangeReservable(input)).toBe(true);
   });
 
   test("NO for starting in the past", () => {
+    const now = new Date();
+    const start = addHours(startOfDay(now), now.getHours() - 1);
     const input = createInput({
-      start: addHours(new Date(), -1),
-      end: addHours(new Date(), 2),
+      start,
+      end: addHours(start, 2),
     });
     expect(isRangeReservable(input)).toBe(false);
   });
 
   test("NO if end < start", () => {
+    const start = addHours(startOfDay(Date.now()), 10);
     const input = createInput({
-      start: addHours(new Date(), 2),
-      end: addHours(new Date(), 1),
+      start,
+      end: addHours(start, -1),
     });
     expect(isRangeReservable(input)).toBe(false);
   });
@@ -327,18 +392,28 @@ describe("isRangeReservable", () => {
   test("YES if the range is exactly an interval", () => {
     const date = startOfDay(addDays(new Date(), 1));
     const input = createInput({
-      start: addHours(date, 9),
-      end: addHours(date, 11),
+      start: addHours(date, 10),
+      end: addHours(date, 12),
       interval: ReservationStartInterval.Interval_120Mins,
     });
     expect(isRangeReservable(input)).toBe(true);
   });
 
+  test("NO if the range start time doesn't match interval", () => {
+    const date = startOfDay(addDays(new Date(), 1));
+    const input = createInput({
+      start: addHours(date, 11),
+      end: addHours(date, 13),
+      interval: ReservationStartInterval.Interval_120Mins,
+    });
+    expect(isRangeReservable(input)).toBe(false);
+  });
+
   test("NO if the range is not divisible with interval", () => {
     const date = startOfDay(addDays(new Date(), 1));
     const input = createInput({
-      start: addHours(date, 9),
-      end: addHours(date, 12),
+      start: addHours(date, 10),
+      end: addHours(date, 13),
       interval: ReservationStartInterval.Interval_120Mins,
     });
     expect(isRangeReservable(input)).toBe(false);

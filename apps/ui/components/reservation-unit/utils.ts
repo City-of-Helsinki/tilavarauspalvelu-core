@@ -1,4 +1,11 @@
-import { addDays, addMinutes, isAfter, isBefore, set, startOfDay } from "date-fns";
+import {
+  addDays,
+  addMinutes,
+  isAfter,
+  isBefore,
+  set,
+  startOfDay,
+} from "date-fns";
 import type {
   ReservationUnitNode,
   ReservationUnitPageQuery,
@@ -119,7 +126,9 @@ export function getNextAvailableTime(props: AvailableTimesProps): Date | null {
   const endDay = possibleEndDay ? addDays(possibleEndDay, 1) : undefined;
   // NOTE there is still a case where application rounds have a hole but there are no reservable times
   // this is not a real use case but technically possible
-  const openAfterRound: Date | undefined = props.activeApplicationRounds.reduce<Date | undefined>((acc, round) => {
+  const openAfterRound: Date | undefined = props.activeApplicationRounds.reduce<
+    Date | undefined
+  >((acc, round) => {
     if (round.reservationPeriodEnd == null) {
       return acc;
     }
