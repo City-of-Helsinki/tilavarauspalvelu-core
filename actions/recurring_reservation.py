@@ -7,11 +7,14 @@ from typing import TYPE_CHECKING, Any, TypedDict
 
 from common.date_utils import DEFAULT_TIMEZONE, combine, get_periods_between
 from opening_hours.utils.time_span_element import TimeSpanElement
-from opening_hours.utils.time_span_element_utils import merge_overlapping_time_span_elements
-from reservation_units.models import ReservationUnit
-from reservation_units.utils.affecting_reservations_helper import AffectingReservationHelper
 from reservations.enums import RejectionReadinessChoice
-from reservations.models import RecurringReservation, RejectedOccurrence, Reservation, ReservationPurpose
+from reservations.models import (
+    AffectingTimeSpan,
+    RecurringReservation,
+    RejectedOccurrence,
+    Reservation,
+    ReservationPurpose,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable
@@ -136,17 +139,14 @@ class RecurringReservationActions:
         """
         pk = self.recurring_reservation.reservation_unit.pk
 
-        helper = AffectingReservationHelper(
-            start_date=self.recurring_reservation.begin_date,
-            end_date=self.recurring_reservation.end_date,
-            reservation_unit_queryset=ReservationUnit.objects.filter(pk=pk).prefetch_related("spaces", "resources"),
-        )
-        closed, blocked = helper.get_affecting_time_spans()
-
-        sorted_closed = sorted(closed.get(pk, []), key=lambda x: x.buffered_start_datetime)
-        sorted_blocked = sorted(blocked.get(pk, []), key=lambda x: x.buffered_start_datetime)
-        closed_timespans = merge_overlapping_time_span_elements(sorted_closed)
-        blocked_timespans = merge_overlapping_time_span_elements(sorted_blocked)
+        timespans = [
+            timespan.as_time_span_element()
+            for timespan in AffectingTimeSpan.objects.filter(
+                affected_reservation_unit_ids__contains=[pk],
+                buffered_start_datetime__date__lte=self.recurring_reservation.end_date,
+                buffered_end_datetime__date__gte=self.recurring_reservation.begin_date,
+            )
+        ]
 
         reservable_timespans = self.get_reservable_timespans() if check_opening_hours else []
 
@@ -199,12 +199,10 @@ class RecurringReservationActions:
                 # that exist due to existing reservations? Checks for:
                 # 1) Unbuffered reservation timespan overlapping with any buffered closed timespan
                 # 2) Unbuffered closed timespan overlapping with any buffered reservation timespan
-                # 3) Unbuffered reservation timespan overlapping with any unbuffered blocked timespan
                 # Note that reservation timespans buffers are only checked if `check_buffers=True`.
-                if (
-                    any(reservation_timespan.overlaps_with(closed) for closed in closed_timespans)
-                    or any(closed.overlaps_with(reservation_timespan) for closed in closed_timespans)
-                    or any(reservation_timespan.overlaps_with(blocked) for blocked in blocked_timespans)
+                if any(
+                    reservation_timespan.overlaps_with(timespan) or timespan.overlaps_with(reservation_timespan)
+                    for timespan in timespans
                 ):
                     results.overlapping.append(ReservationPeriod(begin=begin, end=end))
                     continue

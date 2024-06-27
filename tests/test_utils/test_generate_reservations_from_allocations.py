@@ -6,7 +6,7 @@ import pytest
 
 from applications.enums import ApplicantTypeChoice, Weekday
 from applications.tasks import generate_reservation_series_from_allocations
-from common.date_utils import DEFAULT_TIMEZONE, combine, local_datetime, local_iso_format
+from common.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_datetime, local_iso_format
 from opening_hours.enums import HaukiResourceState
 from opening_hours.utils.hauki_api_client import HaukiAPIClient
 from opening_hours.utils.hauki_api_types import (
@@ -23,7 +23,7 @@ from reservations.enums import (
     ReservationStateChoice,
     ReservationTypeChoice,
 )
-from reservations.models import RecurringReservation, RejectedOccurrence, Reservation
+from reservations.models import AffectingTimeSpan, RecurringReservation, RejectedOccurrence, Reservation
 from tests.factories import AllocatedTimeSlotFactory, ReservationFactory
 from tests.helpers import patch_method
 from utils.sentry import SentryLogger
@@ -32,7 +32,7 @@ pytestmark = [
     pytest.mark.django_db,
 ]
 
-
+NEXT_YEAR = local_date().year + 1
 EMPTY_RESPONSE = HaukiAPIOpeningHoursResponseItem(
     resource=HaukiAPIOpeningHoursResponseResource(
         id=1,
@@ -232,7 +232,7 @@ def test_generate_reservation_series_from_allocations__invalid_start_interval():
 
 
 @patch_method(HaukiAPIClient.get_resource_opening_hours, return_value=EMPTY_RESPONSE)
-@freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=DEFAULT_TIMEZONE))
+@freezegun.freeze_time(datetime.datetime(NEXT_YEAR, 1, 1, tzinfo=DEFAULT_TIMEZONE))
 def test_generate_reservation_series_from_allocations__overlapping_reservation():
     slot = AllocatedTimeSlotFactory.create_ready_for_reservation(num=2)
     application_round = slot.reservation_unit_option.application_section.application.application_round
@@ -244,6 +244,7 @@ def test_generate_reservation_series_from_allocations__overlapping_reservation()
     )
 
     ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
 
     generate_reservation_series_from_allocations(application_round_id=application_round.id)
 
@@ -259,8 +260,8 @@ def test_generate_reservation_series_from_allocations__overlapping_reservation()
     assert len(rejected) == 1
 
     assert rejected[0].rejection_reason == RejectionReadinessChoice.OVERLAPPING_RESERVATIONS
-    assert local_iso_format(rejected[0].begin_datetime) == local_datetime(2024, 1, 1, hour=12).isoformat()
-    assert local_iso_format(rejected[0].end_datetime) == local_datetime(2024, 1, 1, hour=14).isoformat()
+    assert local_iso_format(rejected[0].begin_datetime) == local_datetime(NEXT_YEAR, 1, 1, hour=12).isoformat()
+    assert local_iso_format(rejected[0].end_datetime) == local_datetime(NEXT_YEAR, 1, 1, hour=14).isoformat()
 
 
 @patch_method(HaukiAPIClient.get_resource_opening_hours)

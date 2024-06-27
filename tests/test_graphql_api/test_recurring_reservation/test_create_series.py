@@ -2,10 +2,10 @@ import datetime
 
 import pytest
 
-from common.date_utils import DEFAULT_TIMEZONE, local_end_of_day, local_start_of_day
+from common.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_end_of_day, local_start_of_day
 from reservation_units.models import ReservationUnitHierarchy
 from reservations.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
-from reservations.models import RecurringReservation, Reservation
+from reservations.models import AffectingTimeSpan, RecurringReservation, Reservation
 from tests.factories import (
     AbilityGroupFactory,
     AgeGroupFactory,
@@ -529,26 +529,38 @@ def test_recurring_reservations__create_series__overlapping_reservations(graphql
     space = SpaceFactory.create()
     reservation_unit = ReservationUnitFactory.create(spaces=[space])
     user = graphql.login_with_superuser()
+    next_year = local_date().year + 1
+
+    start = datetime.date(next_year, 1, 1)
+    end = datetime.date(next_year, 1, 8)
+    reservation_begin = combine(end, datetime.time(10), tzinfo=DEFAULT_TIMEZONE)
+    reservation_end = combine(end, datetime.time(12), tzinfo=DEFAULT_TIMEZONE)
 
     ReservationFactory.create(
         reservation_unit=[reservation_unit],
-        begin=datetime.datetime(2024, 1, 8, 10, 0, 0, tzinfo=DEFAULT_TIMEZONE),
-        end=datetime.datetime(2024, 1, 8, 12, 0, 0, tzinfo=DEFAULT_TIMEZONE),
+        begin=reservation_begin,
+        end=reservation_end,
         state=ReservationStateChoice.CONFIRMED,
     )
 
     ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
 
-    end = datetime.date(2024, 1, 8).isoformat()
-    data = get_minimal_series_data(reservation_unit, user, endDate=end)
+    data = get_minimal_series_data(
+        reservation_unit,
+        user,
+        weekdays=[start.weekday()],
+        beginDate=start.isoformat(),
+        endDate=end.isoformat(),
+    )
     response = graphql(CREATE_SERIES_MUTATION, input_data=data)
 
     assert response.has_errors is True
     assert response.error_message() == "Not all reservations can be made due to overlapping reservations."
     assert response.errors[0]["extensions"]["overlapping"] == [
         {
-            "begin": "2024-01-08T10:00:00+02:00",
-            "end": "2024-01-08T12:00:00+02:00",
+            "begin": f"{next_year}-01-08T10:00:00+02:00",
+            "end": f"{next_year}-01-08T12:00:00+02:00",
         },
     ]
 
