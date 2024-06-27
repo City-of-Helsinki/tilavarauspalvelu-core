@@ -71,15 +71,22 @@ export const reservationToInterval = (
   };
 };
 
+// NOTE optionals (?) are super bad because if you forget to query anything from the object there will be no type errors
+// can't remove them because they are not mandatory in the gql schema
+// maybe using an utility function that forces subobjects to NonNullable could work for this.
 type Application = {
   applicantType?:
     | Pick<ApplicationNode, "applicantType">["applicantType"]
-    | null;
-  contactPerson?: Pick<PersonNode, "firstName" | "lastName"> | null;
-  organisation?: Pick<
-    NonNullable<Pick<ApplicationNode, "organisation">["organisation"]>,
-    "name"
-  > | null;
+    | null
+    | undefined;
+  contactPerson?: Pick<PersonNode, "firstName" | "lastName"> | null | undefined;
+  organisation?:
+    | Pick<
+        NonNullable<Pick<ApplicationNode, "organisation">["organisation"]>,
+        "name"
+      >
+    | null
+    | undefined;
 };
 export function getApplicantName(app?: Application | undefined | null): string {
   if (!app) {

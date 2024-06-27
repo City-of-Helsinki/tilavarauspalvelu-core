@@ -8608,6 +8608,7 @@ export type RejectedOccurrencesQuery = {
                     firstName: string;
                     lastName: string;
                   } | null;
+                  organisation?: { id: string; name: string } | null;
                 };
               };
               reservationUnit: {
@@ -15491,6 +15492,10 @@ export const RejectedOccurrencesDocument = gql`
                       id
                       firstName
                       lastName
+                    }
+                    organisation {
+                      id
+                      name
                     }
                   }
                 }

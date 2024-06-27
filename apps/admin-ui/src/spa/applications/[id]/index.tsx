@@ -857,7 +857,7 @@ function ApplicationDetails({
     application?.billingAddress != null &&
     !isEqual(application?.billingAddress, application?.organisation?.address);
 
-  const customerName = application != null ? getApplicantName(application) : "";
+  const customerName = getApplicantName(application);
   // TODO where is this defined in the application form?
   const homeCity = application?.homeCity?.nameFi ?? "-";
 

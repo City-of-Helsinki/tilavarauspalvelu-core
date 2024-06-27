@@ -176,9 +176,7 @@ export function AllocatedCard({
   // TODO should compare the allocated to the suitable time ranges, not to selection
   const isTimeMismatch = false;
 
-  const applicantName = applicationSection.application
-    ? getApplicantName(applicationSection.application)
-    : "-";
+  const applicantName = getApplicantName(applicationSection.application);
   const isLoading = isResetLoading || isRefreshLoading;
 
   return (
@@ -284,9 +282,7 @@ export function SuitableTimeCard({
       reservationUnitOptionPk,
       refresh,
     });
-  const applicantName = applicationSection.application
-    ? getApplicantName(applicationSection.application)
-    : "-";
+  const applicantName = getApplicantName(applicationSection.application);
 
   const isDisabled = !reservationUnitOptionPk || !isAllocationEnabled;
 

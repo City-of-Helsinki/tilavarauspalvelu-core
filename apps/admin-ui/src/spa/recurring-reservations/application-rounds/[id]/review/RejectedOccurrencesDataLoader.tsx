@@ -177,6 +177,10 @@ export const REJECTED_OCCURRENCES_QUERY = gql`
                       firstName
                       lastName
                     }
+                    organisation {
+                      id
+                      name
+                    }
                   }
                 }
                 reservationUnit {
