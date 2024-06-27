@@ -3159,6 +3159,14 @@ msgctxt "RejectionReadiness"
 msgid "Reservation unit closed"
 msgstr "Varausyksikkö suljettu"
 
+#: reservations/models/affecting_time_span.py
+msgid "affecting time span"
+msgstr "vaikuttava aikaväli"
+
+#: reservations/models/affecting_time_span.py
+msgid "affecting time spans"
+msgstr "vaikuttavat aikavälit"
+
 #: reservations/models/rejected_occurrence.py
 msgid "Rejected occurrence"
 msgstr "Hylätty ajankohta"

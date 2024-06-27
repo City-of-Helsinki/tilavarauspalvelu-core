@@ -1,4 +1,5 @@
 from .ability_group import AbilityGroup
+from .affecting_time_span import AffectingTimeSpan
 from .age_group import AgeGroup
 from .recurring_reservation import RecurringReservation
 from .rejected_occurrence import RejectedOccurrence
@@ -11,6 +12,7 @@ from .reservation_statistic import ReservationStatistic, ReservationStatisticsRe
 
 __all__ = [
     "AbilityGroup",
+    "AffectingTimeSpan",
     "AgeGroup",
     "RecurringReservation",
     "RejectedOccurrence",
