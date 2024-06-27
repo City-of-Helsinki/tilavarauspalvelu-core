@@ -3,15 +3,17 @@ import { useTranslation } from "next-i18next";
 import type { AddressNode } from "@gql/gql-types";
 import { SpanTwoColumns } from "../common/common";
 import { StyledLabelValue } from "./styled";
-import { AddressFormValues } from "./Form";
 
-const Address = ({
+function Address({
   address,
   i18nMessagePrefix,
 }: {
-  address: AddressNode | AddressFormValues | undefined;
+  address:
+    | Pick<AddressNode, "streetAddressFi" | "postCode" | "cityFi">
+    | undefined
+    | null;
   i18nMessagePrefix: string;
-}): JSX.Element | null => {
+}): JSX.Element | null {
   const { t } = useTranslation();
 
   if (!address) {
@@ -22,7 +24,7 @@ const Address = ({
     <>
       <StyledLabelValue
         label={t(`${i18nMessagePrefix}.streetAddress`)}
-        value={address.streetAddress}
+        value={address.streetAddressFi}
       />
       <StyledLabelValue
         label={t(`${i18nMessagePrefix}.postCode`)}
@@ -31,11 +33,11 @@ const Address = ({
       <SpanTwoColumns>
         <StyledLabelValue
           label={t(`${i18nMessagePrefix}.city`)}
-          value={address.city}
+          value={address.cityFi}
         />
       </SpanTwoColumns>
     </>
   );
-};
+}
 
 export default Address;

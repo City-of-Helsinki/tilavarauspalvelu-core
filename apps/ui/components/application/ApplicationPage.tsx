@@ -58,7 +58,7 @@ function calculateCompletedStep(values: Node): 0 | 1 | 2 | 3 | 4 {
 
   // 3 if the user information is filled
   if (
-    (values.billingAddress?.streetAddress &&
+    (values.billingAddress?.streetAddressFi &&
       values.applicantType === ApplicantTypeChoice.Individual) ||
     values.contactPerson != null
   ) {

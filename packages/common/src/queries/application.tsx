@@ -6,7 +6,7 @@ export const APPLICANT_NAME_FRAGMENT = gql`
     applicantType
     organisation {
       id
-      name
+      nameFi
       organisationType
     }
     contactPerson {
@@ -113,17 +113,17 @@ export const APPLICANT_FRAGMENT = gql`
     organisation {
       id
       pk
-      name
+      nameFi
       identifier
       organisationType
-      coreBusiness
+      coreBusinessFi
       yearEstablished
       address {
         id
         pk
         postCode
-        streetAddress
-        city
+        streetAddressFi
+        cityFi
       }
     }
     homeCity {
@@ -137,8 +137,8 @@ export const APPLICANT_FRAGMENT = gql`
       id
       pk
       postCode
-      streetAddress
-      city
+      streetAddressFi
+      cityFi
     }
     user {
       id

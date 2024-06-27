@@ -5471,7 +5471,7 @@ export type ApplicationNameFragment = {
   applicantType?: ApplicantTypeChoice | null;
   organisation?: {
     id: string;
-    name: string;
+    nameFi?: string | null;
     organisationType: OrganizationTypeChoice;
   } | null;
   contactPerson?: { id: string; lastName: string; firstName: string } | null;
@@ -5581,17 +5581,17 @@ export type ApplicantFragment = {
   organisation?: {
     id: string;
     pk?: number | null;
-    name: string;
+    nameFi?: string | null;
     identifier?: string | null;
     organisationType: OrganizationTypeChoice;
-    coreBusiness: string;
+    coreBusinessFi?: string | null;
     yearEstablished?: number | null;
     address?: {
       id: string;
       pk?: number | null;
       postCode: string;
-      streetAddress: string;
-      city: string;
+      streetAddressFi?: string | null;
+      cityFi?: string | null;
     } | null;
   } | null;
   homeCity?: {
@@ -5605,8 +5605,8 @@ export type ApplicantFragment = {
     id: string;
     pk?: number | null;
     postCode: string;
-    streetAddress: string;
-    city: string;
+    streetAddressFi?: string | null;
+    cityFi?: string | null;
   } | null;
   user?: {
     id: string;
@@ -5781,17 +5781,17 @@ export type ApplicationCommonFragment = {
   organisation?: {
     id: string;
     pk?: number | null;
-    name: string;
+    nameFi?: string | null;
     identifier?: string | null;
     organisationType: OrganizationTypeChoice;
-    coreBusiness: string;
+    coreBusinessFi?: string | null;
     yearEstablished?: number | null;
     address?: {
       id: string;
       pk?: number | null;
       postCode: string;
-      streetAddress: string;
-      city: string;
+      streetAddressFi?: string | null;
+      cityFi?: string | null;
     } | null;
   } | null;
   homeCity?: {
@@ -5805,8 +5805,8 @@ export type ApplicationCommonFragment = {
     id: string;
     pk?: number | null;
     postCode: string;
-    streetAddress: string;
-    city: string;
+    streetAddressFi?: string | null;
+    cityFi?: string | null;
   } | null;
   user?: {
     id: string;
@@ -5955,17 +5955,17 @@ export type ApplicationQuery = {
     organisation?: {
       id: string;
       pk?: number | null;
-      name: string;
+      nameFi?: string | null;
       identifier?: string | null;
       organisationType: OrganizationTypeChoice;
-      coreBusiness: string;
+      coreBusinessFi?: string | null;
       yearEstablished?: number | null;
       address?: {
         id: string;
         pk?: number | null;
         postCode: string;
-        streetAddress: string;
-        city: string;
+        streetAddressFi?: string | null;
+        cityFi?: string | null;
       } | null;
     } | null;
     homeCity?: {
@@ -5979,8 +5979,8 @@ export type ApplicationQuery = {
       id: string;
       pk?: number | null;
       postCode: string;
-      streetAddress: string;
-      city: string;
+      streetAddressFi?: string | null;
+      cityFi?: string | null;
     } | null;
     user?: {
       id: string;
@@ -6127,7 +6127,7 @@ export const ApplicationNameFragmentDoc = gql`
     applicantType
     organisation {
       id
-      name
+      nameFi
       organisationType
     }
     contactPerson {
@@ -6152,17 +6152,17 @@ export const ApplicantFragmentDoc = gql`
     organisation {
       id
       pk
-      name
+      nameFi
       identifier
       organisationType
-      coreBusiness
+      coreBusinessFi
       yearEstablished
       address {
         id
         pk
         postCode
-        streetAddress
-        city
+        streetAddressFi
+        cityFi
       }
     }
     homeCity {
@@ -6176,8 +6176,8 @@ export const ApplicantFragmentDoc = gql`
       id
       pk
       postCode
-      streetAddress
-      city
+      streetAddressFi
+      cityFi
     }
     user {
       id

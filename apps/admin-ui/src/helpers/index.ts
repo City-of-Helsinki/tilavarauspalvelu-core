@@ -83,7 +83,7 @@ type Application = {
   organisation?:
     | Pick<
         NonNullable<Pick<ApplicationNode, "organisation">["organisation"]>,
-        "name"
+        "nameFi"
       >
     | null
     | undefined;
@@ -96,7 +96,7 @@ export function getApplicantName(app?: Application | undefined | null): string {
     const { firstName, lastName } = app.contactPerson || {};
     return `${firstName || "-"} ${lastName || "-"}`;
   }
-  return app.organisation?.name || "-";
+  return app.organisation?.nameFi || "-";
 }
 
 export function getApplicationStatusColor(

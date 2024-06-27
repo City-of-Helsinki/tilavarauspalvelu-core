@@ -155,7 +155,7 @@ function getApplicant(application: ApplicationType, t: TFunction): string {
       type: t(
         `applicationCard:applicantType.${application.applicantType?.toLocaleLowerCase()}`
       ),
-      name: application.organisation?.name || t("applicationCard:noName"),
+      name: application.organisation?.nameFi || t("applicationCard:noName"),
     });
   }
   if (application.contactPerson) {

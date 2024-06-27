@@ -23,7 +23,7 @@ export function ApplicantInfoPreview({
         <>
           <StyledLabelValue
             label={t("application:preview.organisation.name")}
-            value={application.organisation?.name}
+            value={application.organisation?.nameFi}
           />
           <StyledLabelValue
             label={t("application:preview.applicantTypeLabel")}
@@ -34,7 +34,7 @@ export function ApplicantInfoPreview({
           <SpanTwoColumns>
             <StyledLabelValue
               label={t("application:preview.organisation.coreBusiness")}
-              value={application.organisation?.coreBusiness}
+              value={application.organisation?.coreBusinessFi}
             />
           </SpanTwoColumns>
           <SpanTwoColumns>

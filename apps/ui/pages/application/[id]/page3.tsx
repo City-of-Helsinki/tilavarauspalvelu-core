@@ -96,7 +96,7 @@ function convertApplicationToForm(
     billingAddress: convertAddress(app?.billingAddress),
     hasBillingAddress:
       app?.applicantType !== ApplicantTypeChoice.Individual &&
-      app?.billingAddress?.streetAddress != null,
+      app?.billingAddress?.streetAddressFi != null,
     additionalInformation: app?.additionalInformation ?? "",
     homeCity: app?.homeCity?.pk ?? undefined,
   };

@@ -195,8 +195,8 @@ export const convertPerson = (p: Maybe<PersonNode>): PersonFormValues => ({
 // TODO are these converters the wrong way around? (not input, but output)
 export const convertAddress = (a: Address): AddressFormValues => ({
   pk: a?.pk ?? undefined,
-  streetAddress: a?.streetAddress ?? "",
-  city: a?.city ?? "",
+  streetAddress: a?.streetAddressFi ?? "",
+  city: a?.cityFi ?? "",
   postCode: a?.postCode ?? "",
 });
 
@@ -204,10 +204,10 @@ export const convertOrganisation = (
   o: Organisation
 ): OrganisationFormValues => ({
   pk: o?.pk ?? undefined,
-  name: o?.name ?? "",
+  name: o?.nameFi ?? "",
   identifier: o?.identifier ?? "",
   yearEstablished: o?.yearEstablished ?? 0,
-  coreBusiness: o?.coreBusiness ?? "",
+  coreBusiness: o?.coreBusinessFi ?? "",
   address: convertAddress(o?.address),
 });
 

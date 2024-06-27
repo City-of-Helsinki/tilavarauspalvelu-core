@@ -940,7 +940,7 @@ function ApplicationDetails({
               {isOrganisation && (
                 <KV
                   k={t("Application.coreActivity")}
-                  v={application.organisation?.coreBusiness || "-"}
+                  v={application.organisation?.coreBusinessFi || "-"}
                 />
               )}
             </DefinitionList>
@@ -984,11 +984,11 @@ function ApplicationDetails({
             <>
               <ValueBox
                 label={t("Application.organisationName")}
-                value={application.organisation?.name}
+                value={application.organisation?.nameFi}
               />
               <ValueBox
                 label={t("Application.coreActivity")}
-                value={application.organisation?.coreBusiness}
+                value={application.organisation?.coreBusinessFi}
               />
               <ValueBox label={t("common.homeCity")} value={homeCity} />
               <ValueBox
@@ -1031,7 +1031,7 @@ function ApplicationDetails({
             <EventProps>
               <ValueBox
                 label={t("common.streetAddress")}
-                value={application.organisation?.address?.streetAddress}
+                value={application.organisation?.address?.streetAddressFi}
               />
               <ValueBox
                 label={t("common.postalNumber")}
@@ -1039,7 +1039,7 @@ function ApplicationDetails({
               />
               <ValueBox
                 label={t("common.postalDistrict")}
-                value={application.organisation?.address?.city}
+                value={application.organisation?.address?.cityFi}
               />
             </EventProps>
           </>
@@ -1054,7 +1054,7 @@ function ApplicationDetails({
             <EventProps>
               <ValueBox
                 label={t("common.streetAddress")}
-                value={application.billingAddress?.streetAddress}
+                value={application.billingAddress?.streetAddressFi}
               />
               <ValueBox
                 label={t("common.postalNumber")}
@@ -1062,7 +1062,7 @@ function ApplicationDetails({
               />
               <ValueBox
                 label={t("common.postalDistrict")}
-                value={application.billingAddress?.city}
+                value={application.billingAddress?.cityFi}
               />
             </EventProps>
           </>

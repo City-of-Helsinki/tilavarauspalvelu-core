@@ -179,7 +179,7 @@ export const REJECTED_OCCURRENCES_QUERY = gql`
                     }
                     organisation {
                       id
-                      name
+                      nameFi
                     }
                   }
                 }
