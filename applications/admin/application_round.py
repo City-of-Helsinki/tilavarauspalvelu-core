@@ -49,11 +49,9 @@ class ApplicationRoundAdmin(ExtraButtonsMixin, TranslationAdmin):
     def _name(self, obj: ApplicationRound) -> str:
         return str(obj)
 
-    @button(label="Export applications to CSV")
-    def export_applications_to_csv(self, request) -> FileResponse | None:
-        application_round_id: int | None = request.resolver_match.kwargs.get("extra_context")
-
-        exporter = ApplicationRoundApplicationsCSVExporter(application_round_id=application_round_id)
+    @button(label="Export applications to CSV", change_form=True)
+    def export_applications_to_csv(self, request: WSGIRequest, pk: int) -> FileResponse | None:
+        exporter = ApplicationRoundApplicationsCSVExporter(application_round_id=pk)
         try:
             response = exporter.export_as_file_response()
         except Exception as err:
@@ -66,11 +64,9 @@ class ApplicationRoundAdmin(ExtraButtonsMixin, TranslationAdmin):
 
         return response
 
-    @button(label="Export results to CSV")
-    def export_results_to_csv(self, request) -> FileResponse | None:
-        application_round_id: int | None = request.resolver_match.kwargs.get("extra_context")
-
-        exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round_id)
+    @button(label="Export results to CSV", change_form=True)
+    def export_results_to_csv(self, request: WSGIRequest, pk: int) -> FileResponse | None:
+        exporter = ApplicationRoundResultCSVExporter(application_round_id=pk)
         try:
             response = exporter.export_as_file_response()
         except Exception as err:
