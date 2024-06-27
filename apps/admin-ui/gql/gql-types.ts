@@ -2210,9 +2210,9 @@ export type QueryRejectedOccurrencesArgs = {
   orderBy?: InputMaybe<Array<InputMaybe<RejectedOccurrenceOrderingChoices>>>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   recurringReservation?: InputMaybe<Scalars["Int"]["input"]>;
-  reservationUnit?: InputMaybe<Scalars["Int"]["input"]>;
+  reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
-  unit?: InputMaybe<Scalars["Int"]["input"]>;
+  unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type QueryReservationArgs = {
@@ -2555,9 +2555,9 @@ export type RecurringReservationNodeRejectedOccurrencesArgs = {
   orderBy?: InputMaybe<Array<InputMaybe<RejectedOccurrenceOrderingChoices>>>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   recurringReservation?: InputMaybe<Scalars["Int"]["input"]>;
-  reservationUnit?: InputMaybe<Scalars["Int"]["input"]>;
+  reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
-  unit?: InputMaybe<Scalars["Int"]["input"]>;
+  unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type RecurringReservationNodeReservationsArgs = {
@@ -8560,8 +8560,14 @@ export type ApplicationRoundCriteriaQuery = {
 
 export type RejectedOccurrencesQueryVariables = Exact<{
   applicationRound?: InputMaybe<Scalars["Int"]["input"]>;
-  unit?: InputMaybe<Scalars["Int"]["input"]>;
-  reservationUnit?: InputMaybe<Scalars["Int"]["input"]>;
+  unit?: InputMaybe<
+    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | InputMaybe<Scalars["Int"]["input"]>
+  >;
+  reservationUnit?: InputMaybe<
+    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | InputMaybe<Scalars["Int"]["input"]>
+  >;
   orderBy?: InputMaybe<
     | Array<InputMaybe<RejectedOccurrenceOrderingChoices>>
     | InputMaybe<RejectedOccurrenceOrderingChoices>
@@ -15438,8 +15444,8 @@ export type ApplicationRoundCriteriaQueryResult = Apollo.QueryResult<
 export const RejectedOccurrencesDocument = gql`
   query RejectedOccurrences(
     $applicationRound: Int
-    $unit: Int
-    $reservationUnit: Int
+    $unit: [Int]
+    $reservationUnit: [Int]
     $orderBy: [RejectedOccurrenceOrderingChoices]
     $textSearch: String
     $after: String

@@ -34,11 +34,10 @@ function RejectedOccurrencesDataLoader({
     useRejectedOccurrencesQuery({
       variables: {
         applicationRound: applicationRoundPk,
-        unit: unitFilter.map(Number).filter(Number.isFinite)[0],
+        unit: unitFilter.map(Number).filter(Number.isFinite),
         reservationUnit: reservationUnitFilter
           .map(Number)
-          // TODO: remove the [0], as this should be the entire array instead of single value
-          .filter(Number.isFinite)[0],
+          .filter(Number.isFinite),
         orderBy: transformOrderBy(orderBy),
         textSearch: nameFilter,
       },
@@ -126,12 +125,11 @@ function transformOrderBy(
 
 export default RejectedOccurrencesDataLoader;
 
-// TODO: $reservationUnit: Int should be $reservationUnit: [Int] - fix once the API is updated
 export const REJECTED_OCCURRENCES_QUERY = gql`
   query RejectedOccurrences(
     $applicationRound: Int
-    $unit: Int
-    $reservationUnit: Int
+    $unit: [Int]
+    $reservationUnit: [Int]
     $orderBy: [RejectedOccurrenceOrderingChoices]
     $textSearch: String
     $after: String
