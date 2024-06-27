@@ -1,37 +1,29 @@
-from datetime import timedelta
-from typing import Literal, Self, TypedDict
+from typing import Literal, Self
 
 from django.db import models
 from django.db.models import Subquery
 from lookup_property import L
 
-
-class AggregateSectionData(TypedDict):
-    event_duration: timedelta
-    min_duration: timedelta
+__all__ = [
+    "ApplicationSectionQuerySet",
+]
 
 
 class ApplicationSectionQuerySet(models.QuerySet):
     def has_status_in(self, statuses: list[str]) -> Self:
-        return self.alias(status=L("status")).filter(status__in=statuses)
+        return self.filter(L(status__in=statuses))
 
     def has_application_status_in(self, statuses: list[str]) -> Self:
-        return self.alias(application_status=L("application__status")).filter(application_status__in=statuses)
+        return self.filter(L(application__status__in=statuses))
 
     def order_by_status(self, *, desc: bool = False) -> Self:
-        return self.alias(status_sort_order=L("status_sort_order")).order_by(
-            models.OrderBy(models.F("status_sort_order"), descending=desc),
-        )
+        return self.order_by(L("status_sort_order").order_by(descending=desc))
 
     def order_by_application_status(self, *, desc: bool = False) -> Self:
-        return self.alias(application_status_sort_order=L("application__status_sort_order")).order_by(
-            models.OrderBy(models.F("application_status_sort_order"), descending=desc),
-        )
+        return self.order_by(L("application__status_sort_order").order_by(descending=desc))
 
     def order_by_applicant(self, *, desc: bool = False) -> Self:
-        return self.alias(applicant=L("application__applicant")).order_by(
-            models.OrderBy(models.F("applicant"), descending=desc),
-        )
+        return self.order_by(L("application__applicant").order_by(descending=desc))
 
     def preferred_unit_name_alias(self, *, lang: Literal["fi", "en", "sv"]) -> Self:
         from applications.models import ReservationUnitOption
