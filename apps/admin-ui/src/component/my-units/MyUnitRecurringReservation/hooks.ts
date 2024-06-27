@@ -2,33 +2,33 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import get from "lodash/get";
 import type {
-  RecurringReservationCreateMutationInput,
-  ReservationStaffCreateMutationInput,
   Maybe,
+  RecurringReservationCreateMutationInput,
   ReservationMetadataFieldNode,
   ReservationsInIntervalFragment,
+  ReservationStaffCreateMutationInput,
 } from "@gql/gql-types";
 import {
-  ReservationTypeChoice,
   ReservationStartInterval,
-  useCreateStaffReservationMutation,
+  ReservationTypeChoice,
   useCreateRecurringReservationMutation,
+  useCreateStaffReservationMutation,
   useRecurringReservationUnitQuery,
   useReservationTimesInReservationUnitQuery,
 } from "@gql/gql-types";
 import type { UseFormReturn } from "react-hook-form";
 import type { RecurringReservationForm } from "app/schemas";
 import {
+  fromUIDateUnsafe,
   toApiDate,
   toApiDateUnsafe,
-  fromUIDateUnsafe,
 } from "common/src/common/util";
 import { addDays } from "date-fns";
 import {
   CollisionInterval,
+  dateTime,
   doesIntervalCollide,
   reservationToInterval,
-  dateTime,
 } from "@/helpers";
 import { generateReservations } from "./generateReservations";
 import { useNotification } from "@/context/NotificationContext";

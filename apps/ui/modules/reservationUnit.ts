@@ -11,7 +11,6 @@ import {
 import {
   ReservationUnitState,
   type ReservationUnitNode,
-  State,
   PricingType,
   PriceUnit,
   Status,
@@ -22,6 +21,7 @@ import {
   ReservationState,
   type MetadataSetsFragment,
   ReservationKind,
+  ReservationStateChoice,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { capitalize, getTranslation } from "./util";
@@ -153,16 +153,18 @@ export function getUnitName(
   return unit.nameFi ?? "-";
 }
 
-export function getReservationUnitInstructionsKey(state: State): string | null {
+export function getReservationUnitInstructionsKey(
+  state?: ReservationStateChoice | null | undefined
+): string | null {
   switch (state) {
-    case State.Created:
-    case State.RequiresHandling:
+    case ReservationStateChoice.Created:
+    case ReservationStateChoice.RequiresHandling:
       return "reservationPendingInstructions";
-    case State.Cancelled:
+    case ReservationStateChoice.Cancelled:
       return "reservationCancelledInstructions";
-    case State.Confirmed:
+    case ReservationStateChoice.Confirmed:
       return "reservationConfirmedInstructions";
-    case State.Denied:
+    case ReservationStateChoice.Denied:
     default:
       return null;
   }

@@ -1,18 +1,21 @@
 import React from "react";
-import { IconGlyphEuro, IconCross, IconArrowRight } from "hds-react";
+import { IconArrowRight, IconCross, IconGlyphEuro } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { differenceInMinutes } from "date-fns";
 import styled from "styled-components";
 import { getReservationPrice } from "common";
 import { trim } from "lodash";
 import { breakpoints } from "common/src/common/style";
-import { State, type ListReservationsQuery } from "@gql/gql-types";
+import {
+  type ListReservationsQuery,
+  ReservationStateChoice,
+} from "@gql/gql-types";
 import {
   capitalize,
+  formatDateTimeRange,
   getMainImage,
   getTranslation,
   reservationsUrl,
-  formatDateTimeRange,
 } from "@/modules/util";
 import {
   canUserCancelReservation,
@@ -173,7 +176,7 @@ function ReservationCard({ reservation, type }: PropsT): JSX.Element {
   );
 
   const price =
-    reservation.state === State.RequiresHandling
+    reservation.state === ReservationStateChoice.RequiresHandling
       ? getReservationUnitPrice({
           reservationUnit,
           pricingDate: new Date(reservation.begin),
@@ -197,7 +200,7 @@ function ReservationCard({ reservation, type }: PropsT): JSX.Element {
     orderStatus,
     statusType = "desktop",
   }: {
-    state: State;
+    state: ReservationStateChoice;
     orderStatus: string | null;
     statusType: "desktop" | "mobile";
   }) => (
@@ -227,7 +230,7 @@ function ReservationCard({ reservation, type }: PropsT): JSX.Element {
           <Name data-testid="reservation-card__name">{title}</Name>
           <JustForDesktop customBreakpoint={breakpoints.l}>
             {statusTags({
-              state: reservation.state,
+              state: reservation.state ?? ReservationStateChoice.Confirmed,
               orderStatus: normalizedOrderStatus,
               statusType: "desktop",
             })}
@@ -243,7 +246,7 @@ function ReservationCard({ reservation, type }: PropsT): JSX.Element {
               style={{ marginTop: "var(--spacing-s)" }}
             >
               {statusTags({
-                state: reservation.state,
+                state: reservation.state ?? ReservationStateChoice.Confirmed,
                 orderStatus: normalizedOrderStatus,
                 statusType: "mobile",
               })}

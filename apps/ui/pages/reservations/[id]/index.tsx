@@ -15,7 +15,7 @@ import { H2, H4, fontRegular } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
   CustomerTypeChoice,
-  State,
+  ReservationStateChoice,
   type ReservationNode,
   type ReservationMetadataFieldNode,
   ReservationDocument,
@@ -515,7 +515,8 @@ function Reservation({
   const checkoutUrl = getCheckoutUrl(order, i18n.language);
 
   const hasCheckoutUrl = !!checkoutUrl;
-  const isWaitingForPayment = reservation.state === State.WaitingForPayment;
+  const isWaitingForPayment =
+    reservation.state === ReservationStateChoice.WaitingForPayment;
 
   const routes = [
     {
@@ -549,7 +550,7 @@ function Reservation({
             <StatusContainer>
               <ReservationStatus
                 data-testid="reservation__status"
-                state={reservation.state}
+                state={reservation.state ?? ReservationStateChoice.Confirmed}
               />
               {normalizedOrderStatus && (
                 <ReservationOrderStatus
@@ -562,7 +563,7 @@ function Reservation({
           <div style={{ gridRowEnd: "span 3" }}>
             <ReservationInfoCard reservation={reservation} type="complete" />
             <SecondaryActions>
-              {reservation.state === State.Confirmed && (
+              {reservation.state === ReservationStateChoice.Confirmed && (
                 <BlackButton
                   variant="secondary"
                   iconRight={<IconCalendar aria-hidden />}

@@ -1,6 +1,6 @@
 import {
   type CalendarReservationFragment,
-  State,
+  ReservationStateChoice,
   ReservationTypeChoice,
   useReservationQuery,
   useReservationDenyReasonsQuery,
@@ -63,8 +63,8 @@ const shouldBeShownInTheCalendar = (
   r: CalendarReservationFragment,
   ownPk?: number
 ) =>
-  r.state === State.Confirmed ||
-  r.state === State.RequiresHandling ||
+  r.state === ReservationStateChoice.Confirmed ||
+  r.state === ReservationStateChoice.RequiresHandling ||
   r.pk === ownPk;
 
 // TODO there is an issue here with denied "Blocked" reservations shown in the Calendar as regular "Blocked" reservations
@@ -93,10 +93,10 @@ export function useReservationData(
       endDate: toApiDate(end ?? today) ?? "",
       // NOTE we need denied to show the past reservations
       state: [
-        State.Confirmed,
-        State.RequiresHandling,
-        State.Denied,
-        State.WaitingForPayment,
+        ReservationStateChoice.Confirmed,
+        ReservationStateChoice.RequiresHandling,
+        ReservationStateChoice.Denied,
+        ReservationStateChoice.WaitingForPayment,
       ],
     },
     onError: () => {
@@ -209,7 +209,7 @@ export const useReservationEditData = (pk?: string) => {
   // into it will break the reservation queries elsewhere.
   const possibleReservations = recurringReservations
     .filter((x) => new Date(x.begin) > new Date())
-    .filter((x) => x.state === State.Confirmed);
+    .filter((x) => x.state === ReservationStateChoice.Confirmed);
 
   const nextRecurranceId = base64encode(
     `${typename}:${possibleReservations?.at(0)?.pk}` ?? 0

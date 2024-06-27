@@ -11,7 +11,6 @@ import { breakpoints } from "common/src/common/style";
 import { fontRegular, H2 } from "common/src/common/typography";
 import {
   CustomerTypeChoice,
-  State,
   useConfirmReservationMutation,
   useUpdateReservationMutation,
   useDeleteReservationMutation,
@@ -25,6 +24,7 @@ import {
   ReservationDocument,
   ReservationQueryVariables,
   useReservationLazyQuery,
+  ReservationStateChoice,
 } from "@gql/gql-types";
 import { Inputs } from "common/src/reservation-form/types";
 import { Subheading } from "common/src/reservation-form/styles";
@@ -143,7 +143,7 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
 
   const reservation = resData?.reservation ?? props.reservation;
   // it should be Created only here (SSR should have redirected)
-  if (reservation.state !== State.Created) {
+  if (reservation.state !== ReservationStateChoice.Created) {
     // eslint-disable-next-line no-console
     console.warn(
       "should NOT be here when reservation state is ",
@@ -260,7 +260,10 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
         return;
       }
 
-      if (state === State.Confirmed || state === State.RequiresHandling) {
+      if (
+        state === ReservationStateChoice.Confirmed ||
+        state === ReservationStateChoice.RequiresHandling
+      ) {
         router.push(`${reservationsUrl}${pk}/confirmation`);
       } else if (steps?.length > 2) {
         const { order } = data.confirmReservation ?? {};
@@ -571,7 +574,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     if (
       reservation?.pk != null &&
       reservation.pk > 0 &&
-      reservation?.state !== State.Created
+      reservation?.state !== ReservationStateChoice.Created
     ) {
       return {
         redirect: {

@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { fromUIDate } from "common/src/common/util";
-import { ReservationStartInterval } from "@gql/gql-types";
+import {
+  ReservationStartInterval,
+  ReservationTypeChoice,
+} from "@gql/gql-types";
 import { intervalToNumber } from "./utils";
 import {
   checkTimeStringFormat,
@@ -8,10 +11,11 @@ import {
 } from "common/src/schemas/schemaCommon";
 
 export const ReservationTypes = [
-  "STAFF",
-  "BEHALF",
-  "BLOCKED",
-  "NORMAL",
+  ReservationTypeChoice.Staff,
+  ReservationTypeChoice.Behalf,
+  ReservationTypeChoice.Blocked,
+  ReservationTypeChoice.Normal,
+  ReservationTypeChoice.Seasonal,
 ] as const;
 export const ReservationTypeSchema = z.enum(ReservationTypes);
 

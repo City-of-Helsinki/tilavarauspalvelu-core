@@ -4,7 +4,7 @@ import {
   type QueryReservationsArgs,
   ReservationOrderingChoices,
   useReservationsQuery,
-  State,
+  ReservationStateChoice,
   OrderStatusWithFree,
 } from "@gql/gql-types";
 import { More } from "@/component/More";
@@ -16,9 +16,7 @@ import { fromUIDate, toApiDate } from "common/src/common/util";
 import { filterNonNullable, toNumber } from "common/src/helpers";
 import { useSearchParams } from "react-router-dom";
 
-function transformPaymentStatusSafe(
-  t: string
-): OrderStatusWithFree | "free" | null {
+function transformPaymentStatusSafe(t: string): OrderStatusWithFree | null {
   switch (t) {
     case OrderStatusWithFree.Paid:
       return OrderStatusWithFree.Paid;
@@ -39,20 +37,20 @@ function transformPaymentStatusSafe(
   }
 }
 
-function transformStateSafe(t: string): State | null {
+function transformStateSafe(t: string): ReservationStateChoice | null {
   switch (t) {
-    case State.Cancelled:
-      return State.Cancelled;
-    case State.Denied:
-      return State.Denied;
-    case State.Created:
-      return State.Created;
-    case State.Confirmed:
-      return State.Confirmed;
-    case State.RequiresHandling:
-      return State.RequiresHandling;
-    case State.WaitingForPayment:
-      return State.WaitingForPayment;
+    case ReservationStateChoice.Cancelled:
+      return ReservationStateChoice.Cancelled;
+    case ReservationStateChoice.Denied:
+      return ReservationStateChoice.Denied;
+    case ReservationStateChoice.Created:
+      return ReservationStateChoice.Created;
+    case ReservationStateChoice.Confirmed:
+      return ReservationStateChoice.Confirmed;
+    case ReservationStateChoice.RequiresHandling:
+      return ReservationStateChoice.RequiresHandling;
+    case ReservationStateChoice.WaitingForPayment:
+      return ReservationStateChoice.WaitingForPayment;
     default:
       return null;
   }

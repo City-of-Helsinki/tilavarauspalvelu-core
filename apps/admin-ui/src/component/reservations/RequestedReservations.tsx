@@ -7,10 +7,14 @@ import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import { HR } from "@/component/Table";
 import { Container } from "@/styles/layout";
 import { useSearchParams } from "react-router-dom";
-import { State } from "@gql/gql-types";
+import { ReservationStateChoice } from "@gql/gql-types";
 import { toUIDate } from "common/src/common/util";
 
-const defaultStates = [State.Denied, State.Confirmed, State.RequiresHandling];
+const defaultStates = [
+  ReservationStateChoice.Denied,
+  ReservationStateChoice.Confirmed,
+  ReservationStateChoice.RequiresHandling,
+];
 
 function Reservations(): JSX.Element {
   const { t } = useTranslation();

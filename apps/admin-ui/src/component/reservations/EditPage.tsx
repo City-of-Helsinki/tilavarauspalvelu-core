@@ -160,7 +160,7 @@ function EditReservation({
       reservationUnitPks: [reservationUnit.pk],
       seriesName: values.seriesName !== "" ? values.seriesName : undefined,
       workingMemo: values.comments,
-      type: values.type ?? "",
+      type: values.type,
       ...flattenedMetadataSetValues,
     };
 

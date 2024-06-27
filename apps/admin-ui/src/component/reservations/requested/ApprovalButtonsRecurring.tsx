@@ -1,5 +1,5 @@
 import React from "react";
-import { State, type ReservationQuery } from "@gql/gql-types";
+import { ReservationStateChoice, type ReservationQuery } from "@gql/gql-types";
 import { useTranslation } from "react-i18next";
 import { Button } from "hds-react";
 import { ButtonLikeLink } from "app/component/ButtonLikeLink";
@@ -43,7 +43,7 @@ const ApprovalButtonsRecurring = ({
   // need to do get all data here otherwise totalCount is incorrect (filter here instead of in the query)
   const reservationsPossibleToDelete = reservations
     .filter((x) => new Date(x.begin) > now)
-    .filter((x) => x.state === State.Confirmed);
+    .filter((x) => x.state === ReservationStateChoice.Confirmed);
 
   const handleDenyClick = () => {
     setModalContent(

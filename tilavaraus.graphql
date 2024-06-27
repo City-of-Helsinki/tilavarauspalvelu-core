@@ -431,10 +431,10 @@ type ApplicationRoundNode implements Node {
     reservableTimeEnd: Time
     reservableTimeStart: Time
     reservationKind: String
-    reservationState: [String]
+    reservationState: [ReservationState]
     reservationUnitType: [Int]
     showOnlyReservable: Boolean
-    state: [String]
+    state: [ReservationUnitState]
     surfaceAreaGte: Decimal
     surfaceAreaLte: Decimal
     textSearch: String
@@ -1817,9 +1817,6 @@ type PaymentProductNode implements Node {
   The ID of the object
   """
   id: ID!
-  """
-  Merchant used for payments
-  """
   merchant: PaymentMerchantNode
   pk: UUID
 }
@@ -1828,17 +1825,8 @@ type PaymentProductNode implements Node {
 An enumeration.
 """
 enum PaymentType {
-  """
-  Lasku
-  """
   INVOICE
-  """
-  Verkossa
-  """
   ONLINE
-  """
-  Paikan päällä
-  """
   ON_SITE
 }
 
@@ -1901,11 +1889,11 @@ An enumeration.
 """
 enum PricingType {
   """
-  Free
+  Maksuton
   """
   FREE
   """
-  Paid
+  Maksullinen
   """
   PAID
 }
@@ -2552,10 +2540,10 @@ type Query {
     reservableTimeEnd: Time
     reservableTimeStart: Time
     reservationKind: String
-    reservationState: [String]
+    reservationState: [ReservationState]
     reservationUnitType: [Int]
     showOnlyReservable: Boolean
-    state: [String]
+    state: [ReservationUnitState]
     surfaceAreaGte: Decimal
     surfaceAreaLte: Decimal
     textSearch: String
@@ -3035,14 +3023,13 @@ input ReservationAdjustTimeMutationInput {
   begin: DateTime
   end: DateTime
   pk: Int!
-  state: State
 }
 
 type ReservationAdjustTimeMutationPayload {
   begin: DateTime
   end: DateTime
   pk: Int
-  state: State
+  state: ReservationStateChoice
 }
 
 input ReservationApproveMutationInput {
@@ -3058,7 +3045,7 @@ type ReservationApproveMutationPayload {
   pk: Int
   price: Decimal
   priceNet: Decimal
-  state: State
+  state: ReservationStateChoice
 }
 
 type ReservationCancelReasonNode implements Node {
@@ -3109,7 +3096,7 @@ type ReservationCancellationMutationPayload {
   cancelDetails: String
   cancelReason: Int
   pk: Int
-  state: State
+  state: ReservationStateChoice
 }
 
 input ReservationConfirmMutationInput {
@@ -3262,7 +3249,7 @@ type ReservationDenyMutationPayload {
   handledAt: DateTime
   handlingDetails: String
   pk: Int
-  state: State
+  state: ReservationStateChoice
 }
 
 type ReservationDenyReasonNode implements Node {
@@ -3316,15 +3303,15 @@ An enumeration.
 """
 enum ReservationKind {
   """
-  Direct
+  Suora
   """
   DIRECT
   """
-  Direct And Season
+  Suora ja kausi
   """
   DIRECT_AND_SEASON
   """
-  Season
+  Kausi
   """
   SEASON
 }
@@ -3413,9 +3400,6 @@ type ReservationNode implements Node {
   numPersons: Int
   order: PaymentOrderNode
     @deprecated(reason: "Please use to 'paymentOrder' instead.")
-  """
-  Reservation this order is based on
-  """
   paymentOrder: [PaymentOrderNode!]!
   pk: Int
   price: Decimal
@@ -3464,10 +3448,10 @@ type ReservationNode implements Node {
     reservableTimeEnd: Time
     reservableTimeStart: Time
     reservationKind: String
-    reservationState: [String]
+    reservationState: [ReservationState]
     reservationUnitType: [Int]
     showOnlyReservable: Boolean
-    state: [String]
+    state: [ReservationUnitState]
     surfaceAreaGte: Decimal
     surfaceAreaLte: Decimal
     textSearch: String
@@ -3490,7 +3474,7 @@ type ReservationNode implements Node {
   reserveePhone: String
   reserveeType: CustomerTypeChoice
   staffEvent: Boolean @deprecated(reason: "Please use to 'type' instead.")
-  state: State!
+  state: ReservationStateChoice
   taxPercentageValue: Decimal
   type: ReservationTypeChoice
   unitPrice: Decimal
@@ -3638,7 +3622,7 @@ input ReservationRequiresHandlingMutationInput {
 
 type ReservationRequiresHandlingMutationPayload {
   pk: Int
-  state: State
+  state: ReservationStateChoice
 }
 
 input ReservationSeriesCreateMutationInput {
@@ -3705,8 +3689,8 @@ input ReservationSeriesReservationSerializerInput {
   reserveeOrganisationName: String
   reserveePhone: String
   reserveeType: ReserveeType
-  state: State
-  type: Type!
+  state: ReservationStateChoice
+  type: ReservationTypeStaffChoice!
   user: Int!
   workingMemo: String
 }
@@ -3723,7 +3707,6 @@ input ReservationStaffAdjustTimeMutationInput {
   bufferTimeBefore: String
   end: DateTime
   pk: Int!
-  state: State
 }
 
 type ReservationStaffAdjustTimeMutationPayload {
@@ -3738,7 +3721,7 @@ type ReservationStaffAdjustTimeMutationPayload {
   bufferTimeBefore: String
   end: DateTime
   pk: Int
-  state: State
+  state: ReservationStateChoice
 }
 
 input ReservationStaffCreateMutationInput {
@@ -3830,7 +3813,7 @@ type ReservationStaffCreateMutationPayload {
   reserveeOrganisationName: String
   reserveePhone: String
   reserveeType: CustomerTypeChoice
-  state: State
+  state: ReservationStateChoice
   type: ReservationTypeChoice
   unitPrice: Decimal
   workingMemo: String
@@ -3866,11 +3849,8 @@ input ReservationStaffModifyMutationInput {
   reserveeOrganisationName: String
   reserveePhone: String
   reserveeType: CustomerTypeChoice
-  """
-  String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, REQUIRES_HANDLING, WAITING_FOR_PAYMENT, CONFIRMED, DENIED.
-  """
-  state: State
-  type: Type
+  state: ReservationStateChoice
+  type: ReservationTypeChoice
 }
 
 type ReservationStaffModifyMutationPayload {
@@ -3911,12 +3891,9 @@ type ReservationStaffModifyMutationPayload {
   reserveeOrganisationName: String
   reserveePhone: String
   reserveeType: CustomerTypeChoice
-  """
-  String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, REQUIRES_HANDLING, WAITING_FOR_PAYMENT, CONFIRMED, DENIED.
-  """
-  state: State
+  state: ReservationStateChoice
   taxPercentageValue: Decimal
-  type: Type
+  type: ReservationTypeChoice
   unitPrice: Decimal
 }
 
@@ -3997,6 +3974,24 @@ enum ReservationTypeChoice {
   BLOCKED
   NORMAL
   SEASONAL
+  STAFF
+}
+
+"""
+An enumeration.
+"""
+enum ReservationTypeStaffChoice {
+  """
+  Puolesta
+  """
+  BEHALF
+  """
+  Suljettu
+  """
+  BLOCKED
+  """
+  Henkilökunta
+  """
   STAFF
 }
 
@@ -4979,11 +4974,11 @@ enum ReserveeType {
   """
   BUSINESS
   """
-  Yksittäinen
+  Yksityinen
   """
   INDIVIDUAL
   """
-  Yhdistys
+  Voittoa tavoittelematon
   """
   NONPROFIT
 }
@@ -5402,36 +5397,6 @@ type SpaceUpdateMutationPayload {
 """
 An enumeration.
 """
-enum State {
-  """
-  Peruttu
-  """
-  CANCELLED
-  """
-  Vahvistettu
-  """
-  CONFIRMED
-  """
-  Luotu
-  """
-  CREATED
-  """
-  Hylätty
-  """
-  DENIED
-  """
-  Vaatiiko käsittelyn
-  """
-  REQUIRES_HANDLING
-  """
-  Odottaa maksua
-  """
-  WAITING_FOR_PAYMENT
-}
-
-"""
-An enumeration.
-"""
 enum Status {
   """
   aktiivinen
@@ -5613,11 +5578,11 @@ enum TermsType {
   """
   PRICING_TERMS
   """
-  Toistuvan varauksen ehdot
+  Kausivarauksen ehdot
   """
   RECURRING_TERMS
   """
-  Palvelualuekohtaiset ehdot
+  Palvelukohtaiset ehdot
   """
   SERVICE_TERMS
 }
@@ -5635,32 +5600,6 @@ input TimeSlotSerializerInput {
 type TimeSlotType {
   begin: Time!
   end: Time!
-}
-
-"""
-An enumeration.
-"""
-enum Type {
-  """
-  Puolesta
-  """
-  BEHALF
-  """
-  Estetty
-  """
-  BLOCKED
-  """
-  Normaali
-  """
-  NORMAL
-  """
-  Kausi
-  """
-  SEASONAL
-  """
-  Henkilökunta
-  """
-  STAFF
 }
 
 """
@@ -5789,10 +5728,10 @@ type UnitNode implements Node {
     reservableTimeEnd: Time
     reservableTimeStart: Time
     reservationKind: String
-    reservationState: [String]
+    reservationState: [ReservationState]
     reservationUnitType: [Int]
     showOnlyReservable: Boolean
-    state: [String]
+    state: [ReservationUnitState]
     surfaceAreaGte: Decimal
     surfaceAreaLte: Decimal
     textSearch: String

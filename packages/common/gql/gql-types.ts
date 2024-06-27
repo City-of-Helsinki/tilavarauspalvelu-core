@@ -417,10 +417,10 @@ export type ApplicationRoundNodeReservationUnitsArgs = {
   reservableTimeEnd?: InputMaybe<Scalars["Time"]["input"]>;
   reservableTimeStart?: InputMaybe<Scalars["Time"]["input"]>;
   reservationKind?: InputMaybe<Scalars["String"]["input"]>;
-  reservationState?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
+  reservationState?: InputMaybe<Array<InputMaybe<ReservationState>>>;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   showOnlyReservable?: InputMaybe<Scalars["Boolean"]["input"]>;
-  state?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
+  state?: InputMaybe<Array<InputMaybe<ReservationUnitState>>>;
   surfaceAreaGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   surfaceAreaLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
@@ -1680,18 +1680,14 @@ export type PaymentOrderNode = Node & {
 export type PaymentProductNode = Node & {
   /** The ID of the object */
   id: Scalars["ID"]["output"];
-  /** Merchant used for payments */
   merchant?: Maybe<PaymentMerchantNode>;
   pk?: Maybe<Scalars["UUID"]["output"]>;
 };
 
 /** An enumeration. */
 export enum PaymentType {
-  /** Lasku */
   Invoice = "INVOICE",
-  /** Verkossa */
   Online = "ONLINE",
-  /** Paikan päällä */
   OnSite = "ON_SITE",
 }
 
@@ -1733,9 +1729,9 @@ export enum PriceUnit {
 
 /** An enumeration. */
 export enum PricingType {
-  /** Free */
+  /** Maksuton */
   Free = "FREE",
-  /** Paid */
+  /** Maksullinen */
   Paid = "PAID",
 }
 
@@ -2345,10 +2341,10 @@ export type QueryReservationUnitsArgs = {
   reservableTimeEnd?: InputMaybe<Scalars["Time"]["input"]>;
   reservableTimeStart?: InputMaybe<Scalars["Time"]["input"]>;
   reservationKind?: InputMaybe<Scalars["String"]["input"]>;
-  reservationState?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
+  reservationState?: InputMaybe<Array<InputMaybe<ReservationState>>>;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   showOnlyReservable?: InputMaybe<Scalars["Boolean"]["input"]>;
-  state?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
+  state?: InputMaybe<Array<InputMaybe<ReservationUnitState>>>;
   surfaceAreaGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   surfaceAreaLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
@@ -2771,14 +2767,13 @@ export type ReservationAdjustTimeMutationInput = {
   begin?: InputMaybe<Scalars["DateTime"]["input"]>;
   end?: InputMaybe<Scalars["DateTime"]["input"]>;
   pk: Scalars["Int"]["input"];
-  state?: InputMaybe<State>;
 };
 
 export type ReservationAdjustTimeMutationPayload = {
   begin?: Maybe<Scalars["DateTime"]["output"]>;
   end?: Maybe<Scalars["DateTime"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
-  state?: Maybe<State>;
+  state?: Maybe<ReservationStateChoice>;
 };
 
 export type ReservationApproveMutationInput = {
@@ -2794,7 +2789,7 @@ export type ReservationApproveMutationPayload = {
   pk?: Maybe<Scalars["Int"]["output"]>;
   price?: Maybe<Scalars["Decimal"]["output"]>;
   priceNet?: Maybe<Scalars["Decimal"]["output"]>;
-  state?: Maybe<State>;
+  state?: Maybe<ReservationStateChoice>;
 };
 
 export type ReservationCancelReasonNode = Node & {
@@ -2833,7 +2828,7 @@ export type ReservationCancellationMutationPayload = {
   cancelDetails?: Maybe<Scalars["String"]["output"]>;
   cancelReason?: Maybe<Scalars["Int"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
-  state?: Maybe<State>;
+  state?: Maybe<ReservationStateChoice>;
 };
 
 export type ReservationConfirmMutationInput = {
@@ -2986,7 +2981,7 @@ export type ReservationDenyMutationPayload = {
   handledAt?: Maybe<Scalars["DateTime"]["output"]>;
   handlingDetails?: Maybe<Scalars["String"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
-  state?: Maybe<State>;
+  state?: Maybe<ReservationStateChoice>;
 };
 
 export type ReservationDenyReasonNode = Node & {
@@ -3023,11 +3018,11 @@ export enum ReservationDenyReasonOrderingChoices {
 
 /** An enumeration. */
 export enum ReservationKind {
-  /** Direct */
+  /** Suora */
   Direct = "DIRECT",
-  /** Direct And Season */
+  /** Suora ja kausi */
   DirectAndSeason = "DIRECT_AND_SEASON",
-  /** Season */
+  /** Kausi */
   Season = "SEASON",
 }
 
@@ -3097,7 +3092,6 @@ export type ReservationNode = Node & {
   numPersons?: Maybe<Scalars["Int"]["output"]>;
   /** @deprecated Please use to 'paymentOrder' instead. */
   order?: Maybe<PaymentOrderNode>;
-  /** Reservation this order is based on */
   paymentOrder: Array<PaymentOrderNode>;
   pk?: Maybe<Scalars["Int"]["output"]>;
   price?: Maybe<Scalars["Decimal"]["output"]>;
@@ -3119,7 +3113,7 @@ export type ReservationNode = Node & {
   reserveeType?: Maybe<CustomerTypeChoice>;
   /** @deprecated Please use to 'type' instead. */
   staffEvent?: Maybe<Scalars["Boolean"]["output"]>;
-  state: State;
+  state?: Maybe<ReservationStateChoice>;
   taxPercentageValue?: Maybe<Scalars["Decimal"]["output"]>;
   type?: Maybe<ReservationTypeChoice>;
   unitPrice?: Maybe<Scalars["Decimal"]["output"]>;
@@ -3166,10 +3160,10 @@ export type ReservationNodeReservationUnitArgs = {
   reservableTimeEnd?: InputMaybe<Scalars["Time"]["input"]>;
   reservableTimeStart?: InputMaybe<Scalars["Time"]["input"]>;
   reservationKind?: InputMaybe<Scalars["String"]["input"]>;
-  reservationState?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
+  reservationState?: InputMaybe<Array<InputMaybe<ReservationState>>>;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   showOnlyReservable?: InputMaybe<Scalars["Boolean"]["input"]>;
-  state?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
+  state?: InputMaybe<Array<InputMaybe<ReservationUnitState>>>;
   surfaceAreaGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   surfaceAreaLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
@@ -3286,7 +3280,7 @@ export type ReservationRequiresHandlingMutationInput = {
 
 export type ReservationRequiresHandlingMutationPayload = {
   pk?: Maybe<Scalars["Int"]["output"]>;
-  state?: Maybe<State>;
+  state?: Maybe<ReservationStateChoice>;
 };
 
 export type ReservationSeriesCreateMutationInput = {
@@ -3353,8 +3347,8 @@ export type ReservationSeriesReservationSerializerInput = {
   reserveeOrganisationName?: InputMaybe<Scalars["String"]["input"]>;
   reserveePhone?: InputMaybe<Scalars["String"]["input"]>;
   reserveeType?: InputMaybe<ReserveeType>;
-  state?: InputMaybe<State>;
-  type: Type;
+  state?: InputMaybe<ReservationStateChoice>;
+  type: ReservationTypeStaffChoice;
   user: Scalars["Int"]["input"];
   workingMemo?: InputMaybe<Scalars["String"]["input"]>;
 };
@@ -3367,7 +3361,6 @@ export type ReservationStaffAdjustTimeMutationInput = {
   bufferTimeBefore?: InputMaybe<Scalars["String"]["input"]>;
   end?: InputMaybe<Scalars["DateTime"]["input"]>;
   pk: Scalars["Int"]["input"];
-  state?: InputMaybe<State>;
 };
 
 export type ReservationStaffAdjustTimeMutationPayload = {
@@ -3378,7 +3371,7 @@ export type ReservationStaffAdjustTimeMutationPayload = {
   bufferTimeBefore?: Maybe<Scalars["String"]["output"]>;
   end?: Maybe<Scalars["DateTime"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
-  state?: Maybe<State>;
+  state?: Maybe<ReservationStateChoice>;
 };
 
 export type ReservationStaffCreateMutationInput = {
@@ -3462,7 +3455,7 @@ export type ReservationStaffCreateMutationPayload = {
   reserveeOrganisationName?: Maybe<Scalars["String"]["output"]>;
   reserveePhone?: Maybe<Scalars["String"]["output"]>;
   reserveeType?: Maybe<CustomerTypeChoice>;
-  state?: Maybe<State>;
+  state?: Maybe<ReservationStateChoice>;
   type?: Maybe<ReservationTypeChoice>;
   unitPrice?: Maybe<Scalars["Decimal"]["output"]>;
   workingMemo?: Maybe<Scalars["String"]["output"]>;
@@ -3498,9 +3491,8 @@ export type ReservationStaffModifyMutationInput = {
   reserveeOrganisationName?: InputMaybe<Scalars["String"]["input"]>;
   reserveePhone?: InputMaybe<Scalars["String"]["input"]>;
   reserveeType?: InputMaybe<CustomerTypeChoice>;
-  /** String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, REQUIRES_HANDLING, WAITING_FOR_PAYMENT, CONFIRMED, DENIED. */
-  state?: InputMaybe<State>;
-  type?: InputMaybe<Type>;
+  state?: InputMaybe<ReservationStateChoice>;
+  type?: InputMaybe<ReservationTypeChoice>;
 };
 
 export type ReservationStaffModifyMutationPayload = {
@@ -3541,10 +3533,9 @@ export type ReservationStaffModifyMutationPayload = {
   reserveeOrganisationName?: Maybe<Scalars["String"]["output"]>;
   reserveePhone?: Maybe<Scalars["String"]["output"]>;
   reserveeType?: Maybe<CustomerTypeChoice>;
-  /** String value for ReservationType's ReservationState enum. Possible values are CREATED, CANCELLED, REQUIRES_HANDLING, WAITING_FOR_PAYMENT, CONFIRMED, DENIED. */
-  state?: Maybe<State>;
+  state?: Maybe<ReservationStateChoice>;
   taxPercentageValue?: Maybe<Scalars["Decimal"]["output"]>;
-  type?: Maybe<Type>;
+  type?: Maybe<ReservationTypeChoice>;
   unitPrice?: Maybe<Scalars["Decimal"]["output"]>;
 };
 
@@ -3597,6 +3588,16 @@ export enum ReservationTypeChoice {
   Blocked = "BLOCKED",
   Normal = "NORMAL",
   Seasonal = "SEASONAL",
+  Staff = "STAFF",
+}
+
+/** An enumeration. */
+export enum ReservationTypeStaffChoice {
+  /** Puolesta */
+  Behalf = "BEHALF",
+  /** Suljettu */
+  Blocked = "BLOCKED",
+  /** Henkilökunta */
   Staff = "STAFF",
 }
 
@@ -4490,9 +4491,9 @@ export enum ReserveeLanguage {
 export enum ReserveeType {
   /** Yritys */
   Business = "BUSINESS",
-  /** Yksittäinen */
+  /** Yksityinen */
   Individual = "INDIVIDUAL",
-  /** Yhdistys */
+  /** Voittoa tavoittelematon */
   Nonprofit = "NONPROFIT",
 }
 
@@ -4846,22 +4847,6 @@ export type SpaceUpdateMutationPayload = {
 };
 
 /** An enumeration. */
-export enum State {
-  /** Peruttu */
-  Cancelled = "CANCELLED",
-  /** Vahvistettu */
-  Confirmed = "CONFIRMED",
-  /** Luotu */
-  Created = "CREATED",
-  /** Hylätty */
-  Denied = "DENIED",
-  /** Vaatiiko käsittelyn */
-  RequiresHandling = "REQUIRES_HANDLING",
-  /** Odottaa maksua */
-  WaitingForPayment = "WAITING_FOR_PAYMENT",
-}
-
-/** An enumeration. */
 export enum Status {
   /** aktiivinen */
   Active = "ACTIVE",
@@ -4984,9 +4969,9 @@ export enum TermsType {
   PaymentTerms = "PAYMENT_TERMS",
   /** Hinnoitteluehdot */
   PricingTerms = "PRICING_TERMS",
-  /** Toistuvan varauksen ehdot */
+  /** Kausivarauksen ehdot */
   RecurringTerms = "RECURRING_TERMS",
-  /** Palvelualuekohtaiset ehdot */
+  /** Palvelukohtaiset ehdot */
   ServiceTerms = "SERVICE_TERMS",
 }
 
@@ -4999,20 +4984,6 @@ export type TimeSlotType = {
   begin: Scalars["Time"]["output"];
   end: Scalars["Time"]["output"];
 };
-
-/** An enumeration. */
-export enum Type {
-  /** Puolesta */
-  Behalf = "BEHALF",
-  /** Estetty */
-  Blocked = "BLOCKED",
-  /** Normaali */
-  Normal = "NORMAL",
-  /** Kausi */
-  Seasonal = "SEASONAL",
-  /** Henkilökunta */
-  Staff = "STAFF",
-}
 
 export type UnitGroupNode = Node & {
   /** The ID of the object */
@@ -5128,10 +5099,10 @@ export type UnitNodeReservationunitSetArgs = {
   reservableTimeEnd?: InputMaybe<Scalars["Time"]["input"]>;
   reservableTimeStart?: InputMaybe<Scalars["Time"]["input"]>;
   reservationKind?: InputMaybe<Scalars["String"]["input"]>;
-  reservationState?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
+  reservationState?: InputMaybe<Array<InputMaybe<ReservationState>>>;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   showOnlyReservable?: InputMaybe<Scalars["Boolean"]["input"]>;
-  state?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
+  state?: InputMaybe<Array<InputMaybe<ReservationUnitState>>>;
   surfaceAreaGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   surfaceAreaLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;

@@ -20,7 +20,7 @@ import { SearchTags } from "../SearchTags";
 import {
   OrderStatusWithFree,
   ReservationTypeChoice,
-  State,
+  ReservationStateChoice,
 } from "@gql/gql-types";
 import { fromUIDate, isValidDate } from "common/src/common/util";
 
@@ -47,8 +47,8 @@ export function Filters({
 
   const { options: reservationUnitTypeOptions } = useReservationUnitTypes();
 
-  const stateOptions = Object.values(State)
-    .filter((s) => s !== State.Created)
+  const stateOptions = Object.values(ReservationStateChoice)
+    .filter((s) => s !== ReservationStateChoice.Created)
     .map((s) => ({
       value: s,
       label: t(`RequestedReservation.state.${s}`),

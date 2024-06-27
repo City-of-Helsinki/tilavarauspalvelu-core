@@ -284,17 +284,20 @@ const DialogContent = ({
 
       const flatMetaValues = flattenMetadata(values, fields);
 
+      if (values.type == null) {
+        throw new Error("Invalid reservation type");
+      }
       const bufferBefore =
-        values.type !== "BLOCKED" && values.bufferTimeBefore
+        values.type !== ReservationTypeChoice.Blocked && values.bufferTimeBefore
           ? reservationUnit.bufferTimeBefore ?? 0
           : 0;
       const bufferAfter =
-        values.type !== "BLOCKED" && values.bufferTimeAfter
+        values.type !== ReservationTypeChoice.Blocked && values.bufferTimeAfter
           ? reservationUnit.bufferTimeAfter ?? 0
           : 0;
       const input: ReservationStaffCreateMutationInput = {
         reservationUnitPks: [reservationUnit.pk],
-        type: values.type ?? "",
+        type: values.type,
         begin: dateTime(values.date, values.startTime),
         end: dateTime(values.date, values.endTime),
         bufferTimeBefore: bufferBefore.toString(),

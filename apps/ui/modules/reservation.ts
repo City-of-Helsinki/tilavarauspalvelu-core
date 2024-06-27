@@ -1,7 +1,6 @@
 import { addMinutes, addSeconds, isAfter, isValid } from "date-fns";
 import type { PendingReservation } from "common/types/common";
 import {
-  State,
   type ReservationNode,
   ReservationStartInterval,
   CustomerTypeChoice,
@@ -11,6 +10,7 @@ import {
   type ListReservationsQuery,
   IsReservableFieldsFragment,
   ReservationUnitNode,
+  ReservationStateChoice,
 } from "@gql/gql-types";
 import {
   type RoundPeriod,
@@ -145,7 +145,7 @@ export function canUserCancelReservation(
   skipTimeCheck = false
 ): boolean {
   const reservationUnit = reservation.reservationUnit?.[0];
-  if (reservation.state !== State.Confirmed) return false;
+  if (reservation.state !== ReservationStateChoice.Confirmed) return false;
   if (!reservationUnit?.cancellationRule) return false;
   if (reservationUnit?.cancellationRule?.needsHandling) return false;
   if (!skipTimeCheck && isReservationWithinCancellationPeriod(reservation))
@@ -222,11 +222,14 @@ export function getReservationCancellationReason(
   return null;
 }
 
-function shouldShowOrderStatus(state: State) {
+function shouldShowOrderStatus(
+  state: Maybe<ReservationStateChoice> | undefined
+) {
   if (
-    state === State.Created ||
-    state === State.WaitingForPayment ||
-    state === State.RequiresHandling
+    state == null ||
+    state === ReservationStateChoice.Created ||
+    state === ReservationStateChoice.WaitingForPayment ||
+    state === ReservationStateChoice.RequiresHandling
   ) {
     return false;
   }
@@ -354,8 +357,9 @@ export function isReservationReservable({
   return true;
 }
 
-const isReservationConfirmed = (reservation: { state: State }): boolean =>
-  reservation.state === State.Confirmed;
+const isReservationConfirmed = (reservation: {
+  state?: Maybe<ReservationStateChoice> | undefined;
+}): boolean => reservation.state === ReservationStateChoice.Confirmed;
 
 const isReservationFreeOfCharge = (
   reservation: Pick<ReservationNode, "price">

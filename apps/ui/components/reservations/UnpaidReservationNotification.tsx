@@ -4,10 +4,11 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import {
-  State,
   ReservationOrderingChoices,
   useListReservationsQuery,
   type ListReservationsQuery,
+  ReservationTypeChoice,
+  ReservationStateChoice,
 } from "@gql/gql-types";
 import NotificationWrapper from "common/src/components/NotificationWrapper";
 import { useCurrentUser } from "@/hooks/user";
@@ -83,7 +84,7 @@ function ReservationNotification({
     startRemainingMinutes
   );
   const { t } = useTranslation(["notification, common"]);
-  const isCreated = reservation.state === State.Created;
+  const isCreated = reservation.state === ReservationStateChoice.Created;
 
   const translateKey = isCreated
     ? "notification:createdReservation"
@@ -160,10 +161,14 @@ export function InProgressReservationNotification() {
   const { data } = useListReservationsQuery({
     skip: !currentUser?.pk,
     variables: {
-      state: [State.WaitingForPayment, State.Created],
+      state: [
+        ReservationStateChoice.WaitingForPayment,
+        ReservationStateChoice.Created,
+      ],
       orderBy: ReservationOrderingChoices.PkDesc,
-      user: currentUser?.pk?.toString() ?? "",
+      user: currentUser?.pk ?? 0,
       beginDate: toApiDate(new Date()),
+      reservationType: ReservationTypeChoice.Normal,
     },
     fetchPolicy: "no-cache",
   });
@@ -190,10 +195,10 @@ export function InProgressReservationNotification() {
 
   const unpaidReservation = reservations
     .filter(() => !shouldHidePaymentNotification)
-    .find((r) => r.state === State.WaitingForPayment);
+    .find((r) => r.state === ReservationStateChoice.WaitingForPayment);
   const createdReservation = reservations
     .filter(() => !shouldHideCreatedNotification)
-    .find((r) => r.state === State.Created);
+    .find((r) => r.state === ReservationStateChoice.Created);
 
   const {
     mutation: deleteReservation,
@@ -300,7 +305,7 @@ export function InProgressReservationNotification() {
   return (
     <>
       {list.map((x) =>
-        x.state === State.Created ? (
+        x.state === ReservationStateChoice.Created ? (
           <ReservationNotification
             key={x.pk}
             onDelete={() => handleDelete(x)}

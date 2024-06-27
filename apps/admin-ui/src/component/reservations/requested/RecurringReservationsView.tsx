@@ -3,7 +3,7 @@ import { H6 } from "common/src/common/typography";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import {
-  State,
+  ReservationStateChoice,
   type ReservationQuery,
   type RecurringReservationQuery,
   useRecurringReservationQuery,
@@ -120,7 +120,7 @@ function RecurringReservationsView({
     const endDate = new Date(x.end);
     const now = new Date();
 
-    if (x.state !== State.Denied) {
+    if (x.state !== ReservationStateChoice.Denied) {
       if (startDate > now && onChange) {
         buttons.push(
           <ReservationListButton

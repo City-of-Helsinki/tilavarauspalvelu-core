@@ -2,7 +2,7 @@ import { get as mockGet } from "lodash";
 import { addDays, addHours, addMinutes, startOfToday } from "date-fns";
 import {
   type PaymentOrderNode,
-  State,
+  ReservationStateChoice,
   type ReservationNode,
   ReservationStartInterval,
   Authentication,
@@ -198,7 +198,7 @@ const reservationUnit: ReservationUnitNode = {
 
 const reservation: ReservationNode = {
   id: "123f4w90",
-  state: State.Confirmed,
+  state: ReservationStateChoice.Confirmed,
   price: "0",
   bufferTimeBefore: 0,
   bufferTimeAfter: 0,
@@ -232,7 +232,7 @@ describe("canUserCancelReservation", () => {
     const res: ReservationNode = {
       ...reservation,
       begin: addMinutes(new Date(), 10).toISOString(),
-      state: State.Confirmed,
+      state: ReservationStateChoice.Confirmed,
       reservationUnit: [
         {
           ...reservationUnit,
@@ -248,7 +248,7 @@ describe("canUserCancelReservation", () => {
   test("that does not need handling", () => {
     const reservation_ = {
       begin: new Date().toISOString(),
-      state: State.Confirmed,
+      state: ReservationStateChoice.Confirmed,
       reservationUnit: [
         {
           cancellationRule: {
@@ -263,7 +263,7 @@ describe("canUserCancelReservation", () => {
   test("with non-confirmed state", () => {
     const reservation_ = {
       begin: new Date().toISOString(),
-      state: State.RequiresHandling,
+      state: ReservationStateChoice.RequiresHandling,
       reservationUnit: [
         {
           cancellationRule: {
@@ -278,7 +278,7 @@ describe("canUserCancelReservation", () => {
   test("with 0 secs of buffer time", () => {
     const reservation_ = {
       begin: new Date().toISOString(),
-      state: State.Confirmed,
+      state: ReservationStateChoice.Confirmed,
       reservationUnit: [
         {
           cancellationRule: {
@@ -573,7 +573,7 @@ describe("canReservationBeChanged", () => {
       canReservationTimeBeChanged({
         reservation: {
           ...reservation,
-          state: State.Created,
+          state: ReservationStateChoice.Created,
         },
         reservationUnit,
       })

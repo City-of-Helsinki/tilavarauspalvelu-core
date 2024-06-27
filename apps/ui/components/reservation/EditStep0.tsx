@@ -461,10 +461,10 @@ export function EditStep0({
             onEventResize={handleCalendarEventChange}
             onSelectSlot={handleSlotClick}
             draggableAccessor={({ event }) =>
-              event?.state.toString() === "INITIAL"
+              event?.state ? event?.state?.toString() === "INITIAL" : false
             }
             resizableAccessor={({ event }) =>
-              event?.state.toString() === "INITIAL"
+              event?.state ? event?.state?.toString() === "INITIAL" : false
             }
             step={30}
             timeslots={getTimeslots(reservationUnit.reservationStartInterval)}

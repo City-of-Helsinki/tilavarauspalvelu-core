@@ -12,7 +12,7 @@ export const SEARCH_RESERVATION_UNITS_QUERY = gql`
     $unit: [Int]
     $reservationUnitType: [Int]
     $orderBy: [ReservationUnitOrderingChoices]
-    $state: [String]
+    $state: [ReservationUnitState]
   ) {
     reservationUnits(
       first: $first

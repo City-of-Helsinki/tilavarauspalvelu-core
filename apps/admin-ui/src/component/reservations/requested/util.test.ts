@@ -8,7 +8,7 @@ import {
   PricingType,
   Status,
   type ReservationUnitNode,
-  State,
+  ReservationStateChoice,
 } from "@gql/gql-types";
 import {
   createTagString,
@@ -50,7 +50,7 @@ function constructReservation(
     id: "1",
     bufferTimeBefore: 0,
     bufferTimeAfter: 0,
-    state: State.Confirmed,
+    state: ReservationStateChoice.Confirmed,
     reservationUnit: [
       {
         nameFi: "Foobar",

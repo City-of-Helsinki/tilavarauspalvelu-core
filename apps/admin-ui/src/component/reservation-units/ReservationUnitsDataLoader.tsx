@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { type ApolloError } from "@apollo/client";
 import {
   ReservationUnitOrderingChoices,
+  ReservationUnitState,
   useSearchReservationUnitsQuery,
 } from "@gql/gql-types";
 import { filterNonNullable, toNumber } from "common/src/helpers";
@@ -94,6 +95,29 @@ export function ReservationUnitsDataReader(): JSX.Element {
     searchParams.get("surfaceAreaGte")
   )?.toString();
 
+  function convertToReservationUnitState(
+    state: string
+  ): ReservationUnitState | null {
+    switch (state) {
+      case ReservationUnitState.Archived:
+        return ReservationUnitState.Archived;
+      case ReservationUnitState.Draft:
+        return ReservationUnitState.Draft;
+      case ReservationUnitState.Hidden:
+        return ReservationUnitState.Hidden;
+      case ReservationUnitState.Published:
+        return ReservationUnitState.Published;
+      case ReservationUnitState.ScheduledHiding:
+        return ReservationUnitState.ScheduledHiding;
+      case ReservationUnitState.ScheduledPeriod:
+        return ReservationUnitState.ScheduledPeriod;
+      case ReservationUnitState.ScheduledPublishing:
+        return ReservationUnitState.ScheduledPublishing;
+      default:
+        return null;
+    }
+  }
+
   const query = useSearchReservationUnitsQuery({
     variables: {
       orderBy,
@@ -104,7 +128,9 @@ export function ReservationUnitsDataReader(): JSX.Element {
       surfaceAreaGte,
       nameFi: searchFilter,
       unit,
-      state: reservationUnitStates,
+      state: reservationUnitStates.map((state) =>
+        convertToReservationUnitState(state)
+      ),
       reservationUnitType: reservationUnitTypes,
     },
     onError: (err: ApolloError) => {

@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useNotification } from "app/context/NotificationContext";
 import {
-  State,
+  ReservationStateChoice,
   type ReservationStaffModifyMutationInput,
   type ReservationQuery,
   useUpdateRecurringReservationMutation,
@@ -52,7 +52,7 @@ export function useStaffReservationMutation({
       // NOTE frontend filtering because of cache issues
       const pksToUpdate = reservations
         .filter((x) => new Date(x.begin) >= new Date())
-        .filter((x) => x.state === State.Confirmed)
+        .filter((x) => x.state === ReservationStateChoice.Confirmed)
         .map((x) => x.pk)
         .filter((x): x is number => x != null);
 

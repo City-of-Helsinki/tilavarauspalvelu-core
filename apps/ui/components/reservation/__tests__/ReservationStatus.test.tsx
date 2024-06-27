@@ -1,6 +1,6 @@
 import * as React from "react";
 import { get as mockGet } from "lodash";
-import { State } from "@gql/gql-types";
+import { ReservationStateChoice } from "@gql/gql-types";
 import { render, screen } from "../../../test/testUtils";
 import { ReservationStatus, type Props } from "../ReservationStatus";
 import mockTranslations from "../../../public/locales/fi/reservations.json";
@@ -27,7 +27,7 @@ jest.mock("next-i18next", () => ({
 }));
 
 const defaultProps: Props = {
-  state: "" as State,
+  state: "" as ReservationStateChoice,
 };
 
 const renderComponent = (props?: Partial<Props>) =>
@@ -35,27 +35,27 @@ const renderComponent = (props?: Partial<Props>) =>
 
 [
   {
-    status: State.Cancelled,
+    status: ReservationStateChoice.Cancelled,
     label: "Peruttu",
   },
   {
-    status: State.Confirmed,
+    status: ReservationStateChoice.Confirmed,
     label: "Hyväksytty",
   },
   {
-    status: State.Denied,
+    status: ReservationStateChoice.Denied,
     label: "Hylätty",
   },
   {
-    status: State.Created,
+    status: ReservationStateChoice.Created,
     label: "Luonnos",
   },
   {
-    status: State.RequiresHandling,
+    status: ReservationStateChoice.RequiresHandling,
     label: "Käsiteltävänä",
   },
   {
-    status: State.WaitingForPayment,
+    status: ReservationStateChoice.WaitingForPayment,
     label: "Odottaa maksua",
   },
 ].forEach((state) => {

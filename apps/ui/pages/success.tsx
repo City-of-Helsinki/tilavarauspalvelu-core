@@ -4,7 +4,7 @@ import type { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
-import { State, useReservationQuery } from "@gql/gql-types";
+import { ReservationStateChoice, useReservationQuery } from "@gql/gql-types";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { Container } from "common";
 import { useOrder } from "@/hooks/reservation";
@@ -110,12 +110,12 @@ const ReservationSuccess = ({ apiBaseUrl }: Props) => {
     const { state } = reservation;
 
     switch (state) {
-      case State.Created:
-      case State.WaitingForPayment:
+      case ReservationStateChoice.Created:
+      case ReservationStateChoice.WaitingForPayment:
         router.replace(`/reservations?error=order1`);
         break;
-      case State.Confirmed:
-      case State.RequiresHandling:
+      case ReservationStateChoice.Confirmed:
+      case ReservationStateChoice.RequiresHandling:
       default:
         router.replace(`/reservation/confirmation/${reservation.pk}`);
     }

@@ -2,11 +2,11 @@ import { camelCase } from "lodash";
 import React, { useMemo } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { State } from "@gql/gql-types";
+import { ReservationStateChoice } from "@gql/gql-types";
 import { truncatedText } from "../../styles/util";
 
 export type Props = {
-  state: State;
+  state: ReservationStateChoice;
 };
 
 // TODO why ? why not use HDS tags?
@@ -24,16 +24,16 @@ export function ReservationStatus({ state, ...rest }: Props): JSX.Element {
 
   const color = useMemo(() => {
     switch (state) {
-      case State.Cancelled:
+      case ReservationStateChoice.Cancelled:
         return "var(--color-black-10)";
-      case State.Confirmed:
+      case ReservationStateChoice.Confirmed:
         return "var(--color-success-light)";
-      case State.Denied:
+      case ReservationStateChoice.Denied:
         return "var(--color-error-light)";
-      case State.Created:
-      case State.RequiresHandling:
+      case ReservationStateChoice.Created:
+      case ReservationStateChoice.RequiresHandling:
         return "var(--color-info-light)";
-      case State.WaitingForPayment:
+      case ReservationStateChoice.WaitingForPayment:
         return "var(--color-engel-light)";
       default:
         return "";

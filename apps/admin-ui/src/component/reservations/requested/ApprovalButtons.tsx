@@ -1,5 +1,5 @@
 import React from "react";
-import { State, type ReservationQuery } from "@gql/gql-types";
+import { ReservationStateChoice, type ReservationQuery } from "@gql/gql-types";
 import { useTranslation } from "react-i18next";
 import { Button } from "hds-react";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
@@ -17,7 +17,7 @@ import {
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
   reservation: ReservationType;
-  state: State;
+  state: ReservationStateChoice;
   isFree: boolean;
   handleClose: () => void;
   handleAccept: () => void;

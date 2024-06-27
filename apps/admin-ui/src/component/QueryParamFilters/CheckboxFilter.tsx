@@ -1,7 +1,7 @@
 import styled from "styled-components";
-import {Checkbox} from "hds-react";
-import {useSearchParams} from "react-router-dom";
-import {useTranslation} from "react-i18next";
+import { Checkbox } from "hds-react";
+import { useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import React from "react";
 
 // "&& > *" needed to position the checkbox and label correctly in the grid block

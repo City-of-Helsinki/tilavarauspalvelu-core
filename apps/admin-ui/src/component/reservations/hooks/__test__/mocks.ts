@@ -5,7 +5,7 @@ import {
   Authentication,
   ReservationKind,
   ReservationStartInterval,
-  State,
+  ReservationStateChoice,
   type ReservationUnitNode,
   UpdateStaffReservationDocument,
   RecurringReservationDocument,
@@ -66,7 +66,7 @@ const getValidInterval = (daysToAdd: number) => {
 function createRecurringEdges(
   startingPk: number,
   recurringPk: number,
-  state: State = State.Confirmed
+  state: ReservationStateChoice = ReservationStateChoice.Confirmed
 ) {
   return [
     {
@@ -116,7 +116,9 @@ const correctRecurringReservationQueryResult = (
           reservations: createRecurringEdges(
             startingPk,
             recurringPk,
-            options?.allDenied ? State.Denied : State.Confirmed
+            options?.allDenied
+              ? ReservationStateChoice.Denied
+              : ReservationStateChoice.Confirmed
           ),
         },
       },
@@ -263,7 +265,7 @@ export const mockReservation: ReservationNode = {
   end: "2024-01-01T14:00:00+00:00",
   bufferTimeAfter: 0,
   bufferTimeBefore: 0,
-  state: State.Confirmed,
+  state: ReservationStateChoice.Confirmed,
   id: base64encode("ReservationNode:1"),
   reservationUnit: [],
   paymentOrder: [],

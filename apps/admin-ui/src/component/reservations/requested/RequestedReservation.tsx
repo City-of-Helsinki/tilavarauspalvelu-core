@@ -8,10 +8,10 @@ import type { TFunction } from "i18next";
 import { add, startOfISOWeek } from "date-fns";
 import { breakpoints } from "common/src/common/style";
 import {
-  type ReservationQuery,
   CustomerTypeChoice,
   PricingType,
-  State,
+  type ReservationQuery,
+  ReservationStateChoice,
   useReservationQuery,
 } from "@gql/gql-types";
 import { Permission } from "@/modules/permissionHelper";
@@ -149,7 +149,7 @@ function ButtonsWithPermChecks({
         />
       ) : (
         <ApprovalButtons
-          state={reservation.state}
+          state={reservation.state ?? ReservationStateChoice.Confirmed}
           isFree={isFree}
           reservation={reservation}
           handleClose={closeDialog}
@@ -226,14 +226,14 @@ function ReservationSummary({
     : undefined;
 
   const cancelReasonString =
-    reservation.state === State.Cancelled
+    reservation.state === ReservationStateChoice.Cancelled
       ? {
           l: "RequestedReservation.cancelReason",
           v: reservation?.cancelReason?.reasonFi || "-",
         }
       : undefined;
   const rejectionReasonString =
-    reservation.state === State.Denied
+    reservation.state === ReservationStateChoice.Denied
       ? {
           l: "RequestedReservation.denyReason",
           v: reservation?.denyReason?.reasonFi || "-",
@@ -310,7 +310,9 @@ function TimeBlock({
   );
 
   const nextReservation = reservations.find(
-    (x) => x.state === State.Confirmed && new Date(x.begin) > new Date()
+    (x) =>
+      x.state === ReservationStateChoice.Confirmed &&
+      new Date(x.begin) > new Date()
   );
 
   const shownReservation =

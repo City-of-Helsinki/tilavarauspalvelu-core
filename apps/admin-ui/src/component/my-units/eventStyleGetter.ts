@@ -1,6 +1,6 @@
 import { type CalendarEvent } from "common/src/calendar/Calendar";
 import {
-  State,
+  ReservationStateChoice,
   ReservationTypeChoice,
   type ReservationUnitReservationsFragment,
 } from "@gql/gql-types";
@@ -77,8 +77,9 @@ const eventStyleGetter =
       (ru) => ru?.pk === currentReservationUnitPk
     );
 
-    const isConfirmed = event?.state === State.Confirmed;
-    const isWaitingForPayment = event?.state === State.WaitingForPayment;
+    const isConfirmed = event?.state === ReservationStateChoice.Confirmed;
+    const isWaitingForPayment =
+      event?.state === ReservationStateChoice.WaitingForPayment;
 
     const isClosed = event?.type === ReservationTypeChoice.Blocked;
     const isStaff = event?.type === ReservationTypeChoice.Staff;

@@ -3,7 +3,7 @@ import { addDays } from "date-fns";
 import { toUIDate } from "common/src/common/util";
 import {
   type EquipmentNode,
-  State,
+  ReservationStateChoice,
   type ReservationUnitPricingNode,
   PriceUnit,
   PricingType,
@@ -685,28 +685,30 @@ describe("getUnitName", () => {
 
 describe("getReservationUnitInstructionsKey", () => {
   it("should return correct key pending states", () => {
-    expect(getReservationUnitInstructionsKey(State.Created)).toEqual(
-      "reservationPendingInstructions"
-    );
-    expect(getReservationUnitInstructionsKey(State.RequiresHandling)).toEqual(
-      "reservationPendingInstructions"
-    );
+    expect(
+      getReservationUnitInstructionsKey(ReservationStateChoice.Created)
+    ).toEqual("reservationPendingInstructions");
+    expect(
+      getReservationUnitInstructionsKey(ReservationStateChoice.RequiresHandling)
+    ).toEqual("reservationPendingInstructions");
   });
 
   it("should return correct key cancelled states", () => {
-    expect(getReservationUnitInstructionsKey(State.Cancelled)).toEqual(
-      "reservationCancelledInstructions"
-    );
+    expect(
+      getReservationUnitInstructionsKey(ReservationStateChoice.Cancelled)
+    ).toEqual("reservationCancelledInstructions");
   });
 
   it("should return correct key confirmed states", () => {
-    expect(getReservationUnitInstructionsKey(State.Confirmed)).toEqual(
-      "reservationConfirmedInstructions"
-    );
+    expect(
+      getReservationUnitInstructionsKey(ReservationStateChoice.Confirmed)
+    ).toEqual("reservationConfirmedInstructions");
   });
 
   it("should return no key for rest", () => {
-    expect(getReservationUnitInstructionsKey(State.Denied)).toEqual(null);
+    expect(
+      getReservationUnitInstructionsKey(ReservationStateChoice.Denied)
+    ).toEqual(null);
   });
 });
 
