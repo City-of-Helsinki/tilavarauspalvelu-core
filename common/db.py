@@ -116,7 +116,7 @@ class SubqueryArray(models.Subquery):
         agg_field: str,
         *,
         distinct: bool = False,
-        include_nulls: bool = False,
+        remove_nulls: bool = True,
         coalesce: bool = True,
         coalesce_output_type: str = "integer",  # https://www.postgresql.org/docs/current/datatype.html#DATATYPE-TABLE
         output_field: models.Field | None = None,
@@ -126,7 +126,7 @@ class SubqueryArray(models.Subquery):
         kwargs["alias"] = alias
         kwargs["agg_field"] = agg_field
         kwargs["distinct"] = "DISTINCT " if distinct else ""
-        if not include_nulls:
+        if remove_nulls:
             self.template = f"ARRAY_REMOVE({self.template}, NULL)"
         if coalesce:
             self.template = f"COALESCE({self.template}, ARRAY[]::{coalesce_output_type}[])"

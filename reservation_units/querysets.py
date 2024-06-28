@@ -1,10 +1,13 @@
+import datetime
 from datetime import date, time
 from decimal import Decimal
 from typing import Self
 
 from django.db import models
 from django.db.models import Q
+from django.db.models.functions import JSONObject
 from elasticsearch_django.models import SearchResultsQuerySet
+from query_optimizer.validators import PaginationArgs
 
 from common.date_utils import local_datetime
 from common.db import ArrayUnnest, SubqueryArray
@@ -33,6 +36,8 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
         filter_time_start: time | None,
         filter_time_end: time | None,
         minimum_duration_minutes: float | Decimal | None,
+        show_only_reservable: bool = False,
+        pagination_args: PaginationArgs | None = None,
     ) -> Self:
         """Annotate the queryset with `first_reservable_time` and `is_closed` for each reservation unit."""
         helper = FirstReservableTimeHelper(
@@ -42,6 +47,8 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
             filter_time_start=filter_time_start,
             filter_time_end=filter_time_end,
             minimum_duration_minutes=minimum_duration_minutes,
+            show_only_reservable=show_only_reservable,
+            pagination_args=pagination_args,
         )
         helper.calculate_all_first_reservable_times()
         return helper.get_annotated_queryset()
@@ -151,3 +158,34 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
 
         ids = models.Subquery(self.affected_reservation_unit_ids)
         return ReservationUnit.objects.alias(ids=ids).filter(pk__in=models.F("ids"))
+
+    def with_affecting_time_spans(self, start: datetime.date, end: datetime.date) -> Self:
+        """
+        Annotate queryset with a list of json objects describing affecting
+        reservations for the reservation units.
+        """
+        from reservations.models import AffectingTimeSpan
+
+        return self.annotate(
+            affected_time_spans=SubqueryArray(
+                AffectingTimeSpan.objects.filter(
+                    affected_reservation_unit_ids__contains=[models.OuterRef("pk")],
+                    buffered_start_datetime__date__lte=end,
+                    buffered_end_datetime__date__gte=start,
+                )
+                .annotate(
+                    data=JSONObject(
+                        start_datetime=models.F("buffered_start_datetime") + models.F("buffer_time_before"),
+                        end_datetime=models.F("buffered_end_datetime") - models.F("buffer_time_after"),
+                        buffer_time_before=models.F("buffer_time_before"),
+                        buffer_time_after=models.F("buffer_time_after"),
+                        is_blocking=models.F("is_blocking"),
+                    ),
+                )
+                .values("data"),
+                agg_field="data",
+                remove_nulls=False,  # Doesn't contain nulls.
+                coalesce_output_type="jsonb",
+                output_field=models.JSONField(),
+            ),
+        )
