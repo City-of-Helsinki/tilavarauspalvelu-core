@@ -3,6 +3,7 @@ from typing import Any
 
 from django.db import transaction
 from graphene_django_extensions import NestingModelSerializer
+from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from graphql import GraphQLError
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -15,7 +16,7 @@ from common.fields.serializer import CurrentUserDefaultNullable, input_only_fiel
 from opening_hours.utils.reservable_time_span_client import ReservableTimeSpanClient
 from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import ReservationUnit
-from reservations.enums import ReservationTypeChoice
+from reservations.enums import ReservationStateChoice, ReservationTypeStaffChoice
 from reservations.models import RecurringReservation, Reservation
 
 __all__ = [
@@ -121,7 +122,17 @@ class RecurringReservationUpdateSerializer(RecurringReservationCreateSerializer)
 
 
 class ReservationSeriesReservationSerializer(NestingModelSerializer):
-    type = serializers.ChoiceField(choices=ReservationTypeChoice.allowed_for_staff_create, required=True)
+    type = EnumFriendlyChoiceField(
+        choices=ReservationTypeStaffChoice.choices,
+        enum=ReservationTypeStaffChoice,
+        required=True,
+    )
+
+    state = EnumFriendlyChoiceField(
+        choices=ReservationStateChoice.choices,
+        enum=ReservationStateChoice,
+        required=False,
+    )
 
     class Meta:
         model = Reservation

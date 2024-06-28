@@ -2,6 +2,7 @@ import datetime
 from typing import TYPE_CHECKING
 
 from django.utils.timezone import get_default_timezone
+from graphene_django_extensions.fields import EnumFriendlyChoiceField
 
 from api.graphql.extensions.serializers import OldPrimaryKeyUpdateSerializer
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
@@ -18,6 +19,12 @@ DEFAULT_TIMEZONE = get_default_timezone()
 
 
 class StaffReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, ReservationSchedulingMixin):
+    state = EnumFriendlyChoiceField(
+        choices=ReservationStateChoice.choices,
+        enum=ReservationStateChoice,
+        read_only=True,
+    )
+
     class Meta:
         model = Reservation
         fields = [
@@ -28,18 +35,20 @@ class StaffReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reserv
             "buffer_time_before",
             "buffer_time_after",
         ]
-
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.fields["state"].readonly = True
-        self.fields["buffer_time_before"].help_text = (
-            "Can be a number of seconds or timespan in format HH:MM:SS. "
-            "Null/undefined value means buffer from reservation unit is used."
-        )
-        self.fields["buffer_time_after"].help_text = (
-            "Can be a number of seconds or timespan in format HH:MM:SS. "
-            "Null/undefined value means buffer from reservation unit is used."
-        )
+        extra_kwargs = {
+            "buffer_time_before": {
+                "help_text": (
+                    "Can be a number of seconds or timespan in format HH:MM:SS. "
+                    "Null/undefined value means buffer from reservation unit is used."
+                )
+            },
+            "buffer_time_after": {
+                "help_text": (
+                    "Can be a number of seconds or timespan in format HH:MM:SS. "
+                    "Null/undefined value means buffer from reservation unit is used."
+                )
+            },
+        }
 
     def save(self, **kwargs):
         instance = super().save(**kwargs)

@@ -37,8 +37,8 @@ class StaffReservationModifySerializer(OldPrimaryKeyUpdateSerializer, Reservatio
     buffer_time_after = DurationField(required=False, read_only=True)
 
     reservee_type = EnumFriendlyChoiceField(choices=CustomerTypeChoice.choices, enum=CustomerTypeChoice)
-    state = EnumFriendlyChoiceField(choices=ReservationStateChoice.choices)
-    type = EnumFriendlyChoiceField(required=False, choices=ReservationTypeChoice.choices)
+    state = EnumFriendlyChoiceField(choices=ReservationStateChoice.choices, enum=ReservationStateChoice)
+    type = EnumFriendlyChoiceField(required=False, choices=ReservationTypeChoice.choices, enum=ReservationTypeChoice)
     reservee_language = serializers.ChoiceField(choices=RESERVEE_LANGUAGE_CHOICES, required=False, default="")
 
     class Meta:
@@ -91,6 +91,7 @@ class StaffReservationModifySerializer(OldPrimaryKeyUpdateSerializer, Reservatio
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.fields["reservation_unit_pks"].write_only = True
+
         self.fields["confirmed_at"].read_only = True
         self.fields["unit_price"].read_only = True
         self.fields["tax_percentage_value"].read_only = True
@@ -130,10 +131,6 @@ class StaffReservationModifySerializer(OldPrimaryKeyUpdateSerializer, Reservatio
         self.fields["num_persons"].required = False
         self.fields["purpose_pk"].required = False
         self.fields["state"].required = False
-        self.fields["state"].help_text = (
-            "String value for ReservationType's ReservationState enum. "
-            f"Possible values are {', '.join(value.upper() for value in ReservationStateChoice.values)}."
-        )
         self.fields["buffer_time_before"].required = False
         self.fields["buffer_time_after"].required = False
         self.fields["reservation_unit_pks"].required = False

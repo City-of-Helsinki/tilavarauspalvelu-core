@@ -6,7 +6,7 @@ import django_filters
 from django.db.models import Expression, F, Q, QuerySet
 from elasticsearch_django.models import SearchQuery
 from graphene_django_extensions import ModelFilterSet
-from graphene_django_extensions.filters import IntMultipleChoiceFilter
+from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntMultipleChoiceFilter
 
 from common.date_utils import local_datetime
 from elastic_django.reservation_units.query_builder import build_elastic_query_str
@@ -70,15 +70,8 @@ class ReservationUnitFilterSet(ModelFilterSet):
 
     reservation_kind = django_filters.CharFilter(field_name="reservation_kind", method="get_reservation_kind")
 
-    state = django_filters.MultipleChoiceFilter(
-        method="get_state",
-        choices=tuple((state.value, state.value) for state in ReservationUnitState),
-    )
-
-    reservation_state = django_filters.MultipleChoiceFilter(
-        method="get_reservation_state",
-        choices=tuple((state.name, state.value) for state in ReservationState),
-    )
+    state = EnumMultipleChoiceFilter(method="get_state", enum=ReservationUnitState)
+    reservation_state = EnumMultipleChoiceFilter(method="get_reservation_state", enum=ReservationState)
 
     only_with_permission = django_filters.BooleanFilter(method="get_only_with_permission")
 

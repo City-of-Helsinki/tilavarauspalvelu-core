@@ -4,7 +4,12 @@ import pytest
 
 from common.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_end_of_day, local_start_of_day
 from reservation_units.models import ReservationUnitHierarchy
-from reservations.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+from reservations.enums import (
+    CustomerTypeChoice,
+    ReservationStateChoice,
+    ReservationTypeChoice,
+    ReservationTypeStaffChoice,
+)
 from reservations.models import AffectingTimeSpan, RecurringReservation, Reservation
 from tests.factories import (
     AbilityGroupFactory,
@@ -242,7 +247,7 @@ def test_recurring_reservations__create_series__multiple_weekdays(graphql):
     assert reservations[2].end.astimezone(DEFAULT_TIMEZONE) == end
 
 
-@pytest.mark.parametrize("reservation_type", ReservationTypeChoice.allowed_for_staff_create)
+@pytest.mark.parametrize("reservation_type", ReservationTypeStaffChoice.values)
 def test_recurring_reservations__create_series__reservation_type(graphql, reservation_type):
     reservation_unit = ReservationUnitFactory.create()
     user = graphql.login_with_superuser()
@@ -268,8 +273,7 @@ def test_recurring_reservations__create_series__reservation_type__cant_create_no
     data["reservationDetails"]["type"] = ReservationTypeChoice.NORMAL.value
     response = graphql(CREATE_SERIES_MUTATION, input_data=data)
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages("reservationDetails.type") == ['"NORMAL" is not a valid choice.']
+    assert response.has_schema_errors is True
 
 
 def test_recurring_reservations__create_series__different_reservation_user(graphql):

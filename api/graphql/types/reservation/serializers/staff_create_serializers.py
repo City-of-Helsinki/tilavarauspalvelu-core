@@ -26,21 +26,52 @@ class ReservationStaffCreateSerializer(OldPrimaryKeySerializer, ReservationSched
     recurring_reservation_pk = IntegerPrimaryKeyField(
         queryset=RecurringReservation.objects.all(),
         source="recurring_reservation",
-        required=False,
         allow_null=True,
+        required=False,
     )
     reservation_unit_pks = serializers.ListField(
         child=IntegerPrimaryKeyField(queryset=ReservationUnit.objects.all()),
         source="reservation_unit",
         required=True,
     )
-    purpose_pk = IntegerPrimaryKeyField(queryset=ReservationPurpose.objects.all(), source="purpose", allow_null=True)
-    home_city_pk = IntegerPrimaryKeyField(queryset=City.objects.all(), source="home_city", allow_null=True)
-    age_group_pk = IntegerPrimaryKeyField(queryset=AgeGroup.objects.all(), source="age_group", allow_null=True)
-
-    reservee_type = EnumFriendlyChoiceField(choices=CustomerTypeChoice.choices, enum=CustomerTypeChoice)
-    type = EnumFriendlyChoiceField(choices=ReservationTypeChoice.choices, enum=ReservationTypeChoice, required=True)
-    reservee_language = OldChoiceCharField(choices=RESERVEE_LANGUAGE_CHOICES, default="", required=False)
+    purpose_pk = IntegerPrimaryKeyField(
+        queryset=ReservationPurpose.objects.all(),
+        source="purpose",
+        allow_null=True,
+        required=False,
+    )
+    home_city_pk = IntegerPrimaryKeyField(
+        queryset=City.objects.all(),
+        source="home_city",
+        allow_null=True,
+        required=False,
+    )
+    age_group_pk = IntegerPrimaryKeyField(
+        queryset=AgeGroup.objects.all(),
+        source="age_group",
+        allow_null=True,
+        required=False,
+    )
+    state = EnumFriendlyChoiceField(
+        choices=ReservationStateChoice.choices,
+        enum=ReservationStateChoice,
+        read_only=True,
+    )
+    reservee_type = EnumFriendlyChoiceField(
+        choices=CustomerTypeChoice.choices,
+        enum=CustomerTypeChoice,
+        required=False,
+    )
+    type = EnumFriendlyChoiceField(
+        choices=ReservationTypeChoice.choices,
+        enum=ReservationTypeChoice,
+        required=True,
+    )
+    reservee_language = OldChoiceCharField(
+        choices=RESERVEE_LANGUAGE_CHOICES,
+        default="",
+        required=False,
+    )
 
     class Meta:
         model = Reservation
@@ -86,53 +117,48 @@ class ReservationStaffCreateSerializer(OldPrimaryKeySerializer, ReservationSched
             "working_memo",
             "recurring_reservation_pk",
         ]
-
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-
-        self.fields["state"].read_only = True
-        self.fields["confirmed_at"].read_only = True
-        self.fields["handled_at"].read_only = True
-        self.fields["begin"].required = True
-        self.fields["end"].required = True
-
-        # Optional fields
-        self.fields["billing_first_name"].required = False
-        self.fields["billing_last_name"].required = False
-        self.fields["billing_phone"].required = False
-        self.fields["billing_email"].required = False
-        self.fields["billing_address_street"].required = False
-        self.fields["billing_address_city"].required = False
-        self.fields["billing_address_zip"].required = False
-        self.fields["reservee_type"].required = False
-        self.fields["reservee_first_name"].required = False
-        self.fields["reservee_last_name"].required = False
-        self.fields["reservee_organisation_name"].required = False
-        self.fields["reservee_phone"].required = False
-        self.fields["reservee_email"].required = False
-        self.fields["reservee_id"].required = False
-        self.fields["reservee_is_unregistered_association"].required = False
-        self.fields["reservee_address_street"].required = False
-        self.fields["reservee_address_city"].required = False
-        self.fields["reservee_address_zip"].required = False
-        self.fields["home_city_pk"].required = False
-        self.fields["age_group_pk"].required = False
-        self.fields["applying_for_free_of_charge"].required = False
-        self.fields["free_of_charge_reason"].required = False
-        self.fields["name"].required = False
-        self.fields["description"].required = False
-        self.fields["num_persons"].required = False
-        self.fields["purpose_pk"].required = False
-        self.fields["buffer_time_after"].required = False
-        self.fields["buffer_time_after"].help_text = (
-            "Can be a number of seconds or timespan in format HH:MM:SS. "
-            "Null/undefined value means buffer from reservation unit is used."
-        )
-        self.fields["buffer_time_before"].required = False
-        self.fields["buffer_time_before"].help_text = (
-            "Can be a number of seconds or timespan in format HH:MM:SS. "
-            "Null/undefined value means buffer from reservation unit is used."
-        )
+        extra_kwargs = {
+            "applying_for_free_of_charge": {"required": False},
+            "begin": {"required": True},
+            "billing_address_city": {"required": False},
+            "billing_address_street": {"required": False},
+            "billing_address_zip": {"required": False},
+            "billing_email": {"required": False},
+            "billing_first_name": {"required": False},
+            "billing_last_name": {"required": False},
+            "billing_phone": {"required": False},
+            "buffer_time_before": {
+                "required": False,
+                "help_text": (
+                    "Can be a number of seconds or timespan in format HH:MM:SS. "
+                    "Null/undefined value means buffer from reservation unit is used."
+                ),
+            },
+            "buffer_time_after": {
+                "required": False,
+                "help_text": (
+                    "Can be a number of seconds or timespan in format HH:MM:SS. "
+                    "Null/undefined value means buffer from reservation unit is used."
+                ),
+            },
+            "confirmed_at": {"read_only": True},
+            "description": {"required": False},
+            "end": {"required": True},
+            "free_of_charge_reason": {"required": False},
+            "handled_at": {"read_only": True},
+            "name": {"required": False},
+            "num_persons": {"required": False},
+            "reservee_address_city": {"required": False},
+            "reservee_address_street": {"required": False},
+            "reservee_address_zip": {"required": False},
+            "reservee_email": {"required": False},
+            "reservee_first_name": {"required": False},
+            "reservee_id": {"required": False},
+            "reservee_is_unregistered_association": {"required": False},
+            "reservee_last_name": {"required": False},
+            "reservee_organisation_name": {"required": False},
+            "reservee_phone": {"required": False},
+        }
 
     def validate(self, data):
         data = super().validate(data)
