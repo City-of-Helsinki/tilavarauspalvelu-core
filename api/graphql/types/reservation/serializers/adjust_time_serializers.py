@@ -2,6 +2,7 @@ import datetime
 from typing import Any
 
 from django.utils.timezone import get_default_timezone
+from graphene_django_extensions.fields import EnumFriendlyChoiceField
 
 from api.graphql.extensions.serializers import OldPrimaryKeyUpdateSerializer
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
@@ -17,6 +18,12 @@ DEFAULT_TIMEZONE = get_default_timezone()
 class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, ReservationPriceMixin, ReservationSchedulingMixin):
     instance: Reservation
 
+    state = EnumFriendlyChoiceField(
+        choices=ReservationStateChoice.choices,
+        enum=ReservationStateChoice,
+        read_only=True,
+    )
+
     class Meta:
         model = Reservation
         fields = [
@@ -25,10 +32,6 @@ class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reservation
             "end",
             "state",
         ]
-
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.fields["state"].readonly = True
 
     def save(self) -> Reservation:
         kwargs: dict[str, Any] = {}

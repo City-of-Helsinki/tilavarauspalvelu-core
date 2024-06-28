@@ -1,6 +1,7 @@
 from typing import Any
 
 from graphene_django_extensions import NestingModelSerializer
+from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from rest_framework.exceptions import ValidationError
 
 from api.graphql.extensions import error_codes
@@ -17,15 +18,18 @@ __all__ = [
 class ReservationRequiresHandlingSerializer(NestingModelSerializer):
     instance: Reservation
 
+    state = EnumFriendlyChoiceField(
+        choices=ReservationStateChoice.choices,
+        enum=ReservationStateChoice,
+        read_only=True,
+    )
+
     class Meta:
         model = Reservation
         fields = [
             "pk",
             "state",
         ]
-        extra_kwargs = {
-            "state": {"read_only": True},
-        }
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         if self.instance.state not in ReservationStateChoice.states_that_can_change_to_handling:

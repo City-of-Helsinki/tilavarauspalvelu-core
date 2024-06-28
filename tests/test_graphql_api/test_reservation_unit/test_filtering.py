@@ -607,7 +607,7 @@ def test_reservation_unit__filter__by_reservation_state__reservable(graphql):
 
     reservation_units = create_reservation_units_for_reservation_state_filtering()
 
-    query = reservation_units_query(reservation_state=ReservationState.RESERVABLE.value)
+    query = reservation_units_query(reservation_state=ReservationState.RESERVABLE)
     response = graphql(query)
 
     assert response.has_errors is False, response
@@ -621,7 +621,7 @@ def test_reservation_unit__filter__by_reservation_state__scheduled_reservation(g
 
     reservation_units = create_reservation_units_for_reservation_state_filtering()
 
-    query = reservation_units_query(reservation_state=ReservationState.SCHEDULED_RESERVATION.value)
+    query = reservation_units_query(reservation_state=ReservationState.SCHEDULED_RESERVATION)
     response = graphql(query)
 
     assert response.has_errors is False, response
@@ -634,7 +634,7 @@ def test_reservation_unit__filter__by_reservation_state__scheduled_period(graphq
 
     reservation_units = create_reservation_units_for_reservation_state_filtering()
 
-    query = reservation_units_query(reservation_state=ReservationState.SCHEDULED_PERIOD.value)
+    query = reservation_units_query(reservation_state=ReservationState.SCHEDULED_PERIOD)
     response = graphql(query)
 
     assert response.has_errors is False, response
@@ -647,7 +647,7 @@ def test_reservation_unit__filter__by_reservation_state__scheduled_closing(graph
 
     reservation_units = create_reservation_units_for_reservation_state_filtering()
 
-    query = reservation_units_query(reservation_state=ReservationState.SCHEDULED_CLOSING.value)
+    query = reservation_units_query(reservation_state=ReservationState.SCHEDULED_CLOSING)
     response = graphql(query)
 
     assert response.has_errors is False, response
@@ -660,7 +660,7 @@ def test_reservation_unit__filter__by_reservation_state__reservation_closed(grap
 
     reservation_units = create_reservation_units_for_reservation_state_filtering()
 
-    query = reservation_units_query(reservation_state=ReservationState.RESERVATION_CLOSED.value)
+    query = reservation_units_query(reservation_state=ReservationState.RESERVATION_CLOSED)
     response = graphql(query)
 
     assert response.has_errors is False, response
@@ -676,7 +676,7 @@ def test_reservation_unit__filter__by_reservation_state__multiple(graphql):
     reservation_units = create_reservation_units_for_reservation_state_filtering()
 
     query = reservation_units_query(
-        reservation_state=[ReservationState.SCHEDULED_RESERVATION.value, ReservationState.RESERVABLE.value],
+        reservation_state=[ReservationState.SCHEDULED_RESERVATION, ReservationState.RESERVABLE],
     )
     response = graphql(query)
 
@@ -695,7 +695,7 @@ def test_reservation_unit__filter__by_reservation_unit_state__archived(graphql):
 
     create_reservation_units_for_reservation_unit_state_filtering()
 
-    query = reservation_units_query(state=ReservationUnitState.ARCHIVED.value)
+    query = reservation_units_query(state=ReservationUnitState.ARCHIVED)
     response = graphql(query)
 
     # Archived reservation units are always hidden
@@ -708,7 +708,7 @@ def test_reservation_unit__filter__by_reservation_unit_state__draft(graphql):
 
     reservation_units = create_reservation_units_for_reservation_unit_state_filtering()
 
-    query = reservation_units_query(state=ReservationUnitState.DRAFT.value)
+    query = reservation_units_query(state=ReservationUnitState.DRAFT)
     response = graphql(query)
 
     assert response.has_errors is False
@@ -721,7 +721,7 @@ def test_reservation_unit__filter__by_reservation_unit_state__scheduled_publishi
 
     reservation_units = create_reservation_units_for_reservation_unit_state_filtering()
 
-    query = reservation_units_query(state=ReservationUnitState.SCHEDULED_PUBLISHING.value)
+    query = reservation_units_query(state=ReservationUnitState.SCHEDULED_PUBLISHING)
     response = graphql(query)
 
     assert response.has_errors is False
@@ -734,7 +734,7 @@ def test_reservation_unit__filter__by_reservation_unit_state__published(graphql)
 
     reservation_units = create_reservation_units_for_reservation_unit_state_filtering()
 
-    query = reservation_units_query(state=ReservationUnitState.PUBLISHED.value)
+    query = reservation_units_query(state=ReservationUnitState.PUBLISHED)
     response = graphql(query)
 
     assert response.has_errors is False
@@ -747,7 +747,7 @@ def test_reservation_unit__filter__by_reservation_unit_state__scheduled_period(g
 
     reservation_units = create_reservation_units_for_reservation_unit_state_filtering()
 
-    query = reservation_units_query(state=ReservationUnitState.SCHEDULED_PERIOD.value)
+    query = reservation_units_query(state=ReservationUnitState.SCHEDULED_PERIOD)
     response = graphql(query)
 
     assert response.has_errors is False
@@ -760,7 +760,7 @@ def test_reservation_unit__filter__by_reservation_unit_state__scheduled_hiding(g
 
     reservation_units = create_reservation_units_for_reservation_unit_state_filtering()
 
-    query = reservation_units_query(state=ReservationUnitState.SCHEDULED_HIDING.value)
+    query = reservation_units_query(state=ReservationUnitState.SCHEDULED_HIDING)
     response = graphql(query)
 
     assert response.has_errors is False
@@ -773,7 +773,7 @@ def test_reservation_unit__filter__by_reservation_unit_state__hidden(graphql):
 
     reservation_units = create_reservation_units_for_reservation_unit_state_filtering()
 
-    query = reservation_units_query(state=ReservationUnitState.HIDDEN.value)
+    query = reservation_units_query(state=ReservationUnitState.HIDDEN)
     response = graphql(query)
 
     assert response.has_errors is False
@@ -788,8 +788,8 @@ def test_reservation_unit__filter__by_reservation_unit_state__multiple(graphql):
 
     query = reservation_units_query(
         state=[
-            ReservationUnitState.DRAFT.value,
-            ReservationUnitState.SCHEDULED_PUBLISHING.value,
+            ReservationUnitState.DRAFT,
+            ReservationUnitState.SCHEDULED_PUBLISHING,
         ],
     )
     response = graphql(query)
@@ -813,7 +813,7 @@ def test_reservation_unit__filter__by_reservation_unit_state__scheduled_publishi
         publish_ends=(now + datetime.timedelta(days=1)),
     )
 
-    query = reservation_units_query(state=ReservationUnitState.SCHEDULED_PUBLISHING.value)
+    query = reservation_units_query(state=ReservationUnitState.SCHEDULED_PUBLISHING)
     response = graphql(query)
 
     assert response.has_errors is False
