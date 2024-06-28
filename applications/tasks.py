@@ -103,7 +103,7 @@ def generate_reservation_series_from_allocations(application_round_id: int) -> N
 
             organisation: Organisation | None = getattr(application, "organisation", None)
             organisation_name: str = getattr(organisation, "name", "")
-            organisation_identifier: str | None = getattr(organisation, "identifier", None)
+            organisation_identifier: str = getattr(organisation, "identifier", "") or ""
             organisation_address: Address | None = getattr(organisation, "address", None)
             organisation_address_street: str = getattr(organisation_address, "street_address", "")
             organisation_address_city: str = getattr(organisation_address, "city", "")
@@ -155,7 +155,7 @@ def generate_reservation_series_from_allocations(application_round_id: int) -> N
             else:
                 reservation_details["reservee_organisation_name"] = organisation_name
                 reservation_details["reservee_id"] = organisation_identifier
-                reservation_details["reservee_is_unregistered_association"] = organisation_identifier is None
+                reservation_details["reservee_is_unregistered_association"] = not organisation_identifier
                 reservation_details["reservee_address_street"] = organisation_address_street
                 reservation_details["reservee_address_city"] = organisation_address_city
                 reservation_details["reservee_address_zip"] = organisation_address_zip
