@@ -2,10 +2,10 @@ import datetime
 from typing import Any
 
 from django.utils.timezone import get_default_timezone
-from graphene_django_extensions.fields import IntegerPrimaryKeyField
+from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPrimaryKeyField
 from rest_framework import serializers
 
-from api.graphql.extensions.fields import DurationField, OldChoiceCharField
+from api.graphql.extensions.fields import DurationField
 from api.graphql.extensions.serializers import OldPrimaryKeyUpdateSerializer
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from api.graphql.types.reservation.serializers.mixins import ReservationSchedulingMixin
@@ -25,21 +25,21 @@ DEFAULT_TIMEZONE = get_default_timezone()
 class StaffReservationModifySerializer(OldPrimaryKeyUpdateSerializer, ReservationSchedulingMixin):
     instance: Reservation
 
-    age_group_pk = IntegerPrimaryKeyField(queryset=AgeGroup.objects.all(), source="age_group", allow_null=True)
-
-    buffer_time_before = DurationField(required=False, read_only=True)
-    buffer_time_after = DurationField(required=False, read_only=True)
-
-    home_city_pk = IntegerPrimaryKeyField(queryset=City.objects.all(), source="home_city", allow_null=True)
-    purpose_pk = IntegerPrimaryKeyField(queryset=ReservationPurpose.objects.all(), source="purpose", allow_null=True)
-    reservee_type = OldChoiceCharField(choices=CustomerTypeChoice.choices)
     reservation_unit_pks = serializers.ListField(
         child=IntegerPrimaryKeyField(queryset=ReservationUnit.objects.all()),
         source="reservation_unit",
     )
-    reservee_language = OldChoiceCharField(choices=RESERVEE_LANGUAGE_CHOICES, required=False, default="")
-    state = OldChoiceCharField(choices=ReservationStateChoice.choices)
-    type = OldChoiceCharField(required=False, choices=ReservationTypeChoice.choices)
+    age_group_pk = IntegerPrimaryKeyField(queryset=AgeGroup.objects.all(), source="age_group", allow_null=True)
+    home_city_pk = IntegerPrimaryKeyField(queryset=City.objects.all(), source="home_city", allow_null=True)
+    purpose_pk = IntegerPrimaryKeyField(queryset=ReservationPurpose.objects.all(), source="purpose", allow_null=True)
+
+    buffer_time_before = DurationField(required=False, read_only=True)
+    buffer_time_after = DurationField(required=False, read_only=True)
+
+    reservee_type = EnumFriendlyChoiceField(choices=CustomerTypeChoice.choices, enum=CustomerTypeChoice)
+    state = EnumFriendlyChoiceField(choices=ReservationStateChoice.choices, enum=ReservationStateChoice)
+    type = EnumFriendlyChoiceField(required=False, choices=ReservationTypeChoice.choices, enum=ReservationTypeChoice)
+    reservee_language = serializers.ChoiceField(choices=RESERVEE_LANGUAGE_CHOICES, required=False, default="")
 
     class Meta:
         model = Reservation
@@ -91,6 +91,7 @@ class StaffReservationModifySerializer(OldPrimaryKeyUpdateSerializer, Reservatio
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.fields["reservation_unit_pks"].write_only = True
+
         self.fields["confirmed_at"].read_only = True
         self.fields["unit_price"].read_only = True
         self.fields["tax_percentage_value"].read_only = True
@@ -130,10 +131,6 @@ class StaffReservationModifySerializer(OldPrimaryKeyUpdateSerializer, Reservatio
         self.fields["num_persons"].required = False
         self.fields["purpose_pk"].required = False
         self.fields["state"].required = False
-        self.fields["state"].help_text = (
-            "String value for ReservationType's ReservationState enum. "
-            f"Possible values are {', '.join(value.upper() for value in ReservationStateChoice.values)}."
-        )
         self.fields["buffer_time_before"].required = False
         self.fields["buffer_time_after"].required = False
         self.fields["reservation_unit_pks"].required = False

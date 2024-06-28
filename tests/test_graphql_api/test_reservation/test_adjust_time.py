@@ -64,7 +64,7 @@ def test_reservation__adjust_time__wrong_state(graphql):
     data = get_adjust_data(reservation)
     response = graphql(ADJUST_MUTATION, input_data=data)
 
-    assert response.error_message() == "Only reservations in confirmed state can be rescheduled."
+    assert response.error_message() == "Only reservations in 'CONFIRMED' state can be rescheduled."
 
 
 def test_reservation__adjust_time__new_reservation_begin_in_past(graphql):
@@ -138,7 +138,7 @@ def test_reservation__adjust_time__reservation_is_already_handled(graphql):
     data = get_adjust_data(reservation)
     response = graphql(ADJUST_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation has gone through handling and it cannot be changed anymore."
+    assert response.error_message() == "Reservation has gone through handling and cannot be changed anymore."
 
 
 def test_reservation__adjust_time__reservation_has_price_to_be_paid(graphql):

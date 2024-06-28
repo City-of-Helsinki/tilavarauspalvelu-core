@@ -1,6 +1,7 @@
 from typing import Any
 
 from graphene_django_extensions import NestingModelSerializer
+from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from rest_framework.exceptions import ValidationError
 
 from api.graphql.extensions import error_codes
@@ -19,6 +20,12 @@ __all__ = [
 class ReservationCancellationSerializer(NestingModelSerializer):
     instance: Reservation
 
+    state = EnumFriendlyChoiceField(
+        choices=ReservationStateChoice.choices,
+        enum=ReservationStateChoice,
+        read_only=True,
+    )
+
     class Meta:
         model = Reservation
         fields = [
@@ -28,15 +35,13 @@ class ReservationCancellationSerializer(NestingModelSerializer):
             "state",
         ]
         extra_kwargs = {
-            "state": {"read_only": True},
             "cancel_reason": {"required": True},
         }
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         data = super().validate(data)
         if self.instance.state != ReservationStateChoice.CONFIRMED.value:
-            state = str(ReservationStateChoice.CONFIRMED)
-            msg = f"Only reservations with state {state!r} can be cancelled."
+            msg = "Only reservations with state 'CONFIRMED' can be cancelled."
             raise ValidationError(msg, code=error_codes.RESERVATION_CANCELLATION_NOT_ALLOWED)
 
         now = local_datetime()

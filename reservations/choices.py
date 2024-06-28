@@ -9,13 +9,14 @@ __all__ = [
     "CustomerTypeChoice",
     "ReservationStateChoice",
     "ReservationTypeChoice",
+    "ReservationTypeStaffChoice",
 ]
 
 
 class CustomerTypeChoice(models.TextChoices):
-    BUSINESS = "business", _("Business")
-    NONPROFIT = "nonprofit", _("Nonprofit")
-    INDIVIDUAL = "individual", _("Individual")
+    BUSINESS = "BUSINESS", _("Business")
+    NONPROFIT = "NONPROFIT", _("Nonprofit")
+    INDIVIDUAL = "INDIVIDUAL", _("Individual")
 
     @classproperty
     def organisation(self) -> list[str]:
@@ -26,12 +27,12 @@ class CustomerTypeChoice(models.TextChoices):
 
 
 class ReservationStateChoice(models.TextChoices):
-    CREATED = "created", _("Created")
-    CANCELLED = "cancelled", _("Cancelled")
-    REQUIRES_HANDLING = "requires_handling", _("Requires handling")
-    WAITING_FOR_PAYMENT = "waiting_for_payment", _("Waiting for payment")
-    CONFIRMED = "confirmed", _("Confirmed")
-    DENIED = "denied", _("Denied")
+    CREATED = "CREATED", _("Created")
+    CANCELLED = "CANCELLED", _("Cancelled")
+    REQUIRES_HANDLING = "REQUIRES_HANDLING", _("Requires handling")
+    WAITING_FOR_PAYMENT = "WAITING_FOR_PAYMENT", _("Waiting for payment")
+    CONFIRMED = "CONFIRMED", _("Confirmed")
+    DENIED = "DENIED", _("Denied")
 
     @classproperty
     def states_going_to_occur(self) -> list[str]:
@@ -58,11 +59,11 @@ class ReservationStateChoice(models.TextChoices):
 
 
 class ReservationTypeChoice(models.TextChoices):
-    NORMAL = "normal", _("Normal")
-    BLOCKED = "blocked", _("Blocked")
-    STAFF = "staff", _("Staff")
-    BEHALF = "behalf", _("Behalf")
-    SEASONAL = "seasonal", _("Seasonal")
+    NORMAL = "NORMAL", _("Normal")
+    BLOCKED = "BLOCKED", _("Blocked")
+    STAFF = "STAFF", _("Staff")
+    BEHALF = "BEHALF", _("Behalf")
+    SEASONAL = "SEASONAL", _("Seasonal")
 
     @classproperty
     def allowed_for_user_time_adjust(cls) -> list[str]:
@@ -71,13 +72,12 @@ class ReservationTypeChoice(models.TextChoices):
             ReservationTypeChoice.BEHALF.value,
         ]
 
-    @classproperty
-    def allowed_for_staff_create(cls) -> list[str]:
-        return [  # type: ignore[return-type]
-            ReservationTypeChoice.BLOCKED.value,
-            ReservationTypeChoice.STAFF.value,
-            ReservationTypeChoice.BEHALF.value,
-        ]
+
+class ReservationTypeStaffChoice(models.TextChoices):
+    # These are the same as the ones above, but for the staff create endpoint
+    BLOCKED = "BLOCKED", _("Blocked")
+    STAFF = "STAFF", _("Staff")
+    BEHALF = "BEHALF", _("Behalf")
 
 
 RESERVEE_LANGUAGE_CHOICES = (*settings.LANGUAGES, ("", ""))

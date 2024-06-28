@@ -4,7 +4,8 @@ import pytest
 from django.utils import timezone
 from freezegun import freeze_time
 
-from merchants.models import OrderStatus
+from common.date_utils import DEFAULT_TIMEZONE
+from merchants.models import OrderStatus, OrderStatusWithFree
 from reservations.choices import ReservationStateChoice, ReservationTypeChoice
 from tests.factories import (
     PaymentOrderFactory,
@@ -36,7 +37,8 @@ def test_reservation__filter__by_reservation_type(graphql):
 
     # when:
     # - User tries to filter reservations by said type
-    response = graphql(reservations_query(reservation_type=ReservationTypeChoice.NORMAL.value))
+    query = reservations_query(reservation_type=ReservationTypeChoice.NORMAL)
+    response = graphql(query)
 
     # then:
     # - The reservation is returned without errors
@@ -57,14 +59,8 @@ def test_reservation__filter__by_reservation_type__multiple(graphql):
 
     # when:
     # - User tries to filter reservations by some of those states
-    response = graphql(
-        reservations_query(
-            reservation_type=[
-                ReservationTypeChoice.NORMAL.value,
-                ReservationTypeChoice.STAFF.value,
-            ]
-        )
-    )
+    query = reservations_query(reservation_type=[ReservationTypeChoice.NORMAL, ReservationTypeChoice.STAFF])
+    response = graphql(query)
 
     # then:
     # - The reservation is returned without errors, and contains those in the selected states
@@ -79,7 +75,7 @@ def test_reservation__filter__by_state(graphql):
     ReservationFactory.create(state=ReservationStateChoice.WAITING_FOR_PAYMENT)
 
     graphql.login_user_based_on_type(UserType.SUPERUSER)
-    query = reservations_query(state=reservation.state.value.upper())
+    query = reservations_query(state=reservation.state)
     response = graphql(query)
 
     assert response.has_errors is False, response
@@ -92,7 +88,7 @@ def test_reservation__filter__by_state__multiple(graphql):
     reservation_2 = ReservationFactory.create(state=ReservationStateChoice.WAITING_FOR_PAYMENT)
 
     graphql.login_user_based_on_type(UserType.SUPERUSER)
-    query = reservations_query(state=[reservation_1.state.value.upper(), reservation_2.state.value.upper()])
+    query = reservations_query(state=[reservation_1.state, reservation_2.state])
     response = graphql(query)
 
     assert response.has_errors is False, response
@@ -108,7 +104,7 @@ def test_reservation__filter__by_order_status(graphql):
     PaymentOrderFactory.create(reservation=reservation_2, status=OrderStatus.REFUNDED)
 
     graphql.login_user_based_on_type(UserType.SUPERUSER)
-    query = reservations_query(order_status=payment_order_1.status.value.upper())
+    query = reservations_query(order_status=payment_order_1.status)
     response = graphql(query)
 
     assert response.has_errors is False, response
@@ -123,9 +119,38 @@ def test_reservation__filter__by_order_status__multiple(graphql):
     payment_order_2 = PaymentOrderFactory.create(reservation=reservation_2, status=OrderStatus.REFUNDED)
 
     graphql.login_user_based_on_type(UserType.SUPERUSER)
-    query = reservations_query(
-        order_status=[payment_order_1.status.value.upper(), payment_order_2.status.value.upper()],
-    )
+    query = reservations_query(order_status=[payment_order_1.status, payment_order_2.status])
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert len(response.edges) == 2
+    assert response.node(0) == {"pk": reservation_1.pk}
+    assert response.node(1) == {"pk": reservation_2.pk}
+
+
+def test_reservation__filter__by_order_status__free(graphql):
+    reservation_1 = ReservationFactory.create()
+    PaymentOrderFactory.create(reservation=reservation_1, status=OrderStatus.PAID)
+
+    reservation_2 = ReservationFactory.create()  # No payment order => free
+
+    graphql.login_with_superuser()
+    query = reservations_query(order_status=OrderStatusWithFree.FREE)
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": reservation_2.pk}
+
+
+def test_reservation__filter__by_order_status__free_and_paid(graphql):
+    reservation_1 = ReservationFactory.create()
+    PaymentOrderFactory.create(reservation=reservation_1, status=OrderStatus.PAID)
+
+    reservation_2 = ReservationFactory.create()  # No payment order => free
+
+    graphql.login_with_superuser()
+    query = reservations_query(order_status=[OrderStatusWithFree.FREE, OrderStatusWithFree.PAID])
     response = graphql(query)
 
     assert response.has_errors is False, response
@@ -430,6 +455,23 @@ def test_reservation__filter__by_recurring_reservation(graphql):
     assert response.node(0) == {"pk": reservation.pk}
 
 
+def test_reservation__filter__by_is_recurring(graphql):
+    recurring_reservation = RecurringReservationFactory.create()
+    reservation = ReservationFactory.create(
+        recurring_reservation=recurring_reservation,
+        reservation_unit=[recurring_reservation.reservation_unit],
+    )
+    ReservationFactory.create(recurring_reservation=None)
+
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    query = reservations_query(is_recurring=True)
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": reservation.pk}
+
+
 def test_reservation__filter__by_reservation_unit(graphql):
     reservation_unit = ReservationUnitFactory.create()
     reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
@@ -715,3 +757,42 @@ def test_reservation__filter__by_begin_and_end_dates_is_timezone_aware(graphql):
     assert response.has_errors is False, response
     assert len(response.edges) == 1
     assert response.node(0) == {"pk": reservation_3.pk}
+
+
+def test_reservation__filter__by_created_at(graphql):
+    ReservationFactory.create(created_at=datetime.datetime(2024, 1, 1, 12, tzinfo=DEFAULT_TIMEZONE))
+    reservation_1 = ReservationFactory.create(created_at=datetime.datetime(2024, 1, 2, 12, tzinfo=DEFAULT_TIMEZONE))
+    reservation_2 = ReservationFactory.create(created_at=datetime.datetime(2024, 1, 2, 16, tzinfo=DEFAULT_TIMEZONE))
+    ReservationFactory.create(created_at=datetime.datetime(2024, 1, 3, 12, tzinfo=DEFAULT_TIMEZONE))
+
+    lte = datetime.date(2024, 1, 2).isoformat()
+    gte = datetime.date(2024, 1, 2).isoformat()
+
+    graphql.login_with_superuser()
+    query = reservations_query(created_at_gte=gte, created_at_lte=lte)
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert len(response.edges) == 2
+    assert response.node(0) == {"pk": reservation_1.pk}
+    assert response.node(1) == {"pk": reservation_2.pk}
+
+
+def test_reservation__filter__by_applying_for_free_of_charge(graphql):
+    reservation_1 = ReservationFactory.create(applying_for_free_of_charge=True)
+    reservation_2 = ReservationFactory.create(applying_for_free_of_charge=False)
+
+    graphql.login_with_superuser()
+    query = reservations_query(applying_for_free_of_charge=True)
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": reservation_1.pk}
+
+    query = reservations_query(applying_for_free_of_charge=False)
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": reservation_2.pk}
