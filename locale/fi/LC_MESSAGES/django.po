@@ -2493,6 +2493,50 @@ msgid "Product used for payments"
 msgstr "Tuote, jota käytetään maksuihin"
 
 #: reservation_units/enums.py
+msgid "Draft"
+msgstr "Luonnos"
+
+#: reservation_units/enums.py
+msgid "Scheduled publishing"
+msgstr "Julkaisu ajastettu"
+
+#: reservation_units/enums.py
+msgid "Scheduled hiding"
+msgstr "Piilotus ajastettu"
+
+#: reservation_units/enums.py
+msgid "Scheduled period"
+msgstr "Julkaisuväli ajastettu"
+
+#: reservation_units/enums.py
+msgid "Hidden"
+msgstr "Piilotettu"
+
+#: reservation_units/enums.py
+msgid "Published"
+msgstr "Julkaistu"
+
+#: reservation_units/enums.py
+msgid "Archived"
+msgstr "Arkistoitu"
+
+#: reservation_units/enums.py
+msgid "Scheduled reservation"
+msgstr "Varaus ajastettu"
+
+#: reservation_units/enums.py
+msgid "Reservable"
+msgstr "Varattavissa"
+
+#: reservation_units/enums.py
+msgid "Scheduled closing"
+msgstr "Sulku ajastettu"
+
+#: reservation_units/enums.py
+msgid "Reservation closed"
+msgstr "Suljettu"
+
+#: reservation_units/enums.py
 msgid "15 minutes"
 msgstr "15 minuuttia"
 
@@ -3145,6 +3189,21 @@ msgstr "Puolesta"
 msgctxt "ReservationType"
 msgid "Seasonal"
 msgstr "Kausi"
+
+#: reservations/enums.py
+msgctxt "ReservationTypeStaffChoice"
+msgid "Blocked"
+msgstr "Suljettu"
+
+#: reservations/enums.py
+msgctxt "ReservationTypeStaffChoice"
+msgid "Staff"
+msgstr "Henkilökunta"
+
+#: reservations/enums.py
+msgctxt "ReservationTypeStaffChoice"
+msgid "Behalf"
+msgstr "Puolesta"
 
 #: reservations/enums.py
 msgctxt "RejectionReadiness"
