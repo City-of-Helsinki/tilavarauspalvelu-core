@@ -10,7 +10,7 @@ from opening_hours.utils.time_span_element import TimeSpanElement
 from opening_hours.utils.time_span_element_utils import merge_overlapping_time_span_elements
 from reservation_units.models import ReservationUnit
 from reservation_units.utils.affecting_reservations_helper import AffectingReservationHelper
-from reservations.enums import RejectionReadinessChoice
+from reservations.enums import RejectionReadinessChoice, ReservationTypeStaffChoice
 from reservations.models import RecurringReservation, RejectedOccurrence, Reservation, ReservationPurpose
 
 if TYPE_CHECKING:
@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 
     from applications.models import City
     from opening_hours.models import ReservableTimeSpan
-    from reservations.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+    from reservations.enums import CustomerTypeChoice, ReservationStateChoice
     from users.models import User
 
 
@@ -71,7 +71,7 @@ class ReservationDetails(TypedDict, total=False):
     description: str
     num_persons: int
     state: ReservationStateChoice
-    type: ReservationTypeChoice
+    type: ReservationTypeStaffChoice
     working_memo: str
 
     buffer_time_before: datetime.timedelta

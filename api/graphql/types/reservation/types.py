@@ -15,7 +15,7 @@ from common.typing import GQLInfo
 from merchants.models import PaymentOrder
 from permissions.helpers import can_view_reservation
 from reservation_units.models import ReservationUnit
-from reservations.enums import CustomerTypeChoice, ReservationTypeChoice
+from reservations.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.enums import ReservationTypeChoice as ReservationTypeField
 from reservations.models import Reservation
 from users.models import User
@@ -71,6 +71,7 @@ class ReservationNode(DjangoNode):
     name = graphene.String()
     description = graphene.String()
     num_persons = graphene.Int()
+    state = graphene.Field(graphene.Enum.from_enum(ReservationStateChoice))
     type = graphene.Field(graphene.Enum.from_enum(ReservationTypeChoice))
     cancel_details = graphene.String()
     handling_details = graphene.String()

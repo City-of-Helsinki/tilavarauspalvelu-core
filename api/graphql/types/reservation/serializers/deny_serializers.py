@@ -1,6 +1,7 @@
 from typing import Any
 
 from graphene_django_extensions import NestingModelSerializer
+from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from rest_framework.exceptions import ValidationError
 
 from api.graphql.extensions import error_codes
@@ -18,6 +19,12 @@ __all__ = [
 class ReservationDenySerializer(NestingModelSerializer):
     instance: Reservation
 
+    state = EnumFriendlyChoiceField(
+        choices=ReservationStateChoice.choices,
+        enum=ReservationStateChoice,
+        read_only=True,
+    )
+
     class Meta:
         model = Reservation
         fields = [
@@ -28,7 +35,6 @@ class ReservationDenySerializer(NestingModelSerializer):
             "handled_at",
         ]
         extra_kwargs = {
-            "state": {"read_only": True},
             "handled_at": {"read_only": True},
             "deny_reason": {"required": True},
             "handling_details": {"required": True},

@@ -25,6 +25,12 @@ if TYPE_CHECKING:
 class ReservationConfirmSerializer(ReservationUpdateSerializer):
     instance: Reservation
 
+    state = EnumFriendlyChoiceField(
+        choices=ReservationStateChoice.choices,
+        enum=ReservationStateChoice,
+        read_only=True,
+    )
+
     payment_type = EnumFriendlyChoiceField(
         choices=PaymentType.choices,
         enum=PaymentType,
