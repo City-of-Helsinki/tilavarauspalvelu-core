@@ -106,7 +106,7 @@ class ReservationEmailNotificationSender:
 
     # Helpers
     @classmethod
-    def _send_customer_email(cls, reservation) -> None:
+    def _send_customer_email(cls, reservation: Reservation) -> None:
         send_reservation_email_task.delay(
             reservation_id=reservation.id,
             email_type=cls.RESERVATION_STATE_EMAIL_TYPE_MAP[reservation.state],

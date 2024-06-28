@@ -10,12 +10,12 @@ __all__ = [
     "PricingType",
     "ReservationKind",
     "ReservationStartInterval",
-    "ReservationState",
-    "ReservationUnitState",
+    "ReservationUnitPublishingState",
+    "ReservationUnitReservationState",
 ]
 
 
-class ReservationUnitState(models.TextChoices):
+class ReservationUnitPublishingState(models.TextChoices):
     DRAFT = "DRAFT", _("Draft")
     SCHEDULED_PUBLISHING = "SCHEDULED_PUBLISHING", _("Scheduled publishing")
     SCHEDULED_HIDING = "SCHEDULED_HIDING", _("Scheduled hiding")
@@ -25,7 +25,7 @@ class ReservationUnitState(models.TextChoices):
     ARCHIVED = "ARCHIVED", _("Archived")
 
 
-class ReservationState(models.TextChoices):
+class ReservationUnitReservationState(models.TextChoices):
     SCHEDULED_RESERVATION = "SCHEDULED_RESERVATION", _("Scheduled reservation")
     SCHEDULED_PERIOD = "SCHEDULED_PERIOD", _("Scheduled period")
     RESERVABLE = "RESERVABLE", _("Reservable")

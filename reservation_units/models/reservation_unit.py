@@ -4,17 +4,22 @@ import datetime
 import uuid
 from typing import TYPE_CHECKING
 
+from django.conf import settings
 from django.db import models
+from django.db.models.functions import Now
 from django.utils.translation import gettext_lazy as _
 from elasticsearch_django.models import SearchDocumentManagerMixin, SearchDocumentMixin
+from lookup_property import L, lookup_property
 
 from common.connectors import ReservationUnitActionsConnector
 from reservation_units.enums import (
     AuthenticationType,
+    PricingStatus,
+    PricingType,
     ReservationKind,
     ReservationStartInterval,
-    ReservationState,
-    ReservationUnitState,
+    ReservationUnitPublishingState,
+    ReservationUnitReservationState,
 )
 from reservation_units.querysets import ReservationUnitQuerySet
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
@@ -268,23 +273,231 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
     def __str__(self) -> str:
         return f"{self.name}, {getattr(self.unit, 'name', '')}"
 
-    @property
-    def state(self) -> ReservationUnitState:
-        from reservation_units.utils.reservation_unit_state_helper import ReservationUnitStateHelper
+    @lookup_property(skip_codegen=True)
+    def active_pricing_type() -> str | None:
+        """Get the pricing type from the currently active pricing."""
+        from reservation_units.models import ReservationUnitPricing
 
-        # TODO: This is bad or performance, since it creates from 1 up to 6 queries
-        #  for each reservation unit. Should be replaced with a lookup-property.
-        return ReservationUnitStateHelper.get_state(self)
+        sq = models.Subquery(
+            queryset=(
+                ReservationUnitPricing.objects.filter(
+                    reservation_unit=models.OuterRef("pk"),
+                    status=PricingStatus.PRICING_STATUS_ACTIVE,
+                )
+                .order_by("begins")
+                .values("pricing_type")[:1]
+            ),
+            output_field=models.CharField(null=True),
+        )
+        return sq  # type: ignore[return-value]  # noqa: RET504
 
-    @property
-    def reservation_state(self) -> ReservationState:
-        from reservation_units.utils.reservation_unit_reservation_state_helper import (
-            ReservationUnitReservationStateHelper,
+    @active_pricing_type.override
+    def _(self) -> str | None:
+        from reservation_units.models import ReservationUnitPricing
+
+        return (
+            ReservationUnitPricing.objects.filter(
+                reservation_unit=self,
+                status=PricingStatus.PRICING_STATUS_ACTIVE,
+            )
+            .order_by("begins")
+            .values_list("pricing_type", flat=True)
+            .first()
         )
 
-        # TODO: This is bad or performance, since it creates from 1 up to 5 queries
-        #  for each reservation unit. Should be replaced with a lookup-property.
-        return ReservationUnitReservationStateHelper.get_state(self)
+    @lookup_property
+    def publishing_state() -> str:
+        """State indicating the publishing status of the reservation unit."""
+        case = models.Case(
+            # Reservation Unit has been archived.
+            models.When(
+                models.Q(is_archived=True),
+                then=models.Value(ReservationUnitPublishingState.ARCHIVED.value),
+            ),
+            # Reservation Unit is still a draft.
+            models.When(
+                models.Q(is_draft=True),
+                then=models.Value(ReservationUnitPublishingState.DRAFT.value),
+            ),
+            # Reservation Unit is going to be published, but has not been set to unpublish in the future.
+            models.When(
+                (
+                    # Publishes in the future.
+                    models.Q(publish_begins__isnull=False)
+                    & models.Q(publish_begins__gt=Now())
+                    & (
+                        # Does not unpublish.
+                        models.Q(publish_ends__isnull=True)
+                        # Was previously unpublished.
+                        | models.Q(publish_ends__lte=Now())
+                        # Will be unpublished in the future, but before it re-publishes.
+                        | (
+                            models.Q(publish_ends__gt=Now())  #
+                            & models.Q(publish_begins__gt=models.F("publish_ends"))
+                        )
+                    )
+                ),
+                then=models.Value(ReservationUnitPublishingState.SCHEDULED_PUBLISHING.value),
+            ),
+            # Reservation Unit is currently unpublished or is going to be unpublished in the future.
+            models.When(
+                (
+                    (
+                        # Is unpublished.
+                        models.Q(publish_ends__isnull=False)
+                        & models.Q(publish_ends__lte=Now())
+                        & (
+                            # Was previously always published.
+                            models.Q(publish_begins__isnull=True)
+                            # Was previously published, but before it was unpublished.
+                            | (
+                                models.Q(publish_begins__lte=Now())  #
+                                & models.Q(publish_begins__lte=models.F("publish_ends"))
+                            )
+                        )
+                    )
+                    | (
+                        # Publishes and unpublishes at the exact same time in the future.
+                        models.Q(publish_begins__isnull=False)
+                        & models.Q(publish_begins__gt=Now())
+                        & models.Q(publish_ends__isnull=False)
+                        & models.Q(publish_ends__gt=Now())
+                        & models.Q(publish_begins=models.F("publish_ends"))
+                    )
+                ),
+                then=models.Value(ReservationUnitPublishingState.HIDDEN.value),
+            ),
+            # Reservation Unit has been published, but is going to unpublish in the future.
+            models.When(
+                (
+                    # Unpublishes in the future.
+                    models.Q(publish_ends__isnull=False)
+                    & models.Q(publish_ends__gt=Now())
+                    & (
+                        # Was always published.
+                        models.Q(publish_begins__isnull=True)
+                        # Was published in the past.
+                        | models.Q(publish_begins__lte=Now())
+                    )
+                ),
+                then=models.Value(ReservationUnitPublishingState.SCHEDULED_HIDING.value),
+            ),
+            # Reservation Unit has not been published, but is going to be published,
+            # and then unpublished in the future.
+            models.When(
+                (
+                    # Publishes in the future.
+                    models.Q(publish_begins__isnull=False)
+                    & models.Q(publish_begins__gt=Now())
+                    # Unpublishes in the future.
+                    & models.Q(publish_ends__isnull=False)
+                    & models.Q(publish_ends__gt=Now())
+                    # Publishes before it unpublishes.
+                    & models.Q(publish_begins__lt=models.F("publish_ends"))
+                ),
+                then=models.Value(ReservationUnitPublishingState.SCHEDULED_PERIOD.value),
+            ),
+            # Otherwise, Reservation Unit is published.
+            default=models.Value(ReservationUnitPublishingState.PUBLISHED.value),
+            output_field=models.CharField(),
+        )
+        return case  # type: ignore[return-value]  # noqa: RET504
+
+    @lookup_property
+    def reservation_state() -> ReservationUnitReservationState:
+        case = models.Case(
+            # Reservation Unit is currently not reservable, but will be in the future.
+            models.When(
+                (
+                    # Reservation period begins in the future.
+                    models.Q(reservation_begins__isnull=False)
+                    & models.Q(reservation_begins__gt=Now())
+                    & (
+                        # No previous reservation period.
+                        models.Q(reservation_ends__isnull=True)
+                        # Previous reservation period ended in the past.
+                        | models.Q(reservation_ends__lte=Now())
+                    )
+                ),
+                then=models.Value(ReservationUnitReservationState.SCHEDULED_RESERVATION.value),
+            ),
+            # Reservation Unit is currently not reservable, but will be in the future for a specific period.
+            models.When(
+                (
+                    # Reservation period begins in the future.
+                    models.Q(reservation_begins__isnull=False)
+                    & models.Q(reservation_begins__gt=Now())
+                    # Reservation period ends in the future
+                    & models.Q(reservation_ends__isnull=False)
+                    & models.Q(reservation_ends__gt=Now())
+                    # Reservation period begins before it ends.
+                    & models.Q(reservation_begins__lt=models.F("reservation_ends"))
+                ),
+                then=models.Value(ReservationUnitReservationState.SCHEDULED_PERIOD.value),
+            ),
+            # Reservation Unit doesn't have an active pricing,
+            #  OR it has a paid pricing with no payment product,
+            #  OR it was reservable in the past (but not anymore),
+            #  OR reservation period is zero-length.
+            models.When(
+                (
+                    # No active pricing.
+                    L(active_pricing_type=None)
+                    | (
+                        # Paid pricing with no payment product.
+                        L(active_pricing_type=models.Value(PricingType.PAID.value))
+                        & models.Q(payment_product__isnull=True)
+                        # When using Mock Verkkokauppa API, pricing is valid even if there is no payment product.
+                        if not settings.MOCK_VERKKOKAUPPA_API_ENABLED
+                        else ~models.Q()  # Evaluates to False
+                    )
+                    | (
+                        # Reservation period ended now or in the past.
+                        models.Q(reservation_ends__isnull=False)
+                        & models.Q(reservation_ends__lte=Now())
+                        & (
+                            # Reservation period never begun.
+                            models.Q(reservation_begins__isnull=True)
+                            # Reservation begun before it ended.
+                            | (
+                                models.Q(reservation_begins__isnull=False)
+                                & models.Q(reservation_begins__lt=models.F("reservation_ends"))
+                            )
+                        )
+                    )
+                    | (
+                        # Reservation period is or was zero-length.
+                        models.Q(reservation_begins__isnull=False)
+                        & models.Q(reservation_ends__isnull=False)
+                        & models.Q(reservation_ends=models.F("reservation_begins"))
+                    )
+                ),
+                then=models.Value(ReservationUnitReservationState.RESERVATION_CLOSED.value),
+            ),
+            # Reservation Unit is currently reservable, but will be closed in the future.
+            # It might be set to become reservable again in the future, but after it first closes.
+            models.When(
+                (
+                    # Reservation period ends in the future.
+                    models.Q(reservation_ends__isnull=False)
+                    & models.Q(reservation_ends__gt=Now())
+                    & (
+                        # Reservation period has never begun.
+                        models.Q(reservation_begins__isnull=True)
+                        # Reservation period has begun in the past.
+                        | models.Q(reservation_begins__lte=Now())
+                        # Reservation period has begins again in the future, but after it first ends.
+                        | models.Q(reservation_begins__gt=models.F("reservation_ends"))
+                    )
+                ),
+                then=models.Value(ReservationUnitReservationState.SCHEDULED_CLOSING.value),
+            ),
+            # Otherwise, Reservation Unit is reservable
+            default=models.Value(ReservationUnitReservationState.RESERVABLE.value),
+            output_field=models.CharField(),
+        )
+
+        return case  # type: ignore[return-value]  # noqa: RET504
 
     # ElasticSearch
     def as_search_document(self, *, index: str) -> dict | None:
@@ -326,4 +539,12 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
         return None
 
 
-AuditLogger.register(ReservationUnit)
+AuditLogger.register(
+    ReservationUnit,
+    # Exclude lookup properties, since they are calculated values.
+    exclude_fields=[
+        "_publishing_state",
+        "_reservation_state",
+        "_active_pricing_type",
+    ],
+)
