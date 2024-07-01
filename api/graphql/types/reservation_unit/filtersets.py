@@ -147,13 +147,8 @@ class ReservationUnitFilterSet(ModelFilterSet):
         now = local_datetime()
 
         qs = qs.filter(is_draft=False, is_archived=False)
-        published = (  #
-            (  #
-                Q(publish_begins__lte=now) | Q(publish_begins__isnull=True)
-            )
-            & (  #
-                Q(publish_ends__gt=now) | Q(publish_ends__isnull=True) | Q(publish_ends__lt=F("publish_begins"))
-            )
+        published = (Q(publish_begins__lte=now) | Q(publish_begins__isnull=True)) & (
+            Q(publish_ends__gt=now) | Q(publish_ends__isnull=True) | Q(publish_ends__lt=F("publish_begins"))
         )
 
         if value:

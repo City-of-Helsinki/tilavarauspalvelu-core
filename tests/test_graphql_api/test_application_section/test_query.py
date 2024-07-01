@@ -70,7 +70,6 @@ def test_application_section__query__all_fields(graphql):
         "reservationMinDuration": int(section.reservation_min_duration.total_seconds()),
         "reservationMaxDuration": int(section.reservation_max_duration.total_seconds()),
         "appliedReservationsPerWeek": section.applied_reservations_per_week,
-        #
         "ageGroup": {
             "minimum": section.age_group.minimum,
             "maximum": section.age_group.maximum,

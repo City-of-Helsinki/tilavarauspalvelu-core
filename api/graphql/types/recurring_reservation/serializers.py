@@ -126,22 +126,18 @@ class ReservationSeriesReservationSerializer(NestingModelSerializer):
     class Meta:
         model = Reservation
         fields = [
-            #
             "name",
             "description",
             "num_persons",
             "state",
             "type",
             "working_memo",
-            #
             "buffer_time_before",
             "buffer_time_after",
             "handled_at",
             "confirmed_at",
-            #
             "applying_for_free_of_charge",
             "free_of_charge_reason",
-            #
             "reservee_id",
             "reservee_first_name",
             "reservee_last_name",
@@ -154,7 +150,6 @@ class ReservationSeriesReservationSerializer(NestingModelSerializer):
             "reservee_is_unregistered_association",
             "reservee_language",
             "reservee_type",
-            #
             "billing_first_name",
             "billing_last_name",
             "billing_email",
@@ -162,7 +157,6 @@ class ReservationSeriesReservationSerializer(NestingModelSerializer):
             "billing_address_street",
             "billing_address_city",
             "billing_address_zip",
-            #
             "user",
             "purpose",
             "home_city",

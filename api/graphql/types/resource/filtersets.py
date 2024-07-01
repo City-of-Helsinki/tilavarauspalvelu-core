@@ -50,8 +50,7 @@ class ResourceFilterSet(ModelFilterSet):
             space__in=models.Subquery(
                 queryset=(
                     Space.objects.filter(
-                        models.Q(unit__in=unit_ids)  #
-                        | models.Q(unit__unit_groups__in=unit_group_ids)
+                        models.Q(unit__in=unit_ids) | models.Q(unit__unit_groups__in=unit_group_ids)
                     ).values("id")
                 )
             )
