@@ -23,25 +23,16 @@ class ApplicationRoundActions:
         match self.application_round.status:
             case ApplicationRoundStatusChoice.IN_ALLOCATION:
                 # Unlock all reservation unit options, and remove all allocated time slots
-                lookup = (
-                    "application_section"  #
-                    "__application"
-                    "__application_round"
-                )
+                lookup = "application_section" "__application" "__application_round"
                 ReservationUnitOption.objects.filter(models.Q(**{lookup: self.application_round})).update(locked=False)
 
-                lookup = (
-                    "reservation_unit_option"  #
-                    "__application_section"
-                    "__application"
-                    "__application_round"
-                )
+                lookup = "reservation_unit_option" "__application_section" "__application" "__application_round"
                 AllocatedTimeSlot.objects.filter(models.Q(**{lookup: self.application_round})).delete()
 
             case ApplicationRoundStatusChoice.HANDLED:
                 # Remove all recurring reservations, and set application round back to HANDLED
                 lookup = (
-                    "recurring_reservation"  #
+                    "recurring_reservation"
                     "__allocated_time_slot"
                     "__reservation_unit_option"
                     "__application_section"
@@ -51,7 +42,7 @@ class ApplicationRoundActions:
                 Reservation.objects.filter(models.Q(**{lookup: self.application_round})).delete()
 
                 lookup = (
-                    "allocated_time_slot"  #
+                    "allocated_time_slot"
                     "__reservation_unit_option"
                     "__application_section"
                     "__application"

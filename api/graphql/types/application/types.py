@@ -87,12 +87,12 @@ class ApplicationNode(DjangoNode):
 
         u_ids = [
             pk
-            for pk, perms in user.unit_permissions.items()  #
+            for pk, perms in user.unit_permissions.items()
             if any(p in perms for p in UnitPermissionChoices.handle_or_validate_applications)
         ]
         g_ids = [
             pk
-            for pk, perms in user.unit_group_permissions.items()  #
+            for pk, perms in user.unit_group_permissions.items()
             if any(p in perms for p in UnitPermissionChoices.handle_or_validate_applications)
         ]
 

@@ -174,7 +174,6 @@ def test_reservation_unit__query__all_fields(graphql):
         "pk": reservation_unit.pk,
         "uuid": str(reservation_unit.uuid),
         "rank": reservation_unit.rank,
-        #
         "nameFi": reservation_unit.name_fi,
         "nameEn": reservation_unit.name_en,
         "nameSv": reservation_unit.name_sv,
@@ -194,14 +193,12 @@ def test_reservation_unit__query__all_fields(graphql):
         "reservationCancelledInstructionsEn": reservation_unit.reservation_cancelled_instructions_en,
         "reservationCancelledInstructionsFi": reservation_unit.reservation_cancelled_instructions_fi,
         "reservationCancelledInstructionsSv": reservation_unit.reservation_cancelled_instructions_sv,
-        #
         "surfaceArea": reservation_unit.surface_area,
         "minPersons": reservation_unit.min_persons,
         "maxPersons": reservation_unit.max_persons,
         "maxReservationsPerUser": reservation_unit.max_reservations_per_user,
         "reservationsMinDaysBefore": reservation_unit.reservations_min_days_before,
         "reservationsMaxDaysBefore": reservation_unit.reservations_max_days_before,
-        #
         "reservationBegins": reservation_unit.reservation_begins.isoformat(),
         "reservationEnds": reservation_unit.reservation_ends.isoformat(),
         "publishBegins": reservation_unit.publish_begins.isoformat(),
@@ -210,7 +207,6 @@ def test_reservation_unit__query__all_fields(graphql):
         "maxReservationDuration": int(reservation_unit.max_reservation_duration.total_seconds()),
         "bufferTimeBefore": int(reservation_unit.buffer_time_before.total_seconds()),
         "bufferTimeAfter": int(reservation_unit.buffer_time_after.total_seconds()),
-        #
         "isDraft": reservation_unit.is_draft,
         "isArchived": reservation_unit.is_archived,
         "requireIntroduction": reservation_unit.require_introduction,
@@ -218,7 +214,6 @@ def test_reservation_unit__query__all_fields(graphql):
         "reservationBlockWholeDay": reservation_unit.reservation_block_whole_day,
         "canApplyFreeOfCharge": reservation_unit.can_apply_free_of_charge,
         "allowReservationsWithoutOpeningHours": reservation_unit.allow_reservations_without_opening_hours,
-        #
         "authentication": reservation_unit.authentication.upper(),
         "reservationStartInterval": reservation_unit.reservation_start_interval.upper(),
         "reservationKind": reservation_unit.reservation_kind.upper(),

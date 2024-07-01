@@ -162,8 +162,7 @@ class ReservationFilterSet(ModelFilterSet):
         unit_group_ids = [pk for pk, perms in user.unit_group_permissions.items() if unit_permission in perms]
 
         return qs.filter(
-            Q(reservation_unit__unit__in=unit_ids)  #
-            | Q(reservation_unit__unit__unit_groups__in=unit_group_ids)
+            Q(reservation_unit__unit__in=unit_ids) | Q(reservation_unit__unit__unit_groups__in=unit_group_ids)
         )
 
     def get_only_with_handling_permission(self, qs: QuerySet, name: str, value: bool) -> QuerySet:
@@ -184,8 +183,7 @@ class ReservationFilterSet(ModelFilterSet):
         unit_group_ids = [pk for pk, perms in user.unit_group_permissions.items() if unit_permission in perms]
 
         return qs.filter(
-            Q(reservation_unit__unit__in=unit_ids)  #
-            | Q(reservation_unit__unit__unit_groups__in=unit_group_ids)
+            Q(reservation_unit__unit__in=unit_ids) | Q(reservation_unit__unit__unit_groups__in=unit_group_ids)
         )
 
     def get_requested(self, qs: QuerySet, name, value: str) -> QuerySet:
