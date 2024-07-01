@@ -189,7 +189,7 @@ def test_email_sender__test_emails(outbox, email_template):
         "price": Decimal("10.00"),
         "non_subsidised_price": Decimal("10.00"),
         "subsidised_price": Decimal("5.00"),
-        "tax_percentage": 24,
+        "tax_percentage": Decimal("25.5"),
         "confirmed_instructions_fi": "Confirmed FI",
         "confirmed_instructions_en": "Confirmed EN",
         "confirmed_instructions_sv": "Confirmed SV",

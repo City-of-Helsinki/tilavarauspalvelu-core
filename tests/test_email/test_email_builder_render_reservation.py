@@ -242,7 +242,7 @@ def test_email_builder__subsidised_price(email_template, reservation):
 
 def test_email_builder__get_content__subsidised_price_from_price_calc(email_template, reservation):
     reservation.price = 52
-    reservation.tax_percentage_value = 10
+    reservation.tax_percentage_value = Decimal("25.5")
     reservation.applying_for_free_of_charge = True
     email_template.content = (
         "{% if price > 0 %}{% if subsidised_price < price %}"
@@ -254,7 +254,7 @@ def test_email_builder__get_content__subsidised_price_from_price_calc(email_temp
         "Varauksen hinta: 0 €"
         "{% endif %}"
     )
-    compiled_content = "Varauksen hinta: 0,00 - 52,00 € (sis. alv 10%)"
+    compiled_content = "Varauksen hinta: 0,00 - 52,00 € (sis. alv 25.5%)"
 
     builder = ReservationEmailBuilder.from_reservation(template=email_template, reservation=reservation)
 
