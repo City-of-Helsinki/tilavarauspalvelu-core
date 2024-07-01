@@ -40,7 +40,7 @@ class ReservationEmailContext(BaseEmailContext):
     price: Decimal
     non_subsidised_price: Decimal
     subsidised_price: Decimal
-    tax_percentage: int
+    tax_percentage: Decimal
 
     confirmed_instructions: str
     pending_instructions: str
@@ -89,7 +89,7 @@ class ReservationEmailContext(BaseEmailContext):
             price=reservation.price,
             non_subsidised_price=reservation.non_subsidised_price,
             subsidised_price=cls._get_reservation_subsidised_price(reservation),
-            tax_percentage=int(reservation.tax_percentage_value),
+            tax_percentage=reservation.tax_percentage_value,
             # Instructions
             confirmed_instructions=cls._get_instruction_field(reservation, "confirmed", language),
             pending_instructions=cls._get_instruction_field(reservation, "pending", language),
@@ -162,7 +162,7 @@ class ReservationEmailContext(BaseEmailContext):
             price=Decimal("12.30"),
             non_subsidised_price=Decimal("15.00"),
             subsidised_price=Decimal("5.00"),
-            tax_percentage=24,
+            tax_percentage=Decimal("25.5"),
             # Instructions
             confirmed_instructions="[lisäohje: hyväksytty]",
             pending_instructions="[lisäohje: käsittelyssä]",
