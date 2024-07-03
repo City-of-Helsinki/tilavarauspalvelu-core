@@ -54,20 +54,43 @@ def test_application_section__status():
     # All reservation unit options have been locked -> status is HANDLED
     option.locked = True
     option.save()
-    assert section.status == ApplicationSectionStatusChoice.REJECTED
-    assert ApplicationSection.objects.filter(L(status=ApplicationSectionStatusChoice.REJECTED)).exists()
+    assert section.status == ApplicationSectionStatusChoice.HANDLED
+    assert ApplicationSection.objects.filter(L(status=ApplicationSectionStatusChoice.HANDLED)).exists()
     option.locked = False
     option.save()
 
     # All reservation unit options have been rejected -> status is HANDLED
     option.rejected = True
     option.save()
-    assert section.status == ApplicationSectionStatusChoice.REJECTED
-    assert ApplicationSection.objects.filter(L(status=ApplicationSectionStatusChoice.REJECTED)).exists()
+    assert section.status == ApplicationSectionStatusChoice.HANDLED
+    assert ApplicationSection.objects.filter(L(status=ApplicationSectionStatusChoice.HANDLED)).exists()
     option.rejected = False
     option.save()
 
     # 2/2 allocations have been made -> status is HANDLED
+    AllocatedTimeSlotFactory.create(reservation_unit_option=option)
+    assert section.status == ApplicationSectionStatusChoice.HANDLED
+    assert ApplicationSection.objects.filter(L(status=ApplicationSectionStatusChoice.HANDLED)).exists()
+
+
+def test_application_section__status__partially_allocated__option_unusable():
+    application_round = ApplicationRoundFactory.create_in_status_in_allocation()
+    section = ApplicationSectionFactory.create(
+        application__application_round=application_round,
+        applied_reservations_per_week=2,
+    )
+    option = ReservationUnitOptionFactory.create(application_section=section, locked=True)
+
+    assert section.status == ApplicationSectionStatusChoice.REJECTED
+    assert ApplicationSection.objects.filter(L(status=ApplicationSectionStatusChoice.REJECTED)).exists()
+
+    option.locked = False
+    option.rejected = True
+    option.save()
+
+    assert section.status == ApplicationSectionStatusChoice.REJECTED
+    assert ApplicationSection.objects.filter(L(status=ApplicationSectionStatusChoice.REJECTED)).exists()
+
     AllocatedTimeSlotFactory.create(reservation_unit_option=option)
     assert section.status == ApplicationSectionStatusChoice.HANDLED
     assert ApplicationSection.objects.filter(L(status=ApplicationSectionStatusChoice.HANDLED)).exists()
