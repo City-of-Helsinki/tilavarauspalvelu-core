@@ -60,13 +60,7 @@ class BaseEmailContext:
 
     @staticmethod
     def _get_feedback_ext_link(language: LanguageType | None) -> str:
-        params = urlencode(
-            {
-                "site": "varaamopalaute",
-                "lang": language,
-                "ref": settings.EMAIL_VARAAMO_EXT_LINK,
-            }
-        )
+        params = urlencode({"lang": language})
         return f"{settings.EMAIL_FEEDBACK_EXT_LINK}?{params}"
 
     @staticmethod

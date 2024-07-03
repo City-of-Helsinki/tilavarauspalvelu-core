@@ -1,6 +1,5 @@
 import datetime
 import re
-import urllib.parse
 from decimal import Decimal
 
 import freezegun
@@ -145,7 +144,7 @@ def test_email_builder__get_content(settings, email_template):
         copyright 2021
         link to varaamo {link}
         link to reservations {link}/reservations
-        link to feedback {feedback}?site=varaamopalaute&lang=fi&ref={urllib.parse.quote(link, safe='')}
+        link to feedback {feedback}?lang=fi
     """
 
     assert builder.get_content() == compiled_content

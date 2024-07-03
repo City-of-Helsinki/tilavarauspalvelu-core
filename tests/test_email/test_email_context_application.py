@@ -17,8 +17,5 @@ def test_email_context__from_application(language: LanguageType, settings):
     lang_part = f"/{language}" if language != "fi" else ""
     assert context.my_applications_ext_link == f"{varaamo_link}{lang_part}/applications"
     assert context.varaamo_ext_link == f"{varaamo_link}{lang_part}"
-    assert (
-        context.feedback_ext_link
-        == f"{feedback_link}?site=varaamopalaute&lang={language}&ref=https%3A%2F%2Ffake.varaamo.hel.fi"
-    )
+    assert context.feedback_ext_link == f"{feedback_link}?lang={language}"
     assert context.current_year == datetime.datetime.now().year
