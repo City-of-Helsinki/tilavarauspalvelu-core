@@ -342,6 +342,26 @@ class Params(NamedTuple):
                     ),
                 ],
             ),
+            "end_time is at midnight": Params(
+                start_date=datetime.date(2024, 1, 1),
+                end_date=datetime.date(2024, 1, 15),
+                start_time=datetime.time(21, 0, 0, tzinfo=DEFAULT_TIMEZONE),
+                end_time=datetime.time(0, 0, 0, tzinfo=DEFAULT_TIMEZONE),
+                periods=[
+                    (
+                        datetime.datetime(2024, 1, 1, 21, 0, tzinfo=DEFAULT_TIMEZONE),
+                        datetime.datetime(2024, 1, 2, 0, 0, tzinfo=DEFAULT_TIMEZONE),
+                    ),
+                    (
+                        datetime.datetime(2024, 1, 8, 21, 0, tzinfo=DEFAULT_TIMEZONE),
+                        datetime.datetime(2024, 1, 9, 0, 0, tzinfo=DEFAULT_TIMEZONE),
+                    ),
+                    (
+                        datetime.datetime(2024, 1, 15, 21, 0, tzinfo=DEFAULT_TIMEZONE),
+                        datetime.datetime(2024, 1, 16, 0, 0, tzinfo=DEFAULT_TIMEZONE),
+                    ),
+                ],
+            ),
         },
     ),
 )

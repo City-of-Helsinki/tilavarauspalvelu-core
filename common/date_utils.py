@@ -449,12 +449,16 @@ def get_periods_between(
     if end_date < start_date:
         msg = "End date cannot be before start date."
         raise ValueError(msg)
-    if end_time <= start_time:
+    if end_time <= start_time and end_time != datetime.time(0, 0):
         msg = "End time cannot be at or before start time."
         raise ValueError(msg)
 
     start_datetime = combine(start_date, start_time, tzinfo=tzinfo)
-    end_datetime = combine(start_date, end_time, tzinfo=tzinfo)
+    if end_time == datetime.time(0, 0):
+        # Handle cases where end time is at midnight
+        end_datetime = combine(start_date + datetime.timedelta(days=1), end_time, tzinfo=tzinfo)
+    else:
+        end_datetime = combine(start_date, end_time, tzinfo=tzinfo)
 
     for delta in range(0, (end_date - start_date).days + 1, interval):
         yield start_datetime + datetime.timedelta(days=delta), end_datetime + datetime.timedelta(days=delta)
