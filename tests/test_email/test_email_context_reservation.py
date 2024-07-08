@@ -25,7 +25,7 @@ pytestmark = [
 ]
 
 
-@pytest.fixture()
+@pytest.fixture
 def reservation() -> Reservation:
     reservation_unit = ReservationUnitFactory.create(
         name_fi="ReservationUnit Name FI",

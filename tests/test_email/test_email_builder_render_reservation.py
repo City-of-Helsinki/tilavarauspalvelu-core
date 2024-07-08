@@ -18,7 +18,7 @@ pytestmark = [
 ]
 
 
-@pytest.fixture()
+@pytest.fixture
 def email_template() -> EmailTemplate:
     html_file_fi = SimpleUploadedFile(name="mock_file_fi.html", content=b"HTML content FI")
     html_file_en = SimpleUploadedFile(name="mock_file_en.html", content=b"HTML content EN")
@@ -36,7 +36,7 @@ def email_template() -> EmailTemplate:
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def reservation() -> Reservation:
     return ReservationFactory.create(name="Test reservation")
 

@@ -21,7 +21,7 @@ pytestmark = [
 ]
 
 
-@pytest.fixture()
+@pytest.fixture
 def email_template() -> EmailTemplate:
     return EmailTemplateFactory.create(
         type=EmailType.RESERVATION_CONFIRMED,
