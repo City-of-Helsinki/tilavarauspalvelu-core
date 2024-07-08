@@ -233,9 +233,7 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
             return
 
         if prefill_info is not None:
-            for key, value in prefill_info.items():
-                if value is not None:
-                    data[key] = value
+            data.update({key: value for key, value in prefill_info.items() if value is not None})
 
     def check_sku(self, current_sku, new_sku) -> None:
         if current_sku is not None and current_sku != new_sku:
