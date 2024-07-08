@@ -118,6 +118,7 @@ lint.select = [
     "FA",       # flake8-future-annotations
     #"FBT",     # flake8-boolean-trap  # TODO: Enable this and fix (95) issues
     "FLY",      # flynt
+    "FURB",     # refurb
     #"G",       # flake8-logging-format  # TODO: Enable this and fix (20) issues
     "I",        # isort
     "ICN",      # flake8-import-conventions
