@@ -43,6 +43,6 @@ class UpdateAllApplicationOptionsPermission(BasePermission):
             return True
 
         return all(
-            has_unit_permission(user, UnitPermissionChoices.CAN_HANDLE_APPLICATIONS, [unit_id])  #
+            has_unit_permission(user, UnitPermissionChoices.CAN_HANDLE_APPLICATIONS, [unit_id])
             for unit_id in instance.units.values_list("pk", flat=True)
         )

@@ -57,10 +57,7 @@ class PaymentOrderPermission(BasePermission):
         if not user.is_authenticated:
             return False
 
-        return (
-            instance.reservation.user.id == user.id  #
-            or can_handle_reservation(user, instance.reservation)
-        )
+        return instance.reservation.user.id == user.id or can_handle_reservation(user, instance.reservation)
 
     @classmethod
     def has_mutation_permission(cls, user: AnyUser, input_data: dict[str, Any]) -> bool:

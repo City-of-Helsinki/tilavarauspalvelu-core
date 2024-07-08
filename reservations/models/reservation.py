@@ -217,15 +217,13 @@ class Reservation(SerializableMixin, models.Model):
         return models.Case(  # type: ignore[return-value]
             # Blocking reservation
             models.When(
-                condition=(
-                    models.Q(type=ReservationTypeChoice.BLOCKED.value)  #
-                ),
+                condition=(models.Q(type=ReservationTypeChoice.BLOCKED.value)),
                 then=models.Value(str(_("Closed"))),
             ),
             # Internal reservations created by STAFF
             models.When(
                 condition=(
-                    models.Q(type=ReservationTypeChoice.STAFF.value)  #
+                    models.Q(type=ReservationTypeChoice.STAFF.value)
                     & models.Q(recurring_reservation__isnull=False)
                     & ~models.Q(recurring_reservation__name="")
                 ),
@@ -233,7 +231,7 @@ class Reservation(SerializableMixin, models.Model):
             ),
             models.When(
                 condition=(
-                    models.Q(type=ReservationTypeChoice.STAFF.value)  #
+                    models.Q(type=ReservationTypeChoice.STAFF.value)
                     & (models.Q(recurring_reservation__isnull=True) | models.Q(recurring_reservation__name=""))
                     & ~models.Q(name="")
                 ),
@@ -242,7 +240,7 @@ class Reservation(SerializableMixin, models.Model):
             # Organisation reservee
             models.When(
                 condition=(
-                    models.Q(reservee_type__in=CustomerTypeChoice.organisation)  #
+                    models.Q(reservee_type__in=CustomerTypeChoice.organisation)
                     & ~models.Q(reservee_organisation_name="")
                 ),
                 then=models.F("reservee_organisation_name"),
@@ -250,7 +248,7 @@ class Reservation(SerializableMixin, models.Model):
             # Individual reservee
             models.When(
                 condition=(
-                    ~models.Q(reservee_type__in=CustomerTypeChoice.organisation)  #
+                    ~models.Q(reservee_type__in=CustomerTypeChoice.organisation)
                     & (~models.Q(reservee_first_name="") | ~models.Q(reservee_last_name=""))
                 ),
                 then=Trim(Concat("reservee_first_name", models.Value(" "), "reservee_last_name")),
@@ -263,11 +261,7 @@ class Reservation(SerializableMixin, models.Model):
             # Use the name of the User who made the reservation as the last fallback
             models.When(
                 condition=(
-                    models.Q(user__isnull=False)  #
-                    & (
-                        ~models.Q(user__first_name="")  #
-                        | ~models.Q(user__last_name="")
-                    )
+                    models.Q(user__isnull=False) & (~models.Q(user__first_name="") | ~models.Q(user__last_name=""))
                 ),
                 then=Trim(Concat("user__first_name", models.Value(" "), "user__last_name")),
             ),

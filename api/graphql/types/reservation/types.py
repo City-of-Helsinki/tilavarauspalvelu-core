@@ -75,18 +75,14 @@ class ReservationNode(DjangoNode):
     cancel_details = graphene.String()
     handling_details = graphene.String()
     working_memo = graphene.String()
-    #
     handled_at = graphene.DateTime()
     created_at = graphene.DateTime()
-    #
     price = graphene.Decimal()
     price_net = graphene.Decimal()
     unit_price = graphene.Decimal()
     tax_percentage_value = graphene.Decimal()
-    #
     applying_for_free_of_charge = graphene.Boolean()
     free_of_charge_reason = graphene.String()
-    #
     reservee_id = graphene.String()
     reservee_first_name = graphene.String()
     reservee_last_name = graphene.String()
@@ -98,7 +94,6 @@ class ReservationNode(DjangoNode):
     reservee_is_unregistered_association = graphene.Boolean()
     reservee_organisation_name = graphene.String()
     reservee_type = graphene.Field(graphene.Enum.from_enum(CustomerTypeChoice))
-    #
     billing_first_name = graphene.String()
     billing_last_name = graphene.String()
     billing_email = graphene.String()
@@ -110,7 +105,6 @@ class ReservationNode(DjangoNode):
     class Meta:
         model = Reservation
         fields = [
-            #
             "pk",
             "name",
             "description",
@@ -120,22 +114,18 @@ class ReservationNode(DjangoNode):
             "cancel_details",
             "handling_details",
             "working_memo",
-            #
             "begin",
             "end",
             "buffer_time_before",
             "buffer_time_after",
             "handled_at",
             "created_at",
-            #
             "price",
             "price_net",
             "unit_price",
             "tax_percentage_value",
-            #
             "applying_for_free_of_charge",
             "free_of_charge_reason",
-            #
             "reservee_id",
             "reservee_name",
             "reservee_first_name",
@@ -148,7 +138,6 @@ class ReservationNode(DjangoNode):
             "reservee_is_unregistered_association",
             "reservee_organisation_name",
             "reservee_type",
-            #
             "billing_first_name",
             "billing_last_name",
             "billing_email",
@@ -156,7 +145,6 @@ class ReservationNode(DjangoNode):
             "billing_address_street",
             "billing_address_city",
             "billing_address_zip",
-            #
             "reservation_unit",
             "user",
             "recurring_reservation",
@@ -165,7 +153,6 @@ class ReservationNode(DjangoNode):
             "purpose",
             "home_city",
             "age_group",
-            #
             "is_blocked",
             "is_handled",
             "order",

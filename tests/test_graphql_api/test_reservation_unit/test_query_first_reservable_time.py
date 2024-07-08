@@ -68,7 +68,7 @@ NOW = _datetime()
 YESTERDAY = _datetime(year=2023, month=12, day=31)
 
 
-@pytest.fixture()
+@pytest.fixture
 def reservation_unit() -> ReservationUnit:
     origin_hauki_resource = OriginHaukiResourceFactory(
         id="999",

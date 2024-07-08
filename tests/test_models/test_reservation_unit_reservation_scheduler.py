@@ -26,7 +26,7 @@ def _get_dt(*, month=1, day=1, hour=None, minute=0) -> datetime.datetime:
     return datetime.datetime(2022, month, day, hour, minute, 0, tzinfo=DEFAULT_TIMEZONE)
 
 
-@pytest.fixture()
+@pytest.fixture
 def reservation_unit() -> ReservationUnit:
     origin_hauki_resource = OriginHaukiResourceFactory.create(id="999")
     reservation_unit = ReservationUnitFactory.create(
@@ -51,7 +51,7 @@ def reservation_unit() -> ReservationUnit:
     return reservation_unit
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 @freeze_time("2022-01-01")
 def test__reservation_unit_reservation_scheduler__get_reservation_unit_possible_start_times(reservation_unit):
     ReservableTimeSpanFactory.create(

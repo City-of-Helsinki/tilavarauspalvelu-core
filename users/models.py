@@ -95,7 +95,7 @@ class User(AbstractUser):
     @cached_property
     def has_staff_permissions(self) -> bool:
         return (
-            self.is_superuser  #
+            self.is_superuser
             or bool(self.general_permissions)
             or bool(self.unit_permissions)
             or bool(self.unit_group_permissions)

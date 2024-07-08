@@ -22,7 +22,7 @@ pytestmark = [
 ]
 
 
-@pytest.fixture()
+@pytest.fixture
 def order():
     reservation = ReservationFactory.create(state=ReservationStateChoice.WAITING_FOR_PAYMENT)
     return PaymentOrderFactory.create(created_at=local_datetime(), reservation=reservation, status=OrderStatus.DRAFT)
