@@ -64,13 +64,6 @@ class PaymentProductFactory(GenericDjangoModelFactory[PaymentProduct]):
     id = factory.LazyFunction(uuid.uuid4)
     merchant = factory.SubFactory("tests.factories.PaymentMerchantFactory")
 
-    @factory.post_generation
-    def merchant(self, create, merchant, **kwargs):
-        if not create or not merchant:
-            return
-
-        self.merchant = merchant
-
 
 class PaymentOrderFactory(GenericDjangoModelFactory[PaymentOrder]):
     class Meta:
