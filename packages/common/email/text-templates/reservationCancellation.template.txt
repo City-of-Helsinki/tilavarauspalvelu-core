@@ -23,6 +23,6 @@ ${cancellationInstructions}
 ${withRegards}
 ${serviceName}
 
-${automaticMessage} ${sendUs} ${feedbackOnService}: {{feedback_ext_link}}
+${automaticMessage} ${contactUs}: {{feedback_ext_link}}
 
 ${reserveCityResourcesAt} {{varaamo_ext_link}}
