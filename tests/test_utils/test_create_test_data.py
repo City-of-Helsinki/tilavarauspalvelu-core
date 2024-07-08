@@ -89,8 +89,8 @@ models_that_should_be_empty: list[type[models.Model]] = [
 ]
 
 
-@pytest.mark.django_db()
-@pytest.mark.slow()
+@pytest.mark.django_db
+@pytest.mark.slow
 def test_create_test_data():
     all_models = []
     for app_config in django.apps.apps.app_configs.values():

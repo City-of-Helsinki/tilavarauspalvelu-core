@@ -20,7 +20,7 @@ DEFAULT_TIMEZONE = get_default_timezone()
 UTCOFFSET = f"0{int(datetime.datetime(2021, 5, 1, tzinfo=DEFAULT_TIMEZONE).utcoffset().total_seconds()/3600)}:00"
 
 
-@pytest.fixture()
+@pytest.fixture
 def reservation_unit() -> ReservationUnit:
     origin_hauki_resource = OriginHaukiResourceFactory(
         id="999",

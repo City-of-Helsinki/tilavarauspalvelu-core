@@ -11,12 +11,12 @@ if TYPE_CHECKING:
     from django.core.mail import EmailMessage
 
 
-@pytest.fixture()
+@pytest.fixture
 def graphql() -> GraphQLClient:
     return GraphQLClient()
 
 
-@pytest.fixture()
+@pytest.fixture
 def api_client() -> APIClient:
     return APIClient()
 
@@ -29,7 +29,7 @@ def _enable_elasticsearch(request, settings):
     settings.SEARCH_SETTINGS["settings"]["auto_sync"] = use_elasticsearch
 
 
-@pytest.fixture()
+@pytest.fixture
 def outbox() -> list[EmailMessage]:
     from django.core import mail
 

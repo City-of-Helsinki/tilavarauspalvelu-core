@@ -16,7 +16,7 @@ def _force_HaukiAPIClient_to_be_mocked():
         yield
 
 
-@pytest.fixture()
+@pytest.fixture
 def reservation_unit() -> ReservationUnit:
     return ReservationUnitFactory(
         origin_hauki_resource=OriginHaukiResourceFactory(id=999, opening_hours_hash="abc123"),

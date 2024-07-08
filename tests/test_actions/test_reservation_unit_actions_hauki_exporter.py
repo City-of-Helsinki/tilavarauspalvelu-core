@@ -13,7 +13,7 @@ pytestmark = [
 
 
 # TODO: Remove the need to have this fixture in this file
-@pytest.fixture()
+@pytest.fixture
 def reservation_unit() -> ReservationUnit:
     return ReservationUnitFactory(
         origin_hauki_resource=OriginHaukiResourceFactory(id=999, opening_hours_hash="abc123"),
