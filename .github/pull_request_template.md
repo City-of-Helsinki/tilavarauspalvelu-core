@@ -17,7 +17,4 @@
 ## 🎫 Tickets
 [//]: # "This pull request resolves all or part of the following ticket(s)."
 
-- [TILA-][TILA]
-
-
-[TILA]: https://helsinkisolutionoffice.atlassian.net/browse/TILA-
+- [TILA-](https://helsinkisolutionoffice.atlassian.net/browse/TILA-)
