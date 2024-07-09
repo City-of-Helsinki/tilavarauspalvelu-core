@@ -38,8 +38,7 @@ class ReservationCancellationSerializer(NestingModelSerializer):
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         data = super().validate(data)
         if self.instance.state != ReservationStateChoice.CONFIRMED.value:
-            state = str(ReservationStateChoice.CONFIRMED)
-            msg = f"Only reservations with state {state!r} can be cancelled."
+            msg = "Only reservations with state 'CONFIRMED' can be cancelled."
             raise ValidationError(msg, code=error_codes.RESERVATION_CANCELLATION_NOT_ALLOWED)
 
         now = local_datetime()

@@ -265,10 +265,11 @@ def test_recurring_reservations__create_series__reservation_type__cant_create_no
     user = graphql.login_with_superuser()
 
     data = get_minimal_series_data(reservation_unit, user)
-    data["reservationDetails"]["type"] = ReservationTypeChoice.NORMAL.upper()
+    data["reservationDetails"]["type"] = ReservationTypeChoice.NORMAL.value
     response = graphql(CREATE_SERIES_MUTATION, input_data=data)
 
-    assert response.has_schema_errors is True
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("reservationDetails.type") == ['"NORMAL" is not a valid choice.']
 
 
 def test_recurring_reservations__create_series__different_reservation_user(graphql):

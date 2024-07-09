@@ -77,7 +77,7 @@ def test_reservation__deny__status_not_allowed_states(graphql):
 
     assert response.error_message() == "Mutation was unsuccessful."
     assert response.field_error_messages() == [
-        "Only reservations with states 'requires_handling' or 'confirmed' can be denied.",
+        "Only reservations with states 'REQUIRES_HANDLING' or 'CONFIRMED' can be denied.",
     ]
 
     reservation.refresh_from_db()
