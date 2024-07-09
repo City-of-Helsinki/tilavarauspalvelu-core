@@ -1,7 +1,7 @@
 import datetime
 
 from django.utils.timezone import get_default_timezone
-from graphene_django_extensions.fields import IntegerPrimaryKeyField
+from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPrimaryKeyField
 from rest_framework import serializers
 
 from api.graphql.extensions.fields import OldChoiceCharField
@@ -37,9 +37,10 @@ class ReservationStaffCreateSerializer(OldPrimaryKeySerializer, ReservationSched
     purpose_pk = IntegerPrimaryKeyField(queryset=ReservationPurpose.objects.all(), source="purpose", allow_null=True)
     home_city_pk = IntegerPrimaryKeyField(queryset=City.objects.all(), source="home_city", allow_null=True)
     age_group_pk = IntegerPrimaryKeyField(queryset=AgeGroup.objects.all(), source="age_group", allow_null=True)
-    reservee_type = OldChoiceCharField(choices=CustomerTypeChoice.choices)
-    reservee_language = OldChoiceCharField(choices=RESERVEE_LANGUAGE_CHOICES, required=False, default="")
-    type = OldChoiceCharField(required=True, choices=ReservationTypeChoice.choices)
+
+    reservee_type = EnumFriendlyChoiceField(choices=CustomerTypeChoice.choices, enum=CustomerTypeChoice)
+    type = EnumFriendlyChoiceField(choices=ReservationTypeChoice.choices, enum=ReservationTypeChoice, required=True)
+    reservee_language = OldChoiceCharField(choices=RESERVEE_LANGUAGE_CHOICES, default="", required=False)
 
     class Meta:
         model = Reservation

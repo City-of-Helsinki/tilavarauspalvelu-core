@@ -13,9 +13,9 @@ __all__ = [
 
 
 class CustomerTypeChoice(models.TextChoices):
-    BUSINESS = "business", pgettext_lazy("CustomerType", "Business")
-    NONPROFIT = "nonprofit", pgettext_lazy("CustomerType", "Nonprofit")
-    INDIVIDUAL = "individual", pgettext_lazy("CustomerType", "Individual")
+    BUSINESS = "BUSINESS", pgettext_lazy("CustomerType", "Business")
+    NONPROFIT = "NONPROFIT", pgettext_lazy("CustomerType", "Nonprofit")
+    INDIVIDUAL = "INDIVIDUAL", pgettext_lazy("CustomerType", "Individual")
 
     @classproperty
     def organisation(self) -> list[str]:
@@ -26,12 +26,12 @@ class CustomerTypeChoice(models.TextChoices):
 
 
 class ReservationStateChoice(models.TextChoices):
-    CREATED = "created", pgettext_lazy("ReservationState", "Created")
-    CANCELLED = "cancelled", pgettext_lazy("ReservationState", "Cancelled")
-    REQUIRES_HANDLING = "requires_handling", pgettext_lazy("ReservationState", "Requires handling")
-    WAITING_FOR_PAYMENT = "waiting_for_payment", pgettext_lazy("ReservationState", "Waiting for payment")
-    CONFIRMED = "confirmed", pgettext_lazy("ReservationState", "Confirmed")
-    DENIED = "denied", pgettext_lazy("ReservationState", "Denied")
+    CREATED = "CREATED", pgettext_lazy("ReservationState", "Created")
+    CANCELLED = "CANCELLED", pgettext_lazy("ReservationState", "Cancelled")
+    REQUIRES_HANDLING = "REQUIRES_HANDLING", pgettext_lazy("ReservationState", "Requires handling")
+    WAITING_FOR_PAYMENT = "WAITING_FOR_PAYMENT", pgettext_lazy("ReservationState", "Waiting for payment")
+    CONFIRMED = "CONFIRMED", pgettext_lazy("ReservationState", "Confirmed")
+    DENIED = "DENIED", pgettext_lazy("ReservationState", "Denied")
 
     @classproperty
     def states_going_to_occur(self) -> list[str]:
@@ -58,11 +58,11 @@ class ReservationStateChoice(models.TextChoices):
 
 
 class ReservationTypeChoice(models.TextChoices):
-    NORMAL = "normal", pgettext_lazy("ReservationType", "Normal")
-    BLOCKED = "blocked", pgettext_lazy("ReservationType", "Blocked")
-    STAFF = "staff", pgettext_lazy("ReservationType", "Staff")
-    BEHALF = "behalf", pgettext_lazy("ReservationType", "Behalf")
-    SEASONAL = "seasonal", pgettext_lazy("ReservationType", "Seasonal")
+    NORMAL = "NORMAL", pgettext_lazy("ReservationType", "Normal")
+    BLOCKED = "BLOCKED", pgettext_lazy("ReservationType", "Blocked")
+    STAFF = "STAFF", pgettext_lazy("ReservationType", "Staff")
+    BEHALF = "BEHALF", pgettext_lazy("ReservationType", "Behalf")
+    SEASONAL = "SEASONAL", pgettext_lazy("ReservationType", "Seasonal")
 
     @classproperty
     def allowed_for_user_time_adjust(cls) -> list[str]:
