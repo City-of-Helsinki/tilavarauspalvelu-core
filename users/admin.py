@@ -1,6 +1,8 @@
 from django.contrib import admin
+from django.utils.translation import gettext_lazy as _
 
 from users.anonymisation import anonymize_user_data
+from users.helauth.typing import LoginMethod
 from users.models import User
 
 
@@ -17,43 +19,73 @@ class UserAdmin(admin.ModelAdmin):
         "last_login",
         "date_joined",
     ]
-    fields = [
-        "username",
-        "last_login",
-        "date_joined",
-        "email",
-        "first_name",
-        "last_name",
-        "is_active",
-        "is_staff",
-        "is_superuser",
-        "preferred_language",
-        "reservation_notification",
-        "tvp_uuid",
-        "profile_id",
-        "ad_groups",
-        "has_staff_permissions",
-        "id_token",
-        "groups",
+
+    fieldsets = [
+        [
+            _("Basic information"),
+            {
+                "fields": [
+                    "username",
+                    "email",
+                    "first_name",
+                    "last_name",
+                ],
+            },
+        ],
+        [
+            _("Settings"),
+            {
+                "fields": [
+                    "preferred_language",
+                    "reservation_notification",
+                    "is_active",
+                    "is_staff",
+                    "is_superuser",
+                    "groups",
+                ],
+            },
+        ],
+        [
+            _("Additional information"),
+            {
+                "fields": [
+                    "last_login",
+                    "date_joined",
+                    "id_token",
+                    "tvp_uuid",
+                    "ad_groups",
+                    "department_name",
+                    "has_staff_permissions",
+                    "profile_id",
+                    "date_of_birth",
+                    "login_method",
+                    "is_strong_login",
+                ],
+            },
+        ],
     ]
     readonly_fields = [
         "last_login",
         "date_joined",
-        "tvp_uuid",
-        "profile_id",
-        "ad_groups",
-        "has_staff_permissions",
         "id_token",
+        "tvp_uuid",
+        "ad_groups",
+        "department_name",
+        "has_staff_permissions",
+        "profile_id",
+        "date_of_birth",
+        "login_method",
+        "is_strong_login",
     ]
+
     search_fields = [
         "username",
         "first_name",
         "last_name",
         "email",
     ]
-    ordering = [
-        "username",
-    ]
+    search_help_text = _("Search by Username, First name, Last name or Email")
+    ordering = ["username"]
     filter_horizontal = ["groups"]
 
     actions = ["anonymize_user_data"]
@@ -62,3 +94,15 @@ class UserAdmin(admin.ModelAdmin):
     def anonymize_user_data(self, request, queryset) -> None:
         for user in queryset.all():
             anonymize_user_data(user)
+
+    def login_method(self, user: User) -> str:
+        if user is None:
+            return "-"
+        if user.id_token is None:
+            return LoginMethod.OTHER.value
+
+        login_method = LoginMethod.PROFILE.value if user.id_token.is_profile_login else LoginMethod.AD.value
+        return f"{login_method} ({user.id_token.amr})"
+
+    def is_strong_login(self, user: User) -> bool:
+        return user.id_token.is_strong_login
