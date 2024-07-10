@@ -14,6 +14,8 @@ class UserAdmin(admin.ModelAdmin):
         "is_staff",
         "is_superuser",
         "reservation_notification",
+        "last_login",
+        "date_joined",
     ]
     fields = [
         "username",
