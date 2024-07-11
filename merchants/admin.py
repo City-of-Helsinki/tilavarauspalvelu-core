@@ -124,6 +124,15 @@ class PaymentOrderForm(forms.ModelForm):
             )
 
 
+class PaymentOrderInline(admin.TabularInline):
+    model = PaymentOrder
+    extra = 0
+    show_change_link = True
+    can_delete = False
+    fields = ["id", "payment_type", "status", "price_total"]
+    readonly_fields = ["id", "payment_type", "status", "price_total"]
+
+
 @admin.register(PaymentOrder)
 class PaymentOrderAdmin(admin.ModelAdmin):
     model = PaymentOrder

@@ -1,11 +1,15 @@
 from django import forms
 from django.contrib import admin
 from django.core.exceptions import ValidationError
+from django.core.handlers.wsgi import WSGIRequest
+from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from import_export.admin import ExportMixin
 from import_export.formats.base_formats import CSV
-from rangefilter.filters import DateRangeFilter
+from more_admin_filters.filters import MultiSelectFilter, MultiSelectRelatedOnlyDropdownFilter
+from rangefilter.filters import DateRangeFilter, DateRangeFilterBuilder
 
+from merchants.admin import PaymentOrderInline
 from reservations.models import (
     AbilityGroup,
     AgeGroup,
@@ -25,6 +29,7 @@ class ReservationAdminForm(forms.ModelForm):
         model = Reservation
         fields = [
             #
+            "id",
             "sku",
             "name",
             "description",
@@ -206,10 +211,180 @@ class ReservationInline(admin.TabularInline):
     model = Reservation
 
 
+class RecurringReservationListFilter(admin.SimpleListFilter):
+    title = _("Recurring reservation")
+    parameter_name = "recurring_reservation"
+
+    def lookups(self, request: WSGIRequest, model_admin: admin.ModelAdmin) -> list[tuple[str, str]]:
+        return [
+            ("1", _("Yes")),
+            ("0", _("No")),
+        ]
+
+    def queryset(self, request: WSGIRequest, queryset: QuerySet[Reservation]):
+        if self.value() == "1":
+            return queryset.filter(recurring_reservation__isnull=False)
+        if self.value() == "0":
+            return queryset.filter(recurring_reservation__isnull=True)
+        return queryset
+
+
+class PaidReservationListFilter(admin.SimpleListFilter):
+    title = _("Paid reservation")
+    parameter_name = "paid_reservation"
+
+    def lookups(self, request: WSGIRequest, model_admin: admin.ModelAdmin) -> list[tuple[str, str]]:
+        return [
+            ("1", _("Yes")),
+            ("0", _("No")),
+        ]
+
+    def queryset(self, request: WSGIRequest, queryset: QuerySet[Reservation]):
+        if self.value() == "1":
+            return queryset.filter(price__gt=0)
+        if self.value() == "0":
+            return queryset.filter(price=0)
+        return queryset
+
+
 @admin.register(Reservation)
 class ReservationAdmin(admin.ModelAdmin):
     model = Reservation
     form = ReservationAdminForm
+
+    list_display = [
+        "id",
+        "name",
+        "type",
+        "state",
+        "begin",
+        "reservation_units",
+    ]
+    list_filter = [
+        ("created_at", DateRangeFilterBuilder(title=_("Created at"))),
+        ("begin", DateRangeFilterBuilder(title=_("Begin time"))),
+        ("type", MultiSelectFilter),
+        ("state", MultiSelectFilter),
+        RecurringReservationListFilter,
+        PaidReservationListFilter,
+        ("reservation_unit__unit", MultiSelectRelatedOnlyDropdownFilter),
+        ("reservation_unit", MultiSelectRelatedOnlyDropdownFilter),
+    ]
+
+    search_fields = [
+        "id__exact",
+    ]
+    search_help_text = _("Search by reservation ID")
+
+    fieldsets = [
+        [
+            _("Basic information"),
+            {
+                "fields": [
+                    "id",
+                    "sku",
+                    "name",
+                    "description",
+                    "num_persons",
+                    "state",
+                    "type",
+                    "cancel_details",
+                    "handling_details",
+                    "working_memo",
+                ],
+            },
+        ],
+        [
+            _("Time"),
+            {
+                "fields": [
+                    "begin",
+                    "end",
+                    "buffer_time_before",
+                    "buffer_time_after",
+                    "handled_at",
+                    "confirmed_at",
+                    "created_at",
+                ],
+            },
+        ],
+        [
+            _("Price"),
+            {
+                "fields": [
+                    "price",
+                    "price_net",
+                    "non_subsidised_price",
+                    "non_subsidised_price_net",
+                    "unit_price",
+                    "tax_percentage_value",
+                    "applying_for_free_of_charge",
+                    "free_of_charge_reason",
+                ],
+            },
+        ],
+        [
+            _("Reservee information"),
+            {
+                "fields": [
+                    "reservee_id",
+                    "reservee_first_name",
+                    "reservee_last_name",
+                    "reservee_email",
+                    "reservee_phone",
+                    "reservee_organisation_name",
+                    "reservee_address_street",
+                    "reservee_address_city",
+                    "reservee_address_zip",
+                    "reservee_is_unregistered_association",
+                    "reservee_language",
+                    "reservee_type",
+                ],
+            },
+        ],
+        [
+            _("Billing information"),
+            {
+                "fields": [
+                    "billing_first_name",
+                    "billing_last_name",
+                    "billing_email",
+                    "billing_phone",
+                    "billing_address_street",
+                    "billing_address_city",
+                    "billing_address_zip",
+                ],
+            },
+        ],
+        [
+            _("Additional information"),
+            {
+                "fields": [
+                    "user",
+                    "recurring_reservation",
+                    "deny_reason",
+                    "cancel_reason",
+                    "purpose",
+                    "home_city",
+                    "age_group",
+                ],
+            },
+        ],
+    ]
+    readonly_fields = [
+        "id",
+        "handled_at",
+        "confirmed_at",
+        "created_at",
+    ]
+    inlines = [PaymentOrderInline]
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related("reservation_unit")
+
+    @admin.display(ordering="reservation_unit__name")
+    def reservation_units(self, obj: Reservation) -> str:
+        return ", ".join([str(reservation_unit) for reservation_unit in obj.reservation_unit.all()])
 
 
 @admin.register(RecurringReservation)
