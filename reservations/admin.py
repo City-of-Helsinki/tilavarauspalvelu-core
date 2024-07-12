@@ -268,7 +268,11 @@ class ReservationMetadataFieldAdmin(admin.ModelAdmin):
 class ReservationMetadataSetForm(forms.ModelForm):
     class Meta:
         model = ReservationMetadataSet
-        fields = ("name", "supported_fields", "required_fields")
+        fields = [
+            "name",
+            "supported_fields",
+            "required_fields",
+        ]
 
     def clean(self):
         supported = set(self.cleaned_data.get("supported_fields"))
@@ -282,6 +286,8 @@ class ReservationMetadataSetForm(forms.ModelForm):
 class ReservationMetadataSetAdmin(admin.ModelAdmin):
     exclude = ("id",)
     form = ReservationMetadataSetForm
+
+    filter_horizontal = ["supported_fields", "required_fields"]
 
 
 @admin.register(ReservationStatistic)
