@@ -70,7 +70,7 @@ jobs:
 
       # TODO reuse the ui image (problem is the build-args)
       - name: "Build ui e2e container"
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: Dockerfile
