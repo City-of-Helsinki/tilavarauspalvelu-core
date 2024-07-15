@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.db import models
 from django.http import HttpRequest
+from django.utils.translation import gettext_lazy as _
 
 from permissions.models import UnitRole, UnitRoleChoice, UnitRolePermission
 
@@ -31,7 +32,8 @@ class UnitRoleChoiceAdmin(admin.ModelAdmin):
 class UnitRoleAdmin(admin.ModelAdmin):
     model = UnitRole
     list_display = [
-        "__str__",
+        "role_verbose_name",
+        "user_email",
         "unit_names",
         "unit_group_names",
     ]
@@ -40,6 +42,7 @@ class UnitRoleAdmin(admin.ModelAdmin):
         "unit",
         "unit_group",
     ]
+
     search_fields = [
         "user__username",
         "user__email",
@@ -48,21 +51,50 @@ class UnitRoleAdmin(admin.ModelAdmin):
         "unit__name",
         "unit_group__name",
     ]
-    autocomplete_fields = [
-        "user",
+    search_help_text = _("Search by user, unit or unit group")
+
+    fieldsets = [
+        [
+            _("Basic information"),
+            {
+                "fields": [
+                    "role",
+                    "user",
+                    "assigner",
+                    "created",
+                    "modified",
+                ],
+            },
+        ],
+        [
+            _("Roles"),
+            {
+                "fields": [
+                    "unit",
+                    "unit_group",
+                ],
+            },
+        ],
     ]
-    filter_horizontal = [
-        "unit",
-        "unit_group",
-    ]
+    readonly_fields = ["created", "modified"]
+    autocomplete_fields = ["user"]
+    filter_horizontal = ["unit", "unit_group"]
 
     def get_queryset(self, request: HttpRequest) -> models.QuerySet:
         return super().get_queryset(request).select_related("user", "role").prefetch_related("unit", "unit_group")
 
-    @staticmethod
-    def unit_names(obj: UnitRole) -> str:
+    @admin.display(ordering="role__verbose_name")
+    def role_verbose_name(self, obj: UnitRole) -> str:
+        return obj.role.verbose_name
+
+    @admin.display(ordering="user__email")
+    def user_email(self, obj: UnitRole) -> str:
+        return obj.user.email
+
+    @admin.display(ordering="unit__name")
+    def unit_names(self, obj: UnitRole) -> str:
         return ", ".join([unit.name for unit in obj.unit.all()])
 
-    @staticmethod
-    def unit_group_names(obj: UnitRole) -> str:
+    @admin.display(ordering="unit_group__name")
+    def unit_group_names(self, obj: UnitRole) -> str:
         return ", ".join([unit.name for unit in obj.unit_group.all()])
