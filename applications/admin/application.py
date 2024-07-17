@@ -2,7 +2,6 @@ from django.contrib import admin, messages
 from django.contrib.admin import helpers
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.models import QuerySet
-from django.http import HttpRequest
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
@@ -89,7 +88,7 @@ class ApplicationAdmin(admin.ModelAdmin):
         return str(obj)
 
     @admin.action(description=_("Reset application allocations"))
-    def reset_applications(self, request: HttpRequest, queryset: ApplicationQuerySet) -> TemplateResponse | None:
+    def reset_applications(self, request: WSGIRequest, queryset: ApplicationQuerySet) -> TemplateResponse | None:
         # Coming from confirmation page, perform the action
         if request.POST.get("post"):
             application: Application

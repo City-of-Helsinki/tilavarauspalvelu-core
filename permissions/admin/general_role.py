@@ -1,6 +1,6 @@
 from django.contrib import admin
+from django.core.handlers.wsgi import WSGIRequest
 from django.db import models
-from django.http import HttpRequest
 
 from permissions.models import GeneralRole, GeneralRoleChoice, GeneralRolePermission
 
@@ -14,10 +14,10 @@ class GeneralRolePermissionInline(admin.TabularInline):
     model = GeneralRolePermission
     extra = 0
 
-    def get_queryset(self, request: HttpRequest) -> models.QuerySet:
+    def get_queryset(self, request: WSGIRequest) -> models.QuerySet:
         return super().get_queryset(request).select_related("role")
 
-    def has_change_permission(self, request: HttpRequest, obj: GeneralRolePermission | None = None) -> bool:
+    def has_change_permission(self, request: WSGIRequest, obj: GeneralRolePermission | None = None) -> bool:
         return False
 
 
@@ -43,5 +43,5 @@ class GeneralRoleAdmin(admin.ModelAdmin):
         "user",
     ]
 
-    def get_queryset(self, request: HttpRequest) -> models.QuerySet:
+    def get_queryset(self, request: WSGIRequest) -> models.QuerySet:
         return super().get_queryset(request).select_related("user", "role")

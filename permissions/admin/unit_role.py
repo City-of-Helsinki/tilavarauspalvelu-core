@@ -1,6 +1,6 @@
 from django.contrib import admin
+from django.core.handlers.wsgi import WSGIRequest
 from django.db import models
-from django.http import HttpRequest
 from django.utils.translation import gettext_lazy as _
 
 from permissions.models import UnitRole, UnitRoleChoice, UnitRolePermission
@@ -15,10 +15,10 @@ class UnitRolePermissionInline(admin.TabularInline):
     model = UnitRolePermission
     extra = 0
 
-    def get_queryset(self, request: HttpRequest) -> models.QuerySet:
+    def get_queryset(self, request: WSGIRequest) -> models.QuerySet:
         return super().get_queryset(request).select_related("role")
 
-    def has_change_permission(self, request: HttpRequest, obj: UnitRolePermission | None = None) -> bool:
+    def has_change_permission(self, request: WSGIRequest, obj: UnitRolePermission | None = None) -> bool:
         return False
 
 
@@ -80,7 +80,7 @@ class UnitRoleAdmin(admin.ModelAdmin):
     autocomplete_fields = ["user"]
     filter_horizontal = ["unit", "unit_group"]
 
-    def get_queryset(self, request: HttpRequest) -> models.QuerySet:
+    def get_queryset(self, request: WSGIRequest) -> models.QuerySet:
         return super().get_queryset(request).select_related("user", "role").prefetch_related("unit", "unit_group")
 
     @admin.display(ordering="role__verbose_name")
