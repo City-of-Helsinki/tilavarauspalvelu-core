@@ -90,7 +90,7 @@ class ApplicationAdmin(admin.ModelAdmin):
     @admin.action(description=_("Reset application allocations"))
     def reset_applications(self, request: WSGIRequest, queryset: ApplicationQuerySet) -> TemplateResponse | None:
         # Coming from confirmation page, perform the action
-        if request.POST.get("post"):
+        if request.POST.get("confirmed"):
             application: Application
             for application in queryset:
                 application.actions.reset_application_allocation()
