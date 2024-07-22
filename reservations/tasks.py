@@ -2,7 +2,7 @@ import uuid
 
 from django.conf import settings
 
-from merchants.models import PaymentOrder
+from merchants.models import OrderStatus, PaymentOrder
 from merchants.pruning import update_expired_orders
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.models import Reservation
@@ -47,14 +47,14 @@ def refund_paid_reservation_task(reservation_pk: int) -> None:
     if not reservation:
         return
 
-    payment_order = PaymentOrder.objects.filter(reservation=reservation).first()
+    payment_order: PaymentOrder | None = PaymentOrder.objects.filter(reservation=reservation).first()
     if not payment_order:
         return
 
     if not settings.MOCK_VERKKOKAUPPA_API_ENABLED:
         refund = VerkkokauppaAPIClient.refund_order(order_uuid=payment_order.remote_id)
         payment_order.refund_id = refund.refund_id
-        payment_order.save(update_fields=["refund_id"])
     else:
         payment_order.refund_id = uuid.uuid4()
-        payment_order.save(update_fields=["refund_id"])
+    payment_order.status = OrderStatus.REFUNDED
+    payment_order.save(update_fields=["refund_id", "status"])
