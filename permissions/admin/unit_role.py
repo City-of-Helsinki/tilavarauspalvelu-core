@@ -51,7 +51,7 @@ class UnitRoleAdmin(admin.ModelAdmin):
         "unit__name",
         "unit_group__name",
     ]
-    search_help_text = _("Search by user, unit or unit group")
+    search_help_text = _("Search by user's username, email, first name, last name, unit or unit group")
 
     fieldsets = [
         [

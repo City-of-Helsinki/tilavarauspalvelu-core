@@ -45,6 +45,7 @@ class ApplicationSectionInline(admin.TabularInline):
 @admin.register(Application)
 class ApplicationAdmin(admin.ModelAdmin):
     form = ApplicationAdminForm
+
     list_display = [
         "_name",
         "application_round",
@@ -56,11 +57,14 @@ class ApplicationAdmin(admin.ModelAdmin):
         ApplicationRoundStatusFilter,
         ApplicationRoundFilter,
     ]
+
     search_fields = [
         "user__first_name",
         "user__last_name",
         "application_round__reservation_units__name",
     ]
+    search_help_text = _("Search by user's first name, last name or reservation units name")
+
     actions = [
         "reset_applications",
     ]

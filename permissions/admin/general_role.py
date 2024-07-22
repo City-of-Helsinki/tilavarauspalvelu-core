@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.core.handlers.wsgi import WSGIRequest
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from permissions.models import GeneralRole, GeneralRoleChoice, GeneralRolePermission
 
@@ -39,9 +40,9 @@ class GeneralRoleAdmin(admin.ModelAdmin):
         "user__first_name",
         "user__last_name",
     ]
-    autocomplete_fields = [
-        "user",
-    ]
+    search_help_text = _("Search by username, email, first name or last name")
+
+    autocomplete_fields = ["user"]
 
     def get_queryset(self, request: WSGIRequest) -> models.QuerySet:
         return super().get_queryset(request).select_related("user", "role")

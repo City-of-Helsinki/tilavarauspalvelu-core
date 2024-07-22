@@ -43,6 +43,9 @@ class AllocatedTimeSlotAdmin(admin.ModelAdmin):
         "reservation_unit_option__application_section__application__user__last_name",
         "reservation_unit_option__application_section__application__user__email",
     ]
+    search_help_text = _(
+        "Search by day of the week, reservation unit, unit, application section, user's first or last name or email"
+    )
 
     @admin.display(description=_("Allocated Time Slot"), ordering="allocated_time_of_week")
     def slot(self, obj: AllocatedTimeSlot) -> str:

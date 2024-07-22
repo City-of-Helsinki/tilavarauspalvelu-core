@@ -148,16 +148,17 @@ class PaymentOrderAdmin(admin.ModelAdmin):
         "processed_at",
         "reservation_unit",
     ]
+    list_filter = [
+        "status",
+        "payment_type",
+    ]
+
     search_fields = [
         "id__exact",
         "reservation__id__exact",
         "reservation__reservation_unit__name",
     ]
     search_help_text = _("Search by Payment order ID, Reservation ID or Reservation unit name")
-    list_filter = [
-        "status",
-        "payment_type",
-    ]
 
     def reservation_unit(self, obj: PaymentOrder) -> str:
         return obj.reservation.reservation_unit.first() if obj.reservation else ""

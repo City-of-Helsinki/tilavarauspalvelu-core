@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.models import QuerySet
+from django.utils.translation import gettext_lazy as _
 from lookup_property import L
 
 from applications.models import ApplicationSection, ReservationUnitOption, SuitableTimeRange
@@ -42,6 +43,7 @@ class SuitableTimeRangeInline(admin.StackedInline):
 @admin.register(ApplicationSection)
 class ApplicationSectionAdmin(admin.ModelAdmin):
     form = ApplicationSectionAdminForm
+
     list_display = [
         "name",
         "application",
@@ -53,11 +55,14 @@ class ApplicationSectionAdmin(admin.ModelAdmin):
         AgeGroupFilter,
         ReservationPurposeFilter,
     ]
+
     search_fields = [
         "name",
         "application__user__first_name",
         "application__user__last_name",
     ]
+    search_help_text = _("Search by name, application user's first name or last name")
+
     inlines = [
         SuitableTimeRangeInline,
         ReservationUnitOptionInline,

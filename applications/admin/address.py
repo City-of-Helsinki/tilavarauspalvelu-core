@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.translation import gettext_lazy as _
 from modeltranslation.admin import TranslationAdmin
 
 from applications.models import Address
@@ -13,6 +14,7 @@ __all__ = [
 @admin.register(Address)
 class AddressAdmin(TranslationAdmin):
     form = AddressAdminForm
+
     list_display = [
         "street_address",
         "post_code",
@@ -22,8 +24,10 @@ class AddressAdmin(TranslationAdmin):
         "post_code",
         "city",
     ]
+
     search_fields = [
         "street_address",
         "post_code",
         "city",
     ]
+    search_help_text = _("Search by street address, post code or city")

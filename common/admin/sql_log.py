@@ -45,6 +45,7 @@ class SQLLogAdmin(admin.ModelAdmin):
         "request_log__body",
         "request_log__request_id",
     ]
+    search_help_text = _("Search by SQL, request log path, body or request ID")
 
     def get_queryset(self, request: WSGIRequest) -> SQLLogQuerySet:
         return super().get_queryset(request).select_related("request_log")
@@ -149,6 +150,7 @@ class RequestLogAdmin(admin.ModelAdmin):
         "path",
         "body",
     ]
+    search_help_text = _("Search by request ID, path or body")
     actions = [
         "export_results_to_csv",
     ]

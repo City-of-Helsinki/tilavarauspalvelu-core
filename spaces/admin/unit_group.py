@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.core.handlers.wsgi import WSGIRequest
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from modeltranslation.admin import TranslationAdmin
 
 from spaces.models import UnitGroup
@@ -22,6 +23,7 @@ class UnitGroupAdmin(TranslationAdmin):
     search_fields = [
         "name",
     ]
+    search_help_text = _("Search by name")
 
     def get_queryset(self, request: WSGIRequest) -> models.QuerySet:
         return (

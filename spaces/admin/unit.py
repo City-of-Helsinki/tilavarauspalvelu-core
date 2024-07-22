@@ -4,6 +4,7 @@ from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin, messages
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.models import QuerySet
+from django.utils.translation import gettext_lazy as _
 from modeltranslation.admin import TranslationAdmin
 
 from spaces.admin.location import LocationInline
@@ -18,21 +19,27 @@ class UnitAdmin(SortableAdminMixin, ExtraButtonsMixin, TranslationAdmin):
         "__str__",
         "payment_merchant",
         "payment_accounting",
+        "tprek_id",
     ]
     list_filter = [
         "payment_merchant",
         "payment_accounting",
     ]
+
     inlines = [
         LocationInline,
     ]
+
     actions = [
         "update_from_tprek",
     ]
+
     search_fields = [
         "name",
         "tprek_id",
     ]
+    search_help_text = _("Search by name or TPREK ID")
+
     readonly_fields = [
         "tprek_last_modified",
     ]

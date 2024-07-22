@@ -1,6 +1,7 @@
 from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin, messages
 from django.http import FileResponse
+from django.utils.translation import gettext_lazy as _
 
 from applications.models import ApplicationRoundTimeSlot
 from opening_hours.utils.hauki_resource_hash_updater import HaukiResourceHashUpdater
@@ -52,12 +53,15 @@ class ReservationUnitAdmin(SortableAdminMixin, admin.ModelAdmin):
         "uuid",
         "payment_product",
     ]
+
     search_fields = [
+        "pk__iexact",
         "name",
         "unit__name",
-        "pk__iexact",
         "unit__service_sectors__name",
     ]
+    search_help_text = _("Search by ID, name, unit name, or service sector name")
+
     ordering = ["rank"]
 
     def get_search_results(self, request, queryset, search_term):
