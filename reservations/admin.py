@@ -1,15 +1,21 @@
 from django import forms
-from django.contrib import admin
+from django.contrib import admin, messages
+from django.contrib.admin import helpers
 from django.core.exceptions import ValidationError
 from django.core.handlers.wsgi import WSGIRequest
-from django.db.models import QuerySet
+from django.db.models import F, OrderBy, QuerySet
+from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 from import_export.admin import ExportMixin
 from import_export.formats.base_formats import CSV
 from more_admin_filters.filters import MultiSelectFilter, MultiSelectRelatedOnlyDropdownFilter
 from rangefilter.filters import DateRangeFilter, DateRangeFilterBuilder
 
+from common.date_utils import local_datetime
+from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from merchants.admin import PaymentOrderInline
+from merchants.models import OrderStatus
+from reservations.choices import ReservationStateChoice
 from reservations.models import (
     AbilityGroup,
     AgeGroup,
@@ -22,6 +28,7 @@ from reservations.models import (
     ReservationPurpose,
     ReservationStatistic,
 )
+from reservations.tasks import refund_paid_reservation_task
 
 
 class ReservationAdminForm(forms.ModelForm):
@@ -377,6 +384,10 @@ class ReservationAdmin(admin.ModelAdmin):
         "confirmed_at",
         "created_at",
     ]
+    actions = [
+        "deny_reservations_without_refund",
+        "deny_reservations_with_refund",
+    ]
     inlines = [PaymentOrderInline]
 
     def get_queryset(self, request):
@@ -385,6 +396,108 @@ class ReservationAdmin(admin.ModelAdmin):
     @admin.display(ordering="reservation_unit__name")
     def reservation_units(self, obj: Reservation) -> str:
         return ", ".join([str(reservation_unit) for reservation_unit in obj.reservation_unit.all()])
+
+    def _deny_reservations_action_confirmation_page(
+        self,
+        request: WSGIRequest,
+        queryset: QuerySet[Reservation],
+        action_name: str,
+    ) -> TemplateResponse | None:
+        if not queryset.exists():
+            msg = _("None of the selected reservations can be denied.")
+            self.message_user(request, msg, level=messages.ERROR)
+            return None
+
+        deny_reasons = ReservationDenyReason.objects.order_by(OrderBy(F("rank"), descending=True, nulls_last=True))
+        queryset = queryset.filter(
+            state__in=ReservationStateChoice.states_that_can_change_to_deny,
+            end__gte=local_datetime(),
+        )
+
+        context = {
+            **self.admin_site.each_context(request),
+            "title": _("Are you sure?"),
+            "subtitle": _("Are you sure you want deny these reservations?"),
+            "queryset": queryset,
+            "queryset_paid_reservation_count": queryset.filter(price__gt=0).count(),
+            "deny_reasons": deny_reasons,
+            "opts": self.model._meta,
+            "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
+            "media": self.media,
+            "action_name": action_name,
+        }
+        request.current_app = self.admin_site.name
+        return TemplateResponse(request, "admin/deny_reservation_confirmation.html", context)
+
+    def _deny_reservations_action_set_denied(self, request: WSGIRequest, queryset: QuerySet[Reservation]) -> None:
+        deny_reason = request.POST.get("deny_reason")
+        queryset.filter(
+            state__in=ReservationStateChoice.states_that_can_change_to_deny,
+            end__gte=local_datetime(),
+        ).update(
+            state=ReservationStateChoice.DENIED,
+            handled_at=local_datetime(),
+            deny_reason=deny_reason,
+        )
+
+        msg = _("Selected reservations have been denied.")
+        self.message_user(request, msg, level=messages.INFO)
+
+        for reservation in queryset:
+            ReservationEmailNotificationSender.send_deny_email(reservation=reservation)
+
+    @admin.action(description=_("Deny selected reservations without refund"))
+    def deny_reservations_without_refund(
+        self,
+        request: WSGIRequest,
+        queryset: QuerySet[Reservation],
+    ) -> TemplateResponse | None:
+        # Confirmation page
+        if not request.POST.get("confirmed"):
+            return self._deny_reservations_action_confirmation_page(
+                request=request,
+                queryset=queryset,
+                action_name="deny_reservations_without_refund",
+            )
+
+        # Set reservations as denied
+        self._deny_reservations_action_set_denied(request=request, queryset=queryset)
+        return None
+
+    @admin.action(description=_("Deny selected reservations and refund"))
+    def deny_reservations_with_refund(
+        self,
+        request: WSGIRequest,
+        queryset: QuerySet[Reservation],
+    ) -> TemplateResponse | None:
+        # Confirmation page
+        if not request.POST.get("confirmed"):
+            return self._deny_reservations_action_confirmation_page(
+                request=request,
+                queryset=queryset,
+                action_name="deny_reservations_with_refund",
+            )
+
+        # Set reservations as denied
+        self._deny_reservations_action_set_denied(request=request, queryset=queryset)
+
+        # Refund paid reservations
+        refund_queryset = queryset.filter(
+            state=ReservationStateChoice.DENIED,
+            price__gt=0,
+            payment_order__isnull=False,
+            payment_order__status=OrderStatus.PAID,
+            payment_order__refund_id__isnull=True,
+        )
+        for reservation in refund_queryset:
+            refund_paid_reservation_task.delay(reservation.pk)
+
+        if refund_queryset.count():
+            msg = _("Refund has been initiated for selected reservations.") + f" ({refund_queryset.count()})"
+        else:
+            msg = _("No reservations with paid orders to refund.")
+        self.message_user(request, msg, level=messages.INFO)
+        return None
 
 
 @admin.register(RecurringReservation)
