@@ -79,8 +79,6 @@ def _update_reservable_time_spans_action(modeladmin, request, queryset: QuerySet
 
 @admin.register(OriginHaukiResource)
 class OriginHaukiResourceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
-    model = OriginHaukiResource
-
     # List
     actions = [_update_reservable_time_spans_action]
     list_display = ["id", "linked_reservation_units", "reservable_time_spans_count", "latest_fetched_date"]

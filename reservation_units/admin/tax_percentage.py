@@ -5,4 +5,4 @@ from reservation_units.models import TaxPercentage
 
 @admin.register(TaxPercentage)
 class TaxPercentageAdmin(admin.ModelAdmin):
-    model = TaxPercentage
+    pass

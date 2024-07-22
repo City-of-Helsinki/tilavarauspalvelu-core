@@ -88,7 +88,6 @@ class PaymentMerchantForm(forms.ModelForm):
 
 @admin.register(PaymentMerchant)
 class PaymentMerchantAdmin(admin.ModelAdmin):
-    model = PaymentMerchant
     form = PaymentMerchantForm
     readonly_fields = ["id"]
 
@@ -135,7 +134,6 @@ class PaymentOrderInline(admin.TabularInline):
 
 @admin.register(PaymentOrder)
 class PaymentOrderAdmin(admin.ModelAdmin):
-    model = PaymentOrder
     form = PaymentOrderForm
 
     list_display = [
@@ -166,4 +164,4 @@ class PaymentOrderAdmin(admin.ModelAdmin):
 
 @admin.register(PaymentAccounting)
 class PaymentAccountingAdmin(admin.ModelAdmin):
-    model = PaymentAccounting
+    pass

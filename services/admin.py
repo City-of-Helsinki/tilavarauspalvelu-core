@@ -5,4 +5,4 @@ from services.models import Service
 
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
-    model = Service
+    pass

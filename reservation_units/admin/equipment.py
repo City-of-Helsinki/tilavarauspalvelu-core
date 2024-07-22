@@ -7,8 +7,6 @@ from reservation_units.models import Equipment, EquipmentCategory
 
 @admin.register(Equipment)
 class EquipmentAdmin(admin.ModelAdmin):
-    model = Equipment
-
     list_display = [
         "name",
         "category",
@@ -20,8 +18,6 @@ class EquipmentAdmin(admin.ModelAdmin):
 
 @admin.register(EquipmentCategory)
 class EquipmentCategoryAdmin(admin.ModelAdmin):
-    model = EquipmentCategory
-
     list_display = [
         "name",
         "number_of_equipment",

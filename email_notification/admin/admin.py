@@ -94,7 +94,6 @@ class EmailTemplateAdminForm(ModelForm):
 
 @admin.register(EmailTemplate)
 class EmailTemplateAdmin(ExtraButtonsMixin, TranslationAdmin):
-    model = EmailTemplate
     form = EmailTemplateAdminForm
 
     @button(label="Email Template Testing", change_form=True)

@@ -5,14 +5,14 @@ from reservation_units.models import Keyword, KeywordCategory, KeywordGroup
 
 @admin.register(KeywordCategory)
 class KeywordCategoryAdmin(admin.ModelAdmin):
-    model = KeywordCategory
+    pass
 
 
 @admin.register(KeywordGroup)
 class KeywordGroupAdmin(admin.ModelAdmin):
-    model = KeywordGroup
+    pass
 
 
 @admin.register(Keyword)
 class KeywordAdmin(admin.ModelAdmin):
-    model = Keyword
+    pass

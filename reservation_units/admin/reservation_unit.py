@@ -30,7 +30,6 @@ class ApplicationRoundTimeSlotInline(admin.TabularInline):
 
 @admin.register(ReservationUnit)
 class ReservationUnitAdmin(SortableAdminMixin, admin.ModelAdmin):
-    model = ReservationUnit
     form = ReservationUnitAdminForm
     actions = [
         "export_to_csv",

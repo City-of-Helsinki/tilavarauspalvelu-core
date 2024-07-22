@@ -256,7 +256,6 @@ class PaidReservationListFilter(admin.SimpleListFilter):
 
 @admin.register(Reservation)
 class ReservationAdmin(admin.ModelAdmin):
-    model = Reservation
     form = ReservationAdminForm
 
     list_display = [
@@ -502,33 +501,32 @@ class ReservationAdmin(admin.ModelAdmin):
 
 @admin.register(RecurringReservation)
 class RecurringReservationAdmin(admin.ModelAdmin):
-    model = RecurringReservation
     inlines = [ReservationInline]
 
 
 @admin.register(ReservationPurpose)
 class ReservationPurposeAdmin(admin.ModelAdmin):
-    model = ReservationPurpose
+    pass
 
 
 @admin.register(AgeGroup)
 class AgeGroupAdmin(admin.ModelAdmin):
-    model = AgeGroup
+    pass
 
 
 @admin.register(AbilityGroup)
 class AbilityGroupAdmin(admin.ModelAdmin):
-    model = AbilityGroup
+    pass
 
 
 @admin.register(ReservationCancelReason)
 class ReservationCancelReasonAdmin(admin.ModelAdmin):
-    model = ReservationCancelReason
+    pass
 
 
 @admin.register(ReservationDenyReason)
 class ReservationDenyReasonAdmin(admin.ModelAdmin):
-    model = ReservationDenyReason
+    pass
 
 
 class ReservationMetadataFieldForm(forms.ModelForm):

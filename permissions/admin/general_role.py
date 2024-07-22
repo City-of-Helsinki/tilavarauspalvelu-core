@@ -24,13 +24,11 @@ class GeneralRolePermissionInline(admin.TabularInline):
 
 @admin.register(GeneralRoleChoice)
 class GeneralRoleChoiceAdmin(admin.ModelAdmin):
-    model = GeneralRoleChoice
     inlines = [GeneralRolePermissionInline]
 
 
 @admin.register(GeneralRole)
 class GeneralRoleAdmin(admin.ModelAdmin):
-    model = GeneralRole
     list_filter = [
         "role",
     ]

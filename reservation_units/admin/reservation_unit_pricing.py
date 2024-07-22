@@ -7,8 +7,6 @@ from reservation_units.models import ReservationUnitPricing
 
 @admin.register(ReservationUnitPricing)
 class ReservationUnitPricingAdmin(admin.ModelAdmin):
-    model = ReservationUnitPricing
-
     fields = (
         "reservation_unit",
         "begins",

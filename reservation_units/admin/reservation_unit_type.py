@@ -6,4 +6,4 @@ from reservation_units.models import ReservationUnitType
 
 @admin.register(ReservationUnitType)
 class ReservationUnitTypeAdmin(SortableAdminMixin, admin.ModelAdmin):
-    model = ReservationUnitType
+    pass

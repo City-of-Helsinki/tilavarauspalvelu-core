@@ -24,13 +24,11 @@ class UnitRolePermissionInline(admin.TabularInline):
 
 @admin.register(UnitRoleChoice)
 class UnitRoleChoiceAdmin(admin.ModelAdmin):
-    model = UnitRoleChoice
     inlines = [UnitRolePermissionInline]
 
 
 @admin.register(UnitRole)
 class UnitRoleAdmin(admin.ModelAdmin):
-    model = UnitRole
     list_display = [
         "role_verbose_name",
         "user_email",

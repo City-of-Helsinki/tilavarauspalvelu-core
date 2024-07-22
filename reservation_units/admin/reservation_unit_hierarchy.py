@@ -8,7 +8,6 @@ from reservation_units.models import ReservationUnitHierarchy
 
 @admin.register(ReservationUnitHierarchy)
 class ReservationUnitHierarchyAdmin(ExtraButtonsMixin, admin.ModelAdmin):
-    model = ReservationUnitHierarchy
     readonly_fields = ["reservation_unit", "related_reservation_unit_ids"]
     ordering = ["reservation_unit"]
 
