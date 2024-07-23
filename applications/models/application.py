@@ -108,7 +108,7 @@ class Application(SerializableMixin, models.Model):
     )
 
     def __str__(self) -> str:
-        return f"{self.user} ({self.created_date})"
+        return f"{self.user} ({self.created_date.date()})"
 
     @lookup_property(joins=["application_round"], skip_codegen=True)
     def status() -> ApplicationStatusChoice:
