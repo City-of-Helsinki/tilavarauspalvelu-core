@@ -1,3 +1,4 @@
+from adminsortable2.admin import SortableAdminMixin
 from django import forms
 from django.contrib import admin, messages
 from django.contrib.admin import helpers
@@ -525,7 +526,7 @@ class ReservationCancelReasonAdmin(admin.ModelAdmin):
 
 
 @admin.register(ReservationDenyReason)
-class ReservationDenyReasonAdmin(admin.ModelAdmin):
+class ReservationDenyReasonAdmin(SortableAdminMixin, admin.ModelAdmin):
     pass
 
 
