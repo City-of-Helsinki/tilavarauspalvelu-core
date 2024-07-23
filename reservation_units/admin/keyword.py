@@ -1,18 +1,19 @@
 from django.contrib import admin
+from modeltranslation.admin import TranslationAdmin
 
 from reservation_units.models import Keyword, KeywordCategory, KeywordGroup
 
 
 @admin.register(KeywordCategory)
-class KeywordCategoryAdmin(admin.ModelAdmin):
+class KeywordCategoryAdmin(TranslationAdmin):
     pass
 
 
 @admin.register(KeywordGroup)
-class KeywordGroupAdmin(admin.ModelAdmin):
+class KeywordGroupAdmin(TranslationAdmin):
     pass
 
 
 @admin.register(Keyword)
-class KeywordAdmin(admin.ModelAdmin):
+class KeywordAdmin(TranslationAdmin):
     pass

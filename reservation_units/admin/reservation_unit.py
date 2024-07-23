@@ -2,6 +2,7 @@ from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin, messages
 from django.http import FileResponse
 from django.utils.translation import gettext_lazy as _
+from modeltranslation.admin import TranslationAdmin
 
 from applications.models import ApplicationRoundTimeSlot
 from opening_hours.utils.hauki_resource_hash_updater import HaukiResourceHashUpdater
@@ -29,7 +30,7 @@ class ApplicationRoundTimeSlotInline(admin.TabularInline):
 
 
 @admin.register(ReservationUnit)
-class ReservationUnitAdmin(SortableAdminMixin, admin.ModelAdmin):
+class ReservationUnitAdmin(SortableAdminMixin, TranslationAdmin):
     form = ReservationUnitAdminForm
     actions = [
         "export_to_csv",

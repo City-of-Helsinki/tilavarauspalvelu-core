@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.core.handlers.wsgi import WSGIRequest
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from modeltranslation.admin import TranslationAdmin
 
 from permissions.models import GeneralRole, GeneralRoleChoice, GeneralRolePermission
 
@@ -23,7 +24,7 @@ class GeneralRolePermissionInline(admin.TabularInline):
 
 
 @admin.register(GeneralRoleChoice)
-class GeneralRoleChoiceAdmin(admin.ModelAdmin):
+class GeneralRoleChoiceAdmin(TranslationAdmin):
     inlines = [GeneralRolePermissionInline]
 
 

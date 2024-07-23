@@ -1,12 +1,13 @@
 from django.contrib import admin
 from django.core.handlers.wsgi import WSGIRequest
 from django.db import models
+from modeltranslation.admin import TranslationAdmin
 
 from reservation_units.models import Equipment, EquipmentCategory
 
 
 @admin.register(Equipment)
-class EquipmentAdmin(admin.ModelAdmin):
+class EquipmentAdmin(TranslationAdmin):
     list_display = [
         "name",
         "category",
@@ -17,7 +18,7 @@ class EquipmentAdmin(admin.ModelAdmin):
 
 
 @admin.register(EquipmentCategory)
-class EquipmentCategoryAdmin(admin.ModelAdmin):
+class EquipmentCategoryAdmin(TranslationAdmin):
     list_display = [
         "name",
         "number_of_equipment",

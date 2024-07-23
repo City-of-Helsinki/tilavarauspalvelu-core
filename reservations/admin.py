@@ -9,6 +9,7 @@ from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 from import_export.admin import ExportMixin
 from import_export.formats.base_formats import CSV
+from modeltranslation.admin import TranslationAdmin
 from more_admin_filters.filters import MultiSelectFilter, MultiSelectRelatedOnlyDropdownFilter
 from rangefilter.filters import DateRangeFilter, DateRangeFilterBuilder
 
@@ -506,7 +507,7 @@ class RecurringReservationAdmin(admin.ModelAdmin):
 
 
 @admin.register(ReservationPurpose)
-class ReservationPurposeAdmin(admin.ModelAdmin):
+class ReservationPurposeAdmin(TranslationAdmin):
     pass
 
 
@@ -516,17 +517,17 @@ class AgeGroupAdmin(admin.ModelAdmin):
 
 
 @admin.register(AbilityGroup)
-class AbilityGroupAdmin(admin.ModelAdmin):
+class AbilityGroupAdmin(TranslationAdmin):
     pass
 
 
 @admin.register(ReservationCancelReason)
-class ReservationCancelReasonAdmin(admin.ModelAdmin):
+class ReservationCancelReasonAdmin(TranslationAdmin):
     pass
 
 
 @admin.register(ReservationDenyReason)
-class ReservationDenyReasonAdmin(SortableAdminMixin, admin.ModelAdmin):
+class ReservationDenyReasonAdmin(SortableAdminMixin, TranslationAdmin):
     pass
 
 
