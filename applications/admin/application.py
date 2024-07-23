@@ -5,6 +5,7 @@ from django.db.models import QuerySet
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
+from rangefilter.filters import DateRangeFilterBuilder
 
 from applications.admin.filters.application import (
     ApplicationRoundFilter,
@@ -47,16 +48,19 @@ class ApplicationAdmin(admin.ModelAdmin):
     form = ApplicationAdminForm
 
     list_display = [
+        "id",
         "_name",
         "application_round",
         "created_date",
         "last_modified_date",
     ]
     list_filter = [
+        ("created_date", DateRangeFilterBuilder(title=_("Created at"))),
         ApplicationStatusFilter,
         ApplicationRoundStatusFilter,
         ApplicationRoundFilter,
     ]
+    ordering = ["-id"]
 
     search_fields = [
         "user__first_name",
@@ -64,12 +68,60 @@ class ApplicationAdmin(admin.ModelAdmin):
         "application_round__reservation_units__name",
     ]
     search_help_text = _("Search by user's first name, last name or reservation units name")
-
     actions = [
         "reset_applications",
     ]
+
+    fieldsets = [
+        [
+            _("Basic information"),
+            {
+                "fields": [
+                    "id",
+                    "status",
+                    "application_round",
+                ],
+            },
+        ],
+        [
+            _("Applicant"),
+            {
+                "fields": [
+                    "applicant_type",
+                    "organisation",
+                    "contact_person",
+                    "user",
+                    "billing_address",
+                    "home_city",
+                ],
+            },
+        ],
+        [
+            _("Time"),
+            {
+                "fields": [
+                    "sent_date",
+                    "cancelled_date",
+                    "in_allocation_notification_sent_date",
+                    "results_ready_notification_sent_date",
+                ],
+            },
+        ],
+        [
+            _("Notes"),
+            {
+                "fields": [
+                    "additional_information",
+                    "working_memo",
+                ],
+            },
+        ],
+    ]
     inlines = [
         ApplicationSectionInline,
+    ]
+    readonly_fields = [
+        "id",
     ]
 
     def get_queryset(self, request: WSGIRequest) -> QuerySet:

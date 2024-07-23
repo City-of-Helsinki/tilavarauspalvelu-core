@@ -25,6 +25,10 @@ class UnitRolePermissionInline(admin.TabularInline):
 
 @admin.register(UnitRoleChoice)
 class UnitRoleChoiceAdmin(TranslationAdmin):
+    list_display = [
+        "verbose_name",
+        "code",
+    ]
     inlines = [UnitRolePermissionInline]
 
 

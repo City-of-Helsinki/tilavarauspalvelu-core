@@ -154,9 +154,7 @@ class RequestLogAdmin(admin.ModelAdmin):
     actions = [
         "export_results_to_csv",
     ]
-    ordering = [
-        "-created",
-    ]
+    ordering = ["-created"]
 
     @admin.display(description=_("Queries"), ordering="queries")
     def _num_of_sql_logs(self, obj: RequestLog) -> int:

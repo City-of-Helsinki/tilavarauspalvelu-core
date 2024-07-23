@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.core.handlers.wsgi import WSGIRequest
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from modeltranslation.admin import TranslationAdmin
 from mptt.admin import MPTTModelAdmin
 
@@ -31,6 +32,19 @@ class SpaceInline(admin.StackedInline):
 
 @admin.register(Space)
 class SpaceAdmin(TranslationAdmin, MPTTModelAdmin):
+    list_display = [
+        "name",
+        "unit",
+        "parent",
+    ]
+
+    search_fields = [
+        "name",
+        "unit__name",
+    ]
+    search_help_text = _("Search by name or unit name")
+    ordering = ["name"]
+
     fields = [
         "name",
         "surface_area",
@@ -38,9 +52,6 @@ class SpaceAdmin(TranslationAdmin, MPTTModelAdmin):
         "code",
         "unit",
         "parent",
-    ]
-    list_display = [
-        "name",
     ]
     inlines = [
         SpaceInline,

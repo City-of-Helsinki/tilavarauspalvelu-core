@@ -23,5 +23,5 @@ class TermsOfUseAdminForm(ModelForm):
 @admin.register(TermsOfUse)
 class TermsOfUseAdmin(TranslationAdmin):
     form = TermsOfUseAdminForm
-    list_display = ("__str__", "terms_type")
+    list_display = ("id", "name", "terms_type")
     list_filter = ("terms_type",)

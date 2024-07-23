@@ -13,12 +13,6 @@ __all__ = [
 
 
 class ApplicationSectionAdminForm(forms.ModelForm):
-    application = forms.ModelChoiceField(
-        Application.objects.select_related("user"),
-        label=_("Application"),
-        help_text=_("Application this section is in."),
-    )
-
     status = forms.CharField(
         widget=disabled_widget,
         required=False,
@@ -44,11 +38,13 @@ class ApplicationSectionAdminForm(forms.ModelForm):
         if instance:
             kwargs.setdefault("initial", {})
             kwargs["initial"]["status"] = ApplicationSectionStatusChoice(instance.status).label
+        self.base_fields["application"].queryset = Application.objects.select_related("user")
         super().__init__(*args, **kwargs)
 
     class Meta:
         model = ApplicationSection
         fields = [
+            "id",
             "name",
             "status",
             "num_persons",
@@ -70,6 +66,7 @@ class ApplicationSectionAdminForm(forms.ModelForm):
             "reservations_begin_date": _("Reservations begin date"),
             "reservations_end_date": _("Reservations end date"),
             "applied_reservations_per_week": _("Applied reservations per week"),
+            "application": _("Application"),
             "age_group": _("Age group"),
             "purpose": _("Purpose"),
         }
@@ -81,6 +78,7 @@ class ApplicationSectionAdminForm(forms.ModelForm):
             "reservations_begin_date": _("First date on which reservations for this section are created."),
             "reservations_end_date": _("Last date on which reservations for this section are created."),
             "applied_reservations_per_week": _("How many reservation the applicant has applied for per week."),
+            "application": _("Application this section is in."),
             "age_group": _("Age group for this section."),
             "purpose": _("Purpose for this section."),
         }

@@ -25,14 +25,73 @@ __all__ = [
 @admin.register(ApplicationRound)
 class ApplicationRoundAdmin(ExtraButtonsMixin, TranslationAdmin):
     form = ApplicationRoundAdminForm
+
     list_display = [
-        "_name",
+        "name",
+        "reservation_period_begin",
+        "reservation_period_end",
+        "_status",
+        "handled_date",
+        "sent_date",
     ]
+    list_filter = [
+        "_status",
+    ]
+    ordering = ["-reservation_period_begin"]
     actions = [
         "reset_application_rounds",
     ]
-    autocomplete_fields = [
+
+    fieldsets = [
+        [
+            _("Basic information"),
+            {
+                "fields": [
+                    "id",
+                    "name",
+                    "status",
+                    "target_group",
+                    "service_sector",
+                    "terms_of_use",
+                    "reservation_units",
+                    "purposes",
+                ],
+            },
+        ],
+        [
+            _("Time"),
+            {
+                "fields": [
+                    "application_period_begin",
+                    "application_period_end",
+                    "reservation_period_begin",
+                    "reservation_period_end",
+                    "public_display_begin",
+                    "public_display_end",
+                    "handled_date",
+                    "sent_date",
+                ],
+            },
+        ],
+        [
+            _("Criteria"),
+            {
+                "fields": ["criteria"],
+            },
+        ],
+        [
+            _("Notes"),
+            {
+                "fields": ["notes_when_applying"],
+            },
+        ],
+    ]
+    readonly_fields = [
+        "id",
+    ]
+    filter_horizontal = [
         "reservation_units",
+        "purposes",
     ]
 
     def get_queryset(self, request: WSGIRequest) -> QuerySet:
@@ -44,10 +103,6 @@ class ApplicationRoundAdmin(ExtraButtonsMixin, TranslationAdmin):
             )
             .select_related("service_sector")
         )
-
-    @admin.display(description=_("Application Round"), ordering="name")
-    def _name(self, obj: ApplicationRound) -> str:
-        return str(obj)
 
     @button(label="Export applications to CSV", change_form=True)
     def export_applications_to_csv(self, request: WSGIRequest, pk: int) -> FileResponse | None:

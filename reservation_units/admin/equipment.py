@@ -21,6 +21,7 @@ class EquipmentAdmin(TranslationAdmin):
 class EquipmentCategoryAdmin(TranslationAdmin):
     list_display = [
         "name",
+        "rank",
         "number_of_equipment",
     ]
 

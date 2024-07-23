@@ -5,4 +5,7 @@ from reservation_units.models import ReservationUnitImage
 
 @admin.register(ReservationUnitImage)
 class ReservationUnitImageAdmin(admin.ModelAdmin):
-    pass
+    list_display = [
+        "reservation_unit",
+        "image_type",
+    ]

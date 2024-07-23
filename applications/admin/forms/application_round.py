@@ -7,9 +7,8 @@ from tinymce.widgets import TinyMCE
 
 from applications.choices import ApplicationRoundStatusChoice
 from applications.models import ApplicationRound
-from common.fields.forms import ModelMultipleChoiceFilteredField, disabled_widget
+from common.fields.forms import disabled_widget
 from reservation_units.models import ReservationUnit
-from reservations.models import ReservationPurpose
 from terms_of_use.models import TermsOfUse
 
 __all__ = [
@@ -39,36 +38,21 @@ class ApplicationRoundAdminForm(forms.ModelForm):
         },
     )
 
-    reservation_units = ModelMultipleChoiceFilteredField(
-        queryset=ReservationUnit.objects.select_related("unit").all(),
-        is_stacked=False,
-        label=_("Reservation units"),
-        help_text=_("Reservation units that can be applied for in this application round."),
-    )
-
-    purposes = ModelMultipleChoiceFilteredField(
-        queryset=ReservationPurpose.objects.all(),
-        is_stacked=False,
-        label=_("Purposes"),
-        help_text=_("Purposes that are allowed in this application period."),
-    )
-
-    terms_of_use = forms.ModelChoiceField(
-        queryset=TermsOfUse.objects.filter(terms_type=TermsOfUse.TERMS_TYPE_RECURRING).all(),
-        label=pgettext_lazy("ApplicationRound", "Terms of use"),
-        help_text=_("Terms of use for the application round."),
-    )
-
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         instance: ApplicationRound | None = kwargs.get("instance", None)
         if instance:
             kwargs.setdefault("initial", {})
             kwargs["initial"]["status"] = ApplicationRoundStatusChoice(instance.status).label
+        self.base_fields["reservation_units"].queryset = ReservationUnit.objects.select_related("unit").all()
+        self.base_fields["terms_of_use"].queryset = TermsOfUse.objects.filter(
+            terms_type=TermsOfUse.TERMS_TYPE_RECURRING
+        )
         super().__init__(*args, **kwargs)
 
     class Meta:
         model = ApplicationRound
         fields = [
+            "id",
             "name",
             "status",
             "target_group",

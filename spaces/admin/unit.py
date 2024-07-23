@@ -25,21 +25,20 @@ class UnitAdmin(SortableAdminMixin, ExtraButtonsMixin, TranslationAdmin):
         "payment_merchant",
         "payment_accounting",
     ]
-
-    inlines = [
-        LocationInline,
-    ]
+    ordering = ["rank"]
 
     actions = [
         "update_from_tprek",
     ]
-
     search_fields = [
         "name",
         "tprek_id",
     ]
     search_help_text = _("Search by name or TPREK ID")
 
+    inlines = [
+        LocationInline,
+    ]
     readonly_fields = [
         "tprek_last_modified",
     ]

@@ -218,6 +218,12 @@ class ReservationAdminForm(forms.ModelForm):
 
 class ReservationInline(admin.TabularInline):
     model = Reservation
+    extra = 0
+    max_num = 0
+    show_change_link = True
+    can_delete = False
+    fields = ["id", "name", "begin", "end", "state", "type", "price", "price_net", "unit_price"]
+    readonly_fields = fields
 
 
 class RecurringReservationListFilter(admin.SimpleListFilter):
@@ -279,6 +285,10 @@ class ReservationAdmin(admin.ModelAdmin):
         ("reservation_unit", MultiSelectRelatedOnlyDropdownFilter),
     ]
 
+    actions = [
+        "deny_reservations_without_refund",
+        "deny_reservations_with_refund",
+    ]
     search_fields = [
         "id__exact",
     ]
@@ -384,10 +394,6 @@ class ReservationAdmin(admin.ModelAdmin):
         "handled_at",
         "confirmed_at",
         "created_at",
-    ]
-    actions = [
-        "deny_reservations_without_refund",
-        "deny_reservations_with_refund",
     ]
     inlines = [PaymentOrderInline]
 
@@ -503,6 +509,15 @@ class ReservationAdmin(admin.ModelAdmin):
 
 @admin.register(RecurringReservation)
 class RecurringReservationAdmin(admin.ModelAdmin):
+    list_display = [
+        "name",
+        "reservation_unit",
+        "allocated_time_slot",
+        "begin_date",
+        "end_date",
+        "recurrence_in_days",
+    ]
+
     inlines = [ReservationInline]
 
 

@@ -96,6 +96,11 @@ class EmailTemplateAdminForm(ModelForm):
 class EmailTemplateAdmin(ExtraButtonsMixin, TranslationAdmin):
     form = EmailTemplateAdminForm
 
+    list_display = [
+        "type",
+        "name",
+    ]
+
     @button(label="Email Template Testing", change_form=True)
     def template_tester(self, request: WSGIRequest, pk: int) -> TemplateResponse | HttpResponseRedirect:
         return email_template_tester_admin_view(self, request, pk)

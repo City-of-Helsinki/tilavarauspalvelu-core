@@ -13,3 +13,8 @@ __all__ = [
 @admin.register(City)
 class CityAdmin(TranslationAdmin):
     form = CityAdminForm
+
+    list_display = [
+        "name",
+        "municipality_code",
+    ]

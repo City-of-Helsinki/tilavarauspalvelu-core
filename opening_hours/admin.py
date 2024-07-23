@@ -18,7 +18,7 @@ class ReservationUnitInline(admin.TabularInline):
     model = ReservationUnit
 
     fields = ["id", "reservation_unit_link"]
-    readonly_fields = ["id", "reservation_unit_link"]
+    readonly_fields = fields
     can_delete = False
     extra = 0
 
@@ -35,7 +35,7 @@ class ReservableTimeSpanInline(admin.TabularInline):
     model = ReservableTimeSpan
 
     fields = ["time_span_str"]
-    readonly_fields = ["time_span_str"]
+    readonly_fields = fields
     can_delete = False
     extra = 0
 
@@ -80,9 +80,15 @@ def _update_reservable_time_spans_action(modeladmin, request, queryset: QuerySet
 @admin.register(OriginHaukiResource)
 class OriginHaukiResourceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
     # List
-    actions = [_update_reservable_time_spans_action]
-    list_display = ["id", "linked_reservation_units", "reservable_time_spans_count", "latest_fetched_date"]
+    list_display = [
+        "id",
+        "linked_reservation_units",
+        "reservable_time_spans_count",
+        "latest_fetched_date",
+    ]
     ordering = ["id"]
+
+    actions = [_update_reservable_time_spans_action]
 
     # Form
     form = OriginHaukiResourceAdminForm

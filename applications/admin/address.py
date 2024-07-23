@@ -27,7 +27,7 @@ class AddressAdmin(TranslationAdmin):
 
     search_fields = [
         "street_address",
-        "post_code",
+        "post_code__iexact",
         "city",
     ]
     search_help_text = _("Search by street address, post code or city")

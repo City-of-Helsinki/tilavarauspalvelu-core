@@ -14,8 +14,13 @@ class BannerNotificationAdmin(TranslationAdmin):
         "target",
         "active_from",
         "active_until",
+        "is_active",
     ]
     list_filter = [
         "level",
         "target",
     ]
+
+    @admin.display(boolean=True)
+    def is_active(self, obj) -> bool:
+        return obj.is_active

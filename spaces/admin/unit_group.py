@@ -9,21 +9,24 @@ from spaces.models import UnitGroup
 
 @admin.register(UnitGroup)
 class UnitGroupAdmin(TranslationAdmin):
-    fields = [
-        "name",
-        "units",
-    ]
     list_display = [
         "name",
         "number_of_units",
     ]
-    filter_horizontal = [
-        "units",
-    ]
+    ordering = ["name"]
+
     search_fields = [
         "name",
     ]
     search_help_text = _("Search by name")
+
+    fields = [
+        "name",
+        "units",
+    ]
+    filter_horizontal = [
+        "units",
+    ]
 
     def get_queryset(self, request: WSGIRequest) -> models.QuerySet:
         return (

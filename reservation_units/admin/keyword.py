@@ -6,14 +6,22 @@ from reservation_units.models import Keyword, KeywordCategory, KeywordGroup
 
 @admin.register(KeywordCategory)
 class KeywordCategoryAdmin(TranslationAdmin):
-    pass
+    list_display = [
+        "name",
+    ]
 
 
 @admin.register(KeywordGroup)
 class KeywordGroupAdmin(TranslationAdmin):
-    pass
+    list_display = [
+        "name",
+        "keyword_category",
+    ]
 
 
 @admin.register(Keyword)
 class KeywordAdmin(TranslationAdmin):
-    pass
+    list_display = [
+        "name",
+        "keyword_group",
+    ]

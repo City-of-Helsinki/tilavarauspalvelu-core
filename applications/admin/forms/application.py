@@ -46,6 +46,7 @@ class ApplicationAdminForm(forms.ModelForm):
     class Meta:
         model = Application
         fields = [
+            "id",
             "applicant_type",
             "status",
             "application_round",

@@ -11,34 +11,18 @@ __all__ = [
 
 
 class ReservationUnitAdminForm(forms.ModelForm):
-    pricing_terms = forms.ModelChoiceField(
-        queryset=TermsOfUse.objects.filter(terms_type=TermsOfUse.TERMS_TYPE_PRICING),
-        required=False,
-        label=_("Pricing terms"),
-        help_text=_("Pricing terms for the reservation unit."),
-    )
-    payment_terms = forms.ModelChoiceField(
-        queryset=TermsOfUse.objects.filter(terms_type=TermsOfUse.TERMS_TYPE_PAYMENT),
-        required=False,
-        label=_("Payment terms"),
-        help_text=_("Payment terms for the reservation unit."),
-    )
-    cancellation_terms = forms.ModelChoiceField(
-        queryset=TermsOfUse.objects.filter(terms_type=TermsOfUse.TERMS_TYPE_CANCELLATION),
-        required=False,
-        label=_("Cancellation terms"),
-        help_text=_("Cancellation terms for the reservation unit."),
-    )
-    service_specific_terms = forms.ModelChoiceField(
-        queryset=TermsOfUse.objects.filter(terms_type=TermsOfUse.TERMS_TYPE_SERVICE),
-        required=False,
-        label=_("Service specific terms"),
-        help_text=_("Service specific terms for the reservation unit."),
-    )
+    def __init__(self, *args, **kwargs) -> None:
+        qs = TermsOfUse.objects.all()
+        self.base_fields["pricing_terms"].queryset = qs.filter(terms_type=TermsOfUse.TERMS_TYPE_PRICING)
+        self.base_fields["payment_terms"].queryset = qs.filter(terms_type=TermsOfUse.TERMS_TYPE_PAYMENT)
+        self.base_fields["cancellation_terms"].queryset = qs.filter(terms_type=TermsOfUse.TERMS_TYPE_CANCELLATION)
+        self.base_fields["service_specific_terms"].queryset = qs.filter(terms_type=TermsOfUse.TERMS_TYPE_SERVICE)
+        super().__init__(*args, **kwargs)
 
     class Meta:
         model = ReservationUnit
         fields = [
+            "id",
             "sku",
             "name",
             "description",
@@ -192,10 +176,10 @@ class ReservationUnitAdminForm(forms.ModelForm):
             "terms_of_use_fi": _("Terms of use (Finnish)"),
             "terms_of_use_en": _("Terms of use (English)"),
             "terms_of_use_sv": _("Terms of use (Swedish)"),
-            "payment_terms": _("Payment terms"),
-            "cancellation_terms": _("Cancellation terms"),
-            "service_specific_terms": _("Service specific terms"),
-            "pricing_terms": _("Pricing terms"),
+            "payment_terms": _("Payment terms for the reservation unit."),
+            "cancellation_terms": _("Cancellation terms for the reservation unit."),
+            "service_specific_terms": _("Service specific terms for the reservation unit."),
+            "pricing_terms": _("Pricing terms for the reservation unit."),
             "reservation_pending_instructions": _("Additional instructions for pending reservation"),
             "reservation_pending_instructions_fi": _("Additional instructions for pending reservation (Finnish)"),
             "reservation_pending_instructions_en": _("Additional instructions for pending reservation (English)"),

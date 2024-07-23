@@ -25,14 +25,23 @@ class GeneralRolePermissionInline(admin.TabularInline):
 
 @admin.register(GeneralRoleChoice)
 class GeneralRoleChoiceAdmin(TranslationAdmin):
+    list_display = [
+        "verbose_name",
+        "code",
+    ]
     inlines = [GeneralRolePermissionInline]
 
 
 @admin.register(GeneralRole)
 class GeneralRoleAdmin(admin.ModelAdmin):
+    list_display = [
+        "user",
+        "role",
+    ]
     list_filter = [
         "role",
     ]
+
     search_fields = [
         "user__username",
         "user__email",
@@ -41,7 +50,21 @@ class GeneralRoleAdmin(admin.ModelAdmin):
     ]
     search_help_text = _("Search by username, email, first name or last name")
 
-    autocomplete_fields = ["user"]
+    fields = [
+        "user",
+        "role",
+        "assigner",
+        "created",
+        "modified",
+    ]
+    readonly_fields = [
+        "created",
+        "modified",
+    ]
+    autocomplete_fields = [
+        "user",
+        "assigner",
+    ]
 
     def get_queryset(self, request: WSGIRequest) -> models.QuerySet:
         return super().get_queryset(request).select_related("user", "role")

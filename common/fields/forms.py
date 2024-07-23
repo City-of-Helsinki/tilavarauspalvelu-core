@@ -2,11 +2,7 @@ from typing import Any
 
 import graphene
 from django import forms
-from django.contrib import admin
-from django.contrib.admin.widgets import AutocompleteSelectMultiple, FilteredSelectMultiple
 from django.db import models
-from django.db.models import ManyToManyField
-from django.forms import ModelMultipleChoiceField
 from graphene_django.converter import convert_django_field
 from graphene_django.forms.converter import convert_form_field, get_form_field_description
 from graphene_django.registry import Registry
@@ -24,30 +20,6 @@ __all__ = [
 
 
 disabled_widget = forms.TextInput(attrs={"class": "readonly", "disabled": True, "required": False})
-
-
-class ModelMultipleChoiceFilteredField(ModelMultipleChoiceField):
-    def __init__(self, queryset: models.QuerySet, *, is_stacked: bool = False, **kwargs: Any) -> None:
-        """
-        Model multiple choice field with filtered select widget.
-
-        :param queryset: The queryset to use for the filtered select widget.
-        :param is_stacked: Whether to use a stacked or horizontal filtered select widget.
-        """
-        kwargs["widget"] = FilteredSelectMultiple(queryset.model._meta.verbose_name_plural, is_stacked=is_stacked)
-        super().__init__(queryset, **kwargs)
-
-
-class ModelMultipleChoiceAutocompleteField(ModelMultipleChoiceField):
-    def __init__(self, queryset: models.QuerySet, *, field: ManyToManyField, **kwargs: Any) -> None:
-        """
-        Model multiple choice field with autocomplete widget.
-
-        :param queryset: The queryset to use for the autocomplete widget.
-        :param field: The field to use for the autocomplete widget. e.g. `UnitGroup.units.field`.
-        """
-        kwargs["widget"] = AutocompleteSelectMultiple(field, admin_site=admin.site)
-        super().__init__(queryset, **kwargs)
 
 
 class IntChoiceMixin:

@@ -6,4 +6,12 @@ from services.models import Service
 
 @admin.register(Service)
 class ServiceAdmin(TranslationAdmin):
-    pass
+    list_display = [
+        "name",
+        "service_type",
+        "buffer_time_before",
+        "buffer_time_after",
+    ]
+    list_filter = [
+        "service_type",
+    ]
