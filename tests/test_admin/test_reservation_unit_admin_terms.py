@@ -2,7 +2,7 @@ import pytest
 from django.contrib.admin import AdminSite
 from django.test import RequestFactory
 
-from reservation_units.admin.reservation_unit import ReservationUnitAdmin
+from reservation_units.admin.reservation_unit.admin import ReservationUnitAdmin
 from reservation_units.enums import ReservationKind, ReservationStartInterval
 from reservation_units.models import ReservationUnit
 from terms_of_use.models import TermsOfUse

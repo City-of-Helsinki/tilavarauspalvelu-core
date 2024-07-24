@@ -12,9 +12,22 @@ from spaces.importers.tprek_unit_importer import TprekUnitImporter
 from spaces.models import Unit
 from utils.sentry import SentryLogger
 
+__all__ = [
+    "UnitAdmin",
+]
+
 
 @admin.register(Unit)
 class UnitAdmin(SortableAdminMixin, ExtraButtonsMixin, TranslationAdmin):
+    # Functions
+    actions = ["update_from_tprek"]
+    search_fields = [
+        "name",
+        "tprek_id",
+    ]
+    search_help_text = _("Search by name or TPREK ID")
+
+    # List
     list_display = [
         "__str__",
         "payment_merchant",
@@ -27,21 +40,9 @@ class UnitAdmin(SortableAdminMixin, ExtraButtonsMixin, TranslationAdmin):
     ]
     ordering = ["rank"]
 
-    actions = [
-        "update_from_tprek",
-    ]
-    search_fields = [
-        "name",
-        "tprek_id",
-    ]
-    search_help_text = _("Search by name or TPREK ID")
-
-    inlines = [
-        LocationInline,
-    ]
-    readonly_fields = [
-        "tprek_last_modified",
-    ]
+    # Form
+    inlines = [LocationInline]
+    readonly_fields = ["tprek_last_modified"]
 
     @admin.action
     def update_from_tprek(self, request: WSGIRequest, queryset: QuerySet[Unit]) -> None:

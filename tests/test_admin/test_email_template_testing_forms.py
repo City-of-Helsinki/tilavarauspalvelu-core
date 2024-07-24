@@ -1,6 +1,9 @@
 import pytest
 
-from email_notification.admin.email_tester import EmailTemplateTesterForm, EmailTemplateTesterReservationUnitSelectForm
+from email_notification.admin.email_template_tester import (
+    EmailTemplateTesterForm,
+    EmailTemplateTesterReservationUnitSelectForm,
+)
 from email_notification.models import EmailType
 from tests.factories import EmailTemplateFactory, ReservationUnitFactory
 

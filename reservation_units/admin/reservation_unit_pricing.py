@@ -3,9 +3,14 @@ from django.contrib import admin
 from reservation_units.models import ReservationUnitPricing
 from utils.decimal_utils import round_decimal
 
+__all__ = [
+    "ReservationUnitPricingAdmin",
+]
+
 
 @admin.register(ReservationUnitPricing)
 class ReservationUnitPricingAdmin(admin.ModelAdmin):
+    # List
     list_display = [
         "reservation_unit",
         "begins",
@@ -16,6 +21,7 @@ class ReservationUnitPricingAdmin(admin.ModelAdmin):
         "status",
     ]
 
+    # Form
     fields = [
         "reservation_unit",
         "begins",

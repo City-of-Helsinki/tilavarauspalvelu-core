@@ -32,19 +32,22 @@ class SpaceInline(admin.StackedInline):
 
 @admin.register(Space)
 class SpaceAdmin(TranslationAdmin, MPTTModelAdmin):
-    list_display = [
-        "name",
-        "unit",
-        "parent",
-    ]
-
+    # Functions
     search_fields = [
         "name",
         "unit__name",
     ]
     search_help_text = _("Search by name or unit name")
+
+    # List
+    list_display = [
+        "name",
+        "unit",
+        "parent",
+    ]
     ordering = ["name"]
 
+    # Form
     fields = [
         "name",
         "surface_area",

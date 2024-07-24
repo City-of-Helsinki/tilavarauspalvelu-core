@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
     from applications.models import Application
-    from email_notification.admin.email_tester import EmailTemplateTesterForm
+    from email_notification.admin.email_template_tester import EmailTemplateTesterForm
     from email_notification.helpers.email_builder_base import BaseEmailBuilder
     from reservations.models import Reservation
     from tilavarauspalvelu.utils.commons import LanguageType

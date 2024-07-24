@@ -1,7 +1,7 @@
 import pytest
 from django.test import RequestFactory
 
-from email_notification.admin.email_tester import _get_email_template_tester_form_initial_values
+from email_notification.admin.email_template_tester import _get_email_template_tester_form_initial_values
 from tests.factories import LocationFactory, ReservationUnitFactory, UnitFactory, UserFactory
 
 pytestmark = [

@@ -1,4 +1,4 @@
-from email_notification.admin.admin import EmailTemplateAdmin
+from .email_template import EmailTemplateAdmin
 
 __all__ = [
     "EmailTemplateAdmin",

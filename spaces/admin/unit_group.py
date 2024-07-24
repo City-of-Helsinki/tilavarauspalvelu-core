@@ -6,27 +6,30 @@ from modeltranslation.admin import TranslationAdmin
 
 from spaces.models import UnitGroup
 
+__all__ = [
+    "UnitGroupAdmin",
+]
+
 
 @admin.register(UnitGroup)
 class UnitGroupAdmin(TranslationAdmin):
+    # Functions
+    search_fields = ["name"]
+    search_help_text = _("Search by name")
+
+    # List
     list_display = [
         "name",
         "number_of_units",
     ]
     ordering = ["name"]
 
-    search_fields = [
-        "name",
-    ]
-    search_help_text = _("Search by name")
-
+    # Form
     fields = [
         "name",
         "units",
     ]
-    filter_horizontal = [
-        "units",
-    ]
+    filter_horizontal = ["units"]
 
     def get_queryset(self, request: WSGIRequest) -> models.QuerySet:
         return (

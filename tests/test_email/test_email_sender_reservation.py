@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 import pytest
 from django.test import override_settings
 
-from email_notification.admin.email_tester import EmailTemplateTesterForm
+from email_notification.admin.email_template_tester import EmailTemplateTesterForm
 from email_notification.helpers.email_sender import EmailNotificationSender
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from email_notification.models import EmailTemplate, EmailType

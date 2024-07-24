@@ -2,38 +2,28 @@ from django.contrib import admin
 from django.core.handlers.wsgi import WSGIRequest
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from modeltranslation.admin import TranslationAdmin
 
-from permissions.models import UnitRole, UnitRoleChoice, UnitRolePermission
+from permissions.models import UnitRole
 
 __all__ = [
     "UnitRoleAdmin",
-    "UnitRoleChoiceAdmin",
 ]
-
-
-class UnitRolePermissionInline(admin.TabularInline):
-    model = UnitRolePermission
-    extra = 0
-
-    def get_queryset(self, request: WSGIRequest) -> models.QuerySet:
-        return super().get_queryset(request).select_related("role")
-
-    def has_change_permission(self, request: WSGIRequest, obj: UnitRolePermission | None = None) -> bool:
-        return False
-
-
-@admin.register(UnitRoleChoice)
-class UnitRoleChoiceAdmin(TranslationAdmin):
-    list_display = [
-        "verbose_name",
-        "code",
-    ]
-    inlines = [UnitRolePermissionInline]
 
 
 @admin.register(UnitRole)
 class UnitRoleAdmin(admin.ModelAdmin):
+    # Functions
+    search_fields = [
+        "user__username",
+        "user__email",
+        "user__first_name",
+        "user__last_name",
+        "unit__name",
+        "unit_group__name",
+    ]
+    search_help_text = _("Search by user's username, email, first name, last name, unit or unit group")
+
+    # List
     list_display = [
         "role_verbose_name",
         "user_email",
@@ -46,16 +36,7 @@ class UnitRoleAdmin(admin.ModelAdmin):
         "unit_group",
     ]
 
-    search_fields = [
-        "user__username",
-        "user__email",
-        "user__first_name",
-        "user__last_name",
-        "unit__name",
-        "unit_group__name",
-    ]
-    search_help_text = _("Search by user's username, email, first name, last name, unit or unit group")
-
+    # Form
     fieldsets = [
         [
             _("Basic information"),
@@ -79,9 +60,15 @@ class UnitRoleAdmin(admin.ModelAdmin):
             },
         ],
     ]
-    readonly_fields = ["created", "modified"]
+    readonly_fields = [
+        "created",
+        "modified",
+    ]
     autocomplete_fields = ["user"]
-    filter_horizontal = ["unit", "unit_group"]
+    filter_horizontal = [
+        "unit",
+        "unit_group",
+    ]
 
     def get_queryset(self, request: WSGIRequest) -> models.QuerySet:
         return super().get_queryset(request).select_related("user", "role").prefetch_related("unit", "unit_group")

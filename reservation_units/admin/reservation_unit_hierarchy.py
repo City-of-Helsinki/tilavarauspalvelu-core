@@ -5,11 +5,21 @@ from django.core.handlers.wsgi import WSGIRequest
 
 from reservation_units.models import ReservationUnitHierarchy
 
+__all__ = [
+    "ReservationUnitHierarchyAdmin",
+]
+
 
 @admin.register(ReservationUnitHierarchy)
 class ReservationUnitHierarchyAdmin(ExtraButtonsMixin, admin.ModelAdmin):
-    readonly_fields = ["reservation_unit", "related_reservation_unit_ids"]
+    # List
     ordering = ["reservation_unit"]
+
+    # Form
+    readonly_fields = [
+        "reservation_unit",
+        "related_reservation_unit_ids",
+    ]
 
     @button(label="Refresh reservation unit hierarchy", change_list=True)
     def refresh_data(self, request: WSGIRequest) -> None:

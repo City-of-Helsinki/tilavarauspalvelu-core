@@ -4,6 +4,10 @@ from modeltranslation.admin import TranslationAdmin
 
 from reservation_units.models import Purpose
 
+__all__ = [
+    "PurposeAdmin",
+]
+
 
 @admin.register(Purpose)
 class PurposeAdmin(SortableAdminMixin, TranslationAdmin):

@@ -3,9 +3,14 @@ from modeltranslation.admin import TranslationAdmin
 
 from reservation_units.models import ReservationUnitCancellationRule
 
+__all__ = [
+    "ReservationUnitCancellationRuleAdmin",
+]
+
 
 @admin.register(ReservationUnitCancellationRule)
 class ReservationUnitCancellationRuleAdmin(TranslationAdmin):
+    # List
     list_display = [
         "name",
         "can_be_cancelled_time_before",

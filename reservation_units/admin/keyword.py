@@ -1,26 +1,16 @@
 from django.contrib import admin
 from modeltranslation.admin import TranslationAdmin
 
-from reservation_units.models import Keyword, KeywordCategory, KeywordGroup
+from reservation_units.models import Keyword
 
-
-@admin.register(KeywordCategory)
-class KeywordCategoryAdmin(TranslationAdmin):
-    list_display = [
-        "name",
-    ]
-
-
-@admin.register(KeywordGroup)
-class KeywordGroupAdmin(TranslationAdmin):
-    list_display = [
-        "name",
-        "keyword_category",
-    ]
+__all__ = [
+    "KeywordAdmin",
+]
 
 
 @admin.register(Keyword)
 class KeywordAdmin(TranslationAdmin):
+    # List
     list_display = [
         "name",
         "keyword_group",

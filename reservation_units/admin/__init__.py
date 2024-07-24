@@ -1,5 +1,8 @@
-from .equipment import EquipmentAdmin, EquipmentCategory
-from .keyword import KeywordAdmin, KeywordCategoryAdmin, KeywordGroupAdmin
+from .equipment import EquipmentAdmin
+from .equipment_category import EquipmentCategoryAdmin
+from .keyword import KeywordAdmin
+from .keyword_category import KeywordCategoryAdmin
+from .keyword_group import KeywordGroupAdmin
 from .purpose import PurposeAdmin
 from .reservation_unit import ReservationUnitAdmin
 from .reservation_unit_cancellation_rule import ReservationUnitCancellationRuleAdmin
@@ -11,7 +14,7 @@ from .tax_percentage import TaxPercentageAdmin
 
 __all__ = [
     "EquipmentAdmin",
-    "EquipmentCategory",
+    "EquipmentCategoryAdmin",
     "KeywordAdmin",
     "KeywordCategoryAdmin",
     "KeywordGroupAdmin",

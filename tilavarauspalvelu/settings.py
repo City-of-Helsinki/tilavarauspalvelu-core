@@ -3,7 +3,7 @@ import os
 import zoneinfo
 from pathlib import Path
 
-from django.utils.translation import gettext_lazy
+from django.utils.translation import gettext_lazy as _
 from env_config import Environment, values
 from helusers.defaults import SOCIAL_AUTH_PIPELINE
 
@@ -264,9 +264,9 @@ class Common(Environment):
 
     LANGUAGE_CODE = "fi"
     LANGUAGES = [
-        ("fi", gettext_lazy("Finnish")),
-        ("en", gettext_lazy("English")),
-        ("sv", gettext_lazy("Swedish")),
+        ("fi", _("Finnish")),
+        ("en", _("English")),
+        ("sv", _("Swedish")),
     ]
     LOCALE_PATHS = [
         BASE_DIR / "locale",

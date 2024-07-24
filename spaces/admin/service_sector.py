@@ -5,20 +5,25 @@ from modeltranslation.admin import TranslationAdmin
 
 from spaces.models import ServiceSector
 
+__all__ = [
+    "ServiceSectorAdmin",
+]
+
 
 @admin.register(ServiceSector)
 class ServiceSectorAdmin(TranslationAdmin):
-    fields = [
-        "name",
-        "units",
-    ]
+    # List
     list_display = [
         "name",
         "number_of_units",
     ]
-    filter_horizontal = [
+
+    # Form
+    fields = [
+        "name",
         "units",
     ]
+    filter_horizontal = ["units"]
 
     def get_queryset(self, request: WSGIRequest) -> models.QuerySet:
         return (

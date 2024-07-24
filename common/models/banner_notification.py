@@ -2,7 +2,7 @@ from datetime import datetime
 
 from django.db import models
 from django.utils import timezone
-from django.utils.translation import gettext_lazy
+from django.utils.translation import gettext_lazy as _
 
 from common.choices import BannerNotificationLevel, BannerNotificationState, BannerNotificationTarget
 from common.fields.model import StrChoiceField
@@ -52,9 +52,7 @@ class BannerNotification(models.Model):
                         & ~models.Q(message="")
                     )
                 ),
-                violation_error_message=gettext_lazy(
-                    "Non-draft notifications must have an active period and message set."
-                ),
+                violation_error_message=_("Non-draft notifications must have an active period and message set."),
             ),
             models.CheckConstraint(
                 name="active_period_not_set_or_active_until_after_active_from",
@@ -66,7 +64,7 @@ class BannerNotification(models.Model):
                         & models.Q(active_until__gt=models.F("active_from"))
                     )
                 ),
-                violation_error_message=gettext_lazy(
+                violation_error_message=_(
                     "Both 'active_from' and 'active_until' must be either empty or set. "
                     "If both are set, 'active_until' must be after 'active_from'."
                 ),
