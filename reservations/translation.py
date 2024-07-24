@@ -1,25 +1,23 @@
-from modeltranslation.translator import TranslationOptions, translator
+from modeltranslation.translator import TranslationOptions, register
 
 from reservations.models import AbilityGroup, ReservationCancelReason, ReservationDenyReason, ReservationPurpose
 
 
+@register(AbilityGroup)
 class AbilityGroupTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
+@register(ReservationPurpose)
 class ReservationPurposeTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
+@register(ReservationCancelReason)
 class ReservationCancelReasonTranslationOptions(TranslationOptions):
     fields = ["reason"]
 
 
+@register(ReservationDenyReason)
 class ReservationDenyReasonTranslationOptions(TranslationOptions):
     fields = ["reason"]
-
-
-translator.register(AbilityGroup, AbilityGroupTranslationOptions)
-translator.register(ReservationPurpose, ReservationPurposeTranslationOptions)
-translator.register(ReservationCancelReason, ReservationCancelReasonTranslationOptions)
-translator.register(ReservationDenyReason, ReservationDenyReasonTranslationOptions)

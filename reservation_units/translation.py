@@ -1,4 +1,4 @@
-from modeltranslation.translator import TranslationOptions, translator
+from modeltranslation.translator import TranslationOptions, register
 
 from reservation_units.models import (
     Equipment,
@@ -14,6 +14,7 @@ from reservation_units.models import (
 )
 
 
+@register(ReservationUnit)
 class ReservationUnitTranslationOptions(TranslationOptions):
     fields = [
         "name",
@@ -25,53 +26,46 @@ class ReservationUnitTranslationOptions(TranslationOptions):
     ]
 
 
+@register(ReservationUnitType)
 class ReservationUnitTypeTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
+@register(KeywordCategory)
 class KeywordCategoryTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
+@register(KeywordGroup)
 class KeywordGroupTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
+@register(Keyword)
 class KeywordTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
+@register(Purpose)
 class PurposeTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
+@register(Qualifier)
 class QualifierTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
-class PeriodTranslationOptions(TranslationOptions):
-    fields = ["name", "description"]
-
-
+@register(Equipment)
 class EquipmentTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
+@register(EquipmentCategory)
 class EquipmentCategoryTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 
+@register(ReservationUnitCancellationRule)
 class ReservationUnitCancellationRuleTranslationOptions(TranslationOptions):
     fields = ["name"]
-
-
-translator.register(ReservationUnit, ReservationUnitTranslationOptions)
-translator.register(ReservationUnitType, ReservationUnitTypeTranslationOptions)
-translator.register(KeywordCategory, KeywordCategoryTranslationOptions)
-translator.register(KeywordGroup, KeywordGroupTranslationOptions)
-translator.register(Keyword, KeywordTranslationOptions)
-translator.register(Purpose, PurposeTranslationOptions)
-translator.register(Qualifier, QualifierTranslationOptions)
-translator.register(Equipment, EquipmentTranslationOptions)
-translator.register(EquipmentCategory, EquipmentCategoryTranslationOptions)
-translator.register(ReservationUnitCancellationRule, ReservationUnitCancellationRuleTranslationOptions)
