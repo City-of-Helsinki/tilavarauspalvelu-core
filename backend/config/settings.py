@@ -49,7 +49,8 @@ class Common(Environment):
         # Load order important
         "modeltranslation",
         "helusers.apps.HelusersConfig",
-        "helusers.apps.HelusersAdminConfig",
+        # "helusers.apps.HelusersAdminConfig",
+        "tvp_admin.apps.TVPAdminConfig",
         # Django builtins
         "django.contrib.auth",
         "django.contrib.contenttypes",
