@@ -55,6 +55,7 @@ sentry-sdk = "2.11.0"
 social-auth-app-django = "5.4.2"
 whitenoise = "6.7.0"
 django-environment-config = {version = "0.1.3", extras = ["db"]}
+django-more-admin-filters = "^1.8"
 
 [tool.poetry.dependencies.uWSGI]
 version = "2.0.23"
@@ -64,6 +65,7 @@ version = "2.0.23"
 markers = "sys_platform != 'win32'"
 
 [tool.poetry.group.test.dependencies]
+django-debug-toolbar = "4.4.5"  # django-graphiql-debug-toolbar 0.2.0 breaks with django-debug-toolbar 4.4.6
 django-graphiql-debug-toolbar = "0.2.0"
 factory-boy = "3.3.0"
 faker = "26.0.0"

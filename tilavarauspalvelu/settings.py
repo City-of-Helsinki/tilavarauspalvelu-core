@@ -59,6 +59,7 @@ class Common(Environment):
         "django.contrib.staticfiles",
         #  Third party apps
         "admin_extra_buttons",
+        "more_admin_filters",
         "adminsortable2",
         "auditlog",
         "corsheaders",
