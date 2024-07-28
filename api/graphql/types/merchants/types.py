@@ -41,6 +41,7 @@ class PaymentOrderNode(DjangoNode):
     refund_uuid = graphene.UUID()
     reservation_pk = graphene.String()
     checkout_url = graphene.String()
+    receipt_url = graphene.String()
     expires_in_minutes = graphene.Int()
 
     status = graphene.Field(graphene.Enum.from_enum(OrderStatus))
@@ -76,7 +77,10 @@ class PaymentOrderNode(DjangoNode):
         if not expires_at or now >= expires_at:
             return None
 
-        return root.checkout_url
+        return root.checkout_url or None
+
+    def resolve_receipt_url(root: PaymentOrder, info: GQLInfo) -> str | None:
+        return root.receipt_url or None
 
     def resolve_expires_in_minutes(root: PaymentOrder, info: GQLInfo) -> int | None:
         expires_at = root.expires_at

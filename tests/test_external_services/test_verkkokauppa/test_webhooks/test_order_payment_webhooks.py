@@ -28,7 +28,7 @@ def test_order_payment_webhook__success(api_client, settings):
     payment_order = PaymentOrderFactory.create(
         remote_id=order_id,
         status=OrderStatus.DRAFT,
-        payment_id=None,
+        payment_id="",
         processed_at=None,
         reservation=reservation,
     )
@@ -50,7 +50,7 @@ def test_order_payment_webhook__success(api_client, settings):
 
     payment_order.refresh_from_db()
     assert payment_order.status == OrderStatus.PAID
-    assert payment_order.payment_id is not None
+    assert payment_order.payment_id
     assert payment_order.processed_at is not None
 
     reservation.refresh_from_db()
@@ -66,7 +66,7 @@ def test_order_payment_webhook__success__no_reservation(api_client, settings):
     payment_order = PaymentOrderFactory.create(
         remote_id=order_id,
         status=OrderStatus.DRAFT,
-        payment_id=None,
+        payment_id="",
         processed_at=None,
     )
 
@@ -87,7 +87,7 @@ def test_order_payment_webhook__success__no_reservation(api_client, settings):
 
     payment_order.refresh_from_db()
     assert payment_order.status == OrderStatus.PAID
-    assert payment_order.payment_id is not None
+    assert payment_order.payment_id
     assert payment_order.processed_at is not None
 
 

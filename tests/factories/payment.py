@@ -64,7 +64,7 @@ class PaymentOrderFactory(GenericDjangoModelFactory[PaymentOrder]):
 
     reservation = factory.SubFactory("tests.factories.ReservationFactory")
     remote_id = factory.LazyFunction(uuid.uuid4)
-    payment_id = None  # uuid
+    payment_id = ""  # uuid
     refund_id = None  # uuid
     payment_type = PaymentType.INVOICE
     status = OrderStatus.DRAFT

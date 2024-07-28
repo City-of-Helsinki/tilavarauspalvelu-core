@@ -25,49 +25,26 @@ class PaymentMerchant(models.Model):
     https://checkout-dev-api.test.hel.ninja/v1/merchant/docs/swagger-ui/#
     """
 
-    id = models.UUIDField(
-        verbose_name=_("Merchant ID"),
-        help_text=_("Value comes from the Merchant Experience API"),
-        primary_key=True,
-        blank=False,
-        null=False,
-    )
-    name = models.CharField(verbose_name=_("Merchant name"), blank=False, null=False, max_length=128)
+    id = models.UUIDField(primary_key=True)
+    name = models.CharField(blank=False, null=False, max_length=128)
 
     class Meta:
         db_table = "payment_merchant"
         base_manager_name = "objects"
-        ordering = [
-            "pk",
-        ]
+        ordering = ["pk"]
 
     def __str__(self) -> str:
         return self.name
 
 
 class PaymentProduct(models.Model):
-    id = models.UUIDField(
-        verbose_name=_("Product ID"),
-        help_text=_("Value comes from the Product Experience API"),
-        primary_key=True,
-        blank=False,
-        null=False,
-    )
-    merchant = models.ForeignKey(
-        PaymentMerchant,
-        verbose_name=_("Payment merchant"),
-        related_name="products",
-        on_delete=models.PROTECT,
-        null=True,
-        help_text="Merchant used for payments",
-    )
+    id = models.UUIDField(primary_key=True)
+    merchant = models.ForeignKey(PaymentMerchant, related_name="products", on_delete=models.PROTECT, null=True)
 
     class Meta:
         db_table = "payment_product"
         base_manager_name = "objects"
-        ordering = [
-            "pk",
-        ]
+        ordering = ["pk"]
 
     def __str__(self) -> str:
         return str(self.id)
@@ -76,101 +53,34 @@ class PaymentProduct(models.Model):
 class PaymentOrder(models.Model):
     reservation = models.ForeignKey(
         "reservations.Reservation",
-        verbose_name=_("Reservation"),
         related_name="payment_order",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        help_text="Reservation this order is based on",
     )
 
-    remote_id = models.UUIDField(
-        verbose_name=_("Remote order ID"),
-        help_text=_("eCommerce order ID"),
-        blank=True,
-        null=True,
-    )
-    payment_id = models.CharField(
-        verbose_name=_("Payment ID"),
-        help_text=_("eCommerce payment ID"),
-        blank=True,
-        null=True,
-        max_length=128,
-    )
-    refund_id = models.UUIDField(
-        verbose_name=_("Refund ID"),
-        help_text=_("Available only when order has been refunded"),
-        blank=True,
-        null=True,
-    )
-    payment_type = models.CharField(
-        verbose_name=_("Payment type"),
-        blank=False,
-        null=False,
-        max_length=128,
-        choices=PaymentType.choices,
-    )
-    status = models.CharField(
-        verbose_name=_("Payment status"),
-        blank=False,
-        null=False,
-        max_length=128,
-        choices=OrderStatus.choices,
-        db_index=True,
-    )
-    price_net = models.DecimalField(
-        verbose_name=_("Net amount"),
-        max_digits=10,
-        decimal_places=2,
-    )
+    remote_id = models.UUIDField(blank=True, null=True)
+    payment_id = models.CharField(blank=True, null=False, default="", max_length=128)
+    refund_id = models.UUIDField(blank=True, null=True)
+    payment_type = models.CharField(blank=False, null=False, max_length=128, choices=PaymentType.choices)
+    status = models.CharField(blank=False, null=False, max_length=128, choices=OrderStatus.choices, db_index=True)
 
-    price_vat = models.DecimalField(
-        verbose_name=_("VAT amount"),
-        max_digits=10,
-        decimal_places=2,
-    )
+    price_net = models.DecimalField(max_digits=10, decimal_places=2)
+    price_vat = models.DecimalField(max_digits=10, decimal_places=2)
+    price_total = models.DecimalField(max_digits=10, decimal_places=2)
 
-    price_total = models.DecimalField(
-        verbose_name=_("Total amount"),
-        max_digits=10,
-        decimal_places=2,
-    )
+    created_at = models.DateTimeField(null=False, auto_now_add=True)
+    processed_at = models.DateTimeField(null=True, blank=True)
 
-    created_at = models.DateTimeField(verbose_name=_("Created at"), null=False, auto_now_add=True)
-
-    processed_at = models.DateTimeField(verbose_name=_("Processed at"), null=True, blank=True)
-
-    language = models.CharField(
-        verbose_name=_("Language"),
-        blank=False,
-        null=False,
-        max_length=8,
-        choices=Language.choices,
-    )
-    reservation_user_uuid = models.UUIDField(
-        verbose_name=_("Reservation user UUID"),
-        blank=True,
-        null=True,
-    )
-    checkout_url = models.CharField(
-        verbose_name=_("Checkout URL"),
-        blank=True,
-        null=True,
-        max_length=512,
-    )
-    receipt_url = models.CharField(
-        verbose_name=_("Receipt URL"),
-        blank=True,
-        null=True,
-        max_length=512,
-    )
+    language = models.CharField(blank=False, null=False, max_length=8, choices=Language.choices)
+    reservation_user_uuid = models.UUIDField(blank=True, null=True)
+    checkout_url = models.CharField(blank=True, null=False, default="", max_length=512)
+    receipt_url = models.CharField(blank=True, null=False, default="", max_length=512)
 
     class Meta:
         db_table = "payment_order"
         base_manager_name = "objects"
-        ordering = [
-            "pk",
-        ]
+        ordering = ["pk"]
 
     def __str__(self) -> str:
         return f"PaymentOrder {self.pk}"
@@ -206,68 +116,26 @@ class PaymentOrder(models.Model):
 class PaymentAccounting(models.Model):
     """Custom validation comes from requirements in SAP"""
 
-    name = models.CharField(verbose_name=_("Accounting name"), blank=False, null=False, max_length=128)
-
-    company_code = models.CharField(
-        verbose_name=_("Company code"),
-        blank=False,
-        null=False,
-        max_length=4,
-        validators=[is_numeric],
-    )
-
-    main_ledger_account = models.CharField(
-        verbose_name=_("Main ledger account"),
-        blank=False,
-        null=False,
-        max_length=6,
-        validators=[is_numeric],
-    )
-
-    vat_code = models.CharField(verbose_name=_("VAT code"), blank=False, null=False, max_length=2)
-
-    internal_order = models.CharField(
-        verbose_name=_("Internal order"),
-        blank=True,
-        null=True,
-        max_length=10,
-        validators=[is_numeric],
-    )
-
-    profit_center = models.CharField(
-        verbose_name=_("Profit center"),
-        blank=True,
-        null=True,
-        max_length=7,
-        validators=[is_numeric],
-    )
-
+    name = models.CharField(blank=False, null=False, max_length=128)
+    company_code = models.CharField(blank=False, null=False, max_length=4, validators=[is_numeric])
+    main_ledger_account = models.CharField(blank=False, null=False, max_length=6, validators=[is_numeric])
+    vat_code = models.CharField(blank=False, null=False, max_length=2)
+    internal_order = models.CharField(blank=True, null=False, default="", max_length=10, validators=[is_numeric])
+    profit_center = models.CharField(blank=True, null=False, default="", max_length=7, validators=[is_numeric])
     project = models.CharField(
-        verbose_name=_("Project"),
         blank=True,
-        null=True,
+        null=False,
+        default="",
         max_length=16,
         validators=[validate_accounting_project, is_numeric],
     )
-
-    operation_area = models.CharField(
-        verbose_name=_("Operation area"),
-        blank=True,
-        null=True,
-        max_length=6,
-        validators=[is_numeric],
-    )
-
-    balance_profit_center = models.CharField(
-        verbose_name=_("Balance profit center"), blank=False, null=False, max_length=10
-    )
+    operation_area = models.CharField(blank=True, null=False, default="", max_length=6, validators=[is_numeric])
+    balance_profit_center = models.CharField(blank=False, null=False, max_length=10)
 
     class Meta:
         db_table = "payment_accounting"
         base_manager_name = "objects"
-        ordering = [
-            "pk",
-        ]
+        ordering = ["pk"]
 
     def __str__(self) -> str:
         return self.name
@@ -278,10 +146,10 @@ class PaymentAccounting(models.Model):
 
         super().save(*args, **kwargs)
         if settings.UPDATE_ACCOUNTING:
-            runits_from_units = ReservationUnit.objects.filter(unit__in=self.units.all())
-            runits = runits_from_units.union(self.reservation_units.all())
-            for runit in runits:
-                refresh_reservation_unit_accounting.delay(runit.pk)
+            reservation_units_from_units = ReservationUnit.objects.filter(unit__in=self.units.all())
+            reservation_units = reservation_units_from_units.union(self.reservation_units.all())
+            for reservation_unit in reservation_units:
+                refresh_reservation_unit_accounting.delay(reservation_unit.pk)
 
     def clean(self) -> None:
         if not self.project and not self.profit_center and not self.internal_order:

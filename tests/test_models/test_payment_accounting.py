@@ -80,9 +80,9 @@ def test_one_of_the_fields_is_required(settings):
 
     payment_accounting = PaymentAccountingFactory.create(
         name="Invalid",
-        internal_order=None,
-        profit_center=None,
-        project=None,
+        internal_order="",
+        profit_center="",
+        project="",
     )
     with pytest.raises(ValidationError) as error:
         payment_accounting.full_clean()

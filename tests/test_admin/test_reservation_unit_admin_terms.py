@@ -16,7 +16,7 @@ pytestmark = [
 
 def get_valid_data():
     return {
-        "name": "test",
+        "name_fi": "test",
         "description": "testing besthing",
         "reservation_start_interval": ReservationStartInterval.INTERVAL_15_MINUTES.value,
         "authentication": "weak",

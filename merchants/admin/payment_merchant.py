@@ -15,7 +15,7 @@ __all__ = [
 class PaymentMerchantForm(forms.ModelForm):
     # paytrail_merchant_id is only used when creating a merchant, later we use the ID returned from the Merchant API
     paytrail_merchant_id = forms.CharField(
-        label=_("Paytrail merchant ID"),
+        label="Paytrail merchant ID",  # Label is intentionally left untranslated (TILA-3425)
         max_length=16,
         required=True,
         help_text=_("The Paytrail Merchant ID should be a six-digit number."),
@@ -23,11 +23,7 @@ class PaymentMerchantForm(forms.ModelForm):
 
     # These fields are saved to / loaded from Merchant API, so they are not part of the model
     shop_id = forms.CharField(label=_("Shop ID"), max_length=256, required=True)
-    business_id = forms.CharField(
-        label=_("Business ID"),
-        max_length=16,
-        required=True,
-    )
+    business_id = forms.CharField(label=_("Business ID"), max_length=16, required=True)
     street = forms.CharField(label=_("Street address"), max_length=128, required=True)
     zip = forms.CharField(label=_("ZIP code"), max_length=16, required=True)
     city = forms.CharField(label=_("City"), max_length=128, required=True)
@@ -35,6 +31,30 @@ class PaymentMerchantForm(forms.ModelForm):
     phone = forms.CharField(label=_("Phone number"), max_length=32, required=True)
     url = forms.CharField(label=_("URL"), max_length=256, required=True)
     tos_url = forms.CharField(label=_("Terms of service URL"), max_length=256, required=True)
+
+    class Meta:
+        model = PaymentMerchant
+        fields = [
+            "id",
+            "name",
+            "paytrail_merchant_id",
+            "shop_id",
+            "business_id",
+            "street",
+            "zip",
+            "city",
+            "email",
+            "phone",
+            "url",
+            "tos_url",
+        ]
+        labels = {
+            "id": _("Merchant ID"),
+            "name": _("Merchant name"),
+        }
+        help_texts = {
+            "id": _("Value comes from the Merchant Experience API"),
+        }
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)

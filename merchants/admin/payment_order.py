@@ -28,6 +28,28 @@ class PaymentOrderForm(forms.ModelForm):
             "checkout_url",
             "receipt_url",
         ]
+        labels = {
+            "reservation": _("Reservation"),
+            "remote_id": _("Remote order ID"),
+            "payment_id": _("Payment ID"),
+            "refund_id": _("Refund ID"),
+            "payment_type": _("Payment type"),
+            "status": _("Payment status"),
+            "price_net": _("Net amount"),
+            "price_vat": _("VAT amount"),
+            "price_total": _("Total amount"),
+            "processed_at": _("Processed at"),
+            "language": _("Language"),
+            "reservation_user_uuid": _("Reservation user UUID"),
+            "checkout_url": _("Checkout URL"),
+            "receipt_url": _("Receipt URL"),
+        }
+        help_texts = {
+            "reservation": _("The reservation associated with this payment order"),
+            "remote_id": _("eCommerce order ID"),
+            "payment_id": _("eCommerce payment ID"),
+            "refund_id": _("Available only when order has been refunded"),
+        }
 
     def __init__(self, *args, **kwargs) -> None:
         """Add reservation and reservation unit to the reservation field help text."""
