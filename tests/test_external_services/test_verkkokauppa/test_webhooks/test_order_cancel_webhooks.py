@@ -6,7 +6,7 @@ import pytest
 from django.urls import reverse
 from django.utils.timezone import get_default_timezone
 
-from merchants.models import OrderStatus
+from merchants.enums import OrderStatus
 from merchants.verkkokauppa.order.exceptions import GetOrderError
 from merchants.verkkokauppa.order.types import Order
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient

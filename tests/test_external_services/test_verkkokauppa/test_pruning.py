@@ -5,7 +5,7 @@ from freezegun import freeze_time
 
 from common.date_utils import local_datetime
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
-from merchants.models import OrderStatus
+from merchants.enums import OrderStatus
 from merchants.pruning import update_expired_orders
 from merchants.verkkokauppa.order.exceptions import CancelOrderError
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError

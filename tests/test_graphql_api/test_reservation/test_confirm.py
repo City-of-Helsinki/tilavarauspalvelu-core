@@ -4,7 +4,8 @@ import pytest
 from graphene_django_extensions.testing import build_mutation
 
 from email_notification.models import EmailType
-from merchants.models import OrderStatus, PaymentOrder, PaymentType
+from merchants.enums import OrderStatus, PaymentType
+from merchants.models import PaymentOrder
 from merchants.verkkokauppa.order.exceptions import CreateOrderError
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservation_units.enums import PricingType

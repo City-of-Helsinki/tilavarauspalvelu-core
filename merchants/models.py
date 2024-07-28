@@ -8,6 +8,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from merchants.enums import Language, OrderStatus, PaymentType
 from merchants.validators import is_numeric, validate_accounting_project
 
 __all__ = [
@@ -70,35 +71,6 @@ class PaymentProduct(models.Model):
 
     def __str__(self) -> str:
         return str(self.id)
-
-
-class PaymentType(models.TextChoices):
-    ON_SITE = "ON_SITE", _("On site")
-    ONLINE = "ONLINE", _("Online")
-    INVOICE = "INVOICE", _("Invoice")
-
-
-class OrderStatus(models.TextChoices):
-    DRAFT = "DRAFT", _("Draft")  # Unpaid order
-    EXPIRED = "EXPIRED", _("Expired")
-    CANCELLED = "CANCELLED", _("Cancelled")
-    PAID = "PAID", _("Paid")
-    PAID_MANUALLY = "PAID_MANUALLY", _("Paid manually")
-    REFUNDED = "REFUNDED", _("Refunded")
-
-    @classmethod
-    def needs_update_statuses(cls) -> list[OrderStatus]:
-        return [
-            OrderStatus.DRAFT,
-            OrderStatus.EXPIRED,
-            OrderStatus.CANCELLED,
-        ]
-
-
-class Language(models.TextChoices):
-    FI = "fi", _("Finnish")
-    SV = "sv", _("Swedish")
-    EN = "en", _("English")
 
 
 class PaymentOrder(models.Model):

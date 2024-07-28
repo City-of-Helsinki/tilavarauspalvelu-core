@@ -5,7 +5,7 @@ import pytest
 from freezegun import freeze_time
 
 from common.date_utils import local_datetime
-from merchants.models import OrderStatus
+from merchants.enums import OrderStatus
 from reservations.choices import ReservationStateChoice
 from reservations.models import Reservation
 from reservations.pruning import prune_reservation_with_inactive_payments

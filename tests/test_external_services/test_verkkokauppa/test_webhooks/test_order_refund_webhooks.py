@@ -3,7 +3,7 @@ import uuid
 import pytest
 from django.urls import reverse
 
-from merchants.models import OrderStatus
+from merchants.enums import OrderStatus
 from merchants.verkkokauppa.payment.exceptions import GetRefundStatusError
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tests.factories import PaymentOrderFactory

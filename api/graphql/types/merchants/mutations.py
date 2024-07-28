@@ -9,7 +9,8 @@ from api.graphql.types.merchants.serializers import RefreshOrderInputSerializer,
 from common.date_utils import local_datetime
 from common.typing import GQLInfo
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
-from merchants.models import OrderStatus, PaymentOrder
+from merchants.enums import OrderStatus
+from merchants.models import PaymentOrder
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.choices import ReservationStateChoice

@@ -1,6 +1,6 @@
 import pytest
 
-from merchants.models import PaymentType
+from merchants.enums import PaymentType
 from reservation_units.enums import ReservationStartInterval
 from terms_of_use.models import TermsOfUse
 from tests.factories import ReservationUnitCancellationRuleFactory, ReservationUnitFactory, TermsOfUseFactory

@@ -7,7 +7,7 @@ from django.utils import timezone
 
 from applications.choices import ApplicationStatusChoice
 from applications.models import Address, Application, ApplicationEvent, ApplicationSection, Person
-from merchants.models import OrderStatus
+from merchants.enums import OrderStatus
 from permissions.models import GeneralRole, ServiceSectorRole, UnitRole
 from reservations.choices import ReservationStateChoice, ReservationTypeChoice
 from reservations.models import Reservation

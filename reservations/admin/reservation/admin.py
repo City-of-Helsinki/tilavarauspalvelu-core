@@ -10,7 +10,8 @@ from rangefilter.filters import DateRangeFilterBuilder
 
 from common.date_utils import local_datetime
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
-from merchants.models import OrderStatus, PaymentOrder
+from merchants.enums import OrderStatus
+from merchants.models import PaymentOrder
 from reservations.admin.reservation.filters import PaidReservationListFilter, RecurringReservationListFilter
 from reservations.admin.reservation.form import ReservationAdminForm
 from reservations.choices import ReservationStateChoice

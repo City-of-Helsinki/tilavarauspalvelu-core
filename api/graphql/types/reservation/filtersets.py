@@ -11,7 +11,7 @@ from graphene_django_extensions import ModelFilterSet
 
 from api.graphql.extensions.filters import TimezoneAwareDateFilter
 from common.db import raw_prefixed_query
-from merchants.models import OrderStatus
+from merchants.enums import OrderStatus
 from permissions.helpers import has_general_permission
 from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
 from reservation_units.models import ReservationUnit, ReservationUnitType

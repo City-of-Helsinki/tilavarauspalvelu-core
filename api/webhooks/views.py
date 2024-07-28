@@ -6,7 +6,8 @@ from rest_framework.response import Response
 
 from common.date_utils import local_datetime
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
-from merchants.models import OrderStatus, PaymentOrder
+from merchants.enums import OrderStatus
+from merchants.models import PaymentOrder
 from merchants.verkkokauppa.order.exceptions import GetOrderError
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError, GetRefundStatusError
 from merchants.verkkokauppa.payment.types import PaymentStatus, RefundStatus

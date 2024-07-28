@@ -5,7 +5,8 @@ from django.conf import settings
 
 from common.date_utils import local_datetime
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
-from merchants.models import OrderStatus, PaymentOrder
+from merchants.enums import OrderStatus
+from merchants.models import PaymentOrder
 from merchants.verkkokauppa.order.exceptions import CancelOrderError
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
 from merchants.verkkokauppa.payment.types import PaymentStatus as WebShopPaymentStatus

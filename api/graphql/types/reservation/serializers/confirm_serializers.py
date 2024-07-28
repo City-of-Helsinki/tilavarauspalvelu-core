@@ -6,7 +6,8 @@ from api.graphql.extensions.fields import OldChoiceCharField
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from api.graphql.types.reservation.serializers.update_serializers import ReservationUpdateSerializer
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
-from merchants.models import Language, OrderStatus, PaymentOrder
+from merchants.enums import Language, OrderStatus
+from merchants.models import PaymentOrder
 from merchants.verkkokauppa.helpers import create_mock_verkkokauppa_order, get_verkkokauppa_order_params
 from merchants.verkkokauppa.order.exceptions import CreateOrderError
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient

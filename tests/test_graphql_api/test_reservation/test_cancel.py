@@ -7,7 +7,7 @@ import pytest
 
 from common.date_utils import local_datetime
 from email_notification.models import EmailType
-from merchants.models import OrderStatus, PaymentType
+from merchants.enums import OrderStatus, PaymentType
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.choices import ReservationStateChoice
 from reservations.models import ReservationCancelReason

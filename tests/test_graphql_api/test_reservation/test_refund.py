@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from common.date_utils import local_datetime
-from merchants.models import OrderStatus
+from merchants.enums import OrderStatus
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.choices import ReservationStateChoice
 from tests.factories import ReservationFactory, UserFactory

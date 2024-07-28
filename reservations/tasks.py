@@ -2,7 +2,8 @@ import uuid
 
 from django.conf import settings
 
-from merchants.models import OrderStatus, PaymentOrder
+from merchants.enums import OrderStatus
+from merchants.models import PaymentOrder
 from merchants.pruning import update_expired_orders
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.models import Reservation

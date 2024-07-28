@@ -1,4 +1,4 @@
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import graphene
 from django.core.exceptions import ValidationError
@@ -6,7 +6,7 @@ from graphene_django_extensions import CreateMutation, DeleteMutation, UpdateMut
 
 from api.graphql.types.merchants.types import PaymentOrderNode
 from common.typing import AnyUser
-from merchants.models import OrderStatus, PaymentOrder
+from merchants.enums import OrderStatus
 from merchants.verkkokauppa.order.exceptions import CancelOrderError
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.choices import ReservationStateChoice
@@ -38,6 +38,9 @@ from .serializers import (
 from .serializers.refund_serializers import ReservationRefundSerializer
 from .serializers.staff_adjust_time_serializers import StaffReservationAdjustTimeSerializer
 from .serializers.staff_reservation_modify_serializers import StaffReservationModifySerializer
+
+if TYPE_CHECKING:
+    from merchants.models import PaymentOrder
 
 __all__ = [
     "ReservationCreateMutation",

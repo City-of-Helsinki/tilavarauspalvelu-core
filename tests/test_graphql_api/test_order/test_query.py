@@ -1,7 +1,7 @@
 import freezegun
 import pytest
 
-from merchants.models import OrderStatus
+from merchants.enums import OrderStatus
 from tests.helpers import UserType
 
 from .helpers import get_order, order_query

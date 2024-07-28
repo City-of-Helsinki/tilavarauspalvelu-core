@@ -3,7 +3,7 @@ import datetime
 import pytest
 from django.utils import timezone
 
-from merchants.models import OrderStatus
+from merchants.enums import OrderStatus
 from reservations.choices import CustomerTypeChoice
 from tests.factories import PaymentOrderFactory, ReservationFactory, ReservationUnitFactory
 from tests.helpers import UserType

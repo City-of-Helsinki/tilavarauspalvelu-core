@@ -3,7 +3,7 @@ import uuid
 import pytest
 
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
-from merchants.models import OrderStatus
+from merchants.enums import OrderStatus
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
 from merchants.verkkokauppa.payment.types import PaymentStatus
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient

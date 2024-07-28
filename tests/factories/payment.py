@@ -6,15 +6,8 @@ import factory
 from django.utils.timezone import get_default_timezone
 from factory import fuzzy
 
-from merchants.models import (
-    Language,
-    OrderStatus,
-    PaymentAccounting,
-    PaymentMerchant,
-    PaymentOrder,
-    PaymentProduct,
-    PaymentType,
-)
+from merchants.enums import Language, OrderStatus, PaymentType
+from merchants.models import PaymentAccounting, PaymentMerchant, PaymentOrder, PaymentProduct
 from merchants.verkkokauppa.payment.types import Payment
 
 from ._base import GenericDjangoModelFactory, GenericFactory

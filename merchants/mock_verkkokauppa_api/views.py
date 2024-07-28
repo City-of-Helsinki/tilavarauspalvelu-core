@@ -9,7 +9,8 @@ from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
 
 from common.date_utils import local_datetime
-from merchants.models import OrderStatus, PaymentOrder
+from merchants.enums import OrderStatus
+from merchants.models import PaymentOrder
 from reservations.choices import ReservationStateChoice
 
 if TYPE_CHECKING:

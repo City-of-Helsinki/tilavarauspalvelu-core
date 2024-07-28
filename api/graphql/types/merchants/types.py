@@ -4,7 +4,8 @@ from graphene_django_extensions import DjangoNode
 from api.graphql.types.merchants.permissions import PaymentOrderPermission
 from common.date_utils import local_datetime
 from common.typing import GQLInfo
-from merchants.models import OrderStatus, PaymentMerchant, PaymentOrder, PaymentProduct
+from merchants.enums import OrderStatus
+from merchants.models import PaymentMerchant, PaymentOrder, PaymentProduct
 
 __all__ = [
     "PaymentMerchantNode",

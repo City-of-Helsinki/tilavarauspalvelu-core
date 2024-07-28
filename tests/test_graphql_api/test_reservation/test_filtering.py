@@ -4,7 +4,7 @@ import pytest
 from django.utils import timezone
 from freezegun import freeze_time
 
-from merchants.models import OrderStatus
+from merchants.enums import OrderStatus
 from reservations.choices import ReservationStateChoice, ReservationTypeChoice
 from tests.factories import (
     PaymentOrderFactory,
