@@ -36,7 +36,7 @@
         {% translate "Number of reservations selected:" %} <b>{{ queryset.count }}</b><br>
         {% translate "Number of paid reservations selected:" %} <b>{{ queryset_paid_reservation_count }}</b><br>
 
-        <label for="deny_reason">{% translate "Reason for denying reservations" %}:</label>
+        <label for="deny_reason">{% translate "Reason for denying the reservations" %}:</label>
         <select id="deny_reason" name="deny_reason" style="margin-top: 2em; margin-bottom: 2em;">
             {% for deny_reason in deny_reasons %}
             <option value="{{ deny_reason.pk }}">{{ deny_reason }}</option>

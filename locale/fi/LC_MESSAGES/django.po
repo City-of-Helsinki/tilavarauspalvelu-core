@@ -1451,7 +1451,7 @@ msgstr "Kuitin URL"
 
 #: merchants/admin/payment_order.py
 msgid "The reservation associated with this payment order"
-msgstr ""
+msgstr "Varaus, joka liittyy tähän maksutilaan"
 
 #: merchants/admin/payment_order.py
 msgid "eCommerce order ID"
@@ -1999,7 +1999,7 @@ msgstr "Peruutusehdot"
 
 #: reservation_units/admin/reservation_unit/form.py
 msgid "Service specific terms"
-msgstr "Palvelualuekohtaiset ehdot"
+msgstr "Palvelukohtaiset ehdot"
 
 #: reservation_units/admin/reservation_unit/form.py terms_of_use/models.py
 msgid "Pricing terms"
@@ -2134,7 +2134,7 @@ msgstr "Julkaisu päättyy"
 #: reservation_units/admin/reservation_unit/form.py
 #: reservations/models/reservation_metadata.py
 msgid "Reservation metadata set"
-msgstr "Varausmetadatasetti"
+msgstr "Varauslomake"
 
 #: reservation_units/admin/reservation_unit/form.py
 msgid "Max reservations per user"
@@ -2331,8 +2331,8 @@ msgid ""
 "Reservation metadata set that defines the set of supported and required form "
 "fields for this reservation unit."
 msgstr ""
-"Varausmetadatasetti, joka määrittelee tuetut ja vaaditut lomakkeen kentät "
-"tälle varausyksikölle."
+"Varauslomake, joka määrittelee tuetut ja vaaditut lomakkeen kentät tälle "
+"varausyksikölle."
 
 #: reservation_units/admin/reservation_unit/form.py
 msgid "Maximum number of active reservations per user"
@@ -3011,63 +3011,51 @@ msgstr "Vaaditut kentät"
 
 #: reservations/models/reservation_metadata.py
 msgid "Reservation metadata sets"
-msgstr "Varauslomakkeen kenttäkokonaisuus"
+msgstr "Varauslomakkeet"
 
 #: reservations/models/reservation_statistic.py
 msgid "Statistics updated at"
-msgstr ""
+msgstr "Statistiikat päivitetty viimeksi"
 
 #: reservations/models/reservation_statistic.py
-#, fuzzy
-#| msgid "Home city"
 msgid "Home city name"
-msgstr "Kotikunta"
+msgstr "Kotikunnan nimi"
 
 #: reservations/models/reservation_statistic.py
 msgid "Home city municipality code"
-msgstr ""
+msgstr "Kotikunnan koodi"
 
 #: reservations/models/reservation_statistic.py
-#, fuzzy
-#| msgid "Service sector for the application round."
 msgid "Is the reservation done through application process."
-msgstr "Kausivarauskierroksen palvelualue."
+msgstr "Onko varaus tehty kausvaraus hakuprosessin kautta."
 
 #: reservations/models/reservation_statistic.py
-#, fuzzy
-#| msgid "Unit group"
 msgid "Ability group"
-msgstr "Yksikköryhmä"
+msgstr "Kykyryhmä"
 
 #: reservations/models/reservation_statistic.py
-#, fuzzy
-#| msgid "Reservation units"
 msgid "Reservation duration in minutes"
-msgstr "Varausyksiköt"
+msgstr "Varauksen kesto minuutteina"
 
 #: reservations/models/reservation_statistic.py
 msgid "The reason text of the cancel reason"
-msgstr ""
+msgstr "Varauksen perumisen syyn kuvaus"
 
 #: reservations/models/reservation_statistic.py
 msgid "The reason text of the deny reason"
-msgstr ""
+msgstr "Varauksen hylkäämisen syyn kuvaus"
 
 #: reservations/models/reservation_statistic.py
-#, fuzzy
-#| msgid "Non-subsidised price"
 msgid "Non subsidised price"
 msgstr "Subventoimaton hinta"
 
 #: reservations/models/reservation_statistic.py
-#, fuzzy
-#| msgid "Non-subsidised net price"
 msgid "Non subsidised net price"
 msgstr "Subventoimaton nettohinta"
 
 #: reservations/models/reservation_statistic.py
 msgid "TPREK id"
-msgstr ""
+msgstr "TPREK-tunnus"
 
 #: resources/choices.py
 msgid "Fixed"
@@ -3149,7 +3137,7 @@ msgstr "Yleiset ehdot"
 
 #: terms_of_use/models.py
 msgid "Recurring reservation terms"
-msgstr "Toistuvan varauksen ehdot"
+msgstr "Kausivarauksen ehdot"
 
 #: terms_of_use/models.py
 msgid "Service-specific terms"
