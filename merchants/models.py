@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+import datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -10,6 +11,11 @@ from django.utils.translation import gettext_lazy as _
 
 from merchants.enums import Language, OrderStatus, PaymentType
 from merchants.validators import is_numeric, validate_accounting_project
+
+if TYPE_CHECKING:
+    import uuid
+
+    from reservations.models import Reservation
 
 __all__ = [
     "PaymentAccounting",
@@ -25,8 +31,8 @@ class PaymentMerchant(models.Model):
     https://checkout-dev-api.test.hel.ninja/v1/merchant/docs/swagger-ui/#
     """
 
-    id = models.UUIDField(primary_key=True)
-    name = models.CharField(blank=False, null=False, max_length=128)
+    id: uuid.UUID = models.UUIDField(primary_key=True)
+    name: str = models.CharField(max_length=128)
 
     class Meta:
         db_table = "payment_merchant"
@@ -38,8 +44,14 @@ class PaymentMerchant(models.Model):
 
 
 class PaymentProduct(models.Model):
-    id = models.UUIDField(primary_key=True)
-    merchant = models.ForeignKey(PaymentMerchant, related_name="products", on_delete=models.PROTECT, null=True)
+    id: uuid.UUID = models.UUIDField(primary_key=True)
+
+    merchant: PaymentMerchant | None = models.ForeignKey(
+        "merchants.PaymentMerchant",
+        related_name="products",
+        on_delete=models.PROTECT,
+        null=True,
+    )
 
     class Meta:
         db_table = "payment_product"
@@ -51,7 +63,7 @@ class PaymentProduct(models.Model):
 
 
 class PaymentOrder(models.Model):
-    reservation = models.ForeignKey(
+    reservation: Reservation | None = models.ForeignKey(
         "reservations.Reservation",
         related_name="payment_order",
         on_delete=models.SET_NULL,
@@ -59,23 +71,23 @@ class PaymentOrder(models.Model):
         blank=True,
     )
 
-    remote_id = models.UUIDField(blank=True, null=True)
-    payment_id = models.CharField(blank=True, null=False, default="", max_length=128)
-    refund_id = models.UUIDField(blank=True, null=True)
-    payment_type = models.CharField(blank=False, null=False, max_length=128, choices=PaymentType.choices)
-    status = models.CharField(blank=False, null=False, max_length=128, choices=OrderStatus.choices, db_index=True)
+    remote_id: uuid.UUID | None = models.UUIDField(blank=True, null=True)
+    payment_id: str = models.CharField(blank=True, default="", max_length=128)
+    refund_id: uuid.UUID | None = models.UUIDField(blank=True, null=True)
+    payment_type: str = models.CharField(max_length=128, choices=PaymentType.choices)
+    status: str = models.CharField(max_length=128, choices=OrderStatus.choices, db_index=True)
 
-    price_net = models.DecimalField(max_digits=10, decimal_places=2)
-    price_vat = models.DecimalField(max_digits=10, decimal_places=2)
-    price_total = models.DecimalField(max_digits=10, decimal_places=2)
+    price_net: Decimal = models.DecimalField(max_digits=10, decimal_places=2)
+    price_vat: Decimal = models.DecimalField(max_digits=10, decimal_places=2)
+    price_total: Decimal = models.DecimalField(max_digits=10, decimal_places=2)
 
-    created_at = models.DateTimeField(null=False, auto_now_add=True)
-    processed_at = models.DateTimeField(null=True, blank=True)
+    created_at: datetime.datetime = models.DateTimeField(auto_now_add=True)
+    processed_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
 
-    language = models.CharField(blank=False, null=False, max_length=8, choices=Language.choices)
-    reservation_user_uuid = models.UUIDField(blank=True, null=True)
-    checkout_url = models.CharField(blank=True, null=False, default="", max_length=512)
-    receipt_url = models.CharField(blank=True, null=False, default="", max_length=512)
+    language: str = models.CharField(max_length=8, choices=Language.choices)
+    reservation_user_uuid: uuid.UUID | None = models.UUIDField(blank=True, null=True)
+    checkout_url: str = models.CharField(blank=True, default="", max_length=512)
+    receipt_url: str = models.CharField(blank=True, default="", max_length=512)
 
     class Meta:
         db_table = "payment_order"
@@ -85,7 +97,7 @@ class PaymentOrder(models.Model):
     def __str__(self) -> str:
         return f"PaymentOrder {self.pk}"
 
-    def save(self, *args, **kwargs) -> PaymentOrder:
+    def save(self, *args: Any, **kwargs: Any) -> PaymentOrder:
         self.full_clean()
         return super().save(*args, **kwargs)
 
@@ -106,31 +118,30 @@ class PaymentOrder(models.Model):
             raise ValidationError(validation_errors)
 
     @property
-    def expires_at(self) -> datetime | None:
+    def expires_at(self) -> datetime.datetime | None:
         if self.status != OrderStatus.DRAFT:
             return None
 
-        return self.created_at + timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
+        return self.created_at + datetime.timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
 
 
 class PaymentAccounting(models.Model):
     """Custom validation comes from requirements in SAP"""
 
-    name = models.CharField(blank=False, null=False, max_length=128)
-    company_code = models.CharField(blank=False, null=False, max_length=4, validators=[is_numeric])
-    main_ledger_account = models.CharField(blank=False, null=False, max_length=6, validators=[is_numeric])
-    vat_code = models.CharField(blank=False, null=False, max_length=2)
-    internal_order = models.CharField(blank=True, null=False, default="", max_length=10, validators=[is_numeric])
-    profit_center = models.CharField(blank=True, null=False, default="", max_length=7, validators=[is_numeric])
-    project = models.CharField(
+    name: str = models.CharField(max_length=128)
+    company_code: str = models.CharField(max_length=4, validators=[is_numeric])
+    main_ledger_account: str = models.CharField(max_length=6, validators=[is_numeric])
+    vat_code: str = models.CharField(max_length=2)
+    internal_order: str = models.CharField(blank=True, default="", max_length=10, validators=[is_numeric])
+    profit_center: str = models.CharField(blank=True, default="", max_length=7, validators=[is_numeric])
+    project: str = models.CharField(
         blank=True,
-        null=False,
         default="",
         max_length=16,
         validators=[validate_accounting_project, is_numeric],
     )
-    operation_area = models.CharField(blank=True, null=False, default="", max_length=6, validators=[is_numeric])
-    balance_profit_center = models.CharField(blank=False, null=False, max_length=10)
+    operation_area: str = models.CharField(blank=True, default="", max_length=6, validators=[is_numeric])
+    balance_profit_center: str = models.CharField(max_length=10)
 
     class Meta:
         db_table = "payment_accounting"
@@ -140,11 +151,12 @@ class PaymentAccounting(models.Model):
     def __str__(self) -> str:
         return self.name
 
-    def save(self, *args, **kwargs) -> None:
+    def save(self, *args: Any, **kwargs: Any) -> None:
         from reservation_units.models import ReservationUnit
         from reservation_units.tasks import refresh_reservation_unit_accounting
 
         super().save(*args, **kwargs)
+
         if settings.UPDATE_ACCOUNTING:
             reservation_units_from_units = ReservationUnit.objects.filter(unit__in=self.units.all())
             reservation_units = reservation_units_from_units.union(self.reservation_units.all())
