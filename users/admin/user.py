@@ -111,4 +111,4 @@ class UserAdmin(admin.ModelAdmin):
         return f"{login_method} ({user.id_token.amr})"
 
     def is_strong_login(self, user: User) -> bool:
-        return user.id_token.is_strong_login
+        return getattr(user.id_token, "is_strong_login", False)

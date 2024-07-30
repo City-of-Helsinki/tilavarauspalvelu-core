@@ -3114,9 +3114,8 @@ msgid "Log out"
 msgstr "Kirjaudu ulos"
 
 #: templates/admin/deny_reservation_confirmation.html
-#: templates/admin/reset_allocation_confirmation.html
-msgid "Reset allocations"
-msgstr "Nollaa allokoinnit"
+msgid "Deny reservations"
+msgstr "Hylkää varauksia"
 
 #: templates/admin/deny_reservation_confirmation.html
 msgid "Number of reservations selected:"
@@ -3139,6 +3138,10 @@ msgstr "Kyllä, olen varma"
 #: templates/admin/reset_allocation_confirmation.html
 msgid "No, take me back"
 msgstr "Ei, vie minut takaisin"
+
+#: templates/admin/reset_allocation_confirmation.html
+msgid "Reset allocations"
+msgstr "Nollaa allokoinnit"
 
 #: terms_of_use/models.py
 msgid "Generic terms"

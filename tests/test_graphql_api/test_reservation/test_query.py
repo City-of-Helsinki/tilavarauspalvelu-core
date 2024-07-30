@@ -360,10 +360,10 @@ def test_reservation__query__order__all_fields(graphql):
         remote_id="b3fef99e-6c18-422e-943d-cf00702af53e",
     )
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
-    query = reservations_query(
-        fields="order { orderUuid status paymentType receiptUrl checkoutUrl reservationPk refundUuid expiresInMinutes }"
-    )
+    fields = "order { orderUuid status paymentType receiptUrl checkoutUrl reservationPk refundUuid expiresInMinutes }"
+    query = reservations_query(fields=fields)
+
+    graphql.login_with_superuser()
     response = graphql(query)
 
     assert response.has_errors is False, response

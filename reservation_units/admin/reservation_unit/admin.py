@@ -2,7 +2,6 @@ from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin, messages
 from django.http import FileResponse
 from django.utils.translation import gettext_lazy as _
-from lookup_property import L
 from modeltranslation.admin import TabbedTranslationAdmin
 
 from applications.models import ApplicationRoundTimeSlot
@@ -53,8 +52,8 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
         "name",
         "unit",
         "origin_hauki_resource",
-        "_publishing_state",
-        "_reservation_state",
+        "publishing_state",
+        "reservation_state",
     ]
     list_filter = [
         "is_archived",
@@ -88,6 +87,8 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
                     "reservation_block_whole_day",
                     "is_draft",
                     "is_archived",
+                    "publishing_state",
+                    "reservation_state",
                 ],
             },
         ],
@@ -174,6 +175,8 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
         "id",
         "uuid",
         "payment_product",
+        "publishing_state",
+        "reservation_state",
     ]
     inlines = [
         ReservationUnitImageInline,
@@ -181,16 +184,16 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
         ApplicationRoundTimeSlotInline,
     ]
 
+    @admin.display
+    def publishing_state(self, obj: ReservationUnit) -> str:
+        return obj.state.value
+
+    @admin.display
+    def reservation_state(self, obj: ReservationUnit) -> str:
+        return obj.reservation_state.value
+
     def get_queryset(self, request):
-        return (
-            super()
-            .get_queryset(request)
-            .annotate(
-                publishing_state=L("publishing_state"),
-                reservation_state=L("reservation_state"),
-            )
-            .select_related("unit", "origin_hauki_resource")
-        )
+        return super().get_queryset(request).select_related("unit", "origin_hauki_resource")
 
     def get_search_results(self, request, queryset, search_term):
         queryset, may_have_duplicates = super().get_search_results(request, queryset, search_term)

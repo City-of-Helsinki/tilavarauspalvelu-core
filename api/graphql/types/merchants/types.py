@@ -1,10 +1,11 @@
 import graphene
 from graphene_django_extensions import DjangoNode
+from query_optimizer import MultiField
 
 from api.graphql.types.merchants.permissions import PaymentOrderPermission
 from common.date_utils import local_datetime
 from common.typing import GQLInfo
-from merchants.enums import OrderStatus
+from merchants.enums import OrderStatus, PaymentType
 from merchants.models import PaymentMerchant, PaymentOrder, PaymentProduct
 
 __all__ = [
@@ -37,14 +38,18 @@ class PaymentProductNode(DjangoNode):
 
 
 class PaymentOrderNode(DjangoNode):
-    order_uuid = graphene.UUID()
-    refund_uuid = graphene.UUID()
-    reservation_pk = graphene.String()
-    checkout_url = graphene.String()
-    receipt_url = graphene.String()
-    expires_in_minutes = graphene.Int()
+    order_uuid = MultiField(graphene.UUID, fields=["remote_id"])
+    refund_uuid = MultiField(graphene.UUID, fields=["refund_id"])
 
-    status = graphene.Field(graphene.Enum.from_enum(OrderStatus))
+    payment_type = graphene.Field(graphene.NonNull(graphene.Enum.from_enum(PaymentType)))
+    status = graphene.Field(graphene.Enum.from_enum(OrderStatus))  # TODO: NonNull, requires frontend changes
+
+    checkout_url = MultiField(graphene.String, fields=["checkout_url", "status", "created_at"])
+    receipt_url = graphene.String()
+    expires_in_minutes = MultiField(graphene.Int, fields=["status", "created_at"])
+    processed_at = graphene.DateTime()
+
+    reservation_pk = MultiField(graphene.String, fields=["reservation_id"])
 
     class Meta:
         model = PaymentOrder
@@ -67,8 +72,8 @@ class PaymentOrderNode(DjangoNode):
     def resolve_refund_uuid(root: PaymentOrder, info: GQLInfo) -> str | None:
         return root.refund_id
 
-    def resolve_reservation_pk(root: PaymentOrder, info: GQLInfo) -> str:
-        return root.reservation.pk
+    def resolve_reservation_pk(root: PaymentOrder, info: GQLInfo) -> str | None:
+        return str(root.reservation_id) if root.reservation is not None else None
 
     def resolve_checkout_url(root: PaymentOrder, info: GQLInfo) -> str | None:
         expires_at = root.expires_at
