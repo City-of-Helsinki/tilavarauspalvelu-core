@@ -63,6 +63,7 @@ class UnitRoleAdmin(admin.ModelAdmin):
     readonly_fields = [
         "created",
         "modified",
+        "assigner",
     ]
     autocomplete_fields = ["user"]
     filter_horizontal = [
@@ -72,6 +73,10 @@ class UnitRoleAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request: WSGIRequest) -> models.QuerySet:
         return super().get_queryset(request).select_related("user", "role").prefetch_related("unit", "unit_group")
+
+    def save_model(self, request: WSGIRequest, obj: UnitRole, form, change: bool) -> UnitRole:
+        obj.assigner = request.user
+        return super().save_model(request, obj, form, change)
 
     @admin.display(ordering="role__verbose_name")
     def role_verbose_name(self, obj: UnitRole) -> str:
