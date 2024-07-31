@@ -75,9 +75,9 @@ class ReservationTypeChoice(models.TextChoices):
 
 class ReservationTypeStaffChoice(models.TextChoices):
     # These are the same as the ones above, but for the staff create endpoint
-    BLOCKED = "BLOCKED", _("Blocked")
-    STAFF = "STAFF", _("Staff")
-    BEHALF = "BEHALF", _("Behalf")
+    BLOCKED = "BLOCKED", pgettext_lazy("ReservationTypeStaffChoice", "Blocked")
+    STAFF = "STAFF", pgettext_lazy("ReservationTypeStaffChoice", "Staff")
+    BEHALF = "BEHALF", pgettext_lazy("ReservationTypeStaffChoice", "Behalf")
 
 
 RESERVEE_LANGUAGE_CHOICES = (*settings.LANGUAGES, ("", ""))
