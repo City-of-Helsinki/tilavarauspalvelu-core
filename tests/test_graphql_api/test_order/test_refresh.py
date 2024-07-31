@@ -7,7 +7,7 @@ from merchants.enums import OrderStatus
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
 from merchants.verkkokauppa.payment.types import PaymentStatus
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from reservations.choices import ReservationStateChoice
+from reservations.enums import ReservationStateChoice
 from tests.factories import PaymentFactory
 from tests.helpers import UserType, patch_method
 

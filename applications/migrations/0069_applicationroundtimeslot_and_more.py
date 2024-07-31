@@ -6,7 +6,7 @@ import django.db.models.deletion
 from django.contrib.postgres.operations import HStoreExtension
 from django.db import migrations, models
 
-import applications.choices
+import applications.enums
 import applications.validators
 import common.fields.model
 
@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                 (
                     "weekday",
                     common.fields.model.IntChoiceField(
-                        enum=applications.choices.WeekdayChoice,
+                        enum=applications.enums.WeekdayChoice,
                         validators=[
                             django.core.validators.MinValueValidator(
                                 limit_value=0, message="Value must be between 0 and 6."

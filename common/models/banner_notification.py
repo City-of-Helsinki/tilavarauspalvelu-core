@@ -4,7 +4,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from common.choices import BannerNotificationLevel, BannerNotificationState, BannerNotificationTarget
+from common.enums import BannerNotificationLevel, BannerNotificationState, BannerNotificationTarget
 from common.fields.model import StrChoiceField
 from common.querysets.banner_notification import (
     BANNER_LEVEL_SORT_ORDER,

@@ -10,7 +10,7 @@ from helsinki_gdpr.models import SerializableMixin
 from common.date_utils import local_datetime
 from merchants.enums import OrderStatus
 from reservation_units.models import ReservationUnit
-from reservations.choices import ReservationStateChoice
+from reservations.enums import ReservationStateChoice
 
 if TYPE_CHECKING:
     from applications.models import ApplicationRound

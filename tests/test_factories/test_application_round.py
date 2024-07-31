@@ -1,7 +1,7 @@
 import pytest
 from lookup_property import L
 
-from applications.choices import ApplicationRoundStatusChoice
+from applications.enums import ApplicationRoundStatusChoice
 from applications.models import ApplicationRound
 from tests.factories import ApplicationRoundFactory
 

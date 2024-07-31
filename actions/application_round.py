@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 
 from django.db import models
 
-from applications.choices import ApplicationRoundStatusChoice
+from applications.enums import ApplicationRoundStatusChoice
 from reservations.models import RecurringReservation, Reservation
 
 if TYPE_CHECKING:

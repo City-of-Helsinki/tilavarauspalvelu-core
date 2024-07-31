@@ -3,7 +3,7 @@ import datetime
 import factory
 from factory import fuzzy
 
-from applications.choices import OrganizationTypeChoice
+from applications.enums import OrganizationTypeChoice
 from applications.models import Organisation
 
 from ._base import GenericDjangoModelFactory

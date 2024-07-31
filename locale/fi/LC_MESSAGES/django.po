@@ -610,7 +610,7 @@ msgstr "Varausyksikkö tälle vaihtoehdolle."
 msgid "Preferred order"
 msgstr "Suosittu järjestys"
 
-#: applications/admin/application_section/form.py applications/choices.py
+#: applications/admin/application_section/form.py
 msgid "Rejected"
 msgstr "Hylätty"
 
@@ -839,140 +839,201 @@ msgstr "Etsi etu- tai sukunimellä."
 msgid "Seasonal Booking"
 msgstr "Kausivaraus"
 
-#: applications/choices.py tilavarauspalvelu/utils/commons.py
+#: applications/enums.py tilavarauspalvelu/utils/commons.py
 msgid "Monday"
 msgstr "Maanantai"
 
-#: applications/choices.py tilavarauspalvelu/utils/commons.py
+#: applications/enums.py tilavarauspalvelu/utils/commons.py
 msgid "Tuesday"
 msgstr "Tiistai"
 
-#: applications/choices.py tilavarauspalvelu/utils/commons.py
+#: applications/enums.py tilavarauspalvelu/utils/commons.py
 msgid "Wednesday"
 msgstr "Keskiviikko"
 
-#: applications/choices.py tilavarauspalvelu/utils/commons.py
+#: applications/enums.py tilavarauspalvelu/utils/commons.py
 msgid "Thursday"
 msgstr "Torstai"
 
-#: applications/choices.py tilavarauspalvelu/utils/commons.py
+#: applications/enums.py tilavarauspalvelu/utils/commons.py
 msgid "Friday"
 msgstr "Perjantai"
 
-#: applications/choices.py tilavarauspalvelu/utils/commons.py
+#: applications/enums.py tilavarauspalvelu/utils/commons.py
 msgid "Saturday"
 msgstr "Lauantai"
 
-#: applications/choices.py tilavarauspalvelu/utils/commons.py
+#: applications/enums.py tilavarauspalvelu/utils/commons.py
 msgid "Sunday"
 msgstr "Sunnuntai"
 
-#: applications/choices.py
+#: applications/enums.py
+msgctxt "Priority"
 msgid "Primary"
 msgstr "Ensisijainen"
 
-#: applications/choices.py
+#: applications/enums.py
+msgctxt "Priority"
 msgid "Secondary"
 msgstr "Toissijainen"
 
-#: applications/choices.py reservations/choices.py
+#: applications/enums.py
+msgctxt "ApplicantType"
 msgid "Individual"
-msgstr "Yksittäinen"
+msgstr "Yksityinen"
 
-#: applications/choices.py
+#: applications/enums.py
+msgctxt "ApplicantType"
 msgid "Association"
 msgstr "Yhdistys"
 
-#: applications/choices.py
+#: applications/enums.py
+msgctxt "ApplicantType"
 msgid "Community"
 msgstr "Yhteisö"
 
-#: applications/choices.py
+#: applications/enums.py
+msgctxt "ApplicantType"
 msgid "Company"
 msgstr "Yritys"
 
-#: applications/choices.py
+#: applications/enums.py
+msgctxt "ApplicationRoundStatus"
 msgid "Upcoming"
 msgstr "Tulossa"
 
-#: applications/choices.py
+#: applications/enums.py
+msgctxt "ApplicationRoundStatus"
 msgid "Open"
 msgstr "Haku avoinna"
 
-#: applications/choices.py
+#: applications/enums.py
+msgctxt "ApplicationRoundStatus"
 msgid "In Allocation"
 msgstr "Käsittelyssä"
 
-#: applications/choices.py
+#: applications/enums.py
+msgctxt "ApplicationRoundStatus"
 msgid "Handled"
 msgstr "Käsitelty"
 
-#: applications/choices.py
+#: applications/enums.py
+msgctxt "ApplicationRoundStatus"
 msgid "Results Sent"
 msgstr "Päätökset lähetetty"
 
-#: applications/choices.py
+#: applications/enums.py
+msgctxt "ApplicationRoundReservationCreationStatus"
 msgid "Not completed"
 msgstr "Ei valmis"
 
-#: applications/choices.py
+#: applications/enums.py
+msgctxt "ApplicationRoundReservationCreationStatus"
 msgid "Completed"
 msgstr "Valmis"
 
-#: applications/choices.py
+#: applications/enums.py
+msgctxt "ApplicationRoundReservationCreationStatus"
 msgid "Failed"
 msgstr "Epäonnistunut"
 
-#: applications/choices.py common/choices/banner_notification.py
-#: merchants/enums.py
+#: applications/enums.py
+msgctxt "ApplicationStatus"
 msgid "Draft"
 msgstr "Luonnos"
 
-#: applications/choices.py
+#: applications/enums.py
+msgctxt "ApplicationStatus"
 msgid "Received"
 msgstr "Vastaanotettu"
 
-#: applications/choices.py merchants/enums.py
+#: applications/enums.py
+msgctxt "ApplicationStatus"
+msgid "In Allocation"
+msgstr "Käsittelyssä"
+
+#: applications/enums.py
+msgctxt "ApplicationStatus"
+msgid "Handled"
+msgstr "Käsitelty"
+
+#: applications/enums.py
+msgctxt "ApplicationStatus"
+msgid "Results Sent"
+msgstr "Päätökset lähetetty"
+
+#: applications/enums.py
+msgctxt "ApplicationStatus"
 msgid "Expired"
 msgstr "Rauennut"
 
-#: applications/choices.py merchants/enums.py reservations/choices.py
+#: applications/enums.py
+msgctxt "ApplicationStatus"
 msgid "Cancelled"
 msgstr "Peruttu"
 
-#: applications/choices.py
+#: applications/enums.py
+msgctxt "ApplicationSectionStatus"
 msgid "Unallocated"
 msgstr "Vastaanotettu"
 
-#: applications/choices.py
+#: applications/enums.py
+msgctxt "ApplicationSectionStatus"
+msgid "In Allocation"
+msgstr "Käsittelyssä"
+
+#: applications/enums.py
+msgctxt "ApplicationSectionStatus"
+msgid "Handled"
+msgstr "Käsitelty"
+
+#: applications/enums.py
+msgctxt "ApplicationSectionStatus"
+msgid "Rejected"
+msgstr "Hylätty"
+
+#: applications/enums.py
+msgctxt "TargetGroup"
 msgid "Internal"
 msgstr "Sisäinen"
 
-#: applications/choices.py
+#: applications/enums.py
+msgctxt "TargetGroup"
 msgid "Public"
 msgstr "Julkinen"
 
-#: applications/choices.py common/choices/banner_notification.py
+#: applications/enums.py
+msgctxt "TargetGroup"
 msgid "All"
 msgstr "Kaikki"
 
-#: applications/choices.py
+#: applications/enums.py
+msgctxt "OrganizationType"
+msgid "Company"
+msgstr "Yritys"
+
+#: applications/enums.py
+msgctxt "OrganizationType"
 msgid "Registered association"
 msgstr "Rekisteröity yhdistys"
 
-#: applications/choices.py
+#: applications/enums.py
+msgctxt "OrganizationType"
 msgid "Public association"
 msgstr "Julkinen yhdistys"
 
-#: applications/choices.py
+#: applications/enums.py
+msgctxt "OrganizationType"
 msgid "Unregistered association"
 msgstr "Rekisteröimätön yhdistys"
 
-#: applications/choices.py
+#: applications/enums.py
+msgctxt "OrganizationType"
 msgid "Municipality consortium"
 msgstr "Kuntakonsortio"
 
-#: applications/choices.py
+#: applications/enums.py
+msgctxt "OrganizationType"
 msgid "Religious community"
 msgstr "Uskonnollinen yhteisö"
 
@@ -1190,7 +1251,6 @@ msgid "Duration (ms)"
 msgstr "Kesto (ms)"
 
 #: common/admin/request_log.py permissions/base_models.py
-#: reservations/choices.py
 msgid "Created"
 msgstr "Luotu"
 
@@ -1248,33 +1308,48 @@ msgstr "Stack trace siellä missä SQL-kysely suoritettiin."
 msgid "Search by SQL, request log path, body or request ID"
 msgstr "Etsi SQL:llä, rajapintakutsun polulla, sisällöllä tai ID:llä"
 
-#: common/choices/banner_notification.py
+#: common/enums.py
+msgctxt "BannerNotificationLevel"
 msgid "Exception"
 msgstr "Poikkeus"
 
-#: common/choices/banner_notification.py
+#: common/enums.py
+msgctxt "BannerNotificationLevel"
 msgid "Warning"
 msgstr "Varoitus"
 
-#: common/choices/banner_notification.py reservations/choices.py
+#: common/enums.py
+msgctxt "BannerNotificationLevel"
 msgid "Normal"
 msgstr "Normaali"
 
-#: common/choices/banner_notification.py reservations/choices.py
+#: common/enums.py
+msgctxt "BannerNotificationTarget"
+msgid "All"
+msgstr "Kaikki"
+
+#: common/enums.py
+msgctxt "BannerNotificationTarget"
 msgid "Staff"
 msgstr "Henkilökunta"
 
-#: common/choices/banner_notification.py permissions/models.py
-#: reservation_units/models/introduction.py
-#: reservations/admin/reservation/form.py
+#: common/enums.py
+msgctxt "BannerNotificationTarget"
 msgid "User"
 msgstr "Käyttäjä"
 
-#: common/choices/banner_notification.py
+#: common/enums.py
+msgctxt "BannerNotificationState"
+msgid "Draft"
+msgstr "Luonnos"
+
+#: common/enums.py
+msgctxt "BannerNotificationState"
 msgid "Scheduled"
 msgstr "Ajastettu"
 
-#: common/choices/banner_notification.py
+#: common/enums.py
+msgctxt "BannerNotificationState"
 msgid "Active"
 msgstr "Aktiivinen"
 
@@ -1482,30 +1557,52 @@ msgid "English"
 msgstr "Englanti"
 
 #: merchants/enums.py
+msgctxt "OrderStatus"
+msgid "Draft"
+msgstr "Luonnos"
+
+#: merchants/enums.py
+msgctxt "OrderStatus"
+msgid "Expired"
+msgstr "Rauennut"
+
+#: merchants/enums.py
+msgctxt "OrderStatus"
+msgid "Cancelled"
+msgstr "Peruttu"
+
+#: merchants/enums.py
+msgctxt "OrderStatus"
 msgid "Paid"
 msgstr "Maksettu"
 
 #: merchants/enums.py
+msgctxt "OrderStatus"
 msgid "Paid manually"
 msgstr "Maksettu manuaalisesti"
 
 #: merchants/enums.py
+msgctxt "OrderStatus"
 msgid "Refunded"
 msgstr "Palautettu"
 
 #: merchants/enums.py
+msgctxt "OrderStatus"
 msgid "Free"
 msgstr "Maksuton"
 
-#: merchants/enums.py
+#: merchants/enums.py reservation_units/enums.py
+msgctxt "PaymentType"
 msgid "On site"
 msgstr "Paikan päällä"
 
-#: merchants/enums.py
+#: merchants/enums.py reservation_units/enums.py
+msgctxt "PaymentType"
 msgid "Online"
 msgstr "Verkossa"
 
-#: merchants/enums.py
+#: merchants/enums.py reservation_units/enums.py
+msgctxt "PaymentType"
 msgid "Invoice"
 msgstr "Lasku"
 
@@ -1773,6 +1870,11 @@ msgstr "Rooli"
 #: permissions/models.py
 msgid "Permission"
 msgstr "Oikeus"
+
+#: permissions/models.py reservation_units/models/introduction.py
+#: reservations/admin/reservation/form.py
+msgid "User"
+msgstr "Käyttäjä"
 
 #: permissions/models.py
 msgid "Can modify roles for the unit"
@@ -2427,66 +2529,107 @@ msgid "7 hours"
 msgstr "7 tuntia"
 
 #: reservation_units/enums.py
+msgctxt "ReservationKind"
+msgid "Direct"
+msgstr "Suora"
+
+#: reservation_units/enums.py
+msgctxt "ReservationKind"
+msgid "Season"
+msgstr "Kausi"
+
+#: reservation_units/enums.py
+msgctxt "ReservationKind"
+msgid "Direct and season"
+msgstr "Suora ja kausi"
+
+#: reservation_units/enums.py
+msgctxt "PricingType"
+msgid "Paid"
+msgstr "Maksullinen"
+
+#: reservation_units/enums.py
+msgctxt "PricingType"
+msgid "Free"
+msgstr "Maksuton"
+
+#: reservation_units/enums.py
+msgctxt "PriceUnit"
 msgid "per 15 minutes"
 msgstr "per 15 minuuttia"
 
 #: reservation_units/enums.py
+msgctxt "PriceUnit"
 msgid "per 30 minutes"
 msgstr "per 30 minuuttia"
 
 #: reservation_units/enums.py
+msgctxt "PriceUnit"
 msgid "per hour"
 msgstr "per tunti"
 
 #: reservation_units/enums.py
+msgctxt "PriceUnit"
 msgid "per half a day"
 msgstr "per puolipäivää"
 
 #: reservation_units/enums.py
+msgctxt "PriceUnit"
 msgid "per day"
 msgstr "per päivä"
 
 #: reservation_units/enums.py
+msgctxt "PriceUnit"
 msgid "per week"
 msgstr "per viikko"
 
 #: reservation_units/enums.py
+msgctxt "PriceUnit"
 msgid "fixed"
 msgstr "per kerta"
 
 #: reservation_units/enums.py
+msgctxt "PricingStatus"
 msgid "past"
 msgstr "mennyt"
 
 #: reservation_units/enums.py
+msgctxt "PricingStatus"
 msgid "active"
 msgstr "aktiivinen"
 
 #: reservation_units/enums.py
+msgctxt "PricingStatus"
 msgid "future"
 msgstr "tuleva"
 
 #: reservation_units/enums.py
+msgctxt "AuthenticationType"
 msgid "Weak"
 msgstr "Heikko"
 
 #: reservation_units/enums.py
+msgctxt "AuthenticationType"
 msgid "Strong"
 msgstr "Vahva"
 
 #: reservation_units/enums.py
+msgctxt "ReservationUnitImageType"
 msgid "Main image"
 msgstr "Pääkuva"
 
 #: reservation_units/enums.py
+msgctxt "ReservationUnitImageType"
 msgid "Ground plan"
 msgstr "Pohjapiirros"
 
 #: reservation_units/enums.py
+msgctxt "ReservationUnitImageType"
 msgid "Map"
 msgstr "Kartta"
 
 #: reservation_units/enums.py
+msgctxt "ReservationUnitImageType"
 msgid "Other"
 msgstr "Muu"
 
@@ -2625,7 +2768,7 @@ msgstr "Ei"
 
 #: reservations/admin/reservation/filters.py
 msgid "Paid reservation"
-msgstr "Maksettu varaus"
+msgstr "Maksullinen varaus"
 
 #: reservations/admin/reservation/form.py
 #: reservations/models/reservation_statistic.py
@@ -2929,51 +3072,88 @@ msgstr "Ikäryhmä tälle ryhmälle tai yhdistykselle"
 msgid "Required fields must be a subset of supported fields"
 msgstr "Vaadittujen kenttien täytyy olla tuettujen kenttien alijoukko"
 
-#: reservations/choices.py
+#: reservations/enums.py
+msgctxt "CustomerType"
 msgid "Business"
 msgstr "Yritys"
 
-#: reservations/choices.py
+#: reservations/enums.py
+msgctxt "CustomerType"
 msgid "Nonprofit"
-msgstr "Yhdistys"
+msgstr "Voittoa tavoittelematon"
 
-#: reservations/choices.py
+#: reservations/enums.py
+msgctxt "CustomerType"
+msgid "Individual"
+msgstr "Yksityinen"
+
+#: reservations/enums.py
+msgctxt "ReservationState"
+msgid "Created"
+msgstr "Luotu"
+
+#: reservations/enums.py
+msgctxt "ReservationState"
+msgid "Cancelled"
+msgstr "Peruutettu"
+
+#: reservations/enums.py
+msgctxt "ReservationState"
 msgid "Requires handling"
-msgstr "Vaatiiko käsittelyn"
+msgstr "Käsittelemättä"
 
-#: reservations/choices.py
+#: reservations/enums.py
+msgctxt "ReservationState"
 msgid "Waiting for payment"
 msgstr "Odottaa maksua"
 
-#: reservations/choices.py
+#: reservations/enums.py
+msgctxt "ReservationState"
 msgid "Confirmed"
-msgstr "Vahvistettu"
+msgstr "Hyväksytty"
 
-#: reservations/choices.py
+#: reservations/enums.py
+msgctxt "ReservationState"
 msgid "Denied"
 msgstr "Hylätty"
 
-#: reservations/choices.py
-msgid "Blocked"
-msgstr "Estetty"
+#: reservations/enums.py
+msgctxt "ReservationType"
+msgid "Normal"
+msgstr "Normaali"
 
-#: reservations/choices.py
+#: reservations/enums.py
+msgctxt "ReservationType"
+msgid "Blocked"
+msgstr "Suljettu"
+
+#: reservations/enums.py
+msgctxt "ReservationType"
+msgid "Staff"
+msgstr "Henkilökunta"
+
+#: reservations/enums.py
+msgctxt "ReservationType"
 msgid "Behalf"
 msgstr "Puolesta"
 
-#: reservations/choices.py
+#: reservations/enums.py
+msgctxt "ReservationType"
 msgid "Seasonal"
 msgstr "Kausi"
 
-#: reservations/choices.py
+#: reservations/enums.py
+msgctxt "RejectionReadiness"
 msgid "Interval not allowed"
 msgstr "Aloitusaika ei sallittu"
 
-#: reservations/choices.py
+#: reservations/enums.py
+msgctxt "RejectionReadiness"
 msgid "Overlapping reservations"
 msgstr "Päällekkäisiä varauksia"
 
-#: reservations/choices.py
+#: reservations/enums.py
+msgctxt "RejectionReadiness"
 msgid "Reservation unit closed"
 msgstr "Varausyksikkö suljettu"
 
@@ -3057,11 +3237,13 @@ msgstr "Subventoimaton nettohinta"
 msgid "TPREK id"
 msgstr "TPREK-tunnus"
 
-#: resources/choices.py
+#: resources/enums.py
+msgctxt "ResourceLocationType"
 msgid "Fixed"
 msgstr "Kiinteä"
 
-#: resources/choices.py
+#: resources/enums.py
+msgctxt "ResourceLocationType"
 msgid "Movable"
 msgstr "Siirrettävä"
 
@@ -3141,7 +3323,7 @@ msgstr "Kausivarauksen ehdot"
 
 #: terms_of_use/models.py
 msgid "Service-specific terms"
-msgstr "Palvelualuekohtaiset ehdot"
+msgstr "Palvelukohtaiset ehdot"
 
 #: terms_of_use/models.py
 msgid "Text"

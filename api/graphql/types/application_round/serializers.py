@@ -5,7 +5,7 @@ from lookup_property import L
 from rest_framework.exceptions import ValidationError
 
 from api.graphql.extensions import error_codes
-from applications.choices import ApplicationRoundStatusChoice, ApplicationStatusChoice
+from applications.enums import ApplicationRoundStatusChoice, ApplicationStatusChoice
 from applications.models import ApplicationRound
 from applications.tasks import generate_reservation_series_from_allocations
 from common.date_utils import local_datetime

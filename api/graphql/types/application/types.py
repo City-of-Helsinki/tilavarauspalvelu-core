@@ -10,7 +10,7 @@ from api.graphql.types.application.filtersets import ApplicationFilterSet
 from api.graphql.types.application.permissions import ApplicationPermission
 from api.graphql.types.application_section.types import ApplicationSectionNode
 from api.graphql.types.user.types import ApplicantNode
-from applications.choices import ApplicationStatusChoice
+from applications.enums import ApplicationStatusChoice
 from applications.models import Application
 from common.typing import GQLInfo
 from permissions.helpers import can_access_application_private_fields, has_any_general_permission

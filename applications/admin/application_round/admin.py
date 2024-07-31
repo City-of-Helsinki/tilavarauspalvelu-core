@@ -11,7 +11,7 @@ from lookup_property import L
 from modeltranslation.admin import TranslationAdmin
 
 from applications.admin.application_round.form import ApplicationRoundAdminForm
-from applications.choices import ApplicationRoundStatusChoice
+from applications.enums import ApplicationRoundStatusChoice
 from applications.exporter.application_round_applications_exporter import ApplicationRoundApplicationsCSVExporter
 from applications.exporter.application_round_result_exporter import ApplicationRoundResultCSVExporter
 from applications.models import ApplicationRound

@@ -1,6 +1,6 @@
 import pytest
 
-from applications.choices import ApplicationStatusChoice
+from applications.enums import ApplicationStatusChoice
 from email_notification.helpers.application_email_notification_sender import ApplicationEmailNotificationSender
 from tests.factories import ApplicationFactory
 from tests.helpers import UserType, patch_method

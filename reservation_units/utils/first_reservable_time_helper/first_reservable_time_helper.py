@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from django.db import models
 from lookup_property import L
 
-from applications.choices import ApplicationRoundStatusChoice
+from applications.enums import ApplicationRoundStatusChoice
 from applications.models import ApplicationRound
 from common.date_utils import local_datetime, local_datetime_max, local_datetime_min, local_start_of_day
 from opening_hours.models import ReservableTimeSpan

@@ -10,7 +10,7 @@ from common.date_utils import TimeSlot, merge_time_slots
 if TYPE_CHECKING:
     import datetime
 
-    from applications.choices import Weekday
+    from applications.enums import Weekday
     from applications.models import ApplicationSection
 
 

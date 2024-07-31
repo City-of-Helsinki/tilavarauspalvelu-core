@@ -4,7 +4,7 @@ import django.db.models.deletion
 import graphene_django_extensions.fields.model
 from django.db import migrations, models
 
-import reservations.choices
+import reservations.enums
 
 
 class Migration(migrations.Migration):
@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                             ("OVERLAPPING_RESERVATIONS", "Overlapping reservations"),
                             ("RESERVATION_UNIT_CLOSED", "Reservation unit closed"),
                         ],
-                        enum=reservations.choices.RejectionReadinessChoice,
+                        enum=reservations.enums.RejectionReadinessChoice,
                         max_length=24,
                     ),
                 ),

@@ -4,7 +4,7 @@ import random
 from datetime import timedelta
 
 from reservation_units.models import Equipment, EquipmentCategory, Purpose, Qualifier
-from resources.choices import ResourceLocationType
+from resources.enums import ResourceLocationType
 from resources.models import Resource
 from services.models import Service
 from spaces.models import Space, Unit

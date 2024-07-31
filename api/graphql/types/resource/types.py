@@ -3,7 +3,7 @@ from graphene_django_extensions import DjangoNode
 
 from api.graphql.types.resource.filtersets import ResourceFilterSet
 from api.graphql.types.resource.permissions import ResourcePermission
-from resources.choices import ResourceLocationType
+from resources.enums import ResourceLocationType
 from resources.models import Resource
 
 

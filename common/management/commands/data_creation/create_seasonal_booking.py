@@ -4,7 +4,7 @@ import random
 from datetime import UTC, datetime, time, timedelta
 from itertools import cycle
 
-from applications.choices import (
+from applications.enums import (
     ApplicantTypeChoice,
     OrganizationTypeChoice,
     Priority,

@@ -3,7 +3,7 @@ import datetime
 import factory
 from factory import fuzzy
 
-from reservations.choices import RejectionReadinessChoice
+from reservations.enums import RejectionReadinessChoice
 from reservations.models import RejectedOccurrence
 
 from ._base import GenericDjangoModelFactory

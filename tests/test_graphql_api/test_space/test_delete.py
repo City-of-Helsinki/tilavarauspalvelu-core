@@ -1,6 +1,6 @@
 import pytest
 
-from applications.choices import ApplicationRoundStatusChoice
+from applications.enums import ApplicationRoundStatusChoice
 from spaces.models import Space
 from tests.factories import ApplicationRoundFactory, SpaceFactory
 from tests.helpers import UserType

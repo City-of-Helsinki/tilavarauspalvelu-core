@@ -13,7 +13,7 @@ from common.date_utils import local_datetime, local_start_of_day
 from reservation_units.enums import PriceUnit, PricingType, ReservationStartInterval, ReservationUnitState
 from reservation_units.models import ReservationUnit, ReservationUnitPricing
 from reservation_units.utils.reservation_unit_pricing_helper import ReservationUnitPricingHelper
-from reservations.choices import ReservationTypeChoice
+from reservations.enums import ReservationTypeChoice
 from reservations.models import Reservation
 
 

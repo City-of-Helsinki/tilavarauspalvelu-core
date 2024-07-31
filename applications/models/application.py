@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L, lookup_property
 
-from applications.choices import (
+from applications.enums import (
     ApplicantTypeChoice,
     ApplicationRoundStatusChoice,
     ApplicationSectionStatusChoice,

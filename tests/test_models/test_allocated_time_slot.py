@@ -2,7 +2,7 @@ import datetime
 
 import pytest
 
-from applications.choices import Weekday
+from applications.enums import Weekday
 from applications.models import AllocatedTimeSlot
 from reservation_units.models import ReservationUnitHierarchy
 from tests.factories import AllocatedTimeSlotFactory, ReservationUnitFactory, ReservationUnitOptionFactory, SpaceFactory

@@ -3,7 +3,7 @@ import datetime
 import pytest
 
 from common.date_utils import next_hour
-from reservations.choices import ReservationStateChoice, ReservationTypeChoice
+from reservations.enums import ReservationStateChoice, ReservationTypeChoice
 from tests.factories import ReservationFactory, UserFactory
 
 from .helpers import UPDATE_STAFF_MUTATION, get_staff_modify_data

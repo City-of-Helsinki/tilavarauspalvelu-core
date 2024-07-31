@@ -1,6 +1,6 @@
 import pytest
 
-from applications.choices import Weekday
+from applications.enums import Weekday
 from tests.factories import ApplicationSectionFactory, ReservationUnitOptionFactory, UserFactory, add_unit_permissions
 
 from .helpers import REJECT_MUTATION

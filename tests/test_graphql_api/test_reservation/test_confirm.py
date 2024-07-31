@@ -9,7 +9,7 @@ from merchants.models import PaymentOrder
 from merchants.verkkokauppa.order.exceptions import CreateOrderError
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservation_units.enums import PricingType
-from reservations.choices import ReservationStateChoice
+from reservations.enums import ReservationStateChoice
 from tests.factories import (
     EmailTemplateFactory,
     OrderFactory,

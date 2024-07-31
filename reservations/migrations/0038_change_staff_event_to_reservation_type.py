@@ -4,30 +4,33 @@ from django.db import migrations, models
 
 
 def change_staff_event_types(apps, schema_editor):
-    from reservations.choices import ReservationTypeChoice
+    from reservations.enums import ReservationTypeChoice
 
     Reservation = apps.get_model("reservations", "Reservation")
 
     Reservation.objects.filter(staff_event=True).update(type=ReservationTypeChoice.STAFF)
 
 
-
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('reservations', '0037_alter_reservation_state'),
+        ("reservations", "0037_alter_reservation_state"),
     ]
 
     operations = [
-
         migrations.AlterField(
-            model_name='reservation',
-            name='type',
-            field=models.CharField(choices=[('normal', 'Normal'), ('blocked', 'Blocked'), ('staff', 'Staff')], default='normal', help_text='Type of reservation', max_length=50, null=True),
+            model_name="reservation",
+            name="type",
+            field=models.CharField(
+                choices=[("normal", "Normal"), ("blocked", "Blocked"), ("staff", "Staff")],
+                default="normal",
+                help_text="Type of reservation",
+                max_length=50,
+                null=True,
+            ),
         ),
         migrations.RunPython(change_staff_event_types, migrations.RunPython.noop),
         migrations.RemoveField(
-            model_name='reservation',
-            name='staff_event',
+            model_name="reservation",
+            name="staff_event",
         ),
     ]

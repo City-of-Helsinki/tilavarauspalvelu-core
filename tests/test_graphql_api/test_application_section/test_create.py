@@ -3,7 +3,7 @@ from datetime import date
 
 import pytest
 
-from applications.choices import ApplicationSectionStatusChoice
+from applications.enums import ApplicationSectionStatusChoice
 from applications.models import ApplicationSection
 from tests.factories import ApplicationFactory
 from tests.test_graphql_api.test_application_section.helpers import CREATE_MUTATION, get_application_section_create_data

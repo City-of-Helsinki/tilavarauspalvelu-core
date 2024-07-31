@@ -15,7 +15,7 @@ from merchants.enums import OrderStatus
 from permissions.helpers import has_general_permission
 from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
 from reservation_units.models import ReservationUnit, ReservationUnitType
-from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+from reservations.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import RecurringReservation, Reservation
 from spaces.models import Unit
 from users.models import User

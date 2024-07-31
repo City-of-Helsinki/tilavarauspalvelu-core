@@ -3,7 +3,7 @@ from datetime import date
 
 import pytest
 
-from applications.choices import ApplicationSectionStatusChoice
+from applications.enums import ApplicationSectionStatusChoice
 from applications.models import ApplicationSection
 from tests.factories import ApplicationSectionFactory, ReservationUnitOptionFactory
 from tests.helpers import UserType

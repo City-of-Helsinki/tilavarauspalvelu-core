@@ -1,6 +1,6 @@
 import pytest
 
-from common.choices import BannerNotificationLevel, BannerNotificationTarget
+from common.enums import BannerNotificationLevel, BannerNotificationTarget
 from tests.helpers import UserType
 from tests.test_graphql_api.test_banner_notification.helpers import CREATE_MUTATION
 

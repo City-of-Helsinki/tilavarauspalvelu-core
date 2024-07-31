@@ -11,7 +11,7 @@ from api.graphql.types.reservation.serializers.mixins import ReservationScheduli
 from applications.models import City
 from common.date_utils import local_datetime
 from reservation_units.models import ReservationUnit
-from reservations.choices import (
+from reservations.enums import (
     RESERVEE_LANGUAGE_CHOICES,
     CustomerTypeChoice,
     ReservationStateChoice,

@@ -3,7 +3,7 @@ import datetime
 import pytest
 from lookup_property import L
 
-from applications.choices import ApplicationStatusChoice
+from applications.enums import ApplicationStatusChoice
 from applications.models import Application
 from tests.factories import (
     AllocatedTimeSlotFactory,

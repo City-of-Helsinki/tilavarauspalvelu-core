@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from applications.choices import (
+from applications.enums import (
     ApplicantTypeChoice,
     ApplicationSectionStatusChoice,
     ApplicationStatusChoice,

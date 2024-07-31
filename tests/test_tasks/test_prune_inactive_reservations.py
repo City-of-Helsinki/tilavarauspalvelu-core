@@ -3,7 +3,7 @@ from datetime import timedelta
 import pytest
 
 from common.date_utils import local_datetime
-from reservations.choices import ReservationStateChoice
+from reservations.enums import ReservationStateChoice
 from reservations.models import Reservation
 from reservations.pruning import prune_inactive_reservations
 from tests.factories import ReservationFactory

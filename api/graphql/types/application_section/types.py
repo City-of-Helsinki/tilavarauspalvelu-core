@@ -6,7 +6,7 @@ from query_optimizer import AnnotatedField
 
 from api.graphql.types.application_section.filtersets import ApplicationSectionFilterSet
 from api.graphql.types.application_section.permissions import ApplicationSectionPermission
-from applications.choices import ApplicationSectionStatusChoice
+from applications.enums import ApplicationSectionStatusChoice
 from applications.models import ApplicationSection
 from common.typing import GQLInfo
 from permissions.helpers import has_any_general_permission

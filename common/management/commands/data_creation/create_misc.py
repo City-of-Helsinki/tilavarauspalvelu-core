@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from django.utils.timezone import localtime
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
 
-from common.choices import BannerNotificationLevel, BannerNotificationTarget
+from common.enums import BannerNotificationLevel, BannerNotificationTarget
 from common.models import BannerNotification
 from opening_hours.models import DEFAULT_TIMEZONE
 from reservations.tasks import prune_reservations_task, update_expired_orders_task

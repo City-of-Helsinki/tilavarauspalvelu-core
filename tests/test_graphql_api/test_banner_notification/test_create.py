@@ -3,7 +3,7 @@ from typing import Any, NamedTuple
 import pytest
 from graphene_django_extensions.testing.utils import parametrize_helper
 
-from common.choices import BannerNotificationLevel, BannerNotificationTarget
+from common.enums import BannerNotificationLevel, BannerNotificationTarget
 from common.models import BannerNotification
 from tests.factories import UserFactory
 

@@ -5,11 +5,11 @@ from auditlog.models import LogEntry
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
-from applications.choices import ApplicationStatusChoice
+from applications.enums import ApplicationStatusChoice
 from applications.models import Address, Application, ApplicationEvent, ApplicationSection, Person
 from merchants.enums import OrderStatus
 from permissions.models import GeneralRole, ServiceSectorRole, UnitRole
-from reservations.choices import ReservationStateChoice, ReservationTypeChoice
+from reservations.enums import ReservationStateChoice, ReservationTypeChoice
 from reservations.models import Reservation
 from users.models import ReservationNotification, User
 

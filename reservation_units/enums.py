@@ -4,6 +4,7 @@ from django.db import models
 from django.db.models import TextChoices
 from django.utils.functional import classproperty
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import pgettext_lazy
 
 __all__ = [
     "AuthenticationType",
@@ -54,9 +55,9 @@ class ReservationStartInterval(TextChoices):
 
 
 class ReservationKind(models.TextChoices):
-    DIRECT = "direct"
-    SEASON = "season"
-    DIRECT_AND_SEASON = "direct_and_season"
+    DIRECT = "direct", pgettext_lazy("ReservationKind", "Direct")
+    SEASON = "season", pgettext_lazy("ReservationKind", "Season")
+    DIRECT_AND_SEASON = "direct_and_season", pgettext_lazy("ReservationKind", "Direct and season")
 
     @classproperty
     def allows_direct(cls) -> list[str]:
@@ -68,39 +69,39 @@ class ReservationKind(models.TextChoices):
 
 
 class PricingType(models.TextChoices):
-    PAID = "paid"
-    FREE = "free"
+    PAID = "paid", pgettext_lazy("PricingType", "Paid")
+    FREE = "free", pgettext_lazy("PricingType", "Free")
 
 
 class PaymentType(models.TextChoices):
-    ONLINE = "ONLINE"
-    INVOICE = "INVOICE"
-    ON_SITE = "ON_SITE"
+    ONLINE = "ONLINE", pgettext_lazy("PaymentType", "Online")
+    INVOICE = "INVOICE", pgettext_lazy("PaymentType", "Invoice")
+    ON_SITE = "ON_SITE", pgettext_lazy("PaymentType", "On site")
 
 
 class PriceUnit(models.TextChoices):
-    PRICE_UNIT_PER_15_MINS = "per_15_mins", _("per 15 minutes")
-    PRICE_UNIT_PER_30_MINS = "per_30_mins", _("per 30 minutes")
-    PRICE_UNIT_PER_HOUR = "per_hour", _("per hour")
-    PRICE_UNIT_PER_HALF_DAY = "per_half_day", _("per half a day")
-    PRICE_UNIT_PER_DAY = "per_day", _("per day")
-    PRICE_UNIT_PER_WEEK = "per_week", _("per week")
-    PRICE_UNIT_FIXED = "fixed", _("fixed")
+    PRICE_UNIT_PER_15_MINS = "per_15_mins", pgettext_lazy("PriceUnit", "per 15 minutes")
+    PRICE_UNIT_PER_30_MINS = "per_30_mins", pgettext_lazy("PriceUnit", "per 30 minutes")
+    PRICE_UNIT_PER_HOUR = "per_hour", pgettext_lazy("PriceUnit", "per hour")
+    PRICE_UNIT_PER_HALF_DAY = "per_half_day", pgettext_lazy("PriceUnit", "per half a day")
+    PRICE_UNIT_PER_DAY = "per_day", pgettext_lazy("PriceUnit", "per day")
+    PRICE_UNIT_PER_WEEK = "per_week", pgettext_lazy("PriceUnit", "per week")
+    PRICE_UNIT_FIXED = "fixed", pgettext_lazy("PriceUnit", "fixed")
 
 
 class PricingStatus(models.TextChoices):
-    PRICING_STATUS_PAST = "past", _("past")
-    PRICING_STATUS_ACTIVE = "active", _("active")
-    PRICING_STATUS_FUTURE = "future", _("future")
+    PRICING_STATUS_PAST = "past", pgettext_lazy("PricingStatus", "past")
+    PRICING_STATUS_ACTIVE = "active", pgettext_lazy("PricingStatus", "active")
+    PRICING_STATUS_FUTURE = "future", pgettext_lazy("PricingStatus", "future")
 
 
 class AuthenticationType(models.TextChoices):
-    WEAK = "weak", _("Weak")
-    STRONG = "strong", _("Strong")
+    WEAK = "weak", pgettext_lazy("AuthenticationType", "Weak")
+    STRONG = "strong", pgettext_lazy("AuthenticationType", "Strong")
 
 
 class ReservationUnitImageType(models.TextChoices):
-    MAIN = "main", _("Main image")
-    GROUND_PLAN = "ground_plan", _("Ground plan")
-    MAP = "map", _("Map")
-    OTHER = "other", _("Other")
+    MAIN = "main", pgettext_lazy("ReservationUnitImageType", "Main image")
+    GROUND_PLAN = "ground_plan", pgettext_lazy("ReservationUnitImageType", "Ground plan")
+    MAP = "map", pgettext_lazy("ReservationUnitImageType", "Map")
+    OTHER = "other", pgettext_lazy("ReservationUnitImageType", "Other")

@@ -5,7 +5,7 @@ from graphene_django_extensions.testing.utils import parametrize_helper
 from graphql_relay import to_global_id
 
 from api.graphql.types.banner_notification.types import BannerNotificationNode
-from common.choices import BannerNotificationTarget
+from common.enums import BannerNotificationTarget
 from tests.factories import BannerNotificationFactory, UserFactory
 
 # Applied to all tests

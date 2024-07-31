@@ -6,7 +6,7 @@ from django.utils.timezone import get_default_timezone
 
 from common.date_utils import local_datetime, next_hour, timedelta_to_json
 from reservation_units.models import ReservationUnitHierarchy
-from reservations.choices import ReservationStateChoice, ReservationTypeChoice
+from reservations.enums import ReservationStateChoice, ReservationTypeChoice
 from reservations.models import Reservation
 from tests.factories import (
     AgeGroupFactory,

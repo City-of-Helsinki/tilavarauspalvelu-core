@@ -5,12 +5,12 @@ from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
 from actions.recurring_reservation import ReservationDetails
-from applications.choices import ApplicantTypeChoice, Weekday
+from applications.enums import ApplicantTypeChoice, Weekday
 from applications.models import Address, AllocatedTimeSlot, Organisation, Person
 from common.utils import translate_for_user
 from opening_hours.errors import ReservableTimeSpanClientError
 from opening_hours.utils.reservable_time_span_client import ReservableTimeSpanClient
-from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+from reservations.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import RecurringReservation
 from tilavarauspalvelu.celery import app
 from utils.sentry import SentryLogger

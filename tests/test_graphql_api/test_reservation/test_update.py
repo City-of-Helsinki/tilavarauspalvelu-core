@@ -6,7 +6,7 @@ import pytest
 from common.date_utils import local_datetime
 from reservation_units.enums import PriceUnit, PricingStatus
 from reservation_units.models import ReservationUnitHierarchy
-from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+from reservations.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from tests.factories import (
     ApplicationRoundFactory,
     CityFactory,

@@ -6,7 +6,7 @@ import pytest
 from django.utils import timezone
 from graphene_django_extensions.testing.utils import parametrize_helper
 
-from applications.choices import ApplicantTypeChoice, Priority, Weekday
+from applications.enums import ApplicantTypeChoice, Priority, Weekday
 from applications.exporter.application_round_applications_exporter import (
     ApplicationExportRow,
     ApplicationRoundApplicationsCSVExporter,

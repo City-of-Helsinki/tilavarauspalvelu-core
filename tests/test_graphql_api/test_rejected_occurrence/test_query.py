@@ -2,7 +2,7 @@ import datetime
 
 import pytest
 
-from reservations.choices import RejectionReadinessChoice
+from reservations.enums import RejectionReadinessChoice
 from tests.factories import RejectedOccurrenceFactory
 
 from .helpers import rejected_occurrence_query

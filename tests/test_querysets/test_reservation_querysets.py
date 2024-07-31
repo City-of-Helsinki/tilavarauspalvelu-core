@@ -6,7 +6,7 @@ from django.utils.timezone import get_current_timezone
 from opening_hours.utils.time_span_element import TimeSpanElement
 from reservation_units.models import ReservationUnit, ReservationUnitHierarchy
 from reservation_units.utils.affecting_reservations_helper import AffectingReservationHelper
-from reservations.choices import ReservationStateChoice, ReservationTypeChoice
+from reservations.enums import ReservationStateChoice, ReservationTypeChoice
 from reservations.models import Reservation
 from tests.factories import ReservationFactory, ReservationUnitFactory, ResourceFactory, SpaceFactory, UnitFactory
 

@@ -5,6 +5,7 @@ from typing import Literal
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import pgettext_lazy
 
 __all__ = [
     "ApplicantTypeChoice",
@@ -114,31 +115,31 @@ class Weekday(models.TextChoices):
 
 
 class Priority(models.TextChoices):
-    PRIMARY = "PRIMARY", _("Primary")
-    SECONDARY = "SECONDARY", _("Secondary")
+    PRIMARY = "PRIMARY", pgettext_lazy("Priority", "Primary")
+    SECONDARY = "SECONDARY", pgettext_lazy("Priority", "Secondary")
 
 
 class ApplicantTypeChoice(models.TextChoices):
-    INDIVIDUAL = "INDIVIDUAL", _("Individual")
-    ASSOCIATION = "ASSOCIATION", _("Association")
-    COMMUNITY = "COMMUNITY", _("Community")
-    COMPANY = "COMPANY", _("Company")
+    INDIVIDUAL = "INDIVIDUAL", pgettext_lazy("ApplicantType", "Individual")
+    ASSOCIATION = "ASSOCIATION", pgettext_lazy("ApplicantType", "Association")
+    COMMUNITY = "COMMUNITY", pgettext_lazy("ApplicantType", "Community")
+    COMPANY = "COMPANY", pgettext_lazy("ApplicantType", "Company")
 
 
 class ApplicationRoundStatusChoice(models.TextChoices):
-    UPCOMING = "UPCOMING", _("Upcoming")
+    UPCOMING = "UPCOMING", pgettext_lazy("ApplicationRoundStatus", "Upcoming")
     """Applications cannot yet be made in the round"""
 
-    OPEN = "OPEN", _("Open")
+    OPEN = "OPEN", pgettext_lazy("ApplicationRoundStatus", "Open")
     """Applications can be made in the round"""
 
-    IN_ALLOCATION = "IN_ALLOCATION", _("In Allocation")
+    IN_ALLOCATION = "IN_ALLOCATION", pgettext_lazy("ApplicationRoundStatus", "In Allocation")
     """Applications in the round are being allocated"""
 
-    HANDLED = "HANDLED", _("Handled")
+    HANDLED = "HANDLED", pgettext_lazy("ApplicationRoundStatus", "Handled")
     """All application have been allocated"""
 
-    RESULTS_SENT = "SENT", _("Results Sent")
+    RESULTS_SENT = "SENT", pgettext_lazy("ApplicationRoundStatus", "Results Sent")
     """All application results have been sent to users"""
 
     @DynamicClassAttribute
@@ -172,36 +173,36 @@ class ApplicationRoundStatusChoice(models.TextChoices):
 
 
 class ApplicationRoundReservationCreationStatusChoice(models.TextChoices):
-    NOT_COMPLETED = "NOT_COMPLETED", _("Not completed")
+    NOT_COMPLETED = "NOT_COMPLETED", pgettext_lazy("ApplicationRoundReservationCreationStatus", "Not completed")
     """The ApplicationRound has not been marked as completed yet or the reservations have not been created yet"""
 
-    COMPLETED = "COMPLETED", _("Completed")
+    COMPLETED = "COMPLETED", pgettext_lazy("ApplicationRoundReservationCreationStatus", "Completed")
     """All reservations for the ApplicationRound have been created successfully"""
 
-    FAILED = "FAILED", _("Failed")
+    FAILED = "FAILED", pgettext_lazy("ApplicationRoundReservationCreationStatus", "Failed")
     """Reservations for the ApplicationRound could not be created successfully or reservation creation has timed out"""
 
 
 class ApplicationStatusChoice(models.TextChoices):
-    DRAFT = "DRAFT", _("Draft")
+    DRAFT = "DRAFT", pgettext_lazy("ApplicationStatus", "Draft")
     """Application started but not ready"""
 
-    RECEIVED = "RECEIVED", _("Received")
+    RECEIVED = "RECEIVED", pgettext_lazy("ApplicationStatus", "Received")
     """Application sent by user"""
 
-    IN_ALLOCATION = "IN_ALLOCATION", _("In Allocation")
+    IN_ALLOCATION = "IN_ALLOCATION", pgettext_lazy("ApplicationStatus", "In Allocation")
     """Application's events are being allocated"""
 
-    HANDLED = "HANDLED", _("Handled")
+    HANDLED = "HANDLED", pgettext_lazy("ApplicationStatus", "Handled")
     """Application's events have all been allocated"""
 
-    RESULTS_SENT = "RESULT_SENT", _("Results Sent")
+    RESULTS_SENT = "RESULT_SENT", pgettext_lazy("ApplicationStatus", "Results Sent")
     """Application's results have been sent to user"""
 
-    EXPIRED = "EXPIRED", _("Expired")
+    EXPIRED = "EXPIRED", pgettext_lazy("ApplicationStatus", "Expired")
     """Application not completed before application round ended"""
 
-    CANCELLED = "CANCELLED", _("Cancelled")
+    CANCELLED = "CANCELLED", pgettext_lazy("ApplicationStatus", "Cancelled")
     """Application cancelled by user"""
 
     @DynamicClassAttribute
@@ -243,16 +244,16 @@ class ApplicationStatusChoice(models.TextChoices):
 
 
 class ApplicationSectionStatusChoice(models.TextChoices):
-    UNALLOCATED = "UNALLOCATED", _("Unallocated")
+    UNALLOCATED = "UNALLOCATED", pgettext_lazy("ApplicationSectionStatus", "Unallocated")
     """Application sections has been created by the user, but it hasn't been allocated"""
 
-    IN_ALLOCATION = "IN_ALLOCATION", _("In Allocation")
+    IN_ALLOCATION = "IN_ALLOCATION", pgettext_lazy("ApplicationSectionStatus", "In Allocation")
     """Some allocations have been made for the application section, but allocation is not finished"""
 
-    HANDLED = "HANDLED", _("Handled")
+    HANDLED = "HANDLED", pgettext_lazy("ApplicationSectionStatus", "Handled")
     """Application section has been handled fully in the allocation process"""
 
-    REJECTED = "REJECTED", _("Rejected")
+    REJECTED = "REJECTED", pgettext_lazy("ApplicationSectionStatus", "Rejected")
     """All applied slots for this application section have been locked or rejected."""
 
     @DynamicClassAttribute
@@ -276,15 +277,15 @@ class ApplicationSectionStatusChoice(models.TextChoices):
 
 
 class TargetGroupChoice(models.TextChoices):
-    INTERNAL = "INTERNAL", _("Internal")
-    PUBLIC = "PUBLIC", _("Public")
-    ALL = "ALL", _("All")
+    INTERNAL = "INTERNAL", pgettext_lazy("TargetGroup", "Internal")
+    PUBLIC = "PUBLIC", pgettext_lazy("TargetGroup", "Public")
+    ALL = "ALL", pgettext_lazy("TargetGroup", "All")
 
 
 class OrganizationTypeChoice(models.TextChoices):
-    COMPANY = "COMPANY", _("Company")
-    REGISTERED_ASSOCIATION = "REGISTERED_ASSOCIATION", _("Registered association")
-    PUBLIC_ASSOCIATION = "PUBLIC_ASSOCIATION", _("Public association")
-    UNREGISTERED_ASSOCIATION = "UNREGISTERED_ASSOCIATION", _("Unregistered association")
-    MUNICIPALITY_CONSORTIUM = "MUNICIPALITY_CONSORTIUM", _("Municipality consortium")
-    RELIGIOUS_COMMUNITY = "RELIGIOUS_COMMUNITY", _("Religious community")
+    COMPANY = "COMPANY", pgettext_lazy("OrganizationType", "Company")
+    REGISTERED_ASSOCIATION = "REGISTERED_ASSOCIATION", pgettext_lazy("OrganizationType", "Registered association")
+    PUBLIC_ASSOCIATION = "PUBLIC_ASSOCIATION", pgettext_lazy("OrganizationType", "Public association")
+    UNREGISTERED_ASSOCIATION = "UNREGISTERED_ASSOCIATION", pgettext_lazy("OrganizationType", "Unregistered association")
+    MUNICIPALITY_CONSORTIUM = "MUNICIPALITY_CONSORTIUM", pgettext_lazy("OrganizationType", "Municipality consortium")
+    RELIGIOUS_COMMUNITY = "RELIGIOUS_COMMUNITY", pgettext_lazy("OrganizationType", "Religious community")

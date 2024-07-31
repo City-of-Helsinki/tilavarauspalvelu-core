@@ -8,7 +8,7 @@ from api.graphql.extensions.validation_errors import ValidationErrorCodes, Valid
 from api.graphql.types.reservation.serializers.mixins import ReservationPriceMixin, ReservationSchedulingMixin
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from reservation_units.models import ReservationUnit
-from reservations.choices import ReservationStateChoice, ReservationTypeChoice
+from reservations.enums import ReservationStateChoice, ReservationTypeChoice
 from reservations.models import Reservation
 
 DEFAULT_TIMEZONE = get_default_timezone()

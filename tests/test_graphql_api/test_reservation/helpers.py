@@ -7,7 +7,7 @@ from graphene_django_extensions.testing import build_mutation, build_query
 
 from common.date_utils import next_hour
 from reservation_units.models import ReservationUnit
-from reservations.choices import ReservationTypeChoice
+from reservations.enums import ReservationTypeChoice
 from reservations.models import Reservation
 from tests.factories import ReservationCancelReasonFactory, ReservationDenyReasonFactory
 from tests.factories.helsinki_profile import MyProfileDataFactory

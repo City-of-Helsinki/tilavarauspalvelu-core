@@ -1,7 +1,7 @@
 import factory
 from factory import fuzzy
 
-from resources.choices import ResourceLocationType
+from resources.enums import ResourceLocationType
 from resources.models import Resource
 
 from ._base import GenericDjangoModelFactory

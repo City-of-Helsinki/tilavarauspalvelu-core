@@ -4,7 +4,7 @@ from unittest import mock
 
 import pytest
 
-from applications.choices import Weekday
+from applications.enums import Weekday
 from applications.exporter.application_round_result_exporter import (
     ApplicationRoundResultCSVExporter,
     ApplicationSectionExportRow,

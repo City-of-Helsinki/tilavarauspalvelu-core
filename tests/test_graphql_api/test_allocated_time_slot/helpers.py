@@ -4,7 +4,7 @@ from typing import Any
 
 from graphene_django_extensions.testing import build_mutation, build_query
 
-from applications.choices import Weekday
+from applications.enums import Weekday
 from applications.models import ReservationUnitOption
 
 allocations_query = partial(build_query, "allocatedTimeSlots", connection=True, order_by="pkAsc")

@@ -7,7 +7,7 @@ from email_notification.helpers.reservation_email_notification_sender import Res
 from merchants.enums import OrderStatus
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from reservations.choices import ReservationStateChoice
+from reservations.enums import ReservationStateChoice
 from tests.factories import PaymentOrderFactory, ReservationFactory
 from tests.helpers import patch_method
 from tests.test_external_services.test_verkkokauppa.test_webhooks.helpers import get_mock_order_payment_api

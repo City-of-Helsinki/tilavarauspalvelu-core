@@ -12,7 +12,7 @@ from django.utils.timezone import get_default_timezone
 from common.utils import get_attr_by_language
 from email_notification.helpers.email_builder_base import BaseEmailBuilder, BaseEmailContext
 from email_notification.models import EmailTemplate, EmailType
-from reservations.choices import CustomerTypeChoice
+from reservations.enums import CustomerTypeChoice
 
 if TYPE_CHECKING:
     from email_notification.admin.email_template_tester import EmailTemplateTesterForm

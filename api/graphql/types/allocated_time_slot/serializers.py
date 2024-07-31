@@ -6,7 +6,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from api.graphql.extensions import error_codes
-from applications.choices import Weekday
+from applications.enums import Weekday
 from applications.models import AllocatedTimeSlot, ApplicationSection, ReservationUnitOption, SuitableTimeRange
 from common.date_utils import time_difference, timedelta_to_json
 

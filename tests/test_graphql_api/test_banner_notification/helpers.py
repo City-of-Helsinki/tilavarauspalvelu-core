@@ -3,7 +3,7 @@ from typing import Any, NamedTuple
 
 from graphene_django_extensions.testing import build_mutation, build_query
 
-from common.choices import BannerNotificationTarget
+from common.enums import BannerNotificationTarget
 from tests.helpers import UserType
 
 banner_notifications_query = partial(build_query, "bannerNotifications", connection=True, order_by="pkAsc")

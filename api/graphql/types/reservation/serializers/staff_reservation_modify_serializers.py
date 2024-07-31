@@ -11,7 +11,7 @@ from api.graphql.extensions.validation_errors import ValidationErrorCodes, Valid
 from api.graphql.types.reservation.serializers.mixins import ReservationSchedulingMixin
 from applications.models import City
 from reservation_units.models import ReservationUnit
-from reservations.choices import (
+from reservations.enums import (
     RESERVEE_LANGUAGE_CHOICES,
     CustomerTypeChoice,
     ReservationStateChoice,

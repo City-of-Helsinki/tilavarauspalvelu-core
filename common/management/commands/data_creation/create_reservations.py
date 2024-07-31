@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 from applications.models import City
 from common.date_utils import local_start_of_day
 from reservation_units.models import ReservationUnit, ReservationUnitPricing
-from reservations.choices import CustomerTypeChoice, ReservationStateChoice
+from reservations.enums import CustomerTypeChoice, ReservationStateChoice
 from reservations.models import (
     AgeGroup,
     Reservation,

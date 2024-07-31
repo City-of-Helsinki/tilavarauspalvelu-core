@@ -2,7 +2,7 @@ import datetime
 
 import pytest
 
-from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+from reservations.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from tests.factories import (
     AgeGroupFactory,
     CityFactory,

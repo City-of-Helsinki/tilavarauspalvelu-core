@@ -3,7 +3,7 @@ from django_filters import rest_framework as filters
 from api.legacy_rest_api.filters import ModelInFilter, NumberInFilter
 from applications.models import ApplicationEvent, ApplicationRound
 from reservation_units.models import Purpose, ReservationUnit, ReservationUnitType
-from reservations.choices import ReservationStateChoice
+from reservations.enums import ReservationStateChoice
 from reservations.models import RecurringReservation, Reservation
 from spaces.models import Unit
 

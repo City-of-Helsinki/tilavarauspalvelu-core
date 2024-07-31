@@ -7,7 +7,7 @@ from django.db.models import Q, QuerySet
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
 
-from applications.choices import ApplicationRoundStatusChoice, ApplicationStatusChoice
+from applications.enums import ApplicationRoundStatusChoice, ApplicationStatusChoice
 from applications.models import ApplicationRound
 
 if TYPE_CHECKING:

@@ -4,7 +4,7 @@ from django.db import models
 from django.db.models import Subquery
 from lookup_property import L
 
-from applications.choices import ApplicationStatusChoice
+from applications.enums import ApplicationStatusChoice
 
 
 class ApplicationQuerySet(models.QuerySet):

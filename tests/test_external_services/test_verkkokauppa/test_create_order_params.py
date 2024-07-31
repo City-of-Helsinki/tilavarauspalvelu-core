@@ -7,7 +7,7 @@ from django.conf import settings
 
 from common.date_utils import local_datetime
 from merchants.verkkokauppa.helpers import get_verkkokauppa_order_params
-from reservations.choices import CustomerTypeChoice
+from reservations.enums import CustomerTypeChoice
 from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory, UserFactory
 
 # Applied to all tests

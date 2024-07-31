@@ -5,7 +5,7 @@ import pytest
 from django.utils.timezone import get_default_timezone
 
 from common.date_utils import timedelta_to_json
-from reservations.choices import ReservationStateChoice
+from reservations.enums import ReservationStateChoice
 from reservations.models import Reservation
 from tests.factories import (
     OriginHaukiResourceFactory,

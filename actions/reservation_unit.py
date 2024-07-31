@@ -193,7 +193,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         end_datetime: datetime.datetime,
         reservation: Reservation | None = None,
     ) -> bool:
-        from reservations.choices import ReservationStateChoice
+        from reservations.enums import ReservationStateChoice
         from reservations.models import Reservation
 
         qs = Reservation.objects.filter(
@@ -214,7 +214,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         reservation: Reservation | None = None,
         exclude_blocked: bool = False,
     ) -> Reservation | None:
-        from reservations.choices import ReservationStateChoice, ReservationTypeChoice
+        from reservations.enums import ReservationStateChoice, ReservationTypeChoice
         from reservations.models import Reservation
 
         qs = Reservation.objects.filter(
@@ -236,7 +236,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         reservation: Reservation | None = None,
         exclude_blocked: bool = False,
     ) -> Reservation | None:
-        from reservations.choices import ReservationStateChoice, ReservationTypeChoice
+        from reservations.enums import ReservationStateChoice, ReservationTypeChoice
         from reservations.models import Reservation
 
         qs = Reservation.objects.filter(

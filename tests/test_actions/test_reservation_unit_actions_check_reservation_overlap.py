@@ -4,7 +4,7 @@ import pytest
 
 from common.date_utils import local_datetime
 from reservation_units.models import ReservationUnitHierarchy
-from reservations.choices import ReservationStateChoice
+from reservations.enums import ReservationStateChoice
 from tests.factories import ReservationFactory, ReservationUnitFactory, ServiceFactory, SpaceFactory
 
 # Applied to all tests

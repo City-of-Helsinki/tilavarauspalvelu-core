@@ -5,7 +5,7 @@ import pytest
 from django.utils.timezone import get_default_timezone
 
 from applications.models import City
-from reservations.choices import CustomerTypeChoice, ReservationStateChoice
+from reservations.enums import CustomerTypeChoice, ReservationStateChoice
 from reservations.models import AgeGroup, ReservationStatistic
 from tests.factories import (
     RecurringReservationFactory,

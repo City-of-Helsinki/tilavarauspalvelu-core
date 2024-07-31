@@ -7,7 +7,7 @@ from django.db.models import Q, QuerySet
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
 
-from applications.choices import (
+from applications.enums import (
     ApplicationRoundStatusChoice,
     ApplicationSectionStatusChoice,
     ApplicationStatusChoice,

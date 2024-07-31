@@ -14,7 +14,7 @@ from merchants.enums import OrderStatus
 from merchants.models import PaymentOrder
 from reservations.admin.reservation.filters import PaidReservationListFilter, RecurringReservationListFilter
 from reservations.admin.reservation.form import ReservationAdminForm
-from reservations.choices import ReservationStateChoice
+from reservations.enums import ReservationStateChoice
 from reservations.models import Reservation, ReservationDenyReason
 from reservations.tasks import refund_paid_reservation_task
 

@@ -6,7 +6,7 @@ from query_optimizer import AnnotatedField
 
 from api.graphql.types.application_round.filtersets import ApplicationRoundFilterSet
 from api.graphql.types.application_round.permissions import ApplicationRoundPermission
-from applications.choices import ApplicationRoundReservationCreationStatusChoice, ApplicationRoundStatusChoice
+from applications.enums import ApplicationRoundReservationCreationStatusChoice, ApplicationRoundStatusChoice
 from applications.models import ApplicationRound
 from common.typing import GQLInfo
 

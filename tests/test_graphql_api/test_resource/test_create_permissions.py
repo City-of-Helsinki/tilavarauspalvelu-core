@@ -1,6 +1,6 @@
 import pytest
 
-from resources.choices import ResourceLocationType
+from resources.enums import ResourceLocationType
 from resources.models import Resource
 from tests.factories import SpaceFactory, UnitGroupFactory, UserFactory
 from tests.helpers import UserType

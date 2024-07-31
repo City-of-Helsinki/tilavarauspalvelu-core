@@ -16,7 +16,7 @@ from common.typing import AnyUser
 from permissions.helpers import can_handle_reservation_with_units
 from reservation_units.enums import ReservationKind
 from reservation_units.models import ReservationUnit
-from reservations.choices import (
+from reservations.enums import (
     RESERVEE_LANGUAGE_CHOICES,
     CustomerTypeChoice,
     ReservationStateChoice,

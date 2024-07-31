@@ -2,7 +2,7 @@ import datetime
 
 import pytest
 
-from applications.choices import (
+from applications.enums import (
     ApplicationRoundReservationCreationStatusChoice,
     ApplicationRoundStatusChoice,
     ApplicationStatusChoice,

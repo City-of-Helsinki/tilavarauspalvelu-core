@@ -5,7 +5,7 @@ from django.utils.timezone import get_default_timezone
 
 from common.utils import get_attr_by_language
 from email_notification.helpers.email_builder_reservation import ReservationEmailContext
-from reservations.choices import CustomerTypeChoice
+from reservations.enums import CustomerTypeChoice
 from reservations.models import Reservation
 from spaces.models import Location
 from tests.factories import (

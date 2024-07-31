@@ -4,7 +4,7 @@ import pytest
 
 from common.date_utils import next_hour
 from email_notification.models import EmailType
-from reservations.choices import ReservationStateChoice
+from reservations.enums import ReservationStateChoice
 from tests.factories import EmailTemplateFactory, ReservationFactory, ReservationUnitFactory, UserFactory
 from users.models import ReservationNotification
 

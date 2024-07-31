@@ -4,7 +4,7 @@ import pytest
 from django.utils import timezone
 
 from merchants.enums import OrderStatus
-from reservations.choices import CustomerTypeChoice
+from reservations.enums import CustomerTypeChoice
 from tests.factories import PaymentOrderFactory, ReservationFactory, ReservationUnitFactory
 from tests.helpers import UserType
 from tests.test_graphql_api.test_reservation.helpers import reservations_query

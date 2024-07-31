@@ -12,7 +12,7 @@ from api.graphql.types.address.serializers import AddressSerializer
 from api.graphql.types.application_section.serializers import ApplicationSectionForApplicationSerializer
 from api.graphql.types.organisation.serializers import OrganisationSerializer
 from api.graphql.types.person.serializers import PersonSerializer
-from applications.choices import ApplicationStatusChoice
+from applications.enums import ApplicationStatusChoice
 from applications.models import AllocatedTimeSlot, Application, ReservationUnitOption
 from common.fields.serializer import CurrentUserDefaultNullable
 from email_notification.helpers.application_email_notification_sender import ApplicationEmailNotificationSender

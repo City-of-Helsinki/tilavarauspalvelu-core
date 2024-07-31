@@ -4,7 +4,7 @@ import pytest
 
 from common.date_utils import DEFAULT_TIMEZONE, local_end_of_day, local_start_of_day
 from reservation_units.models import ReservationUnitHierarchy
-from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+from reservations.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import RecurringReservation, Reservation
 from tests.factories import (
     AbilityGroupFactory,

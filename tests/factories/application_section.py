@@ -6,7 +6,7 @@ from typing import Any
 import factory
 from factory import fuzzy
 
-from applications.choices import ApplicationSectionStatusChoice, Weekday
+from applications.enums import ApplicationSectionStatusChoice, Weekday
 from applications.models import ApplicationSection, ReservationUnitOption, SuitableTimeRange
 
 from ._base import GenericDjangoModelFactory

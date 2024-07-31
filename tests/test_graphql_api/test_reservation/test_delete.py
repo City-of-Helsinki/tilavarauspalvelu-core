@@ -5,7 +5,7 @@ import pytest
 from merchants.enums import OrderStatus
 from merchants.verkkokauppa.order.exceptions import CancelOrderError
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from reservations.choices import ReservationStateChoice
+from reservations.enums import ReservationStateChoice
 from reservations.models import Reservation
 from tests.factories import OrderFactory, PaymentOrderFactory, ReservationFactory
 from tests.helpers import patch_method

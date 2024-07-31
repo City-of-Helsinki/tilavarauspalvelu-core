@@ -1,7 +1,7 @@
 import pytest
 
 from email_notification.models import EmailType
-from reservations.choices import ReservationStateChoice
+from reservations.enums import ReservationStateChoice
 from tests.factories import EmailTemplateFactory, ReservationFactory, UnitFactory, UserFactory
 from users.models import ReservationNotification
 

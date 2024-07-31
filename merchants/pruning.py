@@ -11,7 +11,7 @@ from merchants.verkkokauppa.order.exceptions import CancelOrderError
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
 from merchants.verkkokauppa.payment.types import PaymentStatus as WebShopPaymentStatus
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from reservations.choices import ReservationStateChoice
+from reservations.enums import ReservationStateChoice
 from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:

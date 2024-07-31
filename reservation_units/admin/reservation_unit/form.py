@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from subforms.fields import DynamicArrayField, NestedFormField
 from tinymce.widgets import TinyMCE
 
-from applications.choices import WeekdayChoice
+from applications.enums import WeekdayChoice
 from applications.models import ApplicationRoundTimeSlot
 from applications.validators import validate_string_time
 from reservation_units.models import ReservationUnit

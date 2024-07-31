@@ -13,7 +13,7 @@ from lookup_property import lookup_property
 
 from common.connectors import ReservationActionsConnector
 from common.db import SubqueryArray
-from reservations.choices import (
+from reservations.enums import (
     RESERVEE_LANGUAGE_CHOICES,
     CustomerTypeChoice,
     ReservationStateChoice,

@@ -3,7 +3,7 @@ import datetime
 import pytest
 from django.utils.timezone import get_default_timezone
 
-from applications.choices import ApplicationSectionStatusChoice, ApplicationStatusChoice, Weekday
+from applications.enums import ApplicationSectionStatusChoice, ApplicationStatusChoice, Weekday
 from tests.factories import AllocatedTimeSlotFactory, ApplicationFactory, ApplicationSectionFactory
 from tests.helpers import UserType
 

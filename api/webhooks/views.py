@@ -12,7 +12,7 @@ from merchants.verkkokauppa.order.exceptions import GetOrderError
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError, GetRefundStatusError
 from merchants.verkkokauppa.payment.types import PaymentStatus, RefundStatus
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from reservations.choices import ReservationStateChoice
+from reservations.enums import ReservationStateChoice
 from utils.sentry import SentryLogger
 
 from .permissions import WebhookPermission

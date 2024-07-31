@@ -1,7 +1,7 @@
 import pytest
 from lookup_property import L
 
-from applications.choices import Weekday
+from applications.enums import Weekday
 from applications.models import SuitableTimeRange
 from tests.factories import AllocatedTimeSlotFactory, ApplicationSectionFactory, SuitableTimeRangeFactory
 

@@ -3,7 +3,7 @@ from typing import Self
 from django.db import models
 from lookup_property import L
 
-from reservations.choices import RejectionReadinessChoice
+from reservations.enums import RejectionReadinessChoice
 
 
 class RejectedOccurrenceQuerySet(models.QuerySet):

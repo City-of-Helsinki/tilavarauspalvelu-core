@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 from rest_framework.exceptions import ValidationError
 
-from applications.choices import OrganizationTypeChoice
+from applications.enums import OrganizationTypeChoice
 from common.fields.model import StrChoiceField
 
 __all__ = [

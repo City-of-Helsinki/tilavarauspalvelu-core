@@ -7,7 +7,7 @@ import factory
 from django.utils.timezone import get_default_timezone, now
 from factory import fuzzy
 
-from applications.choices import ApplicantTypeChoice, ApplicationStatusChoice, Priority, Weekday
+from applications.enums import ApplicantTypeChoice, ApplicationStatusChoice, Priority, Weekday
 from applications.models import Application, ApplicationRound, ApplicationSection
 from reservation_units.models import ReservationUnit
 

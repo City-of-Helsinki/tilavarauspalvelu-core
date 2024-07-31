@@ -2,7 +2,7 @@ from typing import Any
 
 from graphene_django_extensions.permissions import BasePermission
 
-from common.choices import BannerNotificationTarget
+from common.enums import BannerNotificationTarget
 from common.models import BannerNotification
 from common.typing import AnyUser
 from permissions.helpers import can_manage_banner_notifications

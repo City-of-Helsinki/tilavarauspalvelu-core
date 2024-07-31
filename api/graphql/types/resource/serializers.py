@@ -3,7 +3,7 @@ from typing import Any
 from graphene_django_extensions import NestingModelSerializer
 from graphql import GraphQLError
 
-from resources.choices import ResourceLocationType
+from resources.enums import ResourceLocationType
 from resources.models import Resource
 
 __all__ = [

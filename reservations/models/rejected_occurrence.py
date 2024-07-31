@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from graphene_django_extensions.fields.model import StrChoiceField
 
 from common.connectors import RejectedOccurrenceActionsConnector
-from reservations.choices import RejectionReadinessChoice
+from reservations.enums import RejectionReadinessChoice
 from reservations.querysets import RejectedOccurrenceQuerySet
 
 if TYPE_CHECKING:

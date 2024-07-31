@@ -22,7 +22,7 @@ from opening_hours.utils.hauki_link_generator import generate_hauki_link
 from permissions.helpers import can_manage_units, can_modify_reservation_unit
 from reservation_units.enums import ReservationState, ReservationUnitState
 from reservation_units.models import ReservationUnit
-from reservations.choices import ReservationTypeChoice
+from reservations.enums import ReservationTypeChoice
 from reservations.models import Reservation
 from spaces.models import Location, Space, Unit
 

@@ -1,6 +1,6 @@
 import pytest
 
-from applications.choices import ApplicantTypeChoice, ApplicationSectionStatusChoice, Weekday
+from applications.enums import ApplicantTypeChoice, ApplicationSectionStatusChoice, Weekday
 from tests.factories import AllocatedTimeSlotFactory, ApplicationSectionFactory, ReservationUnitFactory
 from tests.helpers import UserType
 

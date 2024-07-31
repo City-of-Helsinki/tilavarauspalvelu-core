@@ -4,7 +4,7 @@ from typing import Any
 import factory
 from factory import fuzzy
 
-from applications.choices import WeekdayChoice
+from applications.enums import WeekdayChoice
 from applications.models.application_round_time_slot import ApplicationRoundTimeSlot
 from applications.typing import TimeSlotDB
 

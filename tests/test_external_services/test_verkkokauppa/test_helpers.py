@@ -6,7 +6,7 @@ from freezegun import freeze_time
 
 from merchants.verkkokauppa.exceptions import UnsupportedMetaKeyError
 from merchants.verkkokauppa.helpers import get_formatted_reservation_time, get_meta_label, get_verkkokauppa_order_params
-from reservations.choices import CustomerTypeChoice
+from reservations.enums import CustomerTypeChoice
 from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory, UserFactory
 
 # Applied to all tests

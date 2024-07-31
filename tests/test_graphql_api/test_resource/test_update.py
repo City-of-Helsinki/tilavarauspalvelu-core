@@ -1,6 +1,6 @@
 import pytest
 
-from resources.choices import ResourceLocationType
+from resources.enums import ResourceLocationType
 from tests.factories import ResourceFactory
 from tests.helpers import UserType
 

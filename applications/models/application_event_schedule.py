@@ -3,7 +3,7 @@ import datetime
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from applications.choices import WeekdayChoice
+from applications.enums import WeekdayChoice
 from common.fields.model import IntChoiceField
 
 __all__ = [

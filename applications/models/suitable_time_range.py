@@ -6,7 +6,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L, lookup_property
 
-from applications.choices import ApplicationSectionStatusChoice, Priority, Weekday
+from applications.enums import ApplicationSectionStatusChoice, Priority, Weekday
 from applications.querysets.suitable_time_range import SuitableTimeRangeQuerySet
 from common.connectors import SuitableTimeRangeActionsConnector
 from common.fields.model import StrChoiceField

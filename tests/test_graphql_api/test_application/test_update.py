@@ -1,6 +1,6 @@
 import pytest
 
-from applications.choices import Weekday
+from applications.enums import Weekday
 from applications.models import Address, ApplicationSection, Organisation, SuitableTimeRange
 from tests.factories import ApplicationFactory
 from tests.helpers import UserType

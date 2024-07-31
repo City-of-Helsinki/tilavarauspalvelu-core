@@ -11,7 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L, lookup_property
 
-from applications.choices import ApplicationSectionStatusChoice, Weekday
+from applications.enums import ApplicationSectionStatusChoice, Weekday
 from applications.querysets.application_section import ApplicationSectionQuerySet
 from common.connectors import ApplicationSectionActionsConnector
 from common.date_utils import local_datetime

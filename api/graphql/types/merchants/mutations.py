@@ -13,7 +13,7 @@ from merchants.enums import OrderStatus
 from merchants.models import PaymentOrder
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from reservations.choices import ReservationStateChoice
+from reservations.enums import ReservationStateChoice
 from utils.sentry import SentryLogger
 
 

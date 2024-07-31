@@ -1,6 +1,6 @@
 import pytest
 
-from applications.choices import ApplicationSectionStatusChoice
+from applications.enums import ApplicationSectionStatusChoice
 from tests.factories import ApplicationSectionFactory
 from tests.helpers import UserType
 from tests.test_graphql_api.test_application_section.helpers import DELETE_MUTATION, get_application_section_delete_data

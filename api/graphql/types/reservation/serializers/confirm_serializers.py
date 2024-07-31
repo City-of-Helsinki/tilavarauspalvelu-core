@@ -13,7 +13,7 @@ from merchants.verkkokauppa.order.exceptions import CreateOrderError
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservation_units.enums import PaymentType, PricingType
 from reservation_units.utils.reservation_unit_pricing_helper import ReservationUnitPricingHelper
-from reservations.choices import ReservationStateChoice
+from reservations.enums import ReservationStateChoice
 from reservations.models import Reservation
 from utils.decimal_utils import round_decimal
 from utils.sentry import SentryLogger

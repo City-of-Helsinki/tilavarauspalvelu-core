@@ -3,7 +3,7 @@ import datetime
 import factory
 from factory import fuzzy
 
-from applications.choices import ApplicantTypeChoice, Weekday
+from applications.enums import ApplicantTypeChoice, Weekday
 from applications.models import AllocatedTimeSlot
 from common.date_utils import DEFAULT_TIMEZONE, local_start_of_day
 

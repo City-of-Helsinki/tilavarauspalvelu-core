@@ -7,7 +7,7 @@ from api.graphql.extensions import error_codes
 from common.date_utils import local_datetime
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from merchants.enums import OrderStatus
-from reservations.choices import ReservationStateChoice
+from reservations.enums import ReservationStateChoice
 from reservations.models import Reservation
 from reservations.tasks import refund_paid_reservation_task
 

@@ -4,7 +4,7 @@ import re
 import freezegun
 import pytest
 
-from applications.choices import ApplicantTypeChoice, Weekday
+from applications.enums import ApplicantTypeChoice, Weekday
 from applications.tasks import generate_reservation_series_from_allocations
 from common.date_utils import DEFAULT_TIMEZONE, combine, local_datetime, local_iso_format
 from opening_hours.enums import HaukiResourceState
@@ -17,7 +17,7 @@ from opening_hours.utils.hauki_api_types import (
     HaukiTranslatedField,
 )
 from reservation_units.models import ReservationUnitHierarchy
-from reservations.choices import (
+from reservations.enums import (
     CustomerTypeChoice,
     RejectionReadinessChoice,
     ReservationStateChoice,

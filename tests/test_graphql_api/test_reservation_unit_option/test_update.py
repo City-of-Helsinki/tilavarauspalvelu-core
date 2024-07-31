@@ -1,6 +1,6 @@
 import pytest
 
-from applications.choices import Weekday
+from applications.enums import Weekday
 from tests.factories import ReservationUnitOptionFactory
 from tests.helpers import UserType
 

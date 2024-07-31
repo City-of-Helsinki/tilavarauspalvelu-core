@@ -1,7 +1,7 @@
 import pytest
 from graphene_django_extensions.testing import parametrize_helper
 
-from common.choices import BannerNotificationTarget
+from common.enums import BannerNotificationTarget
 from tests.factories import BannerNotificationFactory
 from tests.helpers import UserType
 from tests.test_graphql_api.test_banner_notification.helpers import FieldParams, TargetParams, UserTypeParams

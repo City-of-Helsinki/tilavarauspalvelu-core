@@ -4,7 +4,7 @@ import pytest
 
 from common.date_utils import local_datetime
 from email_notification.models import EmailType
-from reservations.choices import ReservationStateChoice, ReservationTypeChoice
+from reservations.enums import ReservationStateChoice, ReservationTypeChoice
 from tests.factories import EmailTemplateFactory, ReservationFactory, UserFactory
 
 from .helpers import DENY_MUTATION, get_deny_data

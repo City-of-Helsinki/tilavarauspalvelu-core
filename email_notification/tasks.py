@@ -1,7 +1,7 @@
 from django.conf import settings
 from lookup_property import L
 
-from applications.choices import ApplicationRoundStatusChoice, ApplicationSectionStatusChoice
+from applications.enums import ApplicationRoundStatusChoice, ApplicationSectionStatusChoice
 from applications.models import Application
 from common.date_utils import local_datetime
 from email_notification.exceptions import SendEmailNotificationError

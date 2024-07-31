@@ -11,7 +11,7 @@ from api.graphql.extensions import error_codes
 from api.graphql.types.application_round_time_slot.serializers import ApplicationRoundTimeSlotSerializer
 from api.graphql.types.reservation_unit_image.serializers import ReservationUnitImageFieldSerializer
 from api.graphql.types.reservation_unit_pricing.serializers import ReservationUnitPricingSerializer
-from applications.choices import WeekdayChoice
+from applications.enums import WeekdayChoice
 from opening_hours.utils.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from reservation_units.enums import PricingStatus, ReservationStartInterval
 from reservation_units.models import ReservationUnit, ReservationUnitPricing

@@ -5,7 +5,7 @@ import freezegun
 import pytest
 from graphql_relay import to_global_id
 
-from reservations.choices import CustomerTypeChoice, ReservationTypeChoice
+from reservations.enums import CustomerTypeChoice, ReservationTypeChoice
 from tests.factories import (
     PaymentOrderFactory,
     ReservationFactory,

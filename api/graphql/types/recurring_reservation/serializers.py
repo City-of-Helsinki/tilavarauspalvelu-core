@@ -9,13 +9,13 @@ from rest_framework.exceptions import ValidationError
 
 from actions.recurring_reservation import ReservationDetails
 from api.graphql.extensions import error_codes
-from applications.choices import WeekdayChoice
+from applications.enums import WeekdayChoice
 from common.date_utils import local_date
 from common.fields.serializer import CurrentUserDefaultNullable, input_only_field
 from opening_hours.utils.reservable_time_span_client import ReservableTimeSpanClient
 from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import ReservationUnit
-from reservations.choices import ReservationTypeChoice
+from reservations.enums import ReservationTypeChoice
 from reservations.models import RecurringReservation, Reservation
 
 __all__ = [

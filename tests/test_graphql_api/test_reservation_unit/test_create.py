@@ -2,7 +2,7 @@ import datetime
 
 import pytest
 
-from applications.choices import WeekdayChoice
+from applications.enums import WeekdayChoice
 from opening_hours.errors import HaukiAPIError
 from opening_hours.utils.hauki_api_client import HaukiAPIClient
 from opening_hours.utils.hauki_api_types import HaukiAPIResource, HaukiTranslatedField

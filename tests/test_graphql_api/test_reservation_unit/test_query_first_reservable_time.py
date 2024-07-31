@@ -8,11 +8,11 @@ import pytest
 from graphene_django_extensions.testing.client import GQLResponse
 from graphene_django_extensions.testing.utils import parametrize_helper
 
-from applications.choices import ApplicationRoundStatusChoice
+from applications.enums import ApplicationRoundStatusChoice
 from common.date_utils import DEFAULT_TIMEZONE
 from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import ReservationUnit, ReservationUnitHierarchy
-from reservations.choices import ReservationStateChoice, ReservationTypeChoice
+from reservations.enums import ReservationStateChoice, ReservationTypeChoice
 from tests.factories import (
     ApplicationRoundFactory,
     OriginHaukiResourceFactory,

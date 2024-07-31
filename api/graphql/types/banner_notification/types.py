@@ -4,7 +4,7 @@ from graphene_django_extensions.permissions import restricted_field
 
 from api.graphql.types.banner_notification.filtersets import BannerNotificationFilterSet
 from api.graphql.types.banner_notification.permissions import BannerNotificationPermission
-from common.choices import BannerNotificationState
+from common.enums import BannerNotificationState
 from common.models import BannerNotification
 from common.typing import GQLInfo
 from permissions.helpers import can_manage_banner_notifications

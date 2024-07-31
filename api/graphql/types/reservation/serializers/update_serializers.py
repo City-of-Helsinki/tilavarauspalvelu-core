@@ -6,7 +6,7 @@ from graphene.utils.str_converters import to_camel_case
 from api.graphql.extensions.serializers import OldPrimaryKeyUpdateSerializer
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from api.graphql.types.reservation.serializers.create_serializers import ReservationCreateSerializer
-from reservations.choices import CustomerTypeChoice, ReservationStateChoice
+from reservations.enums import CustomerTypeChoice, ReservationStateChoice
 
 DEFAULT_TIMEZONE = get_default_timezone()
 

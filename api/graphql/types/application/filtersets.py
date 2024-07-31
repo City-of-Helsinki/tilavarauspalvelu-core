@@ -6,7 +6,7 @@ from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntChoiceFilter, IntMultipleChoiceFilter
 from lookup_property import L
 
-from applications.choices import ApplicantTypeChoice, ApplicationStatusChoice
+from applications.enums import ApplicantTypeChoice, ApplicationStatusChoice
 from applications.models import Application
 from applications.querysets.application import ApplicationQuerySet
 from common.db import raw_prefixed_query

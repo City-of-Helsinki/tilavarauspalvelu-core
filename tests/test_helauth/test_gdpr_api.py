@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from merchants.enums import OrderStatus
-from reservations.choices import ReservationStateChoice
+from reservations.enums import ReservationStateChoice
 from tests.factories import ApplicationFactory, PaymentOrderFactory, ReservationFactory, UserFactory
 from tests.test_helauth.helpers import get_gdpr_auth_header, patch_oidc_config
 

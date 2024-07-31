@@ -7,7 +7,7 @@ from django.db import models
 from django.db.models import Prefetch
 
 from opening_hours.utils.time_span_element import TimeSpanElement
-from reservations.choices import ReservationTypeChoice
+from reservations.enums import ReservationTypeChoice
 
 if TYPE_CHECKING:
     import datetime

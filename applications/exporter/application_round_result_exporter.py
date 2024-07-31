@@ -6,7 +6,7 @@ from django.db.models import Prefetch
 from django.http import FileResponse
 from lookup_property import L
 
-from applications.choices import ApplicationStatusChoice
+from applications.enums import ApplicationStatusChoice
 from applications.exporter.base_exporter import BaseCSVExporter, BaseExportRow
 from applications.models import AllocatedTimeSlot, ApplicationSection, ReservationUnitOption
 from applications.querysets.application_section import ApplicationSectionQuerySet

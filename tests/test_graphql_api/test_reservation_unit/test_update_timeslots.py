@@ -1,6 +1,6 @@
 import pytest
 
-from applications.choices import WeekdayChoice
+from applications.enums import WeekdayChoice
 from tests.factories import ReservationUnitFactory
 from tests.factories.application_round_time_slot import ApplicationRoundTimeSlotFactory
 from tests.helpers import UserType

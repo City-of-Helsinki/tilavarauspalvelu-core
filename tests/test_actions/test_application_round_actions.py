@@ -1,8 +1,8 @@
 import pytest
 
-from applications.choices import ApplicationRoundStatusChoice
+from applications.enums import ApplicationRoundStatusChoice
 from applications.models import AllocatedTimeSlot, ReservationUnitOption
-from reservations.choices import ReservationTypeChoice
+from reservations.enums import ReservationTypeChoice
 from reservations.models import RecurringReservation, Reservation
 from tests.factories import AllocatedTimeSlotFactory, ApplicationRoundFactory, ReservationFactory
 

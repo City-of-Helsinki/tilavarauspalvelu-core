@@ -10,7 +10,7 @@ from django.db import migrations, models
 
 import applications.models.organization
 import common.fields.model
-from applications.choices import ApplicantTypeChoice, OrganizationTypeChoice, WeekdayChoice
+from applications.enums import ApplicantTypeChoice, OrganizationTypeChoice, WeekdayChoice
 from applications.models.application_event_schedule import ReservationPriorityChoice
 
 

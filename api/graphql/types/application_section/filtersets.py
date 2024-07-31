@@ -13,7 +13,7 @@ from graphene_django_extensions.filters import (
 )
 from lookup_property import L
 
-from applications.choices import ApplicantTypeChoice, ApplicationSectionStatusChoice, ApplicationStatusChoice, Priority
+from applications.enums import ApplicantTypeChoice, ApplicationSectionStatusChoice, ApplicationStatusChoice, Priority
 from applications.models import ApplicationSection
 from applications.querysets.application_section import ApplicationSectionQuerySet
 from common.db import raw_prefixed_query

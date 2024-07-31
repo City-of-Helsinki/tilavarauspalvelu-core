@@ -1,6 +1,6 @@
 import pytest
 
-from applications.choices import ApplicantTypeChoice
+from applications.enums import ApplicantTypeChoice
 from tests.factories import ApplicationFactory
 from tests.helpers import UserType
 

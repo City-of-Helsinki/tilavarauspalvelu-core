@@ -15,8 +15,8 @@ from common.typing import GQLInfo
 from merchants.models import PaymentOrder
 from permissions.helpers import can_view_reservation
 from reservation_units.models import ReservationUnit
-from reservations.choices import CustomerTypeChoice, ReservationTypeChoice
-from reservations.choices import ReservationTypeChoice as ReservationTypeField
+from reservations.enums import CustomerTypeChoice, ReservationTypeChoice
+from reservations.enums import ReservationTypeChoice as ReservationTypeField
 from reservations.models import Reservation
 from users.models import User
 

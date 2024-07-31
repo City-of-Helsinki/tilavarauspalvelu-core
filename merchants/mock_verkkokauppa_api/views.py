@@ -11,7 +11,7 @@ from django.views.generic import TemplateView
 from common.date_utils import local_datetime
 from merchants.enums import OrderStatus
 from merchants.models import PaymentOrder
-from reservations.choices import ReservationStateChoice
+from reservations.enums import ReservationStateChoice
 
 if TYPE_CHECKING:
     from reservations.models import Reservation

@@ -10,7 +10,7 @@ from common.date_utils import local_date, local_datetime
 from email_notification.models import EmailType
 from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import ReservationUnitHierarchy
-from reservations.choices import ReservationStateChoice
+from reservations.enums import ReservationStateChoice
 from reservations.models import Reservation
 from tests.factories import (
     ApplicationRoundFactory,

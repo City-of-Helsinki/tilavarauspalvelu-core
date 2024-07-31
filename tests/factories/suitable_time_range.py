@@ -4,7 +4,7 @@ import factory
 from django.utils.timezone import get_default_timezone
 from factory import fuzzy
 
-from applications.choices import Priority, Weekday
+from applications.enums import Priority, Weekday
 from applications.models import SuitableTimeRange
 
 from ._base import GenericDjangoModelFactory
