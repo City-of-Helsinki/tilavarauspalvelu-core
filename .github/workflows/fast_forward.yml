@@ -14,8 +14,12 @@ jobs:
       pull-requests: write  # Writing comments on PRs.
       issues: write  # Also required for posting comments on PRs.
 
-    # Only run if the comment contains the '/fast-forward' command.
-    if: ${{ contains(github.event.comment.body, '/fast-forward') && github.event.issue.pull_request }}
+    # Only run if the comment is one of the defined keywords.
+    if: >-
+      ${{
+        github.event.issue.pull_request
+        && contains(fromJSON('["/fast-forward", "/ff"]'), github.event.comment.body)
+      }}
 
     steps:
       - name: "Fast forwarding"
