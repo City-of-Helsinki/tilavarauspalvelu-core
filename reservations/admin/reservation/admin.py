@@ -4,7 +4,7 @@ from django.contrib import admin, messages
 from django.contrib.admin import helpers
 from django.core.handlers.wsgi import WSGIRequest
 from django.db import models
-from django.db.models import F, OrderBy, QuerySet
+from django.db.models import QuerySet
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 from more_admin_filters import MultiSelectFilter
@@ -209,7 +209,7 @@ class ReservationAdmin(admin.ModelAdmin):
             self.message_user(request, msg, level=messages.ERROR)
             return None
 
-        deny_reasons = ReservationDenyReason.objects.order_by(OrderBy(F("rank"), descending=True, nulls_last=True))
+        deny_reasons = ReservationDenyReason.objects.all().order_by("reason")
         queryset = queryset.filter(
             state__in=ReservationStateChoice.states_that_can_change_to_deny,
             end__gte=local_datetime(),
