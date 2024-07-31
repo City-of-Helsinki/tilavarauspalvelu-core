@@ -44,8 +44,10 @@ class ReservationAdmin(admin.ModelAdmin):
         "deny_reservations_without_refund",
         "deny_reservations_with_refund",
     ]
-    search_fields = ["id__exact"]
-    search_help_text = _("Search by reservation ID")
+    search_fields = [
+        "name",
+    ]
+    search_help_text = _("Search by reservation name")
 
     # List
     list_display = [

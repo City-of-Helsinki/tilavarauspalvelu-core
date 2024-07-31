@@ -39,12 +39,11 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
     # Functions
     actions = ["export_to_csv"]
     search_fields = [
-        "pk__iexact",
         "name",
         "unit__name",
         "unit__service_sectors__name",
     ]
-    search_help_text = _("Search by ID, name, unit name, or service sector name")
+    search_help_text = _("Search by name, unit name, or service sector name")
 
     # List
     list_display = [

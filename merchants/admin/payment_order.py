@@ -66,8 +66,8 @@ class PaymentOrderForm(forms.ModelForm):
 class PaymentOrderAdmin(admin.ModelAdmin):
     # Functions
     search_fields = [
-        "id__exact",
-        "reservation__id__exact",
+        "remote_id",
+        "reservation__name",
         "reservation__reservation_unit__name",
     ]
     search_help_text = _("Search by Payment order ID, Reservation ID or Reservation unit name")
@@ -76,6 +76,7 @@ class PaymentOrderAdmin(admin.ModelAdmin):
     list_display = [
         "id",
         "reservation_id",
+        "remote_id",
         "status",
         "price_total",
         "price_net",
