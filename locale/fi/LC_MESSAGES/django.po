@@ -1541,8 +1541,10 @@ msgid "Available only when order has been refunded"
 msgstr "Saatavilla vain, kun maksu on palautettu"
 
 #: merchants/admin/payment_order.py
-msgid "Search by Payment order ID, Reservation ID or Reservation unit name"
-msgstr "Etsi maksutunnuksella, varauksen tunnuksella tai varausyksikön nimellä"
+msgid ""
+"Search by Payment Order ID, Reservation ID, Remote Order ID, Reservation "
+"name, or Reservation Unit name"
+msgstr "Etsi maksutunnuksella, varauksen tunnuksella, verkkokaupan tunnuksella, varauksen nimellä tai varausyksikön nimellä"
 
 #: merchants/enums.py tilavarauspalvelu/settings.py
 msgid "Finnish"
@@ -2708,8 +2710,8 @@ msgid "Tax percentage"
 msgstr "Veroprosentti"
 
 #: reservations/admin/reservation/admin.py
-msgid "Search by reservation ID"
-msgstr "Etsi varauksen ID:llä"
+msgid "Search by Reservation ID or name"
+msgstr "Etsi varauksen ID:llä tai nimellä"
 
 #: reservations/admin/reservation/admin.py
 #: reservations/admin/reservation/form.py

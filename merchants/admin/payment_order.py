@@ -1,5 +1,10 @@
+import uuid
+from typing import Any
+
 from django import forms
 from django.contrib import admin
+from django.core.handlers.wsgi import WSGIRequest
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from merchants.models import PaymentOrder
@@ -66,11 +71,15 @@ class PaymentOrderForm(forms.ModelForm):
 class PaymentOrderAdmin(admin.ModelAdmin):
     # Functions
     search_fields = [
-        "remote_id",
+        # 'id' handled separately in `get_search_results()`
+        # 'reservation_id' handled separately in `get_search_results()`
+        # 'remote_id' handled separately in `get_search_results()`
         "reservation__name",
         "reservation__reservation_unit__name",
     ]
-    search_help_text = _("Search by Payment order ID, Reservation ID or Reservation unit name")
+    search_help_text = _(
+        "Search by Payment Order ID, Reservation ID, Remote Order ID, Reservation name, or Reservation Unit name"
+    )
 
     # List
     list_display = [
@@ -94,3 +103,24 @@ class PaymentOrderAdmin(admin.ModelAdmin):
 
     def reservation_unit(self, obj: PaymentOrder) -> str:
         return obj.reservation.reservation_unit.first() if obj.reservation else ""
+
+    def get_search_results(
+        self,
+        request: WSGIRequest,
+        queryset: models.QuerySet,
+        search_term: Any,
+    ) -> tuple[models.QuerySet, bool]:
+        queryset, may_have_duplicates = super().get_search_results(request, queryset, search_term)
+
+        if str(search_term).isdigit():
+            queryset |= self.model.objects.filter(id__exact=int(search_term))
+            queryset |= self.model.objects.filter(reservation__id__exact=int(search_term))
+
+        try:
+            term = uuid.UUID(search_term)
+        except ValueError:
+            pass
+        else:
+            queryset |= self.model.objects.filter(remote_id=term)
+
+        return queryset, may_have_duplicates

@@ -1,5 +1,9 @@
+from typing import Any
+
 from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin, messages
+from django.core.handlers.wsgi import WSGIRequest
+from django.db import models
 from django.http import FileResponse
 from django.utils.translation import gettext_lazy as _
 from modeltranslation.admin import TabbedTranslationAdmin
@@ -39,11 +43,12 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
     # Functions
     actions = ["export_to_csv"]
     search_fields = [
+        # 'id' handled separately in `get_search_results()`
         "name",
         "unit__name",
         "unit__service_sectors__name",
     ]
-    search_help_text = _("Search by name, unit name, or service sector name")
+    search_help_text = _("Search by ID, name, unit name, or service sector name")
 
     # List
     list_display = [
@@ -194,8 +199,16 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
     def get_queryset(self, request):
         return super().get_queryset(request).select_related("unit", "origin_hauki_resource")
 
-    def get_search_results(self, request, queryset, search_term):
+    def get_search_results(
+        self,
+        request: WSGIRequest,
+        queryset: models.QuerySet,
+        search_term: Any,
+    ) -> tuple[models.QuerySet, bool]:
         queryset, may_have_duplicates = super().get_search_results(request, queryset, search_term)
+
+        if str(search_term).isdigit():
+            queryset |= self.model.objects.filter(id__exact=int(search_term))
 
         model_name = request.GET.get("model_name")
         if model_name == "applicationround":

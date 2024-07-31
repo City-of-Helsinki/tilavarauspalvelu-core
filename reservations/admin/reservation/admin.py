@@ -1,6 +1,9 @@
+from typing import Any
+
 from django.contrib import admin, messages
 from django.contrib.admin import helpers
 from django.core.handlers.wsgi import WSGIRequest
+from django.db import models
 from django.db.models import F, OrderBy, QuerySet
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
@@ -45,9 +48,10 @@ class ReservationAdmin(admin.ModelAdmin):
         "deny_reservations_with_refund",
     ]
     search_fields = [
+        # 'id' handled separately in `get_search_results()`
         "name",
     ]
-    search_help_text = _("Search by reservation name")
+    search_help_text = _("Search by Reservation ID or name")
 
     # List
     list_display = [
@@ -176,6 +180,19 @@ class ReservationAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         return super().get_queryset(request).prefetch_related("reservation_unit")
+
+    def get_search_results(
+        self,
+        request: WSGIRequest,
+        queryset: models.QuerySet,
+        search_term: Any,
+    ) -> tuple[models.QuerySet, bool]:
+        queryset, may_have_duplicates = super().get_search_results(request, queryset, search_term)
+
+        if str(search_term).isdigit():
+            queryset |= self.model.objects.filter(id__exact=int(search_term))
+
+        return queryset, may_have_duplicates
 
     @admin.display(ordering="reservation_unit__name")
     def reservation_units(self, obj: Reservation) -> str:
