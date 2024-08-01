@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('reservations', '0076_uppercase_enums'),
+        ("reservations", "0076_uppercase_enums"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='reservationstatistic',
-            name='reservee_type',
+            model_name="reservationstatistic",
+            name="reservee_type",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
     ]
