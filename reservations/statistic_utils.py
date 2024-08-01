@@ -2,7 +2,7 @@ from reservations.enums import CustomerTypeChoice
 from reservations.models import Reservation, ReservationStatistic, ReservationStatisticsReservationUnit
 
 
-def create_or_update_reservation_statistics(reservation_pk: Reservation) -> None:
+def create_or_update_reservation_statistics(reservation_pk: int) -> None:
     reservation = Reservation.objects.get(pk=reservation_pk)
     recurring = getattr(reservation, "recurring_reservation", None)
     requires_org_name = reservation.reservee_type != CustomerTypeChoice.INDIVIDUAL
