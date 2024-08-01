@@ -13,6 +13,7 @@ from reservations.pruning import (
     prune_reservation_statistics,
     prune_reservation_with_inactive_payments,
 )
+from reservations.statistic_utils import create_or_update_reservation_statistics
 from tilavarauspalvelu.celery import app
 
 
@@ -59,6 +60,12 @@ def refund_paid_reservation_task(reservation_pk: int) -> None:
         payment_order.refund_id = uuid.uuid4()
     payment_order.status = OrderStatus.REFUNDED
     payment_order.save(update_fields=["refund_id", "status"])
+
+
+@app.task(name="create_statistics_for_reservations")
+def create_statistics_for_reservations_task(reservation_pks: list[int]) -> None:
+    for pk in reservation_pks:
+        create_or_update_reservation_statistics(pk)
 
 
 @app.task(name="update_affecting_time_spans")
