@@ -128,4 +128,4 @@ def create_test_data(flush: bool = True) -> None:
 
 @with_logs("Flushing database...", "Database flushed!")
 def _clear_database() -> None:
-    call_command("flush", "--noinput")
+    call_command("flush", "--noinput", allow_cascade=True)
