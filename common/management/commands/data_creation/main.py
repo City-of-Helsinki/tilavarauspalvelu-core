@@ -1,4 +1,5 @@
 # ruff: noqa: S311
+import os
 
 from django.core.management import call_command
 
@@ -128,4 +129,8 @@ def create_test_data(flush: bool = True) -> None:
 
 @with_logs("Flushing database...", "Database flushed!")
 def _clear_database() -> None:
+    if os.getenv("DJANGO_SETTINGS_ENVIRONMENT") == "Production":
+        msg = "Hey! This is the production environment! Don't just go flushing the database! >:("
+        raise RuntimeError(msg)
+
     call_command("flush", "--noinput", allow_cascade=True)
