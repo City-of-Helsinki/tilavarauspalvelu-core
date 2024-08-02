@@ -1,4 +1,4 @@
-FROM python:3.12-slim-bullseye AS base
+FROM public.ecr.aws/docker/library/python:3.12-slim-bullseye AS base
 
 # Make sure we build as the root user.
 USER root
