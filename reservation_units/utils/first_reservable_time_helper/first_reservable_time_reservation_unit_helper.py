@@ -1,16 +1,9 @@
 from __future__ import annotations
 
-import datetime
 from datetime import timedelta
 from typing import TYPE_CHECKING
 
-from common.date_utils import (
-    local_datetime,
-    local_datetime_max,
-    local_datetime_min,
-    local_start_of_day,
-    timedelta_from_json,
-)
+from common.date_utils import local_datetime, local_datetime_max, local_datetime_min, local_start_of_day
 from opening_hours.utils.time_span_element import TimeSpanElement
 from opening_hours.utils.time_span_element_utils import merge_overlapping_time_span_elements
 from reservation_units.enums import ReservationStartInterval
@@ -20,7 +13,7 @@ from reservation_units.utils.first_reservable_time_helper.first_reservable_time_
 from reservation_units.utils.first_reservable_time_helper.utils import ReservableTimeOutput
 
 if TYPE_CHECKING:
-    from reservation_units.models.reservation_unit import ReservationUnitWithAffected
+    from reservation_units.models.reservation_unit import ReservationUnit
     from reservation_units.utils.first_reservable_time_helper.first_reservable_time_helper import (
         FirstReservableTimeHelper,
     )
@@ -34,7 +27,7 @@ class ReservationUnitFirstReservableTimeHelper:
     """
 
     parent: FirstReservableTimeHelper
-    reservation_unit: ReservationUnitWithAffected
+    reservation_unit: ReservationUnit
 
     # Hard Closed Time Spans
     # [x] Affects closed status
@@ -63,7 +56,7 @@ class ReservationUnitFirstReservableTimeHelper:
 
     is_reservation_unit_closed: bool
 
-    def __init__(self, parent: FirstReservableTimeHelper, reservation_unit: ReservationUnitWithAffected) -> None:
+    def __init__(self, parent: FirstReservableTimeHelper, reservation_unit: ReservationUnit) -> None:
         self.parent = parent
         self.reservation_unit = reservation_unit
 
@@ -72,9 +65,9 @@ class ReservationUnitFirstReservableTimeHelper:
             parent.shared_hard_closed_time_spans,
         )
 
-        self.reservation_closed_time_spans, self.blocking_reservation_closed_time_spans = (
-            self._split_closed_and_blocking_reservations()
-        )
+        pk = reservation_unit.pk
+        self.reservation_closed_time_spans = parent.reservation_closed_time_spans_map.get(pk, [])
+        self.blocking_reservation_closed_time_spans = parent.blocking_reservation_closed_time_spans_map.get(pk, [])
 
         self.soft_closed_time_spans = merge_overlapping_time_span_elements(
             self._get_soft_closed_time_spans(),
@@ -219,26 +212,3 @@ class ReservationUnitFirstReservableTimeHelper:
             )
 
         return reservation_unit_closed_time_spans
-
-    def _split_closed_and_blocking_reservations(self) -> tuple[list[TimeSpanElement], list[TimeSpanElement]]:
-        """Get a list of closed and blocked time spans from Reservations for any affecting ReservationUnit"""
-        closed: list[TimeSpanElement] = []
-        blocking: list[TimeSpanElement] = []
-
-        for timespan in self.reservation_unit.affected_time_spans:
-            time_span_element = TimeSpanElement(
-                start_datetime=datetime.datetime.fromisoformat(timespan["start_datetime"]),
-                end_datetime=datetime.datetime.fromisoformat(timespan["end_datetime"]),
-                is_reservable=False,
-                # Buffers are ignored for blocking reservation even if set.
-                buffer_time_before=(
-                    None if timespan["is_blocking"] else timedelta_from_json(timespan["buffer_time_before"])
-                ),
-                buffer_time_after=(
-                    None if timespan["is_blocking"] else timedelta_from_json(timespan["buffer_time_after"])
-                ),
-            )
-            choice = blocking if timespan["is_blocking"] else closed
-            choice.append(time_span_element)
-
-        return merge_overlapping_time_span_elements(closed), blocking

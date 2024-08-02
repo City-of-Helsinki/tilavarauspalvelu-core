@@ -334,12 +334,4 @@ class AffectedTimeSpan(TypedDict):
     is_blocking: bool
 
 
-# Only for typing.
-class ReservationUnitWithAffected(ReservationUnit):
-    affected_time_spans: list[AffectedTimeSpan]
-
-    class Meta:
-        abstract = True
-
-
 AuditLogger.register(ReservationUnit)

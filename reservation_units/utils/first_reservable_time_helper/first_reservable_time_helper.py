@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from datetime import date, datetime, time, timedelta
+import datetime
 from typing import TYPE_CHECKING
 
 from django.db import models
+from graphene_django.settings import graphene_settings
 from lookup_property import L
 from query_optimizer.utils import calculate_queryset_slice
 
@@ -12,9 +13,11 @@ from applications.models import ApplicationRound
 from common.date_utils import local_datetime, local_datetime_max, local_datetime_min, local_start_of_day
 from opening_hours.models import ReservableTimeSpan
 from opening_hours.utils.time_span_element import TimeSpanElement
+from opening_hours.utils.time_span_element_utils import merge_overlapping_time_span_elements
 from reservation_units.utils.first_reservable_time_helper.first_reservable_time_reservation_unit_helper import (
     ReservationUnitFirstReservableTimeHelper,
 )
+from reservations.models import AffectingTimeSpan
 
 if TYPE_CHECKING:
     from decimal import Decimal
@@ -90,20 +93,21 @@ class FirstReservableTimeHelper:
     """
 
     # Date and Time filters are used to filter a range of dates and time that the reservation must be within.
-    filter_date_start: date
-    filter_date_end: date
-    filter_time_start: time | None
-    filter_time_end: time | None
+    filter_date_start: datetime.date
+    filter_date_end: datetime.date
+    filter_time_start: datetime.time | None
+    filter_time_end: datetime.time | None
     filter_minimum_duration_minutes: int
 
     # QuerySet passed to the helper
     original_reservation_unit_queryset: ReservationUnitQuerySet
     # ReservationUnits with prefetched ReservableTimeSpans and ApplicationRounds
     optimized_reservation_unit_queryset: ReservationUnitQuerySet
+
     # Contains a set of closed time spans for each ReservationUnit generated from their relevant Reservations
-    reservation_closed_time_spans_map: dict[ReservationUnitPK, set[TimeSpanElement]]
+    reservation_closed_time_spans_map: dict[ReservationUnitPK, list[TimeSpanElement]]
     # Contains a set of closed time spans for each ReservationUnit generated from their relevant BLOCKING Reservations
-    blocking_reservation_closed_time_spans_map: dict[ReservationUnitPK, set[TimeSpanElement]]
+    blocking_reservation_closed_time_spans_map: dict[ReservationUnitPK, list[TimeSpanElement]]
 
     # Contains a list of the first reservable time for each ReservationUnit.
     first_reservable_times: dict[ReservationUnitPK, datetime]
@@ -115,17 +119,17 @@ class FirstReservableTimeHelper:
     def __init__(
         self,
         reservation_unit_queryset: ReservationUnitQuerySet,
-        filter_date_start: date | None = None,
-        filter_date_end: date | None = None,
-        filter_time_start: time | None = None,
-        filter_time_end: time | None = None,
+        filter_date_start: datetime.date | None = None,
+        filter_date_end: datetime.date | None = None,
+        filter_time_start: datetime.time | None = None,
+        filter_time_end: datetime.time | None = None,
         minimum_duration_minutes: float | Decimal | None = None,
         show_only_reservable: bool = False,
         pagination_args: PaginationArgs | None = None,
     ) -> None:
         now = local_datetime()
         today = now.date()
-        two_years_from_now = today + timedelta(days=731)  # 2 years + 1 day as a buffer
+        two_years_from_now = today + datetime.timedelta(days=731)  # 2 years + 1 day as a buffer
 
         #########################
         # Default filter values #
@@ -182,6 +186,9 @@ class FirstReservableTimeHelper:
         self.original_reservation_unit_queryset = reservation_unit_queryset
         self.optimized_reservation_unit_queryset = self._get_reservation_unit_queryset_for_calculation()
 
+        self.reservation_closed_time_spans_map = {}
+        self.blocking_reservation_closed_time_spans_map = {}
+
         ##################################
         # Initialise important variables #
         ##################################
@@ -210,15 +217,19 @@ class FirstReservableTimeHelper:
         # fill the page size.
         qs = self.optimized_reservation_unit_queryset
 
-        chuck_size: int = qs.count()
+        chunk_size: int = qs.count()
         if self.pagination_args is not None:
-            self.pagination_args["size"] = chuck_size
+            self.pagination_args["size"] = chunk_size
             qs_slice = calculate_queryset_slice(**self.pagination_args)
-            chuck_size = qs_slice.stop - qs_slice.start
+            chunk_size = qs_slice.stop - qs_slice.start
             qs = qs[qs_slice.start :]
 
         page_size: int = 0
-        for reservation_unit in qs.iterator(chunk_size=chuck_size):
+        # If we should only show reservable reservation units, increase the chunk size to max page size
+        # so that if filtering occurs, we don't need to fetch so many chunks.
+        size = graphene_settings.RELAY_CONNECTION_MAX_LIMIT if self.show_only_reservable else chunk_size
+
+        for reservation_unit in qs.hooked_iterator(self._get_elements_for_reservation_units, chunk_size=size):
             helper = ReservationUnitFirstReservableTimeHelper(parent=self, reservation_unit=reservation_unit)
             is_closed, first_reservable_time = helper.calculate_first_reservable_time()
 
@@ -228,10 +239,10 @@ class FirstReservableTimeHelper:
             # If we have pagination args, we can stop if we have enough reservation units to fill the page size.
             # If 'show_only_reservable' is True, we might need to fetch more than the first chunk size.
             if self.pagination_args is not None:
-                if not self.show_only_reservable or not is_closed:
+                if not self.show_only_reservable or first_reservable_time is not None:
                     page_size += 1
 
-                if page_size >= chuck_size:
+                if page_size >= chunk_size:
                     break
 
     def get_annotated_queryset(self) -> ReservationUnitQuerySet | QuerySet[ReservationUnit]:
@@ -276,8 +287,6 @@ class FirstReservableTimeHelper:
             .prefetch_related(None)
             # ReservationUnits are not reservable without a HaukiResource
             .exclude(origin_hauki_resource__isnull=True)
-            # Annotate affecting reservations as timespans
-            .with_affecting_time_spans(start=self.filter_date_start, end=self.filter_date_end)
             .prefetch_related(
                 # Required for calculating first reservable time
                 models.Prefetch(
@@ -316,8 +325,68 @@ class FirstReservableTimeHelper:
                 is_reservable=False,
             ),
             TimeSpanElement(
-                start_datetime=local_start_of_day(self.filter_date_end) + timedelta(days=1),
+                start_datetime=local_start_of_day(self.filter_date_end) + datetime.timedelta(days=1),
                 end_datetime=local_datetime_max(),
                 is_reservable=False,
             ),
         ]
+
+    def _get_elements_for_reservation_units(self, reservation_units: list[ReservationUnit]) -> None:
+        """
+        Find all AffectingTimeSpans for the given ReservationUnits and convert them to a dicts of
+        "closed" and "blocking" TimeSpanElements by the affected ReservationUnit's primary key.
+
+        Note: The PK->TimeSpanElements dicts only contain entries for the given ReservationUnits,
+        even if the TimeSpanElement would affect other ReservationUnits as well. This is done to allow
+        fetching the elements in batches, while also merging overlapping elements for each ReservationUnit.
+        """
+        pks: set[ReservationUnitPK] = {result.pk for result in reservation_units}
+        results = (
+            AffectingTimeSpan.objects.filter(affected_reservation_unit_ids__overlap=list(pks))
+            .annotate(
+                start_datetime=models.F("buffered_start_datetime") + models.F("buffer_time_before"),
+                end_datetime=models.F("buffered_end_datetime") - models.F("buffer_time_after"),
+                # Buffers are ignored for blocking reservation even if set.
+                buffer_before=models.Case(
+                    models.When(is_blocking=True, then=models.Value(datetime.timedelta(0))),
+                    default=models.F("buffer_time_before"),
+                    output_field=models.DurationField(),
+                ),
+                buffer_after=models.Case(
+                    models.When(is_blocking=True, then=models.Value(datetime.timedelta(0))),
+                    default=models.F("buffer_time_after"),
+                    output_field=models.DurationField(),
+                ),
+            )
+            .values(
+                "affected_reservation_unit_ids",
+                "start_datetime",
+                "end_datetime",
+                "buffer_before",
+                "buffer_after",
+                "is_blocking",
+            )
+        )
+
+        closed = self.reservation_closed_time_spans_map
+        blocking = self.blocking_reservation_closed_time_spans_map
+
+        for result in results:
+            time_span_element = TimeSpanElement(
+                start_datetime=result["start_datetime"],
+                end_datetime=result["end_datetime"],
+                is_reservable=False,
+                buffer_time_before=result["buffer_before"],
+                buffer_time_after=result["buffer_after"],
+            )
+            time_spans_map = blocking if result["is_blocking"] else closed
+            for pk in result["affected_reservation_unit_ids"]:
+                if pk in pks:
+                    time_spans_map.setdefault(pk, []).append(time_span_element)
+
+        # Merge overlapping elements for each reservation unit to optimize FRT calculation
+        for pk, timespans in closed.items():
+            closed[pk] = merge_overlapping_time_span_elements(timespans)
+
+        for pk, timespans in blocking.items():
+            blocking[pk] = merge_overlapping_time_span_elements(timespans)

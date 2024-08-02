@@ -69,7 +69,7 @@ def dt(*, year: int = NEXT_YEAR, month: int = 1, day: int = 1, hour: int = 0, mi
 NOW = _datetime()
 
 
-@pytest.fixture()
+@pytest.fixture
 def reservation_unit() -> ReservationUnit:
     origin_hauki_resource = OriginHaukiResourceFactory(
         id="999",

@@ -66,5 +66,5 @@ class SQLLog(models.Model):
     def sql_formatted(self) -> str:
         """Format SQL for readability."""
         # Remove excessive parameter placeholders for clarity.
-        sql = re.sub(r"\(%s,?\s?(%s,?\s?)+\)", "(%s, ...)", self.sql)
+        sql = re.sub(r"[(\[]%s,?\s?(%s,?\s?)+[])]", "(%s, ...)", self.sql)
         return sqlparse.format(sql, reindent=True, keyword_case="upper")

@@ -1,19 +1,29 @@
-import datetime
-from datetime import date, time
-from decimal import Decimal
-from typing import Self
+from __future__ import annotations
 
-from django.db import models
-from django.db.models import Q
+from itertools import islice
+from typing import TYPE_CHECKING, Self
+
+from django.db import connections, models
+from django.db.models import Q, prefetch_related_objects
 from django.db.models.functions import JSONObject
 from elasticsearch_django.models import SearchResultsQuerySet
-from query_optimizer.validators import PaginationArgs
 
 from common.date_utils import local_datetime
 from common.db import ArrayUnnest, SubqueryArray
 from reservation_units.utils.first_reservable_time_helper.first_reservable_time_helper import FirstReservableTimeHelper
 from resources.models import Resource
 from spaces.models import Space
+
+if TYPE_CHECKING:
+    import datetime
+    from collections.abc import Callable, Generator
+    from datetime import date, time
+    from decimal import Decimal
+
+    from query_optimizer.validators import PaginationArgs
+
+    from reservation_units.models import ReservationUnit
+
 
 type ReservationUnitPK = int
 
@@ -163,6 +173,9 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
         """
         Annotate queryset with a list of json objects describing affecting
         reservations for the reservation units.
+
+        Note that this is quite slow for large querysets, since it requires
+        duplication for each reservation unit's affecting reservations.
         """
         from reservations.models import AffectingTimeSpan
 
@@ -189,3 +202,19 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
                 output_field=models.JSONField(),
             ),
         )
+
+    def hooked_iterator(
+        self,
+        hook: Callable[[list[ReservationUnit]], None],
+        *,
+        chunk_size: int,
+    ) -> Generator[ReservationUnit, None, None]:
+        """A `QuerySet.iterator()` that calls the given hook for each chunk of results before yielding them."""
+        chunked_fetch = not connections[self.db].settings_dict.get("DISABLE_SERVER_SIDE_CURSORS")
+        iterable = self._iterable_class(self, chunked_fetch=chunked_fetch, chunk_size=chunk_size)
+        iterator = iter(iterable)
+
+        while results := list(islice(iterator, chunk_size)):
+            prefetch_related_objects(results, *self._prefetch_related_lookups)
+            hook(results)
+            yield from results

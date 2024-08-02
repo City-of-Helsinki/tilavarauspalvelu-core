@@ -9,7 +9,6 @@ from helsinki_gdpr.models import SerializableMixin
 
 from common.date_utils import local_datetime
 from merchants.enums import OrderStatus
-from reservation_units.models import ReservationUnit
 from reservations.enums import ReservationStateChoice
 
 if TYPE_CHECKING:
@@ -98,6 +97,8 @@ class ReservationQuerySet(models.QuerySet):
 
     def affecting_reservations(self: Self, units: list[int] = (), reservation_units: list[int] = ()) -> Self:
         """Filter reservations that affect other reservations in the given units and/or reservation units."""
+        from reservation_units.models import ReservationUnit
+
         qs = ReservationUnit.objects.all()
         if units:
             qs = qs.filter(unit__in=units)
