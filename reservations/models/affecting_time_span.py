@@ -1,20 +1,22 @@
 from __future__ import annotations
 
 import contextlib
+import datetime
 from typing import TYPE_CHECKING
 
+from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
+from django.core.cache import cache
 from django.db import models
 from django.db.transaction import get_connection
 from django.utils.translation import gettext_lazy as _
 
-from common.date_utils import DEFAULT_TIMEZONE, timedelta_to_json
+from common.date_utils import DEFAULT_TIMEZONE, local_datetime, timedelta_to_json
 from opening_hours.utils.time_span_element import TimeSpanElement
 from reservations.querysets import AffectingTimeSpanQuerySet
+from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
-    import datetime
-
     from reservations.models import Reservation
 
 
@@ -35,6 +37,9 @@ class AffectingTimeSpan(models.Model):
     This view itself is created through a migration (See: `0073_affectingtimespan.py`.),
     and updated through a scheduled task (See `update_affecting_time_spans_task`).
     """
+
+    CACHE_KEY = "affecting_time_spans"
+    """Key for storing datetime stamp in cache of when the view was last updated."""
 
     reservation: Reservation = models.OneToOneField(
         "reservations.Reservation",
@@ -94,9 +99,21 @@ class AffectingTimeSpan(models.Model):
         The view gets stale quite often, since it's dependent on current time and reservations.
         Therefore, this is used as a sort of cache, which is updated as a scheduled task,
         but can also be called manually if needed.
+
+        Refreshing updated a value in cache that can be used to check if the view is valid.
         """
-        with get_connection(using).cursor() as cursor:
-            cursor.execute("REFRESH MATERIALIZED VIEW CONCURRENTLY affecting_time_spans")
+        try:
+            with get_connection(using).cursor() as cursor:
+                cursor.execute("REFRESH MATERIALIZED VIEW CONCURRENTLY affecting_time_spans")
+        except Exception as error:
+            # Only raise error in local development, otherwise log to Sentry
+            if settings.RAISE_ERROR_ON_REFRESH_FAILURE:
+                raise
+            SentryLogger.log_exception(error)
+        else:
+            last_updated = local_datetime().isoformat()
+            max_allowed_age = datetime.timedelta(minutes=settings.AFFECTING_TIME_SPANS_UPDATE_INTERVAL_MINUTES)
+            cache.set(cls.CACHE_KEY, last_updated, timeout=max_allowed_age.total_seconds())
 
     @classmethod
     @contextlib.contextmanager
@@ -106,6 +123,16 @@ class AffectingTimeSpan(models.Model):
             yield
         finally:
             cls.refresh()
+
+    @classmethod
+    def is_valid(cls) -> bool:
+        """Check last update datetime against a set max allowed age.."""
+        cached_value: str | None = cache.get(cls.CACHE_KEY)
+        if cached_value is None:
+            return False
+        last_updated = datetime.datetime.fromisoformat(cached_value)
+        max_allowed_age = datetime.timedelta(minutes=settings.AFFECTING_TIME_SPANS_UPDATE_INTERVAL_MINUTES)
+        return local_datetime() - last_updated >= max_allowed_age
 
     def as_time_span_element(self) -> TimeSpanElement:
         return TimeSpanElement(

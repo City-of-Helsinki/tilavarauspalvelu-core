@@ -217,6 +217,9 @@ class FirstReservableTimeHelper:
         # fill the page size.
         qs = self.optimized_reservation_unit_queryset
 
+        if not AffectingTimeSpan.is_valid():
+            AffectingTimeSpan.refresh()
+
         chunk_size: int = qs.count()
         if self.pagination_args is not None:
             self.pagination_args["size"] = chunk_size
@@ -386,7 +389,10 @@ class FirstReservableTimeHelper:
 
         # Merge overlapping elements for each reservation unit to optimize FRT calculation
         for pk, timespans in closed.items():
-            closed[pk] = merge_overlapping_time_span_elements(timespans)
+            # Only merge what was added, not what is already in the dicts!
+            if pk in pks:
+                closed[pk] = merge_overlapping_time_span_elements(timespans)
 
         for pk, timespans in blocking.items():
-            blocking[pk] = merge_overlapping_time_span_elements(timespans)
+            if pk in pks:
+                blocking[pk] = merge_overlapping_time_span_elements(timespans)

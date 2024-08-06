@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, Self
 
 from django.db import connections, models
 from django.db.models import Q, prefetch_related_objects
-from django.db.models.functions import JSONObject
 from elasticsearch_django.models import SearchResultsQuerySet
 
 from common.date_utils import local_datetime
@@ -15,7 +14,6 @@ from resources.models import Resource
 from spaces.models import Space
 
 if TYPE_CHECKING:
-    import datetime
     from collections.abc import Callable, Generator
     from datetime import date, time
     from decimal import Decimal
@@ -168,40 +166,6 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
 
         ids = models.Subquery(self.affected_reservation_unit_ids)
         return ReservationUnit.objects.alias(ids=ids).filter(pk__in=models.F("ids"))
-
-    def with_affecting_time_spans(self, start: datetime.date, end: datetime.date) -> Self:
-        """
-        Annotate queryset with a list of json objects describing affecting
-        reservations for the reservation units.
-
-        Note that this is quite slow for large querysets, since it requires
-        duplication for each reservation unit's affecting reservations.
-        """
-        from reservations.models import AffectingTimeSpan
-
-        return self.annotate(
-            affected_time_spans=SubqueryArray(
-                AffectingTimeSpan.objects.filter(
-                    affected_reservation_unit_ids__contains=[models.OuterRef("pk")],
-                    buffered_start_datetime__date__lte=end,
-                    buffered_end_datetime__date__gte=start,
-                )
-                .annotate(
-                    data=JSONObject(
-                        start_datetime=models.F("buffered_start_datetime") + models.F("buffer_time_before"),
-                        end_datetime=models.F("buffered_end_datetime") - models.F("buffer_time_after"),
-                        buffer_time_before=models.F("buffer_time_before"),
-                        buffer_time_after=models.F("buffer_time_after"),
-                        is_blocking=models.F("is_blocking"),
-                    ),
-                )
-                .values("data"),
-                agg_field="data",
-                remove_nulls=False,  # Doesn't contain nulls.
-                coalesce_output_type="jsonb",
-                output_field=models.JSONField(),
-            ),
-        )
 
     def hooked_iterator(
         self,

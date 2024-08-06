@@ -506,6 +506,8 @@ class Common(Environment):
     REMOVE_RECURRING_RESERVATIONS_OLDER_THAN_DAYS = 1
 
     APPLICATION_ROUND_RESERVATION_CREATION_TIMEOUT_MINUTES = values.IntegerValue(default=10)
+    AFFECTING_TIME_SPANS_UPDATE_INTERVAL_MINUTES = values.IntegerValue(default=2)
+    RAISE_ERROR_ON_REFRESH_FAILURE = False
 
     ICAL_HASH_SECRET = values.StringValue()
 
@@ -645,6 +647,7 @@ class Local(LocalMixin, Common):
     UPDATE_RESERVATION_UNIT_HIERARCHY = values.BooleanValue(default=True)
     SAVE_RESERVATION_STATISTICS = values.BooleanValue(default=True)
     REBUILD_SPACE_HIERARCHY = values.BooleanValue(default=True)
+    RAISE_ERROR_ON_REFRESH_FAILURE = True
 
 
 class Docker(DockerMixin, Common):
@@ -684,6 +687,7 @@ class Docker(DockerMixin, Common):
 
     GRAPHQL_CODEGEN_ENABLED = values.BooleanValue(default=False)
     ICAL_HASH_SECRET = values.StringValue(default="")  # nosec # NOSONAR
+    RAISE_ERROR_ON_REFRESH_FAILURE = True
 
 
 class AutomatedTests(AutomatedTestMixin, EmptyDefaults, Common, dotenv_path=None):

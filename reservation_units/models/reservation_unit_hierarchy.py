@@ -3,10 +3,13 @@ from __future__ import annotations
 import contextlib
 from typing import TYPE_CHECKING, Any
 
+from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.transaction import get_connection
 from django.utils.translation import gettext_lazy as _
+
+from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
     from reservation_units.models import ReservationUnit
@@ -57,8 +60,14 @@ class ReservationUnitHierarchy(models.Model):
         This method is called automatically with appropriate signals,
         and with a scheduled task, but can also be called manually if needed.
         """
-        with get_connection(using).cursor() as cursor:
-            cursor.execute("REFRESH MATERIALIZED VIEW CONCURRENTLY reservation_unit_hierarchy")
+        try:
+            with get_connection(using).cursor() as cursor:
+                cursor.execute("REFRESH MATERIALIZED VIEW CONCURRENTLY reservation_unit_hierarchy")
+        except Exception as error:
+            # Only raise error in local development, otherwise log to Sentry
+            if settings.RAISE_ERROR_ON_REFRESH_FAILURE:
+                raise
+            SentryLogger.log_exception(error)
 
     @classmethod
     @contextlib.contextmanager
