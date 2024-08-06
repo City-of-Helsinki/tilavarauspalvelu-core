@@ -7,8 +7,10 @@ from query_optimizer import AnnotatedField
 from api.graphql.types.application_round.filtersets import ApplicationRoundFilterSet
 from api.graphql.types.application_round.permissions import ApplicationRoundPermission
 from applications.enums import ApplicationRoundReservationCreationStatusChoice, ApplicationRoundStatusChoice
-from applications.models import ApplicationRound
+from applications.models import Application, ApplicationRound
+from common.db import SubqueryCount
 from common.typing import GQLInfo
+from reservation_units.models import ReservationUnit
 
 
 class ApplicationRoundNode(DjangoNode):
@@ -30,14 +32,21 @@ class ApplicationRoundNode(DjangoNode):
     )
     applications_count = AnnotatedField(
         graphene.Int,
-        expression=models.Count(
-            "applications",
-            filter=models.Q(applications__cancelled_date__isnull=True, applications__sent_date__isnull=False),
+        expression=SubqueryCount(
+            queryset=Application.objects.filter(
+                application_round=models.OuterRef("pk"),
+                cancelled_date__isnull=True,
+                sent_date__isnull=False,
+            ),
         ),
     )
     reservation_unit_count = AnnotatedField(
         graphene.Int,
-        expression=models.Count("reservation_units"),
+        expression=SubqueryCount(
+            queryset=ReservationUnit.objects.filter(
+                application_rounds=models.OuterRef("pk"),
+            ),
+        ),
     )
 
     class Meta:
