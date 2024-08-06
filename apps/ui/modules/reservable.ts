@@ -10,12 +10,7 @@ import {
   ReservationStateChoice,
   type Maybe,
 } from "@/gql/gql-types";
-import {
-  dayMax,
-  dayMin,
-  filterNonNullable,
-  getIntervalMinutes,
-} from "common/src/helpers";
+import { dayMax, dayMin, filterNonNullable } from "common/src/helpers";
 import {
   differenceInSeconds,
   isValid,
@@ -35,6 +30,7 @@ import {
 } from "date-fns";
 import { type SlotProps } from "common/src/calendar/Calendar";
 import { type ReservationUnitNode } from "common/gql/gql-types";
+import { getIntervalMinutes } from "common/src/conversion";
 
 export type RoundPeriod = {
   reservationPeriodBegin: string;
@@ -62,6 +58,7 @@ export type ReservableMap = Map<
 export function dateToKey(date: Date): ReservableMapKey {
   return format(date, "yyyy-MM-dd");
 }
+
 /// This function converts a time span array into a map of days with the time spans
 // Cases:
 // - multiple time spans on the same day
@@ -93,9 +90,11 @@ export function generateReservableMap(
       if (isBefore(end, new Date())) {
         return null;
       }
+      // remove all past times while preserving today (long interval)
       if (isBefore(start, startOfDay(new Date()))) {
         start.setTime(startOfDay(new Date()).getTime());
       }
+      // 00:00 end time breaks comparisons
       if (end.getTime() === startOfDay(end).getTime()) {
         end.setTime(addMilliseconds(end, -1).getTime());
       }
@@ -103,7 +102,7 @@ export function generateReservableMap(
     })
     .filter((n): n is NonNullable<typeof n> => n != null);
 
-  const map = new Map<string, Array<{ start: Date; end: Date }>>();
+  const map: ReservableMap = new Map();
   for (const n of converted) {
     if (!isSameDay(n.start, n.end)) {
       const start = startOfDay(n.start);
@@ -156,19 +155,12 @@ type ReservationUnitReservableProps = {
     end: Date;
   };
   reservationUnit: Omit<IsReservableFieldsFragment, "reservableTimeSpans">;
-  // pregenerated open slots
   reservableTimes: ReservableMap;
   activeApplicationRounds: readonly RoundPeriod[];
 };
 
 /// NOTE don't return [boolean, string] causes issues in TS / JS
 /// instead break this function into cleaner separate functions
-/// FIXME this function is getting called 100s or 1000s times when dragging a calendar event
-/// when moving with a click this is called 20+ times
-/// time change using the form elements also 20+ times
-/// TODO this should be renamed and moved
-/// is range reservable is a better name
-/// range: { start, end } should be the first parameter
 export function isRangeReservable({
   range,
   reservationUnit,
@@ -233,7 +225,6 @@ export function isRangeReservable({
     bufferTimeBefore,
     bufferTimeAfter,
   };
-
   const isBufferCollision = others.some((r) => hasCollisions(r, reservation));
   if (isBufferCollision) {
     return false;
@@ -301,8 +292,7 @@ function isRangeReservable_({
 }): boolean {
   // eslint-disable-next-line no-console
   console.assert(range.length === 2, "Invalid range", range);
-  // FIXME this is not good
-  // we should be able to check the range without generating all the slots
+  // TODO we should be able to check the range without generating all the slots
   const slots = generateSlots(
     range[0],
     range[1],
@@ -520,7 +510,6 @@ export const getSlotPropGetter =
   };
 
 /// Clamp the user selected start time and duration to the nearest interval
-/// TODO should this also do range check?
 export function getBoundCheckedReservation({
   start,
   end,
@@ -605,34 +594,4 @@ export function clampDuration(
     Math.max(duration, initialDuration),
     maxReservationDurationMinutes
   );
-}
-
-/// Generate a list of intervals for a day
-// TODO this can be moved to reservationUnit (not used here anymore)
-export function getDayIntervals(
-  startTime: { h: number; m: number },
-  endTime: { h: number; m: number },
-  interval: ReservationStartInterval
-): { h: number; m: number }[] {
-  // normalize end time to allow comparison
-  const nEnd = endTime.h === 0 && endTime.m === 0 ? { h: 23, m: 59 } : endTime;
-  const iMins = getIntervalMinutes(interval);
-
-  const start = startTime;
-  const end = nEnd;
-
-  const startMins = start.h * 60 + start.m;
-  const endMins = end.h * 60 + end.m;
-
-  const intervals: Array<{ h: number; m: number }> = [];
-  for (let i = startMins; i < endMins; i += iMins) {
-    // don't allow interval overflow but handle 0:00 as 23:59
-    if (i + iMins > endMins + 1) {
-      break;
-    }
-    const m = i % 60;
-    const h = (i - m) / 60;
-    intervals.push({ h, m });
-  }
-  return intervals;
 }

@@ -420,11 +420,7 @@ function ReservationCalendarControls({
               {mode === "edit" && (
                 <SelectButton
                   onClick={() => {
-                    /* FIXME setValue doesn't work for some reason
-                     * controllers do work
-                     * */
-                    const value = !areControlsVisible;
-                    setValue("isControlsVisible", value, {
+                    setValue("isControlsVisible", !areControlsVisible, {
                       shouldDirty: true,
                       shouldValidate: true,
                       shouldTouch: true,

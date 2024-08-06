@@ -693,7 +693,6 @@ function ReservationUnit({
       setValue("time", newTime);
 
       if (isTouchDevice()) {
-        // TODO test: does setValue work?
         setValue("isControlsVisible", true);
       }
 
@@ -715,8 +714,6 @@ function ReservationUnit({
   const handleSlotClick = useCallback(
     (props: SlotClickProps): boolean => {
       const { start, end, action } = props;
-      // const isTouchClick = action === "select" && isTouchDevice();
-
       if (
         (action === "select" && !isTouchDevice()) ||
         isReservationQuotaReached ||

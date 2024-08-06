@@ -21,7 +21,7 @@ import {
   type CancellationRuleFieldsFragment,
 } from "@gql/gql-types";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
-import { getIntervalMinutes } from "common/src/helpers";
+import { getIntervalMinutes } from "common/src/conversion";
 import { getTranslation } from "./util";
 import { type TFunction } from "i18next";
 import { type PendingReservation } from "@/modules/types";
@@ -289,35 +289,44 @@ export type CanReservationBeChangedProps = {
   activeApplicationRounds?: RoundPeriod[];
 };
 
-export function isReservationEditable(
+export function getWhyReservationCantBeChanged(
   props: Pick<Required<CanReservationBeChangedProps>, "reservation">
-): boolean {
+): string | null {
   const { reservation } = props;
   // existing reservation state is not CONFIRMED
   if (!isReservationConfirmed(reservation)) {
-    return false;
+    return "RESERVATION_MODIFICATION_NOT_ALLOWED";
   }
 
   // existing reservation begin time is in the future
   if (isReservationInThePast(reservation)) {
-    return false;
+    return "RESERVATION_BEGIN_IN_PAST";
   }
 
   // existing reservation is free
   if (!isReservationFreeOfCharge(reservation)) {
-    return false;
+    return "RESERVATION_MODIFICATION_NOT_ALLOWED";
   }
 
   // existing reservation cancellation buffer is not exceeded
   if (!canUserCancelReservation(reservation)) {
-    return false;
+    return "CANCELLATION_TIME_PAST";
   }
 
   // existing reservation has been handled
   if (reservation.isHandled) {
-    return false;
+    return "RESERVATION_MODIFICATION_NOT_ALLOWED";
   }
 
+  return null;
+}
+
+export function isReservationEditable(
+  props: Pick<Required<CanReservationBeChangedProps>, "reservation">
+): boolean {
+  if (getWhyReservationCantBeChanged(props) != null) {
+    return false;
+  }
   return true;
 }
 
@@ -326,7 +335,6 @@ export function isReservationEditable(
 /// ![false] === ![true] === false, with no type errors
 /// either refactor the return value or add lint rules to disable ! operator
 /// TODO disable undefined from reservation and reservationUnit
-/// Only called from the reservation edit page
 export function canReservationTimeBeChanged({
   reservation,
   newReservation,
@@ -443,8 +451,6 @@ export function isReservationStartInFuture(
   );
 }
 
-// TODO this is only used for calendars (edit and new reservation)
-// the end part is not used at all for some reason
 export function getNewReservation({
   start,
   end,

@@ -45,7 +45,7 @@ import {
   getNormalizedReservationOrderStatus,
   getReservationValue,
   getWhyReservationCantBeCancelled,
-  isReservationEditable,
+  getWhyReservationCantBeChanged,
 } from "@/modules/reservation";
 import {
   getReservationUnitInstructionsKey,
@@ -467,7 +467,8 @@ function Reservation({
       ? getTranslation(reservationUnit?.serviceSpecificTerms, "text")
       : undefined;
 
-  const canTimeBeModified = isReservationEditable({ reservation });
+  const modifyTimeReason = getWhyReservationCantBeChanged({ reservation });
+  const canTimeBeModified = modifyTimeReason == null;
 
   const cancellationReason = useMemo(() => {
     const reason = getWhyReservationCantBeCancelled(reservation);
@@ -642,7 +643,6 @@ function Reservation({
               )}
             </Actions>
             <Reasons>
-              {/* TODO add back or remove completely?
               {modifyTimeReason && (
                 <ReasonText>
                   {t(`reservations:modifyTimeReasons:${modifyTimeReason}`)}
@@ -653,7 +653,7 @@ function Reservation({
                       "reservations:modifyTimeReasons:RESERVATION_MODIFICATION_NOT_ALLOWED_SUFFIX"
                     )}`}
                 </ReasonText>
-              )*/}
+              )}
               {cancellationReason && (
                 <ReasonText>
                   {t(`reservations:cancellationReasons:${cancellationReason}`)}

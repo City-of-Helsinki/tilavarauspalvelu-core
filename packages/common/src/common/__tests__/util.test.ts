@@ -3,7 +3,7 @@ import {
   ReservationStartInterval,
 } from "../../../gql/gql-types";
 import { getEventBuffers } from "../../calendar/util";
-import { getIntervalMinutes } from "../../helpers";
+import { getIntervalMinutes } from "../../conversion";
 
 const tfunction = (str: string, options: { count: number }) => {
   const countStr = options?.count > 1 ? "plural" : "singular";

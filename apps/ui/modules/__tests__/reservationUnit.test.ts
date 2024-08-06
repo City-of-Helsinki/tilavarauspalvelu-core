@@ -25,6 +25,7 @@ import {
   ReservationState,
 } from "@gql/gql-types";
 import {
+  getDayIntervals,
   getEquipmentCategories,
   getEquipmentList,
   getFuturePricing,
@@ -41,6 +42,7 @@ import {
 import mockTranslations from "../../public/locales/fi/prices.json";
 import { type ReservableMap, dateToKey, type RoundPeriod } from "../reservable";
 import { createMockReservationUnit } from "@/test/testUtils";
+import { base64encode } from "common/src/helpers";
 
 jest.mock("next-i18next", () => ({
   i18n: {
@@ -1253,169 +1255,110 @@ describe("isReservationUnitPaidInFuture", () => {
 });
 
 describe("isReservationUnitReservable", () => {
-  const date = new Date().toISOString().split("T")[0];
-  const reservationUnit: ReservationUnitNode = {
-    id: "1234",
-    allowReservationsWithoutOpeningHours: false,
-    authentication: Authentication.Strong,
-    canApplyFreeOfCharge: false,
-    contactInformation: "",
-    isArchived: false,
-    isDraft: false,
-    requireIntroduction: false,
-    requireReservationHandling: false,
-    ReservationKind: ReservationKind.Direct,
-    reservationStartInterval: ReservationStartInterval.Interval_15Mins,
-    uuid: "1234",
-    images: [],
-    reservableTimeSpans: [
-      {
-        startDatetime: `${date}T04:00:00+00:00`,
-        endDatetime: `${date}T20:00:00+00:00`,
+  function constructReservationUnitNode({
+    minReservationDuration = 3600,
+    maxReservationDuration = 3600,
+    reservationState = ReservationState.Reservable,
+  }: {
+    minReservationDuration?: number;
+    maxReservationDuration?: number;
+    reservationState?: ReservationState;
+  }) {
+    const date = new Date().toISOString().split("T")[0];
+    const reservationUnit: ReservationUnitNode = {
+      pk: 1,
+      id: base64encode("ReservationUnitNode:1"),
+      allowReservationsWithoutOpeningHours: true,
+      applicationRoundTimeSlots: [],
+      applicationRounds: [],
+      bufferTimeAfter: 0,
+      bufferTimeBefore: 0,
+      authentication: Authentication.Strong,
+      canApplyFreeOfCharge: false,
+      contactInformation: "",
+      description: "",
+      equipments: [],
+      images: [],
+      isArchived: false,
+      isDraft: false,
+      name: "",
+      paymentTypes: [],
+      pricings: [],
+      purposes: [],
+      qualifiers: [],
+      requireIntroduction: false,
+      requireReservationHandling: false,
+      reservationBlockWholeDay: false,
+      reservationCancelledInstructions: "",
+      reservationConfirmedInstructions: "",
+      reservationKind: ReservationKind.Direct,
+      reservationPendingInstructions: "",
+      reservationStartInterval: ReservationStartInterval.Interval_15Mins,
+      resources: [],
+      services: [],
+      spaces: [],
+      maxPersons: 10,
+      uuid: "be4fa7a2-05b7-11ee-be56-0242ac120004",
+      minReservationDuration,
+      maxReservationDuration,
+      metadataSet: {
+        id: "1234",
+        name: "metadata",
+        supportedFields: [
+          {
+            id: "1234",
+            fieldName: "name",
+          },
+        ],
+        requiredFields: [] as const,
       },
-    ],
-  } as unknown as ReservationUnitNode;
+      reservationState,
+      reservableTimeSpans: [
+        {
+          startDatetime: `${date}T04:00:00+00:00`,
+          endDatetime: `${date}T20:00:00+00:00`,
+        },
+      ],
+    };
+    return reservationUnit;
+  }
 
   test("returns true for a unit that is reservable", () => {
-    const [res1] = isReservationUnitReservable({
-      ...reservationUnit,
-      minReservationDuration: 3600,
-      maxReservationDuration: 3600,
-      metadataSet: {
-        id: "1234",
-        supportedFields: [
-          {
-            id: "1234",
-            fieldName: "name",
-          },
-        ],
-        requiredFields: [],
-      },
-      reservationState: ReservationState.Reservable,
-    });
+    const [res1] = isReservationUnitReservable(
+      constructReservationUnitNode({})
+    );
     expect(res1).toBe(true);
 
-    const [res2] = isReservationUnitReservable({
-      ...reservationUnit,
-      minReservationDuration: 3600,
-      maxReservationDuration: 3600,
-      metadataSet: {
-        id: "1234",
-        supportedFields: [
-          {
-            id: "1234",
-            fieldName: "name",
-          },
-        ],
-        requiredFields: [],
-      },
-      reservationState: ReservationState.ScheduledClosing,
-    });
+    const [res2] = isReservationUnitReservable(
+      constructReservationUnitNode({
+        reservationState: ReservationState.ScheduledClosing,
+      })
+    );
     expect(res2).toBe(true);
   });
 
   test("returns false for a unit that is not reservable", () => {
     const [res1] = isReservationUnitReservable({
-      ...reservationUnit,
-      minReservationDuration: 3600,
-      maxReservationDuration: 3600,
+      ...constructReservationUnitNode({}),
       reservableTimeSpans: undefined,
-      metadataSet: {
-        id: "1234",
-        supportedFields: [
-          {
-            id: "1234",
-            fieldName: "name",
-          },
-        ],
-        requiredFields: [],
-      },
       reservationState: ReservationState.ReservationClosed,
     });
     expect(res1).toBe(false);
 
     const [res2] = isReservationUnitReservable({
-      ...reservationUnit,
-      metadataSet: {
-        id: "1234",
-        supportedFields: [
-          {
-            id: "1234",
-            fieldName: "name",
-          },
-        ],
-        requiredFields: [],
-      },
+      ...constructReservationUnitNode({}),
       reservationState: ReservationState.ReservationClosed,
     });
     expect(res2).toBe(false);
 
-    const [res3] = isReservationUnitReservable({
-      ...reservationUnit,
-      minReservationDuration: 3600,
-      metadataSet: {
-        id: "1234",
-        supportedFields: [
-          {
-            id: "1234",
-            fieldName: "name",
-          },
-        ],
-        requiredFields: [],
-      },
-      reservationState: ReservationState.Reservable,
-    });
-    expect(res3).toBe(false);
-
-    const [res4] = isReservationUnitReservable({
-      ...reservationUnit,
-      maxReservationDuration: 3600,
-      metadataSet: {
-        id: "1234",
-        supportedFields: [
-          {
-            id: "1234",
-            fieldName: "name",
-          },
-        ],
-        requiredFields: [],
-      },
-      reservationState: ReservationState.Reservable,
-    });
-    expect(res4).toBe(false);
-
     const [res5] = isReservationUnitReservable({
-      ...reservationUnit,
-      minReservationDuration: 3600,
-      maxReservationDuration: 3600,
-      metadataSet: {
-        id: "1234",
-        supportedFields: [
-          {
-            id: "1234",
-            fieldName: "name",
-          },
-        ],
-        requiredFields: [],
-      },
+      ...constructReservationUnitNode({}),
       reservationState: ReservationState.ScheduledReservation,
     });
     expect(res5).toBe(false);
 
     const [res6] = isReservationUnitReservable({
-      ...reservationUnit,
-      minReservationDuration: 3600,
-      maxReservationDuration: 3600,
-      metadataSet: {
-        id: "1234",
-        supportedFields: [
-          {
-            id: "1234",
-            fieldName: "name",
-          },
-        ],
-        requiredFields: [],
-      },
+      ...constructReservationUnitNode({}),
       reservationState: ReservationState.ScheduledPeriod,
     });
     expect(res6).toBe(false);
@@ -1423,40 +1366,126 @@ describe("isReservationUnitReservable", () => {
 
   test("returns correct value with buffer days", () => {
     const [res1] = isReservationUnitReservable({
-      ...reservationUnit,
-      minReservationDuration: 3600,
-      maxReservationDuration: 3600,
+      ...constructReservationUnitNode({}),
       reservationBegins: addDays(new Date(), 5).toISOString(),
       reservationsMaxDaysBefore: 5,
-      metadataSet: {
-        id: "1234",
-        supportedFields: [
-          {
-            id: "1234",
-            fieldName: "name",
-          },
-        ],
-        requiredFields: [],
-      },
     });
     expect(res1).toBe(false);
 
     const [res2] = isReservationUnitReservable({
-      ...reservationUnit,
+      ...constructReservationUnitNode({}),
       reservationBegins: addDays(new Date(), 5).toISOString(),
       reservationsMaxDaysBefore: 4,
       reservableTimeSpans: undefined,
-      metadataSet: {
-        id: "1234",
-        supportedFields: [
-          {
-            id: "1234",
-            fieldName: "name",
-          },
-        ],
-        requiredFields: [],
-      },
     });
     expect(res2).toBe(false);
+  });
+});
+
+describe("getDayIntervals", () => {
+  test("getDayIntervals from 9 to 17 with 30 min interval", () => {
+    const input = {
+      startTime: { h: 9, m: 0 },
+      endTime: { h: 17, m: 0 },
+      interval: ReservationStartInterval.Interval_30Mins,
+    };
+    const output: { h: number; m: number }[] = [];
+    for (let i = 9; i < 17; i++) {
+      output.push({ h: i, m: 0 });
+      output.push({ h: i, m: 30 });
+    }
+    const res = getDayIntervals(input.startTime, input.endTime, input.interval);
+    expect(res).toEqual(output);
+  });
+  test("getDayIntervals from 9 to 17 with 15 min interval", () => {
+    const input = {
+      startTime: { h: 9, m: 0 },
+      endTime: { h: 17, m: 0 },
+      interval: ReservationStartInterval.Interval_15Mins,
+    };
+    const output: { h: number; m: number }[] = [];
+    for (let i = 9; i < 17; i++) {
+      output.push({ h: i, m: 0 });
+      output.push({ h: i, m: 15 });
+      output.push({ h: i, m: 30 });
+      output.push({ h: i, m: 45 });
+    }
+    const res = getDayIntervals(input.startTime, input.endTime, input.interval);
+    expect(res).toEqual(output);
+  });
+  test("getDayIntervals from 9 to 17 with 60 min interval", () => {
+    const input = {
+      startTime: { h: 9, m: 0 },
+      endTime: { h: 17, m: 0 },
+      interval: ReservationStartInterval.Interval_60Mins,
+    };
+    const output: { h: number; m: number }[] = [];
+    for (let i = 9; i < 17; i++) {
+      output.push({ h: i, m: 0 });
+    }
+    const res = getDayIntervals(input.startTime, input.endTime, input.interval);
+    expect(res).toEqual(output);
+  });
+  test("getDayIntervals from 0 to 24 with 30 min interval", () => {
+    const input = {
+      startTime: { h: 0, m: 0 },
+      endTime: { h: 24, m: 0 },
+      interval: ReservationStartInterval.Interval_30Mins,
+    };
+    const output: { h: number; m: number }[] = [];
+    for (let i = 0; i < 24; i++) {
+      output.push({ h: i, m: 0 });
+      output.push({ h: i, m: 30 });
+    }
+    const res = getDayIntervals(input.startTime, input.endTime, input.interval);
+    expect(res).toEqual(output);
+  });
+  test("getDayIntervals with invalid range", () => {
+    const input = {
+      startTime: { h: 17, m: 0 },
+      endTime: { h: 9, m: 0 },
+      interval: ReservationStartInterval.Interval_30Mins,
+    };
+    const res = getDayIntervals(input.startTime, input.endTime, input.interval);
+    expect(res).toEqual([]);
+  });
+  test("getDayIntervals with 0 size range", () => {
+    const input = {
+      startTime: { h: 17, m: 0 },
+      endTime: { h: 17, m: 0 },
+      interval: ReservationStartInterval.Interval_30Mins,
+    };
+    const res = getDayIntervals(input.startTime, input.endTime, input.interval);
+    expect(res).toEqual([]);
+  });
+  test("getDayIntervals with uneven times", () => {
+    const input = {
+      startTime: { h: 9, m: 20 },
+      endTime: { h: 17, m: 20 },
+      interval: ReservationStartInterval.Interval_30Mins,
+    };
+    const output: { h: number; m: number }[] = [];
+    for (let i = 9; i < 17; i++) {
+      output.push({ h: i, m: 20 });
+      output.push({ h: i, m: 50 });
+    }
+    const res = getDayIntervals(input.startTime, input.endTime, input.interval);
+    expect(res).toEqual(output);
+  });
+  test("getDayIntervals with uneven times", () => {
+    const input = {
+      startTime: { h: 9, m: 20 },
+      endTime: { h: 17, m: 0 },
+      interval: ReservationStartInterval.Interval_30Mins,
+    };
+    const output: { h: number; m: number }[] = [];
+    for (let i = 9; i < 17; i++) {
+      output.push({ h: i, m: 20 });
+      if (i < 16) {
+        output.push({ h: i, m: 50 });
+      }
+    }
+    const res = getDayIntervals(input.startTime, input.endTime, input.interval);
+    expect(res).toEqual(output);
   });
 });

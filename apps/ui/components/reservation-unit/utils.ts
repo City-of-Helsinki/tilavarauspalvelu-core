@@ -121,7 +121,10 @@ export function getNextAvailableTime(props: AvailableTimesProps): Date | null {
   const { reservationsMinDaysBefore, reservationsMaxDaysBefore } =
     reservationUnit;
 
-  const today = addDays(new Date(), reservationsMinDaysBefore ?? 0);
+  const minReservationDate = addDays(
+    new Date(),
+    reservationsMinDaysBefore ?? 0
+  );
   const possibleEndDay = getLastPossibleReservationDate(reservationUnit);
   const endDay = possibleEndDay ? addDays(possibleEndDay, 1) : undefined;
   // NOTE there is still a case where application rounds have a hole but there are no reservable times
@@ -134,7 +137,7 @@ export function getNextAvailableTime(props: AvailableTimesProps): Date | null {
     }
     const end = new Date(round.reservationPeriodEnd);
     const begin = new Date(round.reservationPeriodBegin);
-    if (isBefore(end, today)) {
+    if (isBefore(end, minReservationDate)) {
       return acc;
     }
     if (acc == null) {
@@ -146,7 +149,8 @@ export function getNextAvailableTime(props: AvailableTimesProps): Date | null {
     }
     return dayMax([acc, new Date(round.reservationPeriodEnd)]);
   }, undefined);
-  const minDay = dayMax([today, start, openAfterRound]) ?? today;
+  const minDay =
+    dayMax([minReservationDate, start, openAfterRound]) ?? minReservationDate;
 
   // Find the first possible day
   let openTimes = reservableTimes.get(dateToKey(minDay));

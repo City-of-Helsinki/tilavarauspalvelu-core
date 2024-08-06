@@ -349,8 +349,6 @@ export function EditStep0({
     }
   };
 
-  // TODO skip length check is weird, why was it needed here?
-  // it allows selecting too long reservations and disables the next button
   const handleCalendarEventChange = useCallback(
     ({ start, end }: CalendarEvent<ReservationNode>): boolean => {
       const { start: newStart, end: newEnd } =

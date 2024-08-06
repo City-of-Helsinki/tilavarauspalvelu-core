@@ -1,4 +1,8 @@
-import { ReservationTypeChoice, Weekday } from "../gql/gql-types";
+import {
+  ReservationStartInterval,
+  ReservationTypeChoice,
+  Weekday,
+} from "../gql/gql-types";
 
 export type Day = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 export function transformWeekday(d: Day): Weekday {
@@ -55,5 +59,32 @@ export function transformReservationTypeSafe(
       return ReservationTypeChoice.Seasonal;
     default:
       return null;
+  }
+}
+
+export function getIntervalMinutes(
+  reservationStartInterval: ReservationStartInterval
+): number {
+  switch (reservationStartInterval) {
+    case ReservationStartInterval.Interval_15Mins:
+      return 15;
+    case ReservationStartInterval.Interval_30Mins:
+      return 30;
+    case ReservationStartInterval.Interval_60Mins:
+      return 60;
+    case ReservationStartInterval.Interval_90Mins:
+      return 90;
+    case ReservationStartInterval.Interval_120Mins:
+      return 120;
+    case ReservationStartInterval.Interval_180Mins:
+      return 180;
+    case ReservationStartInterval.Interval_240Mins:
+      return 240;
+    case ReservationStartInterval.Interval_300Mins:
+      return 300;
+    case ReservationStartInterval.Interval_360Mins:
+      return 360;
+    case ReservationStartInterval.Interval_420Mins:
+      return 420;
   }
 }

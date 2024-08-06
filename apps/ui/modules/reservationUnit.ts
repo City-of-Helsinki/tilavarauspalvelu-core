@@ -25,6 +25,7 @@ import {
   ReservationKind,
   ReservationStateChoice,
   type IsReservableFieldsFragment,
+  ReservationStartInterval,
 } from "@gql/gql-types";
 import { capitalize, getTranslation } from "./util";
 import {
@@ -33,10 +34,10 @@ import {
   isSlotWithinReservationTime,
   dateToKey,
   isRangeReservable,
-  getDayIntervals,
 } from "@/modules/reservable";
 import { type PricingFieldsFragment } from "common/gql/gql-types";
 import { gql } from "@apollo/client";
+import { getIntervalMinutes } from "common/src/conversion";
 
 function formatTimeObject(time: { h: number; m: number }): string {
   return `${time.h.toString().padStart(2, "0")}:${time.m.toString().padStart(2, "0")}`;
@@ -369,6 +370,36 @@ export function isInTimeSpan(
   return true;
 }
 
+/// Generate a list of intervals for a day
+// TODO this can be moved to reservationUnit (not used here anymore)
+export function getDayIntervals(
+  startTime: { h: number; m: number },
+  endTime: { h: number; m: number },
+  interval: ReservationStartInterval
+): { h: number; m: number }[] {
+  // normalize end time to allow comparison
+  const nEnd = endTime.h === 0 && endTime.m === 0 ? { h: 23, m: 59 } : endTime;
+  const iMins = getIntervalMinutes(interval);
+
+  const start = startTime;
+  const end = nEnd;
+
+  const startMins = start.h * 60 + start.m;
+  const endMins = end.h * 60 + end.m;
+
+  const intervals: Array<{ h: number; m: number }> = [];
+  for (let i = startMins; i < endMins; i += iMins) {
+    // don't allow interval overflow but handle 0:00 as 23:59
+    if (i + iMins > endMins + 1) {
+      break;
+    }
+    const m = i % 60;
+    const h = (i - m) / 60;
+    intervals.push({ h, m });
+  }
+  return intervals;
+}
+
 // Returns an timeslot array (in HH:mm format) with the time-slots that are
 // available for reservation on the given date
 // TODO should rewrite the timespans to be NonNullable and dates (and do the conversion early, not on each component render)
@@ -433,7 +464,6 @@ export function getPossibleTimesForDay({
     // TODO the conversion should be done in a separate function so we can reuse the logic without string conversion
     .map((time) => formatTimeObject(time))
     .map((time) => ({ label: time, value: time }));
-
   return times;
 }
 
