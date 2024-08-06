@@ -18,6 +18,7 @@
   "reservationType": {
     "STAFF": "Kaupungin oma käyttö, ulkoinen yhteistyötapahtuma tai toimipisteen sisäinen varaus",
     "BEHALF": "Asiakkaan puolesta",
+    "SEASONAL": "Kausivaraus",
     "BLOCKED": "Suljettu"
   },
   "clientReservationCantBeChanged": "Asiakkaan tekemä varaus",

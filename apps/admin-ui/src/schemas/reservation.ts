@@ -10,14 +10,8 @@ import {
   checkValidFutureDate,
 } from "common/src/schemas/schemaCommon";
 
-export const ReservationTypes = [
-  ReservationTypeChoice.Staff,
-  ReservationTypeChoice.Behalf,
-  ReservationTypeChoice.Blocked,
-  ReservationTypeChoice.Normal,
-  ReservationTypeChoice.Seasonal,
-] as const;
-export const ReservationTypeSchema = z.enum(ReservationTypes);
+export const ReservationTypes = Object.values(ReservationTypeChoice);
+export const ReservationTypeSchema = z.nativeEnum(ReservationTypeChoice);
 
 export type ReservationType = z.infer<typeof ReservationTypeSchema>;
 
