@@ -25,6 +25,23 @@ export function toNumber(filter: string | null): number | null {
   return n;
 }
 
+/* eslint-disable @typescript-eslint/prefer-reduce-type-parameter -- generic reduce requires type casting */
+export function pick<T, K extends keyof T>(
+  reservation: T,
+  keys: ReadonlyArray<K>
+): Pick<T, K> {
+  return keys.reduce<Pick<T, K>>(
+    (acc, key) => {
+      if (reservation[key] != null) {
+        acc[key] = reservation[key];
+      }
+      return acc;
+    },
+    {} as Pick<T, K>
+  );
+}
+/* eslint-enable @typescript-eslint/prefer-reduce-type-parameter */
+
 export const toMondayFirstUnsafe = (day: number) => {
   if (day < 0 || day > 6) {
     throw new Error(`Invalid day ${day}`);

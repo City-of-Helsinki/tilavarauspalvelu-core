@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 import {
   type ReservationStaffCreateMutationInput,
   type ReservationUnitQuery,
-  ReservationStartInterval,
   ReservationTypeChoice,
   useCreateStaffReservationMutation,
   useReservationUnitQuery,
@@ -23,7 +22,7 @@ import {
 import { breakpoints } from "common/src/common/style";
 import { useCheckCollisions } from "@/component/reservations/requested/hooks";
 import Loader from "@/component/Loader";
-import { dateTime, parseDateTimeSafe } from "@/helpers";
+import { dateTime, getNormalizedInterval, parseDateTimeSafe } from "@/helpers";
 import { useModal } from "@/context/ModalContext";
 import { useNotification } from "@/context/NotificationContext";
 import { flattenMetadata } from "./utils";
@@ -122,17 +121,20 @@ const useCheckFormCollisions = ({
   return { hasCollisions };
 };
 
-const CollisionWarning = ({
+function CollisionWarning({
   form,
   reservationUnit,
 }: {
   form: UseFormReturn<FormValueType>;
   reservationUnit: ReservationUnitType;
-}) => {
+}) {
   const { t } = useTranslation();
   const { hasCollisions } = useCheckFormCollisions({ form, reservationUnit });
 
-  return hasCollisions ? (
+  if (!hasCollisions) {
+    return null;
+  }
+  return (
     <StyledNotification
       size="small"
       label={t("errors.descriptive.collision")}
@@ -140,8 +142,8 @@ const CollisionWarning = ({
     >
       {t("errors.descriptive.collision")}
     </StyledNotification>
-  ) : null;
-};
+  );
+}
 
 function ActionContainer({
   form,
@@ -201,11 +203,9 @@ const DialogContent = ({
   start: Date;
 }) => {
   const { t, i18n } = useTranslation();
-  const interval =
-    reservationUnit.reservationStartInterval ===
-    ReservationStartInterval.Interval_15Mins
-      ? ReservationStartInterval.Interval_15Mins
-      : ReservationStartInterval.Interval_30Mins;
+  const interval = getNormalizedInterval(
+    reservationUnit.reservationStartInterval
+  );
   const form = useForm<FormValueType>({
     resolver: zodResolver(ReservationFormSchema(interval)),
     // TODO onBlur or onChange? onChange is anoying because it highlights even untouched fields

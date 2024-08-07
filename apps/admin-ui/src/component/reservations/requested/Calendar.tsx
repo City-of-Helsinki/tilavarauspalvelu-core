@@ -7,7 +7,7 @@ import { type ReservationQuery, ReservationTypeChoice } from "@gql/gql-types";
 import { useModal } from "app/context/ModalContext";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
 import Legend from "./Legend";
-import EditTimeModal from "../EditTimeModal";
+import { EditTimeModal } from "../EditTimeModal";
 import { isPossibleToEdit } from "./reservationModificationRules";
 import { getEventBuffers } from "common/src/calendar/util";
 import { filterNonNullable } from "common/src/helpers";

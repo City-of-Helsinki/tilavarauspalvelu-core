@@ -36,7 +36,7 @@ import {
 import Calendar from "./Calendar";
 import VisibleIfPermission from "./VisibleIfPermission";
 import ApprovalButtons from "./ApprovalButtons";
-import RecurringReservationsView from "./RecurringReservationsView";
+import { RecurringReservationsView } from "./RecurringReservationsView";
 import { useRecurringReservations, useReservationData } from "./hooks";
 import ApprovalButtonsRecurring from "./ApprovalButtonsRecurring";
 import ReservationTitleSection from "./ReservationTitleSection";
@@ -361,6 +361,7 @@ function TimeBlock({
             onSelect={(r) => setSelected(r as ReservationType)}
             onReservationUpdated={handleChanged}
             onChange={handleChanged}
+            reservationToCopy={reservation}
           />
         </Accordion>
       )}

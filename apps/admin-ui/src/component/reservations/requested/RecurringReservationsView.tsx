@@ -16,7 +16,7 @@ import {
 import ReservationListButton from "@/component/ReservationListButton";
 import DenyDialog from "./DenyDialog";
 import { useModal } from "@/context/ModalContext";
-import EditTimeModal from "../EditTimeModal";
+import { EditTimeModal } from "../EditTimeModal";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { useNotification } from "app/context/NotificationContext";
 import { LoadingSpinner } from "hds-react";
@@ -26,17 +26,23 @@ type RecurringReservationType = NonNullable<
 >;
 type ReservationType = NonNullable<RecurringReservationType["reservations"]>[0];
 
-function RecurringReservationsView({
-  recurringPk,
-  onSelect,
-  onChange,
-  onReservationUpdated,
-}: {
+type Props = {
   recurringPk: number;
   onSelect?: (selected: ReservationType) => void;
   onChange?: () => Promise<ApolloQueryResult<ReservationQuery>>;
   onReservationUpdated?: () => void;
-}) {
+  // optional reservation to copy when creating a new reservation
+  // contains a lot more information than the RecurringReservationQuery
+  reservationToCopy?: ReservationQuery["reservation"];
+};
+
+export function RecurringReservationsView({
+  recurringPk,
+  onSelect,
+  onChange,
+  onReservationUpdated,
+  reservationToCopy,
+}: Props) {
   const { t } = useTranslation();
   const { setModalContent } = useModal();
   const { notifyError } = useNotification();
@@ -65,15 +71,14 @@ function RecurringReservationsView({
     onChange?.();
   };
 
-  type ReservationEditType = NonNullable<ReservationQuery["reservation"]>;
   const handleChange = (res: (typeof reservations)[0]) => {
     setModalContent(
       <EditTimeModal
         // TODO this was here already (so probably uses the undefineds on purpose)
         // The correct way to deal with this would be either split
         // the Edit modal into two parts or do a query using id inside it (if we need all the data).
-        reservation={res as ReservationEditType}
-        onAccept={() => handleChangeSuccess()}
+        reservation={res}
+        onAccept={handleChangeSuccess}
         onClose={() => setModalContent(null)}
       />,
       true
@@ -171,8 +176,8 @@ function RecurringReservationsView({
     <ReservationList
       header={<H6 as="h3">{t("RecurringReservationsView.Heading")}</H6>}
       items={items}
+      reservationToCopy={reservationToCopy}
+      refetch={refetch}
     />
   );
 }
-
-export default RecurringReservationsView;

@@ -62,6 +62,14 @@ export function transformReservationTypeSafe(
   }
 }
 
+export function convertReservationType(type: string): ReservationTypeChoice {
+  const t = transformReservationTypeSafe(type);
+  if (t == null) {
+    throw new Error(`Unknown reservation type: ${type}`);
+  }
+  return t;
+}
+
 export function getIntervalMinutes(
   reservationStartInterval: ReservationStartInterval
 ): number {

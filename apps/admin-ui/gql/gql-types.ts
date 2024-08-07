@@ -7195,6 +7195,43 @@ export type SearchReservationUnitsQuery = {
   } | null;
 };
 
+export type StaffAdjustReservationTimeMutationVariables = Exact<{
+  input: ReservationStaffAdjustTimeMutationInput;
+}>;
+
+export type StaffAdjustReservationTimeMutation = {
+  staffAdjustReservationTime?: {
+    pk?: number | null;
+    begin?: string | null;
+    end?: string | null;
+    state?: ReservationStateChoice | null;
+  } | null;
+};
+
+export type ChangeReservationTimeFragment = {
+  id: string;
+  pk?: number | null;
+  begin: string;
+  end: string;
+  type?: ReservationTypeChoice | null;
+  bufferTimeAfter: number;
+  bufferTimeBefore: number;
+  recurringReservation?: {
+    pk?: number | null;
+    id: string;
+    weekdays?: Array<number | null> | null;
+    beginDate?: string | null;
+    endDate?: string | null;
+  } | null;
+  reservationUnit: Array<{
+    id: string;
+    pk?: number | null;
+    bufferTimeBefore: number;
+    bufferTimeAfter: number;
+    reservationStartInterval: ReservationStartInterval;
+  }>;
+};
+
 export type ReservationUnitPricingFragment = {
   pricings: Array<{
     id: string;
@@ -7397,19 +7434,6 @@ export type ReservationsQuery = {
       } | null;
     } | null>;
     pageInfo: { endCursor?: string | null; hasNextPage: boolean };
-  } | null;
-};
-
-export type StaffAdjustReservationTimeMutationVariables = Exact<{
-  input: ReservationStaffAdjustTimeMutationInput;
-}>;
-
-export type StaffAdjustReservationTimeMutation = {
-  staffAdjustReservationTime?: {
-    pk?: number | null;
-    begin?: string | null;
-    end?: string | null;
-    state?: ReservationStateChoice | null;
   } | null;
 };
 
@@ -7703,13 +7727,30 @@ export type RecurringReservationQuery = {
       rejectionReason: RejectionReadinessChoice;
     }>;
     reservations: Array<{
+      state?: ReservationStateChoice | null;
       id: string;
       pk?: number | null;
       begin: string;
       end: string;
-      state?: ReservationStateChoice | null;
+      type?: ReservationTypeChoice | null;
+      bufferTimeAfter: number;
+      bufferTimeBefore: number;
       paymentOrder: Array<{ id: string; status?: OrderStatus | null }>;
-      reservationUnit: Array<{ id: string; pk?: number | null }>;
+      reservationUnit: Array<{
+        id: string;
+        pk?: number | null;
+        bufferTimeBefore: number;
+        bufferTimeAfter: number;
+        reservationStartInterval: ReservationStartInterval;
+        unit?: { id: string; pk?: number | null } | null;
+      }>;
+      recurringReservation?: {
+        pk?: number | null;
+        id: string;
+        weekdays?: Array<number | null> | null;
+        beginDate?: string | null;
+        endDate?: string | null;
+      } | null;
     }>;
   } | null;
 };
@@ -9316,6 +9357,31 @@ export const ReservationsInIntervalFragmentDoc = gql`
     bufferTimeAfter
     type
     affectedReservationUnits
+  }
+`;
+export const ChangeReservationTimeFragmentDoc = gql`
+  fragment ChangeReservationTime on ReservationNode {
+    id
+    pk
+    begin
+    end
+    type
+    bufferTimeAfter
+    bufferTimeBefore
+    recurringReservation {
+      pk
+      id
+      weekdays
+      beginDate
+      endDate
+    }
+    reservationUnit {
+      id
+      pk
+      bufferTimeBefore
+      bufferTimeAfter
+      reservationStartInterval
+    }
   }
 `;
 export const PricingFieldsFragmentDoc = gql`
@@ -12497,6 +12563,62 @@ export type SearchReservationUnitsQueryResult = Apollo.QueryResult<
   SearchReservationUnitsQuery,
   SearchReservationUnitsQueryVariables
 >;
+export const StaffAdjustReservationTimeDocument = gql`
+  mutation StaffAdjustReservationTime(
+    $input: ReservationStaffAdjustTimeMutationInput!
+  ) {
+    staffAdjustReservationTime(input: $input) {
+      pk
+      begin
+      end
+      state
+    }
+  }
+`;
+export type StaffAdjustReservationTimeMutationFn = Apollo.MutationFunction<
+  StaffAdjustReservationTimeMutation,
+  StaffAdjustReservationTimeMutationVariables
+>;
+
+/**
+ * __useStaffAdjustReservationTimeMutation__
+ *
+ * To run a mutation, you first call `useStaffAdjustReservationTimeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useStaffAdjustReservationTimeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [staffAdjustReservationTimeMutation, { data, loading, error }] = useStaffAdjustReservationTimeMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useStaffAdjustReservationTimeMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    StaffAdjustReservationTimeMutation,
+    StaffAdjustReservationTimeMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    StaffAdjustReservationTimeMutation,
+    StaffAdjustReservationTimeMutationVariables
+  >(StaffAdjustReservationTimeDocument, options);
+}
+export type StaffAdjustReservationTimeMutationHookResult = ReturnType<
+  typeof useStaffAdjustReservationTimeMutation
+>;
+export type StaffAdjustReservationTimeMutationResult =
+  Apollo.MutationResult<StaffAdjustReservationTimeMutation>;
+export type StaffAdjustReservationTimeMutationOptions =
+  Apollo.BaseMutationOptions<
+    StaffAdjustReservationTimeMutation,
+    StaffAdjustReservationTimeMutationVariables
+  >;
 export const UpdateStaffReservationDocument = gql`
   mutation UpdateStaffReservation(
     $input: ReservationStaffModifyMutationInput!
@@ -12755,62 +12877,6 @@ export type ReservationsQueryResult = Apollo.QueryResult<
   ReservationsQuery,
   ReservationsQueryVariables
 >;
-export const StaffAdjustReservationTimeDocument = gql`
-  mutation StaffAdjustReservationTime(
-    $input: ReservationStaffAdjustTimeMutationInput!
-  ) {
-    staffAdjustReservationTime(input: $input) {
-      pk
-      begin
-      end
-      state
-    }
-  }
-`;
-export type StaffAdjustReservationTimeMutationFn = Apollo.MutationFunction<
-  StaffAdjustReservationTimeMutation,
-  StaffAdjustReservationTimeMutationVariables
->;
-
-/**
- * __useStaffAdjustReservationTimeMutation__
- *
- * To run a mutation, you first call `useStaffAdjustReservationTimeMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useStaffAdjustReservationTimeMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [staffAdjustReservationTimeMutation, { data, loading, error }] = useStaffAdjustReservationTimeMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useStaffAdjustReservationTimeMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    StaffAdjustReservationTimeMutation,
-    StaffAdjustReservationTimeMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    StaffAdjustReservationTimeMutation,
-    StaffAdjustReservationTimeMutationVariables
-  >(StaffAdjustReservationTimeDocument, options);
-}
-export type StaffAdjustReservationTimeMutationHookResult = ReturnType<
-  typeof useStaffAdjustReservationTimeMutation
->;
-export type StaffAdjustReservationTimeMutationResult =
-  Apollo.MutationResult<StaffAdjustReservationTimeMutation>;
-export type StaffAdjustReservationTimeMutationOptions =
-  Apollo.BaseMutationOptions<
-    StaffAdjustReservationTimeMutation,
-    StaffAdjustReservationTimeMutationVariables
-  >;
 export const ReservationApplicationLinkDocument = gql`
   query ReservationApplicationLink($id: ID!) {
     recurringReservation(id: $id) {
@@ -13109,22 +13175,22 @@ export const RecurringReservationDocument = gql`
         rejectionReason
       }
       reservations {
-        id
-        pk
-        begin
-        end
+        ...ChangeReservationTime
         state
         paymentOrder {
           id
           status
         }
         reservationUnit {
-          id
-          pk
+          unit {
+            id
+            pk
+          }
         }
       }
     }
   }
+  ${ChangeReservationTimeFragmentDoc}
 `;
 
 /**

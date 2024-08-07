@@ -158,10 +158,7 @@ export const RECURRING_RESERVATION_QUERY = gql`
         rejectionReason
       }
       reservations {
-        id
-        pk
-        begin
-        end
+        ...ChangeReservationTime
         state
         paymentOrder {
           id
@@ -169,7 +166,10 @@ export const RECURRING_RESERVATION_QUERY = gql`
         }
         reservationUnit {
           id
-          pk
+          unit {
+            id
+            pk
+          }
         }
       }
     }

@@ -61,20 +61,22 @@ const filterOutRemovedReservations = (
 ) =>
   items.filter((x) => !removedReservations.find((y) => isReservationEq(x, y)));
 
+type ReservationListEditorProps = {
+  items: { reservations: NewReservationListItem[]; refetch: () => void };
+  removedReservations: NewReservationListItem[];
+  setRemovedReservations: (items: NewReservationListItem[]) => void;
+};
+
 /// @param items the checked list of all new reservations to make
 /// @param removedReservations the events the user wanted to remove
 /// @param setRemovedReservations update the user's list
 /// Using two arrays because modifiying a single array causes the hooks to rerun
 /// flow: user makes a time selection => do a query => allow user to disable dates.
-const ReservationListEditor = ({
+function ReservationListEditor({
   items,
   removedReservations,
   setRemovedReservations,
-}: {
-  items: { reservations: NewReservationListItem[]; refetch: () => void };
-  removedReservations: NewReservationListItem[];
-  setRemovedReservations: (items: NewReservationListItem[]) => void;
-}) => {
+}: ReservationListEditorProps) {
   const { t } = useTranslation();
 
   const handleRemove = (item: NewReservationListItem) => {
@@ -118,7 +120,7 @@ const ReservationListEditor = ({
   return (
     <ReservationList key="list-editor" items={itemsWithButtons} hasPadding />
   );
-};
+}
 
 type Props = {
   reservationUnits: {

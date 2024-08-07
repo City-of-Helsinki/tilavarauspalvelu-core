@@ -11,6 +11,7 @@ import {
   ApplicationRoundStatusChoice,
   type ApplicationRoundNode,
   type Maybe,
+  ReservationStartInterval,
 } from "@gql/gql-types";
 import { addSeconds } from "date-fns";
 
@@ -152,4 +153,16 @@ export function isApplicationRoundInProgress(
       ApplicationRoundReservationCreationStatusChoice.NotCompleted &&
     round.status === ApplicationRoundStatusChoice.Handled
   );
+}
+
+/// @brief Normalize the interval to 15 or 30 minutes
+/// @param interval
+/// @return Normalized interval
+/// @desc reservations made in the admin ui don't follow the customer interval rules
+export function getNormalizedInterval(
+  interval: Maybe<ReservationStartInterval> | undefined
+) {
+  return interval === ReservationStartInterval.Interval_15Mins
+    ? ReservationStartInterval.Interval_15Mins
+    : ReservationStartInterval.Interval_30Mins;
 }

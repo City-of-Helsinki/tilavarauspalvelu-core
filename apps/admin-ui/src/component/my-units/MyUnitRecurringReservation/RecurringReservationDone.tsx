@@ -7,7 +7,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { z } from "zod";
 import { H1, H6 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import RecurringReservationsView from "@/component/reservations/requested/RecurringReservationsView";
+import { RecurringReservationsView } from "@/component/reservations/requested/RecurringReservationsView";
 import { ActionsWrapper } from "./commonStyling";
 import { ReservationList } from "@/component/ReservationsList";
 

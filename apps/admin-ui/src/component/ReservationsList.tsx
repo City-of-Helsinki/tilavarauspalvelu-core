@@ -2,7 +2,12 @@ import React from "react";
 import { toUIDate } from "common/src/common/util";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { RejectionReadinessChoice } from "@gql/gql-types";
+import { RejectionReadinessChoice, ReservationQuery } from "@gql/gql-types";
+import { Button } from "hds-react";
+import usePermission from "@/hooks/usePermission";
+import { Permission } from "@/modules/permissionHelper";
+import { NewReservationModal } from "./reservations/EditTimeModal";
+import { useModal } from "@/context/ModalContext";
 
 export type NewReservationListItem = {
   date: Date;
@@ -18,12 +23,6 @@ export type NewReservationListItem = {
     before?: number;
     after?: number;
   };
-};
-
-type Props = {
-  header?: React.ReactNode;
-  items: NewReservationListItem[];
-  hasPadding?: boolean;
 };
 
 // In the UI spec parent container max height is 22rem, but overflow forces us to define child max-height
@@ -142,16 +141,92 @@ function StatusElement({ item }: { item: NewReservationListItem }) {
   );
 }
 
+type AddNewReservationButtonProps = {
+  reservationToCopy: ReservationQuery["reservation"];
+  refetch: () => void;
+};
+
+function AddNewReservationButton({
+  reservationToCopy,
+  refetch,
+}: AddNewReservationButtonProps) {
+  const { hasUnitPermission } = usePermission();
+  const unit = reservationToCopy?.reservationUnit?.[0] ?? {};
+  const isAllowed = hasUnitPermission(Permission.CAN_MANAGE_RESERVATIONS, unit);
+  const { t } = useTranslation();
+
+  const { setModalContent } = useModal();
+
+  const handleClose = () => {
+    setModalContent(null);
+  };
+
+  const handleAccept = () => {
+    handleClose();
+    refetch();
+  };
+
+  const handleClick = () => {
+    setModalContent(
+      <NewReservationModal
+        onAccept={handleAccept}
+        onClose={handleClose}
+        reservationToCopy={reservationToCopy}
+      />,
+      true
+    );
+  };
+
+  return (
+    <Button
+      theme="black"
+      variant="secondary"
+      size="small"
+      disabled={!isAllowed}
+      onClick={handleClick}
+    >
+      {t("MyUnits.RecurringReservation.addNewReservation")}
+    </Button>
+  );
+}
+
+const TitleWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  place-content: center space-between;
+`;
+
+type Props = {
+  header?: React.ReactNode;
+  items: NewReservationListItem[];
+  hasPadding?: boolean;
+};
+type ExtendedProps = AddNewReservationButtonProps & Props;
+
 /// Used by the RecurringReservation pages to show a list of reservations
-/// TODO should be renamed / moved to signify that this is only for recurring reservations
-export function ReservationList({ header, items, hasPadding }: Props) {
+// TODO should be renamed / moved to signify that this is only for recurring reservations
+export function ReservationList(props: Props | ExtendedProps) {
+  const { header, items, hasPadding } = props;
   if (items.length === 0) {
     return null;
   }
 
+  const hasReservation =
+    "reservationToCopy" in props && !!props.reservationToCopy;
+
   return (
     <ListWrapper data-testid="reservations-list">
-      {header}
+      <TitleWrapper>
+        {header}
+        {hasReservation && (
+          <div>
+            <AddNewReservationButton
+              reservationToCopy={props.reservationToCopy}
+              refetch={props.refetch}
+            />
+          </div>
+        )}
+      </TitleWrapper>
       <StyledList $hasPadding={hasPadding ?? false}>
         {items.map((item) => (
           <StyledListItem
