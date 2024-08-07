@@ -51,9 +51,6 @@ def test_application_round_query__all_fields(graphql):
         purposes {
             nameFi
         }
-        serviceSector {
-            nameFi
-        }
         termsOfUse {
             nameFi
         }
@@ -92,7 +89,6 @@ def test_application_round_query__all_fields(graphql):
         "sentDate": None,
         "reservationUnits": [],
         "purposes": [],
-        "serviceSector": {"nameFi": application_round.service_sector.name_fi},
         "termsOfUse": {"nameFi": application_round.terms_of_use.name_fi},
         "status": application_round.status,
         "statusTimestamp": application_round.status_timestamp.isoformat(),

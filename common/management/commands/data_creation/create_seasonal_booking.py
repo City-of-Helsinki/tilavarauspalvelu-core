@@ -28,7 +28,6 @@ from applications.models import (
 from applications.typing import TimeSlotDB
 from reservation_units.models import ReservationUnit
 from reservations.models import AgeGroup, ReservationPurpose
-from spaces.models import ServiceSector
 from users.models import User
 
 from .utils import faker_en, faker_fi, faker_sv, get_paragraphs, random_subset, weighted_choice, with_logs
@@ -38,14 +37,12 @@ from .utils import faker_en, faker_fi, faker_sv, get_paragraphs, random_subset, 
 def _create_application_rounds(
     reservation_units: list[ReservationUnit],
     reservation_purposes: list[ReservationPurpose],
-    service_sectors: list[ServiceSector],
     *,
     number: int = 15,
 ) -> list[ApplicationRound]:
     # Create at least 9 application rounds so that there are past
     # application rounds with different sent and handled dates
     number = max(number, 9)
-    service_sectors_loop = cycle(service_sectors)
     period_options = cycle(
         [
             # past
@@ -105,7 +102,6 @@ def _create_application_rounds(
             reservation_period_end=period[1],
             public_display_begin=datetime(2021, 1, 1, tzinfo=UTC),
             public_display_end=datetime(2027, 1, 1, tzinfo=UTC),
-            service_sector=next(service_sectors_loop),
             criteria=criteria.fi,
             criteria_fi=criteria.fi,
             criteria_en=criteria.en,

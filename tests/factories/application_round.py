@@ -39,7 +39,6 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
     handled_date = None
     sent_date = None
 
-    service_sector = factory.SubFactory("tests.factories.ServiceSectorFactory")
     terms_of_use = factory.SubFactory("tests.factories.TermsOfUseFactory")
     criteria = ""
     notes_when_applying = ""

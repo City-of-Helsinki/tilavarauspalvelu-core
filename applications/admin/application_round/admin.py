@@ -50,7 +50,6 @@ class ApplicationRoundAdmin(ExtraButtonsMixin, TranslationAdmin):
                     "name",
                     "status",
                     "target_group",
-                    "service_sector",
                     "terms_of_use",
                     "reservation_units",
                     "purposes",
@@ -98,7 +97,6 @@ class ApplicationRoundAdmin(ExtraButtonsMixin, TranslationAdmin):
             .annotate(
                 status=L("status"),
             )
-            .select_related("service_sector")
         )
 
     @button(label="Export applications to CSV", change_form=True)
