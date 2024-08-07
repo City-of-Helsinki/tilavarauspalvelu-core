@@ -4,14 +4,7 @@ import random
 from datetime import UTC, datetime, time, timedelta
 from itertools import cycle
 
-from applications.enums import (
-    ApplicantTypeChoice,
-    OrganizationTypeChoice,
-    Priority,
-    TargetGroupChoice,
-    Weekday,
-    WeekdayChoice,
-)
+from applications.enums import ApplicantTypeChoice, OrganizationTypeChoice, Priority, Weekday, WeekdayChoice
 from applications.models import (
     Address,
     AllocatedTimeSlot,
@@ -95,7 +88,6 @@ def _create_application_rounds(
             name_fi=f"Application Round {i}",
             name_en=f"Application Round {i}",
             name_sv=f"Application Round {i}",
-            target_group=random.choice(TargetGroupChoice.values),
             application_period_begin=period[0],
             application_period_end=period[1],
             reservation_period_begin=period[0],

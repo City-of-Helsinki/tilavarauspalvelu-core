@@ -45,7 +45,6 @@ class ApplicationRoundNode(DjangoNode):
         fields = [
             "pk",
             "name",
-            "target_group",
             "terms_of_use",
             "criteria",
             "notes_when_applying",

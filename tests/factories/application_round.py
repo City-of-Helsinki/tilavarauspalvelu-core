@@ -5,7 +5,7 @@ from typing import Any
 import factory
 from factory import fuzzy
 
-from applications.enums import ApplicationRoundStatusChoice, TargetGroupChoice
+from applications.enums import ApplicationRoundStatusChoice
 from applications.models import ApplicationRound
 from common.date_utils import utc_start_of_day
 from reservation_units.models import Purpose, ReservationUnit
@@ -23,7 +23,6 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
         exclude = ["timestamp"]
 
     name = fuzzy.FuzzyText()
-    target_group = fuzzy.FuzzyChoice(choices=TargetGroupChoice.values)
 
     timestamp = factory.LazyFunction(utc_start_of_day)  # private helper (see Meta.exclude)
 
