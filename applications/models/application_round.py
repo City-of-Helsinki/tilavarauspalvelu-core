@@ -60,13 +60,6 @@ class ApplicationRound(models.Model):
         "reservations.ReservationPurpose",
         related_name="application_rounds",
     )
-    service_sector = models.ForeignKey(
-        "spaces.ServiceSector",
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name="application_rounds",
-    )
     terms_of_use = models.ForeignKey(
         "terms_of_use.TermsOfUse",
         null=True,
