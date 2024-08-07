@@ -68,7 +68,6 @@ class ApplicationRoundNode(DjangoNode):
             "sent_date",
             "reservation_units",
             "purposes",
-            "service_sector",
             "status",
             "status_timestamp",
             "applications_count",
