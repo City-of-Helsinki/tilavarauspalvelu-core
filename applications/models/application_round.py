@@ -11,7 +11,6 @@ from applications.enums import (
     ApplicationRoundReservationCreationStatusChoice,
     ApplicationRoundStatusChoice,
     ApplicationStatusChoice,
-    TargetGroupChoice,
 )
 from applications.querysets.application_round import ApplicationRoundQuerySet
 from common.connectors import ApplicationRoundActionsConnector
@@ -33,7 +32,6 @@ class ApplicationRound(models.Model):
     """
 
     name: str = models.CharField(max_length=255)
-    target_group: str = models.CharField(choices=TargetGroupChoice.choices, max_length=50)
     criteria: str = models.TextField(default="")
     notes_when_applying: str = models.TextField(blank=True, default="")
 
@@ -96,7 +94,7 @@ class ApplicationRound(models.Model):
 
     @lookup_property(skip_codegen=True)
     def status() -> ApplicationRoundStatusChoice:
-        return models.Case(
+        return models.Case(  # type: ignore[return-value]
             models.When(
                 models.Q(sent_date__isnull=False),
                 then=models.Value(ApplicationRoundStatusChoice.RESULTS_SENT.value),
@@ -132,7 +130,7 @@ class ApplicationRound(models.Model):
 
     @lookup_property(skip_codegen=True)
     def status_timestamp() -> datetime:
-        return models.Case(
+        return models.Case(  # type: ignore[return-value]
             models.When(
                 models.Q(sent_date__isnull=False),  # RESULTS_SENT
                 then=models.F("sent_date"),

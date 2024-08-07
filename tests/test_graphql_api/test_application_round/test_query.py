@@ -30,7 +30,6 @@ def test_application_round_query__all_fields(graphql):
         nameFi
         nameEn
         nameSv
-        targetGroup
         criteriaFi
         criteriaEn
         criteriaSv
@@ -72,7 +71,6 @@ def test_application_round_query__all_fields(graphql):
         "nameFi": application_round.name_fi,
         "nameEn": application_round.name_en,
         "nameSv": application_round.name_sv,
-        "targetGroup": application_round.target_group,
         "criteriaFi": application_round.criteria_fi,
         "criteriaEn": application_round.criteria_en,
         "criteriaSv": application_round.criteria_sv,
