@@ -3,7 +3,6 @@ import pytest
 from applications.models import (
     Address,
     Application,
-    ApplicationEvent,
     ApplicationSection,
     Organisation,
     Person,
@@ -47,7 +46,6 @@ def test_application__create(graphql):
     assert Organisation.objects.count() == 1
     assert Person.objects.count() == 1  # contact person
     assert Address.objects.count() == 2  # billing and organisation addresses
-    assert ApplicationEvent.objects.count() == 0
 
 
 def test_application__create__with_application_sections(graphql):

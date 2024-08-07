@@ -26,7 +26,7 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
     settings.SAVE_RESERVATION_STATISTICS = True
 
     reservation_unit = ReservationUnitFactory.create(name="resu", unit=UnitFactory(name="mesta", tprek_id="1234"))
-    recurring = RecurringReservationFactory.create(application_event_schedule=None)
+    recurring = RecurringReservationFactory.create()
     reservation = ReservationFactory.create(
         age_group=AgeGroup.objects.create(minimum=18, maximum=30),
         applying_for_free_of_charge=True,

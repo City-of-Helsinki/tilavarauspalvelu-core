@@ -201,10 +201,6 @@ def test_query_user_data__full(api_client, settings):
                                 "value": application.additional_information,
                             },
                             {
-                                "children": [],
-                                "key": "APPLICATION_EVENTS",
-                            },
-                            {
                                 "key": "APPLICATION_SECTIONS",
                                 "children": [
                                     {

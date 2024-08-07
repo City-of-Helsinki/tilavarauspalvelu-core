@@ -1,6 +1,6 @@
 from modeltranslation.translator import TranslationOptions, register
 
-from applications.models import Address, ApplicationEvent, ApplicationRound, City, Organisation
+from applications.models import Address, ApplicationRound, City, Organisation
 
 
 @register(Address)
@@ -20,9 +20,4 @@ class ApplicationRoundTranslationOptions(TranslationOptions):
 
 @register(City)
 class CityTranslationOptions(TranslationOptions):
-    fields = ["name"]
-
-
-@register(ApplicationEvent)
-class ApplicationEventTranslationOptions(TranslationOptions):
     fields = ["name"]
