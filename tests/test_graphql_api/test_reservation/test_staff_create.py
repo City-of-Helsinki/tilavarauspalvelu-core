@@ -441,7 +441,7 @@ def test_reservation__staff_create__reservation_type_normal_not_accepted(graphql
     response = graphql(CREATE_STAFF_MUTATION, input_data=data)
 
     assert response.error_message() == (
-        "Reservation type normal is not allowed in this mutation. Allowed choices are blocked, staff, behalf."
+        "Reservation type normal is not allowed in this mutation. Allowed choices are blocked, staff, behalf, seasonal."
     )
 
 
