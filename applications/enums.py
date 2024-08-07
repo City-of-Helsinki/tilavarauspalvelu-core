@@ -14,7 +14,6 @@ __all__ = [
     "ApplicationStatusChoice",
     "OrganizationTypeChoice",
     "Priority",
-    "TargetGroupChoice",
     "Weekday",
     "WeekdayChoice",
 ]
@@ -274,12 +273,6 @@ class ApplicationSectionStatusChoice(models.TextChoices):
             ApplicationSectionStatusChoice.IN_ALLOCATION,
             ApplicationSectionStatusChoice.HANDLED,
         ]
-
-
-class TargetGroupChoice(models.TextChoices):
-    INTERNAL = "INTERNAL", pgettext_lazy("TargetGroup", "Internal")
-    PUBLIC = "PUBLIC", pgettext_lazy("TargetGroup", "Public")
-    ALL = "ALL", pgettext_lazy("TargetGroup", "All")
 
 
 class OrganizationTypeChoice(models.TextChoices):
