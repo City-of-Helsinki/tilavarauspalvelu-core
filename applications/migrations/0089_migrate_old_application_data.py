@@ -2,15 +2,10 @@ from __future__ import annotations
 
 import datetime
 import logging
-from typing import TYPE_CHECKING
 
 from django.db import migrations
 
 from common.date_utils import time_as_timedelta
-
-if TYPE_CHECKING:
-    from applications import models
-
 
 logger = logging.getLogger(__name__)
 
@@ -18,12 +13,10 @@ logger = logging.getLogger(__name__)
 def migrate_application_data(apps, schema_editor):
     # Migrate application events
 
-    ApplicationEvent: type[models.ApplicationEvent]
     ApplicationEvent = apps.get_model("applications", "ApplicationEvent")
-    ApplicationSection: type[models.ApplicationSection]
     ApplicationSection = apps.get_model("applications", "ApplicationSection")
 
-    application_sections: dict[int, models.ApplicationSection] = {}
+    application_sections = {}
 
     def coerce_duration(duration: datetime.timedelta | None) -> datetime.timedelta:
         if duration is None:
@@ -57,12 +50,10 @@ def migrate_application_data(apps, schema_editor):
 
     # Migrate event reservation units
 
-    EventReservationUnit: type[models.EventReservationUnit]
     EventReservationUnit = apps.get_model("applications", "EventReservationUnit")
-    ReservationUnitOption: type[models.ReservationUnitOption]
     ReservationUnitOption = apps.get_model("applications", "ReservationUnitOption")
 
-    reservation_unit_options: dict[tuple[int, int], models.ReservationUnitOption] = {}
+    reservation_unit_options = {}
 
     for event_reservation_unit in EventReservationUnit.objects.all():
         # (reservation_unit_id, application_event_id)
@@ -88,15 +79,12 @@ def migrate_application_data(apps, schema_editor):
 
     # Migrate application event schedules
 
-    ApplicationEventSchedule: type[models.ApplicationEventSchedule]
     ApplicationEventSchedule = apps.get_model("applications", "ApplicationEventSchedule")
-    AllocatedTimeSlot: type[models.AllocatedTimeSlot]
     AllocatedTimeSlot = apps.get_model("applications", "AllocatedTimeSlot")
-    SuitableTimeRange: type[models.SuitableTimeRange]
     SuitableTimeRange = apps.get_model("applications", "SuitableTimeRange")
 
-    allocated_time_slots: list[models.AllocatedTimeSlot] = []
-    suitable_time_ranges: list[models.SuitableTimeRange] = []
+    allocated_time_slots = []
+    suitable_time_ranges = []
 
     for schedule in ApplicationEventSchedule.objects.all():
         section = application_sections.get(schedule.application_event.id)
