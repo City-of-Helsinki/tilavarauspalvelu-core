@@ -100,7 +100,6 @@ class Application(SerializableMixin, models.Model):
     # For GDPR API
     serialize_fields = (
         {"name": "additional_information"},
-        {"name": "application_events"},
         {"name": "application_sections"},
         {"name": "contact_person"},
         {"name": "organisation"},

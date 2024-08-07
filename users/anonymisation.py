@@ -6,7 +6,7 @@ from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
 from applications.enums import ApplicationStatusChoice
-from applications.models import Address, Application, ApplicationEvent, ApplicationSection, Person
+from applications.models import Address, Application, ApplicationSection, Person
 from merchants.enums import OrderStatus
 from permissions.models import GeneralRole, ServiceSectorRole, UnitRole
 from reservations.enums import ReservationStateChoice, ReservationTypeChoice
@@ -72,12 +72,6 @@ def anonymize_user_reservations(user: User) -> None:
 
 
 def anonymize_user_applications(user: User) -> None:
-    ApplicationEvent.objects.filter(application__user=user).update(
-        name=SENSITIVE_APPLICATION,
-        name_fi=SENSITIVE_APPLICATION,
-        name_en=SENSITIVE_APPLICATION,
-        name_sv=SENSITIVE_APPLICATION,
-    )
     ApplicationSection.objects.filter(application__user=user).update(
         name=SENSITIVE_APPLICATION,
     )

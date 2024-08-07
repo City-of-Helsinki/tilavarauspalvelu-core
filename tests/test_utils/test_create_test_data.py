@@ -2,7 +2,6 @@ import django.apps
 import pytest
 from django.db import models
 
-from applications.models import ApplicationEvent, ApplicationEventSchedule, EventReservationUnit
 from common.management.commands.create_test_data import create_test_data
 from common.models import RequestLog, SQLLog
 from email_notification.models import EmailTemplate
@@ -67,11 +66,8 @@ models_that_always_contain_data: list[type[models.Model]] = [
 
 models_that_should_be_empty: list[type[models.Model]] = [
     AbilityGroup,
-    ApplicationEvent,
-    ApplicationEventSchedule,
     Building,
     EmailTemplate,
-    EventReservationUnit,
     Introduction,
     Keyword,
     KeywordCategory,

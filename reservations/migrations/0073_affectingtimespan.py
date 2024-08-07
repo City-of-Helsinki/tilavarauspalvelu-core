@@ -7,6 +7,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
+        ("reservation_units", "0102_create_reservation_unit_hierarchy_materialized_view"),
         ("reservations", "0072_alter_reservation_begin_alter_reservation_end"),
     ]
 

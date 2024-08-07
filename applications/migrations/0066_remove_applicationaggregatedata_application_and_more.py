@@ -11,7 +11,12 @@ from django.db import migrations, models
 import applications.models.organization
 import common.fields.model
 from applications.enums import ApplicantTypeChoice, OrganizationTypeChoice, WeekdayChoice
-from applications.models.application_event_schedule import ReservationPriorityChoice
+
+
+class ReservationPriorityChoice(models.IntegerChoices):
+    LOW = 100, "Low"
+    MEDIUM = 200, "Medium"
+    HIGH = 300, "High"
 
 
 def convert_schedule_results_to_schedule(apps, schema_editor):
