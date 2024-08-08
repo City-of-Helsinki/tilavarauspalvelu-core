@@ -30,7 +30,6 @@ def test_application_round_query__all_fields(graphql):
         nameFi
         nameEn
         nameSv
-        targetGroup
         criteriaFi
         criteriaEn
         criteriaSv
@@ -49,9 +48,6 @@ def test_application_round_query__all_fields(graphql):
             nameFi
         }
         purposes {
-            nameFi
-        }
-        serviceSector {
             nameFi
         }
         termsOfUse {
@@ -75,7 +71,6 @@ def test_application_round_query__all_fields(graphql):
         "nameFi": application_round.name_fi,
         "nameEn": application_round.name_en,
         "nameSv": application_round.name_sv,
-        "targetGroup": application_round.target_group,
         "criteriaFi": application_round.criteria_fi,
         "criteriaEn": application_round.criteria_en,
         "criteriaSv": application_round.criteria_sv,
@@ -92,7 +87,6 @@ def test_application_round_query__all_fields(graphql):
         "sentDate": None,
         "reservationUnits": [],
         "purposes": [],
-        "serviceSector": {"nameFi": application_round.service_sector.name_fi},
         "termsOfUse": {"nameFi": application_round.terms_of_use.name_fi},
         "status": application_round.status,
         "statusTimestamp": application_round.status_timestamp.isoformat(),

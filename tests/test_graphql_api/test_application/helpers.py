@@ -52,7 +52,6 @@ def get_application_create_data(application_round: ApplicationRound, create_sect
         reservation_purpose = ReservationPurposeFactory.create()
         age_group = AgeGroupFactory.create()
         reservation_unit = ReservationUnitFactory.create(
-            unit__service_sectors=[application_round.service_sector],
             application_rounds=[application_round],
         )
 

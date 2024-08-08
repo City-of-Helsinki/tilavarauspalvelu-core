@@ -81,13 +81,6 @@ class RecurringReservation(models.Model):
         on_delete=models.SET_NULL,
         related_name="recurring_reservations",
     )
-    application_event_schedule = models.ForeignKey(
-        "applications.ApplicationEventSchedule",
-        on_delete=models.PROTECT,
-        null=True,
-        blank=True,
-        related_name="recurring_reservations",
-    )
 
     objects = RecurringReservationQuerySet.as_manager()
     actions = RecurringReservationActionsConnector()

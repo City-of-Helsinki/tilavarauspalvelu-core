@@ -45,7 +45,6 @@ class ApplicationRoundNode(DjangoNode):
         fields = [
             "pk",
             "name",
-            "target_group",
             "terms_of_use",
             "criteria",
             "notes_when_applying",
@@ -59,7 +58,6 @@ class ApplicationRoundNode(DjangoNode):
             "sent_date",
             "reservation_units",
             "purposes",
-            "service_sector",
             "status",
             "status_timestamp",
             "applications_count",

@@ -38,7 +38,6 @@ def get_application_section_create_data(application: Application) -> dict[str, A
     reservation_purpose = ReservationPurposeFactory.create()
     age_group = AgeGroupFactory.create()
     reservation_unit = ReservationUnitFactory.create(
-        unit__service_sectors=[application.application_round.service_sector],
         application_rounds=[application.application_round],
     )
 
@@ -73,7 +72,6 @@ def get_application_section_create_data(application: Application) -> dict[str, A
 def get_application_section_update_data(application_section: ApplicationSection) -> dict[str, Any]:
     # Create required entities
     reservation_unit = ReservationUnitFactory.create(
-        unit__service_sectors=[application_section.application.application_round.service_sector],
         application_rounds=[application_section.application.application_round],
     )
 

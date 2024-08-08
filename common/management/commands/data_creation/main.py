@@ -116,7 +116,6 @@ def create_test_data(flush: bool = True) -> None:
     application_rounds = _create_application_rounds(
         reservation_units,
         reservation_purposes,
-        service_sectors,
     )
     _create_applications(
         application_rounds,

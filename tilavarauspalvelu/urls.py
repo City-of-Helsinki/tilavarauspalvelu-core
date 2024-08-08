@@ -8,7 +8,7 @@ from django.urls import include, path, reverse
 from django.views.decorators.csrf import csrf_exempt
 from graphene_django_extensions import FileUploadGraphQLView
 
-from api.legacy_rest_api.urls import legacy_outer
+from api.legacy_rest_api.urls import legacy_router
 from api.webhooks.urls import webhook_router
 
 # Mock the `each_context` method to add some custom context variables.
@@ -53,7 +53,7 @@ if settings.GRAPHQL_CODEGEN_ENABLED:
 urlpatterns = [
     path("graphql/", graphql_view),
     path("admin/", admin.site.urls),
-    path("v1/", include(legacy_outer.urls)),
+    path("v1/", include(legacy_router.urls)),
     path("v1/webhook/", include(webhook_router.urls)),
     path("pysocial/", include("social_django.urls", namespace="social")),
     path("helauth/", include("api.helauth.urls")),
