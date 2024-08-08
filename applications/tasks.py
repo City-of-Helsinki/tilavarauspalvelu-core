@@ -178,4 +178,4 @@ def generate_reservation_series_from_allocations(application_round_id: int) -> N
             )
 
     if settings.SAVE_RESERVATION_STATISTICS:
-        create_statistics_for_reservations_task.delay(reservation_pks=reservation_pks)
+        create_statistics_for_reservations_task.delay(reservation_pks=list(reservation_pks))
