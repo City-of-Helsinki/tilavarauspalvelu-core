@@ -132,7 +132,7 @@ class AffectingTimeSpan(models.Model):
             return False
         last_updated = datetime.datetime.fromisoformat(cached_value)
         max_allowed_age = datetime.timedelta(minutes=settings.AFFECTING_TIME_SPANS_UPDATE_INTERVAL_MINUTES)
-        return local_datetime() - last_updated >= max_allowed_age
+        return local_datetime() - last_updated < max_allowed_age
 
     def as_time_span_element(self) -> TimeSpanElement:
         return TimeSpanElement(
