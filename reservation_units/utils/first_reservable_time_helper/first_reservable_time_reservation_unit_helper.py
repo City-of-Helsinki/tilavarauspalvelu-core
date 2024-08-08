@@ -98,6 +98,10 @@ class ReservationUnitFirstReservableTimeHelper:
     def calculate_first_reservable_time(self) -> ReservableTimeOutput:
         self.is_reservation_unit_closed = True
 
+        # ReservationUnits are not reservable without a HaukiResource
+        if self.reservation_unit.origin_hauki_resource is None:
+            return ReservableTimeOutput(is_closed=self.is_reservation_unit_closed, first_reservable_time=None)
+
         # Go through each ReservableTimeSpan individually one-by-one until a suitable time span is found.
         for reservable_time_span in self.reservation_unit.origin_hauki_resource.reservable_time_spans.all():
             helper = ReservableTimeSpanFirstReservableTimeHelper(parent=self, reservable_time_span=reservable_time_span)

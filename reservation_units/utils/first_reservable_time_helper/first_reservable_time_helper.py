@@ -288,8 +288,6 @@ class FirstReservableTimeHelper:
             self.original_reservation_unit_queryset.defer(None)
             .select_related(None)
             .prefetch_related(None)
-            # ReservationUnits are not reservable without a HaukiResource
-            .exclude(origin_hauki_resource__isnull=True)
             .prefetch_related(
                 # Required for calculating first reservable time
                 models.Prefetch(
