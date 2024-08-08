@@ -5,8 +5,6 @@ import datetime
 from itertools import chain
 from typing import TYPE_CHECKING, Any, TypedDict
 
-from django.conf import settings
-
 from common.date_utils import DEFAULT_TIMEZONE, combine, get_periods_between
 from opening_hours.utils.time_span_element import TimeSpanElement
 from reservations.enums import RejectionReadinessChoice
@@ -17,7 +15,6 @@ from reservations.models import (
     Reservation,
     ReservationPurpose,
 )
-from reservations.tasks import create_statistics_for_reservations_task
 
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable
@@ -285,12 +282,6 @@ class RecurringReservationActions:
 
         reservations = Reservation.objects.bulk_create(reservations)
         ThroughModel.objects.bulk_create(through_models)
-
-        if settings.SAVE_RESERVATION_STATISTICS:
-            create_statistics_for_reservations_task.delay(
-                reservation_pks=[reservation.pk for reservation in reservations],
-            )
-
         return reservations
 
     def bulk_create_rejected_occurrences_for_periods(

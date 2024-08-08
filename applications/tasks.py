@@ -1,6 +1,7 @@
 import datetime
 from typing import TYPE_CHECKING
 
+from django.conf import settings
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
@@ -12,6 +13,7 @@ from opening_hours.errors import ReservableTimeSpanClientError
 from opening_hours.utils.reservable_time_span_client import ReservableTimeSpanClient
 from reservations.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import RecurringReservation
+from reservations.tasks import create_statistics_for_reservations_task
 from tilavarauspalvelu.celery import app
 from utils.sentry import SentryLogger
 
@@ -74,6 +76,8 @@ def generate_reservation_series_from_allocations(application_round_id: int) -> N
         )
         for allocation in allocations
     ]
+
+    reservation_pks: set[int] = set()
 
     with transaction.atomic():
         recurring_reservations = RecurringReservation.objects.bulk_create(recurring_reservations)
@@ -160,13 +164,18 @@ def generate_reservation_series_from_allocations(application_round_id: int) -> N
                 reservation_details["reservee_address_city"] = organisation_address_city
                 reservation_details["reservee_address_zip"] = organisation_address_zip
 
-            recurring_reservation.actions.bulk_create_reservation_for_periods(
+            reservations = recurring_reservation.actions.bulk_create_reservation_for_periods(
                 periods=slots.possible,
                 reservation_details=reservation_details,
             )
+
+            reservation_pks.update(reservation.pk for reservation in reservations)
 
             recurring_reservation.actions.bulk_create_rejected_occurrences_for_periods(
                 overlapping=slots.overlapping,
                 not_reservable=slots.not_reservable,
                 invalid_start_interval=slots.invalid_start_interval,
             )
+
+    if settings.SAVE_RESERVATION_STATISTICS:
+        create_statistics_for_reservations_task.delay(reservation_pks=reservation_pks)
