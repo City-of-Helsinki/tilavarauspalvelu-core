@@ -209,18 +209,30 @@ class ReservationAdmin(admin.ModelAdmin):
             self.message_user(request, msg, level=messages.ERROR)
             return None
 
+        queryset = queryset.filter(state__in=ReservationStateChoice.states_that_can_change_to_deny)
+        queryset_ended_reservation_count = queryset.filter(end__lt=local_datetime()).count()
+
+        queryset = queryset.filter(end__gte=local_datetime())
+        queryset_unpaid_reservation_count = queryset.filter(price=0).count()
+        queryset_paid_reservation_count = queryset.filter(price__gt=0).count()
+        queryset_refundable_reservation_count = queryset.filter(
+            price__gt=0,
+            payment_order__isnull=False,
+            payment_order__status=OrderStatus.PAID,
+            payment_order__refund_id__isnull=True,
+        ).count()
+
         deny_reasons = ReservationDenyReason.objects.all().order_by("reason")
-        queryset = queryset.filter(
-            state__in=ReservationStateChoice.states_that_can_change_to_deny,
-            end__gte=local_datetime(),
-        )
 
         context = {
             **self.admin_site.each_context(request),
             "title": _("Are you sure?"),
             "subtitle": _("Are you sure you want deny these reservations?"),
             "queryset": queryset,
-            "queryset_paid_reservation_count": queryset.filter(price__gt=0).count(),
+            "queryset_unpaid_reservation_count": queryset_unpaid_reservation_count,
+            "queryset_paid_reservation_count": queryset_paid_reservation_count,
+            "queryset_ended_reservation_count": queryset_ended_reservation_count,
+            "queryset_refundable_reservation_count": queryset_refundable_reservation_count,
             "deny_reasons": deny_reasons,
             "opts": self.model._meta,
             "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,

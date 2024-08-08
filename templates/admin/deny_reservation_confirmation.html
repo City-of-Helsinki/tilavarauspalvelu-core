@@ -29,12 +29,16 @@
         <input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk|unlocalize }}">
         {% endfor %}
 
-
         <input type="hidden" name="action" value={{ action_name }}>
         <input type="hidden" name="confirmed" value="yes">
 
-        {% translate "Number of reservations selected:" %} <b>{{ queryset.count }}</b><br>
-        {% translate "Number of paid reservations selected:" %} <b>{{ queryset_paid_reservation_count }}</b><br>
+        {% translate "Number of unpaid reservations to be denied:" %} <b>{{ queryset_unpaid_reservation_count }}</b><br>
+        {% translate "Number of paid reservations to be denied:" %} <b>{{ queryset_paid_reservation_count }}</b>
+        <i>({% translate "of which can be refunded:" %} {{ queryset_refundable_reservation_count }}</i>)<br>
+
+        {% if queryset_ended_reservation_count > 0 %}
+            {% translate "Number of ended reservations, which can't be denied:" %} <b>{{ queryset_ended_reservation_count }}</b><br>
+        {% endif %}
 
         <label for="deny_reason">{% translate "Reason for denying the reservations" %}:</label>
         <select id="deny_reason" name="deny_reason" style="margin-top: 2em; margin-bottom: 2em;">
@@ -44,7 +48,7 @@
         </select><br>
 
         <input type="submit"{% if queryset.count == 0 %} disabled{% endif %} value="{% translate "Yes, I'm sure" %}">
-        <a href="#" class="button cancel-link">{% translate "No, take me back" %}</a>
+        <a href="#" class="button cancel-link" style="padding: 10px 15px;">{% translate "No, take me back" %}</a>
     </div>
 </form>
 
