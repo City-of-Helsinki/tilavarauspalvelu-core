@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
     from applications.models import AllocatedTimeSlot
     from reservation_units.models import ReservationUnit
-    from reservations.models import AbilityGroup, AgeGroup
+    from reservations.models import AbilityGroup, AgeGroup, Reservation
     from users.models import User
 
 __all__ = [
@@ -108,6 +108,7 @@ class RecurringReservation(models.Model):
     def denied_reservations(self):  # DEPRECATED
         """Used in `api.legacy_rest_api.serializers.RecurringReservationSerializer`"""
         # Avoid a query to the database if we have fetched list already
+        reservation: Reservation  # noqa: F842
         if "reservations" in self._prefetched_objects_cache:
             return [
                 reservation
