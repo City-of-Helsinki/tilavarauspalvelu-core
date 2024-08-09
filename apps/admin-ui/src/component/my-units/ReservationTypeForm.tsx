@@ -1,7 +1,11 @@
 import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { Notification, RadioButton, SelectionGroup, TextArea } from "hds-react";
-import { Authentication, type ReservationQuery } from "@gql/gql-types";
+import {
+  Authentication,
+  ReservationTypeChoice,
+  type ReservationQuery,
+} from "@gql/gql-types";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { type ReservationFormType, ReservationTypes } from "@/schemas";
@@ -47,9 +51,14 @@ const TypeSelect = ({
 
   const type = watch("type");
 
-  if (type === "NORMAL") {
+  if (type === ReservationTypeChoice.Normal) {
     return <p>{t("reservationApplication:clientReservationCantBeChanged")}</p>;
   }
+
+  const allowedTypesChoices = ReservationTypes.filter(
+    (x) =>
+      x !== ReservationTypeChoice.Normal && x !== ReservationTypeChoice.Seasonal
+  );
 
   return (
     <Controller
@@ -67,7 +76,7 @@ const TypeSelect = ({
           }
           tooltipText={t("reservationApplication:typeSelection.tooltip")}
         >
-          {ReservationTypes.filter((x) => x !== "NORMAL").map((v) => (
+          {allowedTypesChoices.map((v) => (
             <RadioButton
               key={v}
               id={v}
@@ -103,16 +112,16 @@ const ReservationTypeForm = ({
       <Element $wide>
         <TypeSelect reservationUnit={reservationUnit} />
       </Element>
-      {type === "BLOCKED" && (
+      {type === ReservationTypeChoice.Blocked && (
         <CommentsTextArea
           label={t("reservationApplication:comment")}
           id="reservationApplication:comment"
           {...register("comments")}
         />
       )}
-      {type !== undefined && type !== "BLOCKED" && (
+      {type !== ReservationTypeChoice.Blocked && (
         <>
-          {type === "BEHALF" &&
+          {type === ReservationTypeChoice.Behalf &&
             reservationUnit.authentication === Authentication.Strong && (
               <Element $wide>
                 <Notification
