@@ -24,7 +24,7 @@ function Reservations(): JSX.Element {
   useEffect(() => {
     if (params.size === 0) {
       const p = new URLSearchParams(params);
-      p.set("begin", toUIDate(today));
+      p.set("dateGte", toUIDate(today));
       for (const state of defaultStates) {
         p.append("state", state);
       }
@@ -35,7 +35,7 @@ function Reservations(): JSX.Element {
 
   const defaultFilters = [
     {
-      key: "begin",
+      key: "dateGte",
       value: toUIDate(today),
     },
     {

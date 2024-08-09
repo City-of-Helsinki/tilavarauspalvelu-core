@@ -12,17 +12,17 @@ import { Filters } from "./Filters";
 function AllReservations(): JSX.Element {
   const { t } = useTranslation();
 
+  const today = useMemo(() => new Date(), []);
   const [params, setParams] = useSearchParams();
   useEffect(() => {
     if (params.size === 0) {
       const p = new URLSearchParams(params);
-      p.set("begin", toUIDate(today));
+      p.set("dateGte", toUIDate(today));
       setParams(p);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only on page load
   }, []);
 
-  const today = useMemo(() => new Date(), []);
   const defaultFilters = [
     {
       key: "dateGte",
