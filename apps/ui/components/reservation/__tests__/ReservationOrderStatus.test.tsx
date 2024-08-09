@@ -3,6 +3,7 @@ import { get as mockGet } from "lodash";
 import { render, screen } from "../../../test/testUtils";
 import { ReservationOrderStatus, type Props } from "../ReservationOrderStatus";
 import mockTranslations from "../../../public/locales/fi/reservations.json";
+import { OrderStatus } from "@/gql/gql-types";
 
 // TODO use a proper mocking solution in setup
 jest.mock("next-i18next", () => ({
@@ -25,24 +26,23 @@ jest.mock("next-i18next", () => ({
   },
 }));
 
-const defaultProps: Props = {
-  orderStatus: "",
-};
+function renderComponent(props: Props) {
+  return render(<ReservationOrderStatus {...props} />);
+}
 
-const renderComponent = (props?: Partial<Props>) =>
-  render(<ReservationOrderStatus {...defaultProps} {...props} />);
+const VALS = [
+  { status: OrderStatus.Draft, label: "Odottaa maksua" },
+  { status: OrderStatus.Paid, label: "Maksettu" },
+  { status: OrderStatus.PaidManually, label: "Paikan päällä" },
+  { status: OrderStatus.Cancelled, label: "Peruttu" },
+  { status: OrderStatus.Expired, label: "Maksamatta" },
+  { status: OrderStatus.Refunded, label: "Hyvitetty" },
+];
 
-[
-  { status: "DRAFT", label: "Odottaa maksua" },
-  { status: "PAID", label: "Maksettu" },
-  { status: "PAID_MANUALLY", label: "Paikan päällä" },
-  { status: "CANCELLED", label: "Peruttu" },
-  { status: "EXPIRED", label: "Maksamatta" },
-  { status: "REFUNDED", label: "Hyvitetty" },
-].forEach((state) => {
+for (const state of VALS) {
   test(`should render ${state.status}`, () => {
     renderComponent({ orderStatus: state.status });
 
     expect(screen.getByText(state.label)).toHaveAttribute("title", state.label);
   });
-});
+}

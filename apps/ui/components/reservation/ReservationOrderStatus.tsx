@@ -3,10 +3,11 @@ import React, { useMemo } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { truncatedText } from "../../styles/util";
+import { OrderStatus } from "@/gql/gql-types";
 
 export type Props = {
-  orderStatus: string;
-};
+  orderStatus: OrderStatus;
+} & React.HTMLAttributes<HTMLDivElement>;
 
 const Wrapper = styled.div<{ $color: string }>`
   display: inline-block;
@@ -25,17 +26,17 @@ export function ReservationOrderStatus({
 
   const color = useMemo(() => {
     switch (orderStatus) {
-      case "DRAFT":
+      case OrderStatus.Draft:
         return "var(--color-summer-light)";
-      case "PAID":
+      case OrderStatus.Paid:
         return "var(--color-info-light)";
-      case "PAID_MANUALLY":
+      case OrderStatus.PaidManually:
         return "var(--color-gold-light)";
-      case "CANCELLED":
+      case OrderStatus.Cancelled:
         return "var(--color-error-light)";
-      case "EXPIRED":
+      case OrderStatus.Expired:
         return "var(--color-metro-medium-light)";
-      case "REFUNDED":
+      case OrderStatus.Refunded:
         return "var(--color-bus-light)";
       default:
         return "";

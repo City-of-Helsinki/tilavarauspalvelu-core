@@ -9,6 +9,7 @@ import { breakpoints } from "common/src/common/style";
 import {
   type ListReservationsQuery,
   ReservationStateChoice,
+  OrderStatus,
 } from "@gql/gql-types";
 import {
   capitalize,
@@ -148,6 +149,31 @@ const Image = styled.img`
   }
 `;
 
+function StatusTags({
+  state,
+  orderStatus,
+  statusType = "desktop",
+}: {
+  state: ReservationStateChoice;
+  orderStatus: OrderStatus | null;
+  statusType: "desktop" | "mobile";
+}) {
+  return (
+    <StatusContainer>
+      {orderStatus != null && (
+        <ReservationOrderStatus
+          orderStatus={orderStatus}
+          data-testid={`reservation-card__order-status-${statusType}`}
+        />
+      )}
+      <ReservationStatus
+        data-testid={`reservation-card__status-${statusType}`}
+        state={state}
+      />
+    </StatusContainer>
+  );
+}
+
 // TODO use a fragment
 type QueryT = NonNullable<ListReservationsQuery["reservations"]>;
 type EdgeT = NonNullable<QueryT["edges"][0]>;
@@ -195,29 +221,6 @@ function ReservationCard({ reservation, type }: PropsT): JSX.Element {
   const normalizedOrderStatus =
     getNormalizedReservationOrderStatus(reservation);
 
-  const statusTags = ({
-    state,
-    orderStatus,
-    statusType = "desktop",
-  }: {
-    state: ReservationStateChoice;
-    orderStatus: string | null;
-    statusType: "desktop" | "mobile";
-  }) => (
-    <StatusContainer>
-      {orderStatus != null && (
-        <ReservationOrderStatus
-          orderStatus={orderStatus}
-          data-testid={`reservation-card__order-status-${statusType}`}
-        />
-      )}
-      <ReservationStatus
-        data-testid={`reservation-card__status-${statusType}`}
-        state={state}
-      />
-    </StatusContainer>
-  );
-
   const name = reservationUnit ? getTranslation(reservationUnit, "name") : "-";
   const img = getMainImage(reservationUnit);
   const imgSrc = getImageSource(img, "medium");
@@ -229,7 +232,7 @@ function ReservationCard({ reservation, type }: PropsT): JSX.Element {
         <Top>
           <Name data-testid="reservation-card__name">{title}</Name>
           <JustForDesktop customBreakpoint={breakpoints.l}>
-            {statusTags({
+            {StatusTags({
               state: reservation.state ?? ReservationStateChoice.Confirmed,
               orderStatus: normalizedOrderStatus,
               statusType: "desktop",
@@ -245,7 +248,7 @@ function ReservationCard({ reservation, type }: PropsT): JSX.Element {
               customBreakpoint={breakpoints.l}
               style={{ marginTop: "var(--spacing-s)" }}
             >
-              {statusTags({
+              {StatusTags({
                 state: reservation.state ?? ReservationStateChoice.Confirmed,
                 orderStatus: normalizedOrderStatus,
                 statusType: "mobile",

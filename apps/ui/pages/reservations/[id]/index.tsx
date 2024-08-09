@@ -23,6 +23,7 @@ import {
   type ReservationQueryVariables,
   CurrentUserDocument,
   type CurrentUserQuery,
+  OrderStatus,
 } from "@gql/gql-types";
 import Link from "next/link";
 import { Container } from "common";
@@ -529,6 +530,11 @@ function Reservation({
     },
   ];
 
+  const hasReceipt =
+    order?.receiptUrl &&
+    (order.status === OrderStatus.Paid ||
+      order.status === OrderStatus.Refunded);
+
   return (
     <>
       <BreadcrumbWrapper route={routes} />
@@ -574,23 +580,21 @@ function Reservation({
                   {t("reservations:saveToCalendar")}
                 </BlackButton>
               )}
-              {order?.receiptUrl &&
-                // TODO enum comparison (not string)
-                ["PAID", "REFUNDED"].includes(order?.status ?? "") && (
-                  <BlackButton
-                    data-testid="reservation__confirmation--button__receipt-link"
-                    onClick={() =>
-                      window.open(
-                        `${order.receiptUrl}&lang=${i18n.language}`,
-                        "_blank"
-                      )
-                    }
-                    variant="secondary"
-                    iconRight={<IconLinkExternal aria-hidden />}
-                  >
-                    {t("reservations:downloadReceipt")}
-                  </BlackButton>
-                )}
+              {hasReceipt && (
+                <BlackButton
+                  data-testid="reservation__confirmation--button__receipt-link"
+                  onClick={() =>
+                    window.open(
+                      `${order.receiptUrl}&lang=${i18n.language}`,
+                      "_blank"
+                    )
+                  }
+                  variant="secondary"
+                  iconRight={<IconLinkExternal aria-hidden />}
+                >
+                  {t("reservations:downloadReceipt")}
+                </BlackButton>
+              )}
             </SecondaryActions>
           </div>
           <div>
@@ -601,8 +605,9 @@ function Reservation({
                   disabled={!hasCheckoutUrl}
                   iconRight={<IconArrowRight aria-hidden />}
                   onClick={() => {
-                    const url = getCheckoutUrl(order, i18n.language);
-                    if (url) router.push(url);
+                    if (checkoutUrl) {
+                      router.push(checkoutUrl);
+                    }
                   }}
                   data-testid="reservation-detail__button--checkout"
                 >
