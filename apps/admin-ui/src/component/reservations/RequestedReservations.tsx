@@ -52,7 +52,10 @@ function Reservations(): JSX.Element {
           <H1 $legacy>{t("Reservations.reservationListHeading")}</H1>
           <p>{t("Reservations.reservationListDescription")}</p>
         </div>
-        <Filters defaultFilters={defaultFilters} />
+        <Filters
+          defaultFilters={defaultFilters}
+          clearButtonLabel={t("common.returnDefaults")}
+        />
         <HR />
         <ReservationsDataLoader />
       </Container>

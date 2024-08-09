@@ -86,6 +86,7 @@ const translations: ITranslations = {
     view: ["Näytä"],
     clearAllSelections: ["Tyhjennä valinnat"],
     clear: ["Tyhjennä"],
+    returnDefaults: ["Palauta oletukset"],
     removeValue: ["Poista arvo"],
     toggleMenu: ["Vaihda valikon tila"],
     hoursLabel: ["Tunnit"],

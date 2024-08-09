@@ -40,8 +40,10 @@ const MoreWrapper = styled(ShowAllContainer)`
 
 export function Filters({
   defaultFilters = [],
+  clearButtonLabel,
 }: {
   defaultFilters?: Array<{ key: string; value: string | string[] }>;
+  clearButtonLabel?: string;
 }): JSX.Element {
   const { t } = useTranslation();
 
@@ -192,7 +194,11 @@ export function Filters({
           <CheckboxFilter name="freeOfCharge" />
         </AutoGrid>
       </MoreWrapper>
-      <SearchTags translateTag={translateTag} defaultTags={defaultFilters} />
+      <SearchTags
+        translateTag={translateTag}
+        defaultTags={defaultFilters}
+        clearButtonLabel={clearButtonLabel}
+      />
     </Wrapper>
   );
 }

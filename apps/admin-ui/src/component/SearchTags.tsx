@@ -13,10 +13,12 @@ export function SearchTags({
   translateTag,
   hide = [],
   defaultTags = [],
+  clearButtonLabel,
 }: {
   translateTag: (key: string, val: string) => string;
   hide?: string[];
   defaultTags?: Array<{ key: string; value: string | string[] }>;
+  clearButtonLabel?: string;
 }): JSX.Element {
   const { t } = useTranslation();
   const [params, setParams] = useSearchParams();
@@ -71,7 +73,7 @@ export function SearchTags({
       ))}
       {tags.length > 0 && (
         <ResetButton onClick={handleReset} onDelete={handleReset}>
-          {t("common.clear")}
+          {clearButtonLabel || t("common.clear")}
         </ResetButton>
       )}
     </FilterTags>
