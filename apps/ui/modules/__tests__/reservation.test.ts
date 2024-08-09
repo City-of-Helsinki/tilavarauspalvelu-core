@@ -495,29 +495,35 @@ describe("getNormalizedReservationOrderStatus", () => {
     expect(
       getNormalizedReservationOrderStatus({
         state: "CANCELLED",
-        order: {
-          status: OrderStatus.Draft,
-        } as PaymentOrderNode,
+        paymentOrder: [
+          {
+            status: OrderStatus.Draft,
+          } as PaymentOrderNode,
+        ],
       } as ReservationNode)
-    ).toBe("DRAFT");
+    ).toBe(OrderStatus.Draft);
 
     expect(
       getNormalizedReservationOrderStatus({
         state: "CANCELLED",
-        order: {
-          status: OrderStatus.Paid,
-        } as PaymentOrderNode,
+        paymentOrder: [
+          {
+            status: OrderStatus.Paid,
+          } as PaymentOrderNode,
+        ],
       } as ReservationNode)
-    ).toBe("PAID");
+    ).toBe(OrderStatus.Paid);
 
     expect(
       getNormalizedReservationOrderStatus({
         state: "CONFIRMED",
-        order: {
-          status: OrderStatus.PaidManually,
-        } as PaymentOrderNode,
+        paymentOrder: [
+          {
+            status: OrderStatus.PaidManually,
+          } as PaymentOrderNode,
+        ],
       } as ReservationNode)
-    ).toBe("PAID_MANUALLY");
+    ).toBe(OrderStatus.PaidManually);
   });
 
   test("return null", () => {

@@ -67,6 +67,16 @@ const CANCELLATION_RULE_FRAGMENT = gql`
   }
 `;
 
+const RESERVATION_ORDER_STATUS_FRAGMENT = gql`
+  fragment ReservationOrderStatus on ReservationNode {
+    state
+    paymentOrder {
+      id
+      status
+    }
+  }
+`;
+
 // NOTE hard coded NORMAL type so only ment to be used in client ui.
 // reservationType valid values: "normal", "behalf", "staff", "blocked"
 // even though the ReservationsReservationTypeChoices says they are uppercase
@@ -76,6 +86,7 @@ export const LIST_RESERVATIONS = gql`
   ${IMAGE_FRAGMENT}
   ${UNIT_NAME_FRAGMENT_I18N}
   ${CANCELLATION_RULE_FRAGMENT}
+  ${RESERVATION_ORDER_STATUS_FRAGMENT}
   query ListReservations(
     $beginDate: Date
     $endDate: Date
@@ -101,6 +112,7 @@ export const LIST_RESERVATIONS = gql`
           name
           bufferTimeBefore
           bufferTimeAfter
+          ...ReservationOrderStatus
           paymentOrder {
             id
             orderUuid

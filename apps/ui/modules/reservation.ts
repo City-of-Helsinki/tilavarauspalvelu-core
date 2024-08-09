@@ -6,11 +6,12 @@ import {
   CustomerTypeChoice,
   type ReservationMetadataFieldNode,
   type Maybe,
-  type PaymentOrderNode,
   type ListReservationsQuery,
-  IsReservableFieldsFragment,
-  ReservationUnitNode,
+  type IsReservableFieldsFragment,
+  type ReservationUnitNode,
   ReservationStateChoice,
+  OrderStatus,
+  type ReservationOrderStatusFragment,
 } from "@gql/gql-types";
 import {
   type RoundPeriod,
@@ -237,16 +238,14 @@ function shouldShowOrderStatus(
 }
 
 export function getNormalizedReservationOrderStatus(
-  reservation: Pick<ReservationNode, "state"> & {
-    order?: Pick<PaymentOrderNode, "status"> | null | undefined;
-  }
-): string | null {
+  reservation: ReservationOrderStatusFragment
+): OrderStatus | null {
   if (!reservation) {
     return null;
   }
 
   if (shouldShowOrderStatus(reservation.state)) {
-    return reservation.order?.status ?? null;
+    return reservation.paymentOrder[0]?.status ?? null;
   }
 
   return null;

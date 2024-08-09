@@ -5945,6 +5945,11 @@ export type CancellationRuleFieldsFragment = {
   } | null;
 };
 
+export type ReservationOrderStatusFragment = {
+  state?: ReservationStateChoice | null;
+  paymentOrder: Array<{ id: string; status?: OrderStatus | null }>;
+};
+
 export type ListReservationsQueryVariables = Exact<{
   beginDate?: InputMaybe<Scalars["Date"]["input"]>;
   endDate?: InputMaybe<Scalars["Date"]["input"]>;
@@ -7844,6 +7849,15 @@ export const CancellationRuleFieldsFragmentDoc = gql`
     }
   }
 `;
+export const ReservationOrderStatusFragmentDoc = gql`
+  fragment ReservationOrderStatus on ReservationNode {
+    state
+    paymentOrder {
+      id
+      status
+    }
+  }
+`;
 export const ReservationInfoFragmentDoc = gql`
   fragment ReservationInfo on ReservationNode {
     description
@@ -9431,6 +9445,7 @@ export const ListReservationsDocument = gql`
           name
           bufferTimeBefore
           bufferTimeAfter
+          ...ReservationOrderStatus
           paymentOrder {
             id
             orderUuid
@@ -9447,6 +9462,7 @@ export const ListReservationsDocument = gql`
     }
   }
   ${ReservationInfoCardFragmentDoc}
+  ${ReservationOrderStatusFragmentDoc}
   ${CancellationRuleFieldsFragmentDoc}
 `;
 
