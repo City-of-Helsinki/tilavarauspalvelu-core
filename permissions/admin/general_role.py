@@ -39,6 +39,7 @@ class GeneralRoleAdmin(admin.ModelAdmin):
     readonly_fields = [
         "created",
         "modified",
+        "assigner",
     ]
     autocomplete_fields = [
         "user",
@@ -47,3 +48,7 @@ class GeneralRoleAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request: WSGIRequest) -> models.QuerySet:
         return super().get_queryset(request).select_related("user", "role")
+
+    def save_model(self, request: WSGIRequest, obj: GeneralRole, form, change: bool) -> GeneralRole:
+        obj.assigner = request.user
+        return super().save_model(request, obj, form, change)
