@@ -203,7 +203,7 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
     reservationUnitPk: reservationUnit?.pk ?? undefined,
     begin: fromUIDate(getValues("startingDate")) ?? new Date(),
     end: fromUIDate(getValues("endingDate")) ?? new Date(),
-    reservationType: reservationType as ReservationTypeChoice,
+    reservationType,
   });
 
   const navigate = useNavigate();
