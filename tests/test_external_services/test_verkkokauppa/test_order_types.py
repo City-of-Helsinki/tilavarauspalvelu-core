@@ -145,7 +145,7 @@ def test_verkkokauppa__order_types__create_order_params__to_json():
                 "rowPriceNet": "100",
                 "rowPriceVat": "24",
                 "rowPriceTotal": "124",
-                "vatPercentage": "24",
+                "vatPercentage": "24.0",
                 "priceNet": "100",
                 "priceVat": "24",
                 "priceGross": "124",
