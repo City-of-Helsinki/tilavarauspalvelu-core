@@ -10,6 +10,7 @@ export const RESERVATIONS_QUERY = gql`
     $unit: [Int]
     $reservationUnit: [Int]
     $reservationUnitType: [Int]
+    $reservationType: [ReservationTypeChoice]
     $state: [ReservationStateChoice]
     $orderStatus: [OrderStatusWithFree]
     $textSearch: String
@@ -29,6 +30,7 @@ export const RESERVATIONS_QUERY = gql`
       unit: $unit
       reservationUnit: $reservationUnit
       reservationUnitType: $reservationUnitType
+      reservationType: $reservationType
       state: $state
       orderStatus: $orderStatus
       textSearch: $textSearch

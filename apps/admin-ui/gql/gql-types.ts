@@ -7408,6 +7408,9 @@ export type ReservationsQueryVariables = Exact<{
     | Array<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
+  reservationType?: InputMaybe<
+    Array<InputMaybe<ReservationTypeChoice>> | InputMaybe<ReservationTypeChoice>
+  >;
   state?: InputMaybe<
     | Array<InputMaybe<ReservationStateChoice>>
     | InputMaybe<ReservationStateChoice>
@@ -12704,6 +12707,7 @@ export const ReservationsDocument = gql`
     $unit: [Int]
     $reservationUnit: [Int]
     $reservationUnitType: [Int]
+    $reservationType: [ReservationTypeChoice]
     $state: [ReservationStateChoice]
     $orderStatus: [OrderStatusWithFree]
     $textSearch: String
@@ -12723,6 +12727,7 @@ export const ReservationsDocument = gql`
       unit: $unit
       reservationUnit: $reservationUnit
       reservationUnitType: $reservationUnitType
+      reservationType: $reservationType
       state: $state
       orderStatus: $orderStatus
       textSearch: $textSearch
@@ -12778,6 +12783,7 @@ export const ReservationsDocument = gql`
  *      unit: // value for 'unit'
  *      reservationUnit: // value for 'reservationUnit'
  *      reservationUnitType: // value for 'reservationUnitType'
+ *      reservationType: // value for 'reservationType'
  *      state: // value for 'state'
  *      orderStatus: // value for 'orderStatus'
  *      textSearch: // value for 'textSearch'

@@ -1,4 +1,4 @@
-import { Weekday } from "../gql/gql-types";
+import { ReservationTypeChoice, Weekday } from "../gql/gql-types";
 
 export type Day = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 export function transformWeekday(d: Day): Weekday {
@@ -36,5 +36,24 @@ export function convertWeekday(d: Weekday): Day {
       return 5;
     case Weekday.Sunday:
       return 6;
+  }
+}
+
+export function transformReservationTypeSafe(
+  d: string
+): ReservationTypeChoice | null {
+  switch (d) {
+    case ReservationTypeChoice.Staff:
+      return ReservationTypeChoice.Staff;
+    case ReservationTypeChoice.Behalf:
+      return ReservationTypeChoice.Behalf;
+    case ReservationTypeChoice.Blocked:
+      return ReservationTypeChoice.Blocked;
+    case ReservationTypeChoice.Normal:
+      return ReservationTypeChoice.Normal;
+    case ReservationTypeChoice.Seasonal:
+      return ReservationTypeChoice.Seasonal;
+    default:
+      return null;
   }
 }

@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { type ApolloError } from "@apollo/client";
 import {
-  type QueryReservationsArgs,
   ReservationOrderingChoices,
   useReservationsQuery,
   ReservationStateChoice,
   OrderStatusWithFree,
+  type ReservationsQueryVariables,
 } from "@gql/gql-types";
 import { More } from "@/component/More";
 import { LIST_PAGE_SIZE } from "@/common/const";
@@ -15,6 +15,7 @@ import { ReservationsTable } from "./ReservationsTable";
 import { fromUIDate, toApiDate } from "common/src/common/util";
 import { filterNonNullable, toNumber } from "common/src/helpers";
 import { useSearchParams } from "react-router-dom";
+import { transformReservationTypeSafe } from "common/src/conversion";
 
 function transformPaymentStatusSafe(t: string): OrderStatusWithFree | null {
   switch (t) {
@@ -56,7 +57,9 @@ function transformStateSafe(t: string): ReservationStateChoice | null {
   }
 }
 
-function mapFilterParams(searchParams: URLSearchParams): QueryReservationsArgs {
+function mapFilterParams(
+  searchParams: URLSearchParams
+): ReservationsQueryVariables {
   const reservationUnitType = searchParams
     .getAll("reservationUnitType")
     .map(Number)
@@ -75,6 +78,10 @@ function mapFilterParams(searchParams: URLSearchParams): QueryReservationsArgs {
 
   const state = filterNonNullable(
     searchParams.getAll("state").map(transformStateSafe)
+  );
+
+  const reservationType = filterNonNullable(
+    searchParams.getAll("reservationType").map(transformReservationTypeSafe)
   );
 
   const textSearch = searchParams.get("search");
@@ -109,10 +116,11 @@ function mapFilterParams(searchParams: URLSearchParams): QueryReservationsArgs {
 
   const applyingForFreeOfCharge = searchParams.get("freeOfCharge") === "true";
 
-  const filterParams = {
+  return {
     unit,
     reservationUnit,
     reservationUnitType,
+    reservationType,
     state,
     orderStatus,
     textSearch,
@@ -125,8 +133,6 @@ function mapFilterParams(searchParams: URLSearchParams): QueryReservationsArgs {
     isRecurring,
     applyingForFreeOfCharge,
   };
-
-  return filterParams;
 }
 
 export function ReservationsDataLoader(): JSX.Element {
