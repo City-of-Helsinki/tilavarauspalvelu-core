@@ -1,10 +1,16 @@
 import { gql } from "@apollo/client";
 import { filterNonNullable } from "common/src/helpers";
-import { useReservationUnitTypesFilterQuery } from "@gql/gql-types";
+import {
+  ReservationUnitTypeOrderingChoices,
+  useReservationUnitTypesFilterQuery,
+} from "@gql/gql-types";
 
 export const RESERVATION_UNIT_TYPES_QUERY = gql`
-  query ReservationUnitTypesFilter($offset: Int, $first: Int) {
-    reservationUnitTypes(offset: $offset, first: $first) {
+  query ReservationUnitTypesFilter(
+    $after: String
+    $orderBy: [ReservationUnitTypeOrderingChoices]
+  ) {
+    reservationUnitTypes(after: $after, orderBy: $orderBy) {
       edges {
         node {
           id
@@ -18,7 +24,11 @@ export const RESERVATION_UNIT_TYPES_QUERY = gql`
 `;
 
 export function useReservationUnitTypes() {
-  const { data, loading } = useReservationUnitTypesFilterQuery();
+  const { data, loading } = useReservationUnitTypesFilterQuery({
+    variables: {
+      orderBy: ReservationUnitTypeOrderingChoices.NameFiAsc,
+    },
+  });
 
   const qd = data?.reservationUnitTypes;
   const types = filterNonNullable(qd?.edges.map((x) => x?.node));

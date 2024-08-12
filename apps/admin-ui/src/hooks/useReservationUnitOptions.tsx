@@ -1,7 +1,10 @@
 import { useEffect } from "react";
 import { gql } from "@apollo/client";
 import { filterNonNullable } from "common/src/helpers";
-import { useReservationUnitsFilterParamsQuery } from "@gql/gql-types";
+import {
+  ReservationUnitOrderingChoices,
+  useReservationUnitsFilterParamsQuery,
+} from "@gql/gql-types";
 
 export const RESERVATION_UNITS_FILTER_PARAMS_QUERY = gql`
   query ReservationUnitsFilterParams(
@@ -32,7 +35,11 @@ export const RESERVATION_UNITS_FILTER_PARAMS_QUERY = gql`
 `;
 
 export function useReservationUnitOptions() {
-  const { data, loading, fetchMore } = useReservationUnitsFilterParamsQuery();
+  const { data, loading, fetchMore } = useReservationUnitsFilterParamsQuery({
+    variables: {
+      orderBy: [ReservationUnitOrderingChoices.NameFiAsc],
+    },
+  });
 
   // auto fetch more (there is no limit, expect number of them would be a few hundred, but in theory this might cause problems)
   // NOTE have to useEffect, onComplete stops at 200 items

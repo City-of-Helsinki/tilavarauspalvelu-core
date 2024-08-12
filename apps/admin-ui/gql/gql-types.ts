@@ -7921,8 +7921,11 @@ export type ReservationUnitsFilterParamsQuery = {
 };
 
 export type ReservationUnitTypesFilterQueryVariables = Exact<{
-  offset?: InputMaybe<Scalars["Int"]["input"]>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  orderBy?: InputMaybe<
+    | Array<InputMaybe<ReservationUnitTypeOrderingChoices>>
+    | InputMaybe<ReservationUnitTypeOrderingChoices>
+  >;
 }>;
 
 export type ReservationUnitTypesFilterQuery = {
@@ -7936,6 +7939,9 @@ export type ReservationUnitTypesFilterQuery = {
 
 export type UnitsFilterQueryVariables = Exact<{
   after?: InputMaybe<Scalars["String"]["input"]>;
+  orderBy?: InputMaybe<
+    Array<InputMaybe<UnitOrderingChoices>> | InputMaybe<UnitOrderingChoices>
+  >;
 }>;
 
 export type UnitsFilterQuery = {
@@ -13784,8 +13790,11 @@ export type ReservationUnitsFilterParamsQueryResult = Apollo.QueryResult<
   ReservationUnitsFilterParamsQueryVariables
 >;
 export const ReservationUnitTypesFilterDocument = gql`
-  query ReservationUnitTypesFilter($offset: Int, $first: Int) {
-    reservationUnitTypes(offset: $offset, first: $first) {
+  query ReservationUnitTypesFilter(
+    $after: String
+    $orderBy: [ReservationUnitTypeOrderingChoices]
+  ) {
+    reservationUnitTypes(after: $after, orderBy: $orderBy) {
       edges {
         node {
           id
@@ -13810,8 +13819,8 @@ export const ReservationUnitTypesFilterDocument = gql`
  * @example
  * const { data, loading, error } = useReservationUnitTypesFilterQuery({
  *   variables: {
- *      offset: // value for 'offset'
- *      first: // value for 'first'
+ *      after: // value for 'after'
+ *      orderBy: // value for 'orderBy'
  *   },
  * });
  */
@@ -13865,8 +13874,8 @@ export type ReservationUnitTypesFilterQueryResult = Apollo.QueryResult<
   ReservationUnitTypesFilterQueryVariables
 >;
 export const UnitsFilterDocument = gql`
-  query UnitsFilter($after: String) {
-    units(onlyWithPermission: true, after: $after) {
+  query UnitsFilter($after: String, $orderBy: [UnitOrderingChoices]) {
+    units(onlyWithPermission: true, after: $after, orderBy: $orderBy) {
       edges {
         node {
           id
@@ -13896,6 +13905,7 @@ export const UnitsFilterDocument = gql`
  * const { data, loading, error } = useUnitsFilterQuery({
  *   variables: {
  *      after: // value for 'after'
+ *      orderBy: // value for 'orderBy'
  *   },
  * });
  */
