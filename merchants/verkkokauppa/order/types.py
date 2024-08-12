@@ -7,6 +7,7 @@ from typing import Any, Literal
 from django.conf import settings
 
 from merchants.verkkokauppa.order.exceptions import ParseOrderError
+from utils.decimal_utils import round_decimal
 from utils.sentry import SentryLogger
 
 
@@ -201,7 +202,8 @@ class CreateOrderParams:
                     "priceNet": str(item.price_net),
                     "priceGross": str(item.price_gross),
                     "priceVat": str(item.price_vat),
-                    "vatPercentage": str(int(item.vat_percentage)),
+                    # PayTrail supports only one number in decimal part: https://docs.paytrail.com/#/?id=item
+                    "vatPercentage": str(round_decimal(item.vat_percentage, 1)),
                     "meta": [
                         {
                             "key": meta.key,
