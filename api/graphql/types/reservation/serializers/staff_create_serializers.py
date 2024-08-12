@@ -205,6 +205,7 @@ class ReservationStaffCreateSerializer(OldPrimaryKeySerializer, ReservationSched
             ReservationTypeChoice.BLOCKED.value,
             ReservationTypeChoice.STAFF.value,
             ReservationTypeChoice.BEHALF.value,
+            ReservationTypeChoice.SEASONAL.value,
         ]
 
         if reservation_type not in allowed_types:
