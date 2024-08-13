@@ -28,8 +28,8 @@ import { getReserveeName, sortByName } from "@/common/util";
 import { useModal } from "@/context/ModalContext";
 import { CELL_BORDER, CELL_BORDER_LEFT, CELL_BORDER_LEFT_ALERT } from "./const";
 import { ReservationPopupContent } from "./ReservationPopupContent";
-import resourceEventStyleGetter from "./eventStyleGetter";
-import CreateReservationModal from "./create-reservation/CreateReservationModal";
+import eventStyleGetter from "./eventStyleGetter";
+import { CreateReservationModal } from "./CreateReservationModal";
 
 type CalendarEventType = CalendarEvent<ReservationUnitReservationsFragment>;
 type Resource = {
@@ -352,12 +352,12 @@ const EventContainer = styled.div`
 function Events({
   firstHour,
   events,
-  eventStyleGetter,
+  styleGetter,
   numHours,
 }: {
   firstHour: number;
   events: CalendarEventType[];
-  eventStyleGetter: EventStyleGetter;
+  styleGetter: EventStyleGetter;
   numHours: number;
 }) {
   const { t } = useTranslation();
@@ -404,7 +404,7 @@ function Events({
               }}
             >
               <EventContent
-                style={{ ...eventStyleGetter(e).style }}
+                style={{ ...styleGetter(e).style }}
                 data-testid={testId}
               >
                 <p>{title}</p>
@@ -436,7 +436,7 @@ function sortByDraftStatusAndTitle(resources: Resource[]) {
   });
 }
 
-function UnitCalendar({ date, resources, refetch }: Props): JSX.Element {
+export function UnitCalendar({ date, resources, refetch }: Props): JSX.Element {
   const calendarRef = useRef<HTMLDivElement>(null);
   // todo find out min and max opening hour of every reservationunit
   const [beginHour, endHour] = [0, 24];
@@ -536,7 +536,7 @@ function UnitCalendar({ date, resources, refetch }: Props): JSX.Element {
                 firstHour={beginHour}
                 numHours={numHours}
                 events={row.events}
-                eventStyleGetter={resourceEventStyleGetter(row.pk)}
+                styleGetter={eventStyleGetter(row.pk)}
               />
             </RowCalendarArea>
           </Row>
@@ -545,5 +545,3 @@ function UnitCalendar({ date, resources, refetch }: Props): JSX.Element {
     </Container>
   );
 }
-
-export { UnitCalendar };

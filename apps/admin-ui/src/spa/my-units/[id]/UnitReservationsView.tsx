@@ -26,7 +26,7 @@ type Params = {
   reservationUnitId: string;
 };
 
-function UnitReservationsView(): JSX.Element {
+export function UnitReservationsView(): JSX.Element {
   const { hash } = useLocation();
   const [queryParams] = useSearchParams();
 
@@ -117,5 +117,3 @@ function UnitReservationsView(): JSX.Element {
     </VerticalFlex>
   );
 }
-
-export default UnitReservationsView;

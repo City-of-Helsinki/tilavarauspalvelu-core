@@ -11,7 +11,7 @@ import { myUnitUrl } from "@/common/urls";
 import { BasicLink } from "@/styles/util";
 import Loader from "@/component/Loader";
 import { ReservationUnitCalendarView } from "./ReservationUnitCalendarView";
-import UnitReservationsView from "./UnitReservationsView";
+import { UnitReservationsView } from "./UnitReservationsView";
 import { TabHeader, Tabs } from "@/component/Tabs";
 import { useNotification } from "@/context/NotificationContext";
 import { useUnitViewQuery } from "@gql/gql-types";

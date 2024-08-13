@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { gql } from "@apollo/client";
 import { useForm, FormProvider, UseFormReturn } from "react-hook-form";
 import { Button, Dialog, Notification } from "hds-react";
 import { useTranslation } from "react-i18next";
@@ -32,6 +33,16 @@ import ReservationTypeForm from "@/component/ReservationTypeForm";
 import { flattenMetadata } from "@/common/util";
 
 type ReservationUnitType = NonNullable<ReservationUnitQuery["reservationUnit"]>;
+
+export const CREATE_STAFF_RESERVATION = gql`
+  mutation CreateStaffReservation(
+    $input: ReservationStaffCreateMutationInput!
+  ) {
+    createStaffReservation(input: $input) {
+      pk
+    }
+  }
+`;
 
 // NOTE HDS forces buttons over each other on mobile, we want them side-by-side
 const ActionButtons = styled(Dialog.ActionButtons)`
@@ -79,13 +90,13 @@ const StyledNotification = styled(Notification)`
   width: auto;
 `;
 
-const useCheckFormCollisions = ({
+function useCheckFormCollisions({
   form,
   reservationUnit,
 }: {
   form: UseFormReturn<FormValueType>;
   reservationUnit: ReservationUnitType;
-}) => {
+}) {
   const { watch } = form;
 
   const formDate = watch("date");
@@ -119,7 +130,7 @@ const useCheckFormCollisions = ({
   });
 
   return { hasCollisions };
-};
+}
 
 function CollisionWarning({
   form,
@@ -193,7 +204,7 @@ function ActionContainer({
   );
 }
 
-const DialogContent = ({
+function DialogContent({
   onClose,
   reservationUnit,
   start,
@@ -201,7 +212,7 @@ const DialogContent = ({
   onClose: () => void;
   reservationUnit: ReservationUnitType;
   start: Date;
-}) => {
+}) {
   const { t, i18n } = useTranslation();
   const interval = getNormalizedInterval(
     reservationUnit.reservationStartInterval
@@ -357,9 +368,9 @@ const DialogContent = ({
       />
     </>
   );
-};
+}
 
-function CreateReservationModal({
+export function CreateReservationModal({
   reservationUnitPk: pk,
   start,
   onClose,
@@ -412,5 +423,3 @@ function CreateReservationModal({
     </FixedDialog>
   );
 }
-
-export default CreateReservationModal;
