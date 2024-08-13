@@ -4,6 +4,7 @@ import random
 import uuid
 import zoneinfo
 from datetime import UTC, date, datetime, time, timedelta
+from decimal import Decimal
 from itertools import cycle
 
 from opening_hours.models import OriginHaukiResource, ReservableTimeSpan
@@ -268,7 +269,7 @@ def _create_pricings(reservation_units: list[ReservationUnit]) -> list[Reservati
 @with_logs()
 def _create_tax_percentages() -> list[TaxPercentage]:
     tax_percentages: list[TaxPercentage] = []
-    percentages = (0, 10, 14, 24)
+    percentages = (0, 10, 14, 24, Decimal("25.5"))
     for percentage in percentages:
         # Creation is done one-by-one since 'value' is a not defined as unique
         # and 'bulk_create' doesn't support 'update_conflicts' without a unique constraint:
