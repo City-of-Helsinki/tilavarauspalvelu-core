@@ -12,36 +12,22 @@ pytestmark = [
 ]
 
 
-def test_reservation_unit__update_pricings():
-    reservation_unit_1 = ReservationUnitFactory.create(name="Unit that should be updated")
+####################################
+# update_reservation_unit_pricings #
+####################################
+
+
+def test_reservation_unit__update_pricings__updated():
+    reservation_unit = ReservationUnitFactory.create(name="Unit that should be updated")
     ReservationUnitPricingFactory.create(
         begins=datetime.date(2022, 1, 1),
         status=PricingStatus.PRICING_STATUS_ACTIVE,
-        reservation_unit=reservation_unit_1,
+        reservation_unit=reservation_unit,
     )
     ReservationUnitPricingFactory.create(
         begins=datetime.date(2022, 9, 19),
         status=PricingStatus.PRICING_STATUS_FUTURE,
-        reservation_unit=reservation_unit_1,
-    )
-
-    reservation_unit_2 = ReservationUnitFactory.create(name="Unit with future price with non-matching date")
-    ReservationUnitPricingFactory.create(
-        begins=datetime.date(2022, 1, 1),
-        status=PricingStatus.PRICING_STATUS_ACTIVE,
-        reservation_unit=reservation_unit_2,
-    )
-    ReservationUnitPricingFactory.create(
-        begins=datetime.date(2022, 9, 20),
-        status=PricingStatus.PRICING_STATUS_FUTURE,
-        reservation_unit=reservation_unit_2,
-    )
-
-    reservation_unit_3 = ReservationUnitFactory.create(name="Unit without future price")
-    ReservationUnitPricingFactory.create(
-        begins=datetime.date(2022, 1, 1),
-        status=PricingStatus.PRICING_STATUS_ACTIVE,
-        reservation_unit=reservation_unit_3,
+        reservation_unit=reservation_unit,
     )
 
     today = datetime.date(2022, 9, 19)
@@ -49,27 +35,54 @@ def test_reservation_unit__update_pricings():
 
     assert num_updated == 1
 
-    reservation_unit_1.refresh_from_db()
-    reservation_unit_2.refresh_from_db()
-    reservation_unit_3.refresh_from_db()
+    active_pricing = reservation_unit.pricings.filter(status=PricingStatus.PRICING_STATUS_ACTIVE).first()
+    future_pricing = reservation_unit.pricings.filter(status=PricingStatus.PRICING_STATUS_FUTURE).first()
+    past_pricing = reservation_unit.pricings.filter(status=PricingStatus.PRICING_STATUS_PAST).first()
+    assert active_pricing.begins == today
+    assert future_pricing is None
+    assert past_pricing.begins == datetime.date(2022, 1, 1)
 
-    active_pricing_1 = reservation_unit_1.pricings.filter(status=PricingStatus.PRICING_STATUS_ACTIVE).first()
-    future_pricing_1 = reservation_unit_1.pricings.filter(status=PricingStatus.PRICING_STATUS_FUTURE).first()
-    past_pricing_1 = reservation_unit_1.pricings.filter(status=PricingStatus.PRICING_STATUS_PAST).first()
-    assert active_pricing_1.begins == today
-    assert future_pricing_1 is None
-    assert past_pricing_1.begins == datetime.date(2022, 1, 1)
 
-    active_pricing_2 = reservation_unit_2.pricings.filter(status=PricingStatus.PRICING_STATUS_ACTIVE).first()
-    future_pricing_2 = reservation_unit_2.pricings.filter(status=PricingStatus.PRICING_STATUS_FUTURE).first()
-    past_pricing_2 = reservation_unit_2.pricings.filter(status=PricingStatus.PRICING_STATUS_PAST).first()
-    assert active_pricing_2.begins == datetime.date(2022, 1, 1)
-    assert future_pricing_2.begins == datetime.date(2022, 9, 20)
-    assert past_pricing_2 is None
+def test_reservation_unit__update_pricings__not_update__non_matching_date():
+    reservation_unit = ReservationUnitFactory.create()
+    ReservationUnitPricingFactory.create(
+        begins=datetime.date(2022, 1, 1),
+        status=PricingStatus.PRICING_STATUS_ACTIVE,
+        reservation_unit=reservation_unit,
+    )
+    ReservationUnitPricingFactory.create(
+        begins=datetime.date(2022, 9, 20),
+        status=PricingStatus.PRICING_STATUS_FUTURE,
+        reservation_unit=reservation_unit,
+    )
 
-    active_pricing_3 = reservation_unit_3.pricings.filter(status=PricingStatus.PRICING_STATUS_ACTIVE).first()
-    future_pricing_3 = reservation_unit_3.pricings.filter(status=PricingStatus.PRICING_STATUS_FUTURE).first()
-    past_pricing_3 = reservation_unit_3.pricings.filter(status=PricingStatus.PRICING_STATUS_PAST).first()
-    assert active_pricing_3.begins == datetime.date(2022, 1, 1)
-    assert future_pricing_3 is None
-    assert past_pricing_3 is None
+    today = datetime.date(2022, 9, 19)
+    num_updated = update_reservation_unit_pricings(today)
+    assert num_updated == 0
+
+    active_pricing = reservation_unit.pricings.filter(status=PricingStatus.PRICING_STATUS_ACTIVE).first()
+    future_pricing = reservation_unit.pricings.filter(status=PricingStatus.PRICING_STATUS_FUTURE).first()
+    past_pricing = reservation_unit.pricings.filter(status=PricingStatus.PRICING_STATUS_PAST).first()
+    assert active_pricing.begins == datetime.date(2022, 1, 1)
+    assert future_pricing.begins == datetime.date(2022, 9, 20)
+    assert past_pricing is None
+
+
+def test_reservation_unit__update_pricings__not_update__no_future_pricing():
+    reservation_unit = ReservationUnitFactory.create()
+    ReservationUnitPricingFactory.create(
+        begins=datetime.date(2022, 1, 1),
+        status=PricingStatus.PRICING_STATUS_ACTIVE,
+        reservation_unit=reservation_unit,
+    )
+
+    today = datetime.date(2022, 9, 19)
+    num_updated = update_reservation_unit_pricings(today)
+    assert num_updated == 0
+
+    active_pricing = reservation_unit.pricings.filter(status=PricingStatus.PRICING_STATUS_ACTIVE).first()
+    future_pricing = reservation_unit.pricings.filter(status=PricingStatus.PRICING_STATUS_FUTURE).first()
+    past_pricing = reservation_unit.pricings.filter(status=PricingStatus.PRICING_STATUS_PAST).first()
+    assert active_pricing.begins == datetime.date(2022, 1, 1)
+    assert future_pricing is None
+    assert past_pricing is None
