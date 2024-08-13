@@ -12,7 +12,7 @@ import {
   type ReservationTimesInReservationUnitQuery,
   ReservationUnitDocument,
   type ReservationUnitQuery,
-  CreateRecurringReservationDocument,
+  CreateReservationSeriesDocument,
 } from "@gql/gql-types";
 import { base64encode } from "common/src/helpers";
 
@@ -279,7 +279,7 @@ export const mocks = [
   },
   {
     request: {
-      query: CreateRecurringReservationDocument,
+      query: CreateReservationSeriesDocument,
     },
     result: {
       data: {

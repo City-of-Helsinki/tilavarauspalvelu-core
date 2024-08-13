@@ -415,6 +415,9 @@ const translations: ITranslations = {
       reservationsList_one: ["Olet tekemässä yhden varauksen"],
       reservationsList_other: ["Olet tekemässä {{count}} varausta"],
       name: ["Varaussarjan nimi"],
+      newOverlapError: [
+        "Varausta ei pystytty tekemään, koska siinä on uusia päällekkäistä varauksia ({{ count }}). Tarkista lista ja yritä uudelleen.",
+      ],
     },
   },
   Application: {
@@ -1152,7 +1155,8 @@ const translations: ITranslations = {
     // dialog specific
     title: ["Varaa {{reservationUnit}}"],
     accept: ["Varaa"],
-    saveFailed: ["Tallennus ei onnistunut. {{error}}"],
+    saveFailedWithError: ["Tallennus ei onnistunut. {{error}}"],
+    saveFailed: ["Tallennus ei onnistunut."],
     saveSuccess: ["Varaus tehty kohteeseen {{reservationUnit}}"],
   },
   ReservationUnits: {

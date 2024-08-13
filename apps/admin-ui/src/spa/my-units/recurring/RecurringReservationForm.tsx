@@ -7,7 +7,7 @@ import {
 } from "@gql/gql-types";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { Button, TextInput } from "hds-react";
+import { Button, TextInput, Notification } from "hds-react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { fromUIDate } from "common/src/common/util";
@@ -36,6 +36,8 @@ import { base64encode, filterNonNullable } from "common/src/helpers";
 import { Element } from "@/styles/util";
 import { AutoGrid } from "@/styles/layout";
 import { errorToast } from "common/src/common/toast";
+import { ButtonLikeLink } from "@/component/ButtonLikeLink";
+import { getSeriesOverlapErrors } from "common/src/apolloUtils";
 
 const Label = styled.p<{ $bold?: boolean }>`
   font-family: var(--fontsize-body-m);
@@ -49,19 +51,22 @@ const InnerTextInput = styled(TextInput)`
 
 const TRANS_PREFIX = "MyUnits.RecurringReservationForm";
 
-const isReservationEq = (
-  a: NewReservationListItem,
-  b: NewReservationListItem
-) =>
-  a.date.getTime() === b.date.getTime() &&
-  a.endTime === b.endTime &&
-  a.startTime === b.startTime;
+function isReservationEq(a: NewReservationListItem, b: NewReservationListItem) {
+  return (
+    a.date.getTime() === b.date.getTime() &&
+    a.endTime === b.endTime &&
+    a.startTime === b.startTime
+  );
+}
 
-const filterOutRemovedReservations = (
+function filterOutRemovedReservations(
   items: NewReservationListItem[],
   removedReservations: NewReservationListItem[]
-) =>
-  items.filter((x) => !removedReservations.find((y) => isReservationEq(x, y)));
+) {
+  return items.filter(
+    (x) => !removedReservations.find((y) => isReservationEq(x, y))
+  );
+}
 
 type ReservationListEditorProps = {
   items: { reservations: NewReservationListItem[]; refetch: () => void };
@@ -168,10 +173,11 @@ export function RecurringReservationForm({ reservationUnits }: Props) {
   const [removedReservations, setRemovedReservations] = useState<
     NewReservationListItem[]
   >([]);
+  const [localError, setLocalError] = useState<string | null>(null);
 
+  // FIXME this is incorrectly typed (it can be undefined)
   const selectedReservationUnit = watch("reservationUnit");
-
-  const reservationUnitPk = selectedReservationUnit?.value;
+  const reservationUnitPk: number | undefined = selectedReservationUnit?.value;
   const id = base64encode(`ReservationUnitNode:${reservationUnitPk}`);
   const isValid = reservationUnitPk > 0;
   const { data: queryData } = useReservationUnitQuery({
@@ -181,10 +187,20 @@ export function RecurringReservationForm({ reservationUnits }: Props) {
   const { reservationUnit } = queryData ?? {};
 
   // Reset removed when time change (infi loop if array is unwrapped)
-  const [startTime, endTime] = watch(["startTime", "endTime"]);
+
+  const startTime = watch("startTime");
+  const endTime = watch("endTime");
+  const startDate = watch("startingDate");
+  const endDate = watch("endingDate");
+  const repeatOnDays = watch("repeatOnDays");
+  const repeatPattern = watch("repeatPattern");
   useEffect(() => {
     setRemovedReservations([]);
+    setLocalError(null);
   }, [startTime, endTime, reservationUnit]);
+  useEffect(() => {
+    setLocalError(null);
+  }, [startDate, endDate, repeatOnDays, repeatPattern]);
 
   const translateError = (errorMsg?: string) =>
     errorMsg ? t(`reservationForm:errors.${errorMsg}`) : "";
@@ -203,7 +219,7 @@ export function RecurringReservationForm({ reservationUnits }: Props) {
   const reservationType = watch("type") ?? ReservationTypeChoice.Blocked;
   const checkedReservations = useFilteredReservationList({
     items: newReservations.reservations,
-    reservationUnitPk: reservationUnit?.pk ?? undefined,
+    reservationUnitPk,
     begin: fromUIDate(getValues("startingDate")) ?? new Date(),
     end: fromUIDate(getValues("endingDate")) ?? new Date(),
     reservationType,
@@ -212,67 +228,76 @@ export function RecurringReservationForm({ reservationUnits }: Props) {
   const navigate = useNavigate();
 
   const onSubmit = async (data: RecurringReservationFormT) => {
+    setLocalError(null);
+
     // TODO notifyError does a double translation somewhere
     if (!newReservations.success) {
       errorToast({ text: t(translateError("formNotValid")) });
       return;
     }
-    const reservationsToMake = filterOutRemovedReservations(
-      checkedReservations.reservations,
-      removedReservations
-    ).filter((x) => !x.isOverlapping);
 
-    if (reservationsToMake.length === 0) {
+    const skipDates = removedReservations
+      .concat(checkedReservations.reservations.filter((x) => x.isOverlapping))
+      .map((x) => x.date);
+
+    if (checkedReservations.reservations.length - skipDates.length === 0) {
       errorToast({ text: t(translateError("noReservations")) });
       return;
     }
+
     const unitPk = reservationUnit?.pk;
     if (unitPk == null) {
       errorToast({ text: t(translateError("formNotValid")) });
       return;
     }
 
+    const metaFields = filterNonNullable(
+      reservationUnit?.metadataSet?.supportedFields
+    );
+    const buffers = {
+      before:
+        data.bufferTimeBefore && reservationUnit?.bufferTimeBefore
+          ? reservationUnit.bufferTimeBefore
+          : undefined,
+      after:
+        data.bufferTimeAfter && reservationUnit?.bufferTimeAfter
+          ? reservationUnit.bufferTimeAfter
+          : undefined,
+    };
+
     try {
-      const metaFields = filterNonNullable(
-        reservationUnit?.metadataSet?.supportedFields
-      );
-
-      const buffers = {
-        before:
-          data.bufferTimeBefore && reservationUnit?.bufferTimeBefore
-            ? reservationUnit.bufferTimeBefore
-            : undefined,
-        after:
-          data.bufferTimeAfter && reservationUnit?.bufferTimeAfter
-            ? reservationUnit.bufferTimeAfter
-            : undefined,
-      };
-      const [recurringPk, result] = await mutate(
+      const recurringPk = await mutate({
         data,
-        reservationsToMake,
-        unitPk,
+        skipDates,
+        reservationUnitPk,
         metaFields,
-        buffers
-      );
-
-      navigate("completed", {
-        state: {
-          reservations: result,
-          recurringPk,
-        },
+        buffers,
       });
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.warn("Exception in RecurringReservation", e);
-      errorToast({ text: t("ReservationDialog.saveFailed") });
-      // on exception in RecurringReservation (because we are catching the individual errors)
-      // We don't need to cleanup the RecurringReservation that has zero connections.
-      // Based on documentation backend will do this for us.
-    }
-  };
 
-  const handleCancel = () => {
-    navigate(-1);
+      navigate(`${recurringPk}/completed`);
+    } catch (e) {
+      const errs = getSeriesOverlapErrors(e);
+      if (errs.length > 0) {
+        const overlaps = errs.flatMap((x) => x.overlapping);
+        // TODO would be better if we highlighted the new ones in the list (different style)
+        // but this is also an edge case anyway (since the collisions are normally already removed)
+        // TODO show a temporary error message to the user but also refetch the collisions / remove the collisions
+        // or maybe we can just retry the mutation without the collisions and show them on the next page?
+        const count = overlaps.length;
+        setLocalError(
+          t("MyUnits.RecurringReservationForm.newOverlapError", { count })
+        );
+        document
+          .getElementById("create-recurring__reservations-list")
+          ?.scrollIntoView();
+      } else {
+        errorToast({ text: t("ReservationDialog.saveFailed") });
+        // on exception in RecurringReservation (because we are catching the individual errors)
+        // We don't need to cleanup the RecurringReservation that has zero connections.
+        // Based on documentation backend will do this for us.
+      }
+      checkedReservations.refetch();
+    }
   };
 
   // TODO (futher work) validators shouldn't be run if the field is focused
@@ -403,12 +428,15 @@ export function RecurringReservationForm({ reservationUnits }: Props) {
           </Element>
 
           {reservationUnit?.pk != null && (
-            <Element $wide>
+            <Element $wide id="create-recurring__reservations-list">
               <Label $bold>
                 {t(`${TRANS_PREFIX}.reservationsList`, {
                   count: newReservationsToMake.length,
                 })}
               </Label>
+              {localError && (
+                <Notification type="alert">{localError}</Notification>
+              )}
               <ReservationListEditor
                 setRemovedReservations={setRemovedReservations}
                 removedReservations={removedReservations}
@@ -433,14 +461,14 @@ export function RecurringReservationForm({ reservationUnits }: Props) {
 
           <ActionsWrapper>
             {/* cancel is disabled while sending because we have no rollback */}
-            <Button
-              variant="secondary"
-              data-testid="recurring-reservation-form__cancel-button"
-              onClick={handleCancel}
+            <ButtonLikeLink
+              to=".."
+              relative="path"
               disabled={isSubmitting}
+              data-testid="recurring-reservation-form__cancel-button"
             >
               {t("common.cancel")}
-            </Button>
+            </ButtonLikeLink>
             <Button
               variant="primary"
               type="submit"

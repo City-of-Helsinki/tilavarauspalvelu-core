@@ -230,7 +230,9 @@ function DialogContent({
             ? t(`errors.descriptive.${message}`)
             : t("errors.descriptive.genericError");
           errorToast({
-            text: t("ReservationDialog.saveFailed", { error: translatedError }),
+            text: t("ReservationDialog.saveFailedWithError", {
+              error: translatedError,
+            }),
           });
         } else {
           errorToast({ text: t("ReservationDialog.saveFailed") });

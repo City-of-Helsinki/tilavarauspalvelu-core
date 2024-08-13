@@ -16,7 +16,7 @@ function MyUnitsRouter(): JSX.Element {
         element={<RecurringReservation />}
       />
       <Route
-        path=":unitId/recurring/completed"
+        path=":unitId/recurring/:pk/completed"
         element={<RecurringReservationDone />}
       />
       <Route

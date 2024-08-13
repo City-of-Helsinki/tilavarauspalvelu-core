@@ -203,18 +203,24 @@ export function getTranslatedError(
   return t(`Notifications.form.errors.${error}`);
 }
 
+// TODO this should be typed
+// some mutations expect purpose others purposePk
+// but because this isn't typed we have to check runtime errors for each mutation
 export function flattenMetadata(
   values:
     | ReservationFormType
     | RecurringReservationForm
     | ReservationChangeFormType,
-  metadataSetFields: Pick<ReservationMetadataFieldNode, "fieldName">[]
+  metadataSetFields: Pick<ReservationMetadataFieldNode, "fieldName">[],
+  shouldRenamePkFields = true
 ) {
   const fieldNames = metadataSetFields.map((f) => f.fieldName).map(camelCase);
   // TODO don't use pick
   const metadataSetValues = pick(values, fieldNames);
 
-  const renamePkFields = ["ageGroup", "homeCity", "purpose"];
+  const renamePkFields = shouldRenamePkFields
+    ? ["ageGroup", "homeCity", "purpose"]
+    : [];
 
   return zipObject(
     Object.keys(metadataSetValues).map((k) =>

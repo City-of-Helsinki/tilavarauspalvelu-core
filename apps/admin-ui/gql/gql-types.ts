@@ -8235,12 +8235,12 @@ export type ReservationUnitCalendarQuery = {
   }> | null;
 };
 
-export type CreateRecurringReservationMutationVariables = Exact<{
-  input: RecurringReservationCreateMutationInput;
+export type CreateReservationSeriesMutationVariables = Exact<{
+  input: ReservationSeriesCreateMutationInput;
 }>;
 
-export type CreateRecurringReservationMutation = {
-  createRecurringReservation?: { pk?: number | null } | null;
+export type CreateReservationSeriesMutation = {
+  createReservationSeries?: { pk?: number | null } | null;
 };
 
 export type ReservationsInIntervalFragment = {
@@ -14670,59 +14670,58 @@ export type ReservationUnitCalendarQueryResult = Apollo.QueryResult<
   ReservationUnitCalendarQuery,
   ReservationUnitCalendarQueryVariables
 >;
-export const CreateRecurringReservationDocument = gql`
-  mutation CreateRecurringReservation(
-    $input: RecurringReservationCreateMutationInput!
+export const CreateReservationSeriesDocument = gql`
+  mutation CreateReservationSeries(
+    $input: ReservationSeriesCreateMutationInput!
   ) {
-    createRecurringReservation(input: $input) {
+    createReservationSeries(input: $input) {
       pk
     }
   }
 `;
-export type CreateRecurringReservationMutationFn = Apollo.MutationFunction<
-  CreateRecurringReservationMutation,
-  CreateRecurringReservationMutationVariables
+export type CreateReservationSeriesMutationFn = Apollo.MutationFunction<
+  CreateReservationSeriesMutation,
+  CreateReservationSeriesMutationVariables
 >;
 
 /**
- * __useCreateRecurringReservationMutation__
+ * __useCreateReservationSeriesMutation__
  *
- * To run a mutation, you first call `useCreateRecurringReservationMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateRecurringReservationMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useCreateReservationSeriesMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateReservationSeriesMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [createRecurringReservationMutation, { data, loading, error }] = useCreateRecurringReservationMutation({
+ * const [createReservationSeriesMutation, { data, loading, error }] = useCreateReservationSeriesMutation({
  *   variables: {
  *      input: // value for 'input'
  *   },
  * });
  */
-export function useCreateRecurringReservationMutation(
+export function useCreateReservationSeriesMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    CreateRecurringReservationMutation,
-    CreateRecurringReservationMutationVariables
+    CreateReservationSeriesMutation,
+    CreateReservationSeriesMutationVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
-    CreateRecurringReservationMutation,
-    CreateRecurringReservationMutationVariables
-  >(CreateRecurringReservationDocument, options);
+    CreateReservationSeriesMutation,
+    CreateReservationSeriesMutationVariables
+  >(CreateReservationSeriesDocument, options);
 }
-export type CreateRecurringReservationMutationHookResult = ReturnType<
-  typeof useCreateRecurringReservationMutation
+export type CreateReservationSeriesMutationHookResult = ReturnType<
+  typeof useCreateReservationSeriesMutation
 >;
-export type CreateRecurringReservationMutationResult =
-  Apollo.MutationResult<CreateRecurringReservationMutation>;
-export type CreateRecurringReservationMutationOptions =
-  Apollo.BaseMutationOptions<
-    CreateRecurringReservationMutation,
-    CreateRecurringReservationMutationVariables
-  >;
+export type CreateReservationSeriesMutationResult =
+  Apollo.MutationResult<CreateReservationSeriesMutation>;
+export type CreateReservationSeriesMutationOptions = Apollo.BaseMutationOptions<
+  CreateReservationSeriesMutation,
+  CreateReservationSeriesMutationVariables
+>;
 export const ReservationTimesInReservationUnitDocument = gql`
   query ReservationTimesInReservationUnit(
     $id: ID!
