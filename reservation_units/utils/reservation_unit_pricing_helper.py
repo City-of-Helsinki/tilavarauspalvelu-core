@@ -22,11 +22,24 @@ class ReservationUnitPricingHelper:
     def get_price_by_date(
         cls, reservation_unit: ReservationUnit, by_date: datetime.date
     ) -> ReservationUnitPricing | None:
+        active_price = cls.get_active_price(reservation_unit)
         future_price = cls.get_future_price(reservation_unit)
-        if future_price and future_price.begins <= by_date:
+
+        if (
+            future_price
+            and future_price.begins <= by_date
+            and (
+                # Only return future price if it has begun and has the same tax percentage as the current active price.
+                # When the future price has a different tax percentage, it should only be used for reservations which
+                # are made after the ReservationUnitPricing.begins date. TILA-3470
+                active_price.tax_percentage == future_price.tax_percentage
+                # If either of the prices is free, the future price can be returned, as the percentage is irrelevant.
+                or active_price.pricing_type != future_price.pricing_type
+            )
+        ):
             return future_price
 
-        return cls.get_active_price(reservation_unit)
+        return active_price
 
     @classmethod
     def is_active(cls, pricing: dict[str, Any]) -> bool:
