@@ -1,4 +1,5 @@
 from django.contrib import admin
+from rangefilter.filters import DateRangeFilterBuilder
 
 from reservation_units.models import ReservationUnitPricing
 from utils.decimal_utils import round_decimal
@@ -12,6 +13,7 @@ __all__ = [
 class ReservationUnitPricingAdmin(admin.ModelAdmin):
     # List
     list_display = [
+        "id",
         "reservation_unit",
         "begins",
         "lowest_price",
@@ -20,6 +22,11 @@ class ReservationUnitPricingAdmin(admin.ModelAdmin):
         "price_unit",
         "status",
     ]
+    list_filter = [
+        ("begins", DateRangeFilterBuilder()),
+        "status",
+    ]
+    ordering = ["-begins"]
 
     # Form
     fields = [
