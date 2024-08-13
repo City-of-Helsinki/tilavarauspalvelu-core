@@ -107,6 +107,9 @@ class ReservationUnitPricing(models.Model):
     def __str__(self) -> str:
         return f"{self.begins}: {self.lowest_price} - {self.highest_price} ({self.tax_percentage.value})"
 
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__}: {self.pk} ({self!s})>"
+
     @property
     def lowest_price_net(self) -> Decimal:
         if self.tax_percentage == 0:
