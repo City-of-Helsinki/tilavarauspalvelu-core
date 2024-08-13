@@ -757,6 +757,7 @@ def test_reservation__update__price_calculation_uses_to_future_pricing(graphql):
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
         status=PricingStatus.PRICING_STATUS_ACTIVE,
         highest_price=Decimal("20.0"),
+        tax_percentage__value=Decimal("25.5"),
         reservation_unit=reservation.reservation_unit.first(),
     )
 
@@ -765,6 +766,7 @@ def test_reservation__update__price_calculation_uses_to_future_pricing(graphql):
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
         status=PricingStatus.PRICING_STATUS_FUTURE,
         highest_price=Decimal("30.0"),
+        tax_percentage__value=Decimal("25.5"),
         reservation_unit=reservation.reservation_unit.first(),
     )
 
