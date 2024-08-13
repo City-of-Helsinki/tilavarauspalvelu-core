@@ -13,15 +13,14 @@ import {
 import { Permission } from "@/modules/permissionHelper";
 import usePermission from "@/hooks/usePermission";
 import { getEventBuffers } from "common/src/calendar/util";
-import { reservationUrl } from "@/common/urls";
+import { getReservationUrl } from "@/common/urls";
 import { useNotification } from "@/context/NotificationContext";
 import Legend from "@/component/reservations/requested/Legend";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
-import { PUBLIC_URL } from "@/common/const";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
-import { TFunction } from "next-i18next";
-import { getReserveeName } from "app/common/util";
+import { type TFunction } from "next-i18next";
+import { getReserveeName } from "@/common/util";
 
 type Props = {
   begin: string;
@@ -167,9 +166,7 @@ export function ReservationUnitCalendar({
             e.event?.pk &&
             hasPermission(e.event, Permission.CAN_VIEW_RESERVATIONS)
           ) {
-            // TODO this looks dangerous, does public url end in slash or not?
-            // TODO use an url builder
-            window.open(PUBLIC_URL + reservationUrl(e.event?.pk), "_blank");
+            window.open(getReservationUrl(e.event?.pk), "_blank");
           }
         }}
         underlineEvents

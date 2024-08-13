@@ -7,7 +7,7 @@ import { Button, Tabs as HDSTabs } from "hds-react";
 import { breakpoints } from "common/src/common/style";
 import { parseAddress } from "@/common/util";
 import { Container } from "@/styles/layout";
-import { myUnitUrl } from "@/common/urls";
+import { getRecurringReservationUrl } from "@/common/urls";
 import { BasicLink } from "@/styles/util";
 import Loader from "@/component/Loader";
 import { ReservationUnitCalendarView } from "./ReservationUnitCalendarView";
@@ -89,9 +89,7 @@ export function MyUnitView() {
     return <div>{t("MyUnits.Calendar.error.unitNotFound")}</div>;
   }
 
-  const recurringReservationUrl = `${myUnitUrl(
-    parseInt(pk, 10)
-  )}/recurring-reservation`;
+  const recurringReservationUrl = getRecurringReservationUrl(pk);
 
   const reservationUnitOptions = filterNonNullable(
     data?.unit?.reservationunitSet

@@ -86,7 +86,7 @@ export const myUnitUrl = (unitId: number): string =>
 export function getApplicationSectionUrl(
   applicationPk: Maybe<number> | undefined,
   sectionPk: Maybe<number> | undefined
-) {
+): string {
   if (applicationPk == null || sectionPk == null) {
     return "";
   }
@@ -94,4 +94,16 @@ export function getApplicationSectionUrl(
     return "";
   }
   return `${PUBLIC_URL}/application/${applicationPk}/details#${sectionPk}`;
+}
+
+// TODO PUBLIC_URL is problematic, it needs to be added when not using react-router or something else?
+export function getRecurringReservationUrl(
+  pk: Maybe<string | number> | undefined,
+  includePrefix = false
+): string {
+  if (pk == null || !(Number(pk) > 0)) {
+    return "";
+  }
+  const prefix = includePrefix ? PUBLIC_URL : "";
+  return `${prefix}/my-units/${pk}/recurring`;
 }
