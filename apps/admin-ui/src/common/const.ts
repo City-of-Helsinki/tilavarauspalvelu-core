@@ -36,6 +36,7 @@ export const GQL_MAX_RESULTS_PER_QUERY = 100;
 export const MAX_NAME_LENGTH = 22;
 export const MAX_UNIT_NAME_LENGTH = 40;
 export const MAX_APPLICATION_ROUND_NAME_LENGTH = 30;
+export const MAX_ALLOCATION_CARD_UNIT_NAME_LENGTH = 31;
 
 // TODO PUBLIC_URL should be cleaned up and always end in /
 export const HERO_IMAGE_URL = `${PUBLIC_URL}/hero-user@1x.jpg`;

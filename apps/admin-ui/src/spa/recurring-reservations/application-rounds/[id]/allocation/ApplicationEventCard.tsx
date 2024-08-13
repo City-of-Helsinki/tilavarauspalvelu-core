@@ -9,7 +9,7 @@ import {
 } from "@gql/gql-types";
 import { SemiBold, fontMedium } from "common";
 import { ageGroup } from "@/component/reservations/requested/util";
-import { filterNonNullable } from "common/src/helpers";
+import { filterNonNullable, truncate } from "common/src/helpers";
 import { convertWeekday } from "common/src/conversion";
 import {
   type ReservationUnitFilterQueryT,
@@ -24,6 +24,7 @@ import { type ApolloQueryResult } from "@apollo/client";
 import { getApplicationSectionUrl } from "@/common/urls";
 import { errorToast } from "common/src/common/toast";
 import { getApplicantName } from "@/helpers";
+import { MAX_ALLOCATION_CARD_UNIT_NAME_LENGTH } from "@/common/const";
 
 export type AllocationApplicationSectionCardType =
   | "unallocated"
@@ -408,6 +409,9 @@ function AllocatedScheduleSection({
     allocatedReservationUnit != null &&
     allocatedReservationUnit.pk !== currentReservationUnit.pk;
 
+  const combinedName = `${allocatedReservationUnit?.nameFi ?? "-"}, ${
+    allocatedReservationUnit.unit?.nameFi ?? "-"
+  }`;
   return (
     <ScheduleCard key={allocatedTimeSlot.pk}>
       {/* TODO functionality for selecting the schedule vs. an applicationSection */}
@@ -421,7 +425,9 @@ function AllocatedScheduleSection({
         <SemiBold>
           {t(`dayShort.${day}`)} {formatTime(begin)}-{formatTime(end)}
         </SemiBold>
-        <div>{allocatedReservationUnit?.nameFi ?? "-"}</div>
+        <div>
+          {truncate(combinedName, MAX_ALLOCATION_CARD_UNIT_NAME_LENGTH)}
+        </div>
       </div>
     </ScheduleCard>
   );
