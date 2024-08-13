@@ -89,7 +89,7 @@ function UnitReservationsView(): JSX.Element {
           options={reservationUnitTypeOptions}
         />
       </AutoGrid>
-      <SearchTags hide={[]} translateTag={translateTag} />
+      <SearchTags hide={["date"]} translateTag={translateTag} />
       <HR />
       <HorisontalFlexWrapper>
         <Button
