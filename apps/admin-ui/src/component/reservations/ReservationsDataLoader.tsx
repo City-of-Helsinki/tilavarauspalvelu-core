@@ -114,7 +114,10 @@ function mapFilterParams(
     isRecurring = false;
   }
 
-  const applyingForFreeOfCharge = searchParams.get("freeOfCharge") === "true";
+  const freeOfCharge = searchParams.get("freeOfCharge");
+  const applyingForFreeOfCharge = freeOfCharge
+    ? freeOfCharge === "true"
+    : undefined;
 
   return {
     unit,
