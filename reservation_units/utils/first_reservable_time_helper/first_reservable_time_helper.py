@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING
+import json
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, Any
 
+from django.core.cache import cache
 from django.db import models
 from graphene_django.settings import graphene_settings
 from lookup_property import L
@@ -29,6 +32,28 @@ if TYPE_CHECKING:
     from reservation_units.querysets import ReservationUnitQuerySet
 
 type ReservationUnitPK = int
+
+
+@dataclass
+class CachedReservableTime:
+    frt: datetime.datetime | None
+    closed: bool
+    valid_until: datetime.datetime
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> CachedReservableTime:
+        return cls(
+            frt=None if data["frt"] == "None" else datetime.datetime.fromisoformat(data["frt"]),
+            closed=data["closed"].lower() == "true",
+            valid_until=datetime.datetime.fromisoformat(data["valid_until"]),
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "frt": self.frt.isoformat() if self.frt is not None else "None",
+            "closed": str(self.closed),
+            "valid_until": self.valid_until.isoformat(),
+        }
 
 
 class FirstReservableTimeHelper:
@@ -126,9 +151,10 @@ class FirstReservableTimeHelper:
         minimum_duration_minutes: float | Decimal | None = None,
         show_only_reservable: bool = False,
         pagination_args: PaginationArgs | None = None,
+        cache_key: str = "",
     ) -> None:
-        now = local_datetime()
-        today = now.date()
+        self.now = local_datetime()
+        today = self.now.date()
         two_years_from_now = today + datetime.timedelta(days=731)  # 2 years + 1 day as a buffer
 
         #########################
@@ -177,7 +203,31 @@ class FirstReservableTimeHelper:
         self.filter_time_end = filter_time_end
         self.filter_minimum_duration_minutes = minimum_duration_minutes
         self.show_only_reservable = show_only_reservable
-        self.pagination_args = pagination_args
+
+        self.cache_key = cache_key
+
+        ##############
+        # Pagination #
+        ##############
+
+        if pagination_args is not None:
+            pagination_args["size"] = graphene_settings.RELAY_CONNECTION_MAX_LIMIT
+            qs_slice = calculate_queryset_slice(**pagination_args)
+            self.start_offset = qs_slice.start
+            self.stop_offset = qs_slice.stop
+            self.needed_reservation_units = self.stop_offset - self.start_offset
+            # If we should only show reservable reservation units, increase the chunk size to max page size
+            # so that if filtering occurs, we don't need to fetch so many chunks.
+            self.chunk_size = (
+                graphene_settings.RELAY_CONNECTION_MAX_LIMIT
+                if self.show_only_reservable
+                else self.needed_reservation_units
+            )
+        else:
+            self.start_offset = 0
+            self.stop_offset = reservation_unit_queryset.count()
+            self.needed_reservation_units = self.stop_offset
+            self.chunk_size = self.stop_offset
 
         ##########################################
         # Get required objects from the database #
@@ -219,34 +269,85 @@ class FirstReservableTimeHelper:
 
         if not AffectingTimeSpan.is_valid():
             AffectingTimeSpan.refresh()
+            cache.delete(self.cache_key)
 
-        chunk_size: int = qs.count()
-        if self.pagination_args is not None:
-            self.pagination_args["size"] = chunk_size
-            qs_slice = calculate_queryset_slice(**self.pagination_args)
-            chunk_size = qs_slice.stop - qs_slice.start
-            qs = qs[qs_slice.start :]
+        has_valid_results_for_previous_pages = self._read_cached_results()
+        if has_valid_results_for_previous_pages:
+            # If we already have cached FRT results for enough reservation units to fill the page
+            # AND all the previous pages, then we don't need to calculate anything.
+            # NOTE: This does not support different orderings of the same queryset!
+            if len(self.first_reservable_times) >= self.stop_offset:
+                return
 
-        page_size: int = 0
-        # If we should only show reservable reservation units, increase the chunk size to max page size
-        # so that if filtering occurs, we don't need to fetch so many chunks.
-        size = graphene_settings.RELAY_CONNECTION_MAX_LIMIT if self.show_only_reservable else chunk_size
+            # Otherwise, we can still skip looping through the previous pages.
+            qs = qs[self.start_offset :]
+            self.start_offset = 0  # Remove offset since we skip the previous pages
 
-        for reservation_unit in qs.hooked_iterator(self._get_elements_for_reservation_units, chunk_size=size):
+        # If we don't have valid results, and this is not the first page,
+        # we should fetch the current and previous pages in on chunk. The next chunk
+        # will also be bigger (if needed), but likely small enough (<100) not to cause any problems.
+        elif self.start_offset > 0:
+            self.chunk_size = self.stop_offset
+
+        results: int = 0
+        for reservation_unit in qs.hooked_iterator(self._get_affecting_time_spans, chunk_size=self.chunk_size):
             helper = ReservationUnitFirstReservableTimeHelper(parent=self, reservation_unit=reservation_unit)
             is_closed, first_reservable_time = helper.calculate_first_reservable_time()
 
             self.reservation_unit_closed_statuses[reservation_unit.pk] = is_closed
             self.first_reservable_times[reservation_unit.pk] = first_reservable_time
 
-            # If we have pagination args, we can stop if we have enough reservation units to fill the page size.
-            # If 'show_only_reservable' is True, we might need to fetch more than the first chunk size.
-            if self.pagination_args is not None:
-                if not self.show_only_reservable or first_reservable_time is not None:
-                    page_size += 1
+            # Start offset should exist only if we need to recalculate previous pages.
+            # -> Don't count the result for the current page.
+            if self.start_offset > 0:
+                self.start_offset -= 1
+                continue
 
-                if page_size >= chunk_size:
-                    break
+            # If we should only show reservable reservation units, then we should count the result for the
+            # current page only if there is a first reservable time.
+            if not self.show_only_reservable or first_reservable_time is not None:
+                results += 1
+
+            # This only really matters when showing only reservable reservation units,
+            # since we might need to fetch more than the first chunk size.
+            if results >= self.needed_reservation_units:
+                break
+
+        self._cache_results()
+
+    def _read_cached_results(self) -> bool:
+        """
+        Reads cached FRT results into the helper's memory.
+
+        Check that we have valid results for all the previous pages.
+        If not, we must recalculate results for all previous pages, since they might be different
+        if one FRT has changed to None or from None to a valid value.
+        """
+        cached_data: dict[ReservationUnitPK, dict[str, Any]] = json.loads(cache.get(self.cache_key, "{}"))
+
+        has_valid_results_for_previous_pages = bool(cached_data)
+        for pk, item in cached_data.items():
+            cached_result = CachedReservableTime.from_dict(item)
+            if cached_result.valid_until < self.now:
+                self.reservation_unit_closed_statuses.clear()
+                self.first_reservable_times.clear()
+                return False
+
+            self.reservation_unit_closed_statuses[pk] = cached_result.closed
+            self.first_reservable_times[pk] = cached_result.frt
+
+        return has_valid_results_for_previous_pages
+
+    def _cache_results(self) -> None:
+        """Save the calculated results to the cache."""
+        cached_data: dict[ReservationUnitPK, dict[str, Any]] = {}
+        is_valid = self.now + datetime.timedelta(minutes=2)
+
+        for pk, frt in self.first_reservable_times.items():
+            is_closed = self.reservation_unit_closed_statuses[pk]
+            cached_data[pk] = CachedReservableTime(frt=frt, closed=is_closed, valid_until=is_valid).to_dict()
+
+        cache.set(self.cache_key, json.dumps(cached_data), timeout=120)
 
     def get_annotated_queryset(self) -> ReservationUnitQuerySet | QuerySet[ReservationUnit]:
         """Annotate the queryset with `first_reservable_datetime` and `is_closed` fields."""
@@ -332,7 +433,7 @@ class FirstReservableTimeHelper:
             ),
         ]
 
-    def _get_elements_for_reservation_units(self, reservation_units: list[ReservationUnit]) -> None:
+    def _get_affecting_time_spans(self, reservation_units: list[ReservationUnit]) -> None:
         """
         Find all AffectingTimeSpans for the given ReservationUnits and convert them to a dicts of
         "closed" and "blocking" TimeSpanElements by the affected ReservationUnit's primary key.

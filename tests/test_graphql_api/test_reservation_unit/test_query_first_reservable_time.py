@@ -1,17 +1,20 @@
+import json
 from dataclasses import asdict, dataclass
 from datetime import UTC, date, datetime, time, timedelta
 from functools import partial
-from typing import NamedTuple
+from typing import Any, NamedTuple
 
 import freezegun
 import pytest
+from django.core.cache import cache
 from graphene_django_extensions.testing.client import GQLResponse
 from graphene_django_extensions.testing.utils import parametrize_helper
 
 from applications.enums import ApplicationRoundStatusChoice
-from common.date_utils import DEFAULT_TIMEZONE, local_date
+from common.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import ReservationUnit, ReservationUnitHierarchy
+from reservation_units.utils.first_reservable_time_helper.first_reservable_time_helper import CachedReservableTime
 from reservations.enums import ReservationStateChoice, ReservationTypeChoice
 from reservations.models import AffectingTimeSpan
 from tests.factories import (
@@ -67,6 +70,17 @@ def dt(*, year: int = NEXT_YEAR, month: int = 1, day: int = 1, hour: int = 0, mi
 
 
 NOW = _datetime()
+
+
+@pytest.fixture(autouse=True)
+def _clear_cache() -> None:
+    # Cache needs to be cleared between tests do that
+    # FRT calculations don't reuse results between runs.
+    try:
+        cache.clear()
+        yield
+    finally:
+        cache.clear()
 
 
 @pytest.fixture
@@ -2450,11 +2464,400 @@ def test__reservation_unit__first_reservable_time__no_bug_in_pagination_from_hau
         end_datetime=_datetime(hour=12),
     )
 
+    ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
+
     query = reservation_units_reservable_query(order_by="nameFiAsc", offset=1)
     response = graphql(query)
     assert response.has_errors is False, response
 
     assert len(response) == 1
-
     assert frt(response) == dt(hour=10)
     assert is_closed(response) is False
+
+
+########################################################################################################################
+
+
+@freezegun.freeze_time(NOW)
+def test__reservation_unit__first_reservable_time__remove_not_reservable(graphql, reservation_unit):
+    """
+    Check that when 'show_only_reservable' is True, non-reservable reservation units are removed and handled
+    correctly with page size. Also check that the correct number of queries are made.
+    """
+    common_space = SpaceFactory.create()
+
+    ReservationUnitFactory(name="A", spaces=[common_space], unit=reservation_unit.unit)
+
+    reservation_unit.name = "B"
+    reservation_unit.spaces.set([common_space])
+    reservation_unit.save()
+
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(hour=10),
+        end_datetime=_datetime(hour=12),
+    )
+
+    ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
+
+    query = reservation_units_reservable_query(order_by="nameFiAsc", show_only_reservable=True, first=1)
+    response = graphql(query)
+    assert response.has_errors is False, response
+
+    assert len(response) == 1
+    assert frt(response) == dt(hour=10)
+    assert is_closed(response) is False
+
+    # Check that we fetch reservation units in a big chunk which is then filtered
+    # instead of fetching chunks of the expected page size.
+    # Queries:
+    #  1) Fetch reservation units for FRT calculation
+    #  2) Fetch hauki resources for FRT calculation
+    #  3) Fetch reservable time spans for FRT calculation
+    #  4) Fetch application rounds for FRT calculation
+    #  5) Fetch affecting time spans for FRT calculation
+    #  6) Count reservation units for response
+    #  7) Fetch reservation units for response
+    response.assert_query_count(7)
+
+
+########################################################################################################################
+
+
+@freezegun.freeze_time(NOW)
+def test__reservation_unit__first_reservable_time__previous_page_cached(graphql, reservation_unit):
+    """Checks that the page results are cached so that pagination works correctly."""
+    common_space = SpaceFactory.create()
+
+    reservation_unit_2 = ReservationUnitFactory(name="A", spaces=[common_space], unit=reservation_unit.unit)
+
+    reservation_unit.name = "B"
+    reservation_unit.spaces.set([common_space])
+    reservation_unit.save()
+
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(hour=10),
+        end_datetime=_datetime(hour=12),
+    )
+
+    ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
+
+    # See "ReservationUnitFilterSet.get_filter_reservable" on how this is calculated
+    cache_key = "Y2FsY3VsYXRlX2ZpcnN0X3Jlc2VydmFibGVfdGltZT1UcnVlLG9yZGVyX2J5PVsnbmFtZV9maSdd"
+
+    query_1 = reservation_units_reservable_query(order_by="nameFiAsc", first=1)
+    response_1 = graphql(query_1)
+    assert response_1.has_errors is False, response_1
+
+    assert len(response_1) == 1
+    assert frt(response_1) is None
+    assert is_closed(response_1) is True
+
+    # Check cache contents.
+    cached_value: dict[str, dict[str, Any]] = json.loads(cache.get(cache_key))
+    assert len(cached_value) == 1
+    assert cached_value[str(reservation_unit_2.pk)]["frt"] == "None"
+    assert cached_value[str(reservation_unit_2.pk)]["closed"] == "True"
+
+    query_2 = reservation_units_reservable_query(order_by="nameFiAsc", first=1, offset=1)
+    response_2 = graphql(query_2)
+    assert response_2.has_errors is False, response_2
+
+    assert len(response_2) == 1
+    assert frt(response_2) == dt(hour=10)
+    assert is_closed(response_2) is False
+
+    # Check cache contents has been updated.
+    cached_value: dict[str, dict[str, Any]] = json.loads(cache.get(cache_key))
+    assert len(cached_value) == 2
+    assert cached_value[str(reservation_unit_2.pk)]["frt"] == "None"
+    assert cached_value[str(reservation_unit_2.pk)]["closed"] == "True"
+    assert cached_value[str(reservation_unit.pk)]["frt"] == "2025-01-01T10:00:00+02:00"
+    assert cached_value[str(reservation_unit.pk)]["closed"] == "False"
+
+    # Check that there was no additional queries
+    response_2.assert_query_count(7)
+    # ...and that we were able to skip iterating through the previous pages due to cached results.
+    assert "OFFSET 1" in response_2.queries[0]
+
+
+########################################################################################################################
+
+
+@freezegun.freeze_time(NOW)
+def test__reservation_unit__first_reservable_time__previous_page_not_cached(graphql, reservation_unit):
+    """
+    Check that when we query the second page first, we calculate the first page's results so that
+    pagination to work correctly for the second page.
+    """
+    common_space = SpaceFactory.create()
+
+    reservation_unit_2 = ReservationUnitFactory(name="A", spaces=[common_space], unit=reservation_unit.unit)
+
+    reservation_unit.name = "B"
+    reservation_unit.spaces.set([common_space])
+    reservation_unit.save()
+
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(hour=10),
+        end_datetime=_datetime(hour=12),
+    )
+
+    ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
+
+    # See "ReservationUnitFilterSet.get_filter_reservable" on how this is calculated
+    cache_key = "Y2FsY3VsYXRlX2ZpcnN0X3Jlc2VydmFibGVfdGltZT1UcnVlLG9yZGVyX2J5PVsnbmFtZV9maSdd"
+
+    query = reservation_units_reservable_query(order_by="nameFiAsc", first=1, offset=1)
+    response = graphql(query)
+    assert response.has_errors is False, response
+
+    assert len(response) == 1
+    assert frt(response) == dt(hour=10)
+    assert is_closed(response) is False
+
+    # Check cache contents has been updated.
+    cached_value: dict[str, dict[str, Any]] = json.loads(cache.get(cache_key))
+    assert len(cached_value) == 2
+    assert cached_value[str(reservation_unit_2.pk)]["frt"] == "None"
+    assert cached_value[str(reservation_unit_2.pk)]["closed"] == "True"
+    assert cached_value[str(reservation_unit.pk)]["frt"] == "2025-01-01T10:00:00+02:00"
+    assert cached_value[str(reservation_unit.pk)]["closed"] == "False"
+
+    # Check that there was no additional queries
+    response.assert_query_count(7)
+    # We also cannot skip previous pages due to missing cached results.
+    assert "OFFSET 1" not in response.queries[0]
+
+
+########################################################################################################################
+
+
+@freezegun.freeze_time(NOW)
+def test__reservation_unit__first_reservable_time__different_filters_dont_share_cache(graphql, reservation_unit):
+    """Checks that cached results based on different filters are not shared."""
+    common_space = SpaceFactory.create()
+
+    ReservationUnitFactory(name="A", spaces=[common_space], unit=reservation_unit.unit)
+
+    reservation_unit.name = "B"
+    reservation_unit.spaces.set([common_space])
+    reservation_unit.save()
+
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(hour=10),
+        end_datetime=_datetime(hour=12),
+    )
+
+    ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
+
+    query_1 = reservation_units_reservable_query(order_by="nameFiAsc", first=1)
+    response_1 = graphql(query_1)
+    assert response_1.has_errors is False, response_1
+
+    assert len(response_1) == 1
+    assert frt(response_1) is None
+    assert is_closed(response_1) is True
+
+    # See "ReservationUnitFilterSet.get_filter_reservable" on how this is calculated
+    cache_key_1 = "Y2FsY3VsYXRlX2ZpcnN0X3Jlc2VydmFibGVfdGltZT1UcnVlLG9yZGVyX2J5PVsnbmFtZV9maSdd"
+
+    # Check that we did cache the first page's results.
+    cached_value: dict[str, dict[str, Any]] = json.loads(cache.get(cache_key_1))
+    assert len(cached_value) == 1
+
+    # Use a different query. Note: even ordering affects results.
+    query_2 = reservation_units_reservable_query(order_by="nameFiDesc", first=1)
+    response_2 = graphql(query_2)
+    assert response_2.has_errors is False, response_2
+
+    assert len(response_2) == 1
+    assert frt(response_2) == dt(hour=10)
+    assert is_closed(response_2) is False
+
+    cache_key_2 = "Y2FsY3VsYXRlX2ZpcnN0X3Jlc2VydmFibGVfdGltZT1UcnVlLG9yZGVyX2J5PVsnLW5hbWVfZmknXQ=="
+
+    # Check that we have a new cached value for the second filter's results.
+    cached_value: dict[str, dict[str, Any]] = json.loads(cache.get(cache_key_2))
+    assert len(cached_value) == 1
+    # Cache for the previous request is still there.
+    cached_value: dict[str, dict[str, Any]] = json.loads(cache.get(cache_key_1))
+    assert len(cached_value) == 1
+
+    # We couldn't use the cached results, so make database queries as usual.
+    response_2.assert_query_count(7)
+
+
+########################################################################################################################
+
+
+@freezegun.freeze_time(NOW)
+def test__reservation_unit__first_reservable_time__use_cached_results(graphql, reservation_unit):
+    """Check that when we query the same page twice, we use the cached results on the second query."""
+    common_space = SpaceFactory.create()
+
+    ReservationUnitFactory(name="A", spaces=[common_space], unit=reservation_unit.unit)
+
+    reservation_unit.name = "B"
+    reservation_unit.spaces.set([common_space])
+    reservation_unit.save()
+
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(hour=10),
+        end_datetime=_datetime(hour=12),
+    )
+
+    ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
+
+    query_1 = reservation_units_reservable_query(order_by="nameFiAsc", first=1)
+    response_1 = graphql(query_1)
+    assert response_1.has_errors is False, response_1
+
+    assert len(response_1) == 1
+    assert frt(response_1) is None
+    assert is_closed(response_1) is True
+
+    # See "ReservationUnitFilterSet.get_filter_reservable" on how this is calculated
+    cache_key_1 = "Y2FsY3VsYXRlX2ZpcnN0X3Jlc2VydmFibGVfdGltZT1UcnVlLG9yZGVyX2J5PVsnbmFtZV9maSdd"
+    # Check tha results were cached.
+    cached_value: dict[str, dict[str, Any]] = json.loads(cache.get(cache_key_1))
+    assert len(cached_value) == 1
+
+    query_2 = reservation_units_reservable_query(order_by="nameFiAsc", first=1)
+    response_2 = graphql(query_2)
+    assert response_2.has_errors is False, response_2
+
+    assert len(response_2) == 1
+    assert frt(response_2) is None
+    assert is_closed(response_2) is True
+
+    # Since we used cached results, we didn't need to make database queries.
+    # Only make queries for:
+    #  1) Count reservation units for response
+    #  2) Fetch reservation units for response
+    response_2.assert_query_count(2)
+
+
+########################################################################################################################
+
+
+@freezegun.freeze_time(NOW)
+def test__reservation_unit__first_reservable_time__use_cached_results__not_first_page(graphql, reservation_unit):
+    """
+    Check that cached results are used for pages other than the first page if they exist
+    for both the first AND the second page.
+    """
+    common_space = SpaceFactory.create()
+
+    ReservationUnitFactory(name="A", spaces=[common_space], unit=reservation_unit.unit)
+
+    reservation_unit.name = "B"
+    reservation_unit.spaces.set([common_space])
+    reservation_unit.save()
+
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(hour=10),
+        end_datetime=_datetime(hour=12),
+    )
+
+    ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
+
+    query_1 = reservation_units_reservable_query(order_by="nameFiAsc", first=1)
+    response_1 = graphql(query_1)
+    assert response_1.has_errors is False, response_1
+
+    assert len(response_1) == 1
+    assert frt(response_1) is None
+    assert is_closed(response_1) is True
+
+    query_2 = reservation_units_reservable_query(order_by="nameFiAsc", first=1, offset=1)
+    response_2 = graphql(query_2)
+    assert response_2.has_errors is False, response_2
+
+    assert len(response_2) == 1
+    assert frt(response_2) == dt(hour=10)
+    assert is_closed(response_2) is False
+
+    query_3 = reservation_units_reservable_query(order_by="nameFiAsc", first=1, offset=1)
+    response_3 = graphql(query_3)
+    assert response_3.has_errors is False, response_3
+
+    assert len(response_3) == 1
+    assert frt(response_3) == dt(hour=10)
+    assert is_closed(response_3) is False
+
+    # Since we used cached results, we didn't need to make database queries.
+    # Only make queries for:
+    #  1) Count reservation units for response
+    #  2) Fetch reservation units for response
+    response_3.assert_query_count(2)
+
+
+########################################################################################################################
+
+
+@freezegun.freeze_time(NOW)
+def test__reservation_unit__first_reservable_time__cached_results_not_valid_anymore(graphql, reservation_unit):
+    """
+    Check that we correctly identify that one of the cached results is not valid anymore.
+    This triggers a re-calculation for all results up to the current page, since the results
+    might have changed in previous pages too.
+    """
+    common_space = SpaceFactory.create()
+
+    reservation_unit_2 = ReservationUnitFactory(name="A", spaces=[common_space], unit=reservation_unit.unit)
+
+    reservation_unit.name = "B"
+    reservation_unit.spaces.set([common_space])
+    reservation_unit.save()
+
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(hour=10),
+        end_datetime=_datetime(hour=12),
+    )
+
+    ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
+
+    # Set the cached results manually. Note that one of the results is not valid anymore!
+    cached_results = {
+        # First page
+        str(reservation_unit_2): CachedReservableTime(
+            frt=None,
+            closed=True,
+            valid_until=local_datetime() - timedelta(minutes=1),  # invalid
+        ).to_dict(),
+        # Second page
+        str(reservation_unit): CachedReservableTime(
+            frt=datetime.fromisoformat("2025-01-01T10:00:00+02:00"),
+            closed=False,
+            valid_until=local_datetime() + timedelta(minutes=1),  # valid
+        ).to_dict(),
+    }
+    cache_key = "Y2FsY3VsYXRlX2ZpcnN0X3Jlc2VydmFibGVfdGltZT1UcnVlLG9yZGVyX2J5PVsnbmFtZV9maSdd"
+    cache.set(cache_key, json.dumps(cached_results), timeout=120)
+
+    query = reservation_units_reservable_query(order_by="nameFiAsc", first=1, offset=1)
+    response = graphql(query)
+    assert response.has_errors is False, response
+
+    assert len(response) == 1
+    assert frt(response) == dt(hour=10)
+    assert is_closed(response) is False
+
+    # Since we couldn't use all the cached results,
+    # we needed to fetch data from the database for re-calculation.
+    response.assert_query_count(7)

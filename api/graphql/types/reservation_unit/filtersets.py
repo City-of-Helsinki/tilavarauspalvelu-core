@@ -1,3 +1,4 @@
+import base64
 import operator
 from functools import reduce
 from typing import TYPE_CHECKING, Any
@@ -210,6 +211,12 @@ class ReservationUnitFilterSet(ModelFilterSet):
         if not calculate_first_reservable_time:
             return qs
 
+        # Calculate a cache key for pagination
+        # Pagination does not affect the calculated results (note: ordering does!).
+        unaffecting = {"first", "last", "offset", "after", "before"}
+        args = sorted(f"{key}={value}" for key, value in self.data.items() if key not in unaffecting)
+        cache_key: str = base64.b64encode(",".join(args).encode()).decode()
+
         # Fetch the pagination information from the request.
         # This is set by the 'DjangoConnectionField' for each connection field in the request.
         # In this case, we want the 'reservation_units' entrypoints connection field pagination args,
@@ -222,7 +229,7 @@ class ReservationUnitFilterSet(ModelFilterSet):
         time_start: datetime.time | None = value["reservable_time_start"]
         time_end: datetime.time | None = value["reservable_time_end"]
         minimum_duration_minutes: Decimal | None = value["reservable_minimum_duration_minutes"]
-        show_only_reservable: bool = value.get("show_only_reservable", False)
+        show_only_reservable = bool(value.get("show_only_reservable", False))
 
         # Annotate all ReservationUnits with `first_reservable_datetime` since we need the info in the GraphQL object.
         # If the GQL field is not selected for the query, then this is unnecessary, but if we do not annotate the info
@@ -235,6 +242,7 @@ class ReservationUnitFilterSet(ModelFilterSet):
             minimum_duration_minutes=minimum_duration_minutes,
             show_only_reservable=show_only_reservable,
             pagination_args=pagination_args,
+            cache_key=cache_key,
         )
 
         if not show_only_reservable:

@@ -46,6 +46,7 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
         minimum_duration_minutes: float | Decimal | None,
         show_only_reservable: bool = False,
         pagination_args: PaginationArgs | None = None,
+        cache_key: str = "",
     ) -> Self:
         """Annotate the queryset with `first_reservable_time` and `is_closed` for each reservation unit."""
         helper = FirstReservableTimeHelper(
@@ -57,6 +58,7 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
             minimum_duration_minutes=minimum_duration_minutes,
             show_only_reservable=show_only_reservable,
             pagination_args=pagination_args,
+            cache_key=cache_key,
         )
         helper.calculate_all_first_reservable_times()
         return helper.get_annotated_queryset()
