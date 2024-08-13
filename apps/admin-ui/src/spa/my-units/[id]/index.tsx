@@ -11,7 +11,7 @@ import { myUnitUrl } from "@/common/urls";
 import { BasicLink } from "@/styles/util";
 import Loader from "@/component/Loader";
 import { ReservationUnitCalendarView } from "./ReservationUnitCalendarView";
-import { UnitReservationsView } from "./UnitReservationsView";
+import { UnitReservations } from "./UnitReservations";
 import { TabHeader, Tabs } from "@/component/Tabs";
 import { useNotification } from "@/context/NotificationContext";
 import { useUnitViewQuery } from "@gql/gql-types";
@@ -110,6 +110,7 @@ export function MyUnitView() {
           </LocationOnlyOnDesktop>
         )}
       </ContainerWithSpacing>
+
       <ContainerWithSpacing>
         <BasicLink to={recurringReservationUrl ?? ""}>
           <Button
@@ -124,7 +125,7 @@ export function MyUnitView() {
       </ContainerWithSpacing>
       <Tabs headers={TabHeaders}>
         <ReservationTabPanel key="unit-reservations">
-          <UnitReservationsView />
+          <UnitReservations />
         </ReservationTabPanel>
         <UnitCalendarTabPanel key="reservation-unit">
           <ReservationUnitCalendarView
