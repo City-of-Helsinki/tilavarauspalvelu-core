@@ -28,14 +28,15 @@ class ReservationUnitImageInline(admin.TabularInline):
 
 class ReservationUnitPricingInline(admin.TabularInline):
     model = ReservationUnitPricing
+    show_change_link = True
     extra = 0
 
 
 class ApplicationRoundTimeSlotInline(admin.TabularInline):
     model = ApplicationRoundTimeSlot
     form = ApplicationRoundTimeSlotForm
-    extra = 0
     show_change_link = True
+    extra = 0
 
 
 @admin.register(ReservationUnit)
