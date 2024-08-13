@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { RESERVATIONUNIT_RESERVATIONS_FRAGMENT } from "../reservations/fragments";
+import { RESERVATIONUNIT_RESERVATIONS_FRAGMENT } from "@/component/reservations/fragments";
 
 export const RECURRING_RESERVATION_UNIT_QUERY = gql`
   query RecurringReservationUnit($id: ID!) {

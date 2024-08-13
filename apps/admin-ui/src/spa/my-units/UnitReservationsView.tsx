@@ -11,8 +11,8 @@ import { useReservationUnitTypes } from "@/hooks";
 import DayNavigation from "./DayNavigation";
 import { UnitReservations } from "./UnitReservations";
 import { HR } from "@/component/Table";
-import { SearchTags } from "../SearchTags";
-import { MultiSelectFilter } from "../QueryParamFilters";
+import { SearchTags } from "@/component/SearchTags";
+import { MultiSelectFilter } from "@/component/QueryParamFilters";
 
 const HorisontalFlexWrapper = styled.div`
   display: flex;

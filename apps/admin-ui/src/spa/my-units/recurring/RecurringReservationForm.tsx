@@ -14,7 +14,7 @@ import { fromUIDate } from "common/src/common/util";
 import { removeRefParam } from "common/src/reservation-form/util";
 import {
   RecurringReservationFormSchema,
-  type RecurringReservationForm,
+  type RecurringReservationForm as RecurringReservationFormT,
 } from "@/schemas";
 import { SortedSelect } from "@/component/SortedSelect";
 import {
@@ -22,18 +22,20 @@ import {
   type NewReservationListItem,
 } from "@/component/ReservationsList";
 import { useNotification } from "@/context/NotificationContext";
-import { ActionsWrapper, Grid, Element } from "./commonStyling";
+import { ActionsWrapper } from "./commonStyling";
 import { WeekdaysSelector } from "./WeekdaysSelector";
 import {
   useCreateRecurringReservation,
   useFilteredReservationList,
   useMultipleReservation,
 } from "./hooks";
-import ReservationTypeForm from "../ReservationTypeForm";
-import ControlledTimeInput from "../components/ControlledTimeInput";
-import ReservationListButton from "../../ReservationListButton";
-import ControlledDateInput from "../components/ControlledDateInput";
+import ReservationTypeForm from "@/component/ReservationTypeForm";
+import ControlledTimeInput from "@/component/ControlledTimeInput";
+import ReservationListButton from "@/component/ReservationListButton";
+import ControlledDateInput from "@/component/ControlledDateInput";
 import { base64encode, filterNonNullable } from "common/src/helpers";
+import { Element } from "@/styles/util";
+import { AutoGrid } from "@/styles/layout";
 
 const Label = styled.p<{ $bold?: boolean }>`
   font-family: var(--fontsize-body-m);
@@ -129,10 +131,10 @@ type Props = {
   }[];
 };
 
-const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
+export function RecurringReservationForm({ reservationUnits }: Props) {
   const { t } = useTranslation();
 
-  const form = useForm<RecurringReservationForm>({
+  const form = useForm<RecurringReservationFormT>({
     mode: "onChange",
     resolver: zodResolver(RecurringReservationFormSchema),
     defaultValues: {
@@ -210,7 +212,7 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
 
   const navigate = useNavigate();
 
-  const onSubmit = async (data: RecurringReservationForm) => {
+  const onSubmit = async (data: RecurringReservationFormT) => {
     // TODO notifyError does a double translation somewhere
     if (!newReservations.success) {
       notifyError(t(translateError("formNotValid")));
@@ -301,7 +303,7 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
   return (
     <FormProvider {...form}>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <Grid>
+        <AutoGrid>
           <Element $start>
             <Controller
               name="reservationUnit"
@@ -450,10 +452,8 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
               {t("common.reserve")}
             </Button>
           </ActionsWrapper>
-        </Grid>
+        </AutoGrid>
       </form>
     </FormProvider>
   );
-};
-
-export default MyUnitRecurringReservationForm;
+}

@@ -15,13 +15,13 @@ import usePermission from "@/hooks/usePermission";
 import { getEventBuffers } from "common/src/calendar/util";
 import { reservationUrl } from "@/common/urls";
 import { useNotification } from "@/context/NotificationContext";
-import Legend from "../reservations/requested/Legend";
+import Legend from "@/component/reservations/requested/Legend";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
 import { PUBLIC_URL } from "@/common/const";
-import { getReserveeName } from "../reservations/requested/util";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { TFunction } from "next-i18next";
+import { getReserveeName } from "app/common/util";
 
 type Props = {
   begin: string;

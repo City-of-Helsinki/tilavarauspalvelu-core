@@ -1,10 +1,20 @@
 import { format, getDay, isSameDay, parseISO } from "date-fns";
 import i18next from "i18next";
-import { trim } from "lodash";
-import type { LocationFieldsFragment } from "@gql/gql-types";
+import { trim, camelCase, get, pick, zipObject } from "lodash";
+import {
+  ReservationTypeChoice,
+  type LocationFieldsFragment,
+  type ReservationCommonFragment,
+  type ReservationMetadataFieldNode,
+} from "@gql/gql-types";
 import { NUMBER_OF_DECIMALS } from "./const";
 import type { TFunction } from "next-i18next";
-import { toMondayFirstUnsafe } from "common/src/helpers";
+import { toMondayFirstUnsafe, truncate } from "common/src/helpers";
+import {
+  type ReservationFormType,
+  type RecurringReservationForm,
+  type ReservationChangeFormType,
+} from "@/schemas";
 
 export { formatDuration } from "common/src/common/util";
 
@@ -191,4 +201,45 @@ export function getTranslatedError(
   }
   // TODO use a common translation key for these
   return t(`Notifications.form.errors.${error}`);
+}
+
+export function flattenMetadata(
+  values:
+    | ReservationFormType
+    | RecurringReservationForm
+    | ReservationChangeFormType,
+  metadataSetFields: Pick<ReservationMetadataFieldNode, "fieldName">[]
+) {
+  const fieldNames = metadataSetFields.map((f) => f.fieldName).map(camelCase);
+  // TODO don't use pick
+  const metadataSetValues = pick(values, fieldNames);
+
+  const renamePkFields = ["ageGroup", "homeCity", "purpose"];
+
+  return zipObject(
+    Object.keys(metadataSetValues).map((k) =>
+      renamePkFields.includes(k) ? `${k}Pk` : k
+    ),
+    Object.values(metadataSetValues).map((v) => get(v, "value") || v)
+  );
+}
+
+export function getReserveeName(
+  reservation: ReservationCommonFragment,
+  t: TFunction,
+  length = 50
+): string {
+  let prefix = "";
+  if (reservation.type === ReservationTypeChoice.Behalf) {
+    prefix = t ? t("Reservations.prefixes.behalf") : "";
+  }
+  if (
+    // commented extra condition out for now, as the staff prefix was requested to be used for all staff reservations
+    reservation.type === ReservationTypeChoice.Staff /* &&
+    reservation.reserveeName ===
+      `${reservation.user?.firstName} ${reservation.user?.lastName}` */
+  ) {
+    prefix = t ? t("Reservations.prefixes.staff") : "";
+  }
+  return truncate(prefix + (reservation.reserveeName ?? "-"), length);
 }

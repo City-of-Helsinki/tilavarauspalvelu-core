@@ -14,15 +14,15 @@ import {
   ReservationChangeFormSchema,
 } from "@/schemas";
 import { useNotification } from "@/context/NotificationContext";
-import { flattenMetadata } from "../my-units/create-reservation/utils";
-import ReservationTypeForm from "../my-units/ReservationTypeForm";
+import ReservationTypeForm from "@/component/ReservationTypeForm";
 import Loader from "../Loader";
 import { HR } from "@/component/Table";
-import { useOptions } from "../my-units/hooks";
+import { useOptions } from "@/hooks";
 import EditPageWrapper from "./EditPageWrapper";
 import { useReservationEditData } from "./requested/hooks";
 import { useStaffReservationMutation } from "./hooks";
 import { filterNonNullable } from "common/src/helpers";
+import { flattenMetadata } from "@/common/util";
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 type ReservationUnitType = NonNullable<ReservationType["reservationUnit"]>[0];

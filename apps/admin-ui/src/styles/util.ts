@@ -31,3 +31,9 @@ export const BasicLink = styled(Link)`
 export const DialogActionsButtons = styled(Dialog.ActionButtons)`
   justify-content: space-between;
 `;
+
+export const Element = styled.div<{ $wide?: boolean; $start?: boolean }>`
+  grid-column: ${({ $wide, $start }) =>
+    $wide ? "1 / -1" : $start ? "1 / span 1" : "auto / span 1"};
+  max-width: var(--prose-width);
+`;

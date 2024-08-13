@@ -25,11 +25,11 @@ import Loader from "@/component/Loader";
 import { dateTime, getNormalizedInterval, parseDateTimeSafe } from "@/helpers";
 import { useModal } from "@/context/ModalContext";
 import { useNotification } from "@/context/NotificationContext";
-import { flattenMetadata } from "./utils";
-import ReservationTypeForm from "../ReservationTypeForm";
-import ControlledTimeInput from "../components/ControlledTimeInput";
-import ControlledDateInput from "../components/ControlledDateInput";
 import { base64encode, filterNonNullable } from "common/src/helpers";
+import ControlledTimeInput from "@/component/ControlledTimeInput";
+import ControlledDateInput from "@/component/ControlledDateInput";
+import ReservationTypeForm from "@/component/ReservationTypeForm";
+import { flattenMetadata } from "@/common/util";
 
 type ReservationUnitType = NonNullable<ReservationUnitQuery["reservationUnit"]>;
 

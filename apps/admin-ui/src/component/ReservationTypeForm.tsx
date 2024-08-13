@@ -15,9 +15,9 @@ import {
   ReserverMetadataSetForm,
 } from "./MetadataSetForm";
 import { BufferToggles } from "./BufferToggles";
-import { Element } from "./MyUnitRecurringReservation/commonStyling";
 import ShowTOS from "./ShowTOS";
 import { HR } from "@/component/Table";
+import { Element } from "@/styles/util";
 
 // TODO use a fragment
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;

@@ -5,9 +5,12 @@ import { memoize } from "lodash";
 import type { ReservationsQuery } from "@gql/gql-types";
 import { truncate } from "@/helpers";
 import { reservationUrl } from "@/common/urls";
-import { formatDateTime, formatDateTimeRange } from "@/common/util";
+import {
+  formatDateTime,
+  formatDateTimeRange,
+  getReserveeName,
+} from "@/common/util";
 import { CustomTable, TableLink } from "@/component/Table";
-import { getReserveeName } from "./requested/util";
 import { MAX_NAME_LENGTH } from "@/common/const";
 
 type ReservationTableColumn = {

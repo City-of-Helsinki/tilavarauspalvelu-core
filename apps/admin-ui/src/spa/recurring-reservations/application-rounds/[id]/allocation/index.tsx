@@ -17,7 +17,7 @@ import {
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { SearchTags } from "@/component/SearchTags";
 import Loader from "@/component/Loader";
-import { useOptions } from "@/component/my-units/hooks";
+import { useOptions } from "@/hooks";
 import {
   Container as BaseContainer,
   TabWrapper,

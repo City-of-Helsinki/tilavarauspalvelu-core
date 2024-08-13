@@ -17,7 +17,7 @@ import {
   useReservationTimesInReservationUnitQuery,
 } from "@gql/gql-types";
 import type { UseFormReturn } from "react-hook-form";
-import type { RecurringReservationForm } from "app/schemas";
+import type { RecurringReservationForm } from "@/schemas";
 import {
   fromUIDateUnsafe,
   toApiDate,
@@ -32,12 +32,12 @@ import {
 } from "@/helpers";
 import { generateReservations } from "./generateReservations";
 import { useNotification } from "@/context/NotificationContext";
-import { NewReservationListItem } from "../../ReservationsList";
+import { NewReservationListItem } from "@/component/ReservationsList";
 import { convertToDate } from "./utils";
 import { ReservationMade } from "./RecurringReservationDone";
-import { flattenMetadata } from "../create-reservation/utils";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
+import { flattenMetadata } from "@/common/util";
 
 type ReservationUnitBufferType = {
   bufferTimeBefore?: number;

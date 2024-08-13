@@ -12,7 +12,7 @@ import { BasicLink } from "@/styles/util";
 import Loader from "@/component/Loader";
 import { ReservationUnitCalendarView } from "./ReservationUnitCalendarView";
 import UnitReservationsView from "./UnitReservationsView";
-import { TabHeader, Tabs } from "../Tabs";
+import { TabHeader, Tabs } from "@/component/Tabs";
 import { useNotification } from "@/context/NotificationContext";
 import { useUnitViewQuery } from "@gql/gql-types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
@@ -52,7 +52,7 @@ const ReservationTabPanel = styled(UnitCalendarTabPanel)`
   }
 `;
 
-function MyUnitView() {
+export function MyUnitView() {
   const { unitId: pk } = useParams<Params>();
   const { t } = useTranslation();
 
@@ -135,5 +135,3 @@ function MyUnitView() {
     </ContainerHack>
   );
 }
-
-export default MyUnitView;

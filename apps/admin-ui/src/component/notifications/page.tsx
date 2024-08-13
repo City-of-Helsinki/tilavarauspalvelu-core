@@ -28,10 +28,10 @@ import {
 import { H1 } from "common/src/common/typography";
 import { fromUIDate } from "common/src/common/util";
 import { breakpoints } from "common";
-import { Container } from "app/styles/layout";
-import Loader from "app/component/Loader";
-import { useNotification } from "app/context/NotificationContext";
-import { ButtonLikeLink } from "app/component/ButtonLikeLink";
+import { Container } from "@/styles/layout";
+import Loader from "@/component/Loader";
+import { useNotification } from "@/context/NotificationContext";
+import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import {
   checkValidDate,
   checkValidFutureDate,
@@ -45,9 +45,9 @@ import {
   parseDateTimeSafe,
 } from "@/helpers";
 import type { TFunction } from "i18next";
-import ControlledDateInput from "../my-units/components/ControlledDateInput";
-import ControlledTimeInput from "../my-units/components/ControlledTimeInput";
 import { base64encode } from "common/src/helpers";
+import ControlledDateInput from "@/component/ControlledDateInput";
+import ControlledTimeInput from "@/component/ControlledTimeInput";
 
 const RichTextInput = dynamic(() => import("@/component/RichTextInput"), {
   ssr: false,

@@ -41,7 +41,7 @@ const RecurringReservationDoneParamsSchema = z.object({
   recurringPk: z.number(),
 });
 
-const RecurringReservationDone = () => {
+function RecurringReservationDoneInner() {
   const location = useLocation();
   const { t } = useTranslation("translation", {
     keyPrefix: "MyUnits.RecurringReservation.Confirmation",
@@ -120,19 +120,17 @@ const RecurringReservationDone = () => {
       </ActionsWrapper>
     </StyledContainer>
   );
-};
+}
 
-const ErrorComponent = () => {
+function ErrorComponent() {
   const { t } = useTranslation();
   return <div>{t("errors.errorRecurringReservationsDoneDisplay")}</div>;
-};
+}
 
-const RecurringReservationDoneErrorWrapped = () => {
+export function RecurringReservationDone() {
   return (
     <ErrorBoundary FallbackComponent={ErrorComponent}>
-      <RecurringReservationDone />
+      <RecurringReservationDoneInner />
     </ErrorBoundary>
   );
-};
-
-export default RecurringReservationDoneErrorWrapped;
+}

@@ -12,7 +12,7 @@ import {
 import userEvent from "@testing-library/user-event";
 import { MockedProvider } from "@apollo/client/testing";
 import { BrowserRouter } from "react-router-dom";
-import MyUnitRecurringReservationForm from "./MyUnitRecurringReservationForm";
+import { RecurringReservationForm } from "./RecurringReservationForm";
 import {
   YEAR,
   mocks,
@@ -24,7 +24,7 @@ const customRender = () =>
   render(
     <BrowserRouter>
       <MockedProvider mocks={mocks} addTypename={false}>
-        <MyUnitRecurringReservationForm reservationUnits={units} />
+        <RecurringReservationForm reservationUnits={units} />
       </MockedProvider>
     </BrowserRouter>
   );

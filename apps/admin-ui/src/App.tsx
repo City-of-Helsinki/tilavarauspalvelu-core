@@ -1,8 +1,7 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import dynamic from "next/dynamic";
-
-import { Permission } from "app/modules/permissionHelper";
+import { Permission } from "@/modules/permissionHelper";
 import ApplicationRound from "./spa/recurring-reservations/application-rounds/[id]";
 import PageWrapper from "./component/PageWrapper";
 import "./i18n";
@@ -10,8 +9,7 @@ import { PUBLIC_URL } from "./common/const";
 import { GlobalContext } from "./context/GlobalContexts";
 import { prefixes } from "./common/urls";
 import AuthorizationChecker from "./common/AuthorizationChecker";
-
-import MyUnitsRouter from "./component/my-units/MyUnitsRouter";
+import MyUnitsRouter from "./spa/my-units/MyUnitsRouter";
 import ReservationsRouter from "./component/reservations/ReservationRouter";
 import NotificationsRouter from "./component/notifications/router";
 import Error404 from "./common/Error404";

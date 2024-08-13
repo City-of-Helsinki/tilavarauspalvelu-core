@@ -3,11 +3,11 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
-import { Container } from "../../../styles/layout";
-import Loader from "../../Loader";
-import MyUnitRecurringReservationForm from "./MyUnitRecurringReservationForm";
+import { Container } from "@/styles/layout";
+import Loader from "@/component/Loader";
+import { RecurringReservationForm } from "./RecurringReservationForm";
 import { useRecurringReservationsUnits } from "./hooks";
-import LinkPrev from "../../LinkPrev";
+import LinkPrev from "@/component/LinkPrev";
 
 const PreviousLinkWrapper = styled.div`
   padding: var(--spacing-s);
@@ -18,15 +18,15 @@ type Params = {
   reservationUnitId: string;
 };
 
-const BackLinkHeader = () => {
+function BackLinkHeader() {
   return (
     <PreviousLinkWrapper>
       <LinkPrev />
     </PreviousLinkWrapper>
   );
-};
+}
 
-const MyUnitRecurringReservation = ({ unitId }: { unitId: number }) => {
+function RecurringReservationInner({ unitId }: { unitId: number }) {
   const { t } = useTranslation();
 
   const { loading, reservationUnits } = useRecurringReservationsUnits(unitId);
@@ -41,7 +41,7 @@ const MyUnitRecurringReservation = ({ unitId }: { unitId: number }) => {
       <Container>
         <H1 $legacy>{t("MyUnits.RecurringReservation.pageTitle")}</H1>
         {reservationUnits !== undefined && reservationUnits?.length > 0 ? (
-          <MyUnitRecurringReservationForm reservationUnits={reservationUnits} />
+          <RecurringReservationForm reservationUnits={reservationUnits} />
         ) : (
           <p>
             {t("MyUnits.RecurringReservation.error.notPossibleForThisUnit")}
@@ -50,10 +50,10 @@ const MyUnitRecurringReservation = ({ unitId }: { unitId: number }) => {
       </Container>
     </>
   );
-};
+}
 
 // Handle invalid route params
-const MyUnitRecurringReservationRouteWrapper = () => {
+export function RecurringReservation() {
   const { t } = useTranslation();
   const { unitId } = useParams<Params>();
 
@@ -67,7 +67,5 @@ const MyUnitRecurringReservationRouteWrapper = () => {
       </>
     );
   }
-  return <MyUnitRecurringReservation unitId={Number(unitId)} />;
-};
-
-export default MyUnitRecurringReservationRouteWrapper;
+  return <RecurringReservationInner unitId={Number(unitId)} />;
+}

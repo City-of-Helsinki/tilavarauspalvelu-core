@@ -24,12 +24,11 @@ import {
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { POST_PAUSE, PRE_PAUSE } from "@/common/calendarStyling";
-import { sortByName } from "@/common/util";
+import { getReserveeName, sortByName } from "@/common/util";
 import { useModal } from "@/context/ModalContext";
 import { CELL_BORDER, CELL_BORDER_LEFT, CELL_BORDER_LEFT_ALERT } from "./const";
 import { ReservationPopupContent } from "./ReservationPopupContent";
 import resourceEventStyleGetter from "./eventStyleGetter";
-import { getReserveeName } from "../reservations/requested/util";
 import CreateReservationModal from "./create-reservation/CreateReservationModal";
 
 type CalendarEventType = CalendarEvent<ReservationUnitReservationsFragment>;

@@ -17,8 +17,11 @@ import {
   type ReservationQuery,
 } from "@gql/gql-types";
 import { formatDuration, fromApiDate } from "common/src/common/util";
-import { truncate } from "@/helpers";
-import { formatDateTimeRange, formatDate } from "@/common/util";
+import {
+  formatDateTimeRange,
+  formatDate,
+  getReserveeName,
+} from "@/common/util";
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 type ReservationUnitType = NonNullable<ReservationType["reservationUnit"]>[0];
@@ -153,26 +156,6 @@ export function getTranslationKeyForCustomerTypeChoice(
       )
     : "";
   return [`ReservationType.${reservationType}`, reserveeTypeTranslationKey];
-}
-
-export function getReserveeName(
-  reservation: ReservationCommonFragment,
-  t: TFunction,
-  length = 50
-): string {
-  let prefix = "";
-  if (reservation.type === ReservationTypeChoice.Behalf) {
-    prefix = t ? t("Reservations.prefixes.behalf") : "";
-  }
-  if (
-    // commented extra condition out for now, as the staff prefix was requested to be used for all staff reservations
-    reservation.type === ReservationTypeChoice.Staff /* &&
-    reservation.reserveeName ===
-      `${reservation.user?.firstName} ${reservation.user?.lastName}` */
-  ) {
-    prefix = t ? t("Reservations.prefixes.staff") : "";
-  }
-  return truncate(prefix + (reservation.reserveeName ?? "-"), length);
 }
 
 export function getName(

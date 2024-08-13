@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 import {
   RESERVATIONUNIT_RESERVATIONS_FRAGMENT,
   RESERVATION_UNIT_FRAGMENT,
-} from "../../reservations/fragments";
+} from "@/component/reservations/fragments";
 import { LOCATION_FRAGMENT } from "common/src/queries/fragments";
 import { UNIT_NAME_FRAGMENT } from "@/common/fragments";
 
