@@ -19,7 +19,7 @@ import { getSelectedOption, getTranslation } from "@/modules/util";
 import { BlackButton, MediumButton, Toast } from "@/styles/util";
 import { ReservationInfoCard } from "./ReservationInfoCard";
 import { Paragraph } from "./styles";
-import { signOut } from "@/hooks/auth";
+import { signOut } from "common/src/browserHelpers";
 import {
   BylineSection,
   Heading,

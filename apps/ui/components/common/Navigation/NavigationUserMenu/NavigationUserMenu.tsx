@@ -7,7 +7,8 @@ import {
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled, { css } from "styled-components";
-import { signIn, signOut, useSession } from "~/hooks/auth";
+import { useSession } from "~/hooks/auth";
+import { signIn, signOut } from "common/src/browserHelpers";
 import { NavigationUserMenuUserCard } from "./NavigationUserMenuUserCard";
 import { MenuItem } from "../types";
 

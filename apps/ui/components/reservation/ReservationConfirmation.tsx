@@ -18,12 +18,12 @@ import {
 import { Subheading } from "common/src/reservation-form/styles";
 import { breakpoints } from "common/src/common/style";
 import { IconButton } from "common/src/components";
+import { signOut } from "common/src/browserHelpers";
 import { getReservationUnitInstructionsKey } from "../../modules/reservationUnit";
 import { getTranslation, reservationsUrl } from "../../modules/util";
 import { BlackButton } from "../../styles/util";
 import { Paragraph } from "./styles";
 import { reservationUnitPath } from "../../modules/const";
-import { signOut } from "@/hooks/auth";
 
 type Node = NonNullable<ReservationQuery["reservation"]>;
 type Props = {

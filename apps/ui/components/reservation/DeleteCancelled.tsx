@@ -6,7 +6,7 @@ import styled from "styled-components";
 import Link from "next/link";
 import { IconArrowRight, IconSignout } from "hds-react";
 import { Container } from "common";
-import { signOut } from "~/hooks/auth";
+import { signOut } from "common/src/browserHelpers";
 import { Paragraph } from "./styles";
 import { LinkButton } from "../../styles/util";
 import { singleSearchUrl } from "../../modules/util";

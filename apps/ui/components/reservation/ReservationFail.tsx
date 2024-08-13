@@ -6,8 +6,7 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Container } from "common";
-import { signOut } from "~/hooks/auth";
-
+import { signOut } from "common/src/browserHelpers";
 import { Paragraph } from "./styles";
 import { singleSearchUrl } from "../../modules/util";
 import { LinkButton } from "../../styles/util";

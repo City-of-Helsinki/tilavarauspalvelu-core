@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { signIn } from "app/hooks/auth";
+import { signIn } from "common/src/browserHelpers";
 import { Button, IconArrowRight, IconGroup } from "hds-react";
 import { H2 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";

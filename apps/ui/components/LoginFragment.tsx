@@ -2,7 +2,8 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
-import { signIn, useSession } from "~/hooks/auth";
+import { signIn } from "common/src/browserHelpers";
+import { useSession } from "~/hooks/auth";
 import { MediumButton } from "@/styles/util";
 
 type Props = {

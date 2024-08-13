@@ -1,10 +1,11 @@
 import { Button, Link } from "hds-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { signOut, useSession } from "app/hooks/auth";
 import styled from "styled-components";
+import { signOut } from "common/src/browserHelpers";
 import { H1 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
+import { useSession } from "@/hooks/auth";
 import { PUBLIC_URL } from "./const";
 
 const Wrapper = styled.div`
