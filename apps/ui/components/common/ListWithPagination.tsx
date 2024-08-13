@@ -3,18 +3,8 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Button, LoadingSpinner } from "hds-react";
 import { breakpoints } from "common/src/common/style";
-import type { PageInfo } from "@gql/gql-types";
-
-export type Props = {
-  items: JSX.Element[];
-  fetchMore: (arg: string) => void;
-  pageInfo?: Pick<PageInfo, "hasNextPage" | "endCursor">;
-  totalCount?: number;
-  loadingMore: boolean;
-  sortingComponent?: React.ReactNode;
-  showHitCount?: boolean;
-  className?: string;
-};
+import type { PageInfo, SearchReservationUnitsQuery } from "@gql/gql-types";
+import type { ApolloQueryResult } from "@apollo/client";
 
 const TopWrapper = styled.div`
   @media (min-width: ${breakpoints.m}) {
@@ -68,17 +58,19 @@ const PaginationButton = styled(Button)`
 function Content({
   items,
   loadingMore,
-  totalCount,
   fetchMore,
   showMore,
 }: {
   items: JSX.Element[];
   loadingMore: boolean;
   fetchMore: () => void;
-  totalCount?: number;
-  showMore?: boolean;
+  showMore: boolean;
 }) {
   const { t } = useTranslation();
+
+  const hitCountSummary = t("searchResultList:paginationSummary", {
+    count: items.length,
+  });
 
   return (
     <>
@@ -91,14 +83,7 @@ function Content({
         ) : (
           <>
             <HitCountSummary data-testid="list-with-pagination__pagination--summary">
-              {showMore
-                ? t("searchResultList:paginationSummary", {
-                    count: items?.length,
-                    totalCount,
-                  })
-                : t("searchResultList:paginationSummaryEnd", {
-                    count: items.length,
-                  })}
+              {hitCountSummary}
             </HitCountSummary>
             {showMore && (
               <PaginationButton
@@ -116,30 +101,44 @@ function Content({
   );
 }
 
-function ListWithPagination({
+export type Props = {
+  items: JSX.Element[];
+  fetchMore: (
+    cursor: string
+  ) => Promise<ApolloQueryResult<SearchReservationUnitsQuery>>;
+  pageInfo?: Pick<PageInfo, "endCursor">;
+  hasMoreData: boolean;
+  isLoading: boolean;
+  sortingComponent?: React.ReactNode;
+  className?: string;
+};
+
+export function ListWithPagination({
   items,
   fetchMore,
-  loadingMore,
+  isLoading,
+  hasMoreData,
   pageInfo,
-  totalCount,
   sortingComponent,
-  showHitCount = true,
   className,
 }: Props): JSX.Element {
   const { t } = useTranslation();
+  const { endCursor } = pageInfo ?? {};
+  const handleFetchMore = async () => {
+    if (endCursor == null) {
+      return;
+    }
+    await fetchMore(endCursor);
+  };
 
-  const endCursor = pageInfo?.endCursor ?? undefined;
-  const showMore =
-    endCursor != null && pageInfo?.hasNextPage && items?.length > 0;
+  const isInProcess = isLoading;
 
   return (
     <div className={className}>
       <TopWrapper data-testid="list-with-pagination__hit-count">
-        {items?.length > 0 ? (
+        {items.length > 0 ? (
           <HitCount>
-            {showHitCount
-              ? t("searchResultList:count", { count: totalCount })
-              : ""}
+            {t("searchResultList:count", { count: items.length })}
           </HitCount>
         ) : (
           <NoResults>{t("searchResultList:noResults")}</NoResults>
@@ -149,15 +148,11 @@ function ListWithPagination({
       {items.length > 0 && (
         <Content
           items={items}
-          // TODO should not be called with empty string
-          fetchMore={() => fetchMore(endCursor ?? "")}
-          loadingMore={loadingMore}
-          totalCount={totalCount}
-          showMore={showMore}
+          fetchMore={handleFetchMore}
+          loadingMore={isInProcess}
+          showMore={hasMoreData}
         />
       )}
     </div>
   );
 }
-
-export default ListWithPagination;

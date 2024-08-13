@@ -5,7 +5,6 @@ import type { GetServerSidePropsContext } from "next";
 import { Notification } from "hds-react";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { NetworkStatus } from "@apollo/client";
 import { H2 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
@@ -18,7 +17,6 @@ import {
   type ApplicationRoundsUiQuery,
   type ApplicationRoundsUiQueryVariables,
   ApplicationRoundsUiDocument,
-  useSearchReservationUnitsQuery,
   type OptionsQuery,
   OptionsDocument,
   SearchFormParamsUnitDocument,
@@ -34,7 +32,7 @@ import { createApolloClient } from "@/modules/apolloClient";
 import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 import { ReservationUnitCard } from "@/components/search/ReservationUnitCard";
 import useReservationUnitsList from "@/hooks/useReservationUnitList";
-import ListWithPagination from "@/components/common/ListWithPagination";
+import { ListWithPagination } from "@/components/common/ListWithPagination";
 import StartApplicationBar from "@/components/common/StartApplicationBar";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { processVariables } from "@/modules/search";
@@ -45,6 +43,7 @@ import {
   convertLanguageCode,
   getTranslationSafe,
 } from "common/src/common/util";
+import { useSearchQuery } from "@/hooks/useSearchQuery";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
@@ -197,33 +196,19 @@ function SeasonalSearch({
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
-  // TODO should hydrate this from SSR results
-  const {
-    data,
-    fetchMore,
-    error,
-    loading: isLoading,
-    networkStatus,
-  } = useSearchReservationUnitsQuery({
-    variables: processVariables(
-      searchValues,
-      i18n.language,
-      ReservationKind.Season
-    ),
-    fetchPolicy: "network-only",
-    // Why?
-    // skip: Object.keys(searchValues).length === 0,
-    notifyOnNetworkStatusChange: true,
-  });
+  const variables = processVariables(
+    searchValues,
+    i18n.language,
+    ReservationKind.Season
+  );
+  const query = useSearchQuery(variables);
+  const { data, isLoading, error, fetchMore } = query;
 
   const currData = data ?? initialData;
   const reservationUnits = filterNonNullable(
     currData?.reservationUnits?.edges?.map((e) => e?.node)
   );
-  const totalCount = currData?.reservationUnits?.totalCount;
   const pageInfo = currData?.reservationUnits?.pageInfo;
-
-  const loadingMore = networkStatus === NetworkStatus.fetchMore;
 
   const applicationRoundOptions = applicationRounds.map((applicationRound) => ({
     value: applicationRound.pk ?? 0,
@@ -279,20 +264,10 @@ function SeasonalSearch({
               key={ru.pk}
             />
           ))}
-          loadingMore={loadingMore}
+          isLoading={isLoading}
+          hasMoreData={query.hasMoreData}
           pageInfo={pageInfo}
-          totalCount={totalCount ?? undefined}
-          fetchMore={(cursor) => {
-            const variables = {
-              ...processVariables(
-                searchValues,
-                i18n.language,
-                ReservationKind.Direct
-              ),
-              after: cursor,
-            };
-            fetchMore({ variables });
-          }}
+          fetchMore={(cursor) => fetchMore(cursor)}
           sortingComponent={
             <StyledSorting
               // TODO these should be gotten from a hook function (set / get)

@@ -83,12 +83,14 @@ function transformSortString(
   desc: boolean
 ): ReservationUnitOrderingChoices[] {
   const lang = getLocalizationLang(language);
-
-  const transformed = transformOrderBy(orderBy ?? "name", desc, lang);
-  if (transformed == null) {
-    return [transformOrderByName(false, lang)];
-  }
-  return [transformed];
+  const transformed =
+    transformOrderBy(orderBy ?? "name", desc, lang) ??
+    transformOrderByName(false, lang);
+  // NOTE a weird backend issue that requires two orderBy params (otherwise 2nd+ page is sometimes incorrect)
+  const sec = desc
+    ? ReservationUnitOrderingChoices.PkDesc
+    : ReservationUnitOrderingChoices.PkAsc;
+  return [transformed, sec];
 }
 
 // known issue this can send invalid values to backend (i.e. -1 or 0, or a pk that has been deleted)

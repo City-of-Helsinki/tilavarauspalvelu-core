@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from "react";
 import { useTranslation } from "next-i18next";
-import { NetworkStatus } from "@apollo/client";
 import type { GetServerSidePropsContext } from "next";
 import styled from "styled-components";
 import { useRouter } from "next/router";
@@ -11,7 +10,6 @@ import { breakpoints } from "common/src/common/style";
 import { H2 } from "common/src/common/typography";
 import {
   ReservationKind,
-  useSearchReservationUnitsQuery,
   OptionsDocument,
   type OptionsQuery,
   SearchReservationUnitsDocument,
@@ -26,7 +24,7 @@ import { filterNonNullable } from "common/src/helpers";
 import { isBrowser } from "@/modules/const";
 import { SingleSearchForm } from "@/components/search/SingleSearchForm";
 import Sorting from "@/components/form/Sorting";
-import ListWithPagination from "@/components/common/ListWithPagination";
+import { ListWithPagination } from "@/components/common/ListWithPagination";
 import ReservationUnitCard from "@/components/search/SingleSearchReservationUnitCard";
 import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
@@ -38,6 +36,7 @@ import {
   convertLanguageCode,
   getTranslationSafe,
 } from "common/src/common/util";
+import { useSearchQuery } from "@/hooks/useSearchQuery";
 
 const Wrapper = styled.div`
   margin-bottom: var(--spacing-layout-l);
@@ -186,24 +185,13 @@ function SearchSingle({
     i18n.language,
     ReservationKind.Direct
   );
-  // TODO should really hydrate the ApolloClient from SSR
-  const query = useSearchReservationUnitsQuery({
-    variables: vars,
-    fetchPolicy: "network-only",
-    // Why?
-    // skip: Object.keys(searchValues).length === 0,
-    notifyOnNetworkStatusChange: true,
-    onError: (error1) =>
-      // eslint-disable-next-line no-console
-      console.warn(error1, vars),
-  });
-  const { data, loading, error, fetchMore, networkStatus } = query;
+  const query = useSearchQuery(vars);
+  const { data, isLoading, error, fetchMore } = query;
 
   const currData = data ?? initialData;
   const reservationUnits = filterNonNullable(
     currData?.reservationUnits?.edges?.map((e) => e?.node)
   );
-  const totalCount = currData?.reservationUnits?.totalCount;
   const pageInfo = currData?.reservationUnits?.pageInfo;
 
   const content = useRef<HTMLElement>(null);
@@ -228,8 +216,6 @@ function SearchSingle({
     }
   }, [content?.current?.offsetTop, currData?.reservationUnits, isMobile]);
 
-  const loadingMore = networkStatus === NetworkStatus.fetchMore;
-
   const isOrderingAsc = searchValues.order !== "desc";
 
   return (
@@ -248,7 +234,7 @@ function SearchSingle({
             reservationUnitTypeOptions={reservationUnitTypeOptions}
             purposeOptions={purposeOptions}
             equipmentsOptions={equipmentsOptions}
-            isLoading={loading}
+            isLoading={isLoading}
           />
         </StyledContainer>
       </HeadContainer>
@@ -256,22 +242,12 @@ function SearchSingle({
         <BottomWrapper>
           <ListWithPagination
             items={filterNonNullable(reservationUnits).map((ru) => (
-              <ReservationUnitCard reservationUnit={ru} key={ru.id} />
+              <ReservationUnitCard reservationUnit={ru} key={ru.pk} />
             ))}
-            loadingMore={loadingMore}
+            isLoading={isLoading}
             pageInfo={pageInfo}
-            totalCount={totalCount ?? undefined}
-            fetchMore={(cursor) => {
-              const variables = {
-                ...processVariables(
-                  searchValues,
-                  i18n.language,
-                  ReservationKind.Direct
-                ),
-                after: cursor,
-              };
-              fetchMore({ variables });
-            }}
+            hasMoreData={query.hasMoreData}
+            fetchMore={(cursor) => fetchMore(cursor)}
             sortingComponent={
               <StyledSorting
                 // TODO these should be gotten from a hook function (set / get)

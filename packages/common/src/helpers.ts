@@ -70,6 +70,21 @@ export function base64encode(str: string) {
   return Buffer.from(str, "binary").toString("base64");
 }
 
+export async function hash(val: string): Promise<string> {
+  if (!isBrowser) {
+    throw new Error("hash is only available in the browser");
+  }
+  const h = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(val)
+  );
+  const hexes = [],
+    view = new DataView(h);
+  for (let i = 0; i < view.byteLength; i += 4)
+    hexes.push(`00000000${view.getUint32(i).toString(16)}`.slice(-8));
+  return hexes.join("");
+}
+
 export function truncate(val: string, maxLen: number): string {
   return val.length > maxLen ? `${val.substring(0, maxLen - 1)}…` : val;
 }
