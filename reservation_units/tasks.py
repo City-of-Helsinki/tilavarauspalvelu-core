@@ -1,13 +1,16 @@
 import logging
 from datetime import date
+from decimal import Decimal
 
 from django.conf import settings
+from django.db.models import Q
 from easy_thumbnails.exceptions import InvalidImageFormatError
 
 from merchants.models import PaymentProduct
 from merchants.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
 from merchants.verkkokauppa.product.types import CreateOrUpdateAccountingParams, CreateProductParams
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
+from reservation_units.enums import PricingStatus, PricingType
 from reservation_units.pricing_updates import update_reservation_unit_pricings
 from reservation_units.utils.reservation_unit_payment_helper import ReservationUnitPaymentHelper
 from tilavarauspalvelu.celery import app
@@ -24,6 +27,70 @@ def _update_reservation_unit_pricings() -> None:
     logger.info(f"Updating reservation unit pricing with date {today}")
     num_updated = update_reservation_unit_pricings(today)
     logger.info(f"Updated {num_updated} reservation units with date {today}")
+
+
+@app.task(name="update_reservation_unit_pricings_tax_percentage")
+def update_reservation_unit_pricings_tax_percentage(change_date: str, current_tax: str, future_tax: str) -> None:
+    from reservation_units.models import ReservationUnitPricing, TaxPercentage
+
+    SentryLogger.log_message(
+        message="Task `update_reservation_unit_pricings_tax_percentage` started",
+        details=f"Task was run with change_date: {change_date}, current_tax: {current_tax}, future_tax: {future_tax}",
+        level="info",
+    )
+
+    change_date = date.fromisoformat(change_date)  # e.g. "2024-09-01"
+    current_tax_percentage, _ = TaxPercentage.objects.get_or_create(value=Decimal(current_tax))
+    future_tax_percentage, _ = TaxPercentage.objects.get_or_create(value=Decimal(future_tax))
+
+    # Last pricing for each reservation unit before the change date
+    latest_pricings = (
+        ReservationUnitPricing.objects.filter(
+            Q(begins__lte=change_date, pricing_type=PricingType.FREE)  # Ignore FREE pricings after the change date
+            | Q(pricing_type=PricingType.PAID)
+        )
+        .filter(status__in=(PricingStatus.PRICING_STATUS_ACTIVE, PricingStatus.PRICING_STATUS_FUTURE))
+        .order_by("reservation_unit_id", "-begins")
+        .distinct("reservation_unit_id")
+    )
+    for pricing in latest_pricings:
+        # Skip pricings that are FREE or have a different tax percentage
+        # We don't want to filter these away in the queryset, as that might cause us to incorrectly create new pricings
+        # in some cases. e.g. Current pricing is PAID, but the future pricing is FREE or has a different tax percentage.
+        if (
+            pricing.pricing_type == PricingType.PAID
+            and pricing.highest_price > 0
+            and pricing.tax_percentage == current_tax_percentage
+            # Don't create a new pricing if the reservation unit has a future pricing after the change date
+            and pricing.begins < change_date
+        ):
+            pricing.id = None  # Create a new pricing when saving
+            pricing.begins = change_date
+            pricing.tax_percentage = future_tax_percentage
+            pricing.status = PricingStatus.PRICING_STATUS_FUTURE
+            pricing.save()
+
+    # Log any unhandled future pricings
+    # PAID Pricings that begin on or after the change date
+    unhandled_future_pricings = ReservationUnitPricing.objects.filter(
+        begins__gte=change_date,
+        tax_percentage=current_tax_percentage,
+        pricing_type=PricingType.PAID,
+        highest_price__gte=0,
+        status__in=(PricingStatus.PRICING_STATUS_ACTIVE, PricingStatus.PRICING_STATUS_FUTURE),
+    )
+
+    for pricing in unhandled_future_pricings:
+        logger.info(f"Pricing should be handled manually: {pricing.id} {pricing.reservation_unit.name} {pricing}")
+
+    unhandled_future_pricings_str = ", ".join(
+        [f"<{pricing.id}: {pricing.reservation_unit}: {pricing}>" for pricing in unhandled_future_pricings]
+    )
+    SentryLogger.log_message(
+        message="Task `update_reservation_unit_pricings_tax_percentage` has unhandled future pricings",
+        details=f"Task found the following unhandled future pricings: {unhandled_future_pricings_str}",
+        level="info",
+    )
 
 
 @app.task(

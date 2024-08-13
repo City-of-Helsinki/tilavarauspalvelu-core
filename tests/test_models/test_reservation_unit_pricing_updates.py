@@ -1,10 +1,15 @@
 import datetime
+from decimal import Decimal
 
 import pytest
 
-from reservation_units.enums import PricingStatus
+from reservation_units.enums import PricingStatus, PricingType
+from reservation_units.models import ReservationUnitPricing
 from reservation_units.pricing_updates import update_reservation_unit_pricings
+from reservation_units.tasks import update_reservation_unit_pricings_tax_percentage
 from tests.factories import ReservationUnitFactory, ReservationUnitPricingFactory
+from tests.helpers import patch_method
+from utils.sentry import SentryLogger
 
 # Applied to all tests
 pytestmark = [
@@ -86,3 +91,170 @@ def test_reservation_unit__update_pricings__not_update__no_future_pricing():
     assert active_pricing.begins == datetime.date(2022, 1, 1)
     assert future_pricing is None
     assert past_pricing is None
+
+
+###################################################
+# update_reservation_unit_pricings_tax_percentage #
+###################################################
+
+
+TAX_CHANGE_DATE = datetime.date(2024, 9, 1)
+CURRENT_TAX = Decimal("24")
+FUTURE_TAX = Decimal("25.5")
+
+
+def test_reservation_unit__update_pricings__tax_percentage__no_future_pricing():
+    active_pricing = ReservationUnitPricingFactory.create(
+        begins=datetime.date(2024, 1, 1),
+        status=PricingStatus.PRICING_STATUS_ACTIVE,
+        tax_percentage__value=CURRENT_TAX,
+    )
+
+    update_reservation_unit_pricings_tax_percentage(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX))
+
+    future_pricing_count = ReservationUnitPricing.objects.filter(status=PricingStatus.PRICING_STATUS_FUTURE).count()
+    assert future_pricing_count == 1  # New pricing should be created for the change date
+
+    future_pricing = ReservationUnitPricing.objects.filter(status=PricingStatus.PRICING_STATUS_FUTURE).first()
+    assert future_pricing.tax_percentage.value == FUTURE_TAX
+    assert active_pricing.tax_percentage.value == CURRENT_TAX  # Active pricing should not be changed
+
+
+def test_reservation_unit__update_pricings__tax_percentage__future_pricing_before_change_date():
+    pricing_1 = ReservationUnitPricingFactory.create(
+        begins=datetime.date(2024, 1, 1),
+        status=PricingStatus.PRICING_STATUS_ACTIVE,
+        tax_percentage__value=CURRENT_TAX,
+        highest_price=Decimal("10"),
+    )
+    pricing_2 = ReservationUnitPricingFactory.create(
+        begins=datetime.date(2024, 8, 31),
+        status=PricingStatus.PRICING_STATUS_FUTURE,
+        reservation_unit=pricing_1.reservation_unit,
+        tax_percentage__value=CURRENT_TAX,
+        highest_price=Decimal("20"),
+    )
+
+    update_reservation_unit_pricings_tax_percentage(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX))
+
+    future_pricing_count = ReservationUnitPricing.objects.filter(status=PricingStatus.PRICING_STATUS_FUTURE).count()
+    assert future_pricing_count == 2  # New pricing should be created, since the future pricing is before change date
+
+    future_pricing = ReservationUnitPricing.objects.filter(
+        status=PricingStatus.PRICING_STATUS_FUTURE,
+        begins=TAX_CHANGE_DATE,
+    ).first()
+    assert future_pricing.tax_percentage.value == FUTURE_TAX
+    # Price should be the same as in the last pricing before the change date
+    assert future_pricing.highest_price == pricing_2.highest_price
+    assert future_pricing.highest_price_net < pricing_2.highest_price_net
+
+
+@pytest.mark.parametrize(
+    "latest_begins_date",
+    [
+        TAX_CHANGE_DATE,
+        datetime.date(2024, 9, 21),  # After the change date
+    ],
+)
+@patch_method(SentryLogger.log_message)
+def test_reservation_unit__update_pricings__tax_percentage__future_pricing_after_change_date(latest_begins_date):
+    pricing_1 = ReservationUnitPricingFactory.create(
+        begins=datetime.date(2024, 1, 1),
+        status=PricingStatus.PRICING_STATUS_ACTIVE,
+        tax_percentage__value=CURRENT_TAX,
+    )
+    pricing_2 = ReservationUnitPricingFactory.create(
+        begins=latest_begins_date,
+        status=PricingStatus.PRICING_STATUS_FUTURE,
+        reservation_unit=pricing_1.reservation_unit,
+        tax_percentage__value=CURRENT_TAX,
+    )
+
+    update_reservation_unit_pricings_tax_percentage(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX))
+
+    future_pricing_count = ReservationUnitPricing.objects.filter(status=PricingStatus.PRICING_STATUS_FUTURE).count()
+    assert future_pricing_count == 1  # No new pricings should be created, since a pricing after the change date exists
+
+    sentry_message = SentryLogger.log_message.call_args.kwargs["details"]
+    assert sentry_message.startswith(f"Task found the following unhandled future pricings: <{pricing_2.id}: ")
+
+
+def test_reservation_unit__update_pricings__tax_percentage__free_future_pricing_on_change_date():
+    pricing_1 = ReservationUnitPricingFactory.create(
+        begins=datetime.date(2024, 1, 1),
+        status=PricingStatus.PRICING_STATUS_ACTIVE,
+        tax_percentage__value=CURRENT_TAX,
+    )
+    ReservationUnitPricingFactory.create(
+        begins=TAX_CHANGE_DATE,
+        status=PricingStatus.PRICING_STATUS_FUTURE,
+        reservation_unit=pricing_1.reservation_unit,
+        tax_percentage__value=CURRENT_TAX,
+        pricing_type=PricingType.FREE,
+    )
+
+    update_reservation_unit_pricings_tax_percentage(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX))
+
+    future_pricing_count = ReservationUnitPricing.objects.filter(status=PricingStatus.PRICING_STATUS_FUTURE).count()
+    assert future_pricing_count == 1  # No new pricings should be created, since a pricing on the change date exists
+
+
+def test_reservation_unit__update_pricings__tax_percentage__free_future_pricing_after_change_date():
+    pricing_1 = ReservationUnitPricingFactory.create(
+        begins=datetime.date(2024, 1, 1),
+        status=PricingStatus.PRICING_STATUS_ACTIVE,
+        tax_percentage__value=CURRENT_TAX,
+    )
+    ReservationUnitPricingFactory.create(
+        begins=datetime.date(2024, 9, 21),
+        status=PricingStatus.PRICING_STATUS_FUTURE,
+        reservation_unit=pricing_1.reservation_unit,
+        tax_percentage__value=CURRENT_TAX,
+        pricing_type=PricingType.FREE,
+    )
+
+    update_reservation_unit_pricings_tax_percentage(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX))
+
+    future_pricing_count = ReservationUnitPricing.objects.filter(status=PricingStatus.PRICING_STATUS_FUTURE).count()
+    assert future_pricing_count == 2  # New pricing should be created, since the FREE pricing is after the change date
+
+    # A new pricing
+    future_pricing = ReservationUnitPricing.objects.filter(
+        status=PricingStatus.PRICING_STATUS_FUTURE,
+        begins=TAX_CHANGE_DATE,
+    ).first()
+    assert future_pricing.tax_percentage.value == FUTURE_TAX
+    assert future_pricing.highest_price == pricing_1.highest_price
+    assert future_pricing.highest_price_net < pricing_1.highest_price_net
+
+
+def test_reservation_unit__update_pricings__tax_percentage__different_tax_percentage_is_ignored():
+    reservation_unit = ReservationUnitFactory.create()
+    ReservationUnitPricingFactory.create(
+        begins=datetime.date(2024, 1, 1),
+        status=PricingStatus.PRICING_STATUS_ACTIVE,
+        reservation_unit=reservation_unit,
+        tax_percentage__value=Decimal("10"),
+    )
+
+    update_reservation_unit_pricings_tax_percentage(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX))
+
+    future_pricing_count = ReservationUnitPricing.objects.filter(status=PricingStatus.PRICING_STATUS_FUTURE).count()
+    assert future_pricing_count == 0  # No new pricing should be created
+
+
+def test_reservation_unit__update_pricings__tax_percentage__free_pricing_is_ignored():
+    reservation_unit = ReservationUnitFactory.create()
+    ReservationUnitPricingFactory.create(
+        begins=datetime.date(2024, 1, 1),
+        status=PricingStatus.PRICING_STATUS_ACTIVE,
+        reservation_unit=reservation_unit,
+        tax_percentage__value=CURRENT_TAX,
+        pricing_type=PricingType.FREE,
+    )
+
+    update_reservation_unit_pricings_tax_percentage(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX))
+
+    future_pricing_count = ReservationUnitPricing.objects.filter(status=PricingStatus.PRICING_STATUS_FUTURE).count()
+    assert future_pricing_count == 0  # No new pricing should be created
