@@ -141,7 +141,7 @@ class FirstReservableTimeHelper:
     # Contains a list of hard closed time spans that are shared by all ReservationUnits.
     shared_hard_closed_time_spans: list[TimeSpanElement]
 
-    def __init__(
+    def __init__(  # noqa: PLR0915
         self,
         reservation_unit_queryset: ReservationUnitQuerySet,
         filter_date_start: datetime.date | None = None,
@@ -245,6 +245,7 @@ class FirstReservableTimeHelper:
 
         self.first_reservable_times = {}
         self.reservation_unit_closed_statuses = {}
+        self.cached_value_validity = {}
 
         # Closed time spans that are shared by all ReservationUnits
         self.shared_hard_closed_time_spans = self._get_shared_hard_closed_time_spans()
@@ -340,17 +341,19 @@ class FirstReservableTimeHelper:
 
             self.reservation_unit_closed_statuses[pk] = cached_result.closed
             self.first_reservable_times[pk] = cached_result.frt
+            self.cached_value_validity[pk] = cached_result.valid_until
 
         return has_valid_results_for_previous_pages
 
     def _cache_results(self) -> None:
         """Save the calculated results to the cache."""
         cached_data: dict[ReservationUnitPK, dict[str, Any]] = {}
-        is_valid = self.now + datetime.timedelta(minutes=2)
+        new_valid_until = self.now + datetime.timedelta(minutes=2)
 
         for pk, frt in self.first_reservable_times.items():
             is_closed = self.reservation_unit_closed_statuses[pk]
-            cached_data[pk] = CachedReservableTime(frt=frt, closed=is_closed, valid_until=is_valid).to_dict()
+            valid_until = self.cached_value_validity.get(pk, new_valid_until)
+            cached_data[pk] = CachedReservableTime(frt=frt, closed=is_closed, valid_until=valid_until).to_dict()
 
         cache.set(self.cache_key, json.dumps(cached_data), timeout=120)
 
