@@ -276,7 +276,12 @@ class FirstReservableTimeHelper:
             # If we already have cached FRT results for enough reservation units to fill the page
             # AND all the previous pages, then we don't need to calculate anything.
             # NOTE: This does not support different orderings of the same queryset!
-            if len(self.first_reservable_times) >= self.stop_offset:
+            required = (
+                sum(1 for frt in self.first_reservable_times.values() if frt is not None)
+                if self.show_only_reservable
+                else len(self.first_reservable_times)
+            )
+            if required >= self.stop_offset:
                 return
 
             # Otherwise, we can still skip looping through the previous pages.
