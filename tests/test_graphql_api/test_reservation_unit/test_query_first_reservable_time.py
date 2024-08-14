@@ -74,7 +74,7 @@ NOW = _datetime()
 
 @pytest.fixture(autouse=True)
 def _clear_cache() -> None:
-    # Cache needs to be cleared between tests do that
+    # Cache needs to be cleared between tests so that
     # FRT calculations don't reuse results between runs.
     try:
         cache.clear()
@@ -2513,14 +2513,15 @@ def test__reservation_unit__first_reservable_time__remove_not_reservable(graphql
     # Check that we fetch reservation units in a big chunk which is then filtered
     # instead of fetching chunks of the expected page size.
     # Queries:
-    #  1) Fetch reservation units for FRT calculation
-    #  2) Fetch hauki resources for FRT calculation
-    #  3) Fetch reservable time spans for FRT calculation
-    #  4) Fetch application rounds for FRT calculation
-    #  5) Fetch affecting time spans for FRT calculation
-    #  6) Count reservation units for response
-    #  7) Fetch reservation units for response
-    response.assert_query_count(7)
+    #  1) Count reservation units for FRT calculation
+    #  2) Fetch reservation units for FRT calculation
+    #  3) Fetch hauki resources for FRT calculation
+    #  4) Fetch reservable time spans for FRT calculation
+    #  5) Fetch application rounds for FRT calculation
+    #  6) Fetch affecting time spans for FRT calculation
+    #  7) Count reservation units for response
+    #  8) Fetch reservation units for response
+    response.assert_query_count(8)
 
 
 ########################################################################################################################
@@ -2580,9 +2581,9 @@ def test__reservation_unit__first_reservable_time__previous_page_cached(graphql,
     assert cached_value[str(reservation_unit.pk)]["closed"] == "False"
 
     # Check that there was no additional queries
-    response_2.assert_query_count(7)
+    response_2.assert_query_count(8)
     # ...and that we were able to skip iterating through the previous pages due to cached results.
-    assert "OFFSET 1" in response_2.queries[0]
+    assert "OFFSET 1" in response_2.queries[1]
 
 
 ########################################################################################################################
@@ -2631,9 +2632,9 @@ def test__reservation_unit__first_reservable_time__previous_page_not_cached(grap
     assert cached_value[str(reservation_unit.pk)]["closed"] == "False"
 
     # Check that there was no additional queries
-    response.assert_query_count(7)
+    response.assert_query_count(8)
     # We also cannot skip previous pages due to missing cached results.
-    assert "OFFSET 1" not in response.queries[0]
+    assert "OFFSET 1" not in response.queries[1]
 
 
 ########################################################################################################################
@@ -2693,7 +2694,7 @@ def test__reservation_unit__first_reservable_time__different_filters_dont_share_
     assert len(cached_value) == 1
 
     # We couldn't use the cached results, so make database queries as usual.
-    response_2.assert_query_count(7)
+    response_2.assert_query_count(8)
 
 
 ########################################################################################################################
@@ -2743,9 +2744,10 @@ def test__reservation_unit__first_reservable_time__use_cached_results(graphql, r
 
     # Since we used cached results, we didn't need to make database queries.
     # Only make queries for:
-    #  1) Count reservation units for response
-    #  2) Fetch reservation units for response
-    response_2.assert_query_count(2)
+    #  1) Count reservation units for FRT calculation
+    #  2) Count reservation units for response
+    #  3) Fetch reservation units for response
+    response_2.assert_query_count(3)
 
 
 ########################################################################################################################
@@ -2800,9 +2802,10 @@ def test__reservation_unit__first_reservable_time__use_cached_results__not_first
 
     # Since we used cached results, we didn't need to make database queries.
     # Only make queries for:
-    #  1) Count reservation units for response
-    #  2) Fetch reservation units for response
-    response_3.assert_query_count(2)
+    #  1) Count reservation units for FRT calculation
+    #  2) Count reservation units for response
+    #  3) Fetch reservation units for response
+    response_3.assert_query_count(3)
 
 
 ########################################################################################################################
@@ -2860,4 +2863,4 @@ def test__reservation_unit__first_reservable_time__cached_results_not_valid_anym
 
     # Since we couldn't use all the cached results,
     # we needed to fetch data from the database for re-calculation.
-    response.assert_query_count(7)
+    response.assert_query_count(8)

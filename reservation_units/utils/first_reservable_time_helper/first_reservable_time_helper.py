@@ -211,7 +211,7 @@ class FirstReservableTimeHelper:
         ##############
 
         if pagination_args is not None:
-            pagination_args["size"] = graphene_settings.RELAY_CONNECTION_MAX_LIMIT
+            pagination_args["size"] = reservation_unit_queryset.count()
             qs_slice = calculate_queryset_slice(**pagination_args)
             self.start_offset = qs_slice.start
             self.stop_offset = qs_slice.stop
@@ -245,7 +245,7 @@ class FirstReservableTimeHelper:
 
         self.first_reservable_times = {}
         self.reservation_unit_closed_statuses = {}
-        self.cached_value_validity = {}
+        self.cached_value_validity: dict[int, datetime.datetime] = {}
 
         # Closed time spans that are shared by all ReservationUnits
         self.shared_hard_closed_time_spans = self._get_shared_hard_closed_time_spans()
@@ -277,20 +277,23 @@ class FirstReservableTimeHelper:
             # If we already have cached FRT results for enough reservation units to fill the page
             # AND all the previous pages, then we don't need to calculate anything.
             # NOTE: This does not support different orderings of the same queryset!
-            required = (
+            # TODO: This doesn't work for the last page if it's not full!
+            cached = (
                 sum(1 for frt in self.first_reservable_times.values() if frt is not None)
                 if self.show_only_reservable
                 else len(self.first_reservable_times)
             )
-            if required >= self.stop_offset:
+            if cached >= self.stop_offset:
                 return
 
-            # Otherwise, we can still skip looping through the previous pages.
-            qs = qs[self.start_offset :]
-            self.start_offset = 0  # Remove offset since we skip the previous pages
+            # Otherwise, we should still have valid results for the previous pages.
+            # We can start calculating after the last cached result.
+            qs = qs[len(self.first_reservable_times) :]
+            # We also don't need to skip any results that are not already cached.
+            self.start_offset = 0
 
         # If we don't have valid results, and this is not the first page,
-        # we should fetch the current and previous pages in on chunk. The next chunk
+        # we should fetch the current and previous pages in one chunk. The next chunk
         # will also be bigger (if needed), but likely small enough (<100) not to cause any problems.
         elif self.start_offset > 0:
             self.chunk_size = self.stop_offset
@@ -303,15 +306,14 @@ class FirstReservableTimeHelper:
             self.reservation_unit_closed_statuses[reservation_unit.pk] = is_closed
             self.first_reservable_times[reservation_unit.pk] = first_reservable_time
 
-            # Start offset should exist only if we need to recalculate previous pages.
-            # -> Don't count the result for the current page.
-            if self.start_offset > 0:
-                self.start_offset -= 1
-                continue
-
             # If we should only show reservable reservation units, then we should count the result for the
             # current page only if there is a first reservable time.
             if not self.show_only_reservable or first_reservable_time is not None:
+                # Start offset should exist only if we need to recalculate previous pages.
+                # -> Don't count the result for the current page.
+                if self.start_offset > 0:
+                    self.start_offset -= 1
+                    continue
                 results += 1
 
             # This only really matters when showing only reservable reservation units,
@@ -327,9 +329,9 @@ class FirstReservableTimeHelper:
 
         Check that we have valid results for all the previous pages.
         If not, we must recalculate results for all previous pages, since they might be different
-        if one FRT has changed to None or from None to a valid value.
+        if one FRT has changed from a datetime to None or vice versa.
         """
-        cached_data: dict[ReservationUnitPK, dict[str, Any]] = json.loads(cache.get(self.cache_key, "{}"))
+        cached_data: dict[str, dict[str, Any]] = json.loads(cache.get(self.cache_key, "{}"))
 
         has_valid_results_for_previous_pages = bool(cached_data)
         for pk, item in cached_data.items():
@@ -339,21 +341,22 @@ class FirstReservableTimeHelper:
                 self.first_reservable_times.clear()
                 return False
 
-            self.reservation_unit_closed_statuses[pk] = cached_result.closed
-            self.first_reservable_times[pk] = cached_result.frt
-            self.cached_value_validity[pk] = cached_result.valid_until
+            self.reservation_unit_closed_statuses[int(pk)] = cached_result.closed
+            self.first_reservable_times[int(pk)] = cached_result.frt
+            self.cached_value_validity[int(pk)] = cached_result.valid_until
 
         return has_valid_results_for_previous_pages
 
     def _cache_results(self) -> None:
-        """Save the calculated results to the cache."""
-        cached_data: dict[ReservationUnitPK, dict[str, Any]] = {}
+        """Save the calculated FRT results to the cache."""
+        cached_data: dict[str, dict[str, Any]] = {}
         new_valid_until = self.now + datetime.timedelta(minutes=2)
 
         for pk, frt in self.first_reservable_times.items():
             is_closed = self.reservation_unit_closed_statuses[pk]
+            # If FRT was not calculated in this request, use the previous 'valid_until' value.
             valid_until = self.cached_value_validity.get(pk, new_valid_until)
-            cached_data[pk] = CachedReservableTime(frt=frt, closed=is_closed, valid_until=valid_until).to_dict()
+            cached_data[str(pk)] = CachedReservableTime(frt=frt, closed=is_closed, valid_until=valid_until).to_dict()
 
         cache.set(self.cache_key, json.dumps(cached_data), timeout=120)
 

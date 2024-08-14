@@ -211,8 +211,8 @@ class ReservationUnitFilterSet(ModelFilterSet):
         if not calculate_first_reservable_time:
             return qs
 
-        # Calculate a cache key for pagination
-        # Pagination does not affect the calculated results (note: ordering does!).
+        # Calculate a cache key caching results for pagination.
+        # Pagination arguments do not affect the calculated results (note: ordering does!).
         unaffecting = {"first", "last", "offset", "after", "before"}
         args = sorted(f"{key}={value}" for key, value in self.data.items() if key not in unaffecting)
         cache_key: str = base64.b64encode(",".join(args).encode()).decode()
