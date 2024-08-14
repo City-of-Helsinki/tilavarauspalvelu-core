@@ -450,9 +450,13 @@ class FirstReservableTimeHelper:
         even if the TimeSpanElement would affect other ReservationUnits as well. This is done to allow
         fetching the elements in batches, while also merging overlapping elements for each ReservationUnit.
         """
-        pks: set[ReservationUnitPK] = {result.pk for result in reservation_units}
+        pks: list[ReservationUnitPK] = [result.pk for result in reservation_units]
         results = (
-            AffectingTimeSpan.objects.filter(affected_reservation_unit_ids__overlap=list(pks))
+            AffectingTimeSpan.objects.filter(
+                affected_reservation_unit_ids__overlap=pks,
+                buffered_start_datetime__date__lte=self.filter_date_end,
+                buffered_end_datetime__date__gte=self.filter_date_start,
+            )
             .annotate(
                 start_datetime=models.F("buffered_start_datetime") + models.F("buffer_time_before"),
                 end_datetime=models.F("buffered_end_datetime") - models.F("buffer_time_after"),
@@ -478,6 +482,10 @@ class FirstReservableTimeHelper:
             )
         )
 
+        # TODO: This part is still slow, since we calculate and merge the time spans in advance for the whole period.
+        #  We should probably calculate them in batches of periods where we are likely to find a valid FRT result
+        #  (e.g. a week at a time). Maybe should take into account reservation unit settings and opening hours?
+
         closed = self.reservation_closed_time_spans_map
         blocking = self.blocking_reservation_closed_time_spans_map
 
@@ -495,11 +503,13 @@ class FirstReservableTimeHelper:
                     time_spans_map.setdefault(pk, []).append(time_span_element)
 
         # Merge overlapping elements for each reservation unit to optimize FRT calculation
-        for pk, timespans in closed.items():
-            # Only merge what was added, not what is already in the dicts!
-            if pk in pks:
+        # Only merge what was added, not what is already in the dicts!
+        for pk in pks:
+            timespans = closed.get(pk)
+            if timespans is not None:
                 closed[pk] = merge_overlapping_time_span_elements(timespans)
 
-        for pk, timespans in blocking.items():
-            if pk in pks:
+        for pk in pks:
+            timespans = blocking.get(pk)
+            if timespans is not None:
                 blocking[pk] = merge_overlapping_time_span_elements(timespans)
