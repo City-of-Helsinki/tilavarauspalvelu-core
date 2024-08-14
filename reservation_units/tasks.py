@@ -1,4 +1,5 @@
 import logging
+from collections.abc import Collection
 from datetime import date
 from decimal import Decimal
 
@@ -30,12 +31,23 @@ def _update_reservation_unit_pricings() -> None:
 
 
 @app.task(name="update_reservation_unit_pricings_tax_percentage")
-def update_reservation_unit_pricings_tax_percentage(change_date: str, current_tax: str, future_tax: str) -> None:
+def update_reservation_unit_pricings_tax_percentage(
+    change_date: str,
+    current_tax: str,
+    future_tax: str,
+    ignored_company_codes: Collection[str] = (),
+) -> None:
     from reservation_units.models import ReservationUnitPricing, TaxPercentage
 
     SentryLogger.log_message(
         message="Task `update_reservation_unit_pricings_tax_percentage` started",
-        details=f"Task was run with change_date: {change_date}, current_tax: {current_tax}, future_tax: {future_tax}",
+        details=(
+            f"Task was run with "
+            f"change_date: {change_date}, "
+            f"current_tax: {current_tax}, "
+            f"future_tax: {future_tax}, "
+            f"ignored_company_codes: {ignored_company_codes}"
+        ),
         level="info",
     )
 
@@ -50,6 +62,7 @@ def update_reservation_unit_pricings_tax_percentage(change_date: str, current_ta
             | Q(pricing_type=PricingType.PAID)
         )
         .filter(status__in=(PricingStatus.PRICING_STATUS_ACTIVE, PricingStatus.PRICING_STATUS_FUTURE))
+        .exclude(reservation_unit__payment_accounting__company_code__in=ignored_company_codes)
         .order_by("reservation_unit_id", "-begins")
         .distinct("reservation_unit_id")
     )
