@@ -42,8 +42,8 @@ importers:
         specifier: ^3.9.7
         version: 3.9.7(@types/react@18.0.27)(graphql-ws@5.15.0(graphql@16.8.1))(graphql@16.8.1)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)
       '@hookform/resolvers':
-        specifier: ^3.3.4
-        version: 3.3.4(react-hook-form@7.52.1(react@18.2.0))
+        specifier: ^3.9.0
+        version: 3.9.0(react-hook-form@7.52.1(react@18.2.0))
       '@n8tb1t/use-scroll-position':
         specifier: ^2.0.3
         version: 2.0.3(@types/react@18.0.27)(react@18.2.0)
@@ -232,8 +232,8 @@ importers:
         specifier: ^3.9.7
         version: 3.9.7(@types/react@18.0.27)(graphql-ws@5.15.0(graphql@16.8.1))(graphql@16.8.1)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)
       '@hookform/resolvers':
-        specifier: ^3.3.4
-        version: 3.3.4(react-hook-form@7.52.1(react@18.2.0))
+        specifier: ^3.9.0
+        version: 3.9.0(react-hook-form@7.52.1(react@18.2.0))
       '@sentry/nextjs':
         specifier: ^8.25.0
         version: 8.25.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.25.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.52.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.25.1(@opentelemetry/api@1.9.0))(next@14.2.5(@babel/core@7.24.7)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)(sass@1.74.1))(react@18.2.0)(webpack@5.92.1)
@@ -2560,8 +2560,8 @@ packages:
     peerDependencies:
       react-hook-form: ^7.0.0
 
-  '@hookform/resolvers@3.3.4':
-    resolution: {integrity: sha512-o5cgpGOuJYrd+iMKvkttOclgwRW86EsWJZZRC23prf0uU2i48Htq4PuT73AVb9ionFyZrwYEITuOFGF+BydEtQ==}
+  '@hookform/resolvers@3.9.0':
+    resolution: {integrity: sha512-bU0Gr4EepJ/EQsH/IwEzYLsT/PEj5C0ynLQ4m+GSHS+xKH4TfSelhluTgOaoc4kA5s7eCsQbM4wvZLzELmWzUg==}
     peerDependencies:
       react-hook-form: ^7.0.0
 
@@ -12402,7 +12402,7 @@ snapshots:
     dependencies:
       react-hook-form: 7.52.1(react@18.2.0)
 
-  '@hookform/resolvers@3.3.4(react-hook-form@7.52.1(react@18.2.0))':
+  '@hookform/resolvers@3.9.0(react-hook-form@7.52.1(react@18.2.0))':
     dependencies:
       react-hook-form: 7.52.1(react@18.2.0)
 

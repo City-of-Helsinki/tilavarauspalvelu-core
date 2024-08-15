@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.9.7",
-    "@hookform/resolvers": "^3.3.4",
+    "@hookform/resolvers": "^3.9.0",
     "@n8tb1t/use-scroll-position": "^2.0.3",
     "@next/bundle-analyzer": "^14.2.5",
     "@next/eslint-plugin-next": "^14.2.5",
