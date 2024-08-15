@@ -46,7 +46,7 @@ const getColConfig = (t: TFunction) => [
           {notification.name ?? t("Notifications.noName")}
         </TableLink>
       ) : (
-        notification.name ?? t("Notifications.noName")
+        (notification.name ?? t("Notifications.noName"))
       ),
   },
   {

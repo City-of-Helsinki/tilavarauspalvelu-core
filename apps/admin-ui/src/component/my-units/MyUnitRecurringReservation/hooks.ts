@@ -76,11 +76,11 @@ export const useMultipleReservation = ({
       buffers: {
         before:
           watch("bufferTimeBefore") && !isBlocked
-            ? reservationUnit?.bufferTimeBefore ?? 0
+            ? (reservationUnit?.bufferTimeBefore ?? 0)
             : 0,
         after:
           watch("bufferTimeAfter") && !isBlocked
-            ? reservationUnit?.bufferTimeAfter ?? 0
+            ? (reservationUnit?.bufferTimeAfter ?? 0)
             : 0,
       },
     })),
@@ -180,10 +180,12 @@ const listItemToInterval = (
       buffers: {
         before:
           type !== ReservationTypeChoice.Blocked
-            ? item.buffers?.before ?? 0
+            ? (item.buffers?.before ?? 0)
             : 0,
         after:
-          type !== ReservationTypeChoice.Blocked ? item.buffers?.after ?? 0 : 0,
+          type !== ReservationTypeChoice.Blocked
+            ? (item.buffers?.after ?? 0)
+            : 0,
       },
       type,
     };
@@ -342,7 +344,7 @@ export const useCreateRecurringReservation = () => {
   ): Promise<[number | undefined, ReservationMade[]]> => {
     const flattenedMetadataSetValues = flattenMetadata(data, metaFields);
 
-    const name = data.type === "BLOCKED" ? "BLOCKED" : data.seriesName ?? "";
+    const name = data.type === "BLOCKED" ? "BLOCKED" : (data.seriesName ?? "");
 
     const input: RecurringReservationCreateMutationInput = {
       reservationUnit: unitPk,

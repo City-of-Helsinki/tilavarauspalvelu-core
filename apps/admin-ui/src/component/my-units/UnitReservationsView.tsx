@@ -36,7 +36,7 @@ function UnitReservationsView(): JSX.Element {
   const initialDate =
     queryParamsDate != null && date && isValidDate(date)
       ? queryParamsDate
-      : toUIDate(startOfDay(new Date())) ?? "";
+      : (toUIDate(startOfDay(new Date())) ?? "");
   const [begin, setBegin] = useState<string>(initialDate);
   const { unitId } = useParams<Params>();
   const { t } = useTranslation();

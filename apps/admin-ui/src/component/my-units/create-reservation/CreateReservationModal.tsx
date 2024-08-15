@@ -288,11 +288,11 @@ const DialogContent = ({
       }
       const bufferBefore =
         values.type !== ReservationTypeChoice.Blocked && values.bufferTimeBefore
-          ? reservationUnit.bufferTimeBefore ?? 0
+          ? (reservationUnit.bufferTimeBefore ?? 0)
           : 0;
       const bufferAfter =
         values.type !== ReservationTypeChoice.Blocked && values.bufferTimeAfter
-          ? reservationUnit.bufferTimeAfter ?? 0
+          ? (reservationUnit.bufferTimeAfter ?? 0)
           : 0;
       const input: ReservationStaffCreateMutationInput = {
         reservationUnitPks: [reservationUnit.pk],

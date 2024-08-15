@@ -291,7 +291,7 @@ function ReservationCalendarControls({
   const dateValue = useMemo(() => fromUIDate(formDate ?? ""), [formDate]);
   const duration = !Number.isNaN(Number(formDuration))
     ? Number(formDuration)
-    : reservationUnit.minReservationDuration ?? 0;
+    : (reservationUnit.minReservationDuration ?? 0);
 
   const togglerLabel = (() => {
     const dateStr = capitalize(

@@ -160,11 +160,11 @@ export function AllocatedCard({
 
   const allocationBegin =
     allocatedTimeSlot?.beginTime != null
-      ? parseApiTime(allocatedTimeSlot.beginTime) ?? 0
+      ? (parseApiTime(allocatedTimeSlot.beginTime) ?? 0)
       : 0;
 
   const allocationEnd = allocatedTimeSlot?.endTime
-    ? parseApiTime(allocatedTimeSlot.endTime) ?? 0
+    ? (parseApiTime(allocatedTimeSlot.endTime) ?? 0)
     : 0;
 
   const minDurationSeconds = applicationSection.reservationMinDuration ?? 0;

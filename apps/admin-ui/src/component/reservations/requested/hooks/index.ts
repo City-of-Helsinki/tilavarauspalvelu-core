@@ -42,7 +42,7 @@ function convertReservationToCalendarEvent(
     "reservationUnit" in r && r.reservationUnit != null
       ? r.reservationUnit
       : [];
-  const paymentOrder = "paymentOrder" in r ? r.paymentOrder ?? [] : [];
+  const paymentOrder = "paymentOrder" in r ? (r.paymentOrder ?? []) : [];
   return {
     title,
     event: {

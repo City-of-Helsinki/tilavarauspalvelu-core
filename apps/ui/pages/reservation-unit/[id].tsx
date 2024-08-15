@@ -482,7 +482,7 @@ function ReservationUnit({
   const defaultValues = {
     date:
       searchUIDate != null && isValidDate(searchUIDate)
-        ? searchDate ?? ""
+        ? (searchDate ?? "")
         : defaultDateString,
     duration: clampDuration(
       searchDuration ?? 0,
