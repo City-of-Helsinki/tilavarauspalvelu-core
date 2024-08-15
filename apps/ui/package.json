@@ -42,7 +42,7 @@
     "react-hook-form": "^7.52.1",
     "react-i18next": "^15.0.1",
     "react-transition-group": "^4.4.5",
-    "react-use": "^17.5.0",
+    "react-use": "^17.5.1",
     "sanitize-html": "^2.13.0",
     "sass": "^1.74.1",
     "styled-components": "5.3.11",
