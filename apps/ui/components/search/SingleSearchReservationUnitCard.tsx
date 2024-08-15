@@ -1,4 +1,4 @@
-import { IconArrowRight, IconGlyphEuro, IconGroup, Tag } from "hds-react";
+import { IconArrowRight, IconEuroSign, IconGroup, Tag } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import Link from "next/link";
@@ -310,7 +310,7 @@ function ReservationUnitCard({ reservationUnit }: PropsT): JSX.Element {
             {unitPrice && (
               <StyledIconWithText
                 icon={
-                  <IconGlyphEuro
+                  <IconEuroSign
                     aria-label={t("prices:reservationUnitPriceLabel")}
                   />
                 }

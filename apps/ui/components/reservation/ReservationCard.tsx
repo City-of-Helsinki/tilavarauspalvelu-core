@@ -1,5 +1,5 @@
 import React from "react";
-import { IconArrowRight, IconCross, IconGlyphEuro } from "hds-react";
+import { IconEuroSign, IconCross, IconArrowRight } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { differenceInMinutes } from "date-fns";
 import styled from "styled-components";
@@ -255,7 +255,7 @@ function ReservationCard({ reservation, type }: PropsT): JSX.Element {
               })}
             </JustForMobile>
             <Price
-              icon={<IconGlyphEuro aria-label={t("reservationUnit:price")} />}
+              icon={<IconEuroSign aria-label={t("reservationUnit:price")} />}
               text={price}
               data-testid="reservation-card__price"
             />

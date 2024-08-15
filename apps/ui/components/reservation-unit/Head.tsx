@@ -1,4 +1,4 @@
-import { IconClock, IconGroup, IconGlyphEuro } from "hds-react";
+import { IconClock, IconGroup, IconEuroSign } from "hds-react";
 import React from "react";
 import NextImage from "next/image";
 import { useTranslation } from "next-i18next";
@@ -231,7 +231,7 @@ function Head({
                 {unitPrice && (
                   <StyledIconWithText
                     icon={
-                      <IconGlyphEuro
+                      <IconEuroSign
                         aria-label={t("prices:reservationUnitPriceLabel")}
                       />
                     }
