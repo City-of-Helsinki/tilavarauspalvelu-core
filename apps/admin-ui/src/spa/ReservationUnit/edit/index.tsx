@@ -62,7 +62,6 @@ import { useModal } from "@/context/ModalContext";
 import { parseAddress, getTranslatedError } from "@/common/util";
 import Error404 from "@/common/Error404";
 import { Accordion } from "@/component/Accordion";
-import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import { ControlledNumberInput } from "common/src/components/form/ControlledNumberInput";
 import { ArchiveDialog } from "./ArchiveDialog";
 import { ReservationStateTag, ReservationUnitStateTag } from "./tags";
@@ -78,7 +77,6 @@ import {
   type ImageFormType,
 } from "./form";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
-import { reservationUnitsUrl } from "@/common/urls";
 import { SeasonalSection } from "./SeasonalSection";
 
 const RichTextInput = dynamic(
@@ -2279,21 +2277,10 @@ function EditorWrapper({ previewUrlPrefix }: { previewUrlPrefix: string }) {
     return <Error404 />;
   }
 
-  const route = [
-    { slug: "", alias: t("breadcrumb.spaces-n-settings") },
-    {
-      slug: reservationUnitsUrl,
-      alias: t("breadcrumb.reservation-units"),
-    },
-    { slug: "", alias: reservationUnit?.nameFi || "-" },
-  ];
-  const backLink = reservationUnitPk == null ? `/unit/${unitPk}` : undefined;
-
   const cleanPreviewUrlPrefix = previewUrlPrefix.replace(/\/$/, "");
 
   return (
     <Wrapper>
-      <BreadcrumbWrapper route={route} backLink={backLink} />
       <ReservationUnitEditor
         reservationUnit={reservationUnit}
         form={form}

@@ -12,7 +12,6 @@ import { Container } from "@/styles/layout";
 import { BasicLink } from "@/styles/util";
 import Loader from "../Loader";
 import { ExternalLink } from "@/component/ExternalLink";
-import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import Error404 from "@/common/Error404";
 import { ReservationUnitList } from "./ReservationUnitList";
@@ -138,94 +137,76 @@ function Unit(): JSX.Element {
 
   const reservationUnits = filterNonNullable(unit.reservationunitSet);
 
-  const route = [
-    {
-      alias: t("breadcrumb.spaces-n-settings"),
-      slug: "",
-    },
-    {
-      alias: t("breadcrumb.units"),
-      slug: `/premises-and-settings/units`,
-    },
-    {
-      slug: "",
-      alias: unit?.nameFi || "-",
-    },
-  ];
-
   return (
-    <>
-      <BreadcrumbWrapper route={route} />
-      <Container>
-        <Links>
-          <BasicLink to={`/unit/${unitPk}/spacesResources`}>
-            {t("Unit.showSpacesAndResources")}
-          </BasicLink>
-        </Links>
-        <Ingress>
-          <Image src="https://tilavaraus.hel.fi/v1/media/reservation_unit_images/liikumistila2.jfif.250x250_q85_crop.jpg" />
-          <div>
-            <Name>{unit?.nameFi}</Name>
-            {unit?.location ? (
-              <Address>{parseAddress(unit?.location)}</Address>
-            ) : (
-              <Prop $disabled>{t("Unit.noAddress")}</Prop>
-            )}
-          </div>
-        </Ingress>
-        {!hasSpacesResources ? (
-          <Notification
-            type="alert"
-            label={t("Unit.noSpacesResourcesTitle")}
-            size="large"
-          >
-            {t("Unit.noSpacesResources")}{" "}
-            <BasicLink to={`/unit/${unit.pk}/spacesResources`}>
-              {t("Unit.createSpaces")}
-            </BasicLink>
-          </Notification>
-        ) : null}
-        <div style={{ margin: "var(--spacing-s) 0" }}>
-          <ExternalLink
-            to={`https://asiointi.hel.fi/tprperhe/TPR/UI/ServicePoint/ServicePointEdit/${unit.tprekId}`}
-          >
-            {t("Unit.maintainOpeningHours")}
-          </ExternalLink>
+    <Container>
+      <Links>
+        <BasicLink to={`/unit/${unitPk}/spacesResources`}>
+          {t("Unit.showSpacesAndResources")}
+        </BasicLink>
+      </Links>
+      <Ingress>
+        <Image src="https://tilavaraus.hel.fi/v1/media/reservation_unit_images/liikumistila2.jfif.250x250_q85_crop.jpg" />
+        <div>
+          <Name>{unit?.nameFi}</Name>
+          {unit?.location ? (
+            <Address>{parseAddress(unit?.location)}</Address>
+          ) : (
+            <Prop $disabled>{t("Unit.noAddress")}</Prop>
+          )}
         </div>
-        <HeadingLarge>{t("Unit.reservationUnitTitle")}</HeadingLarge>
-        <Info>
-          <div>
-            {reservationUnits.length > 0 ? (
-              <ResourceUnitCount>
-                {t("Unit.reservationUnits", {
-                  count: reservationUnits.length,
-                })}
-              </ResourceUnitCount>
-            ) : null}
-          </div>
-          <StyledBoldButton
-            disabled={!hasSpacesResources}
-            variant="supplementary"
-            iconLeft={<IconPlusCircleFill />}
-            onClick={() => {
-              history(`/unit/${unitPk}/reservationUnit/edit/`);
-            }}
-          >
-            {t("Unit.reservationUnitCreate")}
-          </StyledBoldButton>
-        </Info>
-        {reservationUnits.length > 0 ? (
-          <ReservationUnitList
-            reservationUnits={reservationUnits}
-            unitId={unitPk}
-          />
-        ) : (
-          <ReservationUnits>
-            <H3 as="p">{t("Unit.noReservationUnitsTitle")}</H3>
-          </ReservationUnits>
-        )}
-      </Container>
-    </>
+      </Ingress>
+      {!hasSpacesResources ? (
+        <Notification
+          type="alert"
+          label={t("Unit.noSpacesResourcesTitle")}
+          size="large"
+        >
+          {t("Unit.noSpacesResources")}{" "}
+          <BasicLink to={`/unit/${unit.pk}/spacesResources`}>
+            {t("Unit.createSpaces")}
+          </BasicLink>
+        </Notification>
+      ) : null}
+      <div style={{ margin: "var(--spacing-s) 0" }}>
+        <ExternalLink
+          to={`https://asiointi.hel.fi/tprperhe/TPR/UI/ServicePoint/ServicePointEdit/${unit.tprekId}`}
+        >
+          {t("Unit.maintainOpeningHours")}
+        </ExternalLink>
+      </div>
+      <HeadingLarge>{t("Unit.reservationUnitTitle")}</HeadingLarge>
+      <Info>
+        <div>
+          {reservationUnits.length > 0 ? (
+            <ResourceUnitCount>
+              {t("Unit.reservationUnits", {
+                count: reservationUnits.length,
+              })}
+            </ResourceUnitCount>
+          ) : null}
+        </div>
+        <StyledBoldButton
+          disabled={!hasSpacesResources}
+          variant="supplementary"
+          iconLeft={<IconPlusCircleFill />}
+          onClick={() => {
+            history(`/unit/${unitPk}/reservationUnit/edit/`);
+          }}
+        >
+          {t("Unit.reservationUnitCreate")}
+        </StyledBoldButton>
+      </Info>
+      {reservationUnits.length > 0 ? (
+        <ReservationUnitList
+          reservationUnits={reservationUnits}
+          unitId={unitPk}
+        />
+      ) : (
+        <ReservationUnits>
+          <H3 as="p">{t("Unit.noReservationUnitsTitle")}</H3>
+        </ReservationUnits>
+      )}
+    </Container>
   );
 }
 

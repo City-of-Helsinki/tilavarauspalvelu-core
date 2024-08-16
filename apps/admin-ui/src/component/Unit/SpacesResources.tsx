@@ -15,7 +15,6 @@ import { NewResourceModal } from "../Resources/resource-editor/NewResourceModal"
 import { base64encode } from "common/src/helpers";
 import { useNotification } from "@/context/NotificationContext";
 import Error404 from "@/common/Error404";
-import BreadcrumbWrapper from "../BreadcrumbWrapper";
 
 interface IProps {
   [key: string]: string;
@@ -89,65 +88,62 @@ function SpacesResources(): JSX.Element {
   }
 
   return (
-    <>
-      <BreadcrumbWrapper backLink=".." />
-      <Container>
-        <Modal
-          id="space-modal"
-          open={newSpaceDialogIsOpen}
-          close={() => closeNewSpaceModal()}
-          afterCloseFocusRef={newSpacesButtonRef}
+    <Container>
+      <Modal
+        id="space-modal"
+        open={newSpaceDialogIsOpen}
+        close={() => closeNewSpaceModal()}
+        afterCloseFocusRef={newSpacesButtonRef}
+      >
+        <NewSpaceModal
+          unit={unit}
+          closeModal={() => closeNewSpaceModal()}
+          refetch={refetch}
+        />
+      </Modal>
+      <SubPageHead title={t("Unit.spacesAndResources")} unit={unit} />
+      <TableHead>
+        <Title>{t("Unit.spaces")}</Title>
+        <ActionButton
+          ref={newSpacesButtonRef}
+          iconLeft={<IconPlusCircleFill />}
+          variant="supplementary"
+          onClick={() => openNewSpaceModal()}
         >
-          <NewSpaceModal
-            unit={unit}
-            closeModal={() => closeNewSpaceModal()}
-            refetch={refetch}
-          />
-        </Modal>
-        <SubPageHead title={t("Unit.spacesAndResources")} unit={unit} />
-        <TableHead>
-          <Title>{t("Unit.spaces")}</Title>
-          <ActionButton
-            ref={newSpacesButtonRef}
-            iconLeft={<IconPlusCircleFill />}
-            variant="supplementary"
-            onClick={() => openNewSpaceModal()}
-          >
-            {t("Unit.addSpace")}
-          </ActionButton>
-        </TableHead>
-        <SpacesTable unit={unit} refetch={refetch} />
-        <TableHead>
-          <Title>{t("Unit.resources")}</Title>
-          <ActionButton
-            disabled={unit.spaces.length === 0}
-            iconLeft={<IconPlusCircleFill />}
-            variant="supplementary"
-            onClick={() => {
-              openWithContent(
-                <NewResourceModal
-                  spacePk={0}
-                  unit={unit}
-                  closeModal={closeNewResourceModal}
-                  refetch={refetch}
-                />
-              );
-            }}
-          >
-            {t("Unit.addResource")}
-          </ActionButton>
-        </TableHead>
-        <ResourcesTable unit={unit} refetch={refetch} />
-        <Modal
-          id="resource-modal"
-          open={isNewResourceModalOpen}
-          close={closeNewResourceModal}
-          afterCloseFocusRef={newResourceButtonRef}
+          {t("Unit.addSpace")}
+        </ActionButton>
+      </TableHead>
+      <SpacesTable unit={unit} refetch={refetch} />
+      <TableHead>
+        <Title>{t("Unit.resources")}</Title>
+        <ActionButton
+          disabled={unit.spaces.length === 0}
+          iconLeft={<IconPlusCircleFill />}
+          variant="supplementary"
+          onClick={() => {
+            openWithContent(
+              <NewResourceModal
+                spacePk={0}
+                unit={unit}
+                closeModal={closeNewResourceModal}
+                refetch={refetch}
+              />
+            );
+          }}
         >
-          {modalContent}
-        </Modal>
-      </Container>
-    </>
+          {t("Unit.addResource")}
+        </ActionButton>
+      </TableHead>
+      <ResourcesTable unit={unit} refetch={refetch} />
+      <Modal
+        id="resource-modal"
+        open={isNewResourceModalOpen}
+        close={closeNewResourceModal}
+        afterCloseFocusRef={newResourceButtonRef}
+      >
+        {modalContent}
+      </Modal>
+    </Container>
   );
 }
 

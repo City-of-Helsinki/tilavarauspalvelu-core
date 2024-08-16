@@ -19,7 +19,6 @@ import { useNotification } from "@/context/NotificationContext";
 import Loader from "@/component/Loader";
 import { useModal } from "@/context/ModalContext";
 import { ButtonContainer, Container } from "@/styles/layout";
-import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import ShowWhenTargetInvisible from "@/component/ShowWhenTargetInvisible";
 import StickyHeader from "@/component/StickyHeader";
 import { ReservationWorkingMemo } from "@/component/WorkingMemo";
@@ -411,24 +410,8 @@ function RequestedReservation({
   const reservationTagline = createTagString(reservation, t);
   const order = reservation.paymentOrder[0];
 
-  const route = [
-    {
-      alias: t("breadcrumb.reservations"),
-      slug: "",
-    },
-    {
-      alias: t("breadcrumb.requested-reservations"),
-      slug: `/reservations/requested`,
-    },
-    {
-      slug: "",
-      alias: getName(reservation, t),
-    },
-  ];
-
   return (
     <>
-      <BreadcrumbWrapper route={route} />
       <ShowWhenTargetInvisible target={ref}>
         <StickyHeader
           name={getName(reservation, t)}

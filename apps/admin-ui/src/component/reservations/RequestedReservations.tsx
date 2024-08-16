@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { H1 } from "common/src/common/typography";
 import { Filters } from "./Filters";
 import { ReservationsDataLoader } from "./ReservationsDataLoader";
-import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import { HR } from "@/component/Table";
 import { Container } from "@/styles/layout";
 import { useSearchParams } from "react-router-dom";
@@ -45,21 +44,18 @@ function Reservations(): JSX.Element {
   ];
 
   return (
-    <>
-      <BreadcrumbWrapper route={["reservations", "requested-reservations"]} />
-      <Container>
-        <div>
-          <H1 $legacy>{t("Reservations.reservationListHeading")}</H1>
-          <p>{t("Reservations.reservationListDescription")}</p>
-        </div>
-        <Filters
-          defaultFilters={defaultFilters}
-          clearButtonLabel={t("common.returnDefaults")}
-        />
-        <HR />
-        <ReservationsDataLoader />
-      </Container>
-    </>
+    <Container>
+      <div>
+        <H1 $legacy>{t("Reservations.reservationListHeading")}</H1>
+        <p>{t("Reservations.reservationListDescription")}</p>
+      </div>
+      <Filters
+        defaultFilters={defaultFilters}
+        clearButtonLabel={t("common.returnDefaults")}
+      />
+      <HR />
+      <ReservationsDataLoader />
+    </Container>
   );
 }
 

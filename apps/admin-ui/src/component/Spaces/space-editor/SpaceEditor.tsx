@@ -24,7 +24,6 @@ import {
 import { base64encode } from "common/src/helpers";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import BreadcrumbWrapper from "app/component/BreadcrumbWrapper";
 
 const Editor = styled.div`
   margin: 0;
@@ -141,12 +140,8 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
     }
   };
 
-  // TODO use url builder
-  const prevLink = `/unit/${unit}/spacesResources`;
-
   return (
     <form noValidate onSubmit={handleSubmit(onSubmit)}>
-      <BreadcrumbWrapper backLink={prevLink} />
       <Container>
         <Head
           title={data?.space?.parent?.nameFi || t("SpaceEditor.noParent")}

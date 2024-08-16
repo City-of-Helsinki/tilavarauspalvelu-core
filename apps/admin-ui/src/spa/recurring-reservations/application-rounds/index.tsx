@@ -17,7 +17,6 @@ import { Accordion } from "@/common/hds-fork/Accordion";
 import { useNotification } from "@/context/NotificationContext";
 import { Container } from "@/styles/layout";
 import { truncate } from "@/helpers";
-import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import Loader from "@/component/Loader";
 import { ApplicationRoundCard } from "./ApplicationRoundCard";
 import { TableLink } from "@/component/Table";
@@ -120,123 +119,115 @@ function AllApplicationRounds(): JSX.Element | null {
   );
 
   return (
-    <>
-      <BreadcrumbWrapper
-        route={["recurring-reservations", "application-rounds"]}
+    <Container>
+      <div>
+        <H1 $legacy>{t("MainMenu.applicationRounds")}</H1>
+        <p>{t("ApplicationRound.description")}</p>
+      </div>
+      <RoundsAccordion
+        initiallyOpen
+        hideIfEmpty
+        name={t("ApplicationRound.groupLabel.handling")}
+        rounds={
+          orderBy(
+            currentApplicationRounds,
+            ["status", "applicationPeriodEnd"],
+            ["asc", "asc"]
+          ) || []
+        }
       />
-      <Container>
-        <div>
-          <H1 $legacy>{t("MainMenu.applicationRounds")}</H1>
-          <p>{t("ApplicationRound.description")}</p>
-        </div>
-        <RoundsAccordion
-          initiallyOpen
-          hideIfEmpty
-          name={t("ApplicationRound.groupLabel.handling")}
-          rounds={
-            orderBy(
-              currentApplicationRounds,
-              ["status", "applicationPeriodEnd"],
-              ["asc", "asc"]
+      <RoundsAccordion
+        name={t("ApplicationRound.groupLabel.notSent")}
+        rounds={handledApplicationRounds}
+        hideIfEmpty
+        initiallyOpen
+      />
+      <RoundsAccordion
+        name={t("ApplicationRound.groupLabel.open")}
+        rounds={
+          orderBy(openApplicationRounds, ["applicationPeriodEnd", "asc"], []) ||
+          []
+        }
+        hideIfEmpty
+        initiallyOpen
+      />
+      <RoundsAccordion
+        name={t("ApplicationRound.groupLabel.opening")}
+        rounds={
+          orderBy(
+            upcomingApplicationRounds,
+            ["applicationPeriodBegin"],
+            ["asc"]
+          ) || []
+        }
+        emptyContent={
+          <div>
+            <div>{t("ApplicationRound.noUpcoming")}</div>
+          </div>
+        }
+      />
+      <StyledAccordion
+        heading={t("ApplicationRound.groupLabel.previousRounds")}
+        className="previous-rounds"
+      >
+        <StyledHDSTable
+          ariaLabelSortButtonAscending="Sorted in ascending order"
+          ariaLabelSortButtonDescending="Sorted in descending order"
+          ariaLabelSortButtonUnset="Not sorted"
+          initialSortingColumnKey="applicantSort"
+          initialSortingOrder="asc"
+          cols={[
+            {
+              isSortable: true,
+              headerName: t("ApplicationRound.headings.name"),
+              transform: (applicationRound: ApplicationRoundNode) => (
+                <TableLink
+                  href={applicationRoundUrl(Number(applicationRound.pk))}
+                >
+                  <span title={applicationRound.nameFi ?? ""}>
+                    {truncate(applicationRound.nameFi ?? "", 50)}
+                  </span>
+                </TableLink>
+              ),
+              key: "nameFi",
+            },
+            {
+              isSortable: true,
+              headerName: t("ApplicationRound.headings.reservationUnitCount"),
+              transform: (applicationRound: ApplicationRoundNode) =>
+                String(applicationRound.applicationsCount),
+              key: "applicationsCount",
+            },
+            {
+              isSortable: true,
+              headerName: t("ApplicationRound.headings.applicationCount"),
+              transform: (applicationRound: ApplicationRoundNode) =>
+                String(applicationRound.reservationUnitCount),
+              key: "reservationUnitCount",
+            },
+            {
+              isSortable: true,
+              headerName: t("ApplicationRound.headings.sent"),
+              transform: (applicationRound: ApplicationRoundNode) =>
+                formatDate(applicationRound.statusTimestamp || null) || "-",
+              key: "statusTimestampSort",
+            },
+          ]}
+          indexKey="pk"
+          rows={
+            orderBy(sentApplicationRounds, ["statusTimestamp"], ["desc"]).map(
+              (a) => ({
+                ...a,
+                statusTimestampSort: new Date(
+                  a.statusTimestamp || ""
+                ).getTime(),
+              })
             ) || []
           }
+          variant="light"
         />
-        <RoundsAccordion
-          name={t("ApplicationRound.groupLabel.notSent")}
-          rounds={handledApplicationRounds}
-          hideIfEmpty
-          initiallyOpen
-        />
-        <RoundsAccordion
-          name={t("ApplicationRound.groupLabel.open")}
-          rounds={
-            orderBy(
-              openApplicationRounds,
-              ["applicationPeriodEnd", "asc"],
-              []
-            ) || []
-          }
-          hideIfEmpty
-          initiallyOpen
-        />
-        <RoundsAccordion
-          name={t("ApplicationRound.groupLabel.opening")}
-          rounds={
-            orderBy(
-              upcomingApplicationRounds,
-              ["applicationPeriodBegin"],
-              ["asc"]
-            ) || []
-          }
-          emptyContent={
-            <div>
-              <div>{t("ApplicationRound.noUpcoming")}</div>
-            </div>
-          }
-        />
-        <StyledAccordion
-          heading={t("ApplicationRound.groupLabel.previousRounds")}
-          className="previous-rounds"
-        >
-          <StyledHDSTable
-            ariaLabelSortButtonAscending="Sorted in ascending order"
-            ariaLabelSortButtonDescending="Sorted in descending order"
-            ariaLabelSortButtonUnset="Not sorted"
-            initialSortingColumnKey="applicantSort"
-            initialSortingOrder="asc"
-            cols={[
-              {
-                isSortable: true,
-                headerName: t("ApplicationRound.headings.name"),
-                transform: (applicationRound: ApplicationRoundNode) => (
-                  <TableLink
-                    href={applicationRoundUrl(Number(applicationRound.pk))}
-                  >
-                    <span title={applicationRound.nameFi ?? ""}>
-                      {truncate(applicationRound.nameFi ?? "", 50)}
-                    </span>
-                  </TableLink>
-                ),
-                key: "nameFi",
-              },
-              {
-                isSortable: true,
-                headerName: t("ApplicationRound.headings.reservationUnitCount"),
-                transform: (applicationRound: ApplicationRoundNode) =>
-                  String(applicationRound.applicationsCount),
-                key: "applicationsCount",
-              },
-              {
-                isSortable: true,
-                headerName: t("ApplicationRound.headings.applicationCount"),
-                transform: (applicationRound: ApplicationRoundNode) =>
-                  String(applicationRound.reservationUnitCount),
-                key: "reservationUnitCount",
-              },
-              {
-                isSortable: true,
-                headerName: t("ApplicationRound.headings.sent"),
-                transform: (applicationRound: ApplicationRoundNode) =>
-                  formatDate(applicationRound.statusTimestamp || null) || "-",
-                key: "statusTimestampSort",
-              },
-            ]}
-            indexKey="pk"
-            rows={
-              orderBy(sentApplicationRounds, ["statusTimestamp"], ["desc"]).map(
-                (a) => ({
-                  ...a,
-                  statusTimestampSort: new Date(
-                    a.statusTimestamp || ""
-                  ).getTime(),
-                })
-              ) || []
-            }
-            variant="light"
-          />
-        </StyledAccordion>
-      </Container>
-    </>
+      </StyledAccordion>
+    </Container>
   );
 }
 

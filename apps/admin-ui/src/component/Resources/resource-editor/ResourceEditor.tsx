@@ -23,7 +23,6 @@ import {
   type ResourceUpdateForm,
 } from "./modules/resourceEditor";
 import { ResourceEditorFields } from "./EditForm";
-import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 
 type Props = {
   resourcePk?: number;
@@ -119,37 +118,32 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
   const unit = unitData.unit;
   const resource = data.resource;
 
-  // TODO use url builder
-  const previousPage = `/unit/${unitPk}/spacesResources`;
   return (
-    <>
-      <BreadcrumbWrapper backLink={previousPage} />
-      <Container>
-        <SubPageHead
-          unit={unit}
-          title={resource.nameFi || t("ResourceEditor.defaultHeading")}
-        />
-        <IngressContainer>
-          <FormErrorSummary errors={errors} />
-        </IngressContainer>
-        <form noValidate onSubmit={handleSubmit(onSubmit)}>
-          <Editor>
-            <ResourceEditorFields form={form} unitPk={unitPk} />
-            <ButtonContainer>
-              <Button
-                onClick={() => history(-1)}
-                variant="secondary"
-                theme="black"
-              >
-                {t("ResourceModal.cancel")}
-              </Button>
-              <Button type="submit" disabled={!isDirty}>
-                {t("ResourceModal.save")}
-              </Button>
-            </ButtonContainer>
-          </Editor>
-        </form>
-      </Container>
-    </>
+    <Container>
+      <SubPageHead
+        unit={unit}
+        title={resource.nameFi || t("ResourceEditor.defaultHeading")}
+      />
+      <IngressContainer>
+        <FormErrorSummary errors={errors} />
+      </IngressContainer>
+      <form noValidate onSubmit={handleSubmit(onSubmit)}>
+        <Editor>
+          <ResourceEditorFields form={form} unitPk={unitPk} />
+          <ButtonContainer>
+            <Button
+              onClick={() => history(-1)}
+              variant="secondary"
+              theme="black"
+            >
+              {t("ResourceModal.cancel")}
+            </Button>
+            <Button type="submit" disabled={!isDirty}>
+              {t("ResourceModal.save")}
+            </Button>
+          </ButtonContainer>
+        </Editor>
+      </form>
+    </Container>
   );
 }

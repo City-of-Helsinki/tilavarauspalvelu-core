@@ -12,7 +12,6 @@ import { formatDate } from "@/common/util";
 import { useNotification } from "@/context/NotificationContext";
 import Loader from "@/component/Loader";
 import { Accordion } from "@/component/Accordion";
-import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import TimeframeStatus from "../TimeframeStatus";
 
 interface IRouteParams {
@@ -107,88 +106,65 @@ function Criteria({
     return <div>Error: failed to load application round</div>;
   }
 
-  const title = applicationRound.nameFi ?? "-";
-  const route = [
-    {
-      alias: t("breadcrumb.recurring-reservations"),
-      slug: "",
-    },
-    {
-      alias: t("breadcrumb.application-rounds"),
-      slug: `/recurring-reservations/application-rounds`,
-    },
-    {
-      alias: title,
-      slug: `/recurring-reservations/application-rounds/${applicationRound.pk}`,
-    },
-    {
-      alias: t("breadcrumb.criteria"),
-      slug: "",
-    },
-  ];
-
   return (
-    <>
-      <BreadcrumbWrapper route={route} />
-      <Container>
-        <H2 as="h1" $legacy>
-          {applicationRound.nameFi}
-        </H2>
-        <HeadContainer>
-          <TimeframeStatus
-            applicationPeriodBegin={applicationRound.applicationPeriodBegin}
-            applicationPeriodEnd={applicationRound.applicationPeriodEnd}
-          />
-          <span>
-            <SemiBold>{applicationRound.reservationUnitCount}</SemiBold>{" "}
-            <span>{t("ApplicationRound.attachedReservationUnits")}</span>
-          </span>
-        </HeadContainer>
-        <Accordion
-          heading={t("ApplicationRound.searchAndUsageTimeRanges")}
-          initiallyOpen
-        >
+    <Container>
+      <H2 as="h1" $legacy>
+        {applicationRound.nameFi}
+      </H2>
+      <HeadContainer>
+        <TimeframeStatus
+          applicationPeriodBegin={applicationRound.applicationPeriodBegin}
+          applicationPeriodEnd={applicationRound.applicationPeriodEnd}
+        />
+        <span>
+          <SemiBold>{applicationRound.reservationUnitCount}</SemiBold>{" "}
+          <span>{t("ApplicationRound.attachedReservationUnits")}</span>
+        </span>
+      </HeadContainer>
+      <Accordion
+        heading={t("ApplicationRound.searchAndUsageTimeRanges")}
+        initiallyOpen
+      >
+        <div>
+          <H3 $legacy>{t("ApplicationRound.applicationPeriodTitle")}</H3>
           <div>
-            <H3 $legacy>{t("ApplicationRound.applicationPeriodTitle")}</H3>
-            <div>
-              {t("common.begins")}{" "}
-              {formatDate(applicationRound.applicationPeriodBegin)}
-            </div>
-            <div>
-              {t("common.ends")}{" "}
-              {formatDate(applicationRound.applicationPeriodEnd)}
-            </div>
+            {t("common.begins")}{" "}
+            {formatDate(applicationRound.applicationPeriodBegin)}
           </div>
           <div>
-            <H3>{t("ApplicationRound.reservationPeriodTitle")}</H3>
-            <div>
-              {t("common.begins")}{" "}
-              {formatDate(applicationRound.reservationPeriodBegin)}
-            </div>
-            <div>
-              {t("common.ends")}{" "}
-              {formatDate(applicationRound.reservationPeriodEnd)}
-            </div>
+            {t("common.ends")}{" "}
+            {formatDate(applicationRound.applicationPeriodEnd)}
           </div>
-        </Accordion>
-        <Accordion
-          heading={t("ApplicationRound.usedReservationUnits")}
-          initiallyOpen
-        >
-          <ReservationUnits>
-            {/* TODO this should be a reduce where the unique key is the unit pk and under that is all the reservationUnits that belong to it */}
-            {reservationUnits?.map((reservationUnit) => (
-              <ReservationUnit key={reservationUnit.pk}>
-                <div>
-                  <Strong>{reservationUnit.unit?.nameFi ?? "-"}</Strong>
-                </div>
-                <div>{reservationUnit.nameFi}</div>
-              </ReservationUnit>
-            ))}
-          </ReservationUnits>
-        </Accordion>
-      </Container>
-    </>
+        </div>
+        <div>
+          <H3>{t("ApplicationRound.reservationPeriodTitle")}</H3>
+          <div>
+            {t("common.begins")}{" "}
+            {formatDate(applicationRound.reservationPeriodBegin)}
+          </div>
+          <div>
+            {t("common.ends")}{" "}
+            {formatDate(applicationRound.reservationPeriodEnd)}
+          </div>
+        </div>
+      </Accordion>
+      <Accordion
+        heading={t("ApplicationRound.usedReservationUnits")}
+        initiallyOpen
+      >
+        <ReservationUnits>
+          {/* TODO this should be a reduce where the unique key is the unit pk and under that is all the reservationUnits that belong to it */}
+          {reservationUnits?.map((reservationUnit) => (
+            <ReservationUnit key={reservationUnit.pk}>
+              <div>
+                <Strong>{reservationUnit.unit?.nameFi ?? "-"}</Strong>
+              </div>
+              <div>{reservationUnit.nameFi}</div>
+            </ReservationUnit>
+          ))}
+        </ReservationUnits>
+      </Accordion>
+    </Container>
   );
 }
 

@@ -45,7 +45,7 @@ function LogoutPage({ apiBaseUrl, logoutUrl, version }: Props) {
   return (
     <Layout version={version}>
       <ClientOnly>
-        <Navigation disabledRouter apiBaseUrl={apiBaseUrl} />
+        <Navigation apiBaseUrl={apiBaseUrl} />
         <KorosHeading heroImage={HERO_IMAGE_URL}>
           <Heading>{t("common:applicationName")}</Heading>
           <p style={{ fontSize: "1.8rem" }}>{t("logout:message")}</p>

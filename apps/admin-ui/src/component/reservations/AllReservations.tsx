@@ -4,7 +4,6 @@ import { toUIDate } from "common/src/common/util";
 import { useTranslation } from "react-i18next";
 import { H1 } from "common/src/common/typography";
 import { ReservationsDataLoader } from "./ReservationsDataLoader";
-import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import { HR } from "@/component/Table";
 import { Container } from "@/styles/layout";
 import { Filters } from "./Filters";
@@ -31,18 +30,15 @@ function AllReservations(): JSX.Element {
   ];
 
   return (
-    <>
-      <BreadcrumbWrapper route={["reservations", "all-reservations"]} />
-      <Container>
-        <div>
-          <H1 $legacy>{t("Reservations.allReservationListHeading")}</H1>
-          <p>{t("Reservations.allReservationListDescription")}</p>
-        </div>
-        <Filters defaultFilters={defaultFilters} />
-        <HR />
-        <ReservationsDataLoader />
-      </Container>
-    </>
+    <Container>
+      <div>
+        <H1 $legacy>{t("Reservations.allReservationListHeading")}</H1>
+        <p>{t("Reservations.allReservationListDescription")}</p>
+      </div>
+      <Filters defaultFilters={defaultFilters} />
+      <HR />
+      <ReservationsDataLoader />
+    </Container>
   );
 }
 

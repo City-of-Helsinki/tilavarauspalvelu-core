@@ -10,7 +10,6 @@ import {
 } from "@gql/gql-types";
 import { H1 } from "common/src/common/typography";
 import { Container } from "@/styles/layout";
-import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import Loader from "@/component/Loader";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { valueForDateInput, valueForTimeInput } from "@/helpers";
@@ -237,12 +236,9 @@ function transformSortString(
 // We don't have proper layouts yet, so just separate the container stuff here
 function PageWrapped() {
   return (
-    <>
-      <BreadcrumbWrapper route={["messaging", "notifications"]} />
-      <Container>
-        <Page />
-      </Container>
-    </>
+    <Container>
+      <Page />
+    </Container>
   );
 }
 

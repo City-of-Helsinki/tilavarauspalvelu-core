@@ -66,12 +66,10 @@ const Content = styled.div<{ $heroImage: boolean }>`
   }
 `;
 
-const StyledKoros = styled(Koros).attrs(({ flipHorizontal }) => ({
+const StyledKoros = styled(Koros).attrs(() => ({
   style: {
-    fill: flipHorizontal ? "var(--fill-color)" : "var(--background-color)",
-    backgroundColor: flipHorizontal
-      ? "var(--background-color)"
-      : "var(--fill-color)",
+    fill: "var(--background-color)",
+    backgroundColor: "var(--fill-color)",
   } as React.CSSProperties,
 }))<{ $hasImage: boolean }>`
   ${({ $hasImage }) =>
@@ -91,11 +89,7 @@ function KorosHeading({
   return (
     <Wrapper $image={heroImage} className={className} style={style}>
       <Content $heroImage={!!heroImage}>{children}</Content>
-      <StyledKoros
-        type="pulse"
-        flipHorizontal={!heroImage}
-        $hasImage={!!heroImage}
-      />
+      <StyledKoros type="pulse" $hasImage={!!heroImage} />
     </Wrapper>
   );
 }

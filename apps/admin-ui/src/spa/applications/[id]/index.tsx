@@ -40,7 +40,6 @@ import { WEEKDAYS } from "common/src/const";
 import { formatNumber, formatDate, parseAgeGroups } from "@/common/util";
 import { useNotification } from "@/context/NotificationContext";
 import ScrollIntoView from "@/common/ScrollIntoView";
-import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import { Accordion } from "@/component/Accordion";
 import { Accordion as HDSAccordion } from "@/common/hds-fork/Accordion";
 import Loader from "@/component/Loader";
@@ -921,29 +920,8 @@ function ApplicationDetails({
     return <Error404 />;
   }
 
-  const route = [
-    {
-      slug: "",
-      alias: t("breadcrumb.recurring-reservations"),
-    },
-    {
-      slug: `/recurring-reservations/application-rounds`,
-      alias: t("breadcrumb.application-rounds"),
-    },
-    {
-      // TODO url builder
-      slug: `/recurring-reservations/application-rounds/${applicationRound.pk}`,
-      alias: applicationRound.nameFi ?? "-",
-    },
-    {
-      slug: "",
-      alias: customerName,
-    },
-  ];
-
   return (
     <>
-      <BreadcrumbWrapper route={route} />
       <ShowWhenTargetInvisible target={ref}>
         <StickyHeader
           name={customerName}

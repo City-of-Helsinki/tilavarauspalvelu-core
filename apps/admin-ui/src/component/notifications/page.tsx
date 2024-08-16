@@ -29,7 +29,6 @@ import { H1 } from "common/src/common/typography";
 import { fromUIDate } from "common/src/common/util";
 import { breakpoints } from "common";
 import { Container } from "app/styles/layout";
-import BreadcrumbWrapper from "app/component/BreadcrumbWrapper";
 import Loader from "app/component/Loader";
 import { useNotification } from "app/context/NotificationContext";
 import { ButtonLikeLink } from "app/component/ButtonLikeLink";
@@ -742,40 +741,19 @@ const PageWrapped = ({ pk }: { pk?: number }) => {
     skip: !pk,
     variables: { id },
   });
-  const { t } = useTranslation();
 
   const notification = data?.bannerNotification ?? undefined;
 
   const isNew = pk === 0;
-  const name = getName(isNew, isLoading, notification?.name, t);
-
-  const route = [
-    {
-      slug: "",
-      alias: t("breadcrumb.messaging"),
-    },
-    {
-      slug: `/messaging/notifications`,
-      alias: t("breadcrumb.notifications"),
-    },
-    {
-      slug: "",
-      alias: name,
-    },
-  ];
 
   return (
-    <>
-      {/* TODO if new page should show "Back" button instead of breadcrumb */}
-      <BreadcrumbWrapper route={route} />
-      <Container>
-        {isLoading ? (
-          <Loader />
-        ) : (
-          <LoadedContent isNew={isNew} notification={notification} />
-        )}
-      </Container>
-    </>
+    <Container>
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <LoadedContent isNew={isNew} notification={notification} />
+      )}
+    </Container>
   );
 };
 

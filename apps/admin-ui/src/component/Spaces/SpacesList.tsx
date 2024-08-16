@@ -9,7 +9,6 @@ import { useSpacesQuery, type SpaceNode } from "@gql/gql-types";
 import Loader from "../Loader";
 import { useNotification } from "@/context/NotificationContext";
 import { Container } from "@/styles/layout";
-import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import { filterNonNullable } from "common/src/helpers";
 import { CustomTable } from "../Table";
 import { Link } from "react-router-dom";
@@ -108,19 +107,16 @@ function SpacesList(): JSX.Element {
   const cols = getColConfig(t);
 
   return (
-    <>
-      <BreadcrumbWrapper route={["spaces-n-settings", "spaces"]} />
-      <Container>
-        <div>
-          <H1 $legacy>{t("Spaces.spaceListHeading")}</H1>
-          <p>{t("Spaces.spaceListDescription")}</p>
-          <SpaceCount>
-            {spaces.length} {t("common.volumeUnit")}
-          </SpaceCount>
-        </div>
-        <CustomTable indexKey="pk" rows={rows} cols={cols} />
-      </Container>
-    </>
+    <Container>
+      <div>
+        <H1 $legacy>{t("Spaces.spaceListHeading")}</H1>
+        <p>{t("Spaces.spaceListDescription")}</p>
+        <SpaceCount>
+          {spaces.length} {t("common.volumeUnit")}
+        </SpaceCount>
+      </div>
+      <CustomTable indexKey="pk" rows={rows} cols={cols} />
+    </Container>
   );
 }
 

@@ -7,7 +7,6 @@ import { H1, Strong } from "common/src/common/typography";
 import { useResourcesQuery, type ResourceNode } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import Loader from "@/component/Loader";
-import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import { useNotification } from "@/context/NotificationContext";
 import { Container } from "@/styles/layout";
 import { CustomTable } from "../Table";
@@ -90,19 +89,16 @@ function ResourcesList(): JSX.Element {
   }
 
   return (
-    <>
-      <BreadcrumbWrapper route={["spaces-n-settings", "resources"]} />
-      <Container>
-        <div>
-          <H1 $legacy>{t("Resources.resourceListHeading")}</H1>
-          <p>{t("Resources.resourceListDescription")}</p>
-          <ResourceCount>
-            {resources.length} {t("common.volumeUnit")}
-          </ResourceCount>
-        </div>
-        <CustomTable indexKey="pk" rows={rows} cols={cols} />
-      </Container>
-    </>
+    <Container>
+      <div>
+        <H1 $legacy>{t("Resources.resourceListHeading")}</H1>
+        <p>{t("Resources.resourceListDescription")}</p>
+        <ResourceCount>
+          {resources.length} {t("common.volumeUnit")}
+        </ResourceCount>
+      </div>
+      <CustomTable indexKey="pk" rows={rows} cols={cols} />
+    </Container>
   );
 }
 

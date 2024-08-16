@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useApplicationRoundQuery } from "@gql/gql-types";
 import { useNotification } from "@/context/NotificationContext";
-import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import Loader from "@/component/Loader";
 import { Review } from "./review/Review";
 import usePermission from "@/hooks/usePermission";
@@ -61,27 +60,7 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
     return <div>{t("errors.noPermission")}</div>;
   }
 
-  const route = [
-    {
-      alias: t("breadcrumb.recurring-reservations"),
-      slug: "",
-    },
-    {
-      alias: t("breadcrumb.application-rounds"),
-      slug: `/recurring-reservations/application-rounds`,
-    },
-    {
-      alias: applicationRound.nameFi ?? "-",
-      slug: "",
-    },
-  ];
-
-  return (
-    <>
-      <BreadcrumbWrapper route={route} />
-      <Review applicationRound={applicationRound} refetch={refetch} />
-    </>
-  );
+  return <Review applicationRound={applicationRound} refetch={refetch} />;
 }
 
 type IParams = {

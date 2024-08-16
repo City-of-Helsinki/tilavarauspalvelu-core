@@ -9,7 +9,6 @@ import { parseAddress } from "@/common/util";
 import { Container } from "@/styles/layout";
 import { myUnitUrl } from "@/common/urls";
 import { BasicLink } from "@/styles/util";
-import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import Loader from "@/component/Loader";
 import { ReservationUnitCalendarView } from "./ReservationUnitCalendarView";
 import UnitReservationsView from "./UnitReservationsView";
@@ -94,17 +93,6 @@ function MyUnitView() {
     parseInt(pk, 10)
   )}/recurring-reservation`;
 
-  const routes = [
-    {
-      slug: "/my-units",
-      alias: t("breadcrumb.my-units"),
-    },
-    {
-      slug: "",
-      alias: unit.nameFi ?? "unnamed unit",
-    },
-  ];
-
   const reservationUnitOptions = filterNonNullable(
     data?.unit?.reservationunitSet
   ).map((reservationUnit) => ({
@@ -113,41 +101,38 @@ function MyUnitView() {
   }));
 
   return (
-    <>
-      <BreadcrumbWrapper route={routes} />
-      <ContainerHack>
-        <ContainerWithSpacing>
-          <H1 $legacy>{unit?.nameFi}</H1>
-          {unit.location && (
-            <LocationOnlyOnDesktop>
-              {parseAddress(unit.location)}
-            </LocationOnlyOnDesktop>
-          )}
-        </ContainerWithSpacing>
-        <ContainerWithSpacing>
-          <BasicLink to={recurringReservationUrl ?? ""}>
-            <Button
-              disabled={!recurringReservationUrl}
-              variant="secondary"
-              theme="black"
-              size="small"
-            >
-              {t("MyUnits.Calendar.header.recurringReservation")}
-            </Button>
-          </BasicLink>
-        </ContainerWithSpacing>
-        <Tabs headers={TabHeaders}>
-          <ReservationTabPanel key="unit-reservations">
-            <UnitReservationsView />
-          </ReservationTabPanel>
-          <UnitCalendarTabPanel key="reservation-unit">
-            <ReservationUnitCalendarView
-              reservationUnitOptions={reservationUnitOptions}
-            />
-          </UnitCalendarTabPanel>
-        </Tabs>
-      </ContainerHack>
-    </>
+    <ContainerHack>
+      <ContainerWithSpacing>
+        <H1 $legacy>{unit?.nameFi}</H1>
+        {unit.location && (
+          <LocationOnlyOnDesktop>
+            {parseAddress(unit.location)}
+          </LocationOnlyOnDesktop>
+        )}
+      </ContainerWithSpacing>
+      <ContainerWithSpacing>
+        <BasicLink to={recurringReservationUrl ?? ""}>
+          <Button
+            disabled={!recurringReservationUrl}
+            variant="secondary"
+            theme="black"
+            size="small"
+          >
+            {t("MyUnits.Calendar.header.recurringReservation")}
+          </Button>
+        </BasicLink>
+      </ContainerWithSpacing>
+      <Tabs headers={TabHeaders}>
+        <ReservationTabPanel key="unit-reservations">
+          <UnitReservationsView />
+        </ReservationTabPanel>
+        <UnitCalendarTabPanel key="reservation-unit">
+          <ReservationUnitCalendarView
+            reservationUnitOptions={reservationUnitOptions}
+          />
+        </UnitCalendarTabPanel>
+      </Tabs>
+    </ContainerHack>
   );
 }
 

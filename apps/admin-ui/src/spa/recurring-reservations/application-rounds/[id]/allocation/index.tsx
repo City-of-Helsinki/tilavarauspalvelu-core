@@ -17,7 +17,6 @@ import {
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { SearchTags } from "@/component/SearchTags";
 import Loader from "@/component/Loader";
-import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import { useOptions } from "@/component/my-units/hooks";
 import {
   Container as BaseContainer,
@@ -638,19 +637,16 @@ function AllocationWrapper({
   );
 
   return (
-    <>
-      <BreadcrumbWrapper backLink=".." />
-      <ApplicationRoundAllocation
-        applicationRound={applicationRound ?? undefined}
-        applicationRoundPk={applicationRoundPk}
-        units={units}
-        reservationUnits={resUnits}
-        roundName={roundName}
-        applicationRoundStatus={
-          applicationRound?.status ?? ApplicationRoundStatusChoice.Upcoming
-        }
-      />
-    </>
+    <ApplicationRoundAllocation
+      applicationRound={applicationRound ?? undefined}
+      applicationRoundPk={applicationRoundPk}
+      units={units}
+      reservationUnits={resUnits}
+      roundName={roundName}
+      applicationRoundStatus={
+        applicationRound?.status ?? ApplicationRoundStatusChoice.Upcoming
+      }
+    />
   );
 }
 
