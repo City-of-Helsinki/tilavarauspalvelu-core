@@ -32,6 +32,7 @@ i18n.addResourceBundle("fi", "common", {
   },
   hours: "Tunnit",
   minutes: "Minuutit",
+  goToFrontPage: "Palaa Tilavarauskäsittelyn etusivulle",
 });
 i18n.addResourceBundle("en", "common", {
   day: "Day",

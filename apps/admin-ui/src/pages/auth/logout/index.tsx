@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import ClientOnly from "common/src/ClientOnly";
 import KorosHeading, { Heading } from "@/component/KorosHeading";
 import { HERO_IMAGE_URL } from "@/common/const";
-import Footer from "@/component/Footer";
 import Navigation from "@/component/Navigation";
 import { env } from "@/env.mjs";
 import BaseLayout from "../../layout";
@@ -54,7 +53,6 @@ function LogoutPage({ apiBaseUrl, logoutUrl, version }: Props) {
         <Ingress>
           <a href={logoutUrl}>{t("logout:signOutFromOtherServices")}</a>
         </Ingress>
-        <Footer />
       </ClientOnly>
     </Layout>
   );

@@ -7,7 +7,6 @@ import { H2 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { HERO_IMAGE_URL } from "app/common/const";
 import KorosHeading, { Heading } from "./KorosHeading";
-import Footer from "./Footer";
 
 const LoginBtn = styled(Button).attrs({
   iconLeft: <IconGroup className="icon-group" />,
@@ -74,7 +73,6 @@ export function MainLander({ apiBaseUrl }: { apiBaseUrl: string }) {
       <Content>
         <Ingress>{t("MainLander.ingress")}</Ingress>
       </Content>
-      <Footer />
     </>
   );
 }

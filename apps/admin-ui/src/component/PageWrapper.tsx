@@ -10,7 +10,6 @@ import { BannerNotificationTarget } from "@gql/gql-types";
 import ScrollToTop from "../common/ScrollToTop";
 import GlobalElements from "./GlobalElements";
 import Navigation from "./Navigation";
-import MainMenu from "./MainMenu";
 import Loader from "./Loader";
 import { MainLander } from "./MainLander";
 
@@ -21,7 +20,8 @@ type Props = {
 };
 
 const Content = styled.main`
-  max-width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
@@ -53,7 +53,6 @@ export default function PageWrapper({
       <ClientOnly>
         <Navigation apiBaseUrl={apiBaseUrl} />
         <Wrapper>
-          {hasAccess && <MainMenu placement="default" />}
           <Suspense fallback={<Loader />}>
             <Content>
               {hasAccess && (

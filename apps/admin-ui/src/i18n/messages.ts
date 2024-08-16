@@ -324,6 +324,7 @@ const translations: ITranslations = {
     spaces: ["Tilat"],
     resources: ["Resurssit"],
     units: ["Toimipisteet"],
+    notifications: ["Ilmoitukset"],
   },
   Navigation: {
     login: ["Kirjaudu sisään"],

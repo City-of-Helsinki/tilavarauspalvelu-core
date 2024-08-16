@@ -1,4 +1,4 @@
-import { Dialog, Navigation } from "hds-react";
+import { Dialog } from "hds-react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 
@@ -26,16 +26,6 @@ export const BasicLink = styled(Link)`
   align-content: center;
   align-items: center;
   gap: var(--spacing-xs);
-`;
-
-export const StyledHDSNavigation = styled(Navigation)`
-  --breakpoint-xl: 9000px;
-  z-index: var(--tilavaraus-admin-stack-main-menu);
-  .btn-logout {
-    span {
-      margin: 0;
-    }
-  }
 `;
 
 export const DialogActionsButtons = styled(Dialog.ActionButtons)`
