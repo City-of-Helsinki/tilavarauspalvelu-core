@@ -497,6 +497,7 @@ class Common(Environment):
     TPREK_UNIT_URL = values.URLValue()
     GRAPHQL_CODEGEN_ENABLED = False
     UPDATE_RESERVATION_UNIT_HIERARCHY = True
+    UPDATE_AFFECTING_TIME_SPANS = True
     SAVE_RESERVATION_STATISTICS = True
     REBUILD_SPACE_HIERARCHY = True
     SENTRY_LOGGER_ALWAYS_RE_RAISE = False
@@ -645,6 +646,7 @@ class Local(LocalMixin, Common):
     GRAPHQL_CODEGEN_ENABLED = values.BooleanValue(default=False)
     ICAL_HASH_SECRET = values.StringValue(default="")  # nosec # NOSONAR
     UPDATE_RESERVATION_UNIT_HIERARCHY = values.BooleanValue(default=True)
+    UPDATE_AFFECTING_TIME_SPANS = values.BooleanValue(default=True)
     SAVE_RESERVATION_STATISTICS = values.BooleanValue(default=True)
     REBUILD_SPACE_HIERARCHY = values.BooleanValue(default=True)
     RAISE_ERROR_ON_REFRESH_FAILURE = True
@@ -816,9 +818,10 @@ class AutomatedTests(AutomatedTestMixin, EmptyDefaults, Common, dotenv_path=None
     TPREK_UNIT_URL = "https://fake.test.tprek.com"
     ICAL_HASH_SECRET = "qhoew923uqqwee"  # noqa: S105 # nosec # NOSONAR
 
-    # Turn off reservation unit hierarchy updates from signals during tests,
+    # Turn off materialized view updates from signals during tests,
     # since they slow them down a lot in CI. Refresh should be called manually when needed.
     UPDATE_RESERVATION_UNIT_HIERARCHY = False
+    UPDATE_AFFECTING_TIME_SPANS = False
     # Turn off statistics saving during tests for performance reasons
     SAVE_RESERVATION_STATISTICS = False
     # Always re-raise silenced Sentry errors during testing for better debugging
