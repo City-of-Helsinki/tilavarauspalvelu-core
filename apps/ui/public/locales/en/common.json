@@ -1,4 +1,5 @@
 {
+  "language": "English",
   "dateLabel": "Date",
   "timeLabel": "Time",
   "dateTime": "{{date, d.M.yyyy',' HH:mm}}",

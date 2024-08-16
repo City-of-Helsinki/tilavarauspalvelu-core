@@ -7,5 +7,6 @@
     "applications": "My applications"
   },
   "profileLinkLabel": "Go to Helsinki profile",
-  "skipToMainContent": "Skip to main content of the page"
+  "skipToMainContent": "Skip to main content of the page",
+  "languageSelection": "Select language"
 }

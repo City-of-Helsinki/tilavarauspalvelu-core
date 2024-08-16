@@ -21,7 +21,6 @@ import { SingleSearchForm } from "@/components/search/SingleSearchForm";
 import Sorting from "@/components/form/Sorting";
 import { ListWithPagination } from "@/components/common/ListWithPagination";
 import ReservationUnitCard from "@/components/search/SingleSearchReservationUnitCard";
-import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getSearchOptions, processVariables } from "@/modules/search";
@@ -164,7 +163,6 @@ function SearchSingle({
         </Notification>
       ) : null}
       <HeadContainer>
-        <BreadcrumbWrapper route={["searchSingle"]} />
         <StyledContainer>
           <Heading>{t("search:single.heading")}</Heading>
           <SingleSearchForm

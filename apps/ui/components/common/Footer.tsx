@@ -1,12 +1,12 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { Footer as HDSFooter, IconLinkExternal } from "hds-react";
+import Logo from "common/src/components/Logo";
 import styled from "styled-components";
 
 const Wrapper = styled(HDSFooter)`
-  /* problem with HDS footer not reserving space for the Koros */
   margin-top: var(--spacing-xl);
-  a[class*="FooterItem"] {
+  a[class*="FooterLink"] {
     display: flex;
     flex-flow: row-reverse;
     align-items: center;
@@ -31,56 +31,43 @@ const constructFeedbackUrl = (
   }
 };
 
-const Footer = ({ feedbackUrl }: { feedbackUrl: string }): JSX.Element => {
-  const { t, i18n } = useTranslation("footer");
+const Footer = ({ feedbackUrl }: { feedbackUrl: string }) => {
+  const { t, i18n } = useTranslation();
   const locale = i18n.language === "fi" ? "" : `/${i18n.language}`;
   const languageUrl = constructFeedbackUrl(feedbackUrl, i18n);
-  // TODO HDS:Footer causes a hydration error
-  // related to hydration problems, any params we set to it are ignored in SSR
-  // so if the page is static this renders the default style
-  // if the page has client side js then the rerender fixes the styles
   return (
-    <Wrapper
-      title={t("common:applicationName")}
-      theme={{
-        "--footer-background": "var(--tilavaraus-footer-background-color)",
-        "--footer-color": "var(--tilavaraus-footer-color)",
-        "--footer-divider-color": "var(--tilavaraus-footer-color)",
-        "--footer-focus-outline-color": "var(--color-white)",
-      }}
-    >
-      <HDSFooter.Navigation
-        navigationAriaLabel={t("footer:Navigation.navigationAriaLabel")}
-      >
-        <HDSFooter.Item
+    <Wrapper korosType="basic" theme="light" title="Varaamo">
+      <HDSFooter.Navigation>
+        <HDSFooter.Link
           href={`${locale}/terms/service`}
           label={t(`footer:Navigation.serviceTermsLabel`)}
           target="_blank"
           icon={<IconLinkExternal size="s" aria-hidden />}
           rel="noopener noreferrer"
         />
-        {languageUrl && (
-          <HDSFooter.Item
-            href={languageUrl}
-            label={t(`footer:Navigation.feedbackLabel`)}
-            target="_blank"
-            icon={<IconLinkExternal size="s" aria-hidden />}
-            rel="noopener noreferrer"
-          />
-        )}
+        <HDSFooter.Link
+          href={languageUrl ?? ""}
+          label={t(`footer:Navigation.feedbackLabel`)}
+          target="_blank"
+          icon={<IconLinkExternal size="s" aria-hidden />}
+          rel="noopener noreferrer"
+        />
       </HDSFooter.Navigation>
       <HDSFooter.Base
-        copyrightHolder={t("footer:Base.copyrightHolder")}
-        copyrightText={t("footer:Base.copyrightText")}
+        backToTopLabel={t(`footer:Base.backToTop`)}
+        copyrightHolder={t(`footer:Base.copyrightHolder`)}
+        copyrightText={t(`footer:Base.copyrightText`)}
+        logo={<Logo />}
+        logoHref="https://hel.fi"
       >
-        <HDSFooter.Item
+        <HDSFooter.Link
           href={`${locale}/terms/privacy`}
           label={t(`footer:Base.Item.privacyStatement`)}
           target="_blank"
           icon={<IconLinkExternal size="xs" aria-hidden />}
           rel="noopener noreferrer"
         />
-        <HDSFooter.Item
+        <HDSFooter.Link
           href={`${locale}/terms/accessibility`}
           label={t(`footer:Base.Item.accessibilityStatement`)}
           target="_blank"

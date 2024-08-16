@@ -15,9 +15,7 @@ import {
 import { filterNonNullable } from "common/src/helpers";
 import { HeroSubheading } from "@/modules/style/typography";
 import ApplicationRoundCard from "@/components/recurring/ApplicationRoundCard";
-import KorosDefault from "@/components/common/KorosDefault";
 import { createApolloClient } from "@/modules/apolloClient";
-import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
@@ -58,11 +56,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     },
   };
 };
-
-const HeadWrapper = styled.div`
-  background-color: var(--tilavaraus-hero-background-color);
-  color: var(--color-white);
-`;
 
 const Head = styled.div`
   padding: var(--spacing-m) var(--spacing-m) var(--spacing-xl);
@@ -114,14 +107,10 @@ const RecurringLander = ({ applicationRounds }: Props): JSX.Element => {
 
   return (
     <div>
-      <BreadcrumbWrapper route={["recurring"]} />
-      <HeadWrapper>
-        <Head>
-          <H2 as="h1">{t("recurringLander:heading")}</H2>
-          <HeroSubheading>{t("recurringLander:subHeading")}</HeroSubheading>
-        </Head>
-      </HeadWrapper>
-      <KorosDefault />
+      <Head>
+        <H2 as="h1">{t("recurringLander:heading")}</H2>
+        <HeroSubheading>{t("recurringLander:subHeading")}</HeroSubheading>
+      </Head>
       <Content>
         {activeApplicationRounds.length > 0 ? (
           <RoundList data-testid="recurring-lander__application-round-container--active">

@@ -3,7 +3,6 @@ import { H2 } from "common/src/common/typography";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import BreadcrumbWrapper from "../common/BreadcrumbWrapper";
 
 const Container = styled.div``;
 
@@ -28,7 +27,6 @@ const Head = (): JSX.Element => {
 
   return (
     <Container>
-      <BreadcrumbWrapper route={["reservations"]} />
       <Content>
         <Heading>{t(`navigation:Item.reservations`)}</Heading>
       </Content>

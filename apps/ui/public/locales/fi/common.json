@@ -1,4 +1,5 @@
 {
+  "language": "Suomi",
   "dateLabel": "Päivämäärä",
   "timeLabel": "Kellonaika",
   "dateTime": "{{date, d.M.yyyy 'klo' HH:mm}}",

@@ -1,4 +1,5 @@
 {
+  "language": "Svenska",
   "dateLabel": "Datum",
   "timeLabel": "Tid",
   "dateTime": "{{date, d.M.yyyy 'kl' HH:mm}}",
