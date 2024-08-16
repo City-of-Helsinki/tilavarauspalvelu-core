@@ -19,6 +19,7 @@ from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import ReservationUnit
 from reservations.enums import ReservationStateChoice, ReservationTypeStaffChoice
 from reservations.models import AffectingTimeSpan, RecurringReservation, Reservation
+from reservations.tasks import create_statistics_for_reservations_task
 
 __all__ = [
     "RecurringReservationCreateSerializer",
@@ -220,11 +221,16 @@ class ReservationSeriesSerializer(RecurringReservationCreateSerializer):
         # This way if we get, e.g., overlapping reservations, the whole operation is rolled back.
         with transaction.atomic():
             instance = super().save()
-            self.create_reservations(instance, reservation_details, skip_dates, check_opening_hours)
+            reservations = self.create_reservations(instance, reservation_details, skip_dates, check_opening_hours)
 
         # Must refresh the materialized view after the reservation is created.
         if settings.UPDATE_AFFECTING_TIME_SPANS:
             AffectingTimeSpan.refresh()
+
+        if settings.SAVE_RESERVATION_STATISTICS:
+            create_statistics_for_reservations_task.delay(
+                reservation_pks=[reservation.pk for reservation in reservations],
+            )
 
         return instance
 
@@ -234,7 +240,7 @@ class ReservationSeriesSerializer(RecurringReservationCreateSerializer):
         reservation_details: ReservationDetails,
         skip_dates: list[datetime.date],
         check_opening_hours: bool,
-    ) -> None:
+    ) -> list[Reservation]:
         slots = instance.actions.pre_calculate_slots(
             check_opening_hours=check_opening_hours,
             check_buffers=True,
@@ -267,4 +273,4 @@ class ReservationSeriesSerializer(RecurringReservationCreateSerializer):
             }
             raise GraphQLError(msg, extensions=extensions)
 
-        instance.actions.bulk_create_reservation_for_periods(slots.non_overlapping, reservation_details)
+        return instance.actions.bulk_create_reservation_for_periods(slots.non_overlapping, reservation_details)
