@@ -5,7 +5,7 @@ from django.db.models.signals import m2m_changed, post_delete, post_save
 from django.dispatch import receiver
 
 from reservations.models import AffectingTimeSpan, Reservation
-from reservations.statistic_utils import create_or_update_reservation_statistics
+from reservations.tasks import create_or_update_reservation_statistics
 
 type M2MAction = Literal["pre_add", "post_add", "pre_remove", "post_remove", "pre_clear", "post_clear"]
 
@@ -29,7 +29,7 @@ def reservation_create(
         # one can be defined. If in the future we truly support reservations with multiple reservation units,
         # we need to change this implementation so that we either have multiple reservation units in the statistics
         # or we have better way to indicate which one is the primary unit.
-        create_or_update_reservation_statistics(instance.pk)
+        create_or_update_reservation_statistics([instance.pk])
 
     if not raw and settings.UPDATE_AFFECTING_TIME_SPANS:
         AffectingTimeSpan.refresh(using=kwargs.get("using"))
@@ -57,7 +57,7 @@ def reservations_reservation_units_m2m(
     **kwargs: Any,
 ) -> None:
     if action == "post_add" and not raw and not reverse and settings.SAVE_RESERVATION_STATISTICS:
-        create_or_update_reservation_statistics(instance.pk)
+        create_or_update_reservation_statistics([instance.pk])
 
     if not raw and settings.UPDATE_AFFECTING_TIME_SPANS:
         AffectingTimeSpan.refresh(using=kwargs.get("using"))

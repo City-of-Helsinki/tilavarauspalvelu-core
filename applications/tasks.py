@@ -13,7 +13,7 @@ from opening_hours.errors import ReservableTimeSpanClientError
 from opening_hours.utils.reservable_time_span_client import ReservableTimeSpanClient
 from reservations.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import AffectingTimeSpan, RecurringReservation
-from reservations.tasks import create_statistics_for_reservations_task
+from reservations.tasks import create_or_update_reservation_statistics
 from tilavarauspalvelu.celery import app
 from utils.sentry import SentryLogger
 
@@ -182,4 +182,4 @@ def generate_reservation_series_from_allocations(application_round_id: int) -> N
         AffectingTimeSpan.refresh()
 
     if settings.SAVE_RESERVATION_STATISTICS:
-        create_statistics_for_reservations_task.delay(reservation_pks=list(reservation_pks))
+        create_or_update_reservation_statistics.delay(reservation_pks=list(reservation_pks))

@@ -2,17 +2,18 @@
 
 from django.db import migrations
 
-from reservations.statistic_utils import create_or_update_reservation_statistics
+from reservations.tasks import create_or_update_reservation_statistics
+
 
 def refresh_reservation_statistics(apps, schema_editor):
     ReservationStatistic = apps.get_model("reservations", "ReservationStatistic")
 
     for statistic in ReservationStatistic.objects.filter(primary_reservation_unit__isnull=True).all():
         if statistic.reservation is not None:
-            create_or_update_reservation_statistics(statistic.reservation.pk)
+            create_or_update_reservation_statistics([statistic.reservation.pk])
+
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("reservations", "0050_non_subsidised_price_net_decimals"),
     ]

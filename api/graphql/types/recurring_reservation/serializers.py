@@ -19,7 +19,7 @@ from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import ReservationUnit
 from reservations.enums import ReservationStateChoice, ReservationTypeStaffChoice
 from reservations.models import AffectingTimeSpan, RecurringReservation, Reservation
-from reservations.tasks import create_statistics_for_reservations_task
+from reservations.tasks import create_or_update_reservation_statistics
 
 __all__ = [
     "RecurringReservationCreateSerializer",
@@ -228,7 +228,7 @@ class ReservationSeriesSerializer(RecurringReservationCreateSerializer):
             AffectingTimeSpan.refresh()
 
         if settings.SAVE_RESERVATION_STATISTICS:
-            create_statistics_for_reservations_task.delay(
+            create_or_update_reservation_statistics.delay(
                 reservation_pks=[reservation.pk for reservation in reservations],
             )
 
