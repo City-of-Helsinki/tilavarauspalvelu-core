@@ -220,15 +220,19 @@ export function mapSingleParamToFormValue(
   return param;
 }
 
+// default to false if the param is present but not true, null if not present
 export function mapSingleBooleanParamToFormValue(
   param: string | string[] | undefined
 ): boolean | null {
   if (param == null) return null;
   if (param === "") return null;
   if (Array.isArray(param)) {
-    return param.find((p) => p === "true") != null ? true : null;
+    const found = param.find((p) => p === "true");
+    if (found != null) return true;
+    if (param.length > 1) return false;
+    return null;
   }
-  return param === "true" ? true : null;
+  return param === "true";
 }
 
 export function mapQueryParamToNumber(
