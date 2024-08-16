@@ -20,11 +20,24 @@ export function useSearchModify() {
   const searchValues = useSearchValues();
 
   // TODO type this properly (not a Record)
-  const handleSearch = (criteria: Record<string, string>) => {
-    const { sort, order } = router.query;
+  const handleSearch = (criteria: Record<string, string>, force: boolean) => {
+    const { sort, order, ref } = router.query;
     const newSort = sort != null && !Array.isArray(sort) ? sort : null;
     const newOrder = order != null && !Array.isArray(order) ? order : null;
-    const newValues = { ...criteria, sort: newSort, order: newOrder };
+    // form submit -> router push has no other way to communicate with the hook that updates the query
+    // than using query params, so we need to increment the ref to trigger a re-fetch
+    // otherwise submitting the same search without any changes breaks pagination
+    // alternative would be to disable the form submit (or make it a no-op) if the search values are the same
+    // which has other issues like stale data if the page is left open for a long time
+    const v = Number(ref) > 0 ? Number(ref) : null;
+    const nextRef = v != null ? v + 1 : 1;
+
+    const newValues = {
+      ...criteria,
+      sort: newSort,
+      order: newOrder,
+      ...(force ? { ref: nextRef } : {}),
+    };
     router.replace({
       query: newValues,
     });

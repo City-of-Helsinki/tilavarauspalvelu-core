@@ -191,7 +191,7 @@ export function SeasonalSearchForm({
       if (cv[1] == null || cv[1] === "") return c;
       return { ...c, [cv[0]]: cv[1] };
     }, {});
-    handleSearch(searchCriteria);
+    handleSearch(searchCriteria, true);
   };
 
   const translateTag = (key: string, value: string): string | undefined => {
@@ -209,7 +209,7 @@ export function SeasonalSearchForm({
   };
 
   const multiSelectFilters = ["unit", "reservationUnitTypes", "purposes"];
-  const hideList = ["applicationRound", "order", "sort"];
+  const hideList = ["applicationRound", "order", "sort", "ref"];
 
   return (
     <form noValidate onSubmit={handleSubmit(search)}>

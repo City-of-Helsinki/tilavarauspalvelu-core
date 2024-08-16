@@ -4,6 +4,7 @@ import {
 } from "@/gql/gql-types";
 import { SEARCH_PAGING_LIMIT } from "@/modules/const";
 import { hash } from "common/src/helpers";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 /* Wrap the search query with a custom hook
@@ -29,20 +30,23 @@ export function useSearchQuery(
   const [varhash, setVarhash] = useState("");
   const { fetchMore } = query;
 
+  const router = useRouter();
+
   // clear the showMore state if the variables change
   useEffect(() => {
-    function check(v: typeof variables): void {
+    async function check(v: typeof variables, version: number): Promise<void> {
       // use hash to make sure we don't reset unnecessarily
-      hash(JSON.stringify(v)).then((h) => {
-        if (h !== varhash) {
-          setVarhash(h);
-          setHasMoreData(true);
-        }
-      });
+      const hashed = await hash(JSON.stringify({ ...v, version }));
+      if (hashed !== varhash) {
+        setVarhash(hashed);
+        setHasMoreData(true);
+      }
     }
 
-    check(variables);
-  }, [variables, varhash]);
+    const { ref } = router.query;
+    const version = Number(ref) > 0 ? Number(ref) : 0;
+    check(variables, version);
+  }, [variables, varhash, router.query]);
 
   useEffect(() => {
     if (query.data) {

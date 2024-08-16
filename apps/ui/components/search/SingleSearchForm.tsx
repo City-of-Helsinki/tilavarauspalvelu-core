@@ -214,7 +214,7 @@ const multiSelectFilters = [
   "equipments",
 ];
 // we don't want to show "showOnlyReservable" as a FilterTag, as it has its own checkbox in the form
-const hideTagList = ["showOnlyReservable", "order", "sort"];
+const hideTagList = ["showOnlyReservable", "order", "sort", "ref"];
 
 // TODO rewrite this witout the form state (use query params directly, but don't refresh the page)
 export function SingleSearchForm({
@@ -270,13 +270,13 @@ export function SingleSearchForm({
     }
   };
 
-  const search: SubmitHandler<FormValues> = (criteria: FormValues) => {
+  const onSearch: SubmitHandler<FormValues> = (criteria: FormValues) => {
     // Remove empty (null || "") values from the criteria
     const searchCriteria = Object.entries(criteria).reduce((c, cv) => {
       if (cv[1] == null || cv[1] === "") return c;
       return { ...c, [cv[0]]: cv[1] };
     }, {});
-    handleSearch(searchCriteria);
+    handleSearch(searchCriteria, true);
   };
 
   const showOptionalFilters =
@@ -286,7 +286,7 @@ export function SingleSearchForm({
     formValues.textSearch != null;
 
   return (
-    <form noValidate onSubmit={handleSubmit(search)}>
+    <form noValidate onSubmit={handleSubmit(onSearch)}>
       <TopContainer>
         <Filters>
           <ControlledMultiSelect
@@ -397,7 +397,7 @@ export function SingleSearchForm({
               placeholder={t("searchForm:searchTermPlaceholder")}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  handleSubmit(search)();
+                  handleSubmit(onSearch)();
                 }
               }}
             />
