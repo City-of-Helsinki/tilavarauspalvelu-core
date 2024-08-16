@@ -1,6 +1,7 @@
 import datetime
 from typing import Any
 
+from django.conf import settings
 from django.db import transaction
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
@@ -17,7 +18,7 @@ from opening_hours.utils.reservable_time_span_client import ReservableTimeSpanCl
 from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import ReservationUnit
 from reservations.enums import ReservationStateChoice, ReservationTypeStaffChoice
-from reservations.models import RecurringReservation, Reservation
+from reservations.models import AffectingTimeSpan, RecurringReservation, Reservation
 
 __all__ = [
     "RecurringReservationCreateSerializer",
@@ -220,6 +221,10 @@ class ReservationSeriesSerializer(RecurringReservationCreateSerializer):
         with transaction.atomic():
             instance = super().save()
             self.create_reservations(instance, reservation_details, skip_dates, check_opening_hours)
+
+        # Must refresh the materialized view after the reservation is created.
+        if settings.UPDATE_AFFECTING_TIME_SPANS:
+            AffectingTimeSpan.refresh()
 
         return instance
 
