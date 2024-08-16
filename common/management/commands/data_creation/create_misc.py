@@ -8,7 +8,7 @@ from django_celery_beat.models import CrontabSchedule, PeriodicTask
 from common.enums import BannerNotificationLevel, BannerNotificationTarget
 from common.models import BannerNotification
 from opening_hours.models import DEFAULT_TIMEZONE
-from reservations.tasks import prune_reservations_task, update_expired_orders_task
+from reservations.tasks import prune_reservations_task, update_affecting_time_spans_task, update_expired_orders_task
 
 from .utils import faker_en, faker_fi, faker_sv, with_logs
 
@@ -104,6 +104,10 @@ def _create_periodic_tasks() -> None:
         minute="2,7,12,17,22,27,32,37,42,47,52,57",
         timezone=DEFAULT_TIMEZONE,
     )
+    every_other_minute = CrontabSchedule.objects.create(
+        minute="2",
+        timezone=DEFAULT_TIMEZONE,
+    )
 
     PeriodicTask.objects.create(
         name="Maksamattomien tilausten rauetus",
@@ -124,5 +128,16 @@ def _create_periodic_tasks() -> None:
             "jos ne ovat yli 20 minuuttia vanhoja eikä niihin liity verkkomaksua."
             "Ne joihin liittyy verkkomaksu, poistetaan jos tilaus verkkokauppaan on "
             "luotu yli 10 minuuttia sitten ja maksutilauksen status on rauennut tai peruttu."
+        ),
+    )
+
+    PeriodicTask.objects.create(
+        name="Vaikuttavien varausten uudelleenlaskenta",
+        task=update_affecting_time_spans_task.name,
+        crontab=every_other_minute,
+        description=(
+            "Päivittää näkymän ensimmäiseen varattavaan aikaan vaikuttavista varauksista, "
+            "joista tiettyihin varausyksikköihin tietyllä aikavälillä vaikuttavat varaukset "
+            "voidaan hakea esikäsiteltynä."
         ),
     )
