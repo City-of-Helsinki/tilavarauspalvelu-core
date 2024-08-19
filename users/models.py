@@ -11,7 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 from helusers.models import AbstractUser
 
-from permissions.enums import UserRoleChoice
+from permissions.enums import UserPermissionChoice, UserRoleChoice
 from permissions.permission_resolver import PermissionResolver
 from users.helauth.typing import IDToken
 from users.helauth.utils import get_jwt_payload
@@ -105,20 +105,53 @@ class User(AbstractUser):
         return self._general_roles
 
     @property
+    def general_permissions(self) -> list[UserPermissionChoice]:
+        """Get the user's general permissions."""
+        if hasattr(self, "_general_permissions"):
+            return self._general_permissions
+        roles = self.general_roles_list
+        self._general_permissions = sorted({permission for role in roles for permission in role.permissions})
+        return self._general_permissions
+
+    @property
     def unit_roles_map(self) -> dict[int, list[UserRoleChoice]]:
         """Get unit roles by unit id for the user."""
-        if hasattr(self, "_unit_permissions"):
-            return self._unit_permissions
+        if hasattr(self, "_unit_roles"):
+            return self._unit_roles
         self._calculate_unit_roles()
         return self._unit_roles
 
     @property
+    def unit_permissions_map(self) -> dict[int, list[UserPermissionChoice]]:
+        """Get permissions by unit id for the user."""
+        if hasattr(self, "_unit_permissions"):
+            return self._unit_permissions
+
+        self._unit_permissions = {
+            unit_id: sorted({permission for role in roles for permission in role.permissions})
+            for unit_id, roles in self.unit_roles_map.items()
+        }
+        return self._unit_permissions
+
+    @property
     def unit_group_roles_map(self) -> dict[int, list[UserRoleChoice]]:
         """Get unit roles by unit group id for the user."""
-        if hasattr(self, "_unit_group_permissions"):
-            return self._unit_group_permissions
+        if hasattr(self, "_unit_group_roles"):
+            return self._unit_group_roles
         self._calculate_unit_roles()
         return self._unit_group_roles
+
+    @property
+    def unit_group_permissions_map(self) -> dict[int, list[UserPermissionChoice]]:
+        """Get permissions by unit group id for the user."""
+        if hasattr(self, "_unit_group_permissions"):
+            return self._unit_group_permissions
+
+        self._unit_group_permissions = {
+            unit_group_id: sorted({permission for role in roles for permission in role.permissions})
+            for unit_group_id, roles in self.unit_group_roles_map.items()
+        }
+        return self._unit_group_permissions
 
     def _calculate_unit_roles(self) -> None:
         """Calculate all unit roles by unit id and unit group id for the user."""

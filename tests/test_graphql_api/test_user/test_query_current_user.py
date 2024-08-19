@@ -110,6 +110,7 @@ def test_query_current_user__general_roles(graphql):
             }
             created
             modified
+            permissions
         }
     """
 
@@ -128,6 +129,17 @@ def test_query_current_user__general_roles(graphql):
                 "assigner": None,
                 "created": general_role.created.isoformat(),
                 "modified": general_role.modified.isoformat(),
+                "permissions": [
+                    "CAN_CREATE_STAFF_RESERVATIONS",
+                    "CAN_MANAGE_APPLICATIONS",
+                    "CAN_MANAGE_NOTIFICATIONS",
+                    "CAN_MANAGE_RESERVATIONS",
+                    "CAN_MANAGE_RESERVATION_RELATED_DATA",
+                    "CAN_MANAGE_RESERVATION_UNITS",
+                    "CAN_VIEW_APPLICATIONS",
+                    "CAN_VIEW_RESERVATIONS",
+                    "CAN_VIEW_USERS",
+                ],
             },
         ],
     }
@@ -159,6 +171,7 @@ def test_query_current_user__unit_admin(graphql):
             }
             created
             modified
+            permissions
         }
     """
 
@@ -183,6 +196,17 @@ def test_query_current_user__unit_admin(graphql):
                 "assigner": None,
                 "created": unit_role.created.isoformat(),
                 "modified": unit_role.modified.isoformat(),
+                "permissions": [
+                    "CAN_CREATE_STAFF_RESERVATIONS",
+                    "CAN_MANAGE_APPLICATIONS",
+                    "CAN_MANAGE_NOTIFICATIONS",
+                    "CAN_MANAGE_RESERVATIONS",
+                    "CAN_MANAGE_RESERVATION_RELATED_DATA",
+                    "CAN_MANAGE_RESERVATION_UNITS",
+                    "CAN_VIEW_APPLICATIONS",
+                    "CAN_VIEW_RESERVATIONS",
+                    "CAN_VIEW_USERS",
+                ],
             },
         ],
     }

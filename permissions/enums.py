@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import enum
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -73,9 +75,25 @@ class UserRoleChoice(models.TextChoices):
         return [UserRoleChoice.NOTIFICATION_MANAGER, UserRoleChoice.ADMIN]
 
     @classmethod
-    def permissions(cls) -> list[str]:
+    def permission_map(cls) -> dict[UserPermissionChoice, list[UserRoleChoice]]:
         """List of all permissions."""
-        return [str(key).upper() for key, value in cls.__dict__.items() if isinstance(value, permission)]
+        try:
+            converter = UserPermissionChoice
+        except NameError:
+            # When creating 'UserPermissionChoice'
+            def converter(x: str) -> str:
+                return x
+
+        return {
+            converter(str(key).upper()): getattr(cls, key)()
+            for key, value in cls.__dict__.items()
+            if isinstance(value, permission)
+        }
+
+    @enum.property
+    def permissions(self) -> list[UserPermissionChoice]:
+        """List all permissions for the role."""
+        return [name for name, roles in UserRoleChoice.permission_map().items() if self in roles]
 
 
-UserPermissionChoice = models.TextChoices("UserPermissionChoice", list(UserRoleChoice.permissions()))
+UserPermissionChoice = models.TextChoices("UserPermissionChoice", sorted(UserRoleChoice.permission_map()))
