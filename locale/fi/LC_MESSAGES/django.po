@@ -139,7 +139,6 @@ msgstr "Luotu"
 #: applications/admin/application/admin.py
 #: applications/admin/application_round/admin.py
 #: applications/admin/application_section/admin.py
-#: permissions/admin/unit_role.py
 #: reservation_units/admin/reservation_unit/admin.py
 #: reservations/admin/reservation/admin.py users/admin/user.py
 msgid "Basic information"
@@ -439,7 +438,7 @@ msgstr "Käsittelyn valmistumispäivä ja -aika"
 msgid "Purposes"
 msgstr "Käyttötarkoitukset"
 
-#: applications/admin/application_round/form.py permissions/models.py
+#: applications/admin/application_round/form.py
 msgid "Service sector"
 msgstr "Palvelualue"
 
@@ -1242,7 +1241,7 @@ msgstr "Sisältö"
 msgid "Duration (ms)"
 msgstr "Kesto (ms)"
 
-#: common/admin/request_log.py permissions/base_models.py
+#: common/admin/request_log.py
 msgid "Created"
 msgstr "Luotu"
 
@@ -1733,256 +1732,41 @@ msgstr ""
 "Etsi käyttäjänimellä, sähköpostilla, etu- tai sukunimellä, toimipisteellä "
 "tai yksikköryhmällä"
 
-#: permissions/admin/unit_role.py
-msgid "Roles"
-msgstr "Roolit"
+#: permissions/enums.py
+msgid "Admin"
+msgstr "Pääkäyttäjä"
 
-#: permissions/base_models.py
-msgid "Assigner"
-msgstr "Määrittäjä"
+#: permissions/enums.py
+msgid "Handler"
+msgstr "Käsittelijä"
 
-#: permissions/base_models.py
-msgid "Modified"
-msgstr "Muokattu"
+#: permissions/enums.py
+msgid "Viewer"
+msgstr "Katselika"
 
-#: permissions/models.py
-msgid "Can manage general roles for the whole system"
-msgstr "Saa hallita yleisiä rooleja koko järjestelmässä"
+#: permissions/enums.py
+msgid "Reserver"
+msgstr "Varaaja"
 
-#: permissions/models.py
-msgid "Can manage roles for service sectors for the whole system"
-msgstr "Saa hallita palvelualuiden rooleja koko järjestelmässä"
+#: permissions/enums.py
+msgid "Notification manager"
+msgstr "Ilmoituksen hallitsija."
 
-#: permissions/models.py
-msgid "Can manage roles for units in the whole system"
-msgstr "Saa hallita yksiköiden rooleja koko järjestelmässä"
+#: permissions/models/general_role.py
+msgid "General role"
+msgstr "Yleinen rooli"
 
-#: permissions/models.py
-msgid "Can create, edit and delete reservation units in the whole system"
-msgstr "Saa luoda, muokata ja poistaa varausyksiköitä koko järjestelmässä"
+#: permissions/models/general_role.py
+msgid "General roles"
+msgstr "Yleiset roolit"
 
-#: permissions/models.py
-msgid "Can create, edit and delete purposes in the whole system"
-msgstr "Saa luoda, muokata ja poistaa käyttötarkoituksia koko järjestelmässä"
+#: permissions/models/unit_role.py
+msgid "Unit role"
+msgstr "Yksikkökohtainen rooli"
 
-#: permissions/models.py
-msgid "Can create, edit and delete reservation purposes in the whole system"
-msgstr ""
-"Saa luoda, muokata ja poistaa varauskäyttötarkoituksia koko järjestelmässä"
-
-#: permissions/models.py
-msgid "Can create, edit and delete age groups in the whole system"
-msgstr "Saa luoda, muokata ja poistaa ikäryhmiä koko järjestelmässä"
-
-#: permissions/models.py
-msgid "Can create, edit and delete qualifiers in the whole system"
-msgstr "Saa luoda, muokata ja poistaa tarkenteita koko järjestelmässä"
-
-#: permissions/models.py
-msgid "Can create, edit and delete ability groups in the whole system"
-msgstr "Saa luoda, muokata ja poistaa kykyryhmiä koko järjestelmässä"
-
-#: permissions/models.py
-msgid "Can create, edit and delete reservation unit types in the whole system"
-msgstr ""
-"Saa luoda, muokata ja poistaa varausyksikkötyyppejä koko järjestelmässä"
-
-#: permissions/models.py
-msgid "Can create, edit and delete equipment_categories in the whole system"
-msgstr ""
-"Saa luoda, muokata ja poistaa varusteiden kategorioita koko järjestelmässä"
-
-#: permissions/models.py
-msgid "Can create, edit and delete equipment in the whole system"
-msgstr "Saa luoda, muokata ja poistaa varusteita koko järjestelmässä"
-
-#: permissions/models.py
-msgid "Can create, edit and cancel reservations in the whole system"
-msgstr "Saa luoda, muokata ja perua varauksia koko järjestelmässä"
-
-#: permissions/models.py
-msgid "Can view details of all reservations in the whole system"
-msgstr "Saa tarkastella kaikkien varauksien tietoja koko järjestelmässä"
-
-#: permissions/models.py
-msgid "Can create, edit and delete resources in the whole system"
-msgstr "Saa luoda, muokata ja poistaa resursseja koko järjestelmässä"
-
-#: permissions/models.py
-msgid "Can create, edit and delete spaces in the whole system"
-msgstr "Saa luoda, muokata ja poistaa tiloja koko järjestelmässä"
-
-#: permissions/models.py
-msgid "Can handle applications in the whole system"
-msgstr "Saa käsitellä kausivaraushakemuksia koko järjestelmässä"
-
-#: permissions/models.py
-msgid "Can validate applications in the whole system"
-msgstr "Saa validoida kausivaraushakemuksia koko järjestelmässä"
-
-#: permissions/models.py
-msgid "Can allocate applications in the whole system"
-msgstr "Saa allokoida kausivaraushakemuksia koko järjestelmässä"
-
-#: permissions/models.py
-msgid "Can create, edit and delete application rounds in the whole system"
-msgstr ""
-"Saa luoda, muokata ja poistaa kausivarauskierroksia koko järjestelmässä"
-
-#: permissions/models.py
-msgid "Can view users in the whole system"
-msgstr "Saa tarkastella käyttäjiä koko järjestelmässä"
-
-#: permissions/models.py
-msgid "Can comment reservations in the whole system"
-msgstr "Saa kommentoida varauksia koko järjestelmässä"
-
-#: permissions/models.py
-msgid "Can create staff reservations in the whole system"
-msgstr "Saa luoda henkilökunnan varauksia koko järjestelmässä"
-
-#: permissions/models.py
-msgid "Can edit unit information in the whole system"
-msgstr "Saa muokata yksiköiden tietoja koko järjestelmässä"
-
-#: permissions/models.py
-msgid "Can create, edit and delete banner notifications in the whole system"
-msgstr ""
-"Saa luoda, muokata ja poistaa järjestelmäilmoituksia koko järjestelmässä"
-
-#: permissions/models.py
-#: reservation_units/models/reservation_unit_payment_type.py
-msgid "Code"
-msgstr "Koodi"
-
-#: permissions/models.py
-msgid "Verbose name"
-msgstr "Näyttönimi"
-
-#: permissions/models.py
-msgid "Role"
-msgstr "Rooli"
-
-#: permissions/models.py
-msgid "Permission"
-msgstr "Oikeus"
-
-#: permissions/models.py reservation_units/models/introduction.py
-#: reservations/admin/reservation/form.py
-msgid "User"
-msgstr "Käyttäjä"
-
-#: permissions/models.py
-msgid "Can modify roles for the unit"
-msgstr "Saa muokata yksikön rooleja"
-
-#: permissions/models.py
-msgid "Can create, edit and delete reservation units in the unit"
-msgstr "Saa luoda, muokata ja poistaa varausyksiköitä yksikössä"
-
-#: permissions/models.py
-msgid "Can create, edit and cancel reservations in the unit"
-msgstr "Saa luoda, muokata ja perua varauksia yksikössä"
-
-#: permissions/models.py
-msgid "Can view details of all reservations in the unit"
-msgstr "Saa tarkastella kaikkien varauksien tietoja yksikössä"
-
-#: permissions/models.py
-msgid "Can validate applications in the unit"
-msgstr "Saa validoida kausivaraushakemuksia yksikössä"
-
-#: permissions/models.py
-msgid "Can allocate application in the unit"
-msgstr "Saa allokoida kausivaraushakemuksia yksikössä"
-
-#: permissions/models.py
-msgid "Can handle application in the unit"
-msgstr "Saa käsitellä kausivaraushakemuksia yksikössä"
-
-#: permissions/models.py
-msgid "Can edit unit information"
-msgstr "Saa muokata yksikön tietoja"
-
-#: permissions/models.py
-msgid "Can create, edit and delete spaces in the unit"
-msgstr "Saa luoda, muokata ja poistaa tiloja yksikössä"
-
-#: permissions/models.py
-msgid "Can create, edit and delete resources in the given unit"
-msgstr "Saa luoda, muokata ja poistaa resursseja yksikössä"
-
-#: permissions/models.py
-msgid "Can create staff reservations in the given unit"
-msgstr "Saa luoda henkilökunnan varauksia yksikössä"
-
-#: permissions/models.py
-msgid "Can comment reservations in the unit"
-msgstr "Saa kommentoida varauksia yksikössä"
-
-#: permissions/models.py
-msgid "Unit group"
-msgstr "Yksikköryhmä"
-
-#: permissions/models.py reservation_units/admin/reservation_unit/form.py
-msgid "Unit"
-msgstr "Yksikkö"
-
-#: permissions/models.py
-msgid "Can modify roles for the service sector"
-msgstr "Saa muokata palvelualueen rooleja"
-
-#: permissions/models.py
-msgid "Can modify roles for units in the service sector"
-msgstr "Saa muokata yksiköiden rooleja palvelualueella"
-
-#: permissions/models.py
-msgid "Can create, edit and delete reservation units in the service sector"
-msgstr "Saa luoda, muokata ja poistaa varausyksiköitä palvelualueella"
-
-#: permissions/models.py
-msgid "Can create, edit and delete application rounds in the service sector"
-msgstr "Saa luoda, muokata ja poistaa kausivarauskierroksia palvelualueella"
-
-#: permissions/models.py
-msgid "Can handle applications in the service sector"
-msgstr "Saa käsitellä kausivaraushakemuksia palvelualueella"
-
-#: permissions/models.py
-msgid "Can create, edit and cancel reservations in the service sector"
-msgstr "Saa luoda, muokata ja perua varauksia palvelualueella"
-
-#: permissions/models.py
-msgid "Can validate application in the service sector"
-msgstr "Saa validoida kausivaraushakemuksia palvelualueella"
-
-#: permissions/models.py
-msgid "Can view details of all reservations in the service sector"
-msgstr "Saa tarkastella kaikkien varauksien tietoja palvelualueella"
-
-#: permissions/models.py
-msgid "Can allocate applications in the service sector"
-msgstr "Saa allokoida kausivaraushakemuksia palvelualueella"
-
-#: permissions/models.py
-msgid "Can create, edit and delete spaces in the service sector"
-msgstr "Saa luoda, muokata ja poistaa tiloja palvelualueella"
-
-#: permissions/models.py
-msgid "Can create, edit and delete resources in the given service sector"
-msgstr "Saa luoda, muokata ja poistaa resursseja palvelualueella"
-
-#: permissions/models.py
-msgid "Can create staff reservations in the given service sector"
-msgstr "Saa luoda henkilökunnan varauksia palvelualueella"
-
-#: permissions/models.py
-msgid "Can comment reservations in the service sector"
-msgstr "Saa kommentoida varauksia palvelualueella"
-
-#: permissions/models.py
-msgid "Can edit unit information in the service sector"
-msgstr "Saa muokata yksiköiden tietoja palvelualueella"
+#: permissions/models/unit_role.py
+msgid "Unit roles"
+msgstr "Yksikkökohtaiset roolit"
 
 #: reservation_units/admin/reservation_unit/admin.py
 msgid "Search by ID, name, unit name, or service sector name"
@@ -2150,6 +1934,10 @@ msgstr "Peruuutuneen varauksen lisätiedot (Englanniksi)"
 #: reservation_units/admin/reservation_unit/form.py
 msgid "Reservation cancelled instructions (Swedish)"
 msgstr "Peruuutuneen varauksen lisätiedot (Ruotsiksi)"
+
+#: reservation_units/admin/reservation_unit/form.py
+msgid "Unit"
+msgstr "Yksikkö"
 
 #: reservation_units/admin/reservation_unit/form.py
 msgid "Contact information"
@@ -2681,6 +2469,11 @@ msgid "Category"
 msgstr "Kategoria"
 
 #: reservation_units/models/introduction.py
+#: reservations/admin/reservation/form.py
+msgid "User"
+msgstr "Käyttäjä"
+
+#: reservation_units/models/introduction.py
 msgid "Completed at"
 msgstr "Valmistunut"
 
@@ -2719,6 +2512,10 @@ msgstr "varausyksiköiden hierarkia"
 #: reservation_units/models/reservation_unit_hierarchy.py
 msgid "reservation unit hierarchies"
 msgstr "varausyksiköiden hierarkiat"
+
+#: reservation_units/models/reservation_unit_payment_type.py
+msgid "Code"
+msgstr "Koodi"
 
 #: reservation_units/models/reservation_unit_pricing.py
 msgid "Date when price is activated"
@@ -3364,6 +3161,10 @@ msgstr "Etsi käyttäjänimellä, etunimellä, sukunimellä tai sähköpostilla"
 #: users/admin/user.py
 msgid "Settings"
 msgstr "Asetukset"
+
+#: users/admin/user.py
+msgid "Permissions"
+msgstr "Oikeudet"
 
 #: users/models.py
 msgid "Preferred UI language"
