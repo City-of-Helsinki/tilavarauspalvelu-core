@@ -28,7 +28,7 @@ __all__ = [
 class PaymentMerchant(models.Model):
     """
     ID is not auto-generated. It comes from the Merchant experience API. See admin.py.
-    https://checkout-dev-api.test.hel.ninja/v1/merchant/docs/swagger-ui/#
+    https://checkout-test-api.test.hel.ninja/v1/merchant/docs/swagger-ui/
     """
 
     id: uuid.UUID = models.UUIDField(primary_key=True)

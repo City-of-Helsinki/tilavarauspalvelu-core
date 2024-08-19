@@ -52,6 +52,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
     #########
     # Order #
     #########
+    # https://checkout-test-api.test.hel.ninja/v1/order/docs/swagger-ui/
 
     @classmethod
     def get_order(cls, *, order_uuid: uuid.UUID) -> Order:
@@ -123,6 +124,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
     ###########
     # Payment #
     ###########
+    # https://checkout-test-api.test.hel.ninja/v1/payment/docs/swagger-ui/
 
     @classmethod
     def get_payment(cls, *, order_uuid: uuid.UUID) -> Payment | None:
@@ -207,6 +209,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
     ############
     # Merchant #
     ############
+    # https://checkout-test-api.test.hel.ninja/v1/merchant/docs/swagger-ui/
 
     @classmethod
     def get_merchant(cls, *, merchant_uuid: uuid.UUID) -> MerchantInfo | None:
@@ -275,6 +278,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
     ###########
     # Product #
     ###########
+    # https://checkout-test-api.test.hel.ninja/v1/product/docs/swagger-ui/
 
     @classmethod
     def create_product(cls, *, params: CreateProductParams) -> Product:
