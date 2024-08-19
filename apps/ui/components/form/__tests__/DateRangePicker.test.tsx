@@ -1,9 +1,8 @@
 import userEvent from "@testing-library/user-event";
-import { advanceTo } from "jest-date-mock";
 import { get as mockGet } from "lodash";
 import React from "react";
 import mockTranslations from "@/public/locales/fi/dateSelector.json";
-import { act, configure, render, screen } from "@/test/testUtils";
+import { configure, render, screen } from "@/test/testUtils";
 import DateRangePicker, { DateRangePickerProps } from "../DateRangePicker";
 
 jest.mock("next-i18next", () => ({
@@ -27,41 +26,44 @@ const defaultProps: DateRangePickerProps = {
   startDate: null,
 };
 
-beforeEach(() => {
-  advanceTo("2020-10-10");
+beforeAll(() => {
+  jest.useFakeTimers({
+    now: new Date(2020, 10, 10, 9, 0, 0),
+  });
+});
+
+afterAll(() => {
+  jest.useRealTimers();
 });
 
 const renderComponent = (props?: Partial<DateRangePickerProps>) =>
   render(<DateRangePicker {...defaultProps} {...props} />);
 
 test("should show error start date must be before end date", async () => {
-  renderComponent();
-  const user = userEvent.setup();
+  const view = renderComponent();
+  // NOTE weird issues with the default delay causing the test to fail always
+  const user = userEvent.setup({ delay: null });
 
-  const startDateInput = screen.getByRole("textbox", {
-    name: /alkamispäivä/i,
-  });
-  await act(async () => {
-    await user.type(startDateInput, "23.6.2021");
-  });
+  const startDateText = view.getByText(/alkamispäivä/i);
+  expect(startDateText).toBeInTheDocument();
 
-  const endDateInput = screen.getByRole("textbox", {
+  const startDateInput = view.getByLabelText(/alkamispäivä/i);
+  expect(startDateInput).toBeInTheDocument();
+
+  await user.type(startDateInput, "23.6.2021");
+  await user.type(startDateInput, "23.6.2021");
+
+  const endDateInput = view.getByRole("textbox", {
     name: /päättymispäivä/i,
   });
-  await act(async () => {
-    await user.type(endDateInput, "22.6.2021");
-  });
+  await user.type(endDateInput, "22.6.2021");
 
-  screen.queryByText(/Alkamispäivän on oltava ennen päättymispäivää/i);
+  view.queryByText(/Alkamispäivän on oltava ennen päättymispäivää/i);
 
-  await act(async () => {
-    await user.clear(endDateInput);
-  });
-  await act(async () => {
-    await user.type(endDateInput, "24.6.2021");
-  });
+  await user.clear(endDateInput);
+  await user.type(endDateInput, "24.6.2021");
 
-  const start = screen.queryByText(
+  const start = view.queryByText(
     /Alkamispäivän on oltava ennen päättymispäivää/i
   );
 
@@ -69,21 +71,20 @@ test("should show error start date must be before end date", async () => {
 });
 
 test("should show formatting error", async () => {
-  advanceTo("2020-10-10");
-  renderComponent();
+  const view = renderComponent();
 
-  const startDateInput = screen.getByRole("textbox", {
+  const startDateInput = view.getByRole("textbox", {
     name: /alkamispäivä/i,
   });
   userEvent.type(startDateInput, "23..2021");
 
   expect(
-    screen.queryByText(/Päivämäärän on oltava muotoa pp\.kk\.vvvv/i)
+    view.queryByText(/Päivämäärän on oltava muotoa pp\.kk\.vvvv/i)
   ).not.toBeInTheDocument();
 
   // should show error when focusing out of the element
   userEvent.tab();
-  screen.queryByText(/Päivämäärän on oltava muotoa pp\.kk\.vvvv/i);
+  view.queryByText(/Päivämäärän on oltava muotoa pp\.kk\.vvvv/i);
 
   // Error should disappear
   userEvent.clear(startDateInput);
