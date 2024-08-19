@@ -227,15 +227,15 @@ def test_reservation__filter__by_only_with_handling_permission__unit_admin(graph
     reservation_unit_1 = ReservationUnitFactory.create(unit=unit_1)
     reservation_unit_2 = ReservationUnitFactory.create(unit=unit_2)
 
-    admin = UserFactory.create_with_unit_role(units=[unit_1], role=UserRoleChoice.ADMIN)
-    UnitRoleFactory.create(units=[unit_2], role=UserRoleChoice.RESERVER)
+    admin = UserFactory.create_with_unit_role(units=[unit_1], role=UserRoleChoice.RESERVER)
+    UnitRoleFactory.create(user=admin, units=[unit_2], role=UserRoleChoice.ADMIN)
 
     # Reservation for the admin
     ReservationFactory.create(user=admin)
     # Reservation for the unit the admin has manage permissions for
-    reservation = ReservationFactory.create(reservation_unit=[reservation_unit_1])
+    reservation = ReservationFactory.create(reservation_unit=[reservation_unit_2])
     # Reservation for the unit the admin has view permissions for
-    ReservationFactory.create(reservation_unit=[reservation_unit_2])
+    ReservationFactory.create(reservation_unit=[reservation_unit_1])
     # Reservation for another unit
     ReservationFactory.create()
 
@@ -256,15 +256,15 @@ def test_reservation__filter__by_only_with_handling_permission__unit_group_admin
     reservation_unit_1 = ReservationUnitFactory.create(unit=unit_1)
     reservation_unit_2 = ReservationUnitFactory.create(unit=unit_2)
 
-    admin = UserFactory.create_with_unit_role(unit_groups=[unit_group_1], role=UserRoleChoice.ADMIN)
-    UnitRoleFactory.create(unit_groups=[unit_group_2], role=UserRoleChoice.RESERVER)
+    admin = UserFactory.create_with_unit_role(unit_groups=[unit_group_1], role=UserRoleChoice.RESERVER)
+    UnitRoleFactory.create(user=admin, unit_groups=[unit_group_2], role=UserRoleChoice.ADMIN)
 
     # Reservation for the admin
     ReservationFactory.create(user=admin)
     # Reservation for the unit group the admin has manage permissions for
-    reservation = ReservationFactory.create(reservation_unit=[reservation_unit_1])
+    reservation = ReservationFactory.create(reservation_unit=[reservation_unit_2])
     # Reservation for the unit group the admin has view permissions for
-    ReservationFactory.create(reservation_unit=[reservation_unit_2])
+    ReservationFactory.create(reservation_unit=[reservation_unit_1])
     # Reservation for another unit
     ReservationFactory.create()
 
