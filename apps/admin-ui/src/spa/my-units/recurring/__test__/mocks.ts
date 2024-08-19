@@ -8,11 +8,11 @@ import {
   TermsType,
   ReservationTypeChoice,
   CreateStaffReservationDocument,
-  CreateRecurringReservationDocument,
   ReservationTimesInReservationUnitDocument,
-  ReservationTimesInReservationUnitQuery,
+  type ReservationTimesInReservationUnitQuery,
   ReservationUnitDocument,
-  ReservationUnitQuery,
+  type ReservationUnitQuery,
+  CreateRecurringReservationDocument,
 } from "@gql/gql-types";
 import { base64encode } from "common/src/helpers";
 

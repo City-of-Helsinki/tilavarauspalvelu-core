@@ -10,8 +10,12 @@ import {
   UpdateStaffReservationDocument,
   RecurringReservationDocument,
   UpdateRecurringReservationDocument,
+  ReservationTypeChoice,
+  CustomerTypeChoice,
+  type RecurringReservationQuery,
 } from "@gql/gql-types";
 import { base64encode } from "common/src/helpers";
+import { toApiDateUnsafe } from "common/src/common/util";
 
 export const CHANGED_WORKING_MEMO = "Sisaisen kommentti";
 
@@ -19,11 +23,11 @@ export const MUTATION_DATA = {
   input: {
     pk: 1,
     reservationUnitPks: [1],
-    type: "BEHALF",
+    type: ReservationTypeChoice.Behalf,
     reservationBlockWholeDay: false,
     bufferTimeBefore: 0,
     bufferTimeAfter: 0,
-    reserveeType: "BUSINESS",
+    reserveeType: CustomerTypeChoice.Business,
     reserveeFirstName: "Etunimi",
     reserveeLastName: "Sukunimi",
     reserveeOrganisationName: "Yhdistys007",
@@ -67,34 +71,40 @@ function createRecurringEdges(
   startingPk: number,
   recurringPk: number,
   state: ReservationStateChoice = ReservationStateChoice.Confirmed
-) {
+): NonNullable<
+  RecurringReservationQuery["recurringReservation"]
+>["reservations"] {
+  const params = {
+    bufferTimeAfter: 0,
+    bufferTimeBefore: 0,
+    paymentOrder: [],
+    reservationUnit: [],
+    recurringReservation: {
+      id: base64encode(`RecurringReservationNode:${recurringPk}`),
+      pk: recurringPk,
+    },
+    state,
+  };
+
   return [
     {
+      ...params,
       begin: getValidInterval(0)[0],
       end: getValidInterval(0)[1],
       pk: startingPk,
       id: base64encode(`ReservationNode:${startingPk}`),
-      recurringReservation: {
-        id: base64encode(`RecurringReservationNode:${recurringPk}`),
-        pk: recurringPk,
-      },
-      state,
     },
     {
+      ...params,
       begin: getValidInterval(7)[0],
       end: getValidInterval(7)[1],
       pk: startingPk + 1,
       id: base64encode(`ReservationNode:${startingPk + 1}`),
-      recurringReservation: {
-        id: base64encode(`RecurringReservationNode:${recurringPk}`),
-        pk: recurringPk,
-      },
-      state,
     },
   ];
 }
 
-const correctRecurringReservationQueryResult = (
+function correctRecurringReservationQueryResult(
   startingPk: number,
   recurringPk: number,
   options?: {
@@ -102,93 +112,112 @@ const correctRecurringReservationQueryResult = (
     shouldFailOnce?: boolean;
     allDenied?: boolean;
   }
-) => [
-  {
-    request: {
-      query: RecurringReservationDocument,
-      variables: {
-        id: base64encode(`RecurringReservationNode:${recurringPk}`),
+) {
+  const convertDate = (str: string) => {
+    const date = new Date(str);
+    return toApiDateUnsafe(date);
+  };
+  const reservations = createRecurringEdges(
+    startingPk,
+    recurringPk,
+    options?.allDenied
+      ? ReservationStateChoice.Denied
+      : ReservationStateChoice.Confirmed
+  );
+  const recurringReservation: NonNullable<
+    RecurringReservationQuery["recurringReservation"]
+  > = {
+    id: base64encode(`RecurringReservationNode:${recurringPk}`),
+    pk: recurringPk,
+    // TODO this should not be empty
+    weekdays: [],
+    // TODO refactor the magic numbers out
+    beginDate: convertDate(getValidInterval(0)[0]),
+    endDate: convertDate(getValidInterval(7)[1]),
+    reservations,
+    rejectedOccurrences: [],
+  };
+
+  return [
+    {
+      request: {
+        query: RecurringReservationDocument,
+        variables: {
+          id: base64encode(`RecurringReservationNode:${recurringPk}`),
+        },
       },
-    },
-    result: {
-      data: {
-        recurringReservation: {
-          reservations: createRecurringEdges(
-            startingPk,
-            recurringPk,
-            options?.allDenied
-              ? ReservationStateChoice.Denied
-              : ReservationStateChoice.Confirmed
-          ),
+      result: {
+        data: {
+          recurringReservation,
         },
       },
     },
-  },
-  {
-    request: {
-      query: UpdateRecurringReservationDocument,
-      variables: {
-        input: {
-          name: "Modify recurring name",
-          pk: recurringPk,
-          description: CHANGED_WORKING_MEMO,
+    {
+      request: {
+        query: UpdateRecurringReservationDocument,
+        variables: {
+          input: {
+            name: "Modify recurring name",
+            pk: recurringPk,
+            description: CHANGED_WORKING_MEMO,
+          },
+        },
+      },
+      result: {
+        data: {
+          updateRecurringReservation: {
+            pk: recurringPk,
+            errors: null,
+          },
         },
       },
     },
-    result: {
-      data: {
-        updateRecurringReservation: {
-          pk: recurringPk,
-          errors: null,
+    {
+      request: {
+        query: UpdateStaffReservationDocument,
+        variables: {
+          input: { ...MUTATION_DATA.input, pk: startingPk },
+          workingMemo: { ...MUTATION_DATA.workingMemo, pk: startingPk },
+        },
+      },
+      result: {
+        data: {
+          staffReservationModify: { pk: startingPk, errors: null },
+          updateReservationWorkingMemo: {
+            workingMemo: CHANGED_WORKING_MEMO,
+            errors: null,
+          },
         },
       },
     },
-  },
-  {
-    request: {
-      query: UpdateStaffReservationDocument,
-      variables: {
-        input: { ...MUTATION_DATA.input, pk: startingPk },
-        workingMemo: { ...MUTATION_DATA.workingMemo, pk: startingPk },
-      },
-    },
-    result: {
-      data: {
-        staffReservationModify: { pk: startingPk, errors: null },
-        updateReservationWorkingMemo: {
-          workingMemo: CHANGED_WORKING_MEMO,
-          errors: null,
+    // NOTE apollo mocks are consumed on use (unlike MSW which uses functions) so create two of them
+    ...[
+      { fail: (options?.shouldFailAll || options?.shouldFailOnce) ?? false },
+      { fail: options?.shouldFailAll ?? false },
+    ].map(({ fail }) => ({
+      request: {
+        query: UpdateStaffReservationDocument,
+        variables: {
+          input: { ...MUTATION_DATA.input, pk: startingPk + 1 },
+          workingMemo: { ...MUTATION_DATA.workingMemo, pk: startingPk + 1 },
         },
       },
-    },
-  },
-  // NOTE apollo mocks are consumed on use (unlike MSW which uses functions) so create two of them
-  ...[
-    { fail: (options?.shouldFailAll || options?.shouldFailOnce) ?? false },
-    { fail: options?.shouldFailAll ?? false },
-  ].map(({ fail }) => ({
-    request: {
-      query: UpdateStaffReservationDocument,
-      variables: {
-        input: { ...MUTATION_DATA.input, pk: startingPk + 1 },
-        workingMemo: { ...MUTATION_DATA.workingMemo, pk: startingPk + 1 },
-      },
-    },
-    ...(fail
-      ? { error: new Error("Error") }
-      : {
-          result: {
-            data: {
-              staffReservationModify: { pk: startingPk + 1, errors: null },
-              updateReservationWorkingMemo: {
-                workingMemo: CHANGED_WORKING_MEMO,
-                errors: null,
+      ...(fail
+        ? { error: new Error("Error") }
+        : {
+            result: {
+              data: {
+                staffReservationModify: { pk: startingPk + 1, errors: null },
+                updateReservationWorkingMemo: {
+                  workingMemo: CHANGED_WORKING_MEMO,
+                  errors: null,
+                },
               },
             },
-          },
-        }),
-  })),
-];
+          }),
+    })),
+  ];
+}
 
 export const mocks = [
   // single reservation success

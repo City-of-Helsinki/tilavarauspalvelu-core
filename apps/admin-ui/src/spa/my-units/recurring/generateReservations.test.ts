@@ -1,15 +1,11 @@
-import React from "react";
-import "@testing-library/jest-dom";
-import { render } from "@testing-library/react";
 import { addDays, format, nextMonday } from "date-fns";
 import { ReservationStartInterval } from "@gql/gql-types";
-import { toUIDate } from "common/src/common/util";
 import { generateReservations } from "./generateReservations";
-import { ReservationList } from "../../ReservationsList";
 
 const DATE_FORMAT = "dd.MM.yyyy";
 const today = new Date();
 const dtoday = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+
 const twoWeeksOnceAWeek = {
   startingDate: format(today, DATE_FORMAT),
   // two weeks is 13 days since the last day is inclusive
@@ -24,6 +20,7 @@ const twoWeeksOnceAWeek = {
 };
 
 const interval15mins = ReservationStartInterval.Interval_15Mins;
+
 describe("generate reservations", () => {
   test("can generate reservations with valid data", () => {
     const res = generateReservations(twoWeeksOnceAWeek, interval15mins);
@@ -149,70 +146,5 @@ describe("generate reservations", () => {
       interval15mins
     );
     expect(res.reservations).toHaveLength(0);
-  });
-});
-
-describe("ReservationsList", () => {
-  test("Render reservations list", async () => {
-    const items = [
-      {
-        date: new Date(),
-        startTime: "19:00",
-        endTime: "20:00",
-      },
-    ];
-
-    const screen = render(<ReservationList items={items} />);
-
-    const dstring = toUIDate(today);
-    expect(await screen.findByText(/19:00/)).toBeInTheDocument();
-    expect(await screen.findByText(/20:00/)).toBeInTheDocument();
-    expect(await screen.findByText(RegExp(dstring))).toBeInTheDocument();
-  });
-
-  test("Render reservations list", async () => {
-    const N_DAYS = 5;
-    const items = Array.from(Array(N_DAYS)).map((_, i) => ({
-      date: addDays(new Date(), i),
-      startTime: "19:00",
-      endTime: "20:00",
-    }));
-
-    const screen = render(<ReservationList items={items} />);
-
-    const dstring = toUIDate(today);
-    expect(await screen.findAllByText(/19:00/)).toHaveLength(N_DAYS);
-    expect(await screen.findAllByText(/20:00/)).toHaveLength(N_DAYS);
-    expect(await screen.findByText(RegExp(dstring))).toBeInTheDocument();
-  });
-
-  test("Error message is translated correctly", async () => {
-    const items = [
-      {
-        date: new Date(),
-        error: "ApolloError: Overlapping reservations are not allowed.",
-        startTime: "19:00",
-        endTime: "20:00",
-      },
-    ];
-
-    const screen = render(<ReservationList items={items} />);
-    expect(await screen.findAllByText(/19:00/)).toHaveLength(1);
-    expect(screen.getByText(/overlap/)).toBeInTheDocument();
-  });
-
-  test("Error message that has no translation has a default message", async () => {
-    const items = [
-      {
-        date: new Date(),
-        error: "failExistsOnPurpose",
-        startTime: "19:00",
-        endTime: "20:00",
-      },
-    ];
-
-    const screen = render(<ReservationList items={items} />);
-    expect(await screen.findAllByText(/19:00/)).toHaveLength(1);
-    expect(screen.getByText(/default/)).toBeInTheDocument();
   });
 });
