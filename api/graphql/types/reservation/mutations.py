@@ -141,15 +141,15 @@ class ReservationDeleteMutation(DeleteMutation):
         permission_classes = [ReservationPermission]
 
     @classmethod
-    def validate_deletion(cls, instance: Reservation, user: AnyUser) -> None:
-        if instance.state not in (
-            ReservationStateChoice.CREATED.value,
-            ReservationStateChoice.WAITING_FOR_PAYMENT.value,
-        ):
-            msg = "Reservation which is not in created or waiting_for_payment state cannot be deleted."
+    def validate_deletion(cls, reservation: Reservation, user: AnyUser) -> None:
+        if reservation.state not in ReservationStateChoice.states_that_can_be_cancelled:
+            msg = (
+                f"Reservation which is not in {ReservationStateChoice.states_that_can_be_cancelled} "
+                f"state cannot be deleted."
+            )
             raise ValidationError(msg)
 
-        payment_order: PaymentOrder = instance.payment_order.first()
+        payment_order: PaymentOrder = reservation.payment_order.first()
         if payment_order and payment_order.remote_id and payment_order.status != OrderStatus.CANCELLED.value:
             try:
                 webshop_order = VerkkokauppaAPIClient.cancel_order(
