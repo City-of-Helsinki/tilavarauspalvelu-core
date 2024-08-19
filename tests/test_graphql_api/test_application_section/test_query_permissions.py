@@ -1,7 +1,6 @@
 import pytest
 
 from tests.factories import ApplicationSectionFactory, UnitFactory, UnitGroupFactory, UserFactory
-from tests.helpers import UserType
 from tests.test_graphql_api.test_application_section.helpers import sections_query
 
 # Applied to all tests
@@ -31,7 +30,7 @@ def test_application_sections__query__perms__superuser(graphql):
     # - A superuser is using the system
     section_1 = ApplicationSectionFactory.create_in_status_unallocated()
     section_2 = ApplicationSectionFactory.create_in_status_unallocated()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - The user queries for application sections
@@ -68,7 +67,7 @@ def test_application_sections__query__perms__general_admin(graphql):
     # - A general service sector admin is using the system
     section_1 = ApplicationSectionFactory.create_in_status_unallocated()
     section_2 = ApplicationSectionFactory.create_in_status_unallocated()
-    user = UserFactory.create_with_general_permissions(perms=["can_handle_applications"])
+    user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     # when:
@@ -94,7 +93,7 @@ def test_application_sections__query__perms__test_unit_admin(graphql):
     ApplicationSectionFactory.create_in_status_unallocated(
         reservation_unit_options__reservation_unit__unit=unit_2,
     )
-    user = UserFactory.create_with_unit_permissions(unit_1, perms=["can_validate_applications"])
+    user = UserFactory.create_with_unit_role(units=[unit_1])
     graphql.force_login(user)
 
     # when:
@@ -119,7 +118,7 @@ def test_application_sections__query__perms__unit_group_admin(graphql):
     ApplicationSectionFactory.create_in_status_unallocated(
         reservation_unit_options__reservation_unit__unit__unit_groups=[group_2],
     )
-    user = UserFactory.create_with_unit_group_permissions(group_1, perms=["can_validate_applications"])
+    user = UserFactory.create_with_unit_role(unit_groups=[group_1])
     graphql.force_login(user)
 
     # when:

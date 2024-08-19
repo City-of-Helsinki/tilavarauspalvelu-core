@@ -2,7 +2,6 @@ import freezegun
 import pytest
 
 from merchants.enums import OrderStatus
-from tests.helpers import UserType
 
 from .helpers import get_order, order_query
 
@@ -16,7 +15,7 @@ pytestmark = [
 def test_order__query(graphql):
     order = get_order()
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     query = order_query(order_uuid=order.remote_id)
     response = graphql(query)
 
@@ -38,7 +37,7 @@ def test_order__query(graphql):
 def test_order__query__checkout_url_not_visible_when_expired(graphql):
     order = get_order()
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     query = order_query(order_uuid=order.remote_id)
     response_1 = graphql(query)
 
@@ -58,7 +57,7 @@ def test_order__query__checkout_url_not_visible_when_expired(graphql):
 def test_order__query__checkout_url_not_visible_when_not_draft(graphql):
     order = get_order()
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     query = order_query(order_uuid=order.remote_id)
     response_1 = graphql(query)
 
@@ -77,7 +76,7 @@ def test_order__query__checkout_url_not_visible_when_not_draft(graphql):
 def test_order__query__expires_in_minutes_keeps_updating_based_on_current_time(graphql):
     order = get_order()
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     query = order_query(order_uuid=order.remote_id)
     response_1 = graphql(query)
 

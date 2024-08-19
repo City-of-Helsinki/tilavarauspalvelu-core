@@ -21,9 +21,10 @@ from applications.models import (
 from applications.typing import TimeSlotDB
 from reservation_units.models import ReservationUnit
 from reservations.models import AgeGroup, ReservationPurpose
+from spaces.models import ServiceSector, Unit
 from users.models import User
 
-from .utils import faker_en, faker_fi, faker_sv, get_paragraphs, random_subset, weighted_choice, with_logs
+from .utils import batched, faker_en, faker_fi, faker_sv, get_paragraphs, random_subset, weighted_choice, with_logs
 
 
 @with_logs()
@@ -492,3 +493,25 @@ def _create_application_round_time_slots(reservation_units: list[ReservationUnit
             )
 
     return ApplicationRoundTimeSlot.objects.bulk_create(time_slots)
+
+
+@with_logs()
+def _create_service_sectors(units: list[Unit], *, number: int = 3) -> list[ServiceSector]:
+    service_sectors: list[ServiceSector] = []
+    for i in range(number):
+        service_sector = ServiceSector(
+            name=f"Service Sector {i}",
+            name_fi=f"Service Sector {i}",
+            name_sv=f"Service Sector {i}",
+            name_en=f"Service Sector {i}",
+        )
+        service_sectors.append(service_sector)
+
+    service_sectors = ServiceSector.objects.bulk_create(service_sectors)
+
+    units_batched = batched(units, batch_size=len(service_sectors))
+    for service_sector in service_sectors:
+        units_batch = next(units_batched)
+        service_sector.units.add(*units_batch)
+
+    return service_sectors

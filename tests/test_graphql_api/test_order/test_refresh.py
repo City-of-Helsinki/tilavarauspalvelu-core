@@ -9,7 +9,7 @@ from merchants.verkkokauppa.payment.types import PaymentStatus
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.enums import ReservationStateChoice
 from tests.factories import PaymentFactory
-from tests.helpers import UserType, patch_method
+from tests.helpers import patch_method
 
 from .helpers import REFRESH_MUTATION, get_order
 
@@ -20,7 +20,7 @@ pytestmark = [
 
 
 def test_refresh_order__order_not_found(graphql):
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     remote_id = str(uuid.uuid4())
     data = {"orderUuid": remote_id}
@@ -31,7 +31,7 @@ def test_refresh_order__order_not_found(graphql):
 
 @patch_method(VerkkokauppaAPIClient.get_payment, return_value=None)
 def test_refresh_order__payment_not_found(graphql):
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     order = get_order()
     status = order.status
 
@@ -56,7 +56,7 @@ def test_refresh_order__payment_not_found(graphql):
 )
 @patch_method(VerkkokauppaAPIClient.get_payment)
 def test_refresh_order__status_skips_update(graphql, status):
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     order = get_order()
     order.status = status
     order.save()
@@ -82,7 +82,7 @@ def test_refresh_order__status_skips_update(graphql, status):
 )
 @patch_method(VerkkokauppaAPIClient.get_payment)
 def test_refresh_order__status_causes_no_changes(graphql, status):
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     order = get_order()
     order_status = order.status
 
@@ -106,7 +106,7 @@ def test_refresh_order__status_causes_no_changes(graphql, status):
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
 def test_refresh_order__cancelled_status_causes_cancellation(graphql):
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     order = get_order()
 
     payment = PaymentFactory.create(status=PaymentStatus.CANCELLED.value)
@@ -131,7 +131,7 @@ def test_refresh_order__cancelled_status_causes_cancellation(graphql):
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @patch_method(ReservationEmailNotificationSender.send_confirmation_email)
 def test_refresh_order__paid_online_status_causes_paid_marking_and_no_notification(graphql):
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     order = get_order()
 
     payment = PaymentFactory.create(status=PaymentStatus.PAID_ONLINE.value)
@@ -157,7 +157,7 @@ def test_refresh_order__paid_online_status_causes_paid_marking_and_no_notificati
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @patch_method(ReservationEmailNotificationSender.send_confirmation_email)
 def test_refresh_order__paid_online_status_sends_notification_if_reservation_waiting_for_payment(graphql):
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     order = get_order()
 
     order.reservation.state = ReservationStateChoice.WAITING_FOR_PAYMENT
@@ -184,7 +184,7 @@ def test_refresh_order__paid_online_status_sends_notification_if_reservation_wai
 
 @patch_method(VerkkokauppaAPIClient.get_payment, side_effect=GetPaymentError("Error"))
 def test_refresh_order__payment_endpoint_error(graphql):
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     order = get_order()
     order_status = order.status
 

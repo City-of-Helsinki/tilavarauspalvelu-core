@@ -2,7 +2,6 @@ import pytest
 from graphene_django_extensions.testing import build_query
 
 from tests.factories import KeywordFactory
-from tests.helpers import UserType
 
 # Applied to all tests
 pytestmark = [
@@ -13,7 +12,7 @@ pytestmark = [
 def test_keywords__query(graphql):
     keyword = KeywordFactory.create()
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     query = build_query("keywords", fields="nameFi", connection=True)
     response = graphql(query)
 
@@ -28,7 +27,7 @@ def test_keywords__query(graphql):
 def test_keyword_groups__query(graphql):
     keyword = KeywordFactory.create()
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     query = build_query("keywordGroups", fields="nameFi keywords { nameFi }", connection=True)
     response = graphql(query)
 
@@ -48,7 +47,7 @@ def test_keyword_groups__query(graphql):
 def test_keyword_category__query(graphql):
     keyword = KeywordFactory.create()
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     query = build_query(
         "keywordCategories",
         fields="nameFi keywordGroups { nameFi  keywords { nameFi } }",

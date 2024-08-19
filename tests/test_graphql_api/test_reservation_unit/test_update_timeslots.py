@@ -3,7 +3,6 @@ import pytest
 from applications.enums import WeekdayChoice
 from tests.factories import ReservationUnitFactory
 from tests.factories.application_round_time_slot import ApplicationRoundTimeSlotFactory
-from tests.helpers import UserType
 
 from .helpers import UPDATE_MUTATION
 
@@ -18,7 +17,7 @@ def test_reservation_unit__update__timeslots__add(graphql):
     # - There is a draft reservation unit with no timeslots
     # - A superuser is using the system
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "pk": reservation_unit.pk,
@@ -59,7 +58,7 @@ def test_reservation_unit__update__timeslots__replace(graphql):
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
     ApplicationRoundTimeSlotFactory.create(reservation_unit=reservation_unit, weekday=WeekdayChoice.MONDAY)
     ApplicationRoundTimeSlotFactory.create(reservation_unit=reservation_unit, weekday=WeekdayChoice.FRIDAY)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "pk": reservation_unit.pk,
@@ -99,7 +98,7 @@ def test_reservation_unit__update__timeslots__remove_all(graphql):
     # - A superuser is using the system
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
     ApplicationRoundTimeSlotFactory.create(reservation_unit=reservation_unit, weekday=WeekdayChoice.FRIDAY)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "pk": reservation_unit.pk,
@@ -125,7 +124,7 @@ def test_reservation_unit__update__timeslots__weekday_required(graphql):
     # - There is a draft reservation unit with no timeslots
     # - A superuser is using the system
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "pk": reservation_unit.pk,
@@ -155,7 +154,7 @@ def test_reservation_unit__update__timeslots__begin_before_end(graphql):
     # - There is a draft reservation unit with no timeslots
     # - A superuser is using the system
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "pk": reservation_unit.pk,
@@ -193,7 +192,7 @@ def test_reservation_unit__update__timeslots__overlapping_reservable_times(graph
     # - There is a draft reservation unit with no timeslots
     # - A superuser is using the system
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "pk": reservation_unit.pk,
@@ -232,7 +231,7 @@ def test_reservation_unit__update__timeslots__two_for_same_day(graphql):
     # - There is a draft reservation unit with no timeslots
     # - A superuser is using the system
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "pk": reservation_unit.pk,
@@ -270,7 +269,7 @@ def test_reservation_unit__update__timeslots__open_has_no_reservable_times(graph
     # - There is a draft reservation unit with no timeslots
     # - A superuser is using the system
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "pk": reservation_unit.pk,
@@ -302,7 +301,7 @@ def test_reservation_unit__update__timeslots__closed_has_reservable_times(graphq
     # - There is a draft reservation unit with no timeslots
     # - A superuser is using the system
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "pk": reservation_unit.pk,
@@ -334,7 +333,7 @@ def test_reservation_unit__update__timeslots__closed_has_reservable_times(graphq
 
 def test_reservation_unit__update__reservation_block_whole_day(graphql):
     reservation_unit = ReservationUnitFactory.create(is_draft=True, reservation_block_whole_day=False)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "pk": reservation_unit.pk,

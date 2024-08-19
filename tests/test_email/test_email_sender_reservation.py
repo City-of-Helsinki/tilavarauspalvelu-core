@@ -160,9 +160,8 @@ def test_email_sender__reservation__staff_email_sent_in_default_language(outbox,
     email_template.save()
 
     # Create a user with permissions to manage reservations, who will receive the email
-    staff_user = UserFactory.create_with_unit_permissions(
-        unit=reservation.reservation_unit.first().unit,
-        perms=["can_manage_reservations"],
+    staff_user = UserFactory.create_with_unit_role(
+        units=[reservation.reservation_unit.first().unit],
         reservation_notification=ReservationNotification.ALL,
     )
 

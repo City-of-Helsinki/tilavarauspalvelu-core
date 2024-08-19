@@ -1,13 +1,7 @@
 import pytest
 
 from applications.enums import ApplicationRoundStatusChoice, ApplicationStatusChoice
-from tests.factories import (
-    ApplicationFactory,
-    ApplicationRoundFactory,
-    ReservationUnitFactory,
-    UserFactory,
-    add_unit_permissions,
-)
+from tests.factories import ApplicationFactory, ApplicationRoundFactory, ReservationUnitFactory, UserFactory
 
 from .helpers import SET_HANDLED_MUTATION, disable_reservation_generation
 
@@ -62,7 +56,7 @@ def test_application_round__set_handled__general_admin(graphql):
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
     assert application_round.status == ApplicationRoundStatusChoice.IN_ALLOCATION
 
-    admin = UserFactory.create_with_general_permissions(perms=["can_handle_applications"])
+    admin = UserFactory.create_with_general_role()
     graphql.force_login(admin)
 
     with disable_reservation_generation():
@@ -80,7 +74,7 @@ def test_application_round__set_handled__unit_admin(graphql):
     assert application_round.status == ApplicationRoundStatusChoice.IN_ALLOCATION
 
     unit = reservation_unit.unit
-    admin = UserFactory.create_with_unit_permissions(unit=unit, perms=["can_handle_applications"])
+    admin = UserFactory.create_with_unit_role(units=[unit])
     graphql.force_login(admin)
 
     with disable_reservation_generation():
@@ -102,7 +96,7 @@ def test_application_round__set_handled__unit_admin__no_perms_to_all_units(graph
     assert application_round.status == ApplicationRoundStatusChoice.IN_ALLOCATION
 
     unit = reservation_unit_1.unit
-    admin = UserFactory.create_with_unit_permissions(unit=unit, perms=["can_handle_applications"])
+    admin = UserFactory.create_with_unit_role(units=[unit])
     graphql.force_login(admin)
 
     with disable_reservation_generation():
@@ -120,9 +114,7 @@ def test_application_round__set_handled__unit_admin__has_perms_to_all_units(grap
     )
     assert application_round.status == ApplicationRoundStatusChoice.IN_ALLOCATION
 
-    admin = UserFactory.create()
-    add_unit_permissions(admin, unit=reservation_unit_1.unit, perms=["can_handle_applications"])
-    add_unit_permissions(admin, unit=reservation_unit_2.unit, perms=["can_handle_applications"])
+    admin = UserFactory.create_with_unit_role(units=[reservation_unit_1.unit, reservation_unit_2.unit])
     graphql.force_login(admin)
 
     with disable_reservation_generation():

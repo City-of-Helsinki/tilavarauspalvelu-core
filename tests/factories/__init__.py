@@ -23,6 +23,7 @@ from .payment import (
     PaymentOrderFactory,
     PaymentProductFactory,
 )
+from .permissions import GeneralRoleFactory, UnitRoleFactory
 from .person import PersonFactory
 from .purpose import PurposeFactory
 from .qualifier import QualifierFactory
@@ -42,17 +43,6 @@ from .reservation_unit_payment_type import ReservationUnitPaymentTypeFactory
 from .reservation_unit_pricing import ReservationUnitPricingFactory
 from .reservation_unit_type import ReservationUnitTypeFactory
 from .resource import ResourceFactory
-from .role import (
-    GeneralRoleChoiceFactory,
-    GeneralRoleFactory,
-    GeneralRolePermissionFactory,
-    ServiceSectorRoleChoiceFactory,
-    ServiceSectorRoleFactory,
-    ServiceSectorRolePermissionFactory,
-    UnitRoleChoiceFactory,
-    UnitRoleFactory,
-    UnitRolePermissionFactory,
-)
 from .service import ServiceFactory
 from .service_sector import ServiceSectorFactory
 from .space import SpaceFactory
@@ -60,14 +50,7 @@ from .suitable_time_range import SuitableTimeRangeFactory
 from .tax_percentage import TaxPercentageFactory
 from .terms_of_use import TermsOfUseFactory
 from .unit import UnitFactory, UnitGroupFactory
-from .user import (
-    UserFactory,
-    UserSocialAuthFactory,
-    add_general_permissions,
-    add_service_sector_permissions,
-    add_unit_group_permissions,
-    add_unit_permissions,
-)
+from .user import UserFactory, UserSocialAuthFactory
 
 __all__ = [
     "AbilityGroupFactory",
@@ -84,9 +67,7 @@ __all__ = [
     "EmailTemplateFactory",
     "EquipmentCategoryFactory",
     "EquipmentFactory",
-    "GeneralRoleChoiceFactory",
     "GeneralRoleFactory",
-    "GeneralRolePermissionFactory",
     "KeywordCategoryFactory",
     "KeywordFactory",
     "KeywordGroupFactory",
@@ -123,22 +104,13 @@ __all__ = [
     "ResourceFactory",
     "ServiceFactory",
     "ServiceSectorFactory",
-    "ServiceSectorRoleChoiceFactory",
-    "ServiceSectorRoleFactory",
-    "ServiceSectorRolePermissionFactory",
     "SpaceFactory",
     "SuitableTimeRangeFactory",
     "TaxPercentageFactory",
     "TermsOfUseFactory",
     "UnitFactory",
     "UnitGroupFactory",
-    "UnitRoleChoiceFactory",
     "UnitRoleFactory",
-    "UnitRolePermissionFactory",
     "UserFactory",
     "UserSocialAuthFactory",
-    "add_general_permissions",
-    "add_service_sector_permissions",
-    "add_unit_group_permissions",
-    "add_unit_permissions",
 ]

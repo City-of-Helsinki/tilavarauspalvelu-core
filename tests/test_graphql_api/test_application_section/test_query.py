@@ -1,7 +1,6 @@
 import pytest
 
 from tests.factories import ApplicationSectionFactory, SuitableTimeRangeFactory
-from tests.helpers import UserType
 from tests.test_graphql_api.test_application_section.helpers import sections_query
 
 # Applied to all tests
@@ -18,7 +17,7 @@ def test_application_section__query__all_fields(graphql):
     option = section.reservation_unit_options.first()
     suitable_time_range = SuitableTimeRangeFactory.create(application_section=section)
     ApplicationSectionFactory.create_in_status_unallocated()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     fields = """
         pk

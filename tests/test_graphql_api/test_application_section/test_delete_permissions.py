@@ -2,7 +2,6 @@ import pytest
 
 from applications.models import ApplicationSection
 from tests.factories import ApplicationSectionFactory
-from tests.helpers import UserType
 from tests.test_graphql_api.test_application_section.helpers import DELETE_MUTATION, get_application_section_delete_data
 
 # Applied to all tests
@@ -37,7 +36,7 @@ def test_superuser_can_delete_application_event(graphql):
     # - There is an unallocated application section
     # - A superuser is using the system
     section = ApplicationSectionFactory.create_in_status_unallocated()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to delete an application event
@@ -58,7 +57,7 @@ def test_other_user_cannot_delete_application_event(graphql):
     # - There is an unallocated application event
     # - Someone other than the owner of the application is using the system
     section = ApplicationSectionFactory.create_in_status_unallocated()
-    graphql.login_user_based_on_type(UserType.REGULAR)
+    graphql.login_with_regular_user()
 
     # when:
     # - User tries to delete an application section

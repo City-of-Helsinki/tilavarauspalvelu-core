@@ -1,7 +1,6 @@
 import pytest
 
 from tests.factories import EquipmentFactory
-from tests.helpers import UserType
 
 from .helpers import UPDATE_MUTATION
 
@@ -16,7 +15,7 @@ def test_equipment__update(graphql):
 
     data = {"pk": equipment.pk, "nameFi": "bar", "category": equipment.category.pk}
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.has_errors is False

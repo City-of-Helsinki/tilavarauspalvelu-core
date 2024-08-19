@@ -2,7 +2,6 @@ import pytest
 
 from applications.enums import Weekday
 from tests.factories import ReservationUnitOptionFactory
-from tests.helpers import UserType
 
 from .helpers import UPDATE_MUTATION
 
@@ -17,7 +16,7 @@ def test_reservation_unit_option__update__locked(graphql):
     # - There is a usable reservation unit option
     # - A superuser is using the system
     option = ReservationUnitOptionFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to update the reservation unit option
@@ -41,7 +40,7 @@ def test_reservation_unit_option__update__rejected(graphql):
     # - There is a usable reservation unit option
     # - A superuser is using the system
     option = ReservationUnitOptionFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to update the reservation unit option
@@ -65,7 +64,7 @@ def test_reservation_unit_option__update__rejected__has_allocations(graphql):
     # - There is a usable reservation unit option with allocations
     # - A superuser is using the system
     option = ReservationUnitOptionFactory.create(allocated_time_slots__day_of_the_week=Weekday.MONDAY)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to update the reservation unit option

@@ -26,7 +26,7 @@ def test_recurring_reservations__query__regular_user__can_only_see_own(graphql):
 
 
 def test_recurring_reservations__query__general_admin(graphql):
-    user = UserFactory.create_with_general_permissions(perms=["can_view_reservations"])
+    user = UserFactory.create_with_general_role()
     recurring_reservation_1 = RecurringReservationFactory.create(name="1", user=user)
     recurring_reservation_2 = RecurringReservationFactory.create(name="2")
 
@@ -45,7 +45,7 @@ def test_recurring_reservations__query__general_admin(graphql):
 def test_recurring_reservations__query__unit_admin(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
-    user = UserFactory.create_with_unit_permissions(unit=reservation_unit.unit, perms=["can_view_reservations"])
+    user = UserFactory.create_with_unit_role(units=[reservation_unit.unit])
     recurring_reservation_1 = RecurringReservationFactory.create(name="1", user=user)
     recurring_reservation_2 = RecurringReservationFactory.create(name="2", reservation_unit=reservation_unit)
     recurring_reservation_3 = RecurringReservationFactory.create(name="3")

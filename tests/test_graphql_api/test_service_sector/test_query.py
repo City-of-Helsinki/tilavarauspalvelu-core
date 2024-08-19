@@ -2,7 +2,6 @@ import pytest
 from graphene_django_extensions.testing import build_query
 
 from tests.factories import ServiceSectorFactory
-from tests.helpers import UserType
 
 # Applied to all tests
 pytestmark = [
@@ -13,7 +12,7 @@ pytestmark = [
 def test_service_sectors__query(graphql):
     sector = ServiceSectorFactory.create()
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     fields = """
         pk

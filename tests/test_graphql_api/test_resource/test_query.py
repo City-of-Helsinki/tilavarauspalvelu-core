@@ -4,7 +4,6 @@ import pytest
 from graphql_relay import to_global_id
 
 from tests.factories import ResourceFactory
-from tests.helpers import UserType
 
 from .helpers import resource_query, resources_query
 
@@ -17,7 +16,7 @@ pytestmark = [
 def test_resources__query__all_fields(graphql):
     resource = ResourceFactory.create()
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     fields = """
         pk
@@ -58,7 +57,7 @@ def test_resource__buffer_times(graphql):
         buffer_time_after=datetime.timedelta(minutes=30),
     )
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     fields = """
         pk
@@ -80,7 +79,7 @@ def test_resource__buffer_times(graphql):
 
 
 def test_resource__not_found(graphql):
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     global_id = to_global_id("ResourceNode", -1)
     query = resource_query(id=global_id)

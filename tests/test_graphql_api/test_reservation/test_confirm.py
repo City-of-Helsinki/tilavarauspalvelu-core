@@ -44,9 +44,8 @@ def test_reservation__confirm__changes_state__confirmed(graphql, outbox, setting
 
     # Unit admin will get an email
     unit = reservation.reservation_unit.first().unit
-    UserFactory.create_with_unit_permissions(
-        unit=unit,
-        perms=["can_manage_reservations"],
+    UserFactory.create_with_unit_role(
+        units=[unit],
         reservation_notification=ReservationNotification.ALL,
     )
 
@@ -80,9 +79,8 @@ def test_reservation__confirm__changes_state__requires_handling(graphql, outbox,
 
     # Unit admin will get an email
     unit = reservation.reservation_unit.first().unit
-    UserFactory.create_with_unit_permissions(
-        unit=unit,
-        perms=["can_manage_reservations"],
+    UserFactory.create_with_unit_role(
+        units=[unit],
         reservation_notification=ReservationNotification.ALL,
     )
 
@@ -119,9 +117,8 @@ def test_reservation__confirm__changes_state_to_requires_handling_on_subsidy_req
 
     # Unit admin will get an email
     unit = reservation.reservation_unit.first().unit
-    UserFactory.create_with_unit_permissions(
-        unit=unit,
-        perms=["can_manage_reservations"],
+    UserFactory.create_with_unit_role(
+        units=[unit],
         reservation_notification=ReservationNotification.ALL,
     )
 

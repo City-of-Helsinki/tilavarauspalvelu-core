@@ -9,7 +9,7 @@ from api.graphql.types.application_round.permissions import ApplicationRoundPerm
 from applications.enums import ApplicationRoundReservationCreationStatusChoice, ApplicationRoundStatusChoice
 from applications.models import Application, ApplicationRound
 from common.db import SubqueryCount
-from common.typing import GQLInfo
+from common.typing import AnyUser, GQLInfo
 from reservation_units.models import ReservationUnit
 
 
@@ -78,7 +78,8 @@ class ApplicationRoundNode(DjangoNode):
         permission_classes = [ApplicationRoundPermission]
 
     def resolve_is_setting_handled_allowed(root: ApplicationRound, info: GQLInfo) -> bool:
-        if not ApplicationRoundPermission.has_update_permission(root, info.context.user, {}):
+        user: AnyUser = info.context.user
+        if not user.permissions.can_manage_application_round(root):
             return False
 
         return root.is_setting_handled_allowed

@@ -2,7 +2,6 @@ import pytest
 from graphene_django_extensions.testing import build_query
 
 from tests.factories import ReservationUnitTypeFactory
-from tests.helpers import UserType
 
 # Applied to all tests
 pytestmark = [
@@ -13,7 +12,7 @@ pytestmark = [
 def test_reservation_unit_type__query(graphql):
     res_unit_type = ReservationUnitTypeFactory.create(name="foo")
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     fields = """
         pk
@@ -42,7 +41,7 @@ def test_reservation_unit_type__order__by_name(graphql):
     res_unit_type_2 = ReservationUnitTypeFactory.create(name="3")
     res_unit_type_3 = ReservationUnitTypeFactory.create(name="2")
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     query = build_query("reservationUnitTypes", connection=True, order_by="nameFiAsc")
     response = graphql(query)

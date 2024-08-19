@@ -1,7 +1,7 @@
 import pytest
 
+from permissions.enums import UserRoleChoice
 from tests.factories import BannerNotificationFactory
-from tests.helpers import UserType
 
 from .helpers import DELETE_MUTATION
 
@@ -11,16 +11,9 @@ pytestmark = [
 ]
 
 
-@pytest.mark.parametrize("user_type", [UserType.STAFF, UserType.ANONYMOUS, UserType.REGULAR])
-def test_banner_notification__delete__no_perms(graphql, user_type):
-    # given:
-    # - There is a draft banner notification in the system
-    # - User of the given type is using the system
+def test_banner_notification__delete__anonymous_user(graphql):
     notification = BannerNotificationFactory.create(draft=True)
-    graphql.login_user_based_on_type(user_type)
 
-    # when:
-    # - User tries to delete the banner notification
     response = graphql(
         DELETE_MUTATION,
         input_data={
@@ -28,20 +21,41 @@ def test_banner_notification__delete__no_perms(graphql, user_type):
         },
     )
 
-    # then:
-    # - The response complains about permissions
+    assert response.error_message() == "No permission to delete."
+
+
+def test_banner_notification__delete__regular_user(graphql):
+    notification = BannerNotificationFactory.create(draft=True)
+    graphql.login_with_regular_user()
+
+    response = graphql(
+        DELETE_MUTATION,
+        input_data={
+            "pk": notification.pk,
+        },
+    )
+
+    assert response.error_message() == "No permission to delete."
+
+
+def test_banner_notification__delete__no_perms(graphql):
+    notification = BannerNotificationFactory.create(draft=True)
+    graphql.login_user_with_role(role=UserRoleChoice.VIEWER)
+
+    response = graphql(
+        DELETE_MUTATION,
+        input_data={
+            "pk": notification.pk,
+        },
+    )
+
     assert response.error_message() == "No permission to delete."
 
 
 def test_banner_notification__delete__notification_manager(graphql):
-    # given:
-    # - There is a draft banner notification in the system
-    # - Notification manager is using the system
     notification = BannerNotificationFactory.create(draft=True)
-    graphql.login_user_based_on_type(UserType.NOTIFICATION_MANAGER)
+    graphql.login_user_with_role(role=UserRoleChoice.NOTIFICATION_MANAGER)
 
-    # when:
-    # - User tries to delete the banner notification
     response = graphql(
         DELETE_MUTATION,
         variables={
@@ -51,6 +65,4 @@ def test_banner_notification__delete__notification_manager(graphql):
         },
     )
 
-    # then:
-    # - The response has no errors
     assert response.has_errors is False

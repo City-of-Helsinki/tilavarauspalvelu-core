@@ -14,7 +14,6 @@ from tests.factories import (
     UnitGroupFactory,
     UserFactory,
 )
-from tests.helpers import UserType
 from users.models import PersonalInfoViewLog
 
 from .helpers import reservation_query, reservations_query
@@ -33,7 +32,7 @@ def test_reservation__query__all_fields(graphql):
     # - There is a reservation in the system
     # - A superuser is using the system
     reservation: Reservation = ReservationFactory.create(name="")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User queries for reservations with all fields
@@ -219,7 +218,7 @@ def test_reservation__query__reservee_name_for_nonprofit_reservee(graphql):
 def test_reservation__query__reservee_date_of_birth_is_not_shown_to_regular_user(graphql):
     reservation = ReservationFactory.create()
 
-    graphql.login_user_based_on_type(UserType.REGULAR)
+    graphql.login_with_regular_user()
     query = reservations_query(fields="pk user { dateOfBirth }")
     response = graphql(query)
 
@@ -232,7 +231,7 @@ def test_reservation__query__reservee_date_of_birth_is_not_shown_to_regular_user
 
 def test_reservation__query__reservee_date_of_birth_is_show_but_logged__general_admin(graphql):
     reservation = ReservationFactory.create()
-    admin = UserFactory.create_with_general_permissions(perms=["can_view_reservations"])
+    admin = UserFactory.create_with_general_role()
 
     graphql.force_login(admin)
     query = reservations_query(fields="pk user { dateOfBirth }")
@@ -259,7 +258,7 @@ def test_reservation__query__reservee_date_of_birth_is_show_but_logged__unit_adm
     unit = UnitFactory.create()
     reservation_unit = ReservationUnitFactory.create(unit=unit)
     reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
-    admin = UserFactory.create_with_unit_permissions(unit=unit, perms=["can_view_reservations"])
+    admin = UserFactory.create_with_unit_role(units=[unit])
 
     graphql.force_login(admin)
     query = reservations_query(fields="pk user { dateOfBirth }")
@@ -287,7 +286,7 @@ def test_reservation__query__reservee_date_of_birth_is_show_but_logged__unit_gro
     unit = UnitFactory.create(unit_groups=[unit_group])
     reservation_unit = ReservationUnitFactory.create(unit=unit)
     reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
-    admin = UserFactory.create_with_unit_group_permissions(unit_group=unit_group, perms=["can_view_reservations"])
+    admin = UserFactory.create_with_unit_role(unit_groups=[unit_group])
 
     graphql.force_login(admin)
     query = reservations_query(fields="pk user { dateOfBirth }")
@@ -313,7 +312,7 @@ def test_reservation__query__reservee_date_of_birth_is_show_but_logged__unit_gro
 def test_reservation__query__is_handled(graphql):
     reservation = ReservationFactory.create(handled_at=None)
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     query = reservations_query(fields="pk isHandled")
     response = graphql(query)
 
@@ -334,7 +333,7 @@ def test_reservation__query__is_handled(graphql):
 def test_reservation__query__is_blocked(graphql):
     reservation = ReservationFactory.create(type=ReservationTypeChoice.STAFF)
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     query = reservations_query(fields="pk isBlocked")
     response = graphql(query)
 

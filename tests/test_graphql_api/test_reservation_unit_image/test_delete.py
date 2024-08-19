@@ -2,7 +2,6 @@ import pytest
 
 from reservation_units.models import ReservationUnitImage
 from tests.factories import ReservationUnitImageFactory
-from tests.helpers import UserType
 
 from .helpers import DELETE_MUTATION
 
@@ -15,7 +14,7 @@ pytestmark = [
 def test_reservation_unit_image__delete(graphql):
     reservation_unit_image = ReservationUnitImageFactory.create()
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     response = graphql(DELETE_MUTATION, input_data={"pk": reservation_unit_image.pk})
 

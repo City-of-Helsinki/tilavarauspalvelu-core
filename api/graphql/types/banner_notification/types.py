@@ -7,7 +7,6 @@ from api.graphql.types.banner_notification.permissions import BannerNotification
 from common.enums import BannerNotificationState
 from common.models import BannerNotification
 from common.typing import GQLInfo
-from permissions.helpers import can_manage_banner_notifications
 
 __all__ = [
     "BannerNotificationNode",
@@ -33,13 +32,13 @@ class BannerNotificationNode(DjangoNode):
             "active_until",
         ]
         restricted_fields = {
-            "name": can_manage_banner_notifications,
-            "draft": can_manage_banner_notifications,
-            "target": can_manage_banner_notifications,
+            "name": lambda user: user.permissions.can_manage_notifications(),
+            "draft": lambda user: user.permissions.can_manage_notifications(),
+            "target": lambda user: user.permissions.can_manage_notifications(),
         }
         filterset_class = BannerNotificationFilterSet
         permission_classes = [BannerNotificationPermission]
 
-    @restricted_field(can_manage_banner_notifications)
+    @restricted_field(lambda user: user.permissions.can_manage_notifications())
     def resolve_state(root: BannerNotification, info: GQLInfo) -> BannerNotificationState:
         return root.state

@@ -29,7 +29,7 @@ def test_reservation__deny__regular_user(graphql):
 
 def test_reservation__deny__general_admin(graphql):
     reservation = ReservationFactory.create_for_deny()
-    admin = UserFactory.create_with_general_permissions(perms=["can_manage_reservations"])
+    admin = UserFactory.create_with_general_role()
 
     graphql.force_login(admin)
     data = get_deny_data(reservation)
@@ -42,7 +42,7 @@ def test_reservation__deny__general_admin(graphql):
 
 
 def test_reservation__deny__own_reservation_with_reservation_staff_create_permissions(graphql):
-    admin = UserFactory.create_with_general_permissions(perms=["can_create_staff_reservations"])
+    admin = UserFactory.create_with_general_role()
     reservation = ReservationFactory.create_for_deny(user=admin)
 
     graphql.force_login(admin)

@@ -9,8 +9,7 @@ from api.graphql.types.application_section.permissions import ApplicationSection
 from applications.enums import ApplicationSectionStatusChoice
 from applications.models import ApplicationSection
 from common.typing import GQLInfo
-from permissions.helpers import has_any_general_permission
-from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
+from permissions.enums import UserRoleChoice
 
 
 class ApplicationSectionNode(DjangoNode):
@@ -44,19 +43,20 @@ class ApplicationSectionNode(DjangoNode):
     def filter_queryset(cls, queryset: models.QuerySet, info: GQLInfo) -> models.QuerySet:
         user = info.context.user
 
-        if user.is_anonymous:
+        if user.is_anonymous or not user.is_active:
             return queryset.none()
         if user.is_superuser:
             return queryset
-        if has_any_general_permission(user, GeneralPermissionChoices.handle_or_validate_applications):
+
+        roles = UserRoleChoice.can_manage_applications()
+        if user.permissions.has_general_role(role_choices=roles):
             return queryset
 
-        unit_permission = UnitPermissionChoices.CAN_VALIDATE_APPLICATIONS.value
-        unit_ids = [pk for pk, perms in user.unit_permissions.items() if unit_permission in perms]
-        unit_group_ids = [pk for pk, perms in user.unit_group_permissions.items() if unit_permission in perms]
+        u_ids = user.permissions.unit_ids_where_has_role(role_choices=roles)
+        g_ids = user.permissions.unit_group_ids_where_has_role(role_choices=roles)
 
         return queryset.filter(
             models.Q(application__user=user)
-            | models.Q(reservation_unit_options__reservation_unit__unit__in=unit_ids)
-            | models.Q(reservation_unit_options__reservation_unit__unit__unit_groups__in=unit_group_ids)
+            | models.Q(reservation_unit_options__reservation_unit__unit__in=u_ids)
+            | models.Q(reservation_unit_options__reservation_unit__unit__unit_groups__in=g_ids)
         ).distinct()

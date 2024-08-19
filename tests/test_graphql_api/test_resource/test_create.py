@@ -3,7 +3,6 @@ import pytest
 from resources.enums import ResourceLocationType
 from resources.models import Resource
 from tests.factories import SpaceFactory
-from tests.helpers import UserType
 
 from .helpers import CREATE_MUTATION
 
@@ -15,7 +14,7 @@ pytestmark = [
 
 def test_resource__create(graphql):
     space = SpaceFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "name": "abc",
@@ -40,7 +39,7 @@ def test_resource__create(graphql):
 @pytest.mark.parametrize("field", ["nameFi", "nameEn", "nameSv"])
 def test_resource__create__missing_name(graphql, field):
     space = SpaceFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "name": "abc",
@@ -59,7 +58,7 @@ def test_resource__create__missing_name(graphql, field):
 
 
 def test_resource__create__no_space_fixed_location(graphql):
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "name": "abc",
@@ -74,7 +73,7 @@ def test_resource__create__no_space_fixed_location(graphql):
 
 
 def test_resource__create__no_space_movable_location(graphql):
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "name": "abc",
@@ -96,7 +95,7 @@ def test_resource__create__no_space_movable_location(graphql):
 
 def test_resource__create__wrong_location_type(graphql):
     space = SpaceFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "name": "abc",

@@ -15,8 +15,8 @@ pytestmark = [
 
 
 def test_user__query(graphql):
-    user = UserFactory.create_staff_user()
-    admin = UserFactory.create_with_general_permissions(perms=["can_view_users"])
+    user = UserFactory.create()
+    admin = UserFactory.create_with_general_role()
     graphql.force_login(admin)
 
     fields = """
@@ -42,7 +42,7 @@ def test_user__query(graphql):
         "lastName": user.last_name,
         "email": user.email,
         "isSuperuser": user.is_superuser,
-        "reservationNotification": user.reservation_notification.value,
+        "reservationNotification": None,
     }
 
 
@@ -64,8 +64,8 @@ def test_user__query__regular_user_has_no_reservation_notification(graphql):
 
 @freezegun.freeze_time("2021-01-01T12:00:00Z")
 def test_user__query__date_of_birth_read_is_logged(graphql):
-    user = UserFactory.create_staff_user()
-    admin = UserFactory.create_with_general_permissions(perms=["can_view_users"])
+    user = UserFactory.create()
+    admin = UserFactory.create_with_general_role()
     graphql.force_login(admin)
 
     global_id = to_global_id("UserNode", user.pk)

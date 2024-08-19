@@ -8,12 +8,7 @@ from reservations.models import AffectingTimeSpan
 
 from .create_caisa import _create_caisa
 from .create_misc import _create_banner_notifications, _create_periodic_tasks
-from .create_permissions import (
-    _create_roles_and_permissions,
-    _create_service_sectors,
-    _set_user_group_permissions,
-    _set_user_roles,
-)
+from .create_permissions import _set_user_group_permissions, _set_user_roles
 from .create_reservables import (
     _create_equipments,
     _create_purposes,
@@ -43,6 +38,7 @@ from .create_seasonal_booking import (
     _create_application_rounds,
     _create_applications,
     _create_cities,
+    _create_service_sectors,
 )
 from .create_units import _create_unit_groups_for_units, _create_units, _rename_empty_units
 from .create_users import _create_users
@@ -57,11 +53,9 @@ def create_test_data(flush: bool = True) -> None:
         _clear_database()
     users = _create_users()
     _set_user_group_permissions(users)
-    roles = _create_roles_and_permissions()
     units = _create_units()
     unit_groups = _create_unit_groups_for_units(units)
-    service_sectors = _create_service_sectors(units)
-    _set_user_roles(users, roles, units, unit_groups, service_sectors)
+    _set_user_roles(users, units, unit_groups)
 
     reservation_unit_types = _create_reservation_unit_types()
     terms_of_use = _create_terms_of_use()
@@ -113,6 +107,7 @@ def create_test_data(flush: bool = True) -> None:
         cities,
     )
 
+    service_sectors = _create_service_sectors(units)
     application_rounds = _create_application_rounds(
         reservation_units,
         reservation_purposes,

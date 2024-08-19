@@ -4,6 +4,7 @@ import pytest
 
 from common.date_utils import next_hour
 from email_notification.models import EmailType
+from permissions.enums import UserRoleChoice
 from reservations.enums import ReservationStateChoice
 from tests.factories import EmailTemplateFactory, ReservationFactory, ReservationUnitFactory, UserFactory
 from users.models import ReservationNotification
@@ -30,9 +31,8 @@ def test_reservation__approve__superuser_can_approve(graphql, outbox, settings):
     )
 
     # A unit admin that will receive a notification about new reservations
-    UserFactory.create_with_unit_permissions(
-        unit=reservation_unit.unit,
-        perms=["can_manage_reservations"],
+    UserFactory.create_with_unit_role(
+        units=[reservation_unit.unit],
         reservation_notification=ReservationNotification.ALL,
     )
 
@@ -174,10 +174,7 @@ def test_reservation__approve__unit_reserver_can_approve_own_reservation(graphql
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
         reservation_unit=[reservation_unit],
-        user=UserFactory.create_with_unit_permissions(
-            unit=reservation_unit.unit,
-            perms=["can_create_staff_reservations"],
-        ),
+        user=UserFactory.create_with_unit_role(units=[reservation_unit.unit]),
     )
 
     graphql.force_login(reservation.user)
@@ -198,10 +195,7 @@ def test_reservation__approve__unit_reserver_cant_approve_other_reservation(grap
         reservation_unit=[reservation_unit],
     )
 
-    admin = UserFactory.create_with_unit_permissions(
-        unit=reservation_unit.unit,
-        perms=["can_create_staff_reservations"],
-    )
+    admin = UserFactory.create_with_unit_role(units=[reservation_unit.unit], role=UserRoleChoice.RESERVER)
 
     graphql.force_login(admin)
 

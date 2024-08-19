@@ -1,7 +1,6 @@
 import pytest
 
 from tests.factories import PurposeFactory
-from tests.helpers import UserType
 
 from .helpers import purposes_query
 
@@ -14,7 +13,7 @@ pytestmark = [
 def test_purpose__query(graphql):
     purpose = PurposeFactory.create()
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     fields = """
         pk
@@ -47,7 +46,7 @@ def test_purpose__order__by_rank(graphql):
     purpose_2 = PurposeFactory.create(rank=3)
     purpose_3 = PurposeFactory.create(rank=2)
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     query = purposes_query(order_by="rankDesc")
     response = graphql(query)

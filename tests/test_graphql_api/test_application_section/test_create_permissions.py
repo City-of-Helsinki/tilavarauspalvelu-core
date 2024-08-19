@@ -2,7 +2,6 @@ import pytest
 
 from applications.models import ApplicationSection
 from tests.factories import ApplicationFactory, UserFactory
-from tests.helpers import UserType
 from tests.test_graphql_api.test_application_section.helpers import CREATE_MUTATION, get_application_section_create_data
 
 # Applied to all tests
@@ -36,7 +35,7 @@ def test_superuser_can_create_application_event(graphql):
     # - There is draft application in an open application round
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft_no_sections()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to create a new application event
@@ -56,7 +55,7 @@ def test_other_user_cannot_create_application_event(graphql):
     # - There is draft application in an open application round
     # - Someone other than the owner of the application is using the system
     application = ApplicationFactory.create_in_status_draft_no_sections()
-    graphql.login_user_based_on_type(UserType.REGULAR)
+    graphql.login_with_regular_user()
 
     # when:
     # - User tries to create a new application event
@@ -75,7 +74,7 @@ def test_general_admin_can_create_application_event(graphql):
     # - There is draft application in an open application round
     # - A general admin with application permissions is using the system
     application = ApplicationFactory.create_in_status_draft_no_sections()
-    general_admin = UserFactory.create_with_general_permissions(perms=["can_handle_applications"])
+    general_admin = UserFactory.create_with_general_role()
     graphql.force_login(general_admin)
 
     # when:

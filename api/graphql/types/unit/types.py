@@ -1,9 +1,8 @@
 from graphene_django_extensions import DjangoNode
 
 from api.graphql.types.unit.permissions import UnitPermission
-from permissions.helpers import can_manage_units
+from common.typing import AnyUser
 from spaces.models import Unit
-from users.models import User
 
 from .filtersets import UnitFilterSet
 
@@ -12,8 +11,8 @@ __all__ = [
 ]
 
 
-def private_field_check(user: User, unit: Unit) -> bool | None:
-    result = can_manage_units(user, unit)
+def private_field_check(user: AnyUser, unit: Unit) -> bool | None:
+    result = user.permissions.can_manage_unit(unit)
     return True if result else None
 
 

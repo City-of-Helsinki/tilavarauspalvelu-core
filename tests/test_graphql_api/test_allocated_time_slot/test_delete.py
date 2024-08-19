@@ -2,7 +2,6 @@ import pytest
 
 from applications.enums import ApplicationRoundStatusChoice, ApplicationStatusChoice
 from tests.factories import ApplicationFactory, ApplicationRoundFactory
-from tests.helpers import UserType
 
 from .helpers import DELETE_ALLOCATION
 
@@ -23,7 +22,7 @@ def test_delete_allocated_time_slot(graphql):
     section = application.application_sections.first()
     option = section.reservation_unit_options.first()
     slot = option.allocated_time_slots.first()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     assert section.status == ApplicationStatusChoice.HANDLED
 
@@ -66,7 +65,7 @@ def test_allocated_time_slot__delete__blocked_due_to_round_status(graphql, round
     option = section.reservation_unit_options.first()
     slot = option.allocated_time_slots.first()
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to delete an allocated time slot

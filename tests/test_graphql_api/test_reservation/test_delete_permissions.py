@@ -14,7 +14,7 @@ pytestmark = [
 def test_reservation__delete__general_admin(graphql):
     reservation = ReservationFactory.create_for_delete()
 
-    user = UserFactory.create_with_general_permissions(perms=["can_manage_reservations"])
+    user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     data = get_delete_data(reservation)

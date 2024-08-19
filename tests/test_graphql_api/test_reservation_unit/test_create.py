@@ -9,7 +9,7 @@ from opening_hours.utils.hauki_api_types import HaukiAPIResource, HaukiTranslate
 from reservation_units.enums import ReservationKind
 from reservation_units.models import ReservationUnit
 from tests.factories import UnitFactory
-from tests.helpers import UserType, patch_method
+from tests.helpers import patch_method
 
 from .helpers import CREATE_MUTATION, get_create_non_draft_input_data
 
@@ -21,7 +21,7 @@ pytestmark = [
 
 def test_reservation_unit__create(graphql):
     unit = UnitFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "isDraft": True,
@@ -65,7 +65,7 @@ def test_reservation_unit__create__send_to_hauki__succeeded(graphql, settings):
     settings.HAUKI_EXPORTS_ENABLED = True
 
     unit = UnitFactory.create(tprek_id="123", tprek_department_id="org")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "isDraft": True,
@@ -92,7 +92,7 @@ def test_reservation_unit__create__send_to_hauki__failed(graphql, settings):
     settings.HAUKI_EXPORTS_ENABLED = True
 
     unit = UnitFactory.create(tprek_id="123", tprek_department_id="org")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "isDraft": True,
@@ -117,7 +117,7 @@ def test_reservation_unit__create__send_to_hauki__failed(graphql, settings):
 
 def test_reservation_unit__create__empty_name(graphql):
     unit = UnitFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "isDraft": True,
@@ -133,7 +133,7 @@ def test_reservation_unit__create__empty_name(graphql):
 
 def test_reservation_unit__create__payment_types(graphql):
     unit = UnitFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "isDraft": True,
@@ -153,7 +153,7 @@ def test_reservation_unit__create__payment_types(graphql):
 
 def test_reservation_unit__create__instructions(graphql):
     unit = UnitFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "isDraft": True,
@@ -189,7 +189,7 @@ def test_reservation_unit__create__instructions(graphql):
 def test_reservation_unit__create__non_draft(graphql):
     data = get_create_non_draft_input_data()
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is False
@@ -201,7 +201,7 @@ def test_reservation_unit__create__non_draft__empty_name_translation(graphql):
     data = get_create_non_draft_input_data()
     data["nameEn"] = ""
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.error_message().startswith("Mutation was unsuccessful.")
@@ -215,7 +215,7 @@ def test_reservation_unit__create__non_draft__missing_name_translation(graphql):
     data = get_create_non_draft_input_data()
     del data["nameEn"]
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.error_message().startswith("Mutation was unsuccessful.")
@@ -229,7 +229,7 @@ def test_reservation_unit__create__non_draft__empty_description_translation(grap
     data = get_create_non_draft_input_data()
     data["descriptionEn"] = ""
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.error_message().startswith("Mutation was unsuccessful.")
@@ -243,7 +243,7 @@ def test_reservation_unit__create__non_draft__missing_description_translation(gr
     data = get_create_non_draft_input_data()
     del data["descriptionEn"]
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.error_message().startswith("Mutation was unsuccessful.")
@@ -258,7 +258,7 @@ def test_reservation_unit__create__non_draft__empty_spaces_and_missing_resources
     data["resources"] = []
     data["spaces"] = []
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.error_message().startswith("Mutation was unsuccessful.")
@@ -273,7 +273,7 @@ def test_reservation_unit__create__non_draft__missing_spaces_and_missing_resourc
     del data["resources"]
     del data["spaces"]
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.error_message().startswith("Mutation was unsuccessful.")
@@ -287,7 +287,7 @@ def test_reservation_unit__create__non_draft__missing_reservation_unit_type(grap
     data = get_create_non_draft_input_data()
     del data["reservationUnitType"]
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.error_message().startswith("Mutation was unsuccessful.")
@@ -299,7 +299,7 @@ def test_reservation_unit__create__non_draft__min_persons_over_max_persons(graph
     data = get_create_non_draft_input_data()
     data["minPersons"] = 11
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.error_message().startswith("Mutation was unsuccessful.")
@@ -311,7 +311,7 @@ def test_reservation_unit__create__non_draft__reservation_kind_defaults_to_direc
     data = get_create_non_draft_input_data()
     del data["reservationKind"]
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is False
@@ -328,7 +328,7 @@ def test_reservation_unit__create__min_max_reservation_duration__valid(graphql):
     data["minReservationDuration"] = int(datetime.timedelta(hours=2).total_seconds())
     data["maxReservationDuration"] = int(datetime.timedelta(hours=3).total_seconds())
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is False
@@ -340,7 +340,7 @@ def test_reservation_unit__create__min_reservation_duration_greater_than_max_res
     data["minReservationDuration"] = int(datetime.timedelta(hours=2).total_seconds())
     data["maxReservationDuration"] = int(datetime.timedelta(hours=1).total_seconds())
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.error_message().startswith("Mutation was unsuccessful."), response
@@ -354,7 +354,7 @@ def test_reservation_unit__create__min_max_reservation_duration__shorter_than_st
     assert "60" in data["reservationStartInterval"]
     data[field_name] = int(datetime.timedelta(minutes=30).total_seconds())
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.error_message().startswith("Mutation was unsuccessful."), response
@@ -368,7 +368,7 @@ def test_reservation_unit__create__min_max_reservation_duration__not_multiple_of
     assert "60" in data["reservationStartInterval"]
     data[field_name] = int(datetime.timedelta(minutes=90).total_seconds())
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.error_message().startswith("Mutation was unsuccessful."), response
@@ -384,7 +384,7 @@ def test_reservation_unit__create__with_timeslots(graphql):
     # - There is a unit in the system
     # - A superuser is using the system
     unit = UnitFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "isDraft": True,
@@ -423,7 +423,7 @@ def test_reservation_unit__create__with_timeslots__weekday_required(graphql):
     # - There is a unit in the system
     # - A superuser is using the system
     unit = UnitFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "isDraft": True,
@@ -454,7 +454,7 @@ def test_reservation_unit__create__with_timeslots__begin_before_end(graphql):
     # - There is a unit in the system
     # - A superuser is using the system
     unit = UnitFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "isDraft": True,
@@ -493,7 +493,7 @@ def test_reservation_unit__create__with_timeslots__overlapping_reservable_times(
     # - There is a unit in the system
     # - A superuser is using the system
     unit = UnitFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "isDraft": True,
@@ -533,7 +533,7 @@ def test_reservation_unit__create__with_timeslots__two_for_same_day(graphql):
     # - There is a unit in the system
     # - A superuser is using the system
     unit = UnitFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "isDraft": True,
@@ -572,7 +572,7 @@ def test_reservation_unit__create__with_timeslots__open_has_no_reservable_times(
     # - There is a unit in the system
     # - A superuser is using the system
     unit = UnitFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "isDraft": True,
@@ -605,7 +605,7 @@ def test_reservation_unit__create__with_timeslots__closed_has_reservable_times(g
     # - There is a unit in the system
     # - A superuser is using the system
     unit = UnitFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "isDraft": True,
@@ -638,7 +638,7 @@ def test_reservation_unit__create__with_timeslots__closed_has_reservable_times(g
 
 def test_reservation_unit__create__reservation_block_whole_day(graphql):
     unit = UnitFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "isDraft": True,

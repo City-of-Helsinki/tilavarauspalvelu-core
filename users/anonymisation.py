@@ -9,7 +9,7 @@ from social_django.models import UserSocialAuth
 from applications.enums import ApplicationStatusChoice
 from applications.models import Address, Application, ApplicationSection, Person
 from merchants.enums import OrderStatus
-from permissions.models import GeneralRole, ServiceSectorRole, UnitRole
+from permissions.models import GeneralRole, UnitRole
 from reservations.enums import ReservationStateChoice, ReservationTypeChoice
 from reservations.models import Reservation
 from users.models import ReservationNotification, User
@@ -40,7 +40,6 @@ def anonymize_user(user: User) -> None:
     user.ad_groups.clear()
 
     GeneralRole.objects.filter(user=user).delete()
-    ServiceSectorRole.objects.filter(user=user).delete()
     UnitRole.objects.filter(user=user).delete()
     UserSocialAuth.objects.filter(user=user).delete()
 

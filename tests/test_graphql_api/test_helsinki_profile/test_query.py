@@ -286,7 +286,7 @@ def test_helsinki_profile_data__query__general_admin(graphql):
     profile_data = MyProfileDataFactory.create_basic()
     HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
-    admin = UserFactory.create_with_general_permissions(perms=["can_validate_applications"], code="foo")
+    admin = UserFactory.create_with_general_role()
     graphql.force_login(admin)
 
     query = profile_query(application_id=application.id)
@@ -314,7 +314,7 @@ def test_helsinki_profile_data__query__unit_admin(graphql):
     profile_data = MyProfileDataFactory.create_basic()
     HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
-    admin = UserFactory.create_with_unit_permissions(unit=unit, perms=["can_validate_applications"], code="foo")
+    admin = UserFactory.create_with_unit_role(units=[unit])
     graphql.force_login(admin)
 
     query = profile_query(application_id=application.id)

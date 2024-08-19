@@ -1,6 +1,6 @@
 import pytest
 
-from tests.factories import ApplicationFactory, ReservationUnitOptionFactory, UserFactory, add_unit_permissions
+from tests.factories import ApplicationFactory, ReservationUnitOptionFactory, UserFactory
 
 from .helpers import RESTORE_MUTATION
 
@@ -30,7 +30,7 @@ def test_application__restore_all_options(graphql):
 def test_application__restore_all_options__general_admin(graphql):
     application = ApplicationFactory.create_in_status_in_allocation()
 
-    admin = UserFactory.create_with_general_permissions(perms=["can_handle_applications"])
+    admin = UserFactory.create_with_general_role()
     graphql.force_login(admin)
 
     response = graphql(RESTORE_MUTATION, input_data={"pk": application.pk})
@@ -43,7 +43,7 @@ def test_application__restore_all_options__unit_admin(graphql):
 
     section = application.application_sections.first()
     unit = section.reservation_unit_options.first().reservation_unit.unit
-    admin = UserFactory.create_with_unit_permissions(unit=unit, perms=["can_handle_applications"])
+    admin = UserFactory.create_with_unit_role(units=[unit])
     graphql.force_login(admin)
 
     response = graphql(RESTORE_MUTATION, input_data={"pk": application.pk})
@@ -58,7 +58,7 @@ def test_application__restore_all_options__unit_admin__no_permission_for_all_uni
     ReservationUnitOptionFactory.create(application_section=section)
 
     unit = section.reservation_unit_options.first().reservation_unit.unit
-    admin = UserFactory.create_with_unit_permissions(unit=unit, perms=["can_handle_applications"])
+    admin = UserFactory.create_with_unit_role(units=[unit])
     graphql.force_login(admin)
 
     response = graphql(RESTORE_MUTATION, input_data={"pk": application.pk})
@@ -76,10 +76,7 @@ def test_application__restore_all_options__unit_admin__has_permission_for_all_un
     unit_1 = option_1.reservation_unit.unit
     unit_2 = option_2.reservation_unit.unit
 
-    admin = UserFactory.create()
-    add_unit_permissions(admin, unit=unit_1, perms=["can_handle_applications"])
-    add_unit_permissions(admin, unit=unit_2, perms=["can_handle_applications"])
-
+    admin = UserFactory.create_with_unit_role(units=[unit_1, unit_2])
     graphql.force_login(admin)
 
     response = graphql(RESTORE_MUTATION, input_data={"pk": application.pk})

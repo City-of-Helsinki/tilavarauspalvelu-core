@@ -2,7 +2,6 @@ import pytest
 
 from applications.enums import ApplicantTypeChoice, ApplicationSectionStatusChoice, Weekday
 from tests.factories import AllocatedTimeSlotFactory, ApplicationSectionFactory, ReservationUnitFactory
-from tests.helpers import UserType
 
 from .helpers import allocations_query
 
@@ -18,7 +17,7 @@ def test_allocated_time_slot__filter__by_pk(graphql):
     # - A superuser is using the system
     allocation = AllocatedTimeSlotFactory.create()
     AllocatedTimeSlotFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to search allocations with the given pk
@@ -37,7 +36,7 @@ def test_allocated_time_slot__filter__by_pk__multiple(graphql):
     # - A superuser is using the system
     allocation_1 = AllocatedTimeSlotFactory.create()
     allocation_2 = AllocatedTimeSlotFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to search allocations with the given pk
@@ -58,7 +57,7 @@ def test_allocated_time_slot__filter__by_application_round(graphql):
     allocation = AllocatedTimeSlotFactory.create()
     application_round = allocation.reservation_unit_option.application_section.application.application_round
     AllocatedTimeSlotFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to search allocations with the given application round pk
@@ -79,7 +78,7 @@ def test_allocated_time_slot__filter__by_application_section_status(graphql):
     section_2 = ApplicationSectionFactory.create_in_status_handled()
     option = section_1.reservation_unit_options.first()
     allocation = AllocatedTimeSlotFactory.create(reservation_unit_option=option)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # Sanity check
     assert section_1.status == ApplicationSectionStatusChoice.IN_ALLOCATION
@@ -106,7 +105,7 @@ def test_allocated_time_slot__filter__by_application_section_status__multiple(gr
     option_2 = section_2.reservation_unit_options.first()
     allocation_1 = AllocatedTimeSlotFactory.create(reservation_unit_option=option_1)
     allocation_2 = option_2.allocated_time_slots.first()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # Sanity check
     assert section_1.status == ApplicationSectionStatusChoice.IN_ALLOCATION
@@ -134,7 +133,7 @@ def test_allocated_time_slot__filter__by_applicant_type(graphql):
     AllocatedTimeSlotFactory.create(
         reservation_unit_option__application_section__application__applicant_type=ApplicantTypeChoice.COMPANY,
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to search allocations with the given applicant type
@@ -158,7 +157,7 @@ def test_allocated_time_slot__filter__by_applicant_type__multiple(graphql):
     allocation_2 = AllocatedTimeSlotFactory.create(
         reservation_unit_option__application_section__application__applicant_type=ApplicantTypeChoice.COMPANY,
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to search allocations with the given applicant types
@@ -185,7 +184,7 @@ def test_allocated_time_slot__filter__by_allocated_unit(graphql):
     reservation_unit_2 = ReservationUnitFactory.create()
     allocation = AllocatedTimeSlotFactory.create(reservation_unit_option__reservation_unit=reservation_unit_1)
     AllocatedTimeSlotFactory.create(reservation_unit_option__reservation_unit=reservation_unit_2)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to search allocations with the given allocated unit
@@ -206,7 +205,7 @@ def test_allocated_time_slot__filter__by_allocated_unit__multiple(graphql):
     reservation_unit_2 = ReservationUnitFactory.create()
     allocation_1 = AllocatedTimeSlotFactory.create(reservation_unit_option__reservation_unit=reservation_unit_1)
     allocation_2 = AllocatedTimeSlotFactory.create(reservation_unit_option__reservation_unit=reservation_unit_2)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to search allocations with the given allocated units
@@ -228,7 +227,7 @@ def test_allocated_time_slot__filter__by_allocated_reservation_unit(graphql):
     reservation_unit_2 = ReservationUnitFactory.create()
     allocation = AllocatedTimeSlotFactory.create(reservation_unit_option__reservation_unit=reservation_unit_1)
     AllocatedTimeSlotFactory.create(reservation_unit_option__reservation_unit=reservation_unit_2)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to search allocations with the given allocated reservation unit
@@ -249,7 +248,7 @@ def test_allocated_time_slot__filter__by_allocated_reservation_unit__multiple(gr
     reservation_unit_2 = ReservationUnitFactory.create()
     allocation_1 = AllocatedTimeSlotFactory.create(reservation_unit_option__reservation_unit=reservation_unit_1)
     allocation_2 = AllocatedTimeSlotFactory.create(reservation_unit_option__reservation_unit=reservation_unit_2)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to search allocations with the given allocated reservation unit
@@ -269,7 +268,7 @@ def test_allocated_time_slot__filter__by_allocated_day(graphql):
     # - A superuser is using the system
     allocation = AllocatedTimeSlotFactory.create(day_of_the_week=Weekday.MONDAY)
     AllocatedTimeSlotFactory.create(day_of_the_week=Weekday.TUESDAY)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to search allocations with the given allocated day
@@ -288,7 +287,7 @@ def test_allocated_time_slot__filter__by_allocated_day__multiple(graphql):
     # - A superuser is using the system
     allocation_1 = AllocatedTimeSlotFactory.create(day_of_the_week=Weekday.MONDAY)
     allocation_2 = AllocatedTimeSlotFactory.create(day_of_the_week=Weekday.TUESDAY)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to search allocations with the given allocated days
@@ -318,7 +317,7 @@ def test_application__filter__by_text_search__section_id(graphql):
         reservation_unit_option__application_section__application__user=None,
         reservation_unit_option__application_section__name="bar",
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter allocated time slots with a text search
@@ -349,7 +348,7 @@ def test_application__filter__by_text_search__section_name(graphql):
         reservation_unit_option__application_section__application__user=None,
         reservation_unit_option__application_section__name="bar",
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter allocated time slots with a text search
@@ -384,7 +383,7 @@ def test_application__filter__by_text_search__application_id(graphql):
         reservation_unit_option__application_section__id=4,
         reservation_unit_option__application_section__name="bar",
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter allocated time slots with a text search
@@ -416,7 +415,7 @@ def test_application__filter__by_text_search__applicant__organisation_name(graph
         reservation_unit_option__application_section__application__user=None,
         reservation_unit_option__application_section__name=".",
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter allocated time slots with a text search
@@ -449,7 +448,7 @@ def test_application__filter__by_text_search__applicant__contact_person_first_na
         reservation_unit_option__application_section__application__user=None,
         reservation_unit_option__application_section__name=".",
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter allocated time slots with a text search
@@ -482,7 +481,7 @@ def test_application__filter__by_text_search__applicant__contact_person_last_nam
         reservation_unit_option__application_section__application__user=None,
         reservation_unit_option__application_section__name=".",
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter allocated time slots with a text search
@@ -515,7 +514,7 @@ def test_application__filter__by_text_search__applicant__user_first_name(graphql
         reservation_unit_option__application_section__application__user__last_name="none",
         reservation_unit_option__application_section__name=".",
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter allocated time slots with a text search
@@ -548,7 +547,7 @@ def test_application__filter__by_text_search__applicant__user_last_name(graphql)
         reservation_unit_option__application_section__application__user__last_name="bar",
         reservation_unit_option__application_section__name=".",
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter allocated time slots with a text search
@@ -579,7 +578,7 @@ def test_application__filter__by_text_search__not_found(graphql):
         reservation_unit_option__application_section__application__user=None,
         reservation_unit_option__application_section__name="bar",
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter allocated time slots with a text search

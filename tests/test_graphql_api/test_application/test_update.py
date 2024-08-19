@@ -3,7 +3,6 @@ import pytest
 from applications.enums import Weekday
 from applications.models import Address, ApplicationSection, Organisation, SuitableTimeRange
 from tests.factories import ApplicationFactory
-from tests.helpers import UserType
 
 from .helpers import UPDATE_MUTATION
 
@@ -18,7 +17,7 @@ def test_update_application__single_field(graphql):
     # - There is a draft application in an open application round
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft(additional_information="foo")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to update the application data
@@ -41,7 +40,7 @@ def test_update_application__organisation__replace(graphql):
     # - There is a draft application in an open application round
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     old_organisation_pk = application.organisation.pk
     old_address_pk = application.organisation.address.pk
@@ -78,7 +77,7 @@ def test_update_application__organisation__use_existing(graphql):
     # - There is a draft application in an open application round
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     old_organisation_pk = application.organisation.pk
     old_address_pk = application.organisation.address.pk
@@ -107,7 +106,7 @@ def test_update_application__organisation__modify_existing(graphql):
     # - There is a draft application in an open application round
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft(organisation__name="foo")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     old_organisation_pk = application.organisation.pk
     old_address_pk = application.organisation.address.pk
@@ -138,7 +137,7 @@ def test_update_application__organisation__not_deleted_if_not_given(graphql):
     # - There is a draft application in an open application round
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft(additional_information="foo")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     old_organisation_pk = application.organisation.pk
     old_address_pk = application.organisation.address.pk
@@ -165,7 +164,7 @@ def test_update_application__organisation__deleted_if_none(graphql):
     # - There is a draft application in an open application round
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to remove the organisation
@@ -192,7 +191,7 @@ def test_update_application__application_sections__replace(graphql):
     )
     section = application.application_sections.first()
     suitable_time_range = section.suitable_time_ranges.first()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     old_section_pk = section.pk
     old_range_pk = suitable_time_range.pk
@@ -248,7 +247,7 @@ def test_update_application__application_sections__use_existing(graphql):
     )
     section = application.application_sections.first()
     suitable_time_range = section.suitable_time_ranges.first()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     old_section_pk = section.pk
     old_range_pk = suitable_time_range.pk
@@ -293,7 +292,7 @@ def test_update_application__application_sections__modify_existing(graphql):
     section = application.application_sections.first()
     suitable_time_range = section.suitable_time_ranges.first()
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     old_section_pk = section.pk
     old_range_pk = suitable_time_range.pk
@@ -341,7 +340,7 @@ def test_update_application__application_sections__not_deleted_if_not_given(grap
     section = application.application_sections.first()
     suitable_time_range = section.suitable_time_ranges.first()
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     old_section_pk = section.pk
     old_range_pk = suitable_time_range.pk
@@ -372,7 +371,7 @@ def test_update_application__organisation__deleted_if_empty(graphql):
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft()
     section = application.application_sections.first()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to remove the application sections and suitable time ranges

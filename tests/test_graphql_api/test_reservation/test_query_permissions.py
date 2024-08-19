@@ -13,7 +13,6 @@ from tests.factories import (
     UnitFactory,
     UserFactory,
 )
-from tests.helpers import UserType
 
 from .helpers import reservations_query
 
@@ -37,11 +36,10 @@ def test_reservation__query__regular_user_cannot_see_working_memo_for_other_user
 
 
 def test_reservation__query__staff_user_can_see_working_memo_for_own_reservation(graphql):
-    # 'Staff user' here is any user with permission, but not the specific permission for this endpoint
-    staff_user = UserFactory.create_with_general_permissions(perms=["can_manage_general_roles"])
-    reservation = ReservationFactory.create(working_memo="foo", user=staff_user)
+    user = UserFactory.create_with_general_role()
+    reservation = ReservationFactory.create(working_memo="foo", user=user)
 
-    graphql.force_login(staff_user)
+    graphql.force_login(user)
     query = reservations_query(fields="pk workingMemo")
     response = graphql(query)
 
@@ -52,7 +50,7 @@ def test_reservation__query__staff_user_can_see_working_memo_for_own_reservation
 
 def test_reservation__query__general_admin_can_see_working_memo_for_any_reservation(graphql):
     reservation = ReservationFactory.create(working_memo="foo")
-    admin = UserFactory.create_with_general_permissions(perms=["can_view_reservations"])
+    admin = UserFactory.create_with_general_role()
 
     graphql.force_login(admin)
     query = reservations_query(fields="pk workingMemo")
@@ -66,7 +64,7 @@ def test_reservation__query__general_admin_can_see_working_memo_for_any_reservat
 def test_reservation__query__unit_admin_can_see_working_memo_for_reservations_in_their_units(graphql):
     unit = UnitFactory.create()
     reservation_unit = ReservationUnitFactory.create(unit=unit)
-    admin = UserFactory.create_with_unit_permissions(unit=unit, perms=["can_view_reservations"])
+    admin = UserFactory.create_with_unit_role(units=[unit])
     reservation = ReservationFactory.create(working_memo="foo", reservation_unit=[reservation_unit])
 
     graphql.force_login(admin)
@@ -81,7 +79,7 @@ def test_reservation__query__unit_admin_can_see_working_memo_for_reservations_in
 def test_reservation__query__unit_admin_cannot_see_working_memo_for_reservations_other_units(graphql):
     unit = UnitFactory.create()
     reservation_unit = ReservationUnitFactory.create()
-    admin = UserFactory.create_with_unit_permissions(unit=unit, perms=["can_view_reservations"])
+    admin = UserFactory.create_with_unit_role(units=[unit])
     reservation = ReservationFactory.create(working_memo="foo", reservation_unit=[reservation_unit])
 
     graphql.force_login(admin)
@@ -95,7 +93,7 @@ def test_reservation__query__unit_admin_cannot_see_working_memo_for_reservations
 
 def test_reservation__query__regular_user_cannot_see_personal_information_from_other_reservations(graphql):
     reservation = ReservationFactory.create()
-    graphql.login_user_based_on_type(UserType.REGULAR)
+    graphql.login_with_regular_user()
 
     fields = """
         pk
@@ -197,7 +195,7 @@ def test_reservation__query__fields_requiring_staff_permissions__superuser(graph
         handlingDetails
         handledAt
     """
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     query = reservations_query(fields=fields)
     response = graphql(query)
 
@@ -229,7 +227,7 @@ def test_reservation__query__fields_requiring_staff_permissions__regular_user(gr
         handlingDetails
         handledAt
     """
-    graphql.login_user_based_on_type(UserType.REGULAR)
+    graphql.login_with_regular_user()
     query = reservations_query(fields=fields)
     response = graphql(query)
 

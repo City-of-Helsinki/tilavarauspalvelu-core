@@ -1,14 +1,8 @@
-from typing import TYPE_CHECKING
-
 import pytest
 
-from tests.factories import ServiceSectorFactory, UnitFactory, UserFactory, UserSocialAuthFactory
-from tests.helpers import UserType
+from tests.factories import UnitFactory, UserFactory, UserSocialAuthFactory
 
 from .helpers import current_user_query
-
-if TYPE_CHECKING:
-    from permissions.models import GeneralRole, ServiceSectorRole, UnitRole
 
 # Applied to all tests
 pytestmark = [
@@ -35,13 +29,10 @@ def test_query_current_user__all_fields(graphql):
         isSuperuser
         reservationNotification
         generalRoles {
-            pk
-        }
-        serviceSectorRoles {
-            pk
+            role
         }
         unitRoles {
-            pk
+            role
         }
     """
 
@@ -64,7 +55,6 @@ def test_query_current_user__all_fields(graphql):
         "isSuperuser": False,
         "reservationNotification": None,
         "generalRoles": [],
-        "serviceSectorRoles": [],
         "unitRoles": [],
     }
 
@@ -72,7 +62,6 @@ def test_query_current_user__all_fields(graphql):
 def test_query_current_user__unauthenticated(graphql):
     # given:
     # - An anonymous user is using the system
-    graphql.login_user_based_on_type(UserType.ANONYMOUS)
 
     fields = """
         pk
@@ -86,13 +75,10 @@ def test_query_current_user__unauthenticated(graphql):
         isSuperuser
         reservationNotification
         generalRoles {
-            pk
-        }
-        serviceSectorRoles {
-            pk
+            role
         }
         unitRoles {
-            pk
+            role
         }
     """
 
@@ -110,29 +96,20 @@ def test_query_current_user__general_roles(graphql):
     # given:
     # - There is a general admin in the system
     # - That admin is using the system
-    user = UserFactory.create_with_general_permissions(
-        first_name="Unique",
-        last_name="Admin",
-        perms=["can_manage_general_roles"],
-    )
-
-    general_role: GeneralRole = user.general_roles.first()
+    user = UserFactory.create_with_general_role()
+    general_role = user.general_roles.first()
     graphql.force_login(user)
 
     fields = """
         pk
         generalRoles {
-            pk
-            role {
-                code
-                verboseName
-                verboseNameFi
-                verboseNameSv
-                verboseNameEn
-                permissions {
-                    permission
-                }
+            role
+            assigner {
+                firstName
+                lastName
             }
+            created
+            modified
         }
     """
 
@@ -147,86 +124,10 @@ def test_query_current_user__general_roles(graphql):
         "pk": user.pk,
         "generalRoles": [
             {
-                "pk": general_role.pk,
-                "role": {
-                    "code": general_role.role.code,
-                    "verboseName": general_role.role.verbose_name,
-                    "verboseNameFi": general_role.role.verbose_name_fi,
-                    "verboseNameSv": general_role.role.verbose_name_sv,
-                    "verboseNameEn": general_role.role.verbose_name_en,
-                    "permissions": [
-                        {
-                            "permission": perm.permission.upper(),
-                        }
-                        for perm in general_role.role.permissions.all()
-                    ],
-                },
-            },
-        ],
-    }
-
-
-def test_query_current_user__service_sector_roles(graphql):
-    # given:
-    # - There is a service sector in the system
-    # - There is a service sector admin for that service sector in the system
-    # - That admin is using the system
-    sector = ServiceSectorFactory.create()
-    user = UserFactory.create_with_service_sector_permissions(
-        service_sector=sector,
-        perms=["can_manage_service_sector_roles"],
-    )
-    service_sector_role: ServiceSectorRole = user.service_sector_roles.first()
-    graphql.force_login(user)
-
-    fields = """
-        pk
-        serviceSectorRoles {
-            pk
-            role {
-                code
-                verboseName
-                verboseNameFi
-                verboseNameSv
-                verboseNameEn
-                permissions {
-                    permission
-                }
-            }
-            serviceSector {
-                nameFi
-            }
-        }
-    """
-
-    # when:
-    # - User tries to search for current user service sector permissions
-    response = graphql(current_user_query(fields=fields))
-
-    # then:
-    # - The response contains the expected data
-    assert response.has_errors is False, response
-    assert response.first_query_object == {
-        "pk": user.pk,
-        "serviceSectorRoles": [
-            {
-                "pk": service_sector_role.pk,
-                "role": {
-                    "code": service_sector_role.role.code,
-                    "verboseName": service_sector_role.role.verbose_name,
-                    "verboseNameFi": service_sector_role.role.verbose_name_fi,
-                    "verboseNameSv": service_sector_role.role.verbose_name_sv,
-                    "verboseNameEn": service_sector_role.role.verbose_name_en,
-                    "permissions": [
-                        {
-                            "permission": perm.permission.upper(),
-                        }
-                        for perm in service_sector_role.role.permissions.all()
-                    ],
-                },
-                "serviceSector": {
-                    "nameFi": sector.name_fi,
-                },
+                "role": general_role.role,
+                "assigner": None,
+                "created": general_role.created.isoformat(),
+                "modified": general_role.modified.isoformat(),
             },
         ],
     }
@@ -238,33 +139,26 @@ def test_query_current_user__unit_admin(graphql):
     # - There is a unit admin for that unit in the system
     # - That admin is using the system
     unit = UnitFactory.create()
-    user = UserFactory.create_with_unit_permissions(
-        unit=unit,
-        perms=["can_manage_unit_roles"],
-    )
-    unit_role: UnitRole = user.unit_roles.first()
+    user = UserFactory.create_with_unit_role(units=[unit])
+    unit_role = user.unit_roles.first()
     graphql.force_login(user)
 
     fields = """
         pk
         unitRoles {
-            pk
-            role {
-                code
-                verboseName
-                verboseNameFi
-                verboseNameSv
-                verboseNameEn
-                permissions {
-                    permission
-                }
+            role
+            units {
+                pk
             }
-            unit {
-                nameFi
+            unitGroups {
+                pk
             }
-            unitGroup {
-                name
+            assigner {
+                firstName
+                lastName
             }
+            created
+            modified
         }
     """
 
@@ -279,26 +173,16 @@ def test_query_current_user__unit_admin(graphql):
         "pk": user.pk,
         "unitRoles": [
             {
-                "pk": unit_role.pk,
-                "role": {
-                    "code": unit_role.role.code,
-                    "verboseName": unit_role.role.verbose_name,
-                    "verboseNameFi": unit_role.role.verbose_name_fi,
-                    "verboseNameSv": unit_role.role.verbose_name_sv,
-                    "verboseNameEn": unit_role.role.verbose_name_en,
-                    "permissions": [
-                        {
-                            "permission": perm.permission.upper(),
-                        }
-                        for perm in unit_role.role.permissions.all()
-                    ],
-                },
-                "unit": [
+                "role": unit_role.role,
+                "units": [
                     {
-                        "nameFi": unit.name_fi,
-                    },
+                        "pk": unit.pk,
+                    }
                 ],
-                "unitGroup": [],
+                "unitGroups": [],
+                "assigner": None,
+                "created": unit_role.created.isoformat(),
+                "modified": unit_role.modified.isoformat(),
             },
         ],
     }
@@ -306,9 +190,9 @@ def test_query_current_user__unit_admin(graphql):
 
 def test_query_current_user__reservation_notification(graphql):
     # given:
-    # - There is a staff user in the system
+    # - There is a superuser user in the system
     # - That user is using the system
-    user = UserFactory.create_staff_user()
+    user = UserFactory.create_superuser()
     graphql.force_login(user)
 
     fields = """

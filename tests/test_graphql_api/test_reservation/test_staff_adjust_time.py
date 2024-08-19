@@ -411,10 +411,7 @@ def test_reservation__staff_adjust_time__reservation_start_interval_over_30_trea
 def test_reservation__staff_adjust_time__unit_reserver_can_adjust_own_reservation(graphql):
     reservation = ReservationFactory.create_for_time_adjustment()
 
-    admin = UserFactory.create_with_unit_permissions(
-        unit=reservation.reservation_unit.first().unit,
-        perms=["can_create_staff_reservations"],
-    )
+    admin = UserFactory.create_with_unit_role(units=[reservation.reservation_unit.first().unit])
 
     reservation.user = admin
     reservation.save()
@@ -429,11 +426,7 @@ def test_reservation__staff_adjust_time__unit_reserver_can_adjust_own_reservatio
 def test_reservation__staff_adjust_time__unit_reserver_cannot_adjust_for_other_user_reservation(graphql):
     reservation = ReservationFactory.create_for_time_adjustment()
 
-    UserFactory.create_with_unit_permissions(
-        unit=reservation.reservation_unit.first().unit,
-        perms=["can_create_staff_reservations"],
-    )
-
+    UserFactory.create_with_unit_role(units=[reservation.reservation_unit.first().unit])
     graphql.login_with_regular_user()
 
     data = get_staff_adjust_data(reservation)

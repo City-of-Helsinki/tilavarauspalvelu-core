@@ -65,7 +65,7 @@ def test_sort_banner_notifications_by_state(graphql, order_by, expected):
         message="4",
         target=BannerNotificationTarget.ALL,
     )
-    user = UserFactory.create_with_general_permissions(perms=["can_manage_notifications"])
+    user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     # when:
@@ -124,7 +124,7 @@ def test_sort_banner_notifications_by_name(graphql, order_by, expected):
         message="2",
         target=BannerNotificationTarget.ALL,
     )
-    user = UserFactory.create_with_general_permissions(perms=["can_manage_notifications"])
+    user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     # when:
@@ -192,7 +192,7 @@ def test_sort_banner_notifications_by_start_date(graphql, order_by, expected):
         target=BannerNotificationTarget.ALL,
         draft=True,
     )
-    user = UserFactory.create_with_general_permissions(perms=["can_manage_notifications"])
+    user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     # when:
@@ -260,7 +260,7 @@ def test_sort_banner_notifications_by_end_date(graphql, order_by, expected):
         target=BannerNotificationTarget.ALL,
         draft=True,
     )
-    user = UserFactory.create_with_general_permissions(perms=["can_manage_notifications"])
+    user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     # when:
@@ -323,7 +323,7 @@ def test_sort_banner_notifications_by_target(graphql, order_by, expected):
         message="3",
         target=BannerNotificationTarget.STAFF,
     )
-    user = UserFactory.create_with_general_permissions(perms=["can_manage_notifications"])
+    user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     # when:
@@ -386,7 +386,7 @@ def test_sort_banner_notifications_by_level(graphql, order_by, expected):
         message="3",
         level=BannerNotificationLevel.EXCEPTION,
     )
-    user = UserFactory.create_with_general_permissions(perms=["can_manage_notifications"])
+    user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     # when:

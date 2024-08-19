@@ -2,7 +2,6 @@ import pytest
 from graphene_django_extensions.testing import build_query
 
 from tests.factories import ReservationUnitCancellationRuleFactory
-from tests.helpers import UserType
 
 # Applied to all tests
 pytestmark = [
@@ -13,7 +12,7 @@ pytestmark = [
 def test_reservation_unit_cancellation_rules__query(graphql):
     rules = ReservationUnitCancellationRuleFactory.create()
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     fields = """
         pk
@@ -37,8 +36,6 @@ def test_reservation_unit_cancellation_rules__query(graphql):
 
 def test_reservation_unit_cancellation_rules__query__anonymous_user(graphql):
     ReservationUnitCancellationRuleFactory.create()
-
-    graphql.login_user_based_on_type(UserType.ANONYMOUS)
 
     fields = """
         pk

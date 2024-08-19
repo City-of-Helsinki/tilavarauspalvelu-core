@@ -2,16 +2,33 @@ import pytest
 from graphene_django_extensions.testing import parametrize_helper
 
 from common.enums import BannerNotificationTarget
+from permissions.enums import UserRoleChoice
 from tests.factories import BannerNotificationFactory
-from tests.helpers import UserType
-from tests.test_graphql_api.test_banner_notification.helpers import FieldParams, TargetParams, UserTypeParams
+from users.models import User
+
+from .helpers import FieldParams, TargetParams, UserType, UserTypeParams
 
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
+
 _PRIVATE_FIELDS = ("draft", "name", "target", "state")
+
+
+def login_based_on_type(graphql, user_type: UserType) -> User | None:
+    if user_type == UserType.ANONYMOUS:
+        return None
+    if user_type == UserType.REGULAR:
+        return graphql.login_with_regular_user()
+    if user_type == UserType.SUPERUSER:
+        return graphql.login_with_superuser()
+    if user_type == UserType.STAFF:
+        return graphql.login_user_with_role(role=UserRoleChoice.RESERVER)
+    if user_type == UserType.NOTIFICATION_MANAGER:
+        return graphql.login_user_with_role(role=UserRoleChoice.NOTIFICATION_MANAGER)
+    raise ValueError(f"Unknown user type: {user_type}")
 
 
 @pytest.mark.parametrize(
@@ -85,7 +102,7 @@ def test_user_permissions_on_banner_notifications(graphql, target, user_type, ex
     # - There is an active notification with the given target
     # - User of the given type is using the system
     BannerNotificationFactory.create_active(target=target)
-    graphql.login_user_based_on_type(user_type)
+    login_based_on_type(graphql, user_type)
 
     # when:
     # - User requests banner notifications visible for them
@@ -190,7 +207,7 @@ def test_user_permissions_on_banner_notifications_with_target_filter(graphql, ta
         message="3",
         target=BannerNotificationTarget.STAFF,
     )
-    graphql.login_user_based_on_type(user_type)
+    login_based_on_type(graphql, user_type)
 
     # when:
     # - User requests banner notifications visible for them in the given target audience
@@ -264,7 +281,7 @@ def test_user_permissions_on_banner_notifications_without_target_filter(graphql,
         message="3",
         target=BannerNotificationTarget.STAFF,
     )
-    graphql.login_user_based_on_type(user_type)
+    login_based_on_type(graphql, user_type)
 
     # when:
     # - User requests banner notifications visible for them (without target filter)
@@ -331,7 +348,7 @@ def test_field_permissions_on_banner_notifications(graphql, field, user_type, ex
     # - There is an active notification for all
     # - User of the given type is using the system
     BannerNotificationFactory.create_active(target=BannerNotificationTarget.ALL)
-    graphql.login_user_based_on_type(user_type)
+    login_based_on_type(graphql, user_type)
 
     # when:
     # - User requests given fields in banner notifications
@@ -385,7 +402,7 @@ def test_permissions_on_non_visible_banner_notifications(graphql, user_type, exp
     # - There is a draft notification for all
     # - User of the given type is using the system
     BannerNotificationFactory.create(target=BannerNotificationTarget.ALL, draft=True)
-    graphql.login_user_based_on_type(user_type)
+    login_based_on_type(graphql, user_type)
 
     # when:
     # - User requests banner notifications visible for them
@@ -436,7 +453,7 @@ def test_permission_on_both_non_visible_and_visible_banner_notifications(graphql
     # - User of the given type is using the system
     BannerNotificationFactory.create(target=BannerNotificationTarget.ALL, draft=True)
     BannerNotificationFactory.create_active(target=BannerNotificationTarget.ALL)
-    graphql.login_user_based_on_type(user_type)
+    login_based_on_type(graphql, user_type)
 
     # when:
     # - User requests all banner notifications

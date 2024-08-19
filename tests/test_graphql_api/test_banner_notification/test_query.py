@@ -25,7 +25,7 @@ def test_filter_banner_notifications_by_name(graphql):
     # - Notification manager user is using the system
     BannerNotificationFactory.create(name="foo")
     BannerNotificationFactory.create(name="bar")
-    user = UserFactory.create_with_general_permissions(perms=["can_manage_notifications"])
+    user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     # when:
@@ -75,7 +75,7 @@ def test_filter_banner_notifications_by_target(graphql, value, expected):
     BannerNotificationFactory.create(name="foo", target=BannerNotificationTarget.USER)
     BannerNotificationFactory.create(name="bar", target=BannerNotificationTarget.STAFF)
     BannerNotificationFactory.create(name="baz", target=BannerNotificationTarget.ALL)
-    user = UserFactory.create_with_general_permissions(perms=["can_manage_notifications"])
+    user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     # when:
@@ -120,7 +120,7 @@ def test_filter_banner_notifications_by_is_active(graphql, value, expected):
     # - Notification manager user is using the system
     BannerNotificationFactory.create(name="foo")
     BannerNotificationFactory.create_active(name="bar")
-    user = UserFactory.create_with_general_permissions(perms=["can_manage_notifications"])
+    user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     # when:
@@ -178,7 +178,7 @@ def test_filter_banner_notifications_by_is_visible(graphql, value, expected):
     BannerNotificationFactory.create(name="1", target=BannerNotificationTarget.USER)
     BannerNotificationFactory.create(name="2", target=BannerNotificationTarget.STAFF)
     BannerNotificationFactory.create(name="3", target=BannerNotificationTarget.ALL)
-    user = UserFactory.create_with_general_permissions(perms=["can_manage_notifications"])
+    user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     # when:
@@ -209,7 +209,8 @@ def test_fetch_single_banner_notification_by_id(graphql):
     # - Notification manager user is using the system
     notification_1 = BannerNotificationFactory.create(name="foo")
     BannerNotificationFactory.create(name="bar")
-    user = UserFactory.create_with_general_permissions(perms=["can_manage_notifications"])
+
+    user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     global_id = to_global_id(BannerNotificationNode.__name__, notification_1.pk)

@@ -1,7 +1,7 @@
 import pytest
 
 from applications.enums import Weekday
-from tests.factories import ApplicationSectionFactory, ReservationUnitOptionFactory, UserFactory, add_unit_permissions
+from tests.factories import ApplicationSectionFactory, ReservationUnitOptionFactory, UserFactory
 
 from .helpers import REJECT_MUTATION
 
@@ -46,7 +46,7 @@ def test_application_section__reject_all_options__has_allocations(graphql):
 def test_application_section__reject_all_options__general_admin(graphql):
     application_section = ApplicationSectionFactory.create_in_status_in_allocation()
 
-    admin = UserFactory.create_with_general_permissions(perms=["can_handle_applications"])
+    admin = UserFactory.create_with_general_role()
     graphql.force_login(admin)
 
     response = graphql(REJECT_MUTATION, input_data={"pk": application_section.pk})
@@ -58,7 +58,7 @@ def test_application_section__reject_all_options__unit_admin(graphql):
     application_section = ApplicationSectionFactory.create_in_status_in_allocation()
 
     unit = application_section.reservation_unit_options.first().reservation_unit.unit
-    admin = UserFactory.create_with_unit_permissions(unit=unit, perms=["can_handle_applications"])
+    admin = UserFactory.create_with_unit_role(units=[unit])
     graphql.force_login(admin)
 
     response = graphql(REJECT_MUTATION, input_data={"pk": application_section.pk})
@@ -72,7 +72,7 @@ def test_application_section__reject_all_options__unit_admin__no_permission_for_
     ReservationUnitOptionFactory.create(application_section=section)
 
     unit = section.reservation_unit_options.first().reservation_unit.unit
-    admin = UserFactory.create_with_unit_permissions(unit=unit, perms=["can_handle_applications"])
+    admin = UserFactory.create_with_unit_role(units=[unit])
     graphql.force_login(admin)
 
     response = graphql(REJECT_MUTATION, input_data={"pk": section.pk})
@@ -89,10 +89,7 @@ def test_application_section__reject_all_options__unit_admin__has_permission_for
     unit_1 = option_1.reservation_unit.unit
     unit_2 = option_2.reservation_unit.unit
 
-    admin = UserFactory.create()
-    add_unit_permissions(admin, unit=unit_1, perms=["can_handle_applications"])
-    add_unit_permissions(admin, unit=unit_2, perms=["can_handle_applications"])
-
+    admin = UserFactory.create_with_unit_role(units=[unit_1, unit_2])
     graphql.force_login(admin)
 
     response = graphql(REJECT_MUTATION, input_data={"pk": section.pk})

@@ -5,18 +5,9 @@ from collections.abc import Callable, Generator, Sequence
 from enum import StrEnum
 from functools import wraps
 from types import DynamicClassAttribute
-from typing import Any, NamedTuple, ParamSpec, TypedDict, TypeVar
+from typing import Any, NamedTuple, ParamSpec, TypeVar
 
 from faker import Faker
-
-from permissions.models import (
-    GeneralRoleChoice,
-    GeneralRolePermission,
-    ServiceSectorRoleChoice,
-    ServiceSectorRolePermission,
-    UnitRoleChoice,
-    UnitRolePermission,
-)
 
 T = TypeVar("T")
 P = ParamSpec("P")
@@ -114,35 +105,6 @@ class SetName(StrEnum):
         return self in self.applying_free_of_charge()
 
 
-RoleChoice = TypeVar(
-    "RoleChoice",
-    UnitRoleChoice,
-    ServiceSectorRoleChoice,
-    GeneralRoleChoice,
-)
-RolePermission = TypeVar(
-    "RolePermission",
-    UnitRolePermission,
-    ServiceSectorRolePermission,
-    GeneralRolePermission,
-)
-
-
-class UserType(StrEnum):
-    reserver = "Varaaja"
-    viewer = "Katselija"
-    handler = "Käsittelijä"
-    admin = "Pääkäyttäjä"
-    product_owner = "Tuoteomistaja"
-    all = "Ylläpitäjä"
-
-
 class FieldCombination(NamedTuple):
     supported: list[str]
     required: list[str]
-
-
-class Roles(TypedDict):
-    general: dict[str, GeneralRoleChoice]
-    unit: dict[str, UnitRoleChoice]
-    service_sector: dict[str, ServiceSectorRoleChoice]

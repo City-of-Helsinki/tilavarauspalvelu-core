@@ -1,7 +1,6 @@
 import pytest
 
 from spaces.models import Space
-from tests.helpers import UserType
 
 from .helpers import CREATE_MUTATION
 
@@ -14,7 +13,7 @@ pytestmark = [
 def test_create_space(graphql):
     # given:
     # - A superuser is using the system
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to create a space
@@ -30,7 +29,7 @@ def test_create_space(graphql):
 def test_create_space__name_is_required(graphql):
     # given:
     # - A superuser is using the system
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to create a space
@@ -47,7 +46,7 @@ def test_create_space__name_is_required(graphql):
 def test_create_space__name_cannot_be_empty(graphql, value):
     # given:
     # - A superuser is using the system
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to create a space

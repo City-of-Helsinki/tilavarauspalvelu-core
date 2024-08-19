@@ -2,7 +2,6 @@ import pytest
 
 from applications.enums import ApplicantTypeChoice
 from tests.factories import ApplicationFactory, ApplicationSectionFactory, ReservationUnitOptionFactory
-from tests.helpers import UserType
 
 from .helpers import applications_query
 
@@ -18,7 +17,7 @@ def test_application__order__by_pk(graphql):
     # - A superuser is using the system
     application_1 = ApplicationFactory.create_in_status_draft()
     application_2 = ApplicationFactory.create_in_status_draft()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to search for applications ordered by pk ascending
@@ -47,7 +46,7 @@ def test_application__order__by_applicant(graphql):
     # - A superuser is using the system
     application_1 = ApplicationFactory.create_in_status_draft(organisation__name="aaa")
     application_2 = ApplicationFactory.create_in_status_draft(organisation__name="bbb")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to search for applications ordered by applicant pk ascending
@@ -78,7 +77,7 @@ def test_application__order__by_applicant_type(graphql):
     application_2 = ApplicationFactory.create_in_status_draft(applicant_type=ApplicantTypeChoice.INDIVIDUAL)
     application_3 = ApplicationFactory.create_in_status_draft(applicant_type=ApplicantTypeChoice.COMMUNITY)
     application_4 = ApplicationFactory.create_in_status_draft(applicant_type=ApplicantTypeChoice.COMPANY)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to search for applications ordered by applicant types ascending

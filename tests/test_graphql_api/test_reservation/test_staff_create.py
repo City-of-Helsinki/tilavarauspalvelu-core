@@ -44,7 +44,7 @@ def test_reservation__staff_create__reservation_block_whole_day(graphql):
         end_datetime=datetime.datetime(2023, 1, 1, 22, tzinfo=DEFAULT_TIMEZONE),
     )
 
-    user = UserFactory.create_with_unit_permissions(reservation_unit.unit, perms=["can_create_staff_reservations"])
+    user = UserFactory.create_with_unit_role(units=[reservation_unit.unit])
     graphql.force_login(user)
 
     input_data = {
@@ -80,7 +80,7 @@ def test_reservation__staff_create__reservation_block_whole_day__ignore_given_bu
         end_datetime=datetime.datetime(2023, 1, 1, 22, tzinfo=DEFAULT_TIMEZONE),
     )
 
-    user = UserFactory.create_with_unit_permissions(reservation_unit.unit, perms=["can_create_staff_reservations"])
+    user = UserFactory.create_with_unit_role(units=[reservation_unit.unit])
     graphql.force_login(user)
 
     input_data = {
@@ -108,7 +108,7 @@ def test_reservation__staff_create__reservation_block_whole_day__ignore_given_bu
 def test_reservation__staff_create__general_admin_can_create(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
-    admin = UserFactory.create_with_general_permissions(perms=["can_create_staff_reservations"])
+    admin = UserFactory.create_with_general_role()
     graphql.force_login(admin)
 
     data = get_staff_create_data(reservation_unit)
@@ -123,10 +123,7 @@ def test_reservation__staff_create__general_admin_can_create(graphql):
 def test_reservation__staff_create__unit_admin_can_create(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
-    admin = UserFactory.create_with_unit_permissions(
-        unit=reservation_unit.unit,
-        perms=["can_create_staff_reservations"],
-    )
+    admin = UserFactory.create_with_unit_role(units=[reservation_unit.unit])
     graphql.force_login(admin)
 
     data = get_staff_create_data(reservation_unit)

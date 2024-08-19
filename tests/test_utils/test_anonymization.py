@@ -2,20 +2,12 @@ import pytest
 from auditlog.models import LogEntry
 from social_django.models import UserSocialAuth
 
-from permissions.models import (
-    GeneralRole,
-    GeneralRoleChoice,
-    ServiceSectorRole,
-    ServiceSectorRoleChoice,
-    UnitRole,
-    UnitRoleChoice,
-)
+from permissions.models import GeneralRole, UnitRole
 from tests.factories import (
     AddressFactory,
     ApplicationFactory,
     ApplicationSectionFactory,
     ReservationFactory,
-    ServiceSectorFactory,
     UnitFactory,
     UserFactory,
     UserSocialAuthFactory,
@@ -48,23 +40,12 @@ def test_anonymization__user():
     UserSocialAuthFactory.create(user=mr_anonymous)
 
     # Add general role
-    general_role_choice = GeneralRoleChoice.objects.create(code="general_role")
-    GeneralRole.objects.create(role=general_role_choice, user=mr_anonymous)
-
-    # Add service sector role
-    service_sector = ServiceSectorFactory(name="Role testing sector")
-    service_sector_role_choice = ServiceSectorRoleChoice.objects.create(code="service_sector_role")
-    ServiceSectorRole.objects.create(
-        role=service_sector_role_choice,
-        service_sector=service_sector,
-        user=mr_anonymous,
-    )
+    GeneralRole.objects.create(user=mr_anonymous)
 
     # Add unit role
     unit = UnitFactory(name="Role testing unit")
-    unit_role_choice = UnitRoleChoice.objects.create(code="unit_role")
-    unit_role = UnitRole.objects.create(role=unit_role_choice, user=mr_anonymous)
-    unit_role.unit.add(unit)
+    unit_role = UnitRole.objects.create(user=mr_anonymous)
+    unit_role.units.add(unit)
 
     old_user_uuid = mr_anonymous.uuid
 
@@ -83,7 +64,6 @@ def test_anonymization__user():
     assert mr_anonymous.profile_id == ""
 
     assert GeneralRole.objects.filter(user=mr_anonymous).count() == 0
-    assert ServiceSectorRole.objects.filter(user=mr_anonymous).count() == 0
     assert UnitRole.objects.filter(user=mr_anonymous).count() == 0
     assert UserSocialAuth.objects.filter(user=mr_anonymous).count() == 0
 

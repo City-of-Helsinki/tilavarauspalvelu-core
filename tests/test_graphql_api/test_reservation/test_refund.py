@@ -27,7 +27,7 @@ def test_reservation__refund__general_admin(graphql):
     reservation = ReservationFactory.create_for_refund()
     payment_order = reservation.payment_order.first()
 
-    admin = UserFactory.create_with_general_permissions(perms=["can_manage_reservations"])
+    admin = UserFactory.create_with_general_role()
     graphql.force_login(admin)
 
     input_data = get_refund_data(reservation)

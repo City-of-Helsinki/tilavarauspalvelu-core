@@ -19,7 +19,6 @@ from common.typing import GQLInfo
 from merchants.models import PaymentMerchant
 from opening_hours.models import OriginHaukiResource
 from opening_hours.utils.hauki_link_generator import generate_hauki_link
-from permissions.helpers import can_manage_units, can_modify_reservation_unit
 from reservation_units.enums import ReservationState, ReservationUnitState
 from reservation_units.models import ReservationUnit
 from reservations.enums import ReservationTypeChoice
@@ -158,9 +157,9 @@ class ReservationUnitNode(DjangoNode):
         ]
         restricted_fields = {
             "cancellation_rule": lambda user: user.is_authenticated,
-            "payment_merchant": lambda user, reservation_unit: can_modify_reservation_unit(user, reservation_unit),
-            "payment_product": lambda user, reservation_unit: can_modify_reservation_unit(user, reservation_unit),
-            "hauki_url": lambda user, reservation_unit: can_manage_units(user, reservation_unit.unit),
+            "payment_merchant": lambda user, ru: user.permissions.can_manage_unit(ru.unit),
+            "payment_product": lambda user, ru: user.permissions.can_manage_unit(ru.unit),
+            "hauki_url": lambda user, ru: user.permissions.can_manage_unit(ru.unit),
         }
         max_complexity = 20
         filterset_class = ReservationUnitFilterSet

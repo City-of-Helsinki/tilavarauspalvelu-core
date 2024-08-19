@@ -9,7 +9,6 @@ from applications.enums import (
 )
 from common.date_utils import local_datetime
 from tests.factories import ApplicationFactory, ApplicationRoundFactory, ReservationFactory, ReservationUnitFactory
-from tests.helpers import UserType
 from tests.test_graphql_api.test_application_round.helpers import rounds_query
 
 # Applied to all tests
@@ -24,7 +23,7 @@ def test_application_round_query__all_fields(graphql):
     # - A superuser is using the system
     application_round = ApplicationRoundFactory.create_in_status_open()
     ApplicationRoundFactory.create_in_status_open()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     fields = """
         nameFi
@@ -102,7 +101,7 @@ def test_application_round_query__applications_count_does_not_include_draft_appl
     application_round = ApplicationRoundFactory.create_in_status_open()
     ApplicationFactory.create_in_status_draft(application_round=application_round)
     ApplicationFactory.create_in_status_received(application_round=application_round)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - The user queries for application rounds' applications count
@@ -120,7 +119,7 @@ def test_application_round_query__applications_count_does_not_include_expired_ap
     application_round = ApplicationRoundFactory.create_in_status_handled()
     ApplicationFactory.create_in_status_expired(application_round=application_round)
     ApplicationFactory.create_in_status_handled(application_round=application_round)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - The user queries for application rounds' applications count
@@ -138,7 +137,7 @@ def test_application_round_query__applications_count_does_not_include_cancelled_
     application_round = ApplicationRoundFactory.create_in_status_handled()
     ApplicationFactory.create_in_status_cancelled(application_round=application_round)
     ApplicationFactory.create_in_status_handled(application_round=application_round)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - The user queries for application rounds' applications count

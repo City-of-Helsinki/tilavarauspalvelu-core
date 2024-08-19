@@ -1,4 +1,5 @@
 import datetime
+from collections.abc import Iterable
 from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
@@ -13,7 +14,6 @@ from api.graphql.extensions.validation_errors import ValidationErrorCodes, Valid
 from api.graphql.types.reservation.serializers.mixins import ReservationPriceMixin, ReservationSchedulingMixin
 from applications.models import City
 from common.typing import AnyUser
-from permissions.helpers import can_handle_reservation_with_units
 from reservation_units.enums import ReservationKind
 from reservation_units.models import ReservationUnit
 from reservations.enums import (
@@ -23,6 +23,7 @@ from reservations.enums import (
     ReservationTypeChoice,
 )
 from reservations.models import AgeGroup, Reservation, ReservationPurpose
+from spaces.models import Unit
 from users.helauth.clients import HelsinkiProfileClient
 from utils.external_service.errors import ExternalServiceError
 from utils.sentry import SentryLogger
@@ -187,8 +188,8 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
             data["non_subsidised_price_net"] = price_calculation_result.non_subsidised_price_net
 
         reservation_type = data.get("type")
-        reservation_unit_ids = [x.pk for x in reservation_units]
-        self.check_reservation_type(request_user, reservation_unit_ids, reservation_type)
+        units = (x.unit for x in reservation_units)
+        self.check_reservation_type(request_user, units, reservation_type)
 
         prefill_from_profile = prefill_from_profile and settings.PREFILL_RESERVATION_WITH_PROFILE_DATA
         if prefill_from_profile:
@@ -268,8 +269,8 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
                 ValidationErrorCodes.RESERVATION_UNIT_TYPE_IS_SEASON,
             )
 
-    def check_reservation_type(self, user, reservation_unit_ids: list[int], reservation_type: str | None) -> None:
-        if reservation_type is None or can_handle_reservation_with_units(user, reservation_unit_ids):
+    def check_reservation_type(self, user: AnyUser, units: Iterable[Unit], reservation_type: str | None) -> None:
+        if reservation_type is None or user.permissions.can_manage_reservations_for_units(units):
             return
 
         raise GraphQLError("You don't have permissions to set type")

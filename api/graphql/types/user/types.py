@@ -32,7 +32,6 @@ _FIELDS = [
     "reservation_notification",
     "general_roles",
     "unit_roles",
-    "service_sector_roles",
 ]
 
 
@@ -49,7 +48,7 @@ class UserNode(DjangoNode):
         permission_classes = [UserPermission]
 
     def resolve_reservation_notification(root: User, info: GQLInfo) -> str | None:
-        if root.has_staff_permissions:
+        if root.permissions.has_any_role():
             return root.reservation_notification
         return None
 

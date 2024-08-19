@@ -1,7 +1,6 @@
 import pytest
 
 from tests.factories import EquipmentCategoryFactory
-from tests.helpers import UserType
 
 from .helpers import equipment_categories_query
 
@@ -14,7 +13,7 @@ pytestmark = [
 def test_equipment_category__query(graphql):
     category = EquipmentCategoryFactory.create(name="foo")
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     query = equipment_categories_query(fields="nameFi")
     response = graphql(query)
 

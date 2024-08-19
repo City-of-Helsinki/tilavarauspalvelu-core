@@ -25,7 +25,7 @@ from tests.factories import (
     SpaceFactory,
     UserFactory,
 )
-from tests.helpers import ResponseMock, UserType, patch_method
+from tests.helpers import ResponseMock, patch_method
 from users.helauth.clients import HelsinkiProfileClient
 from users.helauth.typing import ADLoginAMR
 from utils.decimal_utils import round_decimal
@@ -1032,7 +1032,7 @@ def test_reservation__create__reservation_block_whole_day__non_reserved_time_is_
         end_datetime=datetime(2023, 1, 1, 22, tzinfo=DEFAULT_TIMEZONE),
     )
 
-    graphql.login_user_based_on_type(UserType.REGULAR)
+    graphql.login_with_regular_user()
 
     input_data = {
         "name": "foo",
@@ -1066,7 +1066,7 @@ def test_reservation__create__reservation_block_whole_day__start_and_end_at_midn
         end_datetime=datetime(2023, 1, 3, 0, tzinfo=DEFAULT_TIMEZONE),
     )
 
-    graphql.login_user_based_on_type(UserType.REGULAR)
+    graphql.login_with_regular_user()
 
     input_data = {
         "name": "foo",
@@ -1117,7 +1117,7 @@ def test_reservation__create__reservation_block_whole_day__blocks_reserving_for_
 
     ReservationFactory.create_for_reservation_unit(reservation_unit=reservation_unit, begin=begin, end=end)
 
-    graphql.login_user_based_on_type(UserType.REGULAR)
+    graphql.login_with_regular_user()
 
     input_data = {
         "name": "foo",

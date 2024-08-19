@@ -1,7 +1,6 @@
 import pytest
 
 from tests.factories import EquipmentFactory
-from tests.helpers import UserType
 
 from .helpers import equipments_query
 
@@ -14,7 +13,7 @@ pytestmark = [
 def test_equipment__query(graphql):
     equipment = EquipmentFactory.create(name="foo")
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     query = equipments_query(fields="nameFi")
     response = graphql(query)
 
@@ -31,7 +30,7 @@ def test_equipment__order__by_category_rank(graphql):
     equipment_2 = EquipmentFactory.create(name="bar", category__rank=3)
     equipment_3 = EquipmentFactory.create(name="baz", category__rank=1)
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     query = equipments_query(fields="nameFi category { nameFi }", order_by="categoryRankAsc")
     response = graphql(query)
 
@@ -59,7 +58,7 @@ def test_equipment__filter__by_category_rank(graphql):
     equipment_2 = EquipmentFactory.create(name="2", category__rank=1)
     EquipmentFactory.create(name="3", category__rank=3)
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     query = equipments_query(fields="nameFi category { nameFi }", rank_gte=1, rank_lte=2, order_by="nameAsc")
     response = graphql(query)
 

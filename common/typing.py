@@ -1,4 +1,6 @@
-from typing import TYPE_CHECKING, TypedDict, Union
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, TypedDict
 
 from django.contrib.auth.models import AnonymousUser
 from django.core.handlers.wsgi import WSGIRequest
@@ -13,7 +15,7 @@ __all__ = [
     "QueryInfo",
 ]
 
-type AnyUser = Union["User", AnonymousUser]  # noqa: UP007
+type AnyUser = User | AnonymousUser
 
 
 class UserHintedWSGIRequest(WSGIRequest):

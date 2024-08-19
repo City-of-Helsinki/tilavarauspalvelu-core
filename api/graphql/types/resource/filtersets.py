@@ -5,8 +5,7 @@ from django.db import models
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import IntMultipleChoiceFilter
 
-from permissions.helpers import has_general_permission
-from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
+from permissions.enums import UserRoleChoice
 from resources.models import Resource
 from spaces.models import Space
 
@@ -30,28 +29,31 @@ class ResourceFilterSet(ModelFilterSet):
             "name_en": ["exact", "icontains", "istartswith"],
         }
 
-    def get_only_with_permission(self, qs, name, value):
+    def get_only_with_permission(self, qs: models.QuerySet, name: str, value: bool) -> models.QuerySet:
         """Returns resources where the user has resource management permissions"""
         if not value:
             return qs
 
         user: AnyUser = self.request.user
 
-        if user.is_anonymous:
+        if user.is_anonymous or not user.is_active:
             return qs.none()
-        if user.is_superuser or has_general_permission(user, GeneralPermissionChoices.CAN_MANAGE_RESOURCES):
+        if user.is_superuser:
             return qs
 
-        unit_permission = UnitPermissionChoices.CAN_MANAGE_RESOURCES.value
-        unit_ids = [pk for pk, perms in user.unit_permissions.items() if unit_permission in perms]
-        unit_group_ids = [pk for pk, perms in user.unit_group_permissions.items() if unit_permission in perms]
+        roles = UserRoleChoice.can_manage_reservation_units()
+        if user.permissions.has_general_role(role_choices=roles):
+            return qs
+
+        u_ids = user.permissions.unit_ids_where_has_role(role_choices=roles)
+        g_ids = user.permissions.unit_group_ids_where_has_role(role_choices=roles)
 
         return qs.filter(
             space__in=models.Subquery(
                 queryset=(
                     Space.objects.filter(
-                        models.Q(unit__in=unit_ids)  #
-                        | models.Q(unit__unit_groups__in=unit_group_ids)
+                        models.Q(unit__in=u_ids)  #
+                        | models.Q(unit__unit_groups__in=g_ids)
                     ).values("id")
                 )
             )

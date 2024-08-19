@@ -1,7 +1,6 @@
 import pytest
 
 from tests.factories import SpaceFactory
-from tests.helpers import UserType
 
 from .helpers import UPDATE_MUTATION
 
@@ -16,7 +15,7 @@ def test_update_space(graphql):
     # - There is a space
     # - A superuser is using the system
     space = SpaceFactory.create(name="foo")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to update the space's name
@@ -36,7 +35,7 @@ def test_update_space__name_fi_cannot_be_empty(graphql, name):
     # - There is a space
     # - A superuser is using the system
     space = SpaceFactory.create(name="foo")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to update the space's name

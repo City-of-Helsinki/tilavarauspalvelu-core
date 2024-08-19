@@ -1,10 +1,10 @@
+from enum import Enum, auto
 from functools import partial
 from typing import Any, NamedTuple
 
 from graphene_django_extensions.testing import build_mutation, build_query
 
 from common.enums import BannerNotificationTarget
-from tests.helpers import UserType
 
 banner_notifications_query = partial(build_query, "bannerNotifications", connection=True, order_by="pkAsc")
 
@@ -21,6 +21,14 @@ DELETE_MUTATION = build_mutation(
     "BannerNotificationDeleteMutation",
     fields="deleted",
 )
+
+
+class UserType(Enum):
+    ANONYMOUS = auto()
+    REGULAR = auto()
+    STAFF = auto()
+    SUPERUSER = auto()
+    NOTIFICATION_MANAGER = auto()
 
 
 class UserTypeParams(NamedTuple):

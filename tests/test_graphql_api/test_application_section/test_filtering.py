@@ -17,7 +17,6 @@ from tests.factories import (
     ReservationPurposeFactory,
     SuitableTimeRangeFactory,
 )
-from tests.helpers import UserType
 from tests.test_graphql_api.test_application_section.helpers import sections_query
 
 if TYPE_CHECKING:
@@ -78,7 +77,7 @@ def test_application_section__filter__by_name(graphql):
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(name="foo", application=application)
     section_2 = ApplicationSectionFactory.create_in_status_unallocated(name="foobar", application=application)
     ApplicationSectionFactory.create_in_status_unallocated(name="bar", application=application)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections whose name starts with "foo"
@@ -102,7 +101,7 @@ def test_application_section__filter__by_application(graphql):
     )
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application_1)
     ApplicationSectionFactory.create_in_status_unallocated(application=application_2)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with an application primary key
@@ -123,7 +122,7 @@ def test_application_section__filter__by_application_round(graphql):
     application_2 = ApplicationFactory.create_in_status_draft_no_sections()
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application_1)
     ApplicationSectionFactory.create_in_status_unallocated(application=application_2)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with an application round primary key
@@ -149,7 +148,7 @@ def test_application_section__filter__by_unit(graphql):
         application=application,
         reservation_unit_options__reservation_unit__name="bar",
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     section_reservation_unit: ReservationUnitOption = section_1.reservation_unit_options.first()
 
@@ -177,7 +176,7 @@ def test_application_section__filter__by_unit__multiple(graphql):
         application=application,
         reservation_unit_options__reservation_unit__name="bar",
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     section_reservation_unit_1: ReservationUnitOption = section_1.reservation_unit_options.first()
     section_reservation_unit_2: ReservationUnitOption = section_2.reservation_unit_options.first()
@@ -212,7 +211,7 @@ def test_application_section__filter__by_reservation_unit(graphql):
         application=application,
         reservation_unit_options__reservation_unit__name="bar",
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     section_reservation_unit: ReservationUnitOption = section_1.reservation_unit_options.first()
 
@@ -240,7 +239,7 @@ def test_application_section__filter__by_reservation_unit__multiple(graphql):
         application=application,
         reservation_unit_options__reservation_unit__name="bar",
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     section_reservation_unit_1: ReservationUnitOption = section_1.reservation_unit_options.first()
     section_reservation_unit_2: ReservationUnitOption = section_2.reservation_unit_options.first()
@@ -270,7 +269,7 @@ def test_application_section__filter__by_user(graphql):
     application_2 = ApplicationFactory.create_in_status_draft_no_sections()
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application_1)
     ApplicationSectionFactory.create_in_status_unallocated(application=application_2)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with a specific application owner
@@ -291,7 +290,7 @@ def test_application_section__filter__by_applicant_type(graphql):
     application_2 = ApplicationFactory.create_in_status_draft_no_sections(applicant_type=ApplicantTypeChoice.INDIVIDUAL)
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application_1)
     ApplicationSectionFactory.create_in_status_unallocated(application=application_2)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections of a specific applicant type
@@ -312,7 +311,7 @@ def test_application_section__filter__by_applicant_type__multiple(graphql):
     application_2 = ApplicationFactory.create_in_status_draft_no_sections(applicant_type=ApplicantTypeChoice.INDIVIDUAL)
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application_1)
     section_2 = ApplicationSectionFactory.create_in_status_unallocated(application=application_2)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with any of the given applicant types
@@ -333,7 +332,7 @@ def test_application_section__filter__by_status(graphql):
     application = ApplicationFactory.create_in_status_in_allocation_no_sections()
     section_1 = ApplicationSectionFactory.create_in_status_in_allocation(application=application)
     section_2 = ApplicationSectionFactory.create_in_status_handled(application=application)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # Sanity check
     assert section_1.status == ApplicationSectionStatusChoice.IN_ALLOCATION
@@ -357,7 +356,7 @@ def test_application_section__filter__by_status__multiple(graphql):
     application = ApplicationFactory.create_in_status_in_allocation_no_sections()
     section_1 = ApplicationSectionFactory.create_in_status_in_allocation(application=application)
     section_2 = ApplicationSectionFactory.create_in_status_handled(application=application)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # Sanity check
     assert section_1.status == ApplicationSectionStatusChoice.IN_ALLOCATION
@@ -384,7 +383,7 @@ def test_application_section__filter__by_application_status(graphql):
     application_2 = ApplicationFactory.create_in_status_handled_no_sections()
     section_1 = ApplicationSectionFactory.create_in_status_in_allocation(application=application_1)
     section_2 = ApplicationSectionFactory.create_in_status_handled(application=application_2)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # Sanity check
     assert application_1.status == ApplicationStatusChoice.IN_ALLOCATION
@@ -412,7 +411,7 @@ def test_application_section__filter__by_application_status__multiple(graphql):
     application_2 = ApplicationFactory.create_in_status_handled_no_sections()
     section_1 = ApplicationSectionFactory.create_in_status_in_allocation(application=application_1)
     section_2 = ApplicationSectionFactory.create_in_status_handled(application=application_2)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # Sanity check
     assert application_1.status == ApplicationStatusChoice.IN_ALLOCATION
@@ -445,7 +444,7 @@ def test_application_section__filter__by_priority(graphql):
         application=application,
         suitable_time_ranges__priority=Priority.SECONDARY,
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with a specific priority
@@ -473,7 +472,7 @@ def test_application_section__filter__by_priority__multiple(graphql):
         application=application,
         suitable_time_ranges__priority=Priority.SECONDARY,
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with a specific priorities
@@ -504,7 +503,7 @@ def test_application_section__filter__suitable_time_range_priority(graphql):
         day_of_the_week=Weekday.TUESDAY,
         priority=Priority.SECONDARY,
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter suitable time ranges inside a section with a specific priority
@@ -541,7 +540,7 @@ def test_application_section__filter__by_preferred_order(graphql):
         application=application,
         reservation_unit_options__preferred_order=3,
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with a specific preferred order
@@ -573,7 +572,7 @@ def test_application_section__filter__by_preferred_order__multiple(graphql):
         application=application,
         reservation_unit_options__preferred_order=3,
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with a specific preferred orders
@@ -610,7 +609,7 @@ def test_application_section__filter__by_include_preferred_order_10_or_higher(gr
         application=application,
         reservation_unit_options__preferred_order=11,
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with a preferred order 10 or higher
@@ -647,7 +646,7 @@ def test_application_section__filter__by_include_preferred_order_10_or_higher__w
         application=application,
         reservation_unit_options__preferred_order=11,
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with a preferred order 10 or higher, and a specific preferred order
@@ -674,7 +673,7 @@ def test_application_section__filter__by_home_city(graphql):
     application_2 = ApplicationFactory.create_in_status_draft_no_sections(home_city=city_2)
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application_1)
     ApplicationSectionFactory.create_in_status_unallocated(application=application_2)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with a specific preferred order
@@ -699,7 +698,7 @@ def test_application_section__filter__by_home_city__multiple(graphql):
     application_2 = ApplicationFactory.create_in_status_draft_no_sections(home_city=city_2)
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application_1)
     section_2 = ApplicationSectionFactory.create_in_status_unallocated(application=application_2)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with a specific preferred order
@@ -724,7 +723,7 @@ def test_application_section__filter__by_age_group(graphql):
     application = ApplicationFactory.create_in_status_draft()
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application, age_group=age_group_1)
     ApplicationSectionFactory.create_in_status_unallocated(application=application, age_group=age_group_2)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with a given age group
@@ -748,7 +747,7 @@ def test_application_section__filter__by_age_group__multiple(graphql):
     application = ApplicationFactory.create_in_status_draft()
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application, age_group=age_group_1)
     section_2 = ApplicationSectionFactory.create_in_status_unallocated(application=application, age_group=age_group_2)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with a given age groups
@@ -773,7 +772,7 @@ def test_application_section__filter__by_purpose(graphql):
     application = ApplicationFactory.create_in_status_draft()
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application, purpose=purpose_1)
     ApplicationSectionFactory.create_in_status_unallocated(application=application, purpose=purpose_2)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with a given reservation purpose
@@ -797,7 +796,7 @@ def test_application_section__filter__by_purpose__multiple(graphql):
     application = ApplicationFactory.create_in_status_draft()
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application, purpose=purpose_1)
     section_2 = ApplicationSectionFactory.create_in_status_unallocated(application=application, purpose=purpose_2)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with a given reservation purpose
@@ -824,7 +823,7 @@ def test_application_section__filter__by_text_search__section_name(graphql):
     )
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application, name="foo")
     ApplicationSectionFactory.create_in_status_unallocated(application=application, name="bar")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with a text search
@@ -848,7 +847,7 @@ def test_application_section__filter__by_text_search__section_name__prefix(graph
     )
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application, name="foo")
     ApplicationSectionFactory.create_in_status_unallocated(application=application, name="bar")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with a text search, which is only a prefix match
@@ -872,7 +871,7 @@ def test_application_section__filter__by_text_search__section_name__has_quotes(g
     )
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application, name="Moe's Bar")
     ApplicationSectionFactory.create_in_status_unallocated(application=application, name="Bar")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with a text search, which is only a partial match
@@ -897,7 +896,7 @@ def test_application_section__filter__by_text_search__applicant__organisation_na
         user=None,
     )
     section = ApplicationSectionFactory.create_in_status_unallocated(application=application, name="foo")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with a text search
@@ -923,7 +922,7 @@ def test_application_section__filter__by_text_search__applicant__contact_person_
         user=None,
     )
     section = ApplicationSectionFactory.create_in_status_unallocated(application=application, name="foo")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with a text search
@@ -949,7 +948,7 @@ def test_application_section__filter__by_text_search__applicant__contact_person_
         user=None,
     )
     section = ApplicationSectionFactory.create_in_status_unallocated(application=application, name="foo")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with a text search
@@ -975,7 +974,7 @@ def test_application_section__filter__by_text_search__applicant__user_first_name
         user__last_name="none",
     )
     section = ApplicationSectionFactory.create_in_status_unallocated(application=application, name="foo")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with a text search
@@ -1001,7 +1000,7 @@ def test_application_section__filter__by_text_search__applicant__user_last_name(
         user__last_name="fizz",
     )
     section = ApplicationSectionFactory.create_in_status_unallocated(application=application, name="foo")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with a text search
@@ -1027,7 +1026,7 @@ def test_application_section__filter__by_text_search__section_id(graphql):
     )
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application, name="foo")
     ApplicationSectionFactory.create_in_status_unallocated(application=application, name="bar")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with a text search
@@ -1058,7 +1057,7 @@ def test_application_section__filter__by_text_search__application_id(graphql):
     )
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application_1, name="foo")
     ApplicationSectionFactory.create_in_status_unallocated(application=application_2, name="bar")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with a text search
@@ -1085,7 +1084,7 @@ def test_application_section__filter__by_text_search__not_found(graphql):
         user__last_name="one",
     )
     ApplicationSectionFactory.create_in_status_unallocated(application=application, name="foo")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application sections with a text search

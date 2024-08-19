@@ -6,7 +6,6 @@ from django.utils import timezone
 from merchants.enums import OrderStatus
 from reservations.enums import CustomerTypeChoice
 from tests.factories import PaymentOrderFactory, ReservationFactory, ReservationUnitFactory
-from tests.helpers import UserType
 from tests.test_graphql_api.test_reservation.helpers import reservations_query
 
 # Applied to all tests
@@ -25,7 +24,7 @@ def test_reservation__order__by_reservation_unit_name__asc(graphql, lang):
     reservation_2 = ReservationFactory.create(reservation_unit=[res_unit_b])
     reservation_3 = ReservationFactory.create(reservation_unit=[res_unit_c])
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     query = reservations_query(order_by=f"reservationUnitName{lang.capitalize()}Asc")
     response = graphql(query)
 
@@ -46,7 +45,7 @@ def test_reservation__order__by_reservation_unit_name__desc(graphql, lang):
     reservation_2 = ReservationFactory.create(reservation_unit=[res_unit_b])
     reservation_3 = ReservationFactory.create(reservation_unit=[res_unit_c])
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     query = reservations_query(order_by=f"reservationUnitName{lang.capitalize()}Desc")
     response = graphql(query)
 
@@ -71,7 +70,7 @@ def test_reservation__order__by_reservee_name__asc(graphql):
         reservee_organisation_name="C",
     )
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     query = reservations_query(order_by="reserveeNameAsc")
     response = graphql(query)
 
@@ -96,7 +95,7 @@ def test_reservation__order__by_reservee_name__desc(graphql):
         reservee_organisation_name="C",
     )
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     query = reservations_query(order_by="reserveeNameDesc")
     response = graphql(query)
 
@@ -117,7 +116,7 @@ def test_reservation__order__by_unit_name__asc(graphql, lang):
     reservation_2 = ReservationFactory.create(reservation_unit=[res_unit_b])
     reservation_3 = ReservationFactory.create(reservation_unit=[res_unit_c])
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     query = reservations_query(order_by=f"unitName{lang.capitalize()}Asc")
     response = graphql(query)
 
@@ -138,7 +137,7 @@ def test_reservation__order__by_unit_name__desc(graphql, lang):
     reservation_2 = ReservationFactory.create(reservation_unit=[res_unit_b])
     reservation_3 = ReservationFactory.create(reservation_unit=[res_unit_c])
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     query = reservations_query(order_by=f"unitName{lang.capitalize()}Desc")
     response = graphql(query)
 
@@ -155,7 +154,7 @@ def test_reservation__order__by_created_at(graphql):
     reservation_2 = ReservationFactory.create(created_at=now + datetime.timedelta(hours=-2))
     reservation_3 = ReservationFactory.create(created_at=now + datetime.timedelta(hours=-1))
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     query = reservations_query(order_by="createdAtAsc")
     response = graphql(query)
 
@@ -185,7 +184,7 @@ def test_reservation__order__by_order_status(graphql):
     reservation_6 = ReservationFactory.create()
     PaymentOrderFactory.create(status=OrderStatus.REFUNDED, reservation=reservation_6)
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     query = reservations_query(order_by="orderStatusAsc")
     response = graphql(query)
 

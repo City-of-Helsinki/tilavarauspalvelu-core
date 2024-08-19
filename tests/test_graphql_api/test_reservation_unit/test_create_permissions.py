@@ -68,7 +68,7 @@ def test_reservation_unit__create__draft__general_admin(graphql):
     # - There is a unit in the system
     # - A general admin is using the system
     unit = UnitFactory.create()
-    admin = UserFactory.create_with_general_permissions(perms=["can_manage_reservation_units"])
+    admin = UserFactory.create_with_general_role()
     graphql.force_login(admin)
 
     data = {"isDraft": True, "name": "foo", "unit": unit.pk}
@@ -87,7 +87,7 @@ def test_reservation_unit__create__draft__unit_admin(graphql):
     # - There is a unit in the system
     # - A unit admin is using the system
     unit = UnitFactory.create()
-    admin = UserFactory.create_with_unit_permissions(unit=unit, perms=["can_manage_reservation_units"])
+    admin = UserFactory.create_with_unit_role(units=[unit])
     graphql.force_login(admin)
 
     data = {"isDraft": True, "name": "foo", "unit": unit.pk}

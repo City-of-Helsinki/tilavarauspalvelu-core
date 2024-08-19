@@ -1,7 +1,6 @@
 import pytest
 
 from tests.factories import ApplicationRoundFactory, ReservationUnitFactory, UserFactory
-from tests.helpers import UserType
 from tests.test_graphql_api.test_application_round.helpers import rounds_query
 
 # Applied to all tests
@@ -16,7 +15,7 @@ def test_application_round__filter__by_pk(graphql):
     # - A superuser is using the system
     application_round = ApplicationRoundFactory.create()
     ApplicationRoundFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - The user queries application rounds with the specific pk
@@ -34,7 +33,7 @@ def test_application_round__filter__by_pk__multiple(graphql):
     # - A superuser is using the system
     application_round_1 = ApplicationRoundFactory.create()
     application_round_2 = ApplicationRoundFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - The user queries application rounds with any of the specific pks
@@ -104,11 +103,10 @@ def test_application_round__filter__by_only_with_permissions__regular_user(graph
     assert len(response.edges) == 0, response
 
 
-@pytest.mark.parametrize("permission", ["can_validate_applications", "can_handle_applications"])
-def test_application_round__filter__by_only_with_permissions__general_admin(graphql, permission):
+def test_application_round__filter__by_only_with_permissions__general_admin(graphql):
     application_round = ApplicationRoundFactory.create()
 
-    admin = UserFactory.create_with_general_permissions(perms=[permission])
+    admin = UserFactory.create_with_general_role()
     graphql.force_login(admin)
 
     query = rounds_query(only_with_permissions=True)
@@ -118,8 +116,7 @@ def test_application_round__filter__by_only_with_permissions__general_admin(grap
     assert response.node(0) == {"pk": application_round.pk}
 
 
-@pytest.mark.parametrize("permission", ["can_validate_applications", "can_handle_applications"])
-def test_application_round__filter__by_only_with_permissions__unit_admin(graphql, permission):
+def test_application_round__filter__by_only_with_permissions__unit_admin(graphql):
     reservation_unit_1 = ReservationUnitFactory.create()
     reservation_unit_2 = ReservationUnitFactory.create()
 
@@ -127,7 +124,7 @@ def test_application_round__filter__by_only_with_permissions__unit_admin(graphql
     ApplicationRoundFactory.create(reservation_units=[reservation_unit_2])
 
     unit = reservation_unit_1.unit
-    admin = UserFactory.create_with_unit_permissions(unit=unit, perms=[permission])
+    admin = UserFactory.create_with_unit_role(units=[unit])
     graphql.force_login(admin)
 
     query = rounds_query(only_with_permissions=True)

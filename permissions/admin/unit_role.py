@@ -18,78 +18,73 @@ class UnitRoleAdmin(admin.ModelAdmin):
         "user__email",
         "user__first_name",
         "user__last_name",
-        "unit__name",
-        "unit_group__name",
+        "units__name",
+        "unit_groups__name",
     ]
     search_help_text = _("Search by user's username, email, first name, last name, unit or unit group")
 
     # List
     list_display = [
-        "role_verbose_name",
+        "role",
         "user_email",
         "unit_names",
         "unit_group_names",
     ]
     list_filter = [
         "role",
-        "unit",
-        "unit_group",
+        "units",
+        "unit_groups",
     ]
 
     # Form
-    fieldsets = [
-        [
-            _("Basic information"),
-            {
-                "fields": [
-                    "role",
-                    "user",
-                    "assigner",
-                    "created",
-                    "modified",
-                ],
-            },
-        ],
-        [
-            _("Roles"),
-            {
-                "fields": [
-                    "unit",
-                    "unit_group",
-                ],
-            },
-        ],
-    ]
-    readonly_fields = [
+    fields = [
+        "role",
+        "user",
+        "assigner",
         "created",
         "modified",
-        "assigner",
+        "units",
+        "unit_groups",
     ]
-    autocomplete_fields = ["user"]
+    readonly_fields = [
+        "assigner",
+        "created",
+        "modified",
+    ]
+    autocomplete_fields = [
+        "user",
+    ]
     filter_horizontal = [
-        "unit",
-        "unit_group",
+        "units",
+        "unit_groups",
     ]
 
     def get_queryset(self, request: WSGIRequest) -> models.QuerySet:
-        return super().get_queryset(request).select_related("user", "role").prefetch_related("unit", "unit_group")
+        return (
+            super()
+            .get_queryset(request)
+            .select_related(
+                "user",
+                "assigner",
+            )
+            .prefetch_related(
+                "units",
+                "unit_groups",
+            )
+        )
 
     def save_model(self, request: WSGIRequest, obj: UnitRole, form, change: bool) -> UnitRole:
         obj.assigner = request.user
         return super().save_model(request, obj, form, change)
 
-    @admin.display(ordering="role__verbose_name")
-    def role_verbose_name(self, obj: UnitRole) -> str:
-        return obj.role.verbose_name
-
     @admin.display(ordering="user__email")
     def user_email(self, obj: UnitRole) -> str:
         return obj.user.email
 
-    @admin.display(ordering="unit__name")
+    @admin.display(ordering="units__name")
     def unit_names(self, obj: UnitRole) -> str:
-        return ", ".join([unit.name for unit in obj.unit.all()])
+        return ", ".join([unit.name for unit in obj.units.all()])
 
-    @admin.display(ordering="unit_group__name")
+    @admin.display(ordering="unit_groups__name")
     def unit_group_names(self, obj: UnitRole) -> str:
-        return ", ".join([unit.name for unit in obj.unit_group.all()])
+        return ", ".join([unit.name for unit in obj.unit_groups.all()])

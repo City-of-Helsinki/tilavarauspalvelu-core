@@ -5,7 +5,6 @@ from django.utils.timezone import get_default_timezone
 
 from applications.enums import ApplicationSectionStatusChoice, ApplicationStatusChoice, Weekday
 from tests.factories import AllocatedTimeSlotFactory, ApplicationFactory, ApplicationSectionFactory
-from tests.helpers import UserType
 
 from .helpers import allocations_query
 
@@ -34,7 +33,7 @@ def test_allocated_time_slot__order__by_ids(graphql, field, order):
         2: AllocatedTimeSlotFactory.create(),
         3: AllocatedTimeSlotFactory.create(),
     }
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - Use tries to fetch the allocated time slots in the given order
@@ -92,7 +91,7 @@ def test_allocated_time_slot__order__by_application_section_name(graphql):
     # - There are two allocated time slots
     allocation_1 = AllocatedTimeSlotFactory.create(reservation_unit_option__application_section__name="A")
     allocation_2 = AllocatedTimeSlotFactory.create(reservation_unit_option__application_section__name="B")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - Use tries to fetch the allocated time slots by application section name in ascending order
@@ -129,7 +128,7 @@ def test_allocated_time_slot__order__by_allocated_unit_name(graphql, lang):
     allocation_2 = AllocatedTimeSlotFactory.create(
         **{f"reservation_unit_option__reservation_unit__unit__name_{lang}": "B"},
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - Use tries to fetch the allocated time slots by allocated unit name in ascending order
@@ -166,7 +165,7 @@ def test_allocated_time_slot__order__by_allocated_reservation_unit_name(graphql,
     allocation_2 = AllocatedTimeSlotFactory.create(
         **{f"reservation_unit_option__reservation_unit__name_{lang}": "B"},
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - Use tries to fetch the allocated time slots by allocated reservation unit name in ascending order
@@ -216,7 +215,7 @@ def test_allocated_time_slot__order__by_allocated_time_of_week(graphql):
         begin_time=datetime.time(13, 0, tzinfo=get_default_timezone()),
         end_time=datetime.time(15, 0, tzinfo=get_default_timezone()),
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - Use tries to fetch the allocated time slots by allocated time of week in ascending order
@@ -306,7 +305,7 @@ def test_allocated_time_slot__order__by_application_status(graphql):
     assert application_6.status == ApplicationStatusChoice.HANDLED
     assert application_7.status == ApplicationStatusChoice.IN_ALLOCATION
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - Use tries to fetch the allocated time slots by application status in ascending order
@@ -369,7 +368,7 @@ def test_allocated_time_slot__order__by_application_section_status(graphql):
     assert section_2.status == ApplicationSectionStatusChoice.IN_ALLOCATION
     assert section_3.status == ApplicationSectionStatusChoice.HANDLED
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - Use tries to fetch the allocated time slots by application section status in ascending order
