@@ -57,6 +57,13 @@ class ReservationStateChoice(models.TextChoices):
             ReservationStateChoice.CONFIRMED.value,
         ]
 
+    @classproperty
+    def states_that_can_be_cancelled(self) -> list[str]:
+        return [  # type: ignore[return-type]
+            ReservationStateChoice.CREATED.value,
+            ReservationStateChoice.WAITING_FOR_PAYMENT.value,
+        ]
+
 
 class ReservationTypeChoice(models.TextChoices):
     NORMAL = "NORMAL", pgettext_lazy("ReservationType", "Normal")

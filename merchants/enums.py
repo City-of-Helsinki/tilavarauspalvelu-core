@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from django.db import models
+from django.utils.functional import classproperty
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext_lazy
 
@@ -26,7 +27,7 @@ class OrderStatus(models.TextChoices):
     PAID_MANUALLY = "PAID_MANUALLY", pgettext_lazy("OrderStatus", "Paid manually")
     REFUNDED = "REFUNDED", pgettext_lazy("OrderStatus", "Refunded")
 
-    @classmethod
+    @classproperty
     def needs_update_statuses(cls) -> list[OrderStatus]:
         return [
             OrderStatus.DRAFT,
