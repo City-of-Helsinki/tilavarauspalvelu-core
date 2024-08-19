@@ -1,7 +1,6 @@
 import pytest
 
 from tests.factories import ApplicationFactory, UnitFactory, UserFactory
-from tests.helpers import UserType
 
 from .helpers import CANCEL_MUTATION
 
@@ -16,7 +15,7 @@ def test_application__cancel__regular_user(graphql):
     # - There is a draft application in an open application round with a single application event
     # - A regular user is using the system
     application = ApplicationFactory.create_in_status_draft()
-    graphql.login_user_based_on_type(UserType.REGULAR)
+    graphql.login_with_regular_user()
 
     # when:
     # - The user tries to cancel the application
@@ -67,7 +66,7 @@ def test_application__cancel__general_user(graphql):
     # - There is a draft application in an open application round with a single application event
     # - The owner of the application is using the system
     application = ApplicationFactory.create_in_status_draft()
-    admin = UserFactory.create_with_general_permissions(perms=["can_handle_applications"])
+    admin = UserFactory.create_with_general_role()
     graphql.force_login(admin)
 
     # when:
@@ -91,7 +90,7 @@ def test_application__update__unit_admin(graphql):
         additional_information="foo",
         application_sections__reservation_unit_options__reservation_unit__unit=unit,
     )
-    admin = UserFactory.create_with_unit_permissions(unit=unit, perms=["can_handle_applications"])
+    admin = UserFactory.create_with_unit_role(units=[unit])
     graphql.force_login(admin)
 
     # when:

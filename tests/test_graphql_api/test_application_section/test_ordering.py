@@ -1,7 +1,6 @@
 import pytest
 
 from tests.factories import ApplicationFactory, ApplicationSectionFactory, ReservationUnitOptionFactory
-from tests.helpers import UserType
 from tests.test_graphql_api.test_application_section.helpers import sections_query
 
 # Applied to all tests
@@ -16,7 +15,7 @@ def test_application_section__order__by_pk__asc(graphql):
     # - A superuser is using the system
     section_1 = ApplicationSectionFactory.create_in_status_unallocated()
     section_2 = ApplicationSectionFactory.create_in_status_unallocated()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to order application sections by the primary key ascending
@@ -36,7 +35,7 @@ def test_application_section__order__by_pk__desc(graphql):
     # - A superuser is using the system
     section_1 = ApplicationSectionFactory.create_in_status_unallocated()
     section_2 = ApplicationSectionFactory.create_in_status_unallocated()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to order application sections by the primary key descending
@@ -56,7 +55,7 @@ def test_application_section__order__by_application_id__asc(graphql):
     # - A superuser is using the system
     section_1 = ApplicationSectionFactory.create_in_status_unallocated()
     section_2 = ApplicationSectionFactory.create_in_status_unallocated()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to order application sections by application id ascending
@@ -76,7 +75,7 @@ def test_application_section__order__by_application_id__desc(graphql):
     # - A superuser is using the system
     section_1 = ApplicationSectionFactory.create_in_status_unallocated()
     section_2 = ApplicationSectionFactory.create_in_status_unallocated()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to order application sections by application id descending
@@ -96,7 +95,7 @@ def test_application_section__order__by_name__asc(graphql):
     # - A superuser is using the system
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(name="A")
     section_2 = ApplicationSectionFactory.create_in_status_unallocated(name="B")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to order application sections by name, ascending
@@ -116,7 +115,7 @@ def test_application_section__order__by_name__asc__case_insensitive(graphql):
     # - A superuser is using the system
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(name="B")
     section_2 = ApplicationSectionFactory.create_in_status_unallocated(name="a")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to order application sections by name, ascending
@@ -136,7 +135,7 @@ def test_application_section__order__by_name__desc(graphql):
     # - A superuser is using the system
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(name="A")
     section_2 = ApplicationSectionFactory.create_in_status_unallocated(name="B")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to order application sections by name, descending
@@ -156,7 +155,7 @@ def test_application_section__order__by_applicant__asc(graphql):
     # - A superuser is using the system
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application__organisation__name="A")
     section_2 = ApplicationSectionFactory.create_in_status_unallocated(application__organisation__name="B")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to order application sections by applicant ascending
@@ -176,7 +175,7 @@ def test_application_section__order__by_applicant__desc(graphql):
     # - A superuser is using the system
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application__organisation__name="A")
     section_2 = ApplicationSectionFactory.create_in_status_unallocated(application__organisation__name="B")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to order application sections by applicant descending
@@ -201,7 +200,7 @@ def test_application_section__order__by_application_status__asc(graphql):
     application_5 = ApplicationFactory.create_in_status_expired(application_sections__name="E")
     application_6 = ApplicationFactory.create_in_status_handled(application_sections__name="F")
     application_7 = ApplicationFactory.create_in_status_in_allocation(application_sections__name="G")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     pk_cancelled = application_1.application_sections.first().pk
     pk_draft = application_2.application_sections.first().pk
@@ -239,7 +238,7 @@ def test_application_section__order__by_application_status__desc(graphql):
     application_5 = ApplicationFactory.create_in_status_expired(application_sections__name="E")
     application_6 = ApplicationFactory.create_in_status_handled(application_sections__name="F")
     application_7 = ApplicationFactory.create_in_status_in_allocation(application_sections__name="G")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     pk_cancelled = application_1.application_sections.first().pk
     pk_draft = application_2.application_sections.first().pk

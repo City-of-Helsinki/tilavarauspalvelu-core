@@ -6,7 +6,6 @@ import pytest
 from applications.enums import ApplicationSectionStatusChoice
 from applications.models import ApplicationSection
 from tests.factories import ApplicationSectionFactory, ReservationUnitOptionFactory
-from tests.helpers import UserType
 from tests.test_graphql_api.test_application_section.helpers import UPDATE_MUTATION, get_application_section_update_data
 
 # Applied to all tests
@@ -20,7 +19,7 @@ def test_application_section__update(graphql):
     # - There is an unallocated application section in a draft application in an open application round
     # - A superuser is using the system
     application_section = ApplicationSectionFactory.create_in_status_unallocated()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to update the application section
@@ -61,7 +60,7 @@ def test_application_section__update__smaller_max_duration_than_min_duration(gra
     # - There is an unallocated application section in a draft application in an open application round
     # - A superuser is using the system
     application_section = ApplicationSectionFactory.create_in_status_unallocated()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to update the application section with a smaller max duration than min duration
@@ -83,7 +82,7 @@ def test_application_section__update__switch_reservation_unit_option_preferred_o
     application_section = ApplicationSectionFactory.create_in_status_unallocated(reservation_unit_options=[])
     option_1 = ReservationUnitOptionFactory.create(application_section=application_section, preferred_order=0)
     option_2 = ReservationUnitOptionFactory.create(application_section=application_section, preferred_order=1)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to update the application section, switching the preferred order of the reservation unit options
@@ -119,7 +118,7 @@ def test_application_section__update__two_reservation_unit_options_with_same_pre
     application_section = ApplicationSectionFactory.create_in_status_unallocated(reservation_unit_options=[])
     option_1 = ReservationUnitOptionFactory.create(application_section=application_section, preferred_order=0)
     option_2 = ReservationUnitOptionFactory.create(application_section=application_section, preferred_order=1)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to update the application section, switching the preferred order of the reservation unit options
@@ -153,7 +152,7 @@ def test_application_section__update__preferred_order_must_be_consecutive(graphq
     application_section = ApplicationSectionFactory.create_in_status_unallocated(reservation_unit_options=[])
     event_unit_1 = ReservationUnitOptionFactory.create(application_section=application_section, preferred_order=0)
     event_unit_2 = ReservationUnitOptionFactory.create(application_section=application_section, preferred_order=1)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to update the application section, making the event reservation unit preferred order nonconsecutive
@@ -183,7 +182,7 @@ def test_application_section__update__reservations_begin_date_not_in_round_reser
     # - There is an unallocated application section in a draft application in an open application round
     # - A superuser is using the system
     application_section = ApplicationSectionFactory.create_in_status_unallocated()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to update the application section
@@ -205,7 +204,7 @@ def test_application_section__update__reservations_end_date_not_in_round_reserva
     # - There is an unallocated application section in a draft application in an open application round
     # - A superuser is using the system
     application_section = ApplicationSectionFactory.create_in_status_unallocated()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to update the application section

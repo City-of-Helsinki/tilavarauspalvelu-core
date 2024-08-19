@@ -20,6 +20,8 @@ __all__ = [
     "ApplicationRound",
 ]
 
+from common.db import SubqueryArray
+
 logger = logging.getLogger(__name__)
 
 
@@ -254,3 +256,41 @@ class ApplicationRound(models.Model):
             return ApplicationRoundReservationCreationStatusChoice.FAILED
 
         return ApplicationRoundReservationCreationStatusChoice.NOT_COMPLETED
+
+    @lookup_property(skip_codegen=True)
+    def unit_ids_for_perms() -> list[int]:
+        from spaces.models import Unit
+
+        return SubqueryArray(  # type: ignore[return-value]
+            queryset=(
+                Unit.objects.filter(reservationunit__application_rounds=models.OuterRef("pk"))  #
+                .distinct()
+                .values("id")
+            ),
+            agg_field="id",
+        )
+
+    @unit_ids_for_perms.override
+    def _(self) -> list[int]:
+        from spaces.models import Unit
+
+        return Unit.objects.filter(reservationunit__application_rounds=self).distinct().values_list("id", flat=True)
+
+    @lookup_property(skip_codegen=True)
+    def unit_group_ids_for_perms() -> list[int]:
+        from spaces.models import UnitGroup
+
+        return SubqueryArray(  # type: ignore[return-value]
+            queryset=(
+                UnitGroup.objects.filter(units__reservationunit__application_rounds=models.OuterRef("pk"))
+                .distinct()
+                .values("id")
+            ),
+            agg_field="id",
+        )
+
+    @unit_group_ids_for_perms.override
+    def _(self) -> list[int]:
+        from spaces.models import UnitGroup
+
+        return UnitGroup.objects.filter(units__reservationunit__application_rounds=self).distinct().values("id")

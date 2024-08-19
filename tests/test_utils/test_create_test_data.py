@@ -6,14 +6,6 @@ from common.management.commands.create_test_data import create_test_data
 from common.models import RequestLog, SQLLog
 from email_notification.models import EmailTemplate
 from merchants.models import PaymentOrder
-from permissions.models import (
-    GeneralRoleChoice,
-    GeneralRolePermission,
-    ServiceSectorRoleChoice,
-    ServiceSectorRolePermission,
-    UnitRoleChoice,
-    UnitRolePermission,
-)
 from reservation_units.models import (
     Introduction,
     Keyword,
@@ -26,6 +18,7 @@ from reservation_units.models import (
 )
 from reservations.models import (
     AbilityGroup,
+    AffectingTimeSpan,
     RecurringReservation,
     RejectedOccurrence,
     ReservationMetadataField,
@@ -53,15 +46,9 @@ apps_to_check: list[str] = [
 ]
 
 models_that_always_contain_data: list[type[models.Model]] = [
-    GeneralRoleChoice,
-    GeneralRolePermission,
     ReservationMetadataField,
     ReservationUnitPaymentType,
-    ServiceSectorRoleChoice,
-    ServiceSectorRolePermission,
     TaxPercentage,
-    UnitRoleChoice,
-    UnitRolePermission,
 ]
 
 models_that_should_be_empty: list[type[models.Model]] = [
@@ -102,6 +89,7 @@ def test_create_test_data():
 
     # Call refresh at the end, since signals for it are disabled.
     ReservationUnitHierarchy.refresh()
+    AffectingTimeSpan.refresh()
 
     for model in all_models:
         if model in models_that_should_be_empty:

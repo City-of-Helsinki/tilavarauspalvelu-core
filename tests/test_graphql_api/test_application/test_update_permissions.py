@@ -1,7 +1,6 @@
 import pytest
 
 from tests.factories import ApplicationFactory, UnitFactory, UserFactory
-from tests.helpers import UserType
 
 from .helpers import UPDATE_MUTATION
 
@@ -16,7 +15,7 @@ def test_application__update__regular_user(graphql):
     # - There is a draft application in an open application round
     # - A regular user is using the system
     application = ApplicationFactory.create_in_status_draft(additional_information="foo")
-    graphql.login_user_based_on_type(UserType.REGULAR)
+    graphql.login_with_regular_user()
 
     # when:
     # - User tries to update the application data
@@ -74,7 +73,7 @@ def test_application__update__general_admin(graphql):
     # - There is a draft application in an open application round
     # - A general admin is using the system
     application = ApplicationFactory.create_in_status_draft(additional_information="foo")
-    admin = UserFactory.create_with_general_permissions(perms=["can_handle_applications"])
+    admin = UserFactory.create_with_general_role()
     graphql.force_login(admin)
 
     # when:
@@ -99,7 +98,7 @@ def test_application__update__unit_admin(graphql):
         additional_information="foo",
         application_sections__reservation_unit_options__reservation_unit__unit=unit,
     )
-    admin = UserFactory.create_with_unit_permissions(unit=unit, perms=["can_handle_applications"])
+    admin = UserFactory.create_with_unit_role(units=[unit])
     graphql.force_login(admin)
 
     # when:
@@ -140,7 +139,7 @@ def test_application__update__general_admin__working_memo(graphql):
     # - There is a draft application in an open application round
     # - A general admin is using the system
     application = ApplicationFactory.create_in_status_draft(additional_information="foo")
-    admin = UserFactory.create_with_general_permissions(perms=["can_handle_applications", "can_validate_applications"])
+    admin = UserFactory.create_with_general_role()
     graphql.force_login(admin)
 
     # when:

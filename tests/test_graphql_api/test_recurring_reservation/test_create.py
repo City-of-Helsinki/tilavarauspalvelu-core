@@ -6,7 +6,6 @@ from common.date_utils import local_date
 from reservation_units.enums import ReservationStartInterval
 from reservations.models import RecurringReservation
 from tests.factories import AbilityGroupFactory, AgeGroupFactory, ReservationUnitFactory
-from tests.helpers import UserType
 
 from .helpers import CREATE_MUTATION, get_minimal_create_date
 
@@ -20,7 +19,7 @@ def test_recurring_reservations__create__full_data(graphql):
     ability_group = AbilityGroupFactory.create()
     age_group = AgeGroupFactory.create()
     reservation_unit = ReservationUnitFactory.create()
-    user = graphql.login_user_based_on_type(UserType.SUPERUSER)
+    user = graphql.login_with_superuser()
 
     data = get_minimal_create_date(reservation_unit)
     data["name"] = "foo"
@@ -50,7 +49,7 @@ def test_recurring_reservations__create__full_data(graphql):
 def test_recurring_reservations__create__end_time_before_begin_time(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = get_minimal_create_date(reservation_unit)
     data["endTime"] = "09:00:00"
@@ -65,7 +64,7 @@ def test_recurring_reservations__create__end_time_before_begin_time(graphql):
 def test_recurring_reservations__create__end_time_same_as_begin_time(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = get_minimal_create_date(reservation_unit)
     data["endTime"] = "10:00:00"
@@ -80,7 +79,7 @@ def test_recurring_reservations__create__end_time_same_as_begin_time(graphql):
 def test_recurring_reservations__create__end_date_before_begin_date(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = get_minimal_create_date(reservation_unit)
     data["endDate"] = "2022-12-31"
@@ -105,7 +104,7 @@ def test_recurring_reservations__create__end_date_before_begin_date(graphql):
 def test_recurring_reservations__create__missing_required_fields(graphql, field):
     reservation_unit = ReservationUnitFactory.create()
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = get_minimal_create_date(reservation_unit)
     del data[field]
@@ -119,7 +118,7 @@ def test_recurring_reservations__create__missing_required_fields(graphql, field)
 def test_recurring_reservations__create__description_can_be_empty(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = get_minimal_create_date(reservation_unit)
     data["description"] = ""
@@ -134,7 +133,7 @@ def test_recurring_reservations__create__description_can_be_empty(graphql):
 def test_recurring_reservations__create__recurrence_in_days_not_in_allowed_values(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = get_minimal_create_date(reservation_unit)
     data["recurrenceInDays"] = 1
@@ -151,7 +150,7 @@ def test_recurring_reservations__create__start_interval_not_allowed(graphql):
         reservation_start_interval=ReservationStartInterval.INTERVAL_15_MINUTES,
     )
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = get_minimal_create_date(reservation_unit)
     data["beginTime"] = "09:00:01"
@@ -168,7 +167,7 @@ def test_recurring_reservations__create__start_interval_not_allowed(graphql):
 def test_recurring_reservations__create__end_date_too_far(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = get_minimal_create_date(reservation_unit)
     data["endDate"] = (local_date() + datetime.timedelta(days=365 * 3 + 1)).isoformat()

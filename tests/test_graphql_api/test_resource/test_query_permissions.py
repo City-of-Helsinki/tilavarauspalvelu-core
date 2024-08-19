@@ -1,7 +1,6 @@
 import pytest
 
 from tests.factories import ResourceFactory, UnitGroupFactory, UserFactory
-from tests.helpers import UserType
 
 from .helpers import resources_query
 
@@ -14,7 +13,7 @@ pytestmark = [
 def test_resources__filter__only_with_permissions__regular_user(graphql):
     ResourceFactory.create()
 
-    graphql.login_user_based_on_type(UserType.REGULAR)
+    graphql.login_with_regular_user()
 
     query = resources_query(only_with_permission=True)
     response = graphql(query)
@@ -26,7 +25,7 @@ def test_resources__filter__only_with_permissions__regular_user(graphql):
 def test_resources__filter__only_with_permissions__general_admin__can_manage_resources(graphql):
     resource = ResourceFactory.create()
 
-    user = UserFactory.create_with_general_permissions(perms=["can_manage_resources"])
+    user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     query = resources_query(only_with_permission=True)
@@ -41,10 +40,7 @@ def test_resources__filter__only_with_permissions__unit_admin__can_manage_resour
     resource_1 = ResourceFactory.create()
     ResourceFactory.create()
 
-    user = UserFactory.create_with_unit_permissions(
-        unit=resource_1.space.unit,
-        perms=["can_manage_resources"],
-    )
+    user = UserFactory.create_with_unit_role(units=[resource_1.space.unit])
     graphql.force_login(user)
 
     query = resources_query(only_with_permission=True)
@@ -61,10 +57,7 @@ def test_resources__filter__only_with_permissions__unit_group_admin__can_manage_
 
     unit_group = UnitGroupFactory.create(units=[resource_1.space.unit])
 
-    user = UserFactory.create_with_unit_group_permissions(
-        unit_group=unit_group,
-        perms=["can_manage_resources"],
-    )
+    user = UserFactory.create_with_unit_role(unit_groups=[unit_group])
     graphql.force_login(user)
 
     query = resources_query(only_with_permission=True)

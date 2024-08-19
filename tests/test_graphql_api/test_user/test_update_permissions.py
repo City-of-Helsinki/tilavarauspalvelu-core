@@ -1,8 +1,8 @@
 import pytest
 from graphene_django_extensions.testing import build_mutation
 
+from permissions.enums import UserRoleChoice
 from tests.factories import UserFactory
-from tests.helpers import UserType
 
 # Applied to all tests
 pytestmark = [
@@ -14,8 +14,7 @@ UPDATE_MUTATION = build_mutation("updateUser", "UserUpdateMutation")
 
 
 def test_user__update__anonymous_user(graphql):
-    user = UserFactory.create_staff_user()
-    graphql.login_user_based_on_type(UserType.ANONYMOUS)
+    user = UserFactory.create()
 
     data = {"pk": user.pk, "reservationNotification": "NONE"}
     response = graphql(UPDATE_MUTATION, input_data=data)
@@ -24,8 +23,8 @@ def test_user__update__anonymous_user(graphql):
 
 
 def test_user__update__cannot_update_other_user(graphql):
-    user = UserFactory.create_staff_user()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    user = UserFactory.create()
+    graphql.login_with_superuser()
 
     data = {"pk": user.pk, "reservationNotification": "NONE"}
     response = graphql(UPDATE_MUTATION, input_data=data)
@@ -34,7 +33,7 @@ def test_user__update__cannot_update_other_user(graphql):
 
 
 def test_user__update__regular_user(graphql):
-    user = graphql.login_user_based_on_type(UserType.REGULAR)
+    user = graphql.login_with_regular_user()
 
     data = {"pk": user.pk, "reservationNotification": "NONE"}
     response = graphql(UPDATE_MUTATION, input_data=data)
@@ -42,8 +41,8 @@ def test_user__update__regular_user(graphql):
     assert response.error_message() == "No permission to update."
 
 
-def test_user__update__staff_user(graphql):
-    user = graphql.login_user_based_on_type(UserType.STAFF)
+def test_user__update__admin_user(graphql):
+    user = graphql.login_user_with_role(role=UserRoleChoice.ADMIN)
 
     data = {"pk": user.pk, "reservationNotification": "NONE"}
     response = graphql(UPDATE_MUTATION, input_data=data)
@@ -55,7 +54,7 @@ def test_user__update__staff_user(graphql):
 
 
 def test_user__update__superuser(graphql):
-    user = graphql.login_user_based_on_type(UserType.SUPERUSER)
+    user = graphql.login_with_superuser()
 
     data = {"pk": user.pk, "reservationNotification": "NONE"}
     response = graphql(UPDATE_MUTATION, input_data=data)

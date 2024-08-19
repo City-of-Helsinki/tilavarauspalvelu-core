@@ -3,7 +3,6 @@ from enum import Enum
 import pytest
 
 from tests.factories import ReservationFactory, ReservationUnitFactory, UnitFactory, UnitGroupFactory
-from tests.helpers import UserType
 
 from .helpers import units_query
 
@@ -15,7 +14,7 @@ pytestmark = [
 
 def test_units__query(graphql):
     unit = UnitFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     fields = """
         pk
@@ -84,7 +83,7 @@ def test_units__query__unit_groups_alphabetical_order(graphql):
     unit_group_2 = UnitGroupFactory.create(units=[unit], name="XXX")
     unit_group_3 = UnitGroupFactory.create(units=[unit], name="ABC")
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     fields = """
         pk
         unitGroups {
@@ -110,7 +109,7 @@ def test_units__query__unit_groups__no_permissions(graphql):
     unit = UnitFactory.create()
     UnitGroupFactory.create(units=[unit], name="AAA")
 
-    graphql.login_user_based_on_type(UserType.REGULAR)
+    graphql.login_with_regular_user()
     fields = """
         pk
         unitGroups {

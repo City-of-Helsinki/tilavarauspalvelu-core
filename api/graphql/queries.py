@@ -22,17 +22,7 @@ from .types.keyword.types import KeywordCategoryNode, KeywordGroupNode, KeywordN
 from .types.location.types import LocationNode
 from .types.merchants.types import PaymentMerchantNode, PaymentOrderNode, PaymentProductNode
 from .types.organisation.types import OrganisationNode
-from .types.permissions.types import (
-    GeneralRoleChoiceNode,
-    GeneralRoleNode,
-    GeneralRolePermissionNode,
-    ServiceSectorRoleChoiceNode,
-    ServiceSectorRoleNode,
-    ServiceSectorRolePermissionNode,
-    UnitRoleChoiceNode,
-    UnitRoleNode,
-    UnitRolePermissionNode,
-)
+from .types.permissions.types import GeneralRoleNode, UnitRoleNode
 from .types.person.types import PersonNode
 from .types.purpose.types import PurposeNode
 from .types.qualifier.types import QualifierNode
@@ -75,9 +65,7 @@ __all__ = [
     "CityNode",
     "EquipmentCategoryNode",
     "EquipmentNode",
-    "GeneralRoleChoiceNode",
     "GeneralRoleNode",
-    "GeneralRolePermissionNode",
     "HelsinkiProfileDataNode",
     "KeywordCategoryNode",
     "KeywordGroupNode",
@@ -108,17 +96,12 @@ __all__ = [
     "ResourceNode",
     "ServiceNode",
     "ServiceSectorNode",
-    "ServiceSectorRoleChoiceNode",
-    "ServiceSectorRoleNode",
-    "ServiceSectorRolePermissionNode",
     "SpaceNode",
     "SuitableTimeRangeNode",
     "TaxPercentageNode",
     "TermsOfUseNode",
     "UnitGroupNode",
     "UnitNode",
-    "UnitRoleChoiceNode",
     "UnitRoleNode",
-    "UnitRolePermissionNode",
     "UserNode",
 ]

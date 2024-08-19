@@ -4,7 +4,6 @@ import pytest
 
 from reservation_units.enums import ReservationUnitImageType
 from tests.factories import ReservationUnitFactory
-from tests.helpers import UserType
 
 from .helpers import CREATE_MUTATION
 
@@ -20,7 +19,7 @@ pytestmark = [
 def test_reservation_unit_image__create__regular_user(graphql, mock_png):
     reservation_unit = ReservationUnitFactory.create()
 
-    graphql.login_user_based_on_type(UserType.REGULAR)
+    graphql.login_with_regular_user()
 
     data = {
         "image": mock_png,

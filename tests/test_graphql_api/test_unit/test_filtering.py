@@ -7,7 +7,6 @@ from graphene_django_extensions.testing import build_query
 
 from reservation_units.enums import ReservationKind
 from tests.factories import ReservationFactory, ReservationUnitFactory, ServiceSectorFactory, UnitFactory, UserFactory
-from tests.helpers import UserType
 
 from .helpers import units_query
 
@@ -22,7 +21,7 @@ def test_units__filter__by_name(graphql):
     UnitFactory.create(name_fi="2222")
     UnitFactory.create(name_fi="3333")
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     response = graphql(units_query(nameFi="111"))
 
     assert response.has_errors is False
@@ -37,7 +36,7 @@ def test_units__filter__by_service_sector(graphql):
     UnitFactory.create()
     sector = ServiceSectorFactory.create(units=[unit])
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     response = graphql(units_query(service_sector=sector.pk))
 
     assert response.has_errors is False
@@ -64,7 +63,7 @@ def test_units__filter__by_published_reservation_units(graphql):
     ReservationUnitFactory.create(is_archived=True, unit=unit_4)
     ReservationUnitFactory.create(publish_begins=publish_date + datetime.timedelta(days=30), unit=unit_4)
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     query = build_query("units", connection=True, published_reservation_units=True, order_by="nameFiAsc")
     response = graphql(query)

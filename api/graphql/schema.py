@@ -13,9 +13,8 @@ from query_optimizer.compiler import optimize
 
 from applications.models import AllocatedTimeSlot
 from common.models import BannerNotification
-from common.typing import GQLInfo
+from common.typing import AnyUser, GQLInfo
 from merchants.models import PaymentOrder
-from permissions.helpers import can_manage_banner_notifications
 from reservations.models import Reservation
 from users.helauth.clients import HelsinkiProfileClient
 from users.helauth.typing import UserProfileInfo
@@ -240,8 +239,8 @@ class Query(graphene.ObjectType):
         return None
 
     def resolve_banner_notifications(root: None, info: GQLInfo, **kwargs: Any):
-        can_see_all = can_manage_banner_notifications(info.context.user)
-        if can_see_all:
+        user: AnyUser = info.context.user
+        if user.permissions.can_manage_notifications():
             return BannerNotification.objects.all()
         if kwargs.get("is_visible", False):
             return BannerNotification.objects.visible(info.context.user)

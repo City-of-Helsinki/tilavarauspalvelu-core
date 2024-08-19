@@ -567,9 +567,7 @@ def test_reservation_unit__filter__only_with_permission__general_admin(graphql):
     reservation_unit_1 = ReservationUnitFactory.create()
     reservation_unit_2 = ReservationUnitFactory.create()
 
-    user = UserFactory.create_with_general_permissions(
-        perms=["can_manage_reservations"],
-    )
+    user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     query = reservation_units_query(onlyWithPermission=True)
@@ -585,10 +583,7 @@ def test_reservation_unit__filter__only_with_permission__unit_admin(graphql):
     reservation_unit = ReservationUnitFactory.create()
     ReservationUnitFactory.create()
 
-    user = UserFactory.create_with_unit_permissions(
-        unit=reservation_unit.unit,
-        perms=["can_manage_reservations"],
-    )
+    user = UserFactory.create_with_unit_role(units=[reservation_unit.unit])
     graphql.force_login(user)
 
     query = reservation_units_query(onlyWithPermission=True)

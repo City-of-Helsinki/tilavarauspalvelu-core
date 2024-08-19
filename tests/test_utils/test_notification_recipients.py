@@ -13,15 +13,13 @@ def test_get_staff_get_notification_recipients__all_and_handling_required():
     reservation_unit_1 = ReservationUnitFactory.create()
     reservation_unit_2 = ReservationUnitFactory.create()
 
-    unit_admin_1 = UserFactory.create_with_unit_permissions(
-        unit=reservation_unit_1.unit,
+    unit_admin_1 = UserFactory.create_with_unit_role(
+        units=[reservation_unit_1.unit],
         reservation_notification=ReservationNotification.ALL,
-        perms=["can_manage_reservations"],
     )
-    unit_admin_2 = UserFactory.create_with_unit_permissions(
-        unit=reservation_unit_1.unit,
+    unit_admin_2 = UserFactory.create_with_unit_role(
+        units=[reservation_unit_1.unit],
         reservation_notification=ReservationNotification.ONLY_HANDLING_REQUIRED,
-        perms=["can_manage_reservations"],
     )
     UserFactory.create(reservation_notification=ReservationNotification.NONE)
 
@@ -41,15 +39,13 @@ def test_get_staff_get_notification_recipients__only_handling_required():
     reservation_unit_1 = ReservationUnitFactory.create()
     reservation_unit_2 = ReservationUnitFactory.create()
 
-    UserFactory.create_with_unit_permissions(
-        unit=reservation_unit_1.unit,
+    UserFactory.create_with_unit_role(
+        units=[reservation_unit_1.unit],
         reservation_notification=ReservationNotification.ALL,
-        perms=["can_manage_reservations"],
     )
-    unit_admin = UserFactory.create_with_unit_permissions(
-        unit=reservation_unit_1.unit,
+    unit_admin = UserFactory.create_with_unit_role(
+        units=[reservation_unit_1.unit],
         reservation_notification=ReservationNotification.ONLY_HANDLING_REQUIRED,
-        perms=["can_manage_reservations"],
     )
     UserFactory.create(reservation_notification=ReservationNotification.NONE)
 
@@ -68,15 +64,13 @@ def test_get_staff_get_notification_recipients__dont_include_reservation_recipie
     reservation_unit_1 = ReservationUnitFactory.create()
     reservation_unit_2 = ReservationUnitFactory.create()
 
-    UserFactory.create_with_unit_permissions(
-        unit=reservation_unit_1.unit,
+    UserFactory.create_with_unit_role(
+        units=[reservation_unit_1.unit],
         reservation_notification=ReservationNotification.ALL,
-        perms=["can_manage_reservations"],
     )
-    unit_admin_1 = UserFactory.create_with_unit_permissions(
-        unit=reservation_unit_1.unit,
+    unit_admin_1 = UserFactory.create_with_unit_role(
+        units=[reservation_unit_1.unit],
         reservation_notification=ReservationNotification.ONLY_HANDLING_REQUIRED,
-        perms=["can_manage_reservations"],
     )
     unit_admin_2 = UserFactory.create(reservation_notification=ReservationNotification.NONE)
 

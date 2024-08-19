@@ -45,7 +45,7 @@ def test_reservation__staff_update__reservation_block_whole_day(graphql):
         state=ReservationStateChoice.CONFIRMED.value,
     )
 
-    user = UserFactory.create_with_unit_permissions(reservation_unit.unit, perms=["can_manage_reservations"])
+    user = UserFactory.create_with_unit_role(units=[reservation_unit.unit])
     graphql.force_login(user)
 
     input_data = {
@@ -85,7 +85,7 @@ def test_reservation__staff_update__reservation_block_whole_day__ignore_given_bu
         state=ReservationStateChoice.CONFIRMED.value,
     )
 
-    user = UserFactory.create_with_unit_permissions(reservation_unit.unit, perms=["can_manage_reservations"])
+    user = UserFactory.create_with_unit_role(units=[reservation_unit.unit])
     graphql.force_login(user)
 
     input_data = {

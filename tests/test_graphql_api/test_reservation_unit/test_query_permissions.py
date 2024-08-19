@@ -12,7 +12,6 @@ from tests.factories import (
     UserFactory,
 )
 from tests.factories.application_round_time_slot import ApplicationRoundTimeSlotFactory
-from tests.helpers import UserType
 from users.models import PersonalInfoViewLog
 
 from .helpers import reservation_units_query
@@ -23,33 +22,29 @@ pytestmark = [
 ]
 
 
-@pytest.mark.parametrize(
-    ("user_type", "expected_timeslots"),
-    [
-        (UserType.ANONYMOUS, 1),
-        (UserType.REGULAR, 1),
-        (UserType.STAFF, 1),
-        (UserType.SUPERUSER, 1),
-    ],
-)
-def test_reservation_unit__query__permissions_by_user_type(graphql, user_type, expected_timeslots):
-    # given:
-    # - There is a reservation unit with timeslots
-    # - The specified user is using the system
+def test_reservation_unit__query__anonymous_user(graphql):
     reservation_unit = ReservationUnitFactory.create()
     ApplicationRoundTimeSlotFactory.create(reservation_unit=reservation_unit)
-    graphql.login_user_based_on_type(user_type)
 
-    # when:
-    # - The reservation unit timeslots are queried
     fields = "applicationRoundTimeSlots { weekday closed reservableTimes { begin end } }"
     query = reservation_units_query(fields=fields)
     response = graphql(query)
 
-    # then:
-    # - The response contains the application round timeslots
     assert response.has_errors is False, response
-    assert len(response.edges) == expected_timeslots
+    assert len(response.edges) == 1
+
+
+def test_reservation_unit__query__regular_user(graphql):
+    reservation_unit = ReservationUnitFactory.create()
+    ApplicationRoundTimeSlotFactory.create(reservation_unit=reservation_unit)
+    graphql.login_with_regular_user()
+
+    fields = "applicationRoundTimeSlots { weekday closed reservableTimes { begin end } }"
+    query = reservation_units_query(fields=fields)
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1
 
 
 SENSITIVE_FIELDS = """
@@ -191,7 +186,7 @@ def test_reservation_unit__query__sensitive_information__general_admin(graphql):
         working_memo="Working Memo",
     )
 
-    admin = UserFactory.create_with_general_permissions(perms=["can_view_reservations"])
+    admin = UserFactory.create_with_general_role()
     graphql.force_login(admin)
 
     query = reservation_units_query(fields=SENSITIVE_FIELDS)

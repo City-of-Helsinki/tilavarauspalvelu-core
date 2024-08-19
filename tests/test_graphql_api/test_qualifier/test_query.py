@@ -2,7 +2,6 @@ import pytest
 from graphene_django_extensions.testing import build_query
 
 from tests.factories import QualifierFactory
-from tests.helpers import UserType
 
 # Applied to all tests
 pytestmark = [
@@ -13,7 +12,7 @@ pytestmark = [
 def test_purpose__query(graphql):
     qualifier = QualifierFactory.create()
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     fields = """
         pk

@@ -1,7 +1,7 @@
 import pytest
 
+from permissions.enums import UserRoleChoice
 from tests.factories import AllocatedTimeSlotFactory
-from tests.helpers import UserType
 from tests.test_graphql_api.test_application.helpers import applications_query
 
 from .helpers import allocations_query
@@ -12,12 +12,12 @@ pytestmark = [
 ]
 
 
-def test_allocated_time_slot__query__perms__staff_user(graphql):
+def test_allocated_time_slot__query__perms__admin_user(graphql):
     # given:
     # - There is an allocated time slot
     # - A staff user is using the system
     allocation = AllocatedTimeSlotFactory.create()
-    graphql.login_user_based_on_type(UserType.STAFF)
+    graphql.login_user_with_role(role=UserRoleChoice.ADMIN)
 
     # when:
     # - User tries to access allocated time slots
@@ -81,7 +81,7 @@ def test_allocated_time_slot__query__perms__regular_user(graphql):
     # - There is an allocated time slot
     # - A regular user is using the system
     AllocatedTimeSlotFactory.create()
-    graphql.login_user_based_on_type(UserType.REGULAR)
+    graphql.login_with_regular_user()
 
     # when:
     # - User tries to access allocated time slots

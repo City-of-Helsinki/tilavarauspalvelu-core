@@ -2,7 +2,6 @@ import pytest
 from graphene_django_extensions.testing import build_query
 
 from tests.factories import TermsOfUseFactory
-from tests.helpers import UserType
 
 # Applied to all tests
 pytestmark = [
@@ -12,7 +11,7 @@ pytestmark = [
 
 def test_terms_of_use__query(graphql):
     terms_of_use = TermsOfUseFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     fields = """
         pk

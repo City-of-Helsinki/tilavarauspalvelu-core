@@ -4,7 +4,6 @@ import pytest
 from graphene_django_extensions.testing import build_query
 
 from tests.factories import AgeGroupFactory
-from tests.helpers import UserType
 
 # Applied to all tests
 pytestmark = [
@@ -20,7 +19,7 @@ def test_age_group__query__all_fields(graphql):
     # - A superuser is using the system
     group_1 = AgeGroupFactory()
     group_2 = AgeGroupFactory()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - The user queries for age groups with all fields
@@ -54,7 +53,7 @@ def test_age_group__query__regular_user(graphql):
     # - Regular user is using the system
     group_1 = AgeGroupFactory()
     group_2 = AgeGroupFactory()
-    graphql.login_user_based_on_type(UserType.REGULAR)
+    graphql.login_with_regular_user()
 
     # when:
     # - The user queries for age groups
@@ -75,7 +74,6 @@ def test_age_group__query__anonymized(graphql):
     # - An anonymized user is using the system
     group_1 = AgeGroupFactory()
     group_2 = AgeGroupFactory()
-    graphql.login_user_based_on_type(UserType.ANONYMOUS)
 
     # when:
     # - The user queries for age groups

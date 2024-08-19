@@ -11,31 +11,17 @@ from django.conf import settings
 from django.utils.crypto import get_random_string
 from social_django.models import UserSocialAuth
 
-from permissions.models import GeneralPermissionChoices, ServiceSectorPermissionsChoices, UnitPermissionChoices
-from spaces.models import ServiceSector, Unit, UnitGroup
+from permissions.enums import UserRoleChoice
+from spaces.models import Unit, UnitGroup
 from users.helauth.typing import IDToken
 from users.models import User
 
 from ._base import GenericDjangoModelFactory
-from .role import (
-    GeneralRoleChoiceFactory,
-    GeneralRoleFactory,
-    GeneralRolePermissionFactory,
-    ServiceSectorRoleChoiceFactory,
-    ServiceSectorRoleFactory,
-    ServiceSectorRolePermissionFactory,
-    UnitRoleChoiceFactory,
-    UnitRoleFactory,
-    UnitRolePermissionFactory,
-)
+from .permissions import GeneralRoleFactory, UnitRoleFactory
 
 __all__ = [
     "UserFactory",
     "UserSocialAuthFactory",
-    "add_general_permissions",
-    "add_service_sector_permissions",
-    "add_unit_group_permissions",
-    "add_unit_permissions",
 ]
 
 
@@ -56,97 +42,24 @@ class UserFactory(GenericDjangoModelFactory[User]):
         return cls.create(is_superuser=True, is_staff=True, **kwargs)
 
     @classmethod
-    def create_staff_user(cls, **kwargs: Any) -> User:
-        # User considered staff user if they have any role
-        return cls.create_with_general_permissions(perms=[GeneralPermissionChoices.CAN_MANAGE_GENERAL_ROLES], **kwargs)
-
-    @classmethod
-    def create_with_general_permissions(
-        cls,
-        *,
-        perms: Iterable[str] = (),
-        code: str = "test-admin",
-        **kwargs: Any,
-    ) -> User:
-        diff = set(perms).difference(GeneralPermissionChoices.values)
-        if diff:
-            raise RuntimeError(f"Invalid perms: {diff}")
-
+    def create_with_general_role(cls, *, role: UserRoleChoice = UserRoleChoice.ADMIN, **kwargs: Any) -> User:
         user = cls.create(**kwargs)
-
-        choice = GeneralRoleChoiceFactory.create(code=code)
-        GeneralRoleFactory.create(role=choice, user=user)
-        for perm in perms:
-            GeneralRolePermissionFactory.create(role=choice, permission=perm)
-
+        GeneralRoleFactory.create(role=role, user=user)
         return user
 
     @classmethod
-    def create_with_service_sector_permissions(
+    def create_with_unit_role(
         cls,
-        service_sector: ServiceSector,
         *,
-        perms: Iterable[str] = (),
-        code: str = "test-admin",
+        units: Iterable[Unit] = (),
+        unit_groups: Iterable[UnitGroup] = (),
+        role: UserRoleChoice = UserRoleChoice.ADMIN,
         **kwargs: Any,
     ) -> User:
-        diff = set(perms).difference(ServiceSectorPermissionsChoices.values)
-        if diff:
-            raise RuntimeError(f"Invalid perms: {diff}")
-
         user = cls.create(**kwargs)
-
-        choice = ServiceSectorRoleChoiceFactory.create(code=code)
-        ServiceSectorRoleFactory.create(role=choice, service_sector=service_sector, user=user)
-        for perm in perms:
-            ServiceSectorRolePermissionFactory.create(role=choice, permission=perm)
-
-        return user
-
-    @classmethod
-    def create_with_unit_permissions(
-        cls,
-        unit: Unit,
-        *,
-        perms: Iterable[str] = (),
-        code: str = "test-admin",
-        **kwargs: Any,
-    ) -> User:
-        diff = set(perms).difference(UnitPermissionChoices.values)
-        if diff:
-            raise RuntimeError(f"Invalid perms: {diff}")
-
-        user = cls.create(**kwargs)
-
-        choice = UnitRoleChoiceFactory.create(code=code)
-        role = UnitRoleFactory.create(role=choice, user=user)
-        role.unit.add(unit)
-        for perm in perms:
-            UnitRolePermissionFactory.create(role=choice, permission=perm)
-
-        return user
-
-    @classmethod
-    def create_with_unit_group_permissions(
-        cls,
-        unit_group: UnitGroup,
-        *,
-        perms: Iterable[str] = (),
-        code: str = "test-admin",
-        **kwargs: Any,
-    ) -> User:
-        diff = set(perms).difference(UnitPermissionChoices.values)
-        if diff:
-            raise RuntimeError(f"Invalid perms: {diff}")
-
-        user = cls.create(**kwargs)
-
-        choice = UnitRoleChoiceFactory.create(code=code)
-        role = UnitRoleFactory.create(role=choice, user=user)
-        role.unit_group.add(unit_group)
-        for perm in perms:
-            UnitRolePermissionFactory.create(role=choice, permission=perm)
-
+        unit_role = UnitRoleFactory.create(role=role, user=user)
+        unit_role.units.add(*units)
+        unit_role.unit_groups.add(*unit_groups)
         return user
 
     @factory.post_generation
@@ -227,38 +140,3 @@ def get_id_token(
             get_random_string(100),
         ]
     )
-
-
-def add_general_permissions(user: User, perms: list[str], code: str = "admin") -> None:
-    choice = GeneralRoleChoiceFactory.create(code=code)
-    GeneralRoleFactory.create(role=choice, user=user)
-    for perm in perms:
-        GeneralRolePermissionFactory.create(role=choice, permission=perm)
-
-
-def add_unit_permissions(user: User, unit: Unit, perms: list[str], code: str = "admin") -> None:
-    choice = UnitRoleChoiceFactory.create(code=code)
-    role = UnitRoleFactory.create(role=choice, user=user)
-    role.unit.add(unit)
-    for perm in perms:
-        UnitRolePermissionFactory.create(role=choice, permission=perm)
-
-
-def add_unit_group_permissions(user: User, unit_group: UnitGroup, perms: list[str], code: str = "admin") -> None:
-    choice = UnitRoleChoiceFactory.create(code=code)
-    role = UnitRoleFactory.create(role=choice, user=user)
-    role.unit_group.add(unit_group)
-    for perm in perms:
-        UnitRolePermissionFactory.create(role=choice, permission=perm)
-
-
-def add_service_sector_permissions(
-    user: User,
-    service_sector: ServiceSector,
-    perms: list[str],
-    code: str = "admin",
-) -> None:
-    choice = ServiceSectorRoleChoiceFactory.create(code=code)
-    ServiceSectorRoleFactory.create(role=choice, user=user, service_sector=service_sector)
-    for perm in perms:
-        ServiceSectorRolePermissionFactory.create(role=choice, permission=perm)

@@ -1,6 +1,7 @@
 import pytest
 
 from email_notification.models import EmailType
+from permissions.enums import UserRoleChoice
 from reservations.enums import ReservationStateChoice
 from tests.factories import EmailTemplateFactory, ReservationFactory, UnitFactory, UserFactory
 from users.models import ReservationNotification
@@ -25,9 +26,8 @@ def test_reservation__handling_required__allowed_states(graphql, outbox, setting
     reservation = ReservationFactory.create_for_handling_required(state=state)
 
     # Admin will get notification
-    UserFactory.create_with_unit_permissions(
-        unit=reservation.reservation_unit.first().unit,
-        perms=["can_manage_reservations"],
+    UserFactory.create_with_unit_role(
+        units=[reservation.reservation_unit.first().unit],
         reservation_notification=ReservationNotification.ALL,
     )
 
@@ -62,9 +62,8 @@ def test_reservation__handling_required__disallowed_states(graphql, state):
     reservation = ReservationFactory.create_for_handling_required(state=state)
 
     # Admin will get notification
-    UserFactory.create_with_unit_permissions(
-        unit=reservation.reservation_unit.first().unit,
-        perms=["can_manage_reservations"],
+    UserFactory.create_with_unit_role(
+        units=[reservation.reservation_unit.first().unit],
         reservation_notification=ReservationNotification.ALL,
     )
 
@@ -96,10 +95,7 @@ def test_reservation__handling_required__regular_user(graphql):
 
 def test_reservation__handling_required__unit_reserver__own_reservation(graphql):
     unit = UnitFactory.create()
-    admin = UserFactory.create_with_unit_permissions(
-        unit=unit,
-        perms=["can_create_staff_reservations"],
-    )
+    admin = UserFactory.create_with_unit_role(units=[unit])
     reservation = ReservationFactory.create_for_handling_required(user=admin, reservation_unit__unit=unit)
 
     graphql.force_login(admin)
@@ -114,10 +110,7 @@ def test_reservation__handling_required__unit_reserver__own_reservation(graphql)
 
 def test_reservation__handling_required__unit_reserver__other_user_reservation(graphql):
     unit = UnitFactory.create()
-    admin = UserFactory.create_with_unit_permissions(
-        unit=unit,
-        perms=["can_create_staff_reservations"],
-    )
+    admin = UserFactory.create_with_unit_role(units=[unit], role=UserRoleChoice.RESERVER)
     reservation = ReservationFactory.create_for_handling_required(reservation_unit__unit=unit)
 
     graphql.force_login(admin)

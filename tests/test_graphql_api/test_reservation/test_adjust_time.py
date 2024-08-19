@@ -359,7 +359,7 @@ def test_reservation__adjust_time__unit_admin_can_adjust_user_reservation(graphq
     reservation_end = reservation.end
 
     unit = reservation.reservation_unit.first().unit
-    admin = UserFactory.create_with_unit_permissions(unit=unit, perms=["can_manage_reservations"])
+    admin = UserFactory.create_with_unit_role(units=[unit])
     graphql.force_login(admin)
 
     data = get_adjust_data(reservation)
@@ -393,7 +393,7 @@ def test_reservation__adjust_time__needs_handling_after_time_change(graphql, out
 
     # Staff user will receive email about the reservation requiring handling
     unit = reservation.reservation_unit.first().unit
-    UserFactory.create_with_unit_permissions(unit=unit, perms=["can_manage_reservations"])
+    UserFactory.create_with_unit_role(units=[unit])
 
     graphql.login_with_superuser()
     data = get_adjust_data(reservation)
@@ -433,7 +433,7 @@ def test_reservation__update__reservation_block_whole_day__ignore_given_buffers(
         handled_at=None,
     )
 
-    user = UserFactory.create_with_unit_permissions(reservation_unit.unit, perms=["can_manage_reservations"])
+    user = UserFactory.create_with_unit_role(units=[reservation_unit.unit])
     graphql.force_login(user)
 
     input_data = {
@@ -481,7 +481,7 @@ def test_reservation__update__update_reservation_buffer_on_adjust(graphql):
     reservation_unit.buffer_time_after = timedelta(hours=2)
     reservation_unit.save()
 
-    user = UserFactory.create_with_unit_permissions(reservation_unit.unit, perms=["can_manage_reservations"])
+    user = UserFactory.create_with_unit_role(units=[reservation_unit.unit])
     graphql.force_login(user)
 
     input_data = {

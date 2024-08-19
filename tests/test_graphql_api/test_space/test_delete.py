@@ -3,7 +3,6 @@ import pytest
 from applications.enums import ApplicationRoundStatusChoice
 from spaces.models import Space
 from tests.factories import ApplicationRoundFactory, SpaceFactory
-from tests.helpers import UserType
 
 from .helpers import DELETE_MUTATION
 
@@ -18,7 +17,7 @@ def test_delete_space(graphql):
     # - There is a space
     # - A superuser is using the system
     space = SpaceFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     pk = space.pk
 
     # when:
@@ -50,7 +49,7 @@ def test_space_not_deleted_because_in_active_application_round(graphql, status):
     # - A superuser is using the system
     space = SpaceFactory.create()
     ApplicationRoundFactory.create_in_status(status=status, reservation_units__spaces=[space])
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     pk = space.pk
 
     # when:

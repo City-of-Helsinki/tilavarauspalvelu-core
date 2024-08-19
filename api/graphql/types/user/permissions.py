@@ -4,8 +4,6 @@ from typing import TYPE_CHECKING, Any
 
 from graphene_django_extensions.permissions import BasePermission
 
-from permissions.helpers import can_view_users
-
 if TYPE_CHECKING:
     from query_optimizer.typing import GraphQLFilterInfo
 
@@ -20,9 +18,7 @@ __all__ = [
 class UserPermission(BasePermission):
     @classmethod
     def has_node_permission(cls, instance: User, user: AnyUser, filters: dict[str, Any]) -> bool:
-        if user.is_anonymous:
-            return False
-        return instance == user or can_view_users(user)
+        return user.permissions.can_view_user(instance)
 
     @classmethod
     def has_filter_permission(cls, user: AnyUser, filters: GraphQLFilterInfo) -> bool:
@@ -34,8 +30,6 @@ class UserPermission(BasePermission):
 
     @classmethod
     def has_update_permission(cls, instance: User, user: AnyUser, input_data: dict[str, Any]) -> bool:
-        if user.is_anonymous:
+        if user != instance:  # Can only update self.
             return False
-        if user != instance:
-            return False
-        return user.has_staff_permissions
+        return user.permissions.has_any_role()

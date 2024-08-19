@@ -12,10 +12,8 @@ pytestmark = [
 
 def test_user__query__unit_admin_read_other(graphql):
     user = UserFactory.create()
-    admin = UserFactory.create_with_unit_permissions(
-        unit=UnitFactory.create(),
-        perms=["can_view_users"],
-    )
+    unit = UnitFactory.create()
+    admin = UserFactory.create_with_unit_role(units=[unit])
     graphql.force_login(admin)
 
     global_id = to_global_id("UserNode", user.pk)

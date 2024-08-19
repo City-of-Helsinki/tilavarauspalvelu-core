@@ -28,7 +28,6 @@ from tests.factories import (
     TermsOfUseFactory,
     UserFactory,
 )
-from tests.helpers import UserType
 
 from .helpers import reservation_unit_query, reservation_units_query
 
@@ -571,7 +570,7 @@ def test_reservation_unit__query__state__published(graphql):
 
 def test_reservation_unit__query__reservation_blocks_whole_day(graphql):
     reservation_unit = ReservationUnitFactory.create(reservation_block_whole_day=True)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     query = reservation_units_query(fields="pk reservationBlockWholeDay")
     response = graphql(query)
@@ -591,7 +590,7 @@ def test_reservation_unit__query__timeslots(graphql):
     reservation_unit = ReservationUnitFactory.create()
     ApplicationRoundTimeSlotFactory.create(reservation_unit=reservation_unit, weekday=WeekdayChoice.MONDAY)
     ApplicationRoundTimeSlotFactory.create_closed(reservation_unit=reservation_unit, weekday=WeekdayChoice.WEDNESDAY)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - The reservation unit timeslots are queried
@@ -629,7 +628,7 @@ def test_reservation_unit__query__timeslots__not_found(graphql):
     # - There is a reservation unit without any timeslots
     # - A superuser is using the system
     ReservationUnitFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - The reservation unit timeslots are queried

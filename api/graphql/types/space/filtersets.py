@@ -3,8 +3,7 @@ from django.db import models
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import IntMultipleChoiceFilter
 
-from permissions.helpers import can_manage_spaces
-from permissions.models import UnitPermissionChoices
+from permissions.enums import UserRoleChoice
 from spaces.models import Space
 
 __all__ = [
@@ -34,13 +33,19 @@ class SpaceFilterSet(ModelFilterSet):
 
         user = self.request.user
 
-        if user.is_anonymous:
+        if user.is_anonymous or not user.is_active:
             return qs.none()
-        if user.is_superuser or can_manage_spaces(user):
+        if user.is_superuser:
             return qs
 
-        unit_permission = UnitPermissionChoices.CAN_MANAGE_SPACES.value
-        unit_ids = [pk for pk, perms in user.unit_permissions.items() if unit_permission in perms]
-        unit_group_ids = [pk for pk, perms in user.unit_group_permissions.items() if unit_permission in perms]
+        roles = UserRoleChoice.can_manage_reservation_units()
+        if user.permissions.has_general_role(role_choices=roles):
+            return qs
 
-        return qs.filter(models.Q(unit__in=unit_ids) | models.Q(unit__unit_groups__in=unit_group_ids)).distinct()
+        u_ids = user.permissions.unit_ids_where_has_role(role_choices=roles)
+        g_ids = user.permissions.unit_group_ids_where_has_role(role_choices=roles)
+
+        return qs.filter(
+            models.Q(unit__in=u_ids)  #
+            | models.Q(unit__unit_groups__in=g_ids),
+        ).distinct()

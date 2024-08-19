@@ -1,7 +1,6 @@
 import pytest
 
 from tests.factories import ApplicationRoundFactory
-from tests.helpers import UserType
 
 from .helpers import CREATE_MUTATION, get_application_create_data
 
@@ -16,7 +15,6 @@ def test_unauthenticated_cannot_create_application(graphql):
     # - There is an open application round
     # - An anonymous user is using the system
     application_round = ApplicationRoundFactory.create_in_status_open()
-    graphql.login_user_based_on_type(UserType.ANONYMOUS)
 
     # when:
     # - User tries to create a new application
@@ -33,7 +31,7 @@ def test_regular_user_can_create_application(graphql):
     # - There is an open application round
     # - A regular user is using the system
     application_round = ApplicationRoundFactory.create_in_status_open()
-    graphql.login_user_based_on_type(UserType.REGULAR)
+    graphql.login_with_regular_user()
 
     # when:
     # - User tries to create a new application

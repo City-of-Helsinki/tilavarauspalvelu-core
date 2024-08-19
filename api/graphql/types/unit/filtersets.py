@@ -8,8 +8,6 @@ from graphene_django_extensions.filters import IntMultipleChoiceFilter
 
 from api.graphql.types.unit.types import Unit
 from common.date_utils import local_datetime
-from permissions.helpers import has_any_general_permission
-from permissions.models import GeneralPermissionChoices
 from reservation_units.enums import ReservationKind
 from spaces.querysets.unit import UnitQuerySet
 
@@ -87,13 +85,15 @@ class UnitFilterSet(ModelFilterSet):
         user: AnyUser = self.request.user
         if user.is_anonymous:
             return qs.none()
-        if user.is_superuser or has_any_general_permission(user, GeneralPermissionChoices.required_for_unit):
+        if user.is_superuser:
+            return qs
+        if user.permissions.has_general_role():
             return qs
 
-        unit_ids = list(user.unit_permissions)
-        unit_group_ids = list(user.unit_group_permissions)
+        u_ids = list(user.unit_roles_map)
+        g_ids = list(user.unit_group_roles_map)
 
-        return qs.filter(Q(id__in=unit_ids) | Q(unit_groups__in=unit_group_ids)).distinct()
+        return qs.filter(Q(id__in=u_ids) | Q(unit_groups__in=g_ids)).distinct()
 
     def filter_by_own_reservations(self, qs: models.QuerySet, name: str, value: bool) -> models.QuerySet:
         user = self.request.user

@@ -1,7 +1,6 @@
 import pytest
 
 from tests.factories import ApplicationFactory
-from tests.helpers import UserType
 from users.models import PersonalInfoViewLog
 
 from .helpers import applications_query
@@ -18,7 +17,7 @@ def test_can_query_application__all_fields(graphql):
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft()
     section = application.application_sections.first()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     fields = """
         pk
@@ -98,7 +97,7 @@ def test_accessing_applicant_date_of_birth_creates_personal_info_view_log(graphq
     # - There is an application in the system
     # - A superuser is using the system
     ApplicationFactory.create_in_status_draft()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to access the date of birth of the applicant

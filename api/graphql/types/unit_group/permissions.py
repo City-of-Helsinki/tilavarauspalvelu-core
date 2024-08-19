@@ -12,11 +12,7 @@ __all__ = [
 class UnitGroupPermission(BasePermission):
     @classmethod
     def has_permission(cls, user: AnyUser) -> bool:
-        if user.is_anonymous:
-            return False
-        if user.is_superuser:
-            return True
-        return user.has_staff_permissions
+        return user.permissions.has_any_role()
 
     @classmethod
     def has_mutation_permission(cls, user: AnyUser, input_data: dict[str, Any]) -> bool:

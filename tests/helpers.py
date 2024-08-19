@@ -1,5 +1,4 @@
 from collections.abc import Callable
-from enum import Enum, auto
 from functools import wraps
 from typing import Any, NamedTuple, ParamSpec, TypeVar
 from unittest import mock
@@ -7,53 +6,26 @@ from unittest import mock
 from django.contrib.auth import get_user_model
 from graphene_django_extensions.testing import GraphQLClient as BaseGraphQLClient
 
+from permissions.enums import UserRoleChoice
+
 __all__ = [
     "GraphQLClient",
     "ResponseMock",
-    "UserType",
 ]
 
-from permissions.models import GeneralPermissionChoices
 
 TNamedTuple = TypeVar("TNamedTuple", bound=NamedTuple)
 
 User = get_user_model()
 
 
-class UserType(Enum):
-    ANONYMOUS = auto()
-    REGULAR = auto()
-    STAFF = auto()
-    SUPERUSER = auto()
-    NOTIFICATION_MANAGER = auto()
-
-
 class GraphQLClient(BaseGraphQLClient):
-    def login_user_based_on_type(self, user_type: UserType) -> User | None:
-        """Login user specific type of user in the client."""
+    def login_user_with_role(self, role: UserRoleChoice) -> User | None:
+        """Login with a user with the given role."""
         from .factories import UserFactory
 
-        user: User | None = None
-
-        match user_type:
-            case UserType.ANONYMOUS:
-                self.logout()
-            case UserType.REGULAR:
-                user = UserFactory.create()
-            case UserType.STAFF:
-                user = UserFactory.create_staff_user()
-            case UserType.SUPERUSER:
-                user = UserFactory.create_superuser()
-            case UserType.NOTIFICATION_MANAGER:
-                user = UserFactory.create_with_general_permissions(
-                    perms=[GeneralPermissionChoices.CAN_MANAGE_NOTIFICATIONS],
-                )
-            case _:
-                raise ValueError(f"Unknown user type: {user_type}")
-
-        if user is not None:
-            self.force_login(user)
-
+        user = UserFactory.create_with_general_role(role=role)
+        self.force_login(user)
         return user
 
 

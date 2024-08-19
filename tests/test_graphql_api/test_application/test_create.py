@@ -10,7 +10,6 @@ from applications.models import (
     SuitableTimeRange,
 )
 from tests.factories import ApplicationRoundFactory
-from tests.helpers import UserType
 from tests.test_graphql_api.test_application.helpers import get_application_create_data
 
 from .helpers import CREATE_MUTATION
@@ -26,7 +25,7 @@ def test_application__create(graphql):
     # - There is an open application round
     # - A superuser is using the system
     application_round = ApplicationRoundFactory.create_in_status_open()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to create a new application without sections
@@ -53,7 +52,7 @@ def test_application__create__with_application_sections(graphql):
     # - There is an open application round
     # - A superuser is using the system
     application_round = ApplicationRoundFactory.create_in_status_open()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     assert Application.objects.count() == 0
 
@@ -88,7 +87,7 @@ def test_application__create__sub_serializer_error(graphql, field):
     # - There is an open application round
     # - A superuser is using the system
     application_round = ApplicationRoundFactory.create_in_status_open()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     address_data = {
         "streetAddress": "Address",

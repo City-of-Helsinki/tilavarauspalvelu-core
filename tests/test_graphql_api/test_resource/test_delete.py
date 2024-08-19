@@ -2,7 +2,6 @@ import pytest
 
 from resources.models import Resource
 from tests.factories import ResourceFactory
-from tests.helpers import UserType
 
 from .helpers import DELETE_MUTATION
 
@@ -14,7 +13,7 @@ pytestmark = [
 
 def test_resource__delete(graphql):
     resource = ResourceFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     response = graphql(DELETE_MUTATION, input_data={"pk": resource.pk})
 

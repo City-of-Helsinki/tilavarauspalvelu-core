@@ -7,7 +7,6 @@ from django.db.models.functions import Now
 
 from common.enums import BannerNotificationLevel, BannerNotificationTarget
 from common.querysets._base import BaseQuerySet
-from permissions.helpers import can_manage_banner_notifications
 
 User = get_user_model()
 
@@ -33,10 +32,10 @@ class BannerNotificationQuerySet(BaseQuerySet):
                 models.Q(target=BannerNotificationTarget.USER) | models.Q(target=BannerNotificationTarget.ALL),
             )
 
-        if can_manage_banner_notifications(user):
+        if user.permissions.can_manage_notifications():
             return self.active()
 
-        if user.has_staff_permissions:
+        if user.permissions.has_any_role():
             return self.active().filter(
                 models.Q(target=BannerNotificationTarget.STAFF) | models.Q(target=BannerNotificationTarget.ALL),
             )
@@ -49,7 +48,7 @@ class BannerNotificationQuerySet(BaseQuerySet):
         if user.is_anonymous:
             return self.none()
 
-        if can_manage_banner_notifications(user):
+        if user.permissions.can_manage_notifications():
             return self.inactive()
 
         return self.none()

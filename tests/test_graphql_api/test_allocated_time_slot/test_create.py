@@ -14,7 +14,6 @@ from tests.factories import (
     SpaceFactory,
     SuitableTimeRangeFactory,
 )
-from tests.helpers import UserType
 
 from .helpers import CREATE_ALLOCATION, allocation_create_data
 
@@ -31,7 +30,7 @@ def test_allocated_time_slot__create(graphql):
     application = ApplicationFactory.create_application_ready_for_allocation()
     section = application.application_sections.first()
     option = section.reservation_unit_options.first()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # At this point the application section is still in IN_ALLOCATION status
     assert section.status == ApplicationSectionStatusChoice.IN_ALLOCATION
@@ -57,7 +56,7 @@ def test_allocated_time_slot__create__still_in_allocation_if_applied_not_fulfill
     application = ApplicationFactory.create_application_ready_for_allocation(applied_reservations_per_week=2)
     section = application.application_sections.first()
     option = section.reservation_unit_options.first()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # At this point the application section is still in IN_ALLOCATION status
     assert section.status == ApplicationSectionStatusChoice.IN_ALLOCATION
@@ -87,7 +86,7 @@ def test_allocated_time_slot__create__incomplete_data(graphql, missing_key):
     application = ApplicationFactory.create_application_ready_for_allocation()
     section = application.application_sections.first()
     option = section.reservation_unit_options.first()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - The user tries to make an allocation for a reservation unit option
@@ -108,7 +107,7 @@ def test_allocated_time_slot__create__application_not_yet_in_allocation(graphql)
     application = ApplicationFactory.create_application_ready_for_allocation(application_round)
     section = application.application_sections.first()
     option = section.reservation_unit_options.first()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     assert application.status == ApplicationStatusChoice.RECEIVED
 
@@ -132,7 +131,7 @@ def test_allocated_time_slot__create__application_not_in_allocation_anymore__HAN
     application = ApplicationFactory.create_application_ready_for_allocation(application_round, pre_allocated=True)
     section = application.application_sections.first()
     option = section.reservation_unit_options.first()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     assert application.status == ApplicationStatusChoice.HANDLED
     assert section.status == ApplicationSectionStatusChoice.HANDLED
@@ -157,7 +156,7 @@ def test_allocated_time_slot__create__application_not_in_allocation_anymore__REJ
     option = section.reservation_unit_options.first()
     option.rejected = True
     option.save()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     assert application.status == ApplicationStatusChoice.HANDLED
     assert section.status == ApplicationSectionStatusChoice.REJECTED
@@ -180,7 +179,7 @@ def test_allocated_time_slot__create__approve_duration_longer_than_section_maxim
     application = ApplicationFactory.create_application_ready_for_allocation()
     section = application.application_sections.first()
     option = section.reservation_unit_options.first()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - The user tries to make an allocation for a reservation unit option,
@@ -206,7 +205,7 @@ def test_allocated_time_slot__create__approve_duration_shorter_than_section_mini
     application = ApplicationFactory.create_application_ready_for_allocation()
     section = application.application_sections.first()
     option = section.reservation_unit_options.first()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - The user tries to make an allocation for a reservation unit option,
@@ -232,7 +231,7 @@ def test_allocated_time_slot__create__approve_duration_not_multiple_of_30_minute
     application = ApplicationFactory.create_application_ready_for_allocation()
     section = application.application_sections.first()
     option = section.reservation_unit_options.first()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - The user tries to make an allocation for a reservation unit option,
@@ -258,7 +257,7 @@ def test_allocated_time_slot__create__approve_more_than_events_per_week(graphql,
     application = ApplicationFactory.create_application_ready_for_allocation(pre_allocated=True)
     section = application.application_sections.first()
     option = section.reservation_unit_options.first()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - The user tries to make an allocation for a reservation unit option,
@@ -289,7 +288,7 @@ def test_allocated_time_slot__create__approve_outside_of_suitable_time_ranges(gr
     application = ApplicationFactory.create_application_ready_for_allocation()
     section = application.application_sections.first()
     option = section.reservation_unit_options.first()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - The user tries to make an allocation for a reservation unit option,
@@ -319,7 +318,7 @@ def test_allocated_time_slot__create__approved_time_falls_on_two_back_to_back_su
     application = ApplicationFactory.create_application_ready_for_allocation()
     section = application.application_sections.first()
     option = section.reservation_unit_options.first()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     SuitableTimeRangeFactory.create(
         application_section=section,
@@ -350,7 +349,7 @@ def test_allocated_time_slot__create__approved_time_falls_on_two_separated_wishe
     application = ApplicationFactory.create_application_ready_for_allocation()
     section = application.application_sections.first()
     option = section.reservation_unit_options.first()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     SuitableTimeRangeFactory.create(
         application_section=section,
@@ -388,7 +387,7 @@ def test_allocated_time_slot__create__reservation_unit_rejected(graphql, force):
     option.rejected = True
     option.save()
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - The user tries to make an allocation for a reservation unit option,
@@ -415,7 +414,7 @@ def test_allocated_time_slot__create__reservation_unit_locked(graphql, force):
     option.locked = True
     option.save()
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - The user tries to make an allocation for a reservation unit option,
@@ -446,7 +445,7 @@ def test_allocated_time_slot__create__two_allocations_for_same_day(graphql, forc
         end_time=datetime.time(12, 0, tzinfo=get_default_timezone()),
     )
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - The user tries to make an allocation for a reservation unit option,
@@ -481,7 +480,7 @@ def test_allocated_time_slot__create__overlapping_with_another_allocation_for_sa
     ApplicationFactory.create_application_ready_for_allocation(reservation_unit=reservation_unit, pre_allocated=True)
     ReservationUnitHierarchy.refresh()
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - The user tries to make an allocation for a reservation unit option,
@@ -506,7 +505,7 @@ def test_allocated_time_slot__create__overlapping_with_another_allocation_for_di
     section = application.application_sections.first()
     option = section.reservation_unit_options.first()
     ApplicationFactory.create_application_ready_for_allocation(pre_allocated=True)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - The user tries to make an allocation for a reservation unit option
@@ -536,7 +535,7 @@ def test_allocated_time_slot__create__overlapping_in_related_reservation_unit(gr
     ApplicationFactory.create_application_ready_for_allocation(reservation_unit=child_unit, pre_allocated=True)
     ReservationUnitHierarchy.refresh()
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - The user tries to make an allocation for a reservation unit option,

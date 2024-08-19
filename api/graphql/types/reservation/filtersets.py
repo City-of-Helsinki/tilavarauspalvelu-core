@@ -12,8 +12,7 @@ from api.graphql.extensions.filters import TimezoneAwareDateFilter
 from common.db import text_search
 from common.utils import log_text_search
 from merchants.enums import OrderStatusWithFree
-from permissions.helpers import has_general_permission
-from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
+from permissions.enums import UserRoleChoice
 from reservations.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import Reservation
 
@@ -86,20 +85,21 @@ class ReservationFilterSet(ModelFilterSet):
             return qs
 
         user: AnyUser = self.request.user
-        if user.is_anonymous:
+        if user.is_anonymous or not user.is_active:
             return qs.none()
         if user.is_superuser:
             return qs
-        if has_general_permission(user, GeneralPermissionChoices.CAN_VIEW_RESERVATIONS):
+
+        roles = UserRoleChoice.can_view_reservations()
+        if user.permissions.has_general_role(role_choices=roles):
             return qs
 
-        unit_permission = UnitPermissionChoices.CAN_VIEW_RESERVATIONS.value
-        unit_ids = [pk for pk, perms in user.unit_permissions.items() if unit_permission in perms]
-        unit_group_ids = [pk for pk, perms in user.unit_group_permissions.items() if unit_permission in perms]
+        u_ids = user.permissions.unit_ids_where_has_role(role_choices=roles)
+        g_ids = user.permissions.unit_group_ids_where_has_role(role_choices=roles)
 
         return qs.filter(
-            Q(reservation_unit__unit__in=unit_ids)  #
-            | Q(reservation_unit__unit__unit_groups__in=unit_group_ids)
+            Q(reservation_unit__unit__in=u_ids)  #
+            | Q(reservation_unit__unit__unit_groups__in=g_ids)
         )
 
     def filter_by_only_with_handling_permission(self, qs: QuerySet, name: str, value: bool) -> QuerySet:
@@ -108,20 +108,21 @@ class ReservationFilterSet(ModelFilterSet):
 
         user: AnyUser = self.request.user
 
-        if user.is_anonymous:
+        if user.is_anonymous or not user.is_active:
             return qs.none()
         if user.is_superuser:
             return qs
-        if has_general_permission(user, GeneralPermissionChoices.CAN_MANAGE_RESERVATIONS):
+
+        roles = UserRoleChoice.can_manage_reservations()
+        if user.permissions.has_general_role(role_choices=roles):
             return qs
 
-        unit_permission = UnitPermissionChoices.CAN_MANAGE_RESERVATIONS.value
-        unit_ids = [pk for pk, perms in user.unit_permissions.items() if unit_permission in perms]
-        unit_group_ids = [pk for pk, perms in user.unit_group_permissions.items() if unit_permission in perms]
+        u_ids = user.permissions.unit_ids_where_has_role(role_choices=roles)
+        g_ids = user.permissions.unit_group_ids_where_has_role(role_choices=roles)
 
         return qs.filter(
-            Q(reservation_unit__unit__in=unit_ids)  #
-            | Q(reservation_unit__unit__unit_groups__in=unit_group_ids)
+            Q(reservation_unit__unit__in=u_ids)  #
+            | Q(reservation_unit__unit__unit_groups__in=g_ids)
         )
 
     @staticmethod

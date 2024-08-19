@@ -7,8 +7,6 @@ from common.date_utils import local_datetime
 from email_notification.exceptions import SendEmailNotificationError
 from email_notification.helpers.email_sender import EmailNotificationSender
 from email_notification.models import EmailType
-from permissions.helpers import has_unit_permission
-from permissions.models import UnitPermissionChoices
 from reservations.models import Reservation
 from spaces.models import Unit
 from tilavarauspalvelu.celery import app
@@ -64,12 +62,11 @@ def _get_reservation_staff_notification_recipients(
     """
     notification_recipients: list[str] = []
     reservation_units = reservation.reservation_unit.all()
-    units: list[int] = list(Unit.objects.filter(reservationunit__in=reservation_units).values_list("pk", flat=True))
-
+    units = Unit.objects.filter(reservationunit__in=reservation_units).prefetch_related("unit_groups").distinct()
     users = User.objects.filter(unit_roles__isnull=False).exclude(reservation_notification="NONE")
     for user in users:
         # Skip users who don't have the correct unit role
-        if not has_unit_permission(user, UnitPermissionChoices.CAN_MANAGE_RESERVATIONS, units):
+        if not user.permissions.can_manage_reservations_for_units(units, any_unit=True):
             continue
 
         # Skip users who don't have the correct notification setting

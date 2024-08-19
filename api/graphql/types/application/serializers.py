@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from collections import defaultdict
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from django.utils import timezone
 from graphene_django_extensions import NestingModelSerializer
@@ -16,7 +18,9 @@ from applications.enums import ApplicationStatusChoice
 from applications.models import AllocatedTimeSlot, Application, ReservationUnitOption
 from common.fields.serializer import CurrentUserDefaultNullable
 from email_notification.helpers.application_email_notification_sender import ApplicationEmailNotificationSender
-from permissions.helpers import can_validate_unit_applications
+
+if TYPE_CHECKING:
+    from common.typing import AnyUser
 
 
 class ApplicationCreateSerializer(NestingModelSerializer):
@@ -63,8 +67,8 @@ class ApplicationUpdateSerializer(ApplicationCreateSerializer):
         fields = [*ApplicationCreateSerializer.Meta.fields, "working_memo"]
 
     def validate_working_memo(self, value: str) -> str:
-        units: list[int] = list(self.instance.units.values_list("pk", flat=True))
-        if not can_validate_unit_applications(self.request_user, units):
+        user: AnyUser = self.request_user
+        if not user.permissions.can_view_application(self.instance, reserver_needs_role=True):
             raise serializers.ValidationError("No permission to access working memo.")
 
         return value

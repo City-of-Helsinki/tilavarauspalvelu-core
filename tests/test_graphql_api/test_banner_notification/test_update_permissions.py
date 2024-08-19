@@ -1,7 +1,7 @@
 import pytest
 
+from permissions.enums import UserRoleChoice
 from tests.factories import BannerNotificationFactory
-from tests.helpers import UserType
 
 from .helpers import UPDATE_MUTATION
 
@@ -11,16 +11,9 @@ pytestmark = [
 ]
 
 
-@pytest.mark.parametrize("user_type", [UserType.STAFF, UserType.ANONYMOUS, UserType.REGULAR])
-def test_banner_notification__update__no_perms(graphql, user_type):
-    # given:
-    # - There is a draft notification in the system
-    # - User of the given type is using the system
+def test_banner_notification__update__anonymous_user(graphql):
     notification = BannerNotificationFactory.create(draft=True, name="foo", message="bar")
-    graphql.login_user_based_on_type(user_type)
 
-    # when:
-    # - User tries to update the banner notification
     response = graphql(
         UPDATE_MUTATION,
         input_data={
@@ -30,20 +23,45 @@ def test_banner_notification__update__no_perms(graphql, user_type):
         },
     )
 
-    # then:
-    # - The response complains about the lack of permissions
+    assert response.error_message() == "No permission to update."
+
+
+def test_banner_notification__update__regular_user(graphql):
+    notification = BannerNotificationFactory.create(draft=True, name="foo", message="bar")
+    graphql.login_with_regular_user()
+
+    response = graphql(
+        UPDATE_MUTATION,
+        input_data={
+            "pk": notification.pk,
+            "name": "1",
+            "message": "2",
+        },
+    )
+
+    assert response.error_message() == "No permission to update."
+
+
+def test_banner_notification__update__no_perms(graphql):
+    notification = BannerNotificationFactory.create(draft=True, name="foo", message="bar")
+    graphql.login_user_with_role(role=UserRoleChoice.VIEWER)
+
+    response = graphql(
+        UPDATE_MUTATION,
+        input_data={
+            "pk": notification.pk,
+            "name": "1",
+            "message": "2",
+        },
+    )
+
     assert response.error_message() == "No permission to update."
 
 
 def test_banner_notification__update__notification_manager(graphql):
-    # given:
-    # - There is a draft notification in the system
-    # - User of the given type is using the system
     notification = BannerNotificationFactory.create(draft=True, name="foo", message="bar")
-    graphql.login_user_based_on_type(UserType.NOTIFICATION_MANAGER)
+    graphql.login_user_with_role(role=UserRoleChoice.NOTIFICATION_MANAGER)
 
-    # when:
-    # - User tries to update the banner notification
     response = graphql(
         UPDATE_MUTATION,
         input_data={
@@ -53,6 +71,4 @@ def test_banner_notification__update__notification_manager(graphql):
         },
     )
 
-    # then:
-    # - The response has no errors
     assert response.has_errors is False

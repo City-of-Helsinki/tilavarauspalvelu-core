@@ -2,7 +2,6 @@ import pytest
 
 from applications.models import ApplicationSection
 from tests.factories import ApplicationSectionFactory, UserFactory
-from tests.helpers import UserType
 from tests.test_graphql_api.test_application_section.helpers import UPDATE_MUTATION, get_application_section_update_data
 
 # Applied to all tests
@@ -37,7 +36,7 @@ def test_application_section__update__perms__superuser(graphql):
     # - There is an unallocated application section in a draft application in an open application round
     # - A superuser is using the system
     application_section = ApplicationSectionFactory.create_in_status_unallocated()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to update the application section
@@ -58,7 +57,7 @@ def test_application_section__update__perms__regular_user(graphql):
     # - There is an unallocated application section in a draft application in an open application round
     # - Someone other than the owner of the application is using the system
     application_section = ApplicationSectionFactory.create_in_status_unallocated()
-    graphql.login_user_based_on_type(UserType.REGULAR)
+    graphql.login_with_regular_user()
 
     # when:
     # - User tries to update the application section
@@ -75,7 +74,7 @@ def test_application_section__update__perms__general_admin(graphql):
     # - There is an unallocated application section in a draft application in an open application round
     # - A general admin with application permissions is using the system
     application_section = ApplicationSectionFactory.create_in_status_unallocated()
-    general_admin = UserFactory.create_with_general_permissions(perms=["can_handle_applications"])
+    general_admin = UserFactory.create_with_general_role()
     graphql.force_login(general_admin)
 
     # when:

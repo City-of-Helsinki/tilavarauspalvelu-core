@@ -1,7 +1,6 @@
 import pytest
 
 from tests.factories import ReservationUnitOptionFactory, UserFactory
-from tests.helpers import UserType
 
 from .helpers import UPDATE_MUTATION
 
@@ -16,7 +15,6 @@ def test_reservation_unit_option__update__anonymous_user(graphql):
     # - There is a usable reservation unit option
     # - A regular user is using the system
     option = ReservationUnitOptionFactory.create(locked=False, rejected=False)
-    graphql.login_user_based_on_type(UserType.ANONYMOUS)
 
     # when:
     # - User tries to update the reservation unit option
@@ -36,7 +34,7 @@ def test_reservation_unit_option__update__regular_user(graphql):
     # - There is a usable reservation unit option
     # - A regular user is using the system
     option = ReservationUnitOptionFactory.create(locked=False, rejected=False)
-    graphql.login_user_based_on_type(UserType.REGULAR)
+    graphql.login_with_regular_user()
 
     # when:
     # - User tries to update the reservation unit option
@@ -57,7 +55,7 @@ def test_reservation_unit_option__update__general_admin(graphql):
     # - A general admin is using the system
     option = ReservationUnitOptionFactory.create(locked=False, rejected=False)
 
-    admin = UserFactory.create_with_general_permissions(perms=["can_handle_applications"])
+    admin = UserFactory.create_with_general_role()
     graphql.force_login(admin)
 
     # when:

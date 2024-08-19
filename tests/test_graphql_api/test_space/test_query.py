@@ -1,7 +1,6 @@
 import pytest
 
 from tests.factories import SpaceFactory
-from tests.helpers import UserType
 from tests.test_graphql_api.test_space.helpers import spaces_query
 
 # Applied to all tests
@@ -16,7 +15,7 @@ def test_query_spaces__all_fields(graphql):
     # - A superuser is using the system
     space = SpaceFactory.create()
     SpaceFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     fields = """
         pk

@@ -1,5 +1,6 @@
 import pytest
 
+from permissions.enums import UserRoleChoice
 from tests.factories import ReservationFactory, ReservationUnitFactory, UserFactory
 
 from .helpers import UPDATE_WORKING_MEMO_MUTATION, get_working_memo_update_data
@@ -13,7 +14,7 @@ def test_reservation__update__working_memo__general_admin(graphql):
     reservation_unit = ReservationUnitFactory.create()
     reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
 
-    admin = UserFactory.create_with_general_permissions(perms=["can_manage_reservations"])
+    admin = UserFactory.create_with_general_role()
 
     graphql.force_login(admin)
     data = get_working_memo_update_data(reservation)
@@ -29,7 +30,7 @@ def test_reservation__update__working_memo__general_commenter(graphql):
     reservation_unit = ReservationUnitFactory.create()
     reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
 
-    admin = UserFactory.create_with_general_permissions(perms=["can_comment_reservations"])
+    admin = UserFactory.create_with_general_role()
 
     graphql.force_login(admin)
     data = get_working_memo_update_data(reservation)
@@ -45,10 +46,7 @@ def test_reservation__update__working_memo__unit_commenter(graphql):
     reservation_unit = ReservationUnitFactory.create()
     reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
 
-    admin = UserFactory.create_with_unit_permissions(
-        unit=reservation_unit.unit,
-        perms=["can_comment_reservations"],
-    )
+    admin = UserFactory.create_with_unit_role(units=[reservation_unit.unit])
 
     graphql.force_login(admin)
     data = get_working_memo_update_data(reservation)
@@ -77,7 +75,7 @@ def test_reservation__update__working_memo__regular_user(graphql):
 def test_reservation__update__working_memo__staff_and_own_reservation(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
-    admin = UserFactory.create_with_general_permissions(perms=["can_manage_purposes"])
+    admin = UserFactory.create_with_general_role()
 
     reservation = ReservationFactory.create(reservation_unit=[reservation_unit], user=admin)
 
@@ -94,7 +92,7 @@ def test_reservation__update__working_memo__staff_and_own_reservation(graphql):
 def test_reservation__update__working_memo__reserver_staff_user_and_not_own_reservation(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
-    admin = UserFactory.create_with_general_permissions(perms=["can_manage_purposes"])
+    admin = UserFactory.create_with_general_role(role=UserRoleChoice.RESERVER)
 
     reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
 

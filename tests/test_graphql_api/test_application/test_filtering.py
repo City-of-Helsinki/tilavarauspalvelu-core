@@ -2,7 +2,6 @@ import pytest
 
 from applications.enums import ApplicantTypeChoice
 from tests.factories import ApplicationFactory
-from tests.helpers import UserType
 
 from .helpers import applications_query
 
@@ -17,7 +16,7 @@ def test_application__filter__by_pk__single(graphql):
     # - There are two applications in the system
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to search for applications by a single primary key
@@ -35,7 +34,7 @@ def test_application__filter__by_pk__multiple(graphql):
     # - A superuser is using the system
     application_1 = ApplicationFactory.create_in_status_draft()
     application_2 = ApplicationFactory.create_in_status_draft()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to search for applications by multiple primary keys
@@ -54,7 +53,7 @@ def test_application__filter__by_application_round(graphql):
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft()
     ApplicationFactory.create_in_status_draft()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to search for applications in an application round
@@ -72,7 +71,7 @@ def test_application__filter__by_applicant_type__single(graphql):
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft(applicant_type=ApplicantTypeChoice.COMPANY)
     ApplicationFactory.create_in_status_draft(applicant_type=ApplicantTypeChoice.INDIVIDUAL)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to search for applications by a single applicant type
@@ -90,7 +89,7 @@ def test_application__filter__by_applicant_type__multiple(graphql):
     # - A superuser is using the system
     application_1 = ApplicationFactory.create_in_status_draft(applicant_type=ApplicantTypeChoice.COMPANY)
     application_2 = ApplicationFactory.create_in_status_draft(applicant_type=ApplicantTypeChoice.INDIVIDUAL)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to search for applications by a multiple applicant types
@@ -116,7 +115,7 @@ def test_application__filter__by_status__single(graphql):
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft()
     ApplicationFactory.create_in_status_received()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to search for applications with a specific status
@@ -134,7 +133,7 @@ def test_application__filter__by_status__multiple(graphql):
     # - A superuser is using the system
     application_1 = ApplicationFactory.create_in_status_draft()
     application_2 = ApplicationFactory.create_in_status_received()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to search for applications with a specific statuses
@@ -157,7 +156,7 @@ def test_application__filter__by_unit__single(graphql):
     ApplicationFactory.create_in_status_draft(
         application_sections__reservation_unit_options__reservation_unit__unit__name="Unit 2",
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     section = application.application_sections.first()
     option = section.reservation_unit_options.first()
@@ -183,7 +182,7 @@ def test_application__filter__by_unit__multiple(graphql):
     application_2 = ApplicationFactory.create_in_status_draft(
         application_sections__reservation_unit_options__reservation_unit__unit__name="Unit 2",
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     section_1 = application_1.application_sections.first()
     option_1 = section_1.reservation_unit_options.first()
@@ -210,7 +209,7 @@ def test_application__filter__by_applicant(graphql):
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft(user__first_name="foo")
     ApplicationFactory.create_in_status_draft(user__first_name="bar")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to search for applications by an applicant
@@ -238,7 +237,7 @@ def test_application__filter__by_text_search__section_name(graphql):
         user=None,
         application_sections__name="bar",
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter applications with a text search
@@ -269,7 +268,7 @@ def test_application__filter__by_text_search__section_name__prefix(graphql):
         user=None,
         application_sections__name="suunnistusryhmä",
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter applications with a text search, which is only a prefix match
@@ -300,7 +299,7 @@ def test_application__filter__by_text_search__section_name__has_quotes(graphql):
         user=None,
         application_sections__name="Bar",
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter applications with a text search, which is only a partial match
@@ -331,7 +330,7 @@ def test_application__filter__by_text_search__applicant__organisation_name(graph
         user=None,
         application_sections__name="bbbb",
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter applications with a text search
@@ -364,7 +363,7 @@ def test_application__filter__by_text_search__applicant__contact_person_first_na
         user=None,
         application_sections__name="bbbb",
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter applications with a text search
@@ -397,7 +396,7 @@ def test_application__filter__by_text_search__applicant__contact_person_last_nam
         user=None,
         application_sections__name="bbbb",
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter applications with a text search
@@ -430,7 +429,7 @@ def test_application__filter__by_text_search__applicant__user_first_name(graphql
         user__last_name="none",
         application_sections__name="bbbb",
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter applications with a text search
@@ -463,7 +462,7 @@ def test_application__filter__by_text_search__applicant__user_last_name(graphql)
         user__last_name="bar",
         application_sections__name="bbbb",
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter applications with a text search
@@ -498,7 +497,7 @@ def test_application__filter__by_text_search__section_id(graphql):
         application_sections__id=4,
         application_sections__name="bar",
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter applications with a text search
@@ -533,7 +532,7 @@ def test_application__filter__by_text_search__application_id(graphql):
         application_sections__id=4,
         application_sections__name="bbbb",
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter applications with a text search
@@ -560,7 +559,7 @@ def test_application__filter__by_text_search__not_found(graphql):
         user__last_name="one",
         application_sections__name="foo",
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter application events with a text search

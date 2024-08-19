@@ -23,32 +23,45 @@ class GeneralRoleAdmin(admin.ModelAdmin):
 
     # List
     list_display = [
-        "user",
+        "role",
+        "user_email",
+    ]
+    list_filter = [
         "role",
     ]
-    list_filter = ["role"]
 
     # Form
     fields = [
-        "user",
         "role",
+        "user",
         "assigner",
         "created",
         "modified",
     ]
     readonly_fields = [
+        "assigner",
         "created",
         "modified",
         "assigner",
     ]
     autocomplete_fields = [
         "user",
-        "assigner",
     ]
 
     def get_queryset(self, request: WSGIRequest) -> models.QuerySet:
-        return super().get_queryset(request).select_related("user", "role")
+        return (
+            super()
+            .get_queryset(request)
+            .select_related(
+                "user",
+                "assigner",
+            )
+        )
 
     def save_model(self, request: WSGIRequest, obj: GeneralRole, form, change: bool) -> GeneralRole:
         obj.assigner = request.user
         return super().save_model(request, obj, form, change)
+
+    @admin.display(ordering="user__email")
+    def user_email(self, obj: GeneralRole) -> str:
+        return obj.user.email

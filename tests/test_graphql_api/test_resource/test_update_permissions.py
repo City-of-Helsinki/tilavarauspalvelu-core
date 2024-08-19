@@ -1,7 +1,6 @@
 import pytest
 
 from tests.factories import ResourceFactory
-from tests.helpers import UserType
 
 from .helpers import UPDATE_MUTATION
 
@@ -13,7 +12,7 @@ pytestmark = [
 
 def test_resource__update__regular_user(graphql):
     resource = ResourceFactory.create()
-    graphql.login_user_based_on_type(UserType.REGULAR)
+    graphql.login_with_regular_user()
 
     data = {
         "pk": resource.pk,

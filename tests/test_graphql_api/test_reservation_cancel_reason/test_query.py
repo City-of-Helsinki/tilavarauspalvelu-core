@@ -2,7 +2,6 @@ import pytest
 from graphene_django_extensions.testing import build_query
 
 from tests.factories import ReservationCancelReasonFactory
-from tests.helpers import UserType
 
 # Applied to all tests
 pytestmark = [
@@ -13,7 +12,7 @@ pytestmark = [
 def test_reservation_cancel_reasons__query(graphql):
     cancel_reason = ReservationCancelReasonFactory.create()
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     fields = """
         pk
@@ -37,8 +36,6 @@ def test_reservation_cancel_reasons__query(graphql):
 
 def test_reservation_cancel_reasons__query__anonymous_user(graphql):
     ReservationCancelReasonFactory.create()
-
-    graphql.login_user_based_on_type(UserType.ANONYMOUS)
 
     fields = """
         pk

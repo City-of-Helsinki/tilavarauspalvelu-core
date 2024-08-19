@@ -1,24 +1,25 @@
 from __future__ import annotations
 
 import uuid
-from functools import cached_property
 from typing import TYPE_CHECKING, Self
 
 from django.conf import settings
-from django.contrib.postgres.aggregates import StringAgg
+from django.contrib.auth.models import AnonymousUser
 from django.db import models
-from django.db.models.functions import Cast, Concat
 from django.utils.timezone import get_default_timezone
 from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 from helusers.models import AbstractUser
 
-from common.db import SubqueryArray
+from permissions.enums import UserRoleChoice
+from permissions.permission_resolver import PermissionResolver
 from users.helauth.typing import IDToken
 from users.helauth.utils import get_jwt_payload
 
 if TYPE_CHECKING:
     from social_django.models import UserSocialAuth
+
+    from permissions.models import UnitRole
 
 
 DEFAULT_TIMEZONE = get_default_timezone()
@@ -73,6 +74,8 @@ class User(AbstractUser):
         default="",
     )
 
+    permissions = PermissionResolver()
+
     class Meta:
         db_table = "user"
         base_manager_name = "objects"
@@ -92,97 +95,42 @@ class User(AbstractUser):
     def get_preferred_language(self) -> str:
         return self.preferred_language or settings.LANGUAGES[0][0]
 
-    @cached_property
-    def has_staff_permissions(self) -> bool:
-        return (
-            self.is_superuser  #
-            or bool(self.general_permissions)
-            or bool(self.unit_permissions)
-            or bool(self.unit_group_permissions)
-        )
+    @property
+    def general_roles_list(self) -> list[UserRoleChoice]:
+        """Get the user's general roles."""
+        if hasattr(self, "_general_roles"):
+            return self._general_roles
 
-    @cached_property
-    def general_permissions(self) -> list[str]:
-        """Get general permissions for the user."""
-        # Could have been annotated in `get_user`, so use the annotated value if available.
-        if hasattr(self, "_general_permissions"):
-            return self._general_permissions
+        self._general_roles = [UserRoleChoice(role) for role in self.general_roles.values_list("role", flat=True)]
+        return self._general_roles
 
-        from permissions.models import GeneralRole
-
-        return list(
-            GeneralRole.objects.filter(user__pk=self.pk)
-            .values_list("role__permissions__permission", flat=True)
-            .distinct()
-        )
-
-    @cached_property
-    def unit_permissions(self) -> dict[int, list[str]]:
-        """Get unit permissions by unit id for the user."""
-        perms: dict[int, list[str]] = {}
-
-        # Could have been annotated in `get_user`, so use the annotated value if available.
+    @property
+    def unit_roles_map(self) -> dict[int, list[UserRoleChoice]]:
+        """Get unit roles by unit id for the user."""
         if hasattr(self, "_unit_permissions"):
-            item: str
-            for item in self._unit_permissions:
-                units, permission = item.split(":")
-                for unit in units.split(","):
-                    perms.setdefault(int(unit), []).append(permission)
-            return perms
+            return self._unit_permissions
+        self._calculate_unit_roles()
+        return self._unit_roles
 
-        from permissions.models import UnitRolePermission
-
-        unit_perms: list[dict[str, str]] = list(
-            UnitRolePermission.objects.select_related("role")
-            .prefetch_related("role__unitrole__unit")
-            .filter(role__unitrole__user__pk=self.pk, role__unitrole__unit__isnull=False)
-            .annotate(
-                units=StringAgg(
-                    Cast("role__unitrole__unit", output_field=models.CharField()),
-                    delimiter=",",
-                ),
-            )
-            .values("permission", "units")
-        )
-
-        for perm in unit_perms:
-            for unit in perm["units"].split(","):
-                perms.setdefault(int(unit), []).append(perm["permission"])
-        return perms
-
-    @cached_property
-    def unit_group_permissions(self) -> dict[int, list[str]]:
-        """Get unit permissions by unit group id for the user."""
-        perms: dict[int, list[str]] = {}
-
-        # Could have been annotated in `get_user`, so use the annotated value if available.
+    @property
+    def unit_group_roles_map(self) -> dict[int, list[UserRoleChoice]]:
+        """Get unit roles by unit group id for the user."""
         if hasattr(self, "_unit_group_permissions"):
-            item: str
-            for item in self._unit_group_permissions:
-                unit_groups, permission = item.split(":")
-                for unit_group in unit_groups.split(","):
-                    perms.setdefault(int(unit_group), []).append(permission)
-            return perms
+            return self._unit_group_permissions
+        self._calculate_unit_roles()
+        return self._unit_group_roles
 
-        from permissions.models import UnitRolePermission
+    def _calculate_unit_roles(self) -> None:
+        """Calculate all unit roles by unit id and unit group id for the user."""
+        self._unit_roles: dict[int, list[UserRoleChoice]] = {}
+        self._unit_group_roles: dict[int, list[UserRoleChoice]] = {}
 
-        unit_group_perms: list[dict[str, str]] = list(
-            UnitRolePermission.objects.select_related("role")
-            .prefetch_related("role__unitrole__unit_group")
-            .filter(role__unitrole__user__pk=self.pk, role__unitrole__unit_group__isnull=False)
-            .annotate(
-                unit_groups=StringAgg(
-                    Cast("role__unitrole__unit_group", output_field=models.CharField()),
-                    delimiter=",",
-                ),
-            )
-            .values("permission", "unit_groups")
-        )
-
-        for perm in unit_group_perms:
-            for unit_group in perm["unit_groups"].split(","):
-                perms.setdefault(int(unit_group), []).append(perm["permission"])
-        return perms
+        unit_role: UnitRole
+        for unit_role in self.unit_roles.all().prefetch_related("units", "unit_groups"):
+            for unit in unit_role.units.all():
+                self._unit_roles.setdefault(int(unit.pk), []).append(UserRoleChoice(unit_role.role))
+            for unit_group in unit_role.unit_groups.all():
+                self._unit_group_roles.setdefault(int(unit_group.pk), []).append(UserRoleChoice(unit_role.role))
 
     @property
     def current_social_auth(self) -> UserSocialAuth | None:
@@ -216,6 +164,10 @@ class User(AbstractUser):
             amr=payload.get("amr"),
             loa=payload.get("loa"),
         )
+
+
+# Set the permissions descriptor to the AnonymousUser class
+AnonymousUser.permissions = PermissionResolver()
 
 
 class PersonalInfoViewLog(models.Model):
@@ -274,82 +226,7 @@ def get_user(pk: int) -> User | None:
     This method is called by the authentication backends to fetch the request user object.
     Any optimization for fetching the user should be done here.
     """
-    from permissions.models import GeneralRolePermission, UnitRolePermission
-
     try:
-        # Annotate permissions to the user object, since they are used so often.
-        # These permissions can then be accessed from corresponding properties of the user object,
-        # without the underscore prefix. The data is modifier slightly in said properties,
-        # see the specific properties for more information.
-        return User.objects.annotate(
-            # General Permissions in form: ["<permission>", ...]
-            _general_permissions=SubqueryArray(
-                queryset=(
-                    GeneralRolePermission.objects.filter(
-                        role__generalrole__user__pk=pk,
-                    ).values("permission")
-                ),
-                agg_field="permission",
-                distinct=True,
-                output_field=models.CharField(),
-                coalesce_output_type="varchar",
-            ),
-            # Unit Permissions in form: ["<id>,<id>:<permission>", ...]
-            _unit_permissions=SubqueryArray(
-                queryset=(
-                    UnitRolePermission.objects.filter(
-                        role__unitrole__user__pk=pk,
-                        role__unitrole__unit__isnull=False,
-                    )
-                    .alias(
-                        units=StringAgg(
-                            Cast("role__unitrole__unit", output_field=models.CharField()),
-                            delimiter=",",
-                        ),
-                    )
-                    .annotate(
-                        unit_to_permission=Concat(
-                            models.F("units"),
-                            models.Value(":"),
-                            models.F("permission"),
-                            output_field=models.CharField(),
-                        ),
-                    )
-                    .values("unit_to_permission")
-                ),
-                agg_field="unit_to_permission",
-                distinct=True,
-                output_field=models.CharField(),
-                coalesce_output_type="varchar",
-            ),
-            # Unit Group Permissions in form: ["<id>,<id>:<permission>", ...]
-            _unit_group_permissions=SubqueryArray(
-                queryset=(
-                    UnitRolePermission.objects.filter(
-                        role__unitrole__user__pk=pk,
-                        role__unitrole__unit_group__isnull=False,
-                    )
-                    .alias(
-                        unit_groups=StringAgg(
-                            Cast("role__unitrole__unit_group", output_field=models.CharField()),
-                            delimiter=",",
-                        ),
-                    )
-                    .annotate(
-                        unit_group_to_permission=Concat(
-                            models.F("unit_groups"),
-                            models.Value(":"),
-                            models.F("permission"),
-                            output_field=models.CharField(),
-                        ),
-                    )
-                    .values("unit_group_to_permission")
-                ),
-                agg_field="unit_group_to_permission",
-                distinct=True,
-                output_field=models.CharField(),
-                coalesce_output_type="varchar",
-            ),
-        ).get(pk=pk)
+        return User.objects.get(pk=pk)
     except User.DoesNotExist:
         return None

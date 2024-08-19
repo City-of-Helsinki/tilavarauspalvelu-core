@@ -67,10 +67,8 @@ def test_application__unit_admin(graphql):
     section = ApplicationSectionFactory.create_in_status_unallocated(
         reservation_unit_options__reservation_unit__unit__name="foo",
     )
-    admin = UserFactory.create_with_unit_permissions(
-        unit=section.reservation_unit_options.first().reservation_unit.unit,
-        perms=["can_validate_applications"],
-    )
+    unit = section.reservation_unit_options.first().reservation_unit.unit
+    admin = UserFactory.create_with_unit_role(units=[unit])
     graphql.force_login(admin)
 
     # when:
@@ -89,7 +87,7 @@ def test_application__unit_admin__other_units(graphql):
     ApplicationSectionFactory.create_in_status_unallocated(
         reservation_unit_options__reservation_unit__unit__name="bar",
     )
-    admin = UserFactory.create_with_unit_permissions(unit=unit, perms=["can_validate_applications"])
+    admin = UserFactory.create_with_unit_role(units=[unit])
     graphql.force_login(admin)
 
     response = graphql(applications_query())
@@ -105,10 +103,8 @@ def test_application__unit_group_admin(graphql):
     event = ApplicationSectionFactory.create_in_status_unallocated(
         reservation_unit_options__reservation_unit__unit__unit_groups__name="foo",
     )
-    admin = UserFactory.create_with_unit_group_permissions(
-        unit_group=event.reservation_unit_options.first().reservation_unit.unit.unit_groups.first(),
-        perms=["can_validate_applications"],
-    )
+    unit_group = event.reservation_unit_options.first().reservation_unit.unit.unit_groups.first()
+    admin = UserFactory.create_with_unit_role(unit_groups=[unit_group])
     graphql.force_login(admin)
 
     # when:
@@ -129,10 +125,8 @@ def test_application__unit_group_admin__other_unit_groups(graphql):
     ApplicationSectionFactory.create_in_status_unallocated(
         reservation_unit_options__reservation_unit__unit__unit_groups__name="foo",
     )
-    admin = UserFactory.create_with_unit_group_permissions(
-        unit_group=UnitGroupFactory.create(name="bar"),
-        perms=["can_validate_applications"],
-    )
+    unit_group = UnitGroupFactory.create(name="bar")
+    admin = UserFactory.create_with_unit_role(unit_groups=[unit_group])
     graphql.force_login(admin)
 
     # when:
@@ -145,13 +139,12 @@ def test_application__unit_group_admin__other_unit_groups(graphql):
     assert response.edges == []
 
 
-@pytest.mark.parametrize("perms", ["can_handle_applications", "can_validate_applications"])
-def test_application__general_admin(graphql, perms):
+def test_application__general_admin(graphql):
     # given:
     # - There is an application in the system
     # - The general admin is using the system
     application = ApplicationFactory.create_in_status_draft()
-    admin = UserFactory.create_with_general_permissions(perms=[perms])
+    admin = UserFactory.create_with_general_role()
     graphql.force_login(admin)
 
     # when:
@@ -189,10 +182,7 @@ def test_application__unit_admin__working_memo(graphql):
         reservation_unit_options__reservation_unit__unit__name="foo",
     )
     option = section.reservation_unit_options.first()
-    admin = UserFactory.create_with_unit_permissions(
-        unit=option.reservation_unit.unit,
-        perms=["can_validate_applications"],
-    )
+    admin = UserFactory.create_with_unit_role(units=[option.reservation_unit.unit])
     graphql.force_login(admin)
 
     # when:
@@ -209,10 +199,8 @@ def test_application__unit_admin__user(graphql):
         reservation_unit_options__reservation_unit__unit__name="foo",
     )
     user = section.application.user
-    admin = UserFactory.create_with_unit_permissions(
-        unit=section.reservation_unit_options.first().reservation_unit.unit,
-        perms=["can_validate_applications"],
-    )
+    unit = section.reservation_unit_options.first().reservation_unit.unit
+    admin = UserFactory.create_with_unit_role(units=[unit])
     graphql.force_login(admin)
 
     response = graphql(applications_query(fields="user { firstName lastName }"))

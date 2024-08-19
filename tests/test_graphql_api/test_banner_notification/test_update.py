@@ -32,7 +32,7 @@ def test_user_updates_draft_banner_notification(graphql):
         target=BannerNotificationTarget.USER.value,
         level=BannerNotificationLevel.EXCEPTION.value,
     )
-    user = UserFactory.create_with_general_permissions(perms=["can_manage_notifications"])
+    user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     # when:
@@ -70,7 +70,7 @@ def test_user_publishes_draft_banner_notification(graphql):
         target=BannerNotificationTarget.USER.value,
         level=BannerNotificationLevel.EXCEPTION.value,
     )
-    user = UserFactory.create_with_general_permissions(perms=["can_manage_notifications"])
+    user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     active_from = datetime.datetime(2020, 1, 1, tzinfo=datetime.UTC)
@@ -109,7 +109,7 @@ def test_user_tries_to_publish_draft_banner_notification_without_setting_active_
         target=BannerNotificationTarget.USER.value,
         level=BannerNotificationLevel.EXCEPTION.value,
     )
-    user = UserFactory.create_with_general_permissions(perms=["can_manage_notifications"])
+    user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     # when:
@@ -220,7 +220,7 @@ def test_user_tries_to_publish_draft_banner_notification_with_improper_active_pe
         target=BannerNotificationTarget.USER.value,
         level=BannerNotificationLevel.EXCEPTION.value,
     )
-    user = UserFactory.create_with_general_permissions(perms=["can_manage_notifications"])
+    user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     # when:
@@ -250,7 +250,7 @@ def test_primary_key_is_required_for_updating(graphql):
         target=BannerNotificationTarget.USER.value,
         level=BannerNotificationLevel.EXCEPTION.value,
     )
-    user = UserFactory.create_with_general_permissions(perms=["can_manage_notifications"])
+    user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     # when:
@@ -267,7 +267,7 @@ def test_user_updates_non_existing_banner_notification(graphql):
     # - There are no banner notifications in the system
     # - Notification manager is using the system
     assert BannerNotification.objects.count() == 0
-    user = UserFactory.create_with_general_permissions(perms=["can_manage_notifications"])
+    user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     # when:

@@ -16,7 +16,7 @@ def test_user_deletes_banner_notification(graphql):
     # - There is a draft banner notification in the system
     # - Notification manager is using the system
     notification = BannerNotificationFactory.create(draft=True)
-    user = UserFactory.create_with_general_permissions(perms=["can_manage_notifications"])
+    user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     # when:
@@ -40,7 +40,7 @@ def test_primary_key_is_required_for_deleting(graphql):
     # - There is a draft banner notification in the system
     # - Notification manager is using the system
     BannerNotificationFactory.create(draft=True)
-    user = UserFactory.create_with_general_permissions(perms=["can_manage_notifications"])
+    user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     # when:
@@ -57,7 +57,7 @@ def test_user_tries_to_delete_non_existing_banner_notification(graphql):
     # - There is no draft banner notifications in the system
     # - Notification manager is using the system
     assert BannerNotification.objects.count() == 0
-    user = UserFactory.create_with_general_permissions(perms=["can_manage_notifications"])
+    user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     # when:

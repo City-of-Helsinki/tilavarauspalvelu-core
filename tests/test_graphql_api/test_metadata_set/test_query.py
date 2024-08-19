@@ -2,7 +2,6 @@ import pytest
 from graphene_django_extensions.testing import build_query
 
 from tests.factories import ReservationMetadataFieldFactory, ReservationMetadataSetFactory
-from tests.helpers import UserType
 
 # Applied to all tests
 pytestmark = [
@@ -21,7 +20,7 @@ def test_metadata_sets__query(graphql):
         required_fields=[field_1, field_2],
     )
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
     fields = "name supportedFields { fieldName } requiredFields { fieldName }"
     query = build_query("metadataSets", fields=fields, connection=True)
     response = graphql(query)

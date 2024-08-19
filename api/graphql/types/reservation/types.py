@@ -11,9 +11,8 @@ from api.graphql.types.merchants.types import PaymentOrderNode
 from api.graphql.types.reservation.permissions import ReservationPermission
 from api.legacy_rest_api.utils import hmac_signature
 from common.db import SubqueryArray
-from common.typing import GQLInfo
+from common.typing import AnyUser, GQLInfo
 from merchants.models import PaymentOrder
-from permissions.helpers import can_view_reservation
 from reservation_units.models import ReservationUnit
 from reservations.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.enums import ReservationTypeChoice as ReservationTypeField
@@ -27,13 +26,13 @@ __all__ = [
 ]
 
 
-def private_field_check(user: User, reservation: Reservation) -> bool | None:
-    result = can_view_reservation(user, reservation)
+def private_field_check(user: AnyUser, reservation: Reservation) -> bool | None:
+    result = user.permissions.can_view_reservation(reservation)
     return True if result else None
 
 
-def staff_field_check(user: User, reservation: Reservation) -> bool | None:
-    result = can_view_reservation(user, reservation, needs_staff_permissions=True)
+def staff_field_check(user: AnyUser, reservation: Reservation) -> bool | None:
+    result = user.permissions.can_view_reservation(reservation, reserver_needs_role=True)
     return True if result else None
 
 

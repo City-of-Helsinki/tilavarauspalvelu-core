@@ -1,7 +1,6 @@
 import pytest
 
 from tests.factories import ReservationFactory, ReservationUnitFactory, UnitFactory, UnitGroupFactory, UserFactory
-from tests.helpers import UserType
 
 from .helpers import units_query
 
@@ -16,7 +15,7 @@ def test_units__order__by_name_fi(graphql):
     unit_2 = UnitFactory.create(name_fi="Unit 2")
     unit_3 = UnitFactory.create(name_fi="Unit 3")
 
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # Ascending
     response = graphql(units_query(order_by="nameFiAsc"))

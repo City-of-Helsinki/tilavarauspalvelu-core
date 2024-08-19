@@ -1,8 +1,6 @@
 import pytest
 from graphene_django_extensions.testing import build_query
 
-from tests.helpers import UserType
-
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
@@ -10,7 +8,7 @@ pytestmark = [
 
 
 def test_tax_percentages__query(graphql):
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     query = build_query("taxPercentages", fields="value", connection=True)
     response = graphql(query)

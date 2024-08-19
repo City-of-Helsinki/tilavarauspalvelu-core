@@ -3,7 +3,7 @@ import pytest
 from applications.enums import ApplicationStatusChoice
 from email_notification.helpers.application_email_notification_sender import ApplicationEmailNotificationSender
 from tests.factories import ApplicationFactory
-from tests.helpers import UserType, patch_method
+from tests.helpers import patch_method
 
 from .helpers import SEND_MUTATION
 
@@ -19,7 +19,7 @@ def test_send_application(graphql):
     # - There is a draft application in an open application round with a single application event
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - The user tries to send the application
@@ -40,7 +40,7 @@ def test_send_application__no_sections(graphql):
     # - There is a draft application without application sections
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft_no_sections()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - The user tries to send the application
@@ -59,7 +59,7 @@ def test_send_application__missing_contact_person(graphql):
     # - There is a draft application without a contact person
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft(contact_person=None)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - The user tries to send the application
@@ -88,7 +88,7 @@ def test_send_application__wrong_status(graphql, status):
     # - There is a draft application in a certain status
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status(status, application_sections__name="foo")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - The user tries to send the application

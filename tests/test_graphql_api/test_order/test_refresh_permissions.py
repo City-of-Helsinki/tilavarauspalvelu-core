@@ -48,7 +48,7 @@ def test_refresh_order__order_owner(graphql):
 def test_refresh_order__general_admin__can_manage_reservations(graphql):
     order = get_order()
 
-    user = UserFactory.create_with_general_permissions(perms=["can_manage_reservations"])
+    user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     data = {"orderUuid": str(order.remote_id)}

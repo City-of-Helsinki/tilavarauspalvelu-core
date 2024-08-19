@@ -5,7 +5,6 @@ from graphene_django_extensions import DjangoNode
 from api.graphql.types.recurring_reservation.filtersets import RecurringReservationFilterSet
 from api.graphql.types.recurring_reservation.permissions import RecurringReservationPermission
 from common.typing import GQLInfo
-from permissions.helpers import can_view_recurring_reservation
 from reservations.models import RecurringReservation
 
 __all__ = [
@@ -38,10 +37,10 @@ class RecurringReservationNode(DjangoNode):
             "allocated_time_slot",
         ]
         restricted_fields = {
-            "name": can_view_recurring_reservation,
-            "description": can_view_recurring_reservation,
-            "user": can_view_recurring_reservation,
-            "allocated_time_slot": can_view_recurring_reservation,
+            "name": lambda user, res: user.permissions.can_view_recurring_reservation(res),
+            "description": lambda user, res: user.permissions.can_view_recurring_reservation(res),
+            "user": lambda user, res: user.permissions.can_view_recurring_reservation(res),
+            "allocated_time_slot": lambda user, res: user.permissions.can_view_recurring_reservation(res),
         }
         filterset_class = RecurringReservationFilterSet
         permission_classes = [RecurringReservationPermission]
@@ -52,7 +51,7 @@ class RecurringReservationNode(DjangoNode):
 
         if user.is_anonymous:
             return queryset.none()
-        if not user.has_staff_permissions:
+        if not user.permissions.has_any_role():
             return queryset.filter(user=user)
         return queryset
 

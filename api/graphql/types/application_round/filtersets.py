@@ -7,8 +7,7 @@ from graphene_django_extensions.filters import IntMultipleChoiceFilter
 
 from applications.models import ApplicationRound
 from common.date_utils import local_datetime
-from permissions.helpers import has_general_permission
-from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
+from permissions.enums import UserRoleChoice
 
 if TYPE_CHECKING:
     from common.typing import AnyUser
@@ -37,30 +36,21 @@ class ApplicationRoundFilterSet(ModelFilterSet):
         if not value:
             return queryset
 
-        request_user: AnyUser = self.request.user
+        user: AnyUser = self.request.user
 
-        if request_user.is_anonymous:
+        if user.is_anonymous or not user.is_active:
             return queryset.none()
-        if request_user.is_superuser:
+        if user.is_superuser:
             return queryset
 
-        general_permissions = GeneralPermissionChoices.handle_or_validate_applications
-        if any(has_general_permission(request_user, perm) for perm in general_permissions):
+        roles = UserRoleChoice.can_manage_applications()
+        if user.permissions.has_general_role(role_choices=roles):
             return queryset
 
-        unit_permissions = UnitPermissionChoices.handle_or_validate_applications
-        units: list[int] = [
-            unit_id
-            for unit_id, unit_perms in request_user.unit_permissions.items()
-            if any(perm in unit_permissions for perm in unit_perms)
-        ]
-        unit_groups: list[int] = [
-            unit_group_id
-            for unit_group_id, unit_group_perms in request_user.unit_group_permissions.items()
-            if any(perm in unit_permissions for perm in unit_group_perms)
-        ]
+        u_ids = user.permissions.unit_ids_where_has_role(role_choices=roles)
+        g_ids = user.permissions.unit_group_ids_where_has_role(role_choices=roles)
 
         return queryset.filter(
-            models.Q(reservation_units__unit__in=units)
-            | models.Q(reservation_units__unit__unit_groups__in=unit_groups),
+            models.Q(reservation_units__unit__in=u_ids)  #
+            | models.Q(reservation_units__unit__unit_groups__in=g_ids),
         ).distinct()

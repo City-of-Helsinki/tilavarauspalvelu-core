@@ -2,7 +2,6 @@ import pytest
 
 from resources.enums import ResourceLocationType
 from tests.factories import ResourceFactory
-from tests.helpers import UserType
 
 from .helpers import UPDATE_MUTATION
 
@@ -14,7 +13,7 @@ pytestmark = [
 
 def test_resource__update(graphql):
     resource = ResourceFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "pk": resource.pk,
@@ -38,7 +37,7 @@ def test_resource__update(graphql):
 
 def test_resource__update__remove_translations(graphql):
     resource = ResourceFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "pk": resource.pk,
@@ -57,7 +56,7 @@ def test_resource__update__remove_translations(graphql):
 
 def test_resource__update__empty_name_fi(graphql):
     resource = ResourceFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "pk": resource.pk,
@@ -71,7 +70,7 @@ def test_resource__update__empty_name_fi(graphql):
 
 def test_resource__update__null_space_with_fixed_location(graphql):
     resource = ResourceFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "pk": resource.pk,
@@ -84,7 +83,7 @@ def test_resource__update__null_space_with_fixed_location(graphql):
 
 def test_resource__update__null_space_with_movable_location(graphql):
     resource = ResourceFactory.create(location_type=ResourceLocationType.MOVABLE)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "pk": resource.pk,
@@ -101,7 +100,7 @@ def test_resource__update__null_space_with_movable_location(graphql):
 
 def test_resource__update__bad_location(graphql):
     resource = ResourceFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     data = {
         "pk": resource.pk,

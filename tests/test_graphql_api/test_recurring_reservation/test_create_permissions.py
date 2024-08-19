@@ -2,7 +2,6 @@ import pytest
 
 from reservations.models import RecurringReservation
 from tests.factories import ReservationUnitFactory, UserFactory
-from tests.helpers import UserType
 
 from .helpers import CREATE_MUTATION, get_minimal_create_date
 
@@ -15,7 +14,7 @@ pytestmark = [
 def test_recurring_reservations__create__regular_user(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
-    graphql.login_user_based_on_type(UserType.REGULAR)
+    graphql.login_with_regular_user()
 
     data = get_minimal_create_date(reservation_unit)
     response = graphql(CREATE_MUTATION, input_data=data)
@@ -26,7 +25,7 @@ def test_recurring_reservations__create__regular_user(graphql):
 def test_recurring_reservations__create__general_admin(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
-    admin = UserFactory.create_with_general_permissions(perms=["can_create_staff_reservations"])
+    admin = UserFactory.create_with_general_role()
     graphql.force_login(admin)
 
     data = get_minimal_create_date(reservation_unit)
@@ -39,10 +38,7 @@ def test_recurring_reservations__create__general_admin(graphql):
 def test_recurring_reservations__create__unit_admin(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
-    admin = UserFactory.create_with_unit_permissions(
-        unit=reservation_unit.unit,
-        perms=["can_create_staff_reservations"],
-    )
+    admin = UserFactory.create_with_unit_role(units=[reservation_unit.unit])
     graphql.force_login(admin)
 
     data = get_minimal_create_date(reservation_unit)

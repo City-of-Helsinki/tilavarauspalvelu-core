@@ -29,7 +29,7 @@ class InvalidActiveParams(NamedTuple):
 def test_user_creates_draft_banner_notification(graphql):
     # given:
     # - Notification manager is using the system
-    user = UserFactory.create_with_general_permissions(perms=["can_manage_notifications"])
+    user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     # when:
@@ -54,7 +54,7 @@ def test_user_creates_draft_banner_notification(graphql):
 def test_user_creates_draft_banner_notification_without_required_fields(graphql):
     # given:
     # - Notification manager is using the system
-    user = UserFactory.create_with_general_permissions(perms=["can_manage_notifications"])
+    user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     # when:
@@ -74,7 +74,7 @@ def test_user_creates_draft_banner_notification_without_required_fields(graphql)
 def test_user_creates_non_draft_banner_notification_without_required_fields(graphql):
     # given:
     # - Notification manager is using the system
-    user = UserFactory.create_with_general_permissions(perms=["can_manage_notifications"])
+    user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     # when:
@@ -163,7 +163,7 @@ def test_user_creates_non_draft_banner_notification_without_required_fields(grap
 def test_user_creates_banner_notification_where_active_range_is_invalid(graphql, active_from, active_until, expected):
     # given:
     # - Notification manager is using the system
-    user = UserFactory.create_with_general_permissions(perms=["can_manage_notifications"])
+    user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
     # when:

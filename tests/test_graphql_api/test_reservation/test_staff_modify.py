@@ -3,6 +3,7 @@ import datetime
 import pytest
 
 from common.date_utils import next_hour
+from permissions.enums import UserRoleChoice
 from reservations.enums import ReservationStateChoice, ReservationTypeChoice
 from tests.factories import ReservationFactory, UserFactory
 
@@ -29,10 +30,7 @@ def test_reservation__staff_modify(graphql):
 def test_reservation__staff_modify__unit_handler__other_users_reservation(graphql):
     reservation = ReservationFactory.create_for_staff_update()
 
-    admin = UserFactory.create_with_unit_permissions(
-        unit=reservation.reservation_unit.first().unit,
-        perms=["can_manage_reservations"],
-    )
+    admin = UserFactory.create_with_unit_role(units=[reservation.reservation_unit.first().unit])
 
     graphql.force_login(admin)
     data = get_staff_modify_data(reservation)
@@ -47,9 +45,9 @@ def test_reservation__staff_modify__unit_handler__other_users_reservation(graphq
 def test_reservation__staff_modify__unit_reserver__other_users_reservation(graphql):
     reservation = ReservationFactory.create_for_staff_update()
 
-    admin = UserFactory.create_with_unit_permissions(
-        unit=reservation.reservation_unit.first().unit,
-        perms=["can_create_staff_reservations"],
+    admin = UserFactory.create_with_unit_role(
+        units=[reservation.reservation_unit.first().unit],
+        role=UserRoleChoice.RESERVER,
     )
 
     graphql.force_login(admin)

@@ -13,8 +13,7 @@ from api.graphql.types.user.types import ApplicantNode
 from applications.enums import ApplicationStatusChoice
 from applications.models import Application
 from common.typing import GQLInfo
-from permissions.helpers import can_access_application_private_fields, has_any_general_permission
-from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
+from permissions.enums import UserRoleChoice
 from users.models import User
 
 __all__ = [
@@ -49,7 +48,9 @@ class ApplicationNode(DjangoNode):
             "status",
         ]
         restricted_fields = {
-            "working_memo": can_access_application_private_fields,
+            "working_memo": lambda user, application: user.permissions.can_view_application(
+                application, reserver_needs_role=True
+            ),
         }
         filterset_class = ApplicationFilterSet
         permission_classes = [ApplicationPermission]
@@ -78,23 +79,17 @@ class ApplicationNode(DjangoNode):
     def filter_queryset(cls, queryset: models.QuerySet, info: GQLInfo) -> models.QuerySet:
         user = info.context.user
 
-        if user.is_anonymous:
+        if user.is_anonymous or not user.is_active:
             return queryset.none()
         if user.is_superuser:
             return queryset
-        if has_any_general_permission(user, GeneralPermissionChoices.handle_or_validate_applications):
+
+        roles = UserRoleChoice.can_manage_applications()
+        if user.permissions.has_general_role(role_choices=roles):
             return queryset
 
-        u_ids = [
-            pk
-            for pk, perms in user.unit_permissions.items()  #
-            if any(p in perms for p in UnitPermissionChoices.handle_or_validate_applications)
-        ]
-        g_ids = [
-            pk
-            for pk, perms in user.unit_group_permissions.items()  #
-            if any(p in perms for p in UnitPermissionChoices.handle_or_validate_applications)
-        ]
+        u_ids = user.permissions.unit_ids_where_has_role(role_choices=roles)
+        g_ids = user.permissions.unit_group_ids_where_has_role(role_choices=roles)
 
         return queryset.filter(
             Q(user=user)

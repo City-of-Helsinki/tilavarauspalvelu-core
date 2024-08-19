@@ -8,8 +8,7 @@ from query_optimizer.selections import get_field_selections
 
 from api.graphql.extensions import error_codes
 from applications.models import Application
-from common.typing import GQLInfo
-from permissions.helpers import can_read_application, can_view_reservation
+from common.typing import AnyUser, GQLInfo
 from reservations.models import Reservation
 from users.helauth.clients import HelsinkiProfileClient
 from users.helauth.typing import LoginMethod, UserProfileInfo
@@ -106,7 +105,8 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
             extensions = {"code": error_codes.HELSINKI_PROFILE_APPLICATION_USER_NOT_FOUND}
             raise GraphQLError(msg, extensions=extensions)
 
-        if not can_read_application(info.context.user, application):
+        user: AnyUser = info.context.user
+        if not user.permissions.can_view_application(application, reserver_needs_role=True):
             raise GQLNodePermissionDeniedError
 
         user: User | None = application.user
@@ -125,7 +125,8 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
             extensions = {"code": error_codes.HELSINKI_PROFILE_RESERVATION_USER_NOT_FOUND}
             raise GraphQLError(msg, extensions=extensions)
 
-        if not can_view_reservation(info.context.user, reservation):
+        user: AnyUser = info.context.user
+        if not user.permissions.can_view_reservation(reservation):
             raise GQLNodePermissionDeniedError
 
         user: User | None = reservation.user

@@ -3,7 +3,6 @@ import pytest
 from resources.enums import ResourceLocationType
 from resources.models import Resource
 from tests.factories import SpaceFactory, UnitGroupFactory, UserFactory
-from tests.helpers import UserType
 
 from .helpers import CREATE_MUTATION
 
@@ -15,7 +14,7 @@ pytestmark = [
 
 def test_resource__create__regular_user(graphql):
     space = SpaceFactory.create()
-    graphql.login_user_based_on_type(UserType.REGULAR)
+    graphql.login_with_regular_user()
 
     data = {
         "name": "abc",
@@ -33,7 +32,7 @@ def test_resource__create__regular_user(graphql):
 def test_resource__create__unit_admin__can_manage_resources(graphql):
     space = SpaceFactory.create()
 
-    user = UserFactory.create_with_unit_permissions(unit=space.unit, perms=["can_manage_resources"])
+    user = UserFactory.create_with_unit_role(units=[space.unit])
     graphql.force_login(user)
 
     data = {
@@ -55,7 +54,7 @@ def test_resource__create__unit_group_admin__can_manage_resources(graphql):
     space = SpaceFactory.create()
     unit_group = UnitGroupFactory.create(units=[space.unit])
 
-    user = UserFactory.create_with_unit_group_permissions(unit_group=unit_group, perms=["can_manage_resources"])
+    user = UserFactory.create_with_unit_role(unit_groups=[unit_group])
     graphql.force_login(user)
 
     data = {

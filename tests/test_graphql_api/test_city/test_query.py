@@ -4,7 +4,6 @@ import pytest
 from graphene_django_extensions.testing import build_query
 
 from tests.factories import CityFactory
-from tests.helpers import UserType
 
 # Applied to all tests
 pytestmark = [
@@ -17,7 +16,7 @@ age_groups_query = partial(build_query, "cities", connection=True)
 def test_cities__query__all_fields(graphql):
     city_1 = CityFactory.create()
     city_2 = CityFactory.create()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     fields = """
         pk
