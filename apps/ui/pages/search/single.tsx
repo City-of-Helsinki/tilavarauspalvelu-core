@@ -102,11 +102,11 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   );
 
   const reservationUnitTypeOptions = reservationUnitTypes.map((n) => ({
-    value: n.pk?.toString() ?? "",
+    value: n.pk ?? 0,
     label: getTranslationSafe(n, "name", convertLanguageCode(locale ?? "")),
   }));
   const purposeOptions = purposes.map((n) => ({
-    value: n.pk?.toString() ?? "",
+    value: n.pk ?? 0,
     label: getTranslationSafe(n, "name", convertLanguageCode(locale ?? "")),
   }));
   const equipmentsOptions = equipments.map((n) => ({

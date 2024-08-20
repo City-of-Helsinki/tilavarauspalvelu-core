@@ -20,6 +20,7 @@ import { ControlledMultiSelect } from "./ControlledMultiSelect";
 import { ControlledSelect } from "@/components/common/ControlledSelect";
 import {
   mapQueryParamToNumber,
+  mapQueryParamToNumberArray,
   mapSingleBooleanParamToFormValue,
   mapSingleParamToFormValue,
 } from "@/modules/search";
@@ -151,10 +152,10 @@ const SubmitButton = styled(MediumButton)`
 type FormValues = {
   // TODO there is some confusion on the types of these
   // they are actually an array of pks (number) but they are encoded as val1,val2,val3 string
-  purposes: string;
-  unit: string;
-  equipments: string;
-  reservationUnitTypes: string;
+  purposes: number[];
+  unit: number[];
+  equipments: number[];
+  reservationUnitTypes: number[];
   timeBegin: string | null;
   timeEnd: string | null;
   startDate: string | null;
@@ -172,12 +173,12 @@ function mapQueryToForm(query: ParsedUrlQuery): FormValues {
   const showOnlyReservable =
     mapSingleBooleanParamToFormValue(query.showOnlyReservable) ?? true;
   return {
-    // array parameters (string encoded with ',' separator)
-    purposes: mapSingleParamToFormValue(query.purposes) ?? "",
-    unit: mapSingleParamToFormValue(query.unit) ?? "",
-    equipments: mapSingleParamToFormValue(query.equipments) ?? "",
-    reservationUnitTypes:
-      mapSingleParamToFormValue(query.reservationUnitTypes) ?? "",
+    purposes: mapQueryParamToNumberArray(query.purposes),
+    unit: mapQueryParamToNumberArray(query.unit),
+    equipments: mapQueryParamToNumberArray(query.equipments),
+    reservationUnitTypes: mapQueryParamToNumberArray(
+      query.reservationUnitTypes
+    ),
     // ?
     timeBegin: mapSingleParamToFormValue(query.timeBegin) ?? null,
     timeEnd: mapSingleParamToFormValue(query.timeEnd) ?? null,
@@ -224,8 +225,8 @@ export function SingleSearchForm({
   equipmentsOptions,
   isLoading,
 }: {
-  reservationUnitTypeOptions: Array<{ value: string; label: string }>;
-  purposeOptions: Array<{ value: string; label: string }>;
+  reservationUnitTypeOptions: Array<{ value: number; label: string }>;
+  purposeOptions: Array<{ value: number; label: string }>;
   unitOptions: Array<{ value: number; label: string }>;
   equipmentsOptions: Array<{ value: number; label: string }>;
   isLoading: boolean;
@@ -253,9 +254,9 @@ export function SingleSearchForm({
       case "unit":
         return unitOptions.find((n) => compFn(n, value))?.label;
       case "reservationUnitTypes":
-        return unitTypeOptions.find((n) => n.value === value)?.label;
+        return unitTypeOptions.find((n) => compFn(n, value))?.label;
       case "purposes":
-        return purposeOptions.find((n) => n.value === value)?.label;
+        return purposeOptions.find((n) => compFn(n, value))?.label;
       case "equipments":
         return equipmentsOptions.find((n) => compFn(n, value))?.label;
       case "duration":
@@ -280,7 +281,7 @@ export function SingleSearchForm({
   };
 
   const showOptionalFilters =
-    formValues.reservationUnitTypes !== "" ||
+    formValues.reservationUnitTypes.length !== 0 ||
     formValues.minPersons != null ||
     formValues.maxPersons != null ||
     formValues.textSearch != null;

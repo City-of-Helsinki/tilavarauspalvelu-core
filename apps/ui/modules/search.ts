@@ -241,10 +241,29 @@ export function mapQueryParamToNumber(
   if (param == null) return null;
   if (param === "") return null;
   if (Array.isArray(param)) {
-    return parseInt(param[0], 10);
+    const v = Number(param[0]);
+    if (Number.isNaN(v)) {
+      return null;
+    }
+    return v;
   }
   if (Number.isNaN(Number(param))) {
     return null;
   }
   return Number(param);
+}
+
+export function mapQueryParamToNumberArray(
+  param: string | string[] | undefined
+): number[] {
+  if (param == null) return [];
+  if (param === "") return [];
+  if (Array.isArray(param)) {
+    return param.map(Number).filter(Number.isInteger);
+  }
+  const v = Number(param);
+  if (Number.isNaN(v)) {
+    return [];
+  }
+  return [v];
 }

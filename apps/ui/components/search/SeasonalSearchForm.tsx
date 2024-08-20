@@ -20,6 +20,7 @@ import { ControlledSelect } from "@/components/common/ControlledSelect";
 import { ControlledMultiSelect } from "./ControlledMultiSelect";
 import {
   mapQueryParamToNumber,
+  mapQueryParamToNumberArray,
   mapSingleParamToFormValue,
 } from "@/modules/search";
 
@@ -142,9 +143,9 @@ type FormValues = {
   applicationRound: number;
   minPersons: number | null;
   maxPersons: number | null;
-  unit: string;
-  reservationUnitTypes: string;
-  purposes: string;
+  unit: number[];
+  reservationUnitTypes: number[];
+  purposes: number[];
   textSearch: string;
 };
 
@@ -152,10 +153,11 @@ type FormValues = {
 function mapQueryToForm(query: ParsedUrlQuery): FormValues {
   return {
     applicationRound: mapQueryParamToNumber(query.applicationRound) ?? 0,
-    unit: mapSingleParamToFormValue(query.unit) ?? "",
-    purposes: mapSingleParamToFormValue(query.purposes) ?? "",
-    reservationUnitTypes:
-      mapSingleParamToFormValue(query.reservationUnitTypes) ?? "",
+    purposes: mapQueryParamToNumberArray(query.purposes),
+    unit: mapQueryParamToNumberArray(query.unit),
+    reservationUnitTypes: mapQueryParamToNumberArray(
+      query.reservationUnitTypes
+    ),
     minPersons: mapQueryParamToNumber(query.minPersons) ?? null,
     maxPersons: mapQueryParamToNumber(query.maxPersons) ?? null,
     textSearch: mapSingleParamToFormValue(query.textSearch) ?? "",
@@ -170,8 +172,8 @@ export function SeasonalSearchForm({
   isLoading,
 }: {
   applicationRoundOptions: Array<{ value: number; label: string }>;
-  reservationUnitTypeOptions: Array<{ value: string; label: string }>;
-  purposeOptions: Array<{ value: string; label: string }>;
+  reservationUnitTypeOptions: Array<{ value: number; label: string }>;
+  purposeOptions: Array<{ value: number; label: string }>;
   unitOptions: Array<{ value: number; label: string }>;
   isLoading: boolean;
 }): JSX.Element | null {
