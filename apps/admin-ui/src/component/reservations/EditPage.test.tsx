@@ -6,12 +6,11 @@ import userEvent from "@testing-library/user-event";
 // @ts-expect-error -- FIXME react-router typing
 import * as router from "react-router";
 import { CustomerTypeChoice, ReservationDocument } from "@gql/gql-types";
-
 import EditPage from "./EditPage";
 import {
   CHANGED_WORKING_MEMO,
   mockReservation,
-  mocks,
+  createMocks,
 } from "./hooks/__test__/mocks";
 import { base64encode } from "common/src/helpers";
 
@@ -84,7 +83,7 @@ const extendedReservation = {
 };
 
 const extendedMocks = [
-  ...mocks,
+  ...createMocks(),
   {
     request: {
       query: ReservationDocument,

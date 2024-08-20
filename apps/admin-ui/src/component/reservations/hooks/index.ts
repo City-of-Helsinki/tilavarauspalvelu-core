@@ -27,9 +27,10 @@ export function useStaffReservationMutation({
 
   const [mutation] = useUpdateStaffReservationMutation();
 
-  const { reservations } = useRecurringReservations(
+  const { recurringReservation } = useRecurringReservations(
     reservation.recurringReservation?.pk ?? undefined
   );
+  const reservations = recurringReservation?.reservations ?? [];
 
   const [recurringMutation] = useUpdateRecurringReservationMutation();
 
@@ -55,6 +56,9 @@ export function useStaffReservationMutation({
         .filter((x) => x.state === ReservationStateChoice.Confirmed)
         .map((x) => x.pk)
         .filter((x): x is number => x != null);
+      if (pksToUpdate.length === 0) {
+        throw new Error("No reservations to update");
+      }
 
       const res = await recurringMutation({
         variables: {

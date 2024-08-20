@@ -143,7 +143,6 @@ export function useRecurringReservations(recurringPk?: number) {
     skip: !recurringPk,
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
-    errorPolicy: "all",
     variables: { id },
     onError: () => {
       errorToast({ text: t("errors.errorFetchingData") });

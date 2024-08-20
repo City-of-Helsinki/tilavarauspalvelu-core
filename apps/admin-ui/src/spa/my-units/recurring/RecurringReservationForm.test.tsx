@@ -2,7 +2,6 @@
 import React from "react";
 import "@testing-library/jest-dom";
 import {
-  act,
   fireEvent,
   render,
   screen,
@@ -55,7 +54,7 @@ test("Render recurring reservation form with all but unit field disabled", async
   expect(resUnitSelectLabel).toBeDefined();
 
   const btn = getReservationUnitBtn();
-  await act(() => user.click(btn));
+  await user.click(btn);
   expect(btn).not.toBeRequired();
 
   const listbox = await view.findByLabelText(/reservationUnit/, {
@@ -69,29 +68,32 @@ test("Render recurring reservation form with all but unit field disabled", async
   expect(within(listbox).getByText(units[1].nameFi!)).toBeInTheDocument();
 
   const selectorFields = ["repeatPattern"];
-  selectorFields.forEach((f) => {
+  for (const f of selectorFields) {
     const labelElem = view.getByRole("button", { name: RegExp(f) });
     expect(labelElem).toBeInTheDocument();
     expect(labelElem).toBeDisabled();
-  });
+  }
   const dateFields = ["startingDate", "endingDate"];
-  dateFields.forEach((f) => {
+  for (const f of dateFields) {
     const labelElem = view.getByRole("textbox", { name: RegExp(f) });
     expect(labelElem).toBeInTheDocument();
     expect(labelElem).toBeDisabled();
-  });
+  }
 
   const submitBtn = await screen.findByRole("button", {
     name: "common.reserve",
   });
   expect(submitBtn).toBeDefined();
 
-  expect(
-    await screen.findByRole("button", { name: "common.cancel" })
-  ).toBeDefined();
+  const cancelBtn = await screen.findByRole("link", {
+    name: "common.cancel",
+  });
+  expect(cancelBtn).toBeDefined();
+  expect(cancelBtn).toBeInTheDocument();
+  expect(cancelBtn).not.toBeDisabled();
 });
 
-const selectUnit = async () => {
+async function selectUnit() {
   const container = screen.getByText(
     /MyUnits.RecurringReservationForm.reservationUnit/
   );
@@ -102,7 +104,7 @@ const selectUnit = async () => {
   expect(btn).not.toBeDisabled();
   // placeholder check because selects use button text checks
   expect(btn).toHaveTextContent("common.select");
-  await act(() => user.click(btn));
+  await user.click(btn);
 
   const listbox = screen.getByLabelText(/reservationUnit/, {
     selector: "ul",
@@ -114,7 +116,7 @@ const selectUnit = async () => {
   // to check the selected value we have to read the button text not check options
   await userEvent.selectOptions(listbox, unitName);
   expect(btn).toHaveTextContent(unitName);
-};
+}
 
 // Smoke test (if this fails, all others will fail also, and it's harder to debug)
 // TODO make it so that it skips the other tests if this fails
@@ -143,44 +145,41 @@ test("SMOKE: selecting unit field allows input to other mandatory fields", async
   // and then submit it and check we get both CREATE_RECURRING and CREATE_STAFF mutations
 });
 
-// FIXME this fails on CI but not locally
-test.skip("Submit is blocked if all mandatory fields are not set", async () => {
+test("Submit is disabled if all mandatory fields are not set", async () => {
   const view = customRender();
 
   await selectUnit();
 
   const submit = view.getByRole("button", { name: "common.reserve" });
   expect(submit).toBeInTheDocument();
-  const user = userEvent.setup();
-  await act(() => user.click(submit));
-  // check errors printed to the form
-  await waitFor(() => {
-    expect(
-      view.getByText("Array must contain at least 1 element(s)")
-    ).toBeInTheDocument();
-    expect(view.getByText("Invalid date")).toBeInTheDocument();
-  });
-
-  // TODO check that there is no calls to Apollo mocks
+  expect(submit).toBeDisabled();
 });
 
-// FIXME this interferes with other tests (nwsapi error)
-test.skip("Form has meta when reservation unit is selected.", async () => {
+test("Form has meta when reservation unit is selected.", async () => {
   const view = customRender();
+  const user = userEvent.setup();
 
   await selectUnit();
 
   // TODO check that the radio buttons are not selected by default
   // this is because it's better for usability even if it causes acccessiblity issues
-
   const typeStaff = view.getByLabelText(/STAFF/);
   expect(typeStaff).toBeInTheDocument();
-  const user = userEvent.setup();
-  await act(() => user.click(typeStaff));
+  const typeClosed = view.getByLabelText(/BLOCKED/);
+  expect(typeClosed).toBeInTheDocument();
+  const typeBehalf = view.getByLabelText(/BEHALF/);
+  expect(typeBehalf).toBeInTheDocument();
 
-  // Just checking a single meta field for now
-  // TODO use camelCase to convert all the metafields from unit[] and run an array check
-  const emailInput = view.getByLabelText(/reserveeEmail/);
+  await user.click(typeBehalf);
+
+  const seriesNameInput = view.getByLabelText(/RecurringReservationForm.name/);
+  expect(seriesNameInput).toBeInTheDocument();
+
+  // we only really need to know that one of the meta fields is there to test this forms logic
+  // all meta fields should have separate tests
+  const metaView = view.getByTestId("reservation__form--reservee-info");
+  expect(metaView).toBeInTheDocument();
+  const emailInput = within(metaView).getByLabelText(/reserveeEmail/);
   expect(emailInput).toBeInTheDocument();
 });
 
@@ -218,7 +217,7 @@ async function fillForm({
   expect(btn).not.toBeDisabled();
   // placeholder check because selects use button text checks
   expect(btn).toHaveTextContent("common.select");
-  await act(() => user.click(btn));
+  await user.click(btn);
 
   // TODO replace the select code with the utility function: selectUnit
   const listbox = screen.getByLabelText(/reservationUnit/, {
@@ -272,7 +271,7 @@ async function fillForm({
     name: `dayShort.${dayNumber}`,
   });
   expect(button).toBeInTheDocument();
-  await act(() => user.click(button));
+  await user.click(button);
 
   // NOTE this logic is wrong in the component (should use checked attribute not classes and component state)
   // toBeChecked doesn't work even though the role is checkbox, type is button
@@ -338,8 +337,7 @@ test("Form submission without any blocking reservations", async () => {
   // and check that the wanted 4 reservations were made (or if we want to test errors)
 }, 15_000);
 
-// FIXME broken after GQL refactor (probably mocks)
-test.skip("Form submission with a lot of blocking reservations", async () => {
+test("Form submission with a lot of blocking reservations", async () => {
   const view = customRender();
 
   await fillForm({
@@ -381,7 +379,7 @@ test.skip("Form submission with a lot of blocking reservations", async () => {
   // TODO test submit, but it doesn't work without extra context
 
   // NOTE This test is long running by design. jest.setTimeout doesn't work for async functions
-}, 60_000);
+}, 15_000);
 
 test("Reservations can be removed and restored", async () => {
   const view = customRender();
@@ -418,7 +416,7 @@ test("Reservations can be removed and restored", async () => {
   await waitFor(
     async () => (await within(list).findAllByText(/common.remove/)).length === 4
   );
-}, 30_000);
+}, 15_000);
 
 // NOTE this requires us to fix submission checking
 test.todo("Removed reservations are not included in the mutation");

@@ -95,7 +95,7 @@ const reserveeOptions = [
   },
 ];
 
-const SubheadingByType = ({
+function SubheadingByType({
   reserveeType,
   index,
   field,
@@ -103,7 +103,7 @@ const SubheadingByType = ({
   reserveeType: CustomerTypeChoice;
   index: number;
   field: string;
-}) => {
+}) {
   const { t } = useTranslation();
 
   const headingForNonProfit =
@@ -137,9 +137,9 @@ const SubheadingByType = ({
       {t("reservationApplication:label.headings.contactInfo")}
     </GroupHeading>
   ) : null;
-};
+}
 
-const ReservationFormFields = ({
+function ReservationFormFields({
   fields,
   options,
   // subheading is needed because application form uses it and requires index / field data to render it
@@ -154,7 +154,7 @@ const ReservationFormFields = ({
   hasSubheading?: boolean;
   metadata: MetadataSetsFragment["metadataSet"];
   params?: { numPersons: { min?: number; max?: number } };
-}) => {
+}) {
   const { getValues } = useFormContext<Reservation>();
 
   const requiredFields = filterNonNullable(metadata?.requiredFields)
@@ -194,10 +194,10 @@ const ReservationFormFields = ({
       ))}
     </>
   );
-};
+}
 
 // TODO reduce prop drilling / remove unused props
-export const ReservationMetaFields = ({
+export function ReservationMetaFields({
   fields,
   reservationUnit,
   options,
@@ -211,7 +211,7 @@ export const ReservationMetaFields = ({
     termsForDiscount?: JSX.Element | string;
   };
   noHeadingMarginal?: boolean;
-}) => {
+}) {
   const { t } = useTranslation();
 
   if (fields.length === 0) {
@@ -251,9 +251,9 @@ export const ReservationMetaFields = ({
       </TwoColumnContainer>
     </>
   );
-};
+}
 
-const CustomerTypeChoiceSelector = () => {
+function CustomerTypeChoiceSelector() {
   const { t } = useTranslation();
 
   return (
@@ -279,10 +279,10 @@ const CustomerTypeChoiceSelector = () => {
       />
     </CustomerTypeChoiceContainer>
   );
-};
+}
 
 // TODO reduce prop drilling / remove unused props
-export const ReserverMetaFields = ({
+export function ReserverMetaFields({
   fields,
   reservationUnit,
   options,
@@ -295,7 +295,7 @@ export const ReserverMetaFields = ({
   data?: {
     termsForDiscount?: JSX.Element | string;
   };
-}) => {
+}) {
   const { watch } = useFormContext<Reservation & Partial<Inputs>>();
   const { t } = useTranslation();
 
@@ -322,7 +322,7 @@ export const ReserverMetaFields = ({
           <CustomerTypeChoiceSelector />
         </>
       )}
-      <ReservationApplicationFieldsContainer>
+      <ReservationApplicationFieldsContainer data-testid="reservation__form--reservee-info">
         <ReservationFormFields
           fields={fields}
           metadata={reservationUnit.metadataSet}
@@ -334,19 +334,19 @@ export const ReserverMetaFields = ({
       </ReservationApplicationFieldsContainer>
     </>
   );
-};
+}
 
 // TODO this should be deprecated (use the individual components instead)
 // because we need the individual components for admin-ui (placement in dom changes)
 // and this component has more props than dom nodes.
 // Not removed yet since requires ui/ refactoring.
-const MetaFields = ({
+function MetaFields({
   reservationUnit,
   generalFields,
   reservationApplicationFields,
   options,
   data,
-}: Props) => {
+}: Props) {
   if (!reservationUnit.metadataSet) {
     return null;
   }
@@ -367,6 +367,6 @@ const MetaFields = ({
       />
     </Container>
   );
-};
+}
 
 export default MetaFields;
