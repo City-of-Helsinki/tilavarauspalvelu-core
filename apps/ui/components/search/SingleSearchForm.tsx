@@ -284,7 +284,7 @@ export function SingleSearchForm({
     formValues.reservationUnitTypes.length !== 0 ||
     formValues.minPersons != null ||
     formValues.maxPersons != null ||
-    formValues.textSearch != null;
+    formValues.textSearch !== "";
 
   return (
     <form noValidate onSubmit={handleSubmit(onSearch)}>
