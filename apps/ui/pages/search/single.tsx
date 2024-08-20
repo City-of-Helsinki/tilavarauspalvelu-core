@@ -10,14 +10,9 @@ import { breakpoints } from "common/src/common/style";
 import { H2 } from "common/src/common/typography";
 import {
   ReservationKind,
-  OptionsDocument,
-  type OptionsQuery,
   SearchReservationUnitsDocument,
   type SearchReservationUnitsQueryVariables,
   type SearchReservationUnitsQuery,
-  type SearchFormParamsUnitQuery,
-  type SearchFormParamsUnitQueryVariables,
-  SearchFormParamsUnitDocument,
 } from "@gql/gql-types";
 import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
@@ -29,12 +24,8 @@ import ReservationUnitCard from "@/components/search/SingleSearchReservationUnit
 import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
-import { processVariables } from "@/modules/search";
+import { getSearchOptions, processVariables } from "@/modules/search";
 import { useSearchValues } from "@/hooks/useSearchValues";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-} from "common/src/common/util";
 import { useSearchQuery } from "@/hooks/useSearchQuery";
 
 const Wrapper = styled.div`
@@ -86,66 +77,15 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     fetchPolicy: "no-cache",
     variables,
   });
-
-  // TODO this is copy pasta from search.tsx (combine into a single function)
-  const { data: optionsData } = await apolloClient.query<OptionsQuery>({
-    query: OptionsDocument,
-  });
-  const reservationUnitTypes = filterNonNullable(
-    optionsData?.reservationUnitTypes?.edges?.map((edge) => edge?.node)
-  );
-  const purposes = filterNonNullable(
-    optionsData?.purposes?.edges?.map((edge) => edge?.node)
-  );
-  const equipments = filterNonNullable(
-    optionsData?.equipments?.edges?.map((edge) => edge?.node)
-  );
-
-  const reservationUnitTypeOptions = reservationUnitTypes.map((n) => ({
-    value: n.pk ?? 0,
-    label: getTranslationSafe(n, "name", convertLanguageCode(locale ?? "")),
-  }));
-  const purposeOptions = purposes.map((n) => ({
-    value: n.pk ?? 0,
-    label: getTranslationSafe(n, "name", convertLanguageCode(locale ?? "")),
-  }));
-  const equipmentsOptions = equipments.map((n) => ({
-    value: n.pk ?? 0,
-    label: getTranslationSafe(n, "name", convertLanguageCode(locale ?? "")),
-  }));
-
-  const { data: unitData } = await apolloClient.query<
-    SearchFormParamsUnitQuery,
-    SearchFormParamsUnitQueryVariables
-  >({
-    query: SearchFormParamsUnitDocument,
-    variables: {
-      publishedReservationUnits: true,
-      onlyDirectBookable: true,
-    },
-  });
-
-  const unitOptions = filterNonNullable(
-    unitData?.units?.edges?.map((e) => e?.node)
-  )
-    .filter((node) => node?.pk != null)
-    .map((node) => ({
-      value: node.pk ?? 0,
-      label:
-        getTranslationSafe(node, "name", convertLanguageCode(locale ?? "")) ??
-        "",
-    }));
+  const opts = await getSearchOptions(apolloClient, "direct", locale ?? "");
 
   return {
     props: {
       ...getCommonServerSideProps(),
       overrideBackgroundColor: "var(--tilavaraus-gray)",
       ...(await serverSideTranslations(locale ?? "fi")),
+      ...opts,
       data,
-      unitOptions,
-      reservationUnitTypeOptions,
-      purposeOptions,
-      equipmentsOptions,
     },
   };
 }

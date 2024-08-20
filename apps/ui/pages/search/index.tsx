@@ -17,11 +17,6 @@ import {
   type ApplicationRoundsUiQuery,
   type ApplicationRoundsUiQueryVariables,
   ApplicationRoundsUiDocument,
-  type OptionsQuery,
-  OptionsDocument,
-  SearchFormParamsUnitDocument,
-  type SearchFormParamsUnitQueryVariables,
-  type SearchFormParamsUnitQuery,
 } from "@gql/gql-types";
 import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
@@ -35,14 +30,9 @@ import useReservationUnitsList from "@/hooks/useReservationUnitList";
 import { ListWithPagination } from "@/components/common/ListWithPagination";
 import StartApplicationBar from "@/components/common/StartApplicationBar";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { processVariables } from "@/modules/search";
+import { getSearchOptions, processVariables } from "@/modules/search";
 import { useSearchValues } from "@/hooks/useSearchValues";
 import { getApplicationRoundName } from "@/modules/applicationRound";
-import { getUnitName } from "@/modules/reservationUnit";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-} from "common/src/common/util";
 import { useSearchQuery } from "@/hooks/useSearchQuery";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
@@ -76,58 +66,14 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     variables: processVariables(values, locale ?? "fi", ReservationKind.Season),
   });
 
-  // TODO this is copy pasta from search/single.tsx (combine into a single function)
-  const { data: optionsData } = await apolloClient.query<OptionsQuery>({
-    query: OptionsDocument,
-  });
-  const reservationUnitTypes = filterNonNullable(
-    optionsData?.reservationUnitTypes?.edges?.map((edge) => edge?.node)
-  );
-  const purposes = filterNonNullable(
-    optionsData?.purposes?.edges?.map((edge) => edge?.node)
-  );
-
-  const reservationUnitTypeOptions = reservationUnitTypes.map((n) => ({
-    value: n.pk ?? 0,
-    label: getTranslationSafe(n, "name", convertLanguageCode(locale ?? "")),
-  }));
-  const purposeOptions = purposes.map((n) => ({
-    value: n.pk ?? 0,
-    label: getTranslationSafe(n, "name", convertLanguageCode(locale ?? "")),
-  }));
-
-  const { data: unitData } = await apolloClient.query<
-    SearchFormParamsUnitQuery,
-    SearchFormParamsUnitQueryVariables
-  >({
-    query: SearchFormParamsUnitDocument,
-    variables: {
-      publishedReservationUnits: true,
-      onlySeasonalBookable: true,
-    },
-  });
-
-  const unitOptions = filterNonNullable(
-    unitData?.units?.edges?.map((e) => e?.node)
-  )
-    .map((node) => ({
-      pk: node.pk ?? 0,
-      name: getUnitName(node, locale) ?? "",
-    }))
-    .map((node) => ({
-      value: node.pk,
-      label: node.name,
-    }));
-
+  const opts = await getSearchOptions(apolloClient, "seasonal", locale ?? "");
   return {
     props: {
       ...commonProps,
       overrideBackgroundColor: "var(--tilavaraus-gray)",
+      ...opts,
       data: searchData,
       applicationRounds,
-      unitOptions,
-      purposeOptions,
-      reservationUnitTypeOptions,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

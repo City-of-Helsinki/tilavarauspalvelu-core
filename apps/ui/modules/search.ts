@@ -8,12 +8,23 @@ import {
   type QueryReservationUnitsArgs,
   ReservationKind,
   ReservationUnitOrderingChoices,
+  type OptionsQuery,
+  OptionsDocument,
+  type SearchFormParamsUnitQueryVariables,
+  type SearchFormParamsUnitQuery,
+  SearchFormParamsUnitDocument,
 } from "@gql/gql-types";
-import { ParsedUrlQuery } from "node:querystring";
+import { filterNonNullable } from "common/src/helpers";
+import {
+  convertLanguageCode,
+  getTranslationSafe,
+  toApiDate,
+} from "common/src/common/util";
+import { type ParsedUrlQuery } from "node:querystring";
 import { fromUIDate } from "./util";
 import { startOfDay } from "date-fns";
-import { toApiDate } from "common/src/common/util";
 import { SEARCH_PAGING_LIMIT } from "./const";
+import { type ApolloClient } from "@apollo/client";
 
 function transformOrderByName(desc: boolean, language: LocalizationLanguages) {
   if (language === "fi") {
@@ -266,4 +277,62 @@ export function mapQueryParamToNumberArray(
     return [];
   }
   return [v];
+}
+
+export async function getSearchOptions(
+  apolloClient: ApolloClient<unknown>,
+  page: "seasonal" | "direct",
+  locale: string
+) {
+  const lang = convertLanguageCode(locale ?? "");
+  const { data: optionsData } = await apolloClient.query<OptionsQuery>({
+    query: OptionsDocument,
+  });
+  const reservationUnitTypes = filterNonNullable(
+    optionsData?.reservationUnitTypes?.edges?.map((edge) => edge?.node)
+  );
+  const purposes = filterNonNullable(
+    optionsData?.purposes?.edges?.map((edge) => edge?.node)
+  );
+  const equipments = filterNonNullable(
+    optionsData?.equipments?.edges?.map((edge) => edge?.node)
+  );
+
+  const reservationUnitTypeOptions = reservationUnitTypes.map((n) => ({
+    value: n.pk ?? 0,
+    label: getTranslationSafe(n, "name", lang),
+  }));
+  const purposeOptions = purposes.map((n) => ({
+    value: n.pk ?? 0,
+    label: getTranslationSafe(n, "name", lang),
+  }));
+  const equipmentsOptions = equipments.map((n) => ({
+    value: n.pk ?? 0,
+    label: getTranslationSafe(n, "name", lang),
+  }));
+
+  const { data: unitData } = await apolloClient.query<
+    SearchFormParamsUnitQuery,
+    SearchFormParamsUnitQueryVariables
+  >({
+    query: SearchFormParamsUnitDocument,
+    variables: {
+      publishedReservationUnits: true,
+      ...(page === "direct" ? { onlyDirectBookable: true } : {}),
+      ...(page === "seasonal" ? { onlySeasonalBookable: true } : {}),
+    },
+  });
+  const unitOptions = filterNonNullable(
+    unitData?.units?.edges?.map((e) => e?.node)
+  ).map((node) => ({
+    value: node.pk ?? 0,
+    label: getTranslationSafe(node, "name", lang),
+  }));
+
+  return {
+    unitOptions,
+    equipmentsOptions,
+    purposeOptions,
+    reservationUnitTypeOptions,
+  };
 }
