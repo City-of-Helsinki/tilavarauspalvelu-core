@@ -1,5 +1,4 @@
 import React from "react";
-import { H6 } from "common/src/common/typography";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import {
@@ -173,7 +172,7 @@ export function RecurringReservationsView({
 
   return (
     <ReservationList
-      header={<H6 as="h3">{t("RecurringReservationsView.Heading")}</H6>}
+      header={t("RecurringReservationsView.Heading")}
       items={items}
       reservationToCopy={reservationToCopy}
       refetch={refetch}

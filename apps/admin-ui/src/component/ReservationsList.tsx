@@ -8,6 +8,7 @@ import usePermission from "@/hooks/usePermission";
 import { Permission } from "@/modules/permissionHelper";
 import { NewReservationModal } from "./reservations/EditTimeModal";
 import { useModal } from "@/context/ModalContext";
+import { H6 } from "common";
 
 export type NewReservationListItem = {
   date: Date;
@@ -197,7 +198,7 @@ const TitleWrapper = styled.div`
 `;
 
 type Props = {
-  header?: React.ReactNode;
+  header?: string;
   items: NewReservationListItem[];
   hasPadding?: boolean;
 };
@@ -214,10 +215,16 @@ export function ReservationList(props: Props | ExtendedProps) {
   const hasReservation =
     "reservationToCopy" in props && !!props.reservationToCopy;
 
+  const removed = items.filter((x) => x.isRemoved).length;
+  const count = items.length - removed;
   return (
     <ListWrapper data-testid="reservations-list">
       <TitleWrapper>
-        {header}
+        {header != null && (
+          <H6 as="h3" style={{ flexGrow: 1 }}>
+            {header} {`(${count})`}
+          </H6>
+        )}
         {hasReservation && (
           <div>
             <AddNewReservationButton

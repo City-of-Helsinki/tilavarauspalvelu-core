@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import { Container } from "hds-react";
 import { ErrorBoundary } from "react-error-boundary";
-import { H1, H6 } from "common/src/common/typography";
+import { H1 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { RecurringReservationsView } from "@/component/reservations/requested/RecurringReservationsView";
 import { ActionsWrapper } from "./commonStyling";
@@ -16,10 +16,6 @@ import { errorToast } from "common/src/common/toast";
 
 const InfoSection = styled.p`
   margin: var(--spacing-l) 0;
-`;
-
-const StyledH6 = styled(H6)`
-  margin-bottom: 0;
 `;
 
 const StyledContainer = styled(Container)`
@@ -57,17 +53,12 @@ function RecurringReservationDoneInner({
   const reservationPk = reservations[0]?.pk;
   const reservationUrl = reservationPk ? `/reservations/${reservationPk}` : "";
 
-  const successes = reservations;
-
   return (
     <StyledContainer>
       <H1 $legacy>
         {reservations.length > 0 ? t(`title`) : t("allFailedTitle")}
       </H1>
       <InfoSection>{t(`successInfo`)}</InfoSection>
-      <StyledH6 as="h2">
-        {t("successSubtitle")} ({successes.length})
-      </StyledH6>
       <RecurringReservationsView recurringPk={recurringPk} />
       <ActionsWrapper>
         <ButtonLikeLink to="../../.." relative="path">
