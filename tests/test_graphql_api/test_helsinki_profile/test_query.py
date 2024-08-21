@@ -309,7 +309,7 @@ def test_helsinki_profile_data__query__unit_admin(graphql):
         user=user,
         application_sections__reservation_unit_options__reservation_unit__unit__name="foo",
     )
-    unit = application.units.first()
+    unit = application.units_for_permissions[0]
 
     profile_data = MyProfileDataFactory.create_basic()
     HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})

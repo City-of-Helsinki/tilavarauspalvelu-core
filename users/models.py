@@ -105,7 +105,7 @@ class User(AbstractUser):
         return self._general_roles
 
     @property
-    def general_permissions(self) -> list[UserPermissionChoice]:
+    def general_permissions_list(self) -> list[UserPermissionChoice]:
         """Get the user's general permissions."""
         if hasattr(self, "_general_permissions"):
             return self._general_permissions
@@ -164,6 +164,10 @@ class User(AbstractUser):
                 self._unit_roles.setdefault(int(unit.pk), []).append(UserRoleChoice(unit_role.role))
             for unit_group in unit_role.unit_groups.all():
                 self._unit_group_roles.setdefault(int(unit_group.pk), []).append(UserRoleChoice(unit_role.role))
+
+        # Remove duplicates and sort roles alphabetically
+        self._unit_roles = {pk: sorted(set(roles)) for pk, roles in self._unit_roles.items()}
+        self._unit_group_roles = {pk: sorted(set(roles)) for pk, roles in self._unit_group_roles.items()}
 
     @property
     def current_social_auth(self) -> UserSocialAuth | None:

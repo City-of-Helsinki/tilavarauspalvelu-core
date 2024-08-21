@@ -7,13 +7,12 @@ from query_optimizer.optimizer import QueryOptimizer
 from common.typing import AnyUser, GQLInfo
 from permissions.enums import UserPermissionChoice
 from permissions.models import GeneralRole, UnitRole
+from spaces.models import Unit, UnitGroup
 
 __all__ = [
     "GeneralRoleNode",
     "UnitRoleNode",
 ]
-
-from spaces.models import Unit, UnitGroup
 
 
 class GeneralRoleNode(DjangoNode):
@@ -34,7 +33,7 @@ class GeneralRoleNode(DjangoNode):
         user: AnyUser = info.context.user
         if user.is_anonymous or not user.is_active:
             return []
-        return user.general_permissions
+        return user.general_permissions_list
 
 
 class UnitRoleNode(DjangoNode):

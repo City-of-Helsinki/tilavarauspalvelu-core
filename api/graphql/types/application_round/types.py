@@ -3,11 +3,13 @@ from django.db import models
 from graphene_django_extensions import DjangoNode
 from lookup_property import L
 from query_optimizer import AnnotatedField
+from query_optimizer.optimizer import QueryOptimizer
 
 from api.graphql.types.application_round.filtersets import ApplicationRoundFilterSet
 from api.graphql.types.application_round.permissions import ApplicationRoundPermission
 from applications.enums import ApplicationRoundReservationCreationStatusChoice, ApplicationRoundStatusChoice
 from applications.models import Application, ApplicationRound
+from applications.querysets.application_round import ApplicationRoundQuerySet
 from common.db import SubqueryCount
 from common.typing import AnyUser, GQLInfo
 from reservation_units.models import ReservationUnit
@@ -83,3 +85,7 @@ class ApplicationRoundNode(DjangoNode):
             return False
 
         return root.is_setting_handled_allowed
+
+    @classmethod
+    def pre_optimization_hook(cls, queryset: ApplicationRoundQuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
+        return queryset.with_permissions()
