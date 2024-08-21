@@ -71,6 +71,7 @@ class RejectedOccurrenceFilterSet(ModelFilterSet):
             ),
             "applicant",
             ("recurring_reservation__reservation_unit__pk", "reservation_unit_pk"),
+            ("recurring_reservation__reservation_unit__name", "reservation_unit_name"),
             ("recurring_reservation__reservation_unit__unit__pk", "unit_pk"),
         ]
 

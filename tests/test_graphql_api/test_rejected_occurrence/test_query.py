@@ -350,6 +350,33 @@ def test_rejected_recurrence__order__by_reservation_unit_pk(graphql):
     assert response.node(2) == {"pk": occurrence_1.pk}
 
 
+def test_rejected_recurrence__order__by_reservation_unit_name(graphql):
+    occurrence_1 = RejectedOccurrenceFactory.create(recurring_reservation__reservation_unit__name="A")
+    occurrence_2 = RejectedOccurrenceFactory.create(recurring_reservation__reservation_unit__name="C")
+    occurrence_3 = RejectedOccurrenceFactory.create(recurring_reservation__reservation_unit__name="B")
+
+    graphql.login_with_superuser()
+    query = rejected_occurrence_query(order_by="reservationUnitNameAsc")
+    response = graphql(query)
+
+    assert response.has_errors is False
+
+    assert len(response.edges) == 3
+    assert response.node(0) == {"pk": occurrence_1.pk}
+    assert response.node(1) == {"pk": occurrence_3.pk}
+    assert response.node(2) == {"pk": occurrence_2.pk}
+
+    query = rejected_occurrence_query(order_by="reservationUnitNameDesc")
+    response = graphql(query)
+
+    assert response.has_errors is False
+
+    assert len(response.edges) == 3
+    assert response.node(0) == {"pk": occurrence_2.pk}
+    assert response.node(1) == {"pk": occurrence_3.pk}
+    assert response.node(2) == {"pk": occurrence_1.pk}
+
+
 def test_rejected_recurrence__order__by_unit_pk(graphql):
     occurrence_1 = RejectedOccurrenceFactory.create()
     occurrence_2 = RejectedOccurrenceFactory.create()
