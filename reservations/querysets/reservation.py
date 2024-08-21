@@ -4,8 +4,9 @@ import datetime
 from typing import TYPE_CHECKING, Self
 
 from django.conf import settings
+from django.contrib.postgres.aggregates import ArrayAgg
 from django.db import models
-from helsinki_gdpr.models import SerializableMixin
+from django.db.models.functions import Coalesce
 
 from common.date_utils import local_datetime
 from merchants.enums import OrderStatus
@@ -13,6 +14,7 @@ from reservations.enums import ReservationStateChoice
 
 if TYPE_CHECKING:
     from applications.models import ApplicationRound
+    from reservations.models import Reservation
 
 
 class ReservationQuerySet(models.QuerySet):
@@ -115,6 +117,45 @@ class ReservationQuerySet(models.QuerySet):
             ]
         )
 
+    def _fetch_all(self) -> None:
+        super()._fetch_all()
+        if "FETCH_UNITS_FOR_PERMISSIONS_FLAG" in self._hints:
+            self._hints.pop("FETCH_UNITS_FOR_PERMISSIONS_FLAG", None)
+            self._add_units_for_permissions()
 
-class ReservationManager(SerializableMixin.SerializableManager, models.Manager.from_queryset(ReservationQuerySet)):
-    """Contains custom queryset methods and GDPR serialization."""
+    def with_permissions(self) -> Self:
+        """Indicates that we need to fetch units for permissions checks when the queryset is evaluated."""
+        self._hints["FETCH_UNITS_FOR_PERMISSIONS_FLAG"] = True
+        return self
+
+    def _add_units_for_permissions(self) -> None:
+        # This works sort of like a 'prefetch_related', since it makes another query
+        # to fetch units and unit groups for the permission checks when the queryset is evaluated,
+        # and 'joins' them to the correct model instances in python.
+        from spaces.models import Unit
+
+        items: list[Reservation] = list(self)
+        if not items:
+            return
+
+        units = (
+            Unit.objects.prefetch_related("unit_groups")
+            .filter(reservationunit__reservation__in=items)
+            .annotate(
+                reservation_ids=Coalesce(
+                    ArrayAgg(
+                        "reservationunit__reservation",
+                        distinct=True,
+                        filter=(
+                            models.Q(reservationunit__isnull=False)
+                            & models.Q(reservationunit__reservation__isnull=False)
+                        ),
+                    ),
+                    models.Value([]),
+                )
+            )
+            .distinct()
+        )
+
+        for item in items:
+            item.units_for_permissions = [unit for unit in units if item.pk in unit.reservation_ids]

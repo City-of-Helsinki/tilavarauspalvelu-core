@@ -17,6 +17,7 @@ from reservation_units.models import ReservationUnit
 from reservations.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.enums import ReservationTypeChoice as ReservationTypeField
 from reservations.models import Reservation
+from reservations.querysets import ReservationQuerySet
 from users.models import User
 
 from .filtersets import ReservationFilterSet
@@ -207,10 +208,8 @@ class ReservationNode(DjangoNode):
         permission_classes = [ReservationPermission]
 
     @classmethod
-    def pre_optimization_hook(cls, queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
-        # Add annotations for field permission checks
-        optimizer.annotations["unit_ids_for_perms"] = L("unit_ids_for_perms")
-        optimizer.annotations["unit_group_ids_for_perms"] = L("unit_group_ids_for_perms")
+    def pre_optimization_hook(cls, queryset: ReservationQuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
+        queryset = queryset.with_permissions()
 
         # Add user id for permission checks
         user_optimizer = optimizer.get_or_set_child_optimizer(

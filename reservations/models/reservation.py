@@ -12,7 +12,6 @@ from helsinki_gdpr.models import SerializableMixin
 from lookup_property import lookup_property
 
 from common.connectors import ReservationActionsConnector
-from common.db import SubqueryArray
 from reservations.enums import (
     RESERVEE_LANGUAGE_CHOICES,
     CustomerTypeChoice,
@@ -33,6 +32,7 @@ if TYPE_CHECKING:
         ReservationDenyReason,
         ReservationPurpose,
     )
+    from spaces.models import Unit
     from users.models import User
 
 
@@ -331,31 +331,23 @@ class Reservation(SerializableMixin, models.Model):
             f"{self.reservation_unit.unit if hasattr(self.reservation_unit, 'unit') else ''}"
         )
 
-    @lookup_property(joins=["reservation_unit"], skip_codegen=True)
-    def unit_ids_for_perms() -> list[int]:
+    @property
+    def units_for_permissions(self) -> list[Unit]:
         from spaces.models import Unit
 
-        return SubqueryArray(  # type: ignore[return-value]
-            queryset=Unit.objects.filter(reservationunit__in=models.OuterRef("reservation_unit")).values("id"),
-            agg_field="id",
+        if hasattr(self, "_units_for_permissions"):
+            return self._units_for_permissions
+
+        self._units_for_permissions = list(
+            Unit.objects.filter(reservationunit__reservation=self).prefetch_related("unit_groups").distinct()
         )
+        return self._units_for_permissions
 
-    @unit_ids_for_perms.override
-    def _(self) -> list[int]:
-        return list(self.reservation_unit.select_related("unit").values_list("unit", flat=True).distinct())
-
-    @lookup_property(joins=["reservation_unit"], skip_codegen=True)
-    def unit_group_ids_for_perms() -> list[int]:
-        from spaces.models import UnitGroup
-
-        return SubqueryArray(  # type: ignore[return-value]
-            queryset=UnitGroup.objects.filter(units__in=models.OuterRef("reservation_unit__unit")).values("id"),
-            agg_field="id",
-        )
-
-    @unit_group_ids_for_perms.override
-    def _(self) -> list[int]:
-        return list(self.reservation_unit.values_list("unit__unit_groups", flat=True).distinct())
+    @units_for_permissions.setter
+    def units_for_permissions(self, value: list[Unit]) -> None:
+        # The setter is used by ReservationQuerySet to pre-evaluate units for multiple Reservations.
+        # Should not be used by anything else!
+        self._units_for_permissions = value
 
 
 AuditLogger.register(Reservation)

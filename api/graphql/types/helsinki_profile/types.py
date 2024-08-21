@@ -3,7 +3,6 @@ import datetime
 import graphene
 from graphene_django_extensions.errors import GQLNodePermissionDeniedError
 from graphql import GraphQLError
-from lookup_property import L
 from query_optimizer.selections import get_field_selections
 
 from api.graphql.extensions import error_codes
@@ -92,12 +91,9 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
     @classmethod
     def get_user_from_application(cls, application_id: int, info: GQLInfo) -> User:
         application: Application | None = (
-            Application.objects.select_related("user")
-            .annotate(
-                unit_ids_for_perms=L("unit_ids_for_perms"),
-                unit_group_ids_for_perms=L("unit_group_ids_for_perms"),
-            )
+            Application.objects.select_related("user")  #
             .filter(pk=application_id)
+            .with_permissions()
             .first()
         )
         if application is None:
@@ -119,7 +115,12 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
 
     @classmethod
     def get_user_from_reservation(cls, reservation_id: int, info: GQLInfo) -> User:
-        reservation: Reservation | None = Reservation.objects.select_related("user").filter(pk=reservation_id).first()
+        reservation: Reservation | None = (
+            Reservation.objects.select_related("user")  #
+            .filter(pk=reservation_id)
+            .with_permissions()
+            .first()
+        )
         if reservation is None:
             msg = f"Reservation with id {reservation_id} not found."
             extensions = {"code": error_codes.HELSINKI_PROFILE_RESERVATION_USER_NOT_FOUND}

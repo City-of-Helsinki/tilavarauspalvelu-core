@@ -1,4 +1,6 @@
-from datetime import datetime
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from django.db import models
 from django.db.models.functions import Concat, Now
@@ -15,8 +17,12 @@ from applications.enums import (
 )
 from applications.querysets.application import ApplicationQuerySet
 from common.connectors import ApplicationActionsConnector
-from common.db import SubqueryArray
 from common.fields.model import StrChoiceField
+from spaces.models import Unit
+
+if TYPE_CHECKING:
+    from datetime import datetime
+
 
 __all__ = [
     "Application",
@@ -275,61 +281,19 @@ class Application(SerializableMixin, models.Model):
         )
 
     @property
-    def units(self):
-        from spaces.models import Unit
+    def units_for_permissions(self) -> list[Unit]:
+        if hasattr(self, "_units_for_permissions"):
+            return self._units_for_permissions
 
-        from .reservation_unit_option import ReservationUnitOption
-
-        qs = ReservationUnitOption.objects.filter(application_section__application=self)
-        ids = qs.values("reservation_unit")
-        return Unit.objects.filter(reservationunit__in=models.Subquery(ids))
-
-    @lookup_property(skip_codegen=True)
-    def unit_ids_for_perms() -> list[int]:
-        from applications.models import ReservationUnitOption
-
-        return SubqueryArray(  # type: ignore[return-value]
-            queryset=(
-                ReservationUnitOption.objects.distinct()
-                .filter(application_section__application=models.OuterRef("pk"))
-                .annotate(unit_id=models.F("reservation_unit__unit"))
-                .values("unit_id")
-            ),
-            agg_field="unit_id",
+        self._units_for_permissions = list(
+            Unit.objects.prefetch_related("unit_groups")
+            .filter(reservationunit__reservation_unit_options__application_section__application=self)
+            .distinct()
         )
+        return self._units_for_permissions
 
-    @unit_ids_for_perms.override
-    def _(self) -> list[int]:
-        return [unit.id for unit in self.units]
-
-    @lookup_property(skip_codegen=True)
-    def unit_group_ids_for_perms() -> list[int]:
-        from applications.models import ReservationUnitOption
-        from spaces.models import UnitGroup
-
-        return SubqueryArray(  # type: ignore[return-value]
-            queryset=(
-                UnitGroup.objects.distinct()
-                .alias(
-                    unit_ids=models.Subquery(
-                        ReservationUnitOption.objects.filter(
-                            application_section__application=models.OuterRef(models.OuterRef("pk")),
-                        )
-                        .annotate(unit_id=models.F("reservation_unit__unit"))
-                        .values("unit_id")
-                    )
-                )
-                .filter(units__in=models.F("unit_ids"))
-            ),
-            agg_field="id",
-        )
-
-    @unit_group_ids_for_perms.override
-    def _(self) -> list[int]:
-        from spaces.models import UnitGroup
-
-        from .reservation_unit_option import ReservationUnitOption
-
-        qs = ReservationUnitOption.objects.filter(application_section__application=self)
-        ids = qs.values("reservation_unit__unit")
-        return list(UnitGroup.objects.distinct().filter(units__in=models.Subquery(ids)).values_list("id", flat=True))
+    @units_for_permissions.setter
+    def units_for_permissions(self, value: list[Unit]) -> None:
+        # The setter is used by ApplicationQuerySet to pre-evaluate units for multiple Applications.
+        # Should not be used by anything else!
+        self._units_for_permissions = value

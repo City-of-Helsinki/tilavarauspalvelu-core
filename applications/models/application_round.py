@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import logging
 from datetime import date, datetime, timedelta
+from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.db import models
@@ -16,11 +19,14 @@ from applications.querysets.application_round import ApplicationRoundQuerySet
 from common.connectors import ApplicationRoundActionsConnector
 from common.date_utils import local_datetime
 
+if TYPE_CHECKING:
+    from spaces.models import Unit
+
+
 __all__ = [
     "ApplicationRound",
 ]
 
-from common.db import SubqueryArray
 
 logger = logging.getLogger(__name__)
 
@@ -257,40 +263,20 @@ class ApplicationRound(models.Model):
 
         return ApplicationRoundReservationCreationStatusChoice.NOT_COMPLETED
 
-    @lookup_property(skip_codegen=True)
-    def unit_ids_for_perms() -> list[int]:
+    @property
+    def units_for_permissions(self) -> list[Unit]:
         from spaces.models import Unit
 
-        return SubqueryArray(  # type: ignore[return-value]
-            queryset=(
-                Unit.objects.filter(reservationunit__application_rounds=models.OuterRef("pk"))  #
-                .distinct()
-                .values("id")
-            ),
-            agg_field="id",
+        if hasattr(self, "_units_for_permissions"):
+            return self._units_for_permissions
+
+        self._units_for_permissions = list(
+            Unit.objects.filter(reservationunit__application_rounds=self).prefetch_related("unit_groups").distinct()
         )
+        return self._units_for_permissions
 
-    @unit_ids_for_perms.override
-    def _(self) -> list[int]:
-        from spaces.models import Unit
-
-        return Unit.objects.filter(reservationunit__application_rounds=self).distinct().values_list("id", flat=True)
-
-    @lookup_property(skip_codegen=True)
-    def unit_group_ids_for_perms() -> list[int]:
-        from spaces.models import UnitGroup
-
-        return SubqueryArray(  # type: ignore[return-value]
-            queryset=(
-                UnitGroup.objects.filter(units__reservationunit__application_rounds=models.OuterRef("pk"))
-                .distinct()
-                .values("id")
-            ),
-            agg_field="id",
-        )
-
-    @unit_group_ids_for_perms.override
-    def _(self) -> list[int]:
-        from spaces.models import UnitGroup
-
-        return UnitGroup.objects.filter(units__reservationunit__application_rounds=self).distinct().values("id")
+    @units_for_permissions.setter
+    def units_for_permissions(self, value: list[Unit]) -> None:
+        # The setter is used by ApplicationRoundQuerySet to pre-evaluate units for multiple ApplicationRounds.
+        # Should not be used by anything else!
+        self._units_for_permissions = value

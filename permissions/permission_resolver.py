@@ -2,8 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Self
 
+from django.db.models import Q
+
 from common.date_utils import local_datetime
 from permissions.enums import UserRoleChoice
+from spaces.models import Unit
 
 if TYPE_CHECKING:
     from collections.abc import Container, Iterable
@@ -12,7 +15,7 @@ if TYPE_CHECKING:
     from common.typing import AnyUser
     from reservation_units.models import ReservationUnit
     from reservations.models import RecurringReservation, Reservation
-    from spaces.models import Space, Unit
+    from spaces.models import Space
     from users.models import User
 
 
@@ -56,141 +59,68 @@ class PermissionResolver:
             return bool(self.user.general_roles_list)
         return any(role in role_choices for role in self.user.general_roles_list)
 
-    def has_role_for_all_units(
+    def has_role_for_units_or_their_unit_groups(
         self,
         *,
-        unit_ids: Iterable[int] | None = None,
+        units: Iterable[Unit] | None = None,
         role_choices: Container[UserRoleChoice] | None = None,
+        require_all: bool = False,
     ) -> bool:
         """
-        Check if the user has at least one of the given roles in all the given units.
-        If unit ids are not given, check for all user's units.
+        Check if the user has at least one of the given roles in the given units or their unit groups.
+        If units are not given, use all units the user has roles in.
         If after that there are no units, then the user has no permission.
         If role choices are not given, check for any role.
+
+        :param units: Units to check for the role.
+        :param role_choices: Roles to check for.
+        :param require_all: If True, require roles in all the given units or their unit groups instead of any.
         """
         if self.is_user_anonymous_or_inactive():
             return False
-        if unit_ids is None:  # For any unit
-            unit_ids = self.user.unit_roles_map.keys()
-        unit_ids = list(unit_ids)
-        if not unit_ids:
-            return False
-        if role_choices is None:  # Any role
-            role_choices = list(UserRoleChoice)
-        return all(
-            any(role in role_choices for role in self.user.unit_roles_map.get(unit_id, []))  #
-            for unit_id in unit_ids
-        )
 
-    def has_role_for_any_unit(
-        self,
-        *,
-        unit_ids: Iterable[int] | None = None,
-        role_choices: Container[UserRoleChoice] | None = None,
-    ) -> bool:
-        """
-        Check if the user has at least one of the given roles in all the given units.
-        If unit ids are not given, check for all user's units.
-        If after that there are no units, then the user has no permission.
-        If role choices are not given, check for any role.
-        """
-        if self.is_user_anonymous_or_inactive():
-            return False
-        if unit_ids is None:  # For any unit
-            unit_ids = self.user.unit_roles_map.keys()
-        unit_ids = list(unit_ids)
-        if not unit_ids:
-            return False
-        if role_choices is None:  # Any role
-            role_choices = list(UserRoleChoice)
-        return any(
-            any(role in role_choices for role in self.user.unit_roles_map.get(unit_id, []))  #
-            for unit_id in unit_ids
-        )
+        if units is None:  # Check for any unit or unit group the user has roles in
+            unit_ids = list(self.user.unit_roles_map.keys())
+            unit_group_ids = list(self.user.unit_group_roles_map.keys())
+            units = (
+                Unit.objects.filter(Q(pk__in=unit_ids) | Q(unit_groups__pk__in=unit_group_ids))
+                .prefetch_related("unit_groups")
+                .distinct()
+            )
 
-    def has_role_for_all_unit_groups(
-        self,
-        *,
-        unit_group_ids: Iterable[int] | None = None,
-        role_choices: Container[UserRoleChoice] | None = None,
-    ) -> bool:
-        """
-        Check if the user has at least one of the given roles in all the given unit groups.
-        If unit group ids are not given, check for all user's unit groups.
-        If after that there are no unit groups, then the user has no permission.
-        If role choices are not given, check for any role.
-        """
-        if self.is_user_anonymous_or_inactive():
+        units = list(units)
+        if not units:
             return False
-        if unit_group_ids is None:
-            unit_group_ids = self.user.unit_group_roles_map.keys()
-        unit_group_ids = list(unit_group_ids)
-        if not unit_group_ids:
-            return False
-        if role_choices is None:  # Any role
-            role_choices = list(UserRoleChoice)
-        return all(
-            any(role in role_choices for role in self.user.unit_group_roles_map.get(unit_group_id, []))  #
-            for unit_group_id in unit_group_ids
-        )
 
-    def has_role_for_any_unit_group(
-        self,
-        *,
-        unit_group_ids: Iterable[int] | None = None,
-        role_choices: Container[UserRoleChoice] | None = None,
-    ) -> bool:
-        """
-        Check if the user has at least one of the given roles in all the given unit groups.
-        If unit group ids are not given, check for all user's unit groups.
-        If after that there are no unit groups, then the user has no permission.
-        If role choices are not given, check for any role.
-        """
-        if self.is_user_anonymous_or_inactive():
-            return False
-        if unit_group_ids is None:
-            unit_group_ids = self.user.unit_group_roles_map.keys()
-        unit_group_ids = list(unit_group_ids)
-        if not unit_group_ids:
-            return False
-        if role_choices is None:  # Any role
+        if role_choices is None:  # Check for any role
             role_choices = list(UserRoleChoice)
-        return any(
-            any(role in role_choices for role in self.user.unit_group_roles_map.get(unit_group_id, []))  #
-            for unit_group_id in unit_group_ids
-        )
 
-    # Combination checks
+        has_role = False
+        for unit in units:
+            roles = self.user.unit_roles_map.get(unit.pk, [])
+            has_role = any(role in role_choices for role in roles)
+
+            # No role though units -> check through unit groups
+            if not has_role:
+                has_role = any(
+                    role in role_choices
+                    for unit_group in unit.unit_groups.all()
+                    for role in self.user.unit_group_roles_map.get(unit_group.pk, [])
+                )
+
+            # If we require roles for all units, we need to keep checking until all units have been checked.
+            # If at any point we don't have a role for a unit or it's groups, we can stop early.
+            if require_all:
+                if not has_role:
+                    return False
+            # Once we have found a role for any unit or its unit group, we can stop.
+            elif has_role:
+                return True
+
+        return has_role
 
     def is_user_anonymous_or_inactive(self) -> bool:
-        """Is user anonymous or inactive?"""
         return getattr(self, "user", None) is None or self.user.is_anonymous or not self.user.is_active
-
-    def has_role_generally_or_for_any_unit(
-        self,
-        *,
-        unit_ids: Iterable[int],
-        unit_group_ids: Iterable[int],
-        role_choices: Container[UserRoleChoice],
-    ) -> bool:
-        if self.has_general_role(role_choices=role_choices):
-            return True
-        if self.has_role_for_any_unit(unit_ids=unit_ids, role_choices=role_choices):
-            return True
-        return self.has_role_for_any_unit_group(unit_group_ids=unit_group_ids, role_choices=role_choices)
-
-    def has_role_generally_or_for_all_units(
-        self,
-        *,
-        unit_ids: Iterable[int],
-        unit_group_ids: Iterable[int],
-        role_choices: Container[UserRoleChoice],
-    ) -> bool:
-        if self.has_general_role(role_choices=role_choices):
-            return True
-        if self.has_role_for_all_units(unit_ids=unit_ids, role_choices=role_choices):
-            return True
-        return self.has_role_for_all_unit_groups(unit_group_ids=unit_group_ids, role_choices=role_choices)
 
     def is_superuser_or_has_general_role(self, *, role_choices: Container[UserRoleChoice]) -> bool:
         if self.is_user_anonymous_or_inactive():
@@ -229,11 +159,14 @@ class PermissionResolver:
         if self.user.is_superuser:
             return True
 
-        unit = reservation_unit.unit
-        return self.has_role_generally_or_for_all_units(
-            unit_ids=[unit.id],
-            unit_group_ids=unit.unit_groups.all().values_list("id", flat=True),
-            role_choices=UserRoleChoice.can_create_staff_reservations(),
+        role_choices = UserRoleChoice.can_create_staff_reservations()
+        if self.has_general_role(role_choices=role_choices):
+            return True
+
+        return self.has_role_for_units_or_their_unit_groups(
+            units=[reservation_unit.unit],
+            role_choices=role_choices,
+            require_all=True,
         )
 
     def can_manage_application(
@@ -254,17 +187,15 @@ class PermissionResolver:
         ):
             return True
 
-        if all_units:
-            return self.has_role_generally_or_for_all_units(
-                unit_ids=application.unit_ids_for_perms,
-                unit_group_ids=application.unit_group_ids_for_perms,
-                role_choices=UserRoleChoice.can_manage_applications(),
-            )
+        role_choices = UserRoleChoice.can_manage_applications()
+        if self.has_general_role(role_choices=role_choices):
+            return True
 
-        return self.has_role_generally_or_for_any_unit(
-            unit_ids=application.unit_ids_for_perms,
-            unit_group_ids=application.unit_group_ids_for_perms,
-            role_choices=UserRoleChoice.can_manage_applications(),
+        units = application.units_for_permissions
+        return self.has_role_for_units_or_their_unit_groups(
+            units=units,
+            role_choices=role_choices,
+            require_all=all_units,
         )
 
     def can_manage_application_round(self, application_round: ApplicationRound) -> bool:
@@ -273,10 +204,14 @@ class PermissionResolver:
         if self.user.is_superuser:
             return True
 
-        return self.has_role_generally_or_for_all_units(
-            unit_ids=application_round.unit_ids_for_perms,
-            unit_group_ids=application_round.unit_group_ids_for_perms,
-            role_choices=UserRoleChoice.can_manage_applications(),
+        role_choices = UserRoleChoice.can_manage_applications()
+        if self.has_general_role(role_choices=role_choices):
+            return True
+
+        return self.has_role_for_units_or_their_unit_groups(
+            units=application_round.units_for_permissions,
+            role_choices=role_choices,
+            require_all=True,
         )
 
     def can_manage_applications_for_units(self, units: Iterable[Unit], *, any_unit: bool = False) -> bool:
@@ -285,20 +220,14 @@ class PermissionResolver:
         if self.user.is_superuser:
             return True
 
-        unit_ids = (unit.id for unit in units)
-        unit_group_ids = (unit_group.id for unit in units for unit_group in unit.unit_groups.all())
+        role_choices = UserRoleChoice.can_manage_applications()
+        if self.has_general_role(role_choices=role_choices):
+            return True
 
-        if any_unit:
-            return self.has_role_generally_or_for_any_unit(
-                unit_ids=unit_ids,
-                unit_group_ids=unit_group_ids,
-                role_choices=UserRoleChoice.can_manage_applications(),
-            )
-
-        return self.has_role_generally_or_for_all_units(
-            unit_ids=unit_ids,
-            unit_group_ids=unit_group_ids,
-            role_choices=UserRoleChoice.can_manage_applications(),
+        return self.has_role_for_units_or_their_unit_groups(
+            units=units,
+            role_choices=role_choices,
+            require_all=not any_unit,
         )
 
     def can_manage_notifications(self) -> bool:
@@ -313,10 +242,13 @@ class PermissionResolver:
         if not reserver_needs_role and self.user == reservation.user:
             return True
 
-        return self.has_role_generally_or_for_any_unit(
-            unit_ids=reservation.unit_ids_for_perms,
-            unit_group_ids=reservation.unit_group_ids_for_perms,
-            role_choices=UserRoleChoice.can_manage_reservations(),
+        role_choices = UserRoleChoice.can_manage_reservations()
+        if self.has_general_role(role_choices=role_choices):
+            return True
+
+        return self.has_role_for_units_or_their_unit_groups(
+            units=reservation.units_for_permissions,
+            role_choices=role_choices,
         )
 
     def can_manage_reservation_related_data(self) -> bool:
@@ -328,20 +260,14 @@ class PermissionResolver:
         if self.user.is_superuser:
             return True
 
-        unit_ids = (unit.id for unit in units)
-        unit_group_ids = (unit_group.id for unit in units for unit_group in unit.unit_groups.all())
+        role_choices = UserRoleChoice.can_manage_reservations()
+        if self.has_general_role(role_choices=role_choices):
+            return True
 
-        if any_unit:
-            return self.has_role_generally_or_for_any_unit(
-                unit_ids=unit_ids,
-                unit_group_ids=unit_group_ids,
-                role_choices=UserRoleChoice.can_manage_reservations(),
-            )
-
-        return self.has_role_generally_or_for_all_units(
-            unit_ids=unit_ids,
-            unit_group_ids=unit_group_ids,
-            role_choices=UserRoleChoice.can_manage_reservations(),
+        return self.has_role_for_units_or_their_unit_groups(
+            units=units,
+            role_choices=role_choices,
+            require_all=not any_unit,
         )
 
     def can_manage_resources(self, space: Space | None) -> bool:
@@ -350,17 +276,17 @@ class PermissionResolver:
         if self.user.is_superuser:
             return True
 
-        roles = UserRoleChoice.can_manage_reservation_units()
-        if self.has_general_role(role_choices=roles):
+        role_choices = UserRoleChoice.can_manage_reservation_units()
+        if self.has_general_role(role_choices=role_choices):
             return True
 
         if space is None:
             return False
 
-        return self.has_role_generally_or_for_all_units(
-            unit_ids=[space.unit.id],
-            unit_group_ids=space.unit.unit_groups.all().values_list("id", flat=True),
-            role_choices=roles,
+        return self.has_role_for_units_or_their_unit_groups(
+            units=[space.unit],
+            role_choices=role_choices,
+            require_all=True,
         )
 
     def can_manage_spaces(self, unit: Unit | None) -> bool:
@@ -369,17 +295,17 @@ class PermissionResolver:
         if self.user.is_superuser:
             return True
 
-        roles = UserRoleChoice.can_manage_reservation_units()
-        if self.has_general_role(role_choices=roles):
+        role_choices = UserRoleChoice.can_manage_reservation_units()
+        if self.has_general_role(role_choices=role_choices):
             return True
 
         if unit is None:
             return False
 
-        return self.has_role_generally_or_for_all_units(
-            unit_ids=[unit.id],
-            unit_group_ids=unit.unit_groups.all().values_list("id", flat=True),
-            role_choices=roles,
+        return self.has_role_for_units_or_their_unit_groups(
+            units=[unit],
+            role_choices=role_choices,
+            require_all=True,
         )
 
     def can_manage_unit(self, unit: Unit) -> bool:
@@ -388,10 +314,14 @@ class PermissionResolver:
         if self.user.is_superuser:
             return True
 
-        return self.has_role_generally_or_for_all_units(
-            unit_ids=[unit.id],
-            unit_group_ids=unit.unit_groups.all().values_list("id", flat=True),
-            role_choices=UserRoleChoice.can_manage_reservation_units(),
+        role_choices = UserRoleChoice.can_manage_reservation_units()
+        if self.has_general_role(role_choices=role_choices):
+            return True
+
+        return self.has_role_for_units_or_their_unit_groups(
+            units=[unit],
+            role_choices=role_choices,
+            require_all=True,
         )
 
     def can_view_application(self, application: Application, *, reserver_needs_role: bool = False) -> bool:
@@ -402,10 +332,13 @@ class PermissionResolver:
         if not reserver_needs_role and self.user == application.user:
             return True
 
-        return self.has_role_generally_or_for_any_unit(
-            unit_ids=application.unit_ids_for_perms,
-            unit_group_ids=application.unit_group_ids_for_perms,
-            role_choices=UserRoleChoice.can_view_applications(),
+        role_choices = UserRoleChoice.can_view_applications()
+        if self.has_general_role(role_choices=role_choices):
+            return True
+
+        return self.has_role_for_units_or_their_unit_groups(
+            units=application.units_for_permissions,
+            role_choices=role_choices,
         )
 
     def can_view_recurring_reservation(self, recurring_reservation: RecurringReservation) -> bool:
@@ -416,10 +349,13 @@ class PermissionResolver:
         if self.user == recurring_reservation.user:
             return True
 
-        return self.has_role_generally_or_for_any_unit(
-            unit_ids=[recurring_reservation.reservation_unit.unit.id],
-            unit_group_ids=recurring_reservation.reservation_unit.unit.unit_groups.all().values_list("id", flat=True),
-            role_choices=UserRoleChoice.can_view_reservations(),
+        role_choices = UserRoleChoice.can_view_reservations()
+        if self.has_general_role(role_choices=role_choices):
+            return True
+
+        return self.has_role_for_units_or_their_unit_groups(
+            units=[recurring_reservation.reservation_unit.unit],
+            role_choices=role_choices,
         )
 
     def can_view_reservation(self, reservation: Reservation, *, reserver_needs_role: bool = False) -> bool:
@@ -430,10 +366,13 @@ class PermissionResolver:
         if self.user == reservation.user and (self.has_any_role() if reserver_needs_role else True):
             return True
 
-        return self.has_role_generally_or_for_any_unit(
-            unit_ids=reservation.unit_ids_for_perms,
-            unit_group_ids=reservation.unit_group_ids_for_perms,
-            role_choices=UserRoleChoice.can_view_reservations(),
+        role_choices = UserRoleChoice.can_view_reservations()
+        if self.has_general_role(role_choices=role_choices):
+            return True
+
+        return self.has_role_for_units_or_their_unit_groups(
+            units=reservation.units_for_permissions,
+            role_choices=role_choices,
         )
 
     def can_view_user(self, user: User | None) -> bool:
@@ -449,6 +388,4 @@ class PermissionResolver:
             return True
 
         # Is admin in any unit or unit group
-        if self.has_role_for_any_unit(role_choices=roles):
-            return True
-        return self.has_role_for_any_unit_group(role_choices=roles)
+        return self.has_role_for_units_or_their_unit_groups(role_choices=roles)

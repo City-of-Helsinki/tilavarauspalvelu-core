@@ -11,7 +11,8 @@ from api.graphql.types.application.permissions import ApplicationPermission
 from api.graphql.types.application_section.types import ApplicationSectionNode
 from api.graphql.types.user.types import ApplicantNode
 from applications.enums import ApplicationStatusChoice
-from applications.models import Application
+from applications.models import Application, ApplicationRound
+from applications.querysets.application import ApplicationQuerySet
 from common.typing import GQLInfo
 from permissions.enums import UserRoleChoice
 from users.models import User
@@ -57,10 +58,8 @@ class ApplicationNode(DjangoNode):
         max_complexity = 22
 
     @classmethod
-    def pre_optimization_hook(cls, queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
-        # Add unit ids for permission checks
-        optimizer.annotations["unit_ids_for_perms"] = L("unit_ids_for_perms")
-        optimizer.annotations["unit_group_ids_for_perms"] = L("unit_group_ids_for_perms")
+    def pre_optimization_hook(cls, queryset: ApplicationQuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
+        queryset = queryset.with_permissions()
 
         # Add user id for permission checks
         user_optimizer = optimizer.get_or_set_child_optimizer(
@@ -73,6 +72,19 @@ class ApplicationNode(DjangoNode):
             ),
         )
         user_optimizer.only_fields.append("id")
+
+        # Add application period end for the "can_manage_application" permission check
+        application_round_optimizer = optimizer.get_or_set_child_optimizer(
+            "application_round",
+            QueryOptimizer(
+                ApplicationRound,
+                info=optimizer.info,
+                name="application_round",
+                parent=optimizer,
+            ),
+        )
+        application_round_optimizer.only_fields.append("application_period_end")
+
         return queryset
 
     @classmethod

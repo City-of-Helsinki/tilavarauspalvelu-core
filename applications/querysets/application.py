@@ -1,10 +1,16 @@
-from typing import Literal, Self
+from __future__ import annotations
 
+from typing import TYPE_CHECKING, Literal, Self
+
+from django.contrib.postgres.aggregates import ArrayAgg
 from django.db import models
 from django.db.models import Subquery
+from django.db.models.functions import Coalesce
 from lookup_property import L
 
-from applications.enums import ApplicationStatusChoice
+if TYPE_CHECKING:
+    from applications.enums import ApplicationStatusChoice
+    from applications.models import Application
 
 
 class ApplicationQuerySet(models.QuerySet):
@@ -47,3 +53,46 @@ class ApplicationQuerySet(models.QuerySet):
 
     def order_by_applicant_type(self, desc: bool = False) -> Self:
         return self.order_by(models.OrderBy(L("applicant_type_sort_order"), descending=desc))
+
+    def _fetch_all(self) -> None:
+        super()._fetch_all()
+        if "FETCH_UNITS_FOR_PERMISSIONS_FLAG" in self._hints:
+            self._hints.pop("FETCH_UNITS_FOR_PERMISSIONS_FLAG", None)
+            self._add_units_for_permissions()
+
+    def with_permissions(self) -> Self:
+        """Indicates that we need to fetch units for permissions checks when the queryset is evaluated."""
+        self._hints["FETCH_UNITS_FOR_PERMISSIONS_FLAG"] = True
+        return self
+
+    def _add_units_for_permissions(self) -> None:
+        # This works sort of like a 'prefetch_related', since it makes another query
+        # to fetch units and unit groups for the permission checks when the queryset is evaluated,
+        # and 'joins' them to the correct model instances in python.
+        from spaces.models import Unit
+
+        items: list[Application] = list(self)
+        if not items:
+            return
+
+        units = (
+            Unit.objects.prefetch_related("unit_groups")
+            .filter(reservationunit__reservation_unit_options__application_section__application__in=items)
+            .annotate(
+                application_ids=Coalesce(
+                    ArrayAgg(
+                        "reservationunit__reservation_unit_options__application_section__application",
+                        distinct=True,
+                        filter=(
+                            models.Q(reservationunit__isnull=False)
+                            & models.Q(reservationunit__reservation_unit_options__isnull=False)
+                        ),
+                    ),
+                    models.Value([]),
+                )
+            )
+            .distinct()
+        )
+
+        for item in items:
+            item.units_for_permissions = [unit for unit in units if item.pk in unit.application_ids]
