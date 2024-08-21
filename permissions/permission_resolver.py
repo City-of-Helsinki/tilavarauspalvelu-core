@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Self
 from django.db.models import Q
 
 from common.date_utils import local_datetime
-from permissions.enums import UserRoleChoice
+from permissions.enums import UserPermissionChoice, UserRoleChoice
 from spaces.models import Unit
 
 if TYPE_CHECKING:
@@ -118,6 +118,51 @@ class PermissionResolver:
                 return True
 
         return has_role
+
+    def has_permission_for_unit_or_their_unit_group(
+        self,
+        *,
+        permission: UserPermissionChoice,
+        unit_ids: Iterable[Unit] = (),
+        require_all: bool = False,
+    ) -> bool:
+        unit_ids = list(unit_ids)
+        if not unit_ids:  # Check for all units and unit groups the user has permissions for.
+            unit_ids = list(self.user.unit_permissions_map.keys())
+            unit_group_ids = list(self.user.unit_group_permissions_map.keys())
+            units = (
+                Unit.objects.filter(Q(pk__in=unit_ids) | Q(unit_groups__pk__in=unit_group_ids))
+                .prefetch_related("unit_groups")
+                .distinct()
+            )
+        else:
+            units = Unit.objects.filter(pk__in=unit_ids).prefetch_related("unit_groups")
+
+        # Has the given permission through their unit roles in the given units or their unit groups
+        has_permission: bool = False
+        for unit in units:
+            permissions = self.user.unit_permissions_map.get(unit.pk, [])
+            has_permission = permission in permissions
+
+            # No permissions though units -> check through unit groups
+            if not has_permission:
+                permissions = {
+                    permission
+                    for unit_group in unit.unit_groups.all()
+                    for permission in self.user.unit_group_permissions_map.get(unit_group.pk, [])
+                }
+                has_permission = permission in permissions
+
+            # If we require permissions for all units, we need to keep checking until all units have been checked.
+            # If at any point we don't have permission for a unit or it's groups, we can stop early.
+            if require_all:
+                if not has_permission:
+                    return False
+            # If we require permissions for any unit, we can stop once we have found one.
+            elif has_permission:
+                return True
+
+        return has_permission
 
     def is_user_anonymous_or_inactive(self) -> bool:
         return getattr(self, "user", None) is None or self.user.is_anonymous or not self.user.is_active

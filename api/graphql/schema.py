@@ -15,6 +15,7 @@ from applications.models import AllocatedTimeSlot
 from common.models import BannerNotification
 from common.typing import AnyUser, GQLInfo
 from merchants.models import PaymentOrder
+from permissions.enums import UserPermissionChoice
 from reservations.models import Reservation
 from users.helauth.clients import HelsinkiProfileClient
 from users.helauth.typing import UserProfileInfo
@@ -94,6 +95,7 @@ from .queries import (
     KeywordGroupNode,
     KeywordNode,
     PaymentOrderNode,
+    PermissionCheckerType,
     PurposeNode,
     QualifierNode,
     RecurringReservationNode,
@@ -197,6 +199,12 @@ class Query(graphene.ObjectType):
     # User
     user = UserNode.Node()
     current_user = UserNode.Field()
+    check_permissions = Field(
+        PermissionCheckerType,
+        permission=graphene.NonNull(graphene.Enum.from_enum(UserPermissionChoice)),
+        units=graphene.List(graphene.NonNull(graphene.Int)),
+        require_all=graphene.Argument(graphene.Boolean, default_value=False),
+    )
     profile_data = Field(
         HelsinkiProfileDataNode,
         reservation_id=graphene.Int(),
@@ -237,6 +245,14 @@ class Query(graphene.ObjectType):
         if PaymentOrderPermission.has_node_permission(order, info.context.user, {}):
             return order
         return None
+
+    def resolve_check_permissions(root: None, info: GQLInfo, **kwargs: Any) -> dict[str, bool]:
+        return PermissionCheckerType.run(
+            user=info.context.user,
+            permission=UserPermissionChoice(kwargs["permission"]),
+            unit_ids=kwargs.get("units", []),
+            require_all=kwargs.get("require_all", False),
+        )
 
     def resolve_banner_notifications(root: None, info: GQLInfo, **kwargs: Any):
         user: AnyUser = info.context.user

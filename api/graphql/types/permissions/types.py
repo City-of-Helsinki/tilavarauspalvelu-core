@@ -1,5 +1,6 @@
 import graphene
 from django.db import models
+from graphene import ObjectType
 from graphene_django_extensions import DjangoNode
 from query_optimizer import ManuallyOptimizedField
 from query_optimizer.optimizer import QueryOptimizer
@@ -11,6 +12,7 @@ from spaces.models import Unit, UnitGroup
 
 __all__ = [
     "GeneralRoleNode",
+    "PermissionCheckerType",
     "UnitRoleNode",
 ]
 
@@ -90,3 +92,30 @@ class UnitRoleNode(DjangoNode):
         )
         unit_group_optimizer.only_fields.append("pk")
         return queryset
+
+
+class PermissionCheckerType(ObjectType):
+    has_permission = graphene.Field(graphene.NonNull(graphene.Boolean))
+
+    @classmethod
+    def run(
+        cls,
+        user: AnyUser,
+        permission: UserPermissionChoice,
+        unit_ids: list[int],
+        require_all: bool = False,
+    ) -> dict[str, bool]:
+        if user.permissions.is_user_anonymous_or_inactive():
+            return {"has_permission": False}
+
+        # Has the given permission through their general roles
+        if permission in user.general_permissions_list:
+            return {"has_permission": True}
+
+        return {
+            "has_permission": user.permissions.has_permission_for_unit_or_their_unit_group(
+                permission=permission,
+                unit_ids=unit_ids,
+                require_all=require_all,
+            )
+        }
