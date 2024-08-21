@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
+from permissions.models import GeneralRole, UnitRole
 from users.anonymisation import anonymize_user_data
 from users.helauth.typing import LoginMethod
 from users.models import User
@@ -8,6 +9,48 @@ from users.models import User
 __all__ = [
     "UserAdmin",
 ]
+
+
+class GeneralRoleInlineAdmin(admin.TabularInline):
+    model = GeneralRole
+    extra = 0
+    show_change_link = True
+    fk_name = "user"
+    fields = [
+        "role",
+    ]
+    readonly_fields = [
+        "role",
+    ]
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+class UnitRoleInlineAdmin(admin.TabularInline):
+    model = UnitRole
+    extra = 0
+    show_change_link = True
+    fk_name = "user"
+    fields = [
+        "role",
+        "units",
+        "unit_groups",
+    ]
+    readonly_fields = [
+        "role",
+        "units",
+        "unit_groups",
+    ]
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 @admin.register(User)
@@ -35,6 +78,10 @@ class UserAdmin(admin.ModelAdmin):
         "date_joined",
     ]
     ordering = ["username"]
+    inlines = [
+        GeneralRoleInlineAdmin,
+        UnitRoleInlineAdmin,
+    ]
 
     # Form
     fieldsets = [
@@ -61,21 +108,6 @@ class UserAdmin(admin.ModelAdmin):
             },
         ],
         [
-            _("Permissions"),
-            {
-                "fields": [
-                    "is_superuser",
-                    "is_staff",
-                    "general_roles_list",
-                    "unit_roles_map",
-                    "unit_group_roles_map",
-                    "login_method",
-                    "is_strong_login",
-                    "ad_groups",
-                ],
-            },
-        ],
-        [
             _("Additional information"),
             {
                 "fields": [
@@ -86,6 +118,18 @@ class UserAdmin(admin.ModelAdmin):
                     "department_name",
                     "profile_id",
                     "date_of_birth",
+                ],
+            },
+        ],
+        [
+            _("Permissions"),
+            {
+                "fields": [
+                    "is_superuser",
+                    "is_staff",
+                    "login_method",
+                    "is_strong_login",
+                    "ad_groups",
                 ],
             },
         ],
