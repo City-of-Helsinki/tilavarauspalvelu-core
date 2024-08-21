@@ -14,7 +14,7 @@ import IconWithText from "../common/IconWithText";
 import Carousel from "../Carousel";
 import {
   getActivePricing,
-  getPrice,
+  getPriceString,
   getReservationUnitName,
   getUnitName,
 } from "@/modules/reservationUnit";
@@ -126,7 +126,8 @@ function RelatedUnits({ units }: PropsType): JSX.Element | null {
         {units.map((unit) => {
           const name = getReservationUnitName(unit);
           const pricing = getActivePricing(unit);
-          const unitPrice = pricing != null ? getPrice({ pricing }) : undefined;
+          const unitPrice =
+            pricing != null ? getPriceString({ pricing }) : undefined;
           const reservationUnitTypeName =
             unit.reservationUnitType != null
               ? getTranslation(unit.reservationUnitType, "name")

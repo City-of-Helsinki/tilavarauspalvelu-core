@@ -17,7 +17,7 @@ import IconWithText from "../common/IconWithText";
 import { truncatedText } from "@/styles/util";
 import {
   getActivePricing,
-  getPrice,
+  getPriceString,
   getReservationUnitName,
   getUnitName,
 } from "@/modules/reservationUnit";
@@ -263,7 +263,7 @@ function ReservationUnitCard({ reservationUnit }: PropsT): JSX.Element {
   const unitName = getUnitName(reservationUnit.unit ?? undefined);
 
   const pricing = getActivePricing(reservationUnit);
-  const unitPrice = pricing != null ? getPrice({ pricing }) : undefined;
+  const unitPrice = pricing != null ? getPriceString({ pricing }) : undefined;
 
   const reservationUnitTypeName =
     reservationUnit.reservationUnitType != null

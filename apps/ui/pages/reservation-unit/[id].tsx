@@ -82,7 +82,7 @@ import {
 import {
   getFuturePricing,
   getPossibleTimesForDay,
-  getPrice,
+  getPriceString,
   getTimeString,
   isReservationUnitPaidInFuture,
   isReservationUnitPublished,
@@ -1220,7 +1220,7 @@ function ReservationUnit({
                         defaults="Huomioi <bold>hinnoittelumuutos {{date}} alkaen. Uusi hinta on {{price}}</bold>."
                         values={{
                           date: toUIDate(new Date(futurePricing.begins)),
-                          price: getPrice({
+                          price: getPriceString({
                             pricing: futurePricing,
                             trailingZeros: true,
                           }).toLocaleLowerCase(),

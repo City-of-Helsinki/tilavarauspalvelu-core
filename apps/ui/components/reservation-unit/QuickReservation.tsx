@@ -6,7 +6,10 @@ import { chunkArray, fromUIDate, toUIDate } from "common/src/common/util";
 import { fontBold, fontMedium, H4 } from "common/src/common/typography";
 import type { ReservationUnitPageQuery } from "@gql/gql-types";
 import { breakpoints } from "common";
-import { getReservationUnitPrice } from "@/modules/reservationUnit";
+import {
+  getReservationUnitPrice,
+  isReservationUnitPaid,
+} from "@/modules/reservationUnit";
 import Carousel from "../Carousel";
 import { getLastPossibleReservationDate } from "@/components/reservation-unit/utils";
 import type { FocusTimeSlot } from "@/components/calendar/ReservationCalendarControls";
@@ -172,21 +175,22 @@ function QuickReservation({
   const dateValue = useMemo(() => fromUIDate(formDate ?? ""), [formDate]);
   const duration = watch("duration");
 
-  const getPrice = useCallback(
-    (asNumeral = false) => {
-      if (reservationUnit == null || dateValue == null || duration == null) {
-        return null;
-      }
-      return getReservationUnitPrice({
-        reservationUnit,
-        pricingDate: dateValue,
-        minutes: duration,
-        trailingZeros: true,
-        asNumeral,
-      });
-    },
-    [duration, reservationUnit, dateValue]
+  const isFreeOfCharge = !isReservationUnitPaid(
+    reservationUnit?.pricings ?? [],
+    dateValue ?? new Date()
   );
+
+  const getPrice = useCallback(() => {
+    if (reservationUnit == null || dateValue == null || duration == null) {
+      return null;
+    }
+    return getReservationUnitPrice({
+      reservationUnit,
+      pricingDate: dateValue,
+      minutes: duration,
+      trailingZeros: true,
+    });
+  }, [duration, reservationUnit, dateValue]);
 
   // A map of all available times for the day, chunked into groups of 8
   const timeChunks: string[][] = useMemo(() => {
@@ -302,7 +306,7 @@ function QuickReservation({
             <>
               {t("reservationUnit:price")}:{" "}
               <PriceValue>{getPrice()}</PriceValue>
-              {getPrice(true) !== "0" && subventionSuffix}
+              {!isFreeOfCharge && subventionSuffix}
             </>
           )}
         </Price>

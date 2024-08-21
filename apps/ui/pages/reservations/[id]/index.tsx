@@ -51,7 +51,7 @@ import {
 import {
   getReservationUnitInstructionsKey,
   getReservationUnitName,
-  getReservationUnitPrice,
+  isReservationUnitPaid,
 } from "@/modules/reservationUnit";
 import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 import { ReservationStatus } from "@/components/reservation/ReservationStatus";
@@ -369,15 +369,14 @@ function Reservation({
       return false;
     }
 
-    const reservationUnitPrice = getReservationUnitPrice({
-      reservationUnit,
-      pricingDate: reservation.begin ? new Date(reservation.begin) : undefined,
-      asNumeral: true,
-    });
+    const isFreeOfCharge = !isReservationUnitPaid(
+      reservationUnit.pricings,
+      new Date(reservation.begin)
+    );
 
     return (
       reservation.applyingForFreeOfCharge ||
-      (reservationUnit.canApplyFreeOfCharge && reservationUnitPrice !== "0")
+      (reservationUnit.canApplyFreeOfCharge && !isFreeOfCharge)
     );
   }, [reservation, reservationUnit]);
 

@@ -37,6 +37,7 @@ import {
   getPossibleTimesForDay,
   getReservationUnitPrice,
   getTimeString,
+  isReservationUnitPaid,
 } from "@/modules/reservationUnit";
 import { formatDuration, isTouchDevice } from "@/modules/util";
 import { BlackButton, MediumButton } from "@/styles/util";
@@ -280,22 +281,14 @@ export function EditStep0({
     reservationUnit?.bufferTimeBefore,
   ]);
 
-  const isSlotFree = useCallback(
-    (start: Date): boolean => {
-      const price = getReservationUnitPrice({
-        reservationUnit,
-        pricingDate: start,
-        asNumeral: true,
-      });
-      return price === "0";
-    },
-    [reservationUnit]
-  );
-
   const slotPropGetter = useMemo(() => {
     if (!reservationUnit) {
       return undefined;
     }
+    const isSlotFree = (start: Date): boolean => {
+      return isReservationUnitPaid(reservationUnit.pricings, start);
+    };
+
     return getSlotPropGetter({
       reservableTimes,
       activeApplicationRounds,
@@ -307,9 +300,9 @@ export function EditStep0({
         : undefined,
       reservationsMinDaysBefore: reservationUnit.reservationsMinDaysBefore ?? 0,
       reservationsMaxDaysBefore: reservationUnit.reservationsMaxDaysBefore ?? 0,
-      customValidation: (date) => isSlotFree(date),
+      customValidation: isSlotFree,
     });
-  }, [activeApplicationRounds, reservationUnit, isSlotFree, reservableTimes]);
+  }, [activeApplicationRounds, reservationUnit, reservableTimes]);
 
   // TODO submit should be completely unnecessary
   // just disable nextStep button if the form is invalid
@@ -318,15 +311,18 @@ export function EditStep0({
     if (!focusSlot?.start || !focusSlot?.end) {
       return;
     }
+    const { start } = focusSlot;
+    const isFree = isReservationUnitPaid(reservationUnit.pricings, start);
     const newReservation: PendingReservation = {
       begin: focusSlot.start.toISOString(),
       end: focusSlot.end.toISOString(),
-      price: getReservationUnitPrice({
-        reservationUnit,
-        pricingDate: focusSlot?.start ? new Date(focusSlot.start) : undefined,
-        minutes: 0,
-        asNumeral: true,
-      }),
+      price: isFree
+        ? "0"
+        : (getReservationUnitPrice({
+            reservationUnit,
+            pricingDate: focusSlot.start,
+            minutes: 0,
+          }) ?? undefined),
     };
 
     const resUnit = getWithoutThisReservation(reservationUnit, reservation);

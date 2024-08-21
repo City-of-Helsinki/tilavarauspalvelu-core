@@ -30,6 +30,7 @@ import {
   ReservationStateChoice,
   type IsReservableFieldsFragment,
   ReservationStartInterval,
+  Maybe,
 } from "@gql/gql-types";
 import { capitalize, getTranslation } from "./util";
 import {
@@ -188,7 +189,7 @@ export function getActivePricing(reservationUnit: {
   pricings: PricingFieldsFragment[];
 }): PricingFieldsFragment | undefined {
   const { pricings } = reservationUnit;
-  return pricings.find((pricing) => pricing?.status === "ACTIVE");
+  return pricings.find((pricing) => pricing.status === Status.Active);
 }
 
 export const RESERVATION_INFO_CARD_FRAGMENT = gql`
@@ -202,21 +203,25 @@ export const RESERVATION_INFO_CARD_FRAGMENT = gql`
 `;
 
 export function getFuturePricing(
-  reservationUnit: PriceReservationUnitFragment,
+  reservationUnit: Maybe<PriceReservationUnitFragment> | undefined,
   applicationRounds: RoundPeriod[] = [],
   reservationDate?: Date
-): PricingFieldsFragment | undefined {
+): PricingFieldsFragment | null {
+  if (!reservationUnit) {
+    return null;
+  }
   const { pricings, reservationBegins, reservationEnds } = reservationUnit;
 
   if (!pricings || pricings.length === 0) {
-    return undefined;
+    return null;
   }
 
   const now = toUIDate(new Date(), "yyyy-MM-dd");
 
-  const futurePricings = pricings
-    .filter((pricing) => pricing?.status === Status.Future)
-    .filter((x): x is NonNullable<typeof x> => x != null)
+  const part = pricings
+    .filter((pricing) => pricing.status === Status.Future)
+    .filter((x): x is NonNullable<typeof x> => x != null);
+  const futurePricings = part
     .filter((futurePricing) => futurePricing.begins > now)
     .filter((futurePricing) => {
       const start = new Date(futurePricing.begins);
@@ -243,13 +248,13 @@ export function getFuturePricing(
     .sort((a, b) => (a.begins > b.begins ? 1 : -1));
 
   if (futurePricings.length === 0) {
-    return undefined;
+    return null;
   }
 
   return reservationDate
-    ? futurePricings.reverse().find((n) => {
+    ? (futurePricings.reverse().find((n) => {
         return n.begins <= toUIDate(new Date(reservationDate), "yyyy-MM-dd");
-      })
+      }) ?? null)
     : futurePricings[0];
 }
 
@@ -257,30 +262,42 @@ function formatPrice(
   price: number,
   trailingZeros: boolean,
   toCurrency?: boolean
-) {
-  const currencyFormatter = trailingZeros ? "currencyWithDecimals" : "currency";
-  const floatFormatter = trailingZeros ? "twoDecimal" : "strippedDecimal";
+): string {
+  const enableDecimals = price !== 0 && trailingZeros;
+  const currencyFormatter = enableDecimals
+    ? "currencyWithDecimals"
+    : "currency";
+  const floatFormatter = enableDecimals ? "twoDecimal" : "strippedDecimal";
   const formatters = getFormatters("fi");
   const formatter = formatters[toCurrency ? currencyFormatter : floatFormatter];
-  return parseFloat(price.toString()) ? formatter.format(price) : 0;
+  return formatter.format(price);
 }
 
 type GetPriceType = {
   pricing: PricingFieldsFragment;
   minutes?: number; // additional minutes for total price calculation
   trailingZeros?: boolean;
-  asNumeral?: boolean; // return a string of numbers ("0" instead of e.g. "free" when the price is 0)
 };
 
-export const getPrice = (props: GetPriceType): string => {
-  const { pricing, minutes, trailingZeros = false, asNumeral = false } = props;
+function isPriceZero(pricing: PricingFieldsFragment): boolean {
   if (
     pricing.pricingType == null ||
     pricing.pricingType === PricingType.Free ||
     (pricing.pricingType === PricingType.Paid &&
       parseFloat(pricing.highestPrice) === 0)
   ) {
-    return asNumeral ? "0" : (i18n?.t("prices:priceFree") ?? "0");
+    return true;
+  }
+  return false;
+}
+
+// TODO rewrite this return number normally
+// and a separate function to format it to string
+export function getPriceString(props: GetPriceType): string {
+  const { pricing, minutes, trailingZeros = false } = props;
+
+  if (isPriceZero(pricing)) {
+    return i18n?.t("prices:priceFree") ?? "0";
   }
 
   const volume = getReservationVolume(minutes ?? 0, pricing.priceUnit);
@@ -295,59 +312,86 @@ export const getPrice = (props: GetPriceType): string => {
       ? ""
       : i18n?.t(`prices:priceUnits.${pricing.priceUnit}`);
   return trim(`${priceString} / ${unitString}`, " / ");
-};
+}
 
-type GetReservationUnitPriceProps = {
+export type GetReservationUnitPriceProps = {
   reservationUnit?: PriceReservationUnitFragment | null;
   pricingDate?: Date;
   minutes?: number;
   trailingZeros?: boolean;
-  asNumeral?: boolean;
 };
 
 export function getReservationUnitPrice(
   props: GetReservationUnitPriceProps
-): string | undefined {
+): string | null {
   const {
     reservationUnit: ru,
     pricingDate,
     minutes,
     trailingZeros = false,
-    asNumeral = false,
   } = props;
+  if (pricingDate != null && Number.isNaN(pricingDate.getTime())) {
+    // eslint-disable-next-line no-console
+    console.warn("Invalid pricing date", pricingDate);
+  }
 
   if (ru == null) {
-    return undefined;
+    return null;
   }
 
-  const pricing = pricingDate
-    ? getFuturePricing(ru, [], pricingDate) || getActivePricing(ru)
-    : getActivePricing(ru);
+  const futurePricing = getFuturePricing(ru, [], pricingDate);
+  const activePricing = getActivePricing(ru);
+  let pricing = futurePricing ?? activePricing;
+  // tax percentage change is based on the day of buying
+  if (
+    futurePricing &&
+    activePricing &&
+    futurePricing.taxPercentage.value !== activePricing.taxPercentage.value
+  ) {
+    pricing = activePricing;
+  }
 
   if (pricing == null) {
-    return undefined;
+    return null;
   }
 
-  return getPrice({
+  return getPriceString({
     pricing,
     minutes,
     trailingZeros,
-    asNumeral,
   });
 }
 
-export const isReservationUnitPaidInFuture = (
+export function isReservationUnitPaid(
+  pricings: PricingFieldsFragment[],
+  date?: Date
+): boolean {
+  const active = pricings.filter((p) => p.status === Status.Active);
+  const future = pricings.filter((p) => p.status === Status.Future);
+  const d =
+    date == null
+      ? active
+      : active.concat(future).filter((p) => {
+          const start = new Date(p.begins);
+          return start <= date;
+        });
+  return (
+    d
+      .filter((p) => p.pricingType === PricingType.Paid)
+      .filter((p) => !isPriceZero(p)).length > 0
+  );
+}
+
+export function isReservationUnitPaidInFuture(
   pricings: PricingFieldsFragment[]
-): boolean => {
-  return pricings
-    .filter(
-      (pricing) =>
-        [Status.Active, Status.Future].includes(pricing.status) &&
-        pricing.pricingType === PricingType.Paid
-    )
-    .map((pricing) => getPrice({ pricing, asNumeral: true }))
-    .some((n) => n !== "0");
-};
+): boolean {
+  return (
+    pricings
+      .filter((p) => p.status === Status.Future || p.status === Status.Active)
+      .filter((p) => p.pricingType === PricingType.Paid)
+      .filter((p) => !isPriceZero(p)).length > 0
+  );
+}
 
 /// Returns true if the given time is 'inside' the time span
 /// inside in this case means it's either the same day or the time span is multiple days

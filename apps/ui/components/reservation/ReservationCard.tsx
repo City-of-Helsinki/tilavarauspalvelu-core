@@ -210,11 +210,12 @@ function ReservationCard({ reservation, type }: PropsT): JSX.Element {
             new Date(reservation.end),
             new Date(reservation.begin)
           ),
-          trailingZeros: true,
+          trailingZeros: false,
         })
       : getReservationPrice(
           reservation.price ?? undefined,
           t("prices:priceFree"),
+          false,
           i18n.language
         );
 

@@ -7,8 +7,14 @@ import styled from "styled-components";
 import { getReservationPrice, formatters as getFormatters } from "common";
 import { breakpoints } from "common/src/common/style";
 import { H4, Strong } from "common/src/common/typography";
-import type { ReservationInfoCardFragment } from "@gql/gql-types";
-import { getReservationUnitPrice } from "@/modules/reservationUnit";
+import {
+  ReservationStateChoice,
+  type ReservationInfoCardFragment,
+} from "@gql/gql-types";
+import {
+  getReservationUnitPrice,
+  isReservationUnitPaid,
+} from "@/modules/reservationUnit";
 import {
   capitalize,
   formatDuration,
@@ -127,7 +133,7 @@ export function ReservationInfoCard({
     return null;
   }
 
-  const price: string | undefined =
+  const price: string | null =
     begin &&
     (reservation?.state === "REQUIRES_HANDLING" ||
       shouldDisplayReservationUnitPrice)
@@ -140,18 +146,13 @@ export function ReservationInfoCard({
       : getReservationPrice(
           reservation?.price,
           t("prices:priceFree"),
-          i18n.language,
-          true
+          true,
+          i18n.language
         );
 
   const shouldDisplayTaxPercentage: boolean =
-    reservation.state === "REQUIRES_HANDLING" && begin
-      ? getReservationUnitPrice({
-          reservationUnit,
-          pricingDate: new Date(begin),
-          minutes: 0,
-          asNumeral: true,
-        }) !== "0"
+    reservation.state === ReservationStateChoice.RequiresHandling && begin
+      ? isReservationUnitPaid(reservationUnit.pricings, new Date(begin))
       : Number(reservation?.price) > 0;
 
   const name = getTranslation(reservationUnit, "name");

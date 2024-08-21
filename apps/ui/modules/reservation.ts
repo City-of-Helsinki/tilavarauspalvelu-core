@@ -274,7 +274,7 @@ function isReservationConfirmed(reservation: {
 function isReservationFreeOfCharge(
   reservation: Pick<ReservationNode, "price">
 ): boolean {
-  return parseInt(String(reservation.price), 10) === 0;
+  return !(Number(reservation.price) > 0);
 }
 
 export type CanReservationBeChangedProps = {

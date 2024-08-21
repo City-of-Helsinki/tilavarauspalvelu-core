@@ -69,8 +69,8 @@ export function getReservationVolume(minutes: number, unit: PriceUnit): number {
 export function getReservationPrice(
   price: Maybe<string> | undefined,
   defaultText: string,
-  language = "fi",
-  trailingZeros = false
+  trailingZeros: boolean,
+  language = "fi"
 ): string {
   if (price == null) {
     return defaultText;

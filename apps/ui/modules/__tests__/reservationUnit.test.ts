@@ -8,11 +8,10 @@ import {
   startOfDay,
   startOfToday,
 } from "date-fns";
-import { toUIDate } from "common/src/common/util";
+import { toApiDateUnsafe, toUIDate } from "common/src/common/util";
 import {
   type EquipmentNode,
   ReservationStateChoice,
-  type ReservationUnitPricingNode,
   PriceUnit,
   PricingType,
   ReservationUnitState,
@@ -23,14 +22,16 @@ import {
   ReservationKind,
   ReservationStartInterval,
   ReservationState,
+  type PriceReservationUnitFragment,
 } from "@gql/gql-types";
 import {
+  type GetReservationUnitPriceProps,
   getDayIntervals,
   getEquipmentCategories,
   getEquipmentList,
   getFuturePricing,
   getPossibleTimesForDay,
-  getPrice,
+  getPriceString,
   getReservationUnitInstructionsKey,
   getReservationUnitName,
   getReservationUnitPrice,
@@ -206,7 +207,7 @@ describe("getPossibleTimesForDay", () => {
   });
 });
 
-describe("getPrice", () => {
+describe("getPriceString", () => {
   const pricingBase: PricingFieldsFragment = {
     id: "1",
     begins: "",
@@ -251,7 +252,7 @@ describe("getPrice", () => {
       priceUnit: PriceUnit.Per_15Mins,
     });
 
-    expect(getPrice(input)).toBe("10 - 50,5 € / 15 min");
+    expect(getPriceString(input)).toBe("10 - 50,5 € / 15 min");
   });
 
   test("price range with no min", () => {
@@ -260,21 +261,21 @@ describe("getPrice", () => {
       highestPrice: 50.5,
       priceUnit: PriceUnit.Per_15Mins,
     });
-    expect(getPrice(input)).toBe("0 - 50,5 € / 15 min");
+    expect(getPriceString(input)).toBe("0 - 50,5 € / 15 min");
   });
 
   test("price range with minutes", () => {
     const input = constructInput({
       minutes: 60,
     });
-    expect(getPrice(input)).toBe("0 - 60,5 €");
+    expect(getPriceString(input)).toBe("0 - 60,5 €");
   });
 
   test("price range with minutes", () => {
     const input = constructInput({
       minutes: 61,
     });
-    expect(getPrice(input)).toBe("0 - 75,63 €");
+    expect(getPriceString(input)).toBe("0 - 75,63 €");
   });
 
   test("price range with minutes", () => {
@@ -282,7 +283,7 @@ describe("getPrice", () => {
       highestPrice: 100,
       minutes: 61,
     });
-    expect(getPrice(input)).toBe("0 - 125 €");
+    expect(getPriceString(input)).toBe("0 - 125 €");
   });
 
   test("price range with minutes", () => {
@@ -290,7 +291,7 @@ describe("getPrice", () => {
       highestPrice: 100,
       minutes: 90,
     });
-    expect(getPrice(input)).toBe("0 - 150 €");
+    expect(getPriceString(input)).toBe("0 - 150 €");
   });
 
   test("price range with minutes", () => {
@@ -298,7 +299,7 @@ describe("getPrice", () => {
       highestPrice: 100,
       minutes: 91,
     });
-    expect(getPrice(input)).toBe("0 - 175 €");
+    expect(getPriceString(input)).toBe("0 - 175 €");
   });
 
   test("price range with minutes", () => {
@@ -307,7 +308,7 @@ describe("getPrice", () => {
       minutes: 60,
       priceUnit: PriceUnit.Per_15Mins,
     });
-    expect(getPrice(input)).toBe("0 - 120 €");
+    expect(getPriceString(input)).toBe("0 - 120 €");
   });
 
   test("price range with minutes", () => {
@@ -316,7 +317,7 @@ describe("getPrice", () => {
       minutes: 60,
       priceUnit: PriceUnit.Per_30Mins,
     });
-    expect(getPrice(input)).toBe("0 - 60 €");
+    expect(getPriceString(input)).toBe("0 - 60 €");
   });
 
   test("price range with minutes", () => {
@@ -325,7 +326,7 @@ describe("getPrice", () => {
       minutes: 61,
       priceUnit: PriceUnit.Per_30Mins,
     });
-    expect(getPrice(input)).toBe("0 - 75 €");
+    expect(getPriceString(input)).toBe("0 - 75 €");
   });
 
   test("price range with minutes and fixed unit", () => {
@@ -335,7 +336,7 @@ describe("getPrice", () => {
       minutes: 61,
       priceUnit: PriceUnit.PerHalfDay,
     });
-    expect(getPrice(input)).toBe("10 - 100 €");
+    expect(getPriceString(input)).toBe("10 - 100 €");
   });
 
   test("price range with minutes and fixed unit", () => {
@@ -345,7 +346,7 @@ describe("getPrice", () => {
       minutes: 1234,
       priceUnit: PriceUnit.PerDay,
     });
-    expect(getPrice(input)).toBe("10 - 100 €");
+    expect(getPriceString(input)).toBe("10 - 100 €");
   });
 
   test("price range with minutes and fixed unit", () => {
@@ -356,7 +357,7 @@ describe("getPrice", () => {
       priceUnit: PriceUnit.PerWeek,
     });
 
-    expect(getPrice(input)).toBe("10 - 100 €");
+    expect(getPriceString(input)).toBe("10 - 100 €");
   });
 
   test("fixed price", () => {
@@ -366,7 +367,7 @@ describe("getPrice", () => {
       priceUnit: PriceUnit.Fixed,
     });
 
-    expect(getPrice(input)).toBe("50 €");
+    expect(getPriceString(input)).toBe("50 €");
   });
 
   test("fixed price with decimals", () => {
@@ -376,7 +377,7 @@ describe("getPrice", () => {
       priceUnit: PriceUnit.Fixed,
     });
 
-    expect(getPrice({ ...input, trailingZeros: true })).toBe("50,00 €");
+    expect(getPriceString({ ...input, trailingZeros: true })).toBe("50,00 €");
   });
 
   test("no price", () => {
@@ -384,7 +385,7 @@ describe("getPrice", () => {
       lowestPrice: 0,
       highestPrice: 0,
     });
-    expect(getPrice(input)).toBe("Maksuton");
+    expect(getPriceString(input)).toBe("Maksuton");
   });
 
   test("total price with minutes", () => {
@@ -395,7 +396,7 @@ describe("getPrice", () => {
       priceUnit: PriceUnit.Per_15Mins,
     };
 
-    expect(getPrice({ pricing, minutes: 180 })).toBe("0 - 606 €");
+    expect(getPriceString({ pricing, minutes: 180 })).toBe("0 - 606 €");
   });
 
   test("total price with minutes and decimals", () => {
@@ -406,7 +407,7 @@ describe("getPrice", () => {
       priceUnit: PriceUnit.Per_15Mins,
     };
 
-    expect(getPrice({ pricing, minutes: 180, trailingZeros: true })).toBe(
+    expect(getPriceString({ pricing, minutes: 180, trailingZeros: true })).toBe(
       "0 - 606,00 €"
     );
   });
@@ -952,9 +953,7 @@ describe("getFuturePricing", () => {
     data.pricings[1]!.status = Status.Active;
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     data.pricings[2]!.status = Status.Past;
-    expect(getFuturePricing(data)).toBeUndefined();
-
-    expect(getFuturePricing({} as ReservationUnitNode)).toBeUndefined();
+    expect(getFuturePricing(data)).toBeNull();
   });
 
   it("with reservation begin time", () => {
@@ -969,7 +968,7 @@ describe("getFuturePricing", () => {
     expect(getFuturePricing(data)).toEqual(data.pricings[1]);
 
     data.reservationBegins = addDays(new Date(), 20).toISOString();
-    expect(getFuturePricing(data)).toBeUndefined();
+    expect(getFuturePricing(data)).toBeNull();
   });
 
   it("with reservation end time", () => {
@@ -981,7 +980,7 @@ describe("getFuturePricing", () => {
     expect(getFuturePricing(data)).toEqual(data.pricings[2]);
 
     data.reservationEnds = addDays(new Date(), 1).toISOString();
-    expect(getFuturePricing(data)).toBeUndefined();
+    expect(getFuturePricing(data)).toBeNull();
 
     data.reservationEnds = addDays(new Date(), 5).toISOString();
     expect(getFuturePricing(data)).toEqual(data.pricings[2]);
@@ -1026,7 +1025,7 @@ describe("getFuturePricing", () => {
       reservationPeriodBegin: addDays(new Date(), 1).toISOString(),
       reservationPeriodEnd: addDays(new Date(), 20).toISOString(),
     };
-    expect(getFuturePricing(data, applicationRounds)).toBeUndefined();
+    expect(getFuturePricing(data, applicationRounds)).toBeNull();
   });
 
   it("handles date lookups", () => {
@@ -1046,209 +1045,186 @@ describe("getFuturePricing", () => {
   });
 });
 
-describe("getReservationUnitPrice", () => {
-  const reservationUnit = {
-    id: "testing",
-    pricings: [
-      {
-        id: "1",
-        pk: 1,
-        begins: toUIDate(addDays(new Date(), 10), "yyyy-MM-dd"),
-        pricingType: PricingType.Paid,
-        priceUnit: PriceUnit.PerHour,
-        lowestPrice: "10",
-        lowestPriceNet: "10",
-        highestPrice: "20",
-        highestPriceNet: "20",
-        taxPercentage: {
-          id: "1",
-          value: "24",
-        },
-        status: Status.Future,
-      },
-      {
-        id: "2",
-        pk: 2,
-        begins: toUIDate(addDays(new Date(), 20), "yyyy-MM-dd"),
-        pricingType: PricingType.Paid,
-        priceUnit: PriceUnit.PerHour,
-        lowestPrice: "20",
-        lowestPriceNet: "20",
-        highestPrice: "30",
-        highestPriceNet: "30",
-        taxPercentage: {
-          id: "1",
-          value: "24",
-        },
-        status: Status.Future,
-      },
-      {
-        id: "3",
-        pk: 3,
-        begins: toUIDate(addDays(new Date(), 5), "yyyy-MM-dd"),
-        pricingType: PricingType.Paid,
-        priceUnit: PriceUnit.PerHour,
-        lowestPrice: "40",
-        lowestPriceNet: "40",
-        highestPrice: "50",
-        highestPriceNet: "50",
-        taxPercentage: {
-          id: "1",
-          value: "24",
-        },
-        status: Status.Future,
-      },
-      {
-        id: "4",
-        pk: 4,
-        begins: toUIDate(addDays(new Date(), 5), "yyyy-MM-dd"),
-        pricingType: PricingType.Paid,
-        priceUnit: PriceUnit.PerHour,
-        lowestPrice: "0",
-        lowestPriceNet: "0",
-        highestPrice: "10",
-        highestPriceNet: "10",
-        taxPercentage: {
-          id: "1",
-          value: "24",
-        },
-        status: Status.Active,
-      },
-    ],
+function constructPricing({
+  lowestPrice,
+  highestPrice,
+  taxPercentage,
+  begins,
+  status,
+  pricingType,
+}: {
+  begins?: Date;
+  lowestPrice?: number;
+  highestPrice?: number;
+  taxPercentage?: number;
+  status?: Status;
+  pricingType?: PricingType;
+}): NonNullable<PriceReservationUnitFragment>["pricings"][0] {
+  const p = highestPrice ?? lowestPrice ?? 0;
+  return {
+    id: "1",
+    begins: toApiDateUnsafe(begins ?? new Date()),
+    pricingType: pricingType ?? PricingType.Paid,
+    priceUnit: PriceUnit.PerHour,
+    lowestPrice: lowestPrice?.toString() ?? p.toString(),
+    highestPrice: highestPrice?.toString() ?? p.toString(),
+    taxPercentage: {
+      id: "1",
+      value: (taxPercentage ?? 24).toString(),
+    },
+    status: status ?? Status.Future,
   };
+}
 
-  it("returns future data based on date lookup", () => {
-    const data = cloneDeep(reservationUnit);
+describe("getReservationUnitPrice", () => {
+  function connstructInput({
+    date,
+  }: {
+    date: Date;
+  }): GetReservationUnitPriceProps {
+    return {
+      pricingDate: date,
+      trailingZeros: true,
+      reservationUnit: {
+        pricings: [
+          constructPricing({
+            begins: addDays(new Date(), 10),
+            lowestPrice: 10,
+            highestPrice: 20,
+            taxPercentage: 24,
+          }),
+          constructPricing({
+            begins: addDays(new Date(), 20),
+            lowestPrice: 20,
+            highestPrice: 30,
+            taxPercentage: 24,
+          }),
+          constructPricing({
+            begins: addDays(new Date(), 5),
+            lowestPrice: 40,
+            highestPrice: 50,
+            taxPercentage: 24,
+          }),
+          constructPricing({
+            begins: addDays(new Date(), 5),
+            lowestPrice: 0,
+            highestPrice: 10,
+            taxPercentage: 24,
+            status: Status.Active,
+          }),
+        ],
+      },
+    };
+  }
 
-    expect(
-      getReservationUnitPrice({
-        reservationUnit: data,
-        pricingDate: addDays(new Date(), 5),
-      })
-    ).toEqual("40 - 50 € / tunti");
+  test("returns future data based on date lookup", () => {
+    const input = connstructInput({ date: addDays(new Date(), 5) });
+    expect(getReservationUnitPrice(input)).toEqual("40,00 - 50,00 € / tunti");
 
-    expect(
-      getReservationUnitPrice({
-        reservationUnit: data,
-        pricingDate: addDays(new Date(), 11),
-        trailingZeros: true,
-      })
-    ).toEqual("10,00 - 20,00 € / tunti");
+    const input2 = connstructInput({ date: addDays(new Date(), 11) });
+    expect(getReservationUnitPrice(input2)).toEqual("10,00 - 20,00 € / tunti");
   });
+
+  test.todo("Tax change should work");
 });
 
 describe("isReservationUnitPaidInFuture", () => {
   it("return true if active and future are paid", () => {
     const pricings = [
-      {
-        pricingType: PricingType.Paid,
-        lowestPrice: "0",
-        lowestPriceNet: "0",
-        highestPrice: "20",
-        highestPriceNet: "20",
+      constructPricing({
+        begins: addDays(new Date(), 10),
+        lowestPrice: 0,
+        highestPrice: 20,
         status: Status.Future,
-      },
-      {
-        pricingType: PricingType.Paid,
-        lowestPrice: "0",
-        lowestPriceNet: "0",
-        highestPrice: "10",
-        highestPriceNet: "10",
+      }),
+      constructPricing({
+        begins: addDays(new Date(), 20),
+        lowestPrice: 0,
+        highestPrice: 10,
         status: Status.Active,
-      },
-    ] as ReservationUnitPricingNode[];
+      }),
+    ];
 
     expect(isReservationUnitPaidInFuture(pricings)).toBe(true);
   });
 
   it("return true if only active is paid", () => {
     const pricings = [
-      {
-        pricingType: PricingType.Free,
-        lowestPrice: "0",
-        lowestPriceNet: "0",
-        highestPrice: "0",
-        highestPriceNet: "0",
+      constructPricing({
+        begins: addDays(new Date(), 10),
+        lowestPrice: 0,
+        highestPrice: 0,
         status: Status.Future,
-      },
-      {
-        pricingType: PricingType.Paid,
-        lowestPrice: "0",
-        lowestPriceNet: "0",
-        highestPrice: "10",
-        highestPriceNet: "10",
+        pricingType: PricingType.Free,
+      }),
+      constructPricing({
+        begins: addDays(new Date(), 20),
+        lowestPrice: 0,
+        highestPrice: 10,
         status: Status.Active,
-      },
-    ] as ReservationUnitPricingNode[];
+      }),
+    ];
 
     expect(isReservationUnitPaidInFuture(pricings)).toBe(true);
   });
 
   it("return true if only future one paid", () => {
     const pricings = [
-      {
-        pricingType: PricingType.Paid,
-        lowestPrice: "0",
-        lowestPriceNet: "0",
-        highestPrice: "20",
-        highestPriceNet: "20",
-        status: Status.Future,
-      },
-      {
-        pricingType: PricingType.Free,
-        lowestPrice: "0",
-        lowestPriceNet: "0",
-        highestPrice: "0",
-        highestPriceNet: "0",
+      constructPricing({
+        begins: addDays(new Date(), -10),
+        lowestPrice: 0,
+        highestPrice: 0,
         status: Status.Active,
-      },
-    ] as ReservationUnitPricingNode[];
+        pricingType: PricingType.Free,
+      }),
+      constructPricing({
+        begins: addDays(new Date(), 20),
+        lowestPrice: 0,
+        highestPrice: 20,
+        status: Status.Future,
+      }),
+    ];
 
     expect(isReservationUnitPaidInFuture(pricings)).toBe(true);
   });
 
   it("returns false if future one if paid but price is set in zero", () => {
     const pricings = [
-      {
-        pricingType: PricingType.Paid,
-        lowestPrice: "0",
-        lowestPriceNet: "0",
-        highestPrice: "0",
-        highestPriceNet: "0",
+      constructPricing({
+        begins: addDays(new Date(), 10),
+        lowestPrice: 0,
+        highestPrice: 0,
         status: Status.Future,
-      },
-      {
-        pricingType: PricingType.Free,
-        lowestPrice: "0",
-        lowestPriceNet: "0",
-        highestPrice: "0",
-        highestPriceNet: "0",
+      }),
+      constructPricing({
+        begins: addDays(new Date(), 20),
+        lowestPrice: 0,
+        highestPrice: 0,
         status: Status.Active,
-      },
-    ] as ReservationUnitPricingNode[];
+        pricingType: PricingType.Free,
+      }),
+    ];
 
     expect(isReservationUnitPaidInFuture(pricings)).toBe(false);
   });
 
   it("returns false all are free", () => {
     const pricings = [
-      {
-        pricingType: PricingType.Free,
-        lowestPrice: "0",
-        lowestPriceNet: "0",
-        highestPrice: "20",
-        highestPriceNet: "20",
+      constructPricing({
+        begins: addDays(new Date(), 10),
+        lowestPrice: 0,
+        highestPrice: 20,
         status: Status.Future,
-      },
-      {
         pricingType: PricingType.Free,
-        lowestPrice: "0",
-        lowestPriceNet: "0",
-        highestPrice: "20",
-        highestPriceNet: "20",
+      }),
+      constructPricing({
+        begins: addDays(new Date(), 20),
+        lowestPrice: 0,
+        highestPrice: 20,
         status: Status.Active,
-      },
-    ] as ReservationUnitPricingNode[];
+        pricingType: PricingType.Free,
+      }),
+    ];
 
     expect(isReservationUnitPaidInFuture(pricings)).toBe(false);
   });

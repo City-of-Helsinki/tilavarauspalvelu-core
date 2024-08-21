@@ -38,7 +38,6 @@ export function reservationPrice(
   return getReservationPrice(
     reservation.price,
     t("RequestedReservation.noPrice"),
-    "fi",
     true
   );
 }
@@ -95,17 +94,17 @@ export function getReservationPriceDetails(
   const taxP = parseFloat(pricing.taxPercentage?.value ?? "");
   const taxPercentage = Number.isNaN(taxP) ? 0 : taxP;
   return priceUnit === PriceUnit.Fixed
-    ? getReservationPrice(maxPrice, t("RequestedReservation.noPrice"))
+    ? getReservationPrice(maxPrice, t("RequestedReservation.noPrice"), false)
     : t("RequestedReservation.ApproveDialog.priceBreakdown", {
         volume: formatters.strippedDecimal.format(volume),
         units: t(`RequestedReservation.ApproveDialog.priceUnits.${priceUnit}`),
         vatPercent: formatters.whole.format(taxPercentage),
         unit: t(`RequestedReservation.ApproveDialog.priceUnit.${priceUnit}`),
-        unitPrice: getReservationPrice(maxPrice, ""),
+        unitPrice: getReservationPrice(maxPrice, "", false),
         price: getReservationPrice(
           String(volume * parseFloat(maxPrice)),
           t("RequestedReservation.noPrice"),
-          "fi"
+          false
         ),
       });
 }

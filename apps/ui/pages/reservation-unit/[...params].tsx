@@ -34,7 +34,7 @@ import { createApolloClient } from "@/modules/apolloClient";
 import { reservationUnitPrefix, reservationsPrefix } from "@/modules/const";
 import { getTranslation, reservationsUrl } from "@/modules/util";
 import Sanitize from "@/components/common/Sanitize";
-import { getReservationUnitPrice } from "@/modules/reservationUnit";
+import { isReservationUnitPaid } from "@/modules/reservationUnit";
 import {
   getCheckoutUrl,
   getReservationApplicationMutationValues,
@@ -184,15 +184,12 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
     reservation?.applyingForFreeOfCharge;
 
   const steps: ReservationStep[] = useMemo(() => {
-    const price = getReservationUnitPrice({
-      reservationUnit,
-      pricingDate: reservation?.begin
-        ? new Date(reservation?.begin)
-        : undefined,
-      asNumeral: true,
-    });
+    const isUnitFreeOfCharge = isReservationUnitPaid(
+      reservationUnit.pricings,
+      new Date(reservation.begin)
+    );
 
-    const stepLength = price === "0" || requireHandling ? 2 : 5;
+    const stepLength = isUnitFreeOfCharge || requireHandling ? 2 : 5;
 
     return Array.from(Array(stepLength)).map((_n, i) => {
       const state = i === step ? 0 : i < step ? 1 : 2;

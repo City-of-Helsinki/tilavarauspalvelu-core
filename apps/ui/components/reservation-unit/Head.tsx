@@ -18,9 +18,10 @@ import IconWithText from "../common/IconWithText";
 import { Images } from "./Images";
 import {
   getActivePricing,
-  getPrice,
+  getPriceString,
   getReservationUnitName,
   getUnitName,
+  isReservationUnitPaid,
 } from "@/modules/reservationUnit";
 import BreadcrumbWrapper from "../common/BreadcrumbWrapper";
 import { isReservationStartInFuture } from "@/modules/reservation";
@@ -154,14 +155,10 @@ function Head({
   const maxReservationDuration = formatDuration(maxDur / 60, t, true);
 
   const pricing = getActivePricing(reservationUnit);
-  const unitPrice = pricing ? getPrice({ pricing }) : undefined;
+  const unitPrice = pricing ? getPriceString({ pricing }) : undefined;
 
-  const unitPriceSuffix =
-    pricing &&
-    getPrice({ pricing, asNumeral: true }) !== "0" &&
-    subventionSuffix != null
-      ? subventionSuffix
-      : undefined;
+  const isPaid = isReservationUnitPaid(reservationUnit.pricings);
+  const hasSubventionSuffix = pricing && isPaid && subventionSuffix != null;
 
   const reservationUnitName = getReservationUnitName(reservationUnit);
 
@@ -241,7 +238,7 @@ function Head({
                     text={
                       <>
                         {unitPrice}
-                        {unitPriceSuffix}
+                        {hasSubventionSuffix ? subventionSuffix : null}
                       </>
                     }
                   />
@@ -252,7 +249,7 @@ function Head({
               )}
             </div>
             <Images
-              images={orderImages(reservationUnit.images ?? [])}
+              images={orderImages(reservationUnit.images)}
               contextName={reservationUnitName}
             />
           </RightContainer>

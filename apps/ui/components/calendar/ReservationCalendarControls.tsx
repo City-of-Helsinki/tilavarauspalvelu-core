@@ -257,7 +257,7 @@ function TogglerLabelContent({
   areControlsVisible: boolean;
   togglerLabel: string;
   t: TFunction;
-  price?: string;
+  price: string | null;
 }) {
   if (areControlsVisible) {
     return <div>&nbsp;</div>;
@@ -287,7 +287,6 @@ function ReservationCalendarControls({
   const { control, watch, handleSubmit, setValue } = reservationForm;
   const formDate = watch("date");
   const formDuration = watch("duration");
-  const date = new Date(formDate ?? "");
   const dateValue = useMemo(() => fromUIDate(formDate ?? ""), [formDate]);
   const duration = !Number.isNaN(Number(formDuration))
     ? Number(formDuration)
@@ -306,14 +305,14 @@ function ReservationCalendarControls({
   })();
 
   const price =
-    date != null && duration != null
+    dateValue != null && duration != null
       ? getReservationUnitPrice({
           reservationUnit,
-          pricingDate: date,
+          pricingDate: dateValue,
           minutes: duration,
           trailingZeros: true,
         })
-      : undefined;
+      : null;
 
   const lastOpeningDate = maxBy(
     reservationUnit.reservableTimeSpans,
