@@ -22,7 +22,7 @@ from .types.keyword.types import KeywordCategoryNode, KeywordGroupNode, KeywordN
 from .types.location.types import LocationNode
 from .types.merchants.types import PaymentMerchantNode, PaymentOrderNode, PaymentProductNode
 from .types.organisation.types import OrganisationNode
-from .types.permissions.types import GeneralRoleNode, UnitRoleNode
+from .types.permissions.types import GeneralRoleNode, PermissionCheckerType, UnitRoleNode
 from .types.person.types import PersonNode
 from .types.purpose.types import PurposeNode
 from .types.qualifier.types import QualifierNode
@@ -75,6 +75,7 @@ __all__ = [
     "PaymentMerchantNode",
     "PaymentOrderNode",
     "PaymentProductNode",
+    "PermissionCheckerType",
     "PersonNode",
     "PurposeNode",
     "QualifierNode",
