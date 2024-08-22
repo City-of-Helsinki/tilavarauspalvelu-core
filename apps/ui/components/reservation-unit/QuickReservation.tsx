@@ -188,7 +188,6 @@ function QuickReservation({
       reservationUnit,
       pricingDate: dateValue,
       minutes: duration,
-      trailingZeros: true,
     });
   }, [duration, reservationUnit, dateValue]);
 

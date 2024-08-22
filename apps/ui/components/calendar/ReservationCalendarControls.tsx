@@ -310,7 +310,6 @@ function ReservationCalendarControls({
           reservationUnit,
           pricingDate: dateValue,
           minutes: duration,
-          trailingZeros: true,
         })
       : null;
 

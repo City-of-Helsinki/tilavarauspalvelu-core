@@ -141,7 +141,6 @@ export function ReservationInfoCard({
           reservationUnit,
           pricingDate: new Date(begin),
           minutes: duration,
-          trailingZeros: true,
         })
       : getReservationPrice(
           reservation?.price,

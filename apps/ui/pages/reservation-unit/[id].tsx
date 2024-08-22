@@ -1222,7 +1222,6 @@ function ReservationUnit({
                           date: toUIDate(new Date(futurePricing.begins)),
                           price: getPriceString({
                             pricing: futurePricing,
-                            trailingZeros: true,
                           }).toLocaleLowerCase(),
                         }}
                         components={{ bold: <strong /> }}

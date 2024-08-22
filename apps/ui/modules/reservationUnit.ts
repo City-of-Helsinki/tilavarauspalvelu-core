@@ -258,12 +258,8 @@ export function getFuturePricing(
     : futurePricings[0];
 }
 
-function formatPrice(
-  price: number,
-  trailingZeros: boolean,
-  toCurrency?: boolean
-): string {
-  const enableDecimals = price !== 0 && trailingZeros;
+function formatPrice(price: number, toCurrency?: boolean): string {
+  const enableDecimals = price !== 0;
   const currencyFormatter = enableDecimals
     ? "currencyWithDecimals"
     : "currency";
@@ -273,10 +269,9 @@ function formatPrice(
   return formatter.format(price);
 }
 
-type GetPriceType = {
+export type GetPriceType = {
   pricing: PricingFieldsFragment;
   minutes?: number; // additional minutes for total price calculation
-  trailingZeros?: boolean;
 };
 
 function isPriceZero(pricing: PricingFieldsFragment): boolean {
@@ -294,7 +289,7 @@ function isPriceZero(pricing: PricingFieldsFragment): boolean {
 // TODO rewrite this return number normally
 // and a separate function to format it to string
 export function getPriceString(props: GetPriceType): string {
-  const { pricing, minutes, trailingZeros = false } = props;
+  const { pricing, minutes } = props;
 
   if (isPriceZero(pricing)) {
     return i18n?.t("prices:priceFree") ?? "0";
@@ -305,8 +300,8 @@ export function getPriceString(props: GetPriceType): string {
   const lowestPrice = parseFloat(pricing.lowestPrice) * volume;
   const priceString =
     lowestPrice === highestPrice
-      ? formatPrice(lowestPrice, trailingZeros, true)
-      : `${formatPrice(lowestPrice, trailingZeros)} - ${formatPrice(highestPrice, trailingZeros, true)}`;
+      ? formatPrice(lowestPrice, true)
+      : `${formatPrice(lowestPrice)} - ${formatPrice(highestPrice, true)}`;
   const unitString =
     pricing.priceUnit === PriceUnit.Fixed || minutes
       ? ""
@@ -318,18 +313,12 @@ export type GetReservationUnitPriceProps = {
   reservationUnit?: PriceReservationUnitFragment | null;
   pricingDate?: Date;
   minutes?: number;
-  trailingZeros?: boolean;
 };
 
 export function getReservationUnitPrice(
   props: GetReservationUnitPriceProps
 ): string | null {
-  const {
-    reservationUnit: ru,
-    pricingDate,
-    minutes,
-    trailingZeros = false,
-  } = props;
+  const { reservationUnit: ru, pricingDate, minutes } = props;
   if (pricingDate != null && Number.isNaN(pricingDate.getTime())) {
     // eslint-disable-next-line no-console
     console.warn("Invalid pricing date", pricingDate);
@@ -358,7 +347,6 @@ export function getReservationUnitPrice(
   return getPriceString({
     pricing,
     minutes,
-    trailingZeros,
   });
 }
 

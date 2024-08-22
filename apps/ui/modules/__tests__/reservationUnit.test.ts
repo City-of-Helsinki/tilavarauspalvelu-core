@@ -38,6 +38,7 @@ import {
   isReservationUnitPaidInFuture,
   isReservationUnitPublished,
   isReservationUnitReservable,
+  GetPriceType,
 } from "../reservationUnit";
 import mockTranslations from "../../public/locales/fi/prices.json";
 import { type ReservableMap, dateToKey, type RoundPeriod } from "../reservable";
@@ -217,7 +218,7 @@ describe("getPriceString", () => {
     highestPrice?: number;
     priceUnit?: PriceUnit;
     minutes?: number;
-  }) {
+  }): GetPriceType {
     return {
       pricing: constructPricing({
         lowestPrice,
@@ -234,7 +235,7 @@ describe("getPriceString", () => {
       highestPrice: 50.5,
       priceUnit: PriceUnit.Per_15Mins,
     });
-    expect(getPriceString(input)).toBe("10 - 50,5 € / 15 min");
+    expect(getPriceString(input)).toBe("10,00 - 50,50 € / 15 min");
   });
 
   test("price range with no min", () => {
@@ -243,7 +244,7 @@ describe("getPriceString", () => {
       highestPrice: 50.5,
       priceUnit: PriceUnit.Per_15Mins,
     });
-    expect(getPriceString(input)).toBe("0 - 50,5 € / 15 min");
+    expect(getPriceString(input)).toBe("0 - 50,50 € / 15 min");
   });
 
   test("price range with minutes", () => {
@@ -252,7 +253,7 @@ describe("getPriceString", () => {
       highestPrice: 60.5,
       minutes: 60,
     });
-    expect(getPriceString(input)).toBe("0 - 60,5 €");
+    expect(getPriceString(input)).toBe("0 - 60,50 €");
   });
 
   test("price range with minutes", () => {
@@ -270,7 +271,7 @@ describe("getPriceString", () => {
       highestPrice: 100,
       minutes: 61,
     });
-    expect(getPriceString(input)).toBe("0 - 125 €");
+    expect(getPriceString(input)).toBe("0 - 125,00 €");
   });
 
   test("price range with minutes", () => {
@@ -279,7 +280,7 @@ describe("getPriceString", () => {
       highestPrice: 100,
       minutes: 90,
     });
-    expect(getPriceString(input)).toBe("0 - 150 €");
+    expect(getPriceString(input)).toBe("0 - 150,00 €");
   });
 
   test("price range with minutes", () => {
@@ -288,7 +289,7 @@ describe("getPriceString", () => {
       highestPrice: 100,
       minutes: 91,
     });
-    expect(getPriceString(input)).toBe("0 - 175 €");
+    expect(getPriceString(input)).toBe("0 - 175,00 €");
   });
 
   test("price range with minutes", () => {
@@ -298,7 +299,7 @@ describe("getPriceString", () => {
       minutes: 60,
       priceUnit: PriceUnit.Per_15Mins,
     });
-    expect(getPriceString(input)).toBe("0 - 120 €");
+    expect(getPriceString(input)).toBe("0 - 120,00 €");
   });
 
   test("price range with minutes", () => {
@@ -308,7 +309,7 @@ describe("getPriceString", () => {
       minutes: 60,
       priceUnit: PriceUnit.Per_30Mins,
     });
-    expect(getPriceString(input)).toBe("0 - 60 €");
+    expect(getPriceString(input)).toBe("0 - 60,00 €");
   });
 
   test("price range with minutes", () => {
@@ -318,7 +319,7 @@ describe("getPriceString", () => {
       minutes: 61,
       priceUnit: PriceUnit.Per_30Mins,
     });
-    expect(getPriceString(input)).toBe("0 - 75 €");
+    expect(getPriceString(input)).toBe("0 - 75,00 €");
   });
 
   test("price range with minutes and fixed unit", () => {
@@ -328,7 +329,7 @@ describe("getPriceString", () => {
       minutes: 61,
       priceUnit: PriceUnit.PerHalfDay,
     });
-    expect(getPriceString(input)).toBe("10 - 100 €");
+    expect(getPriceString(input)).toBe("10,00 - 100,00 €");
   });
 
   test("price range with minutes and fixed unit", () => {
@@ -338,7 +339,7 @@ describe("getPriceString", () => {
       minutes: 1234,
       priceUnit: PriceUnit.PerDay,
     });
-    expect(getPriceString(input)).toBe("10 - 100 €");
+    expect(getPriceString(input)).toBe("10,00 - 100,00 €");
   });
 
   test("price range with minutes and fixed unit", () => {
@@ -348,7 +349,7 @@ describe("getPriceString", () => {
       minutes: 1234,
       priceUnit: PriceUnit.PerWeek,
     });
-    expect(getPriceString(input)).toBe("10 - 100 €");
+    expect(getPriceString(input)).toBe("10,00 - 100,00 €");
   });
 
   test("fixed price", () => {
@@ -357,16 +358,7 @@ describe("getPriceString", () => {
       highestPrice: 50,
       priceUnit: PriceUnit.Fixed,
     });
-    expect(getPriceString(input)).toBe("50 €");
-  });
-
-  test("fixed price with decimals", () => {
-    const input = constructInput({
-      lowestPrice: 50,
-      highestPrice: 50,
-      priceUnit: PriceUnit.Fixed,
-    });
-    expect(getPriceString({ ...input, trailingZeros: true })).toBe("50,00 €");
+    expect(getPriceString(input)).toBe("50,00 €");
   });
 
   test("no price", () => {
@@ -384,19 +376,7 @@ describe("getPriceString", () => {
       minutes: 180,
       priceUnit: PriceUnit.Per_15Mins,
     });
-    expect(getPriceString(input)).toBe("0 - 606 €");
-  });
-
-  test("total price with minutes and decimals", () => {
-    const input = constructInput({
-      lowestPrice: 0,
-      highestPrice: 50.5,
-      minutes: 180,
-      priceUnit: PriceUnit.Per_15Mins,
-    });
-    expect(getPriceString({ ...input, trailingZeros: true })).toBe(
-      "0 - 606,00 €"
-    );
+    expect(getPriceString(input)).toBe("0 - 606,00 €");
   });
 });
 
@@ -1041,7 +1021,6 @@ describe("getReservationUnitPrice", () => {
   }): GetReservationUnitPriceProps {
     return {
       pricingDate: date,
-      trailingZeros: true,
       reservationUnit: {
         pricings: [
           constructPricing({
