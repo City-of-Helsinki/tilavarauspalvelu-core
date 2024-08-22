@@ -1,11 +1,9 @@
 import datetime
-from collections.abc import Iterable
 from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from django.utils.timezone import get_default_timezone
 from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPrimaryKeyField
-from graphql import GraphQLError
 from rest_framework import serializers
 
 from api.graphql.extensions.fields import DurationField, OldChoiceCharField
@@ -23,7 +21,6 @@ from reservations.enums import (
     ReservationTypeChoice,
 )
 from reservations.models import AgeGroup, Reservation, ReservationPurpose
-from spaces.models import Unit
 from users.helauth.clients import HelsinkiProfileClient
 from utils.external_service.errors import ExternalServiceError
 from utils.sentry import SentryLogger
@@ -50,7 +47,6 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
 
     state = EnumFriendlyChoiceField(choices=ReservationStateChoice.choices, enum=ReservationStateChoice)
     reservee_type = EnumFriendlyChoiceField(choices=CustomerTypeChoice.choices, enum=CustomerTypeChoice)
-    type = EnumFriendlyChoiceField(choices=ReservationTypeChoice.choices, enum=ReservationTypeChoice, required=False)
     reservee_language = OldChoiceCharField(choices=RESERVEE_LANGUAGE_CHOICES, default="", required=False)
 
     class Meta:
@@ -97,7 +93,6 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
             "price_net",
             "non_subsidised_price",
             "non_subsidised_price_net",
-            "type",
         ]
 
     def __init__(self, *args, **kwargs) -> None:
@@ -152,11 +147,10 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
 
         sku = None
         for reservation_unit in reservation_units:
-            reservation_type = data.get("type", getattr(self.instance, "type", None))
             self.check_reservation_time(reservation_unit)
             self.check_reservation_overlap(reservation_unit, begin, end)
             self.check_reservation_duration(reservation_unit, begin, end)
-            self.check_buffer_times(reservation_unit, begin, end, reservation_type=reservation_type)
+            self.check_buffer_times(reservation_unit, begin, end)
             self.check_reservation_days_before(begin, reservation_unit)
             self.check_max_reservations_per_user(self.context.get("request").user, reservation_unit)
             self.check_sku(sku, reservation_unit.sku)
@@ -186,10 +180,6 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
             data["price_net"] = price_calculation_result.reservation_price_net
             data["non_subsidised_price"] = price_calculation_result.non_subsidised_price
             data["non_subsidised_price_net"] = price_calculation_result.non_subsidised_price_net
-
-        reservation_type = data.get("type")
-        units = (x.unit for x in reservation_units)
-        self.check_reservation_type(request_user, units, reservation_type)
 
         prefill_from_profile = prefill_from_profile and settings.PREFILL_RESERVATION_WITH_PROFILE_DATA
         if prefill_from_profile:
@@ -268,9 +258,3 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
                 "Reservation unit is only available or seasonal booking.",
                 ValidationErrorCodes.RESERVATION_UNIT_TYPE_IS_SEASON,
             )
-
-    def check_reservation_type(self, user: AnyUser, units: Iterable[Unit], reservation_type: str | None) -> None:
-        if reservation_type is None or user.permissions.can_manage_reservations_for_units(units):
-            return
-
-        raise GraphQLError("You don't have permissions to set type")
