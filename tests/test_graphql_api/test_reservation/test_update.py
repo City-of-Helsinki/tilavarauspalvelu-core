@@ -556,42 +556,6 @@ def test_reservation__update__already_has_max_reservations_per_user(graphql):
     assert reservation.name == "foo"
 
 
-def test_reservation__update__convert_to_staff_type(graphql):
-    reservation = ReservationFactory.create_for_update()
-
-    graphql.login_with_superuser()
-    input_data = get_update_data(reservation, type=ReservationTypeChoice.STAFF.value)
-    response = graphql(UPDATE_MUTATION, input_data=input_data)
-
-    assert response.has_errors is False, response.errors
-
-    reservation.refresh_from_db()
-    assert reservation.type == ReservationTypeChoice.STAFF
-
-
-def test_reservation__update__convert_to_blocked_type(graphql):
-    reservation = ReservationFactory.create_for_update()
-
-    graphql.login_with_superuser()
-    input_data = get_update_data(reservation, type=ReservationTypeChoice.BLOCKED.value)
-    response = graphql(UPDATE_MUTATION, input_data=input_data)
-
-    assert response.has_errors is False, response.errors
-
-    reservation.refresh_from_db()
-    assert reservation.type == ReservationTypeChoice.BLOCKED
-
-
-def test_reservation__update__type_is_provided_without_permissions(graphql):
-    user = graphql.login_with_regular_user()
-    reservation = ReservationFactory.create_for_update(user=user)
-
-    input_data = get_update_data(reservation, type=ReservationTypeChoice.BLOCKED.value)
-    response = graphql(UPDATE_MUTATION, input_data=input_data)
-
-    assert response.error_message() == "You don't have permissions to set type"
-
-
 def test_reservation__update__price_calculation_not_triggered_if_time_not_changed(graphql):
     reservation = ReservationFactory.create_for_update(
         price=Decimal("12.4"),

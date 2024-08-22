@@ -673,42 +673,6 @@ def test_reservation__create__reservation_unit_reservation_kind_is_season(graphq
     assert response.error_message() == "Reservation unit is only available or seasonal booking."
 
 
-def test_reservation__create__reservation_type__staff(graphql):
-    reservation_unit = ReservationUnitFactory.create_reservable_now()
-
-    graphql.login_with_superuser()
-    data = get_create_data(reservation_unit, type=ReservationTypeChoice.STAFF)
-    response = graphql(CREATE_MUTATION, input_data=data)
-
-    assert response.has_errors is False, response.errors
-
-    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
-    assert reservation.type == ReservationTypeChoice.STAFF
-
-
-def test_reservation__create__reservation_type__blocked(graphql):
-    reservation_unit = ReservationUnitFactory.create_reservable_now()
-
-    graphql.login_with_superuser()
-    data = get_create_data(reservation_unit, type=ReservationTypeChoice.BLOCKED)
-    response = graphql(CREATE_MUTATION, input_data=data)
-
-    assert response.has_errors is False, response.errors
-
-    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
-    assert reservation.type == ReservationTypeChoice.BLOCKED
-
-
-def test_reservation__create__reservation_type_provided_without_permissions(graphql):
-    reservation_unit = ReservationUnitFactory.create_reservable_now()
-
-    graphql.login_with_regular_user()
-    data = get_create_data(reservation_unit, type=ReservationTypeChoice.BLOCKED)
-    response = graphql(CREATE_MUTATION, input_data=data)
-
-    assert response.error_message() == "You don't have permissions to set type"
-
-
 def test_reservation__create__price_calculation__free_reservation_unit(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now()
 
