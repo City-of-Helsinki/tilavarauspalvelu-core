@@ -55,7 +55,7 @@ class PaymentOrderPermission(BasePermission):
             return False
         if instance.reservation.user == user:
             return True
-        return user.permissions.can_manage_reservation(instance.reservation)
+        return user.permissions.can_view_reservation(instance.reservation)
 
     @classmethod
     def has_mutation_permission(cls, user: AnyUser, input_data: dict[str, Any]) -> bool:

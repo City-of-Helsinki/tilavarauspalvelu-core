@@ -52,7 +52,7 @@ class ApplicationSectionNode(DjangoNode):
         if user.is_superuser:
             return queryset
 
-        roles = UserRoleChoice.can_manage_applications()
+        roles = UserRoleChoice.can_view_applications()
         if user.permissions.has_general_role(role_choices=roles):
             return queryset
 

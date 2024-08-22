@@ -167,13 +167,6 @@ class PermissionResolver:
     def is_user_anonymous_or_inactive(self) -> bool:
         return getattr(self, "user", None) is None or self.user.is_anonymous or not self.user.is_active
 
-    def is_superuser_or_has_general_role(self, *, role_choices: Container[UserRoleChoice]) -> bool:
-        if self.is_user_anonymous_or_inactive():
-            return False
-        if self.user.is_superuser:
-            return True
-        return self.has_general_role(role_choices=role_choices)
-
     # ID helpers
 
     def unit_ids_where_has_role(self, *, role_choices: Container[UserRoleChoice]) -> list[int]:
@@ -276,7 +269,11 @@ class PermissionResolver:
         )
 
     def can_manage_notifications(self) -> bool:
-        return self.is_superuser_or_has_general_role(role_choices=UserRoleChoice.can_manage_notifications())
+        if self.is_user_anonymous_or_inactive():
+            return False
+        if self.user.is_superuser:
+            return True
+        return self.has_general_role(role_choices=UserRoleChoice.can_manage_notifications())
 
     def can_manage_reservation(self, reservation: Reservation, *, reserver_needs_role: bool = False) -> bool:
         if self.is_user_anonymous_or_inactive():
@@ -297,7 +294,11 @@ class PermissionResolver:
         )
 
     def can_manage_reservation_related_data(self) -> bool:
-        return self.is_superuser_or_has_general_role(role_choices=UserRoleChoice.can_manage_reservation_related_data())
+        if self.is_user_anonymous_or_inactive():
+            return False
+        if self.user.is_superuser:
+            return True
+        return self.has_general_role(role_choices=UserRoleChoice.can_manage_reservation_related_data())
 
     def can_manage_reservations_for_units(self, units: Iterable[Unit], *, any_unit: bool = False) -> bool:
         if self.is_user_anonymous_or_inactive():

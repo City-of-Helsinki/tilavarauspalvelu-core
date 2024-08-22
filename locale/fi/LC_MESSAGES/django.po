@@ -1937,7 +1937,7 @@ msgstr "Peruuutuneen varauksen lisätiedot (Ruotsiksi)"
 
 #: reservation_units/admin/reservation_unit/form.py
 msgid "Unit"
-msgstr "Yksikkö"
+msgstr "Toimipiste"
 
 #: reservation_units/admin/reservation_unit/form.py
 msgid "Contact information"
