@@ -335,7 +335,8 @@ export function getReservationUnitPrice(
   if (
     futurePricing &&
     activePricing &&
-    futurePricing.taxPercentage.value !== activePricing.taxPercentage.value
+    futurePricing.taxPercentage.value !== activePricing.taxPercentage.value &&
+    isReservationUnitPaid([activePricing])
   ) {
     pricing = activePricing;
   }

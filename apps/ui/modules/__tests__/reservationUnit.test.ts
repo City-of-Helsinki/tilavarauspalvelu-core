@@ -1014,6 +1014,16 @@ function constructPricing({
 }
 
 describe("getReservationUnitPrice", () => {
+  beforeAll(() => {
+    jest.useFakeTimers({
+      doNotFake: ["performance"],
+      now: new Date(2024, 0, 1, 10, 0, 0),
+    });
+  });
+  afterAll(() => {
+    jest.useRealTimers();
+  });
+
   function connstructInput({
     date,
   }: {
@@ -1061,7 +1071,51 @@ describe("getReservationUnitPrice", () => {
     expect(getReservationUnitPrice(input2)).toEqual("10,00 - 20,00 € / tunti");
   });
 
-  test.todo("Tax change should work");
+  test("future change in tax uses active price", () => {
+    const date = addDays(new Date(), 15);
+    const input = {
+      pricingDate: date,
+      reservationUnit: {
+        pricings: [
+          constructPricing({
+            begins: addDays(new Date(), -10),
+            highestPrice: 20,
+            taxPercentage: 24,
+            status: Status.Active,
+          }),
+          constructPricing({
+            begins: addDays(new Date(), 10),
+            highestPrice: 25,
+            taxPercentage: 25.5,
+            status: Status.Future,
+          }),
+        ],
+      },
+    };
+    expect(getReservationUnitPrice(input)).toBe("20,00 € / tunti");
+  });
+  test("future change in tax for free uses future price", () => {
+    const date = addDays(new Date(), 15);
+    const input = {
+      pricingDate: date,
+      reservationUnit: {
+        pricings: [
+          constructPricing({
+            begins: addDays(new Date(), -10),
+            status: Status.Active,
+            pricingType: PricingType.Free,
+          }),
+          constructPricing({
+            begins: addDays(new Date(), 10),
+            highestPrice: 25,
+            taxPercentage: 25.5,
+            status: Status.Future,
+          }),
+        ],
+      },
+    };
+    expect(getReservationUnitPrice(input)).toBe("25,00 € / tunti");
+  });
 });
 
 describe("isReservationUnitPaidInFuture", () => {
