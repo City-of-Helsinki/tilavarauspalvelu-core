@@ -12,7 +12,6 @@ from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntMult
 from common.date_utils import local_datetime
 from common.utils import log_text_search
 from elastic_django.reservation_units.query_builder import build_elastic_query_str
-from permissions.enums import UserRoleChoice
 from reservation_units.enums import ReservationKind, ReservationState, ReservationUnitState
 from reservation_units.models import ReservationUnit
 from reservation_units.querysets import ReservationUnitQuerySet
@@ -192,8 +191,7 @@ class ReservationUnitFilterSet(ModelFilterSet):
         if user.is_superuser:
             return qs
 
-        choices = UserRoleChoice.can_view_applications()
-        if user.permissions.has_general_role(role_choices=choices):
+        if user.permissions.has_general_role():
             return qs
 
         unit_ids = list(user.unit_roles_map)

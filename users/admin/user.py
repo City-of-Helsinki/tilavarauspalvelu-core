@@ -78,10 +78,6 @@ class UserAdmin(admin.ModelAdmin):
         "date_joined",
     ]
     ordering = ["username"]
-    inlines = [
-        GeneralRoleInlineAdmin,
-        UnitRoleInlineAdmin,
-    ]
 
     # Form
     fieldsets = [
@@ -148,6 +144,10 @@ class UserAdmin(admin.ModelAdmin):
         "general_roles_list",
         "unit_roles_map",
         "unit_group_roles_map",
+    ]
+    inlines = [
+        GeneralRoleInlineAdmin,
+        UnitRoleInlineAdmin,
     ]
     filter_horizontal = ["groups"]
 

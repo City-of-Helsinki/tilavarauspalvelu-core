@@ -102,7 +102,7 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
             raise GraphQLError(msg, extensions=extensions)
 
         user: AnyUser = info.context.user
-        if not user.permissions.can_view_application(application, reserver_needs_role=True):
+        if not user.permissions.can_view_application(application):
             raise GQLNodePermissionDeniedError
 
         user: User | None = application.user

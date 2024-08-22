@@ -34,7 +34,6 @@ class UnitNode(DjangoNode):
             "location",
             "service_sectors",
             "unit_groups",
-            "payment_merchant",
         ]
         restricted_fields = {
             "payment_merchant": private_field_check,
