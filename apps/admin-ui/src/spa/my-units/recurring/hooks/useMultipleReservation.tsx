@@ -8,6 +8,8 @@ type ReservationUnitBufferType = {
   bufferTimeAfter?: number;
 };
 
+// This is only used in recurring form so we can rework it
+// we want to remove the early generation of reservations
 export function useMultipleReservation({
   form,
   reservationUnit,

@@ -163,3 +163,11 @@ export function dayMax(days: Array<Date | undefined>): Date | undefined {
     return pickMaybeDay(acc, day, isAfter);
   }, undefined);
 }
+
+export function timeToMinutes(time: string) {
+  const [hours, minutes] = time.split(":").map(Number).filter(Number.isFinite);
+  if (hours != null && minutes != null) {
+    return hours * 60 + minutes;
+  }
+  return 0;
+}

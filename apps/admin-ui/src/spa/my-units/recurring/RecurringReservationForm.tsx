@@ -222,6 +222,8 @@ export function RecurringReservationForm({ reservationUnits }: Props) {
     reservationUnitPk,
     begin: fromUIDate(getValues("startingDate")) ?? new Date(),
     end: fromUIDate(getValues("endingDate")) ?? new Date(),
+    startTime,
+    endTime,
     reservationType,
   });
 

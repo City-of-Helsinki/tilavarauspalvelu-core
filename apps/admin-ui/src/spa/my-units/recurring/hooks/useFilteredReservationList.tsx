@@ -4,47 +4,22 @@ import {
   ReservationTypeChoice,
   useReservationTimesInReservationUnitQuery,
 } from "@gql/gql-types";
-import { toApiDate } from "common/src/common/util";
-import { addDays } from "date-fns";
+import { isValidDate, toApiDate } from "common/src/common/util";
+import { addDays, addMinutes, startOfDay } from "date-fns";
 import {
   type CollisionInterval,
   doesIntervalCollide,
   reservationToInterval,
 } from "@/helpers";
 import { type NewReservationListItem } from "@/component/ReservationsList";
-import { convertToDate } from "../utils";
-import { base64encode, filterNonNullable } from "common/src/helpers";
+import {
+  base64encode,
+  filterNonNullable,
+  timeToMinutes,
+} from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { gql } from "@apollo/client";
 import { errorToast } from "common/src/common/toast";
-
-// TODO this is only used for RecurringReservationForm, why? (the above query + hook also)
-
-function listItemToInterval(
-  item: NewReservationListItem,
-  type: ReservationTypeChoice
-): CollisionInterval | null {
-  const start = convertToDate(item.date, item.startTime);
-  const end = convertToDate(item.date, item.endTime);
-  if (start && end) {
-    return {
-      start,
-      end,
-      buffers: {
-        before:
-          type !== ReservationTypeChoice.Blocked
-            ? (item.buffers?.before ?? 0)
-            : 0,
-        after:
-          type !== ReservationTypeChoice.Blocked
-            ? (item.buffers?.after ?? 0)
-            : 0,
-      },
-      type,
-    };
-  }
-  return null;
-}
 
 // TODO there is multiples of these fragments (for each Calendar), should be unified
 const RESERVATIONS_IN_INTERVAL_FRAGMENT = gql`
@@ -148,17 +123,23 @@ function useReservationsInInterval({
   return { reservations, loading, refetch };
 }
 
+// Could also be reworked to work the other way around, return list of collisions, not list of items
+// TODO this should be debounced because keypress message handler is taking 200ms+
 export function useFilteredReservationList({
   items,
   reservationUnitPk,
   begin,
   end,
+  startTime,
+  endTime,
   reservationType,
 }: {
   items: NewReservationListItem[];
   reservationUnitPk?: number;
   begin: Date;
   end: Date;
+  startTime: string;
+  endTime: string;
   reservationType: ReservationTypeChoice;
 }) {
   const { reservations, refetch } = useReservationsInInterval({
@@ -172,12 +153,24 @@ export function useFilteredReservationList({
     if (reservations.length === 0) {
       return items;
     }
+    if (items.length === 0) {
+      return [];
+    }
+
+    const startMin = timeToMinutes(startTime);
+    const endMin = timeToMinutes(endTime);
     const isReservationInsideRange = (
       reservationToMake: NewReservationListItem,
       interval: CollisionInterval
     ) => {
       const type = interval.type ?? ReservationTypeChoice.Blocked;
-      const interval2 = listItemToInterval(reservationToMake, type);
+      const interval2 = listItemToInterval(
+        reservationToMake.date,
+        startMin,
+        endMin,
+        type,
+        reservationToMake.buffers
+      );
       if (interval2 && interval) {
         return doesIntervalCollide(interval2, interval);
       }
@@ -189,7 +182,35 @@ export function useFilteredReservationList({
         ? { ...x, isOverlapping: true }
         : x
     );
-  }, [items, reservations]);
+  }, [items, reservations, startTime, endTime]);
 
   return { reservations: data, refetch };
+}
+
+// unsafe
+function listItemToInterval(
+  date: Date,
+  startTime: number,
+  endTime: number,
+  type: ReservationTypeChoice,
+  buffers?: { before?: number; after?: number }
+): CollisionInterval {
+  const start = addMinutes(startOfDay(date), startTime);
+  const end = addMinutes(startOfDay(date), endTime);
+  if (!isValidDate(start) && !isValidDate(end)) {
+    throw new Error("Invalid date");
+  }
+  const before =
+    type !== ReservationTypeChoice.Blocked ? (buffers?.before ?? 0) : 0;
+  const after =
+    type !== ReservationTypeChoice.Blocked ? (buffers?.after ?? 0) : 0;
+  return {
+    start,
+    end,
+    buffers: {
+      before,
+      after,
+    },
+    type,
+  };
 }
