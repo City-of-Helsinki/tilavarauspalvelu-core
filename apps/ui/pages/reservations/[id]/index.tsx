@@ -51,7 +51,7 @@ import {
 import {
   getReservationUnitInstructionsKey,
   getReservationUnitName,
-  isReservationUnitPaid,
+  isReservationUnitFreeOfCharge,
 } from "@/modules/reservationUnit";
 import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 import { ReservationStatus } from "@/components/reservation/ReservationStatus";
@@ -369,7 +369,7 @@ function Reservation({
       return false;
     }
 
-    const isFreeOfCharge = !isReservationUnitPaid(
+    const isFreeOfCharge = isReservationUnitFreeOfCharge(
       reservationUnit.pricings,
       new Date(reservation.begin)
     );

@@ -37,7 +37,7 @@ import {
   getPossibleTimesForDay,
   getReservationUnitPrice,
   getTimeString,
-  isReservationUnitPaid,
+  isReservationUnitFreeOfCharge,
 } from "@/modules/reservationUnit";
 import { formatDuration, isTouchDevice } from "@/modules/util";
 import { BlackButton, MediumButton } from "@/styles/util";
@@ -286,7 +286,7 @@ export function EditStep0({
       return undefined;
     }
     const isSlotFree = (start: Date): boolean => {
-      return isReservationUnitPaid(reservationUnit.pricings, start);
+      return isReservationUnitFreeOfCharge(reservationUnit.pricings, start);
     };
 
     return getSlotPropGetter({
@@ -312,7 +312,10 @@ export function EditStep0({
       return;
     }
     const { start } = focusSlot;
-    const isFree = isReservationUnitPaid(reservationUnit.pricings, start);
+    const isFree = isReservationUnitFreeOfCharge(
+      reservationUnit.pricings,
+      start
+    );
     const newReservation: PendingReservation = {
       begin: focusSlot.start.toISOString(),
       end: focusSlot.end.toISOString(),

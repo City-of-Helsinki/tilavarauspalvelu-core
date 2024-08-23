@@ -8,7 +8,7 @@ import type { ReservationUnitPageQuery } from "@gql/gql-types";
 import { breakpoints } from "common";
 import {
   getReservationUnitPrice,
-  isReservationUnitPaid,
+  isReservationUnitFreeOfCharge,
 } from "@/modules/reservationUnit";
 import Carousel from "../Carousel";
 import { getLastPossibleReservationDate } from "@/components/reservation-unit/utils";
@@ -175,7 +175,7 @@ function QuickReservation({
   const dateValue = useMemo(() => fromUIDate(formDate ?? ""), [formDate]);
   const duration = watch("duration");
 
-  const isFreeOfCharge = !isReservationUnitPaid(
+  const isFreeOfCharge = isReservationUnitFreeOfCharge(
     reservationUnit?.pricings ?? [],
     dateValue ?? new Date()
   );

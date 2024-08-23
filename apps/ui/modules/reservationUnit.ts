@@ -351,6 +351,13 @@ export function getReservationUnitPrice(
   });
 }
 
+export function isReservationUnitFreeOfCharge(
+  pricings: PricingFieldsFragment[],
+  date?: Date
+): boolean {
+  return !isReservationUnitPaid(pricings, date);
+}
+
 export function isReservationUnitPaid(
   pricings: PricingFieldsFragment[],
   date?: Date
