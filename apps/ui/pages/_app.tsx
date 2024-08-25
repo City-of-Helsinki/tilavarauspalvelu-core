@@ -7,14 +7,15 @@ import { format, isValid } from "date-fns";
 import { ThemeProvider } from "styled-components";
 import { theme } from "common";
 import PageWrapper from "../components/common/PageWrapper";
-import { ExternalScripts } from "../components/ExternalScripts";
-import { DataContextProvider } from "../context/DataContext";
-import { createApolloClient } from "../modules/apolloClient";
-import { TrackingWrapper } from "../modules/tracking";
+import { ExternalScripts } from "@/components/ExternalScripts";
+import { DataContextProvider } from "@/context/DataContext";
+import { createApolloClient } from "@/modules/apolloClient";
+import { TrackingWrapper } from "@/modules/tracking";
 import nextI18NextConfig from "../next-i18next.config";
 import "common/styles/variables.css";
 import "../styles/global.scss";
 import { updateSentryConfig } from "@/sentry.client.config";
+import { ToastContainer } from "common/src/common/toast";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const {
@@ -42,6 +43,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             <ThemeProvider theme={theme}>
               <PageWrapper {...pageProps}>
                 <Component {...pageProps} />
+                <ToastContainer />
               </PageWrapper>
             </ThemeProvider>
           </ApolloProvider>

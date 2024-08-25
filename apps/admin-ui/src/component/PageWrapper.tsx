@@ -12,6 +12,7 @@ import GlobalElements from "./GlobalElements";
 import Navigation from "./Navigation";
 import Loader from "./Loader";
 import { MainLander } from "./MainLander";
+import { ToastContainer } from "common/src/common/toast";
 
 type Props = {
   apiBaseUrl: string;
@@ -61,6 +62,7 @@ export default function PageWrapper({
                 />
               )}
               {user ? children : <MainLander apiBaseUrl={apiBaseUrl} />}
+              <ToastContainer />
             </Content>
           </Suspense>
           <ScrollToTop />
