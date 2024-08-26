@@ -7003,6 +7003,25 @@ export type ReservationApplicationLinkQuery = {
   } | null;
 };
 
+export type ReservationDenyReasonsQueryVariables = Exact<{
+  orderBy?: InputMaybe<
+    | Array<InputMaybe<ReservationDenyReasonOrderingChoices>>
+    | InputMaybe<ReservationDenyReasonOrderingChoices>
+  >;
+}>;
+
+export type ReservationDenyReasonsQuery = {
+  reservationDenyReasons?: {
+    edges: Array<{
+      node?: {
+        id: string;
+        pk?: number | null;
+        reasonFi?: string | null;
+      } | null;
+    } | null>;
+  } | null;
+};
+
 export type ReservationMetaFieldsFragment = {
   numPersons?: number | null;
   name?: string | null;
@@ -7336,22 +7355,6 @@ export type RequireHandlingMutation = {
   requireHandlingForReservation?: {
     pk?: number | null;
     state?: ReservationStateChoice | null;
-  } | null;
-};
-
-export type ReservationDenyReasonsQueryVariables = Exact<{
-  [key: string]: never;
-}>;
-
-export type ReservationDenyReasonsQuery = {
-  reservationDenyReasons?: {
-    edges: Array<{
-      node?: {
-        id: string;
-        pk?: number | null;
-        reasonFi?: string | null;
-      } | null;
-    } | null>;
   } | null;
 };
 
@@ -12099,6 +12102,87 @@ export type ReservationApplicationLinkQueryResult = Apollo.QueryResult<
   ReservationApplicationLinkQuery,
   ReservationApplicationLinkQueryVariables
 >;
+export const ReservationDenyReasonsDocument = gql`
+  query ReservationDenyReasons(
+    $orderBy: [ReservationDenyReasonOrderingChoices]
+  ) {
+    reservationDenyReasons(orderBy: $orderBy) {
+      edges {
+        node {
+          id
+          pk
+          reasonFi
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useReservationDenyReasonsQuery__
+ *
+ * To run a query within a React component, call `useReservationDenyReasonsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationDenyReasonsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReservationDenyReasonsQuery({
+ *   variables: {
+ *      orderBy: // value for 'orderBy'
+ *   },
+ * });
+ */
+export function useReservationDenyReasonsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    ReservationDenyReasonsQuery,
+    ReservationDenyReasonsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ReservationDenyReasonsQuery,
+    ReservationDenyReasonsQueryVariables
+  >(ReservationDenyReasonsDocument, options);
+}
+export function useReservationDenyReasonsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ReservationDenyReasonsQuery,
+    ReservationDenyReasonsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ReservationDenyReasonsQuery,
+    ReservationDenyReasonsQueryVariables
+  >(ReservationDenyReasonsDocument, options);
+}
+export function useReservationDenyReasonsSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<
+    ReservationDenyReasonsQuery,
+    ReservationDenyReasonsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ReservationDenyReasonsQuery,
+    ReservationDenyReasonsQueryVariables
+  >(ReservationDenyReasonsDocument, options);
+}
+export type ReservationDenyReasonsQueryHookResult = ReturnType<
+  typeof useReservationDenyReasonsQuery
+>;
+export type ReservationDenyReasonsLazyQueryHookResult = ReturnType<
+  typeof useReservationDenyReasonsLazyQuery
+>;
+export type ReservationDenyReasonsSuspenseQueryHookResult = ReturnType<
+  typeof useReservationDenyReasonsSuspenseQuery
+>;
+export type ReservationDenyReasonsQueryResult = Apollo.QueryResult<
+  ReservationDenyReasonsQuery,
+  ReservationDenyReasonsQueryVariables
+>;
 export const ReservationsByReservationUnitDocument = gql`
   query ReservationsByReservationUnit(
     $id: ID!
@@ -12594,84 +12678,6 @@ export type RequireHandlingMutationResult =
 export type RequireHandlingMutationOptions = Apollo.BaseMutationOptions<
   RequireHandlingMutation,
   RequireHandlingMutationVariables
->;
-export const ReservationDenyReasonsDocument = gql`
-  query ReservationDenyReasons {
-    reservationDenyReasons {
-      edges {
-        node {
-          id
-          pk
-          reasonFi
-        }
-      }
-    }
-  }
-`;
-
-/**
- * __useReservationDenyReasonsQuery__
- *
- * To run a query within a React component, call `useReservationDenyReasonsQuery` and pass it any options that fit your needs.
- * When your component renders, `useReservationDenyReasonsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useReservationDenyReasonsQuery({
- *   variables: {
- *   },
- * });
- */
-export function useReservationDenyReasonsQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    ReservationDenyReasonsQuery,
-    ReservationDenyReasonsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    ReservationDenyReasonsQuery,
-    ReservationDenyReasonsQueryVariables
-  >(ReservationDenyReasonsDocument, options);
-}
-export function useReservationDenyReasonsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    ReservationDenyReasonsQuery,
-    ReservationDenyReasonsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    ReservationDenyReasonsQuery,
-    ReservationDenyReasonsQueryVariables
-  >(ReservationDenyReasonsDocument, options);
-}
-export function useReservationDenyReasonsSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    ReservationDenyReasonsQuery,
-    ReservationDenyReasonsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    ReservationDenyReasonsQuery,
-    ReservationDenyReasonsQueryVariables
-  >(ReservationDenyReasonsDocument, options);
-}
-export type ReservationDenyReasonsQueryHookResult = ReturnType<
-  typeof useReservationDenyReasonsQuery
->;
-export type ReservationDenyReasonsLazyQueryHookResult = ReturnType<
-  typeof useReservationDenyReasonsLazyQuery
->;
-export type ReservationDenyReasonsSuspenseQueryHookResult = ReturnType<
-  typeof useReservationDenyReasonsSuspenseQuery
->;
-export type ReservationDenyReasonsQueryResult = Apollo.QueryResult<
-  ReservationDenyReasonsQuery,
-  ReservationDenyReasonsQueryVariables
 >;
 export const CheckPermissionsDocument = gql`
   query CheckPermissions(

@@ -8,12 +8,14 @@ import {
   useRecurringReservationQuery,
   ReservationUnitNode,
   ReservationNode,
+  ReservationDenyReasonOrderingChoices,
 } from "@gql/gql-types";
 import { useTranslation } from "react-i18next";
 import { toApiDate } from "common/src/common/util";
 import { errorToast } from "common/src/common/toast";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { type CalendarEventType } from "../Calendar";
+import { gql } from "@apollo/client";
 
 export { default as useCheckCollisions } from "./useCheckCollisions";
 
@@ -160,6 +162,22 @@ export function useRecurringReservations(recurringPk?: number) {
   };
 }
 
+export const RESERVATION_DENY_REASONS = gql`
+  query ReservationDenyReasons(
+    $orderBy: [ReservationDenyReasonOrderingChoices]
+  ) {
+    reservationDenyReasons(orderBy: $orderBy) {
+      edges {
+        node {
+          id
+          pk
+          reasonFi
+        }
+      }
+    }
+  }
+`;
+
 // TODO this has the same useState being local problems as useRecurringReservations
 // used to have but it's not obvious because we don't mutate / refetch this.
 // Cache it in Apollo InMemory cache instead.
@@ -167,6 +185,9 @@ export function useDenyReasonOptions() {
   const { t } = useTranslation();
 
   const { data, loading } = useReservationDenyReasonsQuery({
+    variables: {
+      orderBy: [ReservationDenyReasonOrderingChoices.RankAsc],
+    },
     onError: () => {
       errorToast({ text: t("errors.errorFetchingData") });
     },
