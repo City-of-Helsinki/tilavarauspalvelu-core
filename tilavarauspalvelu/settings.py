@@ -815,6 +815,12 @@ class AutomatedTests(AutomatedTestMixin, EmptyDefaults, Common, dotenv_path=None
 
     # --- Misc settings ----------------------------------------------------------------------------------------------
 
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        }
+    }
+
     TPREK_UNIT_URL = "https://fake.test.tprek.com"
     ICAL_HASH_SECRET = "qhoew923uqqwee"  # noqa: S105 # nosec # NOSONAR
 
