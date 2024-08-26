@@ -98,6 +98,9 @@ def update_reservation_unit_pricings_tax_percentage(
         status__in=(PricingStatus.PRICING_STATUS_ACTIVE, PricingStatus.PRICING_STATUS_FUTURE),
     )
 
+    if not unhandled_future_pricings:
+        return
+
     for pricing in unhandled_future_pricings:
         logger.info(f"Pricing should be handled manually: {pricing.id} {pricing.reservation_unit.name} {pricing}")
 
