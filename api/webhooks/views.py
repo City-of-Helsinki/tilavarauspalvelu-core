@@ -5,14 +5,12 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from common.date_utils import local_datetime
-from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from merchants.enums import OrderStatus
 from merchants.models import PaymentOrder
 from merchants.verkkokauppa.order.exceptions import GetOrderError
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError, GetRefundStatusError
 from merchants.verkkokauppa.payment.types import PaymentStatus, RefundStatus
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from reservations.enums import ReservationStateChoice
 from utils.sentry import SentryLogger
 
 from .permissions import WebhookPermission
@@ -20,8 +18,6 @@ from .serializers import WebhookOrderCancelSerializer, WebhookPaymentSerializer,
 
 if TYPE_CHECKING:
     import uuid
-
-    from reservations.models import Reservation
 
 
 class WebhookOrderPaidViewSet(viewsets.GenericViewSet):
@@ -63,16 +59,7 @@ class WebhookOrderPaidViewSet(viewsets.GenericViewSet):
             SentryLogger.log_message(f"Verkkokauppa: {msg}", details=serializer.validated_data)
             return Response(data={"message": msg}, status=400)
 
-        payment_order.status = OrderStatus.PAID
-        payment_order.payment_id = payment_id
-        payment_order.processed_at = local_datetime()
-        payment_order.save(update_fields=["status", "payment_id", "processed_at"])
-
-        reservation: Reservation | None = payment_order.reservation
-        if reservation is not None and reservation.state == ReservationStateChoice.WAITING_FOR_PAYMENT:
-            reservation.state = ReservationStateChoice.CONFIRMED
-            reservation.save(update_fields=["state"])
-            ReservationEmailNotificationSender.send_confirmation_email(reservation=reservation)
+        payment_order.update_order_status(new_status=OrderStatus.PAID, payment_id=payment_id)
 
         return Response(data={"message": "Order payment completed successfully"}, status=200)
 

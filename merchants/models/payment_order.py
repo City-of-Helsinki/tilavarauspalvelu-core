@@ -9,7 +9,10 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from common.date_utils import local_datetime
+from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from merchants.enums import Language, OrderStatus, PaymentType
+from reservations.enums import ReservationStateChoice
 
 if TYPE_CHECKING:
     import uuid
@@ -78,3 +81,28 @@ class PaymentOrder(models.Model):
             return None
 
         return self.created_at + datetime.timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
+
+    def update_order_status(self, new_status: OrderStatus, payment_id: str = "") -> None:
+        """
+        Updates the PaymentOrder status and processed_at timestamp if the status has changed.
+
+        If the order is paid, updates the reservation state to confirmed and sends a confirmation email.
+        """
+        if new_status == self.status:
+            return
+
+        self.status = new_status
+        self.processed_at = local_datetime()
+        if payment_id:
+            self.payment_id = payment_id
+        self.save(update_fields=["status", "processed_at", "payment_id"])
+
+        # If the order is paid, update the reservation state to confirmed and send confirmation email
+        if (
+            self.status == OrderStatus.PAID
+            and self.reservation is not None
+            and self.reservation.state == ReservationStateChoice.WAITING_FOR_PAYMENT
+        ):
+            self.reservation.state = ReservationStateChoice.CONFIRMED
+            self.reservation.save(update_fields=["state"])
+            ReservationEmailNotificationSender.send_confirmation_email(reservation=self.reservation)
