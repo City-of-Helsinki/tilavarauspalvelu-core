@@ -14,14 +14,14 @@ from utils.sentry import SentryLogger
 class PaymentStatus(Enum):
     """
     Source:
-    https://github.com/City-of-Helsinki/verkkokauppa-core/blob/master/
-    paymentapi/src/main/java/fi/hel/verkkokauppa/payment/model/PaymentStatus.java
+    https://github.com/City-of-Helsinki/verkkokauppa-core/blob/master/paymentapi/src/main/java/fi/hel/verkkokauppa/payment/model/PaymentStatus.java
     """
 
     CREATED = "payment_created"
     PAID_ONLINE = "payment_paid_online"
     CANCELLED = "payment_cancelled"
     AUTHORIZED = "authorized"
+    # INVOICE = "payment_invoice" - Exists in the webshop, but not used in Tilavarauspalvelu.
 
 
 class RefundStatus(Enum):
@@ -36,7 +36,7 @@ class Payment:
     namespace: str
     order_id: uuid.UUID
     user_id: str
-    status: str
+    status: PaymentStatus
     payment_method: str
     payment_type: str
     total_excl_tax: Decimal
@@ -45,7 +45,7 @@ class Payment:
     description: str | None
     additional_info: str
     token: str
-    timestamp: datetime
+    timestamp: datetime  # When the Payment was created in the webshop, usually later than PaymentOrder.created_at
     payment_method_label: str
 
     @classmethod
