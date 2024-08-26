@@ -71,6 +71,7 @@ jobs:
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
+        annotations: ${{ steps.meta.outputs.annotations }}
         # Use a shared cache to speed up builds
         cache-from: type=registry,ref=${{ steps.repo.outputs.repo }}:cache
         cache-to: type=registry,ref=${{ steps.repo.outputs.repo }}:cache,mode=max
