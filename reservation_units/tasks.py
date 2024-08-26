@@ -77,11 +77,16 @@ def update_reservation_unit_pricings_tax_percentage(
             # Don't create a new pricing if the reservation unit has a future pricing after the change date
             and pricing.begins < change_date
         ):
-            pricing.id = None  # Create a new pricing when saving
-            pricing.begins = change_date
-            pricing.tax_percentage = future_tax_percentage
-            pricing.status = PricingStatus.PRICING_STATUS_FUTURE
-            pricing.save()
+            ReservationUnitPricing(
+                begins=change_date,
+                tax_percentage=future_tax_percentage,
+                status=PricingStatus.PRICING_STATUS_FUTURE,
+                pricing_type=pricing.pricing_type,
+                price_unit=pricing.price_unit,
+                lowest_price=pricing.lowest_price,
+                highest_price=pricing.highest_price,
+                reservation_unit=pricing.reservation_unit,
+            ).save()
 
     # Log any unhandled future pricings
     # PAID Pricings that begin on or after the change date
