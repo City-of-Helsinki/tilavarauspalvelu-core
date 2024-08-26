@@ -25,6 +25,8 @@ class ReservationUnitPricingAdmin(admin.ModelAdmin):
     list_filter = [
         ("begins", DateRangeFilterBuilder()),
         "status",
+        "pricing_type",
+        "tax_percentage",
     ]
     ordering = ["-begins"]
 
