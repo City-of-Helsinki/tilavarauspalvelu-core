@@ -8,13 +8,13 @@ import {
 } from "@gql/gql-types";
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useNotification } from "@/context/NotificationContext";
 import {
   type AllocatedTimeSlotNodeT,
   type SectionNodeT,
   type SuitableTimeRangeNodeT,
   timeSlotKeyToScheduleTime,
 } from "./modules/applicationRoundAllocation";
+import { errorToast, successToast } from "common/src/common/toast";
 
 export function useFocusApplicationEvent(): [
   number | undefined,
@@ -222,7 +222,6 @@ export function useAcceptSlotMutation({
   // TODO await instead of calling a callback (alternatively chain a callback to the handle function but it's already red)
   refresh,
 }: AcceptSlotMutationProps): HookReturnValue {
-  const { notifySuccess, notifyError } = useNotification();
   const { t } = useTranslation();
 
   const [acceptApplicationEvent, { loading: isLoading }] =
@@ -243,7 +242,7 @@ export function useAcceptSlotMutation({
       console.error("Invalid timeRange for section: ", applicationSection);
     }
     if (selection.length === 0 || timeRange == null) {
-      notifyError(t("Allocation.errors.accepting.generic"));
+      errorToast({ text: t("Allocation.errors.accepting.generic") });
       return;
     }
     const allocatedBegin = timeSlotKeyToScheduleTime(selection[0]);
@@ -252,7 +251,7 @@ export function useAcceptSlotMutation({
       true
     );
     if (!reservationUnitOptionPk) {
-      notifyError(t("Allocation.errors.accepting.generic"));
+      errorToast({ text: t("Allocation.errors.accepting.generic") });
       return;
     }
 
@@ -276,12 +275,14 @@ export function useAcceptSlotMutation({
       // NOTE there should be no errors here (the new api throws them as exceptions)
       if (errors) {
         const { name } = applicationSection;
-        notifyError(t("Allocation.errors.accepting.generic", { name }));
+        errorToast({
+          text: t("Allocation.errors.accepting.generic", { name }),
+        });
         return;
       }
       const { name } = applicationSection;
       const msg = t("Allocation.acceptingSuccess", { name });
-      notifySuccess(msg);
+      successToast({ text: msg });
       refresh();
     } catch (e) {
       if (e instanceof ApolloError) {
@@ -304,7 +305,7 @@ export function useAcceptSlotMutation({
             const { name } = applicationSection;
             if (errMsg != null) {
               const title = "Allocation.errors.accepting.title";
-              notifyError(t(errMsg, { name }), t(title));
+              errorToast({ text: t(errMsg, { name }), label: t(title) });
               refresh(false);
               return;
             }
@@ -314,10 +315,10 @@ export function useAcceptSlotMutation({
         // eslint-disable-next-line no-console
         console.warn("Not a graphql error: ", e);
       }
-      notifyError(
-        t("Allocation.errors.accepting.generic"),
-        t("Allocation.errors.accepting.title")
-      );
+      errorToast({
+        text: t("Allocation.errors.accepting.generic"),
+        label: t("Allocation.errors.accepting.title"),
+      });
     }
   };
 
@@ -333,7 +334,6 @@ export function useRemoveAllocation({
   applicationSection: SectionNodeT;
   refresh: (clearSelection?: boolean) => void;
 }): HookReturnValue {
-  const { notifySuccess, notifyError } = useNotification();
   const { t } = useTranslation();
 
   const [resetApplicationEvent, { loading: isLoading }] =
@@ -352,10 +352,10 @@ export function useRemoveAllocation({
     const allocatedPk = allocatedTimeSlot.pk;
     if (allocatedPk === 0) {
       const { name } = applicationSection;
-      notifyError(
-        t("Allocation.errors.remove.noAllocations", { name }),
-        t("Allocation.errors.remove.title")
-      );
+      errorToast({
+        text: t("Allocation.errors.remove.noAllocations", { name }),
+        label: t("Allocation.errors.remove.title"),
+      });
       return;
     }
     try {
@@ -371,19 +371,19 @@ export function useRemoveAllocation({
       if (errors) {
         // eslint-disable-next-line no-console
         console.warn("Removing allocation failed with data errors: ", errors);
-        notifyError(
-          t("Allocation.errors.remove.generic", {
+        errorToast({
+          text: t("Allocation.errors.remove.generic", {
             name: applicationSection.name,
           }),
-          t("Allocation.errors.remove.title")
-        );
+          label: t("Allocation.errors.remove.title"),
+        });
         return;
       }
       const { deleteAllocatedTimeslot: res } = data || {};
       if (res?.deleted) {
         const { name } = applicationSection;
         const msg = t("Allocation.resetSuccess", { name });
-        notifySuccess(msg);
+        successToast({ text: msg });
         refresh();
       }
     } catch (e) {
@@ -394,24 +394,22 @@ export function useRemoveAllocation({
             const { code } = err.extensions;
             if (code === "NOT_FOUND") {
               const { name } = applicationSection;
-              notifyError(
-                t("Allocation.errors.remove.alreadyDeleted", {
-                  name,
-                }),
-                t("Allocation.errors.remove.title")
-              );
+              errorToast({
+                text: t("Allocation.errors.remove.alreadyDeleted", { name }),
+                label: t("Allocation.errors.remove.title"),
+              });
               refresh(false);
               return;
             }
           }
         }
       }
-      notifyError(
-        t("Allocation.errors.remove.generic", {
+      errorToast({
+        text: t("Allocation.errors.remove.generic", {
           name: applicationSection.name,
         }),
-        t("Allocation.errors.remove.title")
-      );
+        label: t("Allocation.errors.remove.title"),
+      });
     }
   };
   return [handleRemoveAllocation, { isLoading }];

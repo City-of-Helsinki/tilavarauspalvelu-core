@@ -6,9 +6,6 @@ import userEvent from "@testing-library/user-event";
 // @ts-expect-error -- FIXME react-router typing
 import * as router from "react-router";
 import { CustomerTypeChoice, ReservationDocument } from "@gql/gql-types";
-import NotificationContextMock, {
-  notifySuccess,
-} from "app/__mocks__/NotificationContextMock";
 
 import EditPage from "./EditPage";
 import {
@@ -115,14 +112,12 @@ const wrappedRender = (pk: number) => {
 
   return render(
     <MockedProvider mocks={extendedMocks} addTypename={false}>
-      <NotificationContextMock>
-        <MemoryRouter initialEntries={[routeBase, route]}>
-          <Routes>
-            <Route path="/reservations/:id" element={<div>DONE</div>} />
-            <Route path="/reservations/:id/edit" element={<EditPage />} />
-          </Routes>
-        </MemoryRouter>
-      </NotificationContextMock>
+      <MemoryRouter initialEntries={[routeBase, route]}>
+        <Routes>
+          <Route path="/reservations/:id" element={<div>DONE</div>} />
+          <Route path="/reservations/:id/edit" element={<EditPage />} />
+        </Routes>
+      </MemoryRouter>
     </MockedProvider>
   );
 };
@@ -182,7 +177,6 @@ describe("EditPage", () => {
     await act(() => user.clear(memoInput));
     await act(() => user.type(memoInput, CHANGED_WORKING_MEMO));
 
-    expect(notifySuccess).not.toHaveBeenCalled();
     expect(submitBtn).not.toBeDisabled();
     /* TODO test saving the form (split into it's own test though)
     await act(() => user.click(submitBtn));

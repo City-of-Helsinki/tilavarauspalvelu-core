@@ -18,8 +18,8 @@ import DenyDialog from "./DenyDialog";
 import { useModal } from "@/context/ModalContext";
 import { EditTimeModal } from "../EditTimeModal";
 import { base64encode, filterNonNullable } from "common/src/helpers";
-import { useNotification } from "app/context/NotificationContext";
 import { LoadingSpinner } from "hds-react";
+import { errorToast } from "common/src/common/toast";
 
 type RecurringReservationType = NonNullable<
   RecurringReservationQuery["recurringReservation"]
@@ -45,7 +45,6 @@ export function RecurringReservationsView({
 }: Props) {
   const { t } = useTranslation();
   const { setModalContent } = useModal();
-  const { notifyError } = useNotification();
 
   const id = base64encode(`RecurringReservationNode:${recurringPk}`);
   const { data, loading, refetch } = useRecurringReservationQuery({
@@ -54,7 +53,7 @@ export function RecurringReservationsView({
     nextFetchPolicy: "cache-first",
     variables: { id },
     onError: () => {
-      notifyError(t("errors.errorFetchingData"));
+      errorToast({ text: t("errors.errorFetchingData") });
     },
   });
 

@@ -13,7 +13,7 @@ import Modal, { useModal } from "../HDSModal";
 import { NewSpaceModal } from "../Spaces/space-editor/new-space-modal/NewSpaceModal";
 import { NewResourceModal } from "../Resources/resource-editor/NewResourceModal";
 import { base64encode } from "common/src/helpers";
-import { useNotification } from "@/context/NotificationContext";
+import { errorToast } from "common/src/common/toast";
 import Error404 from "@/common/Error404";
 
 interface IProps {
@@ -50,8 +50,6 @@ function SpacesResources(): JSX.Element {
   const newSpacesButtonRef = React.createRef<HTMLButtonElement>();
   const newResourceButtonRef = React.createRef<HTMLButtonElement>();
 
-  const { notifyError } = useNotification();
-
   const id = base64encode(`UnitNode:${unitPk}`);
   const {
     data,
@@ -61,7 +59,7 @@ function SpacesResources(): JSX.Element {
     variables: { id },
     fetchPolicy: "network-only",
     onError: () => {
-      notifyError("errors.errorFetchingData");
+      errorToast({ text: t("errors.errorFetchingData") });
     },
   });
 

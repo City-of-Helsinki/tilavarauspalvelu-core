@@ -11,7 +11,7 @@ import {
 } from "@gql/gql-types";
 import { useTranslation } from "react-i18next";
 import { toApiDate } from "common/src/common/util";
-import { useNotification } from "@/context/NotificationContext";
+import { errorToast } from "common/src/common/toast";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { type CalendarEventType } from "../Calendar";
 
@@ -76,7 +76,6 @@ export function useReservationData(
   reservationUnitPk?: number,
   reservationPk?: number
 ) {
-  const { notifyError } = useNotification();
   const { t } = useTranslation();
 
   const today = new Date();
@@ -100,7 +99,7 @@ export function useReservationData(
       ],
     },
     onError: () => {
-      notifyError("Varauksia ei voitu hakea");
+      errorToast({ text: "Varauksia ei voitu hakea" });
     },
   });
 
@@ -137,7 +136,6 @@ export function useReservationData(
 /// @param state optionally only fetch some reservation states
 /// @param limit allows to over fetch: 100 is the limit per query, larger amounts are done with multiple fetches
 export function useRecurringReservations(recurringPk?: number) {
-  const { notifyError } = useNotification();
   const { t } = useTranslation();
 
   const id = base64encode(`RecurringReservationNode:${recurringPk}`);
@@ -148,7 +146,7 @@ export function useRecurringReservations(recurringPk?: number) {
     errorPolicy: "all",
     variables: { id },
     onError: () => {
-      notifyError(t("errors.errorFetchingData"));
+      errorToast({ text: t("errors.errorFetchingData") });
     },
   });
 
@@ -167,12 +165,11 @@ export function useRecurringReservations(recurringPk?: number) {
 // used to have but it's not obvious because we don't mutate / refetch this.
 // Cache it in Apollo InMemory cache instead.
 export function useDenyReasonOptions() {
-  const { notifyError } = useNotification();
   const { t } = useTranslation();
 
   const { data, loading } = useReservationDenyReasonsQuery({
     onError: () => {
-      notifyError(t("errors.errorFetchingData"));
+      errorToast({ text: t("errors.errorFetchingData") });
     },
   });
   const { reservationDenyReasons } = data ?? {};

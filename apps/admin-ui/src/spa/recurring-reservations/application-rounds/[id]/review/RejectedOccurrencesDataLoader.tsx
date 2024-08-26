@@ -1,4 +1,4 @@
-import { useNotification } from "@/context/NotificationContext";
+import { errorToast } from "common/src/common/toast";
 import { useSort } from "@/hooks/useSort";
 import {
   RejectedOccurrencesTable,
@@ -22,8 +22,6 @@ type Props = {
 function RejectedOccurrencesDataLoader({
   applicationRoundPk,
 }: Props): JSX.Element {
-  const { notifyError } = useNotification();
-
   const [orderBy, handleSortChanged] = useSort(SORT_KEYS);
   const [searchParams] = useSearchParams();
   const unitFilter = searchParams.getAll("unit");
@@ -42,7 +40,7 @@ function RejectedOccurrencesDataLoader({
         textSearch: nameFilter,
       },
       onError: (err: ApolloError) => {
-        notifyError(err.message);
+        errorToast({ text: err.message });
       },
       fetchPolicy: "cache-and-network",
       // TODO enable or no?

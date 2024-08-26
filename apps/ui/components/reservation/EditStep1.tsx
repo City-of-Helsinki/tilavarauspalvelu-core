@@ -23,6 +23,7 @@ import { reservationsPrefix } from "@/modules/const";
 import { filterNonNullable } from "common/src/helpers";
 import { useGenericTerms } from "common/src/hooks/useGenericTerms";
 import { containsField } from "common/src/metaFieldsHelpers";
+import { errorToast } from "common/src/common/toast";
 
 type ReservationUnitNodeT = NonNullable<
   ReservationUnitPageQuery["reservationUnit"]
@@ -31,7 +32,6 @@ type ReservationNodeT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
   reservation: ReservationNodeT;
   reservationUnit: ReservationUnitNodeT;
-  setErrorMsg: React.Dispatch<React.SetStateAction<string | null>>;
   setStep: React.Dispatch<React.SetStateAction<number>>;
   handleSubmit: () => void;
   isSubmitting: boolean;
@@ -77,7 +77,6 @@ const PreviewValue = styled.span`
 export function EditStep1({
   reservation,
   reservationUnit,
-  setErrorMsg,
   setStep,
   handleSubmit,
   isSubmitting,
@@ -159,9 +158,10 @@ export function EditStep1({
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          setErrorMsg("");
           if (!areTermsSpaceAccepted || !areServiceSpecificTermsAccepted) {
-            setErrorMsg(t("reservationCalendar:errors.termsNotAccepted"));
+            errorToast({
+              text: t("reservationCalendar:errors.termsNotAccepted"),
+            });
           } else {
             handleSubmit();
           }

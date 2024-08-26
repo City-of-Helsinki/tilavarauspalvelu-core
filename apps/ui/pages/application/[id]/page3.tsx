@@ -31,9 +31,9 @@ import {
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
 import { useApplicationUpdate } from "@/hooks/useApplicationUpdate";
 import { CenterSpinner } from "@/components/common/common";
-import { ErrorToast } from "@/components/common/ErrorToast";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { base64encode } from "common/src/helpers";
+import { errorToast } from "common/src/common/toast";
 
 const Form = styled.form`
   margin-bottom: var(--spacing-layout-l);
@@ -215,6 +215,14 @@ function Page3Wrapped(props: Props): JSX.Element | null {
   };
 
   const { t } = useTranslation();
+  const dataErrorMessage = t("common:error.dataError");
+  useEffect(() => {
+    if (error != null) {
+      errorToast({
+        text: dataErrorMessage,
+      });
+    }
+  }, [error, t, dataErrorMessage]);
 
   if (id == null) {
     return <Error statusCode={404} />;
@@ -246,7 +254,6 @@ function Page3Wrapped(props: Props): JSX.Element | null {
   return (
     <FormProvider {...form}>
       {/* TODO general mutation error (not query) */}
-      {error != null && <ErrorToast error={t("common:error.dataError")} />}
       <ApplicationPageWrapper
         translationKeyPrefix="application:Page3"
         application={application}

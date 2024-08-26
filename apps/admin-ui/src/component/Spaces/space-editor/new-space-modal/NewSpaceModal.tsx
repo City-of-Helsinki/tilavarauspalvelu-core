@@ -9,10 +9,10 @@ import {
 import { Page1 } from "./Page1";
 import { Page2 } from "./Page2";
 import { useForm } from "react-hook-form";
-import { useTranslation } from "react-i18next";
 import { SpaceUpdateSchema, SpaceUpdateForm } from "../SpaceForm";
-import { useNotification } from "app/context/NotificationContext";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { errorToast } from "common/src/common/toast";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   unit: UnitQuery["unit"];
@@ -27,14 +27,11 @@ export function NewSpaceModal({
   refetch,
   parentSpace,
 }: Props): JSX.Element | null {
+  const { t } = useTranslation();
   const [mutation] = useCreateSpaceMutation();
 
   const createSpace = (input: SpaceCreateMutationInput) =>
     mutation({ variables: { input } });
-
-  const { notifyError } = useNotification();
-
-  const { t } = useTranslation();
 
   const form = useForm<SpaceUpdateForm>({
     resolver: zodResolver(SpaceUpdateSchema),
@@ -59,7 +56,7 @@ export function NewSpaceModal({
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
-      notifyError(t("SpaceModal.page2.saveFailed"));
+      errorToast({ text: t("SpaceModal.page2.saveFailed") });
     }
   }
 

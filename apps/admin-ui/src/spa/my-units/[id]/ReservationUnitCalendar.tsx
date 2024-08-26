@@ -14,13 +14,13 @@ import { Permission } from "@/modules/permissionHelper";
 import usePermission from "@/hooks/usePermission";
 import { getEventBuffers } from "common/src/calendar/util";
 import { getReservationUrl } from "@/common/urls";
-import { useNotification } from "@/context/NotificationContext";
 import Legend from "@/component/reservations/requested/Legend";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { type TFunction } from "next-i18next";
 import { getReserveeName } from "@/common/util";
+import { errorToast } from "common/src/common/toast";
 
 type Props = {
   begin: string;
@@ -90,7 +90,6 @@ export function ReservationUnitCalendar({
   begin,
   reservationUnitPk,
 }: Props): JSX.Element {
-  const { notifyError } = useNotification();
   const { t } = useTranslation();
 
   const calendarEventExcludedLegends = [
@@ -111,7 +110,9 @@ export function ReservationUnitCalendar({
       endDate: toApiDate(addDays(endOfISOWeek(new Date(begin)), 1)) ?? "",
     },
     onError: () => {
-      notifyError(t("errors.errorFetchingData"));
+      errorToast({
+        text: t("errors.errorFetchingData"),
+      });
     },
   });
 

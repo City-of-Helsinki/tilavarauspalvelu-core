@@ -16,13 +16,13 @@ import {
   type ReservationQuery,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
-import { useNotification } from "@/context/NotificationContext";
 import Loader from "@/component/Loader";
 import { Select } from "@/component/Select";
 import { VerticalFlex } from "@/styles/layout";
 import { CustomDialogHeader } from "@/component/CustomDialogHeader";
 import { useDenyReasonOptions } from "./hooks";
 import { filterNonNullable } from "common/src/helpers";
+import { successToast, errorToast } from "common/src/common/toast";
 
 const ActionButtons = styled(Dialog.ActionButtons)`
   justify-content: end;
@@ -150,19 +150,20 @@ const DialogContent = ({
 }: Props): JSX.Element => {
   const [denyReservationMutation] = useDenyReservationMutation();
 
-  const { notifyError, notifySuccess } = useNotification();
   const { t } = useTranslation();
 
   const [refundReservationMutation] = useRefundReservationMutation({
     onCompleted: () => {
-      notifySuccess(
-        t("RequestedReservation.DenyDialog.refund.mutationSuccess")
-      );
+      successToast({
+        text: t("RequestedReservation.DenyDialog.refund.mutationSuccess"),
+      });
     },
     onError: (err) => {
       // eslint-disable-next-line no-console
       console.error("Refund failed with: ", err);
-      notifyError(t("RequestedReservation.DenyDialog.refund.mutationFailure"));
+      errorToast({
+        text: t("RequestedReservation.DenyDialog.refund.mutationFailure"),
+      });
     },
   });
 
@@ -210,7 +211,7 @@ const DialogContent = ({
       if (errors.length !== 0) {
         // eslint-disable-next-line no-console
         console.error("Deny failed with: ", errors);
-        notifyError(t("RequestedReservation.DenyDialog.errorSaving"));
+        errorToast({ text: t("RequestedReservation.DenyDialog.errorSaving") });
       } else {
         if (returnState === "refund") {
           const refundPromises = reservations.map((x) =>
@@ -218,12 +219,14 @@ const DialogContent = ({
           );
           await Promise.all(refundPromises);
         } else {
-          notifySuccess(t("RequestedReservation.DenyDialog.successNotify"));
+          successToast({
+            text: t("RequestedReservation.DenyDialog.successNotify"),
+          });
         }
         onReject();
       }
     } catch (e) {
-      notifyError(t("RequestedReservation.DenyDialog.errorSaving"));
+      errorToast({ text: t("RequestedReservation.DenyDialog.errorSaving") });
     } finally {
       setInProgress(false);
     }

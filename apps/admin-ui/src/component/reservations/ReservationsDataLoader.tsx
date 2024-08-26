@@ -9,13 +9,13 @@ import {
 } from "@gql/gql-types";
 import { More } from "@/component/More";
 import { LIST_PAGE_SIZE } from "@/common/const";
-import { useNotification } from "@/context/NotificationContext";
 import Loader from "../Loader";
 import { ReservationsTable } from "./ReservationsTable";
 import { fromUIDate, toApiDate } from "common/src/common/util";
 import { filterNonNullable, toNumber } from "common/src/helpers";
 import { useSearchParams } from "react-router-dom";
 import { transformReservationTypeSafe } from "common/src/conversion";
+import { errorToast } from "common/src/common/toast";
 
 function transformPaymentStatusSafe(t: string): OrderStatusWithFree | null {
   switch (t) {
@@ -148,8 +148,6 @@ export function ReservationsDataLoader(): JSX.Element {
     }
   };
 
-  const { notifyError } = useNotification();
-
   // TODO the sort string should be in the url
   const orderBy = transformSortString(sort);
   const [searchParams] = useSearchParams();
@@ -163,7 +161,7 @@ export function ReservationsDataLoader(): JSX.Element {
       ...mapFilterParams(searchParams),
     },
     onError: (err: ApolloError) => {
-      notifyError(err.message);
+      errorToast({ text: err.message });
     },
   });
 

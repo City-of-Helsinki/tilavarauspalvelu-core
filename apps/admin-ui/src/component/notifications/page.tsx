@@ -30,8 +30,8 @@ import { fromUIDate } from "common/src/common/util";
 import { breakpoints } from "common";
 import { Container } from "@/styles/layout";
 import Loader from "@/component/Loader";
-import { useNotification } from "@/context/NotificationContext";
-import { ButtonLikeLink } from "@/component/ButtonLikeLink";
+import { ButtonLikeLink } from "app/component/ButtonLikeLink";
+
 import {
   checkValidDate,
   checkValidFutureDate,
@@ -48,6 +48,7 @@ import type { TFunction } from "i18next";
 import { base64encode } from "common/src/helpers";
 import ControlledDateInput from "@/component/ControlledDateInput";
 import ControlledTimeInput from "@/component/ControlledTimeInput";
+import { errorToast, successToast } from "common/src/common/toast";
 
 const RichTextInput = dynamic(() => import("@/component/RichTextInput"), {
   ssr: false,
@@ -314,8 +315,6 @@ const NotificationForm = ({
   const [createMutation] = useBannerNotificationCreateMutation();
   const [updateMutation] = useBannerNotificationUpdateMutation();
 
-  const { notifyError, notifySuccess } = useNotification();
-
   // TODO rewrite this for the new error codes
   const handleError = (errorMsgs: string[]) => {
     // TODO improved filtering here
@@ -329,16 +328,16 @@ const NotificationForm = ({
       (x) => x === "No permission to mutate."
     );
     if (alreadyExists) {
-      notifyError(t("error.submit.alreadyExists"));
+      errorToast({ text: t("error.submit.alreadyExists") });
     } else if (isMissingMessage) {
-      notifyError(t("error.submit.missingMessage"));
+      errorToast({ text: t("error.submit.missingMessage") });
     } else if (isPermissionError) {
-      notifyError(t("error.submit.noMutationPermission"));
+      errorToast({ text: t("error.submit.noMutationPermission") });
     } else {
       // eslint-disable-next-line no-console
       console.error(errorMsgs);
       // We haven't properly mapped error messages
-      notifyError(t("error.submit.generic"));
+      errorToast({ text: t("error.submit.generic") });
     }
   };
 
@@ -353,7 +352,7 @@ const NotificationForm = ({
 
     // Schema checks this, but TS doesn't know
     if (data.targetGroup === "" || data.level === "") {
-      notifyError(t("Notifications.error.empty"));
+      errorToast({ text: t("Notifications.error.empty") });
       return;
     }
 
@@ -378,12 +377,12 @@ const NotificationForm = ({
           input,
         },
       });
-      notifySuccess(
-        t("form.saveSuccessToast", {
+      successToast({
+        text: t("form.saveSuccessToast", {
           name: data.name,
           state: data.pk === 0 ? t("form.created") : t("form.updated"),
-        })
-      );
+        }),
+      });
       navigate("..");
     } catch (e) {
       // TODO what is the format of these errors?
@@ -393,7 +392,7 @@ const NotificationForm = ({
           if ("code" in err.extensions) {
             const { code } = err.extensions;
             if (code === "NOT_FOUND") {
-              notifyError(t("error.submit.NOT_FOUND"));
+              errorToast({ text: t("error.submit.NOT_FOUND") });
               return;
             }
           }
@@ -649,12 +648,12 @@ const useRemoveNotification = ({
   notification?: BannerNotificationsAdminQuery["bannerNotification"];
 }) => {
   const { t } = useTranslation();
-  const { notifyError, notifySuccess } = useNotification();
+
   const handleError = (errorMsgs: string[]) => {
     // eslint-disable-next-line no-console
     console.error(errorMsgs);
     // We haven't properly mapped error messages
-    notifyError(t("Notifications.error.deleteFailed.generic"));
+    errorToast({ text: t("Notifications.error.deleteFailed.generic") });
   };
 
   const [removeMutation] = useBannerNotificationDeleteMutation();
@@ -675,7 +674,7 @@ const useRemoveNotification = ({
         return;
       }
 
-      notifySuccess(t("Notifications.success.removed"));
+      successToast({ text: t("Notifications.success.removed") });
       navigate("..");
     } catch (e) {
       // eslint-disable-next-line no-console

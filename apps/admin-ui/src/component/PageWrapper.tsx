@@ -8,11 +8,12 @@ import usePermission from "app/hooks/usePermission";
 import { BannerNotificationsList } from "common/src/components";
 import { BannerNotificationTarget } from "@gql/gql-types";
 import ScrollToTop from "../common/ScrollToTop";
-import GlobalElements from "./GlobalElements";
 import Navigation from "./Navigation";
 import Loader from "./Loader";
 import { MainLander } from "./MainLander";
 import { ToastContainer } from "common/src/common/toast";
+import { useModal } from "@/context/ModalContext";
+import Modal from "@/component/Modal";
 
 type Props = {
   apiBaseUrl: string;
@@ -49,6 +50,12 @@ export default function PageWrapper({
 }: Props): JSX.Element {
   const { hasAnyPermission, user } = usePermission();
   const hasAccess = user && hasAnyPermission();
+  const { modalContent } = useModal();
+  const modal = modalContent.isHds ? (
+    modalContent.content
+  ) : (
+    <Modal>{modalContent.content}</Modal>
+  );
   return (
     <ErrorBoundary FallbackComponent={(e) => FallbackComponent(e, feedbackUrl)}>
       <ClientOnly>
@@ -67,7 +74,7 @@ export default function PageWrapper({
           </Suspense>
           <ScrollToTop />
         </Wrapper>
-        <GlobalElements />
+        {modalContent.content && modal}
       </ClientOnly>
     </ErrorBoundary>
   );

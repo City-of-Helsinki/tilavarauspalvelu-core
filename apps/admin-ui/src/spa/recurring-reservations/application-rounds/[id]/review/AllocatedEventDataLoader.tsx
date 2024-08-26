@@ -8,7 +8,7 @@ import {
 import { useTranslation } from "next-i18next";
 import { filterNonNullable } from "common/src/helpers";
 import { LIST_PAGE_SIZE } from "@/common/const";
-import { useNotification } from "@/context/NotificationContext";
+import { errorToast } from "common/src/common/toast";
 import Loader from "@/component/Loader";
 import { More } from "@/component/More";
 import { useSort } from "@/hooks/useSort";
@@ -22,7 +22,6 @@ type Props = {
 };
 
 export function TimeSlotDataLoader({ applicationRoundPk }: Props): JSX.Element {
-  const { notifyError } = useNotification();
   const [orderBy, handleSortChanged] = useSort(SORT_KEYS);
 
   const [searchParams] = useSearchParams();
@@ -55,7 +54,7 @@ export function TimeSlotDataLoader({ applicationRoundPk }: Props): JSX.Element {
       orderBy: transformOrderBy(orderBy),
     },
     onError: (err: ApolloError) => {
-      notifyError(err.message);
+      errorToast({ text: err.message });
     },
     fetchPolicy: "cache-and-network",
     // TODO enable or no?

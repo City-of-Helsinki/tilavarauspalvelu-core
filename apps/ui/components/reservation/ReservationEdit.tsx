@@ -26,7 +26,6 @@ import { ReservationInfoCard } from "./ReservationInfoCard";
 import { EditStep0 } from "./EditStep0";
 import { EditStep1 } from "./EditStep1";
 import { reservationsPrefix } from "@/modules/const";
-import { Toast } from "@/styles/util";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   PendingReservationFormSchema,
@@ -42,6 +41,7 @@ import {
   ReservationPageWrapper,
 } from "../reservations/styles";
 import ClientOnly from "common/src/ClientOnly";
+import { errorToast, successToast } from "common/src/common/toast";
 
 type ReservationUnitNodeT = NonNullable<
   ReservationUnitPageQuery["reservationUnit"]
@@ -155,9 +155,6 @@ export function ReservationEdit({
 
   const [step, setStep] = useState(0);
 
-  const [showSuccessMsg, setShowSuccessMsg] = useState<boolean>(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
   const now = useMemo(() => new Date(), []);
   const { currentUser } = useCurrentUser();
 
@@ -252,13 +249,19 @@ export function ReservationEdit({
     }
     try {
       await adjustReservationTime({ pk: reservation.pk, ...times });
-      setShowSuccessMsg(true);
+      successToast({
+        text: t("reservations:saveNewTimeSuccess"),
+        duration: 3,
+        options: {
+          onClose: () => router.push(`${reservationsPrefix}/${reservation.pk}`),
+        },
+      });
     } catch (e) {
       if (e instanceof Error) {
         // TODO don't print the error message to the user
-        setErrorMsg(e.message);
+        errorToast({ text: e.message });
       } else {
-        setErrorMsg("Unknown error");
+        errorToast({ text: "Unknown error occurred" });
       }
     }
   };
@@ -271,99 +274,64 @@ export function ReservationEdit({
   const termsOfUse = getTranslation(reservationUnit, "termsOfUse");
 
   return (
-    <>
-      <ReservationPageWrapper>
-        <HeadingSection>
-          <Heading>{t(title)}</Heading>
-          <StyledStepper
-            language={i18n.language}
-            selectedStep={step}
-            onStepClick={(e) => {
-              const target = e.currentTarget;
-              const s = target
-                .getAttribute("data-testid")
-                ?.replace("hds-stepper-step-", "");
-              if (s != null) {
-                setStep(parseInt(s, 10));
-              }
-            }}
-            steps={steps}
-          />
-        </HeadingSection>
-        <BylineSection>
-          <BylineContent
-            reservation={reservation}
-            reservationUnit={reservationUnit}
-            form={reservationForm}
-            step={step}
-          />
-        </BylineSection>
-        {/* TODO on mobile in the design this is after the calendar but before action buttons */}
-        {step === 0 && termsOfUse && (
-          <PinkBox>
-            <Subheading>
-              {t("reservations:reservationInfoBoxHeading")}
-            </Subheading>
-            <Sanitize html={termsOfUse} />
-          </PinkBox>
-        )}
-        <ClientOnly>
-          <EditCalendarSection>
-            {step === 0 && (
-              <EditStep0
-                reservation={reservation}
-                reservationUnit={reservationUnit}
-                userReservations={userReservations}
-                activeApplicationRounds={activeApplicationRounds}
-                reservationForm={reservationForm}
-                setErrorMsg={setErrorMsg}
-                nextStep={() => setStep(1)}
-                apiBaseUrl={apiBaseUrl}
-                isLoading={false}
-              />
-            )}
-            {step === 1 && (
-              <EditStep1
-                reservation={reservation}
-                reservationUnit={reservationUnit}
-                setErrorMsg={setErrorMsg}
-                setStep={setStep}
-                handleSubmit={handleSubmit}
-                isSubmitting={isLoading}
-              />
-            )}
-          </EditCalendarSection>
-        </ClientOnly>
-      </ReservationPageWrapper>
-      {errorMsg && (
-        <Toast
-          type="error"
-          label={t("reservations:reservationEditFailed")}
-          position="top-center"
-          autoClose={false}
-          displayAutoCloseProgress={false}
-          onClose={() => setErrorMsg(null)}
-          dismissible
-          closeButtonLabelText={t("common:error.closeErrorMsg")}
-        >
-          {errorMsg}
-        </Toast>
+    <ReservationPageWrapper>
+      <HeadingSection>
+        <Heading>{t(title)}</Heading>
+        <StyledStepper
+          language={i18n.language}
+          selectedStep={step}
+          onStepClick={(e) => {
+            const target = e.currentTarget;
+            const s = target
+              .getAttribute("data-testid")
+              ?.replace("hds-stepper-step-", "");
+            if (s != null) {
+              setStep(parseInt(s, 10));
+            }
+          }}
+          steps={steps}
+        />
+      </HeadingSection>
+      <BylineSection>
+        <BylineContent
+          reservation={reservation}
+          reservationUnit={reservationUnit}
+          form={reservationForm}
+          step={step}
+        />
+      </BylineSection>
+      {/* TODO on mobile in the design this is after the calendar but before action buttons */}
+      {step === 0 && termsOfUse && (
+        <PinkBox>
+          <Subheading>{t("reservations:reservationInfoBoxHeading")}</Subheading>
+          <Sanitize html={termsOfUse} />
+        </PinkBox>
       )}
-      {showSuccessMsg && (
-        <Toast
-          type="success"
-          label={t("reservations:saveNewTimeSuccess")}
-          position="top-center"
-          autoClose
-          autoCloseDuration={3000}
-          displayAutoCloseProgress
-          onClose={() => router.push(`${reservationsPrefix}/${reservation.pk}`)}
-          dismissible
-          closeButtonLabelText={t("common:error.closeErrorMsg")}
-        >
-          {errorMsg}
-        </Toast>
-      )}
-    </>
+      <ClientOnly>
+        <EditCalendarSection>
+          {step === 0 && (
+            <EditStep0
+              reservation={reservation}
+              reservationUnit={reservationUnit}
+              userReservations={userReservations}
+              activeApplicationRounds={activeApplicationRounds}
+              reservationForm={reservationForm}
+              nextStep={() => setStep(1)}
+              apiBaseUrl={apiBaseUrl}
+              isLoading={false}
+            />
+          )}
+          {step === 1 && (
+            <EditStep1
+              reservation={reservation}
+              reservationUnit={reservationUnit}
+              setStep={setStep}
+              handleSubmit={handleSubmit}
+              isSubmitting={isLoading}
+            />
+          )}
+        </EditCalendarSection>
+      </ClientOnly>
+    </ReservationPageWrapper>
   );
 }

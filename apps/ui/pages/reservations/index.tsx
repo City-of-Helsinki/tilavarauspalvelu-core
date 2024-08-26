@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { Tabs, TabList, Tab, TabPanel } from "hds-react";
@@ -16,13 +16,13 @@ import {
 import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
 import { useSession } from "@/hooks/auth";
-import { Toast } from "@/styles/util";
 import ReservationCard from "@/components/reservation/ReservationCard";
 import Head from "@/components/reservations/Head";
 import { CenterSpinner } from "@/components/common/common";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { toApiDate } from "common/src/common/util";
 import { addDays } from "date-fns";
+import { errorToast } from "common/src/common/toast";
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { locale } = ctx;
@@ -113,6 +113,18 @@ function Reservations(): JSX.Element | null {
     },
   });
 
+  useEffect(() => {
+    if (error) {
+      errorToast({ text: t("common:error.dataError") });
+    }
+  }, [error, t]);
+
+  useEffect(() => {
+    if (routerError === "order1") {
+      errorToast({ text: t("reservations:confirmationError.body") });
+    }
+  }, [routerError, t]);
+
   // NOTE should never happen since we do an SSR redirect
   if (!isAuthenticated) {
     return <div>{t("common:error.notAuthenticated")}</div>;
@@ -192,26 +204,6 @@ function Reservations(): JSX.Element | null {
             </StyledTabPanel>
           </Tabs>
         </Heading>
-        {error && (
-          <Toast
-            type="error"
-            label={t("common:error.error")}
-            position="top-center"
-          >
-            {t("common:error.dataError")}
-          </Toast>
-        )}
-        {routerError === "order1" && (
-          <Toast
-            type="error"
-            label={t("reservations:confirmationError.heading")}
-            position="top-center"
-            dismissible
-            closeButtonLabelText={t("common:close")}
-          >
-            {t("reservations:confirmationError.body")}
-          </Toast>
-        )}
       </Container>
     </>
   );

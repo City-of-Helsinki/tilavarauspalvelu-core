@@ -9,7 +9,7 @@ import {
   type SpaceUpdateMutationInput,
   useSpaceQuery,
 } from "@gql/gql-types";
-import { useNotification } from "@/context/NotificationContext";
+import { errorToast, successToast } from "common/src/common/toast";
 import Loader from "@/component/Loader";
 import { ButtonContainer, Container } from "@/styles/layout";
 import { FormErrorSummary } from "@/common/FormErrorSummary";
@@ -48,8 +48,6 @@ type Props = {
 function SpaceEditor({ space, unit }: Props): JSX.Element {
   const history = useNavigate();
 
-  const { notifyError, notifySuccess } = useNotification();
-
   const { t } = useTranslation();
 
   const [updateSpaceMutation, { loading: isMutationLoading }] =
@@ -66,7 +64,7 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
   } = useSpaceQuery({
     variables: { id: base64encode(`SpaceNode:${space}`) },
     onError: (e) => {
-      notifyError(t("errors.errorFetchingData", { error: e }));
+      errorToast({ text: t("errors.errorFetchingData", { error: e }) });
     },
   });
 
@@ -122,7 +120,7 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
     try {
       const { surfaceArea, pk, ...rest } = values;
       if (pk == null || pk === 0) {
-        notifyError(t("SpaceEditor.saveFailed"));
+        errorToast({ text: t("SpaceEditor.saveFailed") });
         return;
       }
       await updateSpace({
@@ -130,13 +128,13 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
         pk,
         surfaceArea: Math.ceil(surfaceArea ?? 0),
       });
-      notifySuccess(
-        t("SpaceEditor.spaceUpdatedNotification"),
-        t("SpaceEditor.spaceUpdated")
-      );
+      successToast({
+        text: t("SpaceEditor.spaceUpdatedNotification"),
+        label: t("SpaceEditor.spaceUpdated"),
+      });
       refetch();
     } catch (e) {
-      notifyError(t("SpaceEditor.saveFailed"));
+      errorToast({ text: t("SpaceEditor.saveFailed") });
     }
   };
 

@@ -21,7 +21,6 @@ import {
   ReservationList,
   type NewReservationListItem,
 } from "@/component/ReservationsList";
-import { useNotification } from "@/context/NotificationContext";
 import { ActionsWrapper } from "./commonStyling";
 import { WeekdaysSelector } from "./WeekdaysSelector";
 import {
@@ -36,6 +35,7 @@ import ControlledDateInput from "@/component/ControlledDateInput";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { Element } from "@/styles/util";
 import { AutoGrid } from "@/styles/layout";
+import { errorToast } from "common/src/common/toast";
 
 const Label = styled.p<{ $bold?: boolean }>`
   font-family: var(--fontsize-body-m);
@@ -186,7 +186,6 @@ export function RecurringReservationForm({ reservationUnits }: Props) {
     setRemovedReservations([]);
   }, [startTime, endTime, reservationUnit]);
 
-  const { notifyError } = useNotification();
   const translateError = (errorMsg?: string) =>
     errorMsg ? t(`reservationForm:errors.${errorMsg}`) : "";
 
@@ -215,7 +214,7 @@ export function RecurringReservationForm({ reservationUnits }: Props) {
   const onSubmit = async (data: RecurringReservationFormT) => {
     // TODO notifyError does a double translation somewhere
     if (!newReservations.success) {
-      notifyError(t(translateError("formNotValid")));
+      errorToast({ text: t(translateError("formNotValid")) });
       return;
     }
     const reservationsToMake = filterOutRemovedReservations(
@@ -224,12 +223,12 @@ export function RecurringReservationForm({ reservationUnits }: Props) {
     ).filter((x) => !x.isOverlapping);
 
     if (reservationsToMake.length === 0) {
-      notifyError(t(translateError("noReservations")));
+      errorToast({ text: t(translateError("noReservations")) });
       return;
     }
     const unitPk = reservationUnit?.pk;
     if (unitPk == null) {
-      notifyError(t(translateError("formNotValid")));
+      errorToast({ text: t(translateError("formNotValid")) });
       return;
     }
 
@@ -265,7 +264,7 @@ export function RecurringReservationForm({ reservationUnits }: Props) {
     } catch (e) {
       // eslint-disable-next-line no-console
       console.warn("Exception in RecurringReservation", e);
-      notifyError(t("ReservationDialog.saveFailed"));
+      errorToast({ text: t("ReservationDialog.saveFailed") });
       // on exception in RecurringReservation (because we are catching the individual errors)
       // We don't need to cleanup the RecurringReservation that has zero connections.
       // Based on documentation backend will do this for us.

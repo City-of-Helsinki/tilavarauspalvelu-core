@@ -15,7 +15,7 @@ import {
 import { PopupMenu } from "@/component/PopupMenu";
 import Modal, { useModal as useHDSModal } from "../HDSModal";
 import { NewSpaceModal } from "../Spaces/space-editor/new-space-modal/NewSpaceModal";
-import { useNotification } from "@/context/NotificationContext";
+import { errorToast } from "common/src/common/toast";
 import { CustomTable, TableLink } from "@/component/Table";
 import { getSpaceUrl } from "@/common/urls";
 import { truncate } from "common/src/helpers";
@@ -65,8 +65,6 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
 
   const [deleteSpaceMutation] = useDeleteSpaceMutation();
 
-  const { notifyError } = useNotification();
-
   async function deleteSpace(pk: Maybe<number> | undefined) {
     if (pk == null || pk === 0) {
       return;
@@ -80,7 +78,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
         refetch();
       } else {
         // TODO missing translation
-        notifyError("SpaceTable.removeFailed");
+        errorToast({ text: t("SpaceTable.removeFailed") });
       }
     } catch (e) {
       /* TODO handle this error
@@ -93,7 +91,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
         }]
         }
       */
-      notifyError("SpaceTable.removeFailed");
+      errorToast({ text: t("SpaceTable.removeFailed") });
     }
   }
 
@@ -104,10 +102,10 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
 
   function handleRemoveSpace(space: SpaceNode) {
     if (space && space.resourceSet && space?.resourceSet.length > 0) {
-      notifyError(
-        t("SpaceTable.removeConflictMessage"),
-        t("SpaceTable.removeConflictTitle")
-      );
+      errorToast({
+        text: t("SpaceTable.removeConflictMessage"),
+        label: t("SpaceTable.removeConflictTitle"),
+      });
       return;
     }
     setSpaceWaitingForDelete(space);

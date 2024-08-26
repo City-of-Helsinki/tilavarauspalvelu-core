@@ -32,6 +32,7 @@ import { getReadableList } from "@/modules/util";
 import { AccordionWithState as Accordion } from "../common/Accordion";
 import { TimeSelector } from "./TimeSelector";
 import { ButtonContainer } from "../common/common";
+import { errorToast, successToast } from "common/src/common/toast";
 
 type Node = NonNullable<ApplicationQuery["application"]>;
 type Props = {
@@ -249,8 +250,7 @@ function Page2({ application, onNext }: Props): JSX.Element {
     application?.applicationSections?.[0]?.reservationUnitOptions?.[0]
       ?.reservationUnit?.pk ?? 0
   );
-  const [successMsg, setSuccessMsg] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
+
   const [minDurationMsg, setMinDurationMsg] = useState(true);
   const router = useRouter();
   // TODO why are we taking the first one only here?
@@ -366,8 +366,12 @@ function Page2({ application, onNext }: Props): JSX.Element {
       });
     });
     setSelectorData(updated);
-    setErrorMsg("");
-    setSuccessMsg(t("application:Page2.notification.copyCells"));
+    successToast({
+      label: t("application:Page2.notification.copyCells"),
+      text: t("application:Page2.notification.copyCells"),
+      duration: 3,
+      dataTestId: "application__page2--notification-success",
+    });
   };
 
   const onSubmit = (data: ApplicationFormValues) => {
@@ -381,8 +385,11 @@ function Page2({ application, onNext }: Props): JSX.Element {
       )
       .flat();
     if (selectedAppEvents.length === 0) {
-      setSuccessMsg("");
-      setErrorMsg("application:error.missingSchedule");
+      errorToast({
+        label: t("application:error.missingSchedule"),
+        text: t("application:error.missingSchedule"),
+        dataTestId: "application__page2--notification-error",
+      });
       return;
     }
     onNext(data);
@@ -400,36 +407,6 @@ function Page2({ application, onNext }: Props): JSX.Element {
 
   return (
     <form noValidate onSubmit={handleSubmit(onSubmit)}>
-      {successMsg && (
-        <Notification
-          type="success"
-          label={t(successMsg)}
-          aria-label={t(successMsg)}
-          position="top-center"
-          autoClose
-          autoCloseDuration={3000}
-          displayAutoCloseProgress={false}
-          onClose={() => setSuccessMsg("")}
-          dismissible
-          closeButtonLabelText={t("common:close")}
-          dataTestId="application__page2--notification-success"
-        />
-      )}
-      {errorMsg && (
-        <Notification
-          type="error"
-          label={t(errorMsg)}
-          position="top-center"
-          autoClose
-          displayAutoCloseProgress={false}
-          onClose={() => setErrorMsg("")}
-          dismissible
-          closeButtonLabelText={t("common:close")}
-          dataTestId="application__page2--notification-error"
-        >
-          {t(errorMsg)}
-        </Notification>
-      )}
       {applicationSections.map((event, index) => {
         // TODO there is something funny with this one on the first render
         // (it's undefined and not Array as expected).

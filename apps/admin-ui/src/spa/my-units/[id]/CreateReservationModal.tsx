@@ -25,12 +25,12 @@ import { useCheckCollisions } from "@/component/reservations/requested/hooks";
 import Loader from "@/component/Loader";
 import { dateTime, getNormalizedInterval, parseDateTimeSafe } from "@/helpers";
 import { useModal } from "@/context/ModalContext";
-import { useNotification } from "@/context/NotificationContext";
-import { base64encode, filterNonNullable } from "common/src/helpers";
 import ControlledTimeInput from "@/component/ControlledTimeInput";
 import ControlledDateInput from "@/component/ControlledDateInput";
 import ReservationTypeForm from "@/component/ReservationTypeForm";
 import { flattenMetadata } from "@/common/util";
+import { base64encode, filterNonNullable } from "common/src/helpers";
+import { errorToast, successToast } from "common/src/common/toast";
 
 type ReservationUnitType = NonNullable<ReservationUnitQuery["reservationUnit"]>;
 
@@ -243,8 +243,6 @@ function DialogContent({
     getFieldState,
   } = form;
 
-  const { notifyError, notifySuccess } = useNotification();
-
   // show errors if the clicked start date is invalid (both previous day and today but in the past)
   useEffect(() => {
     if (start < new Date()) {
@@ -279,7 +277,11 @@ function DialogContent({
     const translatedError = i18n.exists(`errors.descriptive.${errorMsg}`)
       ? t(`errors.descriptive.${errorMsg}`)
       : t("errors.descriptive.genericError");
-    notifyError(t("ReservationDialog.saveFailed", { error: translatedError }));
+    errorToast({
+      text: t("ReservationDialog.saveFailed", {
+        error: translatedError,
+      }),
+    });
   };
 
   const onSubmit = async (values: FormValueType) => {
@@ -319,11 +321,11 @@ function DialogContent({
 
       await createStaffReservation(input);
 
-      notifySuccess(
-        t("ReservationDialog.saveSuccess", {
+      successToast({
+        text: t("ReservationDialog.saveSuccess", {
           reservationUnit: reservationUnit.nameFi,
-        })
-      );
+        }),
+      });
       onClose();
     } catch (e) {
       errorHandler(get(e, "message"));

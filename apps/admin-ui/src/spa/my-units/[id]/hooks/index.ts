@@ -4,16 +4,14 @@ import {
 } from "@gql/gql-types";
 import { toApiDate } from "common/src/common/util";
 import { base64encode, filterNonNullable } from "common/src/helpers";
-import { useNotification } from "@/context/NotificationContext";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
+import { errorToast } from "common/src/common/toast";
 
 export function useUnitResources(
   begin: Date,
   unitPk: string,
   reservationUnitTypes?: number[]
 ) {
-  const { notifyError } = useNotification();
-
   const id = base64encode(`UnitNode:${unitPk}`);
   const isValid = Number(unitPk) > 0;
   const { data, ...rest } = useReservationUnitsByUnitQuery({
@@ -27,7 +25,7 @@ export function useUnitResources(
       state: RELATED_RESERVATION_STATES,
     },
     onError: () => {
-      notifyError("Varauksia ei voitu hakea");
+      errorToast({ text: "Varauksia ei voitu hakea" });
     },
   });
 

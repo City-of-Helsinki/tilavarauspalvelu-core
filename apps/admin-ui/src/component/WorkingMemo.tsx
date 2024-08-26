@@ -9,7 +9,7 @@ import {
   type UpdateApplicationWorkingMemoMutation,
 } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
-import { useNotification } from "@/context/NotificationContext";
+import { errorToast, successToast } from "common/src/common/toast";
 
 const ButtonContainer = styled.div`
   display: flex;
@@ -35,7 +35,6 @@ function WorkingMemo({
   onSuccess: () => void;
 }) {
   const [workingMemo, setWorkingMemo] = useState<string>(initialValue);
-  const { notifyError, notifySuccess } = useNotification();
   const { t } = useTranslation();
 
   const handleSave = async () => {
@@ -59,21 +58,29 @@ function WorkingMemo({
       if (mutRes?.pk == null) {
         throw new Error("No data returned");
       }
-      notifySuccess(t("RequestedReservation.savedWorkingMemo"));
+      successToast({
+        text: t("RequestedReservation.savedWorkingMemo"),
+      });
       onSuccess();
     } catch (ex) {
       if (ex instanceof Error) {
         const { message } = ex;
         if (message === "No permission to mutate.") {
-          notifyError(t("errors.noPermission"));
+          errorToast({
+            text: t("errors.noPermission"),
+          });
           return;
         }
         if (message === "No data returned") {
-          notifyError(t("errors.mutationNoDataReturned"));
+          errorToast({
+            text: t("errors.mutationNoDataReturned"),
+          });
           return;
         }
       }
-      notifyError(t("RequestedReservation.errorSavingWorkingMemo"));
+      errorToast({
+        text: t("RequestedReservation.errorSavingWorkingMemo"),
+      });
     }
   };
 

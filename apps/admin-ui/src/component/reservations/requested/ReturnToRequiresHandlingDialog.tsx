@@ -7,7 +7,7 @@ import {
   useRequireHandlingMutation,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
-import { useNotification } from "@/context/NotificationContext";
+import { errorToast, successToast } from "common/src/common/toast";
 
 // TODO use a fragment
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
@@ -18,14 +18,13 @@ type Props = {
 };
 
 const DialogContent = ({ reservation, onClose, onAccept }: Props) => {
-  const { notifyError, notifySuccess } = useNotification();
   const { t, i18n } = useTranslation();
 
   const [backToRequireHandlingMutation] = useRequireHandlingMutation({
     onCompleted: () => {
-      notifySuccess(
-        t("RequestedReservation.ReturnToRequiresHandlingDialog.returned")
-      );
+      successToast({
+        text: t("RequestedReservation.ReturnToRequiresHandlingDialog.returned"),
+      });
       onAccept();
     },
     onError: (err) => {
@@ -36,11 +35,14 @@ const DialogContent = ({ reservation, onClose, onAccept }: Props) => {
       const errorTranslated = hasTranslatedErrorMsg
         ? `errors.descriptive.${message}`
         : `errors.descriptive.genericError`;
-      notifyError(
-        t("RequestedReservation.ReturnToRequiresHandlingDialog.errorSaving", {
-          error: t(errorTranslated),
-        })
-      );
+      errorToast({
+        text: t(
+          "RequestedReservation.ReturnToRequiresHandlingDialog.errorSaving",
+          {
+            error: t(errorTranslated),
+          }
+        ),
+      });
     },
   });
 

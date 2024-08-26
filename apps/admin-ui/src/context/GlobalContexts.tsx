@@ -1,13 +1,10 @@
 import React from "react";
 import { ModalContextProvider } from "./ModalContext";
-import { NotificationContextProvider } from "./NotificationContext";
 
 const withGlobalContext = (App: () => JSX.Element) => (): JSX.Element => (
-  <NotificationContextProvider>
-    <ModalContextProvider>
-      <App />
-    </ModalContextProvider>
-  </NotificationContextProvider>
+  <ModalContextProvider>
+    <App />
+  </ModalContextProvider>
 );
 
 export const GlobalContext = ({ children }: { children: React.ReactNode }) =>

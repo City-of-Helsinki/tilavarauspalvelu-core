@@ -9,7 +9,7 @@ import { useApplicationRoundCriteriaQuery } from "@gql/gql-types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { Container } from "@/styles/layout";
 import { formatDate } from "@/common/util";
-import { useNotification } from "@/context/NotificationContext";
+import { errorToast } from "common/src/common/toast";
 import Loader from "@/component/Loader";
 import { Accordion } from "@/component/Accordion";
 import TimeframeStatus from "../TimeframeStatus";
@@ -84,14 +84,13 @@ function Criteria({
   applicationRoundPk: number;
 }): JSX.Element {
   const { t } = useTranslation();
-  const { notifyError } = useNotification();
 
   const id = base64encode(`ApplicationRoundNode:${applicationRoundPk}`);
   const { data, loading } = useApplicationRoundCriteriaQuery({
     variables: { id },
     skip: !applicationRoundPk,
     onError: () => {
-      notifyError(t("errors.errorFetchingData"));
+      errorToast({ text: t("errors.errorFetchingData") });
     },
   });
   const { applicationRound } = data ?? {};

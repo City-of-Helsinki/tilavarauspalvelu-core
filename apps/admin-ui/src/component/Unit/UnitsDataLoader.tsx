@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { type ApolloError } from "@apollo/client";
 import { UnitOrderingChoices, useUnitsQuery } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
-import { useNotification } from "@/context/NotificationContext";
+import { errorToast } from "common/src/common/toast";
 import { LARGE_LIST_PAGE_SIZE } from "@/common/const";
 import { More } from "@/component/More";
 import Loader from "../Loader";
@@ -14,8 +14,6 @@ type Props = {
 };
 
 export function UnitsDataLoader({ isMyUnits }: Props): JSX.Element {
-  const { notifyError } = useNotification();
-
   const [sort, setSort] = useState<string>("nameFi");
   const handleSortChanged = (sortField: string) => {
     if (sort === sortField) {
@@ -37,7 +35,7 @@ export function UnitsDataLoader({ isMyUnits }: Props): JSX.Element {
       nameFi: searchFilter,
     },
     onError: (err: ApolloError) => {
-      notifyError(err.message);
+      errorToast({ text: err.message });
     },
     fetchPolicy: "cache-and-network",
   });

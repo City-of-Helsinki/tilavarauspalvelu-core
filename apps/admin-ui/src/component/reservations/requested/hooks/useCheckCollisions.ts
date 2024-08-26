@@ -3,7 +3,7 @@ import {
   ReservationTypeChoice,
   useReservationsByReservationUnitQuery,
 } from "@gql/gql-types";
-import { useNotification } from "@/context/NotificationContext";
+import { errorToast } from "common/src/common/toast";
 import { doesIntervalCollide, reservationToInterval } from "@/helpers";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { toApiDate } from "common/src/common/util";
@@ -27,8 +27,6 @@ function useCheckCollisions({
   };
   reservationType: ReservationTypeChoice;
 }) {
-  const { notifyError } = useNotification();
-
   const today = new Date();
 
   const typename = "ReservationUnitNode";
@@ -45,7 +43,7 @@ function useCheckCollisions({
       state: RELATED_RESERVATION_STATES,
     },
     onError: () => {
-      notifyError("Varauksia ei voitu hakea");
+      errorToast({ text: "Varauksia ei voitu hakea" });
     },
   });
 

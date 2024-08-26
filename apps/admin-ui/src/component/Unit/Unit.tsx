@@ -7,7 +7,7 @@ import { H1, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { useUnitQuery } from "@gql/gql-types";
 import { parseAddress } from "@/common/util";
-import { useNotification } from "@/context/NotificationContext";
+import { errorToast } from "common/src/common/toast";
 import { Container } from "@/styles/layout";
 import { BasicLink } from "@/styles/util";
 import Loader from "../Loader";
@@ -107,8 +107,6 @@ const ReservationUnits = styled.div`
 `;
 
 function Unit(): JSX.Element {
-  const { notifyError } = useNotification();
-
   const { t } = useTranslation();
   const unitPk = Number(useParams<IProps>().unitPk);
   const history = useNavigate();
@@ -119,7 +117,7 @@ function Unit(): JSX.Element {
     variables: { id },
     fetchPolicy: "network-only",
     onError: () => {
-      notifyError(t("errors.errorFetchingData"));
+      errorToast({ text: t("errors.errorFetchingData") });
     },
   });
 

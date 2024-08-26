@@ -7,11 +7,11 @@ import {
 } from "@gql/gql-types";
 import { filterNonNullable, toNumber } from "common/src/helpers";
 import { LARGE_LIST_PAGE_SIZE } from "@/common/const";
-import { useNotification } from "@/context/NotificationContext";
 import Loader from "@/component/Loader";
 import { More } from "@/component/More";
 import { ReservationUnitsTable } from "./ReservationUnitsTable";
 import { useSearchParams } from "react-router-dom";
+import { errorToast } from "common/src/common/toast";
 
 function transformOrderBy(
   orderBy: string,
@@ -61,8 +61,6 @@ function transformSortString(
 }
 
 export function ReservationUnitsDataReader(): JSX.Element {
-  const { notifyError } = useNotification();
-
   const [sort, setSort] = useState<string>("");
   const onSortChanged = (sortField: string) => {
     if (sort === sortField) {
@@ -134,7 +132,7 @@ export function ReservationUnitsDataReader(): JSX.Element {
       reservationUnitType: reservationUnitTypes,
     },
     onError: (err: ApolloError) => {
-      notifyError(err.message);
+      errorToast({ text: err.message });
     },
     fetchPolicy: "cache-and-network",
     // TODO enable or no?

@@ -15,11 +15,11 @@ import {
   toApiDateUnsafe,
 } from "common/src/common/util";
 import { dateTime } from "@/helpers";
-import { useNotification } from "@/context/NotificationContext";
 import { type NewReservationListItem } from "@/component/ReservationsList";
 import { ReservationMade } from "../RecurringReservationDone";
 import { flattenMetadata } from "app/common/util";
 import { gql } from "@apollo/client";
+import { errorToast } from "common/src/common/toast";
 
 // TODO this is common with the ReservationForm combine them
 function myDateTime(date: Date, time: string) {
@@ -50,10 +50,9 @@ export function useCreateRecurringReservation() {
     createReservationMutation({ variables: { input } });
 
   const { t } = useTranslation();
-  const { notifyError } = useNotification();
   const handleError = (error: unknown) => {
     const errorMessage = get(error, "messages[0]");
-    notifyError(t("ReservationDialog.saveFailed", { errorMessage }));
+    errorToast({ text: t("ReservationDialog.saveFailed", { errorMessage }) });
   };
 
   const makeSingleReservation = async (

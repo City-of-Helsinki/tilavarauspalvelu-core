@@ -16,9 +16,9 @@ import {
   type ReservationQuery,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
-import { useNotification } from "@/context/NotificationContext";
 import { VerticalFlex } from "@/styles/layout";
 import { getReservationPriceDetails } from "./util";
+import { errorToast, successToast } from "common/src/common/toast";
 
 const Label = styled.p`
   color: var(--color-black-70);
@@ -56,12 +56,11 @@ const DialogContent = ({
   onClose,
   onAccept,
 }: Props) => {
-  const { notifyError, notifySuccess } = useNotification();
   const { t, i18n } = useTranslation();
 
   const [mutation] = useApproveReservationMutation({
     onCompleted: () => {
-      notifySuccess(t("RequestedReservation.ApproveDialog.approved"));
+      successToast({ text: t("RequestedReservation.ApproveDialog.approved") });
       onAccept();
     },
     onError: (err) => {
@@ -72,11 +71,11 @@ const DialogContent = ({
       const errorTranslated = hasTranslatedErrorMsg
         ? `errors.descriptive.${message}`
         : `errors.descriptive.genericError`;
-      notifyError(
-        t("RequestedReservation.ApproveDialog.errorSaving", {
+      errorToast({
+        text: t("RequestedReservation.ApproveDialog.errorSaving", {
           error: t(errorTranslated),
-        })
-      );
+        }),
+      });
     },
   });
 

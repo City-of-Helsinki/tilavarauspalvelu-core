@@ -46,7 +46,6 @@ import Step1 from "@/components/reservation/Step1";
 import { ReservationStep } from "@/modules/types";
 import { JustForDesktop } from "@/modules/style/layout";
 import { PinkBox } from "@/components/reservation-unit/ReservationUnitStyles";
-import { Toast } from "@/styles/util";
 import {
   getCommonServerSideProps,
   getGenericTerms,
@@ -54,6 +53,7 @@ import {
 import { useConfirmNavigation } from "@/hooks/useConfirmNavigation";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { containsField } from "common/src/metaFieldsHelpers";
+import { errorToast } from "common/src/common/toast";
 
 const StyledContainer = styled(Container)`
   padding-top: var(--spacing-m);
@@ -418,6 +418,10 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
     reservationUnit: reservationUnit != null ? [reservationUnit] : [],
   };
 
+  useEffect(() => {
+    if (errorMsg) errorToast({ text: errorMsg });
+  }, [errorMsg]);
+
   return (
     <StyledContainer>
       <Columns>
@@ -496,21 +500,6 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
           </FormProvider>
         </BodyContainer>
       </Columns>
-      {errorMsg && (
-        <Toast
-          type="error"
-          label={t("reservationUnit:reservationUpdateFailed")}
-          position="top-center"
-          autoClose
-          autoCloseDuration={4000}
-          displayAutoCloseProgress={false}
-          onClose={() => setErrorMsg(null)}
-          dismissible
-          closeButtonLabelText={t("common:error.closeErrorMsg")}
-        >
-          {errorMsg}
-        </Toast>
-      )}
     </StyledContainer>
   );
 }

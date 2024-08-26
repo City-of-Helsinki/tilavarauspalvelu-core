@@ -15,7 +15,6 @@ import {
   useReservationQuery,
 } from "@gql/gql-types";
 import { Permission } from "@/modules/permissionHelper";
-import { useNotification } from "@/context/NotificationContext";
 import Loader from "@/component/Loader";
 import { useModal } from "@/context/ModalContext";
 import { ButtonContainer, Container } from "@/styles/layout";
@@ -41,6 +40,7 @@ import ApprovalButtonsRecurring from "./ApprovalButtonsRecurring";
 import ReservationTitleSection from "./ReservationTitleSection";
 import { base64encode } from "common/src/helpers";
 import { fontMedium } from "common";
+import { errorToast } from "common/src/common/toast";
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 
@@ -583,7 +583,6 @@ function RequestedReservation({
 function PermissionWrappedReservation() {
   const { id: pk } = useParams() as { id: string };
   const { t } = useTranslation();
-  const { notifyError } = useNotification();
   const typename = "ReservationNode";
   const isPkValid = Number(pk) > 0;
   const id = base64encode(`${typename}:${pk}`);
@@ -592,7 +591,7 @@ function PermissionWrappedReservation() {
     fetchPolicy: "no-cache",
     variables: { id },
     onError: () => {
-      notifyError(t("errors.errorFetchingData"));
+      errorToast({ text: t("errors.errorFetchingData") });
     },
   });
 

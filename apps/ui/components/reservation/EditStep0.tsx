@@ -66,7 +66,6 @@ type Props = {
   userReservations: Node[];
   reservationForm: UseFormReturn<PendingReservationFormType>;
   activeApplicationRounds: ApplicationRoundFieldsFragment[];
-  setErrorMsg: React.Dispatch<React.SetStateAction<string | null>>;
   nextStep: () => void;
   apiBaseUrl: string;
   isLoading: boolean;
@@ -338,11 +337,6 @@ export function EditStep0({
       activeApplicationRounds,
     });
 
-    /*
-    if (validationError) {
-      setErrorMsg(t(`reservations:modifyTimeReasons.${validationError}`));
-    }
-    */
     if (isNewReservationValid) {
       nextStep();
     }

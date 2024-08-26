@@ -13,7 +13,6 @@ import {
   type ReservationChangeFormType,
   ReservationChangeFormSchema,
 } from "@/schemas";
-import { useNotification } from "@/context/NotificationContext";
 import ReservationTypeForm from "@/component/ReservationTypeForm";
 import Loader from "../Loader";
 import { HR } from "@/component/Table";
@@ -23,6 +22,7 @@ import { useReservationEditData } from "./requested/hooks";
 import { useStaffReservationMutation } from "./hooks";
 import { filterNonNullable } from "common/src/helpers";
 import { flattenMetadata } from "@/common/util";
+import { errorToast } from "common/src/common/toast";
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 type ReservationUnitType = NonNullable<ReservationType["reservationUnit"]>[0];
@@ -129,8 +129,6 @@ function EditReservation({
     },
   });
 
-  const { notifyError } = useNotification();
-
   const changeStaffReservation = useStaffReservationMutation({
     reservation,
     onSuccess,
@@ -138,11 +136,11 @@ function EditReservation({
 
   const onSubmit = async (values: FormValueType) => {
     if (!reservationUnit.pk) {
-      notifyError("ERROR: Can't update without reservation unit");
+      errorToast({ text: "ERROR: Can't update without reservation unit" });
       return;
     }
     if (!reservation.pk) {
-      notifyError("ERROR: Can't update without reservation");
+      errorToast({ text: "ERROR: Can't update without reservation" });
       return;
     }
 

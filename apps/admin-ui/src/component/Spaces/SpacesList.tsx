@@ -7,7 +7,7 @@ import { H1, Strong } from "common/src/common/typography";
 import { type ApolloError } from "@apollo/client";
 import { useSpacesQuery, type SpaceNode } from "@gql/gql-types";
 import Loader from "../Loader";
-import { useNotification } from "@/context/NotificationContext";
+import { errorToast } from "common/src/common/toast";
 import { Container } from "@/styles/layout";
 import { filterNonNullable } from "common/src/helpers";
 import { CustomTable } from "../Table";
@@ -88,12 +88,11 @@ function getColConfig(t: TFunction): SpacesTableColumn[] {
 
 /// The global list page that is not linked in the menu
 function SpacesList(): JSX.Element {
-  const { notifyError } = useNotification();
   const { t } = useTranslation();
 
   const { data, loading: isLoading } = useSpacesQuery({
     onError: (err: ApolloError) => {
-      notifyError(err.message);
+      errorToast({ text: err.message });
     },
   });
 

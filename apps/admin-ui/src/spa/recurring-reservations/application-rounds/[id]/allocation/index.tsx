@@ -23,7 +23,7 @@ import {
   TabWrapper,
   autoGridCss,
 } from "@/styles/layout";
-import { useNotification } from "@/context/NotificationContext";
+import { errorToast } from "common/src/common/toast";
 import {
   ALLOCATION_POLL_INTERVAL,
   VALID_ALLOCATION_APPLICATION_STATUSES,
@@ -209,8 +209,6 @@ function ApplicationRoundAllocation({
   roundName: string;
   applicationRoundStatus: ApplicationRoundStatusChoice;
 }): JSX.Element {
-  const { notifyError } = useNotification();
-
   const { t } = useTranslation();
 
   const options = useOptions();
@@ -301,7 +299,7 @@ function ApplicationRoundAllocation({
       endDate: applicationRound?.reservationPeriodEnd ?? "",
     },
     onError: () => {
-      notifyError(t("errors.errorFetchingData"));
+      errorToast({ text: t("errors.errorFetchingData") });
     },
   });
   const { data, refetch, previousData, fetchMore } = query;

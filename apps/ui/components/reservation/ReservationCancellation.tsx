@@ -16,7 +16,7 @@ import {
 import { IconButton, ShowAllContainer } from "common/src/components";
 import Sanitize from "../common/Sanitize";
 import { getSelectedOption, getTranslation } from "@/modules/util";
-import { BlackButton, MediumButton, Toast } from "@/styles/util";
+import { BlackButton, MediumButton } from "@/styles/util";
 import { ReservationInfoCard } from "./ReservationInfoCard";
 import { Paragraph } from "./styles";
 import { signOut } from "common/src/browserHelpers";
@@ -30,6 +30,7 @@ import {
   convertLanguageCode,
   getTranslationSafe,
 } from "common/src/common/util";
+import { errorToast } from "common/src/common/toast";
 
 type CancelReasonsQ = NonNullable<
   ReservationCancelReasonsQuery["reservationCancelReasons"]
@@ -128,7 +129,6 @@ export function ReservationCancellation(props: Props): JSX.Element {
   const { t, i18n } = useTranslation();
   const { apiBaseUrl } = props;
 
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [formState, setFormState] = useState<"unsent" | "sent">("unsent");
 
   const lang = convertLanguageCode(i18n.language);
@@ -177,7 +177,9 @@ export function ReservationCancellation(props: Props): JSX.Element {
       // TODO Why?
       window.scrollTo(0, 0);
     } catch (e) {
-      setErrorMsg(t("reservations:reservationCancellationFailed"));
+      errorToast({
+        text: t("reservations:reservationCancellationFailed"),
+      });
     }
   };
 
@@ -196,96 +198,80 @@ export function ReservationCancellation(props: Props): JSX.Element {
       : null;
 
   return (
-    <>
-      <ReservationPageWrapper>
-        <HeadingSection>
-          <Heading>{title}</Heading>
-          <p>{ingress}</p>
-        </HeadingSection>
-        <BylineSection>
-          <ReservationInfoCard reservation={reservation} type="confirmed" />
-        </BylineSection>
-        <ContentSection>
-          {formState === "unsent" ? (
-            <>
-              <p>{t("reservations:cancelInfoBody")}</p>
-              <TermsContainer
-                showAllLabel={t("reservations:showCancellationTerms")}
-                showLessLabel={t("reservations:hideCancellationTerms")}
-                maximumNumber={0}
-              >
-                {cancellationTerms != null && (
-                  <NotificationBox
-                    heading={t("reservationUnit:cancellationTerms")}
-                    body={<Sanitize html={cancellationTerms} />}
+    <ReservationPageWrapper>
+      <HeadingSection>
+        <Heading>{title}</Heading>
+        <p>{ingress}</p>
+      </HeadingSection>
+      <BylineSection>
+        <ReservationInfoCard reservation={reservation} type="confirmed" />
+      </BylineSection>
+      <ContentSection>
+        {formState === "unsent" ? (
+          <>
+            <p>{t("reservations:cancelInfoBody")}</p>
+            <TermsContainer
+              showAllLabel={t("reservations:showCancellationTerms")}
+              showLessLabel={t("reservations:hideCancellationTerms")}
+              maximumNumber={0}
+            >
+              {cancellationTerms != null && (
+                <NotificationBox
+                  heading={t("reservationUnit:cancellationTerms")}
+                  body={<Sanitize html={cancellationTerms} />}
+                />
+              )}
+            </TermsContainer>
+            <Form onSubmit={handleSubmit(onSubmit)}>
+              <Controller
+                name="reason"
+                control={control}
+                render={() => (
+                  <StyledSelect
+                    id="reservation__button--cancel-reason"
+                    label={t("reservations:cancelReason")}
+                    onChange={(val: OptionType) => {
+                      setValue("reason", val.value);
+                    }}
+                    options={[...reasons]}
+                    placeholder={t("common:select")}
+                    value={getSelectedOption(getValues("reason"), reasons)}
+                    required
                   />
                 )}
-              </TermsContainer>
-              <Form onSubmit={handleSubmit(onSubmit)}>
-                <Controller
-                  name="reason"
-                  control={control}
-                  render={() => (
-                    <StyledSelect
-                      id="reservation__button--cancel-reason"
-                      label={t("reservations:cancelReason")}
-                      onChange={(val: OptionType) => {
-                        setValue("reason", val.value);
-                      }}
-                      options={[...reasons]}
-                      placeholder={t("common:select")}
-                      value={getSelectedOption(getValues("reason"), reasons)}
-                      required
-                    />
-                  )}
-                />
-                <Actions>
-                  <BlackButton
-                    variant="secondary"
-                    iconLeft={<IconCross aria-hidden />}
-                    onClick={() => router.back()}
-                    data-testid="reservation-cancel__button--back"
-                  >
-                    {t("reservations:cancelReservationCancellation")}
-                  </BlackButton>
-                  <MediumButton
-                    variant="primary"
-                    type="submit"
-                    disabled={!watch("reason")}
-                    data-testid="reservation-cancel__button--cancel"
-                    isLoading={loading}
-                  >
-                    {t("reservations:cancelReservation")}
-                  </MediumButton>
-                </Actions>
-              </Form>
-            </>
-          ) : (
-            <>
-              {formState === "sent" && instructions && (
-                <Paragraph style={{ margin: "var(--spacing-xl) 0" }}>
-                  {instructions}
-                </Paragraph>
-              )}
-              <ReturnLinkList apiBaseUrl={apiBaseUrl} />
-            </>
-          )}
-        </ContentSection>
-      </ReservationPageWrapper>
-      {errorMsg && (
-        <Toast
-          type="error"
-          label={t("common:error.error")}
-          position="top-center"
-          autoClose={false}
-          displayAutoCloseProgress={false}
-          onClose={() => setErrorMsg(null)}
-          dismissible
-          closeButtonLabelText={t("common:error.closeErrorMsg")}
-        >
-          {errorMsg}
-        </Toast>
-      )}
-    </>
+              />
+              <Actions>
+                <BlackButton
+                  variant="secondary"
+                  iconLeft={<IconCross aria-hidden />}
+                  onClick={() => router.back()}
+                  data-testid="reservation-cancel__button--back"
+                >
+                  {t("reservations:cancelReservationCancellation")}
+                </BlackButton>
+                <MediumButton
+                  variant="primary"
+                  type="submit"
+                  disabled={!watch("reason")}
+                  data-testid="reservation-cancel__button--cancel"
+                  isLoading={loading}
+                >
+                  {t("reservations:cancelReservation")}
+                </MediumButton>
+              </Actions>
+            </Form>
+          </>
+        ) : (
+          <>
+            {formState === "sent" && instructions && (
+              <Paragraph style={{ margin: "var(--spacing-xl) 0" }}>
+                {instructions}
+              </Paragraph>
+            )}
+            <ReturnLinkList apiBaseUrl={apiBaseUrl} />
+          </>
+        )}
+      </ContentSection>
+    </ReservationPageWrapper>
   );
 }

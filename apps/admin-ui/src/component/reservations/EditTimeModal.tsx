@@ -17,7 +17,6 @@ import { differenceInMinutes, format } from "date-fns";
 import { ErrorBoundary } from "react-error-boundary";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { formatDuration, toUIDate } from "common/src/common/util";
-import { useNotification } from "@/context/NotificationContext";
 import { useModal } from "@/context/ModalContext";
 import { TimeChangeFormSchemaRefined, TimeFormSchema } from "@/schemas";
 import ControlledTimeInput from "@/component/ControlledTimeInput";
@@ -28,6 +27,7 @@ import { getNormalizedInterval, parseDateTimeSafe } from "@/helpers";
 import { formatDateTimeRange } from "@/common/util";
 import { gql } from "@apollo/client";
 import { filterNonNullable, pick } from "common/src/helpers";
+import { errorToast, successToast } from "common/src/common/toast";
 
 const StyledForm = styled.form`
   margin-top: var(--spacing-m);
@@ -174,7 +174,6 @@ function DialogContent({
   type,
 }: DialogContentProps) {
   const { t, i18n } = useTranslation();
-  const { notifyError } = useNotification();
 
   const {
     handleSubmit,
@@ -230,11 +229,11 @@ function DialogContent({
           const translatedError = i18n.exists(`errors.descriptive.${message}`)
             ? t(`errors.descriptive.${message}`)
             : t("errors.descriptive.genericError");
-          notifyError(
-            t("ReservationDialog.saveFailed", { error: translatedError })
-          );
+          errorToast({
+            text: t("ReservationDialog.saveFailed", { error: translatedError }),
+          });
         } else {
-          notifyError(t("ReservationDialog.saveFailed"));
+          errorToast({ text: t("ReservationDialog.saveFailed") });
         }
       }
     }
@@ -342,8 +341,6 @@ export function NewReservationModal({
   // but do we need to pass in also the metadata? i.e. copy all the fields from another reservation?
   const [create] = useCreateStaffReservationMutation();
 
-  const { notifySuccess } = useNotification();
-
   function createInput({
     begin,
     end,
@@ -409,7 +406,7 @@ export function NewReservationModal({
       },
     });
     onAccept();
-    notifySuccess(t("Reservation.NewReservationModal.successToast"));
+    successToast({ text: t("Reservation.NewReservationModal.successToast") });
   };
 
   return (
@@ -487,8 +484,6 @@ export function EditTimeModal({
     },
   });
 
-  const { notifySuccess } = useNotification();
-
   const [changeTimeMutation] = useStaffAdjustReservationTimeMutation();
 
   const changeTime = async ({ begin, end, buffers }: MutationValues) => {
@@ -508,7 +503,7 @@ export function EditTimeModal({
         },
       },
     });
-    notifySuccess(t("Reservation.EditTimeModal.successToast"));
+    successToast({ text: t("Reservation.EditTimeModal.successToast") });
     onAccept();
   };
 

@@ -140,9 +140,9 @@ import {
 import { MediumButton } from "@/styles/util";
 import LoginFragment from "@/components/LoginFragment";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
-import { ErrorToast } from "@/components/common/ErrorToast";
 import { ReservationTypeChoice } from "common/gql/gql-types";
 import { useReservableTimes } from "@/hooks/useReservableTimes";
+import { errorToast } from "common/src/common/toast";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -463,7 +463,6 @@ function ReservationUnit({
 
   const [calendarViewType, setCalendarViewType] = useState<WeekOptions>("week");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const calendarRef = useRef<HTMLDivElement>(null);
 
@@ -519,9 +518,6 @@ function ReservationUnit({
   }, [dateValue, timeValue]);
 
   const submitReservation = (_data: PendingReservationFormType) => {
-    if (reservationUnit.pk) {
-      setErrorMsg(null);
-    }
     const { start: begin, end } = focusSlot;
     if (reservationUnit?.pk == null || begin == null || end == null) {
       return;
@@ -865,7 +861,9 @@ function ReservationUnit({
     },
     onError: (error) => {
       const msg = printErrorMessages(error);
-      setErrorMsg(msg || t("errors:general_error"));
+      errorToast({
+        text: msg ?? t("errors:general_error"),
+      });
     },
   });
 
@@ -1337,13 +1335,6 @@ function ReservationUnit({
           </BottomContainer>
         )}
       </BottomWrapper>
-      {errorMsg && (
-        <ErrorToast
-          title={t("reservationUnit:reservationFailed")}
-          onClose={() => setErrorMsg(null)}
-          error={errorMsg}
-        />
-      )}
     </Wrapper>
   );
 }

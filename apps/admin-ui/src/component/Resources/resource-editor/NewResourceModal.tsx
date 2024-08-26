@@ -11,7 +11,7 @@ import {
 } from "@gql/gql-types";
 import { parseAddress } from "@/common/util";
 import { CustomDialogHeader } from "@/component/CustomDialogHeader";
-import { useNotification } from "@/context/NotificationContext";
+import { errorToast } from "common/src/common/toast";
 import {
   Editor,
   ResourceUpdateForm,
@@ -48,8 +48,6 @@ export function NewResourceModal({
 }: IProps): JSX.Element | null {
   const { t } = useTranslation();
 
-  const { notifyError } = useNotification();
-
   const [createResourceMutation, { loading: isMutationLoading }] =
     useCreateResourceMutation();
 
@@ -80,7 +78,7 @@ export function NewResourceModal({
       closeModal();
       refetch();
     } catch (error) {
-      notifyError(t("ResourceModal.saveError"));
+      errorToast({ text: t("ResourceModal.saveError") });
     }
   };
 

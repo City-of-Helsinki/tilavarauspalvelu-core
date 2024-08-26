@@ -38,7 +38,6 @@ import { formatDuration } from "common/src/common/util";
 import { convertWeekday, type Day } from "common/src/conversion";
 import { WEEKDAYS } from "common/src/const";
 import { formatNumber, formatDate, parseAgeGroups } from "@/common/util";
-import { useNotification } from "@/context/NotificationContext";
 import ScrollIntoView from "@/common/ScrollIntoView";
 import { Accordion } from "@/component/Accordion";
 import { Accordion as HDSAccordion } from "@/common/hds-fork/Accordion";
@@ -55,6 +54,7 @@ import { getApplicantName, getApplicationStatusColor } from "@/helpers";
 import Error404 from "@/common/Error404";
 import usePermission from "@/hooks/usePermission";
 import { Permission } from "@/modules/permissionHelper";
+import { errorToast } from "common/src/common/toast";
 
 type ApplicationType = NonNullable<ApplicationAdminQuery["application"]>;
 type ApplicationSectionType = NonNullable<
@@ -364,7 +364,6 @@ function RejectOptionButton({
 }) {
   const [mutation, { loading }] = useRejectRestMutation();
   const { hasUnitPermission } = usePermission();
-  const { notifyError } = useNotification();
   const { t } = useTranslation();
 
   const updateOption = async (
@@ -387,23 +386,23 @@ function RejectOptionButton({
     } catch (err) {
       const mutationErrors = getValidationErrors(err);
       if (getPermissionErrors(err).length > 0) {
-        notifyError(t("errors.noPermission"));
+        errorToast({ text: t("errors.noPermission") });
       } else if (mutationErrors.length > 0) {
         // TODO handle other codes also
         const isInvalidState = mutationErrors.find(
           (e) => e.code === "invalid" && e.field === "rejected"
         );
         if (isInvalidState) {
-          notifyError(t("errors.cantRejectAlreadyAllocated"));
+          errorToast({ text: t("errors.cantRejectAlreadyAllocated") });
         } else {
           // TODO this should show them with cleaner formatting (multiple errors)
           // TODO these should be translated
           const message = mutationErrors.map((e) => e.message).join(", ");
-          notifyError(t("errors.formValidationError", { message }));
+          errorToast({ text: t("errors.formValidationError", { message }) });
         }
       } else {
         // TODO this translation is missing
-        notifyError(t("errors.errorRejectingOption"));
+        errorToast({ text: t("errors.errorRejectingOption") });
       }
     }
   };
@@ -473,8 +472,6 @@ function RejectAllOptionsButton({
   const [restoreMutation, { loading: restoreLoading }] =
     useRestoreAllSectionOptionsMutation();
 
-  const { notifyError } = useNotification();
-
   const isLoading = rejectLoading || restoreLoading;
 
   const mutate = async (pk: Maybe<number> | undefined, restore: boolean) => {
@@ -498,23 +495,23 @@ function RejectAllOptionsButton({
     } catch (err) {
       const mutationErrors = getValidationErrors(err);
       if (getPermissionErrors(err).length > 0) {
-        notifyError(t("errors.noPermission"));
+        errorToast({ text: t("errors.noPermission") });
       } else if (mutationErrors.length > 0) {
         // TODO handle other codes also
         const isInvalidState = mutationErrors.find(
           (e) => e.code === "CANNOT_REJECT_SECTION_OPTIONS"
         );
         if (isInvalidState) {
-          notifyError(t("errors.cantRejectAlreadyAllocated"));
+          errorToast({ text: t("errors.cantRejectAlreadyAllocated") });
         } else {
           // TODO this should show them with cleaner formatting (multiple errors)
           // TODO these should be translated
           const message = mutationErrors.map((e) => e.message).join(", ");
-          notifyError(t("errors.formValidationError", { message }));
+          errorToast({ text: t("errors.formValidationError", { message }) });
         }
       } else {
         // TODO this translation is missing
-        notifyError(t("errors.errorRejectingOption"));
+        errorToast({ text: t("errors.errorRejectingOption") });
       }
     }
   };
@@ -729,7 +726,7 @@ function RejectApplicationButton({
   refetch: () => Promise<ApolloQueryResult<ApplicationAdminQuery>>;
 }): JSX.Element | null {
   const { t } = useTranslation();
-  const { notifyError } = useNotification();
+
   const { hasUnitPermission } = usePermission();
 
   const [rejectionMutation, { loading: isRejectionLoading }] =
@@ -764,22 +761,22 @@ function RejectApplicationButton({
     } catch (err) {
       const mutationErrors = getValidationErrors(err);
       if (getPermissionErrors(err).length > 0) {
-        notifyError(t("errors.noPermission"));
+        errorToast({ text: t("errors.noPermission") });
       } else if (mutationErrors.length > 0) {
         // TODO handle other codes also
         const isInvalidState = mutationErrors.find(
           (e) => e.code === "CANNOT_REJECT_APPLICATION_OPTIONS"
         );
         if (isInvalidState) {
-          notifyError(t("errors.cantRejectAlreadyAllocated"));
+          errorToast({ text: t("errors.cantRejectAlreadyAllocated") });
         } else {
           // TODO this should show them with cleaner formatting (multiple errors)
           // TODO these should be translated
           const message = mutationErrors.map((e) => e.message).join(", ");
-          notifyError(t("errors.formValidationError", { message }));
+          errorToast({ text: t("errors.formValidationError", { message }) });
         }
       } else {
-        notifyError(t("errors.errorRejectingApplication"));
+        errorToast({ text: t("errors.errorRejectingApplication") });
       }
     }
   };
@@ -862,7 +859,6 @@ function ApplicationDetails({
 }): JSX.Element | null {
   const ref = useRef<HTMLHeadingElement>(null);
   const { t } = useTranslation();
-  const { notifyError } = useNotification();
 
   const typename = "ApplicationNode";
   const id = base64encode(`${typename}:${applicationPk}`);
@@ -875,7 +871,7 @@ function ApplicationDetails({
     skip: !(applicationPk > 0),
     variables: { id },
     onError: () => {
-      notifyError(t("errors.errorFetchingApplication"));
+      errorToast({ text: t("errors.errorFetchingApplication") });
     },
   });
 

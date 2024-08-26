@@ -12,13 +12,14 @@ import {
 } from "@gql/gql-types";
 import NotificationWrapper from "common/src/components/NotificationWrapper";
 import { useCurrentUser } from "@/hooks/user";
-import { BlackButton, Toast } from "@/styles/util";
+import { BlackButton } from "@/styles/util";
 import { useOrder, useDeleteReservation } from "@/hooks/reservation";
 import { getCheckoutUrl } from "@/modules/reservation";
 import { filterNonNullable } from "common/src/helpers";
 import { reservationUnitPrefix } from "@/modules/const";
 import { ApolloError } from "@apollo/client";
 import { toApiDate } from "common/src/common/util";
+import { errorToast, successToast } from "common/src/common/toast";
 
 type QueryT = NonNullable<ListReservationsQuery["reservations"]>;
 type EdgeT = NonNullable<QueryT["edges"][number]>;
@@ -212,17 +213,13 @@ export function InProgressReservationNotification() {
   });
   const checkoutUrl = getCheckoutUrl(order, i18n.language);
 
-  if (deleted) {
-    return (
-      <Toast
-        type="success"
-        position="top-center"
-        dismissible
-        label={t("notification:waitingForPayment.reservationCancelledTitle")}
-        closeButtonLabelText={t("common:close")}
-      />
-    );
-  }
+  useEffect(() => {
+    if (deleted) {
+      successToast({
+        text: t("notification:waitingForPayment.reservationCancelledTitle"),
+      });
+    }
+  }, [deleted, t]);
 
   // NOTE don't need to invalidate the cache on reservations list page because Created is not shown on it.
   // how about WaitingForPayment?
@@ -285,19 +282,13 @@ export function InProgressReservationNotification() {
     router.push(url);
   };
 
-  if (deleteError && !isNotFoundError(deleteError)) {
-    return (
-      <Toast
-        type="error"
-        position="top-center"
-        dismissible
-        label={t("common:error.error")}
-        closeButtonLabelText={t("common:close")}
-      >
-        <span>{t("errors:general_error")}</span>
-      </Toast>
-    );
-  }
+  useEffect(() => {
+    if (deleteError && !isNotFoundError(deleteError)) {
+      errorToast({
+        text: t("errors:general_error"),
+      });
+    }
+  }, [deleteError, t]);
 
   // We want to only show the most recent reservation one of each type
   const list = filterNonNullable([unpaidReservation, createdReservation]);

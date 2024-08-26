@@ -14,7 +14,7 @@ import { filterNonNullable } from "common/src/helpers";
 import { applicationRoundUrl } from "@/common/urls";
 import { formatDate } from "@/common/util";
 import { Accordion } from "@/common/hds-fork/Accordion";
-import { useNotification } from "@/context/NotificationContext";
+import { errorToast } from "common/src/common/toast";
 import { Container } from "@/styles/layout";
 import { truncate } from "@/helpers";
 import Loader from "@/component/Loader";
@@ -81,12 +81,11 @@ function RoundsAccordion({
 
 function AllApplicationRounds(): JSX.Element | null {
   const { t } = useTranslation();
-  const { notifyError } = useNotification();
 
   // TODO pagination
   const { data, loading } = useApplicationRoundsQuery({
     onError: (err: ApolloError) => {
-      notifyError(err.message);
+      errorToast({ text: err.message });
     },
   });
 

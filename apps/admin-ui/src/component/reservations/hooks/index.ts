@@ -1,5 +1,4 @@
 import { useTranslation } from "react-i18next";
-import { useNotification } from "app/context/NotificationContext";
 import {
   ReservationStateChoice,
   type ReservationStaffModifyMutationInput,
@@ -8,6 +7,7 @@ import {
   useUpdateStaffReservationMutation,
 } from "@gql/gql-types";
 import { useRecurringReservations } from "../requested/hooks";
+import { errorToast, successToast } from "common/src/common/toast";
 
 export type MutationInputParams = ReservationStaffModifyMutationInput & {
   seriesName?: string;
@@ -24,7 +24,7 @@ export function useStaffReservationMutation({
   onSuccess: () => void;
 }) {
   const { t } = useTranslation();
-  const { notifyError, notifySuccess } = useNotification();
+
   const [mutation] = useUpdateStaffReservationMutation();
 
   const { reservations } = useRecurringReservations(
@@ -37,11 +37,11 @@ export function useStaffReservationMutation({
     const trKey = `Reservation.EditPage.${
       isRecurring ? "saveSuccessRecurring" : "saveSuccess"
     }`;
-    notifySuccess(t(trKey));
+    successToast({ text: t(trKey) });
     onSuccess();
   };
   const handleError = () => {
-    notifyError(t("Reservation.EditPage.saveError"));
+    errorToast({ text: t("Reservation.EditPage.saveError") });
   };
 
   const editStaffReservation = async (input: MutationInputParams) => {

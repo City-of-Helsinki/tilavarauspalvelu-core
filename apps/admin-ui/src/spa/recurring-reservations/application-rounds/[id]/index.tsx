@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useApplicationRoundQuery } from "@gql/gql-types";
-import { useNotification } from "@/context/NotificationContext";
+import { errorToast } from "common/src/common/toast";
 import Loader from "@/component/Loader";
 import { Review } from "./review/Review";
 import usePermission from "@/hooks/usePermission";
@@ -11,7 +11,6 @@ import { base64encode } from "common/src/helpers";
 import { isApplicationRoundInProgress } from "@/helpers";
 
 function ApplicationRound({ pk }: { pk: number }): JSX.Element {
-  const { notifyError } = useNotification();
   const { t } = useTranslation();
   const [isInProgress, setIsInProgress] = useState(false);
 
@@ -23,7 +22,7 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
     variables: { id },
     pollInterval: isInProgress ? 10000 : 0,
     onError: () => {
-      notifyError(t("errors.errorFetchingData"));
+      errorToast({ text: t("errors.errorFetchingData") });
     },
   });
   const { applicationRound } = data ?? {};

@@ -14,7 +14,7 @@ import {
 import { PopupMenu } from "@/component/PopupMenu";
 import { getResourceUrl } from "@/common/urls";
 import { CustomTable, TableLink } from "../Table";
-import { useNotification } from "@/context/NotificationContext";
+import { errorToast, successToast } from "common/src/common/toast";
 import { truncate } from "common/src/helpers";
 import { MAX_NAME_LENGTH } from "@/common/const";
 
@@ -46,8 +46,6 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
   const { t } = useTranslation();
 
   const history = useNavigate();
-
-  const { notifyError, notifySuccess } = useNotification();
 
   const [resourceWaitingForDelete, setResourceWaitingForDelete] =
     useState<ResourceNode | null>(null);
@@ -128,11 +126,11 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
             }
             try {
               await deleteResource(resourceWaitingForDelete.pk);
-              notifySuccess(t("ResourceTable.removeSuccess"));
+              successToast({ text: t("ResourceTable.removeSuccess") });
               setResourceWaitingForDelete(null);
               refetch();
             } catch (error) {
-              notifyError(t("ResourceTable.removeFailed"));
+              errorToast({ text: t("ResourceTable.removeFailed") });
             }
           }}
         />

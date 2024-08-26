@@ -13,9 +13,9 @@ import Loader from "@/component/Loader";
 import { ReservationUnitCalendarView } from "./ReservationUnitCalendarView";
 import { UnitReservations } from "./UnitReservations";
 import { TabHeader, Tabs } from "@/component/Tabs";
-import { useNotification } from "@/context/NotificationContext";
 import { useUnitViewQuery } from "@gql/gql-types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
+import { errorToast } from "common/src/common/toast";
 
 type Params = {
   unitId: string;
@@ -67,15 +67,15 @@ export function MyUnitView() {
     },
   ];
 
-  const { notifyError } = useNotification();
-
   const isPkValid = pk != null && Number(pk) > 0;
   const id = base64encode(`UnitNode:${pk}`);
   const { loading, data } = useUnitViewQuery({
     skip: !isPkValid,
     variables: { id },
     onError: (err) => {
-      notifyError(err.message);
+      errorToast({
+        text: err.message,
+      });
     },
   });
 

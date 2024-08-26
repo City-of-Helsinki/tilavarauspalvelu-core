@@ -24,7 +24,6 @@ import { Filters } from "./Filters";
 import { ApplicationEventDataLoader } from "./ApplicationEventDataLoader";
 import { TimeSlotDataLoader } from "./AllocatedEventDataLoader";
 import { ApolloQueryResult, gql } from "@apollo/client";
-import { useNotification } from "@/context/NotificationContext";
 import {
   getPermissionErrors,
   getValidationErrors,
@@ -34,6 +33,7 @@ import { Permission } from "@/modules/permissionHelper";
 import { isApplicationRoundInProgress } from "@/helpers";
 import { breakpoints } from "common";
 import RejectedOccurrencesDataLoader from "./RejectedOccurrencesDataLoader";
+import { errorToast } from "common/src/common/toast";
 
 const HeadingContainer = styled.div`
   display: flex;
@@ -117,7 +117,7 @@ function EndAllocation({
   const isInProgress = isApplicationRoundInProgress(applicationRound);
 
   const { t } = useTranslation();
-  const { notifyError } = useNotification();
+
   const [mutation] = useEndAllocationMutation();
 
   const handleEndAllocation = async () => {
@@ -131,19 +131,23 @@ function EndAllocation({
     } catch (err) {
       const errors = getValidationErrors(err);
       if (getPermissionErrors(err).length > 0) {
-        notifyError(t("errors.noPermission"));
+        errorToast({ text: t("errors.noPermission") });
       } else if (errors.length > 0) {
         const unhandledCode = "APPLICATION_ROUND_HAS_UNHANDLED_APPLICATIONS";
         const notInAllocationCode = "APPLICATION_ROUND_NOT_IN_ALLOCATION";
         if (errors.some((e) => e.code === unhandledCode)) {
-          notifyError(t("errors.errorEndingAllocationUnhandledApplications"));
+          errorToast({
+            text: t("errors.errorEndingAllocationUnhandledApplications"),
+          });
         } else if (errors.some((e) => e.code === notInAllocationCode)) {
-          notifyError(t("errors.errorEndingAllocationNotInAllocation"));
+          errorToast({
+            text: t("errors.errorEndingAllocationNotInAllocation"),
+          });
         } else {
-          notifyError(t("errors.errorEndingAllocation"));
+          errorToast({ text: t("errors.errorEndingAllocation") });
         }
       } else {
-        notifyError(t("errors.errorEndingAllocation"));
+        errorToast({ text: t("errors.errorEndingAllocation") });
       }
     }
     // refetch even on errors (if somebody else has ended the allocation)
@@ -151,7 +155,7 @@ function EndAllocation({
   };
 
   const handleSendResults = () => {
-    notifyError("TODO: not implemented handleSendResults");
+    errorToast({ text: "TODO: not implemented handleSendResults" });
   };
 
   const hasFailed =

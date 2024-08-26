@@ -3,10 +3,6 @@ import { MockedProvider } from "@apollo/client/testing";
 import { render, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ReservationNode } from "@gql/gql-types";
-import NotificationContextMock, {
-  notifyError,
-  notifySuccess,
-} from "@/__mocks__/NotificationContextMock";
 import { type MutationInputParams, useStaffReservationMutation } from ".";
 import {
   MUTATION_DATA,
@@ -55,9 +51,7 @@ describe("edit mutation hook single reservation", () => {
     const reservation = { ...mockReservation, pk };
     return render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <NotificationContextMock>
-          <TestComponent reservation={reservation} onSuccess={onSuccess} />
-        </NotificationContextMock>
+        <TestComponent reservation={reservation} onSuccess={onSuccess} />
       </MockedProvider>
     );
   };
@@ -70,8 +64,6 @@ describe("edit mutation hook single reservation", () => {
     await user.click(btn);
 
     await waitFor(() => expect(successCb).toHaveBeenCalled());
-    expect(notifyError).not.toHaveBeenCalled();
-    expect(notifySuccess).toHaveBeenCalled();
   });
 
   test("reservation failing with network error gets retried once", async () => {
@@ -82,8 +74,6 @@ describe("edit mutation hook single reservation", () => {
     await user.click(btn);
 
     await waitFor(() => expect(successCb).toHaveBeenCalled());
-    expect(notifyError).not.toHaveBeenCalled();
-    expect(notifySuccess).toHaveBeenCalled();
   });
 
   test("reservation failing with network error twice fails", async () => {
@@ -93,9 +83,7 @@ describe("edit mutation hook single reservation", () => {
     const user = userEvent.setup();
     await user.click(btn);
 
-    await waitFor(() => expect(notifyError).toHaveBeenCalled());
     expect(successCb).not.toHaveBeenCalled();
-    expect(notifySuccess).not.toHaveBeenCalled();
   });
 
   // FIXME fails with missing pk 111 in the mocks
@@ -107,9 +95,7 @@ describe("edit mutation hook single reservation", () => {
     await user.click(btn);
 
     // TODO should check the error message also
-    await waitFor(() => expect(notifyError).toHaveBeenCalled());
     expect(successCb).not.toHaveBeenCalled();
-    expect(notifySuccess).not.toHaveBeenCalled();
   });
 
   // FIXME fails with missing pk 666 in the mocks
@@ -121,9 +107,7 @@ describe("edit mutation hook single reservation", () => {
     await user.click(btn);
 
     // TODO should check the error message also
-    await waitFor(() => expect(notifyError).toHaveBeenCalled());
     expect(successCb).not.toHaveBeenCalled();
-    expect(notifySuccess).not.toHaveBeenCalled();
   });
 });
 
@@ -145,13 +129,11 @@ describe("edit mutation hook recurring reservation", () => {
     };
     return render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <NotificationContextMock>
-          <TestComponent
-            reservation={reservation}
-            onSuccess={onSuccess}
-            seriesName="Modify recurring name"
-          />
-        </NotificationContextMock>
+        <TestComponent
+          reservation={reservation}
+          onSuccess={onSuccess}
+          seriesName="Modify recurring name"
+        />
       </MockedProvider>
     );
   };
@@ -163,9 +145,7 @@ describe("edit mutation hook recurring reservation", () => {
     const user = userEvent.setup();
     await user.click(btn);
 
-    await waitFor(() => expect(notifySuccess).toHaveBeenCalled());
     expect(successCb).toHaveBeenCalled();
-    expect(notifyError).not.toHaveBeenCalled();
   });
 
   // FIXME causes Apollo error to be logged in console
@@ -177,8 +157,6 @@ describe("edit mutation hook recurring reservation", () => {
     await user.click(btn);
 
     await waitFor(() => expect(successCb).toHaveBeenCalled());
-    expect(notifyError).not.toHaveBeenCalled();
-    expect(notifySuccess).toHaveBeenCalled();
   });
 
   // FIXME broken still
@@ -189,9 +167,7 @@ describe("edit mutation hook recurring reservation", () => {
     const user = userEvent.setup();
     await user.click(btn);
 
-    await waitFor(() => expect(notifyError).toHaveBeenCalled());
     expect(successCb).not.toHaveBeenCalled();
-    expect(notifySuccess).not.toHaveBeenCalled();
   });
 
   test.todo("all already denied should fail mutations");

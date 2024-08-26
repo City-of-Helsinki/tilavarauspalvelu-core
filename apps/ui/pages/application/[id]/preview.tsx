@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import {
@@ -13,12 +13,12 @@ import { ButtonContainer, CenterSpinner } from "@/components/common/common";
 import { ViewInner } from "@/components/application/ViewInner";
 import { createApolloClient } from "@/modules/apolloClient";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
-import { ErrorToast } from "@/components/common/ErrorToast";
 import {
   getCommonServerSideProps,
   getGenericTerms,
 } from "@/modules/serverUtils";
 import { base64encode } from "common/src/helpers";
+import { errorToast } from "common/src/common/toast";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -83,6 +83,13 @@ function Preview(props: PropsNarrowed): JSX.Element {
     // TODO error
   };
 
+  useEffect(() => {
+    mutationError &&
+      errorToast({
+        text: t("common:error.mutationError"),
+      });
+  }, [mutationError, t]);
+
   if (pk == null) {
     return <Error statusCode={404} />;
   }
@@ -107,7 +114,6 @@ function Preview(props: PropsNarrowed): JSX.Element {
       translationKeyPrefix="application:preview"
       application={application}
     >
-      {mutationError && <ErrorToast error={t("common:error.mutationError")} />}
       <form onSubmit={onSubmit}>
         <ViewInner
           application={application}

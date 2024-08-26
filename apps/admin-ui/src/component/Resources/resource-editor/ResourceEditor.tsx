@@ -15,7 +15,7 @@ import { base64encode } from "common/src/helpers";
 import Loader from "@/component/Loader";
 import { ButtonContainer, Container, IngressContainer } from "@/styles/layout";
 import { SubPageHead } from "@/component/Unit/SubPageHead";
-import { useNotification } from "@/context/NotificationContext";
+import { errorToast, successToast } from "common/src/common/toast";
 import { FormErrorSummary } from "@/common/FormErrorSummary";
 import {
   Editor,
@@ -32,14 +32,13 @@ type Props = {
 export function ResourceEditor({ resourcePk, unitPk }: Props) {
   const history = useNavigate();
   const { t } = useTranslation();
-  const { notifySuccess, notifyError } = useNotification();
 
   const { data: unitData, loading: isUnitLoading } =
     useUnitWithSpacesAndResourcesQuery({
       variables: { id: base64encode(`UnitNode:${unitPk}`) },
       skip: !unitPk || Number.isNaN(unitPk),
       onError: (e) => {
-        notifyError(t("errors.errorFetchingData", { error: e }));
+        errorToast({ text: t("errors.errorFetchingData", { error: e }) });
       },
     });
 
@@ -51,7 +50,7 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
     variables: { id: base64encode(`ResourceNode:${resourcePk}`) },
     skip: !resourcePk || Number.isNaN(resourcePk),
     onError: (e) => {
-      notifyError(t("errors.errorFetchingData", { error: e }));
+      errorToast({ text: t("errors.errorFetchingData", { error: e }) });
     },
   });
 
@@ -105,13 +104,13 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
         locationType: LocationType.Fixed,
       });
 
-      notifySuccess(
-        t("ResourceEditor.resourceUpdatedNotification"),
-        t("ResourceEditor.resourceUpdated")
-      );
+      successToast({
+        text: t("ResourceEditor.resourceUpdatedNotification"),
+        label: t("ResourceEditor.resourceUpdated"),
+      });
       history(-1);
     } catch (error) {
-      notifyError(t("ResourceModal.saveError"));
+      errorToast({ text: t("ResourceModal.saveError") });
     }
   };
 

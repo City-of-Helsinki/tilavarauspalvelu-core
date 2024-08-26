@@ -11,12 +11,12 @@ import {
   doesIntervalCollide,
   reservationToInterval,
 } from "@/helpers";
-import { useNotification } from "@/context/NotificationContext";
 import { type NewReservationListItem } from "@/component/ReservationsList";
 import { convertToDate } from "../utils";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { gql } from "@apollo/client";
+import { errorToast } from "common/src/common/toast";
 
 // TODO this is only used for RecurringReservationForm, why? (the above query + hook also)
 
@@ -97,8 +97,6 @@ function useReservationsInInterval({
   reservationUnitPk?: number;
   reservationType: ReservationTypeChoice;
 }) {
-  const { notifyError } = useNotification();
-
   const apiStart = toApiDate(begin);
   // NOTE backend error, it returns all till 00:00 not 23:59
   const apiEnd = toApiDate(addDays(end, 1));
@@ -122,7 +120,7 @@ function useReservationsInInterval({
     },
     fetchPolicy: "no-cache",
     onError: (err) => {
-      notifyError(err.message);
+      errorToast({ text: err.message });
     },
   });
 

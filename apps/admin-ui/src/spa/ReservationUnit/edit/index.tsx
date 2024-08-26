@@ -57,7 +57,7 @@ import {
   VerticalFlex,
 } from "@/styles/layout";
 import Loader from "@/component/Loader";
-import { useNotification } from "@/context/NotificationContext";
+import { errorToast, successToast } from "common/src/common/toast";
 import { useModal } from "@/context/ModalContext";
 import { parseAddress, getTranslatedError } from "@/common/util";
 import Error404 from "@/common/Error404";
@@ -1864,7 +1864,6 @@ function ReservationUnitEditor({
   // ----------------------------- State and Hooks ----------------------------
   const { t } = useTranslation();
   const history = useNavigate();
-  const { notifySuccess, notifyError } = useNotification();
   const { setModalContent } = useModal();
   const [reconcileImageChanges] = useImageMutations();
 
@@ -1878,7 +1877,7 @@ function ReservationUnitEditor({
     onError: (e) => {
       // eslint-disable-next-line no-console
       console.error(e);
-      notifyError(t("errors.errorFetchingData"));
+      errorToast({ text: t("errors.errorFetchingData") });
     },
   });
 
@@ -1886,7 +1885,7 @@ function ReservationUnitEditor({
     onError: (e) => {
       // eslint-disable-next-line no-console
       console.error(e);
-      notifyError(t("errors.errorFetchingData"));
+      errorToast({ text: t("errors.errorFetchingData") });
     },
   });
 
@@ -1945,9 +1944,11 @@ function ReservationUnitEditor({
 
       const { data, errors: mutationErrors } = await promise;
       if (mutationErrors != null) {
-        notifyError(
-          t("ReservationUnitEditor.saveFailed", { error: mutationErrors })
-        );
+        errorToast({
+          text: t("ReservationUnitEditor.saveFailed", {
+            error: mutationErrors,
+          }),
+        });
         return undefined;
       }
 
@@ -1978,9 +1979,9 @@ function ReservationUnitEditor({
             formValues.pk === 0
               ? "ReservationUnitEditor.reservationUnitCreatedNotification"
               : "ReservationUnitEditor.reservationUnitUpdatedNotification";
-          notifySuccess(t(tkey, { name: getValues("nameFi") }));
+          successToast({ text: t(tkey, { name: getValues("nameFi") }) });
         } else {
-          notifyError("ReservationUnitEditor.imageSaveFailed");
+          errorToast({ text: "ReservationUnitEditor.imageSaveFailed" });
           return undefined;
         }
       } else {
@@ -1988,7 +1989,7 @@ function ReservationUnitEditor({
         console.warn(
           "saved but, pk was not defined in mutation response: so images are not saved"
         );
-        notifyError("ReservationUnitEditor.imageSaveFailed");
+        errorToast({ text: "ReservationUnitEditor.imageSaveFailed" });
         return undefined;
       }
       refetch();
@@ -2012,16 +2013,18 @@ function ReservationUnitEditor({
                     str += `${e.message}\n`;
                   }
                 }
-                notifyError(
-                  t("ReservationUnitEditor.saveFailed", { error: str })
-                );
+                errorToast({
+                  text: t("ReservationUnitEditor.saveFailed", { error: str }),
+                });
                 return undefined;
               }
             }
           }
         }
       }
-      notifyError(t("ReservationUnitEditor.saveFailed", { error: "" }));
+      errorToast({
+        text: t("ReservationUnitEditor.saveFailed", { error: "" }),
+      });
     }
     return undefined;
   };
@@ -2045,7 +2048,7 @@ function ReservationUnitEditor({
     try {
       await handleSubmit(onSubmit)();
       setModalContent(null);
-      notifySuccess(t("ArchiveReservationUnitDialog.success"));
+      successToast({ text: t("ArchiveReservationUnitDialog.success") });
       history(`/unit/${unit?.pk}`);
     } catch (e) {
       // eslint-disable-next-line no-console

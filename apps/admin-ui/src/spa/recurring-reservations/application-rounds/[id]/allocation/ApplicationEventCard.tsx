@@ -22,7 +22,7 @@ import { useFocusAllocatedSlot, useFocusApplicationEvent } from "./hooks";
 import { PopupMenu } from "@/component/PopupMenu";
 import { type ApolloQueryResult } from "@apollo/client";
 import { getApplicationSectionUrl } from "@/common/urls";
-import { useNotification } from "@/context/NotificationContext";
+import { errorToast } from "common/src/common/toast";
 import { getApplicantName } from "@/helpers";
 
 export type AllocationApplicationSectionCardType =
@@ -294,8 +294,6 @@ function SchedulesList({
     (ruo) => ruo.reservationUnit?.pk === currentReservationUnit.pk
   );
 
-  const { notifyError } = useNotification();
-
   const updateOption = async (
     pk: Maybe<number> | undefined,
     locked: boolean
@@ -317,7 +315,7 @@ function SchedulesList({
       });
       refetch();
     } catch (e) {
-      notifyError(t("errors.mutationFailed"));
+      errorToast({ text: t("errors.mutationFailed") });
     }
   };
 

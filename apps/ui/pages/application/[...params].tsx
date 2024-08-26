@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { ApolloError } from "@apollo/client";
 import Error from "next/error";
 import { FormProvider, useForm } from "react-hook-form";
@@ -20,7 +20,6 @@ import {
 import { getValidationErrors } from "common/src/apolloUtils";
 import useReservationUnitsList from "@/hooks/useReservationUnitList";
 import { useApplicationUpdate } from "@/hooks/useApplicationUpdate";
-import { ErrorToast } from "@/components/common/ErrorToast";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { base64encode } from "common/src/helpers";
 import { createApolloClient } from "@/modules/apolloClient";
@@ -29,6 +28,7 @@ import {
   type ApplicationQuery,
   type ApplicationQueryVariables,
 } from "common/gql/gql-types";
+import { errorToast } from "common/src/common/toast";
 
 // TODO move this to a shared file
 // and combine all the separate error handling functions to one
@@ -221,9 +221,16 @@ function ApplicationRootPage({ slug, data }: PropsNarrowed): JSX.Element {
   const errorTranslated =
     errorMessage !== "" ? t(`errors:applicationMutation.${errorMessage}`) : "";
 
+  useEffect(() => {
+    if (errorTranslated !== "") {
+      errorToast({
+        text: errorTranslated,
+      });
+    }
+  }, [errorTranslated, t]);
+
   return (
     <FormProvider {...form}>
-      {errorTranslated !== "" && <ErrorToast error={errorTranslated} />}
       {pageId === "page1" ? (
         <ApplicationPageWrapper
           overrideText={applicationRoundName}
