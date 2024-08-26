@@ -9,6 +9,7 @@ from reservation_units.pricing_updates import update_reservation_unit_pricings
 from reservation_units.tasks import update_reservation_unit_pricings_tax_percentage
 from tests.factories import ReservationUnitFactory, ReservationUnitPricingFactory
 from tests.helpers import patch_method
+from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 from utils.sentry import SentryLogger
 
 # Applied to all tests
@@ -22,7 +23,13 @@ pytestmark = [
 ####################################
 
 
-def test_reservation_unit__update_pricings__updated():
+def test_reservation_unit__update_pricings__updated(settings):
+    # Enable audit logging for ReservationUnitPricing
+    # This tests for regression for a bug that was found during manual testing,
+    # where this task ran fine in tests but not on the server.
+    settings.AUDIT_LOGGING_ENABLED = True
+    AuditLogger.register(ReservationUnitPricing)
+
     reservation_unit = ReservationUnitFactory.create(name="Unit that should be updated")
     ReservationUnitPricingFactory.create(
         begins=datetime.date(2022, 1, 1),
