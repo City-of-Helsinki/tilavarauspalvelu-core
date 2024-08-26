@@ -12,6 +12,7 @@ from django.utils.translation import gettext_lazy as _
 from common.date_utils import local_datetime
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from merchants.enums import Language, OrderStatus, PaymentType
+from merchants.verkkokauppa.order.exceptions import CancelOrderError
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
 from merchants.verkkokauppa.payment.types import Payment
 from merchants.verkkokauppa.payment.types import PaymentStatus as WebShopPaymentStatus
@@ -22,6 +23,7 @@ from utils.sentry import SentryLogger
 if TYPE_CHECKING:
     import uuid
 
+    from merchants.verkkokauppa.order.types import Order
     from reservations.models import Reservation
 
 
@@ -94,6 +96,13 @@ class PaymentOrder(models.Model):
             SentryLogger.log_exception(err, details="Fetching order payment failed.", remote_id=self.remote_id)
             raise
 
+    def cancel_order_in_webshop(self) -> Order | None:
+        try:
+            return VerkkokauppaAPIClient.cancel_order(order_uuid=self.remote_id, user_uuid=self.reservation_user_uuid)
+        except CancelOrderError as err:
+            SentryLogger.log_exception(err, details="Canceling order failed.", remote_id=self.remote_id)
+            raise
+
     def get_order_status_from_webshop_response(self, webshop_payment: Payment | None) -> OrderStatus:
         """Determines the order status based on the payment response from the webshop."""
         # Statuses PAID, PAID_MANUALLY and REFUNDED are "final" and should not be updated from the webshop.
@@ -146,3 +155,9 @@ class PaymentOrder(models.Model):
             self.reservation.state = ReservationStateChoice.CONFIRMED
             self.reservation.save(update_fields=["state"])
             ReservationEmailNotificationSender.send_confirmation_email(reservation=self.reservation)
+
+    def refresh_order_status_from_webshop(self):
+        """Fetches the payment status from the webshop and updates the PaymentOrder status accordingly."""
+        webshop_payment: Payment | None = self.get_order_payment_from_webshop()
+        new_status: OrderStatus = self.get_order_status_from_webshop_response(webshop_payment)
+        self.update_order_status(new_status, webshop_payment.payment_id if webshop_payment else "")
