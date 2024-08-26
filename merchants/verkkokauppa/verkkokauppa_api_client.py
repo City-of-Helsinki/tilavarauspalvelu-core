@@ -196,7 +196,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             if refund_count == 1:
                 return Refund.from_json(response_json["refunds"][0])
             SentryLogger.log_message(
-                message="Call to Payment Experience API refund endpoint failed, too many refunds in response.",
+                message="Call to Payment Experience API refund endpoint failed, wrong amount of refunds in response.",
                 details=f"Response contains {refund_count} refunds instead of one. Response body: {response.text}",
                 level="error",
             )
