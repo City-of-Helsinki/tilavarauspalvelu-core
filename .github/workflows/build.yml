@@ -57,6 +57,11 @@ jobs:
           type=ref,event=tag,priority=3
           type=sha,priority=2
           type=ref,event=branch,priority=1
+        labels: |
+          org.opencontainers.image.title=Tilavarauspalvelu Core
+          org.opencontainers.image.description=Tilavarauspalvelu backend service version ${{ github.ref_name }} (${{ github.sha }}).
+          org.opencontainers.image.version=${{ github.ref_name }}
+          org.opencontainers.image.revision=${{ github.sha }}
 
     - name: "Build backend container"
       uses: docker/build-push-action@v6
