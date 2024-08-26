@@ -5,13 +5,12 @@ from django.core.exceptions import ValidationError
 from graphene_django_extensions import CreateMutation, DeleteMutation, UpdateMutation
 
 from api.graphql.types.merchants.types import PaymentOrderNode
+from common.date_utils import local_datetime
 from common.typing import AnyUser
 from merchants.enums import OrderStatus
 from merchants.verkkokauppa.order.exceptions import CancelOrderError
-from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.enums import ReservationStateChoice
 from reservations.models import Reservation
-from utils.sentry import SentryLogger
 
 from .permissions import (
     ReservationCommentPermission,
@@ -142,6 +141,7 @@ class ReservationDeleteMutation(DeleteMutation):
 
     @classmethod
     def validate_deletion(cls, reservation: Reservation, user: AnyUser) -> None:
+        # Check Reservation state
         if reservation.state not in ReservationStateChoice.states_that_can_be_cancelled:
             msg = (
                 f"Reservation which is not in {ReservationStateChoice.states_that_can_be_cancelled} "
@@ -149,19 +149,26 @@ class ReservationDeleteMutation(DeleteMutation):
             )
             raise ValidationError(msg)
 
+        # Verify PaymentOrder status from the webshop
         payment_order: PaymentOrder = reservation.payment_order.first()
-        if payment_order and payment_order.remote_id and payment_order.status != OrderStatus.CANCELLED.value:
-            try:
-                webshop_order = VerkkokauppaAPIClient.cancel_order(
-                    order_uuid=payment_order.remote_id,
-                    user_uuid=payment_order.reservation_user_uuid,
-                )
+        if payment_order and payment_order.remote_id:
+            payment_order.refresh_order_status_from_webshop()
 
-                if webshop_order and webshop_order.status == "cancelled":
-                    payment_order.status = OrderStatus.CANCELLED
-                    payment_order.save()
+            # If the PaymentOrder is marked as paid, prevent the deletion.
+            if payment_order.status == OrderStatus.PAID:
+                msg = "Reservation which is paid cannot be deleted."
+                raise ValidationError(msg)
 
-            except CancelOrderError as err:
-                SentryLogger.log_exception(err, details="Order cancellation failed", remote_id=payment_order.remote_id)
+            if payment_order.status in OrderStatus.can_be_cancelled_statuses:
+                # Status should be updated if the webshop call errors or the order is successfully cancelled
+                # When the webshop returns any other status than "cancelled", the payment_order status is not updated
+                try:
+                    webshop_order = payment_order.cancel_order_in_webshop()
+                    if not webshop_order or webshop_order.status != "cancelled":
+                        return
+                except CancelOrderError:
+                    pass
+
                 payment_order.status = OrderStatus.CANCELLED
-                payment_order.save()
+                payment_order.processed_at = local_datetime()
+                payment_order.save(update_fields=["status", "processed_at"])
