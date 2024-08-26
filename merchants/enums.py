@@ -35,6 +35,13 @@ class OrderStatus(models.TextChoices):
             OrderStatus.CANCELLED,
         ]
 
+    @classproperty
+    def can_be_cancelled_statuses(cls) -> list[OrderStatus]:
+        return [
+            OrderStatus.DRAFT,
+            OrderStatus.EXPIRED,
+        ]
+
 
 class OrderStatusWithFree(models.TextChoices):
     """Same as OrderStatus, but includes the 'FREE' option used for filtering reservations without payments."""
