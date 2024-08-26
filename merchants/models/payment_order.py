@@ -12,7 +12,12 @@ from django.utils.translation import gettext_lazy as _
 from common.date_utils import local_datetime
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from merchants.enums import Language, OrderStatus, PaymentType
+from merchants.verkkokauppa.payment.exceptions import GetPaymentError
+from merchants.verkkokauppa.payment.types import Payment
+from merchants.verkkokauppa.payment.types import PaymentStatus as WebShopPaymentStatus
+from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.enums import ReservationStateChoice
+from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
     import uuid
@@ -81,6 +86,41 @@ class PaymentOrder(models.Model):
             return None
 
         return self.created_at + datetime.timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
+
+    def get_order_payment_from_webshop(self) -> Payment | None:
+        try:
+            return VerkkokauppaAPIClient.get_payment(order_uuid=self.remote_id)
+        except GetPaymentError as err:
+            SentryLogger.log_exception(err, details="Fetching order payment failed.", remote_id=self.remote_id)
+            raise
+
+    def get_order_status_from_webshop_response(self, webshop_payment: Payment | None) -> OrderStatus:
+        """Determines the order status based on the payment response from the webshop."""
+        # Statuses PAID, PAID_MANUALLY and REFUNDED are "final" and should not be updated from the webshop.
+        if self.status in (OrderStatus.REFUNDED, OrderStatus.PAID, OrderStatus.PAID_MANUALLY):
+            return OrderStatus(self.status)
+
+        older_than_minutes = settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES
+        webshop_payment_expires_at = local_datetime() - datetime.timedelta(minutes=older_than_minutes)
+
+        if webshop_payment:
+            if webshop_payment.status == WebShopPaymentStatus.CANCELLED.value:
+                return OrderStatus.CANCELLED
+            if webshop_payment.status == WebShopPaymentStatus.PAID_ONLINE.value:
+                return OrderStatus.PAID
+            if (
+                webshop_payment.status == WebShopPaymentStatus.CREATED.value
+                and webshop_payment.timestamp
+                and webshop_payment.timestamp > webshop_payment_expires_at
+            ):
+                # User has entered payment phase in webshop (Payment is created but not yet paid),
+                # give more time to complete the payment before marking the order as expired.
+                return OrderStatus.DRAFT
+        elif not webshop_payment and self.expires_at > local_datetime():
+            # User has not entered payment phase in webshop within the expiration time
+            return OrderStatus.DRAFT
+
+        return OrderStatus.EXPIRED
 
     def update_order_status(self, new_status: OrderStatus, payment_id: str = "") -> None:
         """

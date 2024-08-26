@@ -6,14 +6,10 @@ from graphene_django_extensions.bases import DjangoMutation
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from api.graphql.types.merchants.permissions import OrderRefreshPermission
 from api.graphql.types.merchants.serializers import RefreshOrderInputSerializer, RefreshOrderOutputSerializer
-from common.date_utils import local_datetime
 from common.typing import GQLInfo
-from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from merchants.enums import OrderStatus
 from merchants.models import PaymentOrder
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
-from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from reservations.enums import ReservationStateChoice
 from utils.sentry import SentryLogger
 
 
@@ -45,8 +41,8 @@ class RefreshOrderMutation(DjangoMutation):
             )
 
         try:
-            payment = VerkkokauppaAPIClient.get_payment(order_uuid=remote_id)
-            if not payment:
+            webshop_payment = payment_order.get_order_payment_from_webshop()
+            if not webshop_payment:
                 SentryLogger.log_message(
                     message="Verkkokauppa: Order payment check failed",
                     details=f"Order payment check failed: payment not found ({remote_id}).",
@@ -54,27 +50,13 @@ class RefreshOrderMutation(DjangoMutation):
                 )
                 msg = "Unable to check order payment"
                 raise ValidationErrorWithCode(msg, ValidationErrorCodes.NOT_FOUND)
-
         except GetPaymentError as error:
-            SentryLogger.log_exception(error, details="Order payment check failed", remote_id=remote_id)
             msg = "Unable to check order payment: problem with external service"
             raise ValidationErrorWithCode(msg, ValidationErrorCodes.EXTERNAL_SERVICE_ERROR) from error
 
-        payment_order.payment_id = payment.payment_id
-        payment_order.processed_at = local_datetime()
-
-        if payment.status == "payment_cancelled" and payment_order.status is not OrderStatus.CANCELLED:
-            payment_order.status = OrderStatus.CANCELLED
-            payment_order.save()
-
-        if payment.status == "payment_paid_online" and payment_order.status is not OrderStatus.PAID:
-            payment_order.status = OrderStatus.PAID
-            payment_order.save()
-
-            if payment_order.reservation.state == ReservationStateChoice.WAITING_FOR_PAYMENT:
-                payment_order.reservation.state = ReservationStateChoice.CONFIRMED
-                payment_order.reservation.save()
-                ReservationEmailNotificationSender.send_confirmation_email(reservation=payment_order.reservation)
+        new_status: OrderStatus = payment_order.get_order_status_from_webshop_response(webshop_payment)
+        if new_status in (OrderStatus.CANCELLED, OrderStatus.PAID):
+            payment_order.update_order_status(new_status, webshop_payment.payment_id)
 
         return RefreshOrderMutationOutput(
             order_uuid=payment_order.remote_id,
