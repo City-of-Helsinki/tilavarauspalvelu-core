@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from auditlog.models import LogEntry
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
+from social_django.models import UserSocialAuth
 
 from applications.enums import ApplicationStatusChoice
 from applications.models import Address, Application, ApplicationEvent, ApplicationSection, Person
@@ -33,11 +34,15 @@ def anonymize_user(user: User) -> None:
     user.is_active = False
     user.is_superuser = False
     user.is_staff = False
+    user.profile_id = ""
     user.save()
+
+    user.ad_groups.clear()
 
     GeneralRole.objects.filter(user=user).delete()
     ServiceSectorRole.objects.filter(user=user).delete()
     UnitRole.objects.filter(user=user).delete()
+    UserSocialAuth.objects.filter(user=user).delete()
 
 
 def anonymize_user_reservations(user: User) -> None:
