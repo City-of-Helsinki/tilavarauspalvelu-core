@@ -55,7 +55,7 @@ jobs:
         images: ${{ steps.repo.outputs.repo }}
         tags: |
           type=ref,event=tag,priority=3
-          type=sha,priority=2
+          type=sha,prefix=,priority=2
           type=ref,event=branch,priority=1
         labels: |
           org.opencontainers.image.title=Tilavarauspalvelu Core
