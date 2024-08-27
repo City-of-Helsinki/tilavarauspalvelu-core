@@ -8,6 +8,15 @@ export const prefixes = {
   reservationUnits: "/reservation-units",
 };
 
+export const reservationUnitsUrl = "/premises-and-settings/reservation-units";
+export const applicationRoundsUrl =
+  "/recurring-reservations/application-rounds";
+export const unitsUrl = "/premises-and-settings/units";
+export const bannerNotificationsUrl = "/messaging/notifications";
+export const requestedReservationsUrl = "/reservations/requested";
+export const allReservationsUrl = "/reservations/all";
+export const myUnitsUrl = "/my-units";
+
 export const applicationRoundUrl = (
   applicationRoundId: number | string
 ): string =>
@@ -69,8 +78,6 @@ export const unitUrl = (unitId: number): string => `/unit/${unitId}`;
 // fallback to root route instead of alerting on errors
 export const myUnitUrl = (unitId: number): string =>
   `/my-units/${!Number.isNaN(unitId) && unitId > 0 ? unitId : ""}`;
-
-export const reservationUnitsUrl = `/premises-and-settings/reservation-units`;
 
 // Weird why the other urls are not relative to PUBLIC_URL
 // This is passed as Link href

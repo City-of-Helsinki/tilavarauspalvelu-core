@@ -16,6 +16,15 @@ import usePermission from "@/hooks/usePermission";
 import { Permission } from "@/modules/permissionHelper";
 import Logo from "common/src/components/Logo";
 import { env } from "@/env.mjs";
+import {
+  allReservationsUrl,
+  applicationRoundsUrl,
+  bannerNotificationsUrl,
+  myUnitsUrl,
+  requestedReservationsUrl,
+  reservationUnitsUrl,
+  unitsUrl,
+} from "@/common/urls";
 
 type Props = {
   apiBaseUrl: string;
@@ -103,7 +112,7 @@ const getFilteredMenu = (
         {
           title: "MainMenu.myUnits",
           icon: <IconStar aria-hidden />,
-          route: "/my-units",
+          route: myUnitsUrl,
         },
       ]
     : []),
@@ -113,11 +122,11 @@ const getFilteredMenu = (
     ? [
         {
           title: "MainMenu.requestedReservations",
-          route: "/reservations/requested",
+          route: requestedReservationsUrl,
         },
         {
           title: "MainMenu.allReservations",
-          route: "/reservations/all",
+          route: allReservationsUrl,
         },
       ]
     : []),
@@ -126,7 +135,7 @@ const getFilteredMenu = (
     ? [
         {
           title: "MainMenu.applicationRounds",
-          route: "/recurring-reservations/application-rounds",
+          route: applicationRoundsUrl,
         },
       ]
     : []),
@@ -136,12 +145,12 @@ const getFilteredMenu = (
         {
           permission: Permission.CAN_MANAGE_RESERVATION_UNITS,
           title: "MainMenu.reservationUnits",
-          route: `/premises-and-settings/reservation-unit`,
+          route: reservationUnitsUrl,
         },
         {
           permission: Permission.CAN_MANAGE_UNITS,
           title: "MainMenu.units",
-          route: "/premises-and-settings/units",
+          route: unitsUrl,
         },
       ].filter((item) => hasPermission(item.permission))
     : []),
@@ -151,7 +160,7 @@ const getFilteredMenu = (
         {
           permission: Permission.CAN_MANAGE_BANNER_NOTIFICATIONS,
           title: "MainMenu.notifications",
-          route: "/messaging/notifications",
+          route: bannerNotificationsUrl,
         },
       ].filter((item) => hasPermission(item.permission))
     : []),
