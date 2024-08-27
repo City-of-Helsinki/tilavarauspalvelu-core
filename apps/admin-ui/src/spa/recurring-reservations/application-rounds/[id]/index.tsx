@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useApplicationRoundQuery } from "@gql/gql-types";
 import { errorToast } from "common/src/common/toast";
+import { UserPermissionChoice, useApplicationRoundQuery } from "@gql/gql-types";
 import Loader from "@/component/Loader";
 import { Review } from "./review/Review";
-import usePermission from "@/hooks/usePermission";
-import { Permission } from "@/modules/permissionHelper";
+import { usePermission } from "@/hooks/usePermission";
 import { base64encode } from "common/src/helpers";
 import { isApplicationRoundInProgress } from "@/helpers";
 
@@ -49,11 +48,11 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
 
   const canView = hasApplicationRoundPermission(
     applicationRound,
-    Permission.CAN_VALIDATE_APPLICATIONS
+    UserPermissionChoice.CanViewApplications
   );
   const canManage = hasApplicationRoundPermission(
     applicationRound,
-    Permission.CAN_MANAGE_APPLICATIONS
+    UserPermissionChoice.CanManageApplications
   );
   if (!canView && !canManage) {
     return <div>{t("errors.noPermission")}</div>;

@@ -1,14 +1,14 @@
 import { useSession } from "app/hooks/auth";
-import type {
-  UnitNode,
-  ApplicationRoundQuery,
-  CurrentUserQuery,
+import {
+  type UnitNode,
+  type ApplicationRoundQuery,
+  type CurrentUserQuery,
+  UserPermissionChoice,
 } from "@gql/gql-types";
 import {
   hasPermission as baseHasPermission,
   hasSomePermission as baseHasSomePermission,
   hasAnyPermission as baseHasAnyPermission,
-  Permission,
 } from "@/modules/permissionHelper";
 import { filterNonNullable } from "common/src/helpers";
 
@@ -19,9 +19,11 @@ export type UnitPermissionFragment =
   | null
   | undefined;
 
+type UserNode = CurrentUserQuery["currentUser"];
+
 const hasUnitPermission = (
-  user: CurrentUserQuery["currentUser"],
-  permissionName: Permission,
+  user: UserNode,
+  permissionName: UserPermissionChoice,
   unit: UnitPermissionFragment
 ): boolean => {
   if (user == null || unit?.pk == null) {
@@ -50,9 +52,9 @@ export type ReservationPermissionType = {
 };
 
 const hasPermission = (
-  user: CurrentUserQuery["currentUser"] | undefined,
+  user: UserNode | null | undefined,
   reservation: ReservationPermissionType | null | undefined,
-  permissionName: Permission,
+  permissionName: UserPermissionChoice,
   includeOwn = true
 ) => {
   if (!user) {
@@ -70,17 +72,17 @@ const hasPermission = (
 
   const ownPermissions =
     includeOwn && isUsersOwnReservation
-      ? permissionCheck(Permission.CAN_CREATE_STAFF_RESERVATIONS, unitPk)
+      ? permissionCheck(UserPermissionChoice.CanCreateStaffReservations, unitPk)
       : false;
 
   return permission || ownPermissions;
 };
 
 /// @returns {user, hasPermission, hasSomePermission, hasAnyPermission}
-const usePermission = () => {
+export function usePermission() {
   const { user } = useSession();
 
-  const hasSomePermission = (permissionName: Permission) => {
+  const hasSomePermission = (permissionName: UserPermissionChoice) => {
     if (!user) return false;
     return baseHasSomePermission(user, permissionName);
   };
@@ -93,7 +95,7 @@ const usePermission = () => {
   // TODO restrict the Permission type to only those that are applicable to application rounds
   const hasApplicationRoundPermission = (
     applicationRound: ApplicationRoundQuery["applicationRound"],
-    permission: Permission
+    permission: UserPermissionChoice
   ) => {
     if (!applicationRound) return false;
     if (!user) return false;
@@ -113,25 +115,27 @@ const usePermission = () => {
     user,
     hasPermission: (
       reservation: ReservationPermissionType,
-      permissionName: Permission,
+      permissionName: UserPermissionChoice,
       includeOwn = true
     ) => hasPermission(user, reservation, permissionName, includeOwn),
     hasSomePermission,
     hasAnyPermission,
-    hasUnitPermission: (permission: Permission, unit: UnitPermissionFragment) =>
-      user != null && hasUnitPermission(user, permission, unit),
+    hasUnitPermission: (
+      permission: UserPermissionChoice,
+      unit: UnitPermissionFragment
+    ) => user != null && hasUnitPermission(user, permission, unit),
     hasApplicationRoundPermission,
   };
-};
+}
 
 // NOTE duplicated code from usePermission, because react hooks break if we do some conditional magic
 // Suspended version should be used sparingly because it has to be wrapped in a Suspense component
 // and if not it can go to infinite loops or crash.
-const usePermissionSuspended = () => {
+export function usePermissionSuspended() {
   // TODO should this be suspended? doesn't seem to need it
   const { user } = useSession();
 
-  const hasSomePermission = (permissionName: Permission) => {
+  const hasSomePermission = (permissionName: UserPermissionChoice) => {
     if (!user) return false;
     return baseHasSomePermission(user, permissionName);
   };
@@ -145,14 +149,10 @@ const usePermissionSuspended = () => {
     user,
     hasPermission: (
       reservation: ReservationPermissionType,
-      permissionName: Permission,
+      permissionName: UserPermissionChoice,
       includeOwn = true
     ) => hasPermission(user, reservation, permissionName, includeOwn),
     hasSomePermission,
     hasAnyPermission,
   };
-};
-
-export { usePermissionSuspended };
-
-export default usePermission;
+}

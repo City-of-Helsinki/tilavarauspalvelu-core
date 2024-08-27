@@ -200,7 +200,6 @@ export type ApplicantNode = Node & {
   name?: Maybe<Scalars["String"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
   reservationNotification?: Maybe<Scalars["String"]["output"]>;
-  serviceSectorRoles: Array<ServiceSectorRoleNode>;
   unitRoles: Array<UnitRoleNode>;
   /** Vaaditaan. Enintään 150 merkkiä. Vain kirjaimet, numerot ja @/./+/-/_ ovat sallittuja. */
   username: Scalars["String"]["output"];
@@ -1052,58 +1051,15 @@ export type EquipmentUpdateMutationPayload = {
   pk?: Maybe<Scalars["Int"]["output"]>;
 };
 
-/** An enumeration. */
-export enum GeneralPermissionChoices {
-  CanAllocateApplications = "CAN_ALLOCATE_APPLICATIONS",
-  CanCommentReservations = "CAN_COMMENT_RESERVATIONS",
-  CanCreateStaffReservations = "CAN_CREATE_STAFF_RESERVATIONS",
-  CanHandleApplications = "CAN_HANDLE_APPLICATIONS",
-  CanManageAbilityGroups = "CAN_MANAGE_ABILITY_GROUPS",
-  CanManageAgeGroups = "CAN_MANAGE_AGE_GROUPS",
-  CanManageApplicationRounds = "CAN_MANAGE_APPLICATION_ROUNDS",
-  CanManageEquipment = "CAN_MANAGE_EQUIPMENT",
-  CanManageEquipmentCategories = "CAN_MANAGE_EQUIPMENT_CATEGORIES",
-  CanManageGeneralRoles = "CAN_MANAGE_GENERAL_ROLES",
-  CanManageNotifications = "CAN_MANAGE_NOTIFICATIONS",
-  CanManagePurposes = "CAN_MANAGE_PURPOSES",
-  CanManageQualifiers = "CAN_MANAGE_QUALIFIERS",
-  CanManageReservations = "CAN_MANAGE_RESERVATIONS",
-  CanManageReservationPurposes = "CAN_MANAGE_RESERVATION_PURPOSES",
-  CanManageReservationUnits = "CAN_MANAGE_RESERVATION_UNITS",
-  CanManageReservationUnitTypes = "CAN_MANAGE_RESERVATION_UNIT_TYPES",
-  CanManageResources = "CAN_MANAGE_RESOURCES",
-  CanManageServiceSectorRoles = "CAN_MANAGE_SERVICE_SECTOR_ROLES",
-  CanManageSpaces = "CAN_MANAGE_SPACES",
-  CanManageUnits = "CAN_MANAGE_UNITS",
-  CanManageUnitRoles = "CAN_MANAGE_UNIT_ROLES",
-  CanValidateApplications = "CAN_VALIDATE_APPLICATIONS",
-  CanViewReservations = "CAN_VIEW_RESERVATIONS",
-  CanViewUsers = "CAN_VIEW_USERS",
-}
-
-export type GeneralRoleChoiceNode = Node & {
-  code: Scalars["String"]["output"];
-  /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  permissions?: Maybe<Array<GeneralRolePermissionNode>>;
-  verboseName: Scalars["String"]["output"];
-  verboseNameEn?: Maybe<Scalars["String"]["output"]>;
-  verboseNameFi?: Maybe<Scalars["String"]["output"]>;
-  verboseNameSv?: Maybe<Scalars["String"]["output"]>;
-};
-
 export type GeneralRoleNode = Node & {
+  assigner?: Maybe<UserNode>;
+  created: Scalars["DateTime"]["output"];
   /** The ID of the object */
   id: Scalars["ID"]["output"];
-  pk?: Maybe<Scalars["Int"]["output"]>;
-  role: GeneralRoleChoiceNode;
-};
-
-export type GeneralRolePermissionNode = Node & {
-  /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  permission?: Maybe<GeneralPermissionChoices>;
-  pk?: Maybe<Scalars["Int"]["output"]>;
+  modified: Scalars["DateTime"]["output"];
+  permissions?: Maybe<Array<Maybe<UserPermissionChoice>>>;
+  role: UserRoleChoice;
+  user: UserNode;
 };
 
 export type HelsinkiProfileDataNode = {
@@ -1691,6 +1647,10 @@ export enum PaymentType {
   OnSite = "ON_SITE",
 }
 
+export type PermissionCheckerType = {
+  hasPermission: Scalars["Boolean"]["output"];
+};
+
 export type PersonNode = Node & {
   email?: Maybe<Scalars["String"]["output"]>;
   firstName: Scalars["String"]["output"];
@@ -1860,6 +1820,7 @@ export type Query = {
   applications?: Maybe<ApplicationNodeConnection>;
   bannerNotification?: Maybe<BannerNotificationNode>;
   bannerNotifications?: Maybe<BannerNotificationNodeConnection>;
+  checkPermissions?: Maybe<PermissionCheckerType>;
   cities?: Maybe<CityNodeConnection>;
   currentUser?: Maybe<UserNode>;
   equipment?: Maybe<EquipmentNode>;
@@ -2044,6 +2005,12 @@ export type QueryBannerNotificationsArgs = {
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<BannerNotificationOrderingChoices>>>;
   target?: InputMaybe<BannerNotificationTarget>;
+};
+
+export type QueryCheckPermissionsArgs = {
+  permission: UserPermissionChoice;
+  requireAll?: InputMaybe<Scalars["Boolean"]["input"]>;
+  units?: InputMaybe<Array<Scalars["Int"]["input"]>>;
 };
 
 export type QueryCitiesArgs = {
@@ -2742,6 +2709,8 @@ export enum RejectedOccurrenceOrderingChoices {
   PkDesc = "pkDesc",
   RejectionReasonAsc = "rejectionReasonAsc",
   RejectionReasonDesc = "rejectionReasonDesc",
+  ReservationUnitNameAsc = "reservationUnitNameAsc",
+  ReservationUnitNameDesc = "reservationUnitNameDesc",
   ReservationUnitPkAsc = "reservationUnitPkAsc",
   ReservationUnitPkDesc = "reservationUnitPkDesc",
   UnitPkAsc = "unitPkAsc",
@@ -2877,7 +2846,6 @@ export type ReservationConfirmMutationPayload = {
   reserveeType?: Maybe<CustomerTypeChoice>;
   state?: Maybe<ReservationStateChoice>;
   taxPercentageValue?: Maybe<Scalars["Decimal"]["output"]>;
-  type?: Maybe<ReservationTypeChoice>;
   unitPrice?: Maybe<Scalars["Decimal"]["output"]>;
 };
 
@@ -2915,7 +2883,6 @@ export type ReservationCreateMutationInput = {
   reserveeOrganisationName?: InputMaybe<Scalars["String"]["input"]>;
   reserveePhone?: InputMaybe<Scalars["String"]["input"]>;
   reserveeType?: InputMaybe<CustomerTypeChoice>;
-  type?: InputMaybe<ReservationTypeChoice>;
 };
 
 export type ReservationCreateMutationPayload = {
@@ -2958,7 +2925,6 @@ export type ReservationCreateMutationPayload = {
   reserveeType?: Maybe<CustomerTypeChoice>;
   state?: Maybe<ReservationStateChoice>;
   taxPercentageValue?: Maybe<Scalars["Decimal"]["output"]>;
-  type?: Maybe<ReservationTypeChoice>;
   unitPrice?: Maybe<Scalars["Decimal"]["output"]>;
 };
 
@@ -3012,8 +2978,8 @@ export type ReservationDenyReasonNodeEdge = {
 
 /** Ordering fields for the 'ReservationDenyReason' model. */
 export enum ReservationDenyReasonOrderingChoices {
-  PkAsc = "pkAsc",
-  PkDesc = "pkDesc",
+  RankAsc = "rankAsc",
+  RankDesc = "rankDesc",
 }
 
 /** An enumeration. */
@@ -4417,7 +4383,6 @@ export type ReservationUpdateMutationInput = {
   reserveePhone?: InputMaybe<Scalars["String"]["input"]>;
   reserveeType?: InputMaybe<CustomerTypeChoice>;
   state?: InputMaybe<ReservationStateChoice>;
-  type?: InputMaybe<ReservationTypeChoice>;
 };
 
 export type ReservationUpdateMutationPayload = {
@@ -4460,7 +4425,6 @@ export type ReservationUpdateMutationPayload = {
   reserveeType?: Maybe<CustomerTypeChoice>;
   state?: Maybe<ReservationStateChoice>;
   taxPercentageValue?: Maybe<Scalars["Decimal"]["output"]>;
-  type?: Maybe<ReservationTypeChoice>;
   unitPrice?: Maybe<Scalars["Decimal"]["output"]>;
 };
 
@@ -4648,51 +4612,6 @@ export type ServiceSectorNodeEdge = {
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
   node?: Maybe<ServiceSectorNode>;
-};
-
-/** An enumeration. */
-export enum ServiceSectorPermissionsChoices {
-  CanAllocateApplications = "CAN_ALLOCATE_APPLICATIONS",
-  CanCommentReservations = "CAN_COMMENT_RESERVATIONS",
-  CanCreateStaffReservations = "CAN_CREATE_STAFF_RESERVATIONS",
-  CanHandleApplications = "CAN_HANDLE_APPLICATIONS",
-  CanManageApplicationRounds = "CAN_MANAGE_APPLICATION_ROUNDS",
-  CanManageReservations = "CAN_MANAGE_RESERVATIONS",
-  CanManageReservationUnits = "CAN_MANAGE_RESERVATION_UNITS",
-  CanManageResources = "CAN_MANAGE_RESOURCES",
-  CanManageServiceSectorRoles = "CAN_MANAGE_SERVICE_SECTOR_ROLES",
-  CanManageSpaces = "CAN_MANAGE_SPACES",
-  CanManageUnits = "CAN_MANAGE_UNITS",
-  CanManageUnitRoles = "CAN_MANAGE_UNIT_ROLES",
-  CanValidateApplications = "CAN_VALIDATE_APPLICATIONS",
-  CanViewReservations = "CAN_VIEW_RESERVATIONS",
-  CanViewUsers = "CAN_VIEW_USERS",
-}
-
-export type ServiceSectorRoleChoiceNode = Node & {
-  code: Scalars["String"]["output"];
-  /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  permissions?: Maybe<Array<ServiceSectorRolePermissionNode>>;
-  verboseName: Scalars["String"]["output"];
-  verboseNameEn?: Maybe<Scalars["String"]["output"]>;
-  verboseNameFi?: Maybe<Scalars["String"]["output"]>;
-  verboseNameSv?: Maybe<Scalars["String"]["output"]>;
-};
-
-export type ServiceSectorRoleNode = Node & {
-  /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  pk?: Maybe<Scalars["Int"]["output"]>;
-  role: ServiceSectorRoleChoiceNode;
-  serviceSector: ServiceSectorNode;
-};
-
-export type ServiceSectorRolePermissionNode = Node & {
-  /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  permission?: Maybe<ServiceSectorPermissionsChoices>;
-  pk?: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** An enumeration. */
@@ -5168,44 +5087,20 @@ export enum UnitOrderingChoices {
   UnitGroupNameSvDesc = "unitGroupNameSvDesc",
 }
 
-/** An enumeration. */
-export enum UnitPermissionChoices {
-  CanAllocateApplications = "CAN_ALLOCATE_APPLICATIONS",
-  CanCommentReservations = "CAN_COMMENT_RESERVATIONS",
-  CanCreateStaffReservations = "CAN_CREATE_STAFF_RESERVATIONS",
-  CanHandleApplications = "CAN_HANDLE_APPLICATIONS",
-  CanManageReservations = "CAN_MANAGE_RESERVATIONS",
-  CanManageReservationUnits = "CAN_MANAGE_RESERVATION_UNITS",
-  CanManageResources = "CAN_MANAGE_RESOURCES",
-  CanManageSpaces = "CAN_MANAGE_SPACES",
-  CanManageUnits = "CAN_MANAGE_UNITS",
-  CanManageUnitRoles = "CAN_MANAGE_UNIT_ROLES",
-  CanValidateApplications = "CAN_VALIDATE_APPLICATIONS",
-  CanViewReservations = "CAN_VIEW_RESERVATIONS",
-  CanViewUsers = "CAN_VIEW_USERS",
-}
-
-export type UnitRoleChoiceNode = Node & {
-  code: Scalars["String"]["output"];
-  /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  permissions?: Maybe<Array<UnitRolePermissionNode>>;
-  verboseName: Scalars["String"]["output"];
-  verboseNameEn?: Maybe<Scalars["String"]["output"]>;
-  verboseNameFi?: Maybe<Scalars["String"]["output"]>;
-  verboseNameSv?: Maybe<Scalars["String"]["output"]>;
-};
-
 export type UnitRoleNode = Node & {
+  assigner?: Maybe<UserNode>;
+  created: Scalars["DateTime"]["output"];
   /** The ID of the object */
   id: Scalars["ID"]["output"];
-  pk?: Maybe<Scalars["Int"]["output"]>;
-  role: UnitRoleChoiceNode;
-  unit: Array<UnitNode>;
-  unitGroup: Array<UnitGroupNode>;
+  modified: Scalars["DateTime"]["output"];
+  permissions?: Maybe<Array<Maybe<UserPermissionChoice>>>;
+  role: UserRoleChoice;
+  unitGroups: Array<UnitGroupNode>;
+  units: Array<UnitNode>;
+  user: UserNode;
 };
 
-export type UnitRoleNodeUnitArgs = {
+export type UnitRoleNodeUnitsArgs = {
   nameEn?: InputMaybe<Scalars["String"]["input"]>;
   nameEn_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   nameEn_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
@@ -5223,13 +5118,6 @@ export type UnitRoleNodeUnitArgs = {
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   publishedReservationUnits?: InputMaybe<Scalars["Boolean"]["input"]>;
   serviceSector?: InputMaybe<Scalars["Decimal"]["input"]>;
-};
-
-export type UnitRolePermissionNode = Node & {
-  /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  permission?: Maybe<UnitPermissionChoices>;
-  pk?: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type UnitUpdateMutationInput = {
@@ -5393,12 +5281,38 @@ export type UserNode = Node & {
   name?: Maybe<Scalars["String"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
   reservationNotification?: Maybe<Scalars["String"]["output"]>;
-  serviceSectorRoles: Array<ServiceSectorRoleNode>;
   unitRoles: Array<UnitRoleNode>;
   /** Vaaditaan. Enintään 150 merkkiä. Vain kirjaimet, numerot ja @/./+/-/_ ovat sallittuja. */
   username: Scalars["String"]["output"];
   uuid: Scalars["UUID"]["output"];
 };
+
+/** An enumeration. */
+export enum UserPermissionChoice {
+  CanCreateStaffReservations = "CAN_CREATE_STAFF_RESERVATIONS",
+  CanManageApplications = "CAN_MANAGE_APPLICATIONS",
+  CanManageNotifications = "CAN_MANAGE_NOTIFICATIONS",
+  CanManageReservations = "CAN_MANAGE_RESERVATIONS",
+  CanManageReservationRelatedData = "CAN_MANAGE_RESERVATION_RELATED_DATA",
+  CanManageReservationUnits = "CAN_MANAGE_RESERVATION_UNITS",
+  CanViewApplications = "CAN_VIEW_APPLICATIONS",
+  CanViewReservations = "CAN_VIEW_RESERVATIONS",
+  CanViewUsers = "CAN_VIEW_USERS",
+}
+
+/** An enumeration. */
+export enum UserRoleChoice {
+  /** Pääkäyttäjä */
+  Admin = "ADMIN",
+  /** Käsittelijä */
+  Handler = "HANDLER",
+  /** Ilmoituksen hallitsija. */
+  NotificationManager = "NOTIFICATION_MANAGER",
+  /** Varaaja */
+  Reserver = "RESERVER",
+  /** Katselika */
+  Viewer = "VIEWER",
+}
 
 export type UserUpdateMutationInput = {
   pk: Scalars["Int"]["input"];

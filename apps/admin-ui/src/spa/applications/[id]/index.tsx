@@ -33,6 +33,7 @@ import {
   useApplicationAdminQuery,
   ApplicationAdminQuery,
   useRejectRestMutation,
+  UserPermissionChoice,
 } from "@gql/gql-types";
 import { formatDuration } from "common/src/common/util";
 import { convertWeekday, type Day } from "common/src/conversion";
@@ -52,9 +53,8 @@ import { ValueBox } from "../ValueBox";
 import { TimeSelector } from "../TimeSelector";
 import { getApplicantName, getApplicationStatusColor } from "@/helpers";
 import Error404 from "@/common/Error404";
-import usePermission from "@/hooks/usePermission";
-import { Permission } from "@/modules/permissionHelper";
 import { errorToast } from "common/src/common/toast";
+import { usePermission } from "@/hooks/usePermission";
 
 type ApplicationType = NonNullable<ApplicationAdminQuery["application"]>;
 type ApplicationSectionType = NonNullable<
@@ -424,7 +424,7 @@ function RejectOptionButton({
   }
 
   const hasPerms = hasUnitPermission(
-    Permission.CAN_MANAGE_APPLICATIONS,
+    UserPermissionChoice.CanManageApplications,
     option.reservationUnit?.unit
   );
   const canReject =
@@ -532,7 +532,7 @@ function RejectAllOptionsButton({
 
   const hasPerms = section.reservationUnitOptions.every((x) =>
     hasUnitPermission(
-      Permission.CAN_MANAGE_APPLICATIONS,
+      UserPermissionChoice.CanManageApplications,
       x.reservationUnit?.unit
     )
   );
@@ -814,7 +814,7 @@ function RejectApplicationButton({
     application.applicationSections?.every((section) =>
       section.reservationUnitOptions?.every((x) =>
         hasUnitPermission(
-          Permission.CAN_MANAGE_APPLICATIONS,
+          UserPermissionChoice.CanManageApplications,
           x.reservationUnit?.unit
         )
       )

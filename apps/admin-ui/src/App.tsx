@@ -1,7 +1,6 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import dynamic from "next/dynamic";
-import { Permission } from "@/modules/permissionHelper";
 import ApplicationRound from "./spa/recurring-reservations/application-rounds/[id]";
 import PageWrapper from "./component/PageWrapper";
 import "./i18n";
@@ -13,6 +12,7 @@ import MyUnitsRouter from "./spa/my-units/router";
 import ReservationsRouter from "./component/reservations/ReservationRouter";
 import NotificationsRouter from "./component/notifications/router";
 import Error404 from "./common/Error404";
+import { UserPermissionChoice } from "@gql/gql-types";
 
 const UNIT_PATH = "./component/Unit";
 const Units = dynamic(() => import(`${UNIT_PATH}/Units`));
@@ -59,7 +59,7 @@ const withAuthorization = (
   component: JSX.Element,
   apiBaseUrl: string,
   feedbackUrl: string,
-  permission?: Permission
+  permission?: UserPermissionChoice
 ) => (
   <AuthorizationChecker
     permission={permission}
@@ -132,7 +132,7 @@ const PremisesRouter = ({
         <SpacesList />,
         apiBaseUrl,
         feedbackUrl,
-        Permission.CAN_MANAGE_SPACES
+        UserPermissionChoice.CanManageReservationUnits
       )}
     />
     <Route
@@ -141,7 +141,7 @@ const PremisesRouter = ({
         <ReservationUnits />,
         apiBaseUrl,
         feedbackUrl,
-        Permission.CAN_MANAGE_UNITS
+        UserPermissionChoice.CanManageReservationUnits
       )}
     />
     <Route
@@ -150,7 +150,7 @@ const PremisesRouter = ({
         <ResourcesList />,
         apiBaseUrl,
         feedbackUrl,
-        Permission.CAN_MANAGE_RESOURCES
+        UserPermissionChoice.CanManageReservationUnits
       )}
     />
     <Route
@@ -159,7 +159,7 @@ const PremisesRouter = ({
         <Units />,
         apiBaseUrl,
         feedbackUrl,
-        Permission.CAN_MANAGE_UNITS
+        UserPermissionChoice.CanManageReservationUnits
       )}
     />
   </Routes>
@@ -185,7 +185,7 @@ function ClientApp({
               <ApplicationRouter />,
               apiBaseUrl,
               feedbackUrl,
-              Permission.CAN_VALIDATE_APPLICATIONS
+              UserPermissionChoice.CanManageApplications
             )}
           />
           <Route
@@ -194,7 +194,7 @@ function ClientApp({
               <ApplicationRoundsRouter />,
               apiBaseUrl,
               feedbackUrl,
-              Permission.CAN_VALIDATE_APPLICATIONS
+              UserPermissionChoice.CanManageApplications
             )}
           />
           <Route
@@ -240,7 +240,7 @@ function ClientApp({
               <NotificationsRouter />,
               apiBaseUrl,
               feedbackUrl,
-              Permission.CAN_MANAGE_BANNER_NOTIFICATIONS
+              UserPermissionChoice.CanManageNotifications
             )}
           />
         </Routes>

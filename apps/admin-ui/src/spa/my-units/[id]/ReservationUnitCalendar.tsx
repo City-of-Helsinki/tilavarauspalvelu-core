@@ -7,11 +7,11 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import {
   ReservationTypeChoice,
+  UserPermissionChoice,
   useReservationUnitCalendarQuery,
   type ReservationUnitCalendarQuery,
 } from "@gql/gql-types";
-import { Permission } from "@/modules/permissionHelper";
-import usePermission from "@/hooks/usePermission";
+import { usePermission } from "@/hooks/usePermission";
 import { getEventBuffers } from "common/src/calendar/util";
 import { getReservationUrl } from "@/common/urls";
 import Legend from "@/component/reservations/requested/Legend";
@@ -165,7 +165,7 @@ export function ReservationUnitCalendar({
         onSelectEvent={(e) => {
           if (
             e.event?.pk &&
-            hasPermission(e.event, Permission.CAN_VIEW_RESERVATIONS)
+            hasPermission(e.event, UserPermissionChoice.CanViewReservations)
           ) {
             window.open(getReservationUrl(e.event?.pk), "_blank");
           }

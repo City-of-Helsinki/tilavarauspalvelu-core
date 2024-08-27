@@ -14,6 +14,7 @@ import {
   useEndAllocationMutation,
   ApplicationRoundReservationCreationStatusChoice,
   type ApplicationRoundQuery,
+  UserPermissionChoice,
 } from "@gql/gql-types";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { Container, TabWrapper } from "@/styles/layout";
@@ -28,8 +29,7 @@ import {
   getPermissionErrors,
   getValidationErrors,
 } from "common/src/apolloUtils";
-import usePermission from "@/hooks/usePermission";
-import { Permission } from "@/modules/permissionHelper";
+import { usePermission } from "@/hooks/usePermission";
 import { isApplicationRoundInProgress } from "@/helpers";
 import { breakpoints } from "common";
 import RejectedOccurrencesDataLoader from "./RejectedOccurrencesDataLoader";
@@ -198,7 +198,7 @@ function EndAllocation({
   const { hasApplicationRoundPermission } = usePermission();
   const canEndAllocation = hasApplicationRoundPermission(
     applicationRound,
-    Permission.CAN_MANAGE_APPLICATIONS
+    UserPermissionChoice.CanManageApplications
   );
 
   return (

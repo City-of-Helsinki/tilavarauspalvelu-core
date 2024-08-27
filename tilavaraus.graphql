@@ -200,7 +200,6 @@ type ApplicantNode implements Node {
   name: String
   pk: Int
   reservationNotification: String
-  serviceSectorRoles: [ServiceSectorRoleNode!]!
   unitRoles: [UnitRoleNode!]!
   """
   Vaaditaan. Enintään 150 merkkiä. Vain kirjaimet, numerot ja @/./+/-/_ ovat sallittuja.
@@ -1205,66 +1204,17 @@ type EquipmentUpdateMutationPayload {
   pk: Int
 }
 
-"""
-An enumeration.
-"""
-enum GeneralPermissionChoices {
-  CAN_ALLOCATE_APPLICATIONS
-  CAN_COMMENT_RESERVATIONS
-  CAN_CREATE_STAFF_RESERVATIONS
-  CAN_HANDLE_APPLICATIONS
-  CAN_MANAGE_ABILITY_GROUPS
-  CAN_MANAGE_AGE_GROUPS
-  CAN_MANAGE_APPLICATION_ROUNDS
-  CAN_MANAGE_EQUIPMENT
-  CAN_MANAGE_EQUIPMENT_CATEGORIES
-  CAN_MANAGE_GENERAL_ROLES
-  CAN_MANAGE_NOTIFICATIONS
-  CAN_MANAGE_PURPOSES
-  CAN_MANAGE_QUALIFIERS
-  CAN_MANAGE_RESERVATIONS
-  CAN_MANAGE_RESERVATION_PURPOSES
-  CAN_MANAGE_RESERVATION_UNITS
-  CAN_MANAGE_RESERVATION_UNIT_TYPES
-  CAN_MANAGE_RESOURCES
-  CAN_MANAGE_SERVICE_SECTOR_ROLES
-  CAN_MANAGE_SPACES
-  CAN_MANAGE_UNITS
-  CAN_MANAGE_UNIT_ROLES
-  CAN_VALIDATE_APPLICATIONS
-  CAN_VIEW_RESERVATIONS
-  CAN_VIEW_USERS
-}
-
-type GeneralRoleChoiceNode implements Node {
-  code: String!
-  """
-  The ID of the object
-  """
-  id: ID!
-  permissions: [GeneralRolePermissionNode!]
-  verboseName: String!
-  verboseNameEn: String
-  verboseNameFi: String
-  verboseNameSv: String
-}
-
 type GeneralRoleNode implements Node {
+  assigner: UserNode
+  created: DateTime!
   """
   The ID of the object
   """
   id: ID!
-  pk: Int
-  role: GeneralRoleChoiceNode!
-}
-
-type GeneralRolePermissionNode implements Node {
-  """
-  The ID of the object
-  """
-  id: ID!
-  permission: GeneralPermissionChoices
-  pk: Int
+  modified: DateTime!
+  permissions: [UserPermissionChoice]
+  role: UserRoleChoice!
+  user: UserNode!
 }
 
 type HelsinkiProfileDataNode {
@@ -1830,6 +1780,10 @@ enum PaymentType {
   ON_SITE
 }
 
+type PermissionCheckerType {
+  hasPermission: Boolean!
+}
+
 type PersonNode implements Node {
   email: String
   firstName: String!
@@ -2209,6 +2163,11 @@ type Query {
     orderBy: [BannerNotificationOrderingChoices]
     target: BannerNotificationTarget
   ): BannerNotificationNodeConnection
+  checkPermissions(
+    permission: UserPermissionChoice!
+    requireAll: Boolean = false
+    units: [Int!]
+  ): PermissionCheckerType
   cities(
     after: String
     before: String
@@ -2990,6 +2949,8 @@ enum RejectedOccurrenceOrderingChoices {
   pkDesc
   rejectionReasonAsc
   rejectionReasonDesc
+  reservationUnitNameAsc
+  reservationUnitNameDesc
   reservationUnitPkAsc
   reservationUnitPkDesc
   unitPkAsc
@@ -3145,7 +3106,6 @@ type ReservationConfirmMutationPayload {
   reserveeType: CustomerTypeChoice
   state: ReservationStateChoice
   taxPercentageValue: Decimal
-  type: ReservationTypeChoice
   unitPrice: Decimal
 }
 
@@ -3183,7 +3143,6 @@ input ReservationCreateMutationInput {
   reserveeOrganisationName: String
   reserveePhone: String
   reserveeType: CustomerTypeChoice
-  type: ReservationTypeChoice
 }
 
 type ReservationCreateMutationPayload {
@@ -3226,7 +3185,6 @@ type ReservationCreateMutationPayload {
   reserveeType: CustomerTypeChoice
   state: ReservationStateChoice
   taxPercentageValue: Decimal
-  type: ReservationTypeChoice
   unitPrice: Decimal
 }
 
@@ -3294,8 +3252,8 @@ type ReservationDenyReasonNodeEdge {
 Ordering fields for the 'ReservationDenyReason' model.
 """
 enum ReservationDenyReasonOrderingChoices {
-  pkAsc
-  pkDesc
+  rankAsc
+  rankDesc
 }
 
 """
@@ -4883,7 +4841,6 @@ input ReservationUpdateMutationInput {
   reserveePhone: String
   reserveeType: CustomerTypeChoice
   state: ReservationStateChoice
-  type: ReservationTypeChoice
 }
 
 type ReservationUpdateMutationPayload {
@@ -4926,7 +4883,6 @@ type ReservationUpdateMutationPayload {
   reserveeType: CustomerTypeChoice
   state: ReservationStateChoice
   taxPercentageValue: Decimal
-  type: ReservationTypeChoice
   unitPrice: Decimal
 }
 
@@ -5164,59 +5120,6 @@ type ServiceSectorNodeEdge {
   The item at the end of the edge
   """
   node: ServiceSectorNode
-}
-
-"""
-An enumeration.
-"""
-enum ServiceSectorPermissionsChoices {
-  CAN_ALLOCATE_APPLICATIONS
-  CAN_COMMENT_RESERVATIONS
-  CAN_CREATE_STAFF_RESERVATIONS
-  CAN_HANDLE_APPLICATIONS
-  CAN_MANAGE_APPLICATION_ROUNDS
-  CAN_MANAGE_RESERVATIONS
-  CAN_MANAGE_RESERVATION_UNITS
-  CAN_MANAGE_RESOURCES
-  CAN_MANAGE_SERVICE_SECTOR_ROLES
-  CAN_MANAGE_SPACES
-  CAN_MANAGE_UNITS
-  CAN_MANAGE_UNIT_ROLES
-  CAN_VALIDATE_APPLICATIONS
-  CAN_VIEW_RESERVATIONS
-  CAN_VIEW_USERS
-}
-
-type ServiceSectorRoleChoiceNode implements Node {
-  code: String!
-  """
-  The ID of the object
-  """
-  id: ID!
-  permissions: [ServiceSectorRolePermissionNode!]
-  verboseName: String!
-  verboseNameEn: String
-  verboseNameFi: String
-  verboseNameSv: String
-}
-
-type ServiceSectorRoleNode implements Node {
-  """
-  The ID of the object
-  """
-  id: ID!
-  pk: Int
-  role: ServiceSectorRoleChoiceNode!
-  serviceSector: ServiceSectorNode!
-}
-
-type ServiceSectorRolePermissionNode implements Node {
-  """
-  The ID of the object
-  """
-  id: ID!
-  permission: ServiceSectorPermissionsChoices
-  pk: Int
 }
 
 """
@@ -5820,46 +5723,18 @@ enum UnitOrderingChoices {
   unitGroupNameSvDesc
 }
 
-"""
-An enumeration.
-"""
-enum UnitPermissionChoices {
-  CAN_ALLOCATE_APPLICATIONS
-  CAN_COMMENT_RESERVATIONS
-  CAN_CREATE_STAFF_RESERVATIONS
-  CAN_HANDLE_APPLICATIONS
-  CAN_MANAGE_RESERVATIONS
-  CAN_MANAGE_RESERVATION_UNITS
-  CAN_MANAGE_RESOURCES
-  CAN_MANAGE_SPACES
-  CAN_MANAGE_UNITS
-  CAN_MANAGE_UNIT_ROLES
-  CAN_VALIDATE_APPLICATIONS
-  CAN_VIEW_RESERVATIONS
-  CAN_VIEW_USERS
-}
-
-type UnitRoleChoiceNode implements Node {
-  code: String!
-  """
-  The ID of the object
-  """
-  id: ID!
-  permissions: [UnitRolePermissionNode!]
-  verboseName: String!
-  verboseNameEn: String
-  verboseNameFi: String
-  verboseNameSv: String
-}
-
 type UnitRoleNode implements Node {
+  assigner: UserNode
+  created: DateTime!
   """
   The ID of the object
   """
   id: ID!
-  pk: Int
-  role: UnitRoleChoiceNode!
-  unit(
+  modified: DateTime!
+  permissions: [UserPermissionChoice]
+  role: UserRoleChoice!
+  unitGroups: [UnitGroupNode!]!
+  units(
     nameEn: String
     nameEn_Icontains: String
     nameEn_Istartswith: String
@@ -5881,16 +5756,7 @@ type UnitRoleNode implements Node {
     publishedReservationUnits: Boolean
     serviceSector: Decimal
   ): [UnitNode!]!
-  unitGroup: [UnitGroupNode!]!
-}
-
-type UnitRolePermissionNode implements Node {
-  """
-  The ID of the object
-  """
-  id: ID!
-  permission: UnitPermissionChoices
-  pk: Int
+  user: UserNode!
 }
 
 input UnitUpdateMutationInput {
@@ -6073,13 +5939,53 @@ type UserNode implements Node {
   name: String
   pk: Int
   reservationNotification: String
-  serviceSectorRoles: [ServiceSectorRoleNode!]!
   unitRoles: [UnitRoleNode!]!
   """
   Vaaditaan. Enintään 150 merkkiä. Vain kirjaimet, numerot ja @/./+/-/_ ovat sallittuja.
   """
   username: String!
   uuid: UUID!
+}
+
+"""
+An enumeration.
+"""
+enum UserPermissionChoice {
+  CAN_CREATE_STAFF_RESERVATIONS
+  CAN_MANAGE_APPLICATIONS
+  CAN_MANAGE_NOTIFICATIONS
+  CAN_MANAGE_RESERVATIONS
+  CAN_MANAGE_RESERVATION_RELATED_DATA
+  CAN_MANAGE_RESERVATION_UNITS
+  CAN_VIEW_APPLICATIONS
+  CAN_VIEW_RESERVATIONS
+  CAN_VIEW_USERS
+}
+
+"""
+An enumeration.
+"""
+enum UserRoleChoice {
+  """
+  Pääkäyttäjä
+  """
+  ADMIN
+  """
+  Käsittelijä
+  """
+  HANDLER
+  """
+  Ilmoituksen hallitsija.
+  """
+  NOTIFICATION_MANAGER
+  """
+  Varaaja
+  """
+  RESERVER
+  """
+  Katselika
+  """
+  VIEWER
 }
 
 input UserUpdateMutationInput {

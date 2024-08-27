@@ -2,10 +2,13 @@ import React from "react";
 import { toUIDate } from "common/src/common/util";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { RejectionReadinessChoice, ReservationQuery } from "@gql/gql-types";
+import {
+  RejectionReadinessChoice,
+  ReservationQuery,
+  UserPermissionChoice,
+} from "@gql/gql-types";
 import { Button } from "hds-react";
-import usePermission from "@/hooks/usePermission";
-import { Permission } from "@/modules/permissionHelper";
+import { usePermission } from "@/hooks/usePermission";
 import { NewReservationModal } from "./reservations/EditTimeModal";
 import { useModal } from "@/context/ModalContext";
 import { H6 } from "common";
@@ -152,8 +155,11 @@ function AddNewReservationButton({
   refetch,
 }: AddNewReservationButtonProps) {
   const { hasUnitPermission } = usePermission();
-  const unit = reservationToCopy?.reservationUnit?.[0].unit ?? {};
-  const isAllowed = hasUnitPermission(Permission.CAN_MANAGE_RESERVATIONS, unit);
+  const unit = reservationToCopy?.reservationUnit?.[0] ?? {};
+  const isAllowed = hasUnitPermission(
+    UserPermissionChoice.CanManageReservations,
+    unit
+  );
   const { t } = useTranslation();
 
   const { setModalContent } = useModal();

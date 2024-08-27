@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { H2 } from "common/src/common/typography";
 import { HERO_IMAGE_URL } from "app/common/const";
-import usePermission from "@/hooks/usePermission";
+import { usePermission } from "@/hooks/usePermission";
 import KorosHeading, { Heading } from "@/component/KorosHeading";
 
 const Wrapper = styled.div``;

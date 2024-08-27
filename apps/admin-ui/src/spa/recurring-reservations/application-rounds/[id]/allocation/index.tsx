@@ -13,6 +13,7 @@ import {
   useApplicationRoundFilterQuery,
   useApplicationSectionAllocationsQuery,
   useAllApplicationEventsQuery,
+  UserPermissionChoice,
 } from "@gql/gql-types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { SearchTags } from "@/component/SearchTags";
@@ -28,8 +29,7 @@ import {
   ALLOCATION_POLL_INTERVAL,
   VALID_ALLOCATION_APPLICATION_STATUSES,
 } from "@/common/const";
-import usePermission from "@/hooks/usePermission";
-import { Permission } from "@/modules/permissionHelper";
+import { usePermission } from "@/hooks/usePermission";
 import { truncate } from "@/helpers";
 import { AllocationPageContent } from "./ApplicationEvents";
 import { ComboboxFilter, SearchFilter } from "@/component/QueryParamFilters";
@@ -610,7 +610,7 @@ function AllocationWrapper({
     applicationRound != null
       ? hasApplicationRoundPermission(
           applicationRound as ApplicationRoundNode,
-          Permission.CAN_MANAGE_APPLICATIONS
+          UserPermissionChoice.CanManageApplications
         )
       : false;
 
@@ -626,7 +626,7 @@ function AllocationWrapper({
   // TODO name sort fails with numbers because 11 < 2
   const units = uniqBy(filterNonNullable(unitData), "pk")
     .filter((unit) =>
-      hasUnitPermission(Permission.CAN_VALIDATE_APPLICATIONS, unit)
+      hasUnitPermission(UserPermissionChoice.CanManageApplications, unit)
     )
     .sort((a, b) => a?.nameFi?.localeCompare(b?.nameFi ?? "") ?? 0);
 

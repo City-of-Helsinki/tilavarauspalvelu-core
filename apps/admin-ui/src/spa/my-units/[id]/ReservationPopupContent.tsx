@@ -1,8 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import type { ReservationUnitReservationsFragment } from "@gql/gql-types";
-import { Permission } from "@/modules/permissionHelper";
+import {
+  UserPermissionChoice,
+  type ReservationUnitReservationsFragment,
+} from "@gql/gql-types";
 import { reservationUrl } from "@/common/urls";
 import { formatTime, getReserveeName } from "@/common/util";
 import { truncate } from "@/helpers";
@@ -52,7 +54,7 @@ export function ReservationPopupContent({
         </Heading>
         <VisibleIfPermission
           reservation={reservation}
-          permission={Permission.CAN_VIEW_RESERVATIONS}
+          permission={UserPermissionChoice.CanViewReservations}
         >
           <Reservee>
             {reservation.pk ? (

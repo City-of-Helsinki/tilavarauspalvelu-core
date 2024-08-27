@@ -13,8 +13,8 @@ import {
   type ReservationQuery,
   ReservationStateChoice,
   useReservationQuery,
+  UserPermissionChoice,
 } from "@gql/gql-types";
-import { Permission } from "@/modules/permissionHelper";
 import Loader from "@/component/Loader";
 import { useModal } from "@/context/ModalContext";
 import { ButtonContainer, Container } from "@/styles/layout";
@@ -134,7 +134,7 @@ function ButtonsWithPermChecks({
   return (
     <VisibleIfPermission
       reservation={reservation}
-      permission={Permission.CAN_MANAGE_RESERVATIONS}
+      permission={UserPermissionChoice.CanManageReservations}
     >
       {reservation.recurringReservation ? (
         <ApprovalButtonsRecurring
@@ -442,7 +442,7 @@ function RequestedReservation({
         <ReservationSummary reservation={reservation} isFree={!isNonFree} />
         <div>
           <VisibleIfPermission
-            permission={Permission.CAN_COMMENT_RESERVATIONS}
+            permission={UserPermissionChoice.CanViewReservations}
             reservation={reservation}
           >
             <Accordion
@@ -607,7 +607,7 @@ function PermissionWrappedReservation() {
 
   return (
     <VisibleIfPermission
-      permission={Permission.CAN_VIEW_RESERVATIONS}
+      permission={UserPermissionChoice.CanViewReservations}
       reservation={reservation}
       otherwise={
         <Container>

@@ -1,10 +1,10 @@
 import React, { Suspense } from "react";
 import { useSession } from "app/hooks/auth";
-import { Permission } from "app/modules/permissionHelper";
 import { usePermissionSuspended } from "app/hooks/usePermission";
 import { MainLander } from "app/component/MainLander";
 import Loader from "app/component/Loader";
 import Error403 from "./Error403";
+import { UserPermissionChoice } from "@gql/gql-types";
 
 const AuthorisationChecker = ({
   apiUrl,
@@ -15,7 +15,7 @@ const AuthorisationChecker = ({
   apiUrl: string;
   children: React.ReactNode;
   feedbackUrl: string;
-  permission?: Permission;
+  permission?: UserPermissionChoice;
 }) => {
   const { hasAnyPermission, hasSomePermission } = usePermissionSuspended();
 
