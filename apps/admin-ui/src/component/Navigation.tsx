@@ -10,7 +10,7 @@ import {
 } from "hds-react";
 import React from "react";
 import styled from "styled-components";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import useHandling from "@/hooks/useHandling";
 import usePermission from "@/hooks/usePermission";
 import { Permission } from "@/modules/permissionHelper";
@@ -170,12 +170,21 @@ function NavigationLink({
 }) {
   const { t } = useTranslation();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+
   const shouldDisplayCount =
     title === t("MainMenu.requestedReservations") && count && count > 0;
   const isActive = exact ? pathname === href : pathname.startsWith(href);
+
+  const handleClick = (evt: React.MouseEvent<HTMLAnchorElement>) => {
+    evt.preventDefault();
+    navigate(href);
+  };
+
   return (
     <Header.ActionBarSubItem
       key={href}
+      onClick={handleClick}
       href={`/kasittely/${href}`}
       label={t(title)}
       className={isActive ? "active" : ""}
