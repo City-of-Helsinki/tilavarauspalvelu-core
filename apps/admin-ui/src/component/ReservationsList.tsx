@@ -8,7 +8,7 @@ import {
   UserPermissionChoice,
 } from "@gql/gql-types";
 import { Button } from "hds-react";
-import { usePermission } from "@/hooks/usePermission";
+import { useCheckPermission } from "@/hooks";
 import { NewReservationModal } from "./reservations/EditTimeModal";
 import { useModal } from "@/context/ModalContext";
 import { H6 } from "common";
@@ -154,12 +154,10 @@ function AddNewReservationButton({
   reservationToCopy,
   refetch,
 }: AddNewReservationButtonProps) {
-  const { hasUnitPermission } = usePermission();
-  const unit = reservationToCopy?.reservationUnit?.[0] ?? {};
-  const isAllowed = hasUnitPermission(
-    UserPermissionChoice.CanManageReservations,
-    unit
-  );
+  const { hasPermission } = useCheckPermission({
+    units: [reservationToCopy?.reservationUnit?.[0].unit?.pk ?? 0],
+    permission: UserPermissionChoice.CanManageReservations,
+  });
   const { t } = useTranslation();
 
   const { setModalContent } = useModal();
@@ -189,7 +187,7 @@ function AddNewReservationButton({
       theme="black"
       variant="secondary"
       size="small"
-      disabled={!isAllowed}
+      disabled={!hasPermission}
       onClick={handleClick}
     >
       {t("MyUnits.RecurringReservation.addNewReservation")}

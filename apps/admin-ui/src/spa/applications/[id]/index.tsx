@@ -53,8 +53,8 @@ import { ValueBox } from "../ValueBox";
 import { TimeSelector } from "../TimeSelector";
 import { getApplicantName, getApplicationStatusColor } from "@/helpers";
 import Error404 from "@/common/Error404";
+import { useCheckPermission } from "@/hooks";
 import { errorToast } from "common/src/common/toast";
-import { usePermission } from "@/hooks/usePermission";
 
 type ApplicationType = NonNullable<ApplicationAdminQuery["application"]>;
 type ApplicationSectionType = NonNullable<
@@ -363,7 +363,13 @@ function RejectOptionButton({
   refetch: () => Promise<ApolloQueryResult<ApplicationAdminQuery>>;
 }) {
   const [mutation, { loading }] = useRejectRestMutation();
-  const { hasUnitPermission } = usePermission();
+  const units = [option.reservationUnit?.unit?.pk ?? 0];
+
+  const { hasPermission } = useCheckPermission({
+    units,
+    permission: UserPermissionChoice.CanManageApplications,
+    requireAll: true,
+  });
   const { t } = useTranslation();
 
   const updateOption = async (
@@ -423,17 +429,13 @@ function RejectOptionButton({
     console.warn("no allocatedTimeSlots", option);
   }
 
-  const hasPerms = hasUnitPermission(
-    UserPermissionChoice.CanManageApplications,
-    option.reservationUnit?.unit
-  );
   const canReject =
     applicationStatus === ApplicationStatusChoice.InAllocation ||
     applicationStatus === ApplicationStatusChoice.Handled;
   const isDisabled =
-    !canReject || option.allocatedTimeSlots?.length > 0 || !hasPerms;
+    !canReject || option.allocatedTimeSlots?.length > 0 || !hasPermission;
 
-  if (!hasPerms) {
+  if (!hasPermission) {
     return null;
   }
   return (
@@ -464,7 +466,14 @@ function RejectAllOptionsButton({
   refetch: () => Promise<ApolloQueryResult<ApplicationAdminQuery>>;
 }) {
   const { t } = useTranslation();
-  const { hasUnitPermission } = usePermission();
+  const units = filterNonNullable(
+    section.reservationUnitOptions.map((x) => x.reservationUnit?.unit?.pk)
+  );
+  const { hasPermission } = useCheckPermission({
+    units,
+    permission: UserPermissionChoice.CanManageApplications,
+    requireAll: true,
+  });
 
   const [rejectMutation, { loading: rejectLoading }] =
     useRejectAllSectionOptionsMutation();
@@ -530,21 +539,15 @@ function RejectAllOptionsButton({
     console.warn("section.allocations is null", section);
   }
 
-  const hasPerms = section.reservationUnitOptions.every((x) =>
-    hasUnitPermission(
-      UserPermissionChoice.CanManageApplications,
-      x.reservationUnit?.unit
-    )
-  );
   const inAllocation =
     applicationStatus === ApplicationStatusChoice.InAllocation ||
     applicationStatus === ApplicationStatusChoice.Handled;
   const isRejected = section.reservationUnitOptions.every((x) => x.rejected);
   const hasAllocations = section.allocations != null && section.allocations > 0;
   const canReject = inAllocation && !hasAllocations;
-  const isDisabled = !canReject || !hasPerms;
+  const isDisabled = !canReject || !hasPermission;
 
-  if (!hasPerms) {
+  if (!hasPermission) {
     return null;
   }
   return (
@@ -726,8 +729,16 @@ function RejectApplicationButton({
   refetch: () => Promise<ApolloQueryResult<ApplicationAdminQuery>>;
 }): JSX.Element | null {
   const { t } = useTranslation();
-
-  const { hasUnitPermission } = usePermission();
+  const units = filterNonNullable(
+    application.applicationSections?.flatMap((section) =>
+      section.reservationUnitOptions?.map((x) => x.reservationUnit?.unit?.pk)
+    )
+  );
+  const { hasPermission } = useCheckPermission({
+    units,
+    permission: UserPermissionChoice.CanManageApplications,
+    requireAll: true,
+  });
 
   const [rejectionMutation, { loading: isRejectionLoading }] =
     useRejectAllApplicationOptionsMutation();
@@ -810,15 +821,6 @@ function RejectApplicationButton({
     console.warn("application.status is null", application);
   }
 
-  const hasPerms =
-    application.applicationSections?.every((section) =>
-      section.reservationUnitOptions?.every((x) =>
-        hasUnitPermission(
-          UserPermissionChoice.CanManageApplications,
-          x.reservationUnit?.unit
-        )
-      )
-    ) ?? false;
   const isInAllocation =
     application.status === ApplicationStatusChoice.InAllocation ||
     application.status === ApplicationStatusChoice.Handled;
@@ -833,9 +835,9 @@ function RejectApplicationButton({
     application.applicationSections?.every((section) =>
       section.reservationUnitOptions.every((option) => option.rejected)
     ) ?? false;
-  const isDisabled = !canReject || !hasPerms;
+  const isDisabled = !canReject || !hasPermission;
 
-  if (!hasPerms) {
+  if (!hasPermission) {
     return null;
   }
 

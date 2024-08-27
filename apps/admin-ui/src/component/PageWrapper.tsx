@@ -4,7 +4,6 @@ import * as Sentry from "@sentry/nextjs";
 import styled from "styled-components";
 import ClientOnly from "common/src/ClientOnly";
 import Error5xx from "@/common/Error5xx";
-import { usePermission } from "@/hooks/usePermission";
 import { BannerNotificationsList } from "common/src/components";
 import { BannerNotificationTarget } from "@gql/gql-types";
 import ScrollToTop from "../common/ScrollToTop";
@@ -14,6 +13,8 @@ import { MainLander } from "./MainLander";
 import { ToastContainer } from "common/src/common/toast";
 import { useModal } from "@/context/ModalContext";
 import Modal from "@/component/Modal";
+import { useSession } from "@/hooks/auth";
+import { hasAnyPermission } from "@/modules/permissionHelper";
 
 type Props = {
   apiBaseUrl: string;
@@ -48,8 +49,8 @@ export default function PageWrapper({
   feedbackUrl,
   children,
 }: Props): JSX.Element {
-  const { hasAnyPermission, user } = usePermission();
-  const hasAccess = user && hasAnyPermission();
+  const { user } = useSession();
+  const hasAccess = hasAnyPermission(user);
   const { modalContent } = useModal();
   const modal = modalContent.isHds ? (
     modalContent.content

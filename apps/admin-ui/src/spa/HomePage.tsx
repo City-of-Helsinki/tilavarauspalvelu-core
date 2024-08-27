@@ -2,9 +2,9 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { H2 } from "common/src/common/typography";
-import { HERO_IMAGE_URL } from "app/common/const";
-import { usePermission } from "@/hooks/usePermission";
+import { HERO_IMAGE_URL } from "@/common/const";
 import KorosHeading, { Heading } from "@/component/KorosHeading";
+import { useSession } from "@/hooks/auth";
 
 const Wrapper = styled.div``;
 
@@ -19,7 +19,7 @@ const Ingress = styled(H2).attrs({ $legacy: true })`
 function HomePage(): JSX.Element {
   const { t } = useTranslation();
 
-  const { user } = usePermission();
+  const { user } = useSession();
 
   let headingStr = t("User.welcome");
   const name = user?.firstName;

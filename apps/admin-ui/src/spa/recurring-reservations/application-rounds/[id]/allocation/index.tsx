@@ -6,6 +6,7 @@ import { useParams, useSearchParams } from "react-router-dom";
 import styled from "styled-components";
 import { H1, fontBold, fontMedium } from "common/src/common/typography";
 import { ShowAllContainer } from "common/src/components";
+import { hasPermission as hasUnitPermission } from "@/modules/permissionHelper";
 import {
   ApplicantTypeChoice,
   ApplicationRoundStatusChoice,
@@ -29,13 +30,12 @@ import {
   ALLOCATION_POLL_INTERVAL,
   VALID_ALLOCATION_APPLICATION_STATUSES,
 } from "@/common/const";
-import { usePermission } from "@/hooks/usePermission";
 import { truncate } from "@/helpers";
 import { AllocationPageContent } from "./ApplicationEvents";
 import { ComboboxFilter, SearchFilter } from "@/component/QueryParamFilters";
 import { convertPriorityFilter } from "./modules/applicationRoundAllocation";
-import { ApplicationRoundNode } from "common/gql/gql-types";
 import { LinkPrev } from "@/component/LinkPrev";
+import { useSession } from "@/hooks/auth";
 
 const MAX_RES_UNIT_NAME_LENGTH = 35;
 
@@ -587,8 +587,14 @@ function AllocationWrapper({
   });
 
   const { t } = useTranslation();
-  const { hasUnitPermission } = usePermission();
-  const { hasApplicationRoundPermission } = usePermission();
+  const { user } = useSession();
+
+  const { applicationRound } = data ?? {};
+  const reservationUnits = filterNonNullable(
+    applicationRound?.reservationUnits
+  );
+  const unitData = reservationUnits.map((ru) => ru?.unit);
+  const units = uniqBy(filterNonNullable(unitData), "pk");
 
   // TODO don't use spinners, skeletons are better
   // also this blocks the sub component query (the initial with zero filters) which slows down the page load
@@ -603,32 +609,23 @@ function AllocationWrapper({
     return <p>{t("errors.errorFetchingData")}</p>;
   }
 
-  const { applicationRound } = data ?? {};
+  const hasAccess = (unit: (typeof units)[0]) =>
+    unit.pk != null &&
+    hasUnitPermission(
+      user,
+      UserPermissionChoice.CanManageApplications,
+      unit?.pk
+    );
 
-  // should never be null but our codegen causes type problems
-  const canManage =
-    applicationRound != null
-      ? hasApplicationRoundPermission(
-          applicationRound as ApplicationRoundNode,
-          UserPermissionChoice.CanManageApplications
-        )
-      : false;
+  // filter the list of individual units so user can select only the ones they have permission to
+  const filteredUnits = units
+    .filter(hasAccess)
+    // TODO name sort fails with numbers because 11 < 2
+    .sort((a, b) => a?.nameFi?.localeCompare(b?.nameFi ?? "") ?? 0);
 
-  if (!canManage) {
+  if (filteredUnits.length === 0) {
     return <div>{t("errors.noPermission")}</div>;
   }
-
-  const reservationUnits = filterNonNullable(
-    applicationRound?.reservationUnits
-  );
-  const unitData = reservationUnits.map((ru) => ru?.unit);
-
-  // TODO name sort fails with numbers because 11 < 2
-  const units = uniqBy(filterNonNullable(unitData), "pk")
-    .filter((unit) =>
-      hasUnitPermission(UserPermissionChoice.CanManageApplications, unit)
-    )
-    .sort((a, b) => a?.nameFi?.localeCompare(b?.nameFi ?? "") ?? 0);
 
   const roundName = applicationRound?.nameFi ?? "-";
 
@@ -640,7 +637,7 @@ function AllocationWrapper({
     <ApplicationRoundAllocation
       applicationRound={applicationRound ?? undefined}
       applicationRoundPk={applicationRoundPk}
-      units={units}
+      units={filteredUnits}
       reservationUnits={resUnits}
       roundName={roundName}
       applicationRoundStatus={
@@ -660,7 +657,7 @@ function ApplicationRoundAllocationRouted(): JSX.Element {
   return (
     <>
       <LinkPrev />
-      <AllocationWrapper applicationRoundPk={Number(applicationRoundPk)} />*
+      <AllocationWrapper applicationRoundPk={Number(applicationRoundPk)} />
     </>
   );
 }

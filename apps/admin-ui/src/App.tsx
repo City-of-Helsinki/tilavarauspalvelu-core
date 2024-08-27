@@ -7,7 +7,7 @@ import "./i18n";
 import { PUBLIC_URL } from "./common/const";
 import { GlobalContext } from "./context/GlobalContexts";
 import { prefixes } from "./common/urls";
-import AuthorizationChecker from "./common/AuthorizationChecker";
+import { AuthorizationChecker } from "./common/AuthorizationChecker";
 import MyUnitsRouter from "./spa/my-units/router";
 import ReservationsRouter from "./component/reservations/ReservationRouter";
 import NotificationsRouter from "./component/notifications/router";

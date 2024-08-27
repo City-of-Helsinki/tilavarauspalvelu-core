@@ -8,8 +8,10 @@ import { useTranslation } from "react-i18next";
 
 export function ReservationUnitCalendarView({
   reservationUnitOptions,
+  unitPk,
 }: {
   reservationUnitOptions: { label: string; value: number }[];
+  unitPk: number;
 }): JSX.Element {
   const { t } = useTranslation();
 
@@ -63,6 +65,7 @@ export function ReservationUnitCalendarView({
       <ReservationUnitCalendar
         begin={begin}
         reservationUnitPk={reservationUnitPk}
+        unitPk={unitPk}
       />
     </>
   );

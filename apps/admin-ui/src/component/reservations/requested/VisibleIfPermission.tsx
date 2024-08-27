@@ -1,11 +1,17 @@
 import React from "react";
+import { useCheckPermission } from "@/hooks";
 import {
-  usePermission,
-  type ReservationPermissionType,
-} from "@/hooks/usePermission";
-import { UserPermissionChoice } from "@gql/gql-types";
+  type ReservationUnitReservationsFragment,
+  UserPermissionChoice,
+} from "@gql/gql-types";
+import { useSession } from "@/hooks/auth";
 
-const VisibleIfPermission = ({
+type ReservationPermissionType = Pick<
+  ReservationUnitReservationsFragment,
+  "reservationUnit" | "user"
+>;
+
+function VisibleIfPermission({
   reservation,
   permission,
   children,
@@ -15,14 +21,19 @@ const VisibleIfPermission = ({
   permission: UserPermissionChoice;
   children: React.ReactNode;
   otherwise?: React.ReactNode;
-}) => {
-  const { hasPermission } = usePermission();
+}): JSX.Element | null {
+  const { user } = useSession();
+  const isOwner = reservation.user?.pk === user?.pk;
+  const { hasPermission } = useCheckPermission({
+    units: [reservation?.reservationUnit?.[0]?.unit?.pk ?? 0],
+    permission,
+  });
 
-  if (!hasPermission(reservation, permission)) {
+  if (!isOwner && !hasPermission) {
     return otherwise ? <>{otherwise}</> : null;
   }
 
   return <>{children}</>;
-};
+}
 
 export default VisibleIfPermission;

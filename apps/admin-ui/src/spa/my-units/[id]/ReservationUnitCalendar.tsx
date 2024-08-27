@@ -4,27 +4,27 @@ import CommonCalendar from "common/src/calendar/Calendar";
 import { get } from "lodash";
 import { addDays, endOfISOWeek, startOfISOWeek } from "date-fns";
 import styled from "styled-components";
-import { useTranslation } from "react-i18next";
+import { type TFunction, useTranslation } from "next-i18next";
 import {
   ReservationTypeChoice,
   UserPermissionChoice,
   useReservationUnitCalendarQuery,
   type ReservationUnitCalendarQuery,
 } from "@gql/gql-types";
-import { usePermission } from "@/hooks/usePermission";
 import { getEventBuffers } from "common/src/calendar/util";
 import { getReservationUrl } from "@/common/urls";
 import Legend from "@/component/reservations/requested/Legend";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
-import { type TFunction } from "next-i18next";
 import { getReserveeName } from "@/common/util";
 import { errorToast } from "common/src/common/toast";
+import { useCheckPermission } from "@/hooks";
 
 type Props = {
   begin: string;
   reservationUnitPk: number;
+  unitPk: number;
 };
 
 const Legends = styled.div`
@@ -89,8 +89,13 @@ function constructEventTitle(
 export function ReservationUnitCalendar({
   begin,
   reservationUnitPk,
+  unitPk,
 }: Props): JSX.Element {
   const { t } = useTranslation();
+  const { hasPermission } = useCheckPermission({
+    units: [unitPk],
+    permission: UserPermissionChoice.CanViewReservations,
+  });
 
   const calendarEventExcludedLegends = [
     "RESERVATION_UNIT_RELEASED",
@@ -148,8 +153,6 @@ export function ReservationUnitCalendar({
     };
   });
 
-  const { hasPermission } = usePermission();
-
   const evts = filterNonNullable(events.map((e) => e.event)).filter(
     (e) => e.type !== ReservationTypeChoice.Blocked
   );
@@ -163,10 +166,7 @@ export function ReservationUnitCalendar({
         eventStyleGetter={eventStyleGetter(reservationUnitPk)}
         isLoading={isLoading}
         onSelectEvent={(e) => {
-          if (
-            e.event?.pk &&
-            hasPermission(e.event, UserPermissionChoice.CanViewReservations)
-          ) {
+          if (hasPermission) {
             window.open(getReservationUrl(e.event?.pk), "_blank");
           }
         }}

@@ -1,12 +1,15 @@
 import React, { Suspense } from "react";
-import { useSession } from "app/hooks/auth";
-import { usePermissionSuspended } from "app/hooks/usePermission";
-import { MainLander } from "app/component/MainLander";
-import Loader from "app/component/Loader";
+import { useSessionSuspense } from "@/hooks/auth";
+import { MainLander } from "@/component/MainLander";
+import Loader from "@/component/Loader";
 import Error403 from "./Error403";
 import { UserPermissionChoice } from "@gql/gql-types";
+import {
+  hasAnyPermission,
+  hasSomePermission,
+} from "@/modules/permissionHelper";
 
-const AuthorisationChecker = ({
+export function AuthorizationChecker({
   apiUrl,
   children,
   permission,
@@ -16,17 +19,15 @@ const AuthorisationChecker = ({
   children: React.ReactNode;
   feedbackUrl: string;
   permission?: UserPermissionChoice;
-}) => {
-  const { hasAnyPermission, hasSomePermission } = usePermissionSuspended();
-
-  const { isAuthenticated } = useSession();
+}) {
+  const { isAuthenticated, user } = useSessionSuspense();
   if (!isAuthenticated) {
     return <MainLander apiBaseUrl={apiUrl} />;
   }
 
   const hasAccess = permission
-    ? hasSomePermission(permission)
-    : hasAnyPermission();
+    ? hasSomePermission(user, permission)
+    : hasAnyPermission(user);
 
   // Use suspense to avoid flash of unauthorised content
   return (
@@ -38,6 +39,4 @@ const AuthorisationChecker = ({
       )}
     </Suspense>
   );
-};
-
-export default AuthorisationChecker;
+}

@@ -7369,6 +7369,16 @@ export type ReservationDenyReasonsQuery = {
   } | null;
 };
 
+export type CheckPermissionsQueryVariables = Exact<{
+  permission: UserPermissionChoice;
+  units?: InputMaybe<Array<Scalars["Int"]["input"]> | Scalars["Int"]["input"]>;
+  requireAll?: InputMaybe<Scalars["Boolean"]["input"]>;
+}>;
+
+export type CheckPermissionsQuery = {
+  checkPermissions?: { hasPermission: boolean } | null;
+};
+
 export type ReservationUnitsFilterParamsQueryVariables = Exact<{
   after?: InputMaybe<Scalars["String"]["input"]>;
   unit?: InputMaybe<
@@ -12672,6 +12682,93 @@ export type ReservationDenyReasonsSuspenseQueryHookResult = ReturnType<
 export type ReservationDenyReasonsQueryResult = Apollo.QueryResult<
   ReservationDenyReasonsQuery,
   ReservationDenyReasonsQueryVariables
+>;
+export const CheckPermissionsDocument = gql`
+  query CheckPermissions(
+    $permission: UserPermissionChoice!
+    $units: [Int!]
+    $requireAll: Boolean = false
+  ) {
+    checkPermissions(
+      permission: $permission
+      units: $units
+      requireAll: $requireAll
+    ) {
+      hasPermission
+    }
+  }
+`;
+
+/**
+ * __useCheckPermissionsQuery__
+ *
+ * To run a query within a React component, call `useCheckPermissionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCheckPermissionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCheckPermissionsQuery({
+ *   variables: {
+ *      permission: // value for 'permission'
+ *      units: // value for 'units'
+ *      requireAll: // value for 'requireAll'
+ *   },
+ * });
+ */
+export function useCheckPermissionsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    CheckPermissionsQuery,
+    CheckPermissionsQueryVariables
+  > &
+    (
+      | { variables: CheckPermissionsQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<CheckPermissionsQuery, CheckPermissionsQueryVariables>(
+    CheckPermissionsDocument,
+    options
+  );
+}
+export function useCheckPermissionsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    CheckPermissionsQuery,
+    CheckPermissionsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    CheckPermissionsQuery,
+    CheckPermissionsQueryVariables
+  >(CheckPermissionsDocument, options);
+}
+export function useCheckPermissionsSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<
+    CheckPermissionsQuery,
+    CheckPermissionsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    CheckPermissionsQuery,
+    CheckPermissionsQueryVariables
+  >(CheckPermissionsDocument, options);
+}
+export type CheckPermissionsQueryHookResult = ReturnType<
+  typeof useCheckPermissionsQuery
+>;
+export type CheckPermissionsLazyQueryHookResult = ReturnType<
+  typeof useCheckPermissionsLazyQuery
+>;
+export type CheckPermissionsSuspenseQueryHookResult = ReturnType<
+  typeof useCheckPermissionsSuspenseQuery
+>;
+export type CheckPermissionsQueryResult = Apollo.QueryResult<
+  CheckPermissionsQuery,
+  CheckPermissionsQueryVariables
 >;
 export const ReservationUnitsFilterParamsDocument = gql`
   query ReservationUnitsFilterParams(

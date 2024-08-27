@@ -128,6 +128,7 @@ export function MyUnitView() {
         <UnitCalendarTabPanel key="reservation-unit">
           <ReservationUnitCalendarView
             reservationUnitOptions={reservationUnitOptions}
+            unitPk={Number(pk)}
           />
         </UnitCalendarTabPanel>
       </Tabs>

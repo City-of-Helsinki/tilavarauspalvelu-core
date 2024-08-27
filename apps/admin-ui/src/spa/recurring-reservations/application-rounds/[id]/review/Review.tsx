@@ -29,7 +29,7 @@ import {
   getPermissionErrors,
   getValidationErrors,
 } from "common/src/apolloUtils";
-import { usePermission } from "@/hooks/usePermission";
+import { useCheckPermission } from "@/hooks";
 import { isApplicationRoundInProgress } from "@/helpers";
 import { breakpoints } from "common";
 import RejectedOccurrencesDataLoader from "./RejectedOccurrencesDataLoader";
@@ -194,12 +194,14 @@ function EndAllocation({
       ? t("ApplicationRound.info.sendResultsBtn")
       : t("ApplicationRound.info.createBtn");
 
-  // NOTE the permission check is somewhat redundant because the backend variable is already checked
-  const { hasApplicationRoundPermission } = usePermission();
-  const canEndAllocation = hasApplicationRoundPermission(
-    applicationRound,
-    UserPermissionChoice.CanManageApplications
+  const units = filterNonNullable(
+    applicationRound.reservationUnits.flatMap((ru) => ru.unit?.pk)
   );
+  const { hasPermission: canEndAllocation } = useCheckPermission({
+    units,
+    permission: UserPermissionChoice.CanManageApplications,
+    requireAll: true,
+  });
 
   return (
     <StyledNotification type={hasFailed ? "error" : "info"} label={infoBody}>

@@ -12,8 +12,8 @@ import React from "react";
 import styled from "styled-components";
 import { useLocation, useNavigate } from "react-router-dom";
 import useHandling from "@/hooks/useHandling";
-import { usePermission } from "@/hooks/usePermission";
 import Logo from "common/src/components/Logo";
+import { hasSomePermission } from "@/modules/permissionHelper";
 import { env } from "@/env.mjs";
 import {
   allReservationsUrl,
@@ -134,73 +134,65 @@ interface IMenuChild {
   routes?: string[];
   excludeRoutes?: string[];
   exact?: boolean;
-  permission?: UserPermissionChoice;
 }
 
-const getFilteredMenu = (
+function getFilteredMenu(
   hasOwnUnits: boolean,
-  hasPermission: (perm: UserPermissionChoice) => boolean
-): IMenuChild[] => [
-  ...(hasOwnUnits
-    ? [
-        {
-          title: "MainMenu.myUnits",
-          icon: <IconStar aria-hidden />,
-          routes: [myUnitsUrl],
-        },
-      ]
-    : []),
-
-  ...(hasPermission(UserPermissionChoice.CanViewReservations) ||
-  hasPermission(UserPermissionChoice.CanCreateStaffReservations)
-    ? [
-        {
-          title: "MainMenu.requestedReservations",
-          routes: [requestedReservationsUrl],
-          exact: true,
-        },
-        {
-          title: "MainMenu.allReservations",
-          routes: [allReservationsUrl, reservationsUrl],
-          excludeRoutes: [requestedReservationsUrl],
-        },
-      ]
-    : []),
-
-  ...(hasPermission(UserPermissionChoice.CanViewApplications)
-    ? [
-        {
-          title: "MainMenu.applicationRounds",
-          routes: [applicationRoundsUrl],
-        },
-      ]
-    : []),
-
-  ...(hasPermission(UserPermissionChoice.CanManageReservationUnits)
-    ? [
-        {
-          permission: UserPermissionChoice.CanManageReservationUnits,
-          title: "MainMenu.reservationUnits",
-          routes: [reservationUnitsUrl],
-        },
-        {
-          permission: UserPermissionChoice.CanManageReservationUnits,
-          title: "MainMenu.units",
-          routes: [unitsUrl, singleUnitUrl],
-        },
-      ].filter((item) => hasPermission(item.permission))
-    : []),
-
-  ...(hasPermission(UserPermissionChoice.CanManageNotifications)
-    ? [
-        {
-          permission: UserPermissionChoice.CanManageNotifications,
-          title: "MainMenu.notifications",
-          routes: [bannerNotificationsUrl],
-        },
-      ].filter((item) => hasPermission(item.permission))
-    : []),
-];
+  hasPermission: (perm: UserPermissionChoice, onlyGeneral?: boolean) => boolean
+): IMenuChild[] {
+  const menuItems: IMenuChild[] = [];
+  if (hasOwnUnits) {
+    menuItems.push({
+      title: "MainMenu.myUnits",
+      icon: <IconStar aria-hidden />,
+      routes: [myUnitsUrl],
+    });
+  }
+  if (
+    hasPermission(UserPermissionChoice.CanViewReservations) ||
+    hasPermission(UserPermissionChoice.CanCreateStaffReservations)
+  ) {
+    menuItems.push(
+      {
+        title: "MainMenu.requestedReservations",
+        routes: [requestedReservationsUrl],
+        exact: true,
+      },
+      {
+        title: "MainMenu.allReservations",
+        routes: [allReservationsUrl, reservationsUrl],
+        excludeRoutes: [requestedReservationsUrl],
+      }
+    );
+  }
+  // NOTE: this is shown even if there are no application rounds accessible for this user
+  // i.e. they have the permission to a unit that is not on any application round
+  if (hasPermission(UserPermissionChoice.CanViewApplications)) {
+    menuItems.push({
+      title: "MainMenu.applicationRounds",
+      routes: [applicationRoundsUrl],
+    });
+  }
+  if (hasPermission(UserPermissionChoice.CanManageReservationUnits)) {
+    menuItems.push(
+      {
+        title: "MainMenu.reservationUnits",
+        routes: [reservationUnitsUrl],
+      },
+      {
+        title: "MainMenu.units",
+        routes: [unitsUrl, singleUnitUrl],
+      }
+    );
+  }
+  if (hasPermission(UserPermissionChoice.CanManageNotifications, true)) {
+    menuItems.push({
+      title: "MainMenu.notifications",
+      routes: [bannerNotificationsUrl],
+    });
+  }
+  return menuItems;
+}
 
 function checkActive(
   pathname: string,
@@ -266,10 +258,14 @@ const Navigation = ({ apiBaseUrl }: Props) => {
   const lastName = user?.lastName?.trim() ?? "";
   const name = `${firstName} ${lastName}`.trim() || t("Navigation.noName");
   const { handlingCount, hasOwnUnits } = useHandling();
-  const { hasSomePermission, user: userPermission } = usePermission();
-  if (!userPermission) return null;
+  if (!user) {
+    return null;
+  }
 
-  const menuItemList = getFilteredMenu(hasOwnUnits, hasSomePermission).filter(
+  const hasPerms = (perm: UserPermissionChoice, onlyGeneral?: boolean) => {
+    return hasSomePermission(user, perm, onlyGeneral);
+  };
+  const menuItemList = getFilteredMenu(hasOwnUnits, hasPerms).filter(
     (item) => item != null
   );
 

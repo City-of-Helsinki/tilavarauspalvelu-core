@@ -5,8 +5,8 @@ import { errorToast } from "common/src/common/toast";
 import { UserPermissionChoice, useApplicationRoundQuery } from "@gql/gql-types";
 import Loader from "@/component/Loader";
 import { Review } from "./review/Review";
-import { usePermission } from "@/hooks/usePermission";
-import { base64encode } from "common/src/helpers";
+import { useCheckPermission } from "@/hooks";
+import { base64encode, filterNonNullable } from "common/src/helpers";
 import { isApplicationRoundInProgress } from "@/helpers";
 
 function ApplicationRound({ pk }: { pk: number }): JSX.Element {
@@ -25,7 +25,18 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
     },
   });
   const { applicationRound } = data ?? {};
-  const { hasApplicationRoundPermission } = usePermission();
+  const units = filterNonNullable(
+    applicationRound?.reservationUnits.map((x) => x.unit?.pk)
+  );
+  const { hasPermission: canView } = useCheckPermission({
+    units,
+    permission: UserPermissionChoice.CanViewApplications,
+  });
+  const { hasPermission: canManage } = useCheckPermission({
+    units,
+    permission: UserPermissionChoice.CanManageApplications,
+  });
+  const hasPermission = canView || canManage;
 
   // NOTE: useEffect works, onCompleted does not work with refetch
   useEffect(() => {
@@ -46,15 +57,7 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
     return <div>{t("errors.applicationRoundNotFound")}</div>;
   }
 
-  const canView = hasApplicationRoundPermission(
-    applicationRound,
-    UserPermissionChoice.CanViewApplications
-  );
-  const canManage = hasApplicationRoundPermission(
-    applicationRound,
-    UserPermissionChoice.CanManageApplications
-  );
-  if (!canView && !canManage) {
+  if (!hasPermission) {
     return <div>{t("errors.noPermission")}</div>;
   }
 
