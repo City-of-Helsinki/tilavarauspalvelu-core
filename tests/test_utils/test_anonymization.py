@@ -1,5 +1,6 @@
 import pytest
 from auditlog.models import LogEntry
+from social_django.models import UserSocialAuth
 
 from permissions.models import (
     GeneralRole,
@@ -17,6 +18,7 @@ from tests.factories import (
     ServiceSectorFactory,
     UnitFactory,
     UserFactory,
+    UserSocialAuthFactory,
 )
 from users.anonymisation import (
     ANONYMIZED,
@@ -41,7 +43,9 @@ def test_anonymization__user():
         last_name="mous",
         email="anony.mous@foo.com",
         reservation_notification=ReservationNotification.ALL,
+        profile_id="mouse",
     )
+    UserSocialAuthFactory.create(user=mr_anonymous)
 
     # Add general role
     general_role_choice = GeneralRoleChoice.objects.create(code="general_role")
@@ -76,10 +80,12 @@ def test_anonymization__user():
     assert mr_anonymous.is_active is False
     assert mr_anonymous.is_superuser is False
     assert mr_anonymous.is_staff is False
+    assert mr_anonymous.profile_id == ""
 
     assert GeneralRole.objects.filter(user=mr_anonymous).count() == 0
     assert ServiceSectorRole.objects.filter(user=mr_anonymous).count() == 0
     assert UnitRole.objects.filter(user=mr_anonymous).count() == 0
+    assert UserSocialAuth.objects.filter(user=mr_anonymous).count() == 0
 
 
 def test_anonymization__application():
