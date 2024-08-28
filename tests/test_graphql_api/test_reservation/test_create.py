@@ -686,7 +686,6 @@ def test_reservation__create__price_calculation__free_reservation_unit(graphql):
     assert reservation.price == 0  # Free units should always be 0 €
     assert reservation.non_subsidised_price == reservation.price  # Non subsidised price be the same as price
     assert reservation.price_net == 0
-    assert reservation.non_subsidised_price_net == reservation.price_net
     assert reservation.unit_price == 0
     assert reservation.tax_percentage_value == 0
 
@@ -711,7 +710,6 @@ def test_reservation__create__price_calculation__fixed_price_reservation_unit(gr
     assert reservation.non_subsidised_price == price
     assert reservation.unit_price == price
     assert reservation.price_net == price_net
-    assert reservation.non_subsidised_price_net == price_net
     assert reservation.tax_percentage_value == pricing.tax_percentage.value
 
 
@@ -735,7 +733,6 @@ def test_reservation__create__price_calculation__time_based_price(graphql):
     assert reservation.price == price
     assert reservation.non_subsidised_price == price
     assert reservation.price_net == price_net
-    assert reservation.non_subsidised_price_net == price_net
     assert reservation.unit_price == pricing.highest_price
     assert reservation.tax_percentage_value == pricing.tax_percentage.value
 
@@ -769,7 +766,6 @@ def test_reservation__create__price_calculation__multiple_reservation_units(grap
     assert reservation.price == price
     assert reservation.non_subsidised_price == price
     assert reservation.price_net == price_net
-    assert reservation.non_subsidised_price_net == price_net
     assert reservation.unit_price == pricing_1.highest_price  # always from the first unit
     assert reservation.tax_percentage_value == pricing_1.tax_percentage.value  # always from the first unit
 
@@ -811,7 +807,6 @@ def test_reservation__create__price_calculation__future_pricing(graphql):
     assert reservation.price == price
     assert reservation.non_subsidised_price == price
     assert reservation.price_net == price_net
-    assert reservation.non_subsidised_price_net == price_net
     assert reservation.unit_price == future_pricing.highest_price
     assert reservation.tax_percentage_value == future_pricing.tax_percentage.value
 

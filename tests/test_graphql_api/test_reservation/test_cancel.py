@@ -186,7 +186,7 @@ def test_reservation__cancel__sends_email_notification(graphql, outbox, settings
 
 @patch_method(VerkkokauppaAPIClient.refund_order)
 def test_reservation__cancel__starts_refund_process_for_paid_reservation(graphql):
-    reservation = ReservationFactory.create_for_cancellation(price_net=1)
+    reservation = ReservationFactory.create_for_cancellation(price=1)
 
     remote_id = uuid.uuid4()
     payment_order = PaymentOrderFactory.create(

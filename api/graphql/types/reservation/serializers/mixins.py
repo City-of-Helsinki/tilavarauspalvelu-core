@@ -40,22 +40,6 @@ class PriceCalculationResult:
         self.non_subsidised_price = non_subsidised_price
         self.subsidised_price = subsidised_price
 
-    @property
-    def _tax_percentage_multiplier(self) -> Decimal:
-        return 1 + self.tax_percentage_value / 100
-
-    @property
-    def reservation_price_net(self) -> Decimal:
-        return self.reservation_price / self._tax_percentage_multiplier
-
-    @property
-    def non_subsidised_price_net(self) -> Decimal:
-        return self.non_subsidised_price / self._tax_percentage_multiplier
-
-    @property
-    def subsidised_price_net(self) -> Decimal:
-        return self.subsidised_price / self._tax_percentage_multiplier
-
 
 class ReservationPriceMixin:
     """Validation methods for pricing related operations"""
