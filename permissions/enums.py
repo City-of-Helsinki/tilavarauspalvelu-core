@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import enum
+from inspect import cleandoc
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -90,15 +91,8 @@ class UserRoleChoice(models.TextChoices):
     @classmethod
     def permission_map(cls) -> dict[UserPermissionChoice, list[UserRoleChoice]]:
         """Maps permissions to roles that have those permissions."""
-        try:
-            converter = UserPermissionChoice
-        except NameError:
-            # When creating 'UserPermissionChoice'
-            def converter(x: str) -> str:
-                return x
-
         return {
-            converter(str(key).upper()): getattr(cls, key)()
+            UserPermissionChoice(str(key).upper()): getattr(cls, key)()
             for key, value in cls.__dict__.items()
             if isinstance(value, permission)
         }
@@ -108,8 +102,26 @@ class UserRoleChoice(models.TextChoices):
         """List all permissions for a single role. Use like this: `UserRoleChoice.ADMIN.permissions`"""
         return [name for name, roles in UserRoleChoice.permission_map().items() if self in roles]
 
+    @classmethod
+    def permission_choices(cls) -> list[tuple[str, tuple[str, str]]]:
+        """Choices for UserPermissionChoice."""
+        return sorted(
+            (
+                (
+                    str(key).upper(),  # key
+                    (
+                        str(key).upper(),  # .name
+                        cleandoc(getattr(cls, key).__doc__),  # .label
+                    ),
+                )
+                for key, value in cls.__dict__.items()
+                if isinstance(value, permission)
+            ),
+            key=lambda x: x[0],
+        )
+
 
 # There is the disadvantage that we don't get autocomplete of permissions like this,
 # but we also don't duplicate permissions from the roles above. This should be fine,
 # as the enum is not really used in our code but meant for the frontend.
-UserPermissionChoice = models.TextChoices("UserPermissionChoice", sorted(UserRoleChoice.permission_map()))
+UserPermissionChoice = models.TextChoices("UserPermissionChoice", UserRoleChoice.permission_choices())
