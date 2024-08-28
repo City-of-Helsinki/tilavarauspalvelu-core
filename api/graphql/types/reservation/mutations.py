@@ -15,7 +15,6 @@ from utils.sentry import SentryLogger
 
 from .permissions import (
     ReservationCommentPermission,
-    ReservationDenyPermission,
     ReservationHandlingPermission,
     ReservationPermission,
     ReservationRefundPermission,
@@ -82,7 +81,7 @@ class ReservationCancellationMutation(UpdateMutation):
 class ReservationDenyMutation(UpdateMutation):
     class Meta:
         serializer_class = ReservationDenySerializer
-        permission_classes = [ReservationDenyPermission]
+        permission_classes = [ReservationHandlingPermission]
 
 
 class ReservationRefundMutation(UpdateMutation):

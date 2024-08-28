@@ -275,7 +275,13 @@ class PermissionResolver:
             return True
         return self.has_general_role(role_choices=UserRoleChoice.can_manage_notifications())
 
-    def can_manage_reservation(self, reservation: Reservation, *, reserver_needs_role: bool = False) -> bool:
+    def can_manage_reservation(
+        self,
+        reservation: Reservation,
+        *,
+        reserver_needs_role: bool = False,
+        allow_reserver_role_for_own_reservations: bool = False,
+    ) -> bool:
         if self.is_user_anonymous_or_inactive():
             return False
         if self.user.is_superuser:
@@ -285,6 +291,9 @@ class PermissionResolver:
             return True
 
         role_choices = UserRoleChoice.can_manage_reservations()
+        if allow_reserver_role_for_own_reservations and self.user == reservation.user:
+            role_choices.append(UserRoleChoice.RESERVER)
+
         if self.has_general_role(role_choices=role_choices):
             return True
 
