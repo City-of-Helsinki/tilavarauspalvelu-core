@@ -215,7 +215,8 @@ function ClientApp({
                 reservationUnitPreviewUrl={reservationUnitPreviewUrl}
               />,
               apiBaseUrl,
-              feedbackUrl
+              feedbackUrl,
+              UserPermissionChoice.CanManageReservationUnits
             )}
           />
           <Route
