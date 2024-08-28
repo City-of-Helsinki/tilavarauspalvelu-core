@@ -48,24 +48,6 @@ def test_reservation__approve__approving_fails_when_price_missing(graphql):
     assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
 
 
-def test_reservation__approve__fails_when_price_net_missing(graphql):
-    reservation_unit = ReservationUnitFactory.create()
-    reservation = ReservationFactory.create(
-        state=ReservationStateChoice.REQUIRES_HANDLING,
-        reservation_unit=[reservation_unit],
-    )
-
-    graphql.login_with_superuser()
-    input_data = get_approve_data(reservation)
-    input_data.pop("priceNet")
-    response = graphql(APPROVE_MUTATION, input_data=input_data)
-
-    assert response.has_errors is True
-
-    reservation.refresh_from_db()
-    assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
-
-
 def test_reservation__approve__fails_when_handling_details_missing(graphql):
     reservation_unit = ReservationUnitFactory.create()
     reservation = ReservationFactory.create(

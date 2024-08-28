@@ -7,7 +7,6 @@ from api.graphql.types.reservation.serializers.mixins import ReservationPriceMix
 from common.date_utils import local_datetime
 from reservation_units.enums import PriceUnit, PricingStatus, PricingType
 from tests.factories import ReservationUnitFactory, ReservationUnitPricingFactory
-from utils.decimal_utils import round_decimal
 
 # Applied to all tests
 pytestmark = [
@@ -24,7 +23,6 @@ def test_reservation__calculate_price__subsidised_price_is_equal_to_lowest_price
 
     assert prices.reservation_price == Decimal("10")
     assert prices.subsidised_price == pricing.lowest_price
-    assert prices.subsidised_price_net == pricing.lowest_price_net
 
 
 def test_reservation__calculate_price__subsidised_price_is_equal_to_lowest_price__hourly_price():
@@ -35,9 +33,7 @@ def test_reservation__calculate_price__subsidised_price_is_equal_to_lowest_price
     prices = ReservationPriceMixin().calculate_price(begin, end, [pricing.reservation_unit])
 
     assert prices.reservation_price == pricing.highest_price * 2
-    assert round_decimal(prices.reservation_price_net, 6) == round_decimal(pricing.highest_price_net * 2, 6)
     assert prices.subsidised_price == pricing.lowest_price * 2
-    assert round_decimal(prices.subsidised_price_net, 6) == round_decimal(pricing.lowest_price_net * 2, 6)
 
 
 def test_reservation__calculate_price__pricing_is_calculated_per_15_min_with_pricing_type_less_than_half_day():
@@ -53,9 +49,6 @@ def test_reservation__calculate_price__pricing_is_calculated_per_15_min_with_pri
     prices = ReservationPriceMixin().calculate_price(begin, end, [pricing.reservation_unit])
 
     assert prices.reservation_price == pricing.lowest_price * Decimal("1.25")
-    assert round_decimal(prices.reservation_price_net, 6) == round_decimal(
-        pricing.lowest_price_net * Decimal("1.25"), 6
-    )
 
 
 def test_reservation__calculate_price__pricing_is_fixed_with_pricing_type_more_than_half_day():
@@ -71,7 +64,6 @@ def test_reservation__calculate_price__pricing_is_fixed_with_pricing_type_more_t
     prices = ReservationPriceMixin().calculate_price(begin, end, [pricing.reservation_unit])
 
     assert prices.reservation_price == pricing.lowest_price
-    assert prices.reservation_price_net == pricing.lowest_price_net
 
 
 def test_reservation__calculate_price__pricing_is_fixed_even_when_duration_is_double_the_pricing_unit():
@@ -87,7 +79,6 @@ def test_reservation__calculate_price__pricing_is_fixed_even_when_duration_is_do
     prices = ReservationPriceMixin().calculate_price(begin, end, [pricing.reservation_unit])
 
     assert prices.reservation_price == pricing.lowest_price
-    assert prices.reservation_price_net == pricing.lowest_price_net
 
 
 def test_reservation__calculate_price__future_has_same_tax_percentage():

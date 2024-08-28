@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from decimal import Decimal
 from typing import TYPE_CHECKING
 
 from django.db import models
@@ -20,10 +21,9 @@ from reservations.enums import (
 )
 from reservations.querysets import ReservationQuerySet
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
+from utils.decimal_utils import round_decimal
 
 if TYPE_CHECKING:
-    from decimal import Decimal
-
     from applications.models import City
     from reservations.models import (
         AgeGroup,
@@ -79,9 +79,7 @@ class Reservation(SerializableMixin, models.Model):
 
     # Pricing details
     price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    price_net: Decimal = models.DecimalField(max_digits=20, decimal_places=6, default=0)
     non_subsidised_price: Decimal = models.DecimalField(max_digits=20, decimal_places=2, default=0)
-    non_subsidised_price_net: Decimal = models.DecimalField(max_digits=20, decimal_places=6, default=0)
     unit_price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     tax_percentage_value: Decimal = models.DecimalField(max_digits=5, decimal_places=2, default=0)
 
@@ -212,6 +210,14 @@ class Reservation(SerializableMixin, models.Model):
 
     def __str__(self) -> str:
         return f"{self.name} ({self.type})"
+
+    @property
+    def price_net(self) -> Decimal:
+        return round_decimal(self.price / (1 + self.tax_percentage_value / Decimal(100)), 6)
+
+    @property
+    def non_subsidised_price_net(self) -> Decimal:
+        return round_decimal(self.non_subsidised_price / (1 + self.tax_percentage_value / Decimal(100)), 6)
 
     @lookup_property(joins=["recurring_reservation", "user"])
     def reservee_name() -> str:

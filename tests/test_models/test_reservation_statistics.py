@@ -37,7 +37,6 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
         home_city=City.objects.create(name="Test", municipality_code="1234"),
         name="movies",
         non_subsidised_price=Decimal("11.00"),
-        non_subsidised_price_net=Decimal("8.87"),
         price=10,
         purpose=ReservationPurposeFactory(name="PurpleChoice"),
         recurring_reservation=recurring,

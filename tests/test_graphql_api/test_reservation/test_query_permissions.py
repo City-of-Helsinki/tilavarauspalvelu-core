@@ -261,7 +261,6 @@ def test_reservation__query__reservation_owner_can_see_personal_information_from
         name="foo",
         num_persons=1,
         price=123,
-        price_net=100,
         purpose=ReservationPurposeFactory.create(),
         reservee_address_city="city",
         reservee_address_street="street",
