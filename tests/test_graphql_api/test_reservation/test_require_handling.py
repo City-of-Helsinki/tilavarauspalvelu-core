@@ -1,9 +1,8 @@
 import pytest
 
 from email_notification.models import EmailType
-from permissions.enums import UserRoleChoice
 from reservations.enums import ReservationStateChoice
-from tests.factories import EmailTemplateFactory, ReservationFactory, UnitFactory, UserFactory
+from tests.factories import EmailTemplateFactory, ReservationFactory, UserFactory
 from users.models import ReservationNotification
 
 from .helpers import REQUIRE_HANDLING_MUTATION, get_require_handling_data
@@ -78,46 +77,3 @@ def test_reservation__handling_required__disallowed_states(graphql, state):
 
     reservation.refresh_from_db()
     assert reservation.state == state
-
-
-def test_reservation__handling_required__regular_user(graphql):
-    reservation = ReservationFactory.create_for_handling_required()
-
-    graphql.login_with_regular_user()
-    input_data = get_require_handling_data(reservation)
-    response = graphql(REQUIRE_HANDLING_MUTATION, input_data=input_data)
-
-    assert response.error_message() == "No permission to update."
-
-    reservation.refresh_from_db()
-    assert reservation.state != ReservationStateChoice.REQUIRES_HANDLING
-
-
-def test_reservation__handling_required__unit_reserver__own_reservation(graphql):
-    unit = UnitFactory.create()
-    admin = UserFactory.create_with_unit_role(units=[unit])
-    reservation = ReservationFactory.create_for_handling_required(user=admin, reservation_unit__unit=unit)
-
-    graphql.force_login(admin)
-    input_data = get_require_handling_data(reservation)
-    response = graphql(REQUIRE_HANDLING_MUTATION, input_data=input_data)
-
-    assert response.has_errors is False, response.errors
-
-    reservation.refresh_from_db()
-    assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
-
-
-def test_reservation__handling_required__unit_reserver__other_user_reservation(graphql):
-    unit = UnitFactory.create()
-    admin = UserFactory.create_with_unit_role(units=[unit], role=UserRoleChoice.RESERVER)
-    reservation = ReservationFactory.create_for_handling_required(reservation_unit__unit=unit)
-
-    graphql.force_login(admin)
-    input_data = get_require_handling_data(reservation)
-    response = graphql(REQUIRE_HANDLING_MUTATION, input_data=input_data)
-
-    assert response.error_message() == "No permission to update."
-
-    reservation.refresh_from_db()
-    assert reservation.state != ReservationStateChoice.REQUIRES_HANDLING

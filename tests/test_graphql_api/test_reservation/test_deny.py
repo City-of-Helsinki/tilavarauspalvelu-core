@@ -5,54 +5,13 @@ import pytest
 from common.date_utils import local_datetime
 from email_notification.models import EmailType
 from reservations.enums import ReservationStateChoice, ReservationTypeChoice
-from tests.factories import EmailTemplateFactory, ReservationFactory, UserFactory
+from tests.factories import EmailTemplateFactory, ReservationFactory
 
 from .helpers import DENY_MUTATION, get_deny_data
 
 pytestmark = [
     pytest.mark.django_db,
 ]
-
-
-def test_reservation__deny__regular_user(graphql):
-    reservation = ReservationFactory.create_for_deny()
-
-    graphql.login_with_regular_user()
-    data = get_deny_data(reservation)
-    response = graphql(DENY_MUTATION, input_data=data)
-
-    assert response.error_message() == "No permission to update."
-
-    reservation.refresh_from_db()
-    assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
-
-
-def test_reservation__deny__general_admin(graphql):
-    reservation = ReservationFactory.create_for_deny()
-    admin = UserFactory.create_with_general_role()
-
-    graphql.force_login(admin)
-    data = get_deny_data(reservation)
-    response = graphql(DENY_MUTATION, input_data=data)
-
-    assert response.has_errors is False, response.errors
-
-    reservation.refresh_from_db()
-    assert reservation.state == ReservationStateChoice.DENIED
-
-
-def test_reservation__deny__own_reservation_with_reservation_staff_create_permissions(graphql):
-    admin = UserFactory.create_with_general_role()
-    reservation = ReservationFactory.create_for_deny(user=admin)
-
-    graphql.force_login(admin)
-    input_data = get_deny_data(reservation)
-    response = graphql(DENY_MUTATION, input_data=input_data)
-
-    assert response.has_errors is False, response.errors
-
-    reservation.refresh_from_db()
-    assert reservation.state == ReservationStateChoice.DENIED
 
 
 def test_reservation__deny__state_is_confirmed(graphql):

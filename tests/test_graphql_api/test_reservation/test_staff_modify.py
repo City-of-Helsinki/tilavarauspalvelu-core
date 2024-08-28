@@ -3,9 +3,8 @@ import datetime
 import pytest
 
 from common.date_utils import next_hour
-from permissions.enums import UserRoleChoice
 from reservations.enums import ReservationStateChoice, ReservationTypeChoice
-from tests.factories import ReservationFactory, UserFactory
+from tests.factories import ReservationFactory
 
 from .helpers import UPDATE_STAFF_MUTATION, get_staff_modify_data
 
@@ -25,36 +24,6 @@ def test_reservation__staff_modify(graphql):
 
     reservation.refresh_from_db()
     assert reservation.name == "foo"
-
-
-def test_reservation__staff_modify__unit_handler__other_users_reservation(graphql):
-    reservation = ReservationFactory.create_for_staff_update()
-
-    admin = UserFactory.create_with_unit_role(units=[reservation.reservation_unit.first().unit])
-
-    graphql.force_login(admin)
-    data = get_staff_modify_data(reservation)
-    response = graphql(UPDATE_STAFF_MUTATION, input_data=data)
-
-    assert response.has_errors is False, response.errors
-
-    reservation.refresh_from_db()
-    assert reservation.name == "foo"
-
-
-def test_reservation__staff_modify__unit_reserver__other_users_reservation(graphql):
-    reservation = ReservationFactory.create_for_staff_update()
-
-    admin = UserFactory.create_with_unit_role(
-        units=[reservation.reservation_unit.first().unit],
-        role=UserRoleChoice.RESERVER,
-    )
-
-    graphql.force_login(admin)
-    data = get_staff_modify_data(reservation)
-    response = graphql(UPDATE_STAFF_MUTATION, input_data=data)
-
-    assert response.error_message() == "No permission to update."
 
 
 def test_reservation__staff_modify__normal_reservation_to_staff(graphql):

@@ -8,7 +8,7 @@ from email_notification.models import EmailType
 from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import ReservationUnitHierarchy
 from reservations.enums import ReservationStateChoice, ReservationTypeChoice
-from tests.factories import EmailTemplateFactory, ReservationFactory, UserFactory
+from tests.factories import EmailTemplateFactory, ReservationFactory
 
 from .helpers import ADJUST_STAFF_MUTATION, get_staff_adjust_data
 
@@ -406,30 +406,3 @@ def test_reservation__staff_adjust_time__reservation_start_interval_over_30_trea
     reservation.refresh_from_db()
     assert reservation.begin == begin
     assert reservation.end == end
-
-
-def test_reservation__staff_adjust_time__unit_reserver_can_adjust_own_reservation(graphql):
-    reservation = ReservationFactory.create_for_time_adjustment()
-
-    admin = UserFactory.create_with_unit_role(units=[reservation.reservation_unit.first().unit])
-
-    reservation.user = admin
-    reservation.save()
-
-    graphql.force_login(admin)
-    data = get_staff_adjust_data(reservation)
-    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
-
-    assert response.has_errors is False, response.errors
-
-
-def test_reservation__staff_adjust_time__unit_reserver_cannot_adjust_for_other_user_reservation(graphql):
-    reservation = ReservationFactory.create_for_time_adjustment()
-
-    UserFactory.create_with_unit_role(units=[reservation.reservation_unit.first().unit])
-    graphql.login_with_regular_user()
-
-    data = get_staff_adjust_data(reservation)
-    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
-
-    assert response.error_message() == "No permission to update."

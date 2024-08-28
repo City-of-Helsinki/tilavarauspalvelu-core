@@ -10,7 +10,6 @@ from reservations.models import Reservation
 
 __all__ = [
     "ReservationCommentPermission",
-    "ReservationDenyPermission",
     "ReservationHandlingPermission",
     "ReservationPermission",
     "ReservationRefundPermission",
@@ -41,13 +40,11 @@ class ReservationPermission(BasePermission):
 class ReservationHandlingPermission(BasePermission):
     @classmethod
     def has_update_permission(cls, instance: Reservation, user: AnyUser, input_data: dict[str, Any]) -> bool:
-        return user.permissions.can_manage_reservation(instance, reserver_needs_role=True)
-
-
-class ReservationDenyPermission(BasePermission):
-    @classmethod
-    def has_update_permission(cls, instance: Reservation, user: AnyUser, input_data: dict[str, Any]) -> bool:
-        return user.permissions.can_manage_reservation(instance, reserver_needs_role=True)
+        return user.permissions.can_manage_reservation(
+            instance,
+            reserver_needs_role=True,
+            allow_reserver_role_for_own_reservations=True,
+        )
 
 
 class ReservationRefundPermission(BasePermission):
@@ -59,13 +56,21 @@ class ReservationRefundPermission(BasePermission):
 class StaffAdjustTimePermission(BasePermission):
     @classmethod
     def has_update_permission(cls, instance: Reservation, user: AnyUser, input_data: dict[str, Any]) -> bool:
-        return user.permissions.can_manage_reservation(instance, reserver_needs_role=True)
+        return user.permissions.can_manage_reservation(
+            instance,
+            reserver_needs_role=True,
+            allow_reserver_role_for_own_reservations=True,
+        )
 
 
 class StaffReservationModifyPermission(BasePermission):
     @classmethod
     def has_update_permission(cls, instance: Reservation, user: AnyUser, input_data: dict[str, Any]) -> bool:
-        return user.permissions.can_manage_reservation(instance, reserver_needs_role=True)
+        return user.permissions.can_manage_reservation(
+            instance,
+            reserver_needs_role=True,
+            allow_reserver_role_for_own_reservations=True,
+        )
 
 
 class ReservationCommentPermission(BasePermission):
