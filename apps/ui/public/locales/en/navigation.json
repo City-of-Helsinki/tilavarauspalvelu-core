@@ -1,6 +1,7 @@
 {
   "userNoName": "Anonymous User",
   "Item": {
+    "home": "Front page",
     "spaceReservation": "Seasonal booking",
     "reservationUnitSearch": "Single booking",
     "reservations": "My bookings",
@@ -8,5 +9,10 @@
   },
   "profileLinkLabel": "Go to Helsinki profile",
   "skipToMainContent": "Skip to main content of the page",
-  "languageSelection": "Select language"
+  "languageSelection": "Select language",
+  "languages": {
+    "fi": "Suomi",
+    "sv": "Swedish",
+    "en": "English"
+  },
 }

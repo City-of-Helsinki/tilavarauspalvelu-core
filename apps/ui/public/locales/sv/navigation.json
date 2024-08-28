@@ -1,6 +1,7 @@
 {
   "userNoName": "Namnlös användare",
   "Item": {
+    "home": "Hemsidan",
     "spaceReservation": "Säsongsbokning",
     "reservationUnitSearch": "Bokning av lokal",
     "reservations": "Mina bokningar",
@@ -8,5 +9,10 @@
   },
   "profileLinkLabel": "Gå till Helsinkiprofilen",
   "skipToMainContent": "Gå till sidans huvudinnehåll",
-  "languageSelection": "Välj språk"
+  "languageSelection": "Välj språk",
+    "languages": {
+        "fi": "Suomi",
+        "sv": "Svenska",
+        "en": "English"
+    }
 }

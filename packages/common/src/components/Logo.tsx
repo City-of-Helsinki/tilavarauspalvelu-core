@@ -9,14 +9,17 @@ function logoSrcFromLanguage(language: string) {
   return logoFi;
 }
 
-export default function Logo({ size }: Pick<LogoProps, "size">): JSX.Element {
+export default function Logo({
+  size,
+  style,
+}: Pick<LogoProps, "size"> & { style?: React.CSSProperties }): JSX.Element {
   const { t, i18n } = useTranslation();
   return (
     <HDSLogo
       src={logoSrcFromLanguage(i18n.language)}
       alt={t("common:applicationName")}
       size={size ?? "medium"}
-      style={{ color: "black" }}
+      style={style}
     />
   );
 }
