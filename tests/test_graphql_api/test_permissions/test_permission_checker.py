@@ -18,6 +18,30 @@ permissions_query = partial(
 )
 
 
+def test_permission_checker__superuser(graphql):
+    graphql.login_with_superuser()
+
+    permission = UserPermissionChoice.CAN_MANAGE_APPLICATIONS
+    query = permissions_query(permission=permission)
+    response = graphql(query)
+
+    assert response.has_errors is False
+    assert response.first_query_object == {"hasPermission": True}
+
+
+def test_permission_checker__inactive(graphql):
+    user = graphql.login_with_superuser()
+    user.is_active = False
+    user.save()
+
+    permission = UserPermissionChoice.CAN_MANAGE_APPLICATIONS
+    query = permissions_query(permission=permission)
+    response = graphql(query)
+
+    assert response.has_errors is False
+    assert response.first_query_object == {"hasPermission": False}
+
+
 def test_permission_checker__general_role__admin(graphql):
     admin = UserFactory.create_with_general_role()
     graphql.force_login(admin)

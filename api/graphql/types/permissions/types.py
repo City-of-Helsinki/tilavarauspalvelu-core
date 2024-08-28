@@ -105,8 +105,13 @@ class PermissionCheckerType(ObjectType):
         unit_ids: list[int],
         require_all: bool = False,
     ) -> dict[str, bool]:
+        # Anonymous or inactive users have no permissions
         if user.permissions.is_user_anonymous_or_inactive():
             return {"has_permission": False}
+
+        # Superusers have all permissions
+        if user.is_superuser:
+            return {"has_permission": True}
 
         # Has the given permission through their general roles
         if permission in user.general_permissions_list:
