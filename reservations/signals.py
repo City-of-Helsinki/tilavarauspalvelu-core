@@ -4,8 +4,8 @@ from django.conf import settings
 from django.db.models.signals import m2m_changed, post_delete, post_save
 from django.dispatch import receiver
 
-from reservations.models import AffectingTimeSpan, Reservation
-from reservations.tasks import create_or_update_reservation_statistics
+from reservations.models import Reservation
+from reservations.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task
 
 type M2MAction = Literal["pre_add", "post_add", "pre_remove", "post_remove", "pre_clear", "post_clear"]
 
@@ -32,7 +32,7 @@ def reservation_create(
         create_or_update_reservation_statistics([instance.pk])
 
     if not raw and settings.UPDATE_AFFECTING_TIME_SPANS:
-        AffectingTimeSpan.refresh(using=kwargs.get("using"))
+        update_affecting_time_spans_task.delay()
 
 
 @receiver(post_delete, sender=Reservation, dispatch_uid="reservation_delete")
@@ -41,7 +41,7 @@ def reservation_delete(
     **kwargs,
 ) -> None:
     if settings.UPDATE_AFFECTING_TIME_SPANS:
-        AffectingTimeSpan.refresh(using=kwargs.get("using"))
+        update_affecting_time_spans_task.delay()
 
 
 @receiver(
@@ -60,4 +60,4 @@ def reservations_reservation_units_m2m(
         create_or_update_reservation_statistics([instance.pk])
 
     if not raw and settings.UPDATE_AFFECTING_TIME_SPANS:
-        AffectingTimeSpan.refresh(using=kwargs.get("using"))
+        update_affecting_time_spans_task.delay()

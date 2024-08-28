@@ -12,8 +12,8 @@ from common.utils import translate_for_user
 from opening_hours.errors import ReservableTimeSpanClientError
 from opening_hours.utils.reservable_time_span_client import ReservableTimeSpanClient
 from reservations.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
-from reservations.models import AffectingTimeSpan, RecurringReservation
-from reservations.tasks import create_or_update_reservation_statistics
+from reservations.models import RecurringReservation
+from reservations.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task
 from tilavarauspalvelu.celery import app
 from utils.sentry import SentryLogger
 
@@ -179,7 +179,7 @@ def generate_reservation_series_from_allocations(application_round_id: int) -> N
 
     # Must refresh the materialized view after the reservation is created.
     if settings.UPDATE_AFFECTING_TIME_SPANS:
-        AffectingTimeSpan.refresh()
+        update_affecting_time_spans_task.delay()
 
     if settings.SAVE_RESERVATION_STATISTICS:
         create_or_update_reservation_statistics.delay(reservation_pks=list(reservation_pks))

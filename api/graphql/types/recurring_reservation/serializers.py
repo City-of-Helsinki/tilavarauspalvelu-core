@@ -18,8 +18,8 @@ from opening_hours.utils.reservable_time_span_client import ReservableTimeSpanCl
 from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import ReservationUnit
 from reservations.enums import ReservationStateChoice, ReservationTypeStaffChoice
-from reservations.models import AffectingTimeSpan, RecurringReservation, Reservation
-from reservations.tasks import create_or_update_reservation_statistics
+from reservations.models import RecurringReservation, Reservation
+from reservations.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task
 
 __all__ = [
     "RecurringReservationCreateSerializer",
@@ -225,7 +225,7 @@ class ReservationSeriesSerializer(RecurringReservationCreateSerializer):
 
         # Must refresh the materialized view after the reservation is created.
         if settings.UPDATE_AFFECTING_TIME_SPANS:
-            AffectingTimeSpan.refresh()
+            update_affecting_time_spans_task.delay()
 
         if settings.SAVE_RESERVATION_STATISTICS:
             create_or_update_reservation_statistics.delay(
