@@ -130,7 +130,7 @@ class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reservation
             )
 
     def check_and_handle_pricing(self, data) -> None:
-        if self.instance.price_net > 0:
+        if self.instance.price > 0:
             raise ValidationErrorWithCode(
                 "Reservation time cannot be changed due to its price",
                 ValidationErrorCodes.CANCELLATION_NOT_ALLOWED,
@@ -138,7 +138,7 @@ class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reservation
         if self.requires_price_calculation(data):
             pricing = self.calculate_price(data["begin"], data["end"], self.instance.reservation_unit.all())
 
-            if pricing.reservation_price_net > 0:
+            if pricing.reservation_price > 0:
                 raise ValidationErrorWithCode(
                     "Reservation begin time change causes price change that not allowed.",
                     ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED,

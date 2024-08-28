@@ -29,7 +29,6 @@ def test_get_verkkokauppa_order_params__to_json():
     reservation = ReservationFactory.create(
         reservation_unit=[reservation_unit],
         user=user,
-        price_net=Decimal("10.12"),
         price=Decimal("12.5488"),
         tax_percentage_value=Decimal("24"),
         reservee_type=CustomerTypeChoice.INDIVIDUAL,
@@ -95,7 +94,6 @@ def test_get_verkkokauppa_order_params__to_json__meta_label_language_support():
     reservation = ReservationFactory.create(
         reservation_unit=[reservation_unit],
         user=user,
-        price_net=Decimal("10.12"),
         price=Decimal("12.5488"),
         tax_percentage_value=Decimal("24"),
         reservee_type=CustomerTypeChoice.INDIVIDUAL,

@@ -29,7 +29,6 @@ class ReservationApproveSerializer(NestingModelSerializer):
         fields = [
             "pk",
             "price",
-            "price_net",
             "handling_details",
             "state",
             "handled_at",
@@ -38,7 +37,6 @@ class ReservationApproveSerializer(NestingModelSerializer):
             "handled_at": {"read_only": True},
             "handling_details": {"required": True},
             "price": {"required": True},
-            "price_net": {"required": True},
         }
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:

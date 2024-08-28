@@ -142,7 +142,7 @@ def test_reservation__adjust_time__reservation_is_already_handled(graphql):
 
 
 def test_reservation__adjust_time__reservation_has_price_to_be_paid(graphql):
-    reservation = ReservationFactory.create_for_time_adjustment(price_net=Decimal("1"))
+    reservation = ReservationFactory.create_for_time_adjustment(price=Decimal("1"))
 
     graphql.login_with_superuser()
     data = get_adjust_data(reservation)

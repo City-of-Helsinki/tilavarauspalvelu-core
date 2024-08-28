@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import Any
 
 from django.contrib import admin, messages
@@ -175,6 +176,8 @@ class ReservationAdmin(admin.ModelAdmin):
         "handled_at",
         "confirmed_at",
         "created_at",
+        "price_net",
+        "non_subsidised_price_net",
     ]
     inlines = [PaymentOrderInline]
 
@@ -197,6 +200,12 @@ class ReservationAdmin(admin.ModelAdmin):
     @admin.display(ordering="reservation_unit__name")
     def reservation_units(self, obj: Reservation) -> str:
         return ", ".join([str(reservation_unit) for reservation_unit in obj.reservation_unit.all()])
+
+    def price_net(self, obj: Reservation) -> Decimal:
+        return obj.price_net
+
+    def non_subsidised_price_net(self, obj: Reservation) -> Decimal:
+        return obj.non_subsidised_price_net
 
     def _deny_reservations_action_confirmation_page(
         self,

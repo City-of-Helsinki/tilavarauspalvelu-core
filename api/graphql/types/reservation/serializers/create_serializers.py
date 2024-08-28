@@ -175,9 +175,7 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
             data["price"] = price_calculation_result.reservation_price
             data["unit_price"] = price_calculation_result.unit_price
             data["tax_percentage_value"] = price_calculation_result.tax_percentage_value
-            data["price_net"] = price_calculation_result.reservation_price_net
             data["non_subsidised_price"] = price_calculation_result.non_subsidised_price
-            data["non_subsidised_price_net"] = price_calculation_result.non_subsidised_price_net
 
         prefill_from_profile = prefill_from_profile and settings.PREFILL_RESERVATION_WITH_PROFILE_DATA
         if prefill_from_profile:

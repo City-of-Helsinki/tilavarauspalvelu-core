@@ -559,9 +559,7 @@ def test_reservation__update__already_has_max_reservations_per_user(graphql):
 def test_reservation__update__price_calculation_not_triggered_if_time_not_changed(graphql):
     reservation = ReservationFactory.create_for_update(
         price=Decimal("12.4"),
-        price_net=Decimal("10.0"),
         non_subsidised_price=Decimal("12.4"),
-        non_subsidised_price_net=Decimal("10.0"),
         unit_price=Decimal("10.0"),
         tax_percentage_value=Decimal("24"),
     )
@@ -597,9 +595,7 @@ def test_reservation__update__price_calculation_not_triggered_if_time_not_change
 def test_reservation__update__price_calculation_triggered_if_begin_changes(graphql):
     reservation = ReservationFactory.create_for_update(
         price=Decimal("12.4"),
-        price_net=Decimal("10.0"),
         non_subsidised_price=Decimal("12.4"),
-        non_subsidised_price_net=Decimal("10.0"),
         unit_price=Decimal("10.0"),
         tax_percentage_value=Decimal("24"),
     )
@@ -634,9 +630,7 @@ def test_reservation__update__price_calculation_triggered_if_begin_changes(graph
 def test_reservation__update__price_calculation_triggered_if_end_changes(graphql):
     reservation = ReservationFactory.create_for_update(
         price=Decimal("12.4"),
-        price_net=Decimal("10.0"),
         non_subsidised_price=Decimal("12.4"),
-        non_subsidised_price_net=Decimal("10.0"),
         unit_price=Decimal("10.0"),
         tax_percentage_value=Decimal("24"),
     )
@@ -671,9 +665,7 @@ def test_reservation__update__price_calculation_triggered_if_end_changes(graphql
 def test_reservation__update__price_calculation_triggered_if_unit_changes(graphql):
     reservation = ReservationFactory.create_for_update(
         price=Decimal("12.4"),
-        price_net=Decimal("10.0"),
         non_subsidised_price=Decimal("12.4"),
-        non_subsidised_price_net=Decimal("10.0"),
         unit_price=Decimal("10.0"),
         tax_percentage_value=Decimal("24"),
     )
@@ -706,9 +698,7 @@ def test_reservation__update__price_calculation_triggered_if_unit_changes(graphq
 def test_reservation__update__price_calculation_uses_to_future_pricing(graphql):
     reservation = ReservationFactory.create_for_update(
         price=Decimal("12.4"),
-        price_net=Decimal("10.0"),
         non_subsidised_price=Decimal("12.4"),
-        non_subsidised_price_net=Decimal("10.0"),
         unit_price=Decimal("10.0"),
         tax_percentage_value=Decimal("24"),
     )
