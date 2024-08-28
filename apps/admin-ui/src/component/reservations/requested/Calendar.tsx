@@ -106,7 +106,7 @@ function Calendar({
             {isAllowedToModify && (
               // NOTE don't use HDS buttons in the toolbar, breaks mobile layout
               <button type="button" onClick={handleEditTimeClick}>
-                {t("Reservation.EditTime.buttonName")}
+                {t("Reservation.EditTimeModal.acceptBtn")}
               </button>
             )}
           </Toolbar>
