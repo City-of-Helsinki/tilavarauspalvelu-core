@@ -49,6 +49,7 @@ const Wrapper = styled.div`
       span:has(.active) {
         /* using box-shadow for a bottom border inside of the element, without affecting text positioning */
         box-shadow: 0 -4px 0 0 var(--color-black) inset;
+        font-weight: bold;
       }
     }
   }
