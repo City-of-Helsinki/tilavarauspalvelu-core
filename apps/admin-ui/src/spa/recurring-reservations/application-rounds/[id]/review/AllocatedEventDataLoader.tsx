@@ -12,18 +12,24 @@ import { errorToast } from "common/src/common/toast";
 import Loader from "@/component/Loader";
 import { More } from "@/component/More";
 import { useSort } from "@/hooks/useSort";
-import { transformApplicantType } from "./utils";
+import { getFilteredUnits, transformApplicantType } from "./utils";
 import { useSearchParams } from "react-router-dom";
 import { AllocatedEventsTable, SORT_KEYS } from "./AllocatedEventsTable";
 import { transformWeekday, type Day } from "common/src/conversion";
+import { getPermissionErrors } from "common/src/apolloUtils";
 
 type Props = {
   applicationRoundPk: number;
+  unitOptions: { nameFi: string; pk: number }[];
 };
 
-export function TimeSlotDataLoader({ applicationRoundPk }: Props): JSX.Element {
-  const [orderBy, handleSortChanged] = useSort(SORT_KEYS);
+export function TimeSlotDataLoader({
+  unitOptions,
+  applicationRoundPk,
+}: Props): JSX.Element {
+  const { t } = useTranslation();
 
+  const [orderBy, handleSortChanged] = useSort(SORT_KEYS);
   const [searchParams] = useSearchParams();
   const unitFilter = searchParams.getAll("unit");
   const applicantFilter = searchParams.getAll("applicant");
@@ -34,7 +40,7 @@ export function TimeSlotDataLoader({ applicationRoundPk }: Props): JSX.Element {
   const query = useAllocatedTimeSlotsQuery({
     skip: !applicationRoundPk,
     variables: {
-      allocatedUnit: unitFilter.map(Number).filter(Number.isFinite),
+      allocatedUnit: getFilteredUnits(unitFilter, unitOptions),
       applicationRound: applicationRoundPk,
       applicantType: transformApplicantType(applicantFilter),
       applicationSectionStatus: [
@@ -54,16 +60,18 @@ export function TimeSlotDataLoader({ applicationRoundPk }: Props): JSX.Element {
       orderBy: transformOrderBy(orderBy),
     },
     onError: (err: ApolloError) => {
-      errorToast({ text: err.message });
+      const permErrors = getPermissionErrors(err);
+      if (permErrors.length > 0) {
+        errorToast({ text: t("errors.noPermission") });
+      } else {
+        errorToast({ text: t("errors.errorFetchingData") });
+      }
     },
     fetchPolicy: "cache-and-network",
-    // TODO enable or no?
     nextFetchPolicy: "cache-first",
   });
 
   const { fetchMore, previousData, loading, data } = query;
-
-  const { t } = useTranslation();
 
   const dataToUse = data ?? previousData;
   if (loading && !dataToUse) {

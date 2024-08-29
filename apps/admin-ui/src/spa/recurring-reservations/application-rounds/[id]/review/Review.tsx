@@ -34,6 +34,8 @@ import { isApplicationRoundInProgress } from "@/helpers";
 import { breakpoints } from "common";
 import RejectedOccurrencesDataLoader from "./RejectedOccurrencesDataLoader";
 import { errorToast } from "common/src/common/toast";
+import { hasPermission } from "@/modules/permissionHelper";
+import { useSession } from "@/hooks/auth";
 
 const HeadingContainer = styled.div`
   display: flex;
@@ -247,8 +249,13 @@ export function Review({
     applicationRound?.reservationUnits?.flatMap((x) => x)
   );
 
-  const ds = getUnitOptions(resUnits);
-  const unitPks = uniqBy(ds, (unit) => unit.pk).sort((a, b) =>
+  const { user } = useSession();
+
+  // need filtered list of units that the user has permission to view
+  const ds = getUnitOptions(resUnits).filter((unit) =>
+    hasPermission(user, UserPermissionChoice.CanViewApplications, unit.pk)
+  );
+  const unitOptions = uniqBy(ds, (unit) => unit.pk).sort((a, b) =>
     a.nameFi.localeCompare(b.nameFi)
   );
 
@@ -341,7 +348,7 @@ export function Review({
           </Tabs.TabList>
           <Tabs.TabPanel>
             <TabContent>
-              <Filters units={unitPks} enableApplicant />
+              <Filters units={unitOptions} enableApplicant />
               <ApplicationDataLoader
                 applicationRoundPk={applicationRound.pk ?? 0}
               />
@@ -349,7 +356,11 @@ export function Review({
           </Tabs.TabPanel>
           <Tabs.TabPanel>
             <TabContent>
-              <Filters units={unitPks} statusOption="event" enableApplicant />
+              <Filters
+                units={unitOptions}
+                statusOption="event"
+                enableApplicant
+              />
               <ApplicationEventDataLoader
                 applicationRoundPk={applicationRound.pk ?? 0}
               />
@@ -358,7 +369,7 @@ export function Review({
           <Tabs.TabPanel>
             <TabContent>
               <Filters
-                units={unitPks}
+                units={unitOptions}
                 reservationUnits={reservationUnitOptions}
                 enableApplicant
                 enableWeekday
@@ -367,6 +378,7 @@ export function Review({
               />
               <TimeSlotDataLoader
                 applicationRoundPk={applicationRound.pk ?? 0}
+                unitOptions={unitOptions}
               />
             </TabContent>
           </Tabs.TabPanel>
@@ -374,13 +386,14 @@ export function Review({
             <Tabs.TabPanel>
               <TabContent>
                 <Filters
-                  units={unitPks}
+                  units={unitOptions}
                   reservationUnits={reservationUnitOptions}
                   enableReservationUnit
                   statusOption="eventShort"
                 />
                 <RejectedOccurrencesDataLoader
                   applicationRoundPk={applicationRound.pk ?? 0}
+                  unitOptions={unitOptions}
                 />
               </TabContent>
             </Tabs.TabPanel>

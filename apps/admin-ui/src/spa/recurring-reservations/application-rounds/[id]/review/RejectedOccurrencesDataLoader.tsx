@@ -14,14 +14,21 @@ import { More } from "@/component/More";
 import React from "react";
 import Loader from "@/component/Loader";
 import { filterNonNullable } from "common/src/helpers";
+import { getPermissionErrors } from "common/src/apolloUtils";
+import { useTranslation } from "next-i18next";
+import { getFilteredUnits } from "./utils";
 
 type Props = {
   applicationRoundPk: number;
+  unitOptions: { nameFi: string; pk: number }[];
 };
 
 function RejectedOccurrencesDataLoader({
   applicationRoundPk,
+  unitOptions,
 }: Props): JSX.Element {
+  const { t } = useTranslation();
+
   const [orderBy, handleSortChanged] = useSort(SORT_KEYS);
   const [searchParams] = useSearchParams();
   const unitFilter = searchParams.getAll("unit");
@@ -32,7 +39,7 @@ function RejectedOccurrencesDataLoader({
     useRejectedOccurrencesQuery({
       variables: {
         applicationRound: applicationRoundPk,
-        unit: unitFilter.map(Number).filter(Number.isFinite),
+        unit: getFilteredUnits(unitFilter, unitOptions),
         reservationUnit: reservationUnitFilter
           .map(Number)
           .filter(Number.isFinite),
@@ -40,10 +47,14 @@ function RejectedOccurrencesDataLoader({
         textSearch: nameFilter,
       },
       onError: (err: ApolloError) => {
-        errorToast({ text: err.message });
+        const permErrors = getPermissionErrors(err);
+        if (permErrors.length > 0) {
+          errorToast({ text: t("errors.noPermission") });
+        } else {
+          errorToast({ text: t("errors.errorFetchingData") });
+        }
       },
       fetchPolicy: "cache-and-network",
-      // TODO enable or no?
       nextFetchPolicy: "cache-first",
     });
 

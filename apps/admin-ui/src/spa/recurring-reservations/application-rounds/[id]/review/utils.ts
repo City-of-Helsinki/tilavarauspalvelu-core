@@ -109,3 +109,13 @@ export function formatAppliedReservationTime(time: {
   const { count, hours } = time;
   return `${formatNumber(count, "")} / ${formatters.oneDecimal.format(hours)} t`;
 }
+
+/// Clean query param selection and filter by possible units
+/// @return array of selected unit pks or all possible unit pks
+export function getFilteredUnits(
+  unitFilter: string[],
+  possibleUnits: { nameFi: string; pk: number }[]
+): number[] {
+  const units = unitFilter.map(Number).filter(Number.isFinite);
+  return units.length > 0 ? units : possibleUnits.map((u) => u.pk);
+}
