@@ -9,6 +9,7 @@ from applications.enums import ApplicantTypeChoice, ApplicationStatusChoice
 from applications.models import Application
 from applications.querysets.application import ApplicationQuerySet
 from common.db import text_search
+from common.utils import log_text_search
 
 __all__ = [
     "ApplicationFilterSet",
@@ -40,6 +41,7 @@ class ApplicationFilterSet(ModelFilterSet):
     def filter_by_text_search(qs: ApplicationQuerySet, name: str, value: str) -> models.QuerySet:
         fields = ("id", "application_sections__id", "application_sections__name", "applicant")
         qs = qs.alias(applicant=L("applicant"))
+        log_text_search(where="applications", text=value)
         return text_search(qs=qs, fields=fields, text=value)
 
     @staticmethod

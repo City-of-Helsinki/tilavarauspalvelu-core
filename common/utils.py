@@ -1,8 +1,10 @@
+import datetime
 import operator
 from collections.abc import Generator, Iterable, Sequence
 from typing import Any, Generic, Literal, TypeVar
 
 from django.conf import settings
+from django.core.cache import cache
 from django.db import models
 from django.http import HttpRequest
 from django.utils import translation
@@ -10,6 +12,7 @@ from django.utils.functional import Promise
 from django.utils.translation import get_language_from_request
 from modeltranslation.manager import get_translatable_fields_for_model
 
+from common.date_utils import local_datetime
 from users.models import User
 
 __all__ = [
@@ -170,3 +173,16 @@ def safe_getattr(obj: object, dotted_path: str, default: Any = None) -> Any:
         return operator.attrgetter(dotted_path)(obj)
     except AttributeError:
         return default
+
+
+def log_text_search(where: str, text: str) -> None:
+    """
+    Log text search to the cache for the next 4 weeks.
+    This is used for analysis of the text search performance.
+
+    :param where: Where the text search was performed.
+    :param text: Text search query.
+    """
+    key = f"text_search:{where}:{local_datetime().isoformat()}"
+    cache_time_seconds = int(datetime.timedelta(days=settings.TEXT_SEARCH_CACHE_TIME_DAYS).total_seconds())
+    cache.set(key, text, timeout=cache_time_seconds)

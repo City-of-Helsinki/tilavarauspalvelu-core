@@ -58,6 +58,7 @@ class Common(Environment):
         "whitenoise.runserver_nostatic",
         "django.contrib.staticfiles",
         #  Third party apps
+        "admin_data_views",
         "admin_extra_buttons",
         "more_admin_filters",
         "adminsortable2",
@@ -490,6 +491,18 @@ class Common(Environment):
             },
         }
 
+    # --- Admin data views ------------------------------------------------------------------------------------------
+
+    ADMIN_DATA_VIEWS = {
+        "URLS": [
+            {
+                "route": "text-searches/",
+                "view": "common.admin.text_search_view.text_search_list_view",
+                "name": "text_searches",
+            },
+        ],
+    }
+
     # --- Misc settings ----------------------------------------------------------------------------------------------
 
     RESERVATION_UNIT_IMAGES_ROOT = "reservation_unit_images"
@@ -505,6 +518,7 @@ class Common(Environment):
     PRUNE_RESERVATIONS_OLDER_THAN_MINUTES = 20
     REMOVE_RESERVATION_STATS_OLDER_THAN_YEARS = 5
     REMOVE_RECURRING_RESERVATIONS_OLDER_THAN_DAYS = 1
+    TEXT_SEARCH_CACHE_TIME_DAYS = 30
 
     APPLICATION_ROUND_RESERVATION_CREATION_TIMEOUT_MINUTES = values.IntegerValue(default=10)
     AFFECTING_TIME_SPANS_UPDATE_INTERVAL_MINUTES = values.IntegerValue(default=2)

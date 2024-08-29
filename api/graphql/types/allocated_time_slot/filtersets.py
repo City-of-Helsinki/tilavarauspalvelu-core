@@ -8,6 +8,7 @@ from applications.enums import ApplicantTypeChoice, ApplicationSectionStatusChoi
 from applications.models import AllocatedTimeSlot
 from applications.querysets.allocated_time_slot import AllocatedTimeSlotQuerySet
 from common.db import text_search
+from common.utils import log_text_search
 
 __all__ = [
     "AllocatedTimeSlotFilterSet",
@@ -65,6 +66,7 @@ class AllocatedTimeSlotFilterSet(ModelFilterSet):
             "applicant",
         )
         qs = qs.alias(applicant=L("reservation_unit_option__application_section__application__applicant"))
+        log_text_search(where="allocated_time_slots", text=value)
         return text_search(qs=qs, fields=fields, text=value)
 
     @staticmethod

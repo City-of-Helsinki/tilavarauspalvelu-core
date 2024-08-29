@@ -16,6 +16,7 @@ from applications.enums import ApplicantTypeChoice, ApplicationSectionStatusChoi
 from applications.models import ApplicationSection
 from applications.querysets.application_section import ApplicationSectionQuerySet
 from common.db import text_search
+from common.utils import log_text_search
 
 __all__ = [
     "ApplicationSectionFilterSet",
@@ -88,6 +89,7 @@ class ApplicationSectionFilterSet(ModelFilterSet):
     def filter_text_search(qs: ApplicationSectionQuerySet, name: str, value: str) -> QuerySet:
         fields = ("application__id", "id", "name", "applicant")
         qs = qs.alias(applicant=L("application__applicant"))
+        log_text_search(where="application_section", text=value)
         return text_search(qs=qs, fields=fields, text=value)
 
     def filter_has_allocations(self, queryset: ApplicationSectionQuerySet, name: str, value: bool) -> QuerySet:

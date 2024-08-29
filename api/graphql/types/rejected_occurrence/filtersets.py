@@ -5,6 +5,7 @@ from graphene_django_extensions.filters import IntChoiceFilter, IntMultipleChoic
 from lookup_property import L
 
 from common.db import text_search
+from common.utils import log_text_search
 from reservations.models import RejectedOccurrence
 from reservations.querysets import RejectedOccurrenceQuerySet
 
@@ -93,6 +94,7 @@ class RejectedOccurrenceFilterSet(ModelFilterSet):
             "__applicant"
         )
         qs = qs.alias(applicant=L(applicant_ref))
+        log_text_search(where="rejected_occurrences", text=value)
         return text_search(qs=qs, fields=fields, text=value)
 
     @staticmethod

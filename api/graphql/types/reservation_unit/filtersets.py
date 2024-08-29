@@ -10,6 +10,7 @@ from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntMultipleChoiceFilter
 
 from common.date_utils import local_datetime
+from common.utils import log_text_search
 from elastic_django.reservation_units.query_builder import build_elastic_query_str
 from permissions.helpers import has_any_general_permission
 from permissions.models import GeneralPermissionChoices
@@ -119,6 +120,8 @@ class ReservationUnitFilterSet(ModelFilterSet):
         query_str = build_elastic_query_str(search_words=value)
         if not query_str:
             return qs
+
+        log_text_search(where="reservation_units", text=value)
         sq = SearchQuery.do_search("reservation_units", {"query_string": {"query": query_str}})
         return qs.from_search_results(sq)
 

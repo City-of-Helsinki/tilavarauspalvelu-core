@@ -10,6 +10,7 @@ from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntMult
 
 from api.graphql.extensions.filters import TimezoneAwareDateFilter
 from common.db import text_search
+from common.utils import log_text_search
 from merchants.enums import OrderStatusWithFree
 from permissions.helpers import has_general_permission
 from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
@@ -151,6 +152,8 @@ class ReservationFilterSet(ModelFilterSet):
         value = value.strip()
         if not value:
             return qs
+
+        log_text_search(where="reservations", text=value)
 
         # Shortcut for searching only emails
         if EMAIL_DOMAIN_PATTERN.match(value):
