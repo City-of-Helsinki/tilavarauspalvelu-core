@@ -117,11 +117,6 @@ class UnitFilterSet(ModelFilterSet):
                 & Q(reservationunit__is_draft=False)
                 & (Q(reservationunit__publish_begins__isnull=True) | Q(reservationunit__publish_begins__lte=now))
                 & (Q(reservationunit__publish_ends__isnull=True) | Q(reservationunit__publish_ends__gt=now))
-                & (
-                    Q(reservationunit__reservation_begins__isnull=True)
-                    | Q(reservationunit__reservation_begins__lte=now)
-                )
-                & (Q(reservationunit__reservation_ends__isnull=True) | Q(reservationunit__reservation_ends__gt=now))
             )
 
         else:
@@ -130,8 +125,6 @@ class UnitFilterSet(ModelFilterSet):
                 | Q(reservationunit__is_draft=True)
                 | (Q(reservationunit__publish_begins__gte=now))
                 | (Q(reservationunit__publish_ends__lt=now))
-                | (Q(reservationunit__reservation_begins__lte=now))
-                | (Q(reservationunit__reservation_ends__gt=now))
             )
 
         # Prevent multiple joins, see explanation above.
