@@ -1,7 +1,6 @@
 from typing import Any
 
 import django_filters
-from django.contrib.postgres.search import SearchVector
 from django.db import models
 from django.db.models import QuerySet
 from django.db.models.functions import Lower
@@ -16,7 +15,7 @@ from lookup_property import L
 from applications.enums import ApplicantTypeChoice, ApplicationSectionStatusChoice, ApplicationStatusChoice, Priority
 from applications.models import ApplicationSection
 from applications.querysets.application_section import ApplicationSectionQuerySet
-from common.db import raw_prefixed_query
+from common.db import text_search
 
 __all__ = [
     "ApplicationSectionFilterSet",
@@ -87,11 +86,9 @@ class ApplicationSectionFilterSet(ModelFilterSet):
 
     @staticmethod
     def filter_text_search(qs: ApplicationSectionQuerySet, name: str, value: str) -> QuerySet:
-        # If this becomes slow, look into optimisation strategies here:
-        # https://docs.djangoproject.com/en/4.2/ref/contrib/postgres/search/#performance
-        vector = SearchVector("application__id", "id", "name", "applicant")
-        query = raw_prefixed_query(value)
-        return qs.alias(applicant=L("application__applicant")).annotate(search=vector).filter(search=query)
+        fields = ("application__id", "id", "name", "applicant")
+        qs = qs.alias(applicant=L("application__applicant"))
+        return text_search(qs=qs, fields=fields, text=value)
 
     def filter_has_allocations(self, queryset: ApplicationSectionQuerySet, name: str, value: bool) -> QuerySet:
         if value:

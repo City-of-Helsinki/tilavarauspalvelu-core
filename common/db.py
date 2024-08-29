@@ -1,7 +1,8 @@
-from typing import Any
+from collections.abc import Iterable
+from typing import Any, Literal, TypeVar
 
 from django.contrib.postgres.fields import ArrayField
-from django.contrib.postgres.search import SearchQuery
+from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
 from django.db import models
 
 __all__ = [
@@ -10,7 +11,7 @@ __all__ = [
     "SubqueryArray",
     "SubqueryCount",
     "SubquerySum",
-    "raw_prefixed_query",
+    "text_search",
 ]
 
 
@@ -161,13 +162,48 @@ class ArrayUnnest(models.Func):
     arity = 1
 
 
-def raw_prefixed_query(text: str) -> SearchQuery:
+TQuerySet = TypeVar("TQuerySet")
+
+
+def text_search(
+    qs: TQuerySet,
+    fields: Iterable[str],
+    text: str,
+    language: Literal["finnish", "english", "swedish"] = "finnish",
+) -> TQuerySet:
     """
-    Create a query that searches for each word separately and matched partial words if match is a prefix.
-    Remove any whitespace and replace any single quote mark with two quote marks.
+    Query with postgres full text search.
     https://www.postgresql.org/docs/current/datatype-textsearch.html#DATATYPE-TSQUERY
+
+    :param qs: QuerySet to filter.
+    :param fields: Fields to search.
+    :param text: Text to search for.
+    :param language: Language to search in.
     """
-    return SearchQuery(
-        " | ".join(f"""'{value.replace("'", "''")}':*""" for value in text.split(" ") if value != ""),
-        search_type="raw",
-    )
+    # If this becomes slow, look into optimisation strategies here:
+    # https://docs.djangoproject.com/en/5.1/ref/contrib/postgres/search/#performance
+    vector = SearchVector(*fields, config=language)
+
+    search = build_search(text)
+    query = SearchQuery(value=search, config=language, search_type="raw")
+    rank = SearchRank(vector, query)
+    return qs.annotate(ts_vector=vector, ts_rank=rank).filter(ts_vector=query)
+
+
+def build_search(text: str) -> str:
+    """
+    Build raw postgres full text search query from text.
+
+    Replace single quotes with two single quotes so that they are treated as whitespace in the search.
+    Quote search terms, and support prefix matching.
+    Match all search terms with the OR operator.
+
+    Ref. https://www.postgresql.org/docs/current/datatype-textsearch.html#DATATYPE-TSQUERY
+    """
+    search_terms: list[str] = []
+    for value in text.split(" "):
+        if value:
+            value = value.replace("'", "''")
+            value = f"'{value}':*"
+            search_terms.append(value)
+    return " | ".join(search_terms)

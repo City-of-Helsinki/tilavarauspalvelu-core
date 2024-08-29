@@ -1,5 +1,4 @@
 import django_filters
-from django.contrib.postgres.search import SearchVector
 from django.db import models
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntChoiceFilter, IntMultipleChoiceFilter
@@ -8,7 +7,7 @@ from lookup_property import L
 from applications.enums import ApplicantTypeChoice, ApplicationSectionStatusChoice, Weekday
 from applications.models import AllocatedTimeSlot
 from applications.querysets.allocated_time_slot import AllocatedTimeSlotQuerySet
-from common.db import raw_prefixed_query
+from common.db import text_search
 
 __all__ = [
     "AllocatedTimeSlotFilterSet",
@@ -58,22 +57,15 @@ class AllocatedTimeSlotFilterSet(ModelFilterSet):
     def filter_by_section_status(qs: AllocatedTimeSlotQuerySet, name: str, value: list[str]) -> models.QuerySet:
         return qs.has_section_status_in(value)
 
-    @staticmethod
-    def filter_text_search(qs: AllocatedTimeSlotQuerySet, name: str, value: str) -> models.QuerySet:
-        # If this becomes slow, look into optimisation strategies here:
-        # https://docs.djangoproject.com/en/4.2/ref/contrib/postgres/search/#performance
-        vector = SearchVector(
+    def filter_text_search(self, qs: AllocatedTimeSlotQuerySet, name: str, value: str) -> models.QuerySet:
+        fields = (
             "reservation_unit_option__application_section__id",
             "reservation_unit_option__application_section__name",
             "reservation_unit_option__application_section__application__id",
             "applicant",
         )
-        query = raw_prefixed_query(value)
-        return (
-            qs.alias(applicant=L("reservation_unit_option__application_section__application__applicant"))
-            .annotate(search=vector)
-            .filter(search=query)
-        )
+        qs = qs.alias(applicant=L("reservation_unit_option__application_section__application__applicant"))
+        return text_search(qs=qs, fields=fields, text=value)
 
     @staticmethod
     def order_by_allocated_time_of_week(qs: AllocatedTimeSlotQuerySet, desc: bool) -> models.QuerySet:

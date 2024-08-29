@@ -261,19 +261,19 @@ def test_application__filter__by_text_search__section_name__prefix(graphql):
         organisation=None,
         contact_person=None,
         user=None,
-        application_sections__name="foo",
+        application_sections__name="kirjastoryhmä",
     )
     ApplicationFactory.create_in_status_draft(
         organisation=None,
         contact_person=None,
         user=None,
-        application_sections__name="bar",
+        application_sections__name="suunnistusryhmä",
     )
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     # when:
     # - User tries to filter applications with a text search, which is only a prefix match
-    query = applications_query(text_search="fo")
+    query = applications_query(text_search="kirjasto")
     response = graphql(query)
 
     # then:

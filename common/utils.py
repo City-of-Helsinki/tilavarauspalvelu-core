@@ -4,8 +4,10 @@ from typing import Any, Generic, Literal, TypeVar
 
 from django.conf import settings
 from django.db import models
+from django.http import HttpRequest
 from django.utils import translation
 from django.utils.functional import Promise
+from django.utils.translation import get_language_from_request
 from modeltranslation.manager import get_translatable_fields_for_model
 
 from users.models import User
@@ -14,6 +16,7 @@ __all__ = [
     "comma_sep_str",
     "get_attr_by_language",
     "get_field_to_related_field_mapping",
+    "get_text_search_language",
     "get_translation_fields",
     "with_indices",
 ]
@@ -146,6 +149,11 @@ def translate_for_user(text: Promise, user: User) -> str:
     """
     with translation.override(user.get_preferred_language()):
         return str(text)
+
+
+def get_text_search_language(request: HttpRequest) -> Literal["finnish", "english", "swedish"]:
+    lang_code: Literal["fi", "en", "sv"] = get_language_from_request(request)
+    return "swedish" if lang_code == "sv" else "english" if lang_code == "en" else "finnish"
 
 
 def safe_getattr(obj: object, dotted_path: str, default: Any = None) -> Any:

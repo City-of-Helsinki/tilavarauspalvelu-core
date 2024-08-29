@@ -2,7 +2,6 @@ import re
 from typing import TYPE_CHECKING
 
 import django_filters
-from django.contrib.postgres.search import SearchRank, SearchVector
 from django.db import models
 from django.db.models import Case, CharField, F, Q, QuerySet, Value, When
 from django.db.models.functions import Concat
@@ -10,7 +9,7 @@ from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntMultipleChoiceFilter
 
 from api.graphql.extensions.filters import TimezoneAwareDateFilter
-from common.db import raw_prefixed_query
+from common.db import text_search
 from merchants.enums import OrderStatusWithFree
 from permissions.helpers import has_general_permission
 from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
@@ -148,8 +147,7 @@ class ReservationFilterSet(ModelFilterSet):
 
         return qs.filter(q).distinct()
 
-    @staticmethod
-    def filter_by_text_search(qs: QuerySet, name: str, value: str) -> QuerySet:
+    def filter_by_text_search(self, qs: QuerySet, name: str, value: str) -> QuerySet:
         value = value.strip()
         if not value:
             return qs
@@ -159,7 +157,7 @@ class ReservationFilterSet(ModelFilterSet):
             return qs.filter(Q(user__email__icontains=value) | Q(reservee_email__icontains=value))
 
         if len(value) >= 3:
-            vector = SearchVector(
+            fields = (
                 "pk",
                 "name",
                 "reservee_id",
@@ -172,13 +170,7 @@ class ReservationFilterSet(ModelFilterSet):
                 "user__last_name",
                 "recurring_reservation__name",
             )
-            query = raw_prefixed_query(value)
-            text_search_rank = SearchRank(vector, query)
-            return (
-                qs.annotate(search=vector, text_search_rank=text_search_rank)
-                .filter(search=query)
-                .order_by("-text_search_rank")  # most relevant first
-            )
+            return text_search(qs=qs, fields=fields, text=value)
 
         if value.isnumeric():
             return qs.filter(pk=int(value))

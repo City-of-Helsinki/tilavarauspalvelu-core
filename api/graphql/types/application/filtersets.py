@@ -1,5 +1,4 @@
 import django_filters
-from django.contrib.postgres.search import SearchVector
 from django.db import models
 from django.db.models import QuerySet
 from graphene_django_extensions import ModelFilterSet
@@ -9,7 +8,7 @@ from lookup_property import L
 from applications.enums import ApplicantTypeChoice, ApplicationStatusChoice
 from applications.models import Application
 from applications.querysets.application import ApplicationQuerySet
-from common.db import raw_prefixed_query
+from common.db import text_search
 
 __all__ = [
     "ApplicationFilterSet",
@@ -39,11 +38,9 @@ class ApplicationFilterSet(ModelFilterSet):
 
     @staticmethod
     def filter_by_text_search(qs: ApplicationQuerySet, name: str, value: str) -> models.QuerySet:
-        # If this becomes slow, look into optimisation strategies here:
-        # https://docs.djangoproject.com/en/4.2/ref/contrib/postgres/search/#performance
-        vector = SearchVector("id", "application_sections__id", "application_sections__name", "applicant")
-        query = raw_prefixed_query(value)
-        return qs.alias(applicant=L("applicant")).annotate(search=vector).filter(search=query)
+        fields = ("id", "application_sections__id", "application_sections__name", "applicant")
+        qs = qs.alias(applicant=L("applicant"))
+        return text_search(qs=qs, fields=fields, text=value)
 
     @staticmethod
     def filter_by_status(qs: ApplicationQuerySet, name: str, value: list[str]) -> QuerySet:
