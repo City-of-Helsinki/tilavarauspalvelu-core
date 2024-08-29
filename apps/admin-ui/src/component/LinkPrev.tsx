@@ -5,12 +5,6 @@ import { IconAngleLeft } from "hds-react";
 import { useNavigate } from "react-router-dom";
 import { BasicLink } from "../styles/util";
 
-interface IProps {
-  route?: string;
-  style?: React.CSSProperties;
-  className?: string;
-}
-
 const StyledLink = styled(BasicLink)`
   display: inline-flex;
   align-items: center;
@@ -20,7 +14,13 @@ const StyledLink = styled(BasicLink)`
   gap: var(--spacing-2-xs);
 `;
 
-function LinkPrev({ route, style, className }: IProps): JSX.Element {
+type Props = {
+  route?: string;
+  style?: React.CSSProperties;
+  className?: string;
+};
+
+function LinkPrevInner({ route, style, className }: Props): JSX.Element {
   const { t } = useTranslation();
   const navigate = useNavigate();
   return (
@@ -43,4 +43,14 @@ function LinkPrev({ route, style, className }: IProps): JSX.Element {
   );
 }
 
-export default LinkPrev;
+const PreviousLinkWrapper = styled.div`
+  padding: var(--spacing-s);
+`;
+
+export function LinkPrev(props: Props): JSX.Element {
+  return (
+    <PreviousLinkWrapper>
+      <LinkPrevInner {...props} />
+    </PreviousLinkWrapper>
+  );
+}

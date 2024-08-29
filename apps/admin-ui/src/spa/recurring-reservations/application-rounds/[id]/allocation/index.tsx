@@ -35,6 +35,7 @@ import { AllocationPageContent } from "./ApplicationEvents";
 import { ComboboxFilter, SearchFilter } from "@/component/QueryParamFilters";
 import { convertPriorityFilter } from "./modules/applicationRoundAllocation";
 import { ApplicationRoundNode } from "common/gql/gql-types";
+import { LinkPrev } from "@/component/LinkPrev";
 
 const MAX_RES_UNIT_NAME_LENGTH = 35;
 
@@ -192,6 +193,7 @@ type ApplicationRoundFilterQueryType =
 type ReservationUnitFilterQueryType =
   NonNullable<ApplicationRoundFilterQueryType>["reservationUnits"][0];
 type UnitFilterQueryType = NonNullable<ReservationUnitFilterQueryType>["unit"];
+
 function ApplicationRoundAllocation({
   applicationRound,
   applicationRoundPk,
@@ -655,7 +657,12 @@ function ApplicationRoundAllocationRouted(): JSX.Element {
   if (!applicationRoundPk || Number.isNaN(Number(applicationRoundPk))) {
     return <div>{t("errors.router.invalidApplicationRoundNumber")}</div>;
   }
-  return <AllocationWrapper applicationRoundPk={Number(applicationRoundPk)} />;
+  return (
+    <>
+      <LinkPrev />
+      <AllocationWrapper applicationRoundPk={Number(applicationRoundPk)} />*
+    </>
+  );
 }
 
 export default ApplicationRoundAllocationRouted;
