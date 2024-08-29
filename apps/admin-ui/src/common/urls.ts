@@ -9,11 +9,13 @@ export const prefixes = {
 };
 
 export const reservationUnitsUrl = "/premises-and-settings/reservation-units";
+export const singleUnitUrl = "/unit";
 export const applicationRoundsUrl =
   "/recurring-reservations/application-rounds";
 export const unitsUrl = "/premises-and-settings/units";
 export const bannerNotificationsUrl = "/messaging/notifications";
 export const requestedReservationsUrl = "/reservations/requested";
+export const reservationsUrl = "/reservations";
 export const allReservationsUrl = "/reservations/all";
 export const myUnitsUrl = "/my-units";
 

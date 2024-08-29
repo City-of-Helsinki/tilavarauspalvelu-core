@@ -8,6 +8,7 @@ export const searchPrefix = "/search";
 export const singleSearchPrefix = "/search/single";
 export const applicationsPrefix = "/applications";
 export const reservationsPrefix = "/reservations";
+export const recurringReservationsPrefix = "/recurring";
 
 export const mapUrlPrefix = "https://palvelukartta.hel.fi/";
 

@@ -23,7 +23,9 @@ import {
   myUnitsUrl,
   requestedReservationsUrl,
   reservationUnitsUrl,
+  reservationsUrl,
   unitsUrl,
+  singleUnitUrl,
 } from "@/common/urls";
 
 type Props = {
@@ -100,7 +102,8 @@ const NavigationMenuWrapper = styled.div`
 interface IMenuChild {
   title: string;
   icon?: JSX.Element;
-  route?: string;
+  routes?: string[];
+  excludeRoutes?: string[];
   exact?: boolean;
   permission?: Permission;
 }
@@ -114,7 +117,7 @@ const getFilteredMenu = (
         {
           title: "MainMenu.myUnits",
           icon: <IconStar aria-hidden />,
-          route: myUnitsUrl,
+          routes: [myUnitsUrl],
         },
       ]
     : []),
@@ -124,11 +127,13 @@ const getFilteredMenu = (
     ? [
         {
           title: "MainMenu.requestedReservations",
-          route: requestedReservationsUrl,
+          routes: [requestedReservationsUrl],
+          exact: true,
         },
         {
           title: "MainMenu.allReservations",
-          route: allReservationsUrl,
+          routes: [allReservationsUrl, reservationsUrl],
+          excludeRoutes: [requestedReservationsUrl],
         },
       ]
     : []),
@@ -137,7 +142,7 @@ const getFilteredMenu = (
     ? [
         {
           title: "MainMenu.applicationRounds",
-          route: applicationRoundsUrl,
+          routes: [applicationRoundsUrl],
         },
       ]
     : []),
@@ -147,12 +152,12 @@ const getFilteredMenu = (
         {
           permission: Permission.CAN_MANAGE_RESERVATION_UNITS,
           title: "MainMenu.reservationUnits",
-          route: reservationUnitsUrl,
+          routes: [reservationUnitsUrl],
         },
         {
           permission: Permission.CAN_MANAGE_UNITS,
           title: "MainMenu.units",
-          route: unitsUrl,
+          routes: [unitsUrl, singleUnitUrl],
         },
       ].filter((item) => hasPermission(item.permission))
     : []),
@@ -162,46 +167,65 @@ const getFilteredMenu = (
         {
           permission: Permission.CAN_MANAGE_BANNER_NOTIFICATIONS,
           title: "MainMenu.notifications",
-          route: bannerNotificationsUrl,
+          routes: [bannerNotificationsUrl],
         },
       ].filter((item) => hasPermission(item.permission))
     : []),
 ];
 
+function checkActive(
+  pathname: string,
+  routes: string[],
+  exact: boolean,
+  exclude?: string[]
+) {
+  if (exclude?.includes(pathname)) {
+    return false;
+  }
+  return routes.some((route) =>
+    exact ? pathname === route : pathname.startsWith(route)
+  );
+}
+
 function NavigationLink({
-  href,
   title,
+  routes,
   exact,
+  exclude,
   count,
 }: {
-  href: string;
   title: string;
+  routes: string[];
   exact?: boolean;
+  exclude?: string[];
   count?: number;
 }) {
   const { t } = useTranslation();
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
+  if (!routes) return null;
   const shouldDisplayCount =
-    title === t("MainMenu.requestedReservations") && count && count > 0;
-  const isActive = exact ? pathname === href : pathname.startsWith(href);
+    title === "MainMenu.requestedReservations" && count && count > 0;
 
   const handleClick = (evt: React.MouseEvent<HTMLAnchorElement>) => {
     evt.preventDefault();
-    navigate(href);
+    if (!routes) return;
+    navigate(routes[0]);
   };
 
   return (
     <Header.ActionBarSubItem
-      key={href}
+      key={routes[0]}
       onClick={handleClick}
-      href={`/kasittely/${href}`}
+      href={`/kasittely${routes[0]}`}
       label={t(title)}
-      className={isActive ? "active" : ""}
+      className={
+        checkActive(pathname, routes, exact ?? false, exclude) ? "active" : ""
+      }
       notificationBubbleAriaLabel={shouldDisplayCount ? "Määrä" : undefined}
       notificationBubbleContent={
-        shouldDisplayCount ? count.toString() : undefined
+        shouldDisplayCount ? count?.toString() : undefined
       }
     />
   );
@@ -261,10 +285,11 @@ const Navigation = ({ apiBaseUrl }: Props) => {
         <Header.NavigationMenu>
           {menuItemList.map((item) => (
             <NavigationLink
-              key={item.route}
-              href={item.route ?? ""}
-              title={t(item.title)}
+              key={item.routes && item.routes[0]}
+              title={item.title}
+              routes={item.routes ?? []}
               exact={item.exact}
+              exclude={item.excludeRoutes}
               count={handlingCount}
             />
           ))}

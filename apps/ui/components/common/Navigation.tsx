@@ -19,6 +19,13 @@ import { useLocation } from "react-use";
 import { signIn, signOut } from "common/src/browserHelpers";
 import { getLocalizationLang } from "common/src/helpers";
 import { env } from "@/env.mjs";
+import {
+  applicationsPrefix,
+  recurringReservationsPrefix,
+  reservationsPrefix,
+  reservationUnitPrefix,
+  singleSearchPrefix,
+} from "@/modules/const";
 
 type HeaderProps = {
   apiBaseUrl: string;
@@ -99,20 +106,20 @@ const menuItems = [
   },
   {
     label: "navigation:Item.reservationUnitSearch",
-    routes: ["/search/single", "/reservation-unit"],
+    routes: [singleSearchPrefix, reservationUnitPrefix],
   },
   {
     label: "navigation:Item.spaceReservation",
-    routes: ["/recurring"],
+    routes: [recurringReservationsPrefix],
   },
   {
     label: "navigation:Item.reservations",
-    routes: ["/reservations"],
+    routes: [reservationsPrefix],
     requireLogin: true,
   },
   {
     label: "navigation:Item.applications",
-    routes: ["/applications"],
+    routes: [applicationsPrefix],
     requireLogin: true,
   },
 ];
