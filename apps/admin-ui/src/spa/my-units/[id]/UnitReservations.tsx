@@ -72,7 +72,12 @@ function UnitReservationsInner({
       {loading ? (
         <Loader />
       ) : (
-        <UnitCalendar date={date} resources={resources} refetch={refetch} />
+        <UnitCalendar
+          date={date}
+          resources={resources}
+          refetch={refetch}
+          unitPk={Number(unitPk)}
+        />
       )}
       <LegendContainer>
         <Legends>

@@ -40,3 +40,18 @@ export function AuthorizationChecker({
     </Suspense>
   );
 }
+
+export const withAuthorization = (
+  component: JSX.Element,
+  apiBaseUrl: string,
+  feedbackUrl: string,
+  permission?: UserPermissionChoice
+) => (
+  <AuthorizationChecker
+    permission={permission}
+    apiUrl={apiBaseUrl}
+    feedbackUrl={feedbackUrl}
+  >
+    {component}
+  </AuthorizationChecker>
+);

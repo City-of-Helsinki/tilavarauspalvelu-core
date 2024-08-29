@@ -3,19 +3,20 @@ import { H1 } from "common/src/common/typography";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
-import { Button, Tabs as HDSTabs } from "hds-react";
+import { Tabs as HDSTabs } from "hds-react";
 import { breakpoints } from "common/src/common/style";
 import { parseAddress } from "@/common/util";
 import { Container } from "@/styles/layout";
 import { getRecurringReservationUrl } from "@/common/urls";
-import { BasicLink } from "@/styles/util";
 import Loader from "@/component/Loader";
 import { ReservationUnitCalendarView } from "./ReservationUnitCalendarView";
 import { UnitReservations } from "./UnitReservations";
 import { TabHeader, Tabs } from "@/component/Tabs";
-import { useUnitViewQuery } from "@gql/gql-types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { errorToast } from "common/src/common/toast";
+import { UserPermissionChoice, useUnitViewQuery } from "@gql/gql-types";
+import { useCheckPermission } from "@/hooks";
+import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 
 type Params = {
   unitId: string;
@@ -81,6 +82,11 @@ export function MyUnitView() {
 
   const { unit } = data ?? {};
 
+  const { hasPermission: canCreateReservations } = useCheckPermission({
+    units: [Number(pk)],
+    permission: UserPermissionChoice.CanCreateStaffReservations,
+  });
+
   if (loading) {
     return <Loader />;
   }
@@ -108,18 +114,13 @@ export function MyUnitView() {
           </LocationOnlyOnDesktop>
         )}
       </ContainerWithSpacing>
-
       <ContainerWithSpacing>
-        <BasicLink to={recurringReservationUrl ?? ""}>
-          <Button
-            disabled={!recurringReservationUrl}
-            variant="secondary"
-            theme="black"
-            size="small"
-          >
-            {t("MyUnits.Calendar.header.recurringReservation")}
-          </Button>
-        </BasicLink>
+        <ButtonLikeLink
+          to={canCreateReservations ? recurringReservationUrl : ""}
+          disabled={!canCreateReservations}
+        >
+          {t("MyUnits.Calendar.header.recurringReservation")}
+        </ButtonLikeLink>
       </ContainerWithSpacing>
       <Tabs headers={TabHeaders}>
         <ReservationTabPanel key="unit-reservations">

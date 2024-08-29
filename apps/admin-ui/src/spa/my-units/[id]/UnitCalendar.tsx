@@ -19,6 +19,7 @@ import Popup from "reactjs-popup";
 import styled, { css } from "styled-components";
 import {
   ReservationTypeChoice,
+  UserPermissionChoice,
   type ReservationUnitReservationsFragment,
 } from "@gql/gql-types";
 import { useTranslation } from "react-i18next";
@@ -30,6 +31,7 @@ import { CELL_BORDER, CELL_BORDER_LEFT, CELL_BORDER_LEFT_ALERT } from "./const";
 import { ReservationPopupContent } from "./ReservationPopupContent";
 import eventStyleGetter from "./eventStyleGetter";
 import { CreateReservationModal } from "./CreateReservationModal";
+import { useCheckPermission } from "@/hooks";
 
 type CalendarEventType = CalendarEvent<ReservationUnitReservationsFragment>;
 type Resource = {
@@ -56,12 +58,6 @@ const TemplateProps: CSSProperties = {
 type EventStyleGetter = ({ event }: CalendarEventType) => {
   style: React.CSSProperties;
   className?: string;
-};
-
-type Props = {
-  date: Date;
-  resources: Resource[];
-  refetch: () => void;
 };
 
 const FlexContainer = styled.div<{ $numCols: number }>`
@@ -201,12 +197,14 @@ const Container = styled.div<{ $height: number }>`
 function Cells({
   cols,
   reservationUnitPk,
+  unitPk,
   date,
   setModalContent,
   onComplete,
 }: {
   cols: number;
   reservationUnitPk: number;
+  unitPk: number;
   date: Date;
   setModalContent: (content: JSX.Element | null, isHds?: boolean) => void;
   onComplete: () => void;
@@ -217,8 +215,16 @@ function Cells({
     return setHours(date, Math.round(index / 2)) < now;
   };
 
+  const { hasPermission } = useCheckPermission({
+    units: [unitPk],
+    permission: UserPermissionChoice.CanCreateStaffReservations,
+  });
+
   const onClick =
     (offset: number) => (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      if (!hasPermission) {
+        return;
+      }
       e.preventDefault();
       setModalContent(
         <CreateReservationModal
@@ -436,7 +442,19 @@ function sortByDraftStatusAndTitle(resources: Resource[]) {
   });
 }
 
-export function UnitCalendar({ date, resources, refetch }: Props): JSX.Element {
+type Props = {
+  date: Date;
+  unitPk: number;
+  resources: Resource[];
+  refetch: () => void;
+};
+
+export function UnitCalendar({
+  unitPk,
+  date,
+  resources,
+  refetch,
+}: Props): JSX.Element {
   const calendarRef = useRef<HTMLDivElement>(null);
   // todo find out min and max opening hour of every reservationunit
   const [beginHour, endHour] = [0, 24];
@@ -529,6 +547,7 @@ export function UnitCalendar({ date, resources, refetch }: Props): JSX.Element {
                 cols={numHours * 2}
                 date={startDate}
                 reservationUnitPk={row.pk}
+                unitPk={unitPk}
                 setModalContent={setModalContent}
                 onComplete={refetch}
               />

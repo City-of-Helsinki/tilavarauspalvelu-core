@@ -7,7 +7,7 @@ import "./i18n";
 import { PUBLIC_URL } from "./common/const";
 import { GlobalContext } from "./context/GlobalContexts";
 import { prefixes } from "./common/urls";
-import { AuthorizationChecker } from "./common/AuthorizationChecker";
+import { withAuthorization } from "@/common/AuthorizationChecker";
 import MyUnitsRouter from "./spa/my-units/router";
 import ReservationsRouter from "./component/reservations/ReservationRouter";
 import NotificationsRouter from "./component/notifications/router";
@@ -53,21 +53,6 @@ const Criteria = dynamic(
 const ApplicationRoundAllocation = dynamic(
   () =>
     import(`./spa/recurring-reservations/application-rounds/[id]/allocation`)
-);
-
-const withAuthorization = (
-  component: JSX.Element,
-  apiBaseUrl: string,
-  feedbackUrl: string,
-  permission?: UserPermissionChoice
-) => (
-  <AuthorizationChecker
-    permission={permission}
-    apiUrl={apiBaseUrl}
-    feedbackUrl={feedbackUrl}
-  >
-    {component}
-  </AuthorizationChecker>
 );
 
 type Props = {
@@ -230,7 +215,10 @@ function ClientApp({
           <Route
             path="/my-units/*"
             element={withAuthorization(
-              <MyUnitsRouter />,
+              <MyUnitsRouter
+                apiBaseUrl={apiBaseUrl}
+                feedbackUrl={feedbackUrl}
+              />,
               apiBaseUrl,
               feedbackUrl
             )}
