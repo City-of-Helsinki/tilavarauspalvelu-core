@@ -32,11 +32,11 @@ export function useFocusApplicationEvent(): [
       const p = new URLSearchParams(params);
       p.set("aes", aes.pk.toString());
       p.delete("allocated");
-      setParams(p);
+      setParams(p, { replace: true });
     } else {
       const p = new URLSearchParams(params);
       p.delete("aes");
-      setParams(p);
+      setParams(p, { replace: true });
     }
   };
 
@@ -60,11 +60,11 @@ export function useFocusAllocatedSlot(): [
       const p = new URLSearchParams(params);
       p.set("allocated", allocated.pk.toString());
       p.delete("aes");
-      setParams(p);
+      setParams(p, { replace: true });
     } else {
       const p = new URLSearchParams(params);
       p.delete("allocated");
-      setParams(p);
+      setParams(p, { replace: true });
     }
   };
 
@@ -82,7 +82,7 @@ export function useSlotSelection(): [string[], (slots: string[]) => void] {
       const qp = new URLSearchParams(params);
       qp.delete("selectionBegin");
       qp.delete("selectionEnd");
-      setParams(qp);
+      setParams(qp, { replace: true });
     } else {
       // TODO change the save format
       // current format is: {day}-{hour}-{minute}
@@ -95,7 +95,7 @@ export function useSlotSelection(): [string[], (slots: string[]) => void] {
       const qp = new URLSearchParams(params);
       qp.set("selectionBegin", selectionBegin);
       qp.set("selectionEnd", selectionEnd);
-      setParams(qp);
+      setParams(qp, { replace: true });
     }
   };
 

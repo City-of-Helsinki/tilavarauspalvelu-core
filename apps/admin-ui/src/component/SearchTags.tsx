@@ -26,7 +26,7 @@ export function SearchTags({
   const handleDelete = (tag: { key: string; value: string }) => {
     const vals = new URLSearchParams(params);
     vals.delete(tag.key, tag.value);
-    setParams(vals);
+    setParams(vals, { replace: true });
   };
 
   const handleReset = () => {
@@ -44,7 +44,7 @@ export function SearchTags({
         newParams.set(d.key, d.value);
       }
     }
-    setParams(newParams);
+    setParams(newParams, { replace: true });
   };
 
   const tags: { key: string; value: string; tr: string }[] = [];
