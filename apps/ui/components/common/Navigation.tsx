@@ -250,6 +250,7 @@ function Navigation({ apiBaseUrl, profileLink }: HeaderProps) {
       <Header
         onDidChangeLanguage={languageChangeHandler}
         defaultLanguage={router.locale}
+        languages={languageOptions}
       >
         <ActionBar
           apiBaseUrl={apiBaseUrl}
