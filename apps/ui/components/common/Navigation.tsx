@@ -197,7 +197,7 @@ function ActionBar({ apiBaseUrl, profileLink, languageOptions }: HeaderProps) {
       logoHref={env.NEXT_PUBLIC_BASE_URL}
       menuButtonLabel="Menu"
     >
-      <Header.SimpleLanguageOptions
+      <Header.LanguageSelector
         languages={languageOptions}
         ariaLabel={t("navigation:languageSelection")}
       />
