@@ -51,13 +51,18 @@ def test_units__filter__by_published_reservation_units(graphql):
     unit_1 = UnitFactory.create(name="1")
     unit_2 = UnitFactory.create(name="2")
     unit_3 = UnitFactory.create(name="3")
+    unit_4 = UnitFactory.create(name="4")
 
     publish_date = datetime.datetime.now(tz=get_default_timezone())
 
+    # Returned
     ReservationUnitFactory.create(unit=unit_1)
     ReservationUnitFactory.create(publish_begins=publish_date, unit=unit_2)
-    ReservationUnitFactory.create(is_archived=True, unit=unit_3)
-    ReservationUnitFactory.create(publish_begins=publish_date + datetime.timedelta(days=30), unit=unit_3)
+    ReservationUnitFactory.create(reservation_begins=publish_date + datetime.timedelta(days=30), unit=unit_3)
+
+    # Filtered out
+    ReservationUnitFactory.create(is_archived=True, unit=unit_4)
+    ReservationUnitFactory.create(publish_begins=publish_date + datetime.timedelta(days=30), unit=unit_4)
 
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
@@ -66,9 +71,10 @@ def test_units__filter__by_published_reservation_units(graphql):
 
     assert response.has_errors is False
 
-    assert len(response.edges) == 2
+    assert len(response.edges) == 3
     assert response.node(0) == {"pk": unit_1.pk}
     assert response.node(1) == {"pk": unit_2.pk}
+    assert response.node(2) == {"pk": unit_3.pk}
 
 
 def test_units__filter__by_own_reservations(graphql):
