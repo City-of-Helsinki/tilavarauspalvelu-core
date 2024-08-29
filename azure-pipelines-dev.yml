@@ -25,4 +25,4 @@ pool: Default
 
 extends:
   # Filename for pipeline to extend from the Azure DevOps Repository.
-  template: azure-pipelines-build-tilavarauspalvelu-core-dev.yml@tilavarauspalvelu-pipelines
+  template: core-build-dev.yml@tilavarauspalvelu-pipelines
