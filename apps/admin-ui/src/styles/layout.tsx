@@ -140,13 +140,6 @@ export const Span12 = styled.div`
 
 // Tab causes horizontal overflow without this
 // we use grids primarily and components inside grid without max-width overflow.
-// Because of side navigation we have to some silly calculations here.
 export const TabWrapper = styled.div`
   max-width: 95vw;
-  @media (width > ${breakpoints.m}) {
-    max-width: min(
-      calc(95vw - var(--main-menu-width) - 2 * var(--spacing-layout-m)),
-      var(--container-width-xl)
-    );
-  }
 `;
