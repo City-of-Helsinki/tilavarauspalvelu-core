@@ -6,7 +6,7 @@ import {
   type UseControllerProps,
   useController,
 } from "react-hook-form";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 
 interface ControllerProps<T extends FieldValues> extends UseControllerProps<T> {
   error?: string;
@@ -14,10 +14,14 @@ interface ControllerProps<T extends FieldValues> extends UseControllerProps<T> {
   disabled?: boolean;
   id?: string;
   label?: string;
+  maxDate?: Date;
+  minDate?: Date;
+  initialMonth?: Date;
+  disableConfirmation?: boolean;
 }
 
 // NOTE string version because Date breaks keyboard input
-function ControlledDateInput<T extends FieldValues>({
+export function ControlledDateInput<T extends FieldValues>({
   control,
   name,
   error,
@@ -25,6 +29,10 @@ function ControlledDateInput<T extends FieldValues>({
   disabled,
   id,
   label,
+  maxDate,
+  minDate,
+  initialMonth,
+  disableConfirmation,
 }: ControllerProps<T>) {
   const {
     field: { value, onChange },
@@ -35,9 +43,10 @@ function ControlledDateInput<T extends FieldValues>({
     <DateInput
       id={id ?? `reservationDialog.${name}`}
       label={label ?? t(`ReservationDialog.${name}`)}
-      minDate={new Date()}
-      maxDate={addYears(new Date(), 3)}
-      disableConfirmation
+      minDate={minDate ?? new Date()}
+      maxDate={maxDate ?? addYears(new Date(), 2)}
+      initialMonth={initialMonth}
+      disableConfirmation={disableConfirmation ?? false}
       language="fi"
       value={value}
       errorText={error}
@@ -47,5 +56,3 @@ function ControlledDateInput<T extends FieldValues>({
     />
   );
 }
-
-export default ControlledDateInput;

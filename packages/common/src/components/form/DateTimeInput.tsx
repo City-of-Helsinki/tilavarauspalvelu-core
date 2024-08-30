@@ -30,14 +30,14 @@ interface DateTimeProps<T extends FieldValues>
 /// It can never be reseted after creation (value === defaultValue, and it doesn't allow for refs).
 /// Most apparent when async loading server data and then trying to reset the form.
 /// TODO rework the TimeInput (either custom component or HDS upgrade)
-const DateTimeInput = <T extends FieldValues>({
+export function DateTimeInput<T extends FieldValues>({
   control,
   name,
   required,
   minDate,
   disabled,
   translateError,
-}: DateTimeProps<T>): JSX.Element => {
+}: DateTimeProps<T>): JSX.Element {
   const { t } = useTranslation();
 
   const { field: dateField, fieldState: dateFieldState } = useController({
@@ -91,6 +91,4 @@ const DateTimeInput = <T extends FieldValues>({
       />
     </DateTimeWrapper>
   );
-};
-
-export { DateTimeInput };
+}

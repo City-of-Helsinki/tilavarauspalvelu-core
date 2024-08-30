@@ -46,7 +46,7 @@ import {
 } from "@/helpers";
 import type { TFunction } from "i18next";
 import { base64encode } from "common/src/helpers";
-import ControlledDateInput from "@/component/ControlledDateInput";
+import { ControlledDateInput } from "common/src/components/form";
 import ControlledTimeInput from "@/component/ControlledTimeInput";
 import { errorToast, successToast } from "common/src/common/toast";
 

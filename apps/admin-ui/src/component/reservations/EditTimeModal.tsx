@@ -20,7 +20,7 @@ import { formatDuration, toUIDate } from "common/src/common/util";
 import { useModal } from "@/context/ModalContext";
 import { TimeChangeFormSchemaRefined, TimeFormSchema } from "@/schemas";
 import ControlledTimeInput from "@/component/ControlledTimeInput";
-import ControlledDateInput from "@/component/ControlledDateInput";
+import { ControlledDateInput } from "common/src/components/form";
 import { BufferToggles } from "@/component/BufferToggles";
 import { useCheckCollisions } from "./requested/hooks";
 import { getNormalizedInterval, parseDateTimeSafe } from "@/helpers";

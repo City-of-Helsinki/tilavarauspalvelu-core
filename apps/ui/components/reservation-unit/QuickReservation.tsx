@@ -20,7 +20,7 @@ import {
   type UseFormReturn,
 } from "react-hook-form";
 import { PendingReservationFormType } from "@/components/reservation-unit/schema";
-import ControlledDateInput from "@/components/common/ControlledDateInput";
+import { ControlledDateInput } from "common/src/components/form";
 import { ControlledSelect } from "@/components/common/ControlledSelect";
 import { getSelectedOption } from "@/modules/util";
 

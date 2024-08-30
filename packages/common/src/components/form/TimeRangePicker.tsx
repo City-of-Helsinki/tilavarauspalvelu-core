@@ -64,14 +64,14 @@ const StartBeforeEndError = styled.div`
  *  error is internal, and does not trigger invaliditiy of parent form). Returned elements don't have a wrapping
  *  element, so wrap the component in the parent form if needed.
  */
-const TimeRangePicker = <T extends FieldValues>({
+export function TimeRangePicker<T extends FieldValues>({
   control,
   names,
   required,
   labels,
   placeholders,
   clearable,
-}: TimeRangePickerProps<T>): JSX.Element => {
+}: TimeRangePickerProps<T>): JSX.Element {
   const { field: beginField, fieldState: beginFieldState } = useController({
     control,
     name: names?.begin,
@@ -171,6 +171,4 @@ const TimeRangePicker = <T extends FieldValues>({
       )}
     </>
   );
-};
-
-export default TimeRangePicker;
+}

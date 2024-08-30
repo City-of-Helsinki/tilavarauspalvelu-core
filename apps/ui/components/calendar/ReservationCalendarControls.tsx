@@ -28,8 +28,8 @@ import {
 } from "react-hook-form";
 import type { TimeRange } from "@/components/reservation-unit/QuickReservation";
 import { PendingReservationFormType } from "@/components/reservation-unit/schema";
-import ControlledDateInput from "@/components/common/ControlledDateInput";
 import { ControlledSelect } from "@/components/common/ControlledSelect";
+import { ControlledDateInput } from "common/src/components/form";
 
 export type FocusTimeSlot = TimeRange & {
   isReservable: boolean;

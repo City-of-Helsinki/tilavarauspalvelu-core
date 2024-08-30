@@ -26,7 +26,7 @@ import Loader from "@/component/Loader";
 import { dateTime, getNormalizedInterval, parseDateTimeSafe } from "@/helpers";
 import { useModal } from "@/context/ModalContext";
 import ControlledTimeInput from "@/component/ControlledTimeInput";
-import ControlledDateInput from "@/component/ControlledDateInput";
+import { ControlledDateInput } from "common/src/components/form";
 import ReservationTypeForm from "@/component/ReservationTypeForm";
 import { flattenMetadata } from "@/common/util";
 import { base64encode, filterNonNullable } from "common/src/helpers";

@@ -31,7 +31,7 @@ import {
 import ReservationTypeForm from "@/component/ReservationTypeForm";
 import ControlledTimeInput from "@/component/ControlledTimeInput";
 import ReservationListButton from "@/component/ReservationListButton";
-import ControlledDateInput from "@/component/ControlledDateInput";
+import { ControlledDateInput } from "common/src/components/form";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { Element } from "@/styles/util";
 import { AutoGrid } from "@/styles/layout";
