@@ -11,9 +11,9 @@ classifiers = [
 [tool.poetry.dependencies]
 python = ">=3.12,<3.13"
 celery = { extras = ["redis"], version = "5.4.0" }
-certifi = "2024.7.4"
+certifi = "2024.8.30"
 cryptography = "43.0.0"
-Django = "5.0.8"
+Django = "5.1"
 django-admin-data-views = "0.4.0"
 django-admin-extra-buttons = "1.5.8"
 django-admin-rangefilter = "0.13.2"
@@ -40,8 +40,6 @@ django-redis = "5.4.0"
 django-subforms = "0.3.0"
 django-tinymce = "4.1.0"
 djangorestframework = "3.15.2"
-drf-oidc-auth = "3.0.0"
-drf-spectacular = "0.27.2"
 easy-thumbnails = "2.9"
 elasticsearch-django = "8.5.2"
 graphene-django = "3.2.2"
@@ -80,7 +78,7 @@ requests-mock = "1.12.1"
 
 [tool.poetry.group.lint.dependencies]
 pre-commit = "3.8.0"
-ruff = "0.6.2"
+ruff = "0.6.3"
 ruff-lsp = "0.0.55"
 pyinstrument = "4.7.2"
 
