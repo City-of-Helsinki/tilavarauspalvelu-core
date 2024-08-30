@@ -25,8 +25,10 @@ type Params = {
 
 // HDS tabs aren't responsive inside a grid container
 // flex and block cause problems on other pages (tables overflowing).
+// seems they or something else is not responsive without max-width hack also
 const ContainerHack = styled(Container)`
   display: block;
+  max-width: 92vw;
 `;
 
 const LocationOnlyOnDesktop = styled.p`
