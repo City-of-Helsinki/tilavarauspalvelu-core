@@ -6,33 +6,34 @@ import { Button, IconAngleLeft, IconAngleRight, DateInput } from "hds-react";
 import { fromUIDate, toUIDate } from "common/src/common/util";
 import { breakpoints } from "common";
 import { toMondayFirstUnsafe } from "common/src/helpers";
-
-type Props = {
-  // both in ui string format
-  date: string;
-  onDateChange: (date: string) => void;
-};
+import { useSearchParams } from "react-router-dom";
 
 const Wrapper = styled.div`
   display: flex;
   flex-direction: row;
   place-items: center;
   gap: 0;
-  padding: 0 0.5em;
   color: black;
   text-decoration: none !important;
   svg {
     color: black;
   }
+  position: relative;
 `;
 
+/* hackish way to add date label inside the date selector
+ * if position is not absolute it breaks the responsivity of the date selector
+ */
 const WeekDay = styled.span`
+  position: absolute;
+  left: 3.5rem;
+  z-index: 10;
   @media (min-width: ${breakpoints.m}) {
-    margin-left: var(--spacing-s);
+    left: 4rem;
   }
 `;
 
-const SimpleDatePicker = styled(DateInput)`
+const BorderlessDatePicker = styled(DateInput)`
   border-color: transparent;
   max-width: 180px;
   @media (min-width: ${breakpoints.m}) {
@@ -48,18 +49,43 @@ const SimpleDatePicker = styled(DateInput)`
   }
 `;
 
-const DayNavigation = ({ date, onDateChange }: Props): JSX.Element => {
-  const d = fromUIDate(date);
+type Props = {
+  name: string;
+};
+
+export function DayNavigation({ name }: Props): JSX.Element {
+  if (name.length === 0) {
+    throw new Error("name must not be empty");
+  }
+
   const { t } = useTranslation();
 
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const handleChange = (value: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (value.length > 0) {
+      params.set(name, value);
+      setSearchParams(params, { replace: true });
+    } else {
+      params.delete(name);
+      setSearchParams(params, { replace: true });
+    }
+  };
+
+  const uiDate = searchParams.get(name) ?? "";
+  // fronUIDate returns null if the input is invalid
+  const d = fromUIDate(uiDate) ?? new Date();
+
   const onPreviousDay = () => {
-    if (!d) return;
-    onDateChange(toUIDate(subDays(d, 1)));
+    handleChange(toUIDate(subDays(d, 1)));
   };
   const onNextDay = () => {
-    if (!d) return;
-    onDateChange(toUIDate(addDays(d, 1)));
+    handleChange(toUIDate(addDays(d, 1)));
   };
+
+  // unsafe is fine here d is a valid date and getDay has only 6 possible values
+  const day = toMondayFirstUnsafe(d.getDay());
 
   return (
     <Wrapper>
@@ -72,15 +98,15 @@ const DayNavigation = ({ date, onDateChange }: Props): JSX.Element => {
       >
         {" "}
       </Button>
-      <WeekDay>{`${t(`dayShort.${toMondayFirstUnsafe(d?.getDay() ?? 0)}`)} `}</WeekDay>
-      <SimpleDatePicker
+      <WeekDay>{`${t(`dayShort.${day}`)} `}</WeekDay>
+      <BorderlessDatePicker
         disableConfirmation
         id="date-input"
-        initialMonth={d ?? new Date()}
+        initialMonth={d}
         language="fi"
         required
-        onChange={(value) => onDateChange(value)}
-        value={toUIDate(d)}
+        onChange={(value) => handleChange(value)}
+        value={uiDate}
       />
       <Button
         aria-label={t("common.next")}
@@ -93,6 +119,4 @@ const DayNavigation = ({ date, onDateChange }: Props): JSX.Element => {
       </Button>
     </Wrapper>
   );
-};
-
-export default DayNavigation;
+}

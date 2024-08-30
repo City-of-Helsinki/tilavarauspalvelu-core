@@ -92,9 +92,11 @@ export function fromUIDateUnsafe(date: string): Date {
 }
 
 // Returns a Date object from a string in format "d.M.yyyy"
+// Returns null if the date is invalid (the string is in invalid format or the date is before year 1000)
 export function fromUIDate(date: string): Date | null {
   try {
-    return parse(date, "d.M.yyyy", new Date());
+    const d = parse(date, "d.M.yyyy", new Date());
+    return isValidDate(d) ? d : null;
   } catch (e) {
     return null;
   }
