@@ -796,25 +796,3 @@ def test_reservation_unit__filter__by_reservation_unit_state__multiple(graphql):
     assert len(response.edges) == 2
     assert response.node(0) == {"pk": reservation_units.draft.pk}
     assert response.node(1) == {"pk": reservation_units.scheduled_publishing.pk}
-
-
-def test_reservation_unit__filter__by_reservation_unit_state__scheduled_publishing__when_begin_after_end(graphql):
-    graphql.login_with_superuser()
-
-    reservation_units = create_reservation_units_for_reservation_unit_state_filtering()
-
-    now = local_datetime()
-    reservation_unit = ReservationUnitFactory.create(
-        is_archived=False,
-        is_draft=False,
-        publish_begins=(now + datetime.timedelta(days=2)),
-        publish_ends=(now + datetime.timedelta(days=1)),
-    )
-
-    query = reservation_units_query(publishing_state=ReservationUnitPublishingState.SCHEDULED_PUBLISHING)
-    response = graphql(query)
-
-    assert response.has_errors is False
-    assert len(response.edges) == 2
-    assert response.node(0) == {"pk": reservation_units.scheduled_publishing.pk}
-    assert response.node(1) == {"pk": reservation_unit.pk}

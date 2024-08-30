@@ -330,11 +330,6 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
                         models.Q(publish_ends__isnull=True)
                         # Was previously unpublished.
                         | models.Q(publish_ends__lte=Now())
-                        # Will be unpublished in the future, but before it re-publishes.
-                        | (
-                            models.Q(publish_ends__gt=Now())  #
-                            & models.Q(publish_begins__gt=models.F("publish_ends"))
-                        )
                     )
                 ),
                 then=models.Value(ReservationUnitPublishingState.SCHEDULED_PUBLISHING.value),
@@ -357,17 +352,16 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
                         )
                     )
                     | (
-                        # Publishes and unpublishes at the exact same time in the future.
+                        # Publishes and unpublishes at the exact same time.
                         models.Q(publish_begins__isnull=False)
-                        & models.Q(publish_begins__gt=Now())
                         & models.Q(publish_ends__isnull=False)
-                        & models.Q(publish_ends__gt=Now())
                         & models.Q(publish_begins=models.F("publish_ends"))
                     )
                 ),
                 then=models.Value(ReservationUnitPublishingState.HIDDEN.value),
             ),
-            # Reservation Unit has been published, but is going to unpublish in the future.
+            # Reservation Unit is currently published, but is going to unpublish in the future.
+            # It might be set to become published again in the future, but after it first unpublishes.
             models.When(
                 (
                     # Unpublishes in the future.
@@ -378,6 +372,8 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
                         models.Q(publish_begins__isnull=True)
                         # Was published in the past.
                         | models.Q(publish_begins__lte=Now())
+                        # Publishing begins again in the future, but after it first unpublishes.
+                        | models.Q(publish_begins__gt=models.F("publish_ends"))
                     )
                 ),
                 then=models.Value(ReservationUnitPublishingState.SCHEDULED_HIDING.value),
@@ -456,9 +452,9 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
                         models.Q(reservation_ends__isnull=False)
                         & models.Q(reservation_ends__lte=Now())
                         & (
-                            # Reservation period never begun.
+                            # Reservation period was previously open.
                             models.Q(reservation_begins__isnull=True)
-                            # Reservation begun before it ended.
+                            # Reservation period begun before it ended.
                             | (
                                 models.Q(reservation_begins__isnull=False)
                                 & models.Q(reservation_begins__lt=models.F("reservation_ends"))
@@ -466,7 +462,7 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
                         )
                     )
                     | (
-                        # Reservation period is or was zero-length.
+                        # Reservation period begins and ends at the exact same time.
                         models.Q(reservation_begins__isnull=False)
                         & models.Q(reservation_ends__isnull=False)
                         & models.Q(reservation_ends=models.F("reservation_begins"))
@@ -482,7 +478,7 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
                     models.Q(reservation_ends__isnull=False)
                     & models.Q(reservation_ends__gt=Now())
                     & (
-                        # Reservation period has never begun.
+                        # Reservation period has never been closed.
                         models.Q(reservation_begins__isnull=True)
                         # Reservation period has begun in the past.
                         | models.Q(reservation_begins__lte=Now())
