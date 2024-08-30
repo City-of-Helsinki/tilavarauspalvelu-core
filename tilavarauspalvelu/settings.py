@@ -68,7 +68,6 @@ class Common(Environment):
         "django_celery_results",
         "django_extensions",
         "django_filters",
-        "drf_spectacular",
         "easy_thumbnails",
         "elasticsearch_django",
         "graphene_django",
@@ -176,6 +175,7 @@ class Common(Environment):
         },
     }
 
+    THUMBNAIL_DEFAULT_STORAGE_ALIAS = "default"
     THUMBNAIL_ALIASES = {
         "": {
             # Currently, all custom sized images are wanted to be cropped.
