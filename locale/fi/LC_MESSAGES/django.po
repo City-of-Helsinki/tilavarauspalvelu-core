@@ -1742,7 +1742,7 @@ msgstr "Käsittelijä"
 
 #: permissions/enums.py
 msgid "Viewer"
-msgstr "Katselika"
+msgstr "Katselija"
 
 #: permissions/enums.py
 msgid "Reserver"
@@ -1762,11 +1762,11 @@ msgstr "Yleiset roolit"
 
 #: permissions/models/unit_role.py
 msgid "Unit role"
-msgstr "Yksikkökohtainen rooli"
+msgstr "Toimipistekohtainen rooli"
 
 #: permissions/models/unit_role.py
 msgid "Unit roles"
-msgstr "Yksikkökohtaiset roolit"
+msgstr "Toimipistekohtaiset roolit"
 
 #: reservation_units/admin/reservation_unit/admin.py
 msgid "Search by ID, name, unit name, or service sector name"
