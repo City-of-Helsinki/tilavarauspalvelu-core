@@ -140,7 +140,7 @@ export function UnitReservations(): JSX.Element {
           options={reservationUnitTypeOptions}
         />
       </AutoGrid>
-      <SearchTags hide={["date"]} translateTag={translateTag} />
+      <SearchTags hide={["date", "tab"]} translateTag={translateTag} />
       <HR />
       <HorisontalFlexWrapper>
         <Button
@@ -149,8 +149,8 @@ export function UnitReservations(): JSX.Element {
           size="small"
           onClick={() => {
             const p = new URLSearchParams(searchParams);
-            p.delete("date");
-            setSearchParams(p);
+            p.set("date", toUIDate(new Date()));
+            setSearchParams(p, { replace: true });
           }}
         >
           {t("common.today")}
