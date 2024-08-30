@@ -38,6 +38,27 @@ const BackgroundHeader = styled(Header)`
   --notification-bubble-background-color: var(
     --tilavaraus-admin-handling-count-color
   );
+  [class^="HeaderActionBarItem-module_container"] {
+    > button span {
+      color: white !important;
+      svg {
+        color: white;
+      }
+    }
+  }
+
+  /* retain text-decoration: underline on the plain text in navigation items, but disable it in the notificationBubble */
+  [class^="HeaderNavigationMenu-module_headerNavigationMenuLinkContent__"]:hover {
+    a {
+      text-decoration: none;
+      span {
+        text-decoration: underline;
+      }
+      [class^="HeaderActionBarSubItem-module_notificationBubble__"] {
+        text-decoration: none;
+      }
+    }
+  }
   #user-menu-dropdown {
     color: black;
     button,
@@ -66,6 +87,7 @@ const BackgroundHeader = styled(Header)`
     }
     ul > li {
       > span {
+        box-sizing: border-box;
         padding: var(--spacing-s);
         li {
           width: 100%;
