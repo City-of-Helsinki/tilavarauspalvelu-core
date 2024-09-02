@@ -1,7 +1,6 @@
-import { parse } from "date-fns";
+import { parse, set } from "date-fns";
 import { formatDate } from "../common/util";
 import { fromUIDate } from "common/src/common/util";
-import { setTimeOnDate } from "@/component/reservations/utils";
 
 /* Convert api datetime to date required by date input, defaults to current date */
 export const valueForDateInput = (from: string): string => {
@@ -46,4 +45,22 @@ export function constructApiDate(date: string, time: string): string | null {
   }
   const d2 = setTimeOnDate(d, time);
   return d2.toISOString();
+}
+
+export function setTimeOnDate(date: Date, time: string): Date {
+  const duration = timeToDuration(time);
+  if (duration) {
+    return set(date, duration);
+  }
+  return date;
+}
+
+function timeToDuration(time: string) {
+  const dindex = time.indexOf(":");
+  if (dindex > 0) {
+    const hours = Number(time.substring(0, dindex) ?? "0");
+    const minutes = Number(time.substring(dindex + 1) ?? "0");
+    return { hours, minutes };
+  }
+  return null;
 }

@@ -3,7 +3,7 @@ import { breakpoints } from "common/src/common/style";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import Loader from "@/component/Loader";
-import Legend from "@/component/reservations/requested/Legend";
+import Legend from "@/component/Legend";
 import { legend } from "./eventStyleGetter";
 import { UnitCalendar } from "./UnitCalendar";
 import { useUnitResources } from "./hooks";

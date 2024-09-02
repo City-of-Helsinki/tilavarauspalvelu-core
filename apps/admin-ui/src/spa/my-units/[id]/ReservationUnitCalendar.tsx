@@ -13,7 +13,7 @@ import {
 } from "@gql/gql-types";
 import { getEventBuffers } from "common/src/calendar/util";
 import { getReservationUrl } from "@/common/urls";
-import Legend from "@/component/reservations/requested/Legend";
+import Legend from "@/component/Legend";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";

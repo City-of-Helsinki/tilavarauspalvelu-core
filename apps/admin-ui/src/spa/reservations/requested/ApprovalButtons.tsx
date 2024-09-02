@@ -3,7 +3,7 @@ import { ReservationStateChoice, type ReservationQuery } from "@gql/gql-types";
 import { useTranslation } from "react-i18next";
 import { Button } from "hds-react";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
-import DenyDialog from "./DenyDialog";
+import DenyDialog from "@/component/DenyDialog";
 import ApproveDialog from "./ApproveDialog";
 import ReturnToRequiredHandlingDialog from "./ReturnToRequiresHandlingDialog";
 import { useModal } from "@/context/ModalContext";

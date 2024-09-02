@@ -20,7 +20,7 @@ import Loader from "@/component/Loader";
 import { Select } from "@/component/Select";
 import { VerticalFlex } from "@/styles/layout";
 import { CustomDialogHeader } from "@/component/CustomDialogHeader";
-import { useDenyReasonOptions } from "./hooks";
+import { useDenyReasonOptions } from "@/hooks";
 import { filterNonNullable } from "common/src/helpers";
 import { successToast, errorToast } from "common/src/common/toast";
 

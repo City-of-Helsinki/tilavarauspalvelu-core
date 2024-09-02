@@ -14,7 +14,7 @@ import {
   ReservationChangeFormSchema,
 } from "@/schemas";
 import ReservationTypeForm from "@/component/ReservationTypeForm";
-import Loader from "../Loader";
+import Loader from "@/component/Loader";
 import { HR } from "@/component/Table";
 import { useOptions } from "@/hooks";
 import EditPageWrapper from "./EditPageWrapper";

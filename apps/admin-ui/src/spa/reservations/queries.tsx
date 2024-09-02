@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { RESERVATION_COMMON_FRAGMENT } from "./fragments";
+import { RESERVATION_COMMON_FRAGMENT } from "@/common/fragments";
 
 export const RESERVATIONS_QUERY = gql`
   ${RESERVATION_COMMON_FRAGMENT}

@@ -14,9 +14,9 @@ import {
   ReservationList,
 } from "@/component/ReservationsList";
 import ReservationListButton from "@/component/ReservationListButton";
-import DenyDialog from "./DenyDialog";
+import DenyDialog from "@/component/DenyDialog";
 import { useModal } from "@/context/ModalContext";
-import { EditTimeModal } from "../EditTimeModal";
+import { EditTimeModal } from "@/component/EditTimeModal";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { LoadingSpinner } from "hds-react";
 import { errorToast } from "common/src/common/toast";

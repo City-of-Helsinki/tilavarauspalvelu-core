@@ -6,7 +6,7 @@ import { Container } from "hds-react";
 import { ErrorBoundary } from "react-error-boundary";
 import { H1 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { RecurringReservationsView } from "@/component/reservations/requested/RecurringReservationsView";
+import { RecurringReservationsView } from "@/component/RecurringReservationsView";
 import { ActionsWrapper } from "./commonStyling";
 import Error404 from "@/common/Error404";
 import { useRecurringReservationQuery } from "@gql/gql-types";

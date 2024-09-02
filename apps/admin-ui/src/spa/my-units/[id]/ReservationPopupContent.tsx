@@ -10,7 +10,7 @@ import { formatTime, getReserveeName } from "@/common/util";
 import { truncate } from "@/helpers";
 import { DenseVerticalFlex } from "@/styles/layout";
 import { CELL_BORDER } from "./const";
-import VisibleIfPermission from "@/component/reservations/requested/VisibleIfPermission";
+import VisibleIfPermission from "@/component/VisibleIfPermission";
 import { useTranslation } from "next-i18next";
 
 const MAX_POPOVER_COMMENT_LENGTH = 140;

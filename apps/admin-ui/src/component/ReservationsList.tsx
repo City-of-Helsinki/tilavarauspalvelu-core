@@ -9,7 +9,7 @@ import {
 } from "@gql/gql-types";
 import { Button } from "hds-react";
 import { useCheckPermission } from "@/hooks";
-import { NewReservationModal } from "./reservations/EditTimeModal";
+import { NewReservationModal } from "@/component/EditTimeModal";
 import { useModal } from "@/context/ModalContext";
 import { H6 } from "common";
 

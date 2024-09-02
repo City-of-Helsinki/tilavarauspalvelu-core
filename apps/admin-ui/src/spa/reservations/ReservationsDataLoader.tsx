@@ -9,7 +9,7 @@ import {
 } from "@gql/gql-types";
 import { More } from "@/component/More";
 import { LIST_PAGE_SIZE } from "@/common/const";
-import Loader from "../Loader";
+import Loader from "@/component/Loader";
 import { ReservationsTable } from "./ReservationsTable";
 import { fromUIDate, toApiDate } from "common/src/common/util";
 import { filterNonNullable, toNumber } from "common/src/helpers";

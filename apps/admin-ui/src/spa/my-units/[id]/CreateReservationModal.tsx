@@ -21,7 +21,7 @@ import {
   type ReservationFormMeta,
 } from "@/schemas";
 import { breakpoints } from "common/src/common/style";
-import { useCheckCollisions } from "@/component/reservations/requested/hooks";
+import { useCheckCollisions } from "@/hooks";
 import Loader from "@/component/Loader";
 import { dateTime, getNormalizedInterval, parseDateTimeSafe } from "@/helpers";
 import { useModal } from "@/context/ModalContext";

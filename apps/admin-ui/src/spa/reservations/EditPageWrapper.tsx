@@ -1,8 +1,8 @@
 import React from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { type ReservationQuery } from "@gql/gql-types";
-import { LinkPrev } from "../LinkPrev";
-import { Container } from "../../styles/layout";
+import { LinkPrev } from "@/component/LinkPrev";
+import { Container } from "@/styles/layout";
 import ReservationTitleSection from "./requested/ReservationTitleSection";
 import { createTagString } from "./requested/util";
 

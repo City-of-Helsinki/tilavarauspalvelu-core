@@ -10,12 +10,12 @@ import {
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
-import Legend from "./Legend";
-import { EditTimeModal } from "../EditTimeModal";
+import Legend from "@/component/Legend";
+import { EditTimeModal } from "@/component/EditTimeModal";
 import { isPossibleToEdit } from "./reservationModificationRules";
 import { getEventBuffers } from "common/src/calendar/util";
 import { filterNonNullable } from "common/src/helpers";
-import VisibleIfPermission from "./VisibleIfPermission";
+import VisibleIfPermission from "@/component/VisibleIfPermission";
 
 // TODO fragment
 type ReservationType = Omit<

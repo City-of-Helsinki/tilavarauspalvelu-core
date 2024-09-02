@@ -9,7 +9,7 @@ import { GlobalContext } from "./context/GlobalContexts";
 import { prefixes } from "./common/urls";
 import { withAuthorization } from "@/common/AuthorizationChecker";
 import MyUnitsRouter from "./spa/my-units/router";
-import ReservationsRouter from "./component/reservations/ReservationRouter";
+import ReservationsRouter from "./spa/reservations/router";
 import NotificationsRouter from "./component/notifications/router";
 import Error404 from "./common/Error404";
 import { UserPermissionChoice } from "@gql/gql-types";

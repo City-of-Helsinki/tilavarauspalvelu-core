@@ -2,6 +2,8 @@ import { format, getDay, isSameDay, parseISO } from "date-fns";
 import i18next from "i18next";
 import { trim, camelCase, get, pick, zipObject } from "lodash";
 import {
+  type Maybe,
+  type ReservationNode,
   ReservationTypeChoice,
   type LocationFieldsFragment,
   type ReservationCommonFragment,
@@ -248,4 +250,14 @@ export function getReserveeName(
     prefix = t ? t("Reservations.prefixes.staff") : "";
   }
   return truncate(prefix + (reservation.reserveeName ?? "-"), length);
+}
+
+export function formatAgeGroup(
+  group:
+    | Maybe<
+        Pick<NonNullable<ReservationNode["ageGroup"]>, "minimum" | "maximum">
+      >
+    | undefined
+): string | null {
+  return group ? `${group.minimum}-${group.maximum || ""}` : null;
 }
