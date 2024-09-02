@@ -16,7 +16,7 @@ import { valueForDateInput, valueForTimeInput } from "@/helpers";
 import { GQL_MAX_RESULTS_PER_QUERY } from "@/common/const";
 import { CustomTable, TableLink } from "@/component/Table";
 import { filterNonNullable } from "common/src/helpers";
-import { More } from "../More";
+import { More } from "@/component/More";
 
 const notificationUrl = (pk: number) => `/messaging/notifications/${pk}`;
 

@@ -10,7 +10,7 @@ import { prefixes } from "./common/urls";
 import { withAuthorization } from "@/common/AuthorizationChecker";
 import MyUnitsRouter from "./spa/my-units/router";
 import ReservationsRouter from "./spa/reservations/router";
-import NotificationsRouter from "./component/notifications/router";
+import NotificationsRouter from "./spa/notifications/router";
 import Error404 from "./common/Error404";
 import { UserPermissionChoice } from "@gql/gql-types";
 
