@@ -13,8 +13,8 @@ import {
   UnitQuery,
 } from "@gql/gql-types";
 import { PopupMenu } from "@/component/PopupMenu";
-import Modal, { useModal as useHDSModal } from "../HDSModal";
-import { NewSpaceModal } from "../Spaces/space-editor/new-space-modal/NewSpaceModal";
+import Modal, { useModal as useHDSModal } from "@/component/HDSModal";
+import { NewSpaceModal } from "./space-editor/new-space-modal/NewSpaceModal";
 import { errorToast } from "common/src/common/toast";
 import { CustomTable, TableLink } from "@/component/Table";
 import { getSpaceUrl } from "@/common/urls";

@@ -14,7 +14,7 @@ import {
 import { base64encode } from "common/src/helpers";
 import Loader from "@/component/Loader";
 import { ButtonContainer, Container, IngressContainer } from "@/styles/layout";
-import { SubPageHead } from "@/component/Unit/SubPageHead";
+import { SubPageHead } from "../SubPageHead";
 import { errorToast, successToast } from "common/src/common/toast";
 import { FormErrorSummary } from "@/common/FormErrorSummary";
 import {

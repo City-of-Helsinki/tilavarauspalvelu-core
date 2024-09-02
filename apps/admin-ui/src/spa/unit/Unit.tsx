@@ -10,7 +10,7 @@ import { parseAddress } from "@/common/util";
 import { errorToast } from "common/src/common/toast";
 import { Container } from "@/styles/layout";
 import { BasicLink } from "@/styles/util";
-import Loader from "../Loader";
+import Loader from "@/component/Loader";
 import { ExternalLink } from "@/component/ExternalLink";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import Error404 from "@/common/Error404";

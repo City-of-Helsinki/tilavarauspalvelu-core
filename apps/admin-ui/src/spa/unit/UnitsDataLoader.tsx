@@ -5,7 +5,7 @@ import { filterNonNullable } from "common/src/helpers";
 import { errorToast } from "common/src/common/toast";
 import { LARGE_LIST_PAGE_SIZE } from "@/common/const";
 import { More } from "@/component/More";
-import Loader from "../Loader";
+import Loader from "@/component/Loader";
 import { UnitsTable } from "./UnitsTable";
 import { useSearchParams } from "react-router-dom";
 

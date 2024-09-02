@@ -1,8 +1,8 @@
 import React from "react";
 import { Link } from "hds-react";
 import { H1 } from "common/src/common/typography";
-import { useTranslation } from "react-i18next";
-import { Container } from "../../styles/layout";
+import { useTranslation } from "next-i18next";
+import { Container } from "@/styles/layout";
 import { Filters } from "./Filters";
 import { UnitsDataLoader } from "./UnitsDataLoader";
 import { HR } from "@/component/Table";

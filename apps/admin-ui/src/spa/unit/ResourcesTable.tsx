@@ -13,7 +13,7 @@ import {
 } from "@gql/gql-types";
 import { PopupMenu } from "@/component/PopupMenu";
 import { getResourceUrl } from "@/common/urls";
-import { CustomTable, TableLink } from "../Table";
+import { CustomTable, TableLink } from "@/component/Table";
 import { errorToast, successToast } from "common/src/common/toast";
 import { truncate } from "common/src/helpers";
 import { MAX_NAME_LENGTH } from "@/common/const";
