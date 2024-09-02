@@ -17,9 +17,9 @@ import ReservationTypeForm from "@/component/ReservationTypeForm";
 import Loader from "@/component/Loader";
 import { HR } from "@/component/Table";
 import { useOptions } from "@/hooks";
-import EditPageWrapper from "./EditPageWrapper";
-import { useReservationEditData } from "./requested/hooks";
-import { useStaffReservationMutation } from "./hooks";
+import { EditPageWrapper } from "./EditPageWrapper";
+import { useReservationEditData } from "./hooks";
+import { useStaffReservationMutation } from "../hooks";
 import { filterNonNullable } from "common/src/helpers";
 import { flattenMetadata } from "@/common/util";
 import { errorToast } from "common/src/common/toast";
@@ -212,7 +212,7 @@ function EditReservation({
   );
 }
 
-function EditPage() {
+export function EditPage() {
   const params = useParams();
   const id = params.id ?? undefined;
 
@@ -257,5 +257,3 @@ function EditPage() {
     </EditPageWrapper>
   );
 }
-
-export default EditPage;

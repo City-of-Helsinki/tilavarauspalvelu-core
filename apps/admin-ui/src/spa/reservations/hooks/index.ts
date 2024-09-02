@@ -6,8 +6,8 @@ import {
   useUpdateRecurringReservationMutation,
   useUpdateStaffReservationMutation,
 } from "@gql/gql-types";
-import { useRecurringReservations } from "../requested/hooks";
 import { errorToast, successToast } from "common/src/common/toast";
+import { useRecurringReservations } from "@/hooks";
 
 export type MutationInputParams = ReservationStaffModifyMutationInput & {
   seriesName?: string;

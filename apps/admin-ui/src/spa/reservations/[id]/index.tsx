@@ -34,7 +34,8 @@ import Calendar from "./Calendar";
 import VisibleIfPermission from "@/component/VisibleIfPermission";
 import ApprovalButtons from "./ApprovalButtons";
 import { RecurringReservationsView } from "@/component/RecurringReservationsView";
-import { useRecurringReservations, useReservationData } from "./hooks";
+import { useReservationData } from "./hooks";
+import { useRecurringReservations } from "@/hooks";
 import ApprovalButtonsRecurring from "./ApprovalButtonsRecurring";
 import ReservationTitleSection from "./ReservationTitleSection";
 import { base64encode } from "common/src/helpers";
@@ -580,7 +581,7 @@ function RequestedReservation({
   );
 }
 
-function PermissionWrappedReservation() {
+export function ReservationPage() {
   const { id: pk } = useParams() as { id: string };
   const { t } = useTranslation();
   const typename = "ReservationNode";
@@ -619,5 +620,3 @@ function PermissionWrappedReservation() {
     </VisibleIfPermission>
   );
 }
-
-export default PermissionWrappedReservation;

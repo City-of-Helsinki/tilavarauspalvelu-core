@@ -3,11 +3,12 @@ import { useTranslation } from "next-i18next";
 import { type ReservationQuery } from "@gql/gql-types";
 import { LinkPrev } from "@/component/LinkPrev";
 import { Container } from "@/styles/layout";
-import ReservationTitleSection from "./requested/ReservationTitleSection";
-import { createTagString } from "./requested/util";
+import ReservationTitleSection from "./ReservationTitleSection";
+import { createTagString } from "./util";
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
-const EditPageWrapper = ({
+
+export function EditPageWrapper({
   children,
   reservation,
   title,
@@ -15,7 +16,7 @@ const EditPageWrapper = ({
   children: React.ReactNode;
   title: string;
   reservation?: ReservationType;
-}) => {
+}) {
   const { t } = useTranslation();
   const tagline = reservation ? createTagString(reservation, t) : "";
 
@@ -34,6 +35,4 @@ const EditPageWrapper = ({
       </Container>
     </>
   );
-};
-
-export default EditPageWrapper;
+}

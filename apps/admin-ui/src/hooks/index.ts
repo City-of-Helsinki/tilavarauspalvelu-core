@@ -7,3 +7,4 @@ export { useGeneralFields } from "./useGeneralFields";
 export { useCheckPermission } from "./useCheckPermission";
 export { useCheckCollisions } from "./useCheckCollisions";
 export { useDenyReasonOptions } from "./useDenyReasonOptions";
+export { useRecurringReservations } from "./useRecurringReservations";

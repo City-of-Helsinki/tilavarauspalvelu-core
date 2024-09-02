@@ -5,7 +5,7 @@ import { Button } from "hds-react";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import DenyDialog from "@/component/DenyDialog";
 import { useModal } from "@/context/ModalContext";
-import { useRecurringReservations } from "./hooks";
+import { useRecurringReservations } from "@/hooks";
 
 // TODO use a fragment
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;

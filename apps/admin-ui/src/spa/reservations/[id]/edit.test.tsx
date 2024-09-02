@@ -6,12 +6,12 @@ import userEvent from "@testing-library/user-event";
 // @ts-expect-error -- FIXME react-router typing
 import * as router from "react-router";
 import { CustomerTypeChoice, ReservationDocument } from "@gql/gql-types";
-import EditPage from "./EditPage";
+import { EditPage } from "./edit";
 import {
   CHANGED_WORKING_MEMO,
   mockReservation,
   createMocks,
-} from "./hooks/__test__/mocks";
+} from "../hooks/__test__/mocks";
 import { base64encode } from "common/src/helpers";
 
 const extendedReservation = {

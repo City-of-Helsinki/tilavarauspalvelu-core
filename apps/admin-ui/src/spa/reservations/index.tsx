@@ -8,7 +8,7 @@ import { HR } from "@/component/Table";
 import { Container } from "@/styles/layout";
 import { Filters } from "./Filters";
 
-function AllReservations(): JSX.Element {
+export function ListReservationsPage(): JSX.Element {
   const { t } = useTranslation();
 
   const today = useMemo(() => new Date(), []);
@@ -41,5 +41,3 @@ function AllReservations(): JSX.Element {
     </Container>
   );
 }
-
-export default AllReservations;
