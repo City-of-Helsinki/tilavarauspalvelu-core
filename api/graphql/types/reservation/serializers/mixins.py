@@ -11,8 +11,7 @@ from api.graphql.extensions.validation_errors import ValidationErrorCodes, Valid
 from api.graphql.types.reservation.types import ReservationNode
 from common.date_utils import local_datetime, local_start_of_day
 from reservation_units.enums import PriceUnit, PricingType, ReservationStartInterval, ReservationUnitState
-from reservation_units.models import ReservationUnit, ReservationUnitPricing
-from reservation_units.utils.reservation_unit_pricing_helper import ReservationUnitPricingHelper
+from reservation_units.models import ReservationUnit
 from reservations.enums import ReservationTypeChoice
 from reservations.models import Reservation
 
@@ -113,10 +112,7 @@ class ReservationPriceMixin:
         )
 
         for reservation_unit in reservation_units:
-            pricing: ReservationUnitPricing | None = ReservationUnitPricingHelper.get_price_by_date(
-                reservation_unit=reservation_unit,
-                by_date=begin_datetime.date(),
-            )
+            pricing = reservation_unit.actions.get_active_pricing(by_date=begin_datetime.date())
 
             # If unit pricing type is not PAID, there is no need for calculations, skip to next reservation unit
             if pricing is None or pricing.pricing_type != PricingType.PAID:

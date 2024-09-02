@@ -4,10 +4,9 @@ from dataclasses import dataclass, field
 from django.conf import settings
 from django.db.models import Expression, F, OuterRef, Q, Subquery
 
-from common.date_utils import local_datetime
-from reservation_units.enums import PricingStatus, PricingType, ReservationState
+from common.date_utils import local_date, local_datetime
+from reservation_units.enums import PricingType, ReservationState
 from reservation_units.models import ReservationUnit, ReservationUnitPricing
-from reservation_units.utils.reservation_unit_pricing_helper import ReservationUnitPricingHelper
 
 
 @dataclass
@@ -106,22 +105,25 @@ class ReservationUnitReservationStateHelper:
 
     @classmethod
     def __active_pricing_type_alias(cls) -> dict[str, Subquery]:
+        today = local_date()
         return {
             "active_pricing_type": Subquery(
                 queryset=(
                     ReservationUnitPricing.objects.filter(
                         reservation_unit=OuterRef("pk"),
-                        status=PricingStatus.PRICING_STATUS_ACTIVE,
-                    ).values("pricing_type")[:1]
+                        begins__lte=today,
+                    )
+                    .order_by("-begins")
+                    .values("pricing_type")[:1]
                 ),
             ),
         }
 
     @classmethod
     def __has_valid_pricing(cls, reservation_unit: ReservationUnit) -> bool:
-        active_price = ReservationUnitPricingHelper.get_active_price(reservation_unit)
+        active_pricing = reservation_unit.actions.get_active_pricing()
 
-        if active_price is None:
+        if active_pricing is None:
             return False
 
         # If MOCK_VERKKOKAUPPA_API_ENABLED is True there is no need to check for payment products,
@@ -129,7 +131,7 @@ class ReservationUnitReservationStateHelper:
             return True
 
         # Pricing is FREE
-        if active_price.pricing_type == PricingType.FREE:
+        if active_pricing.pricing_type == PricingType.FREE:
             return True
         # Pricing is PAID and there is a payment product
         return reservation_unit.payment_product is not None
@@ -300,7 +302,7 @@ class ReservationUnitReservationStateHelper:
             elif reservation_unit.reservation_begins <= reservation_unit.reservation_ends <= now:
                 return True
 
-        active_price = ReservationUnitPricingHelper.get_active_price(reservation_unit)
+        active_pricing = reservation_unit.actions.get_active_pricing()
 
         # Reservation period would be for reservable or scheduled closing based on reservable period,
         # but there is no active pricing or pricing is paid and there is no payment product
@@ -308,9 +310,9 @@ class ReservationUnitReservationStateHelper:
             cls.__is_reservable_period(now, reservation_unit)
             or cls.__is_scheduled_closing_period(now, reservation_unit)
         ) and (
-            active_price is None
+            active_pricing is None
             or (
-                active_price.pricing_type == PricingType.PAID
+                active_pricing.pricing_type == PricingType.PAID
                 and reservation_unit.payment_product is None
                 and not settings.MOCK_VERKKOKAUPPA_API_ENABLED  # Don't show as closed if using Mock Verkkokauppa API
             )

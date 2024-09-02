@@ -3,7 +3,9 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any
 
-from common.date_utils import DEFAULT_TIMEZONE, time_as_timedelta
+from django.db import models
+
+from common.date_utils import DEFAULT_TIMEZONE, local_date, time_as_timedelta
 from opening_hours.errors import HaukiAPIError
 from opening_hours.models import OriginHaukiResource, ReservableTimeSpan
 from opening_hours.utils.hauki_api_client import HaukiAPIClient
@@ -14,9 +16,7 @@ from utils.external_service.errors import ExternalServiceError
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    from django.db import models
-
-    from reservation_units.models import ReservationUnit
+    from reservation_units.models import ReservationUnit, ReservationUnitPricing
     from reservations.models import Reservation
     from spaces.models import Building, Location
 
@@ -340,3 +340,18 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         # For staff reservations, we don't need to care about opening hours,
         # so we can just check start interval from the beginning of the day.
         return begin_time.second == 0 and begin_time.microsecond == 0 and begin_time.minute % interval_minutes == 0
+
+    def get_active_pricing(self, by_date: datetime.date | None = None) -> ReservationUnitPricing | None:
+        """Returns the active pricing for the reservation unit."""
+        today = local_date()
+        if by_date is None:
+            by_date = today
+
+        return (
+            self.reservation_unit.pricings.filter(
+                models.Q(begins__lte=by_date, is_activated_on_begins=False)
+                | models.Q(begins__lte=today, is_activated_on_begins=True)
+            )
+            .order_by("-begins")
+            .first()
+        )

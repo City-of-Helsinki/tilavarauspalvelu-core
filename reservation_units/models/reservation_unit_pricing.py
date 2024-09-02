@@ -3,7 +3,7 @@ from decimal import Decimal
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from reservation_units.enums import PriceUnit, PricingStatus, PricingType
+from reservation_units.enums import PriceUnit, PricingType
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 
 __all__ = [
@@ -18,8 +18,7 @@ def get_default_tax_percentage() -> int:
 
 
 class ReservationUnitPricingQuerySet(models.QuerySet):
-    def active(self):
-        return self.filter(status=PricingStatus.PRICING_STATUS_ACTIVE).first()
+    pass
 
 
 class ReservationUnitPricing(models.Model):
@@ -29,6 +28,10 @@ class ReservationUnitPricing(models.Model):
         blank=False,
         help_text="When pricing is activated",
     )
+
+    # True: This pricing is used for reservations that are created after the begins date
+    # False: This pricing is used for reservations that start after the begins date
+    is_activated_on_begins = models.BooleanField(default=False)
 
     pricing_type = models.CharField(
         max_length=20,
@@ -72,13 +75,6 @@ class ReservationUnitPricing(models.Model):
         help_text="The percentage of tax included in the price",
     )
 
-    status = models.CharField(
-        max_length=20,
-        verbose_name=_("Status"),
-        choices=PricingStatus.choices,
-        help_text="Status of the pricing",
-    )
-
     reservation_unit = models.ForeignKey(
         "reservation_units.ReservationUnit",
         verbose_name=_("Reservation unit"),
@@ -93,14 +89,17 @@ class ReservationUnitPricing(models.Model):
     class Meta:
         db_table = "reservation_unit_pricing"
         base_manager_name = "objects"
-        ordering = [
-            "pk",
-        ]
+        ordering = ["pk"]
         constraints = [
             models.CheckConstraint(
-                name="lower_price_greater_than_highest_price",
                 check=models.Q(lowest_price__lte=models.F("highest_price")),
+                name="lower_price_greater_than_highest_price",
                 violation_error_message="Lowest price can not be greater than highest price.",
+            ),
+            models.UniqueConstraint(
+                name="reservation_unit_begin_date_unique_together",
+                fields=["reservation_unit", "begins"],
+                violation_error_message="Pricing for this reservation unit already exists for this date.",
             ),
         ]
 

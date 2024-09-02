@@ -8,7 +8,7 @@ from django.utils.timezone import get_default_timezone
 from graphene_django_extensions.testing import parametrize_helper
 
 from common.date_utils import local_datetime, local_end_of_day, local_start_of_day, next_hour
-from reservation_units.enums import PriceUnit, PricingStatus, ReservationKind
+from reservation_units.enums import PriceUnit, ReservationKind
 from reservation_units.models import ReservationUnitHierarchy
 from reservations.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import Reservation
@@ -780,9 +780,9 @@ def test_reservation__create__price_calculation__future_pricing(graphql):
 
     # Current pricing
     ReservationUnitPricingFactory.create(
+        begins=now,
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
         highest_price=Decimal("6"),
-        status=PricingStatus.PRICING_STATUS_ACTIVE,
         tax_percentage__value=Decimal("24"),
         reservation_unit=reservation_unit,
     )
@@ -792,7 +792,6 @@ def test_reservation__create__price_calculation__future_pricing(graphql):
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
         highest_price=Decimal("10"),
         tax_percentage__value=Decimal("24"),
-        status=PricingStatus.PRICING_STATUS_FUTURE,
         reservation_unit=reservation_unit,
     )
 

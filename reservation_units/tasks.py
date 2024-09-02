@@ -11,7 +11,7 @@ from merchants.models import PaymentProduct
 from merchants.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
 from merchants.verkkokauppa.product.types import CreateOrUpdateAccountingParams, CreateProductParams
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from reservation_units.enums import PricingStatus, PricingType
+from reservation_units.enums import PricingType
 from reservation_units.utils.reservation_unit_payment_helper import ReservationUnitPaymentHelper
 from tilavarauspalvelu.celery import app
 from utils.image_cache import purge
@@ -51,7 +51,6 @@ def update_reservation_unit_pricings_tax_percentage(
             Q(begins__lte=change_date, pricing_type=PricingType.FREE)  # Ignore FREE pricings after the change date
             | Q(pricing_type=PricingType.PAID)
         )
-        .filter(status__in=(PricingStatus.PRICING_STATUS_ACTIVE, PricingStatus.PRICING_STATUS_FUTURE))
         .exclude(reservation_unit__payment_accounting__company_code__in=ignored_company_codes)
         .order_by("reservation_unit_id", "-begins")
         .distinct("reservation_unit_id")
@@ -70,7 +69,6 @@ def update_reservation_unit_pricings_tax_percentage(
             ReservationUnitPricing(
                 begins=change_date,
                 tax_percentage=future_tax_percentage,
-                status=PricingStatus.PRICING_STATUS_FUTURE,
                 pricing_type=pricing.pricing_type,
                 price_unit=pricing.price_unit,
                 lowest_price=pricing.lowest_price,
@@ -85,7 +83,6 @@ def update_reservation_unit_pricings_tax_percentage(
         tax_percentage=current_tax_percentage,
         pricing_type=PricingType.PAID,
         highest_price__gte=0,
-        status__in=(PricingStatus.PRICING_STATUS_ACTIVE, PricingStatus.PRICING_STATUS_FUTURE),
     )
 
     for pricing in unhandled_future_pricings:

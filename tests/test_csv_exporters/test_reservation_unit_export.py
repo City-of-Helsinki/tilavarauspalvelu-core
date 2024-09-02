@@ -1,12 +1,12 @@
 import itertools
 from datetime import datetime
+from decimal import Decimal
 from unittest import mock
 
 import pytest
 from django.utils import timezone
 from graphene_django_extensions.testing.utils import parametrize_helper
 
-from reservation_units.enums import PricingStatus
 from reservation_units.models import ReservationUnit
 from reservation_units.utils.export_data import HEADER_ROW, ReservationUnitExporter
 from tests.factories import ReservationUnitFactory
@@ -39,7 +39,7 @@ def test_reservation_unit_export_multiple():
         cancellation_rule__name="Cancellation rule",
         metadata_set__name="Metadata set",
         payment_types__code="Payment type",
-        pricings__status=PricingStatus.PRICING_STATUS_ACTIVE,
+        pricings__highest_price=Decimal(20),
     )
 
     # when:
@@ -89,17 +89,17 @@ def test_reservation_unit_export_multiple():
     assert row_2[next(index)] == reservation_unit_1.cancellation_terms.name
     assert row_2[next(index)] == reservation_unit_1.pricing_terms.name
     assert row_2[next(index)] == reservation_unit_1.cancellation_rule.name
-    assert row_2[next(index)] == reservation_unit_1.pricings.active().price_unit
-    assert row_2[next(index)] == reservation_unit_1.pricings.active().lowest_price
-    assert row_2[next(index)] == reservation_unit_1.pricings.active().highest_price
-    assert row_2[next(index)] == reservation_unit_1.pricings.active().tax_percentage
+    assert row_2[next(index)] == reservation_unit_1.pricings.first().price_unit
+    assert row_2[next(index)] == reservation_unit_1.pricings.first().lowest_price
+    assert row_2[next(index)] == reservation_unit_1.pricings.first().highest_price
+    assert row_2[next(index)] == reservation_unit_1.pricings.first().tax_percentage
     assert row_2[next(index)] == reservation_unit_1.reservation_begins.strftime("%d:%m:%Y %H:%M")
     assert row_2[next(index)] == reservation_unit_1.reservation_ends.strftime("%d:%m:%Y %H:%M")
     assert row_2[next(index)] == reservation_unit_1.metadata_set.name
     assert row_2[next(index)] == reservation_unit_1.require_reservation_handling
     assert row_2[next(index)] == reservation_unit_1.authentication
     assert row_2[next(index)] == reservation_unit_1.reservation_kind
-    assert row_2[next(index)] == reservation_unit_1.pricings.active().pricing_type
+    assert row_2[next(index)] == reservation_unit_1.pricings.first().pricing_type
     assert row_2[next(index)] == reservation_unit_1.payment_types.first().code
     assert row_2[next(index)] == reservation_unit_1.can_apply_free_of_charge
     assert row_2[next(index)] == reservation_unit_1.reservation_pending_instructions_fi
@@ -192,7 +192,7 @@ def test_reservation_unit_export_multiple():
                 column_value_mapping={"Payment type": ""},
             ),
             "Missing Pricing": MissingParams(
-                missing=Missing(deleted=["pricings__status"]),
+                missing=Missing(deleted=["pricings__highest_price"]),
                 column_value_mapping={
                     "Price unit": "",
                     "Lowest price": "",
@@ -242,7 +242,7 @@ def test_reservation_unit_export_missing_relations(column_value_mapping, missing
         "cancellation_rule__name": "Cancellation rule",
         "metadata_set__name": "Metadata set",
         "payment_types__code": "Payment type",
-        "pricings__status": PricingStatus.PRICING_STATUS_ACTIVE,
+        "pricings__highest_price": Decimal(20),
     }
     missing.remove_from_data(data)
     ReservationUnitFactory.create(**data)

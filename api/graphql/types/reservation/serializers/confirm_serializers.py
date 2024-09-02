@@ -12,7 +12,6 @@ from merchants.verkkokauppa.helpers import create_mock_verkkokauppa_order, get_v
 from merchants.verkkokauppa.order.exceptions import CreateOrderError
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservation_units.enums import PaymentType, PricingType
-from reservation_units.utils.reservation_unit_pricing_helper import ReservationUnitPricingHelper
 from reservations.enums import ReservationStateChoice
 from reservations.models import Reservation
 from utils.decimal_utils import round_decimal
@@ -91,8 +90,8 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
             payment_type = data.get("payment_type", "").upper()
             reservation_unit = self.instance.reservation_unit.first()
 
-            active_price = ReservationUnitPricingHelper.get_active_price(reservation_unit)
-            if active_price.pricing_type == PricingType.PAID or self.instance.price_net > 0:
+            active_pricing = reservation_unit.actions.get_active_pricing()
+            if active_pricing.pricing_type == PricingType.PAID or self.instance.price_net > 0:
                 if not reservation_unit.payment_product and not settings.MOCK_VERKKOKAUPPA_API_ENABLED:
                     raise ValidationErrorWithCode(
                         "Reservation unit is missing payment product",

@@ -2,10 +2,11 @@ import datetime
 from decimal import Decimal
 
 import pytest
+from freezegun import freeze_time
 
 from api.graphql.types.reservation.serializers.mixins import ReservationPriceMixin
 from common.date_utils import local_datetime
-from reservation_units.enums import PriceUnit, PricingStatus, PricingType
+from reservation_units.enums import PriceUnit, PricingType
 from tests.factories import ReservationUnitFactory, ReservationUnitPricingFactory
 from utils.decimal_utils import round_decimal
 
@@ -99,14 +100,12 @@ def test_reservation__calculate_price__future_has_same_tax_percentage():
         reservation_unit=reservation_unit,
         begins=day_1,
         tax_percentage__value=Decimal("24"),
-        status=PricingStatus.PRICING_STATUS_ACTIVE,
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
     )
     pricing_2 = ReservationUnitPricingFactory.create(
         reservation_unit=reservation_unit,
         begins=day_2,
         tax_percentage__value=Decimal("24"),
-        status=PricingStatus.PRICING_STATUS_FUTURE,
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
         highest_price=Decimal("100.0"),
     )
@@ -118,11 +117,7 @@ def test_reservation__calculate_price__future_has_same_tax_percentage():
     assert prices_2.tax_percentage_value == pricing_2.tax_percentage.value
 
 
-def test_reservation__calculate_price__future_has_different_tax_percentage():
-    """
-    If the pricing for the reservation is in the future, but has a different tax percentage than
-    the current active pricing, the price should be calculated using the active pricing.
-    """
+def test_reservation__calculate_price__is_activated_on_begins():
     day_1 = local_datetime()
     day_2 = day_1 + datetime.timedelta(days=1)
 
@@ -131,15 +126,14 @@ def test_reservation__calculate_price__future_has_different_tax_percentage():
         reservation_unit=reservation_unit,
         begins=day_1,
         tax_percentage__value=Decimal("24"),
-        status=PricingStatus.PRICING_STATUS_ACTIVE,
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
     )
-    ReservationUnitPricingFactory.create(
+    pricing_2 = ReservationUnitPricingFactory.create(
         reservation_unit=reservation_unit,
         begins=day_2,
         tax_percentage__value=Decimal("25.5"),
-        status=PricingStatus.PRICING_STATUS_FUTURE,
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
+        is_activated_on_begins=True,
     )
 
     # Price for day 1 is used as expected
@@ -149,6 +143,11 @@ def test_reservation__calculate_price__future_has_different_tax_percentage():
     # Price for day 2 still uses the price from day 1, as the price for day 2 has different tax % and isn't ACTIVE yet
     prices = ReservationPriceMixin().calculate_price(day_2, day_2, [reservation_unit])
     assert prices.tax_percentage_value == pricing_1.tax_percentage.value
+
+    with freeze_time(day_2):
+        # Price for day 2 is now used as expected
+        prices = ReservationPriceMixin().calculate_price(day_2, day_2, [reservation_unit])
+        assert prices.tax_percentage_value == pricing_2.tax_percentage.value
 
 
 def test_reservation__calculate_price__active_is_free_future_is_paid_and_different_tax_percentage():
@@ -160,7 +159,6 @@ def test_reservation__calculate_price__active_is_free_future_is_paid_and_differe
         reservation_unit=reservation_unit,
         begins=day_1,
         tax_percentage__value=Decimal("0"),
-        status=PricingStatus.PRICING_STATUS_ACTIVE,
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
         pricing_type=PricingType.FREE,
     )
@@ -168,7 +166,6 @@ def test_reservation__calculate_price__active_is_free_future_is_paid_and_differe
         reservation_unit=reservation_unit,
         begins=day_2,
         tax_percentage__value=Decimal("25.5"),
-        status=PricingStatus.PRICING_STATUS_FUTURE,
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
     )
 
@@ -188,14 +185,12 @@ def test_reservation__calculate_price__active_is_paid_future_is_free_and_differe
         reservation_unit=reservation_unit,
         begins=day_1,
         tax_percentage__value=Decimal("25.5"),
-        status=PricingStatus.PRICING_STATUS_ACTIVE,
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
     )
     ReservationUnitPricingFactory.create(
         reservation_unit=reservation_unit,
         begins=day_2,
         tax_percentage__value=Decimal("0"),
-        status=PricingStatus.PRICING_STATUS_FUTURE,
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
         pricing_type=PricingType.FREE,
     )

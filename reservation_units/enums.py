@@ -7,7 +7,6 @@ __all__ = [
     "AuthenticationType",
     "PaymentType",
     "PriceUnit",
-    "PricingStatus",
     "PricingType",
     "ReservationKind",
     "ReservationStartInterval",
@@ -84,12 +83,6 @@ class PriceUnit(models.TextChoices):
     PRICE_UNIT_PER_DAY = "per_day", pgettext_lazy("PriceUnit", "per day")
     PRICE_UNIT_PER_WEEK = "per_week", pgettext_lazy("PriceUnit", "per week")
     PRICE_UNIT_FIXED = "fixed", pgettext_lazy("PriceUnit", "fixed")
-
-
-class PricingStatus(models.TextChoices):
-    PRICING_STATUS_PAST = "past", pgettext_lazy("PricingStatus", "past")
-    PRICING_STATUS_ACTIVE = "active", pgettext_lazy("PricingStatus", "active")
-    PRICING_STATUS_FUTURE = "future", pgettext_lazy("PricingStatus", "future")
 
 
 class AuthenticationType(models.TextChoices):

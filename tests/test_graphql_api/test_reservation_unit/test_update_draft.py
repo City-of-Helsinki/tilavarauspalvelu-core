@@ -2,6 +2,7 @@ import pytest
 from auditlog.models import LogEntry
 from django.contrib.contenttypes.models import ContentType
 
+from api.graphql.extensions import error_codes
 from reservation_units.enums import AuthenticationType
 from reservation_units.models import ReservationUnit
 from terms_of_use.models import TermsOfUse
@@ -209,6 +210,7 @@ def test_reservation_unit__update__publish(graphql):
         description_fi="foo",
         description_sv="foo",
         description_en="foo",
+        pricings__highest_price=20,
     )
     data = get_draft_update_input_data(reservation_unit, isDraft=False)
 
@@ -217,3 +219,25 @@ def test_reservation_unit__update__publish(graphql):
 
     reservation_unit.refresh_from_db()
     assert reservation_unit.is_draft is False
+
+
+def test_reservation_unit__update__publish__no_pricings_fails(graphql):
+    graphql.login_with_superuser()
+
+    reservation_unit = ReservationUnitFactory.create(
+        is_draft=True,
+        name="foo",
+        name_fi="foo",
+        name_sv="foo",
+        name_en="foo",
+        description="foo",
+        description_fi="foo",
+        description_sv="foo",
+        description_en="foo",
+        pricings=[],
+    )
+    data = get_draft_update_input_data(reservation_unit, isDraft=False)
+
+    response = graphql(UPDATE_MUTATION, input_data=data)
+    assert response.has_errors is True, response
+    assert response.field_error_codes()[0] == error_codes.RESERVATION_UNIT_PRICINGS_MISSING

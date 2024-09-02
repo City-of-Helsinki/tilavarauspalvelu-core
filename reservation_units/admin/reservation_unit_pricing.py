@@ -16,15 +16,15 @@ class ReservationUnitPricingAdmin(admin.ModelAdmin):
         "id",
         "reservation_unit",
         "begins",
+        "is_activated_on_begins",
         "lowest_price",
         "highest_price",
         "tax_percentage",
         "price_unit",
-        "status",
     ]
     list_filter = [
         ("begins", DateRangeFilterBuilder()),
-        "status",
+        "is_activated_on_begins",
     ]
     ordering = ["-begins"]
 
@@ -32,6 +32,7 @@ class ReservationUnitPricingAdmin(admin.ModelAdmin):
     fields = [
         "reservation_unit",
         "begins",
+        "is_activated_on_begins",
         ("lowest_price", "lowest_price_net"),
         ("highest_price", "highest_price_net"),
         "tax_percentage",
@@ -45,7 +46,7 @@ class ReservationUnitPricingAdmin(admin.ModelAdmin):
     ]
 
     def lowest_price_net(self, obj: ReservationUnitPricing) -> str:
-        return f"{round_decimal(obj.lowest_price_net, 4)} €"
+        return f"{round_decimal(obj.lowest_price_net, 2)} €"
 
     def highest_price_net(self, obj: ReservationUnitPricing) -> str:
-        return f"{round_decimal(obj.highest_price_net, 4)} €"
+        return f"{round_decimal(obj.highest_price_net, 2)} €"
