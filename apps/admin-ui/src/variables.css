@@ -86,4 +86,5 @@
 /* override HDS variables */
 * {
   --notification-z-index-toast: var(--tilavaraus-admin-stack-notification) !important;
+  --header-z-index: var(--tilavaraus-admin-stack-main-menu);
 }
