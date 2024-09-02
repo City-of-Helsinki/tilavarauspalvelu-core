@@ -68,22 +68,19 @@ def get_meta_label(key: str, reservation: Reservation) -> str:
 
 def get_verkkokauppa_order_params(reservation: Reservation) -> CreateOrderParams:
     reservation_unit = reservation.reservation_unit.first()
-    quantity = 1  # Currently, we don't support quantities larger than 1
-    price_net = round_decimal(quantity * reservation.price_net, 2)
-    price_vat = round_decimal(quantity * reservation.price_net * (reservation.tax_percentage_value / Decimal(100)), 2)
     preferred_language = getattr(reservation, "reservee_language", "fi")
     items = [
         OrderItemParams(
             product_id=reservation_unit.payment_product.id,
             product_name=getattr(reservation_unit, f"name_{preferred_language}", reservation_unit.name),
-            quantity=1,
+            quantity=1,  # Currently, we don't support quantities larger than 1
             unit="pcs",
-            row_price_net=price_net,
-            row_price_vat=price_vat,
-            row_price_total=price_net + price_vat,
-            price_net=price_net,
-            price_vat=price_vat,
-            price_gross=price_net + price_vat,
+            row_price_net=reservation.price_net,
+            row_price_vat=reservation.price_vat_amount,
+            row_price_total=reservation.price,
+            price_net=reservation.price_net,
+            price_vat=reservation.price_vat_amount,
+            price_gross=reservation.price,
             vat_percentage=reservation.tax_percentage_value,
             meta=[
                 OrderItemMetaParams(

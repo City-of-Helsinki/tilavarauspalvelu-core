@@ -213,11 +213,17 @@ class Reservation(SerializableMixin, models.Model):
 
     @property
     def price_net(self) -> Decimal:
-        return round_decimal(self.price / (1 + self.tax_percentage_value / Decimal(100)), 6)
+        """Return the net price of the reservation. (Price without VAT)"""
+        return round_decimal(self.price / (1 + self.tax_percentage_value / Decimal(100)), 2)
+
+    @property
+    def price_vat_amount(self) -> Decimal:
+        """Return the VAT amount of the reservation."""
+        return round_decimal(self.price - self.price_net, 2)
 
     @property
     def non_subsidised_price_net(self) -> Decimal:
-        return round_decimal(self.non_subsidised_price / (1 + self.tax_percentage_value / Decimal(100)), 6)
+        return round_decimal(self.non_subsidised_price / (1 + self.tax_percentage_value / Decimal(100)), 2)
 
     @lookup_property(joins=["recurring_reservation", "user"])
     def reservee_name() -> str:

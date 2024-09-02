@@ -29,7 +29,7 @@ def test_get_verkkokauppa_order_params__to_json():
     reservation = ReservationFactory.create(
         reservation_unit=[reservation_unit],
         user=user,
-        price=Decimal("12.5488"),
+        price=Decimal("12.55"),
         tax_percentage_value=Decimal("24"),
         reservee_type=CustomerTypeChoice.INDIVIDUAL,
         reservee_first_name="Firstname",

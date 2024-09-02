@@ -124,7 +124,7 @@ def test_reservation__query__all_fields(graphql):
         "numPersons": reservation.num_persons,
         "order": None,
         "price": f"{reservation.price:.2f}",
-        "priceNet": f"{reservation.price_net:.6f}",
+        "priceNet": f"{reservation.price_net:.2f}",
         "purpose": None,
         "recurringReservation": None,
         "reservationUnit": [],

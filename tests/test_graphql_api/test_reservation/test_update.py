@@ -616,7 +616,7 @@ def test_reservation__update__price_calculation_triggered_if_begin_changes(graph
     assert response.has_errors is False, response.errors
 
     price = pricing.highest_price
-    price_net = round_decimal(pricing.highest_price / pricing.tax_percentage.multiplier, 6)
+    price_net = round_decimal(pricing.highest_price / pricing.tax_percentage.multiplier, 2)
 
     reservation.refresh_from_db()
     assert reservation.price == price
@@ -651,7 +651,7 @@ def test_reservation__update__price_calculation_triggered_if_end_changes(graphql
     assert response.has_errors is False, response.errors
 
     price = pricing.highest_price
-    price_net = round_decimal(pricing.highest_price / pricing.tax_percentage.multiplier, 6)
+    price_net = round_decimal(pricing.highest_price / pricing.tax_percentage.multiplier, 2)
 
     reservation.refresh_from_db()
     assert reservation.price == price
@@ -684,7 +684,7 @@ def test_reservation__update__price_calculation_triggered_if_unit_changes(graphq
     assert response.has_errors is False, response.errors
 
     price = pricing.highest_price
-    price_net = round_decimal(pricing.highest_price / pricing.tax_percentage.multiplier, 6)
+    price_net = round_decimal(pricing.highest_price / pricing.tax_percentage.multiplier, 2)
 
     reservation.refresh_from_db()
     assert reservation.price == price
@@ -731,7 +731,7 @@ def test_reservation__update__price_calculation_uses_to_future_pricing(graphql):
     assert response.has_errors is False, response.errors
 
     price = pricing.highest_price
-    price_net = round_decimal(pricing.highest_price / pricing.tax_percentage.multiplier, 6)
+    price_net = round_decimal(pricing.highest_price / pricing.tax_percentage.multiplier, 2)
 
     reservation.refresh_from_db()
     assert reservation.price == price
