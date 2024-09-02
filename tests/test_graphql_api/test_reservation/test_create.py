@@ -704,7 +704,7 @@ def test_reservation__create__price_calculation__fixed_price_reservation_unit(gr
     reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
 
     price = pricing.highest_price
-    price_net = round_decimal(price / pricing.tax_percentage.multiplier, 6)
+    price_net = round_decimal(price / pricing.tax_percentage.multiplier, 2)
 
     assert reservation.price == price  # With fixed price unit, time is ignored
     assert reservation.non_subsidised_price == price
@@ -727,7 +727,7 @@ def test_reservation__create__price_calculation__time_based_price(graphql):
     reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
 
     price = pricing.highest_price * 4  # 1h reservation, i.e. 4 x 15 min
-    price_net = round_decimal(price / pricing.tax_percentage.multiplier, 6)
+    price_net = round_decimal(price / pricing.tax_percentage.multiplier, 2)
 
     assert reservation is not None
     assert reservation.price == price
@@ -761,7 +761,7 @@ def test_reservation__create__price_calculation__multiple_reservation_units(grap
     reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
 
     price = pricing_1.highest_price * 4 + pricing_2.highest_price * 4  # 1h reservation = 4 x 15 min from both units
-    price_net = round_decimal(price / pricing_1.tax_percentage.multiplier, 6)
+    price_net = round_decimal(price / pricing_1.tax_percentage.multiplier, 2)
 
     assert reservation.price == price
     assert reservation.non_subsidised_price == price
@@ -802,7 +802,7 @@ def test_reservation__create__price_calculation__future_pricing(graphql):
     reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
 
     price = future_pricing.highest_price
-    price_net = round_decimal(price / future_pricing.tax_percentage.multiplier, 6)
+    price_net = round_decimal(price / future_pricing.tax_percentage.multiplier, 2)
 
     assert reservation.price == price
     assert reservation.non_subsidised_price == price
