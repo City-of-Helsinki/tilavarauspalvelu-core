@@ -5,7 +5,7 @@ import { signIn } from "common/src/browserHelpers";
 import { Button, IconArrowRight, IconGroup } from "hds-react";
 import { H2 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { HERO_IMAGE_URL } from "app/common/const";
+import { HERO_IMAGE_URL } from "@/common/const";
 import KorosHeading, { Heading } from "./KorosHeading";
 
 const LoginBtn = styled(Button).attrs({

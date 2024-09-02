@@ -1,4 +1,4 @@
-import { ButtonContainer } from "app/styles/layout";
+import { ButtonContainer } from "@/styles/layout";
 import { breakpoints } from "common/src/common/style";
 import React from "react";
 import styled from "styled-components";

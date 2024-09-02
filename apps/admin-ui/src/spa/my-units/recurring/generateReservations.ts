@@ -1,7 +1,7 @@
 import { toMondayFirst } from "common/src/helpers";
 import { fromUIDateUnsafe } from "common/src/common/util";
 import { ReservationStartInterval } from "@gql/gql-types";
-import { timeSelectionSchema } from "app/schemas";
+import { timeSelectionSchema } from "@/schemas";
 
 // NOTE Custom UTC date code because taking only the date part of Date results
 // in the previous date in UTC+2 timezone

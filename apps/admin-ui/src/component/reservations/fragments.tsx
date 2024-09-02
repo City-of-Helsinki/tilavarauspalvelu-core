@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { UNIT_NAME_FRAGMENT } from "app/common/fragments";
+import { UNIT_NAME_FRAGMENT } from "@/common/fragments";
 import { PRICING_FRAGMENT } from "common/src/queries/fragments";
 
 export const RESERVATION_UNIT_PRICING_FRAGMENT = gql`

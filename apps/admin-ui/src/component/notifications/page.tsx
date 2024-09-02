@@ -2,7 +2,7 @@ import React, { type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import { useParams, useNavigate } from "react-router-dom";
 import { gql, ApolloError } from "@apollo/client";
-import { useTranslation } from "react-i18next";
+import { useTranslation, type TFunction } from "next-i18next";
 import styled from "styled-components";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,8 +32,7 @@ import { fromUIDate } from "common/src/common/util";
 import { breakpoints } from "common";
 import { Container } from "@/styles/layout";
 import Loader from "@/component/Loader";
-import { ButtonLikeLink } from "app/component/ButtonLikeLink";
-
+import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import {
   checkValidDate,
   checkValidFutureDate,
@@ -46,7 +45,6 @@ import {
   dateTime,
   parseDateTimeSafe,
 } from "@/helpers";
-import type { TFunction } from "i18next";
 import { base64encode } from "common/src/helpers";
 import { ControlledDateInput } from "common/src/components/form";
 import ControlledTimeInput from "@/component/ControlledTimeInput";
