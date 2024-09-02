@@ -39,11 +39,7 @@ const Heading = styled.div`
   margin-bottom: var(--spacing-layout-l);
 `;
 
-const StyledTabList = styled(TabList).attrs({
-  style: {
-    "--tablist-border-color": "white",
-  } as React.CSSProperties,
-})`
+const StyledTabList = styled(TabList)`
   ul {
     width: 100% !important;
     position: relative;

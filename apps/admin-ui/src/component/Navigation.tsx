@@ -82,8 +82,11 @@ const BackgroundHeader = styled(Header)`
   }
   #hds-mobile-menu {
     #user-menu * {
-      color: var(--header-color);
+      color: var(--header-color) !important;
       box-sizing: border-box;
+      button {
+        padding-inline: var(--spacing-s);
+      }
     }
     ul > li {
       > span {
@@ -92,6 +95,9 @@ const BackgroundHeader = styled(Header)`
         li {
           width: 100%;
           font-size: var(--fontsize-body-xl);
+        }
+        .active {
+          font-weight: bold;
         }
       }
 
@@ -114,7 +120,7 @@ const ActionBar = styled(Header.ActionBar)`
 
 const NavigationMenuWrapper = styled.div`
   span:has(.active) {
-    font-weight: bold;
+    font-weight: bold !important;
 
     /* using box-shadow for a bottom border inside of the element, without affecting text positioning */
     box-shadow: 0 -4px 0 0 var(--color-black) inset;
