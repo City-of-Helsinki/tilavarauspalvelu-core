@@ -26,8 +26,8 @@ def allocation_create_data(
     option: ReservationUnitOption,
     *,
     day_of_the_week: Weekday = Weekday.MONDAY,
-    begin_time: datetime.time = datetime.time(10),  # noqa: B008
-    end_time: datetime.time = datetime.time(12),  # noqa: B008
+    begin_time: datetime.time = datetime.time(10),
+    end_time: datetime.time = datetime.time(12),
     force: bool = False,
 ) -> dict[str, Any]:
     """Generate approve mutation input data for the given reservation unit option."""
