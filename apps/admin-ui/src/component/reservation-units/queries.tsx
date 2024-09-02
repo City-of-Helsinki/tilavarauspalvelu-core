@@ -12,7 +12,7 @@ export const SEARCH_RESERVATION_UNITS_QUERY = gql`
     $unit: [Int]
     $reservationUnitType: [Int]
     $orderBy: [ReservationUnitOrderingChoices]
-    $state: [ReservationUnitState]
+    $publishingState: [ReservationUnitPublishingState]
   ) {
     reservationUnits(
       first: $first
@@ -27,7 +27,7 @@ export const SEARCH_RESERVATION_UNITS_QUERY = gql`
       surfaceAreaLte: $surfaceAreaLte
       unit: $unit
       reservationUnitType: $reservationUnitType
-      state: $state
+      publishingState: $publishingState
       onlyWithPermission: true
     ) {
       edges {
@@ -46,7 +46,7 @@ export const SEARCH_RESERVATION_UNITS_QUERY = gql`
           }
           maxPersons
           surfaceArea
-          state
+          publishingState
           reservationState
         }
       }

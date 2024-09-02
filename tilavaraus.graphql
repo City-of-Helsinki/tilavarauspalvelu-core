@@ -420,6 +420,7 @@ type ApplicationRoundNode implements Node {
     """
     orderBy: [ReservationUnitOrderingChoices]
     pk: [Int]
+    publishingState: [ReservationUnitPublishingState]
     purposes: [Int]
     qualifiers: [Int]
     rankGte: Decimal
@@ -430,10 +431,9 @@ type ApplicationRoundNode implements Node {
     reservableTimeEnd: Time
     reservableTimeStart: Time
     reservationKind: String
-    reservationState: [ReservationState]
+    reservationState: [ReservationUnitReservationState]
     reservationUnitType: [Int]
     showOnlyReservable: Boolean
-    state: [ReservationUnitState]
     surfaceAreaGte: Decimal
     surfaceAreaLte: Decimal
     textSearch: String
@@ -2487,6 +2487,7 @@ type Query {
     """
     orderBy: [ReservationUnitOrderingChoices]
     pk: [Int]
+    publishingState: [ReservationUnitPublishingState]
     purposes: [Int]
     qualifiers: [Int]
     rankGte: Decimal
@@ -2497,10 +2498,9 @@ type Query {
     reservableTimeEnd: Time
     reservableTimeStart: Time
     reservationKind: String
-    reservationState: [ReservationState]
+    reservationState: [ReservationUnitReservationState]
     reservationUnitType: [Int]
     showOnlyReservable: Boolean
-    state: [ReservationUnitState]
     surfaceAreaGte: Decimal
     surfaceAreaLte: Decimal
     textSearch: String
@@ -3392,6 +3392,7 @@ type ReservationNode implements Node {
     """
     orderBy: [ReservationUnitOrderingChoices]
     pk: [Int]
+    publishingState: [ReservationUnitPublishingState]
     purposes: [Int]
     qualifiers: [Int]
     rankGte: Decimal
@@ -3402,10 +3403,9 @@ type ReservationNode implements Node {
     reservableTimeEnd: Time
     reservableTimeStart: Time
     reservationKind: String
-    reservationState: [ReservationState]
+    reservationState: [ReservationUnitReservationState]
     reservationUnitType: [Int]
     showOnlyReservable: Boolean
-    state: [ReservationUnitState]
     surfaceAreaGte: Decimal
     surfaceAreaLte: Decimal
     textSearch: String
@@ -3900,17 +3900,6 @@ enum ReservationStartInterval {
 """
 An enumeration.
 """
-enum ReservationState {
-  RESERVABLE
-  RESERVATION_CLOSED
-  SCHEDULED_CLOSING
-  SCHEDULED_PERIOD
-  SCHEDULED_RESERVATION
-}
-
-"""
-An enumeration.
-"""
 enum ReservationStateChoice {
   CANCELLED
   CONFIRMED
@@ -4106,6 +4095,7 @@ type ReservationUnitCreateMutationPayload {
   pricings: [ReservationUnitPricingNode]
   publishBegins: DateTime
   publishEnds: DateTime
+  publishingState: String
   purposes: [Int]
   qualifiers: [Int]
   requireIntroduction: Boolean
@@ -4134,7 +4124,6 @@ type ReservationUnitCreateMutationPayload {
   serviceSpecificTerms: String
   services: [Int]
   spaces: [Int]
-  state: String
   surfaceArea: Int
   termsOfUse: String
   termsOfUseEn: String
@@ -4273,6 +4262,7 @@ type ReservationUnitNode implements Node {
   pricings: [ReservationUnitPricingNode!]!
   publishBegins: DateTime
   publishEnds: DateTime
+  publishingState: ReservationUnitPublishingState
   purposes(
     nameEn: String
     nameFi: String
@@ -4346,7 +4336,7 @@ type ReservationUnitNode implements Node {
     user: [Int]
   ): [ReservationNode!]
   reservationStartInterval: ReservationStartInterval!
-  reservationState: ReservationState
+  reservationState: ReservationUnitReservationState
   reservationUnitType: ReservationUnitTypeNode
   reservationsMaxDaysBefore: Int
   reservationsMinDaysBefore: Int
@@ -4386,7 +4376,6 @@ type ReservationUnitNode implements Node {
     orderBy: [SpaceOrderingChoices]
     pk: [Int]
   ): [SpaceNode!]!
-  state: ReservationUnitState
   surfaceArea: Int
   termsOfUse: String
   termsOfUseEn: String
@@ -4592,7 +4581,7 @@ input ReservationUnitPricingSerializerInput {
 """
 An enumeration.
 """
-enum ReservationUnitState {
+enum ReservationUnitPublishingState {
   ARCHIVED
   DRAFT
   HIDDEN
@@ -4600,6 +4589,17 @@ enum ReservationUnitState {
   SCHEDULED_HIDING
   SCHEDULED_PERIOD
   SCHEDULED_PUBLISHING
+}
+
+"""
+An enumeration.
+"""
+enum ReservationUnitReservationState {
+  RESERVABLE
+  RESERVATION_CLOSED
+  SCHEDULED_CLOSING
+  SCHEDULED_PERIOD
+  SCHEDULED_RESERVATION
 }
 
 type ReservationUnitTypeNode implements Node {
@@ -4764,6 +4764,7 @@ type ReservationUnitUpdateMutationPayload {
   pricings: [ReservationUnitPricingNode]
   publishBegins: DateTime
   publishEnds: DateTime
+  publishingState: String
   purposes: [Int]
   qualifiers: [Int]
   requireIntroduction: Boolean
@@ -4792,7 +4793,6 @@ type ReservationUnitUpdateMutationPayload {
   serviceSpecificTerms: String
   services: [Int]
   spaces: [Int]
-  state: String
   surfaceArea: Int
   termsOfUse: String
   termsOfUseEn: String
@@ -5599,6 +5599,7 @@ type UnitNode implements Node {
     """
     orderBy: [ReservationUnitOrderingChoices]
     pk: [Int]
+    publishingState: [ReservationUnitPublishingState]
     purposes: [Int]
     qualifiers: [Int]
     rankGte: Decimal
@@ -5609,10 +5610,9 @@ type UnitNode implements Node {
     reservableTimeEnd: Time
     reservableTimeStart: Time
     reservationKind: String
-    reservationState: [ReservationState]
+    reservationState: [ReservationUnitReservationState]
     reservationUnitType: [Int]
     showOnlyReservable: Boolean
-    state: [ReservationUnitState]
     surfaceAreaGte: Decimal
     surfaceAreaLte: Decimal
     textSearch: String

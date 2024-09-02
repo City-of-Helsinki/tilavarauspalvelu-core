@@ -8,7 +8,7 @@ export const RESERVATION_UNIT_EDIT_QUERY = gql`
     reservationUnit(id: $id) {
       id
       pk
-      state
+      publishingState
       reservationState
       images {
         pk

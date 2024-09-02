@@ -16,7 +16,7 @@ import {
   toUIDate,
 } from "common/src/common/util";
 import {
-  ReservationUnitState,
+  ReservationUnitPublishingState,
   type ReservationUnitNode,
   PricingType,
   PriceUnit,
@@ -24,7 +24,7 @@ import {
   type EquipmentFieldsFragment,
   type PriceReservationUnitFragment,
   type UnitNode,
-  ReservationState,
+  ReservationUnitReservationState,
   type MetadataSetsFragment,
   ReservationKind,
   ReservationStateChoice,
@@ -57,16 +57,16 @@ function formatTime(date: Date): string {
 export { formatTime as getTimeString };
 
 export function isReservationUnitPublished(
-  reservationUnit?: Pick<ReservationUnitNode, "state"> | null
+  reservationUnit?: Pick<ReservationUnitNode, "publishingState"> | null
 ): boolean {
   if (!reservationUnit) {
     return false;
   }
-  const { state } = reservationUnit;
+  const { publishingState } = reservationUnit;
 
-  switch (state) {
-    case ReservationUnitState.Published:
-    case ReservationUnitState.ScheduledHiding:
+  switch (publishingState) {
+    case ReservationUnitPublishingState.Published:
+    case ReservationUnitPublishingState.ScheduledHiding:
       return true;
     default:
       return false;
@@ -534,8 +534,8 @@ export function isReservationUnitReservable(
   } = reservationUnit;
 
   switch (reservationState) {
-    case ReservationState.Reservable:
-    case ReservationState.ScheduledClosing: {
+    case ReservationUnitReservationState.Reservable:
+    case ReservationUnitReservationState.ScheduledClosing: {
       const resBegins = reservationUnit.reservationBegins
         ? new Date(reservationUnit.reservationBegins)
         : null;

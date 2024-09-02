@@ -72,7 +72,7 @@ const RESERVATION_UNIT_PAGE_FRAGMENT = gql`
     bufferTimeAfter
     reservationStartInterval
     canApplyFreeOfCharge
-    state
+    publishingState
     reservationState
     reservationUnitType {
       ...ReservationUnitTypeFields

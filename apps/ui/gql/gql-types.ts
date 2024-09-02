@@ -404,6 +404,9 @@ export type ApplicationRoundNodeReservationUnitsArgs = {
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<ReservationUnitOrderingChoices>>>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  publishingState?: InputMaybe<
+    Array<InputMaybe<ReservationUnitPublishingState>>
+  >;
   purposes?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   qualifiers?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   rankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
@@ -414,10 +417,11 @@ export type ApplicationRoundNodeReservationUnitsArgs = {
   reservableTimeEnd?: InputMaybe<Scalars["Time"]["input"]>;
   reservableTimeStart?: InputMaybe<Scalars["Time"]["input"]>;
   reservationKind?: InputMaybe<Scalars["String"]["input"]>;
-  reservationState?: InputMaybe<Array<InputMaybe<ReservationState>>>;
+  reservationState?: InputMaybe<
+    Array<InputMaybe<ReservationUnitReservationState>>
+  >;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   showOnlyReservable?: InputMaybe<Scalars["Boolean"]["input"]>;
-  state?: InputMaybe<Array<InputMaybe<ReservationUnitState>>>;
   surfaceAreaGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   surfaceAreaLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
@@ -2296,6 +2300,9 @@ export type QueryReservationUnitsArgs = {
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<ReservationUnitOrderingChoices>>>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  publishingState?: InputMaybe<
+    Array<InputMaybe<ReservationUnitPublishingState>>
+  >;
   purposes?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   qualifiers?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   rankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
@@ -2306,10 +2313,11 @@ export type QueryReservationUnitsArgs = {
   reservableTimeEnd?: InputMaybe<Scalars["Time"]["input"]>;
   reservableTimeStart?: InputMaybe<Scalars["Time"]["input"]>;
   reservationKind?: InputMaybe<Scalars["String"]["input"]>;
-  reservationState?: InputMaybe<Array<InputMaybe<ReservationState>>>;
+  reservationState?: InputMaybe<
+    Array<InputMaybe<ReservationUnitReservationState>>
+  >;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   showOnlyReservable?: InputMaybe<Scalars["Boolean"]["input"]>;
-  state?: InputMaybe<Array<InputMaybe<ReservationUnitState>>>;
   surfaceAreaGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   surfaceAreaLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
@@ -3112,6 +3120,9 @@ export type ReservationNodeReservationUnitArgs = {
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<ReservationUnitOrderingChoices>>>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  publishingState?: InputMaybe<
+    Array<InputMaybe<ReservationUnitPublishingState>>
+  >;
   purposes?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   qualifiers?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   rankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
@@ -3122,10 +3133,11 @@ export type ReservationNodeReservationUnitArgs = {
   reservableTimeEnd?: InputMaybe<Scalars["Time"]["input"]>;
   reservableTimeStart?: InputMaybe<Scalars["Time"]["input"]>;
   reservationKind?: InputMaybe<Scalars["String"]["input"]>;
-  reservationState?: InputMaybe<Array<InputMaybe<ReservationState>>>;
+  reservationState?: InputMaybe<
+    Array<InputMaybe<ReservationUnitReservationState>>
+  >;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   showOnlyReservable?: InputMaybe<Scalars["Boolean"]["input"]>;
-  state?: InputMaybe<Array<InputMaybe<ReservationUnitState>>>;
   surfaceAreaGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   surfaceAreaLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
@@ -3526,15 +3538,6 @@ export enum ReservationStartInterval {
 }
 
 /** An enumeration. */
-export enum ReservationState {
-  Reservable = "RESERVABLE",
-  ReservationClosed = "RESERVATION_CLOSED",
-  ScheduledClosing = "SCHEDULED_CLOSING",
-  ScheduledPeriod = "SCHEDULED_PERIOD",
-  ScheduledReservation = "SCHEDULED_RESERVATION",
-}
-
-/** An enumeration. */
 export enum ReservationStateChoice {
   Cancelled = "CANCELLED",
   Confirmed = "CONFIRMED",
@@ -3712,6 +3715,7 @@ export type ReservationUnitCreateMutationPayload = {
   pricings?: Maybe<Array<Maybe<ReservationUnitPricingNode>>>;
   publishBegins?: Maybe<Scalars["DateTime"]["output"]>;
   publishEnds?: Maybe<Scalars["DateTime"]["output"]>;
+  publishingState?: Maybe<Scalars["String"]["output"]>;
   purposes?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
   qualifiers?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
   requireIntroduction?: Maybe<Scalars["Boolean"]["output"]>;
@@ -3740,7 +3744,6 @@ export type ReservationUnitCreateMutationPayload = {
   serviceSpecificTerms?: Maybe<Scalars["String"]["output"]>;
   services?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
   spaces?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
-  state?: Maybe<Scalars["String"]["output"]>;
   surfaceArea?: Maybe<Scalars["Int"]["output"]>;
   termsOfUse?: Maybe<Scalars["String"]["output"]>;
   termsOfUseEn?: Maybe<Scalars["String"]["output"]>;
@@ -3846,6 +3849,7 @@ export type ReservationUnitNode = Node & {
   pricings: Array<ReservationUnitPricingNode>;
   publishBegins?: Maybe<Scalars["DateTime"]["output"]>;
   publishEnds?: Maybe<Scalars["DateTime"]["output"]>;
+  publishingState?: Maybe<ReservationUnitPublishingState>;
   purposes: Array<PurposeNode>;
   qualifiers: Array<QualifierNode>;
   rank?: Maybe<Scalars["Int"]["output"]>;
@@ -3870,7 +3874,7 @@ export type ReservationUnitNode = Node & {
   reservationPendingInstructionsSv?: Maybe<Scalars["String"]["output"]>;
   reservationSet?: Maybe<Array<ReservationNode>>;
   reservationStartInterval: ReservationStartInterval;
-  reservationState?: Maybe<ReservationState>;
+  reservationState?: Maybe<ReservationUnitReservationState>;
   reservationUnitType?: Maybe<ReservationUnitTypeNode>;
   reservationsMaxDaysBefore?: Maybe<Scalars["Int"]["output"]>;
   reservationsMinDaysBefore?: Maybe<Scalars["Int"]["output"]>;
@@ -3878,7 +3882,6 @@ export type ReservationUnitNode = Node & {
   serviceSpecificTerms?: Maybe<TermsOfUseNode>;
   services: Array<ServiceNode>;
   spaces: Array<SpaceNode>;
-  state?: Maybe<ReservationUnitState>;
   surfaceArea?: Maybe<Scalars["Int"]["output"]>;
   termsOfUse?: Maybe<Scalars["String"]["output"]>;
   termsOfUseEn?: Maybe<Scalars["String"]["output"]>;
@@ -4142,7 +4145,7 @@ export type ReservationUnitPricingSerializerInput = {
 };
 
 /** An enumeration. */
-export enum ReservationUnitState {
+export enum ReservationUnitPublishingState {
   Archived = "ARCHIVED",
   Draft = "DRAFT",
   Hidden = "HIDDEN",
@@ -4150,6 +4153,15 @@ export enum ReservationUnitState {
   ScheduledHiding = "SCHEDULED_HIDING",
   ScheduledPeriod = "SCHEDULED_PERIOD",
   ScheduledPublishing = "SCHEDULED_PUBLISHING",
+}
+
+/** An enumeration. */
+export enum ReservationUnitReservationState {
+  Reservable = "RESERVABLE",
+  ReservationClosed = "RESERVATION_CLOSED",
+  ScheduledClosing = "SCHEDULED_CLOSING",
+  ScheduledPeriod = "SCHEDULED_PERIOD",
+  ScheduledReservation = "SCHEDULED_RESERVATION",
 }
 
 export type ReservationUnitTypeNode = Node & {
@@ -4306,6 +4318,7 @@ export type ReservationUnitUpdateMutationPayload = {
   pricings?: Maybe<Array<Maybe<ReservationUnitPricingNode>>>;
   publishBegins?: Maybe<Scalars["DateTime"]["output"]>;
   publishEnds?: Maybe<Scalars["DateTime"]["output"]>;
+  publishingState?: Maybe<Scalars["String"]["output"]>;
   purposes?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
   qualifiers?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
   requireIntroduction?: Maybe<Scalars["Boolean"]["output"]>;
@@ -4334,7 +4347,6 @@ export type ReservationUnitUpdateMutationPayload = {
   serviceSpecificTerms?: Maybe<Scalars["String"]["output"]>;
   services?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
   spaces?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
-  state?: Maybe<Scalars["String"]["output"]>;
   surfaceArea?: Maybe<Scalars["Int"]["output"]>;
   termsOfUse?: Maybe<Scalars["String"]["output"]>;
   termsOfUseEn?: Maybe<Scalars["String"]["output"]>;
@@ -4994,6 +5006,9 @@ export type UnitNodeReservationunitSetArgs = {
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<ReservationUnitOrderingChoices>>>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  publishingState?: InputMaybe<
+    Array<InputMaybe<ReservationUnitPublishingState>>
+  >;
   purposes?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   qualifiers?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   rankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
@@ -5004,10 +5019,11 @@ export type UnitNodeReservationunitSetArgs = {
   reservableTimeEnd?: InputMaybe<Scalars["Time"]["input"]>;
   reservableTimeStart?: InputMaybe<Scalars["Time"]["input"]>;
   reservationKind?: InputMaybe<Scalars["String"]["input"]>;
-  reservationState?: InputMaybe<Array<InputMaybe<ReservationState>>>;
+  reservationState?: InputMaybe<
+    Array<InputMaybe<ReservationUnitReservationState>>
+  >;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   showOnlyReservable?: InputMaybe<Scalars["Boolean"]["input"]>;
-  state?: InputMaybe<Array<InputMaybe<ReservationUnitState>>>;
   surfaceAreaGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   surfaceAreaLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
@@ -6224,8 +6240,8 @@ export type ReservationUnitPageFieldsFragment = {
   bufferTimeAfter: number;
   reservationStartInterval: ReservationStartInterval;
   canApplyFreeOfCharge: boolean;
-  state?: ReservationUnitState | null;
-  reservationState?: ReservationState | null;
+  publishingState?: ReservationUnitPublishingState | null;
+  reservationState?: ReservationUnitReservationState | null;
   numActiveUserReservations?: number | null;
   requireReservationHandling: boolean;
   id: string;
@@ -6382,8 +6398,8 @@ export type ReservationUnitQuery = {
     bufferTimeAfter: number;
     reservationStartInterval: ReservationStartInterval;
     canApplyFreeOfCharge: boolean;
-    state?: ReservationUnitState | null;
-    reservationState?: ReservationState | null;
+    publishingState?: ReservationUnitPublishingState | null;
+    reservationState?: ReservationUnitReservationState | null;
     numActiveUserReservations?: number | null;
     requireReservationHandling: boolean;
     id: string;
@@ -6563,8 +6579,8 @@ export type ReservationUnitPageQuery = {
     bufferTimeAfter: number;
     reservationStartInterval: ReservationStartInterval;
     canApplyFreeOfCharge: boolean;
-    state?: ReservationUnitState | null;
-    reservationState?: ReservationState | null;
+    publishingState?: ReservationUnitPublishingState | null;
+    reservationState?: ReservationUnitReservationState | null;
     numActiveUserReservations?: number | null;
     requireReservationHandling: boolean;
     maxReservationDuration?: number | null;
@@ -7974,7 +7990,7 @@ export const ReservationUnitPageFieldsFragmentDoc = gql`
     bufferTimeAfter
     reservationStartInterval
     canApplyFreeOfCharge
-    state
+    publishingState
     reservationState
     reservationUnitType {
       ...ReservationUnitTypeFields

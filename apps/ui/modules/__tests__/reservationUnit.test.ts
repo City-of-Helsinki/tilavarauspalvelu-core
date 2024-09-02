@@ -14,13 +14,13 @@ import {
   ReservationStateChoice,
   PriceUnit,
   PricingType,
-  ReservationUnitState,
+  ReservationUnitPublishingState,
   type ReservationUnitNode,
   Status,
   Authentication,
   ReservationKind,
   ReservationStartInterval,
-  ReservationState,
+  ReservationUnitReservationState,
   type PriceReservationUnitFragment,
 } from "@gql/gql-types";
 import {
@@ -387,38 +387,46 @@ describe("isReservationUnitPublished", () => {
 
   test("with valid states", () => {
     expect(
-      isReservationUnitPublished({ state: ReservationUnitState.Published })
+      isReservationUnitPublished({
+        publishingState: ReservationUnitPublishingState.Published,
+      })
     ).toBe(true);
 
     expect(
       isReservationUnitPublished({
-        state: ReservationUnitState.ScheduledHiding,
+        publishingState: ReservationUnitPublishingState.ScheduledHiding,
       })
     ).toBe(true);
   });
 
   test("with invalid states", () => {
     expect(
-      isReservationUnitPublished({ state: ReservationUnitState.Archived })
-    ).toBe(false);
-
-    expect(
-      isReservationUnitPublished({ state: ReservationUnitState.Draft })
-    ).toBe(false);
-
-    expect(
-      isReservationUnitPublished({ state: ReservationUnitState.Hidden })
-    ).toBe(false);
-
-    expect(
       isReservationUnitPublished({
-        state: ReservationUnitState.ScheduledPeriod,
+        publishingState: ReservationUnitPublishingState.Archived,
       })
     ).toBe(false);
 
     expect(
       isReservationUnitPublished({
-        state: ReservationUnitState.ScheduledPublishing,
+        publishingState: ReservationUnitPublishingState.Draft,
+      })
+    ).toBe(false);
+
+    expect(
+      isReservationUnitPublished({
+        publishingState: ReservationUnitPublishingState.Hidden,
+      })
+    ).toBe(false);
+
+    expect(
+      isReservationUnitPublished({
+        publishingState: ReservationUnitPublishingState.ScheduledPeriod,
+      })
+    ).toBe(false);
+
+    expect(
+      isReservationUnitPublished({
+        publishingState: ReservationUnitPublishingState.ScheduledPublishing,
       })
     ).toBe(false);
   });
@@ -1224,11 +1232,11 @@ describe("isReservationUnitReservable", () => {
   function constructReservationUnitNode({
     minReservationDuration = 3600,
     maxReservationDuration = 3600,
-    reservationState = ReservationState.Reservable,
+    reservationState = ReservationUnitReservationState.Reservable,
   }: {
     minReservationDuration?: number;
     maxReservationDuration?: number;
-    reservationState?: ReservationState;
+    reservationState?: ReservationUnitReservationState;
   }) {
     const date = new Date().toISOString().split("T")[0];
     const reservationUnit: ReservationUnitNode = {
@@ -1297,7 +1305,7 @@ describe("isReservationUnitReservable", () => {
 
     const [res2] = isReservationUnitReservable(
       constructReservationUnitNode({
-        reservationState: ReservationState.ScheduledClosing,
+        reservationState: ReservationUnitReservationState.ScheduledClosing,
       })
     );
     expect(res2).toBe(true);
@@ -1307,25 +1315,25 @@ describe("isReservationUnitReservable", () => {
     const [res1] = isReservationUnitReservable({
       ...constructReservationUnitNode({}),
       reservableTimeSpans: undefined,
-      reservationState: ReservationState.ReservationClosed,
+      reservationState: ReservationUnitReservationState.ReservationClosed,
     });
     expect(res1).toBe(false);
 
     const [res2] = isReservationUnitReservable({
       ...constructReservationUnitNode({}),
-      reservationState: ReservationState.ReservationClosed,
+      reservationState: ReservationUnitReservationState.ReservationClosed,
     });
     expect(res2).toBe(false);
 
     const [res5] = isReservationUnitReservable({
       ...constructReservationUnitNode({}),
-      reservationState: ReservationState.ScheduledReservation,
+      reservationState: ReservationUnitReservationState.ScheduledReservation,
     });
     expect(res5).toBe(false);
 
     const [res6] = isReservationUnitReservable({
       ...constructReservationUnitNode({}),
-      reservationState: ReservationState.ScheduledPeriod,
+      reservationState: ReservationUnitReservationState.ScheduledPeriod,
     });
     expect(res6).toBe(false);
   });
