@@ -50,9 +50,19 @@ export const applicationDetailsUrl = (applicationId: number | string): string =>
   `${prefixes.applications}/${applicationId}/details`;
 
 export const reservationUnitUrl = (
-  reservationUnitId: number,
-  unitId: number
-): string => `/unit/${unitId}/reservationUnit/edit/${reservationUnitId}`;
+  reservationUnitPk: number,
+  unitPk: number
+): string => `/unit/${unitPk}/reservationUnit/${reservationUnitPk}`;
+
+export function getReservationUnitUrl(
+  reservationUnitPk: Maybe<number> | undefined,
+  unitPk: Maybe<number> | undefined
+): string {
+  if (unitPk == null) {
+    return "";
+  }
+  return `/unit/${unitPk}/reservationUnit/${reservationUnitPk ?? ""}`;
+}
 
 export function getSpaceUrl(
   spacePk: Maybe<number> | undefined,
@@ -61,7 +71,7 @@ export function getSpaceUrl(
   if (spacePk == null || unitPk == null) {
     return "";
   }
-  return `/unit/${unitPk}/space/edit/${spacePk}`;
+  return `/unit/${unitPk}/space/${spacePk}`;
 }
 
 export function getResourceUrl(
@@ -71,7 +81,7 @@ export function getResourceUrl(
   if (resourcePk == null || unitPk == null) {
     return "";
   }
-  return `/unit/${unitPk}/resource/edit/${resourcePk}`;
+  return `/unit/${unitPk}/resource/${resourcePk}`;
 }
 
 export const unitUrl = (unitId: number): string => `/unit/${unitId}`;

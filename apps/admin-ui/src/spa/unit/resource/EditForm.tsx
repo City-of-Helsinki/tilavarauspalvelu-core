@@ -4,7 +4,7 @@ import {
   type ResourceUpdateForm,
 } from "./modules/resourceEditor";
 import { TextInput } from "hds-react";
-import { ParentSelector } from "../space-editor/ParentSelector";
+import { ParentSelector } from "../space/ParentSelector";
 import { useTranslation } from "next-i18next";
 import { getTranslatedError } from "@/common/util";
 

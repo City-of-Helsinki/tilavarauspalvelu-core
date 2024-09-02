@@ -13,30 +13,18 @@ import ReservationsRouter from "./spa/reservations/router";
 import NotificationsRouter from "./spa/notifications/router";
 import Error404 from "./common/Error404";
 import { UserPermissionChoice } from "@gql/gql-types";
+import { UnitsRouter } from "./spa/unit/router";
 
 const Units = dynamic(() => import("./spa/unit"));
-const Unit = dynamic(() => import("./spa/unit/[id]"));
-const SpacesResources = dynamic(import("./spa/unit/SpacesResources"));
-
 const SpacesList = dynamic(() => import("./spa/spaces"));
-const SpaceEditorView = dynamic(
-  () => import("./spa/unit/space-editor/SpaceEditorView")
-);
 
 const ResourcesList = dynamic(() => import("./spa/resources"));
-const ResourceEditorView = dynamic(
-  () => import("./spa/unit/resource-editor/ResourceEditorView")
-);
-
 const ApplicationDetails = dynamic(
   () => import("./spa/applications/[id]/index")
 );
 
 const ReservationUnits = dynamic(
   () => import("./spa/reservation-units/ReservationUnits")
-);
-const ReservationUnitEditor = dynamic(
-  () => import("./spa/ReservationUnit/edit/index")
 );
 
 const HomePage = dynamic(() => import("./spa/HomePage"));
@@ -57,32 +45,6 @@ type Props = {
   apiBaseUrl: string;
   feedbackUrl: string;
 };
-const UnitsRouter = ({
-  reservationUnitPreviewUrl,
-}: Pick<Props, "reservationUnitPreviewUrl">) => (
-  <Routes>
-    <Route path=":unitPk/spacesResources" element={<SpacesResources />} />
-    <Route path=":unitPk/space/edit/:spacePk" element={<SpaceEditorView />} />
-    <Route
-      path=":unitPk/resource/edit/:resourcePk"
-      element={<ResourceEditorView />}
-    />
-    <Route
-      index
-      path=":unitPk/reservationUnit/edit/"
-      element={
-        <ReservationUnitEditor previewUrlPrefix={reservationUnitPreviewUrl} />
-      }
-    />
-    <Route
-      path=":unitPk/reservationUnit/edit/:reservationUnitPk"
-      element={
-        <ReservationUnitEditor previewUrlPrefix={reservationUnitPreviewUrl} />
-      }
-    />
-    <Route path=":unitPk" element={<Unit />} />
-  </Routes>
-);
 
 const ApplicationRouter = () => (
   <Routes>
