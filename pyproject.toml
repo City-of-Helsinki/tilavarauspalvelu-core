@@ -11,10 +11,10 @@ classifiers = [
 [tool.poetry.dependencies]
 python = ">=3.12,<3.13"
 celery = { extras = ["redis"], version = "5.4.0" }
-certifi = "2024.7.4"
+certifi = "2024.8.30"
 cryptography = "43.0.0"
-Django = "5.0.8"
-django-admin-data-views = "0.4.0"
+Django = "5.1"
+django-admin-data-views = "0.4.1"
 django-admin-extra-buttons = "1.5.8"
 django-admin-rangefilter = "0.13.2"
 django-admin-sortable2 = "2.2.2"
@@ -69,18 +69,18 @@ markers = "sys_platform != 'win32'"
 django-debug-toolbar = "4.4.6"  # django-graphiql-debug-toolbar 0.2.0 breaks with django-debug-toolbar 4.4.6
 django-graphiql-debug-toolbar = "0.2.0"
 factory-boy = "3.3.1"
-faker = "28.0.0"
+faker = "28.1.0"
 freezegun = "1.5.1"
 polib = "1.2.0"
 pytest = "8.3.2"
 pytest-cov = "5.0.0"
-pytest-django = "4.8.0"
+pytest-django = "4.9.0"
 pytest-xdist = "3.6.1"
 requests-mock = "1.12.1"
 
 [tool.poetry.group.lint.dependencies]
 pre-commit = "3.8.0"
-ruff = "0.6.2"
+ruff = "0.6.3"
 ruff-lsp = "0.0.55"
 pyinstrument = "4.7.2"
 
