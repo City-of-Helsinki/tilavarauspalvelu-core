@@ -122,17 +122,6 @@ type IsWithinCancellationPeriodReservationT = Pick<
     > | null;
   }> | null;
 };
-type GetReservationCancellationReasonReservationT = Pick<
-  ReservationNodeT,
-  "begin"
-> & {
-  reservationUnit?: Array<{
-    cancellationRule?: Pick<
-      NonNullable<ReservationUnitNode["cancellationRule"]>,
-      "canBeCancelledTimeBefore" | "needsHandling"
-    > | null;
-  }> | null;
-};
 
 function isTooCloseToCancel(
   reservation: IsWithinCancellationPeriodReservationT
@@ -207,36 +196,6 @@ export function getReservationApplicationMutationValues(
   return result;
 }
 
-type ReservationCancellationReason =
-  | "PAST"
-  | "NO_CANCELLATION_RULE"
-  | "REQUIRES_HANDLING"
-  | "BUFFER";
-
-export function getWhyReservationCantBeCancelled(
-  reservation: GetReservationCancellationReasonReservationT
-): ReservationCancellationReason | null {
-  const reservationUnit = reservation.reservationUnit?.[0];
-
-  if (isReservationInThePast(reservation)) {
-    return "PAST";
-  }
-
-  if (reservationUnit?.cancellationRule == null) {
-    return "NO_CANCELLATION_RULE";
-  }
-
-  if (reservationUnit.cancellationRule?.needsHandling) {
-    return "REQUIRES_HANDLING";
-  }
-
-  if (isTooCloseToCancel(reservation)) {
-    return "BUFFER";
-  }
-
-  return null;
-}
-
 function shouldShowOrderStatus(
   state: Maybe<ReservationStateChoice> | undefined
 ) {
@@ -298,14 +257,22 @@ export function getWhyReservationCantBeChanged(
     return "RESERVATION_MODIFICATION_NOT_ALLOWED";
   }
 
+  // existing reservation has been handled
+  if (reservation.isHandled) {
+    return "RESERVATION_MODIFICATION_NOT_ALLOWED";
+  }
+
   // existing reservation begin time is in the future
   if (isReservationInThePast(reservation)) {
     return "RESERVATION_BEGIN_IN_PAST";
   }
 
-  // existing reservation is free
-  if (!isReservationFreeOfCharge(reservation)) {
-    return "RESERVATION_MODIFICATION_NOT_ALLOWED";
+  const reservationUnit = reservation.reservationUnit?.[0];
+  if (
+    reservationUnit?.cancellationRule == null ||
+    reservationUnit.cancellationRule.needsHandling
+  ) {
+    return "CANCELLATION_NOT_ALLOWED";
   }
 
   // existing reservation cancellation buffer is not exceeded
@@ -313,8 +280,8 @@ export function getWhyReservationCantBeChanged(
     return "CANCELLATION_TIME_PAST";
   }
 
-  // existing reservation has been handled
-  if (reservation.isHandled) {
+  // can't move the reservation if it's not free but we can still cancel it
+  if (!isReservationFreeOfCharge(reservation)) {
     return "RESERVATION_MODIFICATION_NOT_ALLOWED";
   }
 

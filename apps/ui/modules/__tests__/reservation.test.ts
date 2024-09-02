@@ -19,7 +19,6 @@ import {
   getDurationOptions,
   getNormalizedReservationOrderStatus,
   getReservationApplicationMutationValues,
-  getWhyReservationCantBeCancelled,
   isReservationEditable,
   isReservationStartInFuture,
 } from "../reservation";
@@ -398,97 +397,6 @@ describe("getReservationApplcationMutationValues", () => {
       reserveeFirstName: "Etunimi",
       reserveeType: CustomerTypeChoice.Individual,
     });
-  });
-});
-
-describe("getWhyReservationCantBeCancelled", () => {
-  beforeAll(() => {
-    jest.useFakeTimers({
-      now: new Date(2024, 0, 1, 9, 0, 0),
-    });
-  });
-  afterAll(() => {
-    jest.useRealTimers();
-  });
-
-  function constructInput({
-    begin,
-    needsHandling,
-    canBeCancelledTimeBefore,
-  }: {
-    begin: Date; // reservation begin time
-    needsHandling?: boolean; // if the reservation unit needs handling
-    canBeCancelledTimeBefore?: number; // in seconds
-  }) {
-    return {
-      ...createMockReservation({
-        begin,
-        reservationUnit: createMockReservationUnit({
-          needsHandling,
-          canBeCancelledTimeBefore,
-        }),
-      }),
-    };
-  }
-
-  test("with no reservation unit", () => {
-    const input = {
-      ...constructInput({
-        begin: addDays(new Date(), 1),
-      }),
-      reservationUnit: [],
-    };
-    expect(getWhyReservationCantBeCancelled(input)).toBe(
-      "NO_CANCELLATION_RULE"
-    );
-  });
-
-  test("with no cancellation rule", () => {
-    const resUnit = {
-      ...createMockReservationUnit({}),
-      cancellationRule: null,
-    };
-    const input = {
-      ...constructInput({
-        begin: addDays(new Date(), 1),
-      }),
-      reservationUnit: [resUnit],
-    };
-    expect(getWhyReservationCantBeCancelled(input)).toBe(
-      "NO_CANCELLATION_RULE"
-    );
-  });
-
-  test("with required handling", () => {
-    const input = constructInput({
-      begin: addDays(new Date(), 1),
-      needsHandling: true,
-    });
-    expect(getWhyReservationCantBeCancelled(input)).toBe("REQUIRES_HANDLING");
-  });
-
-  test("with cancellation period", () => {
-    const input = constructInput({
-      begin: addDays(new Date(), 1),
-      canBeCancelledTimeBefore: 60 * 60,
-    });
-    expect(getWhyReservationCantBeCancelled(input)).toBe(null);
-  });
-
-  test("can be cancelled when the reservation is outside the cancellation buffer", () => {
-    const input = constructInput({
-      begin: addHours(new Date(), 12),
-      canBeCancelledTimeBefore: 60 * 60, // 1 hour
-    });
-    expect(getWhyReservationCantBeCancelled(input)).toBe(null);
-  });
-
-  test("can't cancel if the reservation is too close to the start time", () => {
-    const input = constructInput({
-      begin: addHours(new Date(), 12),
-      canBeCancelledTimeBefore: 24 * 60 * 60, // 24 hours
-    });
-    expect(getWhyReservationCantBeCancelled(input)).toBe("BUFFER");
   });
 });
 

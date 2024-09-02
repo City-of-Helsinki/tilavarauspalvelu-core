@@ -45,7 +45,6 @@ import {
   getCheckoutUrl,
   getNormalizedReservationOrderStatus,
   getReservationValue,
-  getWhyReservationCantBeCancelled,
   getWhyReservationCantBeChanged,
 } from "@/modules/reservation";
 import {
@@ -400,19 +399,6 @@ function Reservation({
   const modifyTimeReason = getWhyReservationCantBeChanged({ reservation });
   const canTimeBeModified = modifyTimeReason == null;
 
-  const cancellationReason = useMemo(() => {
-    const reason = getWhyReservationCantBeCancelled(reservation);
-    switch (reason) {
-      case "NO_CANCELLATION_RULE":
-      case "REQUIRES_HANDLING":
-        return "termsAreBinding";
-      case "BUFFER":
-        return "buffer";
-      default:
-        return null;
-    }
-  }, [reservation]);
-
   const normalizedOrderStatus =
     getNormalizedReservationOrderStatus(reservation);
 
@@ -434,8 +420,10 @@ function Reservation({
     reservationUnit.metadataSet?.supportedFields
   );
 
-  const isReservationCancelled = reservation.state === "CANCELLED";
-  const isBeingHandled = reservation.state === "REQUIRES_HANDLING";
+  const isReservationCancelled =
+    reservation.state === ReservationStateChoice.Cancelled;
+  const isBeingHandled =
+    reservation.state === ReservationStateChoice.RequiresHandling;
 
   const isReservationCancellable =
     canUserCancelReservation(reservation) &&
@@ -573,7 +561,7 @@ function Reservation({
               )}
             </Actions>
             <Reasons>
-              {modifyTimeReason && (
+              {modifyTimeReason != null && (
                 <ReasonText>
                   {t(`reservations:modifyTimeReasons:${modifyTimeReason}`)}
                   {modifyTimeReason ===
@@ -582,11 +570,6 @@ function Reservation({
                     ` ${t(
                       "reservations:modifyTimeReasons:RESERVATION_MODIFICATION_NOT_ALLOWED_SUFFIX"
                     )}`}
-                </ReasonText>
-              )}
-              {cancellationReason && (
-                <ReasonText>
-                  {t(`reservations:cancellationReasons:${cancellationReason}`)}
                 </ReasonText>
               )}
             </Reasons>
