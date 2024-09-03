@@ -4,7 +4,7 @@ import { memoize } from "lodash";
 import type { UnitsQuery } from "@gql/gql-types";
 import type { TFunction } from "i18next";
 import { truncate } from "@/helpers";
-import { myUnitUrl, unitUrl } from "@/common/urls";
+import { getMyUnitUrl, getUnitUrl } from "@/common/urls";
 import { CustomTable, TableLink } from "@/component/Table";
 import { MAX_UNIT_NAME_LENGTH } from "@/common/const";
 
@@ -33,7 +33,7 @@ function getColConfig(t: TFunction, isMyUnits?: boolean): ColumnType[] {
       headerName: t("Units.headings.name"),
       key: "nameFi",
       transform: ({ nameFi, pk }: UnitType) => (
-        <TableLink href={isMyUnits ? myUnitUrl(pk ?? 0) : unitUrl(pk ?? 0)}>
+        <TableLink href={isMyUnits ? getMyUnitUrl(pk) : getUnitUrl(pk)}>
           {truncate(nameFi ?? "-", MAX_UNIT_NAME_LENGTH)}
         </TableLink>
       ),

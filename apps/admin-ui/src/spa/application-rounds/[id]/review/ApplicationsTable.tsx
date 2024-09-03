@@ -8,8 +8,6 @@ import type {
   ApplicationsQuery,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
-import { PUBLIC_URL } from "@/common/const";
-import { applicationDetailsUrl } from "@/common/urls";
 import { getApplicantName, truncate } from "@/helpers";
 import { CustomTable, ExternalTableLink } from "@/component/Table";
 import { ApplicationStatusCell } from "./StatusCell";
@@ -17,6 +15,7 @@ import {
   calculateAppliedReservationTime,
   formatAppliedReservationTime,
 } from "./utils";
+import { getApplicationUrl } from "@/common/urls";
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
@@ -56,8 +55,7 @@ const COLS = [
     transform: ({ applicantName, pk }: ApplicationView) =>
       pk ? (
         <ExternalTableLink
-          // TODO use urlBuilder
-          href={`${PUBLIC_URL}${applicationDetailsUrl(pk)}`}
+          href={getApplicationUrl(pk, undefined, true)}
           target="_blank"
           rel="noopener noreferrer"
         >

@@ -167,7 +167,7 @@ export function ReservationUnitCalendar({
         isLoading={isLoading}
         onSelectEvent={(e) => {
           if (hasPermission) {
-            window.open(getReservationUrl(e.event?.pk), "_blank");
+            window.open(getReservationUrl(e.event?.pk, true), "_blank");
           }
         }}
         underlineEvents

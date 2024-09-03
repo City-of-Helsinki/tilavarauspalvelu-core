@@ -6,7 +6,7 @@ import PageWrapper from "./component/PageWrapper";
 import "./i18n";
 import { PUBLIC_URL } from "./common/const";
 import { GlobalContext } from "./context/GlobalContexts";
-import { prefixes } from "./common/urls";
+import { applicationsUrl } from "./common/urls";
 import { withAuthorization } from "@/common/AuthorizationChecker";
 import MyUnitsRouter from "./spa/my-units/router";
 import ReservationsRouter from "./spa/reservations/router";
@@ -77,7 +77,7 @@ function ClientApp({
             element={withAuthorization(<HomePage />, apiBaseUrl, feedbackUrl)}
           />
           <Route
-            path={`${prefixes.applications}/*`}
+            path={`${applicationsUrl}/*`}
             element={withAuthorization(
               <ApplicationRouter />,
               apiBaseUrl,

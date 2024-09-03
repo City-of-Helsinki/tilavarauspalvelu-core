@@ -5,7 +5,7 @@ import {
   UserPermissionChoice,
   type ReservationUnitReservationsFragment,
 } from "@gql/gql-types";
-import { reservationUrl } from "@/common/urls";
+import { getReservationUrl } from "@/common/urls";
 import { formatTime, getReserveeName } from "@/common/util";
 import { truncate } from "@/helpers";
 import { DenseVerticalFlex } from "@/styles/layout";
@@ -58,7 +58,7 @@ export function ReservationPopupContent({
         >
           <Reservee>
             {reservation.pk ? (
-              <Link target="_blank" to={reservationUrl(reservation.pk)}>
+              <Link target="_blank" to={getReservationUrl(reservation.pk)}>
                 {eventName}
               </Link>
             ) : (

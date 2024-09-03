@@ -5,8 +5,8 @@ import { Card, IconArrowRight, IconCalendar } from "hds-react";
 import { type ApplicationRoundsQuery } from "@gql/gql-types";
 import { breakpoints } from "common/src/common/style";
 import { formatDate } from "@/common/util";
-import { applicationRoundUrl } from "@/common/urls";
 import { ApplicationRoundStatusLabel } from "./ApplicationRoundStatusLabel";
+import { getApplicationRoundUrl } from "@/common/urls";
 import TimeframeStatus from "./TimeframeStatus";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 
@@ -175,7 +175,7 @@ export function ApplicationRoundCard({
               })}
             />
           </Stats>
-          <ButtonLink to={applicationRoundUrl(String(applicationRound.pk))}>
+          <ButtonLink to={getApplicationRoundUrl(applicationRound.pk)}>
             <span>{t("common.view")}</span>
             <IconArrowRight size="l" />
           </ButtonLink>

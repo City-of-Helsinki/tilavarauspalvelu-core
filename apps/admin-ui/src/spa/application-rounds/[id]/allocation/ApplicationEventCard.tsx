@@ -20,7 +20,7 @@ import {
 import { useFocusAllocatedSlot, useFocusApplicationEvent } from "./hooks";
 import { PopupMenu } from "@/component/PopupMenu";
 import { type ApolloQueryResult } from "@apollo/client";
-import { getApplicationSectionUrl } from "@/common/urls";
+import { getApplicationUrl } from "@/common/urls";
 import { errorToast } from "common/src/common/toast";
 import { getApplicantName } from "@/helpers";
 import { MAX_ALLOCATION_CARD_UNIT_NAME_LENGTH } from "@/common/const";
@@ -207,7 +207,7 @@ export function ApplicationSectionCard({
           refetch={refetch}
         />
         <StyledLink
-          href={getApplicationSectionUrl(application.pk, applicationSection.pk)}
+          href={getApplicationUrl(application.pk, applicationSection.pk, true)}
           external
           openInNewTab
           openInExternalDomainAriaLabel={t("common.openToNewTab")}

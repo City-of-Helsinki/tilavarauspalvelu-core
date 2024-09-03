@@ -4,7 +4,7 @@ import type { TFunction } from "i18next";
 import { memoize } from "lodash";
 import type { ReservationsQuery } from "@gql/gql-types";
 import { truncate } from "@/helpers";
-import { reservationUrl } from "@/common/urls";
+import { getReservationUrl } from "@/common/urls";
 import {
   formatDateTime,
   formatDateTimeRange,
@@ -48,7 +48,7 @@ const getColConfig = (t: TFunction): ReservationTableColumn[] => [
         MAX_NAME_LENGTH
       );
       return (
-        <TableLink href={reservationUrl(reservation.pk as number)}>
+        <TableLink href={getReservationUrl(reservation.pk)}>
           {reservationDisplayName || t("RequestedReservation.noName")}
         </TableLink>
       );

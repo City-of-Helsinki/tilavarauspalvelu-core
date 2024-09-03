@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import type { SearchReservationUnitsQuery } from "@gql/gql-types";
 import { truncate } from "@/helpers";
-import { reservationUnitUrl } from "@/common/urls";
+import { getReservationUnitUrl } from "@/common/urls";
 import { CustomTable, TableLink } from "@/component/Table";
 import { MAX_NAME_LENGTH } from "@/common/const";
 
@@ -25,7 +25,7 @@ const getColConfig = (t: TFunction) => [
     headerName: t("ReservationUnits.headings.name"),
     key: "nameFi",
     transform: ({ nameFi, pk, unit }: ReservationUnitNode) => (
-      <TableLink href={reservationUnitUrl(pk ?? 0, unit?.pk ?? 0)}>
+      <TableLink href={getReservationUnitUrl(pk, unit?.pk)}>
         {truncate(nameFi ?? "-", MAX_NAME_LENGTH)}
       </TableLink>
     ),

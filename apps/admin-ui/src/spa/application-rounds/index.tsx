@@ -11,7 +11,7 @@ import {
   useApplicationRoundsQuery,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
-import { applicationRoundUrl } from "@/common/urls";
+import { getApplicationRoundUrl } from "@/common/urls";
 import { formatDate } from "@/common/util";
 import { Accordion } from "@/common/hds-fork/Accordion";
 import { errorToast } from "common/src/common/toast";
@@ -180,9 +180,7 @@ function AllApplicationRounds(): JSX.Element | null {
               isSortable: true,
               headerName: t("ApplicationRound.headings.name"),
               transform: (applicationRound: ApplicationRoundNode) => (
-                <TableLink
-                  href={applicationRoundUrl(Number(applicationRound.pk))}
-                >
+                <TableLink href={getApplicationRoundUrl(applicationRound.pk)}>
                   <span title={applicationRound.nameFi ?? ""}>
                     {truncate(applicationRound.nameFi ?? "", 50)}
                   </span>
