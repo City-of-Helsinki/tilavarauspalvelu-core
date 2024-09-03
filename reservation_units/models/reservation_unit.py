@@ -334,7 +334,7 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
                 ),
                 then=models.Value(ReservationUnitPublishingState.SCHEDULED_PUBLISHING.value),
             ),
-            # Reservation Unit is currently unpublished or is going to be unpublished in the future.
+            # Reservation Unit is currently unpublished and is not going to be published in the future.
             models.When(
                 (
                     (
