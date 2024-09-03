@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import { trim } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { type ApolloQueryResult } from "@apollo/client";
+import { gql, type ApolloQueryResult } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import {
@@ -138,6 +138,14 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
     </div>
   );
 }
+
+export const DELETE_RESOURCE = gql`
+  mutation DeleteResource($input: ResourceDeleteMutationInput!) {
+    deleteResource(input: $input) {
+      deleted
+    }
+  }
+`;
 
 function ResourceMenu({
   locationType,

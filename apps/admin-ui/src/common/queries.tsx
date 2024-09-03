@@ -6,50 +6,9 @@ import {
 } from "common/src/queries/fragments";
 import {
   RESERVATION_UNIT_COMMON_FRAGMENT,
-  RESOURCE_FRAGMENT,
   SPACE_COMMON_FRAGMENT,
   SPACE_FRAGMENT,
 } from "./fragments";
-
-export const SPACES_QUERY = gql`
-  ${SPACE_COMMON_FRAGMENT}
-  query Spaces {
-    spaces(onlyWithPermission: true) {
-      edges {
-        node {
-          ...SpaceCommonFields
-          unit {
-            id
-            pk
-            nameFi
-          }
-        }
-      }
-    }
-  }
-`;
-
-export const RESOURCES_QUERY = gql`
-  ${RESOURCE_FRAGMENT}
-  query Resources {
-    resources(onlyWithPermission: true) {
-      edges {
-        node {
-          locationType
-          ...ResourceFields
-        }
-      }
-    }
-  }
-`;
-
-export const DELETE_SPACE = gql`
-  mutation DeleteSpace($input: SpaceDeleteMutationInput!) {
-    deleteSpace(input: $input) {
-      deleted
-    }
-  }
-`;
 
 export const UNIT_QUERY = gql`
   ${SPACE_FRAGMENT}
@@ -110,14 +69,6 @@ export const UNIT_WITH_SPACES_AND_RESOURCES = gql`
       location {
         ...LocationFields
       }
-    }
-  }
-`;
-
-export const DELETE_RESOURCE = gql`
-  mutation DeleteResource($input: ResourceDeleteMutationInput!) {
-    deleteResource(input: $input) {
-      deleted
     }
   }
 `;

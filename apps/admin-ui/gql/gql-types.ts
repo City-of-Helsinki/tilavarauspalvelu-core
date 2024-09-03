@@ -6236,62 +6236,95 @@ export type ApplicationAdminFragment = {
   } | null;
 };
 
-export type SpacesQueryVariables = Exact<{ [key: string]: never }>;
-
-export type SpacesQuery = {
-  spaces?: {
-    edges: Array<{
-      node?: {
-        id: string;
-        pk?: number | null;
-        nameFi?: string | null;
-        surfaceArea?: number | null;
-        maxPersons?: number | null;
-        unit?: {
-          id: string;
-          pk?: number | null;
-          nameFi?: string | null;
-        } | null;
-        parent?: {
-          id: string;
-          pk?: number | null;
-          nameFi?: string | null;
-        } | null;
-      } | null;
-    } | null>;
-  } | null;
+export type ReservationCommonFragment = {
+  id: string;
+  pk?: number | null;
+  begin: string;
+  end: string;
+  createdAt?: string | null;
+  state?: ReservationStateChoice | null;
+  type?: ReservationTypeChoice | null;
+  isBlocked?: boolean | null;
+  workingMemo?: string | null;
+  reserveeName?: string | null;
+  bufferTimeBefore: number;
+  bufferTimeAfter: number;
+  paymentOrder: Array<{ id: string; status?: OrderStatus | null }>;
+  user?: { id: string; firstName: string; lastName: string } | null;
 };
 
-export type ResourcesQueryVariables = Exact<{ [key: string]: never }>;
-
-export type ResourcesQuery = {
-  resources?: {
-    edges: Array<{
-      node?: {
-        locationType?: ResourceLocationType | null;
-        id: string;
-        pk?: number | null;
-        nameFi?: string | null;
-        space?: {
-          id: string;
-          nameFi?: string | null;
-          unit?: {
-            id: string;
-            nameFi?: string | null;
-            pk?: number | null;
-          } | null;
-        } | null;
-      } | null;
-    } | null>;
+export type ReservationUnitReservationsFragment = {
+  name?: string | null;
+  numPersons?: number | null;
+  calendarUrl?: string | null;
+  affectedReservationUnits?: Array<number | null> | null;
+  id: string;
+  pk?: number | null;
+  begin: string;
+  end: string;
+  createdAt?: string | null;
+  state?: ReservationStateChoice | null;
+  type?: ReservationTypeChoice | null;
+  isBlocked?: boolean | null;
+  workingMemo?: string | null;
+  reserveeName?: string | null;
+  bufferTimeBefore: number;
+  bufferTimeAfter: number;
+  reservationUnit: Array<{
+    id: string;
+    pk?: number | null;
+    nameFi?: string | null;
+    bufferTimeBefore: number;
+    bufferTimeAfter: number;
+    unit?: { id: string; pk?: number | null } | null;
+  }>;
+  user?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    pk?: number | null;
   } | null;
+  paymentOrder: Array<{ id: string; status?: OrderStatus | null }>;
 };
 
-export type DeleteSpaceMutationVariables = Exact<{
-  input: SpaceDeleteMutationInput;
-}>;
-
-export type DeleteSpaceMutation = {
-  deleteSpace?: { deleted?: boolean | null } | null;
+export type ReservationUnitFragment = {
+  id: string;
+  pk?: number | null;
+  nameFi?: string | null;
+  maxPersons?: number | null;
+  bufferTimeBefore: number;
+  bufferTimeAfter: number;
+  reservationStartInterval: ReservationStartInterval;
+  authentication: Authentication;
+  termsOfUseFi?: string | null;
+  minPersons?: number | null;
+  unit?: { id: string; pk?: number | null; nameFi?: string | null } | null;
+  cancellationTerms?: {
+    id: string;
+    textFi?: string | null;
+    nameFi?: string | null;
+  } | null;
+  paymentTerms?: {
+    id: string;
+    textFi?: string | null;
+    nameFi?: string | null;
+  } | null;
+  pricingTerms?: {
+    id: string;
+    textFi?: string | null;
+    nameFi?: string | null;
+  } | null;
+  serviceSpecificTerms?: {
+    id: string;
+    textFi?: string | null;
+    nameFi?: string | null;
+  } | null;
+  metadataSet?: {
+    id: string;
+    requiredFields: Array<{ id: string; fieldName: string }>;
+    supportedFields: Array<{ id: string; fieldName: string }>;
+  } | null;
 };
 
 export type UnitQueryVariables = Exact<{
@@ -6400,14 +6433,6 @@ export type UnitWithSpacesAndResourcesQuery = {
       addressCityFi?: string | null;
     } | null;
   } | null;
-};
-
-export type DeleteResourceMutationVariables = Exact<{
-  input: ResourceDeleteMutationInput;
-}>;
-
-export type DeleteResourceMutation = {
-  deleteResource?: { deleted?: boolean | null } | null;
 };
 
 export type HandlingDataQueryVariables = Exact<{
@@ -6528,232 +6553,6 @@ export type ApplicationDateOfBirthQuery = {
   } | null;
 };
 
-export type CreateResourceMutationVariables = Exact<{
-  input: ResourceCreateMutationInput;
-}>;
-
-export type CreateResourceMutation = {
-  createResource?: { pk?: number | null } | null;
-};
-
-export type UpdateResourceMutationVariables = Exact<{
-  input: ResourceUpdateMutationInput;
-}>;
-
-export type UpdateResourceMutation = {
-  updateResource?: { pk?: number | null } | null;
-};
-
-export type ResourceQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-}>;
-
-export type ResourceQuery = {
-  resource?: {
-    id: string;
-    pk?: number | null;
-    nameFi?: string | null;
-    nameSv?: string | null;
-    nameEn?: string | null;
-    space?: { id: string; pk?: number | null } | null;
-  } | null;
-};
-
-export type CreateSpaceMutationVariables = Exact<{
-  input: SpaceCreateMutationInput;
-}>;
-
-export type CreateSpaceMutation = {
-  createSpace?: { pk?: number | null } | null;
-};
-
-export type UpdateSpaceMutationVariables = Exact<{
-  input: SpaceUpdateMutationInput;
-}>;
-
-export type UpdateSpaceMutation = {
-  updateSpace?: { pk?: number | null } | null;
-};
-
-export type UnitSpacesQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-}>;
-
-export type UnitSpacesQuery = {
-  unit?: {
-    id: string;
-    spaces: Array<{
-      id: string;
-      pk?: number | null;
-      nameFi?: string | null;
-      parent?: { id: string; pk?: number | null } | null;
-    }>;
-  } | null;
-};
-
-export type SpaceQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-}>;
-
-export type SpaceQuery = {
-  space?: {
-    nameSv?: string | null;
-    nameEn?: string | null;
-    code: string;
-    id: string;
-    pk?: number | null;
-    nameFi?: string | null;
-    surfaceArea?: number | null;
-    maxPersons?: number | null;
-    unit?: {
-      id: string;
-      pk?: number | null;
-      nameFi?: string | null;
-      descriptionFi?: string | null;
-      location?: {
-        id: string;
-        addressStreetFi?: string | null;
-        addressZip: string;
-        addressCityFi?: string | null;
-      } | null;
-      spaces: Array<{ id: string; pk?: number | null; nameFi?: string | null }>;
-    } | null;
-    parent?: {
-      id: string;
-      pk?: number | null;
-      nameFi?: string | null;
-      parent?: {
-        id: string;
-        nameFi?: string | null;
-        parent?: { id: string; nameFi?: string | null } | null;
-      } | null;
-    } | null;
-  } | null;
-};
-
-export type UnitsQueryVariables = Exact<{
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  after?: InputMaybe<Scalars["String"]["input"]>;
-  orderBy?: InputMaybe<
-    Array<InputMaybe<UnitOrderingChoices>> | InputMaybe<UnitOrderingChoices>
-  >;
-  nameFi?: InputMaybe<Scalars["String"]["input"]>;
-}>;
-
-export type UnitsQuery = {
-  units?: {
-    totalCount?: number | null;
-    edges: Array<{
-      node?: {
-        id: string;
-        nameFi?: string | null;
-        pk?: number | null;
-        unitGroups: Array<{ id: string; nameFi?: string | null }>;
-        reservationunitSet: Array<{ id: string; pk?: number | null }>;
-      } | null;
-    } | null>;
-    pageInfo: { endCursor?: string | null; hasNextPage: boolean };
-  } | null;
-};
-
-export type BannerNotificationCreateMutationVariables = Exact<{
-  input: BannerNotificationCreateMutationInput;
-}>;
-
-export type BannerNotificationCreateMutation = {
-  createBannerNotification?: { pk?: number | null } | null;
-};
-
-export type BannerNotificationUpdateMutationVariables = Exact<{
-  input: BannerNotificationUpdateMutationInput;
-}>;
-
-export type BannerNotificationUpdateMutation = {
-  updateBannerNotification?: { pk?: number | null } | null;
-};
-
-export type BannerNotificationDeleteMutationVariables = Exact<{
-  input: BannerNotificationDeleteMutationInput;
-}>;
-
-export type BannerNotificationDeleteMutation = {
-  deleteBannerNotification?: { deleted?: boolean | null } | null;
-};
-
-export type UpdateReservationWorkingMemoMutationVariables = Exact<{
-  pk: Scalars["Int"]["input"];
-  workingMemo: Scalars["String"]["input"];
-}>;
-
-export type UpdateReservationWorkingMemoMutation = {
-  updateReservationWorkingMemo?: {
-    pk?: number | null;
-    workingMemo?: string | null;
-  } | null;
-};
-
-export type UpdateApplicationWorkingMemoMutationVariables = Exact<{
-  pk: Scalars["Int"]["input"];
-  workingMemo: Scalars["String"]["input"];
-}>;
-
-export type UpdateApplicationWorkingMemoMutation = {
-  updateApplication?: {
-    pk?: number | null;
-    workingMemo?: string | null;
-  } | null;
-};
-
-export type SearchReservationUnitsQueryVariables = Exact<{
-  after?: InputMaybe<Scalars["String"]["input"]>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  nameFi?: InputMaybe<Scalars["String"]["input"]>;
-  maxPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  maxPersonsLte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  surfaceAreaGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  surfaceAreaLte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  unit?: InputMaybe<
-    | Array<InputMaybe<Scalars["Int"]["input"]>>
-    | InputMaybe<Scalars["Int"]["input"]>
-  >;
-  reservationUnitType?: InputMaybe<
-    | Array<InputMaybe<Scalars["Int"]["input"]>>
-    | InputMaybe<Scalars["Int"]["input"]>
-  >;
-  orderBy?: InputMaybe<
-    | Array<InputMaybe<ReservationUnitOrderingChoices>>
-    | InputMaybe<ReservationUnitOrderingChoices>
-  >;
-  publishingState?: InputMaybe<
-    | Array<InputMaybe<ReservationUnitPublishingState>>
-    | InputMaybe<ReservationUnitPublishingState>
-  >;
-}>;
-
-export type SearchReservationUnitsQuery = {
-  reservationUnits?: {
-    totalCount?: number | null;
-    edges: Array<{
-      node?: {
-        id: string;
-        pk?: number | null;
-        nameFi?: string | null;
-        maxPersons?: number | null;
-        surfaceArea?: number | null;
-        publishingState?: ReservationUnitPublishingState | null;
-        reservationState?: ReservationUnitReservationState | null;
-        unit?: {
-          id: string;
-          nameFi?: string | null;
-          pk?: number | null;
-        } | null;
-        reservationUnitType?: { id: string; nameFi?: string | null } | null;
-      } | null;
-    } | null>;
-    pageInfo: { hasNextPage: boolean; endCursor?: string | null };
-  } | null;
-};
-
 export type StaffAdjustReservationTimeMutationVariables = Exact<{
   input: ReservationStaffAdjustTimeMutationInput;
 }>;
@@ -6791,232 +6590,38 @@ export type ChangeReservationTimeFragment = {
   }>;
 };
 
-export type ReservationUnitPricingFragment = {
-  pricings: Array<{
-    id: string;
-    begins: string;
-    priceUnit: PriceUnit;
-    pricingType?: PricingType | null;
-    lowestPrice: string;
-    highestPrice: string;
-    status: Status;
-    taxPercentage: { id: string; pk?: number | null; value: string };
-  }>;
-};
+export type UpdateReservationWorkingMemoMutationVariables = Exact<{
+  pk: Scalars["Int"]["input"];
+  workingMemo: Scalars["String"]["input"];
+}>;
 
-export type ReservationUnitFragment = {
-  id: string;
-  pk?: number | null;
-  nameFi?: string | null;
-  maxPersons?: number | null;
-  bufferTimeBefore: number;
-  bufferTimeAfter: number;
-  reservationStartInterval: ReservationStartInterval;
-  authentication: Authentication;
-  termsOfUseFi?: string | null;
-  minPersons?: number | null;
-  unit?: { id: string; pk?: number | null; nameFi?: string | null } | null;
-  cancellationTerms?: {
-    id: string;
-    textFi?: string | null;
-    nameFi?: string | null;
-  } | null;
-  paymentTerms?: {
-    id: string;
-    textFi?: string | null;
-    nameFi?: string | null;
-  } | null;
-  pricingTerms?: {
-    id: string;
-    textFi?: string | null;
-    nameFi?: string | null;
-  } | null;
-  serviceSpecificTerms?: {
-    id: string;
-    textFi?: string | null;
-    nameFi?: string | null;
-  } | null;
-  metadataSet?: {
-    id: string;
-    requiredFields: Array<{ id: string; fieldName: string }>;
-    supportedFields: Array<{ id: string; fieldName: string }>;
-  } | null;
-};
-
-export type ReservationRecurringFragment = {
-  recurringReservation?: {
-    id: string;
+export type UpdateReservationWorkingMemoMutation = {
+  updateReservationWorkingMemo?: {
     pk?: number | null;
-    beginDate?: string | null;
-    endDate?: string | null;
-    weekdays?: Array<number | null> | null;
-    name: string;
-    description: string;
+    workingMemo?: string | null;
   } | null;
 };
 
-export type ReservationCommonFragment = {
-  id: string;
-  pk?: number | null;
-  begin: string;
-  end: string;
-  createdAt?: string | null;
-  state?: ReservationStateChoice | null;
-  type?: ReservationTypeChoice | null;
-  isBlocked?: boolean | null;
-  workingMemo?: string | null;
-  reserveeName?: string | null;
-  bufferTimeBefore: number;
-  bufferTimeAfter: number;
-  paymentOrder: Array<{ id: string; status?: OrderStatus | null }>;
-  user?: { id: string; firstName: string; lastName: string } | null;
-};
+export type UpdateApplicationWorkingMemoMutationVariables = Exact<{
+  pk: Scalars["Int"]["input"];
+  workingMemo: Scalars["String"]["input"];
+}>;
 
-export type ReservationUnitReservationsFragment = {
-  name?: string | null;
-  numPersons?: number | null;
-  calendarUrl?: string | null;
-  affectedReservationUnits?: Array<number | null> | null;
-  id: string;
-  pk?: number | null;
-  begin: string;
-  end: string;
-  createdAt?: string | null;
-  state?: ReservationStateChoice | null;
-  type?: ReservationTypeChoice | null;
-  isBlocked?: boolean | null;
-  workingMemo?: string | null;
-  reserveeName?: string | null;
-  bufferTimeBefore: number;
-  bufferTimeAfter: number;
-  reservationUnit: Array<{
-    id: string;
+export type UpdateApplicationWorkingMemoMutation = {
+  updateApplication?: {
     pk?: number | null;
-    nameFi?: string | null;
-    bufferTimeBefore: number;
-    bufferTimeAfter: number;
-    unit?: { id: string; pk?: number | null } | null;
-  }>;
-  user?: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    pk?: number | null;
-  } | null;
-  paymentOrder: Array<{ id: string; status?: OrderStatus | null }>;
-};
-
-export type UpdateStaffReservationMutationVariables = Exact<{
-  input: ReservationStaffModifyMutationInput;
-  workingMemo: ReservationWorkingMemoMutationInput;
-}>;
-
-export type UpdateStaffReservationMutation = {
-  staffReservationModify?: { pk?: number | null } | null;
-  updateReservationWorkingMemo?: { workingMemo?: string | null } | null;
-};
-
-export type UpdateRecurringReservationMutationVariables = Exact<{
-  input: RecurringReservationUpdateMutationInput;
-}>;
-
-export type UpdateRecurringReservationMutation = {
-  updateRecurringReservation?: { pk?: number | null } | null;
-};
-
-export type ReservationsQueryVariables = Exact<{
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  after?: InputMaybe<Scalars["String"]["input"]>;
-  orderBy?: InputMaybe<
-    | Array<InputMaybe<ReservationOrderingChoices>>
-    | InputMaybe<ReservationOrderingChoices>
-  >;
-  unit?: InputMaybe<
-    | Array<InputMaybe<Scalars["Int"]["input"]>>
-    | InputMaybe<Scalars["Int"]["input"]>
-  >;
-  reservationUnit?: InputMaybe<
-    | Array<InputMaybe<Scalars["Int"]["input"]>>
-    | InputMaybe<Scalars["Int"]["input"]>
-  >;
-  reservationUnitType?: InputMaybe<
-    | Array<InputMaybe<Scalars["Int"]["input"]>>
-    | InputMaybe<Scalars["Int"]["input"]>
-  >;
-  reservationType?: InputMaybe<
-    Array<InputMaybe<ReservationTypeChoice>> | InputMaybe<ReservationTypeChoice>
-  >;
-  state?: InputMaybe<
-    | Array<InputMaybe<ReservationStateChoice>>
-    | InputMaybe<ReservationStateChoice>
-  >;
-  orderStatus?: InputMaybe<
-    Array<InputMaybe<OrderStatusWithFree>> | InputMaybe<OrderStatusWithFree>
-  >;
-  textSearch?: InputMaybe<Scalars["String"]["input"]>;
-  priceLte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  priceGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  beginDate?: InputMaybe<Scalars["Date"]["input"]>;
-  endDate?: InputMaybe<Scalars["Date"]["input"]>;
-  createdAtGte?: InputMaybe<Scalars["Date"]["input"]>;
-  createdAtLte?: InputMaybe<Scalars["Date"]["input"]>;
-  applyingForFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
-  isRecurring?: InputMaybe<Scalars["Boolean"]["input"]>;
-}>;
-
-export type ReservationsQuery = {
-  reservations?: {
-    totalCount?: number | null;
-    edges: Array<{
-      node?: {
-        name?: string | null;
-        id: string;
-        pk?: number | null;
-        begin: string;
-        end: string;
-        createdAt?: string | null;
-        state?: ReservationStateChoice | null;
-        type?: ReservationTypeChoice | null;
-        isBlocked?: boolean | null;
-        workingMemo?: string | null;
-        reserveeName?: string | null;
-        bufferTimeBefore: number;
-        bufferTimeAfter: number;
-        reservationUnit: Array<{
-          id: string;
-          nameFi?: string | null;
-          unit?: { id: string; nameFi?: string | null } | null;
-        }>;
-        paymentOrder: Array<{ id: string; status?: OrderStatus | null }>;
-        user?: { id: string; firstName: string; lastName: string } | null;
-      } | null;
-    } | null>;
-    pageInfo: { endCursor?: string | null; hasNextPage: boolean };
+    workingMemo?: string | null;
   } | null;
 };
 
-export type ReservationApplicationLinkQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
+export type CheckPermissionsQueryVariables = Exact<{
+  permission: UserPermissionChoice;
+  units?: InputMaybe<Array<Scalars["Int"]["input"]> | Scalars["Int"]["input"]>;
+  requireAll?: InputMaybe<Scalars["Boolean"]["input"]>;
 }>;
 
-export type ReservationApplicationLinkQuery = {
-  recurringReservation?: {
-    id: string;
-    allocatedTimeSlot?: {
-      id: string;
-      pk?: number | null;
-      reservationUnitOption: {
-        id: string;
-        pk?: number | null;
-        applicationSection: {
-          id: string;
-          pk?: number | null;
-          application: { id: string; pk?: number | null };
-        };
-      };
-    } | null;
-  } | null;
+export type CheckPermissionsQuery = {
+  checkPermissions?: { hasPermission: boolean } | null;
 };
 
 export type ReservationDenyReasonsQueryVariables = Exact<{
@@ -7036,352 +6641,6 @@ export type ReservationDenyReasonsQuery = {
       } | null;
     } | null>;
   } | null;
-};
-
-export type ReservationMetaFieldsFragment = {
-  numPersons?: number | null;
-  name?: string | null;
-  description?: string | null;
-  freeOfChargeReason?: string | null;
-  applyingForFreeOfCharge?: boolean | null;
-  reserveeFirstName?: string | null;
-  reserveeLastName?: string | null;
-  reserveeEmail?: string | null;
-  reserveePhone?: string | null;
-  reserveeType?: CustomerTypeChoice | null;
-  reserveeOrganisationName?: string | null;
-  reserveeId?: string | null;
-  reserveeIsUnregisteredAssociation?: boolean | null;
-  reserveeAddressStreet?: string | null;
-  reserveeAddressCity?: string | null;
-  reserveeAddressZip?: string | null;
-  billingFirstName?: string | null;
-  billingLastName?: string | null;
-  billingPhone?: string | null;
-  billingEmail?: string | null;
-  billingAddressStreet?: string | null;
-  billingAddressCity?: string | null;
-  billingAddressZip?: string | null;
-  ageGroup?: {
-    id: string;
-    minimum: number;
-    maximum?: number | null;
-    pk?: number | null;
-  } | null;
-  purpose?: { id: string; nameFi?: string | null; pk?: number | null } | null;
-  homeCity?: { id: string; nameFi?: string | null; pk?: number | null } | null;
-};
-
-export type CalendarReservationFragment = {
-  id: string;
-  name?: string | null;
-  reserveeName?: string | null;
-  pk?: number | null;
-  begin: string;
-  end: string;
-  state?: ReservationStateChoice | null;
-  type?: ReservationTypeChoice | null;
-  bufferTimeBefore: number;
-  bufferTimeAfter: number;
-  affectedReservationUnits?: Array<number | null> | null;
-  user?: { id: string; email: string } | null;
-};
-
-export type ReservationsByReservationUnitQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-  pk: Scalars["Int"]["input"];
-  beginDate?: InputMaybe<Scalars["Date"]["input"]>;
-  endDate?: InputMaybe<Scalars["Date"]["input"]>;
-  state?: InputMaybe<
-    | Array<InputMaybe<ReservationStateChoice>>
-    | InputMaybe<ReservationStateChoice>
-  >;
-}>;
-
-export type ReservationsByReservationUnitQuery = {
-  reservationUnit?: {
-    id: string;
-    reservationSet?: Array<{
-      id: string;
-      name?: string | null;
-      reserveeName?: string | null;
-      pk?: number | null;
-      begin: string;
-      end: string;
-      state?: ReservationStateChoice | null;
-      type?: ReservationTypeChoice | null;
-      bufferTimeBefore: number;
-      bufferTimeAfter: number;
-      affectedReservationUnits?: Array<number | null> | null;
-      user?: { id: string; email: string } | null;
-    }> | null;
-  } | null;
-  affectingReservations?: Array<{
-    id: string;
-    name?: string | null;
-    reserveeName?: string | null;
-    pk?: number | null;
-    begin: string;
-    end: string;
-    state?: ReservationStateChoice | null;
-    type?: ReservationTypeChoice | null;
-    bufferTimeBefore: number;
-    bufferTimeAfter: number;
-    affectedReservationUnits?: Array<number | null> | null;
-    user?: { id: string; email: string } | null;
-  }> | null;
-};
-
-export type ReservationSpecialisationFragment = {
-  calendarUrl?: string | null;
-  price?: string | null;
-  taxPercentageValue?: string | null;
-  handlingDetails?: string | null;
-  bufferTimeBefore: number;
-  bufferTimeAfter: number;
-  paymentOrder: Array<{
-    id: string;
-    orderUuid?: string | null;
-    refundUuid?: string | null;
-  }>;
-  cancelReason?: { id: string; reasonFi?: string | null } | null;
-  denyReason?: { id: string; reasonFi?: string | null } | null;
-  user?: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    pk?: number | null;
-  } | null;
-};
-
-export type ReservationQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-}>;
-
-export type ReservationQuery = {
-  reservation?: {
-    id: string;
-    pk?: number | null;
-    begin: string;
-    end: string;
-    createdAt?: string | null;
-    state?: ReservationStateChoice | null;
-    type?: ReservationTypeChoice | null;
-    isBlocked?: boolean | null;
-    workingMemo?: string | null;
-    reserveeName?: string | null;
-    bufferTimeBefore: number;
-    bufferTimeAfter: number;
-    calendarUrl?: string | null;
-    price?: string | null;
-    taxPercentageValue?: string | null;
-    handlingDetails?: string | null;
-    numPersons?: number | null;
-    name?: string | null;
-    description?: string | null;
-    freeOfChargeReason?: string | null;
-    applyingForFreeOfCharge?: boolean | null;
-    reserveeFirstName?: string | null;
-    reserveeLastName?: string | null;
-    reserveeEmail?: string | null;
-    reserveePhone?: string | null;
-    reserveeType?: CustomerTypeChoice | null;
-    reserveeOrganisationName?: string | null;
-    reserveeId?: string | null;
-    reserveeIsUnregisteredAssociation?: boolean | null;
-    reserveeAddressStreet?: string | null;
-    reserveeAddressCity?: string | null;
-    reserveeAddressZip?: string | null;
-    billingFirstName?: string | null;
-    billingLastName?: string | null;
-    billingPhone?: string | null;
-    billingEmail?: string | null;
-    billingAddressStreet?: string | null;
-    billingAddressCity?: string | null;
-    billingAddressZip?: string | null;
-    reservationUnit: Array<{
-      id: string;
-      pk?: number | null;
-      nameFi?: string | null;
-      maxPersons?: number | null;
-      bufferTimeBefore: number;
-      bufferTimeAfter: number;
-      reservationStartInterval: ReservationStartInterval;
-      authentication: Authentication;
-      termsOfUseFi?: string | null;
-      minPersons?: number | null;
-      unit?: { id: string; pk?: number | null; nameFi?: string | null } | null;
-      cancellationTerms?: {
-        id: string;
-        textFi?: string | null;
-        nameFi?: string | null;
-      } | null;
-      paymentTerms?: {
-        id: string;
-        textFi?: string | null;
-        nameFi?: string | null;
-      } | null;
-      pricingTerms?: {
-        id: string;
-        textFi?: string | null;
-        nameFi?: string | null;
-      } | null;
-      serviceSpecificTerms?: {
-        id: string;
-        textFi?: string | null;
-        nameFi?: string | null;
-      } | null;
-      pricings: Array<{
-        id: string;
-        begins: string;
-        priceUnit: PriceUnit;
-        pricingType?: PricingType | null;
-        lowestPrice: string;
-        highestPrice: string;
-        status: Status;
-        taxPercentage: { id: string; pk?: number | null; value: string };
-      }>;
-      metadataSet?: {
-        id: string;
-        requiredFields: Array<{ id: string; fieldName: string }>;
-        supportedFields: Array<{ id: string; fieldName: string }>;
-      } | null;
-    }>;
-    paymentOrder: Array<{
-      id: string;
-      status?: OrderStatus | null;
-      orderUuid?: string | null;
-      refundUuid?: string | null;
-    }>;
-    user?: {
-      id: string;
-      firstName: string;
-      lastName: string;
-      email: string;
-      pk?: number | null;
-    } | null;
-    recurringReservation?: {
-      id: string;
-      pk?: number | null;
-      beginDate?: string | null;
-      endDate?: string | null;
-      weekdays?: Array<number | null> | null;
-      name: string;
-      description: string;
-    } | null;
-    cancelReason?: { id: string; reasonFi?: string | null } | null;
-    denyReason?: { id: string; reasonFi?: string | null } | null;
-    ageGroup?: {
-      id: string;
-      minimum: number;
-      maximum?: number | null;
-      pk?: number | null;
-    } | null;
-    purpose?: { id: string; nameFi?: string | null; pk?: number | null } | null;
-    homeCity?: {
-      id: string;
-      nameFi?: string | null;
-      pk?: number | null;
-    } | null;
-  } | null;
-};
-
-export type RecurringReservationQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-}>;
-
-export type RecurringReservationQuery = {
-  recurringReservation?: {
-    id: string;
-    pk?: number | null;
-    weekdays?: Array<number | null> | null;
-    beginDate?: string | null;
-    endDate?: string | null;
-    rejectedOccurrences: Array<{
-      id: string;
-      beginDatetime: string;
-      endDatetime: string;
-      rejectionReason: RejectionReadinessChoice;
-    }>;
-    reservations: Array<{
-      state?: ReservationStateChoice | null;
-      id: string;
-      pk?: number | null;
-      begin: string;
-      end: string;
-      type?: ReservationTypeChoice | null;
-      bufferTimeAfter: number;
-      bufferTimeBefore: number;
-      paymentOrder: Array<{ id: string; status?: OrderStatus | null }>;
-      reservationUnit: Array<{
-        id: string;
-        pk?: number | null;
-        bufferTimeBefore: number;
-        bufferTimeAfter: number;
-        reservationStartInterval: ReservationStartInterval;
-        unit?: { id: string; pk?: number | null } | null;
-      }>;
-      recurringReservation?: {
-        pk?: number | null;
-        id: string;
-        weekdays?: Array<number | null> | null;
-        beginDate?: string | null;
-        endDate?: string | null;
-      } | null;
-    }>;
-  } | null;
-};
-
-export type ApproveReservationMutationVariables = Exact<{
-  input: ReservationApproveMutationInput;
-}>;
-
-export type ApproveReservationMutation = {
-  approveReservation?: {
-    pk?: number | null;
-    state?: ReservationStateChoice | null;
-  } | null;
-};
-
-export type DenyReservationMutationVariables = Exact<{
-  input: ReservationDenyMutationInput;
-}>;
-
-export type DenyReservationMutation = {
-  denyReservation?: {
-    pk?: number | null;
-    state?: ReservationStateChoice | null;
-  } | null;
-};
-
-export type RefundReservationMutationVariables = Exact<{
-  input: ReservationRefundMutationInput;
-}>;
-
-export type RefundReservationMutation = {
-  refundReservation?: { pk?: number | null } | null;
-};
-
-export type RequireHandlingMutationVariables = Exact<{
-  input: ReservationRequiresHandlingMutationInput;
-}>;
-
-export type RequireHandlingMutation = {
-  requireHandlingForReservation?: {
-    pk?: number | null;
-    state?: ReservationStateChoice | null;
-  } | null;
-};
-
-export type CheckPermissionsQueryVariables = Exact<{
-  permission: UserPermissionChoice;
-  units?: InputMaybe<Array<Scalars["Int"]["input"]> | Scalars["Int"]["input"]>;
-  requireAll?: InputMaybe<Scalars["Boolean"]["input"]>;
-}>;
-
-export type CheckPermissionsQuery = {
-  checkPermissions?: { hasPermission: boolean } | null;
 };
 
 export type ReservationUnitsFilterParamsQueryVariables = Exact<{
@@ -8197,6 +7456,30 @@ export type ReservationTimesInReservationUnitQuery = {
   }> | null;
 };
 
+export type BannerNotificationCreateMutationVariables = Exact<{
+  input: BannerNotificationCreateMutationInput;
+}>;
+
+export type BannerNotificationCreateMutation = {
+  createBannerNotification?: { pk?: number | null } | null;
+};
+
+export type BannerNotificationUpdateMutationVariables = Exact<{
+  input: BannerNotificationUpdateMutationInput;
+}>;
+
+export type BannerNotificationUpdateMutation = {
+  updateBannerNotification?: { pk?: number | null } | null;
+};
+
+export type BannerNotificationDeleteMutationVariables = Exact<{
+  input: BannerNotificationDeleteMutationInput;
+}>;
+
+export type BannerNotificationDeleteMutation = {
+  deleteBannerNotification?: { deleted?: boolean | null } | null;
+};
+
 export type ApplicationRoundFilterQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -8865,6 +8148,673 @@ export type ApplicationRoundQuery = {
   } | null;
 };
 
+export type SearchReservationUnitsQueryVariables = Exact<{
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  nameFi?: InputMaybe<Scalars["String"]["input"]>;
+  maxPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  maxPersonsLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  surfaceAreaGte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  surfaceAreaLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  unit?: InputMaybe<
+    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | InputMaybe<Scalars["Int"]["input"]>
+  >;
+  reservationUnitType?: InputMaybe<
+    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | InputMaybe<Scalars["Int"]["input"]>
+  >;
+  orderBy?: InputMaybe<
+    | Array<InputMaybe<ReservationUnitOrderingChoices>>
+    | InputMaybe<ReservationUnitOrderingChoices>
+  >;
+  publishingState?: InputMaybe<
+    | Array<InputMaybe<ReservationUnitPublishingState>>
+    | InputMaybe<ReservationUnitPublishingState>
+  >;
+}>;
+
+export type SearchReservationUnitsQuery = {
+  reservationUnits?: {
+    totalCount?: number | null;
+    edges: Array<{
+      node?: {
+        id: string;
+        pk?: number | null;
+        nameFi?: string | null;
+        maxPersons?: number | null;
+        surfaceArea?: number | null;
+        publishingState?: ReservationUnitPublishingState | null;
+        reservationState?: ReservationUnitReservationState | null;
+        unit?: {
+          id: string;
+          nameFi?: string | null;
+          pk?: number | null;
+        } | null;
+        reservationUnitType?: { id: string; nameFi?: string | null } | null;
+      } | null;
+    } | null>;
+    pageInfo: { hasNextPage: boolean; endCursor?: string | null };
+  } | null;
+};
+
+export type ReservationApplicationLinkQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ReservationApplicationLinkQuery = {
+  recurringReservation?: {
+    id: string;
+    allocatedTimeSlot?: {
+      id: string;
+      pk?: number | null;
+      reservationUnitOption: {
+        id: string;
+        pk?: number | null;
+        applicationSection: {
+          id: string;
+          pk?: number | null;
+          application: { id: string; pk?: number | null };
+        };
+      };
+    } | null;
+  } | null;
+};
+
+export type ReservationMetaFieldsFragment = {
+  numPersons?: number | null;
+  name?: string | null;
+  description?: string | null;
+  freeOfChargeReason?: string | null;
+  applyingForFreeOfCharge?: boolean | null;
+  reserveeFirstName?: string | null;
+  reserveeLastName?: string | null;
+  reserveeEmail?: string | null;
+  reserveePhone?: string | null;
+  reserveeType?: CustomerTypeChoice | null;
+  reserveeOrganisationName?: string | null;
+  reserveeId?: string | null;
+  reserveeIsUnregisteredAssociation?: boolean | null;
+  reserveeAddressStreet?: string | null;
+  reserveeAddressCity?: string | null;
+  reserveeAddressZip?: string | null;
+  billingFirstName?: string | null;
+  billingLastName?: string | null;
+  billingPhone?: string | null;
+  billingEmail?: string | null;
+  billingAddressStreet?: string | null;
+  billingAddressCity?: string | null;
+  billingAddressZip?: string | null;
+  ageGroup?: {
+    id: string;
+    minimum: number;
+    maximum?: number | null;
+    pk?: number | null;
+  } | null;
+  purpose?: { id: string; nameFi?: string | null; pk?: number | null } | null;
+  homeCity?: { id: string; nameFi?: string | null; pk?: number | null } | null;
+};
+
+export type CalendarReservationFragment = {
+  id: string;
+  name?: string | null;
+  reserveeName?: string | null;
+  pk?: number | null;
+  begin: string;
+  end: string;
+  state?: ReservationStateChoice | null;
+  type?: ReservationTypeChoice | null;
+  bufferTimeBefore: number;
+  bufferTimeAfter: number;
+  affectedReservationUnits?: Array<number | null> | null;
+  user?: { id: string; email: string } | null;
+};
+
+export type ReservationsByReservationUnitQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  pk: Scalars["Int"]["input"];
+  beginDate?: InputMaybe<Scalars["Date"]["input"]>;
+  endDate?: InputMaybe<Scalars["Date"]["input"]>;
+  state?: InputMaybe<
+    | Array<InputMaybe<ReservationStateChoice>>
+    | InputMaybe<ReservationStateChoice>
+  >;
+}>;
+
+export type ReservationsByReservationUnitQuery = {
+  reservationUnit?: {
+    id: string;
+    reservationSet?: Array<{
+      id: string;
+      name?: string | null;
+      reserveeName?: string | null;
+      pk?: number | null;
+      begin: string;
+      end: string;
+      state?: ReservationStateChoice | null;
+      type?: ReservationTypeChoice | null;
+      bufferTimeBefore: number;
+      bufferTimeAfter: number;
+      affectedReservationUnits?: Array<number | null> | null;
+      user?: { id: string; email: string } | null;
+    }> | null;
+  } | null;
+  affectingReservations?: Array<{
+    id: string;
+    name?: string | null;
+    reserveeName?: string | null;
+    pk?: number | null;
+    begin: string;
+    end: string;
+    state?: ReservationStateChoice | null;
+    type?: ReservationTypeChoice | null;
+    bufferTimeBefore: number;
+    bufferTimeAfter: number;
+    affectedReservationUnits?: Array<number | null> | null;
+    user?: { id: string; email: string } | null;
+  }> | null;
+};
+
+export type ReservationSpecialisationFragment = {
+  calendarUrl?: string | null;
+  price?: string | null;
+  taxPercentageValue?: string | null;
+  handlingDetails?: string | null;
+  bufferTimeBefore: number;
+  bufferTimeAfter: number;
+  paymentOrder: Array<{
+    id: string;
+    orderUuid?: string | null;
+    refundUuid?: string | null;
+  }>;
+  cancelReason?: { id: string; reasonFi?: string | null } | null;
+  denyReason?: { id: string; reasonFi?: string | null } | null;
+  user?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    pk?: number | null;
+  } | null;
+};
+
+export type ReservationQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ReservationQuery = {
+  reservation?: {
+    id: string;
+    pk?: number | null;
+    begin: string;
+    end: string;
+    createdAt?: string | null;
+    state?: ReservationStateChoice | null;
+    type?: ReservationTypeChoice | null;
+    isBlocked?: boolean | null;
+    workingMemo?: string | null;
+    reserveeName?: string | null;
+    bufferTimeBefore: number;
+    bufferTimeAfter: number;
+    calendarUrl?: string | null;
+    price?: string | null;
+    taxPercentageValue?: string | null;
+    handlingDetails?: string | null;
+    numPersons?: number | null;
+    name?: string | null;
+    description?: string | null;
+    freeOfChargeReason?: string | null;
+    applyingForFreeOfCharge?: boolean | null;
+    reserveeFirstName?: string | null;
+    reserveeLastName?: string | null;
+    reserveeEmail?: string | null;
+    reserveePhone?: string | null;
+    reserveeType?: CustomerTypeChoice | null;
+    reserveeOrganisationName?: string | null;
+    reserveeId?: string | null;
+    reserveeIsUnregisteredAssociation?: boolean | null;
+    reserveeAddressStreet?: string | null;
+    reserveeAddressCity?: string | null;
+    reserveeAddressZip?: string | null;
+    billingFirstName?: string | null;
+    billingLastName?: string | null;
+    billingPhone?: string | null;
+    billingEmail?: string | null;
+    billingAddressStreet?: string | null;
+    billingAddressCity?: string | null;
+    billingAddressZip?: string | null;
+    reservationUnit: Array<{
+      id: string;
+      pk?: number | null;
+      nameFi?: string | null;
+      maxPersons?: number | null;
+      bufferTimeBefore: number;
+      bufferTimeAfter: number;
+      reservationStartInterval: ReservationStartInterval;
+      authentication: Authentication;
+      termsOfUseFi?: string | null;
+      minPersons?: number | null;
+      unit?: { id: string; pk?: number | null; nameFi?: string | null } | null;
+      cancellationTerms?: {
+        id: string;
+        textFi?: string | null;
+        nameFi?: string | null;
+      } | null;
+      paymentTerms?: {
+        id: string;
+        textFi?: string | null;
+        nameFi?: string | null;
+      } | null;
+      pricingTerms?: {
+        id: string;
+        textFi?: string | null;
+        nameFi?: string | null;
+      } | null;
+      serviceSpecificTerms?: {
+        id: string;
+        textFi?: string | null;
+        nameFi?: string | null;
+      } | null;
+      pricings: Array<{
+        id: string;
+        begins: string;
+        priceUnit: PriceUnit;
+        pricingType?: PricingType | null;
+        lowestPrice: string;
+        highestPrice: string;
+        status: Status;
+        taxPercentage: { id: string; pk?: number | null; value: string };
+      }>;
+      metadataSet?: {
+        id: string;
+        requiredFields: Array<{ id: string; fieldName: string }>;
+        supportedFields: Array<{ id: string; fieldName: string }>;
+      } | null;
+    }>;
+    paymentOrder: Array<{
+      id: string;
+      status?: OrderStatus | null;
+      orderUuid?: string | null;
+      refundUuid?: string | null;
+    }>;
+    user?: {
+      id: string;
+      firstName: string;
+      lastName: string;
+      email: string;
+      pk?: number | null;
+    } | null;
+    recurringReservation?: {
+      id: string;
+      pk?: number | null;
+      beginDate?: string | null;
+      endDate?: string | null;
+      weekdays?: Array<number | null> | null;
+      name: string;
+      description: string;
+    } | null;
+    cancelReason?: { id: string; reasonFi?: string | null } | null;
+    denyReason?: { id: string; reasonFi?: string | null } | null;
+    ageGroup?: {
+      id: string;
+      minimum: number;
+      maximum?: number | null;
+      pk?: number | null;
+    } | null;
+    purpose?: { id: string; nameFi?: string | null; pk?: number | null } | null;
+    homeCity?: {
+      id: string;
+      nameFi?: string | null;
+      pk?: number | null;
+    } | null;
+  } | null;
+};
+
+export type RecurringReservationQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type RecurringReservationQuery = {
+  recurringReservation?: {
+    id: string;
+    pk?: number | null;
+    weekdays?: Array<number | null> | null;
+    beginDate?: string | null;
+    endDate?: string | null;
+    rejectedOccurrences: Array<{
+      id: string;
+      beginDatetime: string;
+      endDatetime: string;
+      rejectionReason: RejectionReadinessChoice;
+    }>;
+    reservations: Array<{
+      state?: ReservationStateChoice | null;
+      id: string;
+      pk?: number | null;
+      begin: string;
+      end: string;
+      type?: ReservationTypeChoice | null;
+      bufferTimeAfter: number;
+      bufferTimeBefore: number;
+      paymentOrder: Array<{ id: string; status?: OrderStatus | null }>;
+      reservationUnit: Array<{
+        id: string;
+        pk?: number | null;
+        bufferTimeBefore: number;
+        bufferTimeAfter: number;
+        reservationStartInterval: ReservationStartInterval;
+        unit?: { id: string; pk?: number | null } | null;
+      }>;
+      recurringReservation?: {
+        pk?: number | null;
+        id: string;
+        weekdays?: Array<number | null> | null;
+        beginDate?: string | null;
+        endDate?: string | null;
+      } | null;
+    }>;
+  } | null;
+};
+
+export type ApproveReservationMutationVariables = Exact<{
+  input: ReservationApproveMutationInput;
+}>;
+
+export type ApproveReservationMutation = {
+  approveReservation?: {
+    pk?: number | null;
+    state?: ReservationStateChoice | null;
+  } | null;
+};
+
+export type DenyReservationMutationVariables = Exact<{
+  input: ReservationDenyMutationInput;
+}>;
+
+export type DenyReservationMutation = {
+  denyReservation?: {
+    pk?: number | null;
+    state?: ReservationStateChoice | null;
+  } | null;
+};
+
+export type RefundReservationMutationVariables = Exact<{
+  input: ReservationRefundMutationInput;
+}>;
+
+export type RefundReservationMutation = {
+  refundReservation?: { pk?: number | null } | null;
+};
+
+export type RequireHandlingMutationVariables = Exact<{
+  input: ReservationRequiresHandlingMutationInput;
+}>;
+
+export type RequireHandlingMutation = {
+  requireHandlingForReservation?: {
+    pk?: number | null;
+    state?: ReservationStateChoice | null;
+  } | null;
+};
+
+export type ReservationUnitPricingFragment = {
+  pricings: Array<{
+    id: string;
+    begins: string;
+    priceUnit: PriceUnit;
+    pricingType?: PricingType | null;
+    lowestPrice: string;
+    highestPrice: string;
+    status: Status;
+    taxPercentage: { id: string; pk?: number | null; value: string };
+  }>;
+};
+
+export type ReservationRecurringFragment = {
+  recurringReservation?: {
+    id: string;
+    pk?: number | null;
+    beginDate?: string | null;
+    endDate?: string | null;
+    weekdays?: Array<number | null> | null;
+    name: string;
+    description: string;
+  } | null;
+};
+
+export type UpdateStaffReservationMutationVariables = Exact<{
+  input: ReservationStaffModifyMutationInput;
+  workingMemo: ReservationWorkingMemoMutationInput;
+}>;
+
+export type UpdateStaffReservationMutation = {
+  staffReservationModify?: { pk?: number | null } | null;
+  updateReservationWorkingMemo?: { workingMemo?: string | null } | null;
+};
+
+export type UpdateRecurringReservationMutationVariables = Exact<{
+  input: RecurringReservationUpdateMutationInput;
+}>;
+
+export type UpdateRecurringReservationMutation = {
+  updateRecurringReservation?: { pk?: number | null } | null;
+};
+
+export type ReservationsQueryVariables = Exact<{
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  orderBy?: InputMaybe<
+    | Array<InputMaybe<ReservationOrderingChoices>>
+    | InputMaybe<ReservationOrderingChoices>
+  >;
+  unit?: InputMaybe<
+    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | InputMaybe<Scalars["Int"]["input"]>
+  >;
+  reservationUnit?: InputMaybe<
+    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | InputMaybe<Scalars["Int"]["input"]>
+  >;
+  reservationUnitType?: InputMaybe<
+    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | InputMaybe<Scalars["Int"]["input"]>
+  >;
+  reservationType?: InputMaybe<
+    Array<InputMaybe<ReservationTypeChoice>> | InputMaybe<ReservationTypeChoice>
+  >;
+  state?: InputMaybe<
+    | Array<InputMaybe<ReservationStateChoice>>
+    | InputMaybe<ReservationStateChoice>
+  >;
+  orderStatus?: InputMaybe<
+    Array<InputMaybe<OrderStatusWithFree>> | InputMaybe<OrderStatusWithFree>
+  >;
+  textSearch?: InputMaybe<Scalars["String"]["input"]>;
+  priceLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  priceGte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  beginDate?: InputMaybe<Scalars["Date"]["input"]>;
+  endDate?: InputMaybe<Scalars["Date"]["input"]>;
+  createdAtGte?: InputMaybe<Scalars["Date"]["input"]>;
+  createdAtLte?: InputMaybe<Scalars["Date"]["input"]>;
+  applyingForFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
+  isRecurring?: InputMaybe<Scalars["Boolean"]["input"]>;
+}>;
+
+export type ReservationsQuery = {
+  reservations?: {
+    totalCount?: number | null;
+    edges: Array<{
+      node?: {
+        name?: string | null;
+        id: string;
+        pk?: number | null;
+        begin: string;
+        end: string;
+        createdAt?: string | null;
+        state?: ReservationStateChoice | null;
+        type?: ReservationTypeChoice | null;
+        isBlocked?: boolean | null;
+        workingMemo?: string | null;
+        reserveeName?: string | null;
+        bufferTimeBefore: number;
+        bufferTimeAfter: number;
+        reservationUnit: Array<{
+          id: string;
+          nameFi?: string | null;
+          unit?: { id: string; nameFi?: string | null } | null;
+        }>;
+        paymentOrder: Array<{ id: string; status?: OrderStatus | null }>;
+        user?: { id: string; firstName: string; lastName: string } | null;
+      } | null;
+    } | null>;
+    pageInfo: { endCursor?: string | null; hasNextPage: boolean };
+  } | null;
+};
+
+export type DeleteResourceMutationVariables = Exact<{
+  input: ResourceDeleteMutationInput;
+}>;
+
+export type DeleteResourceMutation = {
+  deleteResource?: { deleted?: boolean | null } | null;
+};
+
+export type DeleteSpaceMutationVariables = Exact<{
+  input: SpaceDeleteMutationInput;
+}>;
+
+export type DeleteSpaceMutation = {
+  deleteSpace?: { deleted?: boolean | null } | null;
+};
+
+export type UnitsQueryVariables = Exact<{
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  orderBy?: InputMaybe<
+    Array<InputMaybe<UnitOrderingChoices>> | InputMaybe<UnitOrderingChoices>
+  >;
+  nameFi?: InputMaybe<Scalars["String"]["input"]>;
+}>;
+
+export type UnitsQuery = {
+  units?: {
+    totalCount?: number | null;
+    edges: Array<{
+      node?: {
+        id: string;
+        nameFi?: string | null;
+        pk?: number | null;
+        unitGroups: Array<{ id: string; nameFi?: string | null }>;
+        reservationunitSet: Array<{ id: string; pk?: number | null }>;
+      } | null;
+    } | null>;
+    pageInfo: { endCursor?: string | null; hasNextPage: boolean };
+  } | null;
+};
+
+export type CreateResourceMutationVariables = Exact<{
+  input: ResourceCreateMutationInput;
+}>;
+
+export type CreateResourceMutation = {
+  createResource?: { pk?: number | null } | null;
+};
+
+export type UpdateResourceMutationVariables = Exact<{
+  input: ResourceUpdateMutationInput;
+}>;
+
+export type UpdateResourceMutation = {
+  updateResource?: { pk?: number | null } | null;
+};
+
+export type ResourceQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ResourceQuery = {
+  resource?: {
+    id: string;
+    pk?: number | null;
+    nameFi?: string | null;
+    nameSv?: string | null;
+    nameEn?: string | null;
+    space?: { id: string; pk?: number | null } | null;
+  } | null;
+};
+
+export type CreateSpaceMutationVariables = Exact<{
+  input: SpaceCreateMutationInput;
+}>;
+
+export type CreateSpaceMutation = {
+  createSpace?: { pk?: number | null } | null;
+};
+
+export type UpdateSpaceMutationVariables = Exact<{
+  input: SpaceUpdateMutationInput;
+}>;
+
+export type UpdateSpaceMutation = {
+  updateSpace?: { pk?: number | null } | null;
+};
+
+export type UnitSpacesQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type UnitSpacesQuery = {
+  unit?: {
+    id: string;
+    spaces: Array<{
+      id: string;
+      pk?: number | null;
+      nameFi?: string | null;
+      parent?: { id: string; pk?: number | null } | null;
+    }>;
+  } | null;
+};
+
+export type SpaceQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type SpaceQuery = {
+  space?: {
+    nameSv?: string | null;
+    nameEn?: string | null;
+    code: string;
+    id: string;
+    pk?: number | null;
+    nameFi?: string | null;
+    surfaceArea?: number | null;
+    maxPersons?: number | null;
+    unit?: {
+      id: string;
+      pk?: number | null;
+      nameFi?: string | null;
+      descriptionFi?: string | null;
+      location?: {
+        id: string;
+        addressStreetFi?: string | null;
+        addressZip: string;
+        addressCityFi?: string | null;
+      } | null;
+      spaces: Array<{ id: string; pk?: number | null; nameFi?: string | null }>;
+    } | null;
+    parent?: {
+      id: string;
+      pk?: number | null;
+      nameFi?: string | null;
+      parent?: {
+        id: string;
+        nameFi?: string | null;
+        parent?: { id: string; nameFi?: string | null } | null;
+      } | null;
+    } | null;
+  } | null;
+};
+
 export const ApplicantFragmentDoc = gql`
   fragment Applicant on ApplicationNode {
     applicantType
@@ -9234,78 +9184,58 @@ export const ApplicationAdminFragmentDoc = gql`
   ${ApplicantFragmentDoc}
   ${ApplicationSectionUiFragmentDoc}
 `;
-export const BannerNotificationCommonFragmentDoc = gql`
-  fragment BannerNotificationCommon on BannerNotificationNode {
-    id
-    level
-    activeFrom
-    message
-    messageEn
-    messageFi
-    messageSv
-  }
-`;
-export const BannerNotificationsAdminFragmentDoc = gql`
-  fragment BannerNotificationsAdmin on BannerNotificationNode {
-    pk
-    ...BannerNotificationCommon
-    name
-    target
-    activeUntil
-    draft
-    state
-  }
-  ${BannerNotificationCommonFragmentDoc}
-`;
-export const ChangeReservationTimeFragmentDoc = gql`
-  fragment ChangeReservationTime on ReservationNode {
+export const ReservationCommonFragmentDoc = gql`
+  fragment ReservationCommon on ReservationNode {
     id
     pk
     begin
     end
+    createdAt
+    state
     type
-    bufferTimeAfter
-    bufferTimeBefore
-    recurringReservation {
-      pk
+    isBlocked
+    workingMemo
+    reserveeName
+    paymentOrder {
       id
-      weekdays
-      beginDate
-      endDate
+      status
     }
+    user {
+      id
+      firstName
+      lastName
+    }
+    bufferTimeBefore
+    bufferTimeAfter
+  }
+`;
+export const ReservationUnitReservationsFragmentDoc = gql`
+  fragment ReservationUnitReservations on ReservationNode {
+    ...ReservationCommon
+    name
+    numPersons
+    calendarUrl
     reservationUnit {
       id
       pk
+      nameFi
       bufferTimeBefore
       bufferTimeAfter
-      reservationStartInterval
+      unit {
+        id
+        pk
+      }
     }
-  }
-`;
-export const PricingFieldsFragmentDoc = gql`
-  fragment PricingFields on ReservationUnitPricingNode {
-    id
-    begins
-    priceUnit
-    pricingType
-    lowestPrice
-    highestPrice
-    taxPercentage {
+    user {
       id
+      firstName
+      lastName
+      email
       pk
-      value
     }
-    status
+    affectedReservationUnits
   }
-`;
-export const ReservationUnitPricingFragmentDoc = gql`
-  fragment ReservationUnitPricing on ReservationUnitNode {
-    pricings {
-      id
-      ...PricingFields
-    }
-  }
-  ${PricingFieldsFragmentDoc}
+  ${ReservationCommonFragmentDoc}
 `;
 export const UnitNameFieldsFragmentDoc = gql`
   fragment UnitNameFields on UnitNode {
@@ -9371,71 +9301,101 @@ export const ReservationUnitFragmentDoc = gql`
   ${UnitNameFieldsFragmentDoc}
   ${MetadataSetsFragmentDoc}
 `;
-export const ReservationRecurringFragmentDoc = gql`
-  fragment ReservationRecurring on ReservationNode {
-    recurringReservation {
-      id
-      pk
-      beginDate
-      endDate
-      weekdays
-      name
-      description
-    }
+export const BannerNotificationCommonFragmentDoc = gql`
+  fragment BannerNotificationCommon on BannerNotificationNode {
+    id
+    level
+    activeFrom
+    message
+    messageEn
+    messageFi
+    messageSv
   }
 `;
-export const ReservationCommonFragmentDoc = gql`
-  fragment ReservationCommon on ReservationNode {
+export const BannerNotificationsAdminFragmentDoc = gql`
+  fragment BannerNotificationsAdmin on BannerNotificationNode {
+    pk
+    ...BannerNotificationCommon
+    name
+    target
+    activeUntil
+    draft
+    state
+  }
+  ${BannerNotificationCommonFragmentDoc}
+`;
+export const ChangeReservationTimeFragmentDoc = gql`
+  fragment ChangeReservationTime on ReservationNode {
     id
     pk
     begin
     end
-    createdAt
-    state
     type
-    isBlocked
-    workingMemo
-    reserveeName
-    paymentOrder {
-      id
-      status
-    }
-    user {
-      id
-      firstName
-      lastName
-    }
-    bufferTimeBefore
     bufferTimeAfter
-  }
-`;
-export const ReservationUnitReservationsFragmentDoc = gql`
-  fragment ReservationUnitReservations on ReservationNode {
-    ...ReservationCommon
-    name
-    numPersons
-    calendarUrl
+    bufferTimeBefore
+    recurringReservation {
+      pk
+      id
+      weekdays
+      beginDate
+      endDate
+    }
     reservationUnit {
       id
       pk
-      nameFi
       bufferTimeBefore
       bufferTimeAfter
+      reservationStartInterval
+    }
+  }
+`;
+export const ReservationsInIntervalFragmentDoc = gql`
+  fragment ReservationsInInterval on ReservationNode {
+    id
+    begin
+    end
+    bufferTimeBefore
+    bufferTimeAfter
+    type
+    affectedReservationUnits
+  }
+`;
+export const AllocatedTimeSlotFragmentDoc = gql`
+  fragment AllocatedTimeSlot on AllocatedTimeSlotNode {
+    id
+    beginTime
+    endTime
+    dayOfTheWeek
+  }
+`;
+export const ApplicationRoundBaseFragmentDoc = gql`
+  fragment ApplicationRoundBase on ApplicationRoundNode {
+    id
+    pk
+    nameFi
+    status
+    applicationPeriodBegin
+    applicationPeriodEnd
+  }
+`;
+export const ApplicationRoundAdminFragmentDoc = gql`
+  fragment ApplicationRoundAdmin on ApplicationRoundNode {
+    ...ApplicationRoundBase
+    applicationsCount
+    isSettingHandledAllowed
+    reservationCreationStatus
+    reservationUnits {
+      id
+      pk
+      nameFi
       unit {
         id
         pk
+        nameFi
       }
     }
-    user {
-      id
-      firstName
-      lastName
-      email
-      pk
-    }
-    affectedReservationUnits
   }
-  ${ReservationCommonFragmentDoc}
+  ${ApplicationRoundBaseFragmentDoc}
 `;
 export const ReserveeNameFieldsFragmentDoc = gql`
   fragment ReserveeNameFields on ReservationNode {
@@ -9542,53 +9502,43 @@ export const ReservationSpecialisationFragmentDoc = gql`
     bufferTimeAfter
   }
 `;
-export const ReservationsInIntervalFragmentDoc = gql`
-  fragment ReservationsInInterval on ReservationNode {
+export const PricingFieldsFragmentDoc = gql`
+  fragment PricingFields on ReservationUnitPricingNode {
     id
-    begin
-    end
-    bufferTimeBefore
-    bufferTimeAfter
-    type
-    affectedReservationUnits
-  }
-`;
-export const AllocatedTimeSlotFragmentDoc = gql`
-  fragment AllocatedTimeSlot on AllocatedTimeSlotNode {
-    id
-    beginTime
-    endTime
-    dayOfTheWeek
-  }
-`;
-export const ApplicationRoundBaseFragmentDoc = gql`
-  fragment ApplicationRoundBase on ApplicationRoundNode {
-    id
-    pk
-    nameFi
-    status
-    applicationPeriodBegin
-    applicationPeriodEnd
-  }
-`;
-export const ApplicationRoundAdminFragmentDoc = gql`
-  fragment ApplicationRoundAdmin on ApplicationRoundNode {
-    ...ApplicationRoundBase
-    applicationsCount
-    isSettingHandledAllowed
-    reservationCreationStatus
-    reservationUnits {
+    begins
+    priceUnit
+    pricingType
+    lowestPrice
+    highestPrice
+    taxPercentage {
       id
       pk
-      nameFi
-      unit {
-        id
-        pk
-        nameFi
-      }
+      value
+    }
+    status
+  }
+`;
+export const ReservationUnitPricingFragmentDoc = gql`
+  fragment ReservationUnitPricing on ReservationUnitNode {
+    pricings {
+      id
+      ...PricingFields
     }
   }
-  ${ApplicationRoundBaseFragmentDoc}
+  ${PricingFieldsFragmentDoc}
+`;
+export const ReservationRecurringFragmentDoc = gql`
+  fragment ReservationRecurring on ReservationNode {
+    recurringReservation {
+      id
+      pk
+      beginDate
+      endDate
+      weekdays
+      name
+      description
+    }
+  }
 `;
 export const BannerNotificationsListAllDocument = gql`
   query BannerNotificationsListAll {
@@ -9913,201 +9863,6 @@ export type TermsOfUseQueryResult = Apollo.QueryResult<
   TermsOfUseQuery,
   TermsOfUseQueryVariables
 >;
-export const SpacesDocument = gql`
-  query Spaces {
-    spaces(onlyWithPermission: true) {
-      edges {
-        node {
-          ...SpaceCommonFields
-          unit {
-            id
-            pk
-            nameFi
-          }
-        }
-      }
-    }
-  }
-  ${SpaceCommonFieldsFragmentDoc}
-`;
-
-/**
- * __useSpacesQuery__
- *
- * To run a query within a React component, call `useSpacesQuery` and pass it any options that fit your needs.
- * When your component renders, `useSpacesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useSpacesQuery({
- *   variables: {
- *   },
- * });
- */
-export function useSpacesQuery(
-  baseOptions?: Apollo.QueryHookOptions<SpacesQuery, SpacesQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<SpacesQuery, SpacesQueryVariables>(
-    SpacesDocument,
-    options
-  );
-}
-export function useSpacesLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<SpacesQuery, SpacesQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<SpacesQuery, SpacesQueryVariables>(
-    SpacesDocument,
-    options
-  );
-}
-export function useSpacesSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    SpacesQuery,
-    SpacesQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<SpacesQuery, SpacesQueryVariables>(
-    SpacesDocument,
-    options
-  );
-}
-export type SpacesQueryHookResult = ReturnType<typeof useSpacesQuery>;
-export type SpacesLazyQueryHookResult = ReturnType<typeof useSpacesLazyQuery>;
-export type SpacesSuspenseQueryHookResult = ReturnType<
-  typeof useSpacesSuspenseQuery
->;
-export type SpacesQueryResult = Apollo.QueryResult<
-  SpacesQuery,
-  SpacesQueryVariables
->;
-export const ResourcesDocument = gql`
-  query Resources {
-    resources(onlyWithPermission: true) {
-      edges {
-        node {
-          locationType
-          ...ResourceFields
-        }
-      }
-    }
-  }
-  ${ResourceFieldsFragmentDoc}
-`;
-
-/**
- * __useResourcesQuery__
- *
- * To run a query within a React component, call `useResourcesQuery` and pass it any options that fit your needs.
- * When your component renders, `useResourcesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useResourcesQuery({
- *   variables: {
- *   },
- * });
- */
-export function useResourcesQuery(
-  baseOptions?: Apollo.QueryHookOptions<ResourcesQuery, ResourcesQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<ResourcesQuery, ResourcesQueryVariables>(
-    ResourcesDocument,
-    options
-  );
-}
-export function useResourcesLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    ResourcesQuery,
-    ResourcesQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<ResourcesQuery, ResourcesQueryVariables>(
-    ResourcesDocument,
-    options
-  );
-}
-export function useResourcesSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    ResourcesQuery,
-    ResourcesQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<ResourcesQuery, ResourcesQueryVariables>(
-    ResourcesDocument,
-    options
-  );
-}
-export type ResourcesQueryHookResult = ReturnType<typeof useResourcesQuery>;
-export type ResourcesLazyQueryHookResult = ReturnType<
-  typeof useResourcesLazyQuery
->;
-export type ResourcesSuspenseQueryHookResult = ReturnType<
-  typeof useResourcesSuspenseQuery
->;
-export type ResourcesQueryResult = Apollo.QueryResult<
-  ResourcesQuery,
-  ResourcesQueryVariables
->;
-export const DeleteSpaceDocument = gql`
-  mutation DeleteSpace($input: SpaceDeleteMutationInput!) {
-    deleteSpace(input: $input) {
-      deleted
-    }
-  }
-`;
-export type DeleteSpaceMutationFn = Apollo.MutationFunction<
-  DeleteSpaceMutation,
-  DeleteSpaceMutationVariables
->;
-
-/**
- * __useDeleteSpaceMutation__
- *
- * To run a mutation, you first call `useDeleteSpaceMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useDeleteSpaceMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [deleteSpaceMutation, { data, loading, error }] = useDeleteSpaceMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useDeleteSpaceMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    DeleteSpaceMutation,
-    DeleteSpaceMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<DeleteSpaceMutation, DeleteSpaceMutationVariables>(
-    DeleteSpaceDocument,
-    options
-  );
-}
-export type DeleteSpaceMutationHookResult = ReturnType<
-  typeof useDeleteSpaceMutation
->;
-export type DeleteSpaceMutationResult =
-  Apollo.MutationResult<DeleteSpaceMutation>;
-export type DeleteSpaceMutationOptions = Apollo.BaseMutationOptions<
-  DeleteSpaceMutation,
-  DeleteSpaceMutationVariables
->;
 export const UnitDocument = gql`
   query Unit($id: ID!) {
     unit(id: $id) {
@@ -10286,56 +10041,6 @@ export type UnitWithSpacesAndResourcesSuspenseQueryHookResult = ReturnType<
 export type UnitWithSpacesAndResourcesQueryResult = Apollo.QueryResult<
   UnitWithSpacesAndResourcesQuery,
   UnitWithSpacesAndResourcesQueryVariables
->;
-export const DeleteResourceDocument = gql`
-  mutation DeleteResource($input: ResourceDeleteMutationInput!) {
-    deleteResource(input: $input) {
-      deleted
-    }
-  }
-`;
-export type DeleteResourceMutationFn = Apollo.MutationFunction<
-  DeleteResourceMutation,
-  DeleteResourceMutationVariables
->;
-
-/**
- * __useDeleteResourceMutation__
- *
- * To run a mutation, you first call `useDeleteResourceMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useDeleteResourceMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [deleteResourceMutation, { data, loading, error }] = useDeleteResourceMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useDeleteResourceMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    DeleteResourceMutation,
-    DeleteResourceMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    DeleteResourceMutation,
-    DeleteResourceMutationVariables
-  >(DeleteResourceDocument, options);
-}
-export type DeleteResourceMutationHookResult = ReturnType<
-  typeof useDeleteResourceMutation
->;
-export type DeleteResourceMutationResult =
-  Apollo.MutationResult<DeleteResourceMutation>;
-export type DeleteResourceMutationOptions = Apollo.BaseMutationOptions<
-  DeleteResourceMutation,
-  DeleteResourceMutationVariables
 >;
 export const HandlingDataDocument = gql`
   query HandlingData($beginDate: Date!, $state: [ReservationStateChoice]!) {
@@ -10764,709 +10469,61 @@ export type ApplicationDateOfBirthQueryResult = Apollo.QueryResult<
   ApplicationDateOfBirthQuery,
   ApplicationDateOfBirthQueryVariables
 >;
-export const CreateResourceDocument = gql`
-  mutation CreateResource($input: ResourceCreateMutationInput!) {
-    createResource(input: $input) {
-      pk
-    }
-  }
-`;
-export type CreateResourceMutationFn = Apollo.MutationFunction<
-  CreateResourceMutation,
-  CreateResourceMutationVariables
->;
-
-/**
- * __useCreateResourceMutation__
- *
- * To run a mutation, you first call `useCreateResourceMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateResourceMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [createResourceMutation, { data, loading, error }] = useCreateResourceMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useCreateResourceMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    CreateResourceMutation,
-    CreateResourceMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    CreateResourceMutation,
-    CreateResourceMutationVariables
-  >(CreateResourceDocument, options);
-}
-export type CreateResourceMutationHookResult = ReturnType<
-  typeof useCreateResourceMutation
->;
-export type CreateResourceMutationResult =
-  Apollo.MutationResult<CreateResourceMutation>;
-export type CreateResourceMutationOptions = Apollo.BaseMutationOptions<
-  CreateResourceMutation,
-  CreateResourceMutationVariables
->;
-export const UpdateResourceDocument = gql`
-  mutation UpdateResource($input: ResourceUpdateMutationInput!) {
-    updateResource(input: $input) {
-      pk
-    }
-  }
-`;
-export type UpdateResourceMutationFn = Apollo.MutationFunction<
-  UpdateResourceMutation,
-  UpdateResourceMutationVariables
->;
-
-/**
- * __useUpdateResourceMutation__
- *
- * To run a mutation, you first call `useUpdateResourceMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUpdateResourceMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [updateResourceMutation, { data, loading, error }] = useUpdateResourceMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useUpdateResourceMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    UpdateResourceMutation,
-    UpdateResourceMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    UpdateResourceMutation,
-    UpdateResourceMutationVariables
-  >(UpdateResourceDocument, options);
-}
-export type UpdateResourceMutationHookResult = ReturnType<
-  typeof useUpdateResourceMutation
->;
-export type UpdateResourceMutationResult =
-  Apollo.MutationResult<UpdateResourceMutation>;
-export type UpdateResourceMutationOptions = Apollo.BaseMutationOptions<
-  UpdateResourceMutation,
-  UpdateResourceMutationVariables
->;
-export const ResourceDocument = gql`
-  query Resource($id: ID!) {
-    resource(id: $id) {
-      id
-      pk
-      nameFi
-      nameSv
-      nameEn
-      space {
-        id
-        pk
-      }
-    }
-  }
-`;
-
-/**
- * __useResourceQuery__
- *
- * To run a query within a React component, call `useResourceQuery` and pass it any options that fit your needs.
- * When your component renders, `useResourceQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useResourceQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useResourceQuery(
-  baseOptions: Apollo.QueryHookOptions<ResourceQuery, ResourceQueryVariables> &
-    ({ variables: ResourceQueryVariables; skip?: boolean } | { skip: boolean })
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<ResourceQuery, ResourceQueryVariables>(
-    ResourceDocument,
-    options
-  );
-}
-export function useResourceLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    ResourceQuery,
-    ResourceQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<ResourceQuery, ResourceQueryVariables>(
-    ResourceDocument,
-    options
-  );
-}
-export function useResourceSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    ResourceQuery,
-    ResourceQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<ResourceQuery, ResourceQueryVariables>(
-    ResourceDocument,
-    options
-  );
-}
-export type ResourceQueryHookResult = ReturnType<typeof useResourceQuery>;
-export type ResourceLazyQueryHookResult = ReturnType<
-  typeof useResourceLazyQuery
->;
-export type ResourceSuspenseQueryHookResult = ReturnType<
-  typeof useResourceSuspenseQuery
->;
-export type ResourceQueryResult = Apollo.QueryResult<
-  ResourceQuery,
-  ResourceQueryVariables
->;
-export const CreateSpaceDocument = gql`
-  mutation CreateSpace($input: SpaceCreateMutationInput!) {
-    createSpace(input: $input) {
-      pk
-    }
-  }
-`;
-export type CreateSpaceMutationFn = Apollo.MutationFunction<
-  CreateSpaceMutation,
-  CreateSpaceMutationVariables
->;
-
-/**
- * __useCreateSpaceMutation__
- *
- * To run a mutation, you first call `useCreateSpaceMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateSpaceMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [createSpaceMutation, { data, loading, error }] = useCreateSpaceMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useCreateSpaceMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    CreateSpaceMutation,
-    CreateSpaceMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<CreateSpaceMutation, CreateSpaceMutationVariables>(
-    CreateSpaceDocument,
-    options
-  );
-}
-export type CreateSpaceMutationHookResult = ReturnType<
-  typeof useCreateSpaceMutation
->;
-export type CreateSpaceMutationResult =
-  Apollo.MutationResult<CreateSpaceMutation>;
-export type CreateSpaceMutationOptions = Apollo.BaseMutationOptions<
-  CreateSpaceMutation,
-  CreateSpaceMutationVariables
->;
-export const UpdateSpaceDocument = gql`
-  mutation UpdateSpace($input: SpaceUpdateMutationInput!) {
-    updateSpace(input: $input) {
-      pk
-    }
-  }
-`;
-export type UpdateSpaceMutationFn = Apollo.MutationFunction<
-  UpdateSpaceMutation,
-  UpdateSpaceMutationVariables
->;
-
-/**
- * __useUpdateSpaceMutation__
- *
- * To run a mutation, you first call `useUpdateSpaceMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUpdateSpaceMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [updateSpaceMutation, { data, loading, error }] = useUpdateSpaceMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useUpdateSpaceMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    UpdateSpaceMutation,
-    UpdateSpaceMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<UpdateSpaceMutation, UpdateSpaceMutationVariables>(
-    UpdateSpaceDocument,
-    options
-  );
-}
-export type UpdateSpaceMutationHookResult = ReturnType<
-  typeof useUpdateSpaceMutation
->;
-export type UpdateSpaceMutationResult =
-  Apollo.MutationResult<UpdateSpaceMutation>;
-export type UpdateSpaceMutationOptions = Apollo.BaseMutationOptions<
-  UpdateSpaceMutation,
-  UpdateSpaceMutationVariables
->;
-export const UnitSpacesDocument = gql`
-  query UnitSpaces($id: ID!) {
-    unit(id: $id) {
-      id
-      spaces {
-        id
-        pk
-        nameFi
-        parent {
-          id
-          pk
-        }
-      }
-    }
-  }
-`;
-
-/**
- * __useUnitSpacesQuery__
- *
- * To run a query within a React component, call `useUnitSpacesQuery` and pass it any options that fit your needs.
- * When your component renders, `useUnitSpacesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useUnitSpacesQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useUnitSpacesQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    UnitSpacesQuery,
-    UnitSpacesQueryVariables
-  > &
-    (
-      | { variables: UnitSpacesQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    )
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<UnitSpacesQuery, UnitSpacesQueryVariables>(
-    UnitSpacesDocument,
-    options
-  );
-}
-export function useUnitSpacesLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    UnitSpacesQuery,
-    UnitSpacesQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<UnitSpacesQuery, UnitSpacesQueryVariables>(
-    UnitSpacesDocument,
-    options
-  );
-}
-export function useUnitSpacesSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    UnitSpacesQuery,
-    UnitSpacesQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<UnitSpacesQuery, UnitSpacesQueryVariables>(
-    UnitSpacesDocument,
-    options
-  );
-}
-export type UnitSpacesQueryHookResult = ReturnType<typeof useUnitSpacesQuery>;
-export type UnitSpacesLazyQueryHookResult = ReturnType<
-  typeof useUnitSpacesLazyQuery
->;
-export type UnitSpacesSuspenseQueryHookResult = ReturnType<
-  typeof useUnitSpacesSuspenseQuery
->;
-export type UnitSpacesQueryResult = Apollo.QueryResult<
-  UnitSpacesQuery,
-  UnitSpacesQueryVariables
->;
-export const SpaceDocument = gql`
-  query Space($id: ID!) {
-    space(id: $id) {
-      ...SpaceCommonFields
-      nameSv
-      nameEn
-      code
-      unit {
-        id
-        pk
-        nameFi
-        descriptionFi
-        location {
-          ...LocationFields
-        }
-        spaces {
-          id
-          pk
-          nameFi
-        }
-      }
-      parent {
-        id
-        parent {
-          id
-          nameFi
-          parent {
-            id
-            nameFi
-          }
-        }
-      }
-    }
-  }
-  ${SpaceCommonFieldsFragmentDoc}
-  ${LocationFieldsFragmentDoc}
-`;
-
-/**
- * __useSpaceQuery__
- *
- * To run a query within a React component, call `useSpaceQuery` and pass it any options that fit your needs.
- * When your component renders, `useSpaceQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useSpaceQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useSpaceQuery(
-  baseOptions: Apollo.QueryHookOptions<SpaceQuery, SpaceQueryVariables> &
-    ({ variables: SpaceQueryVariables; skip?: boolean } | { skip: boolean })
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<SpaceQuery, SpaceQueryVariables>(
-    SpaceDocument,
-    options
-  );
-}
-export function useSpaceLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<SpaceQuery, SpaceQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<SpaceQuery, SpaceQueryVariables>(
-    SpaceDocument,
-    options
-  );
-}
-export function useSpaceSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<SpaceQuery, SpaceQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<SpaceQuery, SpaceQueryVariables>(
-    SpaceDocument,
-    options
-  );
-}
-export type SpaceQueryHookResult = ReturnType<typeof useSpaceQuery>;
-export type SpaceLazyQueryHookResult = ReturnType<typeof useSpaceLazyQuery>;
-export type SpaceSuspenseQueryHookResult = ReturnType<
-  typeof useSpaceSuspenseQuery
->;
-export type SpaceQueryResult = Apollo.QueryResult<
-  SpaceQuery,
-  SpaceQueryVariables
->;
-export const UnitsDocument = gql`
-  query Units(
-    $first: Int
-    $after: String
-    $orderBy: [UnitOrderingChoices]
-    $nameFi: String
+export const StaffAdjustReservationTimeDocument = gql`
+  mutation StaffAdjustReservationTime(
+    $input: ReservationStaffAdjustTimeMutationInput!
   ) {
-    units(
-      first: $first
-      after: $after
-      orderBy: $orderBy
-      nameFi: $nameFi
-      onlyWithPermission: true
-    ) {
-      edges {
-        node {
-          id
-          nameFi
-          pk
-          unitGroups {
-            id
-            nameFi
-          }
-          reservationunitSet {
-            id
-            pk
-          }
-        }
-      }
-      pageInfo {
-        endCursor
-        hasNextPage
-      }
-      totalCount
-    }
-  }
-`;
-
-/**
- * __useUnitsQuery__
- *
- * To run a query within a React component, call `useUnitsQuery` and pass it any options that fit your needs.
- * When your component renders, `useUnitsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useUnitsQuery({
- *   variables: {
- *      first: // value for 'first'
- *      after: // value for 'after'
- *      orderBy: // value for 'orderBy'
- *      nameFi: // value for 'nameFi'
- *   },
- * });
- */
-export function useUnitsQuery(
-  baseOptions?: Apollo.QueryHookOptions<UnitsQuery, UnitsQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<UnitsQuery, UnitsQueryVariables>(
-    UnitsDocument,
-    options
-  );
-}
-export function useUnitsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<UnitsQuery, UnitsQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<UnitsQuery, UnitsQueryVariables>(
-    UnitsDocument,
-    options
-  );
-}
-export function useUnitsSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<UnitsQuery, UnitsQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<UnitsQuery, UnitsQueryVariables>(
-    UnitsDocument,
-    options
-  );
-}
-export type UnitsQueryHookResult = ReturnType<typeof useUnitsQuery>;
-export type UnitsLazyQueryHookResult = ReturnType<typeof useUnitsLazyQuery>;
-export type UnitsSuspenseQueryHookResult = ReturnType<
-  typeof useUnitsSuspenseQuery
->;
-export type UnitsQueryResult = Apollo.QueryResult<
-  UnitsQuery,
-  UnitsQueryVariables
->;
-export const BannerNotificationCreateDocument = gql`
-  mutation BannerNotificationCreate(
-    $input: BannerNotificationCreateMutationInput!
-  ) {
-    createBannerNotification(input: $input) {
+    staffAdjustReservationTime(input: $input) {
       pk
+      begin
+      end
+      state
     }
   }
 `;
-export type BannerNotificationCreateMutationFn = Apollo.MutationFunction<
-  BannerNotificationCreateMutation,
-  BannerNotificationCreateMutationVariables
+export type StaffAdjustReservationTimeMutationFn = Apollo.MutationFunction<
+  StaffAdjustReservationTimeMutation,
+  StaffAdjustReservationTimeMutationVariables
 >;
 
 /**
- * __useBannerNotificationCreateMutation__
+ * __useStaffAdjustReservationTimeMutation__
  *
- * To run a mutation, you first call `useBannerNotificationCreateMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useBannerNotificationCreateMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useStaffAdjustReservationTimeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useStaffAdjustReservationTimeMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [bannerNotificationCreateMutation, { data, loading, error }] = useBannerNotificationCreateMutation({
+ * const [staffAdjustReservationTimeMutation, { data, loading, error }] = useStaffAdjustReservationTimeMutation({
  *   variables: {
  *      input: // value for 'input'
  *   },
  * });
  */
-export function useBannerNotificationCreateMutation(
+export function useStaffAdjustReservationTimeMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    BannerNotificationCreateMutation,
-    BannerNotificationCreateMutationVariables
+    StaffAdjustReservationTimeMutation,
+    StaffAdjustReservationTimeMutationVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
-    BannerNotificationCreateMutation,
-    BannerNotificationCreateMutationVariables
-  >(BannerNotificationCreateDocument, options);
+    StaffAdjustReservationTimeMutation,
+    StaffAdjustReservationTimeMutationVariables
+  >(StaffAdjustReservationTimeDocument, options);
 }
-export type BannerNotificationCreateMutationHookResult = ReturnType<
-  typeof useBannerNotificationCreateMutation
+export type StaffAdjustReservationTimeMutationHookResult = ReturnType<
+  typeof useStaffAdjustReservationTimeMutation
 >;
-export type BannerNotificationCreateMutationResult =
-  Apollo.MutationResult<BannerNotificationCreateMutation>;
-export type BannerNotificationCreateMutationOptions =
+export type StaffAdjustReservationTimeMutationResult =
+  Apollo.MutationResult<StaffAdjustReservationTimeMutation>;
+export type StaffAdjustReservationTimeMutationOptions =
   Apollo.BaseMutationOptions<
-    BannerNotificationCreateMutation,
-    BannerNotificationCreateMutationVariables
-  >;
-export const BannerNotificationUpdateDocument = gql`
-  mutation BannerNotificationUpdate(
-    $input: BannerNotificationUpdateMutationInput!
-  ) {
-    updateBannerNotification(input: $input) {
-      pk
-    }
-  }
-`;
-export type BannerNotificationUpdateMutationFn = Apollo.MutationFunction<
-  BannerNotificationUpdateMutation,
-  BannerNotificationUpdateMutationVariables
->;
-
-/**
- * __useBannerNotificationUpdateMutation__
- *
- * To run a mutation, you first call `useBannerNotificationUpdateMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useBannerNotificationUpdateMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [bannerNotificationUpdateMutation, { data, loading, error }] = useBannerNotificationUpdateMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useBannerNotificationUpdateMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    BannerNotificationUpdateMutation,
-    BannerNotificationUpdateMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    BannerNotificationUpdateMutation,
-    BannerNotificationUpdateMutationVariables
-  >(BannerNotificationUpdateDocument, options);
-}
-export type BannerNotificationUpdateMutationHookResult = ReturnType<
-  typeof useBannerNotificationUpdateMutation
->;
-export type BannerNotificationUpdateMutationResult =
-  Apollo.MutationResult<BannerNotificationUpdateMutation>;
-export type BannerNotificationUpdateMutationOptions =
-  Apollo.BaseMutationOptions<
-    BannerNotificationUpdateMutation,
-    BannerNotificationUpdateMutationVariables
-  >;
-export const BannerNotificationDeleteDocument = gql`
-  mutation BannerNotificationDelete(
-    $input: BannerNotificationDeleteMutationInput!
-  ) {
-    deleteBannerNotification(input: $input) {
-      deleted
-    }
-  }
-`;
-export type BannerNotificationDeleteMutationFn = Apollo.MutationFunction<
-  BannerNotificationDeleteMutation,
-  BannerNotificationDeleteMutationVariables
->;
-
-/**
- * __useBannerNotificationDeleteMutation__
- *
- * To run a mutation, you first call `useBannerNotificationDeleteMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useBannerNotificationDeleteMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [bannerNotificationDeleteMutation, { data, loading, error }] = useBannerNotificationDeleteMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useBannerNotificationDeleteMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    BannerNotificationDeleteMutation,
-    BannerNotificationDeleteMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    BannerNotificationDeleteMutation,
-    BannerNotificationDeleteMutationVariables
-  >(BannerNotificationDeleteDocument, options);
-}
-export type BannerNotificationDeleteMutationHookResult = ReturnType<
-  typeof useBannerNotificationDeleteMutation
->;
-export type BannerNotificationDeleteMutationResult =
-  Apollo.MutationResult<BannerNotificationDeleteMutation>;
-export type BannerNotificationDeleteMutationOptions =
-  Apollo.BaseMutationOptions<
-    BannerNotificationDeleteMutation,
-    BannerNotificationDeleteMutationVariables
+    StaffAdjustReservationTimeMutation,
+    StaffAdjustReservationTimeMutationVariables
   >;
 export const UpdateReservationWorkingMemoDocument = gql`
   mutation UpdateReservationWorkingMemo($pk: Int!, $workingMemo: String!) {
@@ -11576,1124 +10633,6 @@ export type UpdateApplicationWorkingMemoMutationOptions =
     UpdateApplicationWorkingMemoMutation,
     UpdateApplicationWorkingMemoMutationVariables
   >;
-export const SearchReservationUnitsDocument = gql`
-  query SearchReservationUnits(
-    $after: String
-    $first: Int
-    $nameFi: String
-    $maxPersonsGte: Decimal
-    $maxPersonsLte: Decimal
-    $surfaceAreaGte: Decimal
-    $surfaceAreaLte: Decimal
-    $unit: [Int]
-    $reservationUnitType: [Int]
-    $orderBy: [ReservationUnitOrderingChoices]
-    $publishingState: [ReservationUnitPublishingState]
-  ) {
-    reservationUnits(
-      first: $first
-      after: $after
-      orderBy: $orderBy
-      nameFi: $nameFi
-      maxPersonsGte: $maxPersonsGte
-      minPersonsGte: $maxPersonsGte
-      maxPersonsLte: $maxPersonsLte
-      minPersonsLte: $maxPersonsLte
-      surfaceAreaGte: $surfaceAreaGte
-      surfaceAreaLte: $surfaceAreaLte
-      unit: $unit
-      reservationUnitType: $reservationUnitType
-      publishingState: $publishingState
-      onlyWithPermission: true
-    ) {
-      edges {
-        node {
-          id
-          pk
-          nameFi
-          unit {
-            id
-            nameFi
-            pk
-          }
-          reservationUnitType {
-            id
-            nameFi
-          }
-          maxPersons
-          surfaceArea
-          publishingState
-          reservationState
-        }
-      }
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
-      totalCount
-    }
-  }
-`;
-
-/**
- * __useSearchReservationUnitsQuery__
- *
- * To run a query within a React component, call `useSearchReservationUnitsQuery` and pass it any options that fit your needs.
- * When your component renders, `useSearchReservationUnitsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useSearchReservationUnitsQuery({
- *   variables: {
- *      after: // value for 'after'
- *      first: // value for 'first'
- *      nameFi: // value for 'nameFi'
- *      maxPersonsGte: // value for 'maxPersonsGte'
- *      maxPersonsLte: // value for 'maxPersonsLte'
- *      surfaceAreaGte: // value for 'surfaceAreaGte'
- *      surfaceAreaLte: // value for 'surfaceAreaLte'
- *      unit: // value for 'unit'
- *      reservationUnitType: // value for 'reservationUnitType'
- *      orderBy: // value for 'orderBy'
- *      publishingState: // value for 'publishingState'
- *   },
- * });
- */
-export function useSearchReservationUnitsQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    SearchReservationUnitsQuery,
-    SearchReservationUnitsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    SearchReservationUnitsQuery,
-    SearchReservationUnitsQueryVariables
-  >(SearchReservationUnitsDocument, options);
-}
-export function useSearchReservationUnitsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    SearchReservationUnitsQuery,
-    SearchReservationUnitsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    SearchReservationUnitsQuery,
-    SearchReservationUnitsQueryVariables
-  >(SearchReservationUnitsDocument, options);
-}
-export function useSearchReservationUnitsSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    SearchReservationUnitsQuery,
-    SearchReservationUnitsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    SearchReservationUnitsQuery,
-    SearchReservationUnitsQueryVariables
-  >(SearchReservationUnitsDocument, options);
-}
-export type SearchReservationUnitsQueryHookResult = ReturnType<
-  typeof useSearchReservationUnitsQuery
->;
-export type SearchReservationUnitsLazyQueryHookResult = ReturnType<
-  typeof useSearchReservationUnitsLazyQuery
->;
-export type SearchReservationUnitsSuspenseQueryHookResult = ReturnType<
-  typeof useSearchReservationUnitsSuspenseQuery
->;
-export type SearchReservationUnitsQueryResult = Apollo.QueryResult<
-  SearchReservationUnitsQuery,
-  SearchReservationUnitsQueryVariables
->;
-export const StaffAdjustReservationTimeDocument = gql`
-  mutation StaffAdjustReservationTime(
-    $input: ReservationStaffAdjustTimeMutationInput!
-  ) {
-    staffAdjustReservationTime(input: $input) {
-      pk
-      begin
-      end
-      state
-    }
-  }
-`;
-export type StaffAdjustReservationTimeMutationFn = Apollo.MutationFunction<
-  StaffAdjustReservationTimeMutation,
-  StaffAdjustReservationTimeMutationVariables
->;
-
-/**
- * __useStaffAdjustReservationTimeMutation__
- *
- * To run a mutation, you first call `useStaffAdjustReservationTimeMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useStaffAdjustReservationTimeMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [staffAdjustReservationTimeMutation, { data, loading, error }] = useStaffAdjustReservationTimeMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useStaffAdjustReservationTimeMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    StaffAdjustReservationTimeMutation,
-    StaffAdjustReservationTimeMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    StaffAdjustReservationTimeMutation,
-    StaffAdjustReservationTimeMutationVariables
-  >(StaffAdjustReservationTimeDocument, options);
-}
-export type StaffAdjustReservationTimeMutationHookResult = ReturnType<
-  typeof useStaffAdjustReservationTimeMutation
->;
-export type StaffAdjustReservationTimeMutationResult =
-  Apollo.MutationResult<StaffAdjustReservationTimeMutation>;
-export type StaffAdjustReservationTimeMutationOptions =
-  Apollo.BaseMutationOptions<
-    StaffAdjustReservationTimeMutation,
-    StaffAdjustReservationTimeMutationVariables
-  >;
-export const UpdateStaffReservationDocument = gql`
-  mutation UpdateStaffReservation(
-    $input: ReservationStaffModifyMutationInput!
-    $workingMemo: ReservationWorkingMemoMutationInput!
-  ) {
-    staffReservationModify(input: $input) {
-      pk
-    }
-    updateReservationWorkingMemo(input: $workingMemo) {
-      workingMemo
-    }
-  }
-`;
-export type UpdateStaffReservationMutationFn = Apollo.MutationFunction<
-  UpdateStaffReservationMutation,
-  UpdateStaffReservationMutationVariables
->;
-
-/**
- * __useUpdateStaffReservationMutation__
- *
- * To run a mutation, you first call `useUpdateStaffReservationMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUpdateStaffReservationMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [updateStaffReservationMutation, { data, loading, error }] = useUpdateStaffReservationMutation({
- *   variables: {
- *      input: // value for 'input'
- *      workingMemo: // value for 'workingMemo'
- *   },
- * });
- */
-export function useUpdateStaffReservationMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    UpdateStaffReservationMutation,
-    UpdateStaffReservationMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    UpdateStaffReservationMutation,
-    UpdateStaffReservationMutationVariables
-  >(UpdateStaffReservationDocument, options);
-}
-export type UpdateStaffReservationMutationHookResult = ReturnType<
-  typeof useUpdateStaffReservationMutation
->;
-export type UpdateStaffReservationMutationResult =
-  Apollo.MutationResult<UpdateStaffReservationMutation>;
-export type UpdateStaffReservationMutationOptions = Apollo.BaseMutationOptions<
-  UpdateStaffReservationMutation,
-  UpdateStaffReservationMutationVariables
->;
-export const UpdateRecurringReservationDocument = gql`
-  mutation UpdateRecurringReservation(
-    $input: RecurringReservationUpdateMutationInput!
-  ) {
-    updateRecurringReservation(input: $input) {
-      pk
-    }
-  }
-`;
-export type UpdateRecurringReservationMutationFn = Apollo.MutationFunction<
-  UpdateRecurringReservationMutation,
-  UpdateRecurringReservationMutationVariables
->;
-
-/**
- * __useUpdateRecurringReservationMutation__
- *
- * To run a mutation, you first call `useUpdateRecurringReservationMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUpdateRecurringReservationMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [updateRecurringReservationMutation, { data, loading, error }] = useUpdateRecurringReservationMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useUpdateRecurringReservationMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    UpdateRecurringReservationMutation,
-    UpdateRecurringReservationMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    UpdateRecurringReservationMutation,
-    UpdateRecurringReservationMutationVariables
-  >(UpdateRecurringReservationDocument, options);
-}
-export type UpdateRecurringReservationMutationHookResult = ReturnType<
-  typeof useUpdateRecurringReservationMutation
->;
-export type UpdateRecurringReservationMutationResult =
-  Apollo.MutationResult<UpdateRecurringReservationMutation>;
-export type UpdateRecurringReservationMutationOptions =
-  Apollo.BaseMutationOptions<
-    UpdateRecurringReservationMutation,
-    UpdateRecurringReservationMutationVariables
-  >;
-export const ReservationsDocument = gql`
-  query Reservations(
-    $first: Int
-    $after: String
-    $orderBy: [ReservationOrderingChoices]
-    $unit: [Int]
-    $reservationUnit: [Int]
-    $reservationUnitType: [Int]
-    $reservationType: [ReservationTypeChoice]
-    $state: [ReservationStateChoice]
-    $orderStatus: [OrderStatusWithFree]
-    $textSearch: String
-    $priceLte: Decimal
-    $priceGte: Decimal
-    $beginDate: Date
-    $endDate: Date
-    $createdAtGte: Date
-    $createdAtLte: Date
-    $applyingForFreeOfCharge: Boolean
-    $isRecurring: Boolean
-  ) {
-    reservations(
-      first: $first
-      after: $after
-      orderBy: $orderBy
-      unit: $unit
-      reservationUnit: $reservationUnit
-      reservationUnitType: $reservationUnitType
-      reservationType: $reservationType
-      state: $state
-      orderStatus: $orderStatus
-      textSearch: $textSearch
-      priceLte: $priceLte
-      priceGte: $priceGte
-      beginDate: $beginDate
-      endDate: $endDate
-      createdAtGte: $createdAtGte
-      createdAtLte: $createdAtLte
-      isRecurring: $isRecurring
-      applyingForFreeOfCharge: $applyingForFreeOfCharge
-      onlyWithPermission: true
-    ) {
-      edges {
-        node {
-          ...ReservationCommon
-          name
-          reservationUnit {
-            id
-            nameFi
-            unit {
-              id
-              nameFi
-            }
-          }
-        }
-      }
-      pageInfo {
-        endCursor
-        hasNextPage
-      }
-      totalCount
-    }
-  }
-  ${ReservationCommonFragmentDoc}
-`;
-
-/**
- * __useReservationsQuery__
- *
- * To run a query within a React component, call `useReservationsQuery` and pass it any options that fit your needs.
- * When your component renders, `useReservationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useReservationsQuery({
- *   variables: {
- *      first: // value for 'first'
- *      after: // value for 'after'
- *      orderBy: // value for 'orderBy'
- *      unit: // value for 'unit'
- *      reservationUnit: // value for 'reservationUnit'
- *      reservationUnitType: // value for 'reservationUnitType'
- *      reservationType: // value for 'reservationType'
- *      state: // value for 'state'
- *      orderStatus: // value for 'orderStatus'
- *      textSearch: // value for 'textSearch'
- *      priceLte: // value for 'priceLte'
- *      priceGte: // value for 'priceGte'
- *      beginDate: // value for 'beginDate'
- *      endDate: // value for 'endDate'
- *      createdAtGte: // value for 'createdAtGte'
- *      createdAtLte: // value for 'createdAtLte'
- *      applyingForFreeOfCharge: // value for 'applyingForFreeOfCharge'
- *      isRecurring: // value for 'isRecurring'
- *   },
- * });
- */
-export function useReservationsQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    ReservationsQuery,
-    ReservationsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<ReservationsQuery, ReservationsQueryVariables>(
-    ReservationsDocument,
-    options
-  );
-}
-export function useReservationsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    ReservationsQuery,
-    ReservationsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<ReservationsQuery, ReservationsQueryVariables>(
-    ReservationsDocument,
-    options
-  );
-}
-export function useReservationsSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    ReservationsQuery,
-    ReservationsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<ReservationsQuery, ReservationsQueryVariables>(
-    ReservationsDocument,
-    options
-  );
-}
-export type ReservationsQueryHookResult = ReturnType<
-  typeof useReservationsQuery
->;
-export type ReservationsLazyQueryHookResult = ReturnType<
-  typeof useReservationsLazyQuery
->;
-export type ReservationsSuspenseQueryHookResult = ReturnType<
-  typeof useReservationsSuspenseQuery
->;
-export type ReservationsQueryResult = Apollo.QueryResult<
-  ReservationsQuery,
-  ReservationsQueryVariables
->;
-export const ReservationApplicationLinkDocument = gql`
-  query ReservationApplicationLink($id: ID!) {
-    recurringReservation(id: $id) {
-      id
-      allocatedTimeSlot {
-        id
-        pk
-        reservationUnitOption {
-          id
-          pk
-          applicationSection {
-            id
-            pk
-            application {
-              id
-              pk
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
-/**
- * __useReservationApplicationLinkQuery__
- *
- * To run a query within a React component, call `useReservationApplicationLinkQuery` and pass it any options that fit your needs.
- * When your component renders, `useReservationApplicationLinkQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useReservationApplicationLinkQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useReservationApplicationLinkQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    ReservationApplicationLinkQuery,
-    ReservationApplicationLinkQueryVariables
-  > &
-    (
-      | { variables: ReservationApplicationLinkQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    )
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    ReservationApplicationLinkQuery,
-    ReservationApplicationLinkQueryVariables
-  >(ReservationApplicationLinkDocument, options);
-}
-export function useReservationApplicationLinkLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    ReservationApplicationLinkQuery,
-    ReservationApplicationLinkQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    ReservationApplicationLinkQuery,
-    ReservationApplicationLinkQueryVariables
-  >(ReservationApplicationLinkDocument, options);
-}
-export function useReservationApplicationLinkSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    ReservationApplicationLinkQuery,
-    ReservationApplicationLinkQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    ReservationApplicationLinkQuery,
-    ReservationApplicationLinkQueryVariables
-  >(ReservationApplicationLinkDocument, options);
-}
-export type ReservationApplicationLinkQueryHookResult = ReturnType<
-  typeof useReservationApplicationLinkQuery
->;
-export type ReservationApplicationLinkLazyQueryHookResult = ReturnType<
-  typeof useReservationApplicationLinkLazyQuery
->;
-export type ReservationApplicationLinkSuspenseQueryHookResult = ReturnType<
-  typeof useReservationApplicationLinkSuspenseQuery
->;
-export type ReservationApplicationLinkQueryResult = Apollo.QueryResult<
-  ReservationApplicationLinkQuery,
-  ReservationApplicationLinkQueryVariables
->;
-export const ReservationDenyReasonsDocument = gql`
-  query ReservationDenyReasons(
-    $orderBy: [ReservationDenyReasonOrderingChoices]
-  ) {
-    reservationDenyReasons(orderBy: $orderBy) {
-      edges {
-        node {
-          id
-          pk
-          reasonFi
-        }
-      }
-    }
-  }
-`;
-
-/**
- * __useReservationDenyReasonsQuery__
- *
- * To run a query within a React component, call `useReservationDenyReasonsQuery` and pass it any options that fit your needs.
- * When your component renders, `useReservationDenyReasonsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useReservationDenyReasonsQuery({
- *   variables: {
- *      orderBy: // value for 'orderBy'
- *   },
- * });
- */
-export function useReservationDenyReasonsQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    ReservationDenyReasonsQuery,
-    ReservationDenyReasonsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    ReservationDenyReasonsQuery,
-    ReservationDenyReasonsQueryVariables
-  >(ReservationDenyReasonsDocument, options);
-}
-export function useReservationDenyReasonsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    ReservationDenyReasonsQuery,
-    ReservationDenyReasonsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    ReservationDenyReasonsQuery,
-    ReservationDenyReasonsQueryVariables
-  >(ReservationDenyReasonsDocument, options);
-}
-export function useReservationDenyReasonsSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    ReservationDenyReasonsQuery,
-    ReservationDenyReasonsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    ReservationDenyReasonsQuery,
-    ReservationDenyReasonsQueryVariables
-  >(ReservationDenyReasonsDocument, options);
-}
-export type ReservationDenyReasonsQueryHookResult = ReturnType<
-  typeof useReservationDenyReasonsQuery
->;
-export type ReservationDenyReasonsLazyQueryHookResult = ReturnType<
-  typeof useReservationDenyReasonsLazyQuery
->;
-export type ReservationDenyReasonsSuspenseQueryHookResult = ReturnType<
-  typeof useReservationDenyReasonsSuspenseQuery
->;
-export type ReservationDenyReasonsQueryResult = Apollo.QueryResult<
-  ReservationDenyReasonsQuery,
-  ReservationDenyReasonsQueryVariables
->;
-export const ReservationsByReservationUnitDocument = gql`
-  query ReservationsByReservationUnit(
-    $id: ID!
-    $pk: Int!
-    $beginDate: Date
-    $endDate: Date
-    $state: [ReservationStateChoice]
-  ) {
-    reservationUnit(id: $id) {
-      id
-      reservationSet(state: $state, beginDate: $beginDate, endDate: $endDate) {
-        ...CalendarReservation
-      }
-    }
-    affectingReservations(
-      forReservationUnits: [$pk]
-      state: $state
-      beginDate: $beginDate
-      endDate: $endDate
-    ) {
-      ...CalendarReservation
-    }
-  }
-  ${CalendarReservationFragmentDoc}
-`;
-
-/**
- * __useReservationsByReservationUnitQuery__
- *
- * To run a query within a React component, call `useReservationsByReservationUnitQuery` and pass it any options that fit your needs.
- * When your component renders, `useReservationsByReservationUnitQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useReservationsByReservationUnitQuery({
- *   variables: {
- *      id: // value for 'id'
- *      pk: // value for 'pk'
- *      beginDate: // value for 'beginDate'
- *      endDate: // value for 'endDate'
- *      state: // value for 'state'
- *   },
- * });
- */
-export function useReservationsByReservationUnitQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    ReservationsByReservationUnitQuery,
-    ReservationsByReservationUnitQueryVariables
-  > &
-    (
-      | {
-          variables: ReservationsByReservationUnitQueryVariables;
-          skip?: boolean;
-        }
-      | { skip: boolean }
-    )
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    ReservationsByReservationUnitQuery,
-    ReservationsByReservationUnitQueryVariables
-  >(ReservationsByReservationUnitDocument, options);
-}
-export function useReservationsByReservationUnitLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    ReservationsByReservationUnitQuery,
-    ReservationsByReservationUnitQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    ReservationsByReservationUnitQuery,
-    ReservationsByReservationUnitQueryVariables
-  >(ReservationsByReservationUnitDocument, options);
-}
-export function useReservationsByReservationUnitSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    ReservationsByReservationUnitQuery,
-    ReservationsByReservationUnitQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    ReservationsByReservationUnitQuery,
-    ReservationsByReservationUnitQueryVariables
-  >(ReservationsByReservationUnitDocument, options);
-}
-export type ReservationsByReservationUnitQueryHookResult = ReturnType<
-  typeof useReservationsByReservationUnitQuery
->;
-export type ReservationsByReservationUnitLazyQueryHookResult = ReturnType<
-  typeof useReservationsByReservationUnitLazyQuery
->;
-export type ReservationsByReservationUnitSuspenseQueryHookResult = ReturnType<
-  typeof useReservationsByReservationUnitSuspenseQuery
->;
-export type ReservationsByReservationUnitQueryResult = Apollo.QueryResult<
-  ReservationsByReservationUnitQuery,
-  ReservationsByReservationUnitQueryVariables
->;
-export const ReservationDocument = gql`
-  query Reservation($id: ID!) {
-    reservation(id: $id) {
-      ...ReservationCommon
-      ...ReservationRecurring
-      ...ReservationSpecialisation
-      reservationUnit {
-        ...ReservationUnit
-        ...ReservationUnitPricing
-      }
-      ...ReservationMetaFields
-    }
-  }
-  ${ReservationCommonFragmentDoc}
-  ${ReservationRecurringFragmentDoc}
-  ${ReservationSpecialisationFragmentDoc}
-  ${ReservationUnitFragmentDoc}
-  ${ReservationUnitPricingFragmentDoc}
-  ${ReservationMetaFieldsFragmentDoc}
-`;
-
-/**
- * __useReservationQuery__
- *
- * To run a query within a React component, call `useReservationQuery` and pass it any options that fit your needs.
- * When your component renders, `useReservationQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useReservationQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useReservationQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    ReservationQuery,
-    ReservationQueryVariables
-  > &
-    (
-      | { variables: ReservationQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    )
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<ReservationQuery, ReservationQueryVariables>(
-    ReservationDocument,
-    options
-  );
-}
-export function useReservationLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    ReservationQuery,
-    ReservationQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<ReservationQuery, ReservationQueryVariables>(
-    ReservationDocument,
-    options
-  );
-}
-export function useReservationSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    ReservationQuery,
-    ReservationQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<ReservationQuery, ReservationQueryVariables>(
-    ReservationDocument,
-    options
-  );
-}
-export type ReservationQueryHookResult = ReturnType<typeof useReservationQuery>;
-export type ReservationLazyQueryHookResult = ReturnType<
-  typeof useReservationLazyQuery
->;
-export type ReservationSuspenseQueryHookResult = ReturnType<
-  typeof useReservationSuspenseQuery
->;
-export type ReservationQueryResult = Apollo.QueryResult<
-  ReservationQuery,
-  ReservationQueryVariables
->;
-export const RecurringReservationDocument = gql`
-  query RecurringReservation($id: ID!) {
-    recurringReservation(id: $id) {
-      id
-      pk
-      weekdays
-      beginDate
-      endDate
-      rejectedOccurrences {
-        id
-        beginDatetime
-        endDatetime
-        rejectionReason
-      }
-      reservations {
-        ...ChangeReservationTime
-        state
-        paymentOrder {
-          id
-          status
-        }
-        reservationUnit {
-          id
-          unit {
-            id
-            pk
-          }
-        }
-      }
-    }
-  }
-  ${ChangeReservationTimeFragmentDoc}
-`;
-
-/**
- * __useRecurringReservationQuery__
- *
- * To run a query within a React component, call `useRecurringReservationQuery` and pass it any options that fit your needs.
- * When your component renders, `useRecurringReservationQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useRecurringReservationQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useRecurringReservationQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    RecurringReservationQuery,
-    RecurringReservationQueryVariables
-  > &
-    (
-      | { variables: RecurringReservationQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    )
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    RecurringReservationQuery,
-    RecurringReservationQueryVariables
-  >(RecurringReservationDocument, options);
-}
-export function useRecurringReservationLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    RecurringReservationQuery,
-    RecurringReservationQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    RecurringReservationQuery,
-    RecurringReservationQueryVariables
-  >(RecurringReservationDocument, options);
-}
-export function useRecurringReservationSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    RecurringReservationQuery,
-    RecurringReservationQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    RecurringReservationQuery,
-    RecurringReservationQueryVariables
-  >(RecurringReservationDocument, options);
-}
-export type RecurringReservationQueryHookResult = ReturnType<
-  typeof useRecurringReservationQuery
->;
-export type RecurringReservationLazyQueryHookResult = ReturnType<
-  typeof useRecurringReservationLazyQuery
->;
-export type RecurringReservationSuspenseQueryHookResult = ReturnType<
-  typeof useRecurringReservationSuspenseQuery
->;
-export type RecurringReservationQueryResult = Apollo.QueryResult<
-  RecurringReservationQuery,
-  RecurringReservationQueryVariables
->;
-export const ApproveReservationDocument = gql`
-  mutation ApproveReservation($input: ReservationApproveMutationInput!) {
-    approveReservation(input: $input) {
-      pk
-      state
-    }
-  }
-`;
-export type ApproveReservationMutationFn = Apollo.MutationFunction<
-  ApproveReservationMutation,
-  ApproveReservationMutationVariables
->;
-
-/**
- * __useApproveReservationMutation__
- *
- * To run a mutation, you first call `useApproveReservationMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useApproveReservationMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [approveReservationMutation, { data, loading, error }] = useApproveReservationMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useApproveReservationMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    ApproveReservationMutation,
-    ApproveReservationMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    ApproveReservationMutation,
-    ApproveReservationMutationVariables
-  >(ApproveReservationDocument, options);
-}
-export type ApproveReservationMutationHookResult = ReturnType<
-  typeof useApproveReservationMutation
->;
-export type ApproveReservationMutationResult =
-  Apollo.MutationResult<ApproveReservationMutation>;
-export type ApproveReservationMutationOptions = Apollo.BaseMutationOptions<
-  ApproveReservationMutation,
-  ApproveReservationMutationVariables
->;
-export const DenyReservationDocument = gql`
-  mutation DenyReservation($input: ReservationDenyMutationInput!) {
-    denyReservation(input: $input) {
-      pk
-      state
-    }
-  }
-`;
-export type DenyReservationMutationFn = Apollo.MutationFunction<
-  DenyReservationMutation,
-  DenyReservationMutationVariables
->;
-
-/**
- * __useDenyReservationMutation__
- *
- * To run a mutation, you first call `useDenyReservationMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useDenyReservationMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [denyReservationMutation, { data, loading, error }] = useDenyReservationMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useDenyReservationMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    DenyReservationMutation,
-    DenyReservationMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    DenyReservationMutation,
-    DenyReservationMutationVariables
-  >(DenyReservationDocument, options);
-}
-export type DenyReservationMutationHookResult = ReturnType<
-  typeof useDenyReservationMutation
->;
-export type DenyReservationMutationResult =
-  Apollo.MutationResult<DenyReservationMutation>;
-export type DenyReservationMutationOptions = Apollo.BaseMutationOptions<
-  DenyReservationMutation,
-  DenyReservationMutationVariables
->;
-export const RefundReservationDocument = gql`
-  mutation RefundReservation($input: ReservationRefundMutationInput!) {
-    refundReservation(input: $input) {
-      pk
-    }
-  }
-`;
-export type RefundReservationMutationFn = Apollo.MutationFunction<
-  RefundReservationMutation,
-  RefundReservationMutationVariables
->;
-
-/**
- * __useRefundReservationMutation__
- *
- * To run a mutation, you first call `useRefundReservationMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRefundReservationMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [refundReservationMutation, { data, loading, error }] = useRefundReservationMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useRefundReservationMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    RefundReservationMutation,
-    RefundReservationMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    RefundReservationMutation,
-    RefundReservationMutationVariables
-  >(RefundReservationDocument, options);
-}
-export type RefundReservationMutationHookResult = ReturnType<
-  typeof useRefundReservationMutation
->;
-export type RefundReservationMutationResult =
-  Apollo.MutationResult<RefundReservationMutation>;
-export type RefundReservationMutationOptions = Apollo.BaseMutationOptions<
-  RefundReservationMutation,
-  RefundReservationMutationVariables
->;
-export const RequireHandlingDocument = gql`
-  mutation RequireHandling($input: ReservationRequiresHandlingMutationInput!) {
-    requireHandlingForReservation(input: $input) {
-      pk
-      state
-    }
-  }
-`;
-export type RequireHandlingMutationFn = Apollo.MutationFunction<
-  RequireHandlingMutation,
-  RequireHandlingMutationVariables
->;
-
-/**
- * __useRequireHandlingMutation__
- *
- * To run a mutation, you first call `useRequireHandlingMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRequireHandlingMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [requireHandlingMutation, { data, loading, error }] = useRequireHandlingMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useRequireHandlingMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    RequireHandlingMutation,
-    RequireHandlingMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    RequireHandlingMutation,
-    RequireHandlingMutationVariables
-  >(RequireHandlingDocument, options);
-}
-export type RequireHandlingMutationHookResult = ReturnType<
-  typeof useRequireHandlingMutation
->;
-export type RequireHandlingMutationResult =
-  Apollo.MutationResult<RequireHandlingMutation>;
-export type RequireHandlingMutationOptions = Apollo.BaseMutationOptions<
-  RequireHandlingMutation,
-  RequireHandlingMutationVariables
->;
 export const CheckPermissionsDocument = gql`
   query CheckPermissions(
     $permission: UserPermissionChoice!
@@ -12780,6 +10719,87 @@ export type CheckPermissionsSuspenseQueryHookResult = ReturnType<
 export type CheckPermissionsQueryResult = Apollo.QueryResult<
   CheckPermissionsQuery,
   CheckPermissionsQueryVariables
+>;
+export const ReservationDenyReasonsDocument = gql`
+  query ReservationDenyReasons(
+    $orderBy: [ReservationDenyReasonOrderingChoices]
+  ) {
+    reservationDenyReasons(orderBy: $orderBy) {
+      edges {
+        node {
+          id
+          pk
+          reasonFi
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useReservationDenyReasonsQuery__
+ *
+ * To run a query within a React component, call `useReservationDenyReasonsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationDenyReasonsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReservationDenyReasonsQuery({
+ *   variables: {
+ *      orderBy: // value for 'orderBy'
+ *   },
+ * });
+ */
+export function useReservationDenyReasonsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    ReservationDenyReasonsQuery,
+    ReservationDenyReasonsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ReservationDenyReasonsQuery,
+    ReservationDenyReasonsQueryVariables
+  >(ReservationDenyReasonsDocument, options);
+}
+export function useReservationDenyReasonsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ReservationDenyReasonsQuery,
+    ReservationDenyReasonsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ReservationDenyReasonsQuery,
+    ReservationDenyReasonsQueryVariables
+  >(ReservationDenyReasonsDocument, options);
+}
+export function useReservationDenyReasonsSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<
+    ReservationDenyReasonsQuery,
+    ReservationDenyReasonsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ReservationDenyReasonsQuery,
+    ReservationDenyReasonsQueryVariables
+  >(ReservationDenyReasonsDocument, options);
+}
+export type ReservationDenyReasonsQueryHookResult = ReturnType<
+  typeof useReservationDenyReasonsQuery
+>;
+export type ReservationDenyReasonsLazyQueryHookResult = ReturnType<
+  typeof useReservationDenyReasonsLazyQuery
+>;
+export type ReservationDenyReasonsSuspenseQueryHookResult = ReturnType<
+  typeof useReservationDenyReasonsSuspenseQuery
+>;
+export type ReservationDenyReasonsQueryResult = Apollo.QueryResult<
+  ReservationDenyReasonsQuery,
+  ReservationDenyReasonsQueryVariables
 >;
 export const ReservationUnitsFilterParamsDocument = gql`
   query ReservationUnitsFilterParams(
@@ -14804,6 +12824,165 @@ export type ReservationTimesInReservationUnitQueryResult = Apollo.QueryResult<
   ReservationTimesInReservationUnitQuery,
   ReservationTimesInReservationUnitQueryVariables
 >;
+export const BannerNotificationCreateDocument = gql`
+  mutation BannerNotificationCreate(
+    $input: BannerNotificationCreateMutationInput!
+  ) {
+    createBannerNotification(input: $input) {
+      pk
+    }
+  }
+`;
+export type BannerNotificationCreateMutationFn = Apollo.MutationFunction<
+  BannerNotificationCreateMutation,
+  BannerNotificationCreateMutationVariables
+>;
+
+/**
+ * __useBannerNotificationCreateMutation__
+ *
+ * To run a mutation, you first call `useBannerNotificationCreateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useBannerNotificationCreateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [bannerNotificationCreateMutation, { data, loading, error }] = useBannerNotificationCreateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useBannerNotificationCreateMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    BannerNotificationCreateMutation,
+    BannerNotificationCreateMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    BannerNotificationCreateMutation,
+    BannerNotificationCreateMutationVariables
+  >(BannerNotificationCreateDocument, options);
+}
+export type BannerNotificationCreateMutationHookResult = ReturnType<
+  typeof useBannerNotificationCreateMutation
+>;
+export type BannerNotificationCreateMutationResult =
+  Apollo.MutationResult<BannerNotificationCreateMutation>;
+export type BannerNotificationCreateMutationOptions =
+  Apollo.BaseMutationOptions<
+    BannerNotificationCreateMutation,
+    BannerNotificationCreateMutationVariables
+  >;
+export const BannerNotificationUpdateDocument = gql`
+  mutation BannerNotificationUpdate(
+    $input: BannerNotificationUpdateMutationInput!
+  ) {
+    updateBannerNotification(input: $input) {
+      pk
+    }
+  }
+`;
+export type BannerNotificationUpdateMutationFn = Apollo.MutationFunction<
+  BannerNotificationUpdateMutation,
+  BannerNotificationUpdateMutationVariables
+>;
+
+/**
+ * __useBannerNotificationUpdateMutation__
+ *
+ * To run a mutation, you first call `useBannerNotificationUpdateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useBannerNotificationUpdateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [bannerNotificationUpdateMutation, { data, loading, error }] = useBannerNotificationUpdateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useBannerNotificationUpdateMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    BannerNotificationUpdateMutation,
+    BannerNotificationUpdateMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    BannerNotificationUpdateMutation,
+    BannerNotificationUpdateMutationVariables
+  >(BannerNotificationUpdateDocument, options);
+}
+export type BannerNotificationUpdateMutationHookResult = ReturnType<
+  typeof useBannerNotificationUpdateMutation
+>;
+export type BannerNotificationUpdateMutationResult =
+  Apollo.MutationResult<BannerNotificationUpdateMutation>;
+export type BannerNotificationUpdateMutationOptions =
+  Apollo.BaseMutationOptions<
+    BannerNotificationUpdateMutation,
+    BannerNotificationUpdateMutationVariables
+  >;
+export const BannerNotificationDeleteDocument = gql`
+  mutation BannerNotificationDelete(
+    $input: BannerNotificationDeleteMutationInput!
+  ) {
+    deleteBannerNotification(input: $input) {
+      deleted
+    }
+  }
+`;
+export type BannerNotificationDeleteMutationFn = Apollo.MutationFunction<
+  BannerNotificationDeleteMutation,
+  BannerNotificationDeleteMutationVariables
+>;
+
+/**
+ * __useBannerNotificationDeleteMutation__
+ *
+ * To run a mutation, you first call `useBannerNotificationDeleteMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useBannerNotificationDeleteMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [bannerNotificationDeleteMutation, { data, loading, error }] = useBannerNotificationDeleteMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useBannerNotificationDeleteMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    BannerNotificationDeleteMutation,
+    BannerNotificationDeleteMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    BannerNotificationDeleteMutation,
+    BannerNotificationDeleteMutationVariables
+  >(BannerNotificationDeleteDocument, options);
+}
+export type BannerNotificationDeleteMutationHookResult = ReturnType<
+  typeof useBannerNotificationDeleteMutation
+>;
+export type BannerNotificationDeleteMutationResult =
+  Apollo.MutationResult<BannerNotificationDeleteMutation>;
+export type BannerNotificationDeleteMutationOptions =
+  Apollo.BaseMutationOptions<
+    BannerNotificationDeleteMutation,
+    BannerNotificationDeleteMutationVariables
+  >;
 export const ApplicationRoundFilterDocument = gql`
   query ApplicationRoundFilter($id: ID!) {
     applicationRound(id: $id) {
@@ -16230,4 +14409,1630 @@ export type ApplicationRoundSuspenseQueryHookResult = ReturnType<
 export type ApplicationRoundQueryResult = Apollo.QueryResult<
   ApplicationRoundQuery,
   ApplicationRoundQueryVariables
+>;
+export const SearchReservationUnitsDocument = gql`
+  query SearchReservationUnits(
+    $after: String
+    $first: Int
+    $nameFi: String
+    $maxPersonsGte: Decimal
+    $maxPersonsLte: Decimal
+    $surfaceAreaGte: Decimal
+    $surfaceAreaLte: Decimal
+    $unit: [Int]
+    $reservationUnitType: [Int]
+    $orderBy: [ReservationUnitOrderingChoices]
+    $publishingState: [ReservationUnitPublishingState]
+  ) {
+    reservationUnits(
+      first: $first
+      after: $after
+      orderBy: $orderBy
+      nameFi: $nameFi
+      maxPersonsGte: $maxPersonsGte
+      minPersonsGte: $maxPersonsGte
+      maxPersonsLte: $maxPersonsLte
+      minPersonsLte: $maxPersonsLte
+      surfaceAreaGte: $surfaceAreaGte
+      surfaceAreaLte: $surfaceAreaLte
+      unit: $unit
+      reservationUnitType: $reservationUnitType
+      publishingState: $publishingState
+      onlyWithPermission: true
+    ) {
+      edges {
+        node {
+          id
+          pk
+          nameFi
+          unit {
+            id
+            nameFi
+            pk
+          }
+          reservationUnitType {
+            id
+            nameFi
+          }
+          maxPersons
+          surfaceArea
+          publishingState
+          reservationState
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      totalCount
+    }
+  }
+`;
+
+/**
+ * __useSearchReservationUnitsQuery__
+ *
+ * To run a query within a React component, call `useSearchReservationUnitsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchReservationUnitsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSearchReservationUnitsQuery({
+ *   variables: {
+ *      after: // value for 'after'
+ *      first: // value for 'first'
+ *      nameFi: // value for 'nameFi'
+ *      maxPersonsGte: // value for 'maxPersonsGte'
+ *      maxPersonsLte: // value for 'maxPersonsLte'
+ *      surfaceAreaGte: // value for 'surfaceAreaGte'
+ *      surfaceAreaLte: // value for 'surfaceAreaLte'
+ *      unit: // value for 'unit'
+ *      reservationUnitType: // value for 'reservationUnitType'
+ *      orderBy: // value for 'orderBy'
+ *      publishingState: // value for 'publishingState'
+ *   },
+ * });
+ */
+export function useSearchReservationUnitsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    SearchReservationUnitsQuery,
+    SearchReservationUnitsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    SearchReservationUnitsQuery,
+    SearchReservationUnitsQueryVariables
+  >(SearchReservationUnitsDocument, options);
+}
+export function useSearchReservationUnitsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    SearchReservationUnitsQuery,
+    SearchReservationUnitsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    SearchReservationUnitsQuery,
+    SearchReservationUnitsQueryVariables
+  >(SearchReservationUnitsDocument, options);
+}
+export function useSearchReservationUnitsSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<
+    SearchReservationUnitsQuery,
+    SearchReservationUnitsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    SearchReservationUnitsQuery,
+    SearchReservationUnitsQueryVariables
+  >(SearchReservationUnitsDocument, options);
+}
+export type SearchReservationUnitsQueryHookResult = ReturnType<
+  typeof useSearchReservationUnitsQuery
+>;
+export type SearchReservationUnitsLazyQueryHookResult = ReturnType<
+  typeof useSearchReservationUnitsLazyQuery
+>;
+export type SearchReservationUnitsSuspenseQueryHookResult = ReturnType<
+  typeof useSearchReservationUnitsSuspenseQuery
+>;
+export type SearchReservationUnitsQueryResult = Apollo.QueryResult<
+  SearchReservationUnitsQuery,
+  SearchReservationUnitsQueryVariables
+>;
+export const ReservationApplicationLinkDocument = gql`
+  query ReservationApplicationLink($id: ID!) {
+    recurringReservation(id: $id) {
+      id
+      allocatedTimeSlot {
+        id
+        pk
+        reservationUnitOption {
+          id
+          pk
+          applicationSection {
+            id
+            pk
+            application {
+              id
+              pk
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useReservationApplicationLinkQuery__
+ *
+ * To run a query within a React component, call `useReservationApplicationLinkQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationApplicationLinkQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReservationApplicationLinkQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useReservationApplicationLinkQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ReservationApplicationLinkQuery,
+    ReservationApplicationLinkQueryVariables
+  > &
+    (
+      | { variables: ReservationApplicationLinkQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ReservationApplicationLinkQuery,
+    ReservationApplicationLinkQueryVariables
+  >(ReservationApplicationLinkDocument, options);
+}
+export function useReservationApplicationLinkLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ReservationApplicationLinkQuery,
+    ReservationApplicationLinkQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ReservationApplicationLinkQuery,
+    ReservationApplicationLinkQueryVariables
+  >(ReservationApplicationLinkDocument, options);
+}
+export function useReservationApplicationLinkSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<
+    ReservationApplicationLinkQuery,
+    ReservationApplicationLinkQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ReservationApplicationLinkQuery,
+    ReservationApplicationLinkQueryVariables
+  >(ReservationApplicationLinkDocument, options);
+}
+export type ReservationApplicationLinkQueryHookResult = ReturnType<
+  typeof useReservationApplicationLinkQuery
+>;
+export type ReservationApplicationLinkLazyQueryHookResult = ReturnType<
+  typeof useReservationApplicationLinkLazyQuery
+>;
+export type ReservationApplicationLinkSuspenseQueryHookResult = ReturnType<
+  typeof useReservationApplicationLinkSuspenseQuery
+>;
+export type ReservationApplicationLinkQueryResult = Apollo.QueryResult<
+  ReservationApplicationLinkQuery,
+  ReservationApplicationLinkQueryVariables
+>;
+export const ReservationsByReservationUnitDocument = gql`
+  query ReservationsByReservationUnit(
+    $id: ID!
+    $pk: Int!
+    $beginDate: Date
+    $endDate: Date
+    $state: [ReservationStateChoice]
+  ) {
+    reservationUnit(id: $id) {
+      id
+      reservationSet(state: $state, beginDate: $beginDate, endDate: $endDate) {
+        ...CalendarReservation
+      }
+    }
+    affectingReservations(
+      forReservationUnits: [$pk]
+      state: $state
+      beginDate: $beginDate
+      endDate: $endDate
+    ) {
+      ...CalendarReservation
+    }
+  }
+  ${CalendarReservationFragmentDoc}
+`;
+
+/**
+ * __useReservationsByReservationUnitQuery__
+ *
+ * To run a query within a React component, call `useReservationsByReservationUnitQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationsByReservationUnitQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReservationsByReservationUnitQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *      pk: // value for 'pk'
+ *      beginDate: // value for 'beginDate'
+ *      endDate: // value for 'endDate'
+ *      state: // value for 'state'
+ *   },
+ * });
+ */
+export function useReservationsByReservationUnitQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ReservationsByReservationUnitQuery,
+    ReservationsByReservationUnitQueryVariables
+  > &
+    (
+      | {
+          variables: ReservationsByReservationUnitQueryVariables;
+          skip?: boolean;
+        }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ReservationsByReservationUnitQuery,
+    ReservationsByReservationUnitQueryVariables
+  >(ReservationsByReservationUnitDocument, options);
+}
+export function useReservationsByReservationUnitLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ReservationsByReservationUnitQuery,
+    ReservationsByReservationUnitQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ReservationsByReservationUnitQuery,
+    ReservationsByReservationUnitQueryVariables
+  >(ReservationsByReservationUnitDocument, options);
+}
+export function useReservationsByReservationUnitSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<
+    ReservationsByReservationUnitQuery,
+    ReservationsByReservationUnitQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ReservationsByReservationUnitQuery,
+    ReservationsByReservationUnitQueryVariables
+  >(ReservationsByReservationUnitDocument, options);
+}
+export type ReservationsByReservationUnitQueryHookResult = ReturnType<
+  typeof useReservationsByReservationUnitQuery
+>;
+export type ReservationsByReservationUnitLazyQueryHookResult = ReturnType<
+  typeof useReservationsByReservationUnitLazyQuery
+>;
+export type ReservationsByReservationUnitSuspenseQueryHookResult = ReturnType<
+  typeof useReservationsByReservationUnitSuspenseQuery
+>;
+export type ReservationsByReservationUnitQueryResult = Apollo.QueryResult<
+  ReservationsByReservationUnitQuery,
+  ReservationsByReservationUnitQueryVariables
+>;
+export const ReservationDocument = gql`
+  query Reservation($id: ID!) {
+    reservation(id: $id) {
+      ...ReservationCommon
+      ...ReservationRecurring
+      ...ReservationSpecialisation
+      reservationUnit {
+        ...ReservationUnit
+        ...ReservationUnitPricing
+      }
+      ...ReservationMetaFields
+    }
+  }
+  ${ReservationCommonFragmentDoc}
+  ${ReservationRecurringFragmentDoc}
+  ${ReservationSpecialisationFragmentDoc}
+  ${ReservationUnitFragmentDoc}
+  ${ReservationUnitPricingFragmentDoc}
+  ${ReservationMetaFieldsFragmentDoc}
+`;
+
+/**
+ * __useReservationQuery__
+ *
+ * To run a query within a React component, call `useReservationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReservationQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useReservationQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ReservationQuery,
+    ReservationQueryVariables
+  > &
+    (
+      | { variables: ReservationQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<ReservationQuery, ReservationQueryVariables>(
+    ReservationDocument,
+    options
+  );
+}
+export function useReservationLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ReservationQuery,
+    ReservationQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<ReservationQuery, ReservationQueryVariables>(
+    ReservationDocument,
+    options
+  );
+}
+export function useReservationSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<
+    ReservationQuery,
+    ReservationQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<ReservationQuery, ReservationQueryVariables>(
+    ReservationDocument,
+    options
+  );
+}
+export type ReservationQueryHookResult = ReturnType<typeof useReservationQuery>;
+export type ReservationLazyQueryHookResult = ReturnType<
+  typeof useReservationLazyQuery
+>;
+export type ReservationSuspenseQueryHookResult = ReturnType<
+  typeof useReservationSuspenseQuery
+>;
+export type ReservationQueryResult = Apollo.QueryResult<
+  ReservationQuery,
+  ReservationQueryVariables
+>;
+export const RecurringReservationDocument = gql`
+  query RecurringReservation($id: ID!) {
+    recurringReservation(id: $id) {
+      id
+      pk
+      weekdays
+      beginDate
+      endDate
+      rejectedOccurrences {
+        id
+        beginDatetime
+        endDatetime
+        rejectionReason
+      }
+      reservations {
+        ...ChangeReservationTime
+        state
+        paymentOrder {
+          id
+          status
+        }
+        reservationUnit {
+          id
+          unit {
+            id
+            pk
+          }
+        }
+      }
+    }
+  }
+  ${ChangeReservationTimeFragmentDoc}
+`;
+
+/**
+ * __useRecurringReservationQuery__
+ *
+ * To run a query within a React component, call `useRecurringReservationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useRecurringReservationQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useRecurringReservationQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useRecurringReservationQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    RecurringReservationQuery,
+    RecurringReservationQueryVariables
+  > &
+    (
+      | { variables: RecurringReservationQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    RecurringReservationQuery,
+    RecurringReservationQueryVariables
+  >(RecurringReservationDocument, options);
+}
+export function useRecurringReservationLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    RecurringReservationQuery,
+    RecurringReservationQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    RecurringReservationQuery,
+    RecurringReservationQueryVariables
+  >(RecurringReservationDocument, options);
+}
+export function useRecurringReservationSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<
+    RecurringReservationQuery,
+    RecurringReservationQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    RecurringReservationQuery,
+    RecurringReservationQueryVariables
+  >(RecurringReservationDocument, options);
+}
+export type RecurringReservationQueryHookResult = ReturnType<
+  typeof useRecurringReservationQuery
+>;
+export type RecurringReservationLazyQueryHookResult = ReturnType<
+  typeof useRecurringReservationLazyQuery
+>;
+export type RecurringReservationSuspenseQueryHookResult = ReturnType<
+  typeof useRecurringReservationSuspenseQuery
+>;
+export type RecurringReservationQueryResult = Apollo.QueryResult<
+  RecurringReservationQuery,
+  RecurringReservationQueryVariables
+>;
+export const ApproveReservationDocument = gql`
+  mutation ApproveReservation($input: ReservationApproveMutationInput!) {
+    approveReservation(input: $input) {
+      pk
+      state
+    }
+  }
+`;
+export type ApproveReservationMutationFn = Apollo.MutationFunction<
+  ApproveReservationMutation,
+  ApproveReservationMutationVariables
+>;
+
+/**
+ * __useApproveReservationMutation__
+ *
+ * To run a mutation, you first call `useApproveReservationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useApproveReservationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [approveReservationMutation, { data, loading, error }] = useApproveReservationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useApproveReservationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    ApproveReservationMutation,
+    ApproveReservationMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    ApproveReservationMutation,
+    ApproveReservationMutationVariables
+  >(ApproveReservationDocument, options);
+}
+export type ApproveReservationMutationHookResult = ReturnType<
+  typeof useApproveReservationMutation
+>;
+export type ApproveReservationMutationResult =
+  Apollo.MutationResult<ApproveReservationMutation>;
+export type ApproveReservationMutationOptions = Apollo.BaseMutationOptions<
+  ApproveReservationMutation,
+  ApproveReservationMutationVariables
+>;
+export const DenyReservationDocument = gql`
+  mutation DenyReservation($input: ReservationDenyMutationInput!) {
+    denyReservation(input: $input) {
+      pk
+      state
+    }
+  }
+`;
+export type DenyReservationMutationFn = Apollo.MutationFunction<
+  DenyReservationMutation,
+  DenyReservationMutationVariables
+>;
+
+/**
+ * __useDenyReservationMutation__
+ *
+ * To run a mutation, you first call `useDenyReservationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDenyReservationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [denyReservationMutation, { data, loading, error }] = useDenyReservationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDenyReservationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    DenyReservationMutation,
+    DenyReservationMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    DenyReservationMutation,
+    DenyReservationMutationVariables
+  >(DenyReservationDocument, options);
+}
+export type DenyReservationMutationHookResult = ReturnType<
+  typeof useDenyReservationMutation
+>;
+export type DenyReservationMutationResult =
+  Apollo.MutationResult<DenyReservationMutation>;
+export type DenyReservationMutationOptions = Apollo.BaseMutationOptions<
+  DenyReservationMutation,
+  DenyReservationMutationVariables
+>;
+export const RefundReservationDocument = gql`
+  mutation RefundReservation($input: ReservationRefundMutationInput!) {
+    refundReservation(input: $input) {
+      pk
+    }
+  }
+`;
+export type RefundReservationMutationFn = Apollo.MutationFunction<
+  RefundReservationMutation,
+  RefundReservationMutationVariables
+>;
+
+/**
+ * __useRefundReservationMutation__
+ *
+ * To run a mutation, you first call `useRefundReservationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRefundReservationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [refundReservationMutation, { data, loading, error }] = useRefundReservationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useRefundReservationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    RefundReservationMutation,
+    RefundReservationMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    RefundReservationMutation,
+    RefundReservationMutationVariables
+  >(RefundReservationDocument, options);
+}
+export type RefundReservationMutationHookResult = ReturnType<
+  typeof useRefundReservationMutation
+>;
+export type RefundReservationMutationResult =
+  Apollo.MutationResult<RefundReservationMutation>;
+export type RefundReservationMutationOptions = Apollo.BaseMutationOptions<
+  RefundReservationMutation,
+  RefundReservationMutationVariables
+>;
+export const RequireHandlingDocument = gql`
+  mutation RequireHandling($input: ReservationRequiresHandlingMutationInput!) {
+    requireHandlingForReservation(input: $input) {
+      pk
+      state
+    }
+  }
+`;
+export type RequireHandlingMutationFn = Apollo.MutationFunction<
+  RequireHandlingMutation,
+  RequireHandlingMutationVariables
+>;
+
+/**
+ * __useRequireHandlingMutation__
+ *
+ * To run a mutation, you first call `useRequireHandlingMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRequireHandlingMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [requireHandlingMutation, { data, loading, error }] = useRequireHandlingMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useRequireHandlingMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    RequireHandlingMutation,
+    RequireHandlingMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    RequireHandlingMutation,
+    RequireHandlingMutationVariables
+  >(RequireHandlingDocument, options);
+}
+export type RequireHandlingMutationHookResult = ReturnType<
+  typeof useRequireHandlingMutation
+>;
+export type RequireHandlingMutationResult =
+  Apollo.MutationResult<RequireHandlingMutation>;
+export type RequireHandlingMutationOptions = Apollo.BaseMutationOptions<
+  RequireHandlingMutation,
+  RequireHandlingMutationVariables
+>;
+export const UpdateStaffReservationDocument = gql`
+  mutation UpdateStaffReservation(
+    $input: ReservationStaffModifyMutationInput!
+    $workingMemo: ReservationWorkingMemoMutationInput!
+  ) {
+    staffReservationModify(input: $input) {
+      pk
+    }
+    updateReservationWorkingMemo(input: $workingMemo) {
+      workingMemo
+    }
+  }
+`;
+export type UpdateStaffReservationMutationFn = Apollo.MutationFunction<
+  UpdateStaffReservationMutation,
+  UpdateStaffReservationMutationVariables
+>;
+
+/**
+ * __useUpdateStaffReservationMutation__
+ *
+ * To run a mutation, you first call `useUpdateStaffReservationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateStaffReservationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateStaffReservationMutation, { data, loading, error }] = useUpdateStaffReservationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *      workingMemo: // value for 'workingMemo'
+ *   },
+ * });
+ */
+export function useUpdateStaffReservationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    UpdateStaffReservationMutation,
+    UpdateStaffReservationMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    UpdateStaffReservationMutation,
+    UpdateStaffReservationMutationVariables
+  >(UpdateStaffReservationDocument, options);
+}
+export type UpdateStaffReservationMutationHookResult = ReturnType<
+  typeof useUpdateStaffReservationMutation
+>;
+export type UpdateStaffReservationMutationResult =
+  Apollo.MutationResult<UpdateStaffReservationMutation>;
+export type UpdateStaffReservationMutationOptions = Apollo.BaseMutationOptions<
+  UpdateStaffReservationMutation,
+  UpdateStaffReservationMutationVariables
+>;
+export const UpdateRecurringReservationDocument = gql`
+  mutation UpdateRecurringReservation(
+    $input: RecurringReservationUpdateMutationInput!
+  ) {
+    updateRecurringReservation(input: $input) {
+      pk
+    }
+  }
+`;
+export type UpdateRecurringReservationMutationFn = Apollo.MutationFunction<
+  UpdateRecurringReservationMutation,
+  UpdateRecurringReservationMutationVariables
+>;
+
+/**
+ * __useUpdateRecurringReservationMutation__
+ *
+ * To run a mutation, you first call `useUpdateRecurringReservationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateRecurringReservationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateRecurringReservationMutation, { data, loading, error }] = useUpdateRecurringReservationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateRecurringReservationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    UpdateRecurringReservationMutation,
+    UpdateRecurringReservationMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    UpdateRecurringReservationMutation,
+    UpdateRecurringReservationMutationVariables
+  >(UpdateRecurringReservationDocument, options);
+}
+export type UpdateRecurringReservationMutationHookResult = ReturnType<
+  typeof useUpdateRecurringReservationMutation
+>;
+export type UpdateRecurringReservationMutationResult =
+  Apollo.MutationResult<UpdateRecurringReservationMutation>;
+export type UpdateRecurringReservationMutationOptions =
+  Apollo.BaseMutationOptions<
+    UpdateRecurringReservationMutation,
+    UpdateRecurringReservationMutationVariables
+  >;
+export const ReservationsDocument = gql`
+  query Reservations(
+    $first: Int
+    $after: String
+    $orderBy: [ReservationOrderingChoices]
+    $unit: [Int]
+    $reservationUnit: [Int]
+    $reservationUnitType: [Int]
+    $reservationType: [ReservationTypeChoice]
+    $state: [ReservationStateChoice]
+    $orderStatus: [OrderStatusWithFree]
+    $textSearch: String
+    $priceLte: Decimal
+    $priceGte: Decimal
+    $beginDate: Date
+    $endDate: Date
+    $createdAtGte: Date
+    $createdAtLte: Date
+    $applyingForFreeOfCharge: Boolean
+    $isRecurring: Boolean
+  ) {
+    reservations(
+      first: $first
+      after: $after
+      orderBy: $orderBy
+      unit: $unit
+      reservationUnit: $reservationUnit
+      reservationUnitType: $reservationUnitType
+      reservationType: $reservationType
+      state: $state
+      orderStatus: $orderStatus
+      textSearch: $textSearch
+      priceLte: $priceLte
+      priceGte: $priceGte
+      beginDate: $beginDate
+      endDate: $endDate
+      createdAtGte: $createdAtGte
+      createdAtLte: $createdAtLte
+      isRecurring: $isRecurring
+      applyingForFreeOfCharge: $applyingForFreeOfCharge
+      onlyWithPermission: true
+    ) {
+      edges {
+        node {
+          ...ReservationCommon
+          name
+          reservationUnit {
+            id
+            nameFi
+            unit {
+              id
+              nameFi
+            }
+          }
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+      totalCount
+    }
+  }
+  ${ReservationCommonFragmentDoc}
+`;
+
+/**
+ * __useReservationsQuery__
+ *
+ * To run a query within a React component, call `useReservationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReservationsQuery({
+ *   variables: {
+ *      first: // value for 'first'
+ *      after: // value for 'after'
+ *      orderBy: // value for 'orderBy'
+ *      unit: // value for 'unit'
+ *      reservationUnit: // value for 'reservationUnit'
+ *      reservationUnitType: // value for 'reservationUnitType'
+ *      reservationType: // value for 'reservationType'
+ *      state: // value for 'state'
+ *      orderStatus: // value for 'orderStatus'
+ *      textSearch: // value for 'textSearch'
+ *      priceLte: // value for 'priceLte'
+ *      priceGte: // value for 'priceGte'
+ *      beginDate: // value for 'beginDate'
+ *      endDate: // value for 'endDate'
+ *      createdAtGte: // value for 'createdAtGte'
+ *      createdAtLte: // value for 'createdAtLte'
+ *      applyingForFreeOfCharge: // value for 'applyingForFreeOfCharge'
+ *      isRecurring: // value for 'isRecurring'
+ *   },
+ * });
+ */
+export function useReservationsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    ReservationsQuery,
+    ReservationsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<ReservationsQuery, ReservationsQueryVariables>(
+    ReservationsDocument,
+    options
+  );
+}
+export function useReservationsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ReservationsQuery,
+    ReservationsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<ReservationsQuery, ReservationsQueryVariables>(
+    ReservationsDocument,
+    options
+  );
+}
+export function useReservationsSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<
+    ReservationsQuery,
+    ReservationsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<ReservationsQuery, ReservationsQueryVariables>(
+    ReservationsDocument,
+    options
+  );
+}
+export type ReservationsQueryHookResult = ReturnType<
+  typeof useReservationsQuery
+>;
+export type ReservationsLazyQueryHookResult = ReturnType<
+  typeof useReservationsLazyQuery
+>;
+export type ReservationsSuspenseQueryHookResult = ReturnType<
+  typeof useReservationsSuspenseQuery
+>;
+export type ReservationsQueryResult = Apollo.QueryResult<
+  ReservationsQuery,
+  ReservationsQueryVariables
+>;
+export const DeleteResourceDocument = gql`
+  mutation DeleteResource($input: ResourceDeleteMutationInput!) {
+    deleteResource(input: $input) {
+      deleted
+    }
+  }
+`;
+export type DeleteResourceMutationFn = Apollo.MutationFunction<
+  DeleteResourceMutation,
+  DeleteResourceMutationVariables
+>;
+
+/**
+ * __useDeleteResourceMutation__
+ *
+ * To run a mutation, you first call `useDeleteResourceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteResourceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteResourceMutation, { data, loading, error }] = useDeleteResourceMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDeleteResourceMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    DeleteResourceMutation,
+    DeleteResourceMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    DeleteResourceMutation,
+    DeleteResourceMutationVariables
+  >(DeleteResourceDocument, options);
+}
+export type DeleteResourceMutationHookResult = ReturnType<
+  typeof useDeleteResourceMutation
+>;
+export type DeleteResourceMutationResult =
+  Apollo.MutationResult<DeleteResourceMutation>;
+export type DeleteResourceMutationOptions = Apollo.BaseMutationOptions<
+  DeleteResourceMutation,
+  DeleteResourceMutationVariables
+>;
+export const DeleteSpaceDocument = gql`
+  mutation DeleteSpace($input: SpaceDeleteMutationInput!) {
+    deleteSpace(input: $input) {
+      deleted
+    }
+  }
+`;
+export type DeleteSpaceMutationFn = Apollo.MutationFunction<
+  DeleteSpaceMutation,
+  DeleteSpaceMutationVariables
+>;
+
+/**
+ * __useDeleteSpaceMutation__
+ *
+ * To run a mutation, you first call `useDeleteSpaceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteSpaceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteSpaceMutation, { data, loading, error }] = useDeleteSpaceMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDeleteSpaceMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    DeleteSpaceMutation,
+    DeleteSpaceMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<DeleteSpaceMutation, DeleteSpaceMutationVariables>(
+    DeleteSpaceDocument,
+    options
+  );
+}
+export type DeleteSpaceMutationHookResult = ReturnType<
+  typeof useDeleteSpaceMutation
+>;
+export type DeleteSpaceMutationResult =
+  Apollo.MutationResult<DeleteSpaceMutation>;
+export type DeleteSpaceMutationOptions = Apollo.BaseMutationOptions<
+  DeleteSpaceMutation,
+  DeleteSpaceMutationVariables
+>;
+export const UnitsDocument = gql`
+  query Units(
+    $first: Int
+    $after: String
+    $orderBy: [UnitOrderingChoices]
+    $nameFi: String
+  ) {
+    units(
+      first: $first
+      after: $after
+      orderBy: $orderBy
+      nameFi: $nameFi
+      onlyWithPermission: true
+    ) {
+      edges {
+        node {
+          id
+          nameFi
+          pk
+          unitGroups {
+            id
+            nameFi
+          }
+          reservationunitSet {
+            id
+            pk
+          }
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+      totalCount
+    }
+  }
+`;
+
+/**
+ * __useUnitsQuery__
+ *
+ * To run a query within a React component, call `useUnitsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUnitsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUnitsQuery({
+ *   variables: {
+ *      first: // value for 'first'
+ *      after: // value for 'after'
+ *      orderBy: // value for 'orderBy'
+ *      nameFi: // value for 'nameFi'
+ *   },
+ * });
+ */
+export function useUnitsQuery(
+  baseOptions?: Apollo.QueryHookOptions<UnitsQuery, UnitsQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<UnitsQuery, UnitsQueryVariables>(
+    UnitsDocument,
+    options
+  );
+}
+export function useUnitsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<UnitsQuery, UnitsQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<UnitsQuery, UnitsQueryVariables>(
+    UnitsDocument,
+    options
+  );
+}
+export function useUnitsSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<UnitsQuery, UnitsQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<UnitsQuery, UnitsQueryVariables>(
+    UnitsDocument,
+    options
+  );
+}
+export type UnitsQueryHookResult = ReturnType<typeof useUnitsQuery>;
+export type UnitsLazyQueryHookResult = ReturnType<typeof useUnitsLazyQuery>;
+export type UnitsSuspenseQueryHookResult = ReturnType<
+  typeof useUnitsSuspenseQuery
+>;
+export type UnitsQueryResult = Apollo.QueryResult<
+  UnitsQuery,
+  UnitsQueryVariables
+>;
+export const CreateResourceDocument = gql`
+  mutation CreateResource($input: ResourceCreateMutationInput!) {
+    createResource(input: $input) {
+      pk
+    }
+  }
+`;
+export type CreateResourceMutationFn = Apollo.MutationFunction<
+  CreateResourceMutation,
+  CreateResourceMutationVariables
+>;
+
+/**
+ * __useCreateResourceMutation__
+ *
+ * To run a mutation, you first call `useCreateResourceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateResourceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createResourceMutation, { data, loading, error }] = useCreateResourceMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateResourceMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateResourceMutation,
+    CreateResourceMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    CreateResourceMutation,
+    CreateResourceMutationVariables
+  >(CreateResourceDocument, options);
+}
+export type CreateResourceMutationHookResult = ReturnType<
+  typeof useCreateResourceMutation
+>;
+export type CreateResourceMutationResult =
+  Apollo.MutationResult<CreateResourceMutation>;
+export type CreateResourceMutationOptions = Apollo.BaseMutationOptions<
+  CreateResourceMutation,
+  CreateResourceMutationVariables
+>;
+export const UpdateResourceDocument = gql`
+  mutation UpdateResource($input: ResourceUpdateMutationInput!) {
+    updateResource(input: $input) {
+      pk
+    }
+  }
+`;
+export type UpdateResourceMutationFn = Apollo.MutationFunction<
+  UpdateResourceMutation,
+  UpdateResourceMutationVariables
+>;
+
+/**
+ * __useUpdateResourceMutation__
+ *
+ * To run a mutation, you first call `useUpdateResourceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateResourceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateResourceMutation, { data, loading, error }] = useUpdateResourceMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateResourceMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    UpdateResourceMutation,
+    UpdateResourceMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    UpdateResourceMutation,
+    UpdateResourceMutationVariables
+  >(UpdateResourceDocument, options);
+}
+export type UpdateResourceMutationHookResult = ReturnType<
+  typeof useUpdateResourceMutation
+>;
+export type UpdateResourceMutationResult =
+  Apollo.MutationResult<UpdateResourceMutation>;
+export type UpdateResourceMutationOptions = Apollo.BaseMutationOptions<
+  UpdateResourceMutation,
+  UpdateResourceMutationVariables
+>;
+export const ResourceDocument = gql`
+  query Resource($id: ID!) {
+    resource(id: $id) {
+      id
+      pk
+      nameFi
+      nameSv
+      nameEn
+      space {
+        id
+        pk
+      }
+    }
+  }
+`;
+
+/**
+ * __useResourceQuery__
+ *
+ * To run a query within a React component, call `useResourceQuery` and pass it any options that fit your needs.
+ * When your component renders, `useResourceQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useResourceQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useResourceQuery(
+  baseOptions: Apollo.QueryHookOptions<ResourceQuery, ResourceQueryVariables> &
+    ({ variables: ResourceQueryVariables; skip?: boolean } | { skip: boolean })
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<ResourceQuery, ResourceQueryVariables>(
+    ResourceDocument,
+    options
+  );
+}
+export function useResourceLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ResourceQuery,
+    ResourceQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<ResourceQuery, ResourceQueryVariables>(
+    ResourceDocument,
+    options
+  );
+}
+export function useResourceSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<
+    ResourceQuery,
+    ResourceQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<ResourceQuery, ResourceQueryVariables>(
+    ResourceDocument,
+    options
+  );
+}
+export type ResourceQueryHookResult = ReturnType<typeof useResourceQuery>;
+export type ResourceLazyQueryHookResult = ReturnType<
+  typeof useResourceLazyQuery
+>;
+export type ResourceSuspenseQueryHookResult = ReturnType<
+  typeof useResourceSuspenseQuery
+>;
+export type ResourceQueryResult = Apollo.QueryResult<
+  ResourceQuery,
+  ResourceQueryVariables
+>;
+export const CreateSpaceDocument = gql`
+  mutation CreateSpace($input: SpaceCreateMutationInput!) {
+    createSpace(input: $input) {
+      pk
+    }
+  }
+`;
+export type CreateSpaceMutationFn = Apollo.MutationFunction<
+  CreateSpaceMutation,
+  CreateSpaceMutationVariables
+>;
+
+/**
+ * __useCreateSpaceMutation__
+ *
+ * To run a mutation, you first call `useCreateSpaceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateSpaceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createSpaceMutation, { data, loading, error }] = useCreateSpaceMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateSpaceMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateSpaceMutation,
+    CreateSpaceMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<CreateSpaceMutation, CreateSpaceMutationVariables>(
+    CreateSpaceDocument,
+    options
+  );
+}
+export type CreateSpaceMutationHookResult = ReturnType<
+  typeof useCreateSpaceMutation
+>;
+export type CreateSpaceMutationResult =
+  Apollo.MutationResult<CreateSpaceMutation>;
+export type CreateSpaceMutationOptions = Apollo.BaseMutationOptions<
+  CreateSpaceMutation,
+  CreateSpaceMutationVariables
+>;
+export const UpdateSpaceDocument = gql`
+  mutation UpdateSpace($input: SpaceUpdateMutationInput!) {
+    updateSpace(input: $input) {
+      pk
+    }
+  }
+`;
+export type UpdateSpaceMutationFn = Apollo.MutationFunction<
+  UpdateSpaceMutation,
+  UpdateSpaceMutationVariables
+>;
+
+/**
+ * __useUpdateSpaceMutation__
+ *
+ * To run a mutation, you first call `useUpdateSpaceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateSpaceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateSpaceMutation, { data, loading, error }] = useUpdateSpaceMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateSpaceMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    UpdateSpaceMutation,
+    UpdateSpaceMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<UpdateSpaceMutation, UpdateSpaceMutationVariables>(
+    UpdateSpaceDocument,
+    options
+  );
+}
+export type UpdateSpaceMutationHookResult = ReturnType<
+  typeof useUpdateSpaceMutation
+>;
+export type UpdateSpaceMutationResult =
+  Apollo.MutationResult<UpdateSpaceMutation>;
+export type UpdateSpaceMutationOptions = Apollo.BaseMutationOptions<
+  UpdateSpaceMutation,
+  UpdateSpaceMutationVariables
+>;
+export const UnitSpacesDocument = gql`
+  query UnitSpaces($id: ID!) {
+    unit(id: $id) {
+      id
+      spaces {
+        id
+        pk
+        nameFi
+        parent {
+          id
+          pk
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useUnitSpacesQuery__
+ *
+ * To run a query within a React component, call `useUnitSpacesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUnitSpacesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUnitSpacesQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useUnitSpacesQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    UnitSpacesQuery,
+    UnitSpacesQueryVariables
+  > &
+    (
+      | { variables: UnitSpacesQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<UnitSpacesQuery, UnitSpacesQueryVariables>(
+    UnitSpacesDocument,
+    options
+  );
+}
+export function useUnitSpacesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    UnitSpacesQuery,
+    UnitSpacesQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<UnitSpacesQuery, UnitSpacesQueryVariables>(
+    UnitSpacesDocument,
+    options
+  );
+}
+export function useUnitSpacesSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<
+    UnitSpacesQuery,
+    UnitSpacesQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<UnitSpacesQuery, UnitSpacesQueryVariables>(
+    UnitSpacesDocument,
+    options
+  );
+}
+export type UnitSpacesQueryHookResult = ReturnType<typeof useUnitSpacesQuery>;
+export type UnitSpacesLazyQueryHookResult = ReturnType<
+  typeof useUnitSpacesLazyQuery
+>;
+export type UnitSpacesSuspenseQueryHookResult = ReturnType<
+  typeof useUnitSpacesSuspenseQuery
+>;
+export type UnitSpacesQueryResult = Apollo.QueryResult<
+  UnitSpacesQuery,
+  UnitSpacesQueryVariables
+>;
+export const SpaceDocument = gql`
+  query Space($id: ID!) {
+    space(id: $id) {
+      ...SpaceCommonFields
+      nameSv
+      nameEn
+      code
+      unit {
+        id
+        pk
+        nameFi
+        descriptionFi
+        location {
+          ...LocationFields
+        }
+        spaces {
+          id
+          pk
+          nameFi
+        }
+      }
+      parent {
+        id
+        parent {
+          id
+          nameFi
+          parent {
+            id
+            nameFi
+          }
+        }
+      }
+    }
+  }
+  ${SpaceCommonFieldsFragmentDoc}
+  ${LocationFieldsFragmentDoc}
+`;
+
+/**
+ * __useSpaceQuery__
+ *
+ * To run a query within a React component, call `useSpaceQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSpaceQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSpaceQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useSpaceQuery(
+  baseOptions: Apollo.QueryHookOptions<SpaceQuery, SpaceQueryVariables> &
+    ({ variables: SpaceQueryVariables; skip?: boolean } | { skip: boolean })
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<SpaceQuery, SpaceQueryVariables>(
+    SpaceDocument,
+    options
+  );
+}
+export function useSpaceLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<SpaceQuery, SpaceQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<SpaceQuery, SpaceQueryVariables>(
+    SpaceDocument,
+    options
+  );
+}
+export function useSpaceSuspenseQuery(
+  baseOptions?: Apollo.SuspenseQueryHookOptions<SpaceQuery, SpaceQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<SpaceQuery, SpaceQueryVariables>(
+    SpaceDocument,
+    options
+  );
+}
+export type SpaceQueryHookResult = ReturnType<typeof useSpaceQuery>;
+export type SpaceLazyQueryHookResult = ReturnType<typeof useSpaceLazyQuery>;
+export type SpaceSuspenseQueryHookResult = ReturnType<
+  typeof useSpaceSuspenseQuery
+>;
+export type SpaceQueryResult = Apollo.QueryResult<
+  SpaceQuery,
+  SpaceQueryVariables
 >;

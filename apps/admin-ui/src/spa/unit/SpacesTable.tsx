@@ -3,7 +3,7 @@ import { IconGroup } from "hds-react";
 import { trim } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { type ApolloQueryResult } from "@apollo/client";
+import { gql, type ApolloQueryResult } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import {
@@ -244,3 +244,11 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
     </div>
   );
 }
+
+export const DELETE_SPACE = gql`
+  mutation DeleteSpace($input: SpaceDeleteMutationInput!) {
+    deleteSpace(input: $input) {
+      deleted
+    }
+  }
+`;
