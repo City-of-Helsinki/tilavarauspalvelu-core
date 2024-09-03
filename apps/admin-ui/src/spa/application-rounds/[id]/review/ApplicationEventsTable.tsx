@@ -162,7 +162,6 @@ export function ApplicationEventsTable({
   const sortDirection = sort?.startsWith("-") ? "desc" : "asc";
   return (
     <CustomTable
-      disableKey
       setSort={onSortChanged}
       indexKey="pk"
       isLoading={isLoading}
