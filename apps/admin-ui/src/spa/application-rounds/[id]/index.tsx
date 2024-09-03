@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { errorToast } from "common/src/common/toast";
 import { UserPermissionChoice, useApplicationRoundQuery } from "@gql/gql-types";
 import Loader from "@/component/Loader";
-import { Review } from "./review/Review";
+import { Review } from "./review";
 import { useCheckPermission } from "@/hooks";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { isApplicationRoundInProgress } from "@/helpers";
