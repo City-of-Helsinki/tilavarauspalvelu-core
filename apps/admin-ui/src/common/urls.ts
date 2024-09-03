@@ -2,17 +2,15 @@ import { type Maybe } from "@gql/gql-types";
 import { PUBLIC_URL } from "./const";
 
 export const prefixes = {
-  recurringReservations: "/recurring-reservations",
   reservations: "/reservations",
   applications: "/application",
   reservationUnits: "/reservation-units",
 };
 
-export const reservationUnitsUrl = "/premises-and-settings/reservation-units";
+export const reservationUnitsUrl = "/reservation-units";
 export const singleUnitUrl = "/unit";
-export const applicationRoundsUrl =
-  "/recurring-reservations/application-rounds";
-export const unitsUrl = "/premises-and-settings/units";
+export const applicationRoundsUrl = "/application-rounds";
+export const unitsUrl = "/units";
 export const bannerNotificationsUrl = "/messaging/notifications";
 export const requestedReservationsUrl = "/reservations/requested";
 export const reservationsUrl = "/reservations";
@@ -21,8 +19,7 @@ export const myUnitsUrl = "/my-units";
 
 export const applicationRoundUrl = (
   applicationRoundId: number | string
-): string =>
-  `${prefixes.recurringReservations}/application-rounds/${applicationRoundId}`;
+): string => `/application-rounds/${applicationRoundId}`;
 
 export function getReservationUrl(pk: Maybe<number> | undefined): string {
   if (pk == null || !(pk > 0)) {

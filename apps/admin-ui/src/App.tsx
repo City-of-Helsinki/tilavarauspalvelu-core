@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import dynamic from "next/dynamic";
-import ApplicationRound from "./spa/recurring-reservations/application-rounds/[id]";
+import ApplicationRound from "./spa/application-rounds/[id]";
 import PageWrapper from "./component/PageWrapper";
 import "./i18n";
 import { PUBLIC_URL } from "./common/const";
@@ -28,14 +28,13 @@ const ReservationUnits = dynamic(
 const HomePage = dynamic(() => import("./spa/HomePage"));
 
 const AllApplicationRounds = dynamic(
-  () => import(`./spa/recurring-reservations/application-rounds/index`)
+  () => import(`./spa/application-rounds/index`)
 );
 const Criteria = dynamic(
-  () => import(`./spa/recurring-reservations/application-rounds/[id]/criteria`)
+  () => import(`./spa/application-rounds/[id]/criteria`)
 );
 const ApplicationRoundAllocation = dynamic(
-  () =>
-    import(`./spa/recurring-reservations/application-rounds/[id]/allocation`)
+  () => import(`./spa/application-rounds/[id]/allocation`)
 );
 
 type Props = {
@@ -63,32 +62,6 @@ const ApplicationRoundsRouter = () => (
   </Routes>
 );
 
-const PremisesRouter = ({
-  apiBaseUrl,
-  feedbackUrl,
-}: Omit<Props, "reservationUnitPreviewUrl">) => (
-  <Routes>
-    <Route
-      path={prefixes.reservationUnits}
-      element={withAuthorization(
-        <ReservationUnits />,
-        apiBaseUrl,
-        feedbackUrl,
-        UserPermissionChoice.CanManageReservationUnits
-      )}
-    />
-    <Route
-      path="units"
-      element={withAuthorization(
-        <Units />,
-        apiBaseUrl,
-        feedbackUrl,
-        UserPermissionChoice.CanManageReservationUnits
-      )}
-    />
-  </Routes>
-);
-
 function ClientApp({
   reservationUnitPreviewUrl,
   apiBaseUrl,
@@ -113,7 +86,7 @@ function ClientApp({
             )}
           />
           <Route
-            path={`${prefixes.recurringReservations}/application-rounds/*`}
+            path="/application-rounds/*"
             element={withAuthorization(
               <ApplicationRoundsRouter />,
               apiBaseUrl,
@@ -122,14 +95,21 @@ function ClientApp({
             )}
           />
           <Route
-            path="/premises-and-settings/*"
+            path="/reservation-units"
             element={withAuthorization(
-              <PremisesRouter
-                apiBaseUrl={apiBaseUrl}
-                feedbackUrl={feedbackUrl}
-              />,
+              <ReservationUnits />,
               apiBaseUrl,
-              feedbackUrl
+              feedbackUrl,
+              UserPermissionChoice.CanManageReservationUnits
+            )}
+          />
+          <Route
+            path="units"
+            element={withAuthorization(
+              <Units />,
+              apiBaseUrl,
+              feedbackUrl,
+              UserPermissionChoice.CanManageReservationUnits
             )}
           />
           <Route
