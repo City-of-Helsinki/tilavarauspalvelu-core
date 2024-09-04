@@ -6,7 +6,7 @@ from freezegun import freeze_time
 
 from api.graphql.types.reservation.serializers.mixins import ReservationPriceMixin
 from common.date_utils import local_datetime
-from reservation_units.enums import PriceUnit, PricingType
+from reservation_units.enums import PriceUnit
 from tests.factories import ReservationUnitFactory, ReservationUnitPricingFactory
 from utils.decimal_utils import round_decimal
 
@@ -41,7 +41,7 @@ def test_reservation__calculate_price__subsidised_price_is_equal_to_lowest_price
     assert round_decimal(prices.subsidised_price_net, 6) == round_decimal(pricing.lowest_price_net * 2, 6)
 
 
-def test_reservation__calculate_price__pricing_is_calculated_per_15_min_with_pricing_type_less_than_half_day():
+def test_reservation__calculate_price__pricing_is_calculated_per_15_min_with_pricing_unit_less_than_half_day():
     begin = local_datetime()
     end = begin + datetime.timedelta(hours=1, minutes=15)
 
@@ -59,7 +59,7 @@ def test_reservation__calculate_price__pricing_is_calculated_per_15_min_with_pri
     )
 
 
-def test_reservation__calculate_price__pricing_is_fixed_with_pricing_type_more_than_half_day():
+def test_reservation__calculate_price__pricing_is_fixed_with_pricing_unit_more_than_half_day():
     begin = local_datetime()
     end = begin + datetime.timedelta(hours=14)
 
@@ -155,12 +155,10 @@ def test_reservation__calculate_price__active_is_free_future_is_paid_and_differe
     day_2 = day_1 + datetime.timedelta(days=1)
 
     reservation_unit = ReservationUnitFactory.create()
-    ReservationUnitPricingFactory.create(
+    ReservationUnitPricingFactory.create_free(
         reservation_unit=reservation_unit,
         begins=day_1,
-        tax_percentage__value=Decimal("0"),
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
-        pricing_type=PricingType.FREE,
     )
     ReservationUnitPricingFactory.create(
         reservation_unit=reservation_unit,
@@ -187,12 +185,10 @@ def test_reservation__calculate_price__active_is_paid_future_is_free_and_differe
         tax_percentage__value=Decimal("25.5"),
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
     )
-    ReservationUnitPricingFactory.create(
+    ReservationUnitPricingFactory.create_free(
         reservation_unit=reservation_unit,
         begins=day_2,
-        tax_percentage__value=Decimal("0"),
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
-        pricing_type=PricingType.FREE,
     )
 
     prices = ReservationPriceMixin().calculate_price(day_1, day_1, [reservation_unit])

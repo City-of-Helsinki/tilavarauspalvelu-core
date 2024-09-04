@@ -3,7 +3,7 @@ from decimal import Decimal
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from reservation_units.enums import PriceUnit, PricingType
+from reservation_units.enums import PriceUnit
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 
 __all__ = [
@@ -32,15 +32,6 @@ class ReservationUnitPricing(models.Model):
     # True: This pricing is used for reservations that are created after the begins date
     # False: This pricing is used for reservations that start after the begins date
     is_activated_on_begins = models.BooleanField(default=False)
-
-    pricing_type = models.CharField(
-        max_length=20,
-        verbose_name=_("Pricing type"),
-        choices=PricingType.choices,
-        blank=True,
-        null=True,
-        help_text="What kind of pricing types are available with this reservation unit.",
-    )
 
     price_unit = models.CharField(
         max_length=20,

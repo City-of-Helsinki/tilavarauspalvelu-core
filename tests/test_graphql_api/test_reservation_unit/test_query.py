@@ -6,7 +6,7 @@ from graphql_relay import to_global_id
 
 from applications.enums import WeekdayChoice
 from common.date_utils import local_datetime, next_hour
-from reservation_units.enums import PricingType, ReservationUnitState
+from reservation_units.enums import ReservationUnitState
 from reservations.enums import ReservationStateChoice, ReservationTypeChoice
 from terms_of_use.models import TermsOfUse
 from tests.factories import (
@@ -331,7 +331,7 @@ def test_reservation_unit__query__all_one_to_many_relations(graphql):
     """
 
     reservation_unit = ReservationUnitFactory.create(
-        pricings__pricing_type=PricingType.PAID,
+        pricings__highest_price=20,
         images__large_url="https://example.com",
         application_round_time_slots__closed=False,
     )

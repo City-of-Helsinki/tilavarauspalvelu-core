@@ -8,7 +8,6 @@ from merchants.enums import OrderStatus, PaymentType
 from merchants.models import PaymentOrder
 from merchants.verkkokauppa.order.exceptions import CreateOrderError
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from reservation_units.enums import PricingType
 from reservations.enums import ReservationStateChoice
 from tests.factories import (
     EmailTemplateFactory,
@@ -355,7 +354,8 @@ def test_reservation__confirm__does_not_allow_unsupported_payment_type(graphql):
 def test_reservation__confirm__allows_unsupported_payment_type_with_zero_price(graphql):
     reservation = ReservationFactory.create_for_confirmation(
         reservation_unit__payment_types=[PaymentType.INVOICE],
-        reservation_unit__pricings__pricing_type=PricingType.FREE,
+        reservation_unit__pricings__lowest_price=0,
+        reservation_unit__pricings__highest_price=0,
         price=Decimal("0"),
         price_net=Decimal("0"),
     )
@@ -494,10 +494,11 @@ def test_reservation__confirm__with_price_requires_payment_product(graphql):
     assert response.error_message() == "Reservation unit is missing payment product"
 
 
-def test_reservation__confirm__without_price_and_with_free_pricing_type_does_not_require_payment_product(graphql):
+def test_reservation__confirm__without_price_and_with_free_pricing_does_not_require_payment_product(graphql):
     reservation = ReservationFactory.create_for_confirmation(
         reservation_unit__payment_product=None,
-        reservation_unit__pricings__pricing_type=PricingType.FREE,
+        reservation_unit__pricings__lowest_price=0,
+        reservation_unit__pricings__highest_price=0,
         price=Decimal("0"),
         price_net=Decimal("0"),
     )

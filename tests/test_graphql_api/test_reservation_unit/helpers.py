@@ -5,13 +5,7 @@ from typing import Any, NamedTuple
 from graphene_django_extensions.testing import build_mutation, build_query
 
 from common.date_utils import local_datetime
-from reservation_units.enums import (
-    AuthenticationType,
-    PriceUnit,
-    PricingType,
-    ReservationKind,
-    ReservationStartInterval,
-)
+from reservation_units.enums import AuthenticationType, PriceUnit, ReservationKind, ReservationStartInterval
 from reservation_units.models import ReservationUnit
 from tests.factories import (
     PaymentProductFactory,
@@ -96,7 +90,6 @@ def get_create_non_draft_input_data() -> dict[str, Any]:
         "pricings": [
             {
                 "begins": datetime.date.today().strftime("%Y-%m-%d"),
-                "pricingType": PricingType.PAID.value.upper(),
                 "priceUnit": PriceUnit.PRICE_UNIT_PER_15_MINS.value.upper(),
                 "lowestPrice": "10.5",
                 "highestPrice": "18.8",
@@ -135,7 +128,6 @@ def get_create_draft_input_data(**overrides: Any) -> dict[str, Any]:
 def get_pricing_data(**overrides: Any) -> dict[str, Any]:
     return {
         "begins": "2022-09-11",
-        "pricingType": PricingType.PAID.value.upper(),
         "priceUnit": PriceUnit.PRICE_UNIT_PER_15_MINS.value.upper(),
         "lowestPrice": "18.2",
         "highestPrice": "21.5",
@@ -186,17 +178,19 @@ def create_reservation_units_for_reservation_state_filtering() -> ReservationSta
     )
     reservable_paid = ReservationUnitFactory.create(
         payment_product=PaymentProductFactory.create(),
-        pricings__pricing_type=PricingType.PAID,
+        pricings__highest_price=20,
     )
     reservable_free = ReservationUnitFactory.create(
-        pricings__pricing_type=PricingType.FREE,
+        pricings__lowest_price=0,
+        pricings__highest_price=0,
     )
     scheduled_period = ReservationUnitFactory.create(
         reservation_begins=(now + datetime.timedelta(days=1)),
         reservation_ends=(now + datetime.timedelta(days=2)),
     )
     scheduled_closing = ReservationUnitFactory.create(
-        pricings__pricing_type=PricingType.FREE,
+        pricings__lowest_price=0,
+        pricings__highest_price=0,
         reservation_begins=(now - datetime.timedelta(days=1)),
         reservation_ends=(now + datetime.timedelta(days=1)),
     )
@@ -206,7 +200,7 @@ def create_reservation_units_for_reservation_state_filtering() -> ReservationSta
     )
     missing_pricing = ReservationUnitFactory.create()
     missing_payment_product = ReservationUnitFactory.create(
-        pricings__pricing_type=PricingType.PAID,
+        pricings__highest_price=20,
     )
 
     return ReservationStateFiltering(

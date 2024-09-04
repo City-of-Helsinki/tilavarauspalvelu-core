@@ -7,7 +7,6 @@ __all__ = [
     "AuthenticationType",
     "PaymentType",
     "PriceUnit",
-    "PricingType",
     "ReservationKind",
     "ReservationStartInterval",
     "ReservationState",
@@ -62,11 +61,6 @@ class ReservationKind(models.TextChoices):
     @classproperty
     def allows_season(cls) -> list[str]:
         return [cls.SEASON.value, cls.DIRECT_AND_SEASON.value]
-
-
-class PricingType(models.TextChoices):
-    PAID = "paid", pgettext_lazy("PricingType", "Paid")
-    FREE = "free", pgettext_lazy("PricingType", "Free")
 
 
 class PaymentType(models.TextChoices):

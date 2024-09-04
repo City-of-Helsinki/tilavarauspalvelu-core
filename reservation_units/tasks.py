@@ -11,7 +11,6 @@ from merchants.models import PaymentProduct
 from merchants.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
 from merchants.verkkokauppa.product.types import CreateOrUpdateAccountingParams, CreateProductParams
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from reservation_units.enums import PricingType
 from reservation_units.utils.reservation_unit_payment_helper import ReservationUnitPaymentHelper
 from tilavarauspalvelu.celery import app
 from utils.image_cache import purge
@@ -48,8 +47,8 @@ def update_reservation_unit_pricings_tax_percentage(
     # Last pricing for each reservation unit before the change date
     latest_pricings = (
         ReservationUnitPricing.objects.filter(
-            Q(begins__lte=change_date, pricing_type=PricingType.FREE)  # Ignore FREE pricings after the change date
-            | Q(pricing_type=PricingType.PAID)
+            Q(begins__lte=change_date, highest_price=0)  # Ignore FREE pricings after the change date
+            | Q(highest_price__gt=0)
         )
         .exclude(reservation_unit__payment_accounting__company_code__in=ignored_company_codes)
         .order_by("reservation_unit_id", "-begins")
@@ -60,8 +59,7 @@ def update_reservation_unit_pricings_tax_percentage(
         # We don't want to filter these away in the queryset, as that might cause us to incorrectly create new pricings
         # in some cases. e.g. Current pricing is PAID, but the future pricing is FREE or has a different tax percentage.
         if (
-            pricing.pricing_type == PricingType.PAID
-            and pricing.highest_price > 0
+            pricing.highest_price > 0
             and pricing.tax_percentage == current_tax_percentage
             # Don't create a new pricing if the reservation unit has a future pricing after the change date
             and pricing.begins < change_date
@@ -69,7 +67,6 @@ def update_reservation_unit_pricings_tax_percentage(
             ReservationUnitPricing(
                 begins=change_date,
                 tax_percentage=future_tax_percentage,
-                pricing_type=pricing.pricing_type,
                 price_unit=pricing.price_unit,
                 lowest_price=pricing.lowest_price,
                 highest_price=pricing.highest_price,
@@ -81,8 +78,7 @@ def update_reservation_unit_pricings_tax_percentage(
     unhandled_future_pricings = ReservationUnitPricing.objects.filter(
         begins__gte=change_date,
         tax_percentage=current_tax_percentage,
-        pricing_type=PricingType.PAID,
-        highest_price__gte=0,
+        highest_price__gt=0,
     )
 
     for pricing in unhandled_future_pricings:

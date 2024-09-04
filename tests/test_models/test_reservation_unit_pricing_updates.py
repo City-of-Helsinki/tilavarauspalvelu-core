@@ -3,7 +3,6 @@ from decimal import Decimal
 
 import pytest
 
-from reservation_units.enums import PricingType
 from reservation_units.models import ReservationUnitPricing
 from reservation_units.tasks import update_reservation_unit_pricings_tax_percentage
 from tests.factories import ReservationUnitFactory, ReservationUnitPricingFactory
@@ -93,11 +92,10 @@ def test_reservation_unit__update_pricings__tax_percentage__free_future_pricing_
         begins=datetime.date(2024, 1, 1),
         tax_percentage__value=CURRENT_TAX,
     )
-    ReservationUnitPricingFactory.create(
+    ReservationUnitPricingFactory.create_free(
         begins=TAX_CHANGE_DATE,
         reservation_unit=pricing_1.reservation_unit,
         tax_percentage__value=CURRENT_TAX,
-        pricing_type=PricingType.FREE,
     )
 
     update_reservation_unit_pricings_tax_percentage(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX))
@@ -111,11 +109,10 @@ def test_reservation_unit__update_pricings__tax_percentage__free_future_pricing_
         begins=datetime.date(2024, 1, 1),
         tax_percentage__value=CURRENT_TAX,
     )
-    ReservationUnitPricingFactory.create(
+    ReservationUnitPricingFactory.create_free(
         begins=datetime.date(2024, 9, 21),
         reservation_unit=pricing_1.reservation_unit,
         tax_percentage__value=CURRENT_TAX,
-        pricing_type=PricingType.FREE,
     )
 
     update_reservation_unit_pricings_tax_percentage(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX))
@@ -146,11 +143,10 @@ def test_reservation_unit__update_pricings__tax_percentage__different_tax_percen
 
 def test_reservation_unit__update_pricings__tax_percentage__free_pricing_is_ignored():
     reservation_unit = ReservationUnitFactory.create()
-    ReservationUnitPricingFactory.create(
+    ReservationUnitPricingFactory.create_free(
         begins=datetime.date(2024, 1, 1),
         reservation_unit=reservation_unit,
         tax_percentage__value=CURRENT_TAX,
-        pricing_type=PricingType.FREE,
     )
 
     update_reservation_unit_pricings_tax_percentage(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX))

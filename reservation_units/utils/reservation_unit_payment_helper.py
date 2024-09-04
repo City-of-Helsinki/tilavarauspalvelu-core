@@ -19,8 +19,6 @@ class ReservationUnitPaymentHelper:
 
     @classmethod
     def requires_product_mapping_update(cls, reservation_unit: "ReservationUnit") -> bool:
-        from reservation_units.enums import PricingType
-
         payment_merchant = cls.get_merchant(reservation_unit)
         if payment_merchant is None:
             return False
@@ -31,9 +29,9 @@ class ReservationUnitPaymentHelper:
 
         # Has PAID active or future pricings
         active_pricing = reservation_unit.actions.get_active_pricing()
-        if active_pricing.pricing_type == PricingType.PAID:
+        if active_pricing.highest_price > 0:
             return True
-        return reservation_unit.pricings.filter(pricing_type=PricingType.PAID, begins__gt=local_date()).exists()
+        return reservation_unit.pricings.filter(highest_price__gt=0, begins__gt=local_date()).exists()
 
     @classmethod
     def get_accounting(cls, reservation_unit: "ReservationUnit") -> PaymentAccounting | None:

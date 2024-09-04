@@ -5,7 +5,7 @@ from django.conf import settings
 from django.db.models import Expression, F, OuterRef, Q, Subquery
 
 from common.date_utils import local_date, local_datetime
-from reservation_units.enums import PricingType, ReservationState
+from reservation_units.enums import ReservationState
 from reservation_units.models import ReservationUnit, ReservationUnitPricing
 
 
@@ -104,17 +104,17 @@ class ReservationUnitReservationStateHelper:
         )
 
     @classmethod
-    def __active_pricing_type_alias(cls) -> dict[str, Subquery]:
+    def __active_pricing_price_alias(cls) -> dict[str, Subquery]:
         today = local_date()
         return {
-            "active_pricing_type": Subquery(
+            "active_pricing_price": Subquery(
                 queryset=(
                     ReservationUnitPricing.objects.filter(
                         reservation_unit=OuterRef("pk"),
                         begins__lte=today,
                     )
                     .order_by("-begins")
-                    .values("pricing_type")[:1]
+                    .values("highest_price")[:1]
                 ),
             ),
         }
@@ -131,7 +131,7 @@ class ReservationUnitReservationStateHelper:
             return True
 
         # Pricing is FREE
-        if active_pricing.pricing_type == PricingType.FREE:
+        if active_pricing.highest_price == 0:
             return True
         # Pricing is PAID and there is a payment product
         return reservation_unit.payment_product is not None
@@ -141,13 +141,13 @@ class ReservationUnitReservationStateHelper:
         # If MOCK_VERKKOKAUPPA_API_ENABLED is True there is no need to check for payment products,
         # as the products are created when a reservation is made.
         if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
-            return Q(active_pricing_type__isnull=False)
+            return Q(active_pricing_price__isnull=False)
 
         return (
             # Pricing is paid and there is a payment product
-            Q(active_pricing_type=PricingType.PAID, payment_product__isnull=False)
+            Q(active_pricing_price__gt=0, payment_product__isnull=False)
             # or pricing is free
-            | Q(active_pricing_type=PricingType.FREE)
+            | Q(active_pricing_price=0)
         )
 
     @classmethod
@@ -159,7 +159,7 @@ class ReservationUnitReservationStateHelper:
     @classmethod
     def __get_is_reservable_query(cls) -> QueryState:
         return QueryState(
-            aliases=cls.__active_pricing_type_alias(),
+            aliases=cls.__active_pricing_price_alias(),
             filters=(cls.__is_reservable_period_query() & cls.__has_valid_pricing_query()),
         )
 
@@ -217,7 +217,7 @@ class ReservationUnitReservationStateHelper:
     @classmethod
     def __get_is_scheduled_closing_query(cls) -> QueryState:
         return QueryState(
-            aliases=cls.__active_pricing_type_alias(),
+            aliases=cls.__active_pricing_price_alias(),
             filters=(cls.__is_scheduled_closing_period_query() & cls.__has_valid_pricing_query()),
         )
 
@@ -312,7 +312,7 @@ class ReservationUnitReservationStateHelper:
         ) and (
             active_pricing is None
             or (
-                active_pricing.pricing_type == PricingType.PAID
+                active_pricing.highest_price > 0
                 and reservation_unit.payment_product is None
                 and not settings.MOCK_VERKKOKAUPPA_API_ENABLED  # Don't show as closed if using Mock Verkkokauppa API
             )
@@ -322,19 +322,19 @@ class ReservationUnitReservationStateHelper:
     def __get_is_reservation_closed_query(cls) -> QueryState:
         now = local_datetime()
 
-        payment_product_query = Q(active_pricing_type=PricingType.PAID) & Q(payment_product__isnull=True)
+        payment_product_query = Q(active_pricing_price__gt=0) & Q(payment_product__isnull=True)
         if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
             payment_product_query = Q()
 
         return QueryState(
-            aliases=cls.__active_pricing_type_alias(),
+            aliases=cls.__active_pricing_price_alias(),
             filters=(
                 Q(reservation_ends__lte=now, reservation_ends__gte=F("reservation_begins"))
                 | Q(reservation_begins__isnull=True, reservation_ends__lte=now)
                 | Q(reservation_ends=F("reservation_begins"))
                 | (
                     (cls.__is_reservable_period_query() | cls.__is_scheduled_closing_period_query())
-                    & (Q(active_pricing_type=None) | payment_product_query)
+                    & (Q(active_pricing_price=None) | payment_product_query)
                 )
             ),
         )

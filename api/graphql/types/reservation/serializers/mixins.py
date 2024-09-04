@@ -10,7 +10,7 @@ from django.utils.timezone import get_default_timezone
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from api.graphql.types.reservation.types import ReservationNode
 from common.date_utils import local_datetime, local_start_of_day
-from reservation_units.enums import PriceUnit, PricingType, ReservationStartInterval, ReservationUnitState
+from reservation_units.enums import PriceUnit, ReservationStartInterval, ReservationUnitState
 from reservation_units.models import ReservationUnit
 from reservations.enums import ReservationTypeChoice
 from reservations.models import Reservation
@@ -114,8 +114,8 @@ class ReservationPriceMixin:
         for reservation_unit in reservation_units:
             pricing = reservation_unit.actions.get_active_pricing(by_date=begin_datetime.date())
 
-            # If unit pricing type is not PAID, there is no need for calculations, skip to next reservation unit
-            if pricing is None or pricing.pricing_type != PricingType.PAID:
+            # If reservation unit pricing type is FREE, there is no need for calculations, skip to next reservation unit
+            if pricing is None or pricing.highest_price == 0:
                 continue
 
             price = pricing.highest_price
