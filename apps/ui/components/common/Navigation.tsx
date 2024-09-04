@@ -52,6 +52,9 @@ const Wrapper = styled.div`
     [class*="module_headerNavigationMenuContainer__"] li {
       a {
         margin: 0;
+        &:focus {
+          text-decoration: underline;
+        }
       }
 
       span:has(.active) {

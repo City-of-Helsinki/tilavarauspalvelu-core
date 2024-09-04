@@ -48,7 +48,8 @@ const BackgroundHeader = styled(Header)`
   }
 
   /* retain text-decoration: underline on the plain text in navigation items, but disable it in the notificationBubble */
-  [class^="HeaderNavigationMenu-module_headerNavigationMenuLinkContent__"]:hover {
+  [class^="HeaderNavigationMenu-module_headerNavigationMenuLinkContent__"]:hover,
+  [class^="HeaderNavigationMenu-module_headerNavigationMenuLinkContent__"]:focus-within {
     a {
       text-decoration: none;
       span {
