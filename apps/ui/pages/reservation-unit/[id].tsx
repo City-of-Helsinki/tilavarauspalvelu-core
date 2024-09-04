@@ -124,7 +124,6 @@ import QuickReservation, {
 } from "@/components/reservation-unit/QuickReservation";
 import ReservationInfoContainer from "@/components/reservation-unit/ReservationInfoContainer";
 import { useCurrentUser } from "@/hooks/user";
-import { CenterSpinner } from "@/components/common/common";
 import {
   getCommonServerSideProps,
   getGenericTerms,
@@ -519,7 +518,7 @@ function ReservationUnit({
 
   const submitReservation = (_data: PendingReservationFormType) => {
     const { start: begin, end } = focusSlot;
-    if (reservationUnit?.pk == null || begin == null || end == null) {
+    if (reservationUnit.pk == null || begin == null || end == null) {
       return;
     }
     const input: ReservationCreateMutationInput = {
@@ -569,11 +568,11 @@ function ReservationUnit({
   // TODO also combine with other instances of LIST_RESERVATIONS
   const { data } = useListReservationsQuery({
     fetchPolicy: "no-cache",
-    skip: !currentUser || !reservationUnit?.pk,
+    skip: !currentUser || !reservationUnit.pk,
     variables: {
       beginDate: toApiDate(now),
       user: currentUser?.pk ?? 0,
-      reservationUnit: [reservationUnit?.pk ?? 0],
+      reservationUnit: [reservationUnit.pk ?? 0],
       state: RELATED_RESERVATION_STATES,
       reservationType: ReservationTypeChoice.Normal,
     },
@@ -587,60 +586,54 @@ function ReservationUnit({
     return getSlotPropGetter({
       reservableTimes,
       activeApplicationRounds,
-      reservationBegins: reservationUnit?.reservationBegins
+      reservationBegins: reservationUnit.reservationBegins
         ? new Date(reservationUnit.reservationBegins)
         : undefined,
-      reservationEnds: reservationUnit?.reservationEnds
+      reservationEnds: reservationUnit.reservationEnds
         ? new Date(reservationUnit.reservationEnds)
         : undefined,
-      reservationsMinDaysBefore:
-        reservationUnit?.reservationsMinDaysBefore ?? 0,
-      reservationsMaxDaysBefore:
-        reservationUnit?.reservationsMaxDaysBefore ?? 0,
+      reservationsMinDaysBefore: reservationUnit.reservationsMinDaysBefore ?? 0,
+      reservationsMaxDaysBefore: reservationUnit.reservationsMaxDaysBefore ?? 0,
     });
   }, [
     reservableTimes,
     activeApplicationRounds,
-    reservationUnit?.reservationBegins,
-    reservationUnit?.reservationEnds,
-    reservationUnit?.reservationsMinDaysBefore,
-    reservationUnit?.reservationsMaxDaysBefore,
+    reservationUnit.reservationBegins,
+    reservationUnit.reservationEnds,
+    reservationUnit.reservationsMinDaysBefore,
+    reservationUnit.reservationsMaxDaysBefore,
   ]);
 
   const isReservationQuotaReached = useMemo(() => {
     return (
-      reservationUnit?.maxReservationsPerUser != null &&
-      reservationUnit?.numActiveUserReservations != null &&
-      reservationUnit?.numActiveUserReservations >=
-        reservationUnit?.maxReservationsPerUser
+      reservationUnit.maxReservationsPerUser != null &&
+      reservationUnit.numActiveUserReservations != null &&
+      reservationUnit.numActiveUserReservations >=
+        reservationUnit.maxReservationsPerUser
     );
   }, [
-    reservationUnit?.maxReservationsPerUser,
-    reservationUnit?.numActiveUserReservations,
+    reservationUnit.maxReservationsPerUser,
+    reservationUnit.numActiveUserReservations,
   ]);
 
   const shouldDisplayApplicationRoundTimeSlots =
-    !!activeApplicationRounds?.length;
+    activeApplicationRounds.length > 0;
 
   const { applicationRoundTimeSlots } = reservationUnit;
 
   const shouldDisplayPricingTerms = useMemo(() => {
-    const pricings = filterNonNullable(reservationUnit?.pricings);
+    const pricings = filterNonNullable(reservationUnit.pricings);
     if (pricings.length === 0) {
       return false;
     }
     return (
-      reservationUnit?.canApplyFreeOfCharge &&
+      reservationUnit.canApplyFreeOfCharge &&
       isReservationUnitPaidInFuture(pricings)
     );
-  }, [reservationUnit?.canApplyFreeOfCharge, reservationUnit?.pricings]);
+  }, [reservationUnit.canApplyFreeOfCharge, reservationUnit.pricings]);
 
   const handleCalendarEventChange = useCallback(
     ({ start, end }: CalendarEvent<ReservationNode>): boolean => {
-      if (!reservationUnit) {
-        return false;
-      }
-
       if (isReservationQuotaReached) {
         return false;
       }
@@ -712,8 +705,7 @@ function ReservationUnit({
       const { start, end, action } = props;
       if (
         (action === "select" && !isTouchDevice()) ||
-        isReservationQuotaReached ||
-        !reservationUnit
+        isReservationQuotaReached
       ) {
         return false;
       }
@@ -781,7 +773,7 @@ function ReservationUnit({
     const calendarDuration = diff >= 90 ? `(${formatDuration(diff, t)})` : "";
 
     const existingReservations = filterNonNullable(
-      reservationUnit?.reservationSet
+      reservationUnit.reservationSet
     );
     const focusEvent = {
       begin: start,
@@ -853,7 +845,7 @@ function ReservationUnit({
       if (focusSlot == null || pk == null) {
         return;
       }
-      if (reservationUnit?.pk != null) {
+      if (reservationUnit.pk != null) {
         router.push(
           `/reservation-unit/${reservationUnit.pk}/reservation/${pk}`
         );
@@ -953,31 +945,29 @@ function ReservationUnit({
     () => relatedReservationUnits?.length > 0,
     [relatedReservationUnits?.length]
   );
-  const termsOfUseContent = reservationUnit
-    ? getTranslation(reservationUnit, "termsOfUse")
-    : undefined;
-  const paymentTermsContent = reservationUnit?.paymentTerms
+  const termsOfUseContent = getTranslation(reservationUnit, "termsOfUse");
+  const paymentTermsContent = reservationUnit.paymentTerms
     ? getTranslation(reservationUnit.paymentTerms, "text")
     : undefined;
-  const cancellationTermsContent = reservationUnit?.cancellationTerms
+  const cancellationTermsContent = reservationUnit.cancellationTerms
     ? getTranslation(reservationUnit.cancellationTerms, "text")
     : undefined;
-  const pricingTermsContent = reservationUnit?.pricingTerms
+  const pricingTermsContent = reservationUnit.pricingTerms
     ? getTranslation(reservationUnit.pricingTerms, "text")
     : undefined;
-  const serviceSpecificTermsContent = reservationUnit?.serviceSpecificTerms
+  const serviceSpecificTermsContent = reservationUnit.serviceSpecificTerms
     ? getTranslation(reservationUnit.serviceSpecificTerms, "text")
     : undefined;
 
   const [cookiehubBannerHeight, setCookiehubBannerHeight] = useState<number>(0);
-  const futurePricing =
-    reservationUnit != null
-      ? getFuturePricing(reservationUnit, activeApplicationRounds)
-      : undefined;
+  const futurePricing = getFuturePricing(
+    reservationUnit,
+    activeApplicationRounds
+  );
   const formatters = getFormatters(i18n.language);
   const currentDate = focusDate ?? now;
   const dayStartTime = addHours(startOfDay(currentDate), 6);
-  const equipment = filterNonNullable(reservationUnit?.equipments);
+  const equipment = filterNonNullable(reservationUnit.equipments);
 
   const onScroll = () => {
     const banner: HTMLElement | null = window.document.querySelector(
@@ -1026,12 +1016,9 @@ function ReservationUnit({
     [apiBaseUrl, focusSlot, reservationForm, storeReservationForLogin, t]
   );
 
-  if (reservationUnit == null) {
-    return <CenterSpinner />;
-  }
   const startingTimeOptions = getPossibleTimesForDay({
     reservableTimes,
-    interval: reservationUnit?.reservationStartInterval,
+    interval: reservationUnit.reservationStartInterval,
     date: focusDate,
     reservationUnit,
     activeApplicationRounds,
@@ -1060,7 +1047,7 @@ function ReservationUnit({
         reservationUnit={reservationUnit}
         reservationUnitIsReservable={reservationUnitIsReservable}
         subventionSuffix={
-          reservationUnit?.canApplyFreeOfCharge ? (
+          reservationUnit.canApplyFreeOfCharge ? (
             <SubventionSuffix
               placement="reservation-unit-head"
               setIsDialogOpen={setIsDialogOpen}
@@ -1076,7 +1063,7 @@ function ReservationUnit({
                 <QuickReservation
                   {...reservationControlProps}
                   subventionSuffix={
-                    reservationUnit?.canApplyFreeOfCharge ? (
+                    reservationUnit.canApplyFreeOfCharge ? (
                       <SubventionSuffix
                         placement="reservation-unit-head"
                         setIsDialogOpen={setIsDialogOpen}

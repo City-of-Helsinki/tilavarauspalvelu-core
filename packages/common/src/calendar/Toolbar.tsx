@@ -6,6 +6,7 @@ import { fi } from "date-fns/locale/fi";
 import styled from "styled-components";
 import type { NavigateAction, View } from "react-big-calendar";
 import { useTranslation } from "next-i18next";
+import { NoWrap } from "../../styles/util";
 
 export type ToolbarProps = {
   onNavigate: (n: NavigateAction) => void;
@@ -139,13 +140,13 @@ const ButtonWrapper = styled.div`
   }
 `;
 
-const Toolbar = ({
+export function Toolbar({
   onNavigate,
   onView,
   view,
   date,
   children,
-}: ToolbarProps) => {
+}: ToolbarProps) {
   const culture = { locale: fi };
   const { t } = useTranslation();
 
@@ -197,24 +198,20 @@ const Toolbar = ({
           className="rbc-toolbar-button--borderless"
           type="button"
           onClick={() => onNavigate("PREV")}
-          aria-label={String(
-            t("reservationCalendar:showPrevious", {
-              view: String(t(`common:${view}`)).toLowerCase(),
-            })
-          )}
+          aria-label={t("reservationCalendar:showPrevious", {
+            view: t(`common:${view}`).toLowerCase(),
+          })}
         >
           <IconAngleLeft />
         </button>
-        <div className="rbc-toolbar-label">{title}</div>
+        <NoWrap className="rbc-toolbar-label">{title}</NoWrap>
         <button
           className="rbc-toolbar-button--borderless"
           type="button"
           onClick={() => onNavigate("NEXT")}
-          aria-label={String(
-            t("reservationCalendar:showNext", {
-              view: String(t(`common:${view}`)).toLowerCase(),
-            })
-          )}
+          aria-label={t("reservationCalendar:showNext", {
+            view: t(`common:${view}`).toLowerCase(),
+          })}
         >
           <IconAngleRight />
         </button>
@@ -226,11 +223,9 @@ const Toolbar = ({
           })}
           type="button"
           onClick={() => onView("day")}
-          aria-label={String(
-            t("reservationCalendar:showView", {
-              view: String(t("common:day")).toLowerCase(),
-            })
-          )}
+          aria-label={t("reservationCalendar:showView", {
+            view: t("common:day").toLowerCase(),
+          })}
         >
           {t("common:day")}
         </button>
@@ -240,17 +235,13 @@ const Toolbar = ({
           })}
           type="button"
           onClick={() => onView("week")}
-          aria-label={String(
-            t("reservationCalendar:showView", {
-              view: String(t("common:week")).toLowerCase(),
-            })
-          )}
+          aria-label={t("reservationCalendar:showView", {
+            view: t("common:week").toLowerCase(),
+          })}
         >
           {t("common:week")}
         </button>
       </div>
     </Wrapper>
   );
-};
-
-export { Toolbar };
+}
