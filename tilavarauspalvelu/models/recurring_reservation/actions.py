@@ -14,6 +14,7 @@ from tilavarauspalvelu.enums import (
 )
 from tilavarauspalvelu.models import (
     AffectingTimeSpan,
+    AgeGroup,
     RecurringReservation,
     RejectedOccurrence,
     ReservableTimeSpan,
@@ -113,6 +114,7 @@ class ReservationDetails(TypedDict, total=False):
     user: int | User
     purpose: int | ReservationPurpose
     home_city: int | City
+    age_group: int | AgeGroup
 
 
 class RecurringReservationActions:
