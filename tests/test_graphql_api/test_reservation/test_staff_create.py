@@ -453,3 +453,25 @@ def test_reservation__staff_create__reservation_type_behalf_accepted(graphql):
 
     reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
     assert reservation.type == ReservationTypeChoice.BEHALF
+
+
+@pytest.mark.parametrize(
+    ("amr", "expected"),
+    [
+        ("helsinkiazuread", True),
+        ("suomi_fi", False),
+    ],
+)
+def test_reservation__staff_create__reservee_used_ad_login(graphql, amr, expected):
+    reservation_unit = ReservationUnitFactory.create_reservable_now()
+    CityFactory.create(name="Helsinki")
+    user = UserFactory.create_superuser(social_auth__extra_data__amr=amr)
+    graphql.force_login(user)
+
+    data = get_staff_create_data(reservation_unit)
+    response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+    assert reservation.reservee_used_ad_login is expected
