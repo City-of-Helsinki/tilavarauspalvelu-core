@@ -317,6 +317,7 @@ describe("getNextAvailableTime", () => {
 
     test("NO times if times are only available before reservationsMinDaysBefore", () => {
       const today = new Date();
+      const cpy = new Date(today);
       mockOpenTimes(today, 7);
       const input = createInput({
         start: today,
@@ -325,12 +326,15 @@ describe("getNextAvailableTime", () => {
       });
       const val = getNextAvailableTime(input);
       expect(val).toBeNull();
+      // date should not be modified
+      expect(today).toEqual(cpy);
     });
   });
 
   describe("reservationsMaxDaysBefore check", () => {
     test("NO times if times are only available after reservationsMaxDaysBefore", () => {
       const today = new Date();
+      const cpy = new Date(today);
       reservableTimes.set(format(today, "yyyy-MM-dd"), []);
       const input = createInput({
         start: today,
@@ -339,6 +343,8 @@ describe("getNextAvailableTime", () => {
       });
       const val = getNextAvailableTime(input);
       expect(val).toBeNull();
+      // date should not be modified
+      expect(today).toEqual(cpy);
     });
   });
 

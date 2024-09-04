@@ -149,8 +149,10 @@ export function getNextAvailableTime(props: AvailableTimesProps): Date | null {
     }
     return dayMax([acc, new Date(round.reservationPeriodEnd)]);
   }, undefined);
-  const minDay =
-    dayMax([minReservationDate, start, openAfterRound]) ?? minReservationDate;
+
+  const minDay = new Date(
+    dayMax([minReservationDate, start, openAfterRound]) ?? minReservationDate
+  );
 
   // Find the first possible day
   let openTimes = reservableTimes.get(dateToKey(minDay));
