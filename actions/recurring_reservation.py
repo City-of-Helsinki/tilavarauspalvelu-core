@@ -10,6 +10,7 @@ from opening_hours.utils.time_span_element import TimeSpanElement
 from reservations.enums import RejectionReadinessChoice, ReservationTypeStaffChoice
 from reservations.models import (
     AffectingTimeSpan,
+    AgeGroup,
     RecurringReservation,
     RejectedOccurrence,
     Reservation,
@@ -109,6 +110,7 @@ class ReservationDetails(TypedDict, total=False):
     user: int | User
     purpose: int | ReservationPurpose
     home_city: int | City
+    age_group: int | AgeGroup
 
 
 class RecurringReservationActions:

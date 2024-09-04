@@ -52,9 +52,9 @@ from api.graphql.types.equipment_category.mutations import (
 from api.graphql.types.merchants.mutations import RefreshOrderMutation
 from api.graphql.types.purpose.mutations import PurposeCreateMutation, PurposeUpdateMutation
 from api.graphql.types.recurring_reservation.mutations import (
-    RecurringReservationCreateMutation,
     RecurringReservationUpdateMutation,
     ReservationSeriesCreateMutation,
+    ReservationSeriesUpdateMutation,
 )
 from api.graphql.types.reservation.mutations import (
     ReservationAdjustTimeMutation,
@@ -105,7 +105,6 @@ __all__ = [
     "EquipmentUpdateMutation",
     "PurposeCreateMutation",
     "PurposeUpdateMutation",
-    "RecurringReservationCreateMutation",
     "RecurringReservationUpdateMutation",
     "RefreshOrderMutation",
     "RejectAllApplicationOptionsMutation",
@@ -120,6 +119,7 @@ __all__ = [
     "ReservationRefundMutation",
     "ReservationRequiresHandlingMutation",
     "ReservationSeriesCreateMutation",
+    "ReservationSeriesUpdateMutation",
     "ReservationStaffAdjustTimeMutation",
     "ReservationStaffCreateMutation",
     "ReservationStaffModifyMutation",
