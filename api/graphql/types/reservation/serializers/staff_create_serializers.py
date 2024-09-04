@@ -1,4 +1,5 @@
 import datetime
+from typing import TYPE_CHECKING
 
 from django.utils.timezone import get_default_timezone
 from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPrimaryKeyField
@@ -18,6 +19,9 @@ from reservations.enums import (
     ReservationTypeChoice,
 )
 from reservations.models import AgeGroup, RecurringReservation, Reservation, ReservationPurpose
+
+if TYPE_CHECKING:
+    from common.typing import AnyUser
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
@@ -195,8 +199,11 @@ class ReservationStaffCreateSerializer(OldPrimaryKeySerializer, ReservationSched
         data["confirmed_at"] = now
         data["state"] = ReservationStateChoice.CONFIRMED.value
 
-        user = self.context.get("request").user
-        data["user"] = user
+        request_user: AnyUser = self.context["request"].user
+        data["user"] = request_user
+        data["reservee_used_ad_login"] = (
+            False if request_user.is_anonymous else getattr(request_user.id_token, "is_ad_login", False)
+        )
 
         return data
 
