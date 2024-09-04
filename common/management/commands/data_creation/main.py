@@ -107,7 +107,7 @@ def create_test_data(flush: bool = True) -> None:
         cities,
     )
 
-    service_sectors = _create_service_sectors(units)
+    _create_service_sectors(units)
     application_rounds = _create_application_rounds(
         reservation_units,
         reservation_purposes,
