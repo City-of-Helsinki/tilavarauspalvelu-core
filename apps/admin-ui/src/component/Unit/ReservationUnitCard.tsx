@@ -5,16 +5,17 @@ import {
   IconLayers,
   IconHome,
   IconGroup,
-  Tag,
+  IconPen,
+  IconCheck,
 } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { H2, fontMedium } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { ImageType, type UnitQuery } from "@gql/gql-types";
 import { BasicLink } from "@/styles/util";
-import IconDraft from "@/images/icon_draft.svg";
 import { getImageSource } from "common/src/helpers";
 import { NoWrap } from "common/styles/util";
+import StatusLabel from "common/src/components/StatusLabel";
 
 type UnitType = NonNullable<UnitQuery["unit"]>;
 type ReservationUnitType = NonNullable<UnitType["reservationunitSet"]>[0];
@@ -95,11 +96,6 @@ const Prop = styled.div<{ $disabled?: boolean }>`
   }
 `;
 
-const Published = styled(Tag)`
-  background-color: var(--color-success);
-  color: var(--color-white);
-`;
-
 export function ReservationUnitCard({
   reservationUnit,
   unitId,
@@ -157,18 +153,14 @@ export function ReservationUnitCard({
               t("ReservationUnitCard.noMaxPersons")}
           </Prop>
           <Prop>
-            {reservationUnit.isArchived ? (
-              <>
-                <IconDraft />
-                {t("ReservationUnitCard.stateArchived")}
-              </>
-            ) : reservationUnit.isDraft ? (
-              <>
-                <IconDraft />
+            {reservationUnit.isDraft ? (
+              <StatusLabel type="draft" icon={<IconPen ariaHidden />}>
                 {t("ReservationUnitCard.stateDraft")}
-              </>
+              </StatusLabel>
             ) : (
-              <Published>{t("ReservationUnitCard.statePublished")}</Published>
+              <StatusLabel type="success" icon={<IconCheck ariaHidden />}>
+                {t("ReservationUnitCard.statePublished")}
+              </StatusLabel>
             )}
           </Prop>
         </Props>

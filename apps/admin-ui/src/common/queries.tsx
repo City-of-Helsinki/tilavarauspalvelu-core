@@ -65,7 +65,6 @@ export const UNIT_QUERY = gql`
       shortDescriptionFi
       reservationunitSet {
         ...ReservationUnitCommonFields
-        isArchived
         resources {
           id
           pk

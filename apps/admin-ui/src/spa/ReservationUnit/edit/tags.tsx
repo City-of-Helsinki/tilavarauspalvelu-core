@@ -1,21 +1,49 @@
 import React from "react";
 import { ReservationState, ReservationUnitState } from "@gql/gql-types";
-import { Tag } from "hds-react";
+import {
+  IconCheck,
+  IconClock,
+  IconEye,
+  IconEyeCrossed,
+  IconLock,
+  IconPen,
+  IconQuestionCircle,
+} from "hds-react";
 import { useTranslation } from "react-i18next";
+import StatusLabel, {
+  type StatusLabelType,
+} from "common/src/components/StatusLabel";
+
+type StatusPropsType = {
+  type: StatusLabelType;
+  icon: JSX.Element;
+};
 
 export function ReservationStateTag({ state }: { state?: ReservationState }) {
-  const color = ((s?: ReservationState) => {
+  const statusProps = ((s?: ReservationState): StatusPropsType => {
     switch (s) {
       case ReservationState.ScheduledReservation:
-        return "var(--color-summer-light)";
       case ReservationState.ScheduledPeriod:
-        return "var(--color-bus-light)";
       case ReservationState.ScheduledClosing:
-        return "var(--color-black-5)";
+        return {
+          type: "info",
+          icon: <IconClock ariaHidden />,
+        };
       case ReservationState.ReservationClosed:
-        return "var(--color-black-10)";
+        return {
+          type: "neutral",
+          icon: <IconLock ariaHidden />,
+        };
+      case ReservationState.Reservable:
+        return {
+          type: "success",
+          icon: <IconEye ariaHidden />,
+        };
       default:
-        return "white";
+        return {
+          type: "neutral",
+          icon: <IconQuestionCircle ariaHidden />,
+        };
     }
   })(state);
 
@@ -29,33 +57,41 @@ export function ReservationStateTag({ state }: { state?: ReservationState }) {
   }
 
   return (
-    <Tag
-      theme={{
-        "--tag-background": color,
-      }}
-      labelProps={{ style: { whiteSpace: "nowrap" } }}
-    >
+    <StatusLabel type={statusProps.type} icon={statusProps.icon}>
       {t(`ReservationUnits.reservationState.${state}`)}
-    </Tag>
+    </StatusLabel>
   );
 }
 
-const statusColor = (state?: ReservationUnitState) => {
+const statusProps = (state?: ReservationUnitState): StatusPropsType => {
   switch (state) {
     case ReservationUnitState.Draft:
-      return "var(--color-bus-light)";
+      return {
+        type: "draft",
+        icon: <IconPen />,
+      };
     case ReservationUnitState.Hidden:
-      return "var(--color-silver-light)";
+      return {
+        type: "neutral",
+        icon: <IconEyeCrossed />,
+      };
     case ReservationUnitState.Published:
-      return "var(--color-fog-light)";
+      return {
+        type: "success",
+        icon: <IconCheck />,
+      };
     case ReservationUnitState.ScheduledHiding:
-      return "var(--color-suomenlinna-light)";
     case ReservationUnitState.ScheduledPeriod:
-      return "var(--color-summer-light)";
     case ReservationUnitState.ScheduledPublishing:
-      return "var(--color-gold-light)";
+      return {
+        type: "info",
+        icon: <IconClock />,
+      };
     default:
-      return "white";
+      return {
+        type: "neutral",
+        icon: <IconQuestionCircle />,
+      };
   }
 };
 
@@ -69,14 +105,10 @@ export function ReservationUnitStateTag({
     return null;
   }
   return (
-    <Tag
-      theme={{
-        "--tag-background": statusColor(state),
-      }}
-    >
+    <StatusLabel type={statusProps(state).type} icon={statusProps(state).icon}>
       <span style={{ whiteSpace: "nowrap" }}>
         {t(`ReservationUnits.state.${state}`)}
       </span>
-    </Tag>
+    </StatusLabel>
   );
 }
