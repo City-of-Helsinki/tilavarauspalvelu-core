@@ -14,13 +14,9 @@ const TopWrapper = styled.div`
   }
 `;
 
-const HitCount = styled.div`
+const HitCountSummary = styled.div`
   font-size: var(--fontsize-body-l);
-  margin-bottom: var(--spacing-s);
-
-  @media (min-width: ${breakpoints.s}) {
-    margin-bottom: 0;
-  }
+  margin: var(--spacing-l) 0 var(--spacing-m);
 `;
 
 const NoResults = styled.div`
@@ -38,10 +34,6 @@ const Paginator = styled.div`
   display: grid;
   justify-content: center;
   height: 140px;
-`;
-
-const HitCountSummary = styled(HitCount)`
-  margin: var(--spacing-l) 0 var(--spacing-m);
 `;
 
 const PaginationButton = styled(Button)`
@@ -136,12 +128,10 @@ export function ListWithPagination({
   return (
     <div className={className}>
       <TopWrapper data-testid="list-with-pagination__hit-count">
-        {items.length > 0 ? (
-          <HitCount>
-            {t("searchResultList:count", { count: items.length })}
-          </HitCount>
-        ) : (
+        {items.length === 0 ? (
           <NoResults>{t("searchResultList:noResults")}</NoResults>
+        ) : (
+          <div />
         )}
         {sortingComponent && sortingComponent}
       </TopWrapper>
