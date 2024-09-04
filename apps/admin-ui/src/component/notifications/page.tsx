@@ -9,10 +9,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import {
   Button,
+  IconCheck,
+  IconClock,
+  IconPen,
   RadioButton,
   Select,
   SelectionGroup,
-  Tag,
   TextInput,
 } from "hds-react";
 import {
@@ -49,6 +51,9 @@ import { base64encode } from "common/src/helpers";
 import { ControlledDateInput } from "common/src/components/form";
 import ControlledTimeInput from "@/component/ControlledTimeInput";
 import { errorToast, successToast } from "common/src/common/toast";
+import StatusLabel, {
+  type StatusLabelType,
+} from "common/src/components/StatusLabel";
 
 const RichTextInput = dynamic(() => import("@/component/RichTextInput"), {
   ssr: false,
@@ -112,35 +117,52 @@ function convertTarget(
   }
 }
 
-const StyledTag = styled(Tag)`
+const StyledStatusLabel = styled(StatusLabel)`
   justify-content: center;
+  white-space: nowrap;
 `;
 
-function BannerNotificationStateTag({
+type NotificationStatus = {
+  type: StatusLabelType;
+  icon: JSX.Element;
+};
+
+function BannerNotificationStatusLabel({
   state,
 }: {
   state: BannerNotificationState;
 }) {
-  const color = ((s: BannerNotificationState) => {
+  const statusLabelProps = ((
+    s: BannerNotificationState
+  ): NotificationStatus => {
     switch (s) {
       case BannerNotificationState.Draft:
-        return "var(--color-summer-light)";
+        return {
+          type: "draft",
+          icon: <IconPen ariaHidden />,
+        };
       case BannerNotificationState.Active:
-        return "var(--color-bus-light)";
+        return {
+          type: "success",
+          icon: <IconCheck ariaHidden />,
+        };
       case BannerNotificationState.Scheduled:
-        return "var(--color-black-5)";
+        return {
+          type: "info",
+          icon: <IconClock ariaHidden />,
+        };
     }
   })(state);
 
   const { t } = useTranslation();
 
   return (
-    <StyledTag
-      theme={{ "--tag-background": color }}
-      labelProps={{ style: { whiteSpace: "nowrap" } }}
+    <StyledStatusLabel
+      type={statusLabelProps.type}
+      icon={statusLabelProps.icon}
     >
       {t(`Notifications.state.${state}`)}
-    </StyledTag>
+    </StyledStatusLabel>
   );
 }
 
@@ -705,7 +727,7 @@ function LoadedContent({
       <StatusTagContainer>
         <H1 $legacy>{name}</H1>
         {notification?.state && (
-          <BannerNotificationStateTag state={notification.state} />
+          <BannerNotificationStatusLabel state={notification.state} />
         )}
       </StatusTagContainer>
       {(notification || isNew) && (
