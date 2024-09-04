@@ -49,7 +49,6 @@ class ApplicationRoundAdmin(ExtraButtonsMixin, TranslationAdmin):
                     "id",
                     "name",
                     "status",
-                    "target_group",
                     "terms_of_use",
                     "reservation_units",
                     "purposes",
