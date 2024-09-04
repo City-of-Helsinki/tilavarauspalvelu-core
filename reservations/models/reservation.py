@@ -86,7 +86,7 @@ class Reservation(SerializableMixin, models.Model):
     tax_percentage_value: Decimal = models.DecimalField(max_digits=5, decimal_places=2, default=0)
 
     # Free of charge information
-    applying_for_free_of_charge: bool = models.BooleanField(null=False, default=False, blank=True)
+    applying_for_free_of_charge: bool = models.BooleanField(default=False, blank=True)
     free_of_charge_reason: bool | None = models.TextField(null=True, blank=True)
 
     # Reservee information
@@ -99,7 +99,8 @@ class Reservation(SerializableMixin, models.Model):
     reservee_address_street: str = models.CharField(max_length=255, blank=True, default="")
     reservee_address_city: str = models.CharField(max_length=255, blank=True, default="")
     reservee_address_zip: str = models.CharField(max_length=255, blank=True, default="")
-    reservee_is_unregistered_association: bool = models.BooleanField(null=False, default=False, blank=True)
+    reservee_is_unregistered_association: bool = models.BooleanField(default=False, blank=True)
+    reservee_used_ad_login: bool = models.BooleanField(default=False, blank=True)
     reservee_language: str = models.CharField(
         max_length=255,
         blank=True,

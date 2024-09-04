@@ -28,7 +28,6 @@ from utils.sentry import SentryLogger
 if TYPE_CHECKING:
     from django.core.handlers.wsgi import WSGIRequest
 
-    from users.models import User
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
@@ -165,12 +164,11 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
         data["state"] = ReservationStateChoice.CREATED.value
         data["buffer_time_before"], data["buffer_time_after"] = self._calculate_buffers(begin, end, reservation_units)
 
-        request: WSGIRequest = self.context["request"]
-        request_user: User | None = request.user
-        if request_user.is_anonymous:
-            request_user = None
-
-        data["user"] = request_user
+        request_user: AnyUser = self.context["request"].user
+        data["user"] = request_user if request_user.is_anonymous else None
+        data["reservee_used_ad_login"] = (
+            False if request_user.is_anonymous else getattr(request_user.id_token, "is_ad_login", False)
+        )
 
         if self.requires_price_calculation(data):
             price_calculation_result = self.calculate_price(begin, end, reservation_units)

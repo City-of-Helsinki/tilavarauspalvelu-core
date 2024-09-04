@@ -134,6 +134,7 @@ class ReservationStatistic(models.Model):
     recurrence_end_date: datetime.date | None = models.DateField(null=True)
     recurrence_uuid: str = models.CharField(max_length=255, default="", blank=True)
     reservee_uuid: str = models.CharField(max_length=255, default="", blank=True)
+    reservee_used_ad_login: bool = models.BooleanField(default=False, blank=True)
     is_applied: bool = models.BooleanField(default=False, blank=True)
     """Is the reservation done through application process."""
 
@@ -202,6 +203,7 @@ class ReservationStatistic(models.Model):
         statistic.reservee_language = reservation.reservee_language
         statistic.reservee_organisation_name = reservation.reservee_organisation_name if requires_org_name else ""
         statistic.reservee_type = reservation.reservee_type
+        statistic.reservee_used_ad_login = reservation.reservee_used_ad_login
         statistic.reservee_uuid = str(reservation.user.tvp_uuid) if reservation.user else ""
         statistic.state = reservation.state
         statistic.tax_percentage_value = reservation.tax_percentage_value

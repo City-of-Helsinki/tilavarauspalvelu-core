@@ -1095,3 +1095,25 @@ def test_reservation__create__reservation_block_whole_day__blocks_reserving_for_
 
     response = graphql(CREATE_MUTATION, input_data=input_data)
     assert response.error_message() == error_message
+
+
+@pytest.mark.parametrize(
+    ("amr", "expected"),
+    [
+        ("helsinkiazuread", True),
+        ("suomi_fi", False),
+    ],
+)
+def test_reservation__create__reservee_used_ad_login(graphql, amr, expected):
+    reservation_unit = ReservationUnitFactory.create_reservable_now()
+    CityFactory.create(name="Helsinki")
+    user = UserFactory.create(social_auth__extra_data__amr=amr)
+    graphql.force_login(user)
+
+    data = get_create_data(reservation_unit)
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+    assert reservation.reservee_used_ad_login is expected
