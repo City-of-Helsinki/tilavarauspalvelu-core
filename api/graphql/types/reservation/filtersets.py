@@ -91,15 +91,29 @@ class ReservationFilterSet(ModelFilterSet):
             return qs
 
         roles = UserRoleChoice.can_view_reservations()
+        reserver_roles = UserRoleChoice.can_create_staff_reservations()
+
         if user.permissions.has_general_role(role_choices=roles):
             return qs
 
         u_ids = user.permissions.unit_ids_where_has_role(role_choices=roles)
         g_ids = user.permissions.unit_group_ids_where_has_role(role_choices=roles)
 
+        reserver_u_ids = user.permissions.unit_ids_where_has_role(role_choices=reserver_roles)
+        reserver_g_ids = user.permissions.unit_group_ids_where_has_role(role_choices=reserver_roles)
+
         return qs.filter(
+            # Either has "can_view_reservations" permissions
             Q(reservation_unit__unit__in=u_ids)  #
             | Q(reservation_unit__unit__unit_groups__in=g_ids)
+            # ...or is the owner of the reservation, and has "can_create_staff_reservations" permissions to it
+            | (
+                Q(user=user)
+                & (
+                    Q(reservation_unit__unit__in=reserver_u_ids)  #
+                    | Q(reservation_unit__unit__unit_groups__in=reserver_g_ids)
+                )
+            )
         )
 
     def filter_by_only_with_handling_permission(self, qs: QuerySet, name: str, value: bool) -> QuerySet:

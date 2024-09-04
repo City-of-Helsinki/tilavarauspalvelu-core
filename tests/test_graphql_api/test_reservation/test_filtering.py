@@ -189,6 +189,31 @@ def test_reservation__filter__by_only_with_permission__unit_admin(graphql):
     assert response.node(0) == {"pk": reservation.pk}
 
 
+def test_reservation__filter__by_only_with_permission__unit_admin__reserver(graphql):
+    unit = UnitFactory.create()
+
+    reservation_unit = ReservationUnitFactory.create(unit=unit)
+
+    admin = UserFactory.create_with_unit_role(role=UserRoleChoice.RESERVER, units=[unit])
+
+    # Own reservation, own unit
+    reservation = ReservationFactory.create(user=admin, reservation_unit=[reservation_unit])
+    # Own reservation, different unit
+    ReservationFactory.create(user=admin)
+    # Other user's reservation, own unit
+    ReservationFactory.create(reservation_unit=[reservation_unit])
+    # Other user's reservation, different unit
+    ReservationFactory.create()
+
+    graphql.force_login(admin)
+    query = reservations_query(only_with_permission=True)
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": reservation.pk}
+
+
 def test_reservation__filter__by_only_with_permission__unit_group_admin(graphql):
     unit_group = UnitGroupFactory.create()
     unit = UnitFactory.create(unit_groups=[unit_group])
