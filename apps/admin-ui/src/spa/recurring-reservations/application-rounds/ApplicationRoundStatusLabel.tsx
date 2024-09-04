@@ -1,10 +1,21 @@
-import { Tag } from "hds-react";
+import {
+  IconArrowTopLeft,
+  IconCheck,
+  IconClock,
+  IconCogwheel,
+  IconEnvelope,
+  IconQuestionCircle,
+} from "hds-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { ApplicationRoundStatusChoice, type Maybe } from "@gql/gql-types";
+import StatusLabel, {
+  type StatusLabelType,
+} from "common/src/components/StatusLabel";
 
 type RoundStatus = {
-  color: string;
+  type: StatusLabelType;
+  icon: JSX.Element;
   label: string;
   group: string;
 };
@@ -16,55 +27,66 @@ const getApplicationRoundStatus = (
     case ApplicationRoundStatusChoice.Open:
       return {
         group: "g1",
-        color: "var(--color-gold-medium-light)",
+        type: "alert",
+        icon: <IconClock />,
         label: ApplicationRoundStatusChoice.Open,
       };
     case ApplicationRoundStatusChoice.InAllocation:
       return {
         group: "g1",
-        color: "var(--color-info-light)",
+        type: "info",
+        icon: <IconCogwheel />,
         label: ApplicationRoundStatusChoice.InAllocation,
       };
     case ApplicationRoundStatusChoice.Handled:
+      return {
+        group: "g2",
+        type: "success",
+        icon: <IconCheck />,
+        label: ApplicationRoundStatusChoice.Handled,
+      };
     case ApplicationRoundStatusChoice.ResultsSent:
       return {
         group: "g2",
-        color: "var(--color-bus-light)",
+        type: "success",
+        icon: <IconEnvelope />,
         label: ApplicationRoundStatusChoice.Handled,
       };
     case ApplicationRoundStatusChoice.Upcoming:
       return {
         group: "g4",
-        color: "var(--color-engel-light)",
+        type: "draft",
+        icon: <IconArrowTopLeft />,
         label: ApplicationRoundStatusChoice.Upcoming,
       };
     default:
       return {
         group: "g5",
-        color: "white",
+        type: "neutral",
+        icon: <IconQuestionCircle />,
         label: status ?? "-",
       };
   }
 };
 
-export function ApplicationRoundStatusTag({
+export function ApplicationRoundStatusLabel({
   status,
 }: {
   status: Maybe<ApplicationRoundStatusChoice> | undefined;
 }): JSX.Element {
   const { t } = useTranslation();
   if (!status) {
-    return <Tag>{t("ApplicationRound.statuses.unknown")}</Tag>;
+    return (
+      <StatusLabel type="neutral" icon={<IconQuestionCircle />}>
+        {t("ApplicationRound.statuses.unknown")}
+      </StatusLabel>
+    );
   }
 
   const convertedStatus = getApplicationRoundStatus(status);
   return (
-    <Tag
-      theme={{
-        "--tag-background": convertedStatus.color,
-      }}
-    >
+    <StatusLabel type={convertedStatus.type} icon={convertedStatus.icon}>
       {t(`ApplicationRound.statuses.${convertedStatus.label}`)}
-    </Tag>
+    </StatusLabel>
   );
 }

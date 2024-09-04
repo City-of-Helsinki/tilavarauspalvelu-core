@@ -4,9 +4,12 @@ import styled from "styled-components";
 import {
   Card as HdsCard,
   IconArrowRight,
+  IconCheck,
+  IconCogwheel,
   IconCross,
+  IconEnvelope,
   IconPen,
-  Tag as HdsTag,
+  IconQuestionCircle,
 } from "hds-react";
 import { breakpoints } from "common/src/common/style";
 import {
@@ -21,6 +24,9 @@ import { BlackButton } from "@/styles/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
+import StatusLabel, {
+  type StatusLabelType,
+} from "common/src/components/StatusLabel";
 
 const Card = styled(HdsCard)`
   border-width: 0;
@@ -35,20 +41,6 @@ const Card = styled(HdsCard)`
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--spacing-m);
-  }
-`;
-
-const Tag = styled(HdsTag)<{ $style: "normal" | "yellow" | "green" }>`
-  && {
-    color: ${({ $style }) =>
-      $style === "yellow" ? "var(--color-black)" : "var(--color-white)"};
-    background-color: ${({ $style }) =>
-      $style === "green"
-        ? "var(--tilavaraus-green)"
-        : $style === "yellow"
-          ? "var(--tilavaraus-yellow)"
-          : "var(--tilavaraus-blue)"};
-    font-family: var(--font-regular);
   }
 `;
 
@@ -175,23 +167,39 @@ function isEditable(
   return false;
 }
 
-function getApplicationStatusColour(
+function getApplicationStatusLabelProps(
   status?: Maybe<ApplicationStatusChoice>
-): "normal" | "yellow" | "green" {
+): { type: StatusLabelType; icon: JSX.Element } {
   switch (status) {
+    case ApplicationStatusChoice.Draft:
+      return {
+        type: "draft",
+        icon: <IconPen ariaHidden />,
+      };
     case ApplicationStatusChoice.ResultsSent:
-      return "green";
+      return {
+        type: "success",
+        icon: <IconCheck ariaHidden />,
+      };
     case ApplicationStatusChoice.InAllocation:
     case ApplicationStatusChoice.Handled:
-      return "normal";
+      return {
+        type: "info",
+        icon: <IconCogwheel ariaHidden />,
+      };
     case ApplicationStatusChoice.Received:
-      return "green";
+      return {
+        type: "alert",
+        icon: <IconEnvelope ariaHidden />,
+      };
+    // These two should never be shown to the client, so they are shown as any other unexpected status
     case ApplicationStatusChoice.Cancelled:
     case ApplicationStatusChoice.Expired:
-    case ApplicationStatusChoice.Draft:
-      return "yellow";
     default:
-      return "normal";
+      return {
+        type: "neutral",
+        icon: <IconQuestionCircle ariaHidden />,
+      };
   }
 }
 
@@ -222,14 +230,14 @@ function ApplicationCard({ application, actionCallback }: Props): JSX.Element {
 
   const editable = isEditable(application.status);
 
-  const style = getApplicationStatusColour(application.status);
+  const labelProps = getApplicationStatusLabelProps(application.status);
 
   return (
     <Card border key={application.pk} data-testid="applications__card--wrapper">
       <div>
-        <Tag $style={style}>
+        <StatusLabel type={labelProps.type} icon={labelProps.icon}>
           {t(`applicationCard:status.${application.status}`)}
-        </Tag>
+        </StatusLabel>
         <RoundName>{getApplicationRoundName(applicationRound)}</RoundName>
         <Applicant>
           {application.applicantType != null

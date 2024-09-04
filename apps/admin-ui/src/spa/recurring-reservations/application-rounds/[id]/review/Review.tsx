@@ -18,7 +18,7 @@ import {
 } from "@gql/gql-types";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { Container, TabWrapper } from "@/styles/layout";
-import { ApplicationRoundStatusTag } from "../../ApplicationRoundStatusTag";
+import { ApplicationRoundStatusLabel } from "../../ApplicationRoundStatusLabel";
 import TimeframeStatus from "../../TimeframeStatus";
 import { ApplicationDataLoader } from "./ApplicationDataLoader";
 import { Filters } from "./Filters";
@@ -310,7 +310,7 @@ export function Review({
           <H2 as="h1" $legacy style={{ marginBottom: 0 }}>
             {applicationRound.nameFi}
           </H2>
-          <ApplicationRoundStatusTag status={applicationRound.status} />
+          <ApplicationRoundStatusLabel status={applicationRound.status} />
         </HeadingContainer>
         <LinkContainer>
           <TimeframeStatus

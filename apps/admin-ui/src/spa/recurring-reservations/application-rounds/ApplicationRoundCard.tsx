@@ -6,7 +6,7 @@ import { type ApplicationRoundsQuery } from "@gql/gql-types";
 import { breakpoints } from "common/src/common/style";
 import { formatDate } from "@/common/util";
 import { applicationRoundUrl } from "@/common/urls";
-import { ApplicationRoundStatusTag } from "./ApplicationRoundStatusTag";
+import { ApplicationRoundStatusLabel } from "./ApplicationRoundStatusLabel";
 import TimeframeStatus from "./TimeframeStatus";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 
@@ -157,7 +157,7 @@ export function ApplicationRoundCard({
         </Times>
         <StatusTagContainer>
           {applicationRound.status != null && (
-            <ApplicationRoundStatusTag status={applicationRound.status} />
+            <ApplicationRoundStatusLabel status={applicationRound.status} />
           )}
         </StatusTagContainer>
         <BottomContainer>
