@@ -51,6 +51,7 @@ def update_reservation_unit_pricings_tax_percentage(
             | Q(highest_price__gt=0)
         )
         .exclude(reservation_unit__payment_accounting__company_code__in=ignored_company_codes)
+        .exclude(reservation_unit__unit__payment_accounting__company_code__in=ignored_company_codes)
         .order_by("reservation_unit_id", "-begins")
         .distinct("reservation_unit_id")
     )

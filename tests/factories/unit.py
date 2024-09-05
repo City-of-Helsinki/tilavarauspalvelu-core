@@ -6,7 +6,7 @@ from factory import fuzzy
 
 from spaces.models import ServiceSector, Unit, UnitGroup
 
-from ._base import GenericDjangoModelFactory
+from ._base import GenericDjangoModelFactory, NullableSubFactory
 
 __all__ = [
     "UnitFactory",
@@ -27,8 +27,8 @@ class UnitFactory(GenericDjangoModelFactory[Unit]):
     email = ""
     phone = ""
     rank = 0
-    payment_merchant = None
-    payment_accounting = None
+    payment_merchant = NullableSubFactory("tests.factories.PaymentMerchantFactory", null=True)
+    payment_accounting = NullableSubFactory("tests.factories.PaymentAccountingFactory", null=True)
     origin_hauki_resource = None
 
     @factory.post_generation
