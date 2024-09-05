@@ -11,6 +11,7 @@ from reservations.enums import ReservationStateChoice
 from tests.factories import PaymentOrderFactory, ReservationFactory
 from tests.helpers import patch_method
 from tests.test_external_services.test_verkkokauppa.test_webhooks.helpers import get_mock_order_payment_api
+from utils.sentry import SentryLogger
 
 # Applied to all tests
 pytestmark = [
@@ -117,6 +118,7 @@ def test_order_payment_webhook__no_action_needed(api_client, settings, status):
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @patch_method(ReservationEmailNotificationSender.send_confirmation_email)
+@patch_method(SentryLogger.log_message)
 @pytest.mark.parametrize("missing_field", ["orderId", "paymentId", "namespace", "eventType"])
 def test_order_payment_webhook__missing_field(api_client, settings, missing_field):
     order_id = uuid.uuid4()
@@ -139,10 +141,13 @@ def test_order_payment_webhook__missing_field(api_client, settings, missing_fiel
     assert response.status_code == 400, response.data
     assert response.data == {missing_field: ["This field is required."]}
 
+    assert SentryLogger.log_message.call_count == 1
+
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @patch_method(ReservationEmailNotificationSender.send_confirmation_email)
-def test_order_payment_webhook__bad_namespace(api_client, settings):
+@patch_method(SentryLogger.log_message)
+def test_order_payment_webhook__bad_namespace(api_client):
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
     PaymentOrderFactory.create(remote_id=order_id)
@@ -162,9 +167,12 @@ def test_order_payment_webhook__bad_namespace(api_client, settings):
     assert response.status_code == 400, response.data
     assert response.data == {"namespace": ["Invalid namespace: 'foo'"]}
 
+    assert SentryLogger.log_message.call_count == 1
+
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @patch_method(ReservationEmailNotificationSender.send_confirmation_email)
+@patch_method(SentryLogger.log_message)
 def test_order_payment_webhook__bad_event_type(api_client, settings):
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
@@ -185,9 +193,12 @@ def test_order_payment_webhook__bad_event_type(api_client, settings):
     assert response.status_code == 400, response.data
     assert response.data == {"eventType": ["Unsupported event type: 'foo'"]}
 
+    assert SentryLogger.log_message.call_count == 1
+
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @patch_method(ReservationEmailNotificationSender.send_confirmation_email)
+@patch_method(SentryLogger.log_message)
 def test_order_payment_webhook__payment_order_not_found(api_client, settings):
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
@@ -207,8 +218,11 @@ def test_order_payment_webhook__payment_order_not_found(api_client, settings):
     assert response.status_code == 404, response.data
     assert response.data == {"message": f"Payment order '{order_id}' not found"}
 
+    assert SentryLogger.log_message.call_count == 1
+
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
+@patch_method(SentryLogger.log_message)
 def test_order_payment_webhook__payment_fetch_failed(api_client, settings):
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
@@ -229,8 +243,11 @@ def test_order_payment_webhook__payment_fetch_failed(api_client, settings):
     assert response.status_code == 500, response.data
     assert response.data == {"message": f"Checking payment for order '{order_id}' failed"}
 
+    assert SentryLogger.log_message.call_count == 1
+
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
+@patch_method(SentryLogger.log_message)
 def test_order_payment_webhook__no_payment_from_verkkokauppa(api_client, settings):
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
@@ -251,9 +268,12 @@ def test_order_payment_webhook__no_payment_from_verkkokauppa(api_client, setting
     assert response.status_code == 404, response.data
     assert response.data == {"message": f"Payment '{order_id}' not found from verkkokauppa"}
 
+    assert SentryLogger.log_message.call_count == 1
+
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
 @patch_method(ReservationEmailNotificationSender.send_confirmation_email)
+@patch_method(SentryLogger.log_message)
 def test_order_payment_webhook__invalid_payment_status(api_client, settings):
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
@@ -274,3 +294,5 @@ def test_order_payment_webhook__invalid_payment_status(api_client, settings):
 
     assert response.status_code == 400, response.data
     assert response.data == {"message": "Invalid payment status: 'foo'"}
+
+    assert SentryLogger.log_message.call_count == 1

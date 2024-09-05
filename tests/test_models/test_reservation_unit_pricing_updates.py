@@ -110,6 +110,7 @@ CURRENT_TAX = Decimal("24")
 FUTURE_TAX = Decimal("25.5")
 
 
+@patch_method(SentryLogger.log_message)
 def test_reservation_unit__update_pricings__tax_percentage__no_future_pricing():
     active_pricing = ReservationUnitPricingFactory.create(
         begins=datetime.date(2024, 1, 1),
@@ -126,7 +127,10 @@ def test_reservation_unit__update_pricings__tax_percentage__no_future_pricing():
     assert future_pricing.tax_percentage.value == FUTURE_TAX
     assert active_pricing.tax_percentage.value == CURRENT_TAX  # Active pricing should not be changed
 
+    assert SentryLogger.log_message.call_count == 1
 
+
+@patch_method(SentryLogger.log_message)
 def test_reservation_unit__update_pricings__tax_percentage__future_pricing_before_change_date():
     pricing_1 = ReservationUnitPricingFactory.create(
         begins=datetime.date(2024, 1, 1),
@@ -155,6 +159,8 @@ def test_reservation_unit__update_pricings__tax_percentage__future_pricing_befor
     # Price should be the same as in the last pricing before the change date
     assert future_pricing.highest_price == pricing_2.highest_price
     assert future_pricing.highest_price_net < pricing_2.highest_price_net
+
+    assert SentryLogger.log_message.call_count == 1
 
 
 @pytest.mark.parametrize(
@@ -187,6 +193,7 @@ def test_reservation_unit__update_pricings__tax_percentage__future_pricing_after
     assert sentry_message.startswith(f"Task found the following unhandled future pricings: <{pricing_2.id}: ")
 
 
+@patch_method(SentryLogger.log_message)
 def test_reservation_unit__update_pricings__tax_percentage__free_future_pricing_on_change_date():
     pricing_1 = ReservationUnitPricingFactory.create(
         begins=datetime.date(2024, 1, 1),
@@ -207,6 +214,7 @@ def test_reservation_unit__update_pricings__tax_percentage__free_future_pricing_
     assert future_pricing_count == 1  # No new pricings should be created, since a pricing on the change date exists
 
 
+@patch_method(SentryLogger.log_message)
 def test_reservation_unit__update_pricings__tax_percentage__free_future_pricing_after_change_date():
     pricing_1 = ReservationUnitPricingFactory.create(
         begins=datetime.date(2024, 1, 1),
@@ -235,7 +243,10 @@ def test_reservation_unit__update_pricings__tax_percentage__free_future_pricing_
     assert future_pricing.highest_price == pricing_1.highest_price
     assert future_pricing.highest_price_net < pricing_1.highest_price_net
 
+    assert SentryLogger.log_message.call_count == 1
 
+
+@patch_method(SentryLogger.log_message)
 def test_reservation_unit__update_pricings__tax_percentage__different_tax_percentage_is_ignored():
     reservation_unit = ReservationUnitFactory.create()
     ReservationUnitPricingFactory.create(
@@ -250,7 +261,10 @@ def test_reservation_unit__update_pricings__tax_percentage__different_tax_percen
     future_pricing_count = ReservationUnitPricing.objects.filter(status=PricingStatus.PRICING_STATUS_FUTURE).count()
     assert future_pricing_count == 0  # No new pricing should be created
 
+    assert SentryLogger.log_message.call_count == 1
 
+
+@patch_method(SentryLogger.log_message)
 def test_reservation_unit__update_pricings__tax_percentage__free_pricing_is_ignored():
     reservation_unit = ReservationUnitFactory.create()
     ReservationUnitPricingFactory.create(
@@ -266,7 +280,10 @@ def test_reservation_unit__update_pricings__tax_percentage__free_pricing_is_igno
     future_pricing_count = ReservationUnitPricing.objects.filter(status=PricingStatus.PRICING_STATUS_FUTURE).count()
     assert future_pricing_count == 0  # No new pricing should be created
 
+    assert SentryLogger.log_message.call_count == 1
 
+
+@patch_method(SentryLogger.log_message)
 def test_reservation_unit__update_pricings__tax_percentage__ignored_company_codes():
     pricing_1 = ReservationUnitPricingFactory.create(
         begins=datetime.date(2024, 1, 1),
@@ -287,3 +304,5 @@ def test_reservation_unit__update_pricings__tax_percentage__ignored_company_code
     assert pricing_1.reservation_unit.pricings.filter(status=PricingStatus.PRICING_STATUS_FUTURE).count() == 1
     # Second reservation unit is ignored, as the company code is in the ignored list
     assert pricing_2.reservation_unit.pricings.filter(status=PricingStatus.PRICING_STATUS_FUTURE).count() == 0
+
+    assert SentryLogger.log_message.call_count == 1

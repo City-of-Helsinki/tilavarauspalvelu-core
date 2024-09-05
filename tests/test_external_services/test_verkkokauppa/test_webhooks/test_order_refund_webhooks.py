@@ -9,6 +9,7 @@ from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tests.factories import PaymentOrderFactory
 from tests.helpers import patch_method
 from tests.test_external_services.test_verkkokauppa.test_webhooks.helpers import get_mock_order_refund_api
+from utils.sentry import SentryLogger
 
 # Applied to all tests
 pytestmark = [
@@ -48,6 +49,7 @@ def test_order_refund_webhook__success(api_client, settings):
 
 
 @patch_method(VerkkokauppaAPIClient.get_refund_status)
+@patch_method(SentryLogger.log_message)
 def test_order_refund_webhook__order_already_refunded_with_different_refund_id(api_client, settings):
     order_id = uuid.uuid4()
     refund_id = uuid.uuid4()
@@ -111,8 +113,9 @@ def test_order_refund_webhook__no_action_needed(api_client, settings, status):
     assert response.data == {"message": f"Order '{order_id}' is already in a state where no updates are needed"}
 
 
-@pytest.mark.parametrize("missing_field", ["orderId", "refundId", "refundPaymentId", "namespace", "eventType"])
 @patch_method(VerkkokauppaAPIClient.get_refund_status)
+@patch_method(SentryLogger.log_message)
+@pytest.mark.parametrize("missing_field", ["orderId", "refundId", "refundPaymentId", "namespace", "eventType"])
 def test_order_refund_webhook__missing_fields(api_client, settings, missing_field):
     order_id = uuid.uuid4()
     refund_id = uuid.uuid4()
@@ -141,7 +144,8 @@ def test_order_refund_webhook__missing_fields(api_client, settings, missing_fiel
 
 
 @patch_method(VerkkokauppaAPIClient.get_refund_status)
-def test_order_refund_webhook__bad_namespace(api_client, settings):
+@patch_method(SentryLogger.log_message)
+def test_order_refund_webhook__bad_namespace(api_client):
     order_id = uuid.uuid4()
     refund_id = uuid.uuid4()
     PaymentOrderFactory.create(
@@ -168,6 +172,7 @@ def test_order_refund_webhook__bad_namespace(api_client, settings):
 
 
 @patch_method(VerkkokauppaAPIClient.get_refund_status)
+@patch_method(SentryLogger.log_message)
 def test_order_refund_webhook__bad_event_type(api_client, settings):
     order_id = uuid.uuid4()
     refund_id = uuid.uuid4()
@@ -195,6 +200,7 @@ def test_order_refund_webhook__bad_event_type(api_client, settings):
 
 
 @patch_method(VerkkokauppaAPIClient.get_refund_status)
+@patch_method(SentryLogger.log_message)
 def test_order_refund_webhook__payment_order_not_found(api_client, settings):
     order_id = uuid.uuid4()
     refund_id = uuid.uuid4()
@@ -216,6 +222,7 @@ def test_order_refund_webhook__payment_order_not_found(api_client, settings):
 
 
 @patch_method(VerkkokauppaAPIClient.get_refund_status, side_effect=GetRefundStatusError("Mock error"))
+@patch_method(SentryLogger.log_message)
 def test_order_refund_webhook__refund_fetch_failed(api_client, settings):
     order_id = uuid.uuid4()
     refund_id = uuid.uuid4()
@@ -242,6 +249,7 @@ def test_order_refund_webhook__refund_fetch_failed(api_client, settings):
 
 
 @patch_method(VerkkokauppaAPIClient.get_refund_status, return_value=None)
+@patch_method(SentryLogger.log_message)
 def test_order_refund_webhook__no_refund_from_verkkokauppa(api_client, settings):
     order_id = uuid.uuid4()
     refund_id = uuid.uuid4()
@@ -268,6 +276,7 @@ def test_order_refund_webhook__no_refund_from_verkkokauppa(api_client, settings)
 
 
 @patch_method(VerkkokauppaAPIClient.get_refund_status)
+@patch_method(SentryLogger.log_message)
 def test_order_refund_webhook__invalid_refund_status(api_client, settings):
     order_id = uuid.uuid4()
     refund_id = uuid.uuid4()

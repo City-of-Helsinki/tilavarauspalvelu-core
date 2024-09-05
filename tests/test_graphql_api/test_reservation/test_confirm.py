@@ -20,6 +20,7 @@ from tests.factories import (
 )
 from tests.helpers import patch_method
 from users.models import ReservationNotification
+from utils.sentry import SentryLogger
 
 from .helpers import CONFIRM_MUTATION, get_confirm_data
 
@@ -306,6 +307,7 @@ def test_reservation__confirm__calls_verkkokauppa_api_when_payment_type_is_not_o
 
 
 @patch_method(VerkkokauppaAPIClient.create_order, side_effect=CreateOrderError("Test exception"))
+@patch_method(SentryLogger.log_exception)
 def test_reservation__confirm__does_not_save_when_api_call_fails(graphql):
     reservation = ReservationFactory.create_for_confirmation(
         reservation_unit__payment_types=[PaymentType.INVOICE],

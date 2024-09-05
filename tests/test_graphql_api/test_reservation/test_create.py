@@ -29,6 +29,7 @@ from tests.helpers import ResponseMock, patch_method
 from users.helauth.clients import HelsinkiProfileClient
 from users.helauth.typing import ADLoginAMR
 from utils.decimal_utils import round_decimal
+from utils.sentry import SentryLogger
 
 from .helpers import CREATE_MUTATION, get_create_data, mock_profile_reader
 
@@ -916,6 +917,7 @@ def test_reservation__create__prefill_profile_data__null_values(graphql, setting
 
 @patch_method(HelsinkiProfileClient.generic, return_value=ResponseMock(status_code=500, json_data={}))
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
+@patch_method(SentryLogger.log_exception)
 def test_reservation__create__prefilled_with_profile_data__api_call_fails(graphql, settings):
     # given:
     # - Prefill setting is on
@@ -947,6 +949,8 @@ def test_reservation__create__prefilled_with_profile_data__api_call_fails(graphq
     assert reservation.reservee_address_street == ""
     assert reservation.reservee_address_zip == ""
     assert reservation.home_city is None
+
+    assert SentryLogger.log_exception.call_count == 1
 
 
 @pytest.mark.parametrize("arm", ADLoginAMR)

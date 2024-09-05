@@ -74,9 +74,10 @@ def test_update_user_from_profile_logs_to_sentry_if_unsuccessful():
     assert log_message == "Helsinki profile: Could not fetch JWT from Tunnistamo."
 
 
-@patch_method(SentryLogger.log_exception)
 @patch_method(HelsinkiProfileClient.get_token, return_value="token")
 @patch_method(HelsinkiProfileClient.generic, return_value=ResponseMock(json_data={"errors": [{"message": "foo"}]}))
+@patch_method(SentryLogger.log_exception)
+@patch_method(SentryLogger.log_message)
 def test_update_user_from_profile_logs_to_sentry_if_raises():
     user = UserFactory.create(profile_id="", date_of_birth=None)
 
@@ -84,6 +85,7 @@ def test_update_user_from_profile_logs_to_sentry_if_raises():
     with pytest.raises(ExternalServiceError, match=re.escape(msg)):
         update_user_from_profile(request=mock_request(user))
 
+    assert SentryLogger.log_message.call_count == 1
     assert SentryLogger.log_exception.call_count == 1
 
 
