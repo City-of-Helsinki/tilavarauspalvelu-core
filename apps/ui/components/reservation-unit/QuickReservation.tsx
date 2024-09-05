@@ -12,7 +12,6 @@ import {
 } from "@/modules/reservationUnit";
 import Carousel from "../Carousel";
 import { getLastPossibleReservationDate } from "@/components/reservation-unit/utils";
-import type { FocusTimeSlot } from "@/components/calendar/ReservationCalendarControls";
 import {
   Control,
   FieldValues,
@@ -23,11 +22,7 @@ import { PendingReservationFormType } from "@/components/reservation-unit/schema
 import { ControlledDateInput } from "common/src/components/form";
 import { ControlledSelect } from "@/components/common/ControlledSelect";
 import { getSelectedOption } from "@/modules/util";
-
-export type TimeRange = {
-  start: Date;
-  end: Date;
-};
+import { FocusTimeSlot } from "@/modules/reservation";
 
 type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
 type Props = {

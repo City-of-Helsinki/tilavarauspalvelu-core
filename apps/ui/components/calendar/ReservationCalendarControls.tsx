@@ -26,28 +26,29 @@ import {
   type SubmitHandler,
   type UseFormReturn,
 } from "react-hook-form";
-import type { TimeRange } from "@/components/reservation-unit/QuickReservation";
 import { PendingReservationFormType } from "@/components/reservation-unit/schema";
 import { ControlledSelect } from "@/components/common/ControlledSelect";
+import { useMedia } from "react-use";
+import { type FocusTimeSlot } from "@/modules/reservation";
 import { ControlledDateInput } from "common/src/components/form";
 
-export type FocusTimeSlot = TimeRange & {
-  isReservable: boolean;
-  durationMinutes: number;
-};
-
 type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
-type Props = {
+type CommonProps = {
   reservationUnit: QueryT;
-  mode: string;
-  isAnimated?: boolean;
   reservationForm: UseFormReturn<PendingReservationFormType>;
   durationOptions: { label: string; value: number }[];
   startingTimeOptions: { label: string; value: string }[];
   focusSlot: FocusTimeSlot;
   submitReservation: SubmitHandler<PendingReservationFormType>;
-  LoginAndSubmit?: JSX.Element;
 };
+type Props =
+  | (CommonProps & {
+      mode: "create";
+      LoginAndSubmit: JSX.Element;
+    })
+  | (CommonProps & {
+      mode: "edit";
+    });
 
 const Wrapper = styled.div`
   border-top: 1px solid var(--color-black-50);
@@ -172,7 +173,7 @@ const Price = styled.div`
 const ResetButton = styled(Button).attrs({
   variant: "secondary",
   iconLeft: <IconCross aria-hidden />,
-})<{ $isLast: boolean }>`
+})<{ $isLast?: boolean }>`
   --color: var(--color-black);
   white-space: nowrap;
   order: 1;
@@ -272,18 +273,19 @@ function TogglerLabelContent({
   );
 }
 
-function ReservationCalendarControls({
+export function ReservationCalendarControls({
   reservationUnit,
   mode,
-  isAnimated = false,
   reservationForm,
   durationOptions,
   focusSlot,
   startingTimeOptions,
   submitReservation,
-  LoginAndSubmit,
+  ...rest
 }: Props): JSX.Element {
   const { t } = useTranslation();
+  const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
+
   const { control, watch, handleSubmit, setValue } = reservationForm;
   const formDate = watch("date");
   const formDuration = watch("duration");
@@ -293,6 +295,9 @@ function ReservationCalendarControls({
     : (reservationUnit.minReservationDuration ?? 0);
 
   const togglerLabel = (() => {
+    if (!focusSlot.isReservable) {
+      return t("reservationCalendar:selectTime");
+    }
     const dateStr = capitalize(
       formatDateTimeRange(t, focusSlot.start, focusSlot.end)
     );
@@ -358,17 +363,19 @@ function ReservationCalendarControls({
             )}
           />
         </TogglerTop>
+        {/* FIXME
         <TogglerBottom>
           {focusSlot.isReservable && !areControlsVisible && LoginAndSubmit}
         </TogglerBottom>
+            */}
         <Transition
           mountOnEnter
           unmountOnExit
-          timeout={isAnimated ? 500 : 0}
+          timeout={isMobile ? 500 : 0}
           in={areControlsVisible}
         >
           {(state) => (
-            <Content className={state} $isAnimated={isAnimated}>
+            <Content className={state} $isAnimated={isMobile}>
               <ControlledDateInput
                 name="date"
                 control={control}
@@ -411,11 +418,10 @@ function ReservationCalendarControls({
               <ResetButton
                 onClick={() => reservationForm.reset()}
                 disabled={!focusSlot}
-                $isLast={mode === "edit"}
               >
                 {t("searchForm:resetForm")}
               </ResetButton>
-              {mode === "edit" && (
+              {mode === "edit" ? (
                 <SelectButton
                   onClick={() => {
                     setValue("isControlsVisible", !areControlsVisible, {
@@ -429,10 +435,9 @@ function ReservationCalendarControls({
                 >
                   {t("reservationCalendar:selectTime")}
                 </SelectButton>
-              )}
-              {mode === "create" && (
-                <SubmitButtonWrapper>{LoginAndSubmit}</SubmitButtonWrapper>
-              )}
+              ) : mode === "create" && "LoginAndSubmit" in rest ? (
+                <SubmitButtonWrapper>{rest.LoginAndSubmit}</SubmitButtonWrapper>
+              ) : null}
             </Content>
           )}
         </Transition>
@@ -440,5 +445,3 @@ function ReservationCalendarControls({
     </Wrapper>
   );
 }
-
-export default ReservationCalendarControls;

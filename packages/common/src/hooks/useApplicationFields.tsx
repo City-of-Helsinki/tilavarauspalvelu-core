@@ -1,9 +1,13 @@
 import { useMemo } from "react";
-import { CustomerTypeChoice, MetadataSetsFragment } from "@gql/gql-types";
-import { filterNonNullable } from "common/src/helpers";
-import { containsField } from "common/src/metaFieldsHelpers";
-import { getReservationApplicationFields } from "common/src/reservation-form/util";
+import {
+  CustomerTypeChoice,
+  type MetadataSetsFragment,
+} from "../../gql/gql-types";
+import { filterNonNullable } from "../helpers";
+import { containsField } from "../metaFieldsHelpers";
+import { getReservationApplicationFields } from "../reservation-form/util";
 
+// TODO is the hook necessary?
 export function useApplicationFields(
   reservationUnit: MetadataSetsFragment,
   reserveeType?: CustomerTypeChoice

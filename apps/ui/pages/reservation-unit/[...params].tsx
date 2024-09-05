@@ -18,17 +18,13 @@ import {
   ReservationUnitDocument,
   type ReservationUnitQuery,
   type ReservationUnitQueryVariables,
-  OptionsDocument,
-  OptionsQuery,
-  OptionsQueryVariables,
   ReservationDocument,
-  ReservationQueryVariables,
+  type ReservationQueryVariables,
   useReservationLazyQuery,
   ReservationStateChoice,
 } from "@gql/gql-types";
-import { Inputs } from "common/src/reservation-form/types";
+import { type Inputs } from "common/src/reservation-form/types";
 import { Subheading } from "common/src/reservation-form/styles";
-import { getReservationApplicationFields } from "common/src/reservation-form/util";
 import { Container } from "common";
 import { createApolloClient } from "@/modules/apolloClient";
 import { reservationUnitPrefix, reservationsPrefix } from "@/modules/const";
@@ -54,6 +50,8 @@ import { useConfirmNavigation } from "@/hooks/useConfirmNavigation";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { containsField } from "common/src/metaFieldsHelpers";
 import { errorToast } from "common/src/common/toast";
+import { getGeneralFields } from "@/components/reservation/SummaryFields";
+import { queryOptions } from "@/modules/queryOptions";
 
 const StyledContainer = styled(Container)`
   padding-top: var(--spacing-m);
@@ -128,13 +126,7 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
-  const {
-    reservationUnit,
-    reservationPurposes,
-    ageGroups,
-    cities,
-    termsOfUse,
-  } = props;
+  const { reservationUnit, options, termsOfUse } = props;
 
   const [refetch, { data: resData }] = useReservationLazyQuery({
     variables: { id: props.reservation.id },
@@ -282,35 +274,6 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
   });
 
   const { pk: reservationPk } = reservation || {};
-  if (!ageGroups || ageGroups.length < 1) {
-    // eslint-disable-next-line no-console
-    console.warn("No ageGroups received!");
-  }
-
-  // TODO why isn't this on the SSR side? the creation of the options that is
-  const sortedAgeGroups = ageGroups.sort((a, b) => a.minimum - b.minimum);
-  const purposeOptions = reservationPurposes.map((purpose) => ({
-    label: getTranslation(purpose, "name"),
-    value: purpose.pk ?? 0,
-  }));
-  const ageGroupOptions = [
-    // the sortedAgeGroups array has "1 - 99" as the first element, so let's move it to the end for correct order
-    ...sortedAgeGroups.slice(1),
-    ...sortedAgeGroups.slice(0, 1),
-  ].map((ageGroup) => ({
-    label: `${ageGroup.minimum} - ${ageGroup.maximum ?? ""}`,
-    value: ageGroup.pk ?? 0,
-  }));
-  const homeCityOptions = cities.map((city) => ({
-    label: getTranslation(city, "name"),
-    value: city.pk ?? 0,
-  }));
-
-  const options = {
-    purpose: purposeOptions,
-    ageGroup: ageGroupOptions,
-    homeCity: homeCityOptions,
-  };
 
   const pageTitle =
     step === 0
@@ -321,18 +284,6 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
   const supportedFields = filterNonNullable(
     reservationUnit?.metadataSet?.supportedFields
   );
-  const generalFields = getReservationApplicationFields({
-    supportedFields,
-    reserveeType: "common",
-  }).filter((n) => n !== "reserveeType");
-
-  const type = containsField(supportedFields, "reserveeType")
-    ? reserveeType
-    : CustomerTypeChoice.Individual;
-  const reservationApplicationFields = getReservationApplicationFields({
-    supportedFields,
-    reserveeType: type,
-  });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: type the form
   const onSubmitStep0 = async (payload: any): Promise<void> => {
@@ -392,6 +343,7 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
     router.push(`${reservationUnitPrefix}/${reservationUnit?.pk}`);
   }, [router, reservationUnit?.pk]);
 
+  const generalFields = getGeneralFields({ supportedFields, reservation });
   const shouldDisplayReservationUnitPrice = useMemo(() => {
     switch (step) {
       case 0:
@@ -475,8 +427,7 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
               <Step0
                 reservationUnit={reservationUnit}
                 handleSubmit={handleSubmit(onSubmitStep0)}
-                generalFields={generalFields}
-                reservationApplicationFields={reservationApplicationFields}
+                reservation={reservation}
                 cancelReservation={cancelReservation}
                 options={options}
               />
@@ -486,10 +437,8 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
                 reservation={reservation}
                 reservationUnit={reservationUnit}
                 handleSubmit={handleSubmit(onSubmitStep1)}
-                generalFields={generalFields}
-                reservationApplicationFields={reservationApplicationFields}
+                supportedFields={supportedFields}
                 options={options}
-                reserveeType={reserveeType}
                 // TODO this is correct but confusing.
                 // There used to be 5 steps for payed reservations but the stepper is hidden for them now.
                 requiresHandling={steps.length > 2}
@@ -528,13 +477,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     const { reservationUnit } = data || {};
 
     const genericTerms = await getGenericTerms(apolloClient);
-    const { data: paramsData } = await apolloClient.query<
-      OptionsQuery,
-      OptionsQueryVariables
-    >({
-      query: OptionsDocument,
-      fetchPolicy: "no-cache",
-    });
+    const options = await queryOptions(apolloClient, locale ?? "");
 
     const { data: resData } = await apolloClient.query<
       ReservationQuery,
@@ -544,16 +487,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       variables: { id: base64encode(`ReservationNode:${resPk}`) },
       fetchPolicy: "no-cache",
     });
-
-    const reservationPurposes = filterNonNullable(
-      paramsData.reservationPurposes?.edges?.map((e) => e?.node)
-    );
-    const ageGroups = filterNonNullable(
-      paramsData.ageGroups?.edges?.map((e) => e?.node)
-    );
-    const cities = filterNonNullable(
-      paramsData.cities?.edges?.map((e) => e?.node)
-    );
 
     const { reservation } = resData;
 
@@ -579,9 +512,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
           ...commonProps,
           reservation,
           reservationUnit,
-          reservationPurposes,
-          ageGroups,
-          cities,
+          options,
           termsOfUse: { genericTerms },
           ...(await serverSideTranslations(locale ?? "fi")),
         },

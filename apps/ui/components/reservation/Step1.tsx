@@ -3,18 +3,13 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { IconArrowLeft, IconArrowRight } from "hds-react";
 import {
-  CustomerTypeChoice,
-  type ReservationNode,
   type TermsOfUseTextFieldsFragment,
   type ReservationQuery,
   type ReservationUnitPageFieldsFragment,
 } from "@gql/gql-types";
 import TermsBox from "common/src/termsbox/TermsBox";
-import {
-  Subheading,
-  TwoColumnContainer,
-} from "common/src/reservation-form/styles";
-import { capitalize, getTranslation } from "@/modules/util";
+import { Subheading } from "common/src/reservation-form/styles";
+import { getTranslation } from "@/modules/util";
 import { ActionContainer } from "./styles";
 import Sanitize from "../common/Sanitize";
 import { MediumButton } from "@/styles/util";
@@ -26,23 +21,20 @@ import {
   PinkBox,
 } from "../reservation-unit/ReservationUnitStyles";
 import { useFormContext } from "react-hook-form";
-import type { TFunction } from "i18next";
-
-type OptionType = {
-  label: string;
-  value: number;
-};
-type OptionsRecord = Record<"purpose" | "ageGroup" | "homeCity", OptionType[]>;
+import {
+  ApplicationFields,
+  GeneralFields,
+  type OptionsRecord,
+} from "./SummaryFields";
+import { type FieldName } from "common/src/metaFieldsHelpers";
 
 type NodeT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
   reservation: NodeT;
   reservationUnit: ReservationUnitPageFieldsFragment;
   handleSubmit: () => void;
-  generalFields: string[];
-  reservationApplicationFields: string[];
+  supportedFields: FieldName[];
   options: OptionsRecord;
-  reserveeType: CustomerTypeChoice;
   requiresHandling: boolean;
   setStep: React.Dispatch<React.SetStateAction<number>>;
   genericTerms: TermsOfUseTextFieldsFragment | null;
@@ -53,26 +45,7 @@ const Form = styled.form`
   flex-direction: column;
 `;
 
-const ParagraphAlt = styled.div<{ $isWide?: boolean }>`
-  ${({ $isWide }) => $isWide && "grid-column: 1 / -1;"}
-
-  & > div:first-of-type {
-    margin-bottom: var(--spacing-3-xs);
-  }
-`;
-
-const PreviewLabel = styled.span`
-  display: block;
-  color: var(--color-black-70);
-  padding-bottom: var(--spacing-2-xs);
-`;
-
-const PreviewValue = styled.span`
-  display: block;
-  font-size: var(--fontsize-body-l);
-`;
-
-const scrollToBox = (id: string): void => {
+function scrollToBox(id: string): void {
   const element = document.getElementById(id);
   const checkbox = document.getElementById(`${id}-terms-accepted`);
 
@@ -83,101 +56,14 @@ const scrollToBox = (id: string): void => {
     behavior: "smooth",
   });
   checkbox?.focus();
-};
-
-/// Type safe conversion from key value maps for the metadata fields
-/// TODO this is pretty awful (dynamic type checking) but requires refactoring metafields more
-function convertMaybeOptionValue(
-  key: keyof ReservationNode,
-  // TODO use proper fieldNames (string literals or enums), the Record is a hack around required fields
-  reservation: Record<string, unknown>,
-  options: OptionsRecord,
-  t: TFunction
-): string {
-  const rawValue = reservation[key];
-  if (key in options) {
-    const optionsKey = key as keyof OptionsRecord;
-    if (typeof rawValue !== "object" || rawValue == null) {
-      // eslint-disable-next-line no-console
-      console.warn(
-        "convertMaybeOptionValue: rawValue is not object: ",
-        rawValue
-      );
-    }
-    if (
-      typeof rawValue === "object" &&
-      rawValue != null &&
-      "pk" in rawValue &&
-      typeof rawValue.pk === "number"
-    ) {
-      return (
-        options[optionsKey].find((option) => option.value === rawValue.pk)
-          ?.label ?? ""
-      );
-    }
-    // eslint-disable-next-line no-console
-    console.warn(
-      "convertMaybeOptionValue: rawValue is not pk, but object: ",
-      rawValue
-    );
-    return "unknown";
-  }
-  if (typeof rawValue === "boolean") {
-    return t(`common:${String(rawValue)}`);
-  }
-  if (typeof rawValue === "string") {
-    return rawValue;
-  }
-  if (typeof rawValue === "number") {
-    return String(rawValue);
-  }
-  return "unknown";
-}
-
-function isNotEmpty(
-  key: keyof ReservationNode,
-  // TODO use proper fieldNames (string literals or enums), the Record is a hack around required fields
-  reservation: Record<string, unknown>
-): boolean {
-  const rawValue = reservation[key];
-  if (
-    rawValue == null ||
-    rawValue === "" ||
-    rawValue === false ||
-    rawValue === 0
-  ) {
-    return false;
-  }
-  return true;
-}
-
-function LabelValuePair({
-  label,
-  value,
-  isWide,
-  testIdKey,
-}: {
-  label: string;
-  value: string;
-  isWide?: boolean;
-  testIdKey: keyof ReservationNode;
-}) {
-  return (
-    <ParagraphAlt $isWide={isWide}>
-      <PreviewLabel>{label}</PreviewLabel>
-      <PreviewValue data-testid={`confirm_${testIdKey}`}>{value}</PreviewValue>
-    </ParagraphAlt>
-  );
 }
 
 function Step1({
   reservation,
   reservationUnit,
   handleSubmit,
-  generalFields,
-  reservationApplicationFields,
+  supportedFields,
   options,
-  reserveeType,
   requiresHandling,
   setStep,
   genericTerms,
@@ -228,17 +114,6 @@ function Step1({
     },
   ];
 
-  const filteredGeneralFields = generalFields
-    .filter((key): key is keyof ReservationNode => key in reservation)
-    .filter((key) => isNotEmpty(key, reservation));
-
-  const filteredApplicationFields = reservationApplicationFields
-    .filter((key): key is keyof ReservationNode => key in reservation)
-    .filter((key) => isNotEmpty(key, reservation));
-
-  const hasReserveeType =
-    filteredApplicationFields.find((x) => x === "reserveeType") != null;
-
   return (
     <Form
       onSubmit={(e) => {
@@ -250,71 +125,16 @@ function Step1({
       }}
       noValidate
     >
-      {filteredGeneralFields.length > 0 && (
-        <>
-          <Subheading>{t("reservationCalendar:reservationInfo")} </Subheading>
-          <TwoColumnContainer style={{ marginBottom: "var(--spacing-2-xl)" }}>
-            <>
-              {filteredGeneralFields.map((key) => {
-                const value = convertMaybeOptionValue(
-                  key,
-                  reservation,
-                  options,
-                  t
-                );
-                const isWide =
-                  ["name", "description", "freeOfChargeReason"].find(
-                    (x) => x === key
-                  ) != null;
-                const label = t(`reservationApplication:label.common.${key}`);
-                return (
-                  <LabelValuePair
-                    key={key}
-                    label={label}
-                    value={value}
-                    testIdKey={key}
-                    isWide={isWide}
-                  />
-                );
-              })}
-            </>
-          </TwoColumnContainer>
-        </>
-      )}
-      <Subheading>{t("reservationCalendar:reserverInfo")}</Subheading>
-      <TwoColumnContainer style={{ marginBottom: "var(--spacing-2-xl)" }}>
-        <>
-          {hasReserveeType && (
-            <ParagraphAlt $isWide>
-              <PreviewLabel>
-                {t("reservationApplication:reserveeTypePrefix")}
-              </PreviewLabel>
-              <PreviewValue data-testid="reservation-confirm__reserveeType">
-                {capitalize(
-                  t(
-                    `reservationApplication:reserveeTypes.labels.${reserveeType.toLowerCase()}`
-                  )
-                )}
-              </PreviewValue>
-            </ParagraphAlt>
-          )}
-          {filteredApplicationFields.map((key) => {
-            const value = convertMaybeOptionValue(key, reservation, options, t);
-            const typeNamespace =
-              reserveeType?.toLocaleLowerCase() || "individual";
-            const labelKey = `reservationApplication:label.${typeNamespace}.${key}`;
-            const label = t(labelKey);
-            return (
-              <LabelValuePair
-                key={key}
-                label={label}
-                value={value}
-                testIdKey={key}
-              />
-            );
-          })}
-        </>
-      </TwoColumnContainer>
+      <GeneralFields
+        supportedFields={supportedFields}
+        reservation={reservation}
+        options={options}
+      />
+      <ApplicationFields
+        reservation={reservation}
+        options={options}
+        supportedFields={supportedFields}
+      />
       <TermsBox
         id={box[0].id}
         heading={box[0].heading}

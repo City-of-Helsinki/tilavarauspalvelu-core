@@ -5,6 +5,7 @@ import {
   addDays,
   roundToNearestMinutes,
   differenceInMinutes,
+  set,
 } from "date-fns";
 import {
   type ReservationNode,
@@ -22,7 +23,7 @@ import {
 } from "@gql/gql-types";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
 import { getIntervalMinutes } from "common/src/conversion";
-import { getTranslation } from "./util";
+import { fromUIDate, getTranslation } from "./util";
 import { type TFunction } from "i18next";
 import { type PendingReservation } from "@/modules/types";
 import {
@@ -30,6 +31,8 @@ import {
   type RoundPeriod,
   isRangeReservable,
 } from "./reservable";
+import { type PendingReservationFormType } from "@/components/reservation-unit/schema";
+import { isValidDate } from "common/src/common/util";
 
 // TimeSlots change the Calendar view. How many intervals are shown i.e. every half an hour, every hour
 // we use every hour only => 2
@@ -491,4 +494,72 @@ function getValidEndingTime({
   }
 
   return end;
+}
+
+export type TimeRange = {
+  start: Date;
+  end: Date;
+};
+
+type Slot = TimeRange & {
+  isReservable: boolean;
+  durationMinutes: number;
+};
+export type FocusTimeSlot = { isReservable: false } | Slot;
+
+export function convertFormToFocustimeSlot({
+  data,
+  reservationUnit,
+  reservableTimes,
+  activeApplicationRounds,
+}: {
+  data: PendingReservationFormType;
+  reservationUnit: Omit<IsReservableFieldsFragment, "reservableTimeSpans">;
+  reservableTimes: ReservableMap;
+  activeApplicationRounds: readonly RoundPeriod[];
+}): FocusTimeSlot | { isReservable: false } {
+  const [hours, minutes]: Array<number | undefined> = data.time
+    .split(":")
+    .map(Number)
+    .filter((n) => Number.isFinite(n));
+  const maybeDate = fromUIDate(data.date);
+  let start: Date | null = null;
+  if (maybeDate != null && isValidDate(maybeDate)) {
+    start = set(maybeDate, { hours, minutes });
+  }
+  if (hours == null || minutes == null || start == null) {
+    return {
+      isReservable: false,
+    };
+  }
+
+  const end = addMinutes(start, data.duration);
+  const isReservable = isRangeReservable({
+    range: {
+      start,
+      end,
+    },
+    reservationUnit,
+    reservableTimes,
+    activeApplicationRounds,
+  });
+
+  return {
+    start,
+    end,
+    isReservable,
+    durationMinutes: data.duration,
+  };
+}
+
+export function createDateTime(date: string, time: string): Date {
+  const [hours, minutes]: Array<number | undefined> = time
+    .split(":")
+    .map(Number)
+    .filter((n) => Number.isFinite(n));
+  const maybeDate = fromUIDate(date);
+  if (maybeDate != null && isValidDate(maybeDate)) {
+    return set(maybeDate, { hours, minutes });
+  }
+  return new Date();
 }

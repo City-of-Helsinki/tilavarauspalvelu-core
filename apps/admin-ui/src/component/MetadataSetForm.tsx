@@ -5,7 +5,8 @@ import {
   ReserverMetaFields,
   ReservationMetaFields,
 } from "common/src/reservation-form/MetaFields";
-import { useApplicationFields, useGeneralFields, useOptions } from "@/hooks";
+import { useGeneralFields, useApplicationFields } from "common/src/hooks";
+import { useOptions } from "@/hooks";
 import { type MetadataSetsFragment } from "@gql/gql-types";
 
 type Props = {

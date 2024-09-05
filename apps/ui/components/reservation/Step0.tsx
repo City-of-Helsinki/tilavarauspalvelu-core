@@ -23,16 +23,20 @@ import {
   Subheading,
 } from "../reservation-unit/ReservationUnitStyles";
 import Sanitize from "../common/Sanitize";
-import type { ReservationUnitPageFieldsFragment } from "@gql/gql-types";
+import type {
+  ReservationQuery,
+  ReservationUnitPageFieldsFragment,
+} from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { containsField } from "common/src/metaFieldsHelpers";
+import { getApplicationFields, getGeneralFields } from "./SummaryFields";
 
+type ReservationT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
   reservationUnit: ReservationUnitPageFieldsFragment;
   handleSubmit: () => void;
-  generalFields: string[];
-  reservationApplicationFields: string[];
   cancelReservation: () => void;
+  reservation: ReservationT;
   options: Record<string, OptionType[]>;
 };
 
@@ -65,14 +69,13 @@ const LinkLikeButton = styled.button`
   cursor: pointer;
 `;
 
-const Step0 = ({
+function Step0({
   reservationUnit,
+  reservation,
   handleSubmit,
-  generalFields,
-  reservationApplicationFields,
   cancelReservation,
   options,
-}: Props): JSX.Element => {
+}: Props): JSX.Element {
   const { t } = useTranslation();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -84,20 +87,27 @@ const Step0 = ({
     formState: { errors, isSubmitted, isSubmitting, isValid },
   } = useFormContext();
 
-  const errorKeys =
-    Object.keys(errors).sort((a, b) => {
-      const fields = [...generalFields, ...reservationApplicationFields];
-      return fields.indexOf(a) - fields.indexOf(b);
-    }) || [];
-
   const supportedFields = filterNonNullable(
     reservationUnit.metadataSet?.supportedFields
   );
-  const includesReserveeType = containsField(supportedFields, "reserveeType");
-
   const reserveeType = watch("reserveeType");
   const homeCity = watch("homeCity");
   const includesHomeCity = containsField(supportedFields, "homeCity");
+  const includesReserveeType = containsField(supportedFields, "reserveeType");
+
+  const generalFields = getGeneralFields({ supportedFields, reservation });
+  const reservationApplicationFields = getApplicationFields({
+    supportedFields,
+    reservation,
+  });
+
+  // TODO clean this up
+  const errorKeys =
+    Object.keys(errors).sort((a, b) => {
+      const fields = [...supportedFields.map((x) => x.fieldName)];
+      // Why?
+      return fields.indexOf(a) - fields.indexOf(b);
+    }) ?? [];
 
   if (includesReserveeType && isSubmitted && !reserveeType) {
     errorKeys.push("reserveeType");
@@ -168,7 +178,8 @@ const Step0 = ({
           <ErrorList>
             {errorKeys.map((key: string) => {
               const fieldType =
-                generalFields.includes(key) || key === "reserveeType"
+                generalFields.find((x) => x === key) != null ||
+                key === "reserveeType"
                   ? "common"
                   : reserveeType?.toLocaleLowerCase() || "individual";
               return (
@@ -223,6 +234,6 @@ const Step0 = ({
       </ActionContainer>
     </Form>
   );
-};
+}
 
 export default Step0;

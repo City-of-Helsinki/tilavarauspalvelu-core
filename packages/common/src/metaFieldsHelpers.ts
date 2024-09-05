@@ -1,7 +1,7 @@
 import { camelCase } from "lodash";
 import type { ReservationMetadataFieldNode } from "../gql/gql-types";
 
-type FieldName = Pick<ReservationMetadataFieldNode, "fieldName">;
+export type FieldName = Pick<ReservationMetadataFieldNode, "fieldName">;
 /// Transitional helper when moving from string fields
 /// backend field names are in snake_case so we convert them to camelCase
 /// TODO should be enums or string literals instead of arbitary strings

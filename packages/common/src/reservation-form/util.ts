@@ -13,7 +13,7 @@ export function getReservationApplicationFields({
   supportedFields: Pick<ReservationMetadataFieldNode, "fieldName">[];
   reserveeType: CustomerTypeChoice | "common";
 }): string[] {
-  if (!supportedFields || supportedFields?.length === 0 || !reserveeType) {
+  if (!supportedFields || supportedFields?.length === 0) {
     return [];
   }
 

@@ -38,23 +38,6 @@ export const PaddedContent = styled(Content)`
   margin-bottom: var(--spacing-m);
 `;
 
-export const CalendarFooter = styled.div<{ $cookiehubBannerHeight?: number }>`
-  position: sticky;
-  bottom: ${({ $cookiehubBannerHeight }) =>
-    $cookiehubBannerHeight ? `${$cookiehubBannerHeight}px` : 0};
-  background-color: var(--color-white);
-  z-index: var(--tilavaraus-stack-order-sticky-container);
-
-  display: flex;
-  flex-direction: column-reverse;
-
-  @media (min-width: ${breakpoints.l}) {
-    flex-direction: column;
-    gap: var(--spacing-2-xl);
-    justify-content: space-between;
-  }
-`;
-
 export const BottomWrapper = styled.div`
   margin: 0;
   padding: 0;

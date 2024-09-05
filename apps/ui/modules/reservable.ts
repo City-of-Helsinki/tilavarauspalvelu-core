@@ -451,7 +451,7 @@ function areSlotsReservable(
   reservationsMaxDaysBefore: number,
   reservationBegins?: Date,
   reservationEnds?: Date,
-  activeApplicationRounds: RoundPeriod[] = []
+  activeApplicationRounds: readonly RoundPeriod[] = []
 ): boolean {
   return slots.every(
     (slotDate) =>
@@ -470,7 +470,7 @@ function areSlotsReservable(
 
 type PropGetterProps = {
   reservableTimes: ReservableMap;
-  activeApplicationRounds: RoundPeriod[];
+  activeApplicationRounds: readonly RoundPeriod[];
   reservationsMinDaysBefore: number;
   reservationsMaxDaysBefore: number;
   customValidation?: (arg: Date) => boolean;

@@ -1,29 +1,25 @@
 import {
-  CustomerTypeChoice,
   type ReservationQuery,
   type ReservationUnitPageQuery,
 } from "@gql/gql-types";
-import { IconArrowLeft, IconCross, LoadingSpinner } from "hds-react";
-import { get } from "lodash";
-import { useRouter } from "next/router";
+import { Button, IconArrowLeft, IconCross, LoadingSpinner } from "hds-react";
 import { breakpoints } from "common/src/common/style";
-import {
-  Subheading,
-  TwoColumnContainer,
-} from "common/src/reservation-form/styles";
-import { getReservationApplicationFields } from "common/src/reservation-form/util";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import TermsBox from "common/src/termsbox/TermsBox";
-import { capitalize, getTranslation } from "@/modules/util";
+import { getTranslation } from "@/modules/util";
 import Sanitize from "../common/Sanitize";
-import { BlackButton, MediumButton } from "@/styles/util";
 import { reservationsPrefix } from "@/modules/const";
 import { filterNonNullable } from "common/src/helpers";
 import { useGenericTerms } from "common/src/hooks/useGenericTerms";
-import { containsField } from "common/src/metaFieldsHelpers";
 import { errorToast } from "common/src/common/toast";
+import {
+  ApplicationFields,
+  GeneralFields,
+  OptionsRecord,
+} from "./SummaryFields";
+import { ButtonLikeLink } from "../common/ButtonLikeLink";
 
 type ReservationUnitNodeT = NonNullable<
   ReservationUnitPageQuery["reservationUnit"]
@@ -32,7 +28,8 @@ type ReservationNodeT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
   reservation: ReservationNodeT;
   reservationUnit: ReservationUnitNodeT;
-  setStep: React.Dispatch<React.SetStateAction<number>>;
+  options: OptionsRecord;
+  onBack: () => void;
   handleSubmit: () => void;
   isSubmitting: boolean;
 };
@@ -55,34 +52,15 @@ const CancelActions = styled(Actions)`
   margin: 0;
 `;
 
-const ParagraphAlt = styled.div<{ $isWide?: boolean }>`
-  ${({ $isWide }) => $isWide && "grid-column: 1 / -1;"}
-
-  & > div:first-of-type {
-    margin-bottom: var(--spacing-3-xs);
-  }
-`;
-
-const PreviewLabel = styled.span`
-  display: block;
-  color: var(--color-black-70);
-  padding-bottom: var(--spacing-2-xs);
-`;
-
-const PreviewValue = styled.span`
-  display: block;
-  font-size: var(--fontsize-body-l);
-`;
-
 export function EditStep1({
   reservation,
   reservationUnit,
-  setStep,
+  options,
+  onBack,
   handleSubmit,
   isSubmitting,
 }: Props): JSX.Element {
   const { t } = useTranslation();
-  const router = useRouter();
 
   // TODO should use SSR for this
   const genericTerms = useGenericTerms();
@@ -103,50 +81,8 @@ export function EditStep1({
   const [areServiceSpecificTermsAccepted, setAreServiceSpecificTermsAccepted] =
     useState(false);
 
-  // TODO all this is copy pasta from reservation-unit/[...params].tsx
   const supportedFields = filterNonNullable(
     frozenReservationUnit?.metadataSet?.supportedFields
-  );
-  const generalFields = getReservationApplicationFields({
-    supportedFields,
-    reserveeType: "common",
-  }).filter((n) => n !== "reserveeType");
-
-  const includesReserveeType = containsField(supportedFields, "reserveeType");
-  const type = includesReserveeType
-    ? reservation.reserveeType
-    : CustomerTypeChoice.Individual;
-  const reservationApplicationFields = getReservationApplicationFields({
-    supportedFields,
-    reserveeType: type ?? "common",
-  });
-
-  const getValue = useCallback(
-    (key: string) => {
-      if (key === "purpose" && reservation.purpose != null) {
-        return getTranslation(reservation.purpose, "name");
-      }
-
-      if (key === "ageGroup" && reservation.ageGroup != null) {
-        const { minimum, maximum } = reservation[key] ?? {
-          minimum: "1",
-          maximum: "",
-        };
-        return `${minimum} - ${maximum}`;
-      }
-
-      if (key === "homeCity") {
-        return `${reservation[key]?.name}`;
-      }
-
-      const rawValue = get(reservation, key);
-      return get(rawValue, "pk")
-        ? getTranslation(rawValue, "name")
-        : typeof rawValue === "boolean"
-          ? t(`common:${String(rawValue)}`)
-          : rawValue;
-    },
-    [reservation, t]
   );
 
   if (hasTermsOfUse == null) {
@@ -167,86 +103,16 @@ export function EditStep1({
           }
         }}
       >
-        {generalFields?.length > 0 && (
-          <>
-            <Subheading>{t("reservationCalendar:reservationInfo")} </Subheading>
-            <TwoColumnContainer style={{ marginBottom: "var(--spacing-2-xl)" }}>
-              <>
-                {generalFields
-                  .filter(
-                    (key) =>
-                      !["", undefined, false, 0, null].includes(
-                        get(reservation, key)
-                      )
-                  )
-                  .map((key) => {
-                    const value = getValue(key);
-                    return (
-                      <ParagraphAlt
-                        key={`summary_${key}`}
-                        $isWide={[
-                          "name",
-                          "description",
-                          "freeOfChargeReason",
-                        ].includes(key)}
-                      >
-                        <PreviewLabel>
-                          {t(`reservationApplication:label.common.${key}`)}
-                        </PreviewLabel>
-                        <PreviewValue data-testid={`edit_${key}`}>
-                          {value}
-                        </PreviewValue>
-                      </ParagraphAlt>
-                    );
-                  })}
-              </>
-            </TwoColumnContainer>
-          </>
-        )}
-        <Subheading>{t("reservationCalendar:reserverInfo")}</Subheading>
-        <TwoColumnContainer style={{ marginBottom: "var(--spacing-2-xl)" }}>
-          <>
-            {reservationApplicationFields.includes("reserveeType") && (
-              <ParagraphAlt $isWide>
-                <PreviewLabel>
-                  {t("reservationApplication:reserveeTypePrefix")}
-                </PreviewLabel>
-                <PreviewValue data-testid="reservation-edit_reserveeType">
-                  {capitalize(
-                    t(
-                      `reservationApplication:reserveeTypes.labels.${reservation.reserveeType?.toLowerCase()}`
-                    )
-                  )}
-                </PreviewValue>
-              </ParagraphAlt>
-            )}
-            {reservationApplicationFields
-              .filter(
-                (key) =>
-                  !["", undefined, false, 0, null].includes(
-                    get(reservation, key)
-                  )
-              )
-              .map((key) => {
-                const value = getValue(key);
-                return (
-                  <ParagraphAlt key={`summary_${key}`}>
-                    <PreviewLabel>
-                      {t(
-                        `reservationApplication:label.${
-                          reservation.reserveeType?.toLocaleLowerCase() ||
-                          "individual"
-                        }.${key}`
-                      )}
-                    </PreviewLabel>
-                    <PreviewValue data-testid={`reservation-edit__${key}`}>
-                      {value}
-                    </PreviewValue>
-                  </ParagraphAlt>
-                );
-              })}
-          </>
-        </TwoColumnContainer>
+        <GeneralFields
+          supportedFields={supportedFields}
+          reservation={reservation}
+          options={options}
+        />
+        <ApplicationFields
+          supportedFields={supportedFields}
+          reservation={reservation}
+          options={options}
+        />
         <TermsBox
           id="cancellation-and-payment-terms"
           heading={t(
@@ -323,34 +189,34 @@ export function EditStep1({
         />{" "}
         <Actions>
           <CancelActions>
-            <BlackButton
-              variant="secondary"
-              iconLeft={<IconCross aria-hidden />}
-              onClick={() =>
-                router.push(`${reservationsPrefix}/${reservation.pk}`)
-              }
+            <ButtonLikeLink
+              href={`${reservationsPrefix}/${reservation.pk}`}
+              data-testid="reservation-edit__button--cancel"
             >
+              <IconCross aria-hidden />
               {t("reservations:cancelEditReservationTime")}
-            </BlackButton>
-            <BlackButton
+            </ButtonLikeLink>
+            <Button
               variant="secondary"
               iconLeft={<IconArrowLeft aria-hidden />}
-              onClick={() => setStep(0)}
+              size="small"
+              onClick={onBack}
               data-testid="reservation-edit__button--back"
             >
               {t("common:prev")}
-            </BlackButton>
+            </Button>
           </CancelActions>
-          <MediumButton
+          <Button
             variant="primary"
             type="submit"
+            size="small"
             disabled={isSubmitting}
             data-testid="reservation-edit__button--submit"
             isLoading={isSubmitting}
             loadingText={t("reservations:saveNewTimeLoading")}
           >
             {t("reservations:saveNewTime")}
-          </MediumButton>
+          </Button>
         </Actions>
       </form>
     </Wrapper>
