@@ -3,7 +3,7 @@ import { Button } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { chunkArray, fromUIDate, toUIDate } from "common/src/common/util";
-import { fontBold, fontMedium, H4 } from "common/src/common/typography";
+import { fontBold, H4 } from "common/src/common/typography";
 import type { ReservationUnitPageQuery } from "@gql/gql-types";
 import { breakpoints } from "common";
 import {
@@ -42,18 +42,19 @@ type Props = {
   LoginAndSubmit: JSX.Element;
 };
 
-const Wrapper = styled.form`
+const Form = styled.form`
   background-color: var(--color-gold-light);
   padding: var(--spacing-m);
-  max-width: 400px;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-m);
   justify-content: space-between;
 
-  /* hack for page jumping when the size of the component changes */
-  @media (min-width: ${breakpoints.s}) {
+  @media (min-width: ${breakpoints.m}) {
+    /* hack for page jumping when the size of the component changes */
     height: 391.797px;
+    /* grid resize causes issues, so use fixed width */
+    width: 400px;
   }
 `;
 
@@ -73,24 +74,11 @@ const Price = styled.div`
 `;
 
 const Selects = styled.div`
-  & > *:first-child {
-    grid-column: 1/-1;
-  }
-
   display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: var(--spacing-m);
-
-  label {
-    white-space: nowrap;
-    ${fontMedium};
-  }
+  grid-template-columns: 1fr;
 
   @media (min-width: ${breakpoints.s}) {
-    & > *:first-child {
-      grid-column: unset;
-    }
-
     grid-template-columns: 1fr 1fr;
   }
 `;
@@ -158,7 +146,7 @@ const ActionWrapper = styled.div`
   justify-content: space-between;
 `;
 
-function QuickReservation({
+export function QuickReservation({
   reservationUnit,
   subventionSuffix,
   reservationForm,
@@ -218,7 +206,7 @@ function QuickReservation({
   );
 
   return (
-    <Wrapper
+    <Form
       id="quick-reservation"
       noValidate
       onSubmit={handleSubmit(submitReservation)}
@@ -248,30 +236,31 @@ function QuickReservation({
         {t("reservationCalendar:quickReservation.subheading")}
       </Subheading>
       <div>
+        {/* TODO carousel page needs to be resetted if date or duration changes
+         * currently navigate to last page, change date so it has less slots all the slots / navigation disappears
+         */}
         {startingTimeOptions.length > 0 ? (
-          <div>
-            <Carousel
-              hideCenterControls
-              wrapAround={false}
-              slideIndex={activeChunk}
-            >
-              {timeChunks.map((chunk: string[]) => (
-                <SlotGroup key={chunk[0]}>
-                  {chunk.map((value: string) => (
-                    <Slot $active={watch("time") === value} key={value}>
-                      <SlotButton
-                        data-testid="quick-reservation-slot"
-                        onClick={() => setValue("time", value)}
-                        type="button"
-                      >
-                        {value}
-                      </SlotButton>
-                    </Slot>
-                  ))}
-                </SlotGroup>
-              ))}
-            </Carousel>
-          </div>
+          <Carousel
+            hideCenterControls
+            wrapAround={false}
+            slideIndex={activeChunk}
+          >
+            {timeChunks.map((chunk: string[]) => (
+              <SlotGroup key={chunk[0]}>
+                {chunk.map((value: string) => (
+                  <Slot $active={watch("time") === value} key={value}>
+                    <SlotButton
+                      data-testid="quick-reservation-slot"
+                      onClick={() => setValue("time", value)}
+                      type="button"
+                    >
+                      {value}
+                    </SlotButton>
+                  </Slot>
+                ))}
+              </SlotGroup>
+            ))}
+          </Carousel>
         ) : (
           <NoTimes>
             <span>
@@ -283,18 +272,16 @@ function QuickReservation({
               })}
             </span>
             {nextAvailableTime != null && (
-              <span>
-                <Button
-                  data-testid="quick-reservation-next-available-time"
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setValue("date", toUIDate(nextAvailableTime));
-                  }}
-                >
-                  {t("reservationCalendar:quickReservation.nextAvailableTime")}
-                </Button>
-              </span>
+              <Button
+                data-testid="quick-reservation-next-available-time"
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setValue("date", toUIDate(nextAvailableTime));
+                }}
+              >
+                {t("reservationCalendar:quickReservation.nextAvailableTime")}
+              </Button>
             )}
           </NoTimes>
         )}
@@ -311,8 +298,6 @@ function QuickReservation({
         </Price>
         {focusSlot?.isReservable && LoginAndSubmit}
       </ActionWrapper>
-    </Wrapper>
+    </Form>
   );
 }
-
-export default QuickReservation;

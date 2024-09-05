@@ -26,14 +26,13 @@ import {
   toUIDate,
 } from "common/src/common/util";
 import { getEventBuffers } from "common/src/calendar/util";
-import { Container, formatters as getFormatters } from "common";
 import { useLocalStorage, useMedia } from "react-use";
+import { formatters as getFormatters } from "common";
 import { breakpoints } from "common/src/common/style";
 import Calendar, {
   type SlotClickProps,
   type CalendarEvent,
 } from "common/src/calendar/Calendar";
-import { Toolbar } from "common/src/calendar/Toolbar";
 import classNames from "classnames";
 import { type PendingReservation } from "@/modules/types";
 import {
@@ -117,11 +116,11 @@ import {
   PaddedContent,
   StyledNotification,
   Subheading,
-  TwoColumnLayout,
   Wrapper,
 } from "@/components/reservation-unit/ReservationUnitStyles";
-import QuickReservation, {
+import {
   type TimeRange,
+  QuickReservation,
 } from "@/components/reservation-unit/QuickReservation";
 import ReservationInfoContainer from "@/components/reservation-unit/ReservationInfoContainer";
 import { useCurrentUser } from "@/hooks/user";
@@ -143,6 +142,8 @@ import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { ReservationTypeChoice } from "common/gql/gql-types";
 import { useReservableTimes } from "@/hooks/useReservableTimes";
 import { errorToast } from "common/src/common/toast";
+import { NewReservationPageWrapper } from "@/components/reservations/styles";
+import { Toolbar } from "common/src/calendar/Toolbar";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -309,18 +310,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   };
 }
 
-const Columns = styled(TwoColumnLayout)`
-  > div:first-of-type {
-    order: 1;
-  }
-`;
-
-const RightColumn = styled.div`
-  display: flex;
-  gap: var(--spacing-l);
-  flex-direction: column;
-`;
-
 const EventWrapper = styled.div``;
 
 const EventWrapperComponent = ({
@@ -444,6 +433,18 @@ function SubmitFragment(
     />
   );
 }
+
+const QuickReservationWrapper = styled.div`
+  grid-column-end: -1;
+`;
+
+const PageContentWrapper = styled.div`
+  grid-column: 1 / -2;
+
+  @media (min-width: ${breakpoints.l}) {
+    grid-row: 1;
+  }
+`;
 
 function ReservationUnit({
   reservationUnit,
@@ -617,8 +618,7 @@ function ReservationUnit({
     reservationUnit.numActiveUserReservations,
   ]);
 
-  const shouldDisplayApplicationRoundTimeSlots =
-    activeApplicationRounds.length > 0;
+  const showApplicationRoundTimeSlots = activeApplicationRounds.length > 0;
 
   const { applicationRoundTimeSlots } = reservationUnit;
 
@@ -1051,208 +1051,213 @@ function ReservationUnit({
           ) : undefined
         }
       />
-      <Container>
-        <Columns>
-          <RightColumn>
-            {!isReservationStartInFuture(reservationUnit) &&
-              reservationUnitIsReservable && (
-                <QuickReservation
-                  {...reservationControlProps}
-                  subventionSuffix={
-                    reservationUnit.canApplyFreeOfCharge ? (
-                      <SubventionSuffix
-                        placement="reservation-unit-head"
-                        setIsDialogOpen={setIsDialogOpen}
-                      />
-                    ) : undefined
-                  }
-                  nextAvailableTime={nextAvailableTime}
-                />
-              )}
-            <JustForDesktop customBreakpoint={breakpoints.l}>
-              <AddressSection reservationUnit={reservationUnit} />
-            </JustForDesktop>
-          </RightColumn>
-          <div>
-            <Subheading>{t("reservationUnit:description")}</Subheading>
-            <Content data-testid="reservation-unit__description">
-              <Sanitize html={getTranslation(reservationUnit, "description")} />
-            </Content>
-            {equipment?.length > 0 && (
-              <>
-                <Subheading>{t("reservationUnit:equipment")}</Subheading>
-                <Content data-testid="reservation-unit__equipment">
-                  <EquipmentList equipment={equipment} />
-                </Content>
-              </>
-            )}
-            {reservationUnitIsReservable && (
-              <CalendarWrapper data-testid="reservation-unit__calendar--wrapper">
-                <Subheading>
-                  {t("reservations:reservationCalendar", {
-                    title: getTranslation(reservationUnit, "name"),
-                  })}
-                </Subheading>
-                <ReservationQuotaReached
-                  isReservationQuotaReached={isReservationQuotaReached}
-                  reservationUnit={reservationUnit}
-                />
-                <div aria-hidden ref={calendarRef}>
-                  <Calendar<ReservationNode>
-                    events={[...calendarEvents, ...eventBuffers]}
-                    begin={focusDate}
-                    onNavigate={(d: Date) =>
-                      reservationForm.setValue("date", toUIDate(d))
-                    }
-                    eventStyleGetter={(event) =>
-                      eventStyleGetter(
-                        event,
-                        filterNonNullable(userReservations?.map((n) => n?.pk)),
-                        !isReservationQuotaReached
-                      )
-                    }
-                    slotPropGetter={slotPropGetter}
-                    viewType={calendarViewType}
-                    onView={(n) => {
-                      if (n === "month" || n === "week" || n === "day") {
-                        setCalendarViewType(n);
-                      }
-                    }}
-                    min={dayStartTime}
-                    showToolbar
-                    reservable={!isReservationQuotaReached}
-                    toolbarComponent={Toolbar}
-                    dateCellWrapperComponent={TouchCellWrapper}
-                    // @ts-expect-error: TODO: fix this
-                    eventWrapperComponent={EventWrapperComponent}
-                    resizable={!isReservationQuotaReached}
-                    // NOTE there was logic here to disable dragging on mobile
-                    // it breaks SSR render because it swaps the whole Calendar component
-                    draggable
-                    onSelectSlot={handleSlotClick}
-                    onEventDrop={handleCalendarEventChange}
-                    onEventResize={handleCalendarEventChange}
-                    onSelecting={handleCalendarEventChange}
-                    draggableAccessor={({ event }) =>
-                      event?.state?.toString() === "INITIAL"
-                    }
-                    resizableAccessor={({ event }) =>
-                      event?.state?.toString() === "INITIAL"
-                    }
-                    step={30}
-                    timeslots={SLOTS_EVERY_HOUR}
-                    culture={getLocalizationLang(i18n.language)}
-                    aria-hidden
-                    longPressThreshold={100}
-                  />
-                </div>
-                {!isReservationQuotaReached &&
-                  !isReservationStartInFuture(reservationUnit) && (
-                    <CalendarFooter
-                      $cookiehubBannerHeight={cookiehubBannerHeight}
-                    >
-                      <ReservationCalendarControls
-                        {...reservationControlProps}
-                        mode="create"
-                        isAnimated={isMobile}
-                      />
-                    </CalendarFooter>
-                  )}
-                <Legend />
-              </CalendarWrapper>
-            )}
-            <ReservationInfoContainer
-              reservationUnit={reservationUnit}
-              reservationUnitIsReservable={reservationUnitIsReservable}
-            />
-            {termsOfUseContent && (
-              <Accordion
-                heading={t("reservationUnit:terms")}
-                theme="thin"
-                data-testid="reservation-unit__reservation-notice"
-              >
-                <PaddedContent>
-                  <PriceChangeNotice
-                    reservationUnit={reservationUnit}
-                    activeApplicationRounds={activeApplicationRounds}
-                  />
-                  <Sanitize html={termsOfUseContent} />
-                </PaddedContent>
-              </Accordion>
-            )}
-            {shouldDisplayApplicationRoundTimeSlots && (
-              <Accordion heading={t("reservationUnit:recurringHeading")}>
-                <PaddedContent>
-                  <p>{t("reservationUnit:recurringBody")}</p>
-                  {applicationRoundTimeSlots?.map((day) => (
-                    <ApplicationRoundScheduleDay key={day.weekday} {...day} />
-                  ))}
-                </PaddedContent>
-              </Accordion>
-            )}
-            {reservationUnit.unit?.tprekId && (
-              <Accordion heading={t("common:location")} theme="thin" open>
-                <JustForMobile customBreakpoint={breakpoints.l}>
-                  <AddressSection reservationUnit={reservationUnit} />
-                </JustForMobile>
-                <MapWrapper>
-                  <MapComponent tprekId={reservationUnit.unit?.tprekId ?? ""} />
-                </MapWrapper>
-              </Accordion>
-            )}
-            {(paymentTermsContent || cancellationTermsContent) && (
-              <Accordion
-                heading={t(
-                  `reservationUnit:${
-                    paymentTermsContent
-                      ? "paymentAndCancellationTerms"
-                      : "cancellationTerms"
-                  }`
-                )}
-                theme="thin"
-                data-testid="reservation-unit__payment-and-cancellation-terms"
-              >
-                <PaddedContent>
-                  {paymentTermsContent && (
-                    <Sanitize
-                      html={paymentTermsContent}
-                      style={{ marginBottom: "var(--spacing-m)" }}
+      <NewReservationPageWrapper>
+        <QuickReservationWrapper>
+          {!isReservationStartInFuture(reservationUnit) &&
+            reservationUnitIsReservable && (
+              <QuickReservation
+                reservationUnit={reservationUnit}
+                reservationForm={reservationForm}
+                durationOptions={durationOptions}
+                startingTimeOptions={startingTimeOptions}
+                focusSlot={focusSlot}
+                submitReservation={submitReservation}
+                LoginAndSubmit={LoginAndSubmit}
+                subventionSuffix={
+                  reservationUnit.canApplyFreeOfCharge ? (
+                    <SubventionSuffix
+                      placement="reservation-unit-head"
+                      setIsDialogOpen={setIsDialogOpen}
                     />
-                  )}
-                  <Sanitize html={cancellationTermsContent ?? ""} />
-                </PaddedContent>
-              </Accordion>
+                  ) : undefined
+                }
+                nextAvailableTime={nextAvailableTime}
+              />
             )}
-            {shouldDisplayPricingTerms && pricingTermsContent && (
-              <Accordion
-                heading={t("reservationUnit:pricingTerms")}
-                theme="thin"
-                data-testid="reservation-unit__pricing-terms"
-              >
-                <PaddedContent>
-                  <Sanitize html={pricingTermsContent} />
-                </PaddedContent>
-              </Accordion>
-            )}
+          <JustForDesktop customBreakpoint={breakpoints.l}>
+            <AddressSection reservationUnit={reservationUnit} />
+          </JustForDesktop>
+        </QuickReservationWrapper>
+        <PageContentWrapper>
+          <Subheading>{t("reservationUnit:description")}</Subheading>
+          <Content data-testid="reservation-unit__description">
+            <Sanitize html={getTranslation(reservationUnit, "description")} />
+          </Content>
+          {equipment?.length > 0 && (
+            <>
+              <Subheading>{t("reservationUnit:equipment")}</Subheading>
+              <Content data-testid="reservation-unit__equipment">
+                <EquipmentList equipment={equipment} />
+              </Content>
+            </>
+          )}
+          {reservationUnitIsReservable && (
+            <CalendarWrapper data-testid="reservation-unit__calendar--wrapper">
+              <Subheading>
+                {t("reservations:reservationCalendar", {
+                  title: getTranslation(reservationUnit, "name"),
+                })}
+              </Subheading>
+              <ReservationQuotaReached
+                isReservationQuotaReached={isReservationQuotaReached}
+                reservationUnit={reservationUnit}
+              />
+              <div aria-hidden ref={calendarRef}>
+                <Calendar<ReservationNode>
+                  events={[...calendarEvents, ...eventBuffers]}
+                  begin={focusDate}
+                  onNavigate={(d: Date) =>
+                    reservationForm.setValue("date", toUIDate(d))
+                  }
+                  eventStyleGetter={(event) =>
+                    eventStyleGetter(
+                      event,
+                      filterNonNullable(userReservations?.map((n) => n?.pk)),
+                      !isReservationQuotaReached
+                    )
+                  }
+                  slotPropGetter={slotPropGetter}
+                  viewType={calendarViewType}
+                  onView={(n) => {
+                    if (n === "month" || n === "week" || n === "day") {
+                      setCalendarViewType(n);
+                    }
+                  }}
+                  min={dayStartTime}
+                  showToolbar
+                  reservable={!isReservationQuotaReached}
+                  toolbarComponent={Toolbar}
+                  dateCellWrapperComponent={TouchCellWrapper}
+                  // @ts-expect-error: TODO: fix this
+                  eventWrapperComponent={EventWrapperComponent}
+                  resizable={!isReservationQuotaReached}
+                  // NOTE there was logic here to disable dragging on mobile
+                  // it breaks SSR render because it swaps the whole Calendar component
+                  draggable
+                  onSelectSlot={handleSlotClick}
+                  onEventDrop={handleCalendarEventChange}
+                  onEventResize={handleCalendarEventChange}
+                  onSelecting={handleCalendarEventChange}
+                  draggableAccessor={({ event }) =>
+                    event?.state?.toString() === "INITIAL"
+                  }
+                  resizableAccessor={({ event }) =>
+                    event?.state?.toString() === "INITIAL"
+                  }
+                  step={30}
+                  timeslots={SLOTS_EVERY_HOUR}
+                  culture={getLocalizationLang(i18n.language)}
+                  aria-hidden
+                  longPressThreshold={100}
+                />
+              </div>
+              {!isReservationQuotaReached &&
+                !isReservationStartInFuture(reservationUnit) && (
+                  <CalendarFooter
+                    $cookiehubBannerHeight={cookiehubBannerHeight}
+                  >
+                    <ReservationCalendarControls
+                      {...reservationControlProps}
+                      mode="create"
+                      isAnimated={isMobile}
+                    />
+                  </CalendarFooter>
+                )}
+              <Legend />
+            </CalendarWrapper>
+          )}
+
+          <ReservationInfoContainer
+            reservationUnit={reservationUnit}
+            reservationUnitIsReservable={reservationUnitIsReservable}
+          />
+          {termsOfUseContent && (
             <Accordion
-              heading={t("reservationUnit:termsOfUse")}
+              heading={t("reservationUnit:terms")}
               theme="thin"
-              data-testid="reservation-unit__terms-of-use"
+              data-testid="reservation-unit__reservation-notice"
             >
               <PaddedContent>
-                {serviceSpecificTermsContent && (
+                <PriceChangeNotice
+                  reservationUnit={reservationUnit}
+                  activeApplicationRounds={activeApplicationRounds}
+                />
+                <Sanitize html={termsOfUseContent} />
+              </PaddedContent>
+            </Accordion>
+          )}
+          {showApplicationRoundTimeSlots && (
+            <Accordion heading={t("reservationUnit:recurringHeading")}>
+              <PaddedContent>
+                <p>{t("reservationUnit:recurringBody")}</p>
+                {applicationRoundTimeSlots?.map((day) => (
+                  <ApplicationRoundScheduleDay key={day.weekday} {...day} />
+                ))}
+              </PaddedContent>
+            </Accordion>
+          )}
+          {reservationUnit.unit?.tprekId && (
+            <Accordion heading={t("common:location")} theme="thin" open>
+              <JustForMobile customBreakpoint={breakpoints.l}>
+                <AddressSection reservationUnit={reservationUnit} />
+              </JustForMobile>
+              <MapWrapper>
+                <MapComponent tprekId={reservationUnit.unit?.tprekId ?? ""} />
+              </MapWrapper>
+            </Accordion>
+          )}
+          {(paymentTermsContent || cancellationTermsContent) && (
+            <Accordion
+              heading={t(
+                `reservationUnit:${
+                  paymentTermsContent
+                    ? "paymentAndCancellationTerms"
+                    : "cancellationTerms"
+                }`
+              )}
+              theme="thin"
+              data-testid="reservation-unit__payment-and-cancellation-terms"
+            >
+              <PaddedContent>
+                {paymentTermsContent && (
                   <Sanitize
-                    html={serviceSpecificTermsContent}
+                    html={paymentTermsContent}
                     style={{ marginBottom: "var(--spacing-m)" }}
                   />
                 )}
-                <Sanitize
-                  html={getTranslation(termsOfUse.genericTerms ?? {}, "text")}
-                />
+                <Sanitize html={cancellationTermsContent ?? ""} />
               </PaddedContent>
             </Accordion>
-          </div>
-        </Columns>
+          )}
+          {shouldDisplayPricingTerms && pricingTermsContent && (
+            <Accordion
+              heading={t("reservationUnit:pricingTerms")}
+              theme="thin"
+              data-testid="reservation-unit__pricing-terms"
+            >
+              <PaddedContent>
+                <Sanitize html={pricingTermsContent} />
+              </PaddedContent>
+            </Accordion>
+          )}
+          <Accordion
+            heading={t("reservationUnit:termsOfUse")}
+            theme="thin"
+            data-testid="reservation-unit__terms-of-use"
+          >
+            <PaddedContent>
+              {serviceSpecificTermsContent && (
+                <Sanitize
+                  html={serviceSpecificTermsContent}
+                  style={{ marginBottom: "var(--spacing-m)" }}
+                />
+              )}
+              <Sanitize
+                html={getTranslation(termsOfUse.genericTerms ?? {}, "text")}
+              />
+            </PaddedContent>
+          </Accordion>
+        </PageContentWrapper>
         <InfoDialog
           id="pricing-terms"
           heading={t("reservationUnit:pricingTerms")}
@@ -1260,7 +1265,7 @@ function ReservationUnit({
           isOpen={isDialogOpen}
           onClose={() => setIsDialogOpen(false)}
         />
-      </Container>
+      </NewReservationPageWrapper>
       <BottomWrapper>
         {shouldDisplayBottomWrapper && (
           <BottomContainer>

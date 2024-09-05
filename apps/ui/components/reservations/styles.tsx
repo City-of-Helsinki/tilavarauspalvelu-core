@@ -1,19 +1,30 @@
 import { Container } from "common";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { H2 } from "common/src/common/typography";
 
-/* TODO margins should be in page layout component, not custom for every page */
-export const ReservationPageWrapper = styled(Container)`
+const wrapperCss = css`
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: repeat(4, auto);
   grid-gap: var(--spacing-m);
   justify-content: space-between;
   margin-top: var(--spacing-l);
+`;
+/* TODO margins should be in page layout component, not custom for every page */
+export const ReservationPageWrapper = styled(Container)`
+  ${wrapperCss}
 
   @media (width > ${breakpoints.m}) {
     margin-top: var(--spacing-2-xl);
+    grid-template-columns: repeat(6, 1fr);
+  }
+`;
+
+export const NewReservationPageWrapper = styled(Container)`
+  ${wrapperCss}
+
+  @media (min-width: ${breakpoints.l}) {
     grid-template-columns: repeat(6, 1fr);
   }
 `;

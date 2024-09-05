@@ -2,7 +2,6 @@ import React from "react";
 import NukaCarousel from "nuka-carousel";
 import { IconAngleLeft, IconAngleRight } from "hds-react";
 import styled from "styled-components";
-import { breakpoints } from "common/src/common/style";
 import { useTranslation } from "next-i18next";
 import { MediumButton } from "@/styles/util";
 
@@ -69,16 +68,8 @@ const SmallArrowButton = styled(Button)`
 const StyledCarousel = styled(NukaCarousel)<{
   children: React.ReactNode;
 }>`
-  width: calc(100% + var(--spacing-xs) * 2) !important;
-  height: fit-content !important;
-  margin-right: calc(var(--spacing-xs) * -1);
-  margin-left: calc(var(--spacing-xs) * -1);
-
-  @media (min-width: ${breakpoints.m}) {
-    width: 100% !important;
-    height: fit-content !important;
-    margin: 0 !important;
-  }
+  /* hack otherwise the carousel spans over 100%, probably related to children being a grid */
+  max-width: calc(100vw - var(--spacing-m) * 4);
 `;
 
 const CustomBottomControls = styled.div`
@@ -115,7 +106,7 @@ const CustomBottomControls = styled.div`
   }
 `;
 
-const Carousel = ({
+function Carousel({
   children,
   slidesToShow = 1,
   slidesToScroll = 1,
@@ -124,7 +115,7 @@ const Carousel = ({
   hideCenterControls = false,
   controlAriaLabel = "",
   ...rest
-}: Props): JSX.Element => {
+}: Props): JSX.Element {
   const { t } = useTranslation();
 
   const ButtonComponent = SmallArrowButton;
@@ -189,6 +180,6 @@ const Carousel = ({
       {children}
     </StyledCarousel>
   );
-};
+}
 
 export default Carousel;
