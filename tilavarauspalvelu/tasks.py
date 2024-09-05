@@ -43,10 +43,19 @@ from tilavarauspalvelu.models import (
     Application,
     PaymentOrder,
     PaymentProduct,
+    PersonalInfoViewLog,
     RecurringReservation,
     Reservation,
     ReservationStatistic,
     ReservationStatisticsReservationUnit,
+    ReservationUnit,
+    ReservationUnitHierarchy,
+    ReservationUnitImage,
+    ReservationUnitPricing,
+    Space,
+    TaxPercentage,
+    Unit,
+    User,
 )
 from tilavarauspalvelu.models.recurring_reservation.actions import ReservationDetails
 from tilavarauspalvelu.models.request_log.model import RequestLog
@@ -85,8 +94,6 @@ logger = logging.getLogger(__name__)
 
 @app.task(name="rebuild_space_tree_hierarchy")
 def rebuild_space_tree_hierarchy() -> None:
-    from tilavarauspalvelu.models import ReservationUnitHierarchy, Space
-
     with atomic():
         Space.objects.rebuild()
         ReservationUnitHierarchy.refresh()
@@ -94,7 +101,6 @@ def rebuild_space_tree_hierarchy() -> None:
 
 @app.task(name="update_units_from_tprek")
 def update_units_from_tprek() -> None:
-    from tilavarauspalvelu.models import Unit
     from tilavarauspalvelu.utils.importers.tprek_unit_importer import TprekUnitImporter
 
     units_to_update = Unit.objects.exclude(tprek_id__isnull=True)
@@ -104,8 +110,6 @@ def update_units_from_tprek() -> None:
 
 @app.task(name="save_personal_info_view_log")
 def save_personal_info_view_log(user_id: int, viewer_user_id: int, field: str) -> None:
-    from tilavarauspalvelu.models import PersonalInfoViewLog
-
     user = get_user_model().objects.filter(id=user_id).first()
     viewer_user = get_user_model().objects.filter(id=viewer_user_id).first()
 
@@ -125,8 +129,6 @@ def save_personal_info_view_log(user_id: int, viewer_user_id: int, field: str) -
 
 @app.task(name="remove_old_personal_info_view_logs")
 def remove_old_personal_info_view_logs() -> None:
-    from tilavarauspalvelu.models import PersonalInfoViewLog
-
     remove_lt = timezone.now() - timezone.timedelta(days=365 * 2)
     PersonalInfoViewLog.objects.filter(access_time__lt=remove_lt).delete()
 
@@ -173,8 +175,6 @@ def _get_reservation_staff_notification_recipients(
     Get users with unit roles and notifications enabled, collect the ones that can manage relevant units,
     have matching notification setting are not the reservation creator
     """
-    from tilavarauspalvelu.models import Unit, User
-
     notification_recipients: list[str] = []
     reservation_units = reservation.reservation_unit.all()
     units = Unit.objects.filter(reservationunit__in=reservation_units).prefetch_related("unit_groups").distinct()
@@ -331,15 +331,18 @@ def refund_paid_reservation_task(reservation_pk: int) -> None:
     payment_order.save(update_fields=["refund_id", "status"])
 
 
+@app.task(name="update_reservation_unit_hierarchy")
+def update_reservation_unit_hierarchy_task(using: str | None = None) -> None:
+    ReservationUnitHierarchy.refresh(using=using)
+
+
 @app.task(name="update_affecting_time_spans")
-def update_affecting_time_spans_task() -> None:
-    AffectingTimeSpan.refresh()
+def update_affecting_time_spans_task(using: str | None = None) -> None:
+    AffectingTimeSpan.refresh(using=using)
 
 
 @app.task(name="create_statistics_for_reservations")
 def create_or_update_reservation_statistics(reservation_pks: list[int]) -> None:
-    from tilavarauspalvelu.models import ReservationUnit
-
     new_statistics: list[ReservationStatistic] = []
     new_statistics_units: list[ReservationStatisticsReservationUnit] = []
 
@@ -404,8 +407,6 @@ def update_reservation_unit_pricings_tax_percentage(
     future_tax: str,
     ignored_company_codes: Collection[str] = (),
 ) -> None:
-    from tilavarauspalvelu.models import ReservationUnitPricing, TaxPercentage
-
     SentryLogger.log_message(
         message="Task `update_reservation_unit_pricings_tax_percentage` started",
         details=(
@@ -488,8 +489,6 @@ def update_reservation_unit_pricings_tax_percentage(
     retry_backoff=True,
 )
 def refresh_reservation_unit_product_mapping(reservation_unit_pk) -> None:
-    from tilavarauspalvelu.models import ReservationUnit
-
     reservation_unit = ReservationUnit.objects.filter(pk=reservation_unit_pk).first()
     if reservation_unit is None:
         SentryLogger.log_message(
@@ -529,8 +528,6 @@ def refresh_reservation_unit_product_mapping(reservation_unit_pk) -> None:
     retry_backoff=True,
 )
 def refresh_reservation_unit_accounting(reservation_unit_pk) -> None:
-    from tilavarauspalvelu.models import ReservationUnit
-
     reservation_unit = ReservationUnit.objects.filter(pk=reservation_unit_pk).first()
     if reservation_unit is None:
         SentryLogger.log_message(
@@ -567,8 +564,6 @@ def refresh_reservation_unit_accounting(reservation_unit_pk) -> None:
 
 @app.task(name="update_reservation_unit_image_urls")
 def update_urls(pk: int | None = None) -> None:
-    from tilavarauspalvelu.models import ReservationUnitImage
-
     images = ReservationUnitImage.objects.filter(image__isnull=False)
 
     if pk:
