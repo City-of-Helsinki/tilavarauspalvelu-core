@@ -14,6 +14,7 @@ from merchants.verkkokauppa.product.types import (
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tests.helpers import patch_method
 from tests.mocks import MockResponse
+from utils.sentry import SentryLogger
 
 create_product_params = CreateProductParams(
     namespace="test-namespace",
@@ -92,12 +93,15 @@ def test__create_product__raises_exception_if_product_id_is_invalid():
 
 
 @patch_method(VerkkokauppaAPIClient.generic)
+@patch_method(SentryLogger.log_message)
 def test__create_product__raises_exception_if_status_code_is_not_201():
     response = {"errors": [{"code": "mock-error", "message": "Error Message"}]}
     VerkkokauppaAPIClient.generic.return_value = MockResponse(status_code=500, json=response)
 
     with pytest.raises(CreateProductError):
         VerkkokauppaAPIClient.create_product(params=create_product_params)
+
+    assert SentryLogger.log_message.call_count == 1
 
 
 @patch_method(VerkkokauppaAPIClient.generic, side_effect=Timeout())
@@ -131,6 +135,7 @@ def test__create_or_update__account_makes_valid_request():
 
 
 @patch_method(VerkkokauppaAPIClient.generic)
+@patch_method(SentryLogger.log_message)
 def test__create_or_update_accounting__raises_exception_if_status_code_is_not_201():
     VerkkokauppaAPIClient.generic.return_value = MockResponse(
         status_code=500, json={"errors": [{"code": "mock-error", "message": "Error Message"}]}
@@ -141,6 +146,8 @@ def test__create_or_update_accounting__raises_exception_if_status_code_is_not_20
             product_uuid=uuid.UUID("0bd382a0-d79f-44c8-b3c6-8617bf72ebd5"),
             params=create_or_update_account_params,
         )
+
+    assert SentryLogger.log_message.call_count == 1
 
 
 @patch_method(VerkkokauppaAPIClient.generic, side_effect=Timeout())

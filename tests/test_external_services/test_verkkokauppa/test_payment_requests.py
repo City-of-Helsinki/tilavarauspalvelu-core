@@ -75,6 +75,7 @@ def test__get_payment__returns_none_when_payment_is_missing():
 
 
 @patch_method(VerkkokauppaAPIClient.generic)
+@patch_method(SentryLogger.log_exception)
 def test__get_payment__raises_exception_if_key_is_missing():
     response = get_payment_response.copy()
     order_uuid = uuid.UUID(response.pop("orderId"))
@@ -83,8 +84,11 @@ def test__get_payment__raises_exception_if_key_is_missing():
     with pytest.raises(GetPaymentError):
         VerkkokauppaAPIClient.get_payment(order_uuid=order_uuid)
 
+    assert SentryLogger.log_exception.call_count == 1
+
 
 @patch_method(VerkkokauppaAPIClient.generic)
+@patch_method(SentryLogger.log_exception)
 def test__get_payment__raises_exception_if_value_is_invalid():
     order_uuid = uuid.UUID(get_payment_response["orderId"])
 
@@ -95,6 +99,8 @@ def test__get_payment__raises_exception_if_value_is_invalid():
 
     with pytest.raises(GetPaymentError):
         VerkkokauppaAPIClient.get_payment(order_uuid=order_uuid)
+
+    assert SentryLogger.log_exception.call_count == 1
 
 
 @patch_method(VerkkokauppaAPIClient.generic, side_effect=Timeout())
@@ -161,8 +167,9 @@ def test__refund_order__returns_refund():
     assert refund == expected
 
 
-@patch_method(SentryLogger.log_message)
 @patch_method(VerkkokauppaAPIClient.generic, return_value=MockResponse(status_code=500, json={}))
+@patch_method(SentryLogger.log_message)
+@patch_method(SentryLogger.log_exception)
 def test__refund_order__raises_exception_on_non_200_status_code():
     order_uuid = uuid.UUID(refund_response["refunds"][0]["orderId"])
 
@@ -171,7 +178,8 @@ def test__refund_order__raises_exception_on_non_200_status_code():
 
     msg = "Payment refund failed: GET request to VERKKOKAUPPA (http://example.com) failed with status 500."
     assert str(err.value) == msg
-    assert SentryLogger.log_message.called is True
+    assert SentryLogger.log_message.call_count == 1
+    assert SentryLogger.log_exception.call_count == 1
 
 
 @patch_method(SentryLogger.log_message)
@@ -188,7 +196,7 @@ def test__refund_order__raises_exception_on_multi_refund_response():
         VerkkokauppaAPIClient.refund_order(order_uuid=order_uuid)
 
     assert str(err.value) == "Refund response refund count expected to be 1 but was 2"
-    assert SentryLogger.log_message.called is True
+    assert SentryLogger.log_message.call_count == 1
 
 
 @patch_method(VerkkokauppaAPIClient.generic)
@@ -205,4 +213,4 @@ def test__refund_order__raises_exception_on_invalid_response():
 
     assert str(err.value) == "Payment refund failed: Could not parse refund: badly formed hexadecimal UUID string"
 
-    assert SentryLogger.log_exception.called is True
+    assert SentryLogger.log_exception.call_count == 2

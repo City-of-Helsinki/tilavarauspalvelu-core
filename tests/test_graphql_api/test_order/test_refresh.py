@@ -10,6 +10,7 @@ from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.enums import ReservationStateChoice
 from tests.factories import PaymentFactory
 from tests.helpers import patch_method
+from utils.sentry import SentryLogger
 
 from .helpers import REFRESH_MUTATION, get_order
 
@@ -30,6 +31,7 @@ def test_refresh_order__order_not_found(graphql):
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment, return_value=None)
+@patch_method(SentryLogger.log_message)
 def test_refresh_order__payment_not_found(graphql):
     graphql.login_with_superuser()
     order = get_order()
@@ -44,6 +46,8 @@ def test_refresh_order__payment_not_found(graphql):
 
     order.refresh_from_db()
     assert order.status == status
+
+    assert SentryLogger.log_message.call_count == 1
 
 
 @pytest.mark.parametrize(
@@ -183,6 +187,7 @@ def test_refresh_order__paid_online_status_sends_notification_if_reservation_wai
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment, side_effect=GetPaymentError("Error"))
+@patch_method(SentryLogger.log_exception)
 def test_refresh_order__payment_endpoint_error(graphql):
     graphql.login_with_superuser()
     order = get_order()
@@ -199,3 +204,5 @@ def test_refresh_order__payment_endpoint_error(graphql):
 
     order.refresh_from_db()
     assert order.status == order_status
+
+    assert SentryLogger.log_exception.call_count == 1

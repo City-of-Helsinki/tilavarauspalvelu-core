@@ -16,6 +16,8 @@ from merchants.verkkokauppa.order.types import (
     OrderItemMetaParams,
     OrderItemParams,
 )
+from tests.helpers import patch_method
+from utils.sentry import SentryLogger
 
 # Applied to all tests
 pytestmark = [
@@ -234,15 +236,21 @@ def test_verkkokauppa__order_types__order__from_json():
     )
 
 
+@patch_method(SentryLogger.log_exception)
 def test_verkkokauppa__order_types__order__from_json__raises_exception_if_key_is_missing():
     response = create_order_response.copy()
     response.pop("orderId")
     with pytest.raises(ParseOrderError):
         Order.from_json(response)
 
+    assert SentryLogger.log_exception.call_count == 1
 
+
+@patch_method(SentryLogger.log_exception)
 def test_verkkokauppa__order_types__order__from_json__raises_exception_if_value_is_invalid():
     response = create_order_response.copy()
     response["orderId"] = "invalid-order-id"
     with pytest.raises(ParseOrderError):
         Order.from_json(response)
+
+    assert SentryLogger.log_exception.call_count == 1

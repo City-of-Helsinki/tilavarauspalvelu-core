@@ -48,4 +48,4 @@ def test__refund_status__parsing_fails():
         RefundStatusResult.from_json(data)
 
     assert str(ex.value) == "Could not parse refund status: badly formed hexadecimal UUID string"
-    assert SentryLogger.log_exception.called is True
+    assert SentryLogger.log_exception.call_count == 1

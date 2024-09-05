@@ -7,6 +7,8 @@ from email_notification.helpers.email_sender import EmailNotificationSender
 from email_notification.models import EmailType
 from email_notification.tasks import send_application_handled_email_task, send_application_in_allocation_email_task
 from tests.factories import ApplicationFactory, EmailTemplateFactory
+from tests.helpers import patch_method
+from utils.sentry import SentryLogger
 
 # Applied to all tests
 pytestmark = [
@@ -103,11 +105,14 @@ def test_email_sender__application__in_allocation__success__multiple_round_and_a
     assert Application.objects.filter(in_allocation_notification_sent_date__isnull=True).exists() is False
 
 
+@patch_method(SentryLogger.log_message)
 @override_settings(SEND_RESERVATION_NOTIFICATION_EMAILS=True)
 def test_email_sender__application__in_allocation__nothing_sent__template_missing(outbox):
     ApplicationFactory.create_in_status_in_allocation()
     send_application_in_allocation_email_task()
     assert len(outbox) == 0
+
+    assert SentryLogger.log_message.call_count == 1
 
 
 @override_settings(SEND_RESERVATION_NOTIFICATION_EMAILS=True)
@@ -194,11 +199,14 @@ def test_email_sender__application__handled__success__multiple_round_and_applica
     assert Application.objects.filter(results_ready_notification_sent_date__isnull=True).exists() is False
 
 
+@patch_method(SentryLogger.log_message)
 @override_settings(SEND_RESERVATION_NOTIFICATION_EMAILS=True)
 def test_email_sender__application__handled__nothing_sent__template_missing(outbox):
     ApplicationFactory.create_in_status_handled()
     send_application_handled_email_task()
     assert len(outbox) == 0
+
+    assert SentryLogger.log_message.call_count == 1
 
 
 @override_settings(SEND_RESERVATION_NOTIFICATION_EMAILS=True)
