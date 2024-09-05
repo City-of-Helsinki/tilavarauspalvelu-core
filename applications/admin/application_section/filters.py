@@ -67,8 +67,8 @@ class AgeGroupFilter(admin.SimpleListFilter):
     def lookups(self, request: WSGIRequest, model_admin: ApplicationSectionAdmin) -> list[tuple[str, str]]:
         return AgeGroup.objects.annotate(
             repr=models.Case(
-                models.When(maximum=None, then=Concat("minimum", models.Value("+"))),
-                default=Concat("minimum", models.Value(" - "), "maximum"),
+                models.When(maximum=None, then=Concat("minimum", models.Value("+"), output_field=models.CharField())),
+                default=Concat("minimum", models.Value(" - "), "maximum", output_field=models.CharField()),
                 output_field=models.CharField(),
             ),
         ).values_list("id", "repr")
