@@ -58,6 +58,18 @@ def test_reservation_unit__create__pricing__free_pricing_doesnt_require_price_in
     assert pricing.tax_percentage.value == 0
 
 
+def test_reservation_unit__create__pricing__begins_is_required(graphql):
+    graphql.login_with_superuser()
+
+    pricing_data = get_pricing_data(begins=None)
+    response = graphql(CREATE_MUTATION, input_data=get_create_draft_input_data(pricings=pricing_data))
+    assert response.has_errors is True, response
+
+    del pricing_data["begins"]
+    response = graphql(CREATE_MUTATION, input_data=get_create_draft_input_data(pricings=pricing_data))
+    assert response.has_errors is True, response
+
+
 def test_reservation_unit__create__pricing__lowest_price_is_higher_than_highest(graphql):
     graphql.login_with_superuser()
 
