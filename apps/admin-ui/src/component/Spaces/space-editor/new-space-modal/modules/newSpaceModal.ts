@@ -36,8 +36,7 @@ export const EditorColumns = styled.div`
   padding-bottom: var(--spacing-m);
 `;
 
-export const RoundTag = styled(Tag)`
-  border-radius: 10px;
+export const StyledTag = styled(Tag)`
   background-color: var(--color-bus-light);
   color: var(--color-bus);
   font-weight: 600;

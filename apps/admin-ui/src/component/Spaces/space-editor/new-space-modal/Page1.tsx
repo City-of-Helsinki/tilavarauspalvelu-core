@@ -9,7 +9,7 @@ import {
   Address,
   Name,
   Parent,
-  RoundTag,
+  StyledTag,
   Title,
   UnitInfo,
 } from "./modules/newSpaceModal";
@@ -41,7 +41,7 @@ export function Page1({
     <>
       <CustomDialogHeader
         id="dialog-title"
-        extras={<RoundTag>{t("SpaceModal.phase")} 1/2</RoundTag>}
+        extras={<StyledTag>{t("SpaceModal.phase")} 1/2</StyledTag>}
         title={t(
           hasFixedParent
             ? "SpaceModal.page1.subSpaceModalTitle"

@@ -7,7 +7,7 @@ import {
   Address,
   Name,
   Parent,
-  RoundTag,
+  StyledTag,
   UnitInfo,
 } from "./modules/newSpaceModal";
 import { parseAddress } from "@/common/util";
@@ -49,7 +49,7 @@ export function Page2({
             ? "SpaceModal.page2.subSpaceModalTitle"
             : "SpaceModal.page2.modalTitle"
         )}
-        extras={<RoundTag>{t("SpaceModal.phase")} 2/2</RoundTag>}
+        extras={<StyledTag>{t("SpaceModal.phase")} 2/2</StyledTag>}
         close={closeModal}
       />
       <Dialog.Content>
