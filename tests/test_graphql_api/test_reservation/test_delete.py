@@ -111,7 +111,7 @@ def test_reservation__delete__webshop_error__log_error_on_cancel_order_failure_b
 
     assert VerkkokauppaAPIClient.get_payment.called is True
     assert VerkkokauppaAPIClient.cancel_order.called is True
-    assert SentryLogger.log_exception.called is True
+    assert SentryLogger.log_exception.call_count == 1
 
 
 def test_reservation__delete__confirmed__cannot_delete_when_status_not_created_nor_waiting_for_payment(graphql):

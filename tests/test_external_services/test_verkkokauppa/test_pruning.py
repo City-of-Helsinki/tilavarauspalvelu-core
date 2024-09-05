@@ -95,7 +95,7 @@ def test_verkkokauppa_pruning__update_expired_orders__get_payment_errors_are_log
     order.refresh_from_db()
     assert order.status == OrderStatus.DRAFT
     assert VerkkokauppaAPIClient.get_payment.called is True
-    assert SentryLogger.log_exception.called is True
+    assert SentryLogger.log_exception.call_count == 1
 
 
 @patch_method(SentryLogger.log_exception)
@@ -114,7 +114,7 @@ def test_verkkokauppa_pruning__update_expired_orders__cancel_error_errors_are_lo
     assert order.status == OrderStatus.DRAFT
     assert VerkkokauppaAPIClient.get_payment.called is True
     assert VerkkokauppaAPIClient.cancel_order.called is True
-    assert SentryLogger.log_exception.called is True
+    assert SentryLogger.log_exception.call_count == 1
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)

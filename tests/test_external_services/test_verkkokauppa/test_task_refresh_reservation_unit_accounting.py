@@ -107,11 +107,11 @@ def test_refresh_reservation_unit_accounting__capture_error__api_errors():
 
     assert VerkkokauppaAPIClient.create_product.called is True
     assert VerkkokauppaAPIClient.create_or_update_accounting.called is True
-    assert SentryLogger.log_exception.called is True
+    assert SentryLogger.log_exception.call_count == 1
 
 
 @patch_method(SentryLogger.log_message)
 def test_refresh_reservation_unit_accounting__capture_error__reservation_unit_does_not_exist():
     refresh_reservation_unit_accounting(0)
 
-    assert SentryLogger.log_message.called is True
+    assert SentryLogger.log_message.call_count == 1

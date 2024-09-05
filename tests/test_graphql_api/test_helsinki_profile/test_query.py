@@ -5,6 +5,7 @@ from tests.factories.helsinki_profile import MyProfileDataFactory
 from tests.helpers import ResponseMock, patch_method
 from users.helauth.clients import HelsinkiProfileClient
 from users.helauth.typing import ADLoginAMR, LoginMethod, ProfileLoginAMR
+from utils.sentry import SentryLogger
 
 from .helpers import profile_query
 
@@ -246,6 +247,7 @@ def test_helsinki_profile_data__query__no_token(graphql):
 
 @patch_method(HelsinkiProfileClient.get_token, return_value="token")
 @patch_method(HelsinkiProfileClient.generic)
+@patch_method(SentryLogger.log_message)
 def test_helsinki_profile_data__query__profile_request_has_errors(graphql):
     user = UserFactory.create(profile_id="foo", social_auth__extra_data__amr=ProfileLoginAMR.SUOMI_FI.value)
     application = ApplicationFactory.create(user=user)
@@ -258,6 +260,8 @@ def test_helsinki_profile_data__query__profile_request_has_errors(graphql):
 
     assert HelsinkiProfileClient.generic.call_count == 1
     assert response.error_message() == 'Helsinki profile: Response contains errors. [{"message": "foo"}]'
+
+    assert SentryLogger.log_message.call_count == 1
 
 
 @patch_method(HelsinkiProfileClient.get_token, return_value="token")

@@ -20,6 +20,7 @@ from utils.external_service.errors import (
     ExternalServiceParseJSONError,
     ExternalServiceRequestError,
 )
+from utils.sentry import SentryLogger
 
 from .helpers import mock_request
 
@@ -320,6 +321,7 @@ def test_helsinki_profile_client__prefill_info__no_city():
 
 @patch_method(HelsinkiProfileClient.generic)
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
+@patch_method(SentryLogger.log_message)
 def test_helsinki_profile_client__prefill_info__non_200_response():
     response = MagicMock()
     response.status_code = 400
@@ -333,9 +335,12 @@ def test_helsinki_profile_client__prefill_info__non_200_response():
     with pytest.raises(ExternalServiceRequestError, match=re.escape(msg)):
         HelsinkiProfileClient.get_reservation_prefill_info(mock_request(UserFactory.create()))
 
+    assert SentryLogger.log_message.call_count == 1
+
 
 @patch_method(HelsinkiProfileClient.generic)
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
+@patch_method(SentryLogger.log_message)
 def test_helsinki_profile_client__prefill_info__contains_errors():
     profile_data = MyProfileDataFactory.create_basic()
 
@@ -349,6 +354,8 @@ def test_helsinki_profile_client__prefill_info__contains_errors():
     msg = 'Helsinki profile: Response contains errors. [{"message": "foo"}]'
     with pytest.raises(ExternalServiceError, match=re.escape(msg)):
         HelsinkiProfileClient.get_reservation_prefill_info(mock_request(UserFactory.create()))
+
+    assert SentryLogger.log_message.call_count == 1
 
 
 @patch_method(HelsinkiProfileClient.generic)
@@ -367,6 +374,7 @@ def test_helsinki_profile_client__prefill_info__json_decode_error():
 
 @patch_method(HelsinkiProfileClient.generic)
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
+@patch_method(SentryLogger.log_message)
 def test_helsinki_profile_client__prefill_info__500_error():
     response = MagicMock()
     response.status_code = 500
@@ -379,6 +387,8 @@ def test_helsinki_profile_client__prefill_info__500_error():
     msg = "GET request to HELSINKI PROFILE (example.com) failed with status 500."
     with pytest.raises(ExternalServiceRequestError, match=re.escape(msg)):
         HelsinkiProfileClient.get_reservation_prefill_info(mock_request(UserFactory.create()))
+
+    assert SentryLogger.log_message.call_count == 1
 
 
 @patch_method(HelsinkiProfileClient.get_token, return_value=None)

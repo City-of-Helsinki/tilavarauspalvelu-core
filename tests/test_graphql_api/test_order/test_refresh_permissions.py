@@ -3,6 +3,7 @@ import pytest
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tests.factories import UserFactory
 from tests.helpers import patch_method
+from utils.sentry import SentryLogger
 
 from .helpers import REFRESH_MUTATION, get_order
 
@@ -33,6 +34,7 @@ def test_refresh_order__regular_user(graphql):
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment, return_value=None)
+@patch_method(SentryLogger.log_message)
 def test_refresh_order__order_owner(graphql):
     user = graphql.login_with_regular_user()
     order = get_order(user=user)
@@ -43,8 +45,11 @@ def test_refresh_order__order_owner(graphql):
     assert VerkkokauppaAPIClient.get_payment.call_count == 1
     assert response.error_message() == "Unable to check order payment"
 
+    assert SentryLogger.log_message.call_count == 1
+
 
 @patch_method(VerkkokauppaAPIClient.get_payment, return_value=None)
+@patch_method(SentryLogger.log_message)
 def test_refresh_order__general_admin__can_manage_reservations(graphql):
     order = get_order()
 
@@ -56,3 +61,5 @@ def test_refresh_order__general_admin__can_manage_reservations(graphql):
 
     assert VerkkokauppaAPIClient.get_payment.call_count == 1
     assert response.error_message() == "Unable to check order payment"
+
+    assert SentryLogger.log_message.call_count == 1

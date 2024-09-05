@@ -52,4 +52,4 @@ def test_image_cache_purge__logs_failed_requests(request):
     request.return_value = mock.MagicMock(status_code=400)
 
     image_cache.purge("foo/bar.jpg")
-    assert SentryLogger.log_message.called is True
+    assert SentryLogger.log_message.call_count == 1

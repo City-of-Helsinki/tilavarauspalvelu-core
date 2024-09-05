@@ -9,6 +9,7 @@ from merchants.verkkokauppa.merchants.types import CreateMerchantParams, Merchan
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tests.helpers import patch_method
 from tests.mocks import MockResponse
+from utils.sentry import SentryLogger
 
 create_merchant_params: CreateMerchantParams = CreateMerchantParams(
     name="Test Merchant",
@@ -122,11 +123,14 @@ def test__create_merchant__raises_exception_if_merchant_id_is_invalid():
 
 
 @patch_method(VerkkokauppaAPIClient.generic)
+@patch_method(SentryLogger.log_message)
 def test__create_merchant__raises_exception_if_status_code_is_not_201():
     VerkkokauppaAPIClient.generic.return_value = MockResponse(status_code=500, json=mutation_merchant_response)
 
     with pytest.raises(CreateMerchantError):
         VerkkokauppaAPIClient.create_merchant(params=create_merchant_params)
+
+    assert SentryLogger.log_message.call_count == 1
 
 
 @patch_method(VerkkokauppaAPIClient.generic)
@@ -178,6 +182,7 @@ def test__update_merchant__raises_exception_if_merchant_id_is_invalid():
 
 
 @patch_method(VerkkokauppaAPIClient.generic)
+@patch_method(SentryLogger.log_message)
 def test__update_merchant__raises_exception_if_status_code_is_not_200():
     VerkkokauppaAPIClient.generic.return_value = MockResponse(status_code=500, json=mutation_merchant_response)
 
@@ -185,6 +190,8 @@ def test__update_merchant__raises_exception_if_status_code_is_not_200():
         VerkkokauppaAPIClient.update_merchant(
             merchant_uuid=uuid.UUID("7107df38-5985-39c9-8c83-ffe18bff24f5"), params=create_merchant_params
         )
+
+    assert SentryLogger.log_message.call_count == 1
 
 
 @patch_method(VerkkokauppaAPIClient.generic)
