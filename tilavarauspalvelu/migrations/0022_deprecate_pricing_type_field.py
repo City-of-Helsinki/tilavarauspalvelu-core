@@ -5,7 +5,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("tilavarauspalvelu", "0015_refactor_pricing_state"),
+        ("tilavarauspalvelu", "0021_refactor_pricing_state"),
     ]
 
     operations = [
