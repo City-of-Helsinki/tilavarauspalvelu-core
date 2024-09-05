@@ -1,53 +1,68 @@
 import { camelCase } from "lodash";
 import React, { useMemo } from "react";
 import { useTranslation } from "next-i18next";
-import styled from "styled-components";
-import { truncatedText } from "../../styles/util";
 import { OrderStatus } from "@/gql/gql-types";
+import {
+  IconPen,
+  IconEuroSign,
+  IconCross,
+  IconQuestionCircle,
+} from "hds-react";
+import StatusLabel, {
+  StatusLabelType,
+} from "common/src/components/StatusLabel";
 
 export type Props = {
   orderStatus: OrderStatus;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-const Wrapper = styled.div<{ $color: string }>`
-  display: inline-block;
-  padding: var(--spacing-3-xs) var(--spacing-2-xs);
-  background-color: ${({ $color }) => $color};
-  line-height: var(--lineheight-l);
-  font-size: var(--fontsize-body-s);
-  ${truncatedText};
-`;
-
-export function ReservationOrderStatus({
-  orderStatus,
-  ...rest
-}: Props): JSX.Element {
+export function ReservationOrderStatus({ orderStatus }: Props): JSX.Element {
   const { t } = useTranslation();
 
-  const color = useMemo(() => {
+  const labelProps = useMemo((): {
+    type: StatusLabelType;
+    icon: JSX.Element;
+  } => {
     switch (orderStatus) {
       case OrderStatus.Draft:
-        return "var(--color-summer-light)";
+        return {
+          type: "draft",
+          icon: <IconPen ariaHidden />,
+        };
       case OrderStatus.Paid:
-        return "var(--color-info-light)";
+        return {
+          type: "success",
+          icon: <IconEuroSign ariaHidden />,
+        };
       case OrderStatus.PaidManually:
-        return "var(--color-gold-light)";
+        return {
+          type: "alert",
+          icon: <IconEuroSign ariaHidden />,
+        };
       case OrderStatus.Cancelled:
-        return "var(--color-error-light)";
-      case OrderStatus.Expired:
-        return "var(--color-metro-medium-light)";
+        return {
+          type: "neutral",
+          icon: <IconCross ariaHidden />,
+        };
       case OrderStatus.Refunded:
-        return "var(--color-bus-light)";
+        return {
+          type: "success",
+          icon: <IconEuroSign ariaHidden />,
+        };
+      case OrderStatus.Expired: // No idea what to do with this
       default:
-        return "";
+        return {
+          type: "neutral",
+          icon: <IconQuestionCircle ariaHidden />,
+        };
     }
   }, [orderStatus]);
 
   const statusText = t(`reservations:orderStatus.${camelCase(orderStatus)}`);
 
   return (
-    <Wrapper $color={color} {...rest} title={statusText}>
+    <StatusLabel type={labelProps.type} icon={labelProps.icon}>
       {statusText}
-    </Wrapper>
+    </StatusLabel>
   );
 }

@@ -1,12 +1,14 @@
 import React, { forwardRef } from "react";
-import { Tag } from "hds-react";
+import { IconEuroSign } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { H1, fontMedium } from "common/src/common/typography";
+import { fontMedium, H1 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
-  useReservationApplicationLinkQuery,
+  type Maybe,
+  OrderStatus,
   type ReservationQuery,
+  useReservationApplicationLinkQuery,
 } from "@gql/gql-types";
 import { getName } from "./util";
 import { HorisontalFlex } from "@/styles/layout";
@@ -14,6 +16,9 @@ import { formatDateTime } from "@/common/util";
 import { getApplicationUrl } from "@/common/urls";
 import { gql } from "@apollo/client";
 import { ExternalLink } from "@/component/ExternalLink";
+import StatusLabel, {
+  type StatusLabelType,
+} from "common/src/components/StatusLabel";
 
 const Dot = styled.div`
   display: inline-block;
@@ -116,6 +121,22 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
       : null;
 
     const order = reservation.paymentOrder[0];
+    const statusLabelType = ((s?: Maybe<OrderStatus>): StatusLabelType => {
+      switch (s) {
+        case OrderStatus.Paid:
+        case OrderStatus.Refunded:
+          return "success";
+        case OrderStatus.Expired:
+          return "error";
+        case OrderStatus.PaidManually:
+        case OrderStatus.Draft:
+          return "alert";
+        case OrderStatus.Cancelled:
+        default:
+          return "neutral";
+      }
+    })(order?.status);
+
     return (
       <div>
         <NameState ref={ref}>
@@ -123,13 +144,13 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
           <HorisontalFlex>
             <AlignVertically>
               {order?.status != null && (
-                <Tag
-                  theme={{ "--tag-background": "var(--color-engel-light)" }}
+                <StatusLabel
+                  type={statusLabelType}
                   data-testid="reservation_title_section__order_status"
-                  id="reservation-order_status"
+                  icon={<IconEuroSign ariaHidden />}
                 >
                   {t(`Payment.status.${order?.status}`)}
-                </Tag>
+                </StatusLabel>
               )}
             </AlignVertically>
             <AlignVertically style={{ gap: "var(--spacing-xs)" }}>
