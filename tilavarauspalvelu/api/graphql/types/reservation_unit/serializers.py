@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING, Any
 
 from auditlog.models import LogEntry
 from django.conf import settings
+from django.db.transaction import atomic
 from graphene.utils.str_converters import to_camel_case
 from graphene_django_extensions import NestingModelSerializer
 from graphql import GraphQLError
@@ -225,7 +226,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
 
         # At least one given pricing must be currently active (begin date is today or earlier)
         today = local_date()
-        has_active_pricing = any(p.get("begins") <= today for p in pricings)
+        has_active_pricing = any(p["begins"] <= today for p in pricings)
         if pricings and not has_active_pricing:
             msg = "At least one active pricing is required."
             raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_PRICINGS_NO_ACTIVE_PRICING)
@@ -241,7 +242,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
             highest_price = pricing.get("highest_price")
             lowest_price = pricing.get("lowest_price")
 
-            if lowest_price is None and highest_price is None:
+            if lowest_price is None and highest_price is None:  # = Free
                 continue
             if lowest_price is None or highest_price is None:
                 msg = "Both lowest and highest price must be given or neither."
@@ -314,16 +315,19 @@ class ReservationUnitSerializer(NestingModelSerializer):
                 raise GraphQLError("Sending reservation unit as resource to HAUKI failed.") from err
 
     @staticmethod
-    def handle_pricings(pricings: list[dict[Any, Any]], reservation_unit) -> None:
-        # Delete pricings that are not in the payload
-        pricing_pks = [pricing.get("pk") for pricing in pricings if "pk" in pricing]
-        ReservationUnitPricing.objects.filter(reservation_unit=reservation_unit).exclude(pk__in=pricing_pks).delete()
+    def handle_pricings(pricings: list[dict[Any, Any]], reservation_unit: ReservationUnit) -> None:
+        with atomic():
+            # Delete pricings that are not in the payload
+            pricing_pks = [pricing.get("pk") for pricing in pricings if "pk" in pricing]
+            ReservationUnitPricing.objects.filter(reservation_unit=reservation_unit).exclude(
+                pk__in=pricing_pks
+            ).delete()
 
-        for pricing in pricings:
-            if "pk" in pricing:  # Update existing pricings
-                ReservationUnitPricing.objects.update_or_create(pk=pricing["pk"], defaults=pricing)
-            else:  # Create new pricings
-                ReservationUnitPricing.objects.create(**pricing, reservation_unit=reservation_unit)
+            for pricing in pricings:
+                if "pk" in pricing:  # Update existing pricings
+                    ReservationUnitPricing.objects.update_or_create(pk=pricing["pk"], defaults=pricing)
+                else:  # Create new pricings
+                    ReservationUnitPricing.objects.create(**pricing, reservation_unit=reservation_unit)
 
     def update(self, instance: ReservationUnit, validated_data: dict[str, Any]) -> ReservationUnit:
         pricings = validated_data.pop("pricings", [])
