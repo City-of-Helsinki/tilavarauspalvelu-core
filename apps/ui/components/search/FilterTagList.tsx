@@ -95,7 +95,7 @@ export function FilterTagList({
               onClick={() => handleRemoveTag([subValue], key)}
               onDelete={() => handleRemoveTag([subValue], key)}
               key={`${key}-${subValue}`}
-              deleteButtonAriaLabel={t(`searchForm:removeFilter`, {
+              aria-label={t(`searchForm:removeFilter`, {
                 value: translateTag(key, subValue),
               })}
             >
@@ -110,7 +110,7 @@ export function FilterTagList({
             onDelete={() => handleRemoveTag([key])}
             // Why is there no onClick here?
             key={key}
-            deleteButtonAriaLabel={t(`searchForm:removeFilter`, {
+            aria-label={t(`searchForm:removeFilter`, {
               value: label,
             })}
           >

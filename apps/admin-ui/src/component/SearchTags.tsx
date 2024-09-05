@@ -67,6 +67,7 @@ export function SearchTags({
         <StyledTag
           onDelete={() => handleDelete(tag)}
           key={`${tag.key}-${tag.value}`}
+          id={`search-tag-${tag.key}`}
         >
           {tag.tr}
         </StyledTag>

@@ -196,21 +196,27 @@ const StyledTag = styled(Tag)<{ $status: "available" | "no-times" | "closed" }>`
   }
 `;
 
-const StatusTag = (ru: {
+const StatusTag = ({
+  data,
+  id,
+}: {
   data: { closed: boolean; availableAt: string };
+  id: string;
 }): JSX.Element => {
   const { t } = useTranslation();
-  const { closed, availableAt } = ru.data;
+  const { closed, availableAt } = data;
 
   if (closed) {
     return (
-      <StyledTag $status="closed">{t("reservationUnitCard:closed")}</StyledTag>
+      <StyledTag $status="closed" id={id}>
+        {t("reservationUnitCard:closed")}
+      </StyledTag>
     );
   }
 
   if (!availableAt) {
     return (
-      <StyledTag $status="no-times">
+      <StyledTag $status="no-times" id={id}>
         {t("reservationUnitCard:noTimes")}
       </StyledTag>
     );
@@ -224,7 +230,12 @@ const StatusTag = (ru: {
     dayText = t("common:tomorrow");
   } else dayText = `${toUIDate(new Date(availableAt))} `;
 
-  return <StyledTag $status="available">{`${dayText} ${timeText}`}</StyledTag>;
+  return (
+    <StyledTag
+      $status="available"
+      id={id}
+    >{`${dayText} ${timeText}`}</StyledTag>
+  );
 };
 
 // TODO SSR version (and remove the use hook)
@@ -289,6 +300,7 @@ function ReservationUnitCard({ reservationUnit }: PropsT): JSX.Element {
               closed: reservationUnit.isClosed ?? false,
               availableAt: reservationUnit.firstReservableDatetime ?? "",
             }}
+            id={`status-tag-${reservationUnit.pk}`}
           />
         </div>
         <Bottom>
