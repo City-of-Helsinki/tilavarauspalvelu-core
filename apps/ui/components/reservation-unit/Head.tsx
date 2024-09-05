@@ -25,6 +25,7 @@ import {
 } from "@/modules/reservationUnit";
 import BreadcrumbWrapper from "../common/BreadcrumbWrapper";
 import { isReservationStartInFuture } from "@/modules/reservation";
+import { filterNonNullable } from "common/src/helpers";
 
 type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
 interface PropsType {
@@ -141,7 +142,6 @@ function NonReservableNotification({
 
 function Head({
   reservationUnit,
-  // activeOpeningTimes,
   reservationUnitIsReservable,
   subventionSuffix,
 }: PropsType): JSX.Element {
@@ -164,6 +164,66 @@ function Head({
 
   const unitName = getUnitName(reservationUnit.unit ?? undefined);
 
+  const iconsTexts = filterNonNullable([
+    reservationUnit.reservationUnitType != null
+      ? {
+          key: "reservationUnitType",
+          icon: (
+            <NextImage
+              src="/icons/icon_premises.svg"
+              alt=""
+              width="24"
+              height="24"
+              aria-hidden="true"
+            />
+          ),
+          text: getTranslation(reservationUnit.reservationUnitType, "name"),
+        }
+      : null,
+    reservationUnit.maxPersons != null
+      ? {
+          key: "maxPersons",
+          icon: <IconGroup aria-label={t("reservationUnit:maxPersons")} />,
+          text: t("reservationUnitCard:personRange", {
+            count: reservationUnit.maxPersons,
+            value:
+              reservationUnit.minPersons !== reservationUnit.maxPersons &&
+              reservationUnit.minPersons != null &&
+              reservationUnit.minPersons > 1
+                ? `${reservationUnit.minPersons} - ${reservationUnit.maxPersons}`
+                : reservationUnit.maxPersons,
+          }),
+        }
+      : null,
+    reservationUnit.minReservationDuration ||
+    reservationUnit.maxReservationDuration
+      ? {
+          key: "eventDuration",
+          icon: (
+            <IconClock aria-label={t("reservationCalendar:eventDuration")} />
+          ),
+          text: t(`reservationCalendar:eventDurationLiteral`, {
+            min: minReservationDuration,
+            max: maxReservationDuration,
+          }),
+        }
+      : null,
+    unitPrice != null
+      ? {
+          key: "unitPrice",
+          icon: (
+            <IconEuroSign aria-label={t("prices:reservationUnitPriceLabel")} />
+          ),
+          text: (
+            <>
+              {unitPrice}
+              {hasSubventionSuffix ? subventionSuffix : null}
+            </>
+          ),
+        }
+      : null,
+  ] as const);
+
   return (
     <>
       <BreadcrumbWrapper
@@ -180,69 +240,9 @@ function Head({
               <ReservationUnitName>{reservationUnitName}</ReservationUnitName>
               <UnitName>{unitName}</UnitName>
               <Props>
-                {reservationUnit.reservationUnitType ? (
-                  <StyledIconWithText
-                    icon={
-                      <NextImage
-                        src="/icons/icon_premises.svg"
-                        alt=""
-                        width="24"
-                        height="24"
-                        aria-hidden="true"
-                      />
-                    }
-                    text={getTranslation(
-                      reservationUnit.reservationUnitType,
-                      "name"
-                    )}
-                  />
-                ) : null}
-                {reservationUnit.maxPersons && (
-                  <StyledIconWithText
-                    icon={
-                      <IconGroup aria-label={t("reservationUnit:maxPersons")} />
-                    }
-                    text={t("reservationUnitCard:personRange", {
-                      count: reservationUnit.maxPersons,
-                      value:
-                        reservationUnit.minPersons !==
-                          reservationUnit.maxPersons &&
-                        reservationUnit.minPersons != null &&
-                        reservationUnit.minPersons > 1
-                          ? `${reservationUnit.minPersons} - ${reservationUnit.maxPersons}`
-                          : reservationUnit.maxPersons,
-                    })}
-                  />
-                )}
-                {(reservationUnit.minReservationDuration ||
-                  reservationUnit.maxReservationDuration) && (
-                  <StyledIconWithText
-                    icon={
-                      <IconClock
-                        aria-label={t("reservationCalendar:eventDuration")}
-                      />
-                    }
-                    text={t(`reservationCalendar:eventDurationLiteral`, {
-                      min: minReservationDuration,
-                      max: maxReservationDuration,
-                    })}
-                  />
-                )}
-                {unitPrice && (
-                  <StyledIconWithText
-                    icon={
-                      <IconEuroSign
-                        aria-label={t("prices:reservationUnitPriceLabel")}
-                      />
-                    }
-                    text={
-                      <>
-                        {unitPrice}
-                        {hasSubventionSuffix ? subventionSuffix : null}
-                      </>
-                    }
-                  />
-                )}
+                {iconsTexts.map(({ icon, key, text }) => (
+                  <StyledIconWithText key={key} icon={icon} text={text} />
+                ))}
               </Props>
               {!reservationUnitIsReservable && (
                 <NonReservableNotification reservationUnit={reservationUnit} />

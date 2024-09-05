@@ -62,7 +62,8 @@ import {
 import Head from "@/components/reservation-unit/Head";
 import { AddressSection } from "@/components/reservation-unit/Address";
 import Sanitize from "@/components/common/Sanitize";
-import RelatedUnits, {
+import {
+  RelatedUnits,
   type RelatedNodeT,
 } from "@/components/reservation-unit/RelatedUnits";
 import { AccordionWithState as Accordion } from "@/components/common/Accordion";
@@ -960,11 +961,6 @@ function ReservationUnit({
     : undefined;
 
   const [cookiehubBannerHeight, setCookiehubBannerHeight] = useState<number>(0);
-  const futurePricing = getFuturePricing(
-    reservationUnit,
-    activeApplicationRounds
-  );
-  const formatters = getFormatters(i18n.language);
   const currentDate = focusDate ?? now;
   const dayStartTime = addHours(startOfDay(currentDate), 6);
   const equipment = filterNonNullable(reservationUnit.equipments);
@@ -1097,32 +1093,10 @@ function ReservationUnit({
                     title: getTranslation(reservationUnit, "name"),
                   })}
                 </Subheading>
-                {reservationUnit.maxReservationsPerUser &&
-                  userReservations?.length != null &&
-                  userReservations.length > 0 && (
-                    <StyledNotification
-                      $isSticky={isReservationQuotaReached}
-                      type={isReservationQuotaReached ? "alert" : "info"}
-                      label={t(
-                        `reservationCalendar:reservationQuota${
-                          isReservationQuotaReached ? "Full" : ""
-                        }Label`
-                      )}
-                    >
-                      <span data-testid="reservation-unit--notification__reservation-quota">
-                        {t(
-                          `reservationCalendar:reservationQuota${
-                            isReservationQuotaReached ? "Full" : ""
-                          }`,
-                          {
-                            count:
-                              reservationUnit.numActiveUserReservations ?? 0,
-                            total: reservationUnit.maxReservationsPerUser,
-                          }
-                        )}
-                      </span>
-                    </StyledNotification>
-                  )}
+                <ReservationQuotaReached
+                  isReservationQuotaReached={isReservationQuotaReached}
+                  reservationUnit={reservationUnit}
+                />
                 <div aria-hidden ref={calendarRef}>
                   <Calendar<ReservationNode>
                     events={[...calendarEvents, ...eventBuffers]}
@@ -1198,35 +1172,10 @@ function ReservationUnit({
                 data-testid="reservation-unit__reservation-notice"
               >
                 <PaddedContent>
-                  {futurePricing && (
-                    <p style={{ marginTop: 0 }}>
-                      <Trans
-                        i18nKey="reservationUnit:futurePricingNotice"
-                        defaults="Huomioi <bold>hinnoittelumuutos {{date}} alkaen. Uusi hinta on {{price}}</bold>."
-                        values={{
-                          date: toUIDate(new Date(futurePricing.begins)),
-                          price: getPriceString({
-                            pricing: futurePricing,
-                          }).toLocaleLowerCase(),
-                        }}
-                        components={{ bold: <strong /> }}
-                      />
-                      {futurePricing.pricingType === PricingType.Paid &&
-                        parseFloat(futurePricing.taxPercentage?.value ?? "") >
-                          0 && (
-                          <strong>
-                            {t("reservationUnit:futurePriceNoticeTax", {
-                              tax: formatters.strippedDecimal.format(
-                                parseFloat(
-                                  futurePricing.taxPercentage?.value ?? ""
-                                )
-                              ),
-                            })}
-                          </strong>
-                        )}
-                      .
-                    </p>
-                  )}
+                  <PriceChangeNotice
+                    reservationUnit={reservationUnit}
+                    activeApplicationRounds={activeApplicationRounds}
+                  />
                   <Sanitize html={termsOfUseContent} />
                 </PaddedContent>
               </Accordion>
@@ -1323,6 +1272,89 @@ function ReservationUnit({
         )}
       </BottomWrapper>
     </Wrapper>
+  );
+}
+
+function ReservationQuotaReached({
+  reservationUnit,
+  isReservationQuotaReached,
+}: {
+  reservationUnit: NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
+  isReservationQuotaReached: boolean;
+}) {
+  const { t } = useTranslation();
+
+  const isReached = reservationUnit.maxReservationsPerUser;
+  if (!isReached) {
+    return null;
+  }
+
+  return (
+    <StyledNotification
+      $isSticky={isReservationQuotaReached}
+      type={isReservationQuotaReached ? "alert" : "info"}
+      label={t(
+        `reservationCalendar:reservationQuota${
+          isReservationQuotaReached ? "Full" : ""
+        }Label`
+      )}
+    >
+      <span data-testid="reservation-unit--notification__reservation-quota">
+        {t(
+          `reservationCalendar:reservationQuota${
+            isReservationQuotaReached ? "Full" : ""
+          }`,
+          {
+            count: reservationUnit.numActiveUserReservations ?? 0,
+            total: reservationUnit.maxReservationsPerUser,
+          }
+        )}
+      </span>
+    </StyledNotification>
+  );
+}
+
+function PriceChangeNotice({
+  reservationUnit,
+  activeApplicationRounds,
+}: Pick<PropsNarrowed, "reservationUnit" | "activeApplicationRounds">) {
+  const { t, i18n } = useTranslation();
+  const futurePricing = getFuturePricing(
+    reservationUnit,
+    activeApplicationRounds
+  );
+
+  const formatters = getFormatters(i18n.language);
+
+  if (!futurePricing) {
+    return null;
+  }
+
+  return (
+    <p style={{ marginTop: 0 }}>
+      <Trans
+        i18nKey="reservationUnit:futurePricingNotice"
+        defaults="Huomioi <bold>hinnoittelumuutos {{date}} alkaen. Uusi hinta on {{price}}</bold>."
+        values={{
+          date: toUIDate(new Date(futurePricing.begins)),
+          price: getPriceString({
+            pricing: futurePricing,
+          }).toLocaleLowerCase(),
+        }}
+        components={{ bold: <strong /> }}
+      />
+      {futurePricing.pricingType === PricingType.Paid &&
+        parseFloat(futurePricing.taxPercentage?.value ?? "") > 0 && (
+          <strong>
+            {t("reservationUnit:futurePriceNoticeTax", {
+              tax: formatters.strippedDecimal.format(
+                parseFloat(futurePricing.taxPercentage?.value ?? "")
+              ),
+            })}
+          </strong>
+        )}
+      .
+    </p>
   );
 }
 

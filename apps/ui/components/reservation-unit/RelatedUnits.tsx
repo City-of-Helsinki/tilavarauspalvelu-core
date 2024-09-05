@@ -7,7 +7,7 @@ import { useMedia } from "react-use";
 import { breakpoints } from "common/src/common/style";
 import type { RelatedReservationUnitsQuery } from "@gql/gql-types";
 import { reservationUnitPath } from "@/modules/const";
-import { getMainImage, getTranslation } from "@/modules/util";
+import { getMainImage } from "@/modules/util";
 import Carousel from "../Carousel";
 import {
   getActivePricing,
@@ -15,9 +15,13 @@ import {
   getReservationUnitName,
   getUnitName,
 } from "@/modules/reservationUnit";
-import { getImageSource } from "common/src/helpers";
 import Card from "common/src/components/Card";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
+import { getImageSource } from "common/src/helpers";
+import {
+  convertLanguageCode,
+  getTranslationSafe,
+} from "common/src/common/util";
 
 type RelatedQueryT = NonNullable<
   RelatedReservationUnitsQuery["reservationUnits"]
@@ -39,8 +43,15 @@ const StyledCarousel = styled(Carousel)`
   }
 `;
 
-function RelatedUnits({ units }: PropsType): JSX.Element | null {
-  const { t } = useTranslation();
+const Wrapper = styled.div`
+  margin: 0 var(--spacing-s);
+
+  @media (min-width: ${breakpoints.m}) {
+    margin: 0;
+  }
+`;
+
+export function RelatedUnits({ units }: PropsType): JSX.Element | null {
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
   const isWideMobile = useMedia(`(max-width: ${breakpoints.l})`, false);
 
@@ -48,84 +59,94 @@ function RelatedUnits({ units }: PropsType): JSX.Element | null {
     return null;
   }
   return (
-    <StyledCarousel
-      slidesToShow={isMobile ? 1 : isWideMobile ? 2 : 3}
-      slidesToScroll={isMobile ? 1 : isWideMobile ? 2 : 3}
-      wrapAround={false}
-      hideCenterControls
-      cellSpacing={24}
-    >
-      {units.map((unit) => {
-        const name = getReservationUnitName(unit);
-        const pricing = getActivePricing(unit);
-        const unitPrice =
-          pricing != null ? getPriceString({ pricing }) : undefined;
-        const reservationUnitTypeName =
-          unit.reservationUnitType != null
-            ? getTranslation(unit.reservationUnitType, "name")
-            : undefined;
-        const img = getMainImage(unit);
-        const imgSrc = getImageSource(img, "medium");
-        const infos = [];
-        if (reservationUnitTypeName) {
-          infos.push({
-            icon: (
-              <NextImage
-                src="/icons/icon_premises.svg"
-                alt=""
-                width="24"
-                height="24"
-                aria-hidden="true"
-              />
-            ),
-            value: reservationUnitTypeName,
-          });
-        }
-        if (unit.maxPersons) {
-          infos.push({
-            icon: (
-              <IconGroup
-                aria-label={t("reservationUnitCard:maxPersons", {
-                  maxPersons: unit.maxPersons,
-                })}
-              />
-            ),
-            value: t("reservationUnitCard:maxPersons", {
-              count: unit.maxPersons,
-            }),
-          });
-        }
-        if (unitPrice) {
-          infos.push({
-            icon: (
-              <IconTicket aria-label={t("prices:reservationUnitPriceLabel")} />
-            ),
-            value: unitPrice,
-          });
-        }
-        const buttons = [
-          <ButtonLikeLink
-            href={reservationUnitPath(unit.pk ?? 0)}
-            key={unit.pk ?? 0}
-          >
-            {t("reservationUnitCard:seeMore")}
-            <IconArrowRight aria-hidden="true" />
-          </ButtonLikeLink>,
-        ];
-        return (
-          <Card
-            variant="vertical"
-            key={unit.pk}
-            heading={name ?? ""}
-            text={getUnitName(unit.unit) ?? ""}
-            infos={infos}
-            buttons={buttons}
-            imageSrc={imgSrc}
-          />
-        );
-      })}
-    </StyledCarousel>
+    <Wrapper>
+      <StyledCarousel
+        slidesToShow={isMobile ? 1 : isWideMobile ? 2 : 3}
+        slidesToScroll={isMobile ? 1 : isWideMobile ? 2 : 3}
+        wrapAround={false}
+        hideCenterControls
+        cellSpacing={24}
+      >
+        {units.map((ru) => (
+          <RelatedUnitCard key={ru.pk} reservationUnit={ru} />
+        ))}
+      </StyledCarousel>
+    </Wrapper>
   );
 }
 
-export default RelatedUnits;
+function RelatedUnitCard({
+  reservationUnit,
+}: {
+  reservationUnit: RelatedNodeT;
+}): JSX.Element {
+  const { t, i18n } = useTranslation();
+  const lang = convertLanguageCode(i18n.language);
+
+  const name = getReservationUnitName(reservationUnit, lang);
+  const pricing = getActivePricing(reservationUnit);
+  const unitPrice = pricing != null ? getPriceString({ pricing }) : undefined;
+  const reservationUnitTypeName =
+    reservationUnit.reservationUnitType != null
+      ? getTranslationSafe(reservationUnit.reservationUnitType, "name", lang)
+      : undefined;
+  const img = getMainImage(reservationUnit);
+  const imgSrc = getImageSource(img, "medium");
+
+  const infos = [];
+  if (reservationUnitTypeName) {
+    infos.push({
+      icon: (
+        <NextImage
+          src="/icons/icon_premises.svg"
+          alt=""
+          width="24"
+          height="24"
+          aria-hidden="true"
+        />
+      ),
+      value: reservationUnitTypeName,
+    });
+  }
+  if (reservationUnit.maxPersons) {
+    infos.push({
+      icon: (
+        <IconGroup
+          aria-label={t("reservationUnitCard:maxPersons", {
+            maxPersons: reservationUnit.maxPersons,
+          })}
+        />
+      ),
+      value: t("reservationUnitCard:maxPersons", {
+        count: reservationUnit.maxPersons,
+      }),
+    });
+  }
+  if (unitPrice) {
+    infos.push({
+      icon: <IconTicket aria-label={t("prices:reservationUnitPriceLabel")} />,
+      value: unitPrice,
+    });
+  }
+  const buttons = [
+    <ButtonLikeLink
+      href={reservationUnitPath(reservationUnit.pk ?? 0)}
+      key={reservationUnit.pk ?? 0}
+    >
+      {t("reservationUnitCard:seeMore")}
+      <IconArrowRight aria-hidden="true" />
+    </ButtonLikeLink>,
+  ];
+
+  return (
+    <Card
+      variant="vertical"
+      key={reservationUnit.pk}
+      heading={name ?? ""}
+      text={getUnitName(reservationUnit.unit) ?? ""}
+      infos={infos}
+      buttons={buttons}
+      imageSrc={imgSrc}
+    />
+  );
+}
