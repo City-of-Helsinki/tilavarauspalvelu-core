@@ -19,6 +19,7 @@ from tilavarauspalvelu.enums import (
     ReservationStateChoice,
     ReservationTypeChoice,
 )
+from utils.date_utils import datetime_range_as_string
 from utils.decimal_utils import round_decimal
 
 from .queryset import ReservationQuerySet
@@ -204,6 +205,12 @@ class Reservation(SerializableMixin, models.Model):
 
     def __str__(self) -> str:
         return f"{self.name} ({self.type})"
+
+    def __repr__(self) -> str:
+        return (
+            f"<Reservation {self.name} "
+            f"({datetime_range_as_string(start_datetime=self.begin, end_datetime=self.end)})>"
+        )
 
     @cached_property
     def actions(self) -> ReservationActions:

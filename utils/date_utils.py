@@ -393,6 +393,30 @@ def time_as_timedelta(_input: datetime.datetime | datetime.time, /) -> datetime.
     )
 
 
+def datetime_range_as_string(*, start_datetime: datetime.datetime, end_datetime: datetime.datetime) -> str:
+    """Format a datetime range to a human readable string."""
+    strformat = "%Y-%m-%d %H:%M"
+
+    start_datetime = start_datetime.astimezone(DEFAULT_TIMEZONE)
+    end_datetime = end_datetime.astimezone(DEFAULT_TIMEZONE)
+
+    start_date = start_datetime.date()
+    end_date = end_datetime.date()
+
+    start_str = "min" if start_date == datetime.date.min else start_datetime.strftime(strformat)
+
+    if end_date == datetime.date.max:
+        end_str = "max"
+    elif end_date == start_date:
+        end_str = end_datetime.strftime("%H:%M")
+    elif end_date == start_date + datetime.timedelta(days=1) and end_date == datetime.time.min:
+        end_str = "24:00"
+    else:
+        end_str = end_datetime.strftime(strformat)
+
+    return f"{start_str}-{end_str}"
+
+
 def time_difference(
     _input_1: datetime.datetime | datetime.time,
     _input_2: datetime.datetime | datetime.time,
@@ -452,8 +476,8 @@ def get_periods_between(
     if end_date < start_date:
         msg = "End date cannot be before start date."
         raise ValueError(msg)
-    if end_time <= start_time and end_time != datetime.time(0, 0):
-        msg = "End time cannot be at or before start time."
+    if end_date == start_date and end_time <= start_time and end_time != datetime.time(0, 0):
+        msg = "End time cannot be at or before start time if on the same day."
         raise ValueError(msg)
 
     start_datetime = combine(start_date, start_time, tzinfo=tzinfo)
