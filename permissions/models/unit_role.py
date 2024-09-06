@@ -40,7 +40,7 @@ class UnitRole(models.Model):
         ordering = ["pk"]
 
     def __str__(self) -> str:
-        return f"{self.role}"
+        return f"Unit Role '{self.role}' for {self.user.first_name} {self.user.last_name} ({self.user.email})"
 
 
 AuditLogger.register(GeneralRole)
