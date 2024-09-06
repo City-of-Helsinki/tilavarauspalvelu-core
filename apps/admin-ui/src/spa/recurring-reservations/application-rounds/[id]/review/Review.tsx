@@ -252,8 +252,10 @@ export function Review({
   const { user } = useSession();
 
   // need filtered list of units that the user has permission to view
-  const ds = getUnitOptions(resUnits).filter((unit) =>
-    hasPermission(user, UserPermissionChoice.CanViewApplications, unit.pk)
+  const ds = getUnitOptions(resUnits).filter(
+    (unit) =>
+      hasPermission(user, UserPermissionChoice.CanViewApplications, unit.pk) ||
+      hasPermission(user, UserPermissionChoice.CanManageApplications, unit.pk)
   );
   const unitOptions = uniqBy(ds, (unit) => unit.pk).sort((a, b) =>
     a.nameFi.localeCompare(b.nameFi)

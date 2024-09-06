@@ -444,10 +444,8 @@ type ApplicationRoundNode implements Node {
     unit: [Int]
   ): [ReservationUnitNode!]!
   sentDate: DateTime
-  serviceSector: ServiceSectorNode
   status: ApplicationRoundStatusChoice
   statusTimestamp: DateTime
-  targetGroup: TargetGroup!
   termsOfUse: TermsOfUseNode
 }
 
@@ -5345,24 +5343,6 @@ input SuitableTimeRangeSerializerInput {
   priority: Priority!
 }
 
-"""
-An enumeration.
-"""
-enum TargetGroup {
-  """
-  Kaikki
-  """
-  ALL
-  """
-  Sisäinen
-  """
-  INTERNAL
-  """
-  Julkinen
-  """
-  PUBLIC
-}
-
 type TaxPercentageNode implements Node {
   """
   The ID of the object
@@ -5983,7 +5963,7 @@ enum UserRoleChoice {
   """
   RESERVER
   """
-  Katselika
+  Katselija
   """
   VIEWER
 }

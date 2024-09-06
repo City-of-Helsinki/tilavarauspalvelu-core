@@ -362,10 +362,8 @@ export type ApplicationRoundNode = Node & {
   reservationUnitCount?: Maybe<Scalars["Int"]["output"]>;
   reservationUnits: Array<ReservationUnitNode>;
   sentDate?: Maybe<Scalars["DateTime"]["output"]>;
-  serviceSector?: Maybe<ServiceSectorNode>;
   status?: Maybe<ApplicationRoundStatusChoice>;
   statusTimestamp?: Maybe<Scalars["DateTime"]["output"]>;
-  targetGroup: TargetGroup;
   termsOfUse?: Maybe<TermsOfUseNode>;
 };
 
@@ -4801,16 +4799,6 @@ export type SuitableTimeRangeSerializerInput = {
   priority: Priority;
 };
 
-/** An enumeration. */
-export enum TargetGroup {
-  /** Kaikki */
-  All = "ALL",
-  /** Sisäinen */
-  Internal = "INTERNAL",
-  /** Julkinen */
-  Public = "PUBLIC",
-}
-
 export type TaxPercentageNode = Node & {
   /** The ID of the object */
   id: Scalars["ID"]["output"];
@@ -5310,7 +5298,7 @@ export enum UserRoleChoice {
   NotificationManager = "NOTIFICATION_MANAGER",
   /** Varaaja */
   Reserver = "RESERVER",
-  /** Katselika */
+  /** Katselija */
   Viewer = "VIEWER",
 }
 

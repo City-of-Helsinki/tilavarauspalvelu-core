@@ -20,6 +20,13 @@ export const CURRENT_USER = gql`
           pk
           nameFi
         }
+        unitGroups {
+          id
+          units {
+            id
+            pk
+          }
+        }
         role
       }
       generalRoles {
@@ -44,6 +51,12 @@ function hasUnitPermission(
     const perms = filterNonNullable(role.permissions?.map((x) => x));
     if (perms.find((x) => x === permission) == null) {
       continue;
+    }
+    const unitsInGroups = filterNonNullable(
+      role.unitGroups?.flatMap((x) => x.units.map((y) => y.pk))
+    );
+    if (unitsInGroups.find((x) => x === unitPk)) {
+      return true;
     }
 
     // Check unit specific permissions
