@@ -8,6 +8,7 @@ from graphene_django_extensions.filters import IntMultipleChoiceFilter
 
 from api.graphql.types.unit.types import Unit
 from common.date_utils import local_datetime
+from permissions.enums import UserRoleChoice
 from reservation_units.enums import ReservationKind
 from spaces.querysets.unit import UnitQuerySet
 
@@ -78,7 +79,6 @@ class UnitFilterSet(ModelFilterSet):
         ]
 
     def filter_by_only_with_permission(self, qs: models.QuerySet, name: str, value: bool) -> models.QuerySet:
-        """Returns units where the user has any kind of permissions"""
         if not value:
             return qs
 
@@ -87,7 +87,10 @@ class UnitFilterSet(ModelFilterSet):
             return qs.none()
         if user.is_superuser:
             return qs
-        if user.permissions.has_general_role():
+
+        # All roles except the notification manager work with units.
+        role_choices = set(UserRoleChoice) - {UserRoleChoice.NOTIFICATION_MANAGER}
+        if user.permissions.has_general_role(role_choices=role_choices):
             return qs
 
         u_ids = list(user.unit_roles_map)
