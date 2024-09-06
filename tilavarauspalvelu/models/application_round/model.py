@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.db import models
-from django.db.models.functions import Now
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L, lookup_property
 
@@ -16,6 +15,7 @@ from tilavarauspalvelu.enums import (
     ApplicationStatusChoice,
 )
 from utils.date_utils import local_datetime
+from utils.db import NowTT
 
 from .queryset import ApplicationRoundQuerySet
 
@@ -116,11 +116,11 @@ class ApplicationRound(models.Model):
                 then=models.Value(ApplicationRoundStatusChoice.HANDLED.value),
             ),
             models.When(
-                models.Q(application_period_begin__gt=Now()),
+                models.Q(application_period_begin__gt=NowTT()),
                 then=models.Value(ApplicationRoundStatusChoice.UPCOMING.value),
             ),
             models.When(
-                models.Q(application_period_end__gt=Now()),
+                models.Q(application_period_end__gt=NowTT()),
                 then=models.Value(ApplicationRoundStatusChoice.OPEN.value),
             ),
             default=models.Value(ApplicationRoundStatusChoice.IN_ALLOCATION.value),
@@ -152,11 +152,11 @@ class ApplicationRound(models.Model):
                 then=models.F("handled_date"),
             ),
             models.When(
-                models.Q(application_period_begin__gt=Now()),  # UPCOMING
+                models.Q(application_period_begin__gt=NowTT()),  # UPCOMING
                 then=models.F("public_display_begin"),
             ),
             models.When(
-                models.Q(application_period_end__gt=Now()),  # OPEN
+                models.Q(application_period_end__gt=NowTT()),  # OPEN
                 then=models.F("application_period_begin"),
             ),
             default=models.F("application_period_end"),  # IN_ALLOCATION
@@ -240,7 +240,7 @@ class ApplicationRound(models.Model):
                 then=models.Value(ApplicationRoundReservationCreationStatusChoice.COMPLETED.value),
             ),
             models.When(
-                models.Q(handled_date__lte=Now() - timeout),
+                models.Q(handled_date__lte=NowTT() - timeout),
                 then=models.Value(ApplicationRoundReservationCreationStatusChoice.FAILED.value),
             ),
             default=models.Value(ApplicationRoundReservationCreationStatusChoice.NOT_COMPLETED.value),

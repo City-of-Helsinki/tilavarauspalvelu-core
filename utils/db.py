@@ -1,18 +1,26 @@
+import ast
 from collections.abc import Iterable
 from typing import Any, Literal, TypeVar
 
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
 from django.db import models
+from django.db.models import Func
+from django.db.transaction import get_connection
+from lookup_property import State
+from lookup_property.converters.expressions import expression_to_ast
 
 __all__ = [
     "ArrayRemove",
     "ArrayUnnest",
+    "NowTT",
     "SubqueryArray",
     "SubqueryCount",
     "SubquerySum",
     "text_search",
 ]
+
+from lookup_property.converters.utils import ast_attribute, ast_function
 
 
 class SubqueryAggregate(models.Subquery):
@@ -160,6 +168,39 @@ class ArrayUnnest(models.Func):
 
     function = "UNNEST"
     arity = 1
+
+
+class NowTT(Func):  # TT = Time Travel, as in "time travel tests"
+    """Same as `functions.Now()`, but can be offset during testing."""
+
+    template = "NOW_TT()"  # Function created in migrations!
+    output_field = models.DateTimeField()
+
+    @classmethod
+    def set_offset(cls, *, seconds: int, using: str | None = None) -> None:
+        """
+        Set the database offset for the current time.
+
+        :param seconds: The offset in seconds. Can be negative.
+        :param using: The database alias to use.
+        """
+        with get_connection(using).cursor() as cursor:
+            cursor.execute(
+                "UPDATE testing_configurations SET global_time_offset_seconds = %s WHERE id = 1;",
+                params=[str(seconds)],
+            )
+
+
+@expression_to_ast.register
+def _(_: NowTT, state: State) -> ast.Call:
+    """Django ORM -> Python converter for lookup properties containing NowTT."""
+    state.imports.add("datetime")
+    kwargs: dict[str, ast.Attribute] = {}
+
+    if state.use_tz:
+        kwargs["tz"] = ast_attribute("datetime", "timezone", "utc")
+
+    return ast_function("now", ["datetime", "datetime"], **kwargs)
 
 
 TQuerySet = TypeVar("TQuerySet")
