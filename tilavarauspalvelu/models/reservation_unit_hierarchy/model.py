@@ -82,7 +82,7 @@ class ReservationUnitHierarchy(models.Model):
             # Only raise error in local development, otherwise log to Sentry
             if settings.RAISE_ERROR_ON_REFRESH_FAILURE:
                 raise
-            SentryLogger.log_exception(error)
+            SentryLogger.log_exception(error, details="Failed to refresh materialized view.")
 
     @classmethod
     @contextlib.contextmanager
