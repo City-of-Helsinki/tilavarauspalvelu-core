@@ -1,10 +1,10 @@
 from typing import Self
 
 from django.db import models
-from django.db.models.functions import Now
 
 from tilavarauspalvelu.enums import BannerNotificationLevel, BannerNotificationTarget
 from tilavarauspalvelu.typing import AnyUser
+from utils.db import NowTT
 
 __all__ = [
     "BANNER_LEVEL_SORT_ORDER",
@@ -22,8 +22,8 @@ class BannerNotificationQuerySet(models.QuerySet):
     def active(self) -> Self:
         return self.filter(
             draft=False,
-            active_from__lte=Now(),
-            active_until__gte=Now(),
+            active_from__lte=NowTT(),
+            active_until__gte=NowTT(),
         )
 
     def inactive(self) -> Self:
@@ -86,7 +86,7 @@ BANNER_LEVEL_SORT_ORDER = models.Case(
     default=models.Value(4),
 )
 
-# Can't use this for indexing because it uses the Now() function
+# Can't use this for indexing because it uses the NowTT() function
 BANNER_STATE_SORT_ORDER = models.Case(
     # Draft
     models.When(
@@ -95,12 +95,12 @@ BANNER_STATE_SORT_ORDER = models.Case(
     ),
     # Scheduled
     models.When(
-        condition=(models.Q(active_from__gt=Now())),
+        condition=(models.Q(active_from__gt=NowTT())),
         then=models.Value(2),
     ),
     # Active
     models.When(
-        condition=(models.Q(active_from__lte=Now()) & models.Q(active_until__gte=Now())),
+        condition=(models.Q(active_from__lte=NowTT()) & models.Q(active_until__gte=NowTT())),
         then=models.Value(1),
     ),
     # "Past" / "draft"

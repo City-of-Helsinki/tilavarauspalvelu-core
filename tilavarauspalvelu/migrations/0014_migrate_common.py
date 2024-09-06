@@ -159,6 +159,44 @@ class Migration(migrations.Migration):
             },
         ),
         #
+        # Add test configurations table & 'NOW_TT' function
+        # Same as in `0019_add_now_tt`, but added needed earlier so that 'affecting_time_spans' is affected in testing.
+        #
+        migrations.RunSQL(
+            sql=(
+                """
+                CREATE TABLE IF NOT EXISTS testing_configurations (
+                    id BIGSERIAL PRIMARY KEY NOT NULL,
+                    global_time_offset_seconds BIGINT NOT NULL
+                );
+
+                INSERT INTO testing_configurations (id, global_time_offset_seconds) VALUES (1, 0) ON CONFLICT DO NOTHING;
+
+                -- Gets the current time in the database's, but can be offset during testing.
+                CREATE OR REPLACE FUNCTION NOW_TT()
+                RETURNS TIMESTAMP WITH TIME ZONE
+                AS
+                $$
+                BEGIN
+                    -- See `django.db.models.functions.datetime.Now.as_postgresql`
+                    RETURN STATEMENT_TIMESTAMP() + (
+                        select global_time_offset_seconds
+                        from testing_configurations
+                        limit 1
+                    ) * interval '1 second';
+                END;
+                $$
+                LANGUAGE plpgsql STABLE PARALLEL SAFE STRICT;
+                """
+            ),
+            reverse_sql=(
+                """
+                DROP TABLE IF EXISTS testing_configurations;
+                DROP FUNCTION IF EXISTS NOW_TT;
+                """
+            ),
+        ),
+        #
         # Create the ReservationUnitHierarchy materialized view
         #
         # Create the materialized view
@@ -305,7 +343,7 @@ class Migration(migrations.Migration):
                         INNER JOIN "reservation_reservation_unit" rru ON r.id = rru.reservation_id
                         INNER JOIN "reservation_unit_hierarchy" ruh ON rru.reservationunit_id = ruh.reservation_unit_id
                         WHERE (
-                            (r.end + r.buffer_time_after)::date >= NOW()::date
+                            (r.end + r.buffer_time_after)::date >= NOW_TT()::date
                             AND UPPER(r.state) IN ('CREATED', 'CONFIRMED', 'WAITING_FOR_PAYMENT', 'REQUIRES_HANDLING')
                         )
                     ) res

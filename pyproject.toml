@@ -86,6 +86,9 @@ ruff = "0.6.9"
 ruff-lsp = "0.0.57"
 pyinstrument = "4.7.3"
 
+[tool.poetry.plugins.pytest11]
+tilavarauspalvelu = "tests.plugins"
+
 [tool.ruff]
 fix = true
 unsafe-fixes = true
