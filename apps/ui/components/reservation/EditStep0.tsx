@@ -108,47 +108,31 @@ export function EditStep0({
 
   const reservableTimes = useReservableTimes(reservationUnit);
 
-  const durationValue =
-    watch("duration") ?? differenceInMinutes(originalBegin, originalEnd);
-  const dateValue = watch("date");
-  const timeValue = watch("time");
-
   const resUnit = getWithoutThisReservation(reservationUnit, reservation);
 
-  // TODO does this cause issues if the reservation collides with itself?
-  const focusSlot = convertFormToFocustimeSlot({
-    data: watch(),
-    reservationUnit: resUnit,
-    reservableTimes,
-    activeApplicationRounds,
-  });
-  const isReservable = focusSlot.isReservable;
-  // isSlotAvailable(focusSlot.start, focusSlot.end);
-
-  // TODO submit should be completely unnecessary
-  // just disable nextStep button if the form is invalid
-  // the form isn't submitted from this step at all
-  // TODO rework to use the submitted data instead of local state
-  const submitReservation = (_data: PendingReservationFormType) => {
-    if (!focusSlot.isReservable) {
+  const submitReservation = (data: PendingReservationFormType) => {
+    const slot = convertFormToFocustimeSlot({
+      data,
+      reservationUnit: resUnit,
+      reservableTimes,
+      activeApplicationRounds,
+    });
+    if (!slot.isReservable) {
       return;
     }
-    if (!focusSlot.start || !focusSlot.end) {
-      return;
-    }
-    const { start } = focusSlot;
+    const { start, end } = slot;
     const isFree = isReservationUnitFreeOfCharge(
       reservationUnit.pricings,
       start
     );
     const newReservation: PendingReservation = {
-      begin: focusSlot.start.toISOString(),
-      end: focusSlot.end.toISOString(),
+      begin: start.toISOString(),
+      end: end.toISOString(),
       price: isFree
         ? "0"
         : (getReservationUnitPrice({
             reservationUnit,
-            pricingDate: focusSlot.start,
+            pricingDate: start,
             minutes: 0,
           }) ?? undefined),
     };
@@ -166,9 +150,19 @@ export function EditStep0({
     }
   };
 
-  const focusDate = createDateTime(dateValue, timeValue);
+  const durationValue =
+    watch("duration") ?? differenceInMinutes(originalBegin, originalEnd);
+  const dateValue = watch("date");
+  const timeValue = watch("time");
 
+  const focusDate = createDateTime(dateValue, timeValue);
   const durationOptions = getDurationOptions(reservationUnit, t);
+  const focusSlot = convertFormToFocustimeSlot({
+    data: watch(),
+    reservationUnit: resUnit,
+    reservableTimes,
+    activeApplicationRounds,
+  });
   const startingTimeOptions = getPossibleTimesForDay({
     reservableTimes,
     interval: reservationUnit?.reservationStartInterval,
@@ -231,7 +225,7 @@ export function EditStep0({
           <Button
             variant="primary"
             iconRight={<IconArrowRight aria-hidden />}
-            disabled={!isReservable || !isDirty}
+            disabled={!focusSlot.isReservable || !isDirty}
             type="submit"
             data-testid="reservation-edit__button--continue"
             isLoading={isLoading}
