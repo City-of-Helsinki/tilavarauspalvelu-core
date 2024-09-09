@@ -15,7 +15,7 @@ import Calendar, {
 import { Toolbar } from "common/src/calendar/Toolbar";
 import { addMinutes, differenceInMinutes } from "date-fns";
 import { eventStyleGetter } from "@/components/common/calendarUtils";
-import Legend from "@/components/calendar/Legend";
+import { Legend } from "@/components/calendar/Legend";
 import { useMedia } from "react-use";
 import { breakpoints } from "common/src/common/style";
 import { getEventBuffers } from "common/src/calendar/util";

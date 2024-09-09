@@ -1,7 +1,6 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled, { css, FlattenSimpleInterpolation } from "styled-components";
-import { breakpoints } from "common/src/common/style";
 import { truncatedText } from "../../styles/util";
 
 type LegendItemT = {
@@ -16,27 +15,13 @@ type Props = {
 };
 
 const Wrapper = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
   margin-top: var(--spacing-m);
   margin-bottom: var(--spacing-l);
   width: 100%;
   gap: var(--spacing-s) var(--spacing-xs);
-
-  @media (min-width: ${breakpoints.s}) {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
-
-  @media (min-width: ${breakpoints.m}) {
-    display: flex;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: var(--spacing-m);
-  }
-
-  @media (min-width: ${breakpoints.l}) {
-    gap: var(--spacing-s);
-  }
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
 `;
 
 const LegendItem = styled.div<{
@@ -52,7 +37,7 @@ const LegendItem = styled.div<{
       $border
         ? `border: 2px solid ${$border}`
         : "border: 1px solid var(--color-black-20)"};
-    width: 40px;
+    width: 30px;
     height: 40px;
     position: relative;
     box-sizing: border-box;
@@ -61,7 +46,7 @@ const LegendItem = styled.div<{
 
   display: flex;
   place-content: flex-start;
-  gap: var(--spacing-xs) var(--spacing-xl);
+  gap: var(--spacing-3-xs);
   position: relative;
 `;
 
@@ -87,24 +72,10 @@ const defaultItems: LegendItemT[] = [
     title: "unavailable",
     color: "var(--color-black-10)",
     border: "transparent",
-    css: css`
-      border-left: 2px solid var(--color-black-30);
-    `,
   },
   {
     title: "free",
     color: "var(--color-white)",
-  },
-  {
-    title: "buffer",
-    color: "var(--color-black-5)",
-    border: "transparent",
-    css: css`
-      border-top: 4px double var(--color-black-40);
-      border-bottom: 4px double var(--color-black-40);
-      height: 40px;
-      padding: 4px 0;
-    `,
   },
   {
     title: "timeIndicator",
@@ -114,9 +85,9 @@ const defaultItems: LegendItemT[] = [
       top: 20px;
     `,
   },
-];
+] as const;
 
-const Legend = ({ items = defaultItems }: Props): JSX.Element => {
+export function Legend({ items = defaultItems }: Props): JSX.Element {
   const { t } = useTranslation();
 
   return (
@@ -133,5 +104,4 @@ const Legend = ({ items = defaultItems }: Props): JSX.Element => {
       ))}
     </Wrapper>
   );
-};
-export default Legend;
+}
