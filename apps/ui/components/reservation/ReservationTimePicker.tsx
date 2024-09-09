@@ -396,6 +396,16 @@ export function ReservationTimePicker({
     data?.reservations?.edges?.map((e) => e?.node)
   );
 
+  const controlProps =
+    loginAndSubmitButton != null
+      ? ({
+          mode: "create",
+          submitButton: loginAndSubmitButton,
+        } as const)
+      : ({
+          mode: "edit",
+        } as const);
+
   return (
     <>
       {/* TODO is calendar ref necessary? */}
@@ -447,16 +457,13 @@ export function ReservationTimePicker({
       </div>
       <CalendarFooter>
         <ReservationCalendarControls
+          {...controlProps}
           reservationUnit={reservationUnit}
           reservationForm={reservationForm}
           durationOptions={durationOptions}
           focusSlot={focusSlot}
           startingTimeOptions={startingTimeOptions}
           submitReservation={submitReservation}
-          // FIXME typing doesn't work here (it's exclusive but ts can't infere it here)
-          mode={loginAndSubmitButton != null ? "create" : "edit"}
-          // @ts-expect-error: TODO: fix this
-          LoginAndSubmit={loginAndSubmitButton}
         />
       </CalendarFooter>
       <Legend />

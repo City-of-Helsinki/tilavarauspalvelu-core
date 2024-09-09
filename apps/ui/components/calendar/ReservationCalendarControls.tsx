@@ -44,7 +44,7 @@ type CommonProps = {
 type Props =
   | (CommonProps & {
       mode: "create";
-      LoginAndSubmit: JSX.Element;
+      submitButton: JSX.Element;
     })
   | (CommonProps & {
       mode: "edit";
@@ -325,6 +325,8 @@ export function ReservationCalendarControls({
 
   const areControlsVisible = watch("isControlsVisible");
 
+  const submitButton = "submitButton" in rest ? rest.submitButton : null;
+
   return (
     <Wrapper data-testid="reservation-unit__reservation-controls--wrapper">
       <form noValidate onSubmit={handleSubmit(submitReservation)}>
@@ -363,11 +365,9 @@ export function ReservationCalendarControls({
             )}
           />
         </TogglerTop>
-        {/* FIXME
         <TogglerBottom>
-          {focusSlot.isReservable && !areControlsVisible && LoginAndSubmit}
+          {focusSlot.isReservable && !areControlsVisible && submitButton}
         </TogglerBottom>
-            */}
         <Transition
           mountOnEnter
           unmountOnExit
@@ -435,8 +435,8 @@ export function ReservationCalendarControls({
                 >
                   {t("reservationCalendar:selectTime")}
                 </SelectButton>
-              ) : mode === "create" && "LoginAndSubmit" in rest ? (
-                <SubmitButtonWrapper>{rest.LoginAndSubmit}</SubmitButtonWrapper>
+              ) : mode === "create" && submitButton ? (
+                <SubmitButtonWrapper>{submitButton}</SubmitButtonWrapper>
               ) : null}
             </Content>
           )}
