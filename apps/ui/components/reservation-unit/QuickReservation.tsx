@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useMemo } from "react";
 import { Button } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
@@ -18,11 +18,11 @@ import {
   type SubmitHandler,
   type UseFormReturn,
 } from "react-hook-form";
-import { PendingReservationFormType } from "@/components/reservation-unit/schema";
 import { ControlledDateInput } from "common/src/components/form";
+import { type PendingReservationFormType } from "@/components/reservation-unit/schema";
 import { ControlledSelect } from "@/components/common/ControlledSelect";
 import { getSelectedOption } from "@/modules/util";
-import { FocusTimeSlot } from "@/modules/reservation";
+import { type FocusTimeSlot } from "@/modules/reservation";
 
 type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
 type Props = {
@@ -49,7 +49,7 @@ const Form = styled.form`
     /* hack for page jumping when the size of the component changes */
     height: 391.797px;
     /* grid resize causes issues, so use fixed width */
-    width: 400px;
+    width: calc(390px - var(--spacing-m) * 2);
   }
 `;
 
@@ -153,7 +153,7 @@ export function QuickReservation({
   LoginAndSubmit,
 }: Props): JSX.Element | null {
   const { t } = useTranslation();
-  const { control, setValue, watch, handleSubmit } = reservationForm;
+  const { control, watch, handleSubmit } = reservationForm;
   const formDate = watch("date");
   const dateValue = useMemo(() => fromUIDate(formDate ?? ""), [formDate]);
   const duration = watch("duration");
@@ -163,38 +163,11 @@ export function QuickReservation({
     dateValue ?? new Date()
   );
 
-  const getPrice = useCallback(() => {
-    if (reservationUnit == null || dateValue == null || duration == null) {
-      return null;
-    }
-    return getReservationUnitPrice({
-      reservationUnit,
-      pricingDate: dateValue,
-      minutes: duration,
-    });
-  }, [duration, reservationUnit, dateValue]);
-
-  // A map of all available times for the day, chunked into groups of 8
-  const timeChunks: string[][] = useMemo(() => {
-    const itemsPerChunk = 8;
-
-    return chunkArray(
-      startingTimeOptions.map((opt) => opt.label),
-      itemsPerChunk
-    );
-  }, [startingTimeOptions]);
-
-  // Find out which slide has the slot that reflects the selected focusSlot
-  let activeChunk = 0;
-  for (let i = 0; i < timeChunks.length; i++) {
-    if (
-      timeChunks[i].some((item) => {
-        return item === watch("time");
-      })
-    ) {
-      activeChunk = i;
-    }
-  }
+  const price = getReservationUnitPrice({
+    reservationUnit,
+    pricingDate: dateValue,
+    minutes: duration,
+  });
 
   const lastPossibleDate = getLastPossibleReservationDate(
     reservationUnit ?? undefined
@@ -231,62 +204,20 @@ export function QuickReservation({
         {t("reservationCalendar:quickReservation.subheading")}
       </Subheading>
       <div>
-        {/* TODO carousel page needs to be resetted if date or duration changes
-         * currently navigate to last page, change date so it has less slots all the slots / navigation disappears
-         */}
-        {startingTimeOptions.length > 0 ? (
-          <Carousel
-            hideCenterControls
-            wrapAround={false}
-            slideIndex={activeChunk}
-          >
-            {timeChunks.map((chunk: string[]) => (
-              <SlotGroup key={chunk[0]}>
-                {chunk.map((value: string) => (
-                  <Slot $active={watch("time") === value} key={value}>
-                    <SlotButton
-                      data-testid="quick-reservation-slot"
-                      onClick={() => setValue("time", value)}
-                      type="button"
-                    >
-                      {value}
-                    </SlotButton>
-                  </Slot>
-                ))}
-              </SlotGroup>
-            ))}
-          </Carousel>
-        ) : (
-          <NoTimes>
-            <span>
-              {t("reservationCalendar:quickReservation.noTimes", {
-                duration: getSelectedOption(
-                  duration,
-                  durationOptions
-                )?.label.trim(),
-              })}
-            </span>
-            {nextAvailableTime != null && (
-              <Button
-                data-testid="quick-reservation-next-available-time"
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setValue("date", toUIDate(nextAvailableTime));
-                }}
-              >
-                {t("reservationCalendar:quickReservation.nextAvailableTime")}
-              </Button>
-            )}
-          </NoTimes>
-        )}
+        <TimeChunkSection
+          startingTimeOptions={startingTimeOptions}
+          reservationForm={reservationForm}
+          nextAvailableTime={nextAvailableTime}
+          durationString={
+            getSelectedOption(duration, durationOptions)?.label.trim() ?? ""
+          }
+        />
       </div>
       <ActionWrapper>
         <Price data-testid="quick-reservation-price">
           {focusSlot?.isReservable && (
             <>
-              {t("reservationUnit:price")}:{" "}
-              <PriceValue>{getPrice()}</PriceValue>
+              {t("reservationUnit:price")}: <PriceValue>{price}</PriceValue>
               {!isFreeOfCharge && subventionSuffix}
             </>
           )}
@@ -294,5 +225,86 @@ export function QuickReservation({
         {focusSlot?.isReservable && LoginAndSubmit}
       </ActionWrapper>
     </Form>
+  );
+}
+
+function TimeChunkSection({
+  startingTimeOptions,
+  reservationForm: form,
+  nextAvailableTime,
+  durationString,
+}: Pick<
+  Props,
+  "startingTimeOptions" | "reservationForm" | "nextAvailableTime"
+> & {
+  durationString: string;
+}) {
+  const { t } = useTranslation();
+  const { setValue, watch } = form;
+
+  // A map of all available times for the day, chunked into groups of 8
+  const timeChunks: string[][] = useMemo(() => {
+    const itemsPerChunk = 8;
+
+    return chunkArray(
+      startingTimeOptions.map((opt) => opt.label),
+      itemsPerChunk
+    );
+  }, [startingTimeOptions]);
+
+  // Find out which slide has the slot that reflects the selected focusSlot
+  let activeChunk = 0;
+  for (let i = 0; i < timeChunks.length; i++) {
+    if (
+      timeChunks[i].some((item) => {
+        return item === watch("time");
+      })
+    ) {
+      activeChunk = i;
+    }
+  }
+
+  if (startingTimeOptions.length === 0) {
+    return (
+      <NoTimes>
+        <span>
+          {t("reservationCalendar:quickReservation.noTimes", {
+            duration: durationString,
+          })}
+        </span>
+        {nextAvailableTime != null && (
+          <Button
+            data-testid="quick-reservation-next-available-time"
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              setValue("date", toUIDate(nextAvailableTime), { shouldDirty: true });
+            }}
+          >
+            {t("reservationCalendar:quickReservation.nextAvailableTime")}
+          </Button>
+        )}
+      </NoTimes>
+    );
+  }
+
+  return (
+    <Carousel hideCenterControls wrapAround={false} slideIndex={activeChunk}>
+      {timeChunks.map((chunk: string[]) => (
+        <SlotGroup key={chunk[0]}>
+          {chunk.map((value: string) => (
+            <Slot $active={watch("time") === value} key={value}>
+              <SlotButton
+                data-testid="quick-reservation-slot"
+                onClick={() => setValue("time", value, { shouldDirty: true })}
+                type="button"
+              >
+                {value}
+              </SlotButton>
+            </Slot>
+          ))}
+        </SlotGroup>
+      ))}
+    </Carousel>
   );
 }

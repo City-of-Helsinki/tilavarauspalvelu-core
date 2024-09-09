@@ -703,6 +703,7 @@ function ReservationUnit({
               reservationForm={reservationForm}
               durationOptions={durationOptions}
               startingTimeOptions={startingTimeOptions}
+              nextAvailableTime={nextAvailableTime}
               focusSlot={focusSlot}
               submitReservation={submitReservation}
               LoginAndSubmit={LoginAndSubmit}
@@ -714,7 +715,6 @@ function ReservationUnit({
                   />
                 ) : undefined
               }
-              nextAvailableTime={nextAvailableTime}
             />
           )}
           <JustForDesktop customBreakpoint={breakpoints.l}>

@@ -311,8 +311,8 @@ export function getPriceString(props: GetPriceType): string {
 
 export type GetReservationUnitPriceProps = {
   reservationUnit?: PriceReservationUnitFragment | null;
-  pricingDate?: Date;
-  minutes?: number;
+  pricingDate?: Date | null;
+  minutes?: number | null;
 };
 
 export function getReservationUnitPrice(
@@ -324,7 +324,7 @@ export function getReservationUnitPrice(
     console.warn("Invalid pricing date", pricingDate);
   }
 
-  if (ru == null) {
+  if (ru == null || pricingDate == null || minutes == null) {
     return null;
   }
 
