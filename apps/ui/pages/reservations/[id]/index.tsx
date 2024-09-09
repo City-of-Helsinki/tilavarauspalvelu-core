@@ -2,7 +2,6 @@ import React, { useMemo } from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
-import router from "next/router";
 import { capitalize } from "lodash";
 import {
   IconArrowRight,
@@ -36,7 +35,6 @@ import {
   getTranslation,
   reservationsUrl,
 } from "@/modules/util";
-import { BlackButton } from "@/styles/util";
 import { CenterSpinner } from "@/components/common/common";
 import Sanitize from "@/components/common/Sanitize";
 import { AccordionWithState as Accordion } from "@/components/common/Accordion";
@@ -64,6 +62,7 @@ import {
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { containsField, containsNameField } from "common/src/metaFieldsHelpers";
 import { NotModifiableReason } from "@/components/reservation/NotModifiableReason";
+import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
@@ -465,69 +464,57 @@ function Reservation({
             <ReservationInfoCard reservation={reservation} type="complete" />
             <SecondaryActions>
               {reservation.state === ReservationStateChoice.Confirmed && (
-                <BlackButton
-                  variant="secondary"
-                  iconRight={<IconCalendar aria-hidden />}
+                <ButtonLikeLink
+                  size="large"
                   disabled={!reservation.calendarUrl}
                   data-testid="reservation__button--calendar-link"
-                  onClick={() => router.push(reservation.calendarUrl ?? "")}
+                  href={reservation.calendarUrl ?? ""}
                 >
                   {t("reservations:saveToCalendar")}
-                </BlackButton>
+                  <IconCalendar aria-hidden />
+                </ButtonLikeLink>
               )}
               {hasReceipt && (
-                <BlackButton
+                <ButtonLikeLink
+                  size="large"
                   data-testid="reservation__confirmation--button__receipt-link"
-                  onClick={() =>
-                    window.open(
-                      `${order.receiptUrl}&lang=${i18n.language}`,
-                      "_blank"
-                    )
-                  }
-                  variant="secondary"
-                  iconRight={<IconLinkExternal aria-hidden />}
+                  href={`${order.receiptUrl}&lang=${i18n.language}`}
+                  target="_blank"
                 >
                   {t("reservations:downloadReceipt")}
-                </BlackButton>
+                  <IconLinkExternal aria-hidden />
+                </ButtonLikeLink>
               )}
             </SecondaryActions>
           </div>
           <div>
             <Actions>
               {isWaitingForPayment && (
-                <BlackButton
-                  variant="secondary"
+                <ButtonLikeLink
+                  size="large"
                   disabled={!hasCheckoutUrl}
-                  iconRight={<IconArrowRight aria-hidden />}
-                  onClick={() => {
-                    if (checkoutUrl) {
-                      router.push(checkoutUrl);
-                    }
-                  }}
+                  href={checkoutUrl ?? ""}
                   data-testid="reservation-detail__button--checkout"
                 >
                   {t("reservations:payReservation")}
-                </BlackButton>
+                  <IconArrowRight aria-hidden />
+                </ButtonLikeLink>
               )}
               {canTimeBeModified && (
-                <BlackButton
-                  variant="secondary"
-                  iconRight={<IconCalendar aria-hidden />}
-                  onClick={() => {
-                    router.push(`${reservationsUrl}${reservation.pk}/edit`);
-                  }}
+                <ButtonLikeLink
+                  size="large"
+                  href={`${reservationsUrl}${reservation.pk}/edit`}
                   data-testid="reservation-detail__button--edit"
                 >
                   {t("reservations:modifyReservationTime")}
-                </BlackButton>
+                  <IconCalendar aria-hidden />
+                </ButtonLikeLink>
               )}
               {isCancellable && (
-                <BlackButton
-                  variant="secondary"
-                  iconRight={<IconCross aria-hidden />}
-                  onClick={() =>
-                    router.push(`${reservationsUrl}${reservation.pk}/cancel`)
-                  }
+                <ButtonLikeLink
+                  // TODO use url builder
+                  size="large"
+                  href={`${reservationsUrl}${reservation.pk}/cancel`}
                   data-testid="reservation-detail__button--cancel"
                 >
                   {t(
@@ -535,7 +522,8 @@ function Reservation({
                       isBeingHandled ? "Application" : "Reservation"
                     }`
                   )}
-                </BlackButton>
+                  <IconCross aria-hidden />
+                </ButtonLikeLink>
               )}
             </Actions>
             <NotModifiableReason reservation={reservation} />

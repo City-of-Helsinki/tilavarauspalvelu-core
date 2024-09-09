@@ -30,7 +30,7 @@ export const ButtonCss = css<ButtonStyleProps>`
     variant === "primary" ? "var(--color-bus)" : "transparent"};
   color: ${({ variant }) =>
     variant === "primary" ? "var(--color-white)" : "var(--color-black)"};
-  padding: ${({ size }) => (size === "large" ? "4px 20px" : "0 20px")};
+  padding: ${({ size }) => (size === "large" ? "12px 20px" : "0 20px")};
   border: 2px solid
     ${({ variant }) =>
       variant === "primary" ? "var(--color-bus)" : "var(--color-black)"};
