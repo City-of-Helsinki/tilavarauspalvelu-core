@@ -42,7 +42,6 @@ import {
 import { useTranslation } from "next-i18next";
 import { ReservationCalendarControls } from "../calendar/ReservationCalendarControls";
 import { PendingReservation } from "@/modules/types";
-import { isTouchDevice } from "@/modules/util";
 import { getTimeString } from "@/modules/reservationUnit";
 import { UseFormReturn } from "react-hook-form";
 import { PendingReservationFormType } from "../reservation-unit/schema";
@@ -315,10 +314,6 @@ export function ReservationTimePicker({
     setValue("duration", duration, { shouldDirty: true });
     setValue("time", newTime, { shouldDirty: true });
 
-    if (isTouchDevice()) {
-      setValue("isControlsVisible", true, { shouldDirty: true });
-    }
-
     return true;
   };
 
@@ -326,11 +321,8 @@ export function ReservationTimePicker({
   // compared to handleDragEvent, this doesn't allow changing the duration (only the start time)
   // if the duration is not possible, the event is not moved
   const handleSlotClick = (props: SlotClickProps): boolean => {
-    const { start, end, action } = props;
-    if (
-      (action === "select" && !isTouchDevice()) ||
-      isReservationQuotaReached
-    ) {
+    const { start, end } = props;
+    if (isReservationQuotaReached) {
       return false;
     }
 
