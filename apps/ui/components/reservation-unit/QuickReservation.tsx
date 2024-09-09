@@ -26,7 +26,7 @@ import { type FocusTimeSlot } from "@/modules/reservation";
 
 type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
 type Props = {
-  reservationUnit: QueryT | null;
+  reservationUnit: QueryT;
   subventionSuffix: JSX.Element | undefined;
   reservationForm: UseFormReturn<PendingReservationFormType>;
   durationOptions: { label: string; value: number }[];
@@ -35,6 +35,8 @@ type Props = {
   nextAvailableTime: Date | null;
   submitReservation: SubmitHandler<PendingReservationFormType>;
   LoginAndSubmit: JSX.Element;
+  className?: string;
+  style?: React.CSSProperties;
 };
 
 const Form = styled.form`
@@ -151,6 +153,8 @@ export function QuickReservation({
   nextAvailableTime,
   submitReservation,
   LoginAndSubmit,
+  className,
+  style,
 }: Props): JSX.Element | null {
   const { t } = useTranslation();
   const { control, watch, handleSubmit } = reservationForm;
@@ -165,7 +169,7 @@ export function QuickReservation({
 
   const price = getReservationUnitPrice({
     reservationUnit,
-    pricingDate: dateValue,
+    pricingDate: dateValue ?? new Date(),
     minutes: duration,
   });
 
@@ -178,6 +182,8 @@ export function QuickReservation({
       id="quick-reservation"
       noValidate
       onSubmit={handleSubmit(submitReservation)}
+      className={className}
+      style={style}
     >
       <Heading>{t("reservationCalendar:quickReservation.heading")}</Heading>
       <Selects>
@@ -278,7 +284,9 @@ function TimeChunkSection({
             type="button"
             onClick={(e) => {
               e.preventDefault();
-              setValue("date", toUIDate(nextAvailableTime), { shouldDirty: true });
+              setValue("date", toUIDate(nextAvailableTime), {
+                shouldDirty: true,
+              });
             }}
           >
             {t("reservationCalendar:quickReservation.nextAvailableTime")}

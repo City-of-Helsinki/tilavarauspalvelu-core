@@ -17,7 +17,7 @@
   "editReservationTime": "Change the booking time",
   "cancelEditReservationTime": "Stop editing",
   "saveNewTime": "Save the new time",
-  "saveNewTimeLoadingText": "Saving the new time",
+  "saveNewTimeLoading": "Saving the new time",
   "saveNewTimeSuccess": "Time of the booking has been changed",
   "cancelReservation": "Cancel booking",
   "cancelReservationCancellation": "Undo the cancelling",

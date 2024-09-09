@@ -310,22 +310,18 @@ export function getPriceString(props: GetPriceType): string {
 }
 
 export type GetReservationUnitPriceProps = {
-  reservationUnit?: PriceReservationUnitFragment | null;
-  pricingDate?: Date | null;
-  minutes?: number | null;
+  reservationUnit: PriceReservationUnitFragment;
+  pricingDate: Date;
+  minutes?: number;
 };
 
 export function getReservationUnitPrice(
   props: GetReservationUnitPriceProps
 ): string | null {
   const { reservationUnit: ru, pricingDate, minutes } = props;
-  if (pricingDate != null && Number.isNaN(pricingDate.getTime())) {
+  if (Number.isNaN(pricingDate.getTime())) {
     // eslint-disable-next-line no-console
     console.warn("Invalid pricing date", pricingDate);
-  }
-
-  if (ru == null || pricingDate == null || minutes == null) {
-    return null;
   }
 
   const futurePricing = getFuturePricing(ru, [], pricingDate);

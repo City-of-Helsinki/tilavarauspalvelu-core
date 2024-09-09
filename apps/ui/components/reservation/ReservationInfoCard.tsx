@@ -4,8 +4,11 @@ import { gql } from "@apollo/client";
 import { differenceInMinutes } from "date-fns";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { getReservationPrice, formatters as getFormatters } from "common";
-import { breakpoints } from "common/src/common/style";
+import {
+  getReservationPrice,
+  formatters as getFormatters,
+  breakpoints,
+} from "common";
 import { H4, Strong } from "common/src/common/typography";
 import {
   ReservationStateChoice,
@@ -24,7 +27,6 @@ import {
 } from "@/modules/util";
 import { reservationUnitPath } from "@/modules/const";
 import { getImageSource } from "common/src/helpers";
-import ClientOnly from "common/src/ClientOnly";
 
 type Type = "pending" | "confirmed" | "complete";
 
@@ -67,18 +69,20 @@ const Wrapper = styled.div<{ $type: Type }>`
   background-color: var(
     --color-${({ $type }) => ($type === "complete" ? "silver" : "gold")}-light
   );
+
+  width: 100%;
+  @media (width > ${breakpoints.m}) {
+    /* inside a grid so we need to force the size */
+    width: 390px;
+  }
 `;
 
 const MainImage = styled.img`
-  display: none;
-
-  @media (min-width: ${breakpoints.m}) {
-    display: block;
-    width: 100%;
-    max-width: 100%;
-    height: 291px;
-    object-fit: cover;
-  }
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: 291px;
+  object-fit: cover;
 `;
 
 const Content = styled.div`
@@ -134,9 +138,8 @@ export function ReservationInfoCard({
   }
 
   const price: string | null =
-    begin &&
-    (reservation?.state === "REQUIRES_HANDLING" ||
-      shouldDisplayReservationUnitPrice)
+    reservation.state === ReservationStateChoice.RequiresHandling ||
+    shouldDisplayReservationUnitPrice
       ? getReservationUnitPrice({
           reservationUnit,
           pricingDate: new Date(begin),
@@ -164,48 +167,46 @@ export function ReservationInfoCard({
 
   // Have to make client only because date formatting doesn't work on server side
   return (
-    <ClientOnly>
-      <Wrapper $type={type}>
-        <MainImage src={imgSrc} alt={name} />
-        <Content data-testid="reservation__reservation-info-card__content">
-          <Heading>
-            <StyledLink
-              data-testid="reservation__reservation-info-card__reservationUnit"
-              href={link}
-            >
-              {name}
-            </StyledLink>
-          </Heading>
-          {(type === "confirmed" || type === "complete") && (
-            <Subheading>
-              {t("reservations:reservationNumber")}:{" "}
-              <span data-testid="reservation__reservation-info-card__reservationNumber">
-                {reservation.pk ?? "-"}
-              </span>
-            </Subheading>
-          )}
+    <Wrapper $type={type}>
+      <MainImage src={imgSrc} alt={name} />
+      <Content data-testid="reservation__reservation-info-card__content">
+        <Heading>
+          <StyledLink
+            data-testid="reservation__reservation-info-card__reservationUnit"
+            href={link}
+          >
+            {name}
+          </StyledLink>
+        </Heading>
+        {(type === "confirmed" || type === "complete") && (
           <Subheading>
-            {reservationUnit.unit != null
-              ? getTranslation(reservationUnit.unit, "name")
-              : "-"}
+            {t("reservations:reservationNumber")}:{" "}
+            <span data-testid="reservation__reservation-info-card__reservationNumber">
+              {reservation.pk ?? "-"}
+            </span>
           </Subheading>
-          <Value data-testid="reservation__reservation-info-card__duration">
-            <Strong>
-              {capitalize(timeString)}, {formatDuration(duration, t)}
-            </Strong>
-          </Value>
-          <Value data-testid="reservation__reservation-info-card__price">
-            {t("reservationUnit:price")}: <Strong>{price}</Strong>{" "}
-            {taxPercentageValue &&
-              shouldDisplayTaxPercentage &&
-              `(${t("common:inclTax", {
-                taxPercentage: formatters.strippedDecimal.format(
-                  parseFloat(taxPercentageValue)
-                ),
-              })})`}
-          </Value>
-        </Content>
-      </Wrapper>
-    </ClientOnly>
+        )}
+        <Subheading>
+          {reservationUnit.unit != null
+            ? getTranslation(reservationUnit.unit, "name")
+            : "-"}
+        </Subheading>
+        <Value data-testid="reservation__reservation-info-card__duration">
+          <Strong>
+            {capitalize(timeString)}, {formatDuration(duration, t)}
+          </Strong>
+        </Value>
+        <Value data-testid="reservation__reservation-info-card__price">
+          {t("reservationUnit:price")}: <Strong>{price}</Strong>{" "}
+          {taxPercentageValue &&
+            shouldDisplayTaxPercentage &&
+            `(${t("common:inclTax", {
+              taxPercentage: formatters.strippedDecimal.format(
+                parseFloat(taxPercentageValue)
+              ),
+            })})`}
+        </Value>
+      </Content>
+    </Wrapper>
   );
 }

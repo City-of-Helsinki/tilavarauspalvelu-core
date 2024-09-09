@@ -20,6 +20,10 @@ import {
   OptionsRecord,
 } from "./SummaryFields";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
+import { ReservationInfoCard } from "./ReservationInfoCard";
+import { PendingReservationFormType } from "../reservation-unit/schema";
+import { type UseFormReturn } from "react-hook-form";
+import { convertReservationFormToApi } from "@/modules/reservation";
 
 type ReservationUnitNodeT = NonNullable<
   ReservationUnitPageQuery["reservationUnit"]
@@ -32,9 +36,8 @@ type Props = {
   onBack: () => void;
   handleSubmit: () => void;
   isSubmitting: boolean;
+  form: UseFormReturn<PendingReservationFormType>;
 };
-
-const Wrapper = styled.div``;
 
 const Actions = styled.div`
   display: flex;
@@ -45,6 +48,31 @@ const Actions = styled.div`
 
   @media (min-width: ${breakpoints.m}) {
     flex-direction: row;
+  }
+`;
+
+const BylineSection = styled.div`
+  grid-row: 3;
+  @media (min-width: ${breakpoints.m}) {
+    grid-row: 2 / -1;
+  }
+
+  /*
+  grid-row: 2;
+  @media (min-width: ${breakpoints.m}) {
+    grid-column: span 3;
+  }
+  @media (min-width: ${breakpoints.l}) {
+    grid-row: 1 / span 2;
+    grid-column: -3 / span 2;
+  }
+*/
+`;
+
+const StyledForm = styled.form`
+  @media (min-width: ${breakpoints.m}) {
+    grid-column: 1 / -2;
+    grid-row-start: 3;
   }
 `;
 
@@ -59,6 +87,7 @@ export function EditStep1({
   onBack,
   handleSubmit,
   isSubmitting,
+  form,
 }: Props): JSX.Element {
   const { t } = useTranslation();
 
@@ -89,12 +118,29 @@ export function EditStep1({
     return <LoadingSpinner />;
   }
 
+  const { watch } = form;
+
+  const apiValues = convertReservationFormToApi(watch());
+  const modifiedReservation = {
+    ...reservation,
+    begin: apiValues?.begin ?? reservation.begin,
+    end: apiValues?.end ?? reservation.end,
+  };
+
+  const termsAccepted =
+    areTermsSpaceAccepted && areServiceSpecificTermsAccepted;
   return (
-    <Wrapper>
-      <form
+    <>
+      <BylineSection>
+        <ReservationInfoCard
+          reservation={modifiedReservation}
+          type="confirmed"
+        />
+      </BylineSection>
+      <StyledForm
         onSubmit={(e) => {
           e.preventDefault();
-          if (!areTermsSpaceAccepted || !areServiceSpecificTermsAccepted) {
+          if (!termsAccepted) {
             errorToast({
               text: t("reservationCalendar:errors.termsNotAccepted"),
             });
@@ -191,6 +237,7 @@ export function EditStep1({
           <CancelActions>
             <ButtonLikeLink
               href={`${reservationsPrefix}/${reservation.pk}`}
+              size="large"
               data-testid="reservation-edit__button--cancel"
             >
               <IconCross aria-hidden />
@@ -208,7 +255,7 @@ export function EditStep1({
           <Button
             variant="primary"
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || !termsAccepted}
             data-testid="reservation-edit__button--submit"
             isLoading={isSubmitting}
             loadingText={t("reservations:saveNewTimeLoading")}
@@ -216,7 +263,7 @@ export function EditStep1({
             {t("reservations:saveNewTime")}
           </Button>
         </Actions>
-      </form>
-    </Wrapper>
+      </StyledForm>
+    </>
   );
 }

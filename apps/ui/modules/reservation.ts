@@ -32,7 +32,8 @@ import {
   isRangeReservable,
 } from "./reservable";
 import { type PendingReservationFormType } from "@/components/reservation-unit/schema";
-import { isValidDate } from "common/src/common/util";
+import { isValidDate, toUIDate } from "common/src/common/util";
+import { getTimeString } from "./reservationUnit";
 
 // TimeSlots change the Calendar view. How many intervals are shown i.e. every half an hour, every hour
 // we use every hour only => 2
@@ -577,4 +578,32 @@ export function createDateTime(date: string, time: string): Date {
     return set(maybeDate, { hours, minutes });
   }
   return new Date();
+}
+
+export function convertReservationFormToApi(
+  formValues: PendingReservationFormType
+): { begin: string; end: string } | null {
+  const time = formValues.time;
+  const date = fromUIDate(formValues.date ?? "");
+  const duration = formValues.duration;
+  if (date == null || time == null || duration == null) {
+    return null;
+  }
+  const [hours, minutes] = time.split(":").map(Number);
+  const begin: Date = set(date, { hours, minutes });
+  const end: Date = set(begin, { hours, minutes: minutes + duration });
+  return { begin: begin.toISOString(), end: end.toISOString() };
+}
+
+export function transformReservation(
+  reservation?: ReservationNodeT
+): PendingReservationFormType {
+  const originalBegin = new Date(reservation?.begin ?? "");
+  const originalEnd = new Date(reservation?.end ?? "");
+  return {
+    date: toUIDate(originalBegin),
+    duration: differenceInMinutes(originalEnd, originalBegin),
+    time: getTimeString(originalBegin),
+    isControlsVisible: false,
+  };
 }

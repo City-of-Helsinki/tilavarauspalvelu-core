@@ -17,7 +17,7 @@
   "editReservationTime": "Muuta varauksen aikaa",
   "cancelEditReservationTime": "Keskeytä muokkaus",
   "saveNewTime": "Tallenna uusi aika",
-  "saveNewTimeLoadingText": "Tallennetaan uusi aika",
+  "saveNewTimeLoading": "Tallennetaan uusi aika",
   "saveNewTimeSuccess": "Varauksen aika muutettu",
   "cancelReservation": "Peru varaus",
   "cancelReservationCancellation": "Keskeytä peruminen",

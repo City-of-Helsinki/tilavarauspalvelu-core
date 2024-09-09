@@ -110,7 +110,7 @@ export const isValidDate = (date: Date): boolean =>
 
 // Returns a string in "d.M.yyyy" format from a Date object
 // TODO returning undefined would be preferably (specificity) but breaks the users of this function
-export const toUIDate = (date: Date | null, formatStr = "d.M.yyyy"): string => {
+export function toUIDate(date: Date | null, formatStr = "d.M.yyyy"): string {
   if (!date || !isValidDate(date)) {
     return "";
   }
@@ -119,7 +119,7 @@ export const toUIDate = (date: Date | null, formatStr = "d.M.yyyy"): string => {
   } catch (e) {
     return "";
   }
-};
+}
 
 export const chunkArray = <T>(array: T[], size: number): T[][] => {
   const result = [];
