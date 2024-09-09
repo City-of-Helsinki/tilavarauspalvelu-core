@@ -28,7 +28,7 @@ import { Subheading } from "common/src/reservation-form/styles";
 import { Container } from "common";
 import { createApolloClient } from "@/modules/apolloClient";
 import { reservationUnitPrefix, reservationsPrefix } from "@/modules/const";
-import { getTranslation, reservationsUrl } from "@/modules/util";
+import { reservationsUrl } from "@/modules/util";
 import Sanitize from "@/components/common/Sanitize";
 import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
 import {
@@ -42,16 +42,17 @@ import Step1 from "@/components/reservation/Step1";
 import { ReservationStep } from "@/modules/types";
 import { JustForDesktop } from "@/modules/style/layout";
 import { PinkBox } from "@/components/reservation-unit/ReservationUnitStyles";
-import {
-  getCommonServerSideProps,
-  getGenericTerms,
-} from "@/modules/serverUtils";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { useConfirmNavigation } from "@/hooks/useConfirmNavigation";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { containsField } from "common/src/metaFieldsHelpers";
 import { errorToast } from "common/src/common/toast";
 import { getGeneralFields } from "@/components/reservation/SummaryFields";
 import { queryOptions } from "@/modules/queryOptions";
+import {
+  convertLanguageCode,
+  getTranslationSafe,
+} from "common/src/common/util";
 
 const StyledContainer = styled(Container)`
   padding-top: var(--spacing-m);
@@ -126,7 +127,7 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
-  const { reservationUnit, options, termsOfUse } = props;
+  const { reservationUnit, options } = props;
 
   const [refetch, { data: resData }] = useReservationLazyQuery({
     variables: { id: props.reservation.id },
@@ -361,10 +362,12 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
     }
   }, [step, generalFields, reservation, reservationUnit]);
 
-  const termsOfUseContent =
-    reservationUnit != null
-      ? getTranslation(reservationUnit, "termsOfUse")
-      : null;
+  const lang = convertLanguageCode(i18n.language);
+  const termsOfUseContent = getTranslationSafe(
+    reservationUnit,
+    "termsOfUse",
+    lang
+  );
 
   const infoReservation = {
     ...reservation,
@@ -420,7 +423,7 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
                 />
               )}
             </div>
-            {step === 0 && reservationUnit != null && (
+            {step === 0 && (
               <Step0
                 reservationUnit={reservationUnit}
                 handleSubmit={handleSubmit(onSubmitStep0)}
@@ -429,7 +432,7 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
                 options={options}
               />
             )}
-            {step === 1 && reservation != null && reservationUnit != null && (
+            {step === 1 && (
               <Step1
                 reservation={reservation}
                 reservationUnit={reservationUnit}
@@ -440,7 +443,6 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
                 // There used to be 5 steps for payed reservations but the stepper is hidden for them now.
                 requiresHandling={steps.length > 2}
                 setStep={setStep}
-                genericTerms={termsOfUse.genericTerms}
               />
             )}
           </FormProvider>
@@ -473,7 +475,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     });
     const { reservationUnit } = data || {};
 
-    const genericTerms = await getGenericTerms(apolloClient);
     const options = await queryOptions(apolloClient, locale ?? "");
 
     const { data: resData } = await apolloClient.query<
@@ -510,7 +511,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
           reservation,
           reservationUnit,
           options,
-          termsOfUse: { genericTerms },
           ...(await serverSideTranslations(locale ?? "fi")),
         },
       };

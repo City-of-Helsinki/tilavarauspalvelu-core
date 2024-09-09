@@ -2,17 +2,13 @@ import {
   type ReservationQuery,
   type ReservationUnitPageQuery,
 } from "@gql/gql-types";
-import { Button, IconArrowLeft, IconCross, LoadingSpinner } from "hds-react";
+import { Button, IconArrowLeft, IconCross } from "hds-react";
 import { breakpoints } from "common/src/common/style";
 import React, { useMemo, useState } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import TermsBox from "common/src/termsbox/TermsBox";
-import { getTranslation } from "@/modules/util";
-import Sanitize from "../common/Sanitize";
 import { reservationsPrefix } from "@/modules/const";
 import { filterNonNullable } from "common/src/helpers";
-import { useGenericTerms } from "common/src/hooks/useGenericTerms";
 import { errorToast } from "common/src/common/toast";
 import {
   ApplicationFields,
@@ -24,6 +20,7 @@ import { ReservationInfoCard } from "./ReservationInfoCard";
 import { PendingReservationFormType } from "../reservation-unit/schema";
 import { type UseFormReturn } from "react-hook-form";
 import { convertReservationFormToApi } from "@/modules/reservation";
+import { AcceptTerms } from "./AcceptTerms";
 
 type ReservationUnitNodeT = NonNullable<
   ReservationUnitPageQuery["reservationUnit"]
@@ -91,10 +88,6 @@ export function EditStep1({
 }: Props): JSX.Element {
   const { t } = useTranslation();
 
-  // TODO should use SSR for this
-  const genericTerms = useGenericTerms();
-  const hasTermsOfUse = genericTerms != null;
-
   // But why? shouldn't it be an error if the reservationUnit doesn't match the reservation?
   // should we even be querying reservation.reservationUnit in the first place if we are making a separate
   // query for the reservationUnit itself? and are we making or
@@ -106,17 +99,21 @@ export function EditStep1({
     );
   }, [reservation, reservationUnit]);
 
-  const [areTermsSpaceAccepted, setAreTermsSpaceAccepted] = useState(false);
-  const [areServiceSpecificTermsAccepted, setAreServiceSpecificTermsAccepted] =
-    useState(false);
+  const [isTermsAccepted, setIsTermsAccepted] = useState({
+    space: false,
+    service: false,
+  });
+
+  const handleTermsAcceptedChange = (
+    key: "service" | "space",
+    val: boolean
+  ) => {
+    setIsTermsAccepted({ ...isTermsAccepted, [key]: val });
+  };
 
   const supportedFields = filterNonNullable(
     frozenReservationUnit?.metadataSet?.supportedFields
   );
-
-  if (hasTermsOfUse == null) {
-    return <LoadingSpinner />;
-  }
 
   const { watch } = form;
 
@@ -127,8 +124,7 @@ export function EditStep1({
     end: apiValues?.end ?? reservation.end,
   };
 
-  const termsAccepted =
-    areTermsSpaceAccepted && areServiceSpecificTermsAccepted;
+  const termsAccepted = isTermsAccepted.space && isTermsAccepted.service;
   return (
     <>
       <BylineSection>
@@ -159,80 +155,11 @@ export function EditStep1({
           reservation={reservation}
           options={options}
         />
-        <TermsBox
-          id="cancellation-and-payment-terms"
-          heading={t(
-            `reservationCalendar:heading.${
-              reservationUnit.cancellationTerms && reservationUnit.paymentTerms
-                ? "cancellationPaymentTerms"
-                : reservationUnit.cancellationTerms
-                  ? "cancellationTerms"
-                  : "paymentTerms"
-            }`
-          )}
-          body={
-            <>
-              {reservationUnit.cancellationTerms != null && (
-                <Sanitize
-                  html={getTranslation(
-                    reservationUnit.cancellationTerms,
-                    "text"
-                  )}
-                />
-              )}
-              <br />
-              {reservationUnit.paymentTerms != null && (
-                <Sanitize
-                  html={getTranslation(reservationUnit.paymentTerms, "text")}
-                />
-              )}
-            </>
-          }
-          acceptLabel={t(
-            `reservationCalendar:label.${
-              reservationUnit.cancellationTerms && reservationUnit.paymentTerms
-                ? "termsCancellationPayment"
-                : reservationUnit.cancellationTerms
-                  ? "termsCancellation"
-                  : "termsPayment"
-            }`
-          )}
-          accepted={areServiceSpecificTermsAccepted}
-          setAccepted={setAreServiceSpecificTermsAccepted}
+        <AcceptTerms
+          reservationUnit={reservationUnit}
+          isTermsAccepted={isTermsAccepted}
+          setIsTermsAccepted={handleTermsAcceptedChange}
         />
-        <TermsBox
-          id="generic-and-service-specific-terms"
-          heading={t("reservationCalendar:heading.termsOfUse")}
-          body={
-            reservationUnit.serviceSpecificTerms != null ? (
-              <Sanitize
-                html={getTranslation(
-                  reservationUnit.serviceSpecificTerms,
-                  "text"
-                )}
-              />
-            ) : undefined
-          }
-          links={
-            hasTermsOfUse
-              ? [
-                  {
-                    href: "/terms/booking",
-                    text: t("reservationCalendar:heading.generalTerms"),
-                  },
-                ]
-              : undefined
-          }
-          acceptLabel={t(
-            `reservationCalendar:label.${
-              reservationUnit.serviceSpecificTerms
-                ? "termsGeneralSpecific"
-                : "termsGeneral"
-            }`
-          )}
-          accepted={areTermsSpaceAccepted}
-          setAccepted={setAreTermsSpaceAccepted}
-        />{" "}
         <Actions>
           <CancelActions>
             <ButtonLikeLink

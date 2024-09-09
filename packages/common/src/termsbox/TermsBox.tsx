@@ -18,7 +18,6 @@ export type Props = {
   acceptLabel?: string;
   accepted?: boolean;
   setAccepted?: (accepted: boolean) => void;
-  errorText?: string;
 } & React.HTMLAttributes<HTMLDivElement>;
 
 const Wrapper = styled.div`
@@ -99,7 +98,6 @@ const TermsBox = ({
   acceptLabel,
   accepted,
   setAccepted,
-  errorText,
   ...rest
 }: Props): JSX.Element => {
   const canAccept = Boolean(acceptLabel) && Boolean(setAccepted);
@@ -135,7 +133,6 @@ const TermsBox = ({
             label={acceptLabel}
             checked={accepted}
             onChange={() => setAccepted && setAccepted(!accepted)}
-            errorText={errorText}
           />
         </Actions>
       )}
