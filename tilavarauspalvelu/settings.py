@@ -577,7 +577,7 @@ class EmptyDefaults:
     ICAL_HASH_SECRET = ""  # nosec # NOSONAR
 
 
-class Local(LocalMixin, Common):
+class Local(Common, overrides_from=LocalMixin):
     """Settings for local development."""
 
     # --- Basic settings ---------------------------------------------------------------------------------------------
@@ -666,7 +666,7 @@ class Local(LocalMixin, Common):
     RAISE_ERROR_ON_REFRESH_FAILURE = True
 
 
-class Docker(DockerMixin, Common):
+class Docker(Common, overrides_from=DockerMixin):
     """Settings for local Docker development."""
 
     DEBUG = True
@@ -679,15 +679,10 @@ class Docker(DockerMixin, Common):
     STATIC_ROOT = "/srv/static"
     MEDIA_ROOT = "/media"
 
-    DATABASES = values.ParentValue(
-        values.DatabaseURLValue(),
-        default="postgis://tvp:tvp@db/tvp",
-        env_name="DATABASE_URL",
-        check_limit=1,
-    )
+    DATABASES = values.DatabaseURLValue(default="postgis://tvp:tvp@db/tvp")
 
-    REDIS_URL = values.ParentValue(default="redis://redis:6379/0", check_limit=1)
-    ELASTICSEARCH_URL = values.ParentValue(default="http://elastic:9200", check_limit=1)
+    REDIS_URL = values.StringValue(default="redis://redis:6379/0")
+    ELASTICSEARCH_URL = values.StringValue(default="http://elastic:9200")
 
     @classmethod
     @property
@@ -706,7 +701,7 @@ class Docker(DockerMixin, Common):
     RAISE_ERROR_ON_REFRESH_FAILURE = True
 
 
-class AutomatedTests(AutomatedTestMixin, EmptyDefaults, Common, dotenv_path=None):
+class AutomatedTests(EmptyDefaults, Common, dotenv_path=None, overrides_from=AutomatedTestMixin):
     """Settings when running automated tests."""
 
     # --- Basic settings ---------------------------------------------------------------------------------------------
@@ -715,16 +710,11 @@ class AutomatedTests(AutomatedTestMixin, EmptyDefaults, Common, dotenv_path=None
 
     # --- Database settings ------------------------------------------------------------------------------------------
 
-    DATABASES = values.ParentValue(
-        values.DatabaseURLValue(),
-        default="postgis://tvp:tvp@localhost:5432/tvp",
-        env_name="DATABASE_URL",
-        check_limit=1,
-    )
+    DATABASES = values.DatabaseURLValue(default="postgis://tvp:tvp@localhost:5432/tvp")
 
     # --- Logging settings -------------------------------------------------------------------------------------------
 
-    APP_LOGGING_LEVEL = values.ParentValue(default="INFO", check_limit=1)
+    APP_LOGGING_LEVEL = values.StringValue(default="INFO")
     AUDIT_LOGGING_ENABLED = False
 
     # --- Email settings ---------------------------------------------------------------------------------------------
@@ -813,11 +803,11 @@ class AutomatedTests(AutomatedTestMixin, EmptyDefaults, Common, dotenv_path=None
 
     # --- Redis settings ---------------------------------------------------------------------------------------------
 
-    REDIS_URL = values.ParentValue(default="redis://localhost:6379/0", check_limit=1)
+    REDIS_URL = values.StringValue(default="redis://localhost:6379/0")
 
     # --- Elasticsearch settings -------------------------------------------------------------------------------------
 
-    ELASTICSEARCH_URL = values.ParentValue(default="http://localhost:9200", check_limit=1)
+    ELASTICSEARCH_URL = values.StringValue(default="http://localhost:9200")
 
     @classmethod
     @property
