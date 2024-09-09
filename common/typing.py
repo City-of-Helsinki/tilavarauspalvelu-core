@@ -7,6 +7,8 @@ from django.core.handlers.wsgi import WSGIRequest
 from graphql import GraphQLResolveInfo
 
 if TYPE_CHECKING:
+    from django.contrib.sessions.backends.cache import SessionStore
+
     from users.models import User
 
 __all__ = [
@@ -18,12 +20,13 @@ __all__ = [
 type AnyUser = User | AnonymousUser
 
 
-class UserHintedWSGIRequest(WSGIRequest):
+class TypeHintedWSGIRequest(WSGIRequest):
     user: AnyUser
+    session: SessionStore
 
 
 class GQLInfo(GraphQLResolveInfo):
-    context = UserHintedWSGIRequest
+    context = TypeHintedWSGIRequest
 
 
 class QueryInfo(TypedDict):

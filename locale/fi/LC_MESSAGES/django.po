@@ -64,6 +64,10 @@ msgstr ""
 "Valinta \"%(choice)s\" ei ole sallittu. Mahdolliset valinnat ovat: "
 "%(allowed_choices)s."
 
+#: api/helauth/views.py
+msgid "You have been successfully logged out."
+msgstr "Sinut on nyt kirjattu ulos."
+
 #: applications/admin/address.py merchants/admin/payment_merchant.py
 msgid "Street address"
 msgstr "Katuosoite"

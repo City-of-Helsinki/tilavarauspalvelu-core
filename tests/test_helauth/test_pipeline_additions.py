@@ -4,11 +4,18 @@ from typing import Any, NamedTuple
 
 import pytest
 
-from tests.factories import UserFactory
+from tests.factories import (
+    ApplicationFactory,
+    GeneralRoleFactory,
+    RecurringReservationFactory,
+    ReservationFactory,
+    UnitRoleFactory,
+    UserFactory,
+)
 from tests.helpers import ResponseMock, patch_method
 from users.helauth.clients import HelsinkiProfileClient
 from users.helauth.parsers import ssn_to_date
-from users.helauth.pipeline import update_user_from_profile
+from users.helauth.pipeline import migrate_from_tunnistamo_to_keycloak, update_user_from_profile
 from utils.external_service.errors import ExternalServiceError
 from utils.sentry import SentryLogger
 
@@ -113,3 +120,39 @@ def test_update_user_from_profile_logs_to_sentry_if_raises():
 )
 def test_ssn_to_date(id_number, expected):
     assert ssn_to_date(id_number) == expected
+
+
+# TODO: Test "users.helauth.pipeline.migrate_from_tunnistamo_to_keycloak"
+
+
+def test_migrate_from_tunnistamo_to_keycloak():
+    old_user = UserFactory.create(email="foo@example.com", profile_id="", is_staff=True, is_superuser=True)
+
+    application = ApplicationFactory.create(user=old_user)
+    reservation = ReservationFactory.create(user=old_user)
+    recurring_reservation = RecurringReservationFactory.create(user=old_user)
+    general_role = GeneralRoleFactory.create(user=old_user)
+    unit_role = UnitRoleFactory.create(user=old_user)
+
+    new_user = UserFactory.create(email="foo@example.com", profile_id="", is_staff=False, is_superuser=False)
+
+    migrate_from_tunnistamo_to_keycloak(email=new_user.email)
+
+    application.refresh_from_db()
+    reservation.refresh_from_db()
+    recurring_reservation.refresh_from_db()
+    general_role.refresh_from_db()
+    unit_role.refresh_from_db()
+    old_user.refresh_from_db()
+    new_user.refresh_from_db()
+
+    assert application.user == new_user
+    assert reservation.user == new_user
+    assert recurring_reservation.user == new_user
+    assert general_role.user == new_user
+    assert unit_role.user == new_user
+
+    assert new_user.is_staff is True
+    assert new_user.is_superuser is True
+
+    assert old_user.is_active is False

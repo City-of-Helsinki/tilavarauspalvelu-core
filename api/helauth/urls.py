@@ -3,14 +3,14 @@
 # Using `helusers/urls.py` will not add the URLs to the file's `urlpatterns` unless
 # `helusers.tunnistamo_oidc.TunnistamoOIDCAuth` is specifically included in the
 # `AUTHENTICATION_BACKENDS` setting.
-
 from django.urls import path
-from helusers.views import LoginView, LogoutCompleteView, LogoutView
+from helusers.views import LoginView
+
+from .views import logout_view
 
 app_name = "helusers"
 
 urlpatterns = [
     path("login/", LoginView.as_view(), name="auth_login"),
-    path("logout/", LogoutView.as_view(), name="auth_logout"),
-    path("logout/complete/", LogoutCompleteView.as_view(), name="auth_logout_complete"),
+    path("logout/", logout_view, name="auth_logout"),
 ]

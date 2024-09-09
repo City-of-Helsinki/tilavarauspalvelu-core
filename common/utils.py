@@ -2,6 +2,7 @@ import datetime
 import hashlib
 import hmac
 import operator
+import urllib.parse
 from collections.abc import Generator, Iterable, Sequence
 from typing import Any, Generic, Literal, TypeVar
 
@@ -24,6 +25,7 @@ __all__ = [
     "get_field_to_related_field_mapping",
     "get_text_search_language",
     "get_translation_fields",
+    "update_query_params",
     "with_indices",
 ]
 
@@ -198,3 +200,19 @@ def ical_hmac_signature(value: str) -> str:
         msg=value.encode("utf-8"),
         digestmod=hashlib.sha256,
     ).hexdigest()
+
+
+def update_query_params(url: str, **params: str) -> str:
+    """
+    Add query params to the given URL. If the URL already has query params,
+    the params will be updated.
+
+    :param url: URL to add query params to.
+    :param params: Query params to add.
+    :return: URL with query params added.
+    """
+    url_parts = urllib.parse.urlparse(url)._asdict()
+    query_params = dict(urllib.parse.parse_qsl(url_parts["query"]))
+    query_params.update(params)
+    url_parts["query"] = urllib.parse.urlencode(query_params)
+    return urllib.parse.urlunparse(url_parts.values())  # type: ignore[return-value]

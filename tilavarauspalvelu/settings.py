@@ -297,7 +297,7 @@ class Common(Environment):
     ]
 
     LOGIN_REDIRECT_URL = "/admin/"
-    LOGOUT_REDIRECT_URL = "/admin/"
+    LOGOUT_REDIRECT_URL = "/admin/login/"
 
     SESSION_SERIALIZER = "helusers.sessions.TunnistamoOIDCSerializer"
     SESSION_ENGINE = "django.contrib.sessions.backends.cache"
@@ -319,15 +319,19 @@ class Common(Environment):
 
     OIDC_LEEWAY = values.IntegerValue(default=3600)
     TUNNISTAMO_BASE_URL = values.StringValue()
-    TUNNISTAMO_JWT_AUDIENCE = values.StringValue()
-    TUNNISTAMO_JWT_ISSUER = values.StringValue()
 
+    SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT = values.StringValue(env_name="TUNNISTAMO_BASE_URL")
     SOCIAL_AUTH_TUNNISTAMO_KEY = values.StringValue(env_name="TUNNISTAMO_ADMIN_KEY")
     SOCIAL_AUTH_TUNNISTAMO_SECRET = values.StringValue(env_name="TUNNISTAMO_ADMIN_SECRET")
+    SOCIAL_AUTH_TUNNISTAMO_AUDIENCE = values.StringValue(env_name="TUNNISTAMO_AUDIENCE")
+    SOCIAL_AUTH_TUNNISTAMO_ISSUER = values.StringValue(env_name="TUNNISTAMO_ISSUER")
+    SOCIAL_AUTH_TUNNISTAMO_SCOPE = values.ListValue(env_name="TUNNISTAMO_SCOPE", default=[])
+
     SOCIAL_AUTH_TUNNISTAMO_LOGIN_ERROR_URL = "/admin/"
     SOCIAL_AUTH_TUNNISTAMO_PIPELINE = (
         *SOCIAL_AUTH_PIPELINE,
         "users.helauth.pipeline.fetch_additional_info_for_user_from_helsinki_profile",
+        "users.helauth.pipeline.migrate_user_from_tunnistamo_to_keycloak",
     )
 
     @classmethod
@@ -343,21 +347,9 @@ class Common(Environment):
     def OIDC_API_TOKEN_AUTH(cls):
         # See 'helusers/settings.py'
         return {
-            "AUDIENCE": cls.TUNNISTAMO_JWT_AUDIENCE,
-            "ISSUER": cls.TUNNISTAMO_JWT_ISSUER,
+            "AUDIENCE": cls.SOCIAL_AUTH_TUNNISTAMO_AUDIENCE,
+            "ISSUER": cls.SOCIAL_AUTH_TUNNISTAMO_ISSUER,
         }
-
-    @classmethod
-    @property
-    def SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT(cls):
-        return f"{cls.TUNNISTAMO_BASE_URL}/openid"
-
-    @classmethod
-    @property
-    def SOCIAL_AUTH_TUNNISTAMO_SCOPE(cls):
-        return [
-            cls.OPEN_CITY_PROFILE_SCOPE,
-        ]
 
     # --- GDPR settings ----------------------------------------------------------------------------------------------
 
@@ -570,11 +562,12 @@ class EmptyDefaults:
     VERKKOKAUPPA_API_KEY = ""
 
     TUNNISTAMO_BASE_URL = ""
-    TUNNISTAMO_JWT_AUDIENCE = ""
-    TUNNISTAMO_JWT_ISSUER = ""
 
+    SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT = ""
     SOCIAL_AUTH_TUNNISTAMO_KEY = ""
     SOCIAL_AUTH_TUNNISTAMO_SECRET = ""  # nosec # NOSONAR
+    SOCIAL_AUTH_TUNNISTAMO_AUDIENCE = ""
+    SOCIAL_AUTH_TUNNISTAMO_ISSUER = ""
 
     OPEN_CITY_PROFILE_SCOPE = ""
     OPEN_CITY_PROFILE_GRAPHQL_API = ""
@@ -742,8 +735,8 @@ class AutomatedTests(EmptyDefaults, Common, dotenv_path=None, overrides_from=Aut
     TUNNISTAMO_BASE_URL = "https://fake.test.tunnistamo.com"
     SOCIAL_AUTH_TUNNISTAMO_SECRET = "SOCIAL_AUTH_TUNNISTAMO_SECRET"  # noqa: S105 # nosec # NOSONAR
     SOCIAL_AUTH_TUNNISTAMO_KEY = "SOCIAL_AUTH_TUNNISTAMO_KEY"
-    TUNNISTAMO_JWT_AUDIENCE = "TUNNISTAMO_JWT_AUDIENCE"
-    TUNNISTAMO_JWT_ISSUER = "TUNNISTAMO_JWT_ISSUER"
+    SOCIAL_AUTH_TUNNISTAMO_AUDIENCE = "TUNNISTAMO_JWT_AUDIENCE"
+    SOCIAL_AUTH_TUNNISTAMO_ISSUER = "TUNNISTAMO_JWT_ISSUER"
 
     # --- Celery settings --------------------------------------------------------------------------------------------
 
