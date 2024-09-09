@@ -29,7 +29,6 @@ import { useRouter } from "next/router";
 import { Stepper } from "hds-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UseFormReturn, useForm } from "react-hook-form";
-import ClientOnly from "common/src/ClientOnly";
 import { errorToast, successToast } from "common/src/common/toast";
 import { reservationsPrefix } from "@/modules/const";
 import { Subheading } from "common/src/reservation-form/styles";
@@ -50,6 +49,8 @@ import {
   ReservationPageWrapper,
 } from "@/components/reservations/styles";
 import { queryOptions } from "@/modules/queryOptions";
+import { isReservationEditable } from "@/modules/reservation";
+import { NotModifiableReason } from "@/components/reservation/NotModifiableReason";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -61,10 +62,6 @@ type ReservationNodeT = NonNullable<ReservationQuery["reservation"]>;
 
 const StyledStepper = styled(Stepper)`
   margin: var(--spacing-layout-m) 0 var(--spacing-layout-m);
-
-  @media (min-width: ${breakpoints.m}) {
-    max-width: 50%;
-  }
 `;
 
 const PinkBox = styled.div`
@@ -270,6 +267,19 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
     }
   };
 
+  if (!isReservationEditable({ reservation })) {
+    return (
+      <ReservationPageWrapper>
+        <HeadingSection>
+          <Heading>{t(title)}</Heading>
+        </HeadingSection>
+        <div style={{ gridColumn: "1 / -1" }}>
+          <NotModifiableReason reservation={reservation} />
+        </div>
+      </ReservationPageWrapper>
+    );
+  }
+
   return (
     <ReservationPageWrapper>
       <HeadingSection>
@@ -281,6 +291,8 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
           steps={steps}
         />
       </HeadingSection>
+      {/* TODO this should be shown on step1
+        on step0 we should show the quick reservation selector
       <BylineSection>
         <BylineContent
           reservation={reservation}
@@ -289,6 +301,7 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
           step={step}
         />
       </BylineSection>
+      */}
       {/* TODO on mobile in the design this is after the calendar but before action buttons */}
       {step === 0 && termsOfUse && (
         <PinkBox>
@@ -296,30 +309,28 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
           <Sanitize html={termsOfUse} />
         </PinkBox>
       )}
-      <ClientOnly>
-        <EditCalendarSection>
-          {step === 0 ? (
-            <EditStep0
-              reservation={reservation}
-              reservationUnit={reservationUnit}
-              activeApplicationRounds={activeApplicationRounds}
-              reservationForm={reservationForm}
-              nextStep={() => setStep(1)}
-              apiBaseUrl={apiBaseUrl}
-              isLoading={false}
-            />
-          ) : (
-            <EditStep1
-              reservation={reservation}
-              options={options}
-              reservationUnit={reservationUnit}
-              onBack={() => setStep(0)}
-              handleSubmit={handleSubmit}
-              isSubmitting={isLoading}
-            />
-          )}
-        </EditCalendarSection>
-      </ClientOnly>
+      <EditCalendarSection>
+        {step === 0 ? (
+          <EditStep0
+            reservation={reservation}
+            reservationUnit={reservationUnit}
+            activeApplicationRounds={activeApplicationRounds}
+            reservationForm={reservationForm}
+            nextStep={() => setStep(1)}
+            apiBaseUrl={apiBaseUrl}
+            isLoading={false}
+          />
+        ) : (
+          <EditStep1
+            reservation={reservation}
+            options={options}
+            reservationUnit={reservationUnit}
+            onBack={() => setStep(0)}
+            handleSubmit={handleSubmit}
+            isSubmitting={isLoading}
+          />
+        )}
+      </EditCalendarSection>
     </ReservationPageWrapper>
   );
 }

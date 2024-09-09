@@ -300,6 +300,21 @@ export function isReservationEditable(
   return true;
 }
 
+export function isReservationCancellable({
+  reservation,
+}: Pick<Required<CanReservationBeChangedProps>, "reservation">): boolean {
+  const isReservationCancelled =
+    reservation.state === ReservationStateChoice.Cancelled;
+  const isBeingHandled =
+    reservation.state === ReservationStateChoice.RequiresHandling;
+
+  return (
+    canUserCancelReservation(reservation) &&
+    !isReservationCancelled &&
+    !isBeingHandled
+  );
+}
+
 /// Only used by reservation edit (both page and component)
 /// NOTE [boolean, string] causes issues in TS / JS
 /// ![false] === ![true] === false, with no type errors

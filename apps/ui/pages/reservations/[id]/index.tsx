@@ -41,11 +41,11 @@ import { CenterSpinner } from "@/components/common/common";
 import Sanitize from "@/components/common/Sanitize";
 import { AccordionWithState as Accordion } from "@/components/common/Accordion";
 import {
-  canUserCancelReservation,
   getCheckoutUrl,
   getNormalizedReservationOrderStatus,
   getReservationValue,
   getWhyReservationCantBeChanged,
+  isReservationCancellable,
 } from "@/modules/reservation";
 import {
   getReservationUnitInstructionsKey,
@@ -63,6 +63,7 @@ import {
 } from "@/modules/serverUtils";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { containsField, containsNameField } from "common/src/metaFieldsHelpers";
+import { NotModifiableReason } from "@/components/reservation/NotModifiableReason";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
@@ -122,23 +123,6 @@ const Actions = styled.div`
   @media (min-width: ${breakpoints.m}) {
     flex-direction: row;
   }
-`;
-
-const Reasons = styled.div`
-  &:empty {
-    display: none;
-  }
-
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-m);
-  margin-top: var(--spacing-m);
-  margin-bottom: var(--spacing-m);
-`;
-
-const ReasonText = styled.div`
-  color: var(--color-black-70);
-  line-height: var(--lineheight-l);
 `;
 
 const SecondaryActions = styled.div`
@@ -420,15 +404,9 @@ function Reservation({
     reservationUnit.metadataSet?.supportedFields
   );
 
-  const isReservationCancelled =
-    reservation.state === ReservationStateChoice.Cancelled;
   const isBeingHandled =
     reservation.state === ReservationStateChoice.RequiresHandling;
-
-  const isReservationCancellable =
-    canUserCancelReservation(reservation) &&
-    !isReservationCancelled &&
-    !isBeingHandled;
+  const isCancellable = isReservationCancellable({ reservation });
 
   const checkoutUrl = getCheckoutUrl(order, i18n.language);
 
@@ -543,7 +521,7 @@ function Reservation({
                   {t("reservations:modifyReservationTime")}
                 </BlackButton>
               )}
-              {isReservationCancellable && (
+              {isCancellable && (
                 <BlackButton
                   variant="secondary"
                   iconRight={<IconCross aria-hidden />}
@@ -560,19 +538,7 @@ function Reservation({
                 </BlackButton>
               )}
             </Actions>
-            <Reasons>
-              {modifyTimeReason != null && (
-                <ReasonText>
-                  {t(`reservations:modifyTimeReasons:${modifyTimeReason}`)}
-                  {modifyTimeReason ===
-                    "RESERVATION_MODIFICATION_NOT_ALLOWED" &&
-                    isReservationCancellable &&
-                    ` ${t(
-                      "reservations:modifyTimeReasons:RESERVATION_MODIFICATION_NOT_ALLOWED_SUFFIX"
-                    )}`}
-                </ReasonText>
-              )}
-            </Reasons>
+            <NotModifiableReason reservation={reservation} />
           </div>
           <Content>
             {instructionsKey &&
