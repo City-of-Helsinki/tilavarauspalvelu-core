@@ -13,6 +13,7 @@
     "Unknown error": "Unknown error occurred."
   },
   "general_error": "Undefined error.",
+  "update_reservation_not_found": "Booking expired.",
   "CHANGES_NOT_ALLOWED": "You cannot make changes to the booking.",
   "RESERVATION_UNIT_NOT_RESERVABLE": "The item cannot be booked.",
   "OVERLAPPING_RESERVATIONS": "There are duplicate bookings.",

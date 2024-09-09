@@ -13,6 +13,7 @@
     "Unknown error": "Tuntematon virhe"
   },
   "general_error": "Tapahtui määrittämätön virhe.",
+  "update_reservation_not_found": "Varaus on vanhentunut.",
   "CHANGES_NOT_ALLOWED": "Muutoksia ei sallita.",
   "RESERVATION_UNIT_NOT_RESERVABLE": "Kohde ei ole varattavissa.",
   "OVERLAPPING_RESERVATIONS": "Päällekkäisiä varauksia.",

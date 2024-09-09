@@ -53,6 +53,7 @@ import {
   convertLanguageCode,
   getTranslationSafe,
 } from "common/src/common/util";
+import { ApolloError } from "@apollo/client";
 
 const StyledContainer = styled(Container)`
   padding-top: var(--spacing-m);
@@ -227,51 +228,8 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
     whitelist,
   });
 
-  const [updateReservation] = useUpdateReservationMutation({
-    errorPolicy: "all",
-    onCompleted: async (data) => {
-      if (data.updateReservation?.state === "CANCELLED") {
-        router.push(`${reservationUnitPrefix}/${reservationUnit?.pk}`);
-      } else {
-        await refetch();
-        setStep(1);
-        window.scrollTo(0, 0);
-      }
-    },
-  });
-
-  const [confirmReservation] = useConfirmReservationMutation({
-    onCompleted: (data) => {
-      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-      const { pk, state } = data.confirmReservation ?? {};
-      if (pk == null) {
-        errorToast({ text: t("errors:general_error") });
-        return;
-      }
-
-      if (
-        state === ReservationStateChoice.Confirmed ||
-        state === ReservationStateChoice.RequiresHandling
-      ) {
-        router.push(`${reservationsUrl}${pk}/confirmation`);
-      } else if (steps?.length > 2) {
-        const { order } = data.confirmReservation ?? {};
-        const checkoutUrl = getCheckoutUrl(order, i18n.language);
-
-        if (checkoutUrl) {
-          router.push(checkoutUrl);
-        } else {
-          // eslint-disable-next-line no-console
-          console.warn("No checkout url found");
-          errorToast({ text: t("errors:general_error") });
-        }
-      } else {
-        // eslint-disable-next-line no-console
-        console.warn("Confirm reservation mutation returning something odd");
-        errorToast({ text: t("errors:general_error") });
-      }
-    },
-  });
+  const [updateReservation] = useUpdateReservationMutation();
+  const [confirmReservation] = useConfirmReservationMutation();
 
   const { pk: reservationPk } = reservation || {};
 
@@ -310,7 +268,7 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
     );
 
     try {
-      await updateReservation({
+      const { data } = await updateReservation({
         variables: {
           input: {
             pk: reservationPk ?? 0,
@@ -319,24 +277,69 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
           },
         },
       });
+      if (data?.updateReservation?.state === "CANCELLED") {
+        router.push(`${reservationUnitPrefix}/${reservationUnit?.pk}`);
+      } else {
+        await refetch();
+        setStep(1);
+        window.scrollTo(0, 0);
+      }
     } catch (e) {
+      if (e instanceof ApolloError) {
+        if (e.graphQLErrors[0].extensions?.code === "NOT_FOUND") {
+          errorToast({ text: t("errors:update_reservation_not_found") });
+          return;
+        }
+      }
       errorToast({ text: t("errors:general_error") });
     }
   };
 
   const onSubmitStep1 = async (): Promise<void> => {
     try {
-      await confirmReservation({
+      const { data } = await confirmReservation({
         variables: {
           input: {
             pk: reservationPk ?? 0,
           },
         },
       });
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+      const { pk, state } = data?.confirmReservation ?? {};
+      if (pk == null) {
+        errorToast({ text: t("errors:general_error") });
+        return;
+      }
+
+      if (
+        state === ReservationStateChoice.Confirmed ||
+        state === ReservationStateChoice.RequiresHandling
+      ) {
+        router.push(`${reservationsUrl}${pk}/confirmation`);
+      } else if (steps?.length > 2) {
+        const { order } = data?.confirmReservation ?? {};
+        const checkoutUrl = getCheckoutUrl(order, i18n.language);
+
+        if (checkoutUrl) {
+          router.push(checkoutUrl);
+        } else {
+          // eslint-disable-next-line no-console
+          console.warn("No checkout url found");
+          errorToast({ text: t("errors:general_error") });
+        }
+      } else {
+        // eslint-disable-next-line no-console
+        console.warn("Confirm reservation mutation returning something odd");
+        errorToast({ text: t("errors:general_error") });
+      }
     } catch (e) {
-      // TODO: use a specific type of error if the reservation is already confirmed or if it got deleted because it timed out
-      // FIXME: there is something weird with toasts not showing up (at least this one) even though the error handler is called
-      errorToast({ text: t("errors:general_error") });
+      if (e instanceof ApolloError) {
+        if (e.graphQLErrors[0].extensions?.code === "NOT_FOUND") {
+          errorToast({ text: t("errors:update_reservation_not_found") });
+          return;
+        }
+      }
+      errorToast({ text: "errors:general_error" });
     }
   };
 

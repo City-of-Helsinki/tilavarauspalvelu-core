@@ -13,6 +13,7 @@
     "Unknown error": "Okänt fel"
   },
   "general_error": "Odefinierat fel.",
+  "update_reservation_not_found": "Bokningen hittades inte.",
   "CHANGES_NOT_ALLOWED": "Du kan inte göra ändringar.",
   "RESERVATION_UNIT_NOT_RESERVABLE": "Objektet går inte att boka.",
   "OVERLAPPING_RESERVATIONS": "Överlappande bokningar.",
