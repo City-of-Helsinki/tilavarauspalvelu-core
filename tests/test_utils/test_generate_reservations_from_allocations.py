@@ -38,6 +38,7 @@ EMPTY_RESPONSE = HaukiAPIOpeningHoursResponseItem(
         id=1,
         name=HaukiTranslatedField(fi="Test resource", sv=None, en=None),
         timezone="Europe/Helsinki",
+        origins=[],
     ),
     opening_hours=[],
 )

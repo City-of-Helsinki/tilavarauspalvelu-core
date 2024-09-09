@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any, TypedDict
 
 from common.date_utils import DEFAULT_TIMEZONE, combine, get_periods_between
 from opening_hours.utils.time_span_element import TimeSpanElement
-from reservations.enums import RejectionReadinessChoice, ReservationTypeStaffChoice
+from reservations.enums import RejectionReadinessChoice, ReservationTypeChoice, ReservationTypeStaffChoice
 from reservations.models import (
     AffectingTimeSpan,
     RecurringReservation,
@@ -74,7 +74,7 @@ class ReservationDetails(TypedDict, total=False):
     description: str
     num_persons: int
     state: ReservationStateChoice
-    type: ReservationTypeStaffChoice
+    type: ReservationTypeChoice | ReservationTypeStaffChoice
     working_memo: str
 
     buffer_time_before: datetime.timedelta

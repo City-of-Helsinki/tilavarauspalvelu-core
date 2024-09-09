@@ -18,6 +18,8 @@ __all__ = [
     "WeekdayChoice",
 ]
 
+from reservations.enums import CustomerTypeChoice
+
 
 class WeekdayChoice(models.IntegerChoices):
     MONDAY = 0, _("Monday")
@@ -123,6 +125,17 @@ class ApplicantTypeChoice(models.TextChoices):
     ASSOCIATION = "ASSOCIATION", pgettext_lazy("ApplicantType", "Association")
     COMMUNITY = "COMMUNITY", pgettext_lazy("ApplicantType", "Community")
     COMPANY = "COMPANY", pgettext_lazy("ApplicantType", "Company")
+
+    def get_customer_type_choice(self) -> CustomerTypeChoice:
+        match self:
+            case ApplicantTypeChoice.INDIVIDUAL:
+                return CustomerTypeChoice.INDIVIDUAL
+            case ApplicantTypeChoice.ASSOCIATION:
+                return CustomerTypeChoice.NONPROFIT
+            case ApplicantTypeChoice.COMMUNITY:
+                return CustomerTypeChoice.NONPROFIT
+            case ApplicantTypeChoice.COMPANY:
+                return CustomerTypeChoice.BUSINESS
 
 
 class ApplicationRoundStatusChoice(models.TextChoices):
