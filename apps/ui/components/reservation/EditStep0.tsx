@@ -215,7 +215,6 @@ export function EditStep0({
           </ButtonLikeLink>
           <Button
             variant="primary"
-            size="small"
             iconRight={<IconArrowRight aria-hidden />}
             disabled={!isReservable || !isDirty}
             type="submit"

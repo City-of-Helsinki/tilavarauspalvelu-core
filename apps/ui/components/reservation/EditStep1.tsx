@@ -199,7 +199,6 @@ export function EditStep1({
             <Button
               variant="secondary"
               iconLeft={<IconArrowLeft aria-hidden />}
-              size="small"
               onClick={onBack}
               data-testid="reservation-edit__button--back"
             >
@@ -209,7 +208,6 @@ export function EditStep1({
           <Button
             variant="primary"
             type="submit"
-            size="small"
             disabled={isSubmitting}
             data-testid="reservation-edit__button--submit"
             isLoading={isSubmitting}

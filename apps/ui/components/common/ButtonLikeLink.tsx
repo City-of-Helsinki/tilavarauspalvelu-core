@@ -10,6 +10,5 @@ import { fontMedium } from "common";
 export const ButtonLikeLink = styled(Link)<ButtonStyleProps>`
   ${ButtonCss}
   ${fontMedium}
-  max-height: 40px;
   gap: var(--spacing-s);
 `;

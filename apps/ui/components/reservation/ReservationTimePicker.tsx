@@ -311,12 +311,12 @@ export function ReservationTimePicker({
     const newDate = toUIDate(begin);
     const newTime = getTimeString(begin);
 
-    setValue("date", newDate);
-    setValue("duration", duration);
-    setValue("time", newTime);
+    setValue("date", newDate, { shouldDirty: true });
+    setValue("duration", duration, { shouldDirty: true });
+    setValue("time", newTime, { shouldDirty: true });
 
     if (isTouchDevice()) {
-      setValue("isControlsVisible", true);
+      setValue("isControlsVisible", true, { shouldDirty: true });
     }
 
     return true;
@@ -372,8 +372,8 @@ export function ReservationTimePicker({
     const uiDate = toUIDate(begin);
     const uiTime = getTimeString(begin);
     // click doesn't change the duration
-    setValue("date", uiDate);
-    setValue("time", uiTime);
+    setValue("date", uiDate, { shouldDirty: true });
+    setValue("time", uiTime, { shouldDirty: true });
 
     return true;
   };
@@ -403,9 +403,7 @@ export function ReservationTimePicker({
         <Calendar<ReservationNode>
           events={calendarEvents}
           begin={focusDate}
-          onNavigate={(d: Date) =>
-            reservationForm.setValue("date", toUIDate(d))
-          }
+          onNavigate={(d: Date) => setValue("date", toUIDate(d))}
           eventStyleGetter={(event) =>
             eventStyleGetter(
               event,
@@ -424,7 +422,7 @@ export function ReservationTimePicker({
           reservable={!isReservationQuotaReached}
           toolbarComponent={Toolbar}
           dateCellWrapperComponent={TouchCellWrapper}
-          // @ts-expect-error: TODO: fix this
+          // @ts-expect-error: FIXME: fix this
           eventWrapperComponent={EventWrapperComponent}
           resizable={!isReservationQuotaReached}
           // NOTE there was logic here to disable dragging on mobile
