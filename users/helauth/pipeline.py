@@ -102,3 +102,61 @@ def update_user_from_profile(request: WSGIRequest, *, user: User | None = None) 
         user.date_of_birth = birthday_info["birthday"]
 
     user.save()
+
+
+def migrate_user_from_tunnistamo_to_keycloak(
+    backend: TunnistamoOIDCAuth,
+    request: WSGIRequest,
+    response: OIDCResponse,
+    user: User | None = None,
+    **kwargs: Unpack[ExtraKwargs],
+) -> dict[str, Any]:
+    if user is None:
+        return {"user": user}
+
+    id_token = IDToken.from_string(response["id_token"])
+    if id_token is not None and id_token.is_ad_login and id_token.iss.endswith("helsinki-tunnistus"):
+        migrate_from_tunnistamo_to_keycloak(email=user.email)
+
+    return {"user": user}
+
+
+@SentryLogger.log_if_raises("Keycloak migration: Failed to migrate user from tunnistamo to keycloak")
+def migrate_from_tunnistamo_to_keycloak(*, email: str) -> None:
+    # Look at the two most recent AD users with the same email address (no profile ID).
+    # There can be more, but the most recent one is the new Keycloak user and the other one
+    # is the old Tunnistamo user after the auth-migration (when auth moved to backend), which we want to migrate.
+    users: list[User] = list(User.objects.filter(email=email, profile_id="").order_by("date_joined")[:2])
+    if len(users) < 2:
+        return
+
+    old_user = users[0]
+    new_user = users[1]
+
+    # Don't run migration more than once.
+    if not old_user.is_active:
+        return
+
+    # Migrate staff and superuser status.
+    new_user.is_staff = old_user.is_staff
+    new_user.is_superuser = old_user.is_superuser
+    new_user.save()
+
+    from applications.models import Application
+    from permissions.models import GeneralRole, UnitRole
+    from reservations.models import RecurringReservation, Reservation
+
+    # Migrate general roles.
+    GeneralRole.objects.filter(user=old_user).update(user=new_user)
+    # Migrate unit roles.
+    UnitRole.objects.filter(user=old_user).update(user=new_user)
+    # Migrate applications.
+    Application.objects.filter(user=old_user).update(user=new_user)
+    # Migrate reservations.
+    Reservation.objects.filter(user=old_user).update(user=new_user)
+    # Migrate recurring reservations.
+    RecurringReservation.objects.filter(user=old_user).update(user=new_user)
+
+    # Mark the old user as inactive.
+    old_user.is_active = False
+    old_user.save()
