@@ -146,7 +146,6 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
   useRemoveStoredReservation();
 
   const [step, setStep] = useState(0);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // Get prefilled profile user fields from the reservation (backend fills them when created).
   // NOTE Using pick makes the types way too complex; easier to just define the fields here.
@@ -245,7 +244,7 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
       window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
       const { pk, state } = data.confirmReservation ?? {};
       if (pk == null) {
-        setErrorMsg(t("errors:general_error"));
+        errorToast({ text: t("errors:general_error") });
         return;
       }
 
@@ -263,12 +262,12 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
         } else {
           // eslint-disable-next-line no-console
           console.warn("No checkout url found");
-          setErrorMsg(t("errors:general_error"));
+          errorToast({ text: t("errors:general_error") });
         }
       } else {
         // eslint-disable-next-line no-console
         console.warn("Confirm reservation mutation returning something odd");
-        setErrorMsg(t("errors:general_error"));
+        errorToast({ text: t("errors:general_error") });
       }
     },
   });
@@ -320,7 +319,7 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
         },
       });
     } catch (e) {
-      setErrorMsg(t("errors:general_error"));
+      errorToast({ text: t("errors:general_error") });
     }
   };
 
@@ -334,7 +333,9 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
         },
       });
     } catch (e) {
-      setErrorMsg(t("errors:general_error"));
+      // TODO: use a specific type of error if the reservation is already confirmed or if it got deleted because it timed out
+      // FIXME: there is something weird with toasts not showing up (at least this one) even though the error handler is called
+      errorToast({ text: t("errors:general_error") });
     }
   };
 
@@ -369,10 +370,6 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
     ...reservation,
     reservationUnit: reservationUnit != null ? [reservationUnit] : [],
   };
-
-  useEffect(() => {
-    if (errorMsg) errorToast({ text: errorMsg });
-  }, [errorMsg]);
 
   return (
     <StyledContainer>
