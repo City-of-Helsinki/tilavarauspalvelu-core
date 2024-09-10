@@ -39,16 +39,21 @@ def migrate_permissions_to_new_models(apps, schema_editor):
     GeneralRole = apps.get_model("permissions", "GeneralRole")
     NewGeneralRole = apps.get_model("permissions", "NewGeneralRole")
 
-    new_general_roles = [
-        NewGeneralRole(
-            role=_determine_role(permissions=sorted(perm.permission.lower() for perm in role.role.permissions.all())),
-            user=role.user,
-            assigner=role.assigner,
-            created=role.created,
-            modified=role.modified,
+    general_roles = GeneralRole.objects.select_related("user", "role").prefetch_related("role__permissions").all()
+
+    new_general_roles = []
+    for role in general_roles:
+        permissions = sorted(perm.permission.lower() for perm in role.role.permissions.all())
+        new_general_roles.append(
+            NewGeneralRole(
+                role=_determine_role(permissions=permissions, role_name=role.role.code),
+                user=role.user,
+                assigner=role.assigner,
+                created=role.created,
+                modified=role.modified,
+            )
         )
-        for role in GeneralRole.objects.select_related("user", "role").prefetch_related("role__permissions").all()
-    ]
+
     NewGeneralRole.objects.bulk_create(new_general_roles)
 
     # Unit permissions
@@ -68,8 +73,9 @@ def migrate_permissions_to_new_models(apps, schema_editor):
     new_unit_roles_units = []
     new_unit_roles_unit_groups = []
     for role in unit_roles:
+        permissions = sorted(perm.permission.lower() for perm in role.role.permissions.all())
         new_role = NewUnitRole(
-            role=_determine_role(permissions=sorted(perm.permission.lower() for perm in role.role.permissions.all())),
+            role=_determine_role(permissions=permissions, role_name=role.role.code),
             user=role.user,
             assigner=role.assigner,
             created=role.created,
@@ -88,14 +94,16 @@ def migrate_permissions_to_new_models(apps, schema_editor):
     NewUnitRoleUnitGroup.objects.bulk_create(new_unit_roles_unit_groups)
 
 
-def _determine_role(permissions: list[str]) -> str:
-    if permissions == RESERVER_PERMISSIONS:
+def _determine_role(permissions: list[str], role_name: str) -> str:
+    # Role names can technically be anything, but these names are used in production,
+    # which is the most critical part for the migration.
+    if role_name == "Varaaja" or permissions == RESERVER_PERMISSIONS:
         return UserRoleChoices.RESERVER.value
-    if permissions == VIEWER_PERMISSIONS:
+    if role_name in ["Katselija", "viewer"] or permissions == VIEWER_PERMISSIONS:
         return UserRoleChoices.VIEWER.value
-    if permissions == NOTIFICATION_HANDLER_PERMISSIONS:
+    if role_name == "communications_ALL" or permissions == NOTIFICATION_HANDLER_PERMISSIONS:
         return UserRoleChoices.NOTIFICATION_MANAGER.value
-    if permissions == HANDLER_PERMISSIONS:
+    if role_name in ["Käsittelijä", "handler"] or permissions == HANDLER_PERMISSIONS:
         return UserRoleChoices.HANDLER.value
     return UserRoleChoices.ADMIN.value
 
