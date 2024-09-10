@@ -2,7 +2,6 @@ import re
 
 from django import forms
 from django.contrib import admin, messages
-from django.core.handlers.wsgi import WSGIRequest
 from django.db import models
 from django.db.models.functions import Coalesce
 from django.http import FileResponse
@@ -13,6 +12,7 @@ from rangefilter.filters import DateTimeRangeFilterBuilder, NumericRangeFilterBu
 from common.exporter.sql_log_exporter import SQLLogCSVExporter
 from common.models import RequestLog, SQLLog
 from common.querysets.sql_log import RequestLogQuerySet
+from common.typing import WSGIRequest
 from utils.sentry import SentryLogger
 
 __all__ = [

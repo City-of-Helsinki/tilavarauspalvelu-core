@@ -1,13 +1,13 @@
 from admin_extra_buttons.api import ExtraButtonsMixin, button
 from django.contrib import admin
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.core.handlers.wsgi import WSGIRequest
 from django.db.models.fields.files import FieldFile
 from django.forms import ModelForm, ValidationError
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from modeltranslation.admin import TranslationAdmin
 
+from common.typing import WSGIRequest
 from email_notification.admin.email_template_tester import email_template_tester_admin_view
 from email_notification.exceptions import EmailTemplateValidationError
 from email_notification.helpers.email_builder_application import ApplicationEmailBuilder, ApplicationEmailContext

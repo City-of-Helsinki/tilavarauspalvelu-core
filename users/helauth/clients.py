@@ -14,15 +14,13 @@ from social_django.strategy import DjangoStrategy
 
 from tilavarauspalvelu.auth import ProxyTunnistamoOIDCAuthBackend
 from users.helauth.parsers import ProfileDataParser
-from users.helauth.utils import get_jwt_payload, get_session_data
+from users.helauth.utils import get_jwt_payload
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 from utils.external_service.errors import ExternalServiceError, ExternalServiceRequestError
 from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
-    from django.core.handlers.wsgi import WSGIRequest
-
-    from common.typing import AnyUser
+    from common.typing import AnyUser, WSGIRequest
     from users.helauth.typing import (
         BirthdayInfo,
         ExtraData,
@@ -93,8 +91,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
         if user.is_anonymous:
             return None
 
-        session_data = get_session_data(request)
-        api_tokens: dict[str, str] | None = session_data.get("api_tokens")
+        api_tokens: dict[str, str] | None = request.session.get("api_tokens")
         if api_tokens is None:
             msg = "No api-tokens in session. User is not a helsinki profile user."
             logger.info(msg)
@@ -141,7 +138,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
             logger.info(msg)
             return None
 
-        session_data = get_session_data(request)
+        session_data = request.session
         session_data["api_tokens"] = BaseExternalServiceClient.response_json(response=response)
         return session_data["api_tokens"].get(settings.OPEN_CITY_PROFILE_SCOPE)
 
@@ -410,7 +407,7 @@ class TunnistamoClient(BaseExternalServiceClient):
         if user.is_anonymous:
             return None
 
-        session_data = get_session_data(request)
+        session_data = request.session
 
         leeway = datetime.timedelta(seconds=settings.HELSINKI_PROFILE_TOKEN_EXPIRATION_LEEWAY_SECONDS)
         is_token_valid = session_data["access_token_expires_at"] > datetime.datetime.now() + leeway
@@ -452,7 +449,7 @@ class TunnistamoClient(BaseExternalServiceClient):
         expires_at = datetime.datetime.now() + datetime.timedelta(seconds=response["expires_in"])
         expires_at_ts = int(expires_at.timestamp()) * 1000
 
-        session_data = get_session_data(request)
+        session_data = request.session
         session_data["access_token"] = response["access_token"]
         session_data["access_token_expires_at"] = expires_at
         session_data["access_token_expires_at_ts"] = expires_at_ts

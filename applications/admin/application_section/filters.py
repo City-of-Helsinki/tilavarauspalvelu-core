@@ -12,10 +12,10 @@ from applications.enums import ApplicationRoundStatusChoice, ApplicationSectionS
 from reservations.models import AgeGroup, ReservationPurpose
 
 if TYPE_CHECKING:
-    from django.core.handlers.wsgi import WSGIRequest
     from django.db.models import QuerySet
 
     from applications.admin import ApplicationSectionAdmin
+    from common.typing import WSGIRequest
 
 
 class ApplicationRoundStatusFilter(admin.SimpleListFilter):

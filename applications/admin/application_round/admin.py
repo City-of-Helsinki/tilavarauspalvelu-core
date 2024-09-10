@@ -2,7 +2,6 @@ from admin_extra_buttons.decorators import button
 from admin_extra_buttons.mixins import ExtraButtonsMixin
 from django.contrib import admin, messages
 from django.contrib.admin import helpers
-from django.core.handlers.wsgi import WSGIRequest
 from django.db.models import QuerySet
 from django.http import FileResponse
 from django.template.response import TemplateResponse
@@ -15,6 +14,7 @@ from applications.enums import ApplicationRoundStatusChoice
 from applications.exporter.application_round_applications_exporter import ApplicationRoundApplicationsCSVExporter
 from applications.exporter.application_round_result_exporter import ApplicationRoundResultCSVExporter
 from applications.models import ApplicationRound
+from common.typing import WSGIRequest
 from utils.sentry import SentryLogger
 
 __all__ = [

@@ -2,12 +2,12 @@ from admin_extra_buttons.decorators import button
 from admin_extra_buttons.mixins import ExtraButtonsMixin
 from django import forms
 from django.contrib import admin
-from django.core.handlers.wsgi import WSGIRequest
 from django.db.models import Count, QuerySet
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
+from common.typing import WSGIRequest
 from opening_hours.models import OriginHaukiResource, ReservableTimeSpan
 from opening_hours.utils.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from opening_hours.utils.reservable_time_span_client import NEVER_ANY_OPENING_HOURS_HASH

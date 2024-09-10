@@ -2,13 +2,13 @@ import uuid
 
 from django import forms
 from django.contrib import admin
-from django.core.handlers.wsgi import WSGIRequest
 from django.utils.safestring import SafeString, mark_safe
 from django.utils.translation import gettext_lazy as _
 from rangefilter.filters import DateTimeRangeFilter
 
 from common.models import SQLLog
 from common.querysets.sql_log import SQLLogQuerySet
+from common.typing import WSGIRequest
 
 __all__ = [
     "SQLLogAdmin",

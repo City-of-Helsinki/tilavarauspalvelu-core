@@ -1,6 +1,5 @@
 from django.contrib import admin, messages
 from django.contrib.admin import helpers
-from django.core.handlers.wsgi import WSGIRequest
 from django.db.models import QuerySet
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
@@ -15,6 +14,7 @@ from applications.admin.application.filters import (
 from applications.admin.application.form import ApplicationAdminForm, ApplicationSectionInlineAdminForm
 from applications.models import Application, ApplicationSection
 from applications.querysets.application import ApplicationQuerySet
+from common.typing import WSGIRequest
 from common.utils import comma_sep_str
 
 __all__ = [

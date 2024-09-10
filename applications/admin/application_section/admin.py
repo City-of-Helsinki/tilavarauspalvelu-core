@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.core.handlers.wsgi import WSGIRequest
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
@@ -17,6 +16,7 @@ from applications.admin.application_section.form import (
     SuitableTimeRangeInlineAdminForm,
 )
 from applications.models import ApplicationSection, ReservationUnitOption, SuitableTimeRange
+from common.typing import WSGIRequest
 
 __all__ = [
     "ApplicationSectionAdmin",

@@ -1,11 +1,11 @@
 import contextlib
 from typing import Any, TypedDict, Unpack
 
-from django.core.handlers.wsgi import WSGIRequest
 from helusers.tunnistamo_oidc import TunnistamoOIDCAuth
 from social_django.models import DjangoStorage, UserSocialAuth
 from social_django.strategy import DjangoStrategy
 
+from common.typing import WSGIRequest
 from users.helauth.clients import HelsinkiProfileClient
 from users.helauth.typing import IDToken
 from users.models import User

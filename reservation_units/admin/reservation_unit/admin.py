@@ -2,7 +2,6 @@ from typing import Any
 
 from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin, messages
-from django.core.handlers.wsgi import WSGIRequest
 from django.db import models
 from django.http import FileResponse
 from django.utils.translation import gettext_lazy as _
@@ -10,6 +9,7 @@ from lookup_property import L
 from modeltranslation.admin import TabbedTranslationAdmin
 
 from applications.models import ApplicationRoundTimeSlot
+from common.typing import WSGIRequest
 from opening_hours.utils.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from reservation_units.admin.reservation_unit.form import ApplicationRoundTimeSlotForm, ReservationUnitAdminForm
 from reservation_units.enums import ReservationKind

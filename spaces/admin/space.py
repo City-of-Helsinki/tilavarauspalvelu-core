@@ -1,10 +1,10 @@
 from django.contrib import admin
-from django.core.handlers.wsgi import WSGIRequest
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from modeltranslation.admin import TranslationAdmin
 from mptt.admin import MPTTModelAdmin
 
+from common.typing import WSGIRequest
 from spaces.admin.location import LocationInline
 from spaces.models import Space
 

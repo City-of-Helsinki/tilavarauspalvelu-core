@@ -3,12 +3,12 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from unittest.mock import MagicMock, patch
 
-from django.core.handlers.wsgi import WSGIRequest
 from django.utils.timezone import get_default_timezone
 from helusers.settings import api_token_auth_settings
 from jose import jwk, jwt
 from jose.constants import ALGORITHMS
 
+from common.typing import WSGIRequest
 from tests.helpers import ResponseMock
 from users.models import User
 

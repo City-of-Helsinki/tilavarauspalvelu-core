@@ -8,12 +8,11 @@ from pathlib import Path
 from typing import Any
 
 from django.conf import settings
-from django.core.handlers.wsgi import WSGIRequest
 from django.db import connection
 from django.http import HttpResponse
 
 from common.date_utils import local_datetime
-from common.typing import QueryInfo
+from common.typing import QueryInfo, WSGIRequest
 from utils.sentry import SentryLogger
 
 logger = logging.getLogger(__name__)

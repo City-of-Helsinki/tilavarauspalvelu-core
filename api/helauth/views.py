@@ -7,14 +7,14 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_POST
 
-from common.typing import TypeHintedWSGIRequest
+from common.typing import WSGIRequest
 from common.utils import update_query_params
 
 
 @require_POST
 @csrf_protect
 @never_cache
-def logout_view(request: TypeHintedWSGIRequest) -> HttpResponseRedirect:
+def logout_view(request: WSGIRequest) -> HttpResponseRedirect:
     """View hit when logout from Keycloak begins."""
     was_authenticated = request.user.is_authenticated
 

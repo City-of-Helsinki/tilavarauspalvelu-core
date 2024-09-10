@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from django.core.handlers.wsgi import WSGIRequest
+    from common.typing import WSGIRequest
 
 BASE_PATH = str(Path(__file__).resolve().parent.parent)
 
