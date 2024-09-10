@@ -6,6 +6,7 @@ import {
   type ReservationQuery,
   type RecurringReservationQuery,
   useRecurringReservationQuery,
+  UserPermissionChoice,
 } from "@gql/gql-types";
 import { type ApolloQueryResult } from "@apollo/client";
 import {
@@ -19,6 +20,7 @@ import { EditTimeModal } from "../EditTimeModal";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { LoadingSpinner } from "hds-react";
 import { errorToast } from "common/src/common/toast";
+import { useCheckPermission } from "@/hooks";
 
 type RecurringReservationType = NonNullable<
   RecurringReservationQuery["recurringReservation"]
@@ -54,6 +56,11 @@ export function RecurringReservationsView({
     onError: () => {
       errorToast({ text: t("errors.errorFetchingData") });
     },
+  });
+
+  const { hasPermission } = useCheckPermission({
+    units: [reservationToCopy?.reservationUnit?.[0].unit?.pk ?? 0],
+    permission: UserPermissionChoice.CanManageReservations,
   });
 
   const { recurringReservation } = data ?? {};
@@ -124,7 +131,7 @@ export function RecurringReservationsView({
     const now = new Date();
 
     if (x.state !== ReservationStateChoice.Denied) {
-      if (startDate > now && onChange) {
+      if (hasPermission && startDate > now && onChange) {
         buttons.push(
           <ReservationListButton
             key="change"

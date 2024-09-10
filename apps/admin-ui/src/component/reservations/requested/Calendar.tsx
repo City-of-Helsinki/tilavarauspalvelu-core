@@ -3,7 +3,11 @@ import CommonCalendar, { CalendarEvent } from "common/src/calendar/Calendar";
 import { Toolbar } from "common/src/calendar/Toolbar";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { type ReservationQuery, ReservationTypeChoice } from "@gql/gql-types";
+import {
+  type ReservationQuery,
+  ReservationTypeChoice,
+  UserPermissionChoice,
+} from "@gql/gql-types";
 import { useModal } from "app/context/ModalContext";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
 import Legend from "./Legend";
@@ -11,6 +15,7 @@ import { EditTimeModal } from "../EditTimeModal";
 import { isPossibleToEdit } from "./reservationModificationRules";
 import { getEventBuffers } from "common/src/calendar/util";
 import { filterNonNullable } from "common/src/helpers";
+import VisibleIfPermission from "./VisibleIfPermission";
 
 // TODO fragment
 type ReservationType = Omit<
@@ -105,9 +110,14 @@ function Calendar({
           <Toolbar {...props}>
             {isAllowedToModify && (
               // NOTE don't use HDS buttons in the toolbar, breaks mobile layout
-              <button type="button" onClick={handleEditTimeClick}>
-                {t("Reservation.EditTimeModal.acceptBtn")}
-              </button>
+              <VisibleIfPermission
+                reservation={reservation}
+                permission={UserPermissionChoice.CanManageReservations}
+              >
+                <button type="button" onClick={handleEditTimeClick}>
+                  {t("Reservation.EditTimeModal.acceptBtn")}
+                </button>
+              </VisibleIfPermission>
             )}
           </Toolbar>
         )}
