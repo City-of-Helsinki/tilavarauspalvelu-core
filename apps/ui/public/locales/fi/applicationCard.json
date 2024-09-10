@@ -19,7 +19,7 @@
     "RESULTS_SENT": "Tulokset lähetetty"
   },
   "reservations": "Varaukset",
-  "saved": "Viimeksi tallennettu: {{date, d.M.yyyy 'klo' H:mm}}",
+  "saved": "Viimeksi tallennettu:",
   "person": "Hakemus luotu: yksityishenkilönä",
   "organisation": "Hakemus luotu: {{type}}, {{name}}",
   "applicantType": {

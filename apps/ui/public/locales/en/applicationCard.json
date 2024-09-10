@@ -19,7 +19,7 @@
     "RESULTS_SENT": "Processed"
   },
   "reservations": "Bookings",
-  "saved": "Last saved: {{date, d.M.yyyy ',' H:mm}}",
+  "saved": "Last saved:",
   "person": "Application created: as a private person",
   "organisation": "Application created: {{type}}, {{name}}",
   "applicantType": {

@@ -3,10 +3,10 @@
     "applyButton": "Hae tiloja",
     "displayPastButton": "Näytä tilat",
     "criteria": "Tutustu hakuohjeisiin",
-    "pending": "Haku avautuu {{openingDateTime}}",
-    "open": "Haku auki {{until, d.M.yyyy 'klo' H.mm}} saakka",
-    "past": "Haku sulkeutui {{closingDate, d.M.yyyy 'klo' H.mm}}",
-    "reservationPeriod": "Tilat varattavissa ajalle {{reservationPeriodBegin, d.M.yyyy}} - {{reservationPeriodEnd, d.M.yyyy}}"
+    "pending": "Haku avautuu {{opening}}",
+    "open": "Haku auki {{until}} saakka",
+    "past": "Haku sulkeutui {{closing}}",
+    "reservationPeriod": "Tilat varattavissa ajalle {{reservationPeriodBegin}} - {{reservationPeriodEnd}}"
   },
   "criteria": "hakuehdot",
   "notesWhenApplying": "Huomioi hakiessa"

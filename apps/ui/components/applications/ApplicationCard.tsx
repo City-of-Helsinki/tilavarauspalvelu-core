@@ -8,7 +8,6 @@ import {
   IconPen,
   Tag as HdsTag,
 } from "hds-react";
-import { parseISO } from "date-fns";
 import { breakpoints } from "common/src/common/style";
 import {
   ApplicantTypeChoice,
@@ -17,11 +16,10 @@ import {
   useCancelApplicationMutation,
   type ApplicationsQuery,
 } from "@gql/gql-types";
-import { applicationUrl } from "@/modules/util";
+import { applicationUrl, formatDateTime } from "@/modules/util";
 import { BlackButton } from "@/styles/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
-import ClientOnly from "common/src/ClientOnly";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 
 const Card = styled(HdsCard)`
@@ -238,16 +236,10 @@ function ApplicationCard({ application, actionCallback }: Props): JSX.Element {
             ? getApplicant(application, t)
             : ""}
         </Applicant>
-        {/* Causes hydration mismatch */}
-        <ClientOnly>
-          <Modified>
-            {application.lastModifiedDate
-              ? t("applicationCard:saved", {
-                  date: parseISO(application.lastModifiedDate),
-                })
-              : ""}
-          </Modified>
-        </ClientOnly>
+        <Modified>
+          {t("applicationCard:saved")}{" "}
+          {formatDateTime(t, new Date(application.lastModifiedDate))}
+        </Modified>
       </div>
       <Buttons>
         <StyledButton

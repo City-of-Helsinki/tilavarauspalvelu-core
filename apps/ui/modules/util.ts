@@ -1,4 +1,4 @@
-import { parseISO } from "date-fns";
+import { isSameDay, parseISO } from "date-fns";
 import { i18n, TFunction } from "next-i18next";
 import queryString from "query-string";
 import { trim } from "lodash";
@@ -290,39 +290,79 @@ export function getPostLoginUrl() {
   return `${origin}${pathname}?${params.toString()}`;
 }
 
-// TODO move to common and combine with admin (requires i18n changes: replace messages.ts with json)
-export function formatTimeRange(
-  t: TFunction,
-  beginDate: Date,
-  endDate: Date
-): string {
-  const beginTime = t("common:timeWithPrefixInForm", { date: beginDate });
-  const endTime = t("common:timeInForm", { date: endDate });
-  return `${beginTime}–${endTime}`;
+// date format should always be in finnish, but the weekday and time separator should be localized
+const dateFormatParams = {
+  date: {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    locale: "fi",
+  },
+};
+
+function formatTime(t: TFunction, date: Date): string {
+  return t("common:dateWithWeekday", {
+    date,
+    formatParams: {
+      date: {
+        hour: "numeric",
+        minute: "numeric",
+        hour12: false,
+      },
+    },
+  });
 }
+
+function dayTimeSeparator(t: TFunction): string {
+  return t("common:dayTimeSeparator");
+}
+
 export function formatDateTimeRange(
   t: TFunction,
   begin: Date,
   end: Date
 ): string {
-  const beginDate = t("common:dateWithWeekday", { date: begin });
-  const beginTime = t("common:timeWithPrefixInForm", { date: begin });
-  const endDate = t("common:dateWithWeekday", { date: end });
-  const endTime = t("common:timeInForm", { date: end });
+  // TODO change the key names
+  const beginDate = t("common:dateWithWeekday", {
+    date: begin,
+    formatParams: dateFormatParams,
+  });
 
-  return trim(
-    `${beginDate} ${beginTime}–${
-      endDate !== beginDate ? endDate : ""
-    }${endTime}`,
-    " – "
-  );
+  const day = formatDay(t, begin);
+  const showEndDate = !isSameDay(begin, end);
+  const endTime = formatTime(t, end);
+  const time = formatTime(t, begin);
+  const separator = dayTimeSeparator(t);
+  const endDate = showEndDate
+    ? t("common:dateWithWeekday", {
+        date: end,
+        formatParams: dateFormatParams,
+      })
+    : "";
+
+  return `${day} ${beginDate}${separator} ${time}–${endTime} ${endDate}`.trim();
 }
+
+function formatDay(t: TFunction, date: Date): string {
+  return t("common:dateWithWeekday", {
+    date,
+    formatParams: {
+      date: {
+        weekday: "short",
+      },
+    },
+  });
+}
+
 export function formatDateTime(t: TFunction, date: Date): string {
   const dateStr = t("common:dateWithWeekday", {
     date,
+    formatParams: dateFormatParams,
   });
-  const timeStr = t("common:time", {
-    date,
-  });
-  return `${dateStr} ${timeStr}`;
+
+  const day = formatDay(t, date);
+  const time = formatTime(t, date);
+  const separator = dayTimeSeparator(t);
+
+  return `${day} ${dateStr}${separator} ${time}`;
 }

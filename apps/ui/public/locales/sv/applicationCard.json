@@ -19,7 +19,7 @@
     "RESULTS_SENT": "Behandlad"
   },
   "reservations": "Bokningar",
-  "saved": "Senast sparad: {{date, d.M.yyyy 'kl' H:mm}}",
+  "saved": "Senast sparad:",
   "person": "Ansökan skapad: som privatperson",
   "organisation": "Ansökan skapad: {{type}}, {{name}}",
   "applicantType": {

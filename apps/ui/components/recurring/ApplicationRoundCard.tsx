@@ -1,9 +1,8 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { Card, Container, IconArrowRight } from "hds-react";
-import { useTranslation } from "next-i18next";
+import { TFunction, useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
-import { parseISO } from "date-fns";
 import { breakpoints } from "common/src/common/style";
 import { H4 } from "common/src/common/typography";
 import ClientOnly from "common/src/ClientOnly";
@@ -12,9 +11,10 @@ import {
   ApplicationRoundStatusChoice,
 } from "@gql/gql-types";
 import { IconButton } from "common/src/components";
-import { searchUrl } from "@/modules/util";
+import { formatDateTime, searchUrl } from "@/modules/util";
 import { MediumButton } from "@/styles/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
+import { isValid } from "date-fns";
 
 interface Props {
   applicationRound: ApplicationRoundFieldsFragment;
@@ -74,6 +74,33 @@ const StyledLink = styled(IconButton)`
   color: var(--color-black);
 `;
 
+function translateRoundDate(
+  t: TFunction,
+  round: ApplicationRoundFieldsFragment
+) {
+  const begin = new Date(round.applicationPeriodBegin);
+  const end = new Date(round.applicationPeriodEnd);
+  if (!isValid(begin) || !isValid(end)) {
+    // eslint-disable-next-line no-console
+    console.warn("Invalid application period dates");
+    return "";
+  }
+
+  switch (round.status) {
+    case ApplicationRoundStatusChoice.Upcoming:
+      return t("applicationRound:card.pending", {
+        opening: formatDateTime(t, begin),
+      });
+    case ApplicationRoundStatusChoice.Open:
+      return t("applicationRound:card.open", { until: formatDateTime(t, end) });
+    default:
+      // TODO no time here
+      return t("applicationRound:card.past", {
+        closing: formatDateTime(t, end),
+      });
+  }
+}
+
 const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
   const { t } = useTranslation();
 
@@ -87,16 +114,19 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
 
   const name = getApplicationRoundName(applicationRound);
 
-  const reservationPeriod = useMemo(
-    () =>
-      t(`applicationRound:card.reservationPeriod`, {
-        reservationPeriodBegin: new Date(
-          applicationRound.reservationPeriodBegin
-        ),
-        reservationPeriodEnd: new Date(applicationRound.reservationPeriodEnd),
-      }),
-    [applicationRound, t]
-  );
+  const reservationPeriod = t(`applicationRound:card.reservationPeriod`, {
+    // TODO check if time is needed
+    reservationPeriodBegin: formatDateTime(
+      t,
+      new Date(applicationRound.reservationPeriodBegin)
+    ),
+    reservationPeriodEnd: formatDateTime(
+      t,
+      new Date(applicationRound.reservationPeriodEnd)
+    ),
+  });
+
+  const timeString = translateRoundDate(t, applicationRound);
 
   return (
     <StyledCard aria-label={name} border>
@@ -106,21 +136,7 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
           state === ApplicationRoundStatusChoice.Upcoming) && (
           <ReservationPeriod>{reservationPeriod}</ReservationPeriod>
         )}
-        <StatusMessage>
-          {state === ApplicationRoundStatusChoice.Upcoming
-            ? t("applicationRound:card.pending", {
-                openingDateTime: t("common:dateTime", {
-                  date: parseISO(applicationRound.applicationPeriodBegin),
-                }),
-              })
-            : state === ApplicationRoundStatusChoice.Open
-              ? t("applicationRound:card.open", {
-                  until: parseISO(applicationRound.applicationPeriodEnd),
-                })
-              : t("applicationRound:card.past", {
-                  closingDate: parseISO(applicationRound.applicationPeriodEnd),
-                })}
-        </StatusMessage>
+        <StatusMessage>{timeString}</StatusMessage>
         <StyledLink
           href={`/criteria/${applicationRound.pk}`}
           label={t("applicationRound:card.criteria")}

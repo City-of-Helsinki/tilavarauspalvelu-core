@@ -3,10 +3,10 @@
     "applyButton": "Search",
     "displayPastButton": "Show spaces",
     "criteria": "Check the application criteria",
-    "pending": "Application round opens {{openingDateTime}}",
-    "open": "Application round open until {{until, d.M.yyyy',' H.mm}}",
-    "past": "Application round closed {{closingDate, d.M.yyyy',' H.mm}}",
-    "reservationPeriod": "Spaces can be booked for the period {{reservationPeriodBegin, d.M.yyyy}} - {{reservationPeriodEnd, d.M.yyyy}}"
+    "pending": "Application round opens {{opening}}",
+    "open": "Application round open until {{until}}",
+    "past": "Application round closed {{closing}}",
+    "reservationPeriod": "Spaces can be booked for the period {{reservationPeriodBegin}} - {{reservationPeriodEnd}}"
   },
   "criteria": "application criteria",
   "notesWhenApplying": "Please note when applying"
