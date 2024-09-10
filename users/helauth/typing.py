@@ -21,7 +21,6 @@ __all__ = [
     "ProfileTokenPayload",
     "RefreshResponse",
     "ReservationPrefillInfo",
-    "SessionData",
 ]
 
 
@@ -141,12 +140,27 @@ class ExtraData(TypedDict):
     """Refresh token: str"""
 
 
-class RefreshResponse(TypedDict):
+_TokenBase = TypedDict("_TokenBase", {"not-before-policy": int})
+
+
+class TokenResponse(_TokenBase):
     access_token: str
-    refresh_token: str
-    token_type: str  # 'bearer'
     expires_in: int
-    id_token: str  # IDToken as JWT
+    refresh_expires_in: int
+    refresh_token: str
+    token_type: bool
+    upgraded: bool
+
+
+class RefreshResponse(_TokenBase):
+    access_token: str
+    expires_in: int
+    id_token: str
+    refresh_expires_in: int
+    refresh_token: str
+    scope: str
+    session_state: str
+    token_type: str
 
 
 class ProfileTokenPayload(TypedDict):
@@ -170,25 +184,6 @@ class ProfileTokenPayload(TypedDict):
 
     # Additionally, the payload contains a 'scope' key with a list of scopes. E.g.:
     # https://api.hel.fi/auth': ['helsinkiprofile']
-
-
-class SessionData(TypedDict, total=False):
-    # Added by helauth & social_auth. See: 'helusers.pipeline.fetch_api_tokens'.
-    access_token: str  # random token
-    access_token_expires_at: datetime.datetime
-    access_token_expires_at_ts: int  # timestamp
-    access_token_scope: list[str]
-    api_tokens: dict[str, str]  # scope -> token -mapping
-    social_auth_end_session_url: str  # url
-    social_auth_id_token: str  # id token in jwt format
-    social_auth_last_login_backend: str  # 'tunnistamo'
-    tunnistamo_state: str  # random string
-
-    # Some django variables.
-    next: str  # redirect url
-    _auth_user_backend: str  # dot import string
-    _auth_user_hash: str  # hash
-    _auth_user_id: str  # user id
 
 
 class ADLoginAMR(enum.Enum):

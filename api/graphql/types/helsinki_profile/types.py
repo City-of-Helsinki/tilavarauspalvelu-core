@@ -80,7 +80,12 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
         # Modify profile request based on the requested fields in the graphql query
         fields: list[str] = get_field_selections(info)
 
-        data = HelsinkiProfileClient.get_user_profile_info(info.context, user=user, fields=fields)
+        data = HelsinkiProfileClient.get_user_profile_info(
+            user=user,
+            request_user=info.context.user,
+            session=info.context.session,
+            fields=fields,
+        )
         if data is None:
             msg = "Helsinki profile token is not valid and could not be refreshed."
             extensions = {"code": error_codes.HELSINKI_PROFILE_TOKEN_INVALID}

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal, TypedDict
+from typing import TYPE_CHECKING, Any, Literal, Protocol, TypedDict
 
 from django.contrib.auth.models import AnonymousUser
 from django.core.handlers import wsgi
@@ -15,6 +15,8 @@ __all__ = [
     "AnyUser",
     "GQLInfo",
     "QueryInfo",
+    "SessionMapping",
+    "WSGIRequest",
 ]
 
 type AnyUser = User | AnonymousUser
@@ -37,3 +39,9 @@ class QueryInfo(TypedDict):
 
 
 type Lang = Literal["fi", "sv", "en"]
+
+
+class SessionMapping(Protocol):
+    def __setitem__(self, key: str, value: Any) -> None: ...
+
+    def get(self, key: str, default: Any = None) -> Any: ...

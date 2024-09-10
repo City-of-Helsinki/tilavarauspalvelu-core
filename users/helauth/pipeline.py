@@ -87,7 +87,7 @@ def update_user_from_profile(request: WSGIRequest, *, user: User | None = None) 
         return
 
     with use_request_user(request=request, user=user):
-        birthday_info = HelsinkiProfileClient.get_birthday_info(request)
+        birthday_info = HelsinkiProfileClient.get_birthday_info(user=request.user, session=request.session)
 
     if birthday_info is None:
         SentryLogger.log_message(
