@@ -85,7 +85,8 @@ function RelatedUnitCard({
 
   const name = getReservationUnitName(reservationUnit, lang);
   const pricing = getActivePricing(reservationUnit);
-  const unitPrice = pricing != null ? getPriceString({ pricing }) : undefined;
+  const unitPrice =
+    pricing != null ? getPriceString({ t, pricing }) : undefined;
   const reservationUnitTypeName =
     reservationUnit.reservationUnitType != null
       ? getTranslationSafe(reservationUnit.reservationUnitType, "name", lang)

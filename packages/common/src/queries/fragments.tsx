@@ -63,7 +63,6 @@ export const PRICING_FRAGMENT = gql`
     id
     begins
     priceUnit
-    pricingType
     lowestPrice
     highestPrice
     taxPercentage {
@@ -71,7 +70,6 @@ export const PRICING_FRAGMENT = gql`
       pk
       value
     }
-    status
   }
 `;
 

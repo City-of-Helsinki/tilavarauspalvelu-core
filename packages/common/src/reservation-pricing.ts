@@ -1,4 +1,5 @@
 import { Maybe, PriceUnit } from "../gql/gql-types";
+import { toNumber } from "./helpers";
 import formatters from "./number-formatters";
 
 export const getPriceUnitMinutes = (unit: PriceUnit): number => {
@@ -72,11 +73,8 @@ export function getReservationPrice(
   trailingZeros: boolean,
   language = "fi"
 ): string {
-  if (price == null) {
-    return defaultText;
-  }
-  const p = Number(price);
-  if (Number.isNaN(p) || p === 0) {
+  const p = toNumber(price);
+  if (p == null || p === 0) {
     return defaultText;
   }
   const formatter = trailingZeros ? "currencyWithDecimals" : "currency";

@@ -168,6 +168,7 @@ export function QuickReservation({
   );
 
   const price = getReservationUnitPrice({
+    t,
     reservationUnit,
     pricingDate: dateValue ?? new Date(),
     minutes: duration,

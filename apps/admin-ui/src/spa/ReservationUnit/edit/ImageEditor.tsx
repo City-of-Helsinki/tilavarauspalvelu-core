@@ -38,6 +38,16 @@ function RUImage({ image }: { image: ImageFormType }): JSX.Element {
 let fakePk = -1;
 
 const FileInputContainer = styled.div`
+  & button {
+    --background-color-hover: var(--color-black-5);
+    --color-hover: var(--color-black);
+    --background-color-focus: transparent;
+    --color-focus: var(--color-black) --focus-outline-color:
+      var(--color-focus-outline);
+    --color: var(--color-black);
+    --border-color: var(--color-black);
+  }
+
   div:nth-of-type(3) {
     width: 100%;
     button {
@@ -61,7 +71,10 @@ const FileInputContainer = styled.div`
   }
 `;
 
-const SmallButton = styled(Button)`
+const SmallButton = styled(Button).attrs({
+  variant: "secondary",
+  theme: "black",
+})`
   border: 0;
   padding: 0;
   min-height: 0;
@@ -94,7 +107,6 @@ function ReservationUnitImage({
           <span>{t("ImageEditor.mainImage")}</span>
         ) : (
           <SmallButton
-            variant="secondary"
             disabled={isMain || image.pk == null}
             onClick={() => makeIntoMainImage(image.pk ?? 0)}
           >
@@ -102,7 +114,6 @@ function ReservationUnitImage({
           </SmallButton>
         )}
         <SmallButton
-          variant="secondary"
           disabled={image.pk == null}
           onClick={() => deleteImage(image.pk ?? 0)}
         >
@@ -177,7 +188,7 @@ export function ImageEditor({
             dragAndDropInputLabel=" "
             maxSize={5242880}
             onChange={(files) => addImage(files)}
-            tooltipText={t("ReservationUnitEditor.tooltip.images")}
+            tooltipText={t("ImageEditor.tooltip")}
           />
         </FileInputContainer>
       </div>

@@ -143,6 +143,7 @@ export function ReservationInfoCard({
     reservation.state === ReservationStateChoice.RequiresHandling ||
     shouldDisplayReservationUnitPrice
       ? getReservationUnitPrice({
+          t,
           reservationUnit,
           pricingDate: new Date(begin),
           minutes: duration,

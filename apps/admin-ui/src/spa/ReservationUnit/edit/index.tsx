@@ -25,7 +25,6 @@ import {
   type ReservationUnitPublishingState,
   type ReservationUnitReservationState,
   TermsType,
-  Status,
   ImageType,
   useUnitWithSpacesAndResourcesQuery,
   useDeleteImageMutation,
@@ -63,7 +62,7 @@ import { ArchiveDialog } from "./ArchiveDialog";
 import { ReservationStateTag, ReservationUnitStateTag } from "./tags";
 import { ActivationGroup } from "./ActivationGroup";
 import { ImageEditor } from "./ImageEditor";
-import { PricingTypeView } from "./PricingType";
+import { PricingTypeView, TaxOption } from "./PricingType";
 import { GenericDialog } from "./GenericDialog";
 import {
   type ReservationUnitEditFormValues,
@@ -74,6 +73,7 @@ import {
 } from "./form";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { SeasonalSection } from "./SeasonalSection";
+import { getValidationErrors } from "common/src/apolloUtils";
 
 const RichTextInput = dynamic(
   () => import("../../../component/RichTextInput"),
@@ -325,24 +325,25 @@ const FieldGroupHeading = styled.span`
 
 function FieldGroup({
   children,
-  id,
   heading,
   tooltip = "",
   className,
   style,
+  required,
 }: {
   heading: string;
   tooltip?: string;
-  id?: string;
   children?: React.ReactNode;
   className?: string;
   style?: React.CSSProperties;
+  required?: boolean;
 }): JSX.Element {
   return (
     <FieldGroupWrapper className={className} style={style}>
       <div>
-        <FieldGroupHeading>{heading}</FieldGroupHeading>
-        {id ? <span id={id} /> : null}
+        <FieldGroupHeading>
+          {heading} {required ? "*" : ""}
+        </FieldGroupHeading>
         <div className="ReservationUnitEditor__FieldGroup-children">
           {children}
         </div>
@@ -626,7 +627,6 @@ function BasicSection({
     >
       <AutoGrid>
         <RadioFieldGroup
-          id="reservationKind"
           heading={t("ReservationUnitEditor.label.reservationKind")}
           tooltip={t("ReservationUnitEditor.tooltip.reservationKind")}
         >
@@ -866,7 +866,6 @@ function ReservationUnitSettings({
           control={control}
           name="minReservationDuration"
           options={durationOptions}
-          placeholder={t("common.select")}
           style={{ gridColumnStart: "1" }}
           required
           label={t("ReservationUnitEditor.label.minReservationDuration")}
@@ -876,7 +875,6 @@ function ReservationUnitSettings({
         <ControlledSelect
           control={control}
           name="maxReservationDuration"
-          placeholder={t("common.select")}
           required
           options={durationOptions}
           label={t("ReservationUnitEditor.label.maxReservationDuration")}
@@ -887,7 +885,6 @@ function ReservationUnitSettings({
           control={control}
           name="reservationsMaxDaysBefore"
           options={reservationsMaxDaysBeforeOptions}
-          placeholder={t("common.select")}
           required
           label={t("ReservationUnitEditor.label.reservationsMaxDaysBefore")}
           error={getTranslatedError(
@@ -906,7 +903,6 @@ function ReservationUnitSettings({
         <ControlledSelect
           control={control}
           name="reservationStartInterval"
-          placeholder={t("common.select")}
           options={reservationStartIntervalOptions}
           required
           error={getTranslatedError(
@@ -1085,52 +1081,66 @@ function ReservationUnitSettings({
   );
 }
 
+function PricingControl({
+  pricing,
+  form,
+  taxPercentageOptions,
+}: {
+  form: UseFormReturn<ReservationUnitEditFormValues>;
+  pricing: ReservationUnitEditFormValues["pricings"][0];
+  taxPercentageOptions: TaxOption[];
+}) {
+  const { t } = useTranslation();
+  return (
+    <FieldGroup
+      key={`pricing-${pricing.pk}`}
+      heading={t("ReservationUnitEditor.label.pricingType")}
+      required
+      tooltip={t("ReservationUnitEditor.tooltip.pricingType")}
+      style={{ gridColumn: "1 / -1" }}
+    >
+      <PricingTypeView
+        pk={pricing.pk}
+        form={form}
+        taxPercentageOptions={taxPercentageOptions}
+      />
+    </FieldGroup>
+  );
+}
+
 function PricingSection({
   form,
   taxPercentageOptions,
   pricingTermsOptions,
 }: {
   form: UseFormReturn<ReservationUnitEditFormValues>;
-  taxPercentageOptions: { value: number; label: string }[];
+  taxPercentageOptions: TaxOption[];
   pricingTermsOptions: { value: string; label: string }[];
 }) {
   const { t } = useTranslation();
   const { control, watch, formState } = form;
   const { errors } = formState;
 
-  const isFuturePriceVisible = watch("hasFuturePricing");
-  const isPaid =
-    watch("pricings")
-      .filter((p) => p?.pricingType === "PAID")
-      .filter((p) => p.status === Status.Active || isFuturePriceVisible)
-      .length > 0;
-
+  const pricings = watch("pricings");
+  const isPaid = pricings.filter((p) => p.isPaid).length > 0;
   const hasErrors = errors.pricings != null || errors.paymentTypes != null;
+
   return (
     <Accordion
       open={hasErrors}
       heading={t("ReservationUnitEditor.label.pricings")}
     >
-      <VerticalFlex>
-        {watch("pricings").map(
-          (pricing, index) =>
-            pricing?.status === Status.Active && (
-              <FieldGroup
-                // eslint-disable-next-line react/no-array-index-key -- TODO refactor to use pk / fake pks
-                key={index}
-                id="pricings"
-                heading={`${t("ReservationUnitEditor.label.pricingType")} *`}
-                tooltip={t("ReservationUnitEditor.tooltip.pricingType")}
-              >
-                <PricingTypeView
-                  // TODO form index is bad, use pk or form key
-                  index={index}
-                  form={form}
-                  taxPercentageOptions={taxPercentageOptions}
-                />
-              </FieldGroup>
-            )
-        )}
+      <AutoGrid>
+        {watch("pricings")
+          .filter((p) => !p.isFuture)
+          .map((pricing) => (
+            <PricingControl
+              key={pricing.pk}
+              form={form}
+              pricing={pricing}
+              taxPercentageOptions={taxPercentageOptions}
+            />
+          ))}
         <Controller
           control={control}
           name="hasFuturePricing"
@@ -1138,31 +1148,23 @@ function PricingSection({
             <Checkbox
               checked={value}
               onChange={() => onChange(!value)}
-              label={t("ReservationUnitEditor.label.priceChange")}
+              label={t("ReservationUnitEditor.label.hasFuturePrice")}
               id="hasFuturePrice"
+              style={{ gridColumn: "1 / -1" }}
             />
           )}
         />
         {watch("hasFuturePricing") &&
-          watch("pricings").map(
-            (pricing, index) =>
-              pricing.status === Status.Future && (
-                <FieldGroup
-                  // eslint-disable-next-line react/no-array-index-key -- TODO refactor to use pk / fake pks
-                  key={index}
-                  id="pricings"
-                  heading={`${t("ReservationUnitEditor.label.pricingType")} *`}
-                  tooltip={t("ReservationUnitEditor.tooltip.pricingType")}
-                >
-                  <PricingTypeView
-                    // TODO form index is bad, use pk or form key
-                    index={index}
-                    form={form}
-                    taxPercentageOptions={taxPercentageOptions}
-                  />
-                </FieldGroup>
-              )
-          )}
+          watch("pricings")
+            .filter((p) => p.isFuture)
+            .map((pricing) => (
+              <PricingControl
+                key={pricing.pk}
+                form={form}
+                pricing={pricing}
+                taxPercentageOptions={taxPercentageOptions}
+              />
+            ))}
         {isPaid && (
           // TODO this should be outside the pricing type because it's reservation unit wide
           <HorisontalFlex style={{ justifyContent: "space-between" }}>
@@ -1188,7 +1190,6 @@ function PricingSection({
             control={control}
             name="pricingTerms"
             label={t("ReservationUnitEditor.label.pricingTerms")}
-            placeholder={t("common.select")}
             required
             clearable
             options={pricingTermsOptions}
@@ -1196,7 +1197,7 @@ function PricingSection({
             tooltip={t("ReservationUnitEditor.tooltip.pricingTerms")}
           />
         )}
-      </VerticalFlex>
+      </AutoGrid>
     </Accordion>
   );
 }
@@ -1396,19 +1397,20 @@ function OpeningHoursSection({
   reservationUnit: Node | undefined;
   previewUrlPrefix: string;
 }) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(undefined, {
+    keyPrefix: "ReservationUnitEditor",
+  });
 
   const previewUrl = `${previewUrlPrefix}/${reservationUnit?.pk}?ru=${reservationUnit?.uuid}#calendar`;
   const previewDisabled =
     previewUrlPrefix === "" || !reservationUnit?.pk || !reservationUnit?.uuid;
 
-  // TODO refactor this to inner wrapper (so we don't have a ternary in the middle)
   return (
-    <Accordion heading={t("ReservationUnitEditor.openingHours")}>
+    <Accordion heading={t("openingHours")}>
       {reservationUnit?.haukiUrl ? (
         <AutoGrid>
           <p style={{ gridColumn: "1 / -1" }}>
-            {t("ReservationUnitEditor.openingHoursHelperTextHasLink")}
+            {t("openingHoursHelperTextHasLink")}
           </p>
           <ButtonLikeLink
             disabled={!reservationUnit?.haukiUrl}
@@ -1417,7 +1419,7 @@ function OpeningHoursSection({
             fontSize="small"
             rel="noopener noreferrer"
           >
-            {t("ReservationUnitEditor.openingTimesExternalLink")}
+            {t("openingTimesExternalLink")}
             <IconLinkExternal style={{ marginLeft: "var(--spacing-xs)" }} />
           </ButtonLikeLink>
           <ButtonLikeLink
@@ -1427,12 +1429,12 @@ function OpeningHoursSection({
             fontSize="small"
             rel="noopener noreferrer"
           >
-            {t("ReservationUnitEditor.previewCalendarLink")}
+            {t("previewCalendarLink")}
             <IconLinkExternal style={{ marginLeft: "var(--spacing-xs)" }} />
           </ButtonLikeLink>
         </AutoGrid>
       ) : (
-        <p>{t("ReservationUnitEditor.openingHoursHelperTextNoLink")}</p>
+        <p>{t("openingHoursHelperTextNoLink")}</p>
       )}
     </Accordion>
   );
@@ -1458,27 +1460,27 @@ function DescriptionSection({
   const equipmentOptions = filterNonNullable(
     equipments?.edges.map((n) => n?.node)
   ).map((n) => ({
-    value: n?.pk ?? -1,
-    label: n?.nameFi ?? "no-name",
+    value: n.pk ?? -1,
+    label: n.nameFi ?? "no-name",
   }));
 
   const purposeOptions = filterNonNullable(
     purposes?.edges.map((n) => n?.node)
   ).map((n) => ({
-    value: n?.pk ?? -1,
-    label: n?.nameFi ?? "no-name",
+    value: n.pk ?? -1,
+    label: n.nameFi ?? "no-name",
   }));
   const qualifierOptions = filterNonNullable(
     qualifiers?.edges.map((n) => n?.node)
   ).map((n) => ({
-    value: n?.pk ?? -1,
-    label: n?.nameFi ?? "no-name",
+    value: n.pk ?? -1,
+    label: n.nameFi ?? "no-name",
   }));
   const reservationUnitTypeOptions = filterNonNullable(
     reservationUnitTypes?.edges.map((n) => n?.node)
   ).map((n) => ({
-    value: n?.pk ?? -1,
-    label: n?.nameFi ?? "no-name",
+    value: n.pk ?? -1,
+    label: n.nameFi ?? "no-name",
   }));
 
   const hasErrors =
@@ -1679,8 +1681,9 @@ function ReservationUnitEditor({
   const taxPercentageOptions = filterNonNullable(
     parametersData?.taxPercentages?.edges.map((e) => e?.node)
   ).map((n) => ({
-    value: n?.pk ?? -1,
-    label: n?.value.toString(),
+    value: Number(n.value),
+    pk: n.pk ?? -1,
+    label: n.value,
   }));
   const serviceSpecificTermsOptions = makeTermsOptions(
     parametersData,
@@ -1707,8 +1710,7 @@ function ReservationUnitEditor({
 
   // ----------------------------- Callbacks ----------------------------------
   const onSubmit = async (formValues: ReservationUnitEditFormValues) => {
-    const input = transformReservationUnit(formValues);
-    const { pk } = input ?? {};
+    const { pk, ...input } = transformReservationUnit(formValues);
     try {
       const promise =
         pk != null
@@ -1770,36 +1772,15 @@ function ReservationUnitEditor({
       refetch();
       return upPk;
     } catch (error) {
-      if (
-        error != null &&
-        typeof error === "object" &&
-        "graphQLErrors" in error
-      ) {
-        const { graphQLErrors } = error;
-        if (Array.isArray(graphQLErrors) && graphQLErrors.length > 0) {
-          if ("extensions" in graphQLErrors[0]) {
-            const { extensions } = graphQLErrors[0];
-            if ("errors" in extensions) {
-              const { errors } = extensions;
-              if (Array.isArray(errors) && errors.length > 0) {
-                let str = "";
-                for (const e of errors) {
-                  if ("message" in e) {
-                    str += `${e.message}\n`;
-                  }
-                }
-                errorToast({
-                  text: t("ReservationUnitEditor.saveFailed", { error: str }),
-                });
-                return undefined;
-              }
-            }
-          }
-        }
+      const validationErrors = getValidationErrors(error);
+      if (validationErrors.length > 0) {
+        const validationError = validationErrors[0];
+        errorToast({
+          text: t(`errors.backendValidation.${validationError.code}`),
+        });
+      } else {
+        errorToast({ text: t("ReservationDialog.saveFailed") });
       }
-      errorToast({
-        text: t("ReservationUnitEditor.saveFailed", { error: "" }),
-      });
     }
     return undefined;
   };

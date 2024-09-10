@@ -84,7 +84,11 @@ export const autoGridCss = css`
   gap: var(--spacing-m);
 `;
 
-export const AutoGrid = styled.div<{ $minWidth?: string; $largeGap?: boolean }>`
+export const AutoGrid = styled.div<{
+  $minWidth?: string;
+  $largeGap?: boolean;
+  $alignCenter?: boolean;
+}>`
   display: grid;
   grid-template-columns: repeat(
     auto-fill,
@@ -94,7 +98,7 @@ export const AutoGrid = styled.div<{ $minWidth?: string; $largeGap?: boolean }>`
       1fr
     )
   );
-  align-items: baseline;
+  align-items: ${({ $alignCenter }) => ($alignCenter ? "center" : "baseline")};
   gap: ${({ $largeGap }) =>
       $largeGap ? " var(--spacing-xl)" : "var(--spacing-m)"}
     var(--spacing-m);

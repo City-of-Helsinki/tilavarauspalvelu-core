@@ -222,6 +222,16 @@ const translations: ITranslations = {
         "Ei pystytty luomaan varauksia yli 2 vuoden päähän",
       ],
       RESERVATION_SERIES_ALREADY_STARTED: ["Toistuva varaus on jo alkanut"],
+      RESERVATION_UNIT_PRICINGS_MISSING: [
+        "Varausyksiköllä ei ole hinnoittelua",
+      ],
+      RESERVATION_UNIT_PRICINGS_NO_ACTIVE_PRICINGS: [
+        "Varausyksiköllä ei ole aktiivisia hinnoitteluita",
+      ],
+      RESERVATION_UNIT_PRICINGS_DUPLICATE_DATE: ["Päivämäärä on jo käytössä"],
+      RESERVATION_UNIT_PRICINGS_INVALID_PRICES: [
+        "Hinnoittelussa on virheellisiä hintoja",
+      ],
     },
     descriptive: {
       "Reservation overlaps with reservation before due to buffer time.": [
@@ -1334,10 +1344,11 @@ const translations: ITranslations = {
       pricingType: ["Varausyksikön maksullisuus"],
       pricingTerms: ["Hinnoitteluperiaate"],
       pricingTypes: {
-        PAID: ["Maksullinen"],
-        FREE: ["Maksuton"],
+        paid: ["Maksullinen"],
+        free: ["Maksuton"],
       },
-      priceChange: ["Hintaan on tulossa muutos"],
+      hasFuturePrice: ["Hintaan on tulossa muutos"],
+      begins: ["Alkaa"],
       openingTime: ["Alkamisaika"],
       closingTime: ["Päättymisaika"],
     },
@@ -1412,12 +1423,6 @@ const translations: ITranslations = {
       description: [
         `Kuvaus kirjoitetaan standardointipohjan mukaisesti.
       Lisää linkkejä ulkoisille verkkosivuille kuten käyttöohjeisiin vain tarvittaessa. Tarkista linkkien toimivuus ja saavutettavuus säännöllisesti. Käytäthän muotoiluja harkiten. `,
-      ],
-      images: [
-        `Liitä vähintään kolme kuvaa. Kuvien tulisi olla todenmukaisia ja hyvälaatuisia.
-      Suositus:
-      lisää ensisijaisesti vaakatasossa kuvattuja kuvia, ei kuitenkaan panoramoja. jpeg/jpg ja png, max 1 M
-      Kuvissa näkyviltä ihmisiltä tulee olla kuvauslupa. Kuvissa ei saa näkyä turvakameroita.`,
       ],
       publishingSettings: [
         `Voit ajastaa varausyksikön julkaistavaksi tai piilotettavaksi asiakkailta tiettynä ajankohtana.`,
@@ -1705,6 +1710,12 @@ const translations: ITranslations = {
     deleteImage: ["Poista"],
     mainImage: ["Pääkuva"],
     useAsMainImage: ["Käytä pääkuvana"],
+    tooltip: [
+      `Liitä vähintään kolme kuvaa. Kuvien tulisi olla todenmukaisia ja hyvälaatuisia.
+      Suositus:
+      lisää ensisijaisesti vaakatasossa kuvattuja kuvia, ei kuitenkaan panoramoja. jpeg/jpg ja png, max 1 M
+      Kuvissa näkyviltä ihmisiltä tulee olla kuvauslupa. Kuvissa ei saa näkyä turvakameroita.`,
+    ],
   },
   priceUnit: {
     FIXED: ["Per kerta"],

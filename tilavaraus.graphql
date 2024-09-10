@@ -1839,20 +1839,6 @@ enum PriceUnit {
 """
 An enumeration.
 """
-enum PricingType {
-  """
-  Maksuton
-  """
-  FREE
-  """
-  Maksullinen
-  """
-  PAID
-}
-
-"""
-An enumeration.
-"""
 enum Priority {
   PRIMARY
   SECONDARY
@@ -4493,8 +4479,6 @@ type ReservationUnitPricingNode implements Node {
   lowestPriceNet: Decimal
   pk: Int
   priceUnit: PriceUnit!
-  pricingType: PricingType
-  status: Status!
   taxPercentage: TaxPercentageNode!
 }
 
@@ -4502,12 +4486,11 @@ input ReservationUnitPricingSerializerInput {
   begins: Date!
   highestPrice: Decimal
   highestPriceNet: String
+  isActivatedOnBegins: Boolean
   lowestPrice: Decimal
   lowestPriceNet: String
   pk: Int
   priceUnit: PriceUnit
-  pricingType: PricingType
-  status: Status!
   taxPercentage: Int
 }
 
@@ -5228,17 +5211,33 @@ An enumeration.
 """
 enum Status {
   """
-  aktiivinen
+  Peruttu
   """
-  ACTIVE
+  CANCELLED
   """
-  tuleva
+  Luonnos
   """
-  FUTURE
+  DRAFT
   """
-  mennyt
+  Rauennut
   """
-  PAST
+  EXPIRED
+  """
+  Käsitelty
+  """
+  HANDLED
+  """
+  Käsittelyssä
+  """
+  IN_ALLOCATION
+  """
+  Vastaanotettu
+  """
+  RECEIVED
+  """
+  Päätökset lähetetty
+  """
+  RESULT_SENT
 }
 
 type SuitableTimeRangeNode implements Node {
@@ -5813,12 +5812,11 @@ input UpdateReservationUnitPricingSerializerInput {
   begins: Date
   highestPrice: Decimal
   highestPriceNet: String
+  isActivatedOnBegins: Boolean
   lowestPrice: Decimal
   lowestPriceNet: String
   pk: Int
   priceUnit: PriceUnit
-  pricingType: PricingType
-  status: Status
   taxPercentage: Int
 }
 

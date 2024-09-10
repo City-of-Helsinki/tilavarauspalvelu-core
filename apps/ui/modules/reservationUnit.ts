@@ -18,9 +18,7 @@ import {
 import {
   ReservationUnitPublishingState,
   type ReservationUnitNode,
-  PricingType,
   PriceUnit,
-  Status,
   type EquipmentFieldsFragment,
   type PriceReservationUnitFragment,
   type UnitNode,
@@ -43,6 +41,8 @@ import {
 import { type PricingFieldsFragment } from "common/gql/gql-types";
 import { gql } from "@apollo/client";
 import { getIntervalMinutes } from "common/src/conversion";
+import { isPriceFree } from "common/src/helpers";
+import { type TFunction } from "i18next";
 
 function formatTimeObject(time: { h: number; m: number }): string {
   return `${time.h.toString().padStart(2, "0")}:${time.m.toString().padStart(2, "0")}`;
@@ -185,11 +185,18 @@ export function getReservationUnitInstructionsKey(
   }
 }
 
+function isActivePricing(pricing: PricingFieldsFragment): boolean {
+  return new Date(pricing.begins) <= new Date();
+}
+function isFuturePricing(pricing: PricingFieldsFragment): boolean {
+  return new Date(pricing.begins) > new Date();
+}
+
 export function getActivePricing(reservationUnit: {
   pricings: PricingFieldsFragment[];
 }): PricingFieldsFragment | undefined {
   const { pricings } = reservationUnit;
-  return pricings.find((pricing) => pricing.status === Status.Active);
+  return pricings.find((pricing) => isActivePricing(pricing));
 }
 
 export const RESERVATION_INFO_CARD_FRAGMENT = gql`
@@ -216,29 +223,22 @@ export function getFuturePricing(
     return null;
   }
 
-  const now = toUIDate(new Date(), "yyyy-MM-dd");
-
-  const part = pricings
-    .filter((pricing) => pricing.status === Status.Future)
-    .filter((x): x is NonNullable<typeof x> => x != null);
-  const futurePricings = part
-    .filter((futurePricing) => futurePricing.begins > now)
+  const futurePricings = pricings
+    .filter((p) => isFuturePricing(p))
     .filter((futurePricing) => {
-      const start = new Date(futurePricing.begins);
       return isSlotWithinReservationTime(
-        start,
+        new Date(futurePricing.begins),
         reservationBegins ? new Date(reservationBegins) : undefined,
         reservationEnds ? new Date(reservationEnds) : undefined
       );
     })
     .filter((futurePricing) => {
-      if (futurePricing.begins == null) {
-        return false;
-      }
       return !applicationRounds.some((applicationRound) => {
         const { reservationPeriodBegin, reservationPeriodEnd } =
           applicationRound;
-        if (!reservationPeriodBegin || !reservationPeriodEnd) return false;
+        if (!reservationPeriodBegin || !reservationPeriodEnd) {
+          return false;
+        }
         const begins = new Date(futurePricing.begins);
         const periodStart = new Date(reservationPeriodBegin);
         const periodEnd = new Date(reservationPeriodEnd);
@@ -270,32 +270,21 @@ function formatPrice(price: number, toCurrency?: boolean): string {
 }
 
 export type GetPriceType = {
+  t: TFunction;
   pricing: PricingFieldsFragment;
   minutes?: number; // additional minutes for total price calculation
 };
 
-function isPriceZero(pricing: PricingFieldsFragment): boolean {
-  if (
-    pricing.pricingType == null ||
-    pricing.pricingType === PricingType.Free ||
-    (pricing.pricingType === PricingType.Paid &&
-      parseFloat(pricing.highestPrice) === 0)
-  ) {
-    return true;
-  }
-  return false;
-}
-
 // TODO rewrite this return number normally
 // and a separate function to format it to string
 export function getPriceString(props: GetPriceType): string {
-  const { pricing, minutes } = props;
+  const { t, pricing, minutes = 0 } = props;
 
-  if (isPriceZero(pricing)) {
-    return i18n?.t("prices:priceFree") ?? "0";
+  if (isPriceFree(pricing)) {
+    return t("prices:priceFree") ?? "0";
   }
 
-  const volume = getReservationVolume(minutes ?? 0, pricing.priceUnit);
+  const volume = getReservationVolume(minutes, pricing.priceUnit);
   const highestPrice = parseFloat(pricing.highestPrice) * volume;
   const lowestPrice = parseFloat(pricing.lowestPrice) * volume;
   const priceString =
@@ -305,11 +294,12 @@ export function getPriceString(props: GetPriceType): string {
   const unitString =
     pricing.priceUnit === PriceUnit.Fixed || minutes
       ? ""
-      : i18n?.t(`prices:priceUnits.${pricing.priceUnit}`);
+      : t(`prices:priceUnits.${pricing.priceUnit}`);
   return trim(`${priceString} / ${unitString}`, " / ");
 }
 
 export type GetReservationUnitPriceProps = {
+  t: TFunction;
   reservationUnit: PriceReservationUnitFragment;
   pricingDate: Date;
   minutes?: number;
@@ -318,7 +308,7 @@ export type GetReservationUnitPriceProps = {
 export function getReservationUnitPrice(
   props: GetReservationUnitPriceProps
 ): string | null {
-  const { reservationUnit: ru, pricingDate, minutes } = props;
+  const { t, reservationUnit: ru, pricingDate, minutes } = props;
   if (Number.isNaN(pricingDate.getTime())) {
     // eslint-disable-next-line no-console
     console.warn("Invalid pricing date", pricingDate);
@@ -342,6 +332,7 @@ export function getReservationUnitPrice(
   }
 
   return getPriceString({
+    t,
     pricing,
     minutes,
   });
@@ -358,8 +349,8 @@ export function isReservationUnitPaid(
   pricings: PricingFieldsFragment[],
   date?: Date
 ): boolean {
-  const active = pricings.filter((p) => p.status === Status.Active);
-  const future = pricings.filter((p) => p.status === Status.Future);
+  const active = pricings.filter((p) => isActivePricing(p));
+  const future = pricings.filter((p) => isFuturePricing(p));
   const d =
     date == null
       ? active
@@ -367,22 +358,7 @@ export function isReservationUnitPaid(
           const start = new Date(p.begins);
           return start <= date;
         });
-  return (
-    d
-      .filter((p) => p.pricingType === PricingType.Paid)
-      .filter((p) => !isPriceZero(p)).length > 0
-  );
-}
-
-export function isReservationUnitPaidInFuture(
-  pricings: PricingFieldsFragment[]
-): boolean {
-  return (
-    pricings
-      .filter((p) => p.status === Status.Future || p.status === Status.Active)
-      .filter((p) => p.pricingType === PricingType.Paid)
-      .filter((p) => !isPriceZero(p)).length > 0
-  );
+  return d.filter((p) => !isPriceFree(p)).length > 0;
 }
 
 /// Returns true if the given time is 'inside' the time span

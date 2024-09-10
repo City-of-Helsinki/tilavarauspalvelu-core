@@ -155,7 +155,7 @@ function Head({
   const maxReservationDuration = formatDuration(maxDur / 60, t, true);
 
   const pricing = getActivePricing(reservationUnit);
-  const unitPrice = pricing ? getPriceString({ pricing }) : undefined;
+  const unitPrice = pricing ? getPriceString({ t, pricing }) : undefined;
 
   const isPaid = isReservationUnitPaid(reservationUnit.pricings);
   const hasSubventionSuffix = pricing && isPaid && subventionSuffix != null;

@@ -312,6 +312,7 @@ export function ReservationCalendarControls({
   const price =
     dateValue != null && duration != null
       ? getReservationUnitPrice({
+          t,
           reservationUnit,
           pricingDate: dateValue,
           minutes: duration,

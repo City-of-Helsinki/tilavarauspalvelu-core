@@ -13,10 +13,8 @@ import {
   type EquipmentNode,
   ReservationStateChoice,
   PriceUnit,
-  PricingType,
   ReservationUnitPublishingState,
   type ReservationUnitNode,
-  Status,
   Authentication,
   ReservationKind,
   ReservationStartInterval,
@@ -35,22 +33,23 @@ import {
   getReservationUnitName,
   getReservationUnitPrice,
   getUnitName,
-  isReservationUnitPaidInFuture,
   isReservationUnitPublished,
   isReservationUnitReservable,
-  GetPriceType,
+  type GetPriceType,
 } from "../reservationUnit";
 import mockTranslations from "../../public/locales/fi/prices.json";
 import { type ReservableMap, dateToKey, type RoundPeriod } from "../reservable";
 import { createMockReservationUnit } from "@/test/testUtils";
 import { base64encode } from "common/src/helpers";
+import { type TFunction } from "i18next";
 
+function mockT(str: string): ReturnType<TFunction> {
+  const path = str.replace("prices:", "");
+  return mockGet(mockTranslations, path);
+}
 jest.mock("next-i18next", () => ({
   i18n: {
-    t: (str: string) => {
-      const path = str.replace("prices:", "");
-      return mockGet(mockTranslations, path);
-    },
+    t: mockT,
     language: "fi",
   },
 }));
@@ -220,6 +219,7 @@ describe("getPriceString", () => {
     minutes?: number;
   }): GetPriceType {
     return {
+      t: mockT as TFunction,
       pricing: constructPricing({
         lowestPrice,
         highestPrice,
@@ -382,157 +382,103 @@ describe("getPriceString", () => {
 
 describe("isReservationUnitPublished", () => {
   test("without state", () => {
-    expect(isReservationUnitPublished({} as ReservationUnitNode)).toBe(false);
+    expect(isReservationUnitPublished({})).toBe(false);
   });
 
   test("with valid states", () => {
-    expect(
-      isReservationUnitPublished({
-        publishingState: ReservationUnitPublishingState.Published,
-      })
-    ).toBe(true);
-
-    expect(
-      isReservationUnitPublished({
-        publishingState: ReservationUnitPublishingState.ScheduledHiding,
-      })
-    ).toBe(true);
+    const input1 = {
+      publishingState: ReservationUnitPublishingState.Published,
+    };
+    expect(isReservationUnitPublished(input1)).toBe(true);
+    const input2 = {
+      publishingState: ReservationUnitPublishingState.ScheduledHiding,
+    };
+    expect(isReservationUnitPublished(input2)).toBe(true);
   });
 
   test("with invalid states", () => {
-    expect(
-      isReservationUnitPublished({
-        publishingState: ReservationUnitPublishingState.Archived,
-      })
-    ).toBe(false);
+    const archived = {
+      publishingState: ReservationUnitPublishingState.Archived,
+    };
+    expect(isReservationUnitPublished(archived)).toBe(false);
 
-    expect(
-      isReservationUnitPublished({
-        publishingState: ReservationUnitPublishingState.Draft,
-      })
-    ).toBe(false);
+    const draft = { publishingState: ReservationUnitPublishingState.Draft };
+    expect(isReservationUnitPublished(draft)).toBe(false);
 
-    expect(
-      isReservationUnitPublished({
-        publishingState: ReservationUnitPublishingState.Hidden,
-      })
-    ).toBe(false);
+    const hidden = { publishingState: ReservationUnitPublishingState.Hidden };
+    expect(isReservationUnitPublished(hidden)).toBe(false);
 
-    expect(
-      isReservationUnitPublished({
-        publishingState: ReservationUnitPublishingState.ScheduledPeriod,
-      })
-    ).toBe(false);
+    const scheduled = {
+      publishingState: ReservationUnitPublishingState.ScheduledPeriod,
+    };
+    expect(isReservationUnitPublished(scheduled)).toBe(false);
 
-    expect(
-      isReservationUnitPublished({
-        publishingState: ReservationUnitPublishingState.ScheduledPublishing,
-      })
-    ).toBe(false);
+    const scheduled2 = {
+      publishingState: ReservationUnitPublishingState.ScheduledPublishing,
+    };
+    expect(isReservationUnitPublished(scheduled2)).toBe(false);
   });
 });
 
-describe("getEquipmentCategories", () => {
-  test("with equipment out of predefined order", () => {
-    const equipment: EquipmentNode[] = [
-      {
-        id: "1",
-        nameFi: "Item A",
-        name: "Item A",
-        category: {
-          id: "1",
-          nameFi: "Category A",
-          name: "Category A",
-        },
-      },
-      {
-        id: "2",
-        nameFi: "Item B",
-        name: "Item B",
-        category: {
-          id: "2",
-          nameFi: "Category B",
-          name: "Category B",
-        },
-      },
-      {
-        id: "3",
-        nameFi: "Item C",
-        name: "Item C",
-        category: {
-          id: "3",
-          nameFi: "Category C",
-          name: "Category C",
-        },
-      },
-    ];
+function constructEquipmentNode({
+  name,
+  categoryName,
+}: {
+  name: string;
+  categoryName?: string;
+}): EquipmentNode {
+  const cat = categoryName || name;
+  return {
+    id: name,
+    nameFi: name,
+    name,
+    category: {
+      id: cat,
+      nameFi: cat,
+      name: cat,
+    },
+  };
+}
 
+describe("getEquipmentCategories", () => {
+  test("empty equipments list", () => {
+    expect(getEquipmentCategories([])).toStrictEqual([]);
+  });
+
+  test("with equipment out of predefined order", () => {
+    const equipment: EquipmentNode[] = ["Item A", "Item B", "Item C"].map(
+      (name) => constructEquipmentNode({ name })
+    );
     expect(getEquipmentCategories(equipment)).toStrictEqual(["Muu"]);
   });
 
   test("with equipment in predefined order", () => {
     const equipment: EquipmentNode[] = [
       {
-        id: "1",
-        nameFi: "Item A",
         name: "Item A",
-        category: {
-          id: "1",
-          nameFi: "Liittimet",
-          name: "Liittimet",
-        },
+        categoryName: "Liittimet",
       },
       {
-        id: "2",
-        nameFi: "Item B",
         name: "Item B",
-        category: {
-          id: "2",
-          nameFi: "Keittiö",
-          name: "Keittiö",
-        },
+        categoryName: "Keittiö",
       },
       {
-        id: "3",
-        nameFi: "Item C",
         name: "Item C",
-        category: {
-          id: "3",
-          nameFi: "Foobar",
-          name: "Foobar",
-        },
+        categoryName: "Foobar",
       },
       {
-        id: "4",
-        nameFi: "Item D",
         name: "Item D",
-        category: {
-          id: "4",
-          nameFi: "Pelikonsoli",
-          name: "Pelikonsoli",
-        },
+        categoryName: "Pelikonsoli",
       },
       {
-        id: "5",
-        nameFi: "Item ABC 2",
         name: "Item ABC 2",
-        category: {
-          id: "2",
-          nameFi: "Keittiö",
-          name: "Keittiö",
-        },
+        categoryName: "Keittiö",
       },
       {
-        id: "6",
-        nameFi: "Item ABC 1",
         name: "Item ABC 1",
-        category: {
-          id: "2",
-          nameFi: "Keittiö",
-          name: "Keittiö",
-        },
+        categoryName: "Keittiö",
       },
-    ];
+    ].map(constructEquipmentNode);
 
     expect(getEquipmentCategories(equipment)).toStrictEqual([
       "Keittiö",
@@ -541,47 +487,17 @@ describe("getEquipmentCategories", () => {
       "Muu",
     ]);
   });
-
-  test("without categories", () => {
-    expect(getEquipmentCategories([])).toStrictEqual([]);
-  });
 });
 
 describe("getEquipmentList", () => {
-  test("with equipment out of predefined order", () => {
-    const equipment: EquipmentNode[] = [
-      {
-        id: "1",
-        nameFi: "Item A",
-        name: "Item A",
-        category: {
-          id: "1",
-          nameFi: "Category A",
-          name: "Category A",
-        },
-      },
-      {
-        id: "2",
-        nameFi: "Item B",
-        name: "Item B",
-        category: {
-          id: "2",
-          nameFi: "Category B",
-          name: "Category B",
-        },
-      },
-      {
-        id: "3",
-        nameFi: "Item C",
-        name: "Item C",
-        category: {
-          id: "3",
-          nameFi: "Category C",
-          name: "Category C",
-        },
-      },
-    ];
+  test("empty equipments list", () => {
+    expect(getEquipmentList([])).toStrictEqual([]);
+  });
 
+  test("with equipment out of predefined order", () => {
+    const equipment: EquipmentNode[] = ["Item A", "Item B", "Item C"].map(
+      (name) => constructEquipmentNode({ name })
+    );
     expect(getEquipmentList(equipment)).toStrictEqual([
       "Item A",
       "Item B",
@@ -590,39 +506,9 @@ describe("getEquipmentList", () => {
   });
 
   test("with equipment out of predefined order", () => {
-    const equipment: EquipmentNode[] = [
-      {
-        id: "1",
-        nameFi: "Item A",
-        name: "Item A",
-        category: {
-          id: "1",
-          nameFi: "Category C",
-          name: "Category C",
-        },
-      },
-      {
-        id: "2",
-        nameFi: "Item B",
-        name: "Item B",
-        category: {
-          id: "2",
-          nameFi: "Category B",
-          name: "Category B",
-        },
-      },
-      {
-        id: "3",
-        nameFi: "Item C",
-        name: "Item C",
-        category: {
-          id: "3",
-          nameFi: "Category A",
-          name: "Category A",
-        },
-      },
-    ];
-
+    const equipment: EquipmentNode[] = ["Item A", "Item B", "Item C"].map(
+      (name) => constructEquipmentNode({ name })
+    );
     expect(getEquipmentList(equipment)).toStrictEqual([
       "Item A",
       "Item B",
@@ -713,10 +599,6 @@ describe("getEquipmentList", () => {
       "Item C 1",
       "Item C 2",
     ]);
-  });
-
-  test("without equipment", () => {
-    expect(getEquipmentList([])).toStrictEqual([]);
   });
 });
 
@@ -867,8 +749,6 @@ describe("getFuturePricing", () => {
           begins: date,
           lowestPrice: 0,
           highestPrice: 10,
-          status: Status.Future,
-          pricingType: PricingType.Paid,
         })
       ),
     };
@@ -892,16 +772,12 @@ describe("getFuturePricing", () => {
   });
 
   test("should return undefined if no future pricing", () => {
-    const data = constructInput({ days });
-    expect(getFuturePricing(data)).toEqual(data.pricings[2]);
-
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    data.pricings[0]!.status = Status.Past;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    data.pricings[1]!.status = Status.Active;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    data.pricings[2]!.status = Status.Past;
-    expect(getFuturePricing(data)).toBeNull();
+    const d1 = constructInput({ days });
+    expect(getFuturePricing(d1)).toEqual(d1.pricings[2]);
+    const d2 = constructInput({
+      days: [addDays(new Date(), -1)],
+    });
+    expect(getFuturePricing(d2)).toBeNull();
   });
 
   test("with reservation begin time", () => {
@@ -993,23 +869,18 @@ function constructPricing({
   highestPrice,
   taxPercentage,
   begins,
-  status,
-  pricingType,
   priceUnit,
 }: {
   begins?: Date;
   lowestPrice?: number;
   highestPrice?: number;
   taxPercentage?: number;
-  status?: Status;
-  pricingType?: PricingType;
   priceUnit?: PriceUnit;
 }): NonNullable<PriceReservationUnitFragment>["pricings"][0] {
   const p = highestPrice ?? lowestPrice ?? 0;
   return {
     id: "1",
     begins: toApiDateUnsafe(begins ?? new Date()),
-    pricingType: pricingType ?? PricingType.Paid,
     priceUnit: priceUnit ?? PriceUnit.PerHour,
     lowestPrice: lowestPrice?.toString() ?? p.toString(),
     highestPrice: highestPrice?.toString() ?? p.toString(),
@@ -1017,7 +888,6 @@ function constructPricing({
       id: "1",
       value: (taxPercentage ?? 24).toString(),
     },
-    status: status ?? Status.Future,
   };
 }
 
@@ -1038,6 +908,7 @@ describe("getReservationUnitPrice", () => {
     date: Date;
   }): GetReservationUnitPriceProps {
     return {
+      t: mockT as TFunction,
       pricingDate: date,
       reservationUnit: {
         pricings: [
@@ -1064,7 +935,6 @@ describe("getReservationUnitPrice", () => {
             lowestPrice: 0,
             highestPrice: 10,
             taxPercentage: 24,
-            status: Status.Active,
           }),
         ],
       },
@@ -1074,7 +944,6 @@ describe("getReservationUnitPrice", () => {
   test("returns future data based on date lookup", () => {
     const input = connstructInput({ date: addDays(new Date(), 5) });
     expect(getReservationUnitPrice(input)).toEqual("40,00 - 50,00 € / tunti");
-
     const input2 = connstructInput({ date: addDays(new Date(), 11) });
     expect(getReservationUnitPrice(input2)).toEqual("10,00 - 20,00 € / tunti");
   });
@@ -1083,19 +952,18 @@ describe("getReservationUnitPrice", () => {
     const date = addDays(new Date(), 15);
     const input = {
       pricingDate: date,
+      t: mockT as TFunction,
       reservationUnit: {
         pricings: [
           constructPricing({
             begins: addDays(new Date(), -10),
             highestPrice: 20,
             taxPercentage: 24,
-            status: Status.Active,
           }),
           constructPricing({
             begins: addDays(new Date(), 10),
             highestPrice: 25,
             taxPercentage: 25.5,
-            status: Status.Future,
           }),
         ],
       },
@@ -1105,126 +973,22 @@ describe("getReservationUnitPrice", () => {
   test("future change in tax for free uses future price", () => {
     const date = addDays(new Date(), 15);
     const input = {
+      t: mockT as TFunction,
       pricingDate: date,
       reservationUnit: {
         pricings: [
           constructPricing({
             begins: addDays(new Date(), -10),
-            status: Status.Active,
-            pricingType: PricingType.Free,
           }),
           constructPricing({
             begins: addDays(new Date(), 10),
             highestPrice: 25,
             taxPercentage: 25.5,
-            status: Status.Future,
           }),
         ],
       },
     };
     expect(getReservationUnitPrice(input)).toBe("25,00 € / tunti");
-  });
-});
-
-describe("isReservationUnitPaidInFuture", () => {
-  it("return true if active and future are paid", () => {
-    const pricings = [
-      constructPricing({
-        begins: addDays(new Date(), 10),
-        lowestPrice: 0,
-        highestPrice: 20,
-        status: Status.Future,
-      }),
-      constructPricing({
-        begins: addDays(new Date(), 20),
-        lowestPrice: 0,
-        highestPrice: 10,
-        status: Status.Active,
-      }),
-    ];
-
-    expect(isReservationUnitPaidInFuture(pricings)).toBe(true);
-  });
-
-  it("return true if only active is paid", () => {
-    const pricings = [
-      constructPricing({
-        begins: addDays(new Date(), 10),
-        lowestPrice: 0,
-        highestPrice: 0,
-        status: Status.Future,
-        pricingType: PricingType.Free,
-      }),
-      constructPricing({
-        begins: addDays(new Date(), 20),
-        lowestPrice: 0,
-        highestPrice: 10,
-        status: Status.Active,
-      }),
-    ];
-
-    expect(isReservationUnitPaidInFuture(pricings)).toBe(true);
-  });
-
-  it("return true if only future one paid", () => {
-    const pricings = [
-      constructPricing({
-        begins: addDays(new Date(), -10),
-        lowestPrice: 0,
-        highestPrice: 0,
-        status: Status.Active,
-        pricingType: PricingType.Free,
-      }),
-      constructPricing({
-        begins: addDays(new Date(), 20),
-        lowestPrice: 0,
-        highestPrice: 20,
-        status: Status.Future,
-      }),
-    ];
-
-    expect(isReservationUnitPaidInFuture(pricings)).toBe(true);
-  });
-
-  it("returns false if future one if paid but price is set in zero", () => {
-    const pricings = [
-      constructPricing({
-        begins: addDays(new Date(), 10),
-        lowestPrice: 0,
-        highestPrice: 0,
-        status: Status.Future,
-      }),
-      constructPricing({
-        begins: addDays(new Date(), 20),
-        lowestPrice: 0,
-        highestPrice: 0,
-        status: Status.Active,
-        pricingType: PricingType.Free,
-      }),
-    ];
-
-    expect(isReservationUnitPaidInFuture(pricings)).toBe(false);
-  });
-
-  it("returns false all are free", () => {
-    const pricings = [
-      constructPricing({
-        begins: addDays(new Date(), 10),
-        lowestPrice: 0,
-        highestPrice: 20,
-        status: Status.Future,
-        pricingType: PricingType.Free,
-      }),
-      constructPricing({
-        begins: addDays(new Date(), 20),
-        lowestPrice: 0,
-        highestPrice: 20,
-        status: Status.Active,
-        pricingType: PricingType.Free,
-      }),
-    ];
-
-    expect(isReservationUnitPaidInFuture(pricings)).toBe(false);
   });
 });
 

@@ -162,6 +162,7 @@ export function EditStep0({
       price: isFree
         ? "0"
         : (getReservationUnitPrice({
+            t,
             reservationUnit,
             pricingDate: start,
             minutes: 0,

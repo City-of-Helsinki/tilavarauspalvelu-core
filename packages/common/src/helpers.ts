@@ -1,5 +1,9 @@
 import { isAfter, isBefore } from "date-fns";
-import { type ImageFragment, type Maybe } from "../gql/gql-types";
+import {
+  PricingFieldsFragment,
+  type ImageFragment,
+  type Maybe,
+} from "../gql/gql-types";
 import { pixel } from "./common/style";
 
 export function filterNonNullable<T>(
@@ -10,7 +14,8 @@ export function filterNonNullable<T>(
 
 /// Safe string -> number conversion
 /// handles the special cases of empty string and NaN with type safety
-export function toNumber(filter: string | null): number | null {
+/// @return null if the string is empty or NaN otherwise the number
+export function toNumber(filter: Maybe<string> | undefined): number | null {
   if (filter == null) {
     return null;
   }
@@ -137,6 +142,19 @@ function getImageSourceWithoutDefault(
       return null;
   }
 }
+
+/// Returns if price is free
+/// NOTE Only check highestPrice because lowestPrice < highestPrice
+export function isPriceFree(
+  pricing: Pick<PricingFieldsFragment, "highestPrice">
+): boolean {
+  const price = toNumber(pricing.highestPrice);
+  if (price == null || price === 0) {
+    return true;
+  }
+  return false;
+}
+
 function pickMaybeDay(
   a: Date | undefined,
   b: Date | undefined,

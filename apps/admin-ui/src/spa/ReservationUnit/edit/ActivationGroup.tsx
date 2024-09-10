@@ -34,17 +34,14 @@ export function ActivationGroup<T extends FieldValues>({
   style,
   className,
 }: ControllerProps<T>): JSX.Element {
-  const { field } = useController({ control, name });
+  const {
+    field: { value, onChange },
+  } = useController({ control, name });
 
   return (
     <Wrapper $noMargin={noMargin} style={style} className={className}>
-      <Checkbox
-        id={name}
-        label={label}
-        checked={field.value}
-        onChange={field.onChange}
-      />
-      {field.value ? (
+      <Checkbox id={name} label={label} checked={value} onChange={onChange} />
+      {value ? (
         <Wrapper $noMargin={noMargin}>
           <Indent $noIndent={noIndent}>{children}</Indent>
         </Wrapper>

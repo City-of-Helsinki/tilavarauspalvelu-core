@@ -61,6 +61,7 @@ function ReservationCard({ reservation, type }: PropsT): JSX.Element {
   const price =
     reservation.state === ReservationStateChoice.RequiresHandling
       ? getReservationUnitPrice({
+          t,
           reservationUnit,
           pricingDate: new Date(reservation.begin),
           minutes: differenceInMinutes(

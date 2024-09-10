@@ -9,7 +9,6 @@ import { add, startOfISOWeek } from "date-fns";
 import { breakpoints } from "common/src/common/style";
 import {
   CustomerTypeChoice,
-  PricingType,
   type ReservationQuery,
   ReservationStateChoice,
   useReservationQuery,
@@ -38,7 +37,7 @@ import { useReservationData } from "./hooks";
 import { useRecurringReservations } from "@/hooks";
 import ApprovalButtonsRecurring from "./ApprovalButtonsRecurring";
 import ReservationTitleSection from "./ReservationTitleSection";
-import { base64encode } from "common/src/helpers";
+import { base64encode, isPriceFree } from "common/src/helpers";
 import { fontMedium } from "common";
 import { formatAgeGroup } from "@/common/util";
 import Error404 from "@/common/Error404";
@@ -402,11 +401,12 @@ function RequestedReservation({
   const ref = useRef<HTMLHeadingElement>(null);
 
   const resUnit = reservation?.reservationUnits?.[0];
-  const pricing = getReservatinUnitPricing(resUnit, reservation.begin);
+  const pricing = getReservatinUnitPricing(
+    resUnit,
+    new Date(reservation.begin)
+  );
 
-  const isNonFree =
-    pricing?.pricingType === PricingType.Paid &&
-    parseFloat(pricing.highestPrice) >= 0;
+  const isNonFree = pricing != null ? !isPriceFree(pricing) : false;
 
   const reservationTagline = createTagString(reservation, t);
   const order = reservation.paymentOrder[0];

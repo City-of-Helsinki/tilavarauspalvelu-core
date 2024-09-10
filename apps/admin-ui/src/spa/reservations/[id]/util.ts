@@ -9,7 +9,6 @@ import {
   type Maybe,
   CustomerTypeChoice,
   PriceUnit,
-  PricingType,
   ReservationTypeChoice,
   type ReservationCommonFragment,
   type PricingFieldsFragment,
@@ -22,7 +21,7 @@ import {
   getReserveeName,
 } from "@/common/util";
 import { fromAPIDateTime } from "@/helpers";
-import { filterNonNullable } from "common/src/helpers";
+import { filterNonNullable, toNumber } from "common/src/helpers";
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 type ReservationUnitType = NonNullable<ReservationType["reservationUnits"]>[0];
@@ -49,13 +48,11 @@ export function reservationPrice(
 /** returns reservation unit pricing at given date */
 export function getReservatinUnitPricing(
   reservationUnit: Maybe<Pick<ReservationUnitType, "pricings">> | undefined,
-  datetime: string
+  d: Date
 ): PricingFieldsFragment | null {
   if (!reservationUnit?.pricings || reservationUnit.pricings.length === 0) {
     return null;
   }
-
-  const reservationDate = new Date(datetime);
 
   reservationUnit.pricings.sort((a, b) =>
     a?.begins && b?.begins
@@ -65,7 +62,7 @@ export function getReservatinUnitPricing(
   );
 
   return reservationUnit.pricings.reduce((prev, current) => {
-    if ((fromApiDate(current?.begins) ?? 0) < reservationDate) {
+    if ((fromApiDate(current?.begins) ?? 0) < d) {
       return current;
     }
     return prev;
@@ -77,27 +74,23 @@ export function getReservationPriceDetails(
   reservation: ReservationType,
   t: TFunction
 ): string {
-  const durationMinutes = differenceInMinutes(
-    new Date(reservation.end),
-    new Date(reservation.begin)
-  );
+  const begin = new Date(reservation.begin);
+  const end = new Date(reservation.end);
+  const resUnit = reservation.reservationUnits?.[0];
+  const durationMinutes = differenceInMinutes(end, begin);
+  const pricing = getReservatinUnitPricing(resUnit, begin);
 
-  const pricing = getReservatinUnitPricing(
-    reservation.reservationUnits?.[0],
-    reservation.begin
-  );
-
-  if (pricing == null) return "???";
+  if (pricing == null) {
+    return "???";
+  }
 
   const { priceUnit } = pricing;
   const volume = getUnRoundedReservationVolume(durationMinutes, priceUnit);
 
-  const maxPrice =
-    pricing.pricingType === PricingType.Paid ? pricing.highestPrice : "0";
+  const maxPrice = pricing.highestPrice;
   const formatters = getFormatters("fi");
 
-  const taxP = Number(pricing.taxPercentage?.value ?? "");
-  const taxPercentage = Number.isNaN(taxP) ? 0 : taxP;
+  const taxPercentage = toNumber(pricing.taxPercentage.value) ?? 0;
   return priceUnit === PriceUnit.Fixed
     ? getReservationPrice(maxPrice, t("RequestedReservation.noPrice"), false)
     : t("RequestedReservation.ApproveDialog.priceBreakdown", {
@@ -107,7 +100,7 @@ export function getReservationPriceDetails(
         unit: t(`RequestedReservation.ApproveDialog.priceUnit.${priceUnit}`),
         unitPrice: getReservationPrice(maxPrice, "", false),
         price: getReservationPrice(
-          String(volume * parseFloat(maxPrice)),
+          String(volume * (toNumber(maxPrice) ?? 0)),
           t("RequestedReservation.noPrice"),
           false
         ),

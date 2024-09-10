@@ -1,8 +1,6 @@
 import type { TFunction } from "i18next";
 import {
   PriceUnit,
-  PricingType,
-  Status,
   ReservationStateChoice,
   ReservationQuery,
   Authentication,
@@ -20,25 +18,43 @@ type PricingNodeT = ReservationUnitNodeT["pricings"][0];
 
 const mockT = ((x: string) => x) as TFunction;
 
-const PRICING_FREE: PricingNodeT = {
-  begins: "2021-01-01",
-  pricingType: PricingType.Free,
-  id: "1",
-  priceUnit: PriceUnit.PerHour,
-  lowestPrice: "120",
-  highestPrice: "120",
-  taxPercentage: {
+function constructPricing({
+  lowestPrice,
+  highestPrice,
+  begin,
+}: {
+  lowestPrice: number;
+  highestPrice: number;
+  begin: Date;
+}) {
+  return {
+    begins: toApiDate(begin) ?? "",
     id: "1",
-    value: "24",
-  },
-  status: Status.Active,
-};
-const PRICING_PAID: PricingNodeT = {
-  ...PRICING_FREE,
-  begins: "2022-01-01",
-  pricingType: PricingType.Paid,
-  status: Status.Future,
-};
+    priceUnit: PriceUnit.PerHour,
+    lowestPrice: lowestPrice.toString(),
+    highestPrice: highestPrice.toString(),
+    taxPercentage: {
+      id: "1",
+      pk: 1,
+      value: "24",
+    },
+  };
+}
+
+function constructFreePricing(): PricingNodeT {
+  return constructPricing({
+    lowestPrice: 0,
+    highestPrice: 0,
+    begin: new Date("2021-01-01"),
+  });
+}
+function constructPaidPricing(): PricingNodeT {
+  return constructPricing({
+    lowestPrice: 120,
+    highestPrice: 120,
+    begin: new Date("2022-01-01"),
+  });
+}
 
 function constructReservation(
   begin: string,
@@ -70,16 +86,19 @@ function constructReservation(
 describe("getReservatinUnitPricing", () => {
   test("returns correct pricing based on reservation date", () => {
     const input = {
-      pricings: [PRICING_FREE, PRICING_PAID],
+      pricings: [constructFreePricing(), constructPaidPricing()],
     };
 
-    expect(
-      getReservatinUnitPricing(input, "2021-02-01T00:00:01Z")?.pricingType
-    ).toBe(PricingType.Free);
-
-    expect(
-      getReservatinUnitPricing(input, "2022-02-01T00:00:01Z")?.pricingType
-    ).toBe(PricingType.Paid);
+    const first = getReservatinUnitPricing(
+      input,
+      new Date("2021-02-01T00:00:01Z")
+    );
+    const second = getReservatinUnitPricing(
+      input,
+      new Date("2022-02-01T00:00:01Z")
+    );
+    expect(first?.lowestPrice).toBe("0");
+    expect(second?.lowestPrice).toBe("120");
   });
 });
 

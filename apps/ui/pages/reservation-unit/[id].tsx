@@ -17,7 +17,6 @@ import { breakpoints } from "common/src/common/style";
 import { type PendingReservation } from "@/modules/types";
 import {
   type ApplicationRoundTimeSlotNode,
-  PricingType,
   type ReservationCreateMutationInput,
   useCreateReservationMutation,
   type ReservationUnitPageQuery,
@@ -31,6 +30,8 @@ import {
   base64encode,
   filterNonNullable,
   fromMondayFirstUnsafe,
+  isPriceFree,
+  toNumber,
 } from "common/src/helpers";
 import Head from "@/components/reservation-unit/Head";
 import { AddressSection } from "@/components/reservation-unit/Address";
@@ -52,7 +53,6 @@ import {
   getPossibleTimesForDay,
   getPriceString,
   getTimeString,
-  isReservationUnitPaidInFuture,
   isReservationUnitPublished,
   isReservationUnitReservable,
 } from "@/modules/reservationUnit";
@@ -486,10 +486,8 @@ function ReservationUnit({
     if (pricings.length === 0) {
       return false;
     }
-    return (
-      reservationUnit.canApplyFreeOfCharge &&
-      isReservationUnitPaidInFuture(pricings)
-    );
+    const isPaid = pricings.some((pricing) => !isPriceFree(pricing));
+    return reservationUnit.canApplyFreeOfCharge && isPaid;
   }, [reservationUnit.canApplyFreeOfCharge, reservationUnit.pricings]);
 
   const [addReservation] = useCreateReservationMutation();
@@ -897,29 +895,33 @@ function PriceChangeNotice({
     return null;
   }
 
+  const isPaid = !isPriceFree(futurePricing);
+  const taxPercentage = toNumber(futurePricing.taxPercentage.value) ?? 0;
+  const begins = new Date(futurePricing.begins);
+  const priceString = getPriceString({
+    t,
+    pricing: futurePricing,
+  }).toLocaleLowerCase();
+  const showTaxNotice = isPaid && taxPercentage > 0;
+
   return (
     <p style={{ marginTop: 0 }}>
       <Trans
         i18nKey="reservationUnit:futurePricingNotice"
         defaults="Huomioi <bold>hinnoittelumuutos {{date}} alkaen. Uusi hinta on {{price}}</bold>."
         values={{
-          date: toUIDate(new Date(futurePricing.begins)),
-          price: getPriceString({
-            pricing: futurePricing,
-          }).toLocaleLowerCase(),
+          date: toUIDate(begins),
+          price: priceString,
         }}
         components={{ bold: <strong /> }}
       />
-      {futurePricing.pricingType === PricingType.Paid &&
-        parseFloat(futurePricing.taxPercentage?.value ?? "") > 0 && (
-          <strong>
-            {t("reservationUnit:futurePriceNoticeTax", {
-              tax: formatters.strippedDecimal.format(
-                parseFloat(futurePricing.taxPercentage?.value ?? "")
-              ),
-            })}
-          </strong>
-        )}
+      {showTaxNotice && (
+        <strong>
+          {t("reservationUnit:futurePriceNoticeTax", {
+            tax: formatters.strippedDecimal.format(taxPercentage),
+          })}
+        </strong>
+      )}
       .
     </p>
   );

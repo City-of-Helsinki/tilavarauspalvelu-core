@@ -1690,14 +1690,6 @@ export enum PriceUnit {
 }
 
 /** An enumeration. */
-export enum PricingType {
-  /** Maksuton */
-  Free = "FREE",
-  /** Maksullinen */
-  Paid = "PAID",
-}
-
-/** An enumeration. */
 export enum Priority {
   Primary = "PRIMARY",
   Secondary = "SECONDARY",
@@ -4089,8 +4081,6 @@ export type ReservationUnitPricingNode = Node & {
   lowestPriceNet?: Maybe<Scalars["Decimal"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
   priceUnit: PriceUnit;
-  pricingType?: Maybe<PricingType>;
-  status: Status;
   taxPercentage: TaxPercentageNode;
 };
 
@@ -4098,12 +4088,11 @@ export type ReservationUnitPricingSerializerInput = {
   begins: Scalars["Date"]["input"];
   highestPrice?: InputMaybe<Scalars["Decimal"]["input"]>;
   highestPriceNet?: InputMaybe<Scalars["String"]["input"]>;
+  isActivatedOnBegins?: InputMaybe<Scalars["Boolean"]["input"]>;
   lowestPrice?: InputMaybe<Scalars["Decimal"]["input"]>;
   lowestPriceNet?: InputMaybe<Scalars["String"]["input"]>;
   pk?: InputMaybe<Scalars["Int"]["input"]>;
   priceUnit?: InputMaybe<PriceUnit>;
-  pricingType?: InputMaybe<PricingType>;
-  status: Status;
   taxPercentage?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
@@ -4737,12 +4726,20 @@ export type SpaceUpdateMutationPayload = {
 
 /** An enumeration. */
 export enum Status {
-  /** aktiivinen */
-  Active = "ACTIVE",
-  /** tuleva */
-  Future = "FUTURE",
-  /** mennyt */
-  Past = "PAST",
+  /** Peruttu */
+  Cancelled = "CANCELLED",
+  /** Luonnos */
+  Draft = "DRAFT",
+  /** Rauennut */
+  Expired = "EXPIRED",
+  /** Käsitelty */
+  Handled = "HANDLED",
+  /** Käsittelyssä */
+  InAllocation = "IN_ALLOCATION",
+  /** Vastaanotettu */
+  Received = "RECEIVED",
+  /** Päätökset lähetetty */
+  ResultSent = "RESULT_SENT",
 }
 
 export type SuitableTimeRangeNode = Node & {
@@ -5236,12 +5233,11 @@ export type UpdateReservationUnitPricingSerializerInput = {
   begins?: InputMaybe<Scalars["Date"]["input"]>;
   highestPrice?: InputMaybe<Scalars["Decimal"]["input"]>;
   highestPriceNet?: InputMaybe<Scalars["String"]["input"]>;
+  isActivatedOnBegins?: InputMaybe<Scalars["Boolean"]["input"]>;
   lowestPrice?: InputMaybe<Scalars["Decimal"]["input"]>;
   lowestPriceNet?: InputMaybe<Scalars["String"]["input"]>;
   pk?: InputMaybe<Scalars["Int"]["input"]>;
   priceUnit?: InputMaybe<PriceUnit>;
-  pricingType?: InputMaybe<PricingType>;
-  status?: InputMaybe<Status>;
   taxPercentage?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
@@ -5365,10 +5361,8 @@ export type ReservationInfoCardFragment = {
       id: string;
       begins: string;
       priceUnit: PriceUnit;
-      pricingType?: PricingType | null;
       lowestPrice: string;
       highestPrice: string;
-      status: Status;
       taxPercentage: { id: string; pk?: number | null; value: string };
     }>;
   }>;
@@ -5733,10 +5727,8 @@ export type ReservationUnitFieldsFragment = {
     id: string;
     begins: string;
     priceUnit: PriceUnit;
-    pricingType?: PricingType | null;
     lowestPrice: string;
     highestPrice: string;
-    status: Status;
     taxPercentage: { id: string; pk?: number | null; value: string };
   }>;
   images: Array<{
@@ -5936,10 +5928,8 @@ export type ListReservationsQuery = {
             id: string;
             begins: string;
             priceUnit: PriceUnit;
-            pricingType?: PricingType | null;
             lowestPrice: string;
             highestPrice: string;
-            status: Status;
             taxPercentage: { id: string; pk?: number | null; value: string };
           }>;
         }>;
@@ -6087,10 +6077,8 @@ export type ReservationQuery = {
         id: string;
         begins: string;
         priceUnit: PriceUnit;
-        pricingType?: PricingType | null;
         lowestPrice: string;
         highestPrice: string;
-        status: Status;
         taxPercentage: { id: string; pk?: number | null; value: string };
       }>;
       images: Array<{
@@ -6344,10 +6332,8 @@ export type ReservationUnitPageFieldsFragment = {
     id: string;
     begins: string;
     priceUnit: PriceUnit;
-    pricingType?: PricingType | null;
     lowestPrice: string;
     highestPrice: string;
-    status: Status;
     taxPercentage: { id: string; pk?: number | null; value: string };
   }>;
   metadataSet?: {
@@ -6507,10 +6493,8 @@ export type ReservationUnitQuery = {
       id: string;
       begins: string;
       priceUnit: PriceUnit;
-      pricingType?: PricingType | null;
       lowestPrice: string;
       highestPrice: string;
-      status: Status;
       taxPercentage: { id: string; pk?: number | null; value: string };
     }>;
     metadataSet?: {
@@ -6710,10 +6694,8 @@ export type ReservationUnitPageQuery = {
       id: string;
       begins: string;
       priceUnit: PriceUnit;
-      pricingType?: PricingType | null;
       lowestPrice: string;
       highestPrice: string;
-      status: Status;
       taxPercentage: { id: string; pk?: number | null; value: string };
     }>;
     metadataSet?: {
@@ -6843,10 +6825,8 @@ export type SearchReservationUnitsQuery = {
           id: string;
           begins: string;
           priceUnit: PriceUnit;
-          pricingType?: PricingType | null;
           lowestPrice: string;
           highestPrice: string;
-          status: Status;
           taxPercentage: { id: string; pk?: number | null; value: string };
         }>;
         unit?: {
@@ -6942,10 +6922,8 @@ export type RelatedReservationUnitsQuery = {
           id: string;
           begins: string;
           priceUnit: PriceUnit;
-          pricingType?: PricingType | null;
           lowestPrice: string;
           highestPrice: string;
-          status: Status;
           taxPercentage: { id: string; pk?: number | null; value: string };
         }>;
       } | null;
@@ -6973,10 +6951,8 @@ export type PriceReservationUnitFragment = {
     id: string;
     begins: string;
     priceUnit: PriceUnit;
-    pricingType?: PricingType | null;
     lowestPrice: string;
     highestPrice: string;
-    status: Status;
     taxPercentage: { id: string; pk?: number | null; value: string };
   }>;
 };
@@ -7587,10 +7563,8 @@ export type PricingFieldsFragment = {
   id: string;
   begins: string;
   priceUnit: PriceUnit;
-  pricingType?: PricingType | null;
   lowestPrice: string;
   highestPrice: string;
-  status: Status;
   taxPercentage: { id: string; pk?: number | null; value: string };
 };
 
@@ -7669,7 +7643,6 @@ export const PricingFieldsFragmentDoc = gql`
     id
     begins
     priceUnit
-    pricingType
     lowestPrice
     highestPrice
     taxPercentage {
@@ -7677,7 +7650,6 @@ export const PricingFieldsFragmentDoc = gql`
       pk
       value
     }
-    status
   }
 `;
 export const PriceReservationUnitFragmentDoc = gql`

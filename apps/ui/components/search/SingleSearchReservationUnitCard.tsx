@@ -105,7 +105,8 @@ function ReservationUnitCard({ reservationUnit }: PropsT): JSX.Element {
   const unitName = getUnitName(reservationUnit.unit ?? undefined);
 
   const pricing = getActivePricing(reservationUnit);
-  const unitPrice = pricing != null ? getPriceString({ pricing }) : undefined;
+  const unitPrice =
+    pricing != null ? getPriceString({ t, pricing }) : undefined;
 
   const reservationUnitTypeName =
     reservationUnit.reservationUnitType != null
