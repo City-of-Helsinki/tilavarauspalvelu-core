@@ -33,6 +33,10 @@ class IDToken:
     """token subject: uuid"""
     aud: str
     """token audience: tilavaraus-{env}"""
+    jti: str
+    """JWT ID: uuid"""
+    typ: Literal["ID"]
+    """token type: ID"""
     exp: int
     """token expiration date: unix epoch timestamp"""
     iat: int
@@ -43,6 +47,14 @@ class IDToken:
     """random string"""
     at_hash: str
     """access token hash: sha256"""
+    name: str
+    """user name"""
+    preferred_username: str
+    """user preferred username"""
+    given_name: str
+    """user given name"""
+    family_name: str
+    """user family name"""
     email: str
     """user email"""
     email_verified: bool
@@ -53,6 +65,8 @@ class IDToken:
     """authorized party: tilavaraus-{env}"""
     sid: str
     """session id: uuid"""
+    session_state: str
+    """session state: uuid"""
     amr: str | list[str]
     """
     authentication methods reference:

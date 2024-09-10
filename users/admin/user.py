@@ -1,10 +1,13 @@
+import datetime
+
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
+from common.date_utils import local_datetime
 from permissions.models import GeneralRole, UnitRole
 from users.anonymisation import anonymize_user_data
 from users.helauth.typing import LoginMethod
-from users.models import User
+from users.models import DEFAULT_TIMEZONE, User
 
 __all__ = [
     "UserAdmin",
@@ -109,11 +112,33 @@ class UserAdmin(admin.ModelAdmin):
                 "fields": [
                     "last_login",
                     "date_joined",
-                    "id_token",
                     "tvp_uuid",
                     "department_name",
                     "profile_id",
                     "date_of_birth",
+                ],
+            },
+        ],
+        [
+            _("ID token info"),
+            {
+                "fields": [
+                    "issuer",
+                    "audience",
+                    "jwt_id",
+                    "token_type",
+                    "expires",
+                    "issued_at",
+                    "auth_time",
+                    "nonce",
+                    "access_token_hash",
+                    "preferred_username",
+                    "email_verified",
+                    "authorized_party",
+                    "session_identifier",
+                    "session_state",
+                    "authentication_methods_reference",
+                    "level_of_assurance",
                 ],
             },
         ],
@@ -126,6 +151,8 @@ class UserAdmin(admin.ModelAdmin):
                     "login_method",
                     "is_strong_login",
                     "ad_groups",
+                    "access_token",
+                    "refresh_token",
                 ],
             },
         ],
@@ -144,6 +171,24 @@ class UserAdmin(admin.ModelAdmin):
         "general_roles_list",
         "unit_roles_map",
         "unit_group_roles_map",
+        "issuer",
+        "audience",
+        "jwt_id",
+        "token_type",
+        "expires",
+        "issued_at",
+        "auth_time",
+        "nonce",
+        "access_token_hash",
+        "preferred_username",
+        "email_verified",
+        "authorized_party",
+        "session_identifier",
+        "session_state",
+        "authentication_methods_reference",
+        "level_of_assurance",
+        "access_token",
+        "refresh_token",
     ]
     inlines = [
         GeneralRoleInlineAdmin,
@@ -156,6 +201,104 @@ class UserAdmin(admin.ModelAdmin):
         for user in queryset.all():
             anonymize_user_data(user)
 
+    @admin.display(description="Issuer (iss)")
+    def issuer(self, user: User) -> str:
+        if user.id_token is None:
+            return "-"
+        return user.id_token.iss
+
+    @admin.display(description="Audience (aud)")
+    def audience(self, user: User) -> str:
+        if user.id_token is None:
+            return "-"
+        return user.id_token.aud
+
+    @admin.display(description="JWT ID (jti)")
+    def jwt_id(self, user: User) -> str:
+        if user.id_token is None:
+            return "-"
+        return user.id_token.jti
+
+    @admin.display(description="Token type (typ)")
+    def token_type(self, user: User) -> str:
+        if user.id_token is None:
+            return "-"
+        return user.id_token.typ
+
+    @admin.display(description="Expires (exp)")
+    def expires(self, user: User) -> str:
+        if user.id_token is None:
+            return "-"
+        expires = datetime.datetime.fromtimestamp(user.id_token.exp).astimezone(DEFAULT_TIMEZONE)
+        expired = expires < local_datetime()
+        return expires.isoformat() + " (expired)" if expired else " (valid)"
+
+    @admin.display(description="Issued at (iat)")
+    def issued_at(self, user: User) -> str:
+        if user.id_token is None:
+            return "-"
+        return datetime.datetime.fromtimestamp(user.id_token.iat).astimezone(DEFAULT_TIMEZONE).isoformat()
+
+    @admin.display(description="Auth time (auth_time)")
+    def auth_time(self, user: User) -> str:
+        if user.id_token is None:
+            return "-"
+        return datetime.datetime.fromtimestamp(user.id_token.auth_time).astimezone(DEFAULT_TIMEZONE).isoformat()
+
+    @admin.display(description="Nonce (nonce)")
+    def nonce(self, user: User) -> str:
+        if user.id_token is None:
+            return "-"
+        return user.id_token.nonce
+
+    @admin.display(description="Access token hash (at_hash)")
+    def access_token_hash(self, user: User) -> str:
+        if user.id_token is None:
+            return "-"
+        return user.id_token.at_hash
+
+    @admin.display(description="Preferred username (preferred_username)")
+    def preferred_username(self, user: User) -> str:
+        if user.id_token is None:
+            return "-"
+        return user.id_token.preferred_username
+
+    @admin.display(description="Email verified (email_verified)")
+    def email_verified(self, user: User) -> str:
+        if user.id_token is None:
+            return "-"
+        return str(user.id_token.email_verified)
+
+    @admin.display(description="Authorized party (azp)")
+    def authorized_party(self, user: User) -> str:
+        if user.id_token is None:
+            return "-"
+        return user.id_token.azp
+
+    @admin.display(description="Session identifier (sid)")
+    def session_identifier(self, user: User) -> str:
+        if user.id_token is None:
+            return "-"
+        return user.id_token.sid
+
+    @admin.display(description="Session state (session_state)")
+    def session_state(self, user: User) -> str:
+        if user.id_token is None:
+            return "-"
+        return user.id_token.session_state
+
+    @admin.display(description="Authentication methods reference (amr)")
+    def authentication_methods_reference(self, user: User) -> str:
+        if user.id_token is None:
+            return "-"
+        return str(user.id_token.amr)
+
+    @admin.display(description="Level of assurance (loa)")
+    def level_of_assurance(self, user: User) -> str:
+        if user.id_token is None:
+            return "-"
+        return user.id_token.loa
+
     def login_method(self, user: User) -> str:
         if user is None:
             return "-"
@@ -163,7 +306,7 @@ class UserAdmin(admin.ModelAdmin):
             return LoginMethod.OTHER.value
 
         login_method = LoginMethod.PROFILE.value if user.id_token.is_profile_login else LoginMethod.AD.value
-        return f"{login_method} ({user.id_token.amr})"
+        return f"{login_method}"
 
     def is_strong_login(self, user: User) -> bool:
         return getattr(user.id_token, "is_strong_login", False)

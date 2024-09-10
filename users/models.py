@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import uuid
+from functools import cached_property
 from typing import TYPE_CHECKING, Literal, Self
 
 from django.conf import settings
@@ -13,7 +14,7 @@ from helusers.models import AbstractUser
 
 from permissions.enums import UserPermissionChoice, UserRoleChoice
 from permissions.permission_resolver import PermissionResolver
-from users.helauth.typing import IDToken
+from users.helauth.typing import ExtraData, IDToken
 from users.helauth.utils import get_jwt_payload
 
 if TYPE_CHECKING:
@@ -169,7 +170,7 @@ class User(AbstractUser):
         self._unit_roles = {pk: sorted(set(roles)) for pk, roles in self._unit_roles.items()}
         self._unit_group_roles = {pk: sorted(set(roles)) for pk, roles in self._unit_group_roles.items()}
 
-    @property
+    @cached_property
     def current_social_auth(self) -> UserSocialAuth | None:
         # After login in once, the user will have a UserSocialAuth entry created for it.
         # This entry is updated when the user logs in again, so we can use it to get the
@@ -188,19 +189,44 @@ class User(AbstractUser):
             iss=payload.get("iss"),
             sub=payload.get("sub"),
             aud=payload.get("aud"),
+            jti=payload.get("jti"),
+            typ=payload.get("typ"),
             exp=payload.get("exp"),
             iat=payload.get("iat"),
             auth_time=payload.get("auth_time"),
             nonce=payload.get("nonce"),
             at_hash=payload.get("at_hash"),
+            name=payload.get("name"),
+            preferred_username=payload.get("preferred_username"),
+            given_name=payload.get("given_name"),
+            family_name=payload.get("family_name"),
             email=payload.get("email"),
             email_verified=payload.get("email_verified"),
             ad_groups=payload.get("ad_groups"),
             azp=payload.get("azp"),
             sid=payload.get("sid"),
+            session_state=payload.get("session_state"),
             amr=payload.get("amr"),
             loa=payload.get("loa"),
         )
+
+    @property
+    def access_token(self) -> str | None:
+        """KeyCloak access token"""
+        social_auth = self.current_social_auth
+        if social_auth is None:
+            return None
+        extra_data: ExtraData = social_auth.extra_data
+        return extra_data["access_token"]
+
+    @property
+    def refresh_token(self) -> str | None:
+        """KeyCloak refresh token"""
+        social_auth = self.current_social_auth
+        if social_auth is None:
+            return None
+        extra_data: ExtraData = social_auth.extra_data
+        return extra_data["refresh_token"]
 
 
 # Set the permissions descriptor to the AnonymousUser class
