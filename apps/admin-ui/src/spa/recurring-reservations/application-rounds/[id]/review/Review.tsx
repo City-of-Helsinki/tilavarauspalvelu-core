@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Notification, Tabs } from "hds-react";
 import { uniqBy } from "lodash";
 import { useTranslation } from "react-i18next";
@@ -260,6 +260,24 @@ export function Review({
   const unitOptions = uniqBy(ds, (unit) => unit.pk).sort((a, b) =>
     a.nameFi.localeCompare(b.nameFi)
   );
+
+  // user has no accesss to specific unit through URL with search params -> remove it from URL
+  useEffect(() => {
+    const unitParam = searchParams.getAll("unit");
+    if (unitParam.length > 0) {
+      const filteredUnits = unitParam.filter((u) =>
+        unitOptions.some((unit) => unit.pk === Number(u))
+      );
+      if (filteredUnits.length !== unitParam.length) {
+        const p = new URLSearchParams(searchParams);
+        p.delete("unit");
+        for (const u of filteredUnits) {
+          p.append("unit", u);
+        }
+        setParams(p, { replace: true });
+      }
+    }
+  }, [unitOptions, searchParams, setParams]);
 
   const isAllocationEnabled =
     applicationRound.status === ApplicationRoundStatusChoice.InAllocation &&

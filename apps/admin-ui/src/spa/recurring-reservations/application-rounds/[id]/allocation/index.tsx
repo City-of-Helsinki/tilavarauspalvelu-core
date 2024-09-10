@@ -596,19 +596,6 @@ function AllocationWrapper({
   const unitData = reservationUnits.map((ru) => ru?.unit);
   const units = uniqBy(filterNonNullable(unitData), "pk");
 
-  // TODO don't use spinners, skeletons are better
-  // also this blocks the sub component query (the initial with zero filters) which slows down the page load
-  if (loading) {
-    return <Loader />;
-  }
-
-  // TODO improve this (disabled filters if error, notify the user, but don't block the whole page)
-  if (error) {
-    // eslint-disable-next-line no-console
-    console.error("Error: ", error);
-    return <p>{t("errors.errorFetchingData")}</p>;
-  }
-
   const hasAccess = (unit: (typeof units)[0]) =>
     unit.pk != null &&
     hasUnitPermission(
@@ -622,6 +609,30 @@ function AllocationWrapper({
     .filter(hasAccess)
     // TODO name sort fails with numbers because 11 < 2
     .sort((a, b) => a?.nameFi?.localeCompare(b?.nameFi ?? "") ?? 0);
+
+  // user has no accesss to specific unit through URL with search params -> reset the filter
+  const [searchParams, setParams] = useSearchParams();
+  useEffect(() => {
+    const unit = searchParams.get("unit");
+    if (unit && !filteredUnits.some((u) => u.pk === Number(unit))) {
+      const p = new URLSearchParams(searchParams);
+      p.delete("unit");
+      setParams(p, { replace: true });
+    }
+  }, [filteredUnits, searchParams, setParams]);
+
+  // TODO don't use spinners, skeletons are better
+  // also this blocks the sub component query (the initial with zero filters) which slows down the page load
+  if (loading) {
+    return <Loader />;
+  }
+
+  // TODO improve this (disabled filters if error, notify the user, but don't block the whole page)
+  if (error) {
+    // eslint-disable-next-line no-console
+    console.error("Error: ", error);
+    return <p>{t("errors.errorFetchingData")}</p>;
+  }
 
   if (filteredUnits.length === 0) {
     return <div>{t("errors.noPermission")}</div>;
