@@ -9,13 +9,7 @@ from applications.tasks import generate_reservation_series_from_allocations
 from common.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_datetime, local_iso_format
 from opening_hours.enums import HaukiResourceState
 from opening_hours.utils.hauki_api_client import HaukiAPIClient
-from opening_hours.utils.hauki_api_types import (
-    HaukiAPIOpeningHoursResponseDate,
-    HaukiAPIOpeningHoursResponseItem,
-    HaukiAPIOpeningHoursResponseResource,
-    HaukiAPIOpeningHoursResponseTime,
-    HaukiTranslatedField,
-)
+from opening_hours.utils.hauki_api_types import HaukiAPIDatePeriod
 from reservation_units.models import ReservationUnitHierarchy
 from reservations.enums import (
     CustomerTypeChoice,
@@ -32,19 +26,8 @@ pytestmark = [
     pytest.mark.django_db,
 ]
 
-NEXT_YEAR = local_date().year + 1
-EMPTY_RESPONSE = HaukiAPIOpeningHoursResponseItem(
-    resource=HaukiAPIOpeningHoursResponseResource(
-        id=1,
-        name=HaukiTranslatedField(fi="Test resource", sv=None, en=None),
-        timezone="Europe/Helsinki",
-        origins=[],
-    ),
-    opening_hours=[],
-)
 
-
-@patch_method(HaukiAPIClient.get_resource_opening_hours, return_value=EMPTY_RESPONSE)
+@patch_method(HaukiAPIClient.get_date_periods, return_value=[])
 @freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=DEFAULT_TIMEZONE))
 def test_generate_reservation_series_from_allocations():
     slot = AllocatedTimeSlotFactory.create_ready_for_reservation(num=3)
@@ -52,7 +35,7 @@ def test_generate_reservation_series_from_allocations():
     application_round = slot.reservation_unit_option.application_section.application.application_round
     generate_reservation_series_from_allocations(application_round_id=application_round.id)
 
-    assert HaukiAPIClient.get_resource_opening_hours.call_count == 1
+    assert HaukiAPIClient.get_date_periods.call_count == 1
 
     series: list[RecurringReservation] = list(RecurringReservation.objects.all())
     assert len(series) == 1
@@ -107,7 +90,7 @@ def test_generate_reservation_series_from_allocations():
     assert RejectedOccurrence.objects.count() == 0
 
 
-@patch_method(HaukiAPIClient.get_resource_opening_hours, return_value=EMPTY_RESPONSE)
+@patch_method(HaukiAPIClient.get_date_periods, return_value=[])
 @freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=DEFAULT_TIMEZONE))
 def test_generate_reservation_series_from_allocations__individual():
     slot = AllocatedTimeSlotFactory.create_ready_for_reservation(applicant_type=ApplicantTypeChoice.INDIVIDUAL)
@@ -117,7 +100,6 @@ def test_generate_reservation_series_from_allocations__individual():
 
     series: list[RecurringReservation] = list(RecurringReservation.objects.all())
     assert len(series) == 1
-
     assert series[0].allocated_time_slot == slot
 
     reservations: list[Reservation] = list(series[0].reservations.order_by("begin").all())
@@ -130,9 +112,9 @@ def test_generate_reservation_series_from_allocations__individual():
     assert reservations[0].reservee_address_city == application.billing_address.city
     assert reservations[0].reservee_address_zip == application.billing_address.post_code
 
+    assert HaukiAPIClient.get_date_periods.call_count == 1
 
-@patch_method(HaukiAPIClient.get_resource_opening_hours, return_value=EMPTY_RESPONSE)
-@freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=DEFAULT_TIMEZONE))
+
 @pytest.mark.parametrize(
     "applicant_type",
     [
@@ -141,6 +123,8 @@ def test_generate_reservation_series_from_allocations__individual():
         ApplicantTypeChoice.COMMUNITY,
     ],
 )
+@patch_method(HaukiAPIClient.get_date_periods, return_value=[])
+@freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=DEFAULT_TIMEZONE))
 def test_generate_reservation_series_from_allocations__non_individual(applicant_type):
     slot = AllocatedTimeSlotFactory.create_ready_for_reservation(applicant_type=applicant_type)
 
@@ -167,8 +151,10 @@ def test_generate_reservation_series_from_allocations__non_individual(applicant_
     assert reservations[0].reservee_address_city == application.organisation.address.city
     assert reservations[0].reservee_address_zip == application.organisation.address.post_code
 
+    assert HaukiAPIClient.get_date_periods.call_count == 1
 
-@patch_method(HaukiAPIClient.get_resource_opening_hours, return_value=EMPTY_RESPONSE)
+
+@patch_method(HaukiAPIClient.get_date_periods, return_value=[])
 @freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=DEFAULT_TIMEZONE))
 def test_generate_reservation_series_from_allocations__multiple_allocations():
     slot = AllocatedTimeSlotFactory.create_ready_for_reservation()
@@ -193,8 +179,10 @@ def test_generate_reservation_series_from_allocations__multiple_allocations():
     reservations: list[Reservation] = list(series[1].reservations.all())
     assert len(reservations) == 1
 
+    assert HaukiAPIClient.get_date_periods.call_count == 1
 
-@patch_method(HaukiAPIClient.get_resource_opening_hours, side_effect=ValueError("Test error"))
+
+@patch_method(HaukiAPIClient.get_date_periods, side_effect=ValueError("Test error"))
 @patch_method(SentryLogger.log_exception)
 @freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=DEFAULT_TIMEZONE))
 def test_generate_reservation_series_from_allocations__error_handling():
@@ -207,8 +195,10 @@ def test_generate_reservation_series_from_allocations__error_handling():
     # Errors are logged to Sentry.
     assert SentryLogger.log_exception.call_count == 1
 
+    assert HaukiAPIClient.get_date_periods.call_count == 1
 
-@patch_method(HaukiAPIClient.get_resource_opening_hours, return_value=EMPTY_RESPONSE)
+
+@patch_method(HaukiAPIClient.get_date_periods, return_value=[])
 @freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=DEFAULT_TIMEZONE))
 def test_generate_reservation_series_from_allocations__invalid_start_interval():
     slot = AllocatedTimeSlotFactory.create_ready_for_reservation(
@@ -231,8 +221,13 @@ def test_generate_reservation_series_from_allocations__invalid_start_interval():
     assert local_iso_format(rejected[0].begin_datetime) == local_datetime(2024, 1, 1, hour=12, minute=1).isoformat()
     assert local_iso_format(rejected[0].end_datetime) == local_datetime(2024, 1, 1, hour=14).isoformat()
 
+    assert HaukiAPIClient.get_date_periods.call_count == 1
 
-@patch_method(HaukiAPIClient.get_resource_opening_hours, return_value=EMPTY_RESPONSE)
+
+NEXT_YEAR = local_date().year + 1
+
+
+@patch_method(HaukiAPIClient.get_date_periods, return_value=[])
 @freezegun.freeze_time(datetime.datetime(NEXT_YEAR, 1, 1, tzinfo=DEFAULT_TIMEZONE))
 def test_generate_reservation_series_from_allocations__overlapping_reservation():
     slot = AllocatedTimeSlotFactory.create_ready_for_reservation(num=2)
@@ -264,37 +259,23 @@ def test_generate_reservation_series_from_allocations__overlapping_reservation()
     assert local_iso_format(rejected[0].begin_datetime) == local_datetime(NEXT_YEAR, 1, 1, hour=12).isoformat()
     assert local_iso_format(rejected[0].end_datetime) == local_datetime(NEXT_YEAR, 1, 1, hour=14).isoformat()
 
+    assert HaukiAPIClient.get_date_periods.call_count == 1
 
-@patch_method(HaukiAPIClient.get_resource_opening_hours)
+
+@patch_method(HaukiAPIClient.get_date_periods, return_value=[])
 @freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=DEFAULT_TIMEZONE))
 def test_generate_reservation_series_from_allocations__explicitly_closed_opening_hours():
     slot = AllocatedTimeSlotFactory.create_ready_for_reservation()
     application_round = slot.reservation_unit_option.application_section.application.application_round
 
-    HaukiAPIClient.get_resource_opening_hours.return_value = HaukiAPIOpeningHoursResponseItem(
-        resource=HaukiAPIOpeningHoursResponseResource(
-            id=1,
-            name=HaukiTranslatedField(fi="Test resource", sv=None, en=None),
-            timezone="Europe/Helsinki",
+    HaukiAPIClient.get_date_periods.return_value = [
+        HaukiAPIDatePeriod(
+            start_date="2024-01-01",
+            end_date="2024-01-01",
+            resource_state=HaukiResourceState.CLOSED.value,
+            override=True,
         ),
-        opening_hours=[
-            HaukiAPIOpeningHoursResponseDate(
-                date=application_round.reservation_period_begin.isoformat(),
-                times=[
-                    HaukiAPIOpeningHoursResponseTime(
-                        name="Test time",
-                        description="Test description",
-                        start_time=slot.begin_time.isoformat(),
-                        end_time=slot.end_time.isoformat(),
-                        end_time_on_next_day=False,
-                        resource_state=HaukiResourceState.CLOSED.value,
-                        full_day=False,
-                        periods=[1],
-                    )
-                ],
-            )
-        ],
-    )
+    ]
 
     generate_reservation_series_from_allocations(application_round_id=application_round.id)
 
@@ -310,3 +291,49 @@ def test_generate_reservation_series_from_allocations__explicitly_closed_opening
     assert rejected[0].rejection_reason == RejectionReadinessChoice.RESERVATION_UNIT_CLOSED
     assert local_iso_format(rejected[0].begin_datetime) == local_datetime(2024, 1, 1, hour=12).isoformat()
     assert local_iso_format(rejected[0].end_datetime) == local_datetime(2024, 1, 1, hour=14).isoformat()
+
+    assert HaukiAPIClient.get_date_periods.call_count == 1
+
+
+@patch_method(HaukiAPIClient.get_date_periods, return_value=[])
+@freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=DEFAULT_TIMEZONE))
+def test_generate_reservation_series_from_allocations__explicitly_closed_opening_hours__not_affecting():
+    slot = AllocatedTimeSlotFactory.create_ready_for_reservation()
+    application_round = slot.reservation_unit_option.application_section.application.application_round
+
+    HaukiAPIClient.get_date_periods.return_value = [
+        # Wrong date
+        HaukiAPIDatePeriod(
+            start_date="2024-01-02",
+            end_date="2024-01-02",
+            resource_state=HaukiResourceState.CLOSED.value,
+            override=True,
+        ),
+        # Non-overriding date period
+        HaukiAPIDatePeriod(
+            start_date="2024-01-01",
+            end_date="2024-01-01",
+            resource_state=HaukiResourceState.CLOSED.value,
+            override=False,
+        ),
+        # Not closed
+        HaukiAPIDatePeriod(
+            start_date="2024-01-01",
+            end_date="2024-01-01",
+            resource_state=HaukiResourceState.WITH_RESERVATION.value,
+            override=True,
+        ),
+    ]
+
+    generate_reservation_series_from_allocations(application_round_id=application_round.id)
+
+    series: list[RecurringReservation] = list(RecurringReservation.objects.all())
+    assert len(series) == 1
+
+    reservations: list[Reservation] = list(series[0].reservations.all())
+    assert len(reservations) == 1
+
+    rejected = list(RejectedOccurrence.objects.all())
+    assert len(rejected) == 0
+
+    assert HaukiAPIClient.get_date_periods.call_count == 1

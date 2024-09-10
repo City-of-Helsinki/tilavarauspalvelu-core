@@ -1,5 +1,4 @@
 import datetime
-from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.db import transaction
@@ -8,17 +7,16 @@ from django.utils.translation import gettext_lazy as _
 from actions.recurring_reservation import ReservationDetails
 from applications.enums import ApplicantTypeChoice, Weekday
 from applications.models import Address, AllocatedTimeSlot, Organisation, Person
+from common.date_utils import local_end_of_day, local_start_of_day
 from common.utils import translate_for_user
-from opening_hours.errors import ReservableTimeSpanClientError
-from opening_hours.utils.reservable_time_span_client import ReservableTimeSpanClient
+from opening_hours.enums import HaukiResourceState
+from opening_hours.utils.hauki_api_client import HaukiAPIClient
+from opening_hours.utils.time_span_element import TimeSpanElement
 from reservations.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import RecurringReservation
 from reservations.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task
 from tilavarauspalvelu.celery import app
 from utils.sentry import SentryLogger
-
-if TYPE_CHECKING:
-    from opening_hours.utils.time_span_element import TimeSpanElement
 
 
 def _get_series_override_closed_time_spans(allocations: list[AllocatedTimeSlot]) -> dict[int, list["TimeSpanElement"]]:
@@ -34,20 +32,27 @@ def _get_series_override_closed_time_spans(allocations: list[AllocatedTimeSlot])
         if resource is None or resource.id in closed_time_spans:
             continue  # Skip if already fetched
 
-        try:
-            client = ReservableTimeSpanClient(resource)
-        except ReservableTimeSpanClientError:
-            # Skip fetching opening hours if the resource indicates that it never has any opening hours.
-            # There is a slight chance that someone has updated the resource recently,
-            # and it didn't have any opening hour rules previously,
-            # but since there is a performance penalty, we still skip fetching for now.
-            continue
-
         application_round = allocation.reservation_unit_option.application_section.application.application_round
-        closed_time_spans[resource.id] = client.get_closed_time_spans(
-            start_date=application_round.reservation_period_begin,
-            end_date=application_round.reservation_period_end,
+
+        # Fetch periods from Hauki API
+        date_periods = HaukiAPIClient.get_date_periods(
+            hauki_resource_id=resource.id,
+            start_date_lte=application_round.reservation_period_end.isoformat(),  # Starts before period ends
+            end_date_gte=application_round.reservation_period_begin.isoformat(),  # Ends after period begins
         )
+
+        # Convert periods to TimeSpanElements
+        closed_time_spans[resource.id] = [
+            TimeSpanElement(
+                start_datetime=local_start_of_day(datetime.date.fromisoformat(period["start_date"])),
+                end_datetime=local_end_of_day(datetime.date.fromisoformat(period["end_date"])),
+                is_reservable=False,
+            )
+            for period in date_periods
+            # Overriding closed date periods are exceptions to the normal opening hours
+            if period["override"] and period["resource_state"] == HaukiResourceState.CLOSED.value
+        ]
+
     return closed_time_spans
 
 
