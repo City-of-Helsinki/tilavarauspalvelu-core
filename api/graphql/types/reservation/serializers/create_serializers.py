@@ -213,7 +213,7 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
             return
 
         try:
-            prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(request)
+            prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session=request.session)
         except ExternalServiceError:
             return
         except Exception as error:

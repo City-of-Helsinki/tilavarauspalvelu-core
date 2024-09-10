@@ -227,7 +227,7 @@ class Query(graphene.ObjectType):
         if info.context.user.is_anonymous:
             return None
 
-        HelsinkiProfileClient.ensure_token_valid(info.context)
+        HelsinkiProfileClient.ensure_token_valid(user=info.context.user, session=info.context.session)
         return optimize_single(User.objects.all(), info, max_complexity=15, pk=info.context.user.pk)
 
     def resolve_profile_data(root: None, info: GQLInfo, **kwargs: Any) -> UserProfileInfo:

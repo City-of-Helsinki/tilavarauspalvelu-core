@@ -12,30 +12,29 @@ from requests import HTTPError, Response
 from social_django.models import DjangoStorage
 from social_django.strategy import DjangoStrategy
 
+from common.date_utils import DEFAULT_TIMEZONE, local_datetime
 from tilavarauspalvelu.auth import ProxyTunnistamoOIDCAuthBackend
 from users.helauth.parsers import ProfileDataParser
-from users.helauth.utils import get_jwt_payload
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 from utils.external_service.errors import ExternalServiceError, ExternalServiceRequestError
 from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
-    from common.typing import AnyUser, WSGIRequest
+    from common.typing import AnyUser, SessionMapping
     from users.helauth.typing import (
         BirthdayInfo,
         ExtraData,
         ProfileData,
-        ProfileTokenPayload,
         RefreshResponse,
         ReservationPrefillInfo,
+        TokenResponse,
         UserProfileInfo,
     )
-    from users.models import User
 
 
 __all__ = [
     "HelsinkiProfileClient",
-    "TunnistamoClient",
+    "KeyCloakClient",
 ]
 
 
@@ -47,104 +46,134 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
     REQUEST_TIMEOUT_SECONDS = 5
 
     @classmethod
-    def get_reservation_prefill_info(cls, request: WSGIRequest) -> ReservationPrefillInfo | None:
+    def get_reservation_prefill_info(cls, *, user: AnyUser, session: SessionMapping) -> ReservationPrefillInfo | None:
         """Fetch reservation prefill info for the request user from Helsinki Profile."""
-        my_profile_data = cls.graphql_request(request, query=cls.reservation_prefill_query)
+        my_profile_data = cls.graphql_request(user=user, session=session, query=cls.reservation_prefill_query)
         if my_profile_data is None:
             return None
         return ProfileDataParser(my_profile_data).parse_reservation_prefill_data()
 
     @classmethod
-    def get_birthday_info(cls, request: WSGIRequest) -> BirthdayInfo | None:
+    def get_birthday_info(cls, *, user: AnyUser, session: SessionMapping) -> BirthdayInfo | None:
         """Fetch profile ID and birthday for the request user from Helsinki profile."""
-        my_profile_data = cls.graphql_request(request, query=cls.social_security_number_query)
+        my_profile_data = cls.graphql_request(user=user, session=session, query=cls.social_security_number_query)
         if my_profile_data is None:
             return None
         return ProfileDataParser(my_profile_data).parse_birthday_info()
 
     @classmethod
-    def get_user_profile_info(cls, request: WSGIRequest, *, user: User, fields: list[str]) -> UserProfileInfo | None:
+    def get_user_profile_info(
+        cls,
+        *,
+        user: AnyUser,
+        request_user: AnyUser,
+        session: SessionMapping,
+        fields: list[str],
+    ) -> UserProfileInfo | None:
         """Fetch user profile info for the given user from Helsinki Profile."""
         query = cls.user_profile_data(profile_id=user.profile_id, fields=fields)
-        my_profile_data = cls.graphql_request(request, query=query, endpoint="profile")
+        my_profile_data = cls.graphql_request(user=request_user, session=session, query=query, endpoint="profile")
         if my_profile_data is None:
             return None
         return ProfileDataParser(my_profile_data).parse_user_profile_info(user=user)
 
     @classmethod
-    def ensure_token_valid(cls, request: WSGIRequest) -> bool:
+    def ensure_token_valid(cls, *, user: AnyUser, session: SessionMapping) -> bool:
         """
         Ensure that the request user's helsinki profile JWT is valid. Refresh if necessary.
 
         :return: True if the user has a valid token, False otherwise.
         """
-        return cls.get_token(request) is not None
+        return cls.get_token(user=user, session=session) is not None
 
     @classmethod
-    def get_token(cls, request: WSGIRequest) -> str | None:
+    def get_token(cls, *, user: AnyUser, session: SessionMapping) -> str | None:
         """
         Get helsinki profile token from the user session. Refresh if necessary.
 
         :return: The access token if one is valid or could be refreshed, None otherwise.
         """
-        user: AnyUser = request.user
         if user.is_anonymous:
             return None
 
-        api_tokens: dict[str, str] | None = request.session.get("api_tokens")
-        if api_tokens is None:
-            msg = "No api-tokens in session. User is not a helsinki profile user."
-            logger.info(msg)
-            return None
+        leeway = 10
+        cutoff = local_datetime() - datetime.timedelta(seconds=leeway)
+        profile_access_token: str | None = session.get("profile_access_token")
+        profile_access_token_expires_at: datetime.datetime | None = session.get("profile_access_token_expires_at")
 
-        token: str | None = api_tokens.get(settings.OPEN_CITY_PROFILE_SCOPE)
-        if token is not None:
-            payload: ProfileTokenPayload = get_jwt_payload(token)
-            leeway = settings.HELSINKI_PROFILE_TOKEN_EXPIRATION_LEEWAY_SECONDS
-            is_token_valid = payload["exp"] > int(time.time()) + leeway
-            if is_token_valid:
-                return token
+        if (
+            profile_access_token is not None
+            and profile_access_token_expires_at is not None
+            and profile_access_token_expires_at.astimezone(DEFAULT_TIMEZONE) >= cutoff
+        ):
+            return profile_access_token
 
-        # If token or profile was not found in api-tokens, or token was expired, refresh it.
-        return cls.refresh_token(request)
+        # If a profile access token was not found or it was expired, try to refresh it.
+        return cls.refresh_token(user=user, session=session)
 
     @classmethod
-    def refresh_token(cls, request: WSGIRequest) -> str | None:
+    def refresh_token(cls, *, user: AnyUser, session: SessionMapping) -> str | None:
         """
-        Refresh helsinki profile token.
+        Refresh helsinki profile access token.
 
         :return: The new access token if refresh was successful, None otherwise.
         """
-        user: AnyUser = request.user
         if user.is_anonymous:
             return None
 
-        access_token = TunnistamoClient.get_token(request)
-        if access_token is None:
-            msg = "Unable to get tunnistamo access token to refresh profile token."
-            logger.info(msg)
-            return None
+        # The strategy/storage doesn't matter here.
+        backend = ProxyTunnistamoOIDCAuthBackend(strategy=DjangoStrategy(storage=DjangoStorage()))
 
-        url = f"{settings.TUNNISTAMO_BASE_URL}/api-tokens/"
-        headers: dict[str, str] = {"Authorization": f"Bearer {access_token}"}
+        leeway = 10
+        cutoff = local_datetime() - datetime.timedelta(seconds=leeway)
+        profile_refresh_token: str | None = session.get("profile_refresh_token")
+        profile_access_token_expires_at: datetime.datetime | None = session.get("profile_refresh_token_expires_at")
 
-        response = cls.post(url=url, headers=headers)
+        if (
+            profile_refresh_token is None
+            or profile_access_token_expires_at is None
+            or profile_access_token_expires_at.astimezone(DEFAULT_TIMEZONE) < cutoff
+        ):
+            access_token = KeyCloakClient.get_token(user=user, session=session)
+            if access_token is None:
+                msg = "Unable to get keycloak access token to refresh profile token."
+                logger.info(msg)
+                return None
 
-        if response.status_code != 200:
-            msg = (
-                f"Unable to get API tokens for helsinki profile for user {int(request.user.pk)}: "
-                f"[{response.status_code}] {response.text}"
-            )
-            logger.info(msg)
-            return None
+            try:
+                # Delegate refresh to OAuth backend.
+                response: TokenResponse = backend.get_token_for_profile(access_token=access_token)
+            except HTTPError as error:
+                msg = f"Unable to get Helsinki profile token for user {int(user.pk)}: {error.response.text}"
+                logger.info(msg, exc_info=error)
+                return None
 
-        session_data = request.session
-        session_data["api_tokens"] = BaseExternalServiceClient.response_json(response=response)
-        return session_data["api_tokens"].get(settings.OPEN_CITY_PROFILE_SCOPE)
+        else:
+            try:
+                # Delegate refresh to OAuth backend.
+                response: RefreshResponse = backend.refresh_token(token=profile_refresh_token)
+            except HTTPError as error:
+                msg = f"Unable to refresh Helsinki profile token for user {int(user.pk)}: {error.response.text}"
+                logger.info(msg, exc_info=error)
+                return None
+
+        now = local_datetime()
+        session["profile_access_token"] = response["access_token"]
+        session["profile_access_token_expires_at"] = now + datetime.timedelta(seconds=response["expires_in"])
+        session["profile_refresh_token"] = response["refresh_token"]
+        session["profile_refresh_token_expires_at"] = now + datetime.timedelta(seconds=response["refresh_expires_in"])
+        return response["access_token"]
 
     @classmethod
-    def graphql_request(cls, request: WSGIRequest, *, query: str, endpoint: str = "myProfile") -> ProfileData | None:
-        token = cls.get_token(request)
+    def graphql_request(
+        cls,
+        *,
+        user: AnyUser,
+        session: SessionMapping,
+        query: str,
+        endpoint: str = "myProfile",
+    ) -> ProfileData | None:
+        token = cls.get_token(user=user, session=session)
         if token is None:
             return None
 
@@ -392,67 +421,67 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
         )
 
 
-class TunnistamoClient(BaseExternalServiceClient):
-    SERVICE_NAME = "Tunnistamo"
+class KeyCloakClient(BaseExternalServiceClient):
+    SERVICE_NAME = "KeyCloak"
     REQUEST_TIMEOUT_SECONDS = 5
 
     @classmethod
-    def get_token(cls, request: WSGIRequest) -> str | None:
+    def get_token(cls, *, user: AnyUser, session: SessionMapping) -> str | None:
         """
-        Get tunnistamo access token from the user session. Refresh if necessary.
+        Get KeyCloak access token from the user session. Refresh if necessary.
 
         :return: The access token if one is valid or could be refreshed, None otherwise.
         """
-        user: AnyUser = request.user
         if user.is_anonymous:
             return None
 
-        session_data = request.session
+        leeway = 60
+        cutoff = local_datetime() - datetime.timedelta(seconds=leeway)
+        keycloak_access_token: str | None = session.get("keycloak_access_token")
+        keycloak_access_token_expires_at: datetime.datetime | None = session.get("keycloak_access_token_expires_at")
 
-        leeway = datetime.timedelta(seconds=settings.HELSINKI_PROFILE_TOKEN_EXPIRATION_LEEWAY_SECONDS)
-        is_token_valid = session_data["access_token_expires_at"] > datetime.datetime.now() + leeway
-        if is_token_valid:
-            return session_data["access_token"]
+        if (
+            keycloak_access_token is not None
+            and keycloak_access_token_expires_at is not None
+            and keycloak_access_token_expires_at.astimezone(DEFAULT_TIMEZONE) >= cutoff
+        ):
+            return keycloak_access_token
 
-        return cls.refresh_token(request)
+        return cls.refresh_token(user=user, session=session)
 
     @classmethod
-    def refresh_token(cls, request: WSGIRequest) -> str | None:
+    def refresh_token(cls, *, user: AnyUser, session: SessionMapping) -> str | None:
         """
-        Refresh tunnistamo access and refresh tokens.
+        Refresh KeyCloak access and refresh tokens.
 
         :return: The new access token if refresh was successful, None otherwise.
         """
-        user: AnyUser = request.user
         if user.is_anonymous:
             return None
 
         social_auth = user.current_social_auth
         if social_auth is None:
-            msg = f"Unable to get `social_auth` for user {int(request.user.pk)}."
+            msg = f"Unable to get `social_auth` for user {int(user.pk)}."
             logger.info(msg)
             return None
 
         extra_data: ExtraData = social_auth.extra_data
+        keycloak_refresh_token = extra_data["refresh_token"]
 
         # The strategy/storage doesn't matter here.
         backend = ProxyTunnistamoOIDCAuthBackend(strategy=DjangoStrategy(storage=DjangoStorage()))
 
         try:
             # Delegate refresh to OAuth backend.
-            response: RefreshResponse = backend.refresh_token(token=extra_data["refresh_token"])
+            response: RefreshResponse = backend.refresh_token(token=keycloak_refresh_token)
         except HTTPError as error:
-            msg = f"Unable to refresh token for user {int(request.user.pk)}: {error.response.text}"
+            msg = f"Unable to refresh keycloak token for user {int(user.pk)}: {error.response.text}"
             logger.info(msg, exc_info=error)
             return None
 
-        expires_at = datetime.datetime.now() + datetime.timedelta(seconds=response["expires_in"])
-        expires_at_ts = int(expires_at.timestamp()) * 1000
-
-        session_data = request.session
-        session_data["access_token"] = response["access_token"]
-        session_data["access_token_expires_at"] = expires_at
-        session_data["access_token_expires_at_ts"] = expires_at_ts
+        now = local_datetime()
+        session["keycloak_access_token"] = response["access_token"]
+        session["keycloak_access_token_expires_at"] = now + datetime.timedelta(seconds=response["expires_in"])
 
         extra_data["id_token"] = response["id_token"]
         extra_data["auth_time"] = int(time.time())

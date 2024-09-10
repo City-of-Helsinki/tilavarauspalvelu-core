@@ -308,7 +308,6 @@ class Common(Environment):
     OPEN_CITY_PROFILE_SCOPE = values.StringValue()
     OPEN_CITY_PROFILE_GRAPHQL_API = values.StringValue()
     PREFILL_RESERVATION_WITH_PROFILE_DATA = values.BooleanValue(default=False)
-    HELSINKI_PROFILE_TOKEN_EXPIRATION_LEEWAY_SECONDS = values.IntegerValue(default=60)
 
     # Defaults when fetching profile data
     PRIMARY_MUNICIPALITY_NUMBER = values.StringValue(default="091")

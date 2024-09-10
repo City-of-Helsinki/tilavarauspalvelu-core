@@ -22,8 +22,6 @@ from utils.external_service.errors import (
 )
 from utils.sentry import SentryLogger
 
-from .helpers import mock_request
-
 pytestmark = [
     pytest.mark.django_db,
 ]
@@ -42,7 +40,8 @@ def test_helsinki_profile_client__prefill_info__all_primary():
     profile_data = MyProfileDataFactory.create_basic()
     HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
 
-    prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(mock_request(UserFactory.create()))
+    user = UserFactory.create()
+    prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
     assert prefill_info == {
         "reservee_first_name": "Example",
@@ -90,7 +89,8 @@ def test_helsinki_profile_client__prefill_info__highest_priority_address(types, 
     profile_data = MyProfileDataFactory.create_basic(primaryAddress=None, addresses=addresses)
     HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
 
-    prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(mock_request(UserFactory.create()))
+    user = UserFactory.create()
+    prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
     assert prefill_info["reservee_address_street"] == addresses[select]["address"]
     assert prefill_info["reservee_address_zip"] == addresses[select]["postalCode"]
@@ -109,7 +109,8 @@ def test_helsinki_profile_client__prefill_info__permanent_address():
     )
     HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
 
-    prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(mock_request(UserFactory.create()))
+    user = UserFactory.create()
+    prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
     assert prefill_info["reservee_address_street"] == "Permanent street 1"
     assert prefill_info["reservee_address_zip"] == "00100"
@@ -127,7 +128,8 @@ def test_helsinki_profile_client__prefill_info__permanent_foreign_address():
     )
     HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
 
-    prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(mock_request(UserFactory.create()))
+    user = UserFactory.create()
+    prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
     assert prefill_info["reservee_address_street"] == "Foreign street 1"
     assert prefill_info["reservee_address_zip"] is None
@@ -145,7 +147,8 @@ def test_helsinki_profile_client__prefill_info__no_address():
     )
     HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
 
-    prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(mock_request(UserFactory.create()))
+    user = UserFactory.create()
+    prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
     assert prefill_info["reservee_address_street"] is None
     assert prefill_info["reservee_address_zip"] is None
@@ -190,7 +193,8 @@ def test_helsinki_profile_client__prefill_info__highest_priority_phone(types, se
     profile_data = MyProfileDataFactory.create_basic(primaryPhone=None, phones=phones)
     HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
 
-    prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(mock_request(UserFactory.create()))
+    user = UserFactory.create()
+    prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
     assert prefill_info["reservee_phone"] == phones[select]["phone"]
 
@@ -201,7 +205,8 @@ def test_helsinki_profile_client__prefill_info__no_phone():
     profile_data = MyProfileDataFactory.create_basic(primaryPhone=None, phones=[])
     HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
 
-    prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(mock_request(UserFactory.create()))
+    user = UserFactory.create()
+    prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
     assert prefill_info["reservee_phone"] is None
 
@@ -240,7 +245,8 @@ def test_helsinki_profile_client__prefill_info__highest_priority_email(types, se
     profile_data = MyProfileDataFactory.create_basic(primaryEmail=None, emails=emails)
     HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
 
-    prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(mock_request(UserFactory.create()))
+    user = UserFactory.create()
+    prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
     assert prefill_info["reservee_email"] == emails[select]["email"]
 
@@ -251,7 +257,8 @@ def test_helsinki_profile_client__prefill_info__no_email():
     profile_data = MyProfileDataFactory.create_basic(primaryEmail=None, emails=[])
     HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
 
-    prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(mock_request(UserFactory.create()))
+    user = UserFactory.create()
+    prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
     assert prefill_info["reservee_email"] is None
 
@@ -266,7 +273,8 @@ def test_helsinki_profile_client__prefill_info__home_city_matching_municipality_
     )
     HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
 
-    prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(mock_request(UserFactory.create()))
+    user = UserFactory.create()
+    prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
     assert prefill_info["home_city"] == city
 
@@ -281,7 +289,8 @@ def test_helsinki_profile_client__prefill_info__home_city_matching_municipality_
     )
     HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
 
-    prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(mock_request(UserFactory.create()))
+    user = UserFactory.create()
+    prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
     assert prefill_info["home_city"] == city
 
@@ -297,7 +306,8 @@ def test_helsinki_profile_client__prefill_info__secondary_city():
     )
     HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
 
-    prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(mock_request(UserFactory.create()))
+    user = UserFactory.create()
+    prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
     assert prefill_info["home_city"] == city
 
@@ -314,7 +324,8 @@ def test_helsinki_profile_client__prefill_info__no_city():
     )
     HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
 
-    prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(mock_request(UserFactory.create()))
+    user = UserFactory.create()
+    prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
     assert prefill_info["home_city"] is None
 
@@ -331,9 +342,11 @@ def test_helsinki_profile_client__prefill_info__non_200_response():
 
     HelsinkiProfileClient.generic.return_value = response
 
+    user = UserFactory.create()
+
     msg = "GET request to HELSINKI PROFILE (example.com) failed with status 400."
     with pytest.raises(ExternalServiceRequestError, match=re.escape(msg)):
-        HelsinkiProfileClient.get_reservation_prefill_info(mock_request(UserFactory.create()))
+        HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
     assert SentryLogger.log_message.call_count == 1
 
@@ -351,9 +364,11 @@ def test_helsinki_profile_client__prefill_info__contains_errors():
         }
     )
 
+    user = UserFactory.create()
+
     msg = 'Helsinki profile: Response contains errors. [{"message": "foo"}]'
     with pytest.raises(ExternalServiceError, match=re.escape(msg)):
-        HelsinkiProfileClient.get_reservation_prefill_info(mock_request(UserFactory.create()))
+        HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
     assert SentryLogger.log_message.call_count == 1
 
@@ -367,9 +382,11 @@ def test_helsinki_profile_client__prefill_info__json_decode_error():
 
     HelsinkiProfileClient.generic.return_value = response
 
+    user = UserFactory.create()
+
     msg = "Parsing Helsinki Profile return data failed."
     with pytest.raises(ExternalServiceParseJSONError, match=re.escape(msg)):
-        HelsinkiProfileClient.get_reservation_prefill_info(mock_request(UserFactory.create()))
+        HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
 
 @patch_method(HelsinkiProfileClient.generic)
@@ -384,14 +401,17 @@ def test_helsinki_profile_client__prefill_info__500_error():
 
     HelsinkiProfileClient.generic.return_value = response
 
+    user = UserFactory.create()
+
     msg = "GET request to HELSINKI PROFILE (example.com) failed with status 500."
     with pytest.raises(ExternalServiceRequestError, match=re.escape(msg)):
-        HelsinkiProfileClient.get_reservation_prefill_info(mock_request(UserFactory.create()))
+        HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
 
     assert SentryLogger.log_message.call_count == 1
 
 
 @patch_method(HelsinkiProfileClient.get_token, return_value=None)
 def test_helsinki_profile_client__prefill_info__no_token():
-    prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(mock_request(UserFactory.create()))
+    user = UserFactory.create()
+    prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session={})
     assert prefill_info is None

@@ -1,13 +1,19 @@
+from __future__ import annotations
+
 from contextlib import suppress
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from django.contrib.auth.backends import ModelBackend
 from helusers.tunnistamo_oidc import TunnistamoOIDCAuth
 
-from common.typing import WSGIRequest
 from common.utils import update_query_params
 from users.models import User, get_user
+
+if TYPE_CHECKING:
+    from common.typing import WSGIRequest
+    from users.helauth.typing import TokenResponse
+
 
 __all__ = [
     "ProxyModelBackend",
@@ -40,6 +46,23 @@ class ProxyTunnistamoOIDCAuthBackend(TunnistamoOIDCAuth):
             return update_query_params(url, **params)
 
         return None
+
+    def get_token_for_profile(self, access_token: str) -> TokenResponse:
+        url = self.access_token_url()
+        request_args = {
+            "method": "POST",
+            "headers": {
+                **self.auth_headers(),
+                "Authorization": f"Bearer {access_token}",
+            },
+            "data": {
+                "audience": settings.OPEN_CITY_PROFILE_SCOPE,
+                "grant_type": "urn:ietf:params:oauth:grant-type:uma-ticket",
+                "permission": "#access",
+            },
+        }
+        response = self.request(url, **request_args)
+        return response.json()
 
 
 class ProxyModelBackend(ModelBackend):
