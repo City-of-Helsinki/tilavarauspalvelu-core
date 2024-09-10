@@ -852,6 +852,9 @@ const translations: ITranslations = {
         "String must contain at most 80 character(s)": [
           "Nimi ei saa olla yli 80 merkkiä",
         ],
+        "String must contain at most 2000 character(s)": [
+          "Viesti ei saa olla yli 2000 merkkiä",
+        ],
         "String must contain at most 4000 character(s)": [
           "Viesti ei saa olla yli 4000 merkkiä",
         ],

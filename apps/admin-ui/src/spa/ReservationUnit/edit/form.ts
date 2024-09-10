@@ -398,9 +398,9 @@ export const ReservationUnitEditSchema = z
     nameEn: z.string().max(80),
     nameSv: z.string().max(80),
     // backend allows nulls but not empty strings, these are not required though
-    termsOfUseFi: z.string().max(10000),
-    termsOfUseEn: z.string().max(10000),
-    termsOfUseSv: z.string().max(10000),
+    termsOfUseFi: z.string().max(2000),
+    termsOfUseEn: z.string().max(2000),
+    termsOfUseSv: z.string().max(2000),
     spaces: z.array(z.number()),
     resources: z.array(z.number()),
     equipments: z.array(z.number()),
