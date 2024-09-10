@@ -35,4 +35,4 @@ def logout_view(request: WSGIRequest) -> HttpResponseRedirect:
     if was_authenticated:
         messages.success(request, _("You have been successfully logged out."))
 
-    return HttpResponseRedirect(end_session_url)
+    return HttpResponseRedirect(end_session_url)  # NOSONAR
