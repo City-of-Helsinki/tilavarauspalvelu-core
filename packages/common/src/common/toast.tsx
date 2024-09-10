@@ -152,7 +152,7 @@ export default function toast({
       type={type ?? "info"}
       label={label}
       ariaLabel={ariaLabel}
-      duration={duration && duration * 1000}
+      duration={duration ? duration * 1000 : 5000}
       dataTestId={dataTestId}
     />,
     toastOptions
