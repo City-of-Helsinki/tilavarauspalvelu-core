@@ -156,8 +156,8 @@ const BufferWrapper = styled.div`
 const Preview = styled.a<{ $disabled: boolean }>`
   display: flex;
   place-items: center;
-  border-color: var(--color-white) !important;
   border: 2px solid;
+  border-color: var(--color-white) !important;
   background-color: var(--color-bus-dark);
   text-decoration: none;
   &:hover {

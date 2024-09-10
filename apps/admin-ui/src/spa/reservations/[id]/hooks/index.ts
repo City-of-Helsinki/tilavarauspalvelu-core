@@ -155,7 +155,7 @@ export const useReservationEditData = (pk?: string) => {
     .filter((x) => x.state === ReservationStateChoice.Confirmed);
 
   const nextRecurranceId = base64encode(
-    `${typename}:${possibleReservations?.at(0)?.pk}` ?? 0
+    `${typename}:${possibleReservations?.at(0)?.pk ?? 0}`
   );
   const { data: nextRecurrance, loading: nextReservationLoading } =
     useReservationQuery({

@@ -227,12 +227,16 @@ const NotificationFormSchema = z
     messageEn: z.string().max(1000),
     messageSv: z.string().max(1000),
     // refinement is not empty for these two (not having empty as an option forces a default value)
-    targetGroup: z.enum(["", "ALL", "STAFF", "USER"]).refine((x) => x !== "", {
-      message: "Target group cannot be empty",
-    }),
+    targetGroup: z
+      .enum(["ALL", "STAFF", "USER"])
+      .optional()
+      .refine((x) => x != null, {
+        message: "Target group cannot be empty",
+      }),
     level: z
-      .enum(["", "EXCEPTION", "NORMAL", "WARNING"])
-      .refine((x) => x !== "", {
+      .enum(["EXCEPTION", "NORMAL", "WARNING"])
+      .optional()
+      .refine((x) => x != null, {
         message: "Level cannot be empty",
       }),
     pk: z.number(),
@@ -322,8 +326,8 @@ const NotificationForm = ({
       activeUntil,
       activeFromTime,
       activeUntilTime,
-      targetGroup: notification?.target ?? "",
-      level: notification?.level ?? "",
+      targetGroup: notification?.target,
+      level: notification?.level,
       messageFi: notification?.messageFi ?? "",
       messageEn: notification?.messageEn ?? "",
       messageSv: notification?.messageSv ?? "",
@@ -368,12 +372,6 @@ const NotificationForm = ({
       data.activeFrom !== ""
         ? dateTime(data.activeFrom, data.activeFromTime)
         : undefined;
-
-    // Schema checks this, but TS doesn't know
-    if (data.targetGroup === "" || data.level === "") {
-      errorToast({ text: t("Notifications.error.empty") });
-      return;
-    }
 
     const input = {
       name: data.name,
@@ -527,7 +525,7 @@ const NotificationForm = ({
             }
             value={{
               value,
-              label: value !== "" ? t(`form.levelEnum.${value}`) : "",
+              label: value != null ? t(`form.levelEnum.${value}`) : "",
             }}
             invalid={!!errors.level}
             error={translateError(errors.level?.message)}
@@ -549,7 +547,7 @@ const NotificationForm = ({
             }
             value={{
               value,
-              label: value !== "" ? t(`target.${value}`) : "",
+              label: value != null ? t(`target.${value}`) : "",
             }}
             invalid={!!errors.targetGroup}
             error={translateError(errors.targetGroup?.message)}

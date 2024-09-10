@@ -72,7 +72,7 @@ export function getPermissionErrors(error: unknown): ValidationError[] {
           return false;
         }
         return (
-          PERMISSION_ERROR_CODES.find((x) => x === e.extensions.code) != null
+          PERMISSION_ERROR_CODES.find((x) => x === e.extensions?.code) != null
         );
       };
       return graphQLErrors.filter(hasExtension).flatMap(mapValidationError);

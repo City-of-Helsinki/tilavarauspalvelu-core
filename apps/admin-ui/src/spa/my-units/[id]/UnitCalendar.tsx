@@ -187,7 +187,7 @@ const HideTimesOverTitles = styled.div`
 
 const Container = styled.div<{ $height: number }>`
   max-width: 100%;
-  overflow: auto auto;
+  overflow: auto;
   scroll-behavior: smooth;
   overscroll-behavior: contain;
 
