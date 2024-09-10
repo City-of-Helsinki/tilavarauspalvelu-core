@@ -152,7 +152,7 @@ export function RecurringReservationsView({
           />
         );
       }
-      if (endDate > now) {
+      if (hasPermission && endDate > now) {
         buttons.push(
           <ReservationListButton
             key="deny"
