@@ -3164,6 +3164,10 @@ msgid "Settings"
 msgstr "Asetukset"
 
 #: users/admin/user.py
+msgid "ID token info"
+msgstr "ID token sisältö"
+
+#: users/admin/user.py
 msgid "Permissions"
 msgstr "Oikeudet"
 
