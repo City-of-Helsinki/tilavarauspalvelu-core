@@ -138,6 +138,7 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
                 "fields": [
                     "payment_merchant",
                     "payment_accounting",
+                    "payment_product",
                     "can_apply_free_of_charge",
                     "payment_types",
                 ],
