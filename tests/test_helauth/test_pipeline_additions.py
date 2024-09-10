@@ -122,9 +122,6 @@ def test_ssn_to_date(id_number, expected):
     assert ssn_to_date(id_number) == expected
 
 
-# TODO: Test "users.helauth.pipeline.migrate_from_tunnistamo_to_keycloak"
-
-
 def test_migrate_from_tunnistamo_to_keycloak():
     old_user = UserFactory.create(email="foo@example.com", profile_id="", is_staff=True, is_superuser=True)
 

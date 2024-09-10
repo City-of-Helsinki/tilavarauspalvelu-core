@@ -1,6 +1,8 @@
 import pytest
 
 from tests.factories import UnitFactory, UserFactory, UserSocialAuthFactory
+from tests.helpers import patch_method
+from users.helauth.clients import HelsinkiProfileClient
 
 from .helpers import current_user_query
 
@@ -10,6 +12,7 @@ pytestmark = [
 ]
 
 
+@patch_method(HelsinkiProfileClient.ensure_token_valid)
 def test_query_current_user__all_fields(graphql):
     # given:
     # - There is a user in the system
@@ -58,7 +61,10 @@ def test_query_current_user__all_fields(graphql):
         "unitRoles": [],
     }
 
+    assert HelsinkiProfileClient.ensure_token_valid.call_count == 1
 
+
+@patch_method(HelsinkiProfileClient.ensure_token_valid)
 def test_query_current_user__unauthenticated(graphql):
     # given:
     # - An anonymous user is using the system
@@ -92,6 +98,7 @@ def test_query_current_user__unauthenticated(graphql):
     assert response.first_query_object is None
 
 
+@patch_method(HelsinkiProfileClient.ensure_token_valid)
 def test_query_current_user__general_roles(graphql):
     # given:
     # - There is a general admin in the system
@@ -145,6 +152,7 @@ def test_query_current_user__general_roles(graphql):
     }
 
 
+@patch_method(HelsinkiProfileClient.ensure_token_valid)
 def test_query_current_user__unit_admin(graphql):
     # given:
     # - There is a unit in the system
@@ -212,6 +220,7 @@ def test_query_current_user__unit_admin(graphql):
     }
 
 
+@patch_method(HelsinkiProfileClient.ensure_token_valid)
 def test_query_current_user__reservation_notification(graphql):
     # given:
     # - There is a superuser user in the system
@@ -237,6 +246,7 @@ def test_query_current_user__reservation_notification(graphql):
     }
 
 
+@patch_method(HelsinkiProfileClient.ensure_token_valid)
 def test_query_current_user__reservation_notification__hidden_for_non_staff(graphql):
     # given:
     # - There is a regular user in the system
@@ -262,6 +272,7 @@ def test_query_current_user__reservation_notification__hidden_for_non_staff(grap
     }
 
 
+@patch_method(HelsinkiProfileClient.ensure_token_valid)
 def test_query_current_user__ad_login(graphql):
     # given:
     # - There is a user logged in with azure ad
@@ -290,6 +301,7 @@ def test_query_current_user__ad_login(graphql):
     }
 
 
+@patch_method(HelsinkiProfileClient.ensure_token_valid)
 def test_query_current_user__suomi_fi_login(graphql):
     # given:
     # - There is a user logged in with azure ad
