@@ -5,6 +5,7 @@ from django.conf import settings
 
 from opening_hours.errors import HaukiAPIError, HaukiConfigurationError
 from opening_hours.utils.hauki_api_types import (
+    HaukiAPIDatePeriod,
     HaukiAPIOpeningHoursResponse,
     HaukiAPIOpeningHoursResponseItem,
     HaukiAPIResource,
@@ -155,6 +156,26 @@ class HaukiAPIClient(BaseExternalServiceClient):
             raise HaukiAPIError("Received too many results from Hauki API.")
 
         return response_json["results"][0]
+
+    ###############
+    # date_period #
+    ###############
+
+    @classmethod
+    def get_date_periods(cls, *, hauki_resource_id: int, **kwargs) -> list[HaukiAPIDatePeriod]:
+        """
+        Fetch a single resource's DatePeriods.
+
+        Supports filtering by start_date_gte, start_date_lte, end_date_gte, end_date_lte in iso format or relative time
+        e.g. start_date_gte="2024-01-01", end_date_gte="-1d" (end date must be after yesterday)
+        """
+        # Prepare the URL
+        url = cls._build_url("date_period")
+        query_params = {"resource": hauki_resource_id, **kwargs}
+
+        # Get the data from Hauki API
+        response = cls.get(url=url, params=query_params)
+        return cls.response_json(response)
 
     ##################
     # Helper methods #

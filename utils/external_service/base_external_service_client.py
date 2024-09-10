@@ -51,7 +51,7 @@ class BaseExternalServiceClient:
         return cls._get_headers(headers)
 
     @classmethod
-    def response_json(cls, response: Response) -> dict[str, Any]:
+    def response_json(cls, response: Response) -> dict[str, Any] | list[dict[str, Any]]:
         """
         Parse a response from an API as json
         Raises an appropriate error if parsing fails or response is not ok

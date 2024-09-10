@@ -81,14 +81,16 @@ class HaukiAPIDatePeriod(TypedDict):
         rules: list[Any]
         is_removed: bool
 
-    id: int
-    resource: int
+    id: int  # date period id
+    resource: int  # resource id
     name: HaukiTranslatedField
     description: HaukiTranslatedField
     start_date: str | None  # Date, e.g. "2022-09-06"
     end_date: str | None  # Date, e.g. "2022-12-12"
-    resource_state: HaukiResourceState
-    override: bool
+    # `resource_state` is only used when `override=True`, otherwise state is defined for each `time_span_group`
+    # When `override=True`, the whole date period is considered to be in the state defined by `resource_state`
+    resource_state: HaukiResourceState  # Always `undefined` when `override=False`
+    override: bool  # If True, the `time_span_groups` is always empty
     origins: list[HaukiAPIOrigin]
     created: str  # Timestamp, e.g. "2023-09-06T09:14:12.671531+03:00"
     modified: str  # Timestamp, e.g. "2023-09-06T09:14:12.671531+03:00"
