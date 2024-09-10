@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.core.handlers.wsgi import WSGIRequest
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
@@ -13,6 +12,7 @@ from applications.admin.allocated_time_slot.filters import (
 )
 from applications.admin.allocated_time_slot.form import AllocatedTimeSlotAdminForm
 from applications.models import AllocatedTimeSlot
+from common.typing import WSGIRequest
 
 __all__ = [
     "AllocatedTimeSlotAdmin",

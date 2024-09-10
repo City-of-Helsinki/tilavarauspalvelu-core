@@ -11,9 +11,8 @@ from applications.enums import ApplicationRoundStatusChoice, ApplicationStatusCh
 from applications.models import ApplicationRound
 
 if TYPE_CHECKING:
-    from django.core.handlers.wsgi import WSGIRequest
-
     from applications.admin import ApplicationAdmin
+    from common.typing import WSGIRequest
 
 
 class ApplicationRoundFilter(admin.SimpleListFilter):

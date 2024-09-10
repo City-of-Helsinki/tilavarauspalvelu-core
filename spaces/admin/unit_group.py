@@ -1,9 +1,9 @@
 from django.contrib import admin
-from django.core.handlers.wsgi import WSGIRequest
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from modeltranslation.admin import TranslationAdmin
 
+from common.typing import WSGIRequest
 from spaces.models import UnitGroup
 
 __all__ = [

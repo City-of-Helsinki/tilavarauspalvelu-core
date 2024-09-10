@@ -1,8 +1,8 @@
 from admin_extra_buttons.decorators import button
 from admin_extra_buttons.mixins import ExtraButtonsMixin
 from django.contrib import admin
-from django.core.handlers.wsgi import WSGIRequest
 
+from common.typing import WSGIRequest
 from reservation_units.models import ReservationUnitHierarchy
 
 __all__ = [

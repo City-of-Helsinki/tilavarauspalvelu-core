@@ -2,11 +2,11 @@ from admin_extra_buttons.decorators import button
 from admin_extra_buttons.mixins import ExtraButtonsMixin
 from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin, messages
-from django.core.handlers.wsgi import WSGIRequest
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from modeltranslation.admin import TranslationAdmin
 
+from common.typing import WSGIRequest
 from spaces.admin.location import LocationInline
 from spaces.importers.tprek_unit_importer import TprekUnitImporter
 from spaces.models import Unit

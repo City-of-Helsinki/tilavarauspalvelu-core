@@ -16,9 +16,8 @@ from applications.enums import (
 from applications.models import ApplicationRound
 
 if TYPE_CHECKING:
-    from django.core.handlers.wsgi import WSGIRequest
-
     from applications.admin import AllocatedTimeSlotAdmin
+    from common.typing import WSGIRequest
 
 
 class ApplicationRoundFilter(admin.SimpleListFilter):

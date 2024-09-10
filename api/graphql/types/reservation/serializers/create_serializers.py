@@ -11,7 +11,7 @@ from api.graphql.extensions.serializers import OldPrimaryKeySerializer
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from api.graphql.types.reservation.serializers.mixins import ReservationPriceMixin, ReservationSchedulingMixin
 from applications.models import City
-from common.typing import AnyUser
+from common.typing import AnyUser, WSGIRequest
 from reservation_units.enums import ReservationKind
 from reservation_units.models import ReservationUnit
 from reservations.enums import (

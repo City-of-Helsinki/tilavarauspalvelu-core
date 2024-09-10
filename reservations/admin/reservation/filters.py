@@ -1,8 +1,8 @@
 from django.contrib import admin
-from django.core.handlers.wsgi import WSGIRequest
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 
+from common.typing import WSGIRequest
 from reservations.models import Reservation
 
 

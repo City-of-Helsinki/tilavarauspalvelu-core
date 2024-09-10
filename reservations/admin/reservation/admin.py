@@ -3,7 +3,6 @@ from typing import Any
 
 from django.contrib import admin, messages
 from django.contrib.admin import helpers
-from django.core.handlers.wsgi import WSGIRequest
 from django.db import models
 from django.db.models import QuerySet
 from django.template.response import TemplateResponse
@@ -13,6 +12,7 @@ from more_admin_filters.filters import MultiSelectRelatedOnlyDropdownFilter
 from rangefilter.filters import DateRangeFilterBuilder
 
 from common.date_utils import local_datetime
+from common.typing import WSGIRequest
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from merchants.enums import OrderStatus
 from merchants.models import PaymentOrder

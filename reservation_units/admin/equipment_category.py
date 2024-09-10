@@ -1,8 +1,8 @@
 from django.contrib import admin
-from django.core.handlers.wsgi import WSGIRequest
 from django.db import models
 from modeltranslation.admin import TranslationAdmin
 
+from common.typing import WSGIRequest
 from reservation_units.models import EquipmentCategory
 
 __all__ = [

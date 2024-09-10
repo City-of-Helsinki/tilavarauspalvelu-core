@@ -3,10 +3,10 @@ from typing import Any
 
 from django import forms
 from django.contrib import admin
-from django.core.handlers.wsgi import WSGIRequest
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from common.typing import WSGIRequest
 from merchants.models import PaymentOrder
 
 __all__ = [

@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.auth.backends import ModelBackend
 from helusers.tunnistamo_oidc import TunnistamoOIDCAuth
 
-from common.typing import TypeHintedWSGIRequest
+from common.typing import WSGIRequest
 from common.utils import update_query_params
 from users.models import User, get_user
 
@@ -28,7 +28,7 @@ class ProxyTunnistamoOIDCAuthBackend(TunnistamoOIDCAuth):
     def get_user(self, user_id: Any = None) -> User | None:
         return get_user(user_id) if user_id is not None else None
 
-    def get_end_session_url(self, request: TypeHintedWSGIRequest, id_token: str) -> str | None:
+    def get_end_session_url(self, request: WSGIRequest, id_token: str) -> str | None:
         url = self.oidc_config().get("end_session_endpoint")
 
         params = {

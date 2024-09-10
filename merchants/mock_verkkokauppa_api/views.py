@@ -3,12 +3,12 @@ from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.handlers.wsgi import WSGIRequest
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
 
 from common.date_utils import local_datetime
+from common.typing import WSGIRequest
 from merchants.enums import OrderStatus
 from merchants.models import PaymentOrder
 from reservations.enums import ReservationStateChoice
