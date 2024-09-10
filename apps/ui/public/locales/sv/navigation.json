@@ -10,9 +10,9 @@
   "profileLinkLabel": "Gå till Helsinkiprofilen",
   "skipToMainContent": "Gå till sidans huvudinnehåll",
   "languageSelection": "Välj språk",
-    "languages": {
-        "fi": "Suomi",
-        "sv": "Svenska",
-        "en": "English"
-    }
+  "languages": {
+    "fi": "Suomi",
+    "sv": "Svenska",
+    "en": "English"
+  }
 }
