@@ -307,7 +307,9 @@ function formatTime(t: TFunction, date: Date): string {
       date: {
         hour: "numeric",
         minute: "numeric",
+        // force HH:mm format even for finnish locale
         hour12: false,
+        locale: "en-GB",
       },
     },
   });
