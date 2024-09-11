@@ -9,9 +9,9 @@ from rest_framework.reverse import reverse
 
 from api.graphql.types.merchants.types import PaymentOrderNode
 from api.graphql.types.reservation.permissions import ReservationPermission
-from api.legacy_rest_api.utils import hmac_signature
 from common.db import SubqueryArray
 from common.typing import AnyUser, GQLInfo
+from common.utils import ical_hmac_signature
 from merchants.models import PaymentOrder
 from reservation_units.models import ReservationUnit
 from reservations.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
@@ -232,6 +232,6 @@ class ReservationNode(DjangoNode):
     def resolve_calendar_url(root: Reservation, info: GQLInfo) -> str:
         scheme = info.context.scheme
         host = info.context.get_host()
-        calendar_url = reverse("reservation_calendar-detail", kwargs={"pk": root.pk})
-        signature = hmac_signature(f"reservation-{root.pk}")
+        calendar_url = reverse("reservation_calendar", kwargs={"pk": root.pk})
+        signature = ical_hmac_signature(f"reservation-{root.pk}")
         return f"{scheme}://{host}{calendar_url}?hash={signature}"

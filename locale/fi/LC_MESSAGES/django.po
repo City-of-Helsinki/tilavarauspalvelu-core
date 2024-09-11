@@ -2961,6 +2961,31 @@ msgctxt "RejectionReadiness"
 msgid "Reservation unit closed"
 msgstr "Varausyksikkö suljettu"
 
+#: reservations/ical.py
+#, python-format
+msgid "Reservation for %(name)s"
+msgstr "Varaus kohteeseen %(name)s"
+
+#: reservations/ical.py
+msgid "Booking details"
+msgstr "Varauksen tiedot"
+
+#: reservations/ical.py
+msgid "From"
+msgstr "Alkamisaika"
+
+#: reservations/ical.py
+msgid "To"
+msgstr "Päättymisaika"
+
+#: reservations/ical.py
+msgid ""
+"Manage your booking at Varaamo. You can check the details of your booking "
+"and Varaamo's terms of contract and cancellation on the 'My bookings' page."
+msgstr ""
+"Hallitse varaustasi Varaamossa. Voit perua varauksesi ja tarkistaa varauksen "
+"tiedot sekä Varaamon sopimus- ja peruutusehdot Omat Varaukset -sivulla."
+
 #: reservations/models/affecting_time_span.py
 msgid "affecting time span"
 msgstr "vaikuttava aikaväli"

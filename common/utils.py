@@ -1,4 +1,6 @@
 import datetime
+import hashlib
+import hmac
 import operator
 from collections.abc import Generator, Iterable, Sequence
 from typing import Any, Generic, Literal, TypeVar
@@ -13,6 +15,7 @@ from django.utils.translation import get_language_from_request
 from modeltranslation.manager import get_translatable_fields_for_model
 
 from common.date_utils import local_datetime
+from common.typing import Lang
 from users.models import User
 
 __all__ = [
@@ -137,7 +140,7 @@ class with_indices(Generic[T]):  # noqa: N801, RUF100
         self.item_deleted = True
 
 
-def get_attr_by_language(instance: Any, field: str, language: str) -> str | None:
+def get_attr_by_language(instance: Any, field: str, language: Lang) -> str | None:
     """Get field value by language, or fallback to default language"""
     localised_value = getattr(instance, f"{field}_{language}", None)
     if localised_value:
@@ -186,3 +189,12 @@ def log_text_search(where: str, text: str) -> None:
     key = f"text_search:{where}:{local_datetime().isoformat()}"
     cache_time_seconds = int(datetime.timedelta(days=settings.TEXT_SEARCH_CACHE_TIME_DAYS).total_seconds())
     cache.set(key, text, timeout=cache_time_seconds)
+
+
+def ical_hmac_signature(value: str) -> str:
+    """Hmac signature for ical files"""
+    return hmac.new(
+        key=settings.ICAL_HASH_SECRET.encode("utf-8"),
+        msg=value.encode("utf-8"),
+        digestmod=hashlib.sha256,
+    ).hexdigest()

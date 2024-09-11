@@ -294,56 +294,6 @@ class Reservation(SerializableMixin, models.Model):
             self.reservation_unit.filter(require_reservation_handling=True).exists() or self.applying_for_free_of_charge
         )
 
-    def get_location_string(self) -> str:
-        locations = []
-        for reservation_unit in self.reservation_unit.all():
-            location = reservation_unit.actions.get_location()
-            if location is not None:
-                locations.append(str(location))
-        return f"{', '.join(locations)}"
-
-    def get_ical_summary(self) -> str:
-        if self.name:
-            return self.name
-        if self.recurring_reservation is not None:
-            return self.recurring_reservation.application_event.name
-        return ""
-
-    def get_ical_description(self) -> str:
-        reservation_units = self.reservation_unit.all()
-        unit_names = [
-            reservation_unit.unit.name for reservation_unit in reservation_units if hasattr(reservation_unit, "unit")
-        ]
-
-        if self.recurring_reservation is None:
-            return (
-                f"{self.description}\n"
-                f"{', '.join([reservation_unit.name for reservation_unit in reservation_units])}\n"
-                f"{', '.join(unit_names)}\n"
-                f"{self.reservation_unit.unit if hasattr(self.reservation_unit, 'unit') else ''}"
-            )
-
-        application = self.recurring_reservation.application
-
-        application_event = self.recurring_reservation.application_event
-        organisation = application.organisation
-        contact_person = application.contact_person
-
-        applicant_name = ""
-        if organisation:
-            applicant_name = organisation.name
-        elif contact_person:
-            applicant_name = f"{contact_person.first_name} {contact_person.last_name}"
-
-        return (
-            f"{applicant_name}\n"
-            f"{application_event.name}\n"
-            f"{self.description}\n"
-            f"{', '.join([reservation_unit.name for reservation_unit in reservation_units])}\n"
-            f"{', '.join(unit_names)}\n"
-            f"{self.reservation_unit.unit if hasattr(self.reservation_unit, 'unit') else ''}"
-        )
-
     @property
     def units_for_permissions(self) -> list[Unit]:
         from spaces.models import Unit

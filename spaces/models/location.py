@@ -70,6 +70,10 @@ class Location(models.Model):
         ]
 
     def __str__(self) -> str:
+        return self.address
+
+    @property
+    def address(self) -> str:
         return f"{self.address_street}, {self.address_zip} {self.address_city}"
 
     @property

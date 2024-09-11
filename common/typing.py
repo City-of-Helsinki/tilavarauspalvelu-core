@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, TypedDict
+from typing import TYPE_CHECKING, Literal, TypedDict
 
 from django.contrib.auth.models import AnonymousUser
 from django.core.handlers.wsgi import WSGIRequest
@@ -31,3 +31,6 @@ class QueryInfo(TypedDict):
     duration_ns: int
     succeeded: bool
     stack_info: str
+
+
+type Lang = Literal["fi", "sv", "en"]

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from enum import StrEnum
+
 from django.conf import settings
 from django.db import models
 from django.utils.functional import classproperty
@@ -103,3 +105,75 @@ class RejectionReadinessChoice(models.TextChoices):
         "RESERVATION_UNIT_CLOSED",
         pgettext_lazy("RejectionReadiness", "Reservation unit closed"),
     )
+
+
+class CalendarProperty(StrEnum):
+    VERSION = "VERSION"  # type: str
+    """
+    REQUIRED. Version of the iCalendar specification required to interpret the iCalendar object.
+    https://datatracker.ietf.org/doc/html/rfc5545#section-3.7.4
+    """
+
+    PRODID = "PRODID"  # type: str
+    """
+    REQUIRED. The identifier for the product that created the iCalendar object.
+    See: https://en.wikipedia.org/wiki/Formal_Public_Identifier
+    https://datatracker.ietf.org/doc/html/rfc5545#section-3.7.3
+    """
+
+
+class EventProperty(StrEnum):
+    UID = "UID"  # type: str
+    """
+    The unique identifier for the calendar event.
+    https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.4.7
+    """
+
+    DTSTAMP = "DTSTAMP"  # type: datetime.datetime
+    """
+    The date and time that the calendar event was created.
+    https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.7.2
+    """
+
+    DTSTART = "DTSTART"  # type: datetime.datetime
+    """
+    The date and time that the calendar event begins.
+    https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.2.4
+    """
+
+    DTEND = "DTEND"  # type: datetime.datetime
+    """
+    The date and time that the calendar event ends.
+    https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.2.2
+    """
+
+    SUMMARY = "SUMMARY"  # type: str
+    """
+    A short summary or subject for the event.
+    https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.1.12
+    """
+
+    DESCRIPTION = "DESCRIPTION"  # type: str
+    """
+    A more complete description for the event than that provided by "SUMMARY".
+    https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.1.5
+    """
+
+    LOCATION = "LOCATION"  # type: str
+    """
+    The intended venue for the event.
+    https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.1.7
+    """
+
+    GEO = "GEO"  # type: tuple[float, float]
+    """
+    Global position for the activity specified by a event.
+    https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.1.6
+    """
+
+    X_ALT_DESC = "X-ALT-DESC"  # type: str
+    """
+    A more complete description for the event than that provided by "SUMMARY".
+    Required for Outlook calendars to display HTML descriptions properly.
+    https://learn.microsoft.com/openspecs/exchange_server_protocols/ms-oxcical/d7f285da-9c7a-4597-803b-b74193c898a8
+    """

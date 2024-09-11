@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import uuid
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Literal, Self
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
@@ -92,7 +92,7 @@ class User(AbstractUser):
     def get_display_name(self) -> str:
         return f"{self.first_name} {self.last_name}".strip()
 
-    def get_preferred_language(self) -> str:
+    def get_preferred_language(self) -> Literal["fi", "sv", "en"]:
         return self.preferred_language or settings.LANGUAGES[0][0]
 
     @property
