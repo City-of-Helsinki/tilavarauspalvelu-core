@@ -357,8 +357,8 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
 
         return (
             self.reservation_unit.pricings.filter(
-                models.Q(begins__lte=by_date, is_activated_on_begins=False)
-                | models.Q(begins__lte=today, is_activated_on_begins=True)
+                models.Q(begins__lte=today)  # Is active regardless of `is_activated_on_begins` value
+                | models.Q(begins__lte=by_date, is_activated_on_begins=False)
             )
             .order_by("-begins")
             .first()
