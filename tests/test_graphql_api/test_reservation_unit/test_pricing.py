@@ -240,10 +240,13 @@ def test_reservation_unit__update__pricing__add_another_future_pricing(graphql):
 def test_reservation_unit__update__pricing__remove_pricings(graphql):
     graphql.login_with_superuser()
 
-    future_pricing_date = (datetime.date.today() + datetime.timedelta(days=2)).isoformat()
+    today = local_date()
+    past_pricing_date = (today - datetime.timedelta(days=2)).isoformat()
+    future_pricing_date = (today + datetime.timedelta(days=2)).isoformat()
     data = get_create_draft_input_data(
         pricings=[
-            get_pricing_data(),
+            get_pricing_data(begins=past_pricing_date),
+            get_pricing_data(begins=today.isoformat()),
             get_pricing_data(begins=future_pricing_date),
         ],
     )
@@ -252,28 +255,31 @@ def test_reservation_unit__update__pricing__remove_pricings(graphql):
     assert response.has_errors is False, response
 
     reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
-    assert reservation_unit.pricings.count() == 2
+    assert reservation_unit.pricings.count() == 3
 
-    # Remove future pricing
+    # Remove past and future pricing from the payload
     data["pk"] = reservation_unit.pk
-    data["pricings"][0]["pk"] = reservation_unit.pricings.first().pk
-    data["pricings"].pop(1)
+    data["pricings"].pop(0)  # Remove past pricing
+    data["pricings"].pop(1)  # Remove future pricing
+    active_pricing_pk = reservation_unit.pricings.filter(begins=today).first().pk
+    data["pricings"][0]["pk"] = active_pricing_pk
     response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response
 
     reservation_unit.refresh_from_db()
-    assert reservation_unit.pricings.count() == 1
-    assert reservation_unit.pricings.first().pk == data["pricings"][0]["pk"]
+    assert reservation_unit.pricings.count() == 2  # Past and active pricing
+    assert reservation_unit.pricings.last().pk == active_pricing_pk
 
-    # Remove all pricings
+    # Try to remove all pricings, which fails silently, as only future pricings can be removed (not past or active ones)
     data["pricings"] = []
     response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response
 
     reservation_unit.refresh_from_db()
-    assert reservation_unit.pricings.count() == 0
+    assert reservation_unit.pricings.count() == 2  # Past and active pricing
+    assert reservation_unit.pricings.last().pk == active_pricing_pk
 
 
 def test_reservation_unit__update__pricing__remove_active_pricing_while_future_exists(graphql):
