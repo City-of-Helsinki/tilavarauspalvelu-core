@@ -115,7 +115,12 @@ def migrate_user_from_tunnistamo_to_keycloak(
         return {"user": user}
 
     id_token = IDToken.from_string(response["id_token"])
-    if id_token is not None and id_token.is_ad_login and id_token.iss.endswith("helsinki-tunnistus"):
+    if (
+        id_token is not None  # There is an id token.
+        and id_token.iss.endswith("helsinki-tunnistus")  # Issuer is keycloak.
+        and id_token.is_ad_login  # It is an AD login.
+        and user.email not in ("", None, "ANON.ANONYMIZED@anonymized.net")  # User has a valid email.
+    ):
         migrate_from_tunnistamo_to_keycloak(email=user.email)
 
     return {"user": user}
