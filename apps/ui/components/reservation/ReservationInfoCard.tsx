@@ -62,6 +62,7 @@ type Props = {
   reservation: ReservationInfoCardFragment;
   type: Type;
   shouldDisplayReservationUnitPrice?: boolean;
+  disableImage?: boolean;
 };
 
 const Wrapper = styled.div<{ $type: Type }>`
@@ -115,6 +116,7 @@ export function ReservationInfoCard({
   reservation,
   type,
   shouldDisplayReservationUnitPrice = false,
+  disableImage = false,
 }: Props): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const reservationUnit = reservation.reservationUnit?.[0];
@@ -168,7 +170,7 @@ export function ReservationInfoCard({
   // Have to make client only because date formatting doesn't work on server side
   return (
     <Wrapper $type={type}>
-      <MainImage src={imgSrc} alt={name} />
+      {!disableImage && <MainImage src={imgSrc} alt={name} />}
       <Content data-testid="reservation__reservation-info-card__content">
         <Heading>
           <StyledLink

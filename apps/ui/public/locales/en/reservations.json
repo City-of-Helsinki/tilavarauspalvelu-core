@@ -15,7 +15,7 @@
   "errorGeneratingPDF": "Failed to create the PDF document",
   "reservationCalendar": "Book {{title}}",
   "editReservationTime": "Change the booking time",
-  "cancelEditReservationTime": "Stop editing",
+  "cancelEditReservationTime": "Cancel",
   "saveNewTime": "Save the new time",
   "saveNewTimeLoading": "Saving the new time",
   "saveNewTimeSuccess": "Time of the booking has been changed",

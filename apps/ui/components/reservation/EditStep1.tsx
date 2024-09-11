@@ -162,14 +162,6 @@ export function EditStep1({
         />
         <Actions>
           <CancelActions>
-            <ButtonLikeLink
-              href={`${reservationsPrefix}/${reservation.pk}`}
-              size="large"
-              data-testid="reservation-edit__button--cancel"
-            >
-              <IconCross aria-hidden />
-              {t("reservations:cancelEditReservationTime")}
-            </ButtonLikeLink>
             <Button
               variant="secondary"
               iconLeft={<IconArrowLeft aria-hidden />}
@@ -178,6 +170,14 @@ export function EditStep1({
             >
               {t("common:prev")}
             </Button>
+            <ButtonLikeLink
+              href={`${reservationsPrefix}/${reservation.pk}`}
+              size="large"
+              data-testid="reservation-edit__button--cancel"
+            >
+              <IconCross aria-hidden />
+              {t("reservations:cancelEditReservationTime")}
+            </ButtonLikeLink>
           </CancelActions>
           <Button
             variant="primary"

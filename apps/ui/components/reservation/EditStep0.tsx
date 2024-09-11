@@ -31,6 +31,7 @@ import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import { ReservationTimePicker } from "./ReservationTimePicker";
 import { QuickReservation } from "../reservation-unit/QuickReservation";
 import { getNextAvailableTime } from "../reservation-unit/utils";
+import { ReservationInfoCard } from "./ReservationInfoCard";
 
 type ReservationUnitNodeT = NonNullable<
   ReservationUnitPageQuery["reservationUnit"]
@@ -64,13 +65,22 @@ const Actions = styled.div`
   }
 `;
 
-const StyledQuickReservation = styled(QuickReservation)`
+const StyledReservationInfoCard = styled(ReservationInfoCard)`
   grid-column: 1 / -1;
   grid-row: 3;
   @media (min-width: ${breakpoints.m}) {
     grid-column-start: unset;
     grid-column-end: -1;
-    grid-row: 2 / -1;
+    grid-row: 2;
+  }
+`;
+const StyledQuickReservation = styled(QuickReservation)`
+  grid-column: 1 / -1;
+  grid-row: 4;
+  @media (min-width: ${breakpoints.m}) {
+    grid-column-start: unset;
+    grid-column-end: -1;
+    grid-row: 3 / -1;
   }
 `;
 
@@ -182,6 +192,11 @@ export function EditStep0({
 
   return (
     <>
+      <StyledReservationInfoCard
+        reservation={reservation}
+        type="confirmed"
+        disableImage
+      />
       <StyledQuickReservation
         reservationUnit={reservationUnit}
         reservationForm={reservationForm}

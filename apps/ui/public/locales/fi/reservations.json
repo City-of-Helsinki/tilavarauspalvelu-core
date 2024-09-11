@@ -15,7 +15,7 @@
   "errorGeneratingPDF": "PDF dokumentin luominen epäonnistui",
   "reservationCalendar": "Varaa {{title}}",
   "editReservationTime": "Muuta varauksen aikaa",
-  "cancelEditReservationTime": "Keskeytä muokkaus",
+  "cancelEditReservationTime": "Keskeytä",
   "saveNewTime": "Tallenna uusi aika",
   "saveNewTimeLoading": "Tallennetaan uusi aika",
   "saveNewTimeSuccess": "Varauksen aika muutettu",

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import type { GetServerSidePropsContext } from "next";
@@ -25,7 +25,7 @@ import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { CURRENT_USER } from "@/modules/queries/user";
 import { type FetchResult } from "@apollo/client";
 import { useRouter } from "next/router";
-import { Stepper } from "hds-react";
+import { StepState, Stepper } from "hds-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { errorToast, successToast } from "common/src/common/toast";
@@ -132,19 +132,6 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
     });
   };
 
-  const steps = useMemo(() => {
-    return [
-      {
-        label: `1. ${t("reservations:steps.1")}`,
-        state: step === 0 ? 0 : 1,
-      },
-      {
-        label: `2. ${t("reservations:steps.2")}`,
-        state: step === 1 ? 0 : 2,
-      },
-    ];
-  }, [t, step]);
-
   const reservationForm = useForm<PendingReservationFormType>({
     defaultValues: transformReservation(reservation),
     mode: "onChange",
@@ -196,8 +183,8 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
       ?.replace("hds-stepper-step-", "");
     if (s != null) {
       const n = parseInt(s, 10);
-      if (n >= 0 && n < 1) {
-        setStep(n as 0 | 1);
+      if (n === 0 || n === 1) {
+        setStep(n);
       }
     }
   };
@@ -214,6 +201,25 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
       </ReservationPageWrapper>
     );
   }
+
+  const {
+    formState: { isValid, isDirty },
+  } = reservationForm;
+  const steps = [
+    {
+      label: `1. ${t("reservations:steps.1")}`,
+      state: step === 0 ? StepState.available : StepState.completed,
+    },
+    {
+      label: `2. ${t("reservations:steps.2")}`,
+      state:
+        step === 1
+          ? StepState.available
+          : isValid && isDirty
+            ? StepState.available
+            : StepState.disabled,
+    },
+  ];
 
   return (
     <ReservationPageWrapper>

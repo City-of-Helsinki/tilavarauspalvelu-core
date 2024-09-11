@@ -15,7 +15,7 @@
   "errorGeneratingPDF": "Det gick inte att skapa ett PDF-dokument",
   "reservationCalendar": "Boka {{title}}",
   "editReservationTime": "Ändra tiden för bokningen",
-  "cancelEditReservationTime": "Avbryt redigering",
+  "cancelEditReservationTime": "Avbryt",
   "saveNewTime": "Spara ny tid",
   "saveNewTimeLoading": "Sparar den nya tiden",
   "saveNewTimeSuccess": "Tiden för bokningen ändrades",
