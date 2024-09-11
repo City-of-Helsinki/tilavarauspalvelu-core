@@ -203,8 +203,10 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
   }
 
   const {
-    formState: { isValid, isDirty },
+    formState: { isValid, dirtyFields },
   } = reservationForm;
+  // skip control fields
+  const isDirty = dirtyFields.date || dirtyFields.time || dirtyFields.duration;
   const steps = [
     {
       label: `1. ${t("reservations:steps.1")}`,

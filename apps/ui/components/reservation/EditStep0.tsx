@@ -114,7 +114,9 @@ export function EditStep0({
   const originalEnd = new Date(reservation.end);
 
   const { watch, handleSubmit, formState } = reservationForm;
-  const { isDirty } = formState;
+  const { dirtyFields } = formState;
+  // skip control fields
+  const isDirty = dirtyFields.date || dirtyFields.time || dirtyFields.duration;
 
   const reservableTimes = useReservableTimes(reservationUnit);
 
