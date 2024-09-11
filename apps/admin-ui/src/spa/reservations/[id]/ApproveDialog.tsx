@@ -49,13 +49,18 @@ const DialogContent = ({
 }: Props) => {
   const { t, i18n } = useTranslation();
 
-  const [mutation] = useApproveReservationMutation({
-    onCompleted: () => {
+  const [mutation] = useApproveReservationMutation();
+
+  const approveReservation = async (input: ReservationApproveMutationInput) => {
+    try {
+      await mutation({ variables: { input } });
       successToast({ text: t("RequestedReservation.ApproveDialog.approved") });
       onAccept();
-    },
-    onError: (err) => {
-      const { message } = err;
+    } catch (err) {
+      let message = "errors.descriptive.genericError";
+      if (err instanceof Error) {
+        message = err.message;
+      }
       const hasTranslatedErrorMsg = i18n.exists(
         `errors.descriptive.${message}`
       );
@@ -67,11 +72,8 @@ const DialogContent = ({
           error: t(errorTranslated),
         }),
       });
-    },
-  });
-
-  const approveReservation = (input: ReservationApproveMutationInput) =>
-    mutation({ variables: { input } });
+    }
+  };
 
   const [price, setPrice] = useState(Number(reservation.price) ?? 0);
   const [handlingDetails, setHandlingDetails] = useState<string>(

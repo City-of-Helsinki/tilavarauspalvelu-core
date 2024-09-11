@@ -2,7 +2,6 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Button, Dialog, IconInfoCircle } from "hds-react";
 import {
-  type ReservationRequiresHandlingMutationInput,
   type ReservationQuery,
   useRequireHandlingMutation,
 } from "@gql/gql-types";
@@ -20,15 +19,24 @@ type Props = {
 const DialogContent = ({ reservation, onClose, onAccept }: Props) => {
   const { t, i18n } = useTranslation();
 
-  const [backToRequireHandlingMutation] = useRequireHandlingMutation({
-    onCompleted: () => {
+  const [backToRequireHandlingMutation] = useRequireHandlingMutation();
+
+  const handleClick = async () => {
+    try {
+      if (!reservation.pk) {
+        throw new Error("Reservation pk is missing");
+      }
+      const input = { pk: reservation.pk };
+      await backToRequireHandlingMutation({ variables: { input } });
       successToast({
         text: t("RequestedReservation.ReturnToRequiresHandlingDialog.returned"),
       });
       onAccept();
-    },
-    onError: (err) => {
-      const { message } = err;
+    } catch (err) {
+      let message = "errors.descriptive.genericError";
+      if (err instanceof Error) {
+        message = err.message;
+      }
       const hasTranslatedErrorMsg = i18n.exists(
         `errors.descriptive.${message}`
       );
@@ -43,18 +51,7 @@ const DialogContent = ({ reservation, onClose, onAccept }: Props) => {
           }
         ),
       });
-    },
-  });
-
-  const backToRequireHandling = (
-    input: ReservationRequiresHandlingMutationInput
-  ) => backToRequireHandlingMutation({ variables: { input } });
-
-  const handleClick = () => {
-    if (!reservation.pk) {
-      throw new Error("Reservation pk is missing");
     }
-    backToRequireHandling({ pk: reservation.pk });
   };
 
   return (

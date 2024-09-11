@@ -149,29 +149,27 @@ const DialogContent = ({
   onReject,
 }: Props): JSX.Element => {
   const [denyReservationMutation] = useDenyReservationMutation();
+  const [refundReservationMutation] = useRefundReservationMutation();
 
   const { t } = useTranslation();
 
-  const [refundReservationMutation] = useRefundReservationMutation({
-    onCompleted: () => {
+  const denyReservation = (input: ReservationDenyMutationInput) =>
+    denyReservationMutation({ variables: { input } });
+
+  const refundReservation = async (input: ReservationRefundMutationInput) => {
+    try {
+      await refundReservationMutation({ variables: { input } });
       successToast({
         text: t("RequestedReservation.DenyDialog.refund.mutationSuccess"),
       });
-    },
-    onError: (err) => {
+    } catch (err) {
       // eslint-disable-next-line no-console
       console.error("Refund failed with: ", err);
       errorToast({
         text: t("RequestedReservation.DenyDialog.refund.mutationFailure"),
       });
-    },
-  });
-
-  const denyReservation = (input: ReservationDenyMutationInput) =>
-    denyReservationMutation({ variables: { input } });
-
-  const refundReservation = (input: ReservationRefundMutationInput) =>
-    refundReservationMutation({ variables: { input } });
+    }
+  };
 
   const [handlingDetails, setHandlingDetails] = useState<string>(
     reservations?.[0].handlingDetails ?? ""
