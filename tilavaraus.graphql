@@ -2995,7 +2995,6 @@ input ReservationApproveMutationInput {
   handlingDetails: String!
   pk: Int!
   price: Decimal!
-  priceNet: Decimal!
 }
 
 type ReservationApproveMutationPayload {
@@ -3003,7 +3002,6 @@ type ReservationApproveMutationPayload {
   handlingDetails: String
   pk: Int
   price: Decimal
-  priceNet: Decimal
   state: ReservationStateChoice
 }
 
@@ -3083,12 +3081,12 @@ type ReservationConfirmMutationPayload {
   homeCityPk: Int
   name: String
   nonSubsidisedPrice: Decimal
-  nonSubsidisedPriceNet: Decimal
+  nonSubsidisedPriceNet: String
   numPersons: Int
   order: PaymentOrderNode
   pk: Int
   price: Decimal
-  priceNet: Decimal
+  priceNet: String
   purposePk: Int
   reserveeAddressCity: String
   reserveeAddressStreet: String
@@ -3163,11 +3161,11 @@ type ReservationCreateMutationPayload {
   homeCityPk: Int
   name: String
   nonSubsidisedPrice: Decimal
-  nonSubsidisedPriceNet: Decimal
+  nonSubsidisedPriceNet: String
   numPersons: Int
   pk: Int
   price: Decimal
-  priceNet: Decimal
+  priceNet: String
   purposePk: Int
   reserveeAddressCity: String
   reserveeAddressStreet: String
@@ -3829,11 +3827,11 @@ type ReservationStaffModifyMutationPayload {
   homeCityPk: Int
   name: String
   nonSubsidisedPrice: Decimal
-  nonSubsidisedPriceNet: Decimal
+  nonSubsidisedPriceNet: String
   numPersons: Int
   pk: Int
   price: Decimal
-  priceNet: Decimal
+  priceNet: String
   purposePk: Int
   reserveeAddressCity: String
   reserveeAddressStreet: String
@@ -4861,11 +4859,11 @@ type ReservationUpdateMutationPayload {
   homeCityPk: Int
   name: String
   nonSubsidisedPrice: Decimal
-  nonSubsidisedPriceNet: Decimal
+  nonSubsidisedPriceNet: String
   numPersons: Int
   pk: Int
   price: Decimal
-  priceNet: Decimal
+  priceNet: String
   purposePk: Int
   reserveeAddressCity: String
   reserveeAddressStreet: String

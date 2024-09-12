@@ -32,15 +32,6 @@ const ActionButtons = styled(Dialog.ActionButtons)`
   justify-content: end;
 `;
 
-function calcPriceNet(price: number, taxPercentageValue?: number | null) {
-  const priceNet =
-    taxPercentageValue != null && taxPercentageValue > 0
-      ? Number(price) / (1 + taxPercentageValue / 100)
-      : Number(price);
-
-  return Number(priceNet.toFixed(2));
-}
-
 // TODO use a fragment for the reservation type
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
@@ -93,11 +84,9 @@ const DialogContent = ({
     if (reservation.pk == null) {
       throw new Error("Reservation pk is missing");
     }
-    const taxP = reservation.taxPercentageValue ?? "0";
     approveReservation({
       pk: reservation.pk,
       price: price.toString(),
-      priceNet: calcPriceNet(Number(price), parseFloat(taxP)).toString(),
       handlingDetails,
     });
   };

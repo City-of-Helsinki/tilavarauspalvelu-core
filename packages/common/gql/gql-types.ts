@@ -2747,7 +2747,6 @@ export type ReservationApproveMutationInput = {
   handlingDetails: Scalars["String"]["input"];
   pk: Scalars["Int"]["input"];
   price: Scalars["Decimal"]["input"];
-  priceNet: Scalars["Decimal"]["input"];
 };
 
 export type ReservationApproveMutationPayload = {
@@ -2755,7 +2754,6 @@ export type ReservationApproveMutationPayload = {
   handlingDetails?: Maybe<Scalars["String"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
   price?: Maybe<Scalars["Decimal"]["output"]>;
-  priceNet?: Maybe<Scalars["Decimal"]["output"]>;
   state?: Maybe<ReservationStateChoice>;
 };
 
@@ -2823,12 +2821,12 @@ export type ReservationConfirmMutationPayload = {
   homeCityPk?: Maybe<Scalars["Int"]["output"]>;
   name?: Maybe<Scalars["String"]["output"]>;
   nonSubsidisedPrice?: Maybe<Scalars["Decimal"]["output"]>;
-  nonSubsidisedPriceNet?: Maybe<Scalars["Decimal"]["output"]>;
+  nonSubsidisedPriceNet?: Maybe<Scalars["String"]["output"]>;
   numPersons?: Maybe<Scalars["Int"]["output"]>;
   order?: Maybe<PaymentOrderNode>;
   pk?: Maybe<Scalars["Int"]["output"]>;
   price?: Maybe<Scalars["Decimal"]["output"]>;
-  priceNet?: Maybe<Scalars["Decimal"]["output"]>;
+  priceNet?: Maybe<Scalars["String"]["output"]>;
   purposePk?: Maybe<Scalars["Int"]["output"]>;
   reserveeAddressCity?: Maybe<Scalars["String"]["output"]>;
   reserveeAddressStreet?: Maybe<Scalars["String"]["output"]>;
@@ -2903,11 +2901,11 @@ export type ReservationCreateMutationPayload = {
   homeCityPk?: Maybe<Scalars["Int"]["output"]>;
   name?: Maybe<Scalars["String"]["output"]>;
   nonSubsidisedPrice?: Maybe<Scalars["Decimal"]["output"]>;
-  nonSubsidisedPriceNet?: Maybe<Scalars["Decimal"]["output"]>;
+  nonSubsidisedPriceNet?: Maybe<Scalars["String"]["output"]>;
   numPersons?: Maybe<Scalars["Int"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
   price?: Maybe<Scalars["Decimal"]["output"]>;
-  priceNet?: Maybe<Scalars["Decimal"]["output"]>;
+  priceNet?: Maybe<Scalars["String"]["output"]>;
   purposePk?: Maybe<Scalars["Int"]["output"]>;
   reserveeAddressCity?: Maybe<Scalars["String"]["output"]>;
   reserveeAddressStreet?: Maybe<Scalars["String"]["output"]>;
@@ -3479,11 +3477,11 @@ export type ReservationStaffModifyMutationPayload = {
   homeCityPk?: Maybe<Scalars["Int"]["output"]>;
   name?: Maybe<Scalars["String"]["output"]>;
   nonSubsidisedPrice?: Maybe<Scalars["Decimal"]["output"]>;
-  nonSubsidisedPriceNet?: Maybe<Scalars["Decimal"]["output"]>;
+  nonSubsidisedPriceNet?: Maybe<Scalars["String"]["output"]>;
   numPersons?: Maybe<Scalars["Int"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
   price?: Maybe<Scalars["Decimal"]["output"]>;
-  priceNet?: Maybe<Scalars["Decimal"]["output"]>;
+  priceNet?: Maybe<Scalars["String"]["output"]>;
   purposePk?: Maybe<Scalars["Int"]["output"]>;
   reserveeAddressCity?: Maybe<Scalars["String"]["output"]>;
   reserveeAddressStreet?: Maybe<Scalars["String"]["output"]>;
@@ -4403,11 +4401,11 @@ export type ReservationUpdateMutationPayload = {
   homeCityPk?: Maybe<Scalars["Int"]["output"]>;
   name?: Maybe<Scalars["String"]["output"]>;
   nonSubsidisedPrice?: Maybe<Scalars["Decimal"]["output"]>;
-  nonSubsidisedPriceNet?: Maybe<Scalars["Decimal"]["output"]>;
+  nonSubsidisedPriceNet?: Maybe<Scalars["String"]["output"]>;
   numPersons?: Maybe<Scalars["Int"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
   price?: Maybe<Scalars["Decimal"]["output"]>;
-  priceNet?: Maybe<Scalars["Decimal"]["output"]>;
+  priceNet?: Maybe<Scalars["String"]["output"]>;
   purposePk?: Maybe<Scalars["Int"]["output"]>;
   reserveeAddressCity?: Maybe<Scalars["String"]["output"]>;
   reserveeAddressStreet?: Maybe<Scalars["String"]["output"]>;
