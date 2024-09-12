@@ -101,6 +101,9 @@ const StyledCalendar = styled(BigCalendar)<{
   $underlineEvents?: boolean;
   $isLoading?: boolean;
 }>`
+  /* responsivity breaks when inside a grid */
+  max-width: calc(100vw - 2 * var(--spacing-s));
+
   ${({ $isLoading }) =>
     $isLoading &&
     `
