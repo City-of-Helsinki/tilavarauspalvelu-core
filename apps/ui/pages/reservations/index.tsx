@@ -24,21 +24,6 @@ import { toApiDate } from "common/src/common/util";
 import { addDays } from "date-fns";
 import { errorToast } from "common/src/common/toast";
 
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  const { locale } = ctx;
-
-  return {
-    props: {
-      ...getCommonServerSideProps(),
-      ...(await serverSideTranslations(locale ?? "fi")),
-    },
-  };
-};
-
-const Heading = styled.div`
-  margin-bottom: var(--spacing-layout-l);
-`;
-
 const StyledTabList = styled(TabList)`
   ul {
     width: 100% !important;
@@ -140,76 +125,86 @@ function Reservations(): JSX.Element | null {
   return (
     <>
       <Head />
-      <Container>
-        <Heading data-testid="Reservations--page__tab_container">
-          <Tabs>
-            <StyledTabList>
-              <StyledTab onClick={() => setTab("upcoming")}>
-                {t("reservations:upcomingReservations")}
-              </StyledTab>
-              <StyledTab onClick={() => setTab("past")}>
-                {t("reservations:pastReservations")}
-              </StyledTab>
-              <StyledTab onClick={() => setTab("cancelled")}>
-                {t("reservations:cancelledReservations")}
-              </StyledTab>
-            </StyledTabList>
-            <StyledTabPanel>
-              {isLoading ? (
-                <CenterSpinner />
-              ) : reservations.length === 0 ? (
-                <EmptyMessage>
-                  {t("reservations:noUpcomingReservations")}
-                </EmptyMessage>
-              ) : (
-                reservations?.map((reservation) => (
-                  <ReservationCard
-                    key={reservation.pk}
-                    reservation={reservation}
-                    type="upcoming"
-                  />
-                ))
-              )}
-            </StyledTabPanel>
-            <StyledTabPanel>
-              {isLoading ? (
-                <CenterSpinner />
-              ) : reservations.length === 0 ? (
-                <EmptyMessage>
-                  {t("reservations:noPastReservations")}
-                </EmptyMessage>
-              ) : (
-                reservations?.map((reservation) => (
-                  <ReservationCard
-                    key={reservation.pk}
-                    reservation={reservation}
-                    type="past"
-                  />
-                ))
-              )}
-            </StyledTabPanel>
-            <StyledTabPanel>
-              {isLoading ? (
-                <CenterSpinner />
-              ) : reservations.length === 0 ? (
-                <EmptyMessage>
-                  {t("reservations:noCancelledReservations")}
-                </EmptyMessage>
-              ) : (
-                reservations?.map((reservation) => (
-                  <ReservationCard
-                    key={reservation.pk}
-                    reservation={reservation}
-                    type="cancelled"
-                  />
-                ))
-              )}
-            </StyledTabPanel>
-          </Tabs>
-        </Heading>
+      {/* HDS tabs doesn't support data-testid */}
+      <Container data-testid="Reservations--page__tab_container">
+        <Tabs>
+          <StyledTabList>
+            <StyledTab onClick={() => setTab("upcoming")}>
+              {t("reservations:upcomingReservations")}
+            </StyledTab>
+            <StyledTab onClick={() => setTab("past")}>
+              {t("reservations:pastReservations")}
+            </StyledTab>
+            <StyledTab onClick={() => setTab("cancelled")}>
+              {t("reservations:cancelledReservations")}
+            </StyledTab>
+          </StyledTabList>
+          <StyledTabPanel>
+            {isLoading ? (
+              <CenterSpinner />
+            ) : reservations.length === 0 ? (
+              <EmptyMessage>
+                {t("reservations:noUpcomingReservations")}
+              </EmptyMessage>
+            ) : (
+              reservations?.map((reservation) => (
+                <ReservationCard
+                  key={reservation.pk}
+                  reservation={reservation}
+                  type="upcoming"
+                />
+              ))
+            )}
+          </StyledTabPanel>
+          <StyledTabPanel>
+            {isLoading ? (
+              <CenterSpinner />
+            ) : reservations.length === 0 ? (
+              <EmptyMessage>
+                {t("reservations:noPastReservations")}
+              </EmptyMessage>
+            ) : (
+              reservations?.map((reservation) => (
+                <ReservationCard
+                  key={reservation.pk}
+                  reservation={reservation}
+                  type="past"
+                />
+              ))
+            )}
+          </StyledTabPanel>
+          <StyledTabPanel>
+            {isLoading ? (
+              <CenterSpinner />
+            ) : reservations.length === 0 ? (
+              <EmptyMessage>
+                {t("reservations:noCancelledReservations")}
+              </EmptyMessage>
+            ) : (
+              reservations?.map((reservation) => (
+                <ReservationCard
+                  key={reservation.pk}
+                  reservation={reservation}
+                  type="cancelled"
+                />
+              ))
+            )}
+          </StyledTabPanel>
+        </Tabs>
       </Container>
     </>
   );
+}
+
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+  const { locale } = ctx;
+
+  return {
+    props: {
+      ...getCommonServerSideProps(),
+      ...(await serverSideTranslations(locale ?? "fi")),
+    },
+  };
 }
 
 export default Reservations;
