@@ -101,7 +101,7 @@ export function getReservationPriceDetails(
     : t("RequestedReservation.ApproveDialog.priceBreakdown", {
         volume: formatters.strippedDecimal.format(volume),
         units: t(`RequestedReservation.ApproveDialog.priceUnits.${priceUnit}`),
-        vatPercent: formatters.whole.format(taxPercentage),
+        vatPercent: formatters.oneDecimal.format(taxPercentage),
         unit: t(`RequestedReservation.ApproveDialog.priceUnit.${priceUnit}`),
         unitPrice: getReservationPrice(maxPrice, "", false),
         price: getReservationPrice(
