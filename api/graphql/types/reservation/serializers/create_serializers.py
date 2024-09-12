@@ -165,7 +165,7 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
         data["buffer_time_before"], data["buffer_time_after"] = self._calculate_buffers(begin, end, reservation_units)
 
         request_user: AnyUser = self.context["request"].user
-        data["user"] = request_user if request_user.is_anonymous else None
+        data["user"] = None if request_user.is_anonymous else request_user
         data["reservee_used_ad_login"] = (
             False if request_user.is_anonymous else getattr(request_user.id_token, "is_ad_login", False)
         )
