@@ -172,16 +172,23 @@ def test_reservation_unit__update_pricings__tax_percentage__free_pricing_is_igno
 
 
 @patch_method(SentryLogger.log_message)
-def test_reservation_unit__update_pricings__tax_percentage__ignored_company_codes():
+@pytest.mark.parametrize(
+    "company_code_path",
+    [
+        "reservation_unit__payment_accounting__company_code",
+        "reservation_unit__unit__payment_accounting__company_code",
+    ],
+)
+def test_reservation_unit__update_pricings__tax_percentage__ignored_company_codes(company_code_path):
     pricing_1 = ReservationUnitPricingFactory.create(
         begins=datetime.date(2024, 1, 1),
         tax_percentage__value=CURRENT_TAX,
-        reservation_unit__payment_accounting__company_code="1234",
+        **{company_code_path: "1234"},
     )
     pricing_2 = ReservationUnitPricingFactory.create(
         begins=datetime.date(2024, 1, 1),
         tax_percentage__value=CURRENT_TAX,
-        reservation_unit__payment_accounting__company_code="5678",
+        **{company_code_path: "5678"},
     )
 
     update_reservation_unit_pricings_tax_percentage(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX), ["5678"])
