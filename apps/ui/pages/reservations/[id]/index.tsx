@@ -65,6 +65,7 @@ import { NotModifiableReason } from "@/components/reservation/NotModifiableReaso
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { useRouter } from "next/router";
 import { successToast } from "common/src/common/toast";
+import { ReservationPageWrapper } from "@/components/reservations/styles";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
@@ -192,21 +193,6 @@ const AccordionContent = styled.div`
 
 const Terms = styled.div`
   margin-bottom: var(--spacing-xl);
-`;
-
-// TODO top margin is bad, refactor it (also every page should have the same space between Breadcrumb and Heading)
-const PageContent = styled.div`
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: repeat(4, auto);
-  grid-gap: var(--spacing-m);
-  justify-content: space-between;
-  margin-top: var(--spacing-s);
-
-  @media (width > ${breakpoints.m}) {
-    margin-top: var(--spacing-l);
-    grid-template-columns: 2fr 1fr;
-  }
 `;
 
 function ReserveeInfo({
@@ -463,7 +449,7 @@ function Reservation({
     <>
       <BreadcrumbWrapper route={routes} />
       <Container>
-        <PageContent data-testid="reservation__content">
+        <ReservationPageWrapper data-testid="reservation__content">
           <div style={{ gridColumn: "1 / span 1", gridRow: "1 / span 1" }}>
             <Heading data-testid="reservation__name">
               {t("reservations:reservationName", { id: reservation.pk })}
@@ -641,7 +627,7 @@ function Reservation({
             </Terms>
             <AddressSection reservationUnit={reservationUnit} />
           </Content>
-        </PageContent>
+        </ReservationPageWrapper>
       </Container>
     </>
   );

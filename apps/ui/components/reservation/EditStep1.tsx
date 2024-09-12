@@ -38,13 +38,32 @@ type Props = {
 
 const Actions = styled.div`
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  margin: var(--spacing-layout-m) 0 var(--spacing-layout-l);
+  flex-flow: row wrap;
   gap: var(--spacing-m);
+  & > * {
+    flex-grow: 1;
+  }
+  & > :last-child {
+    width: 100%;
+    order: 1;
+  }
+  & > :not(:last-child) {
+    order: 2;
+  }
 
-  @media (min-width: ${breakpoints.m}) {
-    flex-direction: row;
+  @media (min-width: ${breakpoints.s}) {
+    & > * {
+      flex-grow: unset;
+      order: unset;
+    }
+    & > :not(:last-child) {
+      order: unset;
+    }
+    & > :last-child {
+      margin-left: auto;
+      width: auto;
+      order: unset;
+    }
   }
 `;
 
@@ -53,17 +72,6 @@ const BylineSection = styled.div`
   @media (min-width: ${breakpoints.m}) {
     grid-row: 2 / -1;
   }
-
-  /*
-  grid-row: 2;
-  @media (min-width: ${breakpoints.m}) {
-    grid-column: span 3;
-  }
-  @media (min-width: ${breakpoints.l}) {
-    grid-row: 1 / span 2;
-    grid-column: -3 / span 2;
-  }
-*/
 `;
 
 const StyledForm = styled.form`
@@ -71,10 +79,6 @@ const StyledForm = styled.form`
     grid-column: 1 / -2;
     grid-row-start: 3;
   }
-`;
-
-const CancelActions = styled(Actions)`
-  margin: 0;
 `;
 
 export function EditStep1({
@@ -161,24 +165,22 @@ export function EditStep1({
           setIsTermsAccepted={handleTermsAcceptedChange}
         />
         <Actions>
-          <CancelActions>
-            <Button
-              variant="secondary"
-              iconLeft={<IconArrowLeft aria-hidden />}
-              onClick={onBack}
-              data-testid="reservation-edit__button--back"
-            >
-              {t("common:prev")}
-            </Button>
-            <ButtonLikeLink
-              href={`${reservationsPrefix}/${reservation.pk}`}
-              size="large"
-              data-testid="reservation-edit__button--cancel"
-            >
-              <IconCross aria-hidden />
-              {t("reservations:cancelEditReservationTime")}
-            </ButtonLikeLink>
-          </CancelActions>
+          <Button
+            variant="secondary"
+            iconLeft={<IconArrowLeft aria-hidden />}
+            onClick={onBack}
+            data-testid="reservation-edit__button--back"
+          >
+            {t("common:prev")}
+          </Button>
+          <ButtonLikeLink
+            href={`${reservationsPrefix}/${reservation.pk}`}
+            size="large"
+            data-testid="reservation-edit__button--cancel"
+          >
+            <IconCross aria-hidden />
+            {t("reservations:cancelEditReservationTime")}
+          </ButtonLikeLink>
           <Button
             variant="primary"
             type="submit"

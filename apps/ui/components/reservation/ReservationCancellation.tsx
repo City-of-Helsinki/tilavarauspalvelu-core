@@ -20,12 +20,7 @@ import { BlackButton, MediumButton } from "@/styles/util";
 import { ReservationInfoCard } from "./ReservationInfoCard";
 import { Paragraph } from "./styles";
 import { signOut } from "common/src/browserHelpers";
-import {
-  BylineSection,
-  Heading,
-  HeadingSection,
-  ReservationPageWrapper,
-} from "../reservations/styles";
+import { Heading, ReservationPageWrapper } from "../reservations/styles";
 import {
   convertLanguageCode,
   getTranslationSafe,
@@ -65,16 +60,6 @@ const Actions = styled.div`
     button {
       max-width: 300px;
     }
-  }
-`;
-
-const ContentSection = styled.div`
-  grid-column: 1 / -1;
-  grid-row: 3 / -1;
-
-  @media (min-width: ${breakpoints.l}) {
-    grid-column: 1 / span 4;
-    grid-row: 2 / -1;
   }
 `;
 
@@ -199,14 +184,14 @@ export function ReservationCancellation(props: Props): JSX.Element {
 
   return (
     <ReservationPageWrapper>
-      <HeadingSection>
+      <div style={{ gridColumn: "1 / -1" }}>
         <Heading>{title}</Heading>
-        <p>{ingress}</p>
-      </HeadingSection>
-      <BylineSection>
+      </div>
+      <p>{ingress}</p>
+      <div style={{ gridRowEnd: "span 3" }}>
         <ReservationInfoCard reservation={reservation} type="confirmed" />
-      </BylineSection>
-      <ContentSection>
+      </div>
+      <div>
         {formState === "unsent" ? (
           <>
             <p>{t("reservations:cancelInfoBody")}</p>
@@ -271,7 +256,7 @@ export function ReservationCancellation(props: Props): JSX.Element {
             <ReturnLinkList apiBaseUrl={apiBaseUrl} />
           </>
         )}
-      </ContentSection>
+      </div>
     </ReservationPageWrapper>
   );
 }

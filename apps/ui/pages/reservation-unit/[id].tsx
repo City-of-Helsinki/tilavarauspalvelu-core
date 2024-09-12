@@ -104,9 +104,9 @@ import LoginFragment from "@/components/LoginFragment";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { useReservableTimes } from "@/hooks/useReservableTimes";
 import { errorToast } from "common/src/common/toast";
-import { NewReservationPageWrapper } from "@/components/reservations/styles";
 import { ReservationTimePicker } from "@/components/reservation/ReservationTimePicker";
 import { ApolloError } from "@apollo/client";
+import { ReservationPageWrapper } from "@/components/reservations/styles";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -695,7 +695,7 @@ function ReservationUnit({
           ) : undefined
         }
       />
-      <NewReservationPageWrapper>
+      <ReservationPageWrapper>
         <QuickReservationWrapper>
           {isUnitReservable && (
             <QuickReservation
@@ -855,7 +855,7 @@ function ReservationUnit({
           isOpen={isDialogOpen}
           onClose={() => setIsDialogOpen(false)}
         />
-      </NewReservationPageWrapper>
+      </ReservationPageWrapper>
       <BottomWrapper>
         {shouldDisplayBottomWrapper && (
           <BottomContainer>

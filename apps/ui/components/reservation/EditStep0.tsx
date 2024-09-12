@@ -48,10 +48,7 @@ type Props = {
 };
 
 const StyledCalendarWrapper = styled(CalendarWrapper)`
-  @media (min-width: ${breakpoints.m}) {
-    grid-row: 3;
-    grid-column: 1 / -2;
-  }
+  margin-bottom: 0;
 `;
 
 const Actions = styled.div`
