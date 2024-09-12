@@ -30,9 +30,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { errorToast } from "common/src/common/toast";
 import { reservationsPrefix } from "@/modules/const";
-import { Subheading } from "common/src/reservation-form/styles";
-import { getTranslation } from "@/modules/util";
-import Sanitize from "@/components/common/Sanitize";
 import { EditStep0 } from "@/components/reservation/EditStep0";
 import { EditStep1 } from "@/components/reservation/EditStep1";
 import {
@@ -60,20 +57,6 @@ const StepperWrapper = styled.div`
 `;
 const StyledStepper = styled(Stepper)`
   margin: var(--spacing-layout-m) 0 var(--spacing-layout-m);
-`;
-
-const PinkBox = styled.div`
-  padding: 1px var(--spacing-m) var(--spacing-m);
-  background-color: var(--color-suomenlinna-light);
-  grid-column: 1 / -1;
-  grid-row: -1;
-  @media (min-width: ${breakpoints.m}) {
-    grid-column: span 3;
-    grid-row: unset;
-  }
-  @media (min-width: ${breakpoints.l}) {
-    grid-column: -3 / span 2;
-  }
 `;
 
 // copy of ReservationCancellation but some changes to grid layoout
@@ -168,8 +151,6 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
       ? "reservations:editReservationTime"
       : "reservationCalendar:heading.pendingReservation";
 
-  const termsOfUse = getTranslation(reservationUnit, "termsOfUse");
-
   const handleStepClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     const target = e.currentTarget;
     const s = target
@@ -230,13 +211,6 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
           steps={steps}
         />
       </StepperWrapper>
-      {/* TODO on mobile in the design this is after the calendar but before action buttons */}
-      {step === 0 && termsOfUse && (
-        <PinkBox>
-          <Subheading>{t("reservations:reservationInfoBoxHeading")}</Subheading>
-          <Sanitize html={termsOfUse} />
-        </PinkBox>
-      )}
       {step === 0 ? (
         <EditStep0
           reservation={reservation}

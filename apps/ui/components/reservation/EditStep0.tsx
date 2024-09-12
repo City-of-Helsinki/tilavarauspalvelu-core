@@ -25,13 +25,19 @@ import {
 import { CalendarWrapper } from "../reservation-unit/ReservationUnitStyles";
 import { type UseFormReturn } from "react-hook-form";
 import { type PendingReservationFormType } from "@/components/reservation-unit/schema";
-import { fromUIDate } from "common/src/common/util";
+import {
+  convertLanguageCode,
+  fromUIDate,
+  getTranslationSafe,
+} from "common/src/common/util";
 import { useReservableTimes } from "@/hooks/useReservableTimes";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import { ReservationTimePicker } from "./ReservationTimePicker";
 import { QuickReservation } from "../reservation-unit/QuickReservation";
 import { getNextAvailableTime } from "../reservation-unit/utils";
 import { ReservationInfoCard } from "./ReservationInfoCard";
+import { Subheading } from "common/src/reservation-form/styles";
+import Sanitize from "@/components/common/Sanitize";
 
 type ReservationUnitNodeT = NonNullable<
   ReservationUnitPageQuery["reservationUnit"]
@@ -48,7 +54,12 @@ type Props = {
 };
 
 const StyledCalendarWrapper = styled(CalendarWrapper)`
+  grid-column: 1 / -1;
   margin-bottom: 0;
+  @media (min-width: ${breakpoints.l}) {
+    grid-column: span 1;
+    grid-row: 3 / span 2;
+  }
 `;
 
 const Actions = styled.div`
@@ -77,7 +88,18 @@ const StyledQuickReservation = styled(QuickReservation)`
   @media (min-width: ${breakpoints.m}) {
     grid-column-start: unset;
     grid-column-end: -1;
-    grid-row: 3 / -1;
+    grid-row: 3;
+  }
+`;
+
+const PinkBox = styled.div`
+  padding: 1px var(--spacing-m) var(--spacing-m);
+  background-color: var(--color-suomenlinna-light);
+  grid-column: 1 / -1;
+  grid-row: -1;
+  @media (min-width: ${breakpoints.l}) {
+    grid-column: span 1 / -1;
+    grid-row: unset;
   }
 `;
 
@@ -105,7 +127,7 @@ export function EditStep0({
   nextStep,
   isLoading,
 }: Props): JSX.Element {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const originalBegin = new Date(reservation.begin);
   const originalEnd = new Date(reservation.end);
@@ -189,6 +211,9 @@ export function EditStep0({
     activeApplicationRounds,
   });
 
+  const lang = convertLanguageCode(i18n.language);
+  const termsOfUse = getTranslationSafe(reservationUnit, "termsOfUse", lang);
+
   return (
     <>
       <StyledReservationInfoCard
@@ -196,6 +221,13 @@ export function EditStep0({
         type="confirmed"
         disableImage
       />
+      {/* TODO on mobile in the design this is after the calendar but before action buttons */}
+      {termsOfUse !== "" && (
+        <PinkBox>
+          <Subheading>{t("reservations:reservationInfoBoxHeading")}</Subheading>
+          <Sanitize html={termsOfUse} />
+        </PinkBox>
+      )}
       <StyledQuickReservation
         reservationUnit={reservationUnit}
         reservationForm={reservationForm}
@@ -225,7 +257,7 @@ export function EditStep0({
         noValidate
         onSubmit={handleSubmit(submitReservation)}
         style={{
-          gridColumn: "1 / -2",
+          gridColumn: "1 / span 1",
         }}
       >
         <Actions>
