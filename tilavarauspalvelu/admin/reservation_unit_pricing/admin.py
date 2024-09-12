@@ -26,8 +26,6 @@ class ReservationUnitPricingAdmin(admin.ModelAdmin):
     ]
     list_filter = [
         ("begins", DateRangeFilterBuilder()),
-        "status",
-        "pricing_type",
         "tax_percentage",
         "is_activated_on_begins",
     ]
@@ -41,7 +39,6 @@ class ReservationUnitPricingAdmin(admin.ModelAdmin):
         ("lowest_price", "lowest_price_net"),
         ("highest_price", "highest_price_net"),
         "tax_percentage",
-        "status",
         "price_unit",
     ]
     readonly_fields = [
