@@ -28,7 +28,7 @@ import { useRouter } from "next/router";
 import { StepState, Stepper } from "hds-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { errorToast, successToast } from "common/src/common/toast";
+import { errorToast } from "common/src/common/toast";
 import { reservationsPrefix } from "@/modules/const";
 import { Subheading } from "common/src/reservation-form/styles";
 import { getTranslation } from "@/modules/util";
@@ -152,13 +152,7 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
     }
     try {
       await adjustReservationTime({ pk: reservation.pk, ...times });
-      successToast({
-        text: t("reservations:saveNewTimeSuccess"),
-        duration: 3,
-        options: {
-          onClose: () => router.push(`${reservationsPrefix}/${reservation.pk}`),
-        },
-      });
+      router.push(`${reservationsPrefix}/${reservation.pk}/?timeUpdated=true`);
     } catch (e) {
       if (e instanceof Error) {
         // TODO don't print the error message to the user

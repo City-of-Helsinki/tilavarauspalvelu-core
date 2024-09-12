@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
@@ -63,6 +63,8 @@ import { base64encode, filterNonNullable } from "common/src/helpers";
 import { containsField, containsNameField } from "common/src/metaFieldsHelpers";
 import { NotModifiableReason } from "@/components/reservation/NotModifiableReason";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
+import { useRouter } from "next/router";
+import { successToast } from "common/src/common/toast";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
@@ -327,6 +329,37 @@ function ReservationInfo({
   );
 }
 
+function useToastIfUpdated() {
+  const router = useRouter();
+  const { t } = useTranslation();
+
+  useEffect(() => {
+    const removeTimeUpdatedParam = () => {
+      const { pathname, query } = router;
+      // NOTE ParsedQuery is a Record<string, string>
+      const params = new URLSearchParams(query as Record<string, string>);
+      params.delete("timeUpdated");
+
+      router.replace(
+        {
+          pathname,
+          query: params.toString(),
+        },
+        undefined,
+        { shallow: true }
+      );
+    };
+    const q = router.query;
+
+    if (q.timeUpdated) {
+      successToast({
+        text: t("reservations:saveNewTimeSuccess"),
+      });
+      removeTimeUpdatedParam();
+    }
+  }, [router, t]);
+}
+
 // TODO add a state check => if state is Created redirect to the reservation funnel
 // if state is Cancelled, Denied, WaitingForPayment what then?
 function Reservation({
@@ -385,13 +418,10 @@ function Reservation({
   const normalizedOrderStatus =
     getNormalizedReservationOrderStatus(reservation);
 
+  useToastIfUpdated();
+
   if (orderLoading) {
     return <CenterSpinner />;
-  }
-
-  // TODO this should be moved to SSR also (and don't return null on errors)
-  if (!reservationUnit) {
-    return null;
   }
 
   const { begin, end } = reservation;
