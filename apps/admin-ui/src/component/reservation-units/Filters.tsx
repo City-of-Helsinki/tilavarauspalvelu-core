@@ -4,7 +4,7 @@ import styled from "styled-components";
 import ShowAllContainer from "common/src/components/ShowAllContainer";
 import { AutoGrid } from "@/styles/layout";
 import { useReservationUnitTypes, useUnitOptions } from "@/hooks";
-import { ReservationUnitState } from "@gql/gql-types";
+import { ReservationUnitPublishingState } from "@gql/gql-types";
 import {
   MultiSelectFilter,
   SearchFilter,
@@ -30,8 +30,10 @@ const MoreWrapper = styled(ShowAllContainer)`
 function Filters(): JSX.Element {
   const { t } = useTranslation();
 
-  const reservationUnitStateOptions = Object.values(ReservationUnitState)
-    .filter((x) => x !== ReservationUnitState.Archived)
+  const reservationUnitStateOptions = Object.values(
+    ReservationUnitPublishingState
+  )
+    .filter((x) => x !== ReservationUnitPublishingState.Archived)
     .map((s) => ({
       value: s,
       label: t(`ReservationUnits.state.${s}`),

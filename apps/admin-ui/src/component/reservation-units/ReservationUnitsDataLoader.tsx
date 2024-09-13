@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { type ApolloError } from "@apollo/client";
 import {
   ReservationUnitOrderingChoices,
-  ReservationUnitState,
+  ReservationUnitPublishingState,
   useSearchReservationUnitsQuery,
 } from "@gql/gql-types";
 import { filterNonNullable, toNumber } from "common/src/helpers";
@@ -95,22 +95,22 @@ export function ReservationUnitsDataReader(): JSX.Element {
 
   function convertToReservationUnitState(
     state: string
-  ): ReservationUnitState | null {
+  ): ReservationUnitPublishingState | null {
     switch (state) {
-      case ReservationUnitState.Archived:
-        return ReservationUnitState.Archived;
-      case ReservationUnitState.Draft:
-        return ReservationUnitState.Draft;
-      case ReservationUnitState.Hidden:
-        return ReservationUnitState.Hidden;
-      case ReservationUnitState.Published:
-        return ReservationUnitState.Published;
-      case ReservationUnitState.ScheduledHiding:
-        return ReservationUnitState.ScheduledHiding;
-      case ReservationUnitState.ScheduledPeriod:
-        return ReservationUnitState.ScheduledPeriod;
-      case ReservationUnitState.ScheduledPublishing:
-        return ReservationUnitState.ScheduledPublishing;
+      case ReservationUnitPublishingState.Archived:
+        return ReservationUnitPublishingState.Archived;
+      case ReservationUnitPublishingState.Draft:
+        return ReservationUnitPublishingState.Draft;
+      case ReservationUnitPublishingState.Hidden:
+        return ReservationUnitPublishingState.Hidden;
+      case ReservationUnitPublishingState.Published:
+        return ReservationUnitPublishingState.Published;
+      case ReservationUnitPublishingState.ScheduledHiding:
+        return ReservationUnitPublishingState.ScheduledHiding;
+      case ReservationUnitPublishingState.ScheduledPeriod:
+        return ReservationUnitPublishingState.ScheduledPeriod;
+      case ReservationUnitPublishingState.ScheduledPublishing:
+        return ReservationUnitPublishingState.ScheduledPublishing;
       default:
         return null;
     }
@@ -126,7 +126,7 @@ export function ReservationUnitsDataReader(): JSX.Element {
       surfaceAreaGte,
       nameFi: searchFilter,
       unit,
-      state: reservationUnitStates.map((state) =>
+      publishingState: reservationUnitStates.map((state) =>
         convertToReservationUnitState(state)
       ),
       reservationUnitType: reservationUnitTypes,

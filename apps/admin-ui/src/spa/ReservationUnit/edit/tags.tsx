@@ -1,5 +1,8 @@
 import React from "react";
-import { ReservationState, ReservationUnitState } from "@gql/gql-types";
+import {
+  ReservationUnitPublishingState,
+  ReservationUnitReservationState,
+} from "@gql/gql-types";
 import {
   IconCheck,
   IconClock,
@@ -19,22 +22,28 @@ type StatusPropsType = {
   icon: JSX.Element;
 };
 
-export function ReservationStateTag({ state }: { state?: ReservationState }) {
-  const statusProps = ((s?: ReservationState): StatusPropsType => {
+export function ReservationStateTag({
+  state,
+}: {
+  state?: ReservationUnitReservationState;
+}) {
+  const statusProps = ((
+    s?: ReservationUnitReservationState
+  ): StatusPropsType => {
     switch (s) {
-      case ReservationState.ScheduledReservation:
-      case ReservationState.ScheduledPeriod:
-      case ReservationState.ScheduledClosing:
+      case ReservationUnitReservationState.ScheduledReservation:
+      case ReservationUnitReservationState.ScheduledPeriod:
+      case ReservationUnitReservationState.ScheduledClosing:
         return {
           type: "info",
           icon: <IconClock ariaHidden />,
         };
-      case ReservationState.ReservationClosed:
+      case ReservationUnitReservationState.ReservationClosed:
         return {
           type: "neutral",
           icon: <IconLock ariaHidden />,
         };
-      case ReservationState.Reservable:
+      case ReservationUnitReservationState.Reservable:
         return {
           type: "success",
           icon: <IconEye ariaHidden />,
@@ -52,7 +61,7 @@ export function ReservationStateTag({ state }: { state?: ReservationState }) {
   if (!state) {
     return null;
   }
-  if (state === ReservationState.Reservable) {
+  if (state === ReservationUnitReservationState.Reservable) {
     return null;
   }
 
@@ -63,26 +72,28 @@ export function ReservationStateTag({ state }: { state?: ReservationState }) {
   );
 }
 
-const statusProps = (state?: ReservationUnitState): StatusPropsType => {
+const statusProps = (
+  state?: ReservationUnitPublishingState
+): StatusPropsType => {
   switch (state) {
-    case ReservationUnitState.Draft:
+    case ReservationUnitPublishingState.Draft:
       return {
         type: "draft",
         icon: <IconPen />,
       };
-    case ReservationUnitState.Hidden:
+    case ReservationUnitPublishingState.Hidden:
       return {
         type: "neutral",
         icon: <IconEyeCrossed />,
       };
-    case ReservationUnitState.Published:
+    case ReservationUnitPublishingState.Published:
       return {
         type: "success",
         icon: <IconCheck />,
       };
-    case ReservationUnitState.ScheduledHiding:
-    case ReservationUnitState.ScheduledPeriod:
-    case ReservationUnitState.ScheduledPublishing:
+    case ReservationUnitPublishingState.ScheduledHiding:
+    case ReservationUnitPublishingState.ScheduledPeriod:
+    case ReservationUnitPublishingState.ScheduledPublishing:
       return {
         type: "info",
         icon: <IconClock />,
@@ -98,7 +109,7 @@ const statusProps = (state?: ReservationUnitState): StatusPropsType => {
 export function ReservationUnitStateTag({
   state,
 }: {
-  state?: ReservationUnitState;
+  state?: ReservationUnitPublishingState;
 }): JSX.Element | null {
   const { t } = useTranslation();
   if (!state) {

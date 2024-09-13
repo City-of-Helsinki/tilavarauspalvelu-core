@@ -24,8 +24,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ReservationStartInterval,
   Authentication,
-  type ReservationState,
-  type ReservationUnitState,
+  type ReservationUnitPublishingState,
+  type ReservationUnitReservationState,
   TermsType,
   Status,
   ImageType,
@@ -421,8 +421,8 @@ function DisplayUnit({
 }: {
   heading: string;
   unit?: UnitWithSpacesAndResourcesQuery["unit"];
-  unitState?: ReservationUnitState;
-  reservationState?: ReservationState;
+  unitState?: ReservationUnitPublishingState;
+  reservationState?: ReservationUnitReservationState;
 }): JSX.Element {
   const location = unit?.location;
   return (
@@ -2112,7 +2112,7 @@ function ReservationUnitEditor({
           }
           unit={unit ?? undefined}
           reservationState={reservationUnit?.reservationState ?? undefined}
-          unitState={reservationUnit?.state ?? undefined}
+          unitState={reservationUnit?.publishingState ?? undefined}
         />
         <ErrorInfo form={form} />
         <BasicSection form={form} unit={unit} />

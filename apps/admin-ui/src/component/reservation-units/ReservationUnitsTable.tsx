@@ -70,8 +70,8 @@ const getColConfig = (t: TFunction) => [
   {
     headerName: t("ReservationUnits.headings.state"),
     key: "state",
-    transform: ({ state }: ReservationUnitNode) =>
-      t(`ReservationUnits.state.${state}`),
+    transform: ({ publishingState }: ReservationUnitNode) =>
+      t(`ReservationUnits.state.${publishingState}`),
   },
   {
     headerName: t("ReservationUnits.headings.reservationState"),
