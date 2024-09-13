@@ -150,43 +150,50 @@ export function getNextAvailableTime(props: AvailableTimesProps): Date | null {
     return dayMax([acc, new Date(round.reservationPeriodEnd)]);
   }, undefined);
 
-  const minDay = new Date(
+  let minDay = new Date(
     dayMax([minReservationDate, start, openAfterRound]) ?? minReservationDate
   );
 
   // Find the first possible day
-  let openTimes = reservableTimes.get(dateToKey(minDay));
+  let openTimes = reservableTimes.get(dateToKey(minDay)) ?? [];
   const it = reservableTimes.entries();
-  while (openTimes == null || openTimes.length === 0) {
+  while (openTimes.length === 0) {
     const result = it.next();
     if (result.done) {
       return null;
     }
-    const {
-      value: [_key, value],
-    } = result;
     if (endDay != null && isAfter(minDay, endDay)) {
       return null;
     }
+
+    const {
+      value: [_key, value],
+    } = result;
     if (value.length > 0) {
-      minDay.setDate(value[0].start.getDate());
-      openTimes = reservableTimes.get(dateToKey(minDay));
+      const startValue = new Date(value[0].start);
+      // the map contains all the days, skip the ones before the minDay
+      if (isBefore(startValue, minDay)) {
+        continue;
+      }
+      minDay = startValue;
+      openTimes = reservableTimes.get(dateToKey(minDay)) ?? [];
     }
   }
-  if (openTimes == null || openTimes.length === 0) {
+  if (openTimes.length === 0) {
     return null;
   }
 
   const interval = openTimes[0];
   const startDay = dayMax([new Date(interval.start), minDay]) ?? minDay;
 
-  const daysToGenerate = reservationsMaxDaysBefore ?? 180;
-  const days = Array.from({ length: daysToGenerate }, (_, i) =>
-    addDays(startDay, i)
-  );
+  // 2 years is the absolute maximum, use max days before as a performance optimization
+  const MAX_DAYS = 2 * 365;
+  const maxDaysBefore = reservationsMaxDaysBefore ?? 0;
+  const maxDays = maxDaysBefore > 0 ? maxDaysBefore : MAX_DAYS;
 
   // Find the first possible time for that day, continue for each day until we find one
-  for (const singleDay of days) {
+  for (let i = 0; i < maxDays; i++) {
+    const singleDay = addDays(startDay, i);
     // have to run this complex check to remove already reserved times
     const availableTimesForDay = getAvailableTimesForDay({
       ...props,

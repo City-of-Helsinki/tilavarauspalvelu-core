@@ -1,4 +1,11 @@
-import { addDays, format, set } from "date-fns";
+import {
+  addDays,
+  addHours,
+  addMonths,
+  format,
+  set,
+  startOfDay,
+} from "date-fns";
 import { getLastPossibleReservationDate, getNextAvailableTime } from "./utils";
 import {
   ReservationKind,
@@ -122,7 +129,7 @@ function constructDate(d: Date, hours: number, minutes: number) {
 // More important when testing error cases.
 // Alternative would be to refactor and reduce inputs to the function.
 // e.g. this is not necessary for a function that takes 2 - 3 parameters.
-/* eslint-disable @typescript-eslint/no-non-null-assertion -- expect breaks on null */
+
 describe("getNextAvailableTime", () => {
   beforeAll(() => {
     jest.useFakeTimers({
@@ -223,9 +230,8 @@ describe("getNextAvailableTime", () => {
       duration: 60,
     });
     const val = getNextAvailableTime(input);
-    expect(val).toBeInstanceOf(Date);
-    expect(val!.getDate()).toBe(today.getDate());
-    expect(val!.getHours()).toBe(11);
+    const d = startOfDay(today);
+    expect(val).toEqual(addHours(d, 11));
   });
 
   // there is earlier times available but they are too short
@@ -236,9 +242,8 @@ describe("getNextAvailableTime", () => {
       duration: 90,
     });
     const val = getNextAvailableTime(input);
-    expect(val).toBeInstanceOf(Date);
-    expect(val!.getHours()).toBe(13);
-    expect(val!.getDate()).toBe(today.getDate());
+    const d = startOfDay(today);
+    expect(val).toEqual(addHours(d, 13));
   });
 
   // today is reservable, has available times but they are too short
@@ -249,9 +254,8 @@ describe("getNextAvailableTime", () => {
       duration: 90,
     });
     const val = getNextAvailableTime(input);
-    expect(val).toBeInstanceOf(Date);
-    expect(val!.getHours()).toBe(10);
-    expect(val!.getDate()).toBe(start.getDate());
+    const d = startOfDay(start);
+    expect(val).toEqual(addHours(d, 10));
   });
 
   test("finds the next available time tomorrow when today has too short times", () => {
@@ -261,9 +265,8 @@ describe("getNextAvailableTime", () => {
       duration: 300,
     });
     const val = getNextAvailableTime(input);
-    expect(val).toBeInstanceOf(Date);
-    expect(val!.getHours()).toBe(10);
-    expect(val!.getDate()).toBe(addDays(new Date(), 1).getDate());
+    const d = startOfDay(addDays(new Date(), 1));
+    expect(val).toEqual(addHours(d, 10));
   });
 
   test("finds no available times if the duration is too long", () => {
@@ -296,12 +299,79 @@ describe("getNextAvailableTime", () => {
       duration: 30,
     });
     const val = getNextAvailableTime(input);
-    expect(val).toBeInstanceOf(Date);
-    expect(val!.getDate()).toBe(date.getDate());
-    expect(val!.getHours()).toBe(10);
+    expect(val).toEqual(addHours(startOfDay(date), 10));
+  });
+
+  test("Finds a single date after two months", () => {
+    const today = new Date();
+    mockOpenTimes(today, 7, []);
+    const date = addMonths(today, 2);
+    reservableTimes.set(format(date, "yyyy-MM-dd"), [
+      {
+        start: constructDate(date, 10, 0),
+        end: constructDate(date, 15, 0),
+      },
+    ]);
+    const input = createInput({
+      start: today,
+      duration: 30,
+    });
+    const val = getNextAvailableTime(input);
+    expect(val).toEqual(addHours(startOfDay(date), 10));
+  });
+
+  test("Finds a date after a requested date", () => {
+    const today = new Date();
+    const date1 = addMonths(today, 1);
+    const date2 = addMonths(today, 6);
+    mockOpenTimes(today, 7, []);
+    reservableTimes.set(format(date1, "yyyy-MM-dd"), [
+      {
+        start: constructDate(date1, 10, 0),
+        end: constructDate(date1, 15, 0),
+      },
+    ]);
+    reservableTimes.set(format(date2, "yyyy-MM-dd"), [
+      {
+        start: constructDate(date2, 10, 0),
+        end: constructDate(date2, 15, 0),
+      },
+    ]);
+    const input = createInput({
+      start: addDays(date1, 1),
+      duration: 30,
+    });
+    const val = getNextAvailableTime(input);
+    expect(val).toEqual(addHours(startOfDay(date2), 10));
   });
 
   describe("reservationsMinDaysBefore check", () => {
+    test("Min days before 0, should find today", () => {
+      const today = new Date();
+      mockOpenTimes(today, 2 * 7);
+      const input = createInput({
+        start: today,
+        duration: 60,
+        reservationsMinDaysBefore: 0,
+      });
+      const val = getNextAvailableTime(input);
+      const d = startOfDay(today);
+      expect(val).toEqual(addHours(d, 10));
+    });
+
+    test("Min days before 1, should find tomorrow", () => {
+      const today = new Date();
+      mockOpenTimes(today, 2 * 7);
+      const input = createInput({
+        start: today,
+        duration: 60,
+        reservationsMinDaysBefore: 1,
+      });
+      const val = getNextAvailableTime(input);
+      const d = startOfDay(addDays(today, 1));
+      expect(val).toEqual(addHours(d, 10));
+    });
+
     test("finds the next available time a week from now", () => {
       const today = new Date();
       mockOpenTimes(today, 2 * 7);
@@ -311,9 +381,8 @@ describe("getNextAvailableTime", () => {
         reservationsMinDaysBefore: 7,
       });
       const val = getNextAvailableTime(input);
-      expect(val).toBeInstanceOf(Date);
-      expect(val!.getDate()).toBe(addDays(today, 7).getDate());
-      expect(val!.getHours()).toBe(10);
+      const d = startOfDay(addDays(today, 7));
+      expect(val).toEqual(addHours(d, 10));
     });
 
     test("NO times if times are only available before reservationsMinDaysBefore", () => {
@@ -333,6 +402,44 @@ describe("getNextAvailableTime", () => {
   });
 
   describe("reservationsMaxDaysBefore check", () => {
+    test("Max days before 0, should find a week from now", () => {
+      const today = new Date();
+      mockOpenTimes(today, 2 * 7);
+      const input = createInput({
+        start: addDays(today, 7),
+        duration: 60,
+        reservationsMaxDaysBefore: 0,
+      });
+      const val = getNextAvailableTime(input);
+      const d = startOfDay(addDays(today, 7));
+      expect(val).toEqual(addHours(d, 10));
+    });
+
+    test("Max days before undefined is equal to 0", () => {
+      const today = new Date();
+      mockOpenTimes(today, 2 * 7);
+      const input = createInput({
+        start: addDays(today, 7),
+        duration: 60,
+        reservationsMaxDaysBefore: undefined,
+      });
+      const val = getNextAvailableTime(input);
+      const d = startOfDay(addDays(today, 7));
+      expect(val).toEqual(addHours(d, 10));
+    });
+
+    test("Max days before 6, should not find a week from now", () => {
+      const today = new Date();
+      mockOpenTimes(today, 2 * 7);
+      const input = createInput({
+        start: addDays(today, 7),
+        duration: 60,
+        reservationsMaxDaysBefore: 6,
+      });
+      const val = getNextAvailableTime(input);
+      expect(val).toBeNull();
+    });
+
     test("NO times if times are only available after reservationsMaxDaysBefore", () => {
       const today = new Date();
       const cpy = new Date(today);
@@ -366,9 +473,8 @@ describe("getNextAvailableTime", () => {
         activeApplicationRounds,
       });
       const val = getNextAvailableTime(input);
-      expect(val).toBeInstanceOf(Date);
-      expect(val!.getDate()).toBe(addDays(end, 1).getDate());
-      expect(val!.getHours()).toBe(10);
+      const d = startOfDay(addDays(end, 1));
+      expect(val).toEqual(addHours(d, 10));
     });
 
     test("multiple overlapping activeApplicationRounds", () => {
@@ -391,9 +497,8 @@ describe("getNextAvailableTime", () => {
         activeApplicationRounds,
       });
       const val = getNextAvailableTime(input);
-      expect(val).toBeInstanceOf(Date);
-      expect(val!.getDate()).toBe(addDays(end, 3).getDate());
-      expect(val!.getHours()).toBe(10);
+      const d = startOfDay(addDays(end, 3));
+      expect(val).toEqual(addHours(d, 10));
     });
 
     test("finds a time between non-overlapping activeApplicationRounds", () => {
@@ -416,9 +521,8 @@ describe("getNextAvailableTime", () => {
         activeApplicationRounds,
       });
       const val = getNextAvailableTime(input);
-      expect(val).toBeInstanceOf(Date);
-      expect(val!.getDate()).toBe(addDays(middle, 1).getDate());
-      expect(val!.getHours()).toBe(10);
+      const d = startOfDay(addDays(middle, 1));
+      expect(val).toEqual(addHours(d, 10));
     });
 
     test("no times available after activeApplicationRound", () => {
@@ -465,4 +569,3 @@ describe("getNextAvailableTime", () => {
     });
   });
 });
-/* eslint-enable @typescript-eslint/no-non-null-assertion */
