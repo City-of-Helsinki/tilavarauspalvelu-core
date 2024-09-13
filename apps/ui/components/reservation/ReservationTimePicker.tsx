@@ -47,6 +47,7 @@ import { UseFormReturn } from "react-hook-form";
 import { PendingReservationFormType } from "../reservation-unit/schema";
 import { useCurrentUser } from "@/hooks/user";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
+import { CalendarEventBuffer } from "common";
 
 type WeekOptions = "day" | "week" | "month";
 
@@ -148,11 +149,13 @@ function useCalendarEventChange({
   focusSlot,
 }: Pick<Props, "reservationUnit"> & {
   focusSlot: ReturnType<typeof convertFormToFocustimeSlot>;
-}) {
+}): Array<CalendarEventBuffer | CalendarEvent<ReservationNode>> {
   const { t } = useTranslation();
   // TODO this doesn't optimize anything
   // any change in the event will cause a full recalculation
-  const calendarEvents: CalendarEvent<ReservationNode>[] = useMemo(() => {
+  const calendarEvents: Array<
+    CalendarEventBuffer | CalendarEvent<ReservationNode>
+  > = useMemo(() => {
     const existingReservations = filterNonNullable(
       reservationUnit.reservationSet
     );
@@ -170,7 +173,7 @@ function useCalendarEventChange({
       };
     }
 
-    return [
+    const events = [
       ...existingReservations,
       ...(focusEvent != null ? [focusEvent] : []),
     ].map((n) => {
@@ -189,34 +192,33 @@ function useCalendarEventChange({
 
       return event;
     });
-  }, [reservationUnit, t, focusSlot]);
-  // TODO should be combined with calendar events
-  const eventBuffers = useMemo(() => {
-    const bufferTimeBefore = reservationUnit.bufferTimeBefore;
-    const bufferTimeAfter = reservationUnit.bufferTimeAfter;
-    const evts = filterNonNullable(calendarEvents.flatMap((e) => e.event));
-    let pendingReservation: PendingReservation | null = null;
-    if (focusSlot.isReservable) {
-      pendingReservation = {
-        begin: focusSlot.start.toISOString(),
-        end: focusSlot.end.toISOString(),
-        state: "INITIAL",
-        bufferTimeBefore,
-        bufferTimeAfter,
-      };
-    }
-    return getEventBuffers([
-      ...evts,
-      // focusSlot has invalid reservations when the slot isn't properly selected
-      // similar check is in calendarEvents
-      ...(pendingReservation != null ? [pendingReservation] : []),
-    ]);
-  }, [calendarEvents, focusSlot, reservationUnit]);
 
-  return [...calendarEvents, ...eventBuffers];
+    const { bufferTimeBefore, bufferTimeAfter } = reservationUnit;
+    const evts = filterNonNullable(events.map((e) => e.event));
+    const pendingReservation: PendingReservation | null = focusSlot.isReservable
+      ? {
+          begin: focusSlot.start.toISOString(),
+          end: focusSlot.end.toISOString(),
+          state: "INITIAL",
+          bufferTimeBefore,
+          bufferTimeAfter,
+        }
+      : null;
+
+    return [
+      ...events,
+      ...getEventBuffers([
+        ...evts,
+        // focusSlot has invalid reservations when the slot isn't properly selected
+        // similar check is in calendarEvents
+        ...(pendingReservation != null ? [pendingReservation] : []),
+      ]),
+    ];
+  }, [reservationUnit, t, focusSlot]);
+
+  return calendarEvents;
 }
 
-// FIXME handle this reservation if we are in edit mode (remove it from the other reservations)
 export function ReservationTimePicker({
   reservationUnit,
   reservableTimes,
