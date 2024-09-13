@@ -1,0 +1,59 @@
+{% extends "terms_of_use/components/base.jinja" %}
+
+{% block style %}
+  <style>
+      .content-title {
+          font-size: 28pt;
+          margin-bottom: 0;
+          padding-bottom: 0;
+      }
+
+      .content-body {
+          font-size: 10pt;
+      }
+
+      .content-body h2 {
+          font-size: 14pt;
+          margin-bottom: 0;
+          padding-bottom: 0;
+          -pdf-keep-with-next: true;
+      }
+
+      .content-body p {
+          margin: 0 0 0.7em 0;
+          line-height: 1.1em;
+      }
+
+      .content-body ol {
+          margin: 0.3em 0;
+          padding: 0;
+          list-style-position: outside;
+      }
+
+      .content-body li {
+          margin: 0.3em 0;
+          padding: 0;
+          line-height: 1.1em;
+      }
+  </style>
+{% endblock %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+  <h1 class="content-title">Yleiset sopimusehdot</h1>
+  <div class="content-body" style="">{{ terms_text_fi|safe }}</div>
+
+  <pdf:nexttemplate name="swedish" />
+  <pdf:nextpage />
+
+  <h1 class="content-title">Allmänna villkor</h1>
+  <div class="content-body" style="">{{ terms_text_sv|safe }}</div>
+
+  <pdf:nexttemplate name="english" />
+  <pdf:nextpage />
+
+  <h1 class="content-title">General Terms and Conditions</h1>
+  <div class="content-body" style="">{{ terms_text_en|safe }}</div>
+
+{% endblock %}

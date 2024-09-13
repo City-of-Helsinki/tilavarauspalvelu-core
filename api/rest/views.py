@@ -4,10 +4,13 @@ import io
 from django.core.handlers.wsgi import WSGIRequest
 from django.http import FileResponse, HttpResponseRedirect, JsonResponse
 from django.middleware.csrf import get_token
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET
 
+from common.pdf import render_to_pdf
 from common.utils import ical_hmac_signature
 from reservations.models import Reservation
+from terms_of_use.models import TermsOfUse
 
 __all__ = [
     "reservation_ical",
@@ -62,3 +65,43 @@ def csrf_view(request: WSGIRequest) -> HttpResponseRedirect:  # NOSONAR
     # shared automatically like it is in production.
     headers = {"NewCSRFToken": request.META["CSRF_COOKIE"]}
     return HttpResponseRedirect(redirect_to=redirect_to, headers=headers)
+
+
+@require_GET
+@csrf_exempt
+def terms_of_use_pdf(request: WSGIRequest) -> FileResponse | JsonResponse:
+    """Download the booking terms of use as a PDF"""
+    title = "Tilavarauspalvelu yleiset sopimusehdot"
+    as_attachment = request.GET.get("as_attachment", "1").lower() not in ("0", "false", "no", "n")
+
+    try:
+        terms = TermsOfUse.objects.get(id="booking")
+    except TermsOfUse.DoesNotExist:
+        data = {"detail": "Terms of use with ID 'booking' not found"}
+        return JsonResponse(data=data, status=404)
+
+    context = {
+        "title": title,
+        "terms_name_fi": terms.name_fi,
+        "terms_name_en": terms.name_en,
+        "terms_name_sv": terms.name_sv,
+        "terms_text_fi": terms.text_fi,
+        "terms_text_en": terms.text_en,
+        "terms_text_sv": terms.text_sv,
+    }
+
+    try:
+        pdf = render_to_pdf("terms_of_use/booking_terms.jinja", **context)
+    except Exception as error:
+        data = {"detail": f"PDF could not be rendered: {error}"}
+        return JsonResponse(data=data, status=500)
+
+    buffer = io.BytesIO()
+    buffer.write(pdf)
+    buffer.seek(0)
+
+    return FileResponse(
+        buffer,
+        as_attachment=as_attachment,
+        filename=f"{title.replace(' ', '_')}.pdf",
+    )

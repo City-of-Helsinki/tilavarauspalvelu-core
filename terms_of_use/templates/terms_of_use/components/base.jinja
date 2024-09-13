@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}Varaamo{% endblock %}</title>
+  <style>
+
+    {# Use '' for default layout (finnish) #}
+    {% for name, lang in [('', 'fi'), ('swedish', 'sv'), ('english', 'en')] %}
+
+      @page {{ name }} {
+          size: A4 portrait;
+          @frame logo_frame {
+              left: 30pt;
+              width: 85pt;
+              top: 30pt;
+              height: 50pt;
+              -pdf-frame-content: logo_{{ lang }};
+          }
+          @frame header_frame {
+              left: 345pt;
+              width: 125pt;
+              top: 35pt;
+              height: 45pt;
+              -pdf-frame-content: header_{{ lang }};
+          }
+          @frame content_frame {
+              left: 140pt;
+              width: 420pt;
+              top: 110pt;
+              height: 640pt;
+          }
+          @frame footer_frame {
+              left: 140pt;
+              width: 420pt;
+              top: 775pt;
+              height: 50pt;
+              -pdf-frame-content: footer_{{ lang }};
+          }
+      }
+
+    {% endfor %}
+
+    body {
+        font-size: 9pt;
+    }
+
+    #header_fi, #header_sv, #header_en {
+        font-size: 9pt;
+        text-align: right;
+    }
+
+    #footer_fi, #footer_sv, #footer_en {
+        font-size: 7pt;
+        width: 500px;
+    }
+
+  </style>
+  {% block style %}
+  {% endblock %}
+</head>
+
+<body>
+
+{% block header %}
+
+  {% set logo_fi = "
+  PHN2ZyB2aWV3Qm94PSIwIDAgNzggMzYiIHRpdGxlPSJIZWxzaW5naW4ga2F1cHVua2kiIHJvbGU9ImltZyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3J
+  nLzIwMDAvc3ZnIj4KICAgIDxwYXRoCiAgICAgICAgZD0iTTc1Ljc1MyAyLjI1MXYyMC43YzAgMy45NS0zLjI3NSA3LjE3OC03LjMxIDcuMTc4aC0yMi
+  4yNmMtMi42NzQgMC01LjIwNS45Ni03LjE4MyAyLjczOWExMC43NDkgMTAuNzQ5IDAgMDAtNy4xODMtMi43NEg5LjUwOWMtNC4wMDMgMC03LjI0Ny0zL
+  jIxLTcuMjQ3LTcuMTc3VjIuMjVoNzMuNDkxek00MC4xODcgMzQuODM1YTguNDcgOC40NyAwIDAxNi4wMTItMi40NzFoMjIuMjQ1YzUuMjY4IDAgOS41
+  NTYtNC4yMTkgOS41NTYtOS40MTNWMEgwdjIyLjkzNWMwIDUuMTk0IDQuMjU2IDkuNDEzIDkuNTA5IDkuNDEzaDIyLjMwOGMyLjI2MyAwIDQuMzk4Ljg
+  4MiA2LjAxMiAyLjQ3MUwzOS4wMTYgMzZsMS4xNy0xLjE2NXoiCiAgICAgICAgZmlsbD0iY3VycmVudENvbG9yIiAvPgogICAgPHBhdGgKICAgICAgIC
+  BkPSJNNjcuNTIyIDExLjY3NmMwIC42ODEtLjU1NiAxLjE3Ny0xLjI1NSAxLjE3Ny0uNyAwLTEuMjU1LS40OTYtMS4yNTUtMS4xNzcgMC0uNjgyLjU1N
+  i0xLjE3OCAxLjI1NS0xLjE3OC43LS4wMyAxLjI1NS40NjUgMS4yNTUgMS4xNzh6bS0yLjM1MiA5LjYyMmgyLjE3OHYtNy41NDZINjUuMTd2Ny41NDZ6
+  bS0zLjkwOS00LjU1NmwyLjg0NSA0LjU1NmgtMi4zNjhsLTEuOTA3LTMuMDIyLTEuMDMzIDEuMjcxdjEuNzVoLTIuMTYxVjEwLjQ1M2gyLjE2djUuMDA
+  0YzAgLjkzLS4xMSAxLjg2LS4xMSAxLjg2aC4wNDdzLjUwOS0uODIxLjkzOC0xLjQxbDEuNjUzLTIuMTU0aDIuNTQybC0yLjYwNiAyLjk5em0tNi44MT
+  ctLjI3OGMwLTEuODc1LS45MzgtMi44OTgtMi40MzItMi44OTgtMS4yNzEgMC0xLjkzOS43MjgtMi4zMiAxLjQyNmgtLjA0OGwuMTEyLTEuMjRoLTIuM
+  TYydjcuNTQ2aDIuMTYyVjE2LjgyYzAtLjg2OC41MjQtMS40NzIgMS4zMzUtMS40NzIuODEgMCAxLjE2LjUyNyAxLjE2IDEuNTM0djQuNDE2aDIuMTc3
+  bC4wMTYtNC44MzR6bS04LjkzMS00Ljc4OGMwIC42ODEtLjU1NyAxLjE3Ny0xLjI1NiAxLjE3Ny0uNyAwLTEuMjU1LS40OTYtMS4yNTUtMS4xNzcgMC0
+  uNjgyLjU1Ni0xLjE3OCAxLjI1NS0xLjE3OC43MTUtLjAzIDEuMjU2LjQ2NSAxLjI1NiAxLjE3OHptLTIuMzUyIDkuNjIyaDIuMTc3di03LjU0Nkg0My
+  4xNnY3LjU0NnptLTMuNzUtMi4xMDdjMC0uNjA1LS44NTktLjcyOS0xLjg2LTEuMDA4LTEuMTYtLjI5NC0yLjYyMi0uODY3LTIuNjIyLTIuMzA4IDAtM
+  S40MjYgMS4zOTgtMi4zMjQgMy4wNTEtMi4zMjQgMS41NDEgMCAyLjk1Ni43MTIgMy41NDQgMS43MmwtMS44NiAxLjAyMmMtLjE5LS42NjYtLjc2Mi0x
+  LjE5My0xLjYyLTEuMTkzLS41NTcgMC0xLjAxOC4yMzItMS4wMTguNjgyIDAgLjU3MyAxLjAxOC42MzUgMi4xNjIuOTkxIDEuMjA4LjM3MiAyLjMyLjk
+  xNSAyLjMyIDIuMjk0IDAgMS41MTgtMS40NDYgMi40MTctMy4xMTUgMi40MTctMS44MTEgMC0zLjI0Mi0uNzQ0LTMuODc3LTEuOTUybDEuODktMS4wMz
+  ljLjI0LjgyMi45MjIgMS40NDEgMS45NTUgMS40NDEuNjIgMCAxLjA1LS4yNDggMS4wNS0uNzQzem0tNi44ODItOC42NzdoLTIuMTc3djguNjkyYzAgL
+  jc3NS4xNzUgMS4zNDguNTA5IDEuNzA1LjM1LjM1Ni44OS41MjYgMS42MzYuNTI2LjI1NSAwIC41MjUtLjAzLjc4LS4wNzcuMjctLjA2Mi40NzYtLjE0
+  LjY1LS4yMzNsLjE5MS0xLjQyNWEyLjA3IDIuMDcgMCAwMS0uNDYuMTI0Yy0uMTI4LjAzLS4yODcuMDMtLjQ2MS4wMy0uMjg2IDAtLjQxNC0uMDc3LS4
+  1MDktLjIxNi0uMTExLS4xNC0uMTU5LS4zODctLjE1OS0uNzQ0di04LjM4MnptLTcuMjQ2IDQuNTdjLS43OTUgMC0xLjQ0Ni41NTgtMS42MjEgMS41OD
+  FoMy4wNWMuMDE3LS44OTktLjU4Ny0xLjU4LTEuNDMtMS41OHptMy4zNTMgMy4wMDdIMjMuNjNjLjA5NSAxLjIyNC43OTQgMS44MjggMS43IDEuODI4L
+  jgxIDAgMS4zNjctLjUyNyAxLjQ5NC0xLjI0bDEuODI4IDEuMDA3Yy0uNTQuOTYxLTEuNyAxLjc5OC0zLjMyMiAxLjc5OC0yLjE2IDAtMy43NS0xLjQ3
+  Mi0zLjc1LTMuOTUxIDAtMi40NjQgMS42Mi0zLjk1MSAzLjcwMy0zLjk1MSAyLjA4MSAwIDMuNDY0IDEuNDQgMy40NjQgMy40ODYtLjAxNi42MDQtLjE
+  xMSAxLjAyMy0uMTExIDEuMDIzem0tMTEuMDc3IDMuMjA3aDIuMjU3VjEwLjkxNmgtMi4yNTd2NC4xMDdoLTQuMjQzdi00LjA5MUgxMS4wNnYxMC4zNj
+  ZoMi4yNTZ2LTQuMjkyaDQuMjQzdjQuMjkyeiIKICAgICAgICBmaWxsPSJjdXJyZW50Q29sb3IiIC8+Cjwvc3ZnPg==
+  " %}
+
+  {% set logo_sv = "
+  PHN2ZyB2aWV3Qm94PSIwIDAgMTA0IDM2IiB0aXRsZT0iSGVsc2luZ2ZvcnMgc3RhZCIgcm9sZT0iaW1nIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmc
+  vMjAwMC9zdmciPgogICAgPHBhdGgKICAgICAgICBkPSJNMTAzLjEwNSAwdjIyLjkzNWMwIDUuMTc5LTQuMjY2IDkuMzk3LTkuNTI0IDkuMzk3bC0zNC
+  44NjcuMDMyYTguNDYgOC40NiAwIDAwLTUuOTgxIDIuNDcxTDUxLjU1MyAzNmwtMS4xODEtMS4xNjVhOC40MDUgOC40MDUgMCAwMC01Ljk4Mi0yLjQ3M
+  Ug5LjQ3NkM0LjI1IDMyLjM2NCAwIDI4LjE0NSAwIDIyLjk2NlYwaDEwMy4xMDV6bS0yLjIzNiAyLjIzNUgyLjI1MXYyMC43MzFjMCAzLjk1MSAzLjI0
+  MyA3LjE2MyA3LjIyNSA3LjE2M0g0NC4zOWMyLjY3NiAwIDUuMTk1Ljk2IDcuMTYyIDIuNzM5IDEuOTY4LTEuNzggNC40ODYtMi43NCA3LjE2Mi0yLjc
+  0bDM0Ljg2Ny0uMDNjNC4wMTQgMCA3LjI4OC0zLjIxMiA3LjI4OC03LjE2M3YtMjAuN3pNNjIuMDIgMTIuMDlsMiAxLjE1Yy0uMDMyIDEuMDA3LS40OD
+  kgMS40NzktMS4zNTQgMS40NzktLjIwNSAwLS40NzMtLjA0Ny0uNjE0LS4wOTR2LjA2MmMuNDI1LjMzMS45NDQuODgyLjk0NCAxLjc2MyAwIDEuNTEyL
+  TEuNDY0IDIuNDcyLTMuMjc0IDIuNDcyLS44MzQgMC0xLjU1OC4yNjctMS41NTguNjc3IDAgLjMxNS4yNjcuNDU2LjkxMy40NTYuNjQ1IDAgMS4zNjkt
+  LjEyNiAyLjIwMy0uMTI2IDEuNjUzIDAgMi43NTUuNjYxIDIuNzU1IDIuMTU3IDAgMS43OTQtMi4wMTUgMi41MDMtNC4yODIgMi41MDMtMi4xMDkgMC0
+  0LjAzLS41OTgtNC4wMy0xLjk1MiAwLS44MTkuODUtMS4zMDcgMS42MjItMS40NDh2LS4wNDhjLS41ODItLjE3My0xLjEwMi0uNTUtMS4xMDItMS4yMT
+  IgMC0uODY1Ljg4Mi0xLjMzOCAxLjc3OS0xLjUyN3YtLjA0N2MtLjgzNC0uMzMtMS41NDMtMS4wMDctMS41NDMtMi4xODggMC0xLjUxMSAxLjMyMi0yL
+  jU1IDMuMTMzLTIuNTUuNjkyIDAgMS4wODYuMTQyIDEuNjA1LjE0Mi42NDYgMCAuODgyLS4zNjIuODgyLS45NDUgMC0uMjY3LS4wNDctLjUzNS0uMDc5
+  LS43MjR6bS0xLjczMSA5LjU0Yy0uOTMgMC0yLjcyNC4wNzgtMi43MjQuNzg2IDAgLjUzNi44OTguNzg3IDIuMTU3LjgwMyAxLjQxNyAwIDIuMjM1LS4
+  yNjcgMi4yMzUtLjkxMyAwLS41MDQtLjc1NS0uNjc3LTEuNjY4LS42Nzd6bTI4Ljk5NS04LjAxM2MxLjUyNyAwIDIuOTI4LjcyNCAzLjUyNiAxLjc0N2
+  wtMS44NDIgMS4wNGExLjYyNCAxLjYyNCAwIDAwLTEuNjA2LTEuMjEzYy0uNTUgMC0xLjAwNy4yMzYtMS4wMDcuNjc3IDAgLjU4MiAxLjAwNy42NDUgM
+  i4xNTcgMS4wMDggMS4xOTYuMzc3IDIuMjk4LjkyOCAyLjI5OCAyLjMzIDAgMS41NDItMS40MzMgMi40NTUtMy4xMDEgMi40NTUtMS43OTUgMC0zLjIx
+  MS0uNzcxLTMuODQxLTEuOTg0bDEuODczLTEuMDU0Yy4yNTIuODM0LjkxMyAxLjQ2NCAxLjkzNiAxLjQ2NC41OTggMCAxLjAyMy0uMjY4IDEuMDIzLS4
+  3NCAwLS42MTQtLjg1LS43NTYtMS44NDEtMS4wMjMtMS4xNjUtLjMxNS0yLjYxMy0uODgyLTIuNjEzLTIuMzQ2IDAtMS40NDggMS4zODUtMi4zNiAzLj
+  AzOC0yLjM2em0tMTQuNjU1IDBjMi4wNzggMCAzLjY5OSAxLjUyNyAzLjY5OSA0LjAxNHMtMS42MDYgNC4wMTQtMy43IDQuMDE0Yy0yLjEwOSAwLTMuN
+  zE0LTEuNTI3LTMuNzE0LTQuMDE0czEuNjA1LTQuMDE0IDMuNzE1LTQuMDE0em0tNDkuNjggMGMyLjA2MyAwIDMuNDMyIDEuNDY0IDMuNDMyIDMuNTQy
+  LjAxNi42MTQtLjA5NCAxLjAzOS0uMDk0IDEuMDM5aC00Ljk3NGMuMDk0IDEuMjQzLjc4NyAxLjg1NyAxLjY4NCAxLjg1Ny44MDMgMCAxLjM1NC0uNTM
+  1IDEuNDgtMS4yNmwxLjgxIDEuMDI0Yy0uNTM1Ljk3Ni0xLjY4NCAxLjgyNi0zLjI5IDEuODI2LTIuMTQgMC0zLjcxNS0xLjQ5NS0zLjcxNS00LjAxNC
+  AwLTIuNDg3IDEuNjA2LTQuMDE0IDMuNjY4LTQuMDE0em0xMy4wNjYtLjAxNmMxLjUyNyAwIDIuOTI4LjcyNCAzLjUyNiAxLjc0OGwtMS44NDIgMS4wM
+  zljLS4xODktLjY3Ny0uNzU1LTEuMjEzLTEuNjA1LTEuMjEzLS41NTEgMC0xLjAwOC4yMzctMS4wMDguNjc3IDAgLjU4MyAxLjAwOC42NDYgMi4xNCAx
+  LjAwOCAxLjE5Ny4zNzggMi4zLjkyOCAyLjMgMi4zMyAwIDEuNTQyLTEuNDMzIDIuNDQtMy4wODYgMi40NC0xLjc5NSAwLTMuMjExLS43NTYtMy44NDE
+  tMS45ODRsMS44NzMtMS4wNTVjLjIzNi44MzUuOTEzIDEuNDY0IDEuOTM2IDEuNDY0LjU4My4wMTYgMS4wMDgtLjIzNiAxLjAwOC0uNzI0IDAtLjYxNC
+  0uODUtLjc0LTEuODQyLTEuMDIzLTEuMTY1LS4zLTIuNTk3LS44ODItMi41OTctMi4zNDUgMC0xLjQ0OSAxLjM4NS0yLjM2MiAzLjAzOC0yLjM2MnpNM
+  zIuMyAxMC41M3Y4LjUwMWMwIC4zNjIuMDQ3LjYxNC4xNTcuNzU2LjA5NS4xNTcuMjIuMjIuNTA0LjIyLjE3MyAwIC4zMyAwIC40NTYtLjAzMWEyLjAx
+  IDIuMDEgMCAwMC40NTctLjEyNmwtLjE4OSAxLjQ0OGEyLjUzMiAyLjUzMiAwIDAxLS42NDUuMjM2Yy0uMjUyLjA0Ny0uNTIuMDc5LS43NzIuMDc5LS4
+  3NCAwLTEuMjc1LS4xNzQtMS42MjEtLjUzNi0uMzMtLjM2Mi0uNTA0LS45NDQtLjUwNC0xLjczMVYxMC41M2gyLjE1N3ptMTkuODE4IDMuMDg2YzEuND
+  ggMCAyLjQwOCAxLjAyMyAyLjQwOCAyLjkyOHY0LjkxMWgtMi4xNTZWMTYuOTdjMC0xLjAwNy0uMzYyLTEuNTQzLTEuMTY1LTEuNTQzcy0xLjMyMi42M
+  TQtMS4zMjIgMS40OTZ2NC41NDloLTIuMTQxdi03LjY2NmgyLjE0bC0uMTEgMS4yNmguMDQ4Yy4zNzgtLjcxIDEuMDM5LTEuNDQ5IDIuMjk4LTEuNDQ5
+  em0xNi43MzMtMy4zMzdhMy4yNyAzLjI3IDAgMDEyLjczOSAxLjRsLTEuODU4IDEuMTM0Yy0uMDMxLS40NTYtLjI1Mi0uOTI4LS43NzEtLjkyOC0uNTM
+  1IDAtLjc4Ny40MDktLjc4NyAxLjA4NnYuODM0aDEuNjg0djEuNjM3aC0xLjY4NHY2LjAyOWgtMi4xNHYtNi4wMjloLTEuMTgxdi0xLjYzN2gxLjE4di
+  0uODE5YzAtMS43OTQgMS4xOC0yLjcwNyAyLjgxOC0yLjcwN3ptMTQuODEyIDMuMzg0YzEuMDg2IDAgMS42ODQuOTEzIDEuNjg0IDIuMDMgMCAuNTA1L
+  S4wNzguODk4LS4wNzguODk4bC0xLjkzNiAxLjExOGMuMDMxLS4yMi4xMjYtLjc0LjEyNi0xLjI2IDAtLjUwMy0uMTktLjk3NS0uNzI1LS45NzUtLjY3
+  NiAwLS45NDQuNjMtLjk0NCAxLjYydjQuMzc3aC0yLjE1N3YtNy42NWgyLjE1N2wtLjExIDEuMjU5aC4wNDdjLjM3OC0uNzQuOTYtMS40MTcgMS45MzY
+  tMS40MTd6bS03MC41Mi0yLjcyM3Y0LjE3MWg0LjIwM3YtNC4xN2gyLjIzNXYxMC41MTRoLTIuMjM1di00LjM2aC00LjIwM3Y0LjM2aC0yLjIzNVYxMC
+  45NGgyLjIzNXptMzIuMzMyIDIuODV2Ny42NjVINDMuMzJWMTMuNzloMi4xNTZ6bTI5LjE1MyAxLjQ2M2MtMS4wNyAwLTEuNTQzIDEuMDA4LTEuNTQzI
+  DIuMzc3IDAgMS4zNy40NzIgMi4zNzcgMS41NDMgMi4zNzcgMS4wNTQgMCAxLjUyNy0xLjAwNyAxLjUyNy0yLjM3NyAwLTEuMzctLjQ3My0yLjM3Ny0x
+  LjUyNy0yLjM3N3ptLTE0Ljg5MS0uMTg5Yy0uNzI0IDAtMS4zMDcuNDczLTEuMzA3IDEuMTk3IDAgLjc0LjU4MyAxLjIxMiAxLjMwNyAxLjE5Ni43MjQ
+  gMCAxLjMwNi0uNDcyIDEuMzA2LTEuMTk2cy0uNTgyLTEuMTk3LTEuMzA2LTEuMTk3em0tMzQuNzczLjA5NWMtLjc4NyAwLTEuNDMyLjU2Ni0xLjYwNS
+  AxLjYwNWgzLjAzOGMwLS45MTMtLjU5OC0xLjYwNS0xLjQzMy0xLjYwNXptMTkuNDQtNC42NzVjLjY5MyAwIDEuMjQ0LjUwMyAxLjI0NCAxLjE5NnMtL
+  jU1IDEuMTk2LTEuMjQzIDEuMTk2Yy0uNzA5IDAtMS4yNDQtLjUwMy0xLjI0NC0xLjE5NnMuNTUxLTEuMTk2IDEuMjQ0LTEuMTk2eiIKICAgICAgICBm
+  aWxsPSJjdXJyZW50Q29sb3IiIC8+Cjwvc3ZnPg==
+  " %}
+
+  {% set logo_en = logo_fi %}
+
+  {% for lang in ['fi', 'sv', 'en'] %}
+
+    {% if lang == 'fi' %}
+      {% set logo = logo_fi %}
+      {% set city_heading = 'HELSINGIN KAUPUNKI' %}
+      {% set government_heading = 'Keskushallinto' %}
+
+    {% elif lang == 'sv' %}
+      {% set logo = logo_sv %}
+      {% set city_heading = 'HELSINGFORS STAD' %}
+      {% set government_heading = 'Centralförvaltningen' %}
+
+    {% else %}
+      {% set logo = logo_en %}
+      {% set city_heading = 'CITY OF HELSINKI' %}
+      {% set government_heading = 'Central Administration' %}
+
+    {% endif %}
+
+    <div id="logo_{{ lang }}">
+      {# Note: 'image/svg' is on purpose due to a bug in 'xhtml2pdf' v0.2.16. #}
+      {# See `xhtml2pdf.files:B64InlineURI._rx_datauri`: it does not match 'image/svg+xml' correctly. #}
+      <img width="110" src="data:image/svg;base64,{{ logo }}" alt="Helsinki City Logo" />
+    </div>
+
+    <div id="header_{{ lang }}">
+      <div><b>{{ city_heading }}</b></div>
+      <div>{{ government_heading }}</div>
+    </div>
+
+  {% endfor %}
+
+
+{% endblock %}
+
+{% block content %}
+{% endblock %}
+
+{% block footer %}
+
+  {% for lang in ['fi', 'sv', 'en'] %}
+
+    {% if lang == 'fi' %}
+      {% set mail_address_indicator = 'Postiosoite' %}
+      {% set visit_indicator = 'Käyntiosoite' %}
+      {% set business_id_indicator = 'y-tunnus' %}
+
+    {% elif lang == 'sv' %}
+      {% set mail_address_indicator = 'Postadress' %}
+      {% set visit_indicator = 'Besöksadress' %}
+      {% set business_id_indicator = 'fo-nummer' %}
+
+    {% else %}
+      {% set mail_address_indicator = 'Postal address' %}
+      {% set visit_indicator = 'Visiting address' %}
+      {% set business_id_indicator = 'Business ID' %}
+
+    {% endif %}
+
+    <table id="footer_{{ lang }}">
+      <tr style="border-top: 1px solid black; padding: 10px;">
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td style="width: 50%;">{{ mail_address_indicator }}: PL1, 00099 HELSINGIN KAUPUNKI</td>
+        <td style="width: 30%;">kaupunginkanslia@hel.fi</td>
+        <td style="width: 20%; text-align: right;">www.hel.fi</td>
+      </tr>
+      <tr>
+        <td style="width: 50%;">{{ visit_indicator }}: Pohjoisesplanadi 11-13, 00170 Helsinki</td>
+        <td style="width: 30%;">+358 9 310 1641</td>
+        <td style="width: 20%; text-align: right;">{{ business_id_indicator }}: 0201256-6</td>
+      </tr>
+    </table>
+
+  {% endfor %}
+
+{% endblock %}
+
+</body>
+</html>

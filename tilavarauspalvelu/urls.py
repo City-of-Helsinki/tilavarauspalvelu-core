@@ -5,7 +5,7 @@ from django.urls import include, path, reverse
 from django.views.decorators.csrf import csrf_exempt
 from graphene_django_extensions import FileUploadGraphQLView
 
-from api.rest.views import csrf_view, reservation_ical
+from api.rest.views import csrf_view, reservation_ical, terms_of_use_pdf
 from api.webhooks.urls import webhook_router
 
 # Mock the `each_context` method to add some custom context variables.
@@ -30,6 +30,7 @@ urlpatterns = [
     path("graphql/", graphql_view),
     path("admin/", admin.site.urls),
     path("v1/reservation_calendar/<int:pk>/", reservation_ical, name="reservation_calendar"),
+    path("v1/terms_of_use_pdf/", terms_of_use_pdf, name="terms_of_use_pdf"),
     path("v1/webhook/", include(webhook_router.urls)),
     path("pysocial/", include("social_django.urls", namespace="social")),
     path("helauth/", include("api.helauth.urls")),

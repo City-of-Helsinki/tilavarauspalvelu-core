@@ -58,6 +58,7 @@ class Common(Environment):
         "whitenoise.runserver_nostatic",
         "django.contrib.staticfiles",
         #  Third party apps
+        "django_jinja",
         "admin_data_views",
         "admin_extra_buttons",
         "more_admin_filters",
@@ -142,6 +143,11 @@ class Common(Environment):
     # --- Template settings ------------------------------------------------------------------------------------------
 
     TEMPLATES = [
+        {
+            "BACKEND": "django_jinja.jinja2.Jinja2",
+            "DIRS": [],
+            "APP_DIRS": True,
+        },
         {
             "BACKEND": "django.template.backends.django.DjangoTemplates",
             "DIRS": [BASE_DIR / "templates"],
