@@ -10,7 +10,6 @@ import {
   CustomerTypeChoice,
   type ReservationNode,
   type ReservationQuery,
-  ReserveeType,
 } from "@/gql/gql-types";
 import { type FieldName, containsField } from "common/src/metaFieldsHelpers";
 
@@ -80,24 +79,17 @@ function LabelValuePair({
   );
 }
 
+/// Helper function to type safely pick the application fields from the reservation
 // TODO move to common (and reuse in the hooks)
 export function getApplicationFields({
   supportedFields,
   reservation,
+  reserveeType,
 }: {
   supportedFields: FieldName[];
   reservation: NodeT;
+  reserveeType: CustomerTypeChoice;
 }) {
-  const includesReserveeType = containsField(supportedFields, "reserveeType");
-  if (includesReserveeType && reservation.reserveeType == null) {
-    // eslint-disable-next-line no-console
-    console.warn(
-      "getApplicationFields: reserveeType is null, but it is required"
-    );
-  }
-  const reserveeType = includesReserveeType
-    ? (reservation.reserveeType ?? CustomerTypeChoice.Individual)
-    : CustomerTypeChoice.Individual;
   const applicationFields = getReservationApplicationFields({
     supportedFields,
     reserveeType,
@@ -107,6 +99,7 @@ export function getApplicationFields({
   );
 }
 
+/// Helper function to type safely pick the general fields from the reservation
 // TODO move to common (and reuse in the hooks)
 export function getGeneralFields({
   supportedFields,
@@ -127,6 +120,8 @@ export function getGeneralFields({
   return filteredGeneralFields;
 }
 
+/// Component to show the application fields in the reservation confirmation
+/// This requires the reservation to be finalized (reserveeType is set)
 export function ApplicationFields({
   reservation,
   options,
@@ -138,12 +133,23 @@ export function ApplicationFields({
 }): JSX.Element {
   const { t } = useTranslation();
 
+  const includesReserveeType = containsField(supportedFields, "reserveeType");
+  if (includesReserveeType && reservation.reserveeType == null) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      "getApplicationFields: reserveeType is null, but it is required"
+    );
+  }
+  const reserveeType = includesReserveeType
+    ? (reservation.reserveeType ?? CustomerTypeChoice.Individual)
+    : CustomerTypeChoice.Individual;
+
   const filteredApplicationFields = getApplicationFields({
     supportedFields,
     reservation,
+    reserveeType,
   }).filter((key) => isNotEmpty(key, reservation));
 
-  const reserveeType = reservation.reserveeType ?? ReserveeType.Individual;
   const hasReserveeType =
     filteredApplicationFields.find((x) => x === "reserveeType") != null;
 

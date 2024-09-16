@@ -32,7 +32,7 @@ type CommonInputs = {
   purpose: number;
   numPersons: number;
   ageGroup: number;
-  reserveeType: CustomerTypeChoice;
+  reserveeType?: CustomerTypeChoice;
   freeOfChargeReason: string;
   applyingForFreeOfCharge: boolean;
 };

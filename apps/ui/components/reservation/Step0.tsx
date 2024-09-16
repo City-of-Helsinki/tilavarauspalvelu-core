@@ -23,13 +23,15 @@ import {
   Subheading,
 } from "../reservation-unit/ReservationUnitStyles";
 import Sanitize from "../common/Sanitize";
-import type {
-  ReservationQuery,
-  ReservationUnitPageFieldsFragment,
+import {
+  CustomerTypeChoice,
+  type ReservationQuery,
+  type ReservationUnitPageFieldsFragment,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { containsField } from "common/src/metaFieldsHelpers";
 import { getApplicationFields, getGeneralFields } from "./SummaryFields";
+import { type Inputs } from "common/src/reservation-form/types";
 
 type ReservationT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
@@ -85,12 +87,12 @@ function Step0({
   const {
     watch,
     formState: { errors, isSubmitted, isSubmitting, isValid },
-  } = useFormContext();
+  } = useFormContext<Inputs>();
 
   const supportedFields = filterNonNullable(
     reservationUnit.metadataSet?.supportedFields
   );
-  const reserveeType = watch("reserveeType");
+  const reserveeType = watch("reserveeType") ?? CustomerTypeChoice.Individual;
   const homeCity = watch("homeCity");
   const includesHomeCity = containsField(supportedFields, "homeCity");
   const includesReserveeType = containsField(supportedFields, "reserveeType");
@@ -99,6 +101,7 @@ function Step0({
   const reservationApplicationFields = getApplicationFields({
     supportedFields,
     reservation,
+    reserveeType,
   });
 
   // TODO clean this up

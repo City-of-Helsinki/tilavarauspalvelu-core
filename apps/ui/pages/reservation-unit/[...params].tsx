@@ -261,10 +261,11 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
       return acc;
     }, {});
 
+    const type = reserveeType ?? CustomerTypeChoice.Individual;
     const input = getReservationApplicationMutationValues(
       normalizedPayload,
       supportedFields,
-      hasReserveeTypeField ? reserveeType : CustomerTypeChoice.Individual
+      hasReserveeTypeField ? type : CustomerTypeChoice.Individual
     );
 
     try {
