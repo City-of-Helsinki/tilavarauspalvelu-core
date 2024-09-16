@@ -621,24 +621,6 @@ function ReservationUnit({
 
   const equipment = filterNonNullable(reservationUnit.equipments);
 
-  /* TODO do we need this (where is #calendar used?)
-  const calendarRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const hash = router.asPath.split("#")[1];
-    const scrollToCalendar = () => {
-      if (calendarRef?.current?.parentElement?.offsetTop != null) {
-        window.scroll({
-          top: calendarRef.current.parentElement.offsetTop - 20,
-          behavior: "smooth",
-        });
-      }
-    };
-    if (hash === "calendar" && focusSlot) {
-      scrollToCalendar();
-    }
-  }, [focusSlot, router]);
-  */
-
   const LoginAndSubmit = useMemo(
     () => (
       <SubmitFragment
@@ -871,7 +853,7 @@ function ReservationQuotaReached({
   const { t } = useTranslation();
 
   const isReached = reservationUnit.maxReservationsPerUser;
-  if (!isReached) {
+  if (!isReached || !reservationUnit.numActiveUserReservations) {
     return null;
   }
 
