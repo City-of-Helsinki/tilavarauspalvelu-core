@@ -6,7 +6,6 @@ from django.contrib.gis.geos import Point
 from freezegun import freeze_time
 from icalendar import Calendar
 from rest_framework.reverse import reverse
-from rest_framework.test import APIClient
 
 from common.date_utils import local_datetime
 from common.utils import ical_hmac_signature
@@ -18,10 +17,9 @@ pytestmark = [
 
 
 @freeze_time(local_datetime(2023, 1, 1))
-def test_reservation_ical():
+def test_reservation_ical(api_client):
     user = UserFactory.create()
 
-    api_client = APIClient()
     api_client.force_authenticate(user=user)
 
     unit = UnitFactory.create(name="Caisa")
@@ -94,10 +92,9 @@ def test_reservation_ical():
     assert str(event["GEO"].to_ical()) == "3.4;1.2"
 
 
-def test_reservation_ical__without_hash():
+def test_reservation_ical__without_hash(api_client):
     user = UserFactory.create()
 
-    api_client = APIClient()
     api_client.force_authenticate(user=user)
 
     reservation = ReservationFactory.create()
@@ -108,10 +105,9 @@ def test_reservation_ical__without_hash():
     assert response.json() == {"detail": "hash is required"}
 
 
-def test_reservation_ical__with_invalid_hash():
+def test_reservation_ical__with_invalid_hash(api_client):
     user = UserFactory.create()
 
-    api_client = APIClient()
     api_client.force_authenticate(user=user)
 
     reservation = ReservationFactory.create()

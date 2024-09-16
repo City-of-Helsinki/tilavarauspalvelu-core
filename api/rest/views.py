@@ -47,6 +47,7 @@ def reservation_ical(request: WSGIRequest, pk: int) -> FileResponse | JsonRespon
 
 
 @require_GET
+@csrf_exempt  # NOSONAR
 def csrf_view(request: WSGIRequest) -> HttpResponseRedirect:  # NOSONAR
     """View for updating the CSRF cookie."""
     # From: https://fractalideas.com/blog/making-react-and-django-play-well-together-single-page-app-model/
@@ -68,7 +69,7 @@ def csrf_view(request: WSGIRequest) -> HttpResponseRedirect:  # NOSONAR
 
 
 @require_GET
-@csrf_exempt
+@csrf_exempt  # NOSONAR
 def terms_of_use_pdf(request: WSGIRequest) -> FileResponse | JsonResponse:
     """Download the booking terms of use as a PDF"""
     title = "Tilavarauspalvelu yleiset sopimusehdot"
