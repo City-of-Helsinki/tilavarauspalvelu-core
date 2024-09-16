@@ -28,16 +28,20 @@ const handleColorType = ($type: StatusLabelType) => {
 const ColoredLabel = styled(HDSStatusLabel)<{
   $type: StatusLabelType;
 }>`
-  --status-label-background: ${(props) => handleColorType(props.$type)};
-  --status-label-color: var(--color-black);
-  white-space: nowrap;
+  && {
+    --status-label-background: ${(props) => handleColorType(props.$type)};
+    --status-label-color: var(--color-black);
+    white-space: nowrap;
+  }
 `;
 
 /*
  * StatusLabel component (extends HDS StatusLabel with "draft" type)
  * @param {StatusLabelWithDraftType} type - StatusLabel type (neutral, info, alert, success, error, draft)
  * @param {JSX.Element} icon - Icon element
+ * @param {string} dataTestId - Test id
  * @param {React.ReactNode} children - Label text
+ * @returns {JSX.Element} - Rendered StatusLabel component
  */
 function StatusLabel({
   type,

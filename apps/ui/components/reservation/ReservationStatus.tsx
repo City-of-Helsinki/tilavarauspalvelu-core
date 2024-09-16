@@ -1,50 +1,74 @@
 import { camelCase } from "lodash";
 import React, { useMemo } from "react";
 import { useTranslation } from "next-i18next";
-import styled from "styled-components";
 import { ReservationStateChoice } from "@gql/gql-types";
-import { truncatedText } from "../../styles/util";
+import {
+  IconCheck,
+  IconCogwheel,
+  IconCross,
+  IconEuroSign,
+  IconPen,
+  IconQuestionCircle,
+} from "hds-react";
+import StatusLabel, {
+  StatusLabelType,
+} from "common/src/components/StatusLabel";
 
 export type Props = {
   state: ReservationStateChoice;
 };
 
-// TODO why ? why not use HDS tags?
-const Wrapper = styled.div<{ $color: string }>`
-  display: inline-block;
-  padding: var(--spacing-3-xs) var(--spacing-2-xs);
-  background-color: ${({ $color }) => $color};
-  line-height: var(--lineheight-l);
-  font-size: var(--fontsize-body-s);
-  ${truncatedText};
-`;
-
-export function ReservationStatus({ state, ...rest }: Props): JSX.Element {
+export function ReservationStatus({ state }: Props): JSX.Element {
   const { t } = useTranslation();
 
-  const color = useMemo(() => {
+  const statusProps = useMemo((): {
+    type: StatusLabelType;
+    icon: JSX.Element;
+  } => {
     switch (state) {
-      case ReservationStateChoice.Cancelled:
-        return "var(--color-black-10)";
-      case ReservationStateChoice.Confirmed:
-        return "var(--color-success-light)";
-      case ReservationStateChoice.Denied:
-        return "var(--color-error-light)";
       case ReservationStateChoice.Created:
+        return {
+          type: "draft",
+          icon: <IconPen />,
+        };
+      case ReservationStateChoice.Cancelled:
+        return {
+          type: "neutral",
+          icon: <IconCross />,
+        };
+      case ReservationStateChoice.Confirmed:
+        return {
+          type: "success",
+          icon: <IconCheck />,
+        };
+      case ReservationStateChoice.Denied:
+        return {
+          type: "error",
+          icon: <IconCross />,
+        };
       case ReservationStateChoice.RequiresHandling:
-        return "var(--color-info-light)";
+        return {
+          type: "info",
+          icon: <IconCogwheel />,
+        };
       case ReservationStateChoice.WaitingForPayment:
-        return "var(--color-engel-light)";
+        return {
+          type: "alert",
+          icon: <IconEuroSign />,
+        };
       default:
-        return "";
+        return {
+          type: "neutral",
+          icon: <IconQuestionCircle />,
+        };
     }
   }, [state]);
 
   const statusText = t(`reservations:status.${camelCase(state)}`);
 
   return (
-    <Wrapper $color={color} title={statusText} {...rest}>
+    <StatusLabel type={statusProps.type} icon={statusProps.icon}>
       {statusText}
-    </Wrapper>
+    </StatusLabel>
   );
 }
