@@ -249,7 +249,7 @@ export type CanReservationBeChangedProps = {
   reservableTimes: ReservableMap;
   newReservation: PendingReservation;
   reservationUnit: IsReservableFieldsFragment;
-  activeApplicationRounds?: RoundPeriod[];
+  activeApplicationRounds: readonly RoundPeriod[];
 };
 
 export function getWhyReservationCantBeChanged(
@@ -326,7 +326,7 @@ export function canReservationTimeBeChanged({
   newReservation,
   reservableTimes,
   reservationUnit,
-  activeApplicationRounds = [],
+  activeApplicationRounds,
 }: CanReservationBeChangedProps): boolean {
   if (reservation == null) {
     return false;

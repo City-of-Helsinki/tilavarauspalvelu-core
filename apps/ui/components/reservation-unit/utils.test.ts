@@ -199,6 +199,7 @@ describe("getNextAvailableTime", () => {
       uuid: "123",
       images: [],
       applicationRoundTimeSlots: [],
+      applicationRounds: [],
       equipments: [],
       pricings: [],
     };

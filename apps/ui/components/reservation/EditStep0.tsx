@@ -1,7 +1,6 @@
 import { breakpoints } from "common/src/common/style";
 import type { PendingReservation } from "@/modules/types";
 import type {
-  ApplicationRoundFieldsFragment,
   ReservationQuery,
   ReservationUnitPageQuery,
 } from "@gql/gql-types";
@@ -38,6 +37,7 @@ import { getNextAvailableTime } from "../reservation-unit/utils";
 import { ReservationInfoCard } from "./ReservationInfoCard";
 import { Subheading } from "common/src/reservation-form/styles";
 import Sanitize from "@/components/common/Sanitize";
+import { type RoundPeriod } from "@/modules/reservable";
 
 type ReservationUnitNodeT = NonNullable<
   ReservationUnitPageQuery["reservationUnit"]
@@ -47,7 +47,7 @@ type Props = {
   reservation: ReservationNodeT;
   reservationUnit: ReservationUnitNodeT;
   reservationForm: UseFormReturn<PendingReservationFormType>;
-  activeApplicationRounds: ApplicationRoundFieldsFragment[];
+  activeApplicationRounds: readonly RoundPeriod[];
   nextStep: () => void;
   apiBaseUrl: string;
   isLoading: boolean;

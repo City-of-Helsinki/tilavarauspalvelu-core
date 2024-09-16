@@ -64,6 +64,11 @@ const RESERVATION_UNIT_PAGE_FRAGMENT = gql`
         end
       }
     }
+    applicationRounds(active: true) {
+      id
+      reservationPeriodBegin
+      reservationPeriodEnd
+    }
     descriptionFi
     descriptionEn
     descriptionSv

@@ -16,13 +16,10 @@ import { useLocalStorage } from "react-use";
 import { breakpoints } from "common/src/common/style";
 import { type PendingReservation } from "@/modules/types";
 import {
-  ApplicationRoundStatusChoice,
   type ApplicationRoundTimeSlotNode,
   PricingType,
   type ReservationCreateMutationInput,
   useCreateReservationMutation,
-  type ApplicationRoundPeriodsQuery,
-  ApplicationRoundPeriodsDocument,
   type ReservationUnitPageQuery,
   type ReservationUnitPageQueryVariables,
   ReservationUnitPageDocument,
@@ -118,16 +115,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
-  // TODO does this return only possible rounds or do we need to do frontend filtering on them?
-  const { data } = await apolloClient.query<ApplicationRoundPeriodsQuery>({
-    query: ApplicationRoundPeriodsDocument,
-  });
-  const activeApplicationRounds = filterNonNullable(
-    data?.applicationRounds?.edges?.map((e) => e?.node)
-  )
-    .filter((n) => n.status === ApplicationRoundStatusChoice.Open)
-    .filter((n) => n?.reservationUnits?.find((x) => x?.pk === pk));
-
   if (pk) {
     const today = new Date();
     const startDate = today;
@@ -149,6 +136,10 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         pk,
       },
     });
+    // TODO does this include only the active rounds or do we need to filter them?
+    const activeApplicationRounds = filterNonNullable(
+      reservationUnitData?.reservationUnit?.applicationRounds
+    );
 
     const previewPass = uuid === reservationUnitData.reservationUnit?.uuid;
 

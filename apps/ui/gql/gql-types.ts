@@ -6285,6 +6285,11 @@ export type ReservationUnitPageFieldsFragment = {
     weekday: number;
     reservableTimes?: Array<{ begin: string; end: string } | null> | null;
   }>;
+  applicationRounds: Array<{
+    id: string;
+    reservationPeriodBegin: string;
+    reservationPeriodEnd: string;
+  }>;
   reservationUnitType?: {
     id: string;
     pk?: number | null;
@@ -6442,6 +6447,11 @@ export type ReservationUnitQuery = {
       closed: boolean;
       weekday: number;
       reservableTimes?: Array<{ begin: string; end: string } | null> | null;
+    }>;
+    applicationRounds: Array<{
+      id: string;
+      reservationPeriodBegin: string;
+      reservationPeriodEnd: string;
     }>;
     reservationUnitType?: {
       id: string;
@@ -6623,6 +6633,11 @@ export type ReservationUnitPageQuery = {
       closed: boolean;
       weekday: number;
       reservableTimes?: Array<{ begin: string; end: string } | null> | null;
+    }>;
+    applicationRounds: Array<{
+      id: string;
+      reservationPeriodBegin: string;
+      reservationPeriodEnd: string;
     }>;
     reservationUnitType?: {
       id: string;
@@ -7981,6 +7996,11 @@ export const ReservationUnitPageFieldsFragmentDoc = gql`
         begin
         end
       }
+    }
+    applicationRounds(active: true) {
+      id
+      reservationPeriodBegin
+      reservationPeriodEnd
     }
     descriptionFi
     descriptionEn

@@ -16,7 +16,6 @@ import {
   type Mutation,
   type MutationAdjustReservationTimeArgs,
   useAdjustReservationTimeMutation,
-  useApplicationRoundsUiQuery,
 } from "@gql/gql-types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { toApiDate } from "common/src/common/util";
@@ -72,17 +71,6 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
   const router = useRouter();
 
   const [step, setStep] = useState<0 | 1>(0);
-
-  // TODO this should be redundant, use the reservationUnit.applicationRounds instead
-  // TODO this is bad, we can get the application rounds from the reservationUnit
-  const { data: applicationRoundsData } = useApplicationRoundsUiQuery({
-    fetchPolicy: "no-cache",
-  });
-  const activeApplicationRounds = filterNonNullable(
-    applicationRoundsData?.applicationRounds?.edges?.map((e) => e?.node)
-  ).filter((ar) =>
-    ar.reservationUnits?.map((n) => n?.pk).includes(reservationUnit.pk)
-  );
 
   const [mutation, { loading: isLoading }] = useAdjustReservationTimeMutation();
 
@@ -197,6 +185,9 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
             : StepState.disabled,
     },
   ];
+
+  // TODO does this include non active application rounds?
+  const activeApplicationRounds = reservationUnit.applicationRounds;
 
   return (
     <ReservationPageWrapper>
