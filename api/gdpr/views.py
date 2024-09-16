@@ -1,24 +1,40 @@
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import override
-from helsinki_gdpr.views import DryRunSerializer, GDPRAPIView
-from promise import Promise
+from helsinki_gdpr.views import DryRunSerializer, GDPRAPIView, GDPRScopesPermission
 from rest_framework import status
-from rest_framework.request import Request
 from rest_framework.response import Response
 
 from users.anonymisation import anonymize_user_data, can_user_be_anonymized
 from users.models import ProfileUser
+
+if TYPE_CHECKING:
+    from promise import Promise
+    from rest_framework.request import Request
 
 
 class AnonymizationNotAllowedError(Exception):
     pass
 
 
+class GDPRScopesAndLOAPermission(GDPRScopesPermission):
+    def has_permission(self, request: Request, view: TilavarauspalveluGDPRAPIView) -> bool:
+        has_permission = super().has_permission(request, view)
+        if has_permission:
+            # Ensure request is made with by a strongly authenticated user,
+            # following best practices set by the City of Helsinki.
+            return request.auth.data.get("loa", "").lower() in ("substantial", "high")
+        return False
+
+
 class TilavarauspalveluGDPRAPIView(GDPRAPIView):
+    permission_classes = [GDPRScopesAndLOAPermission]
+
     def get_object(self) -> ProfileUser:
         profile = get_object_or_404(ProfileUser, uuid=self.kwargs["uuid"])
         self.check_object_permissions(self.request, profile)
