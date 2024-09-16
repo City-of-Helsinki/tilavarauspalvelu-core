@@ -163,11 +163,11 @@ function StatusTags({
       {orderStatus != null && (
         <ReservationOrderStatus
           orderStatus={orderStatus}
-          data-testid={`reservation-card__order-status-${statusType}`}
+          testId={`reservation-card__payment-status-${statusType}`}
         />
       )}
       <ReservationStatus
-        data-testid={`reservation-card__status-${statusType}`}
+        testId={`reservation-card__status-${statusType}`}
         state={state}
       />
     </StatusContainer>

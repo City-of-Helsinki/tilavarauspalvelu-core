@@ -2,18 +2,20 @@ import { camelCase } from "lodash";
 import React, { useMemo } from "react";
 import { useTranslation } from "next-i18next";
 import { OrderStatus } from "@/gql/gql-types";
-import {
-  IconEuroSign,
-} from "hds-react";
+import { IconEuroSign } from "hds-react";
 import StatusLabel, {
   StatusLabelType,
 } from "common/src/components/StatusLabel";
 
 export type Props = {
   orderStatus: OrderStatus;
-} & React.HTMLAttributes<HTMLDivElement>;
+  testId?: string;
+};
 
-export function ReservationOrderStatus({ orderStatus }: Props): JSX.Element {
+export function ReservationOrderStatus({
+  orderStatus,
+  testId,
+}: Props): JSX.Element {
   const { t } = useTranslation();
 
   const labelType = useMemo((): StatusLabelType => {
@@ -35,7 +37,7 @@ export function ReservationOrderStatus({ orderStatus }: Props): JSX.Element {
   const statusText = t(`reservations:orderStatus.${camelCase(orderStatus)}`);
 
   return (
-    <StatusLabel type={labelType} icon={<IconEuroSign />}>
+    <StatusLabel type={labelType} icon={<IconEuroSign />} dataTestId={testId}>
       {statusText}
     </StatusLabel>
   );

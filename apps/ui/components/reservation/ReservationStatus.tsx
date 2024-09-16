@@ -16,9 +16,10 @@ import StatusLabel, {
 
 export type Props = {
   state: ReservationStateChoice;
+  testId?: string;
 };
 
-export function ReservationStatus({ state }: Props): JSX.Element {
+export function ReservationStatus({ state, testId }: Props): JSX.Element {
   const { t } = useTranslation();
 
   const statusProps = useMemo((): {
@@ -67,7 +68,11 @@ export function ReservationStatus({ state }: Props): JSX.Element {
   const statusText = t(`reservations:status.${camelCase(state)}`);
 
   return (
-    <StatusLabel type={statusProps.type} icon={statusProps.icon}>
+    <StatusLabel
+      type={statusProps.type}
+      icon={statusProps.icon}
+      dataTestId={testId}
+    >
       {statusText}
     </StatusLabel>
   );
