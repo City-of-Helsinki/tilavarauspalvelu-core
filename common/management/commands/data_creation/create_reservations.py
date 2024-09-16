@@ -135,7 +135,6 @@ def _create_reservations(  # NOSONAR (python:S3776)
                 name=f"Reservation {i}",
                 num_persons=persons,
                 price=pricing.highest_price,
-                price_net=pricing.highest_price_net,
                 purpose=random.choice(reservation_purposes),
                 reservee_address_city=faker_fi.city(),
                 reservee_address_street=faker_fi.street_name(),
