@@ -90,10 +90,10 @@
   "orderStatus": {
     "draft": "Odottaa maksua",
     "paid": "Maksettu",
-    "paidManually": "Paikan päällä",
-    "cancelled": "Peruttu",
+    "paidManually": "Maksu paikan päällä",
+    "cancelled": "Maksu Peruttu",
     "expired": "Maksamatta",
-    "refunded": "Hyvitetty"
+    "refunded": "Maksu palautettu"
   },
   "reservationEditFailed": "Varauksen muokkaaminen epäonnistui",
   "backToReservationUnit": "Palaa kohteen sivulle",

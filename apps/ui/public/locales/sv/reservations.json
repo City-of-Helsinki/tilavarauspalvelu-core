@@ -93,8 +93,8 @@
   "orderStatus": {
     "draft": "Inväntar betalning",
     "paid": "Betald",
-    "paidManually": "På plats",
-    "cancelled": "Avbokad",
+    "paidManually": "Betalas på plats",
+    "cancelled": "Betalning avbokad",
     "expired": "Obetald",
     "refunded": "Återbetald"
   },

@@ -3,10 +3,7 @@ import React, { useMemo } from "react";
 import { useTranslation } from "next-i18next";
 import { OrderStatus } from "@/gql/gql-types";
 import {
-  IconPen,
   IconEuroSign,
-  IconCross,
-  IconQuestionCircle,
 } from "hds-react";
 import StatusLabel, {
   StatusLabelType,
@@ -19,49 +16,26 @@ export type Props = {
 export function ReservationOrderStatus({ orderStatus }: Props): JSX.Element {
   const { t } = useTranslation();
 
-  const labelProps = useMemo((): {
-    type: StatusLabelType;
-    icon: JSX.Element;
-  } => {
+  const labelType = useMemo((): StatusLabelType => {
     switch (orderStatus) {
-      case OrderStatus.Draft:
-        return {
-          type: "draft",
-          icon: <IconPen ariaHidden />,
-        };
       case OrderStatus.Paid:
-        return {
-          type: "success",
-          icon: <IconEuroSign ariaHidden />,
-        };
-      case OrderStatus.PaidManually:
-        return {
-          type: "alert",
-          icon: <IconEuroSign ariaHidden />,
-        };
-      case OrderStatus.Cancelled:
-        return {
-          type: "neutral",
-          icon: <IconCross ariaHidden />,
-        };
       case OrderStatus.Refunded:
-        return {
-          type: "success",
-          icon: <IconEuroSign ariaHidden />,
-        };
-      case OrderStatus.Expired: // No idea what to do with this
+        return "success";
+      case OrderStatus.Draft:
+      case OrderStatus.PaidManually:
+        return "alert";
+      case OrderStatus.Expired:
+        return "error";
+      case OrderStatus.Cancelled:
       default:
-        return {
-          type: "neutral",
-          icon: <IconQuestionCircle ariaHidden />,
-        };
+        return "neutral";
     }
   }, [orderStatus]);
 
   const statusText = t(`reservations:orderStatus.${camelCase(orderStatus)}`);
 
   return (
-    <StatusLabel type={labelProps.type} icon={labelProps.icon}>
+    <StatusLabel type={labelType} icon={<IconEuroSign />}>
       {statusText}
     </StatusLabel>
   );

@@ -95,8 +95,8 @@
   "orderStatus": {
     "draft": "Awaiting payment",
     "paid": "Paid",
-    "paidManually": "On site",
-    "cancelled": "Cancelled",
+    "paidManually": "Payment on site",
+    "cancelled": "Payment cancelled",
     "expired": "Unpaid",
     "refunded": "Refunded"
   },
