@@ -234,6 +234,15 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const commonProps = getCommonServerSideProps();
   const client = createApolloClient(commonProps.apiBaseUrl, ctx);
 
+  const notFoundValue = {
+    notFound: true,
+    props: {
+      notFound: true,
+      ...commonProps,
+      ...(await serverSideTranslations(locale ?? "fi")),
+    },
+  };
+
   if (Number.isFinite(Number(pk))) {
     // TODO why are we doing two separate queries? the linked reservationUnit should be part of the reservation query
     const resId = base64encode(`ReservationNode:${pk}`);
@@ -253,9 +262,10 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     const endDate = addYears(today, 2);
 
     const resUnitPk = reservation?.reservationUnit?.[0]?.pk;
-    const id = resUnitPk
-      ? base64encode(`ReservationUnitNode:${resUnitPk}`)
-      : "";
+    if (resUnitPk == null) {
+      return notFoundValue;
+    }
+    const id = base64encode(`ReservationUnitNode:${resUnitPk}`);
     const { data: reservationUnitData } = await client.query<
       ReservationUnitPageQuery,
       ReservationUnitPageQueryVariables
@@ -330,14 +340,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     }
   }
 
-  return {
-    notFound: true,
-    props: {
-      notFound: true,
-      ...commonProps,
-      ...(await serverSideTranslations(locale ?? "fi")),
-    },
-  };
+  return notFoundValue;
 }
 
 export default ReservationEditPage;
