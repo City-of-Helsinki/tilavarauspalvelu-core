@@ -4,6 +4,7 @@ import datetime
 from typing import TYPE_CHECKING
 
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import pgettext_lazy
 from icalendar import Calendar, Event
 
 from common.date_utils import DEFAULT_TIMEZONE, local_datetime
@@ -96,8 +97,8 @@ class ReservationActions:
             site_name += "/sv"
         elif language == "en":
             site_name += "/en"
-        from_ = _("From")
-        to_ = _("To")
+        from_ = pgettext_lazy("ical", "From")
+        to_ = pgettext_lazy("ical", "To")
         footer = _(
             "Manage your booking at Varaamo. You can check the details of your booking and Varaamo's "
             "terms of contract and cancellation on the '%(bookings)s' page."
