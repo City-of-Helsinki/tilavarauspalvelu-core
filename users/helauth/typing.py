@@ -69,7 +69,7 @@ class IDToken:
     amr: str | list[str]
     """
     authentication methods reference:
-    suomi_fi | heltunnistussuomifi | helsinki_adfs | helsinkiad | helsinkiazuread
+    suomi_fi | heltunnistussuomifi | helsinki_adfs | helsinkiad | helsinkiazuread | eduad
     """
     loa: Literal["substantial", "low"]
     """level of authentication"""
@@ -80,25 +80,33 @@ class IDToken:
 
         try:
             payload = get_jwt_payload(token)
-            return cls(
-                iss=payload["iss"],
-                sub=payload["sub"],
-                aud=payload["aud"],
-                exp=payload["exp"],
-                iat=payload["iat"],
-                auth_time=payload["auth_time"],
-                nonce=payload["nonce"],
-                at_hash=payload["at_hash"],
-                email=payload["email"],
-                email_verified=payload["email_verified"],
-                ad_groups=payload["ad_groups"],
-                azp=payload["azp"],
-                sid=payload["sid"],
-                amr=payload["amr"],
-                loa=payload["loa"],
-            )
         except Exception:
             return None
+
+        return cls(
+            iss=payload["iss"],
+            sub=payload["sub"],
+            aud=payload["aud"],
+            jti=payload["jti"],
+            typ=payload.get("typ", ""),  # type: ignore[arg-type]
+            exp=payload["exp"],
+            iat=payload["iat"],
+            auth_time=payload["auth_time"],
+            nonce=payload.get("nonce", ""),
+            at_hash=payload.get("at_hash", ""),
+            name=payload.get("name", ""),
+            preferred_username=payload.get("preferred_username", ""),
+            given_name=payload.get("given_name", ""),
+            family_name=payload.get("family_name", ""),
+            email=payload.get("email", ""),
+            email_verified=payload.get("email_verified", False),
+            ad_groups=payload.get("ad_groups", []),
+            azp=payload.get("azp", ""),
+            sid=payload.get("sid", ""),
+            session_state=payload.get("session_state", ""),
+            amr=payload["amr"],
+            loa=payload["loa"],
+        )
 
     @property
     def is_ad_login(self) -> bool:
@@ -190,6 +198,7 @@ class ADLoginAMR(enum.Enum):
     HELSINKI_ADFS = "helsinki_adfs"
     HELSINKIAD = "helsinkiad"
     HELSINKIAZUREAD = "helsinkiazuread"
+    EDUAD = "eduad"
 
 
 class ProfileLoginAMR(enum.Enum):

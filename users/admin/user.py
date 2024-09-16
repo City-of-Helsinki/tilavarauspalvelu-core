@@ -231,7 +231,7 @@ class UserAdmin(admin.ModelAdmin):
             return "-"
         expires = datetime.datetime.fromtimestamp(user.id_token.exp).astimezone(DEFAULT_TIMEZONE)
         expired = expires < local_datetime()
-        return expires.isoformat() + " (expired)" if expired else " (valid)"
+        return expires.isoformat() + (" (expired)" if expired else " (valid)")
 
     @admin.display(description="Issued at (iat)")
     def issued_at(self, user: User) -> str:
@@ -305,8 +305,7 @@ class UserAdmin(admin.ModelAdmin):
         if user.id_token is None:
             return LoginMethod.OTHER.value
 
-        login_method = LoginMethod.PROFILE.value if user.id_token.is_profile_login else LoginMethod.AD.value
-        return f"{login_method}"
+        return LoginMethod.PROFILE.value if user.id_token.is_profile_login else LoginMethod.AD.value
 
     def is_strong_login(self, user: User) -> bool:
         return getattr(user.id_token, "is_strong_login", False)
