@@ -398,10 +398,6 @@ msgid "Name (Swedish)"
 msgstr "Nimi (ruotsiksi)"
 
 #: applications/admin/application_round/form.py
-msgid "Target group"
-msgstr "Kohderyhmä"
-
-#: applications/admin/application_round/form.py
 msgid "Reservation units"
 msgstr "Varausyksiköt"
 
@@ -437,10 +433,6 @@ msgstr "Käsittelyn valmistumispäivä ja -aika"
 #: reservation_units/admin/reservation_unit/form.py
 msgid "Purposes"
 msgstr "Käyttötarkoitukset"
-
-#: applications/admin/application_round/form.py
-msgid "Service sector"
-msgstr "Palvelualue"
 
 #: applications/admin/application_round/form.py
 msgctxt "ApplicationRound"
@@ -496,10 +488,6 @@ msgid "Name that describes the application round in Swedish."
 msgstr "Kausivarauskierrosta kuvaava nimi ruotsiksi"
 
 #: applications/admin/application_round/form.py
-msgid "Target group of the application round."
-msgstr "Kausivarauskierroksen kohderyhmä"
-
-#: applications/admin/application_round/form.py
 msgid "Reservation units that can be applied for in this application round."
 msgstr "Varausyksiköt, joihin kausivarauskierroksella voi hakea"
 
@@ -544,10 +532,6 @@ msgstr ""
 #: applications/admin/application_round/form.py
 msgid "Purposes that are allowed in this application period."
 msgstr "Kausivarauskierroksella mahdolliset käyttötarkoitukset."
-
-#: applications/admin/application_round/form.py
-msgid "Service sector for the application round."
-msgstr "Kausivarauskierroksen palvelualue."
 
 #: applications/admin/application_round/form.py
 msgid "Terms of use for the application round."
@@ -984,21 +968,6 @@ msgid "Rejected"
 msgstr "Hylätty"
 
 #: applications/enums.py
-msgctxt "TargetGroup"
-msgid "Internal"
-msgstr "Sisäinen"
-
-#: applications/enums.py
-msgctxt "TargetGroup"
-msgid "Public"
-msgstr "Julkinen"
-
-#: applications/enums.py
-msgctxt "TargetGroup"
-msgid "All"
-msgstr "Kaikki"
-
-#: applications/enums.py
 msgctxt "OrganizationType"
 msgid "Company"
 msgstr "Yritys"
@@ -1048,18 +1017,6 @@ msgstr "Aloitusaika tulee ennen lopetusaikaa."
 #: applications/models/application.py
 msgid "Applications"
 msgstr "Hakemukset"
-
-#: applications/models/application_event_schedule.py
-msgid "Low"
-msgstr "Matala"
-
-#: applications/models/application_event_schedule.py
-msgid "Medium"
-msgstr "Keskitaso"
-
-#: applications/models/application_event_schedule.py
-msgid "High"
-msgstr "Korkea"
 
 #: applications/models/application_round.py
 msgid "Application Rounds"
@@ -1601,25 +1558,25 @@ msgctxt "PaymentType"
 msgid "Invoice"
 msgstr "Lasku"
 
-#: merchants/models.py
-msgid "Must be greater than 0.01"
-msgstr "Täytyy olla suurempi kuin 0.01"
-
-#: merchants/models.py
-msgid "Must be greater than 0"
-msgstr "Täytyy olla suurempi kuin 0"
-
-#: merchants/models.py
-msgid "Must be the sum of net and vat amounts"
-msgstr "Täytyy olla netto- ja ALV-määrien summa"
-
-#: merchants/models.py
+#: merchants/models/payment_accounting.py
 msgid ""
 "One of the following fields must be given: internal_order, profit_center, "
 "project"
 msgstr ""
 "Jokin seuraavista kentistä täytyy olla annettu: internal_order, "
 "profit_center, project"
+
+#: merchants/models/payment_order.py
+msgid "Must be greater than 0.01"
+msgstr "Täytyy olla suurempi kuin 0.01"
+
+#: merchants/models/payment_order.py
+msgid "Must be greater than 0"
+msgstr "Täytyy olla suurempi kuin 0"
+
+#: merchants/models/payment_order.py
+msgid "Must be the sum of net and vat amounts"
+msgstr "Täytyy olla netto- ja ALV-määrien summa"
 
 #: opening_hours/admin/origin_hauki_resource.py
 msgid ""
@@ -1792,6 +1749,14 @@ msgstr "Käyttöehdot"
 #: reservation_units/admin/reservation_unit/admin.py
 msgid "Instructions"
 msgstr "Ohjeet"
+
+#: reservation_units/admin/reservation_unit/admin.py
+msgid "Publishing state"
+msgstr "Julkaisun tila"
+
+#: reservation_units/admin/reservation_unit/admin.py
+msgid "Reservation state"
+msgstr "Varattavuuden tila"
 
 #: reservation_units/admin/reservation_unit/form.py
 msgid "Which weekday this timeslot concerns."

@@ -6,6 +6,7 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.db import models
 from django.http import FileResponse
 from django.utils.translation import gettext_lazy as _
+from lookup_property import L
 from modeltranslation.admin import TabbedTranslationAdmin
 
 from applications.models import ApplicationRoundTimeSlot
@@ -190,16 +191,24 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
         ApplicationRoundTimeSlotInline,
     ]
 
-    @admin.display
+    @admin.display(description=_("Publishing state"), ordering=L("publishing_state"))
     def publishing_state(self, obj: ReservationUnit) -> str:
-        return obj.state.value
+        return obj.publishing_state
 
-    @admin.display
+    @admin.display(description=_("Reservation state"), ordering=L("reservation_state"))
     def reservation_state(self, obj: ReservationUnit) -> str:
-        return obj.reservation_state.value
+        return obj.reservation_state
 
     def get_queryset(self, request):
-        return super().get_queryset(request).select_related("unit", "origin_hauki_resource")
+        return (
+            super()
+            .get_queryset(request)
+            .annotate(
+                publishing_state=L("publishing_state"),
+                reservation_state=L("reservation_state"),
+            )
+            .select_related("unit", "origin_hauki_resource")
+        )
 
     def get_search_results(
         self,
