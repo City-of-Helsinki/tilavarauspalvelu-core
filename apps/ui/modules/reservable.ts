@@ -210,26 +210,6 @@ export function isRangeReservable({
     }
   }
 
-  const shouldReservationBlock = (r: Pick<ReservationNode, "state">) => {
-    return (
-      r.state !== ReservationStateChoice.Denied &&
-      r.state !== ReservationStateChoice.Cancelled
-    );
-  };
-  const others = filterNonNullable(reservationSet).filter(
-    shouldReservationBlock
-  );
-  const reservation = {
-    start,
-    end,
-    bufferTimeBefore,
-    bufferTimeAfter,
-  };
-  const isBufferCollision = others.some((r) => hasCollisions(r, reservation));
-  if (isBufferCollision) {
-    return false;
-  }
-
   if (!isStartTimeValid(start, reservableTimes, reservationStartInterval)) {
     return false;
   }
@@ -248,6 +228,42 @@ export function isRangeReservable({
       activeApplicationRounds,
     })
   ) {
+    return false;
+  }
+
+  const shouldReservationBlock = (r: Pick<ReservationNode, "state">) => {
+    return (
+      r.state !== ReservationStateChoice.Denied &&
+      r.state !== ReservationStateChoice.Cancelled
+    );
+  };
+
+  // This is the slowest part of the function => run it last
+  // because the reservationSet includes every reservation not just for the selected day
+  const others = filterNonNullable(reservationSet)
+    .filter(shouldReservationBlock)
+    .filter((r) => {
+      const rStart = new Date(r.begin);
+      const rEnd = new Date(r.end);
+      // Performance optimization:
+      // (should be filtered outside of this function and cached per week, not calculated every time reservation time is selected)
+      // buffer is never greater than 24 hours (using real buffer time could work, but we'd have more complex rules)
+      // this is a noticable performance improvement when there are thousands of reservations
+      // 15 000ms -> 700 ms in click handler when changing days / weeks without caching.
+      // To get it below 100ms we need to move it out of this function.
+      if (addDays(rEnd, 1) < start || addDays(rStart, -1) >= end) {
+        return false;
+      }
+      return true;
+    });
+  const reservation = {
+    start,
+    end,
+    bufferTimeBefore,
+    bufferTimeAfter,
+  };
+  const isBufferCollision = others.some((r) => hasCollisions(r, reservation));
+  if (isBufferCollision) {
     return false;
   }
 
@@ -324,6 +340,22 @@ function isRangeReservable_({
   return range.every((slot) => isSlotReservable(slot));
 }
 
+function getBufferedEventTimes(
+  start: Date,
+  end: Date,
+  bufferTimeBefore: number,
+  bufferTimeAfter: number,
+  isBlocked?: Maybe<boolean> | undefined
+): { start: Date; end: Date } {
+  if (isBlocked) {
+    return { start, end };
+  }
+  return {
+    start: addSeconds(start, -bufferTimeBefore),
+    end: addSeconds(end, bufferTimeAfter),
+  };
+}
+
 /// check if a reservation or it's buffer would collide with a new reservation
 /// buffer overlap is allowed but neither buffer can overlap with another reservation
 function hasCollisions(
@@ -335,29 +367,10 @@ function hasCollisions(
     bufferTimeAfter: number;
   }
 ): boolean {
-  function getBufferedEventTimes(
-    start: Date,
-    end: Date,
-    bufferTimeBefore: number,
-    bufferTimeAfter: number,
-    isBlocked?: Maybe<boolean> | undefined
-  ): { start: Date; end: Date } {
-    if (isBlocked) {
-      return { start, end };
-    }
-    return {
-      start: addSeconds(start, -bufferTimeBefore),
-      end: addSeconds(end, bufferTimeAfter),
-    };
-  }
-
   const unbuf = {
     start: new Date(reservation.begin),
     end: new Date(reservation.end),
   };
-  if (areIntervalsOverlapping(unbuf, newReservation)) {
-    return true;
-  }
   const bufferedNewReservation = getBufferedEventTimes(
     newReservation.start,
     newReservation.end,
