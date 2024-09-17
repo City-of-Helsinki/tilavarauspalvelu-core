@@ -26,11 +26,9 @@ const Wrapper = styled.div`
  */
 const WeekDay = styled.span`
   position: absolute;
-  left: 3.5rem;
+  left: 17%;
+  bottom: 25%;
   z-index: 10;
-  @media (min-width: ${breakpoints.m}) {
-    left: 4rem;
-  }
 `;
 
 const BorderlessDatePicker = styled(DateInput)`
