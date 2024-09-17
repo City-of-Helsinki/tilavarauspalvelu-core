@@ -472,13 +472,13 @@ function Reservation({
             </SubHeading>
             <StatusContainer>
               <ReservationStatus
-                data-testid="reservation__status"
+                testId="reservation__status"
                 state={reservation.state ?? ReservationStateChoice.Confirmed}
               />
               {normalizedOrderStatus && (
                 <ReservationOrderStatus
                   orderStatus={normalizedOrderStatus}
-                  data-testid="reservation__status"
+                  testId="reservation__payment-status"
                 />
               )}
             </StatusContainer>
