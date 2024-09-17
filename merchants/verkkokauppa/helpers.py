@@ -19,7 +19,6 @@ from merchants.verkkokauppa.order.types import (
 from reservation_units.utils.reservation_unit_payment_helper import ReservationUnitPaymentHelper
 from reservations.models import Reservation
 from tilavarauspalvelu.utils.date_util import localized_short_weekday
-from utils.decimal_utils import round_decimal
 
 
 def parse_datetime(string: str | None) -> datetime | None:
@@ -141,9 +140,6 @@ def create_mock_verkkokauppa_order(reservation: Reservation) -> Order:
         reservation_unit.save()
 
     order_uuid = uuid.uuid4()
-    quantity = 1
-    price_net = round_decimal(Decimal(quantity * reservation.price_net), 2)
-    price_vat = round_decimal(Decimal(quantity * reservation.price_net * (reservation.tax_percentage_value / 100)), 2)
 
     # Assume that the first URL in CORS_ALLOWED_ORIGINS is the backend URL
     base_url = settings.MOCK_VERKKOKAUPPA_BACKEND_URL.strip("/")
@@ -157,9 +153,9 @@ def create_mock_verkkokauppa_order(reservation: Reservation) -> Order:
         user="test-user",
         created_at=local_datetime(),
         items=[],
-        price_net=price_net,
-        price_vat=price_vat,
-        price_total=price_net + price_vat,
+        price_net=reservation.price_net,
+        price_vat=reservation.price_vat_amount,
+        price_total=reservation.price,
         customer=OrderCustomer(
             first_name=reservation.user.first_name,
             last_name=reservation.user.last_name,

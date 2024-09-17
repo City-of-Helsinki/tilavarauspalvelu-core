@@ -181,7 +181,7 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         kwargs.setdefault("begin", begin)
         kwargs.setdefault("end", begin + datetime.timedelta(hours=1))
         kwargs.setdefault("price", Decimal("12.4"))
-        kwargs.setdefault("tax_percentage_value", Decimal("24.0"))
+        kwargs.setdefault("tax_percentage_value", Decimal("25.5"))
         kwargs.setdefault("reservation_unit", [reservation_unit])
         return cls.create(**kwargs)
 
