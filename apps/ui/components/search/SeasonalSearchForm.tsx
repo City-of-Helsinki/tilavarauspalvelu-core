@@ -16,7 +16,7 @@ import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
 import { useSearchModify, useSearchValues } from "@/hooks/useSearchValues";
 import { FilterTagList } from "./FilterTagList";
 import { ParsedUrlQuery } from "node:querystring";
-import { ControlledSelect } from "@/components/common/ControlledSelect";
+import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { ControlledMultiSelect } from "./ControlledMultiSelect";
 import {
   mapQueryParamToNumber,

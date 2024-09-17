@@ -27,7 +27,7 @@ import {
   type UseFormReturn,
 } from "react-hook-form";
 import { PendingReservationFormType } from "@/components/reservation-unit/schema";
-import { ControlledSelect } from "@/components/common/ControlledSelect";
+import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { useMedia } from "react-use";
 import { type FocusTimeSlot } from "@/modules/reservation";
 import { ControlledDateInput } from "common/src/components/form";

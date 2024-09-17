@@ -35,6 +35,9 @@ i18n.addResourceBundle("fi", "common", {
   gotoFrontpage: "Palaa Tilavarauskäsittelyn etusivulle",
   subtract: "Vähennä",
   add: "Lisää",
+  select: "Valitse",
+  clear: "Tyhjennä",
+  remove: "Poista",
 });
 i18n.addResourceBundle("en", "common", {
   day: "Day",

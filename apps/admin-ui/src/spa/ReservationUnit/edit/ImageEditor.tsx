@@ -117,9 +117,16 @@ function ReservationUnitImage({
 type Props = {
   images: ImageFormType[];
   setImages: (images: ImageFormType[]) => void;
+  style?: React.CSSProperties;
+  className?: string;
 };
 
-export function ImageEditor({ images, setImages }: Props): JSX.Element {
+export function ImageEditor({
+  images,
+  setImages,
+  style,
+  className,
+}: Props): JSX.Element {
   const { t } = useTranslation();
 
   const addImage = (files: File[]) => {
@@ -157,7 +164,7 @@ export function ImageEditor({ images, setImages }: Props): JSX.Element {
   };
 
   return (
-    <AutoGrid>
+    <AutoGrid style={style} className={className}>
       <div>
         <FileInputContainer>
           <FileInput

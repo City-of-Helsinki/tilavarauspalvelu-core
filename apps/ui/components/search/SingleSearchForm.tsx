@@ -17,7 +17,7 @@ import SingleLabelInputGroup from "@/components/common/SingleLabelInputGroup";
 import { useSearchModify, useSearchValues } from "@/hooks/useSearchValues";
 import { type ParsedUrlQuery } from "node:querystring";
 import { ControlledMultiSelect } from "./ControlledMultiSelect";
-import { ControlledSelect } from "@/components/common/ControlledSelect";
+import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import {
   mapQueryParamToNumber,
   mapQueryParamToNumberArray,

@@ -7,19 +7,17 @@ import {
   IconLinkExternal,
   Notification,
   RadioButton,
-  Select,
   SelectionGroup,
   TextArea,
   TextInput,
   Tooltip,
 } from "hds-react";
 import i18next from "i18next";
-import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import dynamic from "next/dynamic";
 import { Controller, UseFormReturn, useForm } from "react-hook-form";
-import type { TFunction } from "next-i18next";
+import { type TFunction, useTranslation } from "next-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ReservationStartInterval,
@@ -41,6 +39,7 @@ import {
   useUpdateReservationUnitMutation,
   useReservationUnitEditQuery,
 } from "@gql/gql-types";
+import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { DateTimeInput } from "common/src/components/form/DateTimeInput";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { H1, H4, fontBold } from "common/src/common/typography";
@@ -48,10 +47,7 @@ import { breakpoints } from "common";
 import {
   ContainerMedium,
   DenseVerticalFlex,
-  Grid,
   HorisontalFlex,
-  Span12,
-  Span6,
   AutoGrid,
   FullRow,
   VerticalFlex,
@@ -136,19 +132,6 @@ const SubAccordion = styled(Accordion)`
     svg {
       margin: 0;
       color: var(--color-bus);
-    }
-  }
-`;
-
-const BufferWrapper = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-column: 2 / -1;
-  [class*="ActivationGroup"] {
-    margin-top: 0;
-    [class*="ActivationGroup"] {
-      margin-top: var(--spacing-s);
-      margin-bottom: var(--spacing-s);
     }
   }
 `;
@@ -340,7 +323,7 @@ const FieldGroupHeading = styled.span`
   ${fontBold}
 `;
 
-const FieldGroup = ({
+function FieldGroup({
   children,
   id,
   heading,
@@ -354,19 +337,22 @@ const FieldGroup = ({
   children?: React.ReactNode;
   className?: string;
   style?: React.CSSProperties;
-}): JSX.Element => (
-  <FieldGroupWrapper className={className} style={style}>
-    <div>
-      <FieldGroupHeading>{heading}</FieldGroupHeading>
-      {id ? <span id={id} /> : null}
-      <div className="ReservationUnitEditor__FieldGroup-children">
-        {children}
+}): JSX.Element {
+  return (
+    <FieldGroupWrapper className={className} style={style}>
+      <div>
+        <FieldGroupHeading>{heading}</FieldGroupHeading>
+        {id ? <span id={id} /> : null}
+        <div className="ReservationUnitEditor__FieldGroup-children">
+          {children}
+        </div>
       </div>
-    </div>
-    <Tooltip>{tooltip}</Tooltip>
-  </FieldGroupWrapper>
-);
+      <Tooltip>{tooltip}</Tooltip>
+    </FieldGroupWrapper>
+  );
+}
 
+// Why?
 const RadioFieldGroup = styled(FieldGroup)`
   grid-column: 1 / -1;
 
@@ -687,62 +673,42 @@ function BasicSection({
             />
           </FullRow>
         ))}
-        <Controller
+        <ControlledSelect
           control={control}
           name="spaces"
-          render={({ field: { value, onChange } }) => (
-            // @ts-expect-error - HDS multiselect has weird typings
-            <Select<{ label: string; value: number }>
-              id="spaces"
-              multiselect
-              required
-              // style={{ gridColumn: "1 / span 2" }}
-              label={t("ReservationUnitEditor.label.spaces")}
-              placeholder={t("ReservationUnitEditor.spacesPlaceholder")}
-              options={spaceOptions}
-              disabled={spaceOptions.length === 0}
-              onChange={(vals) => {
-                // recalculate the min surface area and max persons after update
-                const sPks = vals.map((y) => y.value);
-                const sspaces = filterNonNullable(
-                  sPks.map((pk) => spaces?.find((s) => s.pk === pk))
-                );
-                onChange(sPks);
-                const minArea = getMinSurfaceArea(sspaces);
-                const maxPer = getMaxPersons(sspaces);
-                if (minArea > 0) {
-                  setValue("surfaceArea", minArea);
-                }
-                if (maxPer > 0) {
-                  setValue("maxPersons", maxPer);
-                }
-              }}
-              value={spaceOptions.filter((x) => value.includes(x.value))}
-              invalid={errors.spaces?.message != null}
-              error={getTranslatedError(t, errors.spaces?.message)}
-              tooltipText={t("ReservationUnitEditor.tooltip.spaces")}
-            />
-          )}
+          multiselect
+          required
+          label={t("ReservationUnitEditor.label.spaces")}
+          placeholder={t("ReservationUnitEditor.spacesPlaceholder")}
+          options={spaceOptions}
+          afterChange={(vals) => {
+            // recalculate the min surface area and max persons after update
+            const sPks = Array.isArray(vals) ? vals.map((y) => y) : [];
+            const sspaces = filterNonNullable(
+              sPks.map((pk) => spaces?.find((s) => s.pk === pk))
+            );
+            const minArea = getMinSurfaceArea(sspaces);
+            const maxPer = getMaxPersons(sspaces);
+            if (minArea > 0) {
+              setValue("surfaceArea", minArea);
+            }
+            if (maxPer > 0) {
+              setValue("maxPersons", maxPer);
+            }
+          }}
+          error={getTranslatedError(t, errors.spaces?.message)}
+          tooltip={t("ReservationUnitEditor.tooltip.spaces")}
         />
-        <Controller
+        <ControlledSelect
           control={control}
           name="resources"
-          render={({ field: { value, onChange } }) => (
-            // @ts-expect-error - HDS multiselect has weird typings
-            <Select<{ label: string; value: number }>
-              id="resources"
-              multiselect
-              label={t("ReservationUnitEditor.label.resources")}
-              placeholder={t("ReservationUnitEditor.resourcesPlaceholder")}
-              options={resourceOptions}
-              disabled={resourceOptions.length === 0}
-              onChange={(vals) => onChange(vals.map((y) => y.value))}
-              value={resourceOptions.filter((x) => value.includes(x.value))}
-              error={getTranslatedError(t, errors.resources?.message)}
-              invalid={errors.resources?.message != null}
-              tooltipText={t("ReservationUnitEditor.tooltip.resources")}
-            />
-          )}
+          multiselect
+          label={t("ReservationUnitEditor.label.resources")}
+          placeholder={t("ReservationUnitEditor.resourcesPlaceholder")}
+          options={resourceOptions}
+          disabled={resourceOptions.length === 0}
+          error={getTranslatedError(t, errors.resources?.message)}
+          tooltip={t("ReservationUnitEditor.tooltip.resources")}
         />
         <CustomNumberInput
           name="surfaceArea"
@@ -897,87 +863,39 @@ function ReservationUnitSettings({
             </ActivationGroup>
           </ActivationGroup>
         </FieldGroup>
-        <Controller
+        <ControlledSelect
           control={control}
           name="minReservationDuration"
-          render={({ field: { value, onChange, ...field } }) => (
-            <Select
-              {...field}
-              id="minReservationDuration"
-              options={durationOptions}
-              placeholder={t("common.select")}
-              style={{ gridColumnStart: "1" }}
-              required
-              label={t("ReservationUnitEditor.label.minReservationDuration")}
-              onChange={(v: { value: number; label: string }) =>
-                onChange(v.value)
-              }
-              value={durationOptions.find((o) => o.value === value) ?? null}
-              error={getTranslatedError(
-                t,
-                errors.minReservationDuration?.message
-              )}
-              invalid={errors.minReservationDuration?.message != null}
-              tooltipText={t(
-                "ReservationUnitEditor.tooltip.minReservationDuration"
-              )}
-            />
-          )}
+          options={durationOptions}
+          placeholder={t("common.select")}
+          style={{ gridColumnStart: "1" }}
+          required
+          label={t("ReservationUnitEditor.label.minReservationDuration")}
+          error={getTranslatedError(t, errors.minReservationDuration?.message)}
+          tooltip={t("ReservationUnitEditor.tooltip.minReservationDuration")}
         />
-        <Controller
+        <ControlledSelect
           control={control}
           name="maxReservationDuration"
-          render={({ field: { value, onChange, ...field } }) => (
-            <Select
-              {...field}
-              id="maxReservationDuration"
-              placeholder={t("common.select")}
-              required
-              options={durationOptions}
-              onChange={(v: { value: number; label: string }) =>
-                onChange(v.value)
-              }
-              value={durationOptions.find((o) => o.value === value) ?? null}
-              label={t("ReservationUnitEditor.label.maxReservationDuration")}
-              error={getTranslatedError(
-                t,
-                errors.maxReservationDuration?.message
-              )}
-              invalid={errors.maxReservationDuration?.message != null}
-              tooltipText={t(
-                "ReservationUnitEditor.tooltip.maxReservationDuration"
-              )}
-            />
-          )}
+          placeholder={t("common.select")}
+          required
+          options={durationOptions}
+          label={t("ReservationUnitEditor.label.maxReservationDuration")}
+          error={getTranslatedError(t, errors.maxReservationDuration?.message)}
+          tooltip={t("ReservationUnitEditor.tooltip.maxReservationDuration")}
         />
-        <Controller
+        <ControlledSelect
           control={control}
           name="reservationsMaxDaysBefore"
-          render={({ field: { value, onChange } }) => (
-            <Select
-              id="reservationsMaxDaysBefore"
-              options={reservationsMaxDaysBeforeOptions}
-              placeholder={t("common.select")}
-              required
-              label={t("ReservationUnitEditor.label.reservationsMaxDaysBefore")}
-              onChange={(v: { value: number; label: string }) =>
-                onChange(v.value)
-              }
-              value={
-                reservationsMaxDaysBeforeOptions.find(
-                  (o) => o.value === value
-                ) ?? null
-              }
-              error={getTranslatedError(
-                t,
-                errors.reservationsMaxDaysBefore?.message
-              )}
-              invalid={errors.reservationsMaxDaysBefore?.message != null}
-              tooltipText={t(
-                "ReservationUnitEditor.tooltip.reservationsMaxDaysBefore"
-              )}
-            />
+          options={reservationsMaxDaysBeforeOptions}
+          placeholder={t("common.select")}
+          required
+          label={t("ReservationUnitEditor.label.reservationsMaxDaysBefore")}
+          error={getTranslatedError(
+            t,
+            errors.reservationsMaxDaysBefore?.message
           )}
+          tooltip={t("ReservationUnitEditor.tooltip.reservationsMaxDaysBefore")}
         />
         <CustomNumberInput
           name="reservationsMinDaysBefore"
@@ -986,107 +904,74 @@ function ReservationUnitSettings({
           form={form}
           required
         />
-        <Controller
+        <ControlledSelect
           control={control}
           name="reservationStartInterval"
-          render={({ field: { value, onChange } }) => (
-            <Select
-              id="reservationStartInterval"
-              placeholder={t("common.select")}
-              options={reservationStartIntervalOptions}
-              required
-              value={
-                reservationStartIntervalOptions.find(
-                  (o) => o.value === value
-                ) ?? null
-              }
-              onChange={(val: {
-                value: ReservationStartInterval;
-                label: string;
-              }) => onChange(val.value)}
-              error={getTranslatedError(
-                t,
-                errors.reservationStartInterval?.message
-              )}
-              invalid={errors.reservationStartInterval?.message != null}
-              label={t("ReservationUnitEditor.label.reservationStartInterval")}
-              tooltipText={t(
-                "ReservationUnitEditor.tooltip.reservationStartInterval"
-              )}
-            />
+          placeholder={t("common.select")}
+          options={reservationStartIntervalOptions}
+          required
+          error={getTranslatedError(
+            t,
+            errors.reservationStartInterval?.message
           )}
+          label={t("ReservationUnitEditor.label.reservationStartInterval")}
+          tooltip={t("ReservationUnitEditor.tooltip.reservationStartInterval")}
         />
         <FieldGroup
           heading={t("ReservationUnitEditor.bufferSettings")}
           tooltip={t("ReservationUnitEditor.tooltip.bufferSettings")}
           style={{ gridColumn: "1 / -1" }}
         >
-          <Grid>
-            <Span12>
-              <Controller
-                control={control}
-                name="reservationBlockWholeDay"
-                render={({ field: { value, onChange } }) => (
-                  <SelectionGroup
-                    errorText={getTranslatedError(
-                      t,
-                      errors.reservationBlockWholeDay?.message
-                    )}
-                    defaultValue="no-buffer"
-                  >
-                    <RadioButton
-                      id="no-buffer"
-                      value="no-buffer"
-                      label={t("ReservationUnitEditor.noBuffer")}
-                      onChange={(e) => onChange(e.target.value)}
-                      checked={value != null && value === "no-buffer"}
-                    />
-                    {/*
-                    <RadioButton
-                      id="blocks-whole-day"
-                      value="blocks-whole-day"
-                      label={t("ReservationUnitEditor.blocksWholeDay")}
-                      onChange={(e) => onChange(e.target.value)}
-                      checked={value != null && value === "blocks-whole-day"}
-                    />
-                    */}
-                    <RadioButton
-                      id="buffer-times-set"
-                      value="buffer-times-set"
-                      label={t("ReservationUnitEditor.setBufferTime")}
-                      onChange={(e) => onChange(e.target.value)}
-                      checked={value != null && value === "buffer-times-set"}
-                    />
-                  </SelectionGroup>
-                )}
-              />
-            </Span12>
+          <AutoGrid>
+            <Controller
+              control={control}
+              name="reservationBlockWholeDay"
+              render={({ field: { value, onChange } }) => (
+                <SelectionGroup
+                  errorText={getTranslatedError(
+                    t,
+                    errors.reservationBlockWholeDay?.message
+                  )}
+                  defaultValue="no-buffer"
+                >
+                  <RadioButton
+                    id="no-buffer"
+                    value="no-buffer"
+                    label={t("ReservationUnitEditor.noBuffer")}
+                    onChange={(e) => onChange(e.target.value)}
+                    checked={value != null && value === "no-buffer"}
+                  />
+                  {/*
+                  <RadioButton
+                    id="blocks-whole-day"
+                    value="blocks-whole-day"
+                    label={t("ReservationUnitEditor.blocksWholeDay")}
+                    onChange={(e) => onChange(e.target.value)}
+                    checked={value != null && value === "blocks-whole-day"}
+                  />
+                  */}
+                  <RadioButton
+                    id="buffer-times-set"
+                    value="buffer-times-set"
+                    label={t("ReservationUnitEditor.setBufferTime")}
+                    onChange={(e) => onChange(e.target.value)}
+                    checked={value != null && value === "buffer-times-set"}
+                  />
+                </SelectionGroup>
+              )}
+            />
             {watch("reservationBlockWholeDay") === "buffer-times-set" && (
-              <BufferWrapper>
+              <>
                 <ActivationGroup
                   label={t("ReservationUnitEditor.bufferTimeBefore")}
                   control={control}
                   name="hasBufferTimeBefore"
                 >
-                  <Controller
+                  <ControlledSelect
                     control={control}
                     name="bufferTimeBefore"
-                    render={({ field: { value, onChange } }) => (
-                      <Select
-                        id="bufferTimeBefore"
-                        options={bufferTimeOptions}
-                        label={t(
-                          "ReservationUnitEditor.bufferTimeBeforeDuration"
-                        )}
-                        onChange={(v: { value: number; label: string }) =>
-                          onChange(v.value)
-                        }
-                        value={
-                          bufferTimeOptions.find((o) => o.value === value) ??
-                          null
-                        }
-                      />
-                    )}
+                    options={bufferTimeOptions}
+                    label={t("ReservationUnitEditor.bufferTimeBeforeDuration")}
                   />
                 </ActivationGroup>
                 <ActivationGroup
@@ -1094,31 +979,16 @@ function ReservationUnitSettings({
                   control={control}
                   name="hasBufferTimeAfter"
                 >
-                  <Controller
+                  <ControlledSelect
                     control={control}
                     name="bufferTimeAfter"
-                    render={({ field: { value, onChange } }) => (
-                      <Select
-                        id="bufferTimeAfter"
-                        label={t(
-                          "ReservationUnitEditor.bufferTimeAfterDuration"
-                        )}
-                        options={bufferTimeOptions}
-                        onChange={(v: { value: number; label: string }) =>
-                          onChange(v.value)
-                        }
-                        value={
-                          bufferTimeOptions.find(
-                            (option) => option.value === value
-                          ) ?? null
-                        }
-                      />
-                    )}
+                    label={t("ReservationUnitEditor.bufferTimeAfterDuration")}
+                    options={bufferTimeOptions}
                   />
                 </ActivationGroup>
-              </BufferWrapper>
+              </>
             )}
-          </Grid>
+          </AutoGrid>
         </FieldGroup>
         <FieldGroup
           heading={t("ReservationUnitEditor.cancellationSettings")}
@@ -1157,45 +1027,22 @@ function ReservationUnitSettings({
             />
           </ActivationGroup>
         </FieldGroup>
-        <Controller
+        <ControlledSelect
           control={control}
           name="metadataSet"
-          render={({ field: { value, onChange } }) => (
-            <Select
-              id="metadataSet"
-              // sort
-              required
-              options={metadataOptions}
-              label={t("ReservationUnitEditor.label.metadataSet")}
-              onChange={(v: { label: string; value: number }) =>
-                onChange(v.value)
-              }
-              value={metadataOptions.find((o) => o.value === value) ?? null}
-              error={getTranslatedError(t, errors.metadataSet?.message)}
-              invalid={errors.metadataSet?.message != null}
-              tooltipText={t("ReservationUnitEditor.tooltip.metadataSet")}
-            />
-          )}
+          required
+          options={metadataOptions}
+          label={t("ReservationUnitEditor.label.metadataSet")}
+          error={getTranslatedError(t, errors.metadataSet?.message)}
+          tooltip={t("ReservationUnitEditor.tooltip.metadataSet")}
         />
-        <Controller
+        <ControlledSelect
           control={control}
           name="authentication"
-          render={({ field: { value, onChange } }) => (
-            <Select
-              // sort
-              id="authentication"
-              required
-              options={authenticationOptions}
-              value={
-                authenticationOptions.find((o) => o.value === value) ?? null
-              }
-              onChange={(val: { value: Authentication; label: string }) =>
-                onChange(val.value)
-              }
-              label={t("ReservationUnitEditor.authenticationLabel")}
-              tooltipText={t("ReservationUnitEditor.tooltip.authentication")}
-            />
-          )}
+          required
+          options={authenticationOptions}
+          label={t("ReservationUnitEditor.authenticationLabel")}
+          tooltip={t("ReservationUnitEditor.tooltip.authentication")}
         />
         <CustomNumberInput name="maxReservationsPerUser" min={1} form={form} />
         <FieldGroup
@@ -1338,28 +1185,16 @@ function PricingSection({
           </HorisontalFlex>
         )}
         {watch("canApplyFreeOfCharge") && isPaid && (
-          <Controller
+          <ControlledSelect
             control={control}
             name="pricingTerms"
-            render={({ field: { value, onChange } }) => (
-              <Select
-                id="pricingTerms"
-                label={t("ReservationUnitEditor.label.pricingTerms")}
-                placeholder={t("common.select")}
-                required
-                clearable
-                options={pricingTermsOptions}
-                value={
-                  pricingTermsOptions.find((o) => o.value === value) ?? null
-                }
-                onChange={(val?: { value: string; label: string }) =>
-                  onChange(val?.value ?? null)
-                }
-                error={getTranslatedError(t, errors.pricingTerms?.message)}
-                invalid={!!errors.pricingTerms}
-                tooltipText={t("ReservationUnitEditor.tooltip.pricingTerms")}
-              />
-            )}
+            label={t("ReservationUnitEditor.label.pricingTerms")}
+            placeholder={t("common.select")}
+            required
+            clearable
+            options={pricingTermsOptions}
+            error={getTranslatedError(t, errors.pricingTerms?.message)}
+            tooltip={t("ReservationUnitEditor.tooltip.pricingTerms")}
           />
         )}
       </VerticalFlex>
@@ -1367,16 +1202,17 @@ function PricingSection({
   );
 }
 
+type OptionType = { value: string; label: string };
 function TermsSection({
   form,
-  serviceSpecificTermsOptions,
-  paymentTermsOptions,
-  cancellationTermsOptions,
+  options,
 }: {
   form: UseFormReturn<ReservationUnitEditFormValues>;
-  serviceSpecificTermsOptions: { value: string; label: string }[];
-  paymentTermsOptions: { value: string; label: string }[];
-  cancellationTermsOptions: { value: string; label: string }[];
+  options: {
+    service: OptionType[];
+    payment: OptionType[];
+    cancellation: OptionType[];
+  };
 }) {
   const { t } = useTranslation();
   const { control, formState } = form;
@@ -1386,6 +1222,22 @@ function TermsSection({
     errors.termsOfUseFi != null ||
     errors.termsOfUseEn != null ||
     errors.termsOfUseSv != null;
+
+  const termsOptions = [
+    {
+      key: "serviceSpecificTerms",
+      options: options.service,
+    },
+    {
+      key: "paymentTerms",
+      options: options.payment,
+    },
+    {
+      key: "cancellationTerms",
+      options: options.cancellation,
+    },
+  ] as const;
+
   return (
     <Accordion
       open={hasErrors}
@@ -1395,31 +1247,17 @@ function TermsSection({
         {(
           ["serviceSpecificTerms", "paymentTerms", "cancellationTerms"] as const
         ).map((name) => {
-          const options =
-            name === "serviceSpecificTerms"
-              ? serviceSpecificTermsOptions
-              : name === "cancellationTerms"
-                ? cancellationTermsOptions
-                : paymentTermsOptions;
+          const opts = termsOptions.find((o) => o.key === name)?.options ?? [];
           return (
-            <Controller
+            <ControlledSelect
               control={control}
               name={name}
               key={name}
-              render={({ field }) => (
-                <Select
-                  clearable
-                  id={name}
-                  label={t(`ReservationUnitEditor.label.${name}`)}
-                  placeholder={t(`ReservationUnitEditor.termsPlaceholder`)}
-                  options={options}
-                  value={options.find((o) => o.value === field.value) ?? null}
-                  onChange={(val?: { value: string; label: string }) =>
-                    field.onChange(val?.value ?? null)
-                  }
-                  tooltipText={t(`ReservationUnitEditor.tooltip.${name}`)}
-                />
-              )}
+              clearable
+              label={t(`ReservationUnitEditor.label.${name}`)}
+              placeholder={t(`ReservationUnitEditor.termsPlaceholder`)}
+              options={opts}
+              tooltip={t(`ReservationUnitEditor.tooltip.${name}`)}
             />
           );
         })}
@@ -1655,134 +1493,79 @@ function DescriptionSection({
       open={hasErrors}
       heading={t("ReservationUnitEditor.typesProperties")}
     >
-      <Grid>
-        <Span6>
-          <Controller
-            control={control}
-            name="reservationUnitType"
-            render={({ field: { value, onChange } }) => (
-              <Select
-                // sort
-                required
-                id="reservationUnitType"
-                label={t(`ReservationUnitEditor.label.reservationUnitType`)}
-                placeholder={t(
-                  `ReservationUnitEditor.reservationUnitTypePlaceholder`
-                )}
-                options={reservationUnitTypeOptions}
-                onChange={(x: { value: number; label: string }) =>
-                  onChange(x.value)
-                }
-                value={
-                  reservationUnitTypeOptions.find((x) => x.value === value) ??
-                  null
-                }
-                helper={t(
-                  "ReservationUnitEditor.reservationUnitTypeHelperText"
-                )}
-                error={getTranslatedError(
-                  t,
-                  errors.reservationUnitType?.message
-                )}
-                invalid={errors.reservationUnitType?.message != null}
-                tooltipText={t(
-                  "ReservationUnitEditor.tooltip.reservationUnitType"
-                )}
-              />
-            )}
-          />
-        </Span6>
-        <Span6>
-          <Controller
-            control={control}
-            name="purposes"
-            render={({ field: { value, onChange } }) => (
-              // @ts-expect-error - HDS multiselect has weird typings
-              <Select<{ label: string; value: number }>
-                multiselect
-                label={t("ReservationUnitEditor.purposesLabel")}
-                placeholder={t("ReservationUnitEditor.purposesPlaceholder")}
-                options={purposeOptions}
-                disabled={purposeOptions.length === 0}
-                onChange={(vals) => onChange(vals.map((y) => y.value))}
-                value={purposeOptions.filter((x) => value.includes(x.value))}
-                tooltipText={t("ReservationUnitEditor.tooltip.purposes")}
-              />
-            )}
-          />
-        </Span6>
-        <Span6>
-          <Controller
-            control={control}
-            name="equipments"
-            render={({ field: { value, onChange } }) => (
-              // @ts-expect-error - HDS multiselect has weird typings
-              <Select<{ label: string; value: number }>
-                multiselect
-                label={t("ReservationUnitEditor.equipmentsLabel")}
-                placeholder={t("ReservationUnitEditor.equipmentsPlaceholder")}
-                options={equipmentOptions}
-                disabled={equipmentOptions.length === 0}
-                onChange={(vals) => onChange(vals.map((y) => y.value))}
-                value={equipmentOptions.filter((x) => value.includes(x.value))}
-                tooltipText={t("ReservationUnitEditor.tooltip.equipments")}
-              />
-            )}
-          />
-        </Span6>
-        <Span6>
-          <Controller
-            control={control}
-            name="qualifiers"
-            render={({ field: { value, onChange, ...field } }) => (
-              // @ts-expect-error - HDS multiselect has weird typings
-              <Select<{ label: string; value: number }>
-                {...field}
-                multiselect
-                label={t("ReservationUnitEditor.qualifiersLabel")}
-                placeholder={t("ReservationUnitEditor.qualifiersPlaceholder")}
-                options={qualifierOptions}
-                disabled={qualifierOptions.length === 0}
-                onChange={(vals) => onChange(vals.map((y) => y.value))}
-                value={qualifierOptions.filter((x) => value.includes(x.value))}
-                tooltipText={t("ReservationUnitEditor.tooltip.qualifiers")}
-              />
-            )}
-          />
-        </Span6>
+      <AutoGrid $minWidth="20rem">
+        <ControlledSelect
+          control={control}
+          name="reservationUnitType"
+          required
+          label={t(`ReservationUnitEditor.label.reservationUnitType`)}
+          placeholder={t(
+            `ReservationUnitEditor.reservationUnitTypePlaceholder`
+          )}
+          options={reservationUnitTypeOptions}
+          helper={t("ReservationUnitEditor.reservationUnitTypeHelperText")}
+          error={getTranslatedError(t, errors.reservationUnitType?.message)}
+          tooltip={t("ReservationUnitEditor.tooltip.reservationUnitType")}
+        />
+        <ControlledSelect
+          control={control}
+          name="purposes"
+          multiselect
+          label={t("ReservationUnitEditor.purposesLabel")}
+          placeholder={t("ReservationUnitEditor.purposesPlaceholder")}
+          options={purposeOptions}
+          tooltip={t("ReservationUnitEditor.tooltip.purposes")}
+        />
+        <ControlledSelect
+          control={control}
+          name="equipments"
+          multiselect
+          label={t("ReservationUnitEditor.equipmentsLabel")}
+          placeholder={t("ReservationUnitEditor.equipmentsPlaceholder")}
+          options={equipmentOptions}
+          tooltip={t("ReservationUnitEditor.tooltip.equipments")}
+        />
+        <ControlledSelect
+          control={control}
+          name="qualifiers"
+          multiselect
+          label={t("ReservationUnitEditor.qualifiersLabel")}
+          placeholder={t("ReservationUnitEditor.qualifiersPlaceholder")}
+          options={qualifierOptions}
+          tooltip={t("ReservationUnitEditor.tooltip.qualifiers")}
+        />
         {(["descriptionFi", "descriptionEn", "descriptionSv"] as const).map(
           (fieldName) => (
-            <Span12 key={fieldName}>
-              <Controller
-                control={control}
-                name={fieldName}
-                render={({ field: { ...field } }) => (
-                  <RichTextInput
-                    {...field}
-                    required
-                    id={fieldName}
-                    label={t(`ReservationUnitEditor.label.${fieldName}`)}
-                    errorText={getTranslatedError(
-                      t,
-                      errors[fieldName]?.message
-                    )}
-                    tooltipText={getTranslatedTooltipTex(t, fieldName)}
-                  />
-                )}
-              />
-            </Span12>
+            <Controller
+              control={control}
+              name={fieldName}
+              key={fieldName}
+              render={({ field: { ...field } }) => (
+                <RichTextInput
+                  {...field}
+                  required
+                  style={{ gridColumn: "1 / -1" }}
+                  id={fieldName}
+                  label={t(`ReservationUnitEditor.label.${fieldName}`)}
+                  errorText={getTranslatedError(t, errors[fieldName]?.message)}
+                  tooltipText={getTranslatedTooltipTex(t, fieldName)}
+                />
+              )}
+            />
           )
         )}
-        <Span12>
-          <Controller
-            control={control}
-            name="images"
-            render={({ field: { value, onChange } }) => (
-              <ImageEditor images={value} setImages={onChange} />
-            )}
-          />
-        </Span12>
-      </Grid>
+        <Controller
+          control={control}
+          name="images"
+          render={({ field: { value, onChange } }) => (
+            <ImageEditor
+              images={value}
+              setImages={onChange}
+              style={{ gridColumn: "1 / -1" }}
+            />
+          )}
+        />
+      </AutoGrid>
     </Accordion>
   );
 }
@@ -1807,28 +1590,21 @@ function ErrorInfo({
   // NOTE the type information for pricings errors is too complex to handle (hence runtime checks)
   const nonNullPricings =
     pricings != null && Array.isArray(pricings) ? pricings : [];
-  const pricingErrors =
-    nonNullPricings
-      .map((pricing) =>
-        Object.entries(pricing ?? {})
-          .map(([key, value]) => {
-            if (
-              value != null &&
-              typeof value === "object" &&
-              "message" in value
-            ) {
-              if (value?.message == null || typeof value.message !== "string") {
-                return null;
-              }
-              const label = t(`ReservationUnitEditor.label.${key}`);
-              const errMsg = getTranslatedError(t, value.message);
-              return `${label} : ${errMsg}`;
-            }
+  const pricingErrors = nonNullPricings.flatMap((pricing) =>
+    Object.entries(pricing ?? {})
+      .map(([key, value]) => {
+        if (value != null && typeof value === "object" && "message" in value) {
+          if (value?.message == null || typeof value.message !== "string") {
             return null;
-          })
-          .filter((x): x is string => x != null)
-      )
-      .flat() ?? [];
+          }
+          const label = t(`ReservationUnitEditor.label.${key}`);
+          const errMsg = getTranslatedError(t, value.message);
+          return `${label} : ${errMsg}`;
+        }
+        return null;
+      })
+      .filter((x): x is string => x != null)
+  );
 
   // TODO errors should be sorted based on the order of the form fields
   return (
@@ -2138,9 +1914,11 @@ function ReservationUnitEditor({
         {isDirect && (
           <TermsSection
             form={form}
-            serviceSpecificTermsOptions={serviceSpecificTermsOptions}
-            paymentTermsOptions={paymentTermsOptions}
-            cancellationTermsOptions={cancellationTermsOptions}
+            options={{
+              service: serviceSpecificTermsOptions,
+              payment: paymentTermsOptions,
+              cancellation: cancellationTermsOptions,
+            }}
           />
         )}
         <CommunicationSection form={form} />
