@@ -4,10 +4,6 @@ on:
   push:
     branches:
       - main
-    # TODO tags is only needed on build jobs (not on test / lint)
-    # move the build jobs into separate workflow
-    tags:
-      - "v*"
   pull_request:
   workflow_dispatch:
 
@@ -17,7 +13,6 @@ concurrency:
 
 env:
   SKIP_ENV_VALIDATION: "true"
-  REGISTRY: "ghcr.io"
 
 jobs:
   # Disabled because it broke, and no idea why.

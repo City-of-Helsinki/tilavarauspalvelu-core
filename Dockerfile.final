@@ -1,0 +1,3 @@
+ARG TAG=main
+ARG APP=ui
+FROM ghcr.io/city-of-helsinki/tilavarauspalvelu-ui-$APP:$TAG AS $APP
