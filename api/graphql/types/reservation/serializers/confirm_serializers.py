@@ -15,7 +15,6 @@ from reservation_units.enums import PaymentType, PricingType
 from reservation_units.utils.reservation_unit_pricing_helper import ReservationUnitPricingHelper
 from reservations.enums import ReservationStateChoice
 from reservations.models import Reservation
-from utils.decimal_utils import round_decimal
 from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
@@ -137,18 +136,15 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
             and self.instance.price_net > 0
         ):
             payment_type = self.validated_data["payment_type"].upper()
-            price_net = round_decimal(self.instance.price_net, 2)
-            price_vat = round_decimal(self.instance.price_net * (self.instance.tax_percentage_value / 100), 2)
-            price_total = round_decimal(self.instance.price, 2)
 
             if payment_type == PaymentType.ON_SITE:
                 PaymentOrder.objects.create(
                     payment_type=payment_type,
                     status=OrderStatus.PAID_MANUALLY,
                     language=self.instance.reservee_language or Language.FI,
-                    price_net=price_net,
-                    price_vat=price_vat,
-                    price_total=price_total,
+                    price_net=self.instance.price_net,
+                    price_vat=self.instance.price_vat_amount,
+                    price_total=self.instance.price,
                     reservation=self.instance,
                 )
             else:
@@ -173,9 +169,9 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
                     payment_type=payment_type,
                     status=OrderStatus.DRAFT,
                     language=self.instance.reservee_language or Language.FI,
-                    price_net=price_net,
-                    price_vat=price_vat,
-                    price_total=price_total,
+                    price_net=self.instance.price_net,
+                    price_vat=self.instance.price_vat_amount,
+                    price_total=self.instance.price,
                     reservation=self.instance,
                     reservation_user_uuid=self.instance.user.uuid,
                     remote_id=verkkokauppa_order.order_id,
