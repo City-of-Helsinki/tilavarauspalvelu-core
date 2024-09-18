@@ -4,6 +4,7 @@ from typing import Any, NamedTuple
 
 import pytest
 
+from common.date_utils import local_datetime
 from tests.factories import (
     ApplicationFactory,
     GeneralRoleFactory,
@@ -123,7 +124,19 @@ def test_ssn_to_date(id_number, expected):
 
 
 def test_migrate_from_tunnistamo_to_keycloak():
-    old_user = UserFactory.create(email="foo@example.com", profile_id="", is_staff=True, is_superuser=True)
+    # Oldest user is ignored.
+    UserFactory.create(
+        email="foo@example.com",
+        profile_id="",
+        date_joined=local_datetime(2020, 1, 1),
+    )
+    old_user = UserFactory.create(
+        email="foo@example.com",
+        profile_id="",
+        is_staff=True,
+        is_superuser=True,
+        date_joined=local_datetime(2021, 1, 1),
+    )
 
     application = ApplicationFactory.create(user=old_user)
     reservation = ReservationFactory.create(user=old_user)
@@ -131,7 +144,13 @@ def test_migrate_from_tunnistamo_to_keycloak():
     general_role = GeneralRoleFactory.create(user=old_user)
     unit_role = UnitRoleFactory.create(user=old_user)
 
-    new_user = UserFactory.create(email="foo@example.com", profile_id="", is_staff=False, is_superuser=False)
+    new_user = UserFactory.create(
+        email="foo@example.com",
+        profile_id="",
+        is_staff=False,
+        is_superuser=False,
+        date_joined=local_datetime(2022, 1, 1),
+    )
 
     migrate_from_tunnistamo_to_keycloak(email=new_user.email)
 

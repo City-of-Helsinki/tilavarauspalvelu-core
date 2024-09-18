@@ -131,16 +131,14 @@ def migrate_from_tunnistamo_to_keycloak(*, email: str) -> None:
     # Look at the two most recent AD users with the same email address (no profile ID).
     # There can be more, but the most recent one is the new Keycloak user and the other one
     # is the old Tunnistamo user after the auth-migration (when auth moved to backend), which we want to migrate.
-    users: list[User] = list(User.objects.filter(email=email, profile_id="").order_by("date_joined")[:2])
+    users: list[User] = list(
+        User.objects.filter(email=email, profile_id="", is_active=True).order_by("-date_joined")[:2]
+    )
     if len(users) < 2:
         return
 
-    old_user = users[0]
-    new_user = users[1]
-
-    # Don't run migration more than once.
-    if not old_user.is_active:
-        return
+    new_user = users[0]
+    old_user = users[1]
 
     # Migrate staff and superuser status.
     new_user.is_staff = old_user.is_staff
