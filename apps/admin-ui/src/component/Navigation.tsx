@@ -299,7 +299,7 @@ const Navigation = ({ apiBaseUrl }: Props) => {
                   <IconSignout />
                 </>
               }
-              onClick={() => signOut(apiBaseUrl)}
+              onClick={() => signOut(apiBaseUrl, env.NEXT_PUBLIC_BASE_URL)}
             />
           </Header.ActionBarItem>
         ) : (

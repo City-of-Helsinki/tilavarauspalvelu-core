@@ -7,6 +7,7 @@ import { H1 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { useSession } from "@/hooks/auth";
 import { PUBLIC_URL } from "./const";
+import { env } from "@/env.mjs";
 
 const Wrapper = styled.div`
   padding: var(--spacing-layout-s);
@@ -67,7 +68,7 @@ const LogoutSection = ({
       </Link>
       {isAuthenticated && (
         <ButtonContainer>
-          <Button onClick={() => signOut(apiBaseUrl)}>
+          <Button onClick={() => signOut(apiBaseUrl, env.NEXT_PUBLIC_BASE_URL)}>
             {t("Navigation.logout")}
           </Button>
         </ButtonContainer>

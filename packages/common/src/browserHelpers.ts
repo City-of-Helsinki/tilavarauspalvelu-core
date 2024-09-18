@@ -26,14 +26,25 @@ export function signIn(apiBaseUrl: string, returnUrl?: unknown) {
   window.location.href = url;
 }
 
-// Log the user out and redirect to route /logout
+function removeTrailingSlash(url: string): string {
+  return url.endsWith("/") ? url.slice(0, -1) : url;
+}
+
+/// Sign the user out and redirect to route /auth/logout/ after the session is destroyed
 /// Thows if called on the server
-export function signOut(apiBaseUrl: string) {
+/// @param apiBaseUrl - base url for api
+/// @param appUrlBasePath - base path for the app (only required if next app is not in host root)
+export function signOut(apiBaseUrl: string, appUrlBasePath = "") {
   if (!isBrowser) {
     throw new Error("signIn can only be called in the browser");
   }
+  const url = new URL(window.location.href);
   const logoutUrl = getSignOutUrl(apiBaseUrl);
   const csrfToken = getCookie("csrftoken");
+  const logoutPath = "/auth/logout/";
+  const origin = url.origin;
+  const returnUrlBase = `${removeTrailingSlash(origin)}${removeTrailingSlash(appUrlBasePath)}`;
+  const returnUrl = `${returnUrlBase}${logoutPath}`;
   if (!csrfToken) {
     throw new Error("csrf token not found");
   }
@@ -44,12 +55,17 @@ export function signOut(apiBaseUrl: string) {
   form.method = "POST";
   form.action = logoutUrl;
   form.style.display = "none";
-  const csrfTokenInput = document.createElement("input");
-  csrfTokenInput.type = "hidden";
-  csrfTokenInput.name = "csrfmiddlewaretoken";
-  csrfTokenInput.value = csrfToken;
-  form.appendChild(csrfTokenInput);
+  addFormParam(form, "csrfmiddlewaretoken", csrfToken);
+  addFormParam(form, "redirect_to", returnUrl);
   document.body.appendChild(form);
   form.submit();
   document.body.removeChild(form);
+}
+
+function addFormParam(form: HTMLFormElement, name: string, value: string) {
+  const input = document.createElement("input");
+  input.type = "hidden";
+  input.name = name;
+  input.value = value;
+  form.appendChild(input);
 }
