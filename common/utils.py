@@ -1,23 +1,29 @@
+from __future__ import annotations
+
 import datetime
 import hashlib
 import hmac
 import operator
 import urllib.parse
-from collections.abc import Generator, Iterable, Sequence
-from typing import Any, Generic, Literal, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar
 
 from django.conf import settings
 from django.core.cache import cache
 from django.db import models
-from django.http import HttpRequest
 from django.utils import translation
-from django.utils.functional import Promise
 from django.utils.translation import get_language_from_request
 from modeltranslation.manager import get_translatable_fields_for_model
 
 from common.date_utils import local_datetime
-from common.typing import Lang
-from tilavarauspalvelu.models import User
+
+if TYPE_CHECKING:
+    from collections.abc import Generator, Iterable, Sequence
+
+    from django.http import HttpRequest
+    from django.utils.functional import Promise
+
+    from common.typing import Lang
+    from tilavarauspalvelu.models import User
 
 __all__ = [
     "comma_sep_str",

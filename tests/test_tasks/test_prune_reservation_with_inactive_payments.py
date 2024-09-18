@@ -5,11 +5,11 @@ import pytest
 from freezegun import freeze_time
 
 from common.date_utils import local_datetime
-from merchants.enums import OrderStatus
 from reservations.enums import ReservationStateChoice
 from reservations.models import Reservation
 from reservations.pruning import prune_reservation_with_inactive_payments
 from tests.factories import PaymentOrderFactory, ReservationFactory
+from tilavarauspalvelu.enums import OrderStatus
 
 # Applied to all tests
 pytestmark = [

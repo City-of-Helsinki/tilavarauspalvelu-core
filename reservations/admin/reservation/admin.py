@@ -14,13 +14,13 @@ from rangefilter.filters import DateRangeFilterBuilder
 from common.date_utils import local_datetime
 from common.typing import WSGIRequest
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
-from merchants.enums import OrderStatus
-from merchants.models import PaymentOrder
 from reservations.admin.reservation.filters import PaidReservationListFilter, RecurringReservationListFilter
 from reservations.admin.reservation.form import ReservationAdminForm
 from reservations.enums import ReservationStateChoice
 from reservations.models import Reservation, ReservationDenyReason
 from reservations.tasks import refund_paid_reservation_task
+from tilavarauspalvelu.enums import OrderStatus
+from tilavarauspalvelu.models import PaymentOrder
 
 __all__ = [
     "ReservationAdmin",

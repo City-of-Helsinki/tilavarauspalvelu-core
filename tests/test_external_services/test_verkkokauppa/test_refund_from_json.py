@@ -4,9 +4,9 @@ from datetime import datetime
 import pytest
 from django.conf import settings
 
-from merchants.verkkokauppa.payment.exceptions import ParseRefundError
-from merchants.verkkokauppa.payment.types import Refund
 from tests.helpers import patch_method
+from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import ParseRefundError
+from tilavarauspalvelu.utils.verkkokauppa.payment.types import Refund
 from utils.sentry import SentryLogger
 
 refund_json = {

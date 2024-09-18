@@ -4,16 +4,16 @@ import pytest
 from django.conf import settings
 from requests import Timeout
 
-from merchants.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError, CreateProductError
-from merchants.verkkokauppa.product.types import (
+from tests.helpers import patch_method
+from tests.mocks import MockResponse
+from tilavarauspalvelu.utils.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError, CreateProductError
+from tilavarauspalvelu.utils.verkkokauppa.product.types import (
     Accounting,
     CreateOrUpdateAccountingParams,
     CreateProductParams,
     Product,
 )
-from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from tests.helpers import patch_method
-from tests.mocks import MockResponse
+from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.sentry import SentryLogger
 
 create_product_params = CreateProductParams(

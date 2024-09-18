@@ -4,10 +4,14 @@ import pytest
 from django.utils.timezone import get_default_timezone
 from freezegun import freeze_time
 
-from merchants.verkkokauppa.exceptions import UnsupportedMetaKeyError
-from merchants.verkkokauppa.helpers import get_formatted_reservation_time, get_meta_label, get_verkkokauppa_order_params
 from reservations.enums import CustomerTypeChoice
 from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory, UserFactory
+from tilavarauspalvelu.utils.verkkokauppa.exceptions import UnsupportedMetaKeyError
+from tilavarauspalvelu.utils.verkkokauppa.helpers import (
+    get_formatted_reservation_time,
+    get_meta_label,
+    get_verkkokauppa_order_params,
+)
 
 # Applied to all tests
 pytestmark = [

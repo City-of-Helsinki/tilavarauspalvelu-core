@@ -8,11 +8,10 @@ from social_django.models import UserSocialAuth
 
 from applications.enums import ApplicationStatusChoice
 from applications.models import Address, Application, ApplicationSection, Person
-from merchants.enums import OrderStatus
 from permissions.models import GeneralRole, UnitRole
 from reservations.enums import ReservationStateChoice, ReservationTypeChoice
 from reservations.models import Reservation
-from tilavarauspalvelu.enums import ReservationNotification
+from tilavarauspalvelu.enums import OrderStatus, ReservationNotification
 from tilavarauspalvelu.models import User
 
 ANONYMIZED = "Anonymized"

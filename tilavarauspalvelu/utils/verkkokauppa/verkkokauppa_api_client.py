@@ -4,18 +4,28 @@ from typing import Any
 from django.conf import settings
 from requests import RequestException, Response
 
-from merchants.verkkokauppa import constants as verkkokauppa_constants
-from merchants.verkkokauppa.exceptions import VerkkokauppaConfigurationError
-from merchants.verkkokauppa.merchants.exceptions import (
+from tilavarauspalvelu.utils.verkkokauppa import constants as verkkokauppa_constants
+from tilavarauspalvelu.utils.verkkokauppa.exceptions import VerkkokauppaConfigurationError
+from tilavarauspalvelu.utils.verkkokauppa.merchants.exceptions import (
     CreateMerchantError,
     GetMerchantError,
     ParseMerchantError,
     UpdateMerchantError,
 )
-from merchants.verkkokauppa.merchants.types import CreateMerchantParams, Merchant, MerchantInfo, UpdateMerchantParams
-from merchants.verkkokauppa.order.exceptions import CancelOrderError, CreateOrderError, GetOrderError, ParseOrderError
-from merchants.verkkokauppa.order.types import CreateOrderParams, Order
-from merchants.verkkokauppa.payment.exceptions import (
+from tilavarauspalvelu.utils.verkkokauppa.merchants.types import (
+    CreateMerchantParams,
+    Merchant,
+    MerchantInfo,
+    UpdateMerchantParams,
+)
+from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import (
+    CancelOrderError,
+    CreateOrderError,
+    GetOrderError,
+    ParseOrderError,
+)
+from tilavarauspalvelu.utils.verkkokauppa.order.types import CreateOrderParams, Order
+from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import (
     GetPaymentError,
     GetRefundStatusError,
     ParsePaymentError,
@@ -23,14 +33,14 @@ from merchants.verkkokauppa.payment.exceptions import (
     ParseRefundStatusError,
     RefundPaymentError,
 )
-from merchants.verkkokauppa.payment.types import Payment, Refund, RefundStatusResult
-from merchants.verkkokauppa.product.exceptions import (
+from tilavarauspalvelu.utils.verkkokauppa.payment.types import Payment, Refund, RefundStatusResult
+from tilavarauspalvelu.utils.verkkokauppa.product.exceptions import (
     CreateOrUpdateAccountingError,
     CreateProductError,
     ParseAccountingError,
     ParseProductError,
 )
-from merchants.verkkokauppa.product.types import (
+from tilavarauspalvelu.utils.verkkokauppa.product.types import (
     Accounting,
     CreateOrUpdateAccountingParams,
     CreateProductParams,

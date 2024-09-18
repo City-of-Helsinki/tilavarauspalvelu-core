@@ -1,14 +1,14 @@
+import datetime
 import uuid
+from contextlib import suppress
 
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Prefetch
+from django.db.transaction import atomic
 
+from common.date_utils import local_datetime
 from config.celery import app
-from merchants.enums import OrderStatus
-from merchants.models import PaymentOrder
-from merchants.pruning import update_expired_orders
-from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservation_units.models import ReservationUnit
 from reservations.models import (
     AffectingTimeSpan,
@@ -22,6 +22,11 @@ from reservations.pruning import (
     prune_reservation_statistics,
     prune_reservation_with_inactive_payments,
 )
+from tilavarauspalvelu.enums import OrderStatus
+from tilavarauspalvelu.models import PaymentOrder
+from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CancelOrderError
+from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import GetPaymentError
+from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 
 
 @app.task(name="prune_reservations")
@@ -32,7 +37,21 @@ def prune_reservations_task() -> None:
 
 @app.task(name="update_expired_orders")
 def update_expired_orders_task() -> None:
-    update_expired_orders()
+    older_than_minutes = settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES
+    expired_datetime = local_datetime() - datetime.timedelta(minutes=older_than_minutes)
+    expired_orders = PaymentOrder.objects.filter(
+        status=OrderStatus.DRAFT,
+        created_at__lte=expired_datetime,
+        remote_id__isnull=False,
+    ).all()
+
+    for payment_order in expired_orders:
+        # Do not update the PaymentOrder status if an error occurs
+        with suppress(GetPaymentError, CancelOrderError), atomic():
+            payment_order.refresh_order_status_from_webshop()
+
+            if payment_order.status == OrderStatus.EXPIRED:
+                payment_order.cancel_order_in_webshop()
 
 
 @app.task(name="prune_reservation_statistics")

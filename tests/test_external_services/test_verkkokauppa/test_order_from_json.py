@@ -4,7 +4,7 @@ from decimal import Decimal
 
 from django.conf import settings
 
-from merchants.verkkokauppa.order.types import Order
+from tilavarauspalvelu.utils.verkkokauppa.order.types import Order
 
 order_json = {
     "orderId": "b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6",

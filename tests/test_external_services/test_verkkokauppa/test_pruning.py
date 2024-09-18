@@ -5,15 +5,15 @@ from freezegun import freeze_time
 
 from common.date_utils import local_datetime
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
-from merchants.enums import OrderStatus
-from merchants.pruning import update_expired_orders
-from merchants.verkkokauppa.order.exceptions import CancelOrderError
-from merchants.verkkokauppa.payment.exceptions import GetPaymentError
-from merchants.verkkokauppa.payment.types import PaymentStatus
-from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.enums import ReservationStateChoice
+from reservations.tasks import update_expired_orders_task
 from tests.factories import PaymentFactory, PaymentOrderFactory, ReservationFactory
 from tests.helpers import patch_method
+from tilavarauspalvelu.enums import OrderStatus
+from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CancelOrderError
+from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import GetPaymentError
+from tilavarauspalvelu.utils.verkkokauppa.payment.types import PaymentStatus
+from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.sentry import SentryLogger
 
 # Applied to all tests
@@ -33,7 +33,7 @@ def test_verkkokauppa_pruning__update_expired_orders__handle_cancelled_orders(or
     VerkkokauppaAPIClient.get_payment.return_value = PaymentFactory.create(status=PaymentStatus.CANCELLED.value)
 
     with freeze_time(order.created_at + timedelta(minutes=6)):
-        update_expired_orders()
+        update_expired_orders_task()
 
     order.refresh_from_db()
     assert order.status == OrderStatus.CANCELLED
@@ -49,7 +49,7 @@ def test_verkkokauppa_pruning__update_expired_orders__handle_expired_orders(orde
     )
 
     with freeze_time(order.created_at + timedelta(minutes=6)):
-        update_expired_orders()
+        update_expired_orders_task()
 
     order.refresh_from_db()
     assert order.status == OrderStatus.EXPIRED
@@ -63,7 +63,7 @@ def test_verkkokauppa_pruning__update_expired_orders__handle_paid_orders(order):
     VerkkokauppaAPIClient.get_payment.return_value = PaymentFactory.create(status=PaymentStatus.PAID_ONLINE.value)
 
     with freeze_time(order.created_at + timedelta(minutes=6)):
-        update_expired_orders()
+        update_expired_orders_task()
 
     order.refresh_from_db()
     assert order.status == OrderStatus.PAID
@@ -78,7 +78,7 @@ def test_verkkokauppa_pruning__update_expired_orders__handle_paid_orders(order):
 @patch_method(VerkkokauppaAPIClient.cancel_order)
 def test_verkkokauppa_pruning__update_expired_orders__handle_missing_payment(order):
     with freeze_time(order.created_at + timedelta(minutes=6)):
-        update_expired_orders()
+        update_expired_orders_task()
 
     order.refresh_from_db()
     assert order.status == OrderStatus.EXPIRED
@@ -90,7 +90,7 @@ def test_verkkokauppa_pruning__update_expired_orders__handle_missing_payment(ord
 @patch_method(VerkkokauppaAPIClient.get_payment, side_effect=GetPaymentError("mock-error"))
 def test_verkkokauppa_pruning__update_expired_orders__get_payment_errors_are_logged(order):
     with freeze_time(order.created_at + timedelta(minutes=6)):
-        update_expired_orders()
+        update_expired_orders_task()
 
     order.refresh_from_db()
     assert order.status == OrderStatus.DRAFT
@@ -108,7 +108,7 @@ def test_verkkokauppa_pruning__update_expired_orders__cancel_error_errors_are_lo
     )
 
     with freeze_time(order.created_at + timedelta(minutes=6)):
-        update_expired_orders()
+        update_expired_orders_task()
 
     order.refresh_from_db()
     assert order.status == OrderStatus.DRAFT
@@ -126,7 +126,7 @@ def test_verkkokauppa_pruning__update_expired_orders__give_more_time_if_user_ent
     )
 
     with freeze_time(order.created_at + timedelta(minutes=6)):
-        update_expired_orders()
+        update_expired_orders_task()
 
     assert VerkkokauppaAPIClient.get_payment.called is True
     assert VerkkokauppaAPIClient.cancel_order.called is False

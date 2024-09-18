@@ -5,8 +5,13 @@ from typing import Any
 import pytest
 from django.conf import settings
 
-from merchants.verkkokauppa.merchants.exceptions import ParseMerchantError
-from merchants.verkkokauppa.merchants.types import CreateMerchantParams, Merchant, MerchantInfo, UpdateMerchantParams
+from tilavarauspalvelu.utils.verkkokauppa.merchants.exceptions import ParseMerchantError
+from tilavarauspalvelu.utils.verkkokauppa.merchants.types import (
+    CreateMerchantParams,
+    Merchant,
+    MerchantInfo,
+    UpdateMerchantParams,
+)
 
 # Applied to all tests
 pytestmark = [

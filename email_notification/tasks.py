@@ -11,7 +11,6 @@ from email_notification.models import EmailType
 from reservations.models import Reservation
 from spaces.models import Unit
 from tilavarauspalvelu.enums import ReservationNotification
-from tilavarauspalvelu.models import User
 from utils.sentry import SentryLogger
 
 ###############
@@ -61,6 +60,8 @@ def _get_reservation_staff_notification_recipients(
     Get users with unit roles and notifications enabled, collect the ones that can manage relevant units,
     have matching notification setting are not the reservation creator
     """
+    from tilavarauspalvelu.models import User
+
     notification_recipients: list[str] = []
     reservation_units = reservation.reservation_unit.all()
     units = Unit.objects.filter(reservationunit__in=reservation_units).prefetch_related("unit_groups").distinct()

@@ -4,13 +4,13 @@ from decimal import Decimal
 from django.utils.timezone import get_default_timezone
 
 from common.utils import comma_sep_str
-from merchants.enums import OrderStatus
-from merchants.models import PaymentOrder
 from reservations.enums import ReservationStateChoice
 from reservations.models import Reservation
 from reservations.tasks import refund_paid_reservation_task
 from tilavarauspalvelu.api.graphql.extensions.serializers import OldPrimaryKeySerializer
 from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
+from tilavarauspalvelu.enums import OrderStatus
+from tilavarauspalvelu.models import PaymentOrder
 
 DEFAULT_TIMEZONE = get_default_timezone()
 

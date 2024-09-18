@@ -46,7 +46,7 @@ urlpatterns = [
 ]
 
 if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
-    urlpatterns.append(path("mock_verkkokauppa/", include("merchants.mock_verkkokauppa_api.urls")))
+    urlpatterns.append(path("mock_verkkokauppa/", include("tilavarauspalvelu.api.mock_verkkokauppa_api.urls")))
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

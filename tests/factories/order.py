@@ -5,7 +5,7 @@ from decimal import Decimal
 import factory
 from django.utils.timezone import get_default_timezone
 
-from merchants.verkkokauppa.order.types import Order, OrderCustomer
+from tilavarauspalvelu.utils.verkkokauppa.order.types import Order, OrderCustomer
 
 from ._base import GenericFactory
 

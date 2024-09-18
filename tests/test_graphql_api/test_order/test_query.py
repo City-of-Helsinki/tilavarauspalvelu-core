@@ -1,7 +1,7 @@
 import freezegun
 import pytest
 
-from merchants.enums import OrderStatus
+from tilavarauspalvelu.enums import OrderStatus
 
 from .helpers import get_order, order_query
 

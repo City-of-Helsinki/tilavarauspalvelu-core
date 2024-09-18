@@ -3,14 +3,14 @@ import uuid
 import pytest
 
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
-from merchants.enums import OrderStatus
-from merchants.verkkokauppa.order.exceptions import CancelOrderError
-from merchants.verkkokauppa.payment.types import PaymentStatus
-from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.enums import ReservationStateChoice
 from reservations.models import Reservation
 from tests.factories import OrderFactory, PaymentFactory, PaymentOrderFactory, ReservationFactory
 from tests.helpers import patch_method
+from tilavarauspalvelu.enums import OrderStatus
+from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CancelOrderError
+from tilavarauspalvelu.utils.verkkokauppa.payment.types import PaymentStatus
+from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.sentry import SentryLogger
 
 from .helpers import DELETE_MUTATION, get_delete_data

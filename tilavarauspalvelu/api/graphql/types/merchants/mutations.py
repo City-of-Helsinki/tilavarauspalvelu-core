@@ -4,10 +4,10 @@ from typing import Any, NamedTuple
 from graphene_django_extensions.bases import DjangoMutation
 
 from common.typing import GQLInfo
-from merchants.enums import OrderStatus
-from merchants.models import PaymentOrder
-from merchants.verkkokauppa.payment.exceptions import GetPaymentError
 from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
+from tilavarauspalvelu.enums import OrderStatus
+from tilavarauspalvelu.models import PaymentOrder
+from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import GetPaymentError
 from utils.sentry import SentryLogger
 
 from .permissions import OrderRefreshPermission

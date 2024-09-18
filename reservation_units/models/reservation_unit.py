@@ -25,12 +25,11 @@ from reservation_units.enums import (
 from reservation_units.querysets import ReservationUnitQuerySet
 
 if TYPE_CHECKING:
-    from merchants.models import PaymentAccounting, PaymentMerchant, PaymentProduct
     from opening_hours.models import OriginHaukiResource
     from reservation_units.models import ReservationUnitCancellationRule, ReservationUnitType
     from reservations.models import ReservationMetadataSet
     from spaces.models import Unit
-    from tilavarauspalvelu.models import TermsOfUse
+    from tilavarauspalvelu.models import PaymentAccounting, PaymentMerchant, PaymentProduct, TermsOfUse
 
 __all__ = [
     "ReservationUnit",
@@ -177,21 +176,21 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
         on_delete=models.SET_NULL,
     )
     payment_product: PaymentProduct | None = models.ForeignKey(
-        "merchants.PaymentProduct",
+        "tilavarauspalvelu.PaymentProduct",
         related_name="reservation_units",
         on_delete=models.PROTECT,
         null=True,
         blank=True,
     )
     payment_merchant: PaymentMerchant | None = models.ForeignKey(
-        "merchants.PaymentMerchant",
+        "tilavarauspalvelu.PaymentMerchant",
         related_name="reservation_units",
         on_delete=models.PROTECT,
         blank=True,
         null=True,
     )
     payment_accounting: PaymentAccounting | None = models.ForeignKey(
-        "merchants.PaymentAccounting",
+        "tilavarauspalvelu.PaymentAccounting",
         related_name="reservation_units",
         on_delete=models.PROTECT,
         null=True,

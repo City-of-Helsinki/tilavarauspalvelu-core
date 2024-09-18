@@ -6,9 +6,9 @@ from typing import Any
 import pytest
 from django.conf import settings
 
-from merchants.verkkokauppa.payment.exceptions import ParsePaymentError
-from merchants.verkkokauppa.payment.types import Payment
 from tests.helpers import patch_method
+from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import ParsePaymentError
+from tilavarauspalvelu.utils.verkkokauppa.payment.types import Payment
 from utils.sentry import SentryLogger
 
 get_payment_response: dict[str, Any] = {
