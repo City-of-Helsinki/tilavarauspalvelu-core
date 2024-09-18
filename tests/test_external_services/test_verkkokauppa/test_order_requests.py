@@ -7,17 +7,17 @@ from urllib.parse import urljoin
 import pytest
 from requests import Timeout
 
-from merchants.verkkokauppa.order.exceptions import CancelOrderError, CreateOrderError, GetOrderError
-from merchants.verkkokauppa.order.types import (
+from tests.helpers import patch_method
+from tests.mocks import MockResponse
+from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CancelOrderError, CreateOrderError, GetOrderError
+from tilavarauspalvelu.utils.verkkokauppa.order.types import (
     CreateOrderParams,
     Order,
     OrderCustomer,
     OrderItemMetaParams,
     OrderItemParams,
 )
-from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from tests.helpers import patch_method
-from tests.mocks import MockResponse
+from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.sentry import SentryLogger
 
 create_order_params: CreateOrderParams = CreateOrderParams(

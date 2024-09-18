@@ -39,7 +39,8 @@ msgstr ""
 msgid "My bookings"
 msgstr "Mina bokningar"
 
-#: applications/admin/address.py merchants/admin/payment_merchant.py
+#: applications/admin/address.py
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
 msgid "Street address"
 msgstr ""
 
@@ -48,7 +49,7 @@ msgid "Post code"
 msgstr ""
 
 #: applications/admin/address.py applications/models/city.py
-#: merchants/admin/payment_merchant.py
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
 msgid "City"
 msgstr ""
 
@@ -562,8 +563,9 @@ msgid "Reservation purpose"
 msgstr ""
 
 #: applications/admin/application_section/form.py
-#: merchants/admin/payment_order.py reservation_units/models/introduction.py
+#: reservation_units/models/introduction.py
 #: reservation_units/models/reservation_unit_pricing.py
+#: tilavarauspalvelu/admin/payment_order/admin.py
 msgid "Reservation unit"
 msgstr ""
 
@@ -765,7 +767,8 @@ msgstr ""
 msgid "Last name"
 msgstr ""
 
-#: applications/admin/person.py merchants/admin/payment_merchant.py
+#: applications/admin/person.py
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
 msgid "Phone number"
 msgstr ""
 
@@ -1291,15 +1294,15 @@ msgstr ""
 msgid "SQL logs"
 msgstr ""
 
-#: config/settings.py merchants/enums.py
+#: config/settings.py tilavarauspalvelu/enums.py
 msgid "Finnish"
 msgstr ""
 
-#: config/settings.py merchants/enums.py
+#: config/settings.py tilavarauspalvelu/enums.py
 msgid "English"
 msgstr ""
 
-#: config/settings.py merchants/enums.py
+#: config/settings.py tilavarauspalvelu/enums.py
 msgid "Swedish"
 msgstr ""
 
@@ -1348,192 +1351,6 @@ msgstr ""
 
 #: email_notification/templates/email_tester.html
 msgid "Email Template Testing"
-msgstr ""
-
-#: merchants/admin/payment_merchant.py
-msgid "The Paytrail Merchant ID should be a six-digit number."
-msgstr ""
-
-#: merchants/admin/payment_merchant.py
-msgid "Shop ID"
-msgstr ""
-
-#: merchants/admin/payment_merchant.py
-msgid "Business ID"
-msgstr ""
-
-#: merchants/admin/payment_merchant.py
-msgid "ZIP code"
-msgstr ""
-
-#: merchants/admin/payment_merchant.py
-msgid "Email address"
-msgstr ""
-
-#: merchants/admin/payment_merchant.py
-msgid "URL"
-msgstr ""
-
-#: merchants/admin/payment_merchant.py
-msgid "Terms of service URL"
-msgstr ""
-
-#: merchants/admin/payment_merchant.py
-msgid "Merchant ID"
-msgstr ""
-
-#: merchants/admin/payment_merchant.py
-msgid "Merchant name"
-msgstr ""
-
-#: merchants/admin/payment_merchant.py
-msgid "Value comes from the Merchant Experience API"
-msgstr ""
-
-#: merchants/admin/payment_order.py
-msgid "Reservation"
-msgstr ""
-
-#: merchants/admin/payment_order.py
-msgid "Remote order ID"
-msgstr ""
-
-#: merchants/admin/payment_order.py
-msgid "Payment ID"
-msgstr ""
-
-#: merchants/admin/payment_order.py
-msgid "Refund ID"
-msgstr ""
-
-#: merchants/admin/payment_order.py
-msgid "Payment type"
-msgstr ""
-
-#: merchants/admin/payment_order.py
-msgid "Payment status"
-msgstr ""
-
-#: merchants/admin/payment_order.py
-msgid "Net amount"
-msgstr ""
-
-#: merchants/admin/payment_order.py
-msgid "VAT amount"
-msgstr ""
-
-#: merchants/admin/payment_order.py
-msgid "Total amount"
-msgstr ""
-
-#: merchants/admin/payment_order.py
-msgid "Processed at"
-msgstr ""
-
-#: merchants/admin/payment_order.py
-msgid "Language"
-msgstr ""
-
-#: merchants/admin/payment_order.py
-msgid "Reservation user UUID"
-msgstr ""
-
-#: merchants/admin/payment_order.py
-msgid "Checkout URL"
-msgstr ""
-
-#: merchants/admin/payment_order.py
-msgid "Receipt URL"
-msgstr ""
-
-#: merchants/admin/payment_order.py
-msgid "The reservation associated with this payment order"
-msgstr ""
-
-#: merchants/admin/payment_order.py
-msgid "eCommerce order ID"
-msgstr ""
-
-#: merchants/admin/payment_order.py
-msgid "eCommerce payment ID"
-msgstr ""
-
-#: merchants/admin/payment_order.py
-msgid "Available only when order has been refunded"
-msgstr ""
-
-#: merchants/admin/payment_order.py
-msgid ""
-"Search by Payment Order ID, Reservation ID, Remote Order ID, Reservation "
-"name, or Reservation Unit name"
-msgstr ""
-
-#: merchants/enums.py
-msgctxt "OrderStatus"
-msgid "Draft"
-msgstr ""
-
-#: merchants/enums.py
-msgctxt "OrderStatus"
-msgid "Expired"
-msgstr ""
-
-#: merchants/enums.py
-msgctxt "OrderStatus"
-msgid "Cancelled"
-msgstr ""
-
-#: merchants/enums.py
-msgctxt "OrderStatus"
-msgid "Paid"
-msgstr ""
-
-#: merchants/enums.py
-msgctxt "OrderStatus"
-msgid "Paid manually"
-msgstr ""
-
-#: merchants/enums.py
-msgctxt "OrderStatus"
-msgid "Refunded"
-msgstr ""
-
-#: merchants/enums.py
-msgctxt "OrderStatus"
-msgid "Free"
-msgstr ""
-
-#: merchants/enums.py reservation_units/enums.py
-msgctxt "PaymentType"
-msgid "On site"
-msgstr ""
-
-#: merchants/enums.py reservation_units/enums.py
-msgctxt "PaymentType"
-msgid "Online"
-msgstr ""
-
-#: merchants/enums.py reservation_units/enums.py
-msgctxt "PaymentType"
-msgid "Invoice"
-msgstr ""
-
-#: merchants/models/payment_accounting.py
-msgid ""
-"One of the following fields must be given: internal_order, profit_center, "
-"project"
-msgstr ""
-
-#: merchants/models/payment_order.py
-msgid "Must be greater than 0.01"
-msgstr ""
-
-#: merchants/models/payment_order.py
-msgid "Must be greater than 0"
-msgstr ""
-
-#: merchants/models/payment_order.py
-msgid "Must be the sum of net and vat amounts"
 msgstr ""
 
 #: opening_hours/admin/origin_hauki_resource.py
@@ -2278,6 +2095,21 @@ msgctxt "PricingType"
 msgid "Free"
 msgstr ""
 
+#: reservation_units/enums.py tilavarauspalvelu/enums.py
+msgctxt "PaymentType"
+msgid "Online"
+msgstr ""
+
+#: reservation_units/enums.py tilavarauspalvelu/enums.py
+msgctxt "PaymentType"
+msgid "Invoice"
+msgstr ""
+
+#: reservation_units/enums.py tilavarauspalvelu/enums.py
+msgctxt "PaymentType"
+msgid "On site"
+msgstr ""
+
 #: reservation_units/enums.py
 msgctxt "PriceUnit"
 msgid "per 15 minutes"
@@ -3007,6 +2839,124 @@ msgstr ""
 msgid "Reset allocations"
 msgstr ""
 
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+msgid "The Paytrail Merchant ID should be a six-digit number."
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+msgid "Shop ID"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+msgid "Business ID"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+msgid "ZIP code"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+msgid "Email address"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+msgid "URL"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+msgid "Terms of service URL"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+msgid "Merchant ID"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+msgid "Merchant name"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+msgid "Value comes from the Merchant Experience API"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Reservation"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Remote order ID"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Payment ID"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Refund ID"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Payment type"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Payment status"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Net amount"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "VAT amount"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Total amount"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Processed at"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Language"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Reservation user UUID"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Checkout URL"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Receipt URL"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "The reservation associated with this payment order"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "eCommerce order ID"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "eCommerce payment ID"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Available only when order has been refunded"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid ""
+"Search by Payment Order ID, Reservation ID, Remote Order ID, Reservation "
+"name, or Reservation Unit name"
+msgstr ""
+
 #: tilavarauspalvelu/api/gdpr/views.py
 msgid "User has upcoming or too recent reservations."
 msgstr ""
@@ -3056,6 +3006,59 @@ msgstr ""
 
 #: tilavarauspalvelu/enums.py
 msgid "Service-specific terms"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "OrderStatus"
+msgid "Draft"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "OrderStatus"
+msgid "Expired"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "OrderStatus"
+msgid "Cancelled"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "OrderStatus"
+msgid "Paid"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "OrderStatus"
+msgid "Paid manually"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "OrderStatus"
+msgid "Refunded"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "OrderStatus"
+msgid "Free"
+msgstr ""
+
+#: tilavarauspalvelu/models/payment_accounting/model.py
+msgid ""
+"One of the following fields must be given: internal_order, profit_center, "
+"project"
+msgstr ""
+
+#: tilavarauspalvelu/models/payment_order/model.py
+msgid "Must be greater than 0.01"
+msgstr ""
+
+#: tilavarauspalvelu/models/payment_order/model.py
+msgid "Must be greater than 0"
+msgstr ""
+
+#: tilavarauspalvelu/models/payment_order/model.py
+msgid "Must be the sum of net and vat amounts"
 msgstr ""
 
 #: tilavarauspalvelu/models/terms_of_use/model.py

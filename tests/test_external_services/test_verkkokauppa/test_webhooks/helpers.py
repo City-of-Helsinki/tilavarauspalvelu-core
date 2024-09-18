@@ -4,7 +4,7 @@ from decimal import Decimal
 
 from django.utils.timezone import get_default_timezone
 
-from merchants.verkkokauppa.payment.types import Payment, PaymentStatus, RefundStatus, RefundStatusResult
+from tilavarauspalvelu.utils.verkkokauppa.payment.types import Payment, PaymentStatus, RefundStatus, RefundStatusResult
 
 
 def get_mock_order_payment_api(remote_id: uuid.UUID, payment_id: uuid.UUID, status: str = "") -> Payment:

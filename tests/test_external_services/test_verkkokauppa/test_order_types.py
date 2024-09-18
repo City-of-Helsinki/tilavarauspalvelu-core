@@ -6,8 +6,9 @@ from typing import Any
 import pytest
 from django.conf import settings
 
-from merchants.verkkokauppa.order.exceptions import ParseOrderError
-from merchants.verkkokauppa.order.types import (
+from tests.helpers import patch_method
+from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import ParseOrderError
+from tilavarauspalvelu.utils.verkkokauppa.order.types import (
     CreateOrderParams,
     Order,
     OrderCustomer,
@@ -16,7 +17,6 @@ from merchants.verkkokauppa.order.types import (
     OrderItemMetaParams,
     OrderItemParams,
 )
-from tests.helpers import patch_method
 from utils.sentry import SentryLogger
 
 # Applied to all tests

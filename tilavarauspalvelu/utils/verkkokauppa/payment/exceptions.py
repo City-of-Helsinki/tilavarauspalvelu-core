@@ -1,4 +1,4 @@
-from merchants.verkkokauppa.exceptions import VerkkokauppaError
+from tilavarauspalvelu.utils.verkkokauppa.exceptions import VerkkokauppaError
 
 
 class PaymentError(VerkkokauppaError):

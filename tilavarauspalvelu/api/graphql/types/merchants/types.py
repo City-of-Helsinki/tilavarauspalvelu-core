@@ -4,8 +4,8 @@ from query_optimizer import MultiField
 
 from common.date_utils import local_datetime
 from common.typing import GQLInfo
-from merchants.enums import OrderStatus, PaymentType
-from merchants.models import PaymentMerchant, PaymentOrder, PaymentProduct
+from tilavarauspalvelu.enums import OrderStatus, PaymentType
+from tilavarauspalvelu.models import PaymentMerchant, PaymentOrder, PaymentProduct
 
 from .permissions import PaymentOrderPermission
 

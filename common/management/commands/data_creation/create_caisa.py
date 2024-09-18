@@ -1,6 +1,5 @@
 from datetime import date, timedelta
 
-from merchants.models import PaymentAccounting, PaymentMerchant, PaymentProduct
 from opening_hours.models import OriginHaukiResource
 from reservation_units.enums import (
     AuthenticationType,
@@ -24,7 +23,7 @@ from reservation_units.models import (
 from reservations.models import ReservationMetadataSet
 from spaces.models import Space, Unit
 from tilavarauspalvelu.enums import TermsOfUseTypeChoices
-from tilavarauspalvelu.models import TermsOfUse
+from tilavarauspalvelu.models import PaymentAccounting, PaymentMerchant, PaymentProduct, TermsOfUse
 
 from .utils import SetName, with_logs
 

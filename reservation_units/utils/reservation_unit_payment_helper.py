@@ -1,4 +1,4 @@
-from merchants.models import PaymentAccounting, PaymentMerchant
+from tilavarauspalvelu.models import PaymentAccounting, PaymentMerchant
 
 
 class ReservationUnitPaymentHelper:

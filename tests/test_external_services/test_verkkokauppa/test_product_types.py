@@ -2,8 +2,8 @@ import uuid
 
 import pytest
 
-from merchants.verkkokauppa.product.exceptions import ParseAccountingError, ParseProductError
-from merchants.verkkokauppa.product.types import (
+from tilavarauspalvelu.utils.verkkokauppa.product.exceptions import ParseAccountingError, ParseProductError
+from tilavarauspalvelu.utils.verkkokauppa.product.types import (
     Accounting,
     CreateOrUpdateAccountingParams,
     CreateProductParams,

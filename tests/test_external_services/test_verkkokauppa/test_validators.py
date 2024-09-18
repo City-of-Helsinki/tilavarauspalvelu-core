@@ -1,7 +1,7 @@
 import pytest
 from django.core.exceptions import ValidationError
 
-from merchants.validators import is_numeric, validate_accounting_project
+from tilavarauspalvelu.utils.validators import is_numeric, validate_accounting_project
 
 
 def test_is_numeric():

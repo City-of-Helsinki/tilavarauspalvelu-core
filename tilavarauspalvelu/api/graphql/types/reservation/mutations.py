@@ -6,11 +6,11 @@ from graphene_django_extensions import CreateMutation, DeleteMutation, UpdateMut
 
 from common.date_utils import local_datetime
 from common.typing import AnyUser
-from merchants.enums import OrderStatus
-from merchants.verkkokauppa.order.exceptions import CancelOrderError
 from reservations.enums import ReservationStateChoice
 from reservations.models import Reservation
 from tilavarauspalvelu.api.graphql.types.merchants.types import PaymentOrderNode
+from tilavarauspalvelu.enums import OrderStatus
+from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CancelOrderError
 
 from .permissions import (
     ReservationCommentPermission,
@@ -38,7 +38,7 @@ from .serializers.staff_adjust_time_serializers import StaffReservationAdjustTim
 from .serializers.staff_reservation_modify_serializers import StaffReservationModifySerializer
 
 if TYPE_CHECKING:
-    from merchants.models import PaymentOrder
+    from tilavarauspalvelu.models import PaymentOrder
 
 __all__ = [
     "ReservationCreateMutation",

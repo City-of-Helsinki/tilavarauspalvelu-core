@@ -6,9 +6,9 @@ import pytest
 from django.conf import settings
 
 from common.date_utils import local_datetime
-from merchants.verkkokauppa.helpers import get_verkkokauppa_order_params
 from reservations.enums import CustomerTypeChoice
 from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory, UserFactory
+from tilavarauspalvelu.utils.verkkokauppa.helpers import get_verkkokauppa_order_params
 
 # Applied to all tests
 pytestmark = [

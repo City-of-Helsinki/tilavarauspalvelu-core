@@ -5,7 +5,6 @@ from django.db import models
 from common.management.commands.create_test_data import create_test_data
 from common.models import RequestLog, SQLLog
 from email_notification.models import EmailTemplate
-from merchants.models import PaymentOrder
 from reservation_units.models import (
     Introduction,
     Keyword,
@@ -26,7 +25,7 @@ from reservations.models import (
     ReservationStatisticsReservationUnit,
 )
 from spaces.models import Building, RealEstate
-from tilavarauspalvelu.models import PersonalInfoViewLog
+from tilavarauspalvelu.models import PaymentOrder, PersonalInfoViewLog
 
 apps_to_check: list[str] = [
     "common",

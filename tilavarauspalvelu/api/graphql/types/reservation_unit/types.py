@@ -13,7 +13,6 @@ from query_optimizer.optimizer import QueryOptimizer
 
 from common.db import SubqueryCount
 from common.typing import GQLInfo
-from merchants.models import PaymentMerchant
 from opening_hours.models import OriginHaukiResource
 from opening_hours.utils.hauki_link_generator import generate_hauki_link
 from reservation_units.enums import ReservationUnitPublishingState, ReservationUnitReservationState
@@ -23,6 +22,7 @@ from reservations.models import Reservation
 from spaces.models import Location, Space, Unit
 from tilavarauspalvelu.api.graphql.types.location.types import LocationNode
 from tilavarauspalvelu.api.graphql.types.reservation.types import ReservationNode
+from tilavarauspalvelu.models import PaymentMerchant
 
 from .filtersets import ReservationUnitFilterSet
 from .permissions import ReservationUnitPermission

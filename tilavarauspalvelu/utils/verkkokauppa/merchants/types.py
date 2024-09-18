@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
-from merchants.verkkokauppa.merchants.exceptions import ParseMerchantError, ParseMerchantInfoError
+from tilavarauspalvelu.utils.verkkokauppa.merchants.exceptions import ParseMerchantError, ParseMerchantInfoError
 
 
 @dataclass(frozen=True)
@@ -57,7 +57,7 @@ class Merchant:
 
     @classmethod
     def from_json(cls, json: dict[str, Any]) -> "Merchant":
-        from merchants.verkkokauppa.helpers import parse_datetime
+        from tilavarauspalvelu.utils.verkkokauppa.helpers import parse_datetime
 
         try:
             configurations = json["configurations"]

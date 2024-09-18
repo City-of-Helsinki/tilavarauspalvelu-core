@@ -9,8 +9,8 @@ from django.db import models
 from django.db.models.functions import Coalesce
 
 from common.date_utils import local_datetime
-from merchants.enums import OrderStatus
 from reservations.enums import ReservationStateChoice
+from tilavarauspalvelu.enums import OrderStatus
 
 if TYPE_CHECKING:
     from applications.models import ApplicationRound

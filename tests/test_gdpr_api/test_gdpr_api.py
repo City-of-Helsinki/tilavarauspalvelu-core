@@ -9,10 +9,10 @@ from django.utils import timezone
 from freezegun import freeze_time
 from rest_framework.exceptions import ErrorDetail
 
-from merchants.enums import OrderStatus
 from reservations.enums import ReservationStateChoice
 from tests.factories import ApplicationFactory, PaymentOrderFactory, ReservationFactory, UserFactory
 from tests.helpers import patch_method
+from tilavarauspalvelu.enums import OrderStatus
 from utils.sentry import SentryLogger
 
 from .helpers import get_gdpr_auth_header, patch_oidc_config

@@ -7,7 +7,11 @@ from typing import Any
 
 from django.conf import settings
 
-from merchants.verkkokauppa.payment.exceptions import ParsePaymentError, ParseRefundError, ParseRefundStatusError
+from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import (
+    ParsePaymentError,
+    ParseRefundError,
+    ParseRefundStatusError,
+)
 from utils.sentry import SentryLogger
 
 
@@ -93,7 +97,7 @@ class Refund:
 
     @classmethod
     def from_json(cls, json: dict[str, Any]) -> "Refund":
-        from merchants.verkkokauppa.helpers import parse_datetime
+        from tilavarauspalvelu.utils.verkkokauppa.helpers import parse_datetime
 
         try:
             return Refund(
@@ -125,7 +129,7 @@ class RefundStatusResult:
 
     @classmethod
     def from_json(cls, json: dict[str, Any]) -> "RefundStatusResult":
-        from merchants.verkkokauppa.helpers import parse_datetime
+        from tilavarauspalvelu.utils.verkkokauppa.helpers import parse_datetime
 
         try:
             return RefundStatusResult(

@@ -8,17 +8,17 @@ from django.utils.timezone import get_default_timezone
 
 from common.date_utils import local_datetime
 from config.utils.date_util import localized_short_weekday
-from merchants.models import PaymentMerchant, PaymentProduct
-from merchants.verkkokauppa.exceptions import UnsupportedMetaKeyError
-from merchants.verkkokauppa.order.types import (
+from reservation_units.utils.reservation_unit_payment_helper import ReservationUnitPaymentHelper
+from reservations.models import Reservation
+from tilavarauspalvelu.models import PaymentMerchant, PaymentProduct
+from tilavarauspalvelu.utils.verkkokauppa.exceptions import UnsupportedMetaKeyError
+from tilavarauspalvelu.utils.verkkokauppa.order.types import (
     CreateOrderParams,
     Order,
     OrderCustomer,
     OrderItemMetaParams,
     OrderItemParams,
 )
-from reservation_units.utils.reservation_unit_payment_helper import ReservationUnitPaymentHelper
-from reservations.models import Reservation
 
 
 def parse_datetime(string: str | None) -> datetime | None:

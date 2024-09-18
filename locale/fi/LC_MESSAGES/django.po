@@ -39,7 +39,8 @@ msgstr ""
 msgid "My bookings"
 msgstr "Omat Varaukset"
 
-#: applications/admin/address.py merchants/admin/payment_merchant.py
+#: applications/admin/address.py
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
 msgid "Street address"
 msgstr "Katuosoite"
 
@@ -48,7 +49,7 @@ msgid "Post code"
 msgstr "Postinumero"
 
 #: applications/admin/address.py applications/models/city.py
-#: merchants/admin/payment_merchant.py
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
 msgid "City"
 msgstr "Kaupunki"
 
@@ -579,8 +580,9 @@ msgid "Reservation purpose"
 msgstr "Varaustarkoitukset"
 
 #: applications/admin/application_section/form.py
-#: merchants/admin/payment_order.py reservation_units/models/introduction.py
+#: reservation_units/models/introduction.py
 #: reservation_units/models/reservation_unit_pricing.py
+#: tilavarauspalvelu/admin/payment_order/admin.py
 msgid "Reservation unit"
 msgstr "Varausyksikkö"
 
@@ -792,7 +794,8 @@ msgstr "Etunimi"
 msgid "Last name"
 msgstr "Sukunimi"
 
-#: applications/admin/person.py merchants/admin/payment_merchant.py
+#: applications/admin/person.py
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
 msgid "Phone number"
 msgstr "Puhelinnumero"
 
@@ -1331,15 +1334,15 @@ msgstr "SQL loki"
 msgid "SQL logs"
 msgstr "SQL lokit"
 
-#: config/settings.py merchants/enums.py
+#: config/settings.py tilavarauspalvelu/enums.py
 msgid "Finnish"
 msgstr "Suomi"
 
-#: config/settings.py merchants/enums.py
+#: config/settings.py tilavarauspalvelu/enums.py
 msgid "English"
 msgstr "Englanti"
 
-#: config/settings.py merchants/enums.py
+#: config/settings.py tilavarauspalvelu/enums.py
 msgid "Swedish"
 msgstr "Ruotsi"
 
@@ -1393,196 +1396,6 @@ msgstr "Koti"
 #: email_notification/templates/email_tester.html
 msgid "Email Template Testing"
 msgstr "Email-pohjan testaus"
-
-#: merchants/admin/payment_merchant.py
-msgid "The Paytrail Merchant ID should be a six-digit number."
-msgstr "Kaupan paytrail-tunnuksen tulisi olla kuusinumeroinen."
-
-#: merchants/admin/payment_merchant.py
-msgid "Shop ID"
-msgstr "Kaupan tunnus"
-
-#: merchants/admin/payment_merchant.py
-msgid "Business ID"
-msgstr "Y-tunnus"
-
-#: merchants/admin/payment_merchant.py
-msgid "ZIP code"
-msgstr "Postinumero"
-
-#: merchants/admin/payment_merchant.py
-msgid "Email address"
-msgstr "Sähköpostiosoite"
-
-#: merchants/admin/payment_merchant.py
-msgid "URL"
-msgstr "Verkko-osoite"
-
-#: merchants/admin/payment_merchant.py
-msgid "Terms of service URL"
-msgstr "Käyttöehtojen URL"
-
-#: merchants/admin/payment_merchant.py
-msgid "Merchant ID"
-msgstr "Kauppiastunniste"
-
-#: merchants/admin/payment_merchant.py
-msgid "Merchant name"
-msgstr "Kauppiaan nimi"
-
-#: merchants/admin/payment_merchant.py
-msgid "Value comes from the Merchant Experience API"
-msgstr "Arvo tulee kauppiaskokemusrajapinnasta"
-
-#: merchants/admin/payment_order.py
-msgid "Reservation"
-msgstr "Varaus"
-
-#: merchants/admin/payment_order.py
-msgid "Remote order ID"
-msgstr "Ulkoinen tilaustunniste"
-
-#: merchants/admin/payment_order.py
-msgid "Payment ID"
-msgstr "Maksutunniste"
-
-#: merchants/admin/payment_order.py
-msgid "Refund ID"
-msgstr "Maksun palautuksen tunniste"
-
-#: merchants/admin/payment_order.py
-msgid "Payment type"
-msgstr "Maksutyyppi"
-
-#: merchants/admin/payment_order.py
-msgid "Payment status"
-msgstr "Maksun tila"
-
-#: merchants/admin/payment_order.py
-msgid "Net amount"
-msgstr "Nettomäärä"
-
-#: merchants/admin/payment_order.py
-msgid "VAT amount"
-msgstr "ALV-määrä"
-
-#: merchants/admin/payment_order.py
-msgid "Total amount"
-msgstr "Kokonaismäärä"
-
-#: merchants/admin/payment_order.py
-msgid "Processed at"
-msgstr "Käsitelty"
-
-#: merchants/admin/payment_order.py
-msgid "Language"
-msgstr "Kieli"
-
-#: merchants/admin/payment_order.py
-msgid "Reservation user UUID"
-msgstr "Varaajan UUID"
-
-#: merchants/admin/payment_order.py
-msgid "Checkout URL"
-msgstr "Kassan URL"
-
-#: merchants/admin/payment_order.py
-msgid "Receipt URL"
-msgstr "Kuitin URL"
-
-#: merchants/admin/payment_order.py
-msgid "The reservation associated with this payment order"
-msgstr "Varaus, joka liittyy tähän maksutilaan"
-
-#: merchants/admin/payment_order.py
-msgid "eCommerce order ID"
-msgstr "eCommerce-tilaustunniste"
-
-#: merchants/admin/payment_order.py
-msgid "eCommerce payment ID"
-msgstr "eCommerce-maksutunniste"
-
-#: merchants/admin/payment_order.py
-msgid "Available only when order has been refunded"
-msgstr "Saatavilla vain, kun maksu on palautettu"
-
-#: merchants/admin/payment_order.py
-msgid ""
-"Search by Payment Order ID, Reservation ID, Remote Order ID, Reservation "
-"name, or Reservation Unit name"
-msgstr ""
-"Etsi maksutunnuksella, varauksen tunnuksella, verkkokaupan tunnuksella, "
-"varauksen nimellä tai varausyksikön nimellä"
-
-#: merchants/enums.py
-msgctxt "OrderStatus"
-msgid "Draft"
-msgstr "Luonnos"
-
-#: merchants/enums.py
-msgctxt "OrderStatus"
-msgid "Expired"
-msgstr "Rauennut"
-
-#: merchants/enums.py
-msgctxt "OrderStatus"
-msgid "Cancelled"
-msgstr "Peruttu"
-
-#: merchants/enums.py
-msgctxt "OrderStatus"
-msgid "Paid"
-msgstr "Maksettu"
-
-#: merchants/enums.py
-msgctxt "OrderStatus"
-msgid "Paid manually"
-msgstr "Maksettu manuaalisesti"
-
-#: merchants/enums.py
-msgctxt "OrderStatus"
-msgid "Refunded"
-msgstr "Palautettu"
-
-#: merchants/enums.py
-msgctxt "OrderStatus"
-msgid "Free"
-msgstr "Maksuton"
-
-#: merchants/enums.py reservation_units/enums.py
-msgctxt "PaymentType"
-msgid "On site"
-msgstr "Paikan päällä"
-
-#: merchants/enums.py reservation_units/enums.py
-msgctxt "PaymentType"
-msgid "Online"
-msgstr "Verkossa"
-
-#: merchants/enums.py reservation_units/enums.py
-msgctxt "PaymentType"
-msgid "Invoice"
-msgstr "Lasku"
-
-#: merchants/models/payment_accounting.py
-msgid ""
-"One of the following fields must be given: internal_order, profit_center, "
-"project"
-msgstr ""
-"Jokin seuraavista kentistä täytyy olla annettu: internal_order, "
-"profit_center, project"
-
-#: merchants/models/payment_order.py
-msgid "Must be greater than 0.01"
-msgstr "Täytyy olla suurempi kuin 0.01"
-
-#: merchants/models/payment_order.py
-msgid "Must be greater than 0"
-msgstr "Täytyy olla suurempi kuin 0"
-
-#: merchants/models/payment_order.py
-msgid "Must be the sum of net and vat amounts"
-msgstr "Täytyy olla netto- ja ALV-määrien summa"
 
 #: opening_hours/admin/origin_hauki_resource.py
 msgid ""
@@ -2348,6 +2161,21 @@ msgctxt "PricingType"
 msgid "Free"
 msgstr "Maksuton"
 
+#: reservation_units/enums.py tilavarauspalvelu/enums.py
+msgctxt "PaymentType"
+msgid "Online"
+msgstr "Verkossa"
+
+#: reservation_units/enums.py tilavarauspalvelu/enums.py
+msgctxt "PaymentType"
+msgid "Invoice"
+msgstr "Lasku"
+
+#: reservation_units/enums.py tilavarauspalvelu/enums.py
+msgctxt "PaymentType"
+msgid "On site"
+msgstr "Paikan päällä"
+
 #: reservation_units/enums.py
 msgctxt "PriceUnit"
 msgid "per 15 minutes"
@@ -3077,6 +2905,126 @@ msgstr "Ei, vie minut takaisin"
 msgid "Reset allocations"
 msgstr "Nollaa allokoinnit"
 
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+msgid "The Paytrail Merchant ID should be a six-digit number."
+msgstr "Kaupan paytrail-tunnuksen tulisi olla kuusinumeroinen."
+
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+msgid "Shop ID"
+msgstr "Kaupan tunnus"
+
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+msgid "Business ID"
+msgstr "Y-tunnus"
+
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+msgid "ZIP code"
+msgstr "Postinumero"
+
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+msgid "Email address"
+msgstr "Sähköpostiosoite"
+
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+msgid "URL"
+msgstr "Verkko-osoite"
+
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+msgid "Terms of service URL"
+msgstr "Käyttöehtojen URL"
+
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+msgid "Merchant ID"
+msgstr "Kauppiastunniste"
+
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+msgid "Merchant name"
+msgstr "Kauppiaan nimi"
+
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+msgid "Value comes from the Merchant Experience API"
+msgstr "Arvo tulee kauppiaskokemusrajapinnasta"
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Reservation"
+msgstr "Varaus"
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Remote order ID"
+msgstr "Ulkoinen tilaustunniste"
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Payment ID"
+msgstr "Maksutunniste"
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Refund ID"
+msgstr "Maksun palautuksen tunniste"
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Payment type"
+msgstr "Maksutyyppi"
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Payment status"
+msgstr "Maksun tila"
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Net amount"
+msgstr "Nettomäärä"
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "VAT amount"
+msgstr "ALV-määrä"
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Total amount"
+msgstr "Kokonaismäärä"
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Processed at"
+msgstr "Käsitelty"
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Language"
+msgstr "Kieli"
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Reservation user UUID"
+msgstr "Varaajan UUID"
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Checkout URL"
+msgstr "Kassan URL"
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Receipt URL"
+msgstr "Kuitin URL"
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "The reservation associated with this payment order"
+msgstr "Varaus, joka liittyy tähän maksutilaan"
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "eCommerce order ID"
+msgstr "eCommerce-tilaustunniste"
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "eCommerce payment ID"
+msgstr "eCommerce-maksutunniste"
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Available only when order has been refunded"
+msgstr "Saatavilla vain, kun maksu on palautettu"
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid ""
+"Search by Payment Order ID, Reservation ID, Remote Order ID, Reservation "
+"name, or Reservation Unit name"
+msgstr ""
+"Etsi maksutunnuksella, varauksen tunnuksella, verkkokaupan tunnuksella, "
+"varauksen nimellä tai varausyksikön nimellä"
+
 #: tilavarauspalvelu/api/gdpr/views.py
 msgid "User has upcoming or too recent reservations."
 msgstr "Käyttäjällä on tulevia tai liian äskettäisiä varauksia."
@@ -3129,6 +3077,61 @@ msgstr "Kausivarauksen ehdot"
 #: tilavarauspalvelu/enums.py
 msgid "Service-specific terms"
 msgstr "Palvelukohtaiset ehdot"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "OrderStatus"
+msgid "Draft"
+msgstr "Luonnos"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "OrderStatus"
+msgid "Expired"
+msgstr "Rauennut"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "OrderStatus"
+msgid "Cancelled"
+msgstr "Peruttu"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "OrderStatus"
+msgid "Paid"
+msgstr "Maksettu"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "OrderStatus"
+msgid "Paid manually"
+msgstr "Maksettu manuaalisesti"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "OrderStatus"
+msgid "Refunded"
+msgstr "Palautettu"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "OrderStatus"
+msgid "Free"
+msgstr "Maksuton"
+
+#: tilavarauspalvelu/models/payment_accounting/model.py
+msgid ""
+"One of the following fields must be given: internal_order, profit_center, "
+"project"
+msgstr ""
+"Jokin seuraavista kentistä täytyy olla annettu: internal_order, "
+"profit_center, project"
+
+#: tilavarauspalvelu/models/payment_order/model.py
+msgid "Must be greater than 0.01"
+msgstr "Täytyy olla suurempi kuin 0.01"
+
+#: tilavarauspalvelu/models/payment_order/model.py
+msgid "Must be greater than 0"
+msgstr "Täytyy olla suurempi kuin 0"
+
+#: tilavarauspalvelu/models/payment_order/model.py
+msgid "Must be the sum of net and vat amounts"
+msgstr "Täytyy olla netto- ja ALV-määrien summa"
 
 #: tilavarauspalvelu/models/terms_of_use/model.py
 msgctxt "singular"

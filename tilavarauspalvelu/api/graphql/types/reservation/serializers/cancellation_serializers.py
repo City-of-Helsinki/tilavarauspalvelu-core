@@ -6,14 +6,14 @@ from rest_framework.exceptions import ValidationError
 
 from common.date_utils import local_datetime
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
-from merchants.enums import OrderStatus
 from reservations.enums import ReservationStateChoice
 from reservations.models import Reservation
 from reservations.tasks import refund_paid_reservation_task
 from tilavarauspalvelu.api.graphql.extensions import error_codes
+from tilavarauspalvelu.enums import OrderStatus
 
 if TYPE_CHECKING:
-    from merchants.models import PaymentOrder
+    from tilavarauspalvelu.models import PaymentOrder
 
 __all__ = [
     "ReservationCancellationSerializer",

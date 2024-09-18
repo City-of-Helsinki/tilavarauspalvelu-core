@@ -9,12 +9,17 @@ from django.views.generic import TemplateView
 
 from common.date_utils import local_datetime
 from common.typing import WSGIRequest
-from merchants.enums import OrderStatus
-from merchants.models import PaymentOrder
 from reservations.enums import ReservationStateChoice
+from tilavarauspalvelu.enums import OrderStatus
+from tilavarauspalvelu.models import PaymentOrder
 
 if TYPE_CHECKING:
     from reservations.models import Reservation
+
+
+__all__ = [
+    "MockVerkkokauppaView",
+]
 
 
 class MockVerkkokauppaView(TemplateView):

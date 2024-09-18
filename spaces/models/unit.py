@@ -38,14 +38,14 @@ class Unit(models.Model):
         null=True,
     )
     payment_merchant = models.ForeignKey(
-        "merchants.PaymentMerchant",
+        "tilavarauspalvelu.PaymentMerchant",
         related_name="units",
         on_delete=models.PROTECT,
         null=True,
         blank=True,
     )
     payment_accounting = models.ForeignKey(
-        "merchants.PaymentAccounting",
+        "tilavarauspalvelu.PaymentAccounting",
         related_name="units",
         on_delete=models.PROTECT,
         null=True,
