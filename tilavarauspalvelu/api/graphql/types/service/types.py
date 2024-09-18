@@ -1,6 +1,6 @@
 from graphene_django_extensions import DjangoNode
 
-from services.models import Service
+from tilavarauspalvelu.models import Service
 
 from .permissions import ServicePermission
 

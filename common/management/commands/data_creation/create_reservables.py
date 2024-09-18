@@ -6,8 +6,9 @@ from datetime import timedelta
 from reservation_units.models import Equipment, EquipmentCategory, Purpose, Qualifier
 from resources.enums import ResourceLocationType
 from resources.models import Resource
-from services.models import Service
 from spaces.models import Space, Unit
+from tilavarauspalvelu.enums import ServiceTypeChoices
+from tilavarauspalvelu.models import Service
 
 from .utils import weighted_choice, with_logs
 
@@ -102,7 +103,7 @@ def _create_services(*, number: int = 10) -> list[Service]:
             name_fi=f"Service {i}",
             name_sv=f"Service {i}",
             name_en=f"Service {i}",
-            service_type=random.choice(Service.SERVICE_TYPES)[0],
+            service_type=random.choice(ServiceTypeChoices.values),
             buffer_time_after=timedelta(hours=buffer_after),
             buffer_time_before=timedelta(hours=buffer_before),
         )

@@ -1,6 +1,6 @@
 from factory import fuzzy
 
-from services.models import Service
+from tilavarauspalvelu.models import Service
 
 from ._base import GenericDjangoModelFactory
 

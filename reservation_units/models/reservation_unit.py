@@ -221,7 +221,7 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
         blank=True,
     )
     services = models.ManyToManyField(
-        "services.Service",
+        "tilavarauspalvelu.Service",
         related_name="reservation_units",
         blank=True,
     )

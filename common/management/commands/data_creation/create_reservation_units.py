@@ -29,9 +29,9 @@ from reservation_units.models import (
 )
 from reservations.models import ReservationMetadataSet
 from resources.models import Resource
-from services.models import Service
 from spaces.models import Unit
 from terms_of_use.models import TermsOfUse
+from tilavarauspalvelu.models import Service
 
 from .create_seasonal_booking import _create_application_round_time_slots
 from .utils import (
