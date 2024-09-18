@@ -13,6 +13,7 @@ from helsinki_gdpr.models import SerializableMixin
 from lookup_property import lookup_property
 
 from common.connectors import ReservationActionsConnector
+from config.utils.auditlog_util import AuditLogger
 from reservations.enums import (
     RESERVEE_LANGUAGE_CHOICES,
     CustomerTypeChoice,
@@ -20,7 +21,6 @@ from reservations.enums import (
     ReservationTypeChoice,
 )
 from reservations.querysets import ReservationQuerySet
-from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 from utils.decimal_utils import round_decimal
 
 if TYPE_CHECKING:

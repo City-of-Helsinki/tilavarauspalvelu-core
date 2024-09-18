@@ -7,9 +7,9 @@ from django.core.validators import validate_comma_separated_integer_list
 from django.db import models
 
 from common.connectors import RecurringReservationActionsConnector
+from config.utils.commons import WEEKDAYS
 from reservations.enums import ReservationStateChoice
 from reservations.querysets.recurring_reservation import RecurringReservationQuerySet
-from tilavarauspalvelu.utils.commons import WEEKDAYS
 
 if TYPE_CHECKING:
     import datetime

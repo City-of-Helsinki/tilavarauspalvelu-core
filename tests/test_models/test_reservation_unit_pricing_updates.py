@@ -3,13 +3,13 @@ from decimal import Decimal
 
 import pytest
 
+from config.utils.auditlog_util import AuditLogger
 from reservation_units.enums import PricingStatus, PricingType
 from reservation_units.models import ReservationUnitPricing
 from reservation_units.pricing_updates import update_reservation_unit_pricings
 from reservation_units.tasks import update_reservation_unit_pricings_tax_percentage
 from tests.factories import ReservationUnitFactory, ReservationUnitPricingFactory
 from tests.helpers import patch_method
-from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 from utils.sentry import SentryLogger
 
 # Applied to all tests

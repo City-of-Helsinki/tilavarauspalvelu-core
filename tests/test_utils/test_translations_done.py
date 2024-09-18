@@ -1,6 +1,6 @@
 import pytest
 
-from tilavarauspalvelu.hooks.translations_done import main
+from config.hooks.translations_done import main
 
 
 @pytest.mark.slow

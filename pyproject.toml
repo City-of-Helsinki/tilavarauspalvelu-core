@@ -95,7 +95,7 @@ extend-exclude = [
     "build",
     "local_settings.py",
     "migrations",
-    "tilavarauspalvelu/settings.py",
+    "config/settings.py",
     "venv",
 ]
 lint.explicit-preview-rules = true
@@ -314,7 +314,7 @@ skips = [
 ]
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "tilavarauspalvelu.settings"
+DJANGO_SETTINGS_MODULE = "config.settings"
 DJANGO_SETTINGS_ENVIRONMENT = "AutomatedTests"
 markers = [
     "slow: Marks a test that takes a long time to run.",
@@ -354,7 +354,7 @@ source = [
     "services/",
     "spaces/",
     "terms_of_use/",
-    "tilavarauspalvelu/",
+    "config/",
     "users/",
     "utils/",
 ]

@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 
-from tilavarauspalvelu.celery import app
+from config.celery import app
 from users.models import PersonalInfoViewLog
 
 

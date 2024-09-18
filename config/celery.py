@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from kombu.asynchronous.timer import Entry, Timer
 
 # Set the default Django settings module for the 'celery' app.
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "tilavarauspalvelu.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 
 
 class LivenessProbe(bootsteps.StartStopStep):

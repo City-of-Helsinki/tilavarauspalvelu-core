@@ -850,31 +850,31 @@ msgstr "Etsi etu- tai sukunimellä."
 msgid "Seasonal Booking"
 msgstr "Kausivaraus"
 
-#: applications/enums.py tilavarauspalvelu/utils/commons.py
+#: applications/enums.py config/utils/commons.py
 msgid "Monday"
 msgstr "Maanantai"
 
-#: applications/enums.py tilavarauspalvelu/utils/commons.py
+#: applications/enums.py config/utils/commons.py
 msgid "Tuesday"
 msgstr "Tiistai"
 
-#: applications/enums.py tilavarauspalvelu/utils/commons.py
+#: applications/enums.py config/utils/commons.py
 msgid "Wednesday"
 msgstr "Keskiviikko"
 
-#: applications/enums.py tilavarauspalvelu/utils/commons.py
+#: applications/enums.py config/utils/commons.py
 msgid "Thursday"
 msgstr "Torstai"
 
-#: applications/enums.py tilavarauspalvelu/utils/commons.py
+#: applications/enums.py config/utils/commons.py
 msgid "Friday"
 msgstr "Perjantai"
 
-#: applications/enums.py tilavarauspalvelu/utils/commons.py
+#: applications/enums.py config/utils/commons.py
 msgid "Saturday"
 msgstr "Lauantai"
 
-#: applications/enums.py tilavarauspalvelu/utils/commons.py
+#: applications/enums.py config/utils/commons.py
 msgid "Sunday"
 msgstr "Sunnuntai"
 
@@ -1532,15 +1532,15 @@ msgstr ""
 "Etsi maksutunnuksella, varauksen tunnuksella, verkkokaupan tunnuksella, "
 "varauksen nimellä tai varausyksikön nimellä"
 
-#: merchants/enums.py tilavarauspalvelu/settings.py
+#: merchants/enums.py config/settings.py
 msgid "Finnish"
 msgstr "Suomi"
 
-#: merchants/enums.py tilavarauspalvelu/settings.py
+#: merchants/enums.py config/settings.py
 msgid "Swedish"
 msgstr "Ruotsi"
 
-#: merchants/enums.py tilavarauspalvelu/settings.py
+#: merchants/enums.py config/settings.py
 msgid "English"
 msgstr "Englanti"
 

@@ -14,8 +14,8 @@ from email_notification.helpers.email_validator import EmailTemplateValidator
 if TYPE_CHECKING:
     from django.db.models.fields.files import FieldFile
 
+    from config.utils.commons import LanguageType
     from email_notification.models import EmailTemplate, EmailType
-    from tilavarauspalvelu.utils.commons import LanguageType
 
 
 @dataclass

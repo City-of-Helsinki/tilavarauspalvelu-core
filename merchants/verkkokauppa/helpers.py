@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.utils.timezone import get_default_timezone
 
 from common.date_utils import local_datetime
+from config.utils.date_util import localized_short_weekday
 from merchants.models import PaymentMerchant, PaymentProduct
 from merchants.verkkokauppa.exceptions import UnsupportedMetaKeyError
 from merchants.verkkokauppa.order.types import (
@@ -18,7 +19,6 @@ from merchants.verkkokauppa.order.types import (
 )
 from reservation_units.utils.reservation_unit_payment_helper import ReservationUnitPaymentHelper
 from reservations.models import Reservation
-from tilavarauspalvelu.utils.date_util import localized_short_weekday
 
 
 def parse_datetime(string: str | None) -> datetime | None:

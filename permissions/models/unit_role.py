@@ -6,9 +6,9 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from graphene_django_extensions.fields.model import StrChoiceField
 
+from config.utils.auditlog_util import AuditLogger
 from permissions.enums import UserRoleChoice
 from permissions.models import GeneralRole
-from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 
 if TYPE_CHECKING:
     import datetime

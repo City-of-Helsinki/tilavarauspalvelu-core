@@ -8,13 +8,13 @@ from django.template.response import TemplateResponse
 from modeltranslation.admin import TranslationAdmin
 
 from common.typing import WSGIRequest
+from config.utils.commons import LanguageType
 from email_notification.admin.email_template_tester import email_template_tester_admin_view
 from email_notification.exceptions import EmailTemplateValidationError
 from email_notification.helpers.email_builder_application import ApplicationEmailBuilder, ApplicationEmailContext
 from email_notification.helpers.email_builder_reservation import ReservationEmailBuilder, ReservationEmailContext
 from email_notification.helpers.email_validator import EmailTemplateValidator
 from email_notification.models import EmailTemplate, EmailType
-from tilavarauspalvelu.utils.commons import LanguageType
 
 __all__ = [
     "EmailTemplateAdmin",

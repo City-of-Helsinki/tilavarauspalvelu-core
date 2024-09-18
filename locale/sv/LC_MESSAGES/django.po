@@ -817,31 +817,31 @@ msgstr ""
 msgid "Seasonal Booking"
 msgstr ""
 
-#: applications/enums.py tilavarauspalvelu/utils/commons.py
+#: applications/enums.py config/utils/commons.py
 msgid "Monday"
 msgstr ""
 
-#: applications/enums.py tilavarauspalvelu/utils/commons.py
+#: applications/enums.py config/utils/commons.py
 msgid "Tuesday"
 msgstr ""
 
-#: applications/enums.py tilavarauspalvelu/utils/commons.py
+#: applications/enums.py config/utils/commons.py
 msgid "Wednesday"
 msgstr ""
 
-#: applications/enums.py tilavarauspalvelu/utils/commons.py
+#: applications/enums.py config/utils/commons.py
 msgid "Thursday"
 msgstr ""
 
-#: applications/enums.py tilavarauspalvelu/utils/commons.py
+#: applications/enums.py config/utils/commons.py
 msgid "Friday"
 msgstr ""
 
-#: applications/enums.py tilavarauspalvelu/utils/commons.py
+#: applications/enums.py config/utils/commons.py
 msgid "Saturday"
 msgstr ""
 
-#: applications/enums.py tilavarauspalvelu/utils/commons.py
+#: applications/enums.py config/utils/commons.py
 msgid "Sunday"
 msgstr ""
 
@@ -1480,15 +1480,15 @@ msgid ""
 "name, or Reservation Unit name"
 msgstr ""
 
-#: merchants/enums.py tilavarauspalvelu/settings.py
+#: merchants/enums.py config/settings.py
 msgid "Finnish"
 msgstr ""
 
-#: merchants/enums.py tilavarauspalvelu/settings.py
+#: merchants/enums.py config/settings.py
 msgid "Swedish"
 msgstr ""
 
-#: merchants/enums.py tilavarauspalvelu/settings.py
+#: merchants/enums.py config/settings.py
 msgid "English"
 msgstr ""
 

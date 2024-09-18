@@ -5,7 +5,7 @@ from django.conf import settings
 
 from common.models import RequestLog, SQLLog
 from common.typing import QueryInfo
-from tilavarauspalvelu.celery import app
+from config.celery import app
 from utils.sentry import SentryLogger
 
 __all__ = [

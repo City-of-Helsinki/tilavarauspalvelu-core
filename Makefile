@@ -101,7 +101,7 @@ stop:
 	@docker compose stop
 
 check-translations:
-	@python -m tilavarauspalvelu.hooks.translations_done
+	@python -m config.hooks.translations_done
 
 translations:
 	@echo ""

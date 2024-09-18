@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db import transaction
 from django.db.models import Prefetch
 
+from config.celery import app
 from merchants.enums import OrderStatus
 from merchants.models import PaymentOrder
 from merchants.pruning import update_expired_orders
@@ -21,7 +22,6 @@ from reservations.pruning import (
     prune_reservation_statistics,
     prune_reservation_with_inactive_payments,
 )
-from tilavarauspalvelu.celery import app
 
 
 @app.task(name="prune_reservations")

@@ -1,7 +1,7 @@
 import logging
 
+from config.celery import app
 from opening_hours.utils.hauki_resource_hash_updater import HaukiResourceHashUpdater
-from tilavarauspalvelu.celery import app
 
 logger = logging.getLogger(__name__)
 

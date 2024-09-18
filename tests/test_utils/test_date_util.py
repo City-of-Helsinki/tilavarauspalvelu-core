@@ -28,7 +28,7 @@ from common.date_utils import (
     utc_time_max,
     utc_time_min,
 )
-from tilavarauspalvelu.utils.date_util import (
+from config.utils.date_util import (
     InvalidWeekdayError,
     localized_short_weekday,
     next_or_current_matching_weekday,

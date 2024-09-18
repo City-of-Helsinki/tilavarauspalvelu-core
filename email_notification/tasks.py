@@ -4,12 +4,12 @@ from lookup_property import L
 from applications.enums import ApplicationRoundStatusChoice, ApplicationSectionStatusChoice
 from applications.models import Application
 from common.date_utils import local_datetime
+from config.celery import app
 from email_notification.exceptions import SendEmailNotificationError
 from email_notification.helpers.email_sender import EmailNotificationSender
 from email_notification.models import EmailType
 from reservations.models import Reservation
 from spaces.models import Unit
-from tilavarauspalvelu.celery import app
 from users.models import ReservationNotification, User
 from utils.sentry import SentryLogger
 

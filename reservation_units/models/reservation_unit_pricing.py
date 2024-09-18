@@ -3,8 +3,8 @@ from decimal import Decimal
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from config.utils.auditlog_util import AuditLogger
 from reservation_units.enums import PriceUnit, PricingStatus, PricingType
-from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 
 __all__ = [
     "ReservationUnitPricing",

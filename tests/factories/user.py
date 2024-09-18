@@ -74,7 +74,7 @@ class UserSocialAuthFactory(GenericDjangoModelFactory[UserSocialAuth]):
         model = UserSocialAuth
 
     user = factory.SubFactory(UserFactory)
-    provider = "tunnistamo"  # matches `tilavarauspalvelu.auth.ProxyTunnistamoOIDCAuthBackend.name`
+    provider = "tunnistamo"  # matches `config.auth.ProxyTunnistamoOIDCAuthBackend.name`
     uid = factory.Sequence(lambda n: f"{n}")
 
     @factory.post_generation

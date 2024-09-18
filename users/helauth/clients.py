@@ -13,7 +13,7 @@ from social_django.models import DjangoStorage
 from social_django.strategy import DjangoStrategy
 
 from common.date_utils import DEFAULT_TIMEZONE, local_datetime
-from tilavarauspalvelu.auth import ProxyTunnistamoOIDCAuthBackend
+from config.auth import ProxyTunnistamoOIDCAuthBackend
 from users.helauth.parsers import ProfileDataParser
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 from utils.external_service.errors import ExternalServiceError, ExternalServiceRequestError
