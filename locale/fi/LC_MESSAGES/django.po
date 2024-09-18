@@ -39,35 +39,6 @@ msgstr ""
 msgid "My bookings"
 msgstr "Omat Varaukset"
 
-#: tilavarauspalvelu/api/gdpr/views.py
-msgid "User has upcoming or too recent reservations."
-msgstr "Käyttäjällä on tulevia tai liian äskettäisiä varauksia."
-
-#: tilavarauspalvelu/api/gdpr/views.py
-msgid "User has an unhandled application."
-msgstr "Käyttäjällä on käsittelemätön hakemus."
-
-#: tilavarauspalvelu/api/gdpr/views.py
-msgid "User has open payments."
-msgstr "Käyttäjällä on avoimia maksuja."
-
-#: tilavarauspalvelu/api/graphql/extensions/fields.py
-msgid "A valid integer is required."
-msgstr "Syötä oikea kokonaisluku."
-
-#: tilavarauspalvelu/api/graphql/extensions/fields.py
-#, python-format
-msgid ""
-"Choice \"%(choice)s\" is not allowed. Allowed choices are: "
-"%(allowed_choices)s."
-msgstr ""
-"Valinta \"%(choice)s\" ei ole sallittu. Mahdolliset valinnat ovat: "
-"%(allowed_choices)s."
-
-#: api/helauth/views.py
-msgid "You have been successfully logged out."
-msgstr "Sinut on nyt kirjattu ulos."
-
 #: applications/admin/address.py merchants/admin/payment_merchant.py
 msgid "Street address"
 msgstr "Katuosoite"
@@ -414,7 +385,6 @@ msgstr ""
 #: reservation_units/models/reservation_unit_type.py
 #: reservations/admin/reservation/form.py
 #: reservations/models/reservation_metadata.py resources/models.py
-#: services/models.py terms_of_use/models.py
 msgid "Name"
 msgstr "Nimi"
 
@@ -1361,6 +1331,18 @@ msgstr "SQL loki"
 msgid "SQL logs"
 msgstr "SQL lokit"
 
+#: config/settings.py merchants/enums.py
+msgid "Finnish"
+msgstr "Suomi"
+
+#: config/settings.py merchants/enums.py
+msgid "English"
+msgstr "Englanti"
+
+#: config/settings.py merchants/enums.py
+msgid "Swedish"
+msgstr "Ruotsi"
+
 #: email_notification/admin/email_template_tester.py
 #, python-format
 msgid "Test Email '%s' successfully sent."
@@ -1531,18 +1513,6 @@ msgid ""
 msgstr ""
 "Etsi maksutunnuksella, varauksen tunnuksella, verkkokaupan tunnuksella, "
 "varauksen nimellä tai varausyksikön nimellä"
-
-#: merchants/enums.py config/settings.py
-msgid "Finnish"
-msgstr "Suomi"
-
-#: merchants/enums.py config/settings.py
-msgid "Swedish"
-msgstr "Ruotsi"
-
-#: merchants/enums.py config/settings.py
-msgid "English"
-msgstr "Englanti"
 
 #: merchants/enums.py
 msgctxt "OrderStatus"
@@ -1872,11 +1842,11 @@ msgstr "Käyttöehdot (Englanniksi)"
 msgid "Terms of use (Swedish)"
 msgstr "Käyttöehdot (Ruotsiksi)"
 
-#: reservation_units/admin/reservation_unit/form.py terms_of_use/models.py
+#: reservation_units/admin/reservation_unit/form.py tilavarauspalvelu/enums.py
 msgid "Payment terms"
 msgstr "Maksuehdot"
 
-#: reservation_units/admin/reservation_unit/form.py terms_of_use/models.py
+#: reservation_units/admin/reservation_unit/form.py tilavarauspalvelu/enums.py
 msgid "Cancellation terms"
 msgstr "Peruutusehdot"
 
@@ -1884,7 +1854,7 @@ msgstr "Peruutusehdot"
 msgid "Service specific terms"
 msgstr "Palvelukohtaiset ehdot"
 
-#: reservation_units/admin/reservation_unit/form.py terms_of_use/models.py
+#: reservation_units/admin/reservation_unit/form.py tilavarauspalvelu/enums.py
 msgid "Pricing terms"
 msgstr "Hinnoitteluehdot"
 
@@ -1970,13 +1940,11 @@ msgstr "Pinta-ala"
 
 #: reservation_units/admin/reservation_unit/form.py
 #: reservations/admin/reservation/form.py resources/models.py
-#: services/models.py
 msgid "Buffer time before"
 msgstr "Tauko ennen varausta"
 
 #: reservation_units/admin/reservation_unit/form.py
 #: reservations/admin/reservation/form.py resources/models.py
-#: services/models.py
 msgid "Buffer time after"
 msgstr "Tauko varauksen jälkeen"
 
@@ -3051,22 +3019,6 @@ msgctxt "ResourceLocationType"
 msgid "Movable"
 msgstr "Siirrettävä"
 
-#: services/models.py
-msgid "Introduction"
-msgstr "Perehdytys"
-
-#: services/models.py
-msgid "Catering"
-msgstr "Tarjoilu"
-
-#: services/models.py
-msgid "Configuration"
-msgstr "Konfiguraatio"
-
-#: services/models.py
-msgid "Service type"
-msgstr "Palvelun tyyppi"
-
 #: spaces/admin/space.py
 msgid "Search by name or unit name"
 msgstr "Etsi nimellä tai toimipisteen nimellä"
@@ -3125,32 +3077,65 @@ msgstr "Ei, vie minut takaisin"
 msgid "Reset allocations"
 msgstr "Nollaa allokoinnit"
 
-#: terms_of_use/models.py
+#: tilavarauspalvelu/api/gdpr/views.py
+msgid "User has upcoming or too recent reservations."
+msgstr "Käyttäjällä on tulevia tai liian äskettäisiä varauksia."
+
+#: tilavarauspalvelu/api/gdpr/views.py
+msgid "User has an unhandled application."
+msgstr "Käyttäjällä on käsittelemätön hakemus."
+
+#: tilavarauspalvelu/api/gdpr/views.py
+msgid "User has open payments."
+msgstr "Käyttäjällä on avoimia maksuja."
+
+#: tilavarauspalvelu/api/graphql/extensions/fields.py
+msgid "A valid integer is required."
+msgstr "Syötä oikea kokonaisluku."
+
+#: tilavarauspalvelu/api/graphql/extensions/fields.py
+#, python-format
+msgid ""
+"Choice \"%(choice)s\" is not allowed. Allowed choices are: "
+"%(allowed_choices)s."
+msgstr ""
+"Valinta \"%(choice)s\" ei ole sallittu. Mahdolliset valinnat ovat: "
+"%(allowed_choices)s."
+
+#: tilavarauspalvelu/api/helauth/views.py
+msgid "You have been successfully logged out."
+msgstr "Sinut on nyt kirjattu ulos."
+
+#: tilavarauspalvelu/enums.py
+msgid "Introduction"
+msgstr "Perehdytys"
+
+#: tilavarauspalvelu/enums.py
+msgid "Catering"
+msgstr "Tarjoilu"
+
+#: tilavarauspalvelu/enums.py
+msgid "Configuration"
+msgstr "Konfiguraatio"
+
+#: tilavarauspalvelu/enums.py
 msgid "Generic terms"
 msgstr "Yleiset ehdot"
 
-#: terms_of_use/models.py
+#: tilavarauspalvelu/enums.py
 msgid "Recurring reservation terms"
 msgstr "Kausivarauksen ehdot"
 
-#: terms_of_use/models.py
+#: tilavarauspalvelu/enums.py
 msgid "Service-specific terms"
 msgstr "Palvelukohtaiset ehdot"
 
-#: terms_of_use/models.py
-msgid "Text"
-msgstr "Teksti"
-
-#: terms_of_use/models.py
-msgid "Terms type"
-msgstr "Ehtotyyppi"
-
-#: terms_of_use/models.py
+#: tilavarauspalvelu/models/terms_of_use/model.py
 msgctxt "singular"
 msgid "terms of use"
 msgstr "Käyttöehto"
 
-#: terms_of_use/models.py
+#: tilavarauspalvelu/models/terms_of_use/model.py
 msgctxt "plural"
 msgid "terms of use"
 msgstr "Käyttöehdot"

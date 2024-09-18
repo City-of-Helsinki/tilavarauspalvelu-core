@@ -5,8 +5,8 @@ import pytest
 from pypdf import PdfReader
 from rest_framework.reverse import reverse
 
-from terms_of_use.models import TermsOfUse
 from tests.factories import TermsOfUseFactory
+from tilavarauspalvelu.enums import TermsOfUseTypeChoices
 
 if TYPE_CHECKING:
     from django.http import FileResponse, JsonResponse
@@ -25,7 +25,7 @@ def test_terms_pdf(api_client):
         text_fi="Test Terms of Use text",
         text_en="Test Terms of Use text English",
         text_sv="Test Terms of Use text Swedish",
-        terms_type=TermsOfUse.TERMS_TYPE_GENERIC,
+        terms_type=TermsOfUseTypeChoices.GENERIC,
     )
 
     url = reverse("terms_of_use_pdf")
@@ -57,7 +57,7 @@ def test_terms_pdf__not_as_attachment(api_client):
         text_fi="Test Terms of Use text",
         text_en="Test Terms of Use text English",
         text_sv="Test Terms of Use text Swedish",
-        terms_type=TermsOfUse.TERMS_TYPE_GENERIC,
+        terms_type=TermsOfUseTypeChoices.GENERIC,
     )
 
     url = reverse("terms_of_use_pdf") + "?as_attachment=False"

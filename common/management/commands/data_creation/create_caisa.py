@@ -23,7 +23,8 @@ from reservation_units.models import (
 )
 from reservations.models import ReservationMetadataSet
 from spaces.models import Space, Unit
-from terms_of_use.models import TermsOfUse
+from tilavarauspalvelu.enums import TermsOfUseTypeChoices
+from tilavarauspalvelu.models import TermsOfUse
 
 from .utils import SetName, with_logs
 
@@ -67,7 +68,7 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
             "name_en": "Payment terms - free of charge",
             "name_sv": "Betalningsvillkor - kostnadsfritt",
             "text": "",
-            "terms_type": TermsOfUse.TERMS_TYPE_PAYMENT,
+            "terms_type": TermsOfUseTypeChoices.PAYMENT,
         },
     )
     payment_terms_1, _ = TermsOfUse.objects.get_or_create(
@@ -82,7 +83,7 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
                 "Palvelussa ilmoitetut hinnat sisältävät arvolisäveron. "
                 "Mahdolliset lisäpalvelut eivät sisälly hintaan.",
             ),
-            "terms_type": TermsOfUse.TERMS_TYPE_PAYMENT,
+            "terms_type": TermsOfUseTypeChoices.PAYMENT,
         },
     )
     payment_terms_3, _ = TermsOfUse.objects.get_or_create(
@@ -103,7 +104,7 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
                 "vähintään 18 vuoden ikää. Palvelussa ilmoitetut hinnat sisältävät arvolisäveron. "
                 "Mahdolliset lisäpalvelut eivät sisälly hintaan.",
             ),
-            "terms_type": TermsOfUse.TERMS_TYPE_PAYMENT,
+            "terms_type": TermsOfUseTypeChoices.PAYMENT,
         },
     )
     payment_terms_4, _ = TermsOfUse.objects.get_or_create(
@@ -124,7 +125,7 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
                 "ilmoitetut hinnat sisältävät arvolisäveron. Mahdolliset lisäpalvelut "
                 "eivät sisälly hintaan."
             ),
-            "terms_type": TermsOfUse.TERMS_TYPE_PAYMENT,
+            "terms_type": TermsOfUseTypeChoices.PAYMENT,
         },
     )
 
@@ -143,7 +144,7 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
                 "Varaajan tulee olla täysi-ikäinen. Tilassa järjestettävä tilaisuus "
                 "ei saa häiritä muuta kirjaston toimintaa, asiakkaita tai käyttäjiä."
             ),
-            "terms_type": TermsOfUse.TERMS_TYPE_SERVICE,
+            "terms_type": TermsOfUseTypeChoices.SERVICE,
         },
     )
     service_terms_library, _ = TermsOfUse.objects.get_or_create(
@@ -156,7 +157,7 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
             "text": (
                 "Tähän varaukseen sovelletaan Helsingin kaupungin tilojen ja laitteiden varaamisen sopimusehtoja."
             ),
-            "terms_type": TermsOfUse.TERMS_TYPE_SERVICE,
+            "terms_type": TermsOfUseTypeChoices.SERVICE,
         },
     )
     service_terms_gadgets, _ = TermsOfUse.objects.get_or_create(
@@ -173,7 +174,7 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
                 "Tilaustöiden tekeminen korvausta vastaan tai ammattimainen "
                 "tulonhankinta ei ole sallittua."
             ),
-            "terms_type": TermsOfUse.TERMS_TYPE_SERVICE,
+            "terms_type": TermsOfUseTypeChoices.SERVICE,
         },
     )
     service_terms_youth, _ = TermsOfUse.objects.get_or_create(
@@ -190,7 +191,7 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
                 "Yöpyminen on sallittu vain nuorisopalveluiden leirikeskuksissa "
                 "tai vastaavissa tiloissa, jotka on tarkoitettu yöpymiseen."
             ),
-            "terms_type": TermsOfUse.TERMS_TYPE_SERVICE,
+            "terms_type": TermsOfUseTypeChoices.SERVICE,
         },
     )
 
@@ -210,7 +211,7 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
                 "ei ole mahdollista. Jos varaus on maksullinen, käyttämättä "
                 "jääneen vuoron maksua ei palauteta."
             ),
-            "terms_type": TermsOfUse.TERMS_TYPE_CANCELLATION,
+            "terms_type": TermsOfUseTypeChoices.CANCELLATION,
         },
     )
     cancel_terms_zero_days, _ = TermsOfUse.objects.get_or_create(
@@ -224,7 +225,7 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
                 "Varauksen voi perua Varaamossa veloituksetta ennen varauksen alkamista. "
                 "Myöhästyessäsi yli 15 minuuttia varaus vapautetaan muiden käyttöön."
             ),
-            "terms_type": TermsOfUse.TERMS_TYPE_CANCELLATION,
+            "terms_type": TermsOfUseTypeChoices.CANCELLATION,
         },
     )
     cancel_terms_14_days, _ = TermsOfUse.objects.get_or_create(
@@ -238,7 +239,7 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
                 "Varauksen voi perua veloituksetta kaksi viikkoa (14 vrk) ennen varauksen alkamista. "
                 "Myöhemmin tehdyistä peruutuksista peritään täysi hinta."
             ),
-            "terms_type": TermsOfUse.TERMS_TYPE_CANCELLATION,
+            "terms_type": TermsOfUseTypeChoices.CANCELLATION,
         },
     )
 
@@ -272,7 +273,7 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
                 "muutos liittyy hinnoittelun tarkoituksenmukaiseen kohtuullistamiseen, "
                 "varauksen tekijän sitä kirjallisesti hakiessa."
             ),
-            "terms_type": TermsOfUse.TERMS_TYPE_PAYMENT,
+            "terms_type": TermsOfUseTypeChoices.PAYMENT,
         },
     )
 

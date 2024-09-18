@@ -39,29 +39,6 @@ msgstr ""
 msgid "My bookings"
 msgstr "Mina bokningar"
 
-#: tilavarauspalvelu/api/gdpr/views.py
-msgid "User has upcoming or too recent reservations."
-msgstr ""
-
-#: tilavarauspalvelu/api/gdpr/views.py
-msgid "User has an unhandled application."
-msgstr ""
-
-#: tilavarauspalvelu/api/gdpr/views.py
-msgid "User has open payments."
-msgstr ""
-
-#: tilavarauspalvelu/api/graphql/extensions/fields.py
-msgid "A valid integer is required."
-msgstr ""
-
-#: tilavarauspalvelu/api/graphql/extensions/fields.py
-#, python-format
-msgid ""
-"Choice \"%(choice)s\" is not allowed. Allowed choices are: "
-"%(allowed_choices)s."
-msgstr ""
-
 #: applications/admin/address.py merchants/admin/payment_merchant.py
 msgid "Street address"
 msgstr ""
@@ -397,7 +374,6 @@ msgstr ""
 #: reservation_units/models/reservation_unit_type.py
 #: reservations/admin/reservation/form.py
 #: reservations/models/reservation_metadata.py resources/models.py
-#: services/models.py terms_of_use/models.py
 msgid "Name"
 msgstr ""
 
@@ -1315,6 +1291,18 @@ msgstr ""
 msgid "SQL logs"
 msgstr ""
 
+#: config/settings.py merchants/enums.py
+msgid "Finnish"
+msgstr ""
+
+#: config/settings.py merchants/enums.py
+msgid "English"
+msgstr ""
+
+#: config/settings.py merchants/enums.py
+msgid "Swedish"
+msgstr ""
+
 #: email_notification/admin/email_template_tester.py
 #, python-format
 msgid "Test Email '%s' successfully sent."
@@ -1478,18 +1466,6 @@ msgstr ""
 msgid ""
 "Search by Payment Order ID, Reservation ID, Remote Order ID, Reservation "
 "name, or Reservation Unit name"
-msgstr ""
-
-#: merchants/enums.py config/settings.py
-msgid "Finnish"
-msgstr ""
-
-#: merchants/enums.py config/settings.py
-msgid "Swedish"
-msgstr ""
-
-#: merchants/enums.py config/settings.py
-msgid "English"
 msgstr ""
 
 #: merchants/enums.py
@@ -1810,11 +1786,11 @@ msgstr ""
 msgid "Terms of use (Swedish)"
 msgstr ""
 
-#: reservation_units/admin/reservation_unit/form.py terms_of_use/models.py
+#: reservation_units/admin/reservation_unit/form.py tilavarauspalvelu/enums.py
 msgid "Payment terms"
 msgstr ""
 
-#: reservation_units/admin/reservation_unit/form.py terms_of_use/models.py
+#: reservation_units/admin/reservation_unit/form.py tilavarauspalvelu/enums.py
 msgid "Cancellation terms"
 msgstr ""
 
@@ -1822,7 +1798,7 @@ msgstr ""
 msgid "Service specific terms"
 msgstr ""
 
-#: reservation_units/admin/reservation_unit/form.py terms_of_use/models.py
+#: reservation_units/admin/reservation_unit/form.py tilavarauspalvelu/enums.py
 msgid "Pricing terms"
 msgstr ""
 
@@ -1908,13 +1884,11 @@ msgstr ""
 
 #: reservation_units/admin/reservation_unit/form.py
 #: reservations/admin/reservation/form.py resources/models.py
-#: services/models.py
 msgid "Buffer time before"
 msgstr ""
 
 #: reservation_units/admin/reservation_unit/form.py
 #: reservations/admin/reservation/form.py resources/models.py
-#: services/models.py
 msgid "Buffer time after"
 msgstr ""
 
@@ -2975,22 +2949,6 @@ msgctxt "ResourceLocationType"
 msgid "Movable"
 msgstr ""
 
-#: services/models.py
-msgid "Introduction"
-msgstr ""
-
-#: services/models.py
-msgid "Catering"
-msgstr ""
-
-#: services/models.py
-msgid "Configuration"
-msgstr ""
-
-#: services/models.py
-msgid "Service type"
-msgstr ""
-
 #: spaces/admin/space.py
 msgid "Search by name or unit name"
 msgstr ""
@@ -3049,32 +3007,63 @@ msgstr ""
 msgid "Reset allocations"
 msgstr ""
 
-#: terms_of_use/models.py
+#: tilavarauspalvelu/api/gdpr/views.py
+msgid "User has upcoming or too recent reservations."
+msgstr ""
+
+#: tilavarauspalvelu/api/gdpr/views.py
+msgid "User has an unhandled application."
+msgstr ""
+
+#: tilavarauspalvelu/api/gdpr/views.py
+msgid "User has open payments."
+msgstr ""
+
+#: tilavarauspalvelu/api/graphql/extensions/fields.py
+msgid "A valid integer is required."
+msgstr ""
+
+#: tilavarauspalvelu/api/graphql/extensions/fields.py
+#, python-format
+msgid ""
+"Choice \"%(choice)s\" is not allowed. Allowed choices are: "
+"%(allowed_choices)s."
+msgstr ""
+
+#: tilavarauspalvelu/api/helauth/views.py
+msgid "You have been successfully logged out."
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Introduction"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Catering"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Configuration"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
 msgid "Generic terms"
 msgstr ""
 
-#: terms_of_use/models.py
+#: tilavarauspalvelu/enums.py
 msgid "Recurring reservation terms"
 msgstr ""
 
-#: terms_of_use/models.py
+#: tilavarauspalvelu/enums.py
 msgid "Service-specific terms"
 msgstr ""
 
-#: terms_of_use/models.py
-msgid "Text"
-msgstr ""
-
-#: terms_of_use/models.py
-msgid "Terms type"
-msgstr ""
-
-#: terms_of_use/models.py
+#: tilavarauspalvelu/models/terms_of_use/model.py
 msgctxt "singular"
 msgid "terms of use"
 msgstr ""
 
-#: terms_of_use/models.py
+#: tilavarauspalvelu/models/terms_of_use/model.py
 msgctxt "plural"
 msgid "terms of use"
 msgstr ""
@@ -3085,6 +3074,10 @@ msgstr ""
 
 #: users/admin/user.py
 msgid "Settings"
+msgstr ""
+
+#: users/admin/user.py
+msgid "ID token info"
 msgstr ""
 
 #: users/admin/user.py

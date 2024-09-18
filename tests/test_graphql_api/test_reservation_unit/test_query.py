@@ -8,7 +8,6 @@ from applications.enums import WeekdayChoice
 from common.date_utils import local_datetime, next_hour
 from reservation_units.enums import PricingType, ReservationUnitPublishingState
 from reservations.enums import ReservationStateChoice, ReservationTypeChoice
-from terms_of_use.models import TermsOfUse
 from tests.factories import (
     ApplicationRoundFactory,
     ApplicationRoundTimeSlotFactory,
@@ -28,6 +27,7 @@ from tests.factories import (
     TermsOfUseFactory,
     UserFactory,
 )
+from tilavarauspalvelu.enums import TermsOfUseTypeChoices
 
 from .helpers import reservation_unit_query, reservation_units_query
 
@@ -266,10 +266,10 @@ def test_reservation_unit__query__all_to_one_relations(graphql):
     reservation_unit = ReservationUnitFactory.create(
         cancellation_rule=ReservationUnitCancellationRuleFactory.create(),
         metadata_set=ReservationMetadataSetFactory.create(),
-        cancellation_terms=TermsOfUseFactory.create(terms_type=TermsOfUse.TERMS_TYPE_CANCELLATION),
-        service_specific_terms=TermsOfUseFactory.create(terms_type=TermsOfUse.TERMS_TYPE_SERVICE),
-        pricing_terms=TermsOfUseFactory.create(terms_type=TermsOfUse.TERMS_TYPE_PRICING),
-        payment_terms=TermsOfUseFactory.create(terms_type=TermsOfUse.TERMS_TYPE_PAYMENT),
+        cancellation_terms=TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.CANCELLATION),
+        service_specific_terms=TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.SERVICE),
+        pricing_terms=TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PRICING),
+        payment_terms=TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PAYMENT),
         payment_product=PaymentProductFactory.create(),
         payment_merchant=PaymentMerchantFactory.create(),
     )

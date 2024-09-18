@@ -67,7 +67,7 @@ class ApplicationRound(models.Model):
         related_name="application_rounds",
     )
     terms_of_use = models.ForeignKey(
-        "terms_of_use.TermsOfUse",
+        "tilavarauspalvelu.TermsOfUse",
         null=True,
         blank=False,
         on_delete=models.SET_NULL,

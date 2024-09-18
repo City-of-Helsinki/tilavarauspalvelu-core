@@ -7,7 +7,8 @@ from applications.enums import WeekdayChoice
 from applications.models import ApplicationRoundTimeSlot
 from applications.validators import validate_string_time
 from reservation_units.models import ReservationUnit
-from terms_of_use.models import TermsOfUse
+from tilavarauspalvelu.enums import TermsOfUseTypeChoices
+from tilavarauspalvelu.models import TermsOfUse
 
 
 def remove_empty_timeslots(timeslots: list[dict[str, str]]) -> None:
@@ -48,10 +49,10 @@ class ApplicationRoundTimeSlotForm(forms.ModelForm):
 class ReservationUnitAdminForm(forms.ModelForm):
     def __init__(self, *args, **kwargs) -> None:
         qs = TermsOfUse.objects.all()
-        self.base_fields["pricing_terms"].queryset = qs.filter(terms_type=TermsOfUse.TERMS_TYPE_PRICING)
-        self.base_fields["payment_terms"].queryset = qs.filter(terms_type=TermsOfUse.TERMS_TYPE_PAYMENT)
-        self.base_fields["cancellation_terms"].queryset = qs.filter(terms_type=TermsOfUse.TERMS_TYPE_CANCELLATION)
-        self.base_fields["service_specific_terms"].queryset = qs.filter(terms_type=TermsOfUse.TERMS_TYPE_SERVICE)
+        self.base_fields["pricing_terms"].queryset = qs.filter(terms_type=TermsOfUseTypeChoices.PRICING)
+        self.base_fields["payment_terms"].queryset = qs.filter(terms_type=TermsOfUseTypeChoices.PAYMENT)
+        self.base_fields["cancellation_terms"].queryset = qs.filter(terms_type=TermsOfUseTypeChoices.CANCELLATION)
+        self.base_fields["service_specific_terms"].queryset = qs.filter(terms_type=TermsOfUseTypeChoices.SERVICE)
         super().__init__(*args, **kwargs)
 
     class Meta:

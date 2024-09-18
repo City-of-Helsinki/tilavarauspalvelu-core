@@ -9,7 +9,8 @@ from applications.enums import ApplicationRoundStatusChoice
 from applications.models import ApplicationRound
 from common.fields.forms import disabled_widget
 from reservation_units.models import ReservationUnit
-from terms_of_use.models import TermsOfUse
+from tilavarauspalvelu.enums import TermsOfUseTypeChoices
+from tilavarauspalvelu.models import TermsOfUse
 
 
 class ApplicationRoundAdminForm(forms.ModelForm):
@@ -41,7 +42,7 @@ class ApplicationRoundAdminForm(forms.ModelForm):
             kwargs["initial"]["status"] = ApplicationRoundStatusChoice(instance.status).label
         self.base_fields["reservation_units"].queryset = ReservationUnit.objects.select_related("unit").all()
         self.base_fields["terms_of_use"].queryset = TermsOfUse.objects.filter(
-            terms_type=TermsOfUse.TERMS_TYPE_RECURRING
+            terms_type=TermsOfUseTypeChoices.RECURRING
         )
         super().__init__(*args, **kwargs)
 

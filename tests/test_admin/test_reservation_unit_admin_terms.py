@@ -5,8 +5,8 @@ from django.test import RequestFactory
 from reservation_units.admin.reservation_unit.admin import ReservationUnitAdmin
 from reservation_units.enums import ReservationKind, ReservationStartInterval
 from reservation_units.models import ReservationUnit
-from terms_of_use.models import TermsOfUse
 from tests.factories import ReservationUnitFactory, TermsOfUseFactory
+from tilavarauspalvelu.enums import TermsOfUseTypeChoices
 
 # Applied to all tests
 pytestmark = [
@@ -27,7 +27,7 @@ def get_valid_data():
 def test_reservation_unit_admin__terms_validation__pricing_terms__accepts_type_pricing():
     reservation_unit = ReservationUnitFactory.create()
 
-    pricing_terms = TermsOfUseFactory.create(terms_type=TermsOfUse.TERMS_TYPE_PRICING)
+    pricing_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PRICING)
 
     request = RequestFactory().get(f"/admin/reservation_units/reservationunit/{reservation_unit.id}/change/")
 
@@ -44,7 +44,7 @@ def test_reservation_unit_admin__terms_validation__pricing_terms__accepts_type_p
 def test_reservation_unit_admin__terms_validation__pricing_terms__errors_when_type_not_pricing():
     reservation_unit = ReservationUnitFactory.create()
 
-    wrong_terms = TermsOfUseFactory.create(terms_type=TermsOfUse.TERMS_TYPE_GENERIC)
+    wrong_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.GENERIC)
 
     request = RequestFactory().get(f"/admin/reservation_units/reservationunit/{reservation_unit.id}/change/")
 
@@ -61,7 +61,7 @@ def test_reservation_unit_admin__terms_validation__pricing_terms__errors_when_ty
 def test_reservation_unit_admin__terms_validation__payment_terms__accepts_type_payment():
     reservation_unit = ReservationUnitFactory.create()
 
-    payment_terms = TermsOfUseFactory.create(terms_type=TermsOfUse.TERMS_TYPE_PAYMENT)
+    payment_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PAYMENT)
 
     request = RequestFactory().get(f"/admin/reservation_units/reservationunit/{reservation_unit.id}/change/")
 
@@ -78,7 +78,7 @@ def test_reservation_unit_admin__terms_validation__payment_terms__accepts_type_p
 def test_reservation_unit_admin__terms_validation__payment_terms__errors_when_type_not_payment():
     reservation_unit = ReservationUnitFactory.create()
 
-    wrong_terms = TermsOfUseFactory.create(terms_type=TermsOfUse.TERMS_TYPE_GENERIC)
+    wrong_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.GENERIC)
 
     request = RequestFactory().get(f"/admin/reservation_units/reservationunit/{reservation_unit.id}/change/")
 
@@ -95,7 +95,7 @@ def test_reservation_unit_admin__terms_validation__payment_terms__errors_when_ty
 def test_reservation_unit_admin__terms_validation__cancellation_terms__accepts_type_cancellation():
     reservation_unit = ReservationUnitFactory.create()
 
-    cancellation_terms = TermsOfUseFactory.create(terms_type=TermsOfUse.TERMS_TYPE_CANCELLATION)
+    cancellation_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.CANCELLATION)
 
     request = RequestFactory().get(f"/admin/reservation_units/reservationunit/{reservation_unit.id}/change/")
 
@@ -112,7 +112,7 @@ def test_reservation_unit_admin__terms_validation__cancellation_terms__accepts_t
 def test_reservation_unit_admin__terms_validation__cancellation_terms__errors_when_type_not_cancellation():
     reservation_unit = ReservationUnitFactory.create()
 
-    wrong_terms = TermsOfUseFactory.create(terms_type=TermsOfUse.TERMS_TYPE_GENERIC)
+    wrong_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.GENERIC)
 
     request = RequestFactory().get(f"/admin/reservation_units/reservationunit/{reservation_unit.id}/change/")
 
@@ -129,7 +129,7 @@ def test_reservation_unit_admin__terms_validation__cancellation_terms__errors_wh
 def test_reservation_unit_admin__terms_validation__service_specific_terms__accepts_type_service():
     reservation_unit = ReservationUnitFactory.create()
 
-    service_specific_terms = TermsOfUseFactory.create(terms_type=TermsOfUse.TERMS_TYPE_SERVICE)
+    service_specific_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.SERVICE)
 
     request = RequestFactory().get(f"/admin/reservation_units/reservationunit/{reservation_unit.id}/change/")
 
@@ -146,7 +146,7 @@ def test_reservation_unit_admin__terms_validation__service_specific_terms__accep
 def test_reservation_unit_admin__terms_validation__service_specific_terms__errors_when_type_not_service():
     reservation_unit = ReservationUnitFactory.create()
 
-    wrong_terms = TermsOfUseFactory.create(terms_type=TermsOfUse.TERMS_TYPE_GENERIC)
+    wrong_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.GENERIC)
 
     request = RequestFactory().get(f"/admin/reservation_units/reservationunit/{reservation_unit.id}/change/")
 
