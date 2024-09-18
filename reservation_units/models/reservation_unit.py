@@ -30,8 +30,7 @@ if TYPE_CHECKING:
     from reservation_units.models import ReservationUnitCancellationRule, ReservationUnitType
     from reservations.models import ReservationMetadataSet
     from spaces.models import Unit
-    from terms_of_use.models import TermsOfUse
-
+    from tilavarauspalvelu.models import TermsOfUse
 
 __all__ = [
     "ReservationUnit",
@@ -150,28 +149,28 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
         on_delete=models.SET_NULL,
     )
     cancellation_terms: TermsOfUse | None = models.ForeignKey(
-        "terms_of_use.TermsOfUse",
+        "tilavarauspalvelu.TermsOfUse",
         related_name="cancellation_terms_reservation_unit",
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
     )
     service_specific_terms: TermsOfUse | None = models.ForeignKey(
-        "terms_of_use.TermsOfUse",
+        "tilavarauspalvelu.TermsOfUse",
         related_name="service_specific_terms_reservation_unit",
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
     )
     pricing_terms: TermsOfUse | None = models.ForeignKey(
-        "terms_of_use.TermsOfUse",
+        "tilavarauspalvelu.TermsOfUse",
         related_name="pricing_terms_reservation_unit",
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
     )
     payment_terms: TermsOfUse | None = models.ForeignKey(
-        "terms_of_use.TermsOfUse",
+        "tilavarauspalvelu.TermsOfUse",
         related_name="payment_terms_reservation_unit",
         blank=True,
         null=True,

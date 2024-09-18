@@ -147,7 +147,7 @@ class Common(Environment):
     TEMPLATES = [
         {
             "BACKEND": "django_jinja.jinja2.Jinja2",
-            "DIRS": [],
+            "DIRS": [BASE_DIR / "templates"],
             "APP_DIRS": True,
         },
         {

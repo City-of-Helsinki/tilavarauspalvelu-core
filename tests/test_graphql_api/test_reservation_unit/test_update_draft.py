@@ -5,8 +5,8 @@ from django.contrib.contenttypes.models import ContentType
 from config.utils.auditlog_util import AuditLogger
 from reservation_units.enums import AuthenticationType
 from reservation_units.models import ReservationUnit
-from terms_of_use.models import TermsOfUse
 from tests.factories import ReservationMetadataSetFactory, ReservationUnitFactory, TermsOfUseFactory
+from tilavarauspalvelu.enums import TermsOfUseTypeChoices
 
 from .helpers import UPDATE_MUTATION, get_draft_update_input_data
 
@@ -63,9 +63,9 @@ def test_reservation_unit__update__metadata_set__null(graphql):
 def test_reservation_unit__update__terms_of_use(graphql):
     graphql.login_with_superuser()
 
-    payment_terms = TermsOfUseFactory.create(terms_type=TermsOfUse.TERMS_TYPE_PAYMENT)
-    cancellation_terms = TermsOfUseFactory.create(terms_type=TermsOfUse.TERMS_TYPE_CANCELLATION)
-    service_specific_terms = TermsOfUseFactory.create(terms_type=TermsOfUse.TERMS_TYPE_SERVICE)
+    payment_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PAYMENT)
+    cancellation_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.CANCELLATION)
+    service_specific_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.SERVICE)
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
     data = get_draft_update_input_data(
         reservation_unit,

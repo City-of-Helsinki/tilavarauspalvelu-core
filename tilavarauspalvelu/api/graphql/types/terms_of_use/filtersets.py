@@ -1,7 +1,7 @@
 from django_filters import MultipleChoiceFilter
 from graphene_django_extensions import ModelFilterSet
 
-from terms_of_use.models import TermsOfUse
+from tilavarauspalvelu.models import TermsOfUse
 
 __all__ = [
     "TermsOfUseFilterSet",

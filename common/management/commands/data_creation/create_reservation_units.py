@@ -30,8 +30,8 @@ from reservation_units.models import (
 from reservations.models import ReservationMetadataSet
 from resources.models import Resource
 from spaces.models import Unit
-from terms_of_use.models import TermsOfUse
-from tilavarauspalvelu.models import Service
+from tilavarauspalvelu.enums import TermsOfUseTypeChoices
+from tilavarauspalvelu.models import Service, TermsOfUse
 
 from .create_seasonal_booking import _create_application_round_time_slots
 from .utils import (
@@ -117,7 +117,7 @@ def _create_reservation_units(
             authentication=weighted_choice(AuthenticationType.values, weights=[2, 1]),
             can_apply_free_of_charge=can_apply_free_of_charge,
             cancellation_rule=next(cancellation_rules_loop),
-            cancellation_terms=terms_of_use[TermsOfUse.TERMS_TYPE_CANCELLATION],
+            cancellation_terms=terms_of_use[TermsOfUseTypeChoices.CANCELLATION.value],
             contact_information=faker_fi.text(),
             description=description.fi,
             description_en=description.en,
@@ -137,8 +137,8 @@ def _create_reservation_units(
             name_fi=f"{name} FI",
             name_sv=f"{name} SV",
             origin_hauki_resource=random.choice(hauki_resources),
-            payment_terms=terms_of_use[TermsOfUse.TERMS_TYPE_PAYMENT],
-            pricing_terms=terms_of_use[TermsOfUse.TERMS_TYPE_PRICING],
+            payment_terms=terms_of_use[TermsOfUseTypeChoices.PAYMENT.value],
+            pricing_terms=terms_of_use[TermsOfUseTypeChoices.PRICING.value],
             rank=i,
             reservation_begins=datetime(2021, 1, 1, tzinfo=UTC),
             reservation_cancelled_instructions=cancelled.fi,
@@ -158,7 +158,7 @@ def _create_reservation_units(
             reservation_unit_type=next(reservation_unit_types_loop),
             reservations_max_days_before=max_before,
             reservations_min_days_before=min_before,
-            service_specific_terms=terms_of_use[TermsOfUse.TERMS_TYPE_SERVICE],
+            service_specific_terms=terms_of_use[TermsOfUseTypeChoices.SERVICE.value],
             surface_area=random.randint(10, 1000),
             terms_of_use=terms.fi,
             terms_of_use_en=terms.en,
@@ -397,7 +397,7 @@ def _create_terms_of_use() -> dict[str, TermsOfUse]:
             text_fi=text_fi,
             text_sv=text_sv,
             text_en=text_en,
-            terms_type=TermsOfUse.TERMS_TYPE_GENERIC,
+            terms_type=TermsOfUseTypeChoices.GENERIC,
         )
 
     #
@@ -405,11 +405,11 @@ def _create_terms_of_use() -> dict[str, TermsOfUse]:
     #
     terms_of_use: list[TermsOfUse] = []
     term_types: list[str] = [
-        TermsOfUse.TERMS_TYPE_PAYMENT,
-        TermsOfUse.TERMS_TYPE_CANCELLATION,
-        TermsOfUse.TERMS_TYPE_RECURRING,
-        TermsOfUse.TERMS_TYPE_SERVICE,
-        TermsOfUse.TERMS_TYPE_PRICING,
+        TermsOfUseTypeChoices.PAYMENT.value,
+        TermsOfUseTypeChoices.CANCELLATION.value,
+        TermsOfUseTypeChoices.RECURRING.value,
+        TermsOfUseTypeChoices.SERVICE.value,
+        TermsOfUseTypeChoices.PRICING.value,
     ]
     for term_type in term_types:
         name = term_type.replace("_", " ").title()

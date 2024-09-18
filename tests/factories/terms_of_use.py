@@ -1,7 +1,8 @@
 import factory
 from factory import fuzzy
 
-from terms_of_use.models import TermsOfUse
+from tilavarauspalvelu.enums import TermsOfUseTypeChoices
+from tilavarauspalvelu.models import TermsOfUse
 
 from ._base import GenericDjangoModelFactory
 
@@ -17,4 +18,4 @@ class TermsOfUseFactory(GenericDjangoModelFactory[TermsOfUse]):
     id = factory.Sequence(lambda n: f"terms-{n}")
     name = fuzzy.FuzzyText()
     text = fuzzy.FuzzyText()
-    terms_type = fuzzy.FuzzyChoice([terms_type for terms_type, _ in TermsOfUse.TERMS_TYPES])
+    terms_type = fuzzy.FuzzyChoice(TermsOfUseTypeChoices.values)

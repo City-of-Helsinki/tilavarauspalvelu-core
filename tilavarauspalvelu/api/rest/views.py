@@ -10,7 +10,7 @@ from django.views.decorators.http import require_GET
 from common.pdf import render_to_pdf
 from common.utils import ical_hmac_signature
 from reservations.models import Reservation
-from terms_of_use.models import TermsOfUse
+from tilavarauspalvelu.models import TermsOfUse
 
 __all__ = [
     "reservation_ical",

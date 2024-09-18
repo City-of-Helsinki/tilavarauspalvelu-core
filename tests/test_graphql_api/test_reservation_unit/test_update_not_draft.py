@@ -2,8 +2,8 @@ import pytest
 
 from merchants.enums import PaymentType
 from reservation_units.enums import ReservationStartInterval
-from terms_of_use.models import TermsOfUse
 from tests.factories import ReservationUnitCancellationRuleFactory, ReservationUnitFactory, TermsOfUseFactory
+from tilavarauspalvelu.enums import TermsOfUseTypeChoices
 
 from .helpers import UPDATE_MUTATION, get_non_draft_update_input_data
 
@@ -214,7 +214,7 @@ def test_reservation_unit__update__pricing_terms(graphql):
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=False)
-    pricing_terms = TermsOfUseFactory.create(terms_type=TermsOfUse.TERMS_TYPE_PRICING)
+    pricing_terms = TermsOfUseFactory.create(terms_type=TermsOfUseTypeChoices.PRICING)
     data = get_non_draft_update_input_data(reservation_unit, pricingTerms=pricing_terms.pk)
 
     response = graphql(UPDATE_MUTATION, input_data=data)

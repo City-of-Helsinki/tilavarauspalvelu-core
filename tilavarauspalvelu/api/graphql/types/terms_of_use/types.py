@@ -1,7 +1,7 @@
 import graphene
 from graphene_django_extensions import DjangoNode
 
-from terms_of_use.models import TermsOfUse
+from tilavarauspalvelu.models import TermsOfUse
 
 from .filtersets import TermsOfUseFilterSet
 from .permissions import TermsOfUsePermission
