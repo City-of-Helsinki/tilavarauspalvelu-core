@@ -39,23 +39,23 @@ msgstr ""
 msgid "My bookings"
 msgstr "Mina bokningar"
 
-#: api/gdpr/views.py
+#: tilavarauspalvelu/api/gdpr/views.py
 msgid "User has upcoming or too recent reservations."
 msgstr ""
 
-#: api/gdpr/views.py
+#: tilavarauspalvelu/api/gdpr/views.py
 msgid "User has an unhandled application."
 msgstr ""
 
-#: api/gdpr/views.py
+#: tilavarauspalvelu/api/gdpr/views.py
 msgid "User has open payments."
 msgstr ""
 
-#: api/graphql/extensions/fields.py
+#: tilavarauspalvelu/api/graphql/extensions/fields.py
 msgid "A valid integer is required."
 msgstr ""
 
-#: api/graphql/extensions/fields.py
+#: tilavarauspalvelu/api/graphql/extensions/fields.py
 #, python-format
 msgid ""
 "Choice \"%(choice)s\" is not allowed. Allowed choices are: "

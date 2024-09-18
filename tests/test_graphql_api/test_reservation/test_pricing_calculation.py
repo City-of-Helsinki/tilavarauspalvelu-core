@@ -3,10 +3,10 @@ from decimal import Decimal
 
 import pytest
 
-from api.graphql.types.reservation.serializers.mixins import ReservationPriceMixin
 from common.date_utils import local_datetime
 from reservation_units.enums import PriceUnit, PricingStatus, PricingType
 from tests.factories import ReservationUnitFactory, ReservationUnitPricingFactory
+from tilavarauspalvelu.api.graphql.types.reservation.serializers.mixins import ReservationPriceMixin
 
 # Applied to all tests
 pytestmark = [

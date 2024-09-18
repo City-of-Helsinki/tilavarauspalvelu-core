@@ -5,9 +5,9 @@ from django.urls import include, path, re_path, reverse
 from django.views.decorators.csrf import csrf_exempt
 from graphene_django_extensions import FileUploadGraphQLView
 
-from api.gdpr.views import TilavarauspalveluGDPRAPIView
-from api.rest.views import csrf_view, reservation_ical, terms_of_use_pdf
-from api.webhooks.urls import webhook_router
+from tilavarauspalvelu.api.gdpr.views import TilavarauspalveluGDPRAPIView
+from tilavarauspalvelu.api.rest.views import csrf_view, reservation_ical, terms_of_use_pdf
+from tilavarauspalvelu.api.webhooks.urls import webhook_router
 
 # Mock the `each_context` method to add some custom context variables.
 original_each_context = admin.site.each_context
@@ -34,7 +34,7 @@ urlpatterns = [
     path("v1/terms_of_use_pdf/", terms_of_use_pdf, name="terms_of_use_pdf"),
     path("v1/webhook/", include(webhook_router.urls)),
     path("pysocial/", include("social_django.urls", namespace="social")),
-    path("helauth/", include("api.helauth.urls")),
+    path("helauth/", include("tilavarauspalvelu.api.helauth.urls")),
     re_path(
         # GDPR UUID's are v1, not v4!
         r"gdpr/v1/user/(?P<uuid>[\da-fA-F]{8}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{12})/?$",

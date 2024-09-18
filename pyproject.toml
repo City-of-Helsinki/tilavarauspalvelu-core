@@ -91,7 +91,6 @@ unsafe-fixes = true
 line-length = 120
 target-version = "py312"
 extend-exclude = [
-    "api/examples.py",
     "build",
     "local_settings.py",
     "migrations",
@@ -211,11 +210,11 @@ lint.ignore = [
 "utils/query_performance.py" = [
     "PLR0912",  # This one is allowed to be as complex as it needs to be.
 ]
-"api/webhooks/serializers.py" = [
+"tilavarauspalvelu/api/webhooks/serializers.py" = [
     "N802",     # Allow non-lowercase function names for webhook serializers.
     "N815",     # Allow mixedCase variables for webhook serializers.
 ]
-"api/graphql/extensions/error_codes.py" = [
+"tilavarauspalvelu/api/graphql/extensions/error_codes.py" = [
     "ERA001",   # Commented code is fine here.
 ]
 "test_*.py" = [
@@ -342,7 +341,6 @@ filterwarnings = [
 [tool.coverage.run]
 source = [
     "allocation/",
-    "api/",
     "applications/",
     "email_notification/",
     "merchants/",

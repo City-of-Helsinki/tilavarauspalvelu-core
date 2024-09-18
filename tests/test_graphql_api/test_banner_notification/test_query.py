@@ -4,9 +4,9 @@ import pytest
 from graphene_django_extensions.testing.utils import parametrize_helper
 from graphql_relay import to_global_id
 
-from api.graphql.types.banner_notification.types import BannerNotificationNode
 from common.enums import BannerNotificationTarget
 from tests.factories import BannerNotificationFactory, UserFactory
+from tilavarauspalvelu.api.graphql.types.banner_notification.types import BannerNotificationNode
 
 # Applied to all tests
 pytestmark = [

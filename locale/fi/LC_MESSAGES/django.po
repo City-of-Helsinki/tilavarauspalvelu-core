@@ -39,23 +39,23 @@ msgstr ""
 msgid "My bookings"
 msgstr "Omat Varaukset"
 
-#: api/gdpr/views.py
+#: tilavarauspalvelu/api/gdpr/views.py
 msgid "User has upcoming or too recent reservations."
 msgstr "Käyttäjällä on tulevia tai liian äskettäisiä varauksia."
 
-#: api/gdpr/views.py
+#: tilavarauspalvelu/api/gdpr/views.py
 msgid "User has an unhandled application."
 msgstr "Käyttäjällä on käsittelemätön hakemus."
 
-#: api/gdpr/views.py
+#: tilavarauspalvelu/api/gdpr/views.py
 msgid "User has open payments."
 msgstr "Käyttäjällä on avoimia maksuja."
 
-#: api/graphql/extensions/fields.py
+#: tilavarauspalvelu/api/graphql/extensions/fields.py
 msgid "A valid integer is required."
 msgstr "Syötä oikea kokonaisluku."
 
-#: api/graphql/extensions/fields.py
+#: tilavarauspalvelu/api/graphql/extensions/fields.py
 #, python-format
 msgid ""
 "Choice \"%(choice)s\" is not allowed. Allowed choices are: "

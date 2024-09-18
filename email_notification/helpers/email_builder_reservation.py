@@ -191,7 +191,7 @@ class ReservationEmailContext(BaseEmailContext):
 
     @staticmethod
     def _get_reservation_subsidised_price(reservation: Reservation) -> Decimal:
-        from api.graphql.types.reservation.serializers.mixins import ReservationPriceMixin
+        from tilavarauspalvelu.api.graphql.types.reservation.serializers.mixins import ReservationPriceMixin
 
         if not reservation.applying_for_free_of_charge:
             return reservation.price
