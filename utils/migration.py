@@ -1,9 +1,13 @@
-from django.db import migrations
+import os
+
+from django.db import migrations, models
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
+from django.db.migrations.recorder import MigrationRecorder
 from django.db.migrations.state import ProjectState
 
 __all__ = [
     "AlterModelTable",
+    "TestOnlyRunBefore",
 ]
 
 
@@ -73,3 +77,41 @@ class AlterModelTable(migrations.AlterModelTable):
         with schema_editor.connection.cursor() as cursor:
             cursor.execute(sql, [table_name])
             return cursor.fetchone()[0]
+
+
+class TestOnlyRunBefore:
+    """
+    During testing, we need to make sure that any migrations using the 'RunPython'-migration
+    run after any migrations that migrate models from one app to another, so that the Django
+    migration schema stays consistent. This can happen e.g. when migrations are run from zero
+    ("--create-db") or from a previous branch where some migrations have already been run ("--reuse-db").
+    """
+
+    def __init__(self, run_before: list[tuple[str, str]]) -> None:
+        self.run_before = run_before
+
+    def __get__(self, instance: object, owner: type) -> list[tuple[str, str]]:
+        if os.environ["DJANGO_SETTINGS_ENVIRONMENT"] != "AutomatedTests":
+            return []
+
+        migration_model: type[models.Model] = MigrationRecorder.Migration
+
+        try:
+            migration_model.objects.exists()
+        except Exception:
+            # If creating database from zero, even the migrations table doesn't exist yet.
+            return self.run_before
+
+        to_run: list[tuple[str, str]] = []
+
+        # Check if all the migrations that need to be run before this one are already run.
+        # If not, add this migration as a dependency to those migrations that haven't been run yet.
+        for app, name in self.run_before:
+            migration: models.Model | None = migration_model.objects.filter(app=app, name=name).first()
+            if migration is None:
+                to_run.append((app, name))
+
+        return to_run
+
+    def __set__(self, instance: object, value: list[tuple[str, str]]) -> None:
+        self.run_before = value
