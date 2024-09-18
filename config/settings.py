@@ -80,6 +80,7 @@ class Common(Environment):
         "tinymce",
         "subforms",
         # Our apps
+        "tilavarauspalvelu",
         "common",
         "users",
         "applications",
