@@ -11,10 +11,10 @@ from terms_of_use.models import TermsOfUse
 
 
 def remove_empty_timeslots(timeslots: list[dict[str, str]]) -> None:
-    # Iterate in reverse order so that items can be deleted without affecting the loop
-    for i, timeslot in enumerate(reversed(timeslots)):
-        if timeslot == {"begin": "", "end": ""}:
-            del timeslots[i]
+    empty_timeslot = {"begin": "", "end": ""}
+
+    while empty_timeslot in timeslots:
+        timeslots.remove(empty_timeslot)
 
 
 class TimeslotForm(forms.Form):
