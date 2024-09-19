@@ -1,8 +1,8 @@
 import pytest
 
-from permissions.enums import UserRoleChoice
 from tests.factories import AllocatedTimeSlotFactory
 from tests.test_graphql_api.test_application.helpers import applications_query
+from tilavarauspalvelu.enums import UserRoleChoice
 
 from .helpers import allocations_query
 

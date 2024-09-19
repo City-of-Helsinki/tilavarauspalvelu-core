@@ -2,7 +2,6 @@ import pytest
 from auditlog.models import LogEntry
 from social_django.models import UserSocialAuth
 
-from permissions.models import GeneralRole, UnitRole
 from tests.factories import (
     AddressFactory,
     ApplicationFactory,
@@ -13,6 +12,7 @@ from tests.factories import (
     UserSocialAuthFactory,
 )
 from tilavarauspalvelu.enums import ReservationNotification
+from tilavarauspalvelu.models import GeneralRole, UnitRole
 from tilavarauspalvelu.utils.anonymisation import (
     ANONYMIZED,
     SENSITIVE_APPLICATION,

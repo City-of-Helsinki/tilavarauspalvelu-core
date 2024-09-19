@@ -5,7 +5,13 @@ import graphene_django_extensions.fields.model
 from django.conf import settings
 from django.db import migrations, models
 
-import permissions.enums
+
+class UserRoleChoice(models.TextChoices):
+    ADMIN = "ADMIN", "Admin"
+    HANDLER = "HANDLER", "Handler"
+    VIEWER = "VIEWER", "Viewer"
+    RESERVER = "RESERVER", "Reserver"
+    NOTIFICATION_MANAGER = "NOTIFICATION_MANAGER", "Notification manager"
 
 
 class Migration(migrations.Migration):
@@ -38,7 +44,7 @@ class Migration(migrations.Migration):
                             ("RESERVER", "Reserver"),
                             ("NOTIFICATION_MANAGER", "Notification manager"),
                         ],
-                        enum=permissions.enums.UserRoleChoice,
+                        enum=UserRoleChoice,
                         max_length=20,
                     ),
                 ),
@@ -97,7 +103,7 @@ class Migration(migrations.Migration):
                             ("RESERVER", "Reserver"),
                             ("NOTIFICATION_MANAGER", "Notification manager"),
                         ],
-                        enum=permissions.enums.UserRoleChoice,
+                        enum=UserRoleChoice,
                         max_length=20,
                     ),
                 ),

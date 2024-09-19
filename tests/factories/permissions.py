@@ -1,7 +1,7 @@
 import factory
 
-from permissions.enums import UserRoleChoice
-from permissions.models import GeneralRole, UnitRole
+from tilavarauspalvelu.enums import UserRoleChoice
+from tilavarauspalvelu.models import GeneralRole, UnitRole
 
 from ._base import GenericDjangoModelFactory, ManyToManyFactory
 

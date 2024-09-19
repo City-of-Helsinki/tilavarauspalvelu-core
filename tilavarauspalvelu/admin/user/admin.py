@@ -4,8 +4,7 @@ from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
 from common.date_utils import DEFAULT_TIMEZONE, local_datetime
-from permissions.models import GeneralRole, UnitRole
-from tilavarauspalvelu.models import User
+from tilavarauspalvelu.models import GeneralRole, UnitRole, User
 from tilavarauspalvelu.utils.anonymisation import anonymize_user_data
 from tilavarauspalvelu.utils.helauth.typing import LoginMethod
 

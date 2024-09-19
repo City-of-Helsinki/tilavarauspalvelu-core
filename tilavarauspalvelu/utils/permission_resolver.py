@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Self
 from django.db.models import Q
 
 from common.date_utils import local_datetime
-from permissions.enums import UserPermissionChoice, UserRoleChoice
+from tilavarauspalvelu.enums import UserPermissionChoice, UserRoleChoice
 
 if TYPE_CHECKING:
     from collections.abc import Container, Iterable

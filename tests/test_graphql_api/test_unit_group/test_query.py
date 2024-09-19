@@ -1,8 +1,8 @@
 import pytest
 from graphene_django_extensions.testing import build_query
 
-from permissions.enums import UserRoleChoice
 from tests.factories import UnitFactory, UnitGroupFactory
+from tilavarauspalvelu.enums import UserRoleChoice
 
 # Applied to all tests
 pytestmark = [

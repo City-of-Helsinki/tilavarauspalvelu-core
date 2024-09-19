@@ -6,9 +6,8 @@ from query_optimizer import ManuallyOptimizedField
 from query_optimizer.optimizer import QueryOptimizer
 
 from common.typing import AnyUser, GQLInfo
-from permissions.enums import UserPermissionChoice
-from permissions.models import GeneralRole, UnitRole
-from tilavarauspalvelu.models import Unit, UnitGroup
+from tilavarauspalvelu.enums import UserPermissionChoice
+from tilavarauspalvelu.models import GeneralRole, Unit, UnitGroup, UnitRole
 
 __all__ = [
     "GeneralRoleNode",

@@ -12,18 +12,17 @@ from helsinki_gdpr.models import SerializableMixin
 from helusers.models import AbstractUser
 
 from common.date_utils import DEFAULT_TIMEZONE
-from permissions.enums import UserPermissionChoice, UserRoleChoice
-from permissions.permission_resolver import PermissionResolver
-from tilavarauspalvelu.enums import ReservationNotification
+from tilavarauspalvelu.enums import ReservationNotification, UserPermissionChoice, UserRoleChoice
 from tilavarauspalvelu.utils.helauth.typing import ExtraData, IDToken
 from tilavarauspalvelu.utils.helauth.utils import get_jwt_payload
+from tilavarauspalvelu.utils.permission_resolver import PermissionResolver
 
 from .queryset import UserManager
 
 if TYPE_CHECKING:
     from social_django.models import UserSocialAuth
 
-    from permissions.models import UnitRole
+    from tilavarauspalvelu.models import UnitRole
 
     from .actions import UserActions
 

@@ -10,7 +10,7 @@ from applications.models import Application, ApplicationSection
 from applications.querysets.application import ApplicationQuerySet
 from applications.querysets.application_section import ApplicationSectionQuerySet
 from common.typing import GQLInfo
-from permissions.enums import UserRoleChoice
+from tilavarauspalvelu.enums import UserRoleChoice
 from tilavarauspalvelu.models import User
 
 from .filtersets import ApplicationSectionFilterSet

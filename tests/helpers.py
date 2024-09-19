@@ -6,7 +6,7 @@ from unittest import mock
 from django.contrib.auth import get_user_model
 from graphene_django_extensions.testing import GraphQLClient as BaseGraphQLClient
 
-from permissions.enums import UserRoleChoice
+from tilavarauspalvelu.enums import UserRoleChoice
 
 __all__ = [
     "GraphQLClient",

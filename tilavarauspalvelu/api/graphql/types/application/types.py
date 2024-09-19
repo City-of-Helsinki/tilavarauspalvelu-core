@@ -10,9 +10,9 @@ from applications.enums import ApplicationStatusChoice
 from applications.models import Application, ApplicationRound
 from applications.querysets.application import ApplicationQuerySet
 from common.typing import GQLInfo
-from permissions.enums import UserRoleChoice
 from tilavarauspalvelu.api.graphql.types.application_section.types import ApplicationSectionNode
 from tilavarauspalvelu.api.graphql.types.user.types import ApplicantNode
+from tilavarauspalvelu.enums import UserRoleChoice
 from tilavarauspalvelu.models import User
 
 from .filtersets import ApplicationFilterSet

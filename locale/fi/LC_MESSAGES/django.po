@@ -1497,53 +1497,6 @@ msgstr "Siivoustauko/huoltotauko"
 msgid "`start_datetime` must be before `end_datetime`."
 msgstr "`start_datetime` täytyy olla ennen `end_datetime`."
 
-#: permissions/admin/general_role.py
-msgid "Search by username, email, first name or last name"
-msgstr "Etsi käyttäjänimellä, sähköpostilla, etu- tai sukunimellä"
-
-#: permissions/admin/unit_role.py
-msgid ""
-"Search by user's username, email, first name, last name, unit or unit group"
-msgstr ""
-"Etsi käyttäjänimellä, sähköpostilla, etu- tai sukunimellä, toimipisteellä "
-"tai yksikköryhmällä"
-
-#: permissions/enums.py
-msgid "Admin"
-msgstr "Pääkäyttäjä"
-
-#: permissions/enums.py
-msgid "Handler"
-msgstr "Käsittelijä"
-
-#: permissions/enums.py
-msgid "Viewer"
-msgstr "Katselija"
-
-#: permissions/enums.py
-msgid "Reserver"
-msgstr "Varaaja"
-
-#: permissions/enums.py
-msgid "Notification manager"
-msgstr "Ilmoituksen hallitsija."
-
-#: permissions/models/general_role.py
-msgid "General role"
-msgstr "Yleinen rooli"
-
-#: permissions/models/general_role.py
-msgid "General roles"
-msgstr "Yleiset roolit"
-
-#: permissions/models/unit_role.py
-msgid "Unit role"
-msgstr "Toimipistekohtainen rooli"
-
-#: permissions/models/unit_role.py
-msgid "Unit roles"
-msgstr "Toimipistekohtaiset roolit"
-
 #: reservation_units/admin/reservation_unit/admin.py
 msgid "Search by ID, name, unit name, or service sector name"
 msgstr "Etsi ID:llä, nimellä, toimipisteen nimellä tai palvelualueen nimellä"
@@ -2883,6 +2836,10 @@ msgstr "Ei, vie minut takaisin"
 msgid "Reset allocations"
 msgstr "Nollaa allokoinnit"
 
+#: tilavarauspalvelu/admin/general_role/admin.py
+msgid "Search by username, email, first name or last name"
+msgstr "Etsi käyttäjänimellä, sähköpostilla, etu- tai sukunimellä"
+
 #: tilavarauspalvelu/admin/payment_merchant/admin.py
 msgid "The Paytrail Merchant ID should be a six-digit number."
 msgstr "Kaupan paytrail-tunnuksen tulisi olla kuusinumeroinen."
@@ -3015,6 +2972,13 @@ msgstr "Etsi nimellä tai TPREK ID:llä"
 msgid "Search by name"
 msgstr "Etsi nimellä"
 
+#: tilavarauspalvelu/admin/unit_role/admin.py
+msgid ""
+"Search by user's username, email, first name, last name, unit or unit group"
+msgstr ""
+"Etsi käyttäjänimellä, sähköpostilla, etu- tai sukunimellä, toimipisteellä "
+"tai yksikköryhmällä"
+
 #: tilavarauspalvelu/api/gdpr/views.py
 msgid "User has upcoming or too recent reservations."
 msgstr "Käyttäjällä on tulevia tai liian äskettäisiä varauksia."
@@ -3104,7 +3068,6 @@ msgid "Free"
 msgstr "Maksuton"
 
 #: tilavarauspalvelu/enums.py
-
 msgctxt "ResourceLocationType"
 msgid "Fixed"
 msgstr "Kiinteä"
@@ -3113,6 +3076,34 @@ msgstr "Kiinteä"
 msgctxt "ResourceLocationType"
 msgid "Movable"
 msgstr "Siirrettävä"
+
+#: tilavarauspalvelu/enums.py
+msgid "Admin"
+msgstr "Pääkäyttäjä"
+
+#: tilavarauspalvelu/enums.py
+msgid "Handler"
+msgstr "Käsittelijä"
+
+#: tilavarauspalvelu/enums.py
+msgid "Viewer"
+msgstr "Katselija"
+
+#: tilavarauspalvelu/enums.py
+msgid "Reserver"
+msgstr "Varaaja"
+
+#: tilavarauspalvelu/enums.py
+msgid "Notification manager"
+msgstr "Ilmoituksen hallitsija."
+
+#: tilavarauspalvelu/models/general_role/model.py
+msgid "General role"
+msgstr "Yleinen rooli"
+
+#: tilavarauspalvelu/models/general_role/model.py
+msgid "General roles"
+msgstr "Yleiset roolit"
 
 #: tilavarauspalvelu/models/payment_accounting/model.py
 msgid ""
@@ -3143,6 +3134,14 @@ msgstr "Käyttöehto"
 msgctxt "plural"
 msgid "terms of use"
 msgstr "Käyttöehdot"
+
+#: tilavarauspalvelu/models/unit_role/model.py
+msgid "Unit role"
+msgstr "Toimipistekohtainen rooli"
+
+#: tilavarauspalvelu/models/unit_role/model.py
+msgid "Unit roles"
+msgstr "Toimipistekohtaiset roolit"
 
 #: users/admin/user.py
 msgid "Search by Username, First name, Last name or Email"

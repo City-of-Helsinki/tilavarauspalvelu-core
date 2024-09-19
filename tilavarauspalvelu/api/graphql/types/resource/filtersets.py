@@ -5,7 +5,7 @@ from django.db import models
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import IntMultipleChoiceFilter
 
-from permissions.enums import UserRoleChoice
+from tilavarauspalvelu.enums import UserRoleChoice
 from tilavarauspalvelu.models import Resource, Space
 
 if TYPE_CHECKING:
