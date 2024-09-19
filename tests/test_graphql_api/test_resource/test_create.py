@@ -1,8 +1,8 @@
 import pytest
 
-from resources.enums import ResourceLocationType
-from resources.models import Resource
 from tests.factories import SpaceFactory
+from tilavarauspalvelu.enums import ResourceLocationType
+from tilavarauspalvelu.models import Resource
 
 from .helpers import CREATE_MUTATION
 

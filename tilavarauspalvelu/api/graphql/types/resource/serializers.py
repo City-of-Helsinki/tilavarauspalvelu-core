@@ -3,8 +3,8 @@ from typing import Any
 from graphene_django_extensions import NestingModelSerializer
 from graphql import GraphQLError
 
-from resources.enums import ResourceLocationType
-from resources.models import Resource
+from tilavarauspalvelu.enums import ResourceLocationType
+from tilavarauspalvelu.models import Resource
 
 __all__ = [
     "ResourceSerializer",

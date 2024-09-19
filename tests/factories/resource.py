@@ -1,8 +1,8 @@
 import factory
 from factory import fuzzy
 
-from resources.enums import ResourceLocationType
-from resources.models import Resource
+from tilavarauspalvelu.enums import ResourceLocationType
+from tilavarauspalvelu.models import Resource
 
 from ._base import GenericDjangoModelFactory
 

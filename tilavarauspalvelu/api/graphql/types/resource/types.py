@@ -1,8 +1,8 @@
 import graphene
 from graphene_django_extensions import DjangoNode
 
-from resources.enums import ResourceLocationType
-from resources.models import Resource
+from tilavarauspalvelu.enums import ResourceLocationType
+from tilavarauspalvelu.models import Resource
 
 from .filtersets import ResourceFilterSet
 from .permissions import ResourcePermission

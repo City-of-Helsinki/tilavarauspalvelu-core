@@ -3,8 +3,8 @@ from typing import Any
 from graphene_django_extensions.permissions import BasePermission
 
 from common.typing import AnyUser
-from resources.models import Resource
 from spaces.models import Space
+from tilavarauspalvelu.models import Resource
 
 __all__ = [
     "ResourcePermission",
