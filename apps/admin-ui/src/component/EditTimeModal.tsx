@@ -19,7 +19,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { formatDuration, toUIDate } from "common/src/common/util";
 import { useModal } from "@/context/ModalContext";
 import { TimeChangeFormSchemaRefined, TimeFormSchema } from "@/schemas";
-import ControlledTimeInput from "@/component/ControlledTimeInput";
+import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
 import { BufferToggles } from "@/component/BufferToggles";
 import { useCheckCollisions } from "@/hooks";

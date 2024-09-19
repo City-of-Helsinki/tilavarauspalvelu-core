@@ -84,7 +84,7 @@ export const autoGridCss = css`
   gap: var(--spacing-m);
 `;
 
-export const AutoGrid = styled.div<{ $minWidth?: string }>`
+export const AutoGrid = styled.div<{ $minWidth?: string; $largeGap?: boolean }>`
   display: grid;
   grid-template-columns: repeat(
     auto-fill,
@@ -95,7 +95,9 @@ export const AutoGrid = styled.div<{ $minWidth?: string }>`
     )
   );
   align-items: baseline;
-  gap: var(--spacing-m);
+  gap: ${({ $largeGap }) =>
+      $largeGap ? " var(--spacing-xl)" : "var(--spacing-m)"}
+    var(--spacing-m);
 `;
 AutoGrid.displayName = "AutoGrid";
 
@@ -140,4 +142,9 @@ export const Span12 = styled.div`
 // we use grids primarily and components inside grid without max-width overflow.
 export const TabWrapper = styled.div`
   max-width: 95vw;
+`;
+
+export const Label = styled.p<{ $bold?: boolean }>`
+  font-family: var(--fontsize-body-m);
+  font-weight: ${({ $bold }) => ($bold ? "700" : "500")};
 `;

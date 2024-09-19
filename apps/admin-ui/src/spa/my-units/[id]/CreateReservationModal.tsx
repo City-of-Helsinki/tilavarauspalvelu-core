@@ -25,7 +25,7 @@ import { useCheckCollisions } from "@/hooks";
 import Loader from "@/component/Loader";
 import { dateTime, getNormalizedInterval, parseDateTimeSafe } from "@/helpers";
 import { useModal } from "@/context/ModalContext";
-import ControlledTimeInput from "@/component/ControlledTimeInput";
+import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
 import ReservationTypeForm from "@/component/ReservationTypeForm";
 import { flattenMetadata } from "@/common/util";

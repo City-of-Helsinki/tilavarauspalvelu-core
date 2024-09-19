@@ -47,7 +47,7 @@ import {
 } from "@/helpers";
 import { base64encode } from "common/src/helpers";
 import { ControlledDateInput } from "common/src/components/form";
-import ControlledTimeInput from "@/component/ControlledTimeInput";
+import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { errorToast, successToast } from "common/src/common/toast";
 import StatusLabel from "common/src/components/StatusLabel";
 import { type StatusLabelType } from "common/src/tags";

@@ -1,29 +1,38 @@
-import { addDays, format } from "date-fns";
-import { ReservationStartInterval } from "@gql/gql-types";
-import { timeSelectionSchema } from "./recurringReservation";
-
-const DATE_FORMAT = "dd.MM.yyyy";
+import { addDays } from "date-fns";
+import {
+  ReservationStartInterval,
+  ReservationTypeChoice,
+} from "@gql/gql-types";
+import {
+  RecurringReservationForm,
+  RecurringReservationFormSchema,
+} from "./recurringReservation";
+import { toUIDate } from "common/src/common/util";
 
 const tomorrow = addDays(new Date(), 1);
-const reservation = {
-  type: "BLOCKED",
-  reservationUnit: {
-    label: "unit",
-    value: "1",
-  },
-  startingDate: format(tomorrow, DATE_FORMAT),
-  endingDate: format(addDays(tomorrow, 6), DATE_FORMAT),
-  repeatOnDays: [1],
-  repeatPattern: {
-    label: "weekly",
-    value: "weekly",
-  },
-  startTime: "09:00",
-  endTime: "10:15",
-  seriesName: "name",
-};
-
 const interval = ReservationStartInterval.Interval_15Mins;
+
+function createInput({
+  type = ReservationTypeChoice.Blocked,
+  startingDate = toUIDate(tomorrow),
+  endingDate = toUIDate(addDays(tomorrow, 6)),
+  repeatOnDays = [1],
+  repeatPattern = "weekly",
+  startTime = "09:00",
+  endTime = "10:15",
+  seriesName = "name",
+}: Partial<RecurringReservationForm>) {
+  return {
+    type,
+    startingDate,
+    endingDate,
+    repeatOnDays,
+    repeatPattern,
+    startTime,
+    endTime,
+    seriesName,
+  };
+}
 
 // Tests timeSelectionSchema instead of the form schema because of refinements
 
@@ -34,36 +43,40 @@ const interval = ReservationStartInterval.Interval_15Mins;
 // no metadata
 // type? BLOCKED or STAFF
 test("one week blocked reservation on a single day is valid", () => {
-  const res = timeSelectionSchema(interval).safeParse(reservation);
-
+  const res = RecurringReservationFormSchema(interval).safeParse(
+    createInput({})
+  );
   expect(res.success).toBeTruthy();
 });
 
 test("over 24h time should fail", () => {
-  const res = timeSelectionSchema(interval).safeParse({
-    ...reservation,
-    startTime: "32:00",
-    endTime: "33:15",
-  });
+  const res = RecurringReservationFormSchema(interval).safeParse(
+    createInput({
+      startTime: "32:00",
+      endTime: "33:15",
+    })
+  );
 
   expect(res.success).toBeFalsy();
 });
 
 test(`invalid time string should fail`, () => {
-  const res = timeSelectionSchema(interval).safeParse({
-    ...reservation,
-    startTime: "fo:ba",
-  });
+  const res = RecurringReservationFormSchema(interval).safeParse(
+    createInput({
+      startTime: "fo:ba",
+    })
+  );
 
   expect(res.success).toBeFalsy();
 });
 
 test(`time start after time end should fail`, () => {
-  const res = timeSelectionSchema(interval).safeParse({
-    ...reservation,
-    startTime: "10:30",
-    endTime: "10:00",
-  });
+  const res = RecurringReservationFormSchema(interval).safeParse(
+    createInput({
+      startTime: "10:30",
+      endTime: "10:00",
+    })
+  );
 
   expect(res.success).toBeFalsy();
 });

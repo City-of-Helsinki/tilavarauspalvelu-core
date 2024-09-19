@@ -139,8 +139,8 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
         <NameState ref={ref}>
           <H1 $legacy>{overrideTitle ?? getName(reservation, t)}</H1>
           <HorisontalFlex>
-            <AlignVertically>
-              {order?.status != null && (
+            {order?.status != null && (
+              <AlignVertically>
                 <StatusLabel
                   type={statusLabelType}
                   data-testid="reservation_title_section__order_status"
@@ -148,8 +148,8 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
                 >
                   {t(`Payment.status.${order?.status}`)}
                 </StatusLabel>
-              )}
-            </AlignVertically>
+              </AlignVertically>
+            )}
             <AlignVertically style={{ gap: "var(--spacing-xs)" }}>
               <Dot />
               <span data-testid="reservation_title_section__state">

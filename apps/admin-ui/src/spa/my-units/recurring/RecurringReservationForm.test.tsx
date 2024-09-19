@@ -10,7 +10,7 @@ import {
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MockedProvider } from "@apollo/client/testing";
-import { BrowserRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router-dom";
 import { RecurringReservationForm } from "./RecurringReservationForm";
 import {
   YEAR,
@@ -19,21 +19,21 @@ import {
   units,
 } from "./__test__/mocks";
 
-const customRender = () =>
-  render(
-    <BrowserRouter>
+function customRender() {
+  return render(
+    <MemoryRouter>
       <MockedProvider mocks={mocks} addTypename={false}>
         <RecurringReservationForm reservationUnits={units} />
       </MockedProvider>
-    </BrowserRouter>
+    </MemoryRouter>
   );
+}
 
 const getReservationUnitBtn = () => {
   // Find and click the button so the listbox is visible
-  const btn = screen.getByLabelText(
-    /MyUnits.RecurringReservationForm.reservationUnit/,
-    { selector: "button" }
-  );
+  const btn = screen.getByLabelText(/filters.label.reservationUnit/, {
+    selector: "button",
+  });
   expect(btn).toBeInTheDocument();
   return btn;
 };
@@ -45,11 +45,10 @@ beforeEach(() => {
 
 test("Render recurring reservation form with all but unit field disabled", async () => {
   const view = customRender();
-
   const user = userEvent.setup();
 
   const resUnitSelectLabel = await screen.findByText(
-    "MyUnits.RecurringReservationForm.reservationUnit"
+    "filters.label.reservationUnit"
   );
   expect(resUnitSelectLabel).toBeDefined();
 
@@ -94,9 +93,7 @@ test("Render recurring reservation form with all but unit field disabled", async
 });
 
 async function selectUnit() {
-  const container = screen.getByText(
-    /MyUnits.RecurringReservationForm.reservationUnit/
-  );
+  const container = screen.getByText(/filters.label.reservationUnit/);
   const btn = within(container.parentElement!).getByRole("button");
   const user = userEvent.setup();
   expect(btn).toBeInTheDocument();
@@ -122,7 +119,6 @@ async function selectUnit() {
 // TODO make it so that it skips the other tests if this fails
 test("SMOKE: selecting unit field allows input to other mandatory fields", async () => {
   const view = customRender();
-
   await selectUnit();
 
   // TODO select some values from them
@@ -147,7 +143,6 @@ test("SMOKE: selecting unit field allows input to other mandatory fields", async
 
 test("Submit is disabled if all mandatory fields are not set", async () => {
   const view = customRender();
-
   await selectUnit();
 
   const submit = view.getByRole("button", { name: "common.reserve" });
@@ -207,9 +202,7 @@ async function fillForm({
   dayNumber: 0 | 1 | 2 | 3 | 4 | 5 | 6;
 }) {
   // Duplicated code from selectUnit because user type is questionable to recreate / pass
-  const container = screen.getByText(
-    /MyUnits.RecurringReservationForm.reservationUnit/
-  );
+  const container = screen.getByText(/filters.label.reservationUnit/);
   const btn = within(container.parentElement!).getByRole("button");
   const user = userEvent.setup();
   expect(btn).toBeInTheDocument();
@@ -227,7 +220,7 @@ async function fillForm({
 
   // Select works for HDS listbox but
   // to check the selected value we have to read the button text not check options
-  await userEvent.selectOptions(listbox, "Unit");
+  await user.selectOptions(listbox, "Unit");
 
   await user.tab();
   await user.keyboard(begin);
@@ -248,7 +241,8 @@ async function fillForm({
 
   await user.tab();
   await user.tab();
-  // skip pattern selector (default value)
+  // Use default value: "weekly"
+  // TODO could make sure it's selected here
   await user.tab();
 
   await user.keyboard("10");

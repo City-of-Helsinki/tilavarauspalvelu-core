@@ -38,6 +38,7 @@ i18n.addResourceBundle("fi", "common", {
   select: "Valitse",
   clear: "Tyhjennä",
   close: "Sulje",
+  cancel: "Peruuta",
   remove: "Poista",
 });
 i18n.addResourceBundle("en", "common", {

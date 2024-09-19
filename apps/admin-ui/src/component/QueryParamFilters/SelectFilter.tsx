@@ -1,11 +1,10 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Select } from "hds-react";
-import { memoize } from "lodash";
+import { useTranslation } from "next-i18next";
 
 type SelectFilterProps = {
   name: string;
-  label: string;
   options: { label: string; value: string | number }[];
   sort?: boolean;
   clearable?: boolean;
@@ -14,21 +13,22 @@ type SelectFilterProps = {
 export function SelectFilter({
   name,
   options,
-  label,
   sort,
   clearable,
 }: SelectFilterProps) {
   const [searchParams, setParams] = useSearchParams();
+  const { t } = useTranslation();
 
-  const sortedOpts = memoize((originalOptions) => {
-    const opts = [...originalOptions];
+  // TODO not a fan of frontend sorting (especially when it's prop toggled)
+  const sortedOptions = useMemo(() => {
+    const opts = [...options];
     if (sort) {
       opts.sort((a, b) =>
         a.label.toLowerCase().localeCompare(b.label.toLowerCase())
       );
     }
     return opts;
-  })(options);
+  }, [options, sort]);
 
   const onChange = (value: (typeof options)[0]) => {
     const params = new URLSearchParams(searchParams);
@@ -41,15 +41,20 @@ export function SelectFilter({
   };
 
   const value = new URLSearchParams(searchParams).get(name) ?? "";
-  const convertedValue = typeof value === "string" ? value : Number(value);
+  const convertedValue =
+    typeof options.values === "string" ? value : Number(value);
+
+  const label = t(`filters.label.${name}`);
+  const placeholder = t("common.select");
   return (
     <Select
       label={label}
       id="isRecurring"
-      options={sortedOpts}
+      options={sortedOptions}
       onChange={onChange}
       value={options.find((x) => x.value === convertedValue) ?? null}
       clearable={clearable}
+      placeholder={placeholder}
     />
   );
 }

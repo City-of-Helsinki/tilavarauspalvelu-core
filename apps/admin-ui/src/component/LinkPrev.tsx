@@ -2,7 +2,6 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { IconAngleLeft } from "hds-react";
-import { useNavigate } from "react-router-dom";
 import { BasicLink } from "../styles/util";
 
 const StyledLink = styled(BasicLink)`
@@ -22,20 +21,13 @@ type Props = {
 
 function LinkPrevInner({ route, style, className }: Props): JSX.Element {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   return (
     <StyledLink
-      to={route || "#"}
+      to={route || ".."}
       relative="path"
       style={style}
       className={className}
       data-testid="link__previous"
-      onClick={(e) => {
-        if (!route) {
-          e.preventDefault();
-          navigate(-1);
-        }
-      }}
     >
       <IconAngleLeft size="s" aria-hidden />
       {t("common.prev")}

@@ -101,7 +101,7 @@ export function useCreateRecurringReservation() {
       endDate: toApiDateUnsafe(fromUIDateUnsafe(data.endingDate)),
       endTime: data.endTime,
       weekdays: data.repeatOnDays,
-      recurrenceInDays: data.repeatPattern.value === "weekly" ? 7 : 14,
+      recurrenceInDays: data.repeatPattern === "weekly" ? 7 : 14,
       name,
       description: data.comments,
     };

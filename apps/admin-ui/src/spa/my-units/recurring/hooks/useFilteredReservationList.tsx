@@ -3,6 +3,7 @@ import {
   type ReservationsInIntervalFragment,
   ReservationTypeChoice,
   useReservationTimesInReservationUnitQuery,
+  type Maybe,
 } from "@gql/gql-types";
 import { isValidDate, toApiDate } from "common/src/common/util";
 import { addDays, addMinutes, startOfDay } from "date-fns";
@@ -31,6 +32,10 @@ const RESERVATIONS_IN_INTERVAL_FRAGMENT = gql`
     bufferTimeAfter
     type
     affectedReservationUnits
+    recurringReservation {
+      id
+      pk
+    }
   }
 `;
 
@@ -133,6 +138,7 @@ export function useFilteredReservationList({
   startTime,
   endTime,
   reservationType,
+  existingRecurringPk,
 }: {
   items: NewReservationListItem[];
   reservationUnitPk?: number;
@@ -141,6 +147,7 @@ export function useFilteredReservationList({
   startTime: string;
   endTime: string;
   reservationType: ReservationTypeChoice;
+  existingRecurringPk?: Maybe<number>;
 }) {
   const { reservations, refetch } = useReservationsInInterval({
     reservationUnitPk,
@@ -178,11 +185,19 @@ export function useFilteredReservationList({
     };
 
     return items.map((x) =>
-      reservations.find((y) => isReservationInsideRange(x, y))
+      reservations.find((y) => {
+        if (
+          existingRecurringPk != null &&
+          y.recurringReservationPk === existingRecurringPk
+        ) {
+          return false;
+        }
+        return isReservationInsideRange(x, y);
+      })
         ? { ...x, isOverlapping: true }
         : x
     );
-  }, [items, reservations, startTime, endTime]);
+  }, [items, reservations, startTime, endTime, existingRecurringPk]);
 
   return { reservations: data, refetch };
 }

@@ -16,7 +16,7 @@ interface ControllerProps<T extends FieldValues> extends UseControllerProps<T> {
   id?: string;
 }
 
-const ControlledTimeInput = <T extends FieldValues>({
+export function ControlledTimeInput<T extends FieldValues>({
   name,
   control,
   error,
@@ -25,7 +25,7 @@ const ControlledTimeInput = <T extends FieldValues>({
   testId,
   label,
   id,
-}: ControllerProps<T>) => {
+}: ControllerProps<T>) {
   const { t } = useTranslation();
   const { field } = useController({ control, name, rules: { required } });
 
@@ -43,6 +43,4 @@ const ControlledTimeInput = <T extends FieldValues>({
       data-testid={testId}
     />
   );
-};
-
-export default ControlledTimeInput;
+}

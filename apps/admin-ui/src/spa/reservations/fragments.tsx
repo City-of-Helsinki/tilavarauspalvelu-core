@@ -17,7 +17,9 @@ export const RESERVATION_RECURRING_FRAGMENT = gql`
       id
       pk
       beginDate
+      beginTime
       endDate
+      endTime
       weekdays
       name
       description

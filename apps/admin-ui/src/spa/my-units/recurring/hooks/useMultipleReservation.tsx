@@ -1,7 +1,7 @@
 import { generateReservations } from "../generateReservations";
-import { ReservationStartInterval, type Maybe } from "@gql/gql-types";
-import type { UseFormReturn } from "react-hook-form";
-import type { RecurringReservationForm } from "@/schemas";
+import { ReservationTypeChoice, type Maybe } from "@gql/gql-types";
+import type { TimeSelectionForm } from "@/schemas";
+import { getBufferTime } from "@/helpers";
 
 type ReservationUnitBufferType = {
   bufferTimeBefore?: number;
@@ -11,45 +11,35 @@ type ReservationUnitBufferType = {
 // This is only used in recurring form so we can rework it
 // we want to remove the early generation of reservations
 export function useMultipleReservation({
-  form,
+  values,
   reservationUnit,
-  interval = ReservationStartInterval.Interval_15Mins,
 }: {
-  form: UseFormReturn<RecurringReservationForm>;
-  reservationUnit?: Maybe<ReservationUnitBufferType>;
-  interval?: ReservationStartInterval;
-}) {
-  const { watch } = form;
-
-  // NOTE useMemo is useless here, watcher already filters out unnecessary runs
-  const result = generateReservations(
-    {
-      startingDate: watch("startingDate"),
-      endingDate: watch("endingDate"),
-      startTime: watch("startTime"),
-      endTime: watch("endTime"),
-      repeatPattern: watch("repeatPattern"),
-      repeatOnDays: watch("repeatOnDays"),
-    },
-    interval
-  );
-
-  const isBlocked = watch("type") === "BLOCKED";
-
-  return {
-    ...result,
-    reservations: result.reservations.map((item) => ({
-      ...item,
-      buffers: {
-        before:
-          watch("bufferTimeBefore") && !isBlocked
-            ? (reservationUnit?.bufferTimeBefore ?? 0)
-            : 0,
-        after:
-          watch("bufferTimeAfter") && !isBlocked
-            ? (reservationUnit?.bufferTimeAfter ?? 0)
-            : 0,
-      },
-    })),
+  values: TimeSelectionForm & {
+    type?: ReservationTypeChoice;
+    bufferTimeBefore?: boolean;
+    bufferTimeAfter?: boolean;
   };
+  reservationUnit?: Maybe<ReservationUnitBufferType>;
+}) {
+  // NOTE useMemo is useless here, watcher already filters out unnecessary runs
+  const result = generateReservations({
+    startingDate: values.startingDate,
+    endingDate: values.endingDate,
+    startTime: values.startTime,
+    endTime: values.endTime,
+    repeatPattern: values.repeatPattern,
+    repeatOnDays: values.repeatOnDays,
+  });
+
+  return result.map((item) => ({
+    ...item,
+    buffers: {
+      before: values.bufferTimeBefore
+        ? getBufferTime(reservationUnit?.bufferTimeBefore, values.type)
+        : 0,
+      after: values.bufferTimeAfter
+        ? getBufferTime(reservationUnit?.bufferTimeBefore, values.type)
+        : 0,
+    },
+  }));
 }

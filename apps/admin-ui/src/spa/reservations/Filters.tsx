@@ -185,12 +185,7 @@ export function Filters({
             options={paymentStatusOptions}
           />
           <DateRangeFilter name="createdAt" />
-          <SelectFilter
-            name="recurring"
-            label={t("filters.label.isRecurring")}
-            options={recurringOptions}
-            clearable
-          />
+          <SelectFilter name="recurring" options={recurringOptions} clearable />
           <CheckboxFilter name="freeOfCharge" />
         </AutoGrid>
       </MoreWrapper>

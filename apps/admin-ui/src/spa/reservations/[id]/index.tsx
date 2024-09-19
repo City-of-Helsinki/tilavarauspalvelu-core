@@ -40,8 +40,8 @@ import ApprovalButtonsRecurring from "./ApprovalButtonsRecurring";
 import ReservationTitleSection from "./ReservationTitleSection";
 import { base64encode } from "common/src/helpers";
 import { fontMedium } from "common";
-import { errorToast } from "common/src/common/toast";
 import { formatAgeGroup } from "@/common/util";
+import Error404 from "@/common/Error404";
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 
@@ -166,9 +166,9 @@ function ButtonsWithPermChecks({
 
 function translateType(res: ReservationType, t: TFunction): string {
   const [part1, part2] = getTranslationKeyForCustomerTypeChoice(
-    res.type ?? undefined,
-    res.reserveeType ?? undefined,
-    res.reserveeIsUnregisteredAssociation ?? false
+    res.type,
+    res.reserveeType,
+    res.reserveeIsUnregisteredAssociation
   );
   return `${t(part1)}${part2 ? ` ${t(part2)}` : ""}`;
 }
@@ -587,23 +587,23 @@ export function ReservationPage() {
   const typename = "ReservationNode";
   const isPkValid = Number(pk) > 0;
   const id = base64encode(`${typename}:${pk}`);
-  const { data, loading, refetch } = useReservationQuery({
+  const { data, loading, refetch, error } = useReservationQuery({
     skip: !isPkValid,
+    // NOTE have to be no-cache because we have some key collisions (tag line disappears if cached)
     fetchPolicy: "no-cache",
     variables: { id },
-    onError: () => {
-      errorToast({ text: t("errors.errorFetchingData") });
-    },
   });
 
   const { reservation } = data ?? {};
 
-  if (loading) {
+  // Loader check first
+  if (loading && reservation == null) {
     return <Loader />;
   }
 
-  if (!reservation) {
-    return null;
+  // NOTE incorrect ids don't return an error (they return a null)
+  if (!isPkValid || error != null || reservation == null) {
+    return <Error404 />;
   }
 
   return (

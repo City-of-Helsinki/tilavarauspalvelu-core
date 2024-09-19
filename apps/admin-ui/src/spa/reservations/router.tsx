@@ -4,6 +4,7 @@ import { RequestedPage } from "./requested";
 import { ListReservationsPage } from ".";
 import { EditPage } from "./[id]/edit";
 import { ReservationPage } from "./[id]";
+import { SeriesPage } from "./[id]/series";
 
 // TODO there is no index? (all and requested works like index but not really)
 const ReservationsRouter = (): JSX.Element => (
@@ -13,6 +14,7 @@ const ReservationsRouter = (): JSX.Element => (
     <Route path="all" element={<ListReservationsPage />} />
     <Route path=":id" element={<ReservationPage />} />
     <Route path=":id/edit" element={<EditPage />} />
+    <Route path=":id/series" element={<SeriesPage />} />
   </Routes>
 );
 

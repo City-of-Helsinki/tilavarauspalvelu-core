@@ -6,10 +6,12 @@ import {
   IconCross,
   IconPen,
 } from "hds-react";
-import { TFunction } from "i18next";
+import { type TFunction } from "i18next";
 
 /// NOTE don't use hooks here; buttons are dynamically added to arrays (so the amount of hooks can change)
-const ReservationListButton = ({
+/// TODO can we change this? so it returns a list of button props instead of the JSX?
+/// so they are not dynamically created (maybe even turn it into a hook instead)
+export function ReservationListButton({
   type,
   callback,
   t,
@@ -18,11 +20,12 @@ const ReservationListButton = ({
   callback: () => void;
   // Pass the TFunc because the amount of buttons change and hooks break
   t: TFunction;
-}) => {
+}) {
   const btnCommon = {
     variant: "supplementary",
     onClick: callback,
     size: "small",
+    theme: "black",
     key: type,
   } as const;
 
@@ -57,6 +60,4 @@ const ReservationListButton = ({
     default:
       return null;
   }
-};
-
-export default ReservationListButton;
+}

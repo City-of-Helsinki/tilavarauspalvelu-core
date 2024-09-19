@@ -30,8 +30,9 @@ export type NewReservationListItem = {
 };
 
 // In the UI spec parent container max height is 22rem, but overflow forces us to define child max-height
-const ListWrapper = styled.div`
-  max-height: 18.5rem;
+// TODO can't be unlimited, because we might have a lot of reservations (like 200 - 400)
+const ListWrapper = styled.div<{ $isTall?: boolean }>`
+  max-height: ${({ $isTall }) => ($isTall ? "48rem" : "18.5rem")};
   overflow: hidden auto;
 `;
 
@@ -205,13 +206,14 @@ type Props = {
   header?: string;
   items: NewReservationListItem[];
   hasPadding?: boolean;
+  isTall?: boolean;
 };
 type ExtendedProps = AddNewReservationButtonProps & Props;
 
 /// Used by the RecurringReservation pages to show a list of reservations
 // TODO should be renamed / moved to signify that this is only for recurring reservations
 export function ReservationList(props: Props | ExtendedProps) {
-  const { header, items, hasPadding } = props;
+  const { header, items, hasPadding, isTall } = props;
   if (items.length === 0) {
     return null;
   }
@@ -222,7 +224,7 @@ export function ReservationList(props: Props | ExtendedProps) {
   const removed = items.filter((x) => x.isRemoved).length;
   const count = items.length - removed;
   return (
-    <ListWrapper data-testid="reservations-list">
+    <ListWrapper data-testid="reservations-list" $isTall={isTall}>
       <TitleWrapper>
         {header != null && (
           <H6 as="h3" style={{ flexGrow: 1 }}>

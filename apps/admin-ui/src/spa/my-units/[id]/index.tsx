@@ -16,6 +16,7 @@ import { errorToast } from "common/src/common/toast";
 import { UserPermissionChoice, useUnitViewQuery } from "@gql/gql-types";
 import { useCheckPermission } from "@/hooks";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
+import { LinkPrev } from "@/component/LinkPrev";
 
 type Params = {
   unitId: string;
@@ -80,9 +81,13 @@ export function MyUnitView() {
   if (loading) {
     return <Loader />;
   }
-  // TODO improve the error reporting (404)
   if (!unit || !isPkValid) {
-    return <div>{t("MyUnits.Calendar.error.unitNotFound")}</div>;
+    return (
+      <>
+        <LinkPrev />
+        <ContainerHack>{t("errors.router.unitNotFound")}</ContainerHack>
+      </>
+    );
   }
 
   const recurringReservationUrl = getRecurringReservationUrl(pk);

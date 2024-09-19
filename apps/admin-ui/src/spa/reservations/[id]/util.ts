@@ -21,6 +21,8 @@ import {
   formatDate,
   getReserveeName,
 } from "@/common/util";
+import { fromAPIDateTime } from "@/helpers";
+import { filterNonNullable } from "common/src/helpers";
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 type ReservationUnitType = NonNullable<ReservationType["reservationUnit"]>[0];
@@ -46,7 +48,7 @@ export function reservationPrice(
 
 /** returns reservation unit pricing at given date */
 export function getReservatinUnitPricing(
-  reservationUnit: ReservationUnitType | undefined,
+  reservationUnit: Maybe<Pick<ReservationUnitType, "pricings">> | undefined,
   datetime: string
 ): PricingFieldsFragment | null {
   if (!reservationUnit?.pricings || reservationUnit.pricings.length === 0) {
@@ -70,6 +72,7 @@ export function getReservatinUnitPricing(
   }, reservationUnit.pricings[0]);
 }
 
+/// TODO refactor this to use reasonable formatting (modern i18next)
 export function getReservationPriceDetails(
   reservation: ReservationType,
   t: TFunction
@@ -93,7 +96,7 @@ export function getReservationPriceDetails(
     pricing.pricingType === PricingType.Paid ? pricing.highestPrice : "0";
   const formatters = getFormatters("fi");
 
-  const taxP = parseFloat(pricing.taxPercentage?.value ?? "");
+  const taxP = Number(pricing.taxPercentage?.value ?? "");
   const taxPercentage = Number.isNaN(taxP) ? 0 : taxP;
   return priceUnit === PriceUnit.Fixed
     ? getReservationPrice(maxPrice, t("RequestedReservation.noPrice"), false)
@@ -129,9 +132,9 @@ function reserveeTypeToTranslationKey(
 }
 
 export function getTranslationKeyForCustomerTypeChoice(
-  reservationType?: ReservationTypeChoice,
-  reserveeType?: CustomerTypeChoice,
-  isUnregisteredAssociation?: boolean
+  reservationType: Maybe<ReservationTypeChoice> | undefined,
+  reserveeType: Maybe<CustomerTypeChoice> | undefined,
+  isUnregisteredAssociation: Maybe<boolean> | undefined
 ): string[] {
   if (!reservationType) {
     return ["errors.missingReservationNode"];
@@ -171,38 +174,78 @@ export function createTagString(
   reservation: ReservationType,
   t: TFunction
 ): string {
-  const createRecurringTag = (begin?: string, end?: string) =>
-    begin && end ? `${formatDate(begin)}–${formatDate(end)}` : "";
+  try {
+    if (reservation.recurringReservation != null) {
+      return createRecurringTagString(reservation, t);
+    }
+    return createSingleTagString(reservation, t);
+  } catch (e) {
+    return "";
+  }
+}
 
-  const recurringTag = createRecurringTag(
-    reservation.recurringReservation?.beginDate ?? undefined,
-    reservation.recurringReservation?.endDate ?? undefined
-  );
+function createSingleTagString(
+  reservation: ReservationType,
+  t: TFunction
+): string {
+  const begin = new Date(reservation.begin);
+  const end = new Date(reservation.end);
+  const singleDateTimeTag = formatDateTimeRange(t, begin, end);
 
   const unitTag = reservation?.reservationUnit
     ?.map(reservationUnitName)
     .join(", ");
 
-  const begin = new Date(reservation.begin);
-  const end = new Date(reservation.end);
-  const singleDateTimeTag = formatDateTimeRange(t, begin, end);
+  const durMinutes = differenceInMinutes(end, begin);
+  const abbreviated = true;
+  const durationTag = formatDuration(durMinutes, t, abbreviated);
+
+  return `${singleDateTimeTag}, ${durationTag} | ${unitTag}`;
+}
+
+function createRecurringTagString(
+  reservation: ReservationType,
+  t: TFunction
+): string {
+  const { recurringReservation } = reservation;
+  const { beginDate, beginTime, endDate, endTime, weekdays } =
+    recurringReservation ?? {};
+  if (
+    endDate == null ||
+    beginDate == null ||
+    beginTime == null ||
+    endTime == null ||
+    filterNonNullable(weekdays).length === 0
+  ) {
+    return "";
+  }
+
+  const recurringTag = `${formatDate(beginDate)}–${formatDate(endDate)}`;
+  const unitTag = reservation?.reservationUnit
+    ?.map(reservationUnitName)
+    .join(", ");
 
   const weekDayTag = reservation.recurringReservation?.weekdays
     ?.sort()
     ?.map((x) => t(`dayShort.${x}`))
     ?.reduce((agv, x) => `${agv}${agv.length > 0 ? "," : ""} ${x}`, "");
 
-  const recurringDateTag = `${weekDayTag} ${format(begin, "HH:mm")}–${format(end, "HH:mm")}`;
+  const begin = fromAPIDateTime(beginDate, beginTime);
+  const end = fromAPIDateTime(endDate, endTime);
+  if (begin == null || end == null) {
+    return "";
+  }
 
-  const durMinutes = differenceInMinutes(end, begin);
+  const durMinutes = differenceInMinutes(
+    new Date(reservation.end),
+    new Date(reservation.begin)
+  );
   const abbreviated = true;
   const durationTag = formatDuration(durMinutes, t, abbreviated);
 
-  const reservationTagline = `${
-    reservation.recurringReservation ? recurringDateTag : singleDateTimeTag
-  }, ${durationTag} ${
+  const recurringDateTag = `${weekDayTag} ${format(begin, "HH:mm")}–${format(end, "HH:mm")}`;
+
+  return `${recurringDateTag}, ${durationTag} ${
     recurringTag.length > 0 ? " | " : ""
   } ${recurringTag} | ${unitTag}`;
-
-  return reservationTagline;
 }

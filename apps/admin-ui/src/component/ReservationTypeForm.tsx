@@ -3,6 +3,7 @@ import { Controller, useFormContext } from "react-hook-form";
 import { Notification, RadioButton, SelectionGroup, TextArea } from "hds-react";
 import {
   Authentication,
+  type MetadataSetsFragment,
   ReservationTypeChoice,
   type ReservationQuery,
 } from "@gql/gql-types";
@@ -37,11 +38,7 @@ const StyledShowAllContainer = styled(ShowAllContainer)`
   }
 `;
 
-const TypeSelect = ({
-  reservationUnit,
-}: {
-  reservationUnit: ReservationUnitType;
-}) => {
+function TypeSelect({ isDisabled }: { isDisabled?: boolean }) {
   const {
     watch,
     control,
@@ -67,7 +64,7 @@ const TypeSelect = ({
       render={({ field }) => (
         <SelectionGroup
           required
-          disabled={reservationUnit == null}
+          disabled={isDisabled}
           label={t("reservationApplication:type")}
           errorText={
             errors.type?.message != null
@@ -89,28 +86,42 @@ const TypeSelect = ({
       )}
     />
   );
-};
+}
+
+export type TypeFormReservationUnit = MetadataSetsFragment &
+  Pick<
+    ReservationUnitType,
+    | "authentication"
+    | "bufferTimeBefore"
+    | "bufferTimeAfter"
+    | "serviceSpecificTerms"
+    | "paymentTerms"
+    | "pricingTerms"
+    | "cancellationTerms"
+  >;
 
 // TODO are buffers in different places for Recurring and Single reservations? Check the UI spec
-const ReservationTypeForm = ({
+function ReservationTypeForm({
   reservationUnit,
   children,
   disableBufferToggle,
 }: {
-  reservationUnit: ReservationUnitType;
+  reservationUnit: TypeFormReservationUnit;
   children?: React.ReactNode;
   disableBufferToggle?: boolean;
-}) => {
+}) {
   const { t } = useTranslation();
 
   const { watch, register } = useFormContext<ReservationFormType>();
-
   const type = watch("type");
+  const showAuthWarning =
+    type === ReservationTypeChoice.Behalf &&
+    reservationUnit.authentication === Authentication.Strong;
 
   return (
     <>
       <Element $wide>
-        <TypeSelect reservationUnit={reservationUnit} />
+        <TypeSelect />
       </Element>
       {type === ReservationTypeChoice.Blocked && (
         <CommentsTextArea
@@ -121,17 +132,16 @@ const ReservationTypeForm = ({
       )}
       {type !== ReservationTypeChoice.Blocked && (
         <>
-          {type === ReservationTypeChoice.Behalf &&
-            reservationUnit.authentication === Authentication.Strong && (
-              <Element $wide>
-                <Notification
-                  label={t("reservationApplication:strongAuthentication.label")}
-                  type="info"
-                >
-                  {t("reservationApplication:strongAuthentication.info")}
-                </Notification>
-              </Element>
-            )}
+          {showAuthWarning && (
+            <Element $wide>
+              <Notification
+                label={t("reservationApplication:strongAuthentication.label")}
+                type="info"
+              >
+                {t("reservationApplication:strongAuthentication.info")}
+              </Notification>
+            </Element>
+          )}
           {!disableBufferToggle && (
             <BufferToggles
               before={reservationUnit.bufferTimeBefore ?? 0}
@@ -149,7 +159,7 @@ const ReservationTypeForm = ({
             <div style={{ marginBottom: 48 }}>
               <ReservationMetadataSetForm reservationUnit={reservationUnit} />
             </div>
-            {type === "STAFF" ? (
+            {type === ReservationTypeChoice.Staff ? (
               <StyledShowAllContainer
                 showAllLabel={t("MyUnits.ReservationForm.showReserver")}
                 maximumNumber={0}
@@ -170,6 +180,6 @@ const ReservationTypeForm = ({
       )}
     </>
   );
-};
+}
 
 export default ReservationTypeForm;

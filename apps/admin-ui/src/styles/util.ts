@@ -52,10 +52,15 @@ export const DialogActionsButtons = styled(Dialog.ActionButtons)`
   justify-content: space-between;
 `;
 
-export const Element = styled.div<{ $wide?: boolean; $start?: boolean }>`
+export const Element = styled.div<{
+  $wide?: boolean;
+  $start?: boolean;
+  $unlimitedMaxWidth?: boolean;
+}>`
   grid-column: ${({ $wide, $start }) =>
     $wide ? "1 / -1" : $start ? "1 / span 1" : "auto / span 1"};
-  max-width: var(--prose-width);
+  max-width: ${({ $unlimitedMaxWidth }) =>
+    $unlimitedMaxWidth ? "inherit" : "var(--prose-width)"};
 `;
 
 // StatusLabels expand the table cell without this, as they're too high au naturel

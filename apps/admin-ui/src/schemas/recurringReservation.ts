@@ -1,5 +1,8 @@
 import { z } from "zod";
-import { ReservationStartInterval } from "@gql/gql-types";
+import {
+  ReservationStartInterval,
+  ReservationTypeChoice,
+} from "@gql/gql-types";
 import { fromUIDate } from "common/src/common/util";
 import {
   ReservationTypeSchema,
@@ -9,7 +12,6 @@ import {
 import {
   checkDateNotInPast,
   checkTimeStringFormat,
-  OptionSchema,
 } from "common/src/schemas/schemaCommon";
 import { intervalToNumber } from "./utils";
 
@@ -31,34 +33,19 @@ const timeSelectionSchemaBase = z.object({
   startTime: z.string(),
   endTime: z.string(),
   repeatOnDays: z.array(z.number()).min(1).max(7),
-  repeatPattern: z.object({
-    label: z.string(),
-    value: z.literal("weekly").or(z.literal("biweekly")),
-  }),
+  repeatPattern: z.literal("weekly").or(z.literal("biweekly")),
 });
 
-export const RecurringReservationFormSchema = z
+export type TimeSelectionForm = z.infer<typeof timeSelectionSchemaBase>;
+const RecurringReservationFormSchema = z
   .object({
-    reservationUnit: OptionSchema,
     type: ReservationTypeSchema,
     seriesName: z.string().optional(),
     comments: z.string().max(500).optional(),
     bufferTimeBefore: z.boolean().optional(),
     bufferTimeAfter: z.boolean().optional(),
   })
-  .merge(timeSelectionSchemaBase)
-  // need passthrough otherwise zod will strip the metafields
-  .passthrough()
-  // this refine works without partial since it's the last required value
-  .refine(
-    (s) =>
-      s.type === "BLOCKED" ||
-      (s.seriesName !== undefined && s.seriesName.length > 0),
-    {
-      path: ["seriesName"],
-      message: "Required",
-    }
-  );
+  .merge(timeSelectionSchemaBase);
 
 const convertToDate = (date?: string): Date | null =>
   date ? fromUIDate(date) : null;
@@ -66,9 +53,22 @@ const convertToDate = (date?: string): Date | null =>
 const dateIsBefore = (date: Date | null, other: Date | null) =>
   date && other && date.getTime() < other.getTime();
 
-export const timeSelectionSchema = (interval: ReservationStartInterval) =>
-  timeSelectionSchemaBase
-    .partial()
+const RecurringReservationFormSchemaRefined = (
+  interval: ReservationStartInterval
+) =>
+  RecurringReservationFormSchema
+    // need passthrough otherwise zod will strip the metafields
+    .passthrough()
+    // this refine works without partial since it's the last required value
+    .refine(
+      (s) =>
+        s.type === ReservationTypeChoice.Blocked ||
+        (s.seriesName !== undefined && s.seriesName.length > 0),
+      {
+        path: ["seriesName"],
+        message: "Required",
+      }
+    )
     .superRefine((val, ctx) =>
       checkDateNotInPast(convertToDate(val.startingDate), ctx, "startingDate")
     )
@@ -92,7 +92,6 @@ export const timeSelectionSchema = (interval: ReservationStartInterval) =>
     .superRefine((val, ctx) =>
       checkTimeStringFormat(val.endTime, ctx, "endTime")
     )
-    .superRefine((val, ctx) => checkStartEndTime(val, ctx))
     .superRefine((val, ctx) =>
       checkReservationInterval(
         val.startTime,
@@ -103,8 +102,73 @@ export const timeSelectionSchema = (interval: ReservationStartInterval) =>
     )
     .superRefine((val, ctx) =>
       checkReservationInterval(val.endTime, ctx, "endTime", 15)
-    );
+    )
+    .superRefine((val, ctx) => checkStartEndTime(val, ctx));
+
+export { RecurringReservationFormSchemaRefined as RecurringReservationFormSchema };
 
 export type RecurringReservationForm = z.infer<
   typeof RecurringReservationFormSchema
 >;
+
+const RescheduleReservationSeriesFormSchema = z
+  .object({
+    // TODO should have enable in the name
+    bufferTimeBefore: z.boolean(),
+    bufferTimeAfter: z.boolean(),
+    type: ReservationTypeSchema,
+  })
+  .merge(timeSelectionSchemaBase);
+
+export type RescheduleReservationSeriesForm = z.infer<
+  typeof RescheduleReservationSeriesFormSchema
+>;
+
+// Copy paste from RecurringReservationFormSchemaRefined
+// TODO schema refinements should be looked over and refactored so they can be reused easily
+// TODO neither of them validates the end date =< 2 years from now (causes a backend error, that is toasted to the user)
+const RescheduleReservationSeriesFormSchemaRefined = (
+  interval: ReservationStartInterval
+) =>
+  RescheduleReservationSeriesFormSchema
+    // need passthrough otherwise zod will strip the metafields
+    // TODO do we need it here? reschedule might not have metadata
+    .passthrough()
+    // this refine works without partial since it's the last required value
+    .superRefine((val, ctx) =>
+      checkDateNotInPast(convertToDate(val.startingDate), ctx, "startingDate")
+    )
+    .superRefine((val, ctx) =>
+      checkDateNotInPast(convertToDate(val.endingDate), ctx, "endingDate")
+    )
+    .refine(
+      (s) =>
+        dateIsBefore(
+          convertToDate(s.startingDate),
+          convertToDate(s.endingDate)
+        ),
+      {
+        path: ["endingDate"],
+        message: "Start date can't be after end date.",
+      }
+    )
+    .superRefine((val, ctx) =>
+      checkTimeStringFormat(val.startTime, ctx, "startTime")
+    )
+    .superRefine((val, ctx) =>
+      checkTimeStringFormat(val.endTime, ctx, "endTime")
+    )
+    .superRefine((val, ctx) =>
+      checkReservationInterval(
+        val.startTime,
+        ctx,
+        "startTime",
+        intervalToNumber(interval)
+      )
+    )
+    .superRefine((val, ctx) =>
+      checkReservationInterval(val.endTime, ctx, "endTime", 15)
+    )
+    .superRefine((val, ctx) => checkStartEndTime(val, ctx));
+
+export { RescheduleReservationSeriesFormSchemaRefined as RescheduleReservationSeriesFormSchema };

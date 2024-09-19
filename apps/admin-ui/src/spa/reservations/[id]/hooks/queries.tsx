@@ -143,37 +143,43 @@ export const SINGLE_RESERVATION_QUERY = gql`
   }
 `;
 
+export const RECURRING_RESERVATION_FRAGMENT = gql`
+  fragment RecurringReservation on RecurringReservationNode {
+    id
+    pk
+    weekdays
+    beginDate
+    endDate
+    rejectedOccurrences {
+      id
+      beginDatetime
+      endDatetime
+      rejectionReason
+    }
+    reservations {
+      ...ChangeReservationTime
+      state
+      paymentOrder {
+        id
+        status
+      }
+      reservationUnit {
+        id
+        unit {
+          id
+          pk
+        }
+      }
+    }
+  }
+`;
+
 // TODO do we need orderBy? orderBy: "begin" (for reservations)
 // TODO do we need $state: [String]?
 export const RECURRING_RESERVATION_QUERY = gql`
   query RecurringReservation($id: ID!) {
     recurringReservation(id: $id) {
-      id
-      pk
-      weekdays
-      beginDate
-      endDate
-      rejectedOccurrences {
-        id
-        beginDatetime
-        endDatetime
-        rejectionReason
-      }
-      reservations {
-        ...ChangeReservationTime
-        state
-        paymentOrder {
-          id
-          status
-        }
-        reservationUnit {
-          id
-          unit {
-            id
-            pk
-          }
-        }
-      }
+      ...RecurringReservation
     }
   }
 `;

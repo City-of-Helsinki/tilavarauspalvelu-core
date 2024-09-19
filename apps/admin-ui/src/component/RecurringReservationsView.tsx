@@ -13,7 +13,7 @@ import {
   NewReservationListItem,
   ReservationList,
 } from "@/component/ReservationsList";
-import ReservationListButton from "@/component/ReservationListButton";
+import { ReservationListButton } from "@/component/ReservationListButton";
 import DenyDialog from "@/component/DenyDialog";
 import { useModal } from "@/context/ModalContext";
 import { EditTimeModal } from "@/component/EditTimeModal";

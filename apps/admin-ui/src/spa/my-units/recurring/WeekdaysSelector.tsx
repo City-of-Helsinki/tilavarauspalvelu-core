@@ -2,7 +2,7 @@
  * Selector component for weekdays
  * TODO this not accessible
  */
-import React, { useEffect, useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { WEEKDAYS } from "common/src/const";
@@ -16,6 +16,7 @@ const Wrapper = styled.div`
 const Day = styled.button`
   background-color: var(--color-black-5);
   border: 2px solid var(--color-black-5);
+  border-radius: 1rem;
   color: var(--color-black);
   display: flex;
   align-items: center;
@@ -24,11 +25,11 @@ const Day = styled.button`
   height: 2rem;
   font-size: var(--fontsize-body-s);
 
-  &:hover {
+  &:hover,
+  &:focus-within {
     cursor: pointer;
-    background-color: var(--color-black-50);
-    border: 2px solid var(--color-black-80);
-    color: var(--color-white);
+    filter: brightness(80%);
+    outline: none;
   }
 
   &.active {
@@ -76,7 +77,7 @@ const WarningIcon = () => (
 
 type Props = {
   label: string;
-  value?: number[];
+  value: number[];
   disabled?: boolean;
   onChange: (value: number[]) => void;
   errorText?: string;
@@ -90,19 +91,14 @@ export function WeekdaysSelector({
   errorText,
 }: Props) {
   const { t } = useTranslation();
-  const [selectedDays, setSelectedDays] = useState<number[]>(value);
-
-  useEffect(() => {
-    if (onChange) {
-      onChange(selectedDays);
-    }
-  }, [selectedDays, onChange]);
 
   const handleDayToggle = (day: number) => {
-    if (selectedDays.includes(day)) {
-      setSelectedDays((prev) => [...prev.filter((d) => d !== day)]);
+    if (value.includes(day)) {
+      const vals = value.filter((d) => d !== day);
+      onChange(vals);
     } else {
-      setSelectedDays((prev) => [...prev, day]);
+      const vals = [...value, day];
+      onChange(vals);
     }
   };
 

@@ -188,6 +188,7 @@ const translations: ITranslations = {
       invalidApplicationNumber: ["Virheellinen hakemusnumero"],
       invalidApplicationRoundNumber: ["Virheellinen hakukierroksen numero"],
       unitPkMismatch: ["Varausyksikkö ei kuulu osoitteen yksikköön"],
+      unitNotFound: ["Yksikköä ei löytynyt"],
     },
     applicationRoundNotFound: ["Haettua hakukierrosta ei löydy"],
     errorFetchingData: ["Virhe haettaessa tietoja"],
@@ -213,6 +214,14 @@ const translations: ITranslations = {
       "Käsittelyä ei ole aloitettu tai se on jo päättynyt.",
     ],
     formValidationError: ["Lomakkeessa on virheitä. {{ message }}"],
+    backendValidation: {
+      RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL: [
+        "Aloitusaika ei ole sallittu",
+      ],
+      RESERVATION_END_DATE_TOO_FAR: [
+        "Ei pystytty luomaan varauksia yli 2 vuoden päähän",
+      ],
+    },
     descriptive: {
       "Reservation overlaps with reservation before due to buffer time.": [
         "Varaus menee päällekkäin edellisen varauksen kanssa tauon takia.",
@@ -419,6 +428,10 @@ const translations: ITranslations = {
         "Varausta ei pystytty tekemään, koska siinä on uusia päällekkäistä varauksia ({{ count }}). Tarkista lista ja yritä uudelleen.",
       ],
     },
+  },
+  ReservationEditSeries: {
+    heading: ["Muokkaa varaussarjaa"],
+    submit: ["Luo varaukset"],
   },
   Application: {
     id: ["Hakemustunnus"],
@@ -1807,7 +1820,8 @@ const translations: ITranslations = {
     showInCalendar: ["Näytä kalenterissa"],
   },
   ApprovalButtons: {
-    edit: ["Muokkaa"],
+    edit: ["Muokkaa tietoja"],
+    editSeriesTime: ["Muokkaa ajankohtaa"],
     editTime: ["Muuta aikaa"],
     recurring: {
       rejectAllButton: ["Hylkää kaikki"],
@@ -1853,7 +1867,7 @@ const translations: ITranslations = {
       createdAtLte: [" "],
       freeOfCharge: ["Hakee maksutonta käyttöä"],
       reservationType: ["Varauksen tyyppi"],
-      isRecurring: ["Toistuva varaus"],
+      recurring: ["Toistuva varaus"],
       onlyRecurring: ["Vain toistuvat"],
       onlyNotRecurring: ["Vain yksittäiset"],
     },
