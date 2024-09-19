@@ -1,6 +1,6 @@
 from applications.models import Application
-from email_notification.models import EmailType
-from email_notification.tasks import send_application_email_task
+from tilavarauspalvelu.enums import EmailType
+from tilavarauspalvelu.tasks import send_application_email_task
 
 
 class ApplicationEmailNotificationSender:

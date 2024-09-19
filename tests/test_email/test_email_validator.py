@@ -5,8 +5,8 @@ import pytest
 from django.conf import settings
 from django.core.exceptions import ValidationError
 
-from email_notification.helpers.email_builder_reservation import ReservationEmailContext
-from email_notification.helpers.email_validator import EmailTemplateValidator
+from tilavarauspalvelu.utils.email.email_builder_reservation import ReservationEmailContext
+from tilavarauspalvelu.utils.email.email_validator import EmailTemplateValidator
 
 
 def test_email_validator__raises__validation_error_on_invalid_file_extension():

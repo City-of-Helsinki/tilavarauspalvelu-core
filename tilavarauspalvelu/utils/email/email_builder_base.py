@@ -8,14 +8,15 @@ from urllib.parse import urlencode, urljoin
 from django.conf import settings
 from django.utils.timezone import get_default_timezone
 
-from email_notification.exceptions import EmailBuilderConfigurationError
-from email_notification.helpers.email_validator import EmailTemplateValidator
+from tilavarauspalvelu.exceptions import EmailBuilderConfigurationError
+from tilavarauspalvelu.utils.email.email_validator import EmailTemplateValidator
 
 if TYPE_CHECKING:
     from django.db.models.fields.files import FieldFile
 
     from config.utils.commons import LanguageType
-    from email_notification.models import EmailTemplate, EmailType
+    from tilavarauspalvelu.enums import EmailType
+    from tilavarauspalvelu.models import EmailTemplate
 
 
 @dataclass

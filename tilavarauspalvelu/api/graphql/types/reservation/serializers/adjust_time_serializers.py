@@ -4,7 +4,6 @@ from typing import Any
 from django.utils.timezone import get_default_timezone
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
 
-from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from reservation_units.models import ReservationUnit
 from reservations.enums import ReservationStateChoice, ReservationTypeChoice
 from reservations.models import Reservation
@@ -14,6 +13,7 @@ from tilavarauspalvelu.api.graphql.types.reservation.serializers.mixins import (
     ReservationPriceMixin,
     ReservationSchedulingMixin,
 )
+from tilavarauspalvelu.utils.email.reservation_email_notification_sender import ReservationEmailNotificationSender
 
 DEFAULT_TIMEZONE = get_default_timezone()
 

@@ -3,7 +3,6 @@ from decimal import Decimal
 import pytest
 from graphene_django_extensions.testing import build_mutation
 
-from email_notification.models import EmailType
 from reservation_units.enums import PricingType
 from reservations.enums import ReservationStateChoice
 from tests.factories import (
@@ -15,7 +14,7 @@ from tests.factories import (
     UserFactory,
 )
 from tests.helpers import patch_method
-from tilavarauspalvelu.enums import OrderStatus, PaymentType, ReservationNotification
+from tilavarauspalvelu.enums import EmailType, OrderStatus, PaymentType, ReservationNotification
 from tilavarauspalvelu.models import PaymentOrder
 from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CreateOrderError
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient

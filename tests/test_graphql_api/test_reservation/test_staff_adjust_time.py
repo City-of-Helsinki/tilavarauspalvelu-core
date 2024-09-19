@@ -4,11 +4,11 @@ import freezegun
 import pytest
 
 from common.date_utils import DEFAULT_TIMEZONE, local_datetime, next_hour
-from email_notification.models import EmailType
 from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import ReservationUnitHierarchy
 from reservations.enums import ReservationStateChoice, ReservationTypeChoice
 from tests.factories import EmailTemplateFactory, ReservationFactory
+from tilavarauspalvelu.enums import EmailType
 
 from .helpers import ADJUST_STAFF_MUTATION, get_staff_adjust_data
 

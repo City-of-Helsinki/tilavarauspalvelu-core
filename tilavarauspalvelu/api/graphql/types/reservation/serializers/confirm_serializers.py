@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING
 from django.conf import settings
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
 
-from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from reservation_units.enums import PaymentType, PricingType
 from reservation_units.utils.reservation_unit_pricing_helper import ReservationUnitPricingHelper
 from reservations.enums import ReservationStateChoice
@@ -12,6 +11,7 @@ from tilavarauspalvelu.api.graphql.extensions.validation_errors import Validatio
 from tilavarauspalvelu.api.graphql.types.reservation.serializers.update_serializers import ReservationUpdateSerializer
 from tilavarauspalvelu.enums import Language, OrderStatus
 from tilavarauspalvelu.models import PaymentOrder
+from tilavarauspalvelu.utils.email.reservation_email_notification_sender import ReservationEmailNotificationSender
 from tilavarauspalvelu.utils.verkkokauppa.helpers import create_mock_verkkokauppa_order, get_verkkokauppa_order_params
 from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CreateOrderError
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient

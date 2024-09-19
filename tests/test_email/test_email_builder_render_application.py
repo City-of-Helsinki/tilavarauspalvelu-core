@@ -2,9 +2,10 @@ import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 from applications.models import Application
-from email_notification.helpers.email_builder_application import ApplicationEmailBuilder
-from email_notification.models import EmailTemplate, EmailType
 from tests.factories import ApplicationFactory, EmailTemplateFactory
+from tilavarauspalvelu.enums import EmailType
+from tilavarauspalvelu.models import EmailTemplate
+from tilavarauspalvelu.utils.email.email_builder_application import ApplicationEmailBuilder
 
 pytestmark = [
     pytest.mark.django_db,

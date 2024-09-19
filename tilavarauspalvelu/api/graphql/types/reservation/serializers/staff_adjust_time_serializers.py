@@ -5,12 +5,12 @@ from django.utils.timezone import get_default_timezone
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
 
 from common.date_utils import local_datetime
-from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from reservations.enums import ReservationStateChoice, ReservationTypeChoice
 from reservations.models import Reservation
 from tilavarauspalvelu.api.graphql.extensions.serializers import OldPrimaryKeyUpdateSerializer
 from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from tilavarauspalvelu.api.graphql.types.reservation.serializers.mixins import ReservationSchedulingMixin
+from tilavarauspalvelu.utils.email.reservation_email_notification_sender import ReservationEmailNotificationSender
 
 if TYPE_CHECKING:
     from reservation_units.models import ReservationUnit

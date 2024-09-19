@@ -8,15 +8,15 @@ from django import forms
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 
-from email_notification.helpers.email_builder_reservation import ReservationEmailBuilder
-from email_notification.helpers.email_sender import EmailNotificationSender
-from email_notification.models import EmailTemplate
 from reservation_units.models import ReservationUnit
+from tilavarauspalvelu.models import EmailTemplate
+from tilavarauspalvelu.utils.email.email_builder_reservation import ReservationEmailBuilder
+from tilavarauspalvelu.utils.email.email_sender import EmailNotificationSender
 
 if TYPE_CHECKING:
     from django.http import HttpResponseRedirect
 
-    from email_notification.admin import EmailTemplateAdmin
+    from tilavarauspalvelu.admin.email_template.admin import EmailTemplateAdmin
     from tilavarauspalvelu.models import Location
 
 
@@ -136,4 +136,4 @@ def email_template_tester_admin_view(
     context["form"] = form
     context["reservation_unit_form"] = EmailTemplateTesterReservationUnitSelectForm()
 
-    return TemplateResponse(request, "email_tester.html", context=context)
+    return TemplateResponse(request, "email/email_tester.html", context=context)

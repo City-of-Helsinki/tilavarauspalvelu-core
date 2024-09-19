@@ -1,6 +1,7 @@
 from factory import fuzzy
 
-from email_notification.models import EmailTemplate, EmailType
+from tilavarauspalvelu.enums import EmailType
+from tilavarauspalvelu.models import EmailTemplate
 
 from ._base import GenericDjangoModelFactory
 

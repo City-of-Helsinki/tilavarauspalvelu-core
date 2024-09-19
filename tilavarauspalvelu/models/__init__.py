@@ -1,4 +1,5 @@
 from .building.model import Building
+from .email_template.model import EmailTemplate
 from .general_role.model import GeneralRole
 from .location.model import Location
 from .payment_accounting.model import PaymentAccounting
@@ -19,6 +20,7 @@ from .user.model import ProfileUser, User
 
 __all__ = [
     "Building",
+    "EmailTemplate",
     "GeneralRole",
     "Location",
     "PaymentAccounting",

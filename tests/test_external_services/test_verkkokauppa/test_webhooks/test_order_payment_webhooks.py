@@ -3,12 +3,12 @@ import uuid
 import pytest
 from django.urls import reverse
 
-from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from reservations.enums import ReservationStateChoice
 from tests.factories import PaymentOrderFactory, ReservationFactory
 from tests.helpers import patch_method
 from tests.test_external_services.test_verkkokauppa.test_webhooks.helpers import get_mock_order_payment_api
 from tilavarauspalvelu.enums import OrderStatus
+from tilavarauspalvelu.utils.email.reservation_email_notification_sender import ReservationEmailNotificationSender
 from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import GetPaymentError
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.sentry import SentryLogger

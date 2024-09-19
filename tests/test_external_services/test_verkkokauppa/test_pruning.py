@@ -4,12 +4,12 @@ import pytest
 from freezegun import freeze_time
 
 from common.date_utils import local_datetime
-from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from reservations.enums import ReservationStateChoice
 from reservations.tasks import update_expired_orders_task
 from tests.factories import PaymentFactory, PaymentOrderFactory, ReservationFactory
 from tests.helpers import patch_method
 from tilavarauspalvelu.enums import OrderStatus
+from tilavarauspalvelu.utils.email.reservation_email_notification_sender import ReservationEmailNotificationSender
 from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CancelOrderError
 from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import GetPaymentError
 from tilavarauspalvelu.utils.verkkokauppa.payment.types import PaymentStatus
