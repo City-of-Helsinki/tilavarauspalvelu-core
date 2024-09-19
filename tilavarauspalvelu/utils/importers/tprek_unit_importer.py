@@ -7,8 +7,8 @@ from django.db.transaction import atomic
 
 from opening_hours.models import OriginHaukiResource
 from opening_hours.utils.hauki_api_client import HaukiAPIClient
-from spaces.importers.tprek_api_client import TprekAPIClient, TprekLocationData, TprekUnitData
-from spaces.models import Location, Unit
+from tilavarauspalvelu.models import Location, Unit
+from tilavarauspalvelu.utils.importers.tprek_api_client import TprekAPIClient, TprekLocationData, TprekUnitData
 from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:

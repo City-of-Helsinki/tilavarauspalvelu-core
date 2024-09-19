@@ -1,6 +1,6 @@
 import pytest
 
-from spaces.models import Space
+from tilavarauspalvelu.models import Space
 
 from .helpers import CREATE_MUTATION
 

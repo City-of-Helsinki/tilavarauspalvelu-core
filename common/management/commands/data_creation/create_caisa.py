@@ -21,9 +21,8 @@ from reservation_units.models import (
     TaxPercentage,
 )
 from reservations.models import ReservationMetadataSet
-from spaces.models import Space, Unit
 from tilavarauspalvelu.enums import TermsOfUseTypeChoices
-from tilavarauspalvelu.models import PaymentAccounting, PaymentMerchant, PaymentProduct, TermsOfUse
+from tilavarauspalvelu.models import PaymentAccounting, PaymentMerchant, PaymentProduct, Space, TermsOfUse, Unit
 
 from .utils import SetName, with_logs
 

@@ -4,7 +4,7 @@ from graphene_django_extensions import DjangoNode
 from query_optimizer import AnnotatedField
 
 from common.typing import GQLInfo
-from spaces.models import Location
+from tilavarauspalvelu.models import Location
 
 __all__ = [
     "LocationNode",

@@ -1,6 +1,6 @@
 from graphene_django_extensions import DjangoNode
 
-from spaces.models import UnitGroup
+from tilavarauspalvelu.models import UnitGroup
 
 from .permissions import UnitGroupPermission
 

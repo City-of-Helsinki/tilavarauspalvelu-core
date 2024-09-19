@@ -3,7 +3,7 @@ from django.db import models
 from modeltranslation.admin import TranslationAdmin
 
 from common.typing import WSGIRequest
-from spaces.models import ServiceSector
+from tilavarauspalvelu.models import ServiceSector
 
 __all__ = [
     "ServiceSectorAdmin",

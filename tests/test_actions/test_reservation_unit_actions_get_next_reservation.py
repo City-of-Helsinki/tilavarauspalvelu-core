@@ -10,7 +10,7 @@ from tests.factories import ReservationFactory, ReservationUnitFactory, SpaceFac
 
 if TYPE_CHECKING:
     from reservation_units.models import ReservationUnit
-    from spaces.models import Space
+    from tilavarauspalvelu.models import Space
 
 # Applied to all tests
 pytestmark = [

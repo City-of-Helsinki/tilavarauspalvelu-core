@@ -24,8 +24,7 @@ from reservations.models import (
     ReservationStatistic,
     ReservationStatisticsReservationUnit,
 )
-from spaces.models import Building, RealEstate
-from tilavarauspalvelu.models import PaymentOrder, PersonalInfoViewLog
+from tilavarauspalvelu.models import Building, PaymentOrder, PersonalInfoViewLog, RealEstate
 
 apps_to_check: list[str] = [
     "common",

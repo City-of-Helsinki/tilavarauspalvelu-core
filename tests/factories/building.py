@@ -1,4 +1,4 @@
-from spaces.models import Building
+from tilavarauspalvelu.models import Building
 
 from ._base import GenericDjangoModelFactory
 

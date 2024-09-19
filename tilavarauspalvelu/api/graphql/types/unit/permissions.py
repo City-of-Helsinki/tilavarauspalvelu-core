@@ -3,7 +3,7 @@ from typing import Any
 from graphene_django_extensions.permissions import BasePermission
 
 from common.typing import AnyUser
-from spaces.models import Unit
+from tilavarauspalvelu.models import Unit
 
 __all__ = [
     "UnitPermission",

@@ -6,7 +6,6 @@ from django.db.models import Q
 
 from common.date_utils import local_datetime
 from permissions.enums import UserPermissionChoice, UserRoleChoice
-from spaces.models import Unit
 
 if TYPE_CHECKING:
     from collections.abc import Container, Iterable
@@ -15,8 +14,7 @@ if TYPE_CHECKING:
     from common.typing import AnyUser
     from reservation_units.models import ReservationUnit
     from reservations.models import RecurringReservation, Reservation
-    from spaces.models import Space
-    from tilavarauspalvelu.models import User
+    from tilavarauspalvelu.models import Space, Unit, User
 
 
 class PermissionResolver:
@@ -80,6 +78,8 @@ class PermissionResolver:
             return False
 
         if units is None:  # Check for any unit or unit group the user has roles in
+            from tilavarauspalvelu.models import Unit
+
             unit_ids = list(self.user.unit_roles_map.keys())
             unit_group_ids = list(self.user.unit_group_roles_map.keys())
             units = (
@@ -126,6 +126,8 @@ class PermissionResolver:
         unit_ids: Iterable[Unit] = (),
         require_all: bool = False,
     ) -> bool:
+        from tilavarauspalvelu.models import Unit
+
         unit_ids = list(unit_ids)
         if not unit_ids:  # Check for all units and unit groups the user has permissions for.
             unit_ids = list(self.user.unit_permissions_map.keys())

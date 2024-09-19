@@ -52,7 +52,7 @@ class UpdateAllSectionOptionsPermission(BasePermission):
         if user.is_anonymous:
             return False
 
-        from spaces.models import Unit
+        from tilavarauspalvelu.models import Unit
 
         units = (
             Unit.objects.filter(reservationunit__reservation_unit_options__application_section=instance)

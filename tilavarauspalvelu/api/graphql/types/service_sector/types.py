@@ -1,6 +1,6 @@
 from graphene_django_extensions import DjangoNode
 
-from spaces.models import ServiceSector
+from tilavarauspalvelu.models import ServiceSector
 
 from .permissions import ServiceSectorPermission
 

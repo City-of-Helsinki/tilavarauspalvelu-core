@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from config.utils.commons import LanguageType
     from email_notification.admin.email_template_tester import EmailTemplateTesterForm
     from reservations.models import Reservation
-    from spaces.models import Location
+    from tilavarauspalvelu.models import Location
 
 type InstructionNameType = Literal["confirmed", "pending", "cancelled"]
 

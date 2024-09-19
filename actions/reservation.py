@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from common.typing import Lang
     from reservation_units.models import ReservationUnit
     from reservations.models import Reservation
-    from spaces.models import Location, Unit
+    from tilavarauspalvelu.models import Location, Unit
 
 
 class ReservationActions:

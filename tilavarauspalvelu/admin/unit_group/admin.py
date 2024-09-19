@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from modeltranslation.admin import TranslationAdmin
 
 from common.typing import WSGIRequest
-from spaces.models import UnitGroup
+from tilavarauspalvelu.models import UnitGroup
 
 __all__ = [
     "UnitGroupAdmin",

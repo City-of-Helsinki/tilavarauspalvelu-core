@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
     from reservation_units.models import ReservationUnit
     from reservations.models import Reservation
-    from spaces.models import Building, Location
+    from tilavarauspalvelu.models import Building, Location
 
 __all__ = [
     "ReservationUnitActions",

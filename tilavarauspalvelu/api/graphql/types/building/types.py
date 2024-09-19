@@ -1,6 +1,6 @@
 from graphene_django_extensions import DjangoNode
 
-from spaces.models import Building
+from tilavarauspalvelu.models import Building
 
 __all__ = [
     "BuildingName",

@@ -3,7 +3,7 @@ from graphene_django_extensions.bases import CreateMutation, DeleteMutation, Upd
 
 from applications.models import ApplicationRound
 from common.typing import AnyUser
-from spaces.models import Space
+from tilavarauspalvelu.models import Space
 
 from .permissions import SpacePermission
 from .serializers import SpaceSerializer

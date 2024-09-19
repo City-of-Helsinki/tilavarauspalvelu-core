@@ -28,8 +28,7 @@ if TYPE_CHECKING:
     from opening_hours.models import OriginHaukiResource
     from reservation_units.models import ReservationUnitCancellationRule, ReservationUnitType
     from reservations.models import ReservationMetadataSet
-    from spaces.models import Unit
-    from tilavarauspalvelu.models import PaymentAccounting, PaymentMerchant, PaymentProduct, TermsOfUse
+    from tilavarauspalvelu.models import PaymentAccounting, PaymentMerchant, PaymentProduct, TermsOfUse, Unit
 
 __all__ = [
     "ReservationUnit",
@@ -115,7 +114,7 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
     # Many-to-One related
 
     unit: Unit | None = models.ForeignKey(
-        "spaces.Unit",
+        "tilavarauspalvelu.Unit",
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
@@ -200,7 +199,7 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
     # Many-to-Many related
 
     spaces = models.ManyToManyField(
-        "spaces.Space",
+        "tilavarauspalvelu.Space",
         related_name="reservation_units",
         blank=True,
     )

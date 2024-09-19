@@ -12,7 +12,7 @@ from .queryset import ResourceManager
 if TYPE_CHECKING:
     import datetime
 
-    from spaces.models import Space
+    from tilavarauspalvelu.models import Space
 
     from .actions import ResourceActions
 
@@ -29,7 +29,7 @@ class Resource(models.Model):
         default=ResourceLocationType.FIXED.value,
     )
     name: str = models.CharField(max_length=255)
-    space: Space | None = models.ForeignKey("spaces.Space", on_delete=models.SET_NULL, null=True, blank=True)
+    space: Space | None = models.ForeignKey("tilavarauspalvelu.Space", on_delete=models.SET_NULL, null=True, blank=True)
     buffer_time_before: datetime.timedelta | None = models.DurationField(blank=True, null=True)
     buffer_time_after: datetime.timedelta | None = models.DurationField(blank=True, null=True)
 

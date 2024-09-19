@@ -4,7 +4,7 @@ from typing import Any
 import factory
 from factory import fuzzy
 
-from spaces.models import ServiceSector, Unit
+from tilavarauspalvelu.models import ServiceSector, Unit
 
 from ._base import GenericDjangoModelFactory
 

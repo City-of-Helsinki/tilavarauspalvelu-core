@@ -1,6 +1,6 @@
 import factory
 
-from spaces.models import Location
+from tilavarauspalvelu.models import Location
 
 from ._base import GenericDjangoModelFactory
 

@@ -2799,18 +2799,6 @@ msgstr ""
 msgid "Reservation metadata sets"
 msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: spaces/admin/space.py
-msgid "Search by name or unit name"
-msgstr ""
-
-#: spaces/admin/unit.py
-msgid "Search by name or TPREK ID"
-msgstr ""
-
-#: spaces/admin/unit_group.py
-msgid "Search by name"
-msgstr ""
-
 #: templates/admin/base.html
 msgid "Change password"
 msgstr ""
@@ -2977,6 +2965,18 @@ msgstr ""
 msgid ""
 "Search by Payment Order ID, Reservation ID, Remote Order ID, Reservation "
 "name, or Reservation Unit name"
+msgstr ""
+
+#: tilavarauspalvelu/admin/space/admin.py
+msgid "Search by name or unit name"
+msgstr ""
+
+#: tilavarauspalvelu/admin/unit/admin.py
+msgid "Search by name or TPREK ID"
+msgstr ""
+
+#: tilavarauspalvelu/admin/unit_group/admin.py
+msgid "Search by name"
 msgstr ""
 
 #: tilavarauspalvelu/api/gdpr/views.py

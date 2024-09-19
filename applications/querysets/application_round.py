@@ -30,7 +30,7 @@ class ApplicationRoundQuerySet(QuerySet):
         # This works sort of like a 'prefetch_related', since it makes another query
         # to fetch units and unit groups for the permission checks when the queryset is evaluated,
         # and 'joins' them to the correct model instances in python.
-        from spaces.models import Unit
+        from tilavarauspalvelu.models import Unit
 
         items: list[ApplicationRound] = list(self)
         if not items:

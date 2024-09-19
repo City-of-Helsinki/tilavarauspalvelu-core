@@ -19,10 +19,9 @@ from reservation_units.enums import ReservationUnitPublishingState, ReservationU
 from reservation_units.models import ReservationUnit
 from reservations.enums import ReservationTypeChoice
 from reservations.models import Reservation
-from spaces.models import Location, Space, Unit
 from tilavarauspalvelu.api.graphql.types.location.types import LocationNode
 from tilavarauspalvelu.api.graphql.types.reservation.types import ReservationNode
-from tilavarauspalvelu.models import PaymentMerchant
+from tilavarauspalvelu.models import Location, PaymentMerchant, Space, Unit
 
 from .filtersets import ReservationUnitFilterSet
 from .permissions import ReservationUnitPermission
