@@ -1,7 +1,7 @@
 import factory
 from factory import fuzzy
 
-from spaces.models import Space
+from tilavarauspalvelu.models import Space
 
 from ._base import GenericDjangoModelFactory
 

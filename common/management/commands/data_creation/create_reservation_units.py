@@ -28,9 +28,8 @@ from reservation_units.models import (
     TaxPercentage,
 )
 from reservations.models import ReservationMetadataSet
-from spaces.models import Unit
 from tilavarauspalvelu.enums import TermsOfUseTypeChoices
-from tilavarauspalvelu.models import Resource, Service, TermsOfUse
+from tilavarauspalvelu.models import Resource, Service, TermsOfUse, Unit
 
 from .create_seasonal_booking import _create_application_round_time_slots
 from .utils import (

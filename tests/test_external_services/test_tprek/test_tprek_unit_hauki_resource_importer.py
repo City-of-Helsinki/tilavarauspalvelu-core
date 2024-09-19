@@ -1,10 +1,10 @@
 import pytest
 
 from opening_hours.utils.hauki_api_client import HaukiAPIClient
-from spaces.importers.tprek_unit_importer import TprekUnitHaukiResourceIdImporter
 from tests.factories import OriginHaukiResourceFactory, UnitFactory
 from tests.helpers import patch_method
 from tests.mocks import MockResponse
+from tilavarauspalvelu.utils.importers.tprek_unit_importer import TprekUnitHaukiResourceIdImporter
 
 pytestmark = [
     pytest.mark.django_db,

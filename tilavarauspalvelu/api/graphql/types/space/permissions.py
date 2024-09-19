@@ -4,8 +4,8 @@ from graphene_django_extensions.errors import GQLCodeError
 from graphene_django_extensions.permissions import BasePermission
 
 from common.typing import AnyUser
-from spaces.models import Space, Unit
 from tilavarauspalvelu.api.graphql.extensions import error_codes
+from tilavarauspalvelu.models import Space, Unit
 
 __all__ = [
     "SpacePermission",

@@ -24,8 +24,8 @@ class UnitRole(models.Model):
     user: User = models.ForeignKey("tilavarauspalvelu.User", related_name="unit_roles", on_delete=models.CASCADE)
     role: str = StrChoiceField(enum=UserRoleChoice)
 
-    units = models.ManyToManyField("spaces.Unit", related_name="unit_roles", blank=True)
-    unit_groups = models.ManyToManyField("spaces.UnitGroup", related_name="unit_roles", blank=True)
+    units = models.ManyToManyField("tilavarauspalvelu.Unit", related_name="unit_roles", blank=True)
+    unit_groups = models.ManyToManyField("tilavarauspalvelu.UnitGroup", related_name="unit_roles", blank=True)
 
     assigner: User | None = models.ForeignKey(
         "tilavarauspalvelu.User", on_delete=models.SET_NULL, null=True, blank=True

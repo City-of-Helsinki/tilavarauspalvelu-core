@@ -1,6 +1,6 @@
 from graphene_django_extensions import NestingModelSerializer
 
-from spaces.models import Unit
+from tilavarauspalvelu.models import Unit
 
 __all__ = [
     "UnitUpdateSerializer",

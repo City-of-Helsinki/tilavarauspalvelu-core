@@ -8,7 +8,7 @@ from query_optimizer.optimizer import QueryOptimizer
 from common.typing import AnyUser, GQLInfo
 from permissions.enums import UserPermissionChoice
 from permissions.models import GeneralRole, UnitRole
-from spaces.models import Unit, UnitGroup
+from tilavarauspalvelu.models import Unit, UnitGroup
 
 __all__ = [
     "GeneralRoleNode",

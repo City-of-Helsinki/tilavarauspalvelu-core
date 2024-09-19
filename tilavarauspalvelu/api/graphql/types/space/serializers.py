@@ -1,6 +1,6 @@
 from graphene_django_extensions import NestingModelSerializer
 
-from spaces.models import Space
+from tilavarauspalvelu.models import Space
 
 __all__ = [
     "SpaceSerializer",

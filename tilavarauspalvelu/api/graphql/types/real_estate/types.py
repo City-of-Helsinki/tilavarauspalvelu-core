@@ -1,6 +1,6 @@
 from graphene_django_extensions import DjangoNode
 
-from spaces.models import RealEstate
+from tilavarauspalvelu.models import RealEstate
 
 __all__ = [
     "RealEstateNode",

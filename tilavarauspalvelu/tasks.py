@@ -1,8 +1,26 @@
 from django.contrib.auth import get_user_model
+from django.db.transaction import atomic
 from django.utils import timezone
 
 from config.celery import app
-from tilavarauspalvelu.models import PersonalInfoViewLog
+from tilavarauspalvelu.models import PersonalInfoViewLog, Space, Unit
+from tilavarauspalvelu.utils.importers.tprek_unit_importer import TprekUnitImporter
+
+
+@app.task(name="rebuild_space_tree_hierarchy")
+def rebuild_space_tree_hierarchy() -> None:
+    from reservation_units.models import ReservationUnitHierarchy
+
+    with atomic():
+        Space.objects.rebuild()
+        ReservationUnitHierarchy.refresh()
+
+
+@app.task(name="update_units_from_tprek")
+def update_units_from_tprek() -> None:
+    units_to_update = Unit.objects.exclude(tprek_id__isnull=True)
+    tprek_unit_importer = TprekUnitImporter()
+    tprek_unit_importer.update_unit_from_tprek(units_to_update)
 
 
 @app.task(name="save_personal_info_view_log")

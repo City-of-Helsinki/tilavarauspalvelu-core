@@ -20,8 +20,7 @@ from common.connectors import ApplicationRoundActionsConnector
 from common.date_utils import local_datetime
 
 if TYPE_CHECKING:
-    from spaces.models import Unit
-
+    from tilavarauspalvelu.models import Unit
 
 __all__ = [
     "ApplicationRound",
@@ -265,7 +264,7 @@ class ApplicationRound(models.Model):
 
     @property
     def units_for_permissions(self) -> list[Unit]:
-        from spaces.models import Unit
+        from tilavarauspalvelu.models import Unit
 
         if hasattr(self, "_units_for_permissions"):
             return self._units_for_permissions

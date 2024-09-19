@@ -4,7 +4,7 @@ from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import IntMultipleChoiceFilter
 
 from permissions.enums import UserRoleChoice
-from spaces.models import Space
+from tilavarauspalvelu.models import Space
 
 __all__ = [
     "SpaceFilterSet",

@@ -1,4 +1,4 @@
-from spaces.models import RealEstate
+from tilavarauspalvelu.models import RealEstate
 
 from ._base import GenericDjangoModelFactory
 

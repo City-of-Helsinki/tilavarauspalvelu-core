@@ -9,8 +9,8 @@ from graphene_django_extensions.filters import IntMultipleChoiceFilter
 from common.date_utils import local_datetime
 from permissions.enums import UserRoleChoice
 from reservation_units.enums import ReservationKind
-from spaces.querysets.unit import UnitQuerySet
-from tilavarauspalvelu.api.graphql.types.unit.types import Unit
+from tilavarauspalvelu.models import Unit
+from tilavarauspalvelu.models.unit.queryset import UnitQuerySet
 
 if TYPE_CHECKING:
     from common.typing import AnyUser

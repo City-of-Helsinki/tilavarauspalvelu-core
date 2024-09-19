@@ -32,8 +32,8 @@ if TYPE_CHECKING:
         ReservationDenyReason,
         ReservationPurpose,
     )
-    from spaces.models import Unit
-    from tilavarauspalvelu.models import User
+    from tilavarauspalvelu.models import Unit, User
+
 
 __all__ = [
     "Reservation",
@@ -295,7 +295,7 @@ class Reservation(SerializableMixin, models.Model):
 
     @property
     def units_for_permissions(self) -> list[Unit]:
-        from spaces.models import Unit
+        from tilavarauspalvelu.models import Unit
 
         if hasattr(self, "_units_for_permissions"):
             return self._units_for_permissions

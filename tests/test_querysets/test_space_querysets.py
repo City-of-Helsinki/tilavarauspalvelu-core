@@ -1,7 +1,7 @@
 import pytest
 
-from spaces.models import Space
 from tests.factories import SpaceFactory
+from tilavarauspalvelu.models import Space
 
 # Applied to all tests
 pytestmark = [

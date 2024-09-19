@@ -2837,18 +2837,6 @@ msgstr "Vaaditut kentät"
 msgid "Reservation metadata sets"
 msgstr "Varauslomakkeet"
 
-#: spaces/admin/space.py
-msgid "Search by name or unit name"
-msgstr "Etsi nimellä tai toimipisteen nimellä"
-
-#: spaces/admin/unit.py
-msgid "Search by name or TPREK ID"
-msgstr "Etsi nimellä tai TPREK ID:llä"
-
-#: spaces/admin/unit_group.py
-msgid "Search by name"
-msgstr "Etsi nimellä"
-
 #: templates/admin/base.html
 msgid "Change password"
 msgstr "Vaihda salasana"
@@ -3014,6 +3002,18 @@ msgid ""
 msgstr ""
 "Etsi maksutunnuksella, varauksen tunnuksella, verkkokaupan tunnuksella, "
 "varauksen nimellä tai varausyksikön nimellä"
+
+#: tilavarauspalvelu/admin/space/admin.py
+msgid "Search by name or unit name"
+msgstr "Etsi nimellä tai toimipisteen nimellä"
+
+#: tilavarauspalvelu/admin/unit/admin.py
+msgid "Search by name or TPREK ID"
+msgstr "Etsi nimellä tai TPREK ID:llä"
+
+#: tilavarauspalvelu/admin/unit_group/admin.py
+msgid "Search by name"
+msgstr "Etsi nimellä"
 
 #: tilavarauspalvelu/api/gdpr/views.py
 msgid "User has upcoming or too recent reservations."

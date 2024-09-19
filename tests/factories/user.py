@@ -12,8 +12,7 @@ from django.utils.crypto import get_random_string
 from social_django.models import UserSocialAuth
 
 from permissions.enums import UserRoleChoice
-from spaces.models import Unit, UnitGroup
-from tilavarauspalvelu.models import User
+from tilavarauspalvelu.models import Unit, UnitGroup, User
 from tilavarauspalvelu.utils.helauth.typing import IDToken
 
 from ._base import GenericDjangoModelFactory

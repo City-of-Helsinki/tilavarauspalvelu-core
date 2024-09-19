@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from django.http import HttpResponseRedirect
 
     from email_notification.admin import EmailTemplateAdmin
-    from spaces.models import Location
+    from tilavarauspalvelu.models import Location
 
 
 def _get_email_template_tester_form_initial_values(request, template_pk: int | None = None) -> dict[str, Any]:

@@ -7,7 +7,6 @@ from common.utils import get_attr_by_language
 from email_notification.helpers.email_builder_reservation import ReservationEmailContext
 from reservations.enums import CustomerTypeChoice
 from reservations.models import Reservation
-from spaces.models import Location
 from tests.factories import (
     LocationFactory,
     ReservationCancelReasonFactory,
@@ -16,6 +15,7 @@ from tests.factories import (
     ReservationUnitFactory,
     UserFactory,
 )
+from tilavarauspalvelu.models import Location
 
 if TYPE_CHECKING:
     from reservation_units.models import ReservationUnit

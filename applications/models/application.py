@@ -18,10 +18,11 @@ from applications.enums import (
 from applications.querysets.application import ApplicationQuerySet
 from common.connectors import ApplicationActionsConnector
 from common.fields.model import StrChoiceField
-from spaces.models import Unit
 
 if TYPE_CHECKING:
     from datetime import datetime
+
+    from tilavarauspalvelu.models import Unit
 
 
 __all__ = [
@@ -282,6 +283,8 @@ class Application(SerializableMixin, models.Model):
 
     @property
     def units_for_permissions(self) -> list[Unit]:
+        from tilavarauspalvelu.models import Unit
+
         if hasattr(self, "_units_for_permissions"):
             return self._units_for_permissions
 
