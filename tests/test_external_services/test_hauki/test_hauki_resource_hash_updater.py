@@ -1,23 +1,26 @@
 import datetime
+from typing import TYPE_CHECKING
 
 import freezegun
 import pytest
-from django.utils.timezone import get_default_timezone
 
-from opening_hours.models import OriginHaukiResource, ReservableTimeSpan
-from opening_hours.utils.hauki_api_client import HaukiAPIClient
-from opening_hours.utils.hauki_resource_hash_updater import HaukiResourceHashUpdater
-from opening_hours.utils.reservable_time_span_client import NEVER_ANY_OPENING_HOURS_HASH, ReservableTimeSpanClient
+from common.date_utils import DEFAULT_TIMEZONE
 from tests.factories.opening_hours import OriginHaukiResourceFactory, ReservableTimeSpanFactory
 from tests.helpers import patch_method
 from tests.mocks import MockResponse
+from tilavarauspalvelu.constants import NEVER_ANY_OPENING_HOURS_HASH
+from tilavarauspalvelu.models import ReservableTimeSpan
+from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
+from tilavarauspalvelu.utils.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
+from tilavarauspalvelu.utils.opening_hours.reservable_time_span_client import ReservableTimeSpanClient
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import OriginHaukiResource
 
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
-
-DEFAULT_TIMEZONE = get_default_timezone()
 
 ############
 # __init__ #

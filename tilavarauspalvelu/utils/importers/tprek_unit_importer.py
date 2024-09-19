@@ -5,14 +5,13 @@ from typing import TYPE_CHECKING
 from django.db.models import QuerySet
 from django.db.transaction import atomic
 
-from opening_hours.models import OriginHaukiResource
-from opening_hours.utils.hauki_api_client import HaukiAPIClient
-from tilavarauspalvelu.models import Location, Unit
+from tilavarauspalvelu.models import Location, OriginHaukiResource, Unit
 from tilavarauspalvelu.utils.importers.tprek_api_client import TprekAPIClient, TprekLocationData, TprekUnitData
+from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
 from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
-    from opening_hours.utils.hauki_api_types import HaukiAPIResource
+    from tilavarauspalvelu.utils.opening_hours import HaukiAPIResource
 
 logger = logging.getLogger(__name__)
 

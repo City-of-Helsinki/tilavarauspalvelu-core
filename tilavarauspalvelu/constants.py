@@ -10,3 +10,8 @@ from __future__ import annotations
 # The coordinates in this coordinate system are numbers in the range of
 # -90.0000 to 90.0000 for latitude and -180.0000 to 180.0000 for longitude.
 COORDINATE_SYSTEM_ID: int = 4326
+
+
+# Hash value for when there are never any opening hours
+# See https://github.com/City-of-Helsinki/hauki `hours.models.Resource._get_date_periods_as_hash`
+NEVER_ANY_OPENING_HOURS_HASH = "d41d8cd98f00b204e9800998ecf8427e"  # md5(b"").hexdigest()

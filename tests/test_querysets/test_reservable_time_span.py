@@ -4,8 +4,8 @@ from typing import NamedTuple
 import pytest
 from graphene_django_extensions.testing.utils import parametrize_helper
 
-from opening_hours.models import ReservableTimeSpan
 from tests.factories import OriginHaukiResourceFactory, ReservableTimeSpanFactory
+from tilavarauspalvelu.models import ReservableTimeSpan
 
 # Applied to all tests
 pytestmark = [

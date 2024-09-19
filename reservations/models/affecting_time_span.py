@@ -12,8 +12,8 @@ from django.db.transaction import get_connection
 from django.utils.translation import gettext_lazy as _
 
 from common.date_utils import DEFAULT_TIMEZONE, local_datetime, timedelta_to_json
-from opening_hours.utils.time_span_element import TimeSpanElement
 from reservations.querysets import AffectingTimeSpanQuerySet
+from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
 from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:

@@ -1346,106 +1346,6 @@ msgstr "Englanti"
 msgid "Swedish"
 msgstr "Ruotsi"
 
-#: opening_hours/admin/origin_hauki_resource.py
-msgid ""
-"OriginHaukiResources with this specific hash never have any opening hours."
-msgstr ""
-"OriginHaukiResources, joilla on tämä tietty tarkiste, eivät koskaan sisällä "
-"aukioloaikoja."
-
-#: opening_hours/admin/origin_hauki_resource.py
-msgid "ID of the resource in Hauki."
-msgstr "Resurssin tunniste Aukiolosovelluksesta."
-
-#: opening_hours/admin/origin_hauki_resource.py
-msgid ""
-"Hash of the opening hours. Used to determine if the opening hours have "
-"changed."
-msgstr ""
-"Aukioloaikojen tarkiste. Käytetään määrittämään, ovatko aukioloajat "
-"muuttuneet."
-
-#: opening_hours/admin/origin_hauki_resource.py
-msgid ""
-"All opening hours have been fetched from Hauki up until this date. Opening "
-"hours are fetched until the last day of the month two years from now."
-msgstr ""
-"Kaikki aukioloajat on haettu Aukiolosovelluksesta tähän päivämäärään asti. "
-"Aukioloajat haetaan kaksi vuotta eteenpäin."
-
-#: opening_hours/admin/origin_hauki_resource.py
-msgid "Reservable Time Spans updated."
-msgstr "Varattavat aikavälit päivitetty."
-
-#: opening_hours/enums.py
-msgctxt "HaukiResourceState"
-msgid "Open"
-msgstr "Auki"
-
-#: opening_hours/enums.py
-msgctxt "HaukiResourceState"
-msgid "Closed"
-msgstr "Suljettu"
-
-#: opening_hours/enums.py
-msgctxt "HaukiResourceState"
-msgid "Undefined"
-msgstr "Määrittelemätön"
-
-#: opening_hours/enums.py
-msgctxt "HaukiResourceState"
-msgid "Self service"
-msgstr "Itsepalvelu"
-
-#: opening_hours/enums.py
-msgctxt "HaukiResourceState"
-msgid "With key"
-msgstr "Avaimella"
-
-#: opening_hours/enums.py
-msgctxt "HaukiResourceState"
-msgid "With reservation"
-msgstr "Varauksella"
-
-#: opening_hours/enums.py
-msgctxt "HaukiResourceState"
-msgid "Open and reservable"
-msgstr "Auki ja varattavissa"
-
-#: opening_hours/enums.py
-msgctxt "HaukiResourceState"
-msgid "With key and reservation"
-msgstr "Avaimella ja varauksella"
-
-#: opening_hours/enums.py
-msgctxt "HaukiResourceState"
-msgid "Enter only"
-msgstr "Vain sisäänkäynti"
-
-#: opening_hours/enums.py
-msgctxt "HaukiResourceState"
-msgid "Exit only"
-msgstr "Vain uloskäynti"
-
-#: opening_hours/enums.py
-msgctxt "HaukiResourceState"
-msgid "Weather permitting"
-msgstr "Sään salliessa"
-
-#: opening_hours/enums.py
-msgctxt "HaukiResourceState"
-msgid "Not in use"
-msgstr "Ei vuoroa käytössä"
-
-#: opening_hours/enums.py
-msgctxt "HaukiResourceState"
-msgid "Maintenance"
-msgstr "Siivoustauko/huoltotauko"
-
-#: opening_hours/models.py
-msgid "`start_datetime` must be before `end_datetime`."
-msgstr "`start_datetime` täytyy olla ennen `end_datetime`."
-
 #: reservation_units/admin/reservation_unit/admin.py
 msgid "Search by ID, name, unit name, or service sector name"
 msgstr "Etsi ID:llä, nimellä, toimipisteen nimellä tai palvelualueen nimellä"
@@ -2804,6 +2704,37 @@ msgstr "Testisähköposti '%s' lähetetty onnistuneesti."
 msgid "Search by username, email, first name or last name"
 msgstr "Etsi käyttäjänimellä, sähköpostilla, etu- tai sukunimellä"
 
+#: tilavarauspalvelu/admin/origin_hauki_resource/admin.py
+msgid ""
+"OriginHaukiResources with this specific hash never have any opening hours."
+msgstr ""
+"OriginHaukiResources, joilla on tämä tietty tarkiste, eivät koskaan sisällä "
+"aukioloaikoja."
+
+#: tilavarauspalvelu/admin/origin_hauki_resource/admin.py
+msgid "ID of the resource in Hauki."
+msgstr "Resurssin tunniste Aukiolosovelluksesta."
+
+#: tilavarauspalvelu/admin/origin_hauki_resource/admin.py
+msgid ""
+"Hash of the opening hours. Used to determine if the opening hours have "
+"changed."
+msgstr ""
+"Aukioloaikojen tarkiste. Käytetään määrittämään, ovatko aukioloajat "
+"muuttuneet."
+
+#: tilavarauspalvelu/admin/origin_hauki_resource/admin.py
+msgid ""
+"All opening hours have been fetched from Hauki up until this date. Opening "
+"hours are fetched until the last day of the month two years from now."
+msgstr ""
+"Kaikki aukioloajat on haettu Aukiolosovelluksesta tähän päivämäärään asti. "
+"Aukioloajat haetaan kaksi vuotta eteenpäin."
+
+#: tilavarauspalvelu/admin/origin_hauki_resource/admin.py
+msgid "Reservable Time Spans updated."
+msgstr "Varattavat aikavälit päivitetty."
+
 #: tilavarauspalvelu/admin/payment_merchant/admin.py
 msgid "The Paytrail Merchant ID should be a six-digit number."
 msgstr "Kaupan paytrail-tunnuksen tulisi olla kuusinumeroinen."
@@ -3061,6 +2992,71 @@ msgstr "Varaaja"
 msgid "Notification manager"
 msgstr "Ilmoituksen hallitsija."
 
+#: tilavarauspalvelu/enums.py
+msgctxt "HaukiResourceState"
+msgid "Open"
+msgstr "Auki"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "HaukiResourceState"
+msgid "Closed"
+msgstr "Suljettu"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "HaukiResourceState"
+msgid "Undefined"
+msgstr "Määrittelemätön"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "HaukiResourceState"
+msgid "Self service"
+msgstr "Itsepalvelu"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "HaukiResourceState"
+msgid "With key"
+msgstr "Avaimella"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "HaukiResourceState"
+msgid "With reservation"
+msgstr "Varauksella"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "HaukiResourceState"
+msgid "Open and reservable"
+msgstr "Auki ja varattavissa"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "HaukiResourceState"
+msgid "With key and reservation"
+msgstr "Avaimella ja varauksella"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "HaukiResourceState"
+msgid "Enter only"
+msgstr "Vain sisäänkäynti"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "HaukiResourceState"
+msgid "Exit only"
+msgstr "Vain uloskäynti"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "HaukiResourceState"
+msgid "Weather permitting"
+msgstr "Sään salliessa"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "HaukiResourceState"
+msgid "Not in use"
+msgstr "Ei vuoroa käytössä"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "HaukiResourceState"
+msgid "Maintenance"
+msgstr "Siivoustauko/huoltotauko"
+
 #: tilavarauspalvelu/models/email_template/model.py
 msgid "Email type"
 msgstr "Sähköpostin tyyppi"
@@ -3124,6 +3120,10 @@ msgstr "Täytyy olla suurempi kuin 0"
 #: tilavarauspalvelu/models/payment_order/model.py
 msgid "Must be the sum of net and vat amounts"
 msgstr "Täytyy olla netto- ja ALV-määrien summa"
+
+#: tilavarauspalvelu/models/reservable_time_span/model.py
+msgid "`start_datetime` must be before `end_datetime`."
+msgstr "`start_datetime` täytyy olla ennen `end_datetime`."
 
 #: tilavarauspalvelu/models/terms_of_use/model.py
 msgctxt "singular"

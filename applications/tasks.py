@@ -10,12 +10,12 @@ from applications.models import Address, AllocatedTimeSlot, Organisation, Person
 from common.date_utils import local_end_of_day, local_start_of_day
 from common.utils import translate_for_user
 from config.celery import app
-from opening_hours.enums import HaukiResourceState
-from opening_hours.utils.hauki_api_client import HaukiAPIClient
-from opening_hours.utils.time_span_element import TimeSpanElement
 from reservations.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import RecurringReservation
 from reservations.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task
+from tilavarauspalvelu.enums import HaukiResourceState
+from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
+from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
 from utils.sentry import SentryLogger
 
 

@@ -1,6 +1,6 @@
 import factory
 
-from opening_hours.models import OriginHaukiResource, ReservableTimeSpan
+from tilavarauspalvelu.models import OriginHaukiResource, ReservableTimeSpan
 
 from ._base import GenericDjangoModelFactory
 

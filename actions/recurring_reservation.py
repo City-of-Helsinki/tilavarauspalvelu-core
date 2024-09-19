@@ -6,7 +6,6 @@ from itertools import chain
 from typing import TYPE_CHECKING, Any, TypedDict
 
 from common.date_utils import DEFAULT_TIMEZONE, combine, get_periods_between
-from opening_hours.utils.time_span_element import TimeSpanElement
 from reservations.enums import RejectionReadinessChoice, ReservationTypeChoice, ReservationTypeStaffChoice
 from reservations.models import (
     AffectingTimeSpan,
@@ -15,6 +14,7 @@ from reservations.models import (
     Reservation,
     ReservationPurpose,
 )
+from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
 
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable
@@ -22,9 +22,8 @@ if TYPE_CHECKING:
     from django.db import models
 
     from applications.models import City
-    from opening_hours.models import ReservableTimeSpan
     from reservations.enums import CustomerTypeChoice, ReservationStateChoice
-    from tilavarauspalvelu.models import User
+    from tilavarauspalvelu.models import ReservableTimeSpan, User
 
 
 class ReservationPeriod(TypedDict):

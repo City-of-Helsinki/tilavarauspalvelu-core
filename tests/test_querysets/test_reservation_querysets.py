@@ -4,11 +4,11 @@ from datetime import UTC, datetime
 import pytest
 
 from common.date_utils import DEFAULT_TIMEZONE, local_date
-from opening_hours.utils.time_span_element import TimeSpanElement
 from reservation_units.models import ReservationUnit, ReservationUnitHierarchy
 from reservations.enums import ReservationStateChoice, ReservationTypeChoice
 from reservations.models import AffectingTimeSpan, Reservation
 from tests.factories import ReservationFactory, ReservationUnitFactory, ResourceFactory, SpaceFactory, UnitFactory
+from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
 
 # Applied to all tests
 pytestmark = [

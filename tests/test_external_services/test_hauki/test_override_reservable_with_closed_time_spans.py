@@ -1,10 +1,10 @@
-from opening_hours.utils.time_span_element import TimeSpanElement
-from opening_hours.utils.time_span_element_utils import override_reservable_with_closed_time_spans
 from tests.test_external_services.test_hauki.test_reservable_time_spans_client import (
     _get_date,
     _get_normalised_time_spans,
     _get_reservable_and_closed_time_spans,
 )
+from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
+from tilavarauspalvelu.utils.opening_hours.time_span_element_utils import override_reservable_with_closed_time_spans
 
 
 def test__override_reservable_with_closed_time_spans():

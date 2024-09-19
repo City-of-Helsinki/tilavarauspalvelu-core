@@ -13,7 +13,6 @@ from actions.recurring_reservation import ReservationDetails
 from applications.enums import WeekdayChoice
 from common.date_utils import local_date
 from common.fields.serializer import CurrentUserDefaultNullable, input_only_field
-from opening_hours.utils.reservable_time_span_client import ReservableTimeSpanClient
 from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import ReservationUnit
 from reservations.enums import ReservationStateChoice, ReservationTypeStaffChoice
@@ -24,6 +23,8 @@ from tilavarauspalvelu.api.graphql.extensions import error_codes
 __all__ = [
     "RecurringReservationCreateSerializer",
 ]
+
+from tilavarauspalvelu.utils.opening_hours.reservable_time_span_client import ReservableTimeSpanClient
 
 
 class RecurringReservationCreateSerializer(NestingModelSerializer):

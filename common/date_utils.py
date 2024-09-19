@@ -465,3 +465,10 @@ def get_periods_between(
 
     for delta in range(0, (end_date - start_date).days + 1, interval):
         yield start_datetime + datetime.timedelta(days=delta), end_datetime + datetime.timedelta(days=delta)
+
+
+def normalize_as_datetime(value: datetime.date | datetime.datetime, *, timedelta_days: int = 0) -> datetime.datetime:
+    if isinstance(value, datetime.datetime):
+        return value
+    # Convert dates to datetimes to include timezone information
+    return combine(value, datetime.time.min, tzinfo=DEFAULT_TIMEZONE) + datetime.timedelta(days=timedelta_days)

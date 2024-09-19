@@ -3,8 +3,8 @@ from typing import Any, NotRequired, TypedDict, Unpack
 
 from django.conf import settings
 
-from opening_hours.errors import HaukiAPIError, HaukiConfigurationError
-from opening_hours.utils.hauki_api_types import (
+from tilavarauspalvelu.exceptions import HaukiAPIError, HaukiConfigurationError
+from tilavarauspalvelu.utils.opening_hours.hauki_api_types import (
     HaukiAPIDatePeriod,
     HaukiAPIOpeningHoursResponse,
     HaukiAPIOpeningHoursResponseItem,

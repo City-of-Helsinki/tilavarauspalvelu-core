@@ -4,13 +4,13 @@ from datetime import timedelta
 from typing import TYPE_CHECKING
 
 from common.date_utils import local_datetime, local_datetime_max, local_datetime_min, local_start_of_day
-from opening_hours.utils.time_span_element import TimeSpanElement
-from opening_hours.utils.time_span_element_utils import merge_overlapping_time_span_elements
 from reservation_units.enums import ReservationStartInterval
 from reservation_units.utils.first_reservable_time_helper.first_reservable_time_reservable_time_span_helper import (
     ReservableTimeSpanFirstReservableTimeHelper,
 )
 from reservation_units.utils.first_reservable_time_helper.utils import ReservableTimeOutput
+from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
+from tilavarauspalvelu.utils.opening_hours.time_span_element_utils import merge_overlapping_time_span_elements
 
 if TYPE_CHECKING:
     from reservation_units.models.reservation_unit import ReservationUnit

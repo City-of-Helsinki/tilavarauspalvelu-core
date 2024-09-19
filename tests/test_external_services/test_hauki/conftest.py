@@ -9,10 +9,11 @@ from tests.factories import OriginHaukiResourceFactory, ReservationUnitFactory
 @pytest.fixture(autouse=True)
 def _force_HaukiAPIClient_to_be_mocked():
     """Force 'HaukiAPIClient.generic' to be mocked in all tests."""
-    with mock.patch(
-        "opening_hours.utils.hauki_api_client.HaukiAPIClient.generic",
-        side_effect=NotImplementedError("'HaukiAPIClient.generic' must be mocked!"),
-    ):
+    from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
+
+    path = HaukiAPIClient.__module__ + "." + HaukiAPIClient.__qualname__ + ".generic"
+    exception = NotImplementedError("'HaukiAPIClient.generic' must be mocked!")
+    with mock.patch(path, side_effect=exception):
         yield
 
 

@@ -3,49 +3,18 @@ from admin_extra_buttons.mixins import ExtraButtonsMixin
 from django import forms
 from django.contrib import admin
 from django.db.models import Count, QuerySet
-from django.urls import reverse
-from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from common.typing import WSGIRequest
-from opening_hours.models import OriginHaukiResource, ReservableTimeSpan
-from opening_hours.utils.hauki_resource_hash_updater import HaukiResourceHashUpdater
-from opening_hours.utils.reservable_time_span_client import NEVER_ANY_OPENING_HOURS_HASH
-from reservation_units.models import ReservationUnit
+from tilavarauspalvelu.admin.reservable_time_span.admin import ReservableTimeSpanInline
+from tilavarauspalvelu.admin.reservation_unit.admin import ReservationUnitInline
+from tilavarauspalvelu.constants import NEVER_ANY_OPENING_HOURS_HASH
+from tilavarauspalvelu.models import OriginHaukiResource
+from tilavarauspalvelu.utils.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
 
 __all__ = [
     "OriginHaukiResourceAdmin",
 ]
-
-
-class ReservationUnitInline(admin.TabularInline):
-    model = ReservationUnit
-    fields = ["id", "reservation_unit_link"]
-    readonly_fields = fields
-    can_delete = False
-    extra = 0
-
-    def has_add_permission(self, request, obj=None) -> bool:
-        return False
-
-    def reservation_unit_link(self, obj):
-        url = reverse("admin:reservation_units_reservationunit_change", args=(obj.pk,))
-
-        return format_html(f"<a href={url}>{obj.name_fi}</a>")
-
-
-class ReservableTimeSpanInline(admin.TabularInline):
-    model = ReservableTimeSpan
-    fields = ["time_span_str"]
-    readonly_fields = fields
-    can_delete = False
-    extra = 0
-
-    def has_add_permission(self, request, obj=None) -> bool:
-        return False
-
-    def time_span_str(self, obj: ReservableTimeSpan) -> str:
-        return obj.get_datetime_str()
 
 
 class OriginHaukiResourceAdminForm(forms.ModelForm):

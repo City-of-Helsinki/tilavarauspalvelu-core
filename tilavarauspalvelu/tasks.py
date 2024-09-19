@@ -1,3 +1,5 @@
+import logging
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.transaction import atomic
@@ -13,6 +15,8 @@ from tilavarauspalvelu.enums import EmailType, ReservationNotification
 from tilavarauspalvelu.exceptions import SendEmailNotificationError
 from tilavarauspalvelu.utils.email.email_sender import EmailNotificationSender
 from utils.sentry import SentryLogger
+
+logger = logging.getLogger(__name__)
 
 
 @app.task(name="rebuild_space_tree_hierarchy")
@@ -203,3 +207,11 @@ def send_application_handled_email_task() -> None:
 
     email_sender.send_batch_application_emails(applications=applications)
     applications.update(results_ready_notification_sent_date=local_datetime())
+
+
+@app.task(name="update_origin_hauki_resource_reservable_time_spans")
+def update_origin_hauki_resource_reservable_time_spans() -> None:
+    from tilavarauspalvelu.utils.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
+
+    logger.info("Updating OriginHaukiResource reservable time spans...")
+    HaukiResourceHashUpdater().run()

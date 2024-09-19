@@ -7,7 +7,6 @@ import pytest
 from django.utils.timezone import get_default_timezone
 from graphene_django_extensions.testing.utils import parametrize_helper
 
-from opening_hours.utils.time_span_element import TimeSpanElement
 from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import ReservationUnit
 from reservation_units.utils.first_reservable_time_helper.first_reservable_time_helper import FirstReservableTimeHelper
@@ -18,6 +17,7 @@ from reservation_units.utils.first_reservable_time_helper.first_reservable_time_
     ReservationUnitFirstReservableTimeHelper,
 )
 from tests.factories import OriginHaukiResourceFactory, ReservableTimeSpanFactory, ReservationUnitFactory
+from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
 
 DEFAULT_TIMEZONE = get_default_timezone()
 

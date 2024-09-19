@@ -14,13 +14,13 @@ from query_optimizer.utils import calculate_queryset_slice
 from applications.enums import ApplicationRoundStatusChoice
 from applications.models import ApplicationRound
 from common.date_utils import local_datetime, local_datetime_max, local_datetime_min, local_start_of_day
-from opening_hours.models import ReservableTimeSpan
-from opening_hours.utils.time_span_element import TimeSpanElement
-from opening_hours.utils.time_span_element_utils import merge_overlapping_time_span_elements
 from reservation_units.utils.first_reservable_time_helper.first_reservable_time_reservation_unit_helper import (
     ReservationUnitFirstReservableTimeHelper,
 )
 from reservations.models import AffectingTimeSpan
+from tilavarauspalvelu.models import ReservableTimeSpan
+from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
+from tilavarauspalvelu.utils.opening_hours.time_span_element_utils import merge_overlapping_time_span_elements
 
 if TYPE_CHECKING:
     from decimal import Decimal

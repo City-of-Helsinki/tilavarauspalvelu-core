@@ -1,6 +1,6 @@
 from typing import Any, Literal, TypedDict
 
-from opening_hours.enums import HaukiResourceState
+from tilavarauspalvelu.enums import HaukiResourceState
 
 ##########
 # Common #
