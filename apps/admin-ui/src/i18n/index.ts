@@ -37,6 +37,7 @@ i18n.addResourceBundle("fi", "common", {
   add: "Lisää",
   select: "Valitse",
   clear: "Tyhjennä",
+  close: "Sulje",
   remove: "Poista",
 });
 i18n.addResourceBundle("en", "common", {

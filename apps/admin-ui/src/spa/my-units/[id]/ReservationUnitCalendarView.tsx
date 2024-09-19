@@ -3,8 +3,8 @@ import { addDays, formatISO, startOfDay, subDays } from "date-fns";
 import { AutoGrid, HorisontalFlex } from "@/styles/layout";
 import { ReservationUnitCalendar } from "./ReservationUnitCalendar";
 import WeekNavigation from "./WeekNavigation";
-import { SortedSelect } from "@/component/SortedSelect";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
+import { Select } from "hds-react";
 
 export function ReservationUnitCalendarView({
   reservationUnitOptions,
@@ -37,12 +37,11 @@ export function ReservationUnitCalendarView({
   return (
     <>
       <AutoGrid>
-        <SortedSelect
+        <Select
           style={{
             zIndex: "var(--tilavaraus-admin-stack-select-over-calendar)",
           }}
           disabled={reservationUnitOptions.length === 0}
-          sort
           label={t("ReservationUnitsFilter.label")}
           placeholder={t("common.select")}
           options={reservationUnitOptions}

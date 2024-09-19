@@ -11,12 +11,10 @@ import { Button, TextInput, Notification } from "hds-react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { fromUIDate } from "common/src/common/util";
-import { removeRefParam } from "common/src/reservation-form/util";
 import {
   RecurringReservationFormSchema,
   type RecurringReservationForm as RecurringReservationFormT,
 } from "@/schemas";
-import { SortedSelect } from "@/component/SortedSelect";
 import {
   ReservationList,
   type NewReservationListItem,
@@ -38,6 +36,7 @@ import { AutoGrid } from "@/styles/layout";
 import { errorToast } from "common/src/common/toast";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { getSeriesOverlapErrors } from "common/src/apolloUtils";
+import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 
 const Label = styled.p<{ $bold?: boolean }>`
   font-family: var(--fontsize-body-m);
@@ -331,23 +330,15 @@ export function RecurringReservationForm({ reservationUnits }: Props) {
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <AutoGrid>
           <Element $start>
-            <Controller
+            <ControlledSelect
               name="reservationUnit"
               control={control}
               defaultValue={{ label: "", value: 0 }}
-              render={({ field }) => (
-                <SortedSelect<number>
-                  {...removeRefParam(field)}
-                  sort
-                  label={t(`${TRANS_PREFIX}.reservationUnit`)}
-                  multiselect={false}
-                  placeholder={t("common.select")}
-                  options={reservationUnitOptions}
-                  required
-                  invalid={errors.reservationUnit != null}
-                  error={translateError(errors.reservationUnit?.message)}
-                />
-              )}
+              label={t(`${TRANS_PREFIX}.reservationUnit`)}
+              placeholder={t("common.select")}
+              options={reservationUnitOptions}
+              required
+              error={translateError(errors.reservationUnit?.message)}
             />
           </Element>
 
@@ -371,24 +362,16 @@ export function RecurringReservationForm({ reservationUnits }: Props) {
             />
           </Element>
           <Element>
-            <Controller
+            <ControlledSelect
               name="repeatPattern"
               control={control}
               defaultValue={repeatPatternOptions[0]}
-              render={({ field }) => (
-                <SortedSelect
-                  {...removeRefParam(field)}
-                  sort
-                  disabled={reservationUnit == null}
-                  label={t(`${TRANS_PREFIX}.repeatPattern`)}
-                  multiselect={false}
-                  placeholder={t("common.select")}
-                  options={[...repeatPatternOptions]}
-                  required
-                  invalid={errors.repeatPattern != null}
-                  error={translateError(errors.repeatPattern?.message)}
-                />
-              )}
+              disabled={reservationUnit == null}
+              label={t(`${TRANS_PREFIX}.repeatPattern`)}
+              placeholder={t("common.select")}
+              options={[...repeatPatternOptions]}
+              required
+              error={translateError(errors.repeatPattern?.message)}
             />
           </Element>
 
