@@ -1246,7 +1246,6 @@ export type Mutation = {
   createEquipment?: Maybe<EquipmentCreateMutationPayload>;
   createEquipmentCategory?: Maybe<EquipmentCategoryCreateMutationPayload>;
   createPurpose?: Maybe<PurposeCreateMutationPayload>;
-  createRecurringReservation?: Maybe<RecurringReservationCreateMutationPayload>;
   createReservation?: Maybe<ReservationCreateMutationPayload>;
   createReservationSeries?: Maybe<ReservationSeriesCreateMutationPayload>;
   createReservationUnit?: Maybe<ReservationUnitCreateMutationPayload>;
@@ -1269,6 +1268,7 @@ export type Mutation = {
   rejectAllApplicationOptions?: Maybe<RejectAllApplicationOptionsMutationPayload>;
   rejectAllSectionOptions?: Maybe<RejectAllSectionOptionsMutationPayload>;
   requireHandlingForReservation?: Maybe<ReservationRequiresHandlingMutationPayload>;
+  rescheduleReservationSeries?: Maybe<ReservationSeriesRescheduleMutationPayload>;
   restoreAllApplicationOptions?: Maybe<RestoreAllApplicationOptionsMutationPayload>;
   restoreAllSectionOptions?: Maybe<RestoreAllSectionOptionsMutationPayload>;
   sendApplication?: Maybe<ApplicationSendMutationPayload>;
@@ -1281,8 +1281,8 @@ export type Mutation = {
   updateEquipment?: Maybe<EquipmentUpdateMutationPayload>;
   updateEquipmentCategory?: Maybe<EquipmentCategoryUpdateMutationPayload>;
   updatePurpose?: Maybe<PurposeUpdateMutationPayload>;
-  updateRecurringReservation?: Maybe<RecurringReservationUpdateMutationPayload>;
   updateReservation?: Maybe<ReservationUpdateMutationPayload>;
+  updateReservationSeries?: Maybe<ReservationSeriesUpdateMutationPayload>;
   updateReservationUnit?: Maybe<ReservationUnitUpdateMutationPayload>;
   updateReservationUnitImage?: Maybe<ReservationUnitImageUpdateMutationPayload>;
   updateReservationUnitOption?: Maybe<ReservationUnitOptionUpdateMutationPayload>;
@@ -1339,10 +1339,6 @@ export type MutationCreateEquipmentCategoryArgs = {
 
 export type MutationCreatePurposeArgs = {
   input: PurposeCreateMutationInput;
-};
-
-export type MutationCreateRecurringReservationArgs = {
-  input: RecurringReservationCreateMutationInput;
 };
 
 export type MutationCreateReservationArgs = {
@@ -1433,6 +1429,10 @@ export type MutationRequireHandlingForReservationArgs = {
   input: ReservationRequiresHandlingMutationInput;
 };
 
+export type MutationRescheduleReservationSeriesArgs = {
+  input: ReservationSeriesRescheduleMutationInput;
+};
+
 export type MutationRestoreAllApplicationOptionsArgs = {
   input: RestoreAllApplicationOptionsMutationInput;
 };
@@ -1481,12 +1481,12 @@ export type MutationUpdatePurposeArgs = {
   input: PurposeUpdateMutationInput;
 };
 
-export type MutationUpdateRecurringReservationArgs = {
-  input: RecurringReservationUpdateMutationInput;
-};
-
 export type MutationUpdateReservationArgs = {
   input: ReservationUpdateMutationInput;
+};
+
+export type MutationUpdateReservationSeriesArgs = {
+  input: ReservationSeriesUpdateMutationInput;
 };
 
 export type MutationUpdateReservationUnitArgs = {
@@ -2479,36 +2479,6 @@ export type QueryUserArgs = {
   id: Scalars["ID"]["input"];
 };
 
-export type RecurringReservationCreateMutationInput = {
-  abilityGroup?: InputMaybe<Scalars["Int"]["input"]>;
-  ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
-  beginDate: Scalars["Date"]["input"];
-  beginTime: Scalars["Time"]["input"];
-  description?: InputMaybe<Scalars["String"]["input"]>;
-  endDate: Scalars["Date"]["input"];
-  endTime: Scalars["Time"]["input"];
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
-  recurrenceInDays: Scalars["Int"]["input"];
-  reservationUnit: Scalars["Int"]["input"];
-  weekdays: Array<InputMaybe<Scalars["Int"]["input"]>>;
-};
-
-export type RecurringReservationCreateMutationPayload = {
-  abilityGroup?: Maybe<Scalars["Int"]["output"]>;
-  ageGroup?: Maybe<Scalars["Int"]["output"]>;
-  beginDate?: Maybe<Scalars["Date"]["output"]>;
-  beginTime?: Maybe<Scalars["Time"]["output"]>;
-  description?: Maybe<Scalars["String"]["output"]>;
-  endDate?: Maybe<Scalars["Date"]["output"]>;
-  endTime?: Maybe<Scalars["Time"]["output"]>;
-  name?: Maybe<Scalars["String"]["output"]>;
-  pk?: Maybe<Scalars["Int"]["output"]>;
-  recurrenceInDays?: Maybe<Scalars["Int"]["output"]>;
-  reservationUnit?: Maybe<Scalars["Int"]["output"]>;
-  weekdays?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
-};
-
 export type RecurringReservationNode = Node & {
   abilityGroup?: Maybe<AbilityGroupNode>;
   ageGroup?: Maybe<AgeGroupNode>;
@@ -2613,36 +2583,6 @@ export enum RecurringReservationOrderingChoices {
   UnitNameSvAsc = "unitNameSvAsc",
   UnitNameSvDesc = "unitNameSvDesc",
 }
-
-export type RecurringReservationUpdateMutationInput = {
-  abilityGroup?: InputMaybe<Scalars["Int"]["input"]>;
-  ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
-  beginDate?: InputMaybe<Scalars["Date"]["input"]>;
-  beginTime?: InputMaybe<Scalars["Time"]["input"]>;
-  description?: InputMaybe<Scalars["String"]["input"]>;
-  endDate?: InputMaybe<Scalars["Date"]["input"]>;
-  endTime?: InputMaybe<Scalars["Time"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  pk: Scalars["Int"]["input"];
-  recurrenceInDays?: InputMaybe<Scalars["Int"]["input"]>;
-  reservationUnit?: InputMaybe<Scalars["Int"]["input"]>;
-  weekdays?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-};
-
-export type RecurringReservationUpdateMutationPayload = {
-  abilityGroup?: Maybe<Scalars["Int"]["output"]>;
-  ageGroup?: Maybe<Scalars["Int"]["output"]>;
-  beginDate?: Maybe<Scalars["Date"]["output"]>;
-  beginTime?: Maybe<Scalars["Time"]["output"]>;
-  description?: Maybe<Scalars["String"]["output"]>;
-  endDate?: Maybe<Scalars["Date"]["output"]>;
-  endTime?: Maybe<Scalars["Time"]["output"]>;
-  name?: Maybe<Scalars["String"]["output"]>;
-  pk?: Maybe<Scalars["Int"]["output"]>;
-  recurrenceInDays?: Maybe<Scalars["Int"]["output"]>;
-  reservationUnit?: Maybe<Scalars["Int"]["output"]>;
-  weekdays?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
-};
 
 export type RefreshOrderMutationInput = {
   orderUuid: Scalars["String"]["input"];
@@ -3269,7 +3209,7 @@ export type ReservationSeriesCreateMutationInput = {
   name?: InputMaybe<Scalars["String"]["input"]>;
   pk?: InputMaybe<Scalars["Int"]["input"]>;
   recurrenceInDays: Scalars["Int"]["input"];
-  reservationDetails: ReservationSeriesReservationSerializerInput;
+  reservationDetails: ReservationSeriesReservationCreateSerializerInput;
   reservationUnit: Scalars["Int"]["input"];
   skipDates?: InputMaybe<Array<InputMaybe<Scalars["Date"]["input"]>>>;
   weekdays: Array<InputMaybe<Scalars["Int"]["input"]>>;
@@ -3290,7 +3230,29 @@ export type ReservationSeriesCreateMutationPayload = {
   weekdays?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
 };
 
-export type ReservationSeriesReservationSerializerInput = {
+export type ReservationSeriesRescheduleMutationInput = {
+  beginDate?: InputMaybe<Scalars["Date"]["input"]>;
+  beginTime?: InputMaybe<Scalars["Time"]["input"]>;
+  bufferTimeAfter?: InputMaybe<Scalars["String"]["input"]>;
+  bufferTimeBefore?: InputMaybe<Scalars["String"]["input"]>;
+  endDate?: InputMaybe<Scalars["Date"]["input"]>;
+  endTime?: InputMaybe<Scalars["Time"]["input"]>;
+  pk: Scalars["Int"]["input"];
+  skipDates?: InputMaybe<Array<InputMaybe<Scalars["Date"]["input"]>>>;
+  weekdays?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+};
+
+export type ReservationSeriesRescheduleMutationPayload = {
+  beginDate?: Maybe<Scalars["Date"]["output"]>;
+  beginTime?: Maybe<Scalars["Time"]["output"]>;
+  endDate?: Maybe<Scalars["Date"]["output"]>;
+  endTime?: Maybe<Scalars["Time"]["output"]>;
+  pk?: Maybe<Scalars["Int"]["output"]>;
+  weekdays?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
+};
+
+export type ReservationSeriesReservationCreateSerializerInput = {
+  ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
   applyingForFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
   billingAddressCity?: InputMaybe<Scalars["String"]["input"]>;
   billingAddressStreet?: InputMaybe<Scalars["String"]["input"]>;
@@ -3325,6 +3287,22 @@ export type ReservationSeriesReservationSerializerInput = {
   type: ReservationTypeStaffChoice;
   user: Scalars["Int"]["input"];
   workingMemo?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type ReservationSeriesUpdateMutationInput = {
+  ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
+  description?: InputMaybe<Scalars["String"]["input"]>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
+  pk: Scalars["Int"]["input"];
+  reservationDetails?: InputMaybe<UpdateReservationSeriesReservationUpdateSerializerInput>;
+  skipReservations?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+};
+
+export type ReservationSeriesUpdateMutationPayload = {
+  ageGroup?: Maybe<Scalars["Int"]["output"]>;
+  description?: Maybe<Scalars["String"]["output"]>;
+  name?: Maybe<Scalars["String"]["output"]>;
+  pk?: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type ReservationStaffAdjustTimeMutationInput = {
@@ -5224,6 +5202,37 @@ export type UpdatePersonSerializerInput = {
   lastName?: InputMaybe<Scalars["String"]["input"]>;
   phoneNumber?: InputMaybe<Scalars["String"]["input"]>;
   pk?: InputMaybe<Scalars["Int"]["input"]>;
+};
+
+export type UpdateReservationSeriesReservationUpdateSerializerInput = {
+  ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
+  applyingForFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
+  billingAddressCity?: InputMaybe<Scalars["String"]["input"]>;
+  billingAddressStreet?: InputMaybe<Scalars["String"]["input"]>;
+  billingAddressZip?: InputMaybe<Scalars["String"]["input"]>;
+  billingEmail?: InputMaybe<Scalars["String"]["input"]>;
+  billingFirstName?: InputMaybe<Scalars["String"]["input"]>;
+  billingLastName?: InputMaybe<Scalars["String"]["input"]>;
+  billingPhone?: InputMaybe<Scalars["String"]["input"]>;
+  description?: InputMaybe<Scalars["String"]["input"]>;
+  freeOfChargeReason?: InputMaybe<Scalars["String"]["input"]>;
+  homeCity?: InputMaybe<Scalars["Int"]["input"]>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
+  numPersons?: InputMaybe<Scalars["Int"]["input"]>;
+  purpose?: InputMaybe<Scalars["Int"]["input"]>;
+  reserveeAddressCity?: InputMaybe<Scalars["String"]["input"]>;
+  reserveeAddressStreet?: InputMaybe<Scalars["String"]["input"]>;
+  reserveeAddressZip?: InputMaybe<Scalars["String"]["input"]>;
+  reserveeEmail?: InputMaybe<Scalars["String"]["input"]>;
+  reserveeFirstName?: InputMaybe<Scalars["String"]["input"]>;
+  reserveeId?: InputMaybe<Scalars["String"]["input"]>;
+  reserveeIsUnregisteredAssociation?: InputMaybe<Scalars["Boolean"]["input"]>;
+  reserveeLanguage?: InputMaybe<ReserveeLanguage>;
+  reserveeLastName?: InputMaybe<Scalars["String"]["input"]>;
+  reserveeOrganisationName?: InputMaybe<Scalars["String"]["input"]>;
+  reserveePhone?: InputMaybe<Scalars["String"]["input"]>;
+  reserveeType?: InputMaybe<ReserveeType>;
+  workingMemo?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type UpdateReservationUnitImageFieldSerializerInput = {

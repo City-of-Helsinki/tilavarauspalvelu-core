@@ -16,9 +16,9 @@ export const UPDATE_STAFF_RESERVATION = gql`
 
 export const UPDATE_STAFF_RECURRING_RESERVATION = gql`
   mutation UpdateRecurringReservation(
-    $input: RecurringReservationUpdateMutationInput!
+    $input: ReservationSeriesUpdateMutationInput!
   ) {
-    updateRecurringReservation(input: $input) {
+    updateReservationSeries(input: $input) {
       pk
     }
   }

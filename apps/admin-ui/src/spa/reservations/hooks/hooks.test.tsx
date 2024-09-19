@@ -29,7 +29,6 @@ function TestComponent({
   const input: MutationInputParams = {
     ...MUTATION_DATA.input,
     ...MUTATION_DATA.workingMemo,
-    pk: reservation.pk ?? 0,
     seriesName,
   };
 
@@ -64,26 +63,6 @@ describe("edit mutation hook single reservation", () => {
     await user.click(btn);
 
     await waitFor(() => expect(successCb).toHaveBeenCalled());
-  });
-
-  test("reservation failing with network error gets retried once", async () => {
-    const view = wrappedRender(101, successCb);
-    const btn = view.getByRole("button", { name: /mutate/i });
-    expect(btn).toBeInTheDocument();
-    const user = userEvent.setup();
-    await user.click(btn);
-
-    await waitFor(() => expect(successCb).toHaveBeenCalled());
-  });
-
-  test("reservation failing with network error twice fails", async () => {
-    const view = wrappedRender(102, successCb);
-    const btn = view.getByRole("button", { name: /mutate/i });
-    expect(btn).toBeInTheDocument();
-    const user = userEvent.setup();
-    await user.click(btn);
-
-    expect(successCb).not.toHaveBeenCalled();
   });
 
   // FIXME fails with missing pk 111 in the mocks

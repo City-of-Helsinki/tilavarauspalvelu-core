@@ -1483,9 +1483,6 @@ type Mutation {
   createPurpose(
     input: PurposeCreateMutationInput!
   ): PurposeCreateMutationPayload
-  createRecurringReservation(
-    input: RecurringReservationCreateMutationInput!
-  ): RecurringReservationCreateMutationPayload
   createReservation(
     input: ReservationCreateMutationInput!
   ): ReservationCreateMutationPayload
@@ -1546,6 +1543,9 @@ type Mutation {
   requireHandlingForReservation(
     input: ReservationRequiresHandlingMutationInput!
   ): ReservationRequiresHandlingMutationPayload
+  rescheduleReservationSeries(
+    input: ReservationSeriesRescheduleMutationInput!
+  ): ReservationSeriesRescheduleMutationPayload
   restoreAllApplicationOptions(
     input: RestoreAllApplicationOptionsMutationInput!
   ): RestoreAllApplicationOptionsMutationPayload
@@ -1582,12 +1582,12 @@ type Mutation {
   updatePurpose(
     input: PurposeUpdateMutationInput!
   ): PurposeUpdateMutationPayload
-  updateRecurringReservation(
-    input: RecurringReservationUpdateMutationInput!
-  ): RecurringReservationUpdateMutationPayload
   updateReservation(
     input: ReservationUpdateMutationInput!
   ): ReservationUpdateMutationPayload
+  updateReservationSeries(
+    input: ReservationSeriesUpdateMutationInput!
+  ): ReservationSeriesUpdateMutationPayload
   updateReservationUnit(
     input: ReservationUnitUpdateMutationInput!
   ): ReservationUnitUpdateMutationPayload
@@ -2681,36 +2681,6 @@ type Query {
   ): UserNode
 }
 
-input RecurringReservationCreateMutationInput {
-  abilityGroup: Int
-  ageGroup: Int
-  beginDate: Date!
-  beginTime: Time!
-  description: String
-  endDate: Date!
-  endTime: Time!
-  name: String
-  pk: Int
-  recurrenceInDays: Int!
-  reservationUnit: Int!
-  weekdays: [Int]!
-}
-
-type RecurringReservationCreateMutationPayload {
-  abilityGroup: Int
-  ageGroup: Int
-  beginDate: Date
-  beginTime: Time
-  description: String
-  endDate: Date
-  endTime: Time
-  name: String
-  pk: Int
-  recurrenceInDays: Int
-  reservationUnit: Int
-  weekdays: [Int]
-}
-
 type RecurringReservationNode implements Node {
   abilityGroup: AbilityGroupNode
   ageGroup: AgeGroupNode
@@ -2830,36 +2800,6 @@ enum RecurringReservationOrderingChoices {
   unitNameFiDesc
   unitNameSvAsc
   unitNameSvDesc
-}
-
-input RecurringReservationUpdateMutationInput {
-  abilityGroup: Int
-  ageGroup: Int
-  beginDate: Date
-  beginTime: Time
-  description: String
-  endDate: Date
-  endTime: Time
-  name: String
-  pk: Int!
-  recurrenceInDays: Int
-  reservationUnit: Int
-  weekdays: [Int]
-}
-
-type RecurringReservationUpdateMutationPayload {
-  abilityGroup: Int
-  ageGroup: Int
-  beginDate: Date
-  beginTime: Time
-  description: String
-  endDate: Date
-  endTime: Time
-  name: String
-  pk: Int
-  recurrenceInDays: Int
-  reservationUnit: Int
-  weekdays: [Int]
 }
 
 input RefreshOrderMutationInput {
@@ -3591,7 +3531,7 @@ input ReservationSeriesCreateMutationInput {
   name: String
   pk: Int
   recurrenceInDays: Int!
-  reservationDetails: ReservationSeriesReservationSerializerInput!
+  reservationDetails: ReservationSeriesReservationCreateSerializerInput!
   reservationUnit: Int!
   skipDates: [Date]
   weekdays: [Int]!
@@ -3612,7 +3552,29 @@ type ReservationSeriesCreateMutationPayload {
   weekdays: [Int]
 }
 
-input ReservationSeriesReservationSerializerInput {
+input ReservationSeriesRescheduleMutationInput {
+  beginDate: Date
+  beginTime: Time
+  bufferTimeAfter: String
+  bufferTimeBefore: String
+  endDate: Date
+  endTime: Time
+  pk: Int!
+  skipDates: [Date]
+  weekdays: [Int]
+}
+
+type ReservationSeriesRescheduleMutationPayload {
+  beginDate: Date
+  beginTime: Time
+  endDate: Date
+  endTime: Time
+  pk: Int
+  weekdays: [Int]
+}
+
+input ReservationSeriesReservationCreateSerializerInput {
+  ageGroup: Int
   applyingForFreeOfCharge: Boolean
   billingAddressCity: String
   billingAddressStreet: String
@@ -3647,6 +3609,22 @@ input ReservationSeriesReservationSerializerInput {
   type: ReservationTypeStaffChoice!
   user: Int!
   workingMemo: String
+}
+
+input ReservationSeriesUpdateMutationInput {
+  ageGroup: Int
+  description: String
+  name: String
+  pk: Int!
+  reservationDetails: UpdateReservationSeriesReservationUpdateSerializerInput
+  skipReservations: [Int]
+}
+
+type ReservationSeriesUpdateMutationPayload {
+  ageGroup: Int
+  description: String
+  name: String
+  pk: Int
 }
 
 input ReservationStaffAdjustTimeMutationInput {
@@ -5835,6 +5813,37 @@ input UpdatePersonSerializerInput {
   lastName: String
   phoneNumber: String
   pk: Int
+}
+
+input UpdateReservationSeriesReservationUpdateSerializerInput {
+  ageGroup: Int
+  applyingForFreeOfCharge: Boolean
+  billingAddressCity: String
+  billingAddressStreet: String
+  billingAddressZip: String
+  billingEmail: String
+  billingFirstName: String
+  billingLastName: String
+  billingPhone: String
+  description: String
+  freeOfChargeReason: String
+  homeCity: Int
+  name: String
+  numPersons: Int
+  purpose: Int
+  reserveeAddressCity: String
+  reserveeAddressStreet: String
+  reserveeAddressZip: String
+  reserveeEmail: String
+  reserveeFirstName: String
+  reserveeId: String
+  reserveeIsUnregisteredAssociation: Boolean
+  reserveeLanguage: ReserveeLanguage
+  reserveeLastName: String
+  reserveeOrganisationName: String
+  reserveePhone: String
+  reserveeType: ReserveeType
+  workingMemo: String
 }
 
 input UpdateReservationUnitImageFieldSerializerInput {

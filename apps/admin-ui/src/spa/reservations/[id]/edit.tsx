@@ -148,14 +148,13 @@ function EditReservation({
       reservationUnit.metadataSet?.supportedFields
     );
 
+    // TODO this removes all type information
     const flattenedMetadataSetValues = flattenMetadata(
       values,
       metadataSetFields
     );
 
     const toSubmit = {
-      pk: reservation.pk,
-      reservationUnitPks: [reservationUnit.pk],
       seriesName: values.seriesName !== "" ? values.seriesName : undefined,
       workingMemo: values.comments,
       type: values.type,

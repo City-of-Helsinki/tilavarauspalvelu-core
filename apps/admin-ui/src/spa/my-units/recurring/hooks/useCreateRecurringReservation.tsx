@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
 import get from "lodash/get";
 import {
-  type ReservationSeriesReservationSerializerInput,
   ReservationStateChoice,
   ReservationTypeChoice,
   ReservationTypeStaffChoice,
@@ -79,7 +78,7 @@ export function useCreateRecurringReservation() {
       throw new Error("Current user pk missing");
     }
 
-    const reservationDetails: ReservationSeriesReservationSerializerInput = {
+    const reservationDetails = {
       ...flattenedMetadataSetValues,
       type: transformReservationTypeStaffChoice(data.type),
       bufferTimeBefore: buffers.before,

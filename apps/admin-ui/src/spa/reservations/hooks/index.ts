@@ -1,15 +1,20 @@
 import { useTranslation } from "react-i18next";
 import {
-  ReservationStateChoice,
-  type ReservationStaffModifyMutationInput,
   type ReservationQuery,
   useUpdateRecurringReservationMutation,
   useUpdateStaffReservationMutation,
+  type ReservationSeriesUpdateMutationInput,
+  ReserveeType,
+  CustomerTypeChoice,
+  type Maybe,
+  type ReservationStaffModifyMutationInput,
 } from "@gql/gql-types";
 import { errorToast, successToast } from "common/src/common/toast";
-import { useRecurringReservations } from "@/hooks";
 
-export type MutationInputParams = ReservationStaffModifyMutationInput & {
+export type MutationInputParams = Omit<
+  ReservationStaffModifyMutationInput,
+  "pk"
+> & {
   seriesName?: string;
   workingMemo?: string;
 };
@@ -20,17 +25,12 @@ export function useStaffReservationMutation({
   reservation,
   onSuccess,
 }: {
-  reservation: ReservationType;
+  reservation: Pick<ReservationType, "pk" | "recurringReservation">;
   onSuccess: () => void;
 }) {
   const { t } = useTranslation();
 
   const [mutation] = useUpdateStaffReservationMutation();
-
-  const { recurringReservation } = useRecurringReservations(
-    reservation.recurringReservation?.pk ?? undefined
-  );
-  const reservations = recurringReservation?.reservations ?? [];
 
   const [recurringMutation] = useUpdateRecurringReservationMutation();
 
@@ -45,103 +45,78 @@ export function useStaffReservationMutation({
     errorToast({ text: t("Reservation.EditPage.saveError") });
   };
 
-  const editStaffReservation = async (input: MutationInputParams) => {
-    const { seriesName, workingMemo, ...rest } = input;
-    const isRecurring = !!reservation.recurringReservation?.pk;
+  const editStaffReservation = async (vals: MutationInputParams) => {
+    const { seriesName, workingMemo, ...rest } = vals;
 
-    if (isRecurring) {
-      // NOTE frontend filtering because of cache issues
-      const pksToUpdate = reservations
-        .filter((x) => new Date(x.begin) >= new Date())
-        .filter((x) => x.state === ReservationStateChoice.Confirmed)
-        .map((x) => x.pk)
-        .filter((x): x is number => x != null);
-      if (pksToUpdate.length === 0) {
-        throw new Error("No reservations to update");
-      }
-
-      const res = await recurringMutation({
-        variables: {
-          input: {
-            name: seriesName,
-            pk: reservation.recurringReservation?.pk ?? 0,
-            description: workingMemo,
-          },
-        },
-      });
-
-      if (res.errors) {
-        handleError();
-        return;
-      }
-
-      const retryOnce = async (vars: {
-        input: ReservationStaffModifyMutationInput;
-        workingMemo: {
-          pk: number;
-          workingMemo?: string;
+    try {
+      if (reservation.recurringReservation?.pk != null) {
+        const { purposePk, ageGroupPk, homeCityPk, type, ...details } = rest;
+        const reserveeType = convertReserveeType(rest.reserveeType);
+        const reservationDetails = {
+          ...details,
+          purpose: purposePk,
+          ageGroup: ageGroupPk,
+          homeCity: homeCityPk,
+          reserveeType,
         };
-      }) => {
-        try {
-          const res2 = await mutation({
-            variables: vars,
-          });
-          return res2;
-        } catch (err) {
-          if (err != null && typeof err === "object" && "networkError" in err) {
-            const res3 = await mutation({
-              variables: vars,
-            });
-            return Promise.resolve(res3);
-          }
-          // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
-          return Promise.reject(err);
-        }
-      };
 
-      const promises = pksToUpdate.map((pk) =>
-        retryOnce({
-          input: { ...rest, pk },
-          workingMemo: { pk, workingMemo },
-        })
-      );
-
-      // NOTE 1000+ mutations takes a long time, do 10 to check if they are valid and early abort on errors.
-      const [firstPass, secondPass] = [
-        promises.slice(0, 10),
-        promises.slice(10),
-      ];
-
-      await Promise.all(firstPass)
-        .then(() => Promise.all(secondPass))
-        .then(() => handleSuccess(true))
-        .catch(handleError);
-    } else {
-      const variables = {
-        input: rest,
-        workingMemo: {
-          pk: input.pk,
-          workingMemo,
-        },
-      };
-
-      // Retry once on network error
-      try {
-        await mutation({
-          variables,
-          onCompleted: () => handleSuccess(false),
+        const input: ReservationSeriesUpdateMutationInput = {
+          name: seriesName,
+          pk: reservation.recurringReservation.pk,
+          description: workingMemo,
+          ageGroup: rest.ageGroupPk,
+          reservationDetails,
+        };
+        const res = await recurringMutation({
+          variables: {
+            input,
+          },
         });
-      } catch (err) {
-        if (err != null && typeof err === "object" && "networkError" in err) {
-          await mutation({
-            variables,
-            onCompleted: () => handleSuccess(false),
-            onError: () => handleError(),
-          });
+
+        if (res.errors) {
+          handleError();
+          return;
         }
+        handleSuccess(true);
+      } else {
+        if (!reservation.pk) {
+          throw new Error("No reservation pk");
+        }
+        const variables = {
+          input: {
+            ...rest,
+            pk: reservation.pk,
+          },
+          workingMemo: {
+            pk: reservation.pk,
+            workingMemo,
+          },
+        };
+        mutation({ variables });
+        handleSuccess(false);
       }
+    } catch (e) {
+      handleError();
     }
   };
 
   return editStaffReservation;
+}
+
+function convertReserveeType(
+  type?: Maybe<CustomerTypeChoice>
+): ReserveeType | undefined {
+  if (type == null) {
+    return undefined;
+  }
+  switch (type) {
+    case CustomerTypeChoice.Business:
+      return ReserveeType.Business;
+    case CustomerTypeChoice.Individual:
+      return ReserveeType.Individual;
+    case CustomerTypeChoice.Nonprofit:
+      return ReserveeType.Nonprofit;
+    default:
+      return undefined;
+  }
 }
