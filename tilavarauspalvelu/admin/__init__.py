@@ -1,5 +1,6 @@
 from .email_template.admin import EmailTemplateAdmin
 from .general_role.admin import GeneralRoleAdmin
+from .origin_hauki_resource.admin import OriginHaukiResourceAdmin
 from .payment_accounting.admin import PaymentAccountingAdmin
 from .payment_merchant.admin import PaymentMerchantAdmin
 from .payment_order.admin import PaymentOrderAdmin
@@ -16,6 +17,7 @@ from .user.admin import UserAdmin
 __all__ = [
     "EmailTemplateAdmin",
     "GeneralRoleAdmin",
+    "OriginHaukiResourceAdmin",
     "PaymentAccountingAdmin",
     "PaymentMerchantAdmin",
     "PaymentOrderAdmin",

@@ -1306,100 +1306,6 @@ msgstr ""
 msgid "Swedish"
 msgstr ""
 
-#: opening_hours/admin/origin_hauki_resource.py
-msgid ""
-"OriginHaukiResources with this specific hash never have any opening hours."
-msgstr ""
-
-#: opening_hours/admin/origin_hauki_resource.py
-msgid "ID of the resource in Hauki."
-msgstr ""
-
-#: opening_hours/admin/origin_hauki_resource.py
-msgid ""
-"Hash of the opening hours. Used to determine if the opening hours have "
-"changed."
-msgstr ""
-
-#: opening_hours/admin/origin_hauki_resource.py
-msgid ""
-"All opening hours have been fetched from Hauki up until this date. Opening "
-"hours are fetched until the last day of the month two years from now."
-msgstr ""
-
-#: opening_hours/admin/origin_hauki_resource.py
-msgid "Reservable Time Spans updated."
-msgstr ""
-
-#: opening_hours/enums.py
-msgctxt "HaukiResourceState"
-msgid "Open"
-msgstr ""
-
-#: opening_hours/enums.py
-msgctxt "HaukiResourceState"
-msgid "Closed"
-msgstr ""
-
-#: opening_hours/enums.py
-msgctxt "HaukiResourceState"
-msgid "Undefined"
-msgstr ""
-
-#: opening_hours/enums.py
-msgctxt "HaukiResourceState"
-msgid "Self service"
-msgstr ""
-
-#: opening_hours/enums.py
-msgctxt "HaukiResourceState"
-msgid "With key"
-msgstr ""
-
-#: opening_hours/enums.py
-msgctxt "HaukiResourceState"
-msgid "With reservation"
-msgstr ""
-
-#: opening_hours/enums.py
-msgctxt "HaukiResourceState"
-msgid "Open and reservable"
-msgstr ""
-
-#: opening_hours/enums.py
-msgctxt "HaukiResourceState"
-msgid "With key and reservation"
-msgstr ""
-
-#: opening_hours/enums.py
-msgctxt "HaukiResourceState"
-msgid "Enter only"
-msgstr ""
-
-#: opening_hours/enums.py
-msgctxt "HaukiResourceState"
-msgid "Exit only"
-msgstr ""
-
-#: opening_hours/enums.py
-msgctxt "HaukiResourceState"
-msgid "Weather permitting"
-msgstr ""
-
-#: opening_hours/enums.py
-msgctxt "HaukiResourceState"
-msgid "Not in use"
-msgstr ""
-
-#: opening_hours/enums.py
-msgctxt "HaukiResourceState"
-msgid "Maintenance"
-msgstr ""
-
-#: opening_hours/models.py
-msgid "`start_datetime` must be before `end_datetime`."
-msgstr ""
-
 #: reservation_units/admin/reservation_unit/admin.py
 msgid "Search by ID, name, unit name, or service sector name"
 msgstr ""
@@ -2772,6 +2678,31 @@ msgstr ""
 msgid "Search by username, email, first name or last name"
 msgstr ""
 
+#: tilavarauspalvelu/admin/origin_hauki_resource/admin.py
+msgid ""
+"OriginHaukiResources with this specific hash never have any opening hours."
+msgstr ""
+
+#: tilavarauspalvelu/admin/origin_hauki_resource/admin.py
+msgid "ID of the resource in Hauki."
+msgstr ""
+
+#: tilavarauspalvelu/admin/origin_hauki_resource/admin.py
+msgid ""
+"Hash of the opening hours. Used to determine if the opening hours have "
+"changed."
+msgstr ""
+
+#: tilavarauspalvelu/admin/origin_hauki_resource/admin.py
+msgid ""
+"All opening hours have been fetched from Hauki up until this date. Opening "
+"hours are fetched until the last day of the month two years from now."
+msgstr ""
+
+#: tilavarauspalvelu/admin/origin_hauki_resource/admin.py
+msgid "Reservable Time Spans updated."
+msgstr ""
+
 #: tilavarauspalvelu/admin/payment_merchant/admin.py
 msgid "The Paytrail Merchant ID should be a six-digit number."
 msgstr ""
@@ -3027,6 +2958,71 @@ msgstr ""
 msgid "Notification manager"
 msgstr ""
 
+#: tilavarauspalvelu/enums.py
+msgctxt "HaukiResourceState"
+msgid "Open"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "HaukiResourceState"
+msgid "Closed"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "HaukiResourceState"
+msgid "Undefined"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "HaukiResourceState"
+msgid "Self service"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "HaukiResourceState"
+msgid "With key"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "HaukiResourceState"
+msgid "With reservation"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "HaukiResourceState"
+msgid "Open and reservable"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "HaukiResourceState"
+msgid "With key and reservation"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "HaukiResourceState"
+msgid "Enter only"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "HaukiResourceState"
+msgid "Exit only"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "HaukiResourceState"
+msgid "Weather permitting"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "HaukiResourceState"
+msgid "Not in use"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "HaukiResourceState"
+msgid "Maintenance"
+msgstr ""
+
 #: tilavarauspalvelu/models/email_template/model.py
 msgid "Email type"
 msgstr ""
@@ -3083,6 +3079,10 @@ msgstr ""
 
 #: tilavarauspalvelu/models/payment_order/model.py
 msgid "Must be the sum of net and vat amounts"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservable_time_span/model.py
+msgid "`start_datetime` must be before `end_datetime`."
 msgstr ""
 
 #: tilavarauspalvelu/models/terms_of_use/model.py

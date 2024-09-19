@@ -6,21 +6,21 @@ from django.utils import timezone
 from freezegun import freeze_time
 
 from common.date_utils import DEFAULT_TIMEZONE
-from opening_hours.enums import HaukiResourceState
-from opening_hours.errors import ReservableTimeSpanClientNothingToDoError
-from opening_hours.models import ReservableTimeSpan
-from opening_hours.utils.hauki_api_client import HaukiAPIClient
-from opening_hours.utils.hauki_api_types import (
+from tests.helpers import patch_method
+from tests.mocks import MockResponse
+from tilavarauspalvelu.enums import HaukiResourceState
+from tilavarauspalvelu.exceptions import ReservableTimeSpanClientNothingToDoError
+from tilavarauspalvelu.models import ReservableTimeSpan
+from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
+from tilavarauspalvelu.utils.opening_hours.hauki_api_types import (
     HaukiAPIOpeningHoursResponseDate,
     HaukiAPIOpeningHoursResponseItem,
     HaukiAPIOpeningHoursResponseResource,
     HaukiAPIOpeningHoursResponseTime,
     HaukiTranslatedField,
 )
-from opening_hours.utils.reservable_time_span_client import ReservableTimeSpanClient
-from opening_hours.utils.time_span_element import TimeSpanElement
-from tests.helpers import patch_method
-from tests.mocks import MockResponse
+from tilavarauspalvelu.utils.opening_hours.reservable_time_span_client import ReservableTimeSpanClient
+from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
 
 # Applied to all tests
 pytestmark = [

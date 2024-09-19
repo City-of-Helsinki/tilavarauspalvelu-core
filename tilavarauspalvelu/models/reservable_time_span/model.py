@@ -1,56 +1,38 @@
-from datetime import datetime
+from __future__ import annotations
+
+from functools import cached_property
+from typing import TYPE_CHECKING
 
 from django.db import models
 from django.db.models import F, Q
-from django.utils.timezone import get_default_timezone
 from django.utils.translation import gettext_lazy as _
 
-from opening_hours.querysets import ReservableTimeSpanQuerySet
-from opening_hours.utils.time_span_element import TimeSpanElement
+from common.date_utils import DEFAULT_TIMEZONE
+from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
 
-DEFAULT_TIMEZONE = get_default_timezone()
+from .queryset import ReservableTimeSpanManager
+
+if TYPE_CHECKING:
+    from .actions import ReservableTimeSpanActions
 
 
 __all__ = [
-    "OriginHaukiResource",
     "ReservableTimeSpan",
 ]
-
-
-class OriginHaukiResource(models.Model):
-    # Resource id in Hauki API
-    id = models.IntegerField(unique=True, primary_key=True)
-    # Hauki API hash for opening hours, which is used to determine if the opening hours have changed
-    opening_hours_hash = models.CharField(max_length=64, blank=True)
-    # Latest date fetched from Hauki opening hours API
-    latest_fetched_date = models.DateField(blank=True, null=True)
-
-    class Meta:
-        db_table = "origin_hauki_resource"
-        base_manager_name = "objects"
-        ordering = [
-            "pk",
-        ]
-
-    def __str__(self) -> str:
-        return str(self.id)
-
-    def is_reservable(self, start_datetime: datetime, end_datetime: datetime) -> bool:
-        return self.reservable_time_spans.fully_fill_period(start=start_datetime, end=end_datetime).exists()
 
 
 class ReservableTimeSpan(models.Model):
     """A time period on which a ReservationUnit is reservable."""
 
     resource = models.ForeignKey(
-        OriginHaukiResource,
+        "tilavarauspalvelu.OriginHaukiResource",
         related_name="reservable_time_spans",
         on_delete=models.CASCADE,
     )
     start_datetime = models.DateTimeField(null=False, blank=False)
     end_datetime = models.DateTimeField(null=False, blank=False)
 
-    objects = ReservableTimeSpanQuerySet.as_manager()
+    objects = ReservableTimeSpanManager()
 
     class Meta:
         db_table = "reservable_time_span"
@@ -70,6 +52,14 @@ class ReservableTimeSpan(models.Model):
 
     def __str__(self) -> str:
         return f"{self.resource} {self.get_datetime_str()}"
+
+    @cached_property
+    def actions(self) -> ReservableTimeSpanActions:
+        # Import actions inline to defer loading them.
+        # This allows us to avoid circular imports.
+        from .actions import ReservableTimeSpanActions
+
+        return ReservableTimeSpanActions(self)
 
     def get_datetime_str(self) -> str:
         strformat = "%Y-%m-%d %H:%M"

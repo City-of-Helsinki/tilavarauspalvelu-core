@@ -1,6 +1,6 @@
 import datetime
 
-from opening_hours.models import ReservableTimeSpan
+from tilavarauspalvelu.models import ReservableTimeSpan
 
 
 def can_reserve_based_on_opening_hours(

@@ -4,11 +4,11 @@ import datetime
 from typing import TYPE_CHECKING, Any
 
 from common.date_utils import DEFAULT_TIMEZONE, time_as_timedelta
-from opening_hours.errors import HaukiAPIError
-from opening_hours.models import OriginHaukiResource, ReservableTimeSpan
-from opening_hours.utils.hauki_api_client import HaukiAPIClient
-from opening_hours.utils.hauki_api_types import HaukiAPIResource, HaukiTranslatedField
 from reservation_units.enums import ReservationStartInterval
+from tilavarauspalvelu.exceptions import HaukiAPIError
+from tilavarauspalvelu.models import OriginHaukiResource
+from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
+from tilavarauspalvelu.utils.opening_hours.hauki_api_types import HaukiAPIResource, HaukiTranslatedField
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
     from reservation_units.models import ReservationUnit
     from reservations.models import Reservation
-    from tilavarauspalvelu.models import Building, Location
+    from tilavarauspalvelu.models import Building, Location, ReservableTimeSpan
 
 __all__ = [
     "ReservationUnitActions",

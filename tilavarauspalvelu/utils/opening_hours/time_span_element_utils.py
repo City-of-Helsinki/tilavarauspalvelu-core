@@ -3,7 +3,7 @@ from copy import copy
 from itertools import chain
 
 from common.utils import with_indices
-from opening_hours.utils.time_span_element import TimeSpanElement
+from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
 
 
 def merge_overlapping_time_span_elements(*time_span_lists: Iterable[TimeSpanElement]) -> list[TimeSpanElement]:

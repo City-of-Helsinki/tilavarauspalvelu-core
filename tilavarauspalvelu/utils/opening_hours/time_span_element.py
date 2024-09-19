@@ -4,8 +4,8 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from common.date_utils import DEFAULT_TIMEZONE, combine, local_start_of_day
-from opening_hours.enums import HaukiResourceState
-from opening_hours.utils.hauki_api_types import HaukiAPIOpeningHoursResponseTime
+from tilavarauspalvelu.enums import HaukiResourceState
+from tilavarauspalvelu.utils.opening_hours.hauki_api_types import HaukiAPIOpeningHoursResponseTime
 
 
 @dataclass(order=True, frozen=False)

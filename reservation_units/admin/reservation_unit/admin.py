@@ -10,11 +10,11 @@ from modeltranslation.admin import TabbedTranslationAdmin
 
 from applications.models import ApplicationRoundTimeSlot
 from common.typing import WSGIRequest
-from opening_hours.utils.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from reservation_units.admin.reservation_unit.form import ApplicationRoundTimeSlotForm, ReservationUnitAdminForm
 from reservation_units.enums import ReservationKind
 from reservation_units.models import ReservationUnit, ReservationUnitImage, ReservationUnitPricing
 from reservation_units.utils.export_data import ReservationUnitExporter
+from tilavarauspalvelu.utils.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
 
 __all__ = [
     "ReservationUnitAdmin",

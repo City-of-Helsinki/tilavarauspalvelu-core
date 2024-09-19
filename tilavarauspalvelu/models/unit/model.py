@@ -39,7 +39,7 @@ class Unit(models.Model):
     rank: int | None = models.PositiveIntegerField(blank=True, null=True)  # Used for ordering
 
     origin_hauki_resource = models.ForeignKey(
-        "opening_hours.OriginHaukiResource",
+        "tilavarauspalvelu.OriginHaukiResource",
         related_name="units",
         on_delete=models.SET_NULL,
         blank=True,

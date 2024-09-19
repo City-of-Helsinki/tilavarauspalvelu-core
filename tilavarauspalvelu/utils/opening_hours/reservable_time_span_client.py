@@ -5,19 +5,16 @@ import zoneinfo
 from django.conf import settings
 
 from common.date_utils import local_date
-from opening_hours.errors import ReservableTimeSpanClientNothingToDoError, ReservableTimeSpanClientValueError
-from opening_hours.models import OriginHaukiResource, ReservableTimeSpan
-from opening_hours.utils.hauki_api_client import HaukiAPIClient
-from opening_hours.utils.hauki_api_types import HaukiAPIOpeningHoursResponseItem
-from opening_hours.utils.time_span_element import TimeSpanElement
-from opening_hours.utils.time_span_element_utils import (
+from tilavarauspalvelu.constants import NEVER_ANY_OPENING_HOURS_HASH
+from tilavarauspalvelu.exceptions import ReservableTimeSpanClientNothingToDoError, ReservableTimeSpanClientValueError
+from tilavarauspalvelu.models import OriginHaukiResource, ReservableTimeSpan
+from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
+from tilavarauspalvelu.utils.opening_hours.hauki_api_types import HaukiAPIOpeningHoursResponseItem
+from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
+from tilavarauspalvelu.utils.opening_hours.time_span_element_utils import (
     merge_overlapping_time_span_elements,
     override_reservable_with_closed_time_spans,
 )
-
-# Hash value for when there are never any opening hours
-# See https://github.com/City-of-Helsinki/hauki `hours.models.Resource._get_date_periods_as_hash`
-NEVER_ANY_OPENING_HOURS_HASH = "d41d8cd98f00b204e9800998ecf8427e"  # md5(b"").hexdigest()
 
 
 class ReservableTimeSpanClient:

@@ -4,16 +4,16 @@ import math
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
-from opening_hours.utils.time_span_element_utils import override_reservable_with_closed_time_spans
 from reservation_units.enums import ReservationStartInterval
 from reservation_units.utils.first_reservable_time_helper.utils import ReservableTimeOutput
+from tilavarauspalvelu.utils.opening_hours.time_span_element_utils import override_reservable_with_closed_time_spans
 
 if TYPE_CHECKING:
-    from opening_hours.models import ReservableTimeSpan
-    from opening_hours.utils.time_span_element import TimeSpanElement
     from reservation_units.utils.first_reservable_time_helper.first_reservable_time_reservation_unit_helper import (
         ReservationUnitFirstReservableTimeHelper,
     )
+    from tilavarauspalvelu.models import ReservableTimeSpan
+    from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
 
 
 class ReservableTimeSpanFirstReservableTimeHelper:

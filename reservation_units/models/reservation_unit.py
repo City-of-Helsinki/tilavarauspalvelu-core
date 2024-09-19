@@ -25,10 +25,16 @@ from reservation_units.enums import (
 from reservation_units.querysets import ReservationUnitQuerySet
 
 if TYPE_CHECKING:
-    from opening_hours.models import OriginHaukiResource
     from reservation_units.models import ReservationUnitCancellationRule, ReservationUnitType
     from reservations.models import ReservationMetadataSet
-    from tilavarauspalvelu.models import PaymentAccounting, PaymentMerchant, PaymentProduct, TermsOfUse, Unit
+    from tilavarauspalvelu.models import (
+        OriginHaukiResource,
+        PaymentAccounting,
+        PaymentMerchant,
+        PaymentProduct,
+        TermsOfUse,
+        Unit,
+    )
 
 __all__ = [
     "ReservationUnit",
@@ -120,7 +126,7 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
         on_delete=models.SET_NULL,
     )
     origin_hauki_resource: OriginHaukiResource | None = models.ForeignKey(
-        "opening_hours.OriginHaukiResource",
+        "tilavarauspalvelu.OriginHaukiResource",
         related_name="reservation_units",
         on_delete=models.SET_NULL,
         blank=True,

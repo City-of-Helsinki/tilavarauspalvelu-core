@@ -5,7 +5,7 @@ from django.db.models import DurationField, F, OuterRef
 from django.db.models.functions import Coalesce
 
 from common.db import SubquerySum
-from opening_hours.models import OriginHaukiResource, ReservableTimeSpan
+from tilavarauspalvelu.models import OriginHaukiResource, ReservableTimeSpan
 
 
 def get_resources_total_hours_per_resource(

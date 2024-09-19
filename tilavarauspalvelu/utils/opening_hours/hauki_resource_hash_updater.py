@@ -2,17 +2,15 @@ import logging
 from datetime import datetime, time
 
 from django.utils import timezone
-from django.utils.timezone import get_default_timezone
 
-from opening_hours.errors import ReservableTimeSpanClientNothingToDoError, ReservableTimeSpanClientValueError
-from opening_hours.models import OriginHaukiResource
-from opening_hours.utils.hauki_api_client import HaukiAPIClient
-from opening_hours.utils.hauki_api_types import HaukiAPIResource
-from opening_hours.utils.reservable_time_span_client import ReservableTimeSpanClient
+from common.date_utils import DEFAULT_TIMEZONE
+from tilavarauspalvelu.exceptions import ReservableTimeSpanClientNothingToDoError, ReservableTimeSpanClientValueError
+from tilavarauspalvelu.models import OriginHaukiResource
+from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
+from tilavarauspalvelu.utils.opening_hours.hauki_api_types import HaukiAPIResource
+from tilavarauspalvelu.utils.opening_hours.reservable_time_span_client import ReservableTimeSpanClient
 
 logger = logging.getLogger(__name__)
-
-DEFAULT_TIMEZONE = get_default_timezone()
 
 
 class HaukiResourceHashUpdater:

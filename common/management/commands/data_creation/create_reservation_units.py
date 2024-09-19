@@ -7,7 +7,6 @@ from datetime import UTC, date, datetime, time, timedelta
 from decimal import Decimal
 from itertools import cycle
 
-from opening_hours.models import OriginHaukiResource, ReservableTimeSpan
 from reservation_units.enums import (
     AuthenticationType,
     PriceUnit,
@@ -29,7 +28,7 @@ from reservation_units.models import (
 )
 from reservations.models import ReservationMetadataSet
 from tilavarauspalvelu.enums import TermsOfUseTypeChoices
-from tilavarauspalvelu.models import Resource, Service, TermsOfUse, Unit
+from tilavarauspalvelu.models import OriginHaukiResource, ReservableTimeSpan, Resource, Service, TermsOfUse, Unit
 
 from .create_seasonal_booking import _create_application_round_time_slots
 from .utils import (
