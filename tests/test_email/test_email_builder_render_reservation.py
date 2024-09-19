@@ -6,11 +6,12 @@ import freezegun
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from email_notification.exceptions import EmailTemplateValidationError
-from email_notification.helpers.email_builder_reservation import ReservationEmailBuilder, ReservationEmailContext
-from email_notification.models import EmailTemplate, EmailType
 from reservations.models import Reservation
 from tests.factories import EmailTemplateFactory, ReservationFactory, ReservationUnitFactory
+from tilavarauspalvelu.enums import EmailType
+from tilavarauspalvelu.exceptions import EmailTemplateValidationError
+from tilavarauspalvelu.models import EmailTemplate
+from tilavarauspalvelu.utils.email.email_builder_reservation import ReservationEmailBuilder, ReservationEmailContext
 
 pytestmark = [
     pytest.mark.django_db,

@@ -1,3 +1,4 @@
+from .email_template.admin import EmailTemplateAdmin
 from .general_role.admin import GeneralRoleAdmin
 from .payment_accounting.admin import PaymentAccountingAdmin
 from .payment_merchant.admin import PaymentMerchantAdmin
@@ -13,6 +14,7 @@ from .unit_role.admin import UnitRoleAdmin
 from .user.admin import UserAdmin
 
 __all__ = [
+    "EmailTemplateAdmin",
     "GeneralRoleAdmin",
     "PaymentAccountingAdmin",
     "PaymentMerchantAdmin",

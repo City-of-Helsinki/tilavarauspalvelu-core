@@ -1,11 +1,11 @@
 import pytest
 
-from email_notification.admin.email_template_tester import (
+from tests.factories import EmailTemplateFactory, ReservationUnitFactory
+from tilavarauspalvelu.admin.email_template.tester import (
     EmailTemplateTesterForm,
     EmailTemplateTesterReservationUnitSelectForm,
 )
-from email_notification.models import EmailType
-from tests.factories import EmailTemplateFactory, ReservationUnitFactory
+from tilavarauspalvelu.enums import EmailType
 
 pytestmark = [
     pytest.mark.django_db,

@@ -8,19 +8,20 @@ from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 
 from common.utils import safe_getattr
-from email_notification.exceptions import SendEmailNotificationError
-from email_notification.helpers.email_builder_application import ApplicationEmailBuilder
-from email_notification.helpers.email_builder_reservation import ReservationEmailBuilder
-from email_notification.models import EmailTemplate, EmailType
+from tilavarauspalvelu.exceptions import SendEmailNotificationError
+from tilavarauspalvelu.models import EmailTemplate
+from tilavarauspalvelu.utils.email.email_builder_application import ApplicationEmailBuilder
+from tilavarauspalvelu.utils.email.email_builder_reservation import ReservationEmailBuilder
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
     from applications.models import Application
     from config.utils.commons import LanguageType
-    from email_notification.admin.email_template_tester import EmailTemplateTesterForm
-    from email_notification.helpers.email_builder_base import BaseEmailBuilder
     from reservations.models import Reservation
+    from tilavarauspalvelu.admin.email_template.tester import EmailTemplateTesterForm
+    from tilavarauspalvelu.enums import EmailType
+    from tilavarauspalvelu.utils.email.email_builder_base import BaseEmailBuilder
 
 
 class EmailNotificationSender:

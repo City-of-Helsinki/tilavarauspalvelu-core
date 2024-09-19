@@ -1346,57 +1346,6 @@ msgstr "Englanti"
 msgid "Swedish"
 msgstr "Ruotsi"
 
-#: email_notification/admin/email_template_tester.py
-#, python-format
-msgid "Test Email '%s' successfully sent."
-msgstr "Testisähköposti '%s' lähetetty onnistuneesti."
-
-#: email_notification/models.py
-msgid "Email type"
-msgstr "Sähköpostin tyyppi"
-
-#: email_notification/models.py
-msgid "Only one template per type can be created."
-msgstr "Vain yksi sähköpostipohja per tyyppi voidaan luoda."
-
-#: email_notification/models.py
-msgid "Unique name for this content"
-msgstr "Uniikki nimi tälle sisällölle"
-
-#: email_notification/models.py
-msgid "Content"
-msgstr "Sisältö"
-
-#: email_notification/models.py
-msgid ""
-"Email body content. Use curly brackets to indicate data specific fields e.g "
-"{{reservee_name}}."
-msgstr ""
-"Sähköpostin sisältö. Käytä aaltosulkeita osoittamaan dataan liittyviä "
-"kenttiä, esim {{reservee_name}}."
-
-#: email_notification/models.py
-msgid "HTML content"
-msgstr "HTML-sisältö"
-
-#: email_notification/models.py
-msgid ""
-"Email body content as HTML. Use curly brackets to indicate data specific "
-"fields e.g {{reservee_name}}."
-msgstr ""
-"Sähköpostin sisältö HTML-muodossa. Käytä aaltosulkeita osoittamaan dataan "
-"liittyviä kenttiä, esim {{reservee_name}}."
-
-#: email_notification/templates/email_tester.html
-#: templates/admin/deny_reservation_confirmation.html
-#: templates/admin/reset_allocation_confirmation.html
-msgid "Home"
-msgstr "Koti"
-
-#: email_notification/templates/email_tester.html
-msgid "Email Template Testing"
-msgstr "Email-pohjan testaus"
-
 #: opening_hours/admin/origin_hauki_resource.py
 msgid ""
 "OriginHaukiResources with this specific hash never have any opening hours."
@@ -2799,6 +2748,12 @@ msgid "Log out"
 msgstr "Kirjaudu ulos"
 
 #: templates/admin/deny_reservation_confirmation.html
+#: templates/admin/reset_allocation_confirmation.html
+#: templates/email/email_tester.html
+msgid "Home"
+msgstr "Koti"
+
+#: templates/admin/deny_reservation_confirmation.html
 msgid "Deny reservations"
 msgstr "Hylkää varauksia"
 
@@ -2835,6 +2790,15 @@ msgstr "Ei, vie minut takaisin"
 #: templates/admin/reset_allocation_confirmation.html
 msgid "Reset allocations"
 msgstr "Nollaa allokoinnit"
+
+#: templates/email/email_tester.html
+msgid "Email Template Testing"
+msgstr "Email-pohjan testaus"
+
+#: tilavarauspalvelu/admin/email_template/tester.py
+#, python-format
+msgid "Test Email '%s' successfully sent."
+msgstr "Testisähköposti '%s' lähetetty onnistuneesti."
 
 #: tilavarauspalvelu/admin/general_role/admin.py
 msgid "Search by username, email, first name or last name"
@@ -3096,6 +3060,42 @@ msgstr "Varaaja"
 #: tilavarauspalvelu/enums.py
 msgid "Notification manager"
 msgstr "Ilmoituksen hallitsija."
+
+#: tilavarauspalvelu/models/email_template/model.py
+msgid "Email type"
+msgstr "Sähköpostin tyyppi"
+
+#: tilavarauspalvelu/models/email_template/model.py
+msgid "Only one template per type can be created."
+msgstr "Vain yksi sähköpostipohja per tyyppi voidaan luoda."
+
+#: tilavarauspalvelu/models/email_template/model.py
+msgid "Unique name for this content"
+msgstr "Uniikki nimi tälle sisällölle"
+
+#: tilavarauspalvelu/models/email_template/model.py
+msgid "Content"
+msgstr "Sisältö"
+
+#: tilavarauspalvelu/models/email_template/model.py
+msgid ""
+"Email body content. Use curly brackets to indicate data specific fields e.g "
+"{{reservee_name}}."
+msgstr ""
+"Sähköpostin sisältö. Käytä aaltosulkeita osoittamaan dataan liittyviä "
+"kenttiä, esim {{reservee_name}}."
+
+#: tilavarauspalvelu/models/email_template/model.py
+msgid "HTML content"
+msgstr "HTML-sisältö"
+
+#: tilavarauspalvelu/models/email_template/model.py
+msgid ""
+"Email body content as HTML. Use curly brackets to indicate data specific "
+"fields e.g {{reservee_name}}."
+msgstr ""
+"Sähköpostin sisältö HTML-muodossa. Käytä aaltosulkeita osoittamaan dataan "
+"liittyviä kenttiä, esim {{reservee_name}}."
 
 #: tilavarauspalvelu/models/general_role/model.py
 msgid "General role"

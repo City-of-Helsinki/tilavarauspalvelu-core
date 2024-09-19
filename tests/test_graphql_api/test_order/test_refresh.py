@@ -2,11 +2,11 @@ import uuid
 
 import pytest
 
-from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from reservations.enums import ReservationStateChoice
 from tests.factories import PaymentFactory
 from tests.helpers import patch_method
 from tilavarauspalvelu.enums import OrderStatus
+from tilavarauspalvelu.utils.email.reservation_email_notification_sender import ReservationEmailNotificationSender
 from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import GetPaymentError
 from tilavarauspalvelu.utils.verkkokauppa.payment.types import PaymentStatus
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient

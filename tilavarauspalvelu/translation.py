@@ -3,6 +3,7 @@ from modeltranslation.translator import TranslationOptions
 
 from .models import Service, TermsOfUse
 from .models.building.model import Building
+from .models.email_template.model import EmailTemplate
 from .models.location.model import Location
 from .models.real_estate.model import RealEstate
 from .models.resource.model import Resource
@@ -60,3 +61,8 @@ class ServiceSectorTranslationOptions(TranslationOptions):
 @register(Location)
 class LocationTranslationOptions(TranslationOptions):
     fields = ["address_street", "address_city"]
+
+
+@register(EmailTemplate)
+class EmailTemplateTranslationOptions(TranslationOptions):
+    fields = ["subject", "content", "html_content"]

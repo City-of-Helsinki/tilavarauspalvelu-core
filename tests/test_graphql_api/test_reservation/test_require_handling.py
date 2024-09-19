@@ -1,9 +1,8 @@
 import pytest
 
-from email_notification.models import EmailType
 from reservations.enums import ReservationStateChoice
 from tests.factories import EmailTemplateFactory, ReservationFactory, UserFactory
-from tilavarauspalvelu.enums import ReservationNotification
+from tilavarauspalvelu.enums import EmailType, ReservationNotification
 
 from .helpers import REQUIRE_HANDLING_MUTATION, get_require_handling_data
 

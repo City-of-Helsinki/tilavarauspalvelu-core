@@ -6,10 +6,10 @@ from rest_framework.exceptions import ValidationError
 
 from common.date_utils import local_datetime
 from common.utils import comma_sep_str
-from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from reservations.enums import ReservationStateChoice
 from reservations.models import Reservation
 from tilavarauspalvelu.api.graphql.extensions import error_codes
+from tilavarauspalvelu.utils.email.reservation_email_notification_sender import ReservationEmailNotificationSender
 
 __all__ = [
     "ReservationDenySerializer",

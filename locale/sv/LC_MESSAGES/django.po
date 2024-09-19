@@ -1306,53 +1306,6 @@ msgstr ""
 msgid "Swedish"
 msgstr ""
 
-#: email_notification/admin/email_template_tester.py
-#, python-format
-msgid "Test Email '%s' successfully sent."
-msgstr ""
-
-#: email_notification/models.py
-msgid "Email type"
-msgstr ""
-
-#: email_notification/models.py
-msgid "Only one template per type can be created."
-msgstr ""
-
-#: email_notification/models.py
-msgid "Unique name for this content"
-msgstr ""
-
-#: email_notification/models.py
-msgid "Content"
-msgstr ""
-
-#: email_notification/models.py
-msgid ""
-"Email body content. Use curly brackets to indicate data specific fields e.g "
-"{{reservee_name}}."
-msgstr ""
-
-#: email_notification/models.py
-msgid "HTML content"
-msgstr ""
-
-#: email_notification/models.py
-msgid ""
-"Email body content as HTML. Use curly brackets to indicate data specific "
-"fields e.g {{reservee_name}}."
-msgstr ""
-
-#: email_notification/templates/email_tester.html
-#: templates/admin/deny_reservation_confirmation.html
-#: templates/admin/reset_allocation_confirmation.html
-msgid "Home"
-msgstr ""
-
-#: email_notification/templates/email_tester.html
-msgid "Email Template Testing"
-msgstr ""
-
 #: opening_hours/admin/origin_hauki_resource.py
 msgid ""
 "OriginHaukiResources with this specific hash never have any opening hours."
@@ -2763,6 +2716,12 @@ msgid "Log out"
 msgstr ""
 
 #: templates/admin/deny_reservation_confirmation.html
+#: templates/admin/reset_allocation_confirmation.html
+#: templates/email/email_tester.html
+msgid "Home"
+msgstr ""
+
+#: templates/admin/deny_reservation_confirmation.html
 msgid "Deny reservations"
 msgstr ""
 
@@ -2798,6 +2757,15 @@ msgstr ""
 
 #: templates/admin/reset_allocation_confirmation.html
 msgid "Reset allocations"
+msgstr ""
+
+#: templates/email/email_tester.html
+msgid "Email Template Testing"
+msgstr ""
+
+#: tilavarauspalvelu/admin/email_template/tester.py
+#, python-format
+msgid "Test Email '%s' successfully sent."
 msgstr ""
 
 #: tilavarauspalvelu/admin/general_role/admin.py
@@ -3057,6 +3025,38 @@ msgstr ""
 
 #: tilavarauspalvelu/enums.py
 msgid "Notification manager"
+msgstr ""
+
+#: tilavarauspalvelu/models/email_template/model.py
+msgid "Email type"
+msgstr ""
+
+#: tilavarauspalvelu/models/email_template/model.py
+msgid "Only one template per type can be created."
+msgstr ""
+
+#: tilavarauspalvelu/models/email_template/model.py
+msgid "Unique name for this content"
+msgstr ""
+
+#: tilavarauspalvelu/models/email_template/model.py
+msgid "Content"
+msgstr ""
+
+#: tilavarauspalvelu/models/email_template/model.py
+msgid ""
+"Email body content. Use curly brackets to indicate data specific fields e.g "
+"{{reservee_name}}."
+msgstr ""
+
+#: tilavarauspalvelu/models/email_template/model.py
+msgid "HTML content"
+msgstr ""
+
+#: tilavarauspalvelu/models/email_template/model.py
+msgid ""
+"Email body content as HTML. Use curly brackets to indicate data specific "
+"fields e.g {{reservee_name}}."
 msgstr ""
 
 #: tilavarauspalvelu/models/general_role/model.py

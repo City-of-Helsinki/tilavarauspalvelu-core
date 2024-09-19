@@ -1,8 +1,8 @@
 import pytest
 
-from email_notification.tasks import _get_reservation_staff_notification_recipients
 from tests.factories import ReservationFactory, ReservationUnitFactory, UserFactory
 from tilavarauspalvelu.enums import ReservationNotification
+from tilavarauspalvelu.tasks import _get_reservation_staff_notification_recipients
 
 pytestmark = [
     pytest.mark.django_db,

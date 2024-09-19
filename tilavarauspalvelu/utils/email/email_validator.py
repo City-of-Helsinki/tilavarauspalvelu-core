@@ -10,13 +10,13 @@ from django.core.exceptions import ValidationError
 from jinja2.exceptions import TemplateError
 from jinja2.sandbox import SandboxedEnvironment
 
-from email_notification.exceptions import EmailTemplateValidationError
-from email_notification.templatetags import format_currency
+from tilavarauspalvelu.exceptions import EmailTemplateValidationError
+from tilavarauspalvelu.templatetags import format_currency
 
 if TYPE_CHECKING:
     from django.core.files.uploadedfile import InMemoryUploadedFile
 
-    from email_notification.helpers.email_builder_base import BaseEmailContext
+    from tilavarauspalvelu.utils.email.email_builder_base import BaseEmailContext
 
 EMAIL_TEMPLATE_SUPPORTED_EXPRESSIONS = ["if", "elif", "else", "endif"]
 FILTERS_MAP = {"currency": format_currency}

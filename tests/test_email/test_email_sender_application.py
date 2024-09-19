@@ -3,11 +3,11 @@ from django.test import override_settings
 
 from applications.models import Application
 from common.date_utils import local_datetime
-from email_notification.helpers.email_sender import EmailNotificationSender
-from email_notification.models import EmailType
-from email_notification.tasks import send_application_handled_email_task, send_application_in_allocation_email_task
 from tests.factories import ApplicationFactory, EmailTemplateFactory
 from tests.helpers import patch_method
+from tilavarauspalvelu.enums import EmailType
+from tilavarauspalvelu.tasks import send_application_handled_email_task, send_application_in_allocation_email_task
+from tilavarauspalvelu.utils.email.email_sender import EmailNotificationSender
 from utils.sentry import SentryLogger
 
 # Applied to all tests
