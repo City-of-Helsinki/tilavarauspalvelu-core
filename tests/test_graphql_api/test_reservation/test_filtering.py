@@ -5,7 +5,6 @@ from django.utils import timezone
 from freezegun import freeze_time
 
 from common.date_utils import DEFAULT_TIMEZONE
-from permissions.enums import UserRoleChoice
 from reservations.enums import ReservationStateChoice, ReservationTypeChoice
 from tests.factories import (
     PaymentOrderFactory,
@@ -18,7 +17,7 @@ from tests.factories import (
     UserFactory,
 )
 from tests.test_graphql_api.test_reservation.helpers import reservations_query
-from tilavarauspalvelu.enums import OrderStatus
+from tilavarauspalvelu.enums import OrderStatus, UserRoleChoice
 
 # Applied to all tests
 pytestmark = [

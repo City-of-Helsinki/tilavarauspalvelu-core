@@ -10,11 +10,10 @@ from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntMult
 
 from common.db import text_search
 from common.utils import log_text_search
-from permissions.enums import UserRoleChoice
 from reservations.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import Reservation
 from tilavarauspalvelu.api.graphql.extensions.filters import TimezoneAwareDateFilter
-from tilavarauspalvelu.enums import OrderStatusWithFree
+from tilavarauspalvelu.enums import OrderStatusWithFree, UserRoleChoice
 
 if TYPE_CHECKING:
     from common.typing import AnyUser

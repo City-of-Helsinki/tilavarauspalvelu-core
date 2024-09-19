@@ -11,7 +11,7 @@ from django.conf import settings
 from django.utils.crypto import get_random_string
 from social_django.models import UserSocialAuth
 
-from permissions.enums import UserRoleChoice
+from tilavarauspalvelu.enums import UserRoleChoice
 from tilavarauspalvelu.models import Unit, UnitGroup, User
 from tilavarauspalvelu.utils.helauth.typing import IDToken
 

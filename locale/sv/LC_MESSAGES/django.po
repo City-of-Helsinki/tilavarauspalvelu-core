@@ -1447,51 +1447,6 @@ msgstr ""
 msgid "`start_datetime` must be before `end_datetime`."
 msgstr ""
 
-#: permissions/admin/general_role.py
-msgid "Search by username, email, first name or last name"
-msgstr ""
-
-#: permissions/admin/unit_role.py
-msgid ""
-"Search by user's username, email, first name, last name, unit or unit group"
-msgstr ""
-
-#: permissions/enums.py
-msgid "Admin"
-msgstr ""
-
-#: permissions/enums.py
-msgid "Handler"
-msgstr ""
-
-#: permissions/enums.py
-msgid "Viewer"
-msgstr ""
-
-#: permissions/enums.py
-msgid "Reserver"
-msgstr ""
-
-#: permissions/enums.py
-msgid "Notification manager"
-msgstr ""
-
-#: permissions/models/general_role.py
-msgid "General role"
-msgstr ""
-
-#: permissions/models/general_role.py
-msgid "General roles"
-msgstr ""
-
-#: permissions/models/unit_role.py
-msgid "Unit role"
-msgstr ""
-
-#: permissions/models/unit_role.py
-msgid "Unit roles"
-msgstr ""
-
 #: reservation_units/admin/reservation_unit/admin.py
 msgid "Search by ID, name, unit name, or service sector name"
 msgstr ""
@@ -2845,6 +2800,10 @@ msgstr ""
 msgid "Reset allocations"
 msgstr ""
 
+#: tilavarauspalvelu/admin/general_role/admin.py
+msgid "Search by username, email, first name or last name"
+msgstr ""
+
 #: tilavarauspalvelu/admin/payment_merchant/admin.py
 msgid "The Paytrail Merchant ID should be a six-digit number."
 msgstr ""
@@ -2979,6 +2938,11 @@ msgstr ""
 msgid "Search by name"
 msgstr ""
 
+#: tilavarauspalvelu/admin/unit_role/admin.py
+msgid ""
+"Search by user's username, email, first name, last name, unit or unit group"
+msgstr ""
+
 #: tilavarauspalvelu/api/gdpr/views.py
 msgid "User has upcoming or too recent reservations."
 msgstr ""
@@ -3075,6 +3039,34 @@ msgctxt "ResourceLocationType"
 msgid "Movable"
 msgstr ""
 
+#: tilavarauspalvelu/enums.py
+msgid "Admin"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Handler"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Viewer"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Reserver"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Notification manager"
+msgstr ""
+
+#: tilavarauspalvelu/models/general_role/model.py
+msgid "General role"
+msgstr ""
+
+#: tilavarauspalvelu/models/general_role/model.py
+msgid "General roles"
+msgstr ""
+
 #: tilavarauspalvelu/models/payment_accounting/model.py
 msgid ""
 "One of the following fields must be given: internal_order, profit_center, "
@@ -3101,6 +3093,14 @@ msgstr ""
 #: tilavarauspalvelu/models/terms_of_use/model.py
 msgctxt "plural"
 msgid "terms of use"
+msgstr ""
+
+#: tilavarauspalvelu/models/unit_role/model.py
+msgid "Unit role"
+msgstr ""
+
+#: tilavarauspalvelu/models/unit_role/model.py
+msgid "Unit roles"
 msgstr ""
 
 #: users/admin/user.py

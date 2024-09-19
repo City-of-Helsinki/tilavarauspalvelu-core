@@ -1,7 +1,7 @@
 import pytest
 
-from permissions.enums import UserRoleChoice
 from tests.factories import ReservationFactory
+from tilavarauspalvelu.enums import UserRoleChoice
 
 from .helpers import ADJUST_STAFF_MUTATION, get_staff_adjust_data
 

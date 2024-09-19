@@ -7,7 +7,7 @@ from graphene_django_extensions.filters import IntMultipleChoiceFilter
 
 from applications.models import ApplicationRound
 from common.date_utils import local_datetime
-from permissions.enums import UserRoleChoice
+from tilavarauspalvelu.enums import UserRoleChoice
 
 if TYPE_CHECKING:
     from common.typing import AnyUser

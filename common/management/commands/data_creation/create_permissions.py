@@ -3,9 +3,8 @@
 
 from django.contrib.auth.models import Group, Permission
 
-from permissions.enums import UserRoleChoice
-from permissions.models import GeneralRole, UnitRole
-from tilavarauspalvelu.models import Unit, UnitGroup, User
+from tilavarauspalvelu.enums import UserRoleChoice
+from tilavarauspalvelu.models import GeneralRole, Unit, UnitGroup, UnitRole, User
 
 from .utils import with_logs
 
