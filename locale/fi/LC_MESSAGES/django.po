@@ -385,7 +385,7 @@ msgstr ""
 #: reservation_units/models/equipment.py reservation_units/models/keyword.py
 #: reservation_units/models/reservation_unit_type.py
 #: reservations/admin/reservation/form.py
-#: reservations/models/reservation_metadata.py resources/models.py
+#: reservations/models/reservation_metadata.py
 msgid "Name"
 msgstr "Nimi"
 
@@ -1752,12 +1752,12 @@ msgid "Surface area"
 msgstr "Pinta-ala"
 
 #: reservation_units/admin/reservation_unit/form.py
-#: reservations/admin/reservation/form.py resources/models.py
+#: reservations/admin/reservation/form.py
 msgid "Buffer time before"
 msgstr "Tauko ennen varausta"
 
 #: reservation_units/admin/reservation_unit/form.py
-#: reservations/admin/reservation/form.py resources/models.py
+#: reservations/admin/reservation/form.py
 msgid "Buffer time after"
 msgstr "Tauko varauksen jälkeen"
 
@@ -2837,16 +2837,6 @@ msgstr "Vaaditut kentät"
 msgid "Reservation metadata sets"
 msgstr "Varauslomakkeet"
 
-#: resources/enums.py
-msgctxt "ResourceLocationType"
-msgid "Fixed"
-msgstr "Kiinteä"
-
-#: resources/enums.py
-msgctxt "ResourceLocationType"
-msgid "Movable"
-msgstr "Siirrettävä"
-
 #: spaces/admin/space.py
 msgid "Search by name or unit name"
 msgstr "Etsi nimellä tai toimipisteen nimellä"
@@ -3112,6 +3102,17 @@ msgstr "Palautettu"
 msgctxt "OrderStatus"
 msgid "Free"
 msgstr "Maksuton"
+
+#: tilavarauspalvelu/enums.py
+
+msgctxt "ResourceLocationType"
+msgid "Fixed"
+msgstr "Kiinteä"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ResourceLocationType"
+msgid "Movable"
+msgstr "Siirrettävä"
 
 #: tilavarauspalvelu/models/payment_accounting/model.py
 msgid ""

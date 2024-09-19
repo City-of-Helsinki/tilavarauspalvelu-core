@@ -374,7 +374,7 @@ msgstr ""
 #: reservation_units/models/equipment.py reservation_units/models/keyword.py
 #: reservation_units/models/reservation_unit_type.py
 #: reservations/admin/reservation/form.py
-#: reservations/models/reservation_metadata.py resources/models.py
+#: reservations/models/reservation_metadata.py
 msgid "Name"
 msgstr ""
 
@@ -1700,12 +1700,12 @@ msgid "Surface area"
 msgstr ""
 
 #: reservation_units/admin/reservation_unit/form.py
-#: reservations/admin/reservation/form.py resources/models.py
+#: reservations/admin/reservation/form.py
 msgid "Buffer time before"
 msgstr ""
 
 #: reservation_units/admin/reservation_unit/form.py
-#: reservations/admin/reservation/form.py resources/models.py
+#: reservations/admin/reservation/form.py
 msgid "Buffer time after"
 msgstr ""
 
@@ -2217,12 +2217,16 @@ msgid "Keyword group"
 msgstr ""
 
 #: reservation_units/models/reservation_unit.py
+#, fuzzy
+#| msgid "Reservation for %(name)s"
 msgid "Reservation Unit"
-msgstr ""
+msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: reservation_units/models/reservation_unit.py
+#, fuzzy
+#| msgid "Reservation for %(name)s"
 msgid "Reservation Units"
-msgstr ""
+msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: reservation_units/models/reservation_unit_cancellation_rule.py
 msgid "Name for the rule"
@@ -2274,8 +2278,10 @@ msgid "Tax percentage"
 msgstr ""
 
 #: reservations/admin/reservation/admin.py
+#, fuzzy
+#| msgid "Reservation for %(name)s"
 msgid "Search by Reservation ID or name"
-msgstr ""
+msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: reservations/admin/reservation/admin.py
 #: reservations/admin/reservation/form.py
@@ -2340,16 +2346,22 @@ msgid "State"
 msgstr ""
 
 #: reservations/admin/reservation/form.py
+#, fuzzy
+#| msgid "Reservation for %(name)s"
 msgid "Reservation type"
-msgstr ""
+msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: reservations/admin/reservation/form.py
+#, fuzzy
+#| msgid "Booking details"
 msgid "Cancel details"
-msgstr ""
+msgstr "Uppgifter om bokningen"
 
 #: reservations/admin/reservation/form.py
+#, fuzzy
+#| msgid "Booking details"
 msgid "Handling details"
-msgstr ""
+msgstr "Uppgifter om bokningen"
 
 #: reservations/admin/reservation/form.py
 msgid "Handled at"
@@ -2392,12 +2404,16 @@ msgid "Reservee ID"
 msgstr ""
 
 #: reservations/admin/reservation/form.py
+#, fuzzy
+#| msgid "Reservation for %(name)s"
 msgid "Reservee first name"
-msgstr ""
+msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: reservations/admin/reservation/form.py
+#, fuzzy
+#| msgid "Reservation for %(name)s"
 msgid "Reservee last name"
-msgstr ""
+msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: reservations/admin/reservation/form.py
 msgid "Reservee email"
@@ -2408,8 +2424,10 @@ msgid "Reservee phone"
 msgstr ""
 
 #: reservations/admin/reservation/form.py
+#, fuzzy
+#| msgid "Reservation for %(name)s"
 msgid "Reservee organisation name"
-msgstr ""
+msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: reservations/admin/reservation/form.py
 msgid "Reservee address street"
@@ -2444,8 +2462,10 @@ msgid "Billing last name"
 msgstr ""
 
 #: reservations/admin/reservation/form.py
+#, fuzzy
+#| msgid "Booking details"
 msgid "Billing email"
-msgstr ""
+msgstr "Uppgifter om bokningen"
 
 #: reservations/admin/reservation/form.py
 msgid "Billing phone"
@@ -2512,8 +2532,10 @@ msgid "Reservation begin date and time"
 msgstr ""
 
 #: reservations/admin/reservation/form.py
+#, fuzzy
+#| msgid "Reservation for %(name)s"
 msgid "Reservation end date and time"
-msgstr ""
+msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: reservations/admin/reservation/form.py
 msgid "When this reservation was handled"
@@ -2564,8 +2586,10 @@ msgid "Reservee's business or association identity code"
 msgstr ""
 
 #: reservations/admin/reservation/form.py
+#, fuzzy
+#| msgid "Reservation for %(name)s"
 msgid "Reservee's first name"
-msgstr ""
+msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: reservations/admin/reservation/form.py
 msgid "Reservee's last name"
@@ -2580,8 +2604,10 @@ msgid "Reservee's phone number"
 msgstr ""
 
 #: reservations/admin/reservation/form.py
+#, fuzzy
+#| msgid "Reservation for %(name)s"
 msgid "Reservee's organisation name"
-msgstr ""
+msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: reservations/admin/reservation/form.py
 msgid "Reservee's street address"
@@ -2768,18 +2794,10 @@ msgid "Required fields"
 msgstr ""
 
 #: reservations/models/reservation_metadata.py
+#, fuzzy
+#| msgid "Reservation for %(name)s"
 msgid "Reservation metadata sets"
-msgstr ""
-
-#: resources/enums.py
-msgctxt "ResourceLocationType"
-msgid "Fixed"
-msgstr ""
-
-#: resources/enums.py
-msgctxt "ResourceLocationType"
-msgid "Movable"
-msgstr ""
+msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: spaces/admin/space.py
 msgid "Search by name or unit name"
@@ -2880,8 +2898,10 @@ msgid "Value comes from the Merchant Experience API"
 msgstr ""
 
 #: tilavarauspalvelu/admin/payment_order/admin.py
+#, fuzzy
+#| msgid "Reservation for %(name)s"
 msgid "Reservation"
-msgstr ""
+msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: tilavarauspalvelu/admin/payment_order/admin.py
 msgid "Remote order ID"
@@ -2924,8 +2944,10 @@ msgid "Language"
 msgstr ""
 
 #: tilavarauspalvelu/admin/payment_order/admin.py
+#, fuzzy
+#| msgid "Reservation for %(name)s"
 msgid "Reservation user UUID"
-msgstr ""
+msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: tilavarauspalvelu/admin/payment_order/admin.py
 msgid "Checkout URL"
@@ -3043,6 +3065,16 @@ msgctxt "OrderStatus"
 msgid "Free"
 msgstr ""
 
+#: tilavarauspalvelu/enums.py
+msgctxt "ResourceLocationType"
+msgid "Fixed"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ResourceLocationType"
+msgid "Movable"
+msgstr ""
+
 #: tilavarauspalvelu/models/payment_accounting/model.py
 msgid ""
 "One of the following fields must be given: internal_order, profit_center, "
@@ -3092,8 +3124,10 @@ msgid "Preferred UI language"
 msgstr ""
 
 #: users/models.py
+#, fuzzy
+#| msgid "Reservation for %(name)s"
 msgid "Reservation notification"
-msgstr ""
+msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: users/models.py
 msgid "Date of birth"

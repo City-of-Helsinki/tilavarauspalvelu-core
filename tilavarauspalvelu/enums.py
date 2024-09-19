@@ -11,6 +11,7 @@ __all__ = [
     "OrderStatusWithFree",
     "PaymentType",
     "ReservationNotification",
+    "ResourceLocationType",
     "ServiceTypeChoices",
     "TermsOfUseTypeChoices",
 ]
@@ -85,3 +86,8 @@ class PaymentType(models.TextChoices):
     ON_SITE = "ON_SITE", pgettext_lazy("PaymentType", "On site")
     ONLINE = "ONLINE", pgettext_lazy("PaymentType", "Online")
     INVOICE = "INVOICE", pgettext_lazy("PaymentType", "Invoice")
+
+
+class ResourceLocationType(models.TextChoices):
+    FIXED = "fixed", pgettext_lazy("ResourceLocationType", "Fixed")
+    MOVABLE = "movable", pgettext_lazy("ResourceLocationType", "Movable")

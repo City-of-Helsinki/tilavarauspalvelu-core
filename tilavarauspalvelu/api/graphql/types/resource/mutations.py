@@ -1,6 +1,6 @@
 from graphene_django_extensions import CreateMutation, DeleteMutation, UpdateMutation
 
-from resources.models import Resource
+from tilavarauspalvelu.models import Resource
 
 from .permissions import ResourcePermission
 from .serializers import ResourceSerializer

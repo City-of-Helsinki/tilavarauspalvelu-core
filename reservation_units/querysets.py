@@ -11,8 +11,8 @@ from lookup_property import L
 from common.date_utils import local_datetime
 from common.db import ArrayUnnest, SubqueryArray
 from reservation_units.utils.first_reservable_time_helper.first_reservable_time_helper import FirstReservableTimeHelper
-from resources.models import Resource
 from spaces.models import Space
+from tilavarauspalvelu.models import Resource
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator

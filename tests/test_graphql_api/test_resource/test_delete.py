@@ -1,7 +1,7 @@
 import pytest
 
-from resources.models import Resource
 from tests.factories import ResourceFactory
+from tilavarauspalvelu.models import Resource
 
 from .helpers import DELETE_MUTATION
 
