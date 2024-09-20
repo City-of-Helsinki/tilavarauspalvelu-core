@@ -3,6 +3,7 @@ import React from "react";
 import styled from "styled-components";
 import { breakpoints } from "../common/style";
 import { H6 } from "../common/typography";
+import Link from "next/link";
 
 type LinkT = {
   href: string;
@@ -53,7 +54,7 @@ const Content = styled.div`
   }
 `;
 
-const Links = styled.ul`
+const LinkList = styled.ul`
   list-style: none;
   margin-bottom: 0;
   padding: 0;
@@ -62,9 +63,7 @@ const Links = styled.ul`
   gap: var(--spacing-2-xs);
 `;
 
-const Link = styled.li``;
-
-const Anchor = styled.a`
+const Anchor = styled(Link)`
   color: var(--color-black) !important;
   text-decoration: underline;
   display: flex;
@@ -111,9 +110,9 @@ const TermsBox = ({
         <Heading>{heading}</Heading>
         <p>{body}</p>
         {links && links?.length > 0 && (
-          <Links>
+          <LinkList>
             {links.map((link) => (
-              <Link key={link.href}>
+              <li key={link.href}>
                 <Anchor
                   href={link.href}
                   target="_blank"
@@ -122,9 +121,9 @@ const TermsBox = ({
                   {link.text}
                   <IconLinkExternal aria-hidden />
                 </Anchor>
-              </Link>
+              </li>
             ))}
-          </Links>
+          </LinkList>
         )}
       </Content>
       {canAccept && (
