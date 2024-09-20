@@ -1,12 +1,26 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
-import type { SearchReservationUnitsQuery } from "@gql/gql-types";
+import {
+  ReservationUnitPublishingState,
+  ReservationUnitReservationState,
+  SearchReservationUnitsQuery,
+} from "@gql/gql-types";
 import { truncate } from "@/helpers";
 import { getReservationUnitUrl } from "@/common/urls";
 import { CustomTable } from "@/component/Table";
 import { MAX_NAME_LENGTH } from "@/common/const";
-import { TableLink } from "@/styles/util";
+import { TableLink, TableStatusLabel } from "@/styles/util";
+import {
+  IconCheck,
+  IconClock,
+  IconEye,
+  IconEyeCrossed,
+  IconLock,
+  IconPen,
+  IconQuestionCircleFill,
+} from "hds-react";
+import type { StatusLabelType } from "common/src/tags";
 
 type ReservationUnitList = NonNullable<
   SearchReservationUnitsQuery["reservationUnits"]
@@ -19,6 +33,42 @@ type Props = {
   sortChanged: (field: string) => void;
   reservationUnits: ReservationUnitNode[];
   isLoading?: boolean;
+};
+
+const getStatusLabelProps = (
+  state: ReservationUnitReservationState | null | undefined
+): { type: StatusLabelType; icon: JSX.Element } => {
+  switch (state) {
+    case ReservationUnitReservationState.Reservable:
+      return { type: "success", icon: <IconEye /> };
+    case ReservationUnitReservationState.ReservationClosed:
+      return { type: "neutral", icon: <IconLock /> };
+    case ReservationUnitReservationState.ScheduledReservation:
+    case ReservationUnitReservationState.ScheduledClosing:
+    case ReservationUnitReservationState.ScheduledPeriod:
+      return { type: "info", icon: <IconClock /> };
+    default:
+      return { type: "info", icon: <IconQuestionCircleFill /> };
+  }
+};
+
+const getPublishingStateProps = (
+  state: ReservationUnitPublishingState | null | undefined
+): { type: StatusLabelType; icon: JSX.Element } => {
+  switch (state) {
+    case ReservationUnitPublishingState.ScheduledHiding:
+    case ReservationUnitPublishingState.ScheduledPeriod:
+    case ReservationUnitPublishingState.ScheduledPublishing:
+      return { type: "info", icon: <IconClock ariaHidden /> };
+    case ReservationUnitPublishingState.Published:
+      return { type: "success", icon: <IconCheck ariaHidden /> };
+    case ReservationUnitPublishingState.Draft:
+      return { type: "draft", icon: <IconPen ariaHidden /> };
+    case ReservationUnitPublishingState.Hidden:
+      return { type: "neutral", icon: <IconEyeCrossed ariaHidden /> };
+    default:
+      return { type: "neutral", icon: <IconQuestionCircleFill ariaHidden /> };
+  }
 };
 
 const getColConfig = (t: TFunction) => [
@@ -71,14 +121,26 @@ const getColConfig = (t: TFunction) => [
   {
     headerName: t("ReservationUnits.headings.state"),
     key: "state",
-    transform: ({ publishingState }: ReservationUnitNode) =>
-      t(`ReservationUnits.state.${publishingState}`),
+    transform: ({ publishingState }: ReservationUnitNode) => {
+      const labelProps = getPublishingStateProps(publishingState);
+      return (
+        <TableStatusLabel type={labelProps.type} icon={labelProps.icon}>
+          {t(`ReservationUnits.state.${publishingState}`)}
+        </TableStatusLabel>
+      );
+    },
   },
   {
     headerName: t("ReservationUnits.headings.reservationState"),
     key: "reservationState",
-    transform: ({ reservationState }: ReservationUnitNode) =>
-      t(`ReservationUnits.reservationState.${reservationState}`),
+    transform: ({ reservationState }: ReservationUnitNode) => {
+      const labelProps = getStatusLabelProps(reservationState);
+      return (
+        <TableStatusLabel type={labelProps.type} icon={labelProps.icon}>
+          {t(`ReservationUnits.reservationState.${reservationState}`)}
+        </TableStatusLabel>
+      );
+    },
   },
 ];
 

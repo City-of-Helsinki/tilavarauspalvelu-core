@@ -5,8 +5,9 @@ import styled from "styled-components";
 import {
   type BannerNotificationNode,
   BannerNotificationOrderingChoices,
-  useBannerNotificationsAdminListQuery,
   BannerNotificationsAdminFragment,
+  BannerNotificationState,
+  useBannerNotificationsAdminListQuery,
 } from "@gql/gql-types";
 import { H1 } from "common/src/common/typography";
 import { Container } from "@/styles/layout";
@@ -17,7 +18,14 @@ import { GQL_MAX_RESULTS_PER_QUERY } from "@/common/const";
 import { CustomTable } from "@/component/Table";
 import { filterNonNullable } from "common/src/helpers";
 import { More } from "@/component/More";
-import { TableLink } from "@/styles/util";
+import { TableLink, TableStatusLabel } from "@/styles/util";
+import type { StatusLabelType } from "common/src/tags";
+import {
+  IconCheck,
+  IconClock,
+  IconPen,
+  IconQuestionCircleFill,
+} from "hds-react";
 
 const notificationUrl = (pk: number) => `/messaging/notifications/${pk}`;
 
@@ -27,14 +35,35 @@ const HeaderContainer = styled.div`
   align-items: center;
 `;
 
+const getStatusLabelProps = (
+  state: BannerNotificationState | null | undefined
+): { type: StatusLabelType; icon: JSX.Element } => {
+  switch (state) {
+    case BannerNotificationState.Draft:
+      return { type: "draft", icon: <IconPen ariaHidden /> };
+    case BannerNotificationState.Scheduled:
+      return { type: "info", icon: <IconClock ariaHidden /> };
+    case BannerNotificationState.Active:
+      return { type: "success", icon: <IconCheck ariaHidden /> };
+    default:
+      return { type: "info", icon: <IconQuestionCircleFill ariaHidden /> };
+  }
+};
+
 // Tila, Nimi, Voimassa alk, Voimassa asti, Kohderyhmä, Tyyppi
 const getColConfig = (t: TFunction) => [
   {
     headerName: t("Notifications.headings.state"),
     key: "state",
     isSortable: true,
-    transform: (notification: NonNullable<BannerNotificationNode>) =>
-      t(`Notifications.state.${notification.state ?? "noState"}`),
+    transform: (notification: NonNullable<BannerNotificationNode>) => {
+      const labelProps = getStatusLabelProps(notification.state);
+      return (
+        <TableStatusLabel type={labelProps.type} icon={labelProps.icon}>
+          {t(`Notifications.state.${notification.state ?? "noState"}`)}
+        </TableStatusLabel>
+      );
+    },
   },
   {
     headerName: t("Notifications.headings.name"),

@@ -13,7 +13,7 @@ type TagPropsType = {
   onClick?: () => void;
   id?: string;
   children: React.ReactNode;
-} & Pick<React.HTMLAttributes<HTMLDivElement>, "role">;
+};
 
 const ColoredTag = styled(StyledTag)<{ $type: StatusLabelType }>`
   && {

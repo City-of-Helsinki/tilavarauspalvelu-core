@@ -58,8 +58,6 @@ export const Container = styled.div`
   display: grid;
   gap: var(--spacing-layout-2-xs);
 
-  max-width: var(--container-width-xl);
-
   margin: var(--spacing-layout-2-xs) var(--spacing-layout-m);
 
   @media (max-width: ${breakpoints.m}) {
