@@ -1,5 +1,5 @@
 import React from "react";
-import { CustomTable, ExternalTableLink } from "@/component/Table";
+import { CustomTable } from "@/component/Table";
 import { getApplicationUrl, getReservationUrl } from "@/common/urls";
 import type { RejectedOccurrencesQuery } from "@gql/gql-types";
 import { truncate } from "common/src/helpers";
@@ -10,6 +10,7 @@ import type { TFunction } from "i18next";
 import { getApplicantName } from "@/helpers";
 import { toUIDate } from "common/src/common/util";
 import { formatTime } from "@/common/util";
+import { ExternalTableLink } from "@/styles/util";
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
@@ -94,11 +95,7 @@ const COLS = [
       applicationPk,
       pk,
     }: RejectedOccurrencesView) => (
-      <ExternalTableLink
-        href={getApplicationUrl(applicationPk, pk, true)}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
+      <ExternalTableLink to={getApplicationUrl(applicationPk, pk)}>
         {truncate(applicantName ?? "-", applicantTruncateLen)}
         <IconLinkExternal size="xs" aria-hidden />
       </ExternalTableLink>
@@ -138,7 +135,7 @@ const COLS = [
     key: "time_of_occurrence",
     transform: ({ time, link }: RejectedOccurrencesView) => {
       if (link !== "") {
-        return <ExternalTableLink href={link}>{time}</ExternalTableLink>;
+        return <ExternalTableLink to={link}>{time}</ExternalTableLink>;
       }
       return <span>{time}</span>;
     },

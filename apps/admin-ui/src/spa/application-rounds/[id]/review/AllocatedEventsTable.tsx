@@ -7,7 +7,8 @@ import type { AllocatedTimeSlotsQuery } from "@gql/gql-types";
 import { convertWeekday } from "common/src/conversion";
 import { getApplicantName, truncate } from "@/helpers";
 import { getApplicationUrl, getReservationUrl } from "@/common/urls";
-import { CustomTable, ExternalTableLink } from "@/component/Table";
+import { CustomTable } from "@/component/Table";
+import { ExternalTableLink, TableLink } from "@/styles/util";
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
@@ -87,11 +88,7 @@ const COLS = [
       applicationPk,
       pk,
     }: ApplicationScheduleView) => (
-      <ExternalTableLink
-        href={getApplicationUrl(applicationPk, pk, true)}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
+      <ExternalTableLink to={getApplicationUrl(applicationPk, pk)}>
         {truncate(applicantName ?? "-", applicantTruncateLen)}
         <IconLinkExternal size="xs" aria-hidden />
       </ExternalTableLink>
@@ -131,7 +128,7 @@ const COLS = [
     key: "allocated_time_of_week",
     transform: ({ time, link }: ApplicationScheduleView) => {
       if (link !== "") {
-        return <ExternalTableLink href={link}>{time}</ExternalTableLink>;
+        return <TableLink to={link}>{time}</TableLink>;
       }
       return <span>{time}</span>;
     },

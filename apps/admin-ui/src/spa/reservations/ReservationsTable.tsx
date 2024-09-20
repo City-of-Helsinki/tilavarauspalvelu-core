@@ -10,8 +10,9 @@ import {
   formatDateTimeRange,
   getReserveeName,
 } from "@/common/util";
-import { CustomTable, TableLink } from "@/component/Table";
+import { CustomTable } from "@/component/Table";
 import { MAX_NAME_LENGTH } from "@/common/const";
+import { TableLink } from "@/styles/util";
 
 type ReservationTableColumn = {
   headerName: string;
@@ -48,7 +49,7 @@ const getColConfig = (t: TFunction): ReservationTableColumn[] => [
         MAX_NAME_LENGTH
       );
       return (
-        <TableLink href={getReservationUrl(reservation.pk)}>
+        <TableLink to={getReservationUrl(reservation.pk)}>
           {reservationDisplayName || t("RequestedReservation.noName")}
         </TableLink>
       );

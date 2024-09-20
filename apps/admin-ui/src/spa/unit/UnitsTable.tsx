@@ -5,8 +5,9 @@ import type { UnitsQuery } from "@gql/gql-types";
 import type { TFunction } from "i18next";
 import { truncate } from "@/helpers";
 import { getMyUnitUrl, getUnitUrl } from "@/common/urls";
-import { CustomTable, TableLink } from "@/component/Table";
+import { CustomTable } from "@/component/Table";
 import { MAX_UNIT_NAME_LENGTH } from "@/common/const";
+import { TableLink } from "@/styles/util";
 
 type UnitType = NonNullable<
   NonNullable<NonNullable<UnitsQuery["units"]>["edges"][0]>["node"]
@@ -33,7 +34,7 @@ function getColConfig(t: TFunction, isMyUnits?: boolean): ColumnType[] {
       headerName: t("Units.headings.name"),
       key: "nameFi",
       transform: ({ nameFi, pk }: UnitType) => (
-        <TableLink href={isMyUnits ? getMyUnitUrl(pk) : getUnitUrl(pk)}>
+        <TableLink to={isMyUnits ? getMyUnitUrl(pk) : getUnitUrl(pk)}>
           {truncate(nameFi ?? "-", MAX_UNIT_NAME_LENGTH)}
         </TableLink>
       ),

@@ -19,8 +19,8 @@ import { Container } from "@/styles/layout";
 import { truncate } from "@/helpers";
 import Loader from "@/component/Loader";
 import { ApplicationRoundCard } from "./ApplicationRoundCard";
-import { TableLink } from "@/component/Table";
 import { StyledHDSTable } from "./CustomTable";
+import { TableLink } from "@/styles/util";
 
 const AccordionContainer = styled.div`
   display: flex;
@@ -180,7 +180,7 @@ function AllApplicationRounds(): JSX.Element | null {
               isSortable: true,
               headerName: t("ApplicationRound.headings.name"),
               transform: (applicationRound: ApplicationRoundNode) => (
-                <TableLink href={getApplicationRoundUrl(applicationRound.pk)}>
+                <TableLink to={getApplicationRoundUrl(applicationRound.pk)}>
                   <span title={applicationRound.nameFi ?? ""}>
                     {truncate(applicationRound.nameFi ?? "", 50)}
                   </span>

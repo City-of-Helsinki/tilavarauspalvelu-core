@@ -15,7 +15,7 @@ import { ExternalLink } from "@/component/ExternalLink";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import Error404 from "@/common/Error404";
 import { ReservationUnitList } from "./ReservationUnitList";
-import { getReservationUnitUrl } from "@/common/urls";
+import { getReservationUnitUrl, getSpacesResourcesUrl } from "@/common/urls";
 
 interface IProps {
   [key: string]: string;
@@ -139,7 +139,7 @@ function Unit(): JSX.Element {
   return (
     <Container>
       <Links>
-        <BasicLink to={`/unit/${unitPk}/spacesResources`}>
+        <BasicLink to={getSpacesResourcesUrl(unitPk)}>
           {t("Unit.showSpacesAndResources")}
         </BasicLink>
       </Links>
@@ -161,7 +161,7 @@ function Unit(): JSX.Element {
           size="large"
         >
           {t("Unit.noSpacesResources")}{" "}
-          <BasicLink to={`/unit/${unit.pk}/spacesResources`}>
+          <BasicLink to={getSpacesResourcesUrl(unitPk)}>
             {t("Unit.createSpaces")}
           </BasicLink>
         </Notification>

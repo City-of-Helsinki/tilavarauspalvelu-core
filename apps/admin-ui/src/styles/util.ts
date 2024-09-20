@@ -18,6 +18,7 @@ export const Seranwrap = styled.div`
   opacity: 0.2;
 `;
 
+// TODO link component naming?
 export const BasicLink = styled(Link)`
   color: var(--tilavaraus-admin-content-text-color);
   text-decoration: none;
@@ -26,6 +27,24 @@ export const BasicLink = styled(Link)`
   align-content: center;
   align-items: center;
   gap: var(--spacing-xs);
+`;
+
+export const TableLink = styled(Link)`
+  color: black;
+`;
+
+// NOTE not using IconButton because of hover effect
+export const ExternalTableLink = styled(Link).attrs({
+  target: "_blank",
+  rel: "noopener noreferrer",
+})`
+  color: var(--color-black);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3-xs);
+  & > svg {
+    margin-top: var(--spacing-3-xs);
+  }
 `;
 
 export const DialogActionsButtons = styled(Dialog.ActionButtons)`

@@ -13,16 +13,18 @@ export const allReservationsUrl = "/reservations/all";
 export const myUnitsUrl = "/my-units";
 
 export function getApplicationRoundUrl(
-  applicationRoundId: Maybe<number> | undefined,
-  includePrefix = false
+  applicationRoundId: Maybe<number> | undefined
 ): string {
   if (applicationRoundId == null || !(applicationRoundId > 0)) {
     return "";
   }
-  const prefix = includePrefix ? PUBLIC_URL : "";
-  return `${prefix}${applicationRoundsUrl}/${applicationRoundId}`;
+  return `${applicationRoundsUrl}/${applicationRoundId}`;
 }
 
+/// @param pk is the primary key of the reservation
+/// @param includePrefix is for anchor or vanilla js route manipulation
+/// @returns the url for the reservation
+/// Generally never enable includePrefix use react-router-dom link / router instead.
 export function getReservationUrl(
   pk: Maybe<number> | undefined,
   includePrefix = false
@@ -36,14 +38,12 @@ export function getReservationUrl(
 
 export function getApplicationUrl(
   pk: Maybe<number> | undefined,
-  sectionPk?: Maybe<number> | undefined,
-  includePrefix = false
+  sectionPk?: Maybe<number> | undefined
 ): string {
   if (pk == null || !(pk > 0)) {
     return "";
   }
-  const prefix = includePrefix ? PUBLIC_URL : "";
-  const baseUrl = `${prefix}${applicationsUrl}/${pk}`;
+  const baseUrl = `${applicationsUrl}/${pk}`;
   if (sectionPk == null || !(sectionPk > 0)) {
     return baseUrl;
   }
@@ -52,14 +52,21 @@ export function getApplicationUrl(
 
 export function getReservationUnitUrl(
   reservationUnitPk: Maybe<number> | undefined,
-  unitPk: Maybe<number> | undefined,
-  includePrefix = false
+  unitPk: Maybe<number> | undefined
 ): string {
   if (unitPk == null) {
     return "";
   }
-  const prefix = includePrefix ? PUBLIC_URL : "";
-  return `${prefix}/unit/${unitPk}/reservationUnit/${reservationUnitPk ?? ""}`;
+  return `/unit/${unitPk}/reservationUnit/${reservationUnitPk ?? ""}`;
+}
+
+export function getSpacesResourcesUrl(
+  unitPk: Maybe<number> | undefined
+): string {
+  if (unitPk == null) {
+    return "";
+  }
+  return `/unit/${unitPk}/spacesResources`;
 }
 
 export function getSpaceUrl(
@@ -82,30 +89,19 @@ export function getResourceUrl(
   return `/unit/${unitPk}/resource/${resourcePk}`;
 }
 
-export function getUnitUrl(
-  unitPk: Maybe<number> | undefined,
-  includePrefix = false
-): string {
-  const prefix = includePrefix ? PUBLIC_URL : "";
-  return `${prefix}/unit/${unitPk}`;
+export function getUnitUrl(unitPk: Maybe<number> | undefined): string {
+  return `/unit/${unitPk}`;
 }
 
-export function getMyUnitUrl(
-  unitPk: Maybe<number> | undefined,
-  includePrefix = false
-): string {
-  const prefix = includePrefix ? PUBLIC_URL : "";
-  return `${prefix}/my-units/${unitPk}`;
+export function getMyUnitUrl(unitPk: Maybe<number> | undefined): string {
+  return `/my-units/${unitPk}`;
 }
 
-// TODO PUBLIC_URL is problematic, it needs to be added when not using react-router or something else?
 export function getRecurringReservationUrl(
-  pk: Maybe<string | number> | undefined,
-  includePrefix = false
+  pk: Maybe<string | number> | undefined
 ): string {
   if (pk == null || !(Number(pk) > 0)) {
     return "";
   }
-  const prefix = includePrefix ? PUBLIC_URL : "";
-  return `${prefix}/my-units/${pk}/recurring`;
+  return `/my-units/${pk}/recurring`;
 }

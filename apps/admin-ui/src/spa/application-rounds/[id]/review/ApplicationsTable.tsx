@@ -9,13 +9,14 @@ import type {
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { getApplicantName, truncate } from "@/helpers";
-import { CustomTable, ExternalTableLink } from "@/component/Table";
+import { CustomTable } from "@/component/Table";
 import { ApplicationStatusCell } from "./StatusCell";
 import {
   calculateAppliedReservationTime,
   formatAppliedReservationTime,
 } from "./utils";
 import { getApplicationUrl } from "@/common/urls";
+import { ExternalTableLink } from "@/styles/util";
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
@@ -52,19 +53,12 @@ const COLS = [
     headerTKey: "Application.headings.customer",
     isSortable: true,
     key: "applicant",
-    transform: ({ applicantName, pk }: ApplicationView) =>
-      pk ? (
-        <ExternalTableLink
-          href={getApplicationUrl(pk, undefined, true)}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {truncate(applicantName ?? "-", applicantTruncateLen)}
-          <IconLinkExternal size="xs" aria-hidden />
-        </ExternalTableLink>
-      ) : (
-        <span>{truncate(applicantName ?? "-", applicantTruncateLen)}</span>
-      ),
+    transform: ({ applicantName, pk }: ApplicationView) => (
+      <ExternalTableLink to={getApplicationUrl(pk)}>
+        {truncate(applicantName ?? "-", applicantTruncateLen)}
+        <IconLinkExternal size="xs" aria-hidden />
+      </ExternalTableLink>
+    ),
   },
   {
     headerTKey: "Application.applicantType",

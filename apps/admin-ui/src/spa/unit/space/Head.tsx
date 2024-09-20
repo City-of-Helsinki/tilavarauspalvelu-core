@@ -6,6 +6,7 @@ import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import type { SpaceQuery } from "@gql/gql-types";
 import { parseAddress } from "@/common/util";
+import { getUnitUrl } from "@/common/urls";
 
 interface IProps {
   title: string;
@@ -59,8 +60,7 @@ export function Head({
   const { unit } = space || {};
   const { t } = useTranslation();
 
-  // TODO use urlBuilder
-  const unitUrl = `/unit/${unit?.pk}`;
+  const unitUrl = getUnitUrl(unit?.pk);
 
   return (
     <Wrapper>

@@ -14,9 +14,10 @@ import Loader from "@/component/Loader";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { valueForDateInput, valueForTimeInput } from "@/helpers";
 import { GQL_MAX_RESULTS_PER_QUERY } from "@/common/const";
-import { CustomTable, TableLink } from "@/component/Table";
+import { CustomTable } from "@/component/Table";
 import { filterNonNullable } from "common/src/helpers";
 import { More } from "@/component/More";
+import { TableLink } from "@/styles/util";
 
 const notificationUrl = (pk: number) => `/messaging/notifications/${pk}`;
 
@@ -41,7 +42,7 @@ const getColConfig = (t: TFunction) => [
     isSortable: true,
     transform: (notification: NonNullable<BannerNotificationNode>) =>
       notification.pk ? (
-        <TableLink href={notificationUrl(notification.pk)}>
+        <TableLink to={notificationUrl(notification.pk)}>
           {notification.name ?? t("Notifications.noName")}
         </TableLink>
       ) : (

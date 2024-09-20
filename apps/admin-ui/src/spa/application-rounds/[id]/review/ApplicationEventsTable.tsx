@@ -7,12 +7,13 @@ import type { ApplicationSectionsQuery } from "@gql/gql-types";
 import { MAX_APPLICATION_ROUND_NAME_LENGTH } from "@/common/const";
 import { getApplicantName, truncate } from "@/helpers";
 import { getApplicationUrl } from "@/common/urls";
-import { CustomTable, ExternalTableLink } from "@/component/Table";
+import { CustomTable } from "@/component/Table";
 import { ApplicationSectionStatusCell } from "./StatusCell";
 import {
   calculateAppliedReservationTime,
   formatAppliedReservationTime,
 } from "./utils";
+import { ExternalTableLink } from "@/styles/util";
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
@@ -84,11 +85,7 @@ const COLS = [
     isSortable: true,
     key: "applicant",
     transform: ({ applicantName, applicationPk, pk }: ApplicationEventView) => (
-      <ExternalTableLink
-        href={getApplicationUrl(applicationPk, pk, true)}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
+      <ExternalTableLink to={getApplicationUrl(applicationPk, pk)}>
         {truncate(applicantName ?? "-", applicantTruncateLen)}
         <IconLinkExternal size="xs" aria-hidden />
       </ExternalTableLink>

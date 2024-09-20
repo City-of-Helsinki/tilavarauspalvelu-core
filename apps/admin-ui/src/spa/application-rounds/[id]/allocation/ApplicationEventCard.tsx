@@ -1,4 +1,9 @@
-import { IconAngleDown, IconAngleUp, Link, RadioButton } from "hds-react";
+import {
+  IconAngleDown,
+  IconAngleUp,
+  IconLinkExternal,
+  RadioButton,
+} from "hds-react";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled, { css } from "styled-components";
@@ -25,6 +30,7 @@ import { errorToast } from "common/src/common/toast";
 import { getApplicantName } from "@/helpers";
 import { MAX_ALLOCATION_CARD_UNIT_NAME_LENGTH } from "@/common/const";
 import { formatAgeGroup } from "@/common/util";
+import { Link } from "react-router-dom";
 
 export type AllocationApplicationSectionCardType =
   | "unallocated"
@@ -207,15 +213,15 @@ export function ApplicationSectionCard({
           refetch={refetch}
         />
         <StyledLink
-          href={getApplicationUrl(application.pk, applicationSection.pk, true)}
-          external
-          openInNewTab
-          openInExternalDomainAriaLabel={t("common.openToNewTab")}
+          to={getApplicationUrl(application.pk, applicationSection.pk)}
+          rel="noopener noreferrer"
+          target="_blank"
         >
           {t("Allocation.openApplication")}{" "}
           <b>
             {applicationSection.application.pk}-{applicationSection.pk}
           </b>
+          <IconLinkExternal size="xs" aria-hidden />
         </StyledLink>
         <div>
           {t("Allocation.ageGroup")}:{" "}

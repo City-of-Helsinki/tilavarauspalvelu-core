@@ -1,6 +1,5 @@
 import { get } from "lodash";
 import React from "react";
-import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { Table, TableProps } from "hds-react";
 import { fontBold } from "common";
@@ -95,26 +94,3 @@ function replacer(_key: string, value: unknown) {
   }
   return value;
 }
-
-const A = styled(Link)`
-  color: black;
-`;
-
-// NOTE not using IconButton because of hover effect
-export const ExternalTableLink = styled.a`
-  color: var(--color-black);
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-3-xs);
-  & > svg {
-    margin-top: var(--spacing-3-xs);
-  }
-`;
-
-export const TableLink = ({
-  href,
-  children,
-}: {
-  href: string;
-  children: React.ReactNode;
-}): JSX.Element => <A to={href}>{children}</A>;

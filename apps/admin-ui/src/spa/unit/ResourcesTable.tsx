@@ -13,10 +13,11 @@ import {
 } from "@gql/gql-types";
 import { PopupMenu } from "@/component/PopupMenu";
 import { getResourceUrl } from "@/common/urls";
-import { CustomTable, TableLink } from "@/component/Table";
+import { CustomTable } from "@/component/Table";
 import { errorToast, successToast } from "common/src/common/toast";
 import { truncate } from "common/src/helpers";
 import { MAX_NAME_LENGTH } from "@/common/const";
+import { TableLink } from "@/styles/util";
 
 interface IProps {
   unit: UnitQuery["unit"];
@@ -72,7 +73,7 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
         const link = getResourceUrl(pk, unit?.pk);
         const name = nameFi != null && nameFi.length > 0 ? nameFi : "-";
         return (
-          <TableLink href={link}>
+          <TableLink to={link}>
             {truncate(trim(name), MAX_NAME_LENGTH)}
           </TableLink>
         );

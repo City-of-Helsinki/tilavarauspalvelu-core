@@ -1,6 +1,7 @@
 import React from "react";
 import { IconLinkExternal } from "hds-react";
 import styled from "styled-components";
+import { Link } from "react-router-dom";
 
 type Props = {
   to: string | null;
@@ -34,11 +35,11 @@ export function ExternalLink({
     return null;
   }
   return (
-    <a href={to} target="_blank" rel="noopener noreferrer">
+    <Link to={to} target="_blank" rel="noopener noreferrer">
       <Container>
         <Name>{children}</Name>
         <IconLinkExternal size={size} aria-hidden />
       </Container>
-    </a>
+    </Link>
   );
 }

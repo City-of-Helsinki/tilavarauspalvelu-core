@@ -16,10 +16,11 @@ import { PopupMenu } from "@/component/PopupMenu";
 import Modal, { useModal as useHDSModal } from "@/component/HDSModal";
 import { NewSpaceModal } from "./space/new-space-modal/NewSpaceModal";
 import { errorToast } from "common/src/common/toast";
-import { CustomTable, TableLink } from "@/component/Table";
+import { CustomTable } from "@/component/Table";
 import { getSpaceUrl } from "@/common/urls";
 import { truncate } from "common/src/helpers";
 import { MAX_NAME_LENGTH } from "@/common/const";
+import { TableLink } from "@/styles/util";
 
 interface IProps {
   unit: UnitQuery["unit"];
@@ -140,7 +141,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
         const link = getSpaceUrl(pk, unit?.pk);
         const name = nameFi != null && nameFi.length > 0 ? nameFi : "-";
         return (
-          <TableLink href={link}>
+          <TableLink to={link}>
             {truncate(trim(name), MAX_NAME_LENGTH)}
           </TableLink>
         );

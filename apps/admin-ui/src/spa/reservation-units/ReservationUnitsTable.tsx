@@ -4,8 +4,9 @@ import type { TFunction } from "i18next";
 import type { SearchReservationUnitsQuery } from "@gql/gql-types";
 import { truncate } from "@/helpers";
 import { getReservationUnitUrl } from "@/common/urls";
-import { CustomTable, TableLink } from "@/component/Table";
+import { CustomTable } from "@/component/Table";
 import { MAX_NAME_LENGTH } from "@/common/const";
+import { TableLink } from "@/styles/util";
 
 type ReservationUnitList = NonNullable<
   SearchReservationUnitsQuery["reservationUnits"]
@@ -25,7 +26,7 @@ const getColConfig = (t: TFunction) => [
     headerName: t("ReservationUnits.headings.name"),
     key: "nameFi",
     transform: ({ nameFi, pk, unit }: ReservationUnitNode) => (
-      <TableLink href={getReservationUnitUrl(pk, unit?.pk)}>
+      <TableLink to={getReservationUnitUrl(pk, unit?.pk)}>
         {truncate(nameFi ?? "-", MAX_NAME_LENGTH)}
       </TableLink>
     ),
