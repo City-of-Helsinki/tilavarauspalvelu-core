@@ -846,7 +846,7 @@ class Build(EmptyDefaults, Common, use_environ=True):
 
 
 class CI(EmptyDefaults, Common, use_environ=True):
-    """Settings for commands in GitHub Actions and Azure Pipelines CI environment."""
+    """Settings for commands in GitHub Actions."""
 
     DEBUG = False
 
@@ -923,6 +923,20 @@ class Platta(Common, use_environ=True):
             release=cls.APP_VERSION,  # type: ignore
             integrations=[DjangoIntegration()],
         )
+
+
+class MidHook(EmptyDefaults, Platta, use_environ=True):
+    """
+    Settings for the mid lifecycle hook which runs migrations on when pods are created.
+    See: https://docs.openshift.com/container-platform/latest/applications/deployments/deployment-strategies.html
+
+    Similar to the 'CI' environment, but includes setup for Redis and Sentry as well.
+    """
+
+    DEBUG = True
+
+    # Migrations require the database
+    DATABASES = values.DatabaseURLValue()
 
 
 class Development(Platta, use_environ=True):
