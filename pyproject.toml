@@ -38,7 +38,7 @@ django-more-admin-filters = "1.8"
 django-mptt = "0.16.0"
 django-recurrence = "1.11.1"
 django-redis = "5.4.0"
-django-subforms = "0.3.0"
+django-subforms = "0.3.1"
 django-tinymce = "4.1.0"
 djangorestframework = "3.15.2"
 easy-thumbnails = "2.10"
@@ -69,7 +69,7 @@ markers = "sys_platform != 'win32'"
 django-debug-toolbar = "4.4.6"  # django-graphiql-debug-toolbar 0.2.0 breaks with django-debug-toolbar 4.4.6
 django-graphiql-debug-toolbar = "0.2.0"
 factory-boy = "3.3.1"
-faker = "28.4.1"
+faker = "29.0.0"
 freezegun = "1.5.1"
 polib = "1.2.0"
 pypdf2 = "3.0.1"
@@ -81,8 +81,8 @@ requests-mock = "1.12.1"
 
 [tool.poetry.group.lint.dependencies]
 pre-commit = "3.8.0"
-ruff = "0.6.5"
-ruff-lsp = "0.0.56"
+ruff = "0.6.7"
+ruff-lsp = "0.0.57"
 pyinstrument = "4.7.3"
 
 [tool.ruff]
