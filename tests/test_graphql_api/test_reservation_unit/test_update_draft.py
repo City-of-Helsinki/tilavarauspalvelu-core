@@ -165,7 +165,7 @@ def test_reservation_unit__update__archiving_removes_contact_information_and_aud
         exclude_fields=[
             "_publishing_state",
             "_reservation_state",
-            "_active_pricing_type",
+            "_active_pricing_price",
         ],
     )
 

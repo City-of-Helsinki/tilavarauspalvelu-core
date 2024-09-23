@@ -3,7 +3,6 @@ import datetime
 import pytest
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
-from tilavarauspalvelu.enums import PricingType
 from tilavarauspalvelu.models import ReservationUnit
 from utils.date_utils import local_date
 
@@ -40,7 +39,6 @@ def test_reservation_unit__create__pricing__free_pricing_doesnt_require_price_in
         pricings=[
             {
                 "begins": local_date().isoformat(),
-                "pricingType": PricingType.FREE.value.upper(),
             }
         ],
     )
@@ -53,7 +51,6 @@ def test_reservation_unit__create__pricing__free_pricing_doesnt_require_price_in
 
     pricing = reservation_unit.pricings.first()
     assert pricing.begins == local_date()
-    assert pricing.pricing_type == PricingType.FREE
     assert pricing.lowest_price == 0
     assert pricing.highest_price == 0
     assert pricing.lowest_price_net == 0

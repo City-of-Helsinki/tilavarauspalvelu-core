@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from django.db import models
 
 from config.utils.auditlog_util import AuditLogger
-from tilavarauspalvelu.enums import PriceUnit, PricingType
+from tilavarauspalvelu.enums import PriceUnit
 
 from .queryset import ReservationUnitPricingManager
 
@@ -29,7 +29,6 @@ def get_default_tax_percentage() -> int:
 
 class ReservationUnitPricing(models.Model):
     begins = models.DateField(null=False, blank=False)
-    pricing_type = models.CharField(max_length=20, choices=PricingType.choices, blank=True, null=True)
     price_unit = models.CharField(max_length=20, choices=PriceUnit.choices, default=PriceUnit.PRICE_UNIT_PER_HOUR)
 
     # True: This pricing is used for reservations that are created after the begins date
