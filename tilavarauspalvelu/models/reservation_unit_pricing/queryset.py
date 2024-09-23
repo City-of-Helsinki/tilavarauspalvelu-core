@@ -1,6 +1,6 @@
-from django.db import models
+from __future__ import annotations
 
-from tilavarauspalvelu.enums import PricingStatus
+from django.db import models
 
 __all__ = [
     "ReservationUnitPricingManager",
@@ -8,9 +8,7 @@ __all__ = [
 ]
 
 
-class ReservationUnitPricingQuerySet(models.QuerySet):
-    def active(self):
-        return self.filter(status=PricingStatus.PRICING_STATUS_ACTIVE).first()
+class ReservationUnitPricingQuerySet(models.QuerySet): ...
 
 
 class ReservationUnitPricingManager(models.Manager.from_queryset(ReservationUnitPricingQuerySet)): ...

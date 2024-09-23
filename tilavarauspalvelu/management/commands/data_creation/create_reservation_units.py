@@ -10,7 +10,6 @@ from itertools import cycle
 from tilavarauspalvelu.enums import (
     AuthenticationType,
     PriceUnit,
-    PricingStatus,
     PricingType,
     ReservationKind,
     ReservationStartInterval,
@@ -252,7 +251,6 @@ def _create_pricings(reservation_units: list[ReservationUnit]) -> list[Reservati
             price_unit=random.choice(PriceUnit.values),
             lowest_price=lowest_price,
             highest_price=highest_price,
-            status=PricingStatus.PRICING_STATUS_ACTIVE.value,
             reservation_unit=reservation_unit,
             tax_percentage=tax,
         )

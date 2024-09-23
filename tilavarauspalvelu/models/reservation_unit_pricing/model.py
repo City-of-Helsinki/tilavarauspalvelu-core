@@ -7,7 +7,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from config.utils.auditlog_util import AuditLogger
-from tilavarauspalvelu.enums import PriceUnit, PricingStatus, PricingType
+from tilavarauspalvelu.enums import PriceUnit, PricingType
 
 from .queryset import ReservationUnitPricingManager
 
@@ -35,7 +35,10 @@ class ReservationUnitPricing(models.Model):
     begins: datetime.date = models.DateField()
     pricing_type: str | None = models.CharField(max_length=20, choices=PricingType.choices, blank=True, null=True)
     price_unit: str = models.CharField(max_length=20, choices=PriceUnit.choices, default=PriceUnit.PRICE_UNIT_PER_HOUR)
-    status: str = models.CharField(max_length=20, choices=PricingStatus.choices)
+
+    # True: This pricing is used for reservations that are created after the begins date
+    # False: This pricing is used for reservations that start after the begins date
+    is_activated_on_begins = models.BooleanField(default=False)
 
     lowest_price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     highest_price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -67,6 +70,11 @@ class ReservationUnitPricing(models.Model):
                 name="lower_price_greater_than_highest_price",
                 check=models.Q(lowest_price__lte=models.F("highest_price")),
                 violation_error_message="Lowest price can not be greater than highest price.",
+            ),
+            models.UniqueConstraint(
+                name="reservation_unit_begin_date_unique_together",
+                fields=["reservation_unit", "begins"],
+                violation_error_message="Pricing for this reservation unit already exists for this date.",
             ),
         ]
 
