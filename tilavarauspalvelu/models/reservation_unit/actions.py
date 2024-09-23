@@ -3,12 +3,16 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any
 
-from tilavarauspalvelu.enums import PricingStatus, PricingType, ReservationStartInterval
+from django.db import models
+
+from tilavarauspalvelu.enums import PricingType, ReservationStartInterval
 from tilavarauspalvelu.exceptions import HaukiAPIError
 from tilavarauspalvelu.models import (
     Building,
     Location,
     OriginHaukiResource,
+    PaymentAccounting,
+    PaymentMerchant,
     ReservableTimeSpan,
     Reservation,
     ReservationUnit,
@@ -16,13 +20,11 @@ from tilavarauspalvelu.models import (
 )
 from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.utils.opening_hours.hauki_api_types import HaukiAPIResource, HaukiTranslatedField
-from utils.date_utils import DEFAULT_TIMEZONE, time_as_timedelta
+from utils.date_utils import DEFAULT_TIMEZONE, local_date, time_as_timedelta
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
-
-    from django.db import models
 
 
 class ReservationUnitHaukiExporter:
@@ -347,11 +349,66 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         # so we can just check start interval from the beginning of the day.
         return begin_time.second == 0 and begin_time.microsecond == 0 and begin_time.minute % interval_minutes == 0
 
-    def get_active_pricing(self) -> ReservationUnitPricing | None:
-        return self.reservation_unit.pricings.filter(status=PricingStatus.PRICING_STATUS_ACTIVE).first()
+    def get_active_pricing(self, by_date: datetime.date | None = None) -> ReservationUnitPricing | None:
+        """Returns the active pricing for the reservation unit."""
+        today = local_date()
+        if by_date is None:
+            by_date = today
 
-    def get_future_pricing(self) -> ReservationUnitPricing | None:
-        return self.reservation_unit.pricings.filter(status=PricingStatus.PRICING_STATUS_FUTURE).first()
+        return (
+            self.reservation_unit.pricings.filter(
+                models.Q(begins__lte=by_date, is_activated_on_begins=False)
+                | models.Q(begins__lte=today, is_activated_on_begins=True)
+            )
+            .order_by("-begins")
+            .first()
+        )
+
+    def get_future_pricing(self, by_date: datetime.date | None = None) -> ReservationUnitPricing | None:
+        today = local_date()
+        if by_date is None:
+            by_date = today
+
+        return (
+            self.reservation_unit.pricings.exclude(
+                models.Q(begins__lte=by_date, is_activated_on_begins=False)
+                | models.Q(begins__lte=today, is_activated_on_begins=True)
+            )
+            .order_by("begins")
+            .first()
+        )
+
+    def get_merchant(self) -> PaymentMerchant | None:
+        if self.reservation_unit.payment_merchant is not None:
+            return self.reservation_unit.payment_merchant
+        if self.reservation_unit.unit and self.reservation_unit.unit.payment_merchant is not None:
+            return self.reservation_unit.unit.payment_merchant
+
+        return None
+
+    def requires_product_mapping_update(self) -> bool:
+        from tilavarauspalvelu.enums import PricingType
+
+        payment_merchant = self.get_merchant()
+        if payment_merchant is None:
+            return False
+        if self.reservation_unit.payment_product is not None:
+            return True
+        if self.reservation_unit.is_draft:
+            return False
+
+        # Has PAID active or future pricings
+        active_pricing = self.reservation_unit.actions.get_active_pricing()
+        if active_pricing.pricing_type == PricingType.PAID:
+            return True
+        return self.reservation_unit.pricings.filter(pricing_type=PricingType.PAID, begins__gt=local_date()).exists()
+
+    def get_accounting(self) -> PaymentAccounting | None:
+        if self.reservation_unit.payment_accounting is not None:
+            return self.reservation_unit.payment_accounting
+        if self.reservation_unit.unit:
+            return self.reservation_unit.unit.payment_accounting
+        return None
 
     def get_pricing_on_date(self, *, date: datetime.date) -> ReservationUnitPricing | None:
         active_price = self.get_active_pricing()

@@ -20,7 +20,6 @@ from tests.factories import (
 from tilavarauspalvelu.enums import (
     AuthenticationType,
     PriceUnit,
-    PricingStatus,
     PricingType,
     ReservationKind,
     ReservationStartInterval,
@@ -103,7 +102,6 @@ def get_create_non_draft_input_data() -> dict[str, Any]:
                 "lowestPrice": "10.5",
                 "highestPrice": "18.8",
                 "taxPercentage": tax_percentage.id,
-                "status": PricingStatus.PRICING_STATUS_ACTIVE.value.upper(),
             }
         ],
     }
@@ -145,7 +143,6 @@ def get_pricing_data(**overrides: Any) -> dict[str, Any]:
         "lowestPrice": "18.2",
         "highestPrice": "21.5",
         "taxPercentage": tax_percentage.id,
-        "status": PricingStatus.PRICING_STATUS_ACTIVE.value.upper(),
         **overrides,
     }
 

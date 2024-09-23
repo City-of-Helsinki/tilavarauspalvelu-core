@@ -13,10 +13,10 @@ from tilavarauspalvelu.api.graphql.types.application_round_time_slot.serializers
 )
 from tilavarauspalvelu.api.graphql.types.reservation_unit_image.serializers import ReservationUnitImageFieldSerializer
 from tilavarauspalvelu.api.graphql.types.reservation_unit_pricing.serializers import ReservationUnitPricingSerializer
-from tilavarauspalvelu.enums import PricingStatus, ReservationStartInterval, WeekdayChoice
+from tilavarauspalvelu.enums import ReservationStartInterval, WeekdayChoice
 from tilavarauspalvelu.models import ReservationUnit, ReservationUnitPricing
 from tilavarauspalvelu.utils.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
-from tilavarauspalvelu.utils.reservation_units.reservation_unit_pricing_helper import ReservationUnitPricingHelper
+from utils.date_utils import local_date
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
@@ -112,19 +112,15 @@ class ReservationUnitSerializer(NestingModelSerializer):
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         is_draft = data.get("is_draft", getattr(self.instance, "is_draft", False))
 
-        self.validate_reservation_duration_fields(data)
-
-        if self.instance is not None:
-            self.validate_updated_pricings(data)
-        else:
-            data = self.validate_created_pricings(data)
+        self._validate_reservation_duration_fields(data)
+        self._validate_pricings(data)
 
         if not is_draft:
-            self.validate_for_publish(data)
+            self._validate_for_publish(data)
 
         return data
 
-    def validate_reservation_duration_fields(self, data: dict[str, Any]) -> None:
+    def _validate_reservation_duration_fields(self, data: dict[str, Any]) -> None:
         """
         Validates:
         - min_reservation_duration
@@ -171,7 +167,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
                     code=error_codes.RESERVATION_UNIT_MAX_RESERVATION_DURATION_INVALID,
                 )
 
-    def validate_for_publish(self, data: dict[str, Any]) -> None:
+    def _validate_for_publish(self, data: dict[str, Any]) -> None:
         required_translations: list[str] = [
             "name_fi",
             "name_sv",
@@ -207,34 +203,52 @@ class ReservationUnitSerializer(NestingModelSerializer):
             msg = "minPersons can't be more than maxPersons"
             raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MIN_PERSONS_GREATER_THAN_MAX_PERSONS)
 
-    def validate_created_pricings(self, data: dict[str, Any]) -> dict[str, Any]:
+    def _validate_pricings(self, data: dict[str, Any]) -> None:
+        """
+        When reservation unit is draft, pricings are not required,
+        but if they are given, they must be valid.
+        """
         is_draft = self.get_or_default("is_draft", data)
-        ReservationUnitPricingHelper.check_pricing_required(is_draft, data)
-        ReservationUnitPricingHelper.check_pricing_dates(data)
-        ReservationUnitPricingHelper.check_pricing_counts(is_draft, data)
-        data["pricings"] = ReservationUnitPricingHelper.calculate_vat_prices(data)
-        return data
+        pricings = data.get("pricings")
 
-    def validate_updated_pricings(self, data: dict[str, Any]) -> dict[str, Any]:
-        current_active_pricing = ReservationUnitPricingHelper.get_active_price(self.instance)
-        current_future_pricing = ReservationUnitPricingHelper.get_future_price(self.instance)
+        # Pricings are optional when reservation unit is draft
+        if is_draft and pricings is None:
+            return
 
-        for pricing in data.get("pricings", []):
-            if (
-                ReservationUnitPricingHelper.is_active(pricing)
-                and current_active_pricing
-                and current_active_pricing.pk != pricing.get("pk", 0)
-            ):
-                raise GraphQLError("ACTIVE pricing is already defined. Only one ACTIVE pricing is allowed")
+        # If the pricings were not given, but the reservation unit has some, skip validation and assume they are valid
+        if pricings is None and self.instance and self.instance.pricings.exists():
+            return
 
-            if (
-                ReservationUnitPricingHelper.is_future(pricing)
-                and current_future_pricing
-                and current_future_pricing.pk != pricing.get("pk", 0)
-            ):
-                raise GraphQLError("FUTURE pricing is already defined. Only one FUTURE pricing is allowed")
+        if pricings is None:
+            msg = "Pricings are required for non-draft reservation units."
+            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_PRICINGS_MISSING)
 
-        return ReservationUnitPricingHelper.calculate_vat_prices(data)
+        # At least one given pricing must be currently active (begin date is today or earlier)
+        today = local_date()
+        has_active_pricing = any(p.get("begins") <= today for p in pricings)
+        if pricings and not has_active_pricing:
+            msg = "At least one active pricing is required."
+            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_PRICINGS_NO_ACTIVE_PRICING)
+
+        # Only one pricing per date is allowed
+        pricing_dates = [p.get("begins") for p in pricings]
+        if len(pricing_dates) != len(set(pricing_dates)):
+            msg = "Reservation unit can have only one pricing per date."
+            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_PRICINGS_DUPLICATE_DATE)
+
+        # Highest price cannot be less than the lowest price
+        for pricing in pricings:
+            highest_price = pricing.get("highest_price")
+            lowest_price = pricing.get("lowest_price")
+
+            if lowest_price is None and highest_price is None:
+                continue
+            if lowest_price is None or highest_price is None:
+                msg = "Both lowest and highest price must be given or neither."
+                raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_PRICINGS_INVALID_PRICES)
+            if highest_price < lowest_price:
+                msg = "Highest price cannot be less than lowest price."
+                raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_PRICINGS_INVALID_PRICES)
 
     @staticmethod
     def validate_application_round_time_slots(timeslots: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -302,25 +316,13 @@ class ReservationUnitSerializer(NestingModelSerializer):
     @staticmethod
     def handle_pricings(pricings: list[dict[Any, Any]], reservation_unit) -> None:
         # Delete pricings that are not in the payload
-        if not ReservationUnitPricingHelper.contains_status(PricingStatus.PRICING_STATUS_ACTIVE, pricings):
-            ReservationUnitPricing.objects.filter(
-                reservation_unit=reservation_unit,
-                status=PricingStatus.PRICING_STATUS_ACTIVE,
-            ).delete()
-
-        if not ReservationUnitPricingHelper.contains_status(PricingStatus.PRICING_STATUS_FUTURE, pricings):
-            ReservationUnitPricing.objects.filter(
-                reservation_unit=reservation_unit,
-                status=PricingStatus.PRICING_STATUS_FUTURE,
-            ).delete()
+        pricing_pks = [pricing.get("pk") for pricing in pricings if "pk" in pricing]
+        ReservationUnitPricing.objects.filter(reservation_unit=reservation_unit).exclude(pk__in=pricing_pks).delete()
 
         for pricing in pricings:
             if "pk" in pricing:  # Update existing pricings
                 ReservationUnitPricing.objects.update_or_create(pk=pricing["pk"], defaults=pricing)
-
             else:  # Create new pricings
-                status = pricing.get("status")
-                ReservationUnitPricing.objects.filter(reservation_unit=reservation_unit, status=status).delete()
                 ReservationUnitPricing.objects.create(**pricing, reservation_unit=reservation_unit)
 
     def update(self, instance: ReservationUnit, validated_data: dict[str, Any]) -> ReservationUnit:

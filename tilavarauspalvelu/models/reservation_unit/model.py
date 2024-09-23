@@ -14,13 +14,13 @@ from lookup_property import L, lookup_property
 from config.utils.auditlog_util import AuditLogger
 from tilavarauspalvelu.enums import (
     AuthenticationType,
-    PricingStatus,
     PricingType,
     ReservationKind,
     ReservationStartInterval,
     ReservationUnitPublishingState,
     ReservationUnitReservationState,
 )
+from utils.date_utils import local_date
 from utils.db import NowTT
 
 from .queryset import ReservationUnitManager
@@ -296,9 +296,9 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
             queryset=(
                 ReservationUnitPricing.objects.filter(
                     reservation_unit=models.OuterRef("pk"),
-                    status=PricingStatus.PRICING_STATUS_ACTIVE,
+                    begins__lte=local_date(),
                 )
-                .order_by("begins")
+                .order_by("-begins")
                 .values("pricing_type")[:1]
             ),
             output_field=models.CharField(null=True),
@@ -312,9 +312,9 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
         return (
             ReservationUnitPricing.objects.filter(
                 reservation_unit=self,
-                status=PricingStatus.PRICING_STATUS_ACTIVE,
+                begins__lte=local_date(),
             )
-            .order_by("begins")
+            .order_by("-begins")
             .values_list("pricing_type", flat=True)
             .first()
         )

@@ -10,13 +10,7 @@ from tests.factories import (
     ReservationMetadataSetFactory,
     ReservationUnitPricingFactory,
 )
-from tilavarauspalvelu.enums import (
-    CustomerTypeChoice,
-    PriceUnit,
-    PricingStatus,
-    ReservationStateChoice,
-    ReservationTypeChoice,
-)
+from tilavarauspalvelu.enums import CustomerTypeChoice, PriceUnit, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.models import ReservationUnitHierarchy
 from utils.date_utils import local_datetime
 from utils.decimal_utils import round_decimal
@@ -584,7 +578,6 @@ def test_reservation__update__price_calculation_not_triggered_if_time_not_change
 
     ReservationUnitPricingFactory.create(
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
-        status=PricingStatus.PRICING_STATUS_ACTIVE,
         reservation_unit=reservation.reservation_units.first(),
         highest_price=Decimal("20.0"),
     )
@@ -614,7 +607,6 @@ def test_reservation__update__price_calculation_triggered_if_begin_changes(graph
 
     pricing = ReservationUnitPricingFactory.create(
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
-        status=PricingStatus.PRICING_STATUS_ACTIVE,
         reservation_unit=reservation.reservation_units.first(),
         highest_price=Decimal("20.0"),
     )
@@ -649,7 +641,6 @@ def test_reservation__update__price_calculation_triggered_if_end_changes(graphql
 
     pricing = ReservationUnitPricingFactory.create(
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
-        status=PricingStatus.PRICING_STATUS_ACTIVE,
         reservation_unit=reservation.reservation_units.first(),
         highest_price=Decimal("20.0"),
     )
@@ -684,7 +675,6 @@ def test_reservation__update__price_calculation_triggered_if_unit_changes(graphq
 
     pricing = ReservationUnitPricingFactory.create(
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
-        status=PricingStatus.PRICING_STATUS_ACTIVE,
         highest_price=Decimal("20.0"),
         reservation_unit__origin_hauki_resource=reservation.reservation_units.first().origin_hauki_resource,
     )
@@ -721,7 +711,6 @@ def test_reservation__update__price_calculation_uses_to_future_pricing(graphql):
 
     ReservationUnitPricingFactory.create(
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
-        status=PricingStatus.PRICING_STATUS_ACTIVE,
         highest_price=Decimal("20.0"),
         tax_percentage__value=Decimal("25.5"),
         reservation_unit=reservation.reservation_units.first(),
@@ -730,7 +719,6 @@ def test_reservation__update__price_calculation_uses_to_future_pricing(graphql):
     pricing = ReservationUnitPricingFactory.create(
         begins=pricing_change,
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
-        status=PricingStatus.PRICING_STATUS_FUTURE,
         highest_price=Decimal("30.0"),
         tax_percentage__value=Decimal("25.5"),
         reservation_unit=reservation.reservation_units.first(),
