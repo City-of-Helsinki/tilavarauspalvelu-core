@@ -132,7 +132,7 @@ def migrate_from_tunnistamo_to_keycloak(*, email: str) -> None:
     # There can be more, but the most recent one is the new Keycloak user and the other one
     # is the old Tunnistamo user after the auth-migration (when auth moved to backend), which we want to migrate.
     users: list[User] = list(
-        User.objects.filter(email=email, profile_id="", is_active=True).order_by("-date_joined")[:2]
+        User.objects.filter(email__iexact=email, profile_id="", is_active=True).order_by("-date_joined")[:2]
     )
     if len(users) < 2:
         return
