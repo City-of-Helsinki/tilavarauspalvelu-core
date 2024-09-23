@@ -80,6 +80,13 @@ class UserAdmin(admin.ModelAdmin):
         "last_login",
         "date_joined",
     ]
+    list_filter = [
+        "is_active",
+        "is_superuser",
+        "is_staff",
+        "reservation_notification",
+        "preferred_language",
+    ]
     ordering = ["username"]
 
     # Form
