@@ -42,7 +42,6 @@ class ReservationUnitPricingAdmin(admin.ModelAdmin):
         ("highest_price", "highest_price_net"),
         "tax_percentage",
         "status",
-        "pricing_type",
         "price_unit",
     ]
     readonly_fields = [

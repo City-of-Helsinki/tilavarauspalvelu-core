@@ -13,7 +13,6 @@ class ReservationUnitPricingNode(DjangoNode):
         fields = [
             "pk",
             "begins",
-            "pricing_type",
             "price_unit",
             "lowest_price",
             "lowest_price_net",

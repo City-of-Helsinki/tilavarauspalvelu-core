@@ -10,7 +10,6 @@ class ReservationUnitPricingSerializer(NestingModelSerializer):
             "pk",
             "begins",
             "is_activated_on_begins",
-            "pricing_type",
             "price_unit",
             "lowest_price",
             "lowest_price_net",

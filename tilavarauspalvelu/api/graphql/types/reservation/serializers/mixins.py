@@ -11,7 +11,6 @@ from tilavarauspalvelu.api.graphql.extensions.validation_errors import Validatio
 from tilavarauspalvelu.api.graphql.types.reservation.types import ReservationNode
 from tilavarauspalvelu.enums import (
     PriceUnit,
-    PricingType,
     ReservationStartInterval,
     ReservationTypeChoice,
     ReservationUnitPublishingState,
@@ -102,8 +101,8 @@ class ReservationPriceMixin:
         for reservation_unit in reservation_units:
             pricing = reservation_unit.actions.get_active_pricing(by_date=begin_datetime.date())
 
-            # If unit pricing type is not PAID, there is no need for calculations, skip to next reservation unit
-            if pricing is None or pricing.pricing_type != PricingType.PAID:
+            # If reservation unit pricing type is FREE, there is no need for calculations, skip to next reservation unit
+            if pricing is None or pricing.highest_price == 0:
                 continue
 
             price = pricing.highest_price

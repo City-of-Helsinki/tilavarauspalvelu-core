@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 import pytest
 
 from tests.factories import PaymentProductFactory, ReservationUnitFactory, ReservationUnitPricingFactory
-from tilavarauspalvelu.enums import PricingType, ReservationUnitReservationState
+from tilavarauspalvelu.enums import ReservationUnitReservationState
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit
@@ -40,7 +40,7 @@ def test_reservation_unit_get_state__reservable__free():
 
     reservation_unit.reservation_ends = None
     reservation_unit.reservation_begins = now - datetime.timedelta(days=1)
-    ReservationUnitPricingFactory.create(reservation_unit=reservation_unit, pricing_type=PricingType.FREE)
+    ReservationUnitPricingFactory.create_free(reservation_unit=reservation_unit)
 
     assert reservation_unit.reservation_state == ReservationUnitReservationState.RESERVABLE
 
@@ -52,7 +52,7 @@ def test_reservation_unit_get_state__reservable__paid():
     reservation_unit.reservation_ends = None
     reservation_unit.reservation_begins = now - datetime.timedelta(days=1)
     reservation_unit.payment_product = PaymentProductFactory.create()
-    ReservationUnitPricingFactory.create(reservation_unit=reservation_unit, pricing_type=PricingType.PAID)
+    ReservationUnitPricingFactory.create(reservation_unit=reservation_unit)
 
     assert reservation_unit.reservation_state == ReservationUnitReservationState.RESERVABLE
 
@@ -73,7 +73,7 @@ def test_reservation_unit_get_state__not_reservable_due_to_missing_payment_produ
 
     reservation_unit.reservation_ends = None
     reservation_unit.reservation_begins = now - datetime.timedelta(days=1)
-    ReservationUnitPricingFactory.create(reservation_unit=reservation_unit, pricing_type=PricingType.PAID)
+    ReservationUnitPricingFactory.create(reservation_unit=reservation_unit)
 
     assert reservation_unit.reservation_state == ReservationUnitReservationState.RESERVATION_CLOSED
 
@@ -84,7 +84,7 @@ def test_reservation_unit_get_state__scheduled_closing__free():
 
     reservation_unit.reservation_ends = now + datetime.timedelta(days=1)
     reservation_unit.reservation_begins = now - datetime.timedelta(days=1)
-    ReservationUnitPricingFactory.create(reservation_unit=reservation_unit, pricing_type=PricingType.FREE)
+    ReservationUnitPricingFactory.create_free(reservation_unit=reservation_unit)
 
     assert reservation_unit.reservation_state == ReservationUnitReservationState.SCHEDULED_CLOSING
 
@@ -96,7 +96,7 @@ def test_reservation_unit_get_state__scheduled_closing__paid():
     reservation_unit.reservation_ends = now + datetime.timedelta(days=1)
     reservation_unit.reservation_begins = now - datetime.timedelta(days=1)
     reservation_unit.payment_product = PaymentProductFactory.create()
-    ReservationUnitPricingFactory.create(reservation_unit=reservation_unit, pricing_type=PricingType.PAID)
+    ReservationUnitPricingFactory.create(reservation_unit=reservation_unit)
 
     assert reservation_unit.reservation_state == ReservationUnitReservationState.SCHEDULED_CLOSING
 
@@ -117,7 +117,7 @@ def test_reservation_unit_get_state__not_scheduled_due_to_no_payment_product():
 
     reservation_unit.reservation_ends = now + datetime.timedelta(days=1)
     reservation_unit.reservation_begins = now - datetime.timedelta(days=1)
-    ReservationUnitPricingFactory.create(reservation_unit=reservation_unit, pricing_type=PricingType.PAID)
+    ReservationUnitPricingFactory.create(reservation_unit=reservation_unit)
 
     assert reservation_unit.reservation_state == ReservationUnitReservationState.RESERVATION_CLOSED
 

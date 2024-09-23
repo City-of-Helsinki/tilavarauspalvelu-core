@@ -10,7 +10,6 @@ from itertools import cycle
 from tilavarauspalvelu.enums import (
     AuthenticationType,
     PriceUnit,
-    PricingType,
     ReservationKind,
     ReservationStartInterval,
     TermsOfUseTypeChoices,
@@ -239,15 +238,13 @@ def _create_pricings(reservation_units: list[ReservationUnit]) -> list[Reservati
     for reservation_unit in reservation_units:
         highest_price = weighted_choice(pricing_options, weights=[5, 1, 1, 3])
         tax = zero_tax if highest_price == 0 else random.choice(list(tax_percentages.values()))
-        pricing_type = PricingType.FREE if highest_price == 0 else PricingType.PAID
 
         lowest_price: int = 0
-        if pricing_type == PricingType.PAID:
+        if highest_price > 0:
             lowest_price = random.randint(1, highest_price - 1)
 
         pricing = ReservationUnitPricing(
             begins=date(2021, 1, 1),
-            pricing_type=pricing_type,
             price_unit=random.choice(PriceUnit.values),
             lowest_price=lowest_price,
             highest_price=highest_price,
@@ -255,7 +252,7 @@ def _create_pricings(reservation_units: list[ReservationUnit]) -> list[Reservati
             tax_percentage=tax,
         )
         pricings.append(pricing)
-        addendum = "maksuton" if pricing_type == PricingType.FREE else "maksullinen"
+        addendum = "maksuton" if highest_price == 0 else "maksullinen"
 
         reservation_unit.name = f"{reservation_unit.name}, {addendum}"
         reservation_unit.name_fi = reservation_unit.name
