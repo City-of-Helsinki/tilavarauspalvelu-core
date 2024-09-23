@@ -14,7 +14,6 @@ from lookup_property import L, lookup_property
 from config.utils.auditlog_util import AuditLogger
 from tilavarauspalvelu.enums import (
     AuthenticationType,
-    PricingType,
     ReservationKind,
     ReservationStartInterval,
     ReservationUnitPublishingState,
@@ -26,6 +25,8 @@ from utils.db import NowTT
 from .queryset import ReservationUnitQuerySet
 
 if TYPE_CHECKING:
+    from decimal import Decimal
+
     from tilavarauspalvelu.models import (
         OriginHaukiResource,
         PaymentAccounting,
@@ -284,7 +285,7 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
         return ReservationUnitActions(self)
 
     @lookup_property(skip_codegen=True)
-    def active_pricing_type() -> str | None:
+    def active_pricing_price() -> Decimal | None:
         """Get the pricing type from the currently active pricing."""
         from tilavarauspalvelu.models import ReservationUnitPricing
 
@@ -295,14 +296,14 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
                     begins__lte=local_date(),
                 )
                 .order_by("-begins")
-                .values("pricing_type")[:1]
+                .values("highest_price")[:1]
             ),
             output_field=models.CharField(null=True),
         )
         return sq  # type: ignore[return-value]  # noqa: RET504
 
-    @active_pricing_type.override
-    def _(self) -> str | None:
+    @active_pricing_price.override
+    def _(self) -> Decimal | None:
         from tilavarauspalvelu.models import ReservationUnitPricing
 
         return (
@@ -311,7 +312,7 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
                 begins__lte=local_date(),
             )
             .order_by("-begins")
-            .values_list("pricing_type", flat=True)
+            .values_list("highest_price", flat=True)
             .first()
         )
 
@@ -448,11 +449,10 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
             models.When(
                 (
                     # No active pricing.
-                    L(active_pricing_type=None)
+                    L(active_pricing_price=None)
                     | (
                         # Paid pricing with no payment product.
-                        L(active_pricing_type=models.Value(PricingType.PAID.value))
-                        & models.Q(payment_product__isnull=True)
+                        L(active_pricing_price__gt=0) & models.Q(payment_product__isnull=True)
                         # When using Mock Verkkokauppa API, pricing is valid even if there is no payment product.
                         if not settings.MOCK_VERKKOKAUPPA_API_ENABLED
                         else ~models.Q()  # Evaluates to False
@@ -551,6 +551,6 @@ AuditLogger.register(
     exclude_fields=[
         "_publishing_state",
         "_reservation_state",
-        "_active_pricing_type",
+        "_active_pricing_price",
     ],
 )

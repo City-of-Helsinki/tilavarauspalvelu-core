@@ -99,7 +99,6 @@ def test_reservation_unit_export_multiple():
     assert row_2[next(index)] == reservation_unit_1.require_reservation_handling
     assert row_2[next(index)] == reservation_unit_1.authentication
     assert row_2[next(index)] == reservation_unit_1.reservation_kind
-    assert row_2[next(index)] == reservation_unit_1.pricings.first().pricing_type
     assert row_2[next(index)] == reservation_unit_1.payment_types.first().code
     assert row_2[next(index)] == reservation_unit_1.can_apply_free_of_charge
     assert row_2[next(index)] == reservation_unit_1.reservation_pending_instructions_fi
@@ -198,7 +197,6 @@ def test_reservation_unit_export_multiple():
                     "Lowest price": "",
                     "Highest price": "",
                     "Tax percentage": "",
-                    "Pricing types": "",
                 },
             ),
             "Missing Reservation begins": MissingParams(
