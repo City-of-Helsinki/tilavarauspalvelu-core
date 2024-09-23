@@ -1,37 +1,33 @@
 import React from "react";
-import {
-  StatusLabel as HDSStatusLabel,
-  type StatusLabelType as HDSStatusLabelType,
-} from "hds-react";
+import { StatusLabel as HDSStatusLabel } from "hds-react";
 import styled from "styled-components";
+import {
+  type StatusLabelType,
+  getStatusBorderColor,
+  getStatusBackgroundColor,
+} from "../tags";
 
-export type StatusLabelType = HDSStatusLabelType | "draft";
-
-const handleColorType = ($type: StatusLabelType) => {
-  switch ($type) {
-    case "info":
-      return "var(--color-coat-of-arms-light)";
-    case "alert":
-      return "var(--color-engel-medium-light)";
-    case "success":
-      return "var(--color-tram-light)";
-    case "error":
-      return "var(--color-metro-medium-light)";
-    case "draft":
-      return "var(--color-suomenlinna-medium-light)";
-    case "neutral":
-    default:
-      return "var(--color-silver)";
-  }
+type StatusLabelProps = {
+  type: StatusLabelType;
+  icon: JSX.Element;
+  testId?: string;
+  children: React.ReactNode;
 };
 
 const ColoredLabel = styled(HDSStatusLabel)<{
   $type: StatusLabelType;
 }>`
   && {
-    --status-label-background: ${(props) => handleColorType(props.$type)};
+    --status-label-background: ${(props) =>
+      getStatusBackgroundColor(props.$type)} !important;
     --status-label-color: var(--color-black);
+    border-width: 1px;
+    border-style: solid;
+    border-color: ${(props) => getStatusBorderColor(props.$type)};
     white-space: nowrap;
+  }
+  svg {
+    scale: 0.8;
   }
 `;
 
@@ -46,19 +42,14 @@ const ColoredLabel = styled(HDSStatusLabel)<{
 function StatusLabel({
   type,
   icon,
-  dataTestId,
+  testId,
   children,
-}: {
-  type: StatusLabelType;
-  icon: JSX.Element;
-  dataTestId?: string;
-  children: React.ReactNode;
-}) {
+}: Readonly<StatusLabelProps>): JSX.Element {
   return (
     <ColoredLabel
       type={type === "draft" ? "neutral" : type} // HDS StatusLabel does not support "draft" type - so convert it to "neutral"
       iconLeft={icon}
-      dataTestId={dataTestId}
+      dataTestId={testId}
       $type={type}
     >
       {children}

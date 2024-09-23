@@ -1,8 +1,7 @@
-import { IconArrowRight, IconEuroSign, IconGroup, Tag } from "hds-react";
+import { IconArrowRight, IconEuroSign, IconGroup } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import NextImage from "next/image";
-import styled from "styled-components";
 import type {
   ReservationUnitNode,
   SearchReservationUnitsQuery,
@@ -16,11 +15,12 @@ import {
   getReservationUnitName,
   getUnitName,
 } from "@/modules/reservationUnit";
-import { reservationUnitPrefix } from "@/modules/const";
+import { isBrowser, reservationUnitPrefix } from "@/modules/const";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
-import { useSearchParams } from "next/navigation";
-import { getImageSource, isBrowser } from "common/src/helpers";
+import { getImageSource } from "common/src/helpers";
 import Card from "common/src/components/Card";
+import Tag from "common/src/components/Tag";
+import { useSearchParams } from "next/navigation";
 
 type QueryT = NonNullable<SearchReservationUnitsQuery["reservationUnits"]>;
 type Edge = NonNullable<NonNullable<QueryT["edges"]>[0]>;
@@ -28,23 +28,6 @@ type Node = NonNullable<Edge["node"]>;
 interface PropsT {
   reservationUnit: Node;
 }
-
-const StyledTag = styled(Tag)<{ $status: "available" | "no-times" | "closed" }>`
-  margin-bottom: var(--spacing-s);
-
-  && {
-    --tag-background: ${({ $status }) => {
-      switch ($status) {
-        case "available":
-          return "var(--color-success-light)";
-        case "no-times":
-          return "var(--color-error-light)";
-        case "closed":
-          return "var(--color-black-10)";
-      }
-    }};
-  }
-`;
 
 const StatusTag = ({
   data,
@@ -58,33 +41,32 @@ const StatusTag = ({
 
   if (closed) {
     return (
-      <StyledTag $status="closed" id={id}>
+      <Tag ariaLabel={t("reservationUnitCard:closed")} type="error" id={id}>
         {t("reservationUnitCard:closed")}
-      </StyledTag>
+      </Tag>
     );
   }
 
   if (!availableAt) {
     return (
-      <StyledTag $status="no-times" id={id}>
+      <Tag ariaLabel={t("reservationUnitCard:noTimes")} type="neutral" id={id}>
         {t("reservationUnitCard:noTimes")}
-      </StyledTag>
+      </Tag>
     );
   }
-
-  let dayText = "";
-  const timeText = format(new Date(availableAt), "HH:mm");
-  if (isToday(new Date(availableAt))) {
+  const availableAtDate = new Date(availableAt);
+  let dayText = toUIDate(availableAtDate);
+  if (isToday(availableAtDate)) {
     dayText = t("common:today");
-  } else if (isTomorrow(new Date(availableAt))) {
+  } else if (isTomorrow(availableAtDate)) {
     dayText = t("common:tomorrow");
-  } else dayText = `${toUIDate(new Date(availableAt))} `;
-
+  }
+  const timeText = format(new Date(availableAt), "HH:mm");
+  const ariaLabel = t("reservationUnitCard:firstAvailableTime");
   return (
-    <StyledTag
-      $status="available"
-      id={id}
-    >{`${dayText} ${timeText}`}</StyledTag>
+    <Tag ariaLabel={ariaLabel} type="success" id={id}>
+      {`${dayText} ${timeText}`}
+    </Tag>
   );
 };
 
@@ -132,6 +114,7 @@ function ReservationUnitCard({ reservationUnit }: PropsT): JSX.Element {
 
   const img = getMainImage(reservationUnit);
   const imgSrc = getImageSource(img, "small");
+
   const tags = [
     <StatusTag
       data={{
@@ -142,6 +125,7 @@ function ReservationUnitCard({ reservationUnit }: PropsT): JSX.Element {
       key={`status-tag-${reservationUnit.pk}`}
     />,
   ];
+
   const infos = [];
   if (reservationUnitTypeName) {
     infos.push({
@@ -178,12 +162,14 @@ function ReservationUnitCard({ reservationUnit }: PropsT): JSX.Element {
       }),
     });
   }
-  const button = (
-    <ButtonLikeLink href={link}>
+
+  const buttons = [
+    <ButtonLikeLink href={link} key={link}>
       {t("reservationUnitCard:seeMore")}
       <IconArrowRight aria-hidden="true" />
-    </ButtonLikeLink>
-  );
+    </ButtonLikeLink>,
+  ];
+
   return (
     <Card
       heading={name ?? ""}
@@ -193,7 +179,7 @@ function ReservationUnitCard({ reservationUnit }: PropsT): JSX.Element {
       imageSrc={imgSrc}
       tags={tags}
       infos={infos}
-      buttons={[button]}
+      buttons={buttons}
     />
   );
 }

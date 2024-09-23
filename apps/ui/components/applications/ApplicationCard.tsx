@@ -23,10 +23,9 @@ import { applicationUrl, formatDateTime } from "@/modules/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
-import StatusLabel, {
-  type StatusLabelType,
-} from "common/src/components/StatusLabel";
 import Card from "common/src/components/Card";
+import StatusLabel from "common/src/components/StatusLabel";
+import { type StatusLabelType } from "common/src/tags";
 
 const StyledButton = styled(Button).attrs({
   variant: "secondary",

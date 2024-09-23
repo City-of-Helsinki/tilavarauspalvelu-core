@@ -13,9 +13,8 @@ import {
   IconQuestionCircle,
 } from "hds-react";
 import { useTranslation } from "react-i18next";
-import StatusLabel, {
-  type StatusLabelType,
-} from "common/src/components/StatusLabel";
+import StatusLabel from "common/src/components/StatusLabel";
+import { type StatusLabelType } from "common/src/tags";
 
 type StatusPropsType = {
   type: StatusLabelType;

@@ -3,9 +3,8 @@ import React, { useMemo } from "react";
 import { useTranslation } from "next-i18next";
 import { OrderStatus } from "@/gql/gql-types";
 import { IconEuroSign } from "hds-react";
-import StatusLabel, {
-  StatusLabelType,
-} from "common/src/components/StatusLabel";
+import StatusLabel from "common/src/components/StatusLabel";
+import { type StatusLabelType } from "common/src/tags";
 
 export type Props = {
   orderStatus: OrderStatus;
@@ -37,7 +36,7 @@ export function ReservationOrderStatus({
   const statusText = t(`reservations:orderStatus.${camelCase(orderStatus)}`);
 
   return (
-    <StatusLabel type={labelType} icon={<IconEuroSign />} dataTestId={testId}>
+    <StatusLabel type={labelType} icon={<IconEuroSign />} testId={testId}>
       {statusText}
     </StatusLabel>
   );

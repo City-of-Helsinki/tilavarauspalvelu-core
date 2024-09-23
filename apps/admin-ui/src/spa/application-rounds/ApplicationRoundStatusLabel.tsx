@@ -9,9 +9,8 @@ import {
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { ApplicationRoundStatusChoice, type Maybe } from "@gql/gql-types";
-import StatusLabel, {
-  type StatusLabelType,
-} from "common/src/components/StatusLabel";
+import StatusLabel from "common/src/components/StatusLabel";
+import { type StatusLabelType } from "common/src/tags";
 
 type RoundStatus = {
   type: StatusLabelType;

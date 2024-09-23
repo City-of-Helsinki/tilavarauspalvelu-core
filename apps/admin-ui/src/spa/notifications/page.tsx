@@ -49,9 +49,8 @@ import { base64encode } from "common/src/helpers";
 import { ControlledDateInput } from "common/src/components/form";
 import ControlledTimeInput from "@/component/ControlledTimeInput";
 import { errorToast, successToast } from "common/src/common/toast";
-import StatusLabel, {
-  type StatusLabelType,
-} from "common/src/components/StatusLabel";
+import StatusLabel from "common/src/components/StatusLabel";
+import { type StatusLabelType } from "common/src/tags";
 
 const RichTextInput = dynamic(() => import("@/component/RichTextInput"), {
   ssr: false,

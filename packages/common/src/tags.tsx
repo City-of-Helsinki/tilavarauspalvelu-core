@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { Tag } from "hds-react";
+import type { StatusLabelType as HDSStatusLabelType } from "hds-react";
 
 export const FilterTags = styled.div`
   display: flex;
@@ -44,3 +45,42 @@ export const ResetButton = styled(StyledTag).attrs({
     background: var(--color-black-10);
   }
 `;
+
+export type StatusLabelType = HDSStatusLabelType | "draft";
+
+export const getStatusBorderColor = ($type: StatusLabelType) => {
+  switch ($type) {
+    case "info":
+      return "var(--color-coat-of-arms)";
+    case "alert":
+      return "var(--color-engel)";
+    case "success":
+      return "var(--color-tram)";
+    case "error":
+      // using custom value since there is no suitable color in the HDS color palette for this (--color-metro is too dark)
+      return "#FBA782";
+    case "draft":
+      return "var(--color-suomenlinna)";
+    case "neutral":
+    default:
+      return "var(--color-silver-dark)";
+  }
+};
+
+export const getStatusBackgroundColor = ($type: StatusLabelType) => {
+  switch ($type) {
+    case "info":
+      return "var(--color-coat-of-arms-medium-light)";
+    case "alert":
+      return "var(--color-engel-medium-light)";
+    case "success":
+      return "var(--color-tram-medium-light)";
+    case "error":
+      return "var(--color-metro-medium-light)";
+    case "draft":
+      return "var(--color-suomenlinna-medium-light)";
+    case "neutral":
+    default:
+      return "var(--color-silver)";
+  }
+};

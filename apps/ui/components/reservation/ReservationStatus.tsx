@@ -10,9 +10,8 @@ import {
   IconPen,
   IconQuestionCircle,
 } from "hds-react";
-import StatusLabel, {
-  StatusLabelType,
-} from "common/src/components/StatusLabel";
+import StatusLabel from "common/src/components/StatusLabel";
+import { type StatusLabelType } from "common/src/tags";
 
 export type Props = {
   state: ReservationStateChoice;
@@ -71,7 +70,7 @@ export function ReservationStatus({ state, testId }: Props): JSX.Element {
     <StatusLabel
       type={statusProps.type}
       icon={statusProps.icon}
-      dataTestId={testId}
+      testId={testId}
     >
       {statusText}
     </StatusLabel>
