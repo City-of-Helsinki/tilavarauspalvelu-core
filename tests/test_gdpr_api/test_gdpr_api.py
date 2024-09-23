@@ -28,11 +28,11 @@ pytestmark = [
 def test_query_user_data__simple(api_client, settings):
     user = UserFactory.create()
 
-    settings.GDPR_API_QUERY_SCOPE = "testprefix.gdprquery"
+    settings.GDPR_API_QUERY_SCOPE = "gdprquery"
     auth_header = get_gdpr_auth_header(user, scopes=[settings.GDPR_API_QUERY_SCOPE])
     api_client.credentials(HTTP_AUTHORIZATION=auth_header)
 
-    url = reverse("gdpr_v1", kwargs={"uuid": user.uuid})
+    url = reverse("gdpr_v1", kwargs={"uuid": str(user.uuid)})
     with patch_oidc_config():
         response = api_client.get(url)
 
@@ -70,11 +70,11 @@ def test_query_user_data__full(api_client, settings):
     section: ApplicationSection = application.application_sections.first()
     reservation: Reservation = ReservationFactory.create(user=user)
 
-    settings.GDPR_API_QUERY_SCOPE = "testprefix.gdprquery"
+    settings.GDPR_API_QUERY_SCOPE = "gdprquery"
     auth_header = get_gdpr_auth_header(user, scopes=[settings.GDPR_API_QUERY_SCOPE])
     api_client.credentials(HTTP_AUTHORIZATION=auth_header)
 
-    url = reverse("gdpr_v1", kwargs={"uuid": user.uuid})
+    url = reverse("gdpr_v1", kwargs={"uuid": str(user.uuid)})
     with patch_oidc_config():
         response = api_client.get(url)
 
@@ -363,11 +363,11 @@ def test_query_user_data__full(api_client, settings):
 def test_query_user_data__user_not_found(api_client, settings):
     user = UserFactory.create()
 
-    settings.GDPR_API_QUERY_SCOPE = "testprefix.gdprquery"
+    settings.GDPR_API_QUERY_SCOPE = "gdprquery"
     auth_header = get_gdpr_auth_header(user, scopes=[settings.GDPR_API_QUERY_SCOPE])
     api_client.credentials(HTTP_AUTHORIZATION=auth_header)
 
-    url = reverse("gdpr_v1", kwargs={"uuid": uuid.uuid4()})
+    url = reverse("gdpr_v1", kwargs={"uuid": str(uuid.uuid4())})
     with patch_oidc_config():
         response = api_client.get(url)
 
@@ -378,11 +378,11 @@ def test_query_user_data__user_not_found(api_client, settings):
 def test_query_user_data__wrong_scope(api_client, settings):
     user = UserFactory.create()
 
-    settings.GDPR_API_QUERY_SCOPE = "testprefix.gdprquery"
-    auth_header = get_gdpr_auth_header(user, scopes=["testprefix.invalid"])
+    settings.GDPR_API_QUERY_SCOPE = "gdprquery"
+    auth_header = get_gdpr_auth_header(user, scopes=["invalid"])
     api_client.credentials(HTTP_AUTHORIZATION=auth_header)
 
-    url = reverse("gdpr_v1", kwargs={"uuid": uuid.uuid4()})
+    url = reverse("gdpr_v1", kwargs={"uuid": str(uuid.uuid4())})
     with patch_oidc_config():
         response = api_client.get(url)
 
@@ -393,11 +393,11 @@ def test_query_user_data__wrong_scope(api_client, settings):
 def test_delete_user_data__should_anonymize(api_client, settings):
     user = UserFactory.create(username="foo")
 
-    settings.GDPR_API_DELETE_SCOPE = "testprefix.gdprdelete"
+    settings.GDPR_API_DELETE_SCOPE = "gdprdelete"
     auth_header = get_gdpr_auth_header(user, scopes=[settings.GDPR_API_DELETE_SCOPE])
     api_client.credentials(HTTP_AUTHORIZATION=auth_header)
 
-    url = reverse("gdpr_v1", kwargs={"uuid": user.uuid})
+    url = reverse("gdpr_v1", kwargs={"uuid": str(user.uuid)})
     with patch_oidc_config():
         response = api_client.delete(url)
 
@@ -412,11 +412,11 @@ def test_delete_user_data__dont_anonymize_if_open_payments(api_client, settings)
     reservation = ReservationFactory.create(user=user)
     PaymentOrderFactory.create(reservation=reservation, status=OrderStatus.DRAFT, remote_id=uuid.uuid4())
 
-    settings.GDPR_API_DELETE_SCOPE = "testprefix.gdprdelete"
+    settings.GDPR_API_DELETE_SCOPE = "gdprdelete"
     auth_header = get_gdpr_auth_header(user, scopes=[settings.GDPR_API_DELETE_SCOPE])
     api_client.credentials(HTTP_AUTHORIZATION=auth_header)
 
-    url = reverse("gdpr_v1", kwargs={"uuid": user.uuid})
+    url = reverse("gdpr_v1", kwargs={"uuid": str(user.uuid)})
     with patch_oidc_config():
         response = api_client.delete(url)
 
@@ -443,11 +443,11 @@ def test_delete_user_data__dont_anonymize_if_open_reservations(api_client, setti
     end = begin + datetime.timedelta(hours=2)
     ReservationFactory.create(user=user, begin=begin, end=end, state=ReservationStateChoice.CREATED)
 
-    settings.GDPR_API_DELETE_SCOPE = "testprefix.gdprdelete"
+    settings.GDPR_API_DELETE_SCOPE = "gdprdelete"
     auth_header = get_gdpr_auth_header(user, scopes=[settings.GDPR_API_DELETE_SCOPE])
     api_client.credentials(HTTP_AUTHORIZATION=auth_header)
 
-    url = reverse("gdpr_v1", kwargs={"uuid": user.uuid})
+    url = reverse("gdpr_v1", kwargs={"uuid": str(user.uuid)})
     with patch_oidc_config():
         response = api_client.delete(url)
 
@@ -474,11 +474,11 @@ def test_delete_user_data__dont_anonymize_if_reservation_one_month_ago(api_clien
     end = begin + datetime.timedelta(hours=2)
     ReservationFactory.create(user=user, begin=begin, end=end, state=ReservationStateChoice.CONFIRMED)
 
-    settings.GDPR_API_DELETE_SCOPE = "testprefix.gdprdelete"
+    settings.GDPR_API_DELETE_SCOPE = "gdprdelete"
     auth_header = get_gdpr_auth_header(user, scopes=[settings.GDPR_API_DELETE_SCOPE])
     api_client.credentials(HTTP_AUTHORIZATION=auth_header)
 
-    url = reverse("gdpr_v1", kwargs={"uuid": user.uuid})
+    url = reverse("gdpr_v1", kwargs={"uuid": str(user.uuid)})
     with patch_oidc_config():
         response = api_client.delete(url)
 
@@ -503,11 +503,11 @@ def test_delete_user_data__dont_anonymize_if_open_applications(api_client, setti
     user = UserFactory.create(username="foo")
     ApplicationFactory.create_in_status_in_allocation(user=user)
 
-    settings.GDPR_API_DELETE_SCOPE = "testprefix.gdprdelete"
+    settings.GDPR_API_DELETE_SCOPE = "gdprdelete"
     auth_header = get_gdpr_auth_header(user, scopes=[settings.GDPR_API_DELETE_SCOPE])
     api_client.credentials(HTTP_AUTHORIZATION=auth_header)
 
-    url = reverse("gdpr_v1", kwargs={"uuid": user.uuid})
+    url = reverse("gdpr_v1", kwargs={"uuid": str(user.uuid)})
     with patch_oidc_config():
         response = api_client.delete(url)
 
@@ -532,11 +532,11 @@ def test_delete_user_data__cannot_anonymize_other_users_data(api_client, setting
     user = UserFactory.create(username="foo")
     other_user = UserFactory.create(username="bar")
 
-    settings.GDPR_API_DELETE_SCOPE = "testprefix.gdprdelete"
+    settings.GDPR_API_DELETE_SCOPE = "gdprdelete"
     auth_header = get_gdpr_auth_header(user, scopes=[settings.GDPR_API_DELETE_SCOPE])
     api_client.credentials(HTTP_AUTHORIZATION=auth_header)
 
-    url = reverse("gdpr_v1", kwargs={"uuid": other_user.uuid})
+    url = reverse("gdpr_v1", kwargs={"uuid": str(other_user.uuid)})
     with patch_oidc_config():
         response = api_client.delete(url)
 
@@ -549,9 +549,9 @@ def test_delete_user_data__cannot_anonymize_other_users_data(api_client, setting
 def test_delete_user_data__not_authenticated(api_client, settings):
     user = UserFactory.create(username="foo")
 
-    settings.GDPR_API_DELETE_SCOPE = "testprefix.gdprdelete"
+    settings.GDPR_API_DELETE_SCOPE = "gdprdelete"
 
-    url = reverse("gdpr_v1", kwargs={"uuid": user.uuid})
+    url = reverse("gdpr_v1", kwargs={"uuid": str(user.uuid)})
     with patch_oidc_config():
         response = api_client.delete(url)
 
@@ -564,11 +564,11 @@ def test_delete_user_data__not_authenticated(api_client, settings):
 def test_delete_user_data__wrong_scope(api_client, settings):
     user = UserFactory.create(username="foo")
 
-    settings.GDPR_API_DELETE_SCOPE = "testprefix.gdprdelete"
-    auth_header = get_gdpr_auth_header(user, scopes=["testprefix.wrong_scope"])
+    settings.GDPR_API_DELETE_SCOPE = "gdprdelete"
+    auth_header = get_gdpr_auth_header(user, scopes=["wrong_scope"])
     api_client.credentials(HTTP_AUTHORIZATION=auth_header)
 
-    url = reverse("gdpr_v1", kwargs={"uuid": user.uuid})
+    url = reverse("gdpr_v1", kwargs={"uuid": str(user.uuid)})
     with patch_oidc_config():
         response = api_client.delete(url)
 
@@ -581,11 +581,11 @@ def test_delete_user_data__wrong_scope(api_client, settings):
 def test_query_user_data__insufficient_loa(api_client, settings):
     user = UserFactory.create(username="foo")
 
-    settings.GDPR_API_QUERY_SCOPE = "testprefix.gdprquery"
+    settings.GDPR_API_QUERY_SCOPE = "gdprquery"
     auth_header = get_gdpr_auth_header(user, scopes=[settings.GDPR_API_QUERY_SCOPE], loa="low")
     api_client.credentials(HTTP_AUTHORIZATION=auth_header)
 
-    url = reverse("gdpr_v1", kwargs={"uuid": user.uuid})
+    url = reverse("gdpr_v1", kwargs={"uuid": str(user.uuid)})
     with patch_oidc_config():
         response = api_client.get(url)
 
@@ -599,11 +599,11 @@ def test_query_user_data__insufficient_loa(api_client, settings):
 def test_delete_user_data__dont_anonymize_if_dryrun(api_client, settings, dry_run):
     user = UserFactory.create(username="foo")
 
-    settings.GDPR_API_DELETE_SCOPE = "testprefix.gdprdelete"
+    settings.GDPR_API_DELETE_SCOPE = "gdprdelete"
     auth_header = get_gdpr_auth_header(user, scopes=[settings.GDPR_API_DELETE_SCOPE])
     api_client.credentials(HTTP_AUTHORIZATION=auth_header)
 
-    url = reverse("gdpr_v1", kwargs={"uuid": user.uuid})
+    url = reverse("gdpr_v1", kwargs={"uuid": str(user.uuid)})
     with patch_oidc_config():
         response = api_client.delete(url, data={"dry_run": dry_run})
 
