@@ -5,7 +5,6 @@ import pytest
 
 from tests.factories import ReservationUnitFactory, ReservationUnitPricingFactory
 from tests.helpers import patch_method
-from tilavarauspalvelu.enums import PricingType
 from tilavarauspalvelu.models import ReservationUnitPricing
 from tilavarauspalvelu.tasks import update_reservation_unit_pricings_tax_percentage
 from utils.sentry import SentryLogger
@@ -100,11 +99,10 @@ def test_reservation_unit__update_pricings__tax_percentage__free_future_pricing_
         begins=datetime.date(2024, 1, 1),
         tax_percentage__value=CURRENT_TAX,
     )
-    ReservationUnitPricingFactory.create(
+    ReservationUnitPricingFactory.create_free(
         begins=TAX_CHANGE_DATE,
         reservation_unit=pricing_1.reservation_unit,
         tax_percentage__value=CURRENT_TAX,
-        pricing_type=PricingType.FREE,
     )
 
     update_reservation_unit_pricings_tax_percentage(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX))
@@ -119,11 +117,10 @@ def test_reservation_unit__update_pricings__tax_percentage__free_future_pricing_
         begins=datetime.date(2024, 1, 1),
         tax_percentage__value=CURRENT_TAX,
     )
-    ReservationUnitPricingFactory.create(
+    ReservationUnitPricingFactory.create_free(
         begins=datetime.date(2024, 9, 21),
         reservation_unit=pricing_1.reservation_unit,
         tax_percentage__value=CURRENT_TAX,
-        pricing_type=PricingType.FREE,
     )
 
     update_reservation_unit_pricings_tax_percentage(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX))
@@ -160,11 +157,10 @@ def test_reservation_unit__update_pricings__tax_percentage__different_tax_percen
 @patch_method(SentryLogger.log_message)
 def test_reservation_unit__update_pricings__tax_percentage__free_pricing_is_ignored():
     reservation_unit = ReservationUnitFactory.create()
-    ReservationUnitPricingFactory.create(
+    ReservationUnitPricingFactory.create_free(
         begins=datetime.date(2024, 1, 1),
         reservation_unit=reservation_unit,
         tax_percentage__value=CURRENT_TAX,
-        pricing_type=PricingType.FREE,
     )
 
     update_reservation_unit_pricings_tax_percentage(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX))

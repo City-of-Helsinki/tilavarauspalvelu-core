@@ -24,7 +24,6 @@ from tests.factories import (
     UserFactory,
 )
 from tilavarauspalvelu.enums import (
-    PricingType,
     ReservationStateChoice,
     ReservationTypeChoice,
     ReservationUnitPublishingState,
@@ -335,7 +334,7 @@ def test_reservation_unit__query__all_one_to_many_relations(graphql):
     """
 
     reservation_unit = ReservationUnitFactory.create(
-        pricings__pricing_type=PricingType.PAID,
+        pricings__highest_price=20,
         images__large_url="https://example.com",
         application_round_time_slots__closed=False,
     )

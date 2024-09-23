@@ -387,8 +387,6 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         return None
 
     def requires_product_mapping_update(self) -> bool:
-        from tilavarauspalvelu.enums import PricingType
-
         payment_merchant = self.get_merchant()
         if payment_merchant is None:
             return False
@@ -399,9 +397,9 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
 
         # Has PAID active or future pricings
         active_pricing = self.reservation_unit.actions.get_active_pricing()
-        if active_pricing.pricing_type == PricingType.PAID:
+        if active_pricing.highest_price > 0:
             return True
-        return self.reservation_unit.pricings.filter(pricing_type=PricingType.PAID, begins__gt=local_date()).exists()
+        return self.reservation_unit.pricings.filter(highest_price__gt=0, begins__gt=local_date()).exists()
 
     def get_accounting(self) -> PaymentAccounting | None:
         if self.reservation_unit.payment_accounting is not None:

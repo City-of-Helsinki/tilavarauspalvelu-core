@@ -3,7 +3,6 @@ from datetime import date, timedelta
 from tilavarauspalvelu.enums import (
     AuthenticationType,
     PriceUnit,
-    PricingType,
     ReservationKind,
     ReservationStartInterval,
     TermsOfUseTypeChoices,
@@ -794,7 +793,6 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
         reservation_unit=aina_kasiteltava_kellarikerros,
         defaults={
             "begins": date(2023, 1, 1),
-            "pricing_type": PricingType.PAID,
             "price_unit": PriceUnit.PRICE_UNIT_PER_HOUR,
             "lowest_price": 0.0,
             "highest_price": 40.0,
@@ -882,7 +880,6 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
         reservation_unit=maksuton_mankeli,
         defaults={
             "begins": date(2023, 1, 1),
-            "pricing_type": PricingType.FREE,
             "price_unit": PriceUnit.PRICE_UNIT_PER_HOUR,
             "lowest_price": 0.0,
             "highest_price": 0.0,
@@ -984,7 +981,6 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
         reservation_unit=aina_maksullinen_aitio,
         defaults={
             "begins": date(2023, 1, 1),
-            "pricing_type": PricingType.PAID,
             "price_unit": PriceUnit.PRICE_UNIT_PER_HOUR,
             "lowest_price": 40.0,
             "highest_price": 40.0,
@@ -1089,7 +1085,6 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
         reservation_unit=alennuskelpoinen_aula,
         defaults={
             "begins": date(2023, 1, 1),
-            "pricing_type": PricingType.PAID,
             "price_unit": PriceUnit.PRICE_UNIT_PER_HOUR,
             "lowest_price": 0.0,
             "highest_price": 30.0,
@@ -1170,7 +1165,6 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
         reservation_unit=perumiskelvoton_parveke,
         defaults={
             "begins": date(2023, 1, 1),
-            "pricing_type": PricingType.FREE,
             "price_unit": PriceUnit.PRICE_UNIT_PER_HOUR,
             "lowest_price": 0.0,
             "highest_price": 0.0,
@@ -1262,7 +1256,6 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
         reservation_unit=perumiskelvoton_patio,
         defaults={
             "begins": date(2023, 1, 1),
-            "pricing_type": PricingType.PAID,
             "price_unit": PriceUnit.PRICE_UNIT_PER_HOUR,
             "lowest_price": 0.0,
             "highest_price": 30.0,
@@ -1358,7 +1351,6 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
         reservation_unit=toistuvien_varausten_toimisto,
         defaults={
             "begins": date(2023, 1, 1),
-            "pricing_type": PricingType.FREE,
             "price_unit": PriceUnit.PRICE_UNIT_PER_HOUR,
             "lowest_price": 0.0,
             "highest_price": 0.0,
@@ -1441,7 +1433,6 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
         reservation_unit=tauotettu_takkahuone,
         defaults={
             "begins": date(2023, 1, 1),
-            "pricing_type": PricingType.FREE,
             "price_unit": PriceUnit.PRICE_UNIT_PER_HOUR,
             "lowest_price": 0.0,
             "highest_price": 0.0,
@@ -1537,7 +1528,6 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
         reservation_unit=aina_kasiteltava_kammio,
         defaults={
             "begins": date(2023, 1, 1),
-            "pricing_type": PricingType.FREE,
             "price_unit": PriceUnit.PRICE_UNIT_PER_HOUR,
             "lowest_price": 0.0,
             "highest_price": 0.0,
