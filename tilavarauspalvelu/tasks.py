@@ -29,7 +29,6 @@ from tilavarauspalvelu.enums import (
     EmailType,
     HaukiResourceState,
     OrderStatus,
-    PricingStatus,
     PricingType,
     ReservationNotification,
     ReservationStateChoice,
@@ -63,14 +62,12 @@ from tilavarauspalvelu.models.sql_log.model import SQLLog
 from tilavarauspalvelu.utils.email.email_sender import EmailNotificationSender
 from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
-from tilavarauspalvelu.utils.pricing_updates import update_reservation_unit_pricings
 from tilavarauspalvelu.utils.pruning import (
     prune_inactive_reservations,
     prune_recurring_reservations,
     prune_reservation_statistics,
     prune_reservation_with_inactive_payments,
 )
-from tilavarauspalvelu.utils.reservation_units.reservation_unit_payment_helper import ReservationUnitPaymentHelper
 from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CancelOrderError
 from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import GetPaymentError
 from tilavarauspalvelu.utils.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
@@ -391,15 +388,6 @@ def create_or_update_reservation_statistics(reservation_pks: list[int]) -> None:
         ReservationStatisticsReservationUnit.objects.bulk_create(new_statistics_units)
 
 
-@app.task(name="update_reservation_unit_pricings")
-def _update_reservation_unit_pricings() -> None:
-    today = date.today()
-
-    logger.info(f"Updating reservation unit pricing with date {today}")
-    num_updated = update_reservation_unit_pricings(today)
-    logger.info(f"Updated {num_updated} reservation units with date {today}")
-
-
 @app.task(name="update_reservation_unit_pricings_tax_percentage")
 def update_reservation_unit_pricings_tax_percentage(
     change_date: str,
@@ -429,7 +417,6 @@ def update_reservation_unit_pricings_tax_percentage(
             Q(begins__lte=change_date, pricing_type=PricingType.FREE)  # Ignore FREE pricings after the change date
             | Q(pricing_type=PricingType.PAID)
         )
-        .filter(status__in=(PricingStatus.PRICING_STATUS_ACTIVE, PricingStatus.PRICING_STATUS_FUTURE))
         .exclude(reservation_unit__payment_accounting__company_code__in=ignored_company_codes)
         .order_by("reservation_unit_id", "-begins")
         .distinct("reservation_unit_id")
@@ -448,7 +435,6 @@ def update_reservation_unit_pricings_tax_percentage(
             ReservationUnitPricing(
                 begins=change_date,
                 tax_percentage=future_tax_percentage,
-                status=PricingStatus.PRICING_STATUS_FUTURE,
                 pricing_type=pricing.pricing_type,
                 price_unit=pricing.price_unit,
                 lowest_price=pricing.lowest_price,
@@ -463,7 +449,6 @@ def update_reservation_unit_pricings_tax_percentage(
         tax_percentage=current_tax_percentage,
         pricing_type=PricingType.PAID,
         highest_price__gte=0,
-        status__in=(PricingStatus.PRICING_STATUS_ACTIVE, PricingStatus.PRICING_STATUS_FUTURE),
     )
 
     if not unhandled_future_pricings:
@@ -498,9 +483,9 @@ def refresh_reservation_unit_product_mapping(reservation_unit_pk) -> None:
         )
         return
 
-    payment_merchant = ReservationUnitPaymentHelper.get_merchant(reservation_unit)
+    payment_merchant = reservation_unit.actions.get_merchant()
 
-    if ReservationUnitPaymentHelper.requires_product_mapping_update(reservation_unit):
+    if reservation_unit.actions.requires_product_mapping_update():
         params = CreateProductParams(
             namespace=settings.VERKKOKAUPPA_NAMESPACE,
             namespace_entity_id=reservation_unit.pk,
@@ -537,7 +522,7 @@ def refresh_reservation_unit_accounting(reservation_unit_pk) -> None:
         )
         return
 
-    accounting = ReservationUnitPaymentHelper.get_accounting(reservation_unit)
+    accounting = reservation_unit.actions.get_accounting()
 
     if reservation_unit.payment_product and accounting:
         params = CreateOrUpdateAccountingParams(

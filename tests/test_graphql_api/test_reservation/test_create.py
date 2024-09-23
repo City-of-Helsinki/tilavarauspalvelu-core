@@ -24,7 +24,6 @@ from tests.helpers import ResponseMock, patch_method
 from tilavarauspalvelu.enums import (
     CustomerTypeChoice,
     PriceUnit,
-    PricingStatus,
     ReservationKind,
     ReservationStateChoice,
     ReservationTypeChoice,
@@ -782,9 +781,9 @@ def test_reservation__create__price_calculation__future_pricing(graphql):
 
     # Current pricing
     ReservationUnitPricingFactory.create(
+        begins=now,
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
         highest_price=Decimal("6"),
-        status=PricingStatus.PRICING_STATUS_ACTIVE,
         tax_percentage__value=Decimal("24"),
         reservation_unit=reservation_unit,
     )
@@ -794,7 +793,6 @@ def test_reservation__create__price_calculation__future_pricing(graphql):
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
         highest_price=Decimal("10"),
         tax_percentage__value=Decimal("24"),
-        status=PricingStatus.PRICING_STATUS_FUTURE,
         reservation_unit=reservation_unit,
     )
 

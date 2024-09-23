@@ -2,7 +2,7 @@ import datetime
 import math
 from collections.abc import Iterable
 from decimal import Decimal
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from django.utils import timezone
 from django.utils.timezone import get_default_timezone
@@ -17,11 +17,7 @@ from tilavarauspalvelu.enums import (
     ReservationUnitPublishingState,
 )
 from tilavarauspalvelu.models import Reservation, ReservationUnit
-from tilavarauspalvelu.utils.reservation_units.reservation_unit_pricing_helper import ReservationUnitPricingHelper
 from utils.date_utils import local_datetime, local_start_of_day
-
-if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ReservationUnitPricing
 
 
 class PriceCalculationResult:
@@ -104,10 +100,7 @@ class ReservationPriceMixin:
         )
 
         for reservation_unit in reservation_units:
-            pricing: ReservationUnitPricing | None = ReservationUnitPricingHelper.get_price_by_date(
-                reservation_unit=reservation_unit,
-                by_date=begin_datetime.date(),
-            )
+            pricing = reservation_unit.actions.get_active_pricing(by_date=begin_datetime.date())
 
             # If unit pricing type is not PAID, there is no need for calculations, skip to next reservation unit
             if pricing is None or pricing.pricing_type != PricingType.PAID:
