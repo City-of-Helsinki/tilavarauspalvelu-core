@@ -17,6 +17,7 @@ from tests.helpers import ResponseMock, patch_method
 from users.helauth.clients import HelsinkiProfileClient
 from users.helauth.parsers import ssn_to_date
 from users.helauth.pipeline import migrate_from_tunnistamo_to_keycloak, update_user_from_profile
+from users.models import ReservationNotification
 from utils.external_service.errors import ExternalServiceError
 from utils.sentry import SentryLogger
 
@@ -125,16 +126,22 @@ def test_ssn_to_date(id_number, expected):
 
 def test_migrate_from_tunnistamo_to_keycloak():
     # Oldest user is ignored.
-    UserFactory.create(
+    oldest_user = UserFactory.create(
+        last_name="Oldest",
         email="foo@example.com",
         profile_id="",
+        is_active=True,
+        reservation_notification=ReservationNotification.NONE,
         date_joined=local_datetime(2020, 1, 1),
     )
     old_user = UserFactory.create(
+        last_name="Old",
         email="foo@example.com",
         profile_id="",
         is_staff=True,
         is_superuser=True,
+        is_active=True,
+        reservation_notification=ReservationNotification.ONLY_HANDLING_REQUIRED,
         date_joined=local_datetime(2021, 1, 1),
     )
 
@@ -145,10 +152,13 @@ def test_migrate_from_tunnistamo_to_keycloak():
     unit_role = UnitRoleFactory.create(user=old_user)
 
     new_user = UserFactory.create(
+        last_name="New",
         email="foo@example.com",
         profile_id="",
         is_staff=False,
         is_superuser=False,
+        is_active=True,
+        reservation_notification=ReservationNotification.ALL,
         date_joined=local_datetime(2022, 1, 1),
     )
 
@@ -159,8 +169,10 @@ def test_migrate_from_tunnistamo_to_keycloak():
     recurring_reservation.refresh_from_db()
     general_role.refresh_from_db()
     unit_role.refresh_from_db()
-    old_user.refresh_from_db()
+
     new_user.refresh_from_db()
+    old_user.refresh_from_db()
+    oldest_user.refresh_from_db()
 
     assert application.user == new_user
     assert reservation.user == new_user
@@ -168,7 +180,13 @@ def test_migrate_from_tunnistamo_to_keycloak():
     assert general_role.user == new_user
     assert unit_role.user == new_user
 
+    assert new_user.is_active is True
     assert new_user.is_staff is True
     assert new_user.is_superuser is True
+    assert new_user.reservation_notification == ReservationNotification.ONLY_HANDLING_REQUIRED
 
     assert old_user.is_active is False
+    assert old_user.last_name == "Old EXPIRED"
+
+    assert oldest_user.is_active is False
+    assert oldest_user.last_name == "Oldest EXPIRED"

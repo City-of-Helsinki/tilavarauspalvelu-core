@@ -1,6 +1,8 @@
 import contextlib
 from typing import Any, TypedDict, Unpack
 
+from django.db import models
+from django.db.models.functions import Concat
 from helusers.tunnistamo_oidc import TunnistamoOIDCAuth
 from social_django.models import DjangoStorage, UserSocialAuth
 from social_django.strategy import DjangoStrategy
@@ -140,9 +142,10 @@ def migrate_from_tunnistamo_to_keycloak(*, email: str) -> None:
     new_user = users[0]
     old_user = users[1]
 
-    # Migrate staff and superuser status.
+    # Migrate user properties.
     new_user.is_staff = old_user.is_staff
     new_user.is_superuser = old_user.is_superuser
+    new_user.reservation_notification = old_user.reservation_notification
     new_user.save()
 
     from applications.models import Application
@@ -162,4 +165,17 @@ def migrate_from_tunnistamo_to_keycloak(*, email: str) -> None:
 
     # Mark the old user as inactive.
     old_user.is_active = False
+    old_user.last_name += " EXPIRED"
     old_user.save()
+
+    # Also mark additional users older than these two as inactive, so that migration doesn't happen again.
+    User.objects.filter(
+        email__iexact=email,
+        profile_id="",
+        is_active=True,
+    ).exclude(
+        id=new_user.id,
+    ).update(
+        is_active=False,
+        last_name=Concat(models.F("last_name"), models.Value(" EXPIRED")),
+    )
