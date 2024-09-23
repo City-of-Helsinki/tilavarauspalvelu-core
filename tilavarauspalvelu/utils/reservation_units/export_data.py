@@ -99,7 +99,7 @@ class ReservationUnitExporter:
                 cls._write_header_row(reservations_writer)
 
                 for reservation_unit in reservation_units:
-                    pricing = reservation_unit.pricings.active()
+                    pricing = reservation_unit.actions.get_active_pricing()
                     reservations_writer.writerow(
                         [
                             reservation_unit.id,
