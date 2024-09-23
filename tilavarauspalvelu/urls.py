@@ -1,10 +1,11 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import include, path, reverse
+from django.urls import include, path, re_path, reverse
 from django.views.decorators.csrf import csrf_exempt
 from graphene_django_extensions import FileUploadGraphQLView
 
+from api.gdpr.views import TilavarauspalveluGDPRAPIView
 from api.rest.views import csrf_view, reservation_ical, terms_of_use_pdf
 from api.webhooks.urls import webhook_router
 
@@ -34,7 +35,12 @@ urlpatterns = [
     path("v1/webhook/", include(webhook_router.urls)),
     path("pysocial/", include("social_django.urls", namespace="social")),
     path("helauth/", include("api.helauth.urls")),
-    path("gdpr/v1/", include("api.gdpr.urls")),
+    re_path(
+        # GDPR UUID's are v1, not v4!
+        r"gdpr/v1/user/(?P<uuid>[\da-fA-F]{8}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{12})/?$",
+        TilavarauspalveluGDPRAPIView.as_view(),
+        name="gdpr_v1",
+    ),
     path("tinymce/", include("tinymce.urls")),
     path("csrf/", csrf_view),
 ]
