@@ -12,6 +12,7 @@ from rest_framework.response import Response
 
 from users.anonymisation import anonymize_user_data, can_user_be_anonymized
 from users.models import ProfileUser
+from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
     from promise import Promise
@@ -99,4 +100,14 @@ class TilavarauspalveluGDPRAPIView(GDPRAPIView):
             if dry_run_serializer.data["dry_run"]:
                 transaction.set_rollback(True)
 
+        return response
+
+    def handle_exception(self, exc: Exception) -> Response:
+        try:
+            response: Response = super().handle_exception(exc)
+        except Exception as error:
+            SentryLogger.log_exception(error, details="Uncaught error in GDPR API")
+            raise
+
+        SentryLogger.log_message("GDPR API query failed.", details=response.data)
         return response
