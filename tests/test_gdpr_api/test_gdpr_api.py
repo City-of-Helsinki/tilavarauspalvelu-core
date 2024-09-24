@@ -6,10 +6,13 @@ import pytest
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from django.utils import timezone
+from rest_framework.exceptions import ErrorDetail
 
 from merchants.enums import OrderStatus
 from reservations.enums import ReservationStateChoice
 from tests.factories import ApplicationFactory, PaymentOrderFactory, ReservationFactory, UserFactory
+from tests.helpers import patch_method
+from utils.sentry import SentryLogger
 
 from .helpers import get_gdpr_auth_header, patch_oidc_config
 
@@ -23,6 +26,9 @@ if TYPE_CHECKING:
 pytestmark = [
     pytest.mark.django_db,
 ]
+
+
+# QUERY
 
 
 def test_query_user_data__simple(api_client, settings):
@@ -360,6 +366,7 @@ def test_query_user_data__full(api_client, settings):
     }
 
 
+@patch_method(SentryLogger.log_message)
 def test_query_user_data__user_not_found(api_client, settings):
     user = UserFactory.create()
 
@@ -374,7 +381,44 @@ def test_query_user_data__user_not_found(api_client, settings):
     assert response.status_code == 404, response.data
     assert response.data == {"detail": "No ProfileUser matches the given query."}
 
+    assert SentryLogger.log_message.call_count == 1
+    assert SentryLogger.log_message.call_args.args == ("GDPR API query failed.",)
+    assert SentryLogger.log_message.call_args.kwargs == {
+        "details": {
+            "detail": ErrorDetail(
+                string="No ProfileUser matches the given query.",
+                code="not_found",
+            )
+        }
+    }
 
+
+@patch_method(SentryLogger.log_message)
+def test_query_user_data__not_authenticated(api_client, settings):
+    user = UserFactory.create()
+
+    settings.GDPR_API_QUERY_SCOPE = "gdprquery"
+
+    url = reverse("gdpr_v1", kwargs={"uuid": str(user.uuid)})
+    with patch_oidc_config():
+        response = api_client.get(url)
+
+    assert response.status_code == 401, response.data
+    assert response.data == {"detail": "Authentication credentials were not provided."}
+
+    assert SentryLogger.log_message.call_count == 1
+    assert SentryLogger.log_message.call_args.args == ("GDPR API query failed.",)
+    assert SentryLogger.log_message.call_args.kwargs == {
+        "details": {
+            "detail": ErrorDetail(
+                string="Authentication credentials were not provided.",
+                code="not_authenticated",
+            )
+        }
+    }
+
+
+@patch_method(SentryLogger.log_message)
 def test_query_user_data__wrong_scope(api_client, settings):
     user = UserFactory.create()
 
@@ -388,6 +432,49 @@ def test_query_user_data__wrong_scope(api_client, settings):
 
     assert response.status_code == 403, response.data
     assert response.data == {"detail": "You do not have permission to perform this action."}
+
+    assert SentryLogger.log_message.call_count == 1
+    assert SentryLogger.log_message.call_args.args == ("GDPR API query failed.",)
+    assert SentryLogger.log_message.call_args.kwargs == {
+        "details": {
+            "detail": ErrorDetail(
+                string="You do not have permission to perform this action.",
+                code="permission_denied",
+            )
+        }
+    }
+
+
+@patch_method(SentryLogger.log_message)
+def test_query_user_data__insufficient_loa(api_client, settings):
+    user = UserFactory.create(username="foo")
+
+    settings.GDPR_API_QUERY_SCOPE = "gdprquery"
+    auth_header = get_gdpr_auth_header(user, scopes=[settings.GDPR_API_QUERY_SCOPE], loa="low")
+    api_client.credentials(HTTP_AUTHORIZATION=auth_header)
+
+    url = reverse("gdpr_v1", kwargs={"uuid": str(user.uuid)})
+    with patch_oidc_config():
+        response = api_client.get(url)
+
+    assert response.status_code == 403, response.data
+    assert response.data == {"detail": "You do not have permission to perform this action."}
+    user.refresh_from_db()
+    assert user.username == "foo"
+
+    assert SentryLogger.log_message.call_count == 1
+    assert SentryLogger.log_message.call_args.args == ("GDPR API query failed.",)
+    assert SentryLogger.log_message.call_args.kwargs == {
+        "details": {
+            "detail": ErrorDetail(
+                string="You do not have permission to perform this action.",
+                code="permission_denied",
+            )
+        }
+    }
+
+
+# DELETE
 
 
 def test_delete_user_data__should_anonymize(api_client, settings):
@@ -528,6 +615,7 @@ def test_delete_user_data__dont_anonymize_if_open_applications(api_client, setti
     assert user.username == "foo"
 
 
+@patch_method(SentryLogger.log_message)
 def test_delete_user_data__cannot_anonymize_other_users_data(api_client, settings):
     user = UserFactory.create(username="foo")
     other_user = UserFactory.create(username="bar")
@@ -545,7 +633,19 @@ def test_delete_user_data__cannot_anonymize_other_users_data(api_client, setting
     other_user.refresh_from_db()
     assert other_user.username == "bar"
 
+    assert SentryLogger.log_message.call_count == 1
+    assert SentryLogger.log_message.call_args.args == ("GDPR API query failed.",)
+    assert SentryLogger.log_message.call_args.kwargs == {
+        "details": {
+            "detail": ErrorDetail(
+                string="You do not have permission to perform this action.",
+                code="permission_denied",
+            )
+        }
+    }
 
+
+@patch_method(SentryLogger.log_message)
 def test_delete_user_data__not_authenticated(api_client, settings):
     user = UserFactory.create(username="foo")
 
@@ -560,7 +660,19 @@ def test_delete_user_data__not_authenticated(api_client, settings):
     user.refresh_from_db()
     assert user.username == "foo"
 
+    assert SentryLogger.log_message.call_count == 1
+    assert SentryLogger.log_message.call_args.args == ("GDPR API query failed.",)
+    assert SentryLogger.log_message.call_args.kwargs == {
+        "details": {
+            "detail": ErrorDetail(
+                string="Authentication credentials were not provided.",
+                code="not_authenticated",
+            )
+        }
+    }
 
+
+@patch_method(SentryLogger.log_message)
 def test_delete_user_data__wrong_scope(api_client, settings):
     user = UserFactory.create(username="foo")
 
@@ -577,22 +689,45 @@ def test_delete_user_data__wrong_scope(api_client, settings):
     user.refresh_from_db()
     assert user.username == "foo"
 
+    assert SentryLogger.log_message.call_count == 1
+    assert SentryLogger.log_message.call_args.args == ("GDPR API query failed.",)
+    assert SentryLogger.log_message.call_args.kwargs == {
+        "details": {
+            "detail": ErrorDetail(
+                string="You do not have permission to perform this action.",
+                code="permission_denied",
+            )
+        }
+    }
 
-def test_query_user_data__insufficient_loa(api_client, settings):
+
+@patch_method(SentryLogger.log_message)
+def test_delete_user_data__insufficient_loa(api_client, settings):
     user = UserFactory.create(username="foo")
 
-    settings.GDPR_API_QUERY_SCOPE = "gdprquery"
-    auth_header = get_gdpr_auth_header(user, scopes=[settings.GDPR_API_QUERY_SCOPE], loa="low")
+    settings.GDPR_API_DELETE_SCOPE = "gdprdelete"
+    auth_header = get_gdpr_auth_header(user, scopes=[settings.GDPR_API_DELETE_SCOPE], loa="low")
     api_client.credentials(HTTP_AUTHORIZATION=auth_header)
 
     url = reverse("gdpr_v1", kwargs={"uuid": str(user.uuid)})
     with patch_oidc_config():
-        response = api_client.get(url)
+        response = api_client.delete(url)
 
     assert response.status_code == 403, response.data
     assert response.data == {"detail": "You do not have permission to perform this action."}
     user.refresh_from_db()
     assert user.username == "foo"
+
+    assert SentryLogger.log_message.call_count == 1
+    assert SentryLogger.log_message.call_args.args == ("GDPR API query failed.",)
+    assert SentryLogger.log_message.call_args.kwargs == {
+        "details": {
+            "detail": ErrorDetail(
+                string="You do not have permission to perform this action.",
+                code="permission_denied",
+            )
+        }
+    }
 
 
 @pytest.mark.parametrize("dry_run", ["true", "True", "TRUE", "1", 1, True])
