@@ -69,7 +69,7 @@ def fetch_additional_info_for_user_from_helsinki_profile(
 
 
 @contextlib.contextmanager
-def use_request_user(*, request: WSGIRequest, user: User):
+def use_request_user(request: WSGIRequest, user: User):
     """
     Use the provided user as the request user for the duration of the context.
     This is needed during login, since the request user is still anonymous.
