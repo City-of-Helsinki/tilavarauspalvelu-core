@@ -3,7 +3,7 @@ from functools import wraps
 from typing import Any, Literal
 
 from django.conf import settings
-from sentry_sdk import capture_exception, capture_message, push_scope
+from sentry_sdk import capture_exception, capture_message, new_scope
 
 LogLevelStr = Literal["fatal", "critical", "error", "warning", "info", "debug"]
 
@@ -11,14 +11,14 @@ LogLevelStr = Literal["fatal", "critical", "error", "warning", "info", "debug"]
 class SentryLogger:
     @staticmethod
     def log_message(message: str, details: str | dict[str, Any] | None = None, level: LogLevelStr = "info") -> None:
-        with push_scope() as scope:
+        with new_scope() as scope:
             if details:
                 scope.set_extra("details", details)
             capture_message(message, level=level)
 
     @staticmethod
     def log_exception(err: Exception, details: str, **extra) -> None:
-        with push_scope() as scope:
+        with new_scope() as scope:
             scope.set_extra("details", details)
 
             for key, value in extra.items():

@@ -45,6 +45,9 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
     SERVICE_NAME = "Helsinki Profile"
     REQUEST_TIMEOUT_SECONDS = 5
 
+    # The strategy/storage doesn't matter here.
+    oidc_backend = ProxyTunnistamoOIDCAuthBackend(strategy=DjangoStrategy(storage=DjangoStorage()))
+
     @classmethod
     def get_reservation_prefill_info(cls, *, user: AnyUser, session: SessionMapping) -> ReservationPrefillInfo | None:
         """Fetch reservation prefill info for the request user from Helsinki Profile."""
@@ -121,9 +124,6 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
         if user.is_anonymous:
             return None
 
-        # The strategy/storage doesn't matter here.
-        backend = ProxyTunnistamoOIDCAuthBackend(strategy=DjangoStrategy(storage=DjangoStorage()))
-
         leeway = 10
         cutoff = local_datetime() - datetime.timedelta(seconds=leeway)
         profile_refresh_token: str | None = session.get("profile_refresh_token")
@@ -136,25 +136,23 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
         ):
             access_token = KeyCloakClient.get_token(user=user, session=session)
             if access_token is None:
-                msg = "Unable to get keycloak access token to refresh profile token."
-                logger.info(msg)
                 return None
 
             try:
                 # Delegate refresh to OAuth backend.
-                response: TokenResponse = backend.get_token_for_profile(access_token=access_token)
+                response: TokenResponse = cls.oidc_backend.get_token_for_profile(access_token=access_token)
             except HTTPError as error:
                 msg = f"Unable to get Helsinki profile token for user {int(user.pk)}: {error.response.text}"
-                logger.info(msg, exc_info=error)
+                SentryLogger.log_exception(error, details=msg)
                 return None
 
         else:
             try:
                 # Delegate refresh to OAuth backend.
-                response: RefreshResponse = backend.refresh_token(token=profile_refresh_token)
+                response: RefreshResponse = cls.oidc_backend.refresh_token(token=profile_refresh_token)
             except HTTPError as error:
                 msg = f"Unable to refresh Helsinki profile token for user {int(user.pk)}: {error.response.text}"
-                logger.info(msg, exc_info=error)
+                SentryLogger.log_exception(error, details=msg)
                 return None
 
         now = local_datetime()
@@ -425,6 +423,9 @@ class KeyCloakClient(BaseExternalServiceClient):
     SERVICE_NAME = "KeyCloak"
     REQUEST_TIMEOUT_SECONDS = 5
 
+    # The strategy/storage doesn't matter here.
+    oidc_backend = ProxyTunnistamoOIDCAuthBackend(strategy=DjangoStrategy(storage=DjangoStorage()))
+
     @classmethod
     def get_token(cls, *, user: AnyUser, session: SessionMapping) -> str | None:
         """
@@ -462,21 +463,18 @@ class KeyCloakClient(BaseExternalServiceClient):
         social_auth = user.current_social_auth
         if social_auth is None:
             msg = f"Unable to get `social_auth` for user {int(user.pk)}."
-            logger.info(msg)
+            SentryLogger.log_message(msg)
             return None
 
         extra_data: ExtraData = social_auth.extra_data
         keycloak_refresh_token = extra_data["refresh_token"]
 
-        # The strategy/storage doesn't matter here.
-        backend = ProxyTunnistamoOIDCAuthBackend(strategy=DjangoStrategy(storage=DjangoStorage()))
-
         try:
             # Delegate refresh to OAuth backend.
-            response: RefreshResponse = backend.refresh_token(token=keycloak_refresh_token)
+            response: RefreshResponse = cls.oidc_backend.refresh_token(token=keycloak_refresh_token)
         except HTTPError as error:
             msg = f"Unable to refresh keycloak token for user {int(user.pk)}: {error.response.text}"
-            logger.info(msg, exc_info=error)
+            SentryLogger.log_exception(error, details=msg)
             return None
 
         now = local_datetime()
