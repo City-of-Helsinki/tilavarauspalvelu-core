@@ -119,7 +119,8 @@ class UserAdmin(admin.ModelAdmin):
                 "fields": [
                     "last_login",
                     "date_joined",
-                    "tvp_uuid",
+                    "statistics_uuid",
+                    "gdpr_uuid",
                     "department_name",
                     "profile_id",
                     "date_of_birth",
@@ -168,7 +169,8 @@ class UserAdmin(admin.ModelAdmin):
         "last_login",
         "date_joined",
         "id_token",
-        "tvp_uuid",
+        "statistics_uuid",
+        "gdpr_uuid",
         "ad_groups",
         "department_name",
         "profile_id",
@@ -207,6 +209,14 @@ class UserAdmin(admin.ModelAdmin):
     def anonymize_user_data(self, request, queryset) -> None:
         for user in queryset.all():
             anonymize_user_data(user)
+
+    @admin.display(description="Statistics UUID")
+    def statistics_uuid(self, user: User) -> str:
+        return user.tvp_uuid
+
+    @admin.display(description="GDPR UUID")
+    def gdpr_uuid(self, user: User) -> str:
+        return user.uuid
 
     @admin.display(description="Issuer (iss)")
     def issuer(self, user: User) -> str:
