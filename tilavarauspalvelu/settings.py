@@ -322,8 +322,6 @@ class Common(Environment):
     SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT = values.StringValue(env_name="TUNNISTAMO_BASE_URL")
     SOCIAL_AUTH_TUNNISTAMO_KEY = values.StringValue(env_name="TUNNISTAMO_ADMIN_KEY")
     SOCIAL_AUTH_TUNNISTAMO_SECRET = values.StringValue(env_name="TUNNISTAMO_ADMIN_SECRET")
-    SOCIAL_AUTH_TUNNISTAMO_AUDIENCE = values.StringValue(env_name="TUNNISTAMO_AUDIENCE")
-    SOCIAL_AUTH_TUNNISTAMO_ISSUER = values.StringValue(env_name="TUNNISTAMO_ISSUER")
     SOCIAL_AUTH_TUNNISTAMO_SCOPE = values.ListValue(env_name="TUNNISTAMO_SCOPE", default=[])
 
     SOCIAL_AUTH_TUNNISTAMO_LOGIN_ERROR_URL = "/admin/"
@@ -346,15 +344,18 @@ class Common(Environment):
     def OIDC_API_TOKEN_AUTH(cls):
         # See 'helusers/settings.py'
         return {
-            "AUDIENCE": cls.SOCIAL_AUTH_TUNNISTAMO_AUDIENCE,
-            "ISSUER": cls.SOCIAL_AUTH_TUNNISTAMO_ISSUER,
+            "AUDIENCE": cls.GDPR_API_AUDIENCE,
+            "ISSUER": cls.GDPR_API_ISSUER,
         }
 
     # --- GDPR settings ----------------------------------------------------------------------------------------------
 
     GDPR_API_MODEL = "users.ProfileUser"
-    GDPR_API_QUERY_SCOPE = values.StringValue(default="")
-    GDPR_API_DELETE_SCOPE = values.StringValue(default="")
+    GDPR_API_QUERY_SCOPE = values.StringValue(default="gdprquery")
+    GDPR_API_DELETE_SCOPE = values.StringValue(default="gdprdelete")
+
+    GDPR_API_AUDIENCE = values.StringValue(env_name="TUNNISTAMO_AUDIENCE")
+    GDPR_API_ISSUER = values.StringValue(env_name="TUNNISTAMO_ISSUER")
 
     # --- (H)Aukiolosovellus settings --------------------------------------------------------------------------------
 
@@ -565,8 +566,9 @@ class EmptyDefaults:
     SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT = ""
     SOCIAL_AUTH_TUNNISTAMO_KEY = ""
     SOCIAL_AUTH_TUNNISTAMO_SECRET = ""  # nosec # NOSONAR
-    SOCIAL_AUTH_TUNNISTAMO_AUDIENCE = ""
-    SOCIAL_AUTH_TUNNISTAMO_ISSUER = ""
+
+    GDPR_API_AUDIENCE = ""
+    GDPR_API_ISSUER = ""
 
     OPEN_CITY_PROFILE_SCOPE = ""
     OPEN_CITY_PROFILE_GRAPHQL_API = ""
@@ -734,8 +736,11 @@ class AutomatedTests(EmptyDefaults, Common, dotenv_path=None, overrides_from=Aut
     TUNNISTAMO_BASE_URL = "https://fake.test.tunnistamo.com"
     SOCIAL_AUTH_TUNNISTAMO_SECRET = "SOCIAL_AUTH_TUNNISTAMO_SECRET"  # noqa: S105 # nosec # NOSONAR
     SOCIAL_AUTH_TUNNISTAMO_KEY = "SOCIAL_AUTH_TUNNISTAMO_KEY"
-    SOCIAL_AUTH_TUNNISTAMO_AUDIENCE = "TUNNISTAMO_JWT_AUDIENCE"
-    SOCIAL_AUTH_TUNNISTAMO_ISSUER = "TUNNISTAMO_JWT_ISSUER"
+
+    # --- GDPR settings ----------------------------------------------------------------------------------------------
+
+    GDPR_API_AUDIENCE = "TUNNISTAMO_AUDIENCE"
+    GDPR_API_ISSUER = "TUNNISTAMO_ISSUER"
 
     # --- Celery settings --------------------------------------------------------------------------------------------
 
