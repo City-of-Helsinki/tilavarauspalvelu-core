@@ -2,8 +2,8 @@ import datetime
 
 from factory import fuzzy
 
-from reservation_units.models import ReservationUnitCancellationRule
 from tests.factories._base import GenericDjangoModelFactory
+from tilavarauspalvelu.models import ReservationUnitCancellationRule
 
 __all__ = [
     "ReservationUnitCancellationRuleFactory",

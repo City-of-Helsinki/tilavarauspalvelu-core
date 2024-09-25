@@ -14,7 +14,7 @@ pytestmark = [
 def test_webshop_sync_is_not_triggered_when_accounting_is_not_used(settings):
     settings.UPDATE_ACCOUNTING = True
 
-    with patch("reservation_units.tasks.refresh_reservation_unit_accounting.delay") as mock:
+    with patch("tilavarauspalvelu.tasks.refresh_reservation_unit_accounting.delay") as mock:
         PaymentAccountingFactory.create()
 
     assert mock.call_count == 0
@@ -23,7 +23,7 @@ def test_webshop_sync_is_not_triggered_when_accounting_is_not_used(settings):
 def test_webshop_sync_trigger_reservation_units(settings):
     settings.UPDATE_ACCOUNTING = True
 
-    with patch("reservation_units.tasks.refresh_reservation_unit_accounting.delay") as mock:
+    with patch("tilavarauspalvelu.tasks.refresh_reservation_unit_accounting.delay") as mock:
         payment_accounting = PaymentAccountingFactory.create()
 
     assert mock.call_count == 0
@@ -31,7 +31,7 @@ def test_webshop_sync_trigger_reservation_units(settings):
     reservation_unit = ReservationUnitFactory.create(payment_accounting=payment_accounting)
 
     payment_accounting.refresh_from_db()
-    with patch("reservation_units.tasks.refresh_reservation_unit_accounting.delay") as mock:
+    with patch("tilavarauspalvelu.tasks.refresh_reservation_unit_accounting.delay") as mock:
         payment_accounting.save()
 
     assert mock.call_count == 1
@@ -41,7 +41,7 @@ def test_webshop_sync_trigger_reservation_units(settings):
 def test_webshop_sync_updates_reservation_units_under_units(settings):
     settings.UPDATE_ACCOUNTING = True
 
-    with patch("reservation_units.tasks.refresh_reservation_unit_accounting.delay") as mock:
+    with patch("tilavarauspalvelu.tasks.refresh_reservation_unit_accounting.delay") as mock:
         payment_accounting = PaymentAccountingFactory.create()
 
     assert mock.call_count == 0
@@ -49,7 +49,7 @@ def test_webshop_sync_updates_reservation_units_under_units(settings):
     reservation_unit = ReservationUnitFactory.create(unit__payment_accounting=payment_accounting)
 
     payment_accounting.refresh_from_db()
-    with patch("reservation_units.tasks.refresh_reservation_unit_accounting.delay") as mock:
+    with patch("tilavarauspalvelu.tasks.refresh_reservation_unit_accounting.delay") as mock:
         payment_accounting.save()
 
     assert mock.call_count == 1
@@ -59,7 +59,7 @@ def test_webshop_sync_updates_reservation_units_under_units(settings):
 def test_webshop_sync_updates_all_unique_reservation_units(settings):
     settings.UPDATE_ACCOUNTING = True
 
-    with patch("reservation_units.tasks.refresh_reservation_unit_accounting.delay") as mock:
+    with patch("tilavarauspalvelu.tasks.refresh_reservation_unit_accounting.delay") as mock:
         payment_accounting = PaymentAccountingFactory.create()
 
     assert mock.call_count == 0
@@ -68,7 +68,7 @@ def test_webshop_sync_updates_all_unique_reservation_units(settings):
     reservation_unit_2 = ReservationUnitFactory.create(unit__payment_accounting=payment_accounting)
 
     payment_accounting.refresh_from_db()
-    with patch("reservation_units.tasks.refresh_reservation_unit_accounting.delay") as mock:
+    with patch("tilavarauspalvelu.tasks.refresh_reservation_unit_accounting.delay") as mock:
         payment_accounting.save()
 
     assert mock.call_count == 2

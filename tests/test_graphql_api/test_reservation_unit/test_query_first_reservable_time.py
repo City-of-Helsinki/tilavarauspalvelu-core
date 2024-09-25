@@ -12,9 +12,6 @@ from graphene_django_extensions.testing.utils import parametrize_helper
 
 from applications.enums import ApplicationRoundStatusChoice
 from common.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
-from reservation_units.enums import ReservationStartInterval
-from reservation_units.models import ReservationUnit, ReservationUnitHierarchy
-from reservation_units.utils.first_reservable_time_helper.first_reservable_time_helper import CachedReservableTime
 from tests.factories import (
     ApplicationRoundFactory,
     OriginHaukiResourceFactory,
@@ -24,8 +21,9 @@ from tests.factories import (
     ResourceFactory,
     SpaceFactory,
 )
-from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
-from tilavarauspalvelu.models import AffectingTimeSpan
+from tilavarauspalvelu.enums import ReservationStartInterval, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.models import AffectingTimeSpan, ReservationUnit, ReservationUnitHierarchy
+from tilavarauspalvelu.utils.first_reservable_time.first_reservable_time_helper import CachedReservableTime
 
 from .helpers import reservation_units_query
 

@@ -4,8 +4,8 @@ import pytest
 
 from applications.enums import Weekday
 from applications.models import AllocatedTimeSlot
-from reservation_units.models import ReservationUnitHierarchy
 from tests.factories import AllocatedTimeSlotFactory, ReservationUnitFactory, ReservationUnitOptionFactory, SpaceFactory
+from tilavarauspalvelu.models import ReservationUnitHierarchy
 
 # Applied to all tests
 pytestmark = [

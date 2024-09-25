@@ -8,8 +8,8 @@ from django.utils.timezone import get_default_timezone
 
 from common.date_utils import local_datetime
 from config.utils.date_util import localized_short_weekday
-from reservation_units.utils.reservation_unit_payment_helper import ReservationUnitPaymentHelper
 from tilavarauspalvelu.models import PaymentMerchant, PaymentProduct, Reservation
+from tilavarauspalvelu.utils.reservation_units.reservation_unit_payment_helper import ReservationUnitPaymentHelper
 from tilavarauspalvelu.utils.verkkokauppa.exceptions import UnsupportedMetaKeyError
 from tilavarauspalvelu.utils.verkkokauppa.order.types import (
     CreateOrderParams,

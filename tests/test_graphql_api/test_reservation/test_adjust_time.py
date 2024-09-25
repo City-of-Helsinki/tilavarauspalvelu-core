@@ -7,8 +7,6 @@ import pytest
 from django.utils.timezone import get_default_timezone
 
 from common.date_utils import local_date, local_datetime
-from reservation_units.enums import ReservationStartInterval
-from reservation_units.models import ReservationUnitHierarchy
 from tests.factories import (
     ApplicationRoundFactory,
     EmailTemplateFactory,
@@ -20,8 +18,8 @@ from tests.factories import (
     SpaceFactory,
     UserFactory,
 )
-from tilavarauspalvelu.enums import EmailType, ReservationStateChoice
-from tilavarauspalvelu.models import Reservation
+from tilavarauspalvelu.enums import EmailType, ReservationStartInterval, ReservationStateChoice
+from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
 
 from .helpers import ADJUST_MUTATION, get_adjust_data
 

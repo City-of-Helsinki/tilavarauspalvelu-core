@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING
 
 from applications.models import City
 from common.date_utils import local_start_of_day
-from reservation_units.models import ReservationUnit, ReservationUnitPricing
 from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice
 from tilavarauspalvelu.models import (
     AgeGroup,
@@ -18,6 +17,7 @@ from tilavarauspalvelu.models import (
     ReservationMetadataField,
     ReservationMetadataSet,
     ReservationPurpose,
+    ReservationUnit,
     User,
 )
 
@@ -25,6 +25,8 @@ from .utils import FieldCombination, SetName, faker_fi, weighted_choice, with_lo
 
 if TYPE_CHECKING:
     from django.db import models
+
+    from tilavarauspalvelu.models import ReservationUnitPricing
 
 
 @with_logs()

@@ -8,16 +8,16 @@ from graphql import GraphQLError
 from rest_framework.exceptions import ValidationError
 
 from applications.enums import WeekdayChoice
-from reservation_units.enums import PricingStatus, ReservationStartInterval
-from reservation_units.models import ReservationUnit, ReservationUnitPricing
-from reservation_units.utils.reservation_unit_pricing_helper import ReservationUnitPricingHelper
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.api.graphql.types.application_round_time_slot.serializers import (
     ApplicationRoundTimeSlotSerializer,
 )
 from tilavarauspalvelu.api.graphql.types.reservation_unit_image.serializers import ReservationUnitImageFieldSerializer
 from tilavarauspalvelu.api.graphql.types.reservation_unit_pricing.serializers import ReservationUnitPricingSerializer
+from tilavarauspalvelu.enums import PricingStatus, ReservationStartInterval
+from tilavarauspalvelu.models import ReservationUnit, ReservationUnitPricing
 from tilavarauspalvelu.utils.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
+from tilavarauspalvelu.utils.reservation_units.reservation_unit_pricing_helper import ReservationUnitPricingHelper
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:

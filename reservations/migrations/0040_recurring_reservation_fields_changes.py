@@ -6,7 +6,7 @@ from django.db import migrations, models
 
 
 def get_default_reservation_unit():
-    from reservation_units.models import ReservationUnit
+    from tilavarauspalvelu.models import ReservationUnit
 
     res_unit = ReservationUnit.objects.only("id").first()
 

@@ -113,8 +113,8 @@ msgstr ""
 #: applications/admin/application/admin.py
 #: applications/admin/application_round/admin.py
 #: applications/admin/application_section/admin.py
-#: reservation_units/admin/reservation_unit/admin.py
-#: tilavarauspalvelu/admin/reservation/admin.py users/admin/user.py
+#: tilavarauspalvelu/admin/reservation/admin.py
+#: tilavarauspalvelu/admin/reservation_unit/admin.py users/admin/user.py
 msgid "Basic information"
 msgstr ""
 
@@ -152,7 +152,6 @@ msgstr ""
 #: applications/admin/application/form.py
 #: applications/admin/application_round/form.py
 #: applications/admin/application_section/form.py
-#: reservation_units/models/reservation_unit_pricing.py
 msgid "Status"
 msgstr ""
 
@@ -338,26 +337,23 @@ msgstr ""
 #: applications/admin/application_round/form.py
 #: applications/admin/application_section/form.py applications/admin/city.py
 #: applications/admin/organization.py
-#: reservation_units/admin/reservation_unit/form.py
-#: reservation_units/models/equipment.py reservation_units/models/keyword.py
-#: reservation_units/models/reservation_unit_type.py
 #: tilavarauspalvelu/admin/reservation/form.py
-#: tilavarauspalvelu/models/reservation_metadata_set/model.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Name"
 msgstr ""
 
 #: applications/admin/application_round/form.py
-#: reservation_units/admin/reservation_unit/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Name (Finnish)"
 msgstr ""
 
 #: applications/admin/application_round/form.py
-#: reservation_units/admin/reservation_unit/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Name (English)"
 msgstr ""
 
 #: applications/admin/application_round/form.py
-#: reservation_units/admin/reservation_unit/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Name (Swedish)"
 msgstr ""
 
@@ -394,7 +390,7 @@ msgid "Handled date"
 msgstr ""
 
 #: applications/admin/application_round/form.py
-#: reservation_units/admin/reservation_unit/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Purposes"
 msgstr ""
 
@@ -531,8 +527,6 @@ msgid "Reservation purpose"
 msgstr ""
 
 #: applications/admin/application_section/form.py
-#: reservation_units/models/introduction.py
-#: reservation_units/models/reservation_unit_pricing.py
 #: tilavarauspalvelu/admin/payment_order/admin.py
 msgid "Reservation unit"
 msgstr ""
@@ -1274,791 +1268,6 @@ msgstr ""
 msgid "Swedish"
 msgstr ""
 
-#: reservation_units/admin/reservation_unit/admin.py
-msgid "Search by ID, name, unit name, or service sector name"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/admin.py
-msgid "Reservation restrictions"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/admin.py
-msgid "Relations"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/admin.py
-msgid "Payment"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/admin.py
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Terms of use"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/admin.py
-msgid "Instructions"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/admin.py
-msgid "Publishing state"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/admin.py
-msgid "Reservation state"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Which weekday this timeslot concerns."
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Timeslots when the reservation unit is reservable"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Is the reservation unit closed on this weekday?"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "SKU"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Description"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Description (Finnish)"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Description (English)"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Description (Swedish)"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Spaces"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Keyword groups"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Resources"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Services"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Qualifiers"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Reservation unit type"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Require introduction"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Equipments"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Terms of use (Finnish)"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Terms of use (English)"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Terms of use (Swedish)"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py tilavarauspalvelu/enums.py
-msgid "Payment terms"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py tilavarauspalvelu/enums.py
-msgid "Cancellation terms"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Service specific terms"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py tilavarauspalvelu/enums.py
-msgid "Pricing terms"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Reservation pending instructions"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Reservation pending instructions (Finnish)"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Reservation pending instructions (English)"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Reservation pending instructions (Swedish)"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Reservation confirmed instructions"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Reservation confirmed instructions (Finnish)"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Reservation confirmed instructions (English)"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Reservation confirmed instructions (Swedish)"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Reservation cancelled instructions"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Reservation cancelled instructions (Finnish)"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Reservation cancelled instructions (English)"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Reservation cancelled instructions (Swedish)"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Unit"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Contact information"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Max reservation duration"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Min reservation duration"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Is draft"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Max persons"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Min persons"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Surface area"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Buffer time before"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Buffer time after"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Origin hauki resource"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Cancellation rule"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Reservation start interval"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Reservations max days before"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Reservations min days before"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Reservation begins"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Reservation ends"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Publish begins"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Publish ends"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-#: tilavarauspalvelu/models/reservation_metadata_set/model.py
-msgid "Reservation metadata set"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Max reservations per user"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Does the reservations of this require a handling"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Authentication"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Reservation kind"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Payment types"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Reservation block whole day"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Can apply free of charge"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Allow reservations without opening hours"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Is archived"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-#: reservation_units/models/equipment.py
-#: reservation_units/models/reservation_unit_type.py
-msgid "Order number"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Payment merchant"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Payment accounting"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "UUID"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Payment product"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Keyword gruops"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Payment terms for the reservation unit."
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Cancellation terms for the reservation unit."
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Service specific terms for the reservation unit."
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Pricing terms for the reservation unit."
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Additional instructions for pending reservation"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Additional instructions for pending reservation (Finnish)"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Additional instructions for pending reservation (English)"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Additional instructions for pending reservation (Swedish)"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Additional instructions for confirmed reservation"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Additional instructions for confirmed reservation (Finnish)"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Additional instructions for confirmed reservation (English)"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Additional instructions for confirmed reservation (Swedish)"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Additional instructions for cancelled reservation"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Additional instructions for cancelled reservations (Finnish)"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Additional instructions for cancelled reservations (English)"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Additional instructions for cancelled reservations (Swedish)"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Is this in draft state"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Maximum number of persons"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Minimum number of persons"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Buffer time before reservation"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Buffer time after reservation"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid ""
-"Determines the interval for the start time of the reservation. For example "
-"an interval of 15 minutes means a reservation can begin at minutes 15, 30, "
-"60, or 90."
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Minimum days before reservations can be made"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Maximum number of days before reservations can be made"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid ""
-"Time when making reservations become possible for this reservation unit."
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid ""
-"Time when making reservations become not possible for this reservation unit"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Time after this reservation unit should be publicly visible in UI."
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Time after this reservation unit should not be publicly visible in UI."
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid ""
-"Reservation metadata set that defines the set of supported and required form "
-"fields for this reservation unit."
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Maximum number of active reservations per user"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid ""
-"Does reservations of this reservation unit need to be handled before they're "
-"confirmed."
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Authentication required for reserving this reservation unit."
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "What kind of reservations are to be booked with this reservation unit."
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid ""
-"Can reservations to this reservation unit be able to apply free of charge."
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid ""
-"Is it possible to reserve this reservation unit when opening hours are not "
-"defined."
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Is reservation unit archived."
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Order number to be use in api sorting."
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Merchant used for payments"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Payment accounting information"
-msgstr ""
-
-#: reservation_units/admin/reservation_unit/form.py
-msgid "Product used for payments"
-msgstr ""
-
-#: reservation_units/enums.py
-msgid "Draft"
-msgstr ""
-
-#: reservation_units/enums.py
-msgid "Scheduled publishing"
-msgstr ""
-
-#: reservation_units/enums.py
-msgid "Scheduled hiding"
-msgstr ""
-
-#: reservation_units/enums.py
-msgid "Scheduled period"
-msgstr ""
-
-#: reservation_units/enums.py
-msgid "Hidden"
-msgstr ""
-
-#: reservation_units/enums.py
-msgid "Published"
-msgstr ""
-
-#: reservation_units/enums.py
-msgid "Archived"
-msgstr ""
-
-#: reservation_units/enums.py
-msgid "Scheduled reservation"
-msgstr ""
-
-#: reservation_units/enums.py
-msgid "Reservable"
-msgstr ""
-
-#: reservation_units/enums.py
-msgid "Scheduled closing"
-msgstr ""
-
-#: reservation_units/enums.py
-msgid "Reservation closed"
-msgstr ""
-
-#: reservation_units/enums.py
-msgid "15 minutes"
-msgstr ""
-
-#: reservation_units/enums.py
-msgid "30 minutes"
-msgstr ""
-
-#: reservation_units/enums.py
-msgid "60 minutes"
-msgstr ""
-
-#: reservation_units/enums.py
-msgid "90 minutes"
-msgstr ""
-
-#: reservation_units/enums.py
-msgid "2 hours"
-msgstr ""
-
-#: reservation_units/enums.py
-msgid "3 hours"
-msgstr ""
-
-#: reservation_units/enums.py
-msgid "4 hours"
-msgstr ""
-
-#: reservation_units/enums.py
-msgid "5 hours"
-msgstr ""
-
-#: reservation_units/enums.py
-msgid "6 hours"
-msgstr ""
-
-#: reservation_units/enums.py
-msgid "7 hours"
-msgstr ""
-
-#: reservation_units/enums.py
-msgctxt "ReservationKind"
-msgid "Direct"
-msgstr ""
-
-#: reservation_units/enums.py
-msgctxt "ReservationKind"
-msgid "Season"
-msgstr ""
-
-#: reservation_units/enums.py
-msgctxt "ReservationKind"
-msgid "Direct and season"
-msgstr ""
-
-#: reservation_units/enums.py
-msgctxt "PricingType"
-msgid "Paid"
-msgstr ""
-
-#: reservation_units/enums.py
-msgctxt "PricingType"
-msgid "Free"
-msgstr ""
-
-#: reservation_units/enums.py tilavarauspalvelu/enums.py
-msgctxt "PaymentType"
-msgid "Online"
-msgstr ""
-
-#: reservation_units/enums.py tilavarauspalvelu/enums.py
-msgctxt "PaymentType"
-msgid "Invoice"
-msgstr ""
-
-#: reservation_units/enums.py tilavarauspalvelu/enums.py
-msgctxt "PaymentType"
-msgid "On site"
-msgstr ""
-
-#: reservation_units/enums.py
-msgctxt "PriceUnit"
-msgid "per 15 minutes"
-msgstr ""
-
-#: reservation_units/enums.py
-msgctxt "PriceUnit"
-msgid "per 30 minutes"
-msgstr ""
-
-#: reservation_units/enums.py
-msgctxt "PriceUnit"
-msgid "per hour"
-msgstr ""
-
-#: reservation_units/enums.py
-msgctxt "PriceUnit"
-msgid "per half a day"
-msgstr ""
-
-#: reservation_units/enums.py
-msgctxt "PriceUnit"
-msgid "per day"
-msgstr ""
-
-#: reservation_units/enums.py
-msgctxt "PriceUnit"
-msgid "per week"
-msgstr ""
-
-#: reservation_units/enums.py
-msgctxt "PriceUnit"
-msgid "fixed"
-msgstr ""
-
-#: reservation_units/enums.py
-msgctxt "PricingStatus"
-msgid "past"
-msgstr ""
-
-#: reservation_units/enums.py
-msgctxt "PricingStatus"
-msgid "active"
-msgstr ""
-
-#: reservation_units/enums.py
-msgctxt "PricingStatus"
-msgid "future"
-msgstr ""
-
-#: reservation_units/enums.py
-msgctxt "AuthenticationType"
-msgid "Weak"
-msgstr ""
-
-#: reservation_units/enums.py
-msgctxt "AuthenticationType"
-msgid "Strong"
-msgstr ""
-
-#: reservation_units/enums.py
-msgctxt "ReservationUnitImageType"
-msgid "Main image"
-msgstr ""
-
-#: reservation_units/enums.py
-msgctxt "ReservationUnitImageType"
-msgid "Ground plan"
-msgstr ""
-
-#: reservation_units/enums.py
-msgctxt "ReservationUnitImageType"
-msgid "Map"
-msgstr ""
-
-#: reservation_units/enums.py
-msgctxt "ReservationUnitImageType"
-msgid "Other"
-msgstr ""
-
-#: reservation_units/models/equipment.py
-#: reservation_units/models/reservation_unit_type.py
-msgid "Order number to be used in api sorting."
-msgstr ""
-
-#: reservation_units/models/equipment.py
-msgid "Category"
-msgstr ""
-
-#: reservation_units/models/introduction.py
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "User"
-msgstr ""
-
-#: reservation_units/models/introduction.py
-msgid "Completed at"
-msgstr ""
-
-#: reservation_units/models/keyword.py
-msgid "Keyword category"
-msgstr ""
-
-#: reservation_units/models/keyword.py
-msgid "Keyword group"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-#, fuzzy
-#| msgid "Reservation for %(name)s"
-msgid "Reservation Unit"
-msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-#: reservation_units/models/reservation_unit.py
-#, fuzzy
-#| msgid "Reservation for %(name)s"
-msgid "Reservation Units"
-msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-#: reservation_units/models/reservation_unit_cancellation_rule.py
-msgid "Name for the rule"
-msgstr ""
-
-#: reservation_units/models/reservation_unit_cancellation_rule.py
-msgid "Time before user can cancel reservations of this reservation unit"
-msgstr ""
-
-#: reservation_units/models/reservation_unit_cancellation_rule.py
-msgid "Will the cancellation need manual staff handling"
-msgstr ""
-
-#: reservation_units/models/reservation_unit_hierarchy.py
-msgid "reservation unit hierarchy"
-msgstr ""
-
-#: reservation_units/models/reservation_unit_hierarchy.py
-msgid "reservation unit hierarchies"
-msgstr ""
-
-#: reservation_units/models/reservation_unit_payment_type.py
-msgid "Code"
-msgstr ""
-
-#: reservation_units/models/reservation_unit_pricing.py
-msgid "Date when price is activated"
-msgstr ""
-
-#: reservation_units/models/reservation_unit_pricing.py
-msgid "Pricing type"
-msgstr ""
-
-#: reservation_units/models/reservation_unit_pricing.py
-msgid "Price unit"
-msgstr ""
-
-#: reservation_units/models/reservation_unit_pricing.py
-msgid "Lowest price"
-msgstr ""
-
-#: reservation_units/models/reservation_unit_pricing.py
-msgid "Highest price"
-msgstr ""
-
-#: reservation_units/models/reservation_unit_pricing.py
-#: reservation_units/models/tax_percentage.py
-msgid "Tax percentage"
-msgstr ""
-
 #: templates/admin/base.html
 msgid "Change password"
 msgstr ""
@@ -2113,6 +1322,18 @@ msgstr ""
 
 #: templates/email/email_tester.html
 msgid "Email Template Testing"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round_time_slot/form.py
+msgid "Which weekday this timeslot concerns."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round_time_slot/form.py
+msgid "Timeslots when the reservation unit is reservable"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round_time_slot/form.py
+msgid "Is the reservation unit closed on this weekday?"
 msgstr ""
 
 #: tilavarauspalvelu/admin/email_template/tester.py
@@ -2336,6 +1557,16 @@ msgid "Paid reservation"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "SKU"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Description"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "State"
 msgstr ""
 
@@ -2356,6 +1587,16 @@ msgstr "Uppgifter om bokningen"
 #| msgid "Booking details"
 msgid "Handling details"
 msgstr "Uppgifter om bokningen"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Buffer time before"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Buffer time after"
+msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Handled at"
@@ -2478,6 +1719,10 @@ msgid "Billing address zip code"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
+msgid "User"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Reason for deny"
 msgstr ""
 
@@ -2530,6 +1775,16 @@ msgstr ""
 #| msgid "Reservation for %(name)s"
 msgid "Reservation end date and time"
 msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Buffer time before reservation"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Buffer time after reservation"
+msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "When this reservation was handled"
@@ -2645,6 +1900,456 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_metadata_set/admin.py
 msgid "Required fields must be a subset of supported fields"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
+msgid "Search by ID, name, unit name, or service sector name"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
+msgid "Reservation restrictions"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
+msgid "Relations"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
+msgid "Payment"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Terms of use"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
+msgid "Instructions"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
+msgid "Publishing state"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
+msgid "Reservation state"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Description (Finnish)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Description (English)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Description (Swedish)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Spaces"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Keyword groups"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Resources"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Services"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Qualifiers"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Reservation unit type"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Require introduction"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Equipments"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Terms of use (Finnish)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Terms of use (English)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Terms of use (Swedish)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py tilavarauspalvelu/enums.py
+msgid "Payment terms"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py tilavarauspalvelu/enums.py
+msgid "Cancellation terms"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Service specific terms"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py tilavarauspalvelu/enums.py
+msgid "Pricing terms"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Reservation pending instructions"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Reservation pending instructions (Finnish)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Reservation pending instructions (English)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Reservation pending instructions (Swedish)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Reservation confirmed instructions"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Reservation confirmed instructions (Finnish)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Reservation confirmed instructions (English)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Reservation confirmed instructions (Swedish)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Reservation cancelled instructions"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Reservation cancelled instructions (Finnish)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Reservation cancelled instructions (English)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Reservation cancelled instructions (Swedish)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Unit"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Contact information"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Max reservation duration"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Min reservation duration"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Is draft"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Max persons"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Min persons"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Surface area"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Origin hauki resource"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Cancellation rule"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Reservation start interval"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Reservations max days before"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Reservations min days before"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Reservation begins"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Reservation ends"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Publish begins"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Publish ends"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+#: tilavarauspalvelu/models/reservation_metadata_set/model.py
+msgid "Reservation metadata set"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Max reservations per user"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Does the reservations of this require a handling"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Authentication"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Reservation kind"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Payment types"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Reservation block whole day"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Can apply free of charge"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Allow reservations without opening hours"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Is archived"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Order number"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Payment merchant"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Payment accounting"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "UUID"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Payment product"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Keyword gruops"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Payment terms for the reservation unit."
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Cancellation terms for the reservation unit."
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Service specific terms for the reservation unit."
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Pricing terms for the reservation unit."
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Additional instructions for pending reservation"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Additional instructions for pending reservation (Finnish)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Additional instructions for pending reservation (English)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Additional instructions for pending reservation (Swedish)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Additional instructions for confirmed reservation"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Additional instructions for confirmed reservation (Finnish)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Additional instructions for confirmed reservation (English)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Additional instructions for confirmed reservation (Swedish)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Additional instructions for cancelled reservation"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Additional instructions for cancelled reservations (Finnish)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Additional instructions for cancelled reservations (English)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Additional instructions for cancelled reservations (Swedish)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Is this in draft state"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Maximum number of persons"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Minimum number of persons"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid ""
+"Determines the interval for the start time of the reservation. For example "
+"an interval of 15 minutes means a reservation can begin at minutes 15, 30, "
+"60, or 90."
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Minimum days before reservations can be made"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Maximum number of days before reservations can be made"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid ""
+"Time when making reservations become possible for this reservation unit."
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid ""
+"Time when making reservations become not possible for this reservation unit"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Time after this reservation unit should be publicly visible in UI."
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Time after this reservation unit should not be publicly visible in UI."
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid ""
+"Reservation metadata set that defines the set of supported and required form "
+"fields for this reservation unit."
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Maximum number of active reservations per user"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid ""
+"Does reservations of this reservation unit need to be handled before they're "
+"confirmed."
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Authentication required for reserving this reservation unit."
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "What kind of reservations are to be booked with this reservation unit."
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid ""
+"Can reservations to this reservation unit be able to apply free of charge."
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid ""
+"Is it possible to reserve this reservation unit when opening hours are not "
+"defined."
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Is reservation unit archived."
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Order number to be use in api sorting."
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Merchant used for payments"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Payment accounting information"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Product used for payments"
 msgstr ""
 
 #: tilavarauspalvelu/admin/space/admin.py
@@ -2945,6 +2650,210 @@ msgctxt "RejectionReadiness"
 msgid "Reservation unit closed"
 msgstr ""
 
+#: tilavarauspalvelu/enums.py
+msgid "Draft"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Scheduled publishing"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Scheduled hiding"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Scheduled period"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Hidden"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Published"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Archived"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Scheduled reservation"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Reservable"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Scheduled closing"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Reservation closed"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "15 minutes"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "30 minutes"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "60 minutes"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "90 minutes"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "2 hours"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "3 hours"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "4 hours"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "5 hours"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "6 hours"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "7 hours"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationKind"
+msgid "Direct"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationKind"
+msgid "Season"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationKind"
+msgid "Direct and season"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "PricingType"
+msgid "Paid"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "PricingType"
+msgid "Free"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "PaymentType"
+msgid "Online"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "PaymentType"
+msgid "On site"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "PaymentType"
+msgid "Invoice"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "PriceUnit"
+msgid "per 15 minutes"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "PriceUnit"
+msgid "per 30 minutes"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "PriceUnit"
+msgid "per hour"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "PriceUnit"
+msgid "per half a day"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "PriceUnit"
+msgid "per day"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "PriceUnit"
+msgid "per week"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "PriceUnit"
+msgid "fixed"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "PricingStatus"
+msgid "past"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "PricingStatus"
+msgid "active"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "PricingStatus"
+msgid "future"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "AuthenticationType"
+msgid "Weak"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "AuthenticationType"
+msgid "Strong"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationUnitImageType"
+msgid "Main image"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationUnitImageType"
+msgid "Ground plan"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationUnitImageType"
+msgid "Map"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationUnitImageType"
+msgid "Other"
+msgstr ""
+
 #: tilavarauspalvelu/models/affecting_time_span/model.py
 msgid "affecting time span"
 msgstr ""
@@ -3060,10 +2969,6 @@ msgid "Closed"
 msgstr ""
 
 #: tilavarauspalvelu/models/reservation_metadata_field/model.py
-msgid "Field name"
-msgstr ""
-
-#: tilavarauspalvelu/models/reservation_metadata_field/model.py
 msgid "Reservation metadata field"
 msgstr ""
 
@@ -3076,6 +2981,26 @@ msgstr ""
 #| msgid "Reservation for %(name)s"
 msgid "Reservation metadata sets"
 msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: tilavarauspalvelu/models/reservation_unit/model.py
+#, fuzzy
+#| msgid "Reservation for %(name)s"
+msgid "Reservation Unit"
+msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: tilavarauspalvelu/models/reservation_unit/model.py
+#, fuzzy
+#| msgid "Reservation for %(name)s"
+msgid "Reservation Units"
+msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: tilavarauspalvelu/models/reservation_unit_hierarchy/model.py
+msgid "reservation unit hierarchy"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_unit_hierarchy/model.py
+msgid "reservation unit hierarchies"
+msgstr ""
 
 #: tilavarauspalvelu/models/terms_of_use/model.py
 msgctxt "singular"

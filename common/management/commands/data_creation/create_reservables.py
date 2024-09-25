@@ -3,9 +3,8 @@
 import random
 from datetime import timedelta
 
-from reservation_units.models import Equipment, EquipmentCategory, Purpose, Qualifier
 from tilavarauspalvelu.enums import ResourceLocationType, ServiceTypeChoices
-from tilavarauspalvelu.models import Resource, Service, Space, Unit
+from tilavarauspalvelu.models import Equipment, EquipmentCategory, Purpose, Qualifier, Resource, Service, Space, Unit
 
 from .utils import weighted_choice, with_logs
 

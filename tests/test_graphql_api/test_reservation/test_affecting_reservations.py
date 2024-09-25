@@ -5,9 +5,9 @@ import pytest
 from django.utils.timezone import get_default_timezone
 from graphene_django_extensions.testing import build_query
 
-from reservation_units.models import ReservationUnitHierarchy
 from tests.factories import ReservationFactory, ReservationUnitFactory, SpaceFactory, UnitFactory
 from tilavarauspalvelu.enums import ReservationStateChoice
+from tilavarauspalvelu.models import ReservationUnitHierarchy
 
 # Applied to all tests
 pytestmark = [

@@ -4,21 +4,15 @@ from django.db import models
 
 from common.management.commands.create_test_data import create_test_data
 from common.models import RequestLog, SQLLog
-from reservation_units.models import (
-    Introduction,
-    Keyword,
-    KeywordCategory,
-    KeywordGroup,
-    ReservationUnitHierarchy,
-    ReservationUnitImage,
-    ReservationUnitPaymentType,
-    TaxPercentage,
-)
 from tilavarauspalvelu.models import (
     AbilityGroup,
     AffectingTimeSpan,
     Building,
     EmailTemplate,
+    Introduction,
+    Keyword,
+    KeywordCategory,
+    KeywordGroup,
     PaymentOrder,
     PersonalInfoViewLog,
     RealEstate,
@@ -27,6 +21,10 @@ from tilavarauspalvelu.models import (
     ReservationMetadataField,
     ReservationStatistic,
     ReservationStatisticsReservationUnit,
+    ReservationUnitHierarchy,
+    ReservationUnitImage,
+    ReservationUnitPaymentType,
+    TaxPercentage,
 )
 
 apps_to_check: list[str] = [

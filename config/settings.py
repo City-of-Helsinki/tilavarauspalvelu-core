@@ -472,7 +472,7 @@ class Common(Environment):
                 else {
                     "reservation_units": {
                         "models": [
-                            "reservation_units.ReservationUnit",
+                            "tilavarauspalvelu.ReservationUnit",
                         ]
                     }
                 }

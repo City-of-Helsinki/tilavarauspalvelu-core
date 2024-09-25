@@ -1,7 +1,7 @@
 import pytest
 
-from reservation_units.models import ReservationUnitImage
 from tests.factories import ReservationUnitImageFactory
+from tilavarauspalvelu.models import ReservationUnitImage
 
 from .helpers import DELETE_MUTATION
 

@@ -3,8 +3,8 @@ from decimal import Decimal
 
 import factory
 
-from reservation_units.enums import PriceUnit, PricingStatus, PricingType
-from reservation_units.models import ReservationUnitPricing
+from tilavarauspalvelu.enums import PriceUnit, PricingStatus, PricingType
+from tilavarauspalvelu.models import ReservationUnitPricing
 
 from ._base import GenericDjangoModelFactory
 

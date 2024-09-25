@@ -98,7 +98,7 @@ class ReservationQuerySet(models.QuerySet):
 
     def affecting_reservations(self: Self, units: list[int] = (), reservation_units: list[int] = ()) -> Self:
         """Filter reservations that affect other reservations in the given units and/or reservation units."""
-        from reservation_units.models import ReservationUnit
+        from tilavarauspalvelu.models import ReservationUnit
 
         qs = ReservationUnit.objects.all()
         if units:

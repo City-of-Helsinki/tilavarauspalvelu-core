@@ -2,7 +2,7 @@ from _decimal import Decimal
 
 from factory.fuzzy import FuzzyChoice
 
-from reservation_units.models import TaxPercentage
+from tilavarauspalvelu.models import TaxPercentage
 
 from ._base import GenericDjangoModelFactory
 

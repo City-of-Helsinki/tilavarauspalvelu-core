@@ -8,7 +8,7 @@ from factory import fuzzy
 from applications.enums import ApplicationRoundStatusChoice
 from applications.models import ApplicationRound
 from common.date_utils import utc_start_of_day
-from reservation_units.models import Purpose, ReservationUnit
+from tilavarauspalvelu.models import Purpose, ReservationUnit
 
 from ._base import GenericDjangoModelFactory
 

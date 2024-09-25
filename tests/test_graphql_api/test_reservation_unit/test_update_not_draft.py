@@ -1,8 +1,7 @@
 import pytest
 
-from reservation_units.enums import ReservationStartInterval
 from tests.factories import ReservationUnitCancellationRuleFactory, ReservationUnitFactory, TermsOfUseFactory
-from tilavarauspalvelu.enums import PaymentType, TermsOfUseTypeChoices
+from tilavarauspalvelu.enums import PaymentType, ReservationStartInterval, TermsOfUseTypeChoices
 
 from .helpers import UPDATE_MUTATION, get_non_draft_update_input_data
 

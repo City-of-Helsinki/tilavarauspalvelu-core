@@ -9,7 +9,7 @@ from factory import fuzzy
 
 from applications.enums import ApplicantTypeChoice, ApplicationStatusChoice, Priority, Weekday
 from applications.models import Application, ApplicationRound, ApplicationSection
-from reservation_units.models import ReservationUnit
+from tilavarauspalvelu.models import ReservationUnit
 
 from ._base import GenericDjangoModelFactory
 from .allocated_time_slot import AllocatedTimeSlotFactory

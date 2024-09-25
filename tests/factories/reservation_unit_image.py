@@ -1,8 +1,8 @@
 import factory
 
-from reservation_units.enums import ReservationUnitImageType
-from reservation_units.models import ReservationUnitImage
 from tests.factories._base import GenericDjangoModelFactory
+from tilavarauspalvelu.enums import ReservationUnitImageType
+from tilavarauspalvelu.models import ReservationUnitImage
 
 __all__ = [
     "ReservationUnitImageFactory",

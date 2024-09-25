@@ -58,7 +58,7 @@ class ApplicationRound(models.Model):
     sent_date: datetime | None = models.DateTimeField(null=True, blank=True, default=None)
 
     reservation_units = models.ManyToManyField(
-        "reservation_units.ReservationUnit",
+        "tilavarauspalvelu.ReservationUnit",
         related_name="application_rounds",
     )
     purposes = models.ManyToManyField(

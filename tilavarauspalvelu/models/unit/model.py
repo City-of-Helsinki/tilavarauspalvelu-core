@@ -90,7 +90,7 @@ class Unit(models.Model):
         if settings.UPDATE_PRODUCT_MAPPING and (
             old_values is None or old_values.payment_merchant != self.payment_merchant
         ):
-            from reservation_units.tasks import refresh_reservation_unit_product_mapping
+            from tilavarauspalvelu.tasks import refresh_reservation_unit_product_mapping
 
             reservation_units = self.reservationunit_set.filter(payment_merchant__isnull=True).all()
             for runit in reservation_units:

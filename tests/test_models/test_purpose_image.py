@@ -16,7 +16,7 @@ pytestmark = [
 ]
 
 
-@mock.patch("reservation_units.models._mixins.purge_image_cache.delay")
+@mock.patch("tilavarauspalvelu.utils.image_purge.purge_image_cache.delay")
 @override_settings(IMAGE_CACHE_ENABLED=True)
 def test_purpose__image_purge_on_save(purge_image_cache):
     mock_image_data = BytesIO()

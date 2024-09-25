@@ -7,7 +7,6 @@ from rest_framework import serializers
 
 from applications.models import City
 from common.date_utils import local_datetime
-from reservation_units.models import ReservationUnit
 from tilavarauspalvelu.api.graphql.extensions.fields import OldChoiceCharField
 from tilavarauspalvelu.api.graphql.extensions.serializers import OldPrimaryKeySerializer
 from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
@@ -18,7 +17,7 @@ from tilavarauspalvelu.enums import (
     ReservationStateChoice,
     ReservationTypeChoice,
 )
-from tilavarauspalvelu.models import AgeGroup, RecurringReservation, Reservation, ReservationPurpose
+from tilavarauspalvelu.models import AgeGroup, RecurringReservation, Reservation, ReservationPurpose, ReservationUnit
 
 if TYPE_CHECKING:
     from common.typing import AnyUser

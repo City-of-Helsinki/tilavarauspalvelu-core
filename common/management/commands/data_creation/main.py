@@ -3,8 +3,7 @@ import os
 
 from django.core.management import call_command
 
-from reservation_units.models import ReservationUnitHierarchy
-from tilavarauspalvelu.models import AffectingTimeSpan
+from tilavarauspalvelu.models import AffectingTimeSpan, ReservationUnitHierarchy
 
 from .create_caisa import _create_caisa
 from .create_misc import _create_banner_notifications, _create_periodic_tasks

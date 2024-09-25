@@ -1,6 +1,6 @@
 from graphene_django_extensions import DjangoNode
 
-from reservation_units.models import ReservationUnitType
+from tilavarauspalvelu.models import ReservationUnitType
 
 from .filtersets import ReservationUnitTypeFilterSet
 from .permissions import ReservationUnitTypePermission

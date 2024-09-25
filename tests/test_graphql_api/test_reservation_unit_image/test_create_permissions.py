@@ -2,13 +2,13 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from reservation_units.enums import ReservationUnitImageType
 from tests.factories import ReservationUnitFactory
+from tilavarauspalvelu.enums import ReservationUnitImageType
 
 from .helpers import CREATE_MUTATION
 
 if TYPE_CHECKING:
-    from reservation_units.models import ReservationUnitImage
+    from tilavarauspalvelu.models import ReservationUnitImage
 
 # Applied to all tests
 pytestmark = [

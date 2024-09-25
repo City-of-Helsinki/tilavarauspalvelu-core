@@ -3,7 +3,6 @@ import uuid
 import pytest
 from django.test import override_settings
 
-from reservation_units.tasks import refresh_reservation_unit_accounting
 from tests.factories import (
     PaymentAccountingFactory,
     PaymentMerchantFactory,
@@ -11,6 +10,7 @@ from tests.factories import (
     ReservationUnitPricingFactory,
 )
 from tests.helpers import patch_method
+from tilavarauspalvelu.tasks import refresh_reservation_unit_accounting
 from tilavarauspalvelu.utils.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
 from tilavarauspalvelu.utils.verkkokauppa.product.types import CreateOrUpdateAccountingParams, Product
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient

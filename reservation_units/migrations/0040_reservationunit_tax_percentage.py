@@ -3,7 +3,11 @@
 import django.db.models.deletion
 from django.db import migrations, models
 
-from reservation_units.models.reservation_unit_pricing import get_default_tax_percentage
+
+def get_default_tax_percentage() -> int:
+    from tilavarauspalvelu.models import TaxPercentage
+
+    return TaxPercentage.objects.order_by("value").first().pk
 
 
 class Migration(migrations.Migration):

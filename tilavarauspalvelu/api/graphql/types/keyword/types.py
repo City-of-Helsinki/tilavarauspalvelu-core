@@ -1,6 +1,6 @@
 from graphene_django_extensions import DjangoNode
 
-from reservation_units.models import Keyword, KeywordCategory, KeywordGroup
+from tilavarauspalvelu.models import Keyword, KeywordCategory, KeywordGroup
 
 from .filtersets import KeywordCategoryFilterSet, KeywordFilterSet, KeywordGroupFilterSet
 from .permissions import KeywordCategoryPermission, KeywordGroupPermission, KeywordPermission

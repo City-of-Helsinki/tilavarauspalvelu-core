@@ -8,7 +8,6 @@ import pytest
 from applications.enums import ApplicantTypeChoice, Weekday
 from applications.tasks import generate_reservation_series_from_allocations
 from common.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_datetime, local_iso_format
-from reservation_units.models import ReservationUnitHierarchy
 from tests.factories import AllocatedTimeSlotFactory, ReservationFactory
 from tests.helpers import patch_method
 from tilavarauspalvelu.enums import (
@@ -18,7 +17,12 @@ from tilavarauspalvelu.enums import (
     ReservationStateChoice,
     ReservationTypeChoice,
 )
-from tilavarauspalvelu.models import AffectingTimeSpan, RecurringReservation, RejectedOccurrence
+from tilavarauspalvelu.models import (
+    AffectingTimeSpan,
+    RecurringReservation,
+    RejectedOccurrence,
+    ReservationUnitHierarchy,
+)
 from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.utils.opening_hours.hauki_api_types import HaukiAPIDatePeriod
 from utils.sentry import SentryLogger

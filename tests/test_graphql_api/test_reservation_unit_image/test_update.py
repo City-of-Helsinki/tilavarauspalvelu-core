@@ -1,7 +1,7 @@
 import pytest
 
-from reservation_units.enums import ReservationUnitImageType
 from tests.factories import ReservationUnitImageFactory
+from tilavarauspalvelu.enums import ReservationUnitImageType
 
 from .helpers import UPDATE_MUTATION
 

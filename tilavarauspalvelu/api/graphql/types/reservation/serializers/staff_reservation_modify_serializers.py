@@ -6,7 +6,6 @@ from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPr
 from rest_framework import serializers
 
 from applications.models import City
-from reservation_units.models import ReservationUnit
 from tilavarauspalvelu.api.graphql.extensions.fields import DurationField
 from tilavarauspalvelu.api.graphql.extensions.serializers import OldPrimaryKeyUpdateSerializer
 from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
@@ -17,7 +16,7 @@ from tilavarauspalvelu.enums import (
     ReservationStateChoice,
     ReservationTypeChoice,
 )
-from tilavarauspalvelu.models import AgeGroup, Reservation, ReservationPurpose
+from tilavarauspalvelu.models import AgeGroup, Reservation, ReservationPurpose, ReservationUnit
 
 DEFAULT_TIMEZONE = get_default_timezone()
 

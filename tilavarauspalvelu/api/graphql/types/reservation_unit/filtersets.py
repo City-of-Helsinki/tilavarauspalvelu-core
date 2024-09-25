@@ -11,9 +11,9 @@ from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntMult
 from common.date_utils import local_datetime
 from common.utils import log_text_search
 from elastic_django.reservation_units.query_builder import build_elastic_query_str
-from reservation_units.enums import ReservationKind, ReservationUnitPublishingState, ReservationUnitReservationState
-from reservation_units.models import ReservationUnit
-from reservation_units.querysets import ReservationUnitQuerySet
+from tilavarauspalvelu.enums import ReservationKind, ReservationUnitPublishingState, ReservationUnitReservationState
+from tilavarauspalvelu.models import ReservationUnit
+from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
 
 if TYPE_CHECKING:
     import datetime

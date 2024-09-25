@@ -1,32 +1,30 @@
 from datetime import date, timedelta
 
-from reservation_units.enums import (
+from tilavarauspalvelu.enums import (
     AuthenticationType,
     PriceUnit,
     PricingStatus,
     PricingType,
     ReservationKind,
     ReservationStartInterval,
+    TermsOfUseTypeChoices,
 )
-from reservation_units.models import (
+from tilavarauspalvelu.models import (
     Equipment,
     EquipmentCategory,
+    OriginHaukiResource,
+    PaymentAccounting,
+    PaymentMerchant,
+    PaymentProduct,
     Qualifier,
+    ReservationMetadataSet,
     ReservationUnit,
     ReservationUnitCancellationRule,
     ReservationUnitPaymentType,
     ReservationUnitPricing,
     ReservationUnitType,
-    TaxPercentage,
-)
-from tilavarauspalvelu.enums import TermsOfUseTypeChoices
-from tilavarauspalvelu.models import (
-    OriginHaukiResource,
-    PaymentAccounting,
-    PaymentMerchant,
-    PaymentProduct,
-    ReservationMetadataSet,
     Space,
+    TaxPercentage,
     TermsOfUse,
     Unit,
 )

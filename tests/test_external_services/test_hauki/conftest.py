@@ -2,8 +2,8 @@ from unittest import mock
 
 import pytest
 
-from reservation_units.models import ReservationUnit
 from tests.factories import OriginHaukiResourceFactory, ReservationUnitFactory
+from tilavarauspalvelu.models import ReservationUnit
 
 
 @pytest.fixture(autouse=True)

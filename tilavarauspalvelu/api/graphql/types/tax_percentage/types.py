@@ -1,6 +1,6 @@
 from graphene_django_extensions import DjangoNode
 
-from reservation_units.models import TaxPercentage
+from tilavarauspalvelu.models import TaxPercentage
 
 from .filtersets import TaxPercentageFilterSet
 from .permissions import TaxPercentagePermission

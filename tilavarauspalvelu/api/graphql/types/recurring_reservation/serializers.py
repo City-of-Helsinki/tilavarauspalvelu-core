@@ -12,19 +12,16 @@ from rest_framework.exceptions import ValidationError
 from applications.enums import WeekdayChoice
 from common.date_utils import local_date
 from common.fields.serializer import CurrentUserDefaultNullable, input_only_field
-from reservation_units.enums import ReservationStartInterval
-from reservation_units.models import ReservationUnit
 from tilavarauspalvelu.api.graphql.extensions import error_codes
-from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeStaffChoice
-from tilavarauspalvelu.models import RecurringReservation, Reservation
+from tilavarauspalvelu.enums import ReservationStartInterval, ReservationStateChoice, ReservationTypeStaffChoice
+from tilavarauspalvelu.models import RecurringReservation, Reservation, ReservationUnit
 from tilavarauspalvelu.models.recurring_reservation.actions import ReservationDetails
 from tilavarauspalvelu.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task
+from tilavarauspalvelu.utils.opening_hours.reservable_time_span_client import ReservableTimeSpanClient
 
 __all__ = [
     "RecurringReservationCreateSerializer",
 ]
-
-from tilavarauspalvelu.utils.opening_hours.reservable_time_span_client import ReservableTimeSpanClient
 
 
 class RecurringReservationCreateSerializer(NestingModelSerializer):

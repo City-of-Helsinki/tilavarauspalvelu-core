@@ -1,7 +1,7 @@
 from factory import fuzzy
 
-from reservation_units.models import ReservationUnitPaymentType
 from tests.factories._base import GenericDjangoModelFactory
+from tilavarauspalvelu.models import ReservationUnitPaymentType
 
 __all__ = [
     "ReservationUnitPaymentTypeFactory",

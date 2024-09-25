@@ -1,6 +1,6 @@
 from graphene_django_extensions import NestingModelSerializer
 
-from reservation_units.models import Purpose
+from tilavarauspalvelu.models import Purpose
 
 __all__ = [
     "PurposeSerializer",

@@ -7,32 +7,30 @@ from datetime import UTC, date, datetime, time, timedelta
 from decimal import Decimal
 from itertools import cycle
 
-from reservation_units.enums import (
+from tilavarauspalvelu.enums import (
     AuthenticationType,
     PriceUnit,
     PricingStatus,
     PricingType,
     ReservationKind,
     ReservationStartInterval,
+    TermsOfUseTypeChoices,
 )
-from reservation_units.models import (
+from tilavarauspalvelu.models import (
     Equipment,
+    OriginHaukiResource,
     Purpose,
     Qualifier,
+    ReservableTimeSpan,
+    ReservationMetadataSet,
     ReservationUnit,
     ReservationUnitCancellationRule,
     ReservationUnitPaymentType,
     ReservationUnitPricing,
     ReservationUnitType,
-    TaxPercentage,
-)
-from tilavarauspalvelu.enums import TermsOfUseTypeChoices
-from tilavarauspalvelu.models import (
-    OriginHaukiResource,
-    ReservableTimeSpan,
-    ReservationMetadataSet,
     Resource,
     Service,
+    TaxPercentage,
     TermsOfUse,
     Unit,
 )

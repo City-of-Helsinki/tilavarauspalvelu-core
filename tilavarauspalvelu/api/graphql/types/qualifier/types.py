@@ -1,6 +1,6 @@
 from graphene_django_extensions import DjangoNode
 
-from reservation_units.models import Qualifier
+from tilavarauspalvelu.models import Qualifier
 
 from .filtersets import QualifierFilterSet
 from .permissions import QualifierPermission

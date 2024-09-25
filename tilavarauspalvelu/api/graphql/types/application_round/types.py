@@ -10,7 +10,7 @@ from applications.models import Application, ApplicationRound
 from applications.querysets.application_round import ApplicationRoundQuerySet
 from common.db import SubqueryCount
 from common.typing import AnyUser, GQLInfo
-from reservation_units.models import ReservationUnit
+from tilavarauspalvelu.models import ReservationUnit
 
 from .filtersets import ApplicationRoundFilterSet
 from .permissions import ApplicationRoundPermission

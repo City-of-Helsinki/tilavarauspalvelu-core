@@ -1,6 +1,6 @@
 from factory import fuzzy
 
-from reservation_units.models import Qualifier
+from tilavarauspalvelu.models import Qualifier
 
 from ._base import GenericDjangoModelFactory
 

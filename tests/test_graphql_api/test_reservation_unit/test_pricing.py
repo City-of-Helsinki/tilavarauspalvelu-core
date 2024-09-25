@@ -2,8 +2,8 @@ import datetime
 
 import pytest
 
-from reservation_units.enums import PricingStatus, PricingType
-from reservation_units.models import ReservationUnit
+from tilavarauspalvelu.enums import PricingStatus, PricingType
+from tilavarauspalvelu.models import ReservationUnit
 
 from .helpers import CREATE_MUTATION, UPDATE_MUTATION, get_create_draft_input_data, get_pricing_data
 

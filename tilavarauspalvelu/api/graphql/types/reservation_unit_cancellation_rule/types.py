@@ -1,6 +1,6 @@
 from graphene_django_extensions import DjangoNode
 
-from reservation_units.models import ReservationUnitCancellationRule
+from tilavarauspalvelu.models import ReservationUnitCancellationRule
 
 from .filtersets import ReservationUnitCancellationRuleFilterSet
 from .permissions import ReservationUnitCancellationRulePermission

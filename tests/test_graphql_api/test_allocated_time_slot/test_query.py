@@ -1,8 +1,8 @@
 import pytest
 from graphene_django_extensions.testing import build_query
 
-from reservation_units.models import ReservationUnitHierarchy
 from tests.factories import AllocatedTimeSlotFactory, RecurringReservationFactory, ReservationUnitFactory, SpaceFactory
+from tilavarauspalvelu.models import ReservationUnitHierarchy
 
 from .helpers import allocations_query
 
