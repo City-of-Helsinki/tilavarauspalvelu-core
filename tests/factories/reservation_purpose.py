@@ -1,7 +1,7 @@
 from factory import fuzzy
 
-from reservations.models import ReservationPurpose
 from tests.factories._base import GenericDjangoModelFactory
+from tilavarauspalvelu.models import ReservationPurpose
 
 __all__ = [
     "ReservationPurposeFactory",

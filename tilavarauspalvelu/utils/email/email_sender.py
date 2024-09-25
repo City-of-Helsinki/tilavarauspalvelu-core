@@ -18,9 +18,9 @@ if TYPE_CHECKING:
 
     from applications.models import Application
     from config.utils.commons import LanguageType
-    from reservations.models import Reservation
     from tilavarauspalvelu.admin.email_template.tester import EmailTemplateTesterForm
     from tilavarauspalvelu.enums import EmailType
+    from tilavarauspalvelu.models import Reservation
     from tilavarauspalvelu.utils.email.email_builder_base import BaseEmailBuilder
 
 

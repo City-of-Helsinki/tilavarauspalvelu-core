@@ -13,8 +13,7 @@ if TYPE_CHECKING:
     from applications.models import Application, ApplicationRound
     from common.typing import AnyUser
     from reservation_units.models import ReservationUnit
-    from reservations.models import RecurringReservation, Reservation
-    from tilavarauspalvelu.models import Space, Unit, User
+    from tilavarauspalvelu.models import RecurringReservation, Reservation, Space, Unit, User
 
 
 class PermissionResolver:

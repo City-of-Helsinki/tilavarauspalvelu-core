@@ -1,7 +1,16 @@
+from __future__ import annotations
+
 from modeltranslation.decorators import register
 from modeltranslation.translator import TranslationOptions
 
-from .models import Service, TermsOfUse
+from .models import (
+    AbilityGroup,
+    ReservationCancelReason,
+    ReservationDenyReason,
+    ReservationPurpose,
+    Service,
+    TermsOfUse,
+)
 from .models.building.model import Building
 from .models.email_template.model import EmailTemplate
 from .models.location.model import Location
@@ -66,3 +75,23 @@ class LocationTranslationOptions(TranslationOptions):
 @register(EmailTemplate)
 class EmailTemplateTranslationOptions(TranslationOptions):
     fields = ["subject", "content", "html_content"]
+
+
+@register(AbilityGroup)
+class AbilityGroupTranslationOptions(TranslationOptions):
+    fields = ["name"]
+
+
+@register(ReservationPurpose)
+class ReservationPurposeTranslationOptions(TranslationOptions):
+    fields = ["name"]
+
+
+@register(ReservationCancelReason)
+class ReservationCancelReasonTranslationOptions(TranslationOptions):
+    fields = ["reason"]
+
+
+@register(ReservationDenyReason)
+class ReservationDenyReasonTranslationOptions(TranslationOptions):
+    fields = ["reason"]

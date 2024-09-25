@@ -1,5 +1,5 @@
-from reservations.models import Reservation
 from tilavarauspalvelu.api.graphql.extensions.serializers import OldPrimaryKeySerializer
+from tilavarauspalvelu.models import Reservation
 
 
 class ReservationWorkingMemoSerializer(OldPrimaryKeySerializer):

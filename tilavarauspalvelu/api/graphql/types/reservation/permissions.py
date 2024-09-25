@@ -5,8 +5,8 @@ from graphene_django_extensions.permissions import BasePermission
 
 from common.typing import AnyUser
 from reservation_units.models import ReservationUnit
-from reservations.models import Reservation
 from tilavarauspalvelu.api.graphql.extensions import error_codes
+from tilavarauspalvelu.models import Reservation
 
 __all__ = [
     "ReservationCommentPermission",

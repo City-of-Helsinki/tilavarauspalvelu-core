@@ -11,10 +11,10 @@ from common.date_utils import local_datetime, local_start_of_day
 from reservation_units.enums import PriceUnit, PricingType, ReservationStartInterval, ReservationUnitPublishingState
 from reservation_units.models import ReservationUnit, ReservationUnitPricing
 from reservation_units.utils.reservation_unit_pricing_helper import ReservationUnitPricingHelper
-from reservations.enums import ReservationTypeChoice
-from reservations.models import Reservation
 from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from tilavarauspalvelu.api.graphql.types.reservation.types import ReservationNode
+from tilavarauspalvelu.enums import ReservationTypeChoice
+from tilavarauspalvelu.models import Reservation
 
 
 class PriceCalculationResult:

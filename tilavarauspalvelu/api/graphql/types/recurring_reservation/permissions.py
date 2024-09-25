@@ -6,8 +6,8 @@ from query_optimizer.typing import GraphQLFilterInfo
 
 from common.typing import AnyUser
 from reservation_units.models import ReservationUnit
-from reservations.models import RecurringReservation
 from tilavarauspalvelu.api.graphql.extensions import error_codes
+from tilavarauspalvelu.models import RecurringReservation
 
 __all__ = [
     "RecurringReservationPermission",

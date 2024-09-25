@@ -7,11 +7,11 @@ from graphene_django_extensions.testing import build_mutation, build_query
 
 from common.date_utils import next_hour
 from reservation_units.models import ReservationUnit
-from reservations.enums import ReservationTypeChoice
-from reservations.models import Reservation
 from tests.factories import ReservationCancelReasonFactory, ReservationDenyReasonFactory
 from tests.factories.helsinki_profile import MyProfileDataFactory
 from tests.helpers import ResponseMock, patch_method
+from tilavarauspalvelu.enums import ReservationTypeChoice
+from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
 
 reservation_query = partial(build_query, "reservation")

@@ -4,8 +4,8 @@ import pytest
 
 from common.date_utils import local_datetime
 from reservation_units.models import ReservationUnitHierarchy
-from reservations.enums import ReservationStateChoice
 from tests.factories import ReservationFactory, ReservationUnitFactory, ServiceFactory, SpaceFactory
+from tilavarauspalvelu.enums import ReservationStateChoice
 
 # Applied to all tests
 pytestmark = [

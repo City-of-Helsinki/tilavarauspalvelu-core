@@ -11,9 +11,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from common.date_utils import local_datetime
-from reservations.enums import ReservationStateChoice
-from tilavarauspalvelu.enums import Language, OrderStatus, PaymentType
-from tilavarauspalvelu.utils.email.reservation_email_notification_sender import ReservationEmailNotificationSender
+from tilavarauspalvelu.enums import Language, OrderStatus, PaymentType, ReservationStateChoice
 from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CancelOrderError
 from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import GetPaymentError
 from tilavarauspalvelu.utils.verkkokauppa.payment.types import Payment
@@ -26,7 +24,7 @@ from .queryset import PaymentOrderManager
 if TYPE_CHECKING:
     import uuid
 
-    from reservations.models import Reservation
+    from tilavarauspalvelu.models import Reservation
     from tilavarauspalvelu.utils.verkkokauppa.order.types import Order
 
     from .actions import PaymentOrderActions
@@ -39,7 +37,7 @@ __all__ = [
 
 class PaymentOrder(models.Model):
     reservation: Reservation | None = models.ForeignKey(
-        "reservations.Reservation",
+        "tilavarauspalvelu.Reservation",
         related_name="payment_order",
         on_delete=models.SET_NULL,
         null=True,
@@ -172,6 +170,10 @@ class PaymentOrder(models.Model):
             and self.reservation is not None
             and self.reservation.state == ReservationStateChoice.WAITING_FOR_PAYMENT
         ):
+            from tilavarauspalvelu.utils.email.reservation_email_notification_sender import (
+                ReservationEmailNotificationSender,
+            )
+
             self.reservation.state = ReservationStateChoice.CONFIRMED
             self.reservation.save(update_fields=["state"])
             ReservationEmailNotificationSender.send_confirmation_email(reservation=self.reservation)

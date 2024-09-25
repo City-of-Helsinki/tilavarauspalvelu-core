@@ -6,7 +6,6 @@ import pytest
 from common.date_utils import local_datetime
 from reservation_units.enums import PriceUnit, PricingStatus
 from reservation_units.models import ReservationUnitHierarchy
-from reservations.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from tests.factories import (
     ApplicationRoundFactory,
     CityFactory,
@@ -14,6 +13,7 @@ from tests.factories import (
     ReservationMetadataSetFactory,
     ReservationUnitPricingFactory,
 )
+from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from utils.decimal_utils import round_decimal
 
 from .helpers import UPDATE_MUTATION, get_update_data, mock_profile_reader

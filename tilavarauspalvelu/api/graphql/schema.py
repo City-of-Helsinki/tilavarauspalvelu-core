@@ -14,9 +14,8 @@ from query_optimizer.compiler import optimize
 from applications.models import AllocatedTimeSlot
 from common.models import BannerNotification
 from common.typing import AnyUser, GQLInfo
-from reservations.models import Reservation
 from tilavarauspalvelu.enums import UserPermissionChoice
-from tilavarauspalvelu.models import PaymentOrder, User
+from tilavarauspalvelu.models import PaymentOrder, Reservation, User
 from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
 from tilavarauspalvelu.utils.helauth.typing import UserProfileInfo
 

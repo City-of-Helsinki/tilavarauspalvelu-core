@@ -8,10 +8,8 @@ from social_django.models import UserSocialAuth
 
 from applications.enums import ApplicationStatusChoice
 from applications.models import Address, Application, ApplicationSection, Person
-from reservations.enums import ReservationStateChoice, ReservationTypeChoice
-from reservations.models import Reservation
-from tilavarauspalvelu.enums import OrderStatus, ReservationNotification
-from tilavarauspalvelu.models import GeneralRole, UnitRole, User
+from tilavarauspalvelu.enums import OrderStatus, ReservationNotification, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.models import GeneralRole, Reservation, UnitRole, User
 
 ANONYMIZED = "Anonymized"
 SENSITIVE_RESERVATION = "Sensitive data of this reservation has been anonymized by a script"

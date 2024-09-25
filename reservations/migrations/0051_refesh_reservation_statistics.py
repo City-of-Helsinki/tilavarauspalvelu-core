@@ -2,7 +2,7 @@
 
 from django.db import migrations
 
-from reservations.tasks import create_or_update_reservation_statistics
+from tilavarauspalvelu.tasks import create_or_update_reservation_statistics
 
 
 def refresh_reservation_statistics(apps, schema_editor):

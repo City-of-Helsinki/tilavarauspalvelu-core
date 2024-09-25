@@ -4,11 +4,9 @@ from django.db import migrations, models
 
 
 def change_staff_event_types(apps, schema_editor):
-    from reservations.enums import ReservationTypeChoice
-
     Reservation = apps.get_model("reservations", "Reservation")
 
-    Reservation.objects.filter(staff_event=True).update(type=ReservationTypeChoice.STAFF)
+    Reservation.objects.filter(staff_event=True).update(type="STAFF")
 
 
 class Migration(migrations.Migration):

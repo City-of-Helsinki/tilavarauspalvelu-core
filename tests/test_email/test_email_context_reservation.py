@@ -4,8 +4,6 @@ import pytest
 from django.utils.timezone import get_default_timezone
 
 from common.utils import get_attr_by_language
-from reservations.enums import CustomerTypeChoice
-from reservations.models import Reservation
 from tests.factories import (
     LocationFactory,
     ReservationCancelReasonFactory,
@@ -14,7 +12,8 @@ from tests.factories import (
     ReservationUnitFactory,
     UserFactory,
 )
-from tilavarauspalvelu.models import Location
+from tilavarauspalvelu.enums import CustomerTypeChoice
+from tilavarauspalvelu.models import Location, Reservation
 from tilavarauspalvelu.utils.email.email_builder_reservation import ReservationEmailContext
 
 if TYPE_CHECKING:

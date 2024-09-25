@@ -10,8 +10,6 @@ from graphene_django_extensions.testing import parametrize_helper
 from common.date_utils import local_datetime, local_end_of_day, local_start_of_day, next_hour
 from reservation_units.enums import PriceUnit, PricingStatus, ReservationKind
 from reservation_units.models import ReservationUnitHierarchy
-from reservations.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
-from reservations.models import Reservation
 from tests.factories import (
     AgeGroupFactory,
     ApplicationRoundFactory,
@@ -26,6 +24,8 @@ from tests.factories import (
     UserFactory,
 )
 from tests.helpers import ResponseMock, patch_method
+from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
 from tilavarauspalvelu.utils.helauth.typing import ADLoginAMR
 from utils.decimal_utils import round_decimal

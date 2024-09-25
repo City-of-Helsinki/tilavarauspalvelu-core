@@ -1,6 +1,6 @@
 from graphene_django_extensions import DjangoNode
 
-from reservations.models import ReservationPurpose
+from tilavarauspalvelu.models import ReservationPurpose
 
 from .filtersets import ReservationPurposeFilterSet
 from .permissions import ReservationPurposePermission

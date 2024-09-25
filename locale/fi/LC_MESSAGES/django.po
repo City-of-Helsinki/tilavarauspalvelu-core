@@ -7,38 +7,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: actions/reservation.py
-#, python-format
-msgid "Reservation for %(name)s"
-msgstr "Varaus kohteeseen %(name)s"
-
-#: actions/reservation.py
-msgid "Booking details"
-msgstr "Varauksen tiedot"
-
-#: actions/reservation.py
-msgctxt "ical"
-msgid "From"
-msgstr "Alkamisaika"
-
-#: actions/reservation.py
-msgctxt "ical"
-msgid "To"
-msgstr "Päättymisaika"
-
-#: actions/reservation.py
-#, python-format
-msgid ""
-"Manage your booking at Varaamo. You can check the details of your booking "
-"and Varaamo's terms of contract and cancellation on the '%(bookings)s' page."
-msgstr ""
-"Hallitse varaustasi Varaamossa. Voit perua varauksesi ja tarkistaa varauksen "
-"tiedot sekä Varaamon sopimus- ja peruutusehdot '%(bookings)s' -sivulla."
-
-#: actions/reservation.py
-msgid "My bookings"
-msgstr "Omat Varaukset"
-
 #: applications/admin/address.py
 #: tilavarauspalvelu/admin/payment_merchant/admin.py
 msgid "Street address"
@@ -111,14 +79,14 @@ msgstr "Varausyksikkövaihtoehto tälle allokoinnille."
 
 #: applications/admin/allocated_time_slot/form.py
 #: applications/admin/application_section/form.py
-#: reservations/admin/reservation/admin.py
-#: reservations/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation/admin.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Begin time"
 msgstr "Aloitusaika"
 
 #: applications/admin/allocated_time_slot/form.py
 #: applications/admin/application_section/form.py
-#: reservations/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "End time"
 msgstr "Lopetusaika"
 
@@ -139,8 +107,8 @@ msgid "Search by user's first name, last name or reservation units name"
 msgstr "Etsi käyttäjän etu- tai sukunimellä tai varausyksikön nimellä"
 
 #: applications/admin/application/admin.py
-#: reservations/admin/reservation/admin.py
-#: reservations/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation/admin.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Created at"
 msgstr "Luotu"
 
@@ -148,7 +116,7 @@ msgstr "Luotu"
 #: applications/admin/application_round/admin.py
 #: applications/admin/application_section/admin.py
 #: reservation_units/admin/reservation_unit/admin.py
-#: reservations/admin/reservation/admin.py users/admin/user.py
+#: tilavarauspalvelu/admin/reservation/admin.py users/admin/user.py
 msgid "Basic information"
 msgstr "Perustiedot"
 
@@ -160,7 +128,7 @@ msgstr "Hakija"
 #: applications/admin/application/admin.py
 #: applications/admin/application_round/admin.py
 #: applications/admin/application_section/admin.py
-#: reservations/admin/reservation/admin.py
+#: tilavarauspalvelu/admin/reservation/admin.py
 msgid "Time"
 msgstr "Aika"
 
@@ -175,7 +143,7 @@ msgstr "Nollaa hakemuksen allokoinnit"
 
 #: applications/admin/application/admin.py
 #: applications/admin/application_round/admin.py
-#: reservations/admin/reservation/admin.py
+#: tilavarauspalvelu/admin/reservation/admin.py
 msgid "Are you sure?"
 msgstr "Oletko varma?"
 
@@ -265,17 +233,17 @@ msgid "Billing address"
 msgstr "Laskutusosoite"
 
 #: applications/admin/application/form.py
-#: reservations/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Home city"
 msgstr "Kotikunta"
 
 #: applications/admin/application/form.py
-#: reservations/admin/reservation/admin.py users/admin/user.py
+#: tilavarauspalvelu/admin/reservation/admin.py users/admin/user.py
 msgid "Additional information"
 msgstr "Lisätiedot"
 
 #: applications/admin/application/form.py
-#: reservations/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Working memo"
 msgstr "Käsittelymuistio"
 
@@ -384,8 +352,8 @@ msgstr ""
 #: reservation_units/admin/reservation_unit/form.py
 #: reservation_units/models/equipment.py reservation_units/models/keyword.py
 #: reservation_units/models/reservation_unit_type.py
-#: reservations/admin/reservation/form.py
-#: reservations/models/reservation_metadata.py
+#: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/models/reservation_metadata_set/model.py
 msgid "Name"
 msgstr "Nimi"
 
@@ -570,12 +538,12 @@ msgstr "Etsi nimellä, hakijan etu- tai sukunimellä"
 
 #: applications/admin/application_section/filters.py
 #: applications/admin/application_section/form.py
-#: reservations/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Age group"
 msgstr "Ikäryhmä"
 
 #: applications/admin/application_section/filters.py
-#: reservations/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Reservation purpose"
 msgstr "Varaustarkoitukset"
 
@@ -665,7 +633,7 @@ msgstr ""
 "toistokerrat tälle hakemuksen osalle ovat lukittu tai hylätty. <br>"
 
 #: applications/admin/application_section/form.py
-#: reservations/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Number of persons"
 msgstr "Henkilömäärä"
 
@@ -1392,12 +1360,12 @@ msgid "Is the reservation unit closed on this weekday?"
 msgstr "Onko varausyksikkö suljettu tänä viikonpäivänä?"
 
 #: reservation_units/admin/reservation_unit/form.py
-#: reservations/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "SKU"
 msgstr "SKU"
 
 #: reservation_units/admin/reservation_unit/form.py
-#: reservations/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Description"
 msgstr "Kuvaus"
 
@@ -1554,12 +1522,12 @@ msgid "Surface area"
 msgstr "Pinta-ala"
 
 #: reservation_units/admin/reservation_unit/form.py
-#: reservations/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Buffer time before"
 msgstr "Tauko ennen varausta"
 
 #: reservation_units/admin/reservation_unit/form.py
-#: reservations/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Buffer time after"
 msgstr "Tauko varauksen jälkeen"
 
@@ -1600,7 +1568,7 @@ msgid "Publish ends"
 msgstr "Julkaisu päättyy"
 
 #: reservation_units/admin/reservation_unit/form.py
-#: reservations/models/reservation_metadata.py
+#: tilavarauspalvelu/models/reservation_metadata_set/model.py
 msgid "Reservation metadata set"
 msgstr "Varauslomake"
 
@@ -1743,12 +1711,12 @@ msgid "Minimum number of persons"
 msgstr "Henkilöiden minimimäärä"
 
 #: reservation_units/admin/reservation_unit/form.py
-#: reservations/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Buffer time before reservation"
 msgstr "Tauko ennen varausta"
 
 #: reservation_units/admin/reservation_unit/form.py
-#: reservations/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Buffer time after reservation"
 msgstr "Tauko varauksen jälkeen"
 
@@ -2068,7 +2036,7 @@ msgid "Category"
 msgstr "Kategoria"
 
 #: reservation_units/models/introduction.py
-#: reservations/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "User"
 msgstr "Käyttäjä"
 
@@ -2140,504 +2108,6 @@ msgstr "Ylin hinta"
 #: reservation_units/models/tax_percentage.py
 msgid "Tax percentage"
 msgstr "Veroprosentti"
-
-#: reservations/admin/reservation/admin.py
-msgid "Search by Reservation ID or name"
-msgstr "Etsi varauksen ID:llä tai nimellä"
-
-#: reservations/admin/reservation/admin.py
-#: reservations/admin/reservation/form.py
-msgid "Price"
-msgstr "Hinta"
-
-#: reservations/admin/reservation/admin.py
-msgid "Reservee information"
-msgstr "Varaajan tiedot"
-
-#: reservations/admin/reservation/admin.py
-msgid "Billing information"
-msgstr "Laskutustiedot"
-
-#: reservations/admin/reservation/admin.py
-msgid "None of the selected reservations can be denied."
-msgstr "Yhtään valittua varausta ei voida hylätä."
-
-#: reservations/admin/reservation/admin.py
-msgid "Are you sure you want deny these reservations?"
-msgstr "Oletko varma, että haluat hylätä nämä varaukset?"
-
-#: reservations/admin/reservation/admin.py
-msgid "Selected reservations have been denied."
-msgstr "Valitut varaukset on hylätty."
-
-#: reservations/admin/reservation/admin.py
-msgid "Deny selected reservations without refund"
-msgstr "Hylkää valitut varaukset ilman hyvitystä"
-
-#: reservations/admin/reservation/admin.py
-msgid "Deny selected reservations and refund"
-msgstr "Hylkää valitut varaukset ja hyvitä"
-
-#: reservations/admin/reservation/admin.py
-msgid "Refund has been initiated for selected reservations."
-msgstr "Hyvitys on aloitettu valituille varauksille."
-
-#: reservations/admin/reservation/admin.py
-msgid "No reservations with paid orders to refund."
-msgstr "Ei varauksia hyvitettävillä maksetuilla tilauksilla."
-
-#: reservations/admin/reservation/filters.py
-#: reservations/admin/reservation/form.py
-msgid "Recurring reservation"
-msgstr "Toistuva varaus"
-
-#: reservations/admin/reservation/filters.py
-msgid "Yes"
-msgstr "Kyllä"
-
-#: reservations/admin/reservation/filters.py
-msgid "No"
-msgstr "Ei"
-
-#: reservations/admin/reservation/filters.py
-msgid "Paid reservation"
-msgstr "Maksullinen varaus"
-
-#: reservations/admin/reservation/form.py
-msgid "State"
-msgstr "Tila"
-
-#: reservations/admin/reservation/form.py
-msgid "Reservation type"
-msgstr "Varauksen tyyppi"
-
-#: reservations/admin/reservation/form.py
-msgid "Cancel details"
-msgstr "Perumistiedot"
-
-#: reservations/admin/reservation/form.py
-msgid "Handling details"
-msgstr "Käsittelytiedot"
-
-#: reservations/admin/reservation/form.py
-msgid "Handled at"
-msgstr "Käsitelty"
-
-#: reservations/admin/reservation/form.py
-msgid "Confirmed at"
-msgstr "Vahvistettu"
-
-#: reservations/admin/reservation/form.py
-msgid "Price net"
-msgstr "Nettohinta"
-
-#: reservations/admin/reservation/form.py
-msgid "Non-subsidised price"
-msgstr "Subventoimaton hinta"
-
-#: reservations/admin/reservation/form.py
-msgid "Non-subsidised net price"
-msgstr "Subventoimaton nettohinta"
-
-#: reservations/admin/reservation/form.py
-msgid "Unit price"
-msgstr "Yksikköhinta"
-
-#: reservations/admin/reservation/form.py
-msgid "Tax percentage value"
-msgstr "Veroprosentti"
-
-#: reservations/admin/reservation/form.py
-msgid "Applying free of charge"
-msgstr "Hakee alennusta"
-
-#: reservations/admin/reservation/form.py
-msgid "Free of charge reason"
-msgstr "Alennuksen haun syy"
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee ID"
-msgstr "Varaajan y-tunnus"
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee first name"
-msgstr "Varaajan etunimi"
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee last name"
-msgstr "Varaajan sukunimi"
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee email"
-msgstr "Varaajan sähköposti"
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee phone"
-msgstr "Varaajan puhelinnumero"
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee organisation name"
-msgstr "Varaajan organisaation nimi"
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee address street"
-msgstr "Varaajan katuosoite"
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee address city"
-msgstr "Varaajan kaupunki"
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee address zip code"
-msgstr "Varaajan postinumero"
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee is an unregistered association"
-msgstr "Varaaja on rekisteröimätön yhdistys"
-
-#: reservations/admin/reservation/form.py
-msgid "Preferred language of reservee"
-msgstr "Varaajan kieli"
-
-#: reservations/admin/reservation/form.py
-msgid "Type of reservee"
-msgstr "Varaajan tyyppi"
-
-#: reservations/admin/reservation/form.py
-msgid "Billing first name"
-msgstr "Varauksen maksajan etunimi"
-
-#: reservations/admin/reservation/form.py
-msgid "Billing last name"
-msgstr "Varauksen maksajan sukunimi"
-
-#: reservations/admin/reservation/form.py
-msgid "Billing email"
-msgstr "Varauksen maksajan sähköposti"
-
-#: reservations/admin/reservation/form.py
-msgid "Billing phone"
-msgstr "Varauksen maksajan puhelinnumero"
-
-#: reservations/admin/reservation/form.py
-msgid "Billing address street"
-msgstr "Varauksen maksajan katuosoite"
-
-#: reservations/admin/reservation/form.py
-msgid "Billing address city"
-msgstr "Varauksen maksajan postitoimipaikka"
-
-#: reservations/admin/reservation/form.py
-msgid "Billing address zip code"
-msgstr "Varauksen maksajan postinumero"
-
-#: reservations/admin/reservation/form.py
-msgid "Reason for deny"
-msgstr "Syy hylkäämiselle"
-
-#: reservations/admin/reservation/form.py
-msgid "Reason for cancellation"
-msgstr "Syy perumiselle"
-
-#: reservations/admin/reservation/form.py
-msgid "SKU for this particular reservation"
-msgstr "Tämän varauksen SKU"
-
-#: reservations/admin/reservation/form.py
-msgid "Name of the reservation"
-msgstr "Varauksen nimi"
-
-#: reservations/admin/reservation/form.py
-msgid "Description of the reservation"
-msgstr "Varauksen kuvaus"
-
-#: reservations/admin/reservation/form.py
-msgid "Number of persons in the reservation"
-msgstr "Henkilöiden määrä varauksessa"
-
-#: reservations/admin/reservation/form.py
-msgid "State of the reservation"
-msgstr "Varauksen tila"
-
-#: reservations/admin/reservation/form.py
-msgid "Type of reservation"
-msgstr "Varauksen tyyppi"
-
-#: reservations/admin/reservation/form.py
-msgid "Details for this reservation's cancellation"
-msgstr "Lisätiedot varauksen perumiselle"
-
-#: reservations/admin/reservation/form.py
-msgid "Additional details for denying or approving the reservation"
-msgstr "Lisätietoja varauksen hylkäämiseen tai hyväksymiseen"
-
-#: reservations/admin/reservation/form.py
-msgid "Working memo for staff users"
-msgstr "Muistio henkilökunnalle"
-
-#: reservations/admin/reservation/form.py
-msgid "Reservation begin date and time"
-msgstr "Varauksen alkamishetki"
-
-#: reservations/admin/reservation/form.py
-msgid "Reservation end date and time"
-msgstr "Varauksen loppumishetki"
-
-#: reservations/admin/reservation/form.py
-msgid "When this reservation was handled"
-msgstr "Milloin tämä varaus käsiteltiin"
-
-#: reservations/admin/reservation/form.py
-msgid "When this reservation was confirmed"
-msgstr "Milloin tämä varaus vahvistettiin"
-
-#: reservations/admin/reservation/form.py
-msgid "When this reservation was created"
-msgstr "Milloin tämä varaus luotiin"
-
-#: reservations/admin/reservation/form.py
-msgid "The price of this particular reservation including VAT"
-msgstr "Varauksen hinta ALV:n kanssa"
-
-#: reservations/admin/reservation/form.py
-msgid "The price of this particular reservation excluding VAT"
-msgstr "Varauksen hinta ilman ALV:ta"
-
-#: reservations/admin/reservation/form.py
-msgid "The non subsidised price of this reservation including VAT"
-msgstr "Subventoimaton hinta ALV:n kanssa"
-
-#: reservations/admin/reservation/form.py
-msgid "The non subsidised price of this reservation excluding VAT"
-msgstr "Subventoimaton hinta ilman ALV:ta"
-
-#: reservations/admin/reservation/form.py
-msgid "The unit price of this particular reservation"
-msgstr "Varauksen yksikköhinta"
-
-#: reservations/admin/reservation/form.py
-msgid "The value of the tax percentage for this particular reservation"
-msgstr "ALV:n prosenttiosuus tässä varauksessa"
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee is applying for a free-of-charge reservation"
-msgstr "Varaaja hakee alennuskelpoisuutta"
-
-#: reservations/admin/reservation/form.py
-msgid "Reason for applying for a free-of-charge reservation"
-msgstr "Syy alennuskelpoisuuden hakemiselle"
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee's business or association identity code"
-msgstr "Varaaja yrityksen tai yhdistyksen y-tunnus"
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee's first name"
-msgstr "Varaajan etunimi"
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee's last name"
-msgstr "Varaajan sukunimi"
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee's email address"
-msgstr "Varaajan sähköpostiosoite"
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee's phone number"
-msgstr "Varaajan puhelinnumero"
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee's organisation name"
-msgstr "Varaajan organisaation nimi"
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee's street address"
-msgstr "Varaajan katuosoite"
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee's city"
-msgstr "Varaajan kaupunki"
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee's zip code"
-msgstr "Varaajan postinumero"
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee's preferred language"
-msgstr "Varaajan suosima kieli"
-
-#: reservations/admin/reservation/form.py
-msgid "User who made the reservation"
-msgstr "Varauksen tehnyt käyttäjä"
-
-#: reservations/admin/reservation/form.py
-msgid "Reason for denying the reservation"
-msgstr "Syy varauksen hylkäämiselle"
-
-#: reservations/admin/reservation/form.py
-msgid "Reason for cancelling the reservation"
-msgstr "Syy varauksen perumiselle"
-
-#: reservations/admin/reservation/form.py
-msgid "Purpose of the reservation"
-msgstr "Varauksen käyttötarkoitus"
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee's home city"
-msgstr "Varaajan kotikunta"
-
-#: reservations/admin/reservation/form.py
-msgid "Age group of the group or association"
-msgstr "Ikäryhmä tälle ryhmälle tai yhdistykselle"
-
-#: reservations/admin/reservation_metadata_set.py
-msgid "Required fields must be a subset of supported fields"
-msgstr "Vaadittujen kenttien täytyy olla tuettujen kenttien alijoukko"
-
-#: reservations/enums.py
-msgctxt "CustomerType"
-msgid "Business"
-msgstr "Yritys"
-
-#: reservations/enums.py
-msgctxt "CustomerType"
-msgid "Nonprofit"
-msgstr "Voittoa tavoittelematon"
-
-#: reservations/enums.py
-msgctxt "CustomerType"
-msgid "Individual"
-msgstr "Yksityinen"
-
-#: reservations/enums.py
-msgctxt "ReservationState"
-msgid "Created"
-msgstr "Luotu"
-
-#: reservations/enums.py
-msgctxt "ReservationState"
-msgid "Cancelled"
-msgstr "Peruutettu"
-
-#: reservations/enums.py
-msgctxt "ReservationState"
-msgid "Requires handling"
-msgstr "Käsittelemättä"
-
-#: reservations/enums.py
-msgctxt "ReservationState"
-msgid "Waiting for payment"
-msgstr "Odottaa maksua"
-
-#: reservations/enums.py
-msgctxt "ReservationState"
-msgid "Confirmed"
-msgstr "Hyväksytty"
-
-#: reservations/enums.py
-msgctxt "ReservationState"
-msgid "Denied"
-msgstr "Hylätty"
-
-#: reservations/enums.py
-msgctxt "ReservationType"
-msgid "Normal"
-msgstr "Normaali"
-
-#: reservations/enums.py
-msgctxt "ReservationType"
-msgid "Blocked"
-msgstr "Suljettu"
-
-#: reservations/enums.py
-msgctxt "ReservationType"
-msgid "Staff"
-msgstr "Henkilökunta"
-
-#: reservations/enums.py
-msgctxt "ReservationType"
-msgid "Behalf"
-msgstr "Puolesta"
-
-#: reservations/enums.py
-msgctxt "ReservationType"
-msgid "Seasonal"
-msgstr "Kausi"
-
-#: reservations/enums.py
-msgctxt "ReservationTypeStaffChoice"
-msgid "Blocked"
-msgstr "Suljettu"
-
-#: reservations/enums.py
-msgctxt "ReservationTypeStaffChoice"
-msgid "Staff"
-msgstr "Henkilökunta"
-
-#: reservations/enums.py
-msgctxt "ReservationTypeStaffChoice"
-msgid "Behalf"
-msgstr "Puolesta"
-
-#: reservations/enums.py
-msgctxt "RejectionReadiness"
-msgid "Interval not allowed"
-msgstr "Aloitusaika ei sallittu"
-
-#: reservations/enums.py
-msgctxt "RejectionReadiness"
-msgid "Overlapping reservations"
-msgstr "Päällekkäisiä varauksia"
-
-#: reservations/enums.py
-msgctxt "RejectionReadiness"
-msgid "Reservation unit closed"
-msgstr "Varausyksikkö suljettu"
-
-#: reservations/models/affecting_time_span.py
-msgid "affecting time span"
-msgstr "vaikuttava aikaväli"
-
-#: reservations/models/affecting_time_span.py
-msgid "affecting time spans"
-msgstr "vaikuttavat aikavälit"
-
-#: reservations/models/rejected_occurrence.py
-msgid "Rejected occurrence"
-msgstr "Hylätty ajankohta"
-
-#: reservations/models/rejected_occurrence.py
-msgid "Rejected occurrences"
-msgstr "Hylätyt ajankohdat"
-
-#: reservations/models/reservation.py
-msgid "Closed"
-msgstr "Suljettu"
-
-#: reservations/models/reservation_metadata.py
-msgid "Field name"
-msgstr "Kentän nimi"
-
-#: reservations/models/reservation_metadata.py
-msgid "Reservation metadata field"
-msgstr "Varauslomakkeen kenttä"
-
-#: reservations/models/reservation_metadata.py
-msgid "Reservation metadata fields"
-msgstr "Varauslomakkeen kentät"
-
-#: reservations/models/reservation_metadata.py
-msgid "Supported fields"
-msgstr "Tuetut kentät"
-
-#: reservations/models/reservation_metadata.py
-msgid "Required fields"
-msgstr "Vaaditut kentät"
-
-#: reservations/models/reservation_metadata.py
-msgid "Reservation metadata sets"
-msgstr "Varauslomakkeet"
 
 #: templates/admin/base.html
 msgid "Change password"
@@ -2855,6 +2325,360 @@ msgstr ""
 "Etsi maksutunnuksella, varauksen tunnuksella, verkkokaupan tunnuksella, "
 "varauksen nimellä tai varausyksikön nimellä"
 
+#: tilavarauspalvelu/admin/reservation/admin.py
+msgid "Search by Reservation ID or name"
+msgstr "Etsi varauksen ID:llä tai nimellä"
+
+#: tilavarauspalvelu/admin/reservation/admin.py
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Price"
+msgstr "Hinta"
+
+#: tilavarauspalvelu/admin/reservation/admin.py
+msgid "Reservee information"
+msgstr "Varaajan tiedot"
+
+#: tilavarauspalvelu/admin/reservation/admin.py
+msgid "Billing information"
+msgstr "Laskutustiedot"
+
+#: tilavarauspalvelu/admin/reservation/admin.py
+msgid "None of the selected reservations can be denied."
+msgstr "Yhtään valittua varausta ei voida hylätä."
+
+#: tilavarauspalvelu/admin/reservation/admin.py
+msgid "Are you sure you want deny these reservations?"
+msgstr "Oletko varma, että haluat hylätä nämä varaukset?"
+
+#: tilavarauspalvelu/admin/reservation/admin.py
+msgid "Selected reservations have been denied."
+msgstr "Valitut varaukset on hylätty."
+
+#: tilavarauspalvelu/admin/reservation/admin.py
+msgid "Deny selected reservations without refund"
+msgstr "Hylkää valitut varaukset ilman hyvitystä"
+
+#: tilavarauspalvelu/admin/reservation/admin.py
+msgid "Deny selected reservations and refund"
+msgstr "Hylkää valitut varaukset ja hyvitä"
+
+#: tilavarauspalvelu/admin/reservation/admin.py
+msgid "Refund has been initiated for selected reservations."
+msgstr "Hyvitys on aloitettu valituille varauksille."
+
+#: tilavarauspalvelu/admin/reservation/admin.py
+msgid "No reservations with paid orders to refund."
+msgstr "Ei varauksia hyvitettävillä maksetuilla tilauksilla."
+
+#: tilavarauspalvelu/admin/reservation/filters.py
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Recurring reservation"
+msgstr "Toistuva varaus"
+
+#: tilavarauspalvelu/admin/reservation/filters.py
+msgid "Yes"
+msgstr "Kyllä"
+
+#: tilavarauspalvelu/admin/reservation/filters.py
+msgid "No"
+msgstr "Ei"
+
+#: tilavarauspalvelu/admin/reservation/filters.py
+msgid "Paid reservation"
+msgstr "Maksullinen varaus"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "State"
+msgstr "Tila"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservation type"
+msgstr "Varauksen tyyppi"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Cancel details"
+msgstr "Perumistiedot"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Handling details"
+msgstr "Käsittelytiedot"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Handled at"
+msgstr "Käsitelty"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Confirmed at"
+msgstr "Vahvistettu"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Price net"
+msgstr "Nettohinta"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Non-subsidised price"
+msgstr "Subventoimaton hinta"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Non-subsidised net price"
+msgstr "Subventoimaton nettohinta"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Unit price"
+msgstr "Yksikköhinta"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Tax percentage value"
+msgstr "Veroprosentti"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Applying free of charge"
+msgstr "Hakee alennusta"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Free of charge reason"
+msgstr "Alennuksen haun syy"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee ID"
+msgstr "Varaajan y-tunnus"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee first name"
+msgstr "Varaajan etunimi"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee last name"
+msgstr "Varaajan sukunimi"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee email"
+msgstr "Varaajan sähköposti"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee phone"
+msgstr "Varaajan puhelinnumero"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee organisation name"
+msgstr "Varaajan organisaation nimi"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee address street"
+msgstr "Varaajan katuosoite"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee address city"
+msgstr "Varaajan kaupunki"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee address zip code"
+msgstr "Varaajan postinumero"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee is an unregistered association"
+msgstr "Varaaja on rekisteröimätön yhdistys"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Preferred language of reservee"
+msgstr "Varaajan kieli"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Type of reservee"
+msgstr "Varaajan tyyppi"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Billing first name"
+msgstr "Varauksen maksajan etunimi"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Billing last name"
+msgstr "Varauksen maksajan sukunimi"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Billing email"
+msgstr "Varauksen maksajan sähköposti"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Billing phone"
+msgstr "Varauksen maksajan puhelinnumero"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Billing address street"
+msgstr "Varauksen maksajan katuosoite"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Billing address city"
+msgstr "Varauksen maksajan postitoimipaikka"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Billing address zip code"
+msgstr "Varauksen maksajan postinumero"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reason for deny"
+msgstr "Syy hylkäämiselle"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reason for cancellation"
+msgstr "Syy perumiselle"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "SKU for this particular reservation"
+msgstr "Tämän varauksen SKU"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Name of the reservation"
+msgstr "Varauksen nimi"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Description of the reservation"
+msgstr "Varauksen kuvaus"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Number of persons in the reservation"
+msgstr "Henkilöiden määrä varauksessa"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "State of the reservation"
+msgstr "Varauksen tila"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Type of reservation"
+msgstr "Varauksen tyyppi"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Details for this reservation's cancellation"
+msgstr "Lisätiedot varauksen perumiselle"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Additional details for denying or approving the reservation"
+msgstr "Lisätietoja varauksen hylkäämiseen tai hyväksymiseen"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Working memo for staff users"
+msgstr "Muistio henkilökunnalle"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservation begin date and time"
+msgstr "Varauksen alkamishetki"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservation end date and time"
+msgstr "Varauksen loppumishetki"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "When this reservation was handled"
+msgstr "Milloin tämä varaus käsiteltiin"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "When this reservation was confirmed"
+msgstr "Milloin tämä varaus vahvistettiin"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "When this reservation was created"
+msgstr "Milloin tämä varaus luotiin"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "The price of this particular reservation including VAT"
+msgstr "Varauksen hinta ALV:n kanssa"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "The price of this particular reservation excluding VAT"
+msgstr "Varauksen hinta ilman ALV:ta"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "The non subsidised price of this reservation including VAT"
+msgstr "Subventoimaton hinta ALV:n kanssa"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "The non subsidised price of this reservation excluding VAT"
+msgstr "Subventoimaton hinta ilman ALV:ta"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "The unit price of this particular reservation"
+msgstr "Varauksen yksikköhinta"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "The value of the tax percentage for this particular reservation"
+msgstr "ALV:n prosenttiosuus tässä varauksessa"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee is applying for a free-of-charge reservation"
+msgstr "Varaaja hakee alennuskelpoisuutta"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reason for applying for a free-of-charge reservation"
+msgstr "Syy alennuskelpoisuuden hakemiselle"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee's business or association identity code"
+msgstr "Varaaja yrityksen tai yhdistyksen y-tunnus"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee's first name"
+msgstr "Varaajan etunimi"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee's last name"
+msgstr "Varaajan sukunimi"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee's email address"
+msgstr "Varaajan sähköpostiosoite"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee's phone number"
+msgstr "Varaajan puhelinnumero"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee's organisation name"
+msgstr "Varaajan organisaation nimi"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee's street address"
+msgstr "Varaajan katuosoite"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee's city"
+msgstr "Varaajan kaupunki"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee's zip code"
+msgstr "Varaajan postinumero"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee's preferred language"
+msgstr "Varaajan suosima kieli"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "User who made the reservation"
+msgstr "Varauksen tehnyt käyttäjä"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reason for denying the reservation"
+msgstr "Syy varauksen hylkäämiselle"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reason for cancelling the reservation"
+msgstr "Syy varauksen perumiselle"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Purpose of the reservation"
+msgstr "Varauksen käyttötarkoitus"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee's home city"
+msgstr "Varaajan kotikunta"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Age group of the group or association"
+msgstr "Ikäryhmä tälle ryhmälle tai yhdistykselle"
+
+#: tilavarauspalvelu/admin/reservation_metadata_set/admin.py
+msgid "Required fields must be a subset of supported fields"
+msgstr "Vaadittujen kenttien täytyy olla tuettujen kenttien alijoukko"
+
 #: tilavarauspalvelu/admin/space/admin.py
 msgid "Search by name or unit name"
 msgstr "Etsi nimellä tai toimipisteen nimellä"
@@ -3057,6 +2881,114 @@ msgctxt "HaukiResourceState"
 msgid "Maintenance"
 msgstr "Siivoustauko/huoltotauko"
 
+#: tilavarauspalvelu/enums.py
+msgctxt "CustomerType"
+msgid "Business"
+msgstr "Yritys"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "CustomerType"
+msgid "Nonprofit"
+msgstr "Voittoa tavoittelematon"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "CustomerType"
+msgid "Individual"
+msgstr "Yksityinen"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationState"
+msgid "Created"
+msgstr "Luotu"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationState"
+msgid "Cancelled"
+msgstr "Peruutettu"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationState"
+msgid "Requires handling"
+msgstr "Käsittelemättä"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationState"
+msgid "Waiting for payment"
+msgstr "Odottaa maksua"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationState"
+msgid "Confirmed"
+msgstr "Hyväksytty"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationState"
+msgid "Denied"
+msgstr "Hylätty"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationType"
+msgid "Normal"
+msgstr "Normaali"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationType"
+msgid "Blocked"
+msgstr "Suljettu"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationType"
+msgid "Staff"
+msgstr "Henkilökunta"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationType"
+msgid "Behalf"
+msgstr "Puolesta"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationType"
+msgid "Seasonal"
+msgstr "Kausi"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationTypeStaffChoice"
+msgid "Blocked"
+msgstr "Suljettu"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationTypeStaffChoice"
+msgid "Staff"
+msgstr "Henkilökunta"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationTypeStaffChoice"
+msgid "Behalf"
+msgstr "Puolesta"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "RejectionReadiness"
+msgid "Interval not allowed"
+msgstr "Aloitusaika ei sallittu"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "RejectionReadiness"
+msgid "Overlapping reservations"
+msgstr "Päällekkäisiä varauksia"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "RejectionReadiness"
+msgid "Reservation unit closed"
+msgstr "Varausyksikkö suljettu"
+
+#: tilavarauspalvelu/models/affecting_time_span/model.py
+msgid "affecting time span"
+msgstr "vaikuttava aikaväli"
+
+#: tilavarauspalvelu/models/affecting_time_span/model.py
+msgid "affecting time spans"
+msgstr "vaikuttavat aikavälit"
+
 #: tilavarauspalvelu/models/email_template/model.py
 msgid "Email type"
 msgstr "Sähköpostin tyyppi"
@@ -3121,9 +3053,69 @@ msgstr "Täytyy olla suurempi kuin 0"
 msgid "Must be the sum of net and vat amounts"
 msgstr "Täytyy olla netto- ja ALV-määrien summa"
 
+#: tilavarauspalvelu/models/rejected_occurrence/model.py
+msgid "Rejected occurrence"
+msgstr "Hylätty ajankohta"
+
+#: tilavarauspalvelu/models/rejected_occurrence/model.py
+msgid "Rejected occurrences"
+msgstr "Hylätyt ajankohdat"
+
 #: tilavarauspalvelu/models/reservable_time_span/model.py
 msgid "`start_datetime` must be before `end_datetime`."
 msgstr "`start_datetime` täytyy olla ennen `end_datetime`."
+
+#: tilavarauspalvelu/models/reservation/actions.py
+#, python-format
+msgid "Reservation for %(name)s"
+msgstr "Varaus kohteeseen %(name)s"
+
+#: tilavarauspalvelu/models/reservation/actions.py
+msgid "Booking details"
+msgstr "Varauksen tiedot"
+
+#: tilavarauspalvelu/models/reservation/actions.py
+msgctxt "ical"
+msgid "From"
+msgstr "Alkamisaika"
+
+#: tilavarauspalvelu/models/reservation/actions.py
+msgctxt "ical"
+msgid "To"
+msgstr "Päättymisaika"
+
+#: tilavarauspalvelu/models/reservation/actions.py
+#, python-format
+msgid ""
+"Manage your booking at Varaamo. You can check the details of your booking "
+"and Varaamo's terms of contract and cancellation on the '%(bookings)s' page."
+msgstr ""
+"Hallitse varaustasi Varaamossa. Voit perua varauksesi ja tarkistaa varauksen "
+"tiedot sekä Varaamon sopimus- ja peruutusehdot '%(bookings)s' -sivulla."
+
+#: tilavarauspalvelu/models/reservation/actions.py
+msgid "My bookings"
+msgstr "Omat Varaukset"
+
+#: tilavarauspalvelu/models/reservation/model.py
+msgid "Closed"
+msgstr "Suljettu"
+
+#: tilavarauspalvelu/models/reservation_metadata_field/model.py
+msgid "Field name"
+msgstr "Kentän nimi"
+
+#: tilavarauspalvelu/models/reservation_metadata_field/model.py
+msgid "Reservation metadata field"
+msgstr "Varauslomakkeen kenttä"
+
+#: tilavarauspalvelu/models/reservation_metadata_field/model.py
+msgid "Reservation metadata fields"
+msgstr "Varauslomakkeen kentät"
+
+#: tilavarauspalvelu/models/reservation_metadata_set/model.py
+msgid "Reservation metadata sets"
+msgstr "Varauslomakkeet"
 
 #: tilavarauspalvelu/models/terms_of_use/model.py
 msgctxt "singular"

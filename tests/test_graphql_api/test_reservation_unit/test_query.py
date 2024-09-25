@@ -7,7 +7,6 @@ from graphql_relay import to_global_id
 from applications.enums import WeekdayChoice
 from common.date_utils import local_datetime, next_hour
 from reservation_units.enums import PricingType, ReservationUnitPublishingState
-from reservations.enums import ReservationStateChoice, ReservationTypeChoice
 from tests.factories import (
     ApplicationRoundFactory,
     ApplicationRoundTimeSlotFactory,
@@ -27,7 +26,7 @@ from tests.factories import (
     TermsOfUseFactory,
     UserFactory,
 )
-from tilavarauspalvelu.enums import TermsOfUseTypeChoices
+from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice, TermsOfUseTypeChoices
 
 from .helpers import reservation_unit_query, reservation_units_query
 

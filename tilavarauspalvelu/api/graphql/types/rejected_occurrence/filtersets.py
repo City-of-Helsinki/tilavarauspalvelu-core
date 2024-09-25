@@ -6,12 +6,13 @@ from lookup_property import L
 
 from common.db import text_search
 from common.utils import log_text_search
-from reservations.models import RejectedOccurrence
-from reservations.querysets import RejectedOccurrenceQuerySet
+from tilavarauspalvelu.models import RejectedOccurrence
 
 __all__ = [
     "RejectedOccurrenceFilterSet",
 ]
+
+from tilavarauspalvelu.models.rejected_occurrence.queryset import RejectedOccurrenceQuerySet
 
 
 class RejectedOccurrenceFilterSet(ModelFilterSet):

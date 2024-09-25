@@ -4,16 +4,20 @@ from django.conf import settings
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
-from actions.recurring_reservation import ReservationDetails
 from applications.enums import ApplicantTypeChoice, Weekday
 from applications.models import Address, AllocatedTimeSlot, Organisation, Person
 from common.date_utils import local_end_of_day, local_start_of_day
 from common.utils import translate_for_user
 from config.celery import app
-from reservations.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
-from reservations.models import RecurringReservation
-from reservations.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task
-from tilavarauspalvelu.enums import HaukiResourceState
+from tilavarauspalvelu.enums import (
+    CustomerTypeChoice,
+    HaukiResourceState,
+    ReservationStateChoice,
+    ReservationTypeChoice,
+)
+from tilavarauspalvelu.models import RecurringReservation
+from tilavarauspalvelu.models.recurring_reservation.actions import ReservationDetails
+from tilavarauspalvelu.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task
 from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
 from utils.sentry import SentryLogger

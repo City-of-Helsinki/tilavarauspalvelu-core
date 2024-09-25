@@ -3,10 +3,10 @@ from datetime import timedelta
 import pytest
 
 from common.date_utils import local_datetime
-from reservations.enums import ReservationStateChoice
-from reservations.models import Reservation
-from reservations.pruning import prune_inactive_reservations
 from tests.factories import ReservationFactory
+from tilavarauspalvelu.enums import ReservationStateChoice
+from tilavarauspalvelu.models import Reservation
+from tilavarauspalvelu.utils.pruning import prune_inactive_reservations
 
 # Applied to all tests
 pytestmark = [

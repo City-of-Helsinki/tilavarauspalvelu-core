@@ -14,16 +14,20 @@ from reservation_units.models import (
     ReservationUnitPaymentType,
     TaxPercentage,
 )
-from reservations.models import (
+from tilavarauspalvelu.models import (
     AbilityGroup,
     AffectingTimeSpan,
+    Building,
+    EmailTemplate,
+    PaymentOrder,
+    PersonalInfoViewLog,
+    RealEstate,
     RecurringReservation,
     RejectedOccurrence,
     ReservationMetadataField,
     ReservationStatistic,
     ReservationStatisticsReservationUnit,
 )
-from tilavarauspalvelu.models import Building, EmailTemplate, PaymentOrder, PersonalInfoViewLog, RealEstate
 
 apps_to_check: list[str] = [
     "common",

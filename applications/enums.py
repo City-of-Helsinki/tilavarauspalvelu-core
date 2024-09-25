@@ -18,7 +18,7 @@ __all__ = [
     "WeekdayChoice",
 ]
 
-from reservations.enums import CustomerTypeChoice
+from tilavarauspalvelu.enums import CustomerTypeChoice
 
 
 class WeekdayChoice(models.IntegerChoices):

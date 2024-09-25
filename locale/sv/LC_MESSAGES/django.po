@@ -7,38 +7,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: actions/reservation.py
-#, python-format
-msgid "Reservation for %(name)s"
-msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-#: actions/reservation.py
-msgid "Booking details"
-msgstr "Uppgifter om bokningen"
-
-#: actions/reservation.py
-msgctxt "ical"
-msgid "From"
-msgstr "Börjar"
-
-#: actions/reservation.py
-msgctxt "ical"
-msgid "To"
-msgstr "Slutar"
-
-#: actions/reservation.py
-#, python-format
-msgid ""
-"Manage your booking at Varaamo. You can check the details of your booking "
-"and Varaamo's terms of contract and cancellation on the '%(bookings)s' page."
-msgstr ""
-"Hantera din bokning på Varaamo. Du kan kontrollera uppgifterna om din "
-"bokning samt Varaamos avtals- och avbokningsvillkor på sidan '%(bookings)s'."
-
-#: actions/reservation.py
-msgid "My bookings"
-msgstr "Mina bokningar"
-
 #: applications/admin/address.py
 #: tilavarauspalvelu/admin/payment_merchant/admin.py
 msgid "Street address"
@@ -109,14 +77,14 @@ msgstr ""
 
 #: applications/admin/allocated_time_slot/form.py
 #: applications/admin/application_section/form.py
-#: reservations/admin/reservation/admin.py
-#: reservations/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation/admin.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Begin time"
 msgstr ""
 
 #: applications/admin/allocated_time_slot/form.py
 #: applications/admin/application_section/form.py
-#: reservations/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "End time"
 msgstr ""
 
@@ -137,8 +105,8 @@ msgid "Search by user's first name, last name or reservation units name"
 msgstr ""
 
 #: applications/admin/application/admin.py
-#: reservations/admin/reservation/admin.py
-#: reservations/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation/admin.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Created at"
 msgstr ""
 
@@ -146,7 +114,7 @@ msgstr ""
 #: applications/admin/application_round/admin.py
 #: applications/admin/application_section/admin.py
 #: reservation_units/admin/reservation_unit/admin.py
-#: reservations/admin/reservation/admin.py users/admin/user.py
+#: tilavarauspalvelu/admin/reservation/admin.py users/admin/user.py
 msgid "Basic information"
 msgstr ""
 
@@ -158,7 +126,7 @@ msgstr ""
 #: applications/admin/application/admin.py
 #: applications/admin/application_round/admin.py
 #: applications/admin/application_section/admin.py
-#: reservations/admin/reservation/admin.py
+#: tilavarauspalvelu/admin/reservation/admin.py
 msgid "Time"
 msgstr ""
 
@@ -173,7 +141,7 @@ msgstr ""
 
 #: applications/admin/application/admin.py
 #: applications/admin/application_round/admin.py
-#: reservations/admin/reservation/admin.py
+#: tilavarauspalvelu/admin/reservation/admin.py
 msgid "Are you sure?"
 msgstr ""
 
@@ -258,17 +226,17 @@ msgid "Billing address"
 msgstr ""
 
 #: applications/admin/application/form.py
-#: reservations/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Home city"
 msgstr ""
 
 #: applications/admin/application/form.py
-#: reservations/admin/reservation/admin.py users/admin/user.py
+#: tilavarauspalvelu/admin/reservation/admin.py users/admin/user.py
 msgid "Additional information"
 msgstr ""
 
 #: applications/admin/application/form.py
-#: reservations/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Working memo"
 msgstr ""
 
@@ -373,8 +341,8 @@ msgstr ""
 #: reservation_units/admin/reservation_unit/form.py
 #: reservation_units/models/equipment.py reservation_units/models/keyword.py
 #: reservation_units/models/reservation_unit_type.py
-#: reservations/admin/reservation/form.py
-#: reservations/models/reservation_metadata.py
+#: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/models/reservation_metadata_set/model.py
 msgid "Name"
 msgstr ""
 
@@ -553,12 +521,12 @@ msgstr ""
 
 #: applications/admin/application_section/filters.py
 #: applications/admin/application_section/form.py
-#: reservations/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Age group"
 msgstr ""
 
 #: applications/admin/application_section/filters.py
-#: reservations/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Reservation purpose"
 msgstr ""
 
@@ -639,7 +607,7 @@ msgid ""
 msgstr ""
 
 #: applications/admin/application_section/form.py
-#: reservations/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Number of persons"
 msgstr ""
 
@@ -1352,12 +1320,12 @@ msgid "Is the reservation unit closed on this weekday?"
 msgstr ""
 
 #: reservation_units/admin/reservation_unit/form.py
-#: reservations/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "SKU"
 msgstr ""
 
 #: reservation_units/admin/reservation_unit/form.py
-#: reservations/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Description"
 msgstr ""
 
@@ -1514,12 +1482,12 @@ msgid "Surface area"
 msgstr ""
 
 #: reservation_units/admin/reservation_unit/form.py
-#: reservations/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Buffer time before"
 msgstr ""
 
 #: reservation_units/admin/reservation_unit/form.py
-#: reservations/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Buffer time after"
 msgstr ""
 
@@ -1560,7 +1528,7 @@ msgid "Publish ends"
 msgstr ""
 
 #: reservation_units/admin/reservation_unit/form.py
-#: reservations/models/reservation_metadata.py
+#: tilavarauspalvelu/models/reservation_metadata_set/model.py
 msgid "Reservation metadata set"
 msgstr ""
 
@@ -1703,12 +1671,12 @@ msgid "Minimum number of persons"
 msgstr ""
 
 #: reservation_units/admin/reservation_unit/form.py
-#: reservations/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Buffer time before reservation"
 msgstr ""
 
 #: reservation_units/admin/reservation_unit/form.py
-#: reservations/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Buffer time after reservation"
 msgstr ""
 
@@ -2014,7 +1982,7 @@ msgid "Category"
 msgstr ""
 
 #: reservation_units/models/introduction.py
-#: reservations/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "User"
 msgstr ""
 
@@ -2090,528 +2058,6 @@ msgstr ""
 #: reservation_units/models/tax_percentage.py
 msgid "Tax percentage"
 msgstr ""
-
-#: reservations/admin/reservation/admin.py
-#, fuzzy
-#| msgid "Reservation for %(name)s"
-msgid "Search by Reservation ID or name"
-msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-#: reservations/admin/reservation/admin.py
-#: reservations/admin/reservation/form.py
-msgid "Price"
-msgstr ""
-
-#: reservations/admin/reservation/admin.py
-msgid "Reservee information"
-msgstr ""
-
-#: reservations/admin/reservation/admin.py
-msgid "Billing information"
-msgstr ""
-
-#: reservations/admin/reservation/admin.py
-msgid "None of the selected reservations can be denied."
-msgstr ""
-
-#: reservations/admin/reservation/admin.py
-msgid "Are you sure you want deny these reservations?"
-msgstr ""
-
-#: reservations/admin/reservation/admin.py
-msgid "Selected reservations have been denied."
-msgstr ""
-
-#: reservations/admin/reservation/admin.py
-msgid "Deny selected reservations without refund"
-msgstr ""
-
-#: reservations/admin/reservation/admin.py
-msgid "Deny selected reservations and refund"
-msgstr ""
-
-#: reservations/admin/reservation/admin.py
-msgid "Refund has been initiated for selected reservations."
-msgstr ""
-
-#: reservations/admin/reservation/admin.py
-msgid "No reservations with paid orders to refund."
-msgstr ""
-
-#: reservations/admin/reservation/filters.py
-#: reservations/admin/reservation/form.py
-msgid "Recurring reservation"
-msgstr ""
-
-#: reservations/admin/reservation/filters.py
-msgid "Yes"
-msgstr ""
-
-#: reservations/admin/reservation/filters.py
-msgid "No"
-msgstr ""
-
-#: reservations/admin/reservation/filters.py
-msgid "Paid reservation"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "State"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-#, fuzzy
-#| msgid "Reservation for %(name)s"
-msgid "Reservation type"
-msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-#: reservations/admin/reservation/form.py
-#, fuzzy
-#| msgid "Booking details"
-msgid "Cancel details"
-msgstr "Uppgifter om bokningen"
-
-#: reservations/admin/reservation/form.py
-#, fuzzy
-#| msgid "Booking details"
-msgid "Handling details"
-msgstr "Uppgifter om bokningen"
-
-#: reservations/admin/reservation/form.py
-msgid "Handled at"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Confirmed at"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Price net"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Non-subsidised price"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Non-subsidised net price"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Unit price"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Tax percentage value"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Applying free of charge"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Free of charge reason"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee ID"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-#, fuzzy
-#| msgid "Reservation for %(name)s"
-msgid "Reservee first name"
-msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-#: reservations/admin/reservation/form.py
-#, fuzzy
-#| msgid "Reservation for %(name)s"
-msgid "Reservee last name"
-msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee email"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee phone"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-#, fuzzy
-#| msgid "Reservation for %(name)s"
-msgid "Reservee organisation name"
-msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee address street"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee address city"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee address zip code"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee is an unregistered association"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Preferred language of reservee"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Type of reservee"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Billing first name"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Billing last name"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-#, fuzzy
-#| msgid "Booking details"
-msgid "Billing email"
-msgstr "Uppgifter om bokningen"
-
-#: reservations/admin/reservation/form.py
-msgid "Billing phone"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Billing address street"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Billing address city"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Billing address zip code"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Reason for deny"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Reason for cancellation"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "SKU for this particular reservation"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Name of the reservation"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Description of the reservation"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Number of persons in the reservation"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "State of the reservation"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Type of reservation"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Details for this reservation's cancellation"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Additional details for denying or approving the reservation"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Working memo for staff users"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Reservation begin date and time"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-#, fuzzy
-#| msgid "Reservation for %(name)s"
-msgid "Reservation end date and time"
-msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-#: reservations/admin/reservation/form.py
-msgid "When this reservation was handled"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "When this reservation was confirmed"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "When this reservation was created"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "The price of this particular reservation including VAT"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "The price of this particular reservation excluding VAT"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "The non subsidised price of this reservation including VAT"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "The non subsidised price of this reservation excluding VAT"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "The unit price of this particular reservation"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "The value of the tax percentage for this particular reservation"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee is applying for a free-of-charge reservation"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Reason for applying for a free-of-charge reservation"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee's business or association identity code"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-#, fuzzy
-#| msgid "Reservation for %(name)s"
-msgid "Reservee's first name"
-msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee's last name"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee's email address"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee's phone number"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-#, fuzzy
-#| msgid "Reservation for %(name)s"
-msgid "Reservee's organisation name"
-msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee's street address"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee's city"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee's zip code"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee's preferred language"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "User who made the reservation"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Reason for denying the reservation"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Reason for cancelling the reservation"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Purpose of the reservation"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Reservee's home city"
-msgstr ""
-
-#: reservations/admin/reservation/form.py
-msgid "Age group of the group or association"
-msgstr ""
-
-#: reservations/admin/reservation_metadata_set.py
-msgid "Required fields must be a subset of supported fields"
-msgstr ""
-
-#: reservations/enums.py
-msgctxt "CustomerType"
-msgid "Business"
-msgstr ""
-
-#: reservations/enums.py
-msgctxt "CustomerType"
-msgid "Nonprofit"
-msgstr ""
-
-#: reservations/enums.py
-msgctxt "CustomerType"
-msgid "Individual"
-msgstr ""
-
-#: reservations/enums.py
-msgctxt "ReservationState"
-msgid "Created"
-msgstr ""
-
-#: reservations/enums.py
-msgctxt "ReservationState"
-msgid "Cancelled"
-msgstr ""
-
-#: reservations/enums.py
-msgctxt "ReservationState"
-msgid "Requires handling"
-msgstr ""
-
-#: reservations/enums.py
-msgctxt "ReservationState"
-msgid "Waiting for payment"
-msgstr ""
-
-#: reservations/enums.py
-msgctxt "ReservationState"
-msgid "Confirmed"
-msgstr ""
-
-#: reservations/enums.py
-msgctxt "ReservationState"
-msgid "Denied"
-msgstr ""
-
-#: reservations/enums.py
-msgctxt "ReservationType"
-msgid "Normal"
-msgstr ""
-
-#: reservations/enums.py
-msgctxt "ReservationType"
-msgid "Blocked"
-msgstr ""
-
-#: reservations/enums.py
-msgctxt "ReservationType"
-msgid "Staff"
-msgstr ""
-
-#: reservations/enums.py
-msgctxt "ReservationType"
-msgid "Behalf"
-msgstr ""
-
-#: reservations/enums.py
-msgctxt "ReservationType"
-msgid "Seasonal"
-msgstr ""
-
-#: reservations/enums.py
-msgctxt "ReservationTypeStaffChoice"
-msgid "Blocked"
-msgstr ""
-
-#: reservations/enums.py
-msgctxt "ReservationTypeStaffChoice"
-msgid "Staff"
-msgstr ""
-
-#: reservations/enums.py
-msgctxt "ReservationTypeStaffChoice"
-msgid "Behalf"
-msgstr ""
-
-#: reservations/enums.py
-msgctxt "RejectionReadiness"
-msgid "Interval not allowed"
-msgstr ""
-
-#: reservations/enums.py
-msgctxt "RejectionReadiness"
-msgid "Overlapping reservations"
-msgstr ""
-
-#: reservations/enums.py
-msgctxt "RejectionReadiness"
-msgid "Reservation unit closed"
-msgstr ""
-
-#: reservations/models/affecting_time_span.py
-msgid "affecting time span"
-msgstr ""
-
-#: reservations/models/affecting_time_span.py
-msgid "affecting time spans"
-msgstr ""
-
-#: reservations/models/rejected_occurrence.py
-msgid "Rejected occurrence"
-msgstr ""
-
-#: reservations/models/rejected_occurrence.py
-msgid "Rejected occurrences"
-msgstr ""
-
-#: reservations/models/reservation.py
-msgid "Closed"
-msgstr ""
-
-#: reservations/models/reservation_metadata.py
-msgid "Field name"
-msgstr ""
-
-#: reservations/models/reservation_metadata.py
-msgid "Reservation metadata field"
-msgstr ""
-
-#: reservations/models/reservation_metadata.py
-msgid "Reservation metadata fields"
-msgstr ""
-
-#: reservations/models/reservation_metadata.py
-msgid "Supported fields"
-msgstr ""
-
-#: reservations/models/reservation_metadata.py
-msgid "Required fields"
-msgstr ""
-
-#: reservations/models/reservation_metadata.py
-#, fuzzy
-#| msgid "Reservation for %(name)s"
-msgid "Reservation metadata sets"
-msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: templates/admin/base.html
 msgid "Change password"
@@ -2825,6 +2271,382 @@ msgid ""
 "name, or Reservation Unit name"
 msgstr ""
 
+#: tilavarauspalvelu/admin/reservation/admin.py
+#, fuzzy
+#| msgid "Reservation for %(name)s"
+msgid "Search by Reservation ID or name"
+msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: tilavarauspalvelu/admin/reservation/admin.py
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Price"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/admin.py
+msgid "Reservee information"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/admin.py
+msgid "Billing information"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/admin.py
+msgid "None of the selected reservations can be denied."
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/admin.py
+msgid "Are you sure you want deny these reservations?"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/admin.py
+msgid "Selected reservations have been denied."
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/admin.py
+msgid "Deny selected reservations without refund"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/admin.py
+msgid "Deny selected reservations and refund"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/admin.py
+msgid "Refund has been initiated for selected reservations."
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/admin.py
+msgid "No reservations with paid orders to refund."
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/filters.py
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Recurring reservation"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/filters.py
+msgid "Yes"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/filters.py
+msgid "No"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/filters.py
+msgid "Paid reservation"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "State"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+#, fuzzy
+#| msgid "Reservation for %(name)s"
+msgid "Reservation type"
+msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+#, fuzzy
+#| msgid "Booking details"
+msgid "Cancel details"
+msgstr "Uppgifter om bokningen"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+#, fuzzy
+#| msgid "Booking details"
+msgid "Handling details"
+msgstr "Uppgifter om bokningen"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Handled at"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Confirmed at"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Price net"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Non-subsidised price"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Non-subsidised net price"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Unit price"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Tax percentage value"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Applying free of charge"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Free of charge reason"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee ID"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+#, fuzzy
+#| msgid "Reservation for %(name)s"
+msgid "Reservee first name"
+msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+#, fuzzy
+#| msgid "Reservation for %(name)s"
+msgid "Reservee last name"
+msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee email"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee phone"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+#, fuzzy
+#| msgid "Reservation for %(name)s"
+msgid "Reservee organisation name"
+msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee address street"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee address city"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee address zip code"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee is an unregistered association"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Preferred language of reservee"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Type of reservee"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Billing first name"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Billing last name"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+#, fuzzy
+#| msgid "Booking details"
+msgid "Billing email"
+msgstr "Uppgifter om bokningen"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Billing phone"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Billing address street"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Billing address city"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Billing address zip code"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reason for deny"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reason for cancellation"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "SKU for this particular reservation"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Name of the reservation"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Description of the reservation"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Number of persons in the reservation"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "State of the reservation"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Type of reservation"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Details for this reservation's cancellation"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Additional details for denying or approving the reservation"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Working memo for staff users"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservation begin date and time"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+#, fuzzy
+#| msgid "Reservation for %(name)s"
+msgid "Reservation end date and time"
+msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "When this reservation was handled"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "When this reservation was confirmed"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "When this reservation was created"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "The price of this particular reservation including VAT"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "The price of this particular reservation excluding VAT"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "The non subsidised price of this reservation including VAT"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "The non subsidised price of this reservation excluding VAT"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "The unit price of this particular reservation"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "The value of the tax percentage for this particular reservation"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee is applying for a free-of-charge reservation"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reason for applying for a free-of-charge reservation"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee's business or association identity code"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+#, fuzzy
+#| msgid "Reservation for %(name)s"
+msgid "Reservee's first name"
+msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee's last name"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee's email address"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee's phone number"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+#, fuzzy
+#| msgid "Reservation for %(name)s"
+msgid "Reservee's organisation name"
+msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee's street address"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee's city"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee's zip code"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee's preferred language"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "User who made the reservation"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reason for denying the reservation"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reason for cancelling the reservation"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Purpose of the reservation"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservee's home city"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Age group of the group or association"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_metadata_set/admin.py
+msgid "Required fields must be a subset of supported fields"
+msgstr ""
+
 #: tilavarauspalvelu/admin/space/admin.py
 msgid "Search by name or unit name"
 msgstr ""
@@ -3023,6 +2845,114 @@ msgctxt "HaukiResourceState"
 msgid "Maintenance"
 msgstr ""
 
+#: tilavarauspalvelu/enums.py
+msgctxt "CustomerType"
+msgid "Business"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "CustomerType"
+msgid "Nonprofit"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "CustomerType"
+msgid "Individual"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationState"
+msgid "Created"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationState"
+msgid "Cancelled"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationState"
+msgid "Requires handling"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationState"
+msgid "Waiting for payment"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationState"
+msgid "Confirmed"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationState"
+msgid "Denied"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationType"
+msgid "Normal"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationType"
+msgid "Blocked"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationType"
+msgid "Staff"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationType"
+msgid "Behalf"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationType"
+msgid "Seasonal"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationTypeStaffChoice"
+msgid "Blocked"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationTypeStaffChoice"
+msgid "Staff"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ReservationTypeStaffChoice"
+msgid "Behalf"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "RejectionReadiness"
+msgid "Interval not allowed"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "RejectionReadiness"
+msgid "Overlapping reservations"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "RejectionReadiness"
+msgid "Reservation unit closed"
+msgstr ""
+
+#: tilavarauspalvelu/models/affecting_time_span/model.py
+msgid "affecting time span"
+msgstr ""
+
+#: tilavarauspalvelu/models/affecting_time_span/model.py
+msgid "affecting time spans"
+msgstr ""
+
 #: tilavarauspalvelu/models/email_template/model.py
 msgid "Email type"
 msgstr ""
@@ -3081,9 +3011,71 @@ msgstr ""
 msgid "Must be the sum of net and vat amounts"
 msgstr ""
 
+#: tilavarauspalvelu/models/rejected_occurrence/model.py
+msgid "Rejected occurrence"
+msgstr ""
+
+#: tilavarauspalvelu/models/rejected_occurrence/model.py
+msgid "Rejected occurrences"
+msgstr ""
+
 #: tilavarauspalvelu/models/reservable_time_span/model.py
 msgid "`start_datetime` must be before `end_datetime`."
 msgstr ""
+
+#: tilavarauspalvelu/models/reservation/actions.py
+#, python-format
+msgid "Reservation for %(name)s"
+msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: tilavarauspalvelu/models/reservation/actions.py
+msgid "Booking details"
+msgstr "Uppgifter om bokningen"
+
+#: tilavarauspalvelu/models/reservation/actions.py
+msgctxt "ical"
+msgid "From"
+msgstr "Börjar"
+
+#: tilavarauspalvelu/models/reservation/actions.py
+msgctxt "ical"
+msgid "To"
+msgstr "Slutar"
+
+#: tilavarauspalvelu/models/reservation/actions.py
+#, python-format
+msgid ""
+"Manage your booking at Varaamo. You can check the details of your booking "
+"and Varaamo's terms of contract and cancellation on the '%(bookings)s' page."
+msgstr ""
+"Hantera din bokning på Varaamo. Du kan kontrollera uppgifterna om din "
+"bokning samt Varaamos avtals- och avbokningsvillkor på sidan '%(bookings)s'."
+
+#: tilavarauspalvelu/models/reservation/actions.py
+msgid "My bookings"
+msgstr "Mina bokningar"
+
+#: tilavarauspalvelu/models/reservation/model.py
+msgid "Closed"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_metadata_field/model.py
+msgid "Field name"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_metadata_field/model.py
+msgid "Reservation metadata field"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_metadata_field/model.py
+msgid "Reservation metadata fields"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_metadata_set/model.py
+#, fuzzy
+#| msgid "Reservation for %(name)s"
+msgid "Reservation metadata sets"
+msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: tilavarauspalvelu/models/terms_of_use/model.py
 msgctxt "singular"

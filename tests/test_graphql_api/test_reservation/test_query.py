@@ -5,7 +5,6 @@ import freezegun
 import pytest
 from graphql_relay import to_global_id
 
-from reservations.enums import CustomerTypeChoice, ReservationTypeChoice
 from tests.factories import (
     PaymentOrderFactory,
     ReservationFactory,
@@ -14,12 +13,13 @@ from tests.factories import (
     UnitGroupFactory,
     UserFactory,
 )
+from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationTypeChoice
 from tilavarauspalvelu.models import PersonalInfoViewLog
 
 from .helpers import reservation_query, reservations_query
 
 if TYPE_CHECKING:
-    from reservations.models import Reservation
+    from tilavarauspalvelu.models import Reservation
 
 # Applied to all tests
 pytestmark = [

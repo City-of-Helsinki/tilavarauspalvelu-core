@@ -3,8 +3,7 @@ from django.db import models
 from graphene_django_extensions import ModelFilterSet
 
 from reservation_units.models import ReservationUnit, ReservationUnitType
-from reservations.models import RecurringReservation
-from tilavarauspalvelu.models import Unit, User
+from tilavarauspalvelu.models import RecurringReservation, Unit, User
 
 __all__ = [
     "RecurringReservationFilterSet",

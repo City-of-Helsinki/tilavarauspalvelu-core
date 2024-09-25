@@ -2,7 +2,6 @@ import datetime
 
 import pytest
 
-from reservations.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from tests.factories import (
     AgeGroupFactory,
     CityFactory,
@@ -13,6 +12,7 @@ from tests.factories import (
     UnitFactory,
     UserFactory,
 )
+from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 
 from .helpers import reservations_query
 

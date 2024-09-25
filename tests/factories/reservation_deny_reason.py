@@ -1,5 +1,5 @@
-from reservations.models import ReservationDenyReason
 from tests.factories._base import GenericDjangoModelFactory
+from tilavarauspalvelu.models import ReservationDenyReason
 
 __all__ = [
     "ReservationDenyReasonFactory",

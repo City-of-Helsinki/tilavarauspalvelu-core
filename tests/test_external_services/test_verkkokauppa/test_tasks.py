@@ -3,9 +3,9 @@ from unittest import mock
 
 import pytest
 
-from reservations.tasks import refund_paid_reservation_task
 from tests.factories import PaymentOrderFactory, ReservationFactory
 from tests.helpers import patch_method
+from tilavarauspalvelu.tasks import refund_paid_reservation_task
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 
 # Applied to all tests

@@ -37,7 +37,7 @@ class UnitQuerySet(models.QuerySet):
         ).order_by(models.OrderBy(models.F("reservation_units_count"), descending=desc))
 
     def order_by_reservation_count(self, *, desc: bool = False) -> Self:
-        from reservations.models import Reservation
+        from tilavarauspalvelu.models import Reservation
 
         return self.alias(
             reservation_count=SubqueryCount(

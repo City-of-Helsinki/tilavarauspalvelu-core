@@ -10,15 +10,13 @@ from django.conf import settings
 from django.utils.timezone import get_default_timezone
 
 from common.utils import get_attr_by_language
-from reservations.enums import CustomerTypeChoice
-from tilavarauspalvelu.enums import EmailType
+from tilavarauspalvelu.enums import CustomerTypeChoice, EmailType
 from tilavarauspalvelu.utils.email.email_builder_base import BaseEmailBuilder, BaseEmailContext
 
 if TYPE_CHECKING:
     from config.utils.commons import LanguageType
-    from reservations.models import Reservation
     from tilavarauspalvelu.admin.email_template.tester import EmailTemplateTesterForm
-    from tilavarauspalvelu.models import EmailTemplate, Location
+    from tilavarauspalvelu.models import EmailTemplate, Location, Reservation
 
 type InstructionNameType = Literal["confirmed", "pending", "cancelled"]
 

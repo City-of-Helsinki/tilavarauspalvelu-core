@@ -19,13 +19,13 @@ from reservation_units.models import (
     ReservationUnitType,
     TaxPercentage,
 )
-from reservations.models import ReservationMetadataSet
 from tilavarauspalvelu.enums import TermsOfUseTypeChoices
 from tilavarauspalvelu.models import (
     OriginHaukiResource,
     PaymentAccounting,
     PaymentMerchant,
     PaymentProduct,
+    ReservationMetadataSet,
     Space,
     TermsOfUse,
     Unit,

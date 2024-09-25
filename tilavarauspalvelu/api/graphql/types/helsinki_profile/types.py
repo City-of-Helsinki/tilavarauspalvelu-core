@@ -7,9 +7,8 @@ from query_optimizer.selections import get_field_selections
 
 from applications.models import Application
 from common.typing import AnyUser, GQLInfo
-from reservations.models import Reservation
 from tilavarauspalvelu.api.graphql.extensions import error_codes
-from tilavarauspalvelu.models import User
+from tilavarauspalvelu.models import Reservation, User
 from tilavarauspalvelu.tasks import save_personal_info_view_log
 
 __all__ = [

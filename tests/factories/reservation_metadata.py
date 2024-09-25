@@ -2,7 +2,7 @@ from collections.abc import Iterable
 
 from factory import fuzzy
 
-from reservations.models import ReservationMetadataField, ReservationMetadataSet
+from tilavarauspalvelu.models import ReservationMetadataField, ReservationMetadataSet
 
 from ._base import GenericDjangoModelFactory, ManyToManyFactory
 

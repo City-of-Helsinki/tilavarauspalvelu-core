@@ -2,9 +2,9 @@ import pytest
 from dateutil.relativedelta import relativedelta
 
 from common.date_utils import local_datetime
-from reservations.models import ReservationStatistic
-from reservations.pruning import prune_reservation_statistics
 from tests.factories import ReservationFactory
+from tilavarauspalvelu.models import ReservationStatistic
+from tilavarauspalvelu.utils.pruning import prune_reservation_statistics
 
 # Applied to all tests
 pytestmark = [

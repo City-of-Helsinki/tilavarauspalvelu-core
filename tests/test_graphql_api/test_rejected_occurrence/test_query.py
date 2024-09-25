@@ -2,8 +2,8 @@ import datetime
 
 import pytest
 
-from reservations.enums import RejectionReadinessChoice
 from tests.factories import RejectedOccurrenceFactory
+from tilavarauspalvelu.enums import RejectionReadinessChoice
 
 from .helpers import rejected_occurrence_query
 

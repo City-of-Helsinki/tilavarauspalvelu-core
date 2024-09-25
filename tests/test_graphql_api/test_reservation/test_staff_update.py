@@ -5,8 +5,6 @@ import pytest
 from django.utils.timezone import get_default_timezone
 
 from common.date_utils import timedelta_to_json
-from reservations.enums import ReservationStateChoice
-from reservations.models import Reservation
 from tests.factories import (
     OriginHaukiResourceFactory,
     ReservableTimeSpanFactory,
@@ -16,6 +14,8 @@ from tests.factories import (
     UserFactory,
 )
 from tests.test_graphql_api.test_reservation.helpers import ADJUST_STAFF_MUTATION
+from tilavarauspalvelu.enums import ReservationStateChoice
+from tilavarauspalvelu.models import Reservation
 
 DEFAULT_TIMEZONE = get_default_timezone()
 

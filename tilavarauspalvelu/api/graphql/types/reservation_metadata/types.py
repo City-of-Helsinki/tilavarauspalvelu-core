@@ -1,6 +1,6 @@
 from graphene_django_extensions import DjangoNode
 
-from reservations.models import ReservationMetadataField, ReservationMetadataSet
+from tilavarauspalvelu.models import ReservationMetadataField, ReservationMetadataSet
 
 from .permissions import ReservationMetadataSetPermission
 

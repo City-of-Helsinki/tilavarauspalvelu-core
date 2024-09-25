@@ -1,6 +1,6 @@
 from factory import fuzzy
 
-from reservations.models import ReservationCancelReason
+from tilavarauspalvelu.models import ReservationCancelReason
 
 from ._base import GenericDjangoModelFactory, OneToManyFactory
 

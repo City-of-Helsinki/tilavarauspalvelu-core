@@ -5,7 +5,6 @@ from django.utils.timezone import get_default_timezone
 from freezegun import freeze_time
 
 from reservation_units.models import ReservationUnit
-from reservations.enums import ReservationStateChoice
 from tests.factories import (
     ApplicationRoundFactory,
     OriginHaukiResourceFactory,
@@ -14,6 +13,7 @@ from tests.factories import (
     ReservationUnitFactory,
     SpaceFactory,
 )
+from tilavarauspalvelu.enums import ReservationStateChoice
 
 DEFAULT_TIMEZONE = get_default_timezone()
 

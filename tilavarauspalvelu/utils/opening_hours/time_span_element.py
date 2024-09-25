@@ -1,11 +1,16 @@
+from __future__ import annotations
+
 import datetime
-import zoneinfo
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import TYPE_CHECKING
 
 from common.date_utils import DEFAULT_TIMEZONE, combine, local_start_of_day
 from tilavarauspalvelu.enums import HaukiResourceState
-from tilavarauspalvelu.utils.opening_hours.hauki_api_types import HaukiAPIOpeningHoursResponseTime
+
+if TYPE_CHECKING:
+    import zoneinfo
+
+    from tilavarauspalvelu.utils.opening_hours.hauki_api_types import HaukiAPIOpeningHoursResponseTime
 
 
 @dataclass(order=True, frozen=False)
@@ -49,7 +54,7 @@ class TimeSpanElement:
 
         return duration_str
 
-    def __copy__(self) -> "TimeSpanElement":
+    def __copy__(self) -> TimeSpanElement:
         return TimeSpanElement(
             start_datetime=self.start_datetime,
             end_datetime=self.end_datetime,
@@ -75,7 +80,7 @@ class TimeSpanElement:
         date: datetime.date,
         timezone: zoneinfo.ZoneInfo,
         time_element: HaukiAPIOpeningHoursResponseTime,
-    ) -> Optional["TimeSpanElement"]:
+    ) -> TimeSpanElement | None:
         # We only care if the resource is reservable or closed on the time frame.
         # That means we can ignore all other states (OPEN, SELF_SERVICE, WEATHER_PERMITTING, etc.)
         time_element_state = HaukiResourceState.get(time_element["resource_state"])
@@ -158,7 +163,7 @@ class TimeSpanElement:
         if self.start_datetime.microsecond > 0 or self.start_datetime.second > 0:
             self.start_datetime = self.start_datetime.replace(second=0, microsecond=0) + datetime.timedelta(minutes=1)
 
-    def overlaps_with(self, other: "TimeSpanElement") -> bool:
+    def overlaps_with(self, other: TimeSpanElement) -> bool:
         """
         Does this time spans overlap with the other time span?
 
@@ -180,7 +185,7 @@ class TimeSpanElement:
         """
         return self.start_datetime < other.buffered_end_datetime and self.end_datetime > other.buffered_start_datetime
 
-    def fully_inside_of(self, other: "TimeSpanElement") -> bool:
+    def fully_inside_of(self, other: TimeSpanElement) -> bool:
         """
         Does this time spans fully overlap with the other time span?
 
@@ -202,7 +207,7 @@ class TimeSpanElement:
         """
         return self.start_datetime >= other.buffered_start_datetime and self.end_datetime <= other.buffered_end_datetime
 
-    def starts_inside_of(self, other: "TimeSpanElement") -> bool:
+    def starts_inside_of(self, other: TimeSpanElement) -> bool:
         """
         Does this time spans start inside the other time span?
 
@@ -224,7 +229,7 @@ class TimeSpanElement:
         """
         return other.buffered_start_datetime <= self.start_datetime < other.buffered_end_datetime
 
-    def ends_inside_of(self, other: "TimeSpanElement") -> bool:
+    def ends_inside_of(self, other: TimeSpanElement) -> bool:
         """
         Does this time spans end inside the other time span?
 
@@ -250,7 +255,7 @@ class TimeSpanElement:
         self,
         filter_time_start: datetime.time | None,
         filter_time_end: datetime.time | None,
-    ) -> list["TimeSpanElement"]:
+    ) -> list[TimeSpanElement]:
         """
         Generate a list of closed time spans for this time span based on given filter time values.
 

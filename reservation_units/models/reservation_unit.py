@@ -26,12 +26,12 @@ from reservation_units.querysets import ReservationUnitQuerySet
 
 if TYPE_CHECKING:
     from reservation_units.models import ReservationUnitCancellationRule, ReservationUnitType
-    from reservations.models import ReservationMetadataSet
     from tilavarauspalvelu.models import (
         OriginHaukiResource,
         PaymentAccounting,
         PaymentMerchant,
         PaymentProduct,
+        ReservationMetadataSet,
         TermsOfUse,
         Unit,
     )
@@ -146,7 +146,7 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
         on_delete=models.PROTECT,
     )
     metadata_set: ReservationMetadataSet | None = models.ForeignKey(
-        "reservations.ReservationMetadataSet",
+        "tilavarauspalvelu.ReservationMetadataSet",
         related_name="reservation_units",
         null=True,
         blank=True,
