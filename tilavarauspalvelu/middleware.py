@@ -48,6 +48,17 @@ class MultipleProxyMiddleware:
         return self.get_response(request)
 
 
+class KeycloakRefreshTokenExpiredMiddleware:
+    def __init__(self, get_response: Callable[[WSGIRequest], HttpResponse]) -> None:
+        self.get_response = get_response
+
+    def __call__(self, request: WSGIRequest) -> HttpResponse:
+        response = self.get_response(request)
+        if "keycloak_refresh_token_expired" in request.session:
+            response["X-Keycloak-Refresh-Token-Expired"] = "true"
+        return response
+
+
 class GraphQLSentryMiddleware:
     def resolve(self, next_, root, info, **kwargs):
         try:

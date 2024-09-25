@@ -473,8 +473,19 @@ class KeyCloakClient(BaseExternalServiceClient):
             # Delegate refresh to OAuth backend.
             response: RefreshResponse = cls.oidc_backend.refresh_token(token=keycloak_refresh_token)
         except HTTPError as error:
-            msg = f"Unable to refresh keycloak token for user {int(user.pk)}: {error.response.text}"
-            SentryLogger.log_exception(error, details=msg)
+            try:
+                # Catch known error for expired keycloak refresh token. This cannot be solved without a
+                # logging out and back in again. Set a flag in the session which is used by the
+                # `KeycloakRefreshTokenExpiredMiddleware` middleware to set a response header to indicate
+                # to frontend that the token is expired.
+                error_data = error.response.json()
+                if "error" in error_data and error_data["error"] == "invalid_grant":
+                    session["keycloak_refresh_token_expired"] = True
+
+            except Exception:
+                msg = f"Unable to refresh keycloak token for user {int(user.pk)}: {error.response.text}"
+                SentryLogger.log_exception(error, details=msg)
+
             return None
 
         now = local_datetime()
