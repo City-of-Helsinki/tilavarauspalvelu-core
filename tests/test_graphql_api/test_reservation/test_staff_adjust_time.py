@@ -6,9 +6,8 @@ import pytest
 from common.date_utils import DEFAULT_TIMEZONE, local_datetime, next_hour
 from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import ReservationUnitHierarchy
-from reservations.enums import ReservationStateChoice, ReservationTypeChoice
 from tests.factories import EmailTemplateFactory, ReservationFactory
-from tilavarauspalvelu.enums import EmailType
+from tilavarauspalvelu.enums import EmailType, ReservationStateChoice, ReservationTypeChoice
 
 from .helpers import ADJUST_STAFF_MUTATION, get_staff_adjust_data
 

@@ -4,7 +4,7 @@ import factory
 from factory import fuzzy
 
 from common.date_utils import DEFAULT_TIMEZONE
-from reservations.models import RecurringReservation
+from tilavarauspalvelu.models import RecurringReservation
 
 from ._base import GenericDjangoModelFactory, OneToManyFactory
 

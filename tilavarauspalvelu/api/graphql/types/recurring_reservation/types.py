@@ -3,7 +3,7 @@ from django.db import models
 from graphene_django_extensions import DjangoNode
 
 from common.typing import GQLInfo
-from reservations.models import RecurringReservation
+from tilavarauspalvelu.models import RecurringReservation
 
 from .filtersets import RecurringReservationFilterSet
 from .permissions import RecurringReservationPermission

@@ -1,8 +1,8 @@
 import freezegun
 import pytest
 
-from reservations.enums import RejectionReadinessChoice
 from tests.factories import RecurringReservationFactory
+from tilavarauspalvelu.enums import RejectionReadinessChoice
 
 from .helpers import recurring_reservations_query
 

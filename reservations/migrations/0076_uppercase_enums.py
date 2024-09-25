@@ -1,16 +1,11 @@
-from typing import TYPE_CHECKING
-
 from django.db import migrations, models
 from django.db.models import F
 from django.db.models.functions import Lower, Upper
 
-if TYPE_CHECKING:
-    from reservations import models as rm
-
 
 def uppercase_enums(apps, schema_editor):
-    Reservation: rm.Reservation = apps.get_model("reservations", "Reservation")
-    ReservationStatistic: rm.ReservationStatistic = apps.get_model("reservations", "ReservationStatistic")
+    Reservation = apps.get_model("reservations", "Reservation")
+    ReservationStatistic = apps.get_model("reservations", "ReservationStatistic")
 
     Reservation.objects.all().update(
         state=Upper(F("state")),
@@ -23,8 +18,8 @@ def uppercase_enums(apps, schema_editor):
 
 
 def lowercase_enums(apps, schema_editor):
-    Reservation: rm.Reservation = apps.get_model("reservations", "Reservation")
-    ReservationStatistic: rm.ReservationStatistic = apps.get_model("reservations", "ReservationStatistic")
+    Reservation = apps.get_model("reservations", "Reservation")
+    ReservationStatistic = apps.get_model("reservations", "ReservationStatistic")
 
     Reservation.objects.all().update(
         state=Lower(F("state")),

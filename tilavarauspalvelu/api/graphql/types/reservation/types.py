@@ -11,12 +11,10 @@ from common.db import SubqueryArray
 from common.typing import AnyUser, GQLInfo
 from common.utils import ical_hmac_signature
 from reservation_units.models import ReservationUnit
-from reservations.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
-from reservations.enums import ReservationTypeChoice as ReservationTypeField
-from reservations.models import Reservation
-from reservations.querysets import ReservationQuerySet
 from tilavarauspalvelu.api.graphql.types.merchants.types import PaymentOrderNode
-from tilavarauspalvelu.models import PaymentOrder, User
+from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.models import PaymentOrder, Reservation, User
+from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
 
 from .filtersets import ReservationFilterSet
 from .permissions import ReservationPermission
@@ -41,12 +39,12 @@ class ReservationNode(DjangoNode):
 
     reservee_name = AnnotatedField(graphene.String, expression=L("reservee_name"))
 
-    is_blocked = AnnotatedField(graphene.Boolean, expression=models.Q(type=ReservationTypeField.BLOCKED.value))
+    is_blocked = AnnotatedField(graphene.Boolean, expression=models.Q(type=ReservationTypeChoice.BLOCKED.value))
     is_handled = AnnotatedField(graphene.Boolean, expression=models.Q(handled_at__isnull=False))
 
     staff_event = AnnotatedField(
         graphene.Boolean,
-        expression=models.Q(type=ReservationTypeField.STAFF.value),
+        expression=models.Q(type=ReservationTypeChoice.STAFF.value),
         deprecation_reason="Please use to 'type' instead.",
     )
 

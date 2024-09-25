@@ -8,17 +8,17 @@ from rest_framework import serializers
 from applications.models import City
 from common.date_utils import local_datetime
 from reservation_units.models import ReservationUnit
-from reservations.enums import (
+from tilavarauspalvelu.api.graphql.extensions.fields import OldChoiceCharField
+from tilavarauspalvelu.api.graphql.extensions.serializers import OldPrimaryKeySerializer
+from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
+from tilavarauspalvelu.api.graphql.types.reservation.serializers.mixins import ReservationSchedulingMixin
+from tilavarauspalvelu.enums import (
     RESERVEE_LANGUAGE_CHOICES,
     CustomerTypeChoice,
     ReservationStateChoice,
     ReservationTypeChoice,
 )
-from reservations.models import AgeGroup, RecurringReservation, Reservation, ReservationPurpose
-from tilavarauspalvelu.api.graphql.extensions.fields import OldChoiceCharField
-from tilavarauspalvelu.api.graphql.extensions.serializers import OldPrimaryKeySerializer
-from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
-from tilavarauspalvelu.api.graphql.types.reservation.serializers.mixins import ReservationSchedulingMixin
+from tilavarauspalvelu.models import AgeGroup, RecurringReservation, Reservation, ReservationPurpose
 
 if TYPE_CHECKING:
     from common.typing import AnyUser

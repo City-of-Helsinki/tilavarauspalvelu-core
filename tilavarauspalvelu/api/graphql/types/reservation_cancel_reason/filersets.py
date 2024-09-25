@@ -1,7 +1,7 @@
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import IntMultipleChoiceFilter
 
-from reservations.models import ReservationPurpose
+from tilavarauspalvelu.models import ReservationPurpose
 
 __all__ = [
     "ReservationCancelReasonFilterSet",

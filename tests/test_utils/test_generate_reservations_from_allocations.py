@@ -1,5 +1,6 @@
 import datetime
 import re
+from typing import TYPE_CHECKING
 
 import freezegun
 import pytest
@@ -8,19 +9,22 @@ from applications.enums import ApplicantTypeChoice, Weekday
 from applications.tasks import generate_reservation_series_from_allocations
 from common.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_datetime, local_iso_format
 from reservation_units.models import ReservationUnitHierarchy
-from reservations.enums import (
+from tests.factories import AllocatedTimeSlotFactory, ReservationFactory
+from tests.helpers import patch_method
+from tilavarauspalvelu.enums import (
     CustomerTypeChoice,
+    HaukiResourceState,
     RejectionReadinessChoice,
     ReservationStateChoice,
     ReservationTypeChoice,
 )
-from reservations.models import AffectingTimeSpan, RecurringReservation, RejectedOccurrence, Reservation
-from tests.factories import AllocatedTimeSlotFactory, ReservationFactory
-from tests.helpers import patch_method
-from tilavarauspalvelu.enums import HaukiResourceState
+from tilavarauspalvelu.models import AffectingTimeSpan, RecurringReservation, RejectedOccurrence
 from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.utils.opening_hours.hauki_api_types import HaukiAPIDatePeriod
 from utils.sentry import SentryLogger
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import Reservation
 
 pytestmark = [
     pytest.mark.django_db,

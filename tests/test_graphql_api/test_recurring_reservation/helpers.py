@@ -5,7 +5,7 @@ from typing import Any
 from graphene_django_extensions.testing import build_mutation, build_query
 
 from reservation_units.models import ReservationUnit
-from reservations.enums import ReservationTypeChoice
+from tilavarauspalvelu.enums import ReservationTypeChoice
 from tilavarauspalvelu.models import User
 
 recurring_reservations_query = partial(build_query, "recurringReservations", connection=True, order_by="nameAsc")

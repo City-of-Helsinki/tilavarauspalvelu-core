@@ -6,8 +6,8 @@ from django.utils.timezone import get_default_timezone
 from graphene_django_extensions.testing import build_query
 
 from reservation_units.models import ReservationUnitHierarchy
-from reservations.enums import ReservationStateChoice
 from tests.factories import ReservationFactory, ReservationUnitFactory, SpaceFactory, UnitFactory
+from tilavarauspalvelu.enums import ReservationStateChoice
 
 # Applied to all tests
 pytestmark = [

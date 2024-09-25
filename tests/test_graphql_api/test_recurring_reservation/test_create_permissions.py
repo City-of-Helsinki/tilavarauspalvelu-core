@@ -1,7 +1,7 @@
 import pytest
 
-from reservations.models import RecurringReservation
 from tests.factories import ReservationUnitFactory, UserFactory
+from tilavarauspalvelu.models import RecurringReservation
 
 from .helpers import CREATE_MUTATION, get_minimal_create_date
 

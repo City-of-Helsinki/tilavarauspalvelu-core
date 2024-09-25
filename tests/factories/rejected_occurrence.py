@@ -3,8 +3,8 @@ import datetime
 import factory
 from factory import fuzzy
 
-from reservations.enums import RejectionReadinessChoice
-from reservations.models import RejectedOccurrence
+from tilavarauspalvelu.enums import RejectionReadinessChoice
+from tilavarauspalvelu.models import RejectedOccurrence
 
 from ._base import GenericDjangoModelFactory
 

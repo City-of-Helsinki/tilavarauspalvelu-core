@@ -1,6 +1,6 @@
 from graphene_django_extensions import DjangoNode
 
-from reservations.models import RejectedOccurrence
+from tilavarauspalvelu.models import RejectedOccurrence
 
 from .filtersets import RejectedOccurrenceFilterSet
 from .permissions import RejectedOccurrencePermission

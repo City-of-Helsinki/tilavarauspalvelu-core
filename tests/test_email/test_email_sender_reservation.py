@@ -13,7 +13,7 @@ from tilavarauspalvelu.utils.email.email_sender import EmailNotificationSender
 from tilavarauspalvelu.utils.email.reservation_email_notification_sender import ReservationEmailNotificationSender
 
 if TYPE_CHECKING:
-    from reservations.models import Reservation
+    from tilavarauspalvelu.models import Reservation
 
 # Applied to all tests
 pytestmark = [

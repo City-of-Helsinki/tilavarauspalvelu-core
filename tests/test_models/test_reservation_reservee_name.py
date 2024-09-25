@@ -3,8 +3,8 @@ from typing import Any, NamedTuple
 import pytest
 from graphene_django_extensions.testing.utils import parametrize_helper
 
-from reservations.enums import CustomerTypeChoice, ReservationTypeChoice
-from tests.factories import RecurringReservationFactory, ReservationFactory
+from tests.factories import ReservationFactory
+from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationTypeChoice
 
 
 class Params(NamedTuple):
@@ -26,7 +26,7 @@ class Params(NamedTuple):
             "Type: STAFF | Recurring Reservation": Params(
                 fields={
                     "type": ReservationTypeChoice.STAFF,
-                    "recurring_reservation": RecurringReservationFactory.build(name="Recurring"),
+                    "recurring_reservation__name": "Recurring",
                     "name": "Reservation Name",
                     "reservee_first_name": "First",
                     "reservee_last_name": "Last",
@@ -36,7 +36,7 @@ class Params(NamedTuple):
             "Type: STAFF | Recurring Reservation has no name": Params(
                 fields={
                     "type": ReservationTypeChoice.STAFF,
-                    "recurring_reservation": RecurringReservationFactory.build(name=""),
+                    "recurring_reservation__name": "",
                     "name": "Reservation Name",
                     "reservee_first_name": "First",
                     "reservee_last_name": "Last",

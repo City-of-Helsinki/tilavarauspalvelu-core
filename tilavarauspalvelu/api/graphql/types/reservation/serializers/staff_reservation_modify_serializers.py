@@ -7,17 +7,17 @@ from rest_framework import serializers
 
 from applications.models import City
 from reservation_units.models import ReservationUnit
-from reservations.enums import (
+from tilavarauspalvelu.api.graphql.extensions.fields import DurationField
+from tilavarauspalvelu.api.graphql.extensions.serializers import OldPrimaryKeyUpdateSerializer
+from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
+from tilavarauspalvelu.api.graphql.types.reservation.serializers.mixins import ReservationSchedulingMixin
+from tilavarauspalvelu.enums import (
     RESERVEE_LANGUAGE_CHOICES,
     CustomerTypeChoice,
     ReservationStateChoice,
     ReservationTypeChoice,
 )
-from reservations.models import AgeGroup, Reservation, ReservationPurpose
-from tilavarauspalvelu.api.graphql.extensions.fields import DurationField
-from tilavarauspalvelu.api.graphql.extensions.serializers import OldPrimaryKeyUpdateSerializer
-from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
-from tilavarauspalvelu.api.graphql.types.reservation.serializers.mixins import ReservationSchedulingMixin
+from tilavarauspalvelu.models import AgeGroup, Reservation, ReservationPurpose
 
 DEFAULT_TIMEZONE = get_default_timezone()
 

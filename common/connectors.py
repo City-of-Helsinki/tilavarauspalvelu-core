@@ -5,7 +5,6 @@ __all__ = [
     "ApplicationActionsConnector",
     "ApplicationRoundActionsConnector",
     "ApplicationSectionActionsConnector",
-    "ReservationActionsConnector",
     "ReservationUnitActionsConnector",
     "SuitableTimeRangeActionsConnector",
 ]
@@ -77,27 +76,3 @@ class ReservationUnitActionsConnector:
         from actions.reservation_unit import ReservationUnitActions
 
         return ReservationUnitActions(instance)
-
-
-class ReservationActionsConnector:
-    def __get__(self, instance, _):
-        _raise_if_accessed_on_class(instance)
-        from actions.reservation import ReservationActions
-
-        return ReservationActions(instance)
-
-
-class RecurringReservationActionsConnector:
-    def __get__(self, instance, _):
-        _raise_if_accessed_on_class(instance)
-        from actions.recurring_reservation import RecurringReservationActions
-
-        return RecurringReservationActions(instance)
-
-
-class RejectedOccurrenceActionsConnector:
-    def __get__(self, instance, _):
-        _raise_if_accessed_on_class(instance)
-        from actions.rejected_occurrence import RejectedOccurrenceActions
-
-        return RejectedOccurrenceActions(instance)

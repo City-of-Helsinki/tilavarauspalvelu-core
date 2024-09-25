@@ -1,6 +1,6 @@
 from graphene_django_extensions import DjangoNode
 
-from reservations.models import AbilityGroup
+from tilavarauspalvelu.models import AbilityGroup
 
 from .permissions import AbilityGroupPermission
 

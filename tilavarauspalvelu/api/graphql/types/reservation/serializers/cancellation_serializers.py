@@ -5,11 +5,10 @@ from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from rest_framework.exceptions import ValidationError
 
 from common.date_utils import local_datetime
-from reservations.enums import ReservationStateChoice
-from reservations.models import Reservation
-from reservations.tasks import refund_paid_reservation_task
 from tilavarauspalvelu.api.graphql.extensions import error_codes
-from tilavarauspalvelu.enums import OrderStatus
+from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
+from tilavarauspalvelu.models import Reservation
+from tilavarauspalvelu.tasks import refund_paid_reservation_task
 from tilavarauspalvelu.utils.email.reservation_email_notification_sender import ReservationEmailNotificationSender
 
 if TYPE_CHECKING:

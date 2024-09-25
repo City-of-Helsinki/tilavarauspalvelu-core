@@ -62,7 +62,7 @@ class ApplicationRound(models.Model):
         related_name="application_rounds",
     )
     purposes = models.ManyToManyField(
-        "reservations.ReservationPurpose",
+        "tilavarauspalvelu.ReservationPurpose",
         related_name="application_rounds",
     )
     terms_of_use = models.ForeignKey(
@@ -215,7 +215,7 @@ class ApplicationRound(models.Model):
 
     @lookup_property(skip_codegen=True)
     def reservation_creation_status() -> ApplicationRoundReservationCreationStatusChoice:
-        from reservations.models import RecurringReservation
+        from tilavarauspalvelu.models import RecurringReservation
 
         timeout = timedelta(minutes=settings.APPLICATION_ROUND_RESERVATION_CREATION_TIMEOUT_MINUTES)
 
@@ -244,7 +244,7 @@ class ApplicationRound(models.Model):
 
     @reservation_creation_status.override
     def _(self) -> ApplicationRoundReservationCreationStatusChoice:
-        from reservations.models import RecurringReservation
+        from tilavarauspalvelu.models import RecurringReservation
 
         now = local_datetime()
         timeout = timedelta(minutes=settings.APPLICATION_ROUND_RESERVATION_CREATION_TIMEOUT_MINUTES)

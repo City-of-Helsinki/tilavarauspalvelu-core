@@ -4,8 +4,8 @@ import pytest
 from django.utils.timezone import get_default_timezone
 from freezegun import freeze_time
 
-from reservations.enums import CustomerTypeChoice
 from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory, UserFactory
+from tilavarauspalvelu.enums import CustomerTypeChoice
 from tilavarauspalvelu.utils.verkkokauppa.exceptions import UnsupportedMetaKeyError
 from tilavarauspalvelu.utils.verkkokauppa.helpers import (
     get_formatted_reservation_time,

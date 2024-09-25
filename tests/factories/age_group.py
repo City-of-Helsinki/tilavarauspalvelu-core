@@ -1,6 +1,6 @@
 from factory import fuzzy
 
-from reservations.models import AgeGroup
+from tilavarauspalvelu.models import AgeGroup
 
 from ._base import GenericDjangoModelFactory
 

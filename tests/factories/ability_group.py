@@ -1,6 +1,6 @@
 from factory import fuzzy
 
-from reservations.models import AbilityGroup
+from tilavarauspalvelu.models import AbilityGroup
 
 from ._base import GenericDjangoModelFactory
 

@@ -17,8 +17,7 @@ from common.date_utils import local_datetime, local_datetime_max, local_datetime
 from reservation_units.utils.first_reservable_time_helper.first_reservable_time_reservation_unit_helper import (
     ReservationUnitFirstReservableTimeHelper,
 )
-from reservations.models import AffectingTimeSpan
-from tilavarauspalvelu.models import ReservableTimeSpan
+from tilavarauspalvelu.models import AffectingTimeSpan, ReservableTimeSpan
 from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
 from tilavarauspalvelu.utils.opening_hours.time_span_element_utils import merge_overlapping_time_span_elements
 

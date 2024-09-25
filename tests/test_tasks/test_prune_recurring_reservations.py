@@ -4,9 +4,9 @@ import pytest
 from freezegun import freeze_time
 
 from common.date_utils import local_datetime
-from reservations.models import RecurringReservation
-from reservations.pruning import prune_recurring_reservations
 from tests.factories import RecurringReservationFactory
+from tilavarauspalvelu.models import RecurringReservation
+from tilavarauspalvelu.utils.pruning import prune_recurring_reservations
 
 # Applied to all tests
 pytestmark = [

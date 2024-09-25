@@ -1,6 +1,6 @@
 from graphene_django_extensions import DjangoNode
 
-from reservations.models import AgeGroup
+from tilavarauspalvelu.models import AgeGroup
 
 from .permissions import AgeGroupPermission
 

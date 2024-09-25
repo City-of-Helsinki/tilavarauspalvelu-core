@@ -5,8 +5,6 @@ import pytest
 from django.utils.timezone import get_default_timezone
 
 from applications.models import City
-from reservations.enums import CustomerTypeChoice, ReservationStateChoice
-from reservations.models import AgeGroup, ReservationStatistic
 from tests.factories import (
     RecurringReservationFactory,
     ReservationCancelReasonFactory,
@@ -15,6 +13,8 @@ from tests.factories import (
     ReservationUnitFactory,
     UnitFactory,
 )
+from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice
+from tilavarauspalvelu.models import AgeGroup, ReservationStatistic
 
 # Applied to all tests
 pytestmark = [

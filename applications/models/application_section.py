@@ -19,7 +19,7 @@ from common.db import SubqueryCount
 
 if TYPE_CHECKING:
     from applications.models import Application
-    from reservations.models import AgeGroup, ReservationPurpose
+    from tilavarauspalvelu.models import AgeGroup, ReservationPurpose
 
 __all__ = [
     "ApplicationSection",
@@ -66,13 +66,13 @@ class ApplicationSection(SerializableMixin, models.Model):
     # purposes and age groups might get deleted, and the application
     # section should still remain in the database
     purpose: ReservationPurpose | None = models.ForeignKey(
-        "reservations.ReservationPurpose",
+        "tilavarauspalvelu.ReservationPurpose",
         null=True,
         on_delete=models.SET_NULL,
         related_name="application_sections",
     )
     age_group: AgeGroup | None = models.ForeignKey(
-        "reservations.AgeGroup",
+        "tilavarauspalvelu.AgeGroup",
         null=True,
         on_delete=models.SET_NULL,
         related_name="application_sections",

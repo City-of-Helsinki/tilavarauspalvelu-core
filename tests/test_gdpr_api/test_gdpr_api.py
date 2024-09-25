@@ -9,18 +9,16 @@ from django.utils import timezone
 from freezegun import freeze_time
 from rest_framework.exceptions import ErrorDetail
 
-from reservations.enums import ReservationStateChoice
 from tests.factories import ApplicationFactory, PaymentOrderFactory, ReservationFactory, UserFactory
 from tests.helpers import patch_method
-from tilavarauspalvelu.enums import OrderStatus
+from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
 from utils.sentry import SentryLogger
 
 from .helpers import get_gdpr_auth_header, patch_oidc_config
 
 if TYPE_CHECKING:
     from applications.models import Application, ApplicationSection
-    from reservations.models import Reservation
-    from tilavarauspalvelu.models import User
+    from tilavarauspalvelu.models import Reservation, User
 
 # Applied to all tests
 pytestmark = [

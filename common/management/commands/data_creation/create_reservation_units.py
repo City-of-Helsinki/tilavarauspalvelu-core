@@ -26,9 +26,16 @@ from reservation_units.models import (
     ReservationUnitType,
     TaxPercentage,
 )
-from reservations.models import ReservationMetadataSet
 from tilavarauspalvelu.enums import TermsOfUseTypeChoices
-from tilavarauspalvelu.models import OriginHaukiResource, ReservableTimeSpan, Resource, Service, TermsOfUse, Unit
+from tilavarauspalvelu.models import (
+    OriginHaukiResource,
+    ReservableTimeSpan,
+    ReservationMetadataSet,
+    Resource,
+    Service,
+    TermsOfUse,
+    Unit,
+)
 
 from .create_seasonal_booking import _create_application_round_time_slots
 from .utils import (

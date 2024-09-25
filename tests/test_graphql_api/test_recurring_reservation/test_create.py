@@ -4,8 +4,8 @@ import pytest
 
 from common.date_utils import local_date
 from reservation_units.enums import ReservationStartInterval
-from reservations.models import RecurringReservation
 from tests.factories import AbilityGroupFactory, AgeGroupFactory, ReservationUnitFactory
+from tilavarauspalvelu.models import RecurringReservation
 
 from .helpers import CREATE_MUTATION, get_minimal_create_date
 

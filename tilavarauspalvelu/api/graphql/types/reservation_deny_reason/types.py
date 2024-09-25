@@ -1,7 +1,7 @@
 from graphene_django_extensions import DjangoNode
 from graphene_django_extensions.permissions import AllowAuthenticated
 
-from reservations.models import ReservationDenyReason
+from tilavarauspalvelu.models import ReservationDenyReason
 
 from .filtersets import ReservationDenyReasonFilterSet
 

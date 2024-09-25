@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from lookup_property import L
 
 from applications.enums import ApplicationRoundStatusChoice, ApplicationSectionStatusChoice, ApplicationStatusChoice
-from reservations.models import AgeGroup, ReservationPurpose
+from tilavarauspalvelu.models import AgeGroup, ReservationPurpose
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet

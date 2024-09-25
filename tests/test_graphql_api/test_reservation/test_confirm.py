@@ -4,7 +4,6 @@ import pytest
 from graphene_django_extensions.testing import build_mutation
 
 from reservation_units.enums import PricingType
-from reservations.enums import ReservationStateChoice
 from tests.factories import (
     EmailTemplateFactory,
     OrderFactory,
@@ -14,7 +13,7 @@ from tests.factories import (
     UserFactory,
 )
 from tests.helpers import patch_method
-from tilavarauspalvelu.enums import EmailType, OrderStatus, PaymentType, ReservationNotification
+from tilavarauspalvelu.enums import EmailType, OrderStatus, PaymentType, ReservationNotification, ReservationStateChoice
 from tilavarauspalvelu.models import PaymentOrder
 from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CreateOrderError
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient

@@ -6,10 +6,9 @@ from graphene_django_extensions import CreateMutation, DeleteMutation, UpdateMut
 
 from common.date_utils import local_datetime
 from common.typing import AnyUser
-from reservations.enums import ReservationStateChoice
-from reservations.models import Reservation
 from tilavarauspalvelu.api.graphql.types.merchants.types import PaymentOrderNode
-from tilavarauspalvelu.enums import OrderStatus
+from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
+from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CancelOrderError
 
 from .permissions import (

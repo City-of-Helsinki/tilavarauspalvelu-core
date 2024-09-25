@@ -2,7 +2,7 @@ from django.db import models
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import IntMultipleChoiceFilter
 
-from reservations.models import ReservationDenyReason
+from tilavarauspalvelu.models import ReservationDenyReason
 
 __all__ = [
     "ReservationDenyReasonFilterSet",

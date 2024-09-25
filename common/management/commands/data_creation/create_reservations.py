@@ -9,8 +9,8 @@ from typing import TYPE_CHECKING
 from applications.models import City
 from common.date_utils import local_start_of_day
 from reservation_units.models import ReservationUnit, ReservationUnitPricing
-from reservations.enums import CustomerTypeChoice, ReservationStateChoice
-from reservations.models import (
+from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice
+from tilavarauspalvelu.models import (
     AgeGroup,
     Reservation,
     ReservationCancelReason,
@@ -18,8 +18,8 @@ from reservations.models import (
     ReservationMetadataField,
     ReservationMetadataSet,
     ReservationPurpose,
+    User,
 )
-from tilavarauspalvelu.models import User
 
 from .utils import FieldCombination, SetName, faker_fi, weighted_choice, with_logs
 

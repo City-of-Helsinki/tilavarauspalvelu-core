@@ -5,8 +5,8 @@ import pytest
 from freezegun import freeze_time
 
 from reservation_units.models import ReservationUnitHierarchy
-from reservations.enums import ReservationStateChoice, ReservationTypeChoice
 from tests.factories import ReservationFactory, ReservationUnitFactory, SpaceFactory
+from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
 
 if TYPE_CHECKING:
     from reservation_units.models import ReservationUnit

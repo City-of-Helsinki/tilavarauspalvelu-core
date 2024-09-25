@@ -5,14 +5,14 @@ from django.utils.timezone import get_default_timezone
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
 
 from reservation_units.models import ReservationUnit
-from reservations.enums import ReservationStateChoice, ReservationTypeChoice
-from reservations.models import Reservation
 from tilavarauspalvelu.api.graphql.extensions.serializers import OldPrimaryKeyUpdateSerializer
 from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from tilavarauspalvelu.api.graphql.types.reservation.serializers.mixins import (
     ReservationPriceMixin,
     ReservationSchedulingMixin,
 )
+from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.utils.email.reservation_email_notification_sender import ReservationEmailNotificationSender
 
 DEFAULT_TIMEZONE = get_default_timezone()

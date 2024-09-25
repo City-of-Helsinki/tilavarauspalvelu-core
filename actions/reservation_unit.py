@@ -17,8 +17,7 @@ if TYPE_CHECKING:
     from django.db import models
 
     from reservation_units.models import ReservationUnit
-    from reservations.models import Reservation
-    from tilavarauspalvelu.models import Building, Location, ReservableTimeSpan
+    from tilavarauspalvelu.models import Building, Location, ReservableTimeSpan, Reservation
 
 __all__ = [
     "ReservationUnitActions",
@@ -193,8 +192,8 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         end_datetime: datetime.datetime,
         reservation: Reservation | None = None,
     ) -> bool:
-        from reservations.enums import ReservationStateChoice
-        from reservations.models import Reservation
+        from tilavarauspalvelu.enums import ReservationStateChoice
+        from tilavarauspalvelu.models import Reservation
 
         qs = Reservation.objects.filter(
             reservation_unit__in=self.reservation_units_with_common_hierarchy,
@@ -214,8 +213,8 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         reservation: Reservation | None = None,
         exclude_blocked: bool = False,
     ) -> Reservation | None:
-        from reservations.enums import ReservationStateChoice, ReservationTypeChoice
-        from reservations.models import Reservation
+        from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
+        from tilavarauspalvelu.models import Reservation
 
         qs = Reservation.objects.filter(
             reservation_unit__in=self.reservation_units_with_common_hierarchy,
@@ -236,8 +235,8 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         reservation: Reservation | None = None,
         exclude_blocked: bool = False,
     ) -> Reservation | None:
-        from reservations.enums import ReservationStateChoice, ReservationTypeChoice
-        from reservations.models import Reservation
+        from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
+        from tilavarauspalvelu.models import Reservation
 
         qs = Reservation.objects.filter(
             reservation_unit__in=self.reservation_units_with_common_hierarchy,
