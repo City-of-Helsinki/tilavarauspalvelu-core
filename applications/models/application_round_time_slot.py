@@ -10,12 +10,12 @@ from applications.validators import validate_reservable_times
 from common.fields.model import IntChoiceField
 
 if TYPE_CHECKING:
-    from reservation_units.models import ReservationUnit
+    from tilavarauspalvelu.models import ReservationUnit
 
 
 class ApplicationRoundTimeSlot(models.Model):
     reservation_unit: "ReservationUnit" = models.ForeignKey(
-        "reservation_units.ReservationUnit",
+        "tilavarauspalvelu.ReservationUnit",
         on_delete=models.CASCADE,
         related_name="application_round_time_slots",
     )

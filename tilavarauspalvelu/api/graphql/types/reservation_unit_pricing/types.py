@@ -1,7 +1,7 @@
 import graphene
 from graphene_django_extensions import DjangoNode
 
-from reservation_units.models import ReservationUnitPricing
+from tilavarauspalvelu.models import ReservationUnitPricing
 
 
 class ReservationUnitPricingNode(DjangoNode):

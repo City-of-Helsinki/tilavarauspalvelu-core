@@ -1,8 +1,8 @@
 import factory
 from factory import fuzzy
 
-from reservation_units.models import Equipment, EquipmentCategory
 from tests.factories._base import GenericDjangoModelFactory
+from tilavarauspalvelu.models import Equipment, EquipmentCategory
 
 __all__ = [
     "EquipmentCategoryFactory",

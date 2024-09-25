@@ -1,6 +1,6 @@
 from graphene_django_extensions import CreateMutation, DeleteMutation, UpdateMutation
 
-from reservation_units.models import ReservationUnitImage
+from tilavarauspalvelu.models import ReservationUnitImage
 
 from .permissions import ReservationUnitImagePermission
 from .serializers import ReservationUnitImageCreateSerializer, ReservationUnitImageUpdateSerializer

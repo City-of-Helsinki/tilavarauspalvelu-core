@@ -1,7 +1,7 @@
 import factory
 from factory import fuzzy
 
-from reservation_units.models import Keyword, KeywordCategory, KeywordGroup
+from tilavarauspalvelu.models import Keyword, KeywordCategory, KeywordGroup
 
 from ._base import GenericDjangoModelFactory
 

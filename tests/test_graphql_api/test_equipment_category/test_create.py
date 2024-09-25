@@ -1,6 +1,6 @@
 import pytest
 
-from reservation_units.models import EquipmentCategory
+from tilavarauspalvelu.models import EquipmentCategory
 
 from .helpers import CREATE_MUTATION
 

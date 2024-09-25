@@ -10,8 +10,7 @@ from common.connectors import ReservationUnitOptionActionsConnector
 
 if TYPE_CHECKING:
     from applications.models import ApplicationSection
-    from reservation_units.models import ReservationUnit
-
+    from tilavarauspalvelu.models import ReservationUnit
 
 __all__ = [
     "ReservationUnitOption",
@@ -29,7 +28,7 @@ class ReservationUnitOption(models.Model):
         related_name="reservation_unit_options",
     )
     reservation_unit: ReservationUnit = models.ForeignKey(
-        "reservation_units.ReservationUnit",
+        "tilavarauspalvelu.ReservationUnit",
         on_delete=models.PROTECT,
         related_name="reservation_unit_options",
     )

@@ -8,8 +8,7 @@ from django import forms
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 
-from reservation_units.models import ReservationUnit
-from tilavarauspalvelu.models import EmailTemplate
+from tilavarauspalvelu.models import EmailTemplate, ReservationUnit
 from tilavarauspalvelu.utils.email.email_builder_reservation import ReservationEmailBuilder
 from tilavarauspalvelu.utils.email.email_sender import EmailNotificationSender
 

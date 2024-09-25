@@ -10,10 +10,9 @@ from rest_framework.reverse import reverse
 from common.db import SubqueryArray
 from common.typing import AnyUser, GQLInfo
 from common.utils import ical_hmac_signature
-from reservation_units.models import ReservationUnit
 from tilavarauspalvelu.api.graphql.types.merchants.types import PaymentOrderNode
 from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
-from tilavarauspalvelu.models import PaymentOrder, Reservation, User
+from tilavarauspalvelu.models import PaymentOrder, Reservation, ReservationUnit, User
 from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
 
 from .filtersets import ReservationFilterSet

@@ -1,7 +1,7 @@
 import pytest
 
-from reservation_units.models import ReservationUnit, ReservationUnitHierarchy
 from tests.factories import ReservationUnitFactory, SpaceFactory
+from tilavarauspalvelu.models import ReservationUnit, ReservationUnitHierarchy
 
 # Applied to all tests
 pytestmark = [

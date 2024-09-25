@@ -13,8 +13,7 @@ from tilavarauspalvelu.enums import CalendarProperty, EventProperty
 
 if TYPE_CHECKING:
     from common.typing import Lang
-    from reservation_units.models import ReservationUnit
-    from tilavarauspalvelu.models import Location, Reservation, Unit
+    from tilavarauspalvelu.models import Location, Reservation, ReservationUnit, Unit
 
 
 __all__ = [

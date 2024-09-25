@@ -119,7 +119,7 @@ class Reservation(SerializableMixin, models.Model):
     billing_address_zip: str = models.CharField(max_length=255, blank=True, default="")
 
     # Relations
-    reservation_unit = models.ManyToManyField("reservation_units.ReservationUnit")
+    reservation_unit = models.ManyToManyField("tilavarauspalvelu.ReservationUnit")
 
     user: User | None = models.ForeignKey(
         "tilavarauspalvelu.User",

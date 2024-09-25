@@ -3,9 +3,9 @@ from datetime import timedelta
 import pytest
 
 from common.date_utils import local_datetime
-from reservation_units.models import ReservationUnitHierarchy
 from tests.factories import ReservationFactory, ReservationUnitFactory, ServiceFactory, SpaceFactory
 from tilavarauspalvelu.enums import ReservationStateChoice
+from tilavarauspalvelu.models import ReservationUnitHierarchy
 
 # Applied to all tests
 pytestmark = [

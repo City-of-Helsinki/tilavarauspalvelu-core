@@ -1,6 +1,6 @@
 from graphene_django_extensions import NestingModelSerializer
 
-from reservation_units.models import ReservationUnitPricing
+from tilavarauspalvelu.models import ReservationUnitPricing
 
 
 class ReservationUnitPricingSerializer(NestingModelSerializer):

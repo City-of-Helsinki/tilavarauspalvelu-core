@@ -4,7 +4,7 @@ from graphene_django_extensions import DjangoNode
 from query_optimizer import AnnotatedField
 
 from common.typing import GQLInfo
-from reservation_units.models import ReservationUnitImage
+from tilavarauspalvelu.models import ReservationUnitImage
 
 from .permissions import ReservationUnitImagePermission
 

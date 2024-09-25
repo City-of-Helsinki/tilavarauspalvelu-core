@@ -1,7 +1,7 @@
 import django_filters
 from graphene_django_extensions.filters import IntMultipleChoiceFilter, ModelFilterSet
 
-from reservation_units.models import Equipment
+from tilavarauspalvelu.models import Equipment
 
 __all__ = [
     "EquipmentFilterSet",

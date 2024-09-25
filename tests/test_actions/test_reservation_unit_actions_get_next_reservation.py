@@ -4,13 +4,12 @@ from typing import TYPE_CHECKING
 import pytest
 from freezegun import freeze_time
 
-from reservation_units.models import ReservationUnitHierarchy
 from tests.factories import ReservationFactory, ReservationUnitFactory, SpaceFactory
 from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.models import ReservationUnitHierarchy
 
 if TYPE_CHECKING:
-    from reservation_units.models import ReservationUnit
-    from tilavarauspalvelu.models import Space
+    from tilavarauspalvelu.models import ReservationUnit, Space
 
 # Applied to all tests
 pytestmark = [

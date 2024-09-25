@@ -1,6 +1,6 @@
 from factory import fuzzy
 
-from reservation_units.models import Purpose
+from tilavarauspalvelu.models import Purpose
 
 from ._base import GenericDjangoModelFactory
 

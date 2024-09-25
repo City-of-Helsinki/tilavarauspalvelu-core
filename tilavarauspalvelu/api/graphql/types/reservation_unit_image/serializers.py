@@ -2,7 +2,7 @@ from django.core import validators
 from graphene_django_extensions import NestingModelSerializer
 from rest_framework import serializers
 
-from reservation_units.models import ReservationUnitImage
+from tilavarauspalvelu.models import ReservationUnitImage
 
 
 class ReservationUnitImageCreateSerializer(NestingModelSerializer):

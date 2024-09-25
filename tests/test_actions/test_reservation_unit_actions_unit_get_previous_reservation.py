@@ -3,9 +3,9 @@ from datetime import UTC, datetime, timedelta
 import pytest
 from freezegun import freeze_time
 
-from reservation_units.models import ReservationUnitHierarchy
 from tests.factories import ReservationFactory, ReservationUnitFactory, SpaceFactory
 from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.models import ReservationUnitHierarchy
 
 # Applied to all tests
 pytestmark = [

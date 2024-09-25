@@ -5,10 +5,8 @@ from typing import Any
 from factory import fuzzy
 
 from common.date_utils import local_start_of_day, next_hour
-from reservation_units.enums import PricingType
-from reservation_units.models import ReservationUnit
-from tilavarauspalvelu.enums import OrderStatus, PaymentType, ReservationStateChoice, ReservationTypeChoice
-from tilavarauspalvelu.models import Reservation
+from tilavarauspalvelu.enums import OrderStatus, PaymentType, PricingType, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.models import Reservation, ReservationUnit
 
 from ._base import GenericDjangoModelFactory, ManyToManyFactory, NullableSubFactory, OneToManyFactory
 

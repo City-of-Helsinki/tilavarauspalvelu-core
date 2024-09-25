@@ -13,7 +13,7 @@ from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.utils.email.reservation_email_notification_sender import ReservationEmailNotificationSender
 
 if TYPE_CHECKING:
-    from reservation_units.models import ReservationUnit
+    from tilavarauspalvelu.models import ReservationUnit
 
 DEFAULT_TIMEZONE = get_default_timezone()
 

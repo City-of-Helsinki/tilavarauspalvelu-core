@@ -8,8 +8,6 @@ from rest_framework import serializers
 
 from applications.models import City
 from common.typing import AnyUser, WSGIRequest
-from reservation_units.enums import ReservationKind
-from reservation_units.models import ReservationUnit
 from tilavarauspalvelu.api.graphql.extensions.fields import DurationField, OldChoiceCharField
 from tilavarauspalvelu.api.graphql.extensions.serializers import OldPrimaryKeySerializer
 from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
@@ -20,10 +18,11 @@ from tilavarauspalvelu.api.graphql.types.reservation.serializers.mixins import (
 from tilavarauspalvelu.enums import (
     RESERVEE_LANGUAGE_CHOICES,
     CustomerTypeChoice,
+    ReservationKind,
     ReservationStateChoice,
     ReservationTypeChoice,
 )
-from tilavarauspalvelu.models import AgeGroup, Reservation, ReservationPurpose
+from tilavarauspalvelu.models import AgeGroup, Reservation, ReservationPurpose, ReservationUnit
 from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
 from utils.external_service.errors import ExternalServiceError
 from utils.sentry import SentryLogger

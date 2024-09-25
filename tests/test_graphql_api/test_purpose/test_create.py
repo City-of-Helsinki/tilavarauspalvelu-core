@@ -1,6 +1,6 @@
 import pytest
 
-from reservation_units.models import Purpose
+from tilavarauspalvelu.models import Purpose
 
 from .helpers import CREATE_MUTATION
 

@@ -1,6 +1,6 @@
 from graphene_django_extensions import CreateMutation, DeleteMutation, UpdateMutation
 
-from reservation_units.models import EquipmentCategory
+from tilavarauspalvelu.models import EquipmentCategory
 
 from .permissions import EquipmentCategoryPermission
 from .serializers import EquipmentCategorySerializer

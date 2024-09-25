@@ -13,8 +13,18 @@ from .models import (
 )
 from .models.building.model import Building
 from .models.email_template.model import EmailTemplate
+from .models.equipment.model import Equipment
+from .models.equipment_category.model import EquipmentCategory
+from .models.keyword.model import Keyword
+from .models.keyword_category.model import KeywordCategory
+from .models.keyword_group.model import KeywordGroup
 from .models.location.model import Location
+from .models.purpose.model import Purpose
+from .models.qualifier.model import Qualifier
 from .models.real_estate.model import RealEstate
+from .models.reservation_unit.model import ReservationUnit
+from .models.reservation_unit_cancellation_rule.model import ReservationUnitCancellationRule
+from .models.reservation_unit_type.model import ReservationUnitType
 from .models.resource.model import Resource
 from .models.service_sector.model import ServiceSector
 from .models.space.model import Space
@@ -95,3 +105,60 @@ class ReservationCancelReasonTranslationOptions(TranslationOptions):
 @register(ReservationDenyReason)
 class ReservationDenyReasonTranslationOptions(TranslationOptions):
     fields = ["reason"]
+
+
+@register(ReservationUnit)
+class ReservationUnitTranslationOptions(TranslationOptions):
+    fields = [
+        "name",
+        "description",
+        "terms_of_use",
+        "reservation_pending_instructions",
+        "reservation_confirmed_instructions",
+        "reservation_cancelled_instructions",
+    ]
+
+
+@register(ReservationUnitType)
+class ReservationUnitTypeTranslationOptions(TranslationOptions):
+    fields = ["name"]
+
+
+@register(KeywordCategory)
+class KeywordCategoryTranslationOptions(TranslationOptions):
+    fields = ["name"]
+
+
+@register(KeywordGroup)
+class KeywordGroupTranslationOptions(TranslationOptions):
+    fields = ["name"]
+
+
+@register(Keyword)
+class KeywordTranslationOptions(TranslationOptions):
+    fields = ["name"]
+
+
+@register(Purpose)
+class PurposeTranslationOptions(TranslationOptions):
+    fields = ["name"]
+
+
+@register(Qualifier)
+class QualifierTranslationOptions(TranslationOptions):
+    fields = ["name"]
+
+
+@register(Equipment)
+class EquipmentTranslationOptions(TranslationOptions):
+    fields = ["name"]
+
+
+@register(EquipmentCategory)
+class EquipmentCategoryTranslationOptions(TranslationOptions):
+    fields = ["name"]
+
+
+@register(ReservationUnitCancellationRule)
+class ReservationUnitCancellationRuleTranslationOptions(TranslationOptions):
+    fields = ["name"]

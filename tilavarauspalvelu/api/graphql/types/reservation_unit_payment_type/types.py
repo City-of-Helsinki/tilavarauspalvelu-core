@@ -1,6 +1,6 @@
 from graphene_django_extensions import DjangoNode
 
-from reservation_units.models import ReservationUnitPaymentType
+from tilavarauspalvelu.models import ReservationUnitPaymentType
 
 __all__ = [
     "ReservationUnitPaymentTypeNode",

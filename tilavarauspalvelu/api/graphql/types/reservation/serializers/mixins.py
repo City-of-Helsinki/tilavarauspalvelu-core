@@ -2,19 +2,26 @@ import datetime
 import math
 from collections.abc import Iterable
 from decimal import Decimal
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from django.utils import timezone
 from django.utils.timezone import get_default_timezone
 
 from common.date_utils import local_datetime, local_start_of_day
-from reservation_units.enums import PriceUnit, PricingType, ReservationStartInterval, ReservationUnitPublishingState
-from reservation_units.models import ReservationUnit, ReservationUnitPricing
-from reservation_units.utils.reservation_unit_pricing_helper import ReservationUnitPricingHelper
 from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from tilavarauspalvelu.api.graphql.types.reservation.types import ReservationNode
-from tilavarauspalvelu.enums import ReservationTypeChoice
-from tilavarauspalvelu.models import Reservation
+from tilavarauspalvelu.enums import (
+    PriceUnit,
+    PricingType,
+    ReservationStartInterval,
+    ReservationTypeChoice,
+    ReservationUnitPublishingState,
+)
+from tilavarauspalvelu.models import Reservation, ReservationUnit
+from tilavarauspalvelu.utils.reservation_units.reservation_unit_pricing_helper import ReservationUnitPricingHelper
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import ReservationUnitPricing
 
 
 class PriceCalculationResult:

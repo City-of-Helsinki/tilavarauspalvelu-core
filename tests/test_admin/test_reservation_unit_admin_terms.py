@@ -2,11 +2,10 @@ import pytest
 from django.contrib.admin import AdminSite
 from django.test import RequestFactory
 
-from reservation_units.admin.reservation_unit.admin import ReservationUnitAdmin
-from reservation_units.enums import ReservationKind, ReservationStartInterval
-from reservation_units.models import ReservationUnit
 from tests.factories import ReservationUnitFactory, TermsOfUseFactory
-from tilavarauspalvelu.enums import TermsOfUseTypeChoices
+from tilavarauspalvelu.admin.reservation_unit.admin import ReservationUnitAdmin
+from tilavarauspalvelu.enums import ReservationKind, ReservationStartInterval, TermsOfUseTypeChoices
+from tilavarauspalvelu.models import ReservationUnit
 
 # Applied to all tests
 pytestmark = [

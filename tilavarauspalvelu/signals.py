@@ -1,12 +1,21 @@
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from django.db.models.signals import m2m_changed, post_delete, post_save
 from django.dispatch import receiver
 
-from tilavarauspalvelu.models import Reservation, Space
-from tilavarauspalvelu.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task
-from tilavarauspalvelu.typing import M2MAction
+from tilavarauspalvelu.models import Reservation, ReservationUnit, ReservationUnitHierarchy, Space
+from tilavarauspalvelu.tasks import (
+    Action,
+    create_or_update_reservation_statistics,
+    refresh_reservation_unit_product_mapping,
+    update_affecting_time_spans_task,
+)
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import M2MAction
 
 
 @receiver([post_save, post_delete], sender=Space, dispatch_uid="space_modify")
@@ -22,7 +31,7 @@ def space_modify(instance: Space, *args: Any, **kwargs: Any) -> None:
 
     # Refresh the reservation unit hierarchy since spaces have changed.
     if settings.UPDATE_RESERVATION_UNIT_HIERARCHY:
-        from reservation_units.models import ReservationUnitHierarchy
+        from tilavarauspalvelu.models import ReservationUnitHierarchy
 
         ReservationUnitHierarchy.refresh(kwargs.get("using"))
 
@@ -78,3 +87,30 @@ def reservations_reservation_units_m2m(
 
     if not raw and settings.UPDATE_AFFECTING_TIME_SPANS:
         update_affecting_time_spans_task.delay()
+
+
+@receiver(post_save, sender=ReservationUnit, dispatch_uid="reservation_unit_saved")
+def reservation_unit_saved(instance: ReservationUnit, created: bool, *args: Any, **kwargs: Any):
+    if settings.UPDATE_PRODUCT_MAPPING:
+        refresh_reservation_unit_product_mapping.delay(instance.pk)
+
+    if settings.UPDATE_RESERVATION_UNIT_HIERARCHY and created:
+        ReservationUnitHierarchy.refresh(kwargs.get("using"))
+
+
+@receiver(post_delete, sender=ReservationUnit, dispatch_uid="reservation_unit_deleted")
+def reservation_unit_deleted(*args: Any, **kwargs: Any):
+    if settings.UPDATE_RESERVATION_UNIT_HIERARCHY:
+        ReservationUnitHierarchy.refresh(kwargs.get("using"))
+
+
+@receiver(m2m_changed, sender=ReservationUnit.spaces.through, dispatch_uid="reservation_unit_spaces_modified")
+def reservation_unit_spaces_modified(action: Action, *args: Any, **kwargs: Any):
+    if settings.UPDATE_RESERVATION_UNIT_HIERARCHY and action in ["post_add", "post_remove", "post_clear"]:
+        ReservationUnitHierarchy.refresh(kwargs.get("using"))
+
+
+@receiver(m2m_changed, sender=ReservationUnit.resources.through, dispatch_uid="reservation_unit_resources_modified")
+def reservation_unit_resources_modified(action: Action, *args: Any, **kwargs: Any):
+    if settings.UPDATE_RESERVATION_UNIT_HIERARCHY and action in ["post_add", "post_remove", "post_clear"]:
+        ReservationUnitHierarchy.refresh(kwargs.get("using"))

@@ -8,9 +8,8 @@ from tinymce.widgets import TinyMCE
 from applications.enums import ApplicationRoundStatusChoice
 from applications.models import ApplicationRound
 from common.fields.forms import disabled_widget
-from reservation_units.models import ReservationUnit
 from tilavarauspalvelu.enums import TermsOfUseTypeChoices
-from tilavarauspalvelu.models import TermsOfUse
+from tilavarauspalvelu.models import ReservationUnit, TermsOfUse
 
 
 class ApplicationRoundAdminForm(forms.ModelForm):

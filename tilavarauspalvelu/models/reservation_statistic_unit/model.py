@@ -24,7 +24,7 @@ class ReservationStatisticsReservationUnit(models.Model):
         related_name="reservation_stats_reservation_units",
     )
     reservation_unit = models.ForeignKey(
-        "reservation_units.ReservationUnit",
+        "tilavarauspalvelu.ReservationUnit",
         null=True,
         on_delete=models.SET_NULL,
     )

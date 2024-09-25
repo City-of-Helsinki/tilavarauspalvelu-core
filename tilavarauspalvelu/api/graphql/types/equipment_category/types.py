@@ -1,6 +1,6 @@
 from graphene_django_extensions import DjangoNode
 
-from reservation_units.models import EquipmentCategory
+from tilavarauspalvelu.models import EquipmentCategory
 
 from .filtersets import EquipmentCategoryFilterSet
 from .permissions import EquipmentCategoryPermission

@@ -6,10 +6,10 @@ import pytest
 from django.utils import timezone
 from graphene_django_extensions.testing.utils import parametrize_helper
 
-from reservation_units.enums import PricingStatus
-from reservation_units.models import ReservationUnit
-from reservation_units.utils.export_data import HEADER_ROW, ReservationUnitExporter
 from tests.factories import ReservationUnitFactory
+from tilavarauspalvelu.enums import PricingStatus
+from tilavarauspalvelu.models import ReservationUnit
+from tilavarauspalvelu.utils.reservation_units.export_data import HEADER_ROW, ReservationUnitExporter
 
 from .helpers import Missing, MissingParams, get_writes
 
@@ -44,8 +44,8 @@ def test_reservation_unit_export_multiple():
 
     # when:
     # - The exporter is run for all reservation units
-    open_mock = mock.patch("reservation_units.utils.export_data.open", new=mock.mock_open())
-    csv_writer_mock = mock.patch("reservation_units.utils.export_data.csv.writer")
+    open_mock = mock.patch("tilavarauspalvelu.utils.reservation_units.export_data.open", new=mock.mock_open())
+    csv_writer_mock = mock.patch("tilavarauspalvelu.utils.reservation_units.export_data.csv.writer")
     with open_mock, csv_writer_mock as mock_file:
         ReservationUnitExporter.export_reservation_unit_data()
 
@@ -249,8 +249,8 @@ def test_reservation_unit_export_missing_relations(column_value_mapping, missing
 
     # when:
     # - The exporter is run for all reservation units
-    open_mock = mock.patch("reservation_units.utils.export_data.open", new=mock.mock_open())
-    csv_writer_mock = mock.patch("reservation_units.utils.export_data.csv.writer")
+    open_mock = mock.patch("tilavarauspalvelu.utils.reservation_units.export_data.open", new=mock.mock_open())
+    csv_writer_mock = mock.patch("tilavarauspalvelu.utils.reservation_units.export_data.csv.writer")
     with open_mock, csv_writer_mock as mock_file:
         ReservationUnitExporter.export_reservation_unit_data()
 
@@ -271,8 +271,8 @@ def test_reservation_unit_export_subset():
 
     # when:
     # - The exporter is run for the first 3 reservation units
-    open_mock = mock.patch("reservation_units.utils.export_data.open", new=mock.mock_open())
-    csv_writer_mock = mock.patch("reservation_units.utils.export_data.csv.writer")
+    open_mock = mock.patch("tilavarauspalvelu.utils.reservation_units.export_data.open", new=mock.mock_open())
+    csv_writer_mock = mock.patch("tilavarauspalvelu.utils.reservation_units.export_data.csv.writer")
     with open_mock, csv_writer_mock as mock_file:
         ReservationUnitExporter.export_reservation_unit_data(queryset=ReservationUnit.objects.all()[:3])
 

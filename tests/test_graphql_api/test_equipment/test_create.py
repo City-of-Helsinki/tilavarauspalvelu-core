@@ -1,7 +1,7 @@
 import pytest
 
-from reservation_units.models import Equipment
 from tests.factories import EquipmentCategoryFactory
+from tilavarauspalvelu.models import Equipment
 
 from .helpers import CREATE_MUTATION
 

@@ -50,8 +50,8 @@ class PaymentAccounting(models.Model):
         return self.name
 
     def save(self, *args: Any, **kwargs: Any) -> None:
-        from reservation_units.models import ReservationUnit
-        from reservation_units.tasks import refresh_reservation_unit_accounting
+        from tilavarauspalvelu.models import ReservationUnit
+        from tilavarauspalvelu.tasks import refresh_reservation_unit_accounting
 
         super().save(*args, **kwargs)
 

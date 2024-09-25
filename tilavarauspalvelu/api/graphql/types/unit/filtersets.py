@@ -7,8 +7,7 @@ from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import IntMultipleChoiceFilter
 
 from common.date_utils import local_datetime
-from reservation_units.enums import ReservationKind
-from tilavarauspalvelu.enums import UserRoleChoice
+from tilavarauspalvelu.enums import ReservationKind, UserRoleChoice
 from tilavarauspalvelu.models import Unit
 from tilavarauspalvelu.models.unit.queryset import UnitQuerySet
 

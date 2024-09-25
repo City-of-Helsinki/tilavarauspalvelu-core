@@ -3,11 +3,11 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from reservation_units.enums import PricingType, ReservationUnitReservationState
 from tests.factories import PaymentProductFactory, ReservationUnitFactory, ReservationUnitPricingFactory
+from tilavarauspalvelu.enums import PricingType, ReservationUnitReservationState
 
 if TYPE_CHECKING:
-    from reservation_units.models import ReservationUnit
+    from tilavarauspalvelu.models import ReservationUnit
 
 pytestmark = [
     pytest.mark.django_db,

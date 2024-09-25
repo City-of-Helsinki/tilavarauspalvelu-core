@@ -17,7 +17,7 @@ from tilavarauspalvelu.models import Location, Reservation
 from tilavarauspalvelu.utils.email.email_builder_reservation import ReservationEmailContext
 
 if TYPE_CHECKING:
-    from reservation_units.models import ReservationUnit
+    from tilavarauspalvelu.models import ReservationUnit
 
 pytestmark = [
     pytest.mark.django_db,

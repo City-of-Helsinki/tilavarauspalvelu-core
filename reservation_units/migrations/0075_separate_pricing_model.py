@@ -5,13 +5,17 @@ import datetime
 import django.db.models.deletion
 from django.db import migrations, models
 
-from reservation_units.models.reservation_unit_pricing import get_default_tax_percentage
+
+def get_default_tax_percentage() -> int:
+    from tilavarauspalvelu.models import TaxPercentage
+
+    return TaxPercentage.objects.order_by("value").first().pk
 
 
 def migrate_active_pricing(apps, schema):
     """Copy current price information to pricing table and mark it as active"""
-    ReservationUnitType = apps.get_model("reservation_units", "ReservationUnit")
-    ReservationUnitPricingType = apps.get_model("reservation_units", "ReservationUnitPricing")
+    ReservationUnitType = apps.get_model("reservation_units", "ReservationUnit")  # noqa: N806
+    ReservationUnitPricingType = apps.get_model("reservation_units", "ReservationUnitPricing")  # noqa: N806
 
     reservation_units = ReservationUnitType.objects.all()
     for ru in reservation_units:

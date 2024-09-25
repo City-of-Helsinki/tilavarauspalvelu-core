@@ -84,7 +84,7 @@ class AllocatedTimeSlotQuerySet(models.QuerySet):
         return any(slot["end_time"] > begin_time and slot["begin_time"] < end_time for slot in merged)
 
     def affecting_allocations(self, reservation_unit: int, begin_date: datetime.date, end_date: datetime.date) -> Self:
-        from reservation_units.models import ReservationUnit
+        from tilavarauspalvelu.models import ReservationUnit
 
         return (
             self.distinct()

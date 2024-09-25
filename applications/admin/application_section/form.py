@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from applications.enums import ApplicationSectionStatusChoice
 from applications.models import Application, ApplicationSection, ReservationUnitOption, SuitableTimeRange
 from common.fields.forms import disabled_widget
-from reservation_units.models import ReservationUnit
+from tilavarauspalvelu.models import ReservationUnit
 
 
 class ReservationUnitOptionInlineAdminForm(forms.ModelForm):

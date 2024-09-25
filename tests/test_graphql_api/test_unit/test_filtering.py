@@ -5,8 +5,8 @@ import pytest
 from django.utils.timezone import get_default_timezone
 from graphene_django_extensions.testing import build_query
 
-from reservation_units.enums import ReservationKind
 from tests.factories import ReservationFactory, ReservationUnitFactory, ServiceSectorFactory, UnitFactory, UserFactory
+from tilavarauspalvelu.enums import ReservationKind
 
 from .helpers import units_query
 

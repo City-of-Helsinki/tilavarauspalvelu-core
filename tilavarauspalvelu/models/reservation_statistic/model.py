@@ -52,7 +52,7 @@ class ReservationStatistic(models.Model):
     # Relations and static copies of their values
 
     primary_reservation_unit = models.ForeignKey(
-        "reservation_units.ReservationUnit",
+        "tilavarauspalvelu.ReservationUnit",
         null=True,
         on_delete=models.SET_NULL,
     )

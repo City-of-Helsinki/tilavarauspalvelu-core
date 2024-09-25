@@ -4,9 +4,9 @@ from decimal import Decimal
 import pytest
 
 from common.date_utils import local_datetime
-from reservation_units.enums import PriceUnit, PricingStatus, PricingType
 from tests.factories import ReservationUnitFactory, ReservationUnitPricingFactory
 from tilavarauspalvelu.api.graphql.types.reservation.serializers.mixins import ReservationPriceMixin
+from tilavarauspalvelu.enums import PriceUnit, PricingStatus, PricingType
 
 # Applied to all tests
 pytestmark = [

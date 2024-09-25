@@ -8,8 +8,8 @@ from django.test import override_settings
 from easy_thumbnails.files import get_thumbnailer
 from PIL import Image
 
-from reservation_units.models import ReservationUnitImage
 from tests.factories import ReservationUnitFactory
+from tilavarauspalvelu.models import ReservationUnitImage
 
 # Applied to all tests
 pytestmark = [
@@ -17,16 +17,16 @@ pytestmark = [
 ]
 
 
-@mock.patch("reservation_units.models.reservation_unit_image.update_urls")
+@mock.patch("tilavarauspalvelu.models.reservation_unit_image.model.update_urls.delay")
 def test_reservation_unit_image__save__update_urls_called_when_save(mock_update_urls):
     reservation_unit = ReservationUnitFactory.create()
     image = ReservationUnitImage(reservation_unit=reservation_unit, image_type="main")
     image.save()
 
-    assert mock_update_urls.delay.call_count == 1
+    assert mock_update_urls.call_count == 1
 
 
-@mock.patch("reservation_units.models._mixins.purge_image_cache.delay")
+@mock.patch("tilavarauspalvelu.utils.image_purge.purge_image_cache.delay")
 @override_settings(IMAGE_CACHE_ENABLED=True)
 def test_reservation_unit_image__purge__image_cache_is_purged_on_save(mock_purge_image_cache):
     mock_image_data = BytesIO()
