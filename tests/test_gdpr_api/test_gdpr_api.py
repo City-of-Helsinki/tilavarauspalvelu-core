@@ -394,6 +394,34 @@ def test_query_user_data__user_not_found(api_client, settings):
 
 
 @patch_method(SentryLogger.log_message)
+def test_query_user_data__cannot_access_other_users_data(api_client, settings):
+    user = UserFactory.create(username="foo", uuid=uuid.uuid4())
+    other_user = UserFactory.create(username="bar", uuid=uuid.uuid4())
+
+    settings.GDPR_API_QUERY_SCOPE = "gdprquery"
+    auth_header = get_gdpr_auth_header(user, scopes=[settings.GDPR_API_QUERY_SCOPE])
+    api_client.credentials(HTTP_AUTHORIZATION=auth_header)
+
+    url = reverse("gdpr_v1", kwargs={"uuid": str(other_user.uuid)})
+    with patch_oidc_config():
+        response = api_client.get(url)
+
+    assert response.status_code == 403, response.data
+    assert response.data == {"detail": "You do not have permission to perform this action."}
+
+    assert SentryLogger.log_message.call_count == 1
+    assert SentryLogger.log_message.call_args.args == ("GDPR API GET request can't access data for user.",)
+    assert SentryLogger.log_message.call_args.kwargs == {
+        "details": {
+            "request_user_id": str(user.id),
+            "request_user_uuid": str(user.uuid),
+            "target_user_id": str(other_user.id),
+            "target_user_uuid": str(other_user.uuid),
+        }
+    }
+
+
+@patch_method(SentryLogger.log_message)
 def test_query_user_data__not_authenticated(api_client, settings):
     user = UserFactory.create()
 
@@ -407,15 +435,7 @@ def test_query_user_data__not_authenticated(api_client, settings):
     assert response.data == {"detail": "Authentication credentials were not provided."}
 
     assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args == ("GDPR API query failed.",)
-    assert SentryLogger.log_message.call_args.kwargs == {
-        "details": {
-            "detail": ErrorDetail(
-                string="Authentication credentials were not provided.",
-                code="not_authenticated",
-            )
-        }
-    }
+    assert SentryLogger.log_message.call_args.args == ("GDPR API GET request not authenticated.",)
 
 
 @patch_method(SentryLogger.log_message)
@@ -434,13 +454,15 @@ def test_query_user_data__wrong_scope(api_client, settings):
     assert response.data == {"detail": "You do not have permission to perform this action."}
 
     assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args == ("GDPR API query failed.",)
+    assert SentryLogger.log_message.call_args.args == ("GDPR API GET permission check failed.",)
     assert SentryLogger.log_message.call_args.kwargs == {
         "details": {
-            "detail": ErrorDetail(
-                string="You do not have permission to perform this action.",
-                code="permission_denied",
-            )
+            "request_method": "GET",
+            "request_api_scopes": ["invalid"],
+            "request_loa": "high",
+            "allowed_loa": ["substantial", "high"],
+            "required_query_scope": "gdprquery",
+            "required_delete_scope": "gdprdelete",
         }
     }
 
@@ -463,13 +485,15 @@ def test_query_user_data__insufficient_loa(api_client, settings):
     assert user.username == "foo"
 
     assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args == ("GDPR API query failed.",)
+    assert SentryLogger.log_message.call_args.args == ("GDPR API GET permission check failed.",)
     assert SentryLogger.log_message.call_args.kwargs == {
         "details": {
-            "detail": ErrorDetail(
-                string="You do not have permission to perform this action.",
-                code="permission_denied",
-            )
+            "request_method": "GET",
+            "request_api_scopes": ["gdprquery"],
+            "request_loa": "low",
+            "allowed_loa": ["substantial", "high"],
+            "required_query_scope": "gdprquery",
+            "required_delete_scope": "gdprdelete",
         }
     }
 
@@ -485,6 +509,25 @@ def test_delete_user_data__should_anonymize(api_client, settings):
     api_client.credentials(HTTP_AUTHORIZATION=auth_header)
 
     url = reverse("gdpr_v1", kwargs={"uuid": str(user.uuid)})
+    with patch_oidc_config():
+        response = api_client.delete(url)
+
+    assert response.status_code == 204, response.data
+
+    user.refresh_from_db()
+    assert user.username == f"anonymized-{user.uuid}"
+
+
+def test_delete_user_data__has_trailing_slash(api_client, settings):
+    # Makes sure that the endpoint works with or without a trailing slash
+    # since delete request cannot be forwarded if the trailing slash is missing.
+    user = UserFactory.create(username="foo")
+
+    settings.GDPR_API_DELETE_SCOPE = "gdprdelete"
+    auth_header = get_gdpr_auth_header(user, scopes=[settings.GDPR_API_DELETE_SCOPE])
+    api_client.credentials(HTTP_AUTHORIZATION=auth_header)
+
+    url = reverse("gdpr_v1", kwargs={"uuid": str(user.uuid)}) + "/"
     with patch_oidc_config():
         response = api_client.delete(url)
 
@@ -616,9 +659,36 @@ def test_delete_user_data__dont_anonymize_if_open_applications(api_client, setti
 
 
 @patch_method(SentryLogger.log_message)
+def test_delete_user_data__user_not_found(api_client, settings):
+    user = UserFactory.create()
+
+    settings.GDPR_API_DELETE_SCOPE = "gdprdelete"
+    auth_header = get_gdpr_auth_header(user, scopes=[settings.GDPR_API_DELETE_SCOPE])
+    api_client.credentials(HTTP_AUTHORIZATION=auth_header)
+
+    url = reverse("gdpr_v1", kwargs={"uuid": str(uuid.uuid4())})
+    with patch_oidc_config():
+        response = api_client.delete(url)
+
+    assert response.status_code == 404, response.data
+    assert response.data == {"detail": "No ProfileUser matches the given query."}
+
+    assert SentryLogger.log_message.call_count == 1
+    assert SentryLogger.log_message.call_args.args == ("GDPR API query failed.",)
+    assert SentryLogger.log_message.call_args.kwargs == {
+        "details": {
+            "detail": ErrorDetail(
+                string="No ProfileUser matches the given query.",
+                code="not_found",
+            )
+        }
+    }
+
+
+@patch_method(SentryLogger.log_message)
 def test_delete_user_data__cannot_anonymize_other_users_data(api_client, settings):
-    user = UserFactory.create(username="foo")
-    other_user = UserFactory.create(username="bar")
+    user = UserFactory.create(username="foo", uuid=uuid.uuid4())
+    other_user = UserFactory.create(username="bar", uuid=uuid.uuid4())
 
     settings.GDPR_API_DELETE_SCOPE = "gdprdelete"
     auth_header = get_gdpr_auth_header(user, scopes=[settings.GDPR_API_DELETE_SCOPE])
@@ -634,13 +704,13 @@ def test_delete_user_data__cannot_anonymize_other_users_data(api_client, setting
     assert other_user.username == "bar"
 
     assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args == ("GDPR API query failed.",)
+    assert SentryLogger.log_message.call_args.args == ("GDPR API DELETE request can't access data for user.",)
     assert SentryLogger.log_message.call_args.kwargs == {
         "details": {
-            "detail": ErrorDetail(
-                string="You do not have permission to perform this action.",
-                code="permission_denied",
-            )
+            "request_user_id": str(user.id),
+            "request_user_uuid": str(user.uuid),
+            "target_user_id": str(other_user.id),
+            "target_user_uuid": str(other_user.uuid),
         }
     }
 
@@ -661,15 +731,7 @@ def test_delete_user_data__not_authenticated(api_client, settings):
     assert user.username == "foo"
 
     assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args == ("GDPR API query failed.",)
-    assert SentryLogger.log_message.call_args.kwargs == {
-        "details": {
-            "detail": ErrorDetail(
-                string="Authentication credentials were not provided.",
-                code="not_authenticated",
-            )
-        }
-    }
+    assert SentryLogger.log_message.call_args.args == ("GDPR API DELETE request not authenticated.",)
 
 
 @patch_method(SentryLogger.log_message)
@@ -677,7 +739,7 @@ def test_delete_user_data__wrong_scope(api_client, settings):
     user = UserFactory.create(username="foo")
 
     settings.GDPR_API_DELETE_SCOPE = "gdprdelete"
-    auth_header = get_gdpr_auth_header(user, scopes=["wrong_scope"])
+    auth_header = get_gdpr_auth_header(user, scopes=["invalid"])
     api_client.credentials(HTTP_AUTHORIZATION=auth_header)
 
     url = reverse("gdpr_v1", kwargs={"uuid": str(user.uuid)})
@@ -690,13 +752,15 @@ def test_delete_user_data__wrong_scope(api_client, settings):
     assert user.username == "foo"
 
     assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args == ("GDPR API query failed.",)
+    assert SentryLogger.log_message.call_args.args == ("GDPR API DELETE permission check failed.",)
     assert SentryLogger.log_message.call_args.kwargs == {
         "details": {
-            "detail": ErrorDetail(
-                string="You do not have permission to perform this action.",
-                code="permission_denied",
-            )
+            "request_method": "DELETE",
+            "request_api_scopes": ["invalid"],
+            "request_loa": "high",
+            "allowed_loa": ["substantial", "high"],
+            "required_query_scope": "gdprquery",
+            "required_delete_scope": "gdprdelete",
         }
     }
 
@@ -719,13 +783,15 @@ def test_delete_user_data__insufficient_loa(api_client, settings):
     assert user.username == "foo"
 
     assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args == ("GDPR API query failed.",)
+    assert SentryLogger.log_message.call_args.args == ("GDPR API DELETE permission check failed.",)
     assert SentryLogger.log_message.call_args.kwargs == {
         "details": {
-            "detail": ErrorDetail(
-                string="You do not have permission to perform this action.",
-                code="permission_denied",
-            )
+            "request_method": "DELETE",
+            "request_api_scopes": ["gdprdelete"],
+            "request_loa": "low",
+            "allowed_loa": ["substantial", "high"],
+            "required_query_scope": "gdprquery",
+            "required_delete_scope": "gdprdelete",
         }
     }
 
