@@ -2,12 +2,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from django.conf import settings
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import override
-from helsinki_gdpr.views import DryRunSerializer, GDPRAPIView, GDPRScopesPermission
+from helsinki_gdpr.views import DryRunSerializer, GDPRAPIView
 from rest_framework import status
+from rest_framework.exceptions import NotAuthenticated, PermissionDenied
+from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
 
 from users.anonymisation import anonymize_user_data, can_user_be_anonymized
@@ -19,17 +22,60 @@ if TYPE_CHECKING:
     from rest_framework.request import Request
 
 
-class AnonymizationNotAllowedError(Exception):
-    pass
+class GDPRScopesAndLOAPermission(BasePermission):
+    # Reimplement `helsinki_gdpr.views.GDPRScopesPermission` to add better logging for permission errors.
 
-
-class GDPRScopesAndLOAPermission(GDPRScopesPermission):
     def has_permission(self, request: Request, view: TilavarauspalveluGDPRAPIView) -> bool:
-        has_permission = super().has_permission(request, view)
-        if has_permission:
-            # Ensure request is made with by a strongly authenticated user,
-            # following best practices set by the City of Helsinki.
-            return request.auth.data.get("loa", "").lower() in ("substantial", "high")
+        request_method = str(request.method)
+        authenticated = bool(request.user and request.user.is_authenticated)
+        if not authenticated:
+            SentryLogger.log_message(f"GDPR API {request_method} request not authenticated.")
+            return False
+
+        # Ensure request is made with by a strongly authenticated user,
+        # following best practices set by the City of Helsinki.
+        loa = request.auth.data.get("loa", "").lower()
+        required_loa = ["substantial", "high"]
+        has_correct_loa = loa in required_loa
+
+        details = {
+            "request_method": request_method,
+            "request_api_scopes": list(request.auth._authorized_api_scopes),  # noqa: SLF001
+            "request_loa": loa,
+            "allowed_loa": required_loa,
+            "required_query_scope": settings.GDPR_API_QUERY_SCOPE,
+            "required_delete_scope": settings.GDPR_API_DELETE_SCOPE,
+        }
+
+        if request.method == "GET":
+            has_query_scope = request.auth.has_api_scopes(settings.GDPR_API_QUERY_SCOPE)
+            if has_query_scope and has_correct_loa:
+                return True
+
+            SentryLogger.log_message(f"GDPR API {request_method} permission check failed.", details=details)
+            return False
+
+        if request.method == "DELETE":
+            has_delete_scope = request.auth.has_api_scopes(settings.GDPR_API_DELETE_SCOPE)
+            if has_delete_scope and has_correct_loa:
+                return True
+
+            SentryLogger.log_message(f"GDPR API {request_method} permission check failed.", details=details)
+            return False
+
+        return False
+
+    def has_object_permission(self, request: Request, view: TilavarauspalveluGDPRAPIView, obj: ProfileUser) -> bool:
+        if request.user == obj.user:
+            return True
+
+        details = {
+            "request_user_id": str(request.user.id),
+            "request_user_uuid": str(request.user.uuid),
+            "target_user_id": str(obj.user.id),
+            "target_user_uuid": str(obj.user.uuid),
+        }
+        SentryLogger.log_message(f"GDPR API {request.method} request can't access data for user.", details=details)
         return False
 
 
@@ -108,6 +154,10 @@ class TilavarauspalveluGDPRAPIView(GDPRAPIView):
         except Exception as error:
             SentryLogger.log_exception(error, details="Uncaught error in GDPR API")
             raise
+
+        # These exceptions are already logged in the permission class.
+        if isinstance(exc, NotAuthenticated | PermissionDenied):
+            return response
 
         SentryLogger.log_message("GDPR API query failed.", details=response.data)
         return response
