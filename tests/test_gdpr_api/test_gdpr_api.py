@@ -6,6 +6,7 @@ import pytest
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from django.utils import timezone
+from freezegun import freeze_time
 from rest_framework.exceptions import ErrorDetail
 
 from merchants.enums import OrderStatus
@@ -439,6 +440,7 @@ def test_query_user_data__not_authenticated(api_client, settings):
 
 
 @patch_method(SentryLogger.log_message)
+@freeze_time("2024-01-01T00:00:00")
 def test_query_user_data__wrong_scope(api_client, settings):
     user = UserFactory.create()
 
@@ -458,16 +460,24 @@ def test_query_user_data__wrong_scope(api_client, settings):
     assert SentryLogger.log_message.call_args.kwargs == {
         "details": {
             "request_method": "GET",
-            "request_api_scopes": ["invalid"],
-            "request_loa": "high",
             "allowed_loa": ["substantial", "high"],
             "required_query_scope": "gdprquery",
             "required_delete_scope": "gdprdelete",
+            "auth_claims": {
+                "aud": "TUNNISTAMO_AUDIENCE",
+                "authorization": {"permissions": [{"scopes": ["invalid"]}]},
+                "exp": 1705276800,
+                "iat": 1704067200,
+                "iss": "TUNNISTAMO_ISSUER",
+                "loa": "high",
+                "sub": str(user.uuid),
+            },
         }
     }
 
 
 @patch_method(SentryLogger.log_message)
+@freeze_time("2024-01-01T00:00:00")
 def test_query_user_data__insufficient_loa(api_client, settings):
     user = UserFactory.create(username="foo")
 
@@ -489,11 +499,18 @@ def test_query_user_data__insufficient_loa(api_client, settings):
     assert SentryLogger.log_message.call_args.kwargs == {
         "details": {
             "request_method": "GET",
-            "request_api_scopes": ["gdprquery"],
-            "request_loa": "low",
             "allowed_loa": ["substantial", "high"],
             "required_query_scope": "gdprquery",
             "required_delete_scope": "gdprdelete",
+            "auth_claims": {
+                "aud": "TUNNISTAMO_AUDIENCE",
+                "authorization": {"permissions": [{"scopes": ["gdprquery"]}]},
+                "exp": 1705276800,
+                "iat": 1704067200,
+                "iss": "TUNNISTAMO_ISSUER",
+                "loa": "low",
+                "sub": str(user.uuid),
+            },
         }
     }
 
@@ -735,6 +752,7 @@ def test_delete_user_data__not_authenticated(api_client, settings):
 
 
 @patch_method(SentryLogger.log_message)
+@freeze_time("2024-01-01T00:00:00")
 def test_delete_user_data__wrong_scope(api_client, settings):
     user = UserFactory.create(username="foo")
 
@@ -756,16 +774,24 @@ def test_delete_user_data__wrong_scope(api_client, settings):
     assert SentryLogger.log_message.call_args.kwargs == {
         "details": {
             "request_method": "DELETE",
-            "request_api_scopes": ["invalid"],
-            "request_loa": "high",
             "allowed_loa": ["substantial", "high"],
             "required_query_scope": "gdprquery",
             "required_delete_scope": "gdprdelete",
+            "auth_claims": {
+                "aud": "TUNNISTAMO_AUDIENCE",
+                "authorization": {"permissions": [{"scopes": ["invalid"]}]},
+                "exp": 1705276800,
+                "iat": 1704067200,
+                "iss": "TUNNISTAMO_ISSUER",
+                "loa": "high",
+                "sub": str(user.uuid),
+            },
         }
     }
 
 
 @patch_method(SentryLogger.log_message)
+@freeze_time("2024-01-01T00:00:00")
 def test_delete_user_data__insufficient_loa(api_client, settings):
     user = UserFactory.create(username="foo")
 
@@ -787,11 +813,18 @@ def test_delete_user_data__insufficient_loa(api_client, settings):
     assert SentryLogger.log_message.call_args.kwargs == {
         "details": {
             "request_method": "DELETE",
-            "request_api_scopes": ["gdprdelete"],
-            "request_loa": "low",
             "allowed_loa": ["substantial", "high"],
             "required_query_scope": "gdprquery",
             "required_delete_scope": "gdprdelete",
+            "auth_claims": {
+                "aud": "TUNNISTAMO_AUDIENCE",
+                "authorization": {"permissions": [{"scopes": ["gdprdelete"]}]},
+                "exp": 1705276800,
+                "iat": 1704067200,
+                "iss": "TUNNISTAMO_ISSUER",
+                "loa": "low",
+                "sub": str(user.uuid),
+            },
         }
     }
 
