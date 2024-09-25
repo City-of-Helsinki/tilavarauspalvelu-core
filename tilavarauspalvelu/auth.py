@@ -64,6 +64,22 @@ class ProxyTunnistamoOIDCAuthBackend(TunnistamoOIDCAuth):
         response = self.request(url, **request_args)
         return response.json()
 
+    def request_access_token(self, *args: Any, **kwargs: Any) -> Any:
+        # This is a hack that can be enabled for local development if you get
+        # errors during authentication for "The token is not yet valid (iat)".
+        # These happens due to incorrect implementation for checking issued at time in
+        # `jwt.api_jwt.PyJWT._validate_iat` (`iat` is an int while `now` is a float,
+        # which can be a few milliseconds off if the server authenticated too fast).
+        if settings.UNSAFE_SKIP_IAT_CLAIM_VALIDATION:
+            from unittest.mock import patch
+
+            # Simply skips the checks.
+            path = "jwt.api_jwt.PyJWT._validate_iat"
+            with patch(path):
+                return super().request_access_token(*args, **kwargs)
+        else:
+            return super().request_access_token(*args, **kwargs)
+
 
 class ProxyModelBackend(ModelBackend):
     """
