@@ -104,6 +104,8 @@ class Common(Environment):
         # Keep this after security middleware, correct place according to whitenoise documentation
         "whitenoise.middleware.WhiteNoiseMiddleware",
         "django.contrib.sessions.middleware.SessionMiddleware",
+        # Must be after the session middleware, since it looks for a flag in the session
+        "tilavarauspalvelu.middleware.KeycloakRefreshTokenExpiredMiddleware",
         "django.middleware.common.CommonMiddleware",
         "django.middleware.csrf.CsrfViewMiddleware",
         "django.contrib.auth.middleware.AuthenticationMiddleware",
