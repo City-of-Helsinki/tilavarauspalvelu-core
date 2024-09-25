@@ -35,16 +35,15 @@ class GDPRScopesAndLOAPermission(BasePermission):
         # Ensure request is made with by a strongly authenticated user,
         # following best practices set by the City of Helsinki.
         loa = request.auth.data.get("loa", "").lower()
-        required_loa = ["substantial", "high"]
-        has_correct_loa = loa in required_loa
+        allowed_loa = ["substantial", "high"]
+        has_correct_loa = loa in allowed_loa
 
         details = {
             "request_method": request_method,
-            "request_api_scopes": list(request.auth._authorized_api_scopes),  # noqa: SLF001
-            "request_loa": loa,
-            "allowed_loa": required_loa,
+            "allowed_loa": allowed_loa,
             "required_query_scope": settings.GDPR_API_QUERY_SCOPE,
             "required_delete_scope": settings.GDPR_API_DELETE_SCOPE,
+            "auth_claims": request.auth.data,
         }
 
         if request.method == "GET":

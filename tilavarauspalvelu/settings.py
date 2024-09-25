@@ -344,6 +344,7 @@ class Common(Environment):
     def OIDC_API_TOKEN_AUTH(cls):
         # See 'helusers/settings.py'
         return {
+            "API_AUTHORIZATION_FIELD": "authorization.permissions.scopes",
             "AUDIENCE": cls.GDPR_API_AUDIENCE,
             "ISSUER": cls.GDPR_API_ISSUER,
         }

@@ -29,7 +29,6 @@ def patch_oidc_config():
 def get_gdpr_auth_header(user: User, *, scopes: list[str], loa: Literal["substantial", "high", "low"] = "high") -> str:
     audience = api_token_auth_settings.AUDIENCE
     issuer = api_token_auth_settings.ISSUER
-    auth_field = api_token_auth_settings.API_AUTHORIZATION_FIELD
 
     now = datetime.datetime.now(tz=get_default_timezone())
     expire = now + datetime.timedelta(days=14)
@@ -41,7 +40,7 @@ def get_gdpr_auth_header(user: User, *, scopes: list[str], loa: Literal["substan
         "iat": int(now.timestamp()),
         "exp": int(expire.timestamp()),
         "loa": loa,
-        auth_field: scopes,
+        "authorization": {"permissions": [{"scopes": scopes}]},
     }
     encoded_jwt = jwt.encode(jwt_data, key=RSA.private_key_pem, algorithm=RSA.jose_algorithm)
     return f"{api_token_auth_settings.AUTH_SCHEME} {encoded_jwt}"
