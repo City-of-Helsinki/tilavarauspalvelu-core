@@ -18,6 +18,8 @@ __all__ = [
 
 
 class ReservationPurpose(models.Model):
+    rank: int = models.PositiveIntegerField(default=0, db_index=True)  # Used for ordering
+
     name: str = models.CharField(max_length=200)
 
     # Translated field hints
@@ -32,7 +34,7 @@ class ReservationPurpose(models.Model):
         base_manager_name = "objects"
         verbose_name = _("reservation purpose")
         verbose_name_plural = _("reservation purposes")
-        ordering = ["pk"]
+        ordering = ["rank"]
 
     def __str__(self) -> str:
         return self.name
