@@ -7,4 +7,9 @@ from tilavarauspalvelu.models import ReservationDenyReason
 
 @admin.register(ReservationDenyReason)
 class ReservationDenyReasonAdmin(SortableAdminMixin, TranslationAdmin):
-    pass
+    # List
+    list_display = [
+        "rank",
+        "reason",
+    ]
+    ordering = ["rank"]
