@@ -18,3 +18,9 @@ class ReservationPurposeFilterSet(ModelFilterSet):
             "name_en",
             "name_sv",
         ]
+        order_by = [
+            "rank",
+            "name_fi",
+            "name_en",
+            "name_sv",
+        ]
