@@ -12,6 +12,8 @@ if TYPE_CHECKING:
 
 
 class ReservationPurpose(models.Model):
+    rank: int = models.PositiveIntegerField(default=0, null=False, blank=False, db_index=True)  # Used for ordering
+
     name = models.CharField(max_length=200)
 
     # Translated field hints
@@ -24,7 +26,7 @@ class ReservationPurpose(models.Model):
     class Meta:
         db_table = "reservation_purpose"
         base_manager_name = "objects"
-        ordering = ["pk"]
+        ordering = ["rank"]
 
     def __str__(self) -> str:
         return self.name

@@ -16,8 +16,9 @@ if TYPE_CHECKING:
 
 
 class Purpose(models.Model):
+    rank: int = models.PositiveIntegerField(default=0, null=False, blank=False, db_index=True)  # Used for ordering
+
     name: str = models.CharField(max_length=200)
-    rank: int | None = models.PositiveIntegerField(blank=True, null=True)
 
     image: ThumbnailFile | None
     image = ThumbnailerImageField(upload_to=settings.RESERVATION_UNIT_PURPOSE_IMAGES_ROOT, null=True)
