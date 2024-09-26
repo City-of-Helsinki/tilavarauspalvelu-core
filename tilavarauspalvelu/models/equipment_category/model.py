@@ -12,8 +12,9 @@ __all__ = [
 
 
 class EquipmentCategory(models.Model):
+    rank: int = models.PositiveIntegerField(default=0, db_index=True)  # Used for ordering
+
     name: str = models.CharField(max_length=200)
-    rank: int | None = models.PositiveIntegerField(blank=True, null=True)
 
     # Translated field hints
     name_fi: str | None
@@ -27,7 +28,7 @@ class EquipmentCategory(models.Model):
         base_manager_name = "objects"
         verbose_name = _("equipment category")
         verbose_name_plural = _("equipment categories")
-        ordering = ["pk"]
+        ordering = ["rank"]
 
     def __str__(self) -> str:
         return self.name

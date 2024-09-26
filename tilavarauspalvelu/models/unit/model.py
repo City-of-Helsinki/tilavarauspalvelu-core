@@ -26,6 +26,8 @@ class Unit(models.Model):
     separate building etc.
     """
 
+    rank: int = models.PositiveIntegerField(default=0, db_index=True)  # Used for ordering
+
     tprek_id: str | None = models.CharField(max_length=255, unique=True, blank=True, null=True)
     tprek_department_id: str | None = models.CharField(max_length=255, blank=True, null=True)
     tprek_last_modified: datetime.datetime | None = models.DateTimeField(blank=True, null=True)
@@ -36,8 +38,6 @@ class Unit(models.Model):
     web_page: str = models.URLField(max_length=255, blank=True, default="")
     email: str = models.EmailField(max_length=255, blank=True, default="")
     phone: str = models.CharField(max_length=255, blank=True, default="")
-
-    rank: int | None = models.PositiveIntegerField(blank=True, null=True)  # Used for ordering
 
     origin_hauki_resource = models.ForeignKey(
         "tilavarauspalvelu.OriginHaukiResource",

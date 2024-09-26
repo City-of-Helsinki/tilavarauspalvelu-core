@@ -52,7 +52,7 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
 
     sku: str = models.CharField(max_length=255, blank=True, default="")
     uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    rank: int | None = models.PositiveIntegerField(null=True, blank=True)
+    rank: int = models.PositiveIntegerField(default=0, db_index=True)  # Used for ordering
 
     # Strings
 
