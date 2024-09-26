@@ -6,8 +6,8 @@ from typing import Any
 import factory
 from factory import fuzzy
 
-from applications.enums import ApplicationSectionStatusChoice, Weekday
-from applications.models import ApplicationSection, ReservationUnitOption, SuitableTimeRange
+from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, Weekday
+from tilavarauspalvelu.models import ApplicationSection, ReservationUnitOption, SuitableTimeRange
 
 from ._base import GenericDjangoModelFactory
 from .reservation_unit_option import ReservationUnitOptionFactory

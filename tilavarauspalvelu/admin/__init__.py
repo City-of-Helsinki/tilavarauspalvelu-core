@@ -1,5 +1,11 @@
 from .ability_group.admin import AbilityGroupAdmin
+from .address.admin import AddressAdmin
 from .age_group.admin import AgeGroupAdmin
+from .allocated_timeslot.admin import AllocatedTimeSlotAdmin
+from .application.admin import ApplicationAdmin
+from .application_round.admin import ApplicationRoundAdmin
+from .application_section.admin import ApplicationSectionAdmin
+from .city.admin import CityAdmin
 from .email_template.admin import EmailTemplateAdmin
 from .equipment.admin import EquipmentAdmin
 from .equipment_category.admin import EquipmentCategoryAdmin
@@ -7,10 +13,12 @@ from .general_role.admin import GeneralRoleAdmin
 from .keyword.admin import KeywordAdmin
 from .keyword_category.admin import KeywordCategoryAdmin
 from .keyword_group.admin import KeywordGroupAdmin
+from .organisation.admin import OrganisationAdmin
 from .origin_hauki_resource.admin import OriginHaukiResourceAdmin
 from .payment_accounting.admin import PaymentAccountingAdmin
 from .payment_merchant.admin import PaymentMerchantAdmin
 from .payment_order.admin import PaymentOrderAdmin
+from .person.admin import PersonAdmin
 from .purpose.admin import PurposeAdmin
 from .qualifier.admin import QualifierAdmin
 from .recurring_reservation.admin import RecurringReservationAdmin
@@ -39,7 +47,13 @@ from .user.admin import UserAdmin
 
 __all__ = [
     "AbilityGroupAdmin",
+    "AddressAdmin",
     "AgeGroupAdmin",
+    "AllocatedTimeSlotAdmin",
+    "ApplicationAdmin",
+    "ApplicationRoundAdmin",
+    "ApplicationSectionAdmin",
+    "CityAdmin",
     "EmailTemplateAdmin",
     "EquipmentAdmin",
     "EquipmentCategoryAdmin",
@@ -47,10 +61,12 @@ __all__ = [
     "KeywordAdmin",
     "KeywordCategoryAdmin",
     "KeywordGroupAdmin",
+    "OrganisationAdmin",
     "OriginHaukiResourceAdmin",
     "PaymentAccountingAdmin",
     "PaymentMerchantAdmin",
     "PaymentOrderAdmin",
+    "PersonAdmin",
     "PurposeAdmin",
     "QualifierAdmin",
     "RecurringReservationAdmin",

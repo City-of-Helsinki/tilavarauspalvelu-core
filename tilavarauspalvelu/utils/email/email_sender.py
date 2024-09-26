@@ -16,11 +16,10 @@ from tilavarauspalvelu.utils.email.email_builder_reservation import ReservationE
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    from applications.models import Application
     from config.utils.commons import LanguageType
     from tilavarauspalvelu.admin.email_template.tester import EmailTemplateTesterForm
     from tilavarauspalvelu.enums import EmailType
-    from tilavarauspalvelu.models import Reservation
+    from tilavarauspalvelu.models import Application, Reservation
     from tilavarauspalvelu.utils.email.email_builder_base import BaseEmailBuilder
 
 

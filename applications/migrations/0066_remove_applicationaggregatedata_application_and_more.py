@@ -6,17 +6,57 @@ import django.core.validators
 import django.db.models.deletion
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import migrations, models
+from django.utils.text import format_lazy
+from django.utils.translation import gettext_lazy as _
 
-import applications.models.organization
 import common.fields.model
-from applications.enums import ApplicantTypeChoice, OrganizationTypeChoice, WeekdayChoice
+
+
+def year_not_in_future(year: int | None) -> None:
+    from common.date_utils import DEFAULT_TIMEZONE
+
+    if year is None:
+        return
+
+    current_date = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
+
+    if current_date.year < year:
+        msg = _("is after current year")
+        raise ValidationError(format_lazy("{year} {msg}", year=year, msg=msg))
 
 
 class ReservationPriorityChoice(models.IntegerChoices):
     LOW = 100, "Low"
     MEDIUM = 200, "Medium"
     HIGH = 300, "High"
+
+
+class WeekdayChoice(models.IntegerChoices):
+    MONDAY = 0, "Monday"
+    TUESDAY = 1, "Tuesday"
+    WEDNESDAY = 2, "Wednesday"
+    THURSDAY = 3, "Thursday"
+    FRIDAY = 4, "Friday"
+    SATURDAY = 5, "Saturday"
+    SUNDAY = 6, "Sunday"
+
+
+class OrganizationTypeChoice(models.TextChoices):
+    COMPANY = "COMPANY", "Company"
+    REGISTERED_ASSOCIATION = "REGISTERED_ASSOCIATION", "Registered association"
+    PUBLIC_ASSOCIATION = "PUBLIC_ASSOCIATION", "Public association"
+    UNREGISTERED_ASSOCIATION = "UNREGISTERED_ASSOCIATION", "Unregistered association"
+    MUNICIPALITY_CONSORTIUM = "MUNICIPALITY_CONSORTIUM", "Municipality consortium"
+    RELIGIOUS_COMMUNITY = "RELIGIOUS_COMMUNITY", "Religious community"
+
+
+class ApplicantTypeChoice(models.TextChoices):
+    INDIVIDUAL = "INDIVIDUAL", "Individual"
+    ASSOCIATION = "ASSOCIATION", "Association"
+    COMMUNITY = "COMMUNITY", "Community"
+    COMPANY = "COMPANY", "Company"
 
 
 def convert_schedule_results_to_schedule(apps, schema_editor):
@@ -738,9 +778,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="organisation",
             name="year_established",
-            field=models.PositiveIntegerField(
-                blank=True, null=True, validators=[applications.models.organization.year_not_in_future]
-            ),
+            field=models.PositiveIntegerField(blank=True, null=True, validators=[year_not_in_future]),
         ),
         migrations.AlterField(
             model_name="person",

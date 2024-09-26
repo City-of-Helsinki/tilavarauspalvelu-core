@@ -5,17 +5,17 @@ from typing import TYPE_CHECKING
 import freezegun
 import pytest
 
-from applications.enums import ApplicantTypeChoice, Weekday
-from applications.tasks import generate_reservation_series_from_allocations
 from common.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_datetime, local_iso_format
 from tests.factories import AllocatedTimeSlotFactory, ReservationFactory
 from tests.helpers import patch_method
 from tilavarauspalvelu.enums import (
+    ApplicantTypeChoice,
     CustomerTypeChoice,
     HaukiResourceState,
     RejectionReadinessChoice,
     ReservationStateChoice,
     ReservationTypeChoice,
+    Weekday,
 )
 from tilavarauspalvelu.models import (
     AffectingTimeSpan,
@@ -23,6 +23,7 @@ from tilavarauspalvelu.models import (
     RejectedOccurrence,
     ReservationUnitHierarchy,
 )
+from tilavarauspalvelu.tasks import generate_reservation_series_from_allocations
 from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.utils.opening_hours.hauki_api_types import HaukiAPIDatePeriod
 from utils.sentry import SentryLogger

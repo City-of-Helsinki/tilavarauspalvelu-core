@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 
     from django.db import models
 
-    from applications.models import City
+    from tilavarauspalvelu.models import City
     from users.models import User
 
 

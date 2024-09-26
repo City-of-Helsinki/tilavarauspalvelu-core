@@ -5,11 +5,11 @@ from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntChoiceFilter, IntMultipleChoiceFilter
 from lookup_property import L
 
-from applications.enums import ApplicantTypeChoice, ApplicationStatusChoice
-from applications.models import Application
-from applications.querysets.application import ApplicationQuerySet
 from common.db import text_search
 from common.utils import log_text_search
+from tilavarauspalvelu.enums import ApplicantTypeChoice, ApplicationStatusChoice
+from tilavarauspalvelu.models import Application
+from tilavarauspalvelu.models.application.queryset import ApplicationQuerySet
 
 __all__ = [
     "ApplicationFilterSet",

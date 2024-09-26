@@ -7,8 +7,7 @@ from typing import TYPE_CHECKING, Literal, TypedDict
 if TYPE_CHECKING:
     import datetime
 
-    from applications.models import City
-
+    from tilavarauspalvelu.models import City
 
 __all__ = [
     "ADLoginAMR",

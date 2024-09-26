@@ -1,9 +1,9 @@
 import pytest
 from lookup_property import L
 
-from applications.enums import ApplicationSectionStatusChoice, ApplicationStatusChoice
-from applications.models import ApplicationSection
 from tests.factories import ApplicationSectionFactory
+from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, ApplicationStatusChoice
+from tilavarauspalvelu.models import ApplicationSection
 
 # Applied to all tests
 pytestmark = [

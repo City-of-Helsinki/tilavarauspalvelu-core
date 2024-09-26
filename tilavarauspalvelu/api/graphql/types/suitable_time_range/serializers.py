@@ -1,6 +1,6 @@
 from graphene_django_extensions import NestingModelSerializer
 
-from applications.models import SuitableTimeRange
+from tilavarauspalvelu.models import SuitableTimeRange
 
 __all__ = [
     "SuitableTimeRangeSerializer",

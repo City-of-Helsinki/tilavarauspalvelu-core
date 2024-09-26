@@ -1,7 +1,7 @@
 import factory
 from factory import fuzzy
 
-from applications.models import Person
+from tilavarauspalvelu.models import Person
 
 from ._base import GenericDjangoModelFactory
 

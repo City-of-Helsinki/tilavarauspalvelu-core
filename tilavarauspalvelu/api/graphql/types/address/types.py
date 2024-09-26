@@ -1,6 +1,6 @@
 from graphene_django_extensions import DjangoNode
 
-from applications.models import Address
+from tilavarauspalvelu.models import Address
 
 from .permissions import AddressPermission
 

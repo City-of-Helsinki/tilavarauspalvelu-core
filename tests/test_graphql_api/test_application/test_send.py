@@ -1,8 +1,8 @@
 import pytest
 
-from applications.enums import ApplicationStatusChoice
 from tests.factories import ApplicationFactory
 from tests.helpers import patch_method
+from tilavarauspalvelu.enums import ApplicationStatusChoice
 from tilavarauspalvelu.utils.email.application_email_notification_sender import ApplicationEmailNotificationSender
 
 from .helpers import SEND_MUTATION

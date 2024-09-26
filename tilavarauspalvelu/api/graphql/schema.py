@@ -11,11 +11,10 @@ from graphene_django_extensions.errors import GQLNotFoundError
 from query_optimizer import DjangoListField, optimize_single
 from query_optimizer.compiler import optimize
 
-from applications.models import AllocatedTimeSlot
 from common.models import BannerNotification
 from common.typing import AnyUser, GQLInfo
 from tilavarauspalvelu.enums import UserPermissionChoice
-from tilavarauspalvelu.models import PaymentOrder, Reservation, User
+from tilavarauspalvelu.models import AllocatedTimeSlot, PaymentOrder, Reservation, User
 from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
 from tilavarauspalvelu.utils.helauth.typing import UserProfileInfo
 

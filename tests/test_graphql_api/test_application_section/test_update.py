@@ -3,10 +3,10 @@ from datetime import date
 
 import pytest
 
-from applications.enums import ApplicationSectionStatusChoice
-from applications.models import ApplicationSection
 from tests.factories import ApplicationSectionFactory, ReservationUnitOptionFactory
 from tests.test_graphql_api.test_application_section.helpers import UPDATE_MUTATION, get_application_section_update_data
+from tilavarauspalvelu.enums import ApplicationSectionStatusChoice
+from tilavarauspalvelu.models import ApplicationSection
 
 # Applied to all tests
 pytestmark = [

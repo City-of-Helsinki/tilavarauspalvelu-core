@@ -7,14 +7,13 @@ from graphene_django_extensions import NestingModelSerializer
 from graphql import GraphQLError
 from rest_framework.exceptions import ValidationError
 
-from applications.enums import WeekdayChoice
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.api.graphql.types.application_round_time_slot.serializers import (
     ApplicationRoundTimeSlotSerializer,
 )
 from tilavarauspalvelu.api.graphql.types.reservation_unit_image.serializers import ReservationUnitImageFieldSerializer
 from tilavarauspalvelu.api.graphql.types.reservation_unit_pricing.serializers import ReservationUnitPricingSerializer
-from tilavarauspalvelu.enums import PricingStatus, ReservationStartInterval
+from tilavarauspalvelu.enums import PricingStatus, ReservationStartInterval, WeekdayChoice
 from tilavarauspalvelu.models import ReservationUnit, ReservationUnitPricing
 from tilavarauspalvelu.utils.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from tilavarauspalvelu.utils.reservation_units.reservation_unit_pricing_helper import ReservationUnitPricingHelper

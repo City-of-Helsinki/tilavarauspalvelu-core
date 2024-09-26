@@ -1,6 +1,6 @@
 from graphene_django_extensions import DjangoNode
 
-from applications.models import AllocatedTimeSlot
+from tilavarauspalvelu.models import AllocatedTimeSlot
 
 from .filtersets import AllocatedTimeSlotFilterSet
 from .permissions import AllocatedTimeSlotPermission

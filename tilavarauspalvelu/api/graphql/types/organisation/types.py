@@ -1,6 +1,6 @@
 from graphene_django_extensions import DjangoNode
 
-from applications.models import Organisation
+from tilavarauspalvelu.models import Organisation
 
 from .permissions import OrganisationPermission
 

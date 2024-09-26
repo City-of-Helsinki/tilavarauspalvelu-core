@@ -12,8 +12,7 @@ from common.date_utils import local_datetime
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
 
 if TYPE_CHECKING:
-    from applications.models import ApplicationRound
-    from tilavarauspalvelu.models import Reservation
+    from tilavarauspalvelu.models import ApplicationRound, Reservation
 
 
 class ReservationQuerySet(models.QuerySet):

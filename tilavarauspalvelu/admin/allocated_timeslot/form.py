@@ -1,7 +1,7 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from applications.models import AllocatedTimeSlot, ReservationUnitOption
+from tilavarauspalvelu.models import AllocatedTimeSlot, ReservationUnitOption
 
 
 class AllocatedTimeSlotAdminForm(forms.ModelForm):

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from applications.models import ApplicationRoundTimeSlot
+from tilavarauspalvelu.models import ApplicationRoundTimeSlot
 
 from .form import ApplicationRoundTimeSlotForm
 

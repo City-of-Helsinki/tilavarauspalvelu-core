@@ -10,7 +10,6 @@ from django.core.cache import cache
 from graphene_django_extensions.testing.client import GQLResponse
 from graphene_django_extensions.testing.utils import parametrize_helper
 
-from applications.enums import ApplicationRoundStatusChoice
 from common.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 from tests.factories import (
     ApplicationRoundFactory,
@@ -21,7 +20,12 @@ from tests.factories import (
     ResourceFactory,
     SpaceFactory,
 )
-from tilavarauspalvelu.enums import ReservationStartInterval, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import (
+    ApplicationRoundStatusChoice,
+    ReservationStartInterval,
+    ReservationStateChoice,
+    ReservationTypeChoice,
+)
 from tilavarauspalvelu.models import AffectingTimeSpan, ReservationUnit, ReservationUnitHierarchy
 from tilavarauspalvelu.utils.first_reservable_time.first_reservable_time_helper import CachedReservableTime
 

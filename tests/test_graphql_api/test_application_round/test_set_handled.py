@@ -1,7 +1,7 @@
 import pytest
 
-from applications.enums import ApplicationRoundStatusChoice, ApplicationStatusChoice
 from tests.factories import ApplicationFactory, ApplicationRoundFactory, ReservationUnitFactory, UserFactory
+from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ApplicationStatusChoice
 
 from .helpers import SET_HANDLED_MUTATION, disable_reservation_generation
 

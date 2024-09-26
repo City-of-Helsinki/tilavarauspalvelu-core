@@ -5,12 +5,11 @@ from lookup_property import L
 from query_optimizer import AnnotatedField
 from query_optimizer.optimizer import QueryOptimizer
 
-from applications.enums import ApplicationRoundReservationCreationStatusChoice, ApplicationRoundStatusChoice
-from applications.models import Application, ApplicationRound
-from applications.querysets.application_round import ApplicationRoundQuerySet
 from common.db import SubqueryCount
 from common.typing import AnyUser, GQLInfo
-from tilavarauspalvelu.models import ReservationUnit
+from tilavarauspalvelu.enums import ApplicationRoundReservationCreationStatusChoice, ApplicationRoundStatusChoice
+from tilavarauspalvelu.models import Application, ApplicationRound, ReservationUnit
+from tilavarauspalvelu.models.application_round.queryset import ApplicationRoundQuerySet
 
 from .filtersets import ApplicationRoundFilterSet
 from .permissions import ApplicationRoundPermission

@@ -2,10 +2,9 @@ import datetime
 
 import pytest
 
-from applications.enums import Weekday
-from applications.models import AllocatedTimeSlot
 from tests.factories import AllocatedTimeSlotFactory, ReservationUnitFactory, ReservationUnitOptionFactory, SpaceFactory
-from tilavarauspalvelu.models import ReservationUnitHierarchy
+from tilavarauspalvelu.enums import Weekday
+from tilavarauspalvelu.models import AllocatedTimeSlot, ReservationUnitHierarchy
 
 # Applied to all tests
 pytestmark = [

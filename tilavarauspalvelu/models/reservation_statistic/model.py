@@ -88,7 +88,7 @@ class ReservationStatistic(models.Model):
     purpose_name: str = models.CharField(max_length=255, default="", blank=True)
 
     home_city = models.ForeignKey(
-        "applications.City",
+        "tilavarauspalvelu.City",
         related_name="reservation_statistics",
         on_delete=models.SET_NULL,
         null=True,

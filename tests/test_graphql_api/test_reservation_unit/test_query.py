@@ -4,7 +4,6 @@ import pytest
 from django.utils.timezone import get_default_timezone
 from graphql_relay import to_global_id
 
-from applications.enums import WeekdayChoice
 from common.date_utils import local_datetime, next_hour
 from tests.factories import (
     ApplicationRoundFactory,
@@ -31,6 +30,7 @@ from tilavarauspalvelu.enums import (
     ReservationTypeChoice,
     ReservationUnitPublishingState,
     TermsOfUseTypeChoices,
+    WeekdayChoice,
 )
 
 from .helpers import reservation_unit_query, reservation_units_query

@@ -1,6 +1,6 @@
 from graphene_django_extensions import NestingModelSerializer
 
-from applications.models import Address
+from tilavarauspalvelu.models import Address
 
 
 class AddressSerializer(NestingModelSerializer):

@@ -1,10 +1,9 @@
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from applications.models import Application
 from tests.factories import ApplicationFactory, EmailTemplateFactory
 from tilavarauspalvelu.enums import EmailType
-from tilavarauspalvelu.models import EmailTemplate
+from tilavarauspalvelu.models import Application, EmailTemplate
 from tilavarauspalvelu.utils.email.email_builder_application import ApplicationEmailBuilder
 
 pytestmark = [

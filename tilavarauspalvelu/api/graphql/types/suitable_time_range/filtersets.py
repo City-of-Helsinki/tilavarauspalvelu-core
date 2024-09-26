@@ -3,9 +3,9 @@ from django.db.models import QuerySet
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntMultipleChoiceFilter
 
-from applications.enums import Priority
-from applications.models import SuitableTimeRange
-from applications.querysets.suitable_time_range import SuitableTimeRangeQuerySet
+from tilavarauspalvelu.enums import Priority
+from tilavarauspalvelu.models import SuitableTimeRange
+from tilavarauspalvelu.models.suitable_time_range.queryset import SuitableTimeRangeQuerySet
 
 
 class SuitableTimeRangeFilterSet(ModelFilterSet):

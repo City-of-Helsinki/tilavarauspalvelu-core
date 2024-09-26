@@ -1,5 +1,5 @@
-from applications.models import Application
 from tilavarauspalvelu.enums import EmailType
+from tilavarauspalvelu.models import Application
 from tilavarauspalvelu.tasks import send_application_email_task
 
 

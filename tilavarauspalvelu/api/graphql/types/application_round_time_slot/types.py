@@ -1,8 +1,8 @@
 from graphene_django_extensions import DjangoNode
 from graphene_django_extensions.fields.graphql import TypedDictListField
 
-from applications.models.application_round_time_slot import ApplicationRoundTimeSlot
-from applications.typing import TimeSlot
+from tilavarauspalvelu.models import ApplicationRoundTimeSlot
+from tilavarauspalvelu.typing import TimeSlot
 
 from .permissions import ApplicationRoundTimeSlotPermission
 

@@ -1,8 +1,8 @@
 from graphene_django_extensions import CreateMutation, DeleteMutation, UpdateMutation
 from rest_framework.exceptions import ValidationError
 
-from applications.models import ApplicationSection
 from common.typing import AnyUser
+from tilavarauspalvelu.models import ApplicationSection
 
 from .permissions import ApplicationSectionPermission, UpdateAllSectionOptionsPermission
 from .serializers import (

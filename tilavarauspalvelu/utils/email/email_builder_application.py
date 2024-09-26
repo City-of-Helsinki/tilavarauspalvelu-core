@@ -11,9 +11,8 @@ from tilavarauspalvelu.enums import EmailType
 from tilavarauspalvelu.utils.email.email_builder_base import BaseEmailBuilder, BaseEmailContext
 
 if TYPE_CHECKING:
-    from applications.models import Application
     from config.utils.commons import LanguageType
-    from tilavarauspalvelu.models import EmailTemplate
+    from tilavarauspalvelu.models import Application, EmailTemplate
 
 
 @dataclass

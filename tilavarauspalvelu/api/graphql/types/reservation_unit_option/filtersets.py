@@ -1,6 +1,6 @@
 from graphene_django_extensions.filters import IntMultipleChoiceFilter, ModelFilterSet
 
-from applications.models import ReservationUnitOption
+from tilavarauspalvelu.models import ReservationUnitOption
 
 
 class ReservationUnitOptionFilterSet(ModelFilterSet):

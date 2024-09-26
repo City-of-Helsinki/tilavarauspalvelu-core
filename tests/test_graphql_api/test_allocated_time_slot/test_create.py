@@ -3,7 +3,6 @@ import datetime
 import pytest
 from django.utils.timezone import get_default_timezone
 
-from applications.enums import ApplicationSectionStatusChoice, ApplicationStatusChoice, Weekday
 from tests.factories import (
     AllocatedTimeSlotFactory,
     ApplicationFactory,
@@ -13,6 +12,7 @@ from tests.factories import (
     SpaceFactory,
     SuitableTimeRangeFactory,
 )
+from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, ApplicationStatusChoice, Weekday
 from tilavarauspalvelu.models import ReservationUnitHierarchy
 
 from .helpers import CREATE_ALLOCATION, allocation_create_data

@@ -11,7 +11,10 @@ from .models import (
     Service,
     TermsOfUse,
 )
+from .models.address.model import Address
+from .models.application_round.model import ApplicationRound
 from .models.building.model import Building
+from .models.city.model import City
 from .models.email_template.model import EmailTemplate
 from .models.equipment.model import Equipment
 from .models.equipment_category.model import EquipmentCategory
@@ -19,6 +22,7 @@ from .models.keyword.model import Keyword
 from .models.keyword_category.model import KeywordCategory
 from .models.keyword_group.model import KeywordGroup
 from .models.location.model import Location
+from .models.organisation.model import Organisation
 from .models.purpose.model import Purpose
 from .models.qualifier.model import Qualifier
 from .models.real_estate.model import RealEstate
@@ -161,4 +165,24 @@ class EquipmentCategoryTranslationOptions(TranslationOptions):
 
 @register(ReservationUnitCancellationRule)
 class ReservationUnitCancellationRuleTranslationOptions(TranslationOptions):
+    fields = ["name"]
+
+
+@register(Address)
+class AddressTranslationOptions(TranslationOptions):
+    fields = ["street_address", "city"]
+
+
+@register(Organisation)
+class OrganisationTranslationOptions(TranslationOptions):
+    fields = ["name", "core_business"]
+
+
+@register(ApplicationRound)
+class ApplicationRoundTranslationOptions(TranslationOptions):
+    fields = ["name", "criteria", "notes_when_applying"]
+
+
+@register(City)
+class CityTranslationOptions(TranslationOptions):
     fields = ["name"]

@@ -6,11 +6,11 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from applications.models import City
 from common.date_utils import local_start_of_day
 from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice
 from tilavarauspalvelu.models import (
     AgeGroup,
+    City,
     Reservation,
     ReservationCancelReason,
     ReservationDenyReason,

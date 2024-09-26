@@ -1,7 +1,7 @@
 import pytest
 
-from applications.enums import ApplicationRoundStatusChoice, ApplicationStatusChoice
 from tests.factories import ApplicationFactory, ApplicationRoundFactory
+from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ApplicationStatusChoice
 
 from .helpers import DELETE_ALLOCATION
 
