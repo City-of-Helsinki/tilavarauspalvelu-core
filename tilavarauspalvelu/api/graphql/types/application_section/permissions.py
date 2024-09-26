@@ -3,9 +3,9 @@ from typing import Any
 from graphene_django_extensions.errors import GQLCodeError
 from graphene_django_extensions.permissions import BasePermission
 
-from applications.models import Application, ApplicationSection
 from common.typing import AnyUser
 from tilavarauspalvelu.api.graphql.extensions import error_codes
+from tilavarauspalvelu.models import Application, ApplicationSection
 
 __all__ = [
     "ApplicationSectionPermission",

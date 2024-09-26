@@ -1,6 +1,8 @@
 import pytest
 
-from applications.models import (
+from tests.factories import ApplicationRoundFactory
+from tests.test_graphql_api.test_application.helpers import get_application_create_data
+from tilavarauspalvelu.models import (
     Address,
     Application,
     ApplicationSection,
@@ -9,8 +11,6 @@ from applications.models import (
     ReservationUnitOption,
     SuitableTimeRange,
 )
-from tests.factories import ApplicationRoundFactory
-from tests.test_graphql_api.test_application.helpers import get_application_create_data
 
 from .helpers import CREATE_MUTATION
 

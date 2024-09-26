@@ -2,10 +2,9 @@ import datetime
 
 import pytest
 
-from applications.enums import WeekdayChoice
 from tests.factories import UnitFactory
 from tests.helpers import patch_method
-from tilavarauspalvelu.enums import ReservationKind
+from tilavarauspalvelu.enums import ReservationKind, WeekdayChoice
 from tilavarauspalvelu.exceptions import HaukiAPIError
 from tilavarauspalvelu.models import ReservationUnit
 from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient

@@ -15,8 +15,7 @@ from .queryset import RecurringReservationQuerySet
 if TYPE_CHECKING:
     import datetime
 
-    from applications.models import AllocatedTimeSlot
-    from tilavarauspalvelu.models import AbilityGroup, AgeGroup, Reservation, ReservationUnit, User
+    from tilavarauspalvelu.models import AbilityGroup, AgeGroup, AllocatedTimeSlot, Reservation, ReservationUnit, User
 
     from .actions import RecurringReservationActions
 
@@ -61,7 +60,7 @@ class RecurringReservation(models.Model):
         on_delete=models.SET_NULL,
     )
     allocated_time_slot: AllocatedTimeSlot | None = models.OneToOneField(
-        "applications.AllocatedTimeSlot",
+        "tilavarauspalvelu.AllocatedTimeSlot",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,

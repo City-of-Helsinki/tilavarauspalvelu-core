@@ -4,9 +4,9 @@ from typing import Any
 import factory
 from factory import fuzzy
 
-from applications.enums import WeekdayChoice
-from applications.models.application_round_time_slot import ApplicationRoundTimeSlot
-from applications.typing import TimeSlotDB
+from tilavarauspalvelu.enums import WeekdayChoice
+from tilavarauspalvelu.models import ApplicationRoundTimeSlot
+from tilavarauspalvelu.typing import TimeSlotDB
 
 from ._base import GenericDjangoModelFactory
 

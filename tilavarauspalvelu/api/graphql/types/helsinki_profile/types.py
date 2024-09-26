@@ -5,18 +5,16 @@ from graphene_django_extensions.errors import GQLNodePermissionDeniedError
 from graphql import GraphQLError
 from query_optimizer.selections import get_field_selections
 
-from applications.models import Application
 from common.typing import AnyUser, GQLInfo
 from tilavarauspalvelu.api.graphql.extensions import error_codes
-from tilavarauspalvelu.models import Reservation, User
+from tilavarauspalvelu.models import Application, Reservation, User
 from tilavarauspalvelu.tasks import save_personal_info_view_log
+from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
+from tilavarauspalvelu.utils.helauth.typing import LoginMethod, UserProfileInfo
 
 __all__ = [
     "HelsinkiProfileDataNode",
 ]
-
-from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
-from tilavarauspalvelu.utils.helauth.typing import LoginMethod, UserProfileInfo
 
 
 class HelsinkiProfileDataNode(graphene.ObjectType):

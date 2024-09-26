@@ -6,10 +6,23 @@ from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 from social_django.models import UserSocialAuth
 
-from applications.enums import ApplicationStatusChoice
-from applications.models import Address, Application, ApplicationSection, Person
-from tilavarauspalvelu.enums import OrderStatus, ReservationNotification, ReservationStateChoice, ReservationTypeChoice
-from tilavarauspalvelu.models import GeneralRole, Reservation, UnitRole, User
+from tilavarauspalvelu.enums import (
+    ApplicationStatusChoice,
+    OrderStatus,
+    ReservationNotification,
+    ReservationStateChoice,
+    ReservationTypeChoice,
+)
+from tilavarauspalvelu.models import (
+    Address,
+    Application,
+    ApplicationSection,
+    GeneralRole,
+    Person,
+    Reservation,
+    UnitRole,
+    User,
+)
 
 ANONYMIZED = "Anonymized"
 SENSITIVE_RESERVATION = "Sensitive data of this reservation has been anonymized by a script"

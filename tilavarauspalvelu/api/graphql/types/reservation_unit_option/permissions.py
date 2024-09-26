@@ -2,8 +2,8 @@ from typing import Any
 
 from graphene_django_extensions.permissions import BasePermission
 
-from applications.models import ReservationUnitOption
 from common.typing import AnyUser
+from tilavarauspalvelu.models import ReservationUnitOption
 
 __all__ = [
     "ReservationUnitOptionPermission",

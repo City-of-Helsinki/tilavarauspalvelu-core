@@ -10,9 +10,17 @@ from tilavarauspalvelu.enums import UserPermissionChoice, UserRoleChoice
 if TYPE_CHECKING:
     from collections.abc import Container, Iterable
 
-    from applications.models import Application, ApplicationRound
     from common.typing import AnyUser
-    from tilavarauspalvelu.models import RecurringReservation, Reservation, ReservationUnit, Space, Unit, User
+    from tilavarauspalvelu.models import (
+        Application,
+        ApplicationRound,
+        RecurringReservation,
+        Reservation,
+        ReservationUnit,
+        Space,
+        Unit,
+        User,
+    )
 
 
 class PermissionResolver:

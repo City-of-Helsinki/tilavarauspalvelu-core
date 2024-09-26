@@ -2,13 +2,6 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from applications.enums import (
-    ApplicantTypeChoice,
-    ApplicationSectionStatusChoice,
-    ApplicationStatusChoice,
-    Priority,
-    Weekday,
-)
 from tests.factories import (
     AgeGroupFactory,
     ApplicationFactory,
@@ -18,9 +11,16 @@ from tests.factories import (
     SuitableTimeRangeFactory,
 )
 from tests.test_graphql_api.test_application_section.helpers import sections_query
+from tilavarauspalvelu.enums import (
+    ApplicantTypeChoice,
+    ApplicationSectionStatusChoice,
+    ApplicationStatusChoice,
+    Priority,
+    Weekday,
+)
 
 if TYPE_CHECKING:
-    from applications.models import ReservationUnitOption
+    from tilavarauspalvelu.models import ReservationUnitOption
 
 # Applied to all tests
 pytestmark = [

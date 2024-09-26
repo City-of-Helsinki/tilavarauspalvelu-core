@@ -318,7 +318,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         return origin_hauki_resource.is_reservable(start_datetime, end_datetime)
 
     def is_in_open_application_round(self, start_date: datetime.date, end_date: datetime.date) -> bool:
-        from applications.models import ApplicationRound
+        from tilavarauspalvelu.models import ApplicationRound
 
         for app_round in ApplicationRound.objects.filter(
             reservation_units=self.reservation_unit,

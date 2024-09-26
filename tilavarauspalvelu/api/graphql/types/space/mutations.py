@@ -1,9 +1,8 @@
 from django.core.exceptions import ValidationError
 from graphene_django_extensions.bases import CreateMutation, DeleteMutation, UpdateMutation
 
-from applications.models import ApplicationRound
 from common.typing import AnyUser
-from tilavarauspalvelu.models import Space
+from tilavarauspalvelu.models import ApplicationRound, Space
 
 from .permissions import SpacePermission
 from .serializers import SpaceSerializer

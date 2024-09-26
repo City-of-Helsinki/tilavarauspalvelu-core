@@ -6,25 +6,25 @@ import pytest
 from django.utils import timezone
 from graphene_django_extensions.testing.utils import parametrize_helper
 
-from applications.enums import ApplicantTypeChoice, Priority, Weekday
-from applications.exporter.application_round_applications_exporter import (
+from common.date_utils import local_date_string, local_timedelta_string
+from tests.factories import ApplicationFactory, ApplicationRoundFactory
+from tilavarauspalvelu.enums import ApplicantTypeChoice, Priority, Weekday
+from tilavarauspalvelu.utils.exporter.application_round_applications_exporter import (
     ApplicationExportRow,
     ApplicationRoundApplicationsCSVExporter,
 )
-from common.date_utils import local_date_string, local_timedelta_string
-from tests.factories import ApplicationFactory, ApplicationRoundFactory
 
 from .helpers import Missing, MissingParams, get_writes
 
 if TYPE_CHECKING:
-    from applications.models import ApplicationSection
+    from tilavarauspalvelu.models import ApplicationSection
 
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
-CSV_WRITER_MOCK_PATH = "applications.exporter.application_round_applications_exporter.csv.writer"
+CSV_WRITER_MOCK_PATH = "tilavarauspalvelu.utils.exporter.application_round_applications_exporter.csv.writer"
 
 
 def test_application_round_applications_export__multiple_applications(graphql):

@@ -7,12 +7,12 @@ from django.db.models import Q, QuerySet
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
 
-from applications.enums import ApplicationRoundStatusChoice, ApplicationStatusChoice
-from applications.models import ApplicationRound
+from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ApplicationStatusChoice
+from tilavarauspalvelu.models import ApplicationRound
 
 if TYPE_CHECKING:
-    from applications.admin import ApplicationAdmin
     from common.typing import WSGIRequest
+    from tilavarauspalvelu.admin.application.admin import ApplicationAdmin
 
 
 class ApplicationRoundFilter(admin.SimpleListFilter):

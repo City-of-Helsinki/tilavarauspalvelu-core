@@ -5,10 +5,9 @@ from typing import Any
 import factory
 from factory import fuzzy
 
-from applications.enums import ApplicationRoundStatusChoice
-from applications.models import ApplicationRound
 from common.date_utils import utc_start_of_day
-from tilavarauspalvelu.models import Purpose, ReservationUnit
+from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
+from tilavarauspalvelu.models import ApplicationRound, Purpose, ReservationUnit
 
 from ._base import GenericDjangoModelFactory
 

@@ -4,9 +4,9 @@ from typing import Any
 
 from graphene_django_extensions.testing import build_mutation, build_query
 
-from applications.enums import ApplicantTypeChoice, Priority, Weekday
-from applications.models import Application, ApplicationRound
 from tests.factories import AgeGroupFactory, CityFactory, ReservationPurposeFactory, ReservationUnitFactory
+from tilavarauspalvelu.enums import ApplicantTypeChoice, Priority, Weekday
+from tilavarauspalvelu.models import Application, ApplicationRound
 
 applications_query = partial(build_query, "applications", connection=True, order_by="pkAsc")
 

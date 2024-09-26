@@ -4,9 +4,10 @@ import random
 from datetime import UTC, datetime, time, timedelta
 from itertools import cycle
 
-from applications.enums import ApplicantTypeChoice, OrganizationTypeChoice, Priority, Weekday, WeekdayChoice
-from applications.models import (
+from tilavarauspalvelu.enums import ApplicantTypeChoice, OrganizationTypeChoice, Priority, Weekday, WeekdayChoice
+from tilavarauspalvelu.models import (
     Address,
+    AgeGroup,
     AllocatedTimeSlot,
     Application,
     ApplicationRound,
@@ -15,11 +16,15 @@ from applications.models import (
     City,
     Organisation,
     Person,
+    ReservationPurpose,
+    ReservationUnit,
     ReservationUnitOption,
+    ServiceSector,
     SuitableTimeRange,
+    Unit,
+    User,
 )
-from applications.typing import TimeSlotDB
-from tilavarauspalvelu.models import AgeGroup, ReservationPurpose, ReservationUnit, ServiceSector, Unit, User
+from tilavarauspalvelu.typing import TimeSlotDB
 
 from .utils import batched, faker_en, faker_fi, faker_sv, get_paragraphs, random_subset, weighted_choice, with_logs
 

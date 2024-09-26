@@ -17,8 +17,7 @@ from utils.sentry import SentryLogger
 from .helpers import get_gdpr_auth_header, patch_oidc_config
 
 if TYPE_CHECKING:
-    from applications.models import Application, ApplicationSection
-    from tilavarauspalvelu.models import Reservation, User
+    from tilavarauspalvelu.models import Application, ApplicationSection, Reservation, User
 
 # Applied to all tests
 pytestmark = [

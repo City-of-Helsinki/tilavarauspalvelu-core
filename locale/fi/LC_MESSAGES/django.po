@@ -7,1085 +7,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: applications/admin/address.py
-#: tilavarauspalvelu/admin/payment_merchant/admin.py
-msgid "Street address"
-msgstr "Katuosoite"
-
-#: applications/admin/address.py
-msgid "Post code"
-msgstr "Postinumero"
-
-#: applications/admin/address.py applications/models/city.py
-#: tilavarauspalvelu/admin/payment_merchant/admin.py
-msgid "City"
-msgstr "Kaupunki"
-
-#: applications/admin/address.py
-msgid "Search by street address, post code or city"
-msgstr "Etsi katuosoitteella, postinumerolla tai kaupungilla"
-
-#: applications/admin/allocated_time_slot/admin.py
-msgid ""
-"Search by day of the week, reservation unit, unit, application section, "
-"user's first or last name or email"
-msgstr ""
-"Etsi viikonpäivän, varausyksikön, toimipisteen, hakemuksen osan, käyttäjän "
-"etu- tai sukunimen tai sähköpostin perusteella"
-
-#: applications/admin/allocated_time_slot/admin.py
-#: applications/admin/application/admin.py
-#: applications/admin/application_section/form.py
-#: applications/models/application.py
-msgid "Application"
-msgstr "Hakemus"
-
-#: applications/admin/allocated_time_slot/filters.py
-#: applications/admin/application/filters.py
-#: applications/models/application_round.py
-msgid "Application Round"
-msgstr "Kausivarauskierros"
-
-#: applications/admin/allocated_time_slot/filters.py
-#: applications/admin/application/filters.py
-#: applications/admin/application_section/filters.py
-msgid "Application round status"
-msgstr "Kausivarauskierroksen status"
-
-#: applications/admin/allocated_time_slot/filters.py
-#: applications/admin/application/filters.py
-#: applications/admin/application_section/filters.py
-msgid "Application status"
-msgstr "Hakemuksen status"
-
-#: applications/admin/allocated_time_slot/filters.py
-#: applications/admin/application_section/filters.py
-msgid "Application section status"
-msgstr "Hakemuksen osan status"
-
-#: applications/admin/allocated_time_slot/filters.py
-#: applications/admin/allocated_time_slot/form.py
-#: applications/admin/application_section/form.py
-msgid "Day of the week"
-msgstr "Viikonpäivä"
-
-#: applications/admin/allocated_time_slot/form.py
-msgid "Reservation unit option"
-msgstr "Varausyksikkö-vaihtoehto"
-
-#: applications/admin/allocated_time_slot/form.py
-msgid "Reservation unit option for to this allocation."
-msgstr "Varausyksikkövaihtoehto tälle allokoinnille."
-
-#: applications/admin/allocated_time_slot/form.py
-#: applications/admin/application_section/form.py
-#: tilavarauspalvelu/admin/reservation/admin.py
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Begin time"
-msgstr "Aloitusaika"
-
-#: applications/admin/allocated_time_slot/form.py
-#: applications/admin/application_section/form.py
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "End time"
-msgstr "Lopetusaika"
-
-#: applications/admin/allocated_time_slot/form.py
-msgid "Allocated day of the week."
-msgstr "Allokoitu viikonpäivä"
-
-#: applications/admin/allocated_time_slot/form.py
-msgid "Allocated begin time."
-msgstr "Allokoitu aloitusaika"
-
-#: applications/admin/allocated_time_slot/form.py
-msgid "Allocated end time."
-msgstr "Allokoitu lopetusaika"
-
-#: applications/admin/application/admin.py
-msgid "Search by user's first name, last name or reservation units name"
-msgstr "Etsi käyttäjän etu- tai sukunimellä tai varausyksikön nimellä"
-
-#: applications/admin/application/admin.py
-#: tilavarauspalvelu/admin/reservation/admin.py
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Created at"
-msgstr "Luotu"
-
-#: applications/admin/application/admin.py
-#: applications/admin/application_round/admin.py
-#: applications/admin/application_section/admin.py
-#: tilavarauspalvelu/admin/reservation/admin.py
-#: tilavarauspalvelu/admin/reservation_unit/admin.py users/admin/user.py
-msgid "Basic information"
-msgstr "Perustiedot"
-
-#: applications/admin/application/admin.py
-#: applications/admin/application/form.py
-msgid "Applicant"
-msgstr "Hakija"
-
-#: applications/admin/application/admin.py
-#: applications/admin/application_round/admin.py
-#: applications/admin/application_section/admin.py
-#: tilavarauspalvelu/admin/reservation/admin.py
-msgid "Time"
-msgstr "Aika"
-
-#: applications/admin/application/admin.py
-#: applications/admin/application_round/admin.py
-msgid "Notes"
-msgstr "Huomiot"
-
-#: applications/admin/application/admin.py
-msgid "Reset application allocations"
-msgstr "Nollaa hakemuksen allokoinnit"
-
-#: applications/admin/application/admin.py
-#: applications/admin/application_round/admin.py
-#: tilavarauspalvelu/admin/reservation/admin.py
-msgid "Are you sure?"
-msgstr "Oletko varma?"
-
-#: applications/admin/application/admin.py
-msgid "Are you sure you want reset allocations for these applications?"
-msgstr "Oletko varma, että haluat nollata näiden hakemusten allokoinnit?"
-
-#: applications/admin/application/form.py
-#: applications/admin/application_round/form.py
-#: applications/admin/application_section/form.py
-msgid "Status"
-msgstr "Status"
-
-#: applications/admin/application/form.py
-msgid "Suitable days of the week"
-msgstr "Sopivat viikonpäivät"
-
-#: applications/admin/application/form.py
-#: applications/admin/application_section/form.py
-msgid "Reservation minimum duration"
-msgstr "Varauksen minimikesto"
-
-#: applications/admin/application/form.py
-#: applications/admin/application_section/form.py
-msgid "Reservation maximum duration"
-msgstr "Varauksen maksimikesto"
-
-#: applications/admin/application/form.py
-#: applications/admin/application_section/form.py
-msgid "Applied reservations per week"
-msgstr "Haetut toistokerrat"
-
-#: applications/admin/application/form.py
-msgid "Suitable days of the week for this section."
-msgstr "Hakemuksen osalle sopivat viikonpäivät."
-
-#: applications/admin/application/form.py
-#: applications/admin/application_section/form.py
-msgid "Minimum duration that should be allocated for this section."
-msgstr "Minimikesto allokoitaville vuoroille."
-
-#: applications/admin/application/form.py
-#: applications/admin/application_section/form.py
-msgid "Maximum duration that should be allocated for this section."
-msgstr "Maksimikesto allokoitaville vuoroille."
-
-#: applications/admin/application/form.py
-#: applications/admin/application_section/form.py
-msgid "How many reservation the applicant has applied for per week."
-msgstr "Kuinka monta toistokertaa hakija on toivonut per viikko."
-
-#: applications/admin/application/form.py
-#, python-format
-msgid ""
-"%(draft)s: Application started but not ready. <br>%(received)s: Application "
-"sent by user. <br>%(in_allocation)s: Application's sections are being "
-"allocated. <br>%(handled)s: Application's sections have all been allocated. "
-"<br>%(results_sent)s: Application's results have been sent to user. "
-"<br>%(expired)s: Application not completed before application round ended. "
-"<br>%(cancelled)s: Application cancelled by user. <br>"
-msgstr ""
-"%(draft)s: Hakemus aloitettu. <br>%(received)s: Hakemus lähetetty. "
-"<br>%(in_allocation)s: Hakemus siirtynyt käsittelyyn. <br>%(handled)s: "
-"Hakemus käsitelty. <br>%(results_sent)s: Käsittelyn tuloksesta ilmoitettu "
-"hakijalle. <br>%(expired)s: Hakemusta ei lähetetty ennen hakuajan "
-"loppumista. <br>%(cancelled)s: Hakemus peruttu hakijan toimesta. <br>"
-
-#: applications/admin/application/form.py
-msgid "Applicant type"
-msgstr "Hakijan tyyppi"
-
-#: applications/admin/application/form.py
-msgid "Application round"
-msgstr "Kausivarauskierros"
-
-#: applications/admin/application/form.py applications/models/organization.py
-msgid "Organisation"
-msgstr "Organisaatio"
-
-#: applications/admin/application/form.py
-msgid "Contact person"
-msgstr "Yhteyshenkilö"
-
-#: applications/admin/application/form.py
-msgid "Billing address"
-msgstr "Laskutusosoite"
-
-#: applications/admin/application/form.py
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Home city"
-msgstr "Kotikunta"
-
-#: applications/admin/application/form.py
-#: tilavarauspalvelu/admin/reservation/admin.py users/admin/user.py
-msgid "Additional information"
-msgstr "Lisätiedot"
-
-#: applications/admin/application/form.py
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Working memo"
-msgstr "Käsittelymuistio"
-
-#: applications/admin/application/form.py
-#: applications/admin/application_round/form.py
-msgid "Sent date"
-msgstr "Lähetyspäivä ja -aika"
-
-#: applications/admin/application/form.py
-msgid "Cancelled date"
-msgstr "Perumispäivä"
-
-#: applications/admin/application/form.py
-msgid "In allocation notification sent date"
-msgstr "'Käsittelyssä' ilmoituksen lähettämispäivä ja -aika"
-
-#: applications/admin/application/form.py
-msgid "Results ready notification sent date"
-msgstr "'Käsitelty' ilmoituksen lähettämispäivä ja -aika"
-
-#: applications/admin/application/form.py
-msgid "Applicant type."
-msgstr "Hakijan tyyppi."
-
-#: applications/admin/application/form.py
-msgid "Application round the application is in."
-msgstr "Hakemuksen kausivarauskierros"
-
-#: applications/admin/application/form.py
-msgid "Organisation the application is for."
-msgstr "Hakemuksen organisaatio"
-
-#: applications/admin/application/form.py
-msgid "Contact person for the application."
-msgstr "Hakemuksen yhteyshenkilö"
-
-#: applications/admin/application/form.py
-msgid "Applicant for the application."
-msgstr "Hakemuksen hakija"
-
-#: applications/admin/application/form.py
-msgid "Billing address for the application."
-msgstr "Hakemuksen laskutusosoite"
-
-#: applications/admin/application/form.py
-msgid "Home city for the application."
-msgstr "Hakemuksen kotipaikka"
-
-#: applications/admin/application/form.py
-msgid "Additional information for the application."
-msgstr "Hakemuksen lisätiedot"
-
-#: applications/admin/application/form.py
-msgid "Working memo for staff users."
-msgstr "Muistio henkilökunnalle"
-
-#: applications/admin/application/form.py
-msgid "Date when the application was sent."
-msgstr "Päivämäärä, jolloin hakemus lähetettiin."
-
-#: applications/admin/application/form.py
-msgid "Date when the application was cancelled."
-msgstr "Päivämäärä, jolloin hakemus peruttiin."
-
-#: applications/admin/application/form.py
-msgid ""
-"Date when the applicant was notified that this application round is now in "
-"allocation."
-msgstr "Päivä ja aika, millon hakija sai tiedon, että hakemus on käsittelyssä."
-
-#: applications/admin/application/form.py
-msgid ""
-"Date when the applicant was notified that this application round results are "
-"now ready."
-msgstr "Päivä ja aika, millon hakija sai tiedon, että hakemus on käsitelty."
-
-#: applications/admin/application_round/admin.py
-msgid "Criteria"
-msgstr "Kriteeri"
-
-#: applications/admin/application_round/admin.py
-msgid "Reset application round"
-msgstr "Nollaa kausivarauskierros"
-
-#: applications/admin/application_round/admin.py
-msgid "Are you sure you want to reset these application rounds?"
-msgstr "Oletko varma, että haluat nollata nämä kausivarauskierrokset?"
-
-#: applications/admin/application_round/form.py
-#, python-format
-msgid ""
-"%(upcoming)s: Applications cannot yet be made in the round. <br>%(open)s: "
-"Applications can be made in the round. <br>%(in_allocation)s: Applications "
-"in the round are being allocated. <br>%(handled)s: All application have been "
-"allocated. <br>%(results_sent)s: All application results have been sent to "
-"users. <br>"
-msgstr ""
-"%(upcoming)s: Hakemuksia ei voi vielä tehdä. <br>%(open)s: Hakemuksia voi "
-"tehdä. <br>%(in_allocation)s: Hakemuksiin jaetaan vuoroja. <br>%(handled)s: "
-"Kierros on käsitelty. <br>%(results_sent)s: Tulokset on lähetetty "
-"hakijoille. <br>"
-
-#: applications/admin/application_round/form.py
-#: applications/admin/application_section/form.py applications/admin/city.py
-#: applications/admin/organization.py
-#: tilavarauspalvelu/admin/reservation/form.py
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Name"
-msgstr "Nimi"
-
-#: applications/admin/application_round/form.py
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Name (Finnish)"
-msgstr "Nimi (suomeksi)"
-
-#: applications/admin/application_round/form.py
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Name (English)"
-msgstr "Nimi (englanniksi)"
-
-#: applications/admin/application_round/form.py
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Name (Swedish)"
-msgstr "Nimi (ruotsiksi)"
-
-#: applications/admin/application_round/form.py
-msgid "Reservation units"
-msgstr "Varausyksiköt"
-
-#: applications/admin/application_round/form.py
-msgid "Application period begin date and time"
-msgstr "Hakuajan alkamispäivä ja -aika"
-
-#: applications/admin/application_round/form.py
-msgid "Application period end date and time"
-msgstr "Hakuajan loppumispäivä ja -aika"
-
-#: applications/admin/application_round/form.py
-msgid "Reservation period begin date"
-msgstr "Varattavan ajanjakson alkamispäivä"
-
-#: applications/admin/application_round/form.py
-msgid "Reservation period end date"
-msgstr "Varattavan ajanjakson loppumispäivä"
-
-#: applications/admin/application_round/form.py
-msgid "Public display begin date and time"
-msgstr "Julkisen näkyvyyden alkamispäivä ja -aika"
-
-#: applications/admin/application_round/form.py
-msgid "Public display end date and time"
-msgstr "Julkisen näkyvyyden loppumispäivä ja -aika"
-
-#: applications/admin/application_round/form.py
-msgid "Handled date"
-msgstr "Käsittelyn valmistumispäivä ja -aika"
-
-#: applications/admin/application_round/form.py
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Purposes"
-msgstr "Käyttötarkoitukset"
-
-#: applications/admin/application_round/form.py
-msgctxt "ApplicationRound"
-msgid "Terms of use"
-msgstr "Sopimusehdot"
-
-#: applications/admin/application_round/form.py
-msgid "Application criteria"
-msgstr "Hakukriteerit"
-
-#: applications/admin/application_round/form.py
-msgid "Application criteria (Finnish)"
-msgstr "Hakukriteerit (suomeksi)"
-
-#: applications/admin/application_round/form.py
-msgid "Application criteria (English)"
-msgstr "Hakukriteerit (englanniksi)"
-
-#: applications/admin/application_round/form.py
-msgid "Application criteria (Swedish)"
-msgstr "Hakukriteerit (ruotsiksi)"
-
-#: applications/admin/application_round/form.py
-msgid "Notes when applying"
-msgstr "Huomioi hakiessa"
-
-#: applications/admin/application_round/form.py
-msgid "Notes when applying (Finnish)"
-msgstr "Huomioi hakiessa (Suomeksi)"
-
-#: applications/admin/application_round/form.py
-msgid "Notes when applying (English)"
-msgstr "Huomioi hakiessa (Englanniksi)"
-
-#: applications/admin/application_round/form.py
-msgid "Notes when applying (Swedish)"
-msgstr "Huomioi hakiessa (Ruotsiksi)"
-
-#: applications/admin/application_round/form.py
-msgid "Name that describes the application round."
-msgstr "Kausivarauskierrosta kuvaava nimi"
-
-#: applications/admin/application_round/form.py
-msgid "Name that describes the application round in Finnish."
-msgstr "Kausivarauskierrosta kuvaava nimi suomeksi"
-
-#: applications/admin/application_round/form.py
-msgid "Name that describes the application round in English."
-msgstr "Kausivarauskierrosta kuvaava nimi englanniksi"
-
-#: applications/admin/application_round/form.py
-msgid "Name that describes the application round in Swedish."
-msgstr "Kausivarauskierrosta kuvaava nimi ruotsiksi"
-
-#: applications/admin/application_round/form.py
-msgid "Reservation units that can be applied for in this application round."
-msgstr "Varausyksiköt, joihin kausivarauskierroksella voi hakea"
-
-#: applications/admin/application_round/form.py
-msgid "Start date and time of the period when application can be sent."
-msgstr "Alku päivämäärä ja -aika, josta eteenpäin hakemuksia voi lähettää."
-
-#: applications/admin/application_round/form.py
-msgid "End date and time of the period when application can be sent."
-msgstr "Loppu päivämäärä ja -aika, johon asti hakemuksia voi lähettää."
-
-#: applications/admin/application_round/form.py
-msgid "Start date of the period to which the reservations will be made."
-msgstr "Alkupäivämäärä, josta eteenpäin varaukset tullaan tekemään."
-
-#: applications/admin/application_round/form.py
-msgid "End date of the period to which the reservations will be made."
-msgstr "Loppupäivämäärä, johon asti varaukset tullaan tekemään."
-
-#: applications/admin/application_round/form.py
-msgid "Start date and time when application round is visible to public."
-msgstr ""
-"Alkupäivämäärä ja -aika, josta eteenpäin kausivarauskierros on näkyvissä "
-"julkisesti."
-
-#: applications/admin/application_round/form.py
-msgid "End date and time when application round is visible to public."
-msgstr ""
-"Loppupäivämäärä ja -aika, johon asti kausivarauskierros on näkyvissä "
-"julkisesti."
-
-#: applications/admin/application_round/form.py
-msgid "When the application round was handled."
-msgstr "Päivämäärä, jolloin kausivarauskierros käsiteltiin loppuun."
-
-#: applications/admin/application_round/form.py
-msgid "When the application round applications were sent to applicants."
-msgstr ""
-"Päivämäärä, jolloin kausivarauskierroksen hakemusten päätökset lähetettiin "
-"hakijoille."
-
-#: applications/admin/application_round/form.py
-msgid "Purposes that are allowed in this application period."
-msgstr "Kausivarauskierroksella mahdolliset käyttötarkoitukset."
-
-#: applications/admin/application_round/form.py
-msgid "Terms of use for the application round."
-msgstr "Kausivarauskierroksen sopimusehdot."
-
-#: applications/admin/application_round/form.py
-msgid "Application criteria for the application round."
-msgstr "Kausivarauskierroksen hakukriteerit."
-
-#: applications/admin/application_round/form.py
-msgid "Application criteria for the application round in Finnish."
-msgstr "Kausivarauskierroksen hakukriteerit suomeksi."
-
-#: applications/admin/application_round/form.py
-msgid "Application criteria for the application round in English."
-msgstr "Kausivarauskierroksen hakukriteerit englanniksi."
-
-#: applications/admin/application_round/form.py
-msgid "Application criteria for the application round in Swedish."
-msgstr "Kausivarauskierroksen hakukriteerit ruotsiksi."
-
-#: applications/admin/application_round/form.py
-msgid "Text to show to applicants while they fill out their application."
-msgstr "Teksti, joka näytetään hakijoille heidän täyttäessään hakemuksia."
-
-#: applications/admin/application_section/admin.py
-msgid "Search by name, application user's first name or last name"
-msgstr "Etsi nimellä, hakijan etu- tai sukunimellä"
-
-#: applications/admin/application_section/filters.py
-#: applications/admin/application_section/form.py
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Age group"
-msgstr "Ikäryhmä"
-
-#: applications/admin/application_section/filters.py
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Reservation purpose"
-msgstr "Varaustarkoitukset"
-
-#: applications/admin/application_section/form.py
-#: tilavarauspalvelu/admin/payment_order/admin.py
-msgid "Reservation unit"
-msgstr "Varausyksikkö"
-
-#: applications/admin/application_section/form.py
-msgid "Reservation unit for to this option."
-msgstr "Varausyksikkö tälle vaihtoehdolle."
-
-#: applications/admin/application_section/form.py
-msgid "Preferred order"
-msgstr "Suosittu järjestys"
-
-#: applications/admin/application_section/form.py
-msgid "Rejected"
-msgstr "Hylätty"
-
-#: applications/admin/application_section/form.py
-msgid "Locked"
-msgstr "Lukittu"
-
-#: applications/admin/application_section/form.py
-msgid "Preferred order of the reservation unit option."
-msgstr "Varausyksikkövaihtoehdon suosittu järjestys."
-
-#: applications/admin/application_section/form.py
-msgid "Rejected reservation unit options can never receive allocations."
-msgstr ""
-"Hylätyt varausyksikkövaihtoehdot eivät koskaan voi saada allokaatioita."
-
-#: applications/admin/application_section/form.py
-msgid "Locked reservation unit options can no longer receive allocations."
-msgstr "Lukitut varausyksikkövaihtoehdot eivät voi enää saada allokaatioita."
-
-#: applications/admin/application_section/form.py
-msgid "Fulfilled"
-msgstr "Täyttynyt"
-
-#: applications/admin/application_section/form.py
-msgid ""
-"Has this suitable time range been fulfilled based on existing allocations "
-"and reservation unit options being locked or rejected."
-msgstr ""
-"Onko tämä sopiva aikaväli täyttynyt olemassa olevien allokaatioiden ja "
-"varausyksikkövaihtoehtojen hylkäysten tai lukitusten myötä."
-
-#: applications/admin/application_section/form.py
-msgid "Priority"
-msgstr "Prioriteetti"
-
-#: applications/admin/application_section/form.py
-msgid "Priority of the time range."
-msgstr "Sopivan aikavälin prioriteetti."
-
-#: applications/admin/application_section/form.py
-msgid "Requested day of the week."
-msgstr "Pyydetty viikonpäivä."
-
-#: applications/admin/application_section/form.py
-msgid "Requested start time for allocations."
-msgstr "Pyydetty aloitusaika allokaatioille."
-
-#: applications/admin/application_section/form.py
-msgid "Requested end time for allocations."
-msgstr "Pyydetty lopetusaika allokaatioille."
-
-#: applications/admin/application_section/form.py
-#, python-format
-msgid ""
-"%(unallocated)s: Section has been created, but application round is still "
-"open. <br>%(in_allocation)s: Application round has closed, but the section "
-"is not fully allocated. <br>%(handled)s: Application round is no longer in "
-"allocation, section's applied reservations per week has been fulfilled, or "
-"all reservation unit options rejected or locked. <br>%(rejected)s: All "
-"applied slots for this application section have been locked or rejected. <br>"
-msgstr ""
-"%(unallocated)s: Hakemuksen osa luotu, mutta kausivarauskierroksen hakuaika "
-"on vielä auki. <br>%(in_allocation)s: Hakuaika on sulkeutunut, mutta osaa ei "
-"ole vielä kokonaan käsitelty. <br>%(handled)s: Kausivarauskierros on "
-"käsitelty, tai osan toistokerrat on täytetty, tai kaikki varausyksikkö-"
-"vaihtoehdot on hylätty tai lukittu. <br>%(rejected)s: Kaikki haetut "
-"toistokerrat tälle hakemuksen osalle ovat lukittu tai hylätty. <br>"
-
-#: applications/admin/application_section/form.py
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Number of persons"
-msgstr "Henkilömäärä"
-
-#: applications/admin/application_section/form.py
-msgid "Reservations begin date"
-msgstr "Varausten alkamispäivä"
-
-#: applications/admin/application_section/form.py
-msgid "Reservations end date"
-msgstr "Varausten loppumispäivä"
-
-#: applications/admin/application_section/form.py
-msgid "Purpose"
-msgstr "Käyttötarkoitus"
-
-#: applications/admin/application_section/form.py
-msgid "Name that describes this section."
-msgstr "Nimi joka kuvaa tätä hakeuksen osaa."
-
-#: applications/admin/application_section/form.py
-msgid "Number of persons that are excepted to attend this section."
-msgstr ""
-"Kuinka monen henkilön odotetaan osallistuvan hakemuksen osan varauksiin."
-
-#: applications/admin/application_section/form.py
-msgid "First date on which reservations for this section are created."
-msgstr "Ensimmäinen päivä jolle varaukset tehdään allokointien perusteella."
-
-#: applications/admin/application_section/form.py
-msgid "Last date on which reservations for this section are created."
-msgstr "Viimeinen päivä jolle varaukset tehdään allokointien perusteella."
-
-#: applications/admin/application_section/form.py
-msgid "Application this section is in."
-msgstr "Hakemus jolle tämä osa kuuluu."
-
-#: applications/admin/application_section/form.py
-msgid "Age group for this section."
-msgstr "Hakemuksen osan ikäryhmä."
-
-#: applications/admin/application_section/form.py
-msgid "Purpose for this section."
-msgstr "Hakemuksen osan käyttötarkoitus."
-
-#: applications/admin/city.py
-msgid "Municipality"
-msgstr "Kunta"
-
-#: applications/admin/city.py
-msgid "Name of the city."
-msgstr "Kunnan nimi"
-
-#: applications/admin/city.py
-msgid "Municipality code for the city."
-msgstr "Kuntanumero"
-
-#: applications/admin/organization.py applications/admin/person.py
-msgid "Email"
-msgstr "Sähköposti"
-
-#: applications/admin/organization.py
-msgid "Company code"
-msgstr "Y-tunnus"
-
-#: applications/admin/organization.py
-msgid "Year established"
-msgstr "Perustamisvuosi"
-
-#: applications/admin/organization.py
-msgid "Active members"
-msgstr "Aktiivisia jäseniä"
-
-#: applications/admin/organization.py
-msgid "Core business area"
-msgstr "Ydinliiketoiminta-alue"
-
-#: applications/admin/organization.py
-msgid "Organisation type"
-msgstr "Organisaation tyyppi"
-
-#: applications/admin/organization.py applications/models/address.py
-msgid "Address"
-msgstr "Osoite"
-
-#: applications/admin/organization.py
-msgid "Name of the organisation."
-msgstr "Organisaation nimi"
-
-#: applications/admin/organization.py
-msgid "Email address of the organisation."
-msgstr "Organisaation sähköpostiosoite"
-
-#: applications/admin/organization.py
-msgid "Organisation company code."
-msgstr "Organisaation y-tunnus"
-
-#: applications/admin/organization.py
-msgid "Year the organisation was established."
-msgstr "Organisaation perustamisvuosi"
-
-#: applications/admin/organization.py
-msgid "Number of active members in the organisation."
-msgstr "Organisaation aktiivisten jäsenten määrä"
-
-#: applications/admin/organization.py
-msgid "Organisation core business area."
-msgstr "Organisaation ydinliiketoiminta-alue"
-
-#: applications/admin/organization.py
-msgid "Organisation type."
-msgstr "Organisaation tyyppi"
-
-#: applications/admin/organization.py
-msgid "Organisation address."
-msgstr "Organisaation osoite"
-
-#: applications/admin/organization.py
-msgid "Search by organisation name or identifier"
-msgstr "Etsi organisaation nimellä tai tunnisteella"
-
-#: applications/admin/person.py
-msgid "First name"
-msgstr "Etunimi"
-
-#: applications/admin/person.py
-msgid "Last name"
-msgstr "Sukunimi"
-
-#: applications/admin/person.py
-#: tilavarauspalvelu/admin/payment_merchant/admin.py
-msgid "Phone number"
-msgstr "Puhelinnumero"
-
-#: applications/admin/person.py
-msgid "Person's first name."
-msgstr "Henkilön etunimi"
-
-#: applications/admin/person.py
-msgid "Person's last name."
-msgstr "Henkilön sukunimi"
-
-#: applications/admin/person.py
-msgid "Person's email address."
-msgstr "Henkilön sähköpostiosoite"
-
-#: applications/admin/person.py
-msgid "Person's phone number."
-msgstr "Henkilön puhelinnumero"
-
-#: applications/admin/person.py
-msgid "Search by first name or last name."
-msgstr "Etsi etu- tai sukunimellä."
-
-#: applications/apps.py applications/tasks.py
-msgid "Seasonal Booking"
-msgstr "Kausivaraus"
-
-#: applications/enums.py config/utils/commons.py
-msgid "Monday"
-msgstr "Maanantai"
-
-#: applications/enums.py config/utils/commons.py
-msgid "Tuesday"
-msgstr "Tiistai"
-
-#: applications/enums.py config/utils/commons.py
-msgid "Wednesday"
-msgstr "Keskiviikko"
-
-#: applications/enums.py config/utils/commons.py
-msgid "Thursday"
-msgstr "Torstai"
-
-#: applications/enums.py config/utils/commons.py
-msgid "Friday"
-msgstr "Perjantai"
-
-#: applications/enums.py config/utils/commons.py
-msgid "Saturday"
-msgstr "Lauantai"
-
-#: applications/enums.py config/utils/commons.py
-msgid "Sunday"
-msgstr "Sunnuntai"
-
-#: applications/enums.py
-msgctxt "Priority"
-msgid "Primary"
-msgstr "Ensisijainen"
-
-#: applications/enums.py
-msgctxt "Priority"
-msgid "Secondary"
-msgstr "Toissijainen"
-
-#: applications/enums.py
-msgctxt "ApplicantType"
-msgid "Individual"
-msgstr "Yksityinen"
-
-#: applications/enums.py
-msgctxt "ApplicantType"
-msgid "Association"
-msgstr "Yhdistys"
-
-#: applications/enums.py
-msgctxt "ApplicantType"
-msgid "Community"
-msgstr "Yhteisö"
-
-#: applications/enums.py
-msgctxt "ApplicantType"
-msgid "Company"
-msgstr "Yritys"
-
-#: applications/enums.py
-msgctxt "ApplicationRoundStatus"
-msgid "Upcoming"
-msgstr "Tulossa"
-
-#: applications/enums.py
-msgctxt "ApplicationRoundStatus"
-msgid "Open"
-msgstr "Haku avoinna"
-
-#: applications/enums.py
-msgctxt "ApplicationRoundStatus"
-msgid "In Allocation"
-msgstr "Käsittelyssä"
-
-#: applications/enums.py
-msgctxt "ApplicationRoundStatus"
-msgid "Handled"
-msgstr "Käsitelty"
-
-#: applications/enums.py
-msgctxt "ApplicationRoundStatus"
-msgid "Results Sent"
-msgstr "Päätökset lähetetty"
-
-#: applications/enums.py
-msgctxt "ApplicationRoundReservationCreationStatus"
-msgid "Not completed"
-msgstr "Ei valmis"
-
-#: applications/enums.py
-msgctxt "ApplicationRoundReservationCreationStatus"
-msgid "Completed"
-msgstr "Valmis"
-
-#: applications/enums.py
-msgctxt "ApplicationRoundReservationCreationStatus"
-msgid "Failed"
-msgstr "Epäonnistunut"
-
-#: applications/enums.py
-msgctxt "ApplicationStatus"
-msgid "Draft"
-msgstr "Luonnos"
-
-#: applications/enums.py
-msgctxt "ApplicationStatus"
-msgid "Received"
-msgstr "Vastaanotettu"
-
-#: applications/enums.py
-msgctxt "ApplicationStatus"
-msgid "In Allocation"
-msgstr "Käsittelyssä"
-
-#: applications/enums.py
-msgctxt "ApplicationStatus"
-msgid "Handled"
-msgstr "Käsitelty"
-
-#: applications/enums.py
-msgctxt "ApplicationStatus"
-msgid "Results Sent"
-msgstr "Päätökset lähetetty"
-
-#: applications/enums.py
-msgctxt "ApplicationStatus"
-msgid "Expired"
-msgstr "Rauennut"
-
-#: applications/enums.py
-msgctxt "ApplicationStatus"
-msgid "Cancelled"
-msgstr "Peruttu"
-
-#: applications/enums.py
-msgctxt "ApplicationSectionStatus"
-msgid "Unallocated"
-msgstr "Vastaanotettu"
-
-#: applications/enums.py
-msgctxt "ApplicationSectionStatus"
-msgid "In Allocation"
-msgstr "Käsittelyssä"
-
-#: applications/enums.py
-msgctxt "ApplicationSectionStatus"
-msgid "Handled"
-msgstr "Käsitelty"
-
-#: applications/enums.py
-msgctxt "ApplicationSectionStatus"
-msgid "Rejected"
-msgstr "Hylätty"
-
-#: applications/enums.py
-msgctxt "OrganizationType"
-msgid "Company"
-msgstr "Yritys"
-
-#: applications/enums.py
-msgctxt "OrganizationType"
-msgid "Registered association"
-msgstr "Rekisteröity yhdistys"
-
-#: applications/enums.py
-msgctxt "OrganizationType"
-msgid "Public association"
-msgstr "Julkinen yhdistys"
-
-#: applications/enums.py
-msgctxt "OrganizationType"
-msgid "Unregistered association"
-msgstr "Rekisteröimätön yhdistys"
-
-#: applications/enums.py
-msgctxt "OrganizationType"
-msgid "Municipality consortium"
-msgstr "Kuntakonsortio"
-
-#: applications/enums.py
-msgctxt "OrganizationType"
-msgid "Religious community"
-msgstr "Uskonnollinen yhteisö"
-
-#: applications/models/address.py
-msgid "Addresses"
-msgstr "Osoitteet"
-
-#: applications/models/allocated_time_slot.py
-msgid "Allocated Time Slot"
-msgstr "Jaettu vuoro"
-
-#: applications/models/allocated_time_slot.py
-msgid "Allocated Time Slots"
-msgstr "Jaetut vuorot"
-
-#: applications/models/allocated_time_slot.py
-#: applications/models/suitable_time_range.py
-msgid "Begin time must be before end time."
-msgstr "Aloitusaika tulee ennen lopetusaikaa."
-
-#: applications/models/application.py
-msgid "Applications"
-msgstr "Hakemukset"
-
-#: applications/models/application_round.py
-msgid "Application Rounds"
-msgstr "Kausivarauskierrokset"
-
-#: applications/models/application_round_time_slot.py
-msgid "Application Round Time Slot"
-msgstr "Kausivararattava aika"
-
-#: applications/models/application_round_time_slot.py
-msgid "Application Round Time Slots"
-msgstr "Kausivararattavat ajat"
-
-#: applications/models/application_section.py
-msgid "Application Section"
-msgstr "Hakemuksen osa"
-
-#: applications/models/application_section.py
-msgid "Application Sections"
-msgstr "Hakemuksen osat"
-
-#: applications/models/application_section.py
-msgid "Reservations begin date must be before reservations end date."
-msgstr "Varausten alkamispäivä tulee ennen varausten loppumispäivää."
-
-#: applications/models/application_section.py
-msgid ""
-"Reservation min duration cannot be greater than reservation max duration."
-msgstr ""
-"Varauksen minimikesto ei voi olla suurempi kuin varauksen maksimikesto."
-
-#: applications/models/application_section.py
-msgid "Can only apply from 1 to 7 reservations per week."
-msgstr "Voi hakea vain 1-7 varausta viikossa."
-
-#: applications/models/application_section.py
-msgid ""
-"Reservation min and max durations must be multiples of 30 minutes, up to a "
-"maximum of 24 hours."
-msgstr ""
-"Varauksen minimi- ja maksimikeston tulee olla 30 minuutin monikertoja, "
-"jakorkeintaan 24 tuntia."
-
-#: applications/models/city.py
-msgid "Cities"
-msgstr "Kaupungit"
-
-#: applications/models/organization.py
+#: applications/migrations/0004_fixed_organisation_year_field.py
+#: applications/migrations/0066_remove_applicationaggregatedata_application_and_more.py
+#: tilavarauspalvelu/models/organisation/model.py
 msgid "is after current year"
 msgstr "on nykyvuoden jälkeen"
-
-#: applications/models/organization.py
-msgid "Organisations"
-msgstr "Organisaatiot"
-
-#: applications/models/person.py
-msgid "Person"
-msgstr "Henkilö"
-
-#: applications/models/person.py
-msgid "Persons"
-msgstr "Henkilöt"
-
-#: applications/models/reservation_unit_option.py
-msgid "Reservation Unit Option"
-msgstr "Varausyksikkövaihtoehto"
-
-#: applications/models/reservation_unit_option.py
-msgid "Reservation Unit Options"
-msgstr "Varausyksikkövaihtoehdot"
-
-#: applications/models/reservation_unit_option.py
-msgid "Preferred order must be unique for each application section"
-msgstr "Suosittu järjestys tulee olla uniikki jokaiselle hakemuksen osalle"
-
-#: applications/models/suitable_time_range.py
-msgid "Suitable Time Range"
-msgstr "Sopiva aikaväli"
-
-#: applications/models/suitable_time_range.py
-msgid "Suitable Time Ranges"
-msgstr "Sopivat aikavälit"
-
-#: applications/models/suitable_time_range.py
-msgid "Begin and end times must be a multiples of 60 minutes."
-msgstr "Alku- ja lopetusaikojen tulee olla 60 minuutin monikertoja."
-
-#: applications/tasks.py
-msgid "Core business"
-msgstr "Ydintoiminta"
-
-#: applications/validators.py
-msgid "This field is required."
-msgstr "Tämä kenttä on pakollinen."
-
-#: applications/validators.py
-msgid "Enter a valid time."
-msgstr "Syötä oikea aika."
 
 #: common/admin/banner_notification.py
 msgid "Name of the notification. Should be unique."
@@ -1308,6 +234,34 @@ msgstr "Englanti"
 msgid "Swedish"
 msgstr "Ruotsi"
 
+#: config/utils/commons.py tilavarauspalvelu/enums.py
+msgid "Monday"
+msgstr "Maanantai"
+
+#: config/utils/commons.py tilavarauspalvelu/enums.py
+msgid "Tuesday"
+msgstr "Tiistai"
+
+#: config/utils/commons.py tilavarauspalvelu/enums.py
+msgid "Wednesday"
+msgstr "Keskiviikko"
+
+#: config/utils/commons.py tilavarauspalvelu/enums.py
+msgid "Thursday"
+msgstr "Torstai"
+
+#: config/utils/commons.py tilavarauspalvelu/enums.py
+msgid "Friday"
+msgstr "Perjantai"
+
+#: config/utils/commons.py tilavarauspalvelu/enums.py
+msgid "Saturday"
+msgstr "Lauantai"
+
+#: config/utils/commons.py tilavarauspalvelu/enums.py
+msgid "Sunday"
+msgstr "Sunnuntai"
+
 #: templates/admin/base.html
 msgid "Change password"
 msgstr "Vaihda salasana"
@@ -1364,6 +318,530 @@ msgstr "Nollaa allokoinnit"
 msgid "Email Template Testing"
 msgstr "Email-pohjan testaus"
 
+#: tilavarauspalvelu/admin/address/admin.py
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+msgid "Street address"
+msgstr "Katuosoite"
+
+#: tilavarauspalvelu/admin/address/admin.py
+msgid "Post code"
+msgstr "Postinumero"
+
+#: tilavarauspalvelu/admin/address/admin.py
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+#: tilavarauspalvelu/models/city/model.py
+msgid "City"
+msgstr "Kaupunki"
+
+#: tilavarauspalvelu/admin/address/admin.py
+msgid "Search by street address, post code or city"
+msgstr "Etsi katuosoitteella, postinumerolla tai kaupungilla"
+
+#: tilavarauspalvelu/admin/allocated_timeslot/admin.py
+msgid ""
+"Search by day of the week, reservation unit, unit, application section, "
+"user's first or last name or email"
+msgstr ""
+"Etsi viikonpäivän, varausyksikön, toimipisteen, hakemuksen osan, käyttäjän "
+"etu- tai sukunimen tai sähköpostin perusteella"
+
+#: tilavarauspalvelu/admin/allocated_timeslot/admin.py
+#: tilavarauspalvelu/admin/application/admin.py
+#: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/models/application/model.py
+msgid "Application"
+msgstr "Hakemus"
+
+#: tilavarauspalvelu/admin/allocated_timeslot/filters.py
+#: tilavarauspalvelu/admin/application/filters.py
+#: tilavarauspalvelu/models/application_round/model.py
+msgid "Application Round"
+msgstr "Kausivarauskierros"
+
+#: tilavarauspalvelu/admin/allocated_timeslot/filters.py
+#: tilavarauspalvelu/admin/application/filters.py
+#: tilavarauspalvelu/admin/application_section/filters.py
+msgid "Application round status"
+msgstr "Kausivarauskierroksen status"
+
+#: tilavarauspalvelu/admin/allocated_timeslot/filters.py
+#: tilavarauspalvelu/admin/application/filters.py
+#: tilavarauspalvelu/admin/application_section/filters.py
+msgid "Application status"
+msgstr "Hakemuksen status"
+
+#: tilavarauspalvelu/admin/allocated_timeslot/filters.py
+#: tilavarauspalvelu/admin/application_section/filters.py
+msgid "Application section status"
+msgstr "Hakemuksen osan status"
+
+#: tilavarauspalvelu/admin/allocated_timeslot/filters.py
+#: tilavarauspalvelu/admin/allocated_timeslot/form.py
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Day of the week"
+msgstr "Viikonpäivä"
+
+#: tilavarauspalvelu/admin/allocated_timeslot/form.py
+msgid "Reservation unit option"
+msgstr "Varausyksikkö-vaihtoehto"
+
+#: tilavarauspalvelu/admin/allocated_timeslot/form.py
+msgid "Reservation unit option for to this allocation."
+msgstr "Varausyksikkövaihtoehto tälle allokoinnille."
+
+#: tilavarauspalvelu/admin/allocated_timeslot/form.py
+#: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/reservation/admin.py
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Begin time"
+msgstr "Aloitusaika"
+
+#: tilavarauspalvelu/admin/allocated_timeslot/form.py
+#: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "End time"
+msgstr "Lopetusaika"
+
+#: tilavarauspalvelu/admin/allocated_timeslot/form.py
+msgid "Allocated day of the week."
+msgstr "Allokoitu viikonpäivä"
+
+#: tilavarauspalvelu/admin/allocated_timeslot/form.py
+msgid "Allocated begin time."
+msgstr "Allokoitu aloitusaika"
+
+#: tilavarauspalvelu/admin/allocated_timeslot/form.py
+msgid "Allocated end time."
+msgstr "Allokoitu lopetusaika"
+
+#: tilavarauspalvelu/admin/application/admin.py
+msgid "Search by user's first name, last name or reservation units name"
+msgstr "Etsi käyttäjän etu- tai sukunimellä tai varausyksikön nimellä"
+
+#: tilavarauspalvelu/admin/application/admin.py
+#: tilavarauspalvelu/admin/reservation/admin.py
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Created at"
+msgstr "Luotu"
+
+#: tilavarauspalvelu/admin/application/admin.py
+#: tilavarauspalvelu/admin/application_round/admin.py
+#: tilavarauspalvelu/admin/application_section/admin.py
+#: tilavarauspalvelu/admin/reservation/admin.py
+#: tilavarauspalvelu/admin/reservation_unit/admin.py users/admin/user.py
+msgid "Basic information"
+msgstr "Perustiedot"
+
+#: tilavarauspalvelu/admin/application/admin.py
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Applicant"
+msgstr "Hakija"
+
+#: tilavarauspalvelu/admin/application/admin.py
+#: tilavarauspalvelu/admin/application_round/admin.py
+#: tilavarauspalvelu/admin/application_section/admin.py
+#: tilavarauspalvelu/admin/reservation/admin.py
+msgid "Time"
+msgstr "Aika"
+
+#: tilavarauspalvelu/admin/application/admin.py
+#: tilavarauspalvelu/admin/application_round/admin.py
+msgid "Notes"
+msgstr "Huomiot"
+
+#: tilavarauspalvelu/admin/application/admin.py
+msgid "Reset application allocations"
+msgstr "Nollaa hakemuksen allokoinnit"
+
+#: tilavarauspalvelu/admin/application/admin.py
+#: tilavarauspalvelu/admin/application_round/admin.py
+#: tilavarauspalvelu/admin/reservation/admin.py
+msgid "Are you sure?"
+msgstr "Oletko varma?"
+
+#: tilavarauspalvelu/admin/application/admin.py
+msgid "Are you sure you want reset allocations for these applications?"
+msgstr "Oletko varma, että haluat nollata näiden hakemusten allokoinnit?"
+
+#: tilavarauspalvelu/admin/application/form.py
+#: tilavarauspalvelu/admin/application_round/form.py
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Status"
+msgstr "Status"
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Suitable days of the week"
+msgstr "Sopivat viikonpäivät"
+
+#: tilavarauspalvelu/admin/application/form.py
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Reservation minimum duration"
+msgstr "Varauksen minimikesto"
+
+#: tilavarauspalvelu/admin/application/form.py
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Reservation maximum duration"
+msgstr "Varauksen maksimikesto"
+
+#: tilavarauspalvelu/admin/application/form.py
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Applied reservations per week"
+msgstr "Haetut toistokerrat"
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Suitable days of the week for this section."
+msgstr "Hakemuksen osalle sopivat viikonpäivät."
+
+#: tilavarauspalvelu/admin/application/form.py
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Minimum duration that should be allocated for this section."
+msgstr "Minimikesto allokoitaville vuoroille."
+
+#: tilavarauspalvelu/admin/application/form.py
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Maximum duration that should be allocated for this section."
+msgstr "Maksimikesto allokoitaville vuoroille."
+
+#: tilavarauspalvelu/admin/application/form.py
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "How many reservation the applicant has applied for per week."
+msgstr "Kuinka monta toistokertaa hakija on toivonut per viikko."
+
+#: tilavarauspalvelu/admin/application/form.py
+#, python-format
+msgid ""
+"%(draft)s: Application started but not ready. <br>%(received)s: Application "
+"sent by user. <br>%(in_allocation)s: Application's sections are being "
+"allocated. <br>%(handled)s: Application's sections have all been allocated. "
+"<br>%(results_sent)s: Application's results have been sent to user. "
+"<br>%(expired)s: Application not completed before application round ended. "
+"<br>%(cancelled)s: Application cancelled by user. <br>"
+msgstr ""
+"%(draft)s: Hakemus aloitettu. <br>%(received)s: Hakemus lähetetty. "
+"<br>%(in_allocation)s: Hakemus siirtynyt käsittelyyn. <br>%(handled)s: "
+"Hakemus käsitelty. <br>%(results_sent)s: Käsittelyn tuloksesta ilmoitettu "
+"hakijalle. <br>%(expired)s: Hakemusta ei lähetetty ennen hakuajan "
+"loppumista. <br>%(cancelled)s: Hakemus peruttu hakijan toimesta. <br>"
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Applicant type"
+msgstr "Hakijan tyyppi"
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Application round"
+msgstr "Kausivarauskierros"
+
+#: tilavarauspalvelu/admin/application/form.py
+#: tilavarauspalvelu/models/organisation/model.py
+msgid "Organisation"
+msgstr "Organisaatio"
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Contact person"
+msgstr "Yhteyshenkilö"
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Billing address"
+msgstr "Laskutusosoite"
+
+#: tilavarauspalvelu/admin/application/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Home city"
+msgstr "Kotikunta"
+
+#: tilavarauspalvelu/admin/application/form.py
+#: tilavarauspalvelu/admin/reservation/admin.py users/admin/user.py
+msgid "Additional information"
+msgstr "Lisätiedot"
+
+#: tilavarauspalvelu/admin/application/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Working memo"
+msgstr "Käsittelymuistio"
+
+#: tilavarauspalvelu/admin/application/form.py
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Sent date"
+msgstr "Lähetyspäivä ja -aika"
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Cancelled date"
+msgstr "Perumispäivä"
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "In allocation notification sent date"
+msgstr "'Käsittelyssä' ilmoituksen lähettämispäivä ja -aika"
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Results ready notification sent date"
+msgstr "'Käsitelty' ilmoituksen lähettämispäivä ja -aika"
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Applicant type."
+msgstr "Hakijan tyyppi."
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Application round the application is in."
+msgstr "Hakemuksen kausivarauskierros"
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Organisation the application is for."
+msgstr "Hakemuksen organisaatio"
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Contact person for the application."
+msgstr "Hakemuksen yhteyshenkilö"
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Applicant for the application."
+msgstr "Hakemuksen hakija"
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Billing address for the application."
+msgstr "Hakemuksen laskutusosoite"
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Home city for the application."
+msgstr "Hakemuksen kotipaikka"
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Additional information for the application."
+msgstr "Hakemuksen lisätiedot"
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Working memo for staff users."
+msgstr "Muistio henkilökunnalle"
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Date when the application was sent."
+msgstr "Päivämäärä, jolloin hakemus lähetettiin."
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Date when the application was cancelled."
+msgstr "Päivämäärä, jolloin hakemus peruttiin."
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid ""
+"Date when the applicant was notified that this application round is now in "
+"allocation."
+msgstr "Päivä ja aika, millon hakija sai tiedon, että hakemus on käsittelyssä."
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid ""
+"Date when the applicant was notified that this application round results are "
+"now ready."
+msgstr "Päivä ja aika, millon hakija sai tiedon, että hakemus on käsitelty."
+
+#: tilavarauspalvelu/admin/application_round/admin.py
+msgid "Criteria"
+msgstr "Kriteeri"
+
+#: tilavarauspalvelu/admin/application_round/admin.py
+msgid "Reset application round"
+msgstr "Nollaa kausivarauskierros"
+
+#: tilavarauspalvelu/admin/application_round/admin.py
+msgid "Are you sure you want to reset these application rounds?"
+msgstr "Oletko varma, että haluat nollata nämä kausivarauskierrokset?"
+
+#: tilavarauspalvelu/admin/application_round/form.py
+#, python-format
+msgid ""
+"%(upcoming)s: Applications cannot yet be made in the round. <br>%(open)s: "
+"Applications can be made in the round. <br>%(in_allocation)s: Applications "
+"in the round are being allocated. <br>%(handled)s: All application have been "
+"allocated. <br>%(results_sent)s: All application results have been sent to "
+"users. <br>"
+msgstr ""
+"%(upcoming)s: Hakemuksia ei voi vielä tehdä. <br>%(open)s: Hakemuksia voi "
+"tehdä. <br>%(in_allocation)s: Hakemuksiin jaetaan vuoroja. <br>%(handled)s: "
+"Kierros on käsitelty. <br>%(results_sent)s: Tulokset on lähetetty "
+"hakijoille. <br>"
+
+#: tilavarauspalvelu/admin/application_round/form.py
+#: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/city/admin.py
+#: tilavarauspalvelu/admin/organisation/admin.py
+#: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Name"
+msgstr "Nimi"
+
+#: tilavarauspalvelu/admin/application_round/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Name (Finnish)"
+msgstr "Nimi (suomeksi)"
+
+#: tilavarauspalvelu/admin/application_round/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Name (English)"
+msgstr "Nimi (englanniksi)"
+
+#: tilavarauspalvelu/admin/application_round/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Name (Swedish)"
+msgstr "Nimi (ruotsiksi)"
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Reservation units"
+msgstr "Varausyksiköt"
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Application period begin date and time"
+msgstr "Hakuajan alkamispäivä ja -aika"
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Application period end date and time"
+msgstr "Hakuajan loppumispäivä ja -aika"
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Reservation period begin date"
+msgstr "Varattavan ajanjakson alkamispäivä"
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Reservation period end date"
+msgstr "Varattavan ajanjakson loppumispäivä"
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Public display begin date and time"
+msgstr "Julkisen näkyvyyden alkamispäivä ja -aika"
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Public display end date and time"
+msgstr "Julkisen näkyvyyden loppumispäivä ja -aika"
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Handled date"
+msgstr "Käsittelyn valmistumispäivä ja -aika"
+
+#: tilavarauspalvelu/admin/application_round/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Purposes"
+msgstr "Käyttötarkoitukset"
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgctxt "ApplicationRound"
+msgid "Terms of use"
+msgstr "Sopimusehdot"
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Application criteria"
+msgstr "Hakukriteerit"
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Application criteria (Finnish)"
+msgstr "Hakukriteerit (suomeksi)"
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Application criteria (English)"
+msgstr "Hakukriteerit (englanniksi)"
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Application criteria (Swedish)"
+msgstr "Hakukriteerit (ruotsiksi)"
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Notes when applying"
+msgstr "Huomioi hakiessa"
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Notes when applying (Finnish)"
+msgstr "Huomioi hakiessa (Suomeksi)"
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Notes when applying (English)"
+msgstr "Huomioi hakiessa (Englanniksi)"
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Notes when applying (Swedish)"
+msgstr "Huomioi hakiessa (Ruotsiksi)"
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Name that describes the application round."
+msgstr "Kausivarauskierrosta kuvaava nimi"
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Name that describes the application round in Finnish."
+msgstr "Kausivarauskierrosta kuvaava nimi suomeksi"
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Name that describes the application round in English."
+msgstr "Kausivarauskierrosta kuvaava nimi englanniksi"
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Name that describes the application round in Swedish."
+msgstr "Kausivarauskierrosta kuvaava nimi ruotsiksi"
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Reservation units that can be applied for in this application round."
+msgstr "Varausyksiköt, joihin kausivarauskierroksella voi hakea"
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Start date and time of the period when application can be sent."
+msgstr "Alku päivämäärä ja -aika, josta eteenpäin hakemuksia voi lähettää."
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "End date and time of the period when application can be sent."
+msgstr "Loppu päivämäärä ja -aika, johon asti hakemuksia voi lähettää."
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Start date of the period to which the reservations will be made."
+msgstr "Alkupäivämäärä, josta eteenpäin varaukset tullaan tekemään."
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "End date of the period to which the reservations will be made."
+msgstr "Loppupäivämäärä, johon asti varaukset tullaan tekemään."
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Start date and time when application round is visible to public."
+msgstr ""
+"Alkupäivämäärä ja -aika, josta eteenpäin kausivarauskierros on näkyvissä "
+"julkisesti."
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "End date and time when application round is visible to public."
+msgstr ""
+"Loppupäivämäärä ja -aika, johon asti kausivarauskierros on näkyvissä "
+"julkisesti."
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "When the application round was handled."
+msgstr "Päivämäärä, jolloin kausivarauskierros käsiteltiin loppuun."
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "When the application round applications were sent to applicants."
+msgstr ""
+"Päivämäärä, jolloin kausivarauskierroksen hakemusten päätökset lähetettiin "
+"hakijoille."
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Purposes that are allowed in this application period."
+msgstr "Kausivarauskierroksella mahdolliset käyttötarkoitukset."
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Terms of use for the application round."
+msgstr "Kausivarauskierroksen sopimusehdot."
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Application criteria for the application round."
+msgstr "Kausivarauskierroksen hakukriteerit."
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Application criteria for the application round in Finnish."
+msgstr "Kausivarauskierroksen hakukriteerit suomeksi."
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Application criteria for the application round in English."
+msgstr "Kausivarauskierroksen hakukriteerit englanniksi."
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Application criteria for the application round in Swedish."
+msgstr "Kausivarauskierroksen hakukriteerit ruotsiksi."
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Text to show to applicants while they fill out their application."
+msgstr "Teksti, joka näytetään hakijoille heidän täyttäessään hakemuksia."
+
 #: tilavarauspalvelu/admin/application_round_time_slot/form.py
 msgid "Which weekday this timeslot concerns."
 msgstr "Mitä viikonpäivää tämä aikaikkuna koskee"
@@ -1376,6 +854,162 @@ msgstr "Aikaikkunat, jolloin varausyksikkö on varattavissa"
 msgid "Is the reservation unit closed on this weekday?"
 msgstr "Onko varausyksikkö suljettu tänä viikonpäivänä?"
 
+#: tilavarauspalvelu/admin/application_section/admin.py
+msgid "Search by name, application user's first name or last name"
+msgstr "Etsi nimellä, hakijan etu- tai sukunimellä"
+
+#: tilavarauspalvelu/admin/application_section/filters.py
+#: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Age group"
+msgstr "Ikäryhmä"
+
+#: tilavarauspalvelu/admin/application_section/filters.py
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservation purpose"
+msgstr "Varaustarkoitukset"
+
+#: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Reservation unit"
+msgstr "Varausyksikkö"
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Reservation unit for to this option."
+msgstr "Varausyksikkö tälle vaihtoehdolle."
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Preferred order"
+msgstr "Suosittu järjestys"
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Rejected"
+msgstr "Hylätty"
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Locked"
+msgstr "Lukittu"
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Preferred order of the reservation unit option."
+msgstr "Varausyksikkövaihtoehdon suosittu järjestys."
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Rejected reservation unit options can never receive allocations."
+msgstr ""
+"Hylätyt varausyksikkövaihtoehdot eivät koskaan voi saada allokaatioita."
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Locked reservation unit options can no longer receive allocations."
+msgstr "Lukitut varausyksikkövaihtoehdot eivät voi enää saada allokaatioita."
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Fulfilled"
+msgstr "Täyttynyt"
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid ""
+"Has this suitable time range been fulfilled based on existing allocations "
+"and reservation unit options being locked or rejected."
+msgstr ""
+"Onko tämä sopiva aikaväli täyttynyt olemassa olevien allokaatioiden ja "
+"varausyksikkövaihtoehtojen hylkäysten tai lukitusten myötä."
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Priority"
+msgstr "Prioriteetti"
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Priority of the time range."
+msgstr "Sopivan aikavälin prioriteetti."
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Requested day of the week."
+msgstr "Pyydetty viikonpäivä."
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Requested start time for allocations."
+msgstr "Pyydetty aloitusaika allokaatioille."
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Requested end time for allocations."
+msgstr "Pyydetty lopetusaika allokaatioille."
+
+#: tilavarauspalvelu/admin/application_section/form.py
+#, python-format
+msgid ""
+"%(unallocated)s: Section has been created, but application round is still "
+"open. <br>%(in_allocation)s: Application round has closed, but the section "
+"is not fully allocated. <br>%(handled)s: Application round is no longer in "
+"allocation, section's applied reservations per week has been fulfilled, or "
+"all reservation unit options rejected or locked. <br>%(rejected)s: All "
+"applied slots for this application section have been locked or rejected. <br>"
+msgstr ""
+"%(unallocated)s: Hakemuksen osa luotu, mutta kausivarauskierroksen hakuaika "
+"on vielä auki. <br>%(in_allocation)s: Hakuaika on sulkeutunut, mutta osaa ei "
+"ole vielä kokonaan käsitelty. <br>%(handled)s: Kausivarauskierros on "
+"käsitelty, tai osan toistokerrat on täytetty, tai kaikki varausyksikkö-"
+"vaihtoehdot on hylätty tai lukittu. <br>%(rejected)s: Kaikki haetut "
+"toistokerrat tälle hakemuksen osalle ovat lukittu tai hylätty. <br>"
+
+#: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Number of persons"
+msgstr "Henkilömäärä"
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Reservations begin date"
+msgstr "Varausten alkamispäivä"
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Reservations end date"
+msgstr "Varausten loppumispäivä"
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Purpose"
+msgstr "Käyttötarkoitus"
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Name that describes this section."
+msgstr "Nimi joka kuvaa tätä hakeuksen osaa."
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Number of persons that are excepted to attend this section."
+msgstr ""
+"Kuinka monen henkilön odotetaan osallistuvan hakemuksen osan varauksiin."
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "First date on which reservations for this section are created."
+msgstr "Ensimmäinen päivä jolle varaukset tehdään allokointien perusteella."
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Last date on which reservations for this section are created."
+msgstr "Viimeinen päivä jolle varaukset tehdään allokointien perusteella."
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Application this section is in."
+msgstr "Hakemus jolle tämä osa kuuluu."
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Age group for this section."
+msgstr "Hakemuksen osan ikäryhmä."
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Purpose for this section."
+msgstr "Hakemuksen osan käyttötarkoitus."
+
+#: tilavarauspalvelu/admin/city/admin.py
+msgid "Municipality"
+msgstr "Kunta"
+
+#: tilavarauspalvelu/admin/city/admin.py
+msgid "Name of the city."
+msgstr "Kunnan nimi"
+
+#: tilavarauspalvelu/admin/city/admin.py
+msgid "Municipality code for the city."
+msgstr "Kuntanumero"
+
 #: tilavarauspalvelu/admin/email_template/tester.py
 #, python-format
 msgid "Test Email '%s' successfully sent."
@@ -1384,6 +1018,72 @@ msgstr "Testisähköposti '%s' lähetetty onnistuneesti."
 #: tilavarauspalvelu/admin/general_role/admin.py
 msgid "Search by username, email, first name or last name"
 msgstr "Etsi käyttäjänimellä, sähköpostilla, etu- tai sukunimellä"
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+#: tilavarauspalvelu/admin/person/admin.py
+msgid "Email"
+msgstr "Sähköposti"
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+msgid "Company code"
+msgstr "Y-tunnus"
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+msgid "Year established"
+msgstr "Perustamisvuosi"
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+msgid "Active members"
+msgstr "Aktiivisia jäseniä"
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+msgid "Core business area"
+msgstr "Ydinliiketoiminta-alue"
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+msgid "Organisation type"
+msgstr "Organisaation tyyppi"
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+#: tilavarauspalvelu/models/address/model.py
+msgid "Address"
+msgstr "Osoite"
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+msgid "Name of the organisation."
+msgstr "Organisaation nimi"
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+msgid "Email address of the organisation."
+msgstr "Organisaation sähköpostiosoite"
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+msgid "Organisation company code."
+msgstr "Organisaation y-tunnus"
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+msgid "Year the organisation was established."
+msgstr "Organisaation perustamisvuosi"
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+msgid "Number of active members in the organisation."
+msgstr "Organisaation aktiivisten jäsenten määrä"
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+msgid "Organisation core business area."
+msgstr "Organisaation ydinliiketoiminta-alue"
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+msgid "Organisation type."
+msgstr "Organisaation tyyppi"
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+msgid "Organisation address."
+msgstr "Organisaation osoite"
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+msgid "Search by organisation name or identifier"
+msgstr "Etsi organisaation nimellä tai tunnisteella"
 
 #: tilavarauspalvelu/admin/origin_hauki_resource/admin.py
 msgid ""
@@ -1435,6 +1135,11 @@ msgstr "Postinumero"
 #: tilavarauspalvelu/admin/payment_merchant/admin.py
 msgid "Email address"
 msgstr "Sähköpostiosoite"
+
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+#: tilavarauspalvelu/admin/person/admin.py
+msgid "Phone number"
+msgstr "Puhelinnumero"
 
 #: tilavarauspalvelu/admin/payment_merchant/admin.py
 msgid "URL"
@@ -1535,6 +1240,34 @@ msgid ""
 msgstr ""
 "Etsi maksutunnuksella, varauksen tunnuksella, verkkokaupan tunnuksella, "
 "varauksen nimellä tai varausyksikön nimellä"
+
+#: tilavarauspalvelu/admin/person/admin.py
+msgid "First name"
+msgstr "Etunimi"
+
+#: tilavarauspalvelu/admin/person/admin.py
+msgid "Last name"
+msgstr "Sukunimi"
+
+#: tilavarauspalvelu/admin/person/admin.py
+msgid "Person's first name."
+msgstr "Henkilön etunimi"
+
+#: tilavarauspalvelu/admin/person/admin.py
+msgid "Person's last name."
+msgstr "Henkilön sukunimi"
+
+#: tilavarauspalvelu/admin/person/admin.py
+msgid "Person's email address."
+msgstr "Henkilön sähköpostiosoite"
+
+#: tilavarauspalvelu/admin/person/admin.py
+msgid "Person's phone number."
+msgstr "Henkilön puhelinnumero"
+
+#: tilavarauspalvelu/admin/person/admin.py
+msgid "Search by first name or last name."
+msgstr "Etsi etu- tai sukunimellä."
 
 #: tilavarauspalvelu/admin/reservation/admin.py
 msgid "Search by Reservation ID or name"
@@ -2894,6 +2627,165 @@ msgctxt "ReservationUnitImageType"
 msgid "Other"
 msgstr "Muu"
 
+#: tilavarauspalvelu/enums.py
+msgctxt "Priority"
+msgid "Primary"
+msgstr "Ensisijainen"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "Priority"
+msgid "Secondary"
+msgstr "Toissijainen"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicantType"
+msgid "Individual"
+msgstr "Yksityinen"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicantType"
+msgid "Association"
+msgstr "Yhdistys"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicantType"
+msgid "Community"
+msgstr "Yhteisö"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicantType"
+msgid "Company"
+msgstr "Yritys"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationRoundStatus"
+msgid "Upcoming"
+msgstr "Tulossa"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationRoundStatus"
+msgid "Open"
+msgstr "Haku avoinna"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationRoundStatus"
+msgid "In Allocation"
+msgstr "Käsittelyssä"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationRoundStatus"
+msgid "Handled"
+msgstr "Käsitelty"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationRoundStatus"
+msgid "Results Sent"
+msgstr "Päätökset lähetetty"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationRoundReservationCreationStatus"
+msgid "Not completed"
+msgstr "Ei valmis"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationRoundReservationCreationStatus"
+msgid "Completed"
+msgstr "Valmis"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationRoundReservationCreationStatus"
+msgid "Failed"
+msgstr "Epäonnistunut"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationStatus"
+msgid "Draft"
+msgstr "Luonnos"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationStatus"
+msgid "Received"
+msgstr "Vastaanotettu"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationStatus"
+msgid "In Allocation"
+msgstr "Käsittelyssä"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationStatus"
+msgid "Handled"
+msgstr "Käsitelty"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationStatus"
+msgid "Results Sent"
+msgstr "Päätökset lähetetty"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationStatus"
+msgid "Expired"
+msgstr "Rauennut"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationStatus"
+msgid "Cancelled"
+msgstr "Peruttu"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationSectionStatus"
+msgid "Unallocated"
+msgstr "Vastaanotettu"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationSectionStatus"
+msgid "In Allocation"
+msgstr "Käsittelyssä"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationSectionStatus"
+msgid "Handled"
+msgstr "Käsitelty"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationSectionStatus"
+msgid "Rejected"
+msgstr "Hylätty"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "OrganizationType"
+msgid "Company"
+msgstr "Yritys"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "OrganizationType"
+msgid "Registered association"
+msgstr "Rekisteröity yhdistys"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "OrganizationType"
+msgid "Public association"
+msgstr "Julkinen yhdistys"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "OrganizationType"
+msgid "Unregistered association"
+msgstr "Rekisteröimätön yhdistys"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "OrganizationType"
+msgid "Municipality consortium"
+msgstr "Kuntakonsortio"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "OrganizationType"
+msgid "Religious community"
+msgstr "Uskonnollinen yhteisö"
+
+#: tilavarauspalvelu/models/address/model.py
+msgid "Addresses"
+msgstr "Osoitteet"
+
 #: tilavarauspalvelu/models/affecting_time_span/model.py
 msgid "affecting time span"
 msgstr "vaikuttava aikaväli"
@@ -2901,6 +2793,69 @@ msgstr "vaikuttava aikaväli"
 #: tilavarauspalvelu/models/affecting_time_span/model.py
 msgid "affecting time spans"
 msgstr "vaikuttavat aikavälit"
+
+#: tilavarauspalvelu/models/allocated_timeslot/model.py
+msgid "Allocated Time Slot"
+msgstr "Jaettu vuoro"
+
+#: tilavarauspalvelu/models/allocated_timeslot/model.py
+msgid "Allocated Time Slots"
+msgstr "Jaetut vuorot"
+
+#: tilavarauspalvelu/models/allocated_timeslot/model.py
+#: tilavarauspalvelu/models/suitable_time_range/model.py
+msgid "Begin time must be before end time."
+msgstr "Aloitusaika tulee ennen lopetusaikaa."
+
+#: tilavarauspalvelu/models/application/model.py
+msgid "Applications"
+msgstr "Hakemukset"
+
+#: tilavarauspalvelu/models/application_round/model.py
+msgid "Application Rounds"
+msgstr "Kausivarauskierrokset"
+
+#: tilavarauspalvelu/models/application_round_time_slot/model.py
+msgid "Application Round Time Slot"
+msgstr "Kausivararattava aika"
+
+#: tilavarauspalvelu/models/application_round_time_slot/model.py
+msgid "Application Round Time Slots"
+msgstr "Kausivararattavat ajat"
+
+#: tilavarauspalvelu/models/application_section/model.py
+msgid "Application Section"
+msgstr "Hakemuksen osa"
+
+#: tilavarauspalvelu/models/application_section/model.py
+msgid "Application Sections"
+msgstr "Hakemuksen osat"
+
+#: tilavarauspalvelu/models/application_section/model.py
+msgid "Reservations begin date must be before reservations end date."
+msgstr "Varausten alkamispäivä tulee ennen varausten loppumispäivää."
+
+#: tilavarauspalvelu/models/application_section/model.py
+msgid ""
+"Reservation min duration cannot be greater than reservation max duration."
+msgstr ""
+"Varauksen minimikesto ei voi olla suurempi kuin varauksen maksimikesto."
+
+#: tilavarauspalvelu/models/application_section/model.py
+msgid "Can only apply from 1 to 7 reservations per week."
+msgstr "Voi hakea vain 1-7 varausta viikossa."
+
+#: tilavarauspalvelu/models/application_section/model.py
+msgid ""
+"Reservation min and max durations must be multiples of 30 minutes, up to a "
+"maximum of 24 hours."
+msgstr ""
+"Varauksen minimi- ja maksimikeston tulee olla 30 minuutin monikertoja, "
+"jakorkeintaan 24 tuntia."
+
+#: tilavarauspalvelu/models/city/model.py
+msgid "Cities"
+msgstr "Kaupungit"
 
 #: tilavarauspalvelu/models/email_template/model.py
 msgid "Email type"
@@ -2946,6 +2901,10 @@ msgstr "Yleinen rooli"
 msgid "General roles"
 msgstr "Yleiset roolit"
 
+#: tilavarauspalvelu/models/organisation/model.py
+msgid "Organisations"
+msgstr "Organisaatiot"
+
 #: tilavarauspalvelu/models/payment_accounting/model.py
 msgid ""
 "One of the following fields must be given: internal_order, profit_center, "
@@ -2965,6 +2924,14 @@ msgstr "Täytyy olla suurempi kuin 0"
 #: tilavarauspalvelu/models/payment_order/model.py
 msgid "Must be the sum of net and vat amounts"
 msgstr "Täytyy olla netto- ja ALV-määrien summa"
+
+#: tilavarauspalvelu/models/person/model.py
+msgid "Person"
+msgstr "Henkilö"
+
+#: tilavarauspalvelu/models/person/model.py
+msgid "Persons"
+msgstr "Henkilöt"
 
 #: tilavarauspalvelu/models/rejected_occurrence/model.py
 msgid "Rejected occurrence"
@@ -3042,6 +3009,30 @@ msgstr "varausyksiköiden hierarkia"
 msgid "reservation unit hierarchies"
 msgstr "varausyksiköiden hierarkiat"
 
+#: tilavarauspalvelu/models/reservation_unit_option/model.py
+msgid "Reservation Unit Option"
+msgstr "Varausyksikkövaihtoehto"
+
+#: tilavarauspalvelu/models/reservation_unit_option/model.py
+msgid "Reservation Unit Options"
+msgstr "Varausyksikkövaihtoehdot"
+
+#: tilavarauspalvelu/models/reservation_unit_option/model.py
+msgid "Preferred order must be unique for each application section"
+msgstr "Suosittu järjestys tulee olla uniikki jokaiselle hakemuksen osalle"
+
+#: tilavarauspalvelu/models/suitable_time_range/model.py
+msgid "Suitable Time Range"
+msgstr "Sopiva aikaväli"
+
+#: tilavarauspalvelu/models/suitable_time_range/model.py
+msgid "Suitable Time Ranges"
+msgstr "Sopivat aikavälit"
+
+#: tilavarauspalvelu/models/suitable_time_range/model.py
+msgid "Begin and end times must be a multiples of 60 minutes."
+msgstr "Alku- ja lopetusaikojen tulee olla 60 minuutin monikertoja."
+
 #: tilavarauspalvelu/models/terms_of_use/model.py
 msgctxt "singular"
 msgid "terms of use"
@@ -3059,6 +3050,22 @@ msgstr "Toimipistekohtainen rooli"
 #: tilavarauspalvelu/models/unit_role/model.py
 msgid "Unit roles"
 msgstr "Toimipistekohtaiset roolit"
+
+#: tilavarauspalvelu/tasks.py
+msgid "Core business"
+msgstr "Ydintoiminta"
+
+#: tilavarauspalvelu/tasks.py
+msgid "Seasonal Booking"
+msgstr "Kausivaraus"
+
+#: tilavarauspalvelu/utils/validators.py
+msgid "This field is required."
+msgstr "Tämä kenttä on pakollinen."
+
+#: tilavarauspalvelu/utils/validators.py
+msgid "Enter a valid time."
+msgstr "Syötä oikea aika."
 
 #: users/admin/user.py
 msgid "Search by Username, First name, Last name or Email"

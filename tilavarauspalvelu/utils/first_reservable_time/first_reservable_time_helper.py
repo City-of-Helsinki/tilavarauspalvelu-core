@@ -11,10 +11,9 @@ from graphene_django.settings import graphene_settings
 from lookup_property import L
 from query_optimizer.utils import calculate_queryset_slice
 
-from applications.enums import ApplicationRoundStatusChoice
-from applications.models import ApplicationRound
 from common.date_utils import local_datetime, local_datetime_max, local_datetime_min, local_start_of_day
-from tilavarauspalvelu.models import AffectingTimeSpan, ReservableTimeSpan
+from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
+from tilavarauspalvelu.models import AffectingTimeSpan, ApplicationRound, ReservableTimeSpan
 from tilavarauspalvelu.utils.first_reservable_time.first_reservable_time_reservation_unit_helper import (
     ReservationUnitFirstReservableTimeHelper,
 )

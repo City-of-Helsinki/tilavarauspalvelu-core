@@ -2,9 +2,9 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 from graphene_django_extensions.fields import EnumChoiceField
 
-from applications.enums import ApplicationSectionStatusChoice, ApplicationStatusChoice
-from applications.models import Application, ApplicationSection
 from common.fields.forms import disabled_widget
+from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, ApplicationStatusChoice
+from tilavarauspalvelu.models import Application, ApplicationSection
 
 
 class ApplicationSectionInlineAdminForm(forms.ModelForm):

@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 from django.conf import settings
 from graphene_django_extensions.utils import get_nested
 
-from applications.models import City
+from tilavarauspalvelu.models import City
 from tilavarauspalvelu.utils.helauth.typing import (
     BirthdayInfo,
     LoginMethod,

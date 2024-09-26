@@ -7,17 +7,17 @@ from django.db.models import Q, QuerySet
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
 
-from applications.enums import (
+from tilavarauspalvelu.enums import (
     ApplicationRoundStatusChoice,
     ApplicationSectionStatusChoice,
     ApplicationStatusChoice,
     Weekday,
 )
-from applications.models import ApplicationRound
+from tilavarauspalvelu.models import ApplicationRound
 
 if TYPE_CHECKING:
-    from applications.admin import AllocatedTimeSlotAdmin
     from common.typing import WSGIRequest
+    from tilavarauspalvelu.admin.allocated_timeslot.admin import AllocatedTimeSlotAdmin
 
 
 class ApplicationRoundFilter(admin.SimpleListFilter):

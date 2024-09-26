@@ -4,11 +4,6 @@ from unittest import mock
 
 import pytest
 
-from applications.enums import Weekday
-from applications.exporter.application_round_result_exporter import (
-    ApplicationRoundResultCSVExporter,
-    ApplicationSectionExportRow,
-)
 from common.date_utils import local_date_string, local_timedelta_string
 from tests.factories import (
     AllocatedTimeSlotFactory,
@@ -17,18 +12,23 @@ from tests.factories import (
     ApplicationSectionFactory,
     ReservationUnitOptionFactory,
 )
+from tilavarauspalvelu.enums import Weekday
+from tilavarauspalvelu.utils.exporter.application_round_result_exporter import (
+    ApplicationRoundResultCSVExporter,
+    ApplicationSectionExportRow,
+)
 
 from .helpers import get_writes
 
 if TYPE_CHECKING:
-    from applications.models import AllocatedTimeSlot, ApplicationSection
+    from tilavarauspalvelu.models import AllocatedTimeSlot, ApplicationSection
 
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
-CSV_WRITER_MOCK_PATH = "applications.exporter.application_round_result_exporter.csv.writer"
+CSV_WRITER_MOCK_PATH = "tilavarauspalvelu.utils.exporter.application_round_result_exporter.csv.writer"
 
 
 def test_application_round_results_export__single_application__all_fields(graphql):

@@ -9,8 +9,6 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.settings import api_settings
 
-from applications.enums import ApplicationStatusChoice
-from applications.models import AllocatedTimeSlot, Application, ReservationUnitOption
 from common.fields.serializer import CurrentUserDefaultNullable
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.api.graphql.types.address.serializers import AddressSerializer
@@ -19,6 +17,8 @@ from tilavarauspalvelu.api.graphql.types.application_section.serializers import 
 )
 from tilavarauspalvelu.api.graphql.types.organisation.serializers import OrganisationSerializer
 from tilavarauspalvelu.api.graphql.types.person.serializers import PersonSerializer
+from tilavarauspalvelu.enums import ApplicationStatusChoice
+from tilavarauspalvelu.models import AllocatedTimeSlot, Application, ReservationUnitOption
 from tilavarauspalvelu.utils.email.application_email_notification_sender import ApplicationEmailNotificationSender
 
 if TYPE_CHECKING:

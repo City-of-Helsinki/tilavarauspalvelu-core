@@ -5,13 +5,11 @@ from lookup_property import L
 from query_optimizer import AnnotatedField
 from query_optimizer.optimizer import QueryOptimizer
 
-from applications.enums import ApplicationSectionStatusChoice
-from applications.models import Application, ApplicationSection
-from applications.querysets.application import ApplicationQuerySet
-from applications.querysets.application_section import ApplicationSectionQuerySet
 from common.typing import GQLInfo
-from tilavarauspalvelu.enums import UserRoleChoice
-from tilavarauspalvelu.models import User
+from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, UserRoleChoice
+from tilavarauspalvelu.models import Application, ApplicationSection, User
+from tilavarauspalvelu.models.application.queryset import ApplicationQuerySet
+from tilavarauspalvelu.models.application_section.queryset import ApplicationSectionQuerySet
 
 from .filtersets import ApplicationSectionFilterSet
 from .permissions import ApplicationSectionPermission

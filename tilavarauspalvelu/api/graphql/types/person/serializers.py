@@ -1,6 +1,6 @@
 from graphene_django_extensions import NestingModelSerializer
 
-from applications.models import Person
+from tilavarauspalvelu.models import Person
 
 
 class PersonSerializer(NestingModelSerializer):

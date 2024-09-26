@@ -5,11 +5,9 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext_lazy
 from tinymce.widgets import TinyMCE
 
-from applications.enums import ApplicationRoundStatusChoice
-from applications.models import ApplicationRound
 from common.fields.forms import disabled_widget
-from tilavarauspalvelu.enums import TermsOfUseTypeChoices
-from tilavarauspalvelu.models import ReservationUnit, TermsOfUse
+from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, TermsOfUseTypeChoices
+from tilavarauspalvelu.models import ApplicationRound, ReservationUnit, TermsOfUse
 
 
 class ApplicationRoundAdminForm(forms.ModelForm):

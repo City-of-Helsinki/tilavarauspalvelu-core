@@ -28,8 +28,7 @@ if TYPE_CHECKING:
 
     from django.db import models
 
-    from applications.models import City
-    from tilavarauspalvelu.models import User
+    from tilavarauspalvelu.models import City, User
 
 
 class ReservationPeriod(TypedDict):

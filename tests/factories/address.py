@@ -1,6 +1,6 @@
 from factory import fuzzy
 
-from applications.models import Address
+from tilavarauspalvelu.models import Address
 
 from ._base import GenericDjangoModelFactory
 

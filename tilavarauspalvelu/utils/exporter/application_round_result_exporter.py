@@ -6,11 +6,11 @@ from django.db.models import Prefetch
 from django.http import FileResponse
 from lookup_property import L
 
-from applications.enums import ApplicationStatusChoice
-from applications.exporter.base_exporter import BaseCSVExporter, BaseExportRow
-from applications.models import AllocatedTimeSlot, ApplicationSection, ReservationUnitOption
-from applications.querysets.application_section import ApplicationSectionQuerySet
 from common.date_utils import local_date, local_date_string, local_time_string, local_timedelta_string
+from tilavarauspalvelu.enums import ApplicationStatusChoice
+from tilavarauspalvelu.models import AllocatedTimeSlot, ApplicationSection, ReservationUnitOption
+from tilavarauspalvelu.models.application_section.queryset import ApplicationSectionQuerySet
+from tilavarauspalvelu.utils.exporter.base_exporter import BaseCSVExporter, BaseExportRow
 
 
 @dataclass

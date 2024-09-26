@@ -1,9 +1,9 @@
 import pytest
 from lookup_property import L
 
-from applications.enums import Weekday
-from applications.models import SuitableTimeRange
 from tests.factories import AllocatedTimeSlotFactory, ApplicationSectionFactory, SuitableTimeRangeFactory
+from tilavarauspalvelu.enums import Weekday
+from tilavarauspalvelu.models import SuitableTimeRange
 
 # Applied to all tests
 pytestmark = [

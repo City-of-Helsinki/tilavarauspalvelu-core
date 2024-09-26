@@ -7,1054 +7,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: applications/admin/address.py
-#: tilavarauspalvelu/admin/payment_merchant/admin.py
-msgid "Street address"
-msgstr ""
-
-#: applications/admin/address.py
-msgid "Post code"
-msgstr ""
-
-#: applications/admin/address.py applications/models/city.py
-#: tilavarauspalvelu/admin/payment_merchant/admin.py
-msgid "City"
-msgstr ""
-
-#: applications/admin/address.py
-msgid "Search by street address, post code or city"
-msgstr ""
-
-#: applications/admin/allocated_time_slot/admin.py
-msgid ""
-"Search by day of the week, reservation unit, unit, application section, "
-"user's first or last name or email"
-msgstr ""
-
-#: applications/admin/allocated_time_slot/admin.py
-#: applications/admin/application/admin.py
-#: applications/admin/application_section/form.py
-#: applications/models/application.py
-msgid "Application"
-msgstr ""
-
-#: applications/admin/allocated_time_slot/filters.py
-#: applications/admin/application/filters.py
-#: applications/models/application_round.py
-msgid "Application Round"
-msgstr ""
-
-#: applications/admin/allocated_time_slot/filters.py
-#: applications/admin/application/filters.py
-#: applications/admin/application_section/filters.py
-msgid "Application round status"
-msgstr ""
-
-#: applications/admin/allocated_time_slot/filters.py
-#: applications/admin/application/filters.py
-#: applications/admin/application_section/filters.py
-msgid "Application status"
-msgstr ""
-
-#: applications/admin/allocated_time_slot/filters.py
-#: applications/admin/application_section/filters.py
-msgid "Application section status"
-msgstr ""
-
-#: applications/admin/allocated_time_slot/filters.py
-#: applications/admin/allocated_time_slot/form.py
-#: applications/admin/application_section/form.py
-msgid "Day of the week"
-msgstr ""
-
-#: applications/admin/allocated_time_slot/form.py
-msgid "Reservation unit option"
-msgstr ""
-
-#: applications/admin/allocated_time_slot/form.py
-msgid "Reservation unit option for to this allocation."
-msgstr ""
-
-#: applications/admin/allocated_time_slot/form.py
-#: applications/admin/application_section/form.py
-#: tilavarauspalvelu/admin/reservation/admin.py
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Begin time"
-msgstr ""
-
-#: applications/admin/allocated_time_slot/form.py
-#: applications/admin/application_section/form.py
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "End time"
-msgstr ""
-
-#: applications/admin/allocated_time_slot/form.py
-msgid "Allocated day of the week."
-msgstr ""
-
-#: applications/admin/allocated_time_slot/form.py
-msgid "Allocated begin time."
-msgstr ""
-
-#: applications/admin/allocated_time_slot/form.py
-msgid "Allocated end time."
-msgstr ""
-
-#: applications/admin/application/admin.py
-msgid "Search by user's first name, last name or reservation units name"
-msgstr ""
-
-#: applications/admin/application/admin.py
-#: tilavarauspalvelu/admin/reservation/admin.py
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Created at"
-msgstr ""
-
-#: applications/admin/application/admin.py
-#: applications/admin/application_round/admin.py
-#: applications/admin/application_section/admin.py
-#: tilavarauspalvelu/admin/reservation/admin.py
-#: tilavarauspalvelu/admin/reservation_unit/admin.py users/admin/user.py
-msgid "Basic information"
-msgstr ""
-
-#: applications/admin/application/admin.py
-#: applications/admin/application/form.py
-msgid "Applicant"
-msgstr ""
-
-#: applications/admin/application/admin.py
-#: applications/admin/application_round/admin.py
-#: applications/admin/application_section/admin.py
-#: tilavarauspalvelu/admin/reservation/admin.py
-msgid "Time"
-msgstr ""
-
-#: applications/admin/application/admin.py
-#: applications/admin/application_round/admin.py
-msgid "Notes"
-msgstr ""
-
-#: applications/admin/application/admin.py
-msgid "Reset application allocations"
-msgstr ""
-
-#: applications/admin/application/admin.py
-#: applications/admin/application_round/admin.py
-#: tilavarauspalvelu/admin/reservation/admin.py
-msgid "Are you sure?"
-msgstr ""
-
-#: applications/admin/application/admin.py
-msgid "Are you sure you want reset allocations for these applications?"
-msgstr ""
-
-#: applications/admin/application/form.py
-#: applications/admin/application_round/form.py
-#: applications/admin/application_section/form.py
-msgid "Status"
-msgstr ""
-
-#: applications/admin/application/form.py
-msgid "Suitable days of the week"
-msgstr ""
-
-#: applications/admin/application/form.py
-#: applications/admin/application_section/form.py
-msgid "Reservation minimum duration"
-msgstr ""
-
-#: applications/admin/application/form.py
-#: applications/admin/application_section/form.py
-msgid "Reservation maximum duration"
-msgstr ""
-
-#: applications/admin/application/form.py
-#: applications/admin/application_section/form.py
-msgid "Applied reservations per week"
-msgstr ""
-
-#: applications/admin/application/form.py
-msgid "Suitable days of the week for this section."
-msgstr ""
-
-#: applications/admin/application/form.py
-#: applications/admin/application_section/form.py
-msgid "Minimum duration that should be allocated for this section."
-msgstr ""
-
-#: applications/admin/application/form.py
-#: applications/admin/application_section/form.py
-msgid "Maximum duration that should be allocated for this section."
-msgstr ""
-
-#: applications/admin/application/form.py
-#: applications/admin/application_section/form.py
-msgid "How many reservation the applicant has applied for per week."
-msgstr ""
-
-#: applications/admin/application/form.py
-#, python-format
-msgid ""
-"%(draft)s: Application started but not ready. <br>%(received)s: Application "
-"sent by user. <br>%(in_allocation)s: Application's sections are being "
-"allocated. <br>%(handled)s: Application's sections have all been allocated. "
-"<br>%(results_sent)s: Application's results have been sent to user. "
-"<br>%(expired)s: Application not completed before application round ended. "
-"<br>%(cancelled)s: Application cancelled by user. <br>"
-msgstr ""
-
-#: applications/admin/application/form.py
-msgid "Applicant type"
-msgstr ""
-
-#: applications/admin/application/form.py
-msgid "Application round"
-msgstr ""
-
-#: applications/admin/application/form.py applications/models/organization.py
-msgid "Organisation"
-msgstr ""
-
-#: applications/admin/application/form.py
-msgid "Contact person"
-msgstr ""
-
-#: applications/admin/application/form.py
-msgid "Billing address"
-msgstr ""
-
-#: applications/admin/application/form.py
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Home city"
-msgstr ""
-
-#: applications/admin/application/form.py
-#: tilavarauspalvelu/admin/reservation/admin.py users/admin/user.py
-msgid "Additional information"
-msgstr ""
-
-#: applications/admin/application/form.py
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Working memo"
-msgstr ""
-
-#: applications/admin/application/form.py
-#: applications/admin/application_round/form.py
-msgid "Sent date"
-msgstr ""
-
-#: applications/admin/application/form.py
-msgid "Cancelled date"
-msgstr ""
-
-#: applications/admin/application/form.py
-msgid "In allocation notification sent date"
-msgstr ""
-
-#: applications/admin/application/form.py
-msgid "Results ready notification sent date"
-msgstr ""
-
-#: applications/admin/application/form.py
-msgid "Applicant type."
-msgstr ""
-
-#: applications/admin/application/form.py
-msgid "Application round the application is in."
-msgstr ""
-
-#: applications/admin/application/form.py
-msgid "Organisation the application is for."
-msgstr ""
-
-#: applications/admin/application/form.py
-msgid "Contact person for the application."
-msgstr ""
-
-#: applications/admin/application/form.py
-msgid "Applicant for the application."
-msgstr ""
-
-#: applications/admin/application/form.py
-msgid "Billing address for the application."
-msgstr ""
-
-#: applications/admin/application/form.py
-msgid "Home city for the application."
-msgstr ""
-
-#: applications/admin/application/form.py
-msgid "Additional information for the application."
-msgstr ""
-
-#: applications/admin/application/form.py
-msgid "Working memo for staff users."
-msgstr ""
-
-#: applications/admin/application/form.py
-msgid "Date when the application was sent."
-msgstr ""
-
-#: applications/admin/application/form.py
-msgid "Date when the application was cancelled."
-msgstr ""
-
-#: applications/admin/application/form.py
-msgid ""
-"Date when the applicant was notified that this application round is now in "
-"allocation."
-msgstr ""
-
-#: applications/admin/application/form.py
-msgid ""
-"Date when the applicant was notified that this application round results are "
-"now ready."
-msgstr ""
-
-#: applications/admin/application_round/admin.py
-msgid "Criteria"
-msgstr ""
-
-#: applications/admin/application_round/admin.py
-msgid "Reset application round"
-msgstr ""
-
-#: applications/admin/application_round/admin.py
-msgid "Are you sure you want to reset these application rounds?"
-msgstr ""
-
-#: applications/admin/application_round/form.py
-#, python-format
-msgid ""
-"%(upcoming)s: Applications cannot yet be made in the round. <br>%(open)s: "
-"Applications can be made in the round. <br>%(in_allocation)s: Applications "
-"in the round are being allocated. <br>%(handled)s: All application have been "
-"allocated. <br>%(results_sent)s: All application results have been sent to "
-"users. <br>"
-msgstr ""
-
-#: applications/admin/application_round/form.py
-#: applications/admin/application_section/form.py applications/admin/city.py
-#: applications/admin/organization.py
-#: tilavarauspalvelu/admin/reservation/form.py
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Name"
-msgstr ""
-
-#: applications/admin/application_round/form.py
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Name (Finnish)"
-msgstr ""
-
-#: applications/admin/application_round/form.py
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Name (English)"
-msgstr ""
-
-#: applications/admin/application_round/form.py
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Name (Swedish)"
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Reservation units"
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Application period begin date and time"
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Application period end date and time"
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Reservation period begin date"
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Reservation period end date"
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Public display begin date and time"
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Public display end date and time"
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Handled date"
-msgstr ""
-
-#: applications/admin/application_round/form.py
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Purposes"
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgctxt "ApplicationRound"
-msgid "Terms of use"
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Application criteria"
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Application criteria (Finnish)"
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Application criteria (English)"
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Application criteria (Swedish)"
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Notes when applying"
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Notes when applying (Finnish)"
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Notes when applying (English)"
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Notes when applying (Swedish)"
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Name that describes the application round."
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Name that describes the application round in Finnish."
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Name that describes the application round in English."
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Name that describes the application round in Swedish."
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Reservation units that can be applied for in this application round."
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Start date and time of the period when application can be sent."
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "End date and time of the period when application can be sent."
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Start date of the period to which the reservations will be made."
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "End date of the period to which the reservations will be made."
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Start date and time when application round is visible to public."
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "End date and time when application round is visible to public."
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "When the application round was handled."
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "When the application round applications were sent to applicants."
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Purposes that are allowed in this application period."
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Terms of use for the application round."
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Application criteria for the application round."
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Application criteria for the application round in Finnish."
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Application criteria for the application round in English."
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Application criteria for the application round in Swedish."
-msgstr ""
-
-#: applications/admin/application_round/form.py
-msgid "Text to show to applicants while they fill out their application."
-msgstr ""
-
-#: applications/admin/application_section/admin.py
-msgid "Search by name, application user's first name or last name"
-msgstr ""
-
-#: applications/admin/application_section/filters.py
-#: applications/admin/application_section/form.py
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Age group"
-msgstr ""
-
-#: applications/admin/application_section/filters.py
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Reservation purpose"
-msgstr ""
-
-#: applications/admin/application_section/form.py
-#: tilavarauspalvelu/admin/payment_order/admin.py
-msgid "Reservation unit"
-msgstr ""
-
-#: applications/admin/application_section/form.py
-msgid "Reservation unit for to this option."
-msgstr ""
-
-#: applications/admin/application_section/form.py
-msgid "Preferred order"
-msgstr ""
-
-#: applications/admin/application_section/form.py
-msgid "Rejected"
-msgstr ""
-
-#: applications/admin/application_section/form.py
-msgid "Locked"
-msgstr ""
-
-#: applications/admin/application_section/form.py
-msgid "Preferred order of the reservation unit option."
-msgstr ""
-
-#: applications/admin/application_section/form.py
-msgid "Rejected reservation unit options can never receive allocations."
-msgstr ""
-
-#: applications/admin/application_section/form.py
-msgid "Locked reservation unit options can no longer receive allocations."
-msgstr ""
-
-#: applications/admin/application_section/form.py
-msgid "Fulfilled"
-msgstr ""
-
-#: applications/admin/application_section/form.py
-msgid ""
-"Has this suitable time range been fulfilled based on existing allocations "
-"and reservation unit options being locked or rejected."
-msgstr ""
-
-#: applications/admin/application_section/form.py
-msgid "Priority"
-msgstr ""
-
-#: applications/admin/application_section/form.py
-msgid "Priority of the time range."
-msgstr ""
-
-#: applications/admin/application_section/form.py
-msgid "Requested day of the week."
-msgstr ""
-
-#: applications/admin/application_section/form.py
-msgid "Requested start time for allocations."
-msgstr ""
-
-#: applications/admin/application_section/form.py
-msgid "Requested end time for allocations."
-msgstr ""
-
-#: applications/admin/application_section/form.py
-#, python-format
-msgid ""
-"%(unallocated)s: Section has been created, but application round is still "
-"open. <br>%(in_allocation)s: Application round has closed, but the section "
-"is not fully allocated. <br>%(handled)s: Application round is no longer in "
-"allocation, section's applied reservations per week has been fulfilled, or "
-"all reservation unit options rejected or locked. <br>%(rejected)s: All "
-"applied slots for this application section have been locked or rejected. <br>"
-msgstr ""
-
-#: applications/admin/application_section/form.py
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Number of persons"
-msgstr ""
-
-#: applications/admin/application_section/form.py
-msgid "Reservations begin date"
-msgstr ""
-
-#: applications/admin/application_section/form.py
-msgid "Reservations end date"
-msgstr ""
-
-#: applications/admin/application_section/form.py
-msgid "Purpose"
-msgstr ""
-
-#: applications/admin/application_section/form.py
-msgid "Name that describes this section."
-msgstr ""
-
-#: applications/admin/application_section/form.py
-msgid "Number of persons that are excepted to attend this section."
-msgstr ""
-
-#: applications/admin/application_section/form.py
-msgid "First date on which reservations for this section are created."
-msgstr ""
-
-#: applications/admin/application_section/form.py
-msgid "Last date on which reservations for this section are created."
-msgstr ""
-
-#: applications/admin/application_section/form.py
-msgid "Application this section is in."
-msgstr ""
-
-#: applications/admin/application_section/form.py
-msgid "Age group for this section."
-msgstr ""
-
-#: applications/admin/application_section/form.py
-msgid "Purpose for this section."
-msgstr ""
-
-#: applications/admin/city.py
-msgid "Municipality"
-msgstr ""
-
-#: applications/admin/city.py
-msgid "Name of the city."
-msgstr ""
-
-#: applications/admin/city.py
-msgid "Municipality code for the city."
-msgstr ""
-
-#: applications/admin/organization.py applications/admin/person.py
-msgid "Email"
-msgstr ""
-
-#: applications/admin/organization.py
-msgid "Company code"
-msgstr ""
-
-#: applications/admin/organization.py
-msgid "Year established"
-msgstr ""
-
-#: applications/admin/organization.py
-msgid "Active members"
-msgstr ""
-
-#: applications/admin/organization.py
-msgid "Core business area"
-msgstr ""
-
-#: applications/admin/organization.py
-msgid "Organisation type"
-msgstr ""
-
-#: applications/admin/organization.py applications/models/address.py
-msgid "Address"
-msgstr ""
-
-#: applications/admin/organization.py
-msgid "Name of the organisation."
-msgstr ""
-
-#: applications/admin/organization.py
-msgid "Email address of the organisation."
-msgstr ""
-
-#: applications/admin/organization.py
-msgid "Organisation company code."
-msgstr ""
-
-#: applications/admin/organization.py
-msgid "Year the organisation was established."
-msgstr ""
-
-#: applications/admin/organization.py
-msgid "Number of active members in the organisation."
-msgstr ""
-
-#: applications/admin/organization.py
-msgid "Organisation core business area."
-msgstr ""
-
-#: applications/admin/organization.py
-msgid "Organisation type."
-msgstr ""
-
-#: applications/admin/organization.py
-msgid "Organisation address."
-msgstr ""
-
-#: applications/admin/organization.py
-msgid "Search by organisation name or identifier"
-msgstr ""
-
-#: applications/admin/person.py
-msgid "First name"
-msgstr ""
-
-#: applications/admin/person.py
-msgid "Last name"
-msgstr ""
-
-#: applications/admin/person.py
-#: tilavarauspalvelu/admin/payment_merchant/admin.py
-msgid "Phone number"
-msgstr ""
-
-#: applications/admin/person.py
-msgid "Person's first name."
-msgstr ""
-
-#: applications/admin/person.py
-msgid "Person's last name."
-msgstr ""
-
-#: applications/admin/person.py
-msgid "Person's email address."
-msgstr ""
-
-#: applications/admin/person.py
-msgid "Person's phone number."
-msgstr ""
-
-#: applications/admin/person.py
-msgid "Search by first name or last name."
-msgstr ""
-
-#: applications/apps.py applications/tasks.py
-msgid "Seasonal Booking"
-msgstr ""
-
-#: applications/enums.py config/utils/commons.py
-msgid "Monday"
-msgstr ""
-
-#: applications/enums.py config/utils/commons.py
-msgid "Tuesday"
-msgstr ""
-
-#: applications/enums.py config/utils/commons.py
-msgid "Wednesday"
-msgstr ""
-
-#: applications/enums.py config/utils/commons.py
-msgid "Thursday"
-msgstr ""
-
-#: applications/enums.py config/utils/commons.py
-msgid "Friday"
-msgstr ""
-
-#: applications/enums.py config/utils/commons.py
-msgid "Saturday"
-msgstr ""
-
-#: applications/enums.py config/utils/commons.py
-msgid "Sunday"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "Priority"
-msgid "Primary"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "Priority"
-msgid "Secondary"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "ApplicantType"
-msgid "Individual"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "ApplicantType"
-msgid "Association"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "ApplicantType"
-msgid "Community"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "ApplicantType"
-msgid "Company"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "ApplicationRoundStatus"
-msgid "Upcoming"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "ApplicationRoundStatus"
-msgid "Open"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "ApplicationRoundStatus"
-msgid "In Allocation"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "ApplicationRoundStatus"
-msgid "Handled"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "ApplicationRoundStatus"
-msgid "Results Sent"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "ApplicationRoundReservationCreationStatus"
-msgid "Not completed"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "ApplicationRoundReservationCreationStatus"
-msgid "Completed"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "ApplicationRoundReservationCreationStatus"
-msgid "Failed"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "ApplicationStatus"
-msgid "Draft"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "ApplicationStatus"
-msgid "Received"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "ApplicationStatus"
-msgid "In Allocation"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "ApplicationStatus"
-msgid "Handled"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "ApplicationStatus"
-msgid "Results Sent"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "ApplicationStatus"
-msgid "Expired"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "ApplicationStatus"
-msgid "Cancelled"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "ApplicationSectionStatus"
-msgid "Unallocated"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "ApplicationSectionStatus"
-msgid "In Allocation"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "ApplicationSectionStatus"
-msgid "Handled"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "ApplicationSectionStatus"
-msgid "Rejected"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "OrganizationType"
-msgid "Company"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "OrganizationType"
-msgid "Registered association"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "OrganizationType"
-msgid "Public association"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "OrganizationType"
-msgid "Unregistered association"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "OrganizationType"
-msgid "Municipality consortium"
-msgstr ""
-
-#: applications/enums.py
-msgctxt "OrganizationType"
-msgid "Religious community"
-msgstr ""
-
-#: applications/models/address.py
-msgid "Addresses"
-msgstr ""
-
-#: applications/models/allocated_time_slot.py
-msgid "Allocated Time Slot"
-msgstr ""
-
-#: applications/models/allocated_time_slot.py
-msgid "Allocated Time Slots"
-msgstr ""
-
-#: applications/models/allocated_time_slot.py
-#: applications/models/suitable_time_range.py
-msgid "Begin time must be before end time."
-msgstr ""
-
-#: applications/models/application.py
-msgid "Applications"
-msgstr ""
-
-#: applications/models/application_round.py
-msgid "Application Rounds"
-msgstr ""
-
-#: applications/models/application_round_time_slot.py
-msgid "Application Round Time Slot"
-msgstr ""
-
-#: applications/models/application_round_time_slot.py
-msgid "Application Round Time Slots"
-msgstr ""
-
-#: applications/models/application_section.py
-msgid "Application Section"
-msgstr ""
-
-#: applications/models/application_section.py
-msgid "Application Sections"
-msgstr ""
-
-#: applications/models/application_section.py
-msgid "Reservations begin date must be before reservations end date."
-msgstr ""
-
-#: applications/models/application_section.py
-msgid ""
-"Reservation min duration cannot be greater than reservation max duration."
-msgstr ""
-
-#: applications/models/application_section.py
-msgid "Can only apply from 1 to 7 reservations per week."
-msgstr ""
-
-#: applications/models/application_section.py
-msgid ""
-"Reservation min and max durations must be multiples of 30 minutes, up to a "
-"maximum of 24 hours."
-msgstr ""
-
-#: applications/models/city.py
-msgid "Cities"
-msgstr ""
-
-#: applications/models/organization.py
+#: applications/migrations/0004_fixed_organisation_year_field.py
+#: applications/migrations/0066_remove_applicationaggregatedata_application_and_more.py
+#: tilavarauspalvelu/models/organisation/model.py
 msgid "is after current year"
-msgstr ""
-
-#: applications/models/organization.py
-msgid "Organisations"
-msgstr ""
-
-#: applications/models/person.py
-msgid "Person"
-msgstr ""
-
-#: applications/models/person.py
-msgid "Persons"
-msgstr ""
-
-#: applications/models/reservation_unit_option.py
-msgid "Reservation Unit Option"
-msgstr ""
-
-#: applications/models/reservation_unit_option.py
-msgid "Reservation Unit Options"
-msgstr ""
-
-#: applications/models/reservation_unit_option.py
-msgid "Preferred order must be unique for each application section"
-msgstr ""
-
-#: applications/models/suitable_time_range.py
-msgid "Suitable Time Range"
-msgstr ""
-
-#: applications/models/suitable_time_range.py
-msgid "Suitable Time Ranges"
-msgstr ""
-
-#: applications/models/suitable_time_range.py
-msgid "Begin and end times must be a multiples of 60 minutes."
-msgstr ""
-
-#: applications/tasks.py
-msgid "Core business"
-msgstr ""
-
-#: applications/validators.py
-msgid "This field is required."
-msgstr ""
-
-#: applications/validators.py
-msgid "Enter a valid time."
 msgstr ""
 
 #: common/admin/banner_notification.py
@@ -1268,6 +224,34 @@ msgstr ""
 msgid "Swedish"
 msgstr ""
 
+#: config/utils/commons.py tilavarauspalvelu/enums.py
+msgid "Monday"
+msgstr ""
+
+#: config/utils/commons.py tilavarauspalvelu/enums.py
+msgid "Tuesday"
+msgstr ""
+
+#: config/utils/commons.py tilavarauspalvelu/enums.py
+msgid "Wednesday"
+msgstr ""
+
+#: config/utils/commons.py tilavarauspalvelu/enums.py
+msgid "Thursday"
+msgstr ""
+
+#: config/utils/commons.py tilavarauspalvelu/enums.py
+msgid "Friday"
+msgstr ""
+
+#: config/utils/commons.py tilavarauspalvelu/enums.py
+msgid "Saturday"
+msgstr ""
+
+#: config/utils/commons.py tilavarauspalvelu/enums.py
+msgid "Sunday"
+msgstr ""
+
 #: templates/admin/base.html
 msgid "Change password"
 msgstr ""
@@ -1324,6 +308,513 @@ msgstr ""
 msgid "Email Template Testing"
 msgstr ""
 
+#: tilavarauspalvelu/admin/address/admin.py
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+msgid "Street address"
+msgstr ""
+
+#: tilavarauspalvelu/admin/address/admin.py
+msgid "Post code"
+msgstr ""
+
+#: tilavarauspalvelu/admin/address/admin.py
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+#: tilavarauspalvelu/models/city/model.py
+msgid "City"
+msgstr ""
+
+#: tilavarauspalvelu/admin/address/admin.py
+msgid "Search by street address, post code or city"
+msgstr ""
+
+#: tilavarauspalvelu/admin/allocated_timeslot/admin.py
+msgid ""
+"Search by day of the week, reservation unit, unit, application section, "
+"user's first or last name or email"
+msgstr ""
+
+#: tilavarauspalvelu/admin/allocated_timeslot/admin.py
+#: tilavarauspalvelu/admin/application/admin.py
+#: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/models/application/model.py
+msgid "Application"
+msgstr ""
+
+#: tilavarauspalvelu/admin/allocated_timeslot/filters.py
+#: tilavarauspalvelu/admin/application/filters.py
+#: tilavarauspalvelu/models/application_round/model.py
+msgid "Application Round"
+msgstr ""
+
+#: tilavarauspalvelu/admin/allocated_timeslot/filters.py
+#: tilavarauspalvelu/admin/application/filters.py
+#: tilavarauspalvelu/admin/application_section/filters.py
+msgid "Application round status"
+msgstr ""
+
+#: tilavarauspalvelu/admin/allocated_timeslot/filters.py
+#: tilavarauspalvelu/admin/application/filters.py
+#: tilavarauspalvelu/admin/application_section/filters.py
+msgid "Application status"
+msgstr ""
+
+#: tilavarauspalvelu/admin/allocated_timeslot/filters.py
+#: tilavarauspalvelu/admin/application_section/filters.py
+msgid "Application section status"
+msgstr ""
+
+#: tilavarauspalvelu/admin/allocated_timeslot/filters.py
+#: tilavarauspalvelu/admin/allocated_timeslot/form.py
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Day of the week"
+msgstr ""
+
+#: tilavarauspalvelu/admin/allocated_timeslot/form.py
+msgid "Reservation unit option"
+msgstr ""
+
+#: tilavarauspalvelu/admin/allocated_timeslot/form.py
+msgid "Reservation unit option for to this allocation."
+msgstr ""
+
+#: tilavarauspalvelu/admin/allocated_timeslot/form.py
+#: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/reservation/admin.py
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Begin time"
+msgstr ""
+
+#: tilavarauspalvelu/admin/allocated_timeslot/form.py
+#: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "End time"
+msgstr ""
+
+#: tilavarauspalvelu/admin/allocated_timeslot/form.py
+msgid "Allocated day of the week."
+msgstr ""
+
+#: tilavarauspalvelu/admin/allocated_timeslot/form.py
+msgid "Allocated begin time."
+msgstr ""
+
+#: tilavarauspalvelu/admin/allocated_timeslot/form.py
+msgid "Allocated end time."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/admin.py
+msgid "Search by user's first name, last name or reservation units name"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/admin.py
+#: tilavarauspalvelu/admin/reservation/admin.py
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Created at"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/admin.py
+#: tilavarauspalvelu/admin/application_round/admin.py
+#: tilavarauspalvelu/admin/application_section/admin.py
+#: tilavarauspalvelu/admin/reservation/admin.py
+#: tilavarauspalvelu/admin/reservation_unit/admin.py users/admin/user.py
+msgid "Basic information"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/admin.py
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Applicant"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/admin.py
+#: tilavarauspalvelu/admin/application_round/admin.py
+#: tilavarauspalvelu/admin/application_section/admin.py
+#: tilavarauspalvelu/admin/reservation/admin.py
+msgid "Time"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/admin.py
+#: tilavarauspalvelu/admin/application_round/admin.py
+msgid "Notes"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/admin.py
+msgid "Reset application allocations"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/admin.py
+#: tilavarauspalvelu/admin/application_round/admin.py
+#: tilavarauspalvelu/admin/reservation/admin.py
+msgid "Are you sure?"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/admin.py
+msgid "Are you sure you want reset allocations for these applications?"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+#: tilavarauspalvelu/admin/application_round/form.py
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Status"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Suitable days of the week"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Reservation minimum duration"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Reservation maximum duration"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Applied reservations per week"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Suitable days of the week for this section."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Minimum duration that should be allocated for this section."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Maximum duration that should be allocated for this section."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "How many reservation the applicant has applied for per week."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+#, python-format
+msgid ""
+"%(draft)s: Application started but not ready. <br>%(received)s: Application "
+"sent by user. <br>%(in_allocation)s: Application's sections are being "
+"allocated. <br>%(handled)s: Application's sections have all been allocated. "
+"<br>%(results_sent)s: Application's results have been sent to user. "
+"<br>%(expired)s: Application not completed before application round ended. "
+"<br>%(cancelled)s: Application cancelled by user. <br>"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Applicant type"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Application round"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+#: tilavarauspalvelu/models/organisation/model.py
+msgid "Organisation"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Contact person"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Billing address"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Home city"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+#: tilavarauspalvelu/admin/reservation/admin.py users/admin/user.py
+msgid "Additional information"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Working memo"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Sent date"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Cancelled date"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "In allocation notification sent date"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Results ready notification sent date"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Applicant type."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Application round the application is in."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Organisation the application is for."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Contact person for the application."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Applicant for the application."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Billing address for the application."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Home city for the application."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Additional information for the application."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Working memo for staff users."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Date when the application was sent."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid "Date when the application was cancelled."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid ""
+"Date when the applicant was notified that this application round is now in "
+"allocation."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application/form.py
+msgid ""
+"Date when the applicant was notified that this application round results are "
+"now ready."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/admin.py
+msgid "Criteria"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/admin.py
+msgid "Reset application round"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/admin.py
+msgid "Are you sure you want to reset these application rounds?"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+#, python-format
+msgid ""
+"%(upcoming)s: Applications cannot yet be made in the round. <br>%(open)s: "
+"Applications can be made in the round. <br>%(in_allocation)s: Applications "
+"in the round are being allocated. <br>%(handled)s: All application have been "
+"allocated. <br>%(results_sent)s: All application results have been sent to "
+"users. <br>"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+#: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/city/admin.py
+#: tilavarauspalvelu/admin/organisation/admin.py
+#: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Name"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Name (Finnish)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Name (English)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Name (Swedish)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Reservation units"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Application period begin date and time"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Application period end date and time"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Reservation period begin date"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Reservation period end date"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Public display begin date and time"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Public display end date and time"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Handled date"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Purposes"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgctxt "ApplicationRound"
+msgid "Terms of use"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Application criteria"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Application criteria (Finnish)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Application criteria (English)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Application criteria (Swedish)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Notes when applying"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Notes when applying (Finnish)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Notes when applying (English)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Notes when applying (Swedish)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Name that describes the application round."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Name that describes the application round in Finnish."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Name that describes the application round in English."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Name that describes the application round in Swedish."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Reservation units that can be applied for in this application round."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Start date and time of the period when application can be sent."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "End date and time of the period when application can be sent."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Start date of the period to which the reservations will be made."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "End date of the period to which the reservations will be made."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Start date and time when application round is visible to public."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "End date and time when application round is visible to public."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "When the application round was handled."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "When the application round applications were sent to applicants."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Purposes that are allowed in this application period."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Terms of use for the application round."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Application criteria for the application round."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Application criteria for the application round in Finnish."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Application criteria for the application round in English."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Application criteria for the application round in Swedish."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_round/form.py
+msgid "Text to show to applicants while they fill out their application."
+msgstr ""
+
 #: tilavarauspalvelu/admin/application_round_time_slot/form.py
 msgid "Which weekday this timeslot concerns."
 msgstr ""
@@ -1336,6 +827,152 @@ msgstr ""
 msgid "Is the reservation unit closed on this weekday?"
 msgstr ""
 
+#: tilavarauspalvelu/admin/application_section/admin.py
+msgid "Search by name, application user's first name or last name"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/filters.py
+#: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Age group"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/filters.py
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Reservation purpose"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "Reservation unit"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Reservation unit for to this option."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Preferred order"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Rejected"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Locked"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Preferred order of the reservation unit option."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Rejected reservation unit options can never receive allocations."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Locked reservation unit options can no longer receive allocations."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Fulfilled"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid ""
+"Has this suitable time range been fulfilled based on existing allocations "
+"and reservation unit options being locked or rejected."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Priority"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Priority of the time range."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Requested day of the week."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Requested start time for allocations."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Requested end time for allocations."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+#, python-format
+msgid ""
+"%(unallocated)s: Section has been created, but application round is still "
+"open. <br>%(in_allocation)s: Application round has closed, but the section "
+"is not fully allocated. <br>%(handled)s: Application round is no longer in "
+"allocation, section's applied reservations per week has been fulfilled, or "
+"all reservation unit options rejected or locked. <br>%(rejected)s: All "
+"applied slots for this application section have been locked or rejected. <br>"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Number of persons"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Reservations begin date"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Reservations end date"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Purpose"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Name that describes this section."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Number of persons that are excepted to attend this section."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "First date on which reservations for this section are created."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Last date on which reservations for this section are created."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Application this section is in."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Age group for this section."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Purpose for this section."
+msgstr ""
+
+#: tilavarauspalvelu/admin/city/admin.py
+msgid "Municipality"
+msgstr ""
+
+#: tilavarauspalvelu/admin/city/admin.py
+msgid "Name of the city."
+msgstr ""
+
+#: tilavarauspalvelu/admin/city/admin.py
+msgid "Municipality code for the city."
+msgstr ""
+
 #: tilavarauspalvelu/admin/email_template/tester.py
 #, python-format
 msgid "Test Email '%s' successfully sent."
@@ -1343,6 +980,72 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/general_role/admin.py
 msgid "Search by username, email, first name or last name"
+msgstr ""
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+#: tilavarauspalvelu/admin/person/admin.py
+msgid "Email"
+msgstr ""
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+msgid "Company code"
+msgstr ""
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+msgid "Year established"
+msgstr ""
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+msgid "Active members"
+msgstr ""
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+msgid "Core business area"
+msgstr ""
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+msgid "Organisation type"
+msgstr ""
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+#: tilavarauspalvelu/models/address/model.py
+msgid "Address"
+msgstr ""
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+msgid "Name of the organisation."
+msgstr ""
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+msgid "Email address of the organisation."
+msgstr ""
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+msgid "Organisation company code."
+msgstr ""
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+msgid "Year the organisation was established."
+msgstr ""
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+msgid "Number of active members in the organisation."
+msgstr ""
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+msgid "Organisation core business area."
+msgstr ""
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+msgid "Organisation type."
+msgstr ""
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+msgid "Organisation address."
+msgstr ""
+
+#: tilavarauspalvelu/admin/organisation/admin.py
+msgid "Search by organisation name or identifier"
 msgstr ""
 
 #: tilavarauspalvelu/admin/origin_hauki_resource/admin.py
@@ -1388,6 +1091,11 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/payment_merchant/admin.py
 msgid "Email address"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_merchant/admin.py
+#: tilavarauspalvelu/admin/person/admin.py
+msgid "Phone number"
 msgstr ""
 
 #: tilavarauspalvelu/admin/payment_merchant/admin.py
@@ -1490,6 +1198,34 @@ msgstr ""
 msgid ""
 "Search by Payment Order ID, Reservation ID, Remote Order ID, Reservation "
 "name, or Reservation Unit name"
+msgstr ""
+
+#: tilavarauspalvelu/admin/person/admin.py
+msgid "First name"
+msgstr ""
+
+#: tilavarauspalvelu/admin/person/admin.py
+msgid "Last name"
+msgstr ""
+
+#: tilavarauspalvelu/admin/person/admin.py
+msgid "Person's first name."
+msgstr ""
+
+#: tilavarauspalvelu/admin/person/admin.py
+msgid "Person's last name."
+msgstr ""
+
+#: tilavarauspalvelu/admin/person/admin.py
+msgid "Person's email address."
+msgstr ""
+
+#: tilavarauspalvelu/admin/person/admin.py
+msgid "Person's phone number."
+msgstr ""
+
+#: tilavarauspalvelu/admin/person/admin.py
+msgid "Search by first name or last name."
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/admin.py
@@ -2854,12 +2590,231 @@ msgctxt "ReservationUnitImageType"
 msgid "Other"
 msgstr ""
 
+#: tilavarauspalvelu/enums.py
+msgctxt "Priority"
+msgid "Primary"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "Priority"
+msgid "Secondary"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicantType"
+msgid "Individual"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicantType"
+msgid "Association"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicantType"
+msgid "Community"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicantType"
+msgid "Company"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationRoundStatus"
+msgid "Upcoming"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationRoundStatus"
+msgid "Open"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationRoundStatus"
+msgid "In Allocation"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationRoundStatus"
+msgid "Handled"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationRoundStatus"
+msgid "Results Sent"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationRoundReservationCreationStatus"
+msgid "Not completed"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationRoundReservationCreationStatus"
+msgid "Completed"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationRoundReservationCreationStatus"
+msgid "Failed"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationStatus"
+msgid "Draft"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationStatus"
+msgid "Received"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationStatus"
+msgid "In Allocation"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationStatus"
+msgid "Handled"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationStatus"
+msgid "Results Sent"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationStatus"
+msgid "Expired"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationStatus"
+msgid "Cancelled"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationSectionStatus"
+msgid "Unallocated"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationSectionStatus"
+msgid "In Allocation"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationSectionStatus"
+msgid "Handled"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "ApplicationSectionStatus"
+msgid "Rejected"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "OrganizationType"
+msgid "Company"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "OrganizationType"
+msgid "Registered association"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "OrganizationType"
+msgid "Public association"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "OrganizationType"
+msgid "Unregistered association"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "OrganizationType"
+msgid "Municipality consortium"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "OrganizationType"
+msgid "Religious community"
+msgstr ""
+
+#: tilavarauspalvelu/models/address/model.py
+msgid "Addresses"
+msgstr ""
+
 #: tilavarauspalvelu/models/affecting_time_span/model.py
 msgid "affecting time span"
 msgstr ""
 
 #: tilavarauspalvelu/models/affecting_time_span/model.py
 msgid "affecting time spans"
+msgstr ""
+
+#: tilavarauspalvelu/models/allocated_timeslot/model.py
+msgid "Allocated Time Slot"
+msgstr ""
+
+#: tilavarauspalvelu/models/allocated_timeslot/model.py
+msgid "Allocated Time Slots"
+msgstr ""
+
+#: tilavarauspalvelu/models/allocated_timeslot/model.py
+#: tilavarauspalvelu/models/suitable_time_range/model.py
+msgid "Begin time must be before end time."
+msgstr ""
+
+#: tilavarauspalvelu/models/application/model.py
+msgid "Applications"
+msgstr ""
+
+#: tilavarauspalvelu/models/application_round/model.py
+msgid "Application Rounds"
+msgstr ""
+
+#: tilavarauspalvelu/models/application_round_time_slot/model.py
+msgid "Application Round Time Slot"
+msgstr ""
+
+#: tilavarauspalvelu/models/application_round_time_slot/model.py
+msgid "Application Round Time Slots"
+msgstr ""
+
+#: tilavarauspalvelu/models/application_section/model.py
+msgid "Application Section"
+msgstr ""
+
+#: tilavarauspalvelu/models/application_section/model.py
+msgid "Application Sections"
+msgstr ""
+
+#: tilavarauspalvelu/models/application_section/model.py
+msgid "Reservations begin date must be before reservations end date."
+msgstr ""
+
+#: tilavarauspalvelu/models/application_section/model.py
+msgid ""
+"Reservation min duration cannot be greater than reservation max duration."
+msgstr ""
+
+#: tilavarauspalvelu/models/application_section/model.py
+msgid "Can only apply from 1 to 7 reservations per week."
+msgstr ""
+
+#: tilavarauspalvelu/models/application_section/model.py
+msgid ""
+"Reservation min and max durations must be multiples of 30 minutes, up to a "
+"maximum of 24 hours."
+msgstr ""
+
+#: tilavarauspalvelu/models/city/model.py
+msgid "Cities"
 msgstr ""
 
 #: tilavarauspalvelu/models/email_template/model.py
@@ -2902,6 +2857,10 @@ msgstr ""
 msgid "General roles"
 msgstr ""
 
+#: tilavarauspalvelu/models/organisation/model.py
+msgid "Organisations"
+msgstr ""
+
 #: tilavarauspalvelu/models/payment_accounting/model.py
 msgid ""
 "One of the following fields must be given: internal_order, profit_center, "
@@ -2918,6 +2877,14 @@ msgstr ""
 
 #: tilavarauspalvelu/models/payment_order/model.py
 msgid "Must be the sum of net and vat amounts"
+msgstr ""
+
+#: tilavarauspalvelu/models/person/model.py
+msgid "Person"
+msgstr ""
+
+#: tilavarauspalvelu/models/person/model.py
+msgid "Persons"
 msgstr ""
 
 #: tilavarauspalvelu/models/rejected_occurrence/model.py
@@ -3002,6 +2969,30 @@ msgstr ""
 msgid "reservation unit hierarchies"
 msgstr ""
 
+#: tilavarauspalvelu/models/reservation_unit_option/model.py
+msgid "Reservation Unit Option"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_unit_option/model.py
+msgid "Reservation Unit Options"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_unit_option/model.py
+msgid "Preferred order must be unique for each application section"
+msgstr ""
+
+#: tilavarauspalvelu/models/suitable_time_range/model.py
+msgid "Suitable Time Range"
+msgstr ""
+
+#: tilavarauspalvelu/models/suitable_time_range/model.py
+msgid "Suitable Time Ranges"
+msgstr ""
+
+#: tilavarauspalvelu/models/suitable_time_range/model.py
+msgid "Begin and end times must be a multiples of 60 minutes."
+msgstr ""
+
 #: tilavarauspalvelu/models/terms_of_use/model.py
 msgctxt "singular"
 msgid "terms of use"
@@ -3018,6 +3009,22 @@ msgstr ""
 
 #: tilavarauspalvelu/models/unit_role/model.py
 msgid "Unit roles"
+msgstr ""
+
+#: tilavarauspalvelu/tasks.py
+msgid "Core business"
+msgstr ""
+
+#: tilavarauspalvelu/tasks.py
+msgid "Seasonal Booking"
+msgstr ""
+
+#: tilavarauspalvelu/utils/validators.py
+msgid "This field is required."
+msgstr ""
+
+#: tilavarauspalvelu/utils/validators.py
+msgid "Enter a valid time."
 msgstr ""
 
 #: users/admin/user.py

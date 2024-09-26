@@ -12,11 +12,16 @@ from graphene_django_extensions.filters import (
 )
 from lookup_property import L
 
-from applications.enums import ApplicantTypeChoice, ApplicationSectionStatusChoice, ApplicationStatusChoice, Priority
-from applications.models import ApplicationSection
-from applications.querysets.application_section import ApplicationSectionQuerySet
 from common.db import text_search
 from common.utils import log_text_search
+from tilavarauspalvelu.enums import (
+    ApplicantTypeChoice,
+    ApplicationSectionStatusChoice,
+    ApplicationStatusChoice,
+    Priority,
+)
+from tilavarauspalvelu.models import ApplicationSection
+from tilavarauspalvelu.models.application_section.queryset import ApplicationSectionQuerySet
 
 __all__ = [
     "ApplicationSectionFilterSet",

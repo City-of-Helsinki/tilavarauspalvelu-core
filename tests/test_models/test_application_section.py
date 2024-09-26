@@ -3,10 +3,10 @@ import datetime
 import pytest
 from lookup_property import L
 
-from applications.enums import ApplicationSectionStatusChoice, Weekday
-from applications.models import ApplicationSection
 from tests.factories import AllocatedTimeSlotFactory, ApplicationRoundFactory, ReservationUnitOptionFactory
 from tests.factories.application_section import ApplicationSectionFactory
+from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, Weekday
+from tilavarauspalvelu.models import ApplicationSection
 
 # Applied to all tests
 pytestmark = [

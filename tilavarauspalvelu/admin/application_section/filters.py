@@ -8,14 +8,18 @@ from django.db.models.functions import Concat
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
 
-from applications.enums import ApplicationRoundStatusChoice, ApplicationSectionStatusChoice, ApplicationStatusChoice
+from tilavarauspalvelu.enums import (
+    ApplicationRoundStatusChoice,
+    ApplicationSectionStatusChoice,
+    ApplicationStatusChoice,
+)
 from tilavarauspalvelu.models import AgeGroup, ReservationPurpose
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
 
-    from applications.admin import ApplicationSectionAdmin
     from common.typing import WSGIRequest
+    from tilavarauspalvelu.admin.application_section.admin import ApplicationSectionAdmin
 
 
 class ApplicationRoundStatusFilter(admin.SimpleListFilter):

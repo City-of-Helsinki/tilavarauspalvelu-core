@@ -4,7 +4,7 @@ from graphene_django_extensions.permissions import AllowAuthenticated
 from lookup_property import L
 from query_optimizer import AnnotatedField
 
-from applications.models import SuitableTimeRange
+from tilavarauspalvelu.models import SuitableTimeRange
 
 from .filtersets import SuitableTimeRangeFilterSet
 

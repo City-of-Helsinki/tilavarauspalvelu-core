@@ -4,11 +4,11 @@ from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntChoiceFilter, IntMultipleChoiceFilter
 from lookup_property import L
 
-from applications.enums import ApplicantTypeChoice, ApplicationSectionStatusChoice, Weekday
-from applications.models import AllocatedTimeSlot
-from applications.querysets.allocated_time_slot import AllocatedTimeSlotQuerySet
 from common.db import text_search
 from common.utils import log_text_search
+from tilavarauspalvelu.enums import ApplicantTypeChoice, ApplicationSectionStatusChoice, Weekday
+from tilavarauspalvelu.models import AllocatedTimeSlot
+from tilavarauspalvelu.models.allocated_timeslot.queryset import AllocatedTimeSlotQuerySet
 
 __all__ = [
     "AllocatedTimeSlotFilterSet",

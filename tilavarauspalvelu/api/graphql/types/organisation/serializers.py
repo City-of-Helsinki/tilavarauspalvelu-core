@@ -1,7 +1,7 @@
 from graphene_django_extensions import NestingModelSerializer
 
-from applications.models import Organisation
 from tilavarauspalvelu.api.graphql.types.address.serializers import AddressSerializer
+from tilavarauspalvelu.models import Organisation
 
 
 class OrganisationSerializer(NestingModelSerializer):

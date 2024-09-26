@@ -1,8 +1,8 @@
 import pytest
 
-from applications.models import ApplicationSection
 from tests.factories import ApplicationSectionFactory, UserFactory
 from tests.test_graphql_api.test_application_section.helpers import UPDATE_MUTATION, get_application_section_update_data
+from tilavarauspalvelu.models import ApplicationSection
 
 # Applied to all tests
 pytestmark = [

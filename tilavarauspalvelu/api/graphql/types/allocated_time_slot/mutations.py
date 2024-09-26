@@ -2,7 +2,7 @@ from graphene_django_extensions import CreateMutation, DeleteMutation
 from graphene_django_extensions.typing import AnyUser
 from rest_framework.exceptions import ValidationError
 
-from applications.models import AllocatedTimeSlot
+from tilavarauspalvelu.models import AllocatedTimeSlot
 
 from .permissions import AllocatedTimeSlotPermission
 from .serializers import AllocatedTimeSlotCreateSerializer

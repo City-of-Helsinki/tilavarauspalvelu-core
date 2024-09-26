@@ -24,9 +24,9 @@ from utils.decimal_utils import round_decimal
 from .queryset import ReservationQuerySet
 
 if TYPE_CHECKING:
-    from applications.models import City
     from tilavarauspalvelu.models import (
         AgeGroup,
+        City,
         RecurringReservation,
         ReservationCancelReason,
         ReservationDenyReason,
@@ -156,7 +156,7 @@ class Reservation(SerializableMixin, models.Model):
         blank=True,
     )
     home_city: City | None = models.ForeignKey(
-        "applications.City",
+        "tilavarauspalvelu.City",
         related_name="home_city_reservation",
         on_delete=models.SET_NULL,
         null=True,

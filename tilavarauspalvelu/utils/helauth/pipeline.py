@@ -148,8 +148,7 @@ def migrate_from_tunnistamo_to_keycloak(*, email: str) -> None:
     new_user.reservation_notification = old_user.reservation_notification
     new_user.save()
 
-    from applications.models import Application
-    from tilavarauspalvelu.models import GeneralRole, RecurringReservation, Reservation, UnitRole
+    from tilavarauspalvelu.models import Application, GeneralRole, RecurringReservation, Reservation, UnitRole
 
     # Migrate general roles.
     GeneralRole.objects.filter(user=old_user).update(user=new_user)

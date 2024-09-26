@@ -1,7 +1,7 @@
 import pytest
 
-from applications.enums import Weekday
 from tests.factories import ReservationUnitOptionFactory
+from tilavarauspalvelu.enums import Weekday
 
 from .helpers import UPDATE_MUTATION
 

@@ -1,6 +1,6 @@
 from graphene_django_extensions import DjangoNode
 
-from applications.models import City
+from tilavarauspalvelu.models import City
 
 from .permissions import CityPermission
 

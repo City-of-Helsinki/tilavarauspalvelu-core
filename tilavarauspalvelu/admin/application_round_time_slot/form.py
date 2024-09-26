@@ -2,9 +2,9 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 from subforms.fields import DynamicArrayField, NestedFormField
 
-from applications.enums import WeekdayChoice
-from applications.models import ApplicationRoundTimeSlot
-from applications.validators import validate_string_time
+from tilavarauspalvelu.enums import WeekdayChoice
+from tilavarauspalvelu.models import ApplicationRoundTimeSlot
+from tilavarauspalvelu.utils.validators import validate_string_time
 
 
 def remove_empty_timeslots(timeslots: list[dict[str, str]]) -> None:

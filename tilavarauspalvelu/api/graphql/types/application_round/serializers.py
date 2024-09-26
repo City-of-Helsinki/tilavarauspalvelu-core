@@ -4,11 +4,11 @@ from graphene_django_extensions import NestingModelSerializer
 from lookup_property import L
 from rest_framework.exceptions import ValidationError
 
-from applications.enums import ApplicationRoundStatusChoice, ApplicationStatusChoice
-from applications.models import ApplicationRound
-from applications.tasks import generate_reservation_series_from_allocations
 from common.date_utils import local_datetime
 from tilavarauspalvelu.api.graphql.extensions import error_codes
+from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ApplicationStatusChoice
+from tilavarauspalvelu.models import ApplicationRound
+from tilavarauspalvelu.tasks import generate_reservation_series_from_allocations
 
 
 class SetApplicationRoundHandledSerializer(NestingModelSerializer):

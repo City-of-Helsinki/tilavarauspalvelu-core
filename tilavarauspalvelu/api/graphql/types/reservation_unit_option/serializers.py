@@ -1,7 +1,7 @@
 from graphene_django_extensions import NestingModelSerializer
 from rest_framework.exceptions import ValidationError
 
-from applications.models import ReservationUnitOption
+from tilavarauspalvelu.models import ReservationUnitOption
 
 
 class ReservationUnitOptionApplicantSerializer(NestingModelSerializer):

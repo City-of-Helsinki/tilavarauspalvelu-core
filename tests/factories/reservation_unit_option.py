@@ -3,9 +3,9 @@ from typing import Any
 
 import factory
 
-from applications.models import AllocatedTimeSlot, ReservationUnitOption
 from tests.factories import AllocatedTimeSlotFactory
 from tests.factories._base import GenericDjangoModelFactory
+from tilavarauspalvelu.models import AllocatedTimeSlot, ReservationUnitOption
 
 
 class ReservationUnitOptionFactory(GenericDjangoModelFactory[ReservationUnitOption]):

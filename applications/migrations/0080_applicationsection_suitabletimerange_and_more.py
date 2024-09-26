@@ -6,8 +6,22 @@ import django.db.models.constraints
 import django.db.models.deletion
 from django.db import migrations, models
 
-import applications.enums
 import common.fields.model
+
+
+class Weekday(models.TextChoices):
+    MONDAY = "MONDAY", "Monday"
+    TUESDAY = "TUESDAY", "Tuesday"
+    WEDNESDAY = "WEDNESDAY", "Wednesday"
+    THURSDAY = "THURSDAY", "Thursday"
+    FRIDAY = "FRIDAY", "Friday"
+    SATURDAY = "SATURDAY", "Saturday"
+    SUNDAY = "SUNDAY", "Sunday"
+
+
+class Priority(models.TextChoices):
+    PRIMARY = "PRIMARY", "Primary"
+    SECONDARY = "SECONDARY", "Secondary"
 
 
 class Migration(migrations.Migration):
@@ -71,7 +85,7 @@ class Migration(migrations.Migration):
                     "priority",
                     common.fields.model.StrChoiceField(
                         choices=[("PRIMARY", "Primary"), ("SECONDARY", "Secondary")],
-                        enum=applications.enums.Priority,
+                        enum=Priority,
                         max_length=9,
                     ),
                 ),
@@ -87,7 +101,7 @@ class Migration(migrations.Migration):
                             ("SATURDAY", "Saturday"),
                             ("SUNDAY", "Sunday"),
                         ],
-                        enum=applications.enums.Weekday,
+                        enum=Weekday,
                         max_length=9,
                     ),
                 ),
@@ -156,7 +170,7 @@ class Migration(migrations.Migration):
                             ("SATURDAY", "Saturday"),
                             ("SUNDAY", "Sunday"),
                         ],
-                        enum=applications.enums.Weekday,
+                        enum=Weekday,
                         max_length=9,
                     ),
                 ),
@@ -339,7 +353,9 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 name="durations_multiple_of_30_minutes_max_24_hours",
-                violation_error_message="Reservation min and max durations must be multiples of 30 minutes, up to a maximum of 24 hours.",
+                violation_error_message=(
+                    "Reservation min and max durations must be multiples of 30 minutes, up to a maximum of 24 hours."
+                ),
             ),
         ),
         migrations.AddConstraint(

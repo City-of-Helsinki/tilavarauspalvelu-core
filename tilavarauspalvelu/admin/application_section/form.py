@@ -1,10 +1,15 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from applications.enums import ApplicationSectionStatusChoice
-from applications.models import Application, ApplicationSection, ReservationUnitOption, SuitableTimeRange
 from common.fields.forms import disabled_widget
-from tilavarauspalvelu.models import ReservationUnit
+from tilavarauspalvelu.enums import ApplicationSectionStatusChoice
+from tilavarauspalvelu.models import (
+    Application,
+    ApplicationSection,
+    ReservationUnit,
+    ReservationUnitOption,
+    SuitableTimeRange,
+)
 
 
 class ReservationUnitOptionInlineAdminForm(forms.ModelForm):

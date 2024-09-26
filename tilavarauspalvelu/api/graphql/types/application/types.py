@@ -6,14 +6,12 @@ from lookup_property import L
 from query_optimizer import AnnotatedField
 from query_optimizer.optimizer import QueryOptimizer
 
-from applications.enums import ApplicationStatusChoice
-from applications.models import Application, ApplicationRound
-from applications.querysets.application import ApplicationQuerySet
 from common.typing import GQLInfo
 from tilavarauspalvelu.api.graphql.types.application_section.types import ApplicationSectionNode
 from tilavarauspalvelu.api.graphql.types.user.types import ApplicantNode
-from tilavarauspalvelu.enums import UserRoleChoice
-from tilavarauspalvelu.models import User
+from tilavarauspalvelu.enums import ApplicationStatusChoice, UserRoleChoice
+from tilavarauspalvelu.models import Application, ApplicationRound, User
+from tilavarauspalvelu.models.application.queryset import ApplicationQuerySet
 
 from .filtersets import ApplicationFilterSet
 from .permissions import ApplicationPermission

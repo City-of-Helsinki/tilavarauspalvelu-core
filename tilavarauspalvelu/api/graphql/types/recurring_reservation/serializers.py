@@ -9,11 +9,15 @@ from graphql import GraphQLError
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from applications.enums import WeekdayChoice
 from common.date_utils import local_date
 from common.fields.serializer import CurrentUserDefaultNullable, input_only_field
 from tilavarauspalvelu.api.graphql.extensions import error_codes
-from tilavarauspalvelu.enums import ReservationStartInterval, ReservationStateChoice, ReservationTypeStaffChoice
+from tilavarauspalvelu.enums import (
+    ReservationStartInterval,
+    ReservationStateChoice,
+    ReservationTypeStaffChoice,
+    WeekdayChoice,
+)
 from tilavarauspalvelu.models import RecurringReservation, Reservation, ReservationUnit
 from tilavarauspalvelu.models.recurring_reservation.actions import ReservationDetails
 from tilavarauspalvelu.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task

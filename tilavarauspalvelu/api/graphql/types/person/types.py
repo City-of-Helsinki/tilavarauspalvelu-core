@@ -1,7 +1,7 @@
 from graphene_django_extensions import DjangoNode
 from graphene_django_extensions.permissions import AllowAuthenticated
 
-from applications.models import Person
+from tilavarauspalvelu.models import Person
 
 
 class PersonNode(DjangoNode):
