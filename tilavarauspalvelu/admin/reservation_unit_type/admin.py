@@ -7,4 +7,9 @@ from tilavarauspalvelu.models import ReservationUnitType
 
 @admin.register(ReservationUnitType)
 class ReservationUnitTypeAdmin(SortableAdminMixin, TranslationAdmin):
-    pass
+    # List
+    list_display = [
+        "rank",
+        "name",
+    ]
+    ordering = ["rank"]

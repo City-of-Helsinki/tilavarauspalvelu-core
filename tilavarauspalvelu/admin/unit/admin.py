@@ -25,6 +25,7 @@ class UnitAdmin(SortableAdminMixin, ExtraButtonsMixin, TranslationAdmin):
 
     # List
     list_display = [
+        "rank",
         "__str__",
         "payment_merchant",
         "payment_accounting",
