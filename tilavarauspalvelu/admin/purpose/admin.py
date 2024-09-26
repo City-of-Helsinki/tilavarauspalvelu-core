@@ -7,4 +7,10 @@ from tilavarauspalvelu.models import Purpose
 
 @admin.register(Purpose)
 class PurposeAdmin(SortableAdminMixin, TranslationAdmin):
-    pass
+    # List
+    list_display = [
+        "rank",
+        "name",
+        "image",
+    ]
+    ordering = ["rank"]
