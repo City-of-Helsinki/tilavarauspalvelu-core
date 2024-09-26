@@ -12,8 +12,7 @@ from permissions.enums import UserRoleChoice
 if TYPE_CHECKING:
     import datetime
 
-    from users.models import User
-
+    from tilavarauspalvelu.models import User
 
 __all__ = [
     "GeneralRole",
@@ -21,10 +20,12 @@ __all__ = [
 
 
 class GeneralRole(models.Model):
-    user: User = models.ForeignKey("users.User", related_name="general_roles", on_delete=models.CASCADE)
+    user: User = models.ForeignKey("tilavarauspalvelu.User", related_name="general_roles", on_delete=models.CASCADE)
     role: str = StrChoiceField(enum=UserRoleChoice)
 
-    assigner: User | None = models.ForeignKey("users.User", on_delete=models.SET_NULL, null=True, blank=True)
+    assigner: User | None = models.ForeignKey(
+        "tilavarauspalvelu.User", on_delete=models.SET_NULL, null=True, blank=True
+    )
     created: datetime.datetime = models.DateTimeField(auto_now_add=True)
     modified: datetime.datetime = models.DateTimeField(auto_now=True)
 

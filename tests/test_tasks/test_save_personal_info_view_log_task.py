@@ -1,8 +1,8 @@
 import pytest
 
 from tests.factories import UserFactory
-from users.models import PersonalInfoViewLog
-from users.tasks import save_personal_info_view_log
+from tilavarauspalvelu.models import PersonalInfoViewLog
+from tilavarauspalvelu.tasks import save_personal_info_view_log
 
 pytestmark = [
     pytest.mark.django_db,

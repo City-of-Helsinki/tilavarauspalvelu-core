@@ -8,9 +8,9 @@ from social_django.models import DjangoStorage, UserSocialAuth
 from social_django.strategy import DjangoStrategy
 
 from common.typing import WSGIRequest
-from users.helauth.clients import HelsinkiProfileClient
-from users.helauth.typing import IDToken
-from users.models import User
+from tilavarauspalvelu.models import User
+from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
+from tilavarauspalvelu.utils.helauth.typing import IDToken
 from utils.sentry import SentryLogger
 
 __all__ = [

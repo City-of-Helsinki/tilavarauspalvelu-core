@@ -26,7 +26,7 @@ from reservations.models import (
     ReservationStatisticsReservationUnit,
 )
 from spaces.models import Building, RealEstate
-from users.models import PersonalInfoViewLog
+from tilavarauspalvelu.models import PersonalInfoViewLog
 
 apps_to_check: list[str] = [
     "common",

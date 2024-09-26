@@ -17,7 +17,7 @@ from reservations.enums import ReservationTypeChoice as ReservationTypeField
 from reservations.models import Reservation
 from reservations.querysets import ReservationQuerySet
 from tilavarauspalvelu.api.graphql.types.merchants.types import PaymentOrderNode
-from users.models import User
+from tilavarauspalvelu.models import User
 
 from .filtersets import ReservationFilterSet
 from .permissions import ReservationPermission

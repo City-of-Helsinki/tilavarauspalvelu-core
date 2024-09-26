@@ -8,8 +8,7 @@ if TYPE_CHECKING:
     from graphene_django_extensions.typing import AnyUser
     from rest_framework import serializers
 
-    from users.models import User
-
+    from tilavarauspalvelu.models import User
 
 __all__ = [
     "CurrentUserDefaultNullable",

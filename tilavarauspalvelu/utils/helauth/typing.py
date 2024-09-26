@@ -76,7 +76,7 @@ class IDToken:
 
     @classmethod
     def from_string(cls, token: str) -> IDToken | None:
-        from users.helauth.utils import get_jwt_payload
+        from tilavarauspalvelu.utils.helauth.utils import get_jwt_payload
 
         try:
             payload = get_jwt_payload(token)

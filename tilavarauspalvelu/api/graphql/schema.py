@@ -17,9 +17,9 @@ from common.typing import AnyUser, GQLInfo
 from merchants.models import PaymentOrder
 from permissions.enums import UserPermissionChoice
 from reservations.models import Reservation
-from users.helauth.clients import HelsinkiProfileClient
-from users.helauth.typing import UserProfileInfo
-from users.models import User
+from tilavarauspalvelu.models import User
+from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
+from tilavarauspalvelu.utils.helauth.typing import UserProfileInfo
 
 from .mutations import (
     AllocatedTimeSlotCreateMutation,

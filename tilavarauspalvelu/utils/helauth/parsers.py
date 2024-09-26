@@ -8,7 +8,7 @@ from django.conf import settings
 from graphene_django_extensions.utils import get_nested
 
 from applications.models import City
-from users.helauth.typing import (
+from tilavarauspalvelu.utils.helauth.typing import (
     BirthdayInfo,
     LoginMethod,
     PermanentAddress,
@@ -26,7 +26,7 @@ from users.helauth.typing import (
 )
 
 if TYPE_CHECKING:
-    from users.models import User
+    from tilavarauspalvelu.models import User
 
 __all__ = [
     "ProfileDataParser",

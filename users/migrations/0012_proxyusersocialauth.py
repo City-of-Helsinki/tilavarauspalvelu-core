@@ -5,19 +5,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("social_django", "0015_rename_extra_data_new_usersocialauth_extra_data"),
         ("users", "0011_change_database_table_names"),
     ]
 
-    operations = [
-        migrations.CreateModel(
-            name="ProxyUserSocialAuth",
-            fields=[],
-            options={
-                "proxy": True,
-                "indexes": [],
-                "constraints": [],
-            },
-            bases=("social_django.usersocialauth",),
-        ),
-    ]
+    operations = []

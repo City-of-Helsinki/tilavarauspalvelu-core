@@ -11,7 +11,7 @@ from jose import jwk, jwt
 from jose.constants import ALGORITHMS
 
 from tests.helpers import ResponseMock
-from users.models import User
+from tilavarauspalvelu.models import User
 
 
 @contextmanager

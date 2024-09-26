@@ -10,7 +10,7 @@ from email_notification.helpers.email_sender import EmailNotificationSender
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from email_notification.models import EmailTemplate, EmailType
 from tests.factories import EmailTemplateFactory, ReservationFactory, UserFactory
-from users.models import ReservationNotification
+from tilavarauspalvelu.enums import ReservationNotification
 
 if TYPE_CHECKING:
     from reservations.models import Reservation

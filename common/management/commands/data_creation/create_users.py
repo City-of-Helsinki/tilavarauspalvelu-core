@@ -3,7 +3,8 @@
 from django.contrib.auth.hashers import make_password
 
 from permissions.enums import UserRoleChoice
-from users.models import ReservationNotification, User
+from tilavarauspalvelu.enums import ReservationNotification
+from tilavarauspalvelu.models import User
 
 from .utils import with_logs
 

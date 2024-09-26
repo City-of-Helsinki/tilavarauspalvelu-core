@@ -1,7 +1,7 @@
 import pytest
 
 from tests.factories import ApplicationFactory
-from users.models import PersonalInfoViewLog
+from tilavarauspalvelu.models import PersonalInfoViewLog
 
 from .helpers import applications_query
 

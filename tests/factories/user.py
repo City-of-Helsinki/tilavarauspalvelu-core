@@ -13,8 +13,8 @@ from social_django.models import UserSocialAuth
 
 from permissions.enums import UserRoleChoice
 from spaces.models import Unit, UnitGroup
-from users.helauth.typing import IDToken
-from users.models import User
+from tilavarauspalvelu.models import User
+from tilavarauspalvelu.utils.helauth.typing import IDToken
 
 from ._base import GenericDjangoModelFactory
 from .permissions import GeneralRoleFactory, UnitRoleFactory

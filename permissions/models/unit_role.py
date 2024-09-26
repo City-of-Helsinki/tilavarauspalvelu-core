@@ -13,8 +13,7 @@ from permissions.models import GeneralRole
 if TYPE_CHECKING:
     import datetime
 
-    from users.models import User
-
+    from tilavarauspalvelu.models import User
 
 __all__ = [
     "UnitRole",
@@ -22,13 +21,15 @@ __all__ = [
 
 
 class UnitRole(models.Model):
-    user: User = models.ForeignKey("users.User", related_name="unit_roles", on_delete=models.CASCADE)
+    user: User = models.ForeignKey("tilavarauspalvelu.User", related_name="unit_roles", on_delete=models.CASCADE)
     role: str = StrChoiceField(enum=UserRoleChoice)
 
     units = models.ManyToManyField("spaces.Unit", related_name="unit_roles", blank=True)
     unit_groups = models.ManyToManyField("spaces.UnitGroup", related_name="unit_roles", blank=True)
 
-    assigner: User | None = models.ForeignKey("users.User", on_delete=models.SET_NULL, null=True, blank=True)
+    assigner: User | None = models.ForeignKey(
+        "tilavarauspalvelu.User", on_delete=models.SET_NULL, null=True, blank=True
+    )
     created: datetime.datetime = models.DateTimeField(auto_now_add=True)
     modified: datetime.datetime = models.DateTimeField(auto_now=True)
 

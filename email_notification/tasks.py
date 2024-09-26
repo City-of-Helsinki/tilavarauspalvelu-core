@@ -10,7 +10,8 @@ from email_notification.helpers.email_sender import EmailNotificationSender
 from email_notification.models import EmailType
 from reservations.models import Reservation
 from spaces.models import Unit
-from users.models import ReservationNotification, User
+from tilavarauspalvelu.enums import ReservationNotification
+from tilavarauspalvelu.models import User
 from utils.sentry import SentryLogger
 
 ###############

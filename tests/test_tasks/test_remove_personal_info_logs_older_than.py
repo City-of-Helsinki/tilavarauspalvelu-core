@@ -2,8 +2,8 @@ import pytest
 from freezegun import freeze_time
 
 from tests.factories import UserFactory
-from users.models import PersonalInfoViewLog
-from users.tasks import remove_old_personal_info_view_logs, remove_personal_info_view_logs_older_than
+from tilavarauspalvelu.models import PersonalInfoViewLog
+from tilavarauspalvelu.tasks import remove_old_personal_info_view_logs, remove_personal_info_view_logs_older_than
 
 pytestmark = [
     pytest.mark.django_db,

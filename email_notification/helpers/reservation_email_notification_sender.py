@@ -3,7 +3,7 @@ from email_notification.models import EmailType
 from email_notification.tasks import send_reservation_email_task, send_staff_reservation_email_task
 from reservations.enums import ReservationStateChoice, ReservationTypeChoice
 from reservations.models import Reservation
-from users.models import ReservationNotification
+from tilavarauspalvelu.enums import ReservationNotification
 
 
 class ReservationEmailNotificationSender:

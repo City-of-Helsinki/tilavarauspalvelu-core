@@ -1,6 +1,6 @@
 from graphene_django_extensions import NestingModelSerializer
 
-from users.models import User
+from tilavarauspalvelu.models import User
 
 __all__ = [
     "UserUpdateSerializer",

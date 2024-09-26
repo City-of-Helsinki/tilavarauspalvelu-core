@@ -19,7 +19,7 @@ from reservations.models import (
     ReservationMetadataSet,
     ReservationPurpose,
 )
-from users.models import User
+from tilavarauspalvelu.models import User
 
 from .utils import FieldCombination, SetName, faker_fi, weighted_choice, with_logs
 

@@ -12,7 +12,6 @@ class Migration(migrations.Migration):
         ("services", "0001_initial"),
         ("resources", "0001_initial"),
         ("spaces", "0001_initial"),
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [

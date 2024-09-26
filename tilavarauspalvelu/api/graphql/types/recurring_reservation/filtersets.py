@@ -5,7 +5,7 @@ from graphene_django_extensions import ModelFilterSet
 from reservation_units.models import ReservationUnit, ReservationUnitType
 from reservations.models import RecurringReservation
 from spaces.models import Unit
-from users.models import User
+from tilavarauspalvelu.models import User
 
 __all__ = [
     "RecurringReservationFilterSet",

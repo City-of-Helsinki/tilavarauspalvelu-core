@@ -71,7 +71,7 @@ class Application(SerializableMixin, models.Model):
         related_name="applications",
     )
     user = models.ForeignKey(
-        "users.User",
+        "tilavarauspalvelu.User",
         null=True,
         blank=True,
         on_delete=models.PROTECT,

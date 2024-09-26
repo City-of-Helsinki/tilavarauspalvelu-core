@@ -17,7 +17,7 @@ from modeltranslation.manager import get_translatable_fields_for_model
 
 from common.date_utils import local_datetime
 from common.typing import Lang
-from users.models import User
+from tilavarauspalvelu.models import User
 
 __all__ = [
     "comma_sep_str",

@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from applications.models import AllocatedTimeSlot
     from reservation_units.models import ReservationUnit
     from reservations.models import AbilityGroup, AgeGroup, Reservation
-    from users.models import User
+    from tilavarauspalvelu.models import User
 
 __all__ = [
     "RecurringReservation",
@@ -53,7 +53,7 @@ class RecurringReservation(models.Model):
         related_name="recurring_reservations",
     )
     user: User | None = models.ForeignKey(
-        "users.User",
+        "tilavarauspalvelu.User",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
