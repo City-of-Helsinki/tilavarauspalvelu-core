@@ -15,6 +15,7 @@ class ReservationPurposeNode(DjangoNode):
         model = ReservationPurpose
         fields = [
             "pk",
+            "rank",
             "name",
         ]
         filterset_class = ReservationPurposeFilterSet
