@@ -6,7 +6,7 @@ from django.contrib.auth.models import Group, Permission
 from permissions.enums import UserRoleChoice
 from permissions.models import GeneralRole, UnitRole
 from spaces.models import Unit, UnitGroup
-from users.models import User
+from tilavarauspalvelu.models import User
 
 from .utils import with_logs
 

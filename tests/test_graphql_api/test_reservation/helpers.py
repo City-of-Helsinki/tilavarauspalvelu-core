@@ -12,7 +12,7 @@ from reservations.models import Reservation
 from tests.factories import ReservationCancelReasonFactory, ReservationDenyReasonFactory
 from tests.factories.helsinki_profile import MyProfileDataFactory
 from tests.helpers import ResponseMock, patch_method
-from users.helauth.clients import HelsinkiProfileClient
+from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
 
 reservation_query = partial(build_query, "reservation")
 reservations_query = partial(build_query, "reservations", connection=True, order_by="pkAsc")

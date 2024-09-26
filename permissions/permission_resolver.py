@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from reservation_units.models import ReservationUnit
     from reservations.models import RecurringReservation, Reservation
     from spaces.models import Space
-    from users.models import User
+    from tilavarauspalvelu.models import User
 
 
 class PermissionResolver:

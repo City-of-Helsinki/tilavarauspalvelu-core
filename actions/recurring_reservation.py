@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     from applications.models import City
     from opening_hours.models import ReservableTimeSpan
     from reservations.enums import CustomerTypeChoice, ReservationStateChoice
-    from users.models import User
+    from tilavarauspalvelu.models import User
 
 
 class ReservationPeriod(TypedDict):

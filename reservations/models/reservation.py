@@ -33,8 +33,7 @@ if TYPE_CHECKING:
         ReservationPurpose,
     )
     from spaces.models import Unit
-    from users.models import User
-
+    from tilavarauspalvelu.models import User
 
 __all__ = [
     "Reservation",
@@ -125,7 +124,7 @@ class Reservation(SerializableMixin, models.Model):
     reservation_unit = models.ManyToManyField("reservation_units.ReservationUnit")
 
     user: User | None = models.ForeignKey(
-        "users.User",
+        "tilavarauspalvelu.User",
         related_name="reservations",
         on_delete=models.SET_NULL,
         null=True,

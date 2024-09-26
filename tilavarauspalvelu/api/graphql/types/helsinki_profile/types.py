@@ -9,14 +9,15 @@ from applications.models import Application
 from common.typing import AnyUser, GQLInfo
 from reservations.models import Reservation
 from tilavarauspalvelu.api.graphql.extensions import error_codes
-from users.helauth.clients import HelsinkiProfileClient
-from users.helauth.typing import LoginMethod, UserProfileInfo
-from users.models import User
-from users.tasks import save_personal_info_view_log
+from tilavarauspalvelu.models import User
+from tilavarauspalvelu.tasks import save_personal_info_view_log
 
 __all__ = [
     "HelsinkiProfileDataNode",
 ]
+
+from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
+from tilavarauspalvelu.utils.helauth.typing import LoginMethod, UserProfileInfo
 
 
 class HelsinkiProfileDataNode(graphene.ObjectType):

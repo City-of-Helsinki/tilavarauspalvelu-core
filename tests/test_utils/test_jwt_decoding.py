@@ -1,4 +1,4 @@
-from users.helauth.utils import get_jwt_payload
+from tilavarauspalvelu.utils.helauth.utils import get_jwt_payload
 
 
 def test_get_jwt_payload():

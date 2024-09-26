@@ -37,7 +37,7 @@ class Common(Environment):
 
     WSGI_APPLICATION = "config.wsgi.application"
     ROOT_URLCONF = "config.urls"
-    AUTH_USER_MODEL = "users.User"
+    AUTH_USER_MODEL = "tilavarauspalvelu.User"
     DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
     SECRET_KEY = values.StringValue()
     ALLOWED_HOSTS = values.ListValue()
@@ -329,8 +329,8 @@ class Common(Environment):
     SOCIAL_AUTH_TUNNISTAMO_LOGIN_ERROR_URL = "/admin/"
     SOCIAL_AUTH_TUNNISTAMO_PIPELINE = (
         *SOCIAL_AUTH_PIPELINE,
-        "users.helauth.pipeline.fetch_additional_info_for_user_from_helsinki_profile",
-        "users.helauth.pipeline.migrate_user_from_tunnistamo_to_keycloak",
+        "tilavarauspalvelu.utils.helauth.pipeline.fetch_additional_info_for_user_from_helsinki_profile",
+        "tilavarauspalvelu.utils.helauth.pipeline.migrate_user_from_tunnistamo_to_keycloak",
     )
 
     @classmethod
@@ -353,7 +353,7 @@ class Common(Environment):
 
     # --- GDPR settings ----------------------------------------------------------------------------------------------
 
-    GDPR_API_MODEL = "users.ProfileUser"
+    GDPR_API_MODEL = "tilavarauspalvelu.ProfileUser"
     GDPR_API_QUERY_SCOPE = values.StringValue(default="gdprquery")
     GDPR_API_DELETE_SCOPE = values.StringValue(default="gdprdelete")
 

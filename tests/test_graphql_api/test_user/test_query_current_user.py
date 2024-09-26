@@ -2,7 +2,7 @@ import pytest
 
 from tests.factories import UnitFactory, UserFactory, UserSocialAuthFactory
 from tests.helpers import patch_method
-from users.helauth.clients import HelsinkiProfileClient
+from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
 
 from .helpers import current_user_query
 

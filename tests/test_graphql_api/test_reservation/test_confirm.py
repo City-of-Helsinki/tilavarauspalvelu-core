@@ -19,7 +19,7 @@ from tests.factories import (
     UserFactory,
 )
 from tests.helpers import patch_method
-from users.models import ReservationNotification
+from tilavarauspalvelu.enums import ReservationNotification
 from utils.sentry import SentryLogger
 
 from .helpers import CONFIRM_MUTATION, get_confirm_data

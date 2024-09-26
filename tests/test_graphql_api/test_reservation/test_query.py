@@ -14,7 +14,7 @@ from tests.factories import (
     UnitGroupFactory,
     UserFactory,
 )
-from users.models import PersonalInfoViewLog
+from tilavarauspalvelu.models import PersonalInfoViewLog
 
 from .helpers import reservation_query, reservations_query
 

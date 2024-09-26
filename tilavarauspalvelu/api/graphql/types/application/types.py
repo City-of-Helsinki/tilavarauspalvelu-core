@@ -13,7 +13,7 @@ from common.typing import GQLInfo
 from permissions.enums import UserRoleChoice
 from tilavarauspalvelu.api.graphql.types.application_section.types import ApplicationSectionNode
 from tilavarauspalvelu.api.graphql.types.user.types import ApplicantNode
-from users.models import User
+from tilavarauspalvelu.models import User
 
 from .filtersets import ApplicationFilterSet
 from .permissions import ApplicationPermission

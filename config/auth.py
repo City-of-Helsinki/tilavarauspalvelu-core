@@ -8,11 +8,11 @@ from django.contrib.auth.backends import ModelBackend
 from helusers.tunnistamo_oidc import TunnistamoOIDCAuth
 
 from common.utils import update_query_params
-from users.models import User, get_user
+from tilavarauspalvelu.models import User
 
 if TYPE_CHECKING:
     from common.typing import WSGIRequest
-    from users.helauth.typing import TokenResponse
+    from tilavarauspalvelu.utils.helauth.typing import TokenResponse
 
 
 __all__ = [
@@ -89,3 +89,14 @@ class ProxyModelBackend(ModelBackend):
 
     def get_user(self, user_id: Any = None) -> User | None:
         return get_user(user_id) if user_id is not None else None
+
+
+def get_user(pk: int) -> User | None:
+    """
+    This method is called by the authentication backends to fetch the request user object.
+    Any optimization for fetching the user should be done here.
+    """
+    try:
+        return User.objects.get(pk=pk)
+    except User.DoesNotExist:
+        return None

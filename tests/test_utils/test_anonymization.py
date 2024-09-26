@@ -12,7 +12,8 @@ from tests.factories import (
     UserFactory,
     UserSocialAuthFactory,
 )
-from users.anonymisation import (
+from tilavarauspalvelu.enums import ReservationNotification
+from tilavarauspalvelu.utils.anonymisation import (
     ANONYMIZED,
     SENSITIVE_APPLICATION,
     SENSITIVE_RESERVATION,
@@ -20,7 +21,6 @@ from users.anonymisation import (
     anonymize_user_applications,
     anonymize_user_reservations,
 )
-from users.models import ReservationNotification
 
 # Applied to all tests
 pytestmark = [

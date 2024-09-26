@@ -22,7 +22,7 @@ from applications.typing import TimeSlotDB
 from reservation_units.models import ReservationUnit
 from reservations.models import AgeGroup, ReservationPurpose
 from spaces.models import ServiceSector, Unit
-from users.models import User
+from tilavarauspalvelu.models import User
 
 from .utils import batched, faker_en, faker_fi, faker_sv, get_paragraphs, random_subset, weighted_choice, with_logs
 

@@ -8,8 +8,4 @@ class Migration(migrations.Migration):
         ("users", "0013_alter_personalinfoviewlog_options_alter_user_options"),
     ]
 
-    operations = [
-        migrations.DeleteModel(
-            name="ProxyUserSocialAuth",
-        ),
-    ]
+    operations = []

@@ -24,7 +24,7 @@ from tilavarauspalvelu.api.graphql.types.reservation.serializers.mixins import (
     ReservationPriceMixin,
     ReservationSchedulingMixin,
 )
-from users.helauth.clients import HelsinkiProfileClient
+from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
 from utils.external_service.errors import ExternalServiceError
 from utils.sentry import SentryLogger
 

@@ -14,7 +14,7 @@ from tests.factories.helsinki_profile import (
     ProfilePhoneFactory,
 )
 from tests.helpers import ResponseMock, patch_method
-from users.helauth.clients import HelsinkiProfileClient
+from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
 from utils.external_service.errors import (
     ExternalServiceError,
     ExternalServiceParseJSONError,

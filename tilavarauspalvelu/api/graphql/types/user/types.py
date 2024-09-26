@@ -7,8 +7,8 @@ from graphene_django_extensions import DjangoNode
 from query_optimizer import AnnotatedField
 
 from common.typing import GQLInfo
-from users.models import User
-from users.tasks import save_personal_info_view_log
+from tilavarauspalvelu.models import User
+from tilavarauspalvelu.tasks import save_personal_info_view_log
 
 from .permissions import UserPermission
 

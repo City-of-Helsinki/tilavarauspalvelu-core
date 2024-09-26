@@ -8,7 +8,7 @@ __all__ = [
 
 class Introduction(models.Model):
     user = models.ForeignKey(
-        "users.User",
+        "tilavarauspalvelu.User",
         verbose_name=_("User"),
         on_delete=models.SET_NULL,
         null=True,

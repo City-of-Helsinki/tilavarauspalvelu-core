@@ -2,7 +2,7 @@ import pytest
 from graphene_django_extensions.testing import build_mutation
 
 from tests.factories import UserFactory
-from users.models import ReservationNotification
+from tilavarauspalvelu.enums import ReservationNotification
 
 # Applied to all tests
 pytestmark = [

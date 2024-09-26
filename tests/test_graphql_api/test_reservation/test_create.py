@@ -26,8 +26,8 @@ from tests.factories import (
     UserFactory,
 )
 from tests.helpers import ResponseMock, patch_method
-from users.helauth.clients import HelsinkiProfileClient
-from users.helauth.typing import ADLoginAMR
+from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
+from tilavarauspalvelu.utils.helauth.typing import ADLoginAMR
 from utils.decimal_utils import round_decimal
 from utils.sentry import SentryLogger
 

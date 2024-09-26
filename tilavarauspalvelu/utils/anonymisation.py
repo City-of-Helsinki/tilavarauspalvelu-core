@@ -12,7 +12,8 @@ from merchants.enums import OrderStatus
 from permissions.models import GeneralRole, UnitRole
 from reservations.enums import ReservationStateChoice, ReservationTypeChoice
 from reservations.models import Reservation
-from users.models import ReservationNotification, User
+from tilavarauspalvelu.enums import ReservationNotification
+from tilavarauspalvelu.models import User
 
 ANONYMIZED = "Anonymized"
 SENSITIVE_RESERVATION = "Sensitive data of this reservation has been anonymized by a script"

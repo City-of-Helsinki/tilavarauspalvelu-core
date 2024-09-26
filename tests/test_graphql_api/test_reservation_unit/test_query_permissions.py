@@ -12,7 +12,7 @@ from tests.factories import (
     UserFactory,
 )
 from tests.factories.application_round_time_slot import ApplicationRoundTimeSlotFactory
-from users.models import PersonalInfoViewLog
+from tilavarauspalvelu.models import PersonalInfoViewLog
 
 from .helpers import reservation_units_query
 

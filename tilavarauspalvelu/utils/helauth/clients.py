@@ -14,14 +14,14 @@ from social_django.strategy import DjangoStrategy
 
 from common.date_utils import DEFAULT_TIMEZONE, local_datetime
 from config.auth import ProxyTunnistamoOIDCAuthBackend
-from users.helauth.parsers import ProfileDataParser
+from tilavarauspalvelu.utils.helauth.parsers import ProfileDataParser
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 from utils.external_service.errors import ExternalServiceError, ExternalServiceRequestError
 from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
     from common.typing import AnyUser, SessionMapping
-    from users.helauth.typing import (
+    from tilavarauspalvelu.utils.helauth.typing import (
         BirthdayInfo,
         ExtraData,
         ProfileData,

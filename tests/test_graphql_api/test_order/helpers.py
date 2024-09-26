@@ -5,7 +5,7 @@ from graphene_django_extensions.testing import build_mutation, build_query
 
 from merchants.models import PaymentOrder
 from tests.factories import PaymentOrderFactory, ReservationFactory, ReservationUnitFactory
-from users.models import User
+from tilavarauspalvelu.models import User
 
 order_query = partial(
     build_query,

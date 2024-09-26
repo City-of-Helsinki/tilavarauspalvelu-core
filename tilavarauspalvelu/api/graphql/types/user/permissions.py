@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from query_optimizer.typing import GraphQLFilterInfo
 
     from common.typing import AnyUser
-    from users.models import User
+    from tilavarauspalvelu.models import User
 
 __all__ = [
     "UserPermission",

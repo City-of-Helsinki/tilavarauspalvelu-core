@@ -20,8 +20,7 @@ from .helpers import get_gdpr_auth_header, patch_oidc_config
 if TYPE_CHECKING:
     from applications.models import Application, ApplicationSection
     from reservations.models import Reservation
-    from users.models import User
-
+    from tilavarauspalvelu.models import User
 
 # Applied to all tests
 pytestmark = [

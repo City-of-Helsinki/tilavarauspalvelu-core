@@ -9,7 +9,7 @@ from graphql import GraphQLResolveInfo
 if TYPE_CHECKING:
     from django.contrib.sessions.backends.cache import SessionStore
 
-    from users.models import User
+    from tilavarauspalvelu.models import User
 
 __all__ = [
     "AnyUser",

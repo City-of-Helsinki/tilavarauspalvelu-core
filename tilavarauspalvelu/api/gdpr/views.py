@@ -13,8 +13,8 @@ from rest_framework.exceptions import NotAuthenticated, PermissionDenied
 from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
 
-from users.anonymisation import anonymize_user_data, can_user_be_anonymized
-from users.models import ProfileUser
+from tilavarauspalvelu.models import ProfileUser
+from tilavarauspalvelu.utils.anonymisation import anonymize_user_data, can_user_be_anonymized
 from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:

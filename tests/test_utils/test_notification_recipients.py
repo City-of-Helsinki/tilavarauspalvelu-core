@@ -2,7 +2,7 @@ import pytest
 
 from email_notification.tasks import _get_reservation_staff_notification_recipients
 from tests.factories import ReservationFactory, ReservationUnitFactory, UserFactory
-from users.models import ReservationNotification
+from tilavarauspalvelu.enums import ReservationNotification
 
 pytestmark = [
     pytest.mark.django_db,
