@@ -3,10 +3,10 @@ import datetime
 import freezegun
 import pytest
 
-from common.date_utils import DEFAULT_TIMEZONE, local_datetime, next_hour
 from tests.factories import EmailTemplateFactory, ReservationFactory
 from tilavarauspalvelu.enums import EmailType, ReservationStartInterval, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.models import ReservationUnitHierarchy
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, next_hour
 
 from .helpers import ADJUST_STAFF_MUTATION, get_staff_adjust_data
 

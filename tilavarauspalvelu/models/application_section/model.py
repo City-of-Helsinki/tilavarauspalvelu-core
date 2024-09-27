@@ -12,9 +12,9 @@ from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L, lookup_property
 
-from common.date_utils import local_datetime
-from common.db import SubqueryCount
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, Weekday
+from utils.date_utils import local_datetime
+from utils.db import SubqueryCount
 
 from .queryset import ApplicationSectionQuerySet
 

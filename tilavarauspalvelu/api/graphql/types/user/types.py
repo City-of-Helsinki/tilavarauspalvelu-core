@@ -6,9 +6,9 @@ from django.db.models.functions import Concat, Trim
 from graphene_django_extensions import DjangoNode
 from query_optimizer import AnnotatedField
 
-from common.typing import GQLInfo
 from tilavarauspalvelu.models import User
 from tilavarauspalvelu.tasks import save_personal_info_view_log
+from tilavarauspalvelu.typing import GQLInfo
 
 from .permissions import UserPermission
 

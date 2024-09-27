@@ -2,8 +2,8 @@ from admin_extra_buttons.decorators import button
 from admin_extra_buttons.mixins import ExtraButtonsMixin
 from django.contrib import admin
 
-from common.typing import WSGIRequest
 from tilavarauspalvelu.models import ReservationUnitHierarchy
+from tilavarauspalvelu.typing import WSGIRequest
 
 
 @admin.register(ReservationUnitHierarchy)

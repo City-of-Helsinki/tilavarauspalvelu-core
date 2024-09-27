@@ -3,8 +3,8 @@ from django.db import models
 from graphene_django_extensions import DjangoNode
 from query_optimizer import AnnotatedField
 
-from common.typing import GQLInfo
 from tilavarauspalvelu.models import ReservationUnitImage
+from tilavarauspalvelu.typing import GQLInfo
 
 from .permissions import ReservationUnitImagePermission
 

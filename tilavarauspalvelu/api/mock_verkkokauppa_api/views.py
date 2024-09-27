@@ -7,10 +7,10 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
 
-from common.date_utils import local_datetime
-from common.typing import WSGIRequest
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
 from tilavarauspalvelu.models import PaymentOrder
+from tilavarauspalvelu.typing import WSGIRequest
+from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Reservation

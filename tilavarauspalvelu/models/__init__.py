@@ -7,6 +7,7 @@ from .application.model import Application
 from .application_round.model import ApplicationRound
 from .application_round_time_slot.model import ApplicationRoundTimeSlot
 from .application_section.model import ApplicationSection
+from .banner_notification.model import BannerNotification
 from .building.model import Building
 from .city.model import City
 from .email_template.model import EmailTemplate
@@ -31,6 +32,7 @@ from .qualifier.model import Qualifier
 from .real_estate.model import RealEstate
 from .recurring_reservation.model import RecurringReservation
 from .rejected_occurrence.model import RejectedOccurrence
+from .request_log.model import RequestLog
 from .reservable_time_span.model import ReservableTimeSpan
 from .reservation.model import Reservation
 from .reservation_cancel_reason.model import ReservationCancelReason
@@ -52,6 +54,7 @@ from .resource.model import Resource
 from .service.model import Service
 from .service_sector.model import ServiceSector
 from .space.model import Space
+from .sql_log.model import SQLLog
 from .suitable_time_range.model import SuitableTimeRange
 from .tax_percentage.model import TaxPercentage
 from .terms_of_use.model import TermsOfUse
@@ -70,6 +73,7 @@ __all__ = [
     "ApplicationRound",
     "ApplicationRoundTimeSlot",
     "ApplicationSection",
+    "BannerNotification",
     "Building",
     "City",
     "EmailTemplate",
@@ -95,6 +99,7 @@ __all__ = [
     "RealEstate",
     "RecurringReservation",
     "RejectedOccurrence",
+    "RequestLog",
     "ReservableTimeSpan",
     "Reservation",
     "ReservationCancelReason",
@@ -114,6 +119,7 @@ __all__ = [
     "ReservationUnitPricing",
     "ReservationUnitType",
     "Resource",
+    "SQLLog",
     "Service",
     "ServiceSector",
     "Space",

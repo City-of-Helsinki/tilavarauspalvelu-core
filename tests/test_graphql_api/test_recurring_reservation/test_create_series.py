@@ -2,7 +2,6 @@ import datetime
 
 import pytest
 
-from common.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_end_of_day, local_start_of_day
 from tests.factories import (
     AbilityGroupFactory,
     AgeGroupFactory,
@@ -21,6 +20,7 @@ from tilavarauspalvelu.enums import (
     ReservationTypeStaffChoice,
 )
 from tilavarauspalvelu.models import AffectingTimeSpan, RecurringReservation, Reservation, ReservationUnitHierarchy
+from utils.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_end_of_day, local_start_of_day
 
 from .helpers import CREATE_SERIES_MUTATION, get_minimal_series_data
 

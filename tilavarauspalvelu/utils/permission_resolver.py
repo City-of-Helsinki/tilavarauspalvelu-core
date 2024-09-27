@@ -4,13 +4,12 @@ from typing import TYPE_CHECKING, Self
 
 from django.db.models import Q
 
-from common.date_utils import local_datetime
 from tilavarauspalvelu.enums import UserPermissionChoice, UserRoleChoice
+from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
     from collections.abc import Container, Iterable
 
-    from common.typing import AnyUser
     from tilavarauspalvelu.models import (
         Application,
         ApplicationRound,
@@ -21,6 +20,7 @@ if TYPE_CHECKING:
         Unit,
         User,
     )
+    from tilavarauspalvelu.typing import AnyUser
 
 
 class PermissionResolver:

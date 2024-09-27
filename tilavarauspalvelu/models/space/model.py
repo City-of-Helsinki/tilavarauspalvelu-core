@@ -8,7 +8,7 @@ from lookup_property import lookup_property
 from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
 
-from common.db import SubqueryArray
+from utils.db import SubqueryArray
 
 from .queryset import SpaceManager
 

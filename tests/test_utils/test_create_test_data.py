@@ -2,8 +2,7 @@ import django.apps
 import pytest
 from django.db import models
 
-from common.management.commands.create_test_data import create_test_data
-from common.models import RequestLog, SQLLog
+from tilavarauspalvelu.management.commands.create_test_data import create_test_data
 from tilavarauspalvelu.models import (
     AbilityGroup,
     AffectingTimeSpan,
@@ -26,6 +25,8 @@ from tilavarauspalvelu.models import (
     ReservationUnitPaymentType,
     TaxPercentage,
 )
+from tilavarauspalvelu.models.request_log.model import RequestLog
+from tilavarauspalvelu.models.sql_log.model import SQLLog
 
 apps_to_check: list[str] = [
     "common",

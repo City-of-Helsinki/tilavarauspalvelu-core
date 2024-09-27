@@ -3,17 +3,16 @@
 import datetime
 
 import django.contrib.postgres.fields
-import django.contrib.postgres.fields.hstore
 import django.core.validators
 import django.db.models.constraints
 import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
 
-import common.fields.model
 import tilavarauspalvelu.enums
 import tilavarauspalvelu.models.organisation.model
 import tilavarauspalvelu.utils.validators
+import utils.fields.model
 
 
 class Migration(migrations.Migration):
@@ -71,7 +70,7 @@ class Migration(migrations.Migration):
                         ),
                         (
                             "day_of_the_week",
-                            common.fields.model.StrChoiceField(
+                            utils.fields.model.StrChoiceField(
                                 choices=[
                                     ("MONDAY", "Monday"),
                                     ("TUESDAY", "Tuesday"),
@@ -214,7 +213,7 @@ class Migration(migrations.Migration):
                         ),
                         (
                             "applicant_type",
-                            common.fields.model.StrChoiceField(
+                            utils.fields.model.StrChoiceField(
                                 choices=[
                                     ("INDIVIDUAL", "Individual"),
                                     ("ASSOCIATION", "Association"),
@@ -386,7 +385,7 @@ class Migration(migrations.Migration):
                         ("core_business_sv", models.TextField(blank=True, null=True)),
                         (
                             "organisation_type",
-                            common.fields.model.StrChoiceField(
+                            utils.fields.model.StrChoiceField(
                                 choices=[
                                     ("COMPANY", "Company"),
                                     ("REGISTERED_ASSOCIATION", "Registered association"),
@@ -493,7 +492,7 @@ class Migration(migrations.Migration):
                         ),
                         (
                             "priority",
-                            common.fields.model.StrChoiceField(
+                            utils.fields.model.StrChoiceField(
                                 choices=[("PRIMARY", "Primary"), ("SECONDARY", "Secondary")],
                                 enum=tilavarauspalvelu.enums.Priority,
                                 max_length=9,
@@ -501,7 +500,7 @@ class Migration(migrations.Migration):
                         ),
                         (
                             "day_of_the_week",
-                            common.fields.model.StrChoiceField(
+                            utils.fields.model.StrChoiceField(
                                 choices=[
                                     ("MONDAY", "Monday"),
                                     ("TUESDAY", "Tuesday"),
@@ -543,7 +542,7 @@ class Migration(migrations.Migration):
                         ),
                         (
                             "weekday",
-                            common.fields.model.IntChoiceField(
+                            utils.fields.model.IntChoiceField(
                                 enum=tilavarauspalvelu.enums.WeekdayChoice,
                                 validators=[
                                     django.core.validators.MinValueValidator(

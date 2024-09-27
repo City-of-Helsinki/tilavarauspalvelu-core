@@ -7,7 +7,6 @@ import pytest
 from django.utils.timezone import get_default_timezone
 from graphene_django_extensions.testing import parametrize_helper
 
-from common.date_utils import local_datetime, local_end_of_day, local_start_of_day, next_hour
 from tests.factories import (
     AgeGroupFactory,
     ApplicationRoundFactory,
@@ -33,6 +32,7 @@ from tilavarauspalvelu.enums import (
 from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
 from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
 from tilavarauspalvelu.utils.helauth.typing import ADLoginAMR
+from utils.date_utils import local_datetime, local_end_of_day, local_start_of_day, next_hour
 from utils.decimal_utils import round_decimal
 from utils.sentry import SentryLogger
 

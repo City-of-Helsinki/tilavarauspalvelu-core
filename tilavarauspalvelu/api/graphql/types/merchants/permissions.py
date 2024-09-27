@@ -4,9 +4,9 @@ from graphene_django_extensions.errors import GQLCodeError
 from graphene_django_extensions.permissions import BasePermission
 from query_optimizer.typing import GraphQLFilterInfo
 
-from common.typing import AnyUser
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.models import PaymentOrder
+from tilavarauspalvelu.typing import AnyUser
 
 if TYPE_CHECKING:
     import uuid

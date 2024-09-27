@@ -4,7 +4,6 @@ from unittest import mock
 
 import pytest
 
-from common.date_utils import local_date_string, local_timedelta_string
 from tests.factories import (
     AllocatedTimeSlotFactory,
     ApplicationFactory,
@@ -17,6 +16,7 @@ from tilavarauspalvelu.utils.exporter.application_round_result_exporter import (
     ApplicationRoundResultCSVExporter,
     ApplicationSectionExportRow,
 )
+from utils.date_utils import local_date_string, local_timedelta_string
 
 from .helpers import get_writes
 

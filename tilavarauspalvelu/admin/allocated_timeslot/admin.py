@@ -3,7 +3,6 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
 
-from common.typing import WSGIRequest
 from tilavarauspalvelu.admin.allocated_timeslot.filters import (
     ApplicationRoundFilter,
     ApplicationRoundStatusFilter,
@@ -13,6 +12,7 @@ from tilavarauspalvelu.admin.allocated_timeslot.filters import (
 )
 from tilavarauspalvelu.admin.allocated_timeslot.form import AllocatedTimeSlotAdminForm
 from tilavarauspalvelu.models import AllocatedTimeSlot
+from tilavarauspalvelu.typing import WSGIRequest
 
 
 @admin.register(AllocatedTimeSlot)

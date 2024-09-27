@@ -7,8 +7,8 @@ from django.db import models
 from django.db.models import F, Q
 from django.utils.translation import gettext_lazy as _
 
-from common.date_utils import DEFAULT_TIMEZONE
 from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
+from utils.date_utils import DEFAULT_TIMEZONE
 
 from .queryset import ReservableTimeSpanManager
 

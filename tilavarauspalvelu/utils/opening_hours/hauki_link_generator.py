@@ -6,7 +6,7 @@ from urllib.parse import quote_plus, urlencode
 
 from django.conf import settings
 
-from common.date_utils import local_datetime
+from utils.date_utils import local_datetime
 
 
 def generate_hauki_link(reservation_unit_uuid: uuid.UUID | str, username: str, organization_id: str) -> None | str:

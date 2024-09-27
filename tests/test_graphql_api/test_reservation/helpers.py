@@ -5,13 +5,13 @@ from typing import Any
 
 from graphene_django_extensions.testing import build_mutation, build_query
 
-from common.date_utils import next_hour
 from tests.factories import ReservationCancelReasonFactory, ReservationDenyReasonFactory
 from tests.factories.helsinki_profile import MyProfileDataFactory
 from tests.helpers import ResponseMock, patch_method
 from tilavarauspalvelu.enums import ReservationTypeChoice
 from tilavarauspalvelu.models import Reservation, ReservationUnit
 from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
+from utils.date_utils import next_hour
 
 reservation_query = partial(build_query, "reservation")
 reservations_query = partial(build_query, "reservations", connection=True, order_by="pkAsc")

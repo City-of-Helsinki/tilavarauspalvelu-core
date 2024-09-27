@@ -4,11 +4,11 @@ from datetime import timedelta
 import pytest
 from freezegun import freeze_time
 
-from common.date_utils import local_datetime
 from tests.factories import PaymentOrderFactory, ReservationFactory
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
 from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.utils.pruning import prune_reservation_with_inactive_payments
+from utils.date_utils import local_datetime
 
 # Applied to all tests
 pytestmark = [

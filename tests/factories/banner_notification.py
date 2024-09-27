@@ -5,8 +5,8 @@ import factory
 from django.utils import timezone
 from factory import fuzzy
 
-from common.enums import BannerNotificationLevel, BannerNotificationTarget
-from common.models import BannerNotification
+from tilavarauspalvelu.enums import BannerNotificationLevel, BannerNotificationTarget
+from tilavarauspalvelu.models.banner_notification.model import BannerNotification
 
 from ._base import GenericDjangoModelFactory
 

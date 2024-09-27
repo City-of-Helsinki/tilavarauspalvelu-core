@@ -9,9 +9,9 @@ from urllib.parse import urljoin
 from django.conf import settings
 from django.utils.timezone import get_default_timezone
 
-from common.utils import get_attr_by_language
 from tilavarauspalvelu.enums import CustomerTypeChoice, EmailType
 from tilavarauspalvelu.utils.email.email_builder_base import BaseEmailBuilder, BaseEmailContext
+from utils.utils import get_attr_by_language
 
 if TYPE_CHECKING:
     from config.utils.commons import LanguageType

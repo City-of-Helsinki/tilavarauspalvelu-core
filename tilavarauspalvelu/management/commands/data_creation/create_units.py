@@ -2,8 +2,8 @@
 
 from django.contrib.gis.geos import Point
 
-from common.management.commands.data_creation.utils import with_logs
 from tilavarauspalvelu.constants import COORDINATE_SYSTEM_ID
+from tilavarauspalvelu.management.commands.data_creation.utils import with_logs
 from tilavarauspalvelu.models import Location, Unit, UnitGroup
 
 

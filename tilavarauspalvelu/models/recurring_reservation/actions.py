@@ -5,7 +5,6 @@ import datetime
 from itertools import chain
 from typing import TYPE_CHECKING, Any, TypedDict
 
-from common.date_utils import DEFAULT_TIMEZONE, combine, get_periods_between
 from tilavarauspalvelu.enums import (
     CustomerTypeChoice,
     RejectionReadinessChoice,
@@ -22,6 +21,7 @@ from tilavarauspalvelu.models import (
     ReservationPurpose,
 )
 from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
+from utils.date_utils import DEFAULT_TIMEZONE, combine, get_periods_between
 
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable

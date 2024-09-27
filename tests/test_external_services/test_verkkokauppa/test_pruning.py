@@ -3,7 +3,6 @@ from datetime import timedelta
 import pytest
 from freezegun import freeze_time
 
-from common.date_utils import local_datetime
 from tests.factories import PaymentFactory, PaymentOrderFactory, ReservationFactory
 from tests.helpers import patch_method
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
@@ -13,6 +12,7 @@ from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CancelOrderErr
 from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import GetPaymentError
 from tilavarauspalvelu.utils.verkkokauppa.payment.types import PaymentStatus
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
+from utils.date_utils import local_datetime
 from utils.sentry import SentryLogger
 
 # Applied to all tests

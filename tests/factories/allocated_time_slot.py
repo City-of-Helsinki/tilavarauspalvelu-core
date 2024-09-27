@@ -3,9 +3,9 @@ import datetime
 import factory
 from factory import fuzzy
 
-from common.date_utils import DEFAULT_TIMEZONE, local_start_of_day
 from tilavarauspalvelu.enums import ApplicantTypeChoice, Weekday
 from tilavarauspalvelu.models import AllocatedTimeSlot
+from utils.date_utils import DEFAULT_TIMEZONE, local_start_of_day
 
 from ._base import GenericDjangoModelFactory
 

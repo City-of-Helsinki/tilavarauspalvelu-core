@@ -2,8 +2,8 @@ from django.contrib import admin
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from common.typing import WSGIRequest
 from tilavarauspalvelu.models import UnitRole
+from tilavarauspalvelu.typing import WSGIRequest
 
 __all__ = [
     "UnitRoleAdmin",

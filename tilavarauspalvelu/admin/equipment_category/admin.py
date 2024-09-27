@@ -2,8 +2,8 @@ from django.contrib import admin
 from django.db import models
 from modeltranslation.admin import TranslationAdmin
 
-from common.typing import WSGIRequest
 from tilavarauspalvelu.models import EquipmentCategory
+from tilavarauspalvelu.typing import WSGIRequest
 
 
 @admin.register(EquipmentCategory)

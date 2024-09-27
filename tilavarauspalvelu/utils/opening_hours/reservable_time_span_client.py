@@ -4,7 +4,6 @@ import zoneinfo
 
 from django.conf import settings
 
-from common.date_utils import local_date
 from tilavarauspalvelu.constants import NEVER_ANY_OPENING_HOURS_HASH
 from tilavarauspalvelu.exceptions import ReservableTimeSpanClientNothingToDoError, ReservableTimeSpanClientValueError
 from tilavarauspalvelu.models import OriginHaukiResource, ReservableTimeSpan
@@ -15,6 +14,7 @@ from tilavarauspalvelu.utils.opening_hours.time_span_element_utils import (
     merge_overlapping_time_span_elements,
     override_reservable_with_closed_time_spans,
 )
+from utils.date_utils import local_date
 
 
 class ReservableTimeSpanClient:

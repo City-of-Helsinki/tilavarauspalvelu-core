@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from common.date_utils import local_start_of_day
 from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice
 from tilavarauspalvelu.models import (
     AgeGroup,
@@ -20,6 +19,7 @@ from tilavarauspalvelu.models import (
     ReservationUnit,
     User,
 )
+from utils.date_utils import local_start_of_day
 
 from .utils import FieldCombination, SetName, faker_fi, weighted_choice, with_logs
 

@@ -10,13 +10,13 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from common.date_utils import local_datetime
 from tilavarauspalvelu.enums import Language, OrderStatus, PaymentType, ReservationStateChoice
 from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CancelOrderError
 from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import GetPaymentError
 from tilavarauspalvelu.utils.verkkokauppa.payment.types import Payment
 from tilavarauspalvelu.utils.verkkokauppa.payment.types import PaymentStatus as WebShopPaymentStatus
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
+from utils.date_utils import local_datetime
 from utils.sentry import SentryLogger
 
 from .queryset import PaymentOrderManager

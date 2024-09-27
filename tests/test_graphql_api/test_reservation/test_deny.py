@@ -2,9 +2,9 @@ import datetime
 
 import pytest
 
-from common.date_utils import local_datetime
 from tests.factories import EmailTemplateFactory, ReservationFactory
 from tilavarauspalvelu.enums import EmailType, ReservationStateChoice, ReservationTypeChoice
+from utils.date_utils import local_datetime
 
 from .helpers import DENY_MUTATION, get_deny_data
 

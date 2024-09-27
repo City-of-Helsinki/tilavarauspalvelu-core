@@ -498,7 +498,7 @@ class Common(Environment):
         "URLS": [
             {
                 "route": "text-searches/",
-                "view": "common.admin.text_search_view.text_search_list_view",
+                "view": "tilavarauspalvelu.admin.text_search_view.text_search_list_view",
                 "name": "text_searches",
             },
         ],

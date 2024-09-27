@@ -6,8 +6,8 @@ from io import StringIO
 
 from django.http import FileResponse
 
-from common.models import RequestLog
-from common.querysets.sql_log import RequestLogQuerySet
+from tilavarauspalvelu.models.request_log.model import RequestLog
+from tilavarauspalvelu.models.request_log.queryset import RequestLogQuerySet
 
 
 @dataclasses.dataclass

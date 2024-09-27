@@ -5,7 +5,6 @@ from django.utils.timezone import get_default_timezone
 from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPrimaryKeyField
 from rest_framework import serializers
 
-from common.date_utils import local_datetime
 from tilavarauspalvelu.api.graphql.extensions.fields import OldChoiceCharField
 from tilavarauspalvelu.api.graphql.extensions.serializers import OldPrimaryKeySerializer
 from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
@@ -24,9 +23,10 @@ from tilavarauspalvelu.models import (
     ReservationPurpose,
     ReservationUnit,
 )
+from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
-    from common.typing import AnyUser
+    from tilavarauspalvelu.typing import AnyUser
 
 DEFAULT_TIMEZONE = get_default_timezone()
 

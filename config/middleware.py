@@ -11,8 +11,8 @@ from django.conf import settings
 from django.db import connection
 from django.http import HttpResponse
 
-from common.date_utils import local_datetime
-from common.typing import QueryInfo, WSGIRequest
+from tilavarauspalvelu.typing import QueryInfo, WSGIRequest
+from utils.date_utils import local_datetime
 from utils.sentry import SentryLogger
 
 logger = logging.getLogger(__name__)
@@ -103,7 +103,7 @@ class QueryLoggingMiddleware:
                 yield
         finally:
             try:
-                from common.tasks import save_sql_queries_from_request
+                from tilavarauspalvelu.tasks import save_sql_queries_from_request
 
                 total_duration_ms = (time.perf_counter_ns() - start) // 1_000_000
 

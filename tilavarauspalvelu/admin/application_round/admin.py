@@ -9,10 +9,10 @@ from django.utils.translation import gettext_lazy as _
 from lookup_property import L
 from modeltranslation.admin import TranslationAdmin
 
-from common.typing import WSGIRequest
 from tilavarauspalvelu.admin.application_round.form import ApplicationRoundAdminForm
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
 from tilavarauspalvelu.models import ApplicationRound
+from tilavarauspalvelu.typing import WSGIRequest
 from tilavarauspalvelu.utils.exporter.application_round_applications_exporter import (
     ApplicationRoundApplicationsCSVExporter,
 )

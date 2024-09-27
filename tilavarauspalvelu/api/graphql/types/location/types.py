@@ -3,8 +3,8 @@ from django.db import models
 from graphene_django_extensions import DjangoNode
 from query_optimizer import AnnotatedField
 
-from common.typing import GQLInfo
 from tilavarauspalvelu.models import Location
+from tilavarauspalvelu.typing import GQLInfo
 
 __all__ = [
     "LocationNode",

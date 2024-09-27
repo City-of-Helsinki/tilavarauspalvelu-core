@@ -11,8 +11,6 @@ from lookup_property import L
 from query_optimizer import AnnotatedField, DjangoListField, ManuallyOptimizedField
 from query_optimizer.optimizer import QueryOptimizer
 
-from common.db import SubqueryCount
-from common.typing import GQLInfo
 from tilavarauspalvelu.api.graphql.types.location.types import LocationNode
 from tilavarauspalvelu.api.graphql.types.reservation.types import ReservationNode
 from tilavarauspalvelu.enums import (
@@ -29,7 +27,9 @@ from tilavarauspalvelu.models import (
     Space,
     Unit,
 )
+from tilavarauspalvelu.typing import GQLInfo
 from tilavarauspalvelu.utils.opening_hours.hauki_link_generator import generate_hauki_link
+from utils.db import SubqueryCount
 
 from .filtersets import ReservationUnitFilterSet
 from .permissions import ReservationUnitPermission

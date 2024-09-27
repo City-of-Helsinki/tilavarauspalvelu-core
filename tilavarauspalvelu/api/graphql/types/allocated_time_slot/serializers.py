@@ -5,10 +5,10 @@ from graphene_django_extensions import NestingModelSerializer
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from common.date_utils import time_difference, timedelta_to_json
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import Weekday
 from tilavarauspalvelu.models import AllocatedTimeSlot, ApplicationSection, ReservationUnitOption, SuitableTimeRange
+from utils.date_utils import time_difference, timedelta_to_json
 
 __all__ = [
     "AllocatedTimeSlotCreateSerializer",

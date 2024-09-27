@@ -7,8 +7,8 @@ from helusers.tunnistamo_oidc import TunnistamoOIDCAuth
 from social_django.models import DjangoStorage, UserSocialAuth
 from social_django.strategy import DjangoStrategy
 
-from common.typing import WSGIRequest
 from tilavarauspalvelu.models import User
+from tilavarauspalvelu.typing import WSGIRequest
 from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
 from tilavarauspalvelu.utils.helauth.typing import IDToken
 from utils.sentry import SentryLogger

@@ -4,8 +4,8 @@ from easy_thumbnails.files import get_thumbnailer
 from graphene_django_extensions import DjangoNode
 from query_optimizer import AnnotatedField
 
-from common.typing import GQLInfo
 from tilavarauspalvelu.models import Purpose
+from tilavarauspalvelu.typing import GQLInfo
 
 from .filtersets import PurposeFilterSet
 from .permissions import PurposePermission

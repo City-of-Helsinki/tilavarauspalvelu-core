@@ -1,6 +1,6 @@
 import datetime
 from collections.abc import Collection
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import graphene
 from django.conf import settings
@@ -11,10 +11,10 @@ from graphene_django_extensions.errors import GQLNotFoundError
 from query_optimizer import DjangoListField, optimize_single
 from query_optimizer.compiler import optimize
 
-from common.models import BannerNotification
-from common.typing import AnyUser, GQLInfo
 from tilavarauspalvelu.enums import UserPermissionChoice
 from tilavarauspalvelu.models import AllocatedTimeSlot, PaymentOrder, Reservation, User
+from tilavarauspalvelu.models.banner_notification.model import BannerNotification
+from tilavarauspalvelu.typing import GQLInfo
 from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
 from tilavarauspalvelu.utils.helauth.typing import UserProfileInfo
 
@@ -115,6 +115,9 @@ from .queries import (
     UserNode,
 )
 from .types.merchants.permissions import PaymentOrderPermission
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import AnyUser
 
 
 class Query(graphene.ObjectType):

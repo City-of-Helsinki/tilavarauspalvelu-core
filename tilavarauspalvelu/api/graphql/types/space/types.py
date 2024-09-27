@@ -3,8 +3,8 @@ from graphene_django_extensions import DjangoNode
 from graphene_django_extensions.fields import RelatedField
 from query_optimizer import DjangoListField
 
-from common.typing import GQLInfo
 from tilavarauspalvelu.models import Space
+from tilavarauspalvelu.typing import GQLInfo
 
 from .filtersets import SpaceFilterSet
 from .permissions import SpacePermission

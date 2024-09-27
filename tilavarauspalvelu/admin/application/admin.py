@@ -6,7 +6,6 @@ from django.utils.translation import gettext_lazy as _
 from lookup_property import L
 from rangefilter.filters import DateRangeFilterBuilder
 
-from common.typing import WSGIRequest
 from tilavarauspalvelu.admin.application.filters import (
     ApplicationRoundFilter,
     ApplicationRoundStatusFilter,
@@ -16,6 +15,7 @@ from tilavarauspalvelu.admin.application.form import ApplicationAdminForm
 from tilavarauspalvelu.admin.application_section.admin import ApplicationSectionInline
 from tilavarauspalvelu.models import Application
 from tilavarauspalvelu.models.application.queryset import ApplicationQuerySet
+from tilavarauspalvelu.typing import WSGIRequest
 
 
 @admin.register(Application)

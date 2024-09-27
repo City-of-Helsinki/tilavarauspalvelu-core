@@ -7,9 +7,9 @@ from django.contrib.postgres.fields import ArrayField, HStoreField
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from common.fields.model import IntChoiceField
 from tilavarauspalvelu.enums import WeekdayChoice
 from tilavarauspalvelu.utils.validators import validate_reservable_times
+from utils.fields.model import IntChoiceField
 
 from .queryset import ApplicationRoundTimeSlotQuerySet
 

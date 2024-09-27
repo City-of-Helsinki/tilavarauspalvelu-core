@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING
 import pytest
 from django.utils.timezone import get_default_timezone
 
-from common.utils import get_attr_by_language
 from tests.factories import (
     LocationFactory,
     ReservationCancelReasonFactory,
@@ -15,6 +14,7 @@ from tests.factories import (
 from tilavarauspalvelu.enums import CustomerTypeChoice
 from tilavarauspalvelu.models import Location, Reservation
 from tilavarauspalvelu.utils.email.email_builder_reservation import ReservationEmailContext
+from utils.utils import get_attr_by_language
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit

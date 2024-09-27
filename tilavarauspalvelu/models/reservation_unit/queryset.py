@@ -8,9 +8,9 @@ from django.db.models import Q, prefetch_related_objects
 from elasticsearch_django.models import SearchResultsQuerySet
 from lookup_property import L
 
-from common.date_utils import local_datetime
-from common.db import ArrayUnnest, SubqueryArray
 from tilavarauspalvelu.utils.first_reservable_time.first_reservable_time_helper import FirstReservableTimeHelper
+from utils.date_utils import local_datetime
+from utils.db import ArrayUnnest, SubqueryArray
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator

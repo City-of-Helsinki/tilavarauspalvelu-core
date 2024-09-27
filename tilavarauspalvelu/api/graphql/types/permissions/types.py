@@ -5,9 +5,9 @@ from graphene_django_extensions import DjangoNode
 from query_optimizer import ManuallyOptimizedField
 from query_optimizer.optimizer import QueryOptimizer
 
-from common.typing import AnyUser, GQLInfo
 from tilavarauspalvelu.enums import UserPermissionChoice
 from tilavarauspalvelu.models import GeneralRole, Unit, UnitGroup, UnitRole
+from tilavarauspalvelu.typing import AnyUser, GQLInfo
 
 __all__ = [
     "GeneralRoleNode",

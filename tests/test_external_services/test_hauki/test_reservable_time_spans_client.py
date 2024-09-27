@@ -5,7 +5,6 @@ import pytest
 from django.utils import timezone
 from freezegun import freeze_time
 
-from common.date_utils import DEFAULT_TIMEZONE
 from tests.helpers import patch_method
 from tests.mocks import MockResponse
 from tilavarauspalvelu.enums import HaukiResourceState
@@ -21,6 +20,7 @@ from tilavarauspalvelu.utils.opening_hours.hauki_api_types import (
 )
 from tilavarauspalvelu.utils.opening_hours.reservable_time_span_client import ReservableTimeSpanClient
 from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
+from utils.date_utils import DEFAULT_TIMEZONE
 
 # Applied to all tests
 pytestmark = [

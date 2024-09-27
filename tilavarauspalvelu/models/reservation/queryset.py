@@ -8,8 +8,8 @@ from django.contrib.postgres.aggregates import ArrayAgg
 from django.db import models
 from django.db.models.functions import Coalesce
 
-from common.date_utils import local_datetime
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
+from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ApplicationRound, Reservation

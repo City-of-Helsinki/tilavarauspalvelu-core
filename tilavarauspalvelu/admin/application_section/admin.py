@@ -3,8 +3,6 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
 
-from common.typing import WSGIRequest
-from common.utils import comma_sep_str
 from tilavarauspalvelu.admin.application.form import ApplicationSectionInlineAdminForm
 from tilavarauspalvelu.admin.application_section.filters import (
     AgeGroupFilter,
@@ -19,6 +17,8 @@ from tilavarauspalvelu.admin.application_section.form import (
 )
 from tilavarauspalvelu.admin.suitable_time_range.admin import SuitableTimeRangeInline
 from tilavarauspalvelu.models import ApplicationSection, ReservationUnitOption
+from tilavarauspalvelu.typing import WSGIRequest
+from utils.utils import comma_sep_str
 
 
 class ApplicationSectionInline(admin.TabularInline):

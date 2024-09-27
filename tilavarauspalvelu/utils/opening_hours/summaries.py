@@ -4,8 +4,8 @@ from datetime import date, timedelta
 from django.db.models import DurationField, F, OuterRef
 from django.db.models.functions import Coalesce
 
-from common.db import SubquerySum
 from tilavarauspalvelu.models import OriginHaukiResource, ReservableTimeSpan
+from utils.db import SubquerySum
 
 
 def get_resources_total_hours_per_resource(

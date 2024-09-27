@@ -1,16 +1,20 @@
 import datetime
+from typing import TYPE_CHECKING
 
 import graphene
 from graphene_django_extensions.errors import GQLNodePermissionDeniedError
 from graphql import GraphQLError
 from query_optimizer.selections import get_field_selections
 
-from common.typing import AnyUser, GQLInfo
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.models import Application, Reservation, User
 from tilavarauspalvelu.tasks import save_personal_info_view_log
+from tilavarauspalvelu.typing import GQLInfo
 from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
 from tilavarauspalvelu.utils.helauth.typing import LoginMethod, UserProfileInfo
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
     "HelsinkiProfileDataNode",

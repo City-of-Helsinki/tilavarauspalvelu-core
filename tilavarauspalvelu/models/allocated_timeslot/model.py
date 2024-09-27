@@ -9,8 +9,8 @@ from django.db.models.functions import Cast, Concat
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L, lookup_property
 
-from common.fields.model import StrChoiceField
 from tilavarauspalvelu.enums import Weekday
+from utils.fields.model import StrChoiceField
 
 from .queryset import AllocatedTimeSlotQuerySet
 

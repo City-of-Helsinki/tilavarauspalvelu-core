@@ -4,13 +4,13 @@ from rest_framework import viewsets
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from common.date_utils import local_datetime
 from tilavarauspalvelu.enums import OrderStatus
 from tilavarauspalvelu.models import PaymentOrder
 from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import GetOrderError
 from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import GetPaymentError, GetRefundStatusError
 from tilavarauspalvelu.utils.verkkokauppa.payment.types import PaymentStatus, RefundStatus
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
+from utils.date_utils import local_datetime
 from utils.sentry import SentryLogger
 
 from .permissions import WebhookPermission

@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING, Any
 from django.utils import timezone
 from django.utils.timezone import get_default_timezone
 
-from common.date_utils import local_datetime, local_start_of_day
 from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from tilavarauspalvelu.api.graphql.types.reservation.types import ReservationNode
 from tilavarauspalvelu.enums import (
@@ -19,6 +18,7 @@ from tilavarauspalvelu.enums import (
 )
 from tilavarauspalvelu.models import Reservation, ReservationUnit
 from tilavarauspalvelu.utils.reservation_units.reservation_unit_pricing_helper import ReservationUnitPricingHelper
+from utils.date_utils import local_datetime, local_start_of_day
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnitPricing

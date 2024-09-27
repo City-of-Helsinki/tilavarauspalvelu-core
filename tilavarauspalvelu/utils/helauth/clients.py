@@ -12,15 +12,15 @@ from requests import HTTPError, Response
 from social_django.models import DjangoStorage
 from social_django.strategy import DjangoStrategy
 
-from common.date_utils import DEFAULT_TIMEZONE, local_datetime
 from config.auth import ProxyTunnistamoOIDCAuthBackend
 from tilavarauspalvelu.utils.helauth.parsers import ProfileDataParser
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 from utils.external_service.errors import ExternalServiceError, ExternalServiceRequestError
 from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
-    from common.typing import AnyUser, SessionMapping
+    from tilavarauspalvelu.typing import AnyUser, SessionMapping
     from tilavarauspalvelu.utils.helauth.typing import (
         BirthdayInfo,
         ExtraData,
@@ -30,7 +30,6 @@ if TYPE_CHECKING:
         TokenResponse,
         UserProfileInfo,
     )
-
 
 __all__ = [
     "HelsinkiProfileClient",

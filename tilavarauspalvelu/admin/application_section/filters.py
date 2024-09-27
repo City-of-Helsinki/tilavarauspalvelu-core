@@ -18,8 +18,8 @@ from tilavarauspalvelu.models import AgeGroup, ReservationPurpose
 if TYPE_CHECKING:
     from django.db.models import QuerySet
 
-    from common.typing import WSGIRequest
     from tilavarauspalvelu.admin.application_section.admin import ApplicationSectionAdmin
+    from tilavarauspalvelu.typing import WSGIRequest
 
 
 class ApplicationRoundStatusFilter(admin.SimpleListFilter):

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import json
 import logging
 import uuid
 from contextlib import suppress
@@ -18,8 +19,6 @@ from django.utils.translation import gettext_lazy as _
 from easy_thumbnails.exceptions import InvalidImageFormatError
 from lookup_property import L
 
-from common.date_utils import local_datetime, local_end_of_day, local_start_of_day
-from common.utils import translate_for_user
 from config.celery import app
 from tilavarauspalvelu.enums import (
     ApplicantTypeChoice,
@@ -49,6 +48,8 @@ from tilavarauspalvelu.models import (
     ReservationStatisticsReservationUnit,
 )
 from tilavarauspalvelu.models.recurring_reservation.actions import ReservationDetails
+from tilavarauspalvelu.models.request_log.model import RequestLog
+from tilavarauspalvelu.models.sql_log.model import SQLLog
 from tilavarauspalvelu.utils.email.email_sender import EmailNotificationSender
 from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
@@ -65,14 +66,16 @@ from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import GetPaymentEr
 from tilavarauspalvelu.utils.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
 from tilavarauspalvelu.utils.verkkokauppa.product.types import CreateOrUpdateAccountingParams, CreateProductParams
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
+from utils.date_utils import local_datetime, local_end_of_day, local_start_of_day
 from utils.image_cache import purge
 from utils.sentry import SentryLogger
+from utils.utils import translate_for_user
 
 if TYPE_CHECKING:
     from collections.abc import Collection
 
     from tilavarauspalvelu.models import Address, Organisation, Person
-
+    from tilavarauspalvelu.typing import QueryInfo
 
 type Action = Literal["pre_add", "post_add", "pre_remove", "post_remove", "pre_clear", "post_clear"]
 
@@ -741,3 +744,59 @@ def generate_reservation_series_from_allocations(application_round_id: int) -> N
 
     if settings.SAVE_RESERVATION_STATISTICS:
         create_or_update_reservation_statistics.delay(reservation_pks=list(reservation_pks))
+
+
+@app.task(name="save_sql_queries_from_request")
+def save_sql_queries_from_request(queries: list[QueryInfo], path: str, body: bytes, duration_ms: int) -> None:
+    decoded_body: str | None = None
+    if path.startswith("/graphql"):
+        with suppress(Exception):
+            decoded_body = body.decode()
+        if decoded_body:
+            data = json.loads(decoded_body)
+            decoded_body = data.get("query")
+
+    request_log = RequestLog.objects.create(
+        path=path,
+        body=decoded_body,
+        duration_ms=duration_ms,
+    )
+    sql_logs = [
+        SQLLog(
+            request_log=request_log,
+            sql=query["sql"],
+            succeeded=query["succeeded"],
+            duration_ns=query["duration_ns"],
+            stack_info=query["stack_info"],
+        )
+        for query in queries
+    ]
+    SQLLog.objects.bulk_create(sql_logs)
+
+    log_to_sentry_if_suspicious(request_log, duration_ms)
+
+
+def log_to_sentry_if_suspicious(request_log: RequestLog, duration_ms: int) -> None:
+    if duration_ms >= settings.QUERY_LOGGING_DURATION_MS_THRESHOLD:
+        msg = "Request took too suspiciously long to complete"
+        details = {
+            "request_log": request_log.request_id,
+            "duration": duration_ms,
+        }
+        SentryLogger.log_message(msg, details=details, level="warning")
+
+    if request_log.body and (body_length := len(request_log.body)) >= settings.QUERY_LOGGING_BODY_LENGTH_THRESHOLD:
+        msg = "Body of request is too suspiciously large"
+        details = {
+            "request_log": request_log.request_id,
+            "body_length": body_length,
+        }
+        SentryLogger.log_message(msg, details=details, level="warning")
+
+    if num_of_queries := request_log.sql_logs.count() >= settings.QUERY_LOGGING_QUERY_COUNT_THRESHOLD:
+        msg = "Request made suspiciously many queries"
+        details = {
+            "request_log": request_log.request_id,
+            "num_of_queries": num_of_queries,
+        }
+        SentryLogger.log_message(msg, details=details, level="warning")

@@ -1,6 +1,6 @@
 from graphene_django_extensions import CreateMutation, DeleteMutation, UpdateMutation
 
-from common.models import BannerNotification
+from tilavarauspalvelu.models.banner_notification.model import BannerNotification
 
 from .permissions import BannerNotificationPermission
 from .serializers import BannerNotificationSerializer

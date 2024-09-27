@@ -13,6 +13,7 @@ from .models import (
 )
 from .models.address.model import Address
 from .models.application_round.model import ApplicationRound
+from .models.banner_notification.model import BannerNotification
 from .models.building.model import Building
 from .models.city.model import City
 from .models.email_template.model import EmailTemplate
@@ -186,3 +187,8 @@ class ApplicationRoundTranslationOptions(TranslationOptions):
 @register(City)
 class CityTranslationOptions(TranslationOptions):
     fields = ["name"]
+
+
+@register(BannerNotification)
+class BannerNotificationTranslationOptions(TranslationOptions):
+    fields = ["message"]

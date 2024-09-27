@@ -4,9 +4,9 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from common.date_utils import local_datetime
 from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.tasks import create_or_update_reservation_statistics
+from utils.date_utils import local_datetime
 
 
 class Command(BaseCommand):

@@ -13,205 +13,6 @@ msgstr ""
 msgid "is after current year"
 msgstr ""
 
-#: common/admin/banner_notification.py
-msgid "Name of the notification. Should be unique."
-msgstr ""
-
-#: common/admin/banner_notification.py
-msgid "Notification body."
-msgstr ""
-
-#: common/admin/banner_notification.py
-msgid "Level of the notification."
-msgstr ""
-
-#: common/admin/banner_notification.py
-msgid "Target user interface of the notification."
-msgstr ""
-
-#: common/admin/banner_notification.py
-msgid ""
-"Start date of the notification. If empty, 'active_until' must also be empty."
-msgstr ""
-
-#: common/admin/banner_notification.py
-msgid ""
-"End date of the notification. If empty, 'active_from' must also be empty."
-msgstr ""
-
-#: common/admin/banner_notification.py
-msgid ""
-"Is the notification a draft. Drafts won't be shown to users, even if they "
-"would be active."
-msgstr ""
-
-#: common/admin/request_log.py common/admin/sql_log.py
-msgid "SQL"
-msgstr ""
-
-#: common/admin/request_log.py common/admin/sql_log.py
-msgid "Duration (ns)"
-msgstr ""
-
-#: common/admin/request_log.py common/admin/sql_log.py
-msgid "Succeeded"
-msgstr ""
-
-#: common/admin/request_log.py common/admin/sql_log.py
-msgid "SQL that was executed (without params)."
-msgstr ""
-
-#: common/admin/request_log.py common/admin/sql_log.py
-msgid "Duration of the SQL query in nanoseconds."
-msgstr ""
-
-#: common/admin/request_log.py common/admin/sql_log.py
-msgid "Whether the SQL query succeeded or not."
-msgstr ""
-
-#: common/admin/request_log.py common/admin/sql_log.py
-msgid "Stack Info"
-msgstr ""
-
-#: common/admin/request_log.py common/admin/sql_log.py
-msgid "Request ID"
-msgstr ""
-
-#: common/admin/request_log.py common/admin/sql_log.py
-msgid "Path"
-msgstr ""
-
-#: common/admin/request_log.py
-msgid "Body"
-msgstr ""
-
-#: common/admin/request_log.py common/admin/sql_log.py
-msgid "Duration (ms)"
-msgstr ""
-
-#: common/admin/request_log.py
-msgid "Created"
-msgstr ""
-
-#: common/admin/request_log.py
-msgid "Random ID for grouping this log with other logs from the same request."
-msgstr ""
-
-#: common/admin/request_log.py
-msgid "Request path where the SQL was executed."
-msgstr ""
-
-#: common/admin/request_log.py
-msgid "Body of the request that executed the SQL."
-msgstr ""
-
-#: common/admin/request_log.py
-msgid "Duration of the request in milliseconds."
-msgstr ""
-
-#: common/admin/request_log.py
-msgid "When the SQL query was executed."
-msgstr ""
-
-#: common/admin/request_log.py
-msgid "Search by request ID, path or body"
-msgstr ""
-
-#: common/admin/request_log.py
-msgid "Queries"
-msgstr ""
-
-#: common/admin/request_log.py
-msgid "Duration Total (ms)"
-msgstr ""
-
-#: common/admin/request_log.py
-msgid "Duration SQL (ms)"
-msgstr ""
-
-#: common/admin/request_log.py
-msgid "Export rows to CSV"
-msgstr ""
-
-#: common/admin/sql_log.py common/models/sql_log.py
-msgid "Request log"
-msgstr ""
-
-#: common/admin/sql_log.py
-msgid "Stack trace where the SQL query was executed."
-msgstr ""
-
-#: common/admin/sql_log.py
-msgid "Search by SQL, request log path, body or request ID"
-msgstr ""
-
-#: common/enums.py
-msgctxt "BannerNotificationLevel"
-msgid "Exception"
-msgstr ""
-
-#: common/enums.py
-msgctxt "BannerNotificationLevel"
-msgid "Warning"
-msgstr ""
-
-#: common/enums.py
-msgctxt "BannerNotificationLevel"
-msgid "Normal"
-msgstr ""
-
-#: common/enums.py
-msgctxt "BannerNotificationTarget"
-msgid "All"
-msgstr ""
-
-#: common/enums.py
-msgctxt "BannerNotificationTarget"
-msgid "Staff"
-msgstr ""
-
-#: common/enums.py
-msgctxt "BannerNotificationTarget"
-msgid "User"
-msgstr ""
-
-#: common/enums.py
-msgctxt "BannerNotificationState"
-msgid "Draft"
-msgstr ""
-
-#: common/enums.py
-msgctxt "BannerNotificationState"
-msgid "Scheduled"
-msgstr ""
-
-#: common/enums.py
-msgctxt "BannerNotificationState"
-msgid "Active"
-msgstr ""
-
-#: common/models/banner_notification.py
-msgid "Non-draft notifications must have an active period and message set."
-msgstr ""
-
-#: common/models/banner_notification.py
-msgid ""
-"Both 'active_from' and 'active_until' must be either empty or set. If both "
-"are set, 'active_until' must be after 'active_from'."
-msgstr ""
-
-#: common/models/sql_log.py
-msgid "Request logs"
-msgstr ""
-
-#: common/models/sql_log.py
-msgid "SQL log"
-msgstr ""
-
-#: common/models/sql_log.py
-msgid "SQL logs"
-msgstr ""
-
 #: config/settings.py tilavarauspalvelu/enums.py
 msgid "Finnish"
 msgstr ""
@@ -416,7 +217,8 @@ msgstr ""
 #: tilavarauspalvelu/admin/application_round/admin.py
 #: tilavarauspalvelu/admin/application_section/admin.py
 #: tilavarauspalvelu/admin/reservation/admin.py
-#: tilavarauspalvelu/admin/reservation_unit/admin.py users/admin/user.py
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
+#: tilavarauspalvelu/admin/user/admin.py
 msgid "Basic information"
 msgstr ""
 
@@ -533,7 +335,8 @@ msgid "Home city"
 msgstr ""
 
 #: tilavarauspalvelu/admin/application/form.py
-#: tilavarauspalvelu/admin/reservation/admin.py users/admin/user.py
+#: tilavarauspalvelu/admin/reservation/admin.py
+#: tilavarauspalvelu/admin/user/admin.py
 msgid "Additional information"
 msgstr ""
 
@@ -961,6 +764,38 @@ msgstr ""
 msgid "Purpose for this section."
 msgstr ""
 
+#: tilavarauspalvelu/admin/banner_notification/admin.py
+msgid "Name of the notification. Should be unique."
+msgstr ""
+
+#: tilavarauspalvelu/admin/banner_notification/admin.py
+msgid "Notification body."
+msgstr ""
+
+#: tilavarauspalvelu/admin/banner_notification/admin.py
+msgid "Level of the notification."
+msgstr ""
+
+#: tilavarauspalvelu/admin/banner_notification/admin.py
+msgid "Target user interface of the notification."
+msgstr ""
+
+#: tilavarauspalvelu/admin/banner_notification/admin.py
+msgid ""
+"Start date of the notification. If empty, 'active_until' must also be empty."
+msgstr ""
+
+#: tilavarauspalvelu/admin/banner_notification/admin.py
+msgid ""
+"End date of the notification. If empty, 'active_from' must also be empty."
+msgstr ""
+
+#: tilavarauspalvelu/admin/banner_notification/admin.py
+msgid ""
+"Is the notification a draft. Drafts won't be shown to users, even if they "
+"would be active."
+msgstr ""
+
 #: tilavarauspalvelu/admin/city/admin.py
 msgid "Municipality"
 msgstr ""
@@ -1226,6 +1061,69 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/person/admin.py
 msgid "Search by first name or last name."
+msgstr ""
+
+#: tilavarauspalvelu/admin/request_log/admin.py
+#: tilavarauspalvelu/admin/sql_log/admin.py
+msgid "Request ID"
+msgstr ""
+
+#: tilavarauspalvelu/admin/request_log/admin.py
+#: tilavarauspalvelu/admin/sql_log/admin.py
+msgid "Path"
+msgstr ""
+
+#: tilavarauspalvelu/admin/request_log/admin.py
+msgid "Body"
+msgstr ""
+
+#: tilavarauspalvelu/admin/request_log/admin.py
+#: tilavarauspalvelu/admin/sql_log/admin.py
+msgid "Duration (ms)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/request_log/admin.py
+msgid "Created"
+msgstr ""
+
+#: tilavarauspalvelu/admin/request_log/admin.py
+msgid "Random ID for grouping this log with other logs from the same request."
+msgstr ""
+
+#: tilavarauspalvelu/admin/request_log/admin.py
+msgid "Request path where the SQL was executed."
+msgstr ""
+
+#: tilavarauspalvelu/admin/request_log/admin.py
+msgid "Body of the request that executed the SQL."
+msgstr ""
+
+#: tilavarauspalvelu/admin/request_log/admin.py
+msgid "Duration of the request in milliseconds."
+msgstr ""
+
+#: tilavarauspalvelu/admin/request_log/admin.py
+msgid "When the SQL query was executed."
+msgstr ""
+
+#: tilavarauspalvelu/admin/request_log/admin.py
+msgid "Search by request ID, path or body"
+msgstr ""
+
+#: tilavarauspalvelu/admin/request_log/admin.py
+msgid "Queries"
+msgstr ""
+
+#: tilavarauspalvelu/admin/request_log/admin.py
+msgid "Duration Total (ms)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/request_log/admin.py
+msgid "Duration SQL (ms)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/request_log/admin.py
+msgid "Export rows to CSV"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/admin.py
@@ -2092,6 +1990,47 @@ msgstr ""
 msgid "Search by name or unit name"
 msgstr ""
 
+#: tilavarauspalvelu/admin/sql_log/admin.py
+msgid "SQL"
+msgstr ""
+
+#: tilavarauspalvelu/admin/sql_log/admin.py
+msgid "Duration (ns)"
+msgstr ""
+
+#: tilavarauspalvelu/admin/sql_log/admin.py
+msgid "Succeeded"
+msgstr ""
+
+#: tilavarauspalvelu/admin/sql_log/admin.py
+msgid "SQL that was executed (without params)."
+msgstr ""
+
+#: tilavarauspalvelu/admin/sql_log/admin.py
+msgid "Duration of the SQL query in nanoseconds."
+msgstr ""
+
+#: tilavarauspalvelu/admin/sql_log/admin.py
+msgid "Whether the SQL query succeeded or not."
+msgstr ""
+
+#: tilavarauspalvelu/admin/sql_log/admin.py
+msgid "Stack Info"
+msgstr ""
+
+#: tilavarauspalvelu/admin/sql_log/admin.py
+#: tilavarauspalvelu/models/request_log/model.py
+msgid "Request log"
+msgstr ""
+
+#: tilavarauspalvelu/admin/sql_log/admin.py
+msgid "Stack trace where the SQL query was executed."
+msgstr ""
+
+#: tilavarauspalvelu/admin/sql_log/admin.py
+msgid "Search by SQL, request log path, body or request ID"
+msgstr ""
+
 #: tilavarauspalvelu/admin/unit/admin.py
 msgid "Search by name or TPREK ID"
 msgstr ""
@@ -2103,6 +2042,22 @@ msgstr ""
 #: tilavarauspalvelu/admin/unit_role/admin.py
 msgid ""
 "Search by user's username, email, first name, last name, unit or unit group"
+msgstr ""
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Search by Username, First name, Last name or Email"
+msgstr ""
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Settings"
+msgstr ""
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "ID token info"
+msgstr ""
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Permissions"
 msgstr ""
 
 #: tilavarauspalvelu/api/gdpr/views.py
@@ -2745,6 +2700,51 @@ msgctxt "OrganizationType"
 msgid "Religious community"
 msgstr ""
 
+#: tilavarauspalvelu/enums.py
+msgctxt "BannerNotificationLevel"
+msgid "Exception"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "BannerNotificationLevel"
+msgid "Warning"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "BannerNotificationLevel"
+msgid "Normal"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "BannerNotificationTarget"
+msgid "All"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "BannerNotificationTarget"
+msgid "Staff"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "BannerNotificationTarget"
+msgid "User"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "BannerNotificationState"
+msgid "Draft"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "BannerNotificationState"
+msgid "Scheduled"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "BannerNotificationState"
+msgid "Active"
+msgstr ""
+
 #: tilavarauspalvelu/models/address/model.py
 msgid "Addresses"
 msgstr ""
@@ -2811,6 +2811,16 @@ msgstr ""
 msgid ""
 "Reservation min and max durations must be multiples of 30 minutes, up to a "
 "maximum of 24 hours."
+msgstr ""
+
+#: tilavarauspalvelu/models/banner_notification/model.py
+msgid "Non-draft notifications must have an active period and message set."
+msgstr ""
+
+#: tilavarauspalvelu/models/banner_notification/model.py
+msgid ""
+"Both 'active_from' and 'active_until' must be either empty or set. If both "
+"are set, 'active_until' must be after 'active_from'."
 msgstr ""
 
 #: tilavarauspalvelu/models/city/model.py
@@ -2893,6 +2903,10 @@ msgstr ""
 
 #: tilavarauspalvelu/models/rejected_occurrence/model.py
 msgid "Rejected occurrences"
+msgstr ""
+
+#: tilavarauspalvelu/models/request_log/model.py
+msgid "Request logs"
 msgstr ""
 
 #: tilavarauspalvelu/models/reservable_time_span/model.py
@@ -2981,6 +2995,14 @@ msgstr ""
 msgid "Preferred order must be unique for each application section"
 msgstr ""
 
+#: tilavarauspalvelu/models/sql_log/model.py
+msgid "SQL log"
+msgstr ""
+
+#: tilavarauspalvelu/models/sql_log/model.py
+msgid "SQL logs"
+msgstr ""
+
 #: tilavarauspalvelu/models/suitable_time_range/model.py
 msgid "Suitable Time Range"
 msgstr ""
@@ -3011,6 +3033,20 @@ msgstr ""
 msgid "Unit roles"
 msgstr ""
 
+#: tilavarauspalvelu/models/user/model.py
+msgid "Preferred UI language"
+msgstr ""
+
+#: tilavarauspalvelu/models/user/model.py
+#, fuzzy
+#| msgid "Reservation for %(name)s"
+msgid "Reservation notification"
+msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: tilavarauspalvelu/models/user/model.py
+msgid "Date of birth"
+msgstr ""
+
 #: tilavarauspalvelu/tasks.py
 msgid "Core business"
 msgstr ""
@@ -3025,34 +3061,4 @@ msgstr ""
 
 #: tilavarauspalvelu/utils/validators.py
 msgid "Enter a valid time."
-msgstr ""
-
-#: users/admin/user.py
-msgid "Search by Username, First name, Last name or Email"
-msgstr ""
-
-#: users/admin/user.py
-msgid "Settings"
-msgstr ""
-
-#: users/admin/user.py
-msgid "ID token info"
-msgstr ""
-
-#: users/admin/user.py
-msgid "Permissions"
-msgstr ""
-
-#: users/models.py
-msgid "Preferred UI language"
-msgstr ""
-
-#: users/models.py
-#, fuzzy
-#| msgid "Reservation for %(name)s"
-msgid "Reservation notification"
-msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-#: users/models.py
-msgid "Date of birth"
 msgstr ""

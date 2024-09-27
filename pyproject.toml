@@ -202,7 +202,7 @@ lint.ignore = [
 ]
 
 [tool.ruff.lint.extend-per-file-ignores]
-"common/management/commands/*.py" = [
+"tilavarauspalvelu/management/commands/data_creation/*.py" = [
     "S311",     # pseudo-random generators are fine here.
     "PLR0913",  # Can take as many arguments as needed.
     "PLR0915",  # Can have as many statements as needed.

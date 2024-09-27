@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING
 import freezegun
 import pytest
 
-from common.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_datetime, local_iso_format
 from tests.factories import AllocatedTimeSlotFactory, ReservationFactory
 from tests.helpers import patch_method
 from tilavarauspalvelu.enums import (
@@ -26,6 +25,7 @@ from tilavarauspalvelu.models import (
 from tilavarauspalvelu.tasks import generate_reservation_series_from_allocations
 from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.utils.opening_hours.hauki_api_types import HaukiAPIDatePeriod
+from utils.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_datetime, local_iso_format
 from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:

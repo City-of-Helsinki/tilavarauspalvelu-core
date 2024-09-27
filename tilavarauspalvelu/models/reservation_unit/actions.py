@@ -3,7 +3,6 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any
 
-from common.date_utils import DEFAULT_TIMEZONE, time_as_timedelta
 from tilavarauspalvelu.enums import ReservationStartInterval
 from tilavarauspalvelu.exceptions import HaukiAPIError
 from tilavarauspalvelu.models import (
@@ -16,6 +15,7 @@ from tilavarauspalvelu.models import (
 )
 from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.utils.opening_hours.hauki_api_types import HaukiAPIResource, HaukiTranslatedField
+from utils.date_utils import DEFAULT_TIMEZONE, time_as_timedelta
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
