@@ -19,6 +19,9 @@ type Props = {
 };
 
 const Wrapper = styled.div`
+  display: flex;
+  flex-flow: column nowrap;
+  gap: var(--spacing-m);
   margin-bottom: var(--spacing-layout-l);
 `;
 

@@ -70,7 +70,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   return {
     props: {
       ...commonProps,
-      overrideBackgroundColor: "var(--tilavaraus-gray)",
       ...opts,
       data: searchData,
       applicationRounds,
@@ -81,7 +80,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
 const Wrapper = styled.div`
   margin-bottom: var(--spacing-layout-l);
-  background-color: var(--tilavaraus-gray);
 `;
 
 const StyledContainer = styled(Container)`

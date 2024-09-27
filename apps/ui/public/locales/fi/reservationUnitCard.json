@@ -12,5 +12,6 @@
   "seeMore": "Näytä",
   "available": "Vapaa",
   "noTimes": "Ei vapaita aikoja",
-  "closed": "Suljettu"
+  "closed": "Suljettu",
+  "firstAvailableTime": "Ensimmäinen vapaa aika"
 }

@@ -19,7 +19,8 @@ interface Props {
 const Main = styled.main<{ $bgColor?: string }>`
   font-size: var(--fontsize-body-m);
   flex: 1 0 auto;
-  ${({ $bgColor }) => ($bgColor ? `background: ${$bgColor}` : ``)}
+  margin-bottom: -14px;
+  background: ${({ $bgColor }) => $bgColor || "var(--color-white)"};
 `;
 
 function PageWrapper({
@@ -42,11 +43,7 @@ function PageWrapper({
         target={BannerNotificationTarget.User}
       />
       <InProgressReservationNotification />
-      <Main
-        $bgColor={overrideBackgroundColor}
-        id="main"
-        style={{ marginBottom: "-14px" }}
-      >
+      <Main id="main" $bgColor={overrideBackgroundColor}>
         {children}
       </Main>
       <Footer feedbackUrl={feedbackUrl} />

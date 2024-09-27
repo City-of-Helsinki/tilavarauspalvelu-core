@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useTranslation, type TFunction } from "next-i18next";
 import styled from "styled-components";
 import {
-  Card as HdsCard,
+  Button,
   IconArrowRight,
   IconCheck,
   IconCogwheel,
@@ -20,101 +20,21 @@ import {
   type ApplicationsQuery,
 } from "@gql/gql-types";
 import { applicationUrl, formatDateTime } from "@/modules/util";
-import { BlackButton } from "@/styles/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import StatusLabel, {
   type StatusLabelType,
 } from "common/src/components/StatusLabel";
+import Card from "common/src/components/Card";
 
-const Card = styled(HdsCard)`
-  border-width: 0;
-  padding-inline: var(--spacing-s);
-  padding-block: var(--spacing-s);
-  margin-bottom: var(--spacing-m);
-  width: auto;
-  grid-template-columns: 1fr;
-  display: block;
-
-  @media (min-width: ${breakpoints.m}) {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--spacing-m);
-  }
-`;
-
-const Buttons = styled.div`
-  font-family: var(--font-medium);
-  font-size: var(--fontsize-body-s);
-  margin-top: var(--spacing-m);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-
-  > * {
-    flex-grow: 1;
-    text-wrap: nowrap;
-  }
-
-  @media (width > ${breakpoints.s}) {
-    flex-direction: row;
-    gap: var(--spacing-s);
-  }
-
-  @media (width > ${breakpoints.m}) {
-    flex-direction: column;
-    align-items: flex-end;
-    justify-content: flex-end;
-
-    /* swapping flex-direction makes grow resize buttons vertically */
-    > * {
-      flex-grow: 0;
-      width: 100%;
-    }
-  }
-
-  @media (width > ${breakpoints.l}) {
-    flex-direction: row;
-  }
-`;
-
-const Applicant = styled.div`
-  font-family: var(--font-regular);
-  font-size: var(--fontsize-body-m);
-  margin-top: var(--spacing-xs);
-  margin-bottom: var(--spacing-s);
-  padding-right: var(--spacing-m);
-`;
-
-const RoundName = styled.div`
-  margin-top: var(--spacing-xs);
-  font-size: var(--fontsize-heading-m);
-  font-family: var(--font-bold);
-  margin-bottom: 0;
-
-  @media (max-width: ${breakpoints.s}) {
-    font-size: var(--fontsize-heading-m);
-  }
-`;
-
-const Modified = styled.div`
-  font-size: var(--fontsize-body-m);
-  font-family: var(--font-regular);
-  color: var(--color-black-70);
-  margin-top: var(--spacing-l);
-
-  @media (min-width: ${breakpoints.s}) {
-    margin-top: var(--spacing-xl);
-  }
-`;
-
-const StyledButton = styled(BlackButton).attrs({
+const StyledButton = styled(Button).attrs({
   variant: "secondary",
   size: "small",
 })`
   white-space: nowrap;
-
+  font-family: var(--font-medium) !important;
+  font-size: var(--fontsize-body-m) !important;
   svg {
     min-width: 24px;
   }
@@ -232,58 +152,66 @@ function ApplicationCard({ application, actionCallback }: Props): JSX.Element {
 
   const labelProps = getApplicationStatusLabelProps(application.status);
 
+  const tags = [
+    <StatusLabel
+      type={labelProps.type}
+      icon={labelProps.icon}
+      key="status-label"
+    >
+      {t(`applicationCard:status.${application.status}`)}
+    </StatusLabel>,
+  ];
+
+  const buttons = [
+    <StyledButton
+      aria-label={t("applicationCard:cancel")}
+      onClick={() => setIsWaitingForDelete(true)}
+      isLoading={isLoading}
+      disabled={!editable}
+      iconRight={<IconCross aria-hidden />}
+      key="cancel"
+    >
+      {t("applicationCard:cancel")}
+    </StyledButton>,
+    <ButtonLikeLink
+      disabled={!editable || application.pk == null || isLoading}
+      href={
+        editable && application.pk != null
+          ? `${applicationUrl(application.pk ?? 0)}/page1`
+          : ""
+      }
+      key="edit"
+    >
+      {t("applicationCard:edit")}
+      <IconPen aria-hidden />
+    </ButtonLikeLink>,
+    <ButtonLikeLink
+      href={
+        application.pk != null
+          ? `${applicationUrl(application.pk ?? 0)}/view`
+          : ""
+      }
+      disabled={application.pk == null}
+      key="view"
+    >
+      {t("applicationCard:view")}
+      <IconArrowRight aria-hidden />
+    </ButtonLikeLink>,
+  ];
+
   return (
-    <Card border key={application.pk} data-testid="applications__card--wrapper">
-      <div>
-        <StatusLabel type={labelProps.type} icon={labelProps.icon}>
-          {t(`applicationCard:status.${application.status}`)}
-        </StatusLabel>
-        <RoundName>{getApplicationRoundName(applicationRound)}</RoundName>
-        <Applicant>
-          {application.applicantType != null
-            ? getApplicant(application, t)
-            : ""}
-        </Applicant>
-        <Modified>
-          {t("applicationCard:saved")}{" "}
-          {formatDateTime(t, new Date(application.lastModifiedDate))}
-        </Modified>
-      </div>
-      <Buttons>
-        <StyledButton
-          aria-label={t("applicationCard:cancel")}
-          onClick={() => setIsWaitingForDelete(true)}
-          isLoading={isLoading}
-          disabled={!editable}
-          iconRight={<IconCross aria-hidden />}
-        >
-          {t("applicationCard:cancel")}
-        </StyledButton>
-        <ButtonLikeLink
-          disabled={!editable || application.pk == null || isLoading}
-          href={
-            editable && application.pk != null
-              ? `${applicationUrl(application.pk ?? 0)}/page1`
-              : ""
-          }
-          fontSize="small"
-        >
-          {t("applicationCard:edit")}
-          <IconPen aria-hidden />
-        </ButtonLikeLink>
-        <ButtonLikeLink
-          href={
-            application.pk != null
-              ? `${applicationUrl(application.pk ?? 0)}/view`
-              : ""
-          }
-          disabled={application.pk == null}
-          fontSize="small"
-        >
-          {t("applicationCard:view")}
-          <IconArrowRight aria-hidden />
-        </ButtonLikeLink>
-      </Buttons>
+    <Card
+      heading={getApplicationRoundName(applicationRound)}
+      headingLevel={2}
+      text={
+        application.applicantType != null ? getApplicant(application, t) : ""
+      }
+      tags={tags}
+      buttons={buttons}
+    >
+      <br />
+      {t("applicationCard:saved")}{" "}
+      {formatDateTime(t, new Date(application.lastModifiedDate))}
       {isWaitingForDelete && (
         <ConfirmationDialog
           isOpen

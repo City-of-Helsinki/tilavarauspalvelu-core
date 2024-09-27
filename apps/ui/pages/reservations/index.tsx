@@ -65,6 +65,9 @@ const StyledTab = styled(Tab)`
 `;
 
 const StyledTabPanel = styled(TabPanel)`
+  display: flex;
+  flex-flow: column nowrap;
+  gap: var(--spacing-m);
   margin-top: var(--spacing-m);
 `;
 

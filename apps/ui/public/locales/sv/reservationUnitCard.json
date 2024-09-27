@@ -11,5 +11,6 @@
   "seeMore": "Visa",
   "available": "Ledigt",
   "noTimes": "Inga lediga tider",
-  "closed": "Stängt"
+  "closed": "Stängt",
+  "firstAvailableTime": "Första lediga tid"
 }

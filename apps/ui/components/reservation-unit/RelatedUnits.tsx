@@ -2,15 +2,12 @@ import { IconArrowRight, IconGroup, IconTicket } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import NextImage from "next/image";
-import router from "next/router";
-import Link from "next/link";
 import styled from "styled-components";
 import { useMedia } from "react-use";
 import { breakpoints } from "common/src/common/style";
 import type { RelatedReservationUnitsQuery } from "@gql/gql-types";
 import { reservationUnitPath } from "@/modules/const";
 import { getMainImage, getTranslation } from "@/modules/util";
-import IconWithText from "../common/IconWithText";
 import Carousel from "../Carousel";
 import {
   getActivePricing,
@@ -18,8 +15,9 @@ import {
   getReservationUnitName,
   getUnitName,
 } from "@/modules/reservationUnit";
-import { SupplementaryButton, truncatedText } from "@/styles/util";
 import { getImageSource } from "common/src/helpers";
+import Card from "common/src/components/Card";
+import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 
 type RelatedQueryT = NonNullable<
   RelatedReservationUnitsQuery["reservationUnits"]
@@ -30,79 +28,14 @@ type PropsType = {
   units: RelatedNodeT[];
 };
 
-const Wrapper = styled.div`
-  margin: 0 var(--spacing-s);
-
-  @media (min-width: ${breakpoints.m}) {
-    margin: 0;
-  }
-`;
-
 const StyledCarousel = styled(Carousel)`
+  &&& {
+    /* Make room for the Carousel controls */
+    margin: 0 auto !important;
+    width: calc(100% - 60px) !important;
+  }
   .slider-list {
     cursor: default !important;
-  }
-`;
-
-const Content = styled.div`
-  padding: var(--spacing-s);
-  height: 180px;
-  position: relative;
-`;
-
-const Unit = styled.div`
-  background-color: var(--color-black-5);
-`;
-
-const Name = styled.div`
-  &:hover {
-    opacity: 0.5;
-  }
-
-  color: var(--color-black-90);
-  cursor: pointer;
-  font-family: var(--font-bold);
-  font-weight: 700;
-  font-size: var(--fontsize-heading-s);
-  margin-bottom: var(--spacing-xs);
-  ${truncatedText};
-`;
-
-const Image = styled.img`
-  width: 100%;
-  height: 205px;
-  object-fit: cover;
-`;
-
-const Building = styled.div`
-  font-family: var(--font-regular);
-  margin: var(--spacing-3-xs) 0 var(--spacing-xs);
-  ${truncatedText};
-`;
-
-const Props = styled.div`
-  font-size: var(--fontsize-body-s);
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0;
-`;
-
-const StyledIconWithText = styled(IconWithText)`
-  margin-top: var(--spacing-xs);
-`;
-
-const Buttons = styled.div`
-  position: absolute;
-  right: 0;
-  bottom: 0;
-`;
-
-const LinkButton = styled(SupplementaryButton)`
-  --color-coat-of-arms: transparent;
-  --color-bus-dark: transparent;
-
-  svg {
-    color: black;
   }
 `;
 
@@ -115,99 +48,83 @@ function RelatedUnits({ units }: PropsType): JSX.Element | null {
     return null;
   }
   return (
-    <Wrapper>
-      <StyledCarousel
-        slidesToShow={isMobile ? 1 : isWideMobile ? 2 : 3}
-        slidesToScroll={isMobile ? 1 : isWideMobile ? 2 : 3}
-        wrapAround={false}
-        hideCenterControls
-        cellSpacing={24}
-      >
-        {units.map((unit) => {
-          const name = getReservationUnitName(unit);
-          const pricing = getActivePricing(unit);
-          const unitPrice =
-            pricing != null ? getPriceString({ pricing }) : undefined;
-          const reservationUnitTypeName =
-            unit.reservationUnitType != null
-              ? getTranslation(unit.reservationUnitType, "name")
-              : undefined;
-          const img = getMainImage(unit);
-          const imgSrc = getImageSource(img, "medium");
-          return (
-            <Unit key={unit.pk}>
-              <Image src={imgSrc} alt={name} style={{ marginTop: 0 }} />
-              <Content>
-                {unit.pk != null ? (
-                  <Link href={reservationUnitPath(unit.pk)}>
-                    <Name>{name}</Name>
-                  </Link>
-                ) : (
-                  <Name>{name}</Name>
-                )}
-                <Building>
-                  {unit.unit != null ? getUnitName(unit.unit) : ""}
-                </Building>
-                <Props>
-                  {reservationUnitTypeName && (
-                    <StyledIconWithText
-                      icon={
-                        <NextImage
-                          src="/icons/icon_premises.svg"
-                          alt=""
-                          width="24"
-                          height="24"
-                          aria-hidden="true"
-                        />
-                      }
-                      text={reservationUnitTypeName}
-                    />
-                  )}
-                  {unit.maxPersons && (
-                    <StyledIconWithText
-                      icon={
-                        <IconGroup
-                          aria-label={t("reservationUnitCard:maxPersons", {
-                            maxPersons: unit.maxPersons,
-                          })}
-                        />
-                      }
-                      text={t("reservationUnitCard:maxPersons", {
-                        count: unit.maxPersons,
-                      })}
-                    />
-                  )}
-                  {unitPrice && (
-                    <StyledIconWithText
-                      icon={
-                        <IconTicket
-                          aria-label={t("prices:reservationUnitPriceLabel")}
-                        />
-                      }
-                      text={unitPrice}
-                    />
-                  )}
-                </Props>
-                <Buttons>
-                  <LinkButton
-                    onClick={() => {
-                      if (unit.pk != null) {
-                        router.push(reservationUnitPath(unit.pk));
-                      }
-                    }}
-                  >
-                    <IconArrowRight
-                      size="l"
-                      aria-label={getReservationUnitName(unit)}
-                    />
-                  </LinkButton>
-                </Buttons>
-              </Content>
-            </Unit>
-          );
-        })}
-      </StyledCarousel>
-    </Wrapper>
+    <StyledCarousel
+      slidesToShow={isMobile ? 1 : isWideMobile ? 2 : 3}
+      slidesToScroll={isMobile ? 1 : isWideMobile ? 2 : 3}
+      wrapAround={false}
+      hideCenterControls
+      cellSpacing={24}
+    >
+      {units.map((unit) => {
+        const name = getReservationUnitName(unit);
+        const pricing = getActivePricing(unit);
+        const unitPrice =
+          pricing != null ? getPriceString({ pricing }) : undefined;
+        const reservationUnitTypeName =
+          unit.reservationUnitType != null
+            ? getTranslation(unit.reservationUnitType, "name")
+            : undefined;
+        const img = getMainImage(unit);
+        const imgSrc = getImageSource(img, "medium");
+        const infos = [];
+        if (reservationUnitTypeName) {
+          infos.push({
+            icon: (
+              <NextImage
+                src="/icons/icon_premises.svg"
+                alt=""
+                width="24"
+                height="24"
+                aria-hidden="true"
+              />
+            ),
+            value: reservationUnitTypeName,
+          });
+        }
+        if (unit.maxPersons) {
+          infos.push({
+            icon: (
+              <IconGroup
+                aria-label={t("reservationUnitCard:maxPersons", {
+                  maxPersons: unit.maxPersons,
+                })}
+              />
+            ),
+            value: t("reservationUnitCard:maxPersons", {
+              count: unit.maxPersons,
+            }),
+          });
+        }
+        if (unitPrice) {
+          infos.push({
+            icon: (
+              <IconTicket aria-label={t("prices:reservationUnitPriceLabel")} />
+            ),
+            value: unitPrice,
+          });
+        }
+        const buttons = [
+          <ButtonLikeLink
+            href={reservationUnitPath(unit.pk ?? 0)}
+            key={unit.pk ?? 0}
+          >
+            {t("reservationUnitCard:seeMore")}
+            <IconArrowRight aria-hidden="true" />
+          </ButtonLikeLink>,
+        ];
+        return (
+          <Card
+            variant="vertical"
+            key={unit.pk}
+            heading={name ?? ""}
+            text={getUnitName(unit.unit) ?? ""}
+            infos={infos}
+            buttons={buttons}
+            imageSrc={imgSrc}
+          />
+        );
+      })}
+    </StyledCarousel>
   );
 }
 

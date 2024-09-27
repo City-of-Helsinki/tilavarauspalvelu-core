@@ -42,7 +42,7 @@ const Button = styled(MediumButton).attrs({
   }
 `;
 
-const SmallArrowButton = styled(Button)<{ $disabled: boolean }>`
+const SmallArrowButton = styled(Button)`
   &&& {
     --color-bus: transparent;
     --color-bus-dark: transparent;
@@ -52,17 +52,12 @@ const SmallArrowButton = styled(Button)<{ $disabled: boolean }>`
     margin: 0;
     padding: 0;
 
-    ${({ $disabled }) =>
-      $disabled
-        ? `
-    display: none !important;
-  `
-        : `
     &:hover {
       opacity: 0.7;
     }
-    opacity: 1;
-  `};
+    :disabled {
+      opacity: 0.1;
+    }
 
     svg {
       color: black;
@@ -138,7 +133,7 @@ const Carousel = ({
     <StyledCarousel
       renderCenterLeftControls={({ previousSlide, previousDisabled }) => (
         <ButtonComponent
-          $disabled={previousDisabled}
+          disabled={previousDisabled}
           type="button"
           onClick={previousSlide}
           aria-label={t("common:prev")}
@@ -149,7 +144,7 @@ const Carousel = ({
       )}
       renderCenterRightControls={({ nextSlide, nextDisabled }) => (
         <ButtonComponent
-          $disabled={nextDisabled}
+          disabled={nextDisabled}
           type="button"
           onClick={nextSlide}
           aria-label={t("common:next")}

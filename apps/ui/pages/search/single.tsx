@@ -28,8 +28,7 @@ import { useSearchValues } from "@/hooks/useSearchValues";
 import { useSearchQuery } from "@/hooks/useSearchQuery";
 
 const Wrapper = styled.div`
-  margin-bottom: var(--spacing-layout-l);
-  background-color: var(--tilavaraus-gray);
+  padding-bottom: var(--spacing-layout-l);
 `;
 
 const StyledContainer = styled(Container)`
@@ -41,7 +40,6 @@ const StyledContainer = styled(Container)`
 `;
 
 const HeadContainer = styled.div`
-  background-color: white;
   padding-top: var(--spacing-m);
 `;
 
@@ -49,6 +47,15 @@ const Heading = styled(H2).attrs({ as: "h1" })``;
 
 const BottomWrapper = styled(Container)`
   padding-top: var(--spacing-l);
+  > div > :first-child {
+    padding: var(--spacing-m);
+    background-color: var(--color-black-5);
+  }
+  [class*="ListContainer"] {
+    display: flex;
+    flex-flow: column nowrap;
+    gap: var(--spacing-m);
+  }
 `;
 
 const StyledSorting = styled(Sorting)`
@@ -81,7 +88,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   return {
     props: {
       ...getCommonServerSideProps(),
-      overrideBackgroundColor: "var(--tilavaraus-gray)",
       ...(await serverSideTranslations(locale ?? "fi")),
       ...opts,
       data,

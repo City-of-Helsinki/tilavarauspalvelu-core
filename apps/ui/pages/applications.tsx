@@ -69,7 +69,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   return {
     props: {
       ...getCommonServerSideProps(),
-      overrideBackgroundColor: "var(--tilavaraus-gray)",
       ...(await serverSideTranslations(locale ?? "fi")),
       data: appData,
     },

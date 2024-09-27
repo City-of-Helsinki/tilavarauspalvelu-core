@@ -45,7 +45,6 @@ const Wrapper = styled.div`
     [class*="module_headerNavigationMenu__"] ul {
       width: 100%;
       margin: 0 auto;
-      padding-inline: 0;
       max-width: var(--container-width-xl);
     }
 

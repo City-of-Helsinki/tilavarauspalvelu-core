@@ -80,6 +80,9 @@ const Content = styled.div`
 `;
 
 const RoundList = styled.div`
+  display: flex;
+  flex-flow: column nowrap;
+  gap: var(--spacing-m);
   margin-bottom: var(--spacing-layout-l);
 `;
 
@@ -106,7 +109,7 @@ const RecurringLander = ({ applicationRounds }: Props): JSX.Element => {
   );
 
   return (
-    <div>
+    <>
       <Head>
         <H2 as="h1">{t("recurringLander:heading")}</H2>
         <HeroSubheading>{t("recurringLander:subHeading")}</HeroSubheading>
@@ -159,7 +162,7 @@ const RecurringLander = ({ applicationRounds }: Props): JSX.Element => {
           </RoundList>
         )}
       </Content>
-    </div>
+    </>
   );
 };
 

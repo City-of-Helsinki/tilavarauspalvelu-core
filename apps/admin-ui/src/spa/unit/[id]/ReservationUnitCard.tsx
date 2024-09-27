@@ -1,5 +1,4 @@
 import React from "react";
-import styled from "styled-components";
 import {
   IconArrowRight,
   IconLayers,
@@ -9,14 +8,12 @@ import {
   IconCheck,
 } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { H2, fontMedium } from "common/src/common/typography";
-import { breakpoints } from "common/src/common/style";
 import { ImageType, type UnitQuery } from "@gql/gql-types";
-import { BasicLink } from "@/styles/util";
 import { getImageSource } from "common/src/helpers";
-import { NoWrap } from "common/styles/util";
 import StatusLabel from "common/src/components/StatusLabel";
 import { getReservationUnitUrl } from "@/common/urls";
+import Card from "common/src/components/Card";
+import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 
 type UnitType = NonNullable<UnitQuery["unit"]>;
 type ReservationUnitType = NonNullable<UnitType["reservationunitSet"]>[0];
@@ -25,82 +22,10 @@ interface IProps {
   unitId: number;
 }
 
-const Wrapper = styled.div`
-  background-color: var(--color-black-5);
-  display: grid;
-
-  @media (min-width: ${breakpoints.l}) {
-    grid-template-columns: 213px auto;
-  }
-  @media (min-width: ${breakpoints.xl}) {
-    width: 90%;
-  }
-`;
-
-// NOTE height is weird, we should have the card height defined then wouldn't this kinda hacks
-// with 160px the text overflows, 100% without image => 213px (becomes a square)
-const ImageBox = styled.div`
-  display: none;
-  height: 160px;
-
-  @media (min-width: ${breakpoints.l}) {
-    height: 100%;
-    max-height: 180px;
-    background-color: var(--color-silver);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    svg {
-      transform: scale(1.4);
-    }
-  }
-`;
-
-const Image = styled.img`
-  height: 100%;
-  width: 100%;
-  object-fit: cover;
-`;
-
-const Content = styled.div`
-  padding: var(--spacing-m);
-
-  ${H2} {
-    margin: 0;
-  }
-`;
-
-const ComboType = styled.div`
-  padding: var(--spacing-xs) 0 var(--spacing-s) 0;
-`;
-
-const Props = styled.div`
-  @media (min-width: ${breakpoints.s}) {
-    display: grid;
-    grid-template-columns: repeat(4, auto);
-    gap: var(--spacing-m);
-  }
-`;
-
-const Prop = styled.div<{ $disabled?: boolean }>`
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-2-xs);
-  ${fontMedium}
-
-  ${({ $disabled }) => $disabled && "opacity: 0.4;"}
-
-  &:last-child {
-    justify-self: end;
-  }
-`;
-
 export function ReservationUnitCard({
   reservationUnit,
   unitId,
-}: IProps): JSX.Element {
+}: Readonly<IProps>): JSX.Element {
   const { t } = useTranslation();
 
   const image =
@@ -113,58 +38,63 @@ export function ReservationUnitCard({
   const link = getReservationUnitUrl(reservationUnit.pk, unitId);
   const imgSrc = getImageSource(image, "medium");
 
+  const infos = [];
+  if (hasPurposes) {
+    infos.push({
+      icon: <IconLayers />,
+      value: t("ReservationUnitCard.purpose", {
+        count: reservationUnit.purposes?.length,
+      }),
+    });
+  }
+  if (reservationUnit.reservationUnitType) {
+    infos.push({
+      icon: <IconHome />,
+      value: reservationUnit.reservationUnitType.nameFi ?? "",
+    });
+  }
+  if (reservationUnit.maxPersons) {
+    infos.push({
+      icon: <IconGroup />,
+      value: `${t("ReservationUnits.headings.maxPersons")} ${reservationUnit.maxPersons}`,
+    });
+  }
+
+  const tags = [];
+  if (reservationUnit.isDraft) {
+    tags.push(
+      <StatusLabel type="draft" icon={<IconPen ariaHidden />} key="draft">
+        {t("ReservationUnitCard.stateDraft")}
+      </StatusLabel>
+    );
+  } else {
+    tags.push(
+      <StatusLabel type="success" icon={<IconCheck ariaHidden />} key="success">
+        {t("ReservationUnitCard.statePublished")}
+      </StatusLabel>
+    );
+  }
+
+  const buttons = [
+    <ButtonLikeLink to={link} key="seeMore">
+      {t("common.view")}
+      <IconArrowRight ariaHidden />
+    </ButtonLikeLink>,
+  ];
+
   return (
-    <Wrapper>
-      <ImageBox>
-        <Image src={imgSrc} alt="" />
-      </ImageBox>
-      <Content>
-        <BasicLink to={link}>
-          <H2 $legacy>{reservationUnit.nameFi}</H2>
-          <IconArrowRight />
-        </BasicLink>
-        <ComboType>
-          {t(
-            (reservationUnit?.resources?.length || 0) > 1
-              ? "ReservationUnitCard.spaceAndResource"
-              : "ReservationUnitCard.spaceOnly"
-          )}
-        </ComboType>
-        <Props>
-          <Prop $disabled={!hasPurposes}>
-            <IconLayers />{" "}
-            <NoWrap>
-              {t(
-                hasPurposes
-                  ? "ReservationUnitCard.purpose"
-                  : "ReservationUnitCard.noPurpose",
-                { count: reservationUnit.purposes?.length }
-              )}
-            </NoWrap>
-          </Prop>
-          <Prop $disabled={!reservationUnit.reservationUnitType}>
-            <IconHome />{" "}
-            {reservationUnit.reservationUnitType?.nameFi ||
-              t("ReservationUnitCard.noReservationUnitType")}
-          </Prop>
-          <Prop $disabled={!reservationUnit.maxPersons}>
-            <IconGroup />{" "}
-            {reservationUnit.maxPersons ||
-              t("ReservationUnitCard.noMaxPersons")}
-          </Prop>
-          <Prop>
-            {reservationUnit.isDraft ? (
-              <StatusLabel type="draft" icon={<IconPen ariaHidden />}>
-                {t("ReservationUnitCard.stateDraft")}
-              </StatusLabel>
-            ) : (
-              <StatusLabel type="success" icon={<IconCheck ariaHidden />}>
-                {t("ReservationUnitCard.statePublished")}
-              </StatusLabel>
-            )}
-          </Prop>
-        </Props>
-      </Content>
-    </Wrapper>
+    <Card
+      heading={reservationUnit.nameFi ?? ""}
+      text={t(
+        (reservationUnit?.resources?.length || 0) > 1
+          ? "ReservationUnitCard.spaceAndResource"
+          : "ReservationUnitCard.spaceOnly"
+      )}
+      link={link}
+      imageSrc={imgSrc}
+      infos={infos}
+      tags={tags}
+      buttons={buttons}
+    />
   );
 }
