@@ -38,7 +38,7 @@ import {
 import { formatDuration } from "common/src/common/util";
 import { convertWeekday, type Day } from "common/src/conversion";
 import { WEEKDAYS } from "common/src/const";
-import { formatNumber, formatDate, parseAgeGroups } from "@/common/util";
+import { formatNumber, formatDate, formatAgeGroups } from "@/common/util";
 import ScrollIntoView from "@/common/ScrollIntoView";
 import { Accordion } from "@/component/Accordion";
 import { Accordion as HDSAccordion } from "@/common/hds-fork/Accordion";
@@ -656,10 +656,13 @@ function ApplicationSectionDetails({
           {section.ageGroup && (
             <ValueBox
               label={t("ApplicationEvent.ageGroup")}
-              value={parseAgeGroups({
-                minimum: section.ageGroup.minimum,
-                maximum: section.ageGroup.maximum ?? undefined,
-              })}
+              value={formatAgeGroups(
+                {
+                  minimum: section.ageGroup.minimum,
+                  maximum: section.ageGroup.maximum ?? undefined,
+                },
+                t
+              )}
             />
           )}
           <ValueBox

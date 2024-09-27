@@ -21,11 +21,10 @@ const jestConfig = async () => {
     moduleNameMapper: {
       // Mock svg imports so we don't have to transpile with svgr
       "\\.svg$": "<rootDir>/__mocks__/fileMock.js",
-      "app/(.*)": "<rootDir>/src/$1",
       "@/(.*)": "<rootDir>/src/$1",
       ...nextJestConfig.moduleNameMapper,
     },
   };
 };
 
-export default jestConfig;
+export default jestConfig();

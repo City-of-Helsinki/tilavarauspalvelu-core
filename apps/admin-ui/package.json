@@ -13,7 +13,7 @@
     "format": "SKIP_ENV_VALIDATION=true prettier --ignore-path \"../.prettierignore\" --write \"**/*.{js,jsx,ts,tsx,json}\"",
     "test": "SKIP_ENV_VALIDATION=true TZ=Europe/Helsinki jest --runInBand",
     "test:watch": "SKIP_ENV_VALIDATION=true jest --watch",
-    "tsc:check": "tsc --noEmit --project tsconfig.tscheck.json",
+    "tsc:check": "tsc --noEmit --project tsconfig.json",
     "tsc:clean": "tsc --build --clean"
   },
   "husky": {

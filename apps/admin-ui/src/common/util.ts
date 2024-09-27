@@ -1,5 +1,4 @@
 import { format, getDay, isSameDay, parseISO } from "date-fns";
-import i18next from "i18next";
 import { trim, camelCase, get, pick, zipObject } from "lodash";
 import {
   type Maybe,
@@ -9,7 +8,6 @@ import {
   type ReservationCommonFragment,
   type ReservationMetadataFieldNode,
 } from "@gql/gql-types";
-import { NUMBER_OF_DECIMALS } from "./const";
 import type { TFunction } from "next-i18next";
 import { toMondayFirstUnsafe, truncate } from "common/src/helpers";
 import {
@@ -76,107 +74,29 @@ export const formatNumber = (
   return `${number}${suffix || ""}`;
 };
 
-// Formats decimal to n -places, and trims trailing zeroes
-export const formatDecimal = ({
-  input,
-  decimals = NUMBER_OF_DECIMALS,
-  fallbackValue = 0,
-}: {
-  input?: number | string;
-  decimals?: number;
-  fallbackValue?: number;
-}): number => {
-  if (!input) return fallbackValue;
-
-  const value = typeof input === "string" ? parseFloat(input) : input;
-
-  return parseFloat(value.toFixed(decimals));
-};
-
-interface HMS {
-  h?: number;
-  m?: number;
-  s?: number;
-}
-
-export const secondsToHms = (duration?: number | null): HMS => {
-  if (!duration || duration < 0) return {};
-  const h = Math.floor(duration / 3600);
-  const m = Math.floor((duration % 3600) / 60);
-  const s = Math.floor((duration % 3600) % 60);
-
-  return { h, m, s };
-};
-
-export const parseDurationString = (time: string): HMS | undefined => {
-  const [hours, minutes] = time.split(":");
-  if (!hours && !minutes) {
-    return undefined;
-  }
-  const h = Number(hours);
-  const m = Number(minutes);
-  if (
-    Number.isNaN(h) ||
-    Number.isNaN(m) ||
-    h >= 24 ||
-    h < 0 ||
-    m < 0 ||
-    m >= 60
-  ) {
-    return undefined;
-  }
-  return { h, m };
-};
-
-export const convertHMSToSeconds = (input: string): number | null => {
-  const result = Number(new Date(`1970-01-01T${input}Z`).getTime() / 1000);
-  return Number.isNaN(result) ? null : result;
-};
-
-export const formatTimeDistance = (
-  timeStart: string,
-  timeEnd: string
-): number | undefined => {
-  const startArr = timeStart.split(":");
-  const endArr = timeEnd.split(":");
-
-  if ([...startArr, ...endArr].some((n) => !Number.isInteger(Number(n)))) {
-    return undefined;
-  }
-
-  const startDate = new Date(
-    1,
-    1,
-    1970,
-    Number(startArr[0]),
-    Number(startArr[1]),
-    Number(startArr[2])
-  );
-  const endDate = new Date(
-    1,
-    1,
-    1970,
-    Number(endArr[0]),
-    Number(endArr[1]),
-    Number(endArr[2])
-  );
-
-  return Math.abs(endDate.getTime() - startDate.getTime()) / 1000;
-};
-
 interface IAgeGroups {
   minimum?: number;
   maximum?: number;
 }
 
-// TODO rename to print or format
-export const parseAgeGroups = (ageGroups: IAgeGroups): string => {
-  return i18next.t("common.agesSuffix", {
+export function formatAgeGroups(ageGroups: IAgeGroups, t: TFunction): string {
+  return t("common.agesSuffix", {
     range: trim(`${ageGroups.minimum || ""}-${ageGroups.maximum || ""}`, "-"),
   });
-};
+}
 
-// TODO rename to print or format
+// TODO why have the two separate versions of this? (s)
+export function formatAgeGroup(
+  group:
+    | Maybe<
+        Pick<NonNullable<ReservationNode["ageGroup"]>, "minimum" | "maximum">
+      >
+    | undefined
+): string | null {
+  return group ? `${group.minimum}-${group.maximum || ""}` : null;
+}
+
+// TODO rename to format
 export function parseAddress(
   location: LocationFieldsFragment | null | undefined
 ): string {
@@ -250,14 +170,4 @@ export function getReserveeName(
     prefix = t ? t("Reservations.prefixes.staff") : "";
   }
   return truncate(prefix + (reservation.reserveeName ?? "-"), length);
-}
-
-export function formatAgeGroup(
-  group:
-    | Maybe<
-        Pick<NonNullable<ReservationNode["ageGroup"]>, "minimum" | "maximum">
-      >
-    | undefined
-): string | null {
-  return group ? `${group.minimum}-${group.maximum || ""}` : null;
 }

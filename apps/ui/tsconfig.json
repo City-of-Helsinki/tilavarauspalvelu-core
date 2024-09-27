@@ -4,9 +4,7 @@
     "plugins": [{ "name": "next" }],
     "paths": {
       "@/*": ["./*"],
-      "@gql/*": ["./gql/*"],
-      // ~ is old prefer the @ as base path
-      "~/*": ["./*"]
+      "@gql/*": ["./gql/*"]
     }
   },
   "include": [
@@ -29,9 +27,6 @@
     ".eslintrc.js"
   ],
   "exclude": [
-    "node_modules",
-    // ignore tests till this is added to all test files
-    // import {expect, jest, test} from '@jest/globals';
-    // "**/*.spec.ts",
+    "node_modules"
   ]
 }
