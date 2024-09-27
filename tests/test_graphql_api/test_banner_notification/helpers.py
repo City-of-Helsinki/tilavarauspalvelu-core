@@ -4,7 +4,7 @@ from typing import Any, NamedTuple
 
 from graphene_django_extensions.testing import build_mutation, build_query
 
-from common.enums import BannerNotificationTarget
+from tilavarauspalvelu.enums import BannerNotificationTarget
 
 banner_notifications_query = partial(build_query, "bannerNotifications", connection=True, order_by="pkAsc")
 

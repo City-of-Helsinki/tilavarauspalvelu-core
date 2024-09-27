@@ -5,11 +5,11 @@ from django.contrib import admin
 from django.db.models import Count, QuerySet
 from django.utils.translation import gettext_lazy as _
 
-from common.typing import WSGIRequest
 from tilavarauspalvelu.admin.reservable_time_span.admin import ReservableTimeSpanInline
 from tilavarauspalvelu.admin.reservation_unit.admin import ReservationUnitInline
 from tilavarauspalvelu.constants import NEVER_ANY_OPENING_HOURS_HASH
 from tilavarauspalvelu.models import OriginHaukiResource
+from tilavarauspalvelu.typing import WSGIRequest
 from tilavarauspalvelu.utils.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
 
 __all__ = [

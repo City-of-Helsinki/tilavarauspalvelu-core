@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING, Any
 from graphene_django_extensions.permissions import BasePermission
 
 if TYPE_CHECKING:
-    from common.typing import AnyUser
     from tilavarauspalvelu.models import Application
+    from tilavarauspalvelu.typing import AnyUser
 
 
 class ApplicationPermission(BasePermission):

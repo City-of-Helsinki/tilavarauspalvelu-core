@@ -4,9 +4,9 @@ from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import IntChoiceFilter, IntMultipleChoiceFilter
 from lookup_property import L
 
-from common.db import text_search
-from common.utils import log_text_search
 from tilavarauspalvelu.models import RejectedOccurrence
+from utils.db import text_search
+from utils.utils import log_text_search
 
 __all__ = [
     "RejectedOccurrenceFilterSet",

@@ -11,11 +11,11 @@ from django.db import migrations, models
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 
-import common.fields.model
+import utils.fields.model
 
 
 def year_not_in_future(year: int | None) -> None:
-    from common.date_utils import DEFAULT_TIMEZONE
+    from utils.date_utils import DEFAULT_TIMEZONE
 
     if year is None:
         return
@@ -162,7 +162,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="applicationeventschedule",
             name="allocated_day",
-            field=common.fields.model.IntChoiceField(
+            field=utils.fields.model.IntChoiceField(
                 blank=True,
                 enum=WeekdayChoice,
                 default=None,
@@ -369,7 +369,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="application",
             name="applicant_type",
-            field=common.fields.model.StrChoiceField(enum=ApplicantTypeChoice, db_index=True, max_length=11, null=True),
+            field=utils.fields.model.StrChoiceField(enum=ApplicantTypeChoice, db_index=True, max_length=11, null=True),
         ),
         migrations.AlterField(
             model_name="application",
@@ -550,7 +550,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="applicationeventschedule",
             name="day",
-            field=common.fields.model.IntChoiceField(
+            field=utils.fields.model.IntChoiceField(
                 enum=WeekdayChoice,
                 validators=[
                     django.core.validators.MinValueValidator(limit_value=0, message="Value must be between 0 and 6."),
@@ -566,7 +566,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="applicationeventschedule",
             name="priority",
-            field=common.fields.model.IntChoiceField(
+            field=utils.fields.model.IntChoiceField(
                 blank=True,
                 enum=ReservationPriorityChoice,
                 default=300,
@@ -773,7 +773,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="organisation",
             name="organisation_type",
-            field=common.fields.model.StrChoiceField(enum=OrganizationTypeChoice, default="COMPANY", max_length=24),
+            field=utils.fields.model.StrChoiceField(enum=OrganizationTypeChoice, default="COMPANY", max_length=24),
         ),
         migrations.AlterField(
             model_name="organisation",

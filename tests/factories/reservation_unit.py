@@ -5,9 +5,9 @@ from typing import Any
 import factory
 from factory import fuzzy
 
-from common.date_utils import local_start_of_day
 from tilavarauspalvelu.enums import AuthenticationType, ReservationKind, ReservationStartInterval
 from tilavarauspalvelu.models import ReservationUnit
+from utils.date_utils import local_start_of_day
 
 from ._base import GenericDjangoModelFactory, ManyToManyFactory, NullableSubFactory, OneToManyFactory
 

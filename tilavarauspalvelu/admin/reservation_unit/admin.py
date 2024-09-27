@@ -10,12 +10,12 @@ from django.utils.translation import gettext_lazy as _
 from lookup_property import L
 from modeltranslation.admin import TabbedTranslationAdmin
 
-from common.typing import WSGIRequest
 from tilavarauspalvelu.admin.application_round_time_slot.admin import ApplicationRoundTimeSlotInline
 from tilavarauspalvelu.admin.reservation_unit_image.admin import ReservationUnitImageInline
 from tilavarauspalvelu.admin.reservation_unit_pricing.admin import ReservationUnitPricingInline
 from tilavarauspalvelu.enums import ReservationKind
 from tilavarauspalvelu.models import ReservationUnit
+from tilavarauspalvelu.typing import WSGIRequest
 from tilavarauspalvelu.utils.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from tilavarauspalvelu.utils.reservation_units.export_data import ReservationUnitExporter
 

@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Self
 from django.db import models
 from lookup_property import L
 
-from common.date_utils import TimeSlot, merge_time_slots
+from utils.date_utils import TimeSlot, merge_time_slots
 
 if TYPE_CHECKING:
     import datetime

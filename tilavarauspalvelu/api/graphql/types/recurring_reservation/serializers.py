@@ -9,8 +9,6 @@ from graphql import GraphQLError
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from common.date_utils import local_date
-from common.fields.serializer import CurrentUserDefaultNullable, input_only_field
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import (
     ReservationStartInterval,
@@ -22,6 +20,8 @@ from tilavarauspalvelu.models import RecurringReservation, Reservation, Reservat
 from tilavarauspalvelu.models.recurring_reservation.actions import ReservationDetails
 from tilavarauspalvelu.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task
 from tilavarauspalvelu.utils.opening_hours.reservable_time_span_client import ReservableTimeSpanClient
+from utils.date_utils import local_date
+from utils.fields.serializer import CurrentUserDefaultNullable, input_only_field
 
 __all__ = [
     "RecurringReservationCreateSerializer",

@@ -6,13 +6,13 @@ from django.db.models import Q
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import IntMultipleChoiceFilter
 
-from common.date_utils import local_datetime
 from tilavarauspalvelu.enums import ReservationKind, UserRoleChoice
 from tilavarauspalvelu.models import Unit
 from tilavarauspalvelu.models.unit.queryset import UnitQuerySet
+from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
-    from common.typing import AnyUser
+    from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
     "UnitFilterSet",

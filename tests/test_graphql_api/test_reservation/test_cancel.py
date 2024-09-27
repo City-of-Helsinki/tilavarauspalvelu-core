@@ -5,12 +5,12 @@ from unittest import mock
 
 import pytest
 
-from common.date_utils import local_datetime
 from tests.factories import EmailTemplateFactory, PaymentOrderFactory, ReservationFactory
 from tests.helpers import patch_method
 from tilavarauspalvelu.enums import EmailType, OrderStatus, PaymentType, ReservationStateChoice
 from tilavarauspalvelu.models import ReservationCancelReason
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
+from utils.date_utils import local_datetime
 
 from .helpers import CANCEL_MUTATION, get_cancel_data
 

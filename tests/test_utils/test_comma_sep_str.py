@@ -1,6 +1,6 @@
 import pytest
 
-from common.utils import comma_sep_str
+from utils.utils import comma_sep_str
 
 
 @pytest.mark.parametrize(

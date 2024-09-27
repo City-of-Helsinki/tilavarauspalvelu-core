@@ -4,8 +4,8 @@ import datetime
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
-from common.date_utils import DEFAULT_TIMEZONE, combine, local_start_of_day
 from tilavarauspalvelu.enums import HaukiResourceState
+from utils.date_utils import DEFAULT_TIMEZONE, combine, local_start_of_day
 
 if TYPE_CHECKING:
     import zoneinfo

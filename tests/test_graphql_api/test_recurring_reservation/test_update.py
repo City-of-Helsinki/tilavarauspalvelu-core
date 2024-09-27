@@ -2,8 +2,8 @@ import datetime
 
 import pytest
 
-from common.date_utils import local_start_of_day, next_hour
 from tests.factories import RecurringReservationFactory, ReservationUnitFactory
+from utils.date_utils import local_start_of_day, next_hour
 
 from .helpers import UPDATE_MUTATION
 

@@ -6,7 +6,7 @@ from django.db import models
 from mptt.managers import TreeManager
 from mptt.querysets import TreeQuerySet
 
-from common.db import SubqueryArray
+from utils.db import SubqueryArray
 
 if TYPE_CHECKING:
     from mptt.models import MPTTOptions

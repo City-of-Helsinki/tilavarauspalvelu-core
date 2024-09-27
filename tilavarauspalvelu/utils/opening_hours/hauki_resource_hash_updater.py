@@ -3,12 +3,12 @@ from datetime import datetime, time
 
 from django.utils import timezone
 
-from common.date_utils import DEFAULT_TIMEZONE
 from tilavarauspalvelu.exceptions import ReservableTimeSpanClientNothingToDoError, ReservableTimeSpanClientValueError
 from tilavarauspalvelu.models import OriginHaukiResource
 from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.utils.opening_hours.hauki_api_types import HaukiAPIResource
 from tilavarauspalvelu.utils.opening_hours.reservable_time_span_client import ReservableTimeSpanClient
+from utils.date_utils import DEFAULT_TIMEZONE
 
 logger = logging.getLogger(__name__)
 

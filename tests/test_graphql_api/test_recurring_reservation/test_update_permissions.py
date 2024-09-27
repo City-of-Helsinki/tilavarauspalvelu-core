@@ -1,7 +1,7 @@
 import pytest
 
-from common.date_utils import next_hour
 from tests.factories import RecurringReservationFactory, UserFactory
+from utils.date_utils import next_hour
 
 from .helpers import UPDATE_MUTATION
 

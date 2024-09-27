@@ -10,9 +10,9 @@ from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 from rest_framework.exceptions import ValidationError
 
-from common.date_utils import DEFAULT_TIMEZONE
-from common.fields.model import StrChoiceField
 from tilavarauspalvelu.enums import OrganizationTypeChoice
+from utils.date_utils import DEFAULT_TIMEZONE
+from utils.fields.model import StrChoiceField
 
 from .queryset import OrganisationQuerySet
 

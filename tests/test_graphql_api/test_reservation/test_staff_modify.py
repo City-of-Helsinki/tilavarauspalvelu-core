@@ -2,9 +2,9 @@ import datetime
 
 import pytest
 
-from common.date_utils import next_hour
 from tests.factories import ReservationFactory
 from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
+from utils.date_utils import next_hour
 
 from .helpers import UPDATE_STAFF_MUTATION, get_staff_modify_data
 

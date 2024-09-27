@@ -6,7 +6,7 @@ import django.db.models.constraints
 import django.db.models.deletion
 from django.db import migrations, models
 
-import common.fields.model
+import utils.fields.model
 
 
 class Weekday(models.TextChoices):
@@ -83,7 +83,7 @@ class Migration(migrations.Migration):
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 (
                     "priority",
-                    common.fields.model.StrChoiceField(
+                    utils.fields.model.StrChoiceField(
                         choices=[("PRIMARY", "Primary"), ("SECONDARY", "Secondary")],
                         enum=Priority,
                         max_length=9,
@@ -91,7 +91,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "day_of_the_week",
-                    common.fields.model.StrChoiceField(
+                    utils.fields.model.StrChoiceField(
                         choices=[
                             ("MONDAY", "Monday"),
                             ("TUESDAY", "Tuesday"),
@@ -160,7 +160,7 @@ class Migration(migrations.Migration):
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 (
                     "day_of_the_week",
-                    common.fields.model.StrChoiceField(
+                    utils.fields.model.StrChoiceField(
                         choices=[
                             ("MONDAY", "Monday"),
                             ("TUESDAY", "Tuesday"),

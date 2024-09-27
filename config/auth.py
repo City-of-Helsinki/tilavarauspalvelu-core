@@ -7,13 +7,12 @@ from django.conf import settings
 from django.contrib.auth.backends import ModelBackend
 from helusers.tunnistamo_oidc import TunnistamoOIDCAuth
 
-from common.utils import update_query_params
 from tilavarauspalvelu.models import User
+from utils.utils import update_query_params
 
 if TYPE_CHECKING:
-    from common.typing import WSGIRequest
+    from tilavarauspalvelu.typing import WSGIRequest
     from tilavarauspalvelu.utils.helauth.typing import TokenResponse
-
 
 __all__ = [
     "ProxyModelBackend",

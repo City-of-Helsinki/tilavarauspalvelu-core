@@ -6,7 +6,6 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils.timezone import get_default_timezone
 
-from common.date_utils import local_datetime
 from config.utils.date_util import localized_short_weekday
 from tilavarauspalvelu.models import PaymentMerchant, PaymentProduct, Reservation
 from tilavarauspalvelu.utils.reservation_units.reservation_unit_payment_helper import ReservationUnitPaymentHelper
@@ -18,6 +17,7 @@ from tilavarauspalvelu.utils.verkkokauppa.order.types import (
     OrderItemMetaParams,
     OrderItemParams,
 )
+from utils.date_utils import local_datetime
 
 
 def parse_datetime(string: str | None) -> datetime | None:

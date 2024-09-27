@@ -16,8 +16,8 @@ from tilavarauspalvelu.enums import (
 from tilavarauspalvelu.models import ApplicationRound
 
 if TYPE_CHECKING:
-    from common.typing import WSGIRequest
     from tilavarauspalvelu.admin.allocated_timeslot.admin import AllocatedTimeSlotAdmin
+    from tilavarauspalvelu.typing import WSGIRequest
 
 
 class ApplicationRoundFilter(admin.SimpleListFilter):

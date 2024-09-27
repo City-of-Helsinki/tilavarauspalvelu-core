@@ -8,7 +8,7 @@ from graphene_django.forms.converter import convert_form_field, get_form_field_d
 from graphene_django.registry import Registry
 from lookup_property.field import LookupPropertyField
 
-from common.typing import GQLInfo
+from tilavarauspalvelu.typing import GQLInfo
 
 __all__ = [
     "EnumChoiceField",

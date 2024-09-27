@@ -4,12 +4,12 @@ from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from rest_framework.exceptions import ValidationError
 
-from common.date_utils import local_datetime
-from common.utils import comma_sep_str
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import ReservationStateChoice
 from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.utils.email.reservation_email_notification_sender import ReservationEmailNotificationSender
+from utils.date_utils import local_datetime
+from utils.utils import comma_sep_str
 
 __all__ = [
     "ReservationDenySerializer",

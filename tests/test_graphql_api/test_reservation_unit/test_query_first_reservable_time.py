@@ -10,7 +10,6 @@ from django.core.cache import cache
 from graphene_django_extensions.testing.client import GQLResponse
 from graphene_django_extensions.testing.utils import parametrize_helper
 
-from common.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 from tests.factories import (
     ApplicationRoundFactory,
     OriginHaukiResourceFactory,
@@ -28,6 +27,7 @@ from tilavarauspalvelu.enums import (
 )
 from tilavarauspalvelu.models import AffectingTimeSpan, ReservationUnit, ReservationUnitHierarchy
 from tilavarauspalvelu.utils.first_reservable_time.first_reservable_time_helper import CachedReservableTime
+from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 
 from .helpers import reservation_units_query
 

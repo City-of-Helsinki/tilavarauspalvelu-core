@@ -4,7 +4,6 @@ import freezegun
 import pytest
 from django.utils.timezone import get_default_timezone
 
-from common.date_utils import local_datetime, next_hour, timedelta_to_json
 from tests.factories import (
     AgeGroupFactory,
     CityFactory,
@@ -19,6 +18,7 @@ from tests.factories import (
 )
 from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
+from utils.date_utils import local_datetime, next_hour, timedelta_to_json
 
 from .helpers import CREATE_STAFF_MUTATION, get_staff_create_data
 

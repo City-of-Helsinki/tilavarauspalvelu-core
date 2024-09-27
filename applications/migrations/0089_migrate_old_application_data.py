@@ -5,7 +5,7 @@ import logging
 
 from django.db import migrations
 
-from common.date_utils import time_as_timedelta
+from utils.date_utils import time_as_timedelta
 
 logger = logging.getLogger(__name__)
 

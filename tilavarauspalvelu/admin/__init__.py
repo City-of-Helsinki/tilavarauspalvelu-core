@@ -5,6 +5,7 @@ from .allocated_timeslot.admin import AllocatedTimeSlotAdmin
 from .application.admin import ApplicationAdmin
 from .application_round.admin import ApplicationRoundAdmin
 from .application_section.admin import ApplicationSectionAdmin
+from .banner_notification.admin import BannerNotificationAdmin
 from .city.admin import CityAdmin
 from .email_template.admin import EmailTemplateAdmin
 from .equipment.admin import EquipmentAdmin
@@ -22,6 +23,7 @@ from .person.admin import PersonAdmin
 from .purpose.admin import PurposeAdmin
 from .qualifier.admin import QualifierAdmin
 from .recurring_reservation.admin import RecurringReservationAdmin
+from .request_log.admin import RequestLogAdmin
 from .reservation.admin import ReservationAdmin
 from .reservation_cancel_reason.admin import ReservationCancelReasonAdmin
 from .reservation_deny_reason.admin import ReservationDenyReasonAdmin
@@ -38,6 +40,7 @@ from .resource.admin import ResourceAdmin
 from .service.admin import ServiceAdmin
 from .service_sector.admin import ServiceSectorAdmin
 from .space.admin import SpaceAdmin
+from .sql_log.admin import SQLLogAdmin
 from .tax_percentage.admin import TaxPercentageAdmin
 from .terms_of_use.admin import TermsOfUseAdmin
 from .unit.admin import UnitAdmin
@@ -53,6 +56,7 @@ __all__ = [
     "ApplicationAdmin",
     "ApplicationRoundAdmin",
     "ApplicationSectionAdmin",
+    "BannerNotificationAdmin",
     "CityAdmin",
     "EmailTemplateAdmin",
     "EquipmentAdmin",
@@ -70,6 +74,7 @@ __all__ = [
     "PurposeAdmin",
     "QualifierAdmin",
     "RecurringReservationAdmin",
+    "RequestLogAdmin",
     "ReservationAdmin",
     "ReservationCancelReasonAdmin",
     "ReservationDenyReasonAdmin",
@@ -83,6 +88,7 @@ __all__ = [
     "ReservationUnitPricingAdmin",
     "ReservationUnitTypeAdmin",
     "ResourceAdmin",
+    "SQLLogAdmin",
     "ServiceAdmin",
     "ServiceSectorAdmin",
     "SpaceAdmin",

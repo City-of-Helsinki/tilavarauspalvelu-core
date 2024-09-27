@@ -7,8 +7,8 @@ from graphene_django_extensions.permissions import BasePermission
 if TYPE_CHECKING:
     from query_optimizer.typing import GraphQLFilterInfo
 
-    from common.typing import AnyUser
     from tilavarauspalvelu.models import User
+    from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
     "UserPermission",

@@ -2,7 +2,7 @@ from typing import Literal, Self
 
 from django.db import models
 
-from common.db import SubqueryCount
+from utils.db import SubqueryCount
 
 __all__ = [
     "UnitManager",

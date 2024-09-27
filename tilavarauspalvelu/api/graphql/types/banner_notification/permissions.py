@@ -2,9 +2,9 @@ from typing import Any
 
 from graphene_django_extensions.permissions import BasePermission
 
-from common.enums import BannerNotificationTarget
-from common.models import BannerNotification
-from common.typing import AnyUser
+from tilavarauspalvelu.enums import BannerNotificationTarget
+from tilavarauspalvelu.models.banner_notification.model import BannerNotification
+from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
     "BannerNotificationPermission",

@@ -12,8 +12,6 @@ from graphene_django_extensions.filters import (
 )
 from lookup_property import L
 
-from common.db import text_search
-from common.utils import log_text_search
 from tilavarauspalvelu.enums import (
     ApplicantTypeChoice,
     ApplicationSectionStatusChoice,
@@ -22,6 +20,8 @@ from tilavarauspalvelu.enums import (
 )
 from tilavarauspalvelu.models import ApplicationSection
 from tilavarauspalvelu.models.application_section.queryset import ApplicationSectionQuerySet
+from utils.db import text_search
+from utils.utils import log_text_search
 
 __all__ = [
     "ApplicationSectionFilterSet",

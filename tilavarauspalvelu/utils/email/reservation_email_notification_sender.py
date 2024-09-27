@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from common.date_utils import local_datetime
 from tilavarauspalvelu.enums import EmailType, ReservationNotification, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.tasks import send_reservation_email_task, send_staff_reservation_email_task
+from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Reservation

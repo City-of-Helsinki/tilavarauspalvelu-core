@@ -2,7 +2,6 @@ import datetime
 
 import pytest
 
-from common.date_utils import local_datetime
 from tests.factories import (
     ApplicationRoundFactory,
     EquipmentFactory,
@@ -13,6 +12,7 @@ from tests.factories import (
     UserFactory,
 )
 from tilavarauspalvelu.enums import ReservationKind, ReservationUnitPublishingState, ReservationUnitReservationState
+from utils.date_utils import local_datetime
 
 from .helpers import (
     create_reservation_units_for_reservation_state_filtering,

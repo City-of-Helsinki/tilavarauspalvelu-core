@@ -7,7 +7,13 @@ import freezegun
 import pytest
 from graphene_django_extensions.testing import parametrize_helper
 
-from common.date_utils import (
+from config.utils.date_util import (
+    InvalidWeekdayError,
+    localized_short_weekday,
+    next_or_current_matching_weekday,
+    previous_or_current_matching_weekday,
+)
+from utils.date_utils import (
     DEFAULT_TIMEZONE,
     combine,
     compare_datetimes,
@@ -27,12 +33,6 @@ from common.date_utils import (
     utc_time,
     utc_time_max,
     utc_time_min,
-)
-from config.utils.date_util import (
-    InvalidWeekdayError,
-    localized_short_weekday,
-    next_or_current_matching_weekday,
-    previous_or_current_matching_weekday,
 )
 
 

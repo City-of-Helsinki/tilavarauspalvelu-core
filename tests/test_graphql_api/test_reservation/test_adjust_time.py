@@ -6,7 +6,6 @@ import freezegun
 import pytest
 from django.utils.timezone import get_default_timezone
 
-from common.date_utils import local_date, local_datetime
 from tests.factories import (
     ApplicationRoundFactory,
     EmailTemplateFactory,
@@ -20,6 +19,7 @@ from tests.factories import (
 )
 from tilavarauspalvelu.enums import EmailType, ReservationStartInterval, ReservationStateChoice
 from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
+from utils.date_utils import local_date, local_datetime
 
 from .helpers import ADJUST_MUTATION, get_adjust_data
 

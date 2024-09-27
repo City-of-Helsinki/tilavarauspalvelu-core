@@ -13,215 +13,6 @@ msgstr ""
 msgid "is after current year"
 msgstr "on nykyvuoden jälkeen"
 
-#: common/admin/banner_notification.py
-msgid "Name of the notification. Should be unique."
-msgstr "Ilmoituksen nimi. Tulee olla uniikki."
-
-#: common/admin/banner_notification.py
-msgid "Notification body."
-msgstr "Ilmoituksen sisältö."
-
-#: common/admin/banner_notification.py
-msgid "Level of the notification."
-msgstr "Ilmoituksen taso."
-
-#: common/admin/banner_notification.py
-msgid "Target user interface of the notification."
-msgstr "Ilmoituksen kohdistettu käyttöliittymä."
-
-#: common/admin/banner_notification.py
-msgid ""
-"Start date of the notification. If empty, 'active_until' must also be empty."
-msgstr ""
-"Ilmoituksen alkamispäivämäärä. Jos tyhjä, 'active_until' täytyy myös olla "
-"tyhjä."
-
-#: common/admin/banner_notification.py
-msgid ""
-"End date of the notification. If empty, 'active_from' must also be empty."
-msgstr ""
-"Ilmoituksen loppumispäivämäärä. Jos tyhjä, 'active_from' täytyy myös olla "
-"tyhjä."
-
-#: common/admin/banner_notification.py
-msgid ""
-"Is the notification a draft. Drafts won't be shown to users, even if they "
-"would be active."
-msgstr ""
-"Onko ilmoitus luonnos. Luonnoksia ei näytetä käyttäjille, vaikka ne olisivat "
-"aktiivisia."
-
-#: common/admin/request_log.py common/admin/sql_log.py
-msgid "SQL"
-msgstr "SQL"
-
-#: common/admin/request_log.py common/admin/sql_log.py
-msgid "Duration (ns)"
-msgstr "Kesto (ns)"
-
-#: common/admin/request_log.py common/admin/sql_log.py
-msgid "Succeeded"
-msgstr "Onnistunut"
-
-#: common/admin/request_log.py common/admin/sql_log.py
-msgid "SQL that was executed (without params)."
-msgstr "Suoritettu SQL (ilman parametreja)."
-
-#: common/admin/request_log.py common/admin/sql_log.py
-msgid "Duration of the SQL query in nanoseconds."
-msgstr "SQL-kyselyn kesto nanosekunteina."
-
-#: common/admin/request_log.py common/admin/sql_log.py
-msgid "Whether the SQL query succeeded or not."
-msgstr "Onnistuiko SQL-kysely vai ei."
-
-#: common/admin/request_log.py common/admin/sql_log.py
-msgid "Stack Info"
-msgstr "Stack Info"
-
-#: common/admin/request_log.py common/admin/sql_log.py
-msgid "Request ID"
-msgstr "Rajapintakyselyn ID"
-
-#: common/admin/request_log.py common/admin/sql_log.py
-msgid "Path"
-msgstr "Polku"
-
-#: common/admin/request_log.py
-msgid "Body"
-msgstr "Sisältö"
-
-#: common/admin/request_log.py common/admin/sql_log.py
-msgid "Duration (ms)"
-msgstr "Kesto (ms)"
-
-#: common/admin/request_log.py
-msgid "Created"
-msgstr "Luotu"
-
-#: common/admin/request_log.py
-msgid "Random ID for grouping this log with other logs from the same request."
-msgstr ""
-"Satunnainen ID, jonka avulla tämä loki voidaan ryhmitellä muiden saman "
-"rajapintakyselyn aikana luotujen lokien kanssa."
-
-#: common/admin/request_log.py
-msgid "Request path where the SQL was executed."
-msgstr "Rajapintakyselyn polku, jossa SQL suoritettiin."
-
-#: common/admin/request_log.py
-msgid "Body of the request that executed the SQL."
-msgstr "Rajapintakyselyn sisältö, joka suoritti SQL:n."
-
-#: common/admin/request_log.py
-msgid "Duration of the request in milliseconds."
-msgstr "Rajapintakyselyn kesto millisekuntia."
-
-#: common/admin/request_log.py
-msgid "When the SQL query was executed."
-msgstr "Milloin SQL-kysely suoritettiin."
-
-#: common/admin/request_log.py
-msgid "Search by request ID, path or body"
-msgstr "Etsi rajapintakyselyn ID:llä, polulla tai sisällöllä"
-
-#: common/admin/request_log.py
-msgid "Queries"
-msgstr "Tietokantakyselyjä"
-
-#: common/admin/request_log.py
-msgid "Duration Total (ms)"
-msgstr "Kesto yhteensä (ms)"
-
-#: common/admin/request_log.py
-msgid "Duration SQL (ms)"
-msgstr "Kyselyn kesto (ms)"
-
-#: common/admin/request_log.py
-msgid "Export rows to CSV"
-msgstr "Vie lokit CSV tiedostoon"
-
-#: common/admin/sql_log.py common/models/sql_log.py
-msgid "Request log"
-msgstr "Rajapintakutsun loki"
-
-#: common/admin/sql_log.py
-msgid "Stack trace where the SQL query was executed."
-msgstr "Stack trace siellä missä SQL-kysely suoritettiin."
-
-#: common/admin/sql_log.py
-msgid "Search by SQL, request log path, body or request ID"
-msgstr "Etsi SQL:llä, rajapintakutsun polulla, sisällöllä tai ID:llä"
-
-#: common/enums.py
-msgctxt "BannerNotificationLevel"
-msgid "Exception"
-msgstr "Poikkeus"
-
-#: common/enums.py
-msgctxt "BannerNotificationLevel"
-msgid "Warning"
-msgstr "Varoitus"
-
-#: common/enums.py
-msgctxt "BannerNotificationLevel"
-msgid "Normal"
-msgstr "Normaali"
-
-#: common/enums.py
-msgctxt "BannerNotificationTarget"
-msgid "All"
-msgstr "Kaikki"
-
-#: common/enums.py
-msgctxt "BannerNotificationTarget"
-msgid "Staff"
-msgstr "Henkilökunta"
-
-#: common/enums.py
-msgctxt "BannerNotificationTarget"
-msgid "User"
-msgstr "Käyttäjä"
-
-#: common/enums.py
-msgctxt "BannerNotificationState"
-msgid "Draft"
-msgstr "Luonnos"
-
-#: common/enums.py
-msgctxt "BannerNotificationState"
-msgid "Scheduled"
-msgstr "Ajastettu"
-
-#: common/enums.py
-msgctxt "BannerNotificationState"
-msgid "Active"
-msgstr "Aktiivinen"
-
-#: common/models/banner_notification.py
-msgid "Non-draft notifications must have an active period and message set."
-msgstr "Ei-luonnos ilmoituksilla täytyy olla aktiivinen ajanjakso ja viesti."
-
-#: common/models/banner_notification.py
-msgid ""
-"Both 'active_from' and 'active_until' must be either empty or set. If both "
-"are set, 'active_until' must be after 'active_from'."
-msgstr ""
-"'active_from' ja 'active_until' täytyy olla joko tyhjiä tai asetettuja. Jos "
-"molemmat on asetettu, 'active_until' täytyy olla 'active_from' jälkeen."
-
-#: common/models/sql_log.py
-msgid "Request logs"
-msgstr "Rajapintakutsujen lokit"
-
-#: common/models/sql_log.py
-msgid "SQL log"
-msgstr "SQL loki"
-
-#: common/models/sql_log.py
-msgid "SQL logs"
-msgstr "SQL lokit"
-
 #: config/settings.py tilavarauspalvelu/enums.py
 msgid "Finnish"
 msgstr "Suomi"
@@ -428,7 +219,8 @@ msgstr "Luotu"
 #: tilavarauspalvelu/admin/application_round/admin.py
 #: tilavarauspalvelu/admin/application_section/admin.py
 #: tilavarauspalvelu/admin/reservation/admin.py
-#: tilavarauspalvelu/admin/reservation_unit/admin.py users/admin/user.py
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
+#: tilavarauspalvelu/admin/user/admin.py
 msgid "Basic information"
 msgstr "Perustiedot"
 
@@ -550,7 +342,8 @@ msgid "Home city"
 msgstr "Kotikunta"
 
 #: tilavarauspalvelu/admin/application/form.py
-#: tilavarauspalvelu/admin/reservation/admin.py users/admin/user.py
+#: tilavarauspalvelu/admin/reservation/admin.py
+#: tilavarauspalvelu/admin/user/admin.py
 msgid "Additional information"
 msgstr "Lisätiedot"
 
@@ -998,6 +791,44 @@ msgstr "Hakemuksen osan ikäryhmä."
 msgid "Purpose for this section."
 msgstr "Hakemuksen osan käyttötarkoitus."
 
+#: tilavarauspalvelu/admin/banner_notification/admin.py
+msgid "Name of the notification. Should be unique."
+msgstr "Ilmoituksen nimi. Tulee olla uniikki."
+
+#: tilavarauspalvelu/admin/banner_notification/admin.py
+msgid "Notification body."
+msgstr "Ilmoituksen sisältö."
+
+#: tilavarauspalvelu/admin/banner_notification/admin.py
+msgid "Level of the notification."
+msgstr "Ilmoituksen taso."
+
+#: tilavarauspalvelu/admin/banner_notification/admin.py
+msgid "Target user interface of the notification."
+msgstr "Ilmoituksen kohdistettu käyttöliittymä."
+
+#: tilavarauspalvelu/admin/banner_notification/admin.py
+msgid ""
+"Start date of the notification. If empty, 'active_until' must also be empty."
+msgstr ""
+"Ilmoituksen alkamispäivämäärä. Jos tyhjä, 'active_until' täytyy myös olla "
+"tyhjä."
+
+#: tilavarauspalvelu/admin/banner_notification/admin.py
+msgid ""
+"End date of the notification. If empty, 'active_from' must also be empty."
+msgstr ""
+"Ilmoituksen loppumispäivämäärä. Jos tyhjä, 'active_from' täytyy myös olla "
+"tyhjä."
+
+#: tilavarauspalvelu/admin/banner_notification/admin.py
+msgid ""
+"Is the notification a draft. Drafts won't be shown to users, even if they "
+"would be active."
+msgstr ""
+"Onko ilmoitus luonnos. Luonnoksia ei näytetä käyttäjille, vaikka ne olisivat "
+"aktiivisia."
+
 #: tilavarauspalvelu/admin/city/admin.py
 msgid "Municipality"
 msgstr "Kunta"
@@ -1268,6 +1099,71 @@ msgstr "Henkilön puhelinnumero"
 #: tilavarauspalvelu/admin/person/admin.py
 msgid "Search by first name or last name."
 msgstr "Etsi etu- tai sukunimellä."
+
+#: tilavarauspalvelu/admin/request_log/admin.py
+#: tilavarauspalvelu/admin/sql_log/admin.py
+msgid "Request ID"
+msgstr "Rajapintakyselyn ID"
+
+#: tilavarauspalvelu/admin/request_log/admin.py
+#: tilavarauspalvelu/admin/sql_log/admin.py
+msgid "Path"
+msgstr "Polku"
+
+#: tilavarauspalvelu/admin/request_log/admin.py
+msgid "Body"
+msgstr "Sisältö"
+
+#: tilavarauspalvelu/admin/request_log/admin.py
+#: tilavarauspalvelu/admin/sql_log/admin.py
+msgid "Duration (ms)"
+msgstr "Kesto (ms)"
+
+#: tilavarauspalvelu/admin/request_log/admin.py
+msgid "Created"
+msgstr "Luotu"
+
+#: tilavarauspalvelu/admin/request_log/admin.py
+msgid "Random ID for grouping this log with other logs from the same request."
+msgstr ""
+"Satunnainen ID, jonka avulla tämä loki voidaan ryhmitellä muiden saman "
+"rajapintakyselyn aikana luotujen lokien kanssa."
+
+#: tilavarauspalvelu/admin/request_log/admin.py
+msgid "Request path where the SQL was executed."
+msgstr "Rajapintakyselyn polku, jossa SQL suoritettiin."
+
+#: tilavarauspalvelu/admin/request_log/admin.py
+msgid "Body of the request that executed the SQL."
+msgstr "Rajapintakyselyn sisältö, joka suoritti SQL:n."
+
+#: tilavarauspalvelu/admin/request_log/admin.py
+msgid "Duration of the request in milliseconds."
+msgstr "Rajapintakyselyn kesto millisekuntia."
+
+#: tilavarauspalvelu/admin/request_log/admin.py
+msgid "When the SQL query was executed."
+msgstr "Milloin SQL-kysely suoritettiin."
+
+#: tilavarauspalvelu/admin/request_log/admin.py
+msgid "Search by request ID, path or body"
+msgstr "Etsi rajapintakyselyn ID:llä, polulla tai sisällöllä"
+
+#: tilavarauspalvelu/admin/request_log/admin.py
+msgid "Queries"
+msgstr "Tietokantakyselyjä"
+
+#: tilavarauspalvelu/admin/request_log/admin.py
+msgid "Duration Total (ms)"
+msgstr "Kesto yhteensä (ms)"
+
+#: tilavarauspalvelu/admin/request_log/admin.py
+msgid "Duration SQL (ms)"
+msgstr "Kyselyn kesto (ms)"
+
+#: tilavarauspalvelu/admin/request_log/admin.py
+msgid "Export rows to CSV"
+msgstr "Vie lokit CSV tiedostoon"
 
 #: tilavarauspalvelu/admin/reservation/admin.py
 msgid "Search by Reservation ID or name"
@@ -2125,6 +2021,47 @@ msgstr "Tuote, jota käytetään maksuihin"
 msgid "Search by name or unit name"
 msgstr "Etsi nimellä tai toimipisteen nimellä"
 
+#: tilavarauspalvelu/admin/sql_log/admin.py
+msgid "SQL"
+msgstr "SQL"
+
+#: tilavarauspalvelu/admin/sql_log/admin.py
+msgid "Duration (ns)"
+msgstr "Kesto (ns)"
+
+#: tilavarauspalvelu/admin/sql_log/admin.py
+msgid "Succeeded"
+msgstr "Onnistunut"
+
+#: tilavarauspalvelu/admin/sql_log/admin.py
+msgid "SQL that was executed (without params)."
+msgstr "Suoritettu SQL (ilman parametreja)."
+
+#: tilavarauspalvelu/admin/sql_log/admin.py
+msgid "Duration of the SQL query in nanoseconds."
+msgstr "SQL-kyselyn kesto nanosekunteina."
+
+#: tilavarauspalvelu/admin/sql_log/admin.py
+msgid "Whether the SQL query succeeded or not."
+msgstr "Onnistuiko SQL-kysely vai ei."
+
+#: tilavarauspalvelu/admin/sql_log/admin.py
+msgid "Stack Info"
+msgstr "Stack Info"
+
+#: tilavarauspalvelu/admin/sql_log/admin.py
+#: tilavarauspalvelu/models/request_log/model.py
+msgid "Request log"
+msgstr "Rajapintakutsun loki"
+
+#: tilavarauspalvelu/admin/sql_log/admin.py
+msgid "Stack trace where the SQL query was executed."
+msgstr "Stack trace siellä missä SQL-kysely suoritettiin."
+
+#: tilavarauspalvelu/admin/sql_log/admin.py
+msgid "Search by SQL, request log path, body or request ID"
+msgstr "Etsi SQL:llä, rajapintakutsun polulla, sisällöllä tai ID:llä"
+
 #: tilavarauspalvelu/admin/unit/admin.py
 msgid "Search by name or TPREK ID"
 msgstr "Etsi nimellä tai TPREK ID:llä"
@@ -2139,6 +2076,22 @@ msgid ""
 msgstr ""
 "Etsi käyttäjänimellä, sähköpostilla, etu- tai sukunimellä, toimipisteellä "
 "tai yksikköryhmällä"
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Search by Username, First name, Last name or Email"
+msgstr "Etsi käyttäjänimellä, etunimellä, sukunimellä tai sähköpostilla"
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Settings"
+msgstr "Asetukset"
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "ID token info"
+msgstr "ID token sisältö"
+
+#: tilavarauspalvelu/admin/user/admin.py
+msgid "Permissions"
+msgstr "Oikeudet"
 
 #: tilavarauspalvelu/api/gdpr/views.py
 msgid "User has upcoming or too recent reservations."
@@ -2782,6 +2735,51 @@ msgctxt "OrganizationType"
 msgid "Religious community"
 msgstr "Uskonnollinen yhteisö"
 
+#: tilavarauspalvelu/enums.py
+msgctxt "BannerNotificationLevel"
+msgid "Exception"
+msgstr "Poikkeus"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "BannerNotificationLevel"
+msgid "Warning"
+msgstr "Varoitus"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "BannerNotificationLevel"
+msgid "Normal"
+msgstr "Normaali"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "BannerNotificationTarget"
+msgid "All"
+msgstr "Kaikki"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "BannerNotificationTarget"
+msgid "Staff"
+msgstr "Henkilökunta"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "BannerNotificationTarget"
+msgid "User"
+msgstr "Käyttäjä"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "BannerNotificationState"
+msgid "Draft"
+msgstr "Luonnos"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "BannerNotificationState"
+msgid "Scheduled"
+msgstr "Ajastettu"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "BannerNotificationState"
+msgid "Active"
+msgstr "Aktiivinen"
+
 #: tilavarauspalvelu/models/address/model.py
 msgid "Addresses"
 msgstr "Osoitteet"
@@ -2852,6 +2850,18 @@ msgid ""
 msgstr ""
 "Varauksen minimi- ja maksimikeston tulee olla 30 minuutin monikertoja, "
 "jakorkeintaan 24 tuntia."
+
+#: tilavarauspalvelu/models/banner_notification/model.py
+msgid "Non-draft notifications must have an active period and message set."
+msgstr "Ei-luonnos ilmoituksilla täytyy olla aktiivinen ajanjakso ja viesti."
+
+#: tilavarauspalvelu/models/banner_notification/model.py
+msgid ""
+"Both 'active_from' and 'active_until' must be either empty or set. If both "
+"are set, 'active_until' must be after 'active_from'."
+msgstr ""
+"'active_from' ja 'active_until' täytyy olla joko tyhjiä tai asetettuja. Jos "
+"molemmat on asetettu, 'active_until' täytyy olla 'active_from' jälkeen."
 
 #: tilavarauspalvelu/models/city/model.py
 msgid "Cities"
@@ -2941,6 +2951,10 @@ msgstr "Hylätty ajankohta"
 msgid "Rejected occurrences"
 msgstr "Hylätyt ajankohdat"
 
+#: tilavarauspalvelu/models/request_log/model.py
+msgid "Request logs"
+msgstr "Rajapintakutsujen lokit"
+
 #: tilavarauspalvelu/models/reservable_time_span/model.py
 msgid "`start_datetime` must be before `end_datetime`."
 msgstr "`start_datetime` täytyy olla ennen `end_datetime`."
@@ -3021,6 +3035,14 @@ msgstr "Varausyksikkövaihtoehdot"
 msgid "Preferred order must be unique for each application section"
 msgstr "Suosittu järjestys tulee olla uniikki jokaiselle hakemuksen osalle"
 
+#: tilavarauspalvelu/models/sql_log/model.py
+msgid "SQL log"
+msgstr "SQL loki"
+
+#: tilavarauspalvelu/models/sql_log/model.py
+msgid "SQL logs"
+msgstr "SQL lokit"
+
 #: tilavarauspalvelu/models/suitable_time_range/model.py
 msgid "Suitable Time Range"
 msgstr "Sopiva aikaväli"
@@ -3051,6 +3073,18 @@ msgstr "Toimipistekohtainen rooli"
 msgid "Unit roles"
 msgstr "Toimipistekohtaiset roolit"
 
+#: tilavarauspalvelu/models/user/model.py
+msgid "Preferred UI language"
+msgstr "Käyttöliittymän kieli"
+
+#: tilavarauspalvelu/models/user/model.py
+msgid "Reservation notification"
+msgstr "Varausilmoitus"
+
+#: tilavarauspalvelu/models/user/model.py
+msgid "Date of birth"
+msgstr "Syntymäaika"
+
 #: tilavarauspalvelu/tasks.py
 msgid "Core business"
 msgstr "Ydintoiminta"
@@ -3066,31 +3100,3 @@ msgstr "Tämä kenttä on pakollinen."
 #: tilavarauspalvelu/utils/validators.py
 msgid "Enter a valid time."
 msgstr "Syötä oikea aika."
-
-#: users/admin/user.py
-msgid "Search by Username, First name, Last name or Email"
-msgstr "Etsi käyttäjänimellä, etunimellä, sukunimellä tai sähköpostilla"
-
-#: users/admin/user.py
-msgid "Settings"
-msgstr "Asetukset"
-
-#: users/admin/user.py
-msgid "ID token info"
-msgstr "ID token sisältö"
-
-#: users/admin/user.py
-msgid "Permissions"
-msgstr "Oikeudet"
-
-#: users/models.py
-msgid "Preferred UI language"
-msgstr "Käyttöliittymän kieli"
-
-#: users/models.py
-msgid "Reservation notification"
-msgstr "Varausilmoitus"
-
-#: users/models.py
-msgid "Date of birth"
-msgstr "Syntymäaika"

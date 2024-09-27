@@ -2,9 +2,9 @@ from django.contrib import admin
 from django.db.models import QuerySet
 from lookup_property import L
 
-from common.typing import WSGIRequest
 from tilavarauspalvelu.admin.application_section.form import SuitableTimeRangeInlineAdminForm
 from tilavarauspalvelu.models import SuitableTimeRange
+from tilavarauspalvelu.typing import WSGIRequest
 
 
 class SuitableTimeRangeInline(admin.TabularInline):

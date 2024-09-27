@@ -1,4 +1,4 @@
-from common.utils import with_indices
+from utils.utils import with_indices
 
 
 def test_with_indices():

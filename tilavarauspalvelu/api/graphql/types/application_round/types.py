@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING
+
 import graphene
 from django.db import models
 from graphene_django_extensions import DjangoNode
@@ -5,14 +7,17 @@ from lookup_property import L
 from query_optimizer import AnnotatedField
 from query_optimizer.optimizer import QueryOptimizer
 
-from common.db import SubqueryCount
-from common.typing import AnyUser, GQLInfo
 from tilavarauspalvelu.enums import ApplicationRoundReservationCreationStatusChoice, ApplicationRoundStatusChoice
 from tilavarauspalvelu.models import Application, ApplicationRound, ReservationUnit
 from tilavarauspalvelu.models.application_round.queryset import ApplicationRoundQuerySet
+from tilavarauspalvelu.typing import GQLInfo
+from utils.db import SubqueryCount
 
 from .filtersets import ApplicationRoundFilterSet
 from .permissions import ApplicationRoundPermission
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import AnyUser
 
 
 class ApplicationRoundNode(DjangoNode):

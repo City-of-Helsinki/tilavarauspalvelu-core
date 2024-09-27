@@ -7,8 +7,8 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L, lookup_property
 
-from common.fields.model import StrChoiceField
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, Priority, Weekday
+from utils.fields.model import StrChoiceField
 
 from .queryset import SuitableTimeRangeQuerySet
 

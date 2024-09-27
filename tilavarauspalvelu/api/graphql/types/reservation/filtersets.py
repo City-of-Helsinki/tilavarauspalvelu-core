@@ -8,8 +8,6 @@ from django.db.models.functions import Concat
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntMultipleChoiceFilter
 
-from common.db import text_search
-from common.utils import log_text_search
 from tilavarauspalvelu.api.graphql.extensions.filters import TimezoneAwareDateFilter
 from tilavarauspalvelu.enums import (
     CustomerTypeChoice,
@@ -19,9 +17,11 @@ from tilavarauspalvelu.enums import (
     UserRoleChoice,
 )
 from tilavarauspalvelu.models import Reservation
+from utils.db import text_search
+from utils.utils import log_text_search
 
 if TYPE_CHECKING:
-    from common.typing import AnyUser
+    from tilavarauspalvelu.typing import AnyUser
 
 EMAIL_DOMAIN_PATTERN = re.compile(r"^@\w[.\w]{0,254}$")
 """

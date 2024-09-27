@@ -8,12 +8,12 @@ from elasticsearch_django.models import SearchQuery
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntMultipleChoiceFilter
 
-from common.date_utils import local_datetime
-from common.utils import log_text_search
 from elastic_django.reservation_units.query_builder import build_elastic_query_str
 from tilavarauspalvelu.enums import ReservationKind, ReservationUnitPublishingState, ReservationUnitReservationState
 from tilavarauspalvelu.models import ReservationUnit
 from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
+from utils.date_utils import local_datetime
+from utils.utils import log_text_search
 
 if TYPE_CHECKING:
     import datetime
@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
     from query_optimizer.validators import PaginationArgs
 
-    from common.typing import AnyUser
+    from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
     "ReservationUnitFilterSet",

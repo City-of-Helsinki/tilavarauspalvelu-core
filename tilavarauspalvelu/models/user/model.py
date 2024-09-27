@@ -11,11 +11,11 @@ from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 from helusers.models import AbstractUser
 
-from common.date_utils import DEFAULT_TIMEZONE
 from tilavarauspalvelu.enums import ReservationNotification, UserPermissionChoice, UserRoleChoice
 from tilavarauspalvelu.utils.helauth.typing import ExtraData, IDToken
 from tilavarauspalvelu.utils.helauth.utils import get_jwt_payload
 from tilavarauspalvelu.utils.permission_resolver import PermissionResolver
+from utils.date_utils import DEFAULT_TIMEZONE
 
 from .queryset import UserManager
 

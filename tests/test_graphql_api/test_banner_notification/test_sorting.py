@@ -6,8 +6,8 @@ from django.utils import timezone
 from freezegun import freeze_time
 from graphene_django_extensions.testing.utils import parametrize_helper
 
-from common.enums import BannerNotificationLevel, BannerNotificationTarget
 from tests.factories import BannerNotificationFactory, UserFactory
+from tilavarauspalvelu.enums import BannerNotificationLevel, BannerNotificationTarget
 
 # Applied to all tests
 pytestmark = [

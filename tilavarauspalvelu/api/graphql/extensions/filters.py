@@ -4,7 +4,7 @@ from typing import Any
 import django_filters
 from django import forms
 
-from common.date_utils import local_end_of_day, local_start_of_day
+from utils.date_utils import local_end_of_day, local_start_of_day
 
 
 class TimezoneAwareDateField(forms.DateField):

@@ -5,14 +5,14 @@ from datetime import datetime, timedelta
 from django.utils.timezone import localtime
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
 
-from common.date_utils import DEFAULT_TIMEZONE
-from common.enums import BannerNotificationLevel, BannerNotificationTarget
-from common.models import BannerNotification
+from tilavarauspalvelu.enums import BannerNotificationLevel, BannerNotificationTarget
+from tilavarauspalvelu.models.banner_notification.model import BannerNotification
 from tilavarauspalvelu.tasks import (
     prune_reservations_task,
     update_affecting_time_spans_task,
     update_expired_orders_task,
 )
+from utils.date_utils import DEFAULT_TIMEZONE
 
 from .utils import faker_en, faker_fi, faker_sv, with_logs
 

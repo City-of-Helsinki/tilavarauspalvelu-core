@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 def year_not_in_future(year: int | None) -> None:
-    from common.date_utils import DEFAULT_TIMEZONE
+    from utils.date_utils import DEFAULT_TIMEZONE
 
     if year is None:
         return

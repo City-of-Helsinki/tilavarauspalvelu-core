@@ -4,12 +4,12 @@ from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from rest_framework.exceptions import ValidationError
 
-from common.date_utils import local_datetime
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
 from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.tasks import refund_paid_reservation_task
 from tilavarauspalvelu.utils.email.reservation_email_notification_sender import ReservationEmailNotificationSender
+from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import PaymentOrder

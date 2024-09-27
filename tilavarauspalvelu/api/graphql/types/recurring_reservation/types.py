@@ -2,8 +2,8 @@ import graphene
 from django.db import models
 from graphene_django_extensions import DjangoNode
 
-from common.typing import GQLInfo
 from tilavarauspalvelu.models import RecurringReservation
+from tilavarauspalvelu.typing import GQLInfo
 
 from .filtersets import RecurringReservationFilterSet
 from .permissions import RecurringReservationPermission

@@ -2,10 +2,10 @@ from datetime import timedelta
 
 import pytest
 
-from common.date_utils import local_datetime
 from tests.factories import ReservationFactory, ReservationUnitFactory, ServiceFactory, SpaceFactory
 from tilavarauspalvelu.enums import ReservationStateChoice
 from tilavarauspalvelu.models import ReservationUnitHierarchy
+from utils.date_utils import local_datetime
 
 # Applied to all tests
 pytestmark = [

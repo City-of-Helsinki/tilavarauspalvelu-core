@@ -7,11 +7,11 @@ from typing import TYPE_CHECKING
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 
-from common.utils import safe_getattr
 from tilavarauspalvelu.exceptions import SendEmailNotificationError
 from tilavarauspalvelu.models import EmailTemplate
 from tilavarauspalvelu.utils.email.email_builder_application import ApplicationEmailBuilder
 from tilavarauspalvelu.utils.email.email_builder_reservation import ReservationEmailBuilder
+from utils.utils import safe_getattr
 
 if TYPE_CHECKING:
     from collections.abc import Iterable

@@ -4,7 +4,6 @@ import pytest
 from django.utils import timezone
 from freezegun import freeze_time
 
-from common.date_utils import DEFAULT_TIMEZONE
 from tests.factories import (
     PaymentOrderFactory,
     RecurringReservationFactory,
@@ -17,6 +16,7 @@ from tests.factories import (
 )
 from tests.test_graphql_api.test_reservation.helpers import reservations_query
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice, ReservationTypeChoice, UserRoleChoice
+from utils.date_utils import DEFAULT_TIMEZONE
 
 # Applied to all tests
 pytestmark = [

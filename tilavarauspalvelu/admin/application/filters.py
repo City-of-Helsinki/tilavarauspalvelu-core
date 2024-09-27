@@ -11,8 +11,8 @@ from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ApplicationSta
 from tilavarauspalvelu.models import ApplicationRound
 
 if TYPE_CHECKING:
-    from common.typing import WSGIRequest
     from tilavarauspalvelu.admin.application.admin import ApplicationAdmin
+    from tilavarauspalvelu.typing import WSGIRequest
 
 
 class ApplicationRoundFilter(admin.SimpleListFilter):

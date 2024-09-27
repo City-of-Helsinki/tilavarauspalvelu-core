@@ -14,7 +14,7 @@ from django.utils import translation
 from django.utils.translation import get_language_from_request
 from modeltranslation.manager import get_translatable_fields_for_model
 
-from common.date_utils import local_datetime
+from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
     from collections.abc import Generator, Iterable, Sequence
@@ -22,8 +22,8 @@ if TYPE_CHECKING:
     from django.http import HttpRequest
     from django.utils.functional import Promise
 
-    from common.typing import Lang
     from tilavarauspalvelu.models import User
+    from tilavarauspalvelu.typing import Lang
 
 __all__ = [
     "comma_sep_str",

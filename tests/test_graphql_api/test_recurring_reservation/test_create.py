@@ -2,10 +2,10 @@ import datetime
 
 import pytest
 
-from common.date_utils import local_date
 from tests.factories import AbilityGroupFactory, AgeGroupFactory, ReservationUnitFactory
 from tilavarauspalvelu.enums import ReservationStartInterval
 from tilavarauspalvelu.models import RecurringReservation
+from utils.date_utils import local_date
 
 from .helpers import CREATE_MUTATION, get_minimal_create_date
 

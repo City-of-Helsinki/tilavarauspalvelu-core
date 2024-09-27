@@ -9,7 +9,7 @@ from tilavarauspalvelu.enums import UserRoleChoice
 from tilavarauspalvelu.models import Resource, Space
 
 if TYPE_CHECKING:
-    from common.typing import AnyUser
+    from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
     "ResourceFilterSet",

@@ -3,7 +3,7 @@ from typing import Self
 
 from django.db import models
 
-from common.date_utils import normalize_as_datetime
+from utils.date_utils import normalize_as_datetime
 
 __all__ = [
     "ReservableTimeSpanManager",

@@ -1,8 +1,8 @@
 import django_filters
 from graphene_django_extensions import ModelFilterSet
 
-from common.models import BannerNotification
-from common.querysets.banner_notification import BannerNotificationQuerySet
+from tilavarauspalvelu.models.banner_notification.model import BannerNotification
+from tilavarauspalvelu.models.banner_notification.queryset import BannerNotificationQuerySet
 
 __all__ = [
     "BannerNotificationFilterSet",

@@ -6,13 +6,13 @@ import pytest
 from django.utils import timezone
 from graphene_django_extensions.testing.utils import parametrize_helper
 
-from common.date_utils import local_date_string, local_timedelta_string
 from tests.factories import ApplicationFactory, ApplicationRoundFactory
 from tilavarauspalvelu.enums import ApplicantTypeChoice, Priority, Weekday
 from tilavarauspalvelu.utils.exporter.application_round_applications_exporter import (
     ApplicationExportRow,
     ApplicationRoundApplicationsCSVExporter,
 )
+from utils.date_utils import local_date_string, local_timedelta_string
 
 from .helpers import Missing, MissingParams, get_writes
 

@@ -5,13 +5,13 @@ from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.serializers import NotProvided
 from rest_framework.exceptions import ValidationError
 
-from common.utils import comma_sep_str
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.api.graphql.types.reservation_unit_option.serializers import (
     ReservationUnitOptionApplicantSerializer,
 )
 from tilavarauspalvelu.api.graphql.types.suitable_time_range.serializers import SuitableTimeRangeSerializer
 from tilavarauspalvelu.models import AllocatedTimeSlot, Application, ApplicationRound, ApplicationSection
+from utils.utils import comma_sep_str
 
 if TYPE_CHECKING:
     import datetime

@@ -1,7 +1,7 @@
 from graphene_django_extensions import DjangoNode
 
-from common.typing import AnyUser
 from tilavarauspalvelu.models import Unit
+from tilavarauspalvelu.typing import AnyUser
 
 from .filtersets import UnitFilterSet
 from .permissions import UnitPermission

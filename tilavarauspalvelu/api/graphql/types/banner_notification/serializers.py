@@ -6,7 +6,7 @@ from typing import Any
 from graphene_django_extensions import NestingModelSerializer
 from rest_framework import serializers
 
-from common.models import BannerNotification
+from tilavarauspalvelu.models.banner_notification.model import BannerNotification
 
 __all__ = [
     "BannerNotificationSerializer",

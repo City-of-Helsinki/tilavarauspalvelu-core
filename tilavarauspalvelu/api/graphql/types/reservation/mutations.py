@@ -4,12 +4,12 @@ import graphene
 from django.core.exceptions import ValidationError
 from graphene_django_extensions import CreateMutation, DeleteMutation, UpdateMutation
 
-from common.date_utils import local_datetime
-from common.typing import AnyUser
 from tilavarauspalvelu.api.graphql.types.merchants.types import PaymentOrderNode
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
 from tilavarauspalvelu.models import Reservation
+from tilavarauspalvelu.typing import AnyUser
 from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CancelOrderError
+from utils.date_utils import local_datetime
 
 from .permissions import (
     ReservationCommentPermission,

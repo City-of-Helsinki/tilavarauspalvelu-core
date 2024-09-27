@@ -10,12 +10,12 @@ from django.db.models.functions import Now
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L, lookup_property
 
-from common.date_utils import local_datetime
 from tilavarauspalvelu.enums import (
     ApplicationRoundReservationCreationStatusChoice,
     ApplicationRoundStatusChoice,
     ApplicationStatusChoice,
 )
+from utils.date_utils import local_datetime
 
 from .queryset import ApplicationRoundQuerySet
 

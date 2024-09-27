@@ -1,8 +1,7 @@
 import pytest
 
-from common.enums import BannerNotificationLevel, BannerNotificationTarget
 from tests.test_graphql_api.test_banner_notification.helpers import CREATE_MUTATION
-from tilavarauspalvelu.enums import UserRoleChoice
+from tilavarauspalvelu.enums import BannerNotificationLevel, BannerNotificationTarget, UserRoleChoice
 
 # Applied to all tests
 pytestmark = [

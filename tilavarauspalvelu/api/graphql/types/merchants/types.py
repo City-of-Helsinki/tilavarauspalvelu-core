@@ -2,10 +2,10 @@ import graphene
 from graphene_django_extensions import DjangoNode
 from query_optimizer import MultiField
 
-from common.date_utils import local_datetime
-from common.typing import GQLInfo
 from tilavarauspalvelu.enums import OrderStatus, PaymentType
 from tilavarauspalvelu.models import PaymentMerchant, PaymentOrder, PaymentProduct
+from tilavarauspalvelu.typing import GQLInfo
+from utils.date_utils import local_datetime
 
 from .permissions import PaymentOrderPermission
 

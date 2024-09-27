@@ -7,13 +7,13 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext_lazy
 from icalendar import Calendar, Event
 
-from common.date_utils import DEFAULT_TIMEZONE, local_datetime
-from common.utils import get_attr_by_language
 from tilavarauspalvelu.enums import CalendarProperty, EventProperty
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+from utils.utils import get_attr_by_language
 
 if TYPE_CHECKING:
-    from common.typing import Lang
     from tilavarauspalvelu.models import Location, Reservation, ReservationUnit, Unit
+    from tilavarauspalvelu.typing import Lang
 
 
 __all__ = [

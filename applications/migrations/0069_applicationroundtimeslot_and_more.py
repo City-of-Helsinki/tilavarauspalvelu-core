@@ -5,8 +5,8 @@ import django.db.models.deletion
 from django.contrib.postgres.operations import HStoreExtension
 from django.db import migrations, models
 
-import common.fields.model
 import tilavarauspalvelu.utils.validators
+import utils.fields.model
 
 
 class WeekdayChoice(models.IntegerChoices):
@@ -33,7 +33,7 @@ class Migration(migrations.Migration):
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 (
                     "weekday",
-                    common.fields.model.IntChoiceField(
+                    utils.fields.model.IntChoiceField(
                         enum=WeekdayChoice,
                         validators=[
                             django.core.validators.MinValueValidator(
