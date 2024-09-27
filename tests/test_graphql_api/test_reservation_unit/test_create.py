@@ -2,9 +2,9 @@ import datetime
 
 import pytest
 
-from tests.factories import UnitFactory
+from tests.factories import ReservationUnitPaymentTypeFactory, UnitFactory
 from tests.helpers import patch_method
-from tilavarauspalvelu.enums import ReservationKind, WeekdayChoice
+from tilavarauspalvelu.enums import PaymentType, ReservationKind, WeekdayChoice
 from tilavarauspalvelu.exceptions import HaukiAPIError
 from tilavarauspalvelu.models import ReservationUnit
 from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
@@ -131,6 +131,9 @@ def test_reservation_unit__create__empty_name(graphql):
 
 
 def test_reservation_unit__create__payment_types(graphql):
+    ReservationUnitPaymentTypeFactory.create(code=PaymentType.INVOICE.value)
+    ReservationUnitPaymentTypeFactory.create(code=PaymentType.ON_SITE.value)
+
     unit = UnitFactory.create()
     graphql.login_with_superuser()
 

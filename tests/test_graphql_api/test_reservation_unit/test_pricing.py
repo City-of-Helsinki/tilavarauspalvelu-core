@@ -1,7 +1,9 @@
 import datetime
+from decimal import Decimal
 
 import pytest
 
+from tests.factories import TaxPercentageFactory
 from tilavarauspalvelu.enums import PricingStatus, PricingType
 from tilavarauspalvelu.models import ReservationUnit
 
@@ -111,6 +113,9 @@ def test_reservation_unit__create__future_pricing_must_be_in_the_future(graphql)
 
 
 def test_reservation_unit__create__free_pricing_doesnt_require_price_information(graphql):
+    TaxPercentageFactory.create(value=Decimal("10.0"))
+    TaxPercentageFactory.create(value=Decimal("0.0"))
+
     graphql.login_with_superuser()
 
     data = get_create_draft_input_data(

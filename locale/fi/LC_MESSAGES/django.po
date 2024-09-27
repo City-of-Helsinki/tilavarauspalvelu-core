@@ -7,12 +7,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: applications/migrations/0004_fixed_organisation_year_field.py
-#: applications/migrations/0066_remove_applicationaggregatedata_application_and_more.py
-#: tilavarauspalvelu/models/organisation/model.py
-msgid "is after current year"
-msgstr "on nykyvuoden jälkeen"
-
 #: config/settings.py tilavarauspalvelu/enums.py
 msgid "Finnish"
 msgstr "Suomi"
@@ -2910,6 +2904,10 @@ msgstr "Yleinen rooli"
 #: tilavarauspalvelu/models/general_role/model.py
 msgid "General roles"
 msgstr "Yleiset roolit"
+
+#: tilavarauspalvelu/models/organisation/model.py
+msgid "is after current year"
+msgstr "on nykyvuoden jälkeen"
 
 #: tilavarauspalvelu/models/organisation/model.py
 msgid "Organisations"

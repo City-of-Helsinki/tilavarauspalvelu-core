@@ -1,4 +1,5 @@
 import datetime
+from decimal import Decimal
 from functools import partial
 from typing import Any, NamedTuple
 
@@ -135,13 +136,15 @@ def get_create_draft_input_data(**overrides: Any) -> dict[str, Any]:
 
 
 def get_pricing_data(**overrides: Any) -> dict[str, Any]:
+    tax_percentage = TaxPercentageFactory.create(value=Decimal("10.0"))
+
     return {
         "begins": "2022-09-11",
         "pricingType": PricingType.PAID.value.upper(),
         "priceUnit": PriceUnit.PRICE_UNIT_PER_15_MINS.value.upper(),
         "lowestPrice": "18.2",
         "highestPrice": "21.5",
-        "taxPercentage": 2,
+        "taxPercentage": tax_percentage.id,
         "status": PricingStatus.PRICING_STATUS_ACTIVE.value.upper(),
         **overrides,
     }

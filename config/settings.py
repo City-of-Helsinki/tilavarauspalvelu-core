@@ -79,21 +79,8 @@ class Common(Environment):
         "social_django",
         "tinymce",
         "subforms",
-        # Our apps
+        # Our app
         "tilavarauspalvelu",
-        "common",
-        "users",
-        "applications",
-        "email_notification",
-        "merchants",
-        "opening_hours",
-        "permissions",
-        "reservation_units",
-        "reservations",
-        "resources",
-        "services",
-        "spaces",
-        "terms_of_use",
     ]
 
     MIDDLEWARE = [

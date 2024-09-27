@@ -1,5 +1,9 @@
+from decimal import Decimal
+
 import pytest
 from graphene_django_extensions.testing import build_query
+
+from tests.factories import TaxPercentageFactory
 
 # Applied to all tests
 pytestmark = [
@@ -8,6 +12,9 @@ pytestmark = [
 
 
 def test_tax_percentages__query(graphql):
+    for value in ["0.0", "10.0", "14.0", "24.0", "25.5"]:
+        TaxPercentageFactory.create(value=Decimal(value))
+
     graphql.login_with_superuser()
 
     query = build_query("taxPercentages", fields="value", connection=True)

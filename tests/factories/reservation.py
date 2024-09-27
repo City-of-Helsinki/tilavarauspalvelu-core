@@ -161,7 +161,7 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
 
         sub_kwargs = cls.pop_sub_kwargs("reservation_unit", kwargs)
         sub_kwargs.setdefault("origin_hauki_resource__id", "987")
-        sub_kwargs.setdefault("payment_types", [PaymentType.ON_SITE])
+        sub_kwargs.setdefault("payment_types__code", PaymentType.ON_SITE)
         sub_kwargs.setdefault("payment_product", PaymentProductFactory.create())
         sub_kwargs.setdefault("pricings__pricing_type", PricingType.PAID)
         reservation_unit = ReservationUnitFactory.create(**sub_kwargs)

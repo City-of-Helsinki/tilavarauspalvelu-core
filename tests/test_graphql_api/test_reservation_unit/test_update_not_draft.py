@@ -1,6 +1,14 @@
+from decimal import Decimal
+
 import pytest
 
-from tests.factories import ReservationUnitCancellationRuleFactory, ReservationUnitFactory, TermsOfUseFactory
+from tests.factories import (
+    ReservationUnitCancellationRuleFactory,
+    ReservationUnitFactory,
+    ReservationUnitPaymentTypeFactory,
+    TaxPercentageFactory,
+    TermsOfUseFactory,
+)
 from tilavarauspalvelu.enums import PaymentType, ReservationStartInterval, TermsOfUseTypeChoices
 
 from .helpers import UPDATE_MUTATION, get_non_draft_update_input_data
@@ -223,6 +231,12 @@ def test_reservation_unit__update__pricing_terms(graphql):
 
 
 def test_reservation_unit__update__payment_types(graphql):
+    TaxPercentageFactory.create(value=Decimal("10.0"))
+    TaxPercentageFactory.create(value=Decimal("0.0"))
+
+    ReservationUnitPaymentTypeFactory.create(code=PaymentType.INVOICE.value)
+    ReservationUnitPaymentTypeFactory.create(code=PaymentType.ON_SITE.value)
+
     graphql.login_with_superuser()
 
     payment_types = [PaymentType.INVOICE.value, PaymentType.ON_SITE.value]
