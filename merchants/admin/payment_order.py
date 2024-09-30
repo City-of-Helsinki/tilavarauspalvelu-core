@@ -59,7 +59,7 @@ class PaymentOrderForm(forms.ModelForm):
     def __init__(self, *args, **kwargs) -> None:
         """Add reservation and reservation unit to the reservation field help text."""
         super().__init__(*args, **kwargs)
-        payment_order: PaymentOrder | None = kwargs.get("instance", None)
+        payment_order: PaymentOrder | None = kwargs.get("instance")
         if payment_order and payment_order.id and payment_order.reservation:
             self.fields["reservation"].help_text += (
                 "<br>" + _("Reservation") + f": {payment_order.reservation.id}"

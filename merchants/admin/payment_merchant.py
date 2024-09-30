@@ -58,7 +58,7 @@ class PaymentMerchantForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        instance: PaymentMerchant | None = kwargs.get("instance", None)
+        instance: PaymentMerchant | None = kwargs.get("instance")
         if instance and instance.id:
             merchant_info = VerkkokauppaAPIClient.get_merchant(merchant_uuid=instance.id)
             if merchant_info is None:
