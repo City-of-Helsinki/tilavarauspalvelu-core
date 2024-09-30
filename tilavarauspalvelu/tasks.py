@@ -17,6 +17,7 @@ from django.db.transaction import atomic
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from easy_thumbnails.exceptions import InvalidImageFormatError
+from elasticsearch_django.index import create_index, delete_index, update_index
 from lookup_property import L
 
 from config.celery import app
@@ -800,3 +801,21 @@ def log_to_sentry_if_suspicious(request_log: RequestLog, duration_ms: int) -> No
             "num_of_queries": num_of_queries,
         }
         SentryLogger.log_message(msg, details=details, level="warning")
+
+
+@app.task(name="Update ReservationUnit Elastic index")
+def update_reservation_unit_elastic_index() -> None:
+    index = next(iter(settings.SEARCH_SETTINGS["indexes"].keys()))
+    update_index(index)
+
+
+@app.task(name="Create ReservationUnit Elastic index")
+def create_reservation_unit_elastic_index() -> None:
+    index = next(iter(settings.SEARCH_SETTINGS["indexes"].keys()))
+    create_index(index)
+
+
+@app.task(name="Delete ReservationUnit Elastic index")
+def delete_reservation_unit_elastic_index() -> None:
+    index = next(iter(settings.SEARCH_SETTINGS["indexes"].keys()))
+    delete_index(index)

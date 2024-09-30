@@ -1,4 +1,4 @@
-from elastic_django.reservation_units.query_builder import build_elastic_query_str
+from utils.elasticsearch import build_elastic_query_str
 
 
 def test_build_elastic_query_str__one_search_word():

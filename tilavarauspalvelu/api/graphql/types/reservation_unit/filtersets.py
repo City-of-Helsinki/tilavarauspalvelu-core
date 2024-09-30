@@ -8,11 +8,11 @@ from elasticsearch_django.models import SearchQuery
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntMultipleChoiceFilter
 
-from elastic_django.reservation_units.query_builder import build_elastic_query_str
 from tilavarauspalvelu.enums import ReservationKind, ReservationUnitPublishingState, ReservationUnitReservationState
 from tilavarauspalvelu.models import ReservationUnit
 from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
 from utils.date_utils import local_datetime
+from utils.elasticsearch import build_elastic_query_str
 from utils.utils import log_text_search
 
 if TYPE_CHECKING:
