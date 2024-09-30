@@ -488,7 +488,8 @@ class Common(Environment):
                 "never_auto_sync": [],
                 # if true, then indexes must have mapping files
                 "strict_validation": False,
-                "mappings_dir": "elastic_django",
+                # Path to the elasticsearch mapping files
+                "mappings_dir": str(Common.BASE_DIR / "config" / "elasticsearch"),
             },
         }
 
@@ -655,7 +656,7 @@ class Local(Common, overrides_from=LocalMixin):
     @property
     def SEARCH_SETTINGS(cls):
         search_settings = super().SEARCH_SETTINGS
-        search_settings["settings"]["mappings_dir"] = str(Common.BASE_DIR / "elastic_django")
+        search_settings["settings"]["mappings_dir"] = str(Common.BASE_DIR / "config" / "elasticsearch")
         return search_settings
 
     # --- Misc settings-----------------------------------------------------------------------------------------------
@@ -820,7 +821,7 @@ class AutomatedTests(EmptyDefaults, Common, dotenv_path=None, overrides_from=Aut
     @property
     def SEARCH_SETTINGS(cls):
         search_settings = super().SEARCH_SETTINGS
-        search_settings["settings"]["mappings_dir"] = str(Common.BASE_DIR / "elastic_django")
+        search_settings["settings"]["mappings_dir"] = str(Common.BASE_DIR / "config" / "elasticsearch")
         search_settings["settings"]["auto_sync"] = False
         return search_settings
 
