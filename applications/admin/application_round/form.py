@@ -35,7 +35,7 @@ class ApplicationRoundAdminForm(forms.ModelForm):
     )
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        instance: ApplicationRound | None = kwargs.get("instance", None)
+        instance: ApplicationRound | None = kwargs.get("instance")
         if instance:
             kwargs.setdefault("initial", {})
             kwargs["initial"]["status"] = ApplicationRoundStatusChoice(instance.status).label

@@ -49,7 +49,7 @@ class SuitableTimeRangeInlineAdminForm(forms.ModelForm):
     )
 
     def __init__(self, *args, **kwargs) -> None:
-        instance: SuitableTimeRange | None = kwargs.get("instance", None)
+        instance: SuitableTimeRange | None = kwargs.get("instance")
         if instance:
             kwargs.setdefault("initial", {})
             kwargs["initial"]["fulfilled"] = instance.fulfilled
@@ -105,7 +105,7 @@ class ApplicationSectionAdminForm(forms.ModelForm):
     )
 
     def __init__(self, *args, **kwargs) -> None:
-        instance: ApplicationSection | None = kwargs.get("instance", None)
+        instance: ApplicationSection | None = kwargs.get("instance")
         if instance:
             kwargs.setdefault("initial", {})
             kwargs["initial"]["status"] = ApplicationSectionStatusChoice(instance.status).label

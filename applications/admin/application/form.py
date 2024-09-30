@@ -12,7 +12,7 @@ class ApplicationSectionInlineAdminForm(forms.ModelForm):
     suitable_days_of_the_week = forms.CharField()
 
     def __init__(self, *args, **kwargs) -> None:
-        instance: ApplicationSection | None = kwargs.get("instance", None)
+        instance: ApplicationSection | None = kwargs.get("instance")
         if instance:
             kwargs.setdefault("initial", {})
             kwargs["initial"]["status"] = instance.status
@@ -70,7 +70,7 @@ class ApplicationAdminForm(forms.ModelForm):
     )
 
     def __init__(self, *args, **kwargs) -> None:
-        instance: Application | None = kwargs.get("instance", None)
+        instance: Application | None = kwargs.get("instance")
         if instance is not None:
             kwargs.setdefault("initial", {})
             kwargs["initial"]["status"] = ApplicationStatusChoice(instance.status).label
