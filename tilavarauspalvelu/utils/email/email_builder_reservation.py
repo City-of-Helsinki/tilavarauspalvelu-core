@@ -10,14 +10,20 @@ from django.conf import settings
 from django.utils.timezone import get_default_timezone
 
 from tilavarauspalvelu.enums import CustomerTypeChoice, EmailType
-from tilavarauspalvelu.utils.email.email_builder_base import BaseEmailBuilder, BaseEmailContext
+from tilavarauspalvelu.utils.email.email_builder_base import BaseEmailBuilder, BaseEmailContext, EmailAttachment
 from utils.date_utils import local_date
 from utils.utils import get_attr_by_language
 
 if TYPE_CHECKING:
     from config.utils.commons import LanguageType
     from tilavarauspalvelu.admin.email_template.tester import EmailTemplateTesterForm
-    from tilavarauspalvelu.models import EmailTemplate, Location, Reservation
+    from tilavarauspalvelu.models import EmailTemplate, Location
+from tilavarauspalvelu.models import Reservation
+from utils.sentry import SentryLogger
+
+if TYPE_CHECKING:
+    from config.utils.commons import LanguageType
+    from tilavarauspalvelu.models import Location
 
 type InstructionNameType = Literal["confirmed", "pending", "cancelled"]
 
@@ -277,3 +283,27 @@ class ReservationEmailBuilder(BaseEmailBuilder):
     @classmethod
     def from_mock_data(cls, *, template: EmailTemplate) -> ReservationEmailBuilder:
         return ReservationEmailBuilder(template=template, context=ReservationEmailContext.from_mock_data())
+
+    def get_attachment(self) -> EmailAttachment | None:
+        if self.template.type not in [
+            EmailType.RESERVATION_CONFIRMED,
+            EmailType.RESERVATION_HANDLED_AND_CONFIRMED,
+            EmailType.RESERVATION_MODIFIED,
+        ]:
+            return None
+
+        reservation = Reservation.objects.filter(id=self.context.reservation_number).first()
+        if reservation is None:
+            return None
+
+        try:
+            ical = reservation.actions.to_ical(site_name=settings.EMAIL_VARAAMO_EXT_LINK)
+        except Exception as exc:
+            SentryLogger.log_exception(exc, "Failed to generate iCal attachment for reservation")
+            return None
+
+        return EmailAttachment(
+            filename="reservation_calendar.ics",
+            content=ical.decode("utf-8"),
+            mimetype="text/calendar",
+        )

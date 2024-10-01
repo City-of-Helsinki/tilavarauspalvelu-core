@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, TypedDict
 from urllib.parse import urlencode, urljoin
 
 from django.conf import settings
@@ -15,6 +15,12 @@ if TYPE_CHECKING:
     from config.utils.commons import LanguageType
     from tilavarauspalvelu.enums import EmailType
     from tilavarauspalvelu.models import EmailTemplate
+
+
+class EmailAttachment(TypedDict):
+    filename: str
+    content: str
+    mimetype: str
 
 
 @dataclass
@@ -104,3 +110,6 @@ class BaseEmailBuilder:
 
     def get_html_content(self) -> str:
         return self.validator.render_template(template_path=self.template.html_template_path)
+
+    def get_attachment(self) -> EmailAttachment | None:
+        return None

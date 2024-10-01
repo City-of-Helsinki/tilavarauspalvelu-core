@@ -222,3 +222,25 @@ def test_email_sender__test_emails(outbox, email_template):
     assert outbox[2].subject == "en"
     assert outbox[2].body == "en"
     assert outbox[2].bcc == ["test@example.com"]
+
+
+def test_email_sender__reservation__success__ical_attachment(outbox, email_template):
+    reservation: Reservation = ReservationFactory.create(
+        reservee_language="fi",
+        reservee_email="example@email.com",
+        user=None,
+        reservation_unit__unit__name="foo",
+    )
+
+    email_notification_sender = EmailNotificationSender(
+        email_type=email_template.type,
+        recipients=None,
+    )
+    email_notification_sender.send_reservation_email(reservation=reservation)
+
+    assert len(outbox) == 1
+    assert len(outbox[0].attachments) == 1
+    assert outbox[0].attachments[0][0] == "reservation_calendar.ics"
+    assert outbox[0].attachments[0][1].startswith("BEGIN:VCALENDAR")
+    assert outbox[0].attachments[0][1].endswith("END:VCALENDAR\r\n")
+    assert outbox[0].attachments[0][2] == "text/calendar"
