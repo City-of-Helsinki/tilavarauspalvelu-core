@@ -292,12 +292,12 @@ class ReservationEmailBuilder(BaseEmailBuilder):
         ]:
             return None
 
-        reservation = Reservation.objects.filter(id=self.context.reservation_number).first()
+        reservation: Reservation | None = Reservation.objects.filter(id=self.context.reservation_number).first()
         if reservation is None:
             return None
 
         try:
-            ical = reservation.actions.to_ical(site_name=settings.EMAIL_VARAAMO_EXT_LINK)
+            ical = reservation.actions.to_ical()
         except Exception as exc:
             SentryLogger.log_exception(exc, "Failed to generate iCal attachment for reservation")
             return None

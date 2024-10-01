@@ -34,7 +34,7 @@ def reservation_ical(request: WSGIRequest, pk: int) -> FileResponse | JsonRespon
         return JsonResponse(data={"detail": "reservation not found"}, status=404)
 
     try:
-        ical = reservation.actions.to_ical(site_name=request.get_host())
+        ical = reservation.actions.to_ical()
     except Exception as exc:
         return JsonResponse(data={"detail": str(exc)}, status=500)
 
