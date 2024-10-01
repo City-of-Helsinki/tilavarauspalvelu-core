@@ -4,24 +4,23 @@
 
 {% block header %}{% include "email/html/partials/header_no_recipient_name.jinja" %}{% endblock %}
 
-{% block content %}
-    <div class="main-container">
-        <p>{{ textStaffReservationRequiresHandling }}: <b>{{ name }}</b></p>
+{% block content_main %}
+    <mj-text>{{ textStaffReservationRequiresHandling }}: <b>{{ name }}</b></mj-text>
+    <mj-spacer />
+    <mj-text>{{ reserveeName }}: {{ reservee_name }}</mj-text>
+    <mj-text>{{ reservationNumber }}: {{ reservation_number }}</mj-text>
+    {% include "email/html/partials/reservation_basic_info.jinja" %}#}
+{% endblock %}
 
-        <div class="spacer"></div>
+{% block content_secondary %}
+    <mj-text><h2>{{ staffReservationRequiresHandlingCheckDetails }}</h2></mj-text>
+    <mj-text font-size="16px">
+        <a href="{{ staff_reservations_ext_link }}{{ reservation_number }}">
+            {{ staff_reservations_ext_link }}{{ reservation_number }}
+        </a>
+    </mj-text>
+{% endblock %}
 
-        <p>{{ reserveeName }}: {{ reservee_name }}</p>
-        <p>{{ reservationNumber }}: {{ reservation_number }}</p>
-
-        {% include "email/html/partials/reservation_basic_info.jinja" %}
-    </div>
-
-    <div class="secondary-container">
-        <p>
-            {{ staffReservationRequiresHandlingCheckDetails }}
-            <a href="{{ staff_reservations_ext_link }}{{ reservation_number }}">{{ staff_reservations_ext_link }}{{ reservation_number }}</a>
-        </p>
-
-        {% include "email/html/partials/closing_staff.jinja" %}
-    </div>
+{% block content_closing %}
+    {% include "email/html/partials/closing_staff.jinja" %}
 {% endblock %}

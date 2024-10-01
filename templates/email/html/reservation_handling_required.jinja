@@ -4,23 +4,19 @@
 
 {% block header %}{% include "email/html/partials/header.jinja" %}{% endblock %}
 
-{% block content %}
-    <div class="main-container">
-        <p>{{ textReservationHandlingRequired }}</p>
+{% block content_main %}
+    <mj-text>{{ textReservationHandlingRequired }}</mj-text>
+    {% include "email/html/partials/reservation_basic_info.jinja" %}#}
+    {% include "email/html/partials/reservation_price_range.jinja" %}
+{% endblock %}
 
-        {% include "email/html/partials/reservation_basic_info.jinja" %}
-        {% include "email/html/partials/reservation_price_range.jinja" %}
-    </div>
+{% block content_secondary %}
+    <mj-text font-size="16px">{{ pendingNotification }}</mj-text>
+    <mj-text><h2>{{ reservationInstruction }}</h2></mj-text>
+    <mj-text font-size="16px">{{ pending_instructions }}</mj-text>
+{% endblock %}
 
-    <div class="secondary-container">
-        <p>{{ pendingNotification }}</p>
-
-        <div class="spacer"></div>
-
-        <h2>{{ reservationInstruction }}</h2>
-        <p>{{ pending_instructions }}</p>
-
-        {% include "email/html/partials/reservation_manage_link.jinja" %}
-        {% include "email/html/partials/closing_polite.jinja" %}
-    </div>
+{% block content_closing %}
+    {% include "email/html/partials/reservation_manage_link.jinja" %}
+    {% include "email/html/partials/closing_polite.jinja" %}
 {% endblock %}

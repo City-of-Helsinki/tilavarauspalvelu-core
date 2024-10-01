@@ -4,12 +4,17 @@
 
 {% block header %}{% include "email/html/partials/header_no_recipient_name.jinja" %}{% endblock %}
 
-{% block content %}
-    <div class="main-container">
-        <p>{{ applicationHandled }} <a href="{{ my_applications_ext_link }}">{{ ownApplicationPage }}</a>.</p>
-    </div>
+{% block content_main %}
+    <mj-text>{{ subjectApplicationHandled }}.</mj-text>
+    <mj-text>
+        {{ applicationHandled }}
+        <a href="{{ my_applications_ext_link }}">{{ ownApplicationPage }}</a>.
+    </mj-text>
+{% endblock %}
 
-    <div class="secondary-container">
-        {% include "email/html/partials/closing_polite.jinja" %}
-    </div>
+{% block content_secondary %}
+{% endblock %}
+
+{% block content_closing %}
+    {% include "email/html/partials/closing_polite.jinja" %}
 {% endblock %}
