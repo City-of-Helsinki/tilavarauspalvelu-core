@@ -1,0 +1,12 @@
+<div class="spacer"></div>
+
+{% if price > 0 %}
+    {% if subsidised_price < price %}
+        <p>{{ reservationPrice }}: <b>{{ subsidised_price | currency }} &ndash; {{ price | currency }} €</b>({{ vatIncluded }} {{ tax_percentage }} %)</p>
+    {% else %}
+        <p>{{ reservationPrice }}: <b>{{ price | currency }} €</b> ({{ vatIncluded }} {{ tax_percentage }} %)</p>
+    {% endif %}
+{% else %}
+    <p>{{ reservationPrice }}: <b>0 €</b></p>
+{% endif %}
+<p>{{ reservationNumber }}: {{ reservation_number }}</p>
