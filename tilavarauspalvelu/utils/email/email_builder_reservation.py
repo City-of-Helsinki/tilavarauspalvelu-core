@@ -233,15 +233,13 @@ class ReservationEmailBuilder(BaseEmailBuilder):
     context: ReservationEmailContext
 
     email_template_types = [
-        EmailType.ACCESS_CODE_FOR_RESERVATION,
-        EmailType.HANDLING_REQUIRED_RESERVATION,
         EmailType.RESERVATION_CANCELLED,
         EmailType.RESERVATION_CONFIRMED,
         EmailType.RESERVATION_HANDLED_AND_CONFIRMED,
+        EmailType.RESERVATION_HANDLING_REQUIRED,
         EmailType.RESERVATION_MODIFIED,
         EmailType.RESERVATION_NEEDS_TO_BE_PAID,
         EmailType.RESERVATION_REJECTED,
-        EmailType.RESERVATION_WITH_PIN_CONFIRMED,
         EmailType.STAFF_NOTIFICATION_RESERVATION_MADE,
         EmailType.STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING,
     ]

@@ -29,7 +29,7 @@ def test_reservation__handling_required__allowed_states(graphql, outbox, setting
     )
 
     template = EmailTemplateFactory(
-        type=EmailType.HANDLING_REQUIRED_RESERVATION,
+        type=EmailType.RESERVATION_HANDLING_REQUIRED,
         subject="handling required",
     )
 

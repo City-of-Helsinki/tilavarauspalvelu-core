@@ -74,7 +74,7 @@ def test_reservation__confirm__changes_state__requires_handling(graphql, outbox,
     reservation = ReservationFactory.create_for_confirmation(reservation_unit__require_reservation_handling=True)
 
     EmailTemplateFactory.create(
-        type=EmailType.HANDLING_REQUIRED_RESERVATION,
+        type=EmailType.RESERVATION_HANDLING_REQUIRED,
         subject="handling",
     )
     EmailTemplateFactory.create(
@@ -112,7 +112,7 @@ def test_reservation__confirm__changes_state_to_requires_handling_on_subsidy_req
     )
 
     EmailTemplateFactory.create(
-        type=EmailType.HANDLING_REQUIRED_RESERVATION,
+        type=EmailType.RESERVATION_HANDLING_REQUIRED,
         subject="handling",
     )
     EmailTemplateFactory.create(
