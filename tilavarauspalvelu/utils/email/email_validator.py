@@ -10,6 +10,7 @@ from jinja2.sandbox import SandboxedEnvironment
 
 from tilavarauspalvelu.exceptions import EmailTemplateValidationError
 from tilavarauspalvelu.templatetags import format_currency
+from tilavarauspalvelu.utils.email.email_translations import EMAIL_TRANSLATIONS
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.utils.email.email_builder_base import BaseEmailContext
@@ -24,6 +25,7 @@ class EmailTemplateValidator:
 
     env: SandboxedEnvironment  # Jinja2 environment
     context: BaseEmailContext
+    translations: dict[str, str]
 
     def __init__(self, context: BaseEmailContext) -> None:
         self.context = context
@@ -32,6 +34,24 @@ class EmailTemplateValidator:
         self.env = SandboxedEnvironment(loader=FileSystemLoader("templates"))
         for fil, func in FILTERS_MAP.items():
             self.env.filters[fil] = func
+
+        self.translations = self._load_translations()
+
+    def _load_translations(self) -> dict[str, str]:
+        """Load the translations for the current language into the Jinja2 environment."""
+        translations = {}
+
+        for key, t in EMAIL_TRANSLATIONS.items():
+            # Extract the translation for the given language
+            translation = t.get(self.context.language, "")
+
+            # If the translation contains variable tags, pre-render them
+            if "{{" in translation:
+                translation = self.render_string(translation)
+
+            translations[key] = translation
+
+        return translations
 
     def _validate_tags(self, string: str) -> None:
         """Validate that the given string does not contain tags that are not defined in the context"""
