@@ -42,7 +42,7 @@ class BaseEmailContext:
 
     # Helpers
     @classmethod
-    def _get_common_kwargs(cls, language) -> dict[str, Any]:
+    def _get_common_kwargs(cls, language: LanguageType) -> dict[str, Any]:
         return {
             "language": language,
             "varaamo_ext_link": cls._get_varaamo_ext_link(language),
@@ -51,14 +51,14 @@ class BaseEmailContext:
         }
 
     @staticmethod
-    def _get_varaamo_ext_link(language: LanguageType | None) -> str:
+    def _get_varaamo_ext_link(language: LanguageType) -> str:
         url_base = settings.EMAIL_VARAAMO_EXT_LINK
         if language.lower() != "fi":
             return urljoin(url_base, language)
         return url_base
 
     @staticmethod
-    def _get_feedback_ext_link(language: LanguageType | None) -> str:
+    def _get_feedback_ext_link(language: LanguageType) -> str:
         params = urlencode({"lang": language})
         return f"{settings.EMAIL_FEEDBACK_EXT_LINK}?{params}"
 
