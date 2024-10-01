@@ -110,15 +110,17 @@
             .footerBottomRow {
                 font-size: 14px;
             }
+
+
+            .spacer-line {
+                border-top: #CCCCCC 2px solid;
+            }
         }
 
         .spacer {
             padding: 15px 0;
         }
 
-        .spacer-line {
-            border-top: #CCCCCC 2px solid;
-        }
     </style>
 </head>
 
@@ -130,7 +132,14 @@
 <div id="content">{% block content %}{% endblock %}</div>
 
 <div id="footer">
-    {% include "email/html/partials/footer.jinja" %}
+    <div class="footerTopRow">
+        <img src="{{ helsinkiLogoUrl }}" alt="Helsinki logo" />
+        <b>{{ serviceName }}</b>
+    </div>
+    <div class="spacer-line"></div>
+    <div class="footerBottomRow">
+        &copy; {{ helsinkiCity }} {{ current_year }}
+    </div>
 </div>
 </body>
 </html>

@@ -8,8 +8,7 @@
     <div class="main-container">
         <p>{{ reservationMadeConfirmed }}</p>
 
-        {% include "email/html/partials/reservation_unit_info.jinja" %}
-        {% include "email/html/partials/reservation_datetime.jinja" %}
+        {% include "email/html/partials/reservation_basic_info.jinja" %}
         {% include "email/html/partials/reservation_price.jinja" %}
     </div>
 
@@ -18,7 +17,6 @@
         <p>{{ confirmed_instructions }}</p>
 
         {% include "email/html/partials/reservation_manage_link.jinja" %}
-        {% include "email/html/partials/thanks_for_using.jinja" %}
-        {% include "email/html/partials/automatic_message.jinja" %}
+        {% include "email/html/partials/closing_polite.jinja" %}
     </div>
 {% endblock %}
