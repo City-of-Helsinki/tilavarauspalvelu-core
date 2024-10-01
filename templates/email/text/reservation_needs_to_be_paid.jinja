@@ -5,7 +5,7 @@
 {% include "email/text/partials/reservation_basic_info.jinja" %}
 
 {{ reservationPrice }}: {{ price | currency }} € ({{ vatIncluded }} {{ tax_percentage }} %)
-{{ paymentDue }}: {{ due_date }}
+{{ paymentDue }}: {{ payment_due_date }}
 {{ reservationNumber }}: {{ reservation_number }}
 
 {{ payReservation }}: {{ my_reservations_ext_link }}

@@ -12,6 +12,9 @@
         {% include "email/html/partials/reservation_price.jinja" %}
 
         <div class="spacer"></div>
+        <p>{{ paymentDue }}: <b>{{ payment_due_date }}</b></p>
+
+        <div class="spacer"></div>
         <p><a href="{{ my_reservations_ext_link }}">{{ payReservation }}</a></p>
     </div>
 

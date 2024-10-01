@@ -85,6 +85,7 @@ class EmailTemplateTesterForm(forms.Form):
     non_subsidised_price = forms.DecimalField(decimal_places=2, initial=Decimal("15.00"), widget=forms.NumberInput())
     subsidised_price = forms.DecimalField(decimal_places=2, initial=Decimal("5.00"), widget=forms.NumberInput)
     tax_percentage = forms.DecimalField(decimal_places=2, initial=Decimal("25.5"), widget=forms.NumberInput)
+    payment_due_date = forms.DateField(initial=datetime(2100, 1, 1), widget=forms.DateInput(format="%d.%m.%Y"))
     confirmed_instructions_fi = forms.CharField(initial="[lisäohje: hyväksytty]", widget=forms.Textarea)
     confirmed_instructions_sv = forms.CharField(initial="[mer information: bekräftats]", widget=forms.Textarea)
     confirmed_instructions_en = forms.CharField(initial="[additional info: confirmed]", widget=forms.Textarea)
