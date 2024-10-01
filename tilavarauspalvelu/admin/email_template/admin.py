@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.core.handlers.wsgi import WSGIRequest
 from django.forms import ModelForm
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.template.response import TemplateResponse
 from modeltranslation.admin import TranslationAdmin
 
@@ -79,3 +79,22 @@ class EmailTemplateAdmin(ExtraButtonsMixin, TranslationAdmin):
     @button(label="Email Template Testing", change_form=True)
     def template_tester(self, request: WSGIRequest, pk: int) -> TemplateResponse | HttpResponseRedirect:
         return email_template_tester_admin_view(self, request, pk)
+
+    @button(label="View template text", change_form=True)
+    def email_text_content_view(self, request: WSGIRequest, pk: int) -> HttpResponse:
+        builder = self._get_builder_with_mock_data(pk)
+        text_content = builder.get_content()
+        return HttpResponse(text_content, content_type="text/plain; charset=utf-8")
+
+    @button(label="View template HTML", change_form=True)
+    def email_html_content_view(self, request: WSGIRequest, pk: int) -> HttpResponse:
+        builder = self._get_builder_with_mock_data(pk)
+        html_content = builder.get_html_content()
+        return HttpResponse(html_content)
+
+    def _get_builder_with_mock_data(self, pk: int) -> ReservationEmailBuilder | ApplicationEmailBuilder:
+        template = EmailTemplate.objects.filter(pk=pk).first()
+
+        if template.type in ReservationEmailBuilder.email_template_types:
+            return ReservationEmailBuilder.from_mock_data(template=template)
+        return ApplicationEmailBuilder.build(template=template, language="fi")
