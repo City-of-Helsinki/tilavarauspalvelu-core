@@ -48,6 +48,7 @@ class ReservationEmailContext(BaseEmailContext):
     cancel_reason: str
 
     my_reservations_ext_link: str
+    staff_reservations_ext_link: str
 
     # Builders
     @classmethod
@@ -97,6 +98,7 @@ class ReservationEmailContext(BaseEmailContext):
             cancel_reason=get_attr_by_language(reservation.cancel_reason, "reason", language),
             # Links
             my_reservations_ext_link=cls._get_my_reservations_ext_link(language),
+            staff_reservations_ext_link=cls._get_staff_reservations_ext_link(),
             **cls._get_common_kwargs(language),
         )
 
@@ -133,6 +135,7 @@ class ReservationEmailContext(BaseEmailContext):
             cancel_reason=form.cleaned_data[f"cancel_reason_{language}"],
             # Links
             my_reservations_ext_link=cls._get_my_reservations_ext_link(language),
+            staff_reservations_ext_link=cls._get_staff_reservations_ext_link(),
             # Common
             **cls._get_common_kwargs(language),
         )
@@ -170,6 +173,7 @@ class ReservationEmailContext(BaseEmailContext):
             cancel_reason="[syy: peruttu]",
             # Links
             my_reservations_ext_link=cls._get_my_reservations_ext_link(language),
+            staff_reservations_ext_link=cls._get_staff_reservations_ext_link(),
             # Common
             **cls._get_common_kwargs(language),
         )
@@ -218,6 +222,11 @@ class ReservationEmailContext(BaseEmailContext):
         if language.lower() != "fi":
             url_base = urljoin(url_base, language) + "/"
         return urljoin(url_base, "reservations")
+
+    @staticmethod
+    def _get_staff_reservations_ext_link() -> str:
+        url_base = settings.EMAIL_VARAAMO_EXT_LINK
+        return urljoin(url_base, "kasittely/reservations")
 
 
 class ReservationEmailBuilder(BaseEmailBuilder):
