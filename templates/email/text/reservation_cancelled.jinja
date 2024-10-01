@@ -1,28 +1,13 @@
-{{ salutation }} {{reservee_name}},
+{{ salutation }} {{ reservee_name }},
 
 {{ reservationCancelled }}
-{{ cancellationReason }}: {{cancel_reason}}
+{{ cancellationReason }}: {{ cancel_reason }}
 
-{{reservation_unit}}
-{{unit_name}}
-{{unit_location}}
+{% include "email/text/partials/reservation_basic_info.jinja" %}
 
-{{ reservationBegins }}: {{begin_date}} {{ oClock }} {{begin_time}}
-{{ reservationEnds }}: {{end_date}} {{ oClock }} {{end_time}}
-
-{% if price > 0 %}
-{{ reservationPrice }}: {{price | currency}} € ({{ vatIncluded }} {{tax_percentage}} %)
-{% else %}
-{{ reservationPrice }}: 0 €
-{% endif %}
-{{ reservationNumber }}: {{reservation_number}}
+{% include "email/text/partials/reservation_price.jinja" %}
 
 {{ cancellationInstructions }}
-{{cancelled_instructions}}
+{{ cancelled_instructions }}
 
-{{ withRegards }}
-{{ serviceName }}
-
-{{ automaticMessage }} {{ contactUs }}: {{feedback_ext_link}}
-
-{{ reserveCityResourcesAt }} {{varaamo_ext_link}}
+{% include "email/text/partials/closing.jinja" %}

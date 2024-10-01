@@ -1,18 +1,13 @@
 {{ salutation }},
 
-{{ staffReservationPending }}: {{name}}
-{{ unit }}: {{unit_name}}, {{unit_location}}
+{{ staffReservationPending }}: {{ name }}
 
-{{ reserveeName }}: {{reservee_name}}
-{{ reservationNumber }}: {{reservation_number}}
+{{ reserveeName }}: {{ reservee_name }}
+{{ reservationNumber }}: {{ reservation_number }}
 
-{{ reservationBegins }}: {{begin_date}} {{ oClock }} {{begin_time}}
-{{ reservationEnds }}: {{end_date}} {{ oClock }} {{end_time}}
+{% include "email/text/partials/reservation_basic_info.jinja" %}
 
 {{ staffCheckDetailsPending }}:
-{{ staff_reservations_ext_link }}{{reservation_number}}
+{{ staff_reservations_ext_link }}{{ reservation_number }}
 
-{{ withRegards }}
-{{ serviceName }}
-
-{{ automaticMessage }}
+{% include "email/text/partials/closing_staff.jinja" %}

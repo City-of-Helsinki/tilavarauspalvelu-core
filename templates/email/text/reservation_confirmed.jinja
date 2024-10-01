@@ -1,30 +1,16 @@
-{{ salutation }} {{reservee_name}},
+{{ salutation }} {{ reservee_name }},
 
 {{ reservationMadeConfirmed }}
 
-{{reservation_unit}}
-{{unit_name}}
-{{unit_location}}
+{% include "email/text/partials/reservation_basic_info.jinja" %}
 
-{{ reservationBegins }}: {{begin_date}} {{ oClock }} {{begin_time}}
-{{ reservationEnds }}: {{end_date}} {{ oClock }} {{end_time}}
-
-{% if price > 0 %}
-{{ reservationPrice }}: {{price | currency}} € ({{ vatIncluded }} {{tax_percentage}} %)
-{% else %}
-{{ reservationPrice }}: 0 €
-{% endif %}
-{{ reservationNumber }}: {{reservation_number}}
+{% include "email/text/partials/reservation_price.jinja" %}
 
 {{ reservationInstruction }}
-{{confirmed_instructions}}
+{{ confirmed_instructions }}
 
-{{ manageReservation }} {{ ownReservationsPage }}: {{my_reservations_ext_link}}
+{% include "email/text/partials/reservation_manage_link.jinja" %}
 
-{{ thankYouForUsing }}
-{{ withRegards }}
-{{ serviceName }}
+{% include "email/text/partials/closing_polite.jinja" %}
 
-{{ automaticMessage }} {{ contactUs }}: {{feedback_ext_link}}
-
-{{ reserveCityResourcesAt }} {{varaamo_ext_link}}
+{% include "email/text/partials/automatic_message.jinja" %}

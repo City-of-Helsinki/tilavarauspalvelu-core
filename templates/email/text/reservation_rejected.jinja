@@ -1,23 +1,13 @@
-{{ salutation }} {{reservee_name}},
+{{ salutation }} {{ reservee_name }},
 
 {{ reservationRejected }}
-{{ rejectionReason }}: {{deny_reason}}
+{{ rejectionReason }}: {{ deny_reason }}
 
-{{reservation_unit}}
-{{unit_name}}
-{{unit_location}}
+{% include "email/text/partials/reservation_basic_info.jinja" %}
 
-{{ reservationBegins }}: {{begin_date}} {{ oClock }} {{begin_time}}
-{{ reservationEnds }}: {{end_date}} {{ oClock }} {{end_time}}
-
-{{ reservationNumber }}: {{reservation_number}}
+{{ reservationNumber }}: {{ reservation_number }}
 
 {{ rejectionInstructions }}
-{{cancelled_instructions}}
+{{ cancelled_instructions }}
 
-{{ withRegards }}
-{{ serviceName }}
-
-{{ automaticMessage }} {{ contactUs }}: {{feedback_ext_link}}
-
-{{ reserveCityResourcesAt }} {{varaamo_ext_link}}
+{% include "email/text/partials/closing.jinja" %}
