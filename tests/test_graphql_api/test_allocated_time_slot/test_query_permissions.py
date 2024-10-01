@@ -1,8 +1,8 @@
 import pytest
 
-from tests.factories import AllocatedTimeSlotFactory
+from tests.factories import AllocatedTimeSlotFactory, ApplicationFactory
 from tests.test_graphql_api.test_application.helpers import applications_query
-from tilavarauspalvelu.enums import UserRoleChoice
+from tilavarauspalvelu.enums import ApplicationStatusChoice, UserRoleChoice
 
 from .helpers import allocations_query
 
@@ -29,28 +29,52 @@ def test_allocated_time_slot__query__perms__admin_user(graphql):
     assert response.node(0) == {"pk": allocation.pk}
 
 
-def test_allocated_time_slot__query__perms__application_owner(graphql):
-    # given:
-    # - There is an allocated time slot
-    # - The owner of that application is using the system
-    allocation = AllocatedTimeSlotFactory.create()
-    graphql.force_login(allocation.reservation_unit_option.application_section.application.user)
+@pytest.mark.parametrize(
+    "status",
+    [
+        ApplicationStatusChoice.DRAFT,
+        ApplicationStatusChoice.RECEIVED,
+        ApplicationStatusChoice.IN_ALLOCATION,
+        ApplicationStatusChoice.HANDLED,
+        ApplicationStatusChoice.EXPIRED,
+        ApplicationStatusChoice.CANCELLED,
+    ],
+)
+def test_allocated_time_slot__query__perms__application_owner__hidden(graphql, status):
+    application = ApplicationFactory.create_in_status(status=status)
+    AllocatedTimeSlotFactory.create(reservation_unit_option__application_section__application=application)
+    graphql.force_login(application.user)
 
-    # when:
-    # - User tries to access allocated time slots
     response = graphql(allocations_query())
 
-    # then:
-    # - The response contains errors about permissions
-    assert response.error_message() == "No permission to access node."
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 0
+
+
+def test_allocated_time_slot__query__perms__application_owner__shown(graphql):
+    application = ApplicationFactory.create_in_status_results_sent()
+    section = application.application_sections.first()
+    option = section.reservation_unit_options.first()
+    allocation = option.allocated_time_slots.first()
+    graphql.force_login(application.user)
+
+    response = graphql(allocations_query())
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 1
+
+    assert response.node(0) == {"pk": allocation.pk}
 
 
 def test_allocated_time_slot__query__perms__application_owner__through_application(graphql):
-    # given:
-    # - There is an allocated time slot
-    # - The owner of that application is using the system
-    allocation = AllocatedTimeSlotFactory.create()
-    graphql.force_login(allocation.reservation_unit_option.application_section.application.user)
+    application = ApplicationFactory.create_in_status_handled()
+    section = application.application_sections.first()
+    option = section.reservation_unit_options.first()
+    allocation = option.allocated_time_slots.first()
+
+    assert allocation is not None
+
+    graphql.force_login(application.user)
 
     fields = """
         applicationSections {
@@ -64,29 +88,31 @@ def test_allocated_time_slot__query__perms__application_owner__through_applicati
         }
     """
 
-    # when:
-    # - User tries to access allocated time slots through their application,
-    #   since they are too curious about what slot they will be given
     query = applications_query(fields=fields)
     response = graphql(query)
 
-    # then:
-    # - The response contains errors about permissions, since the user shouldn't
-    #   have access to the allocated time slots before the allocation period is finished.
-    assert response.error_message("allocatedTimeSlots") == "No permission to access node."
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 1
+
+    # No allocated time slots should be shown
+    assert response.node(0) == {
+        "applicationSections": [
+            {
+                "reservationUnitOptions": [
+                    {
+                        "allocatedTimeSlots": [],
+                    },
+                ],
+            },
+        ],
+    }
 
 
 def test_allocated_time_slot__query__perms__regular_user(graphql):
-    # given:
-    # - There is an allocated time slot
-    # - A regular user is using the system
     AllocatedTimeSlotFactory.create()
     graphql.login_with_regular_user()
 
-    # when:
-    # - User tries to access allocated time slots
     response = graphql(allocations_query())
 
-    # then:
-    # - The response contains errors about permissions
-    assert response.error_message() == "No permission to access node."
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 0
