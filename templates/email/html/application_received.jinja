@@ -1,0 +1,19 @@
+{% extends "email/html/partials/base.jinja" %}
+
+{% block title %}{{ subjectApplicationReceived }}{% endblock %}
+
+{% block header %}{% include "email/html/partials/header_staff.jinja" %}{% endblock %}
+
+{% block content %}
+    <div class="main-container">
+        <p>
+            {{ applicationReceived }} {{ manageApplication }}
+            <a href="{{ my_applications_ext_link }}">{{ ownApplicationPage }}</a> {{ untilApplicationPeriodEnd }}.
+        </p>
+    </div>
+
+    <div class="secondary-container">
+        {% include "email/html/partials/thanks_for_using.jinja" %}
+        {% include "email/html/partials/automatic_message.jinja" %}
+    </div>
+{% endblock %}

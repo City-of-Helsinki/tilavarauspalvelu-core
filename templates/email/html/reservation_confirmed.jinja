@@ -1,0 +1,24 @@
+{% extends "email/html/partials/base.jinja" %}
+
+{% block title %}{{ subjectConfirmed }}{% endblock %}
+
+{% block header %}{% include "email/html/partials/header.jinja" %}{% endblock %}
+
+{% block content %}
+    <div class="main-container">
+        <p>{{ reservationMadeConfirmed }}</p>
+
+        {% include "email/html/partials/reservation_unit_info.jinja" %}
+        {% include "email/html/partials/reservation_datetime.jinja" %}
+        {% include "email/html/partials/reservation_price.jinja" %}
+    </div>
+
+    <div class="secondary-container">
+        <h2>{{ reservationInstruction }}</h2>
+        <p>{{ confirmed_instructions }}</p>
+
+        {% include "email/html/partials/reservation_manage_link.jinja" %}
+        {% include "email/html/partials/thanks_for_using.jinja" %}
+        {% include "email/html/partials/automatic_message.jinja" %}
+    </div>
+{% endblock %}
