@@ -87,10 +87,9 @@ class BaseEmailBuilder:
         self.context = context
 
         self.validator = EmailTemplateValidator(context=self.context)
-        self._validate_template_type()
-        self._validate_template_content()
+        self._validate_template()
 
-    def _validate_template_type(self) -> None:
+    def _validate_template(self) -> None:
         """
         Validate that the template type is supported by this builder.
         This way we get an early error if trying to e.g. send a reservation email with an application email builder.
@@ -99,13 +98,7 @@ class BaseEmailBuilder:
             msg = f"Email template type '{self.template.type}' is not supported by this builder."
             raise EmailBuilderConfigurationError(msg)
 
-    def _validate_template_content(self) -> None:
-        html_content = self._get_html_content()
-        if html_content:
-            self.validator.validate_string(html_content)
-
         self.validator.validate_string(self.template.subject)
-        self.validator.validate_string(self.template.content)
 
     # Helper methods
     def _get_field_by_language(self, instance: Any, field: str) -> str | FieldFile:
@@ -114,23 +107,13 @@ class BaseEmailBuilder:
             return field_value
         return getattr(instance, field, "")
 
-    def _get_html_content(self) -> str:
-        html_template_file = self._get_field_by_language(self.template, "html_content")
-        if not html_template_file:
-            return ""
-        return html_template_file.open().read().decode("utf-8")
-
     # The important methods
     def get_subject(self) -> str:
         subject = self._get_field_by_language(self.template, "subject")
         return self.validator.render_string(string=subject)
 
     def get_content(self) -> str:
-        content = self._get_field_by_language(self.template, "content")
-        return self.validator.render_string(string=content)
+        return self.validator.render_template(template_path=self.template.text_template_path)
 
-    def get_html_content(self) -> str | None:
-        content = self._get_html_content()
-        if not content:
-            return None
-        return self.validator.render_string(string=content)
+    def get_html_content(self) -> str:
+        return self.validator.render_template(template_path=self.template.html_template_path)

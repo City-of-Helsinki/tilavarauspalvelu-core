@@ -89,7 +89,7 @@ class LocationTranslationOptions(TranslationOptions):
 
 @register(EmailTemplate)
 class EmailTemplateTranslationOptions(TranslationOptions):
-    fields = ["subject", "content", "html_content"]
+    fields = ["subject"]
 
 
 @register(AbilityGroup)

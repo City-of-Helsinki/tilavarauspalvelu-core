@@ -201,8 +201,6 @@ class Common(Environment):
     DEFAULT_FROM_EMAIL = values.StringValue(default="tilavarauspalvelu@localhost")
 
     SEND_RESERVATION_NOTIFICATION_EMAILS = values.BooleanValue(default=False)
-    EMAIL_HTML_MAX_FILE_SIZE = values.IntegerValue(default=150_000)
-    EMAIL_HTML_TEMPLATES_ROOT = "email_html_templates"
     EMAIL_VARAAMO_EXT_LINK = values.StringValue(default=None)
     EMAIL_FEEDBACK_EXT_LINK = values.StringValue(default=None)
 
@@ -714,7 +712,6 @@ class AutomatedTests(EmptyDefaults, Common, dotenv_path=None, overrides_from=Aut
     EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 
     SEND_RESERVATION_NOTIFICATION_EMAILS = False
-    EMAIL_HTML_MAX_FILE_SIZE = 150_000
     EMAIL_VARAAMO_EXT_LINK = "https://fake.varaamo.hel.fi"
     EMAIL_FEEDBACK_EXT_LINK = "https://fake.varaamo.hel.fi/feedback"
 

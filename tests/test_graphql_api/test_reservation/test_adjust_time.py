@@ -374,13 +374,11 @@ def test_reservation__adjust_time__needs_handling_after_time_change(graphql, out
 
     EmailTemplateFactory.create(
         type=EmailType.RESERVATION_MODIFIED,
-        content="",
         subject="modified",
     )
 
     EmailTemplateFactory.create(
         type=EmailType.STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING,
-        content="",
         subject="staff",
     )
 
