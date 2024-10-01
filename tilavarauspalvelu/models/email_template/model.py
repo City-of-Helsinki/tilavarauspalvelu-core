@@ -3,7 +3,6 @@ from __future__ import annotations
 from functools import cached_property
 from typing import TYPE_CHECKING
 
-from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -34,22 +33,6 @@ class EmailTemplate(models.Model):
     )
 
     subject: str = models.CharField(max_length=255, null=False, blank=False)
-    content: str = models.TextField(
-        verbose_name=_("Content"),
-        help_text=_("Email body content. Use curly brackets to indicate data specific fields e.g {{reservee_name}}."),
-        null=False,
-        blank=False,
-    )
-
-    html_content: str | None = models.FileField(
-        verbose_name=_("HTML content"),
-        help_text=_(
-            "Email body content as HTML. Use curly brackets to indicate data specific fields e.g {{reservee_name}}."
-        ),
-        null=True,
-        blank=True,
-        upload_to=settings.EMAIL_HTML_TEMPLATES_ROOT,
-    )
 
     objects = EmailTemplateManager()
 
@@ -57,12 +40,6 @@ class EmailTemplate(models.Model):
     subject_fi: str | None
     subject_en: str | None
     subject_sv: str | None
-    content_fi: str | None
-    content_en: str | None
-    content_sv: str | None
-    html_content_fi: str | None
-    html_content_en: str | None
-    html_content_sv: str | None
 
     class Meta:
         db_table = "email_template"
@@ -81,3 +58,11 @@ class EmailTemplate(models.Model):
         from .actions import EmailTemplateActions
 
         return EmailTemplateActions(self)
+
+    @property
+    def text_template_path(self) -> str:
+        return f"email/text/{self.type}.jinja"
+
+    @property
+    def html_template_path(self) -> str:
+        return f"email/html/{self.type}.jinja"

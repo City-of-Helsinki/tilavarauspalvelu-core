@@ -17,5 +17,3 @@ class EmailTemplateFactory(GenericDjangoModelFactory[EmailTemplate]):
     name = fuzzy.FuzzyText(length=255)
     type = fuzzy.FuzzyChoice(choices=EmailType.choices)
     subject = fuzzy.FuzzyText(length=255)
-    content = fuzzy.FuzzyText()
-    html_content = None

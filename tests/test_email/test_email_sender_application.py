@@ -32,7 +32,6 @@ def test_email_sender__application__success__correct_email_recipient_addresses(o
 
     assert len(outbox) == 1
     assert outbox[0].subject == email_template.subject
-    assert outbox[0].body == email_template.content
     assert set(outbox[0].bcc) == {application.user.email, application.contact_person.email}
 
 
@@ -57,7 +56,6 @@ def test_email_sender__application__in_allocation__success__single_application(o
 
     assert len(outbox) == 1
     assert outbox[0].subject == email_template.subject
-    assert outbox[0].body == email_template.content
     assert set(outbox[0].bcc) == {application.user.email, application.contact_person.email}
 
     assert Application.objects.first().in_allocation_notification_sent_date is not None
@@ -68,9 +66,7 @@ def test_email_sender__application__in_allocation__success__multiple_round_and_a
     email_template = EmailTemplateFactory.create(
         type=EmailType.APPLICATION_IN_ALLOCATION,
         subject_fi="subject_fi",
-        content_fi="content_fi",
         subject_sv="subject_sv",
-        content_sv="content_sv",
     )
     application_1: Application = ApplicationFactory.create_in_status_in_allocation(
         user__preferred_language="fi",
@@ -91,7 +87,6 @@ def test_email_sender__application__in_allocation__success__multiple_round_and_a
 
     assert len(outbox) == 2
     assert outbox[0].subject == email_template.subject_fi
-    assert outbox[0].body == email_template.content_fi
     assert set(outbox[0].bcc) == {
         application_1.user.email,
         application_1.contact_person.email,
@@ -99,7 +94,6 @@ def test_email_sender__application__in_allocation__success__multiple_round_and_a
     }
 
     assert outbox[1].subject == email_template.subject_sv
-    assert outbox[1].body == email_template.content_sv
     assert set(outbox[1].bcc) == {application_3.contact_person.email}
 
     assert Application.objects.filter(in_allocation_notification_sent_date__isnull=True).exists() is False
@@ -151,7 +145,6 @@ def test_email_sender__application__handled__success__single_application(outbox)
 
     assert len(outbox) == 1
     assert outbox[0].subject == email_template.subject
-    assert outbox[0].body == email_template.content
     assert set(outbox[0].bcc) == {application.user.email, application.contact_person.email}
 
     assert Application.objects.first().results_ready_notification_sent_date is not None
@@ -162,9 +155,7 @@ def test_email_sender__application__handled__success__multiple_round_and_applica
     email_template = EmailTemplateFactory.create(
         type=EmailType.APPLICATION_HANDLED,
         subject_fi="subject_fi",
-        content_fi="content_fi",
         subject_sv="subject_sv",
-        content_sv="content_sv",
     )
     application_1: Application = ApplicationFactory.create_in_status_handled(
         user__preferred_language="fi",
@@ -185,7 +176,6 @@ def test_email_sender__application__handled__success__multiple_round_and_applica
 
     assert len(outbox) == 2
     assert outbox[0].subject == email_template.subject_fi
-    assert outbox[0].body == email_template.content_fi
     assert set(outbox[0].bcc) == {
         application_1.user.email,
         application_1.contact_person.email,
@@ -193,7 +183,6 @@ def test_email_sender__application__handled__success__multiple_round_and_applica
     }
 
     assert outbox[1].subject == email_template.subject_sv
-    assert outbox[1].body == email_template.content_sv
     assert set(outbox[1].bcc) == {application_3.contact_person.email}
 
     assert Application.objects.filter(results_ready_notification_sent_date__isnull=True).exists() is False

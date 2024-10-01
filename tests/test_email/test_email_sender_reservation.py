@@ -6,10 +6,12 @@ import pytest
 from django.test import override_settings
 
 from tests.factories import EmailTemplateFactory, ReservationFactory, UserFactory
+from tests.helpers import patch_method
 from tilavarauspalvelu.admin.email_template.tester import EmailTemplateTesterForm
 from tilavarauspalvelu.enums import EmailType, ReservationNotification
 from tilavarauspalvelu.models import EmailTemplate
 from tilavarauspalvelu.utils.email.email_sender import EmailNotificationSender
+from tilavarauspalvelu.utils.email.email_validator import EmailTemplateValidator
 from tilavarauspalvelu.utils.email.reservation_email_notification_sender import ReservationEmailNotificationSender
 
 if TYPE_CHECKING:
@@ -26,13 +28,9 @@ def email_template() -> EmailTemplate:
     return EmailTemplateFactory.create(
         type=EmailType.RESERVATION_CONFIRMED,
         subject="foo",
-        content="bar",
         subject_fi="fi",
-        content_fi="fi",
         subject_en="en",
-        content_en="en",
         subject_sv="sv",
-        content_sv="sv",
     )
 
 
@@ -52,7 +50,6 @@ def test_email_sender__reservation__success__reservee_email(outbox, email_templa
 
     assert len(outbox) == 1
     assert outbox[0].subject == email_template.subject
-    assert outbox[0].body == email_template.content
     assert outbox[0].bcc == [reservation.reservee_email]
 
 
@@ -71,7 +68,6 @@ def test_email_sender__reservation__success__reservation_user_email(outbox, emai
 
     assert len(outbox) == 1
     assert outbox[0].subject == email_template.subject
-    assert outbox[0].body == email_template.content
     assert outbox[0].bcc == [reservation.user.email]
 
 
@@ -91,7 +87,6 @@ def test_email_sender__reservation__success__reservee_and_user_email(outbox, ema
 
     assert len(outbox) == 1
     assert outbox[0].subject == email_template.subject
-    assert outbox[0].body == email_template.content
     assert sorted(outbox[0].bcc) == [reservation.reservee_email, reservation.user.email]
 
 
@@ -112,7 +107,6 @@ def test_email_sender__reservation__with_multiple_recipients__success(outbox, em
 
     assert len(outbox) == 1
     assert outbox[0].subject == email_template.subject
-    assert outbox[0].body == email_template.content
     assert outbox[0].bcc == recipients
 
 
@@ -145,7 +139,6 @@ def test_email_sender__reservation__reservation_language_is_used(outbox, languag
 
     assert len(outbox) == 1
     assert outbox[0].subject == getattr(email_template, f"subject_{language}", None)
-    assert outbox[0].body == getattr(email_template, f"content_{language}", None)
     assert outbox[0].bcc == [reservation.user.email]
 
 
@@ -169,11 +162,20 @@ def test_email_sender__reservation__staff_email_sent_in_default_language(outbox,
 
     assert len(outbox) == 1
     assert outbox[0].subject == getattr(email_template, "subject_fi", None)
-    assert outbox[0].body == getattr(email_template, "content_fi", None)
     assert outbox[0].bcc == [staff_user.email]
 
 
+@patch_method(EmailTemplateValidator.render_template)
 def test_email_sender__test_emails(outbox, email_template):
+    EmailTemplateValidator.render_template.side_effect = [
+        "fi",  # Text
+        "fi",  # HTML
+        "sv",
+        "sv",
+        "en",
+        "en",
+    ]
+
     form = EmailTemplateTesterForm()
     form.cleaned_data = {
         "recipient": "test@example.com",
