@@ -261,3 +261,7 @@ class ReservationEmailBuilder(BaseEmailBuilder):
             template=template,
             context=ReservationEmailContext.from_form(form, language),
         )
+
+    @classmethod
+    def from_mock_data(cls, *, template: EmailTemplate) -> ReservationEmailBuilder:
+        return ReservationEmailBuilder(template=template, context=ReservationEmailContext.from_mock_data())
