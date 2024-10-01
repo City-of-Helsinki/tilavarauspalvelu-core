@@ -9,8 +9,7 @@
         <p>{{ reservationCancelled }}</p>
         <p>{{ cancellationReason }}: {{ cancel_reason }}</p>
 
-        {% include "email/html/partials/reservation_unit_info.jinja" %}
-        {% include "email/html/partials/reservation_datetime.jinja" %}
+        {% include "email/html/partials/reservation_basic_info.jinja" %}
         {% include "email/html/partials/reservation_price.jinja" %}
     </div>
 
@@ -18,11 +17,6 @@
         <h2>{{ cancellationInstructions }}</h2>
         <p>{{ cancelled_instructions }}</p>
 
-        <div class="spacer"></div>
-
-        <p>{{ withRegards }}</p>
-        <p>{{ serviceName }}</p>
-
-        {% include "email/html/partials/automatic_message.jinja" %}
+        {% include "email/html/partials/closing.jinja" %}
     </div>
 {% endblock %}

@@ -2,19 +2,18 @@
 
 {% block title %}{{ subjectStaffReservationMade }}{% endblock %}
 
-{% block header %}{% include "email/html/partials/header_staff.jinja" %}{% endblock %}
+{% block header %}{% include "email/html/partials/header_no_recipient_name.jinja" %}{% endblock %}
 
 {% block content %}
     <div class="main-container">
         <p>{{ staffReservationMade }}: <b>{{ name }}</b></p>
-        <p>{{ unit }}: <b>{{ unit_name }}</b>, {{ unit_location }}</p>
 
         <div class="spacer"></div>
 
         <p>{{ reserveeName }}: {{ reservee_name }}</p>
         <p>{{ reservationNumber }}: {{ reservation_number }}</p>
 
-        {% include "email/html/partials/reservation_datetime.jinja" %}
+        {% include "email/html/partials/reservation_basic_info.jinja" %}
     </div>
 
     <div class="secondary-container">
@@ -23,6 +22,6 @@
             <a href="{{ staff_reservations_ext_link }}{{ reservation_number }}">{{ staff_reservations_ext_link }}{{ reservation_number }}</a>
         </p>
 
-        {% include "email/html/partials/staff_closing.jinja" %}
+        {% include "email/html/partials/closing_staff.jinja" %}
     </div>
 {% endblock %}

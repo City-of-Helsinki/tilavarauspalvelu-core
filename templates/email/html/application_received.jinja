@@ -2,7 +2,7 @@
 
 {% block title %}{{ subjectApplicationReceived }}{% endblock %}
 
-{% block header %}{% include "email/html/partials/header_staff.jinja" %}{% endblock %}
+{% block header %}{% include "email/html/partials/header_no_recipient_name.jinja" %}{% endblock %}
 
 {% block content %}
     <div class="main-container">
@@ -13,7 +13,6 @@
     </div>
 
     <div class="secondary-container">
-        {% include "email/html/partials/thanks_for_using.jinja" %}
-        {% include "email/html/partials/automatic_message.jinja" %}
+        {% include "email/html/partials/closing_polite.jinja" %}
     </div>
 {% endblock %}

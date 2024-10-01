@@ -2,7 +2,7 @@
 
 {% if price > 0 %}
     {% if subsidised_price < price %}
-        <p>{{ reservationPrice }}: <b>{{ subsidised_price | currency }} &ndash; {{ price | currency }} €</b> ({{ vatIncluded }} {{ tax_percentage }} %)</p>
+        <p>{{ reservationPrice }}: <b>{{ subsidised_price | currency }} &ndash; {{ price | currency }} €</b>({{ vatIncluded }} {{ tax_percentage }} %)</p>
     {% else %}
         <p>{{ reservationPrice }}: <b>{{ price | currency }} €</b> ({{ vatIncluded }} {{ tax_percentage }} %)</p>
     {% endif %}
