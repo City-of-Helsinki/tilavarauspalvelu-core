@@ -7,12 +7,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: applications/migrations/0004_fixed_organisation_year_field.py
-#: applications/migrations/0066_remove_applicationaggregatedata_application_and_more.py
-#: tilavarauspalvelu/models/organisation/model.py
-msgid "is after current year"
-msgstr ""
-
 #: config/settings.py tilavarauspalvelu/enums.py
 msgid "Finnish"
 msgstr ""
@@ -2839,32 +2833,16 @@ msgstr ""
 msgid "Unique name for this content"
 msgstr ""
 
-#: tilavarauspalvelu/models/email_template/model.py
-msgid "Content"
-msgstr ""
-
-#: tilavarauspalvelu/models/email_template/model.py
-msgid ""
-"Email body content. Use curly brackets to indicate data specific fields e.g "
-"{{reservee_name}}."
-msgstr ""
-
-#: tilavarauspalvelu/models/email_template/model.py
-msgid "HTML content"
-msgstr ""
-
-#: tilavarauspalvelu/models/email_template/model.py
-msgid ""
-"Email body content as HTML. Use curly brackets to indicate data specific "
-"fields e.g {{reservee_name}}."
-msgstr ""
-
 #: tilavarauspalvelu/models/general_role/model.py
 msgid "General role"
 msgstr ""
 
 #: tilavarauspalvelu/models/general_role/model.py
 msgid "General roles"
+msgstr ""
+
+#: tilavarauspalvelu/models/organisation/model.py
+msgid "is after current year"
 msgstr ""
 
 #: tilavarauspalvelu/models/organisation/model.py

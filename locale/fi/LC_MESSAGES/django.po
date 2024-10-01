@@ -2873,30 +2873,6 @@ msgstr "Vain yksi sähköpostipohja per tyyppi voidaan luoda."
 msgid "Unique name for this content"
 msgstr "Uniikki nimi tälle sisällölle"
 
-#: tilavarauspalvelu/models/email_template/model.py
-msgid "Content"
-msgstr "Sisältö"
-
-#: tilavarauspalvelu/models/email_template/model.py
-msgid ""
-"Email body content. Use curly brackets to indicate data specific fields e.g "
-"{{reservee_name}}."
-msgstr ""
-"Sähköpostin sisältö. Käytä aaltosulkeita osoittamaan dataan liittyviä "
-"kenttiä, esim {{reservee_name}}."
-
-#: tilavarauspalvelu/models/email_template/model.py
-msgid "HTML content"
-msgstr "HTML-sisältö"
-
-#: tilavarauspalvelu/models/email_template/model.py
-msgid ""
-"Email body content as HTML. Use curly brackets to indicate data specific "
-"fields e.g {{reservee_name}}."
-msgstr ""
-"Sähköpostin sisältö HTML-muodossa. Käytä aaltosulkeita osoittamaan dataan "
-"liittyviä kenttiä, esim {{reservee_name}}."
-
 #: tilavarauspalvelu/models/general_role/model.py
 msgid "General role"
 msgstr "Yleinen rooli"
