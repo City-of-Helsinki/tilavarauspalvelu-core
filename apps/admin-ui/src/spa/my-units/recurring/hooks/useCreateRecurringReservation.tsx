@@ -69,6 +69,9 @@ export function useCreateRecurringReservation() {
   }): Promise<number | undefined> => {
     const { data, reservationUnitPk, metaFields, buffers } = props;
     const flattenedMetadataSetValues = flattenMetadata(data, metaFields, false);
+    // unlike reservation creation age group are passed to the main mutation and others to details
+    const ageGroup = flattenedMetadataSetValues.ageGroup;
+    delete flattenedMetadataSetValues.ageGroup;
 
     const name = data.type === "BLOCKED" ? "BLOCKED" : (data.seriesName ?? "");
 
@@ -92,6 +95,7 @@ export function useCreateRecurringReservation() {
       reservationDetails,
       skipDates,
       // checkOpeningHours: true,
+      ageGroup: !Number.isNaN(Number(ageGroup)) ? Number(ageGroup) : undefined,
       reservationUnit: reservationUnitPk,
       beginDate: toApiDateUnsafe(fromUIDateUnsafe(data.startingDate)),
       beginTime: data.startTime,
