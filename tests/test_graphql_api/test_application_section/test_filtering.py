@@ -1101,7 +1101,7 @@ def test_application_section__filter__by_text_search__not_found(graphql):
 def test_application_section__filter__reservation_unit_options__preferred_order(graphql):
     # given:
     # - There is draft application in an open application round with two application sections
-    # - The owner of the application is using the system
+    # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft_no_sections()
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(
         application=application,
@@ -1111,7 +1111,7 @@ def test_application_section__filter__reservation_unit_options__preferred_order(
         application=application,
         reservation_unit_options__preferred_order=1,
     )
-    graphql.force_login(application.user)
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to filter only section reservation units with preferred order of 0
