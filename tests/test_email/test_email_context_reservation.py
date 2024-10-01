@@ -13,6 +13,7 @@ from tests.factories import (
 )
 from tilavarauspalvelu.enums import CustomerTypeChoice
 from tilavarauspalvelu.models import Location, Reservation
+from tilavarauspalvelu.typing import Lang
 from tilavarauspalvelu.utils.email.email_builder_reservation import ReservationEmailContext
 from utils.utils import get_attr_by_language
 
@@ -60,7 +61,7 @@ def reservation() -> Reservation:
 
 
 @pytest.mark.parametrize("language", ["fi", "en", "sv"])
-def test_email_context__from_reservation(language, reservation):
+def test_email_context__from_reservation(language: Lang, reservation):
     reservation.reservee_language = language
 
     reservation_unit: ReservationUnit = reservation.reservation_unit.first()

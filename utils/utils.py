@@ -148,12 +148,12 @@ class with_indices(Generic[T]):  # noqa: N801, RUF100
         self.item_deleted = True
 
 
-def get_attr_by_language(instance: Any, field: str, language: Lang) -> str | None:
+def get_attr_by_language(instance: Any, field: str, language: Lang) -> str:
     """Get field value by language, or fallback to default language"""
     localised_value = getattr(instance, f"{field}_{language}", None)
     if localised_value:
         return localised_value
-    return getattr(instance, field, None)
+    return getattr(instance, field, "")
 
 
 def translate_for_user(text: Promise, user: User) -> str:
