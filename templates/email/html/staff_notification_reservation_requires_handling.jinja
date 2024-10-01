@@ -20,7 +20,7 @@
     <div class="secondary-container">
         <p>
             {{ staffCheckDetailsPending }}
-            <a href="{{ handleReservationsUrl }}{{ reservation_number }}">{{ handleReservationsUrl }}{{ reservation_number }}</a>
+            <a href="{{ staff_reservations_ext_link }}{{ reservation_number }}">{{ staff_reservations_ext_link }}{{ reservation_number }}</a>
         </p>
 
         {% include "email/html/partials/staff_closing.jinja" %}

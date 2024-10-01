@@ -53,11 +53,6 @@ EMAIL_TRANSLATIONS: dict[str, dict[LanguageType, str]] = {
         "en": "varaamo.hel.fi/en/",
         "sv": "varaamo.hel.fi/sv/",
     },
-    "handleReservationsUrl": {
-        "fi": "https://tilavaraus.hel.fi/kasittely/reservations/",
-        "en": "https://tilavaraus.hel.fi/kasittely/reservations/",
-        "sv": "https://tilavaraus.hel.fi/kasittely/reservations/",
-    },
     "helsinkiCity": {
         "fi": "Helsingin kaupunki",
         "en": "City of Helsinki",
