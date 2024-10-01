@@ -1,12 +1,12 @@
 {% extends "email/html/partials/base.jinja" %}
 
-{% block title %}{{ subjectStaffReservationPending }}{% endblock %}
+{% block title %}{{ subjectStaffReservationRequiresHandling }}{% endblock %}
 
 {% block header %}{% include "email/html/partials/header_no_recipient_name.jinja" %}{% endblock %}
 
 {% block content %}
     <div class="main-container">
-        <p>{{ staffReservationPending }}: <b>{{ name }}</b></p>
+        <p>{{ textStaffReservationRequiresHandling }}: <b>{{ name }}</b></p>
 
         <div class="spacer"></div>
 
@@ -18,7 +18,7 @@
 
     <div class="secondary-container">
         <p>
-            {{ staffCheckDetailsPending }}
+            {{ staffReservationRequiresHandlingCheckDetails }}
             <a href="{{ staff_reservations_ext_link }}{{ reservation_number }}">{{ staff_reservations_ext_link }}{{ reservation_number }}</a>
         </p>
 

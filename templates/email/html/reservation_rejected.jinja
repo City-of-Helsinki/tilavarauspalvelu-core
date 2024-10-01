@@ -1,12 +1,12 @@
 {% extends "email/html/partials/base.jinja" %}
 
-{% block title %}{{ subjectRejected }}{% endblock %}
+{% block title %}{{ subjectReservationRejected }}{% endblock %}
 
 {% block header %}{% include "email/html/partials/header.jinja" %}{% endblock %}
 
 {% block content %}
     <div class="main-container">
-        <p>{{ reservationRejected }}</p>
+        <p>{{ textReservationRejected }}</p>
         <p>{{ rejectionReason }}: {{ deny_reason }}</p>
 
         {% include "email/html/partials/reservation_basic_info.jinja" %}
