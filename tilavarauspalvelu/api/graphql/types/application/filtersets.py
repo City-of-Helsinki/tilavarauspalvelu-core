@@ -35,6 +35,7 @@ class ApplicationFilterSet(ModelFilterSet):
             "preferred_unit_name_en",
             "preferred_unit_name_sv",
             "status",
+            "sent_date",
         ]
 
     @staticmethod
