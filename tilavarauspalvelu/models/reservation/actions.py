@@ -42,7 +42,8 @@ class ReservationActions:
             buffer_time_after = max(after, buffer_time_after)
         return buffer_time_after
 
-    def to_ical(self, *, site_name: str) -> bytes:
+    def to_ical(self) -> bytes:
+        site_name = settings.EMAIL_VARAAMO_EXT_LINK
         language: Lang = (  # type: ignore[assignment]
             self.reservation.reservee_language
             or (self.reservation.user is not None and self.reservation.user.get_preferred_language())
@@ -109,7 +110,7 @@ class ReservationActions:
             "Manage your booking at Varaamo. You can check the details of your booking and Varaamo's "
             "terms of contract and cancellation on the '%(bookings)s' page."
         ) % {
-            "bookings": f"<a href='https://{site_name}/reservations'>" + _("My bookings") + "</a>",
+            "bookings": f"<a href='{site_name}/reservations'>" + _("My bookings") + "</a>",
         }
 
         return (

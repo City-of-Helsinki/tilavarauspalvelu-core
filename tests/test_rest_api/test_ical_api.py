@@ -3,6 +3,7 @@ import io
 
 import pytest
 from django.contrib.gis.geos import Point
+from django.test import override_settings
 from freezegun import freeze_time
 from icalendar import Calendar
 from rest_framework.reverse import reverse
@@ -16,8 +17,9 @@ pytestmark = [
 ]
 
 
+@override_settings(EMAIL_VARAAMO_EXT_LINK="https://fake.varaamo.hel.fi")
 @freeze_time(local_datetime(2023, 1, 1))
-def test_reservation_ical(api_client):
+def test_reservation_ical(api_client, settings):
     user = UserFactory.create()
 
     api_client.force_authenticate(user=user)
@@ -68,7 +70,7 @@ def test_reservation_ical(api_client):
         "<p>"
         "Manage your booking at Varaamo. You can check the details of your booking and "
         "Varaamo's terms of contract and cancellation on the "
-        "'<a href='https://testserver/reservations'>My bookings</a>' page."
+        "'<a href='https://fake.varaamo.hel.fi/reservations'>My bookings</a>' page."
         "</p>"
         "</body>"
         "</html>"
@@ -81,7 +83,7 @@ def test_reservation_ical(api_client):
     event = calendar.subcomponents[0]
     assert event.name == "VEVENT"
 
-    assert str(event["UID"]) == f"varaamo.reservation.{reservation.pk}@testserver"
+    assert str(event["UID"]) == f"varaamo.reservation.{reservation.pk}@https://fake.varaamo.hel.fi"
     assert str(event["DTSTART"].to_ical().decode()) == "20240101T120000"
     assert str(event["DTEND"].to_ical().decode()) == "20240101T140000"
     assert str(event["DTSTAMP"].to_ical().decode()) == "20221231T220000Z"
