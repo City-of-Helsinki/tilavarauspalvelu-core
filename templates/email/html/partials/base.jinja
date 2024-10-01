@@ -1,145 +1,76 @@
-<!DOCTYPE html>
-<html lang="{{ language }}">
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <title>{% block title %}Varaamo{% endblock %}</title>
-
-    <style>
-        @font-face {
-            font-family: "HelsinkiGrotesk";
-            src: url("https://makasiini.hel.ninja/delivery/HelsinkiGrotesk/565d73a693abe0776c801607ac28f0bf.woff") format("woff");
-        }
-
-        body {
-            background-color: #FFFFFF;
-            max-width: 960px;
-            margin: 0 auto;
-            font-family: HelsinkiGrotesk, serif;
-        }
-
-        p {
-            margin: 0;
-            font-size: 18px;
-        }
-
-        h2 {
-            font-size: 20px;
-            margin-top: 15px;
-            margin-bottom: 15px;
-        }
-
-        #header {
-            display: flex;
-            flex-direction: column;
-            gap: 50px;
-            padding: 30px 25px;
-            background-color: #FFFFFF;
-
-            .headerTopRow {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                gap: 25px;
-
-                b {
-                    font-size: 24px;
-                }
-
-                img {
-                    width: 215px;
-                }
+<mjml>
+    {% set helsinkiLogoUrl = "https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png" %}
+    <mj-head>
+        <mj-style>
+            @font-face {
+                font-family: "HelsinkiGrotesk";
+                src: url("https://makasiini.hel.ninja/delivery/HelsinkiGrotesk/565d73a693abe0776c801607ac28f0bf.woff") format("woff");
             }
 
-            .headerBottomRow {
-                b {
-                    font-size: 36px;
-                }
-            }
-        }
-
-        #content {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            margin-bottom: 30px;
-
-            .main-container {
-                background-color: #F7F2E4;
-                padding: 20px 25px;
-
-                p {
-                    padding: 2px 0;
-                }
+            p {
+                margin: 0;
             }
 
-            .secondary-container {
-                background-color: #FFFFFF;
-                padding: 0 25px;
-
-                p {
-                    font-size: 16px;
-                }
+            h2 {
+                font-size: 20px;
             }
-        }
+        </mj-style>
 
-        #footer {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-            padding: 25px;
-            margin-top: 50px;
-            background-color: #E6E6E6;
+        <mj-attributes>
+            <mj-text line-height="1" font-weight="400" font-size="18px" padding-top="4px" padding-bottom="4px" />
+            <mj-spacer height="30px" />
+            <mj-all font-family="HelsinkiGrotesk" color="#000000" />
+        </mj-attributes>
 
-            .footerTopRow {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                gap: 25px;
+        <mj-title>{% block title %}Varaamo{% endblock %}</mj-title>
+    </mj-head>
+    <mj-body background-color="#ffffff" width="960px">
+        {% block header %}Header{% endblock %}
 
-                b {
-                    font-size: 16px;
-                }
+        <mj-section background-color="#F7F2E4">
+            <mj-column>
+                {% block content_main %}
+                    Main content
+                {% endblock %}
+            </mj-column>
+        </mj-section>
 
-                img {
-                    width: 120px;
-                }
-            }
+        <mj-section padding-bottom="0">
+            <mj-column>
+                {% block content_secondary %}
+                    Secondary content
+                {% endblock %}
+            </mj-column>
+        </mj-section>
 
-            .footerBottomRow {
-                font-size: 14px;
-            }
+        <mj-section padding-bottom="0">
+            <mj-column>
+                {% block content_closing %}
+                    Closing
+                {% endblock %}
+            </mj-column>
+        </mj-section>
 
-
-            .spacer-line {
-                border-top: #CCCCCC 2px solid;
-            }
-        }
-
-        .spacer {
-            padding: 15px 0;
-        }
-
-    </style>
-</head>
-
-{% set helsinkiLogoUrl = "https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png" %}
-
-<body>
-<div id="header">{% block header %}{% endblock %}</div>
-
-<div id="content">{% block content %}{% endblock %}</div>
-
-<div id="footer">
-    <div class="footerTopRow">
-        <img src="{{ helsinkiLogoUrl }}" alt="Helsinki logo" />
-        <b>{{ serviceName }}</b>
-    </div>
-    <div class="spacer-line"></div>
-    <div class="footerBottomRow">
-        &copy; {{ helsinkiCity }} {{ current_year }}
-    </div>
-</div>
-</body>
-</html>
+        {# Footer #}
+        <mj-section background-color="#E6E6E6" padding-bottom="0">
+            <mj-group>
+                <mj-column vertical-align="middle" width="15%" padding="0">
+                    <mj-image align="left" padding-right="0"
+                              src="https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png" />
+                </mj-column>
+                <mj-column vertical-align="middle">
+                    <mj-text font-size="16px" align="left">
+                        <b>{{ serviceName }}</b>
+                    </mj-text>
+                </mj-column>
+            </mj-group>
+        </mj-section>
+        <mj-section background-color="#E6E6E6">
+            <mj-column>
+                <mj-divider border-width="2px" border-style="solid" border-color="#CCCCCC" padding-top="0" />
+                <mj-spacer height="10px" />
+                <mj-text font-size="14px">&copy; {{ helsinkiCity }} {{ current_year }}</mj-text>
+            </mj-column>
+        </mj-section>
+    </mj-body>
+</mjml>

@@ -1,10 +1,13 @@
-<div class="spacer"></div>
+<mj-spacer />
 
-<p><b>{{ reservation_unit }}</b></p>
-<p>{{ unit_name }}</p>
-<p>{{ unit_location }}</p>
+<mj-text><b>{{ reservation_unit }}</b></mj-text>
+<mj-text>{{ unit_name }}</mj-text>
+<mj-text>{{ unit_location }}</mj-text>
 
-<div class="spacer"></div>
-
-<p>{{ reservationBegins }}: <b>{{ begin_date }}</b> {{ oClock }} <b>{{ begin_time }}</b></p>
-<p>{{ reservationEnds }}: <b>{{ end_date }}</b> {{ oClock }} <b>{{ end_time }}</b></p>
+<mj-spacer />
+<mj-text>
+    {{ reservationBegins }}: <b>{{ begin_date }}</b> {{ oClock }} <b>{{ begin_time }}</b>
+</mj-text>
+<mj-text>
+    {{ reservationEnds }}: <b>{{ end_date }}</b> {{ oClock }} <b>{{ end_time }}</b>
+</mj-text>

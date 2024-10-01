@@ -1,8 +1,13 @@
-<div class="spacer"></div>
+<mj-spacer />
 
-{% if price > 0 %}
-    <p>{{ reservationPrice }}: <b>{{ price | currency }} €</b> ({{ vatIncluded }} {{ tax_percentage }} %)</p>
-{% else %}
-    <p>{{ reservationPrice }}: <b>0 €</b></p>
-{% endif %}
-<p>{{ reservationNumber }}: {{ reservation_number }}</p>
+<mj-text>
+    {{ reservationPrice }}:
+    {% if price > 0 %}
+        <b>{{ price | currency }} €</b> ({{ vatIncluded }} {{ tax_percentage }} %)
+    {% else %}
+        <b>0 €</b>
+    {% endif %}
+</mj-text>
+<mj-text>
+    {{ reservationNumber }}: {{ reservation_number }}
+</mj-text>

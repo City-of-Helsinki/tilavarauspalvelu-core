@@ -4,6 +4,7 @@ import re
 from dataclasses import asdict
 from typing import TYPE_CHECKING
 
+import mjml
 from jinja2 import FileSystemLoader
 from jinja2.exceptions import TemplateError
 from jinja2.sandbox import SandboxedEnvironment
@@ -95,4 +96,7 @@ class EmailTemplateValidator:
 
     def render_template(self, template_path: str) -> str:
         """Render the given template with the given context in a safe, sandboxed environment."""
-        return self.env.get_template(template_path).render(asdict(self.context) | self.translations)
+        markup = self.env.get_template(template_path).render(asdict(self.context) | self.translations)
+        if markup.startswith("<mjml>"):
+            return mjml.mjml2html(markup)
+        return markup
