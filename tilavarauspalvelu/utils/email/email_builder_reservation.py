@@ -76,7 +76,7 @@ class ReservationEmailContext(BaseEmailContext):
             name=reservation.name,
             reservation_number=reservation.id,
             reservation_unit=cls._get_reservation_reservation_unit_name(reservation, language),
-            unit_name=get_attr_by_language(unit, "name", language) or "",
+            unit_name=get_attr_by_language(unit, "name", language),
             unit_location=str(location) if location is not None else "",
             # Dates and times
             begin_date=begin_datetime.strftime("%-d.%-m.%Y"),

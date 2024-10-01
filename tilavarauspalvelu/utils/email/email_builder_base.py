@@ -1,19 +1,17 @@
 from __future__ import annotations
 
-import datetime
 from dataclasses import asdict, dataclass
 from typing import TYPE_CHECKING, Any
 from urllib.parse import urlencode, urljoin
 
 from django.conf import settings
-from django.utils.timezone import get_default_timezone
 
 from tilavarauspalvelu.exceptions import EmailBuilderConfigurationError
 from tilavarauspalvelu.utils.email.email_validator import EmailTemplateValidator
+from utils.date_utils import local_datetime
+from utils.utils import get_attr_by_language
 
 if TYPE_CHECKING:
-    from django.db.models.fields.files import FieldFile
-
     from config.utils.commons import LanguageType
     from tilavarauspalvelu.enums import EmailType
     from tilavarauspalvelu.models import EmailTemplate
@@ -49,7 +47,7 @@ class BaseEmailContext:
             "language": language,
             "varaamo_ext_link": cls._get_varaamo_ext_link(language),
             "feedback_ext_link": cls._get_feedback_ext_link(language),
-            "current_year": cls._get_current_year(),
+            "current_year": local_datetime().year,
         }
 
     @staticmethod
@@ -63,10 +61,6 @@ class BaseEmailContext:
     def _get_feedback_ext_link(language: LanguageType | None) -> str:
         params = urlencode({"lang": language})
         return f"{settings.EMAIL_FEEDBACK_EXT_LINK}?{params}"
-
-    @staticmethod
-    def _get_current_year() -> int:
-        return datetime.datetime.now(get_default_timezone()).year
 
 
 class BaseEmailBuilder:
@@ -100,16 +94,9 @@ class BaseEmailBuilder:
 
         self.validator.validate_string(self.template.subject)
 
-    # Helper methods
-    def _get_field_by_language(self, instance: Any, field: str) -> str | FieldFile:
-        """Get the field value for the given language. Default to Finnish if value is not found."""
-        if field_value := getattr(instance, f"{field}_{self.context.language}", None):
-            return field_value
-        return getattr(instance, field, "")
-
     # The important methods
     def get_subject(self) -> str:
-        subject = self._get_field_by_language(self.template, "subject")
+        subject = get_attr_by_language(self.template, "subject", language=self.context.language)
         return self.validator.render_string(string=subject)
 
     def get_content(self) -> str:
