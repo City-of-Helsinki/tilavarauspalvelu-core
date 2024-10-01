@@ -39,6 +39,7 @@ class ReservationEmailContext(BaseEmailContext):
     non_subsidised_price: Decimal
     subsidised_price: Decimal
     tax_percentage: Decimal
+    payment_due_date: str
 
     confirmed_instructions: str
     pending_instructions: str
@@ -89,6 +90,7 @@ class ReservationEmailContext(BaseEmailContext):
             non_subsidised_price=reservation.non_subsidised_price,
             subsidised_price=cls._get_reservation_subsidised_price(reservation),
             tax_percentage=reservation.tax_percentage_value,
+            payment_due_date="TODO",
             # Instructions
             confirmed_instructions=cls._get_instruction_field(reservation, "confirmed", language),
             pending_instructions=cls._get_instruction_field(reservation, "pending", language),
@@ -126,6 +128,7 @@ class ReservationEmailContext(BaseEmailContext):
             non_subsidised_price=form.cleaned_data["non_subsidised_price"],
             subsidised_price=form.cleaned_data["subsidised_price"],
             tax_percentage=form.cleaned_data["tax_percentage"],
+            payment_due_date=form.cleaned_data["payment_due_date"].strftime("%-d.%-m.%Y"),
             # Instructions
             confirmed_instructions=form.cleaned_data[f"confirmed_instructions_{language}"],
             pending_instructions=form.cleaned_data[f"pending_instructions_{language}"],
@@ -164,6 +167,7 @@ class ReservationEmailContext(BaseEmailContext):
             non_subsidised_price=Decimal("15.00"),
             subsidised_price=Decimal("5.00"),
             tax_percentage=Decimal("25.5"),
+            payment_due_date=begin_datetime.strftime("%-d.%-m.%Y"),
             # Instructions
             confirmed_instructions="[lisäohje: hyväksytty]",
             pending_instructions="[lisäohje: käsittelyssä]",
