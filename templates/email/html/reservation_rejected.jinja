@@ -1,0 +1,30 @@
+{% extends "email/html/partials/base.jinja" %}
+
+{% block title %}{{ subjectRejected }}{% endblock %}
+
+{% block header %}{% include "email/html/partials/header.jinja" %}{% endblock %}
+
+{% block content %}
+    <div class="main-container">
+        <p>{{ reservationRejected }}</p>
+        <p>{{ rejectionReason }}: {{ deny_reason }}</p>
+
+        {% include "email/html/partials/reservation_unit_info.jinja" %}
+        {% include "email/html/partials/reservation_datetime.jinja" %}
+
+        <div class="spacer"></div>
+        <p>{{ reservationNumber }}: {{ reservation_number }}</p>
+    </div>
+
+    <div class="secondary-container">
+        <h2>{{ rejectionInstructions }}</h2>
+        <p>{{ cancelled_instructions }}</p>
+
+        <div class="spacer"></div>
+
+        <p>{{ withRegards }}</p>
+        <p>{{ serviceName }}</p>
+
+        {% include "email/html/partials/automatic_message.jinja" %}
+    </div>
+{% endblock %}

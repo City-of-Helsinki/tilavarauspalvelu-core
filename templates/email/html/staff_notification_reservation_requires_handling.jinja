@@ -1,0 +1,28 @@
+{% extends "email/html/partials/base.jinja" %}
+
+{% block title %}{{ subjectStaffReservationPending }}{% endblock %}
+
+{% block header %}{% include "email/html/partials/header_staff.jinja" %}{% endblock %}
+
+{% block content %}
+    <div class="main-container">
+        <p>{{ staffReservationPending }}: <b>{{ name }}</b></p>
+        <p>{{ unit }}: <b>{{ unit_name }}</b>, {{ unit_location }}</p>
+
+        <div class="spacer"></div>
+
+        <p>{{ reserveeName }}: {{ reservee_name }}</p>
+        <p>{{ reservationNumber }}: {{ reservation_number }}</p>
+
+        {% include "email/html/partials/reservation_datetime.jinja" %}
+    </div>
+
+    <div class="secondary-container">
+        <p>
+            {{ staffCheckDetailsPending }}
+            <a href="{{ handleReservationsUrl }}{{ reservation_number }}">{{ handleReservationsUrl }}{{ reservation_number }}</a>
+        </p>
+
+        {% include "email/html/partials/staff_closing.jinja" %}
+    </div>
+{% endblock %}
