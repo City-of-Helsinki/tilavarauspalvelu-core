@@ -2021,6 +2021,21 @@ files = [
 ]
 
 [[package]]
+name = "mjml-python"
+version = "1.3.3"
+description = "A Python wrapper for MRML (Rust port of MJML)."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "mjml_python-1.3.3-cp37-abi3-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:3583a6d7cbc66edfd2e8a71a85f2452ee10f028ba660b1c61e7acd90cfe0e4c4"},
+    {file = "mjml_python-1.3.3-cp37-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:4e8193ed7ac803bfc83b4452dc3dbf8adb017dbf3297dbcba232b4ee7011cb73"},
+    {file = "mjml_python-1.3.3-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:c4fa9a4eca964889a3d3816750cba92a91abc852f17d8fd9cc3c63765abaf970"},
+    {file = "mjml_python-1.3.3-cp37-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:24083860fd3d6d78bff37d73f1fcf8f1d60c2eeb348bea151c262e60e2d68d95"},
+    {file = "mjml_python-1.3.3-cp37-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:99c34ce7138d2400ec889d5fc263add31a9b60ce9673790f4c6a2db4563b0dcb"},
+    {file = "mjml_python-1.3.3-cp37-abi3-win_amd64.whl", hash = "sha256:321ad94a7ef39902d69bce4f090ba5b4c1a9277ee759bdd3ce0d56bc6404d26d"},
+]
+
+[[package]]
 name = "nodeenv"
 version = "1.9.1"
 description = "Node.js virtual environment builder"
@@ -3527,4 +3542,4 @@ test = ["coverage (>=5.3)", "tomli (>=2.0.1)", "tox"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.12,<3.13"
-content-hash = "814ad5cec4112147ff88de1e1d5e24776a79cc3a18a404c70dd8e6a9fa89a2b7"
+content-hash = "7ff405a841e774af3a994a96c2880db764eb9cb0a7e269d59eb3608d5f574216"
