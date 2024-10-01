@@ -65,7 +65,7 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
             case ApplicationRoundStatusChoice.HANDLED:
                 return cls.create_in_status_handled(**kwargs)
             case ApplicationRoundStatusChoice.RESULTS_SENT:
-                return cls.create_in_status_result_sent(**kwargs)
+                return cls.create_in_status_results_sent(**kwargs)
 
     @classmethod
     def create_in_status_upcoming(cls, **kwargs: Any) -> ApplicationRound:
@@ -103,7 +103,7 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
         return cls.create(**kwargs)
 
     @classmethod
-    def create_in_status_result_sent(cls, **kwargs: Any) -> ApplicationRound:
+    def create_in_status_results_sent(cls, **kwargs: Any) -> ApplicationRound:
         """Create an application round with results sent."""
         kwargs.setdefault("sent_date", utc_start_of_day())
         kwargs.setdefault("handled_date", utc_start_of_day())

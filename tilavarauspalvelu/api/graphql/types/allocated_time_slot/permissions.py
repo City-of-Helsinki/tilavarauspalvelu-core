@@ -4,6 +4,7 @@ from graphene_django_extensions.errors import GQLCodeError
 from graphene_django_extensions.permissions import BasePermission
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
+from tilavarauspalvelu.enums import ApplicationStatusChoice
 from tilavarauspalvelu.models import AllocatedTimeSlot, ReservationUnitOption
 from tilavarauspalvelu.typing import AnyUser
 
@@ -15,6 +16,14 @@ __all__ = [
 class AllocatedTimeSlotPermission(BasePermission):
     @classmethod
     def has_permission(cls, user: AnyUser) -> bool:
+        return user.is_authenticated
+
+    @classmethod
+    def has_node_permission(cls, instance: AllocatedTimeSlot, user: AnyUser, filters: dict[str, Any]) -> bool:
+        application = instance.reservation_unit_option.application_section.application
+        if application.user == user and application.status == ApplicationStatusChoice.RESULTS_SENT:
+            return True
+
         return user.permissions.has_any_role()
 
     @classmethod

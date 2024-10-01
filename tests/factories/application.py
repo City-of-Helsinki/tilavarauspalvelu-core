@@ -191,7 +191,7 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
 
         if "application_round" not in kwargs:
             round_kwargs = cls.pop_sub_kwargs("application_round", kwargs)
-            kwargs["application_round"] = ApplicationRoundFactory.create_in_status_result_sent(**round_kwargs)
+            kwargs["application_round"] = ApplicationRoundFactory.create_in_status_results_sent(**round_kwargs)
 
         key = "application_sections"
         key_kwargs = cls.pop_sub_kwargs(key, kwargs)
