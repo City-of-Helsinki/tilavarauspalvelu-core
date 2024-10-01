@@ -11,6 +11,7 @@ from django.utils.timezone import get_default_timezone
 
 from tilavarauspalvelu.enums import CustomerTypeChoice, EmailType
 from tilavarauspalvelu.utils.email.email_builder_base import BaseEmailBuilder, BaseEmailContext
+from utils.date_utils import local_date
 from utils.utils import get_attr_by_language
 
 if TYPE_CHECKING:
@@ -90,7 +91,7 @@ class ReservationEmailContext(BaseEmailContext):
             non_subsidised_price=reservation.non_subsidised_price,
             subsidised_price=cls._get_reservation_subsidised_price(reservation),
             tax_percentage=reservation.tax_percentage_value,
-            payment_due_date="TODO",
+            payment_due_date=local_date().strftime("%-d.%-m.%Y"),
             # Instructions
             confirmed_instructions=cls._get_instruction_field(reservation, "confirmed", language),
             pending_instructions=cls._get_instruction_field(reservation, "pending", language),
@@ -221,7 +222,7 @@ class ReservationEmailContext(BaseEmailContext):
         )
 
     @staticmethod
-    def _get_my_reservations_ext_link(language: LanguageType | None) -> str:
+    def _get_my_reservations_ext_link(language: LanguageType) -> str:
         url_base = settings.EMAIL_VARAAMO_EXT_LINK
         if language.lower() != "fi":
             url_base = urljoin(url_base, language) + "/"

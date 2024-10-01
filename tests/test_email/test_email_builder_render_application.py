@@ -34,7 +34,7 @@ def application() -> Application:
 @pytest.mark.parametrize("language", ["fi", "en", "sv", None])
 @patch_method(EmailTemplateValidator.render_template)
 def test_email_builder__get_subject(language, email_template, application):
-    EmailTemplateValidator.render_template.return_value = f"HTML content { language or "fi" }"
+    EmailTemplateValidator.render_template.return_value = f"HTML content {language or "fi"}"
 
     application.user.preferred_language = language
     builder = ApplicationEmailBuilder.from_application(template=email_template, application=application)
@@ -50,7 +50,7 @@ def test_email_builder__get_subject(language, email_template, application):
 @pytest.mark.parametrize("language", ["fi", "en", "sv", None])
 @patch_method(EmailTemplateValidator.render_template)
 def test_email_builder__get_content__with_html_file(language, email_template, application):
-    EmailTemplateValidator.render_template.return_value = f"HTML content { language or "fi" }"
+    EmailTemplateValidator.render_template.return_value = f"HTML content {language or "fi"}"
 
     application.user.preferred_language = language
     builder = ApplicationEmailBuilder.from_application(template=email_template, application=application)
@@ -66,7 +66,7 @@ def test_email_builder__get_content__with_html_file(language, email_template, ap
 @pytest.mark.parametrize("language", ["fi", "en", "sv", None])
 @patch_method(EmailTemplateValidator.render_template)
 def test_email_builder__get_content__with_text_content(language, email_template, application):
-    EmailTemplateValidator.render_template.return_value = f"Text content { language or "fi" }"
+    EmailTemplateValidator.render_template.return_value = f"Text content {language or "fi"}"
 
     application.user.preferred_language = language
     builder = ApplicationEmailBuilder.from_application(template=email_template, application=application)
