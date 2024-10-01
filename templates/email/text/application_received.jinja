@@ -1,11 +1,7 @@
 {{ salutation }}
 
-{{ applicationReceived }} {{ manageApplication }} {{ ownApplicationPage }} {{ untilApplicationPeriodEnd }}: {{my_applications_ext_link}}
+{{ applicationReceived }} {{ manageApplication }} {{ ownApplicationPage }} {{ untilApplicationPeriodEnd }}: {{ my_applications_ext_link }}
 
-{{ thankYouForUsing }}
-{{ withRegards }}
-{{ serviceName }}
+{% include "email/text/partials/closing_polite.jinja" %}
 
-{{ automaticMessage }} {{ contactUs }}: {{feedback_ext_link}}
-
-{{ reserveCityResourcesAt }} {{varaamo_ext_link}}
+{% include "email/text/partials/automatic_message.jinja" %}
