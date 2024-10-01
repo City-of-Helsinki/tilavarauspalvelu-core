@@ -14,7 +14,7 @@ import {
 } from "@gql/gql-types";
 import {
   canReservationTimeBeChanged,
-  canUserCancelReservation,
+  isReservationCancellable,
   getCheckoutUrl,
   getDurationOptions,
   getNormalizedReservationOrderStatus,
@@ -242,7 +242,7 @@ describe("getDurationOptions", () => {
   });
 });
 
-describe("canUserCancelReservation", () => {
+describe("isReservationCancellable", () => {
   beforeAll(() => {
     jest.useFakeTimers({
       now: new Date(2024, 0, 1, 9, 0, 0),
@@ -280,7 +280,7 @@ describe("canUserCancelReservation", () => {
       begin: addDays(new Date(), 1),
       state: ReservationStateChoice.RequiresHandling,
     });
-    expect(canUserCancelReservation(input)).toBe(false);
+    expect(isReservationCancellable(input)).toBe(false);
   });
 
   test("NO for reservation that is cancelled", () => {
@@ -288,7 +288,7 @@ describe("canUserCancelReservation", () => {
       begin: addDays(new Date(), 1),
       state: ReservationStateChoice.Cancelled,
     });
-    expect(canUserCancelReservation(input)).toBe(false);
+    expect(isReservationCancellable(input)).toBe(false);
   });
 
   test("YES for reservation that is confirmed", () => {
@@ -296,7 +296,7 @@ describe("canUserCancelReservation", () => {
       begin: addDays(new Date(), 1),
       state: ReservationStateChoice.Confirmed,
     });
-    expect(canUserCancelReservation(input)).toBe(true);
+    expect(isReservationCancellable(input)).toBe(true);
   });
 
   test("NO for reservation that is waiting for payment", () => {
@@ -304,7 +304,7 @@ describe("canUserCancelReservation", () => {
       begin: addDays(new Date(), 1),
       state: ReservationStateChoice.WaitingForPayment,
     });
-    expect(canUserCancelReservation(input)).toBe(false);
+    expect(isReservationCancellable(input)).toBe(false);
   });
 
   test("NO for reservation unit that needs handling", () => {
@@ -312,21 +312,21 @@ describe("canUserCancelReservation", () => {
       begin: addDays(new Date(), 1),
       needsHandling: true,
     });
-    expect(canUserCancelReservation(input)).toBe(false);
+    expect(isReservationCancellable(input)).toBe(false);
   });
 
   test("YES for reservation that does not need handling", () => {
     const input = constructInput({
       begin: addDays(new Date(), 1),
     });
-    expect(canUserCancelReservation(input)).toBe(true);
+    expect(isReservationCancellable(input)).toBe(true);
   });
 
   test("YES for a reservation that can be cancelled till it's start", () => {
     const input = constructInput({
       begin: addMinutes(new Date(), 10),
     });
-    expect(canUserCancelReservation(input)).toBe(true);
+    expect(isReservationCancellable(input)).toBe(true);
   });
 
   test("YES for a reservation in the future with 24h cancel buffer", () => {
@@ -334,14 +334,14 @@ describe("canUserCancelReservation", () => {
       begin: addDays(new Date(), 2),
       canBeCancelledTimeBefore: 24 * 60 * 60, // 24 hours
     });
-    expect(canUserCancelReservation(input)).toBe(true);
+    expect(isReservationCancellable(input)).toBe(true);
   });
 
   test("NO for a reservation that is in the past", () => {
     const input = constructInput({
       begin: addDays(new Date(), -1),
     });
-    expect(canUserCancelReservation(input)).toBe(false);
+    expect(isReservationCancellable(input)).toBe(false);
   });
 
   test("NO for a reservation that is too close to the start time", () => {
@@ -349,7 +349,7 @@ describe("canUserCancelReservation", () => {
       begin: addMinutes(new Date(), 10),
       canBeCancelledTimeBefore: 30 * 60,
     });
-    expect(canUserCancelReservation(input)).toBe(false);
+    expect(isReservationCancellable(input)).toBe(false);
   });
 });
 

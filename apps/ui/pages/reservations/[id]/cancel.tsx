@@ -14,7 +14,7 @@ import { ReservationCancellation } from "@/components/reservation/ReservationCan
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import { base64encode, filterNonNullable } from "common/src/helpers";
-import { canUserCancelReservation } from "@/modules/reservation";
+import { isReservationCancellable } from "@/modules/reservation";
 import { reservationsPrefix } from "@/modules/const";
 import { CURRENT_USER } from "@/modules/queries/user";
 
@@ -78,7 +78,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       };
     }
     const canCancel =
-      reservation != null && canUserCancelReservation(reservation);
+      reservation != null && isReservationCancellable(reservation);
     if (canCancel) {
       return {
         props: {

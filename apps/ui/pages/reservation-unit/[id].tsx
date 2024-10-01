@@ -136,7 +136,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         pk,
       },
     });
-    // TODO does this include only the active rounds or do we need to filter them?
     const activeApplicationRounds = filterNonNullable(
       reservationUnitData?.reservationUnit?.applicationRounds
     );

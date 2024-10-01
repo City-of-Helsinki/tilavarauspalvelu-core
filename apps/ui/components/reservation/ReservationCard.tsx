@@ -15,7 +15,7 @@ import {
   reservationsUrl,
 } from "@/modules/util";
 import {
-  canUserCancelReservation,
+  isReservationCancellable,
   getNormalizedReservationOrderStatus,
 } from "@/modules/reservation";
 import {
@@ -105,7 +105,7 @@ function ReservationCard({ reservation, type }: PropsT): JSX.Element {
   ];
 
   const buttons = [];
-  if (type === "upcoming" && canUserCancelReservation(reservation)) {
+  if (type === "upcoming" && isReservationCancellable(reservation)) {
     buttons.push(
       <ButtonLikeLink
         href={`${reservationsUrl}${reservation.pk}/cancel`}

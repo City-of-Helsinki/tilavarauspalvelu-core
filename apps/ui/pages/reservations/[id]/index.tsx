@@ -421,7 +421,7 @@ function Reservation({
 
   const isBeingHandled =
     reservation.state === ReservationStateChoice.RequiresHandling;
-  const isCancellable = isReservationCancellable({ reservation });
+  const isCancellable = isReservationCancellable(reservation);
 
   const checkoutUrl = getCheckoutUrl(order, i18n.language);
 

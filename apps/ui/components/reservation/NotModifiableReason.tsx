@@ -32,7 +32,7 @@ export function NotModifiableReason({
 >): JSX.Element | null {
   const { t } = useTranslation();
   const modifyTimeReason = getWhyReservationCantBeChanged({ reservation });
-  const isCancellationAllowed = isReservationCancellable({ reservation });
+  const isCancellationAllowed = isReservationCancellable(reservation);
 
   if (modifyTimeReason == null) {
     return null;

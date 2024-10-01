@@ -146,10 +146,17 @@ type CanUserCancelReservationProps = Pick<
 > & {
   reservationUnit?: Maybe<Array<CancellationRuleFieldsFragment>> | undefined;
 };
-export function canUserCancelReservation(
+export function isReservationCancellable(
   reservation: CanUserCancelReservationProps
 ): boolean {
   const reservationUnit = reservation.reservationUnit?.[0];
+  const isReservationCancelled =
+    reservation.state === ReservationStateChoice.Cancelled;
+  const isBeingHandled =
+    reservation.state === ReservationStateChoice.RequiresHandling;
+  if (isBeingHandled || isReservationCancelled) {
+    return false;
+  }
   if (!reservationUnit) return false;
   // TODO why isn't user allowed to cancel waiting for payment?
   // TODO why can't user cancel if the reservation is waiting for handling?
@@ -280,7 +287,7 @@ export function getWhyReservationCantBeChanged(
   }
 
   // existing reservation cancellation buffer is not exceeded
-  if (!canUserCancelReservation(reservation)) {
+  if (!isReservationCancellable(reservation)) {
     return "CANCELLATION_TIME_PAST";
   }
 
@@ -299,21 +306,6 @@ export function isReservationEditable(
     return false;
   }
   return true;
-}
-
-export function isReservationCancellable({
-  reservation,
-}: Pick<Required<CanReservationBeChangedProps>, "reservation">): boolean {
-  const isReservationCancelled =
-    reservation.state === ReservationStateChoice.Cancelled;
-  const isBeingHandled =
-    reservation.state === ReservationStateChoice.RequiresHandling;
-
-  return (
-    canUserCancelReservation(reservation) &&
-    !isReservationCancelled &&
-    !isBeingHandled
-  );
 }
 
 /// Only used by reservation edit (both page and component)
