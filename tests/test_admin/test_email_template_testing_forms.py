@@ -26,8 +26,8 @@ def test_reservation_unit_select_form():
 
 
 def test_email_test_form():
-    template1 = EmailTemplateFactory.create(name="Template 1", type=EmailType.RESERVATION_CONFIRMED)
-    template2 = EmailTemplateFactory.create(name="Template 2", type=EmailType.RESERVATION_CANCELLED)
+    template1 = EmailTemplateFactory.create(name="Template 1", type=EmailType.RESERVATION_CANCELLED)
+    template2 = EmailTemplateFactory.create(name="Template 2", type=EmailType.RESERVATION_CONFIRMED)
     template3 = EmailTemplateFactory.create(name="Template 3", type=EmailType.RESERVATION_REJECTED)
 
     form = EmailTemplateTesterForm()

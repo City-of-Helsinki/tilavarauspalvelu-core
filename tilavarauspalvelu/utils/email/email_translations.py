@@ -2,9 +2,6 @@
 from config.utils.commons import LanguageType
 
 EMAIL_TRANSLATIONS: dict[str, dict[LanguageType, str]] = {
-    # ACCESS_CODE_FOR_RESERVATION
-    # Not in use yet
-    #
     # APPLICATION_HANDLED
     "subjectApplicationHandled": {
         "fi": "Hakemuksesi on käsitelty",
@@ -54,23 +51,6 @@ EMAIL_TRANSLATIONS: dict[str, dict[LanguageType, str]] = {
         "fi": "hakuajan päättymiseen asti",
         "en": "untilApplicationPeriodEnd EN",
         "sv": "untilApplicationPeriodEnd SV",
-    },
-    #
-    # HANDLING_REQUIRED_RESERVATION
-    "subjectReservationHandlingRequired": {
-        "fi": "Varauksesi odottaa käsittelyä",
-        "en": "Your booking is waiting for processing",
-        "sv": "Din bokning väntar på att behandlas",
-    },
-    "textReservationHandlingRequired": {
-        "fi": "Olet tehnyt alustavan varauksen:",
-        "en": "You have made a new booking request:",
-        "sv": "Du har gjort en ny bokningsförfrågan:",
-    },
-    "pendingNotification": {
-        "fi": "Saat varausvahvistuksen sähköpostitse, kun varauksesi on käsitelty. Otamme sinuun yhteyttä, jos tarvitsemme lisätietoja varauspyyntöösi liittyen.",
-        "en": "You will receive a confirmation email once your booking has been processed. We will contact you if further information is needed regarding your booking request.",
-        "sv": "Du kommer att få en bekräftelse via e-post när din bokning har behandlats. Vi kommer att kontakta dig om ytterligare information behövs angående din bokningsförfrågan.",
     },
     #
     # RESERVATION_CANCELLED
@@ -124,6 +104,23 @@ EMAIL_TRANSLATIONS: dict[str, dict[LanguageType, str]] = {
         "sv": "Din bokning har bekräftats med följande rabatt:",
     },
     #
+    # RESERVATION_HANDLING_REQUIRED
+    "subjectReservationHandlingRequired": {
+        "fi": "Varauksesi odottaa käsittelyä",
+        "en": "Your booking is waiting for processing",
+        "sv": "Din bokning väntar på att behandlas",
+    },
+    "textReservationHandlingRequired": {
+        "fi": "Olet tehnyt alustavan varauksen:",
+        "en": "You have made a new booking request:",
+        "sv": "Du har gjort en ny bokningsförfrågan:",
+    },
+    "pendingNotification": {
+        "fi": "Saat varausvahvistuksen sähköpostitse, kun varauksesi on käsitelty. Otamme sinuun yhteyttä, jos tarvitsemme lisätietoja varauspyyntöösi liittyen.",
+        "en": "You will receive a confirmation email once your booking has been processed. We will contact you if further information is needed regarding your booking request.",
+        "sv": "Du kommer att få en bekräftelse via e-post när din bokning har behandlats. Vi kommer att kontakta dig om ytterligare information behövs angående din bokningsförfrågan.",
+    },
+    #
     # RESERVATION_MODIFIED
     "subjectReservationModified": {
         "fi": "Varaustasi on muutettu",
@@ -174,9 +171,6 @@ EMAIL_TRANSLATIONS: dict[str, dict[LanguageType, str]] = {
         "en": "Reason",
         "sv": "Orsak",
     },
-    #
-    # RESERVATION_WITH_PIN_CONFIRMED
-    # Not in use yet
     #
     # STAFF_NOTIFICATION_RESERVATION_MADE
     "subjectStaffReservationMade": {

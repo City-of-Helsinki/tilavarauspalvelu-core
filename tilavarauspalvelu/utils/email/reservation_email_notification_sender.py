@@ -15,7 +15,7 @@ class ReservationEmailNotificationSender:
 
     RESERVATION_STATE_EMAIL_TYPE_MAP = {
         ReservationStateChoice.CONFIRMED.value: EmailType.RESERVATION_CONFIRMED,
-        ReservationStateChoice.REQUIRES_HANDLING.value: EmailType.HANDLING_REQUIRED_RESERVATION,
+        ReservationStateChoice.REQUIRES_HANDLING.value: EmailType.RESERVATION_HANDLING_REQUIRED,
         ReservationStateChoice.CANCELLED.value: EmailType.RESERVATION_CANCELLED,
         ReservationStateChoice.DENIED.value: EmailType.RESERVATION_REJECTED,
         "APPROVED": EmailType.RESERVATION_HANDLED_AND_CONFIRMED,
