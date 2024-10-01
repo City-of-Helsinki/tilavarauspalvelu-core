@@ -11,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from tilavarauspalvelu.models import EmailTemplate, ReservationUnit
 from tilavarauspalvelu.utils.email.email_builder_reservation import ReservationEmailBuilder
 from tilavarauspalvelu.utils.email.email_sender import EmailNotificationSender
+from utils.utils import safe_getattr
 
 if TYPE_CHECKING:
     from django.http import HttpResponseRedirect
@@ -57,7 +58,7 @@ class EmailTemplateTesterReservationUnitSelectForm(forms.Form):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         runit_choices = [
-            (runit.pk, f"{runit.name} - {runit.unit.name}")
+            (runit.pk, f"{runit.name} - {safe_getattr(runit, "unit.name")}")
             for runit in ReservationUnit.objects.select_related("unit").order_by("name_fi")
         ]
         self.fields["reservation_unit"].choices = runit_choices
