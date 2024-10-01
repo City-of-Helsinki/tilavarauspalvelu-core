@@ -1,56 +1,62 @@
-# ruff: noqa: E501
+# ruff: noqa: RUF001
 from config.utils.commons import LanguageType
 
 EMAIL_TRANSLATIONS: dict[str, dict[LanguageType, str]] = {
     # APPLICATION_HANDLED
     "subjectApplicationHandled": {
         "fi": "Hakemuksesi on käsitelty",
-        "en": "subjectApplicationHandled EN",
-        "sv": "subjectApplicationHandled SV",
+        "en": "Your application has been processed",
+        "sv": "Din ansökan har behandlats",
     },
     "applicationHandled": {
         "fi": "Näet tiedon käsittelyn tuloksesta",
-        "en": "applicationHandled EN",
-        "sv": "applicationHandled SV",
+        "en": "You can view the result of the processing on the",
+        "sv": "Du kan se resultatet av behandlingen på sidan",
     },
     #
     # APPLICATION_IN_ALLOCATION
     "subjectApplicationInAllocation": {
         "fi": "Hakemuksesi on käsiteltävänä",
-        "en": "subjectApplicationInAllocation EN",
-        "sv": "subjectApplicationInAllocation SV",
+        "en": "You application is being processed",
+        "sv": "Din ansökan behandlas",
     },
     "applicationInAllocation": {
         "fi": "Hakuaika on päättynyt. Ilmoitamme käsittelyn tuloksesta, kun hakemuksesi on käsitelty.",
-        "en": "applicationInAllocation EN",
-        "sv": "applicationInAllocation SV",
+        "en": (
+            "The application deadline has passed. "
+            "We will notify you of the result when your application has been processed."
+        ),
+        "sv": (
+            "Ansökningstiden har löpt ut. "
+            "Vi skickar ett meddelande till e-postadressen när din ansökan har behandlats."
+        ),
     },
     "viewApplication": {
         "fi": "Voit tarkastella lähettämääsi hakemusta",
-        "en": "viewApplication EN",
-        "sv": "viewApplication SV",
+        "en": "You can view the application you have sent on the",
+        "sv": "Du kan se den ansökan du har skickat på sidan",
     },
     #
     # APPLICATION_RECEIVED
     "subjectApplicationReceived": {
         "fi": "Hakemuksesi on vastaanotettu",
-        "en": "subjectApplicationReceived EN",
-        "sv": "subjectApplicationReceived SV",
+        "en": "Your application has been received",
+        "sv": "Din ansökan har mottagits",
     },
     "applicationReceived": {
         "fi": "Kiitos hakemuksestasi.",
-        "en": "applicationReceived EN",
-        "sv": "applicationReceived SVAAAAAAAA",
+        "en": "Thank you for your application.",
+        "sv": "Tack för din ansökan.",
     },
     "manageApplication": {
-        "fi": "Voit muuttaa tai täydentää hakemustasi",
-        "en": "manageApplication EN",
-        "sv": "manageApplication SV",
+        "fi": "Voit muokata hakemustasi",
+        "en": "You can edit your application on the",
+        "sv": "Du kan redigera din ansökan på sidan",
     },
     "untilApplicationPeriodEnd": {
         "fi": "hakuajan päättymiseen asti",
-        "en": "untilApplicationPeriodEnd EN",
-        "sv": "untilApplicationPeriodEnd SV",
+        "en": "until the application deadline",
+        "sv": "till och med ansökningstidens utgång",
     },
     #
     # RESERVATION_CANCELLED
@@ -77,9 +83,9 @@ EMAIL_TRANSLATIONS: dict[str, dict[LanguageType, str]] = {
     #
     # RESERVATION_CONFIRMED
     "subjectReservationConfirmed": {
-        "fi": "Varauksesi on vahvistettu",
+        "fi": "Kiitos varauksestasi Varaamossa",
         "en": "Thank you for your booking at Varaamo",
-        "sv": "Din bokning är bekräftad",
+        "sv": "Tack för din bokning på Varaamo",
     },
     "textReservationConfirmed": {
         "fi": "Olet tehnyt uuden varauksen:",
@@ -116,9 +122,18 @@ EMAIL_TRANSLATIONS: dict[str, dict[LanguageType, str]] = {
         "sv": "Du har gjort en ny bokningsförfrågan:",
     },
     "pendingNotification": {
-        "fi": "Saat varausvahvistuksen sähköpostitse, kun varauksesi on käsitelty. Otamme sinuun yhteyttä, jos tarvitsemme lisätietoja varauspyyntöösi liittyen.",
-        "en": "You will receive a confirmation email once your booking has been processed. We will contact you if further information is needed regarding your booking request.",
-        "sv": "Du kommer att få en bekräftelse via e-post när din bokning har behandlats. Vi kommer att kontakta dig om ytterligare information behövs angående din bokningsförfrågan.",
+        "fi": (
+            "Saat varausvahvistuksen sähköpostitse, kun varauksesi on käsitelty. "
+            "Otamme sinuun yhteyttä, jos tarvitsemme lisätietoja varauspyyntöösi liittyen."
+        ),
+        "en": (
+            "You will receive a confirmation email once your booking has been processed. "
+            "We will contact you if further information is needed regarding your booking request."
+        ),
+        "sv": (
+            "Du kommer att få en bekräftelse via e-post när din bokning har behandlats. "
+            "Vi kommer att kontakta dig om ytterligare information behövs angående din bokningsförfrågan."
+        ),
     },
     #
     # RESERVATION_MODIFIED
@@ -214,7 +229,7 @@ EMAIL_TRANSLATIONS: dict[str, dict[LanguageType, str]] = {
     },
     "reservationNumber": {
         "fi": "Varausnumero",
-        "en": "Reservation number",
+        "en": "Booking number",
         "sv": "Bokningsnummer",
     },
     "reservationBegins": {
@@ -243,14 +258,23 @@ EMAIL_TRANSLATIONS: dict[str, dict[LanguageType, str]] = {
         "sv": "inkl. moms",
     },
     "manageReservation": {
-        "fi": "Hallitse varaustasi Varaamossa. Voit perua varauksesi ja tarkistaa varauksen tiedot sekä Varaamon sopimus- ja peruutusehdot",
-        "en": "Manage your booking at Varaamo. You can check the details of your booking and Varaamo's terms of contract and cancellation on the",
-        "sv": "Hantera din bokning på Varaamo. Du kan kontrollera uppgifterna om din bokning samt Varaamos avtals- och avbokningsvillkor på sidan",
+        "fi": (
+            "Hallitse varaustasi Varaamossa. "
+            "Voit perua varauksesi ja tarkistaa varauksen tiedot sekä Varaamon sopimus- ja peruutusehdot"
+        ),
+        "en": (
+            "Manage your booking at Varaamo. "
+            "You can check the details of your booking and Varaamo's terms of contract and cancellation on the"
+        ),
+        "sv": (
+            "Hantera din bokning på Varaamo. "
+            "Du kan kontrollera uppgifterna om din bokning samt Varaamos avtals- och avbokningsvillkor på sidan"
+        ),
     },
     "ownReservationsPage": {
         "fi": "Omat Varaukset -sivulla",
-        "en": "'My bookings' page",
-        "sv": "”Mina bokningar”",
+        "en": "‘My bookings’ page",
+        "sv": "‘Mina bokningar’",
     },
     "reservationInstruction": {
         "fi": "Lisätietoa varauksestasi",
@@ -261,8 +285,8 @@ EMAIL_TRANSLATIONS: dict[str, dict[LanguageType, str]] = {
     # Application common translations
     "ownApplicationPage": {
         "fi": "Omat hakemukset -sivulla",
-        "en": "ownApplicationPage EN",
-        "sv": "ownApplicationPage SV",
+        "en": "‘My applications’ page",
+        "sv": "”Mina ansökningar”",
     },
     #
     # Header
