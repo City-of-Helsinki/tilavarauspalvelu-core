@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING
 
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext_lazy
 from icalendar import Calendar, Event
@@ -43,7 +44,9 @@ class ReservationActions:
 
     def to_ical(self, *, site_name: str) -> bytes:
         language: Lang = (  # type: ignore[assignment]
-            self.reservation.reservee_language or self.reservation.user.get_preferred_language()
+            self.reservation.reservee_language
+            or (self.reservation.user is not None and self.reservation.user.get_preferred_language())
+            or settings.LANGUAGE_CODE
         )
 
         ical_event = Event()

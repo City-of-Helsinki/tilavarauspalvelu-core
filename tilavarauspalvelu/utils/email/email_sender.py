@@ -135,15 +135,17 @@ class EmailNotificationSender:
         subject = message_builder.get_subject()
         text_content = message_builder.get_content()
         html_content = message_builder.get_html_content()
+        attachment = message_builder.get_attachment()
 
         email_message = EmailMultiAlternatives(
             subject=subject,
             body=text_content,
             from_email=settings.DEFAULT_FROM_EMAIL,
             bcc=self.recipients,
+            alternatives=[(html_content, "text/html")],
         )
-        if html_content:
-            email_message.attach_alternative(html_content, "text/html")
+        if attachment is not None:
+            email_message.attach(**attachment)
 
         # Send emails in batches (if there are more recipients than the maximum allowed)
         for batch in batched(self.recipients, settings.EMAIL_MAX_RECIPIENTS):
