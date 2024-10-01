@@ -2,32 +2,32 @@
 from config.utils.commons import LanguageType
 
 EMAIL_TRANSLATIONS: dict[str, dict[LanguageType, str]] = {
-    "subjectConfirmed": {
+    "subjectReservationConfirmed": {
         "fi": "Varauksesi on vahvistettu",
         "en": "Thank you for your booking at Varaamo",
         "sv": "Din bokning är bekräftad",
     },
-    "subjectPreliminary": {
+    "subjectReservationHandlingRequired": {
         "fi": "Varauksesi odottaa käsittelyä",
         "en": "Your booking is waiting for processing",
         "sv": "Din bokning väntar på att behandlas",
     },
-    "subjectHandledConfirmed": {
+    "subjectReservationHandledConfirmed": {
         "fi": "Varauksesi on vahvistettu",
         "en": "Your booking is confirmed",
         "sv": "Din bokning är bekräftad",
     },
-    "subjectCancelled": {
+    "subjectReservationCancelled": {
         "fi": "Varauksesi on peruttu",
         "en": "Your booking has been cancelled",
         "sv": "Din bokning har avbokats",
     },
-    "subjectRejected": {
+    "subjectReservationRejected": {
         "fi": "Valitettavasti varaustasi ei voida vahvistaa",
         "en": "Unfortunately your booking cannot be confirmed",
         "sv": "Tyvärr kan vi inte bekräfta din bokning",
     },
-    "subjectUpdated": {
+    "subjectReservationModified": {
         "fi": "Varaustasi on muutettu",
         "en": "Your booking has been updated",
         "sv": "Din bokning har uppdaterats",
@@ -37,7 +37,7 @@ EMAIL_TRANSLATIONS: dict[str, dict[LanguageType, str]] = {
         "en": "New booking {{reservation_number}} has been made for {{unit_name}}",
         "sv": "Ny bokning {{reservation_number}} har gjorts för {{unit_name}}",
     },
-    "subjectStaffReservationPending": {
+    "subjectStaffReservationRequiresHandling": {
         "fi": "Uusi tilavaraus {{reservation_number}} odottaa käsittelyä toimipisteessä {{unit_name}}",
         "en": "New booking {{reservation_number}} requires handling at unit {{unit_name}}",
         "sv": "Ny bokningsförfrågan {{reservation_number}} för {{reservation_unit}} väntar på at behandlats",
@@ -106,7 +106,7 @@ EMAIL_TRANSLATIONS: dict[str, dict[LanguageType, str]] = {
         "en": "Kind regards",
         "sv": "Med vänliga hälsningar,",
     },
-    "automaticMessage": {
+    "automaticMessageDoNotReply": {
         "fi": "Tämä on automaattinen viesti, johon ei voi vastata.",
         "en": "This is an automated message, please do not reply.",
         "sv": "Detta är ett automatiskt meddelande som inte kan besvaras.",
@@ -122,63 +122,63 @@ EMAIL_TRANSLATIONS: dict[str, dict[LanguageType, str]] = {
         "sv": "Boka enkelt stadens lokaler och utrustning för eget bruk på",
     },
     #
-    "reservationMadeConfirmed": {
+    "textReservationConfirmed": {
         "fi": "Olet tehnyt uuden varauksen:",
         "en": "You have made a new booking:",
         "sv": "Du har gjort en ny bokning:",
     },
-    "reservationMadePreliminary": {
+    "textReservationHandlingRequired": {
         "fi": "Olet tehnyt alustavan varauksen:",
         "en": "You have made a new booking request:",
         "sv": "Du har gjort en ny bokningsförfrågan:",
     },
-    "reservationHandledConfirmed": {
+    "textReservationHandledConfirmed": {
         "fi": "Varauksesi on nyt vahvistettu.",
         "en": "Your booking is now confirmed.",
         "sv": "Din bokning har bekräftats.",
     },
-    "reservationHandledSubsidized": {
+    "textReservationHandledConfirmedSubsidized": {
         "fi": "Varauksesi on hyväksytty, ja varaukseen on myönnetty seuraava alennus:",
         "en": "Your booking has been confirmed with the following discount:",
         "sv": "Din bokning har bekräftats med följande rabatt:",
     },
-    "reservationNeedsPayment": {
+    "textReservationNeedsToBePaid": {
         "fi": "Varauksesi on hyväksytty, ja sen voi maksaa pankkitunnuksilla.",
         "en": "Your booking has been confirmed, and can be paid.",
         "sv": "Din bokning har bekräftats och kan betalas.",
     },
-    "reservationRejected": {
+    "textReservationRejected": {
         "fi": "Valitettavasti alla olevaa varaustasi ei voida vahvistaa.",
         "en": "Unfortunately your booking cannot be confirmed.",
         "sv": "Tyvärr kan vi inte bekräfta din bokning.",
     },
-    "reservationUpdated": {
+    "textReservationModified": {
         "fi": "Varaustasi on muutettu:",
         "en": "Your booking has been updated:",
         "sv": "Din bokning har uppdaterats:",
     },
-    "reservationCancelled": {
+    "textReservationCancelled": {
         "fi": "Varauksesi on peruttu.",
         "en": "Your booking has been cancelled.",
         "sv": "Din bokning har avbokats.",
     },
     #
-    "staffReservationMade": {
+    "textReservationMade": {
         "fi": "Varausyksikköön {{reservation_unit}} on tehty uusi hyväksytty varaus",
         "en": "A new booking has been confirmed for {{reservation_unit}}",
         "sv": "En ny bokningsförfrågan för {{reservation_unit}} har bekräftats",
     },
-    "staffReservationPending": {
+    "textStaffReservationRequiresHandling": {
         "fi": "Varausyksikköön {{reservation_unit}} on tehty uusi käsittelyä vaativa varauspyyntö",
         "en": "A booking request for {{reservation_unit}} is waiting for processing",
         "sv": "En ny bokningsförfrågan för {{reservation_unit}} väntar på at behandlats",
     },
-    "staffCheckDetailsMade": {
+    "textStaffReservationMadeCheckDetails": {
         "fi": "Voit tarkistaa varauksen tiedot osoitteessa",
         "en": "You can view the booking at",
         "sv": "Du kan se bokningen på",
     },
-    "staffCheckDetailsPending": {
+    "staffReservationRequiresHandlingCheckDetails": {
         "fi": "Voit tarkistaa ja käsitellä varauksen osoitteessa",
         "en": "You can view and handle the booking at",
         "sv": "Du kan se bokningen på",
@@ -251,10 +251,10 @@ EMAIL_TRANSLATIONS: dict[str, dict[LanguageType, str]] = {
         "en": "subjectApplicationReceived EN",
         "sv": "subjectApplicationReceived SV",
     },
-    "subjectApplicationInHandling": {
+    "subjectApplicationInAllocation": {
         "fi": "Hakemuksesi on käsiteltävänä",
-        "en": "subjectApplicationInHandling EN",
-        "sv": "subjectApplicationInHandling SV",
+        "en": "subjectApplicationInAllocation EN",
+        "sv": "subjectApplicationInAllocation SV",
     },
     "subjectApplicationHandled": {
         "fi": "Hakemuksesi on käsitelty",
@@ -266,10 +266,10 @@ EMAIL_TRANSLATIONS: dict[str, dict[LanguageType, str]] = {
         "en": "applicationReceived EN",
         "sv": "applicationReceived SVAAAAAAAA",
     },
-    "applicationInHandling": {
+    "applicationInAllocation": {
         "fi": "Hakuaika on päättynyt. Ilmoitamme käsittelyn tuloksesta, kun hakemuksesi on käsitelty.",
-        "en": "applicationInHandling EN",
-        "sv": "applicationInHandling SV",
+        "en": "applicationInAllocation EN",
+        "sv": "applicationInAllocation SV",
     },
     "applicationHandled": {
         "fi": "Näet tiedon käsittelyn tuloksesta",

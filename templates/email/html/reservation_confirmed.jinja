@@ -1,12 +1,12 @@
 {% extends "email/html/partials/base.jinja" %}
 
-{% block title %}{{ subjectConfirmed }}{% endblock %}
+{% block title %}{{ subjectReservationConfirmed }}{% endblock %}
 
 {% block header %}{% include "email/html/partials/header.jinja" %}{% endblock %}
 
 {% block content %}
     <div class="main-container">
-        <p>{{ reservationMadeConfirmed }}</p>
+        <p>{{ textReservationConfirmed }}</p>
 
         {% include "email/html/partials/reservation_basic_info.jinja" %}
         {% include "email/html/partials/reservation_price.jinja" %}

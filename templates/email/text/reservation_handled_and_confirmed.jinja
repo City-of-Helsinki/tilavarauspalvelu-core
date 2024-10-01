@@ -1,6 +1,6 @@
 {{ salutation }} {{ reservee_name }},
 
-{% if price < non_subsidised_price %}{{ reservationHandledSubsidized }}{% else %}{{ reservationHandledConfirmed }}{% endif %}
+{% if price < non_subsidised_price %}{{ textReservationHandledConfirmedSubsidized }}{% else %}{{ textReservationHandledConfirmed }}{% endif %}
 
 {% include "email/text/partials/reservation_basic_info.jinja" %}
 

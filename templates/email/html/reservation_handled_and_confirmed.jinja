@@ -1,15 +1,15 @@
 {% extends "email/html/partials/base.jinja" %}
 
-{% block title %}{{ subjectHandledConfirmed }}{% endblock %}
+{% block title %}{{ subjectReservationHandledConfirmed }}{% endblock %}
 
 {% block header %}{% include "email/html/partials/header.jinja" %}{% endblock %}
 
 {% block content %}
     <div class="main-container">
         {% if price < non_subsidised_price %}
-            <p>{{ reservationHandledSubsidized }}</p>
+            <p>{{ textReservationHandledConfirmedSubsidized }}</p>
         {% else %}
-            <p>{{ reservationHandledConfirmed }}</p>
+            <p>{{ textReservationHandledConfirmed }}</p>
         {% endif %}
 
         {% include "email/html/partials/reservation_basic_info.jinja" %}

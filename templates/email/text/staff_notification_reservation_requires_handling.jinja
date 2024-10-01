@@ -1,13 +1,13 @@
 {{ salutation }},
 
-{{ staffReservationPending }}: {{ name }}
+{{ textStaffReservationRequiresHandling }}: {{ name }}
 
 {{ reserveeName }}: {{ reservee_name }}
 {{ reservationNumber }}: {{ reservation_number }}
 
 {% include "email/text/partials/reservation_basic_info.jinja" %}
 
-{{ staffCheckDetailsPending }}:
+{{ staffReservationRequiresHandlingCheckDetails }}:
 {{ staff_reservations_ext_link }}{{ reservation_number }}
 
 {% include "email/text/partials/closing_staff.jinja" %}

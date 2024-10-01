@@ -1,12 +1,12 @@
 {% extends "email/html/partials/base.jinja" %}
 
-{% block title %}{{ subjectApplicationInHandling }}{% endblock %}
+{% block title %}{{ subjectApplicationInAllocation }}{% endblock %}
 
 {% block header %}{% include "email/html/partials/header_no_recipient_name.jinja" %}{% endblock %}
 
 {% block content %}
     <div class="main-container">
-        <p>{{ applicationInHandling }} {{ viewApplication }} <a href="{{ my_applications_ext_link }}">{{ ownApplicationPage }}</a>.</p>
+        <p>{{ applicationInAllocation }} {{ viewApplication }} <a href="{{ my_applications_ext_link }}">{{ ownApplicationPage }}</a>.</p>
     </div>
 
     <div class="secondary-container">
