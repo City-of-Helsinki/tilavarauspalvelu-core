@@ -6,10 +6,8 @@ from typing import TYPE_CHECKING, Any
 from django.utils import timezone
 from graphene_django_extensions import NestingModelSerializer
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
 from rest_framework.settings import api_settings
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.api.graphql.types.address.serializers import AddressSerializer
 from tilavarauspalvelu.api.graphql.types.application_section.serializers import (
     ApplicationSectionForApplicationSerializer,
@@ -17,7 +15,7 @@ from tilavarauspalvelu.api.graphql.types.application_section.serializers import 
 from tilavarauspalvelu.api.graphql.types.organisation.serializers import OrganisationSerializer
 from tilavarauspalvelu.api.graphql.types.person.serializers import PersonSerializer
 from tilavarauspalvelu.enums import ApplicationStatusChoice
-from tilavarauspalvelu.models import AllocatedTimeSlot, Application, ReservationUnitOption
+from tilavarauspalvelu.models import Application, ReservationUnitOption
 from tilavarauspalvelu.utils.email.application_email_notification_sender import ApplicationEmailNotificationSender
 from utils.fields.serializer import CurrentUserDefaultNullable
 
@@ -147,14 +145,9 @@ class RejectAllApplicationOptionsSerializer(NestingModelSerializer):
         ]
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
-        slots_exist = AllocatedTimeSlot.objects.filter(
-            reservation_unit_option__application_section__application=self.instance,
-        ).exists()
-
-        if slots_exist:
-            msg = "Application has allocated time slots and cannot be rejected."
-            raise ValidationError(msg, code=error_codes.CANNOT_REJECT_APPLICATION_OPTIONS)
-
+        Application.validator.can_reject_all_options(self.instance)
+        Application.validator.can_reject_all_options(self.instance)
+        Application.validator.can_reject_all_options(self.instance)
         return data
 
     def save(self, **kwargs: Any) -> Application:
