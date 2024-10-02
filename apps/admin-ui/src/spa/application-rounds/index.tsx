@@ -19,8 +19,9 @@ import { Container } from "@/styles/layout";
 import { truncate } from "@/helpers";
 import Loader from "@/component/Loader";
 import { ApplicationRoundCard } from "./ApplicationRoundCard";
-import { StyledHDSTable } from "./CustomTable";
 import { TableLink } from "@/styles/util";
+import { CustomTable } from "@/component/Table";
+import Error404 from "@/common/Error404";
 
 const AccordionContainer = styled.div`
   display: flex;
@@ -83,7 +84,7 @@ function AllApplicationRounds(): JSX.Element | null {
   const { t } = useTranslation();
 
   // TODO pagination
-  const { data, loading } = useApplicationRoundsQuery({
+  const { data, loading, error } = useApplicationRoundsQuery({
     onError: (err: ApolloError) => {
       errorToast({ text: err.message });
     },
@@ -93,12 +94,13 @@ function AllApplicationRounds(): JSX.Element | null {
     data?.applicationRounds?.edges?.map((ar) => ar?.node)
   );
 
-  if (loading) {
+  if (loading && allApplicationRounds == null) {
     return <Loader />;
   }
 
-  if (!allApplicationRounds) {
-    return null;
+  if (allApplicationRounds == null || error != null) {
+    // TODO should be a different error page
+    return <Error404 />;
   }
 
   const currentApplicationRounds = allApplicationRounds.filter(
@@ -117,6 +119,51 @@ function AllApplicationRounds(): JSX.Element | null {
     (ar) => ar.status === ApplicationRoundStatusChoice.Handled
   );
 
+  const cols = [
+    {
+      isSortable: true,
+      headerName: t("ApplicationRound.headings.name"),
+      transform: (applicationRound: ApplicationRoundNode) => (
+        <TableLink to={getApplicationRoundUrl(applicationRound.pk)}>
+          <span title={applicationRound.nameFi ?? ""}>
+            {truncate(applicationRound.nameFi ?? "", 50)}
+          </span>
+        </TableLink>
+      ),
+      key: "nameFi",
+    },
+    {
+      isSortable: true,
+      headerName: t("ApplicationRound.headings.reservationUnitCount"),
+      transform: (applicationRound: ApplicationRoundNode) =>
+        String(applicationRound.applicationsCount),
+      key: "applicationsCount",
+    },
+    {
+      isSortable: true,
+      headerName: t("ApplicationRound.headings.applicationCount"),
+      transform: (applicationRound: ApplicationRoundNode) =>
+        String(applicationRound.reservationUnitCount),
+      key: "reservationUnitCount",
+    },
+    {
+      isSortable: true,
+      headerName: t("ApplicationRound.headings.sent"),
+      transform: (applicationRound: ApplicationRoundNode) =>
+        formatDate(applicationRound.statusTimestamp || null) || "-",
+      key: "statusTimestampSort",
+    },
+  ];
+
+  const rows = orderBy(
+    sentApplicationRounds,
+    ["statusTimestamp"],
+    ["desc"]
+  ).map((a) => ({
+    ...a,
+    statusTimestampSort: new Date(a.statusTimestamp || "").getTime(),
+  }));
+
   return (
     <Container>
       <div>
@@ -127,13 +174,11 @@ function AllApplicationRounds(): JSX.Element | null {
         initiallyOpen
         hideIfEmpty
         name={t("ApplicationRound.groupLabel.handling")}
-        rounds={
-          orderBy(
-            currentApplicationRounds,
-            ["status", "applicationPeriodEnd"],
-            ["asc", "asc"]
-          ) || []
-        }
+        rounds={orderBy(
+          currentApplicationRounds,
+          ["status", "applicationPeriodEnd"],
+          ["asc", "asc"]
+        )}
       />
       <RoundsAccordion
         name={t("ApplicationRound.groupLabel.notSent")}
@@ -143,22 +188,21 @@ function AllApplicationRounds(): JSX.Element | null {
       />
       <RoundsAccordion
         name={t("ApplicationRound.groupLabel.open")}
-        rounds={
-          orderBy(openApplicationRounds, ["applicationPeriodEnd", "asc"], []) ||
+        rounds={orderBy(
+          openApplicationRounds,
+          ["applicationPeriodEnd", "asc"],
           []
-        }
+        )}
         hideIfEmpty
         initiallyOpen
       />
       <RoundsAccordion
         name={t("ApplicationRound.groupLabel.opening")}
-        rounds={
-          orderBy(
-            upcomingApplicationRounds,
-            ["applicationPeriodBegin"],
-            ["asc"]
-          ) || []
-        }
+        rounds={orderBy(
+          upcomingApplicationRounds,
+          ["applicationPeriodBegin"],
+          ["asc"]
+        )}
         emptyContent={
           <div>
             <div>{t("ApplicationRound.noUpcoming")}</div>
@@ -169,58 +213,13 @@ function AllApplicationRounds(): JSX.Element | null {
         heading={t("ApplicationRound.groupLabel.previousRounds")}
         className="previous-rounds"
       >
-        <StyledHDSTable
-          ariaLabelSortButtonAscending="Sorted in ascending order"
-          ariaLabelSortButtonDescending="Sorted in descending order"
-          ariaLabelSortButtonUnset="Not sorted"
+        <CustomTable
+          enableFrontendSorting
           initialSortingColumnKey="applicantSort"
           initialSortingOrder="asc"
-          cols={[
-            {
-              isSortable: true,
-              headerName: t("ApplicationRound.headings.name"),
-              transform: (applicationRound: ApplicationRoundNode) => (
-                <TableLink to={getApplicationRoundUrl(applicationRound.pk)}>
-                  <span title={applicationRound.nameFi ?? ""}>
-                    {truncate(applicationRound.nameFi ?? "", 50)}
-                  </span>
-                </TableLink>
-              ),
-              key: "nameFi",
-            },
-            {
-              isSortable: true,
-              headerName: t("ApplicationRound.headings.reservationUnitCount"),
-              transform: (applicationRound: ApplicationRoundNode) =>
-                String(applicationRound.applicationsCount),
-              key: "applicationsCount",
-            },
-            {
-              isSortable: true,
-              headerName: t("ApplicationRound.headings.applicationCount"),
-              transform: (applicationRound: ApplicationRoundNode) =>
-                String(applicationRound.reservationUnitCount),
-              key: "reservationUnitCount",
-            },
-            {
-              isSortable: true,
-              headerName: t("ApplicationRound.headings.sent"),
-              transform: (applicationRound: ApplicationRoundNode) =>
-                formatDate(applicationRound.statusTimestamp || null) || "-",
-              key: "statusTimestampSort",
-            },
-          ]}
+          cols={cols}
           indexKey="pk"
-          rows={
-            orderBy(sentApplicationRounds, ["statusTimestamp"], ["desc"]).map(
-              (a) => ({
-                ...a,
-                statusTimestampSort: new Date(
-                  a.statusTimestamp || ""
-                ).getTime(),
-              })
-            ) || []
-          }
+          rows={rows}
           variant="light"
         />
       </StyledAccordion>

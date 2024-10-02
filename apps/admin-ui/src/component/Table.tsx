@@ -45,6 +45,7 @@ const StyledTable = styled(Table)<TableWrapperProps>`
 type Props = Omit<TableProps, "onSort"> & {
   setSort?: (col: string) => void;
   isLoading?: boolean;
+  enableFrontendSorting?: boolean;
 };
 
 // @param isLoading - if true, table is rendered with a loading overlay
@@ -52,11 +53,14 @@ type Props = Omit<TableProps, "onSort"> & {
 export function CustomTable({
   isLoading,
   setSort,
+  enableFrontendSorting,
   ...props
 }: Props): JSX.Element {
+  const [keyOverride, setKeyOverride] = React.useState<number>(0);
   const onSort = (order: "asc" | "desc", colKey: string) => {
     const field = order === "asc" ? colKey : `-${colKey}`;
     if (setSort) {
+      setKeyOverride((prev) => prev + 1);
       setSort(field);
     }
   };
@@ -65,11 +69,11 @@ export function CustomTable({
     <StyledTable
       {...props}
       variant="light"
-      onSort={onSort}
-      // NOTE have to unmount on data changes because there is a bug in the Table component
-      // removing this and using sort leaves ghost elements in the table.
-      // also search indicators are not correct when search changes (initial direction / key)
-      key={JSON.stringify(props.rows, replacer)}
+      onSort={!enableFrontendSorting ? onSort : undefined}
+      // NOTE when using backend sorting we need to unmount the table
+      // otherwise the table header is not updated
+      // unmounting on other data changes is not necessary and causes other bugs like automatic scrolling.
+      key={`custom-table-${keyOverride}`}
       $tableBackground={
         isLoading ? "var(--color-black-10)" : "var(--color-white)"
       }
@@ -78,19 +82,4 @@ export function CustomTable({
       }
     />
   );
-}
-
-// React elements can't be serialized into json
-function replacer(_key: string, value: unknown) {
-  if (typeof value === "object" && value != null) {
-    if (
-      "$$typeof" in value &&
-      value.$$typeof != null &&
-      // eslint-disable-next-line @typescript-eslint/no-base-to-string
-      value.$$typeof.toString() === "Symbol(react.element)"
-    ) {
-      return undefined;
-    }
-  }
-  return value;
 }
