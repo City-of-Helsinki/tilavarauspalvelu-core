@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 from django.db import models
 from django.db.models.functions import Concat
+from django.utils.functional import classproperty
 from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L, lookup_property
@@ -26,6 +27,7 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import Address, ApplicationRound, City, Organisation, Person, Unit, User
 
     from .actions import ApplicationActions
+    from .validators import ApplicationValidator
 
 
 __all__ = [
@@ -121,6 +123,14 @@ class Application(SerializableMixin, models.Model):
         from .actions import ApplicationActions
 
         return ApplicationActions(self)
+
+    @classproperty
+    def validator(cls) -> ApplicationValidator:
+        # Import actions inline to defer loading them.
+        # This allows us to avoid circular imports.
+        from .validators import ApplicationValidator
+
+        return ApplicationValidator()
 
     @lookup_property(joins=["application_round"], skip_codegen=True)
     def status() -> ApplicationStatusChoice:
