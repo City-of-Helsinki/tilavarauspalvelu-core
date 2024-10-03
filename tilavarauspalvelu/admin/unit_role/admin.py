@@ -29,15 +29,18 @@ class UnitRoleAdmin(admin.ModelAdmin):
         "user_email",
         "unit_names",
         "unit_group_names",
+        "role_active",
     ]
     list_filter = [
         "role",
         "units",
         "unit_groups",
+        "role_active",
     ]
 
     # Form
     fields = [
+        "role_active",
         "role",
         "user",
         "assigner",
