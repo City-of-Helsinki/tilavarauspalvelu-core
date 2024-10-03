@@ -99,70 +99,71 @@ class User(AbstractUser):
         return self.preferred_language or settings.LANGUAGE_CODE
 
     @property
-    def general_roles_list(self) -> list[UserRoleChoice]:
+    def active_general_roles(self) -> list[UserRoleChoice]:
         """Get the user's general roles."""
         if hasattr(self, "_general_roles"):
             return self._general_roles
 
-        self._general_roles = [UserRoleChoice(role) for role in self.general_roles.values_list("role", flat=True)]
+        qs = self.general_roles.filter(role_active=True).values_list("role", flat=True)
+        self._general_roles = [UserRoleChoice(role) for role in qs]
         return self._general_roles
 
     @property
-    def general_permissions_list(self) -> list[UserPermissionChoice]:
+    def active_general_permissions(self) -> list[UserPermissionChoice]:
         """Get the user's general permissions."""
         if hasattr(self, "_general_permissions"):
             return self._general_permissions
-        roles = self.general_roles_list
+        roles = self.active_general_roles
         self._general_permissions = sorted({permission for role in roles for permission in role.permissions})
         return self._general_permissions
 
     @property
-    def unit_roles_map(self) -> dict[int, list[UserRoleChoice]]:
+    def active_unit_roles(self) -> dict[int, list[UserRoleChoice]]:
         """Get unit roles by unit id for the user."""
         if hasattr(self, "_unit_roles"):
             return self._unit_roles
-        self._calculate_unit_roles()
+        self._calculate_active_unit_roles()
         return self._unit_roles
 
     @property
-    def unit_permissions_map(self) -> dict[int, list[UserPermissionChoice]]:
+    def active_unit_permissions(self) -> dict[int, list[UserPermissionChoice]]:
         """Get permissions by unit id for the user."""
         if hasattr(self, "_unit_permissions"):
             return self._unit_permissions
 
         self._unit_permissions = {
             unit_id: sorted({permission for role in roles for permission in role.permissions})
-            for unit_id, roles in self.unit_roles_map.items()
+            for unit_id, roles in self.active_unit_roles.items()
         }
         return self._unit_permissions
 
     @property
-    def unit_group_roles_map(self) -> dict[int, list[UserRoleChoice]]:
+    def active_unit_group_roles(self) -> dict[int, list[UserRoleChoice]]:
         """Get unit roles by unit group id for the user."""
         if hasattr(self, "_unit_group_roles"):
             return self._unit_group_roles
-        self._calculate_unit_roles()
+        self._calculate_active_unit_roles()
         return self._unit_group_roles
 
     @property
-    def unit_group_permissions_map(self) -> dict[int, list[UserPermissionChoice]]:
+    def active_unit_group_permissions(self) -> dict[int, list[UserPermissionChoice]]:
         """Get permissions by unit group id for the user."""
         if hasattr(self, "_unit_group_permissions"):
             return self._unit_group_permissions
 
         self._unit_group_permissions = {
             unit_group_id: sorted({permission for role in roles for permission in role.permissions})
-            for unit_group_id, roles in self.unit_group_roles_map.items()
+            for unit_group_id, roles in self.active_unit_group_roles.items()
         }
         return self._unit_group_permissions
 
-    def _calculate_unit_roles(self) -> None:
+    def _calculate_active_unit_roles(self) -> None:
         """Calculate all unit roles by unit id and unit group id for the user."""
         self._unit_roles: dict[int, list[UserRoleChoice]] = {}
         self._unit_group_roles: dict[int, list[UserRoleChoice]] = {}
 
         unit_role: UnitRole
-        for unit_role in self.unit_roles.all().prefetch_related("units", "unit_groups"):
+        for unit_role in self.unit_roles.filter(role_active=True).prefetch_related("units", "unit_groups"):
             for unit in unit_role.units.all():
                 self._unit_roles.setdefault(int(unit.pk), []).append(UserRoleChoice(unit_role.role))
             for unit_group in unit_role.unit_groups.all():
