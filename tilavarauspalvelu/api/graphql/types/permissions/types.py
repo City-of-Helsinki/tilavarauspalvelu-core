@@ -34,7 +34,7 @@ class GeneralRoleNode(DjangoNode):
         user: AnyUser = info.context.user
         if user.is_anonymous or not user.is_active:
             return []
-        return user.general_permissions_list
+        return user.active_general_permissions
 
 
 class UnitRoleNode(DjangoNode):
@@ -60,9 +60,9 @@ class UnitRoleNode(DjangoNode):
 
         permissions: list[UserPermissionChoice] = []
         for unit in root.units.all():
-            permissions += user.unit_permissions_map.get(unit.pk, [])
+            permissions += user.active_unit_permissions.get(unit.pk, [])
         for unit_group in root.unit_groups.all():
-            permissions += user.unit_group_permissions_map.get(unit_group.pk, [])
+            permissions += user.active_unit_group_permissions.get(unit_group.pk, [])
 
         return sorted(set(permissions))
 
@@ -113,7 +113,7 @@ class PermissionCheckerType(ObjectType):
             return {"has_permission": True}
 
         # Has the given permission through their general roles
-        if permission in user.general_permissions_list:
+        if permission in user.active_general_permissions:
             return {"has_permission": True}
 
         return {

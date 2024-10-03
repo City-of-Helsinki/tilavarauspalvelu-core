@@ -92,8 +92,8 @@ class UnitFilterSet(ModelFilterSet):
         if user.permissions.has_general_role(role_choices=role_choices):
             return qs
 
-        u_ids = list(user.unit_roles_map)
-        g_ids = list(user.unit_group_roles_map)
+        u_ids = list(user.active_unit_roles)
+        g_ids = list(user.active_unit_group_roles)
 
         return qs.filter(Q(id__in=u_ids) | Q(unit_groups__in=g_ids)).distinct()
 
