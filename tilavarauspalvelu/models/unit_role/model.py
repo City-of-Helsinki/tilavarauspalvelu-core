@@ -37,6 +37,8 @@ class UnitRole(models.Model):
     created: datetime.datetime = models.DateTimeField(auto_now_add=True)
     modified: datetime.datetime = models.DateTimeField(auto_now=True)
 
+    role_active: bool = models.BooleanField(default=True)
+
     objects = UnitRoleManager()
 
     class Meta:
