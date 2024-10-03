@@ -37,7 +37,12 @@ __all__ = [
 
 class User(AbstractUser):
     tvp_uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    preferred_language: str | None = models.CharField(max_length=8, null=True, blank=True, choices=settings.LANGUAGES)
+    preferred_language: str = models.CharField(
+        max_length=8,
+        blank=True,
+        choices=settings.LANGUAGES,
+        default=settings.LANGUAGE_CODE,
+    )
     date_of_birth: datetime.date | None = models.DateField(null=True, blank=True)
     profile_id: str = models.CharField(max_length=255, blank=True, default="")
 
