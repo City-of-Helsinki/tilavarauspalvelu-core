@@ -3,10 +3,10 @@ from functools import wraps
 from typing import Any, NamedTuple, ParamSpec, TypeVar
 from unittest import mock
 
-from django.contrib.auth import get_user_model
 from graphene_django_extensions.testing import GraphQLClient as BaseGraphQLClient
 
 from tilavarauspalvelu.enums import UserRoleChoice
+from tilavarauspalvelu.models import User
 
 __all__ = [
     "GraphQLClient",
@@ -15,8 +15,6 @@ __all__ = [
 
 
 TNamedTuple = TypeVar("TNamedTuple", bound=NamedTuple)
-
-User = get_user_model()
 
 
 class GraphQLClient(BaseGraphQLClient):
