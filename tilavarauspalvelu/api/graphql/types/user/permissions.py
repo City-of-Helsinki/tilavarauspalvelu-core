@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
-    "UserPermission",
+    "UserStaffPermission",
 ]
 
 
@@ -28,6 +28,12 @@ class UserPermission(BasePermission):
     def has_mutation_permission(cls, user: AnyUser, input_data: dict[str, Any]) -> bool:
         return False
 
+    @classmethod
+    def has_update_permission(cls, instance: User, user: AnyUser, input_data: dict[str, Any]) -> bool:
+        return user == instance  # Can only update own information.
+
+
+class UserStaffPermission(BasePermission):
     @classmethod
     def has_update_permission(cls, instance: User, user: AnyUser, input_data: dict[str, Any]) -> bool:
         if user != instance:  # Can only update self.
