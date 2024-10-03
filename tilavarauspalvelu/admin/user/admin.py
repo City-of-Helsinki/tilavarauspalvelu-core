@@ -174,6 +174,8 @@ class UserAdmin(admin.ModelAdmin):
         "general_roles_list",
         "unit_roles_map",
         "unit_group_roles_map",
+        "statistics_uuid",
+        "gdpr_uuid",
         "issuer",
         "audience",
         "jwt_id",
