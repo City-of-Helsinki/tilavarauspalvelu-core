@@ -1,10 +1,14 @@
 from graphene_django_extensions import UpdateMutation
 
-from .permissions import UserPermission
-from .serializers import UserUpdateSerializer
+from .permissions import UserStaffPermission
+from .serializers import UserStaffUpdateSerializer
+
+__all__ = [
+    "UserStaffUpdateMutation",
+]
 
 
-class UserUpdateMutation(UpdateMutation):
+class UserStaffUpdateMutation(UpdateMutation):
     class Meta:
-        serializer_class = UserUpdateSerializer
-        permission_classes = [UserPermission]
+        serializer_class = UserStaffUpdateSerializer
+        permission_classes = [UserStaffPermission]
