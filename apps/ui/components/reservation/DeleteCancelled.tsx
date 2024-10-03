@@ -9,7 +9,7 @@ import { Container } from "common";
 import { signOut } from "common/src/browserHelpers";
 import { Paragraph } from "./styles";
 import { LinkButton } from "../../styles/util";
-import { singleSearchUrl } from "../../modules/util";
+import { getSingleSearchPath } from "@/modules/urls";
 
 type Props = {
   reservationPk: string;
@@ -89,7 +89,7 @@ const DeleteCancelled = ({ reservationPk, error, apiBaseUrl }: Props) => {
               marginTop: "var(--spacing-3-xl)",
             }}
           >
-            <StyledLink href={singleSearchUrl({})}>
+            <StyledLink href={getSingleSearchPath()}>
               {t("reservations:backToSearch")}
               <IconArrowRight aria-hidden size="m" />
             </StyledLink>

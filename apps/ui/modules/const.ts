@@ -3,19 +3,9 @@ import type { TFunction } from "i18next";
 export { isBrowser } from "common/src/helpers";
 export { genericTermsVariant } from "common/src/const";
 
-export const reservationUnitPrefix = "/reservation-unit";
-export const searchPrefix = "/search";
-export const singleSearchPrefix = "/search/single";
-export const applicationsPrefix = "/applications";
-export const reservationsPrefix = "/reservations";
-export const recurringReservationsPrefix = "/recurring";
-
 export const mapUrlPrefix = "https://palvelukartta.hel.fi/";
 
 export const SEARCH_PAGING_LIMIT = 36;
-
-export const reservationUnitPath = (id: number): string =>
-  `${reservationUnitPrefix}/${id}`;
 
 export const participantCountOptions = [
   1, 2, 5, 10, 15, 20, 25, 30, 40, 50, 60, 80, 100, 150, 200,

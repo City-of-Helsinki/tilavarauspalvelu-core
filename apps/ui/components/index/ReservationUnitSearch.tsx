@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
-import { singleSearchPrefix } from "@/modules/const";
+import { getSingleSearchPath } from "@/modules/urls";
 
 const StyledTextInput = styled(TextInput)`
   position: relative;
@@ -37,7 +37,9 @@ const ReservationUnitSearch = (): JSX.Element => {
 
   const handleSubmit = (event: React.FormEvent | React.MouseEvent) => {
     event.preventDefault();
-    router.push(`${singleSearchPrefix}?textSearch=${searchTerm}`);
+    const params = new URLSearchParams();
+    params.set("textSearch", searchTerm);
+    router.push(getSingleSearchPath(params));
   };
 
   return (

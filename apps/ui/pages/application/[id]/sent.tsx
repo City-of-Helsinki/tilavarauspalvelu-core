@@ -7,7 +7,7 @@ import { breakpoints } from "common/src/common/style";
 import { Container } from "common";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import type { GetServerSidePropsContext } from "next";
-import { applicationsUrl } from "@/modules/util";
+import { applicationsPath } from "@/modules/urls";
 import Head from "@/components/application/Head";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 
@@ -36,7 +36,7 @@ const Sent = (): JSX.Element => {
       <Container>
         <Paragraph>{t("application:sent.body")}</Paragraph>
         <StyledButton
-          onClick={() => router.push(applicationsUrl)}
+          onClick={() => router.push(applicationsPath)}
           iconRight={<IconAngleRight />}
           size="small"
         >
@@ -47,7 +47,7 @@ const Sent = (): JSX.Element => {
   );
 };
 
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale } = ctx;
 
   // TODO should fetch on SSR but we need authentication for it
@@ -64,6 +64,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
-};
+}
 
 export default Sent;

@@ -28,13 +28,8 @@ import {
 import Link from "next/link";
 import { Container } from "common";
 import { useOrder } from "@/hooks/reservation";
-import { reservationUnitPath } from "@/modules/const";
 import { createApolloClient } from "@/modules/apolloClient";
-import {
-  formatDateTimeRange,
-  getTranslation,
-  reservationsUrl,
-} from "@/modules/util";
+import { formatDateTimeRange, getTranslation } from "@/modules/util";
 import { CenterSpinner } from "@/components/common/common";
 import Sanitize from "@/components/common/Sanitize";
 import { AccordionWithState as Accordion } from "@/components/common/Accordion";
@@ -66,6 +61,7 @@ import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { useRouter } from "next/router";
 import { successToast } from "common/src/common/toast";
 import { ReservationPageWrapper } from "@/components/reservations/styles";
+import { getReservationPath, getReservationUnitPath } from "@/modules/urls";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
@@ -457,7 +453,7 @@ function Reservation({
             <SubHeading>
               <Link
                 data-testid="reservation__reservation-unit"
-                href={reservationUnitPath(reservationUnit.pk ?? 0)}
+                href={getReservationUnitPath(reservationUnit.pk)}
               >
                 {getReservationUnitName(reservationUnit)}
               </Link>
@@ -520,7 +516,7 @@ function Reservation({
               {canTimeBeModified && (
                 <ButtonLikeLink
                   size="large"
-                  href={`${reservationsUrl}${reservation.pk}/edit`}
+                  href={getReservationPath(reservation.pk, "edit")}
                   data-testid="reservation-detail__button--edit"
                 >
                   {t("reservations:modifyReservationTime")}
@@ -529,9 +525,8 @@ function Reservation({
               )}
               {isCancellable && (
                 <ButtonLikeLink
-                  // TODO use url builder
                   size="large"
-                  href={`${reservationsUrl}${reservation.pk}/cancel`}
+                  href={getReservationPath(reservation.pk, "cancel")}
                   data-testid="reservation-detail__button--cancel"
                 >
                   {t(

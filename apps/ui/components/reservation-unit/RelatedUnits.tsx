@@ -6,7 +6,6 @@ import styled from "styled-components";
 import { useMedia } from "react-use";
 import { breakpoints } from "common/src/common/style";
 import type { RelatedReservationUnitsQuery } from "@gql/gql-types";
-import { reservationUnitPath } from "@/modules/const";
 import { getMainImage } from "@/modules/util";
 import Carousel from "../Carousel";
 import {
@@ -22,6 +21,7 @@ import {
   convertLanguageCode,
   getTranslationSafe,
 } from "common/src/common/util";
+import { getReservationUnitPath } from "@/modules/urls";
 
 type RelatedQueryT = NonNullable<
   RelatedReservationUnitsQuery["reservationUnits"]
@@ -131,7 +131,7 @@ function RelatedUnitCard({
   }
   const buttons = [
     <ButtonLikeLink
-      href={reservationUnitPath(reservationUnit.pk ?? 0)}
+      href={getReservationUnitPath(reservationUnit.pk)}
       key={reservationUnit.pk ?? 0}
     >
       {t("reservationUnitCard:seeMore")}

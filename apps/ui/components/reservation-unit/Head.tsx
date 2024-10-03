@@ -8,12 +8,7 @@ import { fontRegular, H2, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { ReservationKind, type ReservationUnitPageQuery } from "@gql/gql-types";
 import { Container } from "common";
-import {
-  formatDate,
-  getTranslation,
-  orderImages,
-  singleSearchUrl,
-} from "@/modules/util";
+import { formatDate, getTranslation, orderImages } from "@/modules/util";
 import IconWithText from "../common/IconWithText";
 import { Images } from "./Images";
 import {
@@ -26,6 +21,7 @@ import {
 import BreadcrumbWrapper from "../common/BreadcrumbWrapper";
 import { isReservationStartInFuture } from "@/modules/reservation";
 import { filterNonNullable } from "common/src/helpers";
+import { getSingleSearchPath } from "@/modules/urls";
 
 type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
 interface PropsType {
@@ -147,8 +143,6 @@ function Head({
 }: PropsType): JSX.Element {
   const { t } = useTranslation();
 
-  const searchUrl = singleSearchUrl();
-
   const minDur = reservationUnit.minReservationDuration ?? 0;
   const maxDur = reservationUnit.maxReservationDuration ?? 0;
   const minReservationDuration = formatDuration(minDur / 60, t, true);
@@ -156,13 +150,11 @@ function Head({
 
   const pricing = getActivePricing(reservationUnit);
   const unitPrice = pricing ? getPriceString({ t, pricing }) : undefined;
-
   const isPaid = isReservationUnitPaid(reservationUnit.pricings);
   const hasSubventionSuffix = pricing && isPaid && subventionSuffix != null;
-
   const reservationUnitName = getReservationUnitName(reservationUnit);
-
   const unitName = getUnitName(reservationUnit.unit ?? undefined);
+  const searchUrl = getSingleSearchPath();
 
   const iconsTexts = filterNonNullable([
     reservationUnit.reservationUnitType != null

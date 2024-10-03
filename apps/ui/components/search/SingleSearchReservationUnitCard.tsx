@@ -15,12 +15,13 @@ import {
   getReservationUnitName,
   getUnitName,
 } from "@/modules/reservationUnit";
-import { isBrowser, reservationUnitPrefix } from "@/modules/const";
+import { isBrowser } from "@/modules/const";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import { getImageSource } from "common/src/helpers";
 import Card from "common/src/components/Card";
 import Tag from "common/src/components/Tag";
 import { useSearchParams } from "next/navigation";
+import { getReservationUnitPath } from "@/modules/urls";
 
 type QueryT = NonNullable<SearchReservationUnitsQuery["reservationUnits"]>;
 type Edge = NonNullable<NonNullable<QueryT["edges"]>[0]>;
@@ -87,7 +88,7 @@ function useConstructLink(
   }
 
   const linkURL = new URL(
-    `${reservationUnitPrefix}/${reservationUnit.pk}`,
+    getReservationUnitPath(reservationUnit.pk),
     document.baseURI
   );
   if (duration != null) linkURL.searchParams.set("duration", duration);

@@ -27,8 +27,7 @@ import { type Inputs } from "common/src/reservation-form/types";
 import { Subheading } from "common/src/reservation-form/styles";
 import { Container } from "common";
 import { createApolloClient } from "@/modules/apolloClient";
-import { reservationUnitPrefix, reservationsPrefix } from "@/modules/const";
-import { reservationsUrl } from "@/modules/util";
+import { getReservationPath, getReservationUnitPath } from "@/modules/urls";
 import Sanitize from "@/components/common/Sanitize";
 import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
 import {
@@ -197,7 +196,7 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
   const [deleteReservation] = useDeleteReservationMutation({
     errorPolicy: "all",
     onError: () => {
-      router.push(`${reservationUnitPrefix}/${reservationUnit?.pk}`);
+      router.push(getReservationUnitPath(reservationUnit?.pk));
     },
   });
 
@@ -279,7 +278,7 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
         },
       });
       if (data?.updateReservation?.state === "CANCELLED") {
-        router.push(`${reservationUnitPrefix}/${reservationUnit?.pk}`);
+        router.push(getReservationUnitPath(reservationUnit?.pk));
       } else {
         await refetch();
         setStep(1);
@@ -316,7 +315,7 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
         state === ReservationStateChoice.Confirmed ||
         state === ReservationStateChoice.RequiresHandling
       ) {
-        router.push(`${reservationsUrl}${pk}/confirmation`);
+        router.push(getReservationPath(pk, "confirmation"));
       } else if (steps?.length > 2) {
         const { order } = data?.confirmReservation ?? {};
         const checkoutUrl = getCheckoutUrl(order, i18n.language);
@@ -346,7 +345,7 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
 
   // NOTE: only navigate away from the page if the reservation is cancelled the confirmation hook handles delete
   const cancelReservation = useCallback(async () => {
-    router.push(`${reservationUnitPrefix}/${reservationUnit?.pk}`);
+    router.push(getReservationUnitPath(reservationUnit?.pk));
   }, [router, reservationUnit?.pk]);
 
   const generalFields = getGeneralFields({ supportedFields, reservation });
@@ -500,7 +499,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       return {
         redirect: {
           permanent: false,
-          destination: `${reservationsPrefix}/${reservation.pk}`,
+          destination: getReservationPath(reservation.pk),
         },
         props: {
           notFound: true, // for prop narrowing

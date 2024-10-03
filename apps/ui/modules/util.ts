@@ -1,6 +1,5 @@
 import { isSameDay, parseISO } from "date-fns";
 import { i18n, TFunction } from "next-i18next";
-import queryString from "query-string";
 import { trim } from "lodash";
 import type { ApolloError } from "@apollo/client";
 import type { OptionType } from "common";
@@ -16,13 +15,7 @@ import type {
   ImageFragment,
   LocationFieldsI18nFragment,
 } from "@gql/gql-types";
-import {
-  searchPrefix,
-  applicationsPrefix,
-  singleSearchPrefix,
-  reservationsPrefix,
-  isBrowser,
-} from "./const";
+import { isBrowser } from "./const";
 import { type LocalizationLanguages } from "common/src/helpers";
 
 export { formatDuration } from "common/src/common/util";
@@ -148,38 +141,6 @@ export const getComboboxValues = (
   }
   return [];
 };
-
-type SearchParams = Record<
-  string,
-  string | (string | null)[] | number | boolean | null
->;
-
-// @deprecated, todo rewrite a getSearcSeasonalhUrl function
-// or alternatively remove the use of query-string
-export const searchUrl = (params: SearchParams): string => {
-  const response = `${searchPrefix}/`;
-
-  if (params && Object.keys(params).length > 0) {
-    return `${response}?${queryString.stringify(params)}`;
-  }
-
-  return response;
-};
-
-// @deprecated, todo rewrite a getSingleSearchUrl function
-// or alternatively remove the use of query-string
-export const singleSearchUrl = (params?: SearchParams): string => {
-  const response = `${singleSearchPrefix}/`;
-
-  if (params && Object.keys(params).length > 0) {
-    return `${response}?${queryString.stringify(params)}`;
-  }
-
-  return response;
-};
-
-export const applicationsUrl = `${applicationsPrefix}/`;
-export const reservationsUrl = `${reservationsPrefix}/`;
 
 const imagePriority = ["main", "map", "ground_plan", "other"].map((n) =>
   n.toUpperCase()

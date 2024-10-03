@@ -7,7 +7,6 @@ import { breakpoints } from "common/src/common/style";
 import React, { useMemo, useState } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { reservationsPrefix } from "@/modules/const";
 import { filterNonNullable } from "common/src/helpers";
 import { errorToast } from "common/src/common/toast";
 import {
@@ -21,6 +20,7 @@ import { PendingReservationFormType } from "../reservation-unit/schema";
 import { type UseFormReturn } from "react-hook-form";
 import { convertReservationFormToApi } from "@/modules/reservation";
 import { AcceptTerms } from "./AcceptTerms";
+import { getReservationPath } from "@/modules/urls";
 
 type ReservationUnitNodeT = NonNullable<
   ReservationUnitPageQuery["reservationUnit"]
@@ -174,7 +174,7 @@ export function EditStep1({
             {t("common:prev")}
           </Button>
           <ButtonLikeLink
-            href={`${reservationsPrefix}/${reservation.pk}`}
+            href={getReservationPath(reservation.pk)}
             size="large"
             data-testid="reservation-edit__button--cancel"
           >

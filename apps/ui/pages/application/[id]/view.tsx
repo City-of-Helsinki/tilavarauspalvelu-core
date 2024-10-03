@@ -17,7 +17,7 @@ import {
 import { base64encode } from "common/src/helpers";
 import { useApplicationQuery } from "@gql/gql-types";
 
-const View = ({ id: pk, tos }: Props): JSX.Element => {
+function View({ id: pk, tos }: Props): JSX.Element {
   const { t } = useTranslation();
 
   const router = useRouter();
@@ -66,11 +66,11 @@ const View = ({ id: pk, tos }: Props): JSX.Element => {
       </ButtonContainer>
     </ApplicationPageWrapper>
   );
-};
+}
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale } = ctx;
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
@@ -92,6 +92,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
-};
+}
 
 export default View;

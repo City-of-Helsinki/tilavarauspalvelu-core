@@ -1,17 +1,16 @@
 import React from "react";
 import { IconArrowRight, IconLinkExternal } from "hds-react";
-import { TFunction, useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
-import ClientOnly from "common/src/ClientOnly";
+import { type TFunction, useTranslation } from "next-i18next";
 import {
   type ApplicationRoundFieldsFragment,
   ApplicationRoundStatusChoice,
 } from "@gql/gql-types";
-import { formatDateTime, searchUrl } from "@/modules/util";
+import { formatDateTime } from "@/modules/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { isValid } from "date-fns";
 import Card from "common/src/components/Card";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
+import { getApplicationRoundPath, getSeasonalSearchPath } from "@/modules/urls";
 
 interface Props {
   applicationRound: ApplicationRoundFieldsFragment;
@@ -44,10 +43,8 @@ function translateRoundDate(
   }
 }
 
-const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
+export function ApplicationRoundCard({ applicationRound }: Props): JSX.Element {
   const { t } = useTranslation();
-
-  const history = useRouter();
 
   const state = applicationRound.status;
   if (state == null) {
@@ -71,7 +68,7 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
 
   const buttons = [
     <ButtonLikeLink
-      href={`/criteria/${applicationRound.pk}`}
+      href={getApplicationRoundPath(applicationRound.pk, "criteria")}
       target="_blank"
       key="criteria"
     >
@@ -83,13 +80,7 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
     buttons.push(
       <ButtonLikeLink
         key="button"
-        href={searchUrl({ applicationRound: applicationRound.pk ?? null })}
-        onClick={(e) => {
-          e.preventDefault();
-          if (applicationRound.pk) {
-            history.push(searchUrl({ applicationRound: applicationRound.pk }));
-          }
-        }}
+        href={getSeasonalSearchPath(applicationRound.pk)}
       >
         {t("application:Intro.startNewApplication")}
         <IconArrowRight aria-hidden />
@@ -102,11 +93,4 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
       {reservationPeriod}
     </Card>
   );
-};
-
-// Hack to deal with hydration errors
-export default ({ applicationRound }: Props): JSX.Element => (
-  <ClientOnly>
-    <ApplicationRoundCard applicationRound={applicationRound} />
-  </ClientOnly>
-);
+}

@@ -10,10 +10,11 @@ import { useTranslation } from "next-i18next";
 import NextImage from "next/image";
 import type { ReservationUnitCardFieldsFragment } from "@gql/gql-types";
 import { getMainImage, getTranslation } from "@/modules/util";
-import { reservationUnitPrefix } from "@/modules/const";
 import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
 import { getImageSource } from "common/src/helpers";
 import Card from "common/src/components/Card";
+import { getReservationUnitPath } from "@/modules/urls";
+import { ButtonLikeLink } from "../common/ButtonLikeLink";
 
 type Node = ReservationUnitCardFieldsFragment;
 interface IProps {
@@ -29,12 +30,9 @@ export function ReservationUnitCard({
   containsReservationUnit,
   removeReservationUnit,
 }: IProps): JSX.Element {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const name = getReservationUnitName(reservationUnit);
-
-  const localeString = i18n.language === "fi" ? "" : `/${i18n.language}`;
-  const link = `${localeString}${reservationUnitPrefix}/${reservationUnit.pk}`;
 
   const unitName = reservationUnit.unit
     ? getUnitName(reservationUnit.unit)
@@ -108,15 +106,16 @@ export function ReservationUnitCard({
     );
   }
   buttons.push(
-    <StyledButton
-      variant="secondary"
-      iconRight={<IconLinkExternal aria-hidden />}
-      onClick={() => window.open(link, "_blank")}
+    <ButtonLikeLink
+      href={getReservationUnitPath(reservationUnit.pk)}
+      target="_blank"
+      rel="noopener noreferrer"
       data-testid="reservation-unit-card__button--link"
       key={t("reservationUnitCard:seeMore")}
     >
+      <IconLinkExternal aria-hidden />
       {t("reservationUnitCard:seeMore")}
-    </StyledButton>
+    </ButtonLikeLink>
   );
 
   return (

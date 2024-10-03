@@ -15,8 +15,8 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { isReservationCancellable } from "@/modules/reservation";
-import { reservationsPrefix } from "@/modules/const";
 import { CURRENT_USER } from "@/modules/queries/user";
+import { getReservationPath } from "@/modules/urls";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
@@ -92,7 +92,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       return {
         redirect: {
           permanent: true,
-          destination: `${reservationsPrefix}/${reservation.pk}`,
+          destination: getReservationPath(reservation.pk),
         },
         props: {
           notFound: true, // for prop narrowing

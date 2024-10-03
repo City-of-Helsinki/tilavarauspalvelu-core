@@ -16,10 +16,10 @@ import { BlackButton } from "@/styles/util";
 import { useOrder, useDeleteReservation } from "@/hooks/reservation";
 import { getCheckoutUrl } from "@/modules/reservation";
 import { filterNonNullable } from "common/src/helpers";
-import { reservationUnitPrefix } from "@/modules/const";
 import { ApolloError } from "@apollo/client";
 import { toApiDate } from "common/src/common/util";
 import { errorToast, successToast } from "common/src/common/toast";
+import { getReservationInProgressPath } from "@/modules/urls";
 
 type QueryT = NonNullable<ListReservationsQuery["reservations"]>;
 type EdgeT = NonNullable<QueryT["edges"][number]>;
@@ -275,10 +275,11 @@ export function InProgressReservationNotification() {
   };
 
   const handleContinue = (reservation?: NodeT) => {
-    // TODO add an url builder for this
-    // - reuse the url builder in [...params].tsx
     const reservationUnit = reservation?.reservationUnits?.find(() => true);
-    const url = `${reservationUnitPrefix}/${reservationUnit?.pk}/reservation/${reservation?.pk}`;
+    const url = getReservationInProgressPath(
+      reservationUnit?.pk,
+      reservation?.pk
+    );
     router.push(url);
   };
 

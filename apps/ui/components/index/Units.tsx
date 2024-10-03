@@ -7,8 +7,8 @@ import Link from "next/link";
 import { fontMedium, H3 } from "common/src/common/typography";
 import type { UnitNode } from "@gql/gql-types";
 import { IconButton } from "common/src/components";
-import { singleSearchPrefix } from "../../modules/const";
-import { getTranslation } from "../../modules/util";
+import { singleSearchPrefix } from "@/modules/urls";
+import { getTranslation } from "@/modules/util";
 import { anchorStyles, focusStyles } from "common/styles/cssFragments";
 
 type Props = {

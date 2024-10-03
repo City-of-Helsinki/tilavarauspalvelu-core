@@ -14,7 +14,7 @@ import {
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { HeroSubheading } from "@/modules/style/typography";
-import ApplicationRoundCard from "@/components/recurring/ApplicationRoundCard";
+import { ApplicationRoundCard } from "@/components/recurring/ApplicationRoundCard";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 

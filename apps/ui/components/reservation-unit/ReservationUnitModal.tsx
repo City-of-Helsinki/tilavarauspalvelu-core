@@ -22,12 +22,12 @@ import {
   type ApplicationQuery,
 } from "@gql/gql-types";
 import { filterNonNullable, getImageSource } from "common/src/helpers";
-import { reservationUnitPath } from "@/modules/const";
 import { getAddressAlt, getMainImage, getTranslation } from "@/modules/util";
 import { MediumButton } from "@/styles/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
 import IconWithText from "../common/IconWithText";
+import { getReservationUnitPath } from "@/modules/urls";
 
 const Container = styled.div`
   width: 100%;
@@ -161,8 +161,7 @@ function ReservationUnitCard({
         <Name>{name}</Name>
         <Unit>{unitName}</Unit>
         <Link
-          // TODO link should be disabled if no pk
-          href={reservationUnitPath(reservationUnit.pk ?? 0)}
+          href={getReservationUnitPath(reservationUnit.pk)}
           target="_blank"
           rel="noopener noreferrer"
         >

@@ -26,6 +26,7 @@ import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import Card from "common/src/components/Card";
 import StatusLabel from "common/src/components/StatusLabel";
 import { type StatusLabelType } from "common/src/tags";
+import { getApplicationPath } from "@/modules/urls";
 
 const StyledButton = styled(Button).attrs({
   variant: "secondary",
@@ -174,11 +175,7 @@ function ApplicationCard({ application, actionCallback }: Props): JSX.Element {
     </StyledButton>,
     <ButtonLikeLink
       disabled={!editable || application.pk == null || isLoading}
-      href={
-        editable && application.pk != null
-          ? `${applicationUrl(application.pk ?? 0)}/page1`
-          : ""
-      }
+      href={editable ? getApplicationPath(application.pk, "page1") : ""}
       key="edit"
     >
       {t("applicationCard:edit")}

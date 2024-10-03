@@ -28,7 +28,6 @@ import { StepState, Stepper } from "hds-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { errorToast } from "common/src/common/toast";
-import { reservationsPrefix } from "@/modules/const";
 import { EditStep0 } from "@/components/reservation/EditStep0";
 import { EditStep1 } from "@/components/reservation/EditStep1";
 import {
@@ -46,6 +45,7 @@ import {
   transformReservation,
 } from "@/modules/reservation";
 import { NotModifiableReason } from "@/components/reservation/NotModifiableReason";
+import { getReservationPath } from "@/modules/urls";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -129,7 +129,7 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
     }
     try {
       await adjustReservationTime({ pk: reservation.pk, ...times });
-      router.push(`${reservationsPrefix}/${reservation.pk}/?timeUpdated=true`);
+      router.push(`${getReservationPath(reservation.pk)}?timeUpdated=true`);
     } catch (e) {
       if (e instanceof Error) {
         // TODO don't print the error message to the user

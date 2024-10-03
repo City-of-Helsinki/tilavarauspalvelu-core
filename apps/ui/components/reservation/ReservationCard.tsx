@@ -8,12 +8,7 @@ import {
   type ListReservationsQuery,
   ReservationStateChoice,
 } from "@gql/gql-types";
-import {
-  capitalize,
-  formatDateTimeRange,
-  getMainImage,
-  reservationsUrl,
-} from "@/modules/util";
+import { capitalize, formatDateTimeRange, getMainImage } from "@/modules/util";
 import {
   isReservationCancellable,
   getNormalizedReservationOrderStatus,
@@ -28,6 +23,7 @@ import { ReservationStatus } from "./ReservationStatus";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import { getImageSource } from "common/src/helpers";
 import Card from "common/src/components/Card";
+import { getReservationPath } from "@/modules/urls";
 
 type CardType = "upcoming" | "past" | "cancelled";
 
@@ -109,7 +105,7 @@ function ReservationCard({ reservation, type }: PropsT): JSX.Element {
   if (type === "upcoming" && isReservationCancellable(reservation)) {
     buttons.push(
       <ButtonLikeLink
-        href={`${reservationsUrl}${reservation.pk}/cancel`}
+        href={getReservationPath(reservation.pk, "cancel")}
         data-testid="reservation-card__button--cancel-reservation"
         key={t("reservations:cancelReservationAbbreviated")}
       >
