@@ -25,13 +25,16 @@ class GeneralRoleAdmin(admin.ModelAdmin):
     list_display = [
         "role",
         "user_email",
+        "role_active",
     ]
     list_filter = [
         "role",
+        "role_active",
     ]
 
     # Form
     fields = [
+        "role_active",
         "role",
         "user",
         "assigner",
