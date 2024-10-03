@@ -75,7 +75,7 @@ from .mutations import (
     SpaceDeleteMutation,
     SpaceUpdateMutation,
     UnitUpdateMutation,
-    UserUpdateMutation,
+    UserStaffUpdateMutation,
 )
 from .queries import (
     AgeGroupNode,
@@ -345,7 +345,7 @@ class Mutation(graphene.ObjectType):
     refresh_order = RefreshOrderMutation.Field()
     #
     # User
-    update_user = UserUpdateMutation.Field()
+    update_staff_user = UserStaffUpdateMutation.Field()
     #
     # Misc.
     create_banner_notification = BannerNotificationCreateMutation.Field()
