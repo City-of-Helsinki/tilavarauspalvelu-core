@@ -3,11 +3,11 @@ from graphene_django_extensions import NestingModelSerializer
 from tilavarauspalvelu.models import User
 
 __all__ = [
-    "UserUpdateSerializer",
+    "UserStaffUpdateSerializer",
 ]
 
 
-class UserUpdateSerializer(NestingModelSerializer):
+class UserStaffUpdateSerializer(NestingModelSerializer):
     class Meta:
         model = User
         fields = [
