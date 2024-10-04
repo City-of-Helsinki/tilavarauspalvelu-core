@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
-import { ParsedUrlQuery } from "node:querystring";
+import { type ParsedUrlQuery } from "node:querystring";
+import { type UrlObject } from "node:url";
 
 // TODO should take a list of keys or use a type instead of a record so we can remove invalid keys
 export function useSearchValues() {
@@ -38,9 +39,16 @@ export function useSearchModify() {
       order: newOrder,
       ...(force ? { ref: nextRef } : {}),
     };
-    router.replace({
-      query: newValues,
-    });
+
+    // NOTE without this next router can't handle [id] pages
+    const url: UrlObject = {
+      pathname: router.pathname,
+      query: {
+        ...router.query,
+        ...newValues,
+      },
+    };
+    router.replace(url, undefined, { shallow: true });
   };
 
   /// @param hideList - list of keys to ignore when resetting the query
@@ -52,6 +60,7 @@ export function useSearchModify() {
       }
       return acc;
     }, {});
+    // NOTE for some reason we don't have to fix [id] pages here
     router.replace({
       query: newValues,
     });

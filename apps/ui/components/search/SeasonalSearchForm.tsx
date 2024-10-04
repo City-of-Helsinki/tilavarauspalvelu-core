@@ -140,7 +140,6 @@ const filterOrder = [
 ];
 
 type FormValues = {
-  applicationRound: number;
   minPersons: number | null;
   maxPersons: number | null;
   unit: number[];
@@ -152,7 +151,6 @@ type FormValues = {
 // TODO combine as much as possible with the one in single-search (move them to a common place)
 function mapQueryToForm(query: ParsedUrlQuery): FormValues {
   return {
-    applicationRound: mapQueryParamToNumber(query.applicationRound) ?? 0,
     purposes: mapQueryParamToNumberArray(query.purposes),
     unit: mapQueryParamToNumberArray(query.unit),
     reservationUnitTypes: mapQueryParamToNumberArray(

@@ -10,13 +10,13 @@ export const applicationsPath = `${applicationsPrefix}/`;
 export const reservationsPath = `${reservationsPrefix}/`;
 
 export function getApplicationRoundPath(
-  pk: Maybe<number> | undefined,
+  id: Maybe<number> | undefined,
   page?: string | undefined
 ): string {
-  if (pk == null) {
+  if (id == null) {
     return "";
   }
-  return `${seasonalPrefix}/${pk}/${page ?? ""}`;
+  return `${seasonalPrefix}/${id}/${page ?? ""}`;
 }
 
 export function getSeasonalSearchPath(

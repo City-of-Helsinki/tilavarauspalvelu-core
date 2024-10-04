@@ -211,8 +211,8 @@ export function processVariables(
           showOnlyReservable: true,
         }
       : {}),
-    ...(values.applicationRound != null && isSeasonal
-      ? { applicationRound: paramToIntegers(values.applicationRound) }
+    ...(values.id != null && isSeasonal
+      ? { applicationRound: paramToIntegers(values.id) }
       : {}),
     first: SEARCH_PAGING_LIMIT,
     orderBy,

@@ -29,6 +29,7 @@ import {
   type ApplicationQueryVariables,
 } from "common/gql/gql-types";
 import { errorToast } from "common/src/common/toast";
+import { getApplicationPath } from "@/modules/urls";
 
 // TODO move this to a shared file
 // and combine all the separate error handling functions to one
@@ -160,7 +161,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
 function ApplicationRootPage({ slug, data }: PropsNarrowed): JSX.Element {
   const { application, applicationRound } = data;
-  const pageId = slug;
   const router = useRouter();
 
   const [update, { error }] = useApplicationUpdate();
@@ -173,21 +173,16 @@ function ApplicationRootPage({ slug, data }: PropsNarrowed): JSX.Element {
       console.error("application pk is 0");
       return 0;
     }
-
-    const input = transformApplication(appToSave);
-    const pk = await update(input);
-    return pk;
+    return update(transformApplication(appToSave));
   };
 
   const saveAndNavigate =
-    (path: string) => async (appToSave: ApplicationFormValues) => {
+    (path: "page2" | "page3") => async (appToSave: ApplicationFormValues) => {
       const pk = await handleSave(appToSave);
       if (pk === 0) {
         return;
       }
-      const prefix = `/application/${pk}`;
-      const target = `${prefix}/${path}`;
-      router.push(target);
+      router.push(getApplicationPath(pk, path));
     };
 
   const { reservationUnits: selectedReservationUnits } =
@@ -231,7 +226,7 @@ function ApplicationRootPage({ slug, data }: PropsNarrowed): JSX.Element {
 
   return (
     <FormProvider {...form}>
-      {pageId === "page1" ? (
+      {slug === "page1" ? (
         <ApplicationPageWrapper
           overrideText={applicationRoundName}
           translationKeyPrefix="application:Page1"
@@ -243,7 +238,7 @@ function ApplicationRootPage({ slug, data }: PropsNarrowed): JSX.Element {
             onNext={saveAndNavigate("page2")}
           />
         </ApplicationPageWrapper>
-      ) : pageId === "page2" ? (
+      ) : slug === "page2" ? (
         <ApplicationPageWrapper
           translationKeyPrefix="application:Page2"
           application={application}

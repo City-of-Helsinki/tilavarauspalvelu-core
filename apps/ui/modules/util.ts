@@ -192,8 +192,6 @@ export const getAddressAlt = (ru: {
   return trim(`${street}, ${city}`, ", ");
 };
 
-export const applicationUrl = (id: number): string => `/application/${id}`;
-
 export const applicationErrorText = (
   t: TFunction,
   key: string | undefined,

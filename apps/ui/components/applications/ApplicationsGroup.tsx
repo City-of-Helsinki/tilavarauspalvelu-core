@@ -25,11 +25,11 @@ const Wrapper = styled.div`
   margin-bottom: var(--spacing-layout-l);
 `;
 
-const ApplicationsGroup = ({
+function ApplicationsGroup({
   name,
   applications,
   actionCallback,
-}: Props): JSX.Element | null => {
+}: Props): JSX.Element | null {
   if (applications.length === 0 || !applications[0].applicationRound == null) {
     return null;
   }
@@ -50,6 +50,6 @@ const ApplicationsGroup = ({
       ))}
     </Wrapper>
   );
-};
+}
 
 export default ApplicationsGroup;

@@ -7,8 +7,13 @@ import { Container as CommonContainer } from "common";
 import ClientOnly from "common/src/ClientOnly";
 import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
 import { truncatedText } from "@/styles/util";
-import Link from "next/link";
-import { focusStyles } from "common/styles/cssFragments";
+import { useRouter } from "next/router";
+import {
+  ApplicationCreateMutationInput,
+  useCreateApplicationMutation,
+} from "@/gql/gql-types";
+import { errorToast } from "common/src/common/toast";
+import { getApplicationPath } from "@/modules/urls";
 
 type Props = {
   count: number;
@@ -78,28 +83,43 @@ const DeleteButton = styled(Button).attrs({
   ${truncatedText}
 `;
 
-const StyledLink = styled(Link)`
-  background-color: transparent;
-  color: var(--color-white);
-  ${truncatedText}
-  display: flex;
-  gap: var(--spacing-2-xs);
-  ${focusStyles}
-  padding: var(--spacing-2-xs) var(--spacing-s);
-  && {
-    --color-focus: var(--color-white);
-    --focus-outline-color: var(--color-white);
-  }
-  &:hover {
-    text-decoration: underline;
-  }
-`;
-
-const StartApplicationBar = ({
+function StartApplicationBar({
   count,
   clearSelections,
-}: Props): JSX.Element | null => {
+}: Props): JSX.Element | null {
   const { t } = useTranslation();
+  const router = useRouter();
+
+  const [create, { loading: isSaving }] = useCreateApplicationMutation();
+
+  const createNewApplication = async (applicationRoundId: number) => {
+    const input: ApplicationCreateMutationInput = {
+      applicationRound: applicationRoundId,
+    };
+    try {
+      const { data } = await create({
+        variables: { input },
+      });
+
+      if (data?.createApplication?.pk) {
+        const { pk } = data.createApplication;
+        router.replace(getApplicationPath(pk, "page1"));
+      } else {
+        throw new Error("create application mutation failed");
+      }
+    } catch (e) {
+      errorToast({ text: t("application:Intro.createFailedContent") });
+    }
+  };
+
+  const onNext = () => {
+    const applicationRoundId = router.query.id;
+    if (typeof applicationRoundId === "string" && applicationRoundId !== "") {
+      createNewApplication(Number(applicationRoundId));
+    } else {
+      throw new Error("Application round id is missing");
+    }
+  };
 
   // This breaks SSR because the server knowns nothing about client side stores
   // we can't fix it with CSS since it doesn't update properly
@@ -135,16 +155,20 @@ const StartApplicationBar = ({
               </JustForMobile>
             </DeleteButton>
           </Left>
-          <StyledLink id="startApplicationButton" href="/intro">
+          <Button
+            id="startApplicationButton"
+            onClick={onNext}
+            disabled={isSaving}
+            iconRight={<IconArrowRight />}
+          >
             <JustForDesktop>{t("shoppingCart:next")}</JustForDesktop>
             <JustForMobile>{t("shoppingCart:nextShort")}</JustForMobile>
-            <IconArrowRight />
-          </StyledLink>
+          </Button>
         </InnerContainer>
       </Container>
     </BackgroundContainer>
   );
-};
+}
 
 const StartApplicationBarWrapped = (props: Props) => (
   <ClientOnly>

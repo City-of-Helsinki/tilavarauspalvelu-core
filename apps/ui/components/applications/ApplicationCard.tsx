@@ -19,7 +19,7 @@ import {
   useCancelApplicationMutation,
   type ApplicationsQuery,
 } from "@gql/gql-types";
-import { applicationUrl, formatDateTime } from "@/modules/util";
+import { formatDateTime } from "@/modules/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
@@ -182,11 +182,7 @@ function ApplicationCard({ application, actionCallback }: Props): JSX.Element {
       <IconPen aria-hidden />
     </ButtonLikeLink>,
     <ButtonLikeLink
-      href={
-        application.pk != null
-          ? `${applicationUrl(application.pk ?? 0)}/view`
-          : ""
-      }
+      href={getApplicationPath(application.pk, "view")}
       disabled={application.pk == null}
       key="view"
     >
