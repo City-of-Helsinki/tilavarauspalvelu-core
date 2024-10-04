@@ -1,6 +1,5 @@
 import { type Maybe } from "@/gql/gql-types";
 
-export const searchPrefix = "/search";
 export const reservationUnitPrefix = "/reservation-unit";
 export const singleSearchPrefix = "/search/single";
 export const applicationsPrefix = "/applications";

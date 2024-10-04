@@ -28,11 +28,15 @@ import useReservationUnitsList from "@/hooks/useReservationUnitList";
 import { ListWithPagination } from "@/components/common/ListWithPagination";
 import StartApplicationBar from "@/components/common/StartApplicationBar";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { getSearchOptions, processVariables } from "@/modules/search";
+import {
+  getSearchOptions,
+  mapQueryParamToNumber,
+  processVariables,
+} from "@/modules/search";
 import { useSearchValues } from "@/hooks/useSearchValues";
-import { getApplicationRoundName } from "@/modules/applicationRound";
 import { useSearchQuery } from "@/hooks/useSearchQuery";
 import { SortingComponent } from "@/components/SortingComponent";
+import { useRouter } from "next/router";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
@@ -114,10 +118,13 @@ function SeasonalSearch({
   reservationUnitTypeOptions,
   purposeOptions,
 }: Props): JSX.Element {
+  const { t, i18n } = useTranslation();
+  const router = useRouter();
   const searchValues = useSearchValues();
 
+  const applicationRoundPk = mapQueryParamToNumber(router.query.id);
   const selectedApplicationRound = applicationRounds.find(
-    (ar) => ar.pk === Number(searchValues.applicationRound)
+    (ar) => ar.pk === applicationRoundPk
   );
   const {
     reservationUnits: selectedReservationUnits,
@@ -127,8 +134,6 @@ function SeasonalSearch({
     clearSelections,
     // Hide other application rounds' reservation units
   } = useReservationUnitsList(selectedApplicationRound);
-
-  const { t, i18n } = useTranslation();
 
   const variables = processVariables(
     searchValues,
@@ -144,11 +149,6 @@ function SeasonalSearch({
   );
   const pageInfo = currData?.reservationUnits?.pageInfo;
 
-  const applicationRoundOptions = applicationRounds.map((applicationRound) => ({
-    value: applicationRound.pk ?? 0,
-    label: getApplicationRoundName(applicationRound),
-  }));
-
   return (
     <Wrapper>
       {error ? (
@@ -162,7 +162,6 @@ function SeasonalSearch({
           <Title>{t("search:recurring.heading")}</Title>
           <Ingress>{t("search:recurring.text")}</Ingress>
           <SeasonalSearchForm
-            applicationRoundOptions={applicationRoundOptions}
             unitOptions={unitOptions}
             reservationUnitTypeOptions={reservationUnitTypeOptions}
             purposeOptions={purposeOptions}
