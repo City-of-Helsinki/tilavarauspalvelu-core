@@ -96,16 +96,21 @@ button {
 }
 
 [class*="button_hds-button--secondary"]:not(:disabled) {
-  font-family: var(--font-bold);
-  --color: var(--color-black) !important;
-  color: var(--color) !important;
-  border-color: var(--color-black) !important;
-  --background-color: var(--color-white) !important;
-  --background-color-hover: var(--color-black-20) !important;
-  --border-color: var(--color-black) !important;
-  --border-color-hover: var(--border-color) !important;
-  --border-color-focus: var(--border-color) !important;
-  --border-color-hover-focus: var(--border-color) !important;
+  font-family: var(--font-medium);
+  --color: var(--color-black);
+  color: var(--color);
+  border-color: var(--color-black);
+  --color-hover: var(--color-black);
+  --color-focus: var(--color-black);
+  --color-hover-focus: var(--color-black);
+  --background-color: var(--color-white);
+  --background-color-hover: var(--color-black-20);
+  --background-color-focus: var(--color-black-20);
+  --background-color-hover-focus: var(--color-black-20);
+  --border-color: var(--color-black);
+  --border-color-hover: var(--border-color);
+  --border-color-focus: var(--border-color);
+  --border-color-hover-focus: var(--border-color);
 }
 
 // cookiehub overrides

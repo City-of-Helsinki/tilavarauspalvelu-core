@@ -308,14 +308,6 @@ const ButtonContainer = styled.div`
   gap: var(--spacing-xs);
   flex-direction: column;
   align-items: flex-end;
-  > * {
-    --background-color: var(--color-white) !important;
-    --background-color-disabled: var(--color-white) !important;
-    --border-color: var(--color-black) !important;
-    color: var(--color-black);
-    background: var(--color-white);
-    width: 100%;
-  }
 
   @media (min-width: ${breakpoints.m}) {
     .card--default & {

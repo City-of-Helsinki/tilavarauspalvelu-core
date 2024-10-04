@@ -9,13 +9,11 @@ export type ButtonStyleProps = {
 
 export const ButtonCss = css<ButtonStyleProps>`
   --background-color-hover: ${({ variant }) =>
-    variant === "primary" ? "var(--color-bus-dark)" : "var(--color-black-5)"};
+    variant === "primary" ? "var(--color-bus-dark)" : "var(--color-black-20)"};
   --color-hover: ${({ variant }) =>
     variant === "primary" ? "var(--color-white)" : "var(--color-black)"};
-  --background-color-focus: ${({ variant }) =>
-    variant === "primary" ? "var(--color-bus)" : "transparent"};
-  --color-focus: ${({ variant }) =>
-    variant === "primary" ? "var(--color-white)" : "var(--color-black)"};
+  --background-color-focus: var(--background-color-hover);
+  --color-focus: var(--color-hover);
   --focus-outline-color: var(--color-focus-outline);
   --outline-gutter: 2px;
   --outline-width: 3px;
@@ -27,7 +25,7 @@ export const ButtonCss = css<ButtonStyleProps>`
   opacity: ${({ disabled }) => (disabled ? "0.5" : "1")};
   text-decoration: none;
   background-color: ${({ variant }) =>
-    variant === "primary" ? "var(--color-bus)" : "transparent"};
+    variant === "primary" ? "var(--color-bus)" : "var(--color-white)"};
   color: ${({ variant }) =>
     variant === "primary" ? "var(--color-white)" : "var(--color-black)"};
   padding: ${({ size }) => (size === "large" ? "12px 20px" : "0 20px")};

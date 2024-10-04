@@ -8,8 +8,6 @@ import {
 import React from "react";
 import { useTranslation } from "next-i18next";
 import NextImage from "next/image";
-import styled from "styled-components";
-import { fontMedium } from "common/src/common/typography";
 import type { ReservationUnitCardFieldsFragment } from "@gql/gql-types";
 import { getMainImage, getTranslation } from "@/modules/util";
 import { reservationUnitPrefix } from "@/modules/const";
@@ -24,13 +22,6 @@ interface IProps {
   containsReservationUnit: (reservationUnit: Node) => boolean;
   removeReservationUnit: (reservationUnit: Node) => void;
 }
-
-/* TODO something is overriding button font-family to be bold */
-const StyledButton = styled(Button).attrs({ size: "small" })`
-  && {
-    ${fontMedium}
-  }
-`;
 
 export function ReservationUnitCard({
   reservationUnit,
@@ -91,18 +82,21 @@ export function ReservationUnitCard({
   const buttons = [];
   if (containsReservationUnit(reservationUnit)) {
     buttons.push(
-      <StyledButton
+      <Button
+        size="small"
+        variant="primary"
         iconRight={<IconCheck aria-hidden />}
         onClick={() => removeReservationUnit(reservationUnit)}
         data-testid="reservation-unit-card__button--select"
         key={t("common:removeReservationUnit")}
       >
         {t("common:removeReservationUnit")}
-      </StyledButton>
+      </Button>
     );
   } else {
     buttons.push(
-      <StyledButton
+      <Button
+        size="small"
         variant="secondary"
         iconRight={<IconPlus aria-hidden />}
         onClick={() => selectReservationUnit(reservationUnit)}
@@ -110,7 +104,7 @@ export function ReservationUnitCard({
         key={t("common:selectReservationUnit")}
       >
         {t("common:selectReservationUnit")}
-      </StyledButton>
+      </Button>
     );
   }
   buttons.push(
