@@ -37,6 +37,7 @@ from tilavarauspalvelu.enums import (
     Weekday,
 )
 from tilavarauspalvelu.exceptions import SendEmailNotificationError
+from tilavarauspalvelu.integrations.email import EmailNotificationSender
 from tilavarauspalvelu.models import (
     AffectingTimeSpan,
     AllocatedTimeSlot,
@@ -53,7 +54,6 @@ from tilavarauspalvelu.models.recurring_reservation.actions import ReservationDe
 from tilavarauspalvelu.models.request_log.model import RequestLog
 from tilavarauspalvelu.models.sql_log.model import SQLLog
 from tilavarauspalvelu.services.permission_service import deactivate_old_permissions
-from tilavarauspalvelu.utils.email.email_sender import EmailNotificationSender
 from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
 from tilavarauspalvelu.utils.pricing_updates import update_reservation_unit_pricings

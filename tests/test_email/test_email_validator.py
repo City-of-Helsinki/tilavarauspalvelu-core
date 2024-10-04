@@ -3,8 +3,8 @@ import re
 import pytest
 
 from tilavarauspalvelu.exceptions import EmailTemplateValidationError
-from tilavarauspalvelu.utils.email.email_builder_reservation import ReservationEmailContext
-from tilavarauspalvelu.utils.email.email_validator import EmailTemplateValidator
+from tilavarauspalvelu.integrations.email import EmailTemplateValidator
+from tilavarauspalvelu.integrations.email.email_builder_reservation import ReservationEmailContext
 
 
 def test_email_validator__raises__validation_error_on_unsupported_tag():

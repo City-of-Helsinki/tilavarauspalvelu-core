@@ -12,9 +12,9 @@ from tests.factories import (
     UserFactory,
 )
 from tilavarauspalvelu.enums import CustomerTypeChoice
+from tilavarauspalvelu.integrations.email.email_builder_reservation import ReservationEmailContext
 from tilavarauspalvelu.models import Location, Reservation
 from tilavarauspalvelu.typing import Lang
-from tilavarauspalvelu.utils.email.email_builder_reservation import ReservationEmailContext
 from utils.utils import get_attr_by_language
 
 if TYPE_CHECKING:

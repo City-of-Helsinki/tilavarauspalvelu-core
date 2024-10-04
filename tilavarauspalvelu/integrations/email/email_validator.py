@@ -10,11 +10,11 @@ from jinja2.exceptions import TemplateError
 from jinja2.sandbox import SandboxedEnvironment
 
 from tilavarauspalvelu.exceptions import EmailTemplateValidationError
+from tilavarauspalvelu.integrations.email.email_translations import EMAIL_TRANSLATIONS
 from tilavarauspalvelu.templatetags import format_currency
-from tilavarauspalvelu.utils.email.email_translations import EMAIL_TRANSLATIONS
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.utils.email.email_builder_base import BaseEmailContext
+    from tilavarauspalvelu.integrations.email.email_builder_base import BaseEmailContext
 
 
 EMAIL_TEMPLATE_SUPPORTED_EXPRESSIONS = ["if", "elif", "else", "endif"]

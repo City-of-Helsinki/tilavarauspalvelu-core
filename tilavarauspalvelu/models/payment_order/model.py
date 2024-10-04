@@ -170,9 +170,7 @@ class PaymentOrder(models.Model):
             and self.reservation is not None
             and self.reservation.state == ReservationStateChoice.WAITING_FOR_PAYMENT
         ):
-            from tilavarauspalvelu.utils.email.reservation_email_notification_sender import (
-                ReservationEmailNotificationSender,
-            )
+            from tilavarauspalvelu.integrations.email import ReservationEmailNotificationSender
 
             self.reservation.state = ReservationStateChoice.CONFIRMED
             self.reservation.save(update_fields=["state"])
