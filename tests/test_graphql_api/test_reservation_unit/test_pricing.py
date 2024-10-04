@@ -1,7 +1,9 @@
 import datetime
+from decimal import Decimal
 
 import pytest
 
+from tests.factories import TaxPercentageFactory
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.models import ReservationUnit
 from utils.date_utils import local_date
@@ -34,6 +36,8 @@ def test_reservation_unit__create__pricing__is_required_for_non_drafts(graphql):
 
 
 def test_reservation_unit__create__pricing__free_pricing_doesnt_require_price_information(graphql):
+    TaxPercentageFactory.create(value=Decimal("0.0"))
+
     graphql.login_with_superuser()
     data = get_create_draft_input_data(
         pricings=[
