@@ -28,6 +28,9 @@ const NoResults = styled.div`
 
 const ListContainer = styled.div`
   margin-top: var(--spacing-layout-s);
+  display: flex;
+  flex-flow: column nowrap;
+  gap: var(--spacing-m);
 `;
 
 const Paginator = styled.div`

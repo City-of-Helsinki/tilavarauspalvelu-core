@@ -44,15 +44,6 @@ const HeadContainer = styled.div`
 
 const Heading = styled(H2).attrs({ as: "h1" })``;
 
-const BottomWrapper = styled(Container)`
-  padding-top: var(--spacing-l);
-  [class*="ListContainer"] {
-    display: flex;
-    flex-flow: column nowrap;
-    gap: var(--spacing-m);
-  }
-`;
-
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, query } = ctx;
   const commonProps = getCommonServerSideProps();
@@ -150,7 +141,7 @@ function SearchSingle({
         </StyledContainer>
       </HeadContainer>
       <section ref={content}>
-        <BottomWrapper>
+        <Container>
           <ListWithPagination
             items={filterNonNullable(reservationUnits).map((ru) => (
               <ReservationUnitCard reservationUnit={ru} key={ru.pk} />
@@ -161,7 +152,7 @@ function SearchSingle({
             fetchMore={(cursor) => fetchMore(cursor)}
             sortingComponent={<SortingComponent />}
           />
-        </BottomWrapper>
+        </Container>
       </section>
     </Wrapper>
   );
