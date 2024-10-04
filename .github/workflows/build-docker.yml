@@ -57,6 +57,8 @@ jobs:
     - name: "Extract ui metadata (tags, labels) for Docker"
       id: meta
       uses: docker/metadata-action@v5
+      env:
+        DOCKER_METADATA_PR_HEAD_SHA: true
       with:
         images: ${{ steps.repo.outputs.repo }}
         tags: |
@@ -65,16 +67,17 @@ jobs:
           type=ref,event=branch,priority=1
         labels: |
           org.opencontainers.image.title=Tilavarauspalvelu ${{ env.BUILD_APP }}
-          org.opencontainers.image.description=Tilavarauspalvelu ${{ env.BUILD_APP }} ${{ github.ref_name }} (${{ github.sha }}).
+          org.opencontainers.image.description=Tilavarauspalvelu ${{ env.BUILD_APP }} ${{ github.ref_name }}.
           org.opencontainers.image.version=${{ github.ref_name }}
-          org.opencontainers.image.revision=${{ github.sha }}
 
     - name: "Build container"
       uses: docker/build-push-action@v6
       with:
         context: .
         push: true
-        build-args: APP=${{ env.BUILD_APP }}
+        build-args: |
+          APP=${{ env.BUILD_APP }}
+          NEXT_PUBLIC_BASE_URL=${{ env.NEXT_PUBLIC_BASE_URL }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         annotations: ${{ steps.meta.outputs.annotations }}
