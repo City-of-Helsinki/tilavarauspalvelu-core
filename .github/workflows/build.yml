@@ -48,31 +48,21 @@ jobs:
           echo ${{ env.REGISTRY }}/${{ github.repository }} | tr '[:upper:]' '[:lower:]'
         )" >> $GITHUB_OUTPUT
 
-    - name: "Get pull request or branch short SHA for tags"
-      id: head-sha
-      run: >-
-        echo "sha=$(
-          if [ ${{ github.event_name == 'pull_request' }} ]; then
-            echo ${{ github.event.pull_request.head.sha }} | head -c 7;
-          else
-            echo ${{ github.sha }} | head -c 7;
-          fi
-        )" >> $GITHUB_OUTPUT
-
     - name: "Extract metadata (tags, labels) for Docker"
       id: meta
       uses: docker/metadata-action@v5
+      env:
+        DOCKER_METADATA_PR_HEAD_SHA: true
       with:
         images: ${{ steps.repo.outputs.repo }}
         tags: |
           type=ref,event=tag,priority=3
-          type=raw,value=${{ steps.head-sha.outputs.sha }},priority=2
+          type=sha,prefix=,priority=2
           type=ref,event=branch,priority=1
         labels: |
           org.opencontainers.image.title=Tilavarauspalvelu Core
-          org.opencontainers.image.description=Tilavarauspalvelu backend ${{ github.ref_name }} (${{ steps.head-sha.outputs.sha }}).
+          org.opencontainers.image.description=Tilavarauspalvelu backend ${{ github.ref_name }}.
           org.opencontainers.image.version=${{ github.ref_name }}
-          org.opencontainers.image.revision=${{ steps.head-sha.outputs.sha }}
 
     - name: "Build backend container"
       uses: docker/build-push-action@v6
