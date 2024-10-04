@@ -9,9 +9,12 @@ from tests.factories import EmailTemplateFactory, ReservationFactory, Reservatio
 from tests.helpers import patch_method
 from tilavarauspalvelu.enums import EmailType
 from tilavarauspalvelu.exceptions import EmailTemplateValidationError
+from tilavarauspalvelu.integrations.email.email_builder_reservation import (
+    ReservationEmailBuilder,
+    ReservationEmailContext,
+)
+from tilavarauspalvelu.integrations.email.email_validator import EmailTemplateValidator
 from tilavarauspalvelu.models import EmailTemplate, Reservation
-from tilavarauspalvelu.utils.email.email_builder_reservation import ReservationEmailBuilder, ReservationEmailContext
-from tilavarauspalvelu.utils.email.email_validator import EmailTemplateValidator
 
 pytestmark = [
     pytest.mark.django_db,

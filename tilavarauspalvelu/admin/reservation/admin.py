@@ -12,10 +12,12 @@ from more_admin_filters.filters import MultiSelectRelatedOnlyDropdownFilter
 from rangefilter.filters import DateRangeFilterBuilder
 
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
+from tilavarauspalvelu.integrations.email.reservation_email_notification_sender import (
+    ReservationEmailNotificationSender,
+)
 from tilavarauspalvelu.models import PaymentOrder, Reservation, ReservationDenyReason
 from tilavarauspalvelu.tasks import refund_paid_reservation_task
 from tilavarauspalvelu.typing import WSGIRequest
-from tilavarauspalvelu.utils.email.reservation_email_notification_sender import ReservationEmailNotificationSender
 from utils.date_utils import local_datetime
 
 from .filters import PaidReservationListFilter, RecurringReservationListFilter

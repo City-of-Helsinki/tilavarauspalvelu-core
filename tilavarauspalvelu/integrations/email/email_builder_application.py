@@ -7,7 +7,7 @@ from urllib.parse import urljoin
 from django.conf import settings
 
 from tilavarauspalvelu.enums import EmailType
-from tilavarauspalvelu.utils.email.email_builder_base import BaseEmailBuilder, BaseEmailContext
+from tilavarauspalvelu.integrations.email.email_builder_base import BaseEmailBuilder, BaseEmailContext
 from utils.utils import safe_getattr
 
 if TYPE_CHECKING:

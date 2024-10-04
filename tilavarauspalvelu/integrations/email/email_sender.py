@@ -8,9 +8,9 @@ from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 
 from tilavarauspalvelu.exceptions import SendEmailNotificationError
+from tilavarauspalvelu.integrations.email.email_builder_application import ApplicationEmailBuilder
+from tilavarauspalvelu.integrations.email.email_builder_reservation import ReservationEmailBuilder
 from tilavarauspalvelu.models import EmailTemplate
-from tilavarauspalvelu.utils.email.email_builder_application import ApplicationEmailBuilder
-from tilavarauspalvelu.utils.email.email_builder_reservation import ReservationEmailBuilder
 from utils.utils import safe_getattr
 
 if TYPE_CHECKING:
@@ -19,8 +19,8 @@ if TYPE_CHECKING:
     from config.utils.commons import LanguageType
     from tilavarauspalvelu.admin.email_template.tester import EmailTemplateTesterForm
     from tilavarauspalvelu.enums import EmailType
+    from tilavarauspalvelu.integrations.email.email_builder_base import BaseEmailBuilder
     from tilavarauspalvelu.models import Application, Reservation
-    from tilavarauspalvelu.utils.email.email_builder_base import BaseEmailBuilder
 
 
 class EmailNotificationSender:

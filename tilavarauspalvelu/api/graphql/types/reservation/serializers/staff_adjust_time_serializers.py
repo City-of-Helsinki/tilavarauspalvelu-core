@@ -8,8 +8,10 @@ from tilavarauspalvelu.api.graphql.extensions.serializers import OldPrimaryKeyUp
 from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from tilavarauspalvelu.api.graphql.types.reservation.serializers.mixins import ReservationSchedulingMixin
 from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.integrations.email.reservation_email_notification_sender import (
+    ReservationEmailNotificationSender,
+)
 from tilavarauspalvelu.models import Reservation
-from tilavarauspalvelu.utils.email.reservation_email_notification_sender import ReservationEmailNotificationSender
 from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:

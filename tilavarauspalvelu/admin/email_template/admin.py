@@ -11,10 +11,16 @@ from modeltranslation.admin import TranslationAdmin
 from tilavarauspalvelu.admin.email_template.tester import email_template_tester_admin_view
 from tilavarauspalvelu.enums import EmailType
 from tilavarauspalvelu.exceptions import EmailTemplateValidationError
+from tilavarauspalvelu.integrations.email.email_builder_application import (
+    ApplicationEmailBuilder,
+    ApplicationEmailContext,
+)
+from tilavarauspalvelu.integrations.email.email_builder_reservation import (
+    ReservationEmailBuilder,
+    ReservationEmailContext,
+)
+from tilavarauspalvelu.integrations.email.email_validator import EmailTemplateValidator
 from tilavarauspalvelu.models import EmailTemplate
-from tilavarauspalvelu.utils.email.email_builder_application import ApplicationEmailBuilder, ApplicationEmailContext
-from tilavarauspalvelu.utils.email.email_builder_reservation import ReservationEmailBuilder, ReservationEmailContext
-from tilavarauspalvelu.utils.email.email_validator import EmailTemplateValidator
 
 
 class EmailTemplateAdminForm(ModelForm):

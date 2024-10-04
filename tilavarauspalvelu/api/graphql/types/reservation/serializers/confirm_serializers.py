@@ -6,8 +6,10 @@ from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from tilavarauspalvelu.api.graphql.types.reservation.serializers.update_serializers import ReservationUpdateSerializer
 from tilavarauspalvelu.enums import Language, OrderStatus, PaymentType, PricingType, ReservationStateChoice
+from tilavarauspalvelu.integrations.email.reservation_email_notification_sender import (
+    ReservationEmailNotificationSender,
+)
 from tilavarauspalvelu.models import PaymentOrder, Reservation
-from tilavarauspalvelu.utils.email.reservation_email_notification_sender import ReservationEmailNotificationSender
 from tilavarauspalvelu.utils.reservation_units.reservation_unit_pricing_helper import ReservationUnitPricingHelper
 from tilavarauspalvelu.utils.verkkokauppa.helpers import create_mock_verkkokauppa_order, get_verkkokauppa_order_params
 from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CreateOrderError

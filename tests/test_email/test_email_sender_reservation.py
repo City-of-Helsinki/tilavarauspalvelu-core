@@ -9,10 +9,12 @@ from tests.factories import EmailTemplateFactory, ReservationFactory, UserFactor
 from tests.helpers import patch_method
 from tilavarauspalvelu.admin.email_template.tester import EmailTemplateTesterForm
 from tilavarauspalvelu.enums import EmailType, ReservationNotification
+from tilavarauspalvelu.integrations.email.email_sender import EmailNotificationSender
+from tilavarauspalvelu.integrations.email.email_validator import EmailTemplateValidator
+from tilavarauspalvelu.integrations.email.reservation_email_notification_sender import (
+    ReservationEmailNotificationSender,
+)
 from tilavarauspalvelu.models import EmailTemplate
-from tilavarauspalvelu.utils.email.email_sender import EmailNotificationSender
-from tilavarauspalvelu.utils.email.email_validator import EmailTemplateValidator
-from tilavarauspalvelu.utils.email.reservation_email_notification_sender import ReservationEmailNotificationSender
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Reservation

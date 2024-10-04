@@ -3,9 +3,9 @@ import pytest
 from tests.factories import ApplicationFactory, EmailTemplateFactory
 from tests.helpers import patch_method
 from tilavarauspalvelu.enums import EmailType
+from tilavarauspalvelu.integrations.email.email_builder_application import ApplicationEmailBuilder
+from tilavarauspalvelu.integrations.email.email_validator import EmailTemplateValidator
 from tilavarauspalvelu.models import Application, EmailTemplate
-from tilavarauspalvelu.utils.email.email_builder_application import ApplicationEmailBuilder
-from tilavarauspalvelu.utils.email.email_validator import EmailTemplateValidator
 
 pytestmark = [
     pytest.mark.django_db,

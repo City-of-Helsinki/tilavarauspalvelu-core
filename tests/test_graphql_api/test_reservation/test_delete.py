@@ -5,8 +5,10 @@ import pytest
 from tests.factories import OrderFactory, PaymentFactory, PaymentOrderFactory, ReservationFactory
 from tests.helpers import patch_method
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
+from tilavarauspalvelu.integrations.email.reservation_email_notification_sender import (
+    ReservationEmailNotificationSender,
+)
 from tilavarauspalvelu.models import Reservation
-from tilavarauspalvelu.utils.email.reservation_email_notification_sender import ReservationEmailNotificationSender
 from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CancelOrderError
 from tilavarauspalvelu.utils.verkkokauppa.payment.types import PaymentStatus
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient

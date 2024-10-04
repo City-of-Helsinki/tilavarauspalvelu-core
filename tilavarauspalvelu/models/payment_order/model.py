@@ -170,7 +170,7 @@ class PaymentOrder(models.Model):
             and self.reservation is not None
             and self.reservation.state == ReservationStateChoice.WAITING_FOR_PAYMENT
         ):
-            from tilavarauspalvelu.utils.email.reservation_email_notification_sender import (
+            from tilavarauspalvelu.integrations.email.reservation_email_notification_sender import (
                 ReservationEmailNotificationSender,
             )
 

@@ -11,8 +11,10 @@ from tilavarauspalvelu.api.graphql.types.reservation.serializers.mixins import (
     ReservationSchedulingMixin,
 )
 from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.integrations.email.reservation_email_notification_sender import (
+    ReservationEmailNotificationSender,
+)
 from tilavarauspalvelu.models import Reservation, ReservationUnit
-from tilavarauspalvelu.utils.email.reservation_email_notification_sender import ReservationEmailNotificationSender
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
