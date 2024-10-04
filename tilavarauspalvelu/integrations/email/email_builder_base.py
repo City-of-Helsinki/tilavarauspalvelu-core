@@ -7,7 +7,7 @@ from urllib.parse import urlencode, urljoin
 from django.conf import settings
 
 from tilavarauspalvelu.exceptions import EmailBuilderConfigurationError
-from tilavarauspalvelu.utils.email.email_validator import EmailTemplateValidator
+from tilavarauspalvelu.integrations.email.email_validator import EmailTemplateValidator
 from utils.date_utils import local_datetime
 from utils.utils import get_attr_by_language
 

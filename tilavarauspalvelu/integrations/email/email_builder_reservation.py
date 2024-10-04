@@ -10,7 +10,7 @@ from django.conf import settings
 from django.utils.timezone import get_default_timezone
 
 from tilavarauspalvelu.enums import CustomerTypeChoice, EmailType
-from tilavarauspalvelu.utils.email.email_builder_base import BaseEmailBuilder, BaseEmailContext, EmailAttachment
+from tilavarauspalvelu.integrations.email.email_builder_base import BaseEmailBuilder, BaseEmailContext, EmailAttachment
 from utils.date_utils import local_date
 from utils.utils import get_attr_by_language
 

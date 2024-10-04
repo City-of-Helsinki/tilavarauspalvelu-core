@@ -3,7 +3,7 @@ import datetime
 import pytest
 
 from config.utils.commons import LanguageType
-from tilavarauspalvelu.utils.email.email_builder_application import ApplicationEmailContext
+from tilavarauspalvelu.integrations.email.email_builder_application import ApplicationEmailContext
 
 
 @pytest.mark.parametrize("language", ["fi", "en", "sv"])

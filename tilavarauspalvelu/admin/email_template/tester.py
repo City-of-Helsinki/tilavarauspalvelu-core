@@ -8,9 +8,9 @@ from django import forms
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 
+from tilavarauspalvelu.integrations.email.email_builder_reservation import ReservationEmailBuilder
+from tilavarauspalvelu.integrations.email.email_sender import EmailNotificationSender
 from tilavarauspalvelu.models import EmailTemplate, ReservationUnit
-from tilavarauspalvelu.utils.email.email_builder_reservation import ReservationEmailBuilder
-from tilavarauspalvelu.utils.email.email_sender import EmailNotificationSender
 from utils.utils import safe_getattr
 
 if TYPE_CHECKING:

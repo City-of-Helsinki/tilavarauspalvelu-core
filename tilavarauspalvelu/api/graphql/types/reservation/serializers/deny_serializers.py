@@ -6,8 +6,10 @@ from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import ReservationStateChoice
+from tilavarauspalvelu.integrations.email.reservation_email_notification_sender import (
+    ReservationEmailNotificationSender,
+)
 from tilavarauspalvelu.models import Reservation
-from tilavarauspalvelu.utils.email.reservation_email_notification_sender import ReservationEmailNotificationSender
 from utils.date_utils import local_datetime
 from utils.utils import comma_sep_str
 

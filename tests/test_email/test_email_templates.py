@@ -5,9 +5,9 @@ from jinja2.sandbox import SandboxedEnvironment
 from config.utils.commons import LanguageType
 from tests.factories import EmailTemplateFactory, ReservationFactory
 from tilavarauspalvelu.enums import EmailType
+from tilavarauspalvelu.integrations.email.email_builder_application import ApplicationEmailBuilder
+from tilavarauspalvelu.integrations.email.email_builder_reservation import ReservationEmailBuilder
 from tilavarauspalvelu.templatetags import format_currency
-from tilavarauspalvelu.utils.email.email_builder_application import ApplicationEmailBuilder
-from tilavarauspalvelu.utils.email.email_builder_reservation import ReservationEmailBuilder
 
 pytestmark = [
     pytest.mark.django_db,

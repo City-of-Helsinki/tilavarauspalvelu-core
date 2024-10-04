@@ -17,8 +17,10 @@ from tilavarauspalvelu.api.graphql.types.application_section.serializers import 
 from tilavarauspalvelu.api.graphql.types.organisation.serializers import OrganisationSerializer
 from tilavarauspalvelu.api.graphql.types.person.serializers import PersonSerializer
 from tilavarauspalvelu.enums import ApplicationStatusChoice
+from tilavarauspalvelu.integrations.email.application_email_notification_sender import (
+    ApplicationEmailNotificationSender,
+)
 from tilavarauspalvelu.models import AllocatedTimeSlot, Application, ReservationUnitOption
-from tilavarauspalvelu.utils.email.application_email_notification_sender import ApplicationEmailNotificationSender
 from utils.fields.serializer import CurrentUserDefaultNullable
 
 if TYPE_CHECKING:

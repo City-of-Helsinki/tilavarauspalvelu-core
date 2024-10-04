@@ -6,9 +6,11 @@ from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
+from tilavarauspalvelu.integrations.email.reservation_email_notification_sender import (
+    ReservationEmailNotificationSender,
+)
 from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.tasks import refund_paid_reservation_task
-from tilavarauspalvelu.utils.email.reservation_email_notification_sender import ReservationEmailNotificationSender
 from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
