@@ -12,7 +12,8 @@ if TYPE_CHECKING:
 
 
 class ReservationDenyReason(models.Model):
-    rank: int | None = models.PositiveBigIntegerField(null=True, blank=True, db_index=True)
+    rank: int = models.PositiveIntegerField(default=0, null=False, blank=False, db_index=True)  # Used for ordering
+
     reason: str = models.CharField(max_length=255)
 
     # Translated field hints
