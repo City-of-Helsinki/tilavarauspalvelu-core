@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import {
@@ -7,7 +7,7 @@ import {
 } from "@gql/gql-types";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import Error from "next/error";
+import { default as ErrorComponent } from "next/error";
 import { MediumButton } from "@/styles/util";
 import { ButtonContainer, CenterSpinner } from "@/components/common/common";
 import { ViewInner } from "@/components/application/ViewInner";
@@ -19,6 +19,8 @@ import {
 } from "@/modules/serverUtils";
 import { base64encode } from "common/src/helpers";
 import { errorToast } from "common/src/common/toast";
+import { getApplicationPath } from "@/modules/urls";
+import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -45,69 +47,45 @@ function Preview(props: PropsNarrowed): JSX.Element {
 
   const { t } = useTranslation();
 
-  const [send, { error: mutationError, loading: isMutationLoading }] =
-    useSendApplicationMutation();
+  const [send, { loading: isMutationLoading }] = useSendApplicationMutation();
 
   const onSubmit = async (evt: React.FormEvent) => {
     evt.preventDefault();
     if (!acceptTermsOfUse) {
       return;
     }
-    if (!pk) {
-      // eslint-disable-next-line no-console
-      console.error("no pk in values");
-      return;
-    }
-    const { data: mutData, errors } = await send({
-      variables: {
-        input: {
-          pk,
+    try {
+      const { data: mutData } = await send({
+        variables: {
+          input: {
+            pk,
+          },
         },
-      },
-    });
-    if (errors) {
-      // eslint-disable-next-line no-console
-      console.error("error sending application", errors);
-      // TODO show error
-      return;
-    }
+      });
 
-    const { pk: resPk } = mutData?.sendApplication ?? {};
+      const { pk: resPk } = mutData?.sendApplication ?? {};
+      if (resPk == null) {
+        throw new Error("no pk in response");
+      }
 
-    if (resPk != null) {
-      // TODO use an urlbuilder
-      const prefix = `/application/${resPk}`;
-      const target = `${prefix}/sent`;
-      router.push(target);
+      router.push(getApplicationPath(resPk, "sent"));
+    } catch (e) {
+      errorToast({ text: t("common:error.mutationError") });
     }
-    // TODO error
   };
 
-  useEffect(() => {
-    mutationError &&
-      errorToast({
-        text: t("common:error.mutationError"),
-      });
-  }, [mutationError, t]);
-
-  if (pk == null) {
-    return <Error statusCode={404} />;
-  }
   if (error) {
     // eslint-disable-next-line no-console
     console.error(error);
-    return <Error statusCode={500} />;
+    return <ErrorComponent statusCode={500} />;
   }
   if (isLoading) {
     return <CenterSpinner />;
   }
 
   if (application == null) {
-    return <Error statusCode={404} />;
+    return <ErrorComponent statusCode={404} />;
   }
-
-  // TODO use an urlbuilder
-  const handleBack = () => router.push(`/application/${application.pk}/page3`);
 
   return (
     <ApplicationPageWrapper
@@ -122,9 +100,9 @@ function Preview(props: PropsNarrowed): JSX.Element {
           setAcceptTermsOfUse={setAcceptTermsOfUse}
         />
         <ButtonContainer>
-          <MediumButton variant="secondary" onClick={handleBack}>
+          <ButtonLikeLink size="large" href={getApplicationPath(pk, "page3")}>
             {t("common:prev")}
-          </MediumButton>
+          </ButtonLikeLink>
           <MediumButton
             id="submit"
             type="submit"

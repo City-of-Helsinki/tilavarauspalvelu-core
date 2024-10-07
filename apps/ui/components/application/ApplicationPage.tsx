@@ -12,6 +12,7 @@ import { useRouter } from "next/router";
 import Head from "./Head";
 import Stepper, { StepperProps } from "./Stepper";
 import NotesWhenApplying from "@/components/application/NotesWhenApplying";
+import { getApplicationPath } from "@/modules/urls";
 
 const StyledContainer = styled(Container)`
   background-color: var(--color-white);
@@ -103,15 +104,14 @@ export function ApplicationPageWrapper({
   const { t } = useTranslation();
   const router = useRouter();
 
-  const pages = ["page1", "page2", "page3", "preview"];
+  const pages = ["page1", "page2", "page3", "preview"] as const;
 
   const hideStepper =
     pages.filter((x) => router.asPath.match(`/${x}`)).length === 0;
   const steps: StepperProps = {
     steps: pages.map((x, i) => ({ slug: x, step: i })),
     completedStep: application ? calculateCompletedStep(application) : 0,
-    // TODO use an urlbuilder
-    basePath: `/application/${application?.pk ?? 0}`,
+    basePath: getApplicationPath(application?.pk),
     isFormDirty: isDirty ?? false,
   };
 

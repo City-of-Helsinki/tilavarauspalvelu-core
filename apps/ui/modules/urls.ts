@@ -45,7 +45,13 @@ export function getSingleSearchPath(params?: URLSearchParams): string {
   return base;
 }
 
-type ApplicationPages = "page1" | "page2" | "page3" | "view" | "preview";
+type ApplicationPages =
+  | "page1"
+  | "page2"
+  | "page3"
+  | "view"
+  | "preview"
+  | "sent";
 export function getApplicationPath(
   pk: Maybe<number> | undefined,
   page?: ApplicationPages | undefined

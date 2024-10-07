@@ -18,7 +18,6 @@ import { IndividualForm } from "@/components/application/IndividualForm";
 import { OrganisationForm } from "@/components/application/OrganisationForm";
 import { ApplicantTypeSelector } from "@/components/application/ApplicantTypeSelector";
 import { useOptions } from "@/hooks/useOptions";
-import Buttons from "@/components/application/Buttons";
 import {
   convertAddress,
   convertOrganisation,
@@ -30,15 +29,40 @@ import {
 } from "@/components/application/Form";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
 import { useApplicationUpdate } from "@/hooks/useApplicationUpdate";
-import { CenterSpinner } from "@/components/common/common";
+import { CenterSpinner, ButtonContainer } from "@/components/common/common";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { base64encode } from "common/src/helpers";
 import { errorToast } from "common/src/common/toast";
+import { MediumButton } from "@/styles/util";
+import { getApplicationPath } from "@/modules/urls";
+import { IconArrowRight } from "hds-react";
 
 const Form = styled.form`
   margin-bottom: var(--spacing-layout-l);
   padding-bottom: var(--spacing-l);
 `;
+
+function Buttons({ applicationPk }: { applicationPk: number }): JSX.Element {
+  const { t } = useTranslation();
+  const router = useRouter();
+
+  const onPrev = () => router.push(getApplicationPath(applicationPk, "page2"));
+
+  return (
+    <ButtonContainer>
+      <MediumButton variant="secondary" onClick={onPrev}>
+        {t("common:prev")}
+      </MediumButton>
+      <MediumButton
+        id="button__application--next"
+        iconRight={<IconArrowRight />}
+        type="submit"
+      >
+        {t("common:next")}
+      </MediumButton>
+    </ButtonContainer>
+  );
+}
 
 // Filter out any empty strings from the object (otherwise the mutation fails)
 function transformPerson(person?: PersonFormValues) {
@@ -187,7 +211,8 @@ function Page3Wrapped(props: Props): JSX.Element | null {
     }
   }, [application, reset]);
 
-  const [update, { error }] = useApplicationUpdate();
+  const { t } = useTranslation();
+  const [update] = useApplicationUpdate();
 
   const handleSave = async (values: ApplicationFormPage3Values) => {
     // There should not be a situation where we are saving on this page without an application
@@ -198,51 +223,33 @@ function Page3Wrapped(props: Props): JSX.Element | null {
       console.error("application pk is 0");
       return 0;
     }
-
-    const input = transformApplication(values);
-    const pk = await update(input);
-    return pk;
+    return update(transformApplication(values));
   };
 
   const onSubmit = async (values: ApplicationFormPage3Values) => {
-    const pk = await handleSave(values);
-    if (pk === 0) {
-      return;
+    try {
+      const pk = await handleSave(values);
+      if (pk === 0) {
+        return;
+      }
+      router.push(getApplicationPath(pk, "preview"));
+    } catch (e) {
+      errorToast({ text: t("common:error.dataError") });
     }
-    const prefix = `/application/${pk}`;
-    const target = `${prefix}/preview`;
-    router.push(target);
   };
-
-  const { t } = useTranslation();
-  const dataErrorMessage = t("common:error.dataError");
-  useEffect(() => {
-    if (error != null) {
-      errorToast({
-        text: dataErrorMessage,
-      });
-    }
-  }, [error, t, dataErrorMessage]);
 
   if (id == null) {
     return <Error statusCode={404} />;
-  }
-  if (isLoading) {
-    return <CenterSpinner />;
   }
 
   if (queryError != null) {
     // eslint-disable-next-line no-console
     console.error(queryError);
-    // TODO should be wrapped in layout and have an option to retry the query
-    // probably better to show error page over a toast
-    // return <ErrorToast error={`${t("common:error.dataError")}`} />;
     return <Error statusCode={500} />;
   }
 
-  if (error != null) {
-    // eslint-disable-next-line no-console
-    console.error(error);
+  if (isLoading && application == null && applicationRound == null) {
+    return <CenterSpinner />;
   }
 
   // TODO these are 404
@@ -262,7 +269,7 @@ function Page3Wrapped(props: Props): JSX.Element | null {
         <Form noValidate onSubmit={handleSubmit(onSubmit)}>
           <ApplicantTypeSelector />
           <Page3 />
-          {application.pk && <Buttons applicationId={application.pk} />}
+          {application.pk && <Buttons applicationPk={application.pk} />}
         </Form>
       </ApplicationPageWrapper>
     </FormProvider>
