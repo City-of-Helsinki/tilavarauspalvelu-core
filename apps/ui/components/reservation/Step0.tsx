@@ -5,7 +5,7 @@
 import type { OptionType } from "common/types/common";
 import { IconArrowLeft, IconArrowRight } from "hds-react";
 import { useFormContext } from "react-hook-form";
-import React from "react";
+import React, { useState } from "react";
 import { Trans, useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { fontMedium, fontRegular } from "common/src/common/typography";
@@ -75,7 +75,7 @@ const Step0 = ({
 }: Props): JSX.Element => {
   const { t } = useTranslation();
 
-  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const termsOfUse = getTranslation(reservationUnit, "termsOfUse");
 

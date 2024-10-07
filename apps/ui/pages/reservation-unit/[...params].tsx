@@ -174,7 +174,7 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
   // TODO is defaultValues correct? it's prefilled from the profile data and we are not refetching at any point.
   // If we would refetch values would be more correct with reset hook.
   // Also if this is ever initialised without the data it will not prefill the form.
-  const form = useForm<Inputs>({ defaultValues, mode: "onBlur" });
+  const form = useForm<Inputs>({ defaultValues, mode: "onChange" });
   const { handleSubmit, watch } = form;
 
   const reserveeType = watch("reserveeType");
