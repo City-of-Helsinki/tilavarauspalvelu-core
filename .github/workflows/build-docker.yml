@@ -27,6 +27,9 @@ jobs:
       REPO_NAME: ${{ github.repository }}
       # Have to be build variable
       NEXT_PUBLIC_BASE_URL: ${{ inputs.base-url }}
+      # required because error pages use build time env vars, not runtime env vars
+      # it's the same on every environment
+      EMAIL_VARAAMO_EXT_LINK: "https://lomake.hel.fi/varaamo-palaute"
 
     permissions:
       contents: read
@@ -78,6 +81,7 @@ jobs:
         build-args: |
           APP=${{ env.BUILD_APP }}
           NEXT_PUBLIC_BASE_URL=${{ env.NEXT_PUBLIC_BASE_URL }}
+          EMAIL_VARAAMO_EXT_LINK=${{ env.EMAIL_VARAAMO_EXT_LINK }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         annotations: ${{ steps.meta.outputs.annotations }}

@@ -27,6 +27,8 @@ ARG NEXT_PUBLIC_TILAVARAUS_API_URL
 ENV NEXT_PUBLIC_TILAVARAUS_API_URL=$NEXT_PUBLIC_TILAVARAUS_API_URL
 ARG NEXT_PUBLIC_BASE_URL
 ENV NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL
+ARG EMAIL_VARAAMO_EXT_LINK
+ENV EMAIL_VARAAMO_EXT_LINK=$EMAIL_VARAAMO_EXT_LINK
 # Build should not fail on missing env variables
 # TODO this should be removed because we need NEXT_PUBLIC_TILAVARAUS_API_URL to be set during build
 # unless we let it be undefined and use "" as default value (does it work?)

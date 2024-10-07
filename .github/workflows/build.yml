@@ -12,11 +12,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
-env:
-  # required because error pages use build time env vars, not runtime env vars
-  # it's the same on every environment
-  EMAIL_VARAAMO_EXT_LINK: "https://lomake.hel.fi/varaamo-palaute"
-
 jobs:
   # Build both ui and admin-ui dockers
   build-ui-docker:
