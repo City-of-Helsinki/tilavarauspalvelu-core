@@ -8,7 +8,7 @@ import { Container } from "common";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import type { GetServerSidePropsContext } from "next";
 import { applicationsPath } from "@/modules/urls";
-import Head from "@/components/application/Head";
+import { Head } from "@/components/application/Head";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 const Paragraph = styled.p`
@@ -24,28 +24,26 @@ const StyledButton = styled(Button)`
   margin-bottom: var(--spacing-layout-l);
 `;
 
-const Sent = (): JSX.Element => {
+function Sent(): JSX.Element {
   const { t } = useTranslation();
   const router = useRouter();
 
   return (
-    <>
+    <Container>
       <Head heading={t("application:sent.heading")}>
         <p>{t("application:sent.subHeading")}</p>
       </Head>
-      <Container>
-        <Paragraph>{t("application:sent.body")}</Paragraph>
-        <StyledButton
-          onClick={() => router.push(applicationsPath)}
-          iconRight={<IconAngleRight />}
-          size="small"
-        >
-          {t("navigation:Item.applications")}
-        </StyledButton>
-      </Container>
-    </>
+      <Paragraph>{t("application:sent.body")}</Paragraph>
+      <StyledButton
+        onClick={() => router.push(applicationsPath)}
+        iconRight={<IconAngleRight />}
+        size="small"
+      >
+        {t("navigation:Item.applications")}
+      </StyledButton>
+    </Container>
   );
-};
+}
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale } = ctx;

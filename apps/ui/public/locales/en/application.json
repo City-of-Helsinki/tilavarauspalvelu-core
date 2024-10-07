@@ -205,7 +205,9 @@
     }
   },
   "view": {
-    "heading": "Seasonal booking application"
+    "heading": "Seasonal booking application",
+    "reservations": "Reservations",
+    "application": "Application"
   },
   "sent": {
     "heading": "Thank you for the application",

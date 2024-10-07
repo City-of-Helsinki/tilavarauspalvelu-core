@@ -9,7 +9,7 @@ type Props = {
   size?: Size;
 };
 
-const Wrapper = styled.div.attrs(() => ({}))<{ $size: Size }>`
+const Wrapper = styled.div<{ $size?: Size }>`
   max-width: ${({ $size }) =>
     $size === "l" ? "var(--container-width-xl)" : "var(--container-width-l)"};
   margin: 0 auto;

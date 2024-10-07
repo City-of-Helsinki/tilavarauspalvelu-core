@@ -205,7 +205,9 @@
     }
   },
   "view": {
-    "heading": "Säsongbokningsansökan"
+    "heading": "Säsongbokningsansökan",
+    "reservations": "Bokningar",
+    "application": "Ansökan"
   },
   "sent": {
     "heading": "Tack för din ansökan!",

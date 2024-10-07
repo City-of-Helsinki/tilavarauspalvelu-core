@@ -34,7 +34,7 @@ type NotesWhenApplyingProps = {
   > | null;
 };
 
-const NotesWhenApplying = ({ applicationRound }: NotesWhenApplyingProps) => {
+function NotesWhenApplying({ applicationRound }: NotesWhenApplyingProps) {
   const { t, i18n } = useTranslation();
 
   if (!applicationRound) {
@@ -58,6 +58,6 @@ const NotesWhenApplying = ({ applicationRound }: NotesWhenApplyingProps) => {
       <Sanitize html={translatedNotes} />
     </NotesBox>
   );
-};
+}
 
 export default NotesWhenApplying;

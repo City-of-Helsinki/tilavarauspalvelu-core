@@ -8,10 +8,9 @@ import {
   type ApplicationRoundsUiQuery,
   type ApplicationRoundsUiQueryVariables,
 } from "@gql/gql-types";
-import { breakpoints, Container } from "common";
+import { breakpoints, Container, H2 } from "common";
 import { createApolloClient } from "@/modules/apolloClient";
 import Sanitize from "@/components/common/Sanitize";
-import KorosDefault from "@/components/common/KorosDefault";
 import { getTranslation } from "@/modules/util";
 import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 import { getApplicationRoundName } from "@/modules/applicationRound";
@@ -49,21 +48,13 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   };
 };
 
-const Head = styled.div`
-  background-color: var(--tilavaraus-hero-background-color);
-  color: var(--color-white);
-`;
-
 const HeadContent = styled.div`
-  padding: var(--spacing-l) var(--spacing-m) var(--spacing-l);
   max-width: var(--container-width-xl);
   margin: 0 auto var(--spacing-2-xl) auto;
   font-size: var(--fontsize-body-xl);
 `;
 
-const H1 = styled.h1`
-  font-size: var(--fontsize-heading-l);
-`;
+const Heading = styled(H2).attrs({ as: "h1" })``;
 
 const ContentWrapper = styled.div`
   display: flex;
@@ -83,7 +74,7 @@ const NotesWrapper = styled.div`
   flex-grow: 1;
 `;
 
-const Criteria = ({ applicationRound }: Props): JSX.Element | null => {
+function Criteria({ applicationRound }: Props): JSX.Element | null {
   const { t } = useTranslation();
 
   if (!applicationRound) {
@@ -92,23 +83,20 @@ const Criteria = ({ applicationRound }: Props): JSX.Element | null => {
 
   return (
     <>
-      <Head>
+      <div>
         <BreadcrumbWrapper route={["/recurring", "criteria"]} />
         <HeadContent>
-          <H1>
+          <Heading>
             {`${getApplicationRoundName(applicationRound)} ${t(
               "applicationRound:criteria"
             )}`}
-          </H1>
+          </Heading>
         </HeadContent>
-        <KorosDefault />
-      </Head>
+      </div>
       <Container>
         <ContentWrapper>
           <Content>
-            <Sanitize
-              html={getTranslation(applicationRound, "criteria") || ""}
-            />
+            <Sanitize html={getTranslation(applicationRound, "criteria")} />
           </Content>
           <NotesWrapper>
             <NotesWhenApplying applicationRound={applicationRound} />
@@ -117,6 +105,6 @@ const Criteria = ({ applicationRound }: Props): JSX.Element | null => {
       </Container>
     </>
   );
-};
+}
 
 export default Criteria;

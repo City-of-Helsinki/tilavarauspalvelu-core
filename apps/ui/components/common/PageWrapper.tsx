@@ -16,11 +16,10 @@ interface Props {
   version: string;
 }
 
-const Main = styled.main<{ $bgColor?: string }>`
+const Main = styled.main`
   font-size: var(--fontsize-body-m);
   flex: 1 0 auto;
   margin-bottom: -14px;
-  background: ${({ $bgColor }) => $bgColor || "var(--color-white)"};
 `;
 
 function PageWrapper({
@@ -28,7 +27,6 @@ function PageWrapper({
   profileLink,
   feedbackUrl,
   children,
-  overrideBackgroundColor,
   version,
 }: Props): JSX.Element {
   return (
@@ -43,9 +41,7 @@ function PageWrapper({
         target={BannerNotificationTarget.User}
       />
       <InProgressReservationNotification />
-      <Main id="main" $bgColor={overrideBackgroundColor}>
-        {children}
-      </Main>
+      <Main id="main">{children}</Main>
       <Footer feedbackUrl={feedbackUrl} />
       <div id="modal-root" />
     </>

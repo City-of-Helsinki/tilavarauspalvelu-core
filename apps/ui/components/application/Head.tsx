@@ -1,9 +1,7 @@
 import React from "react";
-import { useRouter } from "next/router";
 import styled from "styled-components";
-import { H2 } from "common/src/common/typography";
+import { fontMedium, H2 } from "common/src/common/typography";
 import BreadcrumbWrapper from "../common/BreadcrumbWrapper";
-import KorosDefault from "../common/KorosDefault";
 
 type HeadProps = {
   heading: string;
@@ -13,42 +11,24 @@ type HeadProps = {
 
 const Heading = styled(H2).attrs({ as: "h1" })``;
 
-const Container = styled.div<{ $white: boolean }>`
-  background-color: ${({ $white }) =>
-    $white ? "var(--color-white)" : "var(--tilavaraus-hero-background-color)"};
-  color: ${({ $white }) =>
-    $white ? "var(--color-black)" : "var(--color-white)"};
-`;
-
 const Content = styled.div`
-  padding: var(--spacing-l) var(--spacing-m) var(--spacing-layout-l);
   max-width: var(--container-width-xl);
-  margin: 0 auto;
+  margin: var(--spacing-layout-m) 0 auto;
   font-size: var(--fontsize-heading-xs);
-  font-weight: 500;
+  ${fontMedium}
 `;
 
-const StyledKoros = styled(KorosDefault)`
-  margin-top: var(--spacing-layout-m);
-`;
-
-const Head = ({
-  children,
-  heading,
-  noKoros = false,
-}: HeadProps): JSX.Element => {
-  const router = useRouter();
-
+export function Head({ children, heading }: HeadProps): JSX.Element {
   return (
-    <Container $white={router.route === "/intro"}>
-      <BreadcrumbWrapper route={["/recurring", "application"]} />
+    <>
+      <BreadcrumbWrapper
+        disablePadding
+        route={["/applications", "application"]}
+      />
       <Content>
         <Heading>{heading}</Heading>
         {children || null}
       </Content>
-      {!noKoros && <StyledKoros />}
-    </Container>
+    </>
   );
-};
-
-export default Head;
+}

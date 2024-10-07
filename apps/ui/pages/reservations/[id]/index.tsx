@@ -679,7 +679,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
           ...commonProps,
           key: `${id}-${locale}`,
           ...(await serverSideTranslations(locale ?? "fi")),
-          overrideBackgroundColor: "var(--tilavaraus-white)",
           reservation,
           termsOfUse: {
             genericTerms: bookingTerms ?? null,

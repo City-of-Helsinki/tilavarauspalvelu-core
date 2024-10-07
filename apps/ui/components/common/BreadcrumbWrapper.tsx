@@ -14,6 +14,7 @@ type Alias = {
 
 type Props = {
   route: Array<string | RouteItem>;
+  disablePadding?: boolean;
   aliases?: Alias[];
   className?: string;
 };
@@ -31,6 +32,7 @@ const LinkWrapper = (props: LinkProps & { children?: React.ReactNode }) => (
 const BreadcrumbWrapper = ({
   route,
   aliases,
+  disablePadding,
   className,
 }: Props): JSX.Element => {
   const { t } = useTranslation();
@@ -52,6 +54,7 @@ const BreadcrumbWrapper = ({
     <Wrapper>
       <Breadcrumb
         linkComponent={LinkWrapper}
+        disablePadding={disablePadding}
         routes={[{ title: t("breadcrumb:frontpage"), slug: "/" }, ...routes]}
         isMobile={isMobile}
         className={className}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Error from "next/error";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
@@ -16,10 +16,10 @@ import {
 } from "@/modules/serverUtils";
 import { base64encode } from "common/src/helpers";
 import { useApplicationQuery } from "@gql/gql-types";
+import { Tabs } from "hds-react";
 
 function View({ id: pk, tos }: Props): JSX.Element {
   const { t } = useTranslation();
-
   const router = useRouter();
 
   const id = base64encode(`ApplicationNode:${pk}`);
@@ -33,9 +33,10 @@ function View({ id: pk, tos }: Props): JSX.Element {
   });
   const { application } = data ?? {};
 
-  if (id == null) {
-    return <Error statusCode={404} />;
-  }
+  // TODO move to query var
+  type TabOptions = "reservations" | "application";
+  const [tab, setTab] = useState<TabOptions>("reservations");
+
   if (error) {
     // eslint-disable-next-line no-console -- TODO use logger (sentry)
     console.error("application query error: ", error);
@@ -48,6 +49,10 @@ function View({ id: pk, tos }: Props): JSX.Element {
     return <Error statusCode={404} />;
   }
 
+  const handleTabChange = (tab_: TabOptions) => {
+    setTab(tab_);
+  };
+
   const round = application.applicationRound;
   const applicationRoundName =
     round != null ? getTranslation(round, "name") : "-";
@@ -58,7 +63,22 @@ function View({ id: pk, tos }: Props): JSX.Element {
       headContent={applicationRoundName}
       application={application}
     >
-      <ViewInner application={application} tos={tos} />
+      <Tabs initiallyActiveTab={tab === "application" ? 1 : 0}>
+        <Tabs.TabList>
+          <Tabs.Tab onClick={() => handleTabChange("reservations")}>
+            {t("application:view.reservations")}
+          </Tabs.Tab>
+          <Tabs.Tab onClick={() => handleTabChange("application")}>
+            {t("application:view.application")}
+          </Tabs.Tab>
+        </Tabs.TabList>
+        <Tabs.TabPanel>
+          <ReservationsList />
+        </Tabs.TabPanel>
+        <Tabs.TabPanel>
+          <ViewInner application={application} tos={tos} />
+        </Tabs.TabPanel>
+      </Tabs>
       <ButtonContainer>
         <BlackButton variant="secondary" onClick={() => router.back()}>
           {t("common:prev")}
@@ -66,6 +86,10 @@ function View({ id: pk, tos }: Props): JSX.Element {
       </ButtonContainer>
     </ApplicationPageWrapper>
   );
+}
+
+function ReservationsList() {
+  return <div>ReservationsList: TODO</div>;
 }
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];

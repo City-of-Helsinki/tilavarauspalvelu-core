@@ -10,6 +10,7 @@ export type RouteItem = {
 type Props = {
   routes: RouteItem[];
   isMobile: boolean;
+  disablePadding?: boolean;
   linkComponent?: ElementType;
   className?: string;
 };
@@ -19,7 +20,8 @@ const limits = {
   current: 40,
 };
 
-const Wrapper = styled.nav<{ $isMobile: boolean }>`
+// $disablePadding is required for refactoring purposes -> it should be the default with no variable
+const Nav = styled.nav<{ $isMobile?: boolean; $disablePadding?: boolean }>`
   background-color: var(--color-white);
   font-size: var(--fontsize-body-m);
   display: flex;
@@ -28,15 +30,17 @@ const Wrapper = styled.nav<{ $isMobile: boolean }>`
   margin: 0 auto;
   line-height: var(--spacing-3-xl);
   color: var(--color-black);
-  padding: 0 var(--spacing-m);
+  padding: ${({ $disablePadding }) =>
+    $disablePadding ? "0" : "0 var(--spacing-m)"};
 
   && > a {
     color: var(--color-black);
     text-decoration: underline;
   }
 
-  ${({ $isMobile }) =>
+  ${({ $isMobile, $disablePadding }) =>
     $isMobile &&
+    !$disablePadding &&
     `
       padding-left: var(--spacing-xs);
     `};
@@ -98,6 +102,7 @@ const Slug = styled.span<{ $current?: boolean }>`
 function Breadcrumb({
   routes = [],
   isMobile,
+  disablePadding,
   linkComponent,
   className,
 }: Props): JSX.Element {
@@ -116,10 +121,11 @@ function Breadcrumb({
     lastRoute.slug !== lastRouteWithSlug.slug;
 
   return (
-    <Wrapper
+    <Nav
       className={className}
       data-testid="breadcrumb__wrapper"
       $isMobile={isMobile}
+      $disablePadding={disablePadding}
     >
       {!isMobile ? (
         routes?.map((item, index) => (
@@ -173,7 +179,7 @@ function Breadcrumb({
           </Link>
         </Item>
       ) : null}
-    </Wrapper>
+    </Nav>
   );
 }
 

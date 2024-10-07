@@ -206,7 +206,9 @@
     }
   },
   "view": {
-    "heading": "Kausivaraushakemus"
+    "heading": "Kausivaraushakemus",
+    "reservations": "Varaukset",
+    "application": "Hakemus"
   },
   "sent": {
     "heading": "Kiitos hakemuksesta!",
