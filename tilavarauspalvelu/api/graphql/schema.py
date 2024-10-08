@@ -75,6 +75,7 @@ from .mutations import (
     SpaceDeleteMutation,
     SpaceUpdateMutation,
     UnitUpdateMutation,
+    UserStaffUpdateMutation,
     UserUpdateMutation,
 )
 from .queries import (
@@ -346,6 +347,7 @@ class Mutation(graphene.ObjectType):
     #
     # User
     update_user = UserUpdateMutation.Field()
+    update_staff_user = UserStaffUpdateMutation.Field()
     #
     # Misc.
     create_banner_notification = BannerNotificationCreateMutation.Field()

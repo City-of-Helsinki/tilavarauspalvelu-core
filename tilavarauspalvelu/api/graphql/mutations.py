@@ -75,7 +75,7 @@ from .types.reservation_unit_option.mutations import ReservationUnitOptionUpdate
 from .types.resource.mutations import ResourceCreateMutation, ResourceDeleteMutation, ResourceUpdateMutation
 from .types.space.mutations import SpaceCreateMutation, SpaceDeleteMutation, SpaceUpdateMutation
 from .types.unit.mutations import UnitUpdateMutation
-from .types.user.mutations import UserUpdateMutation
+from .types.user.mutations import UserStaffUpdateMutation, UserUpdateMutation
 
 __all__ = [
     "AllocatedTimeSlotCreateMutation",
@@ -134,5 +134,6 @@ __all__ = [
     "SpaceDeleteMutation",
     "SpaceUpdateMutation",
     "UnitUpdateMutation",
+    "UserStaffUpdateMutation",
     "UserUpdateMutation",
 ]
