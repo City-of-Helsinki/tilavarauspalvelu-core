@@ -12,6 +12,7 @@ import {
   type ApplicationsQueryVariables,
   CurrentUserDocument,
   type CurrentUserQuery,
+  ApplicationOrderingChoices,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import Head from "@/components/applications/Head";
@@ -63,6 +64,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     variables: {
       user: user.pk,
       status: VALID_STATUSES,
+      orderBy: [ApplicationOrderingChoices.PkDesc],
     },
   });
 
@@ -157,6 +159,7 @@ function ApplicationsPage({
     variables: {
       user: currentUser?.pk ?? 0,
       status: VALID_STATUSES,
+      orderBy: [ApplicationOrderingChoices.PkDesc],
     },
   });
 
