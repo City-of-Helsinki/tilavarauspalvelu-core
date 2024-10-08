@@ -13,7 +13,6 @@ const Heading = styled(H2).attrs({ as: "h1" })``;
 
 const Content = styled.div`
   max-width: var(--container-width-xl);
-  margin: var(--spacing-layout-m) 0 auto;
   font-size: var(--fontsize-heading-xs);
   ${fontMedium}
 `;
