@@ -126,33 +126,35 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
         leeway = 10
         cutoff = local_datetime() - datetime.timedelta(seconds=leeway)
         profile_refresh_token: str | None = session.get("profile_refresh_token")
-        profile_access_token_expires_at: datetime.datetime | None = session.get("profile_refresh_token_expires_at")
+        profile_refresh_token_expires_at: datetime.datetime | None = session.get("profile_refresh_token_expires_at")
 
         if (
             profile_refresh_token is None
-            or profile_access_token_expires_at is None
-            or profile_access_token_expires_at.astimezone(DEFAULT_TIMEZONE) < cutoff
+            or profile_refresh_token_expires_at is None
+            or profile_refresh_token_expires_at.astimezone(DEFAULT_TIMEZONE) < cutoff
         ):
             access_token = KeyCloakClient.get_token(user=user, session=session)
             if access_token is None:
                 return None
 
-            try:
-                # Delegate refresh to OAuth backend.
-                response: TokenResponse = cls.oidc_backend.get_token_for_profile(access_token=access_token)
-            except HTTPError as error:
-                msg = f"Unable to get Helsinki profile token for user {int(user.pk)}: {error.response.text}"
-                SentryLogger.log_exception(error, details=msg)
-                return None
-
         else:
             try:
-                # Delegate refresh to OAuth backend.
+                # Use the profile refresh token to fetch a 'special' access token from Keycloak that
+                # can only be used to fetch new access and refresh tokens for Helsinki profile for the same audience.
                 response: RefreshResponse = cls.oidc_backend.refresh_token(token=profile_refresh_token)
+                access_token = response["access_token"]
             except HTTPError as error:
                 msg = f"Unable to refresh Helsinki profile token for user {int(user.pk)}: {error.response.text}"
                 SentryLogger.log_exception(error, details=msg)
                 return None
+
+        try:
+            # Fetch new profile tokens.
+            response: TokenResponse = cls.oidc_backend.get_token_for_profile(access_token=access_token)
+        except HTTPError as error:
+            msg = f"Unable to get Helsinki profile token for user {int(user.pk)}: {error.response.text}"
+            SentryLogger.log_exception(error, details=msg)
+            return None
 
         now = local_datetime()
         session["profile_access_token"] = response["access_token"]
