@@ -62,6 +62,16 @@ export function getApplicationPath(
   return `${applicationsPrefix}/${pk}/${page ?? ""}`;
 }
 
+export function getApplicationSectionPath(
+  sectionPk: Maybe<number> | undefined,
+  applicationPk: Maybe<number> | undefined
+): string {
+  if (applicationPk == null || sectionPk == null) {
+    return "";
+  }
+  return `${getApplicationPath(applicationPk, "view")}/${sectionPk}`;
+}
+
 export function getReservationPath(
   pk: Maybe<number> | undefined,
   page?: string | undefined

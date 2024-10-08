@@ -259,7 +259,7 @@ const dateFormatParams = {
   },
 };
 
-function formatTime(t: TFunction, date: Date): string {
+export function formatTime(t: TFunction, date: Date): string {
   return t("common:dateWithWeekday", {
     date,
     formatParams: {
@@ -315,17 +315,21 @@ function formatDay(t: TFunction, date: Date): string {
   });
 }
 
-export function formatDateTime(t: TFunction, date: Date): string {
+export function formatDateTime(
+  t: TFunction,
+  date: Date,
+  includeWeekday = true
+): string {
   const dateStr = t("common:dateWithWeekday", {
     date,
     formatParams: dateFormatParams,
   });
 
-  const day = formatDay(t, date);
+  const day = includeWeekday ? formatDay(t, date) : "";
   const time = formatTime(t, date);
   const separator = dayTimeSeparator(t);
 
-  return `${day} ${dateStr}${separator} ${time}`;
+  return `${day} ${dateStr}${separator} ${time}`.trim();
 }
 
 export function getDayTimes(

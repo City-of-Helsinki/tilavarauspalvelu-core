@@ -5455,6 +5455,117 @@ export type OptionsQuery = {
   } | null;
 };
 
+export type ApplicationSectionReservationFragment = {
+  id: string;
+  pk?: number | null;
+  name: string;
+  reservationUnitOptions: Array<{
+    id: string;
+    allocatedTimeSlots: Array<{
+      id: string;
+      dayOfTheWeek: Weekday;
+      beginTime: string;
+      endTime: string;
+      recurringReservation?: {
+        id: string;
+        pk?: number | null;
+        beginTime?: string | null;
+        endTime?: string | null;
+        weekdays?: Array<number | null> | null;
+        reservationUnit: {
+          id: string;
+          pk?: number | null;
+          nameFi?: string | null;
+          nameEn?: string | null;
+          nameSv?: string | null;
+          reservationConfirmedInstructionsFi?: string | null;
+          reservationConfirmedInstructionsEn?: string | null;
+          reservationConfirmedInstructionsSv?: string | null;
+          unit?: {
+            id: string;
+            nameFi?: string | null;
+            nameEn?: string | null;
+            nameSv?: string | null;
+          } | null;
+        };
+        rejectedOccurrences: Array<{
+          id: string;
+          beginDatetime: string;
+          endDatetime: string;
+        }>;
+        reservations: Array<{
+          id: string;
+          pk?: number | null;
+          begin: string;
+          end: string;
+          state?: ReservationStateChoice | null;
+        }>;
+      } | null;
+    }>;
+  }>;
+};
+
+export type ApplicationReservationsQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  beginDate: Scalars["Date"]["input"];
+}>;
+
+export type ApplicationReservationsQuery = {
+  application?: {
+    id: string;
+    pk?: number | null;
+    applicationSections?: Array<{
+      id: string;
+      pk?: number | null;
+      name: string;
+      reservationUnitOptions: Array<{
+        id: string;
+        allocatedTimeSlots: Array<{
+          id: string;
+          dayOfTheWeek: Weekday;
+          beginTime: string;
+          endTime: string;
+          recurringReservation?: {
+            id: string;
+            pk?: number | null;
+            beginTime?: string | null;
+            endTime?: string | null;
+            weekdays?: Array<number | null> | null;
+            reservationUnit: {
+              id: string;
+              pk?: number | null;
+              nameFi?: string | null;
+              nameEn?: string | null;
+              nameSv?: string | null;
+              reservationConfirmedInstructionsFi?: string | null;
+              reservationConfirmedInstructionsEn?: string | null;
+              reservationConfirmedInstructionsSv?: string | null;
+              unit?: {
+                id: string;
+                nameFi?: string | null;
+                nameEn?: string | null;
+                nameSv?: string | null;
+              } | null;
+            };
+            rejectedOccurrences: Array<{
+              id: string;
+              beginDatetime: string;
+              endDatetime: string;
+            }>;
+            reservations: Array<{
+              id: string;
+              pk?: number | null;
+              begin: string;
+              end: string;
+              state?: ReservationStateChoice | null;
+            }>;
+          } | null;
+        }>;
+      }>;
+    }> | null;
+  } | null;
+};
+
 export type ApplicationsQueryVariables = Exact<{
   user: Scalars["Int"]["input"];
   status:
@@ -7629,6 +7740,78 @@ export type TermsOfUseQuery = {
   } | null;
 };
 
+export type ApplicationSectionViewQueryVariables = Exact<{
+  pk: Scalars["Int"]["input"];
+  beginDate?: InputMaybe<Scalars["Date"]["input"]>;
+}>;
+
+export type ApplicationSectionViewQuery = {
+  applicationSections?: {
+    edges: Array<{
+      node?: {
+        id: string;
+        pk?: number | null;
+        name: string;
+        application: {
+          id: string;
+          pk?: number | null;
+          status?: ApplicationStatusChoice | null;
+          applicationRound: {
+            id: string;
+            nameEn?: string | null;
+            nameFi?: string | null;
+            nameSv?: string | null;
+          };
+        };
+        reservationUnitOptions: Array<{
+          id: string;
+          allocatedTimeSlots: Array<{
+            id: string;
+            dayOfTheWeek: Weekday;
+            beginTime: string;
+            endTime: string;
+            recurringReservation?: {
+              id: string;
+              pk?: number | null;
+              beginTime?: string | null;
+              endTime?: string | null;
+              weekdays?: Array<number | null> | null;
+              reservationUnit: {
+                id: string;
+                pk?: number | null;
+                nameFi?: string | null;
+                nameEn?: string | null;
+                nameSv?: string | null;
+                reservationConfirmedInstructionsFi?: string | null;
+                reservationConfirmedInstructionsEn?: string | null;
+                reservationConfirmedInstructionsSv?: string | null;
+                unit?: {
+                  id: string;
+                  nameFi?: string | null;
+                  nameEn?: string | null;
+                  nameSv?: string | null;
+                } | null;
+              };
+              rejectedOccurrences: Array<{
+                id: string;
+                beginDatetime: string;
+                endDatetime: string;
+              }>;
+              reservations: Array<{
+                id: string;
+                pk?: number | null;
+                begin: string;
+                end: string;
+                state?: ReservationStateChoice | null;
+              }>;
+            } | null;
+          }>;
+        }>;
+      } | null;
+    } | null>;
+  } | null;
+};
+
 export type ApplicationViewQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -7862,6 +8045,57 @@ export const ReservationInfoCardFragmentDoc = gql`
   }
   ${PriceReservationUnitFragmentDoc}
   ${ImageFragmentDoc}
+`;
+export const ApplicationSectionReservationFragmentDoc = gql`
+  fragment ApplicationSectionReservation on ApplicationSectionNode {
+    id
+    pk
+    name
+    reservationUnitOptions {
+      id
+      allocatedTimeSlots {
+        id
+        dayOfTheWeek
+        beginTime
+        endTime
+        recurringReservation {
+          id
+          pk
+          beginTime
+          endTime
+          weekdays
+          reservationUnit {
+            id
+            pk
+            nameFi
+            nameEn
+            nameSv
+            reservationConfirmedInstructionsFi
+            reservationConfirmedInstructionsEn
+            reservationConfirmedInstructionsSv
+            unit {
+              id
+              nameFi
+              nameEn
+              nameSv
+            }
+          }
+          rejectedOccurrences {
+            id
+            beginDatetime
+            endDatetime
+          }
+          reservations(orderBy: [beginAsc], beginDate: $beginDate) {
+            id
+            pk
+            begin
+            end
+            state
+          }
+        }
+      }
+    }
+  }
 `;
 export const ApplicationRoundFieldsFragmentDoc = gql`
   fragment ApplicationRoundFields on ApplicationRoundNode {
@@ -8577,6 +8811,94 @@ export type OptionsSuspenseQueryHookResult = ReturnType<
 export type OptionsQueryResult = Apollo.QueryResult<
   OptionsQuery,
   OptionsQueryVariables
+>;
+export const ApplicationReservationsDocument = gql`
+  query ApplicationReservations($id: ID!, $beginDate: Date!) {
+    application(id: $id) {
+      id
+      pk
+      applicationSections {
+        ...ApplicationSectionReservation
+      }
+    }
+  }
+  ${ApplicationSectionReservationFragmentDoc}
+`;
+
+/**
+ * __useApplicationReservationsQuery__
+ *
+ * To run a query within a React component, call `useApplicationReservationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useApplicationReservationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useApplicationReservationsQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *      beginDate: // value for 'beginDate'
+ *   },
+ * });
+ */
+export function useApplicationReservationsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ApplicationReservationsQuery,
+    ApplicationReservationsQueryVariables
+  > &
+    (
+      | { variables: ApplicationReservationsQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ApplicationReservationsQuery,
+    ApplicationReservationsQueryVariables
+  >(ApplicationReservationsDocument, options);
+}
+export function useApplicationReservationsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ApplicationReservationsQuery,
+    ApplicationReservationsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ApplicationReservationsQuery,
+    ApplicationReservationsQueryVariables
+  >(ApplicationReservationsDocument, options);
+}
+export function useApplicationReservationsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ApplicationReservationsQuery,
+        ApplicationReservationsQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ApplicationReservationsQuery,
+    ApplicationReservationsQueryVariables
+  >(ApplicationReservationsDocument, options);
+}
+export type ApplicationReservationsQueryHookResult = ReturnType<
+  typeof useApplicationReservationsQuery
+>;
+export type ApplicationReservationsLazyQueryHookResult = ReturnType<
+  typeof useApplicationReservationsLazyQuery
+>;
+export type ApplicationReservationsSuspenseQueryHookResult = ReturnType<
+  typeof useApplicationReservationsSuspenseQuery
+>;
+export type ApplicationReservationsQueryResult = Apollo.QueryResult<
+  ApplicationReservationsQuery,
+  ApplicationReservationsQueryVariables
 >;
 export const ApplicationsDocument = gql`
   query Applications(
@@ -10891,6 +11213,105 @@ export type TermsOfUseSuspenseQueryHookResult = ReturnType<
 export type TermsOfUseQueryResult = Apollo.QueryResult<
   TermsOfUseQuery,
   TermsOfUseQueryVariables
+>;
+export const ApplicationSectionViewDocument = gql`
+  query ApplicationSectionView($pk: Int!, $beginDate: Date = null) {
+    applicationSections(pk: [$pk]) {
+      edges {
+        node {
+          ...ApplicationSectionReservation
+          application {
+            id
+            pk
+            status
+            applicationRound {
+              id
+              nameEn
+              nameFi
+              nameSv
+            }
+          }
+        }
+      }
+    }
+  }
+  ${ApplicationSectionReservationFragmentDoc}
+`;
+
+/**
+ * __useApplicationSectionViewQuery__
+ *
+ * To run a query within a React component, call `useApplicationSectionViewQuery` and pass it any options that fit your needs.
+ * When your component renders, `useApplicationSectionViewQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useApplicationSectionViewQuery({
+ *   variables: {
+ *      pk: // value for 'pk'
+ *      beginDate: // value for 'beginDate'
+ *   },
+ * });
+ */
+export function useApplicationSectionViewQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ApplicationSectionViewQuery,
+    ApplicationSectionViewQueryVariables
+  > &
+    (
+      | { variables: ApplicationSectionViewQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ApplicationSectionViewQuery,
+    ApplicationSectionViewQueryVariables
+  >(ApplicationSectionViewDocument, options);
+}
+export function useApplicationSectionViewLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ApplicationSectionViewQuery,
+    ApplicationSectionViewQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ApplicationSectionViewQuery,
+    ApplicationSectionViewQueryVariables
+  >(ApplicationSectionViewDocument, options);
+}
+export function useApplicationSectionViewSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ApplicationSectionViewQuery,
+        ApplicationSectionViewQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ApplicationSectionViewQuery,
+    ApplicationSectionViewQueryVariables
+  >(ApplicationSectionViewDocument, options);
+}
+export type ApplicationSectionViewQueryHookResult = ReturnType<
+  typeof useApplicationSectionViewQuery
+>;
+export type ApplicationSectionViewLazyQueryHookResult = ReturnType<
+  typeof useApplicationSectionViewLazyQuery
+>;
+export type ApplicationSectionViewSuspenseQueryHookResult = ReturnType<
+  typeof useApplicationSectionViewSuspenseQuery
+>;
+export type ApplicationSectionViewQueryResult = Apollo.QueryResult<
+  ApplicationSectionViewQuery,
+  ApplicationSectionViewQueryVariables
 >;
 export const ApplicationViewDocument = gql`
   query ApplicationView($id: ID!) {

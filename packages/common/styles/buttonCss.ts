@@ -1,4 +1,5 @@
-import { css } from "styled-components";
+import styled, { css } from "styled-components";
+import { focusStyles } from "./cssFragments";
 
 export type ButtonStyleProps = {
   readonly variant?: "primary" | "secondary";
@@ -56,5 +57,23 @@ export const ButtonCss = css<ButtonStyleProps>`
     color: var(--color-focus);
     outline-offset: var(--outline-gutter);
     outline: var(--outline-width) solid var(--focus-outline-color);
+  }
+`;
+
+export const LinkLikeButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: var(--content-font-size);
+  line-height: var(--content-line-height);
+  padding: var(--spacing-3-xs);
+  text-decoration: underline;
+  &:hover {
+    text-decoration: none;
+  }
+  ${focusStyles}
+  &:disabled {
+    cursor: not-allowed;
+    color: var(--color-black-40);
   }
 `;

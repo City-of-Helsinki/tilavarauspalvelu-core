@@ -3,7 +3,7 @@ import { Notification } from "hds-react";
 import LabelValue from "../common/LabelValue";
 import TermsBox from "common/src/termsbox/TermsBox";
 import { breakpoints, fontMedium, fontRegular } from "common";
-import { AccordionWithState } from "@/components/common/Accordion";
+import { AccordionWithState } from "@/components/Accordion";
 
 export const CheckboxContainer = styled.div`
   margin-top: var(--spacing-m);

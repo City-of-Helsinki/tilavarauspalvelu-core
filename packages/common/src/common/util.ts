@@ -165,6 +165,8 @@ export function getTranslation(
 // TODO go through all the files and replace the old getTranslation with this one
 // TODO rename to getTranslation when the other one is removed
 // TODO Records are bad, use a query result type instead?
+// TODO key should not be a string (so we don't accidentially pass "nameFi" here)
+// gather all used keys and make a string literal for them (typically it's just name)
 export function getTranslationSafe(
   parent: Record<string, unknown>,
   key: string,

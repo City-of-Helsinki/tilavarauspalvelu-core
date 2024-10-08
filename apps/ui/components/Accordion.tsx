@@ -80,7 +80,7 @@ const Content = styled.div<{ $open: boolean }>`
 
 const Heading = styled(H4).attrs({ as: "div" })``;
 
-const Accordion = ({
+export function Accordion({
   heading,
   open = false,
   children,
@@ -88,7 +88,7 @@ const Accordion = ({
   id,
   theme = "default",
   ...rest
-}: Props): JSX.Element => {
+}: Props): JSX.Element {
   const { isOpen, openAccordion, closeAccordion } = useAccordion({
     initiallyOpen: open,
   });
@@ -102,11 +102,13 @@ const Accordion = ({
       }
     }
   }, [closeAccordion, isOpen, open, openAccordion]);
+
   const icon = isOpen ? (
     <IconAngleUp aria-hidden />
   ) : (
     <IconAngleDown aria-hidden />
   );
+
   return (
     <AccordionElement id={id} {...rest}>
       <HeadingButton
@@ -120,15 +122,13 @@ const Accordion = ({
       <Content $open={isOpen}>{children}</Content>
     </AccordionElement>
   );
-};
+}
 
-export default Accordion;
-
-export const AccordionWithState = ({
+export function AccordionWithState({
   open: initiallyOpen,
   ...rest
-}: Props): JSX.Element => {
+}: Props): JSX.Element {
   const [open, setOpen] = useState(initiallyOpen);
 
   return <Accordion onToggle={() => setOpen(!open)} {...rest} open={open} />;
-};
+}

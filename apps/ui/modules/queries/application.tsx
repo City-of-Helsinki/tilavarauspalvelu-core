@@ -1,5 +1,75 @@
 import { gql } from "@apollo/client";
 
+// NOTE for some reason codegen doesn't run on component files (at least some of them)
+
+export const APPLICATION_SECTION_RESERVATION_FRAGMENT = gql`
+  fragment ApplicationSectionReservation on ApplicationSectionNode {
+    id
+    pk
+    name
+    reservationUnitOptions {
+      id
+      allocatedTimeSlots {
+        id
+        dayOfTheWeek
+        beginTime
+        endTime
+        recurringReservation {
+          id
+          pk
+          beginTime
+          endTime
+          weekdays
+          reservationUnit {
+            id
+            pk
+            nameFi
+            nameEn
+            nameSv
+            reservationConfirmedInstructionsFi
+            reservationConfirmedInstructionsEn
+            reservationConfirmedInstructionsSv
+            unit {
+              id
+              nameFi
+              nameEn
+              nameSv
+            }
+          }
+          rejectedOccurrences {
+            id
+            beginDatetime
+            endDatetime
+          }
+          reservations(orderBy: [beginAsc], beginDate: $beginDate) {
+            id
+            pk
+            begin
+            end
+            state
+          }
+        }
+      }
+    }
+  }
+`;
+
+// client side query, for now take all the data needed for this Tab
+// client side because the SSR query is too complex already
+// this allows faster iteration and splitting the query if needed (based on open Accordions)
+// we can cache data on client side (when user opens Accordions)
+export const APPLICATION_RESERVATIONS_QUERY = gql`
+  query ApplicationReservations($id: ID!, $beginDate: Date!) {
+    application(id: $id) {
+      id
+      pk
+      applicationSections {
+        ...ApplicationSectionReservation
+      }
+    }
+  }
+`;
+
 // NOTE because this doesn't have pagination we use orderBy for development purposes only
 // if you create new application it's the first one in the list
 export const APPLICATIONS = gql`

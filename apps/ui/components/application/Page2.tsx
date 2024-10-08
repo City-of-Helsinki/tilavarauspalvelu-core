@@ -29,7 +29,7 @@ import {
 } from "common/src/conversion";
 import { MediumButton } from "@/styles/util";
 import { getReadableList } from "@/modules/util";
-import { AccordionWithState as Accordion } from "../common/Accordion";
+import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { TimeSelector } from "./TimeSelector";
 import { ButtonContainer } from "../common/common";
 import { errorToast, successToast } from "common/src/common/toast";

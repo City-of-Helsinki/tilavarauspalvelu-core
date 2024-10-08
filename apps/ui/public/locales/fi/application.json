@@ -213,7 +213,23 @@
     "heading": "Kausivaraushakemus",
     "reservations": "Hyväksytyt varaukset",
     "application": "Hakemus",
-    "handledDate": "Käsitelty"
+    "handledDate": "Käsitelty",
+    "allReservations": "Kaikki varaukset",
+    "reservationsTab": {
+      "reservationUnit": "Tila",
+      "rejected": "Hylätty",
+      "modified": "Muokattu",
+      "showAllReservations": "Näytä kaikki varaukset",
+      "cancelApplication": "Peru koko kausivaraus",
+      "reservationUnitsTitle": "Toimipisteet",
+      "reservationsTitle": "Varaukset",
+      "others": "muuta",
+      "reservationCountPostfix": "varausta"
+    },
+    "helpLink": "Ohjeet",
+    "helpModal": {
+      "title": "Tilakohtaiset ohjeet"
+    }
   },
   "sent": {
     "heading": "Kiitos hakemuksesta!",

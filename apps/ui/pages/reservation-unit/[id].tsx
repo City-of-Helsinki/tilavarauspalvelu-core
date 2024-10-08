@@ -40,7 +40,7 @@ import {
   RelatedUnits,
   type RelatedNodeT,
 } from "@/components/reservation-unit/RelatedUnits";
-import { AccordionWithState as Accordion } from "@/components/common/Accordion";
+import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { createApolloClient } from "@/modules/apolloClient";
 import { Map as MapComponent } from "@/components/Map";
 import {

@@ -217,7 +217,23 @@
     "heading": "Seasonal booking application",
     "reservations": "Accepted bookings",
     "application": "Application",
-    "handledDate": "Handled"
+    "handledDate": "Handled",
+    "allReservations": "All bookings",
+    "reservationsTab": {
+      "reservationUnit": "Space",
+      "rejected": "Rejected",
+      "modified": "Modified",
+      "showAllReservations": "Show all bookings",
+      "cancelApplication": "Cancel whole application",
+      "reservationUnitsTitle": "Location",
+      "reservationsTitle": "Reservations",
+      "others": "others",
+      "reservationCountPostfix": "bookings"
+    },
+    "helpLink": "Help",
+    "helpModal": {
+      "title": "Unit specific information"
+    }
   },
   "sent": {
     "heading": "Thank you for the application",

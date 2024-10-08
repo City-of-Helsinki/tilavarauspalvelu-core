@@ -190,6 +190,37 @@ export function timeToMinutes(time: string) {
   return 0;
 }
 
+export function formatMinutes(
+  minutes: number,
+  trailingMinutes = false
+): string {
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  const showMins = trailingMinutes || mins > 0;
+  if (showMins) {
+    return `${hours}:${mins < 10 ? `0${mins}` : mins}`;
+  }
+  return `${hours}`;
+}
+
+export function formatApiTimeInterval({
+  beginTime,
+  endTime,
+  trailingMinutes = false,
+}: {
+  beginTime?: Maybe<string> | undefined;
+  endTime?: Maybe<string> | undefined;
+  trailingMinutes?: boolean;
+}): string {
+  if (!beginTime || !endTime) {
+    return "";
+  }
+  // NOTE this uses extra cycles because of double conversions but it's safer than stripping from raw data
+  const btime = formatMinutes(timeToMinutes(beginTime), trailingMinutes);
+  const etime = formatMinutes(timeToMinutes(endTime), trailingMinutes);
+  return `${btime}–${etime}`;
+}
+
 export function calculateMedian(numbers: number[]): number {
   const sorted = [...numbers].sort((a, b) => a - b);
   const middle = Math.floor(sorted.length / 2);

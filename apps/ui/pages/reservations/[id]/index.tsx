@@ -32,7 +32,7 @@ import { createApolloClient } from "@/modules/apolloClient";
 import { formatDateTimeRange, getTranslation } from "@/modules/util";
 import { CenterSpinner } from "@/components/common/common";
 import Sanitize from "@/components/common/Sanitize";
-import { AccordionWithState as Accordion } from "@/components/common/Accordion";
+import { AccordionWithState as Accordion } from "@/components/Accordion";
 import {
   getCheckoutUrl,
   getNormalizedReservationOrderStatus,

@@ -28,6 +28,8 @@ const gqlConfig = {
     object: false,
     defaultValue: false,
   },
+  // TODO this would improve linting fragments but it causes some issues in type generation
+  // experimentalFragmentVariables: true,
   skipTypename: true,
   defaultScalarType: "unknown",
   scalars,
@@ -38,7 +40,7 @@ const plugins = [
   "typescript",
   "typescript-operations",
   "typescript-react-apollo",
-];
+] as const;
 
 const config: IGraphQLConfig = {
   projects: {
@@ -51,7 +53,6 @@ const config: IGraphQLConfig = {
           generates: {
             "packages/common/gql/gql-types.ts": {
               plugins,
-
             },
             'tilavaraus.graphql': {
               plugins: ['schema-ast'],

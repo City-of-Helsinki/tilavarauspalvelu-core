@@ -19,12 +19,14 @@ interface IconButtonProps {
   openInNewTab?: boolean;
   // an optional function to call when clicking the button
   onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
+  className?: string;
+  style?: React.CSSProperties;
   [rest: string]: unknown; // any other params, like id/aria/testing/etc
 }
 
 // TODO can't define padding for this otherwise it's not aligned properly since we have no border
 // but a bit of padding around the focus outline would be nice
-const Container = styled.div`
+const Container = styled.span`
   display: flex;
   align-items: center;
 `;
@@ -46,6 +48,9 @@ const StyledLink = styled(Link)<{ $disableVisitedStyles?: boolean }>`
   ${focusStyles}
   ${anchorStyles}
   ${visitedStyles}
+
+  /* required for the focus outline to work */
+  display: inline-block;
 `;
 
 const StyledLinkButton = styled.button`
@@ -56,6 +61,9 @@ const StyledLinkButton = styled.button`
   padding: 0;
   ${linkStyles}
   ${focusStyles}
+
+  /* button user-agent sizes are supper small */
+  font-size: var(--fontsize-body-m);
 
   cursor: pointer;
   &:disabled {
@@ -69,18 +77,18 @@ const StyledLinkButton = styled.button`
 
 const Anchor = styled.a`
   width: fit-content;
+  display: inline-block;
   ${focusStyles}
   ${anchorStyles}
   ${visitedStyles}
 `;
 
-const HoverWrapper = styled.div<{ $disabled?: boolean }>`
+const HoverWrapper = styled.span<{ $disabled?: boolean }>`
   display: flex;
   gap: var(--spacing-xs);
-  padding-bottom: var(--spacing-3-xs);
+  padding: var(--spacing-3-xs);
   border-bottom: 1px solid transparent;
   align-items: center;
-  ${focusStyles}
   ${({ $disabled }) => $disabled && "pointer-events: none;"}
   &:hover {
     ${({ $disabled }) => !$disabled && "border-color: var(--color-black-30);"}
@@ -94,7 +102,6 @@ const HoverWrapper = styled.div<{ $disabled?: boolean }>`
 const Label = styled.span`
   display: flex;
   flex-direction: row;
-  font-size: var(--fontsize-body-m);
   ${fontMedium}
 `;
 
@@ -181,7 +188,13 @@ const IconButton = ({
       <LinkElement label={label} icon={icon} />
     </StyledLinkButton>
   ) : (
-    <LinkWrapper {...linkOptions} href={href} label={label} icon={icon} />
+    <LinkWrapper
+      {...rest}
+      {...linkOptions}
+      href={href}
+      label={label}
+      icon={icon}
+    />
   );
 };
 

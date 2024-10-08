@@ -9,7 +9,7 @@ import styled from "styled-components";
 
 type TagPropsType = {
   ariaLabel: string;
-  type: StatusLabelType;
+  type?: StatusLabelType;
   onClick?: () => void;
   id?: string;
   children: React.ReactNode;

@@ -10,7 +10,11 @@ import {
   getGenericTerms,
 } from "@/modules/serverUtils";
 import { base64encode, getLocalizationLang } from "common/src/helpers";
-import { ApplicationViewDocument, ApplicationViewQuery } from "@gql/gql-types";
+import {
+  ApplicationStatusChoice,
+  ApplicationViewDocument,
+  type ApplicationViewQuery,
+} from "@gql/gql-types";
 import { Tabs } from "hds-react";
 import { Head } from "@/components/application/Head";
 import { Container } from "common";
@@ -32,16 +36,18 @@ function View({ application, tos }: PropsNarrowed): JSX.Element {
   const lang = getLocalizationLang(i18n.language);
   const applicationRoundName = getTranslationSafe(round, "name", lang);
   const { sentDate } = application.applicationRound;
-  const handledDate = sentDate ? new Date(sentDate) : null;
+  const handledDate = sentDate ? new Date(sentDate) : new Date();
+  const showReservations =
+    application.status === ApplicationStatusChoice.ResultsSent;
 
   return (
     <Container>
       <Head heading={applicationRoundName} />
-      {handledDate ? (
+      {showReservations ? (
         <>
           <p>
-            {/* TODO format date should not include the day name */}
-            {t("application:view.handledDate")} {formatDateTime(t, handledDate)}
+            {t("application:view.handledDate")}{" "}
+            {formatDateTime(t, handledDate, false)}
           </p>
           <Tabs initiallyActiveTab={tab === "application" ? 1 : 0}>
             <Tabs.TabList>

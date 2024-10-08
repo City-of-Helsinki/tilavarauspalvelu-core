@@ -19,7 +19,7 @@ import {
   uiDateToApiDate,
 } from "@/modules/util";
 import { ApplicationEventSummary } from "./ApplicationEventSummary";
-import Accordion from "../common/Accordion";
+import { Accordion } from "@/components/Accordion";
 import { getDurationOptions } from "@/modules/const";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import { MediumButton } from "@/styles/util";

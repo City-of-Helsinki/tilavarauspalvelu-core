@@ -32,6 +32,7 @@ import { filterNonNullable } from "common/src/helpers";
 import { containsField } from "common/src/metaFieldsHelpers";
 import { getApplicationFields, getGeneralFields } from "./SummaryFields";
 import { type Inputs } from "common/src/reservation-form/types";
+import { LinkLikeButton } from "common/styles/buttonCss";
 
 type ReservationT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
@@ -61,14 +62,6 @@ const Form = styled.form`
   input[type="radio"] + label {
     ${fontRegular};
   }
-`;
-
-const LinkLikeButton = styled.button`
-  border: unset;
-  background: unset;
-  color: blue;
-  padding: unset;
-  cursor: pointer;
 `;
 
 function Step0({
