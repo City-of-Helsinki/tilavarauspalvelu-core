@@ -47,14 +47,19 @@ const config = {
   },
 };
 
-const Sanitize = ({ html, style }: Props): JSX.Element | null =>
-  html ? (
+function Sanitize({ html, style }: Props): JSX.Element | null {
+  if (!html) {
+    return null;
+  }
+
+  return (
     <StyledContent
       style={style}
       dangerouslySetInnerHTML={{
         __html: sanitizeHtml(html, config),
       }}
     />
-  ) : null;
+  );
+}
 
 export default Sanitize;

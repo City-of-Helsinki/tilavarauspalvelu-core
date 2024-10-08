@@ -13,6 +13,7 @@ import { AccordionWithState as Accordion } from "../common/Accordion";
 import { ApplicationEventList } from "./ApplicationEventList";
 import TermsBox from "common/src/termsbox/TermsBox";
 import Sanitize from "../common/Sanitize";
+import ClientOnly from "common/src/ClientOnly";
 
 type Node = NonNullable<ApplicationViewQuery["application"]>;
 export function ViewInner({
@@ -41,22 +42,25 @@ export function ViewInner({
         <ApplicantInfoPreview application={application} />
       </Accordion>
       <ApplicationEventList application={application} />
-      {tos && (
-        <TermsBox
-          id="preview.acceptTermsOfUse"
-          heading={t("reservationUnit:termsOfUse")}
-          body={<Sanitize html={getTranslation(tos, "text")} />}
-        />
-      )}
-      {tos2 && (
-        <TermsBox
-          id="preview.acceptServiceSpecificTerms"
-          heading={t("application:preview.reservationUnitTerms")}
-          body={<Sanitize html={getTranslation(tos2, "text")} />}
-          /* TODO TermsBox has accepted and checkbox we could use but for now leaving the single
-           * page specfici checkbox to accept all terms */
-        />
-      )}
+      {/* NOTE TermsBox has hydration issues */}
+      <ClientOnly>
+        {tos && (
+          <TermsBox
+            id="preview.acceptTermsOfUse"
+            heading={t("reservationUnit:termsOfUse")}
+            body={<Sanitize html={getTranslation(tos, "text")} />}
+          />
+        )}
+        {tos2 && (
+          <TermsBox
+            id="preview.acceptServiceSpecificTerms"
+            heading={t("application:preview.reservationUnitTerms")}
+            body={<Sanitize html={getTranslation(tos2, "text")} />}
+            /* TODO TermsBox has accepted and checkbox we could use but for now leaving the single
+             * page specfici checkbox to accept all terms */
+          />
+        )}
+      </ClientOnly>
       {acceptTermsOfUse != null && setAcceptTermsOfUse != null && (
         <CheckboxContainer>
           <Checkbox
