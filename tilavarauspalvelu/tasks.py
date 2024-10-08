@@ -47,10 +47,12 @@ from tilavarauspalvelu.models import (
     Reservation,
     ReservationStatistic,
     ReservationStatisticsReservationUnit,
+    User,
 )
 from tilavarauspalvelu.models.recurring_reservation.actions import ReservationDetails
 from tilavarauspalvelu.models.request_log.model import RequestLog
 from tilavarauspalvelu.models.sql_log.model import SQLLog
+from tilavarauspalvelu.services.permission_service import deactivate_old_permissions
 from tilavarauspalvelu.utils.email.email_sender import EmailNotificationSender
 from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
@@ -173,7 +175,7 @@ def _get_reservation_staff_notification_recipients(
     Get users with unit roles and notifications enabled, collect the ones that can manage relevant units,
     have matching notification setting are not the reservation creator
     """
-    from tilavarauspalvelu.models import Unit, User
+    from tilavarauspalvelu.models import Unit
 
     notification_recipients: list[str] = []
     reservation_units = reservation.reservation_unit.all()
@@ -819,3 +821,8 @@ def create_reservation_unit_elastic_index() -> None:
 def delete_reservation_unit_elastic_index() -> None:
     index = next(iter(settings.SEARCH_SETTINGS["indexes"].keys()))
     delete_index(index)
+
+
+@app.task(name="deactivate_old_permissions")
+def deactivate_old_permissions_task() -> None:
+    deactivate_old_permissions()

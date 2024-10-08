@@ -189,8 +189,8 @@ class ReservationUnitFilterSet(ModelFilterSet):
         if user.permissions.has_general_role():
             return qs
 
-        unit_ids = list(user.unit_roles_map)
-        unit_group_ids = list(user.unit_group_roles_map)
+        unit_ids = list(user.active_unit_roles)
+        unit_group_ids = list(user.active_unit_group_roles)
 
         return qs.filter(Q(unit_id__in=unit_ids) | Q(unit__unit_groups__in=unit_group_ids)).distinct()
 
