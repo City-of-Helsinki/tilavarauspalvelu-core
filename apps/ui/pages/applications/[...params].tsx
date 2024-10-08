@@ -27,7 +27,7 @@ import {
   ApplicationDocument,
   type ApplicationQuery,
   type ApplicationQueryVariables,
-} from "common/gql/gql-types";
+} from "@/gql/gql-types";
 import { errorToast } from "common/src/common/toast";
 import { getApplicationPath } from "@/modules/urls";
 

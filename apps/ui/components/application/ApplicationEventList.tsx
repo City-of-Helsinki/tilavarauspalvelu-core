@@ -15,6 +15,7 @@ import { StyledLabelValue, TimePreviewContainer } from "./styled";
 import { TwoColumnContainer, FormSubHeading } from "../common/common";
 import { AccordionWithState as Accordion } from "../common/Accordion";
 import { UnitList } from "./UnitList";
+import { filterNonNullable } from "common/src/helpers";
 
 const filterPrimary = (n: { priority: Priority }) =>
   n.priority === Priority.Primary;
@@ -63,18 +64,16 @@ type Node = NonNullable<ApplicationQuery["application"]>;
 export function ApplicationEventList({ application }: { application: Node }) {
   const { t } = useTranslation();
 
-  const aes = application.applicationSections ?? [];
-  const reservationUnits =
-    aes.map(
-      (evt) =>
-        evt?.reservationUnitOptions?.map((eru, index) => ({
-          pk: eru.reservationUnit?.pk ?? 0,
-          priority: index,
-          nameFi: eru.reservationUnit?.nameFi ?? undefined,
-          nameSv: eru.reservationUnit?.nameSv ?? undefined,
-          nameEn: eru.reservationUnit?.nameEn ?? undefined,
-        })) ?? []
-    ) ?? [];
+  const aes = filterNonNullable(application.applicationSections);
+  const reservationUnits = aes.map((evt) =>
+    evt?.reservationUnitOptions?.map((eru, index) => ({
+      pk: eru.reservationUnit?.pk ?? 0,
+      priority: index,
+      nameFi: eru.reservationUnit?.nameFi ?? undefined,
+      nameSv: eru.reservationUnit?.nameSv ?? undefined,
+      nameEn: eru.reservationUnit?.nameEn ?? undefined,
+    }))
+  );
 
   return (
     <>

@@ -10,12 +10,13 @@ import {
   getGenericTerms,
 } from "@/modules/serverUtils";
 import { base64encode, getLocalizationLang } from "common/src/helpers";
-import { ApplicationDocument, ApplicationQuery } from "@gql/gql-types";
+import { ApplicationViewDocument, ApplicationViewQuery } from "@gql/gql-types";
 import { Tabs } from "hds-react";
 import { Head } from "@/components/application/Head";
 import { Container } from "common";
 import { formatDateTime } from "@/modules/util";
 import { ApprovedReservations } from "@/components/application/ApprovedReservations";
+import { gql } from "@apollo/client";
 
 function View({ application, tos }: PropsNarrowed): JSX.Element {
   const { t, i18n } = useTranslation();
@@ -66,6 +67,32 @@ function View({ application, tos }: PropsNarrowed): JSX.Element {
   );
 }
 
+// TODO refactor this by splitting the query based on tab
+// it includes all the application section information that is not required by by the View Application tab
+// the reservations tab doesn't need to know what the user applied for but what they got.
+// The query is already too complex at 22 complexity (requires backend changes to add more fields).
+// Terms of use is only required by the application tab.
+// ApplicationCommon fragment needs to be refactored so we have a separate minimal fragments for
+// - reservation tab
+// - application tab
+// They can both be included in the SSR query
+// (or alternatively the reservation tab can be fetched on the client side per each applicationSection)
+export const APPLICATION_VIEW_QUERY = gql`
+  query ApplicationView($id: ID!) {
+    application(id: $id) {
+      ...ApplicationCommon
+      applicationRound {
+        id
+        sentDate
+        termsOfUse {
+          id
+          ...TermsOfUseFields
+        }
+      }
+    }
+  }
+`;
+
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
@@ -94,8 +121,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return notFoundRetvalue;
   }
 
-  const { data } = await apolloClient.query<ApplicationQuery>({
-    query: ApplicationDocument,
+  const { data } = await apolloClient.query<ApplicationViewQuery>({
+    query: ApplicationViewDocument,
     variables: { id: base64encode(`ApplicationNode:${pk}`) },
   });
 

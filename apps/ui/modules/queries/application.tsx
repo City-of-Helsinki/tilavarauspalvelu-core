@@ -1,7 +1,11 @@
 import { gql } from "@apollo/client";
 import { APPLICATION_ROUND_FRAGMENT } from "./applicationRound";
-import { APPLICANT_NAME_FRAGMENT } from "common/src/queries/application";
+import {
+  APPLICANT_NAME_FRAGMENT,
+  APPLICATION_FRAGMENT,
+} from "common/src/queries/application";
 import { ApplicationOrderingChoices } from "@gql/gql-types";
+import { TERMS_OF_USE_FRAGMENT } from "common/src/queries/fragments";
 
 // TODO this doesn't have pagination so the orderBy is for development purposes only
 // in production the order isn't specified and pagination is not needed
@@ -30,6 +34,27 @@ export const APPLICATIONS = gql`
           status
           ...ApplicationName
           lastModifiedDate
+        }
+      }
+    }
+  }
+`;
+
+export const APPLICATION_QUERY = gql`
+  ${APPLICATION_FRAGMENT}
+  ${TERMS_OF_USE_FRAGMENT}
+  query Application($id: ID!) {
+    application(id: $id) {
+      ...ApplicationCommon
+      applicationRound {
+        id
+        sentDate
+        notesWhenApplyingFi
+        notesWhenApplyingEn
+        notesWhenApplyingSv
+        termsOfUse {
+          id
+          ...TermsOfUseFields
         }
       }
     }

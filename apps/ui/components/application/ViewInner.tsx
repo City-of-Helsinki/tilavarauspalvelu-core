@@ -2,7 +2,7 @@ import React from "react";
 import { Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
 import type {
-  ApplicationQuery,
+  ApplicationViewQuery,
   Maybe,
   TermsOfUseTextFieldsFragment,
 } from "@gql/gql-types";
@@ -14,7 +14,7 @@ import { ApplicationEventList } from "./ApplicationEventList";
 import TermsBox from "common/src/termsbox/TermsBox";
 import Sanitize from "../common/Sanitize";
 
-type Node = NonNullable<ApplicationQuery["application"]>;
+type Node = NonNullable<ApplicationViewQuery["application"]>;
 export function ViewInner({
   application,
   tos,

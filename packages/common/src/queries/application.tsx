@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { IMAGE_FRAGMENT, TERMS_OF_USE_FRAGMENT } from "./fragments";
+import { IMAGE_FRAGMENT } from "./fragments";
 
 export const APPLICANT_NAME_FRAGMENT = gql`
   fragment ApplicationName on ApplicationNode {
@@ -202,28 +202,6 @@ export const APPLICATION_FRAGMENT = gql`
     }
     applicationSections {
       ...ApplicationSectionUI
-    }
-  }
-`;
-
-/// NOTE Requires higher backend optimizer complexity limit (22 works, lower doesn't)
-export const APPLICATION_QUERY = gql`
-  ${APPLICATION_FRAGMENT}
-  ${TERMS_OF_USE_FRAGMENT}
-  query Application($id: ID!) {
-    application(id: $id) {
-      ...ApplicationCommon
-      applicationRound {
-        id
-        sentDate
-        notesWhenApplyingFi
-        notesWhenApplyingEn
-        notesWhenApplyingSv
-        termsOfUse {
-          id
-          ...TermsOfUseFields
-        }
-      }
     }
   }
 `;
