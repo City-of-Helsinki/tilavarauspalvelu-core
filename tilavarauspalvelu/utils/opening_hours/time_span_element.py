@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 from tilavarauspalvelu.enums import HaukiResourceState
-from utils.date_utils import DEFAULT_TIMEZONE, combine, local_start_of_day
+from utils.date_utils import DEFAULT_TIMEZONE, combine, datetime_range_as_string, local_start_of_day
 
 if TYPE_CHECKING:
     import zoneinfo
@@ -23,36 +23,14 @@ class TimeSpanElement:
 
     def __repr__(self) -> str:
         reservable_str = "Reservable" if self.is_reservable else "Closed"
-        return f"<{self.__class__.__name__}({self._get_datetime_str()}, {reservable_str})>"
-
-    def _get_datetime_str(self) -> str:
-        strformat = "%Y-%m-%d %H:%M"
-
-        start = self.start_datetime.astimezone(DEFAULT_TIMEZONE)
-        end = self.end_datetime.astimezone(DEFAULT_TIMEZONE)
-
-        start_date = start.date()
-        end_date = end.date()
-
-        start_str = "min" if start_date == datetime.date.min else start.strftime(strformat)
-
-        if end_date == datetime.date.max:
-            end_str = "max"
-        elif end_date == start_date:
-            end_str = end.strftime("%H:%M")
-        elif end_date == start_date + datetime.timedelta(days=1) and end_date == datetime.time.min:
-            end_str = "24:00"
-        else:
-            end_str = end.strftime(strformat)
-
-        duration_str = f"{start_str}-{end_str}"
+        duration_str = datetime_range_as_string(start_datetime=self.start_datetime, end_datetime=self.end_datetime)
 
         if self.buffer_time_before:
             duration_str += f", -{str(self.buffer_time_before).zfill(8)[:5]}"
         if self.buffer_time_after:
             duration_str += f", +{str(self.buffer_time_after).zfill(8)[:5]}"
 
-        return duration_str
+        return f"<{self.__class__.__name__}({duration_str}, {reservable_str})>"
 
     def __copy__(self) -> TimeSpanElement:
         return TimeSpanElement(

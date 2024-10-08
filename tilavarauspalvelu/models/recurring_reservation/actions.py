@@ -14,6 +14,7 @@ from tilavarauspalvelu.enums import (
 )
 from tilavarauspalvelu.models import (
     AffectingTimeSpan,
+    AgeGroup,
     RecurringReservation,
     RejectedOccurrence,
     ReservableTimeSpan,
@@ -113,6 +114,7 @@ class ReservationDetails(TypedDict, total=False):
     user: int | User
     purpose: int | ReservationPurpose
     home_city: int | City
+    age_group: int | AgeGroup
 
 
 class RecurringReservationActions:
@@ -129,6 +131,7 @@ class RecurringReservationActions:
         closed_hours: Collection[TimeSpanElement] = (),
         buffer_time_before: datetime.timedelta | None = None,
         buffer_time_after: datetime.timedelta | None = None,
+        ignore_reservations: Collection[int] = (),
     ) -> ReservationSeriesCalculationResults:
         """
         Pre-calculate slots for reservations for the recurring reservation.
@@ -140,17 +143,17 @@ class RecurringReservationActions:
         :param closed_hours: Explicitly closed opening hours for the resource.
         :param buffer_time_before: Used buffer time before the reservation.
         :param buffer_time_after: Used buffer time after the reservation.
+        :param ignore_reservations: Reservations to ignore when calculating slots, e.g., for rescheduling.
         """
-        pk = self.recurring_reservation.reservation_unit.pk
+        affecting_timespans = AffectingTimeSpan.objects.filter(
+            affected_reservation_unit_ids__contains=[self.recurring_reservation.reservation_unit.pk],
+            buffered_start_datetime__date__lte=self.recurring_reservation.end_date,
+            buffered_end_datetime__date__gte=self.recurring_reservation.begin_date,
+        )
+        if ignore_reservations:
+            affecting_timespans = affecting_timespans.exclude(reservation__in=ignore_reservations)
 
-        timespans = [
-            timespan.as_time_span_element()
-            for timespan in AffectingTimeSpan.objects.filter(
-                affected_reservation_unit_ids__contains=[pk],
-                buffered_start_datetime__date__lte=self.recurring_reservation.end_date,
-                buffered_end_datetime__date__gte=self.recurring_reservation.begin_date,
-            )
-        ]
+        timespans = [timespan.as_time_span_element() for timespan in affecting_timespans]
 
         reservable_timespans = self.get_reservable_timespans() if check_opening_hours else []
 

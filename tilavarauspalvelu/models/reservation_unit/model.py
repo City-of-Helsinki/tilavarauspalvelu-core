@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.db import models
-from django.db.models.functions import Now
 from django.utils.translation import gettext_lazy as _
 from elasticsearch_django.models import SearchDocumentManagerMixin, SearchDocumentMixin
 from lookup_property import L, lookup_property
@@ -22,6 +21,7 @@ from tilavarauspalvelu.enums import (
     ReservationUnitPublishingState,
     ReservationUnitReservationState,
 )
+from utils.db import NowTT
 
 from .queryset import ReservationUnitQuerySet
 
@@ -334,12 +334,12 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
                 (
                     # Publishes in the future.
                     models.Q(publish_begins__isnull=False)
-                    & models.Q(publish_begins__gt=Now())
+                    & models.Q(publish_begins__gt=NowTT())
                     & (
                         # Does not unpublish.
                         models.Q(publish_ends__isnull=True)
                         # Was previously unpublished.
-                        | models.Q(publish_ends__lte=Now())
+                        | models.Q(publish_ends__lte=NowTT())
                     )
                 ),
                 then=models.Value(ReservationUnitPublishingState.SCHEDULED_PUBLISHING.value),
@@ -350,13 +350,13 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
                     (
                         # Is unpublished.
                         models.Q(publish_ends__isnull=False)
-                        & models.Q(publish_ends__lte=Now())
+                        & models.Q(publish_ends__lte=NowTT())
                         & (
                             # Was previously always published.
                             models.Q(publish_begins__isnull=True)
                             # Was previously published, but before it was unpublished.
                             | (
-                                models.Q(publish_begins__lte=Now())  #
+                                models.Q(publish_begins__lte=NowTT())  #
                                 & models.Q(publish_begins__lte=models.F("publish_ends"))
                             )
                         )
@@ -376,12 +376,12 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
                 (
                     # Unpublishes in the future.
                     models.Q(publish_ends__isnull=False)
-                    & models.Q(publish_ends__gt=Now())
+                    & models.Q(publish_ends__gt=NowTT())
                     & (
                         # Was always published.
                         models.Q(publish_begins__isnull=True)
                         # Was published in the past.
-                        | models.Q(publish_begins__lte=Now())
+                        | models.Q(publish_begins__lte=NowTT())
                         # Publishing begins again in the future, but after it first unpublishes.
                         | models.Q(publish_begins__gt=models.F("publish_ends"))
                     )
@@ -394,10 +394,10 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
                 (
                     # Publishes in the future.
                     models.Q(publish_begins__isnull=False)
-                    & models.Q(publish_begins__gt=Now())
+                    & models.Q(publish_begins__gt=NowTT())
                     # Unpublishes in the future.
                     & models.Q(publish_ends__isnull=False)
-                    & models.Q(publish_ends__gt=Now())
+                    & models.Q(publish_ends__gt=NowTT())
                     # Publishes before it unpublishes.
                     & models.Q(publish_begins__lt=models.F("publish_ends"))
                 ),
@@ -417,12 +417,12 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
                 (
                     # Reservation period begins in the future.
                     models.Q(reservation_begins__isnull=False)
-                    & models.Q(reservation_begins__gt=Now())
+                    & models.Q(reservation_begins__gt=NowTT())
                     & (
                         # No previous reservation period.
                         models.Q(reservation_ends__isnull=True)
                         # Previous reservation period ended in the past.
-                        | models.Q(reservation_ends__lte=Now())
+                        | models.Q(reservation_ends__lte=NowTT())
                     )
                 ),
                 then=models.Value(ReservationUnitReservationState.SCHEDULED_RESERVATION.value),
@@ -432,10 +432,10 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
                 (
                     # Reservation period begins in the future.
                     models.Q(reservation_begins__isnull=False)
-                    & models.Q(reservation_begins__gt=Now())
+                    & models.Q(reservation_begins__gt=NowTT())
                     # Reservation period ends in the future
                     & models.Q(reservation_ends__isnull=False)
-                    & models.Q(reservation_ends__gt=Now())
+                    & models.Q(reservation_ends__gt=NowTT())
                     # Reservation period begins before it ends.
                     & models.Q(reservation_begins__lt=models.F("reservation_ends"))
                 ),
@@ -460,7 +460,7 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
                     | (
                         # Reservation period ended now or in the past.
                         models.Q(reservation_ends__isnull=False)
-                        & models.Q(reservation_ends__lte=Now())
+                        & models.Q(reservation_ends__lte=NowTT())
                         & (
                             # Reservation period was previously open.
                             models.Q(reservation_begins__isnull=True)
@@ -486,12 +486,12 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
                 (
                     # Reservation period ends in the future.
                     models.Q(reservation_ends__isnull=False)
-                    & models.Q(reservation_ends__gt=Now())
+                    & models.Q(reservation_ends__gt=NowTT())
                     & (
                         # Reservation period has never been closed.
                         models.Q(reservation_begins__isnull=True)
                         # Reservation period has begun in the past.
-                        | models.Q(reservation_begins__lte=Now())
+                        | models.Q(reservation_begins__lte=NowTT())
                         # Reservation period has begins again in the future, but after it first ends.
                         | models.Q(reservation_begins__gt=models.F("reservation_ends"))
                     )

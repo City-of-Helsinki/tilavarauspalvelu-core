@@ -78,7 +78,7 @@ def test_recurring_reservations__query(graphql):
         "beginTime": recurring_reservation.begin_time.isoformat(),
         "endTime": recurring_reservation.end_time.isoformat(),
         "recurrenceInDays": recurring_reservation.recurrence_in_days,
-        "weekdays": [1, 2, 3, 4, 5],
+        "weekdays": [0],
         "created": recurring_reservation.created.isoformat(),
         "user": {
             "email": recurring_reservation.user.email,

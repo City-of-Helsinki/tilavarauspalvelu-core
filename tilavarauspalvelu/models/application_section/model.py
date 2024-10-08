@@ -7,14 +7,14 @@ from typing import TYPE_CHECKING
 
 from django.db import models
 from django.db.models import Manager, OrderBy
-from django.db.models.functions import Coalesce, Now
+from django.db.models.functions import Coalesce
 from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L, lookup_property
 
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, Weekday
 from utils.date_utils import local_datetime
-from utils.db import SubqueryCount
+from utils.db import NowTT, SubqueryCount
 
 from .queryset import ApplicationSectionQuerySet
 
@@ -155,7 +155,7 @@ class ApplicationSection(SerializableMixin, models.Model):
         return models.Case(  # type: ignore[return-value]
             models.When(
                 # The application round has not yet moved to the allocation stage
-                models.Q(application__application_round__application_period_end__gte=Now()),
+                models.Q(application__application_round__application_period_end__gte=NowTT()),
                 then=models.Value(ApplicationSectionStatusChoice.UNALLOCATED.value),
             ),
             models.When(

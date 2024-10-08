@@ -2,30 +2,31 @@ from graphene_django_extensions import CreateMutation, UpdateMutation
 
 from .permissions import RecurringReservationPermission
 from .serializers import (
-    RecurringReservationCreateSerializer,
-    RecurringReservationUpdateSerializer,
-    ReservationSeriesSerializer,
+    ReservationSeriesCreateSerializer,
+    ReservationSeriesRescheduleSerializer,
+    ReservationSeriesUpdateSerializer,
 )
 
 __all__ = [
-    "RecurringReservationCreateMutation",
-    "RecurringReservationUpdateMutation",
+    "ReservationSeriesCreateMutation",
+    "ReservationSeriesRescheduleMutation",
+    "ReservationSeriesUpdateMutation",
 ]
 
 
 class ReservationSeriesCreateMutation(CreateMutation):
     class Meta:
-        serializer_class = ReservationSeriesSerializer
+        serializer_class = ReservationSeriesCreateSerializer
         permission_classes = [RecurringReservationPermission]
 
 
-class RecurringReservationCreateMutation(CreateMutation):
+class ReservationSeriesUpdateMutation(UpdateMutation):
     class Meta:
-        serializer_class = RecurringReservationCreateSerializer
+        serializer_class = ReservationSeriesUpdateSerializer
         permission_classes = [RecurringReservationPermission]
 
 
-class RecurringReservationUpdateMutation(UpdateMutation):
+class ReservationSeriesRescheduleMutation(UpdateMutation):
     class Meta:
-        serializer_class = RecurringReservationUpdateSerializer
+        serializer_class = ReservationSeriesRescheduleSerializer
         permission_classes = [RecurringReservationPermission]

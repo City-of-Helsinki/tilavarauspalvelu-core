@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 from django.db import models
 from django.db.models import Manager
-from django.db.models.functions import Concat, Now
+from django.db.models.functions import Concat
 from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L, lookup_property
@@ -16,6 +16,7 @@ from tilavarauspalvelu.enums import (
     ApplicationSectionStatusChoice,
     ApplicationStatusChoice,
 )
+from utils.db import NowTT
 from utils.fields.model import StrChoiceField
 
 from .queryset import ApplicationQuerySet
@@ -137,7 +138,7 @@ class Application(SerializableMixin, models.Model):
                     # NOTE: Some copy-pasta from Application Round status for efficiency
                     & models.Q(application_round__sent_date__isnull=True)
                     & models.Q(application_round__handled_date__isnull=True)
-                    & models.Q(application_round__application_period_end__gt=Now())
+                    & models.Q(application_round__application_period_end__gt=NowTT())
                 ),
                 then=models.Value(ApplicationStatusChoice.DRAFT.value),
             ),
@@ -160,7 +161,7 @@ class Application(SerializableMixin, models.Model):
             ),
             models.When(
                 # If the application round application period has not ended
-                models.Q(application_round__application_period_end__gt=Now()),
+                models.Q(application_round__application_period_end__gt=NowTT()),
                 then=models.Value(ApplicationStatusChoice.RECEIVED.value),
             ),
             models.When(

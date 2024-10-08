@@ -8,7 +8,6 @@ from django.db import models
 from easy_thumbnails.fields import ThumbnailerImageField
 
 from tilavarauspalvelu.enums import ReservationUnitImageType
-from tilavarauspalvelu.tasks import update_urls
 
 from .queryset import ReservationUnitImageQuerySet
 
@@ -48,8 +47,10 @@ class ReservationUnitImage(models.Model):
         return f"{self.reservation_unit.name} ({self.get_image_type_display()})"
 
     def save(self, *args: Any, **kwargs: Any) -> None:
-        run_update_urls = bool(kwargs.pop("update_urls", True))
+        from tilavarauspalvelu.tasks import update_urls
         from tilavarauspalvelu.utils.image_purge import purge_previous_image_cache
+
+        run_update_urls = bool(kwargs.pop("update_urls", True))
 
         purge_previous_image_cache(self)
         super().save(*args, **kwargs)

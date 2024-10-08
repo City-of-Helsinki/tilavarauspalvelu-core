@@ -39,8 +39,6 @@ from .mutations import (
     EquipmentUpdateMutation,
     PurposeCreateMutation,
     PurposeUpdateMutation,
-    RecurringReservationCreateMutation,
-    RecurringReservationUpdateMutation,
     RefreshOrderMutation,
     RejectAllApplicationOptionsMutation,
     RejectAllSectionOptionsMutation,
@@ -54,6 +52,8 @@ from .mutations import (
     ReservationRefundMutation,
     ReservationRequiresHandlingMutation,
     ReservationSeriesCreateMutation,
+    ReservationSeriesRescheduleMutation,
+    ReservationSeriesUpdateMutation,
     ReservationStaffAdjustTimeMutation,
     ReservationStaffCreateMutation,
     ReservationStaffModifyMutation,
@@ -340,8 +340,8 @@ class Mutation(graphene.ObjectType):
     staff_adjust_reservation_time = ReservationStaffAdjustTimeMutation.Field()
     staff_reservation_modify = ReservationStaffModifyMutation.Field()
     create_reservation_series = ReservationSeriesCreateMutation.Field()
-    create_recurring_reservation = RecurringReservationCreateMutation.Field()
-    update_recurring_reservation = RecurringReservationUpdateMutation.Field()
+    update_reservation_series = ReservationSeriesUpdateMutation.Field()
+    reschedule_reservation_series = ReservationSeriesRescheduleMutation.Field()
     refresh_order = RefreshOrderMutation.Field()
     #
     # User
