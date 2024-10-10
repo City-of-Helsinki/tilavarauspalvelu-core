@@ -3,7 +3,6 @@
   "maxPersons": "Maximum permitted number of persons",
   "address": "Address",
   "maxDuration": "Duration",
-  "price": "Price",
   "billableHours": "Chargeable hours",
   "mapTitle": "Service Map - location",
   "linkMap": "Open map in a new window",

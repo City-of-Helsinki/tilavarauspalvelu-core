@@ -224,7 +224,7 @@ export function QuickReservation({
         <Price data-testid="quick-reservation-price">
           {focusSlot?.isReservable && (
             <>
-              {t("reservationUnit:price")}: <PriceValue>{price}</PriceValue>
+              {t("common:price")}: <PriceValue>{price}</PriceValue>
               {!isFreeOfCharge && subventionSuffix}
             </>
           )}

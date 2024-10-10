@@ -202,7 +202,7 @@ export function ReservationInfoCard({
           </Strong>
         </Value>
         <Value data-testid="reservation__reservation-info-card__price">
-          {t("reservationUnit:price")}: <Strong>{price}</Strong>{" "}
+          {t("common:price")}: <Strong>{price}</Strong>{" "}
           {taxPercentageValue &&
             shouldDisplayTaxPercentage &&
             `(${t("common:inclTax", {

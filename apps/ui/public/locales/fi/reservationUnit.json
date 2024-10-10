@@ -3,7 +3,6 @@
   "maxPersons": "Suurin sallittu henkilömäärä",
   "address": "Osoite",
   "maxDuration": "Varauksen kesto",
-  "price": "Hinta",
   "billableHours": "Maksulliset tunnit",
   "mapTitle": "Palvelukartta - sijainti",
   "linkMap": "Avaa kartta uuteen ikkunaan",

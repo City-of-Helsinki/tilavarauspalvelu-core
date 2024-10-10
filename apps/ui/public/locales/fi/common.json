@@ -86,6 +86,7 @@
     "postCode": "Postinumero",
     "city": "Postitoimipaikka"
   },
+  "price": "Hinta",
   "location": "Sijainti",
   "phone": "Puhelin",
   "email": "Sähköposti",
@@ -97,6 +98,7 @@
   "seeDetails": "Katso tiedot",
   "minimum": "Vähintään",
   "maximum": "Enintään",
+  "show": "Näytä",
   "showMore": "Näytä lisää",
   "showLess": "Näytä vähemmän",
   "showAll": "Näytä kaikki",

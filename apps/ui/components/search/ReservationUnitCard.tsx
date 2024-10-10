@@ -111,10 +111,10 @@ export function ReservationUnitCard({
       target="_blank"
       rel="noopener noreferrer"
       data-testid="reservation-unit-card__button--link"
-      key={t("reservationUnitCard:seeMore")}
+      key="show"
     >
       <IconLinkExternal aria-hidden />
-      {t("reservationUnitCard:seeMore")}
+      {t("common:show")}
     </ButtonLikeLink>
   );
 

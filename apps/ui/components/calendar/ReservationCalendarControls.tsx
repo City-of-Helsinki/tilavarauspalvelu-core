@@ -267,7 +267,7 @@ function TogglerLabelContent({
     <>
       <TogglerDate>{togglerLabel}</TogglerDate>
       <TogglerPrice>
-        {t("reservationUnit:price")}: {price}
+        {t("common:price")}: {price}
       </TogglerPrice>
     </>
   );
@@ -409,7 +409,7 @@ export function ReservationCalendarControls({
               <PriceWrapper>
                 {focusSlot.isReservable && (
                   <>
-                    <label htmlFor="price">{t("reservationUnit:price")}</label>
+                    <label htmlFor="price">{t("common:price")}</label>
                     <Price id="price" data-testid="reservation__price--value">
                       {price}
                     </Price>

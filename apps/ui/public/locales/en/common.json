@@ -86,6 +86,7 @@
     "postCode": "Postal code",
     "city": "City"
   },
+  "price": "Price",
   "location": "Location",
   "phone": "Telephone",
   "email": "Email",
@@ -97,6 +98,7 @@
   "seeDetails": "See details",
   "minimum": "At least",
   "maximum": "At most",
+  "show": "Show",
   "showMore": "Show more",
   "showLess": "Show less",
   "showAll": "Show all",

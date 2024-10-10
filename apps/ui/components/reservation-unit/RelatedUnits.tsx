@@ -134,7 +134,7 @@ function RelatedUnitCard({
       href={getReservationUnitPath(reservationUnit.pk)}
       key={reservationUnit.pk ?? 0}
     >
-      {t("reservationUnitCard:seeMore")}
+      {t("common:show")}
       <IconArrowRight aria-hidden="true" />
     </ButtonLikeLink>,
   ];

@@ -86,6 +86,7 @@
     "postCode": "Postnummer",
     "city": "Postanstalt"
   },
+  "price": "Pris",
   "location": "Läge",
   "phone": "Telefon",
   "email": "E-post",
@@ -97,6 +98,7 @@
   "seeDetails": "Se uppgifterna",
   "minimum": "Minst",
   "maximum": "Upp till",
+  "show": "Visa",
   "showMore": "Visa mer",
   "showLess": "Visa mindre",
   "showAll": "Visa allt",

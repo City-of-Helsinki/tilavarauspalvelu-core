@@ -308,7 +308,7 @@ export function SingleSearchForm({
             options={equipmentsOptions}
             label={t("searchForm:equipmentsFilter")}
           />
-          <SingleLabelRangeWrapper label={t("searchForm:dateFilter")}>
+          <SingleLabelRangeWrapper label={t("common:dateLabel")}>
             <DateRangePicker
               startDate={fromUIDate(String(getValues("startDate")))}
               endDate={fromUIDate(String(getValues("endDate")))}
@@ -334,13 +334,13 @@ export function SingleSearchForm({
               }}
             />
           </SingleLabelRangeWrapper>
-          <SingleLabelRangeWrapper label={t("searchForm:timeFilter")}>
+          <SingleLabelRangeWrapper label={t("common:timeLabel")}>
             <TimeRangePicker
               control={control}
               names={{ begin: "timeBegin", end: "timeEnd" }}
               labels={{
-                begin: `${t("searchForm:timeFilter")}: ${t("common:beginLabel")}`,
-                end: `${t("searchForm:timeFilter")}: ${t("common:endLabel")}`,
+                begin: `${t("common:time")}: ${t("common:beginLabel")}`,
+                end: `${t("common:time")}: ${t("common:endLabel")}`,
               }}
               placeholders={{
                 begin: t("common:beginLabel"),
