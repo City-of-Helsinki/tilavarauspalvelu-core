@@ -21,9 +21,29 @@ const StyledContent = styled.div`
 `;
 
 const config = {
-  allowedTags: ["p", "strong", "a", "br"],
+  allowedTags: [
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "p",
+    "br",
+    "div",
+    "span",
+    "ol",
+    "ul",
+    "li",
+    "strong",
+    "em",
+    "u",
+    "a",
+    "pre",
+  ],
   allowedAttributes: {
     a: ["href", "target", "rel"],
+    "*": ["style"],
   },
 };
 
