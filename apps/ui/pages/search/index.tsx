@@ -3,7 +3,6 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import type { GetServerSidePropsContext } from "next";
 import { Notification } from "hds-react";
-import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { H2 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
@@ -22,7 +21,6 @@ import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
 import { SeasonalSearchForm } from "@/components/search/SeasonalSearchForm";
 import { HeroSubheading } from "@/modules/style/typography";
-import Sorting from "@/components/form/Sorting";
 import { createApolloClient } from "@/modules/apolloClient";
 import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 import { ReservationUnitCard } from "@/components/search/ReservationUnitCard";
@@ -34,6 +32,7 @@ import { getSearchOptions, processVariables } from "@/modules/search";
 import { useSearchValues } from "@/hooks/useSearchValues";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { useSearchQuery } from "@/hooks/useSearchQuery";
+import { SortingComponent } from "@/components/SortingComponent";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
@@ -108,14 +107,6 @@ const BottomWrapper = styled(Container)`
   padding-top: var(--spacing-l);
 `;
 
-const StyledSorting = styled(Sorting)`
-  display: block;
-
-  @media (width > 420px) {
-    display: flex;
-  }
-`;
-
 function SeasonalSearch({
   data: initialData,
   applicationRounds,
@@ -138,7 +129,6 @@ function SeasonalSearch({
   } = useReservationUnitsList(selectedApplicationRound);
 
   const { t, i18n } = useTranslation();
-  const router = useRouter();
 
   const variables = processVariables(
     searchValues,
@@ -158,23 +148,6 @@ function SeasonalSearch({
     value: applicationRound.pk ?? 0,
     label: getApplicationRoundName(applicationRound),
   }));
-
-  const sortingOptions = [
-    {
-      label: t("search:sorting.label.name"),
-      value: "name",
-    },
-    {
-      label: t("search:sorting.label.type"),
-      value: "typeRank",
-    },
-    {
-      label: t("search:sorting.label.unit"),
-      value: "unitName",
-    },
-  ];
-
-  const isOrderingAsc = searchValues.order !== "desc";
 
   return (
     <Wrapper>
@@ -212,32 +185,7 @@ function SeasonalSearch({
           hasMoreData={query.hasMoreData}
           pageInfo={pageInfo}
           fetchMore={(cursor) => fetchMore(cursor)}
-          sortingComponent={
-            <StyledSorting
-              // TODO these should be gotten from a hook function (set / get)
-              value={
-                searchValues.sort != null && !Array.isArray(searchValues.sort)
-                  ? searchValues.sort
-                  : "name"
-              }
-              sortingOptions={sortingOptions}
-              setSorting={(val) => {
-                const params = {
-                  ...searchValues,
-                  sort: val.value,
-                };
-                router.replace({ query: params });
-              }}
-              isOrderingAsc={isOrderingAsc}
-              setIsOrderingAsc={(isAsc: boolean) => {
-                const params = {
-                  ...searchValues,
-                  order: isAsc ? "asc" : "desc",
-                };
-                router.replace({ query: params });
-              }}
-            />
-          }
+          sortingComponent={<SortingComponent />}
         />
         <StartApplicationBar
           count={selectedReservationUnits.length}

@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from "react";
 import { useTranslation } from "next-i18next";
 import type { GetServerSidePropsContext } from "next";
 import styled from "styled-components";
-import { useRouter } from "next/router";
 import { Notification } from "hds-react";
 import { useMedia } from "react-use";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -18,7 +17,6 @@ import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
 import { isBrowser } from "@/modules/const";
 import { SingleSearchForm } from "@/components/search/SingleSearchForm";
-import Sorting from "@/components/form/Sorting";
 import { ListWithPagination } from "@/components/common/ListWithPagination";
 import ReservationUnitCard from "@/components/search/SingleSearchReservationUnitCard";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
@@ -26,6 +24,7 @@ import { createApolloClient } from "@/modules/apolloClient";
 import { getSearchOptions, processVariables } from "@/modules/search";
 import { useSearchValues } from "@/hooks/useSearchValues";
 import { useSearchQuery } from "@/hooks/useSearchQuery";
+import { SortingComponent } from "@/components/SortingComponent";
 
 const Wrapper = styled.div`
   padding-bottom: var(--spacing-layout-l);
@@ -47,22 +46,10 @@ const Heading = styled(H2).attrs({ as: "h1" })``;
 
 const BottomWrapper = styled(Container)`
   padding-top: var(--spacing-l);
-  > div > :first-child {
-    padding: var(--spacing-m);
-    background-color: var(--color-black-5);
-  }
   [class*="ListContainer"] {
     display: flex;
     flex-flow: column nowrap;
     gap: var(--spacing-m);
-  }
-`;
-
-const StyledSorting = styled(Sorting)`
-  display: block;
-
-  @media (width > 420px) {
-    display: flex;
   }
 `;
 
@@ -106,21 +93,6 @@ function SearchSingle({
 }: Props): JSX.Element {
   const { t, i18n } = useTranslation();
 
-  const sortingOptions = [
-    {
-      label: t("search:sorting.label.name"),
-      value: "name",
-    },
-    {
-      label: t("search:sorting.label.type"),
-      value: "typeRank",
-    },
-    {
-      label: t("search:sorting.label.unit"),
-      value: "unitName",
-    },
-  ];
-
   const searchValues = useSearchValues();
 
   const vars = processVariables(
@@ -138,7 +110,6 @@ function SearchSingle({
   const pageInfo = currData?.reservationUnits?.pageInfo;
 
   const content = useRef<HTMLElement>(null);
-  const router = useRouter();
 
   // TODO this is hackish, but the purpose is to scroll to the list (esp on mobile)
   // if the search options were selected on the front page already (and the search is automatic).
@@ -158,8 +129,6 @@ function SearchSingle({
       });
     }
   }, [content?.current?.offsetTop, currData?.reservationUnits, isMobile]);
-
-  const isOrderingAsc = searchValues.order !== "desc";
 
   return (
     <Wrapper>
@@ -190,32 +159,7 @@ function SearchSingle({
             pageInfo={pageInfo}
             hasMoreData={query.hasMoreData}
             fetchMore={(cursor) => fetchMore(cursor)}
-            sortingComponent={
-              <StyledSorting
-                // TODO these should be gotten from a hook function (set / get)
-                value={
-                  searchValues.sort != null && !Array.isArray(searchValues.sort)
-                    ? searchValues.sort
-                    : "name"
-                }
-                sortingOptions={sortingOptions}
-                setSorting={(val) => {
-                  const params = {
-                    ...searchValues,
-                    sort: val.value,
-                  };
-                  router.replace({ query: params });
-                }}
-                isOrderingAsc={isOrderingAsc}
-                setIsOrderingAsc={(isAsc: boolean) => {
-                  const params = {
-                    ...searchValues,
-                    order: isAsc ? "asc" : "desc",
-                  };
-                  router.replace({ query: params });
-                }}
-              />
-            }
+            sortingComponent={<SortingComponent />}
           />
         </BottomWrapper>
       </section>

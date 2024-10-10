@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { IconSortAscending, IconSortDescending, Select } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { fontMedium } from "common/src/common/typography";
+import { breakpoints } from "common";
 
 type OptionType = {
   label: string;
@@ -20,18 +21,11 @@ type Props = {
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-m);
+  gap: var(--spacing-xs);
 
   label {
     ${fontMedium};
   }
-`;
-
-const LeftBlock = styled.div`
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
 `;
 
 const OrderBtn = styled.button`
@@ -48,47 +42,48 @@ const OrderBtn = styled.button`
 
 const StyledSelect = styled(Select<OptionType>)`
   min-width: 230px;
+  flex-grow: 1;
+  @media (min-width: ${breakpoints.s}) {
+    padding-left: var(--spacing-s);
+    flex-grow: 0;
+  }
 `;
 
-const Sorting = ({
+export function Sorting({
   value,
   sortingOptions,
   setSorting,
   isOrderingAsc,
   setIsOrderingAsc,
   className,
-}: Props): JSX.Element => {
+}: Props): JSX.Element {
   const { t } = useTranslation();
 
   return (
     <Wrapper className={className}>
-      <LeftBlock>
-        <OrderBtn
-          type="button"
-          onClick={() => setIsOrderingAsc(!isOrderingAsc)}
-          aria-label={t(
-            `search:sorting.action.${
-              isOrderingAsc ? "descending" : "ascending"
-            }`
-          )}
-          data-testid="sorting-button"
-        >
-          {isOrderingAsc ? (
-            <IconSortAscending
-              size="m"
-              aria-label={t("search:sorting.ascendingLabel")}
-            />
-          ) : (
-            <IconSortDescending
-              size="m"
-              aria-label={t("search:sorting.descendingLabel")}
-            />
-          )}
-        </OrderBtn>
-        <label htmlFor="search-form__button--sorting-toggle-button">
-          {t("searchResultList:sortButtonLabel")}:
-        </label>
-      </LeftBlock>
+      <OrderBtn
+        type="button"
+        onClick={() => setIsOrderingAsc(!isOrderingAsc)}
+        aria-label={t(
+          `search:sorting.action.${isOrderingAsc ? "descending" : "ascending"}`
+        )}
+        data-testid="sorting-button"
+      >
+        {isOrderingAsc ? (
+          <IconSortAscending
+            size="m"
+            aria-label={t("search:sorting.ascendingLabel")}
+          />
+        ) : (
+          <IconSortDescending
+            size="m"
+            aria-label={t("search:sorting.descendingLabel")}
+          />
+        )}
+      </OrderBtn>
+      <label htmlFor="search-form__button--sorting-toggle-button">
+        {t("searchResultList:sortButtonLabel")}:
+      </label>
       <StyledSelect
         label=""
         id="search-form__button--sorting"
@@ -98,7 +93,4 @@ const Sorting = ({
       />
     </Wrapper>
   );
-};
-
-export default Sorting;
-export type SortingProps = Props;
+}
