@@ -13,7 +13,7 @@ type LinkT = {
 export type Props = {
   id?: string;
   heading: string;
-  body?: string | JSX.Element;
+  body: JSX.Element;
   links?: LinkT[];
   acceptLabel?: string;
   accepted?: boolean;
@@ -105,8 +105,9 @@ const TermsBox = ({
   return (
     <Wrapper {...rest} id={id}>
       <Content>
+        {/* FIXME this is wrong it's hard coded to h6 */}
         <Heading>{heading}</Heading>
-        <p>{body}</p>
+        {body}
         {links && links?.length > 0 && (
           <LinkList>
             {links.map((link) => (

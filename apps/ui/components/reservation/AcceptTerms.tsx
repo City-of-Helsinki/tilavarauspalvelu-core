@@ -76,7 +76,9 @@ export function AcceptTerms({
         body={
           serviceSpecificTerms != null ? (
             <Sanitize html={getTranslation(serviceSpecificTerms, "text")} />
-          ) : undefined
+          ) : (
+            <span />
+          )
         }
         links={[
           {

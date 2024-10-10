@@ -2,11 +2,13 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import * as React from "react";
 import TermsBox, { Props } from "../TermsBox";
 
+const bodyText = `Excepteur ut veniam minim id. Veniam laboris laborum cupidatat nisi sunt est magna id voluptate. Ullamco elit do tempor et dolore. Sit dolore laborum excepteur laborum qui eiusmod. Nisi proident officia labore sunt sit labore. Non aute ut exercitation elit sint. Aute irure reprehenderit reprehenderit amet sunt velit irure voluptate.`;
+
 const defaultProps = {
   id: "testing",
   heading:
     "A heading with somewhat long text that might wrap to multiple lines",
-  body: `Excepteur ut veniam minim id. Veniam laboris laborum cupidatat nisi sunt est magna id voluptate. Ullamco elit do tempor et dolore. Sit dolore laborum excepteur laborum qui eiusmod. Nisi proident officia labore sunt sit labore. Non aute ut exercitation elit sint. Aute irure reprehenderit reprehenderit amet sunt velit irure voluptate.`,
+  body: <span>{bodyText}</span>,
   links: [
     { href: "https://www.google.com", text: "Google" },
     { href: "https://www.hel.fi", text: "Helsinki" },
@@ -29,7 +31,7 @@ describe("TermsBox", () => {
 
     expect(screen.getByText(defaultProps.heading)).toBeInTheDocument();
 
-    expect(screen.getByText(defaultProps.body)).toBeInTheDocument();
+    expect(screen.getByText(bodyText)).toBeInTheDocument();
 
     expect(link1).toBeInTheDocument();
     expect(link1).toHaveAttribute("href", defaultProps.links[0].href);
@@ -54,9 +56,7 @@ describe("TermsBox", () => {
     renderComponent({ links: undefined });
 
     expect(screen.getByText(defaultProps.heading)).toBeInTheDocument();
-
-    expect(screen.getByText(defaultProps.body)).toBeInTheDocument();
-
+    expect(screen.getByText(bodyText)).toBeInTheDocument();
     expect(screen.getByText(defaultProps.acceptLabel)).toBeInTheDocument();
   });
 
