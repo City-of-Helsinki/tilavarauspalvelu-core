@@ -6,8 +6,8 @@
 
 {% block content_main %}
     <mj-text>{{ textReservationNeedsToBePaid }}</mj-text>
-    {% include "email/html/partials/reservation_basic_info.jinja" %}#}
-    {% include "email/html/partials/reservation_price.jinja" %}#}
+    {% include "email/html/partials/reservation_basic_info.jinja" %}
+    {% include "email/html/partials/reservation_price.jinja" %}
 
     <mj-text>{{ paymentDue }}: <b>{{ payment_due_date }}</b></mj-text>
     <mj-spacer />
