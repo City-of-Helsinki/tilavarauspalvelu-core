@@ -60,10 +60,13 @@ class ReservationActions:
 
     def _get_ical_timezone(self) -> Timezone:
         """Adds timezone information to the ical calendar event."""
+        # Note: This assumes that the ical Event is created in 'Europe/Helsinki' timezone.
         timezone = Timezone()
         timezone.add(TimezoneProperty.TZID, settings.TIME_ZONE)
 
-        # Taken from outlook generated iCal files
+        # Taken from outlook generated 'ical' files.
+        # These assumptions are valid for timezone which observe European Summer Time
+        # as currently defined (EU directive 2000/84/EC).
         standard_start = datetime.datetime(1601, 10, 28, 4, 0, 0)
         daylight_start = datetime.datetime(1601, 3, 25, 3, 0, 0)
 
