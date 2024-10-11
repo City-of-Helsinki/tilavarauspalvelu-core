@@ -4,11 +4,11 @@ import datetime
 from typing import TYPE_CHECKING
 
 from django.conf import settings
-from django.utils.translation import gettext_lazy as _
-from django.utils.translation import pgettext_lazy
+from django.utils.translation import pgettext
 from icalendar import Calendar, Event, Timezone, TimezoneDaylight, TimezoneStandard
 
 from tilavarauspalvelu.enums import CalendarProperty, EventProperty, TimezoneProperty, TimezoneRuleProperty
+from tilavarauspalvelu.translation import get_translated
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.utils import get_attr_by_language
 
@@ -117,18 +117,20 @@ class ReservationActions:
 
         return ical_event
 
+    @get_translated
     def get_ical_summary(self, *, language: Lang = "fi") -> str:
         unit: Unit = self.reservation.reservation_unit.first().unit
         unit_name = get_attr_by_language(unit, "name", language)
-        return _("Reservation for %(name)s") % {"name": unit_name}
+        return pgettext("ICAL", "Reservation for %(name)s") % {"name": unit_name}
 
+    @get_translated
     def get_ical_description(self, *, site_name: str, language: Lang = "fi") -> str:
         reservation_unit: ReservationUnit = self.reservation.reservation_unit.first()
         unit: Unit = reservation_unit.unit
         begin = self.reservation.begin.astimezone(DEFAULT_TIMEZONE)
         end = self.reservation.end.astimezone(DEFAULT_TIMEZONE)
 
-        title = _("Booking details")
+        title = pgettext("ICAL", "Booking details")
         reservation_unit_name = get_attr_by_language(reservation_unit, "name", language)
         unit_name = get_attr_by_language(unit, "name", language)
         location = self.get_location()
@@ -137,18 +139,19 @@ class ReservationActions:
         start_time = begin.time().strftime("%H:%M")
         end_date = end.date().strftime("%d.%m.%Y")
         end_time = end.time().strftime("%H:%M")
-        time_delimiter = "klo" if language == "fi" else "kl." if language == "sv" else "at"
+        time_delimiter = pgettext("ICAL", "at")
         if language == "sv":
             site_name += "/sv"
         elif language == "en":
             site_name += "/en"
-        from_ = pgettext_lazy("ical", "From")
-        to_ = pgettext_lazy("ical", "To")
-        footer = _(
+        from_ = pgettext("ICAL", "From")
+        to_ = pgettext("ICAL", "To")
+        footer = pgettext(
+            "ICAL",
             "Manage your booking at Varaamo. You can check the details of your booking and Varaamo's "
-            "terms of contract and cancellation on the '%(bookings)s' page."
+            "terms of contract and cancellation on the '%(bookings)s' page.",
         ) % {
-            "bookings": f"<a href='{site_name}/reservations'>" + _("My bookings") + "</a>",
+            "bookings": f"<a href='{site_name}/reservations'>" + pgettext("ICAL", "My bookings") + "</a>",
         }
 
         return (

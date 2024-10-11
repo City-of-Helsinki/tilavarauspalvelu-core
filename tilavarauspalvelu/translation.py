@@ -1,40 +1,53 @@
 from __future__ import annotations
 
+from functools import wraps
+from typing import TYPE_CHECKING, ParamSpec, TypeVar
+
+from django.conf import settings
+from django.utils import translation
 from modeltranslation.decorators import register
 from modeltranslation.translator import TranslationOptions
 
 from .models import (
     AbilityGroup,
+    Address,
+    ApplicationRound,
+    BannerNotification,
+    Building,
+    City,
+    EmailTemplate,
+    Equipment,
+    EquipmentCategory,
+    Keyword,
+    KeywordCategory,
+    KeywordGroup,
+    Location,
+    Organisation,
+    Purpose,
+    Qualifier,
+    RealEstate,
     ReservationCancelReason,
     ReservationDenyReason,
     ReservationPurpose,
+    ReservationUnit,
+    ReservationUnitCancellationRule,
+    ReservationUnitType,
+    Resource,
     Service,
+    ServiceSector,
+    Space,
     TermsOfUse,
+    Unit,
+    UnitGroup,
 )
-from .models.address.model import Address
-from .models.application_round.model import ApplicationRound
-from .models.banner_notification.model import BannerNotification
-from .models.building.model import Building
-from .models.city.model import City
-from .models.email_template.model import EmailTemplate
-from .models.equipment.model import Equipment
-from .models.equipment_category.model import EquipmentCategory
-from .models.keyword.model import Keyword
-from .models.keyword_category.model import KeywordCategory
-from .models.keyword_group.model import KeywordGroup
-from .models.location.model import Location
-from .models.organisation.model import Organisation
-from .models.purpose.model import Purpose
-from .models.qualifier.model import Qualifier
-from .models.real_estate.model import RealEstate
-from .models.reservation_unit.model import ReservationUnit
-from .models.reservation_unit_cancellation_rule.model import ReservationUnitCancellationRule
-from .models.reservation_unit_type.model import ReservationUnitType
-from .models.resource.model import Resource
-from .models.service_sector.model import ServiceSector
-from .models.space.model import Space
-from .models.unit.model import Unit
-from .models.unit_group.model import UnitGroup
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+
+__all__ = [
+    "get_translated",
+]
 
 
 @register(Service)
@@ -192,3 +205,22 @@ class CityTranslationOptions(TranslationOptions):
 @register(BannerNotification)
 class BannerNotificationTranslationOptions(TranslationOptions):
     fields = ["message"]
+
+
+P = ParamSpec("P")
+R = TypeVar("R")
+
+
+def get_translated(func: Callable[P, R]) -> Callable[P, R]:
+    """
+    Wraps a function so that it's contents are translated using the language
+    in the function's 'language' keyword argument. By default, translations will be made in Finnish.
+    """
+
+    @wraps(func)
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+        language = kwargs.get("language", settings.LANGUAGE_CODE)
+        with translation.override(language=language):
+            return func(*args, **kwargs)
+
+    return wrapper

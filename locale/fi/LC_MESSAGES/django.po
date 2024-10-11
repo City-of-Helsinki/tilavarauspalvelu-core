@@ -2935,25 +2935,33 @@ msgstr "`start_datetime` täytyy olla ennen `end_datetime`."
 
 #: tilavarauspalvelu/models/reservation/actions.py
 #, python-format
+msgctxt "ICAL"
 msgid "Reservation for %(name)s"
 msgstr "Varaus kohteeseen %(name)s"
 
 #: tilavarauspalvelu/models/reservation/actions.py
+msgctxt "ICAL"
 msgid "Booking details"
 msgstr "Varauksen tiedot"
 
 #: tilavarauspalvelu/models/reservation/actions.py
-msgctxt "ical"
+msgctxt "ICAL"
+msgid "at"
+msgstr "klo"
+
+#: tilavarauspalvelu/models/reservation/actions.py
+msgctxt "ICAL"
 msgid "From"
 msgstr "Alkamisaika"
 
 #: tilavarauspalvelu/models/reservation/actions.py
-msgctxt "ical"
+msgctxt "ICAL"
 msgid "To"
 msgstr "Päättymisaika"
 
 #: tilavarauspalvelu/models/reservation/actions.py
 #, python-format
+msgctxt "ICAL"
 msgid ""
 "Manage your booking at Varaamo. You can check the details of your booking "
 "and Varaamo's terms of contract and cancellation on the '%(bookings)s' page."
@@ -2962,6 +2970,7 @@ msgstr ""
 "tiedot sekä Varaamon sopimus- ja peruutusehdot '%(bookings)s' -sivulla."
 
 #: tilavarauspalvelu/models/reservation/actions.py
+msgctxt "ICAL"
 msgid "My bookings"
 msgstr "Omat Varaukset"
 

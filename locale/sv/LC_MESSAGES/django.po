@@ -948,10 +948,8 @@ msgid "Value comes from the Merchant Experience API"
 msgstr ""
 
 #: tilavarauspalvelu/admin/payment_order/admin.py
-#, fuzzy
-#| msgid "Reservation for %(name)s"
 msgid "Reservation"
-msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+msgstr ""
 
 #: tilavarauspalvelu/admin/payment_order/admin.py
 msgid "Remote order ID"
@@ -994,10 +992,8 @@ msgid "Language"
 msgstr ""
 
 #: tilavarauspalvelu/admin/payment_order/admin.py
-#, fuzzy
-#| msgid "Reservation for %(name)s"
 msgid "Reservation user UUID"
-msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+msgstr ""
 
 #: tilavarauspalvelu/admin/payment_order/admin.py
 msgid "Checkout URL"
@@ -1121,10 +1117,8 @@ msgid "Export rows to CSV"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/admin.py
-#, fuzzy
-#| msgid "Reservation for %(name)s"
 msgid "Search by Reservation ID or name"
-msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/admin.py
 #: tilavarauspalvelu/admin/reservation/form.py
@@ -1199,20 +1193,14 @@ msgid "State"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
-#, fuzzy
-#| msgid "Reservation for %(name)s"
 msgid "Reservation type"
-msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
-#, fuzzy
-#| msgid "Booking details"
 msgid "Cancel details"
 msgstr "Uppgifter om bokningen"
 
 #: tilavarauspalvelu/admin/reservation/form.py
-#, fuzzy
-#| msgid "Booking details"
 msgid "Handling details"
 msgstr "Uppgifter om bokningen"
 
@@ -1267,16 +1255,12 @@ msgid "Reservee ID"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
-#, fuzzy
-#| msgid "Reservation for %(name)s"
 msgid "Reservee first name"
-msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
-#, fuzzy
-#| msgid "Reservation for %(name)s"
 msgid "Reservee last name"
-msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Reservee email"
@@ -1287,10 +1271,8 @@ msgid "Reservee phone"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
-#, fuzzy
-#| msgid "Reservation for %(name)s"
 msgid "Reservee organisation name"
-msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Reservee address street"
@@ -1325,8 +1307,6 @@ msgid "Billing last name"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
-#, fuzzy
-#| msgid "Booking details"
 msgid "Billing email"
 msgstr "Uppgifter om bokningen"
 
@@ -1399,10 +1379,8 @@ msgid "Reservation begin date and time"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
-#, fuzzy
-#| msgid "Reservation for %(name)s"
 msgid "Reservation end date and time"
-msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
 #: tilavarauspalvelu/admin/reservation_unit/form.py
@@ -1463,10 +1441,8 @@ msgid "Reservee's business or association identity code"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
-#, fuzzy
-#| msgid "Reservation for %(name)s"
 msgid "Reservee's first name"
-msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Reservee's last name"
@@ -1481,10 +1457,8 @@ msgid "Reservee's phone number"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
-#, fuzzy
-#| msgid "Reservation for %(name)s"
 msgid "Reservee's organisation name"
-msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Reservee's street address"
@@ -2893,25 +2867,33 @@ msgstr ""
 
 #: tilavarauspalvelu/models/reservation/actions.py
 #, python-format
+msgctxt "ICAL"
 msgid "Reservation for %(name)s"
-msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+msgstr "Bokning för %(name)s"
 
 #: tilavarauspalvelu/models/reservation/actions.py
+msgctxt "ICAL"
 msgid "Booking details"
 msgstr "Uppgifter om bokningen"
 
 #: tilavarauspalvelu/models/reservation/actions.py
-msgctxt "ical"
+msgctxt "ICAL"
+msgid "at"
+msgstr "kl."
+
+#: tilavarauspalvelu/models/reservation/actions.py
+msgctxt "ICAL"
 msgid "From"
 msgstr "Börjar"
 
 #: tilavarauspalvelu/models/reservation/actions.py
-msgctxt "ical"
+msgctxt "ICAL"
 msgid "To"
 msgstr "Slutar"
 
 #: tilavarauspalvelu/models/reservation/actions.py
 #, python-format
+msgctxt "ICAL"
 msgid ""
 "Manage your booking at Varaamo. You can check the details of your booking "
 "and Varaamo's terms of contract and cancellation on the '%(bookings)s' page."
@@ -2920,6 +2902,7 @@ msgstr ""
 "bokning samt Varaamos avtals- och avbokningsvillkor på sidan '%(bookings)s'."
 
 #: tilavarauspalvelu/models/reservation/actions.py
+msgctxt "ICAL"
 msgid "My bookings"
 msgstr "Mina bokningar"
 
@@ -2936,22 +2919,16 @@ msgid "Reservation metadata fields"
 msgstr ""
 
 #: tilavarauspalvelu/models/reservation_metadata_set/model.py
-#, fuzzy
-#| msgid "Reservation for %(name)s"
 msgid "Reservation metadata sets"
-msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+msgstr ""
 
 #: tilavarauspalvelu/models/reservation_unit/model.py
-#, fuzzy
-#| msgid "Reservation for %(name)s"
 msgid "Reservation Unit"
-msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+msgstr ""
 
 #: tilavarauspalvelu/models/reservation_unit/model.py
-#, fuzzy
-#| msgid "Reservation for %(name)s"
 msgid "Reservation Units"
-msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+msgstr ""
 
 #: tilavarauspalvelu/models/reservation_unit_hierarchy/model.py
 msgid "reservation unit hierarchy"
@@ -3016,10 +2993,8 @@ msgid "Preferred UI language"
 msgstr ""
 
 #: tilavarauspalvelu/models/user/model.py
-#, fuzzy
-#| msgid "Reservation for %(name)s"
 msgid "Reservation notification"
-msgstr "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+msgstr ""
 
 #: tilavarauspalvelu/models/user/model.py
 msgid "Date of birth"
