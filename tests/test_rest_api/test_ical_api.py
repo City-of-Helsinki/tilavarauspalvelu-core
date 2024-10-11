@@ -79,8 +79,29 @@ def test_reservation_ical(api_client, settings):
     assert str(calendar["VERSION"]) == "2.0"
     assert str(calendar["PRODID"]) == "-//Helsinki City//NONSGML Varaamo//FI"
 
-    assert len(calendar.subcomponents) == 1
-    event = calendar.subcomponents[0]
+    assert len(calendar.subcomponents) == 2
+
+    timezone = calendar.subcomponents[0]
+    assert timezone.name == "VTIMEZONE"
+
+    assert str(timezone["TZID"]) == "Europe/Helsinki"
+    assert len(timezone.subcomponents) == 2
+
+    standard = timezone.subcomponents[0]
+    assert standard.name == "STANDARD"
+    assert str(standard["DTSTART"].to_ical().decode()) == "16011028T040000"
+    assert str(standard["RRULE"].to_ical().decode()) == "FREQ=YEARLY;BYDAY=-1SU;BYMONTH=10"
+    assert str(standard["TZOFFSETFROM"].to_ical()) == "+0300"
+    assert str(standard["TZOFFSETTO"].to_ical()) == "+0200"
+
+    daylight = timezone.subcomponents[1]
+    assert daylight.name == "DAYLIGHT"
+    assert str(daylight["DTSTART"].to_ical().decode()) == "16010325T030000"
+    assert str(daylight["RRULE"].to_ical().decode()) == "FREQ=YEARLY;BYDAY=-1SU;BYMONTH=3"
+    assert str(daylight["TZOFFSETFROM"].to_ical()) == "+0200"
+    assert str(daylight["TZOFFSETTO"].to_ical()) == "+0300"
+
+    event = calendar.subcomponents[1]
     assert event.name == "VEVENT"
 
     assert str(event["UID"]) == f"varaamo.reservation.{reservation.pk}@https://fake.varaamo.hel.fi"

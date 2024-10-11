@@ -485,6 +485,42 @@ class EventProperty(StrEnum):
     """
 
 
+class TimezoneProperty(StrEnum):
+    TZID = "TZID"  # type: str
+    """
+    The timezone identifier for the time zone of the event.
+    https://datatracker.ietf.org/doc/html/rfc5545#section-3.2.19
+    """
+
+
+class TimezoneRuleProperty(StrEnum):
+    DTSTART = "DTSTART"  # type: int
+    """
+    Date and time after which this timezone rule is in effect.
+    https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.2.4
+    """
+
+    RRULE = "RRULE"  # type: str
+    """
+    Recurrence for the timezone change described by this rule.
+    https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.5.3
+    """
+
+    TZOFFSETFROM = "TZOFFSETFROM"  # type: str
+    """
+    In which timezone offset (e.g. +0200) the event should be considered in
+    before moving to this rule (e.g. from standard to daylight savings time).
+    https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.3.3
+    """
+
+    TZOFFSETTO = "TZOFFSETTO"  # type: str
+    """
+    To which timezone offset (e.g. +0300) the event should be converted to
+    when moving to this rule (e.g. from standard to daylight savings time).
+    https://datatracker.ietf.org/doc/html/rfc5545#section-3.8.3.4
+    """
+
+
 class ReservationUnitPublishingState(models.TextChoices):
     DRAFT = "DRAFT", _("Draft")
     SCHEDULED_PUBLISHING = "SCHEDULED_PUBLISHING", _("Scheduled publishing")
