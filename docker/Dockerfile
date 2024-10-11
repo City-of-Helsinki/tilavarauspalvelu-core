@@ -137,7 +137,7 @@ ENV PATH=$VENV_ROOT/bin:$PATH \
 # Compile translations.
 RUN \
     DJANGO_SETTINGS_ENVIRONMENT="Build" \
-    python manage.py compilemessages -l fi -x "$VENV_ROOT"
+    python manage.py compilemessages -l fi -l sv -x "$VENV_ROOT"
 
 # Expose port for uWSGI.
 EXPOSE 8000
