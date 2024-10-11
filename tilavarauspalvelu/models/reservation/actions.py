@@ -6,9 +6,9 @@ from typing import TYPE_CHECKING
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext_lazy
-from icalendar import Calendar, Event
+from icalendar import Calendar, Event, Timezone, TimezoneDaylight, TimezoneStandard
 
-from tilavarauspalvelu.enums import CalendarProperty, EventProperty
+from tilavarauspalvelu.enums import CalendarProperty, EventProperty, TimezoneProperty, TimezoneRuleProperty
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.utils import get_attr_by_language
 
@@ -43,14 +43,57 @@ class ReservationActions:
         return buffer_time_after
 
     def to_ical(self) -> bytes:
-        site_name = settings.EMAIL_VARAAMO_EXT_LINK
         language: Lang = (  # type: ignore[assignment]
             self.reservation.reservee_language
             or (self.reservation.user is not None and self.reservation.user.get_preferred_language())
             or settings.LANGUAGE_CODE
         )
 
+        cal = Calendar()
+        cal.add(CalendarProperty.VERSION, "2.0")
+        cal.add(CalendarProperty.PRODID, "-//Helsinki City//NONSGML Varaamo//FI")
+
+        cal.add_component(self._get_ical_timezone())
+        cal.add_component(self._get_ical_event(language=language))
+
+        return cal.to_ical()
+
+    def _get_ical_timezone(self) -> Timezone:
+        """Adds timezone information to the ical calendar event."""
+        timezone = Timezone()
+        timezone.add(TimezoneProperty.TZID, settings.TIME_ZONE)
+
+        # Taken from outlook generated iCal files
+        standard_start = datetime.datetime(1601, 10, 28, 4, 0, 0)
+        daylight_start = datetime.datetime(1601, 3, 25, 3, 0, 0)
+
+        standard = TimezoneStandard()
+        standard.add(name=TimezoneRuleProperty.DTSTART, value=standard_start)
+        standard.add(
+            name=TimezoneRuleProperty.RRULE,
+            value={"FREQ": "YEARLY", "BYDAY": "-1SU", "BYMONTH": 10},
+        )
+        standard.add(name=TimezoneRuleProperty.TZOFFSETFROM, value=datetime.timedelta(hours=3))
+        standard.add(name=TimezoneRuleProperty.TZOFFSETTO, value=datetime.timedelta(hours=2))
+
+        daylight = TimezoneDaylight()
+        daylight.add(name=TimezoneRuleProperty.DTSTART, value=daylight_start)
+        daylight.add(
+            name=TimezoneRuleProperty.RRULE,
+            value={"FREQ": "YEARLY", "BYDAY": "-1SU", "BYMONTH": 3},
+        )
+        daylight.add(name=TimezoneRuleProperty.TZOFFSETFROM, value=datetime.timedelta(hours=2))
+        daylight.add(name=TimezoneRuleProperty.TZOFFSETTO, value=datetime.timedelta(hours=3))
+
+        timezone.add_component(standard)
+        timezone.add_component(daylight)
+        return timezone
+
+    def _get_ical_event(self, *, language: Lang) -> Event:
+        """Adds the actual event information to the ical file."""
         ical_event = Event()
+
+        site_name = str(settings.EMAIL_VARAAMO_EXT_LINK).removesuffix("/")
         # This should be unique such that if another iCal file is created
         # for the same reservation, it will be the same as the previous one.
         uid = f"varaamo.reservation.{self.reservation.pk}@{site_name}"
@@ -72,12 +115,7 @@ class ReservationActions:
             if location.coordinates is not None:
                 ical_event.add(name=EventProperty.GEO, value=(location.lat, location.lon))
 
-        cal = Calendar()
-        cal.add(CalendarProperty.VERSION, "2.0")
-        cal.add(CalendarProperty.PRODID, "-//Helsinki City//NONSGML Varaamo//FI")
-
-        cal.add_component(ical_event)
-        return cal.to_ical()
+        return ical_event
 
     def get_ical_summary(self, *, language: Lang = "fi") -> str:
         unit: Unit = self.reservation.reservation_unit.first().unit
