@@ -5,7 +5,6 @@ import {
   IconLinkExternal,
   IconSignout,
 } from "hds-react";
-import { useRouter } from "next/router";
 import { Trans, useTranslation } from "next-i18next";
 import Link from "next/link";
 import styled from "styled-components";
@@ -24,6 +23,7 @@ import { getTranslation, reservationsUrl } from "../../modules/util";
 import { BlackButton } from "../../styles/util";
 import { Paragraph } from "./styles";
 import { reservationUnitPath } from "../../modules/const";
+import { ButtonLikeLink } from "../common/ButtonLikeLink";
 
 type Node = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
@@ -106,7 +106,6 @@ function ReservationConfirmation({
   order,
 }: Props): JSX.Element {
   const { t, i18n } = useTranslation();
-  const router = useRouter();
 
   const reservationUnit = reservation.reservationUnit?.[0];
   const instructionsKey = getReservationUnitInstructionsKey(reservation?.state);
@@ -141,14 +140,16 @@ function ReservationConfirmation({
       </Paragraph>
       {reservation.state === ReservationStateChoice.Confirmed && (
         <ActionContainer1 style={{ marginBottom: "var(--spacing-2-xl)" }}>
-          <BlackButton
+          <ButtonLikeLink
+            size="large"
+            disabled={!reservation.calendarUrl}
             data-testid="reservation__confirmation--button__calendar-url"
-            onClick={() => router.push(String(reservation.calendarUrl))}
-            variant="secondary"
-            iconRight={<IconCalendar aria-hidden />}
+            href={reservation.calendarUrl ?? ""}
+            locale={false}
           >
             {t("reservations:saveToCalendar")}
-          </BlackButton>
+            <IconCalendar aria-hidden />
+          </ButtonLikeLink>
           {order?.receiptUrl && (
             <BlackButton
               data-testid="reservation__confirmation--button__receipt-link"

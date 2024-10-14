@@ -485,6 +485,7 @@ function Reservation({
                   disabled={!reservation.calendarUrl}
                   data-testid="reservation__button--calendar-link"
                   href={reservation.calendarUrl ?? ""}
+                  locale={false}
                 >
                   {t("reservations:saveToCalendar")}
                   <IconCalendar aria-hidden />
