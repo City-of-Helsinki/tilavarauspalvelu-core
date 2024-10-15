@@ -1,8 +1,9 @@
 import pytest
-from graphene_django_extensions.testing import build_mutation
 
 from tests.factories import UserFactory
-from tilavarauspalvelu.enums import ReservationNotification
+from tilavarauspalvelu.enums import Language
+
+from .helpers import UPDATE_MUTATION
 
 # Applied to all tests
 pytestmark = [
@@ -10,27 +11,33 @@ pytestmark = [
 ]
 
 
-UPDATE_MUTATION = build_mutation("updateUser", "UserUpdateMutation")
+def test_user__update__language(graphql):
+    user = UserFactory.create_superuser(preferred_language=Language.EN.value)
 
+    data = {
+        "pk": user.pk,
+        "preferredLanguage": Language.FI.value.upper(),
+    }
 
-def test_user__update(graphql):
-    user = graphql.login_with_superuser()
-
-    data = {"pk": user.pk, "reservationNotification": ReservationNotification.NONE.value.upper()}
+    graphql.force_login(user)
     response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.has_errors is False
     assert response.first_query_object["pk"] == user.pk
 
     user.refresh_from_db()
-    assert user.reservation_notification == ReservationNotification.NONE.value
+    assert user.preferred_language == Language.FI.value
 
 
-def test_user__update__not_self(graphql):
-    user = UserFactory.create_superuser()
-    graphql.login_with_superuser()
+def test_user__update__language_not_available(graphql):
+    user = UserFactory.create_superuser(preferred_language=Language.EN.value)
 
-    data = {"pk": user.pk, "reservationNotification": ReservationNotification.NONE.value.upper()}
+    data = {
+        "pk": user.pk,
+        "preferredLanguage": "UK",
+    }
+
+    graphql.force_login(user)
     response = graphql(UPDATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "No permission to update."
+    assert response.has_schema_errors is True, response
