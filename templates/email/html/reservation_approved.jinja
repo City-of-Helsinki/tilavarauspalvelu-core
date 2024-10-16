@@ -1,7 +1,7 @@
 {% extends "email/html/partials/base.jinja" %}
 
 {% block content_main %}
-    <mj-text>{{ text_reservation_confirmed | sentence | safe }}</mj-text>
+    <mj-text>{{ text_reservation_approved | sentence | safe }}</mj-text>
     {% include "email/html/partials/reservation_basic_info.jinja" %}
     {% include "email/html/partials/reservation_price.jinja" %}
 {% endblock %}

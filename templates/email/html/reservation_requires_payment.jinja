@@ -1,9 +1,13 @@
 {% extends "email/html/partials/base.jinja" %}
 
 {% block content_main %}
-    <mj-text>{{ text_reservation_confirmed | sentence | safe }}</mj-text>
+    <mj-text>{{ text_reservation_requires_payment | sentence | safe }}</mj-text>
     {% include "email/html/partials/reservation_basic_info.jinja" %}
     {% include "email/html/partials/reservation_price.jinja" %}
+
+    <mj-text>{{ payment_due_date_label | safe }}: <b>{{ payment_due_date }}</b></mj-text>
+    <mj-spacer />
+    <mj-text>{{ pay_reservation_link_html | safe }}</mj-text>
 {% endblock %}
 
 {% block content_secondary %}

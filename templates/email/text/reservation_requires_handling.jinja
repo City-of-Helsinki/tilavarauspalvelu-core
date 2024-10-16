@@ -1,15 +1,14 @@
-{{ salutation }} {{ reservee_name }},
+{{ salutation | safe }} {{ email_recipient_name | safe }},
 
-{{ textReservationHandlingRequired }}
+{{ text_reservation_requires_handling | sentence | safe }}
 
 {% include "email/text/partials/reservation_basic_info.jinja" %}
 
 {% include "email/text/partials/reservation_price_range.jinja" %}
 
-{{ pendingNotification }}
+{{ text_pending_notification | sentence | safe }}
 
-{{ reservationInstruction }}
-{{ pending_instructions }}
+{% include "email/text/partials/instructions.jinja" %}
 
 {% include "email/text/partials/reservation_manage_link.jinja" %}
 

@@ -1,6 +1,6 @@
-{{ salutation }}
+{{ salutation | safe }}
 
-{{ applicationInAllocation }} {{ viewApplication }} {{ ownApplicationPage }}: {{ my_applications_ext_link }}
+{{ text_application_in_allocation | safe | sentence }} {{ text_view_application | sentence | safe }}
 
 {% include "email/text/partials/closing_polite.jinja" %}
 
