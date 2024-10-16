@@ -1,24 +1,16 @@
 {% extends "email/html/partials/base.jinja" %}
 
-{% block title %}{{ subjectStaffReservationRequiresHandling }}{% endblock %}
-
-{% block header %}{% include "email/html/partials/header_no_recipient_name.jinja" %}{% endblock %}
-
 {% block content_main %}
-    <mj-text>{{ textStaffReservationRequiresHandling }}: <b>{{ name }}</b></mj-text>
+    <mj-text>{{ text_staff_reservation_requires_handling }}: <b>{{ reservation_name | safe }}</b>.</mj-text>
     <mj-spacer />
-    <mj-text>{{ reserveeName }}: {{ reservee_name }}</mj-text>
-    <mj-text>{{ reservationNumber }}: {{ reservation_number }}</mj-text>
+    <mj-text>{{ reservee_name_label | safe }}: {{ reservee_name | safe }}</mj-text>
+    <mj-text>{{ booking_number_label | safe }}: {{ booking_number }}</mj-text>
     {% include "email/html/partials/reservation_basic_info.jinja" %}
 {% endblock %}
 
 {% block content_secondary %}
-    <mj-text><h2>{{ staffReservationRequiresHandlingCheckDetails }}</h2></mj-text>
-    <mj-text font-size="16px">
-        <a href="{{ staff_reservations_ext_link }}/{{ reservation_number }}">
-            {{ staff_reservations_ext_link }}/{{ reservation_number }}
-        </a>
-    </mj-text>
+    <mj-text><h2>{{ text_check_details | safe }}</h2></mj-text>
+    <mj-text font-size="16px">{{ staff_reservations_ext_link_html | safe }}</mj-text>
 {% endblock %}
 
 {% block content_closing %}

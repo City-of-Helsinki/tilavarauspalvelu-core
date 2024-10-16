@@ -1,13 +1,12 @@
-{{ salutation }} {{ reservee_name }},
+{{ salutation | safe }} {{ email_recipient_name | safe }},
 
-{{ textReservationCancelled }}
-{{ cancellationReason }}: {{ cancel_reason }}
+{{ text_reservation_cancelled | sentence | safe }}
+{{ cancel_reason_label | safe }}: {{ cancel_reason }}
 
 {% include "email/text/partials/reservation_basic_info.jinja" %}
 
 {% include "email/text/partials/reservation_price.jinja" %}
 
-{{ cancellationInstructions }}
-{{ cancelled_instructions }}
+{% include "email/text/partials/instructions.jinja" %}
 
 {% include "email/text/partials/closing.jinja" %}

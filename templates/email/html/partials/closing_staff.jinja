@@ -1,8 +1,10 @@
 <mj-spacer />
 
-<mj-text font-size="16px">{{ withRegards }}</mj-text>
-<mj-text font-size="16px">{{ serviceName }}</mj-text>
+<mj-text font-size="16px">{{ with_regards | safe }}</mj-text>
+<mj-text font-size="16px">{{ service_name | safe }}</mj-text>
 
 <mj-spacer />
 
-<mj-text font-size="16px">{{ automaticMessageDoNotReply }}</mj-text>
+<mj-text font-size="16px">{{ automatic_message_do_not_reply | sentence | safe }}</mj-text>
+
+<mj-spacer height="50px" />

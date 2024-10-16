@@ -1,19 +1,14 @@
 {% extends "email/html/partials/base.jinja" %}
 
-{% block title %}{{ subjectReservationCancelled }}{% endblock %}
-
-{% block header %}{% include "email/html/partials/header.jinja" %}{% endblock %}
-
 {% block content_main %}
-    <mj-text>{{ textReservationCancelled }}</mj-text>
-    <mj-text>{{ cancellationReason }}: {{ cancel_reason }}</mj-text>
+    <mj-text>{{ text_reservation_cancelled | sentence | safe }}</mj-text>
+    <mj-text>{{ cancel_reason_label | safe }}: {{ cancel_reason | safe }}</mj-text>
     {% include "email/html/partials/reservation_basic_info.jinja" %}
     {% include "email/html/partials/reservation_price.jinja" %}
 {% endblock %}
 
 {% block content_secondary %}
-    <mj-text><h2>{{ cancellationInstructions }}</h2></mj-text>
-    <mj-text font-size="16px">{{ cancelled_instructions }}</mj-text>
+    {% include "email/html/partials/instructions.jinja" %}
 {% endblock %}
 
 {% block content_closing %}

@@ -1,6 +1,6 @@
-{{ salutation }}
+{{ salutation | safe }}
 
-{{ applicationReceived }} {{ manageApplication }} {{ ownApplicationPage }} {{ untilApplicationPeriodEnd }}: {{ my_applications_ext_link }}
+{{ text_application_received | sentence | safe }} {{ text_view_application | sentence | safe }}
 
 {% include "email/text/partials/closing_polite.jinja" %}
 

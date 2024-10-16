@@ -1,19 +1,14 @@
 {% extends "email/html/partials/base.jinja" %}
 
-{% block title %}{{ subjectReservationHandlingRequired }}{% endblock %}
-
-{% block header %}{% include "email/html/partials/header.jinja" %}{% endblock %}
-
 {% block content_main %}
-    <mj-text>{{ textReservationHandlingRequired }}</mj-text>
+    <mj-text>{{ text_reservation_requires_handling | sentence | safe }}</mj-text>
     {% include "email/html/partials/reservation_basic_info.jinja" %}
     {% include "email/html/partials/reservation_price_range.jinja" %}
 {% endblock %}
 
 {% block content_secondary %}
-    <mj-text font-size="16px">{{ pendingNotification }}</mj-text>
-    <mj-text><h2>{{ reservationInstruction }}</h2></mj-text>
-    <mj-text font-size="16px">{{ pending_instructions }}</mj-text>
+    <mj-text font-size="16px">{{ text_pending_notification | sentence | safe }}</mj-text>
+    {% include "email/html/partials/instructions.jinja" %}
 {% endblock %}
 
 {% block content_closing %}
