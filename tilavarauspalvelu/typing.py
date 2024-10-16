@@ -17,7 +17,10 @@ if TYPE_CHECKING:
 __all__ = [
     "AffectedTimeSpan",
     "AnyUser",
+    "EmailContext",
+    "EmailData",
     "GQLInfo",
+    "Lang",
     "M2MAction",
     "QueryInfo",
     "SessionMapping",
@@ -34,6 +37,7 @@ class permission(classmethod): ...  # noqa: N801
 type AnyUser = User | AnonymousUser
 type Lang = Literal["fi", "sv", "en"]
 type M2MAction = Literal["pre_add", "post_add", "pre_remove", "post_remove", "pre_clear", "post_clear"]
+type EmailContext = dict[str, str | None]
 
 
 class AffectedTimeSpan(TypedDict):
@@ -79,3 +83,17 @@ class SessionMapping(Protocol):
     def __setitem__(self, key: str, value: Any) -> None: ...
 
     def get(self, key: str, default: Any = None) -> Any: ...
+
+
+class EmailAttachment(TypedDict):
+    filename: str
+    content: str
+    mimetype: str
+
+
+class EmailData(TypedDict):
+    recipients: list[str]
+    subject: str
+    text_content: str
+    html_content: str
+    attachments: list[EmailAttachment]

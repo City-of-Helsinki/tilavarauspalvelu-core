@@ -151,7 +151,7 @@ class ReservationDeleteMutation(DeleteMutation):
         # Verify PaymentOrder status from the webshop
         payment_order: PaymentOrder = reservation.payment_order.first()
         if payment_order and payment_order.remote_id:
-            payment_order.refresh_order_status_from_webshop()
+            payment_order.actions.refresh_order_status_from_webshop()
 
             # If the PaymentOrder is marked as paid, prevent the deletion.
             if payment_order.status == OrderStatus.PAID:
@@ -162,7 +162,7 @@ class ReservationDeleteMutation(DeleteMutation):
                 # Status should be updated if the webshop call errors or the order is successfully cancelled
                 # When the webshop returns any other status than "cancelled", the payment_order status is not updated
                 try:
-                    webshop_order = payment_order.cancel_order_in_webshop()
+                    webshop_order = payment_order.actions.cancel_order_in_webshop()
                     if not webshop_order or webshop_order.status != "cancelled":
                         return
                 except CancelOrderError:

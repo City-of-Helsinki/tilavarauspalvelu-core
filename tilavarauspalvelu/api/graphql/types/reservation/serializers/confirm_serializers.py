@@ -6,9 +6,7 @@ from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from tilavarauspalvelu.api.graphql.types.reservation.serializers.update_serializers import ReservationUpdateSerializer
 from tilavarauspalvelu.enums import Language, OrderStatus, PaymentType, PricingType, ReservationStateChoice
-from tilavarauspalvelu.integrations.email.reservation_email_notification_sender import (
-    ReservationEmailNotificationSender,
-)
+from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import PaymentOrder, Reservation
 from tilavarauspalvelu.utils.reservation_units.reservation_unit_pricing_helper import ReservationUnitPricingHelper
 from tilavarauspalvelu.utils.verkkokauppa.helpers import create_mock_verkkokauppa_order, get_verkkokauppa_order_params
@@ -179,5 +177,13 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
                 )
 
         instance = super().save(**kwargs)
-        ReservationEmailNotificationSender.send_confirmation_email(reservation=instance)
+
+        if instance.state == ReservationStateChoice.CONFIRMED:
+            EmailService.send_reservation_confirmed_email(reservation=instance)
+            EmailService.send_staff_notification_reservation_made_email(reservation=instance)
+
+        elif instance.state == ReservationStateChoice.REQUIRES_HANDLING:
+            EmailService.send_reservation_requires_handling_email(reservation=instance)
+            EmailService.send_staff_notification_reservation_requires_handling_email(reservation=instance)
+
         return instance

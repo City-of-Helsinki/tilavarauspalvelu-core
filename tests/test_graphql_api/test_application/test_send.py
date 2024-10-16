@@ -3,9 +3,7 @@ import pytest
 from tests.factories import ApplicationFactory
 from tests.helpers import patch_method
 from tilavarauspalvelu.enums import ApplicationStatusChoice
-from tilavarauspalvelu.integrations.email.application_email_notification_sender import (
-    ApplicationEmailNotificationSender,
-)
+from tilavarauspalvelu.integrations.email.main import EmailService
 
 from .helpers import SEND_MUTATION
 
@@ -15,7 +13,7 @@ pytestmark = [
 ]
 
 
-@patch_method(ApplicationEmailNotificationSender.send_received_email)
+@patch_method(EmailService.send_application_received_email)
 def test_send_application(graphql):
     # given:
     # - There is a draft application in an open application round with a single application event
@@ -34,7 +32,7 @@ def test_send_application(graphql):
     application.refresh_from_db()
     assert application.sent_date is not None
 
-    assert ApplicationEmailNotificationSender.send_received_email.called is True
+    assert EmailService.send_application_received_email.called is True
 
 
 def test_send_application__no_sections(graphql):

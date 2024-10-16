@@ -8,9 +8,7 @@ from tilavarauspalvelu.api.graphql.extensions.serializers import OldPrimaryKeyUp
 from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from tilavarauspalvelu.api.graphql.types.reservation.serializers.mixins import ReservationSchedulingMixin
 from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
-from tilavarauspalvelu.integrations.email.reservation_email_notification_sender import (
-    ReservationEmailNotificationSender,
-)
+from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import Reservation
 from utils.date_utils import local_datetime
 
@@ -57,9 +55,11 @@ class StaffReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reserv
     def save(self, **kwargs):
         instance = super().save(**kwargs)
 
-        now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
-        if instance.type == ReservationTypeChoice.NORMAL and instance.end > now:
-            ReservationEmailNotificationSender.send_reservation_modified_email(reservation=instance)
+        now = local_datetime()
+        if instance.type == ReservationTypeChoice.NORMAL and now < instance.end.astimezone(DEFAULT_TIMEZONE):
+            EmailService.send_reservation_modified_email(reservation=instance)
+            if instance.state == ReservationStateChoice.REQUIRES_HANDLING:
+                EmailService.send_staff_notification_reservation_requires_handling_email(reservation=instance)
 
         return instance
 

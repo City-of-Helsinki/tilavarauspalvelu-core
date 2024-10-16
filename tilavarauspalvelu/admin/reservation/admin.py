@@ -12,9 +12,7 @@ from more_admin_filters.filters import MultiSelectRelatedOnlyDropdownFilter
 from rangefilter.filters import DateRangeFilterBuilder
 
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
-from tilavarauspalvelu.integrations.email.reservation_email_notification_sender import (
-    ReservationEmailNotificationSender,
-)
+from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import PaymentOrder, Reservation, ReservationDenyReason
 from tilavarauspalvelu.tasks import refund_paid_reservation_task
 from tilavarauspalvelu.typing import WSGIRequest
@@ -283,7 +281,7 @@ class ReservationAdmin(admin.ModelAdmin):
         self.message_user(request, msg, level=messages.INFO)
 
         for reservation in queryset:
-            ReservationEmailNotificationSender.send_deny_email(reservation=reservation)
+            EmailService.send_reservation_rejected_email(reservation=reservation)
 
     @admin.action(description=_("Deny selected reservations without refund"))
     def deny_reservations_without_refund(

@@ -18,30 +18,22 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from easy_thumbnails.exceptions import InvalidImageFormatError
 from elasticsearch_django.index import create_index, delete_index, update_index
-from lookup_property import L
 
 from config.celery import app
 from tilavarauspalvelu.enums import (
     ApplicantTypeChoice,
-    ApplicationRoundStatusChoice,
-    ApplicationSectionStatusChoice,
     CustomerTypeChoice,
-    EmailType,
     HaukiResourceState,
     OrderStatus,
     PricingStatus,
     PricingType,
-    ReservationNotification,
     ReservationStateChoice,
     ReservationTypeChoice,
     Weekday,
 )
-from tilavarauspalvelu.exceptions import SendEmailNotificationError
-from tilavarauspalvelu.integrations.email.email_sender import EmailNotificationSender
 from tilavarauspalvelu.models import (
     AffectingTimeSpan,
     AllocatedTimeSlot,
-    Application,
     PaymentOrder,
     PaymentProduct,
     PersonalInfoViewLog,
@@ -56,11 +48,11 @@ from tilavarauspalvelu.models import (
     Space,
     TaxPercentage,
     Unit,
-    User,
 )
 from tilavarauspalvelu.models.recurring_reservation.actions import ReservationDetails
 from tilavarauspalvelu.models.request_log.model import RequestLog
 from tilavarauspalvelu.models.sql_log.model import SQLLog
+from tilavarauspalvelu.translation import translate_for_user
 from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
 from tilavarauspalvelu.utils.pricing_updates import update_reservation_unit_pricings
@@ -79,10 +71,9 @@ from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import Verkkok
 from utils.date_utils import local_datetime, local_end_of_day, local_start_of_day
 from utils.image_cache import purge
 from utils.sentry import SentryLogger
-from utils.utils import translate_for_user
 
 if TYPE_CHECKING:
-    from collections.abc import Collection
+    from collections.abc import Collection, Iterable
 
     from tilavarauspalvelu.models import Address, Organisation, Person
     from tilavarauspalvelu.typing import QueryInfo
@@ -133,137 +124,6 @@ def remove_old_personal_info_view_logs() -> None:
     PersonalInfoViewLog.objects.filter(access_time__lt=remove_lt).delete()
 
 
-@app.task(name="send_reservation_email")
-def send_reservation_email_task(reservation_id: int, email_type: EmailType) -> None:
-    if not settings.SEND_RESERVATION_NOTIFICATION_EMAILS:
-        return
-    reservation = Reservation.objects.filter(id=reservation_id).first()
-    if not reservation:
-        return
-
-    email_notification_sender = EmailNotificationSender(email_type=email_type, recipients=None)
-    email_notification_sender.send_reservation_email(reservation=reservation)
-
-
-@app.task(name="send_staff_reservation_email")
-def send_staff_reservation_email_task(
-    reservation_id: int,
-    email_type: EmailType,
-    notification_settings: list[ReservationNotification],
-) -> None:
-    if not settings.SEND_RESERVATION_NOTIFICATION_EMAILS:
-        return
-    reservation = Reservation.objects.filter(id=reservation_id).first()
-    if not reservation:
-        return
-
-    recipients = _get_reservation_staff_notification_recipients(reservation, notification_settings)
-    if not recipients:
-        return
-
-    email_notification_sender = EmailNotificationSender(email_type=email_type, recipients=recipients)
-    email_notification_sender.send_reservation_email(reservation=reservation, forced_language=settings.LANGUAGE_CODE)
-
-
-def _get_reservation_staff_notification_recipients(
-    reservation: Reservation,
-    notification_settings: list[ReservationNotification],
-) -> list[str]:
-    """
-    Get staff users who should receive reservation notifications based on their unit roles and notification settings.
-
-    Get users with unit roles and notifications enabled, collect the ones that can manage relevant units,
-    have matching notification setting are not the reservation creator
-    """
-    notification_recipients: list[str] = []
-    reservation_units = reservation.reservation_unit.all()
-    units = Unit.objects.filter(reservationunit__in=reservation_units).prefetch_related("unit_groups").distinct()
-    users = User.objects.filter(unit_roles__isnull=False).exclude(reservation_notification="NONE")
-    for user in users:
-        # Skip users who don't have the correct unit role
-        if not user.permissions.can_manage_reservations_for_units(units, any_unit=True):
-            continue
-
-        # Skip users who don't have the correct notification setting
-        if not (any(user.reservation_notification.upper() == setting.upper() for setting in notification_settings)):
-            continue
-
-        # Skip the reservation creator
-        if reservation.user and reservation.user.pk == user.pk:
-            continue
-
-        notification_recipients.append(user.email)
-
-    # Remove possible duplicates
-    return list(set(notification_recipients))
-
-
-@app.task(name="send_application_email")
-def send_application_email_task(application_id: int, email_type: EmailType) -> None:
-    if not settings.SEND_RESERVATION_NOTIFICATION_EMAILS:
-        return
-    application = Application.objects.filter(id=application_id).first()
-    if not application:
-        return
-
-    email_notification_sender = EmailNotificationSender(email_type=email_type, recipients=None)
-    email_notification_sender.send_application_email(application=application)
-
-
-@app.task(name="send_application_in_allocation_emails")
-def send_application_in_allocation_email_task() -> None:
-    if not settings.SEND_RESERVATION_NOTIFICATION_EMAILS:
-        return
-
-    # Don't try to send anything if the email template is not defined (EmailNotificationSender will raise an error)
-    try:
-        email_sender = EmailNotificationSender(email_type=EmailType.APPLICATION_IN_ALLOCATION, recipients=None)
-    except SendEmailNotificationError:
-        msg = "Tried to send an email, but Email Template for APPLICATION_IN_ALLOCATION was not found."
-        SentryLogger.log_message(msg, level="warning")
-        return
-
-    # Get all applications that need a notification to be sent
-    applications = Application.objects.filter(
-        L(application_round__status=ApplicationRoundStatusChoice.IN_ALLOCATION.value),
-        L(status=ApplicationSectionStatusChoice.IN_ALLOCATION.value),
-        in_allocation_notification_sent_date__isnull=True,
-        application_sections__isnull=False,
-    ).order_by("created_date")
-    if not applications:
-        return
-
-    email_sender.send_batch_application_emails(applications=applications)
-    applications.update(in_allocation_notification_sent_date=local_datetime())
-
-
-@app.task(name="send_application_handled_emails")
-def send_application_handled_email_task() -> None:
-    if not settings.SEND_RESERVATION_NOTIFICATION_EMAILS:
-        return
-
-    # Don't try to send anything if the email template is not defined (EmailNotificationSender will raise an error)
-    try:
-        email_sender = EmailNotificationSender(email_type=EmailType.APPLICATION_HANDLED, recipients=None)
-    except SendEmailNotificationError:
-        msg = "Tried to send an email, but Email Template for APPLICATION_HANDLED was not found."
-        SentryLogger.log_message(msg, level="warning")
-        return
-
-    # Get all applications that need a notification to be sent
-    applications = Application.objects.filter(
-        L(application_round__status=ApplicationRoundStatusChoice.HANDLED.value),
-        L(status=ApplicationSectionStatusChoice.HANDLED.value),
-        results_ready_notification_sent_date__isnull=True,
-        application_sections__isnull=False,
-    ).order_by("created_date")
-    if not applications:
-        return
-
-    email_sender.send_batch_application_emails(applications=applications)
-    applications.update(results_ready_notification_sent_date=local_datetime())
-
-
 @app.task(name="update_origin_hauki_resource_reservable_time_spans")
 def update_origin_hauki_resource_reservable_time_spans() -> None:
     from tilavarauspalvelu.utils.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
@@ -278,11 +138,25 @@ def prune_reservations_task() -> None:
     prune_reservation_with_inactive_payments()
 
 
+@app.task(name="send_application_in_allocation_email")
+def send_application_in_allocation_email_task():
+    from tilavarauspalvelu.integrations.email.main import EmailService
+
+    EmailService.send_application_in_allocation_emails()
+
+
+@app.task(name="send_application_handled_email")
+def send_application_handled_email_task():
+    from tilavarauspalvelu.integrations.email.main import EmailService
+
+    EmailService.send_application_handled_emails()
+
+
 @app.task(name="update_expired_orders")
 def update_expired_orders_task() -> None:
     older_than_minutes = settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES
     expired_datetime = local_datetime() - datetime.timedelta(minutes=older_than_minutes)
-    expired_orders = PaymentOrder.objects.filter(
+    expired_orders: Iterable[PaymentOrder] = PaymentOrder.objects.filter(
         status=OrderStatus.DRAFT,
         created_at__lte=expired_datetime,
         remote_id__isnull=False,
@@ -291,10 +165,10 @@ def update_expired_orders_task() -> None:
     for payment_order in expired_orders:
         # Do not update the PaymentOrder status if an error occurs
         with suppress(GetPaymentError, CancelOrderError), atomic():
-            payment_order.refresh_order_status_from_webshop()
+            payment_order.actions.refresh_order_status_from_webshop()
 
             if payment_order.status == OrderStatus.EXPIRED:
-                payment_order.cancel_order_in_webshop()
+                payment_order.actions.cancel_order_in_webshop()
 
 
 @app.task(name="prune_reservation_statistics")

@@ -256,12 +256,19 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         return cls.create(**kwargs)
 
     @classmethod
-    def create_for_handling_required(cls, **kwargs: Any) -> Reservation:
+    def create_for_requires_handling(cls, **kwargs: Any) -> Reservation:
         """Create a Reservation for a single ReservationUnit in the necessary state for setting handling required."""
         from .reservation_unit import ReservationUnitFactory
+        from .reservation_unit_pricing import ReservationUnitPricingFactory
 
         sub_kwargs = cls.pop_sub_kwargs("reservation_unit", kwargs)
         reservation_unit = ReservationUnitFactory.create(**sub_kwargs)
+
+        ReservationUnitPricingFactory.create(
+            reservation_unit=reservation_unit,
+            lowest_price=Decimal("0.00"),
+            highest_price=Decimal("0.00"),
+        )
 
         begin = next_hour(plus_hours=1)
         kwargs.setdefault("state", ReservationStateChoice.CONFIRMED)

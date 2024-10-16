@@ -96,7 +96,7 @@ class User(AbstractUser):
         return f"{self.first_name} {self.last_name}".strip()
 
     def get_preferred_language(self) -> Literal["fi", "sv", "en"]:
-        return self.preferred_language or settings.LANGUAGES[0][0]
+        return self.preferred_language or settings.LANGUAGE_CODE
 
     @property
     def general_roles_list(self) -> list[UserRoleChoice]:

@@ -4,10 +4,11 @@ from decimal import Decimal
 from unittest import mock
 
 import pytest
+from django.test import override_settings
 
-from tests.factories import EmailTemplateFactory, PaymentOrderFactory, ReservationFactory
+from tests.factories import PaymentOrderFactory, ReservationFactory
 from tests.helpers import patch_method
-from tilavarauspalvelu.enums import EmailType, OrderStatus, PaymentType, ReservationStateChoice
+from tilavarauspalvelu.enums import OrderStatus, PaymentType, ReservationStateChoice
 from tilavarauspalvelu.models import ReservationCancelReason
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.date_utils import local_datetime
@@ -159,15 +160,9 @@ def test_reservation__cancel__fails_if_no_cancellation_rule(graphql):
     assert reservation.state == ReservationStateChoice.CONFIRMED
 
 
-def test_reservation__cancel__sends_email_notification(graphql, outbox, settings):
-    settings.SEND_RESERVATION_NOTIFICATION_EMAILS = True
-
+@override_settings(SEND_EMAILS=True)
+def test_reservation__cancel__sends_email_notification(graphql, outbox):
     reservation = ReservationFactory.create_for_cancellation()
-
-    EmailTemplateFactory.create(
-        type=EmailType.RESERVATION_CANCELLED,
-        subject="cancelled",
-    )
 
     graphql.login_with_superuser()
     data = get_cancel_data(reservation)
@@ -179,7 +174,7 @@ def test_reservation__cancel__sends_email_notification(graphql, outbox, settings
     assert reservation.state == ReservationStateChoice.CANCELLED
 
     assert len(outbox) == 1
-    assert outbox[0].subject == "cancelled"
+    assert outbox[0].subject == "Your booking has been cancelled"
 
 
 @patch_method(VerkkokauppaAPIClient.refund_order)

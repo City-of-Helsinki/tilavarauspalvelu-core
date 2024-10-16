@@ -5,9 +5,7 @@ import pytest
 from tests.factories import OrderFactory, PaymentFactory, PaymentOrderFactory, ReservationFactory
 from tests.helpers import patch_method
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
-from tilavarauspalvelu.integrations.email.reservation_email_notification_sender import (
-    ReservationEmailNotificationSender,
-)
+from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CancelOrderError
 from tilavarauspalvelu.utils.verkkokauppa.payment.types import PaymentStatus
@@ -131,7 +129,7 @@ def test_reservation__delete__confirmed__cannot_delete_when_status_not_created_n
 
 @patch_method(VerkkokauppaAPIClient.get_payment, PaymentFactory.create(status=PaymentStatus.PAID_ONLINE.value))
 @patch_method(VerkkokauppaAPIClient.cancel_order)
-@patch_method(ReservationEmailNotificationSender.send_confirmation_email)
+@patch_method(EmailService.send_reservation_confirmed_email)
 def test_reservation__delete__reservation_is_in_draft_state_but_paid_in_verkkokauppa(graphql):
     reservation = ReservationFactory.create_for_delete(state=ReservationStateChoice.WAITING_FOR_PAYMENT)
     payment_order = PaymentOrderFactory.create(
@@ -153,4 +151,4 @@ def test_reservation__delete__reservation_is_in_draft_state_but_paid_in_verkkoka
     payment_order.refresh_from_db()
     assert payment_order.status == OrderStatus.PAID
 
-    assert ReservationEmailNotificationSender.send_confirmation_email.called is True
+    assert EmailService.send_reservation_confirmed_email.called is True

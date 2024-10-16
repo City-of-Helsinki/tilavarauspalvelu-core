@@ -7,8 +7,7 @@ from typing import TYPE_CHECKING
 from django.core.validators import validate_comma_separated_integer_list
 from django.db import models
 
-from config.utils.commons import WEEKDAYS
-from tilavarauspalvelu.enums import ReservationStateChoice
+from tilavarauspalvelu.enums import ReservationStateChoice, WeekdayChoice
 
 from .queryset import RecurringReservationQuerySet
 
@@ -41,7 +40,7 @@ class RecurringReservation(models.Model):
     weekdays: str = models.CharField(
         max_length=16,
         validators=[validate_comma_separated_integer_list],
-        choices=WEEKDAYS.CHOICES,
+        choices=WeekdayChoice.choices,
         blank=True,
         default="",
     )

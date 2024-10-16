@@ -11,9 +11,7 @@ from tilavarauspalvelu.api.graphql.types.reservation.serializers.mixins import (
     ReservationSchedulingMixin,
 )
 from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
-from tilavarauspalvelu.integrations.email.reservation_email_notification_sender import (
-    ReservationEmailNotificationSender,
-)
+from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import Reservation, ReservationUnit
 
 DEFAULT_TIMEZONE = get_default_timezone()
@@ -45,7 +43,9 @@ class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reservation
             break
 
         instance = super().save(**kwargs)
-        ReservationEmailNotificationSender.send_reservation_modified_email(reservation=instance)
+        EmailService.send_reservation_modified_email(reservation=instance)
+        if instance.state == ReservationStateChoice.REQUIRES_HANDLING:
+            EmailService.send_staff_notification_reservation_requires_handling_email(reservation=instance)
         return instance
 
     def validate(self, data):
