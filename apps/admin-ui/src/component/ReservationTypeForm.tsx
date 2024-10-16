@@ -105,10 +105,12 @@ function ReservationTypeForm({
   reservationUnit,
   children,
   disableBufferToggle,
+  disableTypeSelect,
 }: {
   reservationUnit: TypeFormReservationUnit;
   children?: React.ReactNode;
   disableBufferToggle?: boolean;
+  disableTypeSelect?: boolean;
 }) {
   const { t } = useTranslation();
 
@@ -121,7 +123,7 @@ function ReservationTypeForm({
   return (
     <>
       <Element $wide>
-        <TypeSelect />
+        <TypeSelect isDisabled={disableTypeSelect} />
       </Element>
       {type === ReservationTypeChoice.Blocked && (
         <CommentsTextArea

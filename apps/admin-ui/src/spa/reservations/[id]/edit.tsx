@@ -179,6 +179,8 @@ function EditReservation({
         <ReservationTypeForm
           reservationUnit={reservationUnit}
           disableBufferToggle
+          // backend doesn't allow changing type for series but does allow it for single reservations
+          disableTypeSelect={reservation.recurringReservation?.pk != null}
         >
           {reservation.recurringReservation?.pk && (
             <InnerTextInput

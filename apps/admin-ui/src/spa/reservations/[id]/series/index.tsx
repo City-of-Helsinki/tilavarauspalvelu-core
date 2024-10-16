@@ -317,6 +317,8 @@ function SeriesPageInner({ pk }: { pk: number }) {
                 control={control}
                 error={translateError(errors.startingDate?.message)}
                 required
+                // NOTE we can't change the start date of the series
+                disabled
               />
 
               <ControlledDateInput

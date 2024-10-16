@@ -221,6 +221,7 @@ const translations: ITranslations = {
       RESERVATION_END_DATE_TOO_FAR: [
         "Ei pystytty luomaan varauksia yli 2 vuoden päähän",
       ],
+      RESERVATION_SERIES_ALREADY_STARTED: ["Toistuva varaus on jo alkanut"],
     },
     descriptive: {
       "Reservation overlaps with reservation before due to buffer time.": [

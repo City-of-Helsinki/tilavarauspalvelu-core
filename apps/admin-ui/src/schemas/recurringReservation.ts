@@ -135,9 +135,7 @@ const RescheduleReservationSeriesFormSchemaRefined = (
     // TODO do we need it here? reschedule might not have metadata
     .passthrough()
     // this refine works without partial since it's the last required value
-    .superRefine((val, ctx) =>
-      checkDateNotInPast(convertToDate(val.startingDate), ctx, "startingDate")
-    )
+    /* Don't validate start time since it's not editable */
     .superRefine((val, ctx) =>
       checkDateNotInPast(convertToDate(val.endingDate), ctx, "endingDate")
     )
