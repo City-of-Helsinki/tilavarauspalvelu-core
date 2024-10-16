@@ -42,7 +42,7 @@ class RefreshOrderMutation(DjangoMutation):
             )
 
         try:
-            webshop_payment = payment_order.get_order_payment_from_webshop()
+            webshop_payment = payment_order.actions.get_order_payment_from_webshop()
             if not webshop_payment:
                 SentryLogger.log_message(
                     message="Verkkokauppa: Order payment check failed",
@@ -55,9 +55,9 @@ class RefreshOrderMutation(DjangoMutation):
             msg = "Unable to check order payment: problem with external service"
             raise ValidationErrorWithCode(msg, ValidationErrorCodes.EXTERNAL_SERVICE_ERROR) from error
 
-        new_status: OrderStatus = payment_order.get_order_status_from_webshop_response(webshop_payment)
+        new_status: OrderStatus = payment_order.actions.get_order_status_from_webshop_response(webshop_payment)
         if new_status in (OrderStatus.CANCELLED, OrderStatus.PAID):
-            payment_order.update_order_status(new_status, webshop_payment.payment_id)
+            payment_order.actions.update_order_status(new_status, webshop_payment.payment_id)
 
         return RefreshOrderMutationOutput(
             order_uuid=payment_order.remote_id,

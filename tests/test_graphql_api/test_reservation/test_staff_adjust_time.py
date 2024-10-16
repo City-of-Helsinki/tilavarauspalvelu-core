@@ -2,9 +2,10 @@ import datetime
 
 import freezegun
 import pytest
+from django.test import override_settings
 
-from tests.factories import EmailTemplateFactory, ReservationFactory
-from tilavarauspalvelu.enums import EmailType, ReservationStartInterval, ReservationStateChoice, ReservationTypeChoice
+from tests.factories import ReservationFactory
+from tilavarauspalvelu.enums import ReservationStartInterval, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.models import ReservationUnitHierarchy
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, next_hour
 
@@ -15,11 +16,9 @@ pytestmark = [
 ]
 
 
-def test_reservation__staff_adjust_time__send_email_if_type_normal(graphql, outbox, settings):
-    settings.SEND_RESERVATION_NOTIFICATION_EMAILS = True
-
+@override_settings(SEND_EMAILS=True)
+def test_reservation__staff_adjust_time__send_email_if_type_normal(graphql, outbox):
     reservation = ReservationFactory.create_for_time_adjustment()
-    template = EmailTemplateFactory.create(type=EmailType.RESERVATION_MODIFIED, subject="modified")
 
     graphql.login_with_superuser()
     data = get_staff_adjust_data(reservation)
@@ -28,14 +27,12 @@ def test_reservation__staff_adjust_time__send_email_if_type_normal(graphql, outb
     assert response.has_errors is False, response.errors
 
     assert len(outbox) == 1
-    assert outbox[0].subject == template.subject
+    assert outbox[0].subject == "Your booking has been updated"
 
 
-def test_reservation__staff_adjust_time__dont_send_email_to_staff_type_reservations(graphql, outbox, settings):
-    settings.SEND_RESERVATION_NOTIFICATION_EMAILS = True
-
+@override_settings(SEND_EMAILS=True)
+def test_reservation__staff_adjust_time__dont_send_email_to_staff_type_reservations(graphql, outbox):
     reservation = ReservationFactory.create_for_time_adjustment(type=ReservationTypeChoice.STAFF)
-    EmailTemplateFactory.create(type=EmailType.RESERVATION_MODIFIED, subject="modified")
 
     graphql.login_with_superuser()
     data = get_staff_adjust_data(reservation)

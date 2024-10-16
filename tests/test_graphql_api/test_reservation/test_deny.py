@@ -1,9 +1,10 @@
 import datetime
 
 import pytest
+from django.test import override_settings
 
-from tests.factories import EmailTemplateFactory, ReservationFactory
-from tilavarauspalvelu.enums import EmailType, ReservationStateChoice, ReservationTypeChoice
+from tests.factories import ReservationFactory
+from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
 from utils.date_utils import local_datetime
 
 from .helpers import DENY_MUTATION, get_deny_data
@@ -109,11 +110,9 @@ def test_reservation__deny__state_requires_handling_and_reservation_ended(graphq
     assert reservation.state == ReservationStateChoice.DENIED
 
 
-def test_reservation__deny__send_email(graphql, outbox, settings):
-    settings.SEND_RESERVATION_NOTIFICATION_EMAILS = True
-
+@override_settings(SEND_EMAILS=True)
+def test_reservation__deny__send_email(graphql, outbox):
     reservation = ReservationFactory.create_for_deny()
-    EmailTemplateFactory.create(type=EmailType.RESERVATION_REJECTED, subject="denied")
 
     graphql.login_with_superuser()
     data = get_deny_data(reservation)
@@ -127,9 +126,10 @@ def test_reservation__deny__send_email(graphql, outbox, settings):
     assert reservation.handled_at is not None
 
     assert len(outbox) == 1
-    assert outbox[0].subject == "denied"
+    assert outbox[0].subject == "Unfortunately your booking cannot be confirmed"
 
 
+@override_settings(SEND_EMAILS=True)
 @pytest.mark.parametrize(
     "reservation_type",
     [
@@ -138,11 +138,8 @@ def test_reservation__deny__send_email(graphql, outbox, settings):
         ReservationTypeChoice.BEHALF,
     ],
 )
-def test_reservation__deny__dont_send_email_for_reservation_type_x(graphql, outbox, settings, reservation_type):
-    settings.SEND_RESERVATION_NOTIFICATION_EMAILS = True
-
+def test_reservation__deny__dont_send_email_for_reservation_type_x(graphql, outbox, reservation_type):
     reservation = ReservationFactory.create_for_deny(type=reservation_type)
-    EmailTemplateFactory.create(type=EmailType.RESERVATION_REJECTED, subject="denied")
 
     graphql.login_with_superuser()
     input_data = get_deny_data(reservation)
@@ -156,16 +153,14 @@ def test_reservation__deny__dont_send_email_for_reservation_type_x(graphql, outb
     assert len(outbox) == 0
 
 
-def test_reservation__deny__send_email_if_reservation_started_but_not_ended(graphql, outbox, settings):
-    settings.SEND_RESERVATION_NOTIFICATION_EMAILS = True
-
+@override_settings(SEND_EMAILS=True)
+def test_reservation__deny__send_email_if_reservation_started_but_not_ended(graphql, outbox):
     now = local_datetime()
     last_hour = now.replace(minute=0, second=0, microsecond=0)
     begin = last_hour - datetime.timedelta(hours=1)
     end = last_hour + datetime.timedelta(hours=1)
 
     reservation = ReservationFactory.create_for_deny(begin=begin, end=end)
-    EmailTemplateFactory.create(type=EmailType.RESERVATION_REJECTED, subject="denied")
 
     graphql.login_with_superuser()
     data = get_deny_data(reservation)
@@ -177,19 +172,17 @@ def test_reservation__deny__send_email_if_reservation_started_but_not_ended(grap
     assert reservation.state == ReservationStateChoice.DENIED
 
     assert len(outbox) == 1
-    assert outbox[0].subject == "denied"
+    assert outbox[0].subject == "Unfortunately your booking cannot be confirmed"
 
 
-def test_reservation__deny__dont_send_notification_if_reservation_already_ended(graphql, outbox, settings):
-    settings.SEND_RESERVATION_NOTIFICATION_EMAILS = True
-
+@override_settings(SEND_EMAILS=True)
+def test_reservation__deny__dont_send_notification_if_reservation_already_ended(graphql, outbox):
     now = local_datetime()
     last_hour = now.replace(minute=0, second=0, microsecond=0)
     end = last_hour - datetime.timedelta(hours=1)
     begin = end - datetime.timedelta(hours=1)
 
     reservation = ReservationFactory.create_for_deny(begin=begin, end=end)
-    EmailTemplateFactory.create(type=EmailType.RESERVATION_REJECTED, subject="denied")
 
     graphql.login_with_superuser()
     data = get_deny_data(reservation)

@@ -1,22 +1,30 @@
 from collections.abc import Callable
 from functools import wraps
-from typing import Any, NamedTuple, ParamSpec, TypeVar
+from typing import Any, NamedTuple, ParamSpec, Self, TypeVar
 from unittest import mock
+from unittest.mock import patch
 
-from django.contrib.auth import get_user_model
+import polib
+import pytest
+from django.conf import settings
+from django.http import HttpRequest
+from django.utils import translation
+from django.utils.functional import lazy
+from django.utils.translation import trans_real
 from graphene_django_extensions.testing import GraphQLClient as BaseGraphQLClient
 
 from tilavarauspalvelu.enums import UserRoleChoice
+from tilavarauspalvelu.models import User
+from tilavarauspalvelu.typing import Lang
 
 __all__ = [
     "GraphQLClient",
     "ResponseMock",
+    "TranslationsFromPOFiles",
 ]
 
 
 TNamedTuple = TypeVar("TNamedTuple", bound=NamedTuple)
-
-User = get_user_model()
 
 
 class GraphQLClient(BaseGraphQLClient):
@@ -86,3 +94,119 @@ class patch_method:
 
     def __exit__(self, *exc_info: object) -> Any:
         return self.patch.__exit__(*exc_info)
+
+
+class TranslationsFromPOFiles:
+    """
+    Mock django translations by fetching current uncompiled translations from .po files.
+    This is useful, since translations aren't otherwise active during tests.
+
+    >>> with TranslationsFromPOFiles():
+    ...     # Do stuff with translations
+    """
+
+    translations: dict[Lang, polib.POFile]
+    language_options: tuple[Lang, ...] = ("fi", "sv", "en")
+    default_language: Lang = settings.LANGUAGE_CODE
+
+    def __new__(cls, *args: Any, **kwargs: Any) -> Any:
+        # Load translations to the clas only once
+        if not hasattr(cls, "contents"):
+            from config.settings import Common
+
+            cls.translations: dict[Lang, polib.POFile] = {}
+            for lang in cls.language_options:
+                # No explicit translations for English
+                if lang == "en":
+                    continue
+
+                for locale_path in Common.LOCALE_PATHS:
+                    path = str(locale_path / lang / "LC_MESSAGES" / "django.po")
+                    file_contents = polib.pofile(path)
+
+                    if lang not in cls.translations:
+                        cls.translations[lang] = file_contents
+                    else:
+                        cls.translations[lang].merge(file_contents)
+
+        return super().__new__(cls)
+
+    def __init__(self):
+        self.language: Lang = self.default_language
+
+    def __enter__(self) -> Self:
+        if not hasattr(translation, "_trans"):
+            pytest.fail("Translations cannot be mocked. `_trans` not found in `django.utils.translation`.")
+
+        self.patch = patch("django.utils.translation._trans", new=self)
+        self.patch.start()
+        return self
+
+    def __exit__(self, *args: object, **kwargs: Any) -> None:
+        if hasattr(self, "patch"):
+            self.patch.stop()
+            del self.patch
+
+    # Django translation interface:
+
+    def gettext_noop(self, message: str) -> str:
+        return message
+
+    def gettext(self, message: str) -> str:
+        if self.language == "en":
+            return message
+        return self.translations[self.language].find(message, by="msgid").msgstr
+
+    gettext_lazy = lazy(gettext, str)
+
+    def pgettext(self, context: str, message: str) -> str:
+        if self.language == "en":
+            return message
+        return self.translations[self.language].find(message, by="msgid", msgctxt=context).msgstr
+
+    pgettext_lazy = lazy(pgettext, str)
+
+    def ngettext(self, singular: str, plural: str, number: int) -> str:
+        raise NotImplementedError
+
+    def ngettext_lazy(self, singular: str, plural: str, number: int) -> str:
+        raise NotImplementedError
+
+    def npgettext(self, context, singular, plural, number):
+        raise NotImplementedError
+
+    def activate(self, language: Lang) -> None:
+        assert language in self.language_options  # noqa: S101
+        self.language = language
+
+    def deactivate(self) -> None:
+        self.language = self.default_language
+
+    def deactivate_all(self) -> None:
+        self.language = self.default_language
+
+    def get_language(self) -> Lang:
+        return self.language
+
+    def get_language_bidi(self) -> bool:
+        return self.language in settings.LANGUAGES_BIDI
+
+    def check_for_language(self, language: Lang) -> bool:
+        return language in self.language_options
+
+    def get_language_from_request(self, request: HttpRequest, check_path: bool = False):
+        return trans_real.get_language_from_request(request, check_path)
+
+    def get_language_from_path(self, request: HttpRequest) -> None:
+        return trans_real.get_language_from_path(request)
+
+    def get_supported_language_variant(self, lang_code: Lang, strict: bool = False) -> str:
+        if "fi" in lang_code:
+            return "fi"
+        if "sv" in lang_code:
+            return "sv"
+        if "en" in lang_code:
+            return "en"
+
+        msg = f"Language '{lang_code}' is not supported"
+        raise LookupError(msg)

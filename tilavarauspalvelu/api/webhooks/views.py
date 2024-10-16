@@ -59,7 +59,7 @@ class WebhookOrderPaidViewSet(viewsets.GenericViewSet):
             SentryLogger.log_message(f"Verkkokauppa: {msg}", details=serializer.validated_data)
             return Response(data={"message": msg}, status=400)
 
-        payment_order.update_order_status(new_status=OrderStatus.PAID, payment_id=payment_id)
+        payment_order.actions.update_order_status(new_status=OrderStatus.PAID, payment_id=payment_id)
 
         return Response(data={"message": "Order payment completed successfully"}, status=200)
 

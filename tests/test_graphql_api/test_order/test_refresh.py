@@ -5,9 +5,7 @@ import pytest
 from tests.factories import PaymentFactory
 from tests.helpers import patch_method
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
-from tilavarauspalvelu.integrations.email.reservation_email_notification_sender import (
-    ReservationEmailNotificationSender,
-)
+from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import GetPaymentError
 from tilavarauspalvelu.utils.verkkokauppa.payment.types import PaymentStatus
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
@@ -134,7 +132,8 @@ def test_refresh_order__cancelled_status_causes_cancellation(graphql):
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
-@patch_method(ReservationEmailNotificationSender.send_confirmation_email)
+@patch_method(EmailService.send_reservation_confirmed_email)
+@patch_method(EmailService.send_staff_notification_reservation_made_email)
 def test_refresh_order__paid_online_status_causes_paid_marking_and_no_notification(graphql):
     graphql.login_with_superuser()
     order = get_order()
@@ -146,7 +145,9 @@ def test_refresh_order__paid_online_status_causes_paid_marking_and_no_notificati
     response = graphql(REFRESH_MUTATION, input_data=data)
 
     assert VerkkokauppaAPIClient.get_payment.call_count == 1
-    assert ReservationEmailNotificationSender.send_confirmation_email.call_count == 0
+
+    assert EmailService.send_reservation_confirmed_email.call_count == 0
+    assert EmailService.send_staff_notification_reservation_made_email.call_count == 0
 
     assert response.has_errors is False
     assert response.first_query_object == {
@@ -160,7 +161,8 @@ def test_refresh_order__paid_online_status_causes_paid_marking_and_no_notificati
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
-@patch_method(ReservationEmailNotificationSender.send_confirmation_email)
+@patch_method(EmailService.send_reservation_confirmed_email)
+@patch_method(EmailService.send_staff_notification_reservation_made_email)
 def test_refresh_order__paid_online_status_sends_notification_if_reservation_waiting_for_payment(graphql):
     graphql.login_with_superuser()
     order = get_order()
@@ -175,7 +177,9 @@ def test_refresh_order__paid_online_status_sends_notification_if_reservation_wai
     response = graphql(REFRESH_MUTATION, input_data=data)
 
     assert VerkkokauppaAPIClient.get_payment.call_count == 1
-    assert ReservationEmailNotificationSender.send_confirmation_email.call_count == 1
+
+    assert EmailService.send_reservation_confirmed_email.call_count == 1
+    assert EmailService.send_staff_notification_reservation_made_email.call_count == 1
 
     assert response.has_errors is False
     assert response.first_query_object == {

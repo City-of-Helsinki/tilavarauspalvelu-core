@@ -6,9 +6,7 @@ from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
-from tilavarauspalvelu.integrations.email.reservation_email_notification_sender import (
-    ReservationEmailNotificationSender,
-)
+from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.tasks import refund_paid_reservation_task
 from utils.date_utils import local_datetime
@@ -84,5 +82,5 @@ class ReservationCancellationSerializer(NestingModelSerializer):
         if payment_is_refundable and instance.price_net > 0:
             refund_paid_reservation_task.delay(instance.pk)
 
-        ReservationEmailNotificationSender.send_cancellation_email(reservation=instance)
+        EmailService.send_reservation_cancelled_email(reservation=instance)
         return instance

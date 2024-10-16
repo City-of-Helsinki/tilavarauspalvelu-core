@@ -1,7 +1,8 @@
 import pytest
+from django.test import override_settings
 
-from tests.factories import EmailTemplateFactory, ReservationFactory, UserFactory
-from tilavarauspalvelu.enums import EmailType, ReservationNotification, ReservationStateChoice
+from tests.factories import ReservationFactory, UserFactory
+from tilavarauspalvelu.enums import ReservationNotification, ReservationStateChoice
 
 from .helpers import REQUIRE_HANDLING_MUTATION, get_require_handling_data
 
@@ -10,6 +11,7 @@ pytestmark = [
 ]
 
 
+@override_settings(SEND_EMAILS=True)
 @pytest.mark.parametrize(
     "state",
     [
@@ -17,20 +19,13 @@ pytestmark = [
         ReservationStateChoice.DENIED,
     ],
 )
-def test_reservation__handling_required__allowed_states(graphql, outbox, settings, state):
-    settings.SEND_RESERVATION_NOTIFICATION_EMAILS = True
-
-    reservation = ReservationFactory.create_for_handling_required(state=state)
+def test_reservation__requires_handling__allowed_states(graphql, outbox, state):
+    reservation = ReservationFactory.create_for_requires_handling(state=state)
 
     # Admin will get notification
     UserFactory.create_with_unit_role(
         units=[reservation.reservation_unit.first().unit],
         reservation_notification=ReservationNotification.ALL,
-    )
-
-    template = EmailTemplateFactory(
-        type=EmailType.RESERVATION_HANDLING_REQUIRED,
-        subject="handling required",
     )
 
     graphql.login_with_superuser()
@@ -43,7 +38,7 @@ def test_reservation__handling_required__allowed_states(graphql, outbox, setting
     assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
 
     assert len(outbox) == 1
-    assert outbox[0].subject == template.subject
+    assert outbox[0].subject == "Your booking is waiting for processing"
 
 
 @pytest.mark.parametrize(
@@ -55,8 +50,8 @@ def test_reservation__handling_required__allowed_states(graphql, outbox, setting
         ReservationStateChoice.WAITING_FOR_PAYMENT,
     ],
 )
-def test_reservation__handling_required__disallowed_states(graphql, state):
-    reservation = ReservationFactory.create_for_handling_required(state=state)
+def test_reservation__requires_handling__disallowed_states(graphql, state):
+    reservation = ReservationFactory.create_for_requires_handling(state=state)
 
     # Admin will get notification
     UserFactory.create_with_unit_role(

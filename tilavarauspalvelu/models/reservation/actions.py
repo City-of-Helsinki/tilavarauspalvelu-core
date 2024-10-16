@@ -1,16 +1,27 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING
+import math
+from decimal import Decimal
+from typing import TYPE_CHECKING, Literal
 
 from django.conf import settings
+from django.db.models import Prefetch
 from django.utils.translation import pgettext
 from icalendar import Calendar, Event, Timezone, TimezoneDaylight, TimezoneStandard
 
-from tilavarauspalvelu.enums import CalendarProperty, EventProperty, TimezoneProperty, TimezoneRuleProperty
-from tilavarauspalvelu.translation import get_translated
+from tilavarauspalvelu.enums import (
+    CalendarProperty,
+    CustomerTypeChoice,
+    EventProperty,
+    PriceUnit,
+    PricingType,
+    TimezoneProperty,
+    TimezoneRuleProperty,
+)
+from tilavarauspalvelu.models import Space
+from tilavarauspalvelu.translation import get_attr_by_language, get_translated
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
-from utils.utils import get_attr_by_language
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Location, Reservation, ReservationUnit, Unit
@@ -151,6 +162,7 @@ class ReservationActions:
         to_ = pgettext("ICAL", "To")
         footer = pgettext(
             "ICAL",
+            # NOTE: Must format like this (not in braces '()' for example) so that translations pick it up.
             "Manage your booking at Varaamo. You can check the details of your booking and Varaamo's "
             "terms of contract and cancellation on the '%(bookings)s' page.",
         ) % {
@@ -171,9 +183,63 @@ class ReservationActions:
         )
 
     def get_location(self) -> Location | None:
-        reservation_unit: ReservationUnit = self.reservation.reservation_unit.first()
+        reservation_unit: ReservationUnit = (
+            self.reservation.reservation_unit.select_related("unit__location")
+            .prefetch_related(Prefetch("spaces", Space.objects.select_related("location")))
+            .first()
+        )
         unit: Unit = reservation_unit.unit
         location: Location | None = getattr(unit, "location", None)
         if location is None:
             return reservation_unit.actions.get_location()
         return location
+
+    def get_email_reservee_name(self) -> str:
+        # Note: Different from 'reservation.reservee_name' (simpler, mainly)
+        if self.reservation.reservee_type in (CustomerTypeChoice.INDIVIDUAL.value, None):
+            return f"{self.reservation.reservee_first_name} {self.reservation.reservee_last_name}".strip()
+        return self.reservation.reservee_organisation_name
+
+    def get_instructions(
+        self,
+        *,
+        kind: Literal["confirmed", "pending", "cancelled"],
+        language: Lang,
+    ) -> str:
+        return "\n-\n".join(
+            get_attr_by_language(reservation_unit, f"reservation_{kind}_instructions", language)
+            for reservation_unit in self.reservation.reservation_unit.all()
+        )
+
+    def calculate_full_price(
+        self,
+        begin_datetime: datetime.datetime,
+        end_datetime: datetime.datetime,
+        *,
+        subsidised: bool = False,
+    ) -> Decimal:
+        # Currently, there is ever only one reservation unit per reservation
+        reservation_unit: ReservationUnit | None = self.reservation.reservation_unit.first()
+        if reservation_unit is None:
+            raise ValueError("Reservation has no reservation unit")
+
+        pricing = reservation_unit.actions.get_pricing_on_date(date=begin_datetime.date())
+        if pricing is None:
+            raise ValueError("Reservation unit has no pricing information")
+
+        if pricing.pricing_type == PricingType.FREE:
+            return Decimal("0")
+
+        price_unit = PriceUnit(pricing.price_unit)
+        price = pricing.lowest_price if subsidised else pricing.highest_price
+
+        # Time-based calculation is needed only if price unit is not fixed.
+        # Otherwise, we can just use the price defined in the reservation unit
+        if price_unit in PriceUnit.fixed_price_units:
+            return price
+
+        # Price calculations use duration rounded to the next 15 minutes
+        duration_seconds = int((end_datetime - begin_datetime).total_seconds())
+        duration_minutes = int(math.ceil(duration_seconds / 60 / 15) * 15)
+
+        return (price / price_unit.in_minutes) * duration_minutes

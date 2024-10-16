@@ -7,9 +7,7 @@ from tests.factories import PaymentOrderFactory, ReservationFactory
 from tests.helpers import patch_method
 from tests.test_external_services.test_verkkokauppa.test_webhooks.helpers import get_mock_order_payment_api
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
-from tilavarauspalvelu.integrations.email.reservation_email_notification_sender import (
-    ReservationEmailNotificationSender,
-)
+from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import GetPaymentError
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.sentry import SentryLogger
@@ -21,7 +19,8 @@ pytestmark = [
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
-@patch_method(ReservationEmailNotificationSender.send_confirmation_email)
+@patch_method(EmailService.send_reservation_confirmed_email)
+@patch_method(EmailService.send_staff_notification_reservation_made_email)
 def test_order_payment_webhook__success(api_client, settings):
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
@@ -58,9 +57,11 @@ def test_order_payment_webhook__success(api_client, settings):
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CONFIRMED
 
+    assert EmailService.send_reservation_confirmed_email.called is True
+    assert EmailService.send_staff_notification_reservation_made_email.called is True
+
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
-@patch_method(ReservationEmailNotificationSender.send_confirmation_email)
 def test_order_payment_webhook__success__no_reservation(api_client, settings):
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
@@ -94,7 +95,6 @@ def test_order_payment_webhook__success__no_reservation(api_client, settings):
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
-@patch_method(ReservationEmailNotificationSender.send_confirmation_email)
 @pytest.mark.parametrize("status", [OrderStatus.PAID, OrderStatus.PAID_MANUALLY, OrderStatus.REFUNDED])
 def test_order_payment_webhook__no_action_needed(api_client, settings, status):
     order_id = uuid.uuid4()
@@ -118,7 +118,6 @@ def test_order_payment_webhook__no_action_needed(api_client, settings, status):
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
-@patch_method(ReservationEmailNotificationSender.send_confirmation_email)
 @patch_method(SentryLogger.log_message)
 @pytest.mark.parametrize("missing_field", ["orderId", "paymentId", "namespace", "eventType"])
 def test_order_payment_webhook__missing_field(api_client, settings, missing_field):
@@ -146,7 +145,6 @@ def test_order_payment_webhook__missing_field(api_client, settings, missing_fiel
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
-@patch_method(ReservationEmailNotificationSender.send_confirmation_email)
 @patch_method(SentryLogger.log_message)
 def test_order_payment_webhook__bad_namespace(api_client):
     order_id = uuid.uuid4()
@@ -172,7 +170,6 @@ def test_order_payment_webhook__bad_namespace(api_client):
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
-@patch_method(ReservationEmailNotificationSender.send_confirmation_email)
 @patch_method(SentryLogger.log_message)
 def test_order_payment_webhook__bad_event_type(api_client, settings):
     order_id = uuid.uuid4()
@@ -198,7 +195,6 @@ def test_order_payment_webhook__bad_event_type(api_client, settings):
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
-@patch_method(ReservationEmailNotificationSender.send_confirmation_email)
 @patch_method(SentryLogger.log_message)
 def test_order_payment_webhook__payment_order_not_found(api_client, settings):
     order_id = uuid.uuid4()
@@ -273,7 +269,6 @@ def test_order_payment_webhook__no_payment_from_verkkokauppa(api_client, setting
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
-@patch_method(ReservationEmailNotificationSender.send_confirmation_email)
 @patch_method(SentryLogger.log_message)
 def test_order_payment_webhook__invalid_payment_status(api_client, settings):
     order_id = uuid.uuid4()

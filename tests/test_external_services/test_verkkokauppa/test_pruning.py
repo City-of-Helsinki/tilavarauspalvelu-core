@@ -6,9 +6,7 @@ from freezegun import freeze_time
 from tests.factories import PaymentFactory, PaymentOrderFactory, ReservationFactory
 from tests.helpers import patch_method
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
-from tilavarauspalvelu.integrations.email.reservation_email_notification_sender import (
-    ReservationEmailNotificationSender,
-)
+from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.tasks import update_expired_orders_task
 from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CancelOrderError
 from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import GetPaymentError
@@ -58,7 +56,8 @@ def test_verkkokauppa_pruning__update_expired_orders__handle_expired_orders(orde
     assert VerkkokauppaAPIClient.cancel_order.called is True
 
 
-@patch_method(ReservationEmailNotificationSender.send_confirmation_email)
+@patch_method(EmailService.send_reservation_confirmed_email)
+@patch_method(EmailService.send_staff_notification_reservation_made_email)
 @patch_method(VerkkokauppaAPIClient.get_payment)
 def test_verkkokauppa_pruning__update_expired_orders__handle_paid_orders(order):
     VerkkokauppaAPIClient.get_payment.return_value = PaymentFactory.create(status=PaymentStatus.PAID_ONLINE.value)
@@ -72,7 +71,9 @@ def test_verkkokauppa_pruning__update_expired_orders__handle_paid_orders(order):
     order.reservation.refresh_from_db()
     assert order.reservation.state == ReservationStateChoice.CONFIRMED
     assert VerkkokauppaAPIClient.get_payment.called is True
-    assert ReservationEmailNotificationSender.send_confirmation_email.called is True
+
+    assert EmailService.send_reservation_confirmed_email.called is True
+    assert EmailService.send_staff_notification_reservation_made_email.called is True
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment, return_value=None)

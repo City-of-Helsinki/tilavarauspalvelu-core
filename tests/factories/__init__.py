@@ -9,7 +9,6 @@ from .application_section import ApplicationSectionFactory
 from .banner_notification import BannerNotificationFactory
 from .building import BuildingFactory
 from .city import CityFactory
-from .email_template import EmailTemplateFactory
 from .equipment import EquipmentCategoryFactory, EquipmentFactory
 from .keyword import KeywordCategoryFactory, KeywordFactory, KeywordGroupFactory
 from .location import LocationFactory
@@ -64,7 +63,6 @@ __all__ = [
     "BannerNotificationFactory",
     "BuildingFactory",
     "CityFactory",
-    "EmailTemplateFactory",
     "EquipmentCategoryFactory",
     "EquipmentFactory",
     "GeneralRoleFactory",

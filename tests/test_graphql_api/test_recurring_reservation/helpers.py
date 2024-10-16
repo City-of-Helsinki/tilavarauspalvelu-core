@@ -4,9 +4,8 @@ from typing import Any
 
 from graphene_django_extensions.testing import build_mutation, build_query
 
-from config.utils.commons import WEEKDAYS
 from tests.factories import RecurringReservationFactory
-from tilavarauspalvelu.enums import ReservationTypeChoice
+from tilavarauspalvelu.enums import ReservationTypeChoice, WeekdayChoice
 from tilavarauspalvelu.models import (
     AffectingTimeSpan,
     RecurringReservation,
@@ -65,7 +64,7 @@ def create_reservation_series(**kwargs: Any) -> RecurringReservation:
         begin_time=local_time(hour=10),
         end_date=local_date(year=2024, month=2, day=1),  # Thursday
         end_time=local_time(hour=12),
-        weekdays=f"{WEEKDAYS.MONDAY}",
+        weekdays=f"{WeekdayChoice.MONDAY}",
         **kwargs,
     )
 

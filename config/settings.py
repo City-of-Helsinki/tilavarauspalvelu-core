@@ -200,7 +200,7 @@ class Common(Environment):
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
     DEFAULT_FROM_EMAIL = values.StringValue(default="tilavarauspalvelu@localhost")
 
-    SEND_RESERVATION_NOTIFICATION_EMAILS = values.BooleanValue(default=False)
+    SEND_EMAILS = values.BooleanValue(default=True)
     EMAIL_VARAAMO_EXT_LINK = values.StringValue(default=None)
     EMAIL_FEEDBACK_EXT_LINK = values.StringValue(default=None)
 
@@ -487,6 +487,26 @@ class Common(Environment):
                 "view": "tilavarauspalvelu.admin.text_search_view.text_search_list_view",
                 "name": "text_searches",
             },
+            {
+                "route": "email-templates/",
+                "view": "tilavarauspalvelu.admin.email_template.view.email_templates_admin_list_view",
+                "name": "email_templates",
+                "items": {
+                    "route": "<str:email_type>/",
+                    "view": "tilavarauspalvelu.admin.email_template.view.email_type_admin_view",
+                    "name": "view_email_type",
+                },
+            },
+            {
+                "route": "email-tester/",
+                "view": "tilavarauspalvelu.admin.email_template.tester.email_tester_admin_redirect_view",
+                "name": "email_template_tester",
+                "items": {
+                    "route": "<str:email_type>/",
+                    "view": "tilavarauspalvelu.admin.email_template.tester.email_tester_admin_view",
+                    "name": "email_tester",
+                },
+            },
         ],
     }
 
@@ -711,7 +731,7 @@ class AutomatedTests(EmptyDefaults, Common, dotenv_path=None, overrides_from=Aut
 
     EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 
-    SEND_RESERVATION_NOTIFICATION_EMAILS = False
+    SEND_EMAILS = False
     EMAIL_VARAAMO_EXT_LINK = "https://fake.varaamo.hel.fi"
     EMAIL_FEEDBACK_EXT_LINK = "https://fake.varaamo.hel.fi/feedback"
 

@@ -1,10 +1,10 @@
 from decimal import Decimal
 
 import pytest
+from django.test import override_settings
 from graphene_django_extensions.testing import build_mutation
 
 from tests.factories import (
-    EmailTemplateFactory,
     OrderFactory,
     PaymentOrderFactory,
     ReservationFactory,
@@ -14,7 +14,6 @@ from tests.factories import (
 )
 from tests.helpers import patch_method
 from tilavarauspalvelu.enums import (
-    EmailType,
     OrderStatus,
     PaymentType,
     PricingType,
@@ -33,19 +32,9 @@ pytestmark = [
 ]
 
 
-def test_reservation__confirm__changes_state__confirmed(graphql, outbox, settings):
-    settings.SEND_RESERVATION_NOTIFICATION_EMAILS = True
-
+@override_settings(SEND_EMAILS=True)
+def test_reservation__confirm__changes_state__confirmed(graphql, outbox):
     reservation = ReservationFactory.create_for_confirmation()
-
-    EmailTemplateFactory.create(
-        type=EmailType.RESERVATION_CONFIRMED,
-        subject="confirmed",
-    )
-    EmailTemplateFactory.create(
-        type=EmailType.STAFF_NOTIFICATION_RESERVATION_MADE,
-        subject="staff reservation made",
-    )
 
     # Unit admin will get an email
     unit = reservation.reservation_unit.first().unit
@@ -64,23 +53,14 @@ def test_reservation__confirm__changes_state__confirmed(graphql, outbox, setting
     assert reservation.state == ReservationStateChoice.CONFIRMED
 
     assert len(outbox) == 2
-    assert outbox[0].subject == "confirmed"
-    assert outbox[1].subject == "staff reservation made"
+    assert outbox[0].subject == "Thank you for your booking at Varaamo"
+    unit_name = reservation.reservation_unit.first().unit.name
+    assert outbox[1].subject == f"New booking {reservation.id} has been made for {unit_name}"
 
 
-def test_reservation__confirm__changes_state__requires_handling(graphql, outbox, settings):
-    settings.SEND_RESERVATION_NOTIFICATION_EMAILS = True
-
+@override_settings(SEND_EMAILS=True)
+def test_reservation__confirm__changes_state__requires_handling(graphql, outbox):
     reservation = ReservationFactory.create_for_confirmation(reservation_unit__require_reservation_handling=True)
-
-    EmailTemplateFactory.create(
-        type=EmailType.RESERVATION_HANDLING_REQUIRED,
-        subject="handling",
-    )
-    EmailTemplateFactory.create(
-        type=EmailType.STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING,
-        subject="staff requires handling",
-    )
 
     # Unit admin will get an email
     unit = reservation.reservation_unit.first().unit
@@ -99,25 +79,16 @@ def test_reservation__confirm__changes_state__requires_handling(graphql, outbox,
     assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
 
     assert len(outbox) == 2
-    assert outbox[0].subject == "handling"
-    assert outbox[1].subject == "staff requires handling"
+    assert outbox[0].subject == "Your booking is waiting for processing"
+    unit_name = reservation.reservation_unit.first().unit.name
+    assert outbox[1].subject == f"New booking {reservation.id} requires handling at unit {unit_name}"
 
 
-def test_reservation__confirm__changes_state_to_requires_handling_on_subsidy_request(graphql, outbox, settings):
-    settings.SEND_RESERVATION_NOTIFICATION_EMAILS = True
-
+@override_settings(SEND_EMAILS=True)
+def test_reservation__confirm__changes_state_to_requires_handling_on_subsidy_request(graphql, outbox):
     reservation = ReservationFactory.create_for_confirmation(
         applying_for_free_of_charge=True,
         free_of_charge_reason="foo",
-    )
-
-    EmailTemplateFactory.create(
-        type=EmailType.RESERVATION_HANDLING_REQUIRED,
-        subject="handling",
-    )
-    EmailTemplateFactory.create(
-        type=EmailType.STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING,
-        subject="staff requires handling",
     )
 
     # Unit admin will get an email
@@ -138,8 +109,9 @@ def test_reservation__confirm__changes_state_to_requires_handling_on_subsidy_req
     assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
 
     assert len(outbox) == 2
-    assert outbox[0].subject == "handling"
-    assert outbox[1].subject == "staff requires handling"
+    assert outbox[0].subject == "Your booking is waiting for processing"
+    unit_name = reservation.reservation_unit.first().unit.name
+    assert outbox[1].subject == f"New booking {reservation.id} requires handling at unit {unit_name}"
 
 
 def test_reservation__confirm__fails_if_state_is_not_created(graphql):

@@ -220,18 +220,32 @@ UserPermissionChoice = models.TextChoices("UserPermissionChoice", UserRoleChoice
 
 
 class EmailType(models.TextChoices):
-    APPLICATION_HANDLED = "application_handled"
-    APPLICATION_IN_ALLOCATION = "application_in_allocation"
-    APPLICATION_RECEIVED = "application_received"
-    RESERVATION_CANCELLED = "reservation_cancelled"
-    RESERVATION_CONFIRMED = "reservation_confirmed"
-    RESERVATION_HANDLED_AND_CONFIRMED = "reservation_handled_and_confirmed"
-    RESERVATION_HANDLING_REQUIRED = "reservation_handling_required"
-    RESERVATION_MODIFIED = "reservation_modified"
-    RESERVATION_NEEDS_TO_BE_PAID = "reservation_needs_to_be_paid"
-    RESERVATION_REJECTED = "reservation_rejected"
-    STAFF_NOTIFICATION_RESERVATION_MADE = "staff_notification_reservation_made"
-    STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING = "staff_notification_reservation_requires_handling"
+    APPLICATION_HANDLED = "application_handled", _("Application handled")
+    APPLICATION_IN_ALLOCATION = "application_in_allocation", _("Application in allocation")
+    APPLICATION_RECEIVED = "application_received", _("Application received")
+    RESERVATION_CANCELLED = "reservation_cancelled", _("Reservation cancelled")
+    RESERVATION_CONFIRMED = "reservation_confirmed", _("Reservation confirmed")
+    RESERVATION_APPROVED = "reservation_approved", _("Reservation approved")
+    RESERVATION_REQUIRES_HANDLING = "reservation_requires_handling", _("Reservation requires handling")
+    RESERVATION_MODIFIED = "reservation_modified", _("Reservation modified")
+    RESERVATION_REQUIRES_PAYMENT = "reservation_requires_payment", _("Reservation requires payment")
+    RESERVATION_REJECTED = "reservation_rejected", _("Reservation rejected")
+    STAFF_NOTIFICATION_RESERVATION_MADE = (
+        "staff_notification_reservation_made",
+        _("Staff notification reservation made"),
+    )
+    STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING = (
+        "staff_notification_reservation_requires_handling",
+        _("Staff notification reservation requires handling"),
+    )
+
+    @enum.property
+    def html_path(self) -> str:
+        return f"email/html/{self.value}.jinja"
+
+    @enum.property
+    def text_path(self) -> str:
+        return f"email/text/{self.value}.jinja"
 
 
 class HaukiResourceState(Enum):
@@ -589,6 +603,33 @@ class PriceUnit(models.TextChoices):
     PRICE_UNIT_PER_DAY = "per_day", pgettext_lazy("PriceUnit", "per day")
     PRICE_UNIT_PER_WEEK = "per_week", pgettext_lazy("PriceUnit", "per week")
     PRICE_UNIT_FIXED = "fixed", pgettext_lazy("PriceUnit", "fixed")
+
+    @classproperty
+    def fixed_price_units(cls) -> list[str]:
+        return [  # type: ignore[return-value]
+            PriceUnit.PRICE_UNIT_FIXED.value,
+            PriceUnit.PRICE_UNIT_PER_HALF_DAY.value,
+            PriceUnit.PRICE_UNIT_PER_DAY.value,
+            PriceUnit.PRICE_UNIT_PER_WEEK.value,
+        ]
+
+    @enum.property
+    def in_minutes(self) -> int:
+        match self:
+            case PriceUnit.PRICE_UNIT_PER_15_MINS:
+                return 15
+            case PriceUnit.PRICE_UNIT_PER_30_MINS:
+                return 30
+            case PriceUnit.PRICE_UNIT_PER_HOUR:
+                return 60
+            case PriceUnit.PRICE_UNIT_PER_HALF_DAY:
+                return 120
+            case PriceUnit.PRICE_UNIT_PER_DAY:
+                return 1440
+            case PriceUnit.PRICE_UNIT_PER_WEEK:
+                return 10080
+            case _:
+                raise ValueError(f"Price unit {self} cannot be represented in minutes.")
 
 
 class PricingStatus(models.TextChoices):
