@@ -1,7 +1,7 @@
 # This is required so that UTF-8 chars can be used in the file.
 msgid ""
 msgstr ""
-"Language: fi\n"
+"Language: sv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,39 +19,11 @@ msgstr ""
 msgid "Swedish"
 msgstr ""
 
-#: config/utils/commons.py tilavarauspalvelu/enums.py
-msgid "Monday"
-msgstr ""
-
-#: config/utils/commons.py tilavarauspalvelu/enums.py
-msgid "Tuesday"
-msgstr ""
-
-#: config/utils/commons.py tilavarauspalvelu/enums.py
-msgid "Wednesday"
-msgstr ""
-
-#: config/utils/commons.py tilavarauspalvelu/enums.py
-msgid "Thursday"
-msgstr ""
-
-#: config/utils/commons.py tilavarauspalvelu/enums.py
-msgid "Friday"
-msgstr ""
-
-#: config/utils/commons.py tilavarauspalvelu/enums.py
-msgid "Saturday"
-msgstr ""
-
-#: config/utils/commons.py tilavarauspalvelu/enums.py
-msgid "Sunday"
-msgstr ""
-
-#: templates/admin/base.html
+#: templates/admin/base_site.html
 msgid "Change password"
 msgstr ""
 
-#: templates/admin/base.html templates/admin/hel_login.html
+#: templates/admin/base_site.html templates/admin/hel_login.html
 msgid "Log out"
 msgstr ""
 
@@ -804,7 +776,7 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/email_template/tester.py
 #, python-format
-msgid "Test Email '%s' successfully sent."
+msgid "Test email '%(email_type)s' successfully sent."
 msgstr ""
 
 #: tilavarauspalvelu/admin/general_role/admin.py
@@ -1198,7 +1170,7 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Cancel details"
-msgstr "Uppgifter om bokningen"
+msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Handling details"
@@ -1308,7 +1280,7 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Billing email"
-msgstr "Uppgifter om bokningen"
+msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Billing phone"
@@ -2145,6 +2117,54 @@ msgid "Notification manager"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
+msgid "Application handled"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Application in allocation"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Application received"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Reservation cancelled"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Reservation confirmed"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Reservation approved"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Reservation requires handling"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Reservation modified"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Reservation requires payment"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Reservation rejected"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Staff notification reservation made"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Staff notification reservation requires handling"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
 msgctxt "HaukiResourceState"
 msgid "Open"
 msgstr ""
@@ -2514,6 +2534,34 @@ msgid "Other"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
+msgid "Monday"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Tuesday"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Wednesday"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Thursday"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Friday"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Saturday"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgid "Sunday"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
 msgctxt "Priority"
 msgid "Primary"
 msgstr ""
@@ -2712,6 +2760,292 @@ msgstr ""
 msgctxt "BannerNotificationState"
 msgid "Active"
 msgstr ""
+
+#: tilavarauspalvelu/integrations/email/template_context/application.py
+msgctxt "Email"
+msgid "'My applications' page"
+msgstr "'Mina ansökningar'"
+
+#: tilavarauspalvelu/integrations/email/template_context/application.py
+#, python-format
+msgctxt "Email"
+msgid "You can view the result of the processing on the %(page)s"
+msgstr "Du kan se resultatet av behandlingen på sidan %(page)s"
+
+#: tilavarauspalvelu/integrations/email/template_context/application.py
+msgctxt "Email"
+msgid "Your application has been processed"
+msgstr "Din ansökan har behandlats"
+
+#: tilavarauspalvelu/integrations/email/template_context/application.py
+#, python-format
+msgctxt "Email"
+msgid "You can view the application you have sent on the %(page)s"
+msgstr "Du kan se den ansökan du har skickat på sidan %(page)s"
+
+#: tilavarauspalvelu/integrations/email/template_context/application.py
+msgctxt "Email"
+msgid "Your application is being processed"
+msgstr "Din ansökan behandlas"
+
+#: tilavarauspalvelu/integrations/email/template_context/application.py
+msgctxt "Email"
+msgid ""
+"The application deadline has passed. We will notify you of the result when "
+"your application has been processed."
+msgstr ""
+"Ansökningstiden har löpt ut. Vi skickar ett meddelande till e-postadressen "
+"när din ansökan har behandlats."
+
+#: tilavarauspalvelu/integrations/email/template_context/application.py
+#, python-format
+msgctxt "Email"
+msgid ""
+"You can edit your application on the %(page)s until the application deadline"
+msgstr ""
+"Du kan redigera din ansökan på sidan %(page)s till och med ansökningstidens "
+"utgång"
+
+#: tilavarauspalvelu/integrations/email/template_context/application.py
+msgctxt "Email"
+msgid "Your application has been received"
+msgstr "Din ansökan har mottagits"
+
+#: tilavarauspalvelu/integrations/email/template_context/application.py
+msgctxt "Email"
+msgid "Thank you for your application"
+msgstr "Tack för din ansökan"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Varaamo"
+msgstr "Varaamo"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "City of Helsinki"
+msgstr "Helsingfors stad"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Hi"
+msgstr "Hej"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Kind regards"
+msgstr "Med vänliga hälsningar"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Thank you for choosing Varaamo!"
+msgstr "Tack för att du använder Varaamo!"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "This is an automated message, please do not reply"
+msgstr "Detta är ett automatiskt meddelande som inte kan besvaras"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Contact us"
+msgstr "Ta kontakt"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+#, python-format
+msgctxt "Email"
+msgid "Book the city's premises and equipment for your use at %(link)s"
+msgstr "Boka enkelt stadens lokaler och utrustning för eget bruk på %(link)s"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "From"
+msgstr "Börjar"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "To"
+msgstr "Slutar"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "at"
+msgstr "kl."
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "'My bookings' page"
+msgstr "'Mina bokningar'"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+#, python-format
+msgctxt "Email"
+msgid ""
+"Manage your booking at Varaamo. You can check the details of your booking "
+"and Varaamo's terms of contract and cancellation on the %(page)s."
+msgstr ""
+"Hantera din bokning på Varaamo. Du kan kontrollera uppgifterna om din "
+"bokning samt Varaamos avtals- och avbokningsvillkor på sidan %(page)s."
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Price"
+msgstr "Pris"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "incl. VAT"
+msgstr "inkl. moms"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Booking number"
+msgstr "Bokningsnummer"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Your booking has been cancelled"
+msgstr "Din bokning har avbokats"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Your reason for cancellation"
+msgstr "Din anledning till avbokning"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Additional information about cancellation"
+msgstr "Mer information om avbokning"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Thank you for your booking at Varaamo"
+msgstr "Tack för din bokning på Varaamo"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "You have made a new booking"
+msgstr "Du har gjort en ny bokning"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Additional information about your booking"
+msgstr "Mer information om din bokning"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Your booking has been confirmed with the following discount:"
+msgstr "Din bokning har bekräftats med följande rabatt:"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Your booking is now confirmed"
+msgstr "Din bokning har bekräftats"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Your booking is confirmed"
+msgstr "Din bokning är bekräftad"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Your booking is waiting for processing"
+msgstr "Din bokning väntar på att behandlas"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "You have made a new booking request"
+msgstr "Du har gjort en ny bokningsförfrågan"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid ""
+"You will receive a confirmation email once your booking has been processed. "
+"We will contact you if further information is needed regarding your booking "
+"request."
+msgstr ""
+"Du kommer att få en bekräftelse via e-post när din bokning har behandlats. "
+"Vi kommer att kontakta dig om ytterligare information behövs angående din "
+"bokningsförfrågan."
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Your booking has been updated"
+msgstr "Din bokning har uppdaterats"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Pay the booking"
+msgstr "Betala bokningen"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Your booking has been confirmed, and can be paid"
+msgstr "Din bokning har bekräftats och kan betalas"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Due date"
+msgstr "Förfallodatum"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Unfortunately your booking cannot be confirmed"
+msgstr "Tyvärr kan vi inte bekräfta din bokning"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Reason"
+msgstr "Orsak"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Additional information"
+msgstr "Mer information"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+#, python-format
+msgctxt "Email"
+msgid "New booking %(booking_number)s has been made for %(unit_name)s"
+msgstr "Ny bokning %(booking_number)s har gjorts för %(unit_name)s"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+#, python-format
+msgctxt "Email"
+msgid "A new booking has been confirmed for %(reservation_unit_name)s"
+msgstr "En ny bokningsförfrågan för %(reservation_unit_name)s har bekräftats"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Reservee name"
+msgstr "Bokare"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "You can view the booking at"
+msgstr "Du kan se bokningen på"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+#, python-format
+msgctxt "Email"
+msgid "New booking %(booking_number)s requires handling at unit %(unit_name)s"
+msgstr ""
+"Ny bokningsförfrågan %(booking_number)s för %(unit_name)s väntar på at "
+"behandlats"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+#, python-format
+msgctxt "Email"
+msgid ""
+"A booking request for %(reservation_unit_name)s is waiting for processing"
+msgstr ""
+"En ny bokningsförfrågan för %(reservation_unit_name)s väntar på at behandlats"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "You can view and handle the booking at"
+msgstr "Du kan se bokningen på"
 
 #: tilavarauspalvelu/models/address/model.py
 msgid "Addresses"
