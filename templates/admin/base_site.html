@@ -1,0 +1,21 @@
+{% extends "admin/base_site_default.html" %}
+{% load i18n static %}
+
+{% block userlinks %}
+    / <span>Version: {{ version }}</span>
+
+    {% if user.has_usable_password %}
+    / <a href="{% url 'admin:password_change' %}">{% translate 'Change password' %}</a>
+    {% endif %}
+
+    {% if request.session.social_auth_end_session_url %}
+    <form id="logout-form" method="post" action="{% url 'helusers:auth_logout' %}">
+    {% else %}
+    <form id="logout-form" method="post" action="{% url 'admin:logout' %}">
+    {% endif %}
+    {% csrf_token %}
+    / <button type="submit">{% translate 'Log out' %}</button>
+    </form>
+
+    / {% include "admin/color_theme_toggle.html" %}
+{% endblock %}
