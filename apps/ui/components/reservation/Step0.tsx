@@ -92,7 +92,7 @@ function Step0({
   const supportedFields = filterNonNullable(
     reservationUnit.metadataSet?.supportedFields
   );
-  const reserveeType = watch("reserveeType") ?? CustomerTypeChoice.Individual;
+  const reserveeType = watch("reserveeType");
   const homeCity = watch("homeCity");
   const includesHomeCity = containsField(supportedFields, "homeCity");
   const includesReserveeType = containsField(supportedFields, "reserveeType");
@@ -101,7 +101,7 @@ function Step0({
   const reservationApplicationFields = getApplicationFields({
     supportedFields,
     reservation,
-    reserveeType,
+    reserveeType: reserveeType ?? CustomerTypeChoice.Individual,
   });
 
   // TODO clean this up
