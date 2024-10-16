@@ -1,11 +1,10 @@
 {% extends "admin/base_site.html" %}
-{% load i18n admin_urls %}
+{% load i18n %}
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
     <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
-    &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
-    &rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+    &rsaquo; <a href="{% url 'admin:admin-data-index-view' %}">{{ app_view_name }}</a>
     &rsaquo; {% translate 'Email Template Testing' %}
 </div>
 {% endblock %}
@@ -13,23 +12,34 @@
 {% block content %}
 <h1 id="site-name">Email Template Testing</h1>
 
-<div style="display: flex; flex-direction: row-reverse; flex-wrap: wrap; justify-content: flex-end; gap: 40px 10px">
-    <form method="get" novalidate>
-        <table>
-            {{ reservation_unit_form.as_table }}
-            <tr>
-                <td></td>
-                <td><button>Fill form with Reservation Unit data</button></td>
-            </tr>
-        </table>
+<div style="display: flex; flex-direction: column; flex-wrap: wrap; justify-content: flex-end; gap: 10px 10px">
+
+    <form method="get" novalidate id="test_email_template_select_form">
+        <h2>Switch email template</h2>
+        <table>{{ template_switcher_form.as_table }}</table>
+    </form>
+
+    <form method="get" novalidate id="test_email_reservation_unit_select_form">
+        <h2>Fill form with Reservation Unit data</h2>
+        <table>{{ reservation_unit_form.as_table }}</table>
     </form>
 
     <form method="post" novalidate>
+        <h2>Email template test form</h2>
         {% csrf_token %}
-        <table>
-        {{ form.as_table }}
-        </table>
+        <table>{{ form.as_table }}</table>
         <button>Send Test Emails</button>
     </form>
+
+    <script>
+        document.querySelector("#test_email_reservation_unit_select").addEventListener("change", function () {
+            const form = document.querySelector("#test_email_reservation_unit_select_form");
+            form.submit();
+        });
+        document.querySelector("#test_email_template_select").addEventListener("change", function () {
+            const form = document.querySelector("#test_email_template_select_form");
+            form.submit();
+        });
+    </script>
 </div>
 {% endblock %}
