@@ -42,8 +42,11 @@ class UserFactory(GenericDjangoModelFactory[User]):
 
     @classmethod
     def create_with_general_role(cls, *, role: UserRoleChoice = UserRoleChoice.ADMIN, **kwargs: Any) -> User:
+        sub_kwargs = cls.pop_sub_kwargs("general_role", kwargs)
         user = cls.create(**kwargs)
-        GeneralRoleFactory.create(role=role, user=user)
+        sub_kwargs["role"] = role
+        sub_kwargs["user"] = user
+        GeneralRoleFactory.create(**sub_kwargs)
         return user
 
     @classmethod
@@ -55,8 +58,11 @@ class UserFactory(GenericDjangoModelFactory[User]):
         role: UserRoleChoice = UserRoleChoice.ADMIN,
         **kwargs: Any,
     ) -> User:
+        sub_kwargs = cls.pop_sub_kwargs("unit_role", kwargs)
         user = cls.create(**kwargs)
-        unit_role = UnitRoleFactory.create(role=role, user=user)
+        sub_kwargs["role"] = role
+        sub_kwargs["user"] = user
+        unit_role = UnitRoleFactory.create(**sub_kwargs)
         unit_role.units.add(*units)
         unit_role.unit_groups.add(*unit_groups)
         return user

@@ -1,12 +1,13 @@
 import pytest
 
 from tests.factories import ApplicationFactory, ReservationFactory, ReservationUnitFactory, UserFactory
-from tilavarauspalvelu.enums import ReservationNotification
+from tilavarauspalvelu.enums import Language, ReservationNotification
 from tilavarauspalvelu.integrations.email.find_recipients import (
     get_application_email_recipients,
     get_recipients_for_applications_by_language,
     get_reservation_email_recipients,
     get_reservation_staff_notification_recipients,
+    get_users_by_email_language,
 )
 
 pytestmark = [
@@ -92,6 +93,20 @@ def test_get_recipients_for_applications_by_language():
 
     assert sorted(result["fi"]) == ["applicant1@example.com", "contact1@example.com"]
     assert sorted(result["en"]) == ["applicant2@example.com", "contact2@example.com"]
+    assert sorted(result["sv"]) == []
+
+
+def test_get_users_by_email_language():
+    applications = [
+        UserFactory.create(email="user1@example.com", preferred_language=Language.FI.value),
+        UserFactory.create(email="user2@example.com", preferred_language=Language.EN.value),
+        UserFactory.create(email="user3@example.com", preferred_language=Language.EN.value),
+    ]
+
+    result = get_users_by_email_language(applications)
+
+    assert sorted(result["fi"]) == ["user1@example.com"]
+    assert sorted(result["en"]) == ["user2@example.com", "user3@example.com"]
     assert sorted(result["sv"]) == []
 
 
