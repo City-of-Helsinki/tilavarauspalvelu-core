@@ -530,6 +530,7 @@ class Common(Environment):
 
     APPLICATION_ROUND_RESERVATION_CREATION_TIMEOUT_MINUTES = values.IntegerValue(default=10)
     AFFECTING_TIME_SPANS_UPDATE_INTERVAL_MINUTES = values.IntegerValue(default=2)
+    ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS = values.IntegerValue(default=730)
     PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS = values.IntegerValue(default=365)
     PERMISSION_NOTIFICATION_BEFORE_DAYS = values.IntegerValue(default=14)
     RAISE_ERROR_ON_REFRESH_FAILURE = False
