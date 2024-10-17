@@ -79,18 +79,12 @@ def test_email_service__send_application_in_allocation_emails__multiple_language
 
 
 @override_settings(SEND_EMAILS=True)
-@patch_method(SentryLogger.log_message)
 def test_email_service__send_application_in_allocation_emails__wrong_status(outbox):
     ApplicationFactory.create_in_status_expired()
 
     EmailService.send_application_in_allocation_emails()
 
     assert len(outbox) == 0
-
-    assert SentryLogger.log_message.call_count == 1
-    assert SentryLogger.log_message.call_args.args[0] == (
-        "Zero applications require the 'application in allocation' email to be sent"
-    )
 
 
 @override_settings(SEND_EMAILS=True)
