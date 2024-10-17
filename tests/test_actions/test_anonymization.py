@@ -1,19 +1,32 @@
+import datetime
+import uuid
+
 import pytest
 from auditlog.models import LogEntry
+from django.test import override_settings
+from freezegun import freeze_time
 from social_django.models import UserSocialAuth
 
 from tests.factories import (
     AddressFactory,
     ApplicationFactory,
     ApplicationSectionFactory,
+    PaymentOrderFactory,
     ReservationFactory,
     UnitFactory,
     UserFactory,
     UserSocialAuthFactory,
 )
-from tilavarauspalvelu.enums import ReservationNotification
-from tilavarauspalvelu.models import GeneralRole, UnitRole
-from tilavarauspalvelu.models.user.actions import ANONYMIZED, SENSITIVE_APPLICATION, SENSITIVE_RESERVATION
+from tilavarauspalvelu.enums import OrderStatus, ReservationNotification
+from tilavarauspalvelu.models import GeneralRole, UnitRole, User
+from tilavarauspalvelu.models.user.actions import (
+    ANONYMIZED,
+    ANONYMIZED_FIRST_NAME,
+    ANONYMIZED_LAST_NAME,
+    SENSITIVE_APPLICATION,
+    SENSITIVE_RESERVATION,
+)
+from utils.date_utils import local_datetime
 
 # Applied to all tests
 pytestmark = [
@@ -46,8 +59,8 @@ def test_anonymization__user():
     mr_anonymous.refresh_from_db()
 
     assert mr_anonymous.username == f"anonymized-{mr_anonymous.uuid}"
-    assert mr_anonymous.first_name == "ANON"
-    assert mr_anonymous.last_name == "ANONYMIZED"
+    assert mr_anonymous.first_name == ANONYMIZED_FIRST_NAME
+    assert mr_anonymous.last_name == ANONYMIZED_LAST_NAME
     assert mr_anonymous.email == f"{mr_anonymous.first_name}.{mr_anonymous.last_name}@anonymized.net"
     assert mr_anonymous.uuid != old_user_uuid
     assert mr_anonymous.reservation_notification == ReservationNotification.NONE
@@ -193,3 +206,80 @@ def test_anonymization__reservation__empty_values():
     assert reservation.name == ""
     assert reservation.description == ""
     assert reservation.free_of_charge_reason is None
+
+
+@freeze_time("2024-01-01")
+def test_anonymization__can_anonymize__open_reservations():
+    user = UserFactory.create(first_name="foo")
+
+    now = local_datetime()
+    ReservationFactory.create(user=user, begin=now, end=now + datetime.timedelta(days=1))
+
+    can_anonymize = user.actions.can_anonymize()
+
+    assert can_anonymize.has_open_reservations is True
+    assert can_anonymize.has_open_applications is False
+    assert can_anonymize.has_open_payments is False
+
+
+def test_anonymization__can_anonymize__open_applications__received():
+    user = UserFactory.create(first_name="foo")
+
+    ApplicationFactory.create_in_status_received(user=user)
+
+    can_anonymize = user.actions.can_anonymize()
+
+    assert can_anonymize.has_open_reservations is False
+    assert can_anonymize.has_open_applications is True
+    assert can_anonymize.has_open_payments is False
+
+
+def test_anonymization__can_anonymize__open_applications__in_allocation():
+    user = UserFactory.create(first_name="foo")
+
+    ApplicationFactory.create_in_status_in_allocation(user=user)
+
+    can_anonymize = user.actions.can_anonymize()
+
+    assert can_anonymize.has_open_reservations is False
+    assert can_anonymize.has_open_applications is True
+    assert can_anonymize.has_open_payments is False
+
+
+def test_anonymization__can_anonymize__open_payments():
+    user = UserFactory.create(first_name="foo")
+
+    PaymentOrderFactory.create(
+        reservation__user=user,
+        remote_id=uuid.uuid4(),
+        status=OrderStatus.DRAFT,
+    )
+
+    can_anonymize = user.actions.can_anonymize()
+
+    assert can_anonymize.has_open_reservations is False
+    assert can_anonymize.has_open_applications is False
+    assert can_anonymize.has_open_payments is True
+
+
+@freeze_time("2024-01-01")
+@override_settings(ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS=10)
+def test_anonymization__anonymize_inactive_users():
+    now = local_datetime()
+
+    user_1 = UserFactory.create(first_name="foo", last_login=now - datetime.timedelta(days=11))
+    user_2 = UserFactory.create(first_name="bar", last_login=now - datetime.timedelta(days=11))
+    user_3 = UserFactory.create(first_name="baz", last_login=now - datetime.timedelta(days=10))
+
+    # User 2 cannot be anonymized, since it has open reservations
+    ReservationFactory.create(user=user_2, begin=now, end=now + datetime.timedelta(days=1))
+
+    User.objects.anonymize_inactive_users()
+
+    user_1.refresh_from_db()
+    user_2.refresh_from_db()
+    user_3.refresh_from_db()
+
+    assert user_1.first_name == ANONYMIZED_FIRST_NAME
+    assert user_2.first_name == "bar"
+    assert user_3.first_name == "baz"

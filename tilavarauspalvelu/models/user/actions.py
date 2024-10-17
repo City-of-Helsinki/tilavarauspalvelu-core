@@ -30,6 +30,8 @@ if TYPE_CHECKING:
     from .model import User
 
 
+ANONYMIZED_FIRST_NAME = "ANON"
+ANONYMIZED_LAST_NAME = "ANONYMIZED"
 ANONYMIZED = "Anonymized"
 SENSITIVE_RESERVATION = "Sensitive data of this reservation has been anonymized by a script"
 SENSITIVE_APPLICATION = "Sensitive data of this application has been anonymized by a script"
@@ -45,8 +47,8 @@ class UserActions:
         self.anonymize_user_reservations()
 
     def anonymize_user(self) -> None:
-        self.user.first_name = "ANON"
-        self.user.last_name = "ANONYMIZED"
+        self.user.first_name = ANONYMIZED_FIRST_NAME
+        self.user.last_name = ANONYMIZED_LAST_NAME
         self.user.email = f"{self.user.first_name}.{self.user.last_name}@anonymized.net"
         self.user.uuid = uuid.uuid4()
         self.user.username = f"anonymized-{self.user.uuid}"
