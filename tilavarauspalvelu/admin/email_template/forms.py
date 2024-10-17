@@ -21,6 +21,7 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_reservation_requires_payment,
     get_context_for_staff_notification_reservation_made,
     get_context_for_staff_notification_reservation_requires_handling,
+    get_context_for_user_anonymization,
 )
 from tilavarauspalvelu.models import ReservationUnit
 from tilavarauspalvelu.translation import get_attr_by_language
@@ -97,6 +98,8 @@ def select_tester_form(*, email_type: EmailType) -> type[EmailTemplateForm] | No
             return ApplicationReceivedEmailTemplateTesterForm
         case EmailType.PERMISSION_DEACTIVATION:
             return PermissionDeactivationEmailTemplateTesterForm
+        case EmailType.USER_ANONYMIZATION:
+            return UserAnonymizationEmailTemplateTesterForm
         case EmailType.RESERVATION_CANCELLED:
             return ReservationCancelledEmailTemplateTesterForm
         case EmailType.RESERVATION_CONFIRMED:
@@ -189,6 +192,14 @@ class PermissionDeactivationEmailTemplateTesterForm(
 ):
     def to_context(self) -> EmailContext:
         return get_context_for_permission_deactivation(language=self.cleaned_data["language"])
+
+
+class UserAnonymizationEmailTemplateTesterForm(
+    LanguageFormMixin,
+    EmailTemplateForm,
+):
+    def to_context(self) -> EmailContext:
+        return get_context_for_user_anonymization(language=self.cleaned_data["language"])
 
 
 class ReservationCancelledEmailTemplateTesterForm(
