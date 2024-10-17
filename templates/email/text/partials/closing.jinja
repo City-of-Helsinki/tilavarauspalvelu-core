@@ -1,4 +1,4 @@
-{{ with_regards }}
-{{ service_name }}
+{{ with_regards | safe }}
+{{ service_name | safe }}
 
 {% include "email/text/partials/automatic_message.jinja" %}

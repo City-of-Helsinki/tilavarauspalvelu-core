@@ -306,6 +306,7 @@ class ReservationHandlingRequiredEmailTemplateTesterForm(
     EmailTemplateForm,
 ):
     subsidised_price = forms.DecimalField(decimal_places=2, initial=Decimal("10.00"), widget=number_widget)
+    applying_for_free_of_charge = forms.BooleanField(initial=False)
 
     @classmethod
     def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang):
@@ -329,6 +330,7 @@ class ReservationHandlingRequiredEmailTemplateTesterForm(
             end_datetime=self.cleaned_data["end_datetime"],
             price=self.cleaned_data["price"],
             subsidised_price=self.cleaned_data["subsidised_price"],
+            applying_for_free_of_charge=self.cleaned_data["applying_for_free_of_charge"],
             tax_percentage=self.cleaned_data["tax_percentage"],
             booking_number=self.cleaned_data["booking_number"],
             pending_instructions=self.cleaned_data["pending_instructions"],

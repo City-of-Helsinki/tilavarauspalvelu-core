@@ -1,2 +1,2 @@
-{{ price_label }}: {% if price > 0 %}{% if subsidised_price < price %}{{ subsidised_price | currency }} - {{ price | currency }} €{% else %}{{ price | currency }} €{% endif %} ({{ vat_included_label }} {{ tax_percentage }} %){% else %}0 €{% endif %}
-{{ booking_number_label }}: {{ booking_number }}
+{{ price_label | safe }}: {% if price > 0 %}{% if price_can_be_subsidised %}{{ subsidised_price | currency }} - {{ price | currency }} €{% else %}{{ price | currency }} €{% endif %} ({{ vat_included_label | safe }} {{ tax_percentage }} %){% else %}0 €{% endif %}
+{{ booking_number_label | safe }}: {{ booking_number }}

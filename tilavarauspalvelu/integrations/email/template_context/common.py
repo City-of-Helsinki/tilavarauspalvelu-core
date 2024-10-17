@@ -140,6 +140,7 @@ def get_contex_for_reservation_price_range(
     subsidised_price: Decimal,
     tax_percentage: Decimal,
     booking_number: int,
+    applying_for_free_of_charge: bool,
     *,
     language: Lang,
 ) -> EmailContext:
@@ -147,6 +148,7 @@ def get_contex_for_reservation_price_range(
         "price_label": pgettext("Email", "Price"),
         "price": price,
         "subsidised_price": subsidised_price,
+        "price_can_be_subsidised": applying_for_free_of_charge and subsidised_price < price,
         "vat_included_label": pgettext("Email", "incl. VAT"),
         "tax_percentage": tax_percentage,
         "booking_number_label": pgettext("Email", "Booking number"),
@@ -177,6 +179,21 @@ def params_for_base_info(
 def params_for_price_info(reservation: Reservation, *, language: Lang) -> dict[str, Any]:
     return {
         "price": reservation.price,
+        "tax_percentage": reservation.tax_percentage_value,
+        "booking_number": reservation.id,
+    }
+
+
+def params_for_price_range_info(reservation: Reservation, *, language: Lang) -> dict[str, Any]:
+    begin_datetime = reservation.begin.astimezone(DEFAULT_TIMEZONE)
+    end_datetime = reservation.end.astimezone(DEFAULT_TIMEZONE)
+
+    subsidised_price = reservation.actions.calculate_full_price(begin_datetime, end_datetime, subsidised=True)
+
+    return {
+        "price": reservation.price,
+        "subsidised_price": subsidised_price,
+        "applying_for_free_of_charge": reservation.applying_for_free_of_charge,
         "tax_percentage": reservation.tax_percentage_value,
         "booking_number": reservation.id,
     }
