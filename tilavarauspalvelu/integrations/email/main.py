@@ -35,6 +35,7 @@ from .template_context import (
     get_context_for_reservation_requires_payment,
     get_context_for_staff_notification_reservation_made,
     get_context_for_staff_notification_reservation_requires_handling,
+    get_context_for_user_anonymization,
 )
 
 if TYPE_CHECKING:
@@ -184,6 +185,32 @@ class EmailService:
 
         send_multiple_emails_in_batches_task.delay(emails=emails)
         users.update(sent_email_about_deactivating_permissions=True)
+
+    @staticmethod
+    def send_user_anonymization_emails() -> None:
+        users = User.objects.should_anonymize_users().exclude(email="").order_by("last_login")
+        if not users:
+            return
+
+        recipients_by_language = get_users_by_email_language(users)
+
+        emails: list[EmailData] = []
+        email_type = EmailType.USER_ANONYMIZATION
+
+        for language, recipients in recipients_by_language.items():
+            context = get_context_for_user_anonymization(language=language)
+
+            emails.append(
+                EmailData(
+                    recipients=list(recipients),
+                    subject=context["title"],
+                    text_content=render_text(email_type=email_type, context=context),
+                    html_content=render_html(email_type=email_type, context=context),
+                    attachments=[],
+                )
+            )
+
+        send_multiple_emails_in_batches_task.delay(emails=emails)
 
     @staticmethod
     def send_reservation_cancelled_email(

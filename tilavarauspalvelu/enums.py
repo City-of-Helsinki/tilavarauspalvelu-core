@@ -249,6 +249,7 @@ class EmailType(models.TextChoices):
     APPLICATION_IN_ALLOCATION = "application_in_allocation", _("Application in allocation")
     APPLICATION_RECEIVED = "application_received", _("Application received")
     PERMISSION_DEACTIVATION = "permission_deactivation", _("Permission deactivation")
+    USER_ANONYMIZATION = "user_anonymization", _("User anonymization")
     RESERVATION_CANCELLED = "reservation_cancelled", _("Reservation cancelled")
     RESERVATION_CONFIRMED = "reservation_confirmed", _("Reservation confirmed")
     RESERVATION_APPROVED = "reservation_approved", _("Reservation approved")

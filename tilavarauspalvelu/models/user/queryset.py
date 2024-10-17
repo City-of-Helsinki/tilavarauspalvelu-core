@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import Self
 
 from django.conf import settings
 from django.contrib.auth.models import UserManager as DjangoUserManager
@@ -29,7 +30,7 @@ class UserQuerySet(models.QuerySet):
             & models.Q(last_login__date__lt=cutoff)
         ).update(is_staff=False, is_superuser=False)
 
-    def should_deactivate_permissions(self) -> models.QuerySet:
+    def should_deactivate_permissions(self) -> Self:
         """Which users' permissions should be deactivated due to inactivity."""
         cutoff = (
             local_date()
@@ -55,6 +56,7 @@ class UserQuerySet(models.QuerySet):
         )
 
     def anonymize_inactive_users(self) -> None:
+        """Anonymize users who haven't logged in in a while and haven't been anonymized yet."""
         cutoff = local_date() - datetime.timedelta(days=settings.ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS)
 
         # All users who haven't logged in in a while but haven't been anonymized yet.
@@ -79,6 +81,18 @@ class UserQuerySet(models.QuerySet):
         for user in users:
             if user.actions.can_anonymize():
                 user.actions.anonymize()
+
+    def should_anonymize_users(self) -> Self:
+        """Which users should be anonymized due to inactivity (and aren't already anonymized)."""
+        cutoff = (
+            local_date()
+            + datetime.timedelta(days=settings.ANONYMIZATION_NOTIFICATION_BEFORE_DAYS)
+            - datetime.timedelta(days=settings.ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS)
+        )
+        return self.exclude(
+            first_name=ANONYMIZED_FIRST_NAME,
+            last_name=ANONYMIZED_LAST_NAME,
+        ).filter(last_login__date__lt=cutoff)
 
 
 class UserManager(DjangoUserManager.from_queryset(UserQuerySet)): ...

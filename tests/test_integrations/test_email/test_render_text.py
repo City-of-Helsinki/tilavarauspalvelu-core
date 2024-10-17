@@ -21,6 +21,7 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_reservation_requires_payment,
     get_context_for_staff_notification_reservation_made,
     get_context_for_staff_notification_reservation_requires_handling,
+    get_context_for_user_anonymization,
 )
 
 
@@ -126,6 +127,30 @@ def test_render_permission_deactivation__text():
 
         You can login to Varaamo here to prevent this from happening:
         https://fake.varaamo.hel.fi/kasittely
+
+        Kind regards
+        Varaamo
+
+        This is an automated message, please do not reply. Contact us: https://fake.varaamo.hel.fi/feedback?lang=en.
+
+        Book the city's premises and equipment for your use at https://fake.varaamo.hel.fi/en.
+        """
+    )
+
+
+@freeze_time("2024-01-01")
+def test_render_user_anonymization__text():
+    context = get_context_for_user_anonymization(language="en")
+    text_content = render_text(email_type=EmailType.USER_ANONYMIZATION, context=context)
+
+    assert text_content == cleandoc(
+        """
+        Hi,
+
+        Your account in Varaamo has not been used for a while. The data in your account will be removed soon.
+
+        You can login to Varaamo here to prevent this from happening:
+        https://fake.varaamo.hel.fi/en
 
         Kind regards
         Varaamo

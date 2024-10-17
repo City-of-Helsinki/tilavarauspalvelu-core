@@ -8,6 +8,7 @@ from tests.factories import ApplicationFactory, ReservationFactory, UnitFactory,
 from tests.helpers import TranslationsFromPOFiles, patch_method
 from tilavarauspalvelu.enums import Language, ReservationNotification, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
+from tilavarauspalvelu.models.user.actions import ANONYMIZED_FIRST_NAME, ANONYMIZED_LAST_NAME
 from utils.date_utils import local_datetime
 from utils.sentry import SentryLogger
 
@@ -342,6 +343,138 @@ def test_email_service__send_permission_deactivation_emails__email_already_sent(
     EmailService.send_permission_deactivation_emails()
 
     assert len(outbox) == 0
+
+
+@freeze_time("2024-01-01")
+@override_settings(
+    SEND_EMAILS=True,
+    ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS=10,
+    ANONYMIZATION_NOTIFICATION_BEFORE_DAYS=5,
+)
+def test_email_service__send_user_anonymization_emails(outbox):
+    UserFactory.create(
+        email="user@email.com",
+        preferred_language=Language.EN.value,
+        last_login=local_datetime() - datetime.timedelta(days=20),
+    )
+
+    EmailService.send_user_anonymization_emails()
+
+    assert len(outbox) == 1
+
+    assert outbox[0].subject == "The data in your Varaamo account will be removed soon"
+    assert sorted(outbox[0].bcc) == ["user@email.com"]
+
+
+@freeze_time("2024-01-01")
+@override_settings(
+    SEND_EMAILS=True,
+    ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS=10,
+    ANONYMIZATION_NOTIFICATION_BEFORE_DAYS=5,
+)
+def test_email_service__send_user_anonymization_emails__no_email(outbox):
+    UserFactory.create(
+        # User has no email, so we can't notify them (but we should still anonymize)
+        email="",
+        preferred_language=Language.EN.value,
+        last_login=local_datetime() - datetime.timedelta(days=20),
+    )
+
+    EmailService.send_user_anonymization_emails()
+
+    assert len(outbox) == 0
+
+
+@freeze_time("2024-01-01")
+@override_settings(
+    SEND_EMAILS=True,
+    ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS=10,
+    ANONYMIZATION_NOTIFICATION_BEFORE_DAYS=5,
+)
+def test_email_service__send_user_anonymization_emails__logged_in_recently(outbox):
+    UserFactory.create(
+        email="user@email.com",
+        preferred_language=Language.EN.value,
+        last_login=local_datetime() - datetime.timedelta(days=1),
+    )
+
+    EmailService.send_user_anonymization_emails()
+
+    assert len(outbox) == 0
+
+
+@freeze_time("2024-01-01")
+@override_settings(
+    SEND_EMAILS=True,
+    ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS=10,
+    ANONYMIZATION_NOTIFICATION_BEFORE_DAYS=5,
+)
+def test_email_service__send_user_anonymization_emails__going_to_be_old(outbox):
+    UserFactory.create(
+        email="user@email.com",
+        preferred_language=Language.EN.value,
+        # Logged in within `ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS`,
+        # but after `ANONYMIZATION_NOTIFICATION_BEFORE_DAYS`
+        # user will be considered inactive, so we need to send email now.
+        last_login=local_datetime() - datetime.timedelta(days=6),
+    )
+
+    EmailService.send_user_anonymization_emails()
+
+    assert len(outbox) == 1
+
+    assert outbox[0].subject == "The data in your Varaamo account will be removed soon"
+    assert sorted(outbox[0].bcc) == ["user@email.com"]
+
+
+@freeze_time("2024-01-01")
+@override_settings(
+    SEND_EMAILS=True,
+    ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS=10,
+    ANONYMIZATION_NOTIFICATION_BEFORE_DAYS=5,
+)
+def test_email_service__send_user_anonymization_emails__already_anonymized(outbox):
+    UserFactory.create(
+        first_name=ANONYMIZED_FIRST_NAME,
+        last_name=ANONYMIZED_LAST_NAME,
+        email="user@email.com",
+        preferred_language=Language.EN.value,
+        last_login=local_datetime() - datetime.timedelta(days=20),
+    )
+
+    EmailService.send_user_anonymization_emails()
+
+    assert len(outbox) == 0
+
+
+@freeze_time("2024-01-01")
+@override_settings(
+    SEND_EMAILS=True,
+    ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS=10,
+    ANONYMIZATION_NOTIFICATION_BEFORE_DAYS=5,
+)
+def test_email_service__send_user_anonymization_emails__multiple_languages(outbox):
+    UserFactory.create(
+        email="user1@email.com",
+        preferred_language=Language.EN.value,
+        last_login=local_datetime() - datetime.timedelta(days=20),
+    )
+    UserFactory.create(
+        email="user2@email.com",
+        preferred_language=Language.FI.value,
+        last_login=local_datetime() - datetime.timedelta(days=25),
+    )
+
+    with TranslationsFromPOFiles():
+        EmailService.send_user_anonymization_emails()
+
+    assert len(outbox) == 2
+
+    assert outbox[0].subject == "Tiedot Varaamo tililläsi tullaan poistamaan pian"
+    assert sorted(outbox[0].bcc) == ["user2@email.com"]
+
+    assert outbox[1].subject == "The data in your Varaamo account will be removed soon"
+    assert sorted(outbox[1].bcc) == ["user1@email.com"]
 
 
 @override_settings(SEND_EMAILS=True)

@@ -704,6 +704,13 @@ def send_permission_deactivation_email_task():
     EmailService.send_permission_deactivation_emails()
 
 
+@app.task(name="send_user_anonymization_email")
+def send_user_anonymization_email_task():
+    from tilavarauspalvelu.integrations.email.main import EmailService
+
+    EmailService.send_user_anonymization_emails()
+
+
 @app.task(name="deactivate_old_permissions")
 def anonymize_old_users_task() -> None:
     User.objects.anonymize_inactive_users()

@@ -2133,6 +2133,10 @@ msgid "Permission deactivation"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
+msgid "User anonymization"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
 msgid "Reservation cancelled"
 msgstr ""
 
@@ -2925,6 +2929,20 @@ msgstr ""
 msgctxt "Email"
 msgid "You can login to Varaamo here to prevent this from happening"
 msgstr "Du kan logga in på Varaamo här för att förhindra att detta händer"
+
+#: tilavarauspalvelu/integrations/email/template_context/permissions.py
+msgctxt "Email"
+msgid "The data in your Varaamo account will be removed soon"
+msgstr "Uppgifterna i ditt Varaamo-konto kommer snart att tas bort"
+
+#: tilavarauspalvelu/integrations/email/template_context/permissions.py
+msgctxt "Email"
+msgid ""
+"Your account in Varaamo has not been used for a while. The data in your "
+"account will be removed soon."
+msgstr ""
+"Ditt konto i Varaamo har inte använts på ett tag. Uppgifterna på ditt konto "
+"kommer snart att tas bort."
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"

@@ -16,6 +16,7 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_reservation_requires_payment,
     get_context_for_staff_notification_reservation_made,
     get_context_for_staff_notification_reservation_requires_handling,
+    get_context_for_user_anonymization,
 )
 from tilavarauspalvelu.typing import EmailContext, Lang
 from utils.date_utils import local_datetime
@@ -59,6 +60,9 @@ def get_mock_data(*, email_type: EmailType, language: Lang) -> EmailContext | No
 
         case EmailType.PERMISSION_DEACTIVATION:
             return get_context_for_permission_deactivation(language=language)
+
+        case EmailType.USER_ANONYMIZATION:
+            return get_context_for_user_anonymization(language=language)
 
         case EmailType.RESERVATION_CANCELLED:
             return get_context_for_reservation_cancelled(
