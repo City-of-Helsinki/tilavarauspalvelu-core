@@ -1,0 +1,15 @@
+{% extends "email/html/partials/base.jinja" %}
+
+{% block content_main %}
+    <mj-text>{{ text_user_anonymization | sentence | safe }}</mj-text>
+    <mj-spacer />
+    <mj-text>{{ text_login_to_prevent | safe }}:</mj-text>
+    <mj-text>{{ login_url_html | safe }}</mj-text>
+{% endblock %}
+
+{% block content_secondary %}
+{% endblock %}
+
+{% block content_closing %}
+    {% include "email/html/partials/closing.jinja" %}
+{% endblock %}
