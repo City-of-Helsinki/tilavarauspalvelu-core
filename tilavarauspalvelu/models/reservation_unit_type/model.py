@@ -17,8 +17,9 @@ __all__ = [
 
 
 class ReservationUnitType(models.Model):
+    rank: int = models.PositiveIntegerField(default=0, null=False, blank=False, db_index=True)  # Used for ordering
+
     name = models.CharField(max_length=255)
-    rank = models.PositiveIntegerField(blank=True, null=True)
 
     # Translated field hints
     name_fi: str | None
