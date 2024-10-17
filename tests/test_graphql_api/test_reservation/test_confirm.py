@@ -13,14 +13,7 @@ from tests.factories import (
     UserFactory,
 )
 from tests.helpers import patch_method
-from tilavarauspalvelu.enums import (
-    EmailType,
-    OrderStatus,
-    PaymentType,
-    PricingType,
-    ReservationNotification,
-    ReservationStateChoice,
-)
+from tilavarauspalvelu.enums import EmailType, OrderStatus, PaymentType, ReservationNotification, ReservationStateChoice
 from tilavarauspalvelu.models import PaymentOrder
 from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CreateOrderError
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
@@ -365,7 +358,8 @@ def test_reservation__confirm__does_not_allow_unsupported_payment_type(graphql):
 def test_reservation__confirm__allows_unsupported_payment_type_with_zero_price(graphql):
     reservation = ReservationFactory.create_for_confirmation(
         reservation_unit__payment_types__code=PaymentType.INVOICE,
-        reservation_unit__pricings__pricing_type=PricingType.FREE,
+        reservation_unit__pricings__lowest_price=0,
+        reservation_unit__pricings__highest_price=0,
         price=Decimal("0"),
     )
 
@@ -511,10 +505,11 @@ def test_reservation__confirm__with_price_requires_payment_product(graphql):
     assert response.error_message() == "Reservation unit is missing payment product"
 
 
-def test_reservation__confirm__without_price_and_with_free_pricing_type_does_not_require_payment_product(graphql):
+def test_reservation__confirm__without_price_and_with_free_pricing_does_not_require_payment_product(graphql):
     reservation = ReservationFactory.create_for_confirmation(
         reservation_unit__payment_product=None,
-        reservation_unit__pricings__pricing_type=PricingType.FREE,
+        reservation_unit__pricings__lowest_price=0,
+        reservation_unit__pricings__highest_price=0,
         price=Decimal("0"),
     )
 

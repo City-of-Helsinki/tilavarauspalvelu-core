@@ -3,8 +3,6 @@ from datetime import date, timedelta
 from tilavarauspalvelu.enums import (
     AuthenticationType,
     PriceUnit,
-    PricingStatus,
-    PricingType,
     ReservationKind,
     ReservationStartInterval,
     TermsOfUseTypeChoices,
@@ -793,14 +791,11 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
     aina_kasiteltava_kellarikerros.payment_types.add(payment_type_online)
     ReservationUnitPricing.objects.get_or_create(
         reservation_unit=aina_kasiteltava_kellarikerros,
-        status=PricingStatus.PRICING_STATUS_ACTIVE,
         defaults={
             "begins": date(2023, 1, 1),
-            "pricing_type": PricingType.PAID,
             "price_unit": PriceUnit.PRICE_UNIT_PER_HOUR,
             "lowest_price": 0.0,
             "highest_price": 40.0,
-            "status": PricingStatus.PRICING_STATUS_ACTIVE,
             "tax_percentage": tax_percentage_24,
         },
     )
@@ -883,10 +878,8 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
     maksuton_mankeli.qualifiers.add(qualifier_under_15)
     ReservationUnitPricing.objects.get_or_create(
         reservation_unit=maksuton_mankeli,
-        status=PricingStatus.PRICING_STATUS_ACTIVE,
         defaults={
             "begins": date(2023, 1, 1),
-            "pricing_type": PricingType.FREE,
             "price_unit": PriceUnit.PRICE_UNIT_PER_HOUR,
             "lowest_price": 0.0,
             "highest_price": 0.0,
@@ -986,10 +979,8 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
     aina_maksullinen_aitio.payment_types.add(payment_type_online)
     ReservationUnitPricing.objects.get_or_create(
         reservation_unit=aina_maksullinen_aitio,
-        status=PricingStatus.PRICING_STATUS_ACTIVE,
         defaults={
             "begins": date(2023, 1, 1),
-            "pricing_type": PricingType.PAID,
             "price_unit": PriceUnit.PRICE_UNIT_PER_HOUR,
             "lowest_price": 40.0,
             "highest_price": 40.0,
@@ -1092,10 +1083,8 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
     alennuskelpoinen_aula.payment_types.add(payment_type_online)
     ReservationUnitPricing.objects.get_or_create(
         reservation_unit=alennuskelpoinen_aula,
-        status=PricingStatus.PRICING_STATUS_ACTIVE,
         defaults={
             "begins": date(2023, 1, 1),
-            "pricing_type": PricingType.PAID,
             "price_unit": PriceUnit.PRICE_UNIT_PER_HOUR,
             "lowest_price": 0.0,
             "highest_price": 30.0,
@@ -1174,10 +1163,8 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
     perumiskelvoton_parveke.equipments.add(equipment_billiard_table)
     ReservationUnitPricing.objects.get_or_create(
         reservation_unit=perumiskelvoton_parveke,
-        status=PricingStatus.PRICING_STATUS_ACTIVE,
         defaults={
             "begins": date(2023, 1, 1),
-            "pricing_type": PricingType.FREE,
             "price_unit": PriceUnit.PRICE_UNIT_PER_HOUR,
             "lowest_price": 0.0,
             "highest_price": 0.0,
@@ -1267,10 +1254,8 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
     perumiskelvoton_patio.payment_types.add(payment_type_online)
     ReservationUnitPricing.objects.get_or_create(
         reservation_unit=perumiskelvoton_patio,
-        status=PricingStatus.PRICING_STATUS_ACTIVE,
         defaults={
             "begins": date(2023, 1, 1),
-            "pricing_type": PricingType.PAID,
             "price_unit": PriceUnit.PRICE_UNIT_PER_HOUR,
             "lowest_price": 0.0,
             "highest_price": 30.0,
@@ -1364,10 +1349,8 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
     )
     ReservationUnitPricing.objects.get_or_create(
         reservation_unit=toistuvien_varausten_toimisto,
-        status=PricingStatus.PRICING_STATUS_ACTIVE,
         defaults={
             "begins": date(2023, 1, 1),
-            "pricing_type": PricingType.FREE,
             "price_unit": PriceUnit.PRICE_UNIT_PER_HOUR,
             "lowest_price": 0.0,
             "highest_price": 0.0,
@@ -1448,10 +1431,8 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
     )
     ReservationUnitPricing.objects.get_or_create(
         reservation_unit=tauotettu_takkahuone,
-        status=PricingStatus.PRICING_STATUS_ACTIVE,
         defaults={
             "begins": date(2023, 1, 1),
-            "pricing_type": PricingType.FREE,
             "price_unit": PriceUnit.PRICE_UNIT_PER_HOUR,
             "lowest_price": 0.0,
             "highest_price": 0.0,
@@ -1545,10 +1526,8 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]) -> None:
     )
     ReservationUnitPricing.objects.get_or_create(
         reservation_unit=aina_kasiteltava_kammio,
-        status=PricingStatus.PRICING_STATUS_ACTIVE,
         defaults={
             "begins": date(2023, 1, 1),
-            "pricing_type": PricingType.FREE,
             "price_unit": PriceUnit.PRICE_UNIT_PER_HOUR,
             "lowest_price": 0.0,
             "highest_price": 0.0,
