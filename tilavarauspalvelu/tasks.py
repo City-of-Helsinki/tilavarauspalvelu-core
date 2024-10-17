@@ -48,6 +48,7 @@ from tilavarauspalvelu.models import (
     Space,
     TaxPercentage,
     Unit,
+    User,
 )
 from tilavarauspalvelu.models.recurring_reservation.actions import ReservationDetails
 from tilavarauspalvelu.models.request_log.model import RequestLog
@@ -701,3 +702,8 @@ def send_permission_deactivation_email_task():
     from tilavarauspalvelu.integrations.email.main import EmailService
 
     EmailService.send_permission_deactivation_emails()
+
+
+@app.task(name="deactivate_old_permissions")
+def anonymize_old_users_task() -> None:
+    User.objects.anonymize_inactive_users()

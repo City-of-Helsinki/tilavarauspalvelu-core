@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth.models import UserManager as DjangoUserManager
 from django.db import models
 
+from tilavarauspalvelu.models.user.actions import ANONYMIZED_FIRST_NAME, ANONYMIZED_LAST_NAME
 from utils.date_utils import local_date
 
 __all__ = [
@@ -52,6 +53,19 @@ class UserQuerySet(models.QuerySet):
             )
             & models.Q(last_login__date__lt=cutoff)
         )
+
+    def anonymize_inactive_users(self) -> None:
+        cutoff = local_date() - datetime.timedelta(days=settings.ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS)
+
+        # All users who haven't logged in in a while but haven't been anonymized yet
+        users = self.exclude(
+            first_name=ANONYMIZED_FIRST_NAME,
+            last_name=ANONYMIZED_LAST_NAME,
+        ).filter(last_login__date__lt=cutoff)
+
+        for user in users:
+            if user.actions.can_anonymize():
+                user.actions.anonymize()
 
 
 class UserManager(DjangoUserManager.from_queryset(UserQuerySet)): ...
