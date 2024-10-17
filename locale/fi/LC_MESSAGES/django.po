@@ -2190,6 +2190,10 @@ msgid "Application received"
 msgstr "Kausivaraushakemus vastaanotettu"
 
 #: tilavarauspalvelu/enums.py
+msgid "Permission deactivation"
+msgstr "Käyttöoikeuksien deaktivointi"
+
+#: tilavarauspalvelu/enums.py
 msgid "Reservation cancelled"
 msgstr "Varaus peruttu"
 
@@ -2963,6 +2967,26 @@ msgctxt "Email"
 msgid "Booking number"
 msgstr "Varausnumero"
 
+#: tilavarauspalvelu/integrations/email/template_context/permissions.py
+msgctxt "Email"
+msgid "Your permissions in Varaamo are going to be deactivated"
+msgstr "Varaamo-tunnuksesi käyttöoikeudet ovat vanhenemassa"
+
+#: tilavarauspalvelu/integrations/email/template_context/permissions.py
+msgctxt "Email"
+msgid ""
+"Your account in Varaamo has staff permissions. Since you haven't logged in "
+"for a while, these permissions are going to be revoked."
+msgstr ""
+"Sähköpostiosoitteellasi on Varaamossa käyttäjätunnus, jolle on myönnetty "
+"henkilökunnan käyttöoikeuksia. Koska tunnuksella ei ole kirjauduttu "
+"lähiaikoina, tullaan nämä oikeudet poistamaan."
+
+#: tilavarauspalvelu/integrations/email/template_context/permissions.py
+msgctxt "Email"
+msgid "You can login to Varaamo here to prevent this from happening"
+msgstr "Voit kirjautua palveluun osoitteessa"
+
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
 msgid "Your booking has been cancelled"
@@ -3195,18 +3219,6 @@ msgstr ""
 #: tilavarauspalvelu/models/city/model.py
 msgid "Cities"
 msgstr "Kaupungit"
-
-#: tilavarauspalvelu/models/email_template/model.py
-msgid "Email type"
-msgstr "Sähköpostin tyyppi"
-
-#: tilavarauspalvelu/models/email_template/model.py
-msgid "Only one template per type can be created."
-msgstr "Vain yksi sähköpostipohja per tyyppi voidaan luoda."
-
-#: tilavarauspalvelu/models/email_template/model.py
-msgid "Unique name for this content"
-msgstr "Uniikki nimi tälle sisällölle"
 
 #: tilavarauspalvelu/models/general_role/model.py
 msgid "General role"
