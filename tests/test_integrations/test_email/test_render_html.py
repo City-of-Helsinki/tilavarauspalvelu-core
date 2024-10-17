@@ -22,6 +22,7 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_reservation_requires_payment,
     get_context_for_staff_notification_reservation_made,
     get_context_for_staff_notification_reservation_requires_handling,
+    get_context_for_user_anonymization,
 )
 
 
@@ -182,6 +183,40 @@ def test_render_permission_deactivation__html():
 
         You can login to Varaamo here to prevent this from happening:
         <https://fake.varaamo.hel.fi/kasittely>
+
+        Kind regards
+        Varaamo
+        This is an automated message, please do not reply.
+        [Contact us](https://fake.varaamo.hel.fi/feedback?lang=en).
+        Book the city's premises and equipment for your use at [varaamo.hel.fi](https://fake.varaamo.hel.fi/en).
+
+        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
+
+        **Varaamo**
+
+        (C) City of Helsinki 2024
+        """
+    )
+
+
+@freeze_time("2024-01-01")
+def test_render_user_anonymization__html():
+    context = get_context_for_user_anonymization(language="en")
+    html_content = render_html(email_type=EmailType.USER_ANONYMIZATION, context=context)
+    text_content = html_email_to_text(html_content)
+
+    assert text_content == cleandoc(
+        """
+        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
+
+        **Varaamo**
+
+        **Hi,**
+
+        Your account in Varaamo has not been used for a while. The data in your account will be removed soon.
+
+        You can login to Varaamo here to prevent this from happening:
+        <https://fake.varaamo.hel.fi/en>
 
         Kind regards
         Varaamo
