@@ -13,14 +13,7 @@ from tests.factories import (
 )
 from tilavarauspalvelu.enums import ReservationNotification
 from tilavarauspalvelu.models import GeneralRole, UnitRole
-from tilavarauspalvelu.utils.anonymisation import (
-    ANONYMIZED,
-    SENSITIVE_APPLICATION,
-    SENSITIVE_RESERVATION,
-    anonymize_user,
-    anonymize_user_applications,
-    anonymize_user_reservations,
-)
+from tilavarauspalvelu.models.user.actions import ANONYMIZED, SENSITIVE_APPLICATION, SENSITIVE_RESERVATION
 
 # Applied to all tests
 pytestmark = [
@@ -49,7 +42,7 @@ def test_anonymization__user():
 
     old_user_uuid = mr_anonymous.uuid
 
-    anonymize_user(mr_anonymous)
+    mr_anonymous.actions.anonymize_user()
     mr_anonymous.refresh_from_db()
 
     assert mr_anonymous.username == f"anonymized-{mr_anonymous.uuid}"
@@ -80,7 +73,7 @@ def test_anonymization__application():
     application = ApplicationFactory.create(user=mr_anonymous, billing_address=billing_address)
     app_section = ApplicationSectionFactory.create(application=application)
 
-    anonymize_user_applications(mr_anonymous)
+    mr_anonymous.actions.anonymize_user_applications()
     app_section.refresh_from_db()
 
     # Section
@@ -151,7 +144,7 @@ def test_anonymization__reservation():
         handling_details="Test handling details",
     )
 
-    anonymize_user_reservations(mr_anonymous)
+    mr_anonymous.actions.anonymize_user_reservations()
     reservation.refresh_from_db()
 
     assert reservation.name == ANONYMIZED
@@ -194,7 +187,7 @@ def test_anonymization__reservation__empty_values():
         free_of_charge_reason=None,
     )
 
-    anonymize_user_reservations(mr_anonymous)
+    mr_anonymous.actions.anonymize_user_reservations()
     reservation.refresh_from_db()
 
     assert reservation.name == ""

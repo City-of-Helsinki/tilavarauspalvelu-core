@@ -1,10 +1,11 @@
 import datetime
 
 from django.contrib import admin
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.models import GeneralRole, UnitRole, User
-from tilavarauspalvelu.utils.anonymisation import anonymize_user_data
+from tilavarauspalvelu.typing import WSGIRequest
 from tilavarauspalvelu.utils.helauth.typing import LoginMethod
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
@@ -206,9 +207,10 @@ class UserAdmin(admin.ModelAdmin):
     filter_horizontal = ["groups"]
 
     @admin.action
-    def anonymize_user_data(self, request, queryset) -> None:
+    def anonymize_user_data(self, request: WSGIRequest, queryset: models.QuerySet) -> None:
+        user: User
         for user in queryset.all():
-            anonymize_user_data(user)
+            user.actions.anonymize()
 
     @admin.display(description="Statistics UUID")
     def statistics_uuid(self, user: User) -> str:

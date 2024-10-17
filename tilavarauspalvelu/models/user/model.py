@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import uuid
 from functools import cached_property
-from typing import TYPE_CHECKING, Literal, Self
+from typing import TYPE_CHECKING, Literal
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
@@ -254,6 +254,6 @@ class ProfileUser(SerializableMixin, User):
     )
 
     @property
-    def user(self) -> Self:
+    def user(self) -> User:
         """Needed for GDPR API"""
         return self
