@@ -86,8 +86,6 @@ class EmailService:
         """Sends emails to applicants when application round has entered the allocation phase."""
         applications = Application.objects.should_send_in_allocation_email().order_by("created_date")
         if not applications:
-            # TODO: Should we log this?
-            SentryLogger.log_message("Zero applications require the 'application in allocation' email to be sent")
             return
 
         recipients_by_language = get_recipients_for_applications_by_language(applications)
@@ -122,7 +120,6 @@ class EmailService:
         """Sends email to applicants when application round has its allocation results available."""
         applications = Application.objects.should_send_handled_email().order_by("created_date")
         if not applications:
-            # TODO: Should we log this?
             SentryLogger.log_message("Zero applications require the 'application handled' email to be sent")
             return
 
