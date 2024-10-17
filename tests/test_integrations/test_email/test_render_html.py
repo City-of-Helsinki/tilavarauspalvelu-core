@@ -341,6 +341,69 @@ def test_render_reservation_approved__html():
 
 
 @freeze_time("2024-01-01")
+def test_render_reservation_approved__discount__html():
+    context = get_context_for_reservation_approved(
+        language="en",
+        email_recipient_name="John Doe",
+        reservation_unit_name="Test reservation unit",
+        unit_name="Test unit",
+        unit_location="Test location",
+        begin_datetime=datetime.datetime(2024, 1, 1, 12),
+        end_datetime=datetime.datetime(2024, 1, 1, 14),
+        price=Decimal("12.30"),
+        non_subsidised_price=Decimal("15.30"),
+        tax_percentage=Decimal("25.5"),
+        booking_number=12,
+        confirmed_instructions="This are the instructions",
+    )
+    html_content = render_html(email_type=EmailType.RESERVATION_APPROVED, context=context)
+    text_content = html_email_to_text(html_content)
+
+    manage = (
+        "Manage your booking at Varaamo. You can check the details of your booking and Varaamo's "
+        "terms of contract and cancellation on the ['My bookings' page](https://fake.varaamo.hel.fi/en/reservations)."
+    )
+
+    assert text_content == cleandoc(
+        f"""
+        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
+
+        **Varaamo**
+
+        **Hi John Doe,**
+
+        Your booking has been confirmed with the following discount:
+
+        **Test reservation unit**
+        Test unit
+        Test location
+        From: **1.1.2024** at **12:00**
+        To: **1.1.2024** at **14:00**
+        Price: **12,30 €** (incl. VAT 25.5 %)
+        Booking number: 12
+
+        ## Additional information about your booking
+
+        This are the instructions
+
+        {manage}
+        Thank you for choosing Varaamo!
+        Kind regards
+        Varaamo
+        This is an automated message, please do not reply.
+        [Contact us](https://fake.varaamo.hel.fi/feedback?lang=en).
+        Book the city's premises and equipment for your use at [varaamo.hel.fi](https://fake.varaamo.hel.fi/en).
+
+        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
+
+        **Varaamo**
+
+        (C) City of Helsinki 2024
+        """
+    )
+
+
+@freeze_time("2024-01-01")
 def test_render_reservation_requires_handling__html():
     context = get_context_for_reservation_requires_handling(
         language="en",
@@ -352,6 +415,7 @@ def test_render_reservation_requires_handling__html():
         end_datetime=datetime.datetime(2024, 1, 1, 14),
         price=Decimal("12.30"),
         subsidised_price=Decimal("12.30"),
+        applying_for_free_of_charge=True,
         tax_percentage=Decimal("25.5"),
         booking_number=12,
         pending_instructions="This are the instructions",
@@ -386,6 +450,78 @@ def test_render_reservation_requires_handling__html():
         From: **1.1.2024** at **12:00**
         To: **1.1.2024** at **14:00**
         Price: **12,30 €** (incl. VAT 25.5 %)
+        Booking number: 12
+
+        {confirm}
+
+        ## Additional information about your booking
+
+        This are the instructions
+
+        {manage}
+        Thank you for choosing Varaamo!
+        Kind regards
+        Varaamo
+        This is an automated message, please do not reply.
+        [Contact us](https://fake.varaamo.hel.fi/feedback?lang=en).
+        Book the city's premises and equipment for your use at [varaamo.hel.fi](https://fake.varaamo.hel.fi/en).
+
+        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
+
+        **Varaamo**
+
+        (C) City of Helsinki 2024
+        """
+    )
+
+
+@freeze_time("2024-01-01")
+def test_render_reservation_requires_handling__subsidised__html():
+    context = get_context_for_reservation_requires_handling(
+        language="en",
+        email_recipient_name="John Doe",
+        reservation_unit_name="Test reservation unit",
+        unit_name="Test unit",
+        unit_location="Test location",
+        begin_datetime=datetime.datetime(2024, 1, 1, 12),
+        end_datetime=datetime.datetime(2024, 1, 1, 14),
+        price=Decimal("12.30"),
+        subsidised_price=Decimal("10.30"),
+        applying_for_free_of_charge=True,
+        tax_percentage=Decimal("25.5"),
+        booking_number=12,
+        pending_instructions="This are the instructions",
+    )
+    html_content = render_html(email_type=EmailType.RESERVATION_REQUIRES_HANDLING, context=context)
+    text_content = html_email_to_text(html_content)
+
+    confirm = (
+        "You will receive a confirmation email once your booking has been processed. "
+        "We will contact you if further information is needed regarding your booking "
+        "request."
+    )
+
+    manage = (
+        "Manage your booking at Varaamo. You can check the details of your booking and Varaamo's "
+        "terms of contract and cancellation on the ['My bookings' page](https://fake.varaamo.hel.fi/en/reservations)."
+    )
+
+    assert text_content == cleandoc(
+        f"""
+        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
+
+        **Varaamo**
+
+        **Hi John Doe,**
+
+        You have made a new booking request.
+
+        **Test reservation unit**
+        Test unit
+        Test location
+        From: **1.1.2024** at **12:00**
+        To: **1.1.2024** at **14:00**
+        Price: **10,30 - 12,30€** (incl. VAT 25.5 %)
         Booking number: 12
 
         {confirm}

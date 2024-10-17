@@ -165,6 +165,37 @@ RESERVATION_PRICE_INFO_CONTEXT_SV = {
     "booking_number": "12",
 }
 
+RESERVATION_PRICE_RANGE_INFO_CONTEXT_EN = {
+    "price_label": "Price",
+    "price": Decimal("12.30"),
+    "subsidised_price": Decimal("12.30"),
+    "price_can_be_subsidised": False,
+    "vat_included_label": "incl. VAT",
+    "tax_percentage": Decimal("25.5"),
+    "booking_number_label": "Booking number",
+    "booking_number": "12",
+}
+RESERVATION_PRICE_RANGE_INFO_CONTEXT_FI = {
+    "price_label": "Hinta",
+    "price": Decimal("12.30"),
+    "subsidised_price": Decimal("12.30"),
+    "price_can_be_subsidised": False,
+    "vat_included_label": "sis. alv",
+    "tax_percentage": Decimal("25.5"),
+    "booking_number_label": "Varausnumero",
+    "booking_number": "12",
+}
+RESERVATION_PRICE_RANGE_INFO_CONTEXT_SV = {
+    "price_label": "Pris",
+    "price": Decimal("12.30"),
+    "subsidised_price": Decimal("12.30"),
+    "price_can_be_subsidised": False,
+    "vat_included_label": "inkl. moms",
+    "tax_percentage": Decimal("25.5"),
+    "booking_number_label": "Bokningsnummer",
+    "booking_number": "12",
+}
+
 RESERVATION_MANAGE_LINK_CONTEXT_EN = {
     "manage_reservation": (
         "Manage your booking at Varaamo. "

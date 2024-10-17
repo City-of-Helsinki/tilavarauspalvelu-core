@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, overload
 from django.utils.translation import pgettext
 
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
-from utils.date_utils import DEFAULT_TIMEZONE, local_date
+from utils.date_utils import local_date
 
 from .common import (
     create_anchor_tag,
@@ -21,6 +21,7 @@ from .common import (
     get_staff_reservations_ext_link,
     params_for_base_info,
     params_for_price_info,
+    params_for_price_range_info,
 )
 
 if TYPE_CHECKING:
@@ -274,6 +275,7 @@ def get_context_for_reservation_requires_handling(
     end_datetime: datetime.datetime,
     price: Decimal,
     subsidised_price: Decimal,
+    applying_for_free_of_charge: bool,
     tax_percentage: Decimal,
     booking_number: int,
     pending_instructions: str,
@@ -288,14 +290,11 @@ def get_context_for_reservation_requires_handling(
     **data: Any,
 ) -> EmailContext:
     if reservation is not None:
-        begin_datetime = reservation.begin.astimezone(DEFAULT_TIMEZONE)
-        end_datetime = reservation.end.astimezone(DEFAULT_TIMEZONE)
         data: dict[str, Any] = {
             "email_recipient_name": reservation.actions.get_email_reservee_name(),
-            "subsidised_price": reservation.actions.calculate_full_price(begin_datetime, end_datetime, subsidised=True),
             "pending_instructions": reservation.actions.get_instructions(kind="pending", language=language),
             **params_for_base_info(reservation=reservation, language=language),
-            **params_for_price_info(reservation=reservation, language=language),
+            **params_for_price_range_info(reservation=reservation, language=language),
         }
 
     return {
@@ -323,6 +322,7 @@ def get_context_for_reservation_requires_handling(
             subsidised_price=data["subsidised_price"],
             tax_percentage=data["tax_percentage"],
             booking_number=data["booking_number"],
+            applying_for_free_of_charge=data["applying_for_free_of_charge"],
             language=language,
         ),
         **get_contex_for_reservation_manage_link(language=language),

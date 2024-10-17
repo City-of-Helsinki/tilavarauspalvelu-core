@@ -38,6 +38,7 @@ def get_mock_data(*, email_type: EmailType, language: Lang) -> EmailContext | No
     price = Decimal("12.30")
     subsidised_price = Decimal("10.30")
     non_subsidised_price = Decimal("15.30")
+    applying_for_free_of_charge = True
     payment_due_date = end.date()
     tax_percentage = Decimal("25.5")
     booking_number = 1234
@@ -112,6 +113,7 @@ def get_mock_data(*, email_type: EmailType, language: Lang) -> EmailContext | No
                 end_datetime=end,
                 price=price,
                 subsidised_price=subsidised_price,
+                applying_for_free_of_charge=applying_for_free_of_charge,
                 tax_percentage=tax_percentage,
                 booking_number=booking_number,
                 pending_instructions=pending_instructions,

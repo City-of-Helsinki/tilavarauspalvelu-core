@@ -30,6 +30,9 @@ from tests.test_integrations.test_email.helpers import (
     RESERVATION_PRICE_INFO_CONTEXT_EN,
     RESERVATION_PRICE_INFO_CONTEXT_FI,
     RESERVATION_PRICE_INFO_CONTEXT_SV,
+    RESERVATION_PRICE_RANGE_INFO_CONTEXT_EN,
+    RESERVATION_PRICE_RANGE_INFO_CONTEXT_FI,
+    RESERVATION_PRICE_RANGE_INFO_CONTEXT_SV,
 )
 from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_reservation_approved,
@@ -452,6 +455,7 @@ def test_get_context__reservation_requires_handling__en():
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             price=Decimal("12.30"),
             subsidised_price=Decimal("12.30"),
+            applying_for_free_of_charge=True,
             tax_percentage=Decimal("25.5"),
             booking_number=12,
             pending_instructions="These are the instructions",
@@ -468,10 +472,9 @@ def test_get_context__reservation_requires_handling__en():
         "instructions_label": "Additional information about your booking",
         "instructions": "These are the instructions",
         "title": "Your booking is waiting for processing",
-        "subsidised_price": Decimal("12.30"),
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
-        **RESERVATION_PRICE_INFO_CONTEXT_EN,
+        **RESERVATION_PRICE_RANGE_INFO_CONTEXT_EN,
         **RESERVATION_MANAGE_LINK_CONTEXT_EN,
         **CLOSING_POLITE_CONTEXT_EN,
         **AUTOMATIC_REPLY_CONTEXT_EN,
@@ -490,6 +493,7 @@ def test_get_context__reservation_requires_handling__fi():
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             price=Decimal("12.30"),
             subsidised_price=Decimal("12.30"),
+            applying_for_free_of_charge=True,
             tax_percentage=Decimal("25.5"),
             booking_number=12,
             pending_instructions="Tässä ovat ohjeet",
@@ -506,10 +510,9 @@ def test_get_context__reservation_requires_handling__fi():
         "instructions_label": "Lisätietoa varauksestasi",
         "instructions": "Tässä ovat ohjeet",
         "title": "Varauksesi odottaa käsittelyä",
-        "subsidised_price": Decimal("12.30"),
         **BASE_TEMPLATE_CONTEXT_FI,
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
-        **RESERVATION_PRICE_INFO_CONTEXT_FI,
+        **RESERVATION_PRICE_RANGE_INFO_CONTEXT_FI,
         **RESERVATION_MANAGE_LINK_CONTEXT_FI,
         **CLOSING_POLITE_CONTEXT_FI,
         **AUTOMATIC_REPLY_CONTEXT_FI,
@@ -528,6 +531,7 @@ def test_get_context__reservation_requires_handling__sv():
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             price=Decimal("12.30"),
             subsidised_price=Decimal("12.30"),
+            applying_for_free_of_charge=True,
             tax_percentage=Decimal("25.5"),
             booking_number=12,
             pending_instructions="Här är instruktionerna",
@@ -544,13 +548,52 @@ def test_get_context__reservation_requires_handling__sv():
         "instructions_label": "Mer information om din bokning",
         "instructions": "Här är instruktionerna",
         "title": "Din bokning väntar på att behandlas",
-        "subsidised_price": Decimal("12.30"),
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
-        **RESERVATION_PRICE_INFO_CONTEXT_SV,
+        **RESERVATION_PRICE_RANGE_INFO_CONTEXT_SV,
         **RESERVATION_MANAGE_LINK_CONTEXT_SV,
         **CLOSING_POLITE_CONTEXT_SV,
         **AUTOMATIC_REPLY_CONTEXT_SV,
+    }
+
+
+@freeze_time("2024-01-01")
+def test_get_context__reservation_requires_handling__subsidised():
+    with TranslationsFromPOFiles():
+        context = get_context_for_reservation_requires_handling(
+            email_recipient_name="John Doe",
+            reservation_unit_name="Test reservation unit",
+            unit_name="Test unit",
+            unit_location="Test location",
+            begin_datetime=datetime.datetime(2024, 1, 1, 12),
+            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            price=Decimal("12.30"),
+            subsidised_price=Decimal("10.30"),
+            applying_for_free_of_charge=True,
+            tax_percentage=Decimal("25.5"),
+            booking_number=12,
+            pending_instructions="These are the instructions",
+            language="en",
+        )
+
+    assert context == {
+        "email_recipient_name": "John Doe",
+        "text_pending_notification": (
+            "You will receive a confirmation email once your booking has been processed. "
+            "We will contact you if further information is needed regarding your booking request."
+        ),
+        "text_reservation_requires_handling": "You have made a new booking request",
+        "instructions_label": "Additional information about your booking",
+        "instructions": "These are the instructions",
+        "title": "Your booking is waiting for processing",
+        **BASE_TEMPLATE_CONTEXT_EN,
+        **RESERVATION_BASIC_INFO_CONTEXT_EN,
+        **RESERVATION_PRICE_RANGE_INFO_CONTEXT_EN,
+        **RESERVATION_MANAGE_LINK_CONTEXT_EN,
+        **CLOSING_POLITE_CONTEXT_EN,
+        **AUTOMATIC_REPLY_CONTEXT_EN,
+        "subsidised_price": Decimal("10.30"),
+        "price_can_be_subsidised": True,
     }
 
 
