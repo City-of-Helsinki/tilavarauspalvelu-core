@@ -11,6 +11,7 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_application_handled,
     get_context_for_application_in_allocation,
     get_context_for_application_received,
+    get_context_for_permission_deactivation,
     get_context_for_reservation_approved,
     get_context_for_reservation_cancelled,
     get_context_for_reservation_confirmed,
@@ -97,6 +98,35 @@ def test_render_application_received_email__text():
         {body}
 
         Thank you for choosing Varaamo!
+        Kind regards
+        Varaamo
+
+        This is an automated message, please do not reply. Contact us: https://fake.varaamo.hel.fi/feedback?lang=en.
+
+        Book the city's premises and equipment for your use at https://fake.varaamo.hel.fi/en.
+        """
+    )
+
+
+@freeze_time("2024-01-01")
+def test_render_permission_deactivation__text():
+    context = get_context_for_permission_deactivation(language="en")
+    text_content = render_text(email_type=EmailType.PERMISSION_DEACTIVATION, context=context)
+
+    message = (
+        "Your account in Varaamo has staff permissions. "
+        "Since you haven't logged in for a while, these permissions are going to be revoked."
+    )
+
+    assert text_content == cleandoc(
+        f"""
+        Hi,
+
+        {message}
+
+        You can login to Varaamo here to prevent this from happening:
+        https://fake.varaamo.hel.fi/kasittely
+
         Kind regards
         Varaamo
 

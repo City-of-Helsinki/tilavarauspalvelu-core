@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from tilavarauspalvelu.enums import ApplicationStatusChoice, EmailType, ReservationStateChoice, ReservationTypeChoice
-from tilavarauspalvelu.models import Application
+from tilavarauspalvelu.models import Application, User
 from tilavarauspalvelu.typing import EmailData
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.sentry import SentryLogger
@@ -22,6 +22,7 @@ from .template_context import (
     get_context_for_application_handled,
     get_context_for_application_in_allocation,
     get_context_for_application_received,
+    get_context_for_permission_deactivation,
     get_context_for_reservation_approved,
     get_context_for_reservation_cancelled,
     get_context_for_reservation_confirmed,
@@ -149,6 +150,28 @@ class EmailService:
 
         send_multiple_emails_in_batches_task.delay(emails=emails)
         applications.update(results_ready_notification_sent_date=local_datetime())
+
+    @staticmethod
+    def send_permission_deactivation_email(
+        user: User,
+        *,
+        language: Lang | None = None,
+    ) -> None:
+        # Prevent accidental sending of wrong email.
+        if not user.permissions.has_any_role():
+            return
+
+        if language is None:
+            language = user.get_preferred_language()
+
+        email_type = EmailType.PERMISSION_DEACTIVATION
+        context = get_context_for_permission_deactivation(language=language)
+        send_emails_in_batches_task.delay(
+            recipients=[user.email],
+            subject=context["title"],
+            text_content=render_text(email_type=email_type, context=context),
+            html_content=render_html(email_type=email_type, context=context),
+        )
 
     @staticmethod
     def send_reservation_cancelled_email(

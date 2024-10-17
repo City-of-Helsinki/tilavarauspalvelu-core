@@ -17,23 +17,48 @@ from tilavarauspalvelu.typing import permission
 
 __all__ = [
     "RESERVEE_LANGUAGE_CHOICES",
+    "ApplicantTypeChoice",
+    "ApplicationRoundReservationCreationStatusChoice",
+    "ApplicationRoundStatusChoice",
+    "ApplicationSectionStatusChoice",
+    "ApplicationStatusChoice",
+    "AuthenticationType",
+    "BannerNotificationLevel",
+    "BannerNotificationState",
+    "BannerNotificationTarget",
     "CalendarProperty",
     "CustomerTypeChoice",
+    "EmailType",
     "EventProperty",
+    "HaukiResourceState",
     "Language",
     "OrderStatus",
     "OrderStatusWithFree",
+    "OrganizationTypeChoice",
     "PaymentType",
+    "PriceUnit",
+    "PricingStatus",
+    "PricingType",
+    "Priority",
     "RejectionReadinessChoice",
+    "ReservationKind",
     "ReservationNotification",
+    "ReservationStartInterval",
     "ReservationStateChoice",
     "ReservationTypeChoice",
     "ReservationTypeStaffChoice",
+    "ReservationUnitImageType",
+    "ReservationUnitPublishingState",
+    "ReservationUnitReservationState",
     "ResourceLocationType",
     "ServiceTypeChoices",
     "TermsOfUseTypeChoices",
+    "TimezoneProperty",
+    "TimezoneRuleProperty",
     "UserPermissionChoice",
     "UserRoleChoice",
+    "Weekday",
+    "WeekdayChoice",
 ]
 
 
@@ -223,6 +248,7 @@ class EmailType(models.TextChoices):
     APPLICATION_HANDLED = "application_handled", _("Application handled")
     APPLICATION_IN_ALLOCATION = "application_in_allocation", _("Application in allocation")
     APPLICATION_RECEIVED = "application_received", _("Application received")
+    PERMISSION_DEACTIVATION = "permission_deactivation", _("Permission deactivation")
     RESERVATION_CANCELLED = "reservation_cancelled", _("Reservation cancelled")
     RESERVATION_CONFIRMED = "reservation_confirmed", _("Reservation confirmed")
     RESERVATION_APPROVED = "reservation_approved", _("Reservation approved")

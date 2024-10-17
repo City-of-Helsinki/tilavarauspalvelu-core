@@ -6,7 +6,7 @@ from freezegun import freeze_time
 
 from tests.factories import ApplicationFactory, ReservationFactory, UnitFactory, UserFactory
 from tests.helpers import TranslationsFromPOFiles, patch_method
-from tilavarauspalvelu.enums import ReservationNotification, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import Language, ReservationNotification, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from utils.sentry import SentryLogger
 
@@ -155,6 +155,27 @@ def test_email_service__send_application_handled_emails__no_recipients(outbox):
 
     assert SentryLogger.log_message.call_count == 1
     assert SentryLogger.log_message.call_args.args[0] == "No recipients for application handled emails"
+
+
+@override_settings(SEND_EMAILS=True)
+def test_email_service__send_permission_deactivation_email(outbox):
+    user = UserFactory.create_superuser(email="user@email.com", preferred_language=Language.EN.value)
+
+    EmailService.send_permission_deactivation_email(user)
+
+    assert len(outbox) == 1
+
+    assert outbox[0].subject == "Your permissions in Varaamo are going to be deactivated"
+    assert sorted(outbox[0].bcc) == ["user@email.com"]
+
+
+@override_settings(SEND_EMAILS=True)
+def test_email_service__send_permission_deactivation_email__no_permissions(outbox):
+    user = UserFactory.create(email="user@email.com", preferred_language=Language.EN.value)
+
+    EmailService.send_permission_deactivation_email(user)
+
+    assert len(outbox) == 0
 
 
 @override_settings(SEND_EMAILS=True)
