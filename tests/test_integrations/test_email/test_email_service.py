@@ -8,6 +8,7 @@ from tests.factories import ApplicationFactory, ReservationFactory, UnitFactory,
 from tests.helpers import TranslationsFromPOFiles, patch_method
 from tilavarauspalvelu.enums import Language, ReservationNotification, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
+from utils.date_utils import local_datetime
 from utils.sentry import SentryLogger
 
 pytestmark = [
@@ -157,11 +158,16 @@ def test_email_service__send_application_handled_emails__no_recipients(outbox):
     assert SentryLogger.log_message.call_args.args[0] == "No recipients for application handled emails"
 
 
-@override_settings(SEND_EMAILS=True)
-def test_email_service__send_permission_deactivation_email(outbox):
-    user = UserFactory.create_superuser(email="user@email.com", preferred_language=Language.EN.value)
+@freeze_time("2024-01-01")
+@override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
+def test_email_service__send_permission_deactivation_emails(outbox):
+    UserFactory.create_superuser(
+        email="user@email.com",
+        preferred_language=Language.EN.value,
+        last_login=local_datetime() - datetime.timedelta(days=20),
+    )
 
-    EmailService.send_permission_deactivation_email(user)
+    EmailService.send_permission_deactivation_emails()
 
     assert len(outbox) == 1
 
@@ -169,11 +175,156 @@ def test_email_service__send_permission_deactivation_email(outbox):
     assert sorted(outbox[0].bcc) == ["user@email.com"]
 
 
-@override_settings(SEND_EMAILS=True)
-def test_email_service__send_permission_deactivation_email__no_permissions(outbox):
-    user = UserFactory.create(email="user@email.com", preferred_language=Language.EN.value)
+@freeze_time("2024-01-01")
+@override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
+def test_email_service__send_permission_deactivation_emails__logged_in_recently(outbox):
+    UserFactory.create_superuser(
+        email="user@email.com",
+        preferred_language=Language.EN.value,
+        last_login=local_datetime() - datetime.timedelta(days=1),
+    )
 
-    EmailService.send_permission_deactivation_email(user)
+    EmailService.send_permission_deactivation_emails()
+
+    assert len(outbox) == 0
+
+
+@freeze_time("2024-01-01")
+@override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
+def test_email_service__send_permission_deactivation_emails__permissions_going_to_expire(outbox):
+    UserFactory.create_superuser(
+        email="user@email.com",
+        preferred_language=Language.EN.value,
+        # Logged in within `PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS`, but after `PERMISSION_NOTIFICATION_BEFORE_DAYS`
+        # permissions are going to be expired, so we need to send email now.
+        last_login=local_datetime() - datetime.timedelta(days=6),
+    )
+
+    EmailService.send_permission_deactivation_emails()
+
+    assert len(outbox) == 1
+
+    assert outbox[0].subject == "Your permissions in Varaamo are going to be deactivated"
+    assert sorted(outbox[0].bcc) == ["user@email.com"]
+
+
+@freeze_time("2024-01-01")
+@override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
+def test_email_service__send_permission_deactivation_emails__no_email(outbox):
+    UserFactory.create_superuser(
+        # User has no email, so we can't notify them (but we should still deactivate the permissions)
+        email="",
+        preferred_language=Language.EN.value,
+        last_login=local_datetime() - datetime.timedelta(days=20),
+    )
+
+    EmailService.send_permission_deactivation_emails()
+
+    assert len(outbox) == 0
+
+
+@freeze_time("2024-01-01")
+@override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
+def test_email_service__send_permission_deactivation_emails__general_admin(outbox):
+    UserFactory.create_with_general_role(
+        email="user@email.com",
+        preferred_language=Language.EN.value,
+        last_login=local_datetime() - datetime.timedelta(days=20),
+    )
+
+    EmailService.send_permission_deactivation_emails()
+
+    assert len(outbox) == 1
+
+    assert outbox[0].subject == "Your permissions in Varaamo are going to be deactivated"
+    assert sorted(outbox[0].bcc) == ["user@email.com"]
+
+
+@freeze_time("2024-01-01")
+@override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
+def test_email_service__send_permission_deactivation_emails__general_admin__role_inactive(outbox):
+    UserFactory.create_with_general_role(
+        email="user@email.com",
+        preferred_language=Language.EN.value,
+        last_login=local_datetime() - datetime.timedelta(days=20),
+        general_role__role_active=False,
+    )
+
+    EmailService.send_permission_deactivation_emails()
+
+    assert len(outbox) == 0
+
+
+@freeze_time("2024-01-01")
+@override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
+def test_email_service__send_permission_deactivation_emails__unit_admin(outbox):
+    UserFactory.create_with_unit_role(
+        units=[UnitFactory.create()],
+        email="user@email.com",
+        preferred_language=Language.EN.value,
+        last_login=local_datetime() - datetime.timedelta(days=20),
+    )
+
+    EmailService.send_permission_deactivation_emails()
+
+    assert len(outbox) == 1
+
+    assert outbox[0].subject == "Your permissions in Varaamo are going to be deactivated"
+    assert sorted(outbox[0].bcc) == ["user@email.com"]
+
+
+@freeze_time("2024-01-01")
+@override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
+def test_email_service__send_permission_deactivation_emails__unit_admin__role_inactive(outbox):
+    UserFactory.create_with_unit_role(
+        units=[UnitFactory.create()],
+        email="user@email.com",
+        preferred_language=Language.EN.value,
+        last_login=local_datetime() - datetime.timedelta(days=20),
+        unit_role__role_active=False,
+    )
+
+    EmailService.send_permission_deactivation_emails()
+
+    assert len(outbox) == 0
+
+
+@freeze_time("2024-01-01")
+@override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
+def test_email_service__send_permission_deactivation_emails__multiple_languages(outbox):
+    UserFactory.create_superuser(
+        email="user1@email.com",
+        preferred_language=Language.EN.value,
+        last_login=local_datetime() - datetime.timedelta(days=20),
+    )
+    UserFactory.create_superuser(
+        email="user2@email.com",
+        preferred_language=Language.FI.value,
+        last_login=local_datetime() - datetime.timedelta(days=25),
+    )
+
+    with TranslationsFromPOFiles():
+        EmailService.send_permission_deactivation_emails()
+
+    assert len(outbox) == 2
+
+    assert outbox[0].subject == "Varaamo-tunnuksesi käyttöoikeudet ovat vanhenemassa"
+    assert sorted(outbox[0].bcc) == ["user2@email.com"]
+
+    assert outbox[1].subject == "Your permissions in Varaamo are going to be deactivated"
+    assert sorted(outbox[1].bcc) == ["user1@email.com"]
+
+
+@freeze_time("2024-01-01")
+@override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
+def test_email_service__send_permission_deactivation_emails__no_permissions(outbox):
+    UserFactory.create(
+        email="user@email.com",
+        preferred_language=Language.EN.value,
+        last_login=local_datetime() - datetime.timedelta(days=20),
+    )
+
+    EmailService.send_permission_deactivation_emails()
 
     assert len(outbox) == 0
 

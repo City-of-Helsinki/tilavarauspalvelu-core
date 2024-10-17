@@ -531,6 +531,7 @@ class Common(Environment):
     APPLICATION_ROUND_RESERVATION_CREATION_TIMEOUT_MINUTES = values.IntegerValue(default=10)
     AFFECTING_TIME_SPANS_UPDATE_INTERVAL_MINUTES = values.IntegerValue(default=2)
     PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS = values.IntegerValue(default=365)
+    PERMISSION_NOTIFICATION_BEFORE_DAYS = values.IntegerValue(default=14)
     RAISE_ERROR_ON_REFRESH_FAILURE = False
 
     ICAL_HASH_SECRET = values.StringValue()

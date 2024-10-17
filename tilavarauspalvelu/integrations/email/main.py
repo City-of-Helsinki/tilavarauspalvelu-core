@@ -15,6 +15,7 @@ from .find_recipients import (
     get_recipients_for_applications_by_language,
     get_reservation_email_recipients,
     get_reservation_staff_notification_recipients,
+    get_users_by_email_language,
 )
 from .rendering import render_html, render_text
 from .sending import send_emails_in_batches_task, send_multiple_emails_in_batches_task
@@ -152,26 +153,30 @@ class EmailService:
         applications.update(results_ready_notification_sent_date=local_datetime())
 
     @staticmethod
-    def send_permission_deactivation_email(
-        user: User,
-        *,
-        language: Lang | None = None,
-    ) -> None:
-        # Prevent accidental sending of wrong email.
-        if not user.permissions.has_any_role():
+    def send_permission_deactivation_emails() -> None:
+        users = User.objects.should_deactivate_permissions().exclude(email="").order_by("last_login")
+        if not users:
             return
 
-        if language is None:
-            language = user.get_preferred_language()
+        recipients_by_language = get_users_by_email_language(users)
 
+        emails: list[EmailData] = []
         email_type = EmailType.PERMISSION_DEACTIVATION
-        context = get_context_for_permission_deactivation(language=language)
-        send_emails_in_batches_task.delay(
-            recipients=[user.email],
-            subject=context["title"],
-            text_content=render_text(email_type=email_type, context=context),
-            html_content=render_html(email_type=email_type, context=context),
-        )
+
+        for language, recipients in recipients_by_language.items():
+            context = get_context_for_permission_deactivation(language=language)
+
+            emails.append(
+                EmailData(
+                    recipients=list(recipients),
+                    subject=context["title"],
+                    text_content=render_text(email_type=email_type, context=context),
+                    html_content=render_html(email_type=email_type, context=context),
+                    attachments=[],
+                )
+            )
+
+        send_multiple_emails_in_batches_task.delay(emails=emails)
 
     @staticmethod
     def send_reservation_cancelled_email(

@@ -694,3 +694,10 @@ def delete_reservation_unit_elastic_index() -> None:
 @app.task(name="deactivate_old_permissions")
 def deactivate_old_permissions_task() -> None:
     deactivate_old_permissions()
+
+
+@app.task(name="send_permission_deactivation_email")
+def send_permission_deactivation_email_task():
+    from tilavarauspalvelu.integrations.email.main import EmailService
+
+    EmailService.send_permission_deactivation_emails()
