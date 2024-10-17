@@ -1,0 +1,8 @@
+{{ salutation | safe }},
+
+{{ text_permission_deactivation | sentence | safe }}
+
+{{ text_login_to_prevent | safe }}:
+{{ login_url }}
+
+{% include "email/text/partials/closing.jinja" %}

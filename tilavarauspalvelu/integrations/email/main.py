@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from tilavarauspalvelu.enums import ApplicationStatusChoice, EmailType, ReservationStateChoice, ReservationTypeChoice
-from tilavarauspalvelu.models import Application
+from tilavarauspalvelu.models import Application, User
 from tilavarauspalvelu.typing import EmailData
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.sentry import SentryLogger
@@ -15,6 +15,7 @@ from .find_recipients import (
     get_recipients_for_applications_by_language,
     get_reservation_email_recipients,
     get_reservation_staff_notification_recipients,
+    get_users_by_email_language,
 )
 from .rendering import render_html, render_text
 from .sending import send_emails_in_batches_task, send_multiple_emails_in_batches_task
@@ -22,6 +23,7 @@ from .template_context import (
     get_context_for_application_handled,
     get_context_for_application_in_allocation,
     get_context_for_application_received,
+    get_context_for_permission_deactivation,
     get_context_for_reservation_approved,
     get_context_for_reservation_cancelled,
     get_context_for_reservation_confirmed,
@@ -149,6 +151,32 @@ class EmailService:
 
         send_multiple_emails_in_batches_task.delay(emails=emails)
         applications.update(results_ready_notification_sent_date=local_datetime())
+
+    @staticmethod
+    def send_permission_deactivation_emails() -> None:
+        users = User.objects.should_deactivate_permissions().exclude(email="").order_by("last_login")
+        if not users:
+            return
+
+        recipients_by_language = get_users_by_email_language(users)
+
+        emails: list[EmailData] = []
+        email_type = EmailType.PERMISSION_DEACTIVATION
+
+        for language, recipients in recipients_by_language.items():
+            context = get_context_for_permission_deactivation(language=language)
+
+            emails.append(
+                EmailData(
+                    recipients=list(recipients),
+                    subject=context["title"],
+                    text_content=render_text(email_type=email_type, context=context),
+                    html_content=render_html(email_type=email_type, context=context),
+                    attachments=[],
+                )
+            )
+
+        send_multiple_emails_in_batches_task.delay(emails=emails)
 
     @staticmethod
     def send_reservation_cancelled_email(
