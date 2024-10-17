@@ -14,7 +14,6 @@ from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
 
 from tilavarauspalvelu.models import ProfileUser
-from tilavarauspalvelu.utils.anonymisation import anonymize_user_data, can_user_be_anonymized
 from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
@@ -106,7 +105,7 @@ class TilavarauspalveluGDPRAPIView(GDPRAPIView):
 
     def _delete_and_anonymize(self) -> Response:
         profile_user = self.get_object()
-        can_anonymize = can_user_be_anonymized(profile_user.user)
+        can_anonymize = profile_user.user.actions.can_anonymize()
         if not can_anonymize:
             errors = []
             if can_anonymize.has_open_reservations:
@@ -133,7 +132,7 @@ class TilavarauspalveluGDPRAPIView(GDPRAPIView):
 
             return Response(data={"errors": errors}, status=status.HTTP_403_FORBIDDEN)
 
-        anonymize_user_data(profile_user.user)
+        profile_user.user.actions.anonymize()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def delete(self, request: Request, *args: Any, **kwargs: Any) -> Response:
