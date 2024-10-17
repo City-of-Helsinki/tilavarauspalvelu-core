@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any
 
-from tilavarauspalvelu.enums import ReservationStartInterval
+from tilavarauspalvelu.enums import PricingStatus, PricingType, ReservationStartInterval
 from tilavarauspalvelu.exceptions import HaukiAPIError
 from tilavarauspalvelu.models import (
     Building,
@@ -12,6 +12,7 @@ from tilavarauspalvelu.models import (
     ReservableTimeSpan,
     Reservation,
     ReservationUnit,
+    ReservationUnitPricing,
 )
 from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.utils.opening_hours.hauki_api_types import HaukiAPIResource, HaukiTranslatedField
@@ -177,6 +178,12 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         spaces = self.reservation_unit.spaces.all()
         return next((space.location for space in spaces if hasattr(space, "location")), None)
 
+    def get_address(self) -> str:
+        location = getattr(self.reservation_unit.unit, "location", None)
+        if location is None:
+            return ""
+        return location.address
+
     def get_building(self) -> Building:
         # For now, we assume that if reservation has multiple spaces they all have same building
         spaces = self.reservation_unit.spaces.all()
@@ -339,3 +346,31 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         # For staff reservations, we don't need to care about opening hours,
         # so we can just check start interval from the beginning of the day.
         return begin_time.second == 0 and begin_time.microsecond == 0 and begin_time.minute % interval_minutes == 0
+
+    def get_active_pricing(self) -> ReservationUnitPricing | None:
+        return self.reservation_unit.pricings.filter(status=PricingStatus.PRICING_STATUS_ACTIVE).first()
+
+    def get_future_pricing(self) -> ReservationUnitPricing | None:
+        return self.reservation_unit.pricings.filter(status=PricingStatus.PRICING_STATUS_FUTURE).first()
+
+    def get_pricing_on_date(self, *, date: datetime.date) -> ReservationUnitPricing | None:
+        active_price = self.get_active_pricing()
+        future_price = self.get_future_pricing()
+
+        if future_price is None:
+            return active_price
+
+        if future_price.begins > date:
+            return active_price
+
+        # If either of the prices is free, the future price can be returned, as the percentage is irrelevant.
+        if PricingType.FREE in (active_price.pricing_type, future_price.pricing_type):
+            return future_price
+
+        # Only return future price if it has the same tax percentage as the current active price.
+        # When the future price has a different tax percentage, it should only be used for reservations which
+        # are made after the pricings begins date (due to VAT-change rules, see TILA-3470).
+        if active_price.tax_percentage == future_price.tax_percentage:
+            return future_price
+
+        return active_price

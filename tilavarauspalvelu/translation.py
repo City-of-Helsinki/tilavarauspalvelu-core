@@ -15,7 +15,6 @@ from .models import (
     BannerNotification,
     Building,
     City,
-    EmailTemplate,
     Equipment,
     EquipmentCategory,
     Keyword,
@@ -39,14 +38,22 @@ from .models import (
     TermsOfUse,
     Unit,
     UnitGroup,
+    User,
 )
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
+    from django.db import models
+    from django.utils.functional import Promise
+
+    from .typing import Lang
 
 __all__ = [
+    "get_attr_by_language",
     "get_translated",
+    "get_translated",
+    "translate_for_user",
 ]
 
 
@@ -98,11 +105,6 @@ class ServiceSectorTranslationOptions(TranslationOptions):
 @register(Location)
 class LocationTranslationOptions(TranslationOptions):
     fields = ["address_street", "address_city"]
-
-
-@register(EmailTemplate)
-class EmailTemplateTranslationOptions(TranslationOptions):
-    fields = ["subject"]
 
 
 @register(AbilityGroup)
@@ -224,3 +226,20 @@ def get_translated(func: Callable[P, R]) -> Callable[P, R]:
             return func(*args, **kwargs)
 
     return wrapper
+
+
+def get_attr_by_language(instance: models.Model | None, field: str, language: Lang) -> str:
+    """Get field value by language, or fallback to default language"""
+    localised_value = getattr(instance, f"{field}_{language}", None)
+    if localised_value:
+        return localised_value
+    return getattr(instance, field, "")
+
+
+def translate_for_user(text: Promise, user: User) -> str:
+    """
+    Translate the given text based on the user's preferred language.
+    If the user has no language set, use the default language of Finnish.
+    """
+    with translation.override(user.get_preferred_language()):
+        return str(text)

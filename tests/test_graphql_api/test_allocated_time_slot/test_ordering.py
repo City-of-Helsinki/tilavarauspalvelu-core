@@ -258,7 +258,7 @@ def test_allocated_time_slot__order__by_application_status(graphql):
     application_3 = ApplicationFactory.create_in_status_received(
         application_sections__reservation_unit_options__allocated_time_slots__day_of_the_week=Weekday.MONDAY,
     )
-    application_4 = ApplicationFactory.create_in_status_result_sent(
+    application_4 = ApplicationFactory.create_in_status_results_sent(
         application_sections__reservation_unit_options__allocated_time_slots__day_of_the_week=Weekday.MONDAY,
     )
     application_5 = ApplicationFactory.create_in_status_expired(

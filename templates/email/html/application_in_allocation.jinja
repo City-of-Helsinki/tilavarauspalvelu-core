@@ -1,15 +1,8 @@
 {% extends "email/html/partials/base.jinja" %}
 
-{% block title %}{{ subjectApplicationInAllocation }}{% endblock %}
-
-{% block header %}{% include "email/html/partials/header_no_recipient_name.jinja" %}{% endblock %}
-
 {% block content_main %}
-    <mj-text>{{ applicationInAllocation }}</mj-text>
-    <mj-text>
-        {{ viewApplication }}
-        <a href="{{ my_applications_ext_link }}">{{ ownApplicationPage }}</a>.
-    </mj-text>
+    <mj-text>{{ text_application_in_allocation | sentence | safe }}</mj-text>
+    <mj-text>{{ text_view_application_html | sentence | safe }}</mj-text>
 {% endblock %}
 
 {% block content_secondary %}

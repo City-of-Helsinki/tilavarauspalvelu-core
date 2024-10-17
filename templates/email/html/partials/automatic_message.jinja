@@ -1,7 +1,7 @@
 <mj-spacer />
 
-<mj-text font-size="16px">{{ automaticMessageDoNotReply }}</mj-text>
-<mj-text font-size="16px"><a href="{{ feedback_ext_link }}">{{ contactUs }}</a>.</mj-text>
-<mj-text font-size="16px">{{ reserveCityResourcesAt }} <a href="{{ varaamo_ext_link }}">{{ serviceUrl }}</a>.</mj-text>
+<mj-text font-size="16px">{{ automatic_message_do_not_reply | sentence | safe }}</mj-text>
+<mj-text font-size="16px">{{ contact_us_html | sentence | safe }}</mj-text>
+<mj-text font-size="16px">{{ reserve_city_resources_at_html | sentence | safe }}</mj-text>
 
 <mj-spacer height="50px" />

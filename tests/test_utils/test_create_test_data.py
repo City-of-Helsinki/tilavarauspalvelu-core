@@ -7,7 +7,6 @@ from tilavarauspalvelu.models import (
     AbilityGroup,
     AffectingTimeSpan,
     Building,
-    EmailTemplate,
     Introduction,
     Keyword,
     KeywordCategory,
@@ -54,7 +53,6 @@ models_that_always_contain_data: list[type[models.Model]] = [
 models_that_should_be_empty: list[type[models.Model]] = [
     AbilityGroup,
     Building,
-    EmailTemplate,
     Introduction,
     Keyword,
     KeywordCategory,

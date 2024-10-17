@@ -8,6 +8,8 @@ from django.db.models import Subquery
 from django.db.models.functions import Coalesce
 from lookup_property import L
 
+from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ApplicationSectionStatusChoice
+
 if TYPE_CHECKING:
     from tilavarauspalvelu.enums import ApplicationStatusChoice
     from tilavarauspalvelu.models import Application
@@ -96,3 +98,21 @@ class ApplicationQuerySet(models.QuerySet):
 
         for item in items:
             item.units_for_permissions = [unit for unit in units if item.pk in unit.application_ids]
+
+    def should_send_in_allocation_email(self) -> Self:
+        """Get all applications that need the "application in allocation" notification to be sent."""
+        return self.filter(
+            L(application_round__status=ApplicationRoundStatusChoice.IN_ALLOCATION.value),
+            L(status=ApplicationSectionStatusChoice.IN_ALLOCATION.value),
+            in_allocation_notification_sent_date__isnull=True,
+            application_sections__isnull=False,
+        )
+
+    def should_send_handled_email(self) -> Self:
+        """Get all applications that need the "application handled" notification to be sent."""
+        return self.filter(
+            L(application_round__status=ApplicationRoundStatusChoice.HANDLED.value),
+            L(status=ApplicationSectionStatusChoice.HANDLED.value),
+            results_ready_notification_sent_date__isnull=True,
+            application_sections__isnull=False,
+        )

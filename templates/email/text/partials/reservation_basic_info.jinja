@@ -1,6 +1,6 @@
-{{ reservation_unit }}
-{{ unit_name }}
-{{ unit_location }}
+{{ reservation_unit_name | safe }}
+{{ unit_name | safe }}
+{{ unit_location | safe }}
 
-{{ reservationBegins }}: {{ begin_date }} {{ oClock }} {{ begin_time }}
-{{ reservationEnds }}: {{ end_date }} {{ oClock }} {{ end_time }}
+{{ begins_label | safe }}: {{ begin_date }} {{ o_clock_label | safe }} {{ begin_time }}
+{{ ends_label | safe }}: {{ end_date }} {{ o_clock_label | safe }} {{ end_time }}

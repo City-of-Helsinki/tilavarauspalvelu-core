@@ -9,28 +9,18 @@ from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar
 
 from django.conf import settings
 from django.core.cache import cache
-from django.db import models
-from django.utils import translation
 from django.utils.translation import get_language_from_request
-from modeltranslation.manager import get_translatable_fields_for_model
 
 from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
-    from collections.abc import Generator, Iterable, Sequence
+    from collections.abc import Generator, Iterable
 
     from django.http import HttpRequest
-    from django.utils.functional import Promise
-
-    from tilavarauspalvelu.models import User
-    from tilavarauspalvelu.typing import Lang
 
 __all__ = [
     "comma_sep_str",
-    "get_attr_by_language",
-    "get_field_to_related_field_mapping",
     "get_text_search_language",
-    "get_translation_fields",
     "update_query_params",
     "with_indices",
 ]
@@ -67,29 +57,6 @@ def comma_sep_str(values: Iterable[Any], *, last_sep: str = "&", quote: bool = F
         string += f"'{previous_value}'" if quote else previous_value
 
     return string
-
-
-def get_field_to_related_field_mapping(model: type[models.Model]) -> dict[str, str]:
-    """
-    Mapping of all 'many_to_one' and 'many_to_many' fields
-    on the given model to their related entity's field names.
-    """
-    return {
-        field.name: field.remote_field.name  # many_to_one
-        if isinstance(field.remote_field, models.ForeignKey)
-        else field.remote_field.get_accessor_name()  # many_to_many
-        for field in model._meta.get_fields()
-        if field.is_relation and (field.many_to_many or field.one_to_many)
-    }
-
-
-def get_translation_fields(model: type[models.Model], fields: Sequence[str] | Literal["__all__"]) -> list[str]:
-    translatable_fields = get_translatable_fields_for_model(model) or []
-    if fields == "__all__":
-        fields = translatable_fields
-    return [
-        f"{field}_{language}" for field in translatable_fields for language, _ in settings.LANGUAGES if field in fields
-    ]
 
 
 class with_indices(Generic[T]):  # noqa: N801, RUF100
@@ -146,23 +113,6 @@ class with_indices(Generic[T]):  # noqa: N801, RUF100
     def delete_item(self, i: int) -> None:
         del self.seq[i]
         self.item_deleted = True
-
-
-def get_attr_by_language(instance: Any, field: str, language: Lang) -> str:
-    """Get field value by language, or fallback to default language"""
-    localised_value = getattr(instance, f"{field}_{language}", None)
-    if localised_value:
-        return localised_value
-    return getattr(instance, field, "")
-
-
-def translate_for_user(text: Promise, user: User) -> str:
-    """
-    Translate the given text based on the user's preferred language.
-    If the user has no language set, use the default language of Finnish.
-    """
-    with translation.override(user.get_preferred_language()):
-        return str(text)
 
 
 def get_text_search_language(request: HttpRequest) -> Literal["finnish", "english", "swedish"]:

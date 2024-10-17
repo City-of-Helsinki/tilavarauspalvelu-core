@@ -1,10 +1,9 @@
 <mjml>
-    {% set helsinkiLogoUrl = "https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png" %}
     <mj-head>
         <mj-style>
             @font-face {
                 font-family: "HelsinkiGrotesk";
-                src: url("https://makasiini.hel.ninja/delivery/HelsinkiGrotesk/565d73a693abe0776c801607ac28f0bf.woff") format("woff");
+                src: url("{{ font_src }}") format("woff");
             }
 
             p {
@@ -22,11 +21,32 @@
             <mj-all font-family="HelsinkiGrotesk" color="#000000" />
         </mj-attributes>
 
-        <mj-title>{% block title %}Varaamo{% endblock %}</mj-title>
+        <mj-title>{{ title | safe }}</mj-title>
     </mj-head>
     <mj-body background-color="#ffffff" width="960px">
-        {% block header %}Header{% endblock %}
+        {# Header #}
+        <mj-section background-color="#FFFFFF">
+            <mj-group>
+                <mj-column vertical-align="middle" width="25%" padding="0">
+                    <mj-image align="left" padding-right="0" src="{{ helsinki_logo_url }}" />
+                </mj-column>
+                <mj-column vertical-align="middle">
+                    <mj-text font-size="24px" align="left">
+                        <b>{{ service_name | safe }}</b>
+                    </mj-text>
+                </mj-column>
+            </mj-group>
+        </mj-section>
 
+        <mj-section background-color="#FFFFFF" padding-bottom="30px">
+            <mj-column>
+                <mj-text font-size="36px">
+                    <b>{{ salutation | safe }}{% if email_recipient_name %} {{ email_recipient_name | safe }}{% endif %},</b>
+                </mj-text>
+            </mj-column>
+        </mj-section>
+
+        {# Content #}
         <mj-section background-color="#F7F2E4">
             <mj-column>
                 {% block content_main %}
@@ -55,21 +75,21 @@
         <mj-section background-color="#E6E6E6" padding-bottom="0">
             <mj-group>
                 <mj-column vertical-align="middle" width="15%" padding="0">
-                    <mj-image align="left" padding-right="0"
-                              src="https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png" />
+                    <mj-image align="left" padding-right="0" src="{{ helsinki_logo_url }}" />
                 </mj-column>
                 <mj-column vertical-align="middle">
                     <mj-text font-size="16px" align="left">
-                        <b>{{ serviceName }}</b>
+                        <b>{{ service_name | safe }}</b>
                     </mj-text>
                 </mj-column>
             </mj-group>
         </mj-section>
+
         <mj-section background-color="#E6E6E6">
             <mj-column>
                 <mj-divider border-width="2px" border-style="solid" border-color="#CCCCCC" padding-top="0" />
                 <mj-spacer height="10px" />
-                <mj-text font-size="14px">&copy; {{ helsinkiCity }} {{ current_year }}</mj-text>
+                <mj-text font-size="14px">&copy; {{ helsinki_city | safe }} {{ current_year | safe }}</mj-text>
             </mj-column>
         </mj-section>
     </mj-body>

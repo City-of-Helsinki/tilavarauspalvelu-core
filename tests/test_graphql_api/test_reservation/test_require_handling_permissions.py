@@ -11,9 +11,9 @@ pytestmark = [
 
 
 @pytest.mark.parametrize("role", [UserRoleChoice.HANDLER, UserRoleChoice.ADMIN])
-def test_reservation__handling_required__allowed(graphql, role):
+def test_reservation__requires_handling__allowed(graphql, role):
     graphql.login_user_with_role(role=role)
-    reservation = ReservationFactory.create_for_handling_required()
+    reservation = ReservationFactory.create_for_requires_handling()
 
     data = get_require_handling_data(reservation)
     response = graphql(REQUIRE_HANDLING_MUTATION, input_data=data)
@@ -21,10 +21,10 @@ def test_reservation__handling_required__allowed(graphql, role):
     assert response.has_errors is False, response.errors
 
 
-def test_reservation__handling_required__allowed__own(graphql):
+def test_reservation__requires_handling__allowed__own(graphql):
     # Reservers are allowed to set handling required for their own reservations.
     user = graphql.login_user_with_role(role=UserRoleChoice.RESERVER)
-    reservation = ReservationFactory.create_for_handling_required(user=user)
+    reservation = ReservationFactory.create_for_requires_handling(user=user)
 
     data = get_require_handling_data(reservation)
     response = graphql(REQUIRE_HANDLING_MUTATION, input_data=data)
@@ -32,9 +32,9 @@ def test_reservation__handling_required__allowed__own(graphql):
     assert response.has_errors is False, response.errors
 
 
-def test_reservation__handling_required__not_allowed(graphql):
+def test_reservation__requires_handling__not_allowed(graphql):
     graphql.login_with_regular_user()
-    reservation = ReservationFactory.create_for_handling_required()
+    reservation = ReservationFactory.create_for_requires_handling()
 
     data = get_require_handling_data(reservation)
     response = graphql(REQUIRE_HANDLING_MUTATION, input_data=data)
@@ -43,10 +43,10 @@ def test_reservation__handling_required__not_allowed(graphql):
     assert response.error_message() == "No permission to update."
 
 
-def test_reservation__handling_required__not_allowed__own(graphql):
+def test_reservation__requires_handling__not_allowed__own(graphql):
     # Regular users are not approve to set handling required for their own reservations without required role.
     user = graphql.login_with_regular_user()
-    reservation = ReservationFactory.create_for_handling_required(user=user)
+    reservation = ReservationFactory.create_for_requires_handling(user=user)
 
     data = get_require_handling_data(reservation)
     response = graphql(REQUIRE_HANDLING_MUTATION, input_data=data)

@@ -1,0 +1,17 @@
+{{ salutation | safe }} {{ email_recipient_name | safe }},
+
+{{ text_reservation_requires_handling | sentence | safe }}
+
+{% include "email/text/partials/reservation_basic_info.jinja" %}
+
+{% include "email/text/partials/reservation_price_range.jinja" %}
+
+{{ text_pending_notification | sentence | safe }}
+
+{% include "email/text/partials/instructions.jinja" %}
+
+{% include "email/text/partials/reservation_manage_link.jinja" %}
+
+{% include "email/text/partials/closing_polite.jinja" %}
+
+{% include "email/text/partials/automatic_message.jinja" %}

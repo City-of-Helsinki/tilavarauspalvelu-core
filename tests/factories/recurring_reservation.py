@@ -4,8 +4,7 @@ from typing import Any
 import factory
 from factory import fuzzy
 
-from config.utils.commons import WEEKDAYS
-from tilavarauspalvelu.enums import ReservationStartInterval, ReservationStateChoice
+from tilavarauspalvelu.enums import ReservationStartInterval, ReservationStateChoice, WeekdayChoice
 from tilavarauspalvelu.models import RecurringReservation
 from utils.date_utils import DEFAULT_TIMEZONE, get_periods_between
 
@@ -24,7 +23,7 @@ class RecurringReservationFactory(GenericDjangoModelFactory[RecurringReservation
     name = fuzzy.FuzzyText()
     description = fuzzy.FuzzyText()
     recurrence_in_days = 7
-    weekdays = f"{WEEKDAYS.MONDAY}"
+    weekdays = f"{WeekdayChoice.MONDAY}"
 
     begin = fuzzy.FuzzyDateTime(start_dt=datetime.datetime(2023, 1, 1, tzinfo=DEFAULT_TIMEZONE))
     end = factory.LazyAttribute(lambda r: r.begin + datetime.timedelta(days=30, hours=1))

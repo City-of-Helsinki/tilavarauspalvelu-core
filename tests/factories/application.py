@@ -53,7 +53,7 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
             case ApplicationStatusChoice.HANDLED:
                 return cls.create_in_status_handled(**kwargs)
             case ApplicationStatusChoice.RESULTS_SENT:
-                return cls.create_in_status_result_sent(**kwargs)
+                return cls.create_in_status_results_sent(**kwargs)
             case ApplicationStatusChoice.EXPIRED:
                 return cls.create_in_status_expired(**kwargs)
             case ApplicationStatusChoice.CANCELLED:
@@ -175,7 +175,7 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
         return application
 
     @classmethod
-    def create_in_status_result_sent(cls, **kwargs: Any) -> Application:
+    def create_in_status_results_sent(cls, **kwargs: Any) -> Application:
         """
         Create an application, the result of which has been sent to the user:
         - in a handled application round

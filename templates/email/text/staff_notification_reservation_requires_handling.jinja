@@ -1,13 +1,13 @@
-{{ salutation }},
+{{ salutation | safe }},
 
-{{ textStaffReservationRequiresHandling }}: {{ name }}
+{{ text_staff_reservation_requires_handling | safe }}: {{ reservation_name | safe }}
 
-{{ reserveeName }}: {{ reservee_name }}
-{{ reservationNumber }}: {{ reservation_number }}
+{{ reservee_name_label | safe }}: {{ reservee_name }}
+{{ booking_number_label | safe }}: {{ booking_number }}
 
 {% include "email/text/partials/reservation_basic_info.jinja" %}
 
-{{ staffReservationRequiresHandlingCheckDetails }}:
-{{ staff_reservations_ext_link }}/{{ reservation_number }}
+{{ text_check_details | safe }}:
+{{ staff_reservations_ext_link }}
 
 {% include "email/text/partials/closing_staff.jinja" %}
