@@ -16,9 +16,11 @@ class GeneralRoleInlineAdmin(admin.TabularInline):
     fk_name = "user"
     fields = [
         "role",
+        "role_active",
     ]
     readonly_fields = [
         "role",
+        "role_active",
     ]
 
     def has_add_permission(self, request, obj=None):
@@ -37,11 +39,13 @@ class UnitRoleInlineAdmin(admin.TabularInline):
         "role",
         "units",
         "unit_groups",
+        "role_active",
     ]
     readonly_fields = [
         "role",
         "units",
         "unit_groups",
+        "role_active",
     ]
 
     def has_add_permission(self, request, obj=None):
@@ -171,9 +175,9 @@ class UserAdmin(admin.ModelAdmin):
         "date_of_birth",
         "login_method",
         "is_strong_login",
-        "general_roles_list",
-        "unit_roles_map",
-        "unit_group_roles_map",
+        "active_general_roles",
+        "active_unit_roles",
+        "active_unit_group_roles",
         "statistics_uuid",
         "gdpr_uuid",
         "issuer",
