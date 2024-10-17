@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Literal, Protocol, TypedDict
 
 from django.contrib.auth.models import AnonymousUser
@@ -26,6 +27,7 @@ __all__ = [
     "SessionMapping",
     "TimeSlot",
     "TimeSlotDB",
+    "UserAnonymizationInfo",
     "WSGIRequest",
     "permission",
 ]
@@ -97,3 +99,13 @@ class EmailData(TypedDict):
     text_content: str
     html_content: str
     attachments: list[EmailAttachment]
+
+
+@dataclass
+class UserAnonymizationInfo:
+    has_open_reservations: bool
+    has_open_applications: bool
+    has_open_payments: bool
+
+    def __bool__(self) -> bool:
+        return not (self.has_open_reservations or self.has_open_applications or self.has_open_payments)
