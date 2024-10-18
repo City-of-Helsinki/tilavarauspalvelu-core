@@ -44,12 +44,12 @@ export const HorisontalFlex = styled.div`
 
 HorisontalFlex.displayName = "HorisontalFlex";
 
-export const ButtonContainer = styled.div`
+export const ButtonContainer = styled.div<{ $noMargin?: boolean }>`
   display: flex;
   flex-wrap: wrap;
   gap: var(--spacing-2-xs);
   width: 100%;
-  margin-bottom: var(--spacing-s);
+  margin-bottom: ${({ $noMargin }) => ($noMargin ? "0" : "var(--spacing-s);")};
 `;
 ButtonContainer.displayName = "ButtonContainer";
 

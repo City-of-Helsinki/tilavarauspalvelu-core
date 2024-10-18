@@ -45,7 +45,7 @@ import { Accordion as HDSAccordion } from "@/common/hds-fork/Accordion";
 import Loader from "@/component/Loader";
 import { ApplicationWorkingMemo } from "@/component/WorkingMemo";
 import ShowWhenTargetInvisible from "@/component/ShowWhenTargetInvisible";
-import StickyHeader from "@/component/StickyHeader";
+import { StickyHeader } from "@/component/StickyHeader";
 import StatusBlock from "@/component/StatusBlock";
 import { BirthDate } from "@/component/BirthDate";
 import { Container } from "@/styles/layout";

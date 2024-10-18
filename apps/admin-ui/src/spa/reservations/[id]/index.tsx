@@ -19,7 +19,7 @@ import Loader from "@/component/Loader";
 import { useModal } from "@/context/ModalContext";
 import { ButtonContainer, Container } from "@/styles/layout";
 import ShowWhenTargetInvisible from "@/component/ShowWhenTargetInvisible";
-import StickyHeader from "@/component/StickyHeader";
+import { StickyHeader } from "@/component/StickyHeader";
 import { ReservationWorkingMemo } from "@/component/WorkingMemo";
 import { Accordion } from "@/common/hds-fork/Accordion";
 import { BirthDate } from "@/component/BirthDate";

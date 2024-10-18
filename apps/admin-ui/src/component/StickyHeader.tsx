@@ -1,28 +1,19 @@
-import { ButtonContainer } from "@/styles/layout";
-import { breakpoints } from "common/src/common/style";
 import React from "react";
 import styled from "styled-components";
+import { ButtonContainer } from "@/styles/layout";
+import { H2 } from "common";
+import { breakpoints } from "common/src/common/style";
 
 const Sticky = styled.div`
   z-index: var(--tilavaraus-admin-stack-sticky-reservation-header);
   position: sticky;
-  top: 0;
-  width: 100%;
-  background-color: white;
-  height: 0;
+  inset: 0;
 `;
 
 const StickyContent = styled.div`
   color: var(--color-white);
   background: var(--color-bus-dark);
-  border-width: 0;
-  border-style: solid;
-  border-color: var(--color-black-20);
-  padding: 10px;
-  display: flex;
-  justify-content: space-between;
-  gap: var(--spacing-s);
-  line-height: 1.5;
+  padding: var(--spacing-s);
   && button,
   && a {
     border-color: var(--color-white);
@@ -33,54 +24,23 @@ const StickyContent = styled.div`
       color: var(--color-black-10);
       border-color: var(--color-black-10);
     }
-  }
-  flex-direction: column;
-  @media (min-width: ${breakpoints.l}) {
-    flex-direction: row;
-  }
-`;
-
-const Name = styled.h2`
-  font-weight: 500;
-  font-family: var(--tilavaraus-admin-font-medium);
-  margin-top: 0;
-
-  font-size: var(--fontsize-heading-xs);
-  margin-bottom: var(--spacing-2-xs);
-  @media (min-width: ${breakpoints.s}) {
-    font-size: var(--fontsize-heading-m);
-    margin-bottom: var(--spacing-s);
-  }
-`;
-const Tagline = styled.div`
-  font-size: var(--fontsize-body-m);
-`;
-
-const StyledButtonContainer = styled(ButtonContainer)`
-  margin: 0;
-  flex-grow: 0;
-  flex-shrink: 0;
-  width: auto;
-  align-items: center;
-  flex-direction: row-reverse;
-
-  justify-content: space-between;
-  & > button {
-    flex: 1;
-    max-width: 50%;
-  }
-  @media (min-width: ${breakpoints.s}) {
-    justify-content: flex-end;
-    & > button {
-      flex: unset;
-      max-width: unset;
+    &:hover {
+      filter: brightness(0.8);
     }
   }
+
+  display: grid;
+  gap: var(--spacing-s);
+  align-items: center;
+  grid-template-columns: 1fr;
+  @media (min-width: ${breakpoints.s}) {
+    grid-template-columns: 1fr auto;
+  }
 `;
 
-const TagContainer = styled.div`
-  flex-grow: 1;
-  flex-shrink: 1;
+const Name = styled(H2).attrs({ $legacy: true })`
+  margin-top: 0;
+  margin-bottom: var(--spacing-2-xs);
 `;
 
 type Props = {
@@ -89,16 +49,16 @@ type Props = {
   buttons?: React.ReactNode;
 };
 
-const StickyHeader = ({ name, tagline, buttons }: Props): JSX.Element => (
-  <Sticky>
-    <StickyContent>
-      <TagContainer>
-        <Name>{name}</Name>
-        <Tagline>{tagline}</Tagline>
-      </TagContainer>
-      <StyledButtonContainer>{buttons}</StyledButtonContainer>
-    </StickyContent>
-  </Sticky>
-);
-
-export default StickyHeader;
+export function StickyHeader({ name, tagline, buttons }: Props): JSX.Element {
+  return (
+    <Sticky>
+      <StickyContent>
+        <div>
+          <Name>{name}</Name>
+          <div>{tagline}</div>
+        </div>
+        <ButtonContainer $noMargin>{buttons}</ButtonContainer>
+      </StickyContent>
+    </Sticky>
+  );
+}
