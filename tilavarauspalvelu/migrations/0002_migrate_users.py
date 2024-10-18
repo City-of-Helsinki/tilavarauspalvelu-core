@@ -4,7 +4,7 @@ import django.contrib.auth.validators
 import django.db.models.deletion
 import django.utils.timezone
 from django.conf import settings
-from django.contrib.postgres.operations import HStoreExtension
+from django.contrib.postgres.operations import CreateExtension, HStoreExtension
 from django.db import migrations, models
 
 import tilavarauspalvelu.models.user.queryset
@@ -24,8 +24,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # Add the hstore extension.
+        # Add the extensions.
         HStoreExtension(),
+        CreateExtension("intarray"),  # Allows array indexing
         # Create models.
         migrations.CreateModel(
             name="User",

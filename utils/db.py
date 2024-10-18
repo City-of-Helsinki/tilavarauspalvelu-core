@@ -1,10 +1,11 @@
 import ast
 from collections.abc import Iterable
+from inspect import cleandoc
 from typing import Any, Literal, TypeVar
 
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
-from django.db import models
+from django.db import migrations, models
 from django.db.models import Func
 from django.db.transaction import get_connection
 from lookup_property import State
@@ -189,6 +190,48 @@ class NowTT(Func):  # TT = Time Travel, as in "time travel tests"
                 "UPDATE testing_configurations SET global_time_offset_seconds = %s WHERE id = 1;",
                 params=[str(seconds)],
             )
+
+    @classmethod
+    def migration(cls) -> migrations.RunSQL:
+        return migrations.RunSQL(sql=cls.__forward_sql(), reverse_sql=cls.__reverse_sql())
+
+    @classmethod
+    def __forward_sql(cls) -> str:
+        return cleandoc(
+            """
+            CREATE TABLE IF NOT EXISTS testing_configurations (
+                id BIGSERIAL PRIMARY KEY NOT NULL,
+                global_time_offset_seconds BIGINT NOT NULL
+            );
+
+            INSERT INTO testing_configurations (id, global_time_offset_seconds) VALUES (1, 0) ON CONFLICT DO NOTHING;
+
+            -- Gets the current time in the database's, but can be offset during testing.
+            CREATE OR REPLACE FUNCTION NOW_TT()
+            RETURNS TIMESTAMP WITH TIME ZONE
+            AS
+            $$
+            BEGIN
+                -- See `django.db.models.functions.datetime.Now.as_postgresql`
+                RETURN STATEMENT_TIMESTAMP() + (
+                    select global_time_offset_seconds
+                    from testing_configurations
+                    limit 1
+                ) * interval '1 second';
+            END;
+            $$
+            LANGUAGE plpgsql STABLE PARALLEL SAFE STRICT;
+            """
+        )
+
+    @classmethod
+    def __reverse_sql(cls) -> str:
+        return cleandoc(
+            """
+            DROP TABLE IF EXISTS testing_configurations;
+            DROP FUNCTION IF EXISTS NOW_TT;
+            """
+        )
 
 
 @expression_to_ast.register

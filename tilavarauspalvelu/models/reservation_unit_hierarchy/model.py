@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import contextlib
 from functools import cached_property
+from inspect import cleandoc
 from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
-from django.db import models
+from django.db import migrations, models
 from django.db.transaction import get_connection
 from django.utils.translation import gettext_lazy as _
 
@@ -28,9 +29,6 @@ class ReservationUnitHierarchy(models.Model):
     """
     A PostgreSQL materialized view that is used to pre-calculate
     which reservation units affect a given reservation unit's reservations.
-
-    This view itself is created through a migration.
-    See: `0102_create_reservation_unit_hierarchy_materialized_view.py`.
     """
 
     reservation_unit: ReservationUnit = models.OneToOneField(
@@ -107,3 +105,106 @@ class ReservationUnitHierarchy(models.Model):
             cls.refresh = original_refresh
             if should_refresh:
                 cls.refresh()
+
+    # For migrations.
+
+    @classmethod
+    def create_migration(cls) -> migrations.RunSQL:
+        return migrations.RunSQL(sql=cls.__forward_sql(), reverse_sql=cls.__reverse_sql())
+
+    @classmethod
+    def __forward_sql(cls) -> str:
+        view_sql = "CREATE MATERIALIZED VIEW reservation_unit_hierarchy AS"
+
+        table_sql = cleandoc(
+            """
+            SELECT
+                subquery.reservation_unit_id,
+                subquery.related_reservation_unit_ids
+            FROM (
+                SELECT
+                    target_reservation_unit.id as reservation_unit_id,
+                    (
+                        SELECT
+                            ARRAY_AGG(DISTINCT reservation_ids.id)
+                        FROM (
+                            SELECT
+                                agg_res_unit.id
+                            FROM "reservation_unit" agg_res_unit
+                            LEFT OUTER JOIN reservation_unit_spaces res_space ON (
+                                agg_res_unit.id = res_space.reservationunit_id
+                            )
+                            LEFT OUTER JOIN reservation_unit_resources res_resource ON (
+                                agg_res_unit.id = res_resource.reservationunit_id
+                            )
+                            WHERE (
+                                agg_res_unit.id = target_reservation_unit.id
+                                OR res_space.space_id IN (
+                                    SELECT
+                                        UNNEST((
+                                            SELECT
+                                                ARRAY_AGG(id)
+                                            FROM (
+                                                SELECT
+                                                    family_space.id
+                                                FROM "space" family_space
+                                                WHERE (
+                                                    (
+                                                        family_space.lft <= (target_space.lft)
+                                                        AND family_space.rght >= (target_space.rght)
+                                                        AND family_space.tree_id = (target_space.tree_id)
+                                                    )
+                                                    OR (
+                                                        family_space.lft >= (target_space.lft)
+                                                        AND family_space.rght <= (target_space.rght)
+                                                        AND family_space.tree_id = (target_space.tree_id)
+                                                    )
+                                                )
+                                                ORDER BY family_space.tree_id, family_space.lft
+                                            ) space_ids
+                                        )) AS all_families
+                                    FROM
+                                        "space" target_space
+                                    INNER JOIN reservation_unit_spaces target_rus ON (
+                                        target_space.id = target_rus.space_id
+                                    )
+                                    WHERE target_rus.reservationunit_id = target_reservation_unit.id
+                                    ORDER BY target_space.tree_id, target_space.lft
+                                )
+                                OR res_resource.resource_id IN (
+                                    SELECT
+                                        resource.id
+                                    FROM "resource" resource
+                                    INNER JOIN reservation_unit_resources ON (
+                                        resource.id = reservation_unit_resources.resource_id
+                                    )
+                                    WHERE reservation_unit_resources.reservationunit_id = target_reservation_unit.id
+                                    ORDER BY agg_res_unit.id
+                                )
+                            )
+                            ORDER BY agg_res_unit.rank, agg_res_unit.id
+                        ) reservation_ids
+                    ) AS related_reservation_unit_ids
+                FROM "reservation_unit" target_reservation_unit
+            ) subquery;
+            """
+        )
+
+        indexes_sql = cleandoc(
+            """
+            CREATE UNIQUE INDEX reservation_unit_hierarchy_reservation_unit_id ON reservation_unit_hierarchy (
+                reservation_unit_id
+            );
+            """
+        )
+
+        return f"{view_sql}\n{table_sql}\n{indexes_sql}"
+
+    @classmethod
+    def __reverse_sql(cls) -> str:
+        return cleandoc(
+            """
+            DROP INDEX reservation_unit_hierarchy_reservation_unit_id;
+            DROP MATERIALIZED VIEW reservation_unit_hierarchy;
+            """
+        )

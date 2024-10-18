@@ -8,6 +8,8 @@ from django.db import migrations, models
 
 import tilavarauspalvelu.enums
 import utils.fields.model
+from tilavarauspalvelu.models import AffectingTimeSpan, ReservationUnitHierarchy
+from utils.db import NowTT
 
 
 class Migration(migrations.Migration):
@@ -160,132 +162,11 @@ class Migration(migrations.Migration):
         ),
         #
         # Add test configurations table & 'NOW_TT' function
-        # Same as in `0019_add_now_tt`, but added needed earlier so that 'affecting_time_spans' is affected in testing.
-        #
-        migrations.RunSQL(
-            sql=(
-                """
-                CREATE TABLE IF NOT EXISTS testing_configurations (
-                    id BIGSERIAL PRIMARY KEY NOT NULL,
-                    global_time_offset_seconds BIGINT NOT NULL
-                );
-
-                INSERT INTO testing_configurations (id, global_time_offset_seconds) VALUES (1, 0) ON CONFLICT DO NOTHING;
-
-                -- Gets the current time in the database's, but can be offset during testing.
-                CREATE OR REPLACE FUNCTION NOW_TT()
-                RETURNS TIMESTAMP WITH TIME ZONE
-                AS
-                $$
-                BEGIN
-                    -- See `django.db.models.functions.datetime.Now.as_postgresql`
-                    RETURN STATEMENT_TIMESTAMP() + (
-                        select global_time_offset_seconds
-                        from testing_configurations
-                        limit 1
-                    ) * interval '1 second';
-                END;
-                $$
-                LANGUAGE plpgsql STABLE PARALLEL SAFE STRICT;
-                """
-            ),
-            reverse_sql=(
-                """
-                DROP TABLE IF EXISTS testing_configurations;
-                DROP FUNCTION IF EXISTS NOW_TT;
-                """
-            ),
-        ),
+        # Added earlier so that 'affecting_time_spans' is affected in local testing.
+        NowTT.migration(),
         #
         # Create the ReservationUnitHierarchy materialized view
-        #
-        # Create the materialized view
-        migrations.RunSQL(
-            sql=(
-                """
-                CREATE MATERIALIZED VIEW reservation_unit_hierarchy AS
-                    SELECT
-                        subquery.reservation_unit_id,
-                        subquery.related_reservation_unit_ids
-                    FROM (
-                        SELECT
-                            target_reservation_unit.id as reservation_unit_id,
-                            (
-                                SELECT
-                                    ARRAY_AGG(DISTINCT reservation_ids.id)
-                                FROM (
-                                    SELECT
-                                        agg_res_unit.id
-                                    FROM "reservation_unit" agg_res_unit
-                                    LEFT OUTER JOIN reservation_unit_spaces res_space ON agg_res_unit.id = res_space.reservationunit_id
-                                    LEFT OUTER JOIN reservation_unit_resources res_resource ON agg_res_unit.id = res_resource.reservationunit_id
-                                    WHERE (
-                                        agg_res_unit.id = target_reservation_unit.id
-                                        OR res_space.space_id IN (
-                                            SELECT
-                                                UNNEST((
-                                                    SELECT
-                                                        ARRAY_AGG(id)
-                                                    FROM (
-                                                        SELECT
-                                                            family_space.id
-                                                        FROM "space" family_space
-                                                        WHERE (
-                                                            (
-                                                                family_space.lft <= (target_space.lft)
-                                                                AND family_space.rght >= (target_space.rght)
-                                                                AND family_space.tree_id = (target_space.tree_id)
-                                                            )
-                                                            OR (
-                                                                family_space.lft >= (target_space.lft)
-                                                                AND family_space.rght <= (target_space.rght)
-                                                                AND family_space.tree_id = (target_space.tree_id)
-                                                            )
-                                                        )
-                                                        ORDER BY family_space.tree_id, family_space.lft
-                                                    ) space_ids
-                                                )) AS all_families
-                                            FROM
-                                                "space" target_space
-                                            INNER JOIN reservation_unit_spaces target_rus ON target_space.id = target_rus.space_id
-                                            WHERE target_rus.reservationunit_id = target_reservation_unit.id
-                                            ORDER BY target_space.tree_id, target_space.lft
-                                        )
-                                        OR res_resource.resource_id IN (
-                                            SELECT
-                                                resource.id
-                                            FROM "resource" resource
-                                            INNER JOIN reservation_unit_resources ON resource.id = reservation_unit_resources.resource_id
-                                            WHERE reservation_unit_resources.reservationunit_id = target_reservation_unit.id
-                                            ORDER BY agg_res_unit.id
-                                        )
-                                    )
-                                    ORDER BY agg_res_unit.rank, agg_res_unit.id
-                                ) reservation_ids
-                            ) AS related_reservation_unit_ids
-                        FROM "reservation_unit" target_reservation_unit
-                    ) subquery;
-                """
-            ),
-            reverse_sql=(
-                """
-                DROP MATERIALIZED VIEW reservation_unit_hierarchy
-                """
-            ),
-        ),
-        # Add index on 'reservation_unit_id'
-        migrations.RunSQL(
-            sql=(
-                """
-                CREATE UNIQUE INDEX reservation_unit_hierarchy_reservation_unit_id ON reservation_unit_hierarchy (reservation_unit_id);
-                """
-            ),
-            reverse_sql=(
-                """
-                DROP INDEX reservation_unit_hierarchy_reservation_unit_id
-                """
-            ),
-        ),
+        ReservationUnitHierarchy.create_migration(),
         # Add the model
         migrations.CreateModel(
             name="ReservationUnitHierarchy",
@@ -316,81 +197,7 @@ class Migration(migrations.Migration):
         ),
         #
         # Create the AffectingTimeSpan materialized view
-        #
-        # Create the materialized view
-        migrations.RunSQL(
-            sql=(
-                """
-                CREATE MATERIALIZED VIEW affecting_time_spans AS
-                    SELECT
-                        res.reservation_id,
-                        array_agg(res.ru_id ORDER BY res.ru_id) AS affected_reservation_unit_ids,
-                        res.buffered_start_datetime,
-                        res.buffered_end_datetime,
-                        res.buffer_time_before,
-                        res.buffer_time_after,
-                        res.is_blocking
-                    FROM (
-                        SELECT DISTINCT
-                            r.id as reservation_id,
-                            unnest(ruh.related_reservation_unit_ids) as ru_id,
-                            (r.begin - r.buffer_time_before) as buffered_start_datetime,
-                            (r.end + r.buffer_time_after) as buffered_end_datetime,
-                            r.buffer_time_before as buffer_time_before,
-                            r.buffer_time_after as buffer_time_after,
-                            (CASE WHEN UPPER(r."type") = 'BLOCKED' THEN true ELSE false END) as is_blocking
-                        FROM reservation r
-                        INNER JOIN "reservation_reservation_unit" rru ON r.id = rru.reservation_id
-                        INNER JOIN "reservation_unit_hierarchy" ruh ON rru.reservationunit_id = ruh.reservation_unit_id
-                        WHERE (
-                            (r.end + r.buffer_time_after)::date >= NOW_TT()::date
-                            AND UPPER(r.state) IN ('CREATED', 'CONFIRMED', 'WAITING_FOR_PAYMENT', 'REQUIRES_HANDLING')
-                        )
-                    ) res
-                    GROUP BY
-                        res.reservation_id,
-                        res.buffered_start_datetime,
-                        res.buffered_end_datetime,
-                        res.buffer_time_before,
-                        res.buffer_time_after,
-                        res.is_blocking
-                    ORDER BY res.buffered_start_datetime, res.reservation_id;
-                """
-            ),
-            reverse_sql=(
-                """
-                DROP MATERIALIZED VIEW affecting_time_spans
-                """
-            ),
-        ),
-        # Add the intarray extension for array indexing
-        migrations.RunSQL(
-            sql="CREATE EXTENSION IF NOT EXISTS intarray; ",
-            reverse_sql="DROP EXTENSION IF EXISTS intarray;",
-        ),
-        # Add index on 'reservation_id'
-        migrations.RunSQL(
-            sql="CREATE UNIQUE INDEX idx_reservation_id ON affecting_time_spans (reservation_id);",
-            reverse_sql="DROP INDEX idx_reservation_id;",
-        ),
-        # Add index on 'affected_reservation_unit_ids'
-        migrations.RunSQL(
-            sql=(
-                "CREATE INDEX idx_affected_reservation_unit_ids on affecting_time_spans "
-                "USING GIN (affected_reservation_unit_ids gin__int_ops);"
-            ),
-            reverse_sql="DROP INDEX idx_affected_reservation_unit_ids;",
-        ),
-        # Add index on 'buffered_start_datetime'
-        migrations.RunSQL(
-            sql="CREATE INDEX idx_buffered_start_datetime ON affecting_time_spans (buffered_start_datetime);",
-            reverse_sql="DROP INDEX idx_buffered_start_datetime;",
-        ),
-        # Add index on 'buffered_end_datetime'
-        migrations.RunSQL(
-            sql="CREATE INDEX idx_buffered_end_datetime ON affecting_time_spans (buffered_end_datetime);",
-            reverse_sql="DROP INDEX idx_buffered_end_datetime",
-        ),
+        AffectingTimeSpan.create_migration(),
         # Create the model
         migrations.CreateModel(
             name="AffectingTimeSpan",
