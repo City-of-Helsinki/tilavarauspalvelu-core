@@ -11,6 +11,7 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_application_handled,
     get_context_for_application_in_allocation,
     get_context_for_application_received,
+    get_context_for_permission_deactivation,
     get_context_for_reservation_approved,
     get_context_for_reservation_cancelled,
     get_context_for_reservation_confirmed,
@@ -94,6 +95,8 @@ def select_tester_form(*, email_type: EmailType) -> type[EmailTemplateForm] | No
             return ApplicationInAllocationEmailTemplateTesterForm
         case EmailType.APPLICATION_RECEIVED:
             return ApplicationReceivedEmailTemplateTesterForm
+        case EmailType.PERMISSION_DEACTIVATION:
+            return PermissionDeactivationEmailTemplateTesterForm
         case EmailType.RESERVATION_CANCELLED:
             return ReservationCancelledEmailTemplateTesterForm
         case EmailType.RESERVATION_CONFIRMED:
@@ -178,6 +181,14 @@ class ApplicationReceivedEmailTemplateTesterForm(
 ):
     def to_context(self) -> EmailContext:
         return get_context_for_application_received(language=self.cleaned_data["language"])
+
+
+class PermissionDeactivationEmailTemplateTesterForm(
+    LanguageFormMixin,
+    EmailTemplateForm,
+):
+    def to_context(self) -> EmailContext:
+        return get_context_for_permission_deactivation(language=self.cleaned_data["language"])
 
 
 class ReservationCancelledEmailTemplateTesterForm(

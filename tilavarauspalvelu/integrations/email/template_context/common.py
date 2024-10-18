@@ -223,6 +223,14 @@ def get_my_reservations_ext_link(*, language: Lang) -> str:
     return f"{url_base}/reservations"
 
 
+def get_staff_login_link(
+    *,
+    language: Lang,
+) -> str:
+    url_base = settings.EMAIL_VARAAMO_EXT_LINK.removesuffix("/")
+    return f"{url_base}/kasittely"
+
+
 def get_staff_reservations_ext_link(
     booking_number,
     *,

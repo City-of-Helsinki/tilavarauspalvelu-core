@@ -2129,6 +2129,10 @@ msgid "Application received"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
+msgid "Permission deactivation"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
 msgid "Reservation cancelled"
 msgstr ""
 
@@ -2903,6 +2907,25 @@ msgctxt "Email"
 msgid "Booking number"
 msgstr "Bokningsnummer"
 
+#: tilavarauspalvelu/integrations/email/template_context/permissions.py
+msgctxt "Email"
+msgid "Your permissions in Varaamo are going to be deactivated"
+msgstr "Dina behörigheter i Varaamo kommer att avaktiveras"
+
+#: tilavarauspalvelu/integrations/email/template_context/permissions.py
+msgctxt "Email"
+msgid ""
+"Your account in Varaamo has staff permissions. Since you haven't logged in "
+"for a while, these permissions are going to be revoked."
+msgstr ""
+"Ditt konto i Varaamo har personalbehörighet. Eftersom du inte har loggat in "
+"på ett tag kommer dessa behörigheter att återkallas."
+
+#: tilavarauspalvelu/integrations/email/template_context/permissions.py
+msgctxt "Email"
+msgid "You can login to Varaamo here to prevent this from happening"
+msgstr "Du kan logga in på Varaamo här för att förhindra att detta händer"
+
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
 msgid "Your booking has been cancelled"
@@ -3127,18 +3150,6 @@ msgstr ""
 
 #: tilavarauspalvelu/models/city/model.py
 msgid "Cities"
-msgstr ""
-
-#: tilavarauspalvelu/models/email_template/model.py
-msgid "Email type"
-msgstr ""
-
-#: tilavarauspalvelu/models/email_template/model.py
-msgid "Only one template per type can be created."
-msgstr ""
-
-#: tilavarauspalvelu/models/email_template/model.py
-msgid "Unique name for this content"
 msgstr ""
 
 #: tilavarauspalvelu/models/general_role/model.py

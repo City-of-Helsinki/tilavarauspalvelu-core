@@ -5,6 +5,7 @@ from .application import (
     get_context_for_application_in_allocation,
     get_context_for_application_received,
 )
+from .permissions import get_context_for_permission_deactivation
 from .reservation import (
     get_context_for_reservation_approved,
     get_context_for_reservation_cancelled,
@@ -21,6 +22,7 @@ __all__ = [
     "get_context_for_application_handled",
     "get_context_for_application_in_allocation",
     "get_context_for_application_received",
+    "get_context_for_permission_deactivation",
     "get_context_for_reservation_approved",
     "get_context_for_reservation_cancelled",
     "get_context_for_reservation_confirmed",

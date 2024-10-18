@@ -63,6 +63,16 @@ def get_recipients_for_applications_by_language(applications: Iterable[Applicati
     return recipients_by_language
 
 
+def get_users_by_email_language(users: Iterable[User]) -> dict[Lang, set[str]]:
+    recipients_by_language: dict[Lang, set[str]] = defaultdict(set)
+    for user in users:
+        if user.email:
+            user_language = user.get_preferred_language()
+            recipients_by_language[user_language].add(user.email.lower())
+
+    return recipients_by_language
+
+
 def get_reservation_staff_notification_recipients(reservation: Reservation, *, handling: bool = False) -> list[str]:
     """
     Get staff users who should receive email notifications for the given reservation.

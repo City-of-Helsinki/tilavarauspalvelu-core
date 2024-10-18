@@ -12,6 +12,7 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_application_handled,
     get_context_for_application_in_allocation,
     get_context_for_application_received,
+    get_context_for_permission_deactivation,
     get_context_for_reservation_approved,
     get_context_for_reservation_cancelled,
     get_context_for_reservation_confirmed,
@@ -143,6 +144,45 @@ def test_render_application_received_email__html():
         You can edit your application on the ['My applications' page]({link}) until the application deadline.
 
         Thank you for choosing Varaamo!
+        Kind regards
+        Varaamo
+        This is an automated message, please do not reply.
+        [Contact us](https://fake.varaamo.hel.fi/feedback?lang=en).
+        Book the city's premises and equipment for your use at [varaamo.hel.fi](https://fake.varaamo.hel.fi/en).
+
+        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
+
+        **Varaamo**
+
+        (C) City of Helsinki 2024
+        """
+    )
+
+
+@freeze_time("2024-01-01")
+def test_render_permission_deactivation__html():
+    context = get_context_for_permission_deactivation(language="en")
+    html_content = render_html(email_type=EmailType.PERMISSION_DEACTIVATION, context=context)
+    text_content = html_email_to_text(html_content)
+
+    message = (
+        "Your account in Varaamo has staff permissions. "
+        "Since you haven't logged in for a while, these permissions are going to be revoked."
+    )
+
+    assert text_content == cleandoc(
+        f"""
+        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
+
+        **Varaamo**
+
+        **Hi,**
+
+        {message}
+
+        You can login to Varaamo here to prevent this from happening:
+        <https://fake.varaamo.hel.fi/kasittely>
+
         Kind regards
         Varaamo
         This is an automated message, please do not reply.
