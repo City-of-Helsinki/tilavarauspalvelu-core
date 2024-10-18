@@ -4,7 +4,7 @@ from typing import Any
 
 from factory import fuzzy
 
-from tilavarauspalvelu.enums import OrderStatus, PaymentType, PricingType, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import OrderStatus, PaymentType, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.models import Reservation, ReservationUnit
 from utils.date_utils import local_start_of_day, next_hour
 
@@ -163,7 +163,7 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         sub_kwargs.setdefault("origin_hauki_resource__id", "987")
         sub_kwargs.setdefault("payment_types__code", PaymentType.ON_SITE)
         sub_kwargs.setdefault("payment_product", PaymentProductFactory.create())
-        sub_kwargs.setdefault("pricings__pricing_type", PricingType.PAID)
+        sub_kwargs.setdefault("pricings__highest_price", 20)
         reservation_unit = ReservationUnitFactory.create(**sub_kwargs)
 
         day_start = local_start_of_day()

@@ -46,7 +46,6 @@ HEADER_ROW: list[str] = [
     "Require a handling",
     "Authentication",
     "Reservation kind",
-    "Pricing types",
     "Payment type",
     "Can apply free of charge",
     "Additional instructions for pending reservation [fi]",
@@ -99,7 +98,7 @@ class ReservationUnitExporter:
                 cls._write_header_row(reservations_writer)
 
                 for reservation_unit in reservation_units:
-                    pricing = reservation_unit.pricings.active()
+                    pricing = reservation_unit.actions.get_active_pricing()
                     reservations_writer.writerow(
                         [
                             reservation_unit.id,
@@ -152,7 +151,6 @@ class ReservationUnitExporter:
                             reservation_unit.require_reservation_handling,
                             reservation_unit.authentication,
                             reservation_unit.reservation_kind,
-                            getattr(pricing, "pricing_type", ""),
                             ", ".join(reservation_unit.payment_types.values_list("code", flat=True)),
                             reservation_unit.can_apply_free_of_charge,
                             reservation_unit.reservation_pending_instructions_fi,
