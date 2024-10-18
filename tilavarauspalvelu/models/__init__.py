@@ -10,7 +10,6 @@ from .application_section.model import ApplicationSection
 from .banner_notification.model import BannerNotification
 from .building.model import Building
 from .city.model import City
-from .email_template.model import EmailTemplate
 from .equipment.model import Equipment
 from .equipment_category.model import EquipmentCategory
 from .general_role.model import GeneralRole
@@ -76,7 +75,6 @@ __all__ = [
     "BannerNotification",
     "Building",
     "City",
-    "EmailTemplate",
     "Equipment",
     "EquipmentCategory",
     "GeneralRole",

@@ -1,16 +1,8 @@
 {% extends "email/html/partials/base.jinja" %}
 
-{% block title %}{{ subjectApplicationReceived }}{% endblock %}
-
-{% block header %}{% include "email/html/partials/header_no_recipient_name.jinja" %}{% endblock %}
-
 {% block content_main %}
-    <mj-text>{{ applicationReceived }}</mj-text>
-    <mj-text>
-        {{ manageApplication }}
-        <a href="{{ my_applications_ext_link }}">{{ ownApplicationPage }}</a>
-        {{ untilApplicationPeriodEnd }}.
-    </mj-text>
+    <mj-text>{{ text_application_received | sentence | safe }}</mj-text>
+    <mj-text>{{ text_view_application_html | sentence | safe }}</mj-text>
 {% endblock %}
 
 {% block content_secondary %}

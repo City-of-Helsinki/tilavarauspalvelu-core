@@ -7,7 +7,6 @@ from .application_round.admin import ApplicationRoundAdmin
 from .application_section.admin import ApplicationSectionAdmin
 from .banner_notification.admin import BannerNotificationAdmin
 from .city.admin import CityAdmin
-from .email_template.admin import EmailTemplateAdmin
 from .equipment.admin import EquipmentAdmin
 from .equipment_category.admin import EquipmentCategoryAdmin
 from .general_role.admin import GeneralRoleAdmin
@@ -58,7 +57,6 @@ __all__ = [
     "ApplicationSectionAdmin",
     "BannerNotificationAdmin",
     "CityAdmin",
-    "EmailTemplateAdmin",
     "EquipmentAdmin",
     "EquipmentCategoryAdmin",
     "GeneralRoleAdmin",

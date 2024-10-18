@@ -111,7 +111,7 @@ def test_application__order__by_status(graphql):
     application_1 = ApplicationFactory.create_in_status_cancelled()
     application_2 = ApplicationFactory.create_in_status_draft()
     application_3 = ApplicationFactory.create_in_status_received()
-    application_4 = ApplicationFactory.create_in_status_result_sent()
+    application_4 = ApplicationFactory.create_in_status_results_sent()
     application_5 = ApplicationFactory.create_in_status_expired()
     application_6 = ApplicationFactory.create_in_status_handled()
     application_7 = ApplicationFactory.create_in_status_in_allocation()

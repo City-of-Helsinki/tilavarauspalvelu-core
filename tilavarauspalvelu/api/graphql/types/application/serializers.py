@@ -17,8 +17,8 @@ from tilavarauspalvelu.api.graphql.types.application_section.serializers import 
 from tilavarauspalvelu.api.graphql.types.organisation.serializers import OrganisationSerializer
 from tilavarauspalvelu.api.graphql.types.person.serializers import PersonSerializer
 from tilavarauspalvelu.enums import ApplicationStatusChoice
+from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import AllocatedTimeSlot, Application, ReservationUnitOption
-from tilavarauspalvelu.utils.email.application_email_notification_sender import ApplicationEmailNotificationSender
 from utils.fields.serializer import CurrentUserDefaultNullable
 
 if TYPE_CHECKING:
@@ -107,7 +107,7 @@ class ApplicationSendSerializer(NestingModelSerializer):
     def save(self, **kwargs: Any) -> Application:
         self.instance.sent_date = timezone.now()
         self.instance.save()
-        ApplicationEmailNotificationSender.send_received_email(application=self.instance)
+        EmailService.send_application_received_email(application=self.instance)
         return self.instance
 
 

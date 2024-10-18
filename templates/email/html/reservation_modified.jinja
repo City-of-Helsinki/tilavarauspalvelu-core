@@ -1,18 +1,13 @@
 {% extends "email/html/partials/base.jinja" %}
 
-{% block title %}{{ subjectReservationModified }}{% endblock %}
-
-{% block header %}{% include "email/html/partials/header.jinja" %}{% endblock %}
-
 {% block content_main %}
-    <mj-text>{{ textReservationModified }}</mj-text>
+    <mj-text>{{ text_reservation_modified | sentence | safe }}</mj-text>
     {% include "email/html/partials/reservation_basic_info.jinja" %}
     {% include "email/html/partials/reservation_price.jinja" %}
 {% endblock %}
 
 {% block content_secondary %}
-    <mj-text><h2>{{ reservationInstruction }}</h2></mj-text>
-    <mj-text font-size="16px">{{ confirmed_instructions }}</mj-text>
+    {% include "email/html/partials/instructions.jinja" %}
 {% endblock %}
 
 {% block content_closing %}

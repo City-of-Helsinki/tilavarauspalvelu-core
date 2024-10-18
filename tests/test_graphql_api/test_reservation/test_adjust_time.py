@@ -4,11 +4,11 @@ from decimal import Decimal
 
 import freezegun
 import pytest
+from django.test import override_settings
 from django.utils.timezone import get_default_timezone
 
 from tests.factories import (
     ApplicationRoundFactory,
-    EmailTemplateFactory,
     OriginHaukiResourceFactory,
     ReservableTimeSpanFactory,
     ReservationFactory,
@@ -17,7 +17,7 @@ from tests.factories import (
     SpaceFactory,
     UserFactory,
 )
-from tilavarauspalvelu.enums import EmailType, ReservationStartInterval, ReservationStateChoice
+from tilavarauspalvelu.enums import ReservationStartInterval, ReservationStateChoice
 from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
 from utils.date_utils import local_date, local_datetime
 
@@ -31,11 +31,8 @@ pytestmark = [
 DEFAULT_TIMEZONE = get_default_timezone()
 
 
-def test_reservation__adjust_time__success(graphql, outbox, settings):
-    settings.SEND_RESERVATION_NOTIFICATION_EMAILS = True
-
-    EmailTemplateFactory.create(type=EmailType.RESERVATION_MODIFIED, subject="modified")
-
+@override_settings(SEND_EMAILS=True)
+def test_reservation__adjust_time__success(graphql, outbox):
     reservation = ReservationFactory.create_for_time_adjustment()
     reservation_begin = reservation.begin
     reservation_end = reservation.end
@@ -51,7 +48,7 @@ def test_reservation__adjust_time__success(graphql, outbox, settings):
     assert reservation.end != reservation_end
 
     assert len(outbox) == 1
-    assert outbox[0].subject == "modified"
+    assert outbox[0].subject == "Your booking has been updated"
 
 
 def test_reservation__adjust_time__wrong_state(graphql):
@@ -369,19 +366,8 @@ def test_reservation__adjust_time__unit_admin_can_adjust_user_reservation(graphq
     assert reservation.end != reservation_end
 
 
-def test_reservation__adjust_time__needs_handling_after_time_change(graphql, outbox, settings):
-    settings.SEND_RESERVATION_NOTIFICATION_EMAILS = True
-
-    EmailTemplateFactory.create(
-        type=EmailType.RESERVATION_MODIFIED,
-        subject="modified",
-    )
-
-    EmailTemplateFactory.create(
-        type=EmailType.STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING,
-        subject="staff",
-    )
-
+@override_settings(SEND_EMAILS=True)
+def test_reservation__adjust_time__needs_handling_after_time_change(graphql, outbox):
     reservation = ReservationFactory.create_for_time_adjustment(reservation_unit__require_reservation_handling=True)
     reservation_begin = reservation.begin
     reservation_end = reservation.end
@@ -402,8 +388,9 @@ def test_reservation__adjust_time__needs_handling_after_time_change(graphql, out
     assert reservation.end != reservation_end
 
     assert len(outbox) == 2
-    assert outbox[0].subject == "modified"
-    assert outbox[1].subject == "staff"
+    assert outbox[0].subject == "Your booking has been updated"
+    unit_name = reservation.reservation_unit.first().unit.name
+    assert outbox[1].subject == f"New booking {reservation.id} requires handling at unit {unit_name}"
 
 
 @freezegun.freeze_time("2021-01-01")

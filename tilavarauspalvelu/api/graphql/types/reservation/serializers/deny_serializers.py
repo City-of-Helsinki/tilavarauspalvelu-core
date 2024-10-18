@@ -6,8 +6,8 @@ from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import ReservationStateChoice
+from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import Reservation
-from tilavarauspalvelu.utils.email.reservation_email_notification_sender import ReservationEmailNotificationSender
 from utils.date_utils import local_datetime
 from utils.utils import comma_sep_str
 
@@ -58,5 +58,5 @@ class ReservationDenySerializer(NestingModelSerializer):
         kwargs["state"] = ReservationStateChoice.DENIED.value
         kwargs["handled_at"] = local_datetime()
         instance = super().save(**kwargs)
-        ReservationEmailNotificationSender.send_deny_email(reservation=instance)
+        EmailService.send_reservation_rejected_email(reservation=instance)
         return instance

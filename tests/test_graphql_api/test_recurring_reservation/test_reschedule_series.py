@@ -3,9 +3,8 @@ import datetime
 import pytest
 from freezegun import freeze_time
 
-from config.utils.commons import WEEKDAYS
 from tests.factories import RecurringReservationFactory, ReservationFactory
-from tilavarauspalvelu.enums import ReservationStateChoice
+from tilavarauspalvelu.enums import ReservationStateChoice, WeekdayChoice
 from tilavarauspalvelu.models import AffectingTimeSpan, Reservation, ReservationStatistic, ReservationUnitHierarchy
 from utils.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_datetime, local_time
 
@@ -153,7 +152,7 @@ def test_recurring_reservations__reschedule_series__change_begin_date__reservati
 def test_recurring_reservations__reschedule_series__change_weekdays(graphql):
     recurring_reservation = create_reservation_series()
 
-    data = get_minimal_reschedule_data(recurring_reservation, weekdays=[WEEKDAYS.TUESDAY])
+    data = get_minimal_reschedule_data(recurring_reservation, weekdays=[WeekdayChoice.TUESDAY])
 
     graphql.login_with_superuser()
     response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
@@ -162,7 +161,7 @@ def test_recurring_reservations__reschedule_series__change_weekdays(graphql):
 
     # Series repeat on Tuesdays.
     recurring_reservation.refresh_from_db()
-    recurring_reservation.weekdays = f"{WEEKDAYS.TUESDAY}"
+    recurring_reservation.weekdays = f"{WeekdayChoice.TUESDAY}"
 
     reservations = list(recurring_reservation.reservations.order_by("begin").all())
     assert len(reservations) == 9
@@ -286,7 +285,7 @@ def test_recurring_reservations__reschedule_series__dont_remove_unconfirmed_rese
     reservation.state = state
     reservation.save()
 
-    data = get_minimal_reschedule_data(recurring_reservation, weekdays=[WEEKDAYS.TUESDAY])
+    data = get_minimal_reschedule_data(recurring_reservation, weekdays=[WeekdayChoice.TUESDAY])
 
     graphql.login_with_superuser()
     response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
@@ -313,7 +312,7 @@ def test_recurring_reservations__reschedule_series__details_from_reservation__us
     reservation.name = "bar"
     reservation.save()
 
-    data = get_minimal_reschedule_data(recurring_reservation, weekdays=[WEEKDAYS.TUESDAY])
+    data = get_minimal_reschedule_data(recurring_reservation, weekdays=[WeekdayChoice.TUESDAY])
 
     graphql.login_with_superuser()
     response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
@@ -352,7 +351,7 @@ def test_recurring_reservations__reschedule_series__details_from_reservation__ne
     reservation.name = "baz"
     reservation.save()
 
-    data = get_minimal_reschedule_data(recurring_reservation, weekdays=[WEEKDAYS.TUESDAY])
+    data = get_minimal_reschedule_data(recurring_reservation, weekdays=[WeekdayChoice.TUESDAY])
 
     graphql.login_with_superuser()
     response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
@@ -427,7 +426,7 @@ def test_recurring_reservations__reschedule_series__details_from_reservation__us
     # All reservations are cancelled, so we must use the next one's details, even if it's cancelled.
     recurring_reservation.reservations.update(state=ReservationStateChoice.CANCELLED)
 
-    data = get_minimal_reschedule_data(recurring_reservation, weekdays=[WEEKDAYS.TUESDAY])
+    data = get_minimal_reschedule_data(recurring_reservation, weekdays=[WeekdayChoice.TUESDAY])
 
     graphql.login_with_superuser()
     response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
