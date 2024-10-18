@@ -47,9 +47,9 @@ class PermissionResolver:
             return False
         return (
             self.user.is_superuser
-            or bool(self.user.general_roles_list)
-            or bool(self.user.unit_roles_map)
-            or bool(self.user.unit_group_roles_map)
+            or bool(self.user.active_general_roles)
+            or bool(self.user.active_unit_roles)
+            or bool(self.user.active_unit_group_roles)
         )
 
     def has_general_role(self, *, role_choices: Container[UserRoleChoice] | None = None) -> bool:
@@ -60,8 +60,8 @@ class PermissionResolver:
         if self.is_user_anonymous_or_inactive():
             return False
         if role_choices is None:  # Has any general role
-            return bool(self.user.general_roles_list)
-        return any(role in role_choices for role in self.user.general_roles_list)
+            return bool(self.user.active_general_roles)
+        return any(role in role_choices for role in self.user.active_general_roles)
 
     def has_role_for_units_or_their_unit_groups(
         self,
@@ -86,8 +86,8 @@ class PermissionResolver:
         if units is None:  # Check for any unit or unit group the user has roles in
             from tilavarauspalvelu.models import Unit
 
-            unit_ids = list(self.user.unit_roles_map.keys())
-            unit_group_ids = list(self.user.unit_group_roles_map.keys())
+            unit_ids = list(self.user.active_unit_roles.keys())
+            unit_group_ids = list(self.user.active_unit_group_roles.keys())
             units = (
                 Unit.objects.filter(Q(pk__in=unit_ids) | Q(unit_groups__pk__in=unit_group_ids))
                 .prefetch_related("unit_groups")
@@ -103,7 +103,7 @@ class PermissionResolver:
 
         has_role = False
         for unit in units:
-            roles = self.user.unit_roles_map.get(unit.pk, [])
+            roles = self.user.active_unit_roles.get(unit.pk, [])
             has_role = any(role in role_choices for role in roles)
 
             # No role though units -> check through unit groups
@@ -111,7 +111,7 @@ class PermissionResolver:
                 has_role = any(
                     role in role_choices
                     for unit_group in unit.unit_groups.all()
-                    for role in self.user.unit_group_roles_map.get(unit_group.pk, [])
+                    for role in self.user.active_unit_group_roles.get(unit_group.pk, [])
                 )
 
             # If we require roles for all units, we need to keep checking until all units have been checked.
@@ -136,8 +136,8 @@ class PermissionResolver:
 
         unit_ids = list(unit_ids)
         if not unit_ids:  # Check for all units and unit groups the user has permissions for.
-            unit_ids = list(self.user.unit_permissions_map.keys())
-            unit_group_ids = list(self.user.unit_group_permissions_map.keys())
+            unit_ids = list(self.user.active_unit_permissions.keys())
+            unit_group_ids = list(self.user.active_unit_group_permissions.keys())
             units = (
                 Unit.objects.filter(Q(pk__in=unit_ids) | Q(unit_groups__pk__in=unit_group_ids))
                 .prefetch_related("unit_groups")
@@ -149,7 +149,7 @@ class PermissionResolver:
         # Has the given permission through their unit roles in the given units or their unit groups
         has_permission: bool = False
         for unit in units:
-            permissions = self.user.unit_permissions_map.get(unit.pk, [])
+            permissions = self.user.active_unit_permissions.get(unit.pk, [])
             has_permission = permission in permissions
 
             # No permissions though units -> check through unit groups
@@ -157,7 +157,7 @@ class PermissionResolver:
                 permissions = {
                     permission
                     for unit_group in unit.unit_groups.all()
-                    for permission in self.user.unit_group_permissions_map.get(unit_group.pk, [])
+                    for permission in self.user.active_unit_group_permissions.get(unit_group.pk, [])
                 }
                 has_permission = permission in permissions
 
@@ -183,7 +183,7 @@ class PermissionResolver:
             return []
         return [
             pk
-            for pk, roles in self.user.unit_roles_map.items()  #
+            for pk, roles in self.user.active_unit_roles.items()  #
             if any(role in role_choices for role in roles)
         ]
 
@@ -193,7 +193,7 @@ class PermissionResolver:
             return []
         return [
             pk
-            for pk, roles in self.user.unit_group_roles_map.items()  #
+            for pk, roles in self.user.active_unit_group_roles.items()  #
             if any(role in role_choices for role in roles)
         ]
 
