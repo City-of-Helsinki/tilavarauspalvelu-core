@@ -17,7 +17,7 @@ from tests.factories import (
     UserFactory,
     UserSocialAuthFactory,
 )
-from tilavarauspalvelu.enums import OrderStatus, ReservationNotification
+from tilavarauspalvelu.enums import ApplicationStatusChoice, OrderStatus, ReservationNotification
 from tilavarauspalvelu.models import GeneralRole, UnitRole, User
 from tilavarauspalvelu.models.user.actions import (
     ANONYMIZED,
@@ -208,22 +208,11 @@ def test_anonymization__can_anonymize__open_reservations():
     assert can_anonymize.has_open_payments is False
 
 
-def test_anonymization__can_anonymize__open_applications__received():
+@pytest.mark.parametrize("status", ApplicationStatusChoice.blocks_anonymization)
+def test_anonymization__can_anonymize__open_applications(status):
     user = UserFactory.create(first_name="foo")
 
-    ApplicationFactory.create_in_status_received(user=user)
-
-    can_anonymize = user.actions.can_anonymize()
-
-    assert can_anonymize.has_open_reservations is False
-    assert can_anonymize.has_open_applications is True
-    assert can_anonymize.has_open_payments is False
-
-
-def test_anonymization__can_anonymize__open_applications__in_allocation():
-    user = UserFactory.create(first_name="foo")
-
-    ApplicationFactory.create_in_status_in_allocation(user=user)
+    ApplicationFactory.create_in_status(status, user=user)
 
     can_anonymize = user.actions.can_anonymize()
 

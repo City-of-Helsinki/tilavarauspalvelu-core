@@ -168,24 +168,12 @@ class UserActions:
 
         has_open_reservations = (
             self.user.reservations.filter(end__gte=month_ago)
-            .exclude(
-                state__in=[
-                    ReservationStateChoice.CANCELLED.value,
-                    ReservationStateChoice.DENIED.value,
-                ]
-            )
+            .exclude(state__in=ReservationStateChoice.doesnt_block_anonymization)
             .exists()
         )
 
-        has_open_applications = (
-            self.user.applications.all()
-            .has_status_in(
-                [
-                    ApplicationStatusChoice.RECEIVED.value,
-                    ApplicationStatusChoice.IN_ALLOCATION.value,
-                ]
-            )
-            .exists()
+        has_open_applications = (  #
+            self.user.applications.has_status_in(statuses=ApplicationStatusChoice.blocks_anonymization).exists()
         )
 
         has_open_payments = self.user.reservations.filter(

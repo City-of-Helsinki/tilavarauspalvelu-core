@@ -412,6 +412,13 @@ class ReservationStateChoice(models.TextChoices):
             ReservationStateChoice.WAITING_FOR_PAYMENT.value,
         ]
 
+    @classproperty
+    def doesnt_block_anonymization(self) -> list[str]:
+        return [  # type: ignore[return-type]
+            ReservationStateChoice.CANCELLED.value,
+            ReservationStateChoice.DENIED.value,
+        ]
+
 
 class ReservationTypeChoice(models.TextChoices):
     NORMAL = "NORMAL", pgettext_lazy("ReservationType", "Normal")
@@ -914,6 +921,14 @@ class ApplicationStatusChoice(models.TextChoices):
         return self in [
             ApplicationStatusChoice.IN_ALLOCATION,
             ApplicationStatusChoice.HANDLED,
+        ]
+
+    @classproperty
+    def blocks_anonymization(cls) -> list[str]:
+        return [  # type: ignore[return-type]
+            ApplicationStatusChoice.RECEIVED.value,
+            ApplicationStatusChoice.IN_ALLOCATION.value,
+            ApplicationStatusChoice.HANDLED.value,
         ]
 
 
