@@ -68,6 +68,7 @@ class User(AbstractUser):
     )
 
     sent_email_about_deactivating_permissions = models.BooleanField(default=False, blank=True)
+    sent_email_about_anonymization = models.BooleanField(default=False, blank=True)
 
     objects = UserManager()
 

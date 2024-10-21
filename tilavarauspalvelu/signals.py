@@ -117,9 +117,11 @@ def reservation_unit_resources_modified(action: Action, *args: Any, **kwargs: An
 def update_last_login(user: User, **kwargs: Any) -> None:
     user.last_login = local_datetime()
     user.sent_email_about_deactivating_permissions = False
+    user.sent_email_about_anonymization = False
     user.save(
         update_fields=[
             "last_login",
             "sent_email_about_deactivating_permissions",
+            "sent_email_about_anonymization",
         ]
     )

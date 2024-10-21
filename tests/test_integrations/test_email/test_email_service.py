@@ -477,6 +477,25 @@ def test_email_service__send_user_anonymization_emails__multiple_languages(outbo
     assert sorted(outbox[1].bcc) == ["user1@email.com"]
 
 
+@freeze_time("2024-01-01")
+@override_settings(
+    SEND_EMAILS=True,
+    ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS=10,
+    ANONYMIZATION_NOTIFICATION_BEFORE_DAYS=5,
+)
+def test_email_service__send_user_anonymization_emails__email_already_sent(outbox):
+    UserFactory.create(
+        email="user@email.com",
+        preferred_language=Language.EN.value,
+        last_login=local_datetime() - datetime.timedelta(days=20),
+        sent_email_about_anonymization=True,
+    )
+
+    EmailService.send_user_anonymization_emails()
+
+    assert len(outbox) == 0
+
+
 @override_settings(SEND_EMAILS=True)
 def test_email_service__send_reservation_cancelled_email(outbox):
     reservation = ReservationFactory.create(
