@@ -57,11 +57,24 @@ class UserQuerySet(models.QuerySet):
     def anonymize_inactive_users(self) -> None:
         cutoff = local_date() - datetime.timedelta(days=settings.ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS)
 
-        # All users who haven't logged in in a while but haven't been anonymized yet
-        users = self.exclude(
-            first_name=ANONYMIZED_FIRST_NAME,
-            last_name=ANONYMIZED_LAST_NAME,
-        ).filter(last_login__date__lt=cutoff)
+        # All users who haven't logged in in a while but haven't been anonymized yet.
+        # If user doesn't have a last login, we use the date they joined the system.
+        users = (
+            self.exclude(
+                first_name=ANONYMIZED_FIRST_NAME,
+                last_name=ANONYMIZED_LAST_NAME,
+            )
+            .alias(
+                inactive_date=models.Case(
+                    models.When(
+                        models.Q(last_login=None),
+                        then=models.F("date_joined__date"),
+                    ),
+                    default=models.F("last_login__date"),
+                ),
+            )
+            .filter(inactive_date__lt=cutoff)
+        )
 
         for user in users:
             if user.actions.can_anonymize():

@@ -245,6 +245,7 @@ def test_anonymization__anonymize_inactive_users():
     user_1 = UserFactory.create(first_name="foo", last_login=now - datetime.timedelta(days=11))
     user_2 = UserFactory.create(first_name="bar", last_login=now - datetime.timedelta(days=11))
     user_3 = UserFactory.create(first_name="baz", last_login=now - datetime.timedelta(days=10))
+    user_4 = UserFactory.create(first_name="bax", last_login=None, date_joined=now - datetime.timedelta(days=11))
 
     # User 2 cannot be anonymized, since it has open reservations
     ReservationFactory.create(user=user_2, begin=now, end=now + datetime.timedelta(days=1))
@@ -254,7 +255,9 @@ def test_anonymization__anonymize_inactive_users():
     user_1.refresh_from_db()
     user_2.refresh_from_db()
     user_3.refresh_from_db()
+    user_4.refresh_from_db()
 
     assert user_1.first_name == ANONYMIZED_FIRST_NAME
     assert user_2.first_name == "bar"
     assert user_3.first_name == "baz"
+    assert user_4.first_name == ANONYMIZED_FIRST_NAME
