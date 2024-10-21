@@ -97,7 +97,7 @@ importers:
         version: 14.2.15(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)(sass@1.78.0)
       next-i18next:
         specifier: ^15.3.1
-        version: 15.3.1(i18next@23.15.1)(next@14.2.15(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)(sass@1.78.0))(react-i18next@15.0.3(i18next@23.15.1)(react-dom@18.3.1(react@18.2.0))(react@18.2.0))(react@18.2.0)
+        version: 15.3.1(i18next@23.15.1)(next@14.2.15(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)(sass@1.78.0))(react-i18next@15.1.0(i18next@23.15.1)(react-dom@18.3.1(react@18.2.0))(react@18.2.0))(react@18.2.0)
       query-string:
         specifier: 9.1.0
         version: 9.1.0
@@ -114,8 +114,8 @@ importers:
         specifier: ^7.52.1
         version: 7.53.0(react@18.2.0)
       react-i18next:
-        specifier: ^15.0.3
-        version: 15.0.3(i18next@23.15.1)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)
+        specifier: ^15.1.0
+        version: 15.1.0(i18next@23.15.1)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)
       react-quill:
         specifier: 2.0.0
         version: 2.0.0(react-dom@18.3.1(react@18.2.0))(react@18.2.0)
@@ -278,7 +278,7 @@ importers:
         version: 2.2.1
       next-i18next:
         specifier: ^15.3.1
-        version: 15.3.1(i18next@23.15.1)(next@14.2.15(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)(sass@1.78.0))(react-i18next@15.0.3(i18next@23.15.1)(react-dom@18.3.1(react@18.2.0))(react@18.2.0))(react@18.2.0)
+        version: 15.3.1(i18next@23.15.1)(next@14.2.15(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)(sass@1.78.0))(react-i18next@15.1.0(i18next@23.15.1)(react-dom@18.3.1(react@18.2.0))(react@18.2.0))(react@18.2.0)
       next-transpile-modules:
         specifier: ^10.0.1
         version: 10.0.1
@@ -298,8 +298,8 @@ importers:
         specifier: ^7.52.1
         version: 7.53.0(react@18.2.0)
       react-i18next:
-        specifier: ^15.0.3
-        version: 15.0.3(i18next@23.15.1)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)
+        specifier: ^15.1.0
+        version: 15.1.0(i18next@23.15.1)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)
       react-transition-group:
         specifier: ^4.4.5
         version: 4.4.5(react-dom@18.3.1(react@18.2.0))(react@18.2.0)
@@ -429,7 +429,7 @@ importers:
         version: 14.2.15(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)(sass@1.78.0)
       next-i18next:
         specifier: ^15.3.1
-        version: 15.3.1(i18next@23.15.1)(next@14.2.15(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)(sass@1.78.0))(react-i18next@15.0.3(i18next@23.15.1)(react-dom@18.3.1(react@18.2.0))(react@18.2.0))(react@18.2.0)
+        version: 15.3.1(i18next@23.15.1)(next@14.2.15(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)(sass@1.78.0))(react-i18next@15.1.0(i18next@23.15.1)(react-dom@18.3.1(react@18.2.0))(react@18.2.0))(react@18.2.0)
       react:
         specifier: ^18.2.0
         version: 18.2.0
@@ -443,8 +443,8 @@ importers:
         specifier: ^7.52.1
         version: 7.53.0(react@18.2.0)
       react-i18next:
-        specifier: ^15.0.3
-        version: 15.0.3(i18next@23.15.1)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)
+        specifier: ^15.1.0
+        version: 15.1.0(i18next@23.15.1)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)
       react-toastify:
         specifier: ^10.0.5
         version: 10.0.5(react-dom@18.3.1(react@18.2.0))(react@18.2.0)
@@ -6281,8 +6281,8 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17 || ^18 || ^19
 
-  react-i18next@15.0.3:
-    resolution: {integrity: sha512-BlO1P+oLKjjIxDBQ0GkAIMacgjfMbnvops+3Y5nZXF7UJ99v4KCWr0Na1azJXC8AMiNWp4kgUcFCJM7U9ZsUDg==}
+  react-i18next@15.1.0:
+    resolution: {integrity: sha512-zj3nJynMnZsy2gPZiOTC7XctCY5eQGqT3tcKMmfJWC9FMvgd+960w/adq61j8iPzpwmsXejqID9qC3Mqu1Xu2Q==}
     peerDependencies:
       i18next: '>= 23.2.3'
       react: '>= 16.8.0'
@@ -14441,7 +14441,7 @@ snapshots:
 
   next-compose-plugins@2.2.1: {}
 
-  next-i18next@15.3.1(i18next@23.15.1)(next@14.2.15(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)(sass@1.78.0))(react-i18next@15.0.3(i18next@23.15.1)(react-dom@18.3.1(react@18.2.0))(react@18.2.0))(react@18.2.0):
+  next-i18next@15.3.1(i18next@23.15.1)(next@14.2.15(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)(sass@1.78.0))(react-i18next@15.1.0(i18next@23.15.1)(react-dom@18.3.1(react@18.2.0))(react@18.2.0))(react@18.2.0):
     dependencies:
       '@babel/runtime': 7.25.6
       '@types/hoist-non-react-statics': 3.3.5
@@ -14451,7 +14451,7 @@ snapshots:
       i18next-fs-backend: 2.3.2
       next: 14.2.15(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)(sass@1.78.0)
       react: 18.2.0
-      react-i18next: 15.0.3(i18next@23.15.1)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)
+      react-i18next: 15.1.0(i18next@23.15.1)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)
 
   next-transpile-modules@10.0.1:
     dependencies:
@@ -14982,7 +14982,7 @@ snapshots:
     dependencies:
       react: 18.2.0
 
-  react-i18next@15.0.3(i18next@23.15.1)(react-dom@18.3.1(react@18.2.0))(react@18.2.0):
+  react-i18next@15.1.0(i18next@23.15.1)(react-dom@18.3.1(react@18.2.0))(react@18.2.0):
     dependencies:
       '@babel/runtime': 7.25.7
       html-parse-stringify: 3.0.1
