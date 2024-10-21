@@ -199,7 +199,7 @@ class ReservationCancelledEmailTemplateTesterForm(
     LanguageFormMixin,
     EmailTemplateForm,
 ):
-    cancel_reason = forms.CharField(initial="", widget=text_widget)
+    cancel_reason = forms.CharField(initial="[PERUUTUKSEN SYY]", widget=text_widget)
 
     @classmethod
     def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang):
@@ -317,7 +317,7 @@ class ReservationHandlingRequiredEmailTemplateTesterForm(
     EmailTemplateForm,
 ):
     subsidised_price = forms.DecimalField(decimal_places=2, initial=Decimal("10.00"), widget=number_widget)
-    applying_for_free_of_charge = forms.BooleanField(initial=False)
+    applying_for_free_of_charge = forms.BooleanField(initial=False, required=False)
 
     @classmethod
     def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang):
@@ -471,6 +471,7 @@ class StaffNotificationReservationMadeEmailTemplateTesterForm(
 ):
     reservation_name = forms.CharField(initial="[VARAUKSEN NIMI]", widget=text_widget)
     reservee_name = forms.CharField(initial="[VARAAJAN NIMI]", widget=text_widget)
+    booking_number = forms.IntegerField(initial=0, widget=number_widget)
 
     @classmethod
     def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang):
@@ -504,6 +505,7 @@ class StaffNotificationReservationRequiresHandlingEmailTemplateTesterForm(
 ):
     reservation_name = forms.CharField(initial="[VARAUKSEN NIMI]", widget=text_widget)
     reservee_name = forms.CharField(initial="[VARAAJAN NIMI]", widget=text_widget)
+    booking_number = forms.IntegerField(initial=0, widget=number_widget)
 
     @classmethod
     def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang):
