@@ -21,12 +21,15 @@ from tilavarauspalvelu.models import (
     ApplicationSection,
     GeneralRole,
     Person,
+    RecurringReservation,
     Reservation,
     UnitRole,
 )
 from tilavarauspalvelu.typing import UserAnonymizationInfo
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from .model import User
 
 
@@ -67,35 +70,72 @@ class UserActions:
         UserSocialAuth.objects.filter(user=self.user).delete()
 
     def anonymize_user_reservations(self) -> None:
-        reservations = Reservation.objects.filter(user=self.user).exclude(
-            type__in=[ReservationTypeChoice.BLOCKED, ReservationTypeChoice.STAFF],
+        reservations: Iterable[Reservation] = Reservation.objects.filter(user=self.user).exclude(
+            type__in=ReservationTypeChoice.should_not_anonymize,
         )
-        for reservation in reservations:
-            Reservation.objects.filter(pk=reservation.pk).update(
-                name=self._anonymize_string(reservation.name),
-                description=self._anonymize_string(reservation.description),
-                reservee_first_name=self.user.first_name,
-                reservee_last_name=self.user.last_name,
-                reservee_email=self.user.email,
-                reservee_phone="",
-                reservee_address_zip=self._anonymize_string(reservation.reservee_address_zip, "999999"),
-                reservee_address_city=self._anonymize_string(reservation.reservee_address_city),
-                reservee_address_street=self._anonymize_string(reservation.reservee_address_street),
-                billing_first_name=self.user.first_name,
-                billing_last_name=self.user.last_name,
-                billing_email=self.user.email,
-                billing_phone="",
-                billing_address_zip=self._anonymize_string(reservation.billing_address_zip, "99999"),
-                billing_address_city=self._anonymize_string(reservation.billing_address_city),
-                billing_address_street=self._anonymize_string(reservation.billing_address_street),
-                working_memo="",
-                free_of_charge_reason=self._anonymize_string(reservation.free_of_charge_reason, SENSITIVE_RESERVATION),
-                cancel_details=self._anonymize_string(reservation.cancel_details, SENSITIVE_RESERVATION),
-                handling_details=self._anonymize_string(reservation.handling_details, SENSITIVE_RESERVATION),
-            )
+        recurring_reservations = RecurringReservation.objects.filter(reservations__in=reservations)
 
-        audit_log_ids = LogEntry.objects.get_for_objects(reservations).values_list("id", flat=True)
-        LogEntry.objects.filter(id__in=audit_log_ids).delete()
+        for reservation in reservations:
+            reservation.name = ANONYMIZED
+            reservation.description = ANONYMIZED
+            reservation.reservee_first_name = self.user.first_name
+            reservation.reservee_last_name = self.user.last_name
+            reservation.reservee_email = self.user.email
+            reservation.reservee_phone = ""
+            reservation.reservee_address_zip = "99999"
+            reservation.reservee_address_city = ANONYMIZED
+            reservation.reservee_address_street = ANONYMIZED
+            reservation.billing_first_name = self.user.first_name
+            reservation.billing_last_name = self.user.last_name
+            reservation.billing_email = self.user.email
+            reservation.billing_phone = ""
+            reservation.billing_address_zip = "99999"
+            reservation.billing_address_city = ANONYMIZED
+            reservation.billing_address_street = ANONYMIZED
+            reservation.working_memo = ""
+            reservation.free_of_charge_reason = SENSITIVE_RESERVATION
+            reservation.cancel_details = SENSITIVE_RESERVATION
+            reservation.handling_details = SENSITIVE_RESERVATION
+
+        for recurring_reservation in recurring_reservations:
+            recurring_reservation.name = ANONYMIZED
+            recurring_reservation.description = ANONYMIZED
+
+        Reservation.objects.bulk_update(
+            reservations,
+            [
+                "name",
+                "description",
+                "reservee_first_name",
+                "reservee_last_name",
+                "reservee_email",
+                "reservee_phone",
+                "reservee_address_zip",
+                "reservee_address_city",
+                "reservee_address_street",
+                "billing_first_name",
+                "billing_last_name",
+                "billing_email",
+                "billing_phone",
+                "billing_address_zip",
+                "billing_address_city",
+                "billing_address_street",
+                "working_memo",
+                "free_of_charge_reason",
+                "cancel_details",
+                "handling_details",
+            ],
+        )
+
+        RecurringReservation.objects.bulk_update(
+            recurring_reservations,
+            [
+                "name",
+                "description",
+            ],
+        )
+
+        LogEntry.objects.get_for_objects(reservations).delete()
 
     def anonymize_user_applications(self) -> None:
         ApplicationSection.objects.filter(application__user=self.user).update(
@@ -122,9 +162,6 @@ class UserActions:
             additional_information=SENSITIVE_APPLICATION,
             working_memo=SENSITIVE_APPLICATION,
         )
-
-    def _anonymize_string(self, s: str | None, replacement: str = ANONYMIZED) -> str:
-        return replacement if s and s.strip() else s
 
     def can_anonymize(self) -> UserAnonymizationInfo:
         month_ago = timezone.now() - relativedelta(months=1)

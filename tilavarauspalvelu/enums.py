@@ -427,6 +427,13 @@ class ReservationTypeChoice(models.TextChoices):
             ReservationTypeChoice.BEHALF.value,
         ]
 
+    @classproperty
+    def should_not_anonymize(cls) -> list[str]:
+        return [  # type: ignore[return-type]
+            ReservationTypeChoice.BLOCKED.value,
+            ReservationTypeChoice.STAFF.value,
+        ]
+
 
 class ReservationTypeStaffChoice(models.TextChoices):
     # These are the same as the ones above, but for the staff create endpoint

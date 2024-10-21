@@ -136,7 +136,6 @@ def test_anonymization__application():
 
 
 def test_anonymization__reservation():
-    """Test also that the audit logger instances gets anonymized"""
     mr_anonymous = UserFactory.create_superuser(
         username="anonym",
         first_name="anony",
@@ -155,6 +154,8 @@ def test_anonymization__reservation():
         free_of_charge_reason="Test reason",
         cancel_details="Test cancel details",
         handling_details="Test handling details",
+        recurring_reservation__name="foo",
+        recurring_reservation__description="bar",
     )
 
     mr_anonymous.actions.anonymize_user_reservations()
@@ -166,7 +167,7 @@ def test_anonymization__reservation():
     assert reservation.reservee_last_name == mr_anonymous.last_name
     assert reservation.reservee_email == mr_anonymous.email
     assert reservation.reservee_phone == ""
-    assert reservation.reservee_address_zip == "999999"
+    assert reservation.reservee_address_zip == "99999"
     assert reservation.reservee_address_city == ANONYMIZED
     assert reservation.reservee_address_street == ANONYMIZED
     assert reservation.billing_first_name == mr_anonymous.first_name
@@ -186,26 +187,11 @@ def test_anonymization__reservation():
     assert reservation.cancel_details == SENSITIVE_RESERVATION
     assert reservation.handling_details == SENSITIVE_RESERVATION
 
-    # Test that auditlog entries are wiped.
+    assert reservation.recurring_reservation.name == ANONYMIZED
+    assert reservation.recurring_reservation.description == ANONYMIZED
+
+    # Check that auditlog entries are removed also
     assert LogEntry.objects.get_for_object(reservation).count() == 0
-
-
-def test_anonymization__reservation__empty_values():
-    """Test also that the audit logger instances gets anonymized"""
-    mr_anonymous = UserFactory.create_superuser()
-    reservation = ReservationFactory.create(
-        user=mr_anonymous,
-        name="",
-        description="",
-        free_of_charge_reason=None,
-    )
-
-    mr_anonymous.actions.anonymize_user_reservations()
-    reservation.refresh_from_db()
-
-    assert reservation.name == ""
-    assert reservation.description == ""
-    assert reservation.free_of_charge_reason is None
 
 
 @freeze_time("2024-01-01")
