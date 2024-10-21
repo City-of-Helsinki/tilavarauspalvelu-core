@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from django.db import models
+
 from tilavarauspalvelu.enums import ApplicationStatusChoice, EmailType, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.models import Application, User
 from tilavarauspalvelu.typing import EmailData
@@ -154,7 +156,11 @@ class EmailService:
 
     @staticmethod
     def send_permission_deactivation_emails() -> None:
-        users = User.objects.should_deactivate_permissions().exclude(email="").order_by("last_login")
+        users = (
+            User.objects.should_deactivate_permissions()
+            .exclude(models.Q(email="") | models.Q(sent_email_about_deactivating_permissions=True))
+            .order_by("last_login")
+        )
         if not users:
             return
 
@@ -177,6 +183,7 @@ class EmailService:
             )
 
         send_multiple_emails_in_batches_task.delay(emails=emails)
+        users.update(sent_email_about_deactivating_permissions=True)
 
     @staticmethod
     def send_reservation_cancelled_email(

@@ -3,10 +3,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
+from django.contrib.auth import user_logged_in
 from django.db.models.signals import m2m_changed, post_delete, post_save
 from django.dispatch import receiver
 
-from tilavarauspalvelu.models import Reservation, ReservationUnit, Space
+from tilavarauspalvelu.models import Reservation, ReservationUnit, Space, User
 from tilavarauspalvelu.tasks import (
     Action,
     create_or_update_reservation_statistics,
@@ -14,6 +15,7 @@ from tilavarauspalvelu.tasks import (
     update_affecting_time_spans_task,
     update_reservation_unit_hierarchy_task,
 )
+from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.typing import M2MAction
@@ -109,3 +111,15 @@ def reservation_unit_spaces_modified(action: Action, *args: Any, **kwargs: Any):
 def reservation_unit_resources_modified(action: Action, *args: Any, **kwargs: Any):
     if settings.UPDATE_RESERVATION_UNIT_HIERARCHY and action in ["post_add", "post_remove", "post_clear"]:
         update_reservation_unit_hierarchy_task.delay(using=kwargs.get("using"))
+
+
+@receiver(user_logged_in, dispatch_uid="user_logged_in")
+def update_last_login(user: User, **kwargs: Any) -> None:
+    user.last_login = local_datetime()
+    user.sent_email_about_deactivating_permissions = False
+    user.save(
+        update_fields=[
+            "last_login",
+            "sent_email_about_deactivating_permissions",
+        ]
+    )

@@ -329,6 +329,21 @@ def test_email_service__send_permission_deactivation_emails__no_permissions(outb
     assert len(outbox) == 0
 
 
+@freeze_time("2024-01-01")
+@override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
+def test_email_service__send_permission_deactivation_emails__email_already_sent(outbox):
+    UserFactory.create_superuser(
+        email="user@email.com",
+        preferred_language=Language.EN.value,
+        last_login=local_datetime() - datetime.timedelta(days=20),
+        sent_email_about_deactivating_permissions=True,
+    )
+
+    EmailService.send_permission_deactivation_emails()
+
+    assert len(outbox) == 0
+
+
 @override_settings(SEND_EMAILS=True)
 def test_email_service__send_reservation_cancelled_email(outbox):
     reservation = ReservationFactory.create(

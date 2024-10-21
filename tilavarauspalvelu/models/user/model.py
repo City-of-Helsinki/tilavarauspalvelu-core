@@ -67,6 +67,8 @@ class User(AbstractUser):
         default="",
     )
 
+    sent_email_about_deactivating_permissions = models.BooleanField(default=False, blank=True)
+
     objects = UserManager()
 
     permissions = PermissionResolver()
