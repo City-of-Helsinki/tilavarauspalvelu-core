@@ -818,6 +818,7 @@ def test_email_service__send_staff_notification_reservation_made_email(outbox):
         units=[unit],
         email="admin@email.com",
         reservation_notification=ReservationNotification.ALL,
+        preferred_language="en",
     )
 
     reservation = ReservationFactory.create(
@@ -858,6 +859,7 @@ def test_email_service__send_staff_notification_reservation_made_email__wrong_st
     UserFactory.create_with_unit_role(
         units=[unit],
         reservation_notification=ReservationNotification.ALL,
+        preferred_language="en",
     )
 
     reservation = ReservationFactory.create(
@@ -871,6 +873,41 @@ def test_email_service__send_staff_notification_reservation_made_email__wrong_st
 
 
 @override_settings(SEND_EMAILS=True)
+def test_email_service__send_staff_notification_reservation_made_email__multiple_recipients(outbox):
+    unit = UnitFactory.create(name="foo")
+
+    UserFactory.create_with_unit_role(
+        units=[unit],
+        email="admin1@email.com",
+        reservation_notification=ReservationNotification.ALL,
+        preferred_language="fi",
+    )
+
+    UserFactory.create_with_unit_role(
+        units=[unit],
+        email="admin2@email.com",
+        reservation_notification=ReservationNotification.ALL,
+        preferred_language="en",
+    )
+
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.CONFIRMED,
+        reservation_unit__unit=unit,
+    )
+
+    with TranslationsFromPOFiles():
+        EmailService.send_staff_notification_reservation_made_email(reservation)
+
+    assert len(outbox) == 2
+
+    assert outbox[0].subject == f"Toimipisteeseen foo on tehty uusi tilavaraus {reservation.id}"
+    assert sorted(outbox[0].bcc) == ["admin1@email.com"]
+
+    assert outbox[1].subject == f"New booking {reservation.id} has been made for foo"
+    assert sorted(outbox[1].bcc) == ["admin2@email.com"]
+
+
+@override_settings(SEND_EMAILS=True)
 def test_email_service__send_staff_notification_reservation_requires_handling_email(outbox):
     unit = UnitFactory.create(name="foo")
 
@@ -878,6 +915,7 @@ def test_email_service__send_staff_notification_reservation_requires_handling_em
         units=[unit],
         email="admin@email.com",
         reservation_notification=ReservationNotification.ALL,
+        preferred_language="en",
     )
 
     reservation = ReservationFactory.create(
@@ -921,6 +959,7 @@ def test_email_service__send_staff_notification_reservation_requires_handling_em
         units=[unit],
         email="admin@email.com",
         reservation_notification=ReservationNotification.ALL,
+        preferred_language="en",
     )
 
     reservation = ReservationFactory.create(
@@ -931,3 +970,38 @@ def test_email_service__send_staff_notification_reservation_requires_handling_em
     EmailService.send_staff_notification_reservation_requires_handling_email(reservation)
 
     assert len(outbox) == 0
+
+
+@override_settings(SEND_EMAILS=True)
+def test_email_service__send_staff_notification_reservation_requires_handling_email__multiple_recipients(outbox):
+    unit = UnitFactory.create(name="foo")
+
+    UserFactory.create_with_unit_role(
+        units=[unit],
+        email="admin1@email.com",
+        reservation_notification=ReservationNotification.ALL,
+        preferred_language="fi",
+    )
+
+    UserFactory.create_with_unit_role(
+        units=[unit],
+        email="admin2@email.com",
+        reservation_notification=ReservationNotification.ALL,
+        preferred_language="en",
+    )
+
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit__unit=unit,
+    )
+
+    with TranslationsFromPOFiles():
+        EmailService.send_staff_notification_reservation_requires_handling_email(reservation)
+
+    assert len(outbox) == 2
+
+    assert outbox[0].subject == f"Uusi tilavaraus {reservation.id} odottaa käsittelyä toimipisteessä foo"
+    assert sorted(outbox[0].bcc) == ["admin1@email.com"]
+
+    assert outbox[1].subject == f"New booking {reservation.id} requires handling at unit foo"
+    assert sorted(outbox[1].bcc) == ["admin2@email.com"]
