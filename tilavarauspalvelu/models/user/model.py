@@ -40,12 +40,13 @@ class User(AbstractUser):
         editable=False,
         unique=True,
     )
-    preferred_language: str | None = models.CharField(
+    preferred_language: str = models.CharField(
         max_length=8,
-        null=True,
+        null=False,
         blank=True,
         verbose_name=_("Preferred UI language"),
         choices=settings.LANGUAGES,
+        default=settings.LANGUAGE_CODE,
     )
     reservation_notification = models.CharField(
         max_length=32,
