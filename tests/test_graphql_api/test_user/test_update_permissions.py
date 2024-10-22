@@ -1,8 +1,9 @@
 import pytest
-from graphene_django_extensions.testing import build_mutation
 
 from tests.factories import UserFactory
-from tilavarauspalvelu.enums import UserRoleChoice
+from tilavarauspalvelu.enums import Language
+
+from .helpers import UPDATE_MUTATION
 
 # Applied to all tests
 pytestmark = [
@@ -10,56 +11,57 @@ pytestmark = [
 ]
 
 
-UPDATE_MUTATION = build_mutation("updateUser", "UserUpdateMutation")
+def test_user__update__language__superuser(graphql):
+    user = UserFactory.create_superuser()
 
+    data = {
+        "pk": user.pk,
+        "preferredLanguage": Language.FI.value.upper(),
+    }
 
-def test_user__update__anonymous_user(graphql):
-    user = UserFactory.create()
-
-    data = {"pk": user.pk, "reservationNotification": "NONE"}
-    response = graphql(UPDATE_MUTATION, input_data=data)
-
-    assert response.error_message() == "No permission to update."
-
-
-def test_user__update__cannot_update_other_user(graphql):
-    user = UserFactory.create()
-    graphql.login_with_superuser()
-
-    data = {"pk": user.pk, "reservationNotification": "NONE"}
-    response = graphql(UPDATE_MUTATION, input_data=data)
-
-    assert response.error_message() == "No permission to update."
-
-
-def test_user__update__regular_user(graphql):
-    user = graphql.login_with_regular_user()
-
-    data = {"pk": user.pk, "reservationNotification": "NONE"}
-    response = graphql(UPDATE_MUTATION, input_data=data)
-
-    assert response.error_message() == "No permission to update."
-
-
-def test_user__update__admin_user(graphql):
-    user = graphql.login_user_with_role(role=UserRoleChoice.ADMIN)
-
-    data = {"pk": user.pk, "reservationNotification": "NONE"}
+    graphql.force_login(user)
     response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.has_errors is False
 
-    user.refresh_from_db()
-    assert user.reservation_notification == "none"
 
+def test_user__update__language__regular_user(graphql):
+    user = UserFactory.create()
 
-def test_user__update__superuser(graphql):
-    user = graphql.login_with_superuser()
+    data = {
+        "pk": user.pk,
+        "preferredLanguage": Language.FI.value.upper(),
+    }
 
-    data = {"pk": user.pk, "reservationNotification": "NONE"}
+    graphql.force_login(user)
     response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.has_errors is False
 
-    user.refresh_from_db()
-    assert user.reservation_notification == "none"
+
+def test_user__update__language__other_user(graphql):
+    user = UserFactory.create_superuser()
+
+    data = {
+        "pk": user.pk,
+        "preferredLanguage": Language.FI.value.upper(),
+    }
+
+    graphql.login_with_regular_user()
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    assert response.error_message() == "No permission to update."
+
+
+def test_user__update__language__admin(graphql):
+    user = UserFactory.create_with_general_role()
+
+    data = {
+        "pk": user.pk,
+        "preferredLanguage": Language.FI.value.upper(),
+    }
+
+    graphql.force_login(user)
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False
