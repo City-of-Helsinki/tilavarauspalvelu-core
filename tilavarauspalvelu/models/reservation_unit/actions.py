@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any
 
 from django.db import models
 
-from tilavarauspalvelu.enums import PricingType, ReservationStartInterval
+from tilavarauspalvelu.enums import ReservationStartInterval
 from tilavarauspalvelu.exceptions import HaukiAPIError
 from tilavarauspalvelu.models import (
     Building,
@@ -364,20 +364,6 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
             .first()
         )
 
-    def get_future_pricing(self, by_date: datetime.date | None = None) -> ReservationUnitPricing | None:
-        today = local_date()
-        if by_date is None:
-            by_date = today
-
-        return (
-            self.reservation_unit.pricings.exclude(
-                models.Q(begins__lte=by_date, is_activated_on_begins=False)
-                | models.Q(begins__lte=today, is_activated_on_begins=True)
-            )
-            .order_by("begins")
-            .first()
-        )
-
     def get_merchant(self) -> PaymentMerchant | None:
         if self.reservation_unit.payment_merchant is not None:
             return self.reservation_unit.payment_merchant
@@ -407,25 +393,3 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         if self.reservation_unit.unit:
             return self.reservation_unit.unit.payment_accounting
         return None
-
-    def get_pricing_on_date(self, *, date: datetime.date) -> ReservationUnitPricing | None:
-        active_price = self.get_active_pricing()
-        future_price = self.get_future_pricing()
-
-        if future_price is None:
-            return active_price
-
-        if future_price.begins > date:
-            return active_price
-
-        # If either of the prices is free, the future price can be returned, as the percentage is irrelevant.
-        if PricingType.FREE in (active_price.pricing_type, future_price.pricing_type):
-            return future_price
-
-        # Only return future price if it has the same tax percentage as the current active price.
-        # When the future price has a different tax percentage, it should only be used for reservations which
-        # are made after the pricings begins date (due to VAT-change rules, see TILA-3470).
-        if active_price.tax_percentage == future_price.tax_percentage:
-            return future_price
-
-        return active_price

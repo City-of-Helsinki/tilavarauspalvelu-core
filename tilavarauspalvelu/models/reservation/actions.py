@@ -15,7 +15,6 @@ from tilavarauspalvelu.enums import (
     CustomerTypeChoice,
     EventProperty,
     PriceUnit,
-    PricingType,
     TimezoneProperty,
     TimezoneRuleProperty,
 )
@@ -223,11 +222,11 @@ class ReservationActions:
         if reservation_unit is None:
             raise ValueError("Reservation has no reservation unit")
 
-        pricing = reservation_unit.actions.get_pricing_on_date(date=begin_datetime.date())
+        pricing = reservation_unit.actions.get_active_pricing(by_date=begin_datetime.date())
         if pricing is None:
             raise ValueError("Reservation unit has no pricing information")
 
-        if pricing.pricing_type == PricingType.FREE:
+        if pricing.highest_price == 0:
             return Decimal("0")
 
         price_unit = PriceUnit(pricing.price_unit)
