@@ -22,7 +22,7 @@
     "@sentry/nextjs": "^8.29.0",
     "classnames": "^2.5.1",
     "common": "workspace:*",
-    "date-fns": "^3.6.0",
+    "date-fns": "^4.1.0",
     "eslint-config-custom": "workspace:*",
     "focus-trap-react": "^10.2.3",
     "graphql": "^16.9.0",
