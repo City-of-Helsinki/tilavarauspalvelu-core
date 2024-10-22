@@ -17,9 +17,11 @@ from tilavarauspalvelu.utils.helauth.utils import get_jwt_payload
 from tilavarauspalvelu.utils.permission_resolver import PermissionResolver
 from utils.date_utils import DEFAULT_TIMEZONE
 
-from .queryset import UserManager
+from .queryset import ProfileUserManager, UserManager
 
 if TYPE_CHECKING:
+    import datetime
+
     from social_django.models import UserSocialAuth
 
     from tilavarauspalvelu.models import UnitRole
@@ -34,37 +36,15 @@ __all__ = [
 
 
 class User(AbstractUser):
-    tvp_uuid = models.UUIDField(
-        default=uuid.uuid4,
-        null=False,
-        editable=False,
-        unique=True,
-    )
-    preferred_language: str | None = models.CharField(
-        max_length=8,
-        null=True,
-        blank=True,
-        verbose_name=_("Preferred UI language"),
-        choices=settings.LANGUAGES,
-    )
-    reservation_notification = models.CharField(
+    tvp_uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    preferred_language: str | None = models.CharField(max_length=8, null=True, blank=True, choices=settings.LANGUAGES)
+    date_of_birth: datetime.date | None = models.DateField(null=True, blank=True)
+    profile_id: str = models.CharField(max_length=255, blank=True, default="")
+
+    reservation_notification: str = models.CharField(
         max_length=32,
-        verbose_name=_("Reservation notification"),
         choices=ReservationNotification.choices,
-        blank=False,
-        null=False,
         default=ReservationNotification.ONLY_HANDLING_REQUIRED,
-        help_text="When user wants to receive reservation notification emails.",
-    )
-    date_of_birth = models.DateField(
-        verbose_name=_("Date of birth"),
-        null=True,
-    )
-    profile_id = models.CharField(
-        max_length=255,
-        null=False,
-        blank=True,
-        default="",
     )
 
     sent_email_about_deactivating_permissions = models.BooleanField(default=False, blank=True)
@@ -77,9 +57,9 @@ class User(AbstractUser):
     class Meta:
         db_table = "user"
         base_manager_name = "objects"
-        ordering = [
-            "pk",
-        ]
+        verbose_name = _("user")
+        verbose_name_plural = _("users")
+        ordering = ["pk"]
 
     def __str__(self) -> str:
         default = super().__str__()
@@ -241,6 +221,8 @@ AnonymousUser.permissions = PermissionResolver()
 
 class ProfileUser(SerializableMixin, User):
     """User model for the GDPR API"""
+
+    objects = ProfileUserManager()
 
     class Meta:
         proxy = True

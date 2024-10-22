@@ -4,8 +4,9 @@ from functools import cached_property
 from typing import TYPE_CHECKING
 
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
-from .queryset import QualifierQuerySet
+from .queryset import QualifierManager
 
 if TYPE_CHECKING:
     from .actions import QualifierActions
@@ -24,11 +25,13 @@ class Qualifier(models.Model):
     name_sv: str | None
     name_en: str | None
 
-    objects = QualifierQuerySet.as_manager()
+    objects = QualifierManager()
 
     class Meta:
         db_table = "qualifier"
         base_manager_name = "objects"
+        verbose_name = _("qualifier")
+        verbose_name_plural = _("qualifiers")
         ordering = ["pk"]
 
     def __str__(self) -> str:

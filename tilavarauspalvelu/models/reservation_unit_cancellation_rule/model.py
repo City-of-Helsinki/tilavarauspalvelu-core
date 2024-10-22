@@ -5,8 +5,9 @@ from functools import cached_property
 from typing import TYPE_CHECKING
 
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
-from .queryset import ReservationUnitCancellationRuleQuerySet
+from .queryset import ReservationUnitCancellationRuleManager
 
 if TYPE_CHECKING:
     from .actions import ReservationUnitCancellationRuleActions
@@ -17,20 +18,26 @@ __all__ = [
 
 
 class ReservationUnitCancellationRule(models.Model):
-    name = models.CharField(max_length=255)
-    can_be_cancelled_time_before = models.DurationField(blank=True, null=True, default=datetime.timedelta(hours=24))
-    needs_handling = models.BooleanField(default=False)
+    name: str = models.CharField(max_length=255)
+    needs_handling: bool = models.BooleanField(default=False)
+    can_be_cancelled_time_before: datetime.timedelta | None = models.DurationField(
+        default=datetime.timedelta(hours=24),
+        blank=True,
+        null=True,
+    )
 
     # Translated field hints
     name_fi: str | None
     name_en: str | None
     name_sv: str | None
 
-    objects = ReservationUnitCancellationRuleQuerySet.as_manager()
+    objects = ReservationUnitCancellationRuleManager()
 
     class Meta:
         db_table = "reservation_unit_cancellation_rule"
         base_manager_name = "objects"
+        verbose_name = _("reservation unit cancellation rule")
+        verbose_name_plural = _("reservation unit cancellation rules")
         ordering = ["pk"]
 
     def __str__(self) -> str:

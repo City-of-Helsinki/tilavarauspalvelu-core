@@ -5,14 +5,20 @@ from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from easy_thumbnails.fields import ThumbnailerImageField
 
-from .queryset import PurposeQuerySet
+from .queryset import PurposeManager
 
 if TYPE_CHECKING:
     from easy_thumbnails.files import ThumbnailFile
 
     from .actions import PurposeActions
+
+
+__all__ = [
+    "Purpose",
+]
 
 
 class Purpose(models.Model):
@@ -27,11 +33,13 @@ class Purpose(models.Model):
     name_en: str | None
     name_sv: str | None
 
-    objects = PurposeQuerySet.as_manager()
+    objects = PurposeManager()
 
     class Meta:
         db_table = "purpose"
         base_manager_name = "objects"
+        verbose_name = _("purpose")
+        verbose_name_plural = _("purposes")
         ordering = ["rank"]
 
     def __str__(self) -> str:

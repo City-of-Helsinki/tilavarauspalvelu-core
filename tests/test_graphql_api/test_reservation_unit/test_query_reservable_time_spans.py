@@ -22,8 +22,8 @@ UTCOFFSET = f"0{int(datetime.datetime(2021, 5, 1, tzinfo=DEFAULT_TIMEZONE).utcof
 
 @pytest.fixture
 def reservation_unit() -> ReservationUnit:
-    origin_hauki_resource = OriginHaukiResourceFactory(
-        id="999",
+    origin_hauki_resource = OriginHaukiResourceFactory.create(
+        id=999,
         opening_hours_hash="test_hash",
         latest_fetched_date="2021-05-03",
     )
@@ -99,17 +99,17 @@ def test_reservation_unit__reservable_time_spans__no_results(graphql, reservatio
 
 
 def test_reservation_unit__reservable_time_spans__multiple_days(graphql, reservation_unit):
-    ReservableTimeSpanFactory(
+    ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_get_date(day=1, hour=0),
         end_datetime=_get_date(day=1, hour=12),
     )
-    ReservableTimeSpanFactory(
+    ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_get_date(day=2, hour=10),
         end_datetime=_get_date(day=2, hour=12),
     )
-    ReservableTimeSpanFactory(
+    ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_get_date(day=3, hour=20),
         end_datetime=_get_date(day=4, hour=0),
@@ -141,22 +141,22 @@ def test_reservation_unit__reservable_time_spans__multiple_days(graphql, reserva
 
 
 def test_reservation_unit__reservable_time_spans__multiple_spans_in_same_day(graphql, reservation_unit):
-    ReservableTimeSpanFactory(
+    ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_get_date(day=1, hour=10),
         end_datetime=_get_date(day=1, hour=20),
     )
-    ReservableTimeSpanFactory(
+    ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_get_date(day=2, hour=10),
         end_datetime=_get_date(day=2, hour=12),
     )
-    ReservableTimeSpanFactory(
+    ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_get_date(day=2, hour=14),
         end_datetime=_get_date(day=2, hour=16),
     )
-    ReservableTimeSpanFactory(
+    ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_get_date(day=2, hour=18),
         end_datetime=_get_date(day=2, hour=20),
@@ -192,7 +192,7 @@ def test_reservation_unit__reservable_time_spans__multiple_spans_in_same_day(gra
 
 
 def test_reservation_unit__reservable_time_spans__full_day(graphql, reservation_unit):
-    ReservableTimeSpanFactory(
+    ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_get_date(day=4, hour=0),
         end_datetime=_get_date(day=5, hour=0),
@@ -216,7 +216,7 @@ def test_reservation_unit__reservable_time_spans__full_day(graphql, reservation_
 
 
 def test_reservation_unit__reservable_time_spans__multiple_days_long_time_span(graphql, reservation_unit):
-    ReservableTimeSpanFactory(
+    ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_get_date(day=10, hour=12),
         end_datetime=_get_date(day=12, hour=12),
@@ -240,17 +240,17 @@ def test_reservation_unit__reservable_time_spans__multiple_days_long_time_span(g
 
 
 def test_reservation_unit__reservable_time_spans__all_timezones_are_in_default_tz(graphql, reservation_unit):
-    rts1 = ReservableTimeSpanFactory(
+    rts1 = ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_get_date(day=1, hour=10, tzinfo=ZoneInfo("Europe/Helsinki")),
         end_datetime=_get_date(day=1, hour=20, tzinfo=ZoneInfo("Europe/Helsinki")),
     )
-    rts2 = ReservableTimeSpanFactory(
+    rts2 = ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_get_date(day=2, hour=10, tzinfo=ZoneInfo("America/New_York")),
         end_datetime=_get_date(day=2, hour=20, tzinfo=ZoneInfo("America/New_York")),
     )
-    rts3 = ReservableTimeSpanFactory(
+    rts3 = ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_get_date(day=3, hour=10, tzinfo=ZoneInfo("Asia/Shanghai")),
         end_datetime=_get_date(day=3, hour=20, tzinfo=ZoneInfo("Asia/Shanghai")),

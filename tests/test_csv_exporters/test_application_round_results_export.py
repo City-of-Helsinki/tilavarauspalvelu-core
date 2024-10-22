@@ -46,7 +46,7 @@ def test_application_round_results_export__single_application__all_fields(graphq
     section: ApplicationSection = application.application_sections.first()
     allocation: AllocatedTimeSlot = section.reservation_unit_options.first().allocated_time_slots.first()
 
-    exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round)
+    exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round.id)
     with mock.patch(CSV_WRITER_MOCK_PATH) as mock_writer:
         exporter.export()
 
@@ -104,7 +104,7 @@ def test_application_round_results_export__application_status_is_draft(graphql):
         application_sections__suitable_time_ranges__day_of_the_week=Weekday.TUESDAY,
     )
 
-    exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round)
+    exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round.id)
     assert exporter.export() is None
 
 
@@ -118,7 +118,7 @@ def test_application_round_results_export__section_has_no_allocated_time_slots(g
         reservation_unit_options__reservation_unit__name="foo",
     )
 
-    exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round)
+    exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round.id)
     with mock.patch(CSV_WRITER_MOCK_PATH) as mock_writer:
         exporter.export()
     writes = get_writes(mock_writer)
@@ -159,7 +159,7 @@ def test_application_round_results_export__reservation_unit_option_ordering(grap
         allocated_time_slots__day_of_the_week=Weekday.TUESDAY,
     )
 
-    exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round)
+    exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round.id)
     with mock.patch(CSV_WRITER_MOCK_PATH) as mock_writer:
         exporter.export()
     writes = get_writes(mock_writer)
@@ -204,7 +204,7 @@ def test_application_round_results_export__allocated_slot_ordering(graphql):
         end_time=datetime.time(20, 0),
     )
 
-    exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round)
+    exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round.id)
     with mock.patch(CSV_WRITER_MOCK_PATH) as mock_writer:
         exporter.export()
     writes = get_writes(mock_writer)

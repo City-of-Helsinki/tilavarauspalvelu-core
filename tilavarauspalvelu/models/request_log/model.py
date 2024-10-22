@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .queryset import RequestLogQuerySet
+from .queryset import RequestLogManager
 
 if TYPE_CHECKING:
     import datetime
@@ -27,17 +27,17 @@ class RequestLog(models.Model):
     duration_ms: int = models.PositiveBigIntegerField(editable=False)
     created: datetime.datetime = models.DateTimeField(auto_now_add=True, editable=False)
 
-    objects = RequestLogQuerySet.as_manager()
+    objects = RequestLogManager()
 
     class Meta:
         db_table = "request_log"
         base_manager_name = "objects"
-        verbose_name = _("Request log")
-        verbose_name_plural = _("Request logs")
+        verbose_name = _("request log")
+        verbose_name_plural = _("request logs")
         ordering = ["pk"]
 
     def __str__(self) -> str:
-        return _("Request log") + f" '{self.request_id}' ({self.duration_str} ms)"
+        return _("request log") + f" '{self.request_id}' ({self.duration_str} ms)"
 
     @cached_property
     def actions(self) -> RequestLogActions:

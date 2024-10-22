@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from .queryset import UnitManager
 
@@ -75,6 +76,8 @@ class Unit(models.Model):
     class Meta:
         db_table = "unit"
         base_manager_name = "objects"
+        verbose_name = _("unit")
+        verbose_name_plural = _("units")
         ordering = ["rank"]
 
     def __str__(self) -> str:
@@ -92,7 +95,7 @@ class Unit(models.Model):
         ):
             from tilavarauspalvelu.tasks import refresh_reservation_unit_product_mapping
 
-            reservation_units = self.reservationunit_set.filter(payment_merchant__isnull=True).all()
+            reservation_units = self.reservation_units.filter(payment_merchant__isnull=True).all()
             for runit in reservation_units:
                 refresh_reservation_unit_product_mapping.delay(runit.pk)
 

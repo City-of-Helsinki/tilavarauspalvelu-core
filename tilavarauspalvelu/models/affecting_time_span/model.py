@@ -16,7 +16,7 @@ from django.utils.translation import gettext_lazy as _
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, timedelta_to_json
 from utils.sentry import SentryLogger
 
-from .queryset import AffectingTimeSpanQuerySet
+from .queryset import AffectingTimeSpanManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Reservation
@@ -40,10 +40,10 @@ class AffectingTimeSpan(models.Model):
 
     reservation: Reservation = models.OneToOneField(
         "tilavarauspalvelu.Reservation",
+        related_name="affecting_time_span",
         on_delete=models.DO_NOTHING,
         primary_key=True,
         db_column="reservation_id",
-        related_name="affecting_time_span",
     )
 
     affected_reservation_unit_ids: list[int] = ArrayField(base_field=models.IntegerField())
@@ -53,13 +53,13 @@ class AffectingTimeSpan(models.Model):
     buffer_time_before: datetime.timedelta = models.DurationField()
     buffer_time_after: datetime.timedelta = models.DurationField()
 
-    objects = AffectingTimeSpanQuerySet.as_manager()
+    objects = AffectingTimeSpanManager()
 
     class Meta:
         managed = False
         db_table = "affecting_time_spans"
-        verbose_name = _("Affecting time span")
-        verbose_name_plural = _("Affecting time spans")
+        verbose_name = _("affecting time span")
+        verbose_name_plural = _("affecting time spans")
         base_manager_name = "objects"
         ordering = [
             "buffered_start_datetime",

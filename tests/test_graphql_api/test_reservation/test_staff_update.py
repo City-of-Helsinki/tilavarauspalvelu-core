@@ -28,7 +28,7 @@ pytestmark = [
 @freezegun.freeze_time("2021-01-01")
 def test_reservation__staff_update__reservation_block_whole_day(graphql):
     reservation_unit = ReservationUnitFactory.create(
-        origin_hauki_resource=OriginHaukiResourceFactory(id=999),
+        origin_hauki_resource=OriginHaukiResourceFactory.create(id=999),
         reservation_block_whole_day=True,
         spaces=[SpaceFactory.create()],
     )
@@ -68,7 +68,7 @@ def test_reservation__staff_update__reservation_block_whole_day(graphql):
 @freezegun.freeze_time("2021-01-01")
 def test_reservation__staff_update__reservation_block_whole_day__ignore_given_buffers(graphql):
     reservation_unit = ReservationUnitFactory.create(
-        origin_hauki_resource=OriginHaukiResourceFactory(id=999),
+        origin_hauki_resource=OriginHaukiResourceFactory.create(id=999),
         reservation_block_whole_day=True,
         spaces=[SpaceFactory.create()],
     )

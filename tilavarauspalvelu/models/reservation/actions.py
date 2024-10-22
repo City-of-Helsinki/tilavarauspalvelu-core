@@ -40,7 +40,7 @@ class ReservationActions:
     def get_actual_before_buffer(self) -> datetime.timedelta:
         buffer_time_before: datetime.timedelta = self.reservation.buffer_time_before or datetime.timedelta()
         reservation_unit: ReservationUnit
-        for reservation_unit in self.reservation.reservation_unit.all():
+        for reservation_unit in self.reservation.reservation_units.all():
             before = reservation_unit.actions.get_actual_before_buffer(self.reservation.begin)
             buffer_time_before = max(before, buffer_time_before)
         return buffer_time_before
@@ -48,7 +48,7 @@ class ReservationActions:
     def get_actual_after_buffer(self) -> datetime.timedelta:
         buffer_time_after: datetime.timedelta = self.reservation.buffer_time_after or datetime.timedelta()
         reservation_unit: ReservationUnit
-        for reservation_unit in self.reservation.reservation_unit.all():
+        for reservation_unit in self.reservation.reservation_units.all():
             after = reservation_unit.actions.get_actual_after_buffer(self.reservation.end)
             buffer_time_after = max(after, buffer_time_after)
         return buffer_time_after
@@ -133,13 +133,13 @@ class ReservationActions:
 
     @get_translated
     def get_ical_summary(self, *, language: Lang = "fi") -> str:
-        unit: Unit = self.reservation.reservation_unit.first().unit
+        unit: Unit = self.reservation.reservation_units.first().unit
         unit_name = get_attr_by_language(unit, "name", language)
         return pgettext("ICAL", "Reservation for %(name)s") % {"name": unit_name}
 
     @get_translated
     def get_ical_description(self, *, site_name: str, language: Lang = "fi") -> str:
-        reservation_unit: ReservationUnit = self.reservation.reservation_unit.first()
+        reservation_unit: ReservationUnit = self.reservation.reservation_units.first()
         unit: Unit = reservation_unit.unit
         begin = self.reservation.begin.astimezone(DEFAULT_TIMEZONE)
         end = self.reservation.end.astimezone(DEFAULT_TIMEZONE)
@@ -184,7 +184,7 @@ class ReservationActions:
 
     def get_location(self) -> Location | None:
         reservation_unit: ReservationUnit = (
-            self.reservation.reservation_unit.select_related("unit__location")
+            self.reservation.reservation_units.select_related("unit__location")
             .prefetch_related(Prefetch("spaces", Space.objects.select_related("location")))
             .first()
         )
@@ -208,7 +208,7 @@ class ReservationActions:
     ) -> str:
         return "\n-\n".join(
             get_attr_by_language(reservation_unit, f"reservation_{kind}_instructions", language)
-            for reservation_unit in self.reservation.reservation_unit.all()
+            for reservation_unit in self.reservation.reservation_units.all()
         )
 
     def calculate_full_price(
@@ -219,7 +219,7 @@ class ReservationActions:
         subsidised: bool = False,
     ) -> Decimal:
         # Currently, there is ever only one reservation unit per reservation
-        reservation_unit: ReservationUnit | None = self.reservation.reservation_unit.first()
+        reservation_unit: ReservationUnit | None = self.reservation.reservation_units.first()
         if reservation_unit is None:
             raise ValueError("Reservation has no reservation unit")
 

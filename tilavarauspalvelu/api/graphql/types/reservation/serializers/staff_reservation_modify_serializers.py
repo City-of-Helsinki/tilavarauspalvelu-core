@@ -25,7 +25,7 @@ class StaffReservationModifySerializer(OldPrimaryKeyUpdateSerializer, Reservatio
 
     reservation_unit_pks = serializers.ListField(
         child=IntegerPrimaryKeyField(queryset=ReservationUnit.objects.all()),
-        source="reservation_unit",
+        source="reservation_units",
     )
     age_group_pk = IntegerPrimaryKeyField(queryset=AgeGroup.objects.all(), source="age_group", allow_null=True)
     home_city_pk = IntegerPrimaryKeyField(queryset=City.objects.all(), source="home_city", allow_null=True)

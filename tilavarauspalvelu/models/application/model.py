@@ -4,7 +4,6 @@ from functools import cached_property
 from typing import TYPE_CHECKING
 
 from django.db import models
-from django.db.models import Manager
 from django.db.models.functions import Concat
 from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
@@ -19,18 +18,20 @@ from tilavarauspalvelu.enums import (
 from utils.db import NowTT
 from utils.fields.model import StrChoiceField
 
-from .queryset import ApplicationQuerySet
+from .queryset import ApplicationManager
 
 if TYPE_CHECKING:
-    from datetime import datetime
+    import datetime
 
-    from tilavarauspalvelu.models import Unit
+    from tests.helpers import User
+    from tilavarauspalvelu.models import Address, ApplicationRound, City, Organisation, Person, Unit
 
     from .actions import ApplicationActions
 
 
-class ApplicationManager(SerializableMixin.SerializableManager, Manager.from_queryset(ApplicationQuerySet)):
-    """Contains custom queryset methods and GDPR serialization."""
+__all__ = [
+    "Application",
+]
 
 
 class Application(SerializableMixin, models.Model):
@@ -39,56 +40,58 @@ class Application(SerializableMixin, models.Model):
     as well as information about the applicant.
     """
 
-    applicant_type: str = StrChoiceField(enum=ApplicantTypeChoice, null=True, db_index=True)
-    created_date: datetime = models.DateTimeField(auto_now_add=True)
-    last_modified_date: datetime = models.DateTimeField(auto_now=True)
-    cancelled_date: datetime | None = models.DateTimeField(null=True, blank=True, default=None)
-    sent_date: datetime | None = models.DateTimeField(null=True, blank=True, default=None)
-    in_allocation_notification_sent_date: datetime | None = models.DateTimeField(null=True, blank=True, default=None)
-    results_ready_notification_sent_date: datetime | None = models.DateTimeField(null=True, blank=True, default=None)
+    applicant_type: str | None = StrChoiceField(enum=ApplicantTypeChoice, null=True, db_index=True)
+    created_date: datetime.datetime = models.DateTimeField(auto_now_add=True)
+    last_modified_date: datetime.datetime = models.DateTimeField(auto_now=True)
+    cancelled_date: datetime.datetime | None = models.DateTimeField(null=True, blank=True, default=None)
+    sent_date: datetime.datetime | None = models.DateTimeField(null=True, blank=True, default=None)
+    in_allocation_notification_sent_date: datetime.datetime | None = models.DateTimeField(
+        null=True, blank=True, default=None
+    )
+    results_ready_notification_sent_date: datetime.datetime | None = models.DateTimeField(
+        null=True, blank=True, default=None
+    )
     additional_information: str | None = models.TextField(null=True, blank=True)
     working_memo: str = models.TextField(blank=True, default="")
 
-    application_round = models.ForeignKey(
+    application_round: ApplicationRound = models.ForeignKey(
         "tilavarauspalvelu.ApplicationRound",
-        null=False,
-        blank=False,
-        on_delete=models.PROTECT,
         related_name="applications",
+        on_delete=models.PROTECT,
     )
-    organisation = models.ForeignKey(
+    organisation: Organisation | None = models.ForeignKey(
         "tilavarauspalvelu.Organisation",
+        related_name="applications",
+        on_delete=models.PROTECT,
         null=True,
         blank=True,
-        on_delete=models.PROTECT,
-        related_name="applications",
     )
-    contact_person = models.ForeignKey(
+    contact_person: Person | None = models.ForeignKey(
         "tilavarauspalvelu.Person",
+        related_name="applications",
+        on_delete=models.PROTECT,
         null=True,
         blank=True,
-        on_delete=models.PROTECT,
-        related_name="applications",
     )
-    user = models.ForeignKey(
+    user: User | None = models.ForeignKey(
         "tilavarauspalvelu.User",
-        null=True,
-        blank=True,
+        related_name="applications",
         on_delete=models.PROTECT,
-        related_name="applications",
-    )
-    billing_address = models.ForeignKey(
-        "tilavarauspalvelu.Address",
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
-        related_name="applications",
     )
-    home_city = models.ForeignKey(
-        "tilavarauspalvelu.City",
+    billing_address: Address | None = models.ForeignKey(
+        "tilavarauspalvelu.Address",
+        related_name="applications",
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
+    )
+    home_city: City | None = models.ForeignKey(
+        "tilavarauspalvelu.City",
         related_name="applications",
+        on_delete=models.SET_NULL,
+        null=True,
     )
 
     objects = ApplicationManager()
@@ -96,11 +99,9 @@ class Application(SerializableMixin, models.Model):
     class Meta:
         db_table = "application"
         base_manager_name = "objects"
-        verbose_name = _("Application")
-        verbose_name_plural = _("Applications")
-        ordering = [
-            "pk",
-        ]
+        verbose_name = _("application")
+        verbose_name_plural = _("applications")
+        ordering = ["pk"]
 
     # For GDPR API
     serialize_fields = (
@@ -296,7 +297,7 @@ class Application(SerializableMixin, models.Model):
 
         self._units_for_permissions = list(
             Unit.objects.prefetch_related("unit_groups")
-            .filter(reservationunit__reservation_unit_options__application_section__application=self)
+            .filter(reservation_units__reservation_unit_options__application_section__application=self)
             .distinct()
         )
         return self._units_for_permissions

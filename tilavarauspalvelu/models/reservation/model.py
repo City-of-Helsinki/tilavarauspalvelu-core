@@ -22,7 +22,7 @@ from tilavarauspalvelu.enums import (
 from utils.date_utils import datetime_range_as_string
 from utils.decimal_utils import round_decimal
 
-from .queryset import ReservationQuerySet
+from .queryset import ReservationManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import (
@@ -39,8 +39,9 @@ if TYPE_CHECKING:
     from .actions import ReservationActions
 
 
-class ReservationManager(SerializableMixin.SerializableManager, models.Manager.from_queryset(ReservationQuerySet)):
-    """Contains custom queryset methods and GDPR serialization."""
+__all__ = [
+    "Reservation",
+]
 
 
 class Reservation(SerializableMixin, models.Model):
@@ -48,7 +49,7 @@ class Reservation(SerializableMixin, models.Model):
     sku: str = models.CharField(max_length=255, blank=True, default="")
     name: str = models.CharField(max_length=255, blank=True, default="")
     description: str = models.CharField(max_length=255, blank=True, default="")
-    num_persons: int | None = models.fields.PositiveIntegerField(null=True, blank=True)
+    num_persons: int | None = models.PositiveIntegerField(null=True, blank=True)
     state: str = models.CharField(
         max_length=32,
         choices=ReservationStateChoice.choices,
@@ -120,7 +121,10 @@ class Reservation(SerializableMixin, models.Model):
     billing_address_zip: str = models.CharField(max_length=255, blank=True, default="")
 
     # Relations
-    reservation_unit = models.ManyToManyField("tilavarauspalvelu.ReservationUnit")
+    reservation_units = models.ManyToManyField(
+        "tilavarauspalvelu.ReservationUnit",
+        related_name="reservations",
+    )
 
     user: User | None = models.ForeignKey(
         "tilavarauspalvelu.User",
@@ -152,19 +156,21 @@ class Reservation(SerializableMixin, models.Model):
     )
     purpose: ReservationPurpose | None = models.ForeignKey(
         "tilavarauspalvelu.ReservationPurpose",
+        related_name="reservations",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
     )
     home_city: City | None = models.ForeignKey(
         "tilavarauspalvelu.City",
-        related_name="home_city_reservation",
+        related_name="reservations",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
     )
     age_group: AgeGroup | None = models.ForeignKey(
         "tilavarauspalvelu.AgeGroup",
+        related_name="reservations",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -175,6 +181,8 @@ class Reservation(SerializableMixin, models.Model):
     class Meta:
         db_table = "reservation"
         base_manager_name = "objects"
+        verbose_name = _("reservation")
+        verbose_name_plural = _("reservations")
         ordering = ["begin"]
 
     # For GDPR API
@@ -204,7 +212,7 @@ class Reservation(SerializableMixin, models.Model):
     )
 
     def __str__(self) -> str:
-        return f"{self.name} ({self.type})"
+        return _("reservation") + f" {self.name} ({self.type})"
 
     def __repr__(self) -> str:
         return (
@@ -300,7 +308,8 @@ class Reservation(SerializableMixin, models.Model):
     @property
     def requires_handling(self) -> bool:
         return (
-            self.reservation_unit.filter(require_reservation_handling=True).exists() or self.applying_for_free_of_charge
+            self.reservation_units.filter(require_reservation_handling=True).exists()
+            or self.applying_for_free_of_charge
         )
 
     @property
@@ -311,7 +320,7 @@ class Reservation(SerializableMixin, models.Model):
             return self._units_for_permissions
 
         self._units_for_permissions = list(
-            Unit.objects.filter(reservationunit__reservation=self).prefetch_related("unit_groups").distinct()
+            Unit.objects.filter(reservation_units__reservations=self).prefetch_related("unit_groups").distinct()
         )
         return self._units_for_permissions
 

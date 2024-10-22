@@ -237,7 +237,7 @@ def create_or_update_reservation_statistics(reservation_pks: list[int]) -> None:
         )
         .prefetch_related(
             Prefetch(
-                "reservation_unit",
+                "reservation_units",
                 queryset=ReservationUnit.objects.select_related("unit"),
             ),
         )
@@ -538,9 +538,7 @@ def _get_recurring_reservation_details(recurring_reservation: RecurringReservati
         organisation_identifier: str = getattr(organisation, "identifier", "") or ""
         organisation_address: Address | None = getattr(organisation, "address", None)
 
-        reservation_details["description"] = (
-            translate_for_user(_("Core business"), application.user) + f": {organisation.core_business}"
-        )
+        reservation_details["description"] = getattr(organisation, "core_business", "")
         reservation_details["reservee_organisation_name"] = getattr(organisation, "name", "")
         reservation_details["reservee_id"] = organisation_identifier
         reservation_details["reservee_is_unregistered_association"] = not organisation_identifier

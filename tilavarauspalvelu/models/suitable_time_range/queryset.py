@@ -14,6 +14,12 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import ApplicationSection
 
 
+__all__ = [
+    "SuitableTimeRangeManager",
+    "SuitableTimeRangeQuerySet",
+]
+
+
 class SuitableTimeRangeQuerySet(models.QuerySet):
     def order_by_day_of_the_week(self, *, desc: bool = False) -> Self:
         return self.alias(day_of_the_week_number=L("day_of_the_week_number")).order_by(
@@ -43,3 +49,6 @@ class SuitableTimeRangeQuerySet(models.QuerySet):
 
     def fulfilled(self, value: bool) -> Self:
         return self.filter(L(fulfilled=value))
+
+
+class SuitableTimeRangeManager(models.Manager.from_queryset(SuitableTimeRangeQuerySet)): ...

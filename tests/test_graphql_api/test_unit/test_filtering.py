@@ -89,10 +89,10 @@ def test_units__filter__by_own_reservations(graphql):
     user_1 = UserFactory.create()
     user_2 = UserFactory.create()
 
-    ReservationFactory.create(reservation_unit=[res_unit_1], user=user_1)
-    ReservationFactory.create(reservation_unit=[res_unit_2], user=user_1)
-    ReservationFactory.create(reservation_unit=[res_unit_3], user=user_2)
-    ReservationFactory.create(reservation_unit=[res_unit_4], user=user_2)
+    ReservationFactory.create(reservation_units=[res_unit_1], user=user_1)
+    ReservationFactory.create(reservation_units=[res_unit_2], user=user_1)
+    ReservationFactory.create(reservation_units=[res_unit_3], user=user_2)
+    ReservationFactory.create(reservation_units=[res_unit_4], user=user_2)
 
     graphql.force_login(user_1)
 

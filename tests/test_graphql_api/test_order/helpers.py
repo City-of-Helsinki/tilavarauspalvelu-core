@@ -28,7 +28,7 @@ REFRESH_MUTATION = build_mutation("refreshOrder", "RefreshOrderMutation", fields
 def get_order(*, user: User | None = None) -> PaymentOrder:
     reservation_unit = ReservationUnitFactory.create()
     reservation = ReservationFactory.create(
-        reservation_unit=[reservation_unit],
+        reservation_units=[reservation_unit],
         **({"user": user} if user is not None else {}),
     )
     return PaymentOrderFactory.create(

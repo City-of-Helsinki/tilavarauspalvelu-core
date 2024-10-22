@@ -29,6 +29,6 @@ def test_service_sectors__query(graphql):
     assert response.node(0) == {
         "pk": sector.pk,
         "nameFi": sector.name_fi,
-        "nameSv": sector.name_en,
-        "nameEn": sector.name_sv,
+        "nameSv": sector.name_sv,
+        "nameEn": sector.name_en,
     }

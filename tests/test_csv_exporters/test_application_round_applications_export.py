@@ -32,6 +32,11 @@ def test_application_round_applications_export__multiple_applications(graphql):
     application_1 = ApplicationFactory.create_in_status_in_allocation(
         application_round=application_round,
         organisation__name="aaa",
+        contact_person__first_name="foo",
+        home_city__name="Helsinki",
+        application_sections__purpose__name="purpose",
+        application_sections__age_group__minimum=18,
+        application_sections__age_group__maximum=100,
         application_sections__suitable_time_ranges__priority=Priority.PRIMARY,
         application_sections__suitable_time_ranges__day_of_the_week=Weekday.TUESDAY,
         application_sections__reservation_unit_options__reservation_unit__name="foo",
@@ -40,6 +45,11 @@ def test_application_round_applications_export__multiple_applications(graphql):
     application_2 = ApplicationFactory.create_in_status_in_allocation(
         application_round=application_round,
         organisation__name="bbb",
+        contact_person__first_name="bar",
+        home_city__name="Helsinki",
+        application_sections__purpose__name="free",
+        application_sections__age_group__minimum=18,
+        application_sections__age_group__maximum=100,
         application_sections__suitable_time_ranges__priority=Priority.SECONDARY,
         application_sections__suitable_time_ranges__day_of_the_week=Weekday.FRIDAY,
         application_sections__reservation_unit_options__reservation_unit__name="bar",

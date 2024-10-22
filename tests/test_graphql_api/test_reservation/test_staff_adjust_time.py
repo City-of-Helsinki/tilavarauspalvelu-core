@@ -203,7 +203,7 @@ def test_reservation__staff_adjust_time__overlaps_with_another_reservation(graph
     ReservationFactory.create(
         begin=blocking_begin,
         end=blocking_end,
-        reservation_unit=[reservation.reservation_unit.first()],
+        reservation_units=[reservation.reservation_units.first()],
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
     )
@@ -239,7 +239,7 @@ def test_reservation__staff_adjust_time__overlaps_with_reservation_before_due_to
     ReservationFactory.create(
         begin=blocking_begin,
         end=blocking_end,
-        reservation_unit=[reservation.reservation_unit.first()],
+        reservation_units=[reservation.reservation_units.first()],
         buffer_time_after=datetime.timedelta(minutes=1),
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -276,7 +276,7 @@ def test_reservation__staff_adjust_time__overlaps_with_reservation_after_due_to_
     ReservationFactory.create(
         begin=blocking_begin,
         end=blocking_end,
-        reservation_unit=[reservation.reservation_unit.first()],
+        reservation_units=[reservation.reservation_units.first()],
         buffer_time_before=datetime.timedelta(minutes=1),
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -313,7 +313,7 @@ def test_reservation__staff_adjust_time__overlaps_with_reservation_before_due_to
     ReservationFactory.create(
         begin=blocking_begin,
         end=blocking_end,
-        reservation_unit=[reservation.reservation_unit.first()],
+        reservation_units=[reservation.reservation_units.first()],
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
     )
@@ -349,7 +349,7 @@ def test_reservation__staff_adjust_time__overlaps_with_reservation_after_due_to_
     ReservationFactory.create(
         begin=blocking_begin,
         end=blocking_end,
-        reservation_unit=[reservation.reservation_unit.first()],
+        reservation_units=[reservation.reservation_units.first()],
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
     )
@@ -385,7 +385,7 @@ def test_reservation__staff_adjust_time__reservation_start_time_not_in_interval(
 
 @pytest.mark.parametrize("interval", ReservationStartInterval.values)
 def test_reservation__staff_adjust_time__reservation_start_interval_over_30_treated_as_30(graphql, interval):
-    reservation = ReservationFactory.create_for_time_adjustment(reservation_unit__reservation_start_interval=interval)
+    reservation = ReservationFactory.create_for_time_adjustment(reservation_units__reservation_start_interval=interval)
 
     now = local_datetime()
     last_hour = now.replace(minute=0, second=0, microsecond=0)

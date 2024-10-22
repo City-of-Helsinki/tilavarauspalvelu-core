@@ -24,7 +24,7 @@ def test_reservation__requires_handling__allowed_states(graphql, outbox, state):
 
     # Admin will get notification
     UserFactory.create_with_unit_role(
-        units=[reservation.reservation_unit.first().unit],
+        units=[reservation.reservation_units.first().unit],
         reservation_notification=ReservationNotification.ALL,
     )
 
@@ -55,7 +55,7 @@ def test_reservation__requires_handling__disallowed_states(graphql, state):
 
     # Admin will get notification
     UserFactory.create_with_unit_role(
-        units=[reservation.reservation_unit.first().unit],
+        units=[reservation.reservation_units.first().unit],
         reservation_notification=ReservationNotification.ALL,
     )
 

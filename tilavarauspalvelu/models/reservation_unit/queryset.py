@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Self
 
 from django.db import connections, models
 from django.db.models import Q, prefetch_related_objects
-from elasticsearch_django.models import SearchResultsQuerySet
+from elasticsearch_django.models import SearchDocumentManagerMixin, SearchResultsQuerySet
 from lookup_property import L
 
 from tilavarauspalvelu.utils.first_reservable_time.first_reservable_time_helper import FirstReservableTimeHelper
@@ -20,6 +20,13 @@ if TYPE_CHECKING:
     from query_optimizer.validators import PaginationArgs
 
     from tilavarauspalvelu.models import ReservationUnit
+
+
+__all__ = [
+    "ReservationUnitManager",
+    "ReservationUnitQuerySet",
+]
+
 
 type ReservationUnitPK = int
 
@@ -192,3 +199,8 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
 
     def with_reservation_state_in(self, states: list[str]) -> Self:
         return self.filter(L(reservation_state__in=states))
+
+
+class ReservationUnitManager(SearchDocumentManagerMixin.from_queryset(ReservationUnitQuerySet)):
+    def get_search_queryset(self, index: str = "_all") -> models.QuerySet:
+        return self.get_queryset()

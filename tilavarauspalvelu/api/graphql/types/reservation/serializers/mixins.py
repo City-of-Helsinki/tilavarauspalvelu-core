@@ -64,9 +64,9 @@ class ReservationPriceMixin:
         if "end" in data and self.instance.end != data["end"]:
             return True
 
-        if "reservation_unit" in data:
-            existing_unit_ids = set(self.instance.reservation_unit.values_list("pk", flat=True))
-            new_unit_ids = {unit.pk for unit in data["reservation_unit"]}
+        if "reservation_units" in data:
+            existing_unit_ids = set(self.instance.reservation_units.values_list("pk", flat=True))
+            new_unit_ids = {unit.pk for unit in data["reservation_units"]}
 
             if existing_unit_ids != new_unit_ids:
                 return True

@@ -1,6 +1,5 @@
 import datetime
 import uuid
-from typing import TYPE_CHECKING
 
 import pytest
 from dateutil.relativedelta import relativedelta
@@ -9,15 +8,20 @@ from django.utils import timezone
 from freezegun import freeze_time
 from rest_framework.exceptions import ErrorDetail
 
-from tests.factories import ApplicationFactory, PaymentOrderFactory, ReservationFactory, UserFactory
+from tests.factories import (
+    AddressFactory,
+    ApplicationFactory,
+    OrganisationFactory,
+    PaymentOrderFactory,
+    PersonFactory,
+    ReservationFactory,
+    UserFactory,
+)
 from tests.helpers import patch_method
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
 from utils.sentry import SentryLogger
 
 from .helpers import get_gdpr_auth_header, patch_oidc_config
-
-if TYPE_CHECKING:
-    from tilavarauspalvelu.models import Application, ApplicationSection, Reservation, User
 
 # Applied to all tests
 pytestmark = [
@@ -68,10 +72,19 @@ def test_query_user_data__simple(api_client, settings):
 
 
 def test_query_user_data__full(api_client, settings):
-    user: User = UserFactory.create()
-    application: Application = ApplicationFactory.create_in_status_in_allocation(user=user)
-    section: ApplicationSection = application.application_sections.first()
-    reservation: Reservation = ReservationFactory.create(user=user)
+    user = UserFactory.create()
+    organisation_address = AddressFactory.create()
+    billing_address = AddressFactory.create()
+    organisation = OrganisationFactory.create(address=organisation_address)
+    contact_person = PersonFactory.create()
+    application = ApplicationFactory.create_in_status_in_allocation(
+        user=user,
+        organisation=organisation,
+        contact_person=contact_person,
+        billing_address=billing_address,
+    )
+    section = application.application_sections.first()
+    reservation = ReservationFactory.create(user=user)
 
     settings.GDPR_API_QUERY_SCOPE = "gdprquery"
     auth_header = get_gdpr_auth_header(user, scopes=[settings.GDPR_API_QUERY_SCOPE])

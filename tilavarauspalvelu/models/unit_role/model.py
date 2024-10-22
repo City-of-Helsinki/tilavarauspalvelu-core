@@ -32,7 +32,11 @@ class UnitRole(models.Model):
     unit_groups = models.ManyToManyField("tilavarauspalvelu.UnitGroup", related_name="unit_roles", blank=True)
 
     assigner: User | None = models.ForeignKey(
-        "tilavarauspalvelu.User", on_delete=models.SET_NULL, null=True, blank=True
+        "tilavarauspalvelu.User",
+        related_name="assigned_unit_roles",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
     )
     created: datetime.datetime = models.DateTimeField(auto_now_add=True)
     modified: datetime.datetime = models.DateTimeField(auto_now=True)
@@ -44,8 +48,8 @@ class UnitRole(models.Model):
     class Meta:
         db_table = "unit_role"
         base_manager_name = "objects"
-        verbose_name = _("Unit role")
-        verbose_name_plural = _("Unit roles")
+        verbose_name = _("unit role")
+        verbose_name_plural = _("unit roles")
         ordering = ["pk"]
 
     def __str__(self) -> str:

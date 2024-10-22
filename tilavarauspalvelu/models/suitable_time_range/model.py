@@ -10,7 +10,7 @@ from lookup_property import L, lookup_property
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, Priority, Weekday
 from utils.fields.model import StrChoiceField
 
-from .queryset import SuitableTimeRangeQuerySet
+from .queryset import SuitableTimeRangeManager
 
 if TYPE_CHECKING:
     import datetime
@@ -18,6 +18,11 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import ApplicationSection
 
     from .actions import SuitableTimeRangeActions
+
+
+__all__ = [
+    "SuitableTimeRange",
+]
 
 
 class SuitableTimeRange(models.Model):
@@ -30,17 +35,17 @@ class SuitableTimeRange(models.Model):
 
     application_section: ApplicationSection = models.ForeignKey(
         "tilavarauspalvelu.ApplicationSection",
-        on_delete=models.CASCADE,
         related_name="suitable_time_ranges",
+        on_delete=models.CASCADE,
     )
 
-    objects = SuitableTimeRangeQuerySet.as_manager()
+    objects = SuitableTimeRangeManager()
 
     class Meta:
         db_table = "suitable_time_range"
         base_manager_name = "objects"
-        verbose_name = _("Suitable Time Range")
-        verbose_name_plural = _("Suitable Time Ranges")
+        verbose_name = _("suitable time range")
+        verbose_name_plural = _("suitable time ranges")
         ordering = ["pk"]
         constraints = [
             models.CheckConstraint(

@@ -14,6 +14,12 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnitOption
 
 
+__all__ = [
+    "AllocatedTimeSlotManager",
+    "AllocatedTimeSlotQuerySet",
+]
+
+
 class AllocatedTimeSlotQuerySet(models.QuerySet):
     def has_section_status_in(self, statuses: list[str]) -> Self:
         order = L("reservation_unit_option__application_section__status")
@@ -96,3 +102,6 @@ class AllocatedTimeSlotQuerySet(models.QuerySet):
                 reservation_unit_option__application_section__reservations_end_date__gte=begin_date,
             )
         )
+
+
+class AllocatedTimeSlotManager(models.Manager.from_queryset(AllocatedTimeSlotQuerySet)): ...

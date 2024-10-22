@@ -6,6 +6,7 @@ from django.contrib.postgres.aggregates import ArrayAgg
 from django.db import models
 from django.db.models import Subquery
 from django.db.models.functions import Coalesce
+from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L
 
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ApplicationSectionStatusChoice
@@ -13,6 +14,12 @@ from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ApplicationSec
 if TYPE_CHECKING:
     from tilavarauspalvelu.enums import ApplicationStatusChoice
     from tilavarauspalvelu.models import Application
+
+
+__all__ = [
+    "ApplicationManager",
+    "ApplicationQuerySet",
+]
 
 
 class ApplicationQuerySet(models.QuerySet):
@@ -79,15 +86,15 @@ class ApplicationQuerySet(models.QuerySet):
 
         units = (
             Unit.objects.prefetch_related("unit_groups")
-            .filter(reservationunit__reservation_unit_options__application_section__application__in=items)
+            .filter(reservation_units__reservation_unit_options__application_section__application__in=items)
             .annotate(
                 application_ids=Coalesce(
                     ArrayAgg(
-                        "reservationunit__reservation_unit_options__application_section__application",
+                        "reservation_units__reservation_unit_options__application_section__application",
                         distinct=True,
                         filter=(
-                            models.Q(reservationunit__isnull=False)
-                            & models.Q(reservationunit__reservation_unit_options__isnull=False)
+                            models.Q(reservation_units__isnull=False)
+                            & models.Q(reservation_units__reservation_unit_options__isnull=False)
                         ),
                     ),
                     models.Value([]),
@@ -116,3 +123,7 @@ class ApplicationQuerySet(models.QuerySet):
             results_ready_notification_sent_date__isnull=True,
             application_sections__isnull=False,
         )
+
+
+class ApplicationManager(SerializableMixin.SerializableManager.from_queryset(ApplicationQuerySet)):
+    """Contains custom queryset methods and GDPR serialization."""

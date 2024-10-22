@@ -87,8 +87,8 @@ def _clear_cache() -> None:
 
 @pytest.fixture
 def reservation_unit() -> ReservationUnit:
-    origin_hauki_resource = OriginHaukiResourceFactory(
-        id="999",
+    origin_hauki_resource = OriginHaukiResourceFactory.create(
+        id=999,
         opening_hours_hash="test_hash",
         latest_fetched_date=_date() - timedelta(days=1),
     )
@@ -109,7 +109,7 @@ def reservation_unit() -> ReservationUnit:
 def create_child_for_reservation_unit(reservation_unit: ReservationUnit) -> ReservationUnit:
     parent_space = reservation_unit.spaces.all().first()
     if not parent_space:
-        parent_space = SpaceFactory()
+        parent_space = SpaceFactory.create()
         reservation_unit.spaces.set([parent_space])
     reservation_unit.name = "Parent ReservationUnit"
     reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_30_MINUTES.value
@@ -2316,7 +2316,7 @@ def test__reservation_unit__first_reservable_time__blocked_type_reservation_can_
 
     # 1st Jan 12:00 - 14:00 (2h)
     ReservationFactory.create(
-        reservation_unit=[reservation_unit],
+        reservation_units=[reservation_unit],
         begin=_datetime(hour=12),
         end=_datetime(hour=14),
         buffer_time_before=timedelta(minutes=300),  # This buffer should be completely ignored
@@ -2397,7 +2397,7 @@ def test_reservation_unit__first_reservable_time__duration_exactly_min_but_buffe
         end=_datetime(hour=18),
         buffer_time_before=timedelta(),
         buffer_time_after=timedelta(),
-        reservation_unit=[reservation_unit],
+        reservation_units=[reservation_unit],
         state=ReservationStateChoice.CREATED,
     )
 
@@ -2407,7 +2407,7 @@ def test_reservation_unit__first_reservable_time__duration_exactly_min_but_buffe
         end=_datetime(hour=19, minute=30),
         buffer_time_before=timedelta(),
         buffer_time_after=timedelta(),
-        reservation_unit=[reservation_unit],
+        reservation_units=[reservation_unit],
         state=ReservationStateChoice.CREATED,
     )
 
@@ -2417,7 +2417,7 @@ def test_reservation_unit__first_reservable_time__duration_exactly_min_but_buffe
         end=_datetime(hour=21),
         buffer_time_before=timedelta(minutes=15),
         buffer_time_after=timedelta(minutes=30),
-        reservation_unit=[reservation_unit],
+        reservation_units=[reservation_unit],
         state=ReservationStateChoice.CREATED,
     )
 

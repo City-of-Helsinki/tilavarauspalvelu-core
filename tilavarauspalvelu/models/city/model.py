@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .queryset import CityQuerySet
+from .queryset import CityManager
 
 if TYPE_CHECKING:
     from .actions import CityActions
@@ -17,21 +17,21 @@ __all__ = [
 
 
 class City(models.Model):
-    name = models.CharField(max_length=100)
-    municipality_code = models.CharField(default="", max_length=30)
+    name: str = models.CharField(max_length=100)
+    municipality_code: str = models.CharField(max_length=30, default="")
 
     # Translated field hints
     name_fi: str | None
     name_en: str | None
     name_sv: str | None
 
-    objects = CityQuerySet.as_manager()
+    objects = CityManager()
 
     class Meta:
         db_table = "city"
         base_manager_name = "objects"
-        verbose_name = _("City")
-        verbose_name_plural = _("Cities")
+        verbose_name = _("city")
+        verbose_name_plural = _("cities")
         ordering = ["pk"]
 
     def __str__(self) -> str:

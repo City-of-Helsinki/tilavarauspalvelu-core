@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from datetime import date, timedelta
 from functools import cached_property
 from typing import TYPE_CHECKING
 
 from django.db import models
-from django.db.models import Manager, OrderBy
+from django.db.models import OrderBy
 from django.db.models.functions import Coalesce
 from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
@@ -16,7 +15,7 @@ from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, Weekday
 from utils.date_utils import local_datetime
 from utils.db import NowTT, SubqueryCount
 
-from .queryset import ApplicationSectionQuerySet
+from .queryset import ApplicationSectionManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import AgeGroup, Application, ReservationPurpose
@@ -27,21 +26,6 @@ if TYPE_CHECKING:
 __all__ = [
     "ApplicationSection",
 ]
-
-
-@dataclass
-class SlotRequest:
-    reservation_min_duration: timedelta
-    reservation_max_duration: timedelta
-    applied_reservations_per_week: int
-    suitable_days_of_the_week: list[str]
-
-
-class ApplicationSectionManager(
-    SerializableMixin.SerializableManager,
-    Manager.from_queryset(ApplicationSectionQuerySet),
-):
-    """Contains custom queryset methods and GDPR serialization."""
 
 
 class ApplicationSection(SerializableMixin, models.Model):
@@ -62,23 +46,20 @@ class ApplicationSection(SerializableMixin, models.Model):
 
     application: Application = models.ForeignKey(
         "tilavarauspalvelu.Application",
-        on_delete=models.CASCADE,
         related_name="application_sections",
+        on_delete=models.CASCADE,
     )
-    # TODO: These should be required, but nullable since the
-    # purposes and age groups might get deleted, and the application
-    # section should still remain in the database
     purpose: ReservationPurpose | None = models.ForeignKey(
         "tilavarauspalvelu.ReservationPurpose",
-        null=True,
-        on_delete=models.SET_NULL,
         related_name="application_sections",
+        on_delete=models.SET_NULL,
+        null=True,
     )
     age_group: AgeGroup | None = models.ForeignKey(
         "tilavarauspalvelu.AgeGroup",
-        null=True,
-        on_delete=models.SET_NULL,
         related_name="application_sections",
+        on_delete=models.SET_NULL,
+        null=True,
     )
 
     objects = ApplicationSectionManager()
@@ -86,8 +67,8 @@ class ApplicationSection(SerializableMixin, models.Model):
     class Meta:
         db_table = "application_section"
         base_manager_name = "objects"
-        verbose_name = _("Application Section")
-        verbose_name_plural = _("Application Sections")
+        verbose_name = _("application section")
+        verbose_name_plural = _("application sections")
         ordering = ["pk"]
         constraints = [
             models.CheckConstraint(
@@ -131,15 +112,6 @@ class ApplicationSection(SerializableMixin, models.Model):
         from .actions import ApplicationSectionActions
 
         return ApplicationSectionActions(self)
-
-    @property
-    def slot_request(self) -> SlotRequest:
-        return SlotRequest(
-            reservation_min_duration=self.reservation_min_duration,
-            reservation_max_duration=self.reservation_max_duration,
-            applied_reservations_per_week=self.applied_reservations_per_week,
-            suitable_days_of_the_week=self.suitable_days_of_the_week,
-        )
 
     @property
     def suitable_days_of_the_week(self) -> list[Weekday]:

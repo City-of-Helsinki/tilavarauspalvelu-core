@@ -70,7 +70,7 @@ def test_reservation__update__overlaps_with_another_reservation(graphql):
     ReservationFactory.create(
         begin=blocking_begin,
         end=blocking_end,
-        reservation_unit=[reservation.reservation_unit.first()],
+        reservation_units=[reservation.reservation_units.first()],
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
     )
@@ -106,7 +106,7 @@ def test_reservation__update__overlaps_with_reservation_before_due_to_its_buffer
     ReservationFactory.create(
         begin=blocking_begin,
         end=blocking_end,
-        reservation_unit=[reservation.reservation_unit.first()],
+        reservation_units=[reservation.reservation_units.first()],
         buffer_time_after=datetime.timedelta(minutes=1),
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -143,7 +143,7 @@ def test_reservation__update__overlaps_with_reservation_after_due_to_its_buffer(
     ReservationFactory.create(
         begin=blocking_begin,
         end=blocking_end,
-        reservation_unit=[reservation.reservation_unit.first()],
+        reservation_units=[reservation.reservation_units.first()],
         buffer_time_before=datetime.timedelta(minutes=1),
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -180,12 +180,12 @@ def test_reservation__update__overlaps_with_reservation_before_due_to_own_buffer
         begin=begin,
         end=end,
         # Use reservation unit buffer!
-        reservation_unit__buffer_time_before=datetime.timedelta(minutes=1),
+        reservation_units__buffer_time_before=datetime.timedelta(minutes=1),
     )
     ReservationFactory.create(
         begin=blocking_begin,
         end=blocking_end,
-        reservation_unit=[reservation.reservation_unit.first()],
+        reservation_units=[reservation.reservation_units.first()],
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
     )
@@ -226,12 +226,12 @@ def test_reservation__update__overlaps_with_reservation_after_due_to_own_buffer(
         begin=begin,
         end=end,
         # Use reservation unit buffer!
-        reservation_unit__buffer_time_after=datetime.timedelta(minutes=1),
+        reservation_units__buffer_time_after=datetime.timedelta(minutes=1),
     )
     ReservationFactory.create(
         begin=blocking_begin,
         end=blocking_end,
-        reservation_unit=[reservation.reservation_unit.first()],
+        reservation_units=[reservation.reservation_units.first()],
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
     )
@@ -271,7 +271,7 @@ def test_reservation__update__reservation_unit_closed(graphql):
 
 
 def test_reservation__update__reservation_unit_closed__opening_hours_are_ignored(graphql):
-    reservation = ReservationFactory.create_for_update(reservation_unit__allow_reservations_without_opening_hours=True)
+    reservation = ReservationFactory.create_for_update(reservation_units__allow_reservations_without_opening_hours=True)
 
     now = local_datetime()
     last_hour = now.replace(minute=0, second=0, microsecond=0)
@@ -298,7 +298,7 @@ def test_reservation__update__reservation_unit_in_open_application_round(graphql
     end = begin + datetime.timedelta(hours=1)
 
     ApplicationRoundFactory.create_in_status_open(
-        reservation_units=[reservation.reservation_unit.first()],
+        reservation_units=[reservation.reservation_units.first()],
         reservation_period_begin=begin.date(),
         reservation_period_end=end.date(),
     )
@@ -312,7 +312,7 @@ def test_reservation__update__reservation_unit_in_open_application_round(graphql
 
 def test_reservation__update__reservation_unit_max_reservation_duration_exceeded(graphql):
     reservation = ReservationFactory.create_for_update(
-        reservation_unit__max_reservation_duration=datetime.timedelta(minutes=30),
+        reservation_units__max_reservation_duration=datetime.timedelta(minutes=30),
     )
 
     graphql.login_with_superuser()
@@ -324,7 +324,7 @@ def test_reservation__update__reservation_unit_max_reservation_duration_exceeded
 
 def test_reservation__update__update_fails_when_reservation_unit_min_reservation_duration_subceeded(graphql):
     reservation = ReservationFactory.create_for_update(
-        reservation_unit__min_reservation_duration=datetime.timedelta(hours=3),
+        reservation_units__min_reservation_duration=datetime.timedelta(hours=3),
     )
 
     graphql.login_with_superuser()
@@ -370,7 +370,7 @@ def test_reservation__update__confirm(graphql):
 def test_reservation__update__all_required_fields_are_filled(graphql):
     metadata_set = ReservationMetadataSetFactory.create_basic()
     reservation = ReservationFactory.create_for_update(
-        reservation_unit__metadata_set=metadata_set,
+        reservation_units__metadata_set=metadata_set,
     )
 
     data = get_update_data(reservation)
@@ -406,7 +406,10 @@ def test_reservation__update__missing_reservee_id_for_unregistered_organisation(
             "reservee_id",
         ],
     )
-    reservation = ReservationFactory.create_for_update(reservation_unit__metadata_set=metadata_set)
+    reservation = ReservationFactory.create_for_update(
+        reservation_units__metadata_set=metadata_set,
+        reservee_id="",
+    )
 
     data = get_update_data(reservation)
     data["reserveeFirstName"] = "John"
@@ -441,7 +444,7 @@ def test_reservation__update__missing_home_city_for_individual(graphql):
             "home_city",
         ],
     )
-    reservation = ReservationFactory.create_for_update(reservation_unit__metadata_set=metadata_set)
+    reservation = ReservationFactory.create_for_update(reservation_units__metadata_set=metadata_set)
     CityFactory.create(name="Helsinki")  # Create some city, but it should not be used
 
     data = get_update_data(reservation)
@@ -476,7 +479,10 @@ def test_reservation__update__missing_reservee_id_for_individual(graphql):
             "reservee_id",
         ],
     )
-    reservation = ReservationFactory.create_for_update(reservation_unit__metadata_set=metadata_set)
+    reservation = ReservationFactory.create_for_update(
+        reservation_units__metadata_set=metadata_set,
+        reservee_id="",
+    )
     CityFactory.create(name="Helsinki")  # Create some city, but it should not be used
 
     data = get_update_data(reservation)
@@ -511,7 +517,10 @@ def test_reservation__update__missing_reservee_organisation_name_for_individual(
             "reservee_organisation_name",
         ],
     )
-    reservation = ReservationFactory.create_for_update(reservation_unit__metadata_set=metadata_set)
+    reservation = ReservationFactory.create_for_update(
+        reservation_units__metadata_set=metadata_set,
+        reservee_organisation_name="",
+    )
     CityFactory.create(name="Helsinki")  # Create some city, but it should not be used
 
     data = get_update_data(reservation)
@@ -533,9 +542,7 @@ def test_reservation__update__missing_reservee_organisation_name_for_individual(
 
 def test_reservation__update__some_required_fields_are_missing(graphql):
     metadata_set = ReservationMetadataSetFactory.create_basic()
-    reservation = ReservationFactory.create_for_update(
-        reservation_unit__metadata_set=metadata_set,
-    )
+    reservation = ReservationFactory.create_for_update(reservation_units__metadata_set=metadata_set, reservee_phone="")
 
     data = get_update_data(reservation)
     data["reserveeFirstName"] = "John"
@@ -549,7 +556,7 @@ def test_reservation__update__some_required_fields_are_missing(graphql):
 
 
 def test_reservation__update__already_has_max_reservations_per_user(graphql):
-    reservation = ReservationFactory.create_for_update(reservation_unit__max_reservations_per_user=1)
+    reservation = ReservationFactory.create_for_update(reservation_units__max_reservations_per_user=1)
 
     graphql.login_with_superuser()
     update_data = get_update_data(reservation)
@@ -578,7 +585,7 @@ def test_reservation__update__price_calculation_not_triggered_if_time_not_change
     ReservationUnitPricingFactory.create(
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
         status=PricingStatus.PRICING_STATUS_ACTIVE,
-        reservation_unit=reservation.reservation_unit.first(),
+        reservation_unit=reservation.reservation_units.first(),
         highest_price=Decimal("20.0"),
     )
 
@@ -608,7 +615,7 @@ def test_reservation__update__price_calculation_triggered_if_begin_changes(graph
     pricing = ReservationUnitPricingFactory.create(
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
         status=PricingStatus.PRICING_STATUS_ACTIVE,
-        reservation_unit=reservation.reservation_unit.first(),
+        reservation_unit=reservation.reservation_units.first(),
         highest_price=Decimal("20.0"),
     )
 
@@ -643,7 +650,7 @@ def test_reservation__update__price_calculation_triggered_if_end_changes(graphql
     pricing = ReservationUnitPricingFactory.create(
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
         status=PricingStatus.PRICING_STATUS_ACTIVE,
-        reservation_unit=reservation.reservation_unit.first(),
+        reservation_unit=reservation.reservation_units.first(),
         highest_price=Decimal("20.0"),
     )
 
@@ -679,7 +686,7 @@ def test_reservation__update__price_calculation_triggered_if_unit_changes(graphq
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
         status=PricingStatus.PRICING_STATUS_ACTIVE,
         highest_price=Decimal("20.0"),
-        reservation_unit__origin_hauki_resource=reservation.reservation_unit.first().origin_hauki_resource,
+        reservation_unit__origin_hauki_resource=reservation.reservation_units.first().origin_hauki_resource,
     )
 
     graphql.login_with_superuser()
@@ -717,7 +724,7 @@ def test_reservation__update__price_calculation_uses_to_future_pricing(graphql):
         status=PricingStatus.PRICING_STATUS_ACTIVE,
         highest_price=Decimal("20.0"),
         tax_percentage__value=Decimal("25.5"),
-        reservation_unit=reservation.reservation_unit.first(),
+        reservation_unit=reservation.reservation_units.first(),
     )
 
     pricing = ReservationUnitPricingFactory.create(
@@ -726,7 +733,7 @@ def test_reservation__update__price_calculation_uses_to_future_pricing(graphql):
         status=PricingStatus.PRICING_STATUS_FUTURE,
         highest_price=Decimal("30.0"),
         tax_percentage__value=Decimal("25.5"),
-        reservation_unit=reservation.reservation_unit.first(),
+        reservation_unit=reservation.reservation_units.first(),
     )
 
     graphql.login_with_superuser()

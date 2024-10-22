@@ -373,7 +373,6 @@ def test_reservation_unit__query__all_many_to_many_relations(graphql):
 
     fields = """
         pk
-
         spaces {
             nameFi
         }
@@ -395,11 +394,10 @@ def test_reservation_unit__query__all_many_to_many_relations(graphql):
         qualifiers {
             nameFi
         }
-
         applicationRounds {
             nameFi
         }
-        reservationSet {
+        reservations {
             begin
         }
     """
@@ -413,7 +411,7 @@ def test_reservation_unit__query__all_many_to_many_relations(graphql):
         payment_types=[ReservationUnitPaymentTypeFactory.create()],
         qualifiers=[QualifierFactory.create()],
         application_rounds=[ApplicationRoundFactory.create()],
-        reservation_set=[ReservationFactory.create()],
+        reservations=[ReservationFactory.create()],
     )
     query = reservation_units_query(fields=fields)
     response = graphql(query)
@@ -466,9 +464,9 @@ def test_reservation_unit__query__all_many_to_many_relations(graphql):
                 "nameFi": reservation_unit.application_rounds.first().name_fi,
             },
         ],
-        "reservationSet": [
+        "reservations": [
             {
-                "begin": reservation_unit.reservation_set.first().begin.isoformat(),
+                "begin": reservation_unit.reservations.first().begin.isoformat(),
             },
         ],
     }

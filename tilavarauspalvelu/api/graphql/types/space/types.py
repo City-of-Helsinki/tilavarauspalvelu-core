@@ -29,7 +29,7 @@ class SpaceNode(DjangoNode):
             "parent",
             "building",
             "unit",
-            "resource_set",
+            "resources",
             "children",
         ]
         filterset_class = SpaceFilterSet

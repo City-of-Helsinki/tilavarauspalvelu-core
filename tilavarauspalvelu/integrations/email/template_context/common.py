@@ -165,7 +165,7 @@ def params_for_base_info(
     language: Lang,
 ) -> dict[str, Any]:
     # Currently, there is ever only one reservation unit per reservation.
-    primary: ReservationUnit = reservation.reservation_unit.select_related("unit__location").first()
+    primary: ReservationUnit = reservation.reservation_units.select_related("unit__location").first()
 
     return {
         "reservation_unit_name": get_attr_by_language(primary, "name", language),

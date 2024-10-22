@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .queryset import ReservationMetadataSetQuerySet
+from .queryset import ReservationMetadataSetManager
 
 if TYPE_CHECKING:
     from .actions import ReservationMetadataSetActions
@@ -18,7 +18,8 @@ __all__ = [
 
 
 class ReservationMetadataSet(models.Model):
-    name = models.CharField(max_length=100, unique=True)
+    name: str = models.CharField(max_length=100, unique=True)
+
     supported_fields = models.ManyToManyField(
         "tilavarauspalvelu.ReservationMetadataField",
         related_name="metadata_sets_supported",
@@ -29,13 +30,13 @@ class ReservationMetadataSet(models.Model):
         blank=True,
     )
 
-    objects = ReservationMetadataSetQuerySet.as_manager()
+    objects = ReservationMetadataSetManager()
 
     class Meta:
         db_table = "reservation_metadata_set"
         base_manager_name = "objects"
-        verbose_name = _("Reservation metadata set")
-        verbose_name_plural = _("Reservation metadata sets")
+        verbose_name = _("reservation metadata set")
+        verbose_name_plural = _("reservation metadata sets")
         ordering = ["pk"]
 
     def __str__(self) -> str:

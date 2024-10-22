@@ -29,6 +29,6 @@ def test_reservation_purpose__query(graphql):
     assert response.node() == {
         "pk": res_purpose.pk,
         "nameFi": res_purpose.name_fi,
-        "nameSv": res_purpose.name_en,
-        "nameEn": res_purpose.name_sv,
+        "nameSv": res_purpose.name_sv,
+        "nameEn": res_purpose.name_en,
     }

@@ -11,6 +11,12 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import ApplicationRound
 
 
+__all__ = [
+    "ApplicationRoundManager",
+    "ApplicationRoundQuerySet",
+]
+
+
 class ApplicationRoundQuerySet(QuerySet):
     def active(self) -> Self:
         return self.filter(sent_date=None)
@@ -38,15 +44,15 @@ class ApplicationRoundQuerySet(QuerySet):
 
         units = (
             Unit.objects.prefetch_related("unit_groups")
-            .filter(reservationunit__application_rounds__in=items)
+            .filter(reservation_units__application_rounds__in=items)
             .annotate(
                 application_round_ids=Coalesce(
                     ArrayAgg(
-                        "reservationunit__application_rounds",
+                        "reservation_units__application_rounds",
                         distinct=True,
                         filter=(
-                            models.Q(reservationunit__isnull=False)
-                            & models.Q(reservationunit__application_rounds__isnull=False)
+                            models.Q(reservation_units__isnull=False)
+                            & models.Q(reservation_units__application_rounds__isnull=False)
                         ),
                     ),
                     models.Value([]),
@@ -57,3 +63,6 @@ class ApplicationRoundQuerySet(QuerySet):
 
         for item in items:
             item.units_for_permissions = [unit for unit in units if item.pk in unit.application_round_ids]
+
+
+class ApplicationRoundManager(models.Manager.from_queryset(ApplicationRoundQuerySet)): ...

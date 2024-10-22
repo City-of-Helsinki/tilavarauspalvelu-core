@@ -4,6 +4,7 @@ from functools import cached_property
 from typing import TYPE_CHECKING
 
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from .queryset import RealEstateManager
 
@@ -11,6 +12,11 @@ if TYPE_CHECKING:
     from decimal import Decimal
 
     from .actions import RealEstateActions
+
+
+__all__ = [
+    "RealEstate",
+]
 
 
 class RealEstate(models.Model):
@@ -27,6 +33,8 @@ class RealEstate(models.Model):
     class Meta:
         db_table = "real_estate"
         base_manager_name = "objects"
+        verbose_name = _("real estate")
+        verbose_name_plural = _("real estates")
         ordering = ["pk"]
 
     def __str__(self) -> str:

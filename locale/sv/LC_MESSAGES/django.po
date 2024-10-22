@@ -86,7 +86,6 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/address/admin.py
 #: tilavarauspalvelu/admin/payment_merchant/admin.py
-#: tilavarauspalvelu/models/city/model.py
 msgid "City"
 msgstr ""
 
@@ -103,13 +102,11 @@ msgstr ""
 #: tilavarauspalvelu/admin/allocated_timeslot/admin.py
 #: tilavarauspalvelu/admin/application/admin.py
 #: tilavarauspalvelu/admin/application_section/form.py
-#: tilavarauspalvelu/models/application/model.py
 msgid "Application"
 msgstr ""
 
 #: tilavarauspalvelu/admin/allocated_timeslot/filters.py
 #: tilavarauspalvelu/admin/application/filters.py
-#: tilavarauspalvelu/models/application_round/model.py
 msgid "Application Round"
 msgstr ""
 
@@ -283,7 +280,6 @@ msgid "Application round"
 msgstr ""
 
 #: tilavarauspalvelu/admin/application/form.py
-#: tilavarauspalvelu/models/organisation/model.py
 msgid "Organisation"
 msgstr ""
 
@@ -809,7 +805,6 @@ msgid "Organisation type"
 msgstr ""
 
 #: tilavarauspalvelu/admin/organisation/admin.py
-#: tilavarauspalvelu/models/address/model.py
 msgid "Address"
 msgstr ""
 
@@ -1698,7 +1693,6 @@ msgid "Publish ends"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-#: tilavarauspalvelu/models/reservation_metadata_set/model.py
 msgid "Reservation metadata set"
 msgstr ""
 
@@ -1959,7 +1953,6 @@ msgid "Stack Info"
 msgstr ""
 
 #: tilavarauspalvelu/admin/sql_log/admin.py
-#: tilavarauspalvelu/models/request_log/model.py
 msgid "Request log"
 msgstr ""
 
@@ -3088,8 +3081,20 @@ msgctxt "Email"
 msgid "You can view and handle the booking at"
 msgstr "Du kan se bokningen på"
 
+#: tilavarauspalvelu/models/ability_group/model.py
+msgid "ability group"
+msgstr ""
+
+#: tilavarauspalvelu/models/ability_group/model.py
+msgid "ability groups"
+msgstr ""
+
 #: tilavarauspalvelu/models/address/model.py
-msgid "Addresses"
+msgid "address"
+msgstr ""
+
+#: tilavarauspalvelu/models/address/model.py
+msgid "addresses"
 msgstr ""
 
 #: tilavarauspalvelu/models/affecting_time_span/model.py
@@ -3100,12 +3105,20 @@ msgstr ""
 msgid "affecting time spans"
 msgstr ""
 
-#: tilavarauspalvelu/models/allocated_timeslot/model.py
-msgid "Allocated Time Slot"
+#: tilavarauspalvelu/models/age_group/model.py
+msgid "age group"
+msgstr ""
+
+#: tilavarauspalvelu/models/age_group/model.py
+msgid "age groups"
 msgstr ""
 
 #: tilavarauspalvelu/models/allocated_timeslot/model.py
-msgid "Allocated Time Slots"
+msgid "allocated time slot"
+msgstr ""
+
+#: tilavarauspalvelu/models/allocated_timeslot/model.py
+msgid "allocated time slots"
 msgstr ""
 
 #: tilavarauspalvelu/models/allocated_timeslot/model.py
@@ -3114,27 +3127,35 @@ msgid "Begin time must be before end time."
 msgstr ""
 
 #: tilavarauspalvelu/models/application/model.py
-msgid "Applications"
+msgid "application"
+msgstr ""
+
+#: tilavarauspalvelu/models/application/model.py
+msgid "applications"
 msgstr ""
 
 #: tilavarauspalvelu/models/application_round/model.py
-msgid "Application Rounds"
+msgid "application round"
+msgstr ""
+
+#: tilavarauspalvelu/models/application_round/model.py
+msgid "application rounds"
 msgstr ""
 
 #: tilavarauspalvelu/models/application_round_time_slot/model.py
-msgid "Application Round Time Slot"
+msgid "application round time slot"
 msgstr ""
 
 #: tilavarauspalvelu/models/application_round_time_slot/model.py
-msgid "Application Round Time Slots"
+msgid "application round time slots"
 msgstr ""
 
 #: tilavarauspalvelu/models/application_section/model.py
-msgid "Application Section"
+msgid "application section"
 msgstr ""
 
 #: tilavarauspalvelu/models/application_section/model.py
-msgid "Application Sections"
+msgid "application sections"
 msgstr ""
 
 #: tilavarauspalvelu/models/application_section/model.py
@@ -3157,6 +3178,14 @@ msgid ""
 msgstr ""
 
 #: tilavarauspalvelu/models/banner_notification/model.py
+msgid "banner notification"
+msgstr ""
+
+#: tilavarauspalvelu/models/banner_notification/model.py
+msgid "banner notifications"
+msgstr ""
+
+#: tilavarauspalvelu/models/banner_notification/model.py
 msgid "Non-draft notifications must have an active period and message set."
 msgstr ""
 
@@ -3166,16 +3195,84 @@ msgid ""
 "are set, 'active_until' must be after 'active_from'."
 msgstr ""
 
+#: tilavarauspalvelu/models/building/model.py
+msgid "building"
+msgstr ""
+
+#: tilavarauspalvelu/models/building/model.py
+msgid "buildings"
+msgstr ""
+
 #: tilavarauspalvelu/models/city/model.py
-msgid "Cities"
+msgid "city"
+msgstr ""
+
+#: tilavarauspalvelu/models/city/model.py
+msgid "cities"
+msgstr ""
+
+#: tilavarauspalvelu/models/equipment/model.py
+msgid "equipment"
+msgstr ""
+
+#: tilavarauspalvelu/models/equipment/model.py
+msgid "equipments"
+msgstr ""
+
+#: tilavarauspalvelu/models/equipment_category/model.py
+msgid "equipment category"
+msgstr ""
+
+#: tilavarauspalvelu/models/equipment_category/model.py
+msgid "equipment categories"
 msgstr ""
 
 #: tilavarauspalvelu/models/general_role/model.py
-msgid "General role"
+msgid "general role"
 msgstr ""
 
 #: tilavarauspalvelu/models/general_role/model.py
-msgid "General roles"
+msgid "general roles"
+msgstr ""
+
+#: tilavarauspalvelu/models/introduction/model.py
+msgid "introduction"
+msgstr ""
+
+#: tilavarauspalvelu/models/introduction/model.py
+msgid "introductions"
+msgstr ""
+
+#: tilavarauspalvelu/models/keyword/model.py
+msgid "keyword"
+msgstr ""
+
+#: tilavarauspalvelu/models/keyword/model.py
+msgid "keywords"
+msgstr ""
+
+#: tilavarauspalvelu/models/keyword_category/model.py
+msgid "keyword category"
+msgstr ""
+
+#: tilavarauspalvelu/models/keyword_category/model.py
+msgid "keyword categories"
+msgstr ""
+
+#: tilavarauspalvelu/models/keyword_group/model.py
+msgid "keyword group"
+msgstr ""
+
+#: tilavarauspalvelu/models/keyword_group/model.py
+msgid "keyword groups"
+msgstr ""
+
+#: tilavarauspalvelu/models/location/model.py
+msgid "location"
+msgstr ""
+
+#: tilavarauspalvelu/models/location/model.py
+msgid "locations"
 msgstr ""
 
 #: tilavarauspalvelu/models/organisation/model.py
@@ -3183,13 +3280,49 @@ msgid "is after current year"
 msgstr ""
 
 #: tilavarauspalvelu/models/organisation/model.py
-msgid "Organisations"
+msgid "organisation"
+msgstr ""
+
+#: tilavarauspalvelu/models/organisation/model.py
+msgid "organisations"
+msgstr ""
+
+#: tilavarauspalvelu/models/origin_hauki_resource/model.py
+msgid "origin hauki resource"
+msgstr ""
+
+#: tilavarauspalvelu/models/origin_hauki_resource/model.py
+msgid "origin hauki resources"
+msgstr ""
+
+#: tilavarauspalvelu/models/payment_accounting/model.py
+msgid "payment accounting"
+msgstr ""
+
+#: tilavarauspalvelu/models/payment_accounting/model.py
+msgid "payment accountings"
 msgstr ""
 
 #: tilavarauspalvelu/models/payment_accounting/model.py
 msgid ""
 "One of the following fields must be given: internal_order, profit_center, "
 "project"
+msgstr ""
+
+#: tilavarauspalvelu/models/payment_merchant/model.py
+msgid "payment merchant"
+msgstr ""
+
+#: tilavarauspalvelu/models/payment_merchant/model.py
+msgid "payment merchants"
+msgstr ""
+
+#: tilavarauspalvelu/models/payment_order/model.py
+msgid "payment order"
+msgstr ""
+
+#: tilavarauspalvelu/models/payment_order/model.py
+msgid "payment orders"
 msgstr ""
 
 #: tilavarauspalvelu/models/payment_order/model.py
@@ -3204,24 +3337,78 @@ msgstr ""
 msgid "Must be the sum of net and vat amounts"
 msgstr ""
 
-#: tilavarauspalvelu/models/person/model.py
-msgid "Person"
+#: tilavarauspalvelu/models/payment_product/model.py
+msgid "payment product"
+msgstr ""
+
+#: tilavarauspalvelu/models/payment_product/model.py
+msgid "payment products"
 msgstr ""
 
 #: tilavarauspalvelu/models/person/model.py
-msgid "Persons"
+msgid "person"
+msgstr ""
+
+#: tilavarauspalvelu/models/person/model.py
+msgid "persons"
+msgstr ""
+
+#: tilavarauspalvelu/models/personal_info_view_log/model.py
+msgid "personal info view log"
+msgstr ""
+
+#: tilavarauspalvelu/models/personal_info_view_log/model.py
+msgid "personal info view logs"
+msgstr ""
+
+#: tilavarauspalvelu/models/purpose/model.py
+msgid "purpose"
+msgstr ""
+
+#: tilavarauspalvelu/models/purpose/model.py
+msgid "purposes"
+msgstr ""
+
+#: tilavarauspalvelu/models/qualifier/model.py
+msgid "qualifier"
+msgstr ""
+
+#: tilavarauspalvelu/models/qualifier/model.py
+msgid "qualifiers"
+msgstr ""
+
+#: tilavarauspalvelu/models/real_estate/model.py
+msgid "real estate"
+msgstr ""
+
+#: tilavarauspalvelu/models/real_estate/model.py
+msgid "real estates"
+msgstr ""
+
+#: tilavarauspalvelu/models/recurring_reservation/model.py
+msgid "recurring reservation"
+msgstr ""
+
+#: tilavarauspalvelu/models/recurring_reservation/model.py
+msgid "recurring reservations"
 msgstr ""
 
 #: tilavarauspalvelu/models/rejected_occurrence/model.py
-msgid "Rejected occurrence"
+msgid "rejected occurrence"
 msgstr ""
 
 #: tilavarauspalvelu/models/rejected_occurrence/model.py
-msgid "Rejected occurrences"
+msgid "rejected occurrences"
 msgstr ""
 
 #: tilavarauspalvelu/models/request_log/model.py
-msgid "Request logs"
+#: tilavarauspalvelu/models/reservable_time_span/model.py
+msgid "request log"
+msgstr ""
+
+#: tilavarauspalvelu/models/request_log/model.py
+#: tilavarauspalvelu/models/reservable_time_span/model.py
+msgid "request logs"
 msgstr ""
 
 #: tilavarauspalvelu/models/reservable_time_span/model.py
@@ -3270,27 +3457,87 @@ msgid "My bookings"
 msgstr "Mina bokningar"
 
 #: tilavarauspalvelu/models/reservation/model.py
+msgid "reservation"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation/model.py
+msgid "reservations"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation/model.py
 msgid "Closed"
 msgstr ""
 
-#: tilavarauspalvelu/models/reservation_metadata_field/model.py
-msgid "Reservation metadata field"
+#: tilavarauspalvelu/models/reservation_cancel_reason/model.py
+msgid "reservation cancel reason"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_cancel_reason/model.py
+msgid "reservation cancel reasons"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_deny_reason/model.py
+msgid "reservation deny reason"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_deny_reason/model.py
+msgid "reservation deny reasons"
 msgstr ""
 
 #: tilavarauspalvelu/models/reservation_metadata_field/model.py
-msgid "Reservation metadata fields"
+msgid "reservation metadata field"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_metadata_field/model.py
+msgid "reservation metadata fields"
 msgstr ""
 
 #: tilavarauspalvelu/models/reservation_metadata_set/model.py
-msgid "Reservation metadata sets"
+msgid "reservation metadata set"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_metadata_set/model.py
+msgid "reservation metadata sets"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_purpose/model.py
+msgid "reservation purpose"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_purpose/model.py
+msgid "reservation purposes"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_statistic/model.py
+msgid "reservation statistic"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_statistic/model.py
+msgid "reservation statistics"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_statistic_unit/model.py
+msgid "reservation statistics reservation unit"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_statistic_unit/model.py
+msgid "reservation statistics reservation units"
 msgstr ""
 
 #: tilavarauspalvelu/models/reservation_unit/model.py
-msgid "Reservation Unit"
+msgid "reservation unit"
 msgstr ""
 
 #: tilavarauspalvelu/models/reservation_unit/model.py
-msgid "Reservation Units"
+msgid "reservation units"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_unit_cancellation_rule/model.py
+msgid "reservation unit cancellation rule"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_unit_cancellation_rule/model.py
+msgid "reservation unit cancellation rules"
 msgstr ""
 
 #: tilavarauspalvelu/models/reservation_unit_hierarchy/model.py
@@ -3301,16 +3548,80 @@ msgstr ""
 msgid "reservation unit hierarchies"
 msgstr ""
 
-#: tilavarauspalvelu/models/reservation_unit_option/model.py
-msgid "Reservation Unit Option"
+#: tilavarauspalvelu/models/reservation_unit_image/model.py
+msgid "reservation unit image"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_unit_image/model.py
+msgid "reservation unit images"
 msgstr ""
 
 #: tilavarauspalvelu/models/reservation_unit_option/model.py
-msgid "Reservation Unit Options"
+msgid "reservation unit option"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_unit_option/model.py
+msgid "reservation unit options"
 msgstr ""
 
 #: tilavarauspalvelu/models/reservation_unit_option/model.py
 msgid "Preferred order must be unique for each application section"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_unit_payment_type/model.py
+msgid "reservation unit payment type"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_unit_payment_type/model.py
+msgid "reservation unit payment types"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_unit_pricing/model.py
+msgid "reservation unit pricing"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_unit_pricing/model.py
+msgid "reservation unit pricings"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_unit_type/model.py
+msgid "reservation unit type"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_unit_type/model.py
+msgid "reservation unit types"
+msgstr ""
+
+#: tilavarauspalvelu/models/resource/model.py
+msgid "resource"
+msgstr ""
+
+#: tilavarauspalvelu/models/resource/model.py
+msgid "resources"
+msgstr ""
+
+#: tilavarauspalvelu/models/service/model.py
+msgid "service"
+msgstr ""
+
+#: tilavarauspalvelu/models/service/model.py
+msgid "services"
+msgstr ""
+
+#: tilavarauspalvelu/models/service_sector/model.py
+msgid "service sector"
+msgstr ""
+
+#: tilavarauspalvelu/models/service_sector/model.py
+msgid "service sectors"
+msgstr ""
+
+#: tilavarauspalvelu/models/space/model.py
+msgid "space"
+msgstr ""
+
+#: tilavarauspalvelu/models/space/model.py
+msgid "spaces"
 msgstr ""
 
 #: tilavarauspalvelu/models/sql_log/model.py
@@ -3322,15 +3633,23 @@ msgid "SQL logs"
 msgstr ""
 
 #: tilavarauspalvelu/models/suitable_time_range/model.py
-msgid "Suitable Time Range"
+msgid "suitable time range"
 msgstr ""
 
 #: tilavarauspalvelu/models/suitable_time_range/model.py
-msgid "Suitable Time Ranges"
+msgid "suitable time ranges"
 msgstr ""
 
 #: tilavarauspalvelu/models/suitable_time_range/model.py
 msgid "Begin and end times must be a multiples of 60 minutes."
+msgstr ""
+
+#: tilavarauspalvelu/models/tax_percentage/model.py
+msgid "tax percentage"
+msgstr ""
+
+#: tilavarauspalvelu/models/tax_percentage/model.py
+msgid "tax percentages"
 msgstr ""
 
 #: tilavarauspalvelu/models/terms_of_use/model.py
@@ -3343,28 +3662,36 @@ msgctxt "plural"
 msgid "terms of use"
 msgstr ""
 
-#: tilavarauspalvelu/models/unit_role/model.py
-msgid "Unit role"
+#: tilavarauspalvelu/models/unit/model.py
+msgid "unit"
+msgstr ""
+
+#: tilavarauspalvelu/models/unit/model.py
+msgid "units"
+msgstr ""
+
+#: tilavarauspalvelu/models/unit_group/model.py
+msgid "unit group"
+msgstr ""
+
+#: tilavarauspalvelu/models/unit_group/model.py
+msgid "unit groups"
 msgstr ""
 
 #: tilavarauspalvelu/models/unit_role/model.py
-msgid "Unit roles"
+msgid "unit role"
+msgstr ""
+
+#: tilavarauspalvelu/models/unit_role/model.py
+msgid "unit roles"
 msgstr ""
 
 #: tilavarauspalvelu/models/user/model.py
-msgid "Preferred UI language"
+msgid "user"
 msgstr ""
 
 #: tilavarauspalvelu/models/user/model.py
-msgid "Reservation notification"
-msgstr ""
-
-#: tilavarauspalvelu/models/user/model.py
-msgid "Date of birth"
-msgstr ""
-
-#: tilavarauspalvelu/tasks.py
-msgid "Core business"
+msgid "users"
 msgstr ""
 
 #: tilavarauspalvelu/tasks.py

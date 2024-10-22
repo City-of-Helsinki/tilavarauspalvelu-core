@@ -190,8 +190,8 @@ def test__find_first_reservable_time_span_for_reservation_unit__different_buffer
     Reservations exist at 01-02 and 04-05.
     Reservable time spans are at 02-04 and 05-09 (Reservation buffers may shorten these).
     """
-    origin_hauki_resource = OriginHaukiResourceFactory(
-        id="999",
+    origin_hauki_resource = OriginHaukiResourceFactory.create(
+        id=999,
         opening_hours_hash="test_hash",
         latest_fetched_date=date(2024, 12, 31),
     )
@@ -216,7 +216,7 @@ def test__find_first_reservable_time_span_for_reservation_unit__different_buffer
         ),
     ]
 
-    original_reservable_time_span = ReservableTimeSpanFactory(
+    original_reservable_time_span = ReservableTimeSpanFactory.create(
         resource=origin_hauki_resource,
         start_datetime=reservable_time_spans[0].start_datetime,
         end_datetime=reservable_time_spans[1].end_datetime,
@@ -260,8 +260,8 @@ def test__find_first_reservable_time_span_for_reservation_unit__buffer_goes_thro
     # │ ░░░░░░░░▁▁▁▁░░░░████░░░░▁▁▁▁░░░░▁▁▁▁░░░░░░░░ │
     # │                         ────────══────────   │
 
-    origin_hauki_resource = OriginHaukiResourceFactory(
-        id="999",
+    origin_hauki_resource = OriginHaukiResourceFactory.create(
+        id=999,
         opening_hours_hash="test_hash",
         latest_fetched_date=date(2024, 12, 31),
     )
@@ -272,7 +272,7 @@ def test__find_first_reservable_time_span_for_reservation_unit__buffer_goes_thro
         reservation_start_interval=ReservationStartInterval.INTERVAL_30_MINUTES.value,
     )
 
-    original_reservable_time_span = ReservableTimeSpanFactory(
+    original_reservable_time_span = ReservableTimeSpanFactory.create(
         resource=origin_hauki_resource,
         start_datetime=_time(hour=2),
         end_datetime=_time(hour=9),
@@ -310,7 +310,7 @@ def test__find_first_reservable_time_span_for_reservation_unit__interval_is_long
     # │ ░░░░░░░░░░░░▁▁▁▁████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
     # │                     ════════                 │
 
-    origin_hauki_resource = OriginHaukiResourceFactory(id="999", latest_fetched_date=date(2024, 12, 31))
+    origin_hauki_resource = OriginHaukiResourceFactory.create(id=999, latest_fetched_date=date(2024, 12, 31))
     reservation_unit = ReservationUnitFactory(
         origin_hauki_resource=origin_hauki_resource,
         min_reservation_duration=timedelta(minutes=15),
@@ -322,7 +322,7 @@ def test__find_first_reservable_time_span_for_reservation_unit__interval_is_long
         TimeSpanElement(start_datetime=_time(hour=3), end_datetime=_time(hour=4), is_reservable=True),
         TimeSpanElement(start_datetime=_time(hour=5), end_datetime=_time(hour=9), is_reservable=True),
     ]
-    original_reservable_time_span = ReservableTimeSpanFactory(
+    original_reservable_time_span = ReservableTimeSpanFactory.create(
         resource=origin_hauki_resource,
         start_datetime=reservable_time_spans[0].start_datetime,
         end_datetime=reservable_time_spans[1].end_datetime,

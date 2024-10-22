@@ -29,8 +29,8 @@ def test_reservation_unit_cancellation_rules__query(graphql):
     assert response.node() == {
         "pk": rules.pk,
         "nameFi": rules.name_fi,
-        "nameSv": rules.name_en,
-        "nameEn": rules.name_sv,
+        "nameSv": rules.name_sv,
+        "nameEn": rules.name_en,
     }
 
 

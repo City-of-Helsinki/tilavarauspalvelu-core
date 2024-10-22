@@ -4,8 +4,9 @@ from functools import cached_property
 from typing import TYPE_CHECKING
 
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
-from .queryset import KeywordGroupQuerySet
+from .queryset import KeywordGroupManager
 
 if TYPE_CHECKING:
     from .actions import KeywordGroupActions
@@ -25,11 +26,13 @@ class KeywordGroup(models.Model):
     name_sv: str | None
     name_en: str | None
 
-    objects = KeywordGroupQuerySet.as_manager()
+    objects = KeywordGroupManager()
 
     class Meta:
         db_table = "keyword_group"
         base_manager_name = "objects"
+        verbose_name = _("keyword group")
+        verbose_name_plural = _("keyword groups")
         ordering = ["pk"]
 
     def __str__(self) -> str:

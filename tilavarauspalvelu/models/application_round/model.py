@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import date, datetime, timedelta
+import datetime
 from functools import cached_property
 from typing import TYPE_CHECKING
 
@@ -17,10 +17,10 @@ from tilavarauspalvelu.enums import (
 from utils.date_utils import local_datetime
 from utils.db import NowTT
 
-from .queryset import ApplicationRoundQuerySet
+from .queryset import ApplicationRoundManager
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import Unit
+    from tilavarauspalvelu.models import TermsOfUse, Unit
 
     from .actions import ApplicationRoundActions
 
@@ -43,19 +43,19 @@ class ApplicationRound(models.Model):
     notes_when_applying: str = models.TextField(blank=True, default="")
 
     # When the application round accepts reservations
-    application_period_begin: datetime = models.DateTimeField()
-    application_period_end: datetime = models.DateTimeField()
+    application_period_begin: datetime.datetime = models.DateTimeField()
+    application_period_end: datetime.datetime = models.DateTimeField()
 
     # Period where the application in the application round are being allocated to
-    reservation_period_begin: date = models.DateField()
-    reservation_period_end: date = models.DateField()
+    reservation_period_begin: datetime.date = models.DateField()
+    reservation_period_end: datetime.date = models.DateField()
 
     # When the application round is visible to the public
-    public_display_begin: datetime = models.DateTimeField()
-    public_display_end: datetime = models.DateTimeField()
+    public_display_begin: datetime.datetime = models.DateTimeField()
+    public_display_end: datetime.datetime = models.DateTimeField()
 
-    handled_date: datetime | None = models.DateTimeField(null=True, blank=True, default=None)
-    sent_date: datetime | None = models.DateTimeField(null=True, blank=True, default=None)
+    handled_date: datetime.datetime | None = models.DateTimeField(null=True, blank=True, default=None)
+    sent_date: datetime.datetime | None = models.DateTimeField(null=True, blank=True, default=None)
 
     reservation_units = models.ManyToManyField(
         "tilavarauspalvelu.ReservationUnit",
@@ -65,15 +65,14 @@ class ApplicationRound(models.Model):
         "tilavarauspalvelu.ReservationPurpose",
         related_name="application_rounds",
     )
-    terms_of_use = models.ForeignKey(
+    terms_of_use: TermsOfUse | None = models.ForeignKey(
         "tilavarauspalvelu.TermsOfUse",
-        null=True,
-        blank=False,
-        on_delete=models.SET_NULL,
         related_name="application_rounds",
+        on_delete=models.SET_NULL,
+        null=True,
     )
 
-    objects = ApplicationRoundQuerySet.as_manager()
+    objects = ApplicationRoundManager()
 
     # Translated field hints
     name_fi: str | None
@@ -89,8 +88,8 @@ class ApplicationRound(models.Model):
     class Meta:
         db_table = "application_round"
         base_manager_name = "objects"
-        verbose_name = _("Application Round")
-        verbose_name_plural = _("Application Rounds")
+        verbose_name = _("application round")
+        verbose_name_plural = _("application rounds")
         ordering = ["pk"]
 
     def __str__(self) -> str:
@@ -141,7 +140,7 @@ class ApplicationRound(models.Model):
         return ApplicationRoundStatusChoice.IN_ALLOCATION
 
     @lookup_property(skip_codegen=True)
-    def status_timestamp() -> datetime:
+    def status_timestamp() -> datetime.datetime:
         return models.Case(  # type: ignore[return-value]
             models.When(
                 models.Q(sent_date__isnull=False),  # RESULTS_SENT
@@ -164,7 +163,7 @@ class ApplicationRound(models.Model):
         )
 
     @status_timestamp.override
-    def _(self) -> datetime:
+    def _(self) -> datetime.datetime:
         match self.status:
             case ApplicationRoundStatusChoice.UPCOMING:
                 return self.public_display_begin
@@ -222,7 +221,13 @@ class ApplicationRound(models.Model):
     def reservation_creation_status() -> ApplicationRoundReservationCreationStatusChoice:
         from tilavarauspalvelu.models import RecurringReservation
 
-        timeout = timedelta(minutes=settings.APPLICATION_ROUND_RESERVATION_CREATION_TIMEOUT_MINUTES)
+        timeout = datetime.timedelta(minutes=settings.APPLICATION_ROUND_RESERVATION_CREATION_TIMEOUT_MINUTES)
+
+        recurring_reservation_filters = {
+            "allocated_time_slot__reservation_unit_option__application_section__application__application_round": (
+                models.OuterRef("id")
+            )
+        }
 
         return models.Case(  # type: ignore[return-value]
             models.When(
@@ -230,13 +235,7 @@ class ApplicationRound(models.Model):
                 then=models.Value(ApplicationRoundReservationCreationStatusChoice.NOT_COMPLETED.value),
             ),
             models.When(
-                models.Exists(
-                    RecurringReservation.objects.filter(
-                        allocated_time_slot__reservation_unit_option__application_section__application__application_round=models.OuterRef(
-                            "id"
-                        )
-                    )
-                ),
+                models.Exists(RecurringReservation.objects.filter(**recurring_reservation_filters)),
                 then=models.Value(ApplicationRoundReservationCreationStatusChoice.COMPLETED.value),
             ),
             models.When(
@@ -252,7 +251,7 @@ class ApplicationRound(models.Model):
         from tilavarauspalvelu.models import RecurringReservation
 
         now = local_datetime()
-        timeout = timedelta(minutes=settings.APPLICATION_ROUND_RESERVATION_CREATION_TIMEOUT_MINUTES)
+        timeout = datetime.timedelta(minutes=settings.APPLICATION_ROUND_RESERVATION_CREATION_TIMEOUT_MINUTES)
 
         if self.handled_date is None:
             return ApplicationRoundReservationCreationStatusChoice.NOT_COMPLETED
@@ -275,7 +274,7 @@ class ApplicationRound(models.Model):
             return self._units_for_permissions
 
         self._units_for_permissions = list(
-            Unit.objects.filter(reservationunit__application_rounds=self).prefetch_related("unit_groups").distinct()
+            Unit.objects.filter(reservation_units__application_rounds=self).prefetch_related("unit_groups").distinct()
         )
         return self._units_for_permissions
 

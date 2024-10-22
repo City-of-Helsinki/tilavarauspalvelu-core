@@ -4,6 +4,7 @@ from functools import cached_property
 from typing import TYPE_CHECKING
 
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.enums import ServiceTypeChoices
 
@@ -22,6 +23,7 @@ __all__ = [
 
 class Service(models.Model):
     name: str = models.CharField(max_length=255)
+
     service_type: str = models.CharField(
         max_length=50,
         choices=ServiceTypeChoices.choices,
@@ -41,6 +43,8 @@ class Service(models.Model):
     class Meta:
         db_table = "service"
         base_manager_name = "objects"
+        verbose_name = _("service")
+        verbose_name_plural = _("services")
         ordering = ["pk"]
 
     def __str__(self) -> str:

@@ -6,22 +6,27 @@ from typing import TYPE_CHECKING
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .queryset import ReservationMetadataFieldQuerySet
+from .queryset import ReservationMetadataFieldManager
 
 if TYPE_CHECKING:
     from .actions import ReservationMetadataFieldActions
 
 
-class ReservationMetadataField(models.Model):
-    field_name = models.CharField(max_length=100, unique=True)
+__all__ = [
+    "ReservationMetadataField",
+]
 
-    objects = ReservationMetadataFieldQuerySet.as_manager()
+
+class ReservationMetadataField(models.Model):
+    field_name: str = models.CharField(max_length=100, unique=True)
+
+    objects = ReservationMetadataFieldManager()
 
     class Meta:
         db_table = "reservation_metadata_field"
         base_manager_name = "objects"
-        verbose_name = _("Reservation metadata field")
-        verbose_name_plural = _("Reservation metadata fields")
+        verbose_name = _("reservation metadata field")
+        verbose_name_plural = _("reservation metadata fields")
         ordering = ["pk"]
 
     def __str__(self) -> str:

@@ -28,7 +28,7 @@ def _get_dt(*, month=1, day=1, hour=None, minute=0) -> datetime.datetime:
 
 @pytest.fixture
 def reservation_unit() -> ReservationUnit:
-    origin_hauki_resource = OriginHaukiResourceFactory.create(id="999")
+    origin_hauki_resource = OriginHaukiResourceFactory.create(id=999)
     reservation_unit = ReservationUnitFactory.create(
         origin_hauki_resource=origin_hauki_resource,
         spaces=[SpaceFactory.create()],
@@ -44,7 +44,7 @@ def reservation_unit() -> ReservationUnit:
     ReservationFactory.create(
         begin=_get_dt(month=4, day=15, hour=12),
         end=_get_dt(month=4, day=15, hour=14),
-        reservation_unit=[reservation_unit],
+        reservation_units=[reservation_unit],
         state=ReservationStateChoice.CREATED.value,
     )
 

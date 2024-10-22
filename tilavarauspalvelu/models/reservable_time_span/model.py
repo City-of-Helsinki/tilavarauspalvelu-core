@@ -4,7 +4,6 @@ from functools import cached_property
 from typing import TYPE_CHECKING
 
 from django.db import models
-from django.db.models import F, Q
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
@@ -13,6 +12,10 @@ from utils.date_utils import DEFAULT_TIMEZONE
 from .queryset import ReservableTimeSpanManager
 
 if TYPE_CHECKING:
+    import datetime
+
+    from tilavarauspalvelu.models import OriginHaukiResource
+
     from .actions import ReservableTimeSpanActions
 
 
@@ -24,19 +27,21 @@ __all__ = [
 class ReservableTimeSpan(models.Model):
     """A time period on which a ReservationUnit is reservable."""
 
-    resource = models.ForeignKey(
+    resource: OriginHaukiResource = models.ForeignKey(
         "tilavarauspalvelu.OriginHaukiResource",
         related_name="reservable_time_spans",
         on_delete=models.CASCADE,
     )
-    start_datetime = models.DateTimeField(null=False, blank=False)
-    end_datetime = models.DateTimeField(null=False, blank=False)
+    start_datetime: datetime.datetime = models.DateTimeField(null=False, blank=False)
+    end_datetime: datetime.datetime = models.DateTimeField(null=False, blank=False)
 
     objects = ReservableTimeSpanManager()
 
     class Meta:
         db_table = "reservable_time_span"
         base_manager_name = "objects"
+        verbose_name = _("request log")
+        verbose_name_plural = _("request logs")
         ordering = [
             "resource",
             "start_datetime",
@@ -45,7 +50,7 @@ class ReservableTimeSpan(models.Model):
         constraints = [
             models.CheckConstraint(
                 name="reservable_time_span_start_before_end",
-                check=Q(start_datetime__lt=F("end_datetime")),
+                check=models.Q(start_datetime__lt=models.F("end_datetime")),
                 violation_error_message=_("`start_datetime` must be before `end_datetime`."),
             ),
         ]

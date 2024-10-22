@@ -4,8 +4,9 @@ from functools import cached_property
 from typing import TYPE_CHECKING
 
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
-from .queryset import AbilityGroupQuerySet
+from .queryset import AbilityGroupManager
 
 if TYPE_CHECKING:
     from .actions import AbilityGroupActions
@@ -17,13 +18,20 @@ __all__ = [
 
 
 class AbilityGroup(models.Model):
-    name = models.fields.TextField(null=False, blank=False, unique=True)
+    name: str = models.TextField(unique=True)
 
-    objects = AbilityGroupQuerySet.as_manager()
+    objects = AbilityGroupManager()
+
+    # Translated field hints
+    name_fi: str | None
+    name_sv: str | None
+    name_en: str | None
 
     class Meta:
         db_table = "ability_group"
         base_manager_name = "objects"
+        verbose_name = _("ability group")
+        verbose_name_plural = _("ability groups")
         ordering = ["pk"]
 
     def __str__(self) -> str:

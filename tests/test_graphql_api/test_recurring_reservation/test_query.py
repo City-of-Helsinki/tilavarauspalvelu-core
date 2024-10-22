@@ -2,7 +2,7 @@ import freezegun
 import pytest
 
 from tests.factories import RecurringReservationFactory
-from tilavarauspalvelu.enums import RejectionReadinessChoice
+from tilavarauspalvelu.enums import RejectionReadinessChoice, Weekday
 
 from .helpers import recurring_reservations_query
 
@@ -15,7 +15,11 @@ pytestmark = [
 def test_recurring_reservations__query(graphql):
     recurring_reservation = RecurringReservationFactory.create(
         reservations__name="foo",
+        age_group__minimum=18,
+        age_group__maximum=30,
+        ability_group__name="foo",
         rejected_occurrences__rejection_reason=RejectionReadinessChoice.INTERVAL_NOT_ALLOWED,
+        allocated_time_slot__day_of_the_week=Weekday.MONDAY,
     )
     graphql.login_with_superuser()
 

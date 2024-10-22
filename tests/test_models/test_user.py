@@ -29,6 +29,7 @@ def test_user__str__last_login_does_not_display_if_has_not_logged():
         first_name="First",
         last_name="Last",
         email="test@localhost",
+        last_login=None,
     )
 
     assert str(user) == "Last First (test@localhost)"

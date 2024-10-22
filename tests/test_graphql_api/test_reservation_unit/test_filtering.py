@@ -352,9 +352,9 @@ def test_reservation_unit__filter__by_keyword_group(graphql):
 
 
 def test_reservation_unit__filter__by_multiple_keyword_groups(graphql):
-    keyword_group_1 = KeywordGroupFactory.create()
-    keyword_group_2 = KeywordGroupFactory.create()
-    keyword_group_3 = KeywordGroupFactory.create()
+    keyword_group_1 = KeywordGroupFactory.create(name="foo")
+    keyword_group_2 = KeywordGroupFactory.create(name="bar")
+    keyword_group_3 = KeywordGroupFactory.create(name="baz")
     reservation_unit_1 = ReservationUnitFactory.create(keyword_groups=[keyword_group_1])
     reservation_unit_2 = ReservationUnitFactory.create(keyword_groups=[keyword_group_2])
     ReservationUnitFactory.create(keyword_groups=[keyword_group_3])

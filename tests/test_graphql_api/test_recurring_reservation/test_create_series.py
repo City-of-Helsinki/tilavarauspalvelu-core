@@ -72,8 +72,8 @@ def test_recurring_reservations__create_series(graphql):
     assert reservations[0].user == user
     assert reservations[0].age_group == age_group
 
-    assert reservations[0].reservation_unit.count() == 1
-    assert reservations[0].reservation_unit.first() == reservation_unit
+    assert reservations[0].reservation_units.count() == 1
+    assert reservations[0].reservation_units.first() == reservation_unit
 
 
 def test_recurring_reservations__create_series__reservation_details(graphql):
@@ -167,8 +167,8 @@ def test_recurring_reservations__create_series__reservation_details(graphql):
     assert reservations[0].home_city == city
     assert reservations[0].user == user
     assert reservations[0].age_group == age_group
-    assert reservations[0].reservation_unit.count() == 1
-    assert reservations[0].reservation_unit.first() == reservation_unit
+    assert reservations[0].reservation_units.count() == 1
+    assert reservations[0].reservation_units.first() == reservation_unit
 
 
 def test_recurring_reservations__create_series__multiple_recurrences(graphql):
@@ -541,7 +541,7 @@ def test_recurring_reservations__create_series__overlapping_reservations(graphql
     reservation_end = combine(end, datetime.time(12), tzinfo=DEFAULT_TIMEZONE)
 
     ReservationFactory.create(
-        reservation_unit=[reservation_unit],
+        reservation_units=[reservation_unit],
         begin=reservation_begin,
         end=reservation_end,
         state=ReservationStateChoice.CONFIRMED,

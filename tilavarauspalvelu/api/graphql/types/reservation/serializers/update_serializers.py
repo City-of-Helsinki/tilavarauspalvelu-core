@@ -49,7 +49,7 @@ class ReservationUpdateSerializer(OldPrimaryKeyUpdateSerializer, ReservationCrea
         data = super().validate(data, prefill_from_profile)
         data["state"] = new_state
 
-        reservation_units = data.get("reservation_unit", getattr(self.instance, "reservation_unit", None))
+        reservation_units = data.get("reservation_units", getattr(self.instance, "reservation_units", None))
         if hasattr(reservation_units, "all"):
             reservation_units = reservation_units.all()
 

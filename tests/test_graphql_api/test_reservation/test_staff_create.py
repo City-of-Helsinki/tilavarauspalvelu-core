@@ -33,7 +33,7 @@ pytestmark = [
 @freezegun.freeze_time("2021-01-01")
 def test_reservation__staff_create__reservation_block_whole_day(graphql):
     reservation_unit = ReservationUnitFactory.create(
-        origin_hauki_resource=OriginHaukiResourceFactory(id=999),
+        origin_hauki_resource=OriginHaukiResourceFactory.create(id=999),
         reservation_block_whole_day=True,
         spaces=[SpaceFactory.create()],
     )
@@ -69,7 +69,7 @@ def test_reservation__staff_create__reservation_block_whole_day(graphql):
 @freezegun.freeze_time("2021-01-01")
 def test_reservation__staff_create__reservation_block_whole_day__ignore_given_buffers(graphql):
     reservation_unit = ReservationUnitFactory.create(
-        origin_hauki_resource=OriginHaukiResourceFactory(id=999),
+        origin_hauki_resource=OriginHaukiResourceFactory.create(id=999),
         reservation_block_whole_day=True,
         spaces=[SpaceFactory.create()],
     )
@@ -320,7 +320,7 @@ def test_reservation__staff_create__reservation_overlapping_fails(graphql):
         begin=begin,
         end=end,
         state=ReservationStateChoice.CONFIRMED,
-        reservation_unit=[reservation_unit],
+        reservation_units=[reservation_unit],
     )
 
     graphql.login_with_superuser()
@@ -345,7 +345,7 @@ def test_reservation__staff_create__buffer_times_cause_overlap_fails(graphql):
         end=end + datetime.timedelta(hours=1),
         buffer_time_before=datetime.timedelta(minutes=1),
         state=ReservationStateChoice.CONFIRMED,
-        reservation_unit=[reservation_unit],
+        reservation_units=[reservation_unit],
     )
 
     graphql.login_with_superuser()
@@ -369,7 +369,7 @@ def test_reservation__staff_create__buffer_times_cause_overlap_fails_with_buffer
         begin=begin,
         end=end,
         state=ReservationStateChoice.CONFIRMED,
-        reservation_unit=[reservation_unit],
+        reservation_units=[reservation_unit],
     )
 
     graphql.login_with_superuser()
@@ -398,7 +398,7 @@ def test_reservation__staff_create__buffer_times_cause_overlap_fails_with_buffer
         begin=begin + datetime.timedelta(hours=1),
         end=end + datetime.timedelta(hours=1),
         state=ReservationStateChoice.CONFIRMED,
-        reservation_unit=[reservation_unit],
+        reservation_units=[reservation_unit],
     )
 
     graphql.login_with_superuser()

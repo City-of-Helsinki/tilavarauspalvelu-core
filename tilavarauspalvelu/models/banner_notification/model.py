@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from tilavarauspalvelu.enums import BannerNotificationLevel, BannerNotificationState, BannerNotificationTarget
 from utils.fields.model import StrChoiceField
 
-from .queryset import BANNER_LEVEL_SORT_ORDER, BANNER_TARGET_SORT_ORDER, BannerNotificationQuerySet
+from .queryset import BANNER_LEVEL_SORT_ORDER, BANNER_TARGET_SORT_ORDER, BannerNotificationManager
 
 if TYPE_CHECKING:
     from datetime import datetime
@@ -24,7 +24,7 @@ __all__ = [
 
 
 class BannerNotification(models.Model):
-    name: str = models.CharField(max_length=100, null=False, blank=False, unique=True)
+    name: str = models.CharField(max_length=100, unique=True)
     message: str = models.TextField(max_length=1_000, blank=True, default="")
     draft: bool = models.BooleanField(default=True)
     level: str = StrChoiceField(enum=BannerNotificationLevel)
@@ -32,14 +32,19 @@ class BannerNotification(models.Model):
     active_from: datetime | None = models.DateTimeField(null=True, blank=True, default=None)
     active_until: datetime | None = models.DateTimeField(null=True, blank=True, default=None)
 
-    objects = BannerNotificationQuerySet.as_manager()
+    objects = BannerNotificationManager()
+
+    # Translated field hints
+    message_fi: str | None
+    message_sv: str | None
+    message_en: str | None
 
     class Meta:
         db_table = "banner_notification"
         base_manager_name = "objects"
-        ordering = [
-            "pk",
-        ]
+        verbose_name = _("banner notification")
+        verbose_name_plural = _("banner notifications")
+        ordering = ["pk"]
         indexes = [
             models.Index(
                 BANNER_LEVEL_SORT_ORDER,

@@ -4,6 +4,7 @@ from functools import cached_property
 from typing import TYPE_CHECKING
 
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from .queryset import PaymentMerchantManager
 
@@ -32,6 +33,8 @@ class PaymentMerchant(models.Model):
     class Meta:
         db_table = "payment_merchant"
         base_manager_name = "objects"
+        verbose_name = _("payment merchant")
+        verbose_name_plural = _("payment merchants")
         ordering = ["pk"]
 
     def __str__(self) -> str:

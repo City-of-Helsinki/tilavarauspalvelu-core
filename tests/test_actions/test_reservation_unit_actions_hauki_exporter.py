@@ -16,10 +16,10 @@ pytestmark = [
 @pytest.fixture
 def reservation_unit() -> ReservationUnit:
     return ReservationUnitFactory(
-        origin_hauki_resource=OriginHaukiResourceFactory(id=999, opening_hours_hash="abc123"),
+        origin_hauki_resource=OriginHaukiResourceFactory.create(id=999, opening_hours_hash="abc123"),
         unit__tprek_id=1234,
         unit__tprek_department_id=4321,
-        unit__origin_hauki_resource=OriginHaukiResourceFactory(id=888),
+        unit__origin_hauki_resource=OriginHaukiResourceFactory.create(id=888),
     )
 
 

@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 import pytest
 
 from tests.factories import ReservationFactory, ReservationUnitFactory, ResourceFactory, SpaceFactory, UnitFactory
-from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import Language, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.models import AffectingTimeSpan, Reservation, ReservationUnit, ReservationUnitHierarchy
 from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
 from utils.date_utils import DEFAULT_TIMEZONE, local_date
@@ -35,8 +35,9 @@ def _create_test_reservations_for_all_reservation_units() -> None:
         ReservationFactory.create(
             begin=_datetime(minute=i),
             end=_datetime(minute=0),
-            reservation_unit=[reservation_unit],
+            reservation_units=[reservation_unit],
             user=None,
+            reservee_language=Language.FI.value,
             state=ReservationStateChoice.CREATED,
             type=ReservationTypeChoice.NORMAL,
         )
@@ -61,7 +62,7 @@ def _validate_time_spans(
             is_reservable=False,
         )
         for reservation in Reservation.objects.with_buffered_begin_and_end().filter(
-            reservation_unit__pk__in=[*related_reservation_unit_ids, reservation_unit_id]
+            reservation_units__pk__in=[*related_reservation_unit_ids, reservation_unit_id]
         )
     }
 
@@ -72,9 +73,9 @@ def test__get_affecting_reservations__only_resources():
     # Resource 1 <- ReservationUnit 1, 2
     # Resource 2 <- ReservationUnit 3, 4
     # Resource 3 <- ReservationUnit 5
-    resource_1 = ResourceFactory.create()
-    resource_2 = ResourceFactory.create()
-    resource_3 = ResourceFactory.create()
+    resource_1 = ResourceFactory.create(name="1")
+    resource_2 = ResourceFactory.create(name="2")
+    resource_3 = ResourceFactory.create(name="3")
 
     unit_1 = UnitFactory.create()
     reservation_unit_1 = ReservationUnitFactory.create(unit=unit_1, resources=[resource_1])
@@ -111,13 +112,13 @@ def test__get_affecting_reservations__only_spaces():
     # │   └── Space 1.1.2        <- ReservationUnit 5
     # └── Space 1.2              <- ReservationUnit 3
     # Space 2                    <- ReservationUnit 7
-    space_1 = SpaceFactory.create(parent=None)
-    space_1_1 = SpaceFactory.create(parent=space_1)
-    space_1_2 = SpaceFactory.create(parent=space_1)
-    space_1_1_1 = SpaceFactory.create(parent=space_1_1)
-    space_1_1_2 = SpaceFactory.create(parent=space_1_1)
-    space_1_1_1_1 = SpaceFactory.create(parent=space_1_1_1)
-    space_2 = SpaceFactory.create(parent=None)
+    space_1 = SpaceFactory.create(name="1", parent=None)
+    space_1_1 = SpaceFactory.create(name="2", parent=space_1)
+    space_1_2 = SpaceFactory.create(name="3", parent=space_1)
+    space_1_1_1 = SpaceFactory.create(name="4", parent=space_1_1)
+    space_1_1_2 = SpaceFactory.create(name="5", parent=space_1_1)
+    space_1_1_1_1 = SpaceFactory.create(name="6", parent=space_1_1_1)
+    space_2 = SpaceFactory.create(name="7", parent=None)
 
     unit_1 = UnitFactory.create()
     reservation_unit_1 = ReservationUnitFactory.create(unit=unit_1, spaces=[space_1])
@@ -226,10 +227,10 @@ def test__get_affecting_reservations__resources_and_spaces():
     # ├── Space 1.1       <- ReservationUnit 1, 3
     # │   └── Space 1.1.1 <- ReservationUnit 4
     # └── Space 1.2       <- ReservationUnit 6
-    space_1 = SpaceFactory.create(parent=None)
-    space_1_1 = SpaceFactory.create(parent=space_1)
-    space_1_1_1 = SpaceFactory.create(parent=space_1_1)
-    space_1_2 = SpaceFactory.create(parent=space_1)
+    space_1 = SpaceFactory.create(name="1", parent=None)
+    space_1_1 = SpaceFactory.create(name="2", parent=space_1)
+    space_1_1_1 = SpaceFactory.create(name="3", parent=space_1_1)
+    space_1_2 = SpaceFactory.create(name="4", parent=space_1)
 
     # Resource 1 <- ReservationUnit 1, 2
     # Resource 2 <- ReservationUnit 7

@@ -1,8 +1,16 @@
+from __future__ import annotations
+
 from typing import Literal, Self
 
 from django.db import models
 from django.db.models import Subquery
+from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L
+
+__all__ = [
+    "ApplicationSectionManager",
+    "ApplicationSectionQuerySet",
+]
 
 
 class ApplicationSectionQuerySet(models.QuerySet):
@@ -42,3 +50,7 @@ class ApplicationSectionQuerySet(models.QuerySet):
         return self.preferred_unit_name_alias(lang=lang).order_by(
             models.OrderBy(models.F(f"preferred_unit_name_{lang}"), descending=desc),
         )
+
+
+class ApplicationSectionManager(SerializableMixin.SerializableManager.from_queryset(ApplicationSectionQuerySet)):
+    """Contains custom queryset methods and GDPR serialization."""

@@ -12,7 +12,7 @@ from lookup_property import L, lookup_property
 from tilavarauspalvelu.enums import Weekday
 from utils.fields.model import StrChoiceField
 
-from .queryset import AllocatedTimeSlotQuerySet
+from .queryset import AllocatedTimeSlotManager
 
 if TYPE_CHECKING:
     import datetime
@@ -40,17 +40,17 @@ class AllocatedTimeSlot(models.Model):
 
     reservation_unit_option: ReservationUnitOption = models.ForeignKey(
         "tilavarauspalvelu.ReservationUnitOption",
-        on_delete=models.CASCADE,
         related_name="allocated_time_slots",
+        on_delete=models.CASCADE,
     )
 
-    objects = AllocatedTimeSlotQuerySet.as_manager()
+    objects = AllocatedTimeSlotManager()
 
     class Meta:
         db_table = "allocated_time_slot"
         base_manager_name = "objects"
-        verbose_name = _("Allocated Time Slot")
-        verbose_name_plural = _("Allocated Time Slots")
+        verbose_name = _("allocated time slot")
+        verbose_name_plural = _("allocated time slots")
         ordering = ["pk"]
         constraints = [
             models.CheckConstraint(

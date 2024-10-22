@@ -3,7 +3,7 @@ import datetime
 import pytest
 
 from tests.factories import RejectedOccurrenceFactory
-from tilavarauspalvelu.enums import RejectionReadinessChoice
+from tilavarauspalvelu.enums import RejectionReadinessChoice, Weekday
 
 from .helpers import rejected_occurrence_query
 
@@ -80,7 +80,9 @@ def test_rejected_recurrence__filter__by_recurring_reservation(graphql):
 
 def test_rejected_recurrence__filter__by_application_round(graphql):
     RejectedOccurrenceFactory.create()
-    occurrence = RejectedOccurrenceFactory.create()
+    occurrence = RejectedOccurrenceFactory.create(
+        recurring_reservation__allocated_time_slot__day_of_the_week=Weekday.MONDAY,
+    )
     RejectedOccurrenceFactory.create()
 
     option = occurrence.recurring_reservation.allocated_time_slot.reservation_unit_option
@@ -270,9 +272,15 @@ def test_rejected_recurrence__order__by_rejection_reason(graphql):
 
 
 def test_rejected_recurrence__order__by_application_pk(graphql):
-    occurrence_1 = RejectedOccurrenceFactory.create()
-    occurrence_2 = RejectedOccurrenceFactory.create()
-    occurrence_3 = RejectedOccurrenceFactory.create()
+    occurrence_1 = RejectedOccurrenceFactory.create(
+        recurring_reservation__allocated_time_slot__day_of_the_week=Weekday.MONDAY,
+    )
+    occurrence_2 = RejectedOccurrenceFactory.create(
+        recurring_reservation__allocated_time_slot__day_of_the_week=Weekday.MONDAY,
+    )
+    occurrence_3 = RejectedOccurrenceFactory.create(
+        recurring_reservation__allocated_time_slot__day_of_the_week=Weekday.MONDAY,
+    )
 
     graphql.login_with_superuser()
     query = rejected_occurrence_query(order_by="applicationPkAsc")
@@ -297,9 +305,15 @@ def test_rejected_recurrence__order__by_application_pk(graphql):
 
 
 def test_rejected_recurrence__order__by_application_section_pk(graphql):
-    occurrence_1 = RejectedOccurrenceFactory.create()
-    occurrence_2 = RejectedOccurrenceFactory.create()
-    occurrence_3 = RejectedOccurrenceFactory.create()
+    occurrence_1 = RejectedOccurrenceFactory.create(
+        recurring_reservation__allocated_time_slot__day_of_the_week=Weekday.MONDAY,
+    )
+    occurrence_2 = RejectedOccurrenceFactory.create(
+        recurring_reservation__allocated_time_slot__day_of_the_week=Weekday.MONDAY,
+    )
+    occurrence_3 = RejectedOccurrenceFactory.create(
+        recurring_reservation__allocated_time_slot__day_of_the_week=Weekday.MONDAY,
+    )
 
     graphql.login_with_superuser()
     query = rejected_occurrence_query(order_by="applicationSectionPkAsc")

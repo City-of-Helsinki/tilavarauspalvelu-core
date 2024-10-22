@@ -6,10 +6,11 @@ from typing import TYPE_CHECKING
 
 from django.db import models
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.enums import CustomerTypeChoice
 
-from .queryset import ReservationStatisticQuerySet
+from .queryset import ReservationStatisticManager
 
 if TYPE_CHECKING:
     from decimal import Decimal
@@ -22,7 +23,7 @@ if TYPE_CHECKING:
 class ReservationStatistic(models.Model):
     # Copied from Reservation
 
-    num_persons: int | None = models.fields.PositiveIntegerField(null=True, blank=True)
+    num_persons: int | None = models.PositiveIntegerField(null=True, blank=True)
     state: str = models.CharField(max_length=255)
     reservation_type: str | None = models.CharField(max_length=255, null=True)
 
@@ -53,6 +54,7 @@ class ReservationStatistic(models.Model):
 
     primary_reservation_unit = models.ForeignKey(
         "tilavarauspalvelu.ReservationUnit",
+        related_name="reservation_statistics",
         null=True,
         on_delete=models.SET_NULL,
     )
@@ -104,19 +106,21 @@ class ReservationStatistic(models.Model):
         null=True,
         blank=True,
     )
-    age_group_name: str = models.fields.CharField(max_length=255, default="", blank=True)
+    age_group_name: str = models.CharField(max_length=255, default="", blank=True)
 
     # From RecurringReservation
     ability_group = models.ForeignKey(
         "tilavarauspalvelu.AbilityGroup",
+        related_name="reservation_statistics",
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
     )
-    ability_group_name: str = models.fields.TextField()
+    ability_group_name: str = models.TextField()
 
     reservation = models.OneToOneField(
         "tilavarauspalvelu.Reservation",
+        related_name="reservation_statistic",
         on_delete=models.SET_NULL,
         null=True,
     )
@@ -137,11 +141,13 @@ class ReservationStatistic(models.Model):
     is_applied: bool = models.BooleanField(default=False, blank=True)
     """Is the reservation done through application process."""
 
-    objects = ReservationStatisticQuerySet.as_manager()
+    objects = ReservationStatisticManager()
 
     class Meta:
         db_table = "reservation_statistic"
         base_manager_name = "objects"
+        verbose_name = _("reservation statistic")
+        verbose_name_plural = _("reservation statistics")
         ordering = ["pk"]
 
     def __str__(self) -> str:
@@ -215,7 +221,7 @@ class ReservationStatistic(models.Model):
         statistic.state = reservation.state
         statistic.tax_percentage_value = reservation.tax_percentage_value
 
-        for res_unit in reservation.reservation_unit.all():
+        for res_unit in reservation.reservation_units.all():
             statistic.primary_reservation_unit = res_unit
             statistic.primary_reservation_unit_name = res_unit.name
             statistic.primary_unit_name = getattr(res_unit.unit, "name", "")

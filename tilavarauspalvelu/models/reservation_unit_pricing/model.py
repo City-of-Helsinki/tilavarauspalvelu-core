@@ -4,14 +4,18 @@ from functools import cached_property
 from typing import TYPE_CHECKING
 
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from config.utils.auditlog_util import AuditLogger
 from tilavarauspalvelu.enums import PriceUnit, PricingStatus, PricingType
 
-from .queryset import ReservationUnitPricingQuerySet
+from .queryset import ReservationUnitPricingManager
 
 if TYPE_CHECKING:
+    import datetime
     from decimal import Decimal
+
+    from tilavarauspalvelu.models import ReservationUnit, TaxPercentage
 
     from .actions import ReservationUnitPricingActions
 
@@ -28,33 +32,35 @@ def get_default_tax_percentage() -> int:
 
 
 class ReservationUnitPricing(models.Model):
-    begins = models.DateField(null=False, blank=False)
-    pricing_type = models.CharField(max_length=20, choices=PricingType.choices, blank=True, null=True)
-    price_unit = models.CharField(max_length=20, choices=PriceUnit.choices, default=PriceUnit.PRICE_UNIT_PER_HOUR)
-    status = models.CharField(max_length=20, choices=PricingStatus.choices)
+    begins: datetime.date = models.DateField()
+    pricing_type: str | None = models.CharField(max_length=20, choices=PricingType.choices, blank=True, null=True)
+    price_unit: str = models.CharField(max_length=20, choices=PriceUnit.choices, default=PriceUnit.PRICE_UNIT_PER_HOUR)
+    status: str = models.CharField(max_length=20, choices=PricingStatus.choices)
 
-    lowest_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    highest_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    lowest_price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    highest_price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
-    tax_percentage = models.ForeignKey(
+    tax_percentage: TaxPercentage = models.ForeignKey(
         "tilavarauspalvelu.TaxPercentage",
         related_name="reservation_unit_pricings",
         on_delete=models.PROTECT,
         default=get_default_tax_percentage,
     )
 
-    reservation_unit = models.ForeignKey(
+    reservation_unit: ReservationUnit = models.ForeignKey(
         "tilavarauspalvelu.ReservationUnit",
-        null=True,
         related_name="pricings",
         on_delete=models.CASCADE,
+        null=True,
     )
 
-    objects = ReservationUnitPricingQuerySet.as_manager()
+    objects = ReservationUnitPricingManager()
 
     class Meta:
         db_table = "reservation_unit_pricing"
         base_manager_name = "objects"
+        verbose_name = _("reservation unit pricing")
+        verbose_name_plural = _("reservation unit pricings")
         ordering = ["pk"]
         constraints = [
             models.CheckConstraint(

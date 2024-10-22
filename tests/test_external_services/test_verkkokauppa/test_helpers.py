@@ -5,7 +5,7 @@ from django.utils.timezone import get_default_timezone
 from freezegun import freeze_time
 
 from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory, UserFactory
-from tilavarauspalvelu.enums import CustomerTypeChoice
+from tilavarauspalvelu.enums import CustomerTypeChoice, Language
 from tilavarauspalvelu.utils.verkkokauppa.exceptions import UnsupportedMetaKeyError
 from tilavarauspalvelu.utils.verkkokauppa.helpers import (
     get_formatted_reservation_time,
@@ -48,26 +48,26 @@ def test_get_verkkokauppa_order_params__respect_reservee_language():
     )
 
     reservation_en = ReservationFactory.create(
-        reservation_unit=[runit],
+        reservation_units=[runit],
         user=user,
         reservee_type=CustomerTypeChoice.INDIVIDUAL,
-        reservee_language="en",
+        reservee_language=Language.EN.value,
     )
     order_params = get_verkkokauppa_order_params(reservation_en)
     assert order_params.items[0].product_name == "Name"
 
     reservation_sv = ReservationFactory.create(
-        reservation_unit=[runit],
+        reservation_units=[runit],
         user=user,
         reservee_type=CustomerTypeChoice.INDIVIDUAL,
-        reservee_language="sv",
+        reservee_language=Language.SV.value,
     )
     order_params = get_verkkokauppa_order_params(reservation_sv)
     assert order_params.items[0].product_name == "Namn"
 
 
 def test_get_meta_label():
-    reservation = ReservationFactory.create()
+    reservation = ReservationFactory.create(reservee_language=Language.FI.value)
 
     period_label = get_meta_label("reservationPeriod", reservation)
     assert period_label == "Varausaika"
@@ -77,7 +77,7 @@ def test_get_meta_label():
 
 
 def test_get_meta_label__raises_exception_with_unsupported_key():
-    reservation = ReservationFactory.create()
+    reservation = ReservationFactory.create(reservee_language=Language.FI.value)
 
     with pytest.raises(UnsupportedMetaKeyError) as err:
         get_meta_label("unsupported", reservation)

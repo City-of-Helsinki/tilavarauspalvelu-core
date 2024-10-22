@@ -14,9 +14,11 @@ from tilavarauspalvelu.enums import OrganizationTypeChoice
 from utils.date_utils import DEFAULT_TIMEZONE
 from utils.fields.model import StrChoiceField
 
-from .queryset import OrganisationQuerySet
+from .queryset import OrganisationManager
 
 if TYPE_CHECKING:
+    from tilavarauspalvelu.models import Address
+
     from .actions import OrganisationActions
 
 __all__ = [
@@ -36,11 +38,11 @@ def year_not_in_future(year: int | None) -> None:
 
 
 class Organisation(SerializableMixin, models.Model):
-    name: str = models.CharField(null=False, blank=False, max_length=255)
-    email: str = models.EmailField(default="", blank=True)
-    identifier: str | None = models.CharField(null=True, blank=False, max_length=255, unique=False)
-    year_established: int | None = models.PositiveIntegerField(validators=[year_not_in_future], null=True, blank=True)
-    active_members: int | None = models.PositiveIntegerField(null=True, blank=False)
+    name: str = models.CharField(max_length=255)
+    email: str = models.EmailField(blank=True, default="")
+    identifier: str | None = models.CharField(max_length=255, null=True, unique=False)
+    year_established: int | None = models.PositiveIntegerField(null=True, blank=True, validators=[year_not_in_future])
+    active_members: int | None = models.PositiveIntegerField(null=True)
     core_business: str = models.TextField(blank=True)
 
     organisation_type: OrganizationTypeChoice = StrChoiceField(
@@ -48,26 +50,28 @@ class Organisation(SerializableMixin, models.Model):
         default=OrganizationTypeChoice.COMPANY,
     )
 
-    address = models.ForeignKey(
+    address: Address | None = models.ForeignKey(
         "tilavarauspalvelu.Address",
-        null=True,
-        blank=False,
-        on_delete=models.SET_NULL,
         related_name="organisations",
+        on_delete=models.SET_NULL,
+        null=True,
     )
 
     # Translated field hints
+    name_fi: str | None
+    name_en: str | None
+    name_sv: str | None
     core_business_fi: str | None
     core_business_en: str | None
     core_business_sv: str | None
 
-    objects = OrganisationQuerySet.as_manager()
+    objects = OrganisationManager()
 
     class Meta:
         db_table = "organisation"
         base_manager_name = "objects"
-        verbose_name = _("Organisation")
-        verbose_name_plural = _("Organisations")
+        verbose_name = _("organisation")
+        verbose_name_plural = _("organisations")
         ordering = ["pk"]
 
     # For GDPR API

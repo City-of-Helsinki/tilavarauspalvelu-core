@@ -51,7 +51,7 @@ class ReservationCancellationSerializer(NestingModelSerializer):
             msg = "Reservation cannot be cancelled after it has begun."
             raise ValidationError(msg, code=error_codes.RESERVATION_CANCELLATION_NOT_ALLOWED)
 
-        for reservation_unit in self.instance.reservation_unit.all():
+        for reservation_unit in self.instance.reservation_units.all():
             cancel_rule = reservation_unit.cancellation_rule
             if cancel_rule is None:
                 msg = "Reservation cannot be cancelled because its reservation unit has no cancellation rule."

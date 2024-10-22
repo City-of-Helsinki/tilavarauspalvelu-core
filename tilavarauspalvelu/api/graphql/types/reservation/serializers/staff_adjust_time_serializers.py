@@ -79,7 +79,7 @@ class StaffReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reserv
         new_buffer_after = data.get("buffer_time_after", None)
 
         reservation_unit: ReservationUnit
-        for reservation_unit in self.instance.reservation_unit.all():
+        for reservation_unit in self.instance.reservation_units.all():
             if reservation_unit.reservation_block_whole_day:
                 data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begin)
                 data["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(end)

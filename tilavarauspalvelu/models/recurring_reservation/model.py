@@ -6,15 +6,16 @@ from typing import TYPE_CHECKING
 
 from django.core.validators import validate_comma_separated_integer_list
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
-from tilavarauspalvelu.enums import ReservationStateChoice, WeekdayChoice
+from tilavarauspalvelu.enums import WeekdayChoice
 
-from .queryset import RecurringReservationQuerySet
+from .queryset import RecurringReservationManager
 
 if TYPE_CHECKING:
     import datetime
 
-    from tilavarauspalvelu.models import AbilityGroup, AgeGroup, AllocatedTimeSlot, Reservation, ReservationUnit, User
+    from tilavarauspalvelu.models import AbilityGroup, AgeGroup, AllocatedTimeSlot, ReservationUnit, User
 
     from .actions import RecurringReservationActions
 
@@ -49,44 +50,47 @@ class RecurringReservation(models.Model):
 
     reservation_unit: ReservationUnit = models.ForeignKey(
         "tilavarauspalvelu.ReservationUnit",
-        on_delete=models.PROTECT,
         related_name="recurring_reservations",
+        on_delete=models.PROTECT,
     )
     user: User | None = models.ForeignKey(
         "tilavarauspalvelu.User",
+        related_name="recurring_reservations",
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
     )
     allocated_time_slot: AllocatedTimeSlot | None = models.OneToOneField(
         "tilavarauspalvelu.AllocatedTimeSlot",
+        related_name="recurring_reservation",
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
-        related_name="recurring_reservation",
     )
     age_group: AgeGroup | None = models.ForeignKey(
         "tilavarauspalvelu.AgeGroup",
+        related_name="recurring_reservations",
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
-        related_name="recurring_reservations",
     )
 
     # TODO: Remove these fields
     ability_group: AbilityGroup | None = models.ForeignKey(
         "tilavarauspalvelu.AbilityGroup",
+        related_name="recurring_reservations",
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
-        related_name="recurring_reservations",
     )
 
-    objects = RecurringReservationQuerySet.as_manager()
+    objects = RecurringReservationManager()
 
     class Meta:
         db_table = "recurring_reservation"
         base_manager_name = "objects"
+        verbose_name = _("recurring reservation")
+        verbose_name_plural = _("recurring reservations")
         ordering = [
             "begin_date",
             "begin_time",
@@ -103,17 +107,3 @@ class RecurringReservation(models.Model):
         from .actions import RecurringReservationActions
 
         return RecurringReservationActions(self)
-
-    @property
-    def denied_reservations(self):  # DEPRECATED
-        """Used in `api.legacy_rest_api.serializers.RecurringReservationSerializer`"""
-        # Avoid a query to the database if we have fetched list already
-        reservation: Reservation  # noqa: F842
-        if "reservations" in self._prefetched_objects_cache:
-            return [
-                reservation
-                for reservation in self.reservations.all()
-                if reservation.state == ReservationStateChoice.DENIED
-            ]
-
-        return self.reservations.filter(state=ReservationStateChoice.DENIED)

@@ -4,8 +4,9 @@ from functools import cached_property
 from typing import TYPE_CHECKING
 
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
-from .queryset import ReservationUnitTypeQuerySet
+from .queryset import ReservationUnitTypeManager
 
 if TYPE_CHECKING:
     from .actions import ReservationUnitTypeActions
@@ -17,19 +18,21 @@ __all__ = [
 
 
 class ReservationUnitType(models.Model):
-    name = models.CharField(max_length=255)
-    rank = models.PositiveIntegerField(blank=True, null=True)
+    name: str = models.CharField(max_length=255)
+    rank: int | None = models.PositiveIntegerField(blank=True, null=True)
 
     # Translated field hints
     name_fi: str | None
     name_sv: str | None
     name_en: str | None
 
-    objects = ReservationUnitTypeQuerySet.as_manager()
+    objects = ReservationUnitTypeManager()
 
     class Meta:
         db_table = "reservation_unit_type"
         base_manager_name = "objects"
+        verbose_name = _("reservation unit type")
+        verbose_name_plural = _("reservation unit types")
         ordering = ["rank"]
 
     def __str__(self) -> str:

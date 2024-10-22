@@ -4,7 +4,8 @@ from typing import TYPE_CHECKING
 import freezegun
 import pytest
 
-from tests.factories.opening_hours import OriginHaukiResourceFactory, ReservableTimeSpanFactory
+from tests.factories import ReservableTimeSpanFactory
+from tests.factories.origin_hauki_resource import OriginHaukiResourceFactory
 from tests.helpers import patch_method
 from tests.mocks import MockResponse
 from tilavarauspalvelu.constants import NEVER_ANY_OPENING_HOURS_HASH
@@ -92,7 +93,7 @@ def test__HaukiResourceHashUpdater__fetch_hauki_resources__nothing_returned(rese
 
 
 def test__HaukiResourceHashUpdater__update_reservation_units_hashes__no_initial_hash():
-    origin_hauki_resource: OriginHaukiResource = OriginHaukiResourceFactory(
+    origin_hauki_resource: OriginHaukiResource = OriginHaukiResourceFactory.create(
         id=999,
         opening_hours_hash="",
         latest_fetched_date=None,
@@ -109,26 +110,26 @@ def test__HaukiResourceHashUpdater__update_reservation_units_hashes__no_initial_
 
 @freezegun.freeze_time("2020-01-01")
 def test__HaukiResourceHashUpdater__update_reservation_units_hashes__hash_updated():
-    origin_hauki_resource: OriginHaukiResource = OriginHaukiResourceFactory(
+    origin_hauki_resource: OriginHaukiResource = OriginHaukiResourceFactory.create(
         id=999,
         opening_hours_hash="foo",
         latest_fetched_date=datetime.date(2019, 12, 31),
     )
 
     # In the past: Should be kept as is
-    rts1 = ReservableTimeSpanFactory(
+    rts1 = ReservableTimeSpanFactory.create(
         resource=origin_hauki_resource,
         start_datetime=datetime.datetime(2019, 12, 1, 10, tzinfo=DEFAULT_TIMEZONE),
         end_datetime=datetime.datetime(2019, 12, 31, 20, tzinfo=DEFAULT_TIMEZONE),
     )
     # Overlaps with the cutoff date: should be shortened to cutoff date
-    rts2 = ReservableTimeSpanFactory(
+    rts2 = ReservableTimeSpanFactory.create(
         resource=origin_hauki_resource,
         start_datetime=datetime.datetime(2019, 12, 31, 10, tzinfo=DEFAULT_TIMEZONE),
         end_datetime=datetime.datetime(2020, 1, 1, 20, tzinfo=DEFAULT_TIMEZONE),
     )
     # In the future: should be deleted
-    rts3 = ReservableTimeSpanFactory(
+    rts3 = ReservableTimeSpanFactory.create(
         resource=origin_hauki_resource,
         start_datetime=datetime.datetime(2020, 1, 1, 10, tzinfo=DEFAULT_TIMEZONE),
         end_datetime=datetime.datetime(2020, 2, 1, 20, tzinfo=DEFAULT_TIMEZONE),
@@ -167,22 +168,22 @@ def test__HaukiResourceHashUpdater__update_reservation_units_hashes__hash_update
 def test__HaukiResourceHashUpdater__create_reservable_time_spans_for_reservation_units():
     updater = HaukiResourceHashUpdater()
     updater.resources_updated = [
-        OriginHaukiResourceFactory(
+        OriginHaukiResourceFactory.create(
             id=999,
             opening_hours_hash="foo",
             latest_fetched_date=datetime.date(2019, 12, 31),
         ),
-        OriginHaukiResourceFactory(
+        OriginHaukiResourceFactory.create(
             id=888,
             opening_hours_hash="bar",
             latest_fetched_date=None,
         ),
-        OriginHaukiResourceFactory(
+        OriginHaukiResourceFactory.create(
             id=777,
             opening_hours_hash=NEVER_ANY_OPENING_HOURS_HASH,
             latest_fetched_date=None,
         ),
-        OriginHaukiResourceFactory(
+        OriginHaukiResourceFactory.create(
             id=666,
             opening_hours_hash="",
             latest_fetched_date=None,

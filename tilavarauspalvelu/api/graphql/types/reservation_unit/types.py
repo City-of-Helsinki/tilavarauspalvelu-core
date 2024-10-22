@@ -72,7 +72,7 @@ class ReservationUnitNode(DjangoNode):
         end_date=graphene.Date(required=True),
     )
 
-    reservation_set = DjangoListField(ReservationNode)
+    reservations = DjangoListField(ReservationNode)
 
     num_active_user_reservations = ManuallyOptimizedField(graphene.Int)
 
@@ -155,7 +155,7 @@ class ReservationUnitNode(DjangoNode):
             #
             # Reverse many-to-many related
             "application_rounds",
-            "reservation_set",
+            "reservations",
             #
             # Reverse one-to-many related
             "images",
@@ -342,7 +342,7 @@ class ReservationUnitNode(DjangoNode):
         return queryset.annotate(
             num_active_user_reservations=SubqueryCount(
                 Reservation.objects.filter(
-                    reservation_unit=models.OuterRef("id"),
+                    reservation_units=models.OuterRef("id"),
                     user=optimizer.info.context.user,
                 )
                 .exclude(type=ReservationTypeChoice.SEASONAL.value)

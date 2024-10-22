@@ -58,7 +58,7 @@ def test_reservation_unit__check_reservation_overlap__same_space__same_time__ove
     end = begin + timedelta(minutes=120)
 
     ReservationFactory.create(
-        reservation_unit=[res_unit_parent],
+        reservation_units=[res_unit_parent],
         begin=begin,
         end=end,
         state=ReservationStateChoice.CREATED,
@@ -77,7 +77,7 @@ def test_reservation_unit__check_reservation_overlap__child__same_time__overlaps
     end = begin + timedelta(minutes=120)
 
     ReservationFactory.create(
-        reservation_unit=[res_unit_child_1],
+        reservation_units=[res_unit_child_1],
         begin=begin,
         end=end,
         state=ReservationStateChoice.CREATED,
@@ -96,7 +96,7 @@ def test_reservation_unit__check_reservation_overlap__sibling__same_time__does_n
     end = begin + timedelta(minutes=120)
 
     ReservationFactory.create(
-        reservation_unit=[res_unit_child_1],
+        reservation_units=[res_unit_child_1],
         begin=begin,
         end=end,
         state=ReservationStateChoice.CREATED,
@@ -112,7 +112,7 @@ def test_reservation_unit__check_reservation_overlap__same_space__partly_same_ti
     end = begin + timedelta(minutes=120)
 
     ReservationFactory.create(
-        reservation_unit=[res_unit_child_1],
+        reservation_units=[res_unit_child_1],
         begin=begin + timedelta(minutes=30),
         end=end,
         state=ReservationStateChoice.CREATED,
@@ -131,7 +131,7 @@ def test_reservation_unit__check_reservation_overlap__child__partly_same_time__o
     end = begin + timedelta(minutes=120)
 
     ReservationFactory.create(
-        reservation_unit=[res_unit_child_1],
+        reservation_units=[res_unit_child_1],
         begin=begin + timedelta(minutes=30),
         end=end,
         state=ReservationStateChoice.CREATED,
@@ -150,7 +150,7 @@ def test_reservation_unit__check_reservation_overlap__child_of_child__same_time_
     end = begin + timedelta(minutes=120)
 
     ReservationFactory.create(
-        reservation_unit=[res_unit_child_2_child],
+        reservation_units=[res_unit_child_2_child],
         begin=begin,
         end=end,
         state=ReservationStateChoice.CREATED,
@@ -169,7 +169,7 @@ def test_reservation_unit__check_reservation_overlap__child_of_sibling__same_tim
     end = begin + timedelta(minutes=120)
 
     ReservationFactory.create(
-        reservation_unit=[res_unit_child_2_child],
+        reservation_units=[res_unit_child_2_child],
         begin=begin,
         end=end,
         state=ReservationStateChoice.CREATED,
@@ -185,7 +185,7 @@ def test_reservation_unit__check_reservation_overlap__child_parent__same_time__o
     end = begin + timedelta(minutes=120)
 
     ReservationFactory.create(
-        reservation_unit=[res_unit_child_2],
+        reservation_units=[res_unit_child_2],
         begin=begin,
         end=end,
         state=ReservationStateChoice.CREATED,

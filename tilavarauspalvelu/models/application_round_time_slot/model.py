@@ -11,7 +11,7 @@ from tilavarauspalvelu.enums import WeekdayChoice
 from tilavarauspalvelu.utils.validators import validate_reservable_times
 from utils.fields.model import IntChoiceField
 
-from .queryset import ApplicationRoundTimeSlotQuerySet
+from .queryset import ApplicationRoundTimeSlotManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit
@@ -23,8 +23,8 @@ if TYPE_CHECKING:
 class ApplicationRoundTimeSlot(models.Model):
     reservation_unit: ReservationUnit = models.ForeignKey(
         "tilavarauspalvelu.ReservationUnit",
-        on_delete=models.CASCADE,
         related_name="application_round_time_slots",
+        on_delete=models.CASCADE,
     )
 
     weekday: int = IntChoiceField(enum=WeekdayChoice)
@@ -36,13 +36,13 @@ class ApplicationRoundTimeSlot(models.Model):
         validators=[validate_reservable_times],
     )
 
-    objects = ApplicationRoundTimeSlotQuerySet.as_manager()
+    objects = ApplicationRoundTimeSlotManager()
 
     class Meta:
         db_table = "application_round_time_slot"
         base_manager_name = "objects"
-        verbose_name = _("Application Round Time Slot")
-        verbose_name_plural = _("Application Round Time Slots")
+        verbose_name = _("application round time slot")
+        verbose_name_plural = _("application round time slots")
         ordering = [
             "reservation_unit",
             "weekday",

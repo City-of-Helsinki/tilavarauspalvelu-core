@@ -4,6 +4,7 @@ from functools import cached_property
 from typing import TYPE_CHECKING
 
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from .queryset import ServiceSectorManager
 
@@ -22,6 +23,7 @@ class ServiceSector(models.Model):
     """
 
     name: str = models.CharField(max_length=255)
+
     units = models.ManyToManyField("tilavarauspalvelu.Unit", related_name="service_sectors")
 
     # Translated field hints
@@ -34,6 +36,8 @@ class ServiceSector(models.Model):
     class Meta:
         db_table = "service_sector"
         base_manager_name = "objects"
+        verbose_name = _("service sector")
+        verbose_name_plural = _("service sectors")
         ordering = ["pk"]
 
     def __str__(self) -> str:

@@ -12,7 +12,7 @@ from tests.factories import (
     ReservationUnitFactory,
     UnitFactory,
 )
-from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice
+from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice, Weekday
 from tilavarauspalvelu.models import AgeGroup, City, ReservationStatistic
 
 # Applied to all tests
@@ -25,7 +25,10 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
     settings.SAVE_RESERVATION_STATISTICS = True
 
     reservation_unit = ReservationUnitFactory.create(name="resu", unit=UnitFactory(name="mesta", tprek_id="1234"))
-    recurring = RecurringReservationFactory.create()
+    recurring = RecurringReservationFactory.create(
+        ability_group__name="group",
+        allocated_time_slot__day_of_the_week=Weekday.MONDAY,
+    )
     reservation = ReservationFactory.create(
         age_group=AgeGroup.objects.create(minimum=18, maximum=30),
         applying_for_free_of_charge=True,
@@ -39,7 +42,7 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
         price=10,
         purpose=ReservationPurposeFactory(name="PurpleChoice"),
         recurring_reservation=recurring,
-        reservation_unit=[reservation_unit],
+        reservation_units=[reservation_unit],
         reservee_address_zip="12345",
         reservee_id="123456789",
         reservee_is_unregistered_association=False,
@@ -51,7 +54,7 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
         working_memo="its like that",
     )
 
-    reservation_unit = reservation.reservation_unit.first()
+    reservation_unit = reservation.reservation_units.first()
     recurring = reservation.recurring_reservation
 
     assert ReservationStatistic.objects.count() == 1
@@ -212,13 +215,13 @@ def test_statistics__update__reservation_unit_updates_statistics(settings):
     settings.SAVE_RESERVATION_STATISTICS = True
 
     reservation_unit = ReservationUnitFactory.create(name="Test reservation unit", unit__name="Test unit")
-    reservation = ReservationFactory.create(name="Test reservation", reservation_unit=[reservation_unit])
+    reservation = ReservationFactory.create(name="Test reservation", reservation_units=[reservation_unit])
 
     statistics = ReservationStatistic.objects.first()
     assert statistics.primary_reservation_unit == reservation_unit
 
     new_reservation_unit = ReservationUnitFactory.create(name="Another reservation unit", unit__name="Another unit")
-    reservation.reservation_unit.set([new_reservation_unit])
+    reservation.reservation_units.set([new_reservation_unit])
     reservation.save()
 
     statistics = ReservationStatistic.objects.first()

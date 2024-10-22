@@ -37,7 +37,7 @@ def test_reservation__confirm__changes_state__confirmed(graphql, outbox):
     reservation = ReservationFactory.create_for_confirmation()
 
     # Unit admin will get an email
-    unit = reservation.reservation_unit.first().unit
+    unit = reservation.reservation_units.first().unit
     UserFactory.create_with_unit_role(
         units=[unit],
         reservation_notification=ReservationNotification.ALL,
@@ -54,16 +54,16 @@ def test_reservation__confirm__changes_state__confirmed(graphql, outbox):
 
     assert len(outbox) == 2
     assert outbox[0].subject == "Thank you for your booking at Varaamo"
-    unit_name = reservation.reservation_unit.first().unit.name
+    unit_name = reservation.reservation_units.first().unit.name
     assert outbox[1].subject == f"New booking {reservation.id} has been made for {unit_name}"
 
 
 @override_settings(SEND_EMAILS=True)
 def test_reservation__confirm__changes_state__requires_handling(graphql, outbox):
-    reservation = ReservationFactory.create_for_confirmation(reservation_unit__require_reservation_handling=True)
+    reservation = ReservationFactory.create_for_confirmation(reservation_units__require_reservation_handling=True)
 
     # Unit admin will get an email
-    unit = reservation.reservation_unit.first().unit
+    unit = reservation.reservation_units.first().unit
     UserFactory.create_with_unit_role(
         units=[unit],
         reservation_notification=ReservationNotification.ALL,
@@ -80,7 +80,7 @@ def test_reservation__confirm__changes_state__requires_handling(graphql, outbox)
 
     assert len(outbox) == 2
     assert outbox[0].subject == "Your booking is waiting for processing"
-    unit_name = reservation.reservation_unit.first().unit.name
+    unit_name = reservation.reservation_units.first().unit.name
     assert outbox[1].subject == f"New booking {reservation.id} requires handling at unit {unit_name}"
 
 
@@ -92,7 +92,7 @@ def test_reservation__confirm__changes_state_to_requires_handling_on_subsidy_req
     )
 
     # Unit admin will get an email
-    unit = reservation.reservation_unit.first().unit
+    unit = reservation.reservation_units.first().unit
     UserFactory.create_with_unit_role(
         units=[unit],
         reservation_notification=ReservationNotification.ALL,
@@ -110,7 +110,7 @@ def test_reservation__confirm__changes_state_to_requires_handling_on_subsidy_req
 
     assert len(outbox) == 2
     assert outbox[0].subject == "Your booking is waiting for processing"
-    unit_name = reservation.reservation_unit.first().unit.name
+    unit_name = reservation.reservation_units.first().unit.name
     assert outbox[1].subject == f"New booking {reservation.id} requires handling at unit {unit_name}"
 
 
@@ -168,7 +168,7 @@ def test_reservation__confirm__updates_confirmed_at(graphql):
 
 def test_reservation__confirm__succeeds_if_reservation_has_all_required_fields(graphql):
     reservation = ReservationFactory.create_for_confirmation(
-        reservation_unit__metadata_set=ReservationMetadataSetFactory.create_basic(),
+        reservation_units__metadata_set=ReservationMetadataSetFactory.create_basic(),
         reservee_first_name="John",
         reservee_last_name="Doe",
         reservee_email="foo@email.com",
@@ -187,7 +187,7 @@ def test_reservation__confirm__succeeds_if_reservation_has_all_required_fields(g
 
 def test_reservation__confirm__fails_if_any_required_field_are_missing(graphql):
     reservation = ReservationFactory.create_for_confirmation(
-        reservation_unit__metadata_set=ReservationMetadataSetFactory.create_basic(),
+        reservation_units__metadata_set=ReservationMetadataSetFactory.create_basic(),
         reservee_first_name="John",
         reservee_last_name="Doe",
         reservee_email=None,
@@ -207,8 +207,8 @@ def test_reservation__confirm__fails_if_any_required_field_are_missing(graphql):
 @patch_method(VerkkokauppaAPIClient.create_order)
 def test_reservation__confirm__does_not_create_order_when_handling_is_required(graphql):
     reservation = ReservationFactory.create_for_confirmation(
-        reservation_unit__require_reservation_handling=True,
-        reservation_unit__payment_types__code=PaymentType.INVOICE,
+        reservation_units__require_reservation_handling=True,
+        reservation_units__payment_types__code=PaymentType.INVOICE,
     )
 
     graphql.login_with_superuser()
@@ -227,7 +227,7 @@ def test_reservation__confirm__does_not_create_order_when_handling_is_required(g
 @patch_method(VerkkokauppaAPIClient.create_order)
 def test_reservation__confirm__creates_local_order_when_payment_type_is_on_site(graphql):
     reservation = ReservationFactory.create_for_confirmation(
-        reservation_unit__payment_types__code=PaymentType.ON_SITE,
+        reservation_units__payment_types__code=PaymentType.ON_SITE,
         reservee_language="fi",
     )
 
@@ -253,7 +253,7 @@ def test_reservation__confirm__creates_local_order_when_payment_type_is_on_site(
 @patch_method(VerkkokauppaAPIClient.create_order)
 def test_reservation__confirm__calls_verkkokauppa_api_when_payment_type_is_not_on_site(graphql):
     reservation = ReservationFactory.create_for_confirmation(
-        reservation_unit__payment_types__code=PaymentType.INVOICE,
+        reservation_units__payment_types__code=PaymentType.INVOICE,
         reservee_language="fi",
     )
 
@@ -286,7 +286,7 @@ def test_reservation__confirm__calls_verkkokauppa_api_when_payment_type_is_not_o
 @patch_method(SentryLogger.log_exception)
 def test_reservation__confirm__does_not_save_when_api_call_fails(graphql):
     reservation = ReservationFactory.create_for_confirmation(
-        reservation_unit__payment_types__code=PaymentType.INVOICE,
+        reservation_units__payment_types__code=PaymentType.INVOICE,
         reservee_language="fi",
     )
 
@@ -305,9 +305,9 @@ def test_reservation__confirm__use_non_default_payment_type(graphql):
     payment_type_1 = ReservationUnitPaymentTypeFactory.create(code=PaymentType.ON_SITE.value)
     payment_type_2 = ReservationUnitPaymentTypeFactory.create(code=PaymentType.INVOICE.value)
 
-    reservation = ReservationFactory.create_for_confirmation(reservation_unit__payment_types=None)
+    reservation = ReservationFactory.create_for_confirmation(reservation_units__payment_types=None)
 
-    reservation_unit = reservation.reservation_unit.first()
+    reservation_unit = reservation.reservation_units.first()
     reservation_unit.payment_types.add(payment_type_1, payment_type_2)
 
     graphql.login_with_superuser()
@@ -336,8 +336,8 @@ def test_reservation__confirm__does_not_allow_unsupported_payment_type(graphql):
 @patch_method(VerkkokauppaAPIClient.create_order)
 def test_reservation__confirm__allows_unsupported_payment_type_with_zero_price(graphql):
     reservation = ReservationFactory.create_for_confirmation(
-        reservation_unit__payment_types__code=PaymentType.INVOICE,
-        reservation_unit__pricings__pricing_type=PricingType.FREE,
+        reservation_units__payment_types__code=PaymentType.INVOICE,
+        reservation_units__pricings__pricing_type=PricingType.FREE,
         price=Decimal("0"),
     )
 
@@ -355,7 +355,7 @@ def test_reservation__confirm__allows_unsupported_payment_type_with_zero_price(g
 
 def test_reservation__confirm__default_payment_type__on_site(graphql):
     reservation = ReservationFactory.create_for_confirmation(
-        reservation_unit__payment_types__code=PaymentType.ON_SITE,
+        reservation_units__payment_types__code=PaymentType.ON_SITE,
     )
 
     graphql.login_with_superuser()
@@ -374,9 +374,9 @@ def test_reservation__confirm__default_payment_type__invoice(graphql):
     payment_type_1 = ReservationUnitPaymentTypeFactory.create(code=PaymentType.ON_SITE.value)
     payment_type_2 = ReservationUnitPaymentTypeFactory.create(code=PaymentType.INVOICE.value)
 
-    reservation = ReservationFactory.create_for_confirmation(reservation_unit__payment_types=None)
+    reservation = ReservationFactory.create_for_confirmation(reservation_units__payment_types=None)
 
-    reservation_unit = reservation.reservation_unit.first()
+    reservation_unit = reservation.reservation_units.first()
     reservation_unit.payment_types.add(payment_type_1, payment_type_2)
 
     VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create()
@@ -400,9 +400,9 @@ def test_reservation__confirm__default_payment_type__online(graphql):
     payment_type_2 = ReservationUnitPaymentTypeFactory.create(code=PaymentType.INVOICE.value)
     payment_type_3 = ReservationUnitPaymentTypeFactory.create(code=PaymentType.ONLINE.value)
 
-    reservation = ReservationFactory.create_for_confirmation(reservation_unit__payment_types=None)
+    reservation = ReservationFactory.create_for_confirmation(reservation_units__payment_types=None)
 
-    reservation_unit = reservation.reservation_unit.first()
+    reservation_unit = reservation.reservation_units.first()
     reservation_unit.payment_types.add(payment_type_1, payment_type_2, payment_type_3)
 
     VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create()
@@ -444,7 +444,7 @@ def test_reservation__confirm__order_not_created_when_price_is_zero(graphql):
 
 @patch_method(VerkkokauppaAPIClient.create_order)
 def test_reservation__confirm__return_order_data(graphql):
-    reservation = ReservationFactory.create_for_confirmation(reservation_unit__payment_types__code=PaymentType.ONLINE)
+    reservation = ReservationFactory.create_for_confirmation(reservation_units__payment_types__code=PaymentType.ONLINE)
 
     VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create()
 
@@ -474,7 +474,7 @@ def test_reservation__confirm__return_order_data(graphql):
 
 
 def test_reservation__confirm__with_price_requires_payment_product(graphql):
-    reservation = ReservationFactory.create_for_confirmation(reservation_unit__payment_product=None)
+    reservation = ReservationFactory.create_for_confirmation(reservation_units__payment_product=None)
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
@@ -485,8 +485,8 @@ def test_reservation__confirm__with_price_requires_payment_product(graphql):
 
 def test_reservation__confirm__without_price_and_with_free_pricing_type_does_not_require_payment_product(graphql):
     reservation = ReservationFactory.create_for_confirmation(
-        reservation_unit__payment_product=None,
-        reservation_unit__pricings__pricing_type=PricingType.FREE,
+        reservation_units__payment_product=None,
+        reservation_units__pricings__pricing_type=PricingType.FREE,
         price=Decimal("0"),
     )
 

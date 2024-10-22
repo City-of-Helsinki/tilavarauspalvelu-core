@@ -29,7 +29,7 @@ class UnitNode(DjangoNode):
             "email",
             "phone",
             "payment_merchant",
-            "reservationunit_set",
+            "reservation_units",
             "spaces",
             "location",
             "service_sectors",

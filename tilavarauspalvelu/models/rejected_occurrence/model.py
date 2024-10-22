@@ -9,7 +9,7 @@ from graphene_django_extensions.fields.model import StrChoiceField
 
 from tilavarauspalvelu.enums import RejectionReadinessChoice
 
-from .queryset import RejectedOccurrenceQuerySet
+from .queryset import RejectedOccurrenceManager
 
 if TYPE_CHECKING:
     import datetime
@@ -32,24 +32,24 @@ class RejectedOccurrence(models.Model):
 
     recurring_reservation: RecurringReservation = models.ForeignKey(
         "tilavarauspalvelu.RecurringReservation",
-        on_delete=models.CASCADE,
         related_name="rejected_occurrences",
+        on_delete=models.CASCADE,
     )
 
-    objects = RejectedOccurrenceQuerySet.as_manager()
+    objects = RejectedOccurrenceManager()
 
     class Meta:
         db_table = "rejected_occurrence"
         base_manager_name = "objects"
-        verbose_name = _("Rejected occurrence")
-        verbose_name_plural = _("Rejected occurrences")
+        verbose_name = _("rejected occurrence")
+        verbose_name_plural = _("rejected occurrences")
         ordering = [
             "begin_datetime",
             "end_datetime",
         ]
 
     def __str__(self) -> str:
-        return f"{_("Rejected occurrence")} ({self.begin_datetime.isoformat()} - {self.end_datetime.isoformat()})"
+        return _("rejected occurrence") + f" ({self.begin_datetime.isoformat()} - {self.end_datetime.isoformat()})"
 
     @cached_property
     def actions(self) -> RejectedOccurrenceActions:

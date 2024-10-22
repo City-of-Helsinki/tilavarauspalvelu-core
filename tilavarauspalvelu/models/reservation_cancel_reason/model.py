@@ -4,8 +4,9 @@ from functools import cached_property
 from typing import TYPE_CHECKING
 
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
-from .queryset import ReservationCancelReasonQuerySet
+from .queryset import ReservationCancelReasonManager
 
 if TYPE_CHECKING:
     from .actions import ReservationCancelReasonActions
@@ -16,21 +17,21 @@ __all__ = [
 
 
 class ReservationCancelReason(models.Model):
-    reason = models.CharField(max_length=255, null=False, blank=False)
+    reason: str = models.CharField(max_length=255)
 
     # Translated field hints
     reason_fi: str | None
     reason_en: str | None
     reason_sv: str | None
 
-    objects = ReservationCancelReasonQuerySet.as_manager()
+    objects = ReservationCancelReasonManager()
 
     class Meta:
         db_table = "reservation_cancel_reason"
         base_manager_name = "objects"
-        ordering = [
-            "pk",
-        ]
+        verbose_name = _("reservation cancel reason")
+        verbose_name_plural = _("reservation cancel reasons")
+        ordering = ["pk"]
 
     def __str__(self) -> str:
         return self.reason

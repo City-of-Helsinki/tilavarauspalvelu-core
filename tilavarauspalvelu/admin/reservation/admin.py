@@ -214,7 +214,7 @@ class ReservationAdmin(admin.ModelAdmin):
 
     @admin.display(ordering="reservation_unit__name")
     def reservation_units(self, obj: Reservation) -> str:
-        return ", ".join([str(reservation_unit) for reservation_unit in obj.reservation_unit.all()])
+        return ", ".join([str(reservation_unit) for reservation_unit in obj.reservation_units.all()])
 
     def price_net(self, obj: Reservation) -> Decimal:
         return obj.price_net

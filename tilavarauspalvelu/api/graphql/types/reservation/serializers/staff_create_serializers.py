@@ -40,7 +40,7 @@ class ReservationStaffCreateSerializer(OldPrimaryKeySerializer, ReservationSched
     )
     reservation_unit_pks = serializers.ListField(
         child=IntegerPrimaryKeyField(queryset=ReservationUnit.objects.all()),
-        source="reservation_unit",
+        source="reservation_units",
         required=True,
     )
     purpose_pk = IntegerPrimaryKeyField(
@@ -175,7 +175,7 @@ class ReservationStaffCreateSerializer(OldPrimaryKeySerializer, ReservationSched
         begin = data.get("begin").astimezone(DEFAULT_TIMEZONE)
         end = data.get("end").astimezone(DEFAULT_TIMEZONE)
 
-        reservation_units: list[ReservationUnit] = data.get("reservation_unit")
+        reservation_units: list[ReservationUnit] = data.get("reservation_units")
 
         self.check_begin(begin, end)
 

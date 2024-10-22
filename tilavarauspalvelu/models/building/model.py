@@ -4,6 +4,7 @@ from functools import cached_property
 from typing import TYPE_CHECKING
 
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from .queryset import BuildingManager
 
@@ -42,6 +43,8 @@ class Building(models.Model):
     class Meta:
         db_table = "building"
         base_manager_name = "objects"
+        verbose_name = _("building")
+        verbose_name_plural = _("buildings")
         ordering = ["pk"]
 
     def __str__(self) -> str:

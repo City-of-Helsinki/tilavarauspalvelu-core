@@ -4,13 +4,19 @@ from functools import cached_property
 from typing import TYPE_CHECKING
 
 from django.db import models, transaction
+from django.utils.translation import gettext_lazy as _
 
-from .queryset import ReservationStatisticsReservationUnitQuerySet
+from .queryset import ReservationStatisticsReservationUnitManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationStatistic
 
     from .actions import ReservationStatisticsReservationUnitActions
+
+
+__all__ = [
+    "ReservationStatisticsReservationUnit",
+]
 
 
 class ReservationStatisticsReservationUnit(models.Model):
@@ -20,20 +26,23 @@ class ReservationStatisticsReservationUnit(models.Model):
 
     reservation_statistics = models.ForeignKey(
         "tilavarauspalvelu.ReservationStatistic",
-        on_delete=models.CASCADE,
         related_name="reservation_stats_reservation_units",
+        on_delete=models.CASCADE,
     )
     reservation_unit = models.ForeignKey(
         "tilavarauspalvelu.ReservationUnit",
-        null=True,
+        related_name="reservation_stats_reservation_units",
         on_delete=models.SET_NULL,
+        null=True,
     )
 
-    objects = ReservationStatisticsReservationUnitQuerySet.as_manager()
+    objects = ReservationStatisticsReservationUnitManager()
 
     class Meta:
         db_table = "reservation_statistics_reservation_unit"
         base_manager_name = "objects"
+        verbose_name = _("reservation statistics reservation unit")
+        verbose_name_plural = _("reservation statistics reservation units")
         ordering = ["pk"]
 
     def __str__(self) -> str:
@@ -55,7 +64,7 @@ class ReservationStatisticsReservationUnit(models.Model):
         save: bool = True,
     ) -> list[ReservationStatisticsReservationUnit]:
         to_save: list[ReservationStatisticsReservationUnit] = []
-        for reservation_unit in statistic.reservation.reservation_unit.all():
+        for reservation_unit in statistic.reservation.reservation_units.all():
             stat_unit = ReservationStatisticsReservationUnit(
                 reservation_statistics=statistic,
                 reservation_unit=reservation_unit,

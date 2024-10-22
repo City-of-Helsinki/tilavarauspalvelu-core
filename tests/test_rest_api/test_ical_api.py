@@ -34,7 +34,7 @@ def test_reservation_ical(api_client, settings):
     )
     reservation_unit = ReservationUnitFactory.create(name="Aitio", unit=unit)
     reservation = ReservationFactory.create(
-        reservation_unit=[reservation_unit],
+        reservation_units=[reservation_unit],
         begin=datetime.datetime(2024, 1, 1, 12),
         end=datetime.datetime(2024, 1, 1, 14),
         user=user,

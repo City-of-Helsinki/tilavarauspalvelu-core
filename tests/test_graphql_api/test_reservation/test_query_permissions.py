@@ -65,7 +65,7 @@ def test_reservation__query__unit_admin_can_see_working_memo_for_reservations_in
     unit = UnitFactory.create()
     reservation_unit = ReservationUnitFactory.create(unit=unit)
     admin = UserFactory.create_with_unit_role(units=[unit])
-    reservation = ReservationFactory.create(working_memo="foo", reservation_unit=[reservation_unit])
+    reservation = ReservationFactory.create(working_memo="foo", reservation_units=[reservation_unit])
 
     graphql.force_login(admin)
     query = reservations_query(fields="pk workingMemo")
@@ -80,7 +80,7 @@ def test_reservation__query__unit_admin_cannot_see_working_memo_for_reservations
     unit = UnitFactory.create()
     reservation_unit = ReservationUnitFactory.create()
     admin = UserFactory.create_with_unit_role(units=[unit])
-    reservation = ReservationFactory.create(working_memo="foo", reservation_unit=[reservation_unit])
+    reservation = ReservationFactory.create(working_memo="foo", reservation_units=[reservation_unit])
 
     graphql.force_login(admin)
     query = reservations_query(fields="pk workingMemo")

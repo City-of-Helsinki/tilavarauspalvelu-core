@@ -7,12 +7,19 @@ from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db import models
 from django.db.models.functions import Coalesce
+from helsinki_gdpr.models import SerializableMixin
 
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
 from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ApplicationRound, Reservation
+
+
+__all__ = [
+    "ReservationManager",
+    "ReservationQuerySet",
+]
 
 
 class ReservationQuerySet(models.QuerySet):
@@ -106,7 +113,7 @@ class ReservationQuerySet(models.QuerySet):
             qs = qs.filter(pk__in=reservation_units)
 
         return self.filter(
-            reservation_unit__in=models.Subquery(qs.affected_reservation_unit_ids),
+            reservation_units__in=models.Subquery(qs.affected_reservation_unit_ids),
         ).exclude(
             # Cancelled or denied reservations never affect any reservations
             state__in=[
@@ -138,15 +145,15 @@ class ReservationQuerySet(models.QuerySet):
 
         units = (
             Unit.objects.prefetch_related("unit_groups")
-            .filter(reservationunit__reservation__in=items)
+            .filter(reservation_units__reservations__in=items)
             .annotate(
                 reservation_ids=Coalesce(
                     ArrayAgg(
-                        "reservationunit__reservation",
+                        "reservation_units__reservations",
                         distinct=True,
                         filter=(
-                            models.Q(reservationunit__isnull=False)
-                            & models.Q(reservationunit__reservation__isnull=False)
+                            models.Q(reservation_units__isnull=False)
+                            & models.Q(reservation_units__reservations__isnull=False)
                         ),
                     ),
                     models.Value([]),
@@ -157,3 +164,7 @@ class ReservationQuerySet(models.QuerySet):
 
         for item in items:
             item.units_for_permissions = [unit for unit in units if item.pk in unit.reservation_ids]
+
+
+class ReservationManager(SerializableMixin.SerializableManager.from_queryset(ReservationQuerySet)):
+    """Contains custom queryset methods and GDPR serialization."""

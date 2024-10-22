@@ -248,7 +248,7 @@ def test_email_service__send_permission_deactivation_emails__general_admin__role
         email="user@email.com",
         preferred_language=Language.EN.value,
         last_login=local_datetime() - datetime.timedelta(days=20),
-        general_role__role_active=False,
+        general_roles__role_active=False,
     )
 
     EmailService.send_permission_deactivation_emails()
@@ -282,7 +282,7 @@ def test_email_service__send_permission_deactivation_emails__unit_admin__role_in
         email="user@email.com",
         preferred_language=Language.EN.value,
         last_login=local_datetime() - datetime.timedelta(days=20),
-        unit_role__role_active=False,
+        unit_roles__role_active=False,
     )
 
     EmailService.send_permission_deactivation_emails()
@@ -502,7 +502,7 @@ def test_email_service__send_reservation_cancelled_email(outbox):
         state=ReservationStateChoice.CANCELLED,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_unit__name="foo",
+        reservation_units__name="foo",
     )
 
     EmailService.send_reservation_cancelled_email(reservation)
@@ -519,7 +519,7 @@ def test_email_service__send_reservation_cancelled_email__wrong_state(outbox):
         state=ReservationStateChoice.CONFIRMED,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_unit__name="foo",
+        reservation_units__name="foo",
     )
 
     EmailService.send_reservation_cancelled_email(reservation)
@@ -534,7 +534,7 @@ def test_email_service__send_reservation_cancelled_email__no_recipients(outbox):
         state=ReservationStateChoice.CANCELLED,
         reservee_email="",
         user__email="",
-        reservation_unit__name="foo",
+        reservation_units__name="foo",
     )
 
     EmailService.send_reservation_cancelled_email(reservation)
@@ -551,7 +551,7 @@ def test_email_service__send_reservation_confirmed_email(outbox):
         state=ReservationStateChoice.CONFIRMED,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_unit__name="foo",
+        reservation_units__name="foo",
     )
 
     EmailService.send_reservation_confirmed_email(reservation)
@@ -571,7 +571,7 @@ def test_email_service__send_reservation_confirmed_email__wrong_state(outbox):
         state=ReservationStateChoice.CANCELLED,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_unit__name="foo",
+        reservation_units__name="foo",
     )
 
     EmailService.send_reservation_confirmed_email(reservation)
@@ -586,7 +586,7 @@ def test_email_service__send_reservation_confirmed_email__no_recipients(outbox):
         state=ReservationStateChoice.CONFIRMED,
         reservee_email="",
         user__email="",
-        reservation_unit__name="foo",
+        reservation_units__name="foo",
     )
 
     EmailService.send_reservation_confirmed_email(reservation)
@@ -604,7 +604,7 @@ def test_email_service__send_reservation_approved_email(outbox):
         state=ReservationStateChoice.CONFIRMED,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_unit__name="foo",
+        reservation_units__name="foo",
         begin=datetime.datetime(2024, 1, 1, 10, 0),
         end=datetime.datetime(2024, 1, 1, 12, 0),
     )
@@ -627,7 +627,7 @@ def test_email_service__send_reservation_approved_email__wrong_state(outbox):
         state=ReservationStateChoice.CANCELLED,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_unit__name="foo",
+        reservation_units__name="foo",
         begin=datetime.datetime(2024, 1, 1, 10, 0),
         end=datetime.datetime(2024, 1, 1, 12, 0),
     )
@@ -645,7 +645,7 @@ def test_email_service__send_reservation_approved_email__no_recipients(outbox):
         state=ReservationStateChoice.CONFIRMED,
         reservee_email="",
         user__email="",
-        reservation_unit__name="foo",
+        reservation_units__name="foo",
         begin=datetime.datetime(2024, 1, 1, 10, 0),
         end=datetime.datetime(2024, 1, 1, 12, 0),
     )
@@ -665,7 +665,7 @@ def test_email_service__send_reservation_approved_email__reservation_in_the_past
         state=ReservationStateChoice.CONFIRMED,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_unit__name="foo",
+        reservation_units__name="foo",
         begin=datetime.datetime(2024, 1, 1, 10, 0),
         end=datetime.datetime(2024, 1, 1, 12, 0),
     )
@@ -682,9 +682,9 @@ def test_email_service__send_reservation_requires_handling_email(outbox):
         state=ReservationStateChoice.REQUIRES_HANDLING,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_unit__name="foo",
-        reservation_unit__pricings__lowest_price=0,
-        reservation_unit__pricings__highest_price=0,
+        reservation_units__name="foo",
+        reservation_units__pricings__lowest_price=0,
+        reservation_units__pricings__highest_price=0,
         begin=datetime.datetime(2024, 1, 1, 10, 0),
         end=datetime.datetime(2024, 1, 1, 12, 0),
     )
@@ -704,9 +704,9 @@ def test_email_service__send_reservation_requires_handling_email__wrong_state(ou
         state=ReservationStateChoice.CONFIRMED,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_unit__name="foo",
-        reservation_unit__pricings__lowest_price=0,
-        reservation_unit__pricings__highest_price=0,
+        reservation_units__name="foo",
+        reservation_units__pricings__lowest_price=0,
+        reservation_units__pricings__highest_price=0,
         begin=datetime.datetime(2024, 1, 1, 10, 0),
         end=datetime.datetime(2024, 1, 1, 12, 0),
     )
@@ -724,9 +724,9 @@ def test_email_service__send_reservation_requires_handling_email__no_recipients(
         state=ReservationStateChoice.REQUIRES_HANDLING,
         reservee_email="",
         user__email="",
-        reservation_unit__name="foo",
-        reservation_unit__pricings__lowest_price=0,
-        reservation_unit__pricings__highest_price=0,
+        reservation_units__name="foo",
+        reservation_units__pricings__lowest_price=0,
+        reservation_units__pricings__highest_price=0,
         begin=datetime.datetime(2024, 1, 1, 10, 0),
         end=datetime.datetime(2024, 1, 1, 12, 0),
     )
@@ -746,9 +746,9 @@ def test_email_service__send_reservation_requires_handling_email__reservation_in
         state=ReservationStateChoice.REQUIRES_HANDLING,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_unit__name="foo",
-        reservation_unit__pricings__lowest_price=0,
-        reservation_unit__pricings__highest_price=0,
+        reservation_units__name="foo",
+        reservation_units__pricings__lowest_price=0,
+        reservation_units__pricings__highest_price=0,
         begin=datetime.datetime(2024, 1, 1, 10, 0),
         end=datetime.datetime(2024, 1, 1, 12, 0),
     )
@@ -764,7 +764,7 @@ def test_email_service__send_reservation_modified_email(outbox):
     reservation = ReservationFactory.create(
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_unit__name="foo",
+        reservation_units__name="foo",
         begin=datetime.datetime(2024, 1, 1, 10, 0),
         end=datetime.datetime(2024, 1, 1, 12, 0),
     )
@@ -787,7 +787,7 @@ def test_email_service__send_reservation_modified_email__no_recipients(outbox):
     reservation = ReservationFactory.create(
         reservee_email="",
         user__email="",
-        reservation_unit__name="foo",
+        reservation_units__name="foo",
         begin=datetime.datetime(2024, 1, 1, 10, 0),
         end=datetime.datetime(2024, 1, 1, 12, 0),
     )
@@ -806,7 +806,7 @@ def test_email_service__send_reservation_modified_email__reservation_in_the_past
     reservation = ReservationFactory.create(
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_unit__name="foo",
+        reservation_units__name="foo",
         begin=datetime.datetime(2024, 1, 1, 10, 0),
         end=datetime.datetime(2024, 1, 1, 12, 0),
     )
@@ -821,7 +821,7 @@ def test_email_service__send_reservation_requires_payment_email(outbox):
     reservation = ReservationFactory.create(
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_unit__name="foo",
+        reservation_units__name="foo",
         price=1,
     )
 
@@ -839,7 +839,7 @@ def test_email_service__send_reservation_requires_payment_email__no_recipients(o
     reservation = ReservationFactory.create(
         reservee_email="",
         user__email="",
-        reservation_unit__name="foo",
+        reservation_units__name="foo",
         price=1,
     )
 
@@ -856,7 +856,7 @@ def test_email_service__send_reservation_requires_payment_email__price_zero(outb
     reservation = ReservationFactory.create(
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_unit__name="foo",
+        reservation_units__name="foo",
         price=0,
     )
 
@@ -873,7 +873,7 @@ def test_email_service__send_reservation_rejected_email(outbox):
         type=ReservationTypeChoice.NORMAL,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_unit__name="foo",
+        reservation_units__name="foo",
         begin=datetime.datetime(2024, 1, 1, 10, 0),
         end=datetime.datetime(2024, 1, 1, 12, 0),
     )
@@ -895,7 +895,7 @@ def test_email_service__send_reservation_rejected_email__no_recipients(outbox):
         type=ReservationTypeChoice.NORMAL,
         reservee_email="",
         user__email="",
-        reservation_unit__name="foo",
+        reservation_units__name="foo",
         begin=datetime.datetime(2024, 1, 1, 10, 0),
         end=datetime.datetime(2024, 1, 1, 12, 0),
     )
@@ -916,7 +916,7 @@ def test_email_service__send_reservation_rejected_email__wrong_state(outbox):
         type=ReservationTypeChoice.NORMAL,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_unit__name="foo",
+        reservation_units__name="foo",
         begin=datetime.datetime(2024, 1, 1, 10, 0),
         end=datetime.datetime(2024, 1, 1, 12, 0),
     )
@@ -934,7 +934,7 @@ def test_email_service__send_reservation_rejected_email__reservation_in_the_past
         type=ReservationTypeChoice.NORMAL,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_unit__name="foo",
+        reservation_units__name="foo",
         begin=datetime.datetime(2024, 1, 1, 10, 0),
         end=datetime.datetime(2024, 1, 1, 12, 0),
     )
@@ -952,7 +952,7 @@ def test_email_service__send_reservation_rejected_email__no_normal_reservation(o
         type=ReservationTypeChoice.BEHALF,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
-        reservation_unit__name="foo",
+        reservation_units__name="foo",
         begin=datetime.datetime(2024, 1, 1, 10, 0),
         end=datetime.datetime(2024, 1, 1, 12, 0),
     )
@@ -964,7 +964,7 @@ def test_email_service__send_reservation_rejected_email__no_normal_reservation(o
 
 @override_settings(SEND_EMAILS=True)
 def test_email_service__send_staff_notification_reservation_made_email(outbox):
-    unit = UnitFactory.create(name="foo")
+    unit = UnitFactory.create(name_en="foo")
 
     UserFactory.create_with_unit_role(
         units=[unit],
@@ -975,7 +975,7 @@ def test_email_service__send_staff_notification_reservation_made_email(outbox):
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
-        reservation_unit__unit=unit,
+        reservation_units__unit=unit,
     )
 
     EmailService.send_staff_notification_reservation_made_email(reservation)
@@ -993,7 +993,7 @@ def test_email_service__send_staff_notification_reservation_made_email__no_recip
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
-        reservation_unit__unit=unit,
+        reservation_units__unit=unit,
     )
 
     EmailService.send_staff_notification_reservation_made_email(reservation)
@@ -1016,7 +1016,7 @@ def test_email_service__send_staff_notification_reservation_made_email__wrong_st
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CANCELLED,
-        reservation_unit__unit=unit,
+        reservation_units__unit=unit,
     )
 
     EmailService.send_staff_notification_reservation_made_email(reservation)
@@ -1026,7 +1026,7 @@ def test_email_service__send_staff_notification_reservation_made_email__wrong_st
 
 @override_settings(SEND_EMAILS=True)
 def test_email_service__send_staff_notification_reservation_made_email__multiple_recipients(outbox):
-    unit = UnitFactory.create(name="foo")
+    unit = UnitFactory.create(name="foo", name_en="foo")
 
     UserFactory.create_with_unit_role(
         units=[unit],
@@ -1044,7 +1044,7 @@ def test_email_service__send_staff_notification_reservation_made_email__multiple
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
-        reservation_unit__unit=unit,
+        reservation_units__unit=unit,
     )
 
     with TranslationsFromPOFiles():
@@ -1061,7 +1061,7 @@ def test_email_service__send_staff_notification_reservation_made_email__multiple
 
 @override_settings(SEND_EMAILS=True)
 def test_email_service__send_staff_notification_reservation_requires_handling_email(outbox):
-    unit = UnitFactory.create(name="foo")
+    unit = UnitFactory.create(name_en="foo")
 
     UserFactory.create_with_unit_role(
         units=[unit],
@@ -1072,7 +1072,7 @@ def test_email_service__send_staff_notification_reservation_requires_handling_em
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
-        reservation_unit__unit=unit,
+        reservation_units__unit=unit,
     )
 
     EmailService.send_staff_notification_reservation_requires_handling_email(reservation)
@@ -1090,7 +1090,7 @@ def test_email_service__send_staff_notification_reservation_requires_handling_em
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
-        reservation_unit__unit=unit,
+        reservation_units__unit=unit,
     )
 
     EmailService.send_staff_notification_reservation_requires_handling_email(reservation)
@@ -1116,7 +1116,7 @@ def test_email_service__send_staff_notification_reservation_requires_handling_em
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CANCELLED,
-        reservation_unit__unit=unit,
+        reservation_units__unit=unit,
     )
 
     EmailService.send_staff_notification_reservation_requires_handling_email(reservation)
@@ -1126,7 +1126,7 @@ def test_email_service__send_staff_notification_reservation_requires_handling_em
 
 @override_settings(SEND_EMAILS=True)
 def test_email_service__send_staff_notification_reservation_requires_handling_email__multiple_recipients(outbox):
-    unit = UnitFactory.create(name="foo")
+    unit = UnitFactory.create(name="foo", name_en="foo")
 
     UserFactory.create_with_unit_role(
         units=[unit],
@@ -1144,7 +1144,7 @@ def test_email_service__send_staff_notification_reservation_requires_handling_em
 
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
-        reservation_unit__unit=unit,
+        reservation_units__unit=unit,
     )
 
     with TranslationsFromPOFiles():

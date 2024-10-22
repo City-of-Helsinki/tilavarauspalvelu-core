@@ -54,7 +54,7 @@ class ReservationNode(DjangoNode):
         description="Which reservation units' reserveability is affected by this reservation?",
         expression=(
             SubqueryArray(
-                queryset=ReservationUnit.objects.filter(reservation=OuterRef("id")).affected_reservation_unit_ids,
+                queryset=ReservationUnit.objects.filter(reservations=OuterRef("id")).affected_reservation_unit_ids,
                 agg_field="ids",
                 distinct=True,
             )
@@ -154,7 +154,7 @@ class ReservationNode(DjangoNode):
             "billing_address_city",
             "billing_address_zip",
             #
-            "reservation_unit",
+            "reservation_units",
             "user",
             "recurring_reservation",
             "deny_reason",
@@ -195,7 +195,7 @@ class ReservationNode(DjangoNode):
                 "end",
                 "buffer_time_before",
                 "buffer_time_after",
-                "reservation_unit",
+                "reservation_units",
                 "is_blocked",
             ]
         }

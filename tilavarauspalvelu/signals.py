@@ -71,7 +71,7 @@ def reservation_delete(
         update_affecting_time_spans_task.delay(using=kwargs.get("using"))
 
 
-@receiver(m2m_changed, sender=Reservation.reservation_unit.through, dispatch_uid="reservations_reservation_units_m2m")
+@receiver(m2m_changed, sender=Reservation.reservation_units.through, dispatch_uid="reservations_reservation_units_m2m")
 def reservations_reservation_units_m2m(
     action: M2MAction,
     instance: Reservation,

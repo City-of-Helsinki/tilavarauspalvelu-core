@@ -14,7 +14,7 @@ def test_reservation__approve__cant_approve_if_status_not_requires_handling(grap
     reservation_unit = ReservationUnitFactory.create()
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CREATED,
-        reservation_unit=[reservation_unit],
+        reservation_units=[reservation_unit],
     )
 
     graphql.login_with_superuser()
@@ -34,7 +34,7 @@ def test_reservation__approve__approving_fails_when_price_missing(graphql):
     reservation_unit = ReservationUnitFactory.create()
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
-        reservation_unit=[reservation_unit],
+        reservation_units=[reservation_unit],
     )
 
     graphql.login_with_superuser()
@@ -52,7 +52,7 @@ def test_reservation__approve__fails_when_handling_details_missing(graphql):
     reservation_unit = ReservationUnitFactory.create()
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
-        reservation_unit=[reservation_unit],
+        reservation_units=[reservation_unit],
     )
 
     graphql.login_with_superuser()
@@ -70,7 +70,7 @@ def test_reservation__approve__succeeds_with_empty_handling_details(graphql):
     reservation_unit = ReservationUnitFactory.create()
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
-        reservation_unit=[reservation_unit],
+        reservation_units=[reservation_unit],
     )
 
     graphql.login_with_superuser()

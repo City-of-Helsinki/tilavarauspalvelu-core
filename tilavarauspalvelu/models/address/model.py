@@ -7,7 +7,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 
-from .queryset import AddressQuerySet
+from .queryset import AddressManager
 
 if TYPE_CHECKING:
     from .actions import AddressActions
@@ -19,9 +19,9 @@ __all__ = [
 
 
 class Address(SerializableMixin, models.Model):
-    street_address = models.TextField(max_length=80, null=False, blank=False)
-    post_code = models.CharField(max_length=32, null=False, blank=False)
-    city = models.TextField(max_length=80, null=False, blank=False)
+    street_address: str = models.TextField(max_length=80)
+    post_code: str = models.CharField(max_length=32)
+    city: str = models.TextField(max_length=80)
 
     # Translated field hints
     street_address_fi: str | None
@@ -31,13 +31,13 @@ class Address(SerializableMixin, models.Model):
     city_en: str | None
     city_sv: str | None
 
-    objects = AddressQuerySet.as_manager()
+    objects = AddressManager()
 
     class Meta:
         db_table = "address"
         base_manager_name = "objects"
-        verbose_name = _("Address")
-        verbose_name_plural = _("Addresses")
+        verbose_name = _("address")
+        verbose_name_plural = _("addresses")
         ordering = ["pk"]
 
     # For GDPR API
@@ -54,7 +54,7 @@ class Address(SerializableMixin, models.Model):
     )
 
     def __str__(self) -> str:
-        return f"{self.street_address}, {self.post_code}, {self.city}"
+        return self.full_address
 
     @cached_property
     def actions(self) -> AddressActions:
@@ -63,3 +63,7 @@ class Address(SerializableMixin, models.Model):
         from .actions import AddressActions
 
         return AddressActions(self)
+
+    @property
+    def full_address(self) -> str:
+        return f"{self.street_address}, {self.post_code} {self.city}"

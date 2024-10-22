@@ -33,10 +33,10 @@ Matches email domains like:
 
 
 class ReservationFilterSet(ModelFilterSet):
-    reservation_unit = IntMultipleChoiceFilter(field_name="reservation_unit")
-    unit = IntMultipleChoiceFilter(field_name="reservation_unit__unit")
+    reservation_units = IntMultipleChoiceFilter(field_name="reservation_units")
+    unit = IntMultipleChoiceFilter(field_name="reservation_units__unit")
     user = IntMultipleChoiceFilter(field_name="user")
-    reservation_unit_type = IntMultipleChoiceFilter(field_name="reservation_unit__reservation_unit_type")
+    reservation_unit_type = IntMultipleChoiceFilter(field_name="reservation_units__reservation_unit_type")
     recurring_reservation = IntMultipleChoiceFilter(field_name="recurring_reservation")
 
     reservation_unit_name_fi = django_filters.CharFilter(method="filter_by_reservation_unit_name")
@@ -74,12 +74,12 @@ class ReservationFilterSet(ModelFilterSet):
             "created_at",
             "state",
             "price",
-            ("reservation_unit__name_fi", "reservation_unit_name_fi"),
-            ("reservation_unit__name_en", "reservation_unit_name_en"),
-            ("reservation_unit__name_sv", "reservation_unit_name_sv"),
-            ("reservation_unit__unit__name_fi", "unit_name_fi"),
-            ("reservation_unit__unit__name_en", "unit_name_en"),
-            ("reservation_unit__unit__name_sv", "unit_name_sv"),
+            ("reservation_units__name_fi", "reservation_unit_name_fi"),
+            ("reservation_units__name_en", "reservation_unit_name_en"),
+            ("reservation_units__name_sv", "reservation_unit_name_sv"),
+            ("reservation_units__unit__name_fi", "unit_name_fi"),
+            ("reservation_units__unit__name_en", "unit_name_en"),
+            ("reservation_units__unit__name_sv", "unit_name_sv"),
             "reservee_name",
             ("payment_order__status", "order_status"),
         ]
@@ -108,14 +108,14 @@ class ReservationFilterSet(ModelFilterSet):
 
         return qs.filter(
             # Either has "can_view_reservations" permissions
-            Q(reservation_unit__unit__in=u_ids)  #
-            | Q(reservation_unit__unit__unit_groups__in=g_ids)
+            Q(reservation_units__unit__in=u_ids)  #
+            | Q(reservation_units__unit__unit_groups__in=g_ids)
             # ...or is the owner of the reservation, and has "can_create_staff_reservations" permissions to it
             | (
                 Q(user=user)
                 & (
-                    Q(reservation_unit__unit__in=reserver_u_ids)  #
-                    | Q(reservation_unit__unit__unit_groups__in=reserver_g_ids)
+                    Q(reservation_units__unit__in=reserver_u_ids)  #
+                    | Q(reservation_units__unit__unit_groups__in=reserver_g_ids)
                 )
             )
         )
@@ -139,8 +139,8 @@ class ReservationFilterSet(ModelFilterSet):
         g_ids = user.permissions.unit_group_ids_where_has_role(role_choices=roles)
 
         return qs.filter(
-            Q(reservation_unit__unit__in=u_ids)  #
-            | Q(reservation_unit__unit__unit_groups__in=g_ids)
+            Q(reservation_units__unit__in=u_ids)  #
+            | Q(reservation_units__unit__unit_groups__in=g_ids)
         )
 
     @staticmethod
@@ -159,11 +159,11 @@ class ReservationFilterSet(ModelFilterSet):
         for word in words:
             word = word.strip()
             if language == "en":
-                q |= Q(reservation_unit__name_en__istartswith=word)
+                q |= Q(reservation_units__name_en__istartswith=word)
             elif language == "sv":
-                q |= Q(reservation_unit__name_sv__istartswith=word)
+                q |= Q(reservation_units__name_sv__istartswith=word)
             else:
-                q |= Q(reservation_unit__name_fi__istartswith=word)
+                q |= Q(reservation_units__name_fi__istartswith=word)
 
         return qs.filter(q).distinct()
 

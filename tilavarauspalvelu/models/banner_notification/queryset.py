@@ -10,6 +10,7 @@ __all__ = [
     "BANNER_LEVEL_SORT_ORDER",
     "BANNER_STATE_SORT_ORDER",
     "BANNER_TARGET_SORT_ORDER",
+    "BannerNotificationManager",
     "BannerNotificationQuerySet",
 ]
 
@@ -68,6 +69,9 @@ class BannerNotificationQuerySet(models.QuerySet):
 
     def order_by_target(self, desc: bool = False) -> Self:
         return self.order_by_expression(alias="__target", expression=BANNER_TARGET_SORT_ORDER, desc=desc)
+
+
+class BannerNotificationManager(models.Manager.from_queryset(BannerNotificationQuerySet)): ...
 
 
 BANNER_LEVEL_SORT_ORDER = models.Case(

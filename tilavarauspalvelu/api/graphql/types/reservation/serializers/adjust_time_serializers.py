@@ -37,7 +37,7 @@ class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reservation
 
     def save(self) -> Reservation:
         kwargs: dict[str, Any] = {}
-        for res_unit in self.instance.reservation_unit.all():
+        for res_unit in self.instance.reservation_units.all():
             kwargs["buffer_time_before"] = res_unit.actions.get_actual_before_buffer(self.validated_data["begin"])
             kwargs["buffer_time_after"] = res_unit.actions.get_actual_after_buffer(self.validated_data["end"])
             break
@@ -73,7 +73,7 @@ class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reservation
         end: datetime.datetime = data["end"].astimezone(DEFAULT_TIMEZONE)
         self.check_begin(begin, end)
 
-        for reservation_unit in self.instance.reservation_unit.all():
+        for reservation_unit in self.instance.reservation_units.all():
             self.check_cancellation_rules(reservation_unit)
             self.check_reservation_time(reservation_unit)
             self.check_reservation_overlap(reservation_unit, begin, end)
@@ -140,7 +140,7 @@ class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reservation
                 ValidationErrorCodes.CANCELLATION_NOT_ALLOWED,
             )
         if self.requires_price_calculation(data):
-            pricing = self.calculate_price(data["begin"], data["end"], self.instance.reservation_unit.all())
+            pricing = self.calculate_price(data["begin"], data["end"], self.instance.reservation_units.all())
 
             if pricing.reservation_price > 0:
                 raise ValidationErrorWithCode(

@@ -40,7 +40,7 @@ def _create_reservations(  # NOSONAR (python:S3776)
     cities: list[City],
 ) -> list[Reservation]:
     # Pick out the through model for the many-to-many relationship and use if for bulk creation
-    ThroughModel: type[models.Model] = Reservation.reservation_unit.through  # noqa: N806
+    ThroughModel: type[models.Model] = Reservation.reservation_units.through  # noqa: N806
 
     reservations: list[Reservation] = []
     through_models: list[models.Model] = []

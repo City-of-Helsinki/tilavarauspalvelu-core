@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 from django.contrib.gis.db.models import PointField
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.constants import COORDINATE_SYSTEM_ID
 
@@ -32,6 +33,9 @@ class Location(models.Model):
     address_street: str = models.CharField(max_length=100, blank=True)
     address_zip: str = models.CharField(max_length=30, blank=True)
     address_city: str = models.CharField(max_length=100, blank=True)
+
+    coordinates: Point | None = PointField(null=True, srid=COORDINATE_SYSTEM_ID)
+
     space: Space | None = models.OneToOneField(
         "tilavarauspalvelu.Space",
         related_name="location",
@@ -60,13 +64,22 @@ class Location(models.Model):
         null=True,
         blank=True,
     )
-    coordinates: Point | None = PointField(null=True, srid=COORDINATE_SYSTEM_ID)
 
     objects = LocationManager()
+
+    # Translated field hints
+    address_street_fi: str | None
+    address_street_en: str | None
+    address_street_sv: str | None
+    address_city_fi: str | None
+    address_city_en: str | None
+    address_city_sv: str | None
 
     class Meta:
         db_table = "location"
         base_manager_name = "objects"
+        verbose_name = _("location")
+        verbose_name_plural = _("locations")
         ordering = ["pk"]
 
     def __str__(self) -> str:

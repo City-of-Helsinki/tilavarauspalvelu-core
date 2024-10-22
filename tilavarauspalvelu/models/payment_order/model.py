@@ -59,6 +59,8 @@ class PaymentOrder(models.Model):
     class Meta:
         db_table = "payment_order"
         base_manager_name = "objects"
+        verbose_name = _("payment order")
+        verbose_name_plural = _("payment orders")
         ordering = ["pk"]
 
     def __str__(self) -> str:

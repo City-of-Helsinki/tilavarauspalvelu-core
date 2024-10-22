@@ -13,7 +13,7 @@ from django.utils.translation import gettext_lazy as _
 
 from utils.sentry import SentryLogger
 
-from .queryset import ReservationUnitHierarchyQuerySet
+from .queryset import ReservationUnitHierarchyManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit
@@ -33,21 +33,21 @@ class ReservationUnitHierarchy(models.Model):
 
     reservation_unit: ReservationUnit = models.OneToOneField(
         "tilavarauspalvelu.ReservationUnit",
+        related_name="reservation_unit_hierarchy",
         on_delete=models.DO_NOTHING,
         primary_key=True,
         db_column="reservation_unit_id",
-        related_name="reservation_unit_hierarchy",
     )
     related_reservation_unit_ids: list[int] = ArrayField(base_field=models.IntegerField())
 
-    objects = ReservationUnitHierarchyQuerySet.as_manager()
+    objects = ReservationUnitHierarchyManager()
 
     class Meta:
         managed = False
         db_table = "reservation_unit_hierarchy"
+        base_manager_name = "objects"
         verbose_name = _("reservation unit hierarchy")
         verbose_name_plural = _("reservation unit hierarchies")
-        base_manager_name = "objects"
 
     def __str__(self) -> str:
         return f"Hierarchy for reservation unit: {self.reservation_unit_id}"

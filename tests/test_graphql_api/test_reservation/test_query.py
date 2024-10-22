@@ -67,7 +67,7 @@ def test_reservation__query__all_fields(graphql):
         priceNet
         purpose { nameFi }
         recurringReservation { user { email } }
-        reservationUnit { nameFi }
+        reservationUnits { nameFi }
         reserveeAddressCity
         reserveeAddressStreet
         reserveeAddressZip
@@ -127,7 +127,7 @@ def test_reservation__query__all_fields(graphql):
         "priceNet": f"{reservation.price_net:.2f}",
         "purpose": None,
         "recurringReservation": None,
-        "reservationUnit": [],
+        "reservationUnits": [],
         "reserveeAddressCity": reservation.reservee_address_city,
         "reserveeAddressStreet": reservation.reservee_address_street,
         "reserveeAddressZip": reservation.reservee_address_zip,
@@ -257,7 +257,7 @@ def test_reservation__query__reservee_date_of_birth_is_show_but_logged__general_
 def test_reservation__query__reservee_date_of_birth_is_show_but_logged__unit_admin(graphql):
     unit = UnitFactory.create()
     reservation_unit = ReservationUnitFactory.create(unit=unit)
-    reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
+    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
     admin = UserFactory.create_with_unit_role(units=[unit])
 
     graphql.force_login(admin)
@@ -285,7 +285,7 @@ def test_reservation__query__reservee_date_of_birth_is_show_but_logged__unit_gro
     unit_group = UnitGroupFactory.create()
     unit = UnitFactory.create(unit_groups=[unit_group])
     reservation_unit = ReservationUnitFactory.create(unit=unit)
-    reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
+    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
     admin = UserFactory.create_with_unit_role(unit_groups=[unit_group])
 
     graphql.force_login(admin)

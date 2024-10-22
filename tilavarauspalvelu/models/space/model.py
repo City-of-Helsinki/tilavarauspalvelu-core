@@ -4,6 +4,7 @@ from functools import cached_property
 from typing import TYPE_CHECKING
 
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from lookup_property import lookup_property
 from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
@@ -26,15 +27,15 @@ __all__ = [
 class Space(MPTTModel):
     name: str = models.CharField(max_length=255)
     surface_area: int | None = models.IntegerField(blank=True, null=True)
-    max_persons: int | None = models.fields.PositiveIntegerField(null=True, blank=True)
+    max_persons: int | None = models.PositiveIntegerField(null=True, blank=True)
     code: str = models.CharField(max_length=255, db_index=True, blank=True, default="")
 
     parent: Space | None = TreeForeignKey(
         "self",
-        null=True,
-        blank=True,
         related_name="children",
         on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
     )
     building: Building | None = models.ForeignKey(
         "tilavarauspalvelu.Building",
@@ -67,6 +68,8 @@ class Space(MPTTModel):
     class Meta:
         db_table = "space"
         base_manager_name = "objects"
+        verbose_name = _("space")
+        verbose_name_plural = _("spaces")
         ordering = ["pk"]
 
     def __str__(self) -> str:

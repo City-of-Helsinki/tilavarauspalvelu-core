@@ -105,7 +105,7 @@ class UnitFilterSet(ModelFilterSet):
 
         # Prevent multiple joins, see explanation above.
         qs.query.filter_is_sticky = True
-        qs = qs.filter(Q(reservationunit__reservation__user=user, _negated=not value))
+        qs = qs.filter(Q(reservation_units__reservations__user=user, _negated=not value))
         qs.query.filter_is_sticky = True
         return qs.distinct()
 
@@ -115,18 +115,18 @@ class UnitFilterSet(ModelFilterSet):
 
         if value:
             query = (
-                Q(reservationunit__is_archived=False)
-                & Q(reservationunit__is_draft=False)
-                & (Q(reservationunit__publish_begins__isnull=True) | Q(reservationunit__publish_begins__lte=now))
-                & (Q(reservationunit__publish_ends__isnull=True) | Q(reservationunit__publish_ends__gt=now))
+                Q(reservation_units__is_archived=False)
+                & Q(reservation_units__is_draft=False)
+                & (Q(reservation_units__publish_begins__isnull=True) | Q(reservation_units__publish_begins__lte=now))
+                & (Q(reservation_units__publish_ends__isnull=True) | Q(reservation_units__publish_ends__gt=now))
             )
 
         else:
             query = (
-                Q(reservationunit__is_archived=True)
-                | Q(reservationunit__is_draft=True)
-                | (Q(reservationunit__publish_begins__gte=now))
-                | (Q(reservationunit__publish_ends__lt=now))
+                Q(reservation_units__is_archived=True)
+                | Q(reservation_units__is_draft=True)
+                | (Q(reservation_units__publish_begins__gte=now))
+                | (Q(reservation_units__publish_ends__lt=now))
             )
 
         # Prevent multiple joins, see explanation above.
@@ -142,7 +142,7 @@ class UnitFilterSet(ModelFilterSet):
 
         # Prevent multiple joins, see explanation above.
         qs.query.filter_is_sticky = True
-        qs = qs.filter(reservationunit__reservation_kind__in=ReservationKind.allows_direct)
+        qs = qs.filter(reservation_units__reservation_kind__in=ReservationKind.allows_direct)
         qs.query.filter_is_sticky = True
         return qs.distinct()
 
@@ -153,7 +153,7 @@ class UnitFilterSet(ModelFilterSet):
 
         # Prevent multiple joins, see explanation above.
         qs.query.filter_is_sticky = True
-        qs = qs.filter(reservationunit__reservation_kind__in=ReservationKind.allows_season)
+        qs = qs.filter(reservation_units__reservation_kind__in=ReservationKind.allows_season)
         qs.query.filter_is_sticky = True
         return qs.distinct()
 

@@ -11,7 +11,9 @@ from tests.factories import (
     AddressFactory,
     ApplicationFactory,
     ApplicationSectionFactory,
+    OrganisationFactory,
     PaymentOrderFactory,
+    PersonFactory,
     ReservationFactory,
     UnitFactory,
     UserFactory,
@@ -83,7 +85,15 @@ def test_anonymization__application():
         reservation_notification=ReservationNotification.ALL,
     )
     billing_address = AddressFactory()
-    application = ApplicationFactory.create(user=mr_anonymous, billing_address=billing_address)
+    organisation_address = AddressFactory.create()
+    contact_person = PersonFactory.create()
+    organisation = OrganisationFactory.create(address=organisation_address)
+    application = ApplicationFactory.create(
+        user=mr_anonymous,
+        billing_address=billing_address,
+        contact_person=contact_person,
+        organisation=organisation,
+    )
     app_section = ApplicationSectionFactory.create(application=application)
 
     mr_anonymous.actions.anonymize_user_applications()
@@ -226,6 +236,8 @@ def test_anonymization__can_anonymize__open_payments():
 
     PaymentOrderFactory.create(
         reservation__user=user,
+        reservation__begin=datetime.datetime(2022, 1, 1),
+        reservation__end=datetime.datetime(2022, 1, 2),
         remote_id=uuid.uuid4(),
         status=OrderStatus.DRAFT,
     )

@@ -14,7 +14,7 @@ pytestmark = [
 
 def test_order__query__unauthenticated_user(graphql):
     reservation_unit = ReservationUnitFactory.create()
-    reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
+    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
     order = PaymentOrderFactory.create(reservation=reservation, remote_id=str(uuid.uuid4()))
 
     query = order_query(order_uuid=order.remote_id)
@@ -26,7 +26,7 @@ def test_order__query__unauthenticated_user(graphql):
 
 def test_order__query__regular_user(graphql):
     reservation_unit = ReservationUnitFactory.create()
-    reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
+    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
     order = PaymentOrderFactory.create(reservation=reservation, remote_id=str(uuid.uuid4()))
 
     graphql.login_with_regular_user()
@@ -40,7 +40,7 @@ def test_order__query__regular_user(graphql):
 
 def test_order__query__general_admin__can_manage_reservations(graphql):
     reservation_unit = ReservationUnitFactory.create()
-    reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
+    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
     order = PaymentOrderFactory.create(reservation=reservation, remote_id=str(uuid.uuid4()))
 
     user = UserFactory.create_with_general_role()
@@ -55,7 +55,7 @@ def test_order__query__general_admin__can_manage_reservations(graphql):
 
 def test_order__query__unit_admin__can_manage_reservations(graphql):
     reservation_unit = ReservationUnitFactory.create()
-    reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
+    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
     order = PaymentOrderFactory.create(reservation=reservation, remote_id=str(uuid.uuid4()))
 
     user = UserFactory.create_with_unit_role(units=[reservation_unit.unit])

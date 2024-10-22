@@ -5,8 +5,9 @@ from functools import cached_property
 from typing import TYPE_CHECKING
 
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
-from .queryset import TaxPercentageQuerySet
+from .queryset import TaxPercentageManager
 
 if TYPE_CHECKING:
     from .actions import TaxPercentageActions
@@ -17,13 +18,15 @@ __all__ = [
 
 
 class TaxPercentage(models.Model):
-    value = models.DecimalField(max_digits=5, decimal_places=2)
+    value: Decimal = models.DecimalField(max_digits=5, decimal_places=2)
 
-    objects = TaxPercentageQuerySet.as_manager()
+    objects = TaxPercentageManager()
 
     class Meta:
         db_table = "tax_percentage"
         base_manager_name = "objects"
+        verbose_name = _("tax percentage")
+        verbose_name_plural = _("tax percentages")
         ordering = ["pk"]
 
     def __str__(self) -> str:

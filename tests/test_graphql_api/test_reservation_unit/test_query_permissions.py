@@ -48,7 +48,7 @@ def test_reservation_unit__query__regular_user(graphql):
 
 
 SENSITIVE_FIELDS = """
-    reservationSet {
+    reservations {
         user {
             email
             dateOfBirth
@@ -102,7 +102,7 @@ def test_reservation_unit__query__sensitive_information__regular_user(graphql):
         description="Description",
         free_of_charge_reason="Free of Charge Reason",
         handling_details="Handling Details",
-        reservation_unit=[reservation_unit],
+        reservation_units=[reservation_unit],
         reservee_address_city="City",
         reservee_address_street="Address",
         reservee_address_zip="Zip",
@@ -123,7 +123,7 @@ def test_reservation_unit__query__sensitive_information__regular_user(graphql):
     assert response.has_errors is False, response.errors
     assert len(response.edges) == 1
     assert response.node(0) == {
-        "reservationSet": [
+        "reservations": [
             {
                 "billingAddressCity": None,
                 "billingAddressStreet": None,
@@ -172,7 +172,7 @@ def test_reservation_unit__query__sensitive_information__general_admin(graphql):
         description="Description",
         free_of_charge_reason="Free of Charge Reason",
         handling_details="Handling Details",
-        reservation_unit=[reservation_unit],
+        reservation_units=[reservation_unit],
         reservee_address_city="City",
         reservee_address_street="Address",
         reservee_address_zip="Zip",
@@ -195,7 +195,7 @@ def test_reservation_unit__query__sensitive_information__general_admin(graphql):
     assert response.has_errors is False, response.errors
     assert len(response.edges) == 1
     assert response.node(0) == {
-        "reservationSet": [
+        "reservations": [
             {
                 "billingAddressCity": "Billing City",
                 "billingAddressStreet": "Billing Street",

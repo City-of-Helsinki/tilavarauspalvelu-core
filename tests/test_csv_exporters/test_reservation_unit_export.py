@@ -40,6 +40,7 @@ def test_reservation_unit_export_multiple():
         metadata_set__name="Metadata set",
         payment_types__code="Payment type",
         pricings__status=PricingStatus.PRICING_STATUS_ACTIVE,
+        reservation_unit_type__name="Normal",
     )
 
     # when:

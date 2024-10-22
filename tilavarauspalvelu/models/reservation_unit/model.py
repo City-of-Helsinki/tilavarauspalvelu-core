@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from elasticsearch_django.models import SearchDocumentManagerMixin, SearchDocumentMixin
+from elasticsearch_django.models import SearchDocumentMixin
 from lookup_property import L, lookup_property
 
 from config.utils.auditlog_util import AuditLogger
@@ -23,7 +23,7 @@ from tilavarauspalvelu.enums import (
 )
 from utils.db import NowTT
 
-from .queryset import ReservationUnitQuerySet
+from .queryset import ReservationUnitManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import (
@@ -41,9 +41,9 @@ if TYPE_CHECKING:
     from .actions import ReservationUnitActions
 
 
-class ReservationUnitManager(SearchDocumentManagerMixin.from_queryset(ReservationUnitQuerySet)):
-    def get_search_queryset(self, index: str = "_all") -> models.QuerySet:
-        return self.get_queryset()
+__all__ = [
+    "ReservationUnit",
+]
 
 
 class ReservationUnit(SearchDocumentMixin, models.Model):
@@ -66,8 +66,8 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
     # Integers
 
     surface_area: int | None = models.IntegerField(null=True, blank=True)
-    min_persons: int | None = models.fields.PositiveIntegerField(null=True, blank=True)
-    max_persons: int | None = models.fields.PositiveIntegerField(null=True, blank=True)
+    min_persons: int | None = models.PositiveIntegerField(null=True, blank=True)
+    max_persons: int | None = models.PositiveIntegerField(null=True, blank=True)
     max_reservations_per_user: int | None = models.PositiveIntegerField(null=True, blank=True)
     # In calculations this is interpreted as the beginning of the calculated day.
     # e.g. Today is 2023-10-10
@@ -121,6 +121,7 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
 
     unit: Unit | None = models.ForeignKey(
         "tilavarauspalvelu.Unit",
+        related_name="reservation_units",
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
@@ -141,6 +142,7 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
     )
     cancellation_rule: ReservationUnitCancellationRule | None = models.ForeignKey(
         "tilavarauspalvelu.ReservationUnitCancellationRule",
+        related_name="reservation_units",
         blank=True,
         null=True,
         on_delete=models.PROTECT,
@@ -154,28 +156,28 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
     )
     cancellation_terms: TermsOfUse | None = models.ForeignKey(
         "tilavarauspalvelu.TermsOfUse",
-        related_name="cancellation_terms_reservation_unit",
+        related_name="cancellation_terms_reservation_units",
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
     )
     service_specific_terms: TermsOfUse | None = models.ForeignKey(
         "tilavarauspalvelu.TermsOfUse",
-        related_name="service_specific_terms_reservation_unit",
+        related_name="service_specific_terms_reservation_units",
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
     )
     pricing_terms: TermsOfUse | None = models.ForeignKey(
         "tilavarauspalvelu.TermsOfUse",
-        related_name="pricing_terms_reservation_unit",
+        related_name="pricing_terms_reservation_units",
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
     )
     payment_terms: TermsOfUse | None = models.ForeignKey(
         "tilavarauspalvelu.TermsOfUse",
-        related_name="payment_terms_reservation_unit",
+        related_name="payment_terms_reservation_units",
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
@@ -221,6 +223,7 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
     )
     equipments = models.ManyToManyField(
         "tilavarauspalvelu.Equipment",
+        related_name="reservation_units",
         blank=True,
     )
     services = models.ManyToManyField(
@@ -230,6 +233,7 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
     )
     payment_types = models.ManyToManyField(
         "tilavarauspalvelu.ReservationUnitPaymentType",
+        related_name="reservation_units",
         blank=True,
     )
     qualifiers = models.ManyToManyField(  # Deprecated
@@ -268,8 +272,8 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
     class Meta:
         db_table = "reservation_unit"
         base_manager_name = "objects"
-        verbose_name = _("Reservation Unit")
-        verbose_name_plural = _("Reservation Units")
+        verbose_name = _("reservation unit")
+        verbose_name_plural = _("reservation units")
         ordering = ["rank", "id"]
 
     def __str__(self) -> str:

@@ -63,6 +63,8 @@ __all__ = [
 
 
 class ReservationNotification(models.TextChoices):
+    """When user wants to receive reservation notification emails."""
+
     ALL = "all"
     ONLY_HANDLING_REQUIRED = "only_handling_required"
     NONE = "none"

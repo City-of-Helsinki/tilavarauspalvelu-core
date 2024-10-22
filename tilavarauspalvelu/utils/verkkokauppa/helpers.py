@@ -65,7 +65,7 @@ def get_meta_label(key: str, reservation: Reservation) -> str:
 
 
 def get_verkkokauppa_order_params(reservation: Reservation) -> CreateOrderParams:
-    reservation_unit = reservation.reservation_unit.first()
+    reservation_unit = reservation.reservation_units.first()
     preferred_language = getattr(reservation, "reservee_language", "fi")
     items = [
         OrderItemParams(
@@ -126,7 +126,7 @@ def get_verkkokauppa_order_params(reservation: Reservation) -> CreateOrderParams
 
 
 def create_mock_verkkokauppa_order(reservation: Reservation) -> Order:
-    reservation_unit = reservation.reservation_unit.first()
+    reservation_unit = reservation.reservation_units.first()
 
     if reservation_unit.payment_product is None:
         payment_merchant = ReservationUnitPaymentHelper.get_merchant(reservation_unit)

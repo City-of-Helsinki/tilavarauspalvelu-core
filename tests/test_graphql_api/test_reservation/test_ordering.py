@@ -19,9 +19,9 @@ def test_reservation__order__by_reservation_unit_name__asc(graphql, lang):
     res_unit_b = ReservationUnitFactory.create(**{f"name_{lang}": "B Unit"})
     res_unit_c = ReservationUnitFactory.create(**{f"name_{lang}": "C Unit"})
 
-    reservation_1 = ReservationFactory.create(reservation_unit=[res_unit_a])
-    reservation_2 = ReservationFactory.create(reservation_unit=[res_unit_b])
-    reservation_3 = ReservationFactory.create(reservation_unit=[res_unit_c])
+    reservation_1 = ReservationFactory.create(reservation_units=[res_unit_a])
+    reservation_2 = ReservationFactory.create(reservation_units=[res_unit_b])
+    reservation_3 = ReservationFactory.create(reservation_units=[res_unit_c])
 
     graphql.login_with_superuser()
     query = reservations_query(order_by=f"reservationUnitName{lang.capitalize()}Asc")
@@ -40,9 +40,9 @@ def test_reservation__order__by_reservation_unit_name__desc(graphql, lang):
     res_unit_b = ReservationUnitFactory.create(**{f"name_{lang}": "B Unit"})
     res_unit_c = ReservationUnitFactory.create(**{f"name_{lang}": "C Unit"})
 
-    reservation_1 = ReservationFactory.create(reservation_unit=[res_unit_a])
-    reservation_2 = ReservationFactory.create(reservation_unit=[res_unit_b])
-    reservation_3 = ReservationFactory.create(reservation_unit=[res_unit_c])
+    reservation_1 = ReservationFactory.create(reservation_units=[res_unit_a])
+    reservation_2 = ReservationFactory.create(reservation_units=[res_unit_b])
+    reservation_3 = ReservationFactory.create(reservation_units=[res_unit_c])
 
     graphql.login_with_superuser()
     query = reservations_query(order_by=f"reservationUnitName{lang.capitalize()}Desc")
@@ -111,9 +111,9 @@ def test_reservation__order__by_unit_name__asc(graphql, lang):
     res_unit_b = ReservationUnitFactory.create(**{f"unit__name_{lang}": "B Unit"})
     res_unit_c = ReservationUnitFactory.create(**{f"unit__name_{lang}": "C Unit"})
 
-    reservation_1 = ReservationFactory.create(reservation_unit=[res_unit_a])
-    reservation_2 = ReservationFactory.create(reservation_unit=[res_unit_b])
-    reservation_3 = ReservationFactory.create(reservation_unit=[res_unit_c])
+    reservation_1 = ReservationFactory.create(reservation_units=[res_unit_a])
+    reservation_2 = ReservationFactory.create(reservation_units=[res_unit_b])
+    reservation_3 = ReservationFactory.create(reservation_units=[res_unit_c])
 
     graphql.login_with_superuser()
     query = reservations_query(order_by=f"unitName{lang.capitalize()}Asc")
@@ -132,9 +132,9 @@ def test_reservation__order__by_unit_name__desc(graphql, lang):
     res_unit_b = ReservationUnitFactory.create(**{f"unit__name_{lang}": "B Unit"})
     res_unit_c = ReservationUnitFactory.create(**{f"unit__name_{lang}": "C Unit"})
 
-    reservation_1 = ReservationFactory.create(reservation_unit=[res_unit_a])
-    reservation_2 = ReservationFactory.create(reservation_unit=[res_unit_b])
-    reservation_3 = ReservationFactory.create(reservation_unit=[res_unit_c])
+    reservation_1 = ReservationFactory.create(reservation_units=[res_unit_a])
+    reservation_2 = ReservationFactory.create(reservation_units=[res_unit_b])
+    reservation_3 = ReservationFactory.create(reservation_units=[res_unit_c])
 
     graphql.login_with_superuser()
     query = reservations_query(order_by=f"unitName{lang.capitalize()}Desc")

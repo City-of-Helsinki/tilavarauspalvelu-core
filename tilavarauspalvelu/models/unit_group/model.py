@@ -4,6 +4,7 @@ from functools import cached_property
 from typing import TYPE_CHECKING
 
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from .queryset import UnitGroupManager
 
@@ -18,6 +19,7 @@ __all__ = [
 
 class UnitGroup(models.Model):
     name: str = models.CharField(max_length=255)
+
     units = models.ManyToManyField("tilavarauspalvelu.Unit", related_name="unit_groups")
 
     # Translated field hints
@@ -30,6 +32,8 @@ class UnitGroup(models.Model):
     class Meta:
         db_table = "unit_group"
         base_manager_name = "objects"
+        verbose_name = _("unit group")
+        verbose_name_plural = _("unit groups")
         ordering = ["name"]
 
     def __str__(self) -> str:

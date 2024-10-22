@@ -24,8 +24,8 @@ def test__get_resources_total_hours_per_resource__when_no_resources():
 
 
 def test__get_resources_total_hours_per_resource__when_no_reservable_time_spans():
-    ohr1 = OriginHaukiResourceFactory(id=123)
-    ohr2 = OriginHaukiResourceFactory(id=321)
+    ohr1 = OriginHaukiResourceFactory.create(id=123)
+    ohr2 = OriginHaukiResourceFactory.create(id=321)
 
     total_hours_dict = get_resources_total_hours_per_resource(
         [ohr1.id, ohr2.id],
@@ -39,14 +39,14 @@ def test__get_resources_total_hours_per_resource__when_no_reservable_time_spans(
 
 
 def test__get_resources_total_hours_per_resource__when_one_resource_has_reservable_time_spans():
-    ohr1 = OriginHaukiResourceFactory(id=123)
-    ohr2 = OriginHaukiResourceFactory(id=321)
-    ReservableTimeSpanFactory(
+    ohr1 = OriginHaukiResourceFactory.create(id=123)
+    ohr2 = OriginHaukiResourceFactory.create(id=321)
+    ReservableTimeSpanFactory.create(
         resource=ohr1,
         start_datetime=datetime.datetime(2023, 1, 1, 10, tzinfo=DEFAULT_TIMEZONE),
         end_datetime=datetime.datetime(2023, 1, 1, 22, tzinfo=DEFAULT_TIMEZONE),
     )
-    ReservableTimeSpanFactory(
+    ReservableTimeSpanFactory.create(
         resource=ohr1,
         start_datetime=datetime.datetime(2023, 1, 2, 10, tzinfo=DEFAULT_TIMEZONE),
         end_datetime=datetime.datetime(2023, 1, 2, 22, tzinfo=DEFAULT_TIMEZONE),
@@ -64,31 +64,31 @@ def test__get_resources_total_hours_per_resource__when_one_resource_has_reservab
 
 
 def test__get_resources_total_hours_per_resource__when_multiple_resources_have_reservable_time_spans():
-    ohr1 = OriginHaukiResourceFactory(id=123)
-    ohr2 = OriginHaukiResourceFactory(id=321)
+    ohr1 = OriginHaukiResourceFactory.create(id=123)
+    ohr2 = OriginHaukiResourceFactory.create(id=321)
     # Date in the past, should not be included
-    ReservableTimeSpanFactory(
+    ReservableTimeSpanFactory.create(
         resource=ohr1,
         start_datetime=datetime.datetime(2022, 12, 31, 10, tzinfo=DEFAULT_TIMEZONE),
         end_datetime=datetime.datetime(2022, 12, 31, 22, tzinfo=DEFAULT_TIMEZONE),
     )
-    ReservableTimeSpanFactory(
+    ReservableTimeSpanFactory.create(
         resource=ohr1,
         start_datetime=datetime.datetime(2023, 1, 1, 10, tzinfo=DEFAULT_TIMEZONE),
         end_datetime=datetime.datetime(2023, 1, 1, 22, tzinfo=DEFAULT_TIMEZONE),
     )
-    ReservableTimeSpanFactory(
+    ReservableTimeSpanFactory.create(
         resource=ohr1,
         start_datetime=datetime.datetime(2023, 1, 2, 10, tzinfo=DEFAULT_TIMEZONE),
         end_datetime=datetime.datetime(2023, 1, 2, 22, tzinfo=DEFAULT_TIMEZONE),
     )
     # Date in the future, should not be included
-    ReservableTimeSpanFactory(
+    ReservableTimeSpanFactory.create(
         resource=ohr1,
         start_datetime=datetime.datetime(2023, 1, 11, 10, tzinfo=DEFAULT_TIMEZONE),
         end_datetime=datetime.datetime(2023, 1, 11, 22, tzinfo=DEFAULT_TIMEZONE),
     )
-    ReservableTimeSpanFactory(
+    ReservableTimeSpanFactory.create(
         resource=ohr2,
         start_datetime=datetime.datetime(2023, 1, 2, 0, tzinfo=DEFAULT_TIMEZONE),
         end_datetime=datetime.datetime(2023, 1, 2, 22, tzinfo=DEFAULT_TIMEZONE),

@@ -203,7 +203,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         from tilavarauspalvelu.models import Reservation
 
         qs = Reservation.objects.filter(
-            reservation_unit__in=self.reservation_units_with_common_hierarchy,
+            reservation_units__in=self.reservation_units_with_common_hierarchy,
             end__gt=start_datetime,
             begin__lt=end_datetime,
         ).exclude(state__in=[ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED])
@@ -224,7 +224,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         from tilavarauspalvelu.models import Reservation
 
         qs = Reservation.objects.filter(
-            reservation_unit__in=self.reservation_units_with_common_hierarchy,
+            reservation_units__in=self.reservation_units_with_common_hierarchy,
             begin__gte=end_time,
         ).exclude(state__in=[ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED])
 
@@ -246,7 +246,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         from tilavarauspalvelu.models import Reservation
 
         qs = Reservation.objects.filter(
-            reservation_unit__in=self.reservation_units_with_common_hierarchy,
+            reservation_units__in=self.reservation_units_with_common_hierarchy,
             end__lte=start_time,
         ).exclude(state__in=[ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED])
 

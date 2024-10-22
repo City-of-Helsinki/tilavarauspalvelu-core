@@ -51,12 +51,12 @@ def test_units__order__by_reservations_count(graphql):
     res_unit_5 = ReservationUnitFactory.create(unit=units[3])
     res_unit_6 = ReservationUnitFactory.create(unit=units[3])
 
-    ReservationFactory.create_batch(3, reservation_unit=[res_unit_1])
-    ReservationFactory.create_batch(1, reservation_unit=[res_unit_2])
-    ReservationFactory.create_batch(2, reservation_unit=[res_unit_3])
-    ReservationFactory.create_batch(3, reservation_unit=[res_unit_4])
-    ReservationFactory.create_batch(1, reservation_unit=[res_unit_5])
-    ReservationFactory.create_batch(1, reservation_unit=[res_unit_6])
+    ReservationFactory.create_batch(3, reservation_units=[res_unit_1])
+    ReservationFactory.create_batch(1, reservation_units=[res_unit_2])
+    ReservationFactory.create_batch(2, reservation_units=[res_unit_3])
+    ReservationFactory.create_batch(3, reservation_units=[res_unit_4])
+    ReservationFactory.create_batch(1, reservation_units=[res_unit_5])
+    ReservationFactory.create_batch(1, reservation_units=[res_unit_6])
 
     # Descending
     query_1 = units_query(order_by=["reservationCountDesc", "pkDesc"])
@@ -104,12 +104,12 @@ def test_units__order__by_reservations_count__only_own_reservations(graphql):
 
     user = UserFactory.create()
 
-    ReservationFactory.create_batch(3, reservation_unit=[res_unit_1], user=user)
-    ReservationFactory.create_batch(1, reservation_unit=[res_unit_2])
-    ReservationFactory.create_batch(2, reservation_unit=[res_unit_3], user=user)
-    ReservationFactory.create_batch(3, reservation_unit=[res_unit_4])
-    ReservationFactory.create_batch(1, reservation_unit=[res_unit_5], user=user)
-    ReservationFactory.create_batch(1, reservation_unit=[res_unit_6])
+    ReservationFactory.create_batch(3, reservation_units=[res_unit_1], user=user)
+    ReservationFactory.create_batch(1, reservation_units=[res_unit_2])
+    ReservationFactory.create_batch(2, reservation_units=[res_unit_3], user=user)
+    ReservationFactory.create_batch(3, reservation_units=[res_unit_4])
+    ReservationFactory.create_batch(1, reservation_units=[res_unit_5], user=user)
+    ReservationFactory.create_batch(1, reservation_units=[res_unit_6])
 
     graphql.force_login(user)
 

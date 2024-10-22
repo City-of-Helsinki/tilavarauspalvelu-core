@@ -22,7 +22,7 @@ __all__ = [
 
 
 class PaymentAccounting(models.Model):
-    """Custom validation comes from requirements in SAP"""
+    # Custom validation comes from requirements in SAP
 
     name: str = models.CharField(max_length=128)
     company_code: str = models.CharField(max_length=4, validators=[is_numeric])
@@ -44,6 +44,8 @@ class PaymentAccounting(models.Model):
     class Meta:
         db_table = "payment_accounting"
         base_manager_name = "objects"
+        verbose_name = _("payment accounting")
+        verbose_name_plural = _("payment accountings")
         ordering = ["pk"]
 
     def __str__(self) -> str:

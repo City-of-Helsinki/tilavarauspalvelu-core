@@ -36,7 +36,7 @@ DEFAULT_TIMEZONE = get_default_timezone()
 class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin, ReservationSchedulingMixin):
     reservation_unit_pks = serializers.ListField(
         child=IntegerPrimaryKeyField(queryset=ReservationUnit.objects.all()),
-        source="reservation_unit",
+        source="reservation_units",
     )
     purpose_pk = IntegerPrimaryKeyField(queryset=ReservationPurpose.objects.all(), source="purpose", allow_null=True)
     home_city_pk = IntegerPrimaryKeyField(queryset=City.objects.all(), source="home_city", allow_null=True)
@@ -141,7 +141,7 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
         begin = begin.astimezone(DEFAULT_TIMEZONE)
         end = end.astimezone(DEFAULT_TIMEZONE)
 
-        reservation_units = data.get("reservation_unit", getattr(self.instance, "reservation_unit", None))
+        reservation_units = data.get("reservation_units", getattr(self.instance, "reservation_units", None))
         if hasattr(reservation_units, "all"):
             reservation_units = reservation_units.all()
 
@@ -237,7 +237,7 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
             return
 
         existing_reservations_count = (
-            Reservation.objects.filter(user=user, reservation_unit=reservation_unit)
+            Reservation.objects.filter(user=user, reservation_units=reservation_unit)
             .exclude(pk=getattr(self.instance, "pk", None))  # Safely handle both create and update cases
             .exclude(type=ReservationTypeChoice.SEASONAL)
             .active()

@@ -6,6 +6,7 @@ from typing import Self
 from django.conf import settings
 from django.contrib.auth.models import UserManager as DjangoUserManager
 from django.db import models
+from helsinki_gdpr.models import SerializableMixin
 
 from tilavarauspalvelu.models.user.actions import ANONYMIZED_FIRST_NAME, ANONYMIZED_LAST_NAME
 from utils.date_utils import local_date
@@ -90,3 +91,6 @@ class UserQuerySet(models.QuerySet):
 
 
 class UserManager(DjangoUserManager.from_queryset(UserQuerySet)): ...
+
+
+class ProfileUserManager(SerializableMixin.SerializableManager.from_queryset(UserQuerySet)): ...

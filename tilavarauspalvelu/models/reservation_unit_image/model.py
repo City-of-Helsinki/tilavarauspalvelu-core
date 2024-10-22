@@ -5,14 +5,17 @@ from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from easy_thumbnails.fields import ThumbnailerImageField
 
 from tilavarauspalvelu.enums import ReservationUnitImageType
 
-from .queryset import ReservationUnitImageQuerySet
+from .queryset import ReservationUnitImageManager
 
 if TYPE_CHECKING:
     from easy_thumbnails.files import ThumbnailFile
+
+    from tilavarauspalvelu.models import ReservationUnit
 
     from .actions import ReservationUnitImageActions
 
@@ -22,7 +25,7 @@ __all__ = [
 
 
 class ReservationUnitImage(models.Model):
-    reservation_unit = models.ForeignKey(
+    reservation_unit: ReservationUnit = models.ForeignKey(
         "tilavarauspalvelu.ReservationUnit",
         related_name="images",
         on_delete=models.CASCADE,
@@ -36,11 +39,13 @@ class ReservationUnitImage(models.Model):
     medium_url: str = models.URLField(max_length=255, default="", blank=True)
     small_url: str = models.URLField(max_length=255, default="", blank=True)
 
-    objects = ReservationUnitImageQuerySet.as_manager()
+    objects = ReservationUnitImageManager()
 
     class Meta:
         db_table = "reservation_unit_image"
         base_manager_name = "objects"
+        verbose_name = _("reservation unit image")
+        verbose_name_plural = _("reservation unit images")
         ordering = ["pk"]
 
     def __str__(self) -> str:

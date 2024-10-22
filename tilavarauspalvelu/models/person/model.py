@@ -7,10 +7,15 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 
-from .queryset import PersonQuerySet
+from .queryset import PersonManager
 
 if TYPE_CHECKING:
     from .actions import PersonActions
+
+
+__all__ = [
+    "Person",
+]
 
 
 class Person(SerializableMixin, models.Model):
@@ -19,16 +24,14 @@ class Person(SerializableMixin, models.Model):
     email: str | None = models.EmailField(null=True, blank=True)
     phone_number: str | None = models.CharField(null=True, blank=True, max_length=50)
 
-    objects = PersonQuerySet.as_manager()
+    objects = PersonManager()
 
     class Meta:
         db_table = "person"
         base_manager_name = "objects"
-        verbose_name = _("Person")
-        verbose_name_plural = _("Persons")
-        ordering = [
-            "pk",
-        ]
+        verbose_name = _("person")
+        verbose_name_plural = _("persons")
+        ordering = ["pk"]
 
     # For GDPR API
     serialize_fields = (

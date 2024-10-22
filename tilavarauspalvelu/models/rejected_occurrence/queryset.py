@@ -5,6 +5,11 @@ from lookup_property import L
 
 from tilavarauspalvelu.enums import RejectionReadinessChoice
 
+__all__ = [
+    "RejectedOccurrenceManager",
+    "RejectedOccurrenceQuerySet",
+]
+
 
 class RejectedOccurrenceQuerySet(models.QuerySet):
     def order_by_applicant(self, *, desc: bool = False) -> Self:
@@ -37,3 +42,6 @@ class RejectedOccurrenceQuerySet(models.QuerySet):
                 output_field=models.IntegerField(),
             ),
         ).order_by(models.OrderBy(models.F("rejection_reason_order"), descending=desc))
+
+
+class RejectedOccurrenceManager(models.Manager.from_queryset(RejectedOccurrenceQuerySet)): ...

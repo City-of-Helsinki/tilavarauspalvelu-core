@@ -30,8 +30,13 @@ class GeneralRole(models.Model):
     role: str = StrChoiceField(enum=UserRoleChoice)
 
     assigner: User | None = models.ForeignKey(
-        "tilavarauspalvelu.User", on_delete=models.SET_NULL, null=True, blank=True
+        "tilavarauspalvelu.User",
+        related_name="assigned_general_roles",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
     )
+
     created: datetime.datetime = models.DateTimeField(auto_now_add=True)
     modified: datetime.datetime = models.DateTimeField(auto_now=True)
 
@@ -42,8 +47,8 @@ class GeneralRole(models.Model):
     class Meta:
         db_table = "general_role"
         base_manager_name = "objects"
-        verbose_name = _("General role")
-        verbose_name_plural = _("General roles")
+        verbose_name = _("general role")
+        verbose_name_plural = _("general roles")
         ordering = ["pk"]
 
     def __str__(self) -> str:

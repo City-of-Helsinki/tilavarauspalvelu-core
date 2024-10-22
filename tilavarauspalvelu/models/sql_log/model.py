@@ -8,7 +8,7 @@ import sqlparse
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .queryset import SQLLogQuerySet
+from .queryset import SQLLogManager
 
 if TYPE_CHECKING:
     from .actions import SQLLogActions
@@ -21,8 +21,8 @@ __all__ = [
 class SQLLog(models.Model):
     request_log = models.ForeignKey(
         "tilavarauspalvelu.RequestLog",
-        on_delete=models.CASCADE,
         related_name="sql_logs",
+        on_delete=models.CASCADE,
         editable=False,
     )
 
@@ -31,7 +31,7 @@ class SQLLog(models.Model):
     succeeded: bool = models.BooleanField(default=True, editable=False)
     stack_info: str = models.TextField(blank=True, editable=False)
 
-    objects = SQLLogQuerySet.as_manager()
+    objects = SQLLogManager()
 
     class Meta:
         db_table = "sql_log"

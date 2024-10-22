@@ -108,7 +108,7 @@ def test_reservation__cancel__regular_user_cannot_cancel_other_users_reservation
 
 def test_reservation__cancel__fails_when_cancellation_time_is_over(graphql):
     reservation = ReservationFactory.create_for_cancellation(
-        reservation_unit__cancellation_rule__can_be_cancelled_time_before=datetime.timedelta(hours=12),
+        reservation_units__cancellation_rule__can_be_cancelled_time_before=datetime.timedelta(hours=12),
     )
 
     graphql.login_with_superuser()
@@ -145,7 +145,7 @@ def test_reservation__cancel__fails_when_reservation_in_the_past(graphql):
 
 
 def test_reservation__cancel__fails_if_no_cancellation_rule(graphql):
-    reservation = ReservationFactory.create_for_cancellation(reservation_unit__cancellation_rule=None)
+    reservation = ReservationFactory.create_for_cancellation(reservation_units__cancellation_rule=None)
 
     graphql.login_with_superuser()
     data = get_cancel_data(reservation)

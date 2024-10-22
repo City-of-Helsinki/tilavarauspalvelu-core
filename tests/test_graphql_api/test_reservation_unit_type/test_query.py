@@ -30,8 +30,8 @@ def test_reservation_unit_type__query(graphql):
     assert response.node(0) == {
         "pk": res_unit_type.pk,
         "nameFi": res_unit_type.name_fi,
-        "nameSv": res_unit_type.name_en,
-        "nameEn": res_unit_type.name_sv,
+        "nameSv": res_unit_type.name_sv,
+        "nameEn": res_unit_type.name_en,
         "rank": res_unit_type.rank,
     }
 

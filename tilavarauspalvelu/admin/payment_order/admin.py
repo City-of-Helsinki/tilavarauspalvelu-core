@@ -63,7 +63,7 @@ class PaymentOrderForm(forms.ModelForm):
         if payment_order and payment_order.id and payment_order.reservation:
             self.fields["reservation"].help_text += (
                 "<br>" + _("Reservation") + f": {payment_order.reservation.id}"
-                "<br>" + _("Reservation unit") + f": {payment_order.reservation.reservation_unit.first()}"
+                "<br>" + _("Reservation unit") + f": {payment_order.reservation.reservation_units.first()}"
             )
 
 
@@ -75,7 +75,7 @@ class PaymentOrderAdmin(admin.ModelAdmin):
         # 'reservation_id' handled separately in `get_search_results()`
         # 'remote_id' handled separately in `get_search_results()`
         "reservation__name",
-        "reservation__reservation_unit__name",
+        "reservation__reservation_units__name",
     ]
     search_help_text = _(
         "Search by Payment Order ID, Reservation ID, Remote Order ID, Reservation name, or Reservation Unit name"
@@ -102,7 +102,7 @@ class PaymentOrderAdmin(admin.ModelAdmin):
     form = PaymentOrderForm
 
     def reservation_unit(self, obj: PaymentOrder) -> str:
-        return obj.reservation.reservation_unit.first() if obj.reservation else ""
+        return obj.reservation.reservation_units.first() if obj.reservation else ""
 
     def get_search_results(
         self,

@@ -62,14 +62,22 @@ def test_get_reservation_email_recipients__no_reservee_email():
 
 
 def test_get_reservation_email_recipients__no_user():
-    reservation = ReservationFactory.create(user=None, reservee_email="reservee@example.com")
+    reservation = ReservationFactory.create(
+        user=None,
+        reservee_email="reservee@example.com",
+        reservee_language=Language.EN.value,
+    )
 
     result = get_reservation_email_recipients(reservation)
     assert result == ["reservee@example.com"]
 
 
 def test_get_reservation_email_recipients__no_reservee_email_or_user():
-    reservation = ReservationFactory.create(user=None, reservee_email="")
+    reservation = ReservationFactory.create(
+        user=None,
+        reservee_email="",
+        reservee_language=Language.EN.value,
+    )
 
     result = get_reservation_email_recipients(reservation)
     assert result == []
@@ -131,7 +139,7 @@ def test_get_reservation_staff_notification_recipients__not_handling():
         preferred_language="sv",
     )
 
-    reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
+    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
 
     result = get_reservation_staff_notification_recipients_by_language(reservation)
     assert result == {"fi": {admin_1.email}}
@@ -158,7 +166,7 @@ def test_get_reservation_staff_notification_recipients__handling():
         preferred_language="sv",
     )
 
-    reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
+    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
 
     result = get_reservation_staff_notification_recipients_by_language(reservation, handling=True)
     assert result == {"fi": {admin_1.email}, "en": {admin_2.email}}
@@ -173,7 +181,7 @@ def test_get_reservation_staff_notification_recipients__dont_include_reservation
         reservation_notification=ReservationNotification.ALL,
     )
 
-    reservation = ReservationFactory.create(reservation_unit=[reservation_unit], user=admin)
+    reservation = ReservationFactory.create(reservation_units=[reservation_unit], user=admin)
 
     result = get_reservation_staff_notification_recipients_by_language(reservation)
     assert result == {}
@@ -186,11 +194,11 @@ def test_get_reservation_staff_notification_recipients__dont_include_if_role_dea
         units=[reservation_unit.unit],
         email="admin@example.com",
         reservation_notification=ReservationNotification.ALL,
-        unit_role__role_active=False,
+        unit_roles__role_active=False,
         preferred_language="fi",
     )
 
-    reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
+    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
 
     result = get_reservation_staff_notification_recipients_by_language(reservation)
     assert result == {}
@@ -205,12 +213,12 @@ def test_get_reservation_staff_notification_recipients__dont_include_if_role_dea
         units=[reservation_unit.unit],
         email="admin@example.com",
         reservation_notification=ReservationNotification.ALL,
-        unit_role__role_active=False,
+        unit_roles__role_active=False,
         preferred_language="fi",
         is_superuser=True,
     )
 
-    reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
+    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
 
     result = get_reservation_staff_notification_recipients_by_language(reservation)
     assert result == {}
@@ -226,7 +234,7 @@ def test_get_reservation_staff_notification_recipients__no_email():
         preferred_language="fi",
     )
 
-    reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
+    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
 
     result = get_reservation_staff_notification_recipients_by_language(reservation)
     assert result == {}

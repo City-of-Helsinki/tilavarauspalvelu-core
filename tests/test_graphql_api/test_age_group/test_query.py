@@ -17,8 +17,8 @@ def test_age_group__query__all_fields(graphql):
     # given:
     # - There are two age groups in the database
     # - A superuser is using the system
-    group_1 = AgeGroupFactory()
-    group_2 = AgeGroupFactory()
+    group_1 = AgeGroupFactory(minimum=18, maximum=30)
+    group_2 = AgeGroupFactory(minimum=31, maximum=60)
     graphql.login_with_superuser()
 
     # when:
@@ -51,8 +51,8 @@ def test_age_group__query__regular_user(graphql):
     # given:
     # - There are two age groups in the database
     # - Regular user is using the system
-    group_1 = AgeGroupFactory()
-    group_2 = AgeGroupFactory()
+    group_1 = AgeGroupFactory(minimum=18, maximum=30)
+    group_2 = AgeGroupFactory(minimum=31, maximum=60)
     graphql.login_with_regular_user()
 
     # when:
@@ -72,8 +72,8 @@ def test_age_group__query__anonymized(graphql):
     # given:
     # - There are two age groups in the database
     # - An anonymized user is using the system
-    group_1 = AgeGroupFactory()
-    group_2 = AgeGroupFactory()
+    group_1 = AgeGroupFactory(minimum=18, maximum=30)
+    group_2 = AgeGroupFactory(minimum=31, maximum=60)
 
     # when:
     # - The user queries for age groups

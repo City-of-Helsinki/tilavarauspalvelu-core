@@ -4,8 +4,9 @@ from functools import cached_property
 from typing import TYPE_CHECKING
 
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
-from .queryset import ReservationUnitPaymentTypeQuerySet
+from .queryset import ReservationUnitPaymentTypeManager
 
 if TYPE_CHECKING:
     from .actions import ReservationUnitPaymentTypeActions
@@ -16,13 +17,15 @@ __all__ = [
 
 
 class ReservationUnitPaymentType(models.Model):
-    code = models.CharField(max_length=32, primary_key=True)
+    code: str = models.CharField(max_length=32, primary_key=True)
 
-    objects = ReservationUnitPaymentTypeQuerySet.as_manager()
+    objects = ReservationUnitPaymentTypeManager()
 
     class Meta:
         db_table = "reservation_unit_payment_type"
         base_manager_name = "objects"
+        verbose_name = _("reservation unit payment type")
+        verbose_name_plural = _("reservation unit payment types")
         ordering = ["pk"]
 
     def __str__(self) -> str:

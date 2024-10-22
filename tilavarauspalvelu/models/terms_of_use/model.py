@@ -20,10 +20,11 @@ __all__ = [
 
 
 class TermsOfUse(models.Model):
-    id = models.CharField(primary_key=True, max_length=100)
-    name = models.CharField(max_length=255, null=True, blank=True)
-    text = models.TextField()
-    terms_type = models.CharField(
+    id: str = models.CharField(primary_key=True, max_length=100)
+    name: str | None = models.CharField(max_length=255, null=True, blank=True)
+    text: str = models.TextField()
+
+    terms_type: str = models.CharField(
         blank=False,
         max_length=40,
         choices=TermsOfUseTypeChoices.choices,

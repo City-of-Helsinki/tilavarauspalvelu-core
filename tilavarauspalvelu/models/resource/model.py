@@ -4,6 +4,7 @@ from functools import cached_property
 from typing import TYPE_CHECKING
 
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.enums import ResourceLocationType
 
@@ -23,15 +24,24 @@ __all__ = [
 
 
 class Resource(models.Model):
+    name: str = models.CharField(max_length=255)
+
     location_type: str = models.CharField(
         max_length=20,
         choices=ResourceLocationType.choices,
         default=ResourceLocationType.FIXED.value,
     )
-    name: str = models.CharField(max_length=255)
-    space: Space | None = models.ForeignKey("tilavarauspalvelu.Space", on_delete=models.SET_NULL, null=True, blank=True)
+
     buffer_time_before: datetime.timedelta | None = models.DurationField(blank=True, null=True)
     buffer_time_after: datetime.timedelta | None = models.DurationField(blank=True, null=True)
+
+    space: Space | None = models.ForeignKey(
+        "tilavarauspalvelu.Space",
+        related_name="resources",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
 
     # Translated field hints
     name_fi: str | None
@@ -43,6 +53,8 @@ class Resource(models.Model):
     class Meta:
         db_table = "resource"
         base_manager_name = "objects"
+        verbose_name = _("resource")
+        verbose_name_plural = _("resources")
         ordering = ["pk"]
 
     def __str__(self) -> str:

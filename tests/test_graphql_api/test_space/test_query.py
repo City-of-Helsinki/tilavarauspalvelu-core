@@ -34,7 +34,7 @@ def test_query_spaces__all_fields(graphql):
         children {
             pk
         }
-        resourceSet {
+        resources {
             pk
         }
     """
@@ -60,5 +60,5 @@ def test_query_spaces__all_fields(graphql):
             "pk": space.unit.pk,
         },
         "children": [],
-        "resourceSet": [],
+        "resources": [],
     }

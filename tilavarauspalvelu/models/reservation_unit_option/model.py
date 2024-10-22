@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .queryset import ReservationUnitOptionQuerySet
+from .queryset import ReservationUnitOptionManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ApplicationSection, ReservationUnit
@@ -21,22 +21,22 @@ class ReservationUnitOption(models.Model):
 
     application_section: ApplicationSection = models.ForeignKey(
         "tilavarauspalvelu.ApplicationSection",
-        on_delete=models.CASCADE,
         related_name="reservation_unit_options",
+        on_delete=models.CASCADE,
     )
     reservation_unit: ReservationUnit = models.ForeignKey(
         "tilavarauspalvelu.ReservationUnit",
-        on_delete=models.PROTECT,
         related_name="reservation_unit_options",
+        on_delete=models.PROTECT,
     )
 
-    objects = ReservationUnitOptionQuerySet.as_manager()
+    objects = ReservationUnitOptionManager()
 
     class Meta:
         db_table = "reservation_unit_option"
         base_manager_name = "objects"
-        verbose_name = _("Reservation Unit Option")
-        verbose_name_plural = _("Reservation Unit Options")
+        verbose_name = _("reservation unit option")
+        verbose_name_plural = _("reservation unit options")
         ordering = ["pk"]
         constraints = [
             models.UniqueConstraint(

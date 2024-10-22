@@ -182,7 +182,7 @@ def test_reservation__create__overlapping_reservation(graphql):
         begin=begin,
         end=end,
         state=ReservationStateChoice.CONFIRMED,
-        reservation_unit=[reservation_unit],
+        reservation_units=[reservation_unit],
     )
 
     graphql.login_with_superuser()
@@ -253,7 +253,7 @@ def test_reservation__create__overlaps_with_reservation_buffer_before_or_after(
         begin=begin + reservation_delta_time,
         end=end + reservation_delta_time,
         state=ReservationStateChoice.CONFIRMED,
-        reservation_unit=[reservation_unit],
+        reservation_units=[reservation_unit],
         buffer_time_before=reservation_buffer_before,
         buffer_time_after=reservation_buffer_after,
         type=reservation_type,
@@ -459,7 +459,7 @@ def test_reservation__create__max_reservations_per_user__over(graphql):
         begin=begin,
         end=end,
         state=ReservationStateChoice.CONFIRMED,
-        reservation_unit=[reservation_unit],
+        reservation_units=[reservation_unit],
         user=user,
     )
 
@@ -481,7 +481,7 @@ def test_reservation__create__max_reservations_per_user__seasonal_reservation(gr
         begin=begin,
         end=end,
         state=ReservationStateChoice.CONFIRMED,
-        reservation_unit=[reservation_unit],
+        reservation_units=[reservation_unit],
         user=user,
         type=ReservationTypeChoice.SEASONAL,
     )
@@ -507,7 +507,7 @@ def test_reservation__create__max_reservations_per_user__past_reservations(graph
         begin=begin - timedelta(hours=3),
         end=end - timedelta(hours=3),
         state=ReservationStateChoice.CONFIRMED,
-        reservation_unit=[reservation_unit],
+        reservation_units=[reservation_unit],
         user=user,
     )
 
@@ -534,7 +534,7 @@ def test_reservation__create__max_reservations_per_user__reservations_for_other_
         begin=begin,
         end=end,
         state=ReservationStateChoice.CONFIRMED,
-        reservation_unit=[reservation_unit_2],
+        reservation_units=[reservation_unit_2],
         user=user,
     )
 
@@ -569,7 +569,7 @@ def test_reservation__create__max_reservations_per_user__reservations_for_other_
         begin=begin + timedelta(hours=1),
         end=end + timedelta(hours=1),
         state=ReservationStateChoice.CONFIRMED,
-        reservation_unit=[reservation_unit_2],
+        reservation_units=[reservation_unit_2],
         user=user,
     )
 
@@ -990,7 +990,7 @@ def test_reservation__create__prefilled_with_profile_data__ad_login(graphql, set
 @freezegun.freeze_time("2021-01-01")
 def test_reservation__create__reservation_block_whole_day__non_reserved_time_is_filled_by_buffers(graphql):
     reservation_unit = ReservationUnitFactory.create(
-        origin_hauki_resource=OriginHaukiResourceFactory(id=999),
+        origin_hauki_resource=OriginHaukiResourceFactory.create(id=999),
         reservation_block_whole_day=True,
         spaces=[SpaceFactory.create()],
     )
@@ -1024,7 +1024,7 @@ def test_reservation__create__reservation_block_whole_day__non_reserved_time_is_
 @freezegun.freeze_time("2021-01-01")
 def test_reservation__create__reservation_block_whole_day__start_and_end_at_midnight_has_no_buffers(graphql):
     reservation_unit = ReservationUnitFactory.create(
-        origin_hauki_resource=OriginHaukiResourceFactory(id=999),
+        origin_hauki_resource=OriginHaukiResourceFactory.create(id=999),
         reservation_block_whole_day=True,
         spaces=[SpaceFactory.create()],
     )
@@ -1069,7 +1069,7 @@ def test_reservation__create__reservation_block_whole_day__blocks_reserving_for_
     error_message,
 ):
     reservation_unit = ReservationUnitFactory.create(
-        origin_hauki_resource=OriginHaukiResourceFactory(id=999),
+        origin_hauki_resource=OriginHaukiResourceFactory.create(id=999),
         reservation_block_whole_day=True,
         spaces=[SpaceFactory.create()],
     )
