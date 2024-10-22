@@ -1,3 +1,4 @@
+from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin
 from django.db import models
 from modeltranslation.admin import TranslationAdmin
@@ -7,13 +8,14 @@ from tilavarauspalvelu.typing import WSGIRequest
 
 
 @admin.register(EquipmentCategory)
-class EquipmentCategoryAdmin(TranslationAdmin):
+class EquipmentCategoryAdmin(SortableAdminMixin, TranslationAdmin):
     # List
     list_display = [
-        "name",
         "rank",
+        "name",
         "number_of_equipment",
     ]
+    ordering = ["rank"]
 
     @admin.display(ordering="number_of_equipment")
     def number_of_equipment(self, obj: EquipmentCategory) -> str:
