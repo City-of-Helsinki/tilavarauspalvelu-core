@@ -6,7 +6,7 @@ from tilavarauspalvelu.integrations.email.find_recipients import (
     get_application_email_recipients,
     get_recipients_for_applications_by_language,
     get_reservation_email_recipients,
-    get_reservation_staff_notification_recipients,
+    get_reservation_staff_notification_recipients_by_language,
     get_users_by_email_language,
 )
 
@@ -117,21 +117,24 @@ def test_get_reservation_staff_notification_recipients__not_handling():
         email="admin1@example.com",
         units=[reservation_unit.unit],
         reservation_notification=ReservationNotification.ALL,
+        preferred_language="fi",
     )
     UserFactory.create_with_unit_role(
         email="admin2@example.com",
         units=[reservation_unit.unit],
         reservation_notification=ReservationNotification.ONLY_HANDLING_REQUIRED,
+        preferred_language="en",
     )
     UserFactory.create(
         email="admin3@example.com",
         reservation_notification=ReservationNotification.NONE,
+        preferred_language="sv",
     )
 
     reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
 
-    result = get_reservation_staff_notification_recipients(reservation)
-    assert sorted(result) == [admin_1.email]
+    result = get_reservation_staff_notification_recipients_by_language(reservation)
+    assert result == {"fi": {admin_1.email}}
 
 
 def test_get_reservation_staff_notification_recipients__handling():
@@ -141,21 +144,24 @@ def test_get_reservation_staff_notification_recipients__handling():
         email="admin1@example.com",
         units=[reservation_unit.unit],
         reservation_notification=ReservationNotification.ALL,
+        preferred_language="fi",
     )
     admin_2 = UserFactory.create_with_unit_role(
         email="admin2@example.com",
         units=[reservation_unit.unit],
         reservation_notification=ReservationNotification.ONLY_HANDLING_REQUIRED,
+        preferred_language="en",
     )
     UserFactory.create(
         email="admin3@example.com",
         reservation_notification=ReservationNotification.NONE,
+        preferred_language="sv",
     )
 
     reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
 
-    result = get_reservation_staff_notification_recipients(reservation, handling=True)
-    assert sorted(result) == [admin_1.email, admin_2.email]
+    result = get_reservation_staff_notification_recipients_by_language(reservation, handling=True)
+    assert result == {"fi": {admin_1.email}, "en": {admin_2.email}}
 
 
 def test_get_reservation_staff_notification_recipients__dont_include_reservation_recipient():
@@ -163,10 +169,64 @@ def test_get_reservation_staff_notification_recipients__dont_include_reservation
 
     admin = UserFactory.create_with_unit_role(
         units=[reservation_unit.unit],
+        email="admin@example.com",
         reservation_notification=ReservationNotification.ALL,
     )
 
     reservation = ReservationFactory.create(reservation_unit=[reservation_unit], user=admin)
 
-    result = get_reservation_staff_notification_recipients(reservation)
-    assert sorted(result) == []
+    result = get_reservation_staff_notification_recipients_by_language(reservation)
+    assert result == {}
+
+
+def test_get_reservation_staff_notification_recipients__dont_include_if_role_deactivated():
+    reservation_unit = ReservationUnitFactory.create()
+
+    UserFactory.create_with_unit_role(
+        units=[reservation_unit.unit],
+        email="admin@example.com",
+        reservation_notification=ReservationNotification.ALL,
+        unit_role__role_active=False,
+        preferred_language="fi",
+    )
+
+    reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
+
+    result = get_reservation_staff_notification_recipients_by_language(reservation)
+    assert result == {}
+
+
+def test_get_reservation_staff_notification_recipients__dont_include_if_role_deactivated__also_superuser():
+    reservation_unit = ReservationUnitFactory.create()
+
+    # Should not be included, since the unit role is deactivated.
+    # Email's should only be sent to active unit admins, not general admin or superusers.
+    UserFactory.create_with_unit_role(
+        units=[reservation_unit.unit],
+        email="admin@example.com",
+        reservation_notification=ReservationNotification.ALL,
+        unit_role__role_active=False,
+        preferred_language="fi",
+        is_superuser=True,
+    )
+
+    reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
+
+    result = get_reservation_staff_notification_recipients_by_language(reservation)
+    assert result == {}
+
+
+def test_get_reservation_staff_notification_recipients__no_email():
+    reservation_unit = ReservationUnitFactory.create()
+
+    UserFactory.create_with_unit_role(
+        units=[reservation_unit.unit],
+        email="",
+        reservation_notification=ReservationNotification.ALL,
+        preferred_language="fi",
+    )
+
+    reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
+
+    result = get_reservation_staff_notification_recipients_by_language(reservation)
+    assert result == {}

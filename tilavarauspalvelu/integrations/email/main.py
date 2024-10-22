@@ -16,7 +16,7 @@ from .find_recipients import (
     get_application_email_recipients,
     get_recipients_for_applications_by_language,
     get_reservation_email_recipients,
-    get_reservation_staff_notification_recipients,
+    get_reservation_staff_notification_recipients_by_language,
     get_users_by_email_language,
 )
 from .rendering import render_html, render_text
@@ -464,75 +464,77 @@ class EmailService:
         )
 
     @staticmethod
-    def send_staff_notification_reservation_made_email(
-        reservation: Reservation,
-        *,
-        language: Lang | None = None,
-    ) -> None:
+    def send_staff_notification_reservation_made_email(reservation: Reservation) -> None:
         """
         Sends an email about the reservation to staff users when a reservation has been made
         in a reservation unit they are responsible for.
 
         :param reservation: The reservation the email concerns.
-        :param language: The language of the email. Determine from reservation if not given.
         """
         # Prevent accidental sending of wrong email.
         if reservation.state != ReservationStateChoice.CONFIRMED:
             return
 
-        recipients = get_reservation_staff_notification_recipients(reservation)
-        if not recipients:
+        recipients_by_language = get_reservation_staff_notification_recipients_by_language(reservation)
+        if not recipients_by_language:
             SentryLogger.log_message(
                 "No recipients for staff notification reservation made email",
                 details={"reservation": reservation.pk},
             )
             return
 
-        if language is None:
-            language = get_reservation_email_language(reservation=reservation)
-
+        emails: list[EmailData] = []
         email_type = EmailType.STAFF_NOTIFICATION_RESERVATION_MADE
-        context = get_context_for_staff_notification_reservation_made(reservation, language=language)
-        send_emails_in_batches_task.delay(
-            recipients=recipients,
-            subject=context["title"],
-            text_content=render_text(email_type=email_type, context=context),
-            html_content=render_html(email_type=email_type, context=context),
-        )
+
+        for language, recipients in recipients_by_language.items():
+            context = get_context_for_staff_notification_reservation_made(reservation, language=language)
+
+            emails.append(
+                EmailData(
+                    recipients=list(recipients),
+                    subject=context["title"],
+                    text_content=render_text(email_type=email_type, context=context),
+                    html_content=render_html(email_type=email_type, context=context),
+                    attachments=[],
+                )
+            )
+
+        send_multiple_emails_in_batches_task.delay(emails=emails)
 
     @staticmethod
-    def send_staff_notification_reservation_requires_handling_email(
-        reservation: Reservation,
-        *,
-        language: Lang | None = None,
-    ) -> None:
+    def send_staff_notification_reservation_requires_handling_email(reservation: Reservation) -> None:
         """
         Sends an email about the reservation to staff users when a reservation has been made
         in a reservation unit they are responsible for that requires handling.
 
         :param reservation: The reservation the email concerns.
-        :param language: The language of the email. Determine from reservation if not given.
         """
         # Prevent accidental sending of wrong email.
         if reservation.state != ReservationStateChoice.REQUIRES_HANDLING:
             return
 
-        recipients = get_reservation_staff_notification_recipients(reservation, handling=True)
-        if not recipients:
+        recipients_by_language = get_reservation_staff_notification_recipients_by_language(reservation, handling=True)
+        if not recipients_by_language:
             SentryLogger.log_message(
                 "No recipients for staff notification reservation requires handling email",
                 details={"reservation": reservation.pk},
             )
             return
 
-        if language is None:
-            language = get_reservation_email_language(reservation=reservation)
-
+        emails: list[EmailData] = []
         email_type = EmailType.STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING
-        context = get_context_for_staff_notification_reservation_requires_handling(reservation, language=language)
-        send_emails_in_batches_task.delay(
-            recipients=recipients,
-            subject=context["title"],
-            text_content=render_text(email_type=email_type, context=context),
-            html_content=render_html(email_type=email_type, context=context),
-        )
+
+        for language, recipients in recipients_by_language.items():
+            context = get_context_for_staff_notification_reservation_requires_handling(reservation, language=language)
+
+            emails.append(
+                EmailData(
+                    recipients=list(recipients),
+                    subject=context["title"],
+                    text_content=render_text(email_type=email_type, context=context),
+                    html_content=render_html(email_type=email_type, context=context),
+                    attachments=[],
+                )
+            )
+
+        send_multiple_emails_in_batches_task.delay(emails=emails)

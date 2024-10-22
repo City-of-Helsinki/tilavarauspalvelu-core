@@ -17,7 +17,7 @@ __all__ = [
     "get_application_email_recipients",
     "get_recipients_for_applications_by_language",
     "get_reservation_email_recipients",
-    "get_reservation_staff_notification_recipients",
+    "get_reservation_staff_notification_recipients_by_language",
 ]
 
 
@@ -73,19 +73,28 @@ def get_users_by_email_language(users: Iterable[User]) -> dict[Lang, set[str]]:
     return recipients_by_language
 
 
-def get_reservation_staff_notification_recipients(reservation: Reservation, *, handling: bool = False) -> list[str]:
+def get_reservation_staff_notification_recipients_by_language(
+    reservation: Reservation,
+    *,
+    handling: bool = False,
+) -> dict[Lang, set[str]]:
     """
     Get staff users who should receive email notifications for the given reservation.
+    Group recipients by their preferred language.
 
     :param reservation: The reservation the email concerns.
     :param handling: Does the email concern reservation handling?
     """
+    recipients_by_language: dict[Lang, set[str]] = defaultdict(set)
+
     notification_settings = [ReservationNotification.ALL]
     if handling:
         notification_settings.append(ReservationNotification.ONLY_HANDLING_REQUIRED)
 
+    # Only fetch users with active unit roles and appropriate notification settings.
     users = User.objects.filter(
         unit_roles__isnull=False,
+        unit_roles__role_active=True,
         reservation_notification__in=notification_settings,
     ).exclude(email="")
 
@@ -101,12 +110,10 @@ def get_reservation_staff_notification_recipients(reservation: Reservation, *, h
         .distinct()
     )
 
-    # Only notify users who have the correct permissions for the given reservation's units.
-    notification_recipients = (
-        user.email  #
-        for user in users
-        if user.permissions.can_manage_reservations_for_units(units, any_unit=True)
-    )
+    # Only notify users who have the correct active permissions for the given reservation's units.
+    for user in users:
+        if user.permissions.can_manage_reservations_for_units(units, any_unit=True):
+            user_language = user.get_preferred_language()
+            recipients_by_language[user_language].add(user.email.lower())
 
-    # Remove possible duplicates
-    return list(set(notification_recipients))
+    return recipients_by_language
