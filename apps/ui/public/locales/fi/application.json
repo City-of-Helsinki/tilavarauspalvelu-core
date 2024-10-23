@@ -227,6 +227,7 @@
       "reservationCountPostfix": "varausta"
     },
     "helpLink": "Ohjeet",
+    "helpLinkLong": "Tilakohtaiset ohjeet",
     "helpModal": {
       "title": "Tilakohtaiset ohjeet"
     }

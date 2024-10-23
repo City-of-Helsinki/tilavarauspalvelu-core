@@ -225,6 +225,7 @@
       "reservationCountPostfix": "bokningar"
     },
     "helpLink": "Hjälp",
+    "helpLinkLong": "Hjälp för ansökan",
     "helpModal": {
       "title": "Lokal specifik information"
     }

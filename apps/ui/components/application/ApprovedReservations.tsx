@@ -9,7 +9,7 @@ import {
   getApplicationSectionPath,
   getReservationUnitPath,
 } from "@/modules/urls";
-import { fontMedium, fontRegular, H5 } from "common";
+import { breakpoints, fontMedium, fontRegular, H5 } from "common";
 import { errorToast } from "common/src/common/toast";
 import {
   getTranslationSafe,
@@ -32,6 +32,7 @@ import {
   IconCalendarRecurring,
   IconClock,
   IconCross,
+  IconEuroSign,
   IconInfoCircle,
   IconLinkExternal,
   IconLocation,
@@ -49,6 +50,7 @@ import { formatTime } from "@/modules/util";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import { AccordionWithIcons } from "../AccordionWithIcons";
 import { CenterSpinner } from "../common/common";
+import { useMedia } from "react-use";
 
 const N_RESERVATIONS_TO_SHOW = 20;
 
@@ -62,23 +64,91 @@ type Props = {
 
 const H3 = styled(H5).attrs({ as: "h3" })`
   ${fontMedium}
+  margin: 0;
 `;
 
 const ListContainer = styled.div`
-  margin-top: var(--spacing-xl);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-m);
+
+  margin-top: var(--spacing-l);
+  @media (width > ${breakpoints.s}) {
+    margin-top: var(--spacing-xl);
+  }
 `;
 
 // Tables can't do horizontal scroll without wrapping the table in a div
 // NOTE HDS Table can't be styled so have to wrap it in an extra div.
 const TableWrapper = styled.div`
-  & > div {
-    overflow-x: auto;
-    > table {
-      width: max-content;
-      min-width: 100%;
+  /* Mobile uses cards, so no horizontal scroll */
+  @media (width > ${breakpoints.s}) {
+    & > div {
+      overflow-x: auto;
+      > table {
+        width: max-content;
+        min-width: 100%;
+      }
+    }
+  }
+
+  @media (width <= ${breakpoints.s}) {
+    && table {
+      /* border can't be in tr because it can't be styled */
+      --border-width: 1px;
+      --border-color: var(--color-black-90);
+      border-bottom: var(--border-width) solid var(--border-color);
+
+      /* No heading, cards have their own headings */
+      & thead {
+        display: none;
+      }
+      /* absolute positioning of status tags */
+      & tr {
+        position: relative;
+      }
+
+      & td {
+        padding: calc(var(--spacing-2-xs) / 2) var(--spacing-s);
+        border: var(--border-width) solid var(--border-color);
+        border-bottom: none;
+        border-top: none;
+        &:first-child {
+          border-top: var(--border-width) solid var(--border-color);
+        }
+
+        & [class*="IconButton__"] > span {
+          padding: 0;
+        }
+      }
+
+      /* card padding has to be implemented with tds because we can't style tr */
+      & td:first-of-type {
+        padding-top: var(--spacing-s);
+        font-size: var(--fontsize-heading-2-xs);
+        ${fontMedium}
+      }
+
+      /* last-of-type is not enough because we are hiding some rows on mobile */
+      & td:last-of-type,
+      & td > *.last-on-mobile {
+        padding-bottom: var(--spacing-s);
+      }
+
+      /* stylelint-disable no-descending-specificity */
+      & > thead > tr > th,
+      & > tbody > tr > td {
+        display: flex;
+        &:empty {
+          display: none;
+        }
+        /* remove the whole td element if the child is hidden
+         * NOTE this will remove the element if any child is hidden */
+        :has(.hide-on-mobile) {
+          display: none;
+        }
+      }
+      /* stylelint-enable no-descending-specificity */
     }
   }
 `;
@@ -87,9 +157,12 @@ const ButtonContainer = styled.div`
   display: flex;
   gap: var(--spacing-s);
   justify-content: center;
+  flex-direction: row;
+  @media (max-width: ${breakpoints.s}) {
+    flex-direction: column;
+  }
 `;
 
-// TODO type return
 function getAesReservationUnits(aes: ApplicationSectionT) {
   return filterNonNullable(
     aes.reservationUnitOptions
@@ -215,6 +288,29 @@ export function ApprovedReservations({ application }: Props) {
 type QueryT = NonNullable<ApplicationReservationsQuery["application"]>;
 type ApplicationSectionT = NonNullable<QueryT["applicationSections"]>[0];
 
+const OnlyForMobile = styled.span`
+  display: inline;
+  @media (width > ${breakpoints.s}) {
+    display: none;
+  }
+`;
+
+const IconTextWrapper = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-3-xs);
+
+  /* mobile uses icons instead of header text */
+  > svg {
+    display: inline;
+  }
+  @media (width > ${breakpoints.s}) {
+    > svg {
+      display: none;
+    }
+  }
+`;
+
 type ReservationUnitTableElem = {
   reservationUnit: Pick<
     ReservationUnitNode,
@@ -244,6 +340,8 @@ function ReservationUnitTable({
 
   const lang = getLocalizationLang(i18n.language);
 
+  const isMobile = useMedia(`(max-width: ${breakpoints.s})`, false);
+
   const cols = [
     {
       key: "reservationUnit",
@@ -259,31 +357,53 @@ function ReservationUnitTable({
       key: "dateOfWeek",
       headerName: t("common:day"),
       isSortable: false,
+      transform: ({ dateOfWeek }: ReservationUnitTableElem) => (
+        <IconTextWrapper className="hide-on-mobile">
+          {dateOfWeek}
+        </IconTextWrapper>
+      ),
     },
     {
       key: "time",
       headerName: t("common:timeLabel"),
       isSortable: false,
+      transform: ({ dateOfWeek, time }: ReservationUnitTableElem) => (
+        <IconTextWrapper aria-label={t("common:timeLabel")}>
+          <IconClock aria-hidden="true" />
+          <OnlyForMobile>{dateOfWeek}</OnlyForMobile>
+          {time}
+        </IconTextWrapper>
+      ),
     },
     {
       key: "price",
       headerName: t("common:price"),
       isSortable: false,
+      transform: ({ price }: ReservationUnitTableElem) =>
+        price ? (
+          <IconTextWrapper aria-label={t("common:price")}>
+            <IconEuroSign aria-hidden="true" />
+            {price}
+          </IconTextWrapper>
+        ) : (
+          ""
+        ),
     },
     {
       key: "helpLink",
       headerName: t("application:view.helpModal.title"),
-      transform: ({ reservationUnit }: ReservationUnitTableElem) => {
-        return (
-          <LinkLikeButton
-            onClick={() => {
-              setModal(reservationUnit);
-            }}
-          >
-            {t("application:view.helpLink")}
-          </LinkLikeButton>
-        );
-      },
+      transform: ({ reservationUnit }: ReservationUnitTableElem) => (
+        <LinkLikeButton
+          onClick={() => setModal(reservationUnit)}
+          // table already includes padding
+          style={{ padding: 0 }}
+        >
+          <IconInfoCircle aria-hidden="true" />
+          {isMobile
+            ? t("application:view.helpLinkLong")
+            : t("application:view.helpLink")}
+        </LinkLikeButton>
+      ),
       isSortable: false,
     },
   ];
@@ -348,10 +468,19 @@ type ReservationsTableElem = {
   pk: number;
 };
 
-// icon button forces medium styling for the label
-const IconButton400 = styled(IconButton)`
+// TODO this should not wrap on mobile, use truncate instead (it looks better and should be a rare case)
+const ReservationUnitLink = styled(IconButton)`
   & span {
+    display: inline-flex;
+    flex-wrap: wrap;
+
     ${fontRegular}
+    text-decoration: underline;
+  }
+
+  /* table hides icons by default, override this behaviour */
+  &&& svg {
+    display: inline;
   }
 `;
 
@@ -367,17 +496,34 @@ function createReservationUnitLink({
 }): JSX.Element {
   const { pk } = reservationUnit;
   const name = getTranslationSafe(reservationUnit, "name", lang);
-  return pk != null && pk > 0 ? (
-    <IconButton400
+  if (pk == null || pk <= 0) {
+    return <span>{name}</span>;
+  }
+  return (
+    <ReservationUnitLink
       href={getReservationUnitPath(pk)}
       label={name}
       openInNewTab
-      icon={<IconLinkExternal aria-hidden />}
+      icon={<IconLinkExternal aria-hidden="true" />}
     />
-  ) : (
-    <span>{name}</span>
   );
 }
+
+const CancelButton = styled(Button).attrs({
+  theme: "black",
+  variant: "supplementary",
+  iconLeft: <IconCross aria-hidden="true" />,
+})`
+  white-space: nowrap;
+`;
+
+const StyledStatusLabel = styled(StatusLabel)`
+  @media (width <= ${breakpoints.s}) {
+    position: absolute;
+    right: var(--spacing-s);
+    top: var(--spacing-s);
+  }
+`;
 
 function ReservationsTable({
   reservations,
@@ -392,32 +538,61 @@ function ReservationsTable({
   const handleCancel = (pk: number) => {
     errorToast({ text: `Not implemented: cancel reservation: ${pk}` });
   };
+
   const cols = [
     {
       key: "date",
       headerName: t("common:dateLabel"),
       isSortable: false,
-      transform: ({ date }: ReservationsTableElem) => toUIDate(date),
+      transform: ({ date, dayOfWeek }: ReservationsTableElem) => (
+        <span aria-label={t("common:dateLabel")}>
+          <span>{toUIDate(date)}</span>
+          <OnlyForMobile>
+            {/* span removes whitespace */}
+            <pre style={{ display: "inline" }}>{" - "}</pre>
+            <span>{dayOfWeek}</span>
+          </OnlyForMobile>
+        </span>
+      ),
     },
     {
       key: "dayOfWeek",
       headerName: t("common:day"),
       isSortable: false,
+      transform: ({ dayOfWeek }: ReservationsTableElem) => (
+        <IconTextWrapper className="hide-on-mobile">
+          {dayOfWeek}
+        </IconTextWrapper>
+      ),
     },
     {
       key: "time",
       headerName: t("common:timeLabel"),
       isSortable: false,
+      transform: ({ dayOfWeek, time }: ReservationsTableElem) => (
+        <IconTextWrapper aria-label={t("common:timeLabel")}>
+          <IconClock aria-hidden="true" />
+          <OnlyForMobile>{dayOfWeek}</OnlyForMobile>
+          {time}
+        </IconTextWrapper>
+      ),
     },
     {
       key: "reservationUnit",
       headerName: t("application:view.reservationsTab.reservationUnit"),
       isSortable: false,
-      transform: (elem: ReservationsTableElem) =>
-        createReservationUnitLink({
-          reservationUnit: elem.reservationUnit,
-          lang,
-        }),
+      transform: (elem: ReservationsTableElem) => (
+        <IconTextWrapper
+          className="last-on-mobile"
+          aria-label={t("application:view.reservationsTab.reservationUnit")}
+        >
+          <IconLocation aria-hidden="true" />
+          {createReservationUnitLink({
+            reservationUnit: elem.reservationUnit,
+            lang,
+          })}
+        </IconTextWrapper>
+      ),
     },
     {
       key: "status",
@@ -426,16 +601,13 @@ function ReservationsTable({
       transform: ({ status }: ReservationsTableElem) => {
         const icon = status === "rejected" ? <IconCross /> : <IconPen />;
         const type = status === "rejected" ? "error" : "neutral";
+        if (status === "") {
+          return "";
+        }
         return (
-          <span>
-            {status !== "" ? (
-              <StatusLabel icon={icon} type={type}>
-                {t(`application:view.reservationsTab.${status}`)}
-              </StatusLabel>
-            ) : (
-              ""
-            )}
-          </span>
+          <StyledStatusLabel icon={icon} type={type}>
+            {t(`application:view.reservationsTab.${status}`)}
+          </StyledStatusLabel>
         );
       },
     },
@@ -444,15 +616,13 @@ function ReservationsTable({
       headerName: "",
       isSortable: false,
       transform: ({ pk }: ReservationsTableElem) => (
-        <Button
-          variant="supplementary"
-          iconLeft={<IconCross />}
-          theme="black"
-          style={{ whiteSpace: "nowrap" }}
+        <CancelButton
           onClick={() => handleCancel(pk)}
+          // TODO on mobile this should be hidden behind a popover (for now it's hidden)
+          className="hide-on-mobile"
         >
           {t("common:cancel")}
-        </Button>
+        </CancelButton>
       ),
     },
   ];

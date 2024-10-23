@@ -231,6 +231,7 @@
       "reservationCountPostfix": "bookings"
     },
     "helpLink": "Help",
+    "helpLinkLong": "Unit specific help",
     "helpModal": {
       "title": "Unit specific information"
     }

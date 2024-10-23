@@ -50,7 +50,7 @@ const StyledLink = styled(Link)<{ $disableVisitedStyles?: boolean }>`
   ${visitedStyles}
 
   /* required for the focus outline to work */
-  display: inline-block;
+  display: inline-flex;
 `;
 
 const StyledLinkButton = styled.button`
@@ -77,7 +77,7 @@ const StyledLinkButton = styled.button`
 
 const Anchor = styled.a`
   width: fit-content;
-  display: inline-block;
+  display: inline-flex;
   ${focusStyles}
   ${anchorStyles}
   ${visitedStyles}

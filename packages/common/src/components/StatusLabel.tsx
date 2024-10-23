@@ -12,6 +12,8 @@ type StatusLabelProps = {
   icon: JSX.Element;
   testId?: string;
   children: React.ReactNode;
+  className?: string;
+  style?: React.CSSProperties;
 };
 
 const ColoredLabel = styled(HDSStatusLabel)<{
@@ -44,9 +46,11 @@ function StatusLabel({
   icon,
   testId,
   children,
+  ...rest
 }: Readonly<StatusLabelProps>): JSX.Element {
   return (
     <ColoredLabel
+      {...rest}
       type={type === "draft" ? "neutral" : type} // HDS StatusLabel does not support "draft" type - so convert it to "neutral"
       iconLeft={icon}
       dataTestId={testId}

@@ -76,4 +76,9 @@ export const LinkLikeButton = styled.button`
     cursor: not-allowed;
     color: var(--color-black-40);
   }
+
+  /* properly align text + icon */
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-3-xs);
 `;
