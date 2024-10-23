@@ -1,15 +1,14 @@
-from collections.abc import Iterable
 from datetime import timedelta
 from typing import Any
 
 import factory
-from factory import fuzzy
+from factory import LazyAttribute
 
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
-from tilavarauspalvelu.models import ApplicationRound, Purpose, ReservationUnit
+from tilavarauspalvelu.models import ApplicationRound
 from utils.date_utils import utc_start_of_day
 
-from ._base import GenericDjangoModelFactory
+from ._base import FakerEN, FakerFI, FakerSV, ForeignKeyFactory, GenericDjangoModelFactory, ManyToManyFactory
 
 __all__ = [
     "ApplicationRoundFactory",
@@ -21,25 +20,38 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
         model = ApplicationRound
         exclude = ["timestamp"]
 
-    name = fuzzy.FuzzyText()
+    name = FakerFI("name")
+    name_fi = LazyAttribute(lambda i: i.name)
+    name_en = FakerEN("name")
+    name_sv = FakerSV("name")
+
+    criteria = FakerFI("sentence")
+    criteria_fi = LazyAttribute(lambda i: i.name)
+    criteria_en = FakerEN("sentence")
+    criteria_sv = FakerSV("sentence")
+
+    notes_when_applying = FakerFI("sentence")
+    notes_when_applying_fi = LazyAttribute(lambda i: i.name)
+    notes_when_applying_en = FakerEN("sentence")
+    notes_when_applying_sv = FakerSV("sentence")
 
     timestamp = factory.LazyFunction(utc_start_of_day)  # private helper (see Meta.exclude)
 
-    application_period_begin = factory.LazyAttribute(lambda a: a.timestamp)
-    application_period_end = factory.LazyAttribute(lambda a: a.application_period_begin + timedelta(weeks=4))
+    application_period_begin = factory.LazyAttribute(lambda i: i.timestamp)
+    application_period_end = factory.LazyAttribute(lambda i: i.application_period_begin + timedelta(weeks=4))
 
-    reservation_period_begin = factory.LazyAttribute(lambda a: a.timestamp.date())
-    reservation_period_end = factory.LazyAttribute(lambda a: a.reservation_period_begin + timedelta(weeks=4))
+    reservation_period_begin = factory.LazyAttribute(lambda i: i.timestamp.date())
+    reservation_period_end = factory.LazyAttribute(lambda i: i.reservation_period_begin + timedelta(weeks=4))
 
-    public_display_begin = factory.LazyAttribute(lambda a: a.timestamp)
-    public_display_end = factory.LazyAttribute(lambda a: a.public_display_begin + timedelta(weeks=4))
+    public_display_begin = factory.LazyAttribute(lambda i: i.timestamp)
+    public_display_end = factory.LazyAttribute(lambda i: i.public_display_begin + timedelta(weeks=4))
 
     handled_date = None
     sent_date = None
 
-    terms_of_use = factory.SubFactory("tests.factories.TermsOfUseFactory")
-    criteria = ""
-    notes_when_applying = ""
+    reservation_units = ManyToManyFactory("tests.factories.ReservationUnitFactory")
+    purposes = ManyToManyFactory("tests.factories.ReservationPurposeFactory")
+    terms_of_use = ForeignKeyFactory("tests.factories.TermsOfUseFactory")
 
     @classmethod
     def create_in_status(cls, status: ApplicationRoundStatusChoice, **kwargs: Any) -> ApplicationRound:
@@ -98,34 +110,3 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
         kwargs.setdefault("application_period_begin", utc_start_of_day() - timedelta(days=2))
         kwargs.setdefault("application_period_end", utc_start_of_day() - timedelta(days=2))
         return cls.create(**kwargs)
-
-    @factory.post_generation
-    def purposes(self, create: bool, purposes: Iterable[Purpose] | None, **kwargs: Any) -> None:
-        if not create:
-            return
-
-        if not purposes and kwargs:
-            from .purpose import PurposeFactory
-
-            self.purposes.add(PurposeFactory.create(**kwargs))
-
-        for purpose in purposes or []:
-            self.purposes.add(purpose)
-
-    @factory.post_generation
-    def reservation_units(
-        self,
-        create: bool,
-        reservation_units: Iterable[ReservationUnit] | None,
-        **kwargs: Any,
-    ) -> None:
-        if not create:
-            return
-
-        if not reservation_units and kwargs:
-            from .reservation_unit import ReservationUnitFactory
-
-            self.reservation_units.add(ReservationUnitFactory.create(**kwargs))
-
-        for reservation_unit in reservation_units or []:
-            self.reservation_units.add(reservation_unit)

@@ -1,16 +1,21 @@
-from collections.abc import Iterable
-from typing import Any
-
 import factory
-from factory import fuzzy
+from factory import LazyAttribute
 
-from tilavarauspalvelu.models import ServiceSector, Unit, UnitGroup
+from tilavarauspalvelu.models import Unit
 
-from ._base import GenericDjangoModelFactory
+from ._base import (
+    FakerEN,
+    FakerFI,
+    FakerSV,
+    ForeignKeyFactory,
+    GenericDjangoModelFactory,
+    ManyToManyFactory,
+    ReverseForeignKeyFactory,
+    ReverseOneToOneFactory,
+)
 
 __all__ = [
     "UnitFactory",
-    "UnitGroupFactory",
 ]
 
 
@@ -18,58 +23,39 @@ class UnitFactory(GenericDjangoModelFactory[Unit]):
     class Meta:
         model = Unit
 
-    tprek_id = None
-    tprek_department_id = None
-    name = fuzzy.FuzzyText()
-    description = ""
-    short_description = ""
+    tprek_id = None  # str
+    tprek_department_id = None  # str
+    tprek_last_modified = None  # datetime.datetime
+
+    name = FakerFI("word")
+    name_fi = LazyAttribute(lambda i: i.name)
+    name_en = FakerEN("word")
+    name_sv = FakerSV("word")
+
+    description = FakerFI("text")
+    description_fi = LazyAttribute(lambda i: i.description)
+    description_en = FakerEN("text")
+    description_sv = FakerSV("text")
+
+    short_description = FakerFI("text")
+    short_description_fi = LazyAttribute(lambda i: i.description)
+    short_description_en = FakerEN("text")
+    short_description_sv = FakerSV("text")
+
     web_page = ""
     email = ""
     phone = ""
-    rank = 0
-    payment_merchant = None
-    payment_accounting = None
-    origin_hauki_resource = None
 
-    @factory.post_generation
-    def service_sectors(self, create: bool, service_sectors: Iterable[ServiceSector] | None, **kwargs: Any) -> None:
-        if not create:
-            return
+    rank = factory.Sequence(lambda i: i)
 
-        if not service_sectors and kwargs:
-            from .service_sector import ServiceSectorFactory
+    origin_hauki_resource = ForeignKeyFactory("tests.factories.OriginHaukiResourceFactory")
+    payment_merchant = ForeignKeyFactory("tests.factories.PaymentMerchantFactory")
+    payment_accounting = ForeignKeyFactory("tests.factories.PaymentAccountingFactory")
 
-            self.service_sectors.add(ServiceSectorFactory.create(**kwargs))
+    location = ReverseOneToOneFactory("tests.factories.LocationFactory")
 
-        for service_sector in service_sectors or []:
-            self.service_sectors.add(service_sector)
+    reservation_units = ReverseForeignKeyFactory("tests.factories.ReservationUnitFactory")
 
-    @factory.post_generation
-    def unit_groups(self, create: bool, unit_groups: Iterable[UnitGroup] | None, **kwargs: Any) -> None:
-        if not create:
-            return
-
-        if not unit_groups and kwargs:
-            unit_groups = [UnitGroupFactory(**kwargs)]
-
-        for unit_group in unit_groups or []:
-            unit_group.units.add(self)
-
-
-class UnitGroupFactory(GenericDjangoModelFactory[UnitGroup]):
-    class Meta:
-        model = UnitGroup
-        django_get_or_create = ["name"]
-
-    name = fuzzy.FuzzyText()
-
-    @factory.post_generation
-    def units(self, create: bool, units: Iterable[Unit] | None, **kwargs: Any) -> None:
-        if not create:
-            return
-
-        if not units and kwargs:
-            self.units.add(UnitFactory.create(**kwargs))
-
-        for unit in units or []:
-            self.units.add(unit)
+    unit_roles = ManyToManyFactory("tests.factories.UnitRoleFactory")
+    service_sectors = ManyToManyFactory("tests.factories.ServiceSectorFactory")
+    unit_groups = ManyToManyFactory("tests.factories.UnitGroupFactory")

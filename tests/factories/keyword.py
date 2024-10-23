@@ -1,35 +1,22 @@
-import factory
-from factory import fuzzy
+from factory import LazyAttribute
 
-from tilavarauspalvelu.models import Keyword, KeywordCategory, KeywordGroup
+from tilavarauspalvelu.models import Keyword
 
-from ._base import GenericDjangoModelFactory
+from ._base import FakerEN, FakerFI, FakerSV, ForeignKeyFactory, GenericDjangoModelFactory
 
 __all__ = [
-    "KeywordCategoryFactory",
     "KeywordFactory",
-    "KeywordGroupFactory",
 ]
 
 
 class KeywordFactory(GenericDjangoModelFactory[Keyword]):
     class Meta:
         model = Keyword
+        django_get_or_create = ["name"]
 
-    name = fuzzy.FuzzyText()
-    keyword_group = factory.SubFactory("tests.factories.KeywordGroupFactory")
+    name = FakerFI("word", unique=True)
+    name_fi = LazyAttribute(lambda i: i.name)
+    name_en = FakerEN("word")
+    name_sv = FakerSV("word")
 
-
-class KeywordGroupFactory(GenericDjangoModelFactory[KeywordGroup]):
-    class Meta:
-        model = KeywordGroup
-
-    name = fuzzy.FuzzyText()
-    keyword_category = factory.SubFactory("tests.factories.KeywordCategoryFactory")
-
-
-class KeywordCategoryFactory(GenericDjangoModelFactory[KeywordCategory]):
-    class Meta:
-        model = KeywordCategory
-
-    name = fuzzy.FuzzyText()
+    keyword_group = ForeignKeyFactory("tests.factories.KeywordGroupFactory")

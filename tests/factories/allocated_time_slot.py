@@ -1,13 +1,12 @@
 import datetime
 
-import factory
 from factory import fuzzy
 
 from tilavarauspalvelu.enums import ApplicantTypeChoice, Weekday
 from tilavarauspalvelu.models import AllocatedTimeSlot
 from utils.date_utils import DEFAULT_TIMEZONE, local_start_of_day
 
-from ._base import GenericDjangoModelFactory
+from ._base import ForeignKeyFactory, GenericDjangoModelFactory, ReverseOneToOneFactory
 
 __all__ = [
     "AllocatedTimeSlotFactory",
@@ -22,7 +21,8 @@ class AllocatedTimeSlotFactory(GenericDjangoModelFactory[AllocatedTimeSlot]):
     begin_time = datetime.time(12, 0, tzinfo=DEFAULT_TIMEZONE)
     end_time = datetime.time(14, 0, tzinfo=DEFAULT_TIMEZONE)
 
-    reservation_unit_option = factory.SubFactory("tests.factories.ReservationUnitOptionFactory")
+    reservation_unit_option = ForeignKeyFactory("tests.factories.ReservationUnitOptionFactory")
+    recurring_reservation = ReverseOneToOneFactory("tests.factories.RecurringReservationFactory")
 
     @classmethod
     def create_ready_for_reservation(
@@ -34,12 +34,12 @@ class AllocatedTimeSlotFactory(GenericDjangoModelFactory[AllocatedTimeSlot]):
         applicant_type: ApplicantTypeChoice = ApplicantTypeChoice.INDIVIDUAL,
     ) -> AllocatedTimeSlot:
         from .application_round import ApplicationRoundFactory
-        from .opening_hours import OriginHaukiResourceFactory
+        from .origin_hauki_resource import OriginHaukiResourceFactory
         from .reservation_unit import ReservationUnitFactory
         from .space import SpaceFactory
 
         space = SpaceFactory.create()
-        resource = OriginHaukiResourceFactory.create(id="987", opening_hours_hash="foo")
+        resource = OriginHaukiResourceFactory.create(id=987, opening_hours_hash="foo")
 
         reservation_unit = ReservationUnitFactory.create(
             origin_hauki_resource=resource,

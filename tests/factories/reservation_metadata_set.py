@@ -1,53 +1,12 @@
 from collections.abc import Iterable
 
-from factory import fuzzy
+from tilavarauspalvelu.models import ReservationMetadataSet
 
-from tilavarauspalvelu.models import ReservationMetadataField, ReservationMetadataSet
-
-from ._base import GenericDjangoModelFactory, ManyToManyFactory
+from ._base import FakerFI, GenericDjangoModelFactory, ManyToManyFactory, ReverseForeignKeyFactory
 
 __all__ = [
-    "ReservationMetadataFieldFactory",
     "ReservationMetadataSetFactory",
 ]
-
-
-POSSIBLE_FIELDS: set[str] = {
-    "reservee_type",
-    "reservee_first_name",
-    "reservee_last_name",
-    "reservee_organisation_name",
-    "reservee_phone",
-    "reservee_email",
-    "reservee_id",
-    "reservee_is_unregistered_association",
-    "reservee_address_street",
-    "reservee_address_city",
-    "reservee_address_zip",
-    "billing_first_name",
-    "billing_last_name",
-    "billing_phone",
-    "billing_email",
-    "billing_address_street",
-    "billing_address_city",
-    "billing_address_zip",
-    "home_city",
-    "age_group",
-    "applying_for_free_of_charge",
-    "free_of_charge_reason",
-    "name",
-    "description",
-    "num_persons",
-    "purpose",
-}
-
-
-class ReservationMetadataFieldFactory(GenericDjangoModelFactory[ReservationMetadataField]):
-    class Meta:
-        model = ReservationMetadataField
-        django_get_or_create = ["field_name"]
-
-    field_name = fuzzy.FuzzyChoice(POSSIBLE_FIELDS)
 
 
 class ReservationMetadataSetFactory(GenericDjangoModelFactory[ReservationMetadataSet]):
@@ -55,9 +14,12 @@ class ReservationMetadataSetFactory(GenericDjangoModelFactory[ReservationMetadat
         model = ReservationMetadataSet
         django_get_or_create = ["name"]
 
-    name = fuzzy.FuzzyText()
-    supported_fields = ManyToManyFactory(ReservationMetadataFieldFactory)
-    required_fields = ManyToManyFactory(ReservationMetadataFieldFactory)
+    name = FakerFI("word", unique=True)
+
+    reservation_units = ReverseForeignKeyFactory("tests.factories.ReservationUnitFactory")
+
+    supported_fields = ManyToManyFactory("tests.factories.ReservationMetadataFieldFactory")
+    required_fields = ManyToManyFactory("tests.factories.ReservationMetadataFieldFactory")
 
     @classmethod
     def create_basic(
@@ -67,6 +29,8 @@ class ReservationMetadataSetFactory(GenericDjangoModelFactory[ReservationMetadat
         supported_fields: Iterable[str] = (),
         required_fields: Iterable[str] = (),
     ) -> ReservationMetadataSet:
+        from .reservation_metadata_field import POSSIBLE_FIELDS, ReservationMetadataFieldFactory
+
         metadata_set = cls.create(name=name)
 
         if extra_fields := set(supported_fields) - POSSIBLE_FIELDS:

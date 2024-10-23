@@ -1,14 +1,19 @@
 import datetime
 from typing import Any
 
-import factory
-from factory import fuzzy
+from factory import LazyAttribute, fuzzy
 
 from tilavarauspalvelu.enums import ReservationStartInterval, ReservationStateChoice, WeekdayChoice
 from tilavarauspalvelu.models import RecurringReservation
-from utils.date_utils import DEFAULT_TIMEZONE, get_periods_between
+from utils.date_utils import DEFAULT_TIMEZONE, get_periods_between, local_datetime
 
-from ._base import GenericDjangoModelFactory, OneToManyFactory
+from ._base import (
+    FakerFI,
+    ForeignKeyFactory,
+    ForwardOneToOneFactory,
+    GenericDjangoModelFactory,
+    ReverseForeignKeyFactory,
+)
 
 __all__ = [
     "RecurringReservationFactory",
@@ -20,28 +25,30 @@ class RecurringReservationFactory(GenericDjangoModelFactory[RecurringReservation
         model = RecurringReservation
         exclude = ["begin", "end"]
 
-    name = fuzzy.FuzzyText()
-    description = fuzzy.FuzzyText()
+    name = FakerFI("word")
+    description = FakerFI("sentence")
     recurrence_in_days = 7
-    weekdays = f"{WeekdayChoice.MONDAY}"
+    weekdays = str(WeekdayChoice.MONDAY)
 
-    begin = fuzzy.FuzzyDateTime(start_dt=datetime.datetime(2023, 1, 1, tzinfo=DEFAULT_TIMEZONE))
-    end = factory.LazyAttribute(lambda r: r.begin + datetime.timedelta(days=30, hours=1))
+    begin = fuzzy.FuzzyDateTime(start_dt=local_datetime(2023, 1, 1))
+    end = LazyAttribute(lambda r: r.begin + datetime.timedelta(days=30, hours=1))
 
-    begin_date = factory.LazyAttribute(lambda r: r.begin.date())
-    begin_time = factory.LazyAttribute(lambda r: r.begin.time())
+    begin_date = LazyAttribute(lambda r: r.begin.date())
+    begin_time = LazyAttribute(lambda r: r.begin.time())
 
-    end_date = factory.LazyAttribute(lambda r: r.end.date())
-    end_time = factory.LazyAttribute(lambda r: r.end.time())
+    end_date = LazyAttribute(lambda r: r.end.date())
+    end_time = LazyAttribute(lambda r: r.end.time())
 
-    user = factory.SubFactory("tests.factories.UserFactory")
-    reservation_unit = factory.SubFactory("tests.factories.ReservationUnitFactory")
-    age_group = factory.SubFactory("tests.factories.AgeGroupFactory")
-    ability_group = factory.SubFactory("tests.factories.AbilityGroupFactory")
-    allocated_time_slot = factory.SubFactory("tests.factories.AllocatedTimeSlotFactory")
+    reservation_unit = ForeignKeyFactory("tests.factories.ReservationUnitFactory")
+    user = ForeignKeyFactory("tests.factories.UserFactory", required=True)
 
-    rejected_occurrences = OneToManyFactory("tests.factories.RejectedOccurrenceFactory")
-    reservations = OneToManyFactory("tests.factories.ReservationFactory")
+    allocated_time_slot = ForwardOneToOneFactory("tests.factories.AllocatedTimeSlotFactory")
+    age_group = ForeignKeyFactory("tests.factories.AgeGroupFactory")
+
+    ability_group = ForeignKeyFactory("tests.factories.AbilityGroupFactory")
+
+    rejected_occurrences = ReverseForeignKeyFactory("tests.factories.RejectedOccurrenceFactory")
+    reservations = ReverseForeignKeyFactory("tests.factories.ReservationFactory")
 
     @classmethod
     def create_with_matching_reservations(cls, **kwargs: Any) -> RecurringReservation:
@@ -81,7 +88,7 @@ class RecurringReservationFactory(GenericDjangoModelFactory[RecurringReservation
             for begin, end in periods:
                 ReservationFactory.create(
                     recurring_reservation=series,
-                    reservation_unit=[series.reservation_unit],
+                    reservation_units=[series.reservation_unit],
                     begin=begin,
                     end=end,
                     **sub_kwargs,

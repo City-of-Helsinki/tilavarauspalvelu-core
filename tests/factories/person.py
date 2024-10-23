@@ -1,9 +1,6 @@
-import factory
-from factory import fuzzy
-
 from tilavarauspalvelu.models import Person
 
-from ._base import GenericDjangoModelFactory
+from ._base import FakerFI, GenericDjangoModelFactory, ReverseForeignKeyFactory
 
 __all__ = [
     "PersonFactory",
@@ -14,7 +11,9 @@ class PersonFactory(GenericDjangoModelFactory[Person]):
     class Meta:
         model = Person
 
-    first_name = factory.Faker("first_name")
-    last_name = factory.Faker("last_name")
-    email = factory.LazyAttribute(lambda o: f"{o.first_name.lower()}.{o.last_name.lower()}@example.com")
-    phone_number = fuzzy.FuzzyText(length=7, chars=[str(c) for c in range(10)])
+    first_name = FakerFI("first_name")
+    last_name = FakerFI("last_name")
+    email = FakerFI("email")
+    phone_number = FakerFI("phone_number")
+
+    applications = ReverseForeignKeyFactory("tests.factories.ApplicationFactory")

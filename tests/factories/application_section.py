@@ -1,17 +1,14 @@
 import datetime
 import random
-from collections.abc import Iterable
 from typing import Any
 
 import factory
 from factory import fuzzy
 
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, Weekday
-from tilavarauspalvelu.models import ApplicationSection, ReservationUnitOption, SuitableTimeRange
+from tilavarauspalvelu.models import ApplicationSection
 
-from ._base import GenericDjangoModelFactory
-from .reservation_unit_option import ReservationUnitOptionFactory
-from .suitable_time_range import SuitableTimeRangeFactory
+from ._base import FakerFI, ForeignKeyFactory, GenericDjangoModelFactory, ReverseForeignKeyFactory
 
 __all__ = [
     "ApplicationSectionFactory",
@@ -22,22 +19,23 @@ class ApplicationSectionFactory(GenericDjangoModelFactory[ApplicationSection]):
     class Meta:
         model = ApplicationSection
 
-    name = fuzzy.FuzzyText()
+    name = FakerFI("word")
     num_persons = fuzzy.FuzzyInteger(low=1, high=1000)
-    reservations_begin_date = factory.LazyAttribute(
-        lambda section: section.application.application_round.reservation_period_begin,
-    )
-    reservations_end_date = factory.LazyAttribute(
-        lambda section: section.application.application_round.reservation_period_end,
-    )
+
+    reservations_begin_date = factory.LazyAttribute(lambda i: i.application.application_round.reservation_period_begin)
+    reservations_end_date = factory.LazyAttribute(lambda i: i.application.application_round.reservation_period_end)
 
     reservation_min_duration = datetime.timedelta(hours=1)
     reservation_max_duration = datetime.timedelta(hours=2)
     applied_reservations_per_week = fuzzy.FuzzyInteger(low=1, high=7)
 
-    application = factory.SubFactory("tests.factories.ApplicationFactory")
-    purpose = factory.SubFactory("tests.factories.ReservationPurposeFactory")
-    age_group = factory.SubFactory("tests.factories.AgeGroupFactory")
+    application = ForeignKeyFactory("tests.factories.ApplicationFactory")
+
+    purpose = ForeignKeyFactory("tests.factories.ReservationPurposeFactory", required=True)
+    age_group = ForeignKeyFactory("tests.factories.AgeGroupFactory", required=True)
+
+    reservation_unit_options = ReverseForeignKeyFactory("tests.factories.ReservationUnitOptionFactory")
+    suitable_time_ranges = ReverseForeignKeyFactory("tests.factories.SuitableTimeRangeFactory")
 
     @classmethod
     def create_in_status(cls, status: ApplicationSectionStatusChoice, **kwargs: Any) -> ApplicationSection:
@@ -138,31 +136,3 @@ class ApplicationSectionFactory(GenericDjangoModelFactory[ApplicationSection]):
             kwargs["reservation_unit_options__locked"] = not is_rejected
 
         return cls.create(**kwargs)
-
-    @factory.post_generation
-    def reservation_unit_options(
-        self,
-        create: bool,
-        reservation_unit_options: Iterable[ReservationUnitOption] | None,
-        **kwargs: Any,
-    ) -> None:
-        if not create:
-            return
-
-        if not reservation_unit_options and kwargs:
-            kwargs.setdefault("application_section", self)
-            ReservationUnitOptionFactory.create(**kwargs)
-
-    @factory.post_generation
-    def suitable_time_ranges(
-        self,
-        create: bool,
-        suitable_time_ranges: Iterable[SuitableTimeRange] | None,
-        **kwargs: Any,
-    ) -> None:
-        if not create:
-            return
-
-        if not suitable_time_ranges and kwargs:
-            kwargs.setdefault("application_section", self)
-            SuitableTimeRangeFactory.create(**kwargs)

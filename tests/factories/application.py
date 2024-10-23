@@ -1,16 +1,14 @@
 import datetime
-from collections.abc import Iterable
 from datetime import timedelta
 from typing import Any
 
-import factory
 from django.utils.timezone import get_default_timezone, now
 from factory import fuzzy
 
 from tilavarauspalvelu.enums import ApplicantTypeChoice, ApplicationStatusChoice, Priority, Weekday
-from tilavarauspalvelu.models import Application, ApplicationRound, ApplicationSection, ReservationUnit
+from tilavarauspalvelu.models import Application, ApplicationRound, ReservationUnit
 
-from ._base import GenericDjangoModelFactory
+from ._base import FakerFI, ForeignKeyFactory, GenericDjangoModelFactory, ReverseForeignKeyFactory
 from .allocated_time_slot import AllocatedTimeSlotFactory
 from .application_round import ApplicationRoundFactory
 from .application_section import ApplicationSectionFactory
@@ -28,18 +26,23 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
         model = Application
 
     applicant_type = fuzzy.FuzzyChoice(choices=ApplicantTypeChoice.values)
-    application_round = factory.SubFactory("tests.factories.ApplicationRoundFactory")
-
-    organisation = factory.SubFactory("tests.factories.OrganisationFactory")
-    contact_person = factory.SubFactory("tests.factories.PersonFactory")
-    user = factory.SubFactory("tests.factories.UserFactory")
-    billing_address = factory.SubFactory("tests.factories.AddressFactory")
-    home_city = factory.SubFactory("tests.factories.CityFactory")
 
     cancelled_date = None
     sent_date = None
-    additional_information = fuzzy.FuzzyText()
-    working_memo = fuzzy.FuzzyText()
+    in_allocation_notification_sent_date = None
+    results_ready_notification_sent_date = None
+    additional_information = FakerFI("sentence")
+    working_memo = FakerFI("sentence")
+
+    application_round = ForeignKeyFactory("tests.factories.ApplicationRoundFactory")
+
+    user = ForeignKeyFactory("tests.factories.UserFactory", required=True)
+    organisation = ForeignKeyFactory("tests.factories.OrganisationFactory", required=True)
+    contact_person = ForeignKeyFactory("tests.factories.PersonFactory", required=True)
+    billing_address = ForeignKeyFactory("tests.factories.AddressFactory", required=True)
+    home_city = ForeignKeyFactory("tests.factories.CityFactory", required=True)
+
+    application_sections = ReverseForeignKeyFactory("tests.factories.ApplicationSectionFactory")
 
     @classmethod
     def create_in_status(cls, status: ApplicationStatusChoice, **kwargs: Any) -> Application:
@@ -328,17 +331,3 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
             )
 
         return application
-
-    @factory.post_generation
-    def application_sections(
-        self,
-        create: bool,
-        application_sections: Iterable[ApplicationSection] | None,
-        **kwargs: Any,
-    ) -> None:
-        if not create:
-            return
-
-        if not application_sections and kwargs:
-            kwargs.setdefault("application", self)
-            ApplicationSectionFactory.create(**kwargs)

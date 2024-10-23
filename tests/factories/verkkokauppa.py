@@ -6,12 +6,14 @@ import factory
 from django.utils.timezone import get_default_timezone
 
 from tilavarauspalvelu.utils.verkkokauppa.order.types import Order, OrderCustomer
+from tilavarauspalvelu.utils.verkkokauppa.payment.types import Payment
 
 from ._base import GenericFactory
 
 __all__ = [
     "OrderCustomerFactory",
     "OrderFactory",
+    "Payment",
 ]
 
 
@@ -43,3 +45,24 @@ class OrderCustomerFactory(GenericFactory[OrderCustomer]):
     last_name = "Bar"
     email = "foo.bar@email.com"
     phone = "+358 50 123 4567"
+
+
+class PaymentFactory(GenericFactory[Payment]):
+    class Meta:
+        model = Payment
+
+    payment_id = uuid.uuid4()
+    namespace = "tilanvaraus"
+    order_id = uuid.uuid4()
+    user_id = uuid.uuid4()
+    status = "payment_created"
+    payment_method = "creditcards"
+    payment_type = "order"
+    total_excl_tax = Decimal("100")
+    total = Decimal("124")
+    tax_amount = Decimal("24")
+    description = "Mock description"
+    additional_info = '{"payment_method": creditcards}'
+    token = uuid.uuid4()
+    timestamp = datetime.now(tz=get_default_timezone())
+    payment_method_label = "Visa"

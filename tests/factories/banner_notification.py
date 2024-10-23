@@ -1,14 +1,13 @@
 from datetime import timedelta
 from typing import Any
 
-import factory
 from django.utils import timezone
-from factory import fuzzy
+from factory import LazyAttribute, fuzzy
 
 from tilavarauspalvelu.enums import BannerNotificationLevel, BannerNotificationTarget
 from tilavarauspalvelu.models.banner_notification.model import BannerNotification
 
-from ._base import GenericDjangoModelFactory
+from ._base import FakerEN, FakerFI, FakerSV, GenericDjangoModelFactory
 
 __all__ = [
     "BannerNotificationFactory",
@@ -19,8 +18,13 @@ class BannerNotificationFactory(GenericDjangoModelFactory[BannerNotification]):
     class Meta:
         model = BannerNotification
 
-    name = factory.Faker("text", max_nb_chars=100)
-    message = factory.Faker("text", max_nb_chars=1_000)
+    name = FakerFI("text", max_nb_chars=100)
+
+    message = FakerFI("text", max_nb_chars=1_000)
+    message_fi = LazyAttribute(lambda i: i.message)
+    message_en = FakerEN("text", max_nb_chars=1_000)
+    message_sv = FakerSV("text", max_nb_chars=1_000)
+
     draft = True
     level = fuzzy.FuzzyChoice(BannerNotificationLevel.values)
     target = fuzzy.FuzzyChoice(BannerNotificationTarget.values)

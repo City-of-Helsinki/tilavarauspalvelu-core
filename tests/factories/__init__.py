@@ -9,30 +9,31 @@ from .application_section import ApplicationSectionFactory
 from .banner_notification import BannerNotificationFactory
 from .building import BuildingFactory
 from .city import CityFactory
-from .equipment import EquipmentCategoryFactory, EquipmentFactory
-from .keyword import KeywordCategoryFactory, KeywordFactory, KeywordGroupFactory
+from .equipment import EquipmentFactory
+from .equipment_category import EquipmentCategoryFactory
+from .general_role import GeneralRoleFactory
+from .keyword import KeywordFactory
+from .keyword_category import KeywordCategoryFactory
+from .keyword_group import KeywordGroupFactory
 from .location import LocationFactory
-from .opening_hours import OriginHaukiResourceFactory, ReservableTimeSpanFactory
-from .order import OrderCustomerFactory, OrderFactory
 from .organization import OrganisationFactory
-from .payment import (
-    PaymentAccountingFactory,
-    PaymentFactory,
-    PaymentMerchantFactory,
-    PaymentOrderFactory,
-    PaymentProductFactory,
-)
-from .permissions import GeneralRoleFactory, UnitRoleFactory
+from .origin_hauki_resource import OriginHaukiResourceFactory
+from .payment_accounting import PaymentAccountingFactory
+from .payment_merchant import PaymentMerchantFactory
+from .payment_order import PaymentOrderFactory
+from .payment_product import PaymentProductFactory
 from .person import PersonFactory
 from .purpose import PurposeFactory
 from .qualifier import QualifierFactory
 from .real_estate import RealEstateFactory
 from .recurring_reservation import RecurringReservationFactory
 from .rejected_occurrence import RejectedOccurrenceFactory
+from .reservable_time_span import ReservableTimeSpanFactory
 from .reservation import ReservationFactory
 from .reservation_cancel_reason import ReservationCancelReasonFactory
 from .reservation_deny_reason import ReservationDenyReasonFactory
-from .reservation_metadata import ReservationMetadataFieldFactory, ReservationMetadataSetFactory
+from .reservation_metadata_field import ReservationMetadataFieldFactory
+from .reservation_metadata_set import ReservationMetadataSetFactory
 from .reservation_purpose import ReservationPurposeFactory
 from .reservation_unit import ReservationUnitFactory
 from .reservation_unit_cancellation_rule import ReservationUnitCancellationRuleFactory
@@ -48,8 +49,11 @@ from .space import SpaceFactory
 from .suitable_time_range import SuitableTimeRangeFactory
 from .tax_percentage import TaxPercentageFactory
 from .terms_of_use import TermsOfUseFactory
-from .unit import UnitFactory, UnitGroupFactory
+from .unit import UnitFactory
+from .unit_group import UnitGroupFactory
+from .unit_role import UnitRoleFactory
 from .user import UserFactory, UserSocialAuthFactory
+from .verkkokauppa import OrderCustomerFactory, OrderFactory, PaymentFactory
 
 __all__ = [
     "AbilityGroupFactory",

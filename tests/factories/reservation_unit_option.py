@@ -1,11 +1,8 @@
-from collections.abc import Iterable
-from typing import Any
-
 import factory
 
-from tests.factories import AllocatedTimeSlotFactory
-from tests.factories._base import GenericDjangoModelFactory
-from tilavarauspalvelu.models import AllocatedTimeSlot, ReservationUnitOption
+from tilavarauspalvelu.models import ReservationUnitOption
+
+from ._base import ForeignKeyFactory, GenericDjangoModelFactory, ReverseForeignKeyFactory
 
 
 class ReservationUnitOptionFactory(GenericDjangoModelFactory[ReservationUnitOption]):
@@ -16,19 +13,7 @@ class ReservationUnitOptionFactory(GenericDjangoModelFactory[ReservationUnitOpti
     rejected = False
     locked = False
 
-    application_section = factory.SubFactory("tests.factories.ApplicationSectionFactory")
-    reservation_unit = factory.SubFactory("tests.factories.ReservationUnitFactory")
+    application_section = ForeignKeyFactory("tests.factories.ApplicationSectionFactory")
+    reservation_unit = ForeignKeyFactory("tests.factories.ReservationUnitFactory")
 
-    @factory.post_generation
-    def allocated_time_slots(
-        self,
-        create: bool,
-        allocated_time_slots: Iterable[AllocatedTimeSlot] | None,
-        **kwargs: Any,
-    ) -> None:
-        if not create:
-            return
-
-        if not allocated_time_slots and kwargs:
-            kwargs.setdefault("reservation_unit_option", self)
-            AllocatedTimeSlotFactory.create(**kwargs)
+    allocated_time_slots = ReverseForeignKeyFactory("tests.factories.AllocatedTimeSlotFactory")

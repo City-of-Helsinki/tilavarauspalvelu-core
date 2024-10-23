@@ -1,17 +1,17 @@
 from factory import LazyAttribute
 
-from tilavarauspalvelu.models import ServiceSector
+from tilavarauspalvelu.models import UnitGroup
 
 from ._base import FakerEN, FakerFI, FakerSV, GenericDjangoModelFactory, ManyToManyFactory
 
 __all__ = [
-    "ServiceSectorFactory",
+    "UnitGroupFactory",
 ]
 
 
-class ServiceSectorFactory(GenericDjangoModelFactory[ServiceSector]):
+class UnitGroupFactory(GenericDjangoModelFactory[UnitGroup]):
     class Meta:
-        model = ServiceSector
+        model = UnitGroup
         django_get_or_create = ["name"]
 
     name = FakerFI("word", unique=True)
@@ -20,3 +20,4 @@ class ServiceSectorFactory(GenericDjangoModelFactory[ServiceSector]):
     name_sv = FakerSV("word")
 
     units = ManyToManyFactory("tests.factories.UnitFactory")
+    unit_roles = ManyToManyFactory("tests.factories.UnitRoleFactory")

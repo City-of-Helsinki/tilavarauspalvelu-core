@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 import pytest
 from rest_framework.test import APIClient
 
+from tests.factories._base import FakerEN, FakerFI, FakerSV
 from tests.helpers import GraphQLClient, patch_method
 from utils.sentry import SentryLogger
 
@@ -44,3 +45,11 @@ def outbox() -> list[EmailMessage]:
     from django.core import mail
 
     return mail.outbox
+
+
+@pytest.fixture(autouse=True)
+def _reset_faker_uniqueness():
+    """Reset the uniqueness of all faker instances between tests so that they don't run out of unique values."""
+    FakerFI.clear_unique()
+    FakerSV.clear_unique()
+    FakerEN.clear_unique()
