@@ -59,7 +59,7 @@ export function RecurringReservationsView({
   });
 
   const { hasPermission } = useCheckPermission({
-    units: [reservationToCopy?.reservationUnit?.[0].unit?.pk ?? 0],
+    units: [reservationToCopy?.reservationUnits?.[0].unit?.pk ?? 0],
     permission: UserPermissionChoice.CanManageReservations,
   });
 

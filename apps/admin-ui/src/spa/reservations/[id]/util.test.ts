@@ -13,7 +13,9 @@ import { addHours, addMonths } from "date-fns";
 import { toApiDate } from "common/src/common/util";
 
 type ReservationNodeT = NonNullable<ReservationQuery["reservation"]>;
-type ReservationUnitNodeT = NonNullable<ReservationNodeT["reservationUnit"]>[0];
+type ReservationUnitNodeT = NonNullable<
+  ReservationNodeT["reservationUnits"]
+>[0];
 type PricingNodeT = ReservationUnitNodeT["pricings"][0];
 
 const mockT = ((x: string) => x) as TFunction;
@@ -51,7 +53,7 @@ function constructReservation(
     bufferTimeAfter: 0,
     state: ReservationStateChoice.Confirmed,
     paymentOrder: [],
-    reservationUnit: [
+    reservationUnits: [
       {
         bufferTimeAfter: 0,
         bufferTimeBefore: 0,

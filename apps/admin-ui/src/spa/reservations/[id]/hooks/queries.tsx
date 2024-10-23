@@ -75,7 +75,7 @@ export const RESERVATIONS_BY_RESERVATIONUNITS = gql`
   ) {
     reservationUnit(id: $id) {
       id
-      reservationSet(state: $state, beginDate: $beginDate, endDate: $endDate) {
+      reservations(state: $state, beginDate: $beginDate, endDate: $endDate) {
         ...CalendarReservation
       }
     }
@@ -134,7 +134,7 @@ export const SINGLE_RESERVATION_QUERY = gql`
       ...ReservationCommon
       ...ReservationRecurring
       ...ReservationSpecialisation
-      reservationUnit {
+      reservationUnits {
         ...ReservationUnit
         ...ReservationUnitPricing
       }
@@ -163,7 +163,7 @@ export const RECURRING_RESERVATION_FRAGMENT = gql`
         id
         status
       }
-      reservationUnit {
+      reservationUnits {
         id
         unit {
           id

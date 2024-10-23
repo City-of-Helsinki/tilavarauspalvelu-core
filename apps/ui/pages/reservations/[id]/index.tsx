@@ -359,7 +359,7 @@ function Reservation({
     orderUuid: reservation.paymentOrder[0]?.orderUuid ?? "",
   });
 
-  const reservationUnit = reservation.reservationUnit?.[0] ?? null;
+  const reservationUnit = reservation.reservationUnits?.[0] ?? null;
   const instructionsKey =
     reservation.state != null
       ? getReservationUnitInstructionsKey(reservation.state)

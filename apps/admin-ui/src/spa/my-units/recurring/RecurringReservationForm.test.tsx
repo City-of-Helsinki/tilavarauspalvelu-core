@@ -16,14 +16,14 @@ import {
   YEAR,
   mocks,
   mondayMorningReservations,
-  units,
+  createUnits,
 } from "./__test__/mocks";
 
 function customRender() {
   return render(
     <MemoryRouter>
       <MockedProvider mocks={mocks} addTypename={false}>
-        <RecurringReservationForm reservationUnits={units} />
+        <RecurringReservationForm reservationUnits={createUnits()} />
       </MockedProvider>
     </MemoryRouter>
   );
@@ -60,6 +60,7 @@ test("Render recurring reservation form with all but unit field disabled", async
     selector: "ul",
   });
 
+  const units = createUnits();
   expect(units[0].nameFi).toBeDefined();
   expect(units[1].nameFi).toBeDefined();
   expect(listbox).toBeInTheDocument();
@@ -106,6 +107,7 @@ async function selectUnit() {
   const listbox = screen.getByLabelText(/reservationUnit/, {
     selector: "ul",
   });
+  const units = createUnits();
   expect(units[0].nameFi).toBeDefined();
   const unitName = units[0].nameFi!;
 
@@ -216,7 +218,6 @@ async function fillForm({
   const listbox = screen.getByLabelText(/reservationUnit/, {
     selector: "ul",
   });
-  expect(units[0].nameFi).toBeDefined();
 
   // Select works for HDS listbox but
   // to check the selected value we have to read the button text not check options

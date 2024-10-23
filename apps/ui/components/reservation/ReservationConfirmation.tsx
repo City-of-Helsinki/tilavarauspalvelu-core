@@ -107,7 +107,7 @@ function ReservationConfirmation({
 }: Props): JSX.Element {
   const { t, i18n } = useTranslation();
 
-  const reservationUnit = reservation.reservationUnit?.[0];
+  const reservationUnit = reservation.reservationUnits?.[0];
   const instructionsKey = getReservationUnitInstructionsKey(reservation?.state);
   const requiresHandling =
     reservation.state === ReservationStateChoice.RequiresHandling;

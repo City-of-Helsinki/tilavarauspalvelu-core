@@ -116,7 +116,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
   const [localError, setLocalError] = useState<string | null>(null);
 
   const interval =
-    reservation?.reservationUnit[0]?.reservationStartInterval ??
+    reservation?.reservationUnits[0]?.reservationStartInterval ??
     ReservationStartInterval.Interval_15Mins;
 
   const form = useForm<RescheduleReservationSeriesForm>({
@@ -132,7 +132,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
       reset(convertToForm(recurringReservation));
     }
   }, [recurringReservation, reset]);
-  const reservationUnit = reservation?.reservationUnit?.[0];
+  const reservationUnit = reservation?.reservationUnits?.[0];
 
   const [removedReservations, setRemovedReservations] = useState<
     NewReservationListItem[]
@@ -429,7 +429,7 @@ export const SERIES_PAGE_QUERY = gql`
         endTime
         beginTime
       }
-      reservationUnit {
+      reservationUnits {
         id
         pk
         nameFi

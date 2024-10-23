@@ -73,7 +73,7 @@ function createReservationEdge({
     bufferTimeAfter: 0,
     bufferTimeBefore: 0,
     paymentOrder: [],
-    reservationUnit: [],
+    reservationUnits: [],
     recurringReservation: {
       id: base64encode(`RecurringReservationNode:${recurringPk}`),
       pk: recurringPk,
@@ -299,7 +299,7 @@ export const mockReservation: ReservationType = {
   bufferTimeBefore: 0,
   state: ReservationStateChoice.Confirmed,
   id: base64encode("ReservationNode:1"),
-  reservationUnit: [],
+  reservationUnits: [],
   paymentOrder: [],
   workingMemo: "empty",
   handlingDetails: "",

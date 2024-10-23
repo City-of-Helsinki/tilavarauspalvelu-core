@@ -87,7 +87,7 @@ function createMockReservationUnit({
     services: [],
     spaces: [],
     cancellationRule,
-    reservationSet: [],
+    reservations: [],
     allowReservationsWithoutOpeningHours: false,
     requireReservationHandling: false,
     reservationBlockWholeDay: false,

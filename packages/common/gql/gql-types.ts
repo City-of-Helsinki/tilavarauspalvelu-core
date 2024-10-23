@@ -1888,11 +1888,11 @@ export type QueryAffectingReservationsArgs = {
   recurringReservation?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   requested?: InputMaybe<Scalars["Boolean"]["input"]>;
   reservationType?: InputMaybe<Array<InputMaybe<ReservationTypeChoice>>>;
-  reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   reservationUnitNameEn?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameFi?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameSv?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  reservationUnits?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   state?: InputMaybe<Array<InputMaybe<ReservationStateChoice>>>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
@@ -2349,11 +2349,11 @@ export type QueryReservationsArgs = {
   recurringReservation?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   requested?: InputMaybe<Scalars["Boolean"]["input"]>;
   reservationType?: InputMaybe<Array<InputMaybe<ReservationTypeChoice>>>;
-  reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   reservationUnitNameEn?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameFi?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameSv?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  reservationUnits?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   state?: InputMaybe<Array<InputMaybe<ReservationStateChoice>>>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
@@ -2527,11 +2527,11 @@ export type RecurringReservationNodeReservationsArgs = {
   recurringReservation?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   requested?: InputMaybe<Scalars["Boolean"]["input"]>;
   reservationType?: InputMaybe<Array<InputMaybe<ReservationTypeChoice>>>;
-  reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   reservationUnitNameEn?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameFi?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameSv?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  reservationUnits?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   state?: InputMaybe<Array<InputMaybe<ReservationStateChoice>>>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
@@ -3008,7 +3008,7 @@ export type ReservationNode = Node & {
   priceNet?: Maybe<Scalars["Decimal"]["output"]>;
   purpose?: Maybe<ReservationPurposeNode>;
   recurringReservation?: Maybe<RecurringReservationNode>;
-  reservationUnit: Array<ReservationUnitNode>;
+  reservationUnits: Array<ReservationUnitNode>;
   reserveeAddressCity?: Maybe<Scalars["String"]["output"]>;
   reserveeAddressStreet?: Maybe<Scalars["String"]["output"]>;
   reserveeAddressZip?: Maybe<Scalars["String"]["output"]>;
@@ -3031,7 +3031,7 @@ export type ReservationNode = Node & {
   workingMemo?: Maybe<Scalars["String"]["output"]>;
 };
 
-export type ReservationNodeReservationUnitArgs = {
+export type ReservationNodeReservationUnitsArgs = {
   applicationRound?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   calculateFirstReservableTime?: InputMaybe<Scalars["Boolean"]["input"]>;
   descriptionEn?: InputMaybe<Scalars["String"]["input"]>;
@@ -3545,7 +3545,6 @@ export enum ReservationTypeStaffChoice {
 }
 
 export type ReservationUnitCancellationRuleNode = Node & {
-  /** Seconds before reservations related to this cancellation rule can be cancelled without handling. */
   canBeCancelledTimeBefore?: Maybe<Scalars["Duration"]["output"]>;
   /** The ID of the object */
   id: Scalars["ID"]["output"];
@@ -3850,10 +3849,10 @@ export type ReservationUnitNode = Node & {
   reservationPendingInstructionsEn?: Maybe<Scalars["String"]["output"]>;
   reservationPendingInstructionsFi?: Maybe<Scalars["String"]["output"]>;
   reservationPendingInstructionsSv?: Maybe<Scalars["String"]["output"]>;
-  reservationSet?: Maybe<Array<ReservationNode>>;
   reservationStartInterval: ReservationStartInterval;
   reservationState?: Maybe<ReservationUnitReservationState>;
   reservationUnitType?: Maybe<ReservationUnitTypeNode>;
+  reservations?: Maybe<Array<ReservationNode>>;
   reservationsMaxDaysBefore?: Maybe<Scalars["Int"]["output"]>;
   reservationsMinDaysBefore?: Maybe<Scalars["Int"]["output"]>;
   resources: Array<ResourceNode>;
@@ -3917,7 +3916,7 @@ export type ReservationUnitNodeReservableTimeSpansArgs = {
   startDate: Scalars["Date"]["input"];
 };
 
-export type ReservationUnitNodeReservationSetArgs = {
+export type ReservationUnitNodeReservationsArgs = {
   applyingForFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
   beginDate?: InputMaybe<Scalars["Date"]["input"]>;
   createdAtGte?: InputMaybe<Scalars["Date"]["input"]>;
@@ -3933,11 +3932,11 @@ export type ReservationUnitNodeReservationSetArgs = {
   recurringReservation?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   requested?: InputMaybe<Scalars["Boolean"]["input"]>;
   reservationType?: InputMaybe<Array<InputMaybe<ReservationTypeChoice>>>;
-  reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   reservationUnitNameEn?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameFi?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameSv?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  reservationUnits?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   state?: InputMaybe<Array<InputMaybe<ReservationStateChoice>>>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
@@ -4081,44 +4080,30 @@ export type ReservationUnitPaymentTypeNode = Node & {
 };
 
 export type ReservationUnitPricingNode = Node & {
-  /** When pricing is activated */
   begins: Scalars["Date"]["output"];
-  /** Maximum price of the reservation unit including VAT */
   highestPrice: Scalars["Decimal"]["output"];
   highestPriceNet?: Maybe<Scalars["Decimal"]["output"]>;
   /** The ID of the object */
   id: Scalars["ID"]["output"];
-  /** Minimum price of the reservation unit including VAT */
   lowestPrice: Scalars["Decimal"]["output"];
   lowestPriceNet?: Maybe<Scalars["Decimal"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
-  /** Unit of the price */
   priceUnit: PriceUnit;
-  /** What kind of pricing types are available with this reservation unit. */
   pricingType?: Maybe<PricingType>;
-  /** Status of the pricing */
   status: Status;
-  /** The percentage of tax included in the price */
   taxPercentage: TaxPercentageNode;
 };
 
 export type ReservationUnitPricingSerializerInput = {
-  /** When pricing is activated */
   begins: Scalars["Date"]["input"];
-  /** Maximum price of the reservation unit including VAT */
   highestPrice?: InputMaybe<Scalars["Decimal"]["input"]>;
   highestPriceNet?: InputMaybe<Scalars["String"]["input"]>;
-  /** Minimum price of the reservation unit including VAT */
   lowestPrice?: InputMaybe<Scalars["Decimal"]["input"]>;
   lowestPriceNet?: InputMaybe<Scalars["String"]["input"]>;
   pk?: InputMaybe<Scalars["Int"]["input"]>;
-  /** Unit of the price */
   priceUnit?: InputMaybe<PriceUnit>;
-  /** What kind of pricing types are available with this reservation unit. */
   pricingType?: InputMaybe<PricingType>;
-  /** Status of the pricing */
   status: Status;
-  /** The percentage of tax included in the price */
   taxPercentage?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
@@ -4150,7 +4135,6 @@ export type ReservationUnitTypeNode = Node & {
   nameFi?: Maybe<Scalars["String"]["output"]>;
   nameSv?: Maybe<Scalars["String"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
-  /** Järjestysnumero, jota käytetään rajapinnan järjestämisessä. */
   rank?: Maybe<Scalars["Int"]["output"]>;
 };
 
@@ -4666,7 +4650,7 @@ export type SpaceNode = Node & {
   nameSv?: Maybe<Scalars["String"]["output"]>;
   parent?: Maybe<SpaceNode>;
   pk?: Maybe<Scalars["Int"]["output"]>;
-  resourceSet: Array<ResourceNode>;
+  resources: Array<ResourceNode>;
   surfaceArea?: Maybe<Scalars["Int"]["output"]>;
   unit?: Maybe<UnitNode>;
 };
@@ -4686,7 +4670,7 @@ export type SpaceNodeChildrenArgs = {
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
-export type SpaceNodeResourceSetArgs = {
+export type SpaceNodeResourcesArgs = {
   nameEn?: InputMaybe<Scalars["String"]["input"]>;
   nameEn_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   nameEn_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
@@ -4791,7 +4775,6 @@ export type TaxPercentageNode = Node & {
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   pk?: Maybe<Scalars["Int"]["output"]>;
-  /** The tax percentage for a price */
   value: Scalars["Decimal"]["output"];
 };
 
@@ -4943,7 +4926,7 @@ export type UnitNode = Node & {
   paymentMerchant?: Maybe<PaymentMerchantNode>;
   phone: Scalars["String"]["output"];
   pk?: Maybe<Scalars["Int"]["output"]>;
-  reservationunitSet: Array<ReservationUnitNode>;
+  reservationUnits: Array<ReservationUnitNode>;
   serviceSectors: Array<ServiceSectorNode>;
   shortDescription: Scalars["String"]["output"];
   shortDescriptionEn?: Maybe<Scalars["String"]["output"]>;
@@ -4955,7 +4938,7 @@ export type UnitNode = Node & {
   webPage: Scalars["String"]["output"];
 };
 
-export type UnitNodeReservationunitSetArgs = {
+export type UnitNodeReservationUnitsArgs = {
   applicationRound?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   calculateFirstReservableTime?: InputMaybe<Scalars["Boolean"]["input"]>;
   descriptionEn?: InputMaybe<Scalars["String"]["input"]>;
@@ -5250,22 +5233,15 @@ export type UpdateReservationUnitOptionApplicantSerializerInput = {
 };
 
 export type UpdateReservationUnitPricingSerializerInput = {
-  /** When pricing is activated */
   begins?: InputMaybe<Scalars["Date"]["input"]>;
-  /** Maximum price of the reservation unit including VAT */
   highestPrice?: InputMaybe<Scalars["Decimal"]["input"]>;
   highestPriceNet?: InputMaybe<Scalars["String"]["input"]>;
-  /** Minimum price of the reservation unit including VAT */
   lowestPrice?: InputMaybe<Scalars["Decimal"]["input"]>;
   lowestPriceNet?: InputMaybe<Scalars["String"]["input"]>;
   pk?: InputMaybe<Scalars["Int"]["input"]>;
-  /** Unit of the price */
   priceUnit?: InputMaybe<PriceUnit>;
-  /** What kind of pricing types are available with this reservation unit. */
   pricingType?: InputMaybe<PricingType>;
-  /** Status of the pricing */
   status?: InputMaybe<Status>;
-  /** The percentage of tax included in the price */
   taxPercentage?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
@@ -5327,13 +5303,11 @@ export enum UserRoleChoice {
 
 export type UserUpdateMutationInput = {
   pk: Scalars["Int"]["input"];
-  /** When user wants to receive reservation notification emails. */
   reservationNotification?: InputMaybe<ReservationNotification>;
 };
 
 export type UserUpdateMutationPayload = {
   pk?: Maybe<Scalars["Int"]["output"]>;
-  /** When user wants to receive reservation notification emails. */
   reservationNotification?: Maybe<ReservationNotification>;
 };
 
@@ -6407,12 +6381,17 @@ export function useBannerNotificationsListAllLazyQuery(
   >(BannerNotificationsListAllDocument, options);
 }
 export function useBannerNotificationsListAllSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    BannerNotificationsListAllQuery,
-    BannerNotificationsListAllQueryVariables
-  >
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        BannerNotificationsListAllQuery,
+        BannerNotificationsListAllQueryVariables
+      >
 ) {
-  const options = { ...defaultOptions, ...baseOptions };
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<
     BannerNotificationsListAllQuery,
     BannerNotificationsListAllQueryVariables
@@ -6489,12 +6468,17 @@ export function useBannerNotificationsListLazyQuery(
   >(BannerNotificationsListDocument, options);
 }
 export function useBannerNotificationsListSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    BannerNotificationsListQuery,
-    BannerNotificationsListQueryVariables
-  >
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        BannerNotificationsListQuery,
+        BannerNotificationsListQueryVariables
+      >
 ) {
-  const options = { ...defaultOptions, ...baseOptions };
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<
     BannerNotificationsListQuery,
     BannerNotificationsListQueryVariables
@@ -6578,12 +6562,17 @@ export function useApplicationLazyQuery(
   );
 }
 export function useApplicationSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    ApplicationQuery,
-    ApplicationQueryVariables
-  >
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ApplicationQuery,
+        ApplicationQueryVariables
+      >
 ) {
-  const options = { ...defaultOptions, ...baseOptions };
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<ApplicationQuery, ApplicationQueryVariables>(
     ApplicationDocument,
     options
@@ -6655,12 +6644,14 @@ export function useTermsOfUseLazyQuery(
   );
 }
 export function useTermsOfUseSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    TermsOfUseQuery,
-    TermsOfUseQueryVariables
-  >
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<TermsOfUseQuery, TermsOfUseQueryVariables>
 ) {
-  const options = { ...defaultOptions, ...baseOptions };
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<TermsOfUseQuery, TermsOfUseQueryVariables>(
     TermsOfUseDocument,
     options

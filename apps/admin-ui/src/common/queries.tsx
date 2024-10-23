@@ -22,7 +22,7 @@ export const UNIT_QUERY = gql`
       nameFi
       tprekId
       shortDescriptionFi
-      reservationunitSet {
+      reservationUnits {
         ...ReservationUnitCommonFields
         resources {
           id
@@ -60,7 +60,7 @@ export const UNIT_WITH_SPACES_AND_RESOURCES = gql`
       nameFi
       spaces {
         ...SpaceCommonFields
-        resourceSet {
+        resources {
           id
           pk
           nameFi

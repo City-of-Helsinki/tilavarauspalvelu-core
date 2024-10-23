@@ -71,7 +71,7 @@ function mapFilterParams(
     searchParams.getAll("orderStatus").map(transformPaymentStatusSafe)
   );
 
-  const reservationUnit = searchParams
+  const reservationUnits = searchParams
     .getAll("reservationUnit")
     .map(Number)
     .filter(Number.isInteger);
@@ -121,7 +121,7 @@ function mapFilterParams(
 
   return {
     unit,
-    reservationUnit,
+    reservationUnits,
     reservationUnitType,
     reservationType,
     state,

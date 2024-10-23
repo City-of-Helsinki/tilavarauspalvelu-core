@@ -54,9 +54,7 @@ export function useCheckCollisions({
   ) {
     return reservation.affectedReservationUnits?.some((pk) => pk === resUnitPk);
   }
-  const reservationSet = filterNonNullable(
-    data?.reservationUnit?.reservationSet
-  );
+  const reservationSet = filterNonNullable(data?.reservationUnit?.reservations);
   // NOTE we could use a recular concat here (we only have single reservationUnit here)
   const affectingReservations = filterNonNullable(data?.affectingReservations);
   const reservations = filterNonNullable(

@@ -126,7 +126,7 @@ export const CHANGE_RESERVATION_TIME_QUERY_FRAGMENT = gql`
       beginDate
       endDate
     }
-    reservationUnit {
+    reservationUnits {
       id
       pk
       bufferTimeBefore
@@ -316,7 +316,7 @@ export function NewReservationModal({
 
   const { recurringReservation, type } = reservationToCopy ?? {};
   const { pk: recurringReservationPk } = recurringReservation ?? {};
-  const reservationUnit = reservationToCopy?.reservationUnit?.[0];
+  const reservationUnit = reservationToCopy?.reservationUnits?.[0];
 
   // NOTE 0 => buffer disabled for this reservation, undefined => no buffers selected
   const bufferTimeBefore = reservationUnit?.bufferTimeBefore ?? 0;
@@ -455,7 +455,7 @@ export function EditTimeModal({
   const startDateTime = new Date(reservation.begin);
   const endDateTime = new Date(reservation.end);
 
-  const reservationUnit = reservation.reservationUnit?.find(() => true);
+  const reservationUnit = reservation.reservationUnits?.find(() => true);
 
   // NOTE 0 => buffer disabled for this reservation, undefined => no buffers selected
   const bufferTimeBefore =
@@ -525,7 +525,7 @@ export function EditTimeModal({
       <ErrorBoundary fallback={<div>{t("errors.descriptive.unknown")}</div>}>
         <DialogContent
           form={form}
-          reservationUnitPk={reservation.reservationUnit?.[0]?.pk ?? 0}
+          reservationUnitPk={reservation.reservationUnits?.[0]?.pk ?? 0}
           bufferTimeAfter={bufferTimeAfter}
           bufferTimeBefore={bufferTimeBefore}
           mutate={changeTime}

@@ -16,7 +16,7 @@ import Card from "common/src/components/Card";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 
 type UnitType = NonNullable<UnitQuery["unit"]>;
-type ReservationUnitType = NonNullable<UnitType["reservationunitSet"]>[0];
+type ReservationUnitType = NonNullable<UnitType["reservationUnits"]>[0];
 interface IProps {
   reservationUnit: ReservationUnitType;
   unitId: number;

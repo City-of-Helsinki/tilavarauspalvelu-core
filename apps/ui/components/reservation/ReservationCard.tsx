@@ -43,7 +43,7 @@ interface PropsT {
 function ReservationCard({ reservation, type }: PropsT): JSX.Element {
   const { t, i18n } = useTranslation();
 
-  const reservationUnit = reservation.reservationUnit?.[0] ?? undefined;
+  const reservationUnit = reservation.reservationUnits?.[0] ?? undefined;
   const link = reservation.pk ? `/reservations/${reservation.pk}` : "";
 
   const { begin, end } = reservation;

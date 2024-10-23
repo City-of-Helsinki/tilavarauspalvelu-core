@@ -54,22 +54,24 @@ const arrays = {
   spaces: [],
 };
 
-export const units: ReservationUnitFragment[] = [
-  {
-    ...unitCommon,
-    ...arrays,
-    pk: 1,
-    id: base64encode(`ReservationUnitNode:1`),
-    nameFi: "Unit",
-  },
-  {
-    ...unitCommon,
-    ...arrays,
-    pk: 2,
-    id: base64encode(`ReservationUnitNode:2`),
-    nameFi: "Absolute",
-  },
-];
+export function createUnits(): ReservationUnitFragment[] {
+  return [
+    {
+      ...unitCommon,
+      ...arrays,
+      pk: 1,
+      id: base64encode(`ReservationUnitNode:1`),
+      nameFi: "Unit",
+    },
+    {
+      ...unitCommon,
+      ...arrays,
+      pk: 2,
+      id: base64encode(`ReservationUnitNode:2`),
+      nameFi: "Absolute",
+    },
+  ];
+}
 
 const emptyTerms = {
   id: "",
@@ -122,39 +124,41 @@ const requiredFields = [
   "purpose",
 ];
 
-const unitResponse: ReservationUnitFragment = {
-  ...unitCommon,
-  ...arrays,
-  nameFi: "Studiohuone 1 + soittimet",
-  pk: 1,
-  id: base64encode(`ReservationUnitNode:1`),
-  minPersons: null,
-  maxPersons: null,
-  bufferTimeBefore: 0,
-  bufferTimeAfter: 0,
-  reservationStartInterval: ReservationStartInterval.Interval_15Mins,
-  pricingTerms: emptyTerms,
-  paymentTerms: emptyTerms,
-  cancellationTerms: emptyTerms,
-  serviceSpecificTerms: emptyTerms,
-  termsOfUseFi: "",
-  unit: {
-    id: base64encode(`UnitNode:1`),
+export function createUnitFragment(): ReservationUnitFragment {
+  return {
+    ...unitCommon,
+    ...arrays,
+    nameFi: "Studiohuone 1 + soittimet",
     pk: 1,
-    nameFi: "unit name",
-  },
-  metadataSet: {
-    id: "1",
-    supportedFields: supportedFields.map((x) => ({
-      fieldName: x,
-      id: x,
-    })),
-    requiredFields: requiredFields.map((x) => ({
-      fieldName: x,
-      id: x,
-    })),
-  },
-};
+    id: base64encode(`ReservationUnitNode:1`),
+    minPersons: null,
+    maxPersons: null,
+    bufferTimeBefore: 0,
+    bufferTimeAfter: 0,
+    reservationStartInterval: ReservationStartInterval.Interval_15Mins,
+    pricingTerms: emptyTerms,
+    paymentTerms: emptyTerms,
+    cancellationTerms: emptyTerms,
+    serviceSpecificTerms: emptyTerms,
+    termsOfUseFi: "",
+    unit: {
+      id: base64encode(`UnitNode:1`),
+      pk: 1,
+      nameFi: "unit name",
+    },
+    metadataSet: {
+      id: "1",
+      supportedFields: supportedFields.map((x) => ({
+        fieldName: x,
+        id: x,
+      })),
+      requiredFields: requiredFields.map((x) => ({
+        fieldName: x,
+        id: x,
+      })),
+    },
+  };
+}
 
 // First monday off the month has reservation from 9:00 - 12:00
 export const mondayMorningReservations = Array.from(Array(12).keys()).map(
@@ -219,9 +223,7 @@ export const mocks = [
       variables: { id: base64encode(`ReservationUnitNode:1`) },
     },
     result: {
-      data: {
-        reservationUnit: unitResponse,
-      } as ReservationUnitQuery,
+      data: createReservationUnitResponse(),
     },
   },
   {
@@ -236,13 +238,7 @@ export const mocks = [
       },
     },
     result: {
-      data: {
-        reservationUnit: {
-          id: base64encode(`ReservationUnitNode:1`),
-          reservationSet: reservationsByUnitResponse,
-        },
-        affectingReservations: reservationsByUnitResponse,
-      } as ReservationTimesInReservationUnitQuery,
+      data: createReservationsInIntervalResponse(),
     },
   },
   {
@@ -266,3 +262,19 @@ export const mocks = [
     },
   },
 ];
+
+function createReservationUnitResponse(): ReservationUnitQuery {
+  return {
+    reservationUnit: createUnitFragment(),
+  };
+}
+
+function createReservationsInIntervalResponse(): ReservationTimesInReservationUnitQuery {
+  return {
+    reservationUnit: {
+      id: base64encode(`ReservationUnitNode:1`),
+      reservations: reservationsByUnitResponse,
+    },
+    affectingReservations: reservationsByUnitResponse,
+  };
+}

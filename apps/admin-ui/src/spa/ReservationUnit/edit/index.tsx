@@ -592,14 +592,13 @@ function BasicSection({
   const { errors } = formState;
   const { spaces } = unit ?? {};
 
-  const spaceOptions =
-    spaces?.map((s) => ({
-      label: String(s?.nameFi),
-      value: Number(s?.pk),
-    })) ?? [];
+  const spaceOptions = filterNonNullable(spaces).map((s) => ({
+    label: s?.nameFi ?? "-",
+    value: s?.pk ?? 0,
+  }));
   const resourceOptions = filterNonNullable(
-    spaces?.flatMap((s) => s?.resourceSet)
-  ).map((r) => ({ label: String(r?.nameFi), value: Number(r?.pk) }));
+    spaces?.flatMap((s) => s?.resources)
+  ).map((r) => ({ label: r?.nameFi ?? "-", value: r?.pk ?? 0 }));
 
   const spacePks = watch("spaces");
   const selectedSpaces = filterNonNullable(

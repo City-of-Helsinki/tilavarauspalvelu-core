@@ -30,7 +30,7 @@ export function useUnitResources(
   });
 
   const { affectingReservations } = data ?? {};
-  const reservationunitSet = filterNonNullable(data?.unit?.reservationunitSet);
+  const reservationunitSet = filterNonNullable(data?.unit?.reservationUnits);
 
   type ReservationType = NonNullable<typeof affectingReservations>[0];
   type ReservationUnitType = NonNullable<typeof reservationunitSet>[0];
@@ -66,7 +66,7 @@ export function useUnitResources(
       const affecting = affectingReservations?.filter((y) =>
         doesReservationAffectReservationUnit(y, x.pk ?? 0)
       );
-      const _events = x.reservationSet?.concat(affecting ?? []);
+      const _events = x.reservations?.concat(affecting ?? []);
       const events = filterNonNullable(_events);
 
       return {

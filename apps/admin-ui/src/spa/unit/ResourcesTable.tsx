@@ -37,7 +37,7 @@ type ResourcesTableColumn = {
 };
 
 export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
-  const resources = unit?.spaces?.flatMap((s) => s?.resourceSet);
+  const resources = unit?.spaces?.flatMap((s) => s?.resources);
 
   const [deleteResourceMutation] = useDeleteResourceMutation();
 

@@ -111,11 +111,11 @@ function getWithoutThisReservation(
   reservation: ReservationNodeT
 ): ReservationUnitNodeT {
   const otherReservations = filterNonNullable(
-    reservationUnit?.reservationSet?.filter((n) => n?.pk !== reservation.pk)
+    reservationUnit?.reservations?.filter((n) => n?.pk !== reservation.pk)
   );
   return {
     ...reservationUnit,
-    reservationSet: otherReservations,
+    reservations: otherReservations,
   };
 }
 

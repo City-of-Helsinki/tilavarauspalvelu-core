@@ -134,7 +134,7 @@ export function ReservationCancellation(props: Props): JSX.Element {
 
   const { reservation } = props;
 
-  const reservationUnit = reservation?.reservationUnit?.[0] ?? null;
+  const reservationUnit = reservation?.reservationUnits?.[0] ?? null;
   const instructions = reservationUnit
     ? getTranslationSafe(
         reservationUnit,

@@ -25,7 +25,7 @@ import { flattenMetadata } from "@/common/util";
 import { errorToast } from "common/src/common/toast";
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
-type ReservationUnitType = NonNullable<ReservationType["reservationUnit"]>[0];
+type ReservationUnitType = NonNullable<ReservationType["reservationUnits"]>[0];
 type FormValueType = ReservationChangeFormType & ReservationFormMeta;
 
 type PossibleOptions = {

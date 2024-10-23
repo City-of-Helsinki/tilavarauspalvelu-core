@@ -45,9 +45,7 @@ function getColConfig(t: TFunction, isMyUnits?: boolean): ColumnType[] {
       headerName: t("Units.headings.reservationUnitCount"),
       key: "reservationUnitCount",
       isSortable: true,
-      transform: (unit: UnitType) => (
-        <>{unit?.reservationunitSet?.length ?? 0}</>
-      ),
+      transform: (unit: UnitType) => <>{unit?.reservationUnits?.length ?? 0}</>,
       width: "25%",
     },
     {

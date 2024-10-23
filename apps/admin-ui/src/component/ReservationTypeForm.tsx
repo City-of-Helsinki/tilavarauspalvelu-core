@@ -23,7 +23,7 @@ import { Element } from "@/styles/util";
 // TODO use a fragment
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 type ReservationUnitType = Omit<
-  NonNullable<ReservationType["reservationUnit"]>[0],
+  NonNullable<ReservationType["reservationUnits"]>[0],
   "pricings"
 >;
 

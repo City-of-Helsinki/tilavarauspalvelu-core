@@ -8,7 +8,7 @@ import { useSession } from "@/hooks/auth";
 
 type ReservationPermissionType = Pick<
   ReservationUnitReservationsFragment,
-  "reservationUnit" | "user"
+  "reservationUnits" | "user"
 >;
 
 function VisibleIfPermission({
@@ -25,7 +25,7 @@ function VisibleIfPermission({
   const { user } = useSession();
   const isOwner = reservation.user?.pk === user?.pk;
   const { hasPermission } = useCheckPermission({
-    units: [reservation?.reservationUnit?.[0]?.unit?.pk ?? 0],
+    units: [reservation?.reservationUnits?.[0]?.unit?.pk ?? 0],
     permission,
   });
 

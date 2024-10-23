@@ -111,15 +111,15 @@ const getColConfig = (t: TFunction): ReservationTableColumn[] => [
     headerName: t("Reservations.headings.reservationUnit"),
     key: "reservation_unit_name_fi",
     isSortable: true,
-    transform: ({ reservationUnit }: ReservationType) =>
-      truncate(reservationUnit?.[0]?.nameFi || "-", MAX_NAME_LENGTH),
+    transform: ({ reservationUnits }: ReservationType) =>
+      truncate(reservationUnits?.[0]?.nameFi || "-", MAX_NAME_LENGTH),
   },
   {
     headerName: t("Reservations.headings.unit"),
     key: "unit_name_fi",
     isSortable: true,
-    transform: ({ reservationUnit }: ReservationType) =>
-      truncate(reservationUnit?.[0]?.unit?.nameFi || "-", MAX_NAME_LENGTH),
+    transform: ({ reservationUnits }: ReservationType) =>
+      truncate(reservationUnits?.[0]?.unit?.nameFi || "-", MAX_NAME_LENGTH),
   },
   {
     headerName: t("Reservations.headings.datetime"),

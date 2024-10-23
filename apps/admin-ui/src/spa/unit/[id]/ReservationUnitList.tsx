@@ -3,7 +3,7 @@ import type { UnitQuery } from "@gql/gql-types";
 import { ReservationUnitCard } from "./ReservationUnitCard";
 
 type UnitType = NonNullable<UnitQuery["unit"]>;
-type ReservationUnitType = NonNullable<UnitType["reservationunitSet"]>[0];
+type ReservationUnitType = NonNullable<UnitType["reservationUnits"]>[0];
 interface IProps {
   reservationUnits: ReservationUnitType[];
   unitId: number;

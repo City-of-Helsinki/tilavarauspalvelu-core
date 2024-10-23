@@ -208,7 +208,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       reservationUnitData?.affectingReservations
     );
     const reservationSet = filterNonNullable(
-      reservationUnitData?.reservationUnit?.reservationSet
+      reservationUnitData?.reservationUnit?.reservations
     );
     const doesReservationAffectReservationUnit = (
       reservation: (typeof affectingReservations)[0],

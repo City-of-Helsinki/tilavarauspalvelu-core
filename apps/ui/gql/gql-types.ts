@@ -1888,11 +1888,11 @@ export type QueryAffectingReservationsArgs = {
   recurringReservation?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   requested?: InputMaybe<Scalars["Boolean"]["input"]>;
   reservationType?: InputMaybe<Array<InputMaybe<ReservationTypeChoice>>>;
-  reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   reservationUnitNameEn?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameFi?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameSv?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  reservationUnits?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   state?: InputMaybe<Array<InputMaybe<ReservationStateChoice>>>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
@@ -2349,11 +2349,11 @@ export type QueryReservationsArgs = {
   recurringReservation?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   requested?: InputMaybe<Scalars["Boolean"]["input"]>;
   reservationType?: InputMaybe<Array<InputMaybe<ReservationTypeChoice>>>;
-  reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   reservationUnitNameEn?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameFi?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameSv?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  reservationUnits?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   state?: InputMaybe<Array<InputMaybe<ReservationStateChoice>>>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
@@ -2527,11 +2527,11 @@ export type RecurringReservationNodeReservationsArgs = {
   recurringReservation?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   requested?: InputMaybe<Scalars["Boolean"]["input"]>;
   reservationType?: InputMaybe<Array<InputMaybe<ReservationTypeChoice>>>;
-  reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   reservationUnitNameEn?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameFi?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameSv?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  reservationUnits?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   state?: InputMaybe<Array<InputMaybe<ReservationStateChoice>>>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
@@ -3008,7 +3008,7 @@ export type ReservationNode = Node & {
   priceNet?: Maybe<Scalars["Decimal"]["output"]>;
   purpose?: Maybe<ReservationPurposeNode>;
   recurringReservation?: Maybe<RecurringReservationNode>;
-  reservationUnit: Array<ReservationUnitNode>;
+  reservationUnits: Array<ReservationUnitNode>;
   reserveeAddressCity?: Maybe<Scalars["String"]["output"]>;
   reserveeAddressStreet?: Maybe<Scalars["String"]["output"]>;
   reserveeAddressZip?: Maybe<Scalars["String"]["output"]>;
@@ -3031,7 +3031,7 @@ export type ReservationNode = Node & {
   workingMemo?: Maybe<Scalars["String"]["output"]>;
 };
 
-export type ReservationNodeReservationUnitArgs = {
+export type ReservationNodeReservationUnitsArgs = {
   applicationRound?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   calculateFirstReservableTime?: InputMaybe<Scalars["Boolean"]["input"]>;
   descriptionEn?: InputMaybe<Scalars["String"]["input"]>;
@@ -3545,7 +3545,6 @@ export enum ReservationTypeStaffChoice {
 }
 
 export type ReservationUnitCancellationRuleNode = Node & {
-  /** Seconds before reservations related to this cancellation rule can be cancelled without handling. */
   canBeCancelledTimeBefore?: Maybe<Scalars["Duration"]["output"]>;
   /** The ID of the object */
   id: Scalars["ID"]["output"];
@@ -3850,10 +3849,10 @@ export type ReservationUnitNode = Node & {
   reservationPendingInstructionsEn?: Maybe<Scalars["String"]["output"]>;
   reservationPendingInstructionsFi?: Maybe<Scalars["String"]["output"]>;
   reservationPendingInstructionsSv?: Maybe<Scalars["String"]["output"]>;
-  reservationSet?: Maybe<Array<ReservationNode>>;
   reservationStartInterval: ReservationStartInterval;
   reservationState?: Maybe<ReservationUnitReservationState>;
   reservationUnitType?: Maybe<ReservationUnitTypeNode>;
+  reservations?: Maybe<Array<ReservationNode>>;
   reservationsMaxDaysBefore?: Maybe<Scalars["Int"]["output"]>;
   reservationsMinDaysBefore?: Maybe<Scalars["Int"]["output"]>;
   resources: Array<ResourceNode>;
@@ -3917,7 +3916,7 @@ export type ReservationUnitNodeReservableTimeSpansArgs = {
   startDate: Scalars["Date"]["input"];
 };
 
-export type ReservationUnitNodeReservationSetArgs = {
+export type ReservationUnitNodeReservationsArgs = {
   applyingForFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
   beginDate?: InputMaybe<Scalars["Date"]["input"]>;
   createdAtGte?: InputMaybe<Scalars["Date"]["input"]>;
@@ -3933,11 +3932,11 @@ export type ReservationUnitNodeReservationSetArgs = {
   recurringReservation?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   requested?: InputMaybe<Scalars["Boolean"]["input"]>;
   reservationType?: InputMaybe<Array<InputMaybe<ReservationTypeChoice>>>;
-  reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   reservationUnitNameEn?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameFi?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameSv?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  reservationUnits?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   state?: InputMaybe<Array<InputMaybe<ReservationStateChoice>>>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
@@ -4081,44 +4080,30 @@ export type ReservationUnitPaymentTypeNode = Node & {
 };
 
 export type ReservationUnitPricingNode = Node & {
-  /** When pricing is activated */
   begins: Scalars["Date"]["output"];
-  /** Maximum price of the reservation unit including VAT */
   highestPrice: Scalars["Decimal"]["output"];
   highestPriceNet?: Maybe<Scalars["Decimal"]["output"]>;
   /** The ID of the object */
   id: Scalars["ID"]["output"];
-  /** Minimum price of the reservation unit including VAT */
   lowestPrice: Scalars["Decimal"]["output"];
   lowestPriceNet?: Maybe<Scalars["Decimal"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
-  /** Unit of the price */
   priceUnit: PriceUnit;
-  /** What kind of pricing types are available with this reservation unit. */
   pricingType?: Maybe<PricingType>;
-  /** Status of the pricing */
   status: Status;
-  /** The percentage of tax included in the price */
   taxPercentage: TaxPercentageNode;
 };
 
 export type ReservationUnitPricingSerializerInput = {
-  /** When pricing is activated */
   begins: Scalars["Date"]["input"];
-  /** Maximum price of the reservation unit including VAT */
   highestPrice?: InputMaybe<Scalars["Decimal"]["input"]>;
   highestPriceNet?: InputMaybe<Scalars["String"]["input"]>;
-  /** Minimum price of the reservation unit including VAT */
   lowestPrice?: InputMaybe<Scalars["Decimal"]["input"]>;
   lowestPriceNet?: InputMaybe<Scalars["String"]["input"]>;
   pk?: InputMaybe<Scalars["Int"]["input"]>;
-  /** Unit of the price */
   priceUnit?: InputMaybe<PriceUnit>;
-  /** What kind of pricing types are available with this reservation unit. */
   pricingType?: InputMaybe<PricingType>;
-  /** Status of the pricing */
   status: Status;
-  /** The percentage of tax included in the price */
   taxPercentage?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
@@ -4150,7 +4135,6 @@ export type ReservationUnitTypeNode = Node & {
   nameFi?: Maybe<Scalars["String"]["output"]>;
   nameSv?: Maybe<Scalars["String"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
-  /** Järjestysnumero, jota käytetään rajapinnan järjestämisessä. */
   rank?: Maybe<Scalars["Int"]["output"]>;
 };
 
@@ -4666,7 +4650,7 @@ export type SpaceNode = Node & {
   nameSv?: Maybe<Scalars["String"]["output"]>;
   parent?: Maybe<SpaceNode>;
   pk?: Maybe<Scalars["Int"]["output"]>;
-  resourceSet: Array<ResourceNode>;
+  resources: Array<ResourceNode>;
   surfaceArea?: Maybe<Scalars["Int"]["output"]>;
   unit?: Maybe<UnitNode>;
 };
@@ -4686,7 +4670,7 @@ export type SpaceNodeChildrenArgs = {
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
-export type SpaceNodeResourceSetArgs = {
+export type SpaceNodeResourcesArgs = {
   nameEn?: InputMaybe<Scalars["String"]["input"]>;
   nameEn_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   nameEn_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
@@ -4791,7 +4775,6 @@ export type TaxPercentageNode = Node & {
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   pk?: Maybe<Scalars["Int"]["output"]>;
-  /** The tax percentage for a price */
   value: Scalars["Decimal"]["output"];
 };
 
@@ -4943,7 +4926,7 @@ export type UnitNode = Node & {
   paymentMerchant?: Maybe<PaymentMerchantNode>;
   phone: Scalars["String"]["output"];
   pk?: Maybe<Scalars["Int"]["output"]>;
-  reservationunitSet: Array<ReservationUnitNode>;
+  reservationUnits: Array<ReservationUnitNode>;
   serviceSectors: Array<ServiceSectorNode>;
   shortDescription: Scalars["String"]["output"];
   shortDescriptionEn?: Maybe<Scalars["String"]["output"]>;
@@ -4955,7 +4938,7 @@ export type UnitNode = Node & {
   webPage: Scalars["String"]["output"];
 };
 
-export type UnitNodeReservationunitSetArgs = {
+export type UnitNodeReservationUnitsArgs = {
   applicationRound?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   calculateFirstReservableTime?: InputMaybe<Scalars["Boolean"]["input"]>;
   descriptionEn?: InputMaybe<Scalars["String"]["input"]>;
@@ -5250,22 +5233,15 @@ export type UpdateReservationUnitOptionApplicantSerializerInput = {
 };
 
 export type UpdateReservationUnitPricingSerializerInput = {
-  /** When pricing is activated */
   begins?: InputMaybe<Scalars["Date"]["input"]>;
-  /** Maximum price of the reservation unit including VAT */
   highestPrice?: InputMaybe<Scalars["Decimal"]["input"]>;
   highestPriceNet?: InputMaybe<Scalars["String"]["input"]>;
-  /** Minimum price of the reservation unit including VAT */
   lowestPrice?: InputMaybe<Scalars["Decimal"]["input"]>;
   lowestPriceNet?: InputMaybe<Scalars["String"]["input"]>;
   pk?: InputMaybe<Scalars["Int"]["input"]>;
-  /** Unit of the price */
   priceUnit?: InputMaybe<PriceUnit>;
-  /** What kind of pricing types are available with this reservation unit. */
   pricingType?: InputMaybe<PricingType>;
-  /** Status of the pricing */
   status?: InputMaybe<Status>;
-  /** The percentage of tax included in the price */
   taxPercentage?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
@@ -5327,13 +5303,11 @@ export enum UserRoleChoice {
 
 export type UserUpdateMutationInput = {
   pk: Scalars["Int"]["input"];
-  /** When user wants to receive reservation notification emails. */
   reservationNotification?: InputMaybe<ReservationNotification>;
 };
 
 export type UserUpdateMutationPayload = {
   pk?: Maybe<Scalars["Int"]["output"]>;
-  /** When user wants to receive reservation notification emails. */
   reservationNotification?: Maybe<ReservationNotification>;
 };
 
@@ -5365,7 +5339,7 @@ export type ReservationInfoCardFragment = {
   end: string;
   state?: ReservationStateChoice | null;
   price?: string | null;
-  reservationUnit: Array<{
+  reservationUnits: Array<{
     id: string;
     pk?: number | null;
     nameFi?: string | null;
@@ -5897,7 +5871,7 @@ export type ListReservationsQueryVariables = Exact<{
     | Array<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
-  reservationUnit?: InputMaybe<
+  reservationUnits?: InputMaybe<
     | Array<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
@@ -5931,7 +5905,7 @@ export type ListReservationsQuery = {
           expiresInMinutes?: number | null;
           status?: OrderStatus | null;
         }>;
-        reservationUnit: Array<{
+        reservationUnits: Array<{
           id: string;
           pk?: number | null;
           nameFi?: string | null;
@@ -6040,7 +6014,7 @@ export type ReservationQuery = {
       orderUuid?: string | null;
       status?: OrderStatus | null;
     }>;
-    reservationUnit: Array<{
+    reservationUnits: Array<{
       id: string;
       canApplyFreeOfCharge: boolean;
       pk?: number | null;
@@ -6557,7 +6531,7 @@ export type IsReservableFieldsFragment = {
   reservationsMinDaysBefore?: number | null;
   reservationBegins?: string | null;
   reservationEnds?: string | null;
-  reservationSet?: Array<{
+  reservations?: Array<{
     pk?: number | null;
     id: string;
     state?: ReservationStateChoice | null;
@@ -6668,7 +6642,7 @@ export type ReservationUnitPageQuery = {
         nameSv?: string | null;
       };
     }>;
-    reservationSet?: Array<{
+    reservations?: Array<{
       pk?: number | null;
       id: string;
       state?: ReservationStateChoice | null;
@@ -7734,7 +7708,7 @@ export const ReservationInfoCardFragmentDoc = gql`
     end
     state
     price
-    reservationUnit {
+    reservationUnits {
       id
       pk
       nameFi
@@ -8055,7 +8029,7 @@ export const BlockingReservationFieldsFragmentDoc = gql`
 `;
 export const IsReservableFieldsFragmentDoc = gql`
   fragment IsReservableFields on ReservationUnitNode {
-    reservationSet(state: $state) {
+    reservations(state: $state) {
       ...BlockingReservationFields
     }
     bufferTimeBefore
@@ -8452,12 +8426,14 @@ export function useOptionsLazyQuery(
   );
 }
 export function useOptionsSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    OptionsQuery,
-    OptionsQueryVariables
-  >
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<OptionsQuery, OptionsQueryVariables>
 ) {
-  const options = { ...defaultOptions, ...baseOptions };
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<OptionsQuery, OptionsQueryVariables>(
     OptionsDocument,
     options
@@ -8548,12 +8524,17 @@ export function useApplicationsLazyQuery(
   );
 }
 export function useApplicationsSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    ApplicationsQuery,
-    ApplicationsQueryVariables
-  >
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ApplicationsQuery,
+        ApplicationsQueryVariables
+      >
 ) {
-  const options = { ...defaultOptions, ...baseOptions };
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<ApplicationsQuery, ApplicationsQueryVariables>(
     ApplicationsDocument,
     options
@@ -8833,12 +8814,17 @@ export function useApplicationRoundPeriodsLazyQuery(
   >(ApplicationRoundPeriodsDocument, options);
 }
 export function useApplicationRoundPeriodsSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    ApplicationRoundPeriodsQuery,
-    ApplicationRoundPeriodsQueryVariables
-  >
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ApplicationRoundPeriodsQuery,
+        ApplicationRoundPeriodsQueryVariables
+      >
 ) {
-  const options = { ...defaultOptions, ...baseOptions };
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<
     ApplicationRoundPeriodsQuery,
     ApplicationRoundPeriodsQueryVariables
@@ -8911,12 +8897,17 @@ export function useApplicationRoundsUiLazyQuery(
   >(ApplicationRoundsUiDocument, options);
 }
 export function useApplicationRoundsUiSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    ApplicationRoundsUiQuery,
-    ApplicationRoundsUiQueryVariables
-  >
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ApplicationRoundsUiQuery,
+        ApplicationRoundsUiQueryVariables
+      >
 ) {
-  const options = { ...defaultOptions, ...baseOptions };
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<
     ApplicationRoundsUiQuery,
     ApplicationRoundsUiQueryVariables
@@ -9008,12 +8999,17 @@ export function useSearchFormParamsUnitLazyQuery(
   >(SearchFormParamsUnitDocument, options);
 }
 export function useSearchFormParamsUnitSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    SearchFormParamsUnitQuery,
-    SearchFormParamsUnitQueryVariables
-  >
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        SearchFormParamsUnitQuery,
+        SearchFormParamsUnitQueryVariables
+      >
 ) {
-  const options = { ...defaultOptions, ...baseOptions };
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<
     SearchFormParamsUnitQuery,
     SearchFormParamsUnitQueryVariables
@@ -9090,12 +9086,17 @@ export function useReservationUnitPurposesLazyQuery(
   >(ReservationUnitPurposesDocument, options);
 }
 export function useReservationUnitPurposesSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    ReservationUnitPurposesQuery,
-    ReservationUnitPurposesQueryVariables
-  >
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ReservationUnitPurposesQuery,
+        ReservationUnitPurposesQueryVariables
+      >
 ) {
-  const options = { ...defaultOptions, ...baseOptions };
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<
     ReservationUnitPurposesQuery,
     ReservationUnitPurposesQueryVariables
@@ -9377,7 +9378,7 @@ export const ListReservationsDocument = gql`
     $endDate: Date
     $state: [ReservationStateChoice]
     $user: [Int]
-    $reservationUnit: [Int]
+    $reservationUnits: [Int]
     $orderBy: [ReservationOrderingChoices]
     $reservationType: [ReservationTypeChoice]!
   ) {
@@ -9386,7 +9387,7 @@ export const ListReservationsDocument = gql`
       endDate: $endDate
       state: $state
       user: $user
-      reservationUnit: $reservationUnit
+      reservationUnits: $reservationUnits
       orderBy: $orderBy
       reservationType: $reservationType
     ) {
@@ -9405,7 +9406,7 @@ export const ListReservationsDocument = gql`
             status
           }
           isBlocked
-          reservationUnit {
+          reservationUnits {
             id
             ...CancellationRuleFields
           }
@@ -9434,7 +9435,7 @@ export const ListReservationsDocument = gql`
  *      endDate: // value for 'endDate'
  *      state: // value for 'state'
  *      user: // value for 'user'
- *      reservationUnit: // value for 'reservationUnit'
+ *      reservationUnits: // value for 'reservationUnits'
  *      orderBy: // value for 'orderBy'
  *      reservationType: // value for 'reservationType'
  *   },
@@ -9469,12 +9470,17 @@ export function useListReservationsLazyQuery(
   >(ListReservationsDocument, options);
 }
 export function useListReservationsSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    ListReservationsQuery,
-    ListReservationsQueryVariables
-  >
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ListReservationsQuery,
+        ListReservationsQueryVariables
+      >
 ) {
-  const options = { ...defaultOptions, ...baseOptions };
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<
     ListReservationsQuery,
     ListReservationsQueryVariables
@@ -9523,7 +9529,7 @@ export const ReservationDocument = gql`
         orderUuid
         status
       }
-      reservationUnit {
+      reservationUnits {
         id
         canApplyFreeOfCharge
         ...ReservationUnitFields
@@ -9584,12 +9590,17 @@ export function useReservationLazyQuery(
   );
 }
 export function useReservationSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    ReservationQuery,
-    ReservationQueryVariables
-  >
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ReservationQuery,
+        ReservationQueryVariables
+      >
 ) {
-  const options = { ...defaultOptions, ...baseOptions };
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<ReservationQuery, ReservationQueryVariables>(
     ReservationDocument,
     options
@@ -9662,12 +9673,17 @@ export function useReservationCancelReasonsLazyQuery(
   >(ReservationCancelReasonsDocument, options);
 }
 export function useReservationCancelReasonsSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    ReservationCancelReasonsQuery,
-    ReservationCancelReasonsQueryVariables
-  >
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ReservationCancelReasonsQuery,
+        ReservationCancelReasonsQueryVariables
+      >
 ) {
-  const options = { ...defaultOptions, ...baseOptions };
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<
     ReservationCancelReasonsQuery,
     ReservationCancelReasonsQueryVariables
@@ -9788,9 +9804,14 @@ export function useOrderLazyQuery(
   );
 }
 export function useOrderSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<OrderQuery, OrderQueryVariables>
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<OrderQuery, OrderQueryVariables>
 ) {
-  const options = { ...defaultOptions, ...baseOptions };
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<OrderQuery, OrderQueryVariables>(
     OrderDocument,
     options
@@ -9910,12 +9931,17 @@ export function useReservationUnitLazyQuery(
   >(ReservationUnitDocument, options);
 }
 export function useReservationUnitSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    ReservationUnitQuery,
-    ReservationUnitQueryVariables
-  >
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ReservationUnitQuery,
+        ReservationUnitQueryVariables
+      >
 ) {
-  const options = { ...defaultOptions, ...baseOptions };
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<
     ReservationUnitQuery,
     ReservationUnitQueryVariables
@@ -10009,12 +10035,17 @@ export function useReservationUnitPageLazyQuery(
   >(ReservationUnitPageDocument, options);
 }
 export function useReservationUnitPageSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    ReservationUnitPageQuery,
-    ReservationUnitPageQueryVariables
-  >
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ReservationUnitPageQuery,
+        ReservationUnitPageQueryVariables
+      >
 ) {
-  const options = { ...defaultOptions, ...baseOptions };
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<
     ReservationUnitPageQuery,
     ReservationUnitPageQueryVariables
@@ -10170,12 +10201,17 @@ export function useSearchReservationUnitsLazyQuery(
   >(SearchReservationUnitsDocument, options);
 }
 export function useSearchReservationUnitsSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    SearchReservationUnitsQuery,
-    SearchReservationUnitsQueryVariables
-  >
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        SearchReservationUnitsQuery,
+        SearchReservationUnitsQueryVariables
+      >
 ) {
-  const options = { ...defaultOptions, ...baseOptions };
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<
     SearchReservationUnitsQuery,
     SearchReservationUnitsQueryVariables
@@ -10276,12 +10312,17 @@ export function useRelatedReservationUnitsLazyQuery(
   >(RelatedReservationUnitsDocument, options);
 }
 export function useRelatedReservationUnitsSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    RelatedReservationUnitsQuery,
-    RelatedReservationUnitsQueryVariables
-  >
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        RelatedReservationUnitsQuery,
+        RelatedReservationUnitsQueryVariables
+      >
 ) {
-  const options = { ...defaultOptions, ...baseOptions };
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<
     RelatedReservationUnitsQuery,
     RelatedReservationUnitsQueryVariables
@@ -10353,12 +10394,17 @@ export function useCurrentUserLazyQuery(
   );
 }
 export function useCurrentUserSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    CurrentUserQuery,
-    CurrentUserQueryVariables
-  >
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        CurrentUserQuery,
+        CurrentUserQueryVariables
+      >
 ) {
-  const options = { ...defaultOptions, ...baseOptions };
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<CurrentUserQuery, CurrentUserQueryVariables>(
     CurrentUserDocument,
     options
@@ -10428,12 +10474,17 @@ export function useBannerNotificationsListAllLazyQuery(
   >(BannerNotificationsListAllDocument, options);
 }
 export function useBannerNotificationsListAllSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    BannerNotificationsListAllQuery,
-    BannerNotificationsListAllQueryVariables
-  >
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        BannerNotificationsListAllQuery,
+        BannerNotificationsListAllQueryVariables
+      >
 ) {
-  const options = { ...defaultOptions, ...baseOptions };
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<
     BannerNotificationsListAllQuery,
     BannerNotificationsListAllQueryVariables
@@ -10510,12 +10561,17 @@ export function useBannerNotificationsListLazyQuery(
   >(BannerNotificationsListDocument, options);
 }
 export function useBannerNotificationsListSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    BannerNotificationsListQuery,
-    BannerNotificationsListQueryVariables
-  >
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        BannerNotificationsListQuery,
+        BannerNotificationsListQueryVariables
+      >
 ) {
-  const options = { ...defaultOptions, ...baseOptions };
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<
     BannerNotificationsListQuery,
     BannerNotificationsListQueryVariables
@@ -10599,12 +10655,17 @@ export function useApplicationLazyQuery(
   );
 }
 export function useApplicationSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    ApplicationQuery,
-    ApplicationQueryVariables
-  >
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ApplicationQuery,
+        ApplicationQueryVariables
+      >
 ) {
-  const options = { ...defaultOptions, ...baseOptions };
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<ApplicationQuery, ApplicationQueryVariables>(
     ApplicationDocument,
     options
@@ -10676,12 +10737,14 @@ export function useTermsOfUseLazyQuery(
   );
 }
 export function useTermsOfUseSuspenseQuery(
-  baseOptions?: Apollo.SuspenseQueryHookOptions<
-    TermsOfUseQuery,
-    TermsOfUseQueryVariables
-  >
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<TermsOfUseQuery, TermsOfUseQueryVariables>
 ) {
-  const options = { ...defaultOptions, ...baseOptions };
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<TermsOfUseQuery, TermsOfUseQueryVariables>(
     TermsOfUseDocument,
     options

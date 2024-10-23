@@ -330,7 +330,7 @@ function getEventTitle({
     return t("MyUnits.Calendar.legend.closed");
   }
 
-  return event && event?.pk !== event?.reservationUnit?.[0]?.pk
+  return event && event?.pk !== event?.reservationUnits?.[0]?.pk
     ? getReserveeName(event, t)
     : title;
 }

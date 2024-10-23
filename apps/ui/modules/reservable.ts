@@ -168,7 +168,7 @@ export function isRangeReservable({
   reservableTimes,
 }: ReservationUnitReservableProps): boolean {
   const {
-    reservationSet,
+    reservations,
     bufferTimeBefore,
     bufferTimeAfter,
     maxReservationDuration,
@@ -240,7 +240,7 @@ export function isRangeReservable({
 
   // This is the slowest part of the function => run it last
   // because the reservationSet includes every reservation not just for the selected day
-  const others = filterNonNullable(reservationSet)
+  const others = filterNonNullable(reservations)
     .filter(shouldReservationBlock)
     .filter((r) => {
       const rStart = new Date(r.begin);

@@ -102,7 +102,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
     useState<SpaceNode | null>(null);
 
   function handleRemoveSpace(space: SpaceNode) {
-    if (space && space.resourceSet && space?.resourceSet.length > 0) {
+    if (space && space.resources && space?.resources.length > 0) {
       errorToast({
         text: t("SpaceTable.removeConflictMessage"),
         label: t("SpaceTable.removeConflictTitle"),

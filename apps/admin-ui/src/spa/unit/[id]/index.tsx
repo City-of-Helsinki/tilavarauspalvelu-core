@@ -134,7 +134,7 @@ function Unit(): JSX.Element {
     return <Error404 />;
   }
 
-  const reservationUnits = filterNonNullable(unit.reservationunitSet);
+  const reservationUnits = filterNonNullable(unit.reservationUnits);
 
   return (
     <Container>

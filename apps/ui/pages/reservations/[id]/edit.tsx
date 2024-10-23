@@ -261,7 +261,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     const startDate = today;
     const endDate = addYears(today, 2);
 
-    const resUnitPk = reservation?.reservationUnit?.[0]?.pk;
+    const resUnitPk = reservation?.reservationUnits?.[0]?.pk;
     if (resUnitPk == null) {
       return notFoundValue;
     }
@@ -301,7 +301,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       );
     };
     const reservationSet = filterNonNullable(
-      reservationUnitData?.reservationUnit?.reservationSet
+      reservationUnitData?.reservationUnit?.reservations
     );
     const affectingReservations = filterNonNullable(
       reservationUnitData?.affectingReservations

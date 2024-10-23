@@ -92,7 +92,7 @@ export const LIST_RESERVATIONS = gql`
     $endDate: Date
     $state: [ReservationStateChoice]
     $user: [Int]
-    $reservationUnit: [Int]
+    $reservationUnits: [Int]
     $orderBy: [ReservationOrderingChoices]
     $reservationType: [ReservationTypeChoice]!
   ) {
@@ -101,7 +101,7 @@ export const LIST_RESERVATIONS = gql`
       endDate: $endDate
       state: $state
       user: $user
-      reservationUnit: $reservationUnit
+      reservationUnits: $reservationUnits
       orderBy: $orderBy
       reservationType: $reservationType
     ) {
@@ -120,7 +120,7 @@ export const LIST_RESERVATIONS = gql`
             status
           }
           isBlocked
-          reservationUnit {
+          reservationUnits {
             id
             ...CancellationRuleFields
           }
@@ -195,7 +195,7 @@ export const GET_RESERVATION = gql`
         orderUuid
         status
       }
-      reservationUnit {
+      reservationUnits {
         id
         canApplyFreeOfCharge
         ...ReservationUnitFields

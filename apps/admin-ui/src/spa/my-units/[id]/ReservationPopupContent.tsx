@@ -50,7 +50,7 @@ export function ReservationPopupContent({
       <DenseVerticalFlex>
         <Heading>
           {formatTime(reservation.begin)} - {formatTime(reservation.end)} /{" "}
-          {reservation.reservationUnit?.[0]?.nameFi}
+          {reservation.reservationUnits?.[0]?.nameFi ?? "-"}
         </Heading>
         <VisibleIfPermission
           reservation={reservation}

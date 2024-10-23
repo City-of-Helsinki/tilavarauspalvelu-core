@@ -93,9 +93,9 @@ export function MyUnitView() {
   const recurringReservationUrl = getRecurringReservationUrl(pk);
 
   const reservationUnitOptions = filterNonNullable(
-    data?.unit?.reservationunitSet
+    data?.unit?.reservationUnits
   ).map((reservationUnit) => ({
-    label: reservationUnit?.nameFi ?? "",
+    label: reservationUnit?.nameFi ?? "-",
     value: reservationUnit?.pk ?? 0,
   }));
 

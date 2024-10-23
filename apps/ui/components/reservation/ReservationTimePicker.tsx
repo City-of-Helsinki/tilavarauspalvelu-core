@@ -157,7 +157,7 @@ function useCalendarEventChange({
     CalendarEventBuffer | CalendarEvent<ReservationNode>
   > = useMemo(() => {
     const existingReservations = filterNonNullable(
-      reservationUnit.reservationSet
+      reservationUnit.reservations
     );
 
     const shouldDisplayFocusSlot = focusSlot.isReservable;
@@ -380,7 +380,7 @@ export function ReservationTimePicker({
     variables: {
       beginDate: toApiDate(now),
       user: currentUser?.pk ?? 0,
-      reservationUnit: [reservationUnit.pk ?? 0],
+      reservationUnits: [reservationUnit.pk ?? 0],
       state: RELATED_RESERVATION_STATES,
       reservationType: ReservationTypeChoice.Normal,
     },

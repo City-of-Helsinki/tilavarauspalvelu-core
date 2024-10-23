@@ -38,7 +38,7 @@ export const RESERVATION_INFO_CARD_FRAGMENT = gql`
     end
     state
     price
-    reservationUnit {
+    reservationUnits {
       id
       pk
       nameFi
@@ -119,7 +119,7 @@ export function ReservationInfoCard({
   disableImage = false,
 }: Props): JSX.Element | null {
   const { t, i18n } = useTranslation();
-  const reservationUnit = reservation.reservationUnit?.[0];
+  const reservationUnit = reservation.reservationUnits?.[0];
 
   const { begin, end } = reservation || {};
   // NOTE can be removed after this has been refactored not to be used for PendingReservation

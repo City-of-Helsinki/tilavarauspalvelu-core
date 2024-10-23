@@ -48,7 +48,7 @@ export const UNIT_VIEW_QUERY = gql`
       location {
         ...LocationFields
       }
-      reservationunitSet {
+      reservationUnits {
         id
         pk
         nameFi
@@ -72,7 +72,7 @@ export const RESERVATION_UNITS_BY_UNIT = gql`
   ) {
     unit(id: $id) {
       id
-      reservationunitSet {
+      reservationUnits {
         id
         pk
         nameFi
@@ -88,11 +88,7 @@ export const RESERVATION_UNITS_BY_UNIT = gql`
         bufferTimeAfter
         isDraft
         authentication
-        reservationSet(
-          beginDate: $beginDate
-          endDate: $endDate
-          state: $state
-        ) {
+        reservations(beginDate: $beginDate, endDate: $endDate, state: $state) {
           ...ReservationUnitReservations
         }
       }

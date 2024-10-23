@@ -7,7 +7,7 @@ export const RECURRING_RESERVATION_UNIT_QUERY = gql`
       id
       nameFi
       pk
-      reservationunitSet {
+      reservationUnits {
         id
         pk
         nameFi
@@ -33,7 +33,7 @@ export const RESERVATION_UNIT_CALENDAR_QUERY = gql`
     reservationUnit(id: $id) {
       id
       pk
-      reservationSet(state: $state, beginDate: $beginDate, endDate: $endDate) {
+      reservations(state: $state, beginDate: $beginDate, endDate: $endDate) {
         ...ReservationUnitReservations
       }
     }

@@ -2030,11 +2030,11 @@ type Query {
     recurringReservation: [Int]
     requested: Boolean
     reservationType: [ReservationTypeChoice]
-    reservationUnit: [Int]
     reservationUnitNameEn: String
     reservationUnitNameFi: String
     reservationUnitNameSv: String
     reservationUnitType: [Int]
+    reservationUnits: [Int]
     state: [ReservationStateChoice]
     textSearch: String
     unit: [Int]
@@ -2534,11 +2534,11 @@ type Query {
     recurringReservation: [Int]
     requested: Boolean
     reservationType: [ReservationTypeChoice]
-    reservationUnit: [Int]
     reservationUnitNameEn: String
     reservationUnitNameFi: String
     reservationUnitNameSv: String
     reservationUnitType: [Int]
+    reservationUnits: [Int]
     state: [ReservationStateChoice]
     textSearch: String
     unit: [Int]
@@ -2730,11 +2730,11 @@ type RecurringReservationNode implements Node {
     recurringReservation: [Int]
     requested: Boolean
     reservationType: [ReservationTypeChoice]
-    reservationUnit: [Int]
     reservationUnitNameEn: String
     reservationUnitNameFi: String
     reservationUnitNameSv: String
     reservationUnitType: [Int]
+    reservationUnits: [Int]
     state: [ReservationStateChoice]
     textSearch: String
     unit: [Int]
@@ -3300,7 +3300,7 @@ type ReservationNode implements Node {
   priceNet: Decimal
   purpose: ReservationPurposeNode
   recurringReservation: RecurringReservationNode
-  reservationUnit(
+  reservationUnits(
     applicationRound: [Int]
     calculateFirstReservableTime: Boolean
     descriptionEn: String
@@ -3917,9 +3917,6 @@ enum ReservationTypeStaffChoice {
 }
 
 type ReservationUnitCancellationRuleNode implements Node {
-  """
-  Seconds before reservations related to this cancellation rule can be cancelled without handling.
-  """
   canBeCancelledTimeBefore: Duration
   """
   The ID of the object
@@ -4284,7 +4281,10 @@ type ReservationUnitNode implements Node {
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsSv: String
-  reservationSet(
+  reservationStartInterval: ReservationStartInterval!
+  reservationState: ReservationUnitReservationState
+  reservationUnitType: ReservationUnitTypeNode
+  reservations(
     applyingForFreeOfCharge: Boolean
     beginDate: Date
     createdAtGte: Date
@@ -4303,19 +4303,16 @@ type ReservationUnitNode implements Node {
     recurringReservation: [Int]
     requested: Boolean
     reservationType: [ReservationTypeChoice]
-    reservationUnit: [Int]
     reservationUnitNameEn: String
     reservationUnitNameFi: String
     reservationUnitNameSv: String
     reservationUnitType: [Int]
+    reservationUnits: [Int]
     state: [ReservationStateChoice]
     textSearch: String
     unit: [Int]
     user: [Int]
   ): [ReservationNode!]
-  reservationStartInterval: ReservationStartInterval!
-  reservationState: ReservationUnitReservationState
-  reservationUnitType: ReservationUnitTypeNode
   reservationsMaxDaysBefore: Int
   reservationsMinDaysBefore: Int
   resources(
@@ -4485,74 +4482,32 @@ type ReservationUnitPaymentTypeNode implements Node {
 }
 
 type ReservationUnitPricingNode implements Node {
-  """
-  When pricing is activated
-  """
   begins: Date!
-  """
-  Maximum price of the reservation unit including VAT
-  """
   highestPrice: Decimal!
   highestPriceNet: Decimal
   """
   The ID of the object
   """
   id: ID!
-  """
-  Minimum price of the reservation unit including VAT
-  """
   lowestPrice: Decimal!
   lowestPriceNet: Decimal
   pk: Int
-  """
-  Unit of the price
-  """
   priceUnit: PriceUnit!
-  """
-  What kind of pricing types are available with this reservation unit.
-  """
   pricingType: PricingType
-  """
-  Status of the pricing
-  """
   status: Status!
-  """
-  The percentage of tax included in the price
-  """
   taxPercentage: TaxPercentageNode!
 }
 
 input ReservationUnitPricingSerializerInput {
-  """
-  When pricing is activated
-  """
   begins: Date!
-  """
-  Maximum price of the reservation unit including VAT
-  """
   highestPrice: Decimal
   highestPriceNet: String
-  """
-  Minimum price of the reservation unit including VAT
-  """
   lowestPrice: Decimal
   lowestPriceNet: String
   pk: Int
-  """
-  Unit of the price
-  """
   priceUnit: PriceUnit
-  """
-  What kind of pricing types are available with this reservation unit.
-  """
   pricingType: PricingType
-  """
-  Status of the pricing
-  """
   status: Status!
-  """
-  The percentage of tax included in the price
-  """
   taxPercentage: Int
 }
 
@@ -4590,9 +4545,6 @@ type ReservationUnitTypeNode implements Node {
   nameFi: String
   nameSv: String
   pk: Int
-  """
-  Järjestysnumero, jota käytetään rajapinnan järjestämisessä.
-  """
   rank: Int
 }
 
@@ -5188,7 +5140,7 @@ type SpaceNode implements Node {
   nameSv: String
   parent: SpaceNode
   pk: Int
-  resourceSet(
+  resources(
     nameEn: String
     nameEn_Icontains: String
     nameEn_Istartswith: String
@@ -5325,9 +5277,6 @@ type TaxPercentageNode implements Node {
   """
   id: ID!
   pk: Int
-  """
-  The tax percentage for a price
-  """
   value: Decimal!
 }
 
@@ -5545,7 +5494,7 @@ type UnitNode implements Node {
   paymentMerchant: PaymentMerchantNode
   phone: String!
   pk: Int
-  reservationunitSet(
+  reservationUnits(
     applicationRound: [Int]
     calculateFirstReservableTime: Boolean
     descriptionEn: String
@@ -5861,36 +5810,15 @@ input UpdateReservationUnitOptionApplicantSerializerInput {
 }
 
 input UpdateReservationUnitPricingSerializerInput {
-  """
-  When pricing is activated
-  """
   begins: Date
-  """
-  Maximum price of the reservation unit including VAT
-  """
   highestPrice: Decimal
   highestPriceNet: String
-  """
-  Minimum price of the reservation unit including VAT
-  """
   lowestPrice: Decimal
   lowestPriceNet: String
   pk: Int
-  """
-  Unit of the price
-  """
   priceUnit: PriceUnit
-  """
-  What kind of pricing types are available with this reservation unit.
-  """
   pricingType: PricingType
-  """
-  Status of the pricing
-  """
   status: Status
-  """
-  The percentage of tax included in the price
-  """
   taxPercentage: Int
 }
 
@@ -5977,17 +5905,11 @@ enum UserRoleChoice {
 
 input UserUpdateMutationInput {
   pk: Int!
-  """
-  When user wants to receive reservation notification emails.
-  """
   reservationNotification: ReservationNotification
 }
 
 type UserUpdateMutationPayload {
   pk: Int
-  """
-  When user wants to receive reservation notification emails.
-  """
   reservationNotification: ReservationNotification
 }
 

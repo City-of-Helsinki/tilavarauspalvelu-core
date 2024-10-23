@@ -35,35 +35,34 @@ type MockReservationUnitProps = {
   bufferTimeBefore?: number;
   bufferTimeAfter?: number;
   reservableTimes?: ReservableMap;
-  reservationSet?: IsReservableFieldsFragment["reservationSet"];
+  reservations?: IsReservableFieldsFragment["reservations"];
   interval?: ReservationStartInterval;
   maxReservationDuration?: IsReservableFieldsFragment["maxReservationDuration"];
   minReservationDuration?: IsReservableFieldsFragment["minReservationDuration"];
   activeApplicationRounds?: RoundPeriod[];
   reservationsMinDaysBefore?: number;
-  reservationsMaxDaysBefore?: number;
+  reservationsMaxDaysBefore?: number | null;
 };
 /// create a mock for IsReservableFragment (not a full reservation unit)
 export function createMockReservationUnit({
-  bufferTimeBefore,
-  bufferTimeAfter,
-  reservationSet,
-  interval,
-  maxReservationDuration,
-  minReservationDuration,
-  reservationsMinDaysBefore,
-  reservationsMaxDaysBefore,
+  bufferTimeBefore = 0,
+  bufferTimeAfter = 0,
+  reservations = [],
+  interval = ReservationStartInterval.Interval_15Mins,
+  maxReservationDuration = 0,
+  minReservationDuration = 0,
+  reservationsMinDaysBefore = 0,
+  reservationsMaxDaysBefore = null,
 }: MockReservationUnitProps): ReservationUnitType {
   const reservationUnit: ReservationUnitType = {
-    reservationSet: reservationSet ?? [],
-    bufferTimeBefore: 60 * 60 * (bufferTimeBefore ?? 0),
-    bufferTimeAfter: 60 * 60 * (bufferTimeAfter ?? 0),
-    maxReservationDuration: maxReservationDuration ?? 0,
-    minReservationDuration: minReservationDuration ?? 0,
-    reservationStartInterval:
-      interval ?? ReservationStartInterval.Interval_15Mins,
-    reservationsMaxDaysBefore: reservationsMaxDaysBefore ?? null,
-    reservationsMinDaysBefore: reservationsMinDaysBefore ?? 0,
+    reservations,
+    bufferTimeBefore: 60 * 60 * bufferTimeBefore,
+    bufferTimeAfter: 60 * 60 * bufferTimeAfter,
+    maxReservationDuration,
+    minReservationDuration,
+    reservationStartInterval: interval,
+    reservationsMaxDaysBefore,
+    reservationsMinDaysBefore,
     reservationBegins: addDays(new Date(), -1).toISOString(),
     reservationEnds: addDays(new Date(), 180).toISOString(),
   };

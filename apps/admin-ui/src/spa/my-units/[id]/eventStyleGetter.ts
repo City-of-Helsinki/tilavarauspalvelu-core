@@ -73,7 +73,7 @@ const eventStyleGetter =
     style: React.CSSProperties;
     className?: string;
   } => {
-    const isCurrentReservationUnit = !!event?.reservationUnit?.find(
+    const isCurrentReservationUnit = !!event?.reservationUnits?.find(
       (ru) => ru?.pk === currentReservationUnitPk
     );
 

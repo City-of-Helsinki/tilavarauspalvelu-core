@@ -23,7 +23,7 @@ export const UNITS_QUERY = gql`
             id
             nameFi
           }
-          reservationunitSet {
+          reservationUnits {
             id
             pk
           }

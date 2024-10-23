@@ -8,7 +8,7 @@ export const RESERVATIONS_QUERY = gql`
     $after: String
     $orderBy: [ReservationOrderingChoices]
     $unit: [Int]
-    $reservationUnit: [Int]
+    $reservationUnits: [Int]
     $reservationUnitType: [Int]
     $reservationType: [ReservationTypeChoice]
     $state: [ReservationStateChoice]
@@ -28,7 +28,7 @@ export const RESERVATIONS_QUERY = gql`
       after: $after
       orderBy: $orderBy
       unit: $unit
-      reservationUnit: $reservationUnit
+      reservationUnits: $reservationUnits
       reservationUnitType: $reservationUnitType
       reservationType: $reservationType
       state: $state
@@ -48,7 +48,7 @@ export const RESERVATIONS_QUERY = gql`
         node {
           ...ReservationCommon
           name
-          reservationUnit {
+          reservationUnits {
             id
             nameFi
             unit {

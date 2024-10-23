@@ -322,7 +322,7 @@ describe("isRangeReservable", () => {
     bufferTimeBefore?: number;
     bufferTimeAfter?: number;
     reservableTimes?: ReservableMap;
-    reservationSet?: IsReservableFieldsFragment["reservationSet"];
+    reservations?: IsReservableFieldsFragment["reservations"];
     interval?: ReservationStartInterval;
     maxReservationDuration?: IsReservableFieldsFragment["maxReservationDuration"];
     minReservationDuration?: IsReservableFieldsFragment["minReservationDuration"];
@@ -500,7 +500,7 @@ describe("isRangeReservable", () => {
       const input = createInput({
         start: addHours(date, 9),
         end: addHours(date, 11),
-        reservationSet: [
+        reservations: [
           createMockReservation({
             start: addHours(date, 8),
             end: addHours(date, 12),
@@ -515,7 +515,7 @@ describe("isRangeReservable", () => {
       const input = createInput({
         start: addHours(date, 9),
         end: addHours(date, 11),
-        reservationSet: [
+        reservations: [
           createMockReservation({
             start: addHours(date, 8),
             end: addHours(date, 12),
@@ -531,7 +531,7 @@ describe("isRangeReservable", () => {
       const input = createInput({
         start: addHours(date, 9),
         end: addHours(date, 11),
-        reservationSet: [
+        reservations: [
           createMockReservation({
             start: addHours(date, 8),
             end: addHours(date, 12),
@@ -547,7 +547,7 @@ describe("isRangeReservable", () => {
       const input = createInput({
         start: addHours(date, 9),
         end: addHours(date, 11),
-        reservationSet: [
+        reservations: [
           createMockReservation({
             start: addHours(date, 8),
             end: addHours(date, 12),
@@ -563,7 +563,7 @@ describe("isRangeReservable", () => {
       const input = createInput({
         start: addHours(date, 9),
         end: addHours(date, 11),
-        reservationSet: [
+        reservations: [
           createMockReservation({
             start: addHours(date, 8),
             end: addHours(date, 12),
@@ -579,7 +579,7 @@ describe("isRangeReservable", () => {
       const input = createInput({
         start: addHours(date, 10),
         end: addHours(date, 11),
-        reservationSet: [
+        reservations: [
           createMockReservation({
             start: addHours(date, 8),
             end: addHours(date, 9),
@@ -596,7 +596,7 @@ describe("isRangeReservable", () => {
       const input = createInput({
         start: addHours(date, 8),
         end: addHours(date, 9),
-        reservationSet: [
+        reservations: [
           createMockReservation({
             start: addHours(date, 10),
             end: addHours(date, 11),
@@ -613,7 +613,7 @@ describe("isRangeReservable", () => {
       const input = createInput({
         start: addHours(date, 8),
         end: addHours(date, 10),
-        reservationSet: [
+        reservations: [
           createMockReservation({
             start: addHours(date, 10),
             end: addHours(date, 11),
@@ -632,7 +632,7 @@ describe("isRangeReservable", () => {
         end: addHours(date, 11),
         bufferTimeAfter: 1,
         bufferTimeBefore: 1,
-        reservationSet: [
+        reservations: [
           createMockReservation({
             start: addHours(date, 8),
             end: addHours(date, 12),
@@ -649,7 +649,7 @@ describe("isRangeReservable", () => {
         end: addHours(date, 11),
         bufferTimeAfter: 1,
         bufferTimeBefore: 1,
-        reservationSet: [
+        reservations: [
           createMockReservation({
             start: addHours(date, 12),
             end: addHours(date, 13),
@@ -667,7 +667,7 @@ describe("isRangeReservable", () => {
         end: addHours(date, 11),
         bufferTimeAfter: 1,
         bufferTimeBefore: 1,
-        reservationSet: [
+        reservations: [
           createMockReservation({
             start: addHours(date, 12),
             end: addHours(date, 13),
@@ -686,7 +686,7 @@ describe("isRangeReservable", () => {
         end: addHours(date, 11),
         bufferTimeAfter: 1,
         bufferTimeBefore: 1,
-        reservationSet: [
+        reservations: [
           createMockReservation({
             start: addHours(date, 12),
             end: addHours(date, 13),
@@ -704,7 +704,7 @@ describe("isRangeReservable", () => {
         end: addHours(date, 15),
         bufferTimeAfter: 1,
         bufferTimeBefore: 1,
-        reservationSet: [
+        reservations: [
           createMockReservation({
             start: addHours(date, 12),
             end: addHours(date, 13),

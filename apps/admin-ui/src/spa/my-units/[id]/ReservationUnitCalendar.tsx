@@ -44,7 +44,7 @@ type ReservationUnitType = NonNullable<
   ReservationUnitCalendarQuery["reservationUnit"]
 >;
 type ReservationType = NonNullable<
-  NonNullable<ReservationUnitType["reservationSet"]>[0]
+  NonNullable<ReservationUnitType["reservations"]>[0]
 >;
 
 function getEventTitle({
@@ -56,7 +56,7 @@ function getEventTitle({
   reservation: ReservationType;
   t: TFunction;
 }) {
-  const reservationUnit = reservation.reservationUnit?.[0];
+  const reservationUnit = reservation.reservationUnits?.[0];
   const isOtherReservationUnit = reservationUnitPk !== reservationUnit?.pk;
 
   const reserveeName = getReserveeName(reservation, t);
@@ -128,9 +128,7 @@ export function ReservationUnitCalendar({
     return reservation.affectedReservationUnits?.some((pk) => pk === resUnitPk);
   }
 
-  const reservationSet = filterNonNullable(
-    data?.reservationUnit?.reservationSet
-  );
+  const reservationSet = filterNonNullable(data?.reservationUnit?.reservations);
   const affectingReservations = filterNonNullable(data?.affectingReservations);
   const reservations = filterNonNullable(
     reservationSet?.concat(

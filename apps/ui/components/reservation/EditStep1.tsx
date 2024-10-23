@@ -98,7 +98,7 @@ export function EditStep1({
   // is it just reservationUnit = reservation.reservationUnit in the parent component?
   const frozenReservationUnit = useMemo(() => {
     return (
-      reservation.reservationUnit?.find((n) => n?.pk === reservationUnit.pk) ??
+      reservation.reservationUnits?.find((n) => n?.pk === reservationUnit.pk) ??
       undefined
     );
   }, [reservation, reservationUnit]);

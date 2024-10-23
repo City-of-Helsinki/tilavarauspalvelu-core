@@ -44,7 +44,7 @@ export const SPACE_FRAGMENT = gql`
   fragment SpaceFields on SpaceNode {
     ...SpaceCommonFields
     code
-    resourceSet {
+    resources {
       ...ResourceFields
     }
     children {
@@ -177,7 +177,7 @@ export const RESERVATIONUNIT_RESERVATIONS_FRAGMENT = gql`
     name
     numPersons
     calendarUrl
-    reservationUnit {
+    reservationUnits {
       id
       pk
       nameFi

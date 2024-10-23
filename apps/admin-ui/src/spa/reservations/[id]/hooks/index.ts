@@ -29,15 +29,15 @@ function convertReservationToCalendarEvent(
   // but these are passed to event handlers that allow changing the reservation that requires a reservationUnit
   // affected don't have event handlers so empty reservationUnit is fine
   r: CalendarReservationFragment & {
-    reservationUnit?: ReservationUnitNode[];
+    reservationUnits?: ReservationUnitNode[];
   } & Partial<Pick<ReservationNode, "paymentOrder">>,
   blockedName: string
 ): CalendarEventType {
   const title = getEventName(r.type, getReservationTitle(r), blockedName);
 
-  const reservationUnit =
-    "reservationUnit" in r && r.reservationUnit != null
-      ? r.reservationUnit
+  const reservationUnits =
+    "reservationUnits" in r && r.reservationUnits != null
+      ? r.reservationUnits
       : [];
   const paymentOrder = "paymentOrder" in r ? (r.paymentOrder ?? []) : [];
   return {
@@ -45,7 +45,7 @@ function convertReservationToCalendarEvent(
     event: {
       ...r,
       name: r.name?.trim() !== "" ? r.name : "No name",
-      reservationUnit,
+      reservationUnits,
       paymentOrder,
     },
     // TODO use zod for datetime conversions
@@ -108,9 +108,7 @@ export function useReservationData(
   ) {
     return reservation.affectedReservationUnits?.some((pk) => pk === resUnitPk);
   }
-  const reservationSet = filterNonNullable(
-    data?.reservationUnit?.reservationSet
-  );
+  const reservationSet = filterNonNullable(data?.reservationUnit?.reservations);
   // NOTE we could use a recular concat here (we only have single reservationUnit here)
   const affectingReservations = filterNonNullable(data?.affectingReservations);
   const reservations = filterNonNullable(
@@ -170,7 +168,7 @@ export const useReservationEditData = (pk?: string) => {
     ? nextRecurrance?.reservation
     : data?.reservation;
   const reservationUnit =
-    data?.reservation?.reservationUnit?.find((x) => x != null) ?? undefined;
+    data?.reservation?.reservationUnits?.find((x) => x != null) ?? undefined;
 
   return {
     reservation: reservation ?? undefined,

@@ -277,7 +277,7 @@ export function InProgressReservationNotification() {
   const handleContinue = (reservation?: NodeT) => {
     // TODO add an url builder for this
     // - reuse the url builder in [...params].tsx
-    const reservationUnit = reservation?.reservationUnit?.find(() => true);
+    const reservationUnit = reservation?.reservationUnits?.find(() => true);
     const url = `${reservationUnitPrefix}/${reservationUnit?.pk}/reservation/${reservation?.pk}`;
     router.push(url);
   };

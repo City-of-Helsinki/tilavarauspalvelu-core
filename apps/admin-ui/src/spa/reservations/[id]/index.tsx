@@ -330,7 +330,7 @@ function TimeBlock({
   const { events: eventsAll, refetch: calendarRefetch } = useReservationData(
     startOfISOWeek(focusDate),
     add(startOfISOWeek(focusDate), { days: 7 }),
-    reservation?.reservationUnit?.[0]?.pk ?? undefined,
+    reservation?.reservationUnits?.[0]?.pk ?? undefined,
     reservation?.pk ?? undefined
   );
 
@@ -401,7 +401,7 @@ function RequestedReservation({
 
   const ref = useRef<HTMLHeadingElement>(null);
 
-  const resUnit = reservation?.reservationUnit?.[0];
+  const resUnit = reservation?.reservationUnits?.[0];
   const pricing = getReservatinUnitPricing(resUnit, reservation.begin);
 
   const isNonFree =

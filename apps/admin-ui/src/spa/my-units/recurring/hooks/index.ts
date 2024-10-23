@@ -16,7 +16,7 @@ export function useRecurringReservationsUnits(unitId: number) {
   });
 
   const { unit } = data ?? {};
-  const reservationUnits = filterNonNullable(unit?.reservationunitSet);
+  const reservationUnits = filterNonNullable(unit?.reservationUnits);
 
   return { loading, reservationUnits };
 }

@@ -25,7 +25,7 @@ import { fromAPIDateTime } from "@/helpers";
 import { filterNonNullable } from "common/src/helpers";
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
-type ReservationUnitType = NonNullable<ReservationType["reservationUnit"]>[0];
+type ReservationUnitType = NonNullable<ReservationType["reservationUnits"]>[0];
 
 function reservationUnitName(
   reservationUnit: Maybe<ReservationUnitType>
@@ -83,7 +83,7 @@ export function getReservationPriceDetails(
   );
 
   const pricing = getReservatinUnitPricing(
-    reservation.reservationUnit?.[0],
+    reservation.reservationUnits?.[0],
     reservation.begin
   );
 
@@ -192,7 +192,7 @@ function createSingleTagString(
   const end = new Date(reservation.end);
   const singleDateTimeTag = formatDateTimeRange(t, begin, end);
 
-  const unitTag = reservation?.reservationUnit
+  const unitTag = reservation?.reservationUnits
     ?.map(reservationUnitName)
     .join(", ");
 
@@ -221,7 +221,7 @@ function createRecurringTagString(
   }
 
   const recurringTag = `${formatDate(beginDate)}–${formatDate(endDate)}`;
-  const unitTag = reservation?.reservationUnit
+  const unitTag = reservation?.reservationUnits
     ?.map(reservationUnitName)
     .join(", ");
 

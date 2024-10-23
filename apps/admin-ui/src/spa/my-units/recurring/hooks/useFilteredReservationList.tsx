@@ -51,7 +51,7 @@ export const GET_RESERVATIONS_IN_INTERVAL = gql`
   ) {
     reservationUnit(id: $id) {
       id
-      reservationSet(beginDate: $beginDate, endDate: $endDate, state: $state) {
+      reservations(beginDate: $beginDate, endDate: $endDate, state: $state) {
         ...ReservationsInInterval
       }
     }
@@ -111,9 +111,7 @@ function useReservationsInInterval({
     return reservation.affectedReservationUnits?.some((pk) => pk === resUnitPk);
   }
 
-  const reservationSet = filterNonNullable(
-    data?.reservationUnit?.reservationSet
-  );
+  const reservationSet = filterNonNullable(data?.reservationUnit?.reservations);
   const affectingReservations = filterNonNullable(data?.affectingReservations);
   const reservations = filterNonNullable(
     reservationSet?.concat(
