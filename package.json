@@ -32,7 +32,7 @@
     "@parcel/watcher": "^2.4.1",
     "graphql-config": "^5.1.0",
     "npkill": "^0.12.2",
-    "turbo": "^1.11.3"
+    "turbo": "^2.2.3"
   },
   "packageManager": "pnpm@9.11.0"
 }
