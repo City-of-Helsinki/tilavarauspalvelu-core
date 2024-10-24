@@ -7,8 +7,7 @@ from django.urls import reverse
 from django.utils.timezone import get_default_timezone
 
 from config.utils.date_util import localized_short_weekday
-from tilavarauspalvelu.models import PaymentMerchant, PaymentProduct, Reservation
-from tilavarauspalvelu.utils.reservation_units.reservation_unit_payment_helper import ReservationUnitPaymentHelper
+from tilavarauspalvelu.models import PaymentMerchant, PaymentProduct, Reservation, ReservationUnit
 from tilavarauspalvelu.utils.verkkokauppa.exceptions import UnsupportedMetaKeyError
 from tilavarauspalvelu.utils.verkkokauppa.order.types import (
     CreateOrderParams,
@@ -126,10 +125,10 @@ def get_verkkokauppa_order_params(reservation: Reservation) -> CreateOrderParams
 
 
 def create_mock_verkkokauppa_order(reservation: Reservation) -> Order:
-    reservation_unit = reservation.reservation_units.first()
+    reservation_unit: ReservationUnit = reservation.reservation_units.first()
 
     if reservation_unit.payment_product is None:
-        payment_merchant = ReservationUnitPaymentHelper.get_merchant(reservation_unit)
+        payment_merchant = reservation_unit.actions.get_merchant()
         if payment_merchant is None:
             payment_merchant = PaymentMerchant.objects.create(id=uuid.uuid4(), name="MOCK VERKKOKAUPPA MERCHANT")
             reservation_unit.payment_merchant = payment_merchant

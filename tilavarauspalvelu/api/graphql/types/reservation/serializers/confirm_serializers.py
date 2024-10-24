@@ -5,10 +5,9 @@ from graphene_django_extensions.fields import EnumFriendlyChoiceField
 
 from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from tilavarauspalvelu.api.graphql.types.reservation.serializers.update_serializers import ReservationUpdateSerializer
-from tilavarauspalvelu.enums import Language, OrderStatus, PaymentType, PricingType, ReservationStateChoice
+from tilavarauspalvelu.enums import Language, OrderStatus, PaymentType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import PaymentOrder, Reservation
-from tilavarauspalvelu.utils.reservation_units.reservation_unit_pricing_helper import ReservationUnitPricingHelper
 from tilavarauspalvelu.utils.verkkokauppa.helpers import create_mock_verkkokauppa_order, get_verkkokauppa_order_params
 from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CreateOrderError
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
@@ -87,8 +86,8 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
             payment_type = data.get("payment_type", "").upper()
             reservation_unit = self.instance.reservation_units.first()
 
-            active_price = ReservationUnitPricingHelper.get_active_price(reservation_unit)
-            if active_price.pricing_type == PricingType.PAID or self.instance.price_net > 0:
+            active_pricing = reservation_unit.actions.get_active_pricing()
+            if active_pricing.highest_price > 0 or self.instance.price_net > 0:
                 if not reservation_unit.payment_product and not settings.MOCK_VERKKOKAUPPA_API_ENABLED:
                     raise ValidationErrorWithCode(
                         "Reservation unit is missing payment product",

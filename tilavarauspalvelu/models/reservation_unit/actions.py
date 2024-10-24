@@ -3,12 +3,16 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any
 
-from tilavarauspalvelu.enums import PricingStatus, PricingType, ReservationStartInterval
+from django.db import models
+
+from tilavarauspalvelu.enums import ReservationStartInterval
 from tilavarauspalvelu.exceptions import HaukiAPIError
 from tilavarauspalvelu.models import (
     Building,
     Location,
     OriginHaukiResource,
+    PaymentAccounting,
+    PaymentMerchant,
     ReservableTimeSpan,
     Reservation,
     ReservationUnit,
@@ -16,13 +20,11 @@ from tilavarauspalvelu.models import (
 )
 from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.utils.opening_hours.hauki_api_types import HaukiAPIResource, HaukiTranslatedField
-from utils.date_utils import DEFAULT_TIMEZONE, time_as_timedelta
+from utils.date_utils import DEFAULT_TIMEZONE, local_date, time_as_timedelta
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
-
-    from django.db import models
 
 
 class ReservationUnitHaukiExporter:
@@ -347,30 +349,47 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         # so we can just check start interval from the beginning of the day.
         return begin_time.second == 0 and begin_time.microsecond == 0 and begin_time.minute % interval_minutes == 0
 
-    def get_active_pricing(self) -> ReservationUnitPricing | None:
-        return self.reservation_unit.pricings.filter(status=PricingStatus.PRICING_STATUS_ACTIVE).first()
+    def get_active_pricing(self, by_date: datetime.date | None = None) -> ReservationUnitPricing | None:
+        """Returns the active pricing for the reservation unit."""
+        today = local_date()
+        if by_date is None:
+            by_date = today
 
-    def get_future_pricing(self) -> ReservationUnitPricing | None:
-        return self.reservation_unit.pricings.filter(status=PricingStatus.PRICING_STATUS_FUTURE).first()
+        return (
+            self.reservation_unit.pricings.filter(
+                models.Q(begins__lte=today)  # Is active regardless of `is_activated_on_begins` value
+                | models.Q(begins__lte=by_date, is_activated_on_begins=False)
+            )
+            .order_by("-begins")
+            .first()
+        )
 
-    def get_pricing_on_date(self, *, date: datetime.date) -> ReservationUnitPricing | None:
-        active_price = self.get_active_pricing()
-        future_price = self.get_future_pricing()
+    def get_merchant(self) -> PaymentMerchant | None:
+        if self.reservation_unit.payment_merchant is not None:
+            return self.reservation_unit.payment_merchant
+        if self.reservation_unit.unit and self.reservation_unit.unit.payment_merchant is not None:
+            return self.reservation_unit.unit.payment_merchant
 
-        if future_price is None:
-            return active_price
+        return None
 
-        if future_price.begins > date:
-            return active_price
+    def requires_product_mapping_update(self) -> bool:
+        payment_merchant = self.get_merchant()
+        if payment_merchant is None:
+            return False
+        if self.reservation_unit.payment_product is not None:
+            return True
+        if self.reservation_unit.is_draft:
+            return False
 
-        # If either of the prices is free, the future price can be returned, as the percentage is irrelevant.
-        if PricingType.FREE in (active_price.pricing_type, future_price.pricing_type):
-            return future_price
+        # Has PAID active or future pricings
+        active_pricing = self.reservation_unit.actions.get_active_pricing()
+        if active_pricing.highest_price > 0:
+            return True
+        return self.reservation_unit.pricings.filter(highest_price__gt=0, begins__gt=local_date()).exists()
 
-        # Only return future price if it has the same tax percentage as the current active price.
-        # When the future price has a different tax percentage, it should only be used for reservations which
-        # are made after the pricings begins date (due to VAT-change rules, see TILA-3470).
-        if active_price.tax_percentage == future_price.tax_percentage:
-            return future_price
-
-        return active_price
+    def get_accounting(self) -> PaymentAccounting | None:
+        if self.reservation_unit.payment_accounting is not None:
+            return self.reservation_unit.payment_accounting
+        if self.reservation_unit.unit:
+            return self.reservation_unit.unit.payment_accounting
+        return None
