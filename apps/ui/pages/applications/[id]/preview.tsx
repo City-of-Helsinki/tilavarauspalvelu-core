@@ -70,7 +70,7 @@ function Preview(props: PropsNarrowed): JSX.Element {
 
       router.push(getApplicationPath(resPk, "sent"));
     } catch (e) {
-      errorToast({ text: t("common:error.mutationError") });
+      errorToast({ text: t("errors:applicationMutation.Validation error") });
     }
   };
 
