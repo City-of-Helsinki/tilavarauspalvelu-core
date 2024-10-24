@@ -119,18 +119,13 @@ type IsWithinCancellationPeriodReservationT = Pick<
   ReservationNodeT,
   "begin"
 > & {
-  reservationUnit?: Array<{
-    cancellationRule?: Pick<
-      NonNullable<ReservationUnitNode["cancellationRule"]>,
-      "canBeCancelledTimeBefore" | "needsHandling"
-    > | null;
-  }> | null;
+  reservationUnits?: Maybe<Array<CancellationRuleFieldsFragment>> | undefined;
 };
 
 function isTooCloseToCancel(
   reservation: IsWithinCancellationPeriodReservationT
 ): boolean {
-  const reservationUnit = reservation.reservationUnit?.[0];
+  const reservationUnit = reservation.reservationUnits?.[0];
   const begin = new Date(reservation.begin);
 
   const { canBeCancelledTimeBefore } = reservationUnit?.cancellationRule ?? {};
@@ -144,12 +139,12 @@ type CanUserCancelReservationProps = Pick<
   NonNullable<ReservationNodeT>,
   "state" | "begin"
 > & {
-  reservationUnit?: Maybe<Array<CancellationRuleFieldsFragment>> | undefined;
+  reservationUnits?: Maybe<Array<CancellationRuleFieldsFragment>> | undefined;
 };
 export function isReservationCancellable(
   reservation: CanUserCancelReservationProps
 ): boolean {
-  const reservationUnit = reservation.reservationUnit?.[0];
+  const reservationUnit = reservation.reservationUnits?.[0];
   const isReservationCancelled =
     reservation.state === ReservationStateChoice.Cancelled;
   const isBeingHandled =
@@ -278,7 +273,7 @@ export function getWhyReservationCantBeChanged(
     return "RESERVATION_BEGIN_IN_PAST";
   }
 
-  const reservationUnit = reservation.reservationUnit?.[0];
+  const reservationUnit = reservation.reservationUnits?.[0];
   if (
     reservationUnit?.cancellationRule == null ||
     reservationUnit.cancellationRule.needsHandling

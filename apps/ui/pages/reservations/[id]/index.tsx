@@ -382,20 +382,20 @@ function Reservation({
   }, [reservation, reservationUnit]);
 
   const paymentTermsContent =
-    reservationUnit?.paymentTerms != null
-      ? getTranslation(reservationUnit?.paymentTerms, "text")
+    reservationUnit.paymentTerms != null
+      ? getTranslation(reservationUnit.paymentTerms, "text")
       : undefined;
   const cancellationTermsContent =
-    reservationUnit?.cancellationTerms != null
-      ? getTranslation(reservationUnit?.cancellationTerms, "text")
+    reservationUnit.cancellationTerms != null
+      ? getTranslation(reservationUnit.cancellationTerms, "text")
       : undefined;
   const pricingTermsContent =
     reservationUnit?.pricingTerms != null
       ? getTranslation(reservationUnit?.pricingTerms, "text")
       : undefined;
   const serviceSpecificTermsContent =
-    reservationUnit?.serviceSpecificTerms != null
-      ? getTranslation(reservationUnit?.serviceSpecificTerms, "text")
+    reservationUnit.serviceSpecificTerms != null
+      ? getTranslation(reservationUnit.serviceSpecificTerms, "text")
       : undefined;
 
   const modifyTimeReason = getWhyReservationCantBeChanged({ reservation });

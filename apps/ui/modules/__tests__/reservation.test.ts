@@ -118,7 +118,7 @@ function createMockReservation({
     paymentOrder: [],
     begin: start.toISOString(),
     end: end.toISOString(),
-    reservationUnit: [reservationUnit ?? createMockReservationUnit({})],
+    reservationUnits: [reservationUnit ?? createMockReservationUnit({})],
     handlingDetails: "",
     isHandled,
   };
