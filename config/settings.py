@@ -201,8 +201,8 @@ class Common(Environment):
     DEFAULT_FROM_EMAIL = values.StringValue(default="tilavarauspalvelu@localhost")
 
     SEND_EMAILS = values.BooleanValue(default=True)
-    EMAIL_VARAAMO_EXT_LINK = values.StringValue(default=None)
-    EMAIL_FEEDBACK_EXT_LINK = values.StringValue(default=None)
+    EMAIL_VARAAMO_EXT_LINK = values.StringValue()
+    EMAIL_FEEDBACK_EXT_LINK = values.StringValue()
 
     # ----- Logging settings -----------------------------------------------------------------------------------------
 
@@ -590,6 +590,9 @@ class EmptyDefaults:
     TPREK_UNIT_URL = ""
     ICAL_HASH_SECRET = ""  # nosec # NOSONAR
 
+    EMAIL_VARAAMO_EXT_LINK = ""
+    EMAIL_FEEDBACK_EXT_LINK = ""
+
 
 class Local(Common, overrides_from=LocalMixin):
     """Settings for local development."""
@@ -679,6 +682,9 @@ class Local(Common, overrides_from=LocalMixin):
     REBUILD_SPACE_HIERARCHY = values.BooleanValue(default=True)
     RAISE_ERROR_ON_REFRESH_FAILURE = True
 
+    EMAIL_VARAAMO_EXT_LINK = "https://fake.local.varaamo.hel.fi"
+    EMAIL_FEEDBACK_EXT_LINK = "https://fake.local.varaamo.hel.fi/feedback"
+
 
 class Docker(Common, overrides_from=DockerMixin):
     """Settings for local Docker development."""
@@ -714,6 +720,9 @@ class Docker(Common, overrides_from=DockerMixin):
     ICAL_HASH_SECRET = values.StringValue(default="")  # nosec # NOSONAR
     RAISE_ERROR_ON_REFRESH_FAILURE = True
 
+    EMAIL_VARAAMO_EXT_LINK = "https://fake.local.varaamo.hel.fi"
+    EMAIL_FEEDBACK_EXT_LINK = "https://fake.local.varaamo.hel.fi/feedback"
+
 
 class AutomatedTests(EmptyDefaults, Common, dotenv_path=None, overrides_from=AutomatedTestMixin):
     """Settings when running automated tests."""
@@ -736,8 +745,6 @@ class AutomatedTests(EmptyDefaults, Common, dotenv_path=None, overrides_from=Aut
     EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 
     SEND_EMAILS = False
-    EMAIL_VARAAMO_EXT_LINK = "https://fake.varaamo.hel.fi"
-    EMAIL_FEEDBACK_EXT_LINK = "https://fake.varaamo.hel.fi/feedback"
 
     # --- Helsinki profile settings ----------------------------------------------------------------------------------
 
@@ -852,6 +859,9 @@ class AutomatedTests(EmptyDefaults, Common, dotenv_path=None, overrides_from=Aut
     SAVE_RESERVATION_STATISTICS = False
     # Always re-raise silenced Sentry errors during testing for better debugging
     SENTRY_LOGGER_ALWAYS_RE_RAISE = True
+
+    EMAIL_VARAAMO_EXT_LINK = "https://fake.varaamo.hel.fi"
+    EMAIL_FEEDBACK_EXT_LINK = "https://fake.varaamo.hel.fi/feedback"
 
 
 class Build(EmptyDefaults, Common, use_environ=True):
