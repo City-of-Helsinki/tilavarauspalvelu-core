@@ -85,8 +85,8 @@ class ReservationAdmin(admin.ModelAdmin):
         ("state", MultiSelectFilter),
         RecurringReservationListFilter,
         PaidReservationListFilter,
-        ("reservation_unit__unit", MultiSelectRelatedOnlyDropdownFilter),
-        ("reservation_unit", MultiSelectRelatedOnlyDropdownFilter),
+        ("reservation_units__unit", MultiSelectRelatedOnlyDropdownFilter),
+        ("reservation_units", MultiSelectRelatedOnlyDropdownFilter),
     ]
 
     # Form
@@ -197,7 +197,7 @@ class ReservationAdmin(admin.ModelAdmin):
     inlines = [PaymentOrderInline]
 
     def get_queryset(self, request):
-        return super().get_queryset(request).prefetch_related("reservation_unit")
+        return super().get_queryset(request).prefetch_related("reservation_units")
 
     def get_search_results(
         self,
@@ -212,7 +212,7 @@ class ReservationAdmin(admin.ModelAdmin):
 
         return queryset, may_have_duplicates
 
-    @admin.display(ordering="reservation_unit__name")
+    @admin.display(ordering="reservation_units__name")
     def reservation_units(self, obj: Reservation) -> str:
         return ", ".join([str(reservation_unit) for reservation_unit in obj.reservation_units.all()])
 
