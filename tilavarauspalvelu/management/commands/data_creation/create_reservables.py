@@ -3,30 +3,20 @@
 import random
 from datetime import timedelta
 
+from tests.factories import EquipmentCategoryFactory, EquipmentFactory, QualifierFactory
 from tilavarauspalvelu.enums import ResourceLocationType, ServiceTypeChoices
-from tilavarauspalvelu.models import Equipment, EquipmentCategory, Purpose, Qualifier, Resource, Service, Space, Unit
+from tilavarauspalvelu.models import Equipment, Purpose, Qualifier, Resource, Service, Space, Unit
 
 from .utils import weighted_choice, with_logs
 
 
 @with_logs()
 def _create_equipments(*, number: int = 10) -> list[Equipment]:
-    equipment_category = EquipmentCategory.objects.create(
-        name="Equipment Category 1",
-        name_fi="Equipment Category 1",
-        name_sv="Equipment Category 1",
-        name_en="Equipment Category 1",
-    )
+    equipment_category = EquipmentCategoryFactory.create()
 
     equipments: list[Equipment] = []
-    for i in range(number):
-        equipment = Equipment(
-            name=f"Equipment {i}",
-            name_fi=f"Equipment {i}",
-            name_sv=f"Equipment {i}",
-            name_en=f"Equipment {i}",
-            category=equipment_category,
-        )
+    for _i in range(number):
+        equipment = EquipmentFactory.build(category=equipment_category)
         equipments.append(equipment)
 
     return Equipment.objects.bulk_create(equipments)
@@ -35,13 +25,8 @@ def _create_equipments(*, number: int = 10) -> list[Equipment]:
 @with_logs()
 def _create_qualifiers(*, number: int = 1) -> list[Qualifier]:
     qualifiers: list[Qualifier] = []
-    for i in range(number):
-        qualifier = Qualifier(
-            name=f"Qualifier {i}",
-            name_fi=f"Qualifier {i}",
-            name_sv=f"Qualifier {i}",
-            name_en=f"Qualifier {i}",
-        )
+    for _i in range(number):
+        qualifier = QualifierFactory.build()
         qualifiers.append(qualifier)
 
     return Qualifier.objects.bulk_create(qualifiers)

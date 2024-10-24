@@ -55,7 +55,7 @@ class AllocatedTimeSlotFactory(GenericDjangoModelFactory[AllocatedTimeSlot]):
             reservation_period_end=(start_of_today + datetime.timedelta(days=7 * (num - 1))).date(),
         )
 
-        return AllocatedTimeSlotFactory.create(
+        return cls.create(
             day_of_the_week=Weekday.from_iso_week_day(start_of_today.isoweekday()),
             begin_time=start_time or datetime.time(12, 0, tzinfo=DEFAULT_TIMEZONE),
             end_time=end_time or datetime.time(14, 0, tzinfo=DEFAULT_TIMEZONE),

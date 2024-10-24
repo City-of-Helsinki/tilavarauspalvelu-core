@@ -2,6 +2,7 @@ import pytest
 from graphene_django_extensions.testing import parametrize_helper
 
 from tests.factories import BannerNotificationFactory
+from tests.factories.banner_notification import BannerNotificationBuilder
 from tilavarauspalvelu.enums import BannerNotificationTarget, UserRoleChoice
 from tilavarauspalvelu.models import User
 
@@ -100,7 +101,7 @@ def test_user_permissions_on_banner_notifications(graphql, target, user_type, ex
     # given:
     # - There is an active notification with the given target
     # - User of the given type is using the system
-    BannerNotificationFactory.create_active(target=target)
+    BannerNotificationBuilder().active().create(target=target)
     login_based_on_type(graphql, user_type)
 
     # when:
@@ -194,15 +195,15 @@ def test_user_permissions_on_banner_notifications_with_target_filter(graphql, ta
     # given:
     # - There are banner notification for all target audiences in the system
     # - User of the given type is using the system
-    BannerNotificationFactory.create_active(
+    BannerNotificationBuilder().active().create(
         message="1",
         target=BannerNotificationTarget.ALL,
     )
-    BannerNotificationFactory.create_active(
+    BannerNotificationBuilder().active().create(
         message="2",
         target=BannerNotificationTarget.USER,
     )
-    BannerNotificationFactory.create_active(
+    BannerNotificationBuilder().active().create(
         message="3",
         target=BannerNotificationTarget.STAFF,
     )
@@ -268,15 +269,15 @@ def test_user_permissions_on_banner_notifications_without_target_filter(graphql,
     # given:
     # - There are banner notification for all target audiences in the system
     # - User of the given type is using the system
-    BannerNotificationFactory.create_active(
+    BannerNotificationBuilder().active().create(
         message="1",
         target=BannerNotificationTarget.ALL,
     )
-    BannerNotificationFactory.create_active(
+    BannerNotificationBuilder().active().create(
         message="2",
         target=BannerNotificationTarget.USER,
     )
-    BannerNotificationFactory.create_active(
+    BannerNotificationBuilder().active().create(
         message="3",
         target=BannerNotificationTarget.STAFF,
     )
@@ -346,7 +347,7 @@ def test_field_permissions_on_banner_notifications(graphql, field, user_type, ex
     # given:
     # - There is an active notification for all
     # - User of the given type is using the system
-    BannerNotificationFactory.create_active(target=BannerNotificationTarget.ALL)
+    BannerNotificationBuilder().active().create(target=BannerNotificationTarget.ALL)
     login_based_on_type(graphql, user_type)
 
     # when:
@@ -451,7 +452,7 @@ def test_permission_on_both_non_visible_and_visible_banner_notifications(graphql
     # - There is a draft notification for all & an active notification for all
     # - User of the given type is using the system
     BannerNotificationFactory.create(target=BannerNotificationTarget.ALL, draft=True)
-    BannerNotificationFactory.create_active(target=BannerNotificationTarget.ALL)
+    BannerNotificationBuilder().active().create(target=BannerNotificationTarget.ALL)
     login_based_on_type(graphql, user_type)
 
     # when:

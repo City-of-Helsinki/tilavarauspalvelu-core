@@ -1,6 +1,6 @@
 import datetime
 from datetime import timedelta
-from typing import Any
+from typing import Any, Self
 
 from django.utils.timezone import get_default_timezone, now
 from factory import fuzzy
@@ -8,15 +8,16 @@ from factory import fuzzy
 from tilavarauspalvelu.enums import ApplicantTypeChoice, ApplicationStatusChoice, Priority, Weekday
 from tilavarauspalvelu.models import Application, ApplicationRound, ReservationUnit
 
-from ._base import FakerFI, ForeignKeyFactory, GenericDjangoModelFactory, ReverseForeignKeyFactory
+from ._base import FakerFI, ForeignKeyFactory, GenericDjangoModelFactory, ModelFactoryBuilder, ReverseForeignKeyFactory
 from .allocated_time_slot import AllocatedTimeSlotFactory
-from .application_round import ApplicationRoundFactory
-from .application_section import ApplicationSectionFactory
+from .application_round import ApplicationRoundBuilder, ApplicationRoundFactory
+from .application_section import ApplicationSectionBuilder, ApplicationSectionFactory
 from .reservation_unit import ReservationUnitFactory
 from .space import SpaceFactory
 from .suitable_time_range import SuitableTimeRangeFactory
 
 __all__ = [
+    "ApplicationBuilder",
     "ApplicationFactory",
 ]
 
@@ -331,3 +332,41 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
             )
 
         return application
+
+
+class ApplicationBuilder(ModelFactoryBuilder[Application]):
+    factory = ApplicationFactory
+
+    def with_status(self, status: ApplicationStatusChoice) -> Self:
+        match status:
+            case ApplicationStatusChoice.DRAFT:
+                return self.draft()
+            case ApplicationStatusChoice.RECEIVED:
+                return self.received()
+            case ApplicationStatusChoice.IN_ALLOCATION:
+                return self.in_allocation()
+            case ApplicationStatusChoice.HANDLED:
+                return self.handled()
+            case ApplicationStatusChoice.RESULTS_SENT:
+                return self.results_sent()
+            case ApplicationStatusChoice.EXPIRED:
+                return self.expired()
+            case ApplicationStatusChoice.CANCELLED:
+                return self.cancelled()
+
+    def draft(self, sections: bool = True) -> Self:
+        """
+        Create a draft application:
+        - in an open application round
+        - with a single application section
+            - with a single reservation unit option
+        """
+        self.kwargs.setdefault("cancelled_date", None)
+        self.kwargs.setdefault("sent_date", None)
+        self.kwargs.setdefault("application_round", ApplicationRoundBuilder().open().create())
+
+        if sections:
+            for key, value in ApplicationSectionBuilder().unallocated().kwargs.items():
+                self.kwargs.setdefault(f"application_sections__{key}", value)
+
+        return self

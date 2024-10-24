@@ -1,6 +1,6 @@
 import datetime
 import random
-from typing import Any
+from typing import Any, Self
 
 import factory
 from factory import fuzzy
@@ -8,9 +8,10 @@ from factory import fuzzy
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, Weekday
 from tilavarauspalvelu.models import ApplicationSection
 
-from ._base import FakerFI, ForeignKeyFactory, GenericDjangoModelFactory, ReverseForeignKeyFactory
+from ._base import FakerFI, ForeignKeyFactory, GenericDjangoModelFactory, ModelFactoryBuilder, ReverseForeignKeyFactory
 
 __all__ = [
+    "ApplicationSectionBuilder",
     "ApplicationSectionFactory",
 ]
 
@@ -136,3 +137,23 @@ class ApplicationSectionFactory(GenericDjangoModelFactory[ApplicationSection]):
             kwargs["reservation_unit_options__locked"] = not is_rejected
 
         return cls.create(**kwargs)
+
+
+class ApplicationSectionBuilder(ModelFactoryBuilder[ApplicationSection]):
+    factory = ApplicationSectionFactory
+
+    def unallocated(self) -> Self:
+        # TODO
+        return self
+
+    def in_allocation(self) -> Self:
+        # TODO
+        return self
+
+    def handled(self) -> Self:
+        # TODO
+        return self
+
+    def rejected(self) -> Self:
+        # TODO
+        return self

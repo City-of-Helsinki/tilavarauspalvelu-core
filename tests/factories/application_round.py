@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import Any
+from typing import Any, Self
 
 import factory
 from factory import LazyAttribute
@@ -8,9 +8,18 @@ from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
 from tilavarauspalvelu.models import ApplicationRound
 from utils.date_utils import utc_start_of_day
 
-from ._base import FakerEN, FakerFI, FakerSV, ForeignKeyFactory, GenericDjangoModelFactory, ManyToManyFactory
+from ._base import (
+    FakerEN,
+    FakerFI,
+    FakerSV,
+    ForeignKeyFactory,
+    GenericDjangoModelFactory,
+    ManyToManyFactory,
+    ModelFactoryBuilder,
+)
 
 __all__ = [
+    "ApplicationRoundBuilder",
     "ApplicationRoundFactory",
 ]
 
@@ -110,3 +119,54 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
         kwargs.setdefault("application_period_begin", utc_start_of_day() - timedelta(days=2))
         kwargs.setdefault("application_period_end", utc_start_of_day() - timedelta(days=2))
         return cls.create(**kwargs)
+
+
+class ApplicationRoundBuilder(ModelFactoryBuilder[ApplicationRound]):
+    factory = ApplicationRoundFactory
+
+    def with_status(self, status: ApplicationRoundStatusChoice) -> Self:
+        match status:
+            case ApplicationRoundStatusChoice.UPCOMING:
+                return self.upcoming()
+            case ApplicationRoundStatusChoice.OPEN:
+                return self.open()
+            case ApplicationRoundStatusChoice.IN_ALLOCATION:
+                return self.in_allocation()
+            case ApplicationRoundStatusChoice.HANDLED:
+                return self.handled()
+            case ApplicationRoundStatusChoice.RESULTS_SENT:
+                return self.result_sent()
+
+    def upcoming(self) -> Self:
+        self.kwargs.setdefault("sent_date", None)
+        self.kwargs.setdefault("handled_date", None)
+        self.kwargs.setdefault("application_period_begin", utc_start_of_day() + timedelta(days=2))
+        return self
+
+    def open(self) -> Self:
+        self.kwargs.setdefault("sent_date", None)
+        self.kwargs.setdefault("handled_date", None)
+        self.kwargs.setdefault("application_period_begin", utc_start_of_day() - timedelta(days=2))
+        self.kwargs.setdefault("application_period_end", utc_start_of_day() + timedelta(days=2))
+        return self
+
+    def in_allocation(self) -> Self:
+        self.kwargs.setdefault("sent_date", None)
+        self.kwargs.setdefault("handled_date", None)
+        self.kwargs.setdefault("application_period_begin", utc_start_of_day() - timedelta(days=2))
+        self.kwargs.setdefault("application_period_end", utc_start_of_day() - timedelta(days=2))
+        return self
+
+    def handled(self) -> Self:
+        self.kwargs.setdefault("sent_date", None)
+        self.kwargs.setdefault("handled_date", utc_start_of_day())
+        self.kwargs.setdefault("application_period_begin", utc_start_of_day() - timedelta(days=2))
+        self.kwargs.setdefault("application_period_end", utc_start_of_day() - timedelta(days=2))
+        return self
+
+    def result_sent(self) -> Self:
+        self.kwargs.setdefault("sent_date", utc_start_of_day())
+        self.kwargs.setdefault("handled_date", utc_start_of_day())
+        self.kwargs.setdefault("application_period_begin", utc_start_of_day() - timedelta(days=2))
+        self.kwargs.setdefault("application_period_end", utc_start_of_day() - timedelta(days=2))
+        return self

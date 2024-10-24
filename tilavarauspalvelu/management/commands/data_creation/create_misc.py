@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from django.utils.timezone import localtime
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
 
+from tests.factories import BannerNotificationFactory
 from tilavarauspalvelu.enums import BannerNotificationLevel, BannerNotificationTarget
 from tilavarauspalvelu.models.banner_notification.model import BannerNotification
 from tilavarauspalvelu.tasks import (
@@ -23,6 +24,7 @@ def _create_banner_notifications():
     with_link_created: bool = False
     with_bold_created: bool = False
     banner_notifications: list[BannerNotification] = []
+
     for target in BannerNotificationTarget.values:
         for level in BannerNotificationLevel.values:
             draft_message_fi = faker_fi.sentence()
@@ -45,31 +47,27 @@ def _create_banner_notifications():
                 with_bold_created = True
 
             banner_notifications += [
-                BannerNotification(
+                BannerNotificationFactory.build(
                     name=f"Draft {level} notification for {target}",
                     message=draft_message_fi,
                     message_fi=draft_message_fi,
-                    message_en=faker_en.sentence(),
-                    message_sv=faker_sv.sentence(),
                     level=level,
                     target=target,
                     draft=True,
                     active_from=None,
                     active_until=None,
                 ),
-                BannerNotification(
+                BannerNotificationFactory.build(
                     name=f"Active {level} notification for {target}",
                     message=active_message_fi,
                     message_fi=active_message_fi,
-                    message_en=faker_en.sentence(),
-                    message_sv=faker_sv.sentence(),
                     level=level,
                     target=target,
                     draft=False,
                     active_from=today - timedelta(days=1),
                     active_until=today + timedelta(days=7),
                 ),
-                BannerNotification(
+                BannerNotificationFactory.build(
                     name=f"Scheduled {level} notification for {target}",
                     message=scheduled_message_fi,
                     message_fi=scheduled_message_fi,
@@ -81,7 +79,7 @@ def _create_banner_notifications():
                     active_from=today + timedelta(days=7),
                     active_until=today + timedelta(days=14),
                 ),
-                BannerNotification(
+                BannerNotificationFactory.build(
                     name=f"Past {level} notification for {target}",
                     message=past_message_fi,
                     message_fi=past_message_fi,
