@@ -150,6 +150,7 @@ function CollisionWarning({
       size="small"
       label={t("errors.descriptive.collision")}
       type="error"
+      dataTestId="CreateReservationModal__collision-warning"
     >
       {t("errors.descriptive.collision")}
     </StyledNotification>
