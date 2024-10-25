@@ -31,7 +31,7 @@ import { ApplicationPageWrapper } from "@/components/application/ApplicationPage
 import { useApplicationUpdate } from "@/hooks/useApplicationUpdate";
 import { CenterSpinner, ButtonContainer } from "@/components/common/common";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { base64encode } from "common/src/helpers";
+import { base64encode, toNumber } from "common/src/helpers";
 import { errorToast } from "common/src/common/toast";
 import { MediumButton } from "@/styles/util";
 import { getApplicationPath } from "@/modules/urls";
@@ -42,7 +42,13 @@ const Form = styled.form`
   padding-bottom: var(--spacing-l);
 `;
 
-function Buttons({ applicationPk }: { applicationPk: number }): JSX.Element {
+function Buttons({
+  applicationPk,
+  submitDisabled,
+}: {
+  applicationPk: number;
+  submitDisabled?: boolean;
+}): JSX.Element {
   const { t } = useTranslation();
   const router = useRouter();
 
@@ -57,6 +63,7 @@ function Buttons({ applicationPk }: { applicationPk: number }): JSX.Element {
         id="button__application--next"
         iconRight={<IconArrowRight />}
         type="submit"
+        disabled={submitDisabled}
       >
         {t("common:next")}
       </MediumButton>
@@ -114,7 +121,7 @@ function convertApplicationToForm(
 ): ApplicationFormPage3Values {
   return {
     pk: app?.pk ?? 0,
-    applicantType: app?.applicantType ?? ApplicantTypeChoice.Individual,
+    applicantType: app?.applicantType ?? undefined,
     organisation: convertOrganisation(app?.organisation),
     contactPerson: convertPerson(app?.contactPerson),
     billingAddress: convertAddress(app?.billingAddress),
@@ -175,8 +182,8 @@ function Page3(): JSX.Element | null {
   }
 }
 
-function Page3Wrapped(props: Props): JSX.Element | null {
-  const { id: appPk } = props;
+function Page3Wrapped(props: PropsNarrowed): JSX.Element | null {
+  const { pk: appPk } = props;
   const router = useRouter();
 
   const id = base64encode(`ApplicationNode:${appPk}`);
@@ -186,7 +193,6 @@ function Page3Wrapped(props: Props): JSX.Element | null {
     loading: isLoading,
   } = useApplicationQuery({
     variables: { id },
-    skip: appPk == null || !(appPk > 0),
   });
   const { application } = data ?? {};
   const { applicationRound } = application ?? {};
@@ -203,6 +209,7 @@ function Page3Wrapped(props: Props): JSX.Element | null {
     handleSubmit,
     reset,
     formState: { isDirty },
+    watch,
   } = form;
 
   useEffect(() => {
@@ -254,9 +261,11 @@ function Page3Wrapped(props: Props): JSX.Element | null {
 
   // TODO these are 404
   // This should never happen but Apollo TS doesn't enforce it
-  if (application == null || applicationRound == null) {
+  if (application?.pk == null || applicationRound == null) {
     return <Error statusCode={404} />;
   }
+
+  const isValid = watch("applicantType") != null;
 
   return (
     <FormProvider {...form}>
@@ -269,7 +278,7 @@ function Page3Wrapped(props: Props): JSX.Element | null {
         <Form noValidate onSubmit={handleSubmit(onSubmit)}>
           <ApplicantTypeSelector />
           <Page3 />
-          {application.pk && <Buttons applicationPk={application.pk} />}
+          <Buttons applicationPk={application.pk} submitDisabled={!isValid} />
         </Form>
       </ApplicationPageWrapper>
     </FormProvider>
@@ -277,6 +286,7 @@ function Page3Wrapped(props: Props): JSX.Element | null {
 }
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale } = ctx;
@@ -285,12 +295,21 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { query } = ctx;
   const { id } = query;
   const pkstring = Array.isArray(id) ? id[0] : id;
-  const pk = Number.isNaN(Number(pkstring)) ? undefined : Number(pkstring);
+  const pk = toNumber(pkstring ?? "");
+  if (pk == null || !(pk > 0)) {
+    return {
+      notFound: true,
+      props: {
+        notFound: true,
+        ...(await serverSideTranslations(locale ?? "fi")),
+      },
+    };
+  }
   return {
     props: {
       ...getCommonServerSideProps(),
       key: locale,
-      id: pk,
+      pk,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

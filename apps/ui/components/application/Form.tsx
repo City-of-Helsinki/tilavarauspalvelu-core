@@ -219,7 +219,7 @@ const ApplicantTypeSchema = z.enum([
 ]);
 const ApplicationFormSchema = z.object({
   pk: z.number(),
-  applicantType: ApplicantTypeSchema,
+  applicantType: ApplicantTypeSchema.optional(),
   applicationSections: z
     .array(ApplicationSectionFormValueSchema.optional())
     .optional(),
@@ -317,7 +317,7 @@ export function ApplicationFormSchemaRefined(round: {
 // if hasBillingAddress | applicantType === Individual => billingAddress is required
 const ApplicationFormPage3Schema = z.object({
   pk: z.number(),
-  applicantType: ApplicantTypeSchema,
+  applicantType: ApplicantTypeSchema.optional(),
   organisation: OrganisationFormValuesSchema.optional(),
   contactPerson: PersonFormValuesSchema.optional(),
   billingAddress: AddressFormValueSchema.optional(),
@@ -433,7 +433,7 @@ export function convertApplication(
   };
   return {
     pk: app?.pk ?? 0,
-    applicantType: app?.applicantType ?? ApplicantTypeChoice.Individual,
+    applicantType: app?.applicantType ?? undefined,
     applicationSections: formAes.length > 0 ? formAes : [defaultAes],
   };
 }
