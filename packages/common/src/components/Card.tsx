@@ -130,6 +130,7 @@ const CardContent = styled.div<{ $itemCount: number }>`
 const ChildContainer = styled.div`
   grid-column: 1;
   grid-row: 2;
+  align-content: end;
 `;
 
 // TODO: Replace next/link so that the link doesn't cause page reload in admin-ui
@@ -263,11 +264,14 @@ const TagContainer = styled.div`
 
   /* display the tags on top of the image */
   .card--with-image & {
-    margin-top: calc(0px - var(--spacing-layout-l));
+    position: absolute;
+    top: calc(0px - var(--spacing-layout-m));
   }
 
   @media (min-width: ${breakpoints.m}) {
     .card--default & {
+      position: relative;
+      top: 0;
       grid-column: 2;
       align-items: flex-start;
       justify-content: flex-end;
