@@ -1,5 +1,5 @@
 import {
-  IconArrowTopLeft,
+  IconArrowTopRight,
   IconCheck,
   IconClock,
   IconCogwheel,
@@ -55,7 +55,7 @@ const getApplicationRoundStatus = (
       return {
         group: "g4",
         type: "draft",
-        icon: <IconArrowTopLeft />,
+        icon: <IconArrowTopRight />,
         label: ApplicationRoundStatusChoice.Upcoming,
       };
     default:
