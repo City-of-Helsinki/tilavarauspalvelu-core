@@ -1,5 +1,12 @@
 import React, { forwardRef } from "react";
-import { IconEuroSign } from "hds-react";
+import {
+  IconCheck,
+  IconCogwheel,
+  IconCross,
+  IconEuroSign,
+  IconPen,
+  IconQuestionCircle,
+} from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { fontMedium, H1 } from "common/src/common/typography";
@@ -8,6 +15,7 @@ import {
   type Maybe,
   OrderStatus,
   type ReservationQuery,
+  ReservationStateChoice,
   useReservationApplicationLinkQuery,
 } from "@gql/gql-types";
 import { getName } from "./util";
@@ -18,22 +26,6 @@ import { gql } from "@apollo/client";
 import { ExternalLink } from "@/component/ExternalLink";
 import StatusLabel from "common/src/components/StatusLabel";
 import { type StatusLabelType } from "common/src/tags";
-
-const Dot = styled.div`
-  display: inline-block;
-  border-radius: 50%;
-  background: var(--tilavaraus-admin-status-not-handled);
-  height: 1.6em;
-  text-align: center;
-  line-height: 1.6;
-  aspect-ratio: 1;
-  font-size: 0.6em;
-  color: white;
-  font-weight: 600;
-  @media (min-width: ${breakpoints.m}) {
-    flex-direction: row;
-  }
-`;
 
 const AlignVertically = styled.div`
   display: flex;
@@ -134,6 +126,27 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
       }
     })(order?.status);
 
+    const stateLabelProps = ((
+      s?: Maybe<ReservationStateChoice>
+    ): { type: StatusLabelType; icon: JSX.Element } => {
+      switch (s) {
+        case ReservationStateChoice.Created:
+          return { type: "draft", icon: <IconPen aria-hidden /> };
+        case ReservationStateChoice.WaitingForPayment:
+          return { type: "alert", icon: <IconEuroSign aria-hidden /> };
+        case ReservationStateChoice.RequiresHandling:
+          return { type: "info", icon: <IconCogwheel aria-hidden /> };
+        case ReservationStateChoice.Confirmed:
+          return { type: "success", icon: <IconCheck aria-hidden /> };
+        case ReservationStateChoice.Denied:
+          return { type: "error", icon: <IconCross aria-hidden /> };
+        case ReservationStateChoice.Cancelled:
+          return { type: "neutral", icon: <IconCross aria-hidden /> };
+        default:
+          return { type: "neutral", icon: <IconQuestionCircle aria-hidden /> };
+      }
+    })(reservation?.state);
+
     return (
       <div>
         <NameState ref={ref}>
@@ -144,17 +157,20 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
                 <StatusLabel
                   type={statusLabelType}
                   data-testid="reservation_title_section__order_status"
-                  icon={<IconEuroSign ariaHidden />}
+                  icon={<IconEuroSign aria-hidden />}
                 >
                   {t(`Payment.status.${order?.status}`)}
                 </StatusLabel>
               </AlignVertically>
             )}
             <AlignVertically style={{ gap: "var(--spacing-xs)" }}>
-              <Dot />
-              <span data-testid="reservation_title_section__state">
+              <StatusLabel
+                type={stateLabelProps.type}
+                icon={stateLabelProps.icon}
+                testId="reservation_title_section__state"
+              >
                 {t(`RequestedReservation.state.${reservation.state}`)}
-              </span>
+              </StatusLabel>
             </AlignVertically>
           </HorisontalFlex>
         </NameState>
