@@ -1946,10 +1946,10 @@ const translations: ITranslations = {
     summary: ["Varauksen yhteenveto"],
     recurring: ["Toistokerrat"],
     state: {
-      REQUIRES_HANDLING: ["Käsittelemättä"],
+      REQUIRES_HANDLING: ["Käsittelyssä"],
       CONFIRMED: ["Hyväksytty"],
       DENIED: ["Hylätty"],
-      CANCELLED: ["Peruutettu"],
+      CANCELLED: ["Peruttu"],
       CREATED: ["Luonnos"],
       WAITING_FOR_PAYMENT: ["Odottaa maksua"],
     },
