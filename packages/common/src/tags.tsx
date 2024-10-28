@@ -51,11 +51,11 @@ export type StatusLabelType = HDSStatusLabelType | "draft";
 export const getStatusBorderColor = ($type: StatusLabelType) => {
   switch ($type) {
     case "info":
-      return "var(--color-coat-of-arms)";
+      return "var(--color-coat-of-arms-medium-light)";
     case "alert":
-      return "var(--color-engel)";
+      return "var(--color-engel-dark)";
     case "success":
-      return "var(--color-tram)";
+      return "var(--color-tram-medium-light)";
     case "error":
       // using custom value since there is no suitable color in the HDS color palette for this (--color-metro is too dark)
       return "#FBA782";
@@ -70,11 +70,11 @@ export const getStatusBorderColor = ($type: StatusLabelType) => {
 export const getStatusBackgroundColor = ($type: StatusLabelType) => {
   switch ($type) {
     case "info":
-      return "var(--color-coat-of-arms-medium-light)";
+      return "var(--color-coat-of-arms-light)";
     case "alert":
       return "var(--color-engel-medium-light)";
     case "success":
-      return "var(--color-tram-medium-light)";
+      return "var(--color-tram-light)";
     case "error":
       return "var(--color-metro-medium-light)";
     case "draft":
