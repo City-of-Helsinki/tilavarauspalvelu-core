@@ -713,19 +713,28 @@ function convertPricing(p?: PricingNode): PricingFormValues {
 
 function convertPricingList(pricings: PricingNode[]): PricingFormValues[] {
   // NOTE Even though the frontend doesn't support adding more than two prices we can show / save more
-  const pris = pricings.map(convertPricing);
+  const convertedPrices = pricings.map(convertPricing);
+  const activePrices = convertedPrices.filter((p) => !p.isFuture);
+  const futurePrices = convertedPrices.filter((p) => p.isFuture);
+
+  // query data includes all past pricings also, remove them
+  const prices =
+    activePrices.length > 1
+      ? [activePrices[activePrices.length - 1], ...futurePrices]
+      : convertedPrices;
+
   // Always include at least two pricings in the form data (the frontend doesn't support dynamic adding)
   // negative pk for new pricings
   let rollingIndex = -1;
-  while (pris.length < 2 || !pris.some((p) => p.isFuture)) {
+  while (prices.length < 2 || !prices.some((p) => p.isFuture)) {
     // if we need to add first price, it's always current
-    const isFuture = pris.length > 0;
+    const isFuture = prices.length > 0;
     const begins =
-      pris.length === 0
+      prices.length === 0
         ? toUIDate(new Date())
         : toUIDate(addDays(new Date(), 1));
 
-    pris.push({
+    prices.push({
       pk: rollingIndex--,
       taxPercentage: 0,
       lowestPrice: 0,
@@ -738,7 +747,7 @@ function convertPricingList(pricings: PricingNode[]): PricingFormValues[] {
       begins,
     });
   }
-  return pris;
+  return prices;
 }
 
 function convertImage(image?: Node["images"][0]): ImageFormType {
