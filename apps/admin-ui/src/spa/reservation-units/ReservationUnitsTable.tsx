@@ -10,7 +10,7 @@ import { truncate } from "@/helpers";
 import { getReservationUnitUrl } from "@/common/urls";
 import { CustomTable } from "@/component/Table";
 import { MAX_NAME_LENGTH } from "@/common/const";
-import { TableLink, TableStatusLabel } from "@/styles/util";
+import { TableLink } from "@/styles/util";
 import {
   IconCheck,
   IconClock,
@@ -21,6 +21,7 @@ import {
   IconQuestionCircleFill,
 } from "hds-react";
 import type { StatusLabelType } from "common/src/tags";
+import StatusLabel from "common/src/components/StatusLabel";
 
 type ReservationUnitList = NonNullable<
   SearchReservationUnitsQuery["reservationUnits"]
@@ -124,9 +125,9 @@ const getColConfig = (t: TFunction) => [
     transform: ({ publishingState }: ReservationUnitNode) => {
       const labelProps = getPublishingStateProps(publishingState);
       return (
-        <TableStatusLabel type={labelProps.type} icon={labelProps.icon}>
+        <StatusLabel type={labelProps.type} icon={labelProps.icon} slim>
           {t(`ReservationUnits.state.${publishingState}`)}
-        </TableStatusLabel>
+        </StatusLabel>
       );
     },
   },
@@ -136,9 +137,9 @@ const getColConfig = (t: TFunction) => [
     transform: ({ reservationState }: ReservationUnitNode) => {
       const labelProps = getStatusLabelProps(reservationState);
       return (
-        <TableStatusLabel type={labelProps.type} icon={labelProps.icon}>
+        <StatusLabel type={labelProps.type} icon={labelProps.icon} slim>
           {t(`ReservationUnits.reservationState.${reservationState}`)}
-        </TableStatusLabel>
+        </StatusLabel>
       );
     },
   },

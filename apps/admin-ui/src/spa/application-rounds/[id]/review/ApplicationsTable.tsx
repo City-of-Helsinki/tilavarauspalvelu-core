@@ -2,21 +2,27 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { memoize, orderBy, uniqBy } from "lodash";
 import type { TFunction } from "i18next";
-import { IconLinkExternal } from "hds-react";
-import type {
-  ApplicationStatusChoice,
-  ApplicationsQuery,
-} from "@gql/gql-types";
+import {
+  IconArrowTopRight,
+  IconCheck,
+  IconClock,
+  IconCogwheel,
+  IconEnvelope,
+  IconLinkExternal,
+  IconQuestionCircle,
+} from "hds-react";
+import { ApplicationsQuery, ApplicationStatusChoice } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { getApplicantName, truncate } from "@/helpers";
 import { CustomTable } from "@/component/Table";
-import { ApplicationStatusCell } from "./StatusCell";
 import {
   calculateAppliedReservationTime,
   formatAppliedReservationTime,
 } from "./utils";
 import { getApplicationUrl } from "@/common/urls";
 import { ExternalTableLink } from "@/styles/util";
+import type { StatusLabelType } from "common/src/tags";
+import StatusLabel from "common/src/components/StatusLabel";
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
@@ -38,72 +44,98 @@ type ApplicationView = {
   units: UnitType[];
   applicationCount: string;
   status?: ApplicationStatusChoice;
-  statusView: JSX.Element;
-  statusType?: ApplicationStatusChoice;
 };
 
-const COLS = [
-  {
-    headerTKey: "Application.headings.id",
-    isSortable: true,
-    key: "pk",
-    transform: ({ pk }: ApplicationView) => String(pk),
-  },
-  {
-    headerTKey: "Application.headings.customer",
-    isSortable: true,
-    key: "applicant",
-    transform: ({ applicantName, pk }: ApplicationView) => (
-      <ExternalTableLink to={getApplicationUrl(pk)}>
-        {truncate(applicantName ?? "-", applicantTruncateLen)}
-        <IconLinkExternal size="xs" aria-hidden />
-      </ExternalTableLink>
-    ),
-  },
-  {
-    headerTKey: "Application.applicantType",
-    isSortable: true,
-    key: "applicantType",
-  },
-  {
-    headerTKey: "Application.headings.unit",
-    isSortable: true,
-    key: "preferredUnitNameFi",
-    transform: ({ units }: ApplicationView) => {
-      const allUnits = units.map((u) => u.name).join(", ");
+const getStatusProps = (
+  status?: ApplicationStatusChoice
+): { type: StatusLabelType; icon: JSX.Element } => {
+  switch (status) {
+    case ApplicationStatusChoice.Draft:
+      return { type: "draft", icon: <IconArrowTopRight aria-hidden /> };
+    case ApplicationStatusChoice.InAllocation:
+      return { type: "alert", icon: <IconClock aria-hidden /> };
+    case ApplicationStatusChoice.Received:
+      return { type: "info", icon: <IconCogwheel aria-hidden /> };
+    case ApplicationStatusChoice.Handled:
+      return { type: "success", icon: <IconCheck aria-hidden /> };
+    case ApplicationStatusChoice.ResultsSent:
+      return { type: "success", icon: <IconEnvelope aria-hidden /> };
+    default:
+      return { type: "neutral", icon: <IconQuestionCircle aria-hidden /> };
+  }
+};
 
-      return (
-        <span title={allUnits}>
-          {truncate(
-            units
-              .filter((_, i) => i < 2)
-              .map((u) => u.name)
-              .join(", "),
-            unitsTruncateLen
-          )}
-        </span>
-      );
-    },
-  },
-  {
-    headerTKey: "Application.headings.applicationCount",
-    key: "applicationCountSort",
-    transform: ({ applicationCount }: ApplicationView) => applicationCount,
-  },
-  {
-    headerTKey: "Application.headings.phase",
-    isSortable: true,
-    key: "application_status",
-    transform: ({ statusView }: ApplicationView) => statusView,
-  },
+export const SORT_KEYS = [
+  "pk",
+  "applicant",
+  "applicantType",
+  "preferredUnitNameFi",
+  "application_status",
 ];
 
 const getColConfig = (t: TFunction) =>
-  COLS.map(({ headerTKey, ...col }) => ({
+  [
+    {
+      headerTKey: "Application.headings.id",
+      key: "pk",
+      transform: ({ pk }: ApplicationView) => String(pk),
+    },
+    {
+      headerTKey: "Application.headings.customer",
+      key: "applicant",
+      transform: ({ applicantName, pk }: ApplicationView) => (
+        <ExternalTableLink to={getApplicationUrl(pk)}>
+          {truncate(applicantName ?? "-", applicantTruncateLen)}
+          <IconLinkExternal size="xs" aria-hidden />
+        </ExternalTableLink>
+      ),
+    },
+    {
+      headerTKey: "Application.applicantType",
+      key: "applicantType",
+    },
+    {
+      headerTKey: "Application.headings.unit",
+      key: "preferredUnitNameFi",
+      transform: ({ units }: ApplicationView) => {
+        const allUnits = units.map((u) => u.name).join(", ");
+
+        return (
+          <span title={allUnits}>
+            {truncate(
+              units
+                .filter((_, i) => i < 2)
+                .map((u) => u.name)
+                .join(", "),
+              unitsTruncateLen
+            )}
+          </span>
+        );
+      },
+    },
+    {
+      headerTKey: "Application.headings.applicationCount",
+      key: "applicationCountSort",
+      transform: ({ applicationCount }: ApplicationView) => applicationCount,
+    },
+    {
+      headerTKey: "Application.headings.phase",
+      key: "application_status",
+      transform: ({ status }: { status: ApplicationStatusChoice }) => {
+        const statusProps = getStatusProps(status);
+        return (
+          <StatusLabel type={statusProps.type} icon={statusProps.icon} slim>
+            {t(`Application.statuses.${status}`)}
+          </StatusLabel>
+        );
+      },
+    },
+  ].map(({ headerTKey, key, ...col }) => ({
     ...col,
+    key,
     headerName: t(headerTKey),
+    isSortable: SORT_KEYS.includes(key) ?? undefined,
   }));
-export const SORT_KEYS = COLS.filter((c) => c.isSortable).map((c) => c.key);
 
 function appMapper(app: Node, t: TFunction): ApplicationView {
   const applicationEvents = (app.applicationSections || [])
@@ -146,8 +178,6 @@ function appMapper(app: Node, t: TFunction): ApplicationView {
     units,
     name,
     status,
-    statusView: <ApplicationStatusCell status={status} />,
-    statusType: app.status ?? undefined,
     applicationCount,
   };
 }

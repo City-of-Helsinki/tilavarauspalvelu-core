@@ -1,7 +1,6 @@
 import { Dialog } from "hds-react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import StatusLabel from "common/src/components/StatusLabel";
 
 export const Seranwrap = styled.div`
   height: 200%;
@@ -61,9 +60,4 @@ export const Element = styled.div<{
     $wide ? "1 / -1" : $start ? "1 / span 1" : "auto / span 1"};
   max-width: ${({ $unlimitedMaxWidth }) =>
     $unlimitedMaxWidth ? "inherit" : "var(--prose-width)"};
-`;
-
-// StatusLabels expand the table cell without this, as they're too high au naturel
-export const TableStatusLabel = styled(StatusLabel)`
-  margin-block: -6px;
 `;

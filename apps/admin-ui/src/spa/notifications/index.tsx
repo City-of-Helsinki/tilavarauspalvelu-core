@@ -18,8 +18,9 @@ import { GQL_MAX_RESULTS_PER_QUERY } from "@/common/const";
 import { CustomTable } from "@/component/Table";
 import { filterNonNullable } from "common/src/helpers";
 import { More } from "@/component/More";
-import { TableLink, TableStatusLabel } from "@/styles/util";
+import { TableLink } from "@/styles/util";
 import type { StatusLabelType } from "common/src/tags";
+import StatusLabel from "common/src/components/StatusLabel";
 import {
   IconCheck,
   IconClock,
@@ -59,9 +60,9 @@ const getColConfig = (t: TFunction) => [
     transform: (notification: NonNullable<BannerNotificationNode>) => {
       const labelProps = getStatusLabelProps(notification.state);
       return (
-        <TableStatusLabel type={labelProps.type} icon={labelProps.icon}>
+        <StatusLabel type={labelProps.type} icon={labelProps.icon} slim>
           {t(`Notifications.state.${notification.state ?? "noState"}`)}
-        </TableStatusLabel>
+        </StatusLabel>
       );
     },
   },

@@ -94,23 +94,23 @@ function getApplicationStatusLabelProps(
     case ApplicationStatusChoice.Draft:
       return {
         type: "draft",
-        icon: <IconPen ariaHidden />,
+        icon: <IconPen aria-hidden="true" />,
       };
     case ApplicationStatusChoice.ResultsSent:
       return {
         type: "success",
-        icon: <IconCheck ariaHidden />,
+        icon: <IconCheck aria-hidden="true" />,
       };
     case ApplicationStatusChoice.InAllocation:
     case ApplicationStatusChoice.Handled:
       return {
         type: "info",
-        icon: <IconCogwheel ariaHidden />,
+        icon: <IconCogwheel aria-hidden="true" />,
       };
     case ApplicationStatusChoice.Received:
       return {
         type: "alert",
-        icon: <IconEnvelope ariaHidden />,
+        icon: <IconEnvelope aria-hidden="true" />,
       };
     // These two should never be shown to the client, so they are shown as any other unexpected status
     case ApplicationStatusChoice.Cancelled:
@@ -118,7 +118,7 @@ function getApplicationStatusLabelProps(
     default:
       return {
         type: "neutral",
-        icon: <IconQuestionCircle ariaHidden />,
+        icon: <IconQuestionCircle aria-hidden="true" />,
       };
   }
 }
@@ -168,7 +168,7 @@ function ApplicationCard({ application, actionCallback }: Props): JSX.Element {
       onClick={() => setIsWaitingForDelete(true)}
       isLoading={isLoading}
       disabled={!editable}
-      iconRight={<IconCross aria-hidden />}
+      iconRight={<IconCross aria-hidden="true" />}
       key="cancel"
     >
       {t("applicationCard:cancel")}
@@ -179,7 +179,7 @@ function ApplicationCard({ application, actionCallback }: Props): JSX.Element {
       key="edit"
     >
       {t("applicationCard:edit")}
-      <IconPen aria-hidden />
+      <IconPen aria-hidden="true" />
     </ButtonLikeLink>,
     <ButtonLikeLink
       href={getApplicationPath(application.pk, "view")}
@@ -187,7 +187,7 @@ function ApplicationCard({ application, actionCallback }: Props): JSX.Element {
       key="view"
     >
       {t("applicationCard:view")}
-      <IconArrowRight aria-hidden />
+      <IconArrowRight aria-hidden="true" />
     </ButtonLikeLink>,
   ];
 

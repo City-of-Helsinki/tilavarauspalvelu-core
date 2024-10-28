@@ -16,8 +16,9 @@ import {
 } from "@/common/util";
 import { CustomTable } from "@/component/Table";
 import { MAX_NAME_LENGTH } from "@/common/const";
-import { TableLink, TableStatusLabel } from "@/styles/util";
+import { TableLink } from "@/styles/util";
 import type { StatusLabelType } from "common/src/tags";
+import StatusLabel from "common/src/components/StatusLabel";
 import {
   IconCheck,
   IconCogwheel,
@@ -50,19 +51,19 @@ const getStatusLabelProps = (
 ): { type: StatusLabelType; icon: JSX.Element } => {
   switch (state) {
     case ReservationStateChoice.Created:
-      return { type: "draft", icon: <IconPen ariaHidden /> };
+      return { type: "draft", icon: <IconPen aria-hidden="true" /> };
     case ReservationStateChoice.Denied:
-      return { type: "error", icon: <IconCross ariaHidden /> };
+      return { type: "error", icon: <IconCross aria-hidden="true" /> };
     case ReservationStateChoice.WaitingForPayment:
-      return { type: "alert", icon: <IconEuroSign ariaHidden /> };
+      return { type: "alert", icon: <IconEuroSign aria-hidden="true" /> };
     case ReservationStateChoice.Cancelled:
-      return { type: "neutral", icon: <IconCross ariaHidden /> };
+      return { type: "neutral", icon: <IconCross aria-hidden="true" /> };
     case ReservationStateChoice.Confirmed:
-      return { type: "success", icon: <IconCheck ariaHidden /> };
+      return { type: "success", icon: <IconCheck aria-hidden="true" /> };
     case ReservationStateChoice.RequiresHandling:
-      return { type: "info", icon: <IconCogwheel ariaHidden /> };
+      return { type: "info", icon: <IconCogwheel aria-hidden="true" /> };
     default:
-      return { type: "info", icon: <IconQuestionCircleFill ariaHidden /> };
+      return { type: "info", icon: <IconQuestionCircleFill aria-hidden /> };
   }
 };
 
@@ -146,9 +147,9 @@ const getColConfig = (t: TFunction): ReservationTableColumn[] => [
       }
       const labelType = getPaymentStatusLabelType(order.status);
       return (
-        <TableStatusLabel type={labelType} icon={<IconEuroSign />}>
+        <StatusLabel type={labelType} icon={<IconEuroSign />} slim>
           {t(`Payment.status.${order.status}`)}
-        </TableStatusLabel>
+        </StatusLabel>
       );
     },
   },
@@ -159,9 +160,9 @@ const getColConfig = (t: TFunction): ReservationTableColumn[] => [
     transform: ({ state }: ReservationType) => {
       const labelProps = getStatusLabelProps(state);
       return (
-        <TableStatusLabel type={labelProps.type} icon={labelProps.icon}>
+        <StatusLabel type={labelProps.type} icon={labelProps.icon} slim>
           {t(`RequestedReservation.state.${state}`)}
-        </TableStatusLabel>
+        </StatusLabel>
       );
     },
   },
