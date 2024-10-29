@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { breakpoints } from "common/src/common/style";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import Loader from "@/component/Loader";
 import Legend from "@/component/Legend";
 import { legend } from "./eventStyleGetter";
 import { UnitCalendar } from "./UnitCalendar";
@@ -45,33 +44,29 @@ function UnitReservationsInner({
   reservationUnitTypes,
 }: InnerProps): JSX.Element {
   const [searchParams] = useSearchParams();
+  const { t } = useTranslation();
 
   const d = searchParams.get("date");
   const currentDate = d ? fromUIDate(d) : startOfDay(new Date());
 
-  const { t } = useTranslation();
+  const date =
+    currentDate && isValidDate(currentDate) ? currentDate : new Date();
 
   const { loading, resources, refetch } = useUnitResources(
-    currentDate ?? new Date(),
+    date,
     unitPk,
     reservationUnitTypes
   );
 
-  const date =
-    currentDate && isValidDate(currentDate) ? currentDate : new Date();
-
   return (
     <>
-      {loading ? (
-        <Loader />
-      ) : (
-        <UnitCalendar
-          date={date}
-          resources={resources}
-          refetch={refetch}
-          unitPk={Number(unitPk)}
-        />
-      )}
+      <UnitCalendar
+        date={date}
+        resources={resources}
+        refetch={refetch}
+        unitPk={Number(unitPk)}
+        isLoading={loading}
+      />
       <LegendContainer>
         <Legends>
           {legend.map((l) => (

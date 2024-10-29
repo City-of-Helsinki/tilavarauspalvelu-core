@@ -9,7 +9,6 @@ import {
 } from "date-fns";
 import React, {
   type CSSProperties,
-  Fragment,
   useCallback,
   useEffect,
   useRef,
@@ -32,6 +31,7 @@ import { ReservationPopupContent } from "./ReservationPopupContent";
 import eventStyleGetter from "./eventStyleGetter";
 import { CreateReservationModal } from "./CreateReservationModal";
 import { useCheckPermission } from "@/hooks";
+import Loader from "@/component/Loader";
 
 type CalendarEventType = CalendarEvent<ReservationUnitReservationsFragment>;
 type Resource = {
@@ -41,6 +41,9 @@ type Resource = {
   isDraft: boolean;
   events: CalendarEventType[];
 };
+
+const N_HOURS = 24;
+const N_COLS = N_HOURS * 2;
 
 const CELL_HEIGHT = 50;
 const TITLE_CELL_WIDTH_CH = 11;
@@ -355,80 +358,84 @@ const EventContainer = styled.div`
   left: 0;
 `;
 
+type EventProps = {
+  event: CalendarEventType;
+  styleGetter: EventStyleGetter;
+};
+
+function Event({ event, styleGetter }: EventProps): JSX.Element {
+  const { t } = useTranslation();
+
+  const title = getEventTitle({ reservation: event, t });
+  const start = new Date(event.start);
+  const endDate = new Date(event.end);
+
+  const eventStartMinutes = start.getHours() * 60 + start.getMinutes();
+  const startMinutes = eventStartMinutes;
+
+  const hourPercent = 100 / N_HOURS;
+  const hours = startMinutes / 60;
+  const left = `${hourPercent * hours}%`;
+
+  const durationMinutes = differenceInMinutes(endDate, start);
+
+  const right = `calc(${left} + ${durationMinutes / 60} * ${
+    100 / N_HOURS
+  }% + 1px)`;
+
+  const reservation = event.event;
+  const testId = `UnitCalendar__RowCalendar--event-${reservation?.pk}`;
+  return (
+    <>
+      <PreBuffer
+        event={event}
+        hourPercent={hourPercent}
+        left={left}
+        style={TemplateProps}
+      />
+      <div
+        style={{
+          left,
+          ...TemplateProps,
+          width: `calc(${durationMinutes / 60} * ${100 / N_HOURS}% - 2px)`,
+          zIndex: 5,
+        }}
+      >
+        <EventContent
+          style={{ ...styleGetter(event).style }}
+          data-testid={testId}
+        >
+          <p>{title}</p>
+          {/* NOTE don't set position on Popup it breaks responsiveness */}
+          <Popup trigger={EventTriggerButton}>
+            {reservation && (
+              <ReservationPopupContent reservation={reservation} />
+            )}
+          </Popup>
+        </EventContent>
+      </div>
+      <PostBuffer
+        event={event}
+        hourPercent={hourPercent}
+        right={right}
+        style={TemplateProps}
+      />
+    </>
+  );
+}
+
 function Events({
-  firstHour,
   events,
   styleGetter,
-  numHours,
 }: {
-  firstHour: number;
   events: CalendarEventType[];
   styleGetter: EventStyleGetter;
-  numHours: number;
 }) {
-  const { t } = useTranslation();
   return (
     <EventContainer data-testid="UnitCalendar__RowCalendar--events">
-      {events.map((e) => {
-        const title = getEventTitle({ reservation: e, t });
-        const startDate = new Date(e.start);
-        const endDate = new Date(e.end);
-        const dayStartDate = new Date(e.start);
-        dayStartDate.setHours(firstHour);
-        dayStartDate.setMinutes(0);
-        dayStartDate.setSeconds(0);
-
-        const startMinutes = differenceInMinutes(startDate, dayStartDate);
-
-        const hourPercent = 100 / numHours;
-        const hours = startMinutes / 60;
-        const left = `${hourPercent * hours}%`;
-
-        const durationMinutes = differenceInMinutes(endDate, startDate);
-
-        const right = `calc(${left} + ${durationMinutes / 60} * ${
-          100 / numHours
-        }% + 1px)`;
-
-        const testId = `UnitCalendar__RowCalendar--event-${e.event?.pk}`;
-        return (
-          <Fragment key={`${title}-${startDate.toISOString()}`}>
-            <PreBuffer
-              event={e}
-              hourPercent={hourPercent}
-              left={left}
-              style={TemplateProps}
-            />
-            <div
-              style={{
-                left,
-                ...TemplateProps,
-                width: `calc(${durationMinutes / 60} * ${
-                  100 / numHours
-                }% - 2px)`,
-                zIndex: 5,
-              }}
-            >
-              <EventContent
-                style={{ ...styleGetter(e).style }}
-                data-testid={testId}
-              >
-                <p>{title}</p>
-                {/* NOTE don't set position on Popup it breaks responsiveness */}
-                <Popup trigger={EventTriggerButton}>
-                  {e.event && <ReservationPopupContent reservation={e.event} />}
-                </Popup>
-              </EventContent>
-            </div>
-            <PostBuffer
-              event={e}
-              hourPercent={hourPercent}
-              right={right}
-              style={TemplateProps}
-            />
-          </Fragment>
-        );
-      })}
+      {events.map((e) => (
+        <Event key={e.event?.pk} event={e} styleGetter={styleGetter} />
+      ))}
     </EventContainer>
   );
 }
@@ -447,6 +454,7 @@ type Props = {
   unitPk: number;
   resources: Resource[];
   refetch: () => void;
+  isLoading?: boolean;
 };
 
 export function UnitCalendar({
@@ -454,11 +462,9 @@ export function UnitCalendar({
   date,
   resources,
   refetch,
+  isLoading,
 }: Props): JSX.Element {
   const calendarRef = useRef<HTMLDivElement>(null);
-  // todo find out min and max opening hour of every reservationunit
-  const [beginHour, endHour] = [0, 24];
-  const numHours = endHour - beginHour;
   const orderedResources = sortByDraftStatusAndTitle([...resources]);
   const { setModalContent } = useModal();
   const startDate = startOfDay(date);
@@ -521,19 +527,23 @@ export function UnitCalendar({
   const margins = windowHeight < MOBILE_CUTOFF ? MOBILE_MARGIN : DESKTOP_MARGIN;
   const containerHeight = windowHeight - margins;
 
+  if (isLoading) {
+    return <Loader />;
+  }
+
   return (
     <Container $height={containerHeight}>
       <HideTimesOverTitles />
-      <FlexContainer $numCols={numHours * 2} ref={calendarRef}>
+      <FlexContainer $numCols={N_COLS} ref={calendarRef}>
         <HeadingRow>
           <div />
           <CellContent
-            $numCols={numHours}
+            $numCols={N_HOURS}
             key="header"
             className="calendar-header"
           >
-            {Array.from(Array(numHours).keys()).map((i, index) => (
-              <Time key={i}>{beginHour + index}</Time>
+            {Array.from(Array(N_HOURS).keys()).map((i, index) => (
+              <Time key={i}>{index}</Time>
             ))}
           </CellContent>
         </HeadingRow>
@@ -544,7 +554,7 @@ export function UnitCalendar({
             </ResourceNameContainer>
             <RowCalendarArea>
               <Cells
-                cols={numHours * 2}
+                cols={N_COLS}
                 date={startDate}
                 reservationUnitPk={row.pk}
                 unitPk={unitPk}
@@ -552,8 +562,6 @@ export function UnitCalendar({
                 onComplete={refetch}
               />
               <Events
-                firstHour={beginHour}
-                numHours={numHours}
                 events={row.events}
                 styleGetter={eventStyleGetter(row.pk)}
               />
