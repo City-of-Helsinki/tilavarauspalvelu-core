@@ -201,3 +201,11 @@ export function calculateMedian(numbers: number[]): number {
   }
   return sorted[middle];
 }
+
+export function constructUrl(basePath: string, page: string): string {
+  const startSlash = page.startsWith("/");
+  const endSlash = basePath.endsWith("/");
+  const hasSlash = startSlash || endSlash;
+  const separator = hasSlash ? "" : "/";
+  return `${basePath}${separator}${page}`;
+}

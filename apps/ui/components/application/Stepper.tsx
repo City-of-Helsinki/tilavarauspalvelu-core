@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { IconCheck } from "hds-react";
 import { useRouter } from "next/router";
 import { fontBold } from "common/src/common/typography";
+import { constructUrl } from "common/src/helpers";
 
 const StepContainer = styled.div<{ $disabled: boolean }>`
   ${({ $disabled }) =>
@@ -108,8 +109,7 @@ const Stepper = ({
         return;
       }
     }
-
-    push(`${basePath}/${page}`);
+    push(constructUrl(basePath, page));
   };
 
   return (

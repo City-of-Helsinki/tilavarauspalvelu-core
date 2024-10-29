@@ -110,7 +110,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       props: {
         ...commonProps,
         notFound: true,
-        slug,
+        slug: slug ?? "page1",
         ...(await serverSideTranslations(locale ?? "fi")),
       },
       notFound: true,
@@ -139,7 +139,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       props: {
         ...commonProps,
         notFound: true,
-        slug,
+        slug: slug ?? "page1",
         ...(await serverSideTranslations(locale ?? "fi")),
       },
       notFound: true,
@@ -149,7 +149,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   return {
     props: {
       ...commonProps,
-      slug,
+      slug: slug ?? "page1",
       ...(await serverSideTranslations(locale ?? "fi")),
       data: {
         application,
