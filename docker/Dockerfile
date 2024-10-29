@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/python:3.12-slim-bullseye AS base
+FROM public.ecr.aws/docker/library/python:3.13-slim-bullseye AS base
 
 # Make sure we build as the root user.
 USER root
@@ -54,11 +54,12 @@ ARG DEPS=main,admin,celery
 # Install build dependencies
 # - build-essential: for building uWSGI
 # - curl: for installing poetry
-# - libpcre3 & libpcre3-dev: for uWSGI internal routing support
+# - libpcre2-dev & libpcre3 & libpcre3-dev: for uWSGI internal routing support
 # - libpq-dev: for building psycopg2
 RUN apt-get install -y --no-install-recommends \
       build-essential \
       curl \
+      libpcre2-dev \
       libpcre3 \
       libpcre3-dev \
       libpq-dev \

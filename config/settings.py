@@ -5,6 +5,7 @@ from pathlib import Path
 
 from django.utils.translation import gettext_lazy as _
 from env_config import Environment, values
+from env_config.decorators import classproperty
 from helusers.defaults import SOCIAL_AUTH_PIPELINE
 
 try:
@@ -113,8 +114,7 @@ class Common(Environment):
     SOURCE_BRANCH_NAME: str = values.StringValue(default="")
     SOURCE_VERSION: str = values.StringValue(default="")
 
-    @classmethod
-    @property
+    @classproperty
     def APP_VERSION(cls) -> str:
         """Either the release tag or git short hash (or "local" if running locally)"""
         return cls.SOURCE_BRANCH_NAME.replace("main", "") or cls.SOURCE_VERSION[:8] or "local"
@@ -214,8 +214,7 @@ class Common(Environment):
 
     APP_LOGGING_LEVEL = values.StringValue(default="WARNING")
 
-    @classmethod
-    @property
+    @classproperty
     def LOGGING(cls):
         return {
             "version": 1,
@@ -324,16 +323,14 @@ class Common(Environment):
         "tilavarauspalvelu.utils.helauth.pipeline.migrate_user_from_tunnistamo_to_keycloak",
     )
 
-    @classmethod
-    @property
+    @classproperty
     def OIDC_AUTH(cls):
         # See 'oidc_auth/settings.py'
         return {
             "OIDC_LEEWAY": cls.OIDC_LEEWAY,
         }
 
-    @classmethod
-    @property
+    @classproperty
     def OIDC_API_TOKEN_AUTH(cls):
         # See 'helusers/settings.py'
         return {
@@ -412,13 +409,11 @@ class Common(Environment):
     CELERY_QUEUE_FOLDER_IN = values.StringValue(default="/broker/queue/")
     CELERY_PROCESSED_FOLDER = values.StringValue(default="/broker/processed/")
 
-    @classmethod
-    @property
+    @classproperty
     def CELERY_BROKER_URL(cls):
         return "filesystem://"
 
-    @classmethod
-    @property
+    @classproperty
     def CELERY_BROKER_TRANSPORT_OPTIONS(cls):
         # Use filesystem as message broker
         return {
@@ -432,8 +427,7 @@ class Common(Environment):
 
     REDIS_URL = values.StringValue()
 
-    @classmethod
-    @property
+    @classproperty
     def CACHES(cls):
         return {
             "default": {
@@ -450,8 +444,7 @@ class Common(Environment):
     ELASTICSEARCH_URL = values.StringValue()
     DISABLE_ELASTICSEARCH_INDEXES = values.BooleanValue(default=False)
 
-    @classmethod
-    @property
+    @classproperty
     def SEARCH_SETTINGS(cls):
         return {
             "connections": {
@@ -686,8 +679,7 @@ class Local(Common, overrides_from=LocalMixin):
 
     ELASTICSEARCH_URL = values.StringValue(default="http://localhost:9200")
 
-    @classmethod
-    @property
+    @classproperty
     def SEARCH_SETTINGS(cls):
         search_settings = super().SEARCH_SETTINGS
         search_settings["settings"]["mappings_dir"] = str(Common.BASE_DIR / "config" / "elasticsearch")
@@ -740,13 +732,11 @@ class Docker(Common, overrides_from=DockerMixin):
     REDIS_URL = values.StringValue(default="redis://redis:6379/0")
     ELASTICSEARCH_URL = values.StringValue(default="http://elastic:9200")
 
-    @classmethod
-    @property
+    @classproperty
     def CELERY_BROKER_URL(cls):
         return cls.REDIS_URL
 
-    @classmethod
-    @property
+    @classproperty
     def CELERY_BROKER_TRANSPORT_OPTIONS(cls):
         return {}
 
@@ -868,8 +858,7 @@ class AutomatedTests(EmptyDefaults, Common, dotenv_path=None, overrides_from=Aut
 
     ELASTICSEARCH_URL = values.StringValue(default="http://localhost:9200")
 
-    @classmethod
-    @property
+    @classproperty
     def SEARCH_SETTINGS(cls):
         search_settings = super().SEARCH_SETTINGS
         search_settings["settings"]["mappings_dir"] = str(Common.BASE_DIR / "config" / "elasticsearch")
@@ -941,8 +930,7 @@ class Platta(Common, use_environ=True):
 
     DJANGO_REDIS_CONNECTION_FACTORY = "django_redis.pool.SentinelConnectionFactory"
 
-    @classmethod
-    @property
+    @classproperty
     def CACHES(cls):
         sentinel_host, sentinel_port = cls.REDIS_SENTINEL_SERVICE.split(":")
         return {
@@ -960,13 +948,11 @@ class Platta(Common, use_environ=True):
 
     # --- Celery settings --------------------------------------------------------------------------------------------
 
-    @classmethod
-    @property
+    @classproperty
     def CELERY_BROKER_URL(cls):
         return f"sentinel://:{cls.REDIS_PASSWORD}@{cls.REDIS_SENTINEL_SERVICE}"
 
-    @classmethod
-    @property
+    @classproperty
     def CELERY_BROKER_TRANSPORT_OPTIONS(cls):
         # Use redis as message broker
         return {

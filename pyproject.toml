@@ -9,7 +9,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.12,<3.13"
+python = ">=3.13,<3.14"
 Django = "5.1.3"
 django-auditlog = "3.0.0"
 django-cors-headers = "4.6.0"
@@ -87,7 +87,7 @@ tilavarauspalvelu = "tests.plugins"
 fix = true
 unsafe-fixes = true
 line-length = 120
-target-version = "py312"
+target-version = "py313"
 extend-exclude = [
     "build",
     "local_settings.py",
