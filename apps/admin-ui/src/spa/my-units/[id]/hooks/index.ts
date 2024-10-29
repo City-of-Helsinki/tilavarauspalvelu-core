@@ -7,6 +7,9 @@ import { base64encode, filterNonNullable } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { errorToast } from "common/src/common/toast";
 
+// TODO this should be split into two queries one for the reservation units and one for the daily reservations
+// since the reservation units only change on page load
+// reservations change when the date changes
 export function useUnitResources(
   begin: Date,
   unitPk: string,
@@ -20,7 +23,6 @@ export function useUnitResources(
       id,
       pk: Number(unitPk),
       beginDate: toApiDate(begin) ?? "",
-      // TODO should this be +1 day? or is it already inclusive? seems to be inclusive
       endDate: toApiDate(begin) ?? "",
       state: RELATED_RESERVATION_STATES,
     },
@@ -30,10 +32,10 @@ export function useUnitResources(
   });
 
   const { affectingReservations } = data ?? {};
-  const reservationunitSet = filterNonNullable(data?.unit?.reservationUnits);
+  const resUnits = filterNonNullable(data?.unit?.reservationUnits);
 
   type ReservationType = NonNullable<typeof affectingReservations>[0];
-  type ReservationUnitType = NonNullable<typeof reservationunitSet>[0];
+  type ReservationUnitType = NonNullable<typeof resUnits>[0];
   function convertToEvent(y: ReservationType, x: ReservationUnitType) {
     return {
       ...y,
@@ -55,7 +57,7 @@ export function useUnitResources(
     );
   }
 
-  const resources = reservationunitSet
+  const resources = resUnits
     .filter(
       (x) =>
         !reservationUnitTypes?.length ||
@@ -66,12 +68,11 @@ export function useUnitResources(
       const affecting = affectingReservations?.filter((y) =>
         doesReservationAffectReservationUnit(y, x.pk ?? 0)
       );
-      const _events = x.reservations?.concat(affecting ?? []);
-      const events = filterNonNullable(_events);
+      const events = filterNonNullable(affecting);
 
       return {
         title: x.nameFi ?? "",
-        url: String(x.pk || 0),
+        url: String(x.pk ?? 0),
         isDraft: x.isDraft,
         pk: x.pk ?? 0,
         events: events.map((y) => ({

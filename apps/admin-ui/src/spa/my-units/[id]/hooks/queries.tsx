@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import {
-  RESERVATIONUNIT_RESERVATIONS_FRAGMENT,
   RESERVATION_UNIT_FRAGMENT,
   UNIT_NAME_FRAGMENT,
 } from "@/common/fragments";
@@ -62,7 +61,6 @@ export const UNIT_VIEW_QUERY = gql`
 `;
 
 export const RESERVATION_UNITS_BY_UNIT = gql`
-  ${RESERVATIONUNIT_RESERVATIONS_FRAGMENT}
   query ReservationUnitsByUnit(
     $id: ID!
     $pk: Int!
@@ -88,9 +86,6 @@ export const RESERVATION_UNITS_BY_UNIT = gql`
         bufferTimeAfter
         isDraft
         authentication
-        reservations(beginDate: $beginDate, endDate: $endDate, state: $state) {
-          ...ReservationUnitReservations
-        }
       }
     }
     affectingReservations(

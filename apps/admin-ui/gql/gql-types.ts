@@ -7823,40 +7823,6 @@ export type ReservationUnitsByUnitQuery = {
       authentication: Authentication;
       spaces: Array<{ id: string; pk?: number | null }>;
       reservationUnitType?: { id: string; pk?: number | null } | null;
-      reservations?: Array<{
-        name?: string | null;
-        numPersons?: number | null;
-        calendarUrl?: string | null;
-        affectedReservationUnits?: Array<number | null> | null;
-        id: string;
-        pk?: number | null;
-        begin: string;
-        end: string;
-        createdAt?: string | null;
-        state?: ReservationStateChoice | null;
-        type?: ReservationTypeChoice | null;
-        isBlocked?: boolean | null;
-        workingMemo?: string | null;
-        reserveeName?: string | null;
-        bufferTimeBefore: number;
-        bufferTimeAfter: number;
-        reservationUnits: Array<{
-          id: string;
-          pk?: number | null;
-          nameFi?: string | null;
-          bufferTimeBefore: number;
-          bufferTimeAfter: number;
-          unit?: { id: string; pk?: number | null } | null;
-        }>;
-        user?: {
-          id: string;
-          firstName: string;
-          lastName: string;
-          email: string;
-          pk?: number | null;
-        } | null;
-        paymentOrder: Array<{ id: string; status?: OrderStatus | null }>;
-      }> | null;
     }>;
   } | null;
   affectingReservations?: Array<{
@@ -14059,9 +14025,6 @@ export const ReservationUnitsByUnitDocument = gql`
         bufferTimeAfter
         isDraft
         authentication
-        reservations(beginDate: $beginDate, endDate: $endDate, state: $state) {
-          ...ReservationUnitReservations
-        }
       }
     }
     affectingReservations(
