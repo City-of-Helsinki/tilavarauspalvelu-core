@@ -120,9 +120,6 @@ export const RESERVATION_UNIT_PARAMS_PAGE_QUERY = gql`
 const IS_RESERVABLE_FRAGMENT = gql`
   ${BLOCKING_RESERVATION_FRAGMENT}
   fragment IsReservableFields on ReservationUnitNode {
-    reservations(state: $state) {
-      ...BlockingReservationFields
-    }
     bufferTimeBefore
     bufferTimeAfter
     reservableTimeSpans(startDate: $beginDate, endDate: $endDate) {

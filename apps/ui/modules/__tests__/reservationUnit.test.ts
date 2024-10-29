@@ -99,6 +99,7 @@ describe("getPossibleTimesForDay", () => {
       activeApplicationRounds: [] as const,
       reservableTimes: reservableTimes ?? mockReservableTimes(),
       durationValue: duration ?? 30,
+      blockingReservations: [] as const,
     };
   }
 

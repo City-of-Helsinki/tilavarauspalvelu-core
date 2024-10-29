@@ -29,6 +29,7 @@ import {
   type IsReservableFieldsFragment,
   ReservationStartInterval,
   Maybe,
+  BlockingReservationFieldsFragment,
 } from "@gql/gql-types";
 import { capitalize, getTranslation } from "./util";
 import {
@@ -421,6 +422,7 @@ export function getPossibleTimesForDay({
   reservationUnit,
   activeApplicationRounds,
   durationValue,
+  blockingReservations,
 }: {
   reservableTimes: ReservableMap;
   interval: ReservationUnitNode["reservationStartInterval"];
@@ -428,6 +430,7 @@ export function getPossibleTimesForDay({
   reservationUnit: Omit<IsReservableFieldsFragment, "reservableTimeSpans">;
   activeApplicationRounds: readonly RoundPeriod[];
   durationValue: number;
+  blockingReservations: readonly BlockingReservationFieldsFragment[];
 }): { label: string; value: string }[] {
   const allTimes: Array<{ h: number; m: number }> = [];
   const slotsForDay = reservableTimes.get(dateToKey(date)) ?? [];
@@ -462,6 +465,7 @@ export function getPossibleTimesForDay({
         return false;
       }
       const isReservable = isRangeReservable({
+        blockingReservations,
         range: {
           start: slotDate,
           end: addMinutes(slotDate, durationValue),

@@ -14,6 +14,7 @@ import {
   isStartTimeValid,
 } from "../reservable";
 import {
+  BlockingReservationFieldsFragment,
   type IsReservableFieldsFragment,
   ReservationStartInterval,
   ReservationStateChoice,
@@ -322,7 +323,7 @@ describe("isRangeReservable", () => {
     bufferTimeBefore?: number;
     bufferTimeAfter?: number;
     reservableTimes?: ReservableMap;
-    reservations?: IsReservableFieldsFragment["reservations"];
+    reservations?: BlockingReservationFieldsFragment[];
     interval?: ReservationStartInterval;
     maxReservationDuration?: IsReservableFieldsFragment["maxReservationDuration"];
     minReservationDuration?: IsReservableFieldsFragment["minReservationDuration"];
@@ -338,6 +339,7 @@ describe("isRangeReservable", () => {
       reservationUnit: createMockReservationUnit(rest),
       activeApplicationRounds: activeApplicationRounds ?? [],
       reservableTimes: reservableTimes ?? mockReservableTimes(),
+      blockingReservations: rest.reservations ?? [],
     };
   }
 

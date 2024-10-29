@@ -220,6 +220,7 @@ describe("getNextAvailableTime", () => {
       },
       reservableTimes,
       activeApplicationRounds: activeApplicationRounds ?? [],
+      blockingReservations: [],
     };
   }
 

@@ -9,8 +9,9 @@ import {
   type ReservableTimeSpanType,
   ReservationStateChoice,
   type Maybe,
+  BlockingReservationFieldsFragment,
 } from "@/gql/gql-types";
-import { dayMax, dayMin, filterNonNullable } from "common/src/helpers";
+import { dayMax, dayMin } from "common/src/helpers";
 import {
   differenceInSeconds,
   isValid,
@@ -156,6 +157,7 @@ type ReservationUnitReservableProps = {
   };
   reservationUnit: Omit<IsReservableFieldsFragment, "reservableTimeSpans">;
   reservableTimes: ReservableMap;
+  blockingReservations: readonly BlockingReservationFieldsFragment[];
   activeApplicationRounds: readonly RoundPeriod[];
 };
 
@@ -166,9 +168,9 @@ export function isRangeReservable({
   reservationUnit,
   activeApplicationRounds,
   reservableTimes,
+  blockingReservations,
 }: ReservationUnitReservableProps): boolean {
   const {
-    reservations,
     bufferTimeBefore,
     bufferTimeAfter,
     maxReservationDuration,
@@ -240,7 +242,7 @@ export function isRangeReservable({
 
   // This is the slowest part of the function => run it last
   // because the reservationSet includes every reservation not just for the selected day
-  const others = filterNonNullable(reservations)
+  const others = blockingReservations
     .filter(shouldReservationBlock)
     .filter((r) => {
       const rStart = new Date(r.begin);

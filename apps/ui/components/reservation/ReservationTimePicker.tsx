@@ -1,6 +1,7 @@
 import React, { Children, useEffect, useMemo, useState } from "react";
 import classNames from "classnames";
 import {
+  BlockingReservationFieldsFragment,
   ReservationNode,
   ReservationTypeChoice,
   ReservationUnitPageQuery,
@@ -105,6 +106,7 @@ type Props = {
   reservationUnit: NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
   reservableTimes: ReservableMap;
   activeApplicationRounds: readonly RoundPeriod[];
+  blockingReservations: readonly BlockingReservationFieldsFragment[];
   reservationForm: UseFormReturn<PendingReservationFormType>;
   isReservationQuotaReached: boolean;
   submitReservation: (d: PendingReservationFormType) => void;
@@ -147,8 +149,10 @@ function useSlotPropGetter({
 function useCalendarEventChange({
   reservationUnit,
   focusSlot,
+  blockingReservations,
 }: Pick<Props, "reservationUnit"> & {
   focusSlot: ReturnType<typeof convertFormToFocustimeSlot>;
+  blockingReservations: readonly BlockingReservationFieldsFragment[];
 }): Array<CalendarEventBuffer | CalendarEvent<ReservationNode>> {
   const { t } = useTranslation();
   // TODO this doesn't optimize anything
@@ -156,9 +160,7 @@ function useCalendarEventChange({
   const calendarEvents: Array<
     CalendarEventBuffer | CalendarEvent<ReservationNode>
   > = useMemo(() => {
-    const existingReservations = filterNonNullable(
-      reservationUnit.reservations
-    );
+    const existingReservations = blockingReservations;
 
     const shouldDisplayFocusSlot = focusSlot.isReservable;
 
@@ -214,7 +216,7 @@ function useCalendarEventChange({
         ...(pendingReservation != null ? [pendingReservation] : []),
       ]),
     ];
-  }, [reservationUnit, t, focusSlot]);
+  }, [reservationUnit, t, focusSlot, blockingReservations]);
 
   return calendarEvents;
 }
@@ -228,6 +230,7 @@ export function ReservationTimePicker({
   loginAndSubmitButton,
   submitReservation,
   startingTimeOptions,
+  blockingReservations,
 }: Props) {
   const { t, i18n } = useTranslation();
   const [calendarViewType, setCalendarViewType] = useState<WeekOptions>("week");
@@ -248,11 +251,13 @@ export function ReservationTimePicker({
     reservationUnit,
     activeApplicationRounds,
     reservableTimes,
+    blockingReservations,
   });
 
   const calendarEvents = useCalendarEventChange({
     reservationUnit,
     focusSlot,
+    blockingReservations,
   });
   const slotPropGetter = useSlotPropGetter({
     reservableTimes,
@@ -294,6 +299,7 @@ export function ReservationTimePicker({
       reservationUnit,
       reservableTimes,
       activeApplicationRounds,
+      blockingReservations,
     });
 
     if (!isReservable) {
@@ -351,6 +357,7 @@ export function ReservationTimePicker({
       reservationUnit,
       reservableTimes,
       activeApplicationRounds,
+      blockingReservations,
     });
     if (!isReservable) {
       return false;

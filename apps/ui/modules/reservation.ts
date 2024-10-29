@@ -20,6 +20,7 @@ import {
   OrderStatus,
   type ReservationOrderStatusFragment,
   type CancellationRuleFieldsFragment,
+  BlockingReservationFieldsFragment,
 } from "@gql/gql-types";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
 import { getIntervalMinutes } from "common/src/conversion";
@@ -252,6 +253,7 @@ export type CanReservationBeChangedProps = {
   newReservation: PendingReservation;
   reservationUnit: IsReservableFieldsFragment;
   activeApplicationRounds: readonly RoundPeriod[];
+  blockingReservations: readonly BlockingReservationFieldsFragment[];
 };
 
 export function getWhyReservationCantBeChanged(
@@ -314,6 +316,7 @@ export function canReservationTimeBeChanged({
   reservableTimes,
   reservationUnit,
   activeApplicationRounds,
+  blockingReservations,
 }: CanReservationBeChangedProps): boolean {
   if (reservation == null) {
     return false;
@@ -338,6 +341,7 @@ export function canReservationTimeBeChanged({
 
   //  new reservation is valid
   return isRangeReservable({
+    blockingReservations,
     range: {
       start: new Date(newReservation.begin),
       end: new Date(newReservation.end),
@@ -515,11 +519,13 @@ export function convertFormToFocustimeSlot({
   reservationUnit,
   reservableTimes,
   activeApplicationRounds,
+  blockingReservations,
 }: {
   data: PendingReservationFormType;
   reservationUnit: Omit<IsReservableFieldsFragment, "reservableTimeSpans">;
   reservableTimes: ReservableMap;
   activeApplicationRounds: readonly RoundPeriod[];
+  blockingReservations: readonly BlockingReservationFieldsFragment[];
 }): FocusTimeSlot | { isReservable: false } {
   const [hours, minutes]: Array<number | undefined> = data.time
     .split(":")
@@ -538,6 +544,7 @@ export function convertFormToFocustimeSlot({
 
   const end = addMinutes(start, data.duration);
   const isReservable = isRangeReservable({
+    blockingReservations,
     range: {
       start,
       end,

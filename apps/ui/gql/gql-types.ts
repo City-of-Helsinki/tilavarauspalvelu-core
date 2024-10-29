@@ -6515,19 +6515,6 @@ export type IsReservableFieldsFragment = {
   reservationsMinDaysBefore?: number | null;
   reservationBegins?: string | null;
   reservationEnds?: string | null;
-  reservations?: Array<{
-    pk?: number | null;
-    id: string;
-    state?: ReservationStateChoice | null;
-    isBlocked?: boolean | null;
-    begin: string;
-    end: string;
-    numPersons?: number | null;
-    calendarUrl?: string | null;
-    bufferTimeBefore: number;
-    bufferTimeAfter: number;
-    affectedReservationUnits?: Array<number | null> | null;
-  }> | null;
   reservableTimeSpans?: Array<{
     startDatetime?: string | null;
     endDatetime?: string | null;
@@ -6626,19 +6613,6 @@ export type ReservationUnitPageQuery = {
         nameSv?: string | null;
       };
     }>;
-    reservations?: Array<{
-      pk?: number | null;
-      id: string;
-      state?: ReservationStateChoice | null;
-      isBlocked?: boolean | null;
-      begin: string;
-      end: string;
-      numPersons?: number | null;
-      calendarUrl?: string | null;
-      bufferTimeBefore: number;
-      bufferTimeAfter: number;
-      affectedReservationUnits?: Array<number | null> | null;
-    }> | null;
     reservableTimeSpans?: Array<{
       startDatetime?: string | null;
       endDatetime?: string | null;
@@ -8001,9 +7975,6 @@ export const BlockingReservationFieldsFragmentDoc = gql`
 `;
 export const IsReservableFieldsFragmentDoc = gql`
   fragment IsReservableFields on ReservationUnitNode {
-    reservations(state: $state) {
-      ...BlockingReservationFields
-    }
     bufferTimeBefore
     bufferTimeAfter
     reservableTimeSpans(startDate: $beginDate, endDate: $endDate) {
@@ -8018,7 +7989,6 @@ export const IsReservableFieldsFragmentDoc = gql`
     reservationBegins
     reservationEnds
   }
-  ${BlockingReservationFieldsFragmentDoc}
 `;
 export const ReservationUnitNameFieldsFragmentDoc = gql`
   fragment ReservationUnitNameFields on ReservationUnitNode {

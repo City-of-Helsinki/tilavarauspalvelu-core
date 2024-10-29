@@ -35,7 +35,6 @@ type MockReservationUnitProps = {
   bufferTimeBefore?: number;
   bufferTimeAfter?: number;
   reservableTimes?: ReservableMap;
-  reservations?: IsReservableFieldsFragment["reservations"];
   interval?: ReservationStartInterval;
   maxReservationDuration?: IsReservableFieldsFragment["maxReservationDuration"];
   minReservationDuration?: IsReservableFieldsFragment["minReservationDuration"];
@@ -47,7 +46,6 @@ type MockReservationUnitProps = {
 export function createMockReservationUnit({
   bufferTimeBefore = 0,
   bufferTimeAfter = 0,
-  reservations = [],
   interval = ReservationStartInterval.Interval_15Mins,
   maxReservationDuration = 0,
   minReservationDuration = 0,
@@ -55,7 +53,6 @@ export function createMockReservationUnit({
   reservationsMaxDaysBefore = null,
 }: MockReservationUnitProps): ReservationUnitType {
   const reservationUnit: ReservationUnitType = {
-    reservations,
     bufferTimeBefore: 60 * 60 * bufferTimeBefore,
     bufferTimeAfter: 60 * 60 * bufferTimeAfter,
     maxReservationDuration,

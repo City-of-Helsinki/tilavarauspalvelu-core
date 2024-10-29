@@ -66,7 +66,13 @@ const HeadingSection = styled.div`
 `;
 
 function ReservationEditPage(props: PropsNarrowed): JSX.Element {
-  const { reservation, reservationUnit, apiBaseUrl, options } = props;
+  const {
+    reservation,
+    reservationUnit,
+    apiBaseUrl,
+    options,
+    blockingReservations,
+  } = props;
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
@@ -211,6 +217,7 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
           nextStep={() => setStep(1)}
           apiBaseUrl={apiBaseUrl}
           isLoading={false}
+          blockingReservations={blockingReservations}
         />
       ) : (
         <EditStep1
@@ -291,31 +298,10 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     const options = await queryOptions(client, locale ?? "");
 
     const timespans = filterNonNullable(reservationUnit?.reservableTimeSpans);
-    const reservableTimeSpans = timespans;
-    const doesReservationAffectReservationUnit = (
-      res: (typeof affectingReservations)[0],
-      reservationUnitPk: number
-    ) => {
-      return res.affectedReservationUnits?.some(
-        (pk_) => pk_ === reservationUnitPk
-      );
-    };
-    const reservationSet = filterNonNullable(
-      reservationUnitData?.reservationUnit?.reservations
-    );
-    const affectingReservations = filterNonNullable(
+    const reservations = filterNonNullable(
       reservationUnitData?.affectingReservations
     );
 
-    const reservations = filterNonNullable(
-      reservationSet?.concat(
-        affectingReservations?.filter((y) =>
-          doesReservationAffectReservationUnit(y, resUnitPk ?? 0)
-        ) ?? []
-      )
-    );
-
-    // TODO check for nulls and return notFound if necessary
     if (
       reservation != null &&
       reservationUnit != null &&
@@ -329,12 +315,9 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
           pk,
           reservation,
           options,
-          // TODO the queries should be combined so that we don't need to do this
-          reservationUnit: {
-            ...reservationUnit,
-            reservableTimeSpans: reservableTimeSpans ?? null,
-            reservationSet: reservations ?? null,
-          },
+          reservationUnit,
+          reservableTimeSpans: timespans,
+          blockingReservations: reservations,
         },
       };
     }

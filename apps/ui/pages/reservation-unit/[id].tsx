@@ -204,27 +204,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       ? null
       : Number(queryParams.get("duration"));
 
-    const affectingReservations = filterNonNullable(
+    const blockingReservations = filterNonNullable(
       reservationUnitData?.affectingReservations
-    );
-    const reservationSet = filterNonNullable(
-      reservationUnitData?.reservationUnit?.reservations
-    );
-    const doesReservationAffectReservationUnit = (
-      reservation: (typeof affectingReservations)[0],
-      resUnitPk: number
-    ) => {
-      return reservation.affectedReservationUnits?.some(
-        (affectedPk) => affectedPk === resUnitPk
-      );
-    };
-
-    const reservations = filterNonNullable(
-      reservationSet?.concat(
-        affectingReservations?.filter((y) =>
-          doesReservationAffectReservationUnit(y, pk)
-        ) ?? []
-      )
     );
 
     return {
@@ -232,12 +213,9 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         key: `${pk}-${locale}`,
         ...commonProps,
         ...(await serverSideTranslations(locale ?? "fi")),
-        // TODO don't edit the GQL response (requires refactoring the component)
-        reservationUnit: {
-          ...reservationUnit,
-          reservableTimeSpans,
-          reservationSet: reservations,
-        },
+        reservationUnit,
+        reservableTimeSpans,
+        blockingReservations,
         relatedReservationUnits,
         activeApplicationRounds,
         termsOfUse: { genericTerms: bookingTerms },
@@ -365,6 +343,7 @@ function ReservationUnit({
   reservationUnit,
   relatedReservationUnits,
   activeApplicationRounds,
+  blockingReservations,
   termsOfUse,
   isPostLogin,
   apiBaseUrl,
@@ -430,6 +409,7 @@ function ReservationUnit({
         reservationUnit,
         reservableTimes,
         activeApplicationRounds,
+        blockingReservations,
       }) ?? {};
     if (!slot.isReservable) {
       throw new Error("Reservation slot is not reservable");
@@ -461,6 +441,7 @@ function ReservationUnit({
       reservationUnit,
       reservableTimes,
       activeApplicationRounds,
+      blockingReservations,
     });
   }, [
     dateValue,
@@ -469,6 +450,7 @@ function ReservationUnit({
     reservationUnit,
     reservableTimes,
     activeApplicationRounds,
+    blockingReservations,
   ]);
 
   const isReservationQuotaReached =
@@ -639,6 +621,7 @@ function ReservationUnit({
     reservationUnit,
     activeApplicationRounds,
     durationValue,
+    blockingReservations,
   });
   const nextAvailableTime = getNextAvailableTime({
     start: focusDate,
@@ -646,6 +629,7 @@ function ReservationUnit({
     duration: durationValue,
     reservationUnit,
     activeApplicationRounds,
+    blockingReservations,
   });
 
   const isUnitReservable =
@@ -724,6 +708,7 @@ function ReservationUnit({
                 loginAndSubmitButton={LoginAndSubmit}
                 startingTimeOptions={startingTimeOptions}
                 submitReservation={submitReservation}
+                blockingReservations={blockingReservations}
               />
             </CalendarWrapper>
           )}

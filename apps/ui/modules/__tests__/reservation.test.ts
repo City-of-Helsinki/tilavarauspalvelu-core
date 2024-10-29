@@ -601,6 +601,7 @@ describe("canReservationBeChanged", () => {
       },
       reservationUnit: baseUnit,
       activeApplicationRounds: [],
+      blockingReservations: [],
     };
   }
 

@@ -1,6 +1,7 @@
 import { breakpoints } from "common/src/common/style";
 import type { PendingReservation } from "@/modules/types";
 import type {
+  BlockingReservationFieldsFragment,
   ReservationQuery,
   ReservationUnitPageQuery,
 } from "@gql/gql-types";
@@ -9,7 +10,6 @@ import { Button, IconArrowRight, IconCross } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { filterNonNullable } from "common/src/helpers";
 import {
   canReservationTimeBeChanged,
   convertFormToFocustimeSlot,
@@ -48,6 +48,7 @@ type Props = {
   reservationUnit: ReservationUnitNodeT;
   reservationForm: UseFormReturn<PendingReservationFormType>;
   activeApplicationRounds: readonly RoundPeriod[];
+  blockingReservations: readonly BlockingReservationFieldsFragment[];
   nextStep: () => void;
   apiBaseUrl: string;
   isLoading: boolean;
@@ -103,22 +104,6 @@ const PinkBox = styled.div`
   }
 `;
 
-/// To check availability for the reservation.
-/// The check functions use the reservationUnit instead of a list of other reservations
-/// so have to do some questionable edits.
-function getWithoutThisReservation(
-  reservationUnit: ReservationUnitNodeT,
-  reservation: ReservationNodeT
-): ReservationUnitNodeT {
-  const otherReservations = filterNonNullable(
-    reservationUnit?.reservations?.filter((n) => n?.pk !== reservation.pk)
-  );
-  return {
-    ...reservationUnit,
-    reservations: otherReservations,
-  };
-}
-
 export function EditStep0({
   reservation,
   reservationUnit,
@@ -126,6 +111,7 @@ export function EditStep0({
   reservationForm,
   nextStep,
   isLoading,
+  blockingReservations: blockingReservationsOrig,
 }: Props): JSX.Element {
   const { t, i18n } = useTranslation();
 
@@ -139,14 +125,17 @@ export function EditStep0({
 
   const reservableTimes = useReservableTimes(reservationUnit);
 
-  const resUnit = getWithoutThisReservation(reservationUnit, reservation);
+  const blockingReservations = blockingReservationsOrig.filter(
+    (r) => r.pk !== reservation.pk
+  );
 
   const submitReservation = (data: PendingReservationFormType) => {
     const slot = convertFormToFocustimeSlot({
       data,
-      reservationUnit: resUnit,
+      reservationUnit,
       reservableTimes,
       activeApplicationRounds,
+      blockingReservations,
     });
     if (!slot.isReservable) {
       return;
@@ -173,8 +162,9 @@ export function EditStep0({
       reservation,
       newReservation,
       reservableTimes,
-      reservationUnit: resUnit,
+      reservationUnit,
       activeApplicationRounds,
+      blockingReservations,
     });
 
     if (isNewReservationValid) {
@@ -191,25 +181,28 @@ export function EditStep0({
   const durationOptions = getDurationOptions(reservationUnit, t);
   const focusSlot = convertFormToFocustimeSlot({
     data: watch(),
-    reservationUnit: resUnit,
+    reservationUnit,
     reservableTimes,
     activeApplicationRounds,
+    blockingReservations,
   });
   const startingTimeOptions = getPossibleTimesForDay({
     reservableTimes,
     interval: reservationUnit?.reservationStartInterval,
     date: fromUIDate(watch("date") ?? "") ?? new Date(),
-    reservationUnit: resUnit,
+    reservationUnit,
     activeApplicationRounds,
     durationValue,
+    blockingReservations,
   });
 
   const nextAvailableTime = getNextAvailableTime({
     start: focusDate,
     reservableTimes,
     duration: durationValue,
-    reservationUnit: resUnit,
+    reservationUnit,
     activeApplicationRounds,
+    blockingReservations,
   });
 
   const lang = convertLanguageCode(i18n.language);
@@ -245,13 +238,14 @@ export function EditStep0({
       />
       <StyledCalendarWrapper>
         <ReservationTimePicker
-          reservationUnit={resUnit}
+          reservationUnit={reservationUnit}
           reservableTimes={reservableTimes}
           activeApplicationRounds={activeApplicationRounds}
           reservationForm={reservationForm}
           isReservationQuotaReached={false}
           startingTimeOptions={startingTimeOptions}
           submitReservation={submitReservation}
+          blockingReservations={blockingReservations}
         />
       </StyledCalendarWrapper>
       <form

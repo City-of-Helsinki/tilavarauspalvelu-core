@@ -7,6 +7,7 @@ import {
   startOfDay,
 } from "date-fns";
 import type {
+  BlockingReservationFieldsFragment,
   ReservationUnitNode,
   ReservationUnitPageQuery,
 } from "@gql/gql-types";
@@ -63,6 +64,7 @@ type AvailableTimesProps = {
   reservationUnit: QueryT;
   reservableTimes: ReservableMap;
   activeApplicationRounds: readonly RoundPeriod[];
+  blockingReservations: readonly BlockingReservationFieldsFragment[];
   fromStartOfDay?: boolean;
 };
 
@@ -74,6 +76,7 @@ function getAvailableTimesForDay({
   reservationUnit,
   reservableTimes,
   activeApplicationRounds,
+  blockingReservations,
 }: AvailableTimesProps): string[] {
   if (!reservationUnit) {
     return [];
@@ -89,6 +92,7 @@ function getAvailableTimesForDay({
     reservationUnit,
     activeApplicationRounds,
     durationValue: duration,
+    blockingReservations,
   })
     .map((n) => {
       const [slotHours, slotMinutes] = n.label.split(":").map(Number);
@@ -105,6 +109,7 @@ function getAvailableTimesForDay({
         reservationUnit,
         reservableTimes,
         activeApplicationRounds,
+        blockingReservations,
       });
 
       return isReservable && !isBefore(startDate, startTime) ? n.label : null;
