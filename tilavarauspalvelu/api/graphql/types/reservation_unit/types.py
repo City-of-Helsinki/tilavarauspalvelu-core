@@ -345,7 +345,7 @@ class ReservationUnitNode(DjangoNode):
                     reservation_units=models.OuterRef("id"),
                     user=optimizer.info.context.user,
                 )
-                .exclude(type=ReservationTypeChoice.SEASONAL.value)
+                .filter(type=ReservationTypeChoice.NORMAL.value)
                 .active()
                 .values("id")
             )

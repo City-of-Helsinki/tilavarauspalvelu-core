@@ -28,6 +28,7 @@ __all__ = [
     "local_time_min",
     "local_time_string",
     "local_timedelta_string",
+    "next_hour",
     "time_as_timedelta",
     "time_difference",
     "timedelta_from_json",

@@ -739,14 +739,20 @@ def test_reservation_unit__query__num_active_user_reservations(graphql):
         user=user,
         state=ReservationStateChoice.DENIED,
     )
-    # Seasonal reservation
-    ReservationFactory.create_for_reservation_unit(
-        begin=begin,
-        end=end,
-        reservation_unit=reservation_unit,
-        user=user,
-        type=ReservationTypeChoice.SEASONAL,
-    )
+    # Only NORMAL type choice should affect the count, all others should be ignored
+    for type_choice in [
+        ReservationTypeChoice.BLOCKED,
+        ReservationTypeChoice.STAFF,
+        ReservationTypeChoice.BEHALF,
+        ReservationTypeChoice.SEASONAL,
+    ]:
+        ReservationFactory.create_for_reservation_unit(
+            begin=begin,
+            end=end,
+            reservation_unit=reservation_unit,
+            user=user,
+            type=type_choice,
+        )
 
     query = reservation_units_query(fields="numActiveUserReservations", pk=reservation_unit.pk)
     response = graphql(query)
