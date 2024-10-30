@@ -30,7 +30,6 @@ import {
 import { H1 } from "common/src/common/typography";
 import { fromUIDate } from "common/src/common/util";
 import { breakpoints } from "common";
-import { Container } from "@/styles/layout";
 import Loader from "@/component/Loader";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import {
@@ -115,7 +114,7 @@ function convertTarget(
 }
 
 const StyledStatusLabel = styled(StatusLabel)`
-  justify-content: center;
+  align-self: center;
   white-space: nowrap;
 `;
 
@@ -168,12 +167,9 @@ const StatusTagContainer = styled.div`
   gap: 0.5rem;
   justify-content: space-between;
   align-items: flex-start;
-  margin-top: var(--spacing-s);
-  & > h1 {
-    margin-top: 0;
-  }
+  flex-direction: column;
   @media (width > ${breakpoints.s}) {
-    margin-top: var(--spacing-l);
+    flex-direction: row;
   }
 `;
 
@@ -609,7 +605,6 @@ const NotificationForm = ({
             variant="secondary"
             size="large"
             to=".."
-            style={{ marginRight: "auto" }}
             data-testid="Notification__Page--cancel-button"
           >
             {t("form.cancel")}
@@ -629,7 +624,6 @@ const NotificationForm = ({
         </InnerButtons>
         <div>
           <Button
-            style={{ marginLeft: "auto" }}
             type="submit"
             data-testid="Notification__Page--publish-button"
           >
@@ -749,7 +743,7 @@ function LoadedContent({
 /// @param pk: primary key of the notification to edit, null for new notification, NaN for error
 /// Client only: uses hooks, window, and react-router-dom
 /// We don't have proper layouts yet, so just separate the container stuff here
-const PageWrapped = ({ pk }: { pk?: number }) => {
+function PageWrapped({ pk }: { pk?: number }) {
   const typename = "BannerNotificationNode";
 
   const id = base64encode(`${typename}:${pk}`);
@@ -763,18 +757,18 @@ const PageWrapped = ({ pk }: { pk?: number }) => {
   const isNew = pk === 0;
 
   return (
-    <Container>
+    <>
       {isLoading ? (
         <Loader />
       ) : (
         <LoadedContent isNew={isNew} notification={notification} />
       )}
-    </Container>
+    </>
   );
-};
+}
 
 // TODO this can be replaced with router match since we don't validate the pk here
-const PageRouted = () => {
+function PageRouted() {
   const { pk } = useParams<{ pk: string }>();
 
   if (pk === "new") {
@@ -782,6 +776,6 @@ const PageRouted = () => {
   }
 
   return <PageWrapped pk={Number(pk)} />;
-};
+}
 
 export default PageRouted;

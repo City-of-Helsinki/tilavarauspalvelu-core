@@ -17,7 +17,7 @@ import {
   UserPermissionChoice,
 } from "@gql/gql-types";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
-import { Container, TabWrapper } from "@/styles/layout";
+import { TabWrapper } from "@/styles/layout";
 import { ApplicationRoundStatusLabel } from "../../ApplicationRoundStatusLabel";
 import TimeframeStatus from "../../TimeframeStatus";
 import { ApplicationDataLoader } from "./ApplicationDataLoader";
@@ -304,7 +304,7 @@ export function Review({
   );
 
   return (
-    <Container>
+    <>
       <>
         <HeadingContainer>
           <H2 as="h1" $legacy style={{ marginBottom: 0 }}>
@@ -420,6 +420,6 @@ export function Review({
           )}
         </Tabs>
       </TabWrapper>
-    </Container>
+    </>
   );
 }

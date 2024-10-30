@@ -15,7 +15,6 @@ import { getApplicationRoundUrl } from "@/common/urls";
 import { formatDate } from "@/common/util";
 import { Accordion } from "@/common/hds-fork/Accordion";
 import { errorToast } from "common/src/common/toast";
-import { Container } from "@/styles/layout";
 import { truncate } from "@/helpers";
 import Loader from "@/component/Loader";
 import { ApplicationRoundCard } from "./ApplicationRoundCard";
@@ -165,7 +164,7 @@ function AllApplicationRounds(): JSX.Element | null {
   }));
 
   return (
-    <Container>
+    <>
       <div>
         <H1 $legacy>{t("MainMenu.applicationRounds")}</H1>
         <p>{t("ApplicationRound.description")}</p>
@@ -223,7 +222,7 @@ function AllApplicationRounds(): JSX.Element | null {
           variant="light"
         />
       </StyledAccordion>
-    </Container>
+    </>
   );
 }
 

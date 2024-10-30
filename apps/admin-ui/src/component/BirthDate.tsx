@@ -7,7 +7,7 @@ import {
   useApplicationDateOfBirthQuery,
 } from "@gql/gql-types";
 import { formatDate } from "@/common/util";
-import { HorisontalFlex } from "@/styles/layout";
+import { Flex } from "@/styles/layout";
 import { base64encode } from "common/src/helpers";
 
 // NOTE separate query because all requests for dateOfBirth are logged
@@ -117,7 +117,7 @@ export function BirthDate(props: Props): JSX.Element {
   const showLabel = t("RequestedReservation.showBirthDate");
 
   return (
-    <HorisontalFlex style={{ gap: "var(--spacing-2-xs)" }}>
+    <Flex $gap="2-xs" $direction="row">
       {isLoading ? (
         <span>{t("common.loading")}</span>
       ) : error != null ? (
@@ -134,6 +134,6 @@ export function BirthDate(props: Props): JSX.Element {
           </Button>
         </>
       )}
-    </HorisontalFlex>
+    </Flex>
   );
 }

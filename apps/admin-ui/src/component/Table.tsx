@@ -15,6 +15,11 @@ export const HR = styled.hr`
   width: 100%;
 `;
 
+// Required for overflow to work
+const Wrapper = styled.div`
+  display: grid;
+`;
+
 const StyledTable = styled(Table)<TableWrapperProps>`
   &&& {
     width: 100%;
@@ -66,20 +71,22 @@ export function CustomTable({
   };
 
   return (
-    <StyledTable
-      {...props}
-      variant="light"
-      onSort={!enableFrontendSorting ? onSort : undefined}
-      // NOTE when using backend sorting we need to unmount the table
-      // otherwise the table header is not updated
-      // unmounting on other data changes is not necessary and causes other bugs like automatic scrolling.
-      key={`custom-table-${keyOverride}`}
-      $tableBackground={
-        isLoading ? "var(--color-black-10)" : "var(--color-white)"
-      }
-      $colWidths={
-        props?.cols ? props.cols.map((col) => get(col, "width", "auto")) : []
-      }
-    />
+    <Wrapper>
+      <StyledTable
+        {...props}
+        variant="light"
+        onSort={!enableFrontendSorting ? onSort : undefined}
+        // NOTE when using backend sorting we need to unmount the table
+        // otherwise the table header is not updated
+        // unmounting on other data changes is not necessary and causes other bugs like automatic scrolling.
+        key={`custom-table-${keyOverride}`}
+        $tableBackground={
+          isLoading ? "var(--color-black-10)" : "var(--color-white)"
+        }
+        $colWidths={
+          props?.cols ? props.cols.map((col) => get(col, "width", "auto")) : []
+        }
+      />
+    </Wrapper>
   );
 }

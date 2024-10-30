@@ -4,7 +4,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { DATE_FORMAT, DATE_FORMAT_SHORT } from "@/common/util";
-import { HorisontalFlex } from "@/styles/layout";
+import { Flex } from "@/styles/layout";
 
 type Props = {
   date: string;
@@ -29,7 +29,7 @@ const WeekNavigation = ({ date, onNext, onPrev }: Props): JSX.Element => {
 
   return (
     <Wrapper>
-      <HorisontalFlex style={{ alignItems: "center", justifyItems: "center" }}>
+      <Flex $align="center" $direction="row">
         <Button
           aria-label={t("common.prev")}
           size="small"
@@ -53,7 +53,7 @@ const WeekNavigation = ({ date, onNext, onPrev }: Props): JSX.Element => {
         >
           {" "}
         </Button>
-      </HorisontalFlex>
+      </Flex>
     </Wrapper>
   );
 };

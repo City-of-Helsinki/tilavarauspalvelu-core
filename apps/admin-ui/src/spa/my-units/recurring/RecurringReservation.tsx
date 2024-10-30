@@ -2,7 +2,6 @@ import { H1 } from "common/src/common/typography";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
-import { Container } from "@/styles/layout";
 import Loader from "@/component/Loader";
 import { RecurringReservationForm } from "./RecurringReservationForm";
 import { useRecurringReservationsUnits } from "./hooks";
@@ -47,13 +46,13 @@ export function RecurringReservation() {
   return (
     <>
       <LinkPrev />
-      <Container>
+      <>
         {isError ? (
           <RecurringErrorPage />
         ) : (
           <RecurringReservationInner unitId={Number(unitId)} />
         )}
-      </Container>
+      </>
     </>
   );
 }

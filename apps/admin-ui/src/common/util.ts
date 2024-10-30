@@ -96,20 +96,26 @@ export function formatAgeGroup(
   return group ? `${group.minimum}-${group.maximum || ""}` : null;
 }
 
-// TODO rename to format
-export function parseAddress(
+export function formatAddress(
   location: LocationFieldsFragment | null | undefined
 ): string {
   if (!location) {
-    return "";
+    return "-";
   }
-  return trim(
+  const res = trim(
     `${location.addressStreetFi ?? ""}, ${location.addressZip} ${
       location.addressCityFi ?? ""
     }`,
     ", "
   );
+  if (res === "") {
+    return "-";
+  }
+  return res;
 }
+
+// @deprecated use formatAddress
+export { formatAddress as parseAddress };
 
 export const sortByName = (a?: string, b?: string): number =>
   a && b ? a.toLowerCase().localeCompare(b.toLowerCase()) : !a ? 1 : -1;

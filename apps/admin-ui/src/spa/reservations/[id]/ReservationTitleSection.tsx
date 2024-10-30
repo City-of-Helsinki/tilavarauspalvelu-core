@@ -19,7 +19,7 @@ import {
   useReservationApplicationLinkQuery,
 } from "@gql/gql-types";
 import { getName } from "./util";
-import { HorisontalFlex } from "@/styles/layout";
+import { Flex } from "@/styles/layout";
 import { formatDateTime } from "@/common/util";
 import { getApplicationUrl } from "@/common/urls";
 import { gql } from "@apollo/client";
@@ -157,7 +157,7 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
       <div>
         <NameState ref={ref}>
           <H1 $legacy>{overrideTitle ?? getName(reservation, t)}</H1>
-          <HorisontalFlex>
+          <Flex $direction="column">
             {order?.status != null && (
               <AlignVertically>
                 <StatusLabel
@@ -180,7 +180,7 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
                 </StatusLabel>
               )}
             </AlignVertically>
-          </HorisontalFlex>
+          </Flex>
         </NameState>
         <Tagline data-testid="reservation_title_section__tagline">
           {tagline}

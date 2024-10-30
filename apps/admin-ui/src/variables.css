@@ -81,10 +81,16 @@
   --tilavaraus-allocation-calendar-colour-text-allocated: #FFFFFF;
   --tilavaraus-allocation-calendar-colour-bg-allocated-elsewhere: #1A1A1A;
   --tilavaraus-allocation-calendar-colour-text-allocated-elsewhere: #FFFFFF;
+
+  /* layout size, these are the same as HDS uses, but for forward compatibility define them here */
+  --tilavaraus-page-max-width: 1440px;
+  --tilavaraus-page-margin: 1.5rem;
 }
 
-/* override HDS variables */
+/* override HDS variables (components define their own variables) */
 * {
   --notification-z-index-toast: var(--tilavaraus-admin-stack-notification) !important;
   --header-z-index: var(--tilavaraus-admin-stack-main-menu);
+  --header-margin: var(--tilavaraus-page-margin);
+  --header-max-width: var(--tilavaraus-page-max-width);
 }

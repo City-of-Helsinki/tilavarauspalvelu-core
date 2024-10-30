@@ -4,7 +4,6 @@ import { H1 } from "common/src/common/typography";
 import { Filters } from "./Filters";
 import { ReservationsDataLoader } from "./ReservationsDataLoader";
 import { HR } from "@/component/Table";
-import { Container } from "@/styles/layout";
 import { useSearchParams } from "react-router-dom";
 import { ReservationStateChoice } from "@gql/gql-types";
 import { toUIDate } from "common/src/common/util";
@@ -44,7 +43,7 @@ export function RequestedPage(): JSX.Element {
   ];
 
   return (
-    <Container>
+    <div>
       <div>
         <H1 $legacy>{t("Reservations.reservationListHeading")}</H1>
         <p>{t("Reservations.reservationListDescription")}</p>
@@ -55,6 +54,6 @@ export function RequestedPage(): JSX.Element {
       />
       <HR />
       <ReservationsDataLoader />
-    </Container>
+    </div>
   );
 }

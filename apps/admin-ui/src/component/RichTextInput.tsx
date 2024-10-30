@@ -5,7 +5,7 @@ import React from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import styled from "styled-components";
-import { HorisontalFlex } from "../styles/layout";
+import { Flex } from "../styles/layout";
 
 const Container = styled.div<{ $disabled: boolean }>`
   .ql-toolbar {
@@ -47,6 +47,7 @@ const ErrorText = styled.div`
   white-space: pre-line;
 `;
 
+// TODO replace with Flex
 const AlignVertically = styled.div`
   display: flex;
   flex-direction: row;
@@ -92,12 +93,12 @@ function RichTextInput({
 }: Props): JSX.Element {
   return (
     <Container {...rest} $disabled={disabled} id={`${id}-container`}>
-      <HorisontalFlex style={{ justifyContent: "space-between" }}>
+      <Flex $justify="space-between" $direction="row">
         <Label htmlFor={id}>
           {label} {required ? <Asterix>*</Asterix> : null}
         </Label>
         {tooltipText && <Tooltip>{tooltipText}</Tooltip>}
-      </HorisontalFlex>
+      </Flex>
       <StyledReactQuill
         modules={modules}
         readOnly={disabled}

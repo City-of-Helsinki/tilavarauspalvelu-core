@@ -13,7 +13,7 @@ import {
 } from "@gql/gql-types";
 import { base64encode } from "common/src/helpers";
 import Loader from "@/component/Loader";
-import { ButtonContainer, Container, IngressContainer } from "@/styles/layout";
+import { ButtonContainer } from "@/styles/layout";
 import { SubPageHead } from "../SubPageHead";
 import { errorToast, successToast } from "common/src/common/toast";
 import { FormErrorSummary } from "@/common/FormErrorSummary";
@@ -118,14 +118,12 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
   const resource = data.resource;
 
   return (
-    <Container>
+    <>
       <SubPageHead
         unit={unit}
         title={resource.nameFi || t("ResourceEditor.defaultHeading")}
       />
-      <IngressContainer>
-        <FormErrorSummary errors={errors} />
-      </IngressContainer>
+      <FormErrorSummary errors={errors} />
       <form noValidate onSubmit={handleSubmit(onSubmit)}>
         <Editor>
           <ResourceEditorFields form={form} unitPk={unitPk} />
@@ -143,6 +141,6 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
           </ButtonContainer>
         </Editor>
       </form>
-    </Container>
+    </>
   );
 }

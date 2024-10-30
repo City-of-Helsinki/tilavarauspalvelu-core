@@ -2,7 +2,6 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import { type ReservationQuery } from "@gql/gql-types";
 import { LinkPrev } from "@/component/LinkPrev";
-import { Container } from "@/styles/layout";
 import ReservationTitleSection from "./ReservationTitleSection";
 import { createTagString } from "./util";
 
@@ -23,7 +22,7 @@ export function EditPageWrapper({
   return (
     <>
       <LinkPrev />
-      <Container>
+      <>
         {reservation && (
           <ReservationTitleSection
             reservation={reservation}
@@ -32,7 +31,7 @@ export function EditPageWrapper({
           />
         )}
         {children}
-      </Container>
+      </>
     </>
   );
 }

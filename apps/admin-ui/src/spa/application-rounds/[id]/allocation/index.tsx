@@ -20,11 +20,7 @@ import { base64encode, filterNonNullable } from "common/src/helpers";
 import { SearchTags } from "@/component/SearchTags";
 import Loader from "@/component/Loader";
 import { useOptions } from "@/hooks";
-import {
-  Container as BaseContainer,
-  TabWrapper,
-  autoGridCss,
-} from "@/styles/layout";
+import { TabWrapper, autoGridCss } from "@/styles/layout";
 import { errorToast } from "common/src/common/toast";
 import {
   ALLOCATION_POLL_INTERVAL,
@@ -42,11 +38,6 @@ const MAX_RES_UNIT_NAME_LENGTH = 35;
 type IParams = {
   applicationRoundPk: string;
 };
-
-/* TODO is the gap everywhere 24px? i.e. can we remove the override */
-const Container = styled(BaseContainer)`
-  gap: var(--spacing-layout-xs);
-`;
 
 const StyledH1 = styled(H1).attrs({ $legacy: true })`
   margin: 0;
@@ -499,7 +490,7 @@ function ApplicationRoundAllocation({
 
   return (
     // TODO top gap is 2rem but the rest of the page is something else so can't change the container directly
-    <Container>
+    <div>
       {/* TODO these look like they have wrong margins */}
       <div>
         <StyledH1>{t("Allocation.allocationTitle")}</StyledH1>
@@ -569,7 +560,7 @@ function ApplicationRoundAllocation({
         refetchApplicationEvents={handleRefetchApplicationEvents}
         applicationRoundStatus={applicationRoundStatus}
       />
-    </Container>
+    </div>
   );
 }
 

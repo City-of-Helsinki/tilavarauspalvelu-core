@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 import { H1 } from "common/src/common/typography";
 import { ReservationsDataLoader } from "./ReservationsDataLoader";
 import { HR } from "@/component/Table";
-import { Container } from "@/styles/layout";
 import { Filters } from "./Filters";
 
 export function ListReservationsPage(): JSX.Element {
@@ -30,7 +29,7 @@ export function ListReservationsPage(): JSX.Element {
   ];
 
   return (
-    <Container>
+    <>
       <div>
         <H1 $legacy>{t("Reservations.allReservationListHeading")}</H1>
         <p>{t("Reservations.allReservationListDescription")}</p>
@@ -38,6 +37,6 @@ export function ListReservationsPage(): JSX.Element {
       <Filters defaultFilters={defaultFilters} />
       <HR />
       <ReservationsDataLoader />
-    </Container>
+    </>
   );
 }

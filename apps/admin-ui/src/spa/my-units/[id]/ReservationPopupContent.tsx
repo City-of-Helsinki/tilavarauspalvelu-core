@@ -8,7 +8,7 @@ import {
 import { getReservationUrl } from "@/common/urls";
 import { formatTime, getReserveeName } from "@/common/util";
 import { truncate } from "@/helpers";
-import { DenseVerticalFlex } from "@/styles/layout";
+import { Flex } from "@/styles/layout";
 import { CELL_BORDER } from "./const";
 import VisibleIfPermission from "@/component/VisibleIfPermission";
 import { useTranslation } from "next-i18next";
@@ -47,7 +47,7 @@ export function ReservationPopupContent({
   const eventName = getReserveeName(reservation, t, 22) || "-";
   return (
     <PopupContent>
-      <DenseVerticalFlex>
+      <Flex $gap="xs">
         <Heading>
           {formatTime(reservation.begin)} - {formatTime(reservation.end)} /{" "}
           {reservation.reservationUnits?.[0]?.nameFi ?? "-"}
@@ -71,7 +71,7 @@ export function ReservationPopupContent({
             </WorkingMemo>
           )}
         </VisibleIfPermission>
-      </DenseVerticalFlex>
+      </Flex>
     </PopupContent>
   );
 }

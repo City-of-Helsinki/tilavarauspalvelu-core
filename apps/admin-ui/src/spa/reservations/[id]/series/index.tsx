@@ -19,7 +19,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import { format, isSameDay } from "date-fns";
 import { useTranslation } from "next-i18next";
-import { AutoGrid, ButtonContainer, Container, Label } from "@/styles/layout";
+import { AutoGrid, ButtonContainer, Label } from "@/styles/layout";
 import { H1 } from "common";
 import { LinkPrev } from "@/component/LinkPrev";
 import { Controller, FormProvider, useForm } from "react-hook-form";
@@ -307,7 +307,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
   return (
     <>
       <LinkPrev />
-      <Container>
+      <>
         <H1 $legacy>{t("ReservationEditSeries.heading")}</H1>
         <FormProvider {...form}>
           <form onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -410,7 +410,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
             </AutoGrid>
           </form>
         </FormProvider>
-      </Container>
+      </>
     </>
   );
 }

@@ -23,11 +23,15 @@ type Props = {
 };
 
 const Content = styled.main`
-  max-width: 1440px;
+  max-width: var(--tilavaraus-page-max-width);
   margin: 0 auto;
+  padding: 0 var(--tilavaraus-page-margin);
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+
+  /* TODO move to global styles */
+  box-sizing: border-box;
 `;
 
 const Wrapper = styled.div`

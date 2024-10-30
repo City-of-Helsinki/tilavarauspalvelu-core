@@ -48,7 +48,6 @@ import ShowWhenTargetInvisible from "@/component/ShowWhenTargetInvisible";
 import { StickyHeader } from "@/component/StickyHeader";
 import StatusBlock from "@/component/StatusBlock";
 import { BirthDate } from "@/component/BirthDate";
-import { Container } from "@/styles/layout";
 import { ValueBox } from "../ValueBox";
 import { TimeSelector } from "../TimeSelector";
 import { getApplicantName, getApplicationStatusColor } from "@/helpers";
@@ -929,7 +928,7 @@ function ApplicationDetails({
           tagline={`${t("Application.id")}: ${application.pk}`}
         />
       </ShowWhenTargetInvisible>
-      <Container>
+      <>
         <HeadingContainer>
           <H2 as="h1" ref={ref} style={{ margin: "0" }}>
             {customerName}
@@ -1094,7 +1093,7 @@ function ApplicationDetails({
             </EventProps>
           </>
         ) : null}
-      </Container>
+      </>
     </>
   );
 }

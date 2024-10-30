@@ -18,7 +18,7 @@ import {
 import { useModal } from "@/context/ModalContext";
 import Loader from "@/component/Loader";
 import { Select } from "@/component/Select";
-import { VerticalFlex } from "@/styles/layout";
+import { Flex } from "@/styles/layout";
 import { CustomDialogHeader } from "@/component/CustomDialogHeader";
 import { useDenyReasonOptions } from "@/hooks";
 import { filterNonNullable } from "common/src/helpers";
@@ -241,7 +241,7 @@ const DialogContent = ({
   return (
     <>
       <Dialog.Content>
-        <VerticalFlex>
+        <Flex>
           <Select
             required
             id="denyReason"
@@ -266,7 +266,7 @@ const DialogContent = ({
             onChange={setReturnState}
             price={findPrice(reservations)}
           />
-        </VerticalFlex>
+        </Flex>
       </Dialog.Content>
       <ActionButtons>
         <Button
@@ -305,7 +305,7 @@ function DenyDialog({
       aria-labelledby="modal-header"
       isOpen={isOpen}
     >
-      <VerticalFlex>
+      <Flex>
         <CustomDialogHeader
           id="modal-header"
           title={title ?? t("RequestedReservation.DenyDialog.title")}
@@ -316,7 +316,7 @@ function DenyDialog({
           onReject={onReject}
           onClose={onClose}
         />
-      </VerticalFlex>
+      </Flex>
     </Dialog>
   );
 }

@@ -16,7 +16,7 @@ import {
 } from "@gql/gql-types";
 import Loader from "@/component/Loader";
 import { useModal } from "@/context/ModalContext";
-import { ButtonContainer, Container } from "@/styles/layout";
+import { ButtonContainer } from "@/styles/layout";
 import ShowWhenTargetInvisible from "@/component/ShowWhenTargetInvisible";
 import { StickyHeader } from "@/component/StickyHeader";
 import { ReservationWorkingMemo } from "@/component/WorkingMemo";
@@ -429,13 +429,13 @@ function RequestedReservation({
           }
         />
       </ShowWhenTargetInvisible>
-      <Container>
+      <div>
         <ReservationTitleSection
           ref={ref}
           reservation={reservation}
           tagline={reservationTagline}
         />
-        <ButtonContainer>
+        <ButtonContainer $justify="flex-start">
           <ButtonsWithPermChecks
             reservation={reservation}
             onReservationUpdated={refetch}
@@ -578,7 +578,7 @@ function RequestedReservation({
             </ApplicationDatas>
           </Accordion>
         </div>
-      </Container>
+      </div>
     </>
   );
 }
@@ -613,9 +613,9 @@ export function ReservationPage() {
       permission={UserPermissionChoice.CanViewReservations}
       reservation={reservation}
       otherwise={
-        <Container>
+        <div>
           <p>{t("errors.noPermission")}</p>
-        </Container>
+        </div>
       }
     >
       <RequestedReservation reservation={reservation} refetch={refetch} />

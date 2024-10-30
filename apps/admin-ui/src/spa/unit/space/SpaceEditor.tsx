@@ -11,7 +11,7 @@ import {
 } from "@gql/gql-types";
 import { errorToast, successToast } from "common/src/common/toast";
 import Loader from "@/component/Loader";
-import { ButtonContainer, Container } from "@/styles/layout";
+import { ButtonContainer } from "@/styles/layout";
 import { FormErrorSummary } from "@/common/FormErrorSummary";
 import { Head } from "./Head";
 import { SpaceHierarchy } from "./SpaceHierarchy";
@@ -25,14 +25,13 @@ import { base64encode } from "common/src/helpers";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-const Editor = styled.div`
-  margin: 0;
+const Form = styled.form`
+  display: flex;
+  gap: var(--spacing-m);
+  flex-direction: column;
   max-width: var(--prose-width);
 `;
-
-const Section = styled.section`
-  margin: var(--spacing-m) 0;
-`;
+const Section = styled.section``;
 
 const SubHeading = styled.div`
   font-family: var(--tilavaraus-admin-font-bold);
@@ -139,64 +138,58 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
   };
 
   return (
-    <form noValidate onSubmit={handleSubmit(onSubmit)}>
-      <Container>
-        <Head
-          title={data?.space?.parent?.nameFi || t("SpaceEditor.noParent")}
-          space={data?.space}
-          maxPersons={watch("maxPersons") || undefined}
-          surfaceArea={watch("surfaceArea") || undefined}
-        />
-        <H2 $legacy style={{ margin: 0 }}>
-          {t("SpaceEditor.details")}
-        </H2>
-        <Editor>
-          <FormErrorSummary errors={errors} />
-          <Section>
-            <SubHeading>{t("SpaceEditor.hierarchy")}</SubHeading>
-            <SpaceHierarchy space={data?.space} />
-            <Controller
-              control={control}
-              name="parent"
-              render={({ field: { onChange, value } }) => (
-                <ParentSelector
-                  helperText={t("SpaceModal.page1.parentHelperText")}
-                  label={t("SpaceModal.page1.parentLabel")}
-                  onChange={(parentPk) => onChange(parentPk)}
-                  value={value}
-                  placeholder={t("SpaceModal.page1.parentPlaceholder")}
-                  unitPk={unit}
-                  selfPk={space}
-                />
-              )}
+    <Form noValidate onSubmit={handleSubmit(onSubmit)}>
+      <Head
+        title={data?.space?.parent?.nameFi || t("SpaceEditor.noParent")}
+        space={data?.space}
+        maxPersons={watch("maxPersons") || undefined}
+        surfaceArea={watch("surfaceArea") || undefined}
+      />
+      <H2 $noMargin>{t("SpaceEditor.details")}</H2>
+      <FormErrorSummary errors={errors} />
+      <Section>
+        <SubHeading>{t("SpaceEditor.hierarchy")}</SubHeading>
+        <SpaceHierarchy space={data?.space} />
+        <Controller
+          control={control}
+          name="parent"
+          render={({ field: { onChange, value } }) => (
+            <ParentSelector
+              helperText={t("SpaceModal.page1.parentHelperText")}
+              label={t("SpaceModal.page1.parentLabel")}
+              onChange={(parentPk) => onChange(parentPk)}
+              value={value}
+              placeholder={t("SpaceModal.page1.parentPlaceholder")}
+              unitPk={unit}
+              selfPk={space}
             />
-          </Section>
-          <Section>
-            <SubHeading>{t("SpaceEditor.other")}</SubHeading>
-            <SpaceForm form={form} />
-          </Section>
-          <ButtonContainer>
-            <Button
-              variant="secondary"
-              theme="black"
-              type="button"
-              onClick={() => history(-1)}
-              disabled={isMutationLoading}
-            >
-              {t("SpaceEditor.cancel")}
-            </Button>
-            <Button
-              disabled={!isDirty}
-              variant="primary"
-              type="submit"
-              isLoading={isMutationLoading}
-            >
-              {t("SpaceEditor.save")}
-            </Button>
-          </ButtonContainer>
-        </Editor>
-      </Container>
-    </form>
+          )}
+        />
+      </Section>
+      <Section>
+        <SubHeading>{t("SpaceEditor.other")}</SubHeading>
+        <SpaceForm form={form} />
+      </Section>
+      <ButtonContainer>
+        <Button
+          variant="secondary"
+          theme="black"
+          type="button"
+          onClick={() => history(-1)}
+          disabled={isMutationLoading}
+        >
+          {t("SpaceEditor.cancel")}
+        </Button>
+        <Button
+          disabled={!isDirty}
+          variant="primary"
+          type="submit"
+          isLoading={isMutationLoading}
+        >
+          {t("SpaceEditor.save")}
+        </Button>
+      </ButtonContainer>
+    </Form>
   );
 }
 

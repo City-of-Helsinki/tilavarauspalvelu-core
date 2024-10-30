@@ -2,10 +2,8 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
-import { Container } from "hds-react";
 import { ErrorBoundary } from "react-error-boundary";
 import { H1 } from "common/src/common/typography";
-import { breakpoints } from "common/src/common/style";
 import { RecurringReservationsView } from "@/component/RecurringReservationsView";
 import { ActionsWrapper } from "./commonStyling";
 import Error404 from "@/common/Error404";
@@ -17,14 +15,6 @@ import { getReservationUrl } from "@/common/urls";
 
 const InfoSection = styled.p`
   margin: var(--spacing-l) 0;
-`;
-
-const StyledContainer = styled(Container)`
-  margin-top: var(--spacing-2-xl);
-  @media (min-width: ${breakpoints.m}) {
-    padding-left: var(--spacing-2-xl) !important;
-    padding-right: var(--spacing-2-xl) !important;
-  }
 `;
 
 function RecurringReservationDoneInner({
@@ -53,7 +43,7 @@ function RecurringReservationDoneInner({
   const reservationUrl = getReservationUrl(reservations[0]?.pk);
 
   return (
-    <StyledContainer>
+    <div>
       <H1 $legacy>
         {reservations.length > 0 ? t(`title`) : t("allFailedTitle")}
       </H1>
@@ -67,7 +57,7 @@ function RecurringReservationDoneInner({
           {t(`buttonToReservation`)}
         </ButtonLikeLink>
       </ActionsWrapper>
-    </StyledContainer>
+    </div>
   );
 }
 

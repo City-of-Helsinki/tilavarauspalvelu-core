@@ -8,7 +8,6 @@ import { breakpoints } from "common/src/common/style";
 import { useUnitQuery } from "@gql/gql-types";
 import { parseAddress } from "@/common/util";
 import { errorToast } from "common/src/common/toast";
-import { Container } from "@/styles/layout";
 import { BasicLink } from "@/styles/util";
 import Loader from "@/component/Loader";
 import { ExternalLink } from "@/component/ExternalLink";
@@ -49,12 +48,22 @@ const Image = styled.img`
   width: 9rem;
   height: 9rem;
 `;
+const Heading = styled.div`
+  flex-grow: 1;
+`;
 
 const Ingress = styled.div`
   display: flex;
   gap: var(--spacing-m);
 `;
 
+const ListContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-m);
+`;
+
+// TODO this is too complicated why?
 const Prop = styled.div<{ $disabled: boolean }>`
   display: flex;
   align-items: center;
@@ -137,22 +146,22 @@ function Unit(): JSX.Element {
   const reservationUnits = filterNonNullable(unit.reservationUnits);
 
   return (
-    <Container>
-      <Links>
-        <BasicLink to={getSpacesResourcesUrl(unitPk)}>
-          {t("Unit.showSpacesAndResources")}
-        </BasicLink>
-      </Links>
+    <ListContainer>
       <Ingress>
         <Image src="https://tilavaraus.hel.fi/v1/media/reservation_unit_images/liikumistila2.jfif.250x250_q85_crop.jpg" />
-        <div>
+        <Heading>
           <Name>{unit?.nameFi}</Name>
           {unit?.location ? (
             <Address>{parseAddress(unit?.location)}</Address>
           ) : (
             <Prop $disabled>{t("Unit.noAddress")}</Prop>
           )}
-        </div>
+        </Heading>
+        <Links>
+          <BasicLink to={getSpacesResourcesUrl(unitPk)}>
+            {t("Unit.showSpacesAndResources")}
+          </BasicLink>
+        </Links>
       </Ingress>
       {!hasSpacesResources ? (
         <Notification
@@ -205,7 +214,7 @@ function Unit(): JSX.Element {
           <H3 as="p">{t("Unit.noReservationUnitsTitle")}</H3>
         </ReservationUnits>
       )}
-    </Container>
+    </ListContainer>
   );
 }
 

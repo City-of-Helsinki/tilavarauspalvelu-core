@@ -10,7 +10,6 @@ import {
   useBannerNotificationsAdminListQuery,
 } from "@gql/gql-types";
 import { H1 } from "common/src/common/typography";
-import { Container } from "@/styles/layout";
 import Loader from "@/component/Loader";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { valueForDateInput, valueForTimeInput } from "@/helpers";
@@ -27,8 +26,7 @@ import {
   IconPen,
   IconQuestionCircleFill,
 } from "hds-react";
-
-const notificationUrl = (pk: number) => `/messaging/notifications/${pk}`;
+import { getNotificationUrl } from "@/common/urls";
 
 const HeaderContainer = styled.div`
   display: flex;
@@ -72,7 +70,7 @@ const getColConfig = (t: TFunction) => [
     isSortable: true,
     transform: (notification: NonNullable<BannerNotificationNode>) =>
       notification.pk ? (
-        <TableLink to={notificationUrl(notification.pk)}>
+        <TableLink to={getNotificationUrl(notification.pk)}>
           {notification.name ?? t("Notifications.noName")}
         </TableLink>
       ) : (
@@ -264,13 +262,4 @@ function transformSortString(
   return orderBy ? [orderBy] : [BannerNotificationOrderingChoices.StateDesc];
 }
 
-// We don't have proper layouts yet, so just separate the container stuff here
-function PageWrapped() {
-  return (
-    <Container>
-      <Page />
-    </Container>
-  );
-}
-
-export default PageWrapped;
+export default Page;

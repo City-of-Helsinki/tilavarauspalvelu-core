@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { addDays, formatISO, startOfDay, subDays } from "date-fns";
-import { AutoGrid, HorisontalFlex } from "@/styles/layout";
+import { AutoGrid, Flex } from "@/styles/layout";
 import { ReservationUnitCalendar } from "./ReservationUnitCalendar";
 import WeekNavigation from "./WeekNavigation";
 import { useTranslation } from "next-i18next";
@@ -50,7 +50,7 @@ export function ReservationUnitCalendarView({
           id="reservation-unit"
         />
       </AutoGrid>
-      <HorisontalFlex style={{ justifyContent: "center" }}>
+      <Flex $justify="center" $direction="row">
         <WeekNavigation
           date={begin}
           onPrev={() => {
@@ -60,7 +60,7 @@ export function ReservationUnitCalendarView({
             setBegin(addDays(new Date(begin), 7).toISOString());
           }}
         />
-      </HorisontalFlex>
+      </Flex>
       <ReservationUnitCalendar
         begin={begin}
         reservationUnitPk={reservationUnitPk}

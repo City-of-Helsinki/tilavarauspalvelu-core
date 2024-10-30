@@ -36,7 +36,7 @@ function LinkPrevInner({ route, style, className }: Props): JSX.Element {
 }
 
 const PreviousLinkWrapper = styled.div`
-  padding: var(--spacing-s);
+  padding: var(--spacing-s) 0;
 `;
 
 export function LinkPrev(props: Props): JSX.Element {

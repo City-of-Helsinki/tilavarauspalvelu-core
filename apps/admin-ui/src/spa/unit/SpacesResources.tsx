@@ -4,7 +4,6 @@ import { useTranslation } from "next-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import { useUnitQuery } from "@gql/gql-types";
-import { Container } from "@/styles/layout";
 import Loader from "@/component/Loader";
 import { ResourcesTable } from "./ResourcesTable";
 import { SpacesTable } from "./SpacesTable";
@@ -15,6 +14,7 @@ import { NewResourceModal } from "./resource/NewResourceModal";
 import { base64encode } from "common/src/helpers";
 import { errorToast } from "common/src/common/toast";
 import Error404 from "@/common/Error404";
+import { H2 } from "common";
 
 interface IProps {
   [key: string]: string;
@@ -25,11 +25,6 @@ const TableHead = styled.div`
   display: flex;
   margin-bottom: var(--spacing-m);
   margin-top: var(--spacing-m);
-`;
-
-const Title = styled.div`
-  font-size: var(--fontsize-heading-l);
-  font-family: var(--tilavaraus-admin-font-bold);
 `;
 
 const ActionButton = styled(Button)`
@@ -86,7 +81,7 @@ function SpacesResources(): JSX.Element {
   }
 
   return (
-    <Container>
+    <>
       <Modal
         id="space-modal"
         open={newSpaceDialogIsOpen}
@@ -101,7 +96,7 @@ function SpacesResources(): JSX.Element {
       </Modal>
       <SubPageHead title={t("Unit.spacesAndResources")} unit={unit} />
       <TableHead>
-        <Title>{t("Unit.spaces")}</Title>
+        <H2 $noMargin>{t("Unit.spaces")}</H2>
         <ActionButton
           ref={newSpacesButtonRef}
           iconLeft={<IconPlusCircleFill />}
@@ -113,7 +108,7 @@ function SpacesResources(): JSX.Element {
       </TableHead>
       <SpacesTable unit={unit} refetch={refetch} />
       <TableHead>
-        <Title>{t("Unit.resources")}</Title>
+        <H2 $noMargin>{t("Unit.resources")}</H2>
         <ActionButton
           disabled={unit.spaces.length === 0}
           iconLeft={<IconPlusCircleFill />}
@@ -141,7 +136,7 @@ function SpacesResources(): JSX.Element {
       >
         {modalContent}
       </Modal>
-    </Container>
+    </>
   );
 }
 

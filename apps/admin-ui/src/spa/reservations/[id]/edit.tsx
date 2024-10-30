@@ -23,6 +23,7 @@ import { useStaffReservationMutation } from "../hooks";
 import { filterNonNullable } from "common/src/helpers";
 import { flattenMetadata } from "@/common/util";
 import { errorToast } from "common/src/common/toast";
+import { ButtonContainer } from "@/styles/layout";
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 type ReservationUnitType = NonNullable<ReservationType["reservationUnits"]>[0];
@@ -33,13 +34,6 @@ type PossibleOptions = {
   purpose: Array<{ label: string; value: number }>;
   homeCity: Array<{ label: string; value: number }>;
 };
-
-const ButtonContainer = styled.div`
-  gap: 1rem;
-  display: flex;
-  justify-content: flex-end;
-  border-top-width: 2px;
-`;
 
 const noSeparateBillingDefined = (reservation: ReservationType): boolean =>
   !reservation.billingAddressCity &&

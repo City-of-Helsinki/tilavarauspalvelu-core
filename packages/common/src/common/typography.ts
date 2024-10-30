@@ -32,14 +32,14 @@ export const Regular = styled.span`
   ${fontRegular}
 `;
 
-export const H1 = styled.h1<{ $legacy?: boolean }>`
+export const H1 = styled.h1<{ $legacy?: boolean, $noMargin?: boolean }>`
   font-size: ${({ $legacy }) =>
     $legacy
       ? "var(--fontsize-heading-l)"
       : " var(--fontsize-heading-xl-mobile)"};
   ${fontRegular}
   line-height: var(--lineheight-s);
-  margin: var(--spacing-s) 0 var(--spacing-m);
+  margin: ${({ $noMargin }) => $noMargin ? "0" : "var(--spacing-s) 0 var(--spacing-m)"};
   word-break: break-word;
 
   @media (min-width: ${breakpoints.s}) {
@@ -49,12 +49,12 @@ export const H1 = styled.h1<{ $legacy?: boolean }>`
   }
 `;
 
-export const H2 = styled.h2<{ $legacy?: boolean }>`
+export const H2 = styled.h2<{ $legacy?: boolean, $noMargin?: boolean }>`
   font-size: ${({ $legacy }) =>
     $legacy ? `var(--fontsize-heading-m)` : `var(--fontsize-heading-l)`};
   ${fontRegular}
   line-height: var(--lineheight-s);
-  margin-bottom: var(--spacing-m);
+  margin-bottom: ${({ $noMargin }) => $noMargin ? "0" : "var(--spacing-m)"};
 
   @media (min-width: ${breakpoints.s}) {
     ${({ $legacy }) =>

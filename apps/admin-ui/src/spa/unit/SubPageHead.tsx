@@ -4,7 +4,7 @@ import { H1, fontMedium } from "common/src/common/typography";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { type UnitWithSpacesAndResourcesQuery } from "@gql/gql-types";
-import { parseAddress } from "@/common/util";
+import { formatAddress } from "@/common/util";
 
 // TODO should use a fragment that is shared by both UnitQuery and UnitWithSpacesAndResourcesQuery
 type UnitType = NonNullable<UnitWithSpacesAndResourcesQuery["unit"]>;
@@ -13,52 +13,35 @@ interface IProps {
   unit: UnitType;
 }
 
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-m);
-`;
-
 const Name = styled.div`
   font-size: var(--fontsize-heading-s);
   ${fontMedium}
 `;
 
-const Address = styled.span`
-  line-height: 26px;
-`;
-
-const LocationIcon = styled(IconLocation)`
-  margin: 2px var(--spacing-s) 2px 0;
-`;
-
-const Label = styled(Address)`
+const Label = styled.span`
   ${fontMedium}
 `;
 
 const AddressSection = styled.div`
   display: flex;
   align-items: center;
+  gap: var(--spacing-xs);
 `;
 
 export function SubPageHead({ title, unit }: IProps): JSX.Element {
   const { t } = useTranslation();
 
   return (
-    <Wrapper>
-      <H1 style={{ flexGrow: 1, margin: 0 }} $legacy>
-        {title}
-      </H1>
+    <div>
+      <H1>{title}</H1>
       <AddressSection>
-        <LocationIcon />
+        <IconLocation aria-hidden="true" />
         <div>
           <Name>{unit?.nameFi}</Name>
           <Label>{t("Unit.address")}</Label>:{" "}
-          {unit?.location ? (
-            <Address>{parseAddress(unit.location)}</Address>
-          ) : null}
+          <span>{formatAddress(unit.location)}</span>
         </div>
       </AddressSection>
-    </Wrapper>
+    </div>
   );
 }

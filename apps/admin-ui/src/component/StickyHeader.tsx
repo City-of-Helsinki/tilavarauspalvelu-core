@@ -6,8 +6,10 @@ import { breakpoints } from "common/src/common/style";
 
 const Sticky = styled.div`
   z-index: var(--tilavaraus-admin-stack-sticky-reservation-header);
-  position: sticky;
-  inset: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
 `;
 
 const StickyContent = styled.div`

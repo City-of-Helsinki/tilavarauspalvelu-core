@@ -43,14 +43,7 @@ import { DateTimeInput } from "common/src/components/form/DateTimeInput";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { H1, H4, fontBold } from "common/src/common/typography";
 import { breakpoints } from "common";
-import {
-  ContainerMedium,
-  DenseVerticalFlex,
-  HorisontalFlex,
-  AutoGrid,
-  FullRow,
-  VerticalFlex,
-} from "@/styles/layout";
+import { AutoGrid, FullRow, Flex } from "@/styles/layout";
 import Loader from "@/component/Loader";
 import { errorToast, successToast } from "common/src/common/toast";
 import { useModal } from "@/context/ModalContext";
@@ -88,7 +81,8 @@ type Node = NonNullable<QueryData>;
 
 // Override the Accordion style: force border even if the accordion is open
 // because the last section is not an accordion but a button and it looks funny otherwise
-const StyledContainerMedium = styled(ContainerMedium)`
+// TODO should we limit the width of the text boxes? or the whole form?
+const StyledContainerMedium = styled.div`
   & > div:nth-last-of-type(2) > div {
     /* stylelint-disable-next-line csstools/value-no-unknown-custom-properties */
     border-bottom: 1px solid var(--border-color);
@@ -784,7 +778,7 @@ function ReservationUnitSettings({
             control={control}
             name="hasScheduledPublish"
           >
-            <DenseVerticalFlex>
+            <Flex $gap="xs">
               {/* TODO the Two DateInputs need to touch each other to rerun common validation code */}
               <ActivationGroup
                 label={t("ReservationUnitEditor.publishBegins")}
@@ -815,7 +809,7 @@ function ReservationUnitSettings({
                   translateError={(err) => getTranslatedError(t, err)}
                 />
               </ActivationGroup>
-            </DenseVerticalFlex>
+            </Flex>
           </ActivationGroup>
         </FieldGroup>
         <FieldGroup
@@ -1168,7 +1162,7 @@ function PricingSection({
             ))}
         {isPaid && (
           // TODO this should be outside the pricing type because it's reservation unit wide
-          <HorisontalFlex style={{ justifyContent: "space-between" }}>
+          <Flex $justify="space-between" $direction="row">
             <Controller
               control={control}
               name="canApplyFreeOfCharge"
@@ -1184,7 +1178,7 @@ function PricingSection({
             <Tooltip>
               {t("ReservationUnitEditor.tooltip.canApplyFreeOfCharge")}
             </Tooltip>
-          </HorisontalFlex>
+          </Flex>
         )}
         {watch("canApplyFreeOfCharge") && isPaid && (
           <ControlledSelect
@@ -1299,7 +1293,7 @@ function CommunicationSection({
   // NOTE no required fields
   return (
     <Accordion heading={t("ReservationUnitEditor.communication")}>
-      <VerticalFlex>
+      <Flex>
         <SlimH4>{t("ReservationUnitEditor.pendingInstructions")}</SlimH4>
         {(
           [
@@ -1385,7 +1379,7 @@ function CommunicationSection({
           helperText={t("ReservationUnitEditor.contactInformationHelperText")}
           tooltipText={getTranslatedTooltipTex(t, "contactInformation")}
         />
-      </VerticalFlex>
+      </Flex>
     </Accordion>
   );
 }

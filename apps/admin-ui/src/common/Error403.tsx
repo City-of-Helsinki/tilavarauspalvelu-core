@@ -8,6 +8,7 @@ import { breakpoints } from "common/src/common/style";
 import { useSession } from "@/hooks/auth";
 import { PUBLIC_URL } from "./const";
 import { env } from "@/env.mjs";
+import { ButtonContainer, Flex } from "@/styles/layout";
 
 const Wrapper = styled.div`
   padding: var(--spacing-layout-s);
@@ -33,18 +34,8 @@ const Wrapper = styled.div`
   }
 `;
 
-const Column = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-layout-2-xs);
-`;
-
 const Image = styled.img`
   width: 100%;
-`;
-
-const ButtonContainer = styled.div`
-  margin-top: var(--spacing-s);
 `;
 
 const LogoutSection = ({
@@ -59,7 +50,7 @@ const LogoutSection = ({
   const { t } = useTranslation();
 
   return (
-    <Column>
+    <Flex>
       <Link external href="/">
         {t("errorPages.linkToVaraamo")}
       </Link>
@@ -73,7 +64,7 @@ const LogoutSection = ({
           </Button>
         </ButtonContainer>
       )}
-    </Column>
+    </Flex>
   );
 };
 

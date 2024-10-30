@@ -10,7 +10,7 @@ import { fromUIDate, isValidDate, toUIDate } from "common/src/common/util";
 import { startOfDay } from "date-fns";
 import { Button } from "hds-react";
 import { useParams, useSearchParams } from "react-router-dom";
-import { AutoGrid, VerticalFlex } from "@/styles/layout";
+import { AutoGrid, Flex } from "@/styles/layout";
 import { useReservationUnitTypes } from "@/hooks";
 import { HR } from "@/component/Table";
 import { SearchTags } from "@/component/SearchTags";
@@ -125,7 +125,7 @@ export function UnitReservations(): JSX.Element {
   }, []);
 
   return (
-    <VerticalFlex>
+    <Flex>
       <AutoGrid>
         <MultiSelectFilter
           style={{
@@ -160,6 +160,6 @@ export function UnitReservations(): JSX.Element {
           unitPk={unitId}
         />
       ) : null}
-    </VerticalFlex>
+    </Flex>
   );
 }

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Button, TextArea } from "hds-react";
-import styled from "styled-components";
 import { type FetchResult } from "@apollo/client";
 import {
   useUpdateApplicationWorkingMemoMutation,
@@ -10,13 +9,7 @@ import {
 } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { errorToast, successToast } from "common/src/common/toast";
-
-const ButtonContainer = styled.div`
-  display: flex;
-  gap: var(--spacing-m);
-  justify-content: flex-end;
-  margin-top: var(--spacing-m);
-`;
+import { ButtonContainer } from "@/styles/layout";
 
 function WorkingMemo({
   initialValue,

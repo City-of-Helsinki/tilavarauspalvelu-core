@@ -7,7 +7,6 @@ import { H2, H3, SemiBold, Strong } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { useApplicationRoundCriteriaQuery } from "@gql/gql-types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
-import { Container } from "@/styles/layout";
 import { formatDate } from "@/common/util";
 import { errorToast } from "common/src/common/toast";
 import Loader from "@/component/Loader";
@@ -106,7 +105,7 @@ function Criteria({
   }
 
   return (
-    <Container>
+    <>
       <H2 as="h1" $legacy>
         {applicationRound.nameFi}
       </H2>
@@ -163,7 +162,7 @@ function Criteria({
           ))}
         </ReservationUnits>
       </Accordion>
-    </Container>
+    </>
   );
 }
 

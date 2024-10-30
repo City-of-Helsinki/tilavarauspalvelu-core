@@ -105,3 +105,10 @@ export function getRecurringReservationUrl(
   }
   return `/my-units/${pk}/recurring`;
 }
+
+export function getNotificationUrl(pk: Maybe<number> | undefined): string {
+  if (pk == null || !(pk > 0)) {
+    return "";
+  }
+  return `${bannerNotificationsUrl}/${pk}`;
+}

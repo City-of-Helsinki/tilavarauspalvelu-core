@@ -16,7 +16,7 @@ import {
   type ReservationQuery,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
-import { VerticalFlex } from "@/styles/layout";
+import { Flex } from "@/styles/layout";
 import { getReservationPriceDetails } from "./util";
 import { errorToast, successToast } from "common/src/common/toast";
 
@@ -101,7 +101,7 @@ const DialogContent = ({
   return (
     <>
       <Dialog.Content>
-        <VerticalFlex>
+        <Flex>
           {reservation.applyingForFreeOfCharge && (
             <>
               <div>
@@ -166,7 +166,7 @@ const DialogContent = ({
             id="handlingDetails"
             helperText={t("RequestedReservation.workingMemoHelperText")}
           />
-        </VerticalFlex>
+        </Flex>
       </Dialog.Content>
       <ActionButtons>
         <Button
@@ -205,7 +205,7 @@ const ApproveDialog = ({
       isOpen={isOpen}
       focusAfterCloseRef={undefined}
     >
-      <VerticalFlex>
+      <Flex>
         <Dialog.Header
           id="modal-header"
           title={
@@ -220,7 +220,7 @@ const ApproveDialog = ({
           onAccept={onAccept}
           onClose={onClose}
         />
-      </VerticalFlex>
+      </Flex>
     </Dialog>
   );
 };
