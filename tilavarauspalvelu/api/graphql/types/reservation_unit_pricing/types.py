@@ -19,5 +19,4 @@ class ReservationUnitPricingNode(DjangoNode):
             "highest_price",
             "highest_price_net",
             "tax_percentage",
-            "status",
         ]
