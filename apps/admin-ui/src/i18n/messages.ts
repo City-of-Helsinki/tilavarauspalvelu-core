@@ -232,6 +232,15 @@ const translations: ITranslations = {
       RESERVATION_UNIT_PRICINGS_INVALID_PRICES: [
         "Hinnoittelussa on virheellisiä hintoja",
       ],
+      RESERVATION_UNIT_MISSING_TRANSLATIONS: [
+        "Varausyksiköllä puuttuu käännökset",
+      ],
+      RESERVATION_UNIT_MISSING_SPACES_OR_RESOURCES: [
+        "Varausyksiköllä ei ole tiloja tai resursseja",
+      ],
+      RESERVATION_UNIT_MISSING_RESERVATION_UNIT_TYPE: [
+        "Varausyksiköllä ei ole varausyksikkötyyppiä",
+      ],
     },
     descriptive: {
       "Reservation overlaps with reservation before due to buffer time.": [

@@ -74,6 +74,7 @@ import {
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { SeasonalSection } from "./SeasonalSection";
 import { getValidationErrors } from "common/src/apolloUtils";
+import { getReservationUnitUrl, getUnitUrl } from "@/common/urls";
 
 const RichTextInput = dynamic(
   () => import("../../../component/RichTextInput"),
@@ -1709,106 +1710,111 @@ function ReservationUnitEditor({
   }));
 
   // ----------------------------- Callbacks ----------------------------------
+  // unsafe because the handleSubmit doesn't pass return value (so throw is the only way to manipulate control flow)
   const onSubmit = async (formValues: ReservationUnitEditFormValues) => {
     const { pk, ...input } = transformReservationUnit(formValues);
-    try {
-      const promise =
-        pk != null
-          ? updateMutation({ variables: { input: { ...input, pk } } })
-          : createMutation({
-              variables: { input: { ...input, unit: unitPk } },
-            });
+    const promise =
+      pk != null
+        ? updateMutation({ variables: { input: { ...input, pk } } })
+        : createMutation({
+            variables: { input: { ...input, unit: unitPk } },
+          });
 
-      const { data, errors: mutationErrors } = await promise;
-      if (mutationErrors != null) {
-        errorToast({
-          text: t("ReservationUnitEditor.saveFailed", {
-            error: mutationErrors,
-          }),
-        });
-        return undefined;
-      }
-
-      const getPk = (d: typeof data) => {
-        if (d == null) {
-          return null;
-        }
-        if ("updateReservationUnit" in d) {
-          return d.updateReservationUnit?.pk ?? null;
-        }
-        if ("createReservationUnit" in d) {
-          return d.createReservationUnit?.pk ?? null;
-        }
-        return null;
-      };
-      const upPk = getPk(data);
-
-      if (upPk) {
-        const { images } = formValues;
-        // res unit is saved, we can save changes to images
-        const success = await reconcileImageChanges(upPk, images);
-        if (success) {
-          // redirect if new one was created
-          if (formValues.pk === 0 && upPk > 0) {
-            history(`/unit/${unitPk}/reservationUnit/edit/${upPk}`);
-          }
-          const tkey =
-            formValues.pk === 0
-              ? "ReservationUnitEditor.reservationUnitCreatedNotification"
-              : "ReservationUnitEditor.reservationUnitUpdatedNotification";
-          successToast({ text: t(tkey, { name: getValues("nameFi") }) });
-        } else {
-          errorToast({ text: "ReservationUnitEditor.imageSaveFailed" });
-          return undefined;
-        }
-      } else {
-        // eslint-disable-next-line no-console
-        console.warn(
-          "saved but, pk was not defined in mutation response: so images are not saved"
-        );
-        errorToast({ text: "ReservationUnitEditor.imageSaveFailed" });
-        return undefined;
-      }
-      refetch();
-      return upPk;
-    } catch (error) {
-      const validationErrors = getValidationErrors(error);
-      if (validationErrors.length > 0) {
-        const validationError = validationErrors[0];
-        errorToast({
-          text: t(`errors.backendValidation.${validationError.code}`),
-        });
-      } else {
-        errorToast({ text: t("ReservationDialog.saveFailed") });
-      }
+    const { data, errors: mutationErrors } = await promise;
+    if (mutationErrors != null) {
+      const msg = t("ReservationUnitEditor.saveFailed", {
+        error: mutationErrors,
+      });
+      throw new Error(msg);
     }
-    return undefined;
+
+    const getPk = (d: typeof data) => {
+      if (d == null) {
+        return null;
+      }
+      if ("updateReservationUnit" in d) {
+        return d.updateReservationUnit?.pk ?? null;
+      }
+      if ("createReservationUnit" in d) {
+        return d.createReservationUnit?.pk ?? null;
+      }
+      return null;
+    };
+    const upPk = getPk(data);
+
+    // crude way to handle different logic for archive vs save (avoids double toast)
+    if (upPk && !formValues.isArchived) {
+      const { images } = formValues;
+      // res unit is saved, we can save changes to images
+      const success = await reconcileImageChanges(upPk, images);
+      if (success) {
+        // redirect if new one was created
+        if (formValues.pk === 0 && upPk > 0) {
+          history(getReservationUnitUrl(upPk, unitPk));
+        }
+        const tkey =
+          formValues.pk === 0
+            ? "ReservationUnitEditor.reservationUnitCreatedNotification"
+            : "ReservationUnitEditor.reservationUnitUpdatedNotification";
+        successToast({ text: t(tkey, { name: getValues("nameFi") }) });
+      } else {
+        const msg = t("ReservationUnitEditor.imageSaveFailed");
+        throw new Error(msg);
+      }
+    } else if (upPk == null) {
+      const msg = t("ReservationUnitEditor.saveFailed", { error: "" });
+      throw new Error(msg);
+    }
+    refetch();
+    return upPk;
+  };
+
+  const handleError = (e: unknown) => {
+    const validationErrors = getValidationErrors(e);
+    if (validationErrors.length > 0) {
+      const validationError = validationErrors[0];
+      errorToast({
+        text: t(`errors.backendValidation.${validationError.code}`),
+      });
+    } else if (e instanceof Error) {
+      const msg = e.message;
+      errorToast({ text: msg });
+    } else {
+      errorToast({ text: t("ReservationDialog.saveFailed") });
+    }
   };
 
   // Have to define these like this because otherwise the state changes don't work
   const handlePublish = async () => {
     setValue("isDraft", false);
     setValue("isArchived", false);
-    await handleSubmit(onSubmit)();
+    try {
+      await handleSubmit(onSubmit)();
+    } catch (error) {
+      handleError(error);
+    }
   };
 
   const handleSaveAsDraft = async () => {
     setValue("isDraft", true);
     setValue("isArchived", false);
-    await handleSubmit(onSubmit)();
+    try {
+      await handleSubmit(onSubmit)();
+    } catch (error) {
+      handleError(error);
+    }
   };
 
   const handleAcceptArchive = async () => {
     setValue("isArchived", true);
     setValue("isDraft", false);
+    setModalContent(null);
     try {
       await handleSubmit(onSubmit)();
-      setModalContent(null);
       successToast({ text: t("ArchiveReservationUnitDialog.success") });
-      history(`/unit/${unit?.pk}`);
+      history(getUnitUrl(unit?.pk));
     } catch (e) {
-      // eslint-disable-next-line no-console
-      console.warn("unable to archive", e);
+      handleError(e);
     }
   };
 
