@@ -317,7 +317,8 @@ class ReservationUnitSerializer(NestingModelSerializer):
     @staticmethod
     def handle_pricings(pricings: list[dict[Any, Any]], reservation_unit: ReservationUnit) -> None:
         with atomic():
-            # Delete future pricings that are not in the payload
+            # Delete future pricings that are not in the payload.
+            # Past or Active pricings can not be deleted.
             pricing_pks = [pricing.get("pk") for pricing in pricings if "pk" in pricing]
             ReservationUnitPricing.objects.filter(
                 reservation_unit=reservation_unit,

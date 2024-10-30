@@ -3,17 +3,68 @@ from decimal import Decimal
 
 import pytest
 
-from tests.factories import TaxPercentageFactory
+from tests.factories import ReservationUnitFactory, ReservationUnitPricingFactory, TaxPercentageFactory
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.models import ReservationUnit
 from utils.date_utils import local_date
 
-from .helpers import CREATE_MUTATION, UPDATE_MUTATION, get_create_draft_input_data, get_pricing_data
+from .helpers import (
+    CREATE_MUTATION,
+    UPDATE_MUTATION,
+    get_create_draft_input_data,
+    get_pricing_data,
+    reservation_units_query,
+)
 
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
+
+
+def test_reservation_unit__query__pricing__old_pricings_not_returned(graphql):
+    today = local_date()
+
+    reservation_unit = ReservationUnitFactory.create()
+
+    # Past, Active and Future pricings
+    ReservationUnitPricingFactory.create(
+        reservation_unit=reservation_unit,
+        begins=today - datetime.timedelta(days=1),
+        highest_price=9,
+    )
+    ReservationUnitPricingFactory.create(reservation_unit=reservation_unit, begins=today, highest_price=10)
+    ReservationUnitPricingFactory.create(
+        reservation_unit=reservation_unit, begins=today + datetime.timedelta(days=1), highest_price=11
+    )
+
+    # Only active pricing, which has been active for a while
+    reservation_unit_2 = ReservationUnitFactory.create()
+    ReservationUnitPricingFactory.create(
+        reservation_unit=reservation_unit_2,
+        begins=today - datetime.timedelta(days=10),
+        highest_price=20,
+    )
+
+    graphql.login_with_superuser()
+    query = reservation_units_query(fields="pk pricings { highestPrice }")
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 2
+    assert response.node(0) == {
+        "pk": reservation_unit.pk,
+        "pricings": [
+            {"highestPrice": "10.00"},
+            {"highestPrice": "11.00"},
+        ],
+    }
+    assert response.node(1) == {
+        "pk": reservation_unit_2.pk,
+        "pricings": [
+            {"highestPrice": "20.00"},
+        ],
+    }
 
 
 def test_reservation_unit__create__pricing__is_not_required_for_drafts(graphql):
