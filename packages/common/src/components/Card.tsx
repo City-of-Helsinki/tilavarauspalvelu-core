@@ -31,7 +31,6 @@ const Wrapper = styled.div<{ $bgColor: string }>`
   }
   background-color: ${(props) => props.$bgColor};
   display: flex;
-  height: 100%;
   flex-direction: column;
   align-items: stretch;
 
@@ -53,7 +52,6 @@ const Wrapper = styled.div<{ $bgColor: string }>`
 const ImageWrapper = styled.div`
   display: flex;
   overflow: hidden;
-  height: 100%;
   width: 100%;
   max-height: 220px;
   background: var(--color-black-20);
@@ -65,12 +63,9 @@ const ImageWrapper = styled.div`
     height: 100%;
   }
   @media (min-width: ${breakpoints.m}) {
-    width: 100%;
-    max-height: 205px;
     .card--default & {
       max-width: 200px;
       max-height: unset;
-      height: unset;
     }
   }
 
@@ -78,8 +73,7 @@ const ImageWrapper = styled.div`
     width: 100%;
     max-height: 205px;
     .card--default & {
-      max-width: 220px;
-      max-height: 160px;
+      max-width: 190px;
     }
   }
 `;
@@ -110,7 +104,7 @@ const CardContent = styled.div<{ $itemCount: number }>`
   @media (min-width: ${breakpoints.m}) {
     .card--default & {
       display: grid;
-      grid-template-rows: repeat(2, 1fr);
+      grid-template-rows: repeat(2, auto);
       grid-template-columns: repeat(2, auto);
       gap: 0;
       padding: var(--spacing-m);
