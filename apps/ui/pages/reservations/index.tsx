@@ -5,7 +5,7 @@ import { Tabs, TabList, Tab, TabPanel } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
-import { fontMedium } from "common/src/common/typography";
+import { fontMedium, H1 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
   ReservationStateChoice,
@@ -13,11 +13,9 @@ import {
   useListReservationsQuery,
   ReservationTypeChoice,
 } from "@gql/gql-types";
-import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
 import { useSession } from "@/hooks/auth";
 import ReservationCard from "@/components/reservation/ReservationCard";
-import Head from "@/components/reservations/Head";
 import { CenterSpinner } from "@/components/common/common";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { toApiDate } from "common/src/common/util";
@@ -124,9 +122,9 @@ function Reservations(): JSX.Element | null {
 
   return (
     <>
-      <Head />
+      <H1>{t(`navigation:Item.reservations`)}</H1>
       {/* HDS tabs doesn't support data-testid */}
-      <Container data-testid="Reservations--page__tab_container">
+      <div data-testid="Reservations--page__tab_container">
         <Tabs>
           <StyledTabList>
             <StyledTab onClick={() => setTab("upcoming")}>
@@ -191,7 +189,7 @@ function Reservations(): JSX.Element | null {
             )}
           </StyledTabPanel>
         </Tabs>
-      </Container>
+      </div>
     </>
   );
 }

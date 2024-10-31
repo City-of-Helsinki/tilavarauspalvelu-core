@@ -16,11 +16,11 @@ import {
   type ApplicationViewQuery,
 } from "@gql/gql-types";
 import { Tabs } from "hds-react";
-import { Head } from "@/components/application/Head";
-import { Container } from "common";
 import { formatDateTime } from "@/modules/util";
 import { ApprovedReservations } from "@/components/application/ApprovedReservations";
 import { gql } from "@apollo/client";
+import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
+import { H1 } from "common";
 
 function View({ application, tos }: PropsNarrowed): JSX.Element {
   const { t, i18n } = useTranslation();
@@ -41,8 +41,9 @@ function View({ application, tos }: PropsNarrowed): JSX.Element {
     application.status === ApplicationStatusChoice.ResultsSent;
 
   return (
-    <Container>
-      <Head heading={applicationRoundName} />
+    <>
+      <BreadcrumbWrapper route={["/applications", "application"]} />
+      <H1>{applicationRoundName}</H1>
       {showReservations ? (
         <>
           <p>
@@ -69,7 +70,7 @@ function View({ application, tos }: PropsNarrowed): JSX.Element {
       ) : (
         <ViewApplication application={application} tos={tos} />
       )}
-    </Container>
+    </>
   );
 }
 

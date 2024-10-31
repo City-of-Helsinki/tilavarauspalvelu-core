@@ -4,10 +4,6 @@ import { Notification } from "hds-react";
 import styled from "styled-components";
 import { Container } from "common";
 
-export const Wrapper = styled.div`
-  padding-bottom: var(--spacing-layout-xl);
-`;
-
 export const TwoColumnLayout = styled.div`
   display: block;
   margin-bottom: var(--spacing-m);

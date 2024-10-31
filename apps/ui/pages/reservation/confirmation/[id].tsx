@@ -1,75 +1,30 @@
 import React from "react";
-import { breakpoints } from "common/src/common/style";
-import { H2 } from "common/src/common/typography";
-import { useReservationQuery } from "@gql/gql-types";
-import { LoadingSpinner } from "hds-react";
+import { H1 } from "common/src/common/typography";
+import {
+  ReservationDocument,
+  type ReservationQuery,
+  type ReservationQueryVariables,
+} from "@gql/gql-types";
+import { CenterSpinner } from "@/components/common/common";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
-import styled from "styled-components";
-import { Container } from "common";
 import ReservationConfirmation from "@/components/reservation/ReservationConfirmation";
 import { ReservationInfoCard } from "@/components/reservation/ReservationInfoCard";
-import { Paragraph } from "@/components/reservation/styles";
 import { useOrder } from "@/hooks/reservation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { base64encode } from "common/src/helpers";
+import { ReservationPageWrapper } from "@/components/reservations/styles";
+import { createApolloClient } from "@/modules/apolloClient";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  const { locale, params } = ctx;
-  const reservationPk = Number(params?.id);
-
-  return {
-    props: {
-      ...getCommonServerSideProps(),
-      key: `${reservationPk}${locale}`,
-      reservationPk: Number.isNaN(reservationPk) ? null : reservationPk,
-      ...(await serverSideTranslations(locale ?? "fi")),
-    },
-  };
-};
-
-const Heading = styled(H2).attrs({ as: "h1" })``;
-
-const StyledContainer = styled(Container)`
-  @media (min-width: ${breakpoints.m}) {
-    margin-bottom: var(--spacing-layout-l);
-  }
-`;
-
-const Columns = styled.div`
-  grid-template-columns: 1fr;
-  display: grid;
-  align-items: flex-start;
-  gap: var(--spacing-m);
-
-  @media (min-width: ${breakpoints.m}) {
-    & > div:nth-of-type(1) {
-      order: 2;
-    }
-
-    margin-top: var(--spacing-xl);
-    grid-template-columns: 1fr 378px;
-  }
-`;
-
-const ReservationSuccess = ({ reservationPk, apiBaseUrl }: Props) => {
+// TODO test this (success after making a payment)
+function ReservationSuccess({ reservation, apiBaseUrl }: PropsNarrowed) {
   const { t } = useTranslation();
 
-  const id = base64encode(`ReservationNode:${reservationPk}`);
-  const {
-    data,
-    loading: isReservationLoading,
-    error: isError,
-  } = useReservationQuery({
-    skip: !reservationPk,
-    fetchPolicy: "no-cache",
-    variables: { id },
-  });
-  const { reservation } = data ?? {};
-
+  // TODO the order should be included in the reservation query
   const {
     order,
     isError: orderError,
@@ -80,43 +35,71 @@ const ReservationSuccess = ({ reservationPk, apiBaseUrl }: Props) => {
     reservation && !reservation.paymentOrder[0]?.orderUuid;
 
   // TODO display error if the orderUuid is missing or the pk is invalid
-  if (isError || orderError || isOrderUuidMissing) {
+  if (orderError || isOrderUuidMissing) {
     return (
-      <StyledContainer size="s">
-        <Columns>
-          <div>
-            <Heading>{t("common:error.error")}</Heading>
-            <Paragraph>{t("common:error.dataError")}</Paragraph>
-          </div>
-        </Columns>
-      </StyledContainer>
+      <div>
+        <H1>{t("common:error.error")}</H1>
+        <p>{t("common:error.dataError")}</p>
+      </div>
     );
   }
 
-  if (isReservationLoading || orderLoading || !reservation) {
-    return (
-      <StyledContainer size="s">
-        <Columns style={{ justifyItems: "center" }}>
-          <LoadingSpinner />
-        </Columns>
-      </StyledContainer>
-    );
+  if (orderLoading) {
+    return <CenterSpinner />;
   }
 
   return (
-    <StyledContainer size="s">
-      <Columns>
-        <div>
-          <ReservationInfoCard reservation={reservation} type="confirmed" />
-        </div>
-        <ReservationConfirmation
-          apiBaseUrl={apiBaseUrl}
-          reservation={reservation}
-          order={order}
-        />
-      </Columns>
-    </StyledContainer>
+    <ReservationPageWrapper>
+      <ReservationInfoCard reservation={reservation} type="confirmed" />
+      <ReservationConfirmation
+        apiBaseUrl={apiBaseUrl}
+        reservation={reservation}
+        order={order}
+      />
+    </ReservationPageWrapper>
   );
-};
+}
+
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+  const { locale, params } = ctx;
+  const commonProps = getCommonServerSideProps();
+  const notFoundValue = {
+    notFound: true,
+    props: {
+      ...commonProps,
+      ...(await serverSideTranslations(locale ?? "fi")),
+      notFound: true,
+    },
+  };
+
+  const reservationPk = Number(params?.id);
+  const isValid = reservationPk > 0;
+  if (!isValid) {
+    return notFoundValue;
+  }
+
+  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
+  const id = base64encode(`ReservationNode:${reservationPk}`);
+  const { data } = await apolloClient.query<
+    ReservationQuery,
+    ReservationQueryVariables
+  >({
+    query: ReservationDocument,
+    variables: { id },
+  });
+  const { reservation } = data ?? {};
+
+  if (reservation == null) {
+    return notFoundValue;
+  }
+
+  return {
+    props: {
+      ...commonProps,
+      reservation,
+      ...(await serverSideTranslations(locale ?? "fi")),
+    },
+  };
+}
 
 export default ReservationSuccess;

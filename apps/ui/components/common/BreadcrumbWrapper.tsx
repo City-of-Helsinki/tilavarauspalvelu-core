@@ -1,7 +1,6 @@
 import React from "react";
-import styled from "styled-components";
 import { useMedia } from "react-use";
-import Breadcrumb, { RouteItem } from "common/src/breadcrumb/Breadcrumb";
+import { Breadcrumb, RouteItem } from "common/src/breadcrumb/Breadcrumb";
 import { useTranslation } from "next-i18next";
 import { breakpoints } from "common/src/common/style";
 import Link, { LinkProps } from "next/link";
@@ -14,27 +13,16 @@ type Alias = {
 
 type Props = {
   route: Array<string | RouteItem>;
-  disablePadding?: boolean;
   aliases?: Alias[];
   className?: string;
 };
-
-const Wrapper = styled.div`
-  display: block;
-  background-color: var(--color-white);
-`;
 
 // Breadcrumbs are shared with admin ui which uses react-router which requires an anchor elem
 const LinkWrapper = (props: LinkProps & { children?: React.ReactNode }) => (
   <Link {...props}>{props.children}</Link>
 );
 
-const BreadcrumbWrapper = ({
-  route,
-  aliases,
-  disablePadding,
-  className,
-}: Props): JSX.Element => {
+function BreadcrumbWrapper({ route, aliases, className }: Props): JSX.Element {
   const { t } = useTranslation();
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
 
@@ -42,6 +30,7 @@ const BreadcrumbWrapper = ({
     if (typeof n === "object") {
       return n;
     }
+    // TODO remove ths trim when all aliases are fixed
     return {
       title:
         aliases?.find((alias) => alias.slug === n)?.title ||
@@ -51,16 +40,13 @@ const BreadcrumbWrapper = ({
   });
 
   return (
-    <Wrapper>
-      <Breadcrumb
-        linkComponent={LinkWrapper}
-        disablePadding={disablePadding}
-        routes={[{ title: t("breadcrumb:frontpage"), slug: "/" }, ...routes]}
-        isMobile={isMobile}
-        className={className}
-      />
-    </Wrapper>
+    <Breadcrumb
+      linkComponent={LinkWrapper}
+      routes={[{ title: t("breadcrumb:frontpage"), slug: "/" }, ...routes]}
+      isMobile={isMobile}
+      className={className}
+    />
   );
-};
+}
 
 export default BreadcrumbWrapper;

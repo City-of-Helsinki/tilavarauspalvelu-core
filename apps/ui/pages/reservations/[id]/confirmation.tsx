@@ -3,99 +3,34 @@ import {
   ReservationDocument,
   type ReservationQuery,
   type ReservationQueryVariables,
-  useReservationQuery,
 } from "@gql/gql-types";
-import { useRouter } from "next/router";
-import styled from "styled-components";
-import { breakpoints, Container } from "common";
-import ClientOnly from "common/src/ClientOnly";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import type { GetServerSidePropsContext } from "next";
 import { ReservationInfoCard } from "@/components/reservation/ReservationInfoCard";
 import ReservationConfirmation from "@/components/reservation/ReservationConfirmation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { base64encode } from "common/src/helpers";
-import { CenterSpinner } from "@/components/common/common";
-import Error from "next/error";
 import { createApolloClient } from "@/modules/apolloClient";
+import { ReservationPageWrapper } from "@/components/reservations/styles";
 
-// TODO styles are copies from [...params].tsx
-const StyledContainer = styled(Container)`
-  padding-top: var(--spacing-m);
-
-  @media (min-width: ${breakpoints.m}) {
-    margin-bottom: var(--spacing-layout-l);
-  }
-`;
-
-const Columns = styled.div`
-  grid-template-columns: 1fr;
-  display: grid;
-  align-items: flex-start;
-  gap: var(--spacing-m);
-
-  @media (min-width: ${breakpoints.m}) {
-    & > div:nth-of-type(1) {
-      order: 2;
-    }
-
-    margin-top: var(--spacing-xl);
-    grid-template-columns: 1fr 378px;
-  }
-`;
-
-function Confirmation({ apiBaseUrl }: Props) {
-  const router = useRouter();
-  const { id: pk } = router.query;
-
-  // TODO check that the pk parameter is valid in getServerSideProps and return 404 if it's not
-  // TODO this could be moved to getServerSideProps
-  // TODO why is there no user check here? are regular users allowed to access a reservation of another user?
-  const typename = "ReservationNode";
-  const id = base64encode(`${typename}:${pk}`);
-  const {
-    data,
-    loading: isLoading,
-    error,
-  } = useReservationQuery({
-    variables: { id },
-    skip: !pk || Number.isNaN(Number(pk)),
-    onError: () => {},
-  });
-
-  const { reservation } = data ?? {};
-
-  if (isLoading) {
-    return <CenterSpinner />;
-  }
-
-  if (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
-    return <Error statusCode={500} />;
-  }
-
-  // TODO show an error page instead of returning null
-  if (reservation == null) {
-    return <Error statusCode={404} />;
-  }
-
+function Confirmation({ apiBaseUrl, reservation }: PropsNarrowed) {
   return (
-    <StyledContainer>
-      <Columns>
-        <ReservationInfoCard reservation={reservation} type="confirmed" />
-        <ReservationConfirmation
-          apiBaseUrl={apiBaseUrl}
-          reservation={reservation}
-        />
-      </Columns>
-    </StyledContainer>
+    // FIXME the info card overscales the screen on mobile (probably similar problem on other pages)
+    // TODO the info card used to be on top on mobile (now it's below)
+    <ReservationPageWrapper $nRows={1}>
+      <ReservationConfirmation
+        apiBaseUrl={apiBaseUrl}
+        reservation={reservation}
+      />
+      <ReservationInfoCard reservation={reservation} type="confirmed" />
+    </ReservationPageWrapper>
   );
 }
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, params } = ctx;
   const pk = params?.id;
 
@@ -119,13 +54,16 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     if (reservation) {
       return {
         props: {
+          reservation,
           ...getCommonServerSideProps(),
           ...(await serverSideTranslations(locale ?? "fi")),
         },
       };
     }
   }
+
   return {
+    notFound: true,
     props: {
       notFound: true,
       ...commonProps,
@@ -133,10 +71,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       key: `${pk}-confirmation-${locale}`,
     },
   };
-};
+}
 
-export default (props: Props) => (
-  <ClientOnly>
-    <Confirmation {...props} />
-  </ClientOnly>
-);
+export default Confirmation;

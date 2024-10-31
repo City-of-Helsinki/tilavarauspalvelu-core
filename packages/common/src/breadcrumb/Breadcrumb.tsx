@@ -1,6 +1,7 @@
 import React, { ElementType, Fragment } from "react";
 import styled, { css } from "styled-components";
 import { IconAngleLeft, IconAngleRight } from "hds-react";
+import { fontMedium } from "../common/typography";
 
 export type RouteItem = {
   title: string;
@@ -10,7 +11,6 @@ export type RouteItem = {
 type Props = {
   routes: RouteItem[];
   isMobile: boolean;
-  disablePadding?: boolean;
   linkComponent?: ElementType;
   className?: string;
 };
@@ -20,30 +20,15 @@ const limits = {
   current: 40,
 };
 
-// $disablePadding is required for refactoring purposes -> it should be the default with no variable
-const Nav = styled.nav<{ $isMobile?: boolean; $disablePadding?: boolean }>`
-  background-color: var(--color-white);
+const Nav = styled.nav<{ $isMobile?: boolean }>`
   font-size: var(--fontsize-body-m);
   display: flex;
   align-items: center;
-  max-width: var(--container-width-xl);
-  margin: 0 auto;
   line-height: var(--spacing-3-xl);
-  color: var(--color-black);
-  padding: ${({ $disablePadding }) =>
-    $disablePadding ? "0" : "0 var(--spacing-m)"};
 
   && > a {
-    color: var(--color-black);
     text-decoration: underline;
   }
-
-  ${({ $isMobile, $disablePadding }) =>
-    $isMobile &&
-    !$disablePadding &&
-    `
-      padding-left: var(--spacing-xs);
-    `};
 
   svg {
     margin: 0 var(--spacing-3-xs);
@@ -56,16 +41,17 @@ const Item = styled.div`
   max-width: 100%;
 `;
 
+const currentCss = css`
+  color: var(--color-black);
+  ${fontMedium}
+`;
+
 const Anchor = styled.span<{ $current?: boolean; $isMobile?: boolean }>`
-  &&& {
+  && {
     ${({ $current }) => {
       switch ($current) {
         case true:
-          return `
-            color: var(--color-black);
-            font-family: HelsinkiGrotesk-Medium, var(--font-default);
-            font-weight: 500;
-          `;
+          return currentCss;
         case false:
         default:
           return `
@@ -87,22 +73,15 @@ const Anchor = styled.span<{ $current?: boolean; $isMobile?: boolean }>`
   white-space: nowrap;
 `;
 
-const currentCss = css`
-  color: var(--color-black);
-  font-family: HelsinkiGrotesk-Medium, var(--font-default);
-  font-weight: 500;
-`;
-
 const Slug = styled.span<{ $current?: boolean }>`
   ${({ $current }) => $current && currentCss}
 
   white-space: nowrap;
 `;
 
-function Breadcrumb({
+export function Breadcrumb({
   routes = [],
   isMobile,
-  disablePadding,
   linkComponent,
   className,
 }: Props): JSX.Element {
@@ -125,7 +104,6 @@ function Breadcrumb({
       className={className}
       data-testid="breadcrumb__wrapper"
       $isMobile={isMobile}
-      $disablePadding={disablePadding}
     >
       {!isMobile ? (
         routes?.map((item, index) => (
@@ -182,5 +160,3 @@ function Breadcrumb({
     </Nav>
   );
 }
-
-export default Breadcrumb;

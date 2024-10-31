@@ -2,17 +2,18 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
-import { Container } from "common";
 import {
   ApplicantTypeChoice,
   ApplicationStatusChoice,
   type ApplicationQuery,
 } from "@gql/gql-types";
 import { useRouter } from "next/router";
-import { Head } from "./Head";
 import Stepper, { StepperProps } from "./Stepper";
 import NotesWhenApplying from "@/components/application/NotesWhenApplying";
 import { getApplicationPath } from "@/modules/urls";
+import BreadcrumbWrapper from "../common/BreadcrumbWrapper";
+import { H1 } from "common";
+import { FontMedium } from "./styled";
 
 const InnerContainer = styled.div<{ $hideStepper: boolean }>`
   display: grid;
@@ -104,11 +105,14 @@ export function ApplicationPageWrapper({
     isFormDirty: isDirty ?? false,
   };
 
+  const title = t(`${translationKeyPrefix}.heading`);
+  const subTitle =
+    headContent || overrideText || t(`${translationKeyPrefix}.text`);
   return (
-    <Container>
-      <Head heading={t(`${translationKeyPrefix}.heading`)}>
-        {headContent || overrideText || t(`${translationKeyPrefix}.text`)}
-      </Head>
+    <>
+      <BreadcrumbWrapper route={["/applications", "application"]} />
+      <H1 $noMargin>{title}</H1>
+      <FontMedium>{subTitle}</FontMedium>
       <InnerContainer $hideStepper={hideStepper}>
         {hideStepper ? null : <Stepper {...steps} />}
         {/* TODO preview / view should not maybe display these notes */}
@@ -121,6 +125,6 @@ export function ApplicationPageWrapper({
           {children}
         </NotesWrapper>
       </InnerContainer>
-    </Container>
+    </>
   );
 }

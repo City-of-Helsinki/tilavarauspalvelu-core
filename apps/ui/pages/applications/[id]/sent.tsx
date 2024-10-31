@@ -1,15 +1,16 @@
-import { Button, IconAngleRight } from "hds-react";
-import { useRouter } from "next/router";
+import { IconAngleRight } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
-import { Container } from "common";
+import { H1 } from "common";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import type { GetServerSidePropsContext } from "next";
 import { applicationsPath } from "@/modules/urls";
-import { Head } from "@/components/application/Head";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { FontMedium } from "@/components/application/styled";
+import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
+import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 
 const Paragraph = styled.p`
   white-space: pre-wrap;
@@ -20,28 +21,20 @@ const Paragraph = styled.p`
   }
 `;
 
-const StyledButton = styled(Button)`
-  margin-bottom: var(--spacing-layout-l);
-`;
-
 function Sent(): JSX.Element {
   const { t } = useTranslation();
-  const router = useRouter();
 
   return (
-    <Container>
-      <Head heading={t("application:sent.heading")}>
-        <p>{t("application:sent.subHeading")}</p>
-      </Head>
+    <>
+      <BreadcrumbWrapper route={["/applications", "application"]} />
+      <H1>{t("application:sent.heading")}</H1>
+      <FontMedium as="p">{t("application:sent.subHeading")}</FontMedium>
       <Paragraph>{t("application:sent.body")}</Paragraph>
-      <StyledButton
-        onClick={() => router.push(applicationsPath)}
-        iconRight={<IconAngleRight />}
-        size="small"
-      >
+      <ButtonLikeLink href={applicationsPath}>
         {t("navigation:Item.applications")}
-      </StyledButton>
-    </Container>
+        <IconAngleRight aria-hidden="true" />
+      </ButtonLikeLink>
+    </>
   );
 }
 

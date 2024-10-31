@@ -25,7 +25,6 @@ import {
 } from "@gql/gql-types";
 import { type Inputs } from "common/src/reservation-form/types";
 import { Subheading } from "common/src/reservation-form/styles";
-import { Container } from "common";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getReservationPath, getReservationUnitPath } from "@/modules/urls";
 import Sanitize from "@/components/common/Sanitize";
@@ -54,14 +53,6 @@ import {
 } from "common/src/common/util";
 import { ApolloError } from "@apollo/client";
 
-const StyledContainer = styled(Container)`
-  padding-top: var(--spacing-m);
-
-  @media (min-width: ${breakpoints.m}) {
-    margin-bottom: var(--spacing-layout-l);
-  }
-`;
-
 const Columns = styled.div`
   grid-template-columns: 1fr;
   display: grid;
@@ -78,15 +69,9 @@ const Columns = styled.div`
   }
 `;
 
+// TODO use a flexbox gap and set $noMargin
 const Title = styled(H2).attrs({ as: "h1" })`
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
   margin-top: 0;
-
-  svg {
-    color: var(--color-tram);
-  }
 `;
 
 const BodyContainer = styled.div`
@@ -378,80 +363,76 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
   };
 
   return (
-    <StyledContainer>
-      <Columns>
-        <div>
-          <ReservationInfoCard
-            reservation={infoReservation}
-            type="pending"
-            shouldDisplayReservationUnitPrice={
-              shouldDisplayReservationUnitPrice
-            }
-          />
-          {termsOfUseContent && (
-            <JustForDesktop>
-              <PinkBox>
-                <Subheading>
-                  {t("reservations:reservationInfoBoxHeading")}
-                </Subheading>
-                <Sanitize html={termsOfUseContent} />
-              </PinkBox>
-            </JustForDesktop>
+    <Columns>
+      <div>
+        <ReservationInfoCard
+          reservation={infoReservation}
+          type="pending"
+          shouldDisplayReservationUnitPrice={shouldDisplayReservationUnitPrice}
+        />
+        {termsOfUseContent && (
+          <JustForDesktop>
+            <PinkBox>
+              <Subheading>
+                {t("reservations:reservationInfoBoxHeading")}
+              </Subheading>
+              <Sanitize html={termsOfUseContent} />
+            </PinkBox>
+          </JustForDesktop>
+        )}
+      </div>
+      <BodyContainer>
+        <FormProvider {...form}>
+          <div>
+            <Title>{pageTitle}</Title>
+            {/* TODO what's the logic here?
+             * in what case are there more than 2 steps?
+             * why do we not show that?
+             * TODO why isn't this shown when creating a paid version? I think there was on purpose reason for that? maybe?
+             */}
+            {steps.length <= 2 && (
+              <StyledStepper
+                language={i18n.language}
+                selectedStep={step}
+                small={false}
+                onStepClick={(e) => {
+                  const target = e.currentTarget;
+                  const s = target
+                    .getAttribute("data-testid")
+                    ?.replace("hds-stepper-step-", "");
+                  if (s) {
+                    setStep(parseInt(s, 10));
+                  }
+                }}
+                steps={steps}
+              />
+            )}
+          </div>
+          {step === 0 && (
+            <Step0
+              reservationUnit={reservationUnit}
+              handleSubmit={handleSubmit(onSubmitStep0)}
+              reservation={reservation}
+              cancelReservation={cancelReservation}
+              options={options}
+            />
           )}
-        </div>
-        <BodyContainer>
-          <FormProvider {...form}>
-            <div>
-              <Title>{pageTitle}</Title>
-              {/* TODO what's the logic here?
-               * in what case are there more than 2 steps?
-               * why do we not show that?
-               * TODO why isn't this shown when creating a paid version? I think there was on purpose reason for that? maybe?
-               */}
-              {steps.length <= 2 && (
-                <StyledStepper
-                  language={i18n.language}
-                  selectedStep={step}
-                  small={false}
-                  onStepClick={(e) => {
-                    const target = e.currentTarget;
-                    const s = target
-                      .getAttribute("data-testid")
-                      ?.replace("hds-stepper-step-", "");
-                    if (s) {
-                      setStep(parseInt(s, 10));
-                    }
-                  }}
-                  steps={steps}
-                />
-              )}
-            </div>
-            {step === 0 && (
-              <Step0
-                reservationUnit={reservationUnit}
-                handleSubmit={handleSubmit(onSubmitStep0)}
-                reservation={reservation}
-                cancelReservation={cancelReservation}
-                options={options}
-              />
-            )}
-            {step === 1 && (
-              <Step1
-                reservation={reservation}
-                reservationUnit={reservationUnit}
-                handleSubmit={handleSubmit(onSubmitStep1)}
-                supportedFields={supportedFields}
-                options={options}
-                // TODO this is correct but confusing.
-                // There used to be 5 steps for payed reservations but the stepper is hidden for them now.
-                requiresHandling={steps.length > 2}
-                setStep={setStep}
-              />
-            )}
-          </FormProvider>
-        </BodyContainer>
-      </Columns>
-    </StyledContainer>
+          {step === 1 && (
+            <Step1
+              reservation={reservation}
+              reservationUnit={reservationUnit}
+              handleSubmit={handleSubmit(onSubmitStep1)}
+              supportedFields={supportedFields}
+              options={options}
+              // TODO this is correct but confusing.
+              // There used to be 5 steps for payed reservations but the stepper is hidden for them now.
+              requiresHandling={steps.length > 2}
+              setStep={setStep}
+            />
+          )}
+        </FormProvider>
+      </BodyContainer>
+    </Columns>
   );
 }
 

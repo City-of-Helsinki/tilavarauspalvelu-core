@@ -1,93 +1,29 @@
-import { breakpoints } from "common/src/common/style";
-import { fontMedium, H2 } from "common/src/common/typography";
-import { IconArrowRight, IconSignout } from "hds-react";
-import Link from "next/link";
 import React from "react";
+import { H1 } from "common/src/common/typography";
 import { useTranslation } from "next-i18next";
-import styled from "styled-components";
-import { Container } from "common";
-import { signOut } from "common/src/browserHelpers";
-import { Paragraph } from "./styles";
-import { LinkButton } from "../../styles/util";
-import { getSingleSearchPath } from "@/modules/urls";
+import { CancelledLinkSet } from "./CancelledLinkSet";
 
 type Props = {
   type: "reservation" | "order";
   apiBaseUrl: string;
 };
 
-const StyledContainer = styled(Container)`
-  padding: var(--spacing-m) var(--spacing-m) var(--spacing-layout-m);
+function getHeadingKey(type: Props["type"]): string {
+  return type === "reservation" ? "reservationExpired" : "orderInvalid";
+}
 
-  @media (min-width: ${breakpoints.m}) {
-    max-width: 1000px;
-    margin-bottom: var(--spacing-layout-l);
-  }
-`;
-
-const Wrapper = styled.div`
-  align-items: flex-start;
-`;
-
-const Heading = styled(H2).attrs({ as: "h1" })``;
-
-const ActionContainer = styled.div`
-  display: flex;
-  gap: var(--spacing-m);
-  flex-direction: column;
-  align-items: flex-start;
-`;
-
-const StyledLink = styled(Link)`
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-2-xs);
-  text-decoration: underline;
-  color: var(--color-black) !important;
-  ${fontMedium}
-`;
-
-const ReservationFail = ({ type, apiBaseUrl }: Props) => {
+// order is at least on DeleteCancelled.tsx
+// success.tsx has both of them
+export function ReservationFail({ type, apiBaseUrl }: Props) {
   const { t } = useTranslation();
-
-  const headingKey =
-    type === "reservation"
-      ? "reservationExpired"
-      : type === "order"
-        ? "orderInvalid"
-        : null;
-
+  const headingKey = getHeadingKey(type);
   return (
-    <StyledContainer>
-      <Wrapper>
-        <div>
-          <Heading>{t(`reservations:${headingKey}`)}</Heading>
-          {type === "reservation" && (
-            <Paragraph style={{ margin: "var(--spacing-xl) 0" }}>
-              {t("reservations:reservationExpiredDescription")}
-            </Paragraph>
-          )}
-          <ActionContainer
-            style={{
-              marginTop: "var(--spacing-3-xl)",
-            }}
-          >
-            <StyledLink href={getSingleSearchPath()}>
-              {t("reservations:backToSearch")}
-              <IconArrowRight aria-hidden size="m" />
-            </StyledLink>
-            <StyledLink href="/">
-              {t("common:gotoFrontpage")}
-              <IconArrowRight aria-hidden size="m" />
-            </StyledLink>
-            <LinkButton onClick={() => signOut(apiBaseUrl)}>
-              {t("common:logout")} <IconSignout size="m" aria-hidden />
-            </LinkButton>
-          </ActionContainer>
-        </div>
-      </Wrapper>
-    </StyledContainer>
+    <>
+      <H1>{t(`reservations:${headingKey}`)}</H1>
+      {type === "reservation" && (
+        <p>{t("reservations:reservationExpiredDescription")}</p>
+      )}
+      <CancelledLinkSet apiBaseUrl={apiBaseUrl} />
+    </>
   );
-};
-
-export default ReservationFail;
+}

@@ -1,19 +1,8 @@
 import styled from "styled-components";
-import { LoadingSpinner } from "hds-react";
 import { breakpoints } from "common/src/common/style";
 import { H5 } from "common/src/common/typography";
 
-export const TwoColumnContainer = styled.div`
-  @media (max-width: ${breakpoints.m}) {
-    grid-template-columns: 1fr;
-  }
-
-  margin-top: var(--spacing-m);
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-m);
-  align-items: baseline;
-`;
+export { CenterSpinner } from "common/styles/util";
 
 export const SpanTwoColumns = styled.span`
   display: grid;
@@ -48,8 +37,4 @@ export const ButtonContainer = styled.div`
   @media (min-width: ${breakpoints.m}) {
     flex-direction: row;
   }
-`;
-
-export const CenterSpinner = styled(LoadingSpinner)`
-  margin: 0 auto var(--spacing-2-xl) auto;
 `;

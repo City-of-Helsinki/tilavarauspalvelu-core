@@ -16,10 +16,31 @@ interface Props {
   version: string;
 }
 
+// TODO these are copied from admin-ui
+export const Layout = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  box-sizing: border-box;
+
+  padding-bottom: var(--spacing-layout-xl);
+`;
+
 const Main = styled.main`
-  font-size: var(--fontsize-body-m);
-  flex: 1 0 auto;
-  margin-bottom: -14px;
+  /* TODO there isn't these global variables defined in customer ui */
+  /*
+  max-width: var(--tilavaraus-page-max-width);
+  padding: 0 var(--tilavaraus-page-margin);
+*/
+  max-width: var(--container-width-xl);
+  padding: 0 var(--spacing-s);
+
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+
+  gap: var(--spacing-2-xl);
 `;
 
 function PageWrapper({
@@ -41,7 +62,9 @@ function PageWrapper({
         target={BannerNotificationTarget.User}
       />
       <InProgressReservationNotification />
-      <Main id="main">{children}</Main>
+      <Layout>
+        <Main id="main">{children}</Main>
+      </Layout>
       <Footer feedbackUrl={feedbackUrl} />
       <div id="modal-root" />
     </>

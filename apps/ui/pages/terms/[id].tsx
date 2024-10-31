@@ -1,6 +1,5 @@
 import React from "react";
 import type { GetServerSidePropsContext } from "next";
-import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
 import {
@@ -9,8 +8,7 @@ import {
   type TermsOfUseQuery,
   type TermsOfUseQueryVariables,
 } from "@gql/gql-types";
-import { H2 } from "common/src/common/typography";
-import { Container } from "common";
+import { H1 } from "common/src/common/typography";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import Sanitize from "@/components/common/Sanitize";
@@ -57,12 +55,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   };
 };
 
-const Wrapper = styled(Container).attrs({ size: "s" })`
-  margin-bottom: var(--spacing-layout-l);
-`;
-
-const Heading = styled(H2).attrs({ as: "h1" })``;
-
 const GenericTerms = ({ genericTerms }: Props): JSX.Element => {
   const { i18n } = useTranslation();
 
@@ -75,10 +67,10 @@ const GenericTerms = ({ genericTerms }: Props): JSX.Element => {
   const text = getTranslationSafe(genericTerms, "text", lang);
 
   return (
-    <Wrapper>
-      <Heading>{title} </Heading>
+    <>
+      <H1>{title}</H1>
       <Sanitize html={text} style={{ whiteSpace: "pre-wrap" }} />
-    </Wrapper>
+    </>
   );
 };
 

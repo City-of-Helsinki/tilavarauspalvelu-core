@@ -3,7 +3,6 @@ import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
-import styled from "styled-components";
 import {
   ApplicationStatusChoice,
   type ApplicationsQuery,
@@ -15,11 +14,12 @@ import {
   ApplicationOrderingChoices,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
-import Head from "@/components/applications/Head";
 import ApplicationsGroup from "@/components/applications/ApplicationsGroup";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import { useCurrentUser } from "@/hooks/user";
+import { HeroSubheading } from "@/modules/style/typography";
+import { H1 } from "common";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -77,13 +77,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     },
   };
 }
-
-const Container = styled.div`
-  padding: 0 var(--spacing-m) var(--spacing-m);
-  max-width: var(--container-width-xl);
-  margin: 0 auto var(--spacing-2-xl) auto;
-  font-size: var(--fontsize-body-xl);
-`;
 
 function ApplicationGroups({
   applications,
@@ -184,13 +177,16 @@ function ApplicationsPage({
 
   return (
     <>
-      <Head />
-      <Container>
+      <div>
+        <H1>{t("applications:heading")}</H1>
+        <HeroSubheading>{t("applications:subHeading")}</HeroSubheading>
+      </div>
+      <div>
         <ApplicationGroups
           applications={applications}
           actionCallback={actionCallback}
         />
-      </Container>
+      </div>
       {cancelled && (
         <Notification
           type="success"

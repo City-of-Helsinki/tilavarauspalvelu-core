@@ -1,4 +1,3 @@
-import Breadcrumb from "./breadcrumb/Breadcrumb";
 import formatters from "./number-formatters";
 import {
   getPriceUnitMinutes,
@@ -13,7 +12,6 @@ export * from "./common/style";
 export * from "./common/typography";
 
 export {
-  Breadcrumb,
   UserInfo,
   getUnRoundedReservationVolume,
   getReservationVolume,

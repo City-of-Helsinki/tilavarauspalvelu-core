@@ -43,7 +43,7 @@ function ViewAll({ applicationSection }: PropsNarrowed): JSX.Element {
   ];
   return (
     <Container>
-      <BreadcrumbWrapper disablePadding route={route} />
+      <BreadcrumbWrapper route={route} />
       <H2 as="h1">{heading}</H2>
       <AllReservations applicationSection={applicationSection} />
     </Container>

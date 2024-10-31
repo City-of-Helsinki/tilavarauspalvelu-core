@@ -266,7 +266,7 @@ const Results = styled.div`
   width: 99%;
 `;
 
-const StyledLoadingSpinner = styled(LoadingSpinner).attrs({ small: true })``;
+const SmallSpinner = styled(LoadingSpinner).attrs({ small: true })``;
 
 type Node = NonNullable<ApplicationQuery["application"]>;
 type AppRoundNode = NonNullable<Node["applicationRound"]>;
@@ -391,7 +391,7 @@ function ReservationUnitModal({
         >
           {t("common:search")}
         </SearchButton>
-        {loading && <StyledLoadingSpinner />}
+        {loading && <SmallSpinner />}
       </ButtonContainer>
       <Ruler />
       <Results>

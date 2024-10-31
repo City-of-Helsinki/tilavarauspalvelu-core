@@ -1,3 +1,4 @@
+import { LoadingSpinner } from "hds-react";
 import styled, { css } from "styled-components";
 
 // TODO rename this file after moving common styled components here
@@ -79,4 +80,8 @@ export const ButtonContainer = styled.div<{
   width: 100%;
   margin-bottom: ${({ $noMargin }) => ($noMargin ? "0" : "var(--spacing-s);")};
   justify-content: ${({ $justify }) => $justify ?? "flex-end"};
+`;
+
+export const CenterSpinner = styled(LoadingSpinner)`
+  margin: 0 auto var(--spacing-2-xl) auto;
 `;

@@ -40,8 +40,8 @@ function MyApp({ Component, pageProps }: AppProps) {
             <ThemeProvider theme={theme}>
               <PageWrapper {...pageProps}>
                 <Component {...pageProps} />
-                <ToastContainer />
               </PageWrapper>
+              <ToastContainer />
             </ThemeProvider>
           </ApolloProvider>
         </TrackingWrapper>

@@ -1,37 +1,48 @@
 import React from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { breakpoints } from "../common/style";
 
 type Size = "s" | "l";
 
 type Props = {
   children: React.ReactNode;
-  size?: Size;
 };
 
-const Wrapper = styled.div<{ $size?: Size }>`
-  max-width: ${({ $size }) =>
-    $size === "l" ? "var(--container-width-xl)" : "var(--container-width-l)"};
+const wrapperCss = css`
+  max-width: var(--container-width-xl);
+  width: 100%;
   margin: 0 auto;
-  padding-right: var(--spacing-s);
-  padding-left: var(--spacing-s);
+  padding: 0 var(--spacing-s);
 
   --spacing-hz: var(--spacing-s);
 
   @media (min-width: ${breakpoints.m}) {
-    padding-right: var(--spacing-m);
-    padding-left: var(--spacing-m);
+    padding: 0 var(--spacing-m);
 
     --spacing-hz: var(--spacing-m);
   }
+
+  box-sizing: border-box;
 `;
 
-const Container = ({ size = "l", children, ...rest }: Props): JSX.Element => {
-  return (
-    <Wrapper $size={size} {...rest}>
-      {children}
-    </Wrapper>
-  );
+const Wrapper = styled.div<{ $size?: Size }>`
+  ${wrapperCss}
+`;
+
+/// TODO rename after migrating Container to this
+export const StyledContainer = styled.div<{
+  $gap?: "2-xs" | "xs" | "s" | "m" | "l" | "xl" | "2-xl";
+}>`
+  ${wrapperCss}
+
+  display: flex;
+  flex-direction: column;
+  gap: ${({ $gap }) => ($gap ? `var(--spacing-${$gap})` : "var(--spacing-m)")};
+`;
+
+/// @deprecated
+const Container = ({ children, ...rest }: Props): JSX.Element => {
+  return <Wrapper {...rest}>{children}</Wrapper>;
 };
 
 export const CenteredContainer = styled(Container)`

@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Button,
   IconArrowRight,
   IconCalendar,
   IconLinkExternal,
@@ -8,22 +9,20 @@ import {
 import { Trans, useTranslation } from "next-i18next";
 import Link from "next/link";
 import styled from "styled-components";
-import { fontRegular, H2 } from "common/src/common/typography";
+import { fontRegular, H1 } from "common/src/common/typography";
 import {
   type PaymentOrderNode,
   type ReservationQuery,
   ReservationStateChoice,
 } from "@gql/gql-types";
 import { Subheading } from "common/src/reservation-form/styles";
-import { breakpoints } from "common/src/common/style";
 import { IconButton } from "common/src/components";
 import { signOut } from "common/src/browserHelpers";
 import { getReservationUnitInstructionsKey } from "@/modules/reservationUnit";
 import { getTranslation } from "@/modules/util";
-import { BlackButton } from "@/styles/util";
-import { Paragraph } from "./styles";
 import { ButtonLikeExternalLink } from "../common/ButtonLikeLink";
 import { getReservationUnitPath, reservationsPath } from "@/modules/urls";
+import { Flex } from "common/styles/util";
 
 type Node = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
@@ -32,28 +31,7 @@ type Props = {
   order?: PaymentOrderNode;
 };
 
-const Wrapper = styled.div`
-  align-items: flex-start;
-  margin-bottom: var(--spacing-layout-l);
-`;
-
-const Heading = styled(H2).attrs({ as: "h1" })``;
-
-const ActionContainer1 = styled.div`
-  margin: var(--spacing-m) 0 var(--spacing-l);
-  display: flex;
-  gap: var(--spacing-m);
-  flex-direction: column;
-
-  > button {
-    max-width: 20rem;
-  }
-
-  @media (min-width: ${breakpoints.l}) {
-    flex-direction: row;
-  }
-`;
-
+// TODO there should be a styled component for this (if not move this to common)
 const InlineStyledLink = styled(Link)`
   && {
     display: inline;
@@ -63,24 +41,17 @@ const InlineStyledLink = styled(Link)`
   }
 `;
 
-const ReturnLinkContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-`;
-
-const ReturnLinkList = ({
+// TODO this is nearly identical to CancelledLinkSet (except for the first link)
+function ReturnLinkList({
   reservationUnitHome,
   apiBaseUrl,
-  style,
 }: {
   reservationUnitHome: string;
   apiBaseUrl: string;
-  style: React.CSSProperties;
-}): JSX.Element => {
+}): JSX.Element {
   const { t } = useTranslation();
   return (
-    <ReturnLinkContainer style={style}>
+    <Flex>
       <IconButton
         href={reservationUnitHome}
         label={t("reservations:backToReservationUnit")}
@@ -96,9 +67,9 @@ const ReturnLinkList = ({
         onClick={() => signOut(apiBaseUrl)}
         label={t("common:logout")}
       />
-    </ReturnLinkContainer>
+    </Flex>
   );
-};
+}
 
 function ReservationConfirmation({
   reservation,
@@ -111,16 +82,21 @@ function ReservationConfirmation({
   const instructionsKey = getReservationUnitInstructionsKey(reservation?.state);
   const requiresHandling =
     reservation.state === ReservationStateChoice.RequiresHandling;
-  const heading = t(
-    `reservationUnit:${
-      requiresHandling ? "reservationInHandling" : "reservationSuccessful"
-    }`
-  );
+
+  const titleKey = requiresHandling
+    ? "reservationInHandling"
+    : "reservationSuccessful";
+  const title = t(`reservationUnit:${titleKey}`);
+  const showInstructions =
+    reservationUnit != null &&
+    instructionsKey != null &&
+    getTranslation(reservationUnit, instructionsKey);
 
   return (
-    <Wrapper>
-      <Heading>{heading}</Heading>
-      <Paragraph style={{ margin: "var(--spacing-xl) 0" }}>
+    <Flex>
+      {/* TODO the H1 margin-bottom and the gap are fighting */}
+      <H1>{title}</H1>
+      <p>
         <Trans
           i18nKey={`reservationUnit:reservationReminderText${
             requiresHandling ? "Handling" : ""
@@ -137,9 +113,10 @@ function ReservationConfirmation({
         >
           {" "}
         </Trans>
-      </Paragraph>
+      </p>
       {reservation.state === ReservationStateChoice.Confirmed && (
-        <ActionContainer1 style={{ marginBottom: "var(--spacing-2-xl)" }}>
+        // TODO this should be a ButtonContainer (we want two buttons side by side on mobile or similar)
+        <Flex>
           <ButtonLikeExternalLink
             size="large"
             disabled={!reservation.calendarUrl}
@@ -150,8 +127,9 @@ function ReservationConfirmation({
             <IconCalendar aria-hidden />
           </ButtonLikeExternalLink>
           {order?.receiptUrl && (
-            <BlackButton
+            <Button
               data-testid="reservation__confirmation--button__receipt-link"
+              // TODO should be a link
               onClick={() =>
                 window.open(
                   `${order.receiptUrl}&lang=${i18n.language}`,
@@ -162,30 +140,23 @@ function ReservationConfirmation({
               iconRight={<IconLinkExternal aria-hidden />}
             >
               {t("reservations:downloadReceipt")}
-            </BlackButton>
+            </Button>
           )}
-        </ActionContainer1>
+        </Flex>
       )}
-      {reservationUnit != null &&
-        instructionsKey != null &&
-        getTranslation(reservationUnit, String(instructionsKey)) && (
-          <>
-            <Subheading>{t("reservations:reservationInfo")}</Subheading>
-            <Paragraph style={{ margin: "var(--spacing-xl) 0" }}>
-              {getTranslation(reservationUnit, String(instructionsKey))}
-            </Paragraph>
-          </>
-        )}
+      {showInstructions && (
+        <>
+          <Subheading>{t("reservations:reservationInfo")}</Subheading>
+          <p>{getTranslation(reservationUnit, instructionsKey)}</p>
+        </>
+      )}
       {reservationUnit != null && (
         <ReturnLinkList
           reservationUnitHome={getReservationUnitPath(reservationUnit?.pk)}
           apiBaseUrl={apiBaseUrl}
-          style={{
-            marginTop: "var(--spacing-3-xl)",
-          }}
         />
       )}
-    </Wrapper>
+    </Flex>
   );
 }
 

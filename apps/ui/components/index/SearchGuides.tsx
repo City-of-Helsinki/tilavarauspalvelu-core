@@ -7,16 +7,11 @@ import { fontMedium, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 
 const Wrapper = styled.div`
-  padding-top: var(--spacing-xl);
-  padding-bottom: var(--spacing-xl);
-  padding-right: var(--spacing-l);
-
+  width: 100%;
   @media (max-width: ${breakpoints.m}) {
     display: flex;
     flex-direction: column;
     gap: 46px;
-    padding-right: 0;
-    padding-bottom: var(--spacing-layout-l);
   }
 `;
 
@@ -102,7 +97,7 @@ const ButtonContainer = styled.div`
   }
 `;
 
-const SearchGuides = (): JSX.Element => {
+export function SearchGuides(): JSX.Element {
   const { t } = useTranslation("home");
   const router = useRouter();
 
@@ -132,6 +127,4 @@ const SearchGuides = (): JSX.Element => {
       </StyledImageWithCard>
     </Wrapper>
   );
-};
-
-export default SearchGuides;
+}

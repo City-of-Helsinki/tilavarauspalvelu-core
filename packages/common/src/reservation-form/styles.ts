@@ -1,6 +1,6 @@
 import styled from "styled-components";
-import { breakpoints } from "../common/style";
 import { H4, H5 } from "../common/typography";
+import { breakpoints } from "../common/style";
 
 export const Subheading = styled(H4).attrs({ as: "h2" })``;
 
@@ -14,9 +14,9 @@ export const TwoColumnContainer = styled.div`
   display: grid;
   gap: var(--spacing-m);
   align-items: baseline;
-  grid-template-columns: 1fr;
 
-  @media (min-width: ${breakpoints.l}) {
+  grid-template-columns: 1fr;
+  @media (width > ${breakpoints.m}) {
     grid-template-columns: 1fr 1fr;
   }
 `;

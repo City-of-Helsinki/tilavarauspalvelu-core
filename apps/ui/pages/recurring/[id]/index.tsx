@@ -4,8 +4,7 @@ import styled from "styled-components";
 import type { GetServerSidePropsContext } from "next";
 import { Notification } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { H2 } from "common/src/common/typography";
-import { breakpoints } from "common/src/common/style";
+import { H1 } from "common/src/common/typography";
 import {
   ApplicationRoundStatusChoice,
   ReservationKind,
@@ -17,7 +16,6 @@ import {
   type ApplicationRoundsUiQueryVariables,
   ApplicationRoundsUiDocument,
 } from "@gql/gql-types";
-import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
 import { SeasonalSearchForm } from "@/components/search/SeasonalSearchForm";
 import { HeroSubheading } from "@/modules/style/typography";
@@ -81,34 +79,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   };
 }
 
-const Wrapper = styled.div`
-  margin-bottom: var(--spacing-layout-l);
-`;
-
-const StyledContainer = styled(Container)`
-  padding-bottom: var(--spacing-3-xs);
-
-  @media (min-width: ${breakpoints.s}) {
-    padding-bottom: var(--spacing-2-xs);
-  }
-`;
-
-const HeadContainer = styled.div`
-  background-color: white;
-
-  @media (min-width: ${breakpoints.m}) {
-    padding-top: 0;
-  }
-`;
-
-const Title = styled(H2).attrs({ as: "h1" })``;
-
 const Ingress = styled(HeroSubheading)`
   margin-bottom: var(--spacing-xs);
-`;
-
-const BottomWrapper = styled(Container)`
-  padding-top: var(--spacing-l);
 `;
 
 function SeasonalSearch({
@@ -150,16 +122,16 @@ function SeasonalSearch({
   const pageInfo = currData?.reservationUnits?.pageInfo;
 
   return (
-    <Wrapper>
+    <>
       {error ? (
         <Notification size="small" type="alert">
           {t("searchResultList:error")}
         </Notification>
       ) : null}
-      <HeadContainer>
+      <div>
         <BreadcrumbWrapper route={["/recurring", "search"]} />
-        <StyledContainer>
-          <Title>{t("search:recurring.heading")}</Title>
+        <div>
+          <H1>{t("search:recurring.heading")}</H1>
           <Ingress>{t("search:recurring.text")}</Ingress>
           <SeasonalSearchForm
             unitOptions={unitOptions}
@@ -167,9 +139,9 @@ function SeasonalSearch({
             purposeOptions={purposeOptions}
             isLoading={isLoading}
           />
-        </StyledContainer>
-      </HeadContainer>
-      <BottomWrapper>
+        </div>
+      </div>
+      <div>
         <ListWithPagination
           items={reservationUnits?.map((ru) => (
             <ReservationUnitCard
@@ -190,8 +162,8 @@ function SeasonalSearch({
           count={selectedReservationUnits.length}
           clearSelections={clearSelections}
         />
-      </BottomWrapper>
-    </Wrapper>
+      </div>
+    </>
   );
 }
 

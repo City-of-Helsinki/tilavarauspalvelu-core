@@ -3,8 +3,7 @@ import styled from "styled-components";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { H2, H3 } from "common/src/common/typography";
-import { breakpoints } from "common/src/common/style";
+import { H1, H3 } from "common/src/common/typography";
 import {
   ApplicationRoundOrderingChoices,
   ApplicationRoundStatusChoice,
@@ -57,28 +56,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   };
 };
 
-const Head = styled.div`
-  padding: var(--spacing-m) var(--spacing-m) var(--spacing-xl);
-
-  @media (min-width: ${breakpoints.m}) {
-    max-width: var(--container-width-xl);
-    padding: var(--spacing-m);
-    margin: 0 auto;
-    padding-bottom: var(--spacing-layout-l);
-  }
-`;
-
-const Content = styled.div`
-  padding: 0 var(--spacing-m) var(--spacing-xl);
-  background-color: var(--color-white);
-
-  @media (min-width: ${breakpoints.m}) {
-    max-width: var(--container-width-xl);
-    margin: 0 auto;
-    padding-bottom: var(--spacing-layout-xl);
-  }
-`;
-
 const RoundList = styled.div`
   display: flex;
   flex-flow: column nowrap;
@@ -110,11 +87,11 @@ const RecurringLander = ({ applicationRounds }: Props): JSX.Element => {
 
   return (
     <>
-      <Head>
-        <H2 as="h1">{t("recurringLander:heading")}</H2>
+      <div>
+        <H1>{t("recurringLander:heading")}</H1>
         <HeroSubheading>{t("recurringLander:subHeading")}</HeroSubheading>
-      </Head>
-      <Content>
+      </div>
+      <div>
         {activeApplicationRounds.length > 0 ? (
           <RoundList data-testid="recurring-lander__application-round-container--active">
             <RoundHeading>
@@ -161,7 +138,7 @@ const RecurringLander = ({ applicationRounds }: Props): JSX.Element => {
             ))}
           </RoundList>
         )}
-      </Content>
+      </div>
     </>
   );
 };

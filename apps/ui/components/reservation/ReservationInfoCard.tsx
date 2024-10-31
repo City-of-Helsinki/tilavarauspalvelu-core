@@ -4,11 +4,7 @@ import { gql } from "@apollo/client";
 import { differenceInMinutes } from "date-fns";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import {
-  getReservationPrice,
-  formatters as getFormatters,
-  breakpoints,
-} from "common";
+import { getReservationPrice, formatters as getFormatters } from "common";
 import { H4, Strong } from "common/src/common/typography";
 import {
   ReservationStateChoice,
@@ -70,12 +66,6 @@ const Wrapper = styled.div<{ $type: Type }>`
   background-color: var(
     --color-${({ $type }) => ($type === "complete" ? "silver" : "gold")}-light
   );
-
-  width: 100%;
-  @media (width > ${breakpoints.m}) {
-    /* inside a grid so we need to force the size */
-    width: 390px;
-  }
 `;
 
 const MainImage = styled.img`
@@ -164,6 +154,7 @@ export function ReservationInfoCard({
   const img = getMainImage(reservationUnit);
   const imgSrc = getImageSource(img, "medium");
 
+  // TODO why does this not use the Card component?
   return (
     <Wrapper $type={type}>
       {!disableImage && <MainImage src={imgSrc} alt={name} />}

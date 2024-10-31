@@ -1,41 +1,18 @@
+import React, { useEffect } from "react";
 import type { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import React, { useEffect } from "react";
-import { breakpoints } from "common/src/common/style";
-import { LoadingSpinner } from "hds-react";
-import styled from "styled-components";
-import { Container } from "common";
+import { CancelledLinkSet } from "@/components/reservation/CancelledLinkSet";
+import { H1 } from "common";
 import { useDeleteReservation, useOrder } from "@/hooks/reservation";
-import DeleteCancelled from "@/components/reservation/DeleteCancelled";
-import ReservationFail from "@/components/reservation/ReservationFail";
+import { ReservationFail } from "@/components/reservation/ReservationFail";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { useTranslation } from "react-i18next";
+import { CenterSpinner } from "@/components/common/common";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  const { locale } = ctx;
-
-  return {
-    props: {
-      ...getCommonServerSideProps(),
-      ...(await serverSideTranslations(locale ?? "fi")),
-    },
-  };
-};
-
-const StyledContainer = styled(Container)`
-  display: flex;
-  padding: var(--spacing-m) var(--spacing-m) var(--spacing-layout-m);
-  justify-content: center;
-
-  @media (min-width: ${breakpoints.m}) {
-    max-width: 1000px;
-    margin-bottom: var(--spacing-layout-l);
-  }
-`;
-
-const Cancel = ({ apiBaseUrl }: Props): JSX.Element => {
+function Cancel({ apiBaseUrl }: Props): JSX.Element {
   const router = useRouter();
   const { orderId } = router.query;
 
@@ -49,6 +26,8 @@ const Cancel = ({ apiBaseUrl }: Props): JSX.Element => {
     deleted,
   } = useDeleteReservation();
 
+  // TODO not a fan of this
+  // just do the reservation query on SSR, handles invalid route errors also
   useEffect(() => {
     const { reservationPk } = order || {};
     if (reservationPk) {
@@ -58,44 +37,58 @@ const Cancel = ({ apiBaseUrl }: Props): JSX.Element => {
     }
   }, [deleteReservation, order]);
 
-  if (isLoading || isDeleteLoading || !called) {
+  // TODO why is this like this?
+  const isError =
+    !deleted &&
+    (!deleteError ||
+      deleteError?.message !== "No Reservation matches the given query.");
+
+  const { t } = useTranslation();
+
+  // TODO improve error reporting
+  if (isError) {
     return (
-      <StyledContainer>
-        <LoadingSpinner />
-      </StyledContainer>
+      <div>
+        <H1>{t("common:error.error")}</H1>
+        <p>{t("errors:general_error")}</p>
+      </div>
     );
   }
 
+  // TEMPORARY testing
   // return invalid order id error
   if (!order || !order.reservationPk) {
     return <ReservationFail apiBaseUrl={apiBaseUrl} type="order" />;
   }
 
-  // return general error
-  if (
-    !deleted &&
-    (!deleteError ||
-      deleteError?.message !== "No Reservation matches the given query.")
-  ) {
-    return (
-      <DeleteCancelled
-        reservationPk={order?.reservationPk}
-        error
-        apiBaseUrl={apiBaseUrl}
-      />
-    );
+  if (isLoading || isDeleteLoading || !called) {
+    return <CenterSpinner />;
   }
 
   // return success report - even if deletion failed
+  return <DeleteCancelled apiBaseUrl={apiBaseUrl} />;
+}
+
+// TODO why is this named DeleteCancelled? it seems to be a success report
+function DeleteCancelled({ apiBaseUrl }: { apiBaseUrl: string }) {
+  const { t } = useTranslation();
   return (
-    <StyledContainer>
-      <DeleteCancelled
-        reservationPk={order?.reservationPk}
-        error={false}
-        apiBaseUrl={apiBaseUrl}
-      />
-    </StyledContainer>
+    <>
+      <H1>{t("reservations:reservationCancelledTitle")}</H1>
+      <CancelledLinkSet apiBaseUrl={apiBaseUrl} />
+    </>
   );
-};
+}
+
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+  const { locale } = ctx;
+
+  return {
+    props: {
+      ...getCommonServerSideProps(),
+      ...(await serverSideTranslations(locale ?? "fi")),
+    },
+  };
+}
 
 export default Cancel;

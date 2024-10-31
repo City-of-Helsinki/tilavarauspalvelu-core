@@ -12,31 +12,32 @@ import {
   type ReservationUnitPurposesQuery,
   type ReservationUnitPurposesQueryVariables,
 } from "@gql/gql-types";
-import { Container } from "common";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import Header from "@/components/index/Header";
-import SearchGuides from "@/components/index/SearchGuides";
-import Purposes from "@/components/index/Purposes";
-import Units from "@/components/index/Units";
+import { Head } from "@/components/index/Header";
+import { SearchGuides } from "@/components/index/SearchGuides";
+import { Purposes } from "@/components/index/Purposes";
+import { Units } from "@/components/index/Units";
 import { createApolloClient } from "@/modules/apolloClient";
 import { filterNonNullable } from "common/src/helpers";
+import { Flex } from "common/styles/util";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
-const Home = ({ purposes, units }: Props): JSX.Element => {
+function Home({ purposes, units }: Props): JSX.Element {
   const { t } = useTranslation(["home", "common"]);
 
+  // FIXME add gap to the layout by default (or allow configuring it), need like 48px here
   return (
-    <Container>
-      <Header heading={t("head.heading")} text={t("head.text")} />
+    <Flex>
+      <Head heading={t("head.heading")} text={t("head.text")} />
       <Purposes purposes={purposes} />
       <Units units={units} />
       <SearchGuides />
-    </Container>
+    </Flex>
   );
-};
+}
 
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale } = ctx;
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
@@ -87,6 +88,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       ])),
     },
   };
-};
+}
 
 export default Home;

@@ -10,7 +10,7 @@ import {
   IconLinkExternal,
 } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { H2, H4, fontRegular } from "common/src/common/typography";
+import { H1, H4, fontRegular } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { NoWrap } from "common/styles/util";
 import {
@@ -24,7 +24,6 @@ import {
   OrderStatus,
 } from "@gql/gql-types";
 import Link from "next/link";
-import { Container } from "common";
 import { useOrder } from "@/hooks/reservation";
 import { createApolloClient } from "@/modules/apolloClient";
 import { formatDateTimeRange, getTranslation } from "@/modules/util";
@@ -65,12 +64,6 @@ import { ReservationPageWrapper } from "@/components/reservations/styles";
 import { getReservationPath, getReservationUnitPath } from "@/modules/urls";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
-
-// TODO this has margin issues on mobile, there is zero margin on top because some element (breadcrumbs?) is removed on mobile
-const Heading = styled(H2).attrs({ as: "h1" })`
-  margin-top: 0;
-  margin-bottom: var(--spacing-m);
-`;
 
 const SubHeading = styled(H4).attrs({ as: "h2" })`
   margin-top: 0;
@@ -445,186 +438,184 @@ function Reservation({
   return (
     <>
       <BreadcrumbWrapper route={routes} />
-      <Container>
-        <ReservationPageWrapper data-testid="reservation__content">
-          <div style={{ gridColumn: "1 / span 1", gridRow: "1 / span 1" }}>
-            <Heading data-testid="reservation__name">
-              {t("reservations:reservationName", { id: reservation.pk })}
-            </Heading>
-            <SubHeading>
-              <Link
-                data-testid="reservation__reservation-unit"
-                href={getReservationUnitPath(reservationUnit.pk)}
-              >
-                {getReservationUnitName(reservationUnit)}
-              </Link>
-              <NoWrap data-testid="reservation__time">{timeString}</NoWrap>
-            </SubHeading>
-            <StatusContainer>
-              <ReservationStatus
-                testId="reservation__status"
-                state={reservation.state ?? ReservationStateChoice.Confirmed}
+      <ReservationPageWrapper data-testid="reservation__content">
+        <div style={{ gridColumn: "1 / span 1", gridRow: "1 / span 1" }}>
+          <H1 data-testid="reservation__name">
+            {t("reservations:reservationName", { id: reservation.pk })}
+          </H1>
+          <SubHeading>
+            <Link
+              data-testid="reservation__reservation-unit"
+              href={getReservationUnitPath(reservationUnit.pk)}
+            >
+              {getReservationUnitName(reservationUnit)}
+            </Link>
+            <NoWrap data-testid="reservation__time">{timeString}</NoWrap>
+          </SubHeading>
+          <StatusContainer>
+            <ReservationStatus
+              testId="reservation__status"
+              state={reservation.state ?? ReservationStateChoice.Confirmed}
+            />
+            {normalizedOrderStatus && (
+              <ReservationOrderStatus
+                orderStatus={normalizedOrderStatus}
+                testId="reservation__payment-status"
               />
-              {normalizedOrderStatus && (
-                <ReservationOrderStatus
-                  orderStatus={normalizedOrderStatus}
-                  testId="reservation__payment-status"
-                />
-              )}
-            </StatusContainer>
-          </div>
-          <div style={{ gridRowEnd: "span 3" }}>
-            <ReservationInfoCard reservation={reservation} type="complete" />
-            <SecondaryActions>
-              {reservation.state === ReservationStateChoice.Confirmed && (
-                <ButtonLikeExternalLink
-                  size="large"
-                  disabled={!reservation.calendarUrl}
-                  data-testid="reservation__button--calendar-link"
-                  href={reservation.calendarUrl ?? ""}
-                >
-                  {t("reservations:saveToCalendar")}
-                  <IconCalendar aria-hidden />
-                </ButtonLikeExternalLink>
-              )}
-              {hasReceipt && (
-                <ButtonLikeLink
-                  size="large"
-                  data-testid="reservation__confirmation--button__receipt-link"
-                  href={`${order.receiptUrl}&lang=${i18n.language}`}
-                  target="_blank"
-                >
-                  {t("reservations:downloadReceipt")}
-                  <IconLinkExternal aria-hidden />
-                </ButtonLikeLink>
-              )}
-            </SecondaryActions>
-          </div>
-          <div>
-            <Actions>
-              {isWaitingForPayment && (
-                <ButtonLikeLink
-                  size="large"
-                  disabled={!hasCheckoutUrl}
-                  href={checkoutUrl ?? ""}
-                  data-testid="reservation-detail__button--checkout"
-                >
-                  {t("reservations:payReservation")}
-                  <IconArrowRight aria-hidden />
-                </ButtonLikeLink>
-              )}
-              {canTimeBeModified && (
-                <ButtonLikeLink
-                  size="large"
-                  href={getReservationPath(reservation.pk, "edit")}
-                  data-testid="reservation-detail__button--edit"
-                >
-                  {t("reservations:modifyReservationTime")}
-                  <IconCalendar aria-hidden />
-                </ButtonLikeLink>
-              )}
-              {isCancellable && (
-                <ButtonLikeLink
-                  size="large"
-                  href={getReservationPath(reservation.pk, "cancel")}
-                  data-testid="reservation-detail__button--cancel"
-                >
-                  {t(
-                    `reservations:cancel${
-                      isBeingHandled ? "Application" : "Reservation"
-                    }`
-                  )}
-                  <IconCross aria-hidden />
-                </ButtonLikeLink>
-              )}
-            </Actions>
-            <NotModifiableReason reservation={reservation} />
-          </div>
-          <Content>
-            {instructionsKey &&
-              getTranslation(reservationUnit, instructionsKey) && (
-                <ContentContainer>
-                  <ParagraphHeading>
-                    {t("reservations:reservationInfo")}
-                  </ParagraphHeading>
-                  <Paragraph>
-                    {getTranslation(reservationUnit, instructionsKey)}
-                  </Paragraph>
-                </ContentContainer>
-              )}
-            <ParagraphHeading>
-              {t("reservationApplication:applicationInfo")}
-            </ParagraphHeading>
-            <ReservationInfo
-              reservation={reservation}
-              supportedFields={supportedFields}
-            />
-            <ParagraphHeading>
-              {t("reservationCalendar:reserverInfo")}
-            </ParagraphHeading>
-            <ReserveeInfo
-              reservation={reservation}
-              supportedFields={supportedFields}
-            />
-            <Terms>
-              {(paymentTermsContent || cancellationTermsContent) && (
-                <Accordion
-                  heading={t(
-                    `reservationUnit:${
-                      paymentTermsContent
-                        ? "paymentAndCancellationTerms"
-                        : "cancellationTerms"
-                    }`
-                  )}
-                  theme="thin"
-                  data-testid="reservation__payment-and-cancellation-terms"
-                >
-                  {paymentTermsContent != null && (
-                    <AccordionContent>
-                      <Sanitize html={paymentTermsContent} />
-                    </AccordionContent>
-                  )}
-                  {cancellationTermsContent != null && (
-                    <AccordionContent>
-                      <Sanitize html={cancellationTermsContent} />
-                    </AccordionContent>
-                  )}
-                </Accordion>
-              )}
-              {shouldDisplayPricingTerms && pricingTermsContent && (
-                <Accordion
-                  heading={t("reservationUnit:pricingTerms")}
-                  theme="thin"
-                  data-testid="reservation__pricing-terms"
-                >
-                  <AccordionContent>
-                    <Sanitize html={pricingTermsContent} />
-                  </AccordionContent>
-                </Accordion>
-              )}
-              <Accordion
-                heading={t("reservationUnit:termsOfUse")}
-                theme="thin"
-                data-testid="reservation__terms-of-use"
+            )}
+          </StatusContainer>
+        </div>
+        <div style={{ gridRowEnd: "span 3" }}>
+          <ReservationInfoCard reservation={reservation} type="complete" />
+          <SecondaryActions>
+            {reservation.state === ReservationStateChoice.Confirmed && (
+              <ButtonLikeExternalLink
+                size="large"
+                disabled={!reservation.calendarUrl}
+                data-testid="reservation__button--calendar-link"
+                href={reservation.calendarUrl ?? ""}
               >
-                {serviceSpecificTermsContent && (
+                {t("reservations:saveToCalendar")}
+                <IconCalendar aria-hidden />
+              </ButtonLikeExternalLink>
+            )}
+            {hasReceipt && (
+              <ButtonLikeExternalLink
+                size="large"
+                data-testid="reservation__confirmation--button__receipt-link"
+                href={`${order.receiptUrl}&lang=${i18n.language}`}
+                target="_blank"
+              >
+                {t("reservations:downloadReceipt")}
+                <IconLinkExternal aria-hidden />
+              </ButtonLikeExternalLink>
+            )}
+          </SecondaryActions>
+        </div>
+        <div>
+          <Actions>
+            {isWaitingForPayment && (
+              <ButtonLikeLink
+                size="large"
+                disabled={!hasCheckoutUrl}
+                href={checkoutUrl ?? ""}
+                data-testid="reservation-detail__button--checkout"
+              >
+                {t("reservations:payReservation")}
+                <IconArrowRight aria-hidden />
+              </ButtonLikeLink>
+            )}
+            {canTimeBeModified && (
+              <ButtonLikeLink
+                size="large"
+                href={getReservationPath(reservation.pk, "edit")}
+                data-testid="reservation-detail__button--edit"
+              >
+                {t("reservations:modifyReservationTime")}
+                <IconCalendar aria-hidden />
+              </ButtonLikeLink>
+            )}
+            {isCancellable && (
+              <ButtonLikeLink
+                size="large"
+                href={getReservationPath(reservation.pk, "cancel")}
+                data-testid="reservation-detail__button--cancel"
+              >
+                {t(
+                  `reservations:cancel${
+                    isBeingHandled ? "Application" : "Reservation"
+                  }`
+                )}
+                <IconCross aria-hidden />
+              </ButtonLikeLink>
+            )}
+          </Actions>
+          <NotModifiableReason reservation={reservation} />
+        </div>
+        <Content>
+          {instructionsKey &&
+            getTranslation(reservationUnit, instructionsKey) && (
+              <ContentContainer>
+                <ParagraphHeading>
+                  {t("reservations:reservationInfo")}
+                </ParagraphHeading>
+                <Paragraph>
+                  {getTranslation(reservationUnit, instructionsKey)}
+                </Paragraph>
+              </ContentContainer>
+            )}
+          <ParagraphHeading>
+            {t("reservationApplication:applicationInfo")}
+          </ParagraphHeading>
+          <ReservationInfo
+            reservation={reservation}
+            supportedFields={supportedFields}
+          />
+          <ParagraphHeading>
+            {t("reservationCalendar:reserverInfo")}
+          </ParagraphHeading>
+          <ReserveeInfo
+            reservation={reservation}
+            supportedFields={supportedFields}
+          />
+          <Terms>
+            {(paymentTermsContent || cancellationTermsContent) && (
+              <Accordion
+                heading={t(
+                  `reservationUnit:${
+                    paymentTermsContent
+                      ? "paymentAndCancellationTerms"
+                      : "cancellationTerms"
+                  }`
+                )}
+                theme="thin"
+                data-testid="reservation__payment-and-cancellation-terms"
+              >
+                {paymentTermsContent != null && (
                   <AccordionContent>
-                    <Sanitize html={serviceSpecificTermsContent} />
+                    <Sanitize html={paymentTermsContent} />
                   </AccordionContent>
                 )}
+                {cancellationTermsContent != null && (
+                  <AccordionContent>
+                    <Sanitize html={cancellationTermsContent} />
+                  </AccordionContent>
+                )}
+              </Accordion>
+            )}
+            {shouldDisplayPricingTerms && pricingTermsContent && (
+              <Accordion
+                heading={t("reservationUnit:pricingTerms")}
+                theme="thin"
+                data-testid="reservation__pricing-terms"
+              >
                 <AccordionContent>
-                  {termsOfUse?.genericTerms != null && (
-                    <Sanitize
-                      html={getTranslation(termsOfUse.genericTerms, "text")}
-                    />
-                  )}
+                  <Sanitize html={pricingTermsContent} />
                 </AccordionContent>
               </Accordion>
-            </Terms>
-            <AddressSection reservationUnit={reservationUnit} />
-          </Content>
-        </ReservationPageWrapper>
-      </Container>
+            )}
+            <Accordion
+              heading={t("reservationUnit:termsOfUse")}
+              theme="thin"
+              data-testid="reservation__terms-of-use"
+            >
+              {serviceSpecificTermsContent && (
+                <AccordionContent>
+                  <Sanitize html={serviceSpecificTermsContent} />
+                </AccordionContent>
+              )}
+              <AccordionContent>
+                {termsOfUse?.genericTerms != null && (
+                  <Sanitize
+                    html={getTranslation(termsOfUse.genericTerms, "text")}
+                  />
+                )}
+              </AccordionContent>
+            </Accordion>
+          </Terms>
+          <AddressSection reservationUnit={reservationUnit} />
+        </Content>
+      </ReservationPageWrapper>
     </>
   );
 }

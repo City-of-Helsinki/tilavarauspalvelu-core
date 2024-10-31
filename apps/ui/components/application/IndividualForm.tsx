@@ -2,12 +2,9 @@ import React from "react";
 import { TextInput } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
+import { TwoColumnContainer } from "common/src/reservation-form/styles";
 import { applicationErrorText } from "@/modules/util";
-import {
-  FormSubHeading,
-  SpanTwoColumns,
-  TwoColumnContainer,
-} from "../common/common";
+import { FormSubHeading, SpanTwoColumns } from "../common/common";
 import { EmailInput } from "./EmailInput";
 import { BillingAddress } from "./BillingAddress";
 import type { ApplicationFormPage3Values } from "./Form";

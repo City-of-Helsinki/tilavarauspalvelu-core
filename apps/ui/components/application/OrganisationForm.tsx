@@ -8,10 +8,11 @@ import { breakpoints } from "common/src/common/style";
 import { CheckboxWrapper } from "common/src/reservation-form/components";
 import { ApplicantTypeChoice } from "@gql/gql-types";
 import { applicationErrorText } from "@/modules/util";
-import { TwoColumnContainer, FormSubHeading } from "../common/common";
+import { FormSubHeading } from "../common/common";
 import { EmailInput } from "./EmailInput";
 import { BillingAddress } from "./BillingAddress";
 import type { ApplicationFormPage3Values } from "./Form";
+import { TwoColumnContainer } from "common/src/reservation-form/styles";
 
 const Placeholder = styled.span`
   @media (max-width: ${breakpoints.m}) {

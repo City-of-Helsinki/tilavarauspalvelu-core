@@ -15,29 +15,25 @@ type Props = {
   units: Pick<UnitNode, "pk" | "nameFi" | "nameEn" | "nameSv">[];
 };
 
-const itemLimit = 8;
-
-const Wrapper = styled.div`
-  margin-bottom: var(--spacing-layout-m);
-`;
+const ITEM_LIMIT = 8;
 
 const Heading = styled(H3).attrs({ as: "h2" })`
   margin-top: 0;
-  margin-bottom: var(--spacing-hz);
 `;
 
 const Content = styled.div`
   display: flex;
   flex-direction: column;
 
+  margin-bottom: var(--spacing-xl);
+
+  /* TODO why is this needed? */
   @media (min-width: ${breakpoints.s}) {
     padding-right: var(--spacing-layout-l);
   }
 `;
 
 const UnitContainer = styled.div`
-  margin-bottom: var(--spacing-xl);
-
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
   gap: 3rem;
@@ -78,18 +74,23 @@ const IconLinkContainer = styled.div`
   ${fontMedium}
 `;
 
-const Units = ({ units }: Props): JSX.Element | null => {
+const Wrapper = styled.div`
+  width: 100%;
+`;
+
+export function Units({ units }: Props): JSX.Element | null {
   const { t } = useTranslation(["home", "common"]);
 
   if (!units == null || units.length === 0) {
     return null;
   }
+
   return (
     <Wrapper>
       <Content>
         <Heading>{t("unitsHeading")}</Heading>
         <UnitContainer>
-          {units.slice(0, itemLimit).map((unit) => (
+          {units.slice(0, ITEM_LIMIT).map((unit) => (
             <UnitItemLink
               key={unit.pk}
               href={`${singleSearchPrefix}?unit=${unit.pk}#content`}
@@ -101,7 +102,7 @@ const Units = ({ units }: Props): JSX.Element | null => {
           ))}
         </UnitContainer>
       </Content>
-      {units?.length > itemLimit && (
+      {units.length > ITEM_LIMIT && (
         <IconLinkContainer>
           <IconButton
             href={singleSearchPrefix}
@@ -113,6 +114,4 @@ const Units = ({ units }: Props): JSX.Element | null => {
       )}
     </Wrapper>
   );
-};
-
-export default Units;
+}

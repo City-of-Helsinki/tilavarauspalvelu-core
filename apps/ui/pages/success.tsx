@@ -1,44 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { LoadingSpinner } from "hds-react";
 import type { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
-import styled from "styled-components";
-import { breakpoints } from "common/src/common/style";
 import { ReservationStateChoice, useReservationQuery } from "@gql/gql-types";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { Container } from "common";
 import { useOrder } from "@/hooks/reservation";
-import ReservationFail from "@/components/reservation/ReservationFail";
+import { ReservationFail } from "@/components/reservation/ReservationFail";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { base64encode } from "common/src/helpers";
+import { CenterSpinner } from "@/components/common/common";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  const { locale } = ctx;
-
-  return {
-    props: {
-      ...getCommonServerSideProps(),
-      ...(await serverSideTranslations(locale ?? "fi")),
-    },
-  };
-};
-
 const howManyTimeShouldWeRetryOrder = 2;
 
-const StyledContainer = styled(Container)`
-  display: flex;
-  padding: var(--spacing-m) var(--spacing-m) var(--spacing-layout-m);
-  justify-content: center;
-
-  @media (min-width: ${breakpoints.m}) {
-    max-width: 1000px;
-    margin-bottom: var(--spacing-layout-l);
-  }
-`;
-
-const ReservationSuccess = ({ apiBaseUrl }: Props) => {
+// TODO all the hook code is super suspicious
+function ReservationSuccess({ apiBaseUrl }: Props) {
   const router = useRouter();
   const { orderId } = router.query as { orderId: string };
 
@@ -121,14 +97,6 @@ const ReservationSuccess = ({ apiBaseUrl }: Props) => {
     }
   }, [orderId, reservation, router, isOrderValid, error]);
 
-  if (isOrderLoading || loading) {
-    return (
-      <StyledContainer>
-        <LoadingSpinner />
-      </StyledContainer>
-    );
-  }
-
   if (!isOrderFetched) {
     return <ReservationFail apiBaseUrl={apiBaseUrl} type="order" />;
   }
@@ -137,12 +105,23 @@ const ReservationSuccess = ({ apiBaseUrl }: Props) => {
     return <ReservationFail apiBaseUrl={apiBaseUrl} type="reservation" />;
   }
 
+  if (isOrderLoading || loading) {
+    return <CenterSpinner />;
+  }
+
   // NOTE weird fallback because we use useEffect to redirect on success
-  return (
-    <StyledContainer>
-      <LoadingSpinner />
-    </StyledContainer>
-  );
-};
+  return <CenterSpinner />;
+}
+
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+  const { locale } = ctx;
+
+  return {
+    props: {
+      ...getCommonServerSideProps(),
+      ...(await serverSideTranslations(locale ?? "fi")),
+    },
+  };
+}
 
 export default ReservationSuccess;

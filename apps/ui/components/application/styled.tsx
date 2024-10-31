@@ -179,3 +179,8 @@ export const TermsAccordion = styled(AccordionWithState)`
 export const CompactTermsBox = styled(TermsBox)`
   margin-bottom: 0;
 `;
+
+// TODO this isn't thought through (naming wise, use cases etc.)
+export const FontMedium = styled.div`
+  ${fontMedium}
+`;

@@ -12,18 +12,13 @@ type HeadProps = {
 const Heading = styled(H2).attrs({ as: "h1" })``;
 
 const Content = styled.div`
-  max-width: var(--container-width-xl);
-  font-size: var(--fontsize-heading-xs);
   ${fontMedium}
 `;
 
 export function Head({ children, heading }: HeadProps): JSX.Element {
   return (
     <>
-      <BreadcrumbWrapper
-        disablePadding
-        route={["/applications", "application"]}
-      />
+      <BreadcrumbWrapper route={["/applications", "application"]} />
       <Content>
         <Heading>{heading}</Heading>
         {children || null}

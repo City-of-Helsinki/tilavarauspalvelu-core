@@ -21,19 +21,6 @@ export const BlackButton = styled(Button)`
   ${fontMedium};
 `;
 
-export const SupplementaryButton = styled(Button)`
-  &&& {
-    --color-bus: transparent;
-    --border-color: transparent;
-    --border-color-hover: transparent;
-    --border-color-focus: var(--color-coat-of-arms);
-    --border-color-hover-focus: var(--color-coat-of-arms);
-    --border-color-disabled: transparent;
-    --focus-outline-color: transparent;
-    --submit-input-focus-gutter-color: transparent;
-  }
-`;
-
 export const arrowUp = css`
   content: "";
   position: absolute;
@@ -52,17 +39,4 @@ export const arrowDown = css`
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
   border-top: 8px solid var(--color-white);
-`;
-
-export const LinkButton = styled.button`
-  background: none;
-  border: none;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  padding: 0;
-  ${fontMedium};
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  cursor: pointer;
 `;

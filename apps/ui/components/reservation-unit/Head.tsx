@@ -7,7 +7,6 @@ import { formatDuration } from "common/src/common/util";
 import { fontRegular, H2, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { ReservationKind, type ReservationUnitPageQuery } from "@gql/gql-types";
-import { Container } from "common";
 import { formatDate, getTranslation, orderImages } from "@/modules/util";
 import IconWithText from "../common/IconWithText";
 import { Images } from "./Images";
@@ -226,26 +225,24 @@ function Head({
         ]}
       />
       <TopContainer>
-        <Container>
-          <RightContainer>
-            <div>
-              <ReservationUnitName>{reservationUnitName}</ReservationUnitName>
-              <UnitName>{unitName}</UnitName>
-              <Props>
-                {iconsTexts.map(({ icon, key, text }) => (
-                  <StyledIconWithText key={key} icon={icon} text={text} />
-                ))}
-              </Props>
-              {!reservationUnitIsReservable && (
-                <NonReservableNotification reservationUnit={reservationUnit} />
-              )}
-            </div>
-            <Images
-              images={orderImages(reservationUnit.images)}
-              contextName={reservationUnitName}
-            />
-          </RightContainer>
-        </Container>
+        <RightContainer>
+          <div>
+            <ReservationUnitName>{reservationUnitName}</ReservationUnitName>
+            <UnitName>{unitName}</UnitName>
+            <Props>
+              {iconsTexts.map(({ icon, key, text }) => (
+                <StyledIconWithText key={key} icon={icon} text={text} />
+              ))}
+            </Props>
+            {!reservationUnitIsReservable && (
+              <NonReservableNotification reservationUnit={reservationUnit} />
+            )}
+          </div>
+          <Images
+            images={orderImages(reservationUnit.images)}
+            contextName={reservationUnitName}
+          />
+        </RightContainer>
       </TopContainer>
     </>
   );

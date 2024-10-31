@@ -8,42 +8,27 @@ interface HeadProps {
   text: string;
 }
 
-const Wrapper = styled.div`
-  width: 100%;
-  color: var(--color-black);
-  font-size: var(--fontsize-heading-s);
-  margin-bottom: var(--spacing-layout-m);
-`;
-
-const Content = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const Title = styled(H1)`
+const Title = styled(H1).attrs({ $large: true })`
   ${fontRegular}
-  margin-bottom: 0;
-  margin-top: var(--spacing-m);
+  margin: 0;
 
+  /* TODO why isn't top margin instead a bottom margin / gap on the layout? it's on every page */
+  margin-top: var(--spacing-m);
   @media (min-width: ${breakpoints.m}) {
     margin-top: var(--spacing-l);
   }
 `;
 
 const Ingress = styled.p`
-  margin: var(--spacing-m) 0 0;
+  margin: 0;
   font-size: var(--fontsize-body-l);
 `;
 
-const Head = (props: HeadProps): JSX.Element => {
+export function Head(props: HeadProps): JSX.Element {
   return (
-    <Wrapper>
-      <Content>
-        <Title>{props.heading}</Title>
-        <Ingress>{props.text}</Ingress>
-      </Content>
-    </Wrapper>
+    <>
+      <Title>{props.heading}</Title>
+      <Ingress>{props.text}</Ingress>
+    </>
   );
-};
-
-export default Head;
+}

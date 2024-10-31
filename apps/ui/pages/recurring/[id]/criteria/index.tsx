@@ -8,7 +8,7 @@ import {
   type ApplicationRoundsUiQuery,
   type ApplicationRoundsUiQueryVariables,
 } from "@gql/gql-types";
-import { breakpoints, Container, H2 } from "common";
+import { breakpoints, H2 } from "common";
 import { createApolloClient } from "@/modules/apolloClient";
 import Sanitize from "@/components/common/Sanitize";
 import { getTranslation } from "@/modules/util";
@@ -18,6 +18,7 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import NotesWhenApplying from "@/components/application/NotesWhenApplying";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { locale, params } = ctx;
@@ -25,6 +26,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
+  // TODO use a singular query for this
   const { data } = await apolloClient.query<
     ApplicationRoundsUiQuery,
     ApplicationRoundsUiQueryVariables
@@ -37,25 +39,21 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       .map((n) => n?.node)
       .find((n) => n?.pk === id) ?? null;
 
+  const notFound = applicationRound == null;
   return {
-    notFound: applicationRound == null,
+    notFound,
     props: {
+      ...(notFound ? { notFound } : { applicationRound }),
       ...commonProps,
-      key: `${id}${locale}`,
-      applicationRound,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
 };
 
-const HeadContent = styled.div`
-  max-width: var(--container-width-xl);
-  margin: 0 auto var(--spacing-2-xl) auto;
-  font-size: var(--fontsize-body-xl);
-`;
-
 const Heading = styled(H2).attrs({ as: "h1" })``;
 
+// TODO why is row-reverse on mobile important? why not use the sidebar for notes on desktop similar to other pages?
+// or just follow the normal flow on both
 const ContentWrapper = styled.div`
   display: flex;
   gap: var(--spacing-m);
@@ -64,45 +62,26 @@ const ContentWrapper = styled.div`
   }
 `;
 
-const Content = styled.div`
-  max-width: var(--container-width-l);
-  font-family: var(--font-regular);
-  font-size: var(--fontsize-body-l);
-`;
-
 const NotesWrapper = styled.div`
   flex-grow: 1;
 `;
 
-function Criteria({ applicationRound }: Props): JSX.Element | null {
+function Criteria({ applicationRound }: PropsNarrowed): JSX.Element | null {
   const { t } = useTranslation();
 
-  if (!applicationRound) {
-    return null;
-  }
-
+  const title = `${getApplicationRoundName(applicationRound)} ${t("applicationRound:criteria")}`;
   return (
     <>
       <div>
         <BreadcrumbWrapper route={["/recurring", "criteria"]} />
-        <HeadContent>
-          <Heading>
-            {`${getApplicationRoundName(applicationRound)} ${t(
-              "applicationRound:criteria"
-            )}`}
-          </Heading>
-        </HeadContent>
+        <Heading>{title}</Heading>
       </div>
-      <Container>
-        <ContentWrapper>
-          <Content>
-            <Sanitize html={getTranslation(applicationRound, "criteria")} />
-          </Content>
-          <NotesWrapper>
-            <NotesWhenApplying applicationRound={applicationRound} />
-          </NotesWrapper>
-        </ContentWrapper>
-      </Container>
+      <ContentWrapper>
+        <Sanitize html={getTranslation(applicationRound, "criteria")} />
+        <NotesWrapper>
+          <NotesWhenApplying applicationRound={applicationRound} />
+        </NotesWrapper>
+      </ContentWrapper>
     </>
   );
 }

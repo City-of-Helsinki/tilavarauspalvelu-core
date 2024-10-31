@@ -81,7 +81,6 @@ import {
   PaddedContent,
   StyledNotification,
   Subheading,
-  Wrapper,
 } from "@/components/reservation-unit/ReservationUnitStyles";
 import { QuickReservation } from "@/components/reservation-unit/QuickReservation";
 import ReservationInfoContainer from "@/components/reservation-unit/ReservationInfoContainer";
@@ -634,7 +633,7 @@ function ReservationUnit({
     !isReservationStartInFuture(reservationUnit) && reservationUnitIsReservable;
 
   return (
-    <Wrapper>
+    <>
       <Head
         reservationUnit={reservationUnit}
         reservationUnitIsReservable={reservationUnitIsReservable}
@@ -647,6 +646,7 @@ function ReservationUnit({
           ) : undefined
         }
       />
+      {/* TODO can we remove the second wrapper? */}
       <ReservationPageWrapper>
         <QuickReservationWrapper>
           {isUnitReservable && (
@@ -819,7 +819,7 @@ function ReservationUnit({
           </BottomContainer>
         )}
       </BottomWrapper>
-    </Wrapper>
+    </>
   );
 }
 
