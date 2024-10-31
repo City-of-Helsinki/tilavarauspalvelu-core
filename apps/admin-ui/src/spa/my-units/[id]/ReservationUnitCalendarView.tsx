@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { addDays, formatISO, startOfDay, subDays } from "date-fns";
-import { AutoGrid, Flex } from "@/styles/layout";
+import { AutoGrid, Flex } from "common/styles/util";
 import { ReservationUnitCalendar } from "./ReservationUnitCalendar";
 import WeekNavigation from "./WeekNavigation";
 import { useTranslation } from "next-i18next";

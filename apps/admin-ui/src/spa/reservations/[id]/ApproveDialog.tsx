@@ -16,7 +16,7 @@ import {
   type ReservationQuery,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
-import { Flex } from "@/styles/layout";
+import { Flex } from "common/styles/util";
 import { getReservationPriceDetails } from "./util";
 import { errorToast, successToast } from "common/src/common/toast";
 

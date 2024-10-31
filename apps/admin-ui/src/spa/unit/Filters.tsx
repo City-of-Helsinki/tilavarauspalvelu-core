@@ -1,5 +1,5 @@
 import React from "react";
-import { AutoGrid, FullRow } from "@/styles/layout";
+import { AutoGrid, FullRow } from "common/styles/util";
 import { SearchFilter } from "@/component/QueryParamFilters";
 import { SearchTags } from "@/component/SearchTags";
 

@@ -7,7 +7,7 @@ import {
   useUnitOptions,
   useReservationUnitOptions,
 } from "@/hooks";
-import { AutoGrid } from "@/styles/layout";
+import { AutoGrid } from "common/styles/util";
 import {
   CheckboxFilter,
   DateRangeFilter,

@@ -19,7 +19,8 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import { format, isSameDay } from "date-fns";
 import { useTranslation } from "next-i18next";
-import { AutoGrid, ButtonContainer, Label } from "@/styles/layout";
+import { Label } from "@/styles/layout";
+import { AutoGrid, ButtonContainer } from "common/styles/util";
 import { H1 } from "common";
 import { LinkPrev } from "@/component/LinkPrev";
 import { Controller, FormProvider, useForm } from "react-hook-form";

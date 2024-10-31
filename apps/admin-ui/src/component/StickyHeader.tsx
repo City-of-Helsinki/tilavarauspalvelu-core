@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { ButtonContainer } from "@/styles/layout";
+import { ButtonContainer } from "common/styles/util";
 import { H2 } from "common";
 import { breakpoints } from "common/src/common/style";
 

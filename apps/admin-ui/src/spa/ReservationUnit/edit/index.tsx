@@ -43,7 +43,7 @@ import { DateTimeInput } from "common/src/components/form/DateTimeInput";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { H1, H4, fontBold } from "common/src/common/typography";
 import { breakpoints } from "common";
-import { AutoGrid, FullRow, Flex } from "@/styles/layout";
+import { AutoGrid, FullRow, Flex } from "common/styles/util";
 import Loader from "@/component/Loader";
 import { errorToast, successToast } from "common/src/common/toast";
 import { useModal } from "@/context/ModalContext";

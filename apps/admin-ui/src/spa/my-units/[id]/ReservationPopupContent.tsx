@@ -8,7 +8,7 @@ import {
 import { getReservationUrl } from "@/common/urls";
 import { formatTime, getReserveeName } from "@/common/util";
 import { truncate } from "@/helpers";
-import { Flex } from "@/styles/layout";
+import { Flex } from "common/styles/util";
 import { CELL_BORDER } from "./const";
 import VisibleIfPermission from "@/component/VisibleIfPermission";
 import { useTranslation } from "next-i18next";

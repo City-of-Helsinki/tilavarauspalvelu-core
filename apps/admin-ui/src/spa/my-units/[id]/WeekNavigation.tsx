@@ -4,7 +4,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { DATE_FORMAT, DATE_FORMAT_SHORT } from "@/common/util";
-import { Flex } from "@/styles/layout";
+import { Flex } from "common/styles/util";
 
 type Props = {
   date: string;

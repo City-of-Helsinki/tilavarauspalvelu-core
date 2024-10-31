@@ -16,7 +16,7 @@ import {
 } from "@gql/gql-types";
 import Loader from "@/component/Loader";
 import { useModal } from "@/context/ModalContext";
-import { ButtonContainer } from "@/styles/layout";
+import { ButtonContainer } from "common/styles/util";
 import ShowWhenTargetInvisible from "@/component/ShowWhenTargetInvisible";
 import { StickyHeader } from "@/component/StickyHeader";
 import { ReservationWorkingMemo } from "@/component/WorkingMemo";

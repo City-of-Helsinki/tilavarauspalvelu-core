@@ -7,7 +7,7 @@ import {
   useApplicationDateOfBirthQuery,
 } from "@gql/gql-types";
 import { formatDate } from "@/common/util";
-import { Flex } from "@/styles/layout";
+import { Flex } from "common/styles/util";
 import { base64encode } from "common/src/helpers";
 
 // NOTE separate query because all requests for dateOfBirth are logged

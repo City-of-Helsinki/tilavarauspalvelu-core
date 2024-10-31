@@ -5,7 +5,7 @@ import { IconAlertCircleFill, RadioButton } from "hds-react";
 import { PriceUnit } from "@gql/gql-types";
 import { Controller, UseFormReturn } from "react-hook-form";
 import { addDays } from "date-fns";
-import { AutoGrid } from "@/styles/layout";
+import { AutoGrid } from "common/styles/util";
 import { getTranslatedError } from "@/common/util";
 import { type ReservationUnitEditFormValues, PaymentTypes } from "./form";
 import { ControlledDateInput } from "common/src/components/form";

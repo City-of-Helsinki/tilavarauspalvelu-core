@@ -11,7 +11,7 @@ import {
 } from "@gql/gql-types";
 import { errorToast, successToast } from "common/src/common/toast";
 import Loader from "@/component/Loader";
-import { ButtonContainer } from "@/styles/layout";
+import { ButtonContainer } from "common/styles/util";
 import { FormErrorSummary } from "@/common/FormErrorSummary";
 import { Head } from "./Head";
 import { SpaceHierarchy } from "./SpaceHierarchy";

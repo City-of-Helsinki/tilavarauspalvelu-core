@@ -8,7 +8,7 @@ import { breakpoints } from "common/src/common/style";
 import { useSession } from "@/hooks/auth";
 import { PUBLIC_URL } from "./const";
 import { env } from "@/env.mjs";
-import { ButtonContainer, Flex } from "@/styles/layout";
+import { ButtonContainer, Flex } from "common/styles/util";
 
 const Wrapper = styled.div`
   padding: var(--spacing-layout-s);

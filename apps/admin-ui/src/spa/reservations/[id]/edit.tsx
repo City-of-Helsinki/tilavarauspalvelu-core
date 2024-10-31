@@ -23,7 +23,7 @@ import { useStaffReservationMutation } from "../hooks";
 import { filterNonNullable } from "common/src/helpers";
 import { flattenMetadata } from "@/common/util";
 import { errorToast } from "common/src/common/toast";
-import { ButtonContainer } from "@/styles/layout";
+import { ButtonContainer } from "common/styles/util";
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 type ReservationUnitType = NonNullable<ReservationType["reservationUnits"]>[0];

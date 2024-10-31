@@ -19,7 +19,7 @@ import {
   useReservationApplicationLinkQuery,
 } from "@gql/gql-types";
 import { getName } from "./util";
-import { Flex } from "@/styles/layout";
+import { Flex } from "common/styles/util";
 import { formatDateTime } from "@/common/util";
 import { getApplicationUrl } from "@/common/urls";
 import { gql } from "@apollo/client";

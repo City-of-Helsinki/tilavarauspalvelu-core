@@ -31,7 +31,8 @@ import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { Element } from "@/styles/util";
-import { AutoGrid, Label } from "@/styles/layout";
+import { Label } from "@/styles/layout";
+import { AutoGrid } from "common/styles/util";
 import { errorToast } from "common/src/common/toast";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import {
