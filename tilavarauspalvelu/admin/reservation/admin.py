@@ -76,7 +76,7 @@ class ReservationAdmin(admin.ModelAdmin):
         "type",
         "state",
         "begin",
-        "reservation_units",
+        "reservation_units_admin",
     ]
     list_filter = [
         ("created_at", DateRangeFilterBuilder(title=_("Created at"))),
@@ -106,6 +106,7 @@ class ReservationAdmin(admin.ModelAdmin):
                     "cancel_details",
                     "handling_details",
                     "working_memo",
+                    "reservation_units",
                 ],
             },
         ],
@@ -186,6 +187,9 @@ class ReservationAdmin(admin.ModelAdmin):
             },
         ],
     ]
+    filter_horizontal = [
+        "reservation_units",
+    ]
     readonly_fields = [
         "id",
         "handled_at",
@@ -212,9 +216,9 @@ class ReservationAdmin(admin.ModelAdmin):
 
         return queryset, may_have_duplicates
 
-    @admin.display(ordering="reservation_units__name")
-    def reservation_units(self, obj: Reservation) -> str:
-        return ", ".join([str(reservation_unit) for reservation_unit in obj.reservation_units.all()])
+    @admin.display(ordering="reservation_units__name", description="Reservation units")
+    def reservation_units_admin(self, obj: Reservation) -> str:
+        return ", ".join(str(reservation_unit) for reservation_unit in obj.reservation_units.all())
 
     def price_net(self, obj: Reservation) -> Decimal:
         return obj.price_net
