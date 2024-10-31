@@ -468,7 +468,7 @@ def test_reservation__create__max_reservations_per_user__over(graphql):
     assert response.error_message() == "Maximum number of active reservations for this reservation unit exceeded."
 
 
-def test_reservation__create__max_reservations_per_user__seasonal_reservation(graphql):
+def test_reservation__create__max_reservations_per_user__non_normal_reservation(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(max_reservations_per_user=1)
 
     begin = next_hour(plus_hours=3)
@@ -476,23 +476,31 @@ def test_reservation__create__max_reservations_per_user__seasonal_reservation(gr
 
     # Seasonal reservations don't count towards the `max_reservations_per_user` limit
     user = graphql.login_with_superuser()
-    ReservationFactory.create(
-        begin=begin,
-        end=end,
-        state=ReservationStateChoice.CONFIRMED,
-        reservation_units=[reservation_unit],
-        user=user,
-        type=ReservationTypeChoice.SEASONAL,
-    )
+
+    # Only NORMAL type choice should affect the count, all others should be ignored
+    for type_choice in [
+        ReservationTypeChoice.BLOCKED,
+        ReservationTypeChoice.STAFF,
+        ReservationTypeChoice.BEHALF,
+        ReservationTypeChoice.SEASONAL,
+    ]:
+        ReservationFactory.create(
+            begin=begin,
+            end=end,
+            state=ReservationStateChoice.CONFIRMED,
+            reservation_units=[reservation_unit],
+            user=user,
+            type=type_choice,
+        )
 
     data = get_create_data(reservation_unit)
 
-    assert Reservation.objects.count() == 1
+    assert Reservation.objects.count() == 4
 
     response = graphql(CREATE_MUTATION, input_data=data)
     assert response.has_errors is False, response.errors
 
-    assert Reservation.objects.count() == 2
+    assert Reservation.objects.count() == 5
 
 
 def test_reservation__create__max_reservations_per_user__past_reservations(graphql):
