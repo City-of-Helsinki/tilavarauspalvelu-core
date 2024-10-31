@@ -236,14 +236,14 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
         if reservation_unit.max_reservations_per_user is None:
             return
 
-        existing_reservations_count = (
+        num_active_user_reservations = (
             Reservation.objects.filter(user=user, reservation_units=reservation_unit)
             .exclude(pk=getattr(self.instance, "pk", None))  # Safely handle both create and update cases
-            .exclude(type=ReservationTypeChoice.SEASONAL)
+            .filter(type=ReservationTypeChoice.NORMAL)
             .active()
             .count()
         )
-        if existing_reservations_count >= reservation_unit.max_reservations_per_user:
+        if num_active_user_reservations >= reservation_unit.max_reservations_per_user:
             raise ValidationErrorWithCode(
                 "Maximum number of active reservations for this reservation unit exceeded.",
                 ValidationErrorCodes.MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED,
