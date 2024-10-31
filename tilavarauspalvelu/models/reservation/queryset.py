@@ -9,11 +9,12 @@ from django.db import models
 from django.db.models.functions import Coalesce
 from helsinki_gdpr.models import SerializableMixin
 
-from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
+from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice, ReservationTypeChoice
 from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ApplicationRound, Reservation
+    from tilavarauspalvelu.models import ApplicationRound, Reservation, ReservationUnit
+    from tilavarauspalvelu.typing import AnyUser
 
 
 __all__ = [
@@ -164,6 +165,17 @@ class ReservationQuerySet(models.QuerySet):
 
         for item in items:
             item.units_for_permissions = [unit for unit in units if item.pk in unit.reservation_ids]
+
+    def filter_for_user_num_active_reservations(
+        self: Self,
+        reservation_unit: ReservationUnit | models.OuterRef,
+        user: AnyUser,
+    ) -> Self:
+        return self.active().filter(
+            reservation_units=reservation_unit,
+            user=user,
+            type=ReservationTypeChoice.NORMAL.value,
+        )
 
 
 class ReservationManager(SerializableMixin.SerializableManager.from_queryset(ReservationQuerySet)):

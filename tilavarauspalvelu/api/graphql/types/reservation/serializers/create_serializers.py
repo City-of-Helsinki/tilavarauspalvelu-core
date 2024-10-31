@@ -18,7 +18,6 @@ from tilavarauspalvelu.enums import (
     CustomerTypeChoice,
     ReservationKind,
     ReservationStateChoice,
-    ReservationTypeChoice,
 )
 from tilavarauspalvelu.models import AgeGroup, City, Reservation, ReservationPurpose, ReservationUnit
 from tilavarauspalvelu.typing import AnyUser, WSGIRequest
@@ -237,10 +236,8 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
             return
 
         num_active_user_reservations = (
-            Reservation.objects.filter(user=user, reservation_units=reservation_unit)
+            Reservation.objects.filter_for_user_num_active_reservations(user=user, reservation_unit=reservation_unit)
             .exclude(pk=getattr(self.instance, "pk", None))  # Safely handle both create and update cases
-            .filter(type=ReservationTypeChoice.NORMAL)
-            .active()
             .count()
         )
         if num_active_user_reservations >= reservation_unit.max_reservations_per_user:

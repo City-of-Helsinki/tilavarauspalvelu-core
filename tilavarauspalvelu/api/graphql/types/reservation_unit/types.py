@@ -13,11 +13,7 @@ from query_optimizer.optimizer import QueryOptimizer
 
 from tilavarauspalvelu.api.graphql.types.location.types import LocationNode
 from tilavarauspalvelu.api.graphql.types.reservation.types import ReservationNode
-from tilavarauspalvelu.enums import (
-    ReservationTypeChoice,
-    ReservationUnitPublishingState,
-    ReservationUnitReservationState,
-)
+from tilavarauspalvelu.enums import ReservationUnitPublishingState, ReservationUnitReservationState
 from tilavarauspalvelu.models import (
     Location,
     OriginHaukiResource,
@@ -341,14 +337,11 @@ class ReservationUnitNode(DjangoNode):
 
         return queryset.annotate(
             num_active_user_reservations=SubqueryCount(
-                Reservation.objects.filter(
-                    reservation_units=models.OuterRef("id"),
+                Reservation.objects.filter_for_user_num_active_reservations(
+                    reservation_unit=models.OuterRef("id"),
                     user=optimizer.info.context.user,
-                )
-                .filter(type=ReservationTypeChoice.NORMAL.value)
-                .active()
-                .values("id")
-            )
+                ).values("id")
+            ),
         )
 
     def resolve_num_active_user_reservations(root: ReservationUnit, info: GQLInfo) -> int:
