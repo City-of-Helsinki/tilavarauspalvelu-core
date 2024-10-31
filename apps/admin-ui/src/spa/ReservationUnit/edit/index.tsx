@@ -410,7 +410,7 @@ function DisplayUnit({
   return (
     <DisplayUnitWrapper>
       <TitleSectionWithTags>
-        <H1 $legacy>{heading}</H1>
+        <H1>{heading}</H1>
         <TagContainer>
           <ReservationStateTag state={reservationState} />
           <ReservationUnitStateTag state={unitState} />

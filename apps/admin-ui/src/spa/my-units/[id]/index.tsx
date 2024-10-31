@@ -102,7 +102,7 @@ export function MyUnitView() {
 
   return (
     <ContainerHack>
-      <H1 $legacy>{unit?.nameFi}</H1>
+      <H1>{unit?.nameFi}</H1>
       {unit.location && (
         <LocationOnlyOnDesktop>
           {parseAddress(unit.location)}

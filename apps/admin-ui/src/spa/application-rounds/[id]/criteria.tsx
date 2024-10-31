@@ -106,9 +106,7 @@ function Criteria({
 
   return (
     <>
-      <H2 as="h1" $legacy>
-        {applicationRound.nameFi}
-      </H2>
+      <H2 as="h1">{applicationRound.nameFi}</H2>
       <HeadContainer>
         <TimeframeStatus
           applicationPeriodBegin={applicationRound.applicationPeriodBegin}
@@ -124,7 +122,7 @@ function Criteria({
         initiallyOpen
       >
         <div>
-          <H3 $legacy>{t("ApplicationRound.applicationPeriodTitle")}</H3>
+          <H3>{t("ApplicationRound.applicationPeriodTitle")}</H3>
           <div>
             {t("common.begins")}{" "}
             {formatDate(applicationRound.applicationPeriodBegin)}

@@ -714,7 +714,7 @@ function LoadedContent({
   return (
     <>
       <StatusTagContainer>
-        <H1 $legacy>{name}</H1>
+        <H1>{name}</H1>
         {notification?.state && (
           <BannerNotificationStatusLabel state={notification.state} />
         )}

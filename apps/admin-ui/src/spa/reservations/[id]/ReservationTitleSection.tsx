@@ -32,6 +32,7 @@ const AlignVertically = styled.div`
   gap: var(--spacing-m);
   flex-direction: row;
   align-items: center;
+  flex-grow: 1;
 `;
 
 const NameState = styled.div`
@@ -156,8 +157,8 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
     return (
       <div>
         <NameState ref={ref}>
-          <H1 $legacy>{overrideTitle ?? getName(reservation, t)}</H1>
-          <Flex $direction="column">
+          <H1>{overrideTitle ?? getName(reservation, t)}</H1>
+          <Flex $direction="column" $align="center">
             {order?.status != null && (
               <AlignVertically>
                 <StatusLabel

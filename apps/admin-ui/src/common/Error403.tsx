@@ -80,7 +80,7 @@ const Error403 = ({
   return (
     <Wrapper>
       <div>
-        <H1 $legacy>403 - {t("errorPages.accessForbidden.title")}</H1>
+        <H1>403 - {t("errorPages.accessForbidden.title")}</H1>
         <p>{t("errorPages.accessForbidden.description")}</p>
         <LogoutSection apiBaseUrl={apiBaseUrl} feedbackUrl={feedbackUrl} />
       </div>

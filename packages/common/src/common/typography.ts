@@ -32,33 +32,35 @@ export const Regular = styled.span`
   ${fontRegular}
 `;
 
-export const H1 = styled.h1<{ $legacy?: boolean, $noMargin?: boolean }>`
-  font-size: ${({ $legacy }) =>
-    $legacy
+export const H1 = styled.h1<{ $large?: boolean; $noMargin?: boolean }>`
+  font-size: ${({ $large }) =>
+    !$large
       ? "var(--fontsize-heading-l)"
       : " var(--fontsize-heading-xl-mobile)"};
   ${fontRegular}
   line-height: var(--lineheight-s);
-  margin: ${({ $noMargin }) => $noMargin ? "0" : "var(--spacing-s) 0 var(--spacing-m)"};
+  margin: ${({ $noMargin }) =>
+    $noMargin ? "0" : "var(--spacing-s) 0 var(--spacing-m)"};
   word-break: break-word;
 
   @media (min-width: ${breakpoints.s}) {
-    font-size: ${({ $legacy }) =>
-      $legacy ? "var(--fontsize-heading-xl)" : "var(--fontsize-heading-xxl)"};
+    font-size: ${({ $large }) =>
+      !$large ? "var(--fontsize-heading-xl)" : "var(--fontsize-heading-xxl)"};
     line-height: var(--lineheight-s);
   }
 `;
 
-export const H2 = styled.h2<{ $legacy?: boolean, $noMargin?: boolean }>`
-  font-size: ${({ $legacy }) =>
-    $legacy ? `var(--fontsize-heading-m)` : `var(--fontsize-heading-l)`};
+export const H2 = styled.h2<{ $large?: boolean; $noMargin?: boolean }>`
+  font-size: ${({ $large }) =>
+    !$large ? `var(--fontsize-heading-m)` : `var(--fontsize-heading-l)`};
   ${fontRegular}
   line-height: var(--lineheight-s);
-  margin-bottom: ${({ $noMargin }) => $noMargin ? "0" : "var(--spacing-m)"};
+  margin-bottom: ${({ $noMargin }) => ($noMargin ? `0` : `var(--spacing-m)`)};
+  margin-top: ${({ $noMargin }) => ($noMargin ? `0` : `var(--spacing-s)`)};
 
   @media (min-width: ${breakpoints.s}) {
-    ${({ $legacy }) =>
-      $legacy
+    ${({ $large }) =>
+      !$large
         ? `
           font-size: var(--fontsize-heading-l);
           line-height: var(--lineheight-m);
@@ -70,16 +72,16 @@ export const H2 = styled.h2<{ $legacy?: boolean, $noMargin?: boolean }>`
   }
 `;
 
-export const H3 = styled.h3<{ $legacy?: boolean }>`
-  font-size: ${({ $legacy }) =>
-    $legacy ? `var(--fontsize-heading-s)` : `var(--fontsize-heading-m)`};
+export const H3 = styled.h3<{ $large?: boolean }>`
+  font-size: ${({ $large }) =>
+    !$large ? `var(--fontsize-heading-s)` : `var(--fontsize-heading-m)`};
   ${fontRegular}
   line-height: 2rem;
   margin-bottom: var(--spacing-m);
 
   @media (min-width: ${breakpoints.s}) {
-    font-size: ${({ $legacy }) =>
-      $legacy ? `var(--fontsize-heading-xs)` : `var(--fontsize-heading-s)`};
+    font-size: ${({ $large }) =>
+      !$large ? `var(--fontsize-heading-xs)` : `var(--fontsize-heading-s)`};
   }
 `;
 

@@ -307,7 +307,7 @@ export function Review({
     <>
       <>
         <HeadingContainer>
-          <H2 as="h1" $legacy style={{ marginBottom: 0 }}>
+          <H2 as="h1" style={{ marginBottom: 0 }}>
             {applicationRound.nameFi}
           </H2>
           <ApplicationRoundStatusLabel status={applicationRound.status} />

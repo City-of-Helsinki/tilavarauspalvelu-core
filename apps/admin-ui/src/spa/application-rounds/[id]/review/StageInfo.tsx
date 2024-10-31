@@ -22,8 +22,6 @@ const Wrapper = styled.div`
   }
 `;
 
-const Title = styled.div``;
-
 const Stages = styled.div`
   margin: var(--spacing-l) 0 0 2rem;
   padding: var(--spacing-xs) 0 var(--spacing-l) 3rem;
@@ -74,6 +72,7 @@ interface IProps {
   reservationPeriodEnd: string;
 }
 
+// TODO where is this used? it has a H1 and I don't recognise the Page
 function StageInfo({
   activeStage,
   name,
@@ -100,8 +99,9 @@ function StageInfo({
 
   return (
     <Wrapper>
-      <Title>{name}</Title>
-      <H1 $legacy>{t("StageInfo.stagesOfHandling")}</H1>
+      {/* TODO why is the name inside a div and not heading? */}
+      <div>{name}</div>
+      <H1>{t("StageInfo.stagesOfHandling")}</H1>
       <Stages>
         {stages.map((stage) => (
           <StageDiv

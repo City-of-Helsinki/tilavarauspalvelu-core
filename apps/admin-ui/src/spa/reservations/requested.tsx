@@ -45,7 +45,7 @@ export function RequestedPage(): JSX.Element {
   return (
     <div>
       <div>
-        <H1 $legacy>{t("Reservations.reservationListHeading")}</H1>
+        <H1>{t("Reservations.reservationListHeading")}</H1>
         <p>{t("Reservations.reservationListDescription")}</p>
       </div>
       <Filters

@@ -11,7 +11,7 @@ export function MyUnits() {
   return (
     <>
       <div>
-        <H1 $legacy>{t("MyUnits.heading")}</H1>
+        <H1>{t("MyUnits.heading")}</H1>
         <p>{t("MyUnits.description")}</p>
       </div>
       <Filters />

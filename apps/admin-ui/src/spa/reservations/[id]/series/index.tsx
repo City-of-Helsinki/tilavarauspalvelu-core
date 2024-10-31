@@ -308,7 +308,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
     <>
       <LinkPrev />
       <>
-        <H1 $legacy>{t("ReservationEditSeries.heading")}</H1>
+        <H1>{t("ReservationEditSeries.heading")}</H1>
         <FormProvider {...form}>
           <form onSubmit={handleSubmit(onSubmit)} noValidate>
             <AutoGrid $minWidth="12rem" $largeGap>

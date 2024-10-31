@@ -180,7 +180,7 @@ function Page() {
   return (
     <>
       <HeaderContainer>
-        <H1 $legacy>{t("Notifications.pageTitle")}</H1>
+        <H1>{t("Notifications.pageTitle")}</H1>
         <ButtonLikeLink
           variant="primary"
           size="large"

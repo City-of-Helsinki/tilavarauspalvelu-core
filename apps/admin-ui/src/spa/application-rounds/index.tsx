@@ -166,7 +166,7 @@ function AllApplicationRounds(): JSX.Element | null {
   return (
     <>
       <div>
-        <H1 $legacy>{t("MainMenu.applicationRounds")}</H1>
+        <H1>{t("MainMenu.applicationRounds")}</H1>
         <p>{t("ApplicationRound.description")}</p>
       </div>
       <RoundsAccordion

@@ -44,9 +44,7 @@ function RecurringReservationDoneInner({
 
   return (
     <div>
-      <H1 $legacy>
-        {reservations.length > 0 ? t(`title`) : t("allFailedTitle")}
-      </H1>
+      <H1>{reservations.length > 0 ? t(`title`) : t("allFailedTitle")}</H1>
       <InfoSection>{t(`successInfo`)}</InfoSection>
       <RecurringReservationsView recurringPk={recurringPk} />
       <ActionsWrapper>

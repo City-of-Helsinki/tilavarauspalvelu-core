@@ -41,7 +41,7 @@ function Error404({ message }: { message?: string }): JSX.Element {
   return (
     <Wrapper>
       <Content>
-        <H1 $legacy>404: Sivua ei löytynyt</H1>
+        <H1>404: Sivua ei löytynyt</H1>
         {message && <p>{message}</p>}
         <Link href={PUBLIC_URL ?? "/"}>Siirry etusivulle</Link>
       </Content>

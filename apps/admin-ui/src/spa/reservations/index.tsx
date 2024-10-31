@@ -31,7 +31,7 @@ export function ListReservationsPage(): JSX.Element {
   return (
     <>
       <div>
-        <H1 $legacy>{t("Reservations.allReservationListHeading")}</H1>
+        <H1>{t("Reservations.allReservationListHeading")}</H1>
         <p>{t("Reservations.allReservationListDescription")}</p>
       </div>
       <Filters defaultFilters={defaultFilters} />

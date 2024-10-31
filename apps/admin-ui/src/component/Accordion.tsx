@@ -127,7 +127,7 @@ export function Accordion({
         data-testid="accordion__header"
         $disabled={disabled}
       >
-        <StyledH2 className="heading" $legacy as={headingLevel}>
+        <StyledH2 className="heading" as={headingLevel}>
           {heading}
         </StyledH2>
         <ToggleButton

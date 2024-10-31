@@ -49,7 +49,7 @@ const Error5xx = ({ feedbackUrl }: { feedbackUrl: string }): JSX.Element => {
   return (
     <Wrapper>
       <Content>
-        <H1 $legacy>{t("errorPages.generalError.title")}</H1>
+        <H1>{t("errorPages.generalError.title")}</H1>
         <p>{t("errorPages.generalError.title")}</p>
         <Link external href="/">
           {t("errorPages.linkToVaraamo")}

@@ -11,7 +11,7 @@ function ReservationUnits(): JSX.Element {
   return (
     <>
       <div>
-        <H1 $legacy>{t("ReservationUnits.reservationUnitListHeading")}</H1>
+        <H1>{t("ReservationUnits.reservationUnitListHeading")}</H1>
         <p>{t("ReservationUnits.reservationUnitListDescription")}</p>
       </div>
       <Filters />
