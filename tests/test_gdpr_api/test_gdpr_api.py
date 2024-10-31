@@ -19,6 +19,7 @@ from tests.factories import (
 )
 from tests.helpers import patch_method
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
+from utils.date_utils import DEFAULT_TIMEZONE
 from utils.sentry import SentryLogger
 
 from .helpers import get_gdpr_auth_header, patch_oidc_config
@@ -565,7 +566,11 @@ def test_delete_user_data__has_trailing_slash(api_client, settings):
 
 def test_delete_user_data__dont_anonymize_if_open_payments(api_client, settings):
     user = UserFactory.create(username="foo")
-    reservation = ReservationFactory.create(user=user)
+    reservation = ReservationFactory.create(
+        user=user,
+        begin=datetime.datetime(2020, 1, 1, 12, tzinfo=DEFAULT_TIMEZONE),
+        end=datetime.datetime(2020, 1, 1, 14, tzinfo=DEFAULT_TIMEZONE),
+    )
     PaymentOrderFactory.create(reservation=reservation, status=OrderStatus.DRAFT, remote_id=uuid.uuid4())
 
     settings.GDPR_API_DELETE_SCOPE = "gdprdelete"
