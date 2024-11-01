@@ -4,7 +4,7 @@ import NextImage from "next/image";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { formatDuration } from "common/src/common/util";
-import { fontRegular, H2, H3 } from "common/src/common/typography";
+import { fontRegular, H1, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { ReservationKind, type ReservationUnitPageQuery } from "@gql/gql-types";
 import { formatDate, getTranslation, orderImages } from "@/modules/util";
@@ -21,25 +21,16 @@ import BreadcrumbWrapper from "../common/BreadcrumbWrapper";
 import { isReservationStartInFuture } from "@/modules/reservation";
 import { filterNonNullable } from "common/src/helpers";
 import { getSingleSearchPath } from "@/modules/urls";
+import { Flex } from "common/styles/util";
 
 type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
-interface PropsType {
+interface Props {
   reservationUnit: QueryT;
   reservationUnitIsReservable?: boolean;
   subventionSuffix?: JSX.Element;
 }
 
-type NotificationType = "alert";
-
-const TopContainer = styled.div`
-  background-color: white;
-  padding-top: var(--spacing-m);
-
-  @media (min-width: ${breakpoints.m}) {
-    padding-top: var(--spacing-l);
-  }
-`;
-
+// FIXME this breaks on 768px
 const RightContainer = styled.div`
   font-size: var(--fontsize-body-m);
   display: grid;
@@ -51,6 +42,99 @@ const RightContainer = styled.div`
   }
 `;
 
+const NotificationWrapper = styled.div`
+  background-color: var(--color-engel-light);
+  font-size: var(--fontsize-body-l);
+  padding: var(--spacing-s);
+  display: inline-block;
+`;
+
+function NonReservableNotification({
+  reservationUnit,
+}: {
+  reservationUnit: Pick<QueryT, "reservationKind" | "reservationBegins">;
+}) {
+  const { t } = useTranslation();
+
+  let returnText = t("reservationUnit:notifications.notReservable");
+  if (reservationUnit.reservationKind === ReservationKind.Season) {
+    returnText = t("reservationUnit:notifications.onlyRecurring");
+  } else if (isReservationStartInFuture(reservationUnit)) {
+    const futureOpeningText = t("reservationUnit:notifications.futureOpening", {
+      date: reservationUnit.reservationBegins
+        ? formatDate(reservationUnit.reservationBegins, "d.M.yyyy")
+        : "",
+      time: reservationUnit.reservationBegins
+        ? formatDate(reservationUnit.reservationBegins, "H.mm")
+        : "",
+    });
+    returnText = futureOpeningText;
+  }
+
+  return (
+    <NotificationWrapper data-testid="reservation-unit--notification__reservation-start">
+      {returnText}
+    </NotificationWrapper>
+  );
+}
+
+export function Head({
+  reservationUnit,
+  reservationUnitIsReservable,
+  subventionSuffix,
+}: Props): JSX.Element {
+  const { t } = useTranslation();
+
+  const reservationUnitName = getReservationUnitName(reservationUnit);
+  const unitName = getUnitName(reservationUnit.unit ?? undefined);
+  const searchUrl = getSingleSearchPath();
+
+  const routes = [
+    { slug: searchUrl, title: t("breadcrumb:search") },
+    // NOTE Don't set slug. It hides the mobile breadcrumb
+    { title: reservationUnitName ?? "-" },
+  ];
+  return (
+    <>
+      <BreadcrumbWrapper route={routes} />
+      <RightContainer>
+        <Flex>
+          <H1 $noMargin>{reservationUnitName}</H1>
+          <H3 as="h2" $noMargin>
+            {unitName}
+          </H3>
+          <IconList
+            reservationUnit={reservationUnit}
+            subventionSuffix={subventionSuffix}
+          />
+          {!reservationUnitIsReservable && (
+            <NonReservableNotification reservationUnit={reservationUnit} />
+          )}
+        </Flex>
+        <Images
+          images={orderImages(reservationUnit.images)}
+          contextName={reservationUnitName}
+        />
+      </RightContainer>
+    </>
+  );
+}
+
+// FIXME this should have spacing-m margin on the bottom (but I'd prefer it to be gap on the layout)
+// (visible as an error on mobile)
+const IconListWrapper = styled.div`
+  & > div:empty {
+    display: none;
+  }
+  width: 100%;
+
+  ${fontRegular};
+  font-size: var(--fontsize-body-s);
+  display: grid;
+  gap: var(--spacing-m) var(--spacing-s);
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+`;
+
 const StyledIconWithText = styled(IconWithText)`
   display: grid;
   align-items: flex-start;
@@ -59,101 +143,20 @@ const StyledIconWithText = styled(IconWithText)`
   margin-top: unset;
 `;
 
-const Props = styled.div`
-  & > div:empty {
-    display: none;
-  }
-
-  ${fontRegular};
-  font-size: var(--fontsize-body-s);
-  display: grid;
-  grid-template-columns: repeat(2, auto);
-  gap: var(--spacing-m) var(--spacing-s);
-  margin-bottom: var(--spacing-m);
-
-  @media (min-width: ${breakpoints.m}) {
-    margin-bottom: var(--spacing-l);
-  }
-
-  @media (min-width: ${breakpoints.l}) {
-    grid-template-columns: repeat(2, auto);
-  }
-
-  @media (min-width: ${breakpoints.xl}) {
-    grid-template-columns: repeat(4, auto);
-  }
-`;
-
-const Wrapper = styled.div<{ $type: NotificationType }>`
-  background-color: ${({ $type }) =>
-    $type === "alert" ? "var(--color-engel-light)" : "transparent"};
-  font-size: var(--fontsize-body-l);
-  padding: var(--spacing-s);
-  margin-bottom: var(--spacing-m);
-  display: inline-block;
-`;
-
-const ReservationUnitName = styled(H2).attrs({ as: "h1" })`
-  margin-top: 0;
-`;
-
-const UnitName = styled(H3).attrs({ as: "h2" })`
-  margin-top: 0;
-  margin-bottom: var(--spacing-m);
-
-  @media (min-width: ${breakpoints.m}) {
-    margin-bottom: var(--spacing-l);
-  }
-`;
-
-function NonReservableNotification({
+function IconList({
   reservationUnit,
-}: {
-  reservationUnit: QueryT;
-}) {
-  const { t } = useTranslation();
-  let returnText = t("reservationUnit:notifications.notReservable");
-  const futureOpeningText = t("reservationUnit:notifications.futureOpening", {
-    date: reservationUnit.reservationBegins
-      ? formatDate(reservationUnit.reservationBegins, "d.M.yyyy")
-      : "",
-    time: reservationUnit.reservationBegins
-      ? formatDate(reservationUnit.reservationBegins, "H.mm")
-      : "",
-  });
-  if (reservationUnit.reservationKind === ReservationKind.Season) {
-    returnText = t("reservationUnit:notifications.onlyRecurring");
-  } else if (isReservationStartInFuture(reservationUnit))
-    returnText = futureOpeningText;
-  return (
-    <Wrapper
-      $type="alert"
-      data-testid="reservation-unit--notification__reservation-start"
-    >
-      {returnText}
-    </Wrapper>
-  );
-}
-
-function Head({
-  reservationUnit,
-  reservationUnitIsReservable,
   subventionSuffix,
-}: PropsType): JSX.Element {
+}: Pick<Props, "reservationUnit" | "subventionSuffix">): JSX.Element {
   const { t } = useTranslation();
 
   const minDur = reservationUnit.minReservationDuration ?? 0;
   const maxDur = reservationUnit.maxReservationDuration ?? 0;
   const minReservationDuration = formatDuration(minDur / 60, t, true);
   const maxReservationDuration = formatDuration(maxDur / 60, t, true);
-
   const pricing = getActivePricing(reservationUnit);
-  const unitPrice = pricing ? getPriceString({ t, pricing }) : undefined;
   const isPaid = isReservationUnitPaid(reservationUnit.pricings);
+  const unitPrice = pricing ? getPriceString({ t, pricing }) : undefined;
   const hasSubventionSuffix = pricing && isPaid && subventionSuffix != null;
-  const reservationUnitName = getReservationUnitName(reservationUnit);
-  const unitName = getUnitName(reservationUnit.unit ?? undefined);
-  const searchUrl = getSingleSearchPath();
 
   const iconsTexts = filterNonNullable([
     reservationUnit.reservationUnitType != null
@@ -216,36 +219,10 @@ function Head({
   ] as const);
 
   return (
-    <>
-      <BreadcrumbWrapper
-        route={[searchUrl, "reservationUnitName"]}
-        aliases={[
-          { slug: searchUrl, title: t("breadcrumb:search") },
-          { slug: "reservationUnitName", title: reservationUnitName ?? "-" },
-        ]}
-      />
-      <TopContainer>
-        <RightContainer>
-          <div>
-            <ReservationUnitName>{reservationUnitName}</ReservationUnitName>
-            <UnitName>{unitName}</UnitName>
-            <Props>
-              {iconsTexts.map(({ icon, key, text }) => (
-                <StyledIconWithText key={key} icon={icon} text={text} />
-              ))}
-            </Props>
-            {!reservationUnitIsReservable && (
-              <NonReservableNotification reservationUnit={reservationUnit} />
-            )}
-          </div>
-          <Images
-            images={orderImages(reservationUnit.images)}
-            contextName={reservationUnitName}
-          />
-        </RightContainer>
-      </TopContainer>
-    </>
+    <IconListWrapper>
+      {iconsTexts.map(({ icon, key, text }) => (
+        <StyledIconWithText key={key} icon={icon} text={text} />
+      ))}
+    </IconListWrapper>
   );
 }
-
-export default Head;

@@ -33,7 +33,7 @@ import {
   isPriceFree,
   toNumber,
 } from "common/src/helpers";
-import Head from "@/components/reservation-unit/Head";
+import { Head } from "@/components/reservation-unit/Head";
 import { AddressSection } from "@/components/reservation-unit/Address";
 import Sanitize from "@/components/common/Sanitize";
 import {

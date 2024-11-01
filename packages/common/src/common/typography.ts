@@ -72,12 +72,12 @@ export const H2 = styled.h2<{ $large?: boolean; $noMargin?: boolean }>`
   }
 `;
 
-export const H3 = styled.h3<{ $large?: boolean }>`
+export const H3 = styled.h3<{ $large?: boolean; $noMargin?: boolean }>`
   font-size: ${({ $large }) =>
     !$large ? `var(--fontsize-heading-s)` : `var(--fontsize-heading-m)`};
   ${fontRegular}
   line-height: 2rem;
-  margin-bottom: var(--spacing-m);
+  margin-bottom: ${({ $noMargin }) => ($noMargin ? `0` : `var(--spacing-m)`)};
 
   @media (min-width: ${breakpoints.s}) {
     font-size: ${({ $large }) =>

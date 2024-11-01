@@ -38,6 +38,7 @@ export const FullRow = styled.div`
   grid-column: 1 / -1;
 `;
 
+// TODO should allow for switching to smaller gap on mobile (scale down)
 export const Flex = styled.div<{
   $direction?: "row" | "column";
   $gap?: "2-xs" | "xs" | "s" | "m" | "l";

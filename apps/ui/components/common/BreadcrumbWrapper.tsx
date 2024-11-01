@@ -6,14 +6,8 @@ import { breakpoints } from "common/src/common/style";
 import Link, { LinkProps } from "next/link";
 import { trim } from "lodash";
 
-type Alias = {
-  slug: string;
-  title: string;
-};
-
 type Props = {
   route: Array<string | RouteItem>;
-  aliases?: Alias[];
   className?: string;
 };
 
@@ -22,7 +16,7 @@ const LinkWrapper = (props: LinkProps & { children?: React.ReactNode }) => (
   <Link {...props}>{props.children}</Link>
 );
 
-function BreadcrumbWrapper({ route, aliases, className }: Props): JSX.Element {
+function BreadcrumbWrapper({ route, className }: Props): JSX.Element {
   const { t } = useTranslation();
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
 
@@ -30,11 +24,8 @@ function BreadcrumbWrapper({ route, aliases, className }: Props): JSX.Element {
     if (typeof n === "object") {
       return n;
     }
-    // TODO remove ths trim when all aliases are fixed
     return {
-      title:
-        aliases?.find((alias) => alias.slug === n)?.title ||
-        t(`breadcrumb:${trim(n, "/")}`),
+      title: t(`breadcrumb:${trim(n, "/")}`),
       ...(n.includes("/") && { slug: n }),
     };
   });
