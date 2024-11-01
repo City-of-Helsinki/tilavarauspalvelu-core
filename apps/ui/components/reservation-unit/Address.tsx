@@ -20,8 +20,7 @@ type Props = {
 };
 
 const Container = styled.div`
-  margin-top: var(--spacing-2-xs);
-  margin-bottom: var(--spacing-layout-l);
+  margin: var(--spacing-xs) 0;
 `;
 
 const Name = styled(H4).attrs({ as: "h3" })``;

@@ -4,7 +4,6 @@ import styled from "styled-components";
 
 type Props = {
   html: string;
-  style?: React.CSSProperties;
 };
 
 const StyledContent = styled.div`
@@ -47,14 +46,13 @@ const config = {
   },
 };
 
-function Sanitize({ html, style }: Props): JSX.Element | null {
+function Sanitize({ html }: Props): JSX.Element | null {
   if (!html) {
     return null;
   }
 
   return (
     <StyledContent
-      style={style}
       dangerouslySetInnerHTML={{
         __html: sanitizeHtml(html, config),
       }}

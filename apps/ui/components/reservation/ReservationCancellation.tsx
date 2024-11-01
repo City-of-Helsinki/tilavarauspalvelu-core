@@ -7,7 +7,7 @@ import { useTranslation } from "next-i18next";
 import { OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
 import NotificationBox from "common/src/common/NotificationBox";
-import { fontMedium } from "common/src/common/typography";
+import { fontMedium, H1 } from "common/src/common/typography";
 import {
   useCancelReservationMutation,
   type ReservationQuery,
@@ -20,7 +20,7 @@ import { BlackButton, MediumButton } from "@/styles/util";
 import { ReservationInfoCard } from "./ReservationInfoCard";
 import { Paragraph } from "./styles";
 import { signOut } from "common/src/browserHelpers";
-import { Heading, ReservationPageWrapper } from "../reservations/styles";
+import { ReservationPageWrapper } from "../reservations/styles";
 import {
   convertLanguageCode,
   getTranslationSafe,
@@ -184,11 +184,11 @@ export function ReservationCancellation(props: Props): JSX.Element {
 
   return (
     <ReservationPageWrapper>
-      <div style={{ gridColumn: "1 / -1" }}>
-        <Heading>{title}</Heading>
+      <div>
+        <H1 $noMargin>{title}</H1>
+        <p>{ingress}</p>
       </div>
-      <p>{ingress}</p>
-      <div style={{ gridRowEnd: "span 3" }}>
+      <div style={{ gridRowEnd: "span 4" }}>
         <ReservationInfoCard reservation={reservation} type="confirmed" />
       </div>
       <div>

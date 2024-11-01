@@ -13,6 +13,7 @@ type Props = {
 
 const EquipmentContainer = styled(ShowAllContainer)`
   .ShowAllContainer__Content {
+    margin: 0;
     list-style: none;
     display: grid;
     grid-template-columns: 1fr;

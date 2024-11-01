@@ -9,5 +9,6 @@
   "recurring": "Kausivaraus",
   "applications": "Omat hakemukset",
   "reservationUnit": "Varausyksikkö",
-  "reservations": "Omat varaukset"
+  "reservations": "Omat varaukset",
+  "confirmation": "Vahvistus"
 }

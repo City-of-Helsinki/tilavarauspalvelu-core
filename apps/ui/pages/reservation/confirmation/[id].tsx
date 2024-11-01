@@ -9,7 +9,7 @@ import { CenterSpinner } from "@/components/common/common";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
-import ReservationConfirmation from "@/components/reservation/ReservationConfirmation";
+import { ReservationConfirmation } from "@/components/reservation/ReservationConfirmation";
 import { ReservationInfoCard } from "@/components/reservation/ReservationInfoCard";
 import { useOrder } from "@/hooks/reservation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
@@ -21,6 +21,8 @@ type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 // TODO test this (success after making a payment)
+// TODO why is this different from reservations/[id]/confirmation.tsx it looks the same, uses the same base component etc.
+// why not just create a hook that is skipped if the orderUuid is missing? i.e. it's free
 function ReservationSuccess({ reservation, apiBaseUrl }: PropsNarrowed) {
   const { t } = useTranslation();
 

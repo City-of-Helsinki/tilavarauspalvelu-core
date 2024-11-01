@@ -9,5 +9,6 @@
   "recurring": "Säsongbokning",
   "applications": "Mina bokningar",
   "reservationUnit": "Bokningsenhet",
-  "reservations": "Mina bokningar"
+  "reservations": "Mina bokningar",
+  "confirmation": "Bekräftelse"
 }

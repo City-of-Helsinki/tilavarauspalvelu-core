@@ -31,3 +31,19 @@ export const ActionContainer = styled.div`
     justify-content: flex-end;
   }
 `;
+
+// TODO rework this (way too much css for the purpose)
+export const PinkBox = styled.div`
+  margin: var(--spacing-m) 0;
+  padding: 1px var(--spacing-m) var(--spacing-m);
+  background-color: var(--color-suomenlinna-light);
+  line-height: var(--lineheight-l);
+
+  p {
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+
+    margin-bottom: var(--spacing-s);
+  }
+`;

@@ -12,7 +12,7 @@ import {
 import { useTranslation } from "next-i18next";
 import { H1, H4, fontRegular } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { NoWrap } from "common/styles/util";
+import { Flex, NoWrap } from "common/styles/util";
 import {
   CustomerTypeChoice,
   ReservationStateChoice,
@@ -65,20 +65,22 @@ import { getReservationPath, getReservationUnitPath } from "@/modules/urls";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
+// TODO clean this up, way too much css
+// also this breaks way too early to two lines (should just have no-wrap on the two elements)
+// reason is the way the separator is added
 const SubHeading = styled(H4).attrs({ as: "h2" })`
-  margin-top: 0;
-  margin-bottom: var(--spacing-m);
-  line-height: 2rem;
   ${fontRegular}
+  margin-top: 0;
 
+  /* TODO make this into a css fragment */
   a,
   a:visited {
     color: var(--color-black);
     text-decoration: underline;
     display: block;
-    margin-bottom: var(--spacing-xs);
 
-    @media (min-width: ${breakpoints.m}) {
+    /* TODO the problem here is that it relies on the size of the window instead if we are splitting the line or not */
+    @media (width > ${breakpoints.m}) {
       &:after {
         content: "|";
         position: relative;
@@ -438,11 +440,30 @@ function Reservation({
   return (
     <>
       <BreadcrumbWrapper route={routes} />
-      <ReservationPageWrapper data-testid="reservation__content">
-        <div style={{ gridColumn: "1 / span 1", gridRow: "1 / span 1" }}>
-          <H1 data-testid="reservation__name">
-            {t("reservations:reservationName", { id: reservation.pk })}
-          </H1>
+      <ReservationPageWrapper data-testid="reservation__content" $nRows={3}>
+        <Flex style={{ gridColumn: "1 / span 1", gridRow: "1 / span 1" }}>
+          <Flex
+            $direction="row"
+            $align="center"
+            $justify="space-between"
+            $wrap="wrap"
+          >
+            <H1 $noMargin data-testid="reservation__name">
+              {t("reservations:reservationName", { id: reservation.pk })}
+            </H1>
+            <StatusContainer>
+              <ReservationStatus
+                testId="reservation__status"
+                state={reservation.state ?? ReservationStateChoice.Confirmed}
+              />
+              {normalizedOrderStatus && (
+                <ReservationOrderStatus
+                  orderStatus={normalizedOrderStatus}
+                  testId="reservation__payment-status"
+                />
+              )}
+            </StatusContainer>
+          </Flex>
           <SubHeading>
             <Link
               data-testid="reservation__reservation-unit"
@@ -452,19 +473,7 @@ function Reservation({
             </Link>
             <NoWrap data-testid="reservation__time">{timeString}</NoWrap>
           </SubHeading>
-          <StatusContainer>
-            <ReservationStatus
-              testId="reservation__status"
-              state={reservation.state ?? ReservationStateChoice.Confirmed}
-            />
-            {normalizedOrderStatus && (
-              <ReservationOrderStatus
-                orderStatus={normalizedOrderStatus}
-                testId="reservation__payment-status"
-              />
-            )}
-          </StatusContainer>
-        </div>
+        </Flex>
         <div style={{ gridRowEnd: "span 3" }}>
           <ReservationInfoCard reservation={reservation} type="complete" />
           <SecondaryActions>

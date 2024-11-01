@@ -32,10 +32,7 @@ import {
   PendingReservationFormSchema,
   PendingReservationFormType,
 } from "@/components/reservation-unit/schema";
-import {
-  Heading,
-  ReservationPageWrapper,
-} from "@/components/reservations/styles";
+import { ReservationPageWrapper } from "@/components/reservations/styles";
 import { queryOptions } from "@/modules/queryOptions";
 import {
   convertReservationFormToApi,
@@ -44,6 +41,8 @@ import {
 } from "@/modules/reservation";
 import { NotModifiableReason } from "@/components/reservation/NotModifiableReason";
 import { getReservationPath } from "@/modules/urls";
+import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
+import { H1 } from "common";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -51,9 +50,6 @@ type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 // HDS pushes className into wrong element (sub not the outermost)
 const StepperWrapper = styled.div`
   grid-column: 1 / -2;
-`;
-const StyledStepper = styled(Stepper)`
-  margin: var(--spacing-layout-m) 0 var(--spacing-layout-m);
 `;
 
 // copy of ReservationCancellation but some changes to grid layoout
@@ -158,14 +154,14 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
 
   if (!isReservationEditable({ reservation })) {
     return (
-      <ReservationPageWrapper>
+      <>
         <HeadingSection>
-          <Heading>{t(title)}</Heading>
+          <H1>{t(title)}</H1>
         </HeadingSection>
         <div style={{ gridColumn: "1 / -1" }}>
           <NotModifiableReason reservation={reservation} />
         </div>
-      </ReservationPageWrapper>
+      </>
     );
   }
 
@@ -193,13 +189,13 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
   // TODO does this include non active application rounds?
   const activeApplicationRounds = reservationUnit.applicationRounds;
 
+  // TODO add breadcrumbs (should be similar to reservations/[id].tsx) for consistency
+  // TODO move the breadcrumbs to a wrapper component (we have an early return above)
   return (
-    <ReservationPageWrapper>
-      <HeadingSection>
-        <Heading>{t(title)}</Heading>
-      </HeadingSection>
+    <>
       <StepperWrapper>
-        <StyledStepper
+        <H1>{t(title)}</H1>
+        <Stepper
           language={i18n.language}
           selectedStep={step}
           onStepClick={handleStepClick}
@@ -228,9 +224,37 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
           isSubmitting={isLoading}
         />
       )}
-    </ReservationPageWrapper>
+    </>
   );
 }
+
+function ReservationEditPageWrapper(props: PropsNarrowed): JSX.Element {
+  const { t } = useTranslation();
+
+  const { reservation } = props;
+  // TODO should have edit in the breadcrumb (and slug for reservation)
+  const routes = [
+    {
+      slug: "/reservations",
+      title: t("breadcrumb:reservations"),
+    },
+    {
+      // NOTE Don't set slug. It hides the mobile breadcrumb
+      title: t("reservations:reservationName", { id: reservation.pk }),
+    },
+  ];
+
+  return (
+    <>
+      <BreadcrumbWrapper route={routes} />
+      <ReservationPageWrapper>
+        <ReservationEditPage {...props} />
+      </ReservationPageWrapper>
+    </>
+  );
+}
+
+export default ReservationEditPageWrapper;
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, params } = ctx;
@@ -313,5 +337,3 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   return notFoundValue;
 }
-
-export default ReservationEditPage;

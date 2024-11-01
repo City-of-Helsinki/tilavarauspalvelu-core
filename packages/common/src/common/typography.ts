@@ -85,11 +85,12 @@ export const H3 = styled.h3<{ $large?: boolean; $noMargin?: boolean }>`
   }
 `;
 
-export const H4 = styled.h4`
+export const H4 = styled.h4<{ $noMargin?: boolean }>`
   font-size: var(--fontsize-heading-s);
   ${fontMedium}
   line-height: var(--lineheight-m);
-  margin-bottom: var(--spacing-s);
+  margin-bottom: ${({ $noMargin }) => ($noMargin ? `0` : `var(--spacing-s)`)};
+  margin-top: ${({ $noMargin }) => ($noMargin ? `0` : `var(--spacing-m)`)};
 
   @media (min-width: ${breakpoints.s}) {
     font-size: var(--fontsize-heading-m);

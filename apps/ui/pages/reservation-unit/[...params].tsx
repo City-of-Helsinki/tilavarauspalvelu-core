@@ -8,7 +8,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { breakpoints } from "common/src/common/style";
-import { fontRegular, H2 } from "common/src/common/typography";
+import { fontMedium, fontRegular, H1 } from "common/src/common/typography";
 import {
   CustomerTypeChoice,
   useConfirmReservationMutation,
@@ -35,11 +35,9 @@ import {
 } from "@/modules/reservation";
 import { ReservationProps } from "@/context/DataContext";
 import { ReservationInfoCard } from "@/components/reservation/ReservationInfoCard";
-import Step0 from "@/components/reservation/Step0";
-import Step1 from "@/components/reservation/Step1";
+import { Step0 } from "@/components/reservation/Step0";
+import { Step1 } from "@/components/reservation/Step1";
 import { ReservationStep } from "@/modules/types";
-import { JustForDesktop } from "@/modules/style/layout";
-import { PinkBox } from "@/components/reservation-unit/ReservationUnitStyles";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { useConfirmNavigation } from "@/hooks/useConfirmNavigation";
 import { base64encode, filterNonNullable } from "common/src/helpers";
@@ -52,38 +50,60 @@ import {
   getTranslationSafe,
 } from "common/src/common/util";
 import { ApolloError } from "@apollo/client";
+import { PinkBox as PinkBoxBase } from "@/components/reservation/styles";
+import { Flex } from "common/styles/util";
+import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
+import { ReservationPageWrapper } from "@/components/reservations/styles";
 
-const Columns = styled.div`
-  grid-template-columns: 1fr;
-  display: grid;
-  align-items: flex-start;
-  gap: var(--spacing-m);
+const StyledReservationInfoCard = styled(ReservationInfoCard)`
+  grid-column: 1 / -1;
+  grid-row: 2;
+  @media (width > ${breakpoints.m}) {
+    grid-column: span 1 / -1;
+    grid-row: 1 / span 2;
+  }
+`;
 
+const PinkBox = styled(PinkBoxBase)`
+  grid-column: 1 / -1;
+  grid-row: 4;
   @media (min-width: ${breakpoints.m}) {
-    & > div:nth-of-type(1) {
-      order: 2;
+    grid-column: span 1 / -1;
+    grid-row: 3;
+  }
+`;
+
+const StyledForm = styled.form`
+  grid-column: 1 / -1;
+  grid-row: 3;
+  @media (width > ${breakpoints.m}) {
+    grid-column: span 1;
+    grid-row: 2 / -1;
+  }
+
+  /* TODO what is the purpose of this and why it's done only here? */
+  label {
+    ${fontMedium};
+
+    span {
+      line-height: unset;
+      transform: unset;
+      margin-left: 0;
+      display: inline;
+      font-size: unset;
     }
+  }
 
-    margin-top: var(--spacing-xl);
-    grid-template-columns: 1fr 378px;
+  input[type="radio"] + label {
+    ${fontRegular};
   }
 `;
 
-// TODO use a flexbox gap and set $noMargin
-const Title = styled(H2).attrs({ as: "h1" })`
-  margin-top: 0;
-`;
-
-const BodyContainer = styled.div`
-  ${fontRegular}
-
-  a {
-    color: var(--color-bus);
+const TitleSection = styled(Flex)`
+  grid-column: 1 / -1;
+  @media (min-width: ${breakpoints.m}) {
+    grid-column: span 1;
   }
-`;
-
-const StyledStepper = styled(Stepper)<{ small: boolean }>`
-  ${({ small }) => !small && "max-width: 300px;"}
 `;
 
 /// We want to get rid of the local storage
@@ -108,7 +128,7 @@ const useRemoveStoredReservation = () => {
 // - using back multiple times breaks the confirmation hook (bypassing it or blocking the navigation while deleting the reservation)
 // - requires complex logic to handle the steps and keep the url in sync with what's on the page
 // - forward / backward navigation work differently
-function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
+function NewReservation(props: PropsNarrowed): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
@@ -188,6 +208,7 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
   const confirmMessage = t("reservations:confirmNavigation");
   // NOTE this is the only place where reservation is deleted, don't add a second place or it gets called repeatedly
   const onNavigationConfirmed = useCallback(() => {
+    // TODO rewrite browser history so user will not end up here if they press next
     deleteReservation({
       variables: {
         input: {
@@ -351,67 +372,68 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
   }, [step, generalFields, reservation, reservationUnit]);
 
   const lang = convertLanguageCode(i18n.language);
-  const termsOfUseContent = getTranslationSafe(
-    reservationUnit,
-    "termsOfUse",
-    lang
-  );
+  const termsOfUse = getTranslationSafe(reservationUnit, "termsOfUse", lang);
 
   const infoReservation = {
     ...reservation,
     reservationUnit: reservationUnit != null ? [reservationUnit] : [],
   };
 
+  // TODO rework so we submit the form values here
+  const onSubmit = (values: unknown) => {
+    if (step === 0) {
+      onSubmitStep0(values);
+    }
+    if (step === 1) {
+      onSubmitStep1();
+    }
+  };
+
   return (
-    <Columns>
-      <div>
-        <ReservationInfoCard
+    <FormProvider {...form}>
+      <ReservationPageWrapper>
+        <StyledReservationInfoCard
           reservation={infoReservation}
           type="pending"
           shouldDisplayReservationUnitPrice={shouldDisplayReservationUnitPrice}
         />
-        {termsOfUseContent && (
-          <JustForDesktop>
-            <PinkBox>
-              <Subheading>
-                {t("reservations:reservationInfoBoxHeading")}
-              </Subheading>
-              <Sanitize html={termsOfUseContent} />
-            </PinkBox>
-          </JustForDesktop>
+        {termsOfUse && (
+          <PinkBox>
+            <Subheading>
+              {t("reservations:reservationInfoBoxHeading")}
+            </Subheading>
+            <Sanitize html={termsOfUse} />
+          </PinkBox>
         )}
-      </div>
-      <BodyContainer>
-        <FormProvider {...form}>
-          <div>
-            <Title>{pageTitle}</Title>
-            {/* TODO what's the logic here?
-             * in what case are there more than 2 steps?
-             * why do we not show that?
-             * TODO why isn't this shown when creating a paid version? I think there was on purpose reason for that? maybe?
-             */}
-            {steps.length <= 2 && (
-              <StyledStepper
-                language={i18n.language}
-                selectedStep={step}
-                small={false}
-                onStepClick={(e) => {
-                  const target = e.currentTarget;
-                  const s = target
-                    .getAttribute("data-testid")
-                    ?.replace("hds-stepper-step-", "");
-                  if (s) {
-                    setStep(parseInt(s, 10));
-                  }
-                }}
-                steps={steps}
-              />
-            )}
-          </div>
+        <TitleSection>
+          <H1 $noMargin>{pageTitle}</H1>
+          {/* TODO what's the logic here?
+           * in what case are there more than 2 steps?
+           * why do we not show that?
+           * TODO why isn't this shown when creating a paid version? I think there was on purpose reason for that? maybe?
+           */}
+          {steps.length <= 2 && (
+            <Stepper
+              language={i18n.language}
+              selectedStep={step}
+              style={{ width: "100%" }}
+              onStepClick={(e) => {
+                const target = e.currentTarget;
+                const s = target
+                  .getAttribute("data-testid")
+                  ?.replace("hds-stepper-step-", "");
+                if (s) {
+                  setStep(parseInt(s, 10));
+                }
+              }}
+              steps={steps}
+            />
+          )}
+        </TitleSection>
+        <StyledForm onSubmit={handleSubmit(onSubmit)} noValidate>
           {step === 0 && (
             <Step0
               reservationUnit={reservationUnit}
-              handleSubmit={handleSubmit(onSubmitStep0)}
               reservation={reservation}
               cancelReservation={cancelReservation}
               options={options}
@@ -421,7 +443,6 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
             <Step1
               reservation={reservation}
               reservationUnit={reservationUnit}
-              handleSubmit={handleSubmit(onSubmitStep1)}
               supportedFields={supportedFields}
               options={options}
               // TODO this is correct but confusing.
@@ -430,11 +451,40 @@ function ReservationUnitReservation(props: PropsNarrowed): JSX.Element | null {
               setStep={setStep}
             />
           )}
-        </FormProvider>
-      </BodyContainer>
-    </Columns>
+        </StyledForm>
+      </ReservationPageWrapper>
+    </FormProvider>
   );
 }
+
+function NewReservationWrapper(props: PropsNarrowed): JSX.Element | null {
+  const { t } = useTranslation();
+  const { reservation, reservationUnit } = props;
+  const lang = convertLanguageCode("fi");
+  const routes = [
+    {
+      slug: "/search",
+      title: t("breadcrumb:search"),
+    },
+    {
+      slug: getReservationUnitPath(reservationUnit?.pk),
+      title: getTranslationSafe(reservationUnit, "name", lang) ?? "",
+    },
+    {
+      // NOTE Don't set slug. It hides the mobile breadcrumb
+      title: t("reservations:reservationName", { id: reservation.pk }),
+    },
+  ];
+
+  return (
+    <>
+      <BreadcrumbWrapper route={routes} />
+      <NewReservation {...props} />
+    </>
+  );
+}
+
+export default NewReservationWrapper;
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -511,5 +561,3 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     notFound: true,
   };
 }
-
-export default ReservationUnitReservation;

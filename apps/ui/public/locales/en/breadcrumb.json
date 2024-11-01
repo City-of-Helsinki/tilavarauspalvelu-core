@@ -9,5 +9,6 @@
   "recurring": "Seasonal booking",
   "applications": "My applications",
   "reservationUnit": "Reservation unit",
-  "reservations": "My bookings"
+  "reservations": "My bookings",
+  "confirmation": "Confirmation"
 }

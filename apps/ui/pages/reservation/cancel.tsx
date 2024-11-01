@@ -7,7 +7,7 @@ import { H1 } from "common";
 import { useDeleteReservation, useOrder } from "@/hooks/reservation";
 import { ReservationFail } from "@/components/reservation/ReservationFail";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { CenterSpinner } from "@/components/common/common";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];

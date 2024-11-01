@@ -54,13 +54,6 @@ export const RESERVATION_INFO_CARD_FRAGMENT = gql`
   }
 `;
 
-type Props = {
-  reservation: ReservationInfoCardFragment;
-  type: Type;
-  shouldDisplayReservationUnitPrice?: boolean;
-  disableImage?: boolean;
-};
-
 const Wrapper = styled.div<{ $type: Type }>`
   /* stylelint-disable custom-property-pattern */
   background-color: var(
@@ -102,11 +95,22 @@ const Subheading = styled(Value)`
   margin-bottom: var(--spacing-xs);
 `;
 
+type Props = {
+  reservation: ReservationInfoCardFragment;
+  type: Type;
+  shouldDisplayReservationUnitPrice?: boolean;
+  disableImage?: boolean;
+  className?: string;
+  style?: React.CSSProperties;
+};
+
 export function ReservationInfoCard({
   reservation,
   type,
   shouldDisplayReservationUnitPrice = false,
   disableImage = false,
+  className,
+  style,
 }: Props): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const reservationUnit = reservation.reservationUnits?.[0];
@@ -156,7 +160,7 @@ export function ReservationInfoCard({
 
   // TODO why does this not use the Card component?
   return (
-    <Wrapper $type={type}>
+    <Wrapper $type={type} className={className} style={style}>
       {!disableImage && <MainImage src={imgSrc} alt={name} />}
       <Content data-testid="reservation__reservation-info-card__content">
         <Heading>

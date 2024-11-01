@@ -36,6 +36,8 @@ type Props = {
   form: UseFormReturn<PendingReservationFormType>;
 };
 
+// TODO move this to general styles: ButtonContainer
+// test different variantions of it (one, two, three buttons)
 const Actions = styled.div`
   display: flex;
   flex-flow: row wrap;
@@ -69,15 +71,15 @@ const Actions = styled.div`
 
 const BylineSection = styled.div`
   grid-row: 3;
-  @media (min-width: ${breakpoints.m}) {
-    grid-row: 2 / -1;
+  @media (width > ${breakpoints.m}) {
+    grid-row: 1 / -1;
   }
 `;
 
 const StyledForm = styled.form`
-  @media (min-width: ${breakpoints.m}) {
+  @media (width > ${breakpoints.m}) {
     grid-column: 1 / -2;
-    grid-row-start: 3;
+    grid-row: 2 / -1;
   }
 `;
 

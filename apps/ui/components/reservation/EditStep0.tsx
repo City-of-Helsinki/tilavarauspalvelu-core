@@ -21,7 +21,6 @@ import {
   getReservationUnitPrice,
   isReservationUnitFreeOfCharge,
 } from "@/modules/reservationUnit";
-import { CalendarWrapper } from "../reservation-unit/ReservationUnitStyles";
 import { type UseFormReturn } from "react-hook-form";
 import { type PendingReservationFormType } from "@/components/reservation-unit/schema";
 import {
@@ -38,6 +37,7 @@ import { ReservationInfoCard } from "./ReservationInfoCard";
 import { Subheading } from "common/src/reservation-form/styles";
 import Sanitize from "@/components/common/Sanitize";
 import { type RoundPeriod } from "@/modules/reservable";
+import { PinkBox as PinkBoxBase } from "./styles";
 
 type ReservationUnitNodeT = NonNullable<
   ReservationUnitPageQuery["reservationUnit"]
@@ -54,12 +54,12 @@ type Props = {
   isLoading: boolean;
 };
 
-const StyledCalendarWrapper = styled(CalendarWrapper)`
+const StyledCalendarWrapper = styled.div`
   grid-column: 1 / -1;
   margin-bottom: 0;
   @media (min-width: ${breakpoints.l}) {
     grid-column: span 1;
-    grid-row: 3 / span 2;
+    grid-row: 2 / span 2;
   }
 `;
 
@@ -80,27 +80,26 @@ const StyledReservationInfoCard = styled(ReservationInfoCard)`
   @media (min-width: ${breakpoints.m}) {
     grid-column-start: unset;
     grid-column-end: -1;
-    grid-row: 2;
+    grid-row: 1;
   }
 `;
+
 const StyledQuickReservation = styled(QuickReservation)`
   grid-column: 1 / -1;
   grid-row: 4;
   @media (min-width: ${breakpoints.m}) {
     grid-column-start: unset;
     grid-column-end: -1;
-    grid-row: 3;
+    grid-row: 2;
   }
 `;
 
-const PinkBox = styled.div`
-  padding: 1px var(--spacing-m) var(--spacing-m);
-  background-color: var(--color-suomenlinna-light);
+const PinkBox = styled(PinkBoxBase)`
   grid-column: 1 / -1;
   grid-row: -1;
   @media (min-width: ${breakpoints.l}) {
     grid-column: span 1 / -1;
-    grid-row: unset;
+    grid-row: 3;
   }
 `;
 

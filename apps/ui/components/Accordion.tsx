@@ -12,11 +12,14 @@ type Props = {
   onToggle?: () => void;
   id?: string;
   theme?: Theme;
+  disableBottomMargin?: boolean;
 };
 
-const AccordionElement = styled.div`
+// TODO should we remove the padding all together? having both seems really silly
+const AccordionElement = styled.div<{ $noBottomMargin?: boolean }>`
   padding-bottom: var(--spacing-xs);
-  margin-bottom: var(--spacing-layout-xs);
+  margin-bottom: ${({ $noBottomMargin }) =>
+    $noBottomMargin ? "0" : "var(--spacing-layout-xs)"};
   margin-left: 0;
   padding-left: 0;
   --accordion-border-color: var(--color-black-50);
@@ -87,6 +90,7 @@ export function Accordion({
   onToggle,
   id,
   theme = "default",
+  disableBottomMargin,
   ...rest
 }: Props): JSX.Element {
   const { isOpen, openAccordion, closeAccordion } = useAccordion({
@@ -110,7 +114,7 @@ export function Accordion({
   );
 
   return (
-    <AccordionElement id={id} {...rest}>
+    <AccordionElement id={id} {...rest} $noBottomMargin={disableBottomMargin}>
       <HeadingButton
         variant="supplementary"
         iconRight={icon}

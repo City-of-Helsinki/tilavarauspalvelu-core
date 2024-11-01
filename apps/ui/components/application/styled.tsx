@@ -11,6 +11,7 @@ export const CheckboxContainer = styled.div`
   align-items: center;
 `;
 
+// TODO this belongs to application view page
 export const StyledNotification = styled(Notification)`
   line-height: var(--fontsize-heading-m);
   margin-top: var(--spacing-m);

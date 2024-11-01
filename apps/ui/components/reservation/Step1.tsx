@@ -1,18 +1,12 @@
 import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
-import styled from "styled-components";
 import { IconArrowLeft, IconArrowRight } from "hds-react";
 import {
   type ReservationQuery,
   type ReservationUnitPageFieldsFragment,
 } from "@gql/gql-types";
-import { Subheading } from "common/src/reservation-form/styles";
-import { getTranslation } from "@/modules/util";
 import { ActionContainer } from "./styles";
-import Sanitize from "../common/Sanitize";
 import { MediumButton } from "@/styles/util";
-import { JustForMobile } from "@/modules/style/layout";
-import { PinkBox } from "../reservation-unit/ReservationUnitStyles";
 import { useFormContext } from "react-hook-form";
 import {
   ApplicationFields,
@@ -26,22 +20,15 @@ type NodeT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
   reservation: NodeT;
   reservationUnit: ReservationUnitPageFieldsFragment;
-  handleSubmit: () => void;
   supportedFields: FieldName[];
   options: OptionsRecord;
   requiresHandling: boolean;
   setStep: React.Dispatch<React.SetStateAction<number>>;
 };
 
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-`;
-
-function Step1({
+export function Step1({
   reservation,
   reservationUnit,
-  handleSubmit,
   supportedFields,
   options,
   requiresHandling,
@@ -56,6 +43,7 @@ function Step1({
     space: false,
     service: false,
   });
+
   const handleTermsAcceptedChange = (
     key: "space" | "service",
     val: boolean
@@ -63,19 +51,16 @@ function Step1({
     setIsTermsAccepted({ ...isTermsAccepted, [key]: val });
   };
 
-  const termsOfUseContent = getTranslation(reservationUnit, "termsOfUse");
-
   const areTermsAccepted = isTermsAccepted.space && isTermsAccepted.service;
+  const loadingText = t(
+    `reservationCalendar:${requiresHandling ? "nextStep" : "makeReservation"}Loading`
+  );
+  const submitText = t(
+    `reservationCalendar:${requiresHandling ? "nextStep" : "makeReservation"}`
+  );
+
   return (
-    <Form
-      onSubmit={(e) => {
-        e.preventDefault();
-        if (areTermsAccepted) {
-          handleSubmit();
-        }
-      }}
-      noValidate
-    >
+    <>
       <GeneralFields
         supportedFields={supportedFields}
         reservation={reservation}
@@ -91,16 +76,6 @@ function Step1({
         isTermsAccepted={isTermsAccepted}
         setIsTermsAccepted={handleTermsAcceptedChange}
       />
-      {termsOfUseContent && (
-        <JustForMobile style={{ marginBottom: "var(--spacing-layout-m)" }}>
-          <PinkBox>
-            <Subheading>
-              {t("reservations:reservationInfoBoxHeading")}
-            </Subheading>
-            <Sanitize html={termsOfUseContent} />
-          </PinkBox>
-        </JustForMobile>
-      )}
       <ActionContainer>
         <MediumButton
           variant="primary"
@@ -110,16 +85,10 @@ function Step1({
           }
           data-test="reservation__button--update"
           isLoading={isSubmitting}
-          loadingText={t(
-            `reservationCalendar:${requiresHandling ? "nextStep" : "makeReservation"}Loading`
-          )}
+          loadingText={loadingText}
           disabled={!areTermsAccepted}
         >
-          {t(
-            `reservationCalendar:${
-              requiresHandling ? "nextStep" : "makeReservation"
-            }`
-          )}
+          {submitText}
         </MediumButton>
         <MediumButton
           variant="secondary"
@@ -130,8 +99,6 @@ function Step1({
           {t("common:prev")}
         </MediumButton>
       </ActionContainer>
-    </Form>
+    </>
   );
 }
-
-export default Step1;

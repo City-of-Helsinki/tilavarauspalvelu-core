@@ -69,7 +69,7 @@ const GenericTerms = ({ genericTerms }: Props): JSX.Element => {
   return (
     <>
       <H1>{title}</H1>
-      <Sanitize html={text} style={{ whiteSpace: "pre-wrap" }} />
+      <Sanitize html={text} />
     </>
   );
 };

@@ -169,9 +169,13 @@ export function getUnitName(
   );
 }
 
+type InstructionsKey =
+  | "reservationPendingInstructions"
+  | "reservationCancelledInstructions"
+  | "reservationConfirmedInstructions";
 export function getReservationUnitInstructionsKey(
-  state?: ReservationStateChoice | null | undefined
-): string | null {
+  state: Maybe<ReservationStateChoice> | undefined
+): InstructionsKey | null {
   switch (state) {
     case ReservationStateChoice.Created:
     case ReservationStateChoice.RequiresHandling:

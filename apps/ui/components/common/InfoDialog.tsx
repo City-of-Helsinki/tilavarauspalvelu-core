@@ -40,10 +40,7 @@ const InfoDialog = ({
         }
       />
       <Dialog.Content id={`dialog__${id}--body`}>
-        <Sanitize
-          style={{ whiteSpace: "pre-line", margin: "var(--spacing-m) 0" }}
-          html={text}
-        />
+        <Sanitize html={text} />
       </Dialog.Content>
       <Dialog.ActionButtons>
         <BlackButton variant="secondary" onClick={() => onClose()}>

@@ -9,20 +9,22 @@ import {
 import { Trans, useTranslation } from "next-i18next";
 import Link from "next/link";
 import styled from "styled-components";
-import { fontRegular, H1 } from "common/src/common/typography";
+import { fontRegular, H1, H4 } from "common/src/common/typography";
 import {
   type PaymentOrderNode,
   type ReservationQuery,
   ReservationStateChoice,
 } from "@gql/gql-types";
-import { Subheading } from "common/src/reservation-form/styles";
 import { IconButton } from "common/src/components";
 import { signOut } from "common/src/browserHelpers";
 import { getReservationUnitInstructionsKey } from "@/modules/reservationUnit";
-import { getTranslation } from "@/modules/util";
 import { ButtonLikeExternalLink } from "../common/ButtonLikeLink";
 import { getReservationUnitPath, reservationsPath } from "@/modules/urls";
 import { Flex } from "common/styles/util";
+import {
+  convertLanguageCode,
+  getTranslationSafe,
+} from "common/src/common/util";
 
 type Node = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
@@ -71,7 +73,7 @@ function ReturnLinkList({
   );
 }
 
-function ReservationConfirmation({
+export function ReservationConfirmation({
   reservation,
   apiBaseUrl,
   order,
@@ -79,7 +81,7 @@ function ReservationConfirmation({
   const { t, i18n } = useTranslation();
 
   const reservationUnit = reservation.reservationUnits?.[0];
-  const instructionsKey = getReservationUnitInstructionsKey(reservation?.state);
+  const instructionsKey = getReservationUnitInstructionsKey(reservation.state);
   const requiresHandling =
     reservation.state === ReservationStateChoice.RequiresHandling;
 
@@ -87,15 +89,21 @@ function ReservationConfirmation({
     ? "reservationInHandling"
     : "reservationSuccessful";
   const title = t(`reservationUnit:${titleKey}`);
+
+  const lang = convertLanguageCode(i18n.language);
+  const instructionsText =
+    instructionsKey != null
+      ? getTranslationSafe(reservationUnit, instructionsKey, lang)
+      : null;
   const showInstructions =
     reservationUnit != null &&
     instructionsKey != null &&
-    getTranslation(reservationUnit, instructionsKey);
+    instructionsText != null &&
+    instructionsText !== "";
 
   return (
     <Flex>
-      {/* TODO the H1 margin-bottom and the gap are fighting */}
-      <H1>{title}</H1>
+      <H1 $noMargin>{title}</H1>
       <p>
         <Trans
           i18nKey={`reservationUnit:reservationReminderText${
@@ -145,10 +153,12 @@ function ReservationConfirmation({
         </Flex>
       )}
       {showInstructions && (
-        <>
-          <Subheading>{t("reservations:reservationInfo")}</Subheading>
-          <p>{getTranslation(reservationUnit, instructionsKey)}</p>
-        </>
+        <div>
+          <H4 $noMargin as="h2">
+            {t("reservations:reservationInfo")}
+          </H4>
+          <p>{instructionsText}</p>
+        </div>
       )}
       {reservationUnit != null && (
         <ReturnLinkList
@@ -159,5 +169,3 @@ function ReservationConfirmation({
     </Flex>
   );
 }
-
-export default ReservationConfirmation;

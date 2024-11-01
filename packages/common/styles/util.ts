@@ -50,8 +50,11 @@ export const Flex = styled.div<{
     | "space-around"
     | "space-evenly";
   $align?: "center" | "flex-start" | "flex-end" | "baseline" | "stretch";
+  $wrap?: "wrap" | "nowrap";
 }>`
+  width: 100%;
   display: flex;
+  flex-wrap: ${({ $wrap }) => $wrap ?? "no-wrap"};
   gap: ${({ $gap }) =>
     $gap != null ? `var(--spacing-${$gap})` : "var(--spacing-m)"};
   flex-direction: ${({ $direction }) =>

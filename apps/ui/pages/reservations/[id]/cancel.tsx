@@ -15,12 +15,32 @@ import { createApolloClient } from "@/modules/apolloClient";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { isReservationCancellable } from "@/modules/reservation";
 import { getReservationPath } from "@/modules/urls";
+import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
+import { useTranslation } from "next-i18next";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
+  const { t } = useTranslation();
   const { reservation } = props;
-  return <ReservationCancellation {...props} reservation={reservation} />;
+  // TODO should have cancel in the breadcrumb (and slug for the reservation)
+  const routes = [
+    {
+      slug: "/reservations",
+      title: t("breadcrumb:reservations"),
+    },
+    {
+      // NOTE Don't set slug. It hides the mobile breadcrumb
+      title: t("reservations:reservationName", { id: reservation.pk }),
+    },
+  ];
+
+  return (
+    <>
+      <BreadcrumbWrapper route={routes} />
+      <ReservationCancellation {...props} reservation={reservation} />
+    </>
+  );
 }
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];

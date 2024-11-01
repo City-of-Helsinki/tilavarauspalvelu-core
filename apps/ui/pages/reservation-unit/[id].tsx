@@ -11,7 +11,7 @@ import {
   toApiDate,
   toUIDate,
 } from "common/src/common/util";
-import { formatters as getFormatters } from "common";
+import { formatters as getFormatters, H4 } from "common";
 import { useLocalStorage } from "react-use";
 import { breakpoints } from "common/src/common/style";
 import { type PendingReservation } from "@/modules/types";
@@ -72,18 +72,9 @@ import {
 } from "@/modules/reservable";
 import SubventionSuffix from "@/components/reservation/SubventionSuffix";
 import InfoDialog from "@/components/common/InfoDialog";
-import {
-  BottomContainer,
-  BottomWrapper,
-  CalendarWrapper,
-  Content,
-  MapWrapper,
-  PaddedContent,
-  StyledNotification,
-  Subheading,
-} from "@/components/reservation-unit/ReservationUnitStyles";
+import { Content } from "@/components/reservation-unit/ReservationUnitStyles";
 import { QuickReservation } from "@/components/reservation-unit/QuickReservation";
-import ReservationInfoContainer from "@/components/reservation-unit/ReservationInfoContainer";
+import { ReservationInfoContainer } from "@/components/reservation-unit/ReservationInfoContainer";
 import {
   getCommonServerSideProps,
   getGenericTerms,
@@ -104,6 +95,7 @@ import { ReservationTimePicker } from "@/components/reservation/ReservationTimeP
 import { ApolloError } from "@apollo/client";
 import { getReservationInProgressPath } from "@/modules/urls";
 import { ReservationPageWrapper } from "@/components/reservations/styles";
+import { Notification } from "hds-react";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -332,10 +324,14 @@ const QuickReservationWrapper = styled.div`
 `;
 
 const PageContentWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-layout-s);
+
   grid-column: 1 / -2;
 
   @media (min-width: ${breakpoints.l}) {
-    grid-row: 1;
+    grid-row: 1 / -1;
   }
 `;
 
@@ -674,25 +670,25 @@ function ReservationUnit({
           </JustForDesktop>
         </QuickReservationWrapper>
         <PageContentWrapper>
-          <Subheading>{t("reservationUnit:description")}</Subheading>
           <Content data-testid="reservation-unit__description">
+            <H4 as="h3">{t("reservationUnit:description")}</H4>
             <Sanitize html={getTranslation(reservationUnit, "description")} />
           </Content>
           {equipment?.length > 0 && (
-            <>
-              <Subheading>{t("reservationUnit:equipment")}</Subheading>
-              <Content data-testid="reservation-unit__equipment">
-                <EquipmentList equipment={equipment} />
-              </Content>
-            </>
+            <Content data-testid="reservation-unit__equipment">
+              <H4 as="h3" $noMargin>
+                {t("reservationUnit:equipment")}
+              </H4>
+              <EquipmentList equipment={equipment} />
+            </Content>
           )}
           {reservationUnitIsReservable && (
-            <CalendarWrapper data-testid="reservation-unit__calendar--wrapper">
-              <Subheading>
+            <div data-testid="reservation-unit__calendar--wrapper">
+              <H4 as="h3">
                 {t("reservations:reservationCalendar", {
                   title: getTranslation(reservationUnit, "name"),
                 })}
-              </Subheading>
+              </H4>
               <ReservationQuotaReached
                 isReservationQuotaReached={isReservationQuotaReached}
                 reservationUnit={reservationUnit}
@@ -708,7 +704,7 @@ function ReservationUnit({
                 submitReservation={submitReservation}
                 blockingReservations={blockingReservations}
               />
-            </CalendarWrapper>
+            </div>
           )}
           <ReservationInfoContainer
             reservationUnit={reservationUnit}
@@ -717,40 +713,44 @@ function ReservationUnit({
           {termsOfUseContent && (
             <Accordion
               heading={t("reservationUnit:terms")}
+              disableBottomMargin
               theme="thin"
               data-testid="reservation-unit__reservation-notice"
             >
-              <PaddedContent>
-                <PriceChangeNotice
-                  reservationUnit={reservationUnit}
-                  activeApplicationRounds={activeApplicationRounds}
-                />
-                <Sanitize html={termsOfUseContent} />
-              </PaddedContent>
+              <PriceChangeNotice
+                reservationUnit={reservationUnit}
+                activeApplicationRounds={activeApplicationRounds}
+              />
+              <Sanitize html={termsOfUseContent} />
             </Accordion>
           )}
           {showApplicationRoundTimeSlots && (
-            <Accordion heading={t("reservationUnit:recurringHeading")}>
-              <PaddedContent>
-                <p>{t("reservationUnit:recurringBody")}</p>
-                {applicationRoundTimeSlots?.map((day) => (
-                  <ApplicationRoundScheduleDay key={day.weekday} {...day} />
-                ))}
-              </PaddedContent>
+            <Accordion
+              disableBottomMargin
+              heading={t("reservationUnit:recurringHeading")}
+            >
+              <p>{t("reservationUnit:recurringBody")}</p>
+              {applicationRoundTimeSlots?.map((day) => (
+                <ApplicationRoundScheduleDay key={day.weekday} {...day} />
+              ))}
             </Accordion>
           )}
           {reservationUnit.unit?.tprekId && (
-            <Accordion heading={t("common:location")} theme="thin" open>
+            <Accordion
+              disableBottomMargin
+              heading={t("common:location")}
+              theme="thin"
+              open
+            >
               <JustForMobile customBreakpoint={breakpoints.l}>
                 <AddressSection reservationUnit={reservationUnit} />
               </JustForMobile>
-              <MapWrapper>
-                <MapComponent tprekId={reservationUnit.unit?.tprekId ?? ""} />
-              </MapWrapper>
+              <MapComponent tprekId={reservationUnit.unit?.tprekId ?? ""} />
             </Accordion>
           )}
           {(paymentTermsContent || cancellationTermsContent) && (
             <Accordion
+              disableBottomMargin
               heading={t(
                 `reservationUnit:${
                   paymentTermsContent
@@ -761,44 +761,32 @@ function ReservationUnit({
               theme="thin"
               data-testid="reservation-unit__payment-and-cancellation-terms"
             >
-              <PaddedContent>
-                {paymentTermsContent && (
-                  <Sanitize
-                    html={paymentTermsContent}
-                    style={{ marginBottom: "var(--spacing-m)" }}
-                  />
-                )}
-                <Sanitize html={cancellationTermsContent ?? ""} />
-              </PaddedContent>
+              {paymentTermsContent && <Sanitize html={paymentTermsContent} />}
+              <Sanitize html={cancellationTermsContent ?? ""} />
             </Accordion>
           )}
           {shouldDisplayPricingTerms && pricingTermsContent && (
             <Accordion
               heading={t("reservationUnit:pricingTerms")}
+              disableBottomMargin
               theme="thin"
               data-testid="reservation-unit__pricing-terms"
             >
-              <PaddedContent>
-                <Sanitize html={pricingTermsContent} />
-              </PaddedContent>
+              <Sanitize html={pricingTermsContent} />
             </Accordion>
           )}
           <Accordion
             heading={t("reservationUnit:termsOfUse")}
             theme="thin"
+            disableBottomMargin
             data-testid="reservation-unit__terms-of-use"
           >
-            <PaddedContent>
-              {serviceSpecificTermsContent && (
-                <Sanitize
-                  html={serviceSpecificTermsContent}
-                  style={{ marginBottom: "var(--spacing-m)" }}
-                />
-              )}
-              <Sanitize
-                html={getTranslation(termsOfUse.genericTerms ?? {}, "text")}
-              />
-            </PaddedContent>
+            {serviceSpecificTermsContent && (
+              <Sanitize html={serviceSpecificTermsContent} />
+            )}
+            <Sanitize
+              html={getTranslation(termsOfUse.genericTerms ?? {}, "text")}
+            />
           </Accordion>
         </PageContentWrapper>
         <InfoDialog
@@ -809,16 +797,12 @@ function ReservationUnit({
           onClose={() => setIsDialogOpen(false)}
         />
       </ReservationPageWrapper>
-      <BottomWrapper>
-        {shouldDisplayBottomWrapper && (
-          <BottomContainer>
-            <Subheading>
-              {t("reservationUnit:relatedReservationUnits")}
-            </Subheading>
-            <RelatedUnits units={relatedReservationUnits} />
-          </BottomContainer>
-        )}
-      </BottomWrapper>
+      {shouldDisplayBottomWrapper && (
+        <div>
+          <H4 as="h3">{t("reservationUnit:relatedReservationUnits")}</H4>
+          <RelatedUnits units={relatedReservationUnits} />
+        </div>
+      )}
     </>
   );
 }
@@ -837,15 +821,16 @@ function ReservationQuotaReached({
     return null;
   }
 
+  const label = t(
+    `reservationCalendar:reservationQuota${
+      isReservationQuotaReached ? "Full" : ""
+    }Label`
+  );
+
   return (
-    <StyledNotification
-      $isSticky={isReservationQuotaReached}
+    <Notification
       type={isReservationQuotaReached ? "alert" : "info"}
-      label={t(
-        `reservationCalendar:reservationQuota${
-          isReservationQuotaReached ? "Full" : ""
-        }Label`
-      )}
+      label={label}
     >
       <span data-testid="reservation-unit--notification__reservation-quota">
         {t(
@@ -858,7 +843,7 @@ function ReservationQuotaReached({
           }
         )}
       </span>
-    </StyledNotification>
+    </Notification>
   );
 }
 
