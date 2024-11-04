@@ -102,6 +102,7 @@ from .queries import (
     ReservationMetadataSetNode,
     ReservationNode,
     ReservationPurposeNode,
+    ReservationUnitAllNode,
     ReservationUnitCancellationRuleNode,
     ReservationUnitNode,
     ReservationUnitTypeNode,
@@ -156,6 +157,7 @@ class Query(graphene.ObjectType):
     # Reservation units
     reservation_unit = ReservationUnitNode.Node()
     reservation_units = ReservationUnitNode.Connection()
+    reservation_units_all = ReservationUnitAllNode.ListField()
     reservation_unit_types = ReservationUnitTypeNode.Connection()
     reservation_unit_cancellation_rules = ReservationUnitCancellationRuleNode.Connection()
     tax_percentages = TaxPercentageNode.Connection()

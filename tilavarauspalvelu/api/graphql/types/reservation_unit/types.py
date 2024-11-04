@@ -27,10 +27,11 @@ from tilavarauspalvelu.typing import GQLInfo
 from tilavarauspalvelu.utils.opening_hours.hauki_link_generator import generate_hauki_link
 from utils.db import SubqueryCount
 
-from .filtersets import ReservationUnitFilterSet
-from .permissions import ReservationUnitPermission
+from .filtersets import ReservationUnitAllFilterSet, ReservationUnitFilterSet
+from .permissions import ReservationUnitAllPermission, ReservationUnitPermission
 
 __all__ = [
+    "ReservationUnitAllNode",
     "ReservationUnitNode",
 ]
 
@@ -350,3 +351,22 @@ class ReservationUnitNode(DjangoNode):
         This is used to determine if the user can make a new reservation based on the max_reservations_per_user.
         """
         return getattr(root, "num_active_user_reservations", 0)
+
+
+class ReservationUnitAllNode(DjangoNode):
+    """This Node should be kept to the bare minimum and never expose any relations to avoid performance issues."""
+
+    class Meta:
+        model = ReservationUnit
+        fields = [
+            "pk",
+            "name",
+        ]
+        filterset_class = ReservationUnitAllFilterSet
+        permission_classes = [ReservationUnitAllPermission]
+        skip_registry = True
+
+    @classmethod
+    def filter_queryset(cls, queryset: models.QuerySet, info: GQLInfo) -> models.QuerySet:
+        # Always hide archived reservation units
+        return queryset.filter(is_archived=False)
