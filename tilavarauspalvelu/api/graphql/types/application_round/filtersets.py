@@ -4,8 +4,9 @@ import django_filters
 from django.db import models
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import IntMultipleChoiceFilter
+from lookup_property import L
 
-from tilavarauspalvelu.enums import UserRoleChoice
+from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, UserRoleChoice
 from tilavarauspalvelu.models import ApplicationRound
 from utils.date_utils import local_datetime
 
@@ -17,6 +18,7 @@ class ApplicationRoundFilterSet(ModelFilterSet):
     pk = IntMultipleChoiceFilter()
     name = django_filters.CharFilter(lookup_expr="istartswith")
     active = django_filters.BooleanFilter(method="filter_by_active")
+    ongoing = django_filters.BooleanFilter(method="filter_by_ongoing")
     only_with_permissions = django_filters.BooleanFilter(method="filter_by_only_with_permissions")
 
     class Meta:
@@ -28,6 +30,14 @@ class ApplicationRoundFilterSet(ModelFilterSet):
             models.Q(
                 application_period_begin__lte=now,
                 application_period_end__gte=now,
+                _negated=not value,
+            )
+        )
+
+    def filter_by_ongoing(self, queryset: models.QuerySet, name: str, value: bool) -> models.QuerySet:
+        return queryset.filter(
+            models.Q(
+                ~L(status=ApplicationRoundStatusChoice.RESULTS_SENT),
                 _negated=not value,
             )
         )
