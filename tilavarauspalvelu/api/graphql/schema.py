@@ -31,6 +31,7 @@ from .mutations import (
     BannerNotificationCreateMutation,
     BannerNotificationDeleteMutation,
     BannerNotificationUpdateMutation,
+    CurrentUserUpdateMutation,
     EquipmentCategoryCreateMutation,
     EquipmentCategoryDeleteMutation,
     EquipmentCategoryUpdateMutation,
@@ -78,7 +79,6 @@ from .mutations import (
     SpaceUpdateMutation,
     UnitUpdateMutation,
     UserStaffUpdateMutation,
-    UserUpdateMutation,
 )
 from .queries import (
     AgeGroupNode,
@@ -356,7 +356,7 @@ class Mutation(graphene.ObjectType):
     refresh_order = RefreshOrderMutation.Field()
     #
     # User
-    update_user = UserUpdateMutation.Field()
+    update_current_user = CurrentUserUpdateMutation.Field()
     update_staff_user = UserStaffUpdateMutation.Field()
     #
     # Misc.

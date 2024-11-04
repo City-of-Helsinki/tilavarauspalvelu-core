@@ -26,11 +26,8 @@ class UserPermission(BasePermission):
 
     @classmethod
     def has_mutation_permission(cls, user: AnyUser, input_data: dict[str, Any]) -> bool:
-        return False
-
-    @classmethod
-    def has_update_permission(cls, instance: User, user: AnyUser, input_data: dict[str, Any]) -> bool:
-        return user == instance  # Can only update own information.
+        # For updating current user information.
+        return not user.is_anonymous
 
 
 class UserStaffPermission(BasePermission):

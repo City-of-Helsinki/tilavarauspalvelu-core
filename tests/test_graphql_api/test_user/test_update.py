@@ -15,7 +15,6 @@ def test_user__update__language(graphql):
     user = UserFactory.create_superuser(preferred_language=Language.EN.value)
 
     data = {
-        "pk": user.pk,
         "preferredLanguage": Language.FI.value.upper(),
     }
 
@@ -33,7 +32,6 @@ def test_user__update__language_not_available(graphql):
     user = UserFactory.create_superuser(preferred_language=Language.EN.value)
 
     data = {
-        "pk": user.pk,
         "preferredLanguage": "UK",
     }
 
@@ -41,3 +39,18 @@ def test_user__update__language_not_available(graphql):
     response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.has_schema_errors is True, response
+
+
+def test_user__update__pk_user_not_an_input(graphql):
+    user = UserFactory.create_superuser(preferred_language=Language.EN.value)
+    other_user = UserFactory.create_superuser(preferred_language=Language.EN.value)
+
+    data = {
+        "pk": other_user.pk,
+        "preferredLanguage": Language.FI.value.upper(),
+    }
+
+    graphql.force_login(user)
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    assert response.has_schema_errors
