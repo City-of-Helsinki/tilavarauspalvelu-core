@@ -143,7 +143,7 @@ def create_mock_verkkokauppa_order(reservation: Reservation) -> Order:
     base_url = settings.MOCK_VERKKOKAUPPA_BACKEND_URL.strip("/")
     # Reservation URI in the django admin
     mock_verkkokauppa_checkout_url = reverse("mock_verkkokauppa", args=[order_uuid]).strip("/")
-    admin_url = reverse("admin:reservations_reservation_change", args=[reservation.id]).strip("/")
+    admin_url = reverse("admin:tilavarauspalvelu_reservation_change", args=[reservation.id]).strip("/")
 
     return Order(
         order_id=order_uuid,
