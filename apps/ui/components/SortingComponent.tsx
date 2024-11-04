@@ -3,7 +3,7 @@ import { breakpoints } from "common/src/common/style";
 import styled from "styled-components";
 import { Sorting } from "@/components/form";
 import { useRouter } from "next/router";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { useSearchValues } from "@/hooks/useSearchValues";
 
 const StyledSorting = styled(Sorting)`
