@@ -4,6 +4,7 @@ from graphene_django_extensions.filters import IntMultipleChoiceFilter, ModelFil
 from tilavarauspalvelu.models import Equipment
 
 __all__ = [
+    "EquipmentAllFilterSet",
     "EquipmentFilterSet",
 ]
 
@@ -23,5 +24,20 @@ class EquipmentFilterSet(ModelFilterSet):
         }
         order_by = [
             "name",
+            "name_fi",
+            "name_en",
+            "name_sv",
+            ("category__rank", "category_rank"),
+        ]
+
+
+class EquipmentAllFilterSet(ModelFilterSet):
+    class Meta:
+        model = Equipment
+        order_by = [
+            "name",
+            "name_fi",
+            "name_en",
+            "name_sv",
             ("category__rank", "category_rank"),
         ]

@@ -85,6 +85,7 @@ from .queries import (
     ApplicationSectionNode,
     BannerNotificationNode,
     CityNode,
+    EquipmentAllNode,
     EquipmentCategoryNode,
     EquipmentNode,
     HelsinkiProfileDataNode,
@@ -153,6 +154,7 @@ class Query(graphene.ObjectType):
     spaces = SpaceNode.Connection()
     equipment = EquipmentNode.Node()
     equipments = EquipmentNode.Connection()
+    equipments_all = EquipmentAllNode.ListField()
     equipment_category = EquipmentCategoryNode.Node()
     equipment_categories = EquipmentCategoryNode.Connection()
     #
