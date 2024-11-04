@@ -24,10 +24,8 @@ import {
   OrderStatus,
 } from "@gql/gql-types";
 import Link from "next/link";
-import { useOrder } from "@/hooks/reservation";
 import { createApolloClient } from "@/modules/apolloClient";
 import { formatDateTimeRange, getTranslation } from "@/modules/util";
-import { CenterSpinner } from "@/components/common/common";
 import Sanitize from "@/components/common/Sanitize";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import {
@@ -346,10 +344,8 @@ function Reservation({
 }: PropsNarrowed): JSX.Element | null {
   const { t, i18n } = useTranslation();
 
-  // TODO this should be moved to SSR also
-  const { order, isLoading: orderLoading } = useOrder({
-    orderUuid: reservation.paymentOrder[0]?.orderUuid ?? "",
-  });
+  // NOTE typescript can't type array off index
+  const order = reservation.paymentOrder.find(() => true);
 
   const reservationUnit = reservation.reservationUnits?.[0] ?? null;
   const instructionsKey =
@@ -397,10 +393,6 @@ function Reservation({
     getNormalizedReservationOrderStatus(reservation);
 
   useToastIfUpdated();
-
-  if (orderLoading) {
-    return <CenterSpinner />;
-  }
 
   const { begin, end } = reservation;
   const timeString = capitalize(

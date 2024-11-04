@@ -9,17 +9,17 @@ import {
   type ListReservationsQuery,
   ReservationTypeChoice,
   ReservationStateChoice,
+  useDeleteReservationMutation,
 } from "@gql/gql-types";
 import NotificationWrapper from "common/src/components/NotificationWrapper";
 import { useCurrentUser } from "@/hooks/user";
-import { BlackButton } from "@/styles/util";
-import { useOrder, useDeleteReservation } from "@/hooks/reservation";
 import { getCheckoutUrl } from "@/modules/reservation";
 import { filterNonNullable } from "common/src/helpers";
 import { ApolloError } from "@apollo/client";
 import { toApiDate } from "common/src/common/util";
 import { errorToast, successToast } from "common/src/common/toast";
 import { getReservationInProgressPath } from "@/modules/urls";
+import { Button } from "hds-react";
 
 type QueryT = NonNullable<ListReservationsQuery["reservations"]>;
 type EdgeT = NonNullable<QueryT["edges"][number]>;
@@ -80,7 +80,8 @@ function ReservationNotification({
   disabled?: boolean;
   isLoading?: boolean;
 }) {
-  const startRemainingMinutes = reservation.paymentOrder[0]?.expiresInMinutes;
+  const order = reservation.paymentOrder.find(() => true);
+  const startRemainingMinutes = order?.expiresInMinutes;
   const [remainingMinutes, setRemainingMinutes] = useState(
     startRemainingMinutes
   );
@@ -104,6 +105,7 @@ function ReservationNotification({
     }
     return minutes - 1;
   }
+
   useEffect(() => {
     const paymentTimeout = setTimeout(() => {
       const minutes = remainingMinutes ?? 0;
@@ -113,9 +115,11 @@ function ReservationNotification({
       return clearTimeout(paymentTimeout);
     }
   }, [remainingMinutes, isCreated]);
+
   if (!isCreated && !remainingMinutes) {
     return null;
   }
+
   return (
     <NotificationWrapper
       type="alert"
@@ -128,7 +132,7 @@ function ReservationNotification({
       <NotificationContent>
         <BodyText>{text}</BodyText>
         <NotificationButtons>
-          <BlackButton
+          <Button
             variant="secondary"
             size="small"
             onClick={onDelete}
@@ -140,8 +144,8 @@ function ReservationNotification({
             data-testid="reservation-notification__button--delete"
           >
             {t("notification:waitingForPayment.cancelReservation")}
-          </BlackButton>
-          <BlackButton
+          </Button>
+          <Button
             variant="secondary"
             size="small"
             disabled={disabled}
@@ -149,7 +153,7 @@ function ReservationNotification({
             data-testid="reservation-notification__button--checkout"
           >
             {submitButtonText}
-          </BlackButton>
+          </Button>
         </NotificationButtons>
       </NotificationContent>
     </NotificationWrapper>
@@ -201,16 +205,13 @@ export function InProgressReservationNotification() {
     .filter(() => !shouldHideCreatedNotification)
     .find((r) => r.state === ReservationStateChoice.Created);
 
-  const {
-    mutation: deleteReservation,
-    deleted,
-    error: deleteError,
-    isLoading: isDeleteLoading,
-  } = useDeleteReservation();
+  const [
+    deleteReservation,
+    { data: deleteData, error: deleteError, loading: isDeleteLoading },
+  ] = useDeleteReservationMutation();
+  const deleted = deleteData?.deleteReservation?.deleted;
 
-  const { order } = useOrder({
-    orderUuid: unpaidReservation?.paymentOrder[0]?.orderUuid ?? undefined,
-  });
+  const order = unpaidReservation?.paymentOrder[0];
   const checkoutUrl = getCheckoutUrl(order, i18n.language);
 
   useEffect(() => {

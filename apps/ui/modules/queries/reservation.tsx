@@ -114,9 +114,8 @@ export const LIST_RESERVATIONS = gql`
           ...ReservationOrderStatus
           paymentOrder {
             id
-            orderUuid
+            checkoutUrl
             expiresInMinutes
-            status
           }
           isBlocked
           reservationUnits {
@@ -155,6 +154,27 @@ const RESERVATION_INFO_FRAGMENT = gql`
   }
 `;
 
+export const ORDER_FRAGMENT = gql`
+  fragment OrderFields on PaymentOrderNode {
+    id
+    reservationPk
+    status
+    paymentType
+    receiptUrl
+    checkoutUrl
+  }
+`;
+
+export const GET_RESERVATION_STATE = gql`
+  query ReservationState($id: ID!) {
+    reservation(id: $id) {
+      id
+      pk
+      state
+    }
+  }
+`;
+
 // TODO do we need all the fields from ReservationUnitNode? ex. pricing (since we should be using the Reservations own pricing anyway)
 // TODO can we split this into smaller queries? per case?
 // making a reservation, showing a reservation, editing a reservation, cancelling a reservation
@@ -190,9 +210,7 @@ export const GET_RESERVATION = gql`
       priceNet
       taxPercentageValue
       paymentOrder {
-        id
-        orderUuid
-        status
+        ...OrderFields
       }
       reservationUnits {
         id
@@ -237,12 +255,7 @@ export const ADJUST_RESERVATION_TIME = gql`
 export const GET_ORDER = gql`
   query Order($orderUuid: String!) {
     order(orderUuid: $orderUuid) {
-      id
-      reservationPk
-      status
-      paymentType
-      receiptUrl
-      checkoutUrl
+      ...OrderFields
     }
   }
 `;

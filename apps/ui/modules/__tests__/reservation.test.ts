@@ -66,6 +66,7 @@ function createMockReservationUnit({
     reservationBegins: addDays(new Date(), -1).toISOString(),
     reservationsMinDaysBefore: reservationsMinDaysBefore ?? 0,
     reservationEnds: reservationEnds?.toISOString() ?? undefined,
+    rank: 0,
     reservableTimeSpans: Array.from(Array(100)).map((_val, index) => {
       return {
         startDatetime: `${toApiDate(addDays(new Date(), index))}T07:00:00+00:00`,

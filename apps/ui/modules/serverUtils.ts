@@ -1,12 +1,19 @@
 import { env } from "@/env.mjs";
-import { type ApolloClient } from "@apollo/client";
+import { NormalizedCacheObject, type ApolloClient } from "@apollo/client";
 import {
   TermsType,
   TermsOfUseDocument,
   type TermsOfUseQuery,
   type TermsOfUseQueryVariables,
+  type ReservationStateQuery,
+  type OrderQuery,
+  type OrderQueryVariables,
+  OrderDocument,
+  type ReservationStateQueryVariables,
+  ReservationStateDocument,
 } from "@gql/gql-types";
 import { genericTermsVariant } from "./const";
+import { base64encode } from "common/src/helpers";
 
 export function getVersion(): string {
   return (
@@ -67,4 +74,37 @@ export async function getGenericTerms(apolloClient: ApolloClient<unknown>) {
   }
 
   return tos;
+}
+
+// TODO narrow down the errors properly and show the user the real reason
+// requires refactoring error pages to display GQL errors
+export async function getReservationByOrderUuid(
+  apolloClient: ApolloClient<NormalizedCacheObject>,
+  uuid: string
+): Promise<NonNullable<ReservationStateQuery["reservation"]> | null> {
+  // TODO retry once if not found (or increase the timeout so the webhook from store has fired)
+  const { data: orderData } = await apolloClient.query<
+    OrderQuery,
+    OrderQueryVariables
+  >({
+    query: OrderDocument,
+    variables: { orderUuid: uuid },
+  });
+
+  const order = orderData?.order ?? undefined;
+  const { reservationPk: pk } = order ?? {};
+  if (!pk) {
+    return null;
+  }
+
+  const id = base64encode(`ReservationNode:${pk}`);
+  const { data } = await apolloClient.query<
+    ReservationStateQuery,
+    ReservationStateQueryVariables
+  >({
+    query: ReservationStateDocument,
+    variables: { id },
+  });
+
+  return data?.reservation ?? null;
 }

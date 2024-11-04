@@ -6126,7 +6126,7 @@ export type ListReservationsQuery = {
         price?: string | null;
         paymentOrder: Array<{
           id: string;
-          orderUuid?: string | null;
+          checkoutUrl?: string | null;
           expiresInMinutes?: number | null;
           status?: OrderStatus | null;
         }>;
@@ -6189,6 +6189,27 @@ export type ReservationInfoFragment = {
   homeCity?: { id: string; pk?: number | null; name: string } | null;
 };
 
+export type OrderFieldsFragment = {
+  id: string;
+  reservationPk?: string | null;
+  status?: OrderStatus | null;
+  paymentType: PaymentType;
+  receiptUrl?: string | null;
+  checkoutUrl?: string | null;
+};
+
+export type ReservationStateQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ReservationStateQuery = {
+  reservation?: {
+    id: string;
+    pk?: number | null;
+    state?: ReservationStateChoice | null;
+  } | null;
+};
+
 export type ReservationQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -6233,8 +6254,11 @@ export type ReservationQuery = {
     user?: { id: string; email: string; pk?: number | null } | null;
     paymentOrder: Array<{
       id: string;
-      orderUuid?: string | null;
+      reservationPk?: string | null;
       status?: OrderStatus | null;
+      paymentType: PaymentType;
+      receiptUrl?: string | null;
+      checkoutUrl?: string | null;
     }>;
     reservationUnits: Array<{
       id: string;
@@ -8098,6 +8122,16 @@ export const ReservationInfoFragmentDoc = gql`
     numPersons
   }
 `;
+export const OrderFieldsFragmentDoc = gql`
+  fragment OrderFields on PaymentOrderNode {
+    id
+    reservationPk
+    status
+    paymentType
+    receiptUrl
+    checkoutUrl
+  }
+`;
 export const LocationFieldsFragmentDoc = gql`
   fragment LocationFields on LocationNode {
     id
@@ -9876,9 +9910,8 @@ export const ListReservationsDocument = gql`
           ...ReservationOrderStatus
           paymentOrder {
             id
-            orderUuid
+            checkoutUrl
             expiresInMinutes
-            status
           }
           isBlocked
           reservationUnits {
@@ -9974,6 +10007,90 @@ export type ListReservationsQueryResult = Apollo.QueryResult<
   ListReservationsQuery,
   ListReservationsQueryVariables
 >;
+export const ReservationStateDocument = gql`
+  query ReservationState($id: ID!) {
+    reservation(id: $id) {
+      id
+      pk
+      state
+    }
+  }
+`;
+
+/**
+ * __useReservationStateQuery__
+ *
+ * To run a query within a React component, call `useReservationStateQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationStateQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReservationStateQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useReservationStateQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ReservationStateQuery,
+    ReservationStateQueryVariables
+  > &
+    (
+      | { variables: ReservationStateQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<ReservationStateQuery, ReservationStateQueryVariables>(
+    ReservationStateDocument,
+    options
+  );
+}
+export function useReservationStateLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ReservationStateQuery,
+    ReservationStateQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ReservationStateQuery,
+    ReservationStateQueryVariables
+  >(ReservationStateDocument, options);
+}
+export function useReservationStateSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ReservationStateQuery,
+        ReservationStateQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ReservationStateQuery,
+    ReservationStateQueryVariables
+  >(ReservationStateDocument, options);
+}
+export type ReservationStateQueryHookResult = ReturnType<
+  typeof useReservationStateQuery
+>;
+export type ReservationStateLazyQueryHookResult = ReturnType<
+  typeof useReservationStateLazyQuery
+>;
+export type ReservationStateSuspenseQueryHookResult = ReturnType<
+  typeof useReservationStateSuspenseQuery
+>;
+export type ReservationStateQueryResult = Apollo.QueryResult<
+  ReservationStateQuery,
+  ReservationStateQueryVariables
+>;
 export const ReservationDocument = gql`
   query Reservation($id: ID!) {
     reservation(id: $id) {
@@ -10000,9 +10117,7 @@ export const ReservationDocument = gql`
       priceNet
       taxPercentageValue
       paymentOrder {
-        id
-        orderUuid
-        status
+        ...OrderFields
       }
       reservationUnits {
         id
@@ -10016,6 +10131,7 @@ export const ReservationDocument = gql`
   ${ReserveeNameFieldsFragmentDoc}
   ${ReserveeBillingFieldsFragmentDoc}
   ${ReservationInfoFragmentDoc}
+  ${OrderFieldsFragmentDoc}
   ${ReservationUnitFieldsFragmentDoc}
   ${CancellationRuleFieldsFragmentDoc}
 `;
@@ -10233,14 +10349,10 @@ export type AdjustReservationTimeMutationOptions = Apollo.BaseMutationOptions<
 export const OrderDocument = gql`
   query Order($orderUuid: String!) {
     order(orderUuid: $orderUuid) {
-      id
-      reservationPk
-      status
-      paymentType
-      receiptUrl
-      checkoutUrl
+      ...OrderFields
     }
   }
+  ${OrderFieldsFragmentDoc}
 `;
 
 /**

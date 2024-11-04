@@ -411,7 +411,7 @@ function RequestedReservation({
   const isNonFree = pricing != null ? !isPriceFree(pricing) : false;
 
   const reservationTagline = createTagString(reservation, t);
-  const order = reservation.paymentOrder[0];
+  const order = reservation.paymentOrder.find(() => true);
 
   return (
     <>

@@ -10,11 +10,7 @@ import { Trans, useTranslation } from "next-i18next";
 import Link from "next/link";
 import styled from "styled-components";
 import { fontRegular, H1, H4 } from "common/src/common/typography";
-import {
-  type PaymentOrderNode,
-  type ReservationQuery,
-  ReservationStateChoice,
-} from "@gql/gql-types";
+import { type ReservationQuery, ReservationStateChoice } from "@gql/gql-types";
 import { IconButton } from "common/src/components";
 import { signOut } from "common/src/browserHelpers";
 import { getReservationUnitInstructionsKey } from "@/modules/reservationUnit";
@@ -30,7 +26,6 @@ type Node = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
   reservation: Node;
   apiBaseUrl: string;
-  order?: PaymentOrderNode;
 };
 
 // TODO there should be a styled component for this (if not move this to common)
@@ -76,9 +71,10 @@ function ReturnLinkList({
 export function ReservationConfirmation({
   reservation,
   apiBaseUrl,
-  order,
 }: Props): JSX.Element {
   const { t, i18n } = useTranslation();
+  // NOTE typescript can't type array off index
+  const order = reservation.paymentOrder.find(() => true);
 
   const reservationUnit = reservation.reservationUnits?.[0];
   const instructionsKey = getReservationUnitInstructionsKey(reservation.state);
