@@ -345,6 +345,8 @@ enum ApplicationOrderingChoices {
   preferredUnitNameFiDesc
   preferredUnitNameSvAsc
   preferredUnitNameSvDesc
+  sentDateAsc
+  sentDateDesc
   statusAsc
   statusDesc
 }
@@ -1871,7 +1873,7 @@ type PurposeNode implements Node {
   nameFi: String
   nameSv: String
   pk: Int
-  rank: Int
+  rank: Int!
   smallUrl: String
 }
 
@@ -2360,13 +2362,13 @@ type Query {
     before: String
     first: Int
     last: Int
-    name: String
     offset: Int
     """
     Järjestä
     """
-    orderBy: [ReservationPurposeOrderingChoices]
+    orderBy: [ReservationCancelReasonOrderingChoices]
     pk: [Int]
+    reason: String
   ): ReservationCancelReasonNodeConnection
   reservationDenyReasons(
     after: String
@@ -2969,6 +2971,14 @@ type ReservationCancelReasonNodeEdge {
   node: ReservationCancelReasonNode
 }
 
+"""
+Ordering fields for the 'ReservationCancelReason' model.
+"""
+enum ReservationCancelReasonOrderingChoices {
+  pkAsc
+  pkDesc
+}
+
 input ReservationCancellationMutationInput {
   cancelDetails: String
   cancelReason: Int!
@@ -3452,6 +3462,7 @@ type ReservationPurposeNode implements Node {
   nameFi: String
   nameSv: String
   pk: Int
+  rank: Int!
 }
 
 type ReservationPurposeNodeConnection {
@@ -3484,8 +3495,14 @@ type ReservationPurposeNodeEdge {
 Ordering fields for the 'ReservationPurpose' model.
 """
 enum ReservationPurposeOrderingChoices {
-  pkAsc
-  pkDesc
+  nameEnAsc
+  nameEnDesc
+  nameFiAsc
+  nameFiDesc
+  nameSvAsc
+  nameSvDesc
+  rankAsc
+  rankDesc
 }
 
 input ReservationRefundMutationInput {
@@ -4244,7 +4261,7 @@ type ReservationUnitNode implements Node {
     orderBy: [QualifierOrderingChoices]
     pk: [Int]
   ): [QualifierNode!]!
-  rank: Int
+  rank: Int!
   requireIntroduction: Boolean!
   requireReservationHandling: Boolean!
   reservableTimeSpans(
@@ -4528,7 +4545,7 @@ type ReservationUnitTypeNode implements Node {
   nameFi: String
   nameSv: String
   pk: Int
-  rank: Int
+  rank: Int!
 }
 
 type ReservationUnitTypeNodeConnection {

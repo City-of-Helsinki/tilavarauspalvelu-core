@@ -328,6 +328,8 @@ export enum ApplicationOrderingChoices {
   PreferredUnitNameFiDesc = "preferredUnitNameFiDesc",
   PreferredUnitNameSvAsc = "preferredUnitNameSvAsc",
   PreferredUnitNameSvDesc = "preferredUnitNameSvDesc",
+  SentDateAsc = "sentDateAsc",
+  SentDateDesc = "sentDateDesc",
   StatusAsc = "statusAsc",
   StatusDesc = "statusDesc",
 }
@@ -1720,7 +1722,7 @@ export type PurposeNode = Node & {
   nameFi?: Maybe<Scalars["String"]["output"]>;
   nameSv?: Maybe<Scalars["String"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
-  rank?: Maybe<Scalars["Int"]["output"]>;
+  rank: Scalars["Int"]["output"];
   smallUrl?: Maybe<Scalars["String"]["output"]>;
 };
 
@@ -2192,10 +2194,12 @@ export type QueryReservationCancelReasonsArgs = {
   before?: InputMaybe<Scalars["String"]["input"]>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   last?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<ReservationPurposeOrderingChoices>>>;
+  orderBy?: InputMaybe<
+    Array<InputMaybe<ReservationCancelReasonOrderingChoices>>
+  >;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  reason?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type QueryReservationDenyReasonsArgs = {
@@ -2723,6 +2727,12 @@ export type ReservationCancelReasonNodeEdge = {
   node?: Maybe<ReservationCancelReasonNode>;
 };
 
+/** Ordering fields for the 'ReservationCancelReason' model. */
+export enum ReservationCancelReasonOrderingChoices {
+  PkAsc = "pkAsc",
+  PkDesc = "pkDesc",
+}
+
 export type ReservationCancellationMutationInput = {
   cancelDetails?: InputMaybe<Scalars["String"]["input"]>;
   cancelReason: Scalars["Int"]["input"];
@@ -3148,6 +3158,7 @@ export type ReservationPurposeNode = Node & {
   nameFi?: Maybe<Scalars["String"]["output"]>;
   nameSv?: Maybe<Scalars["String"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
+  rank: Scalars["Int"]["output"];
 };
 
 export type ReservationPurposeNodeConnection = {
@@ -3168,8 +3179,14 @@ export type ReservationPurposeNodeEdge = {
 
 /** Ordering fields for the 'ReservationPurpose' model. */
 export enum ReservationPurposeOrderingChoices {
-  PkAsc = "pkAsc",
-  PkDesc = "pkDesc",
+  NameEnAsc = "nameEnAsc",
+  NameEnDesc = "nameEnDesc",
+  NameFiAsc = "nameFiAsc",
+  NameFiDesc = "nameFiDesc",
+  NameSvAsc = "nameSvAsc",
+  NameSvDesc = "nameSvDesc",
+  RankAsc = "rankAsc",
+  RankDesc = "rankDesc",
 }
 
 export type ReservationRefundMutationInput = {
@@ -3821,7 +3838,7 @@ export type ReservationUnitNode = Node & {
   publishingState?: Maybe<ReservationUnitPublishingState>;
   purposes: Array<PurposeNode>;
   qualifiers: Array<QualifierNode>;
-  rank?: Maybe<Scalars["Int"]["output"]>;
+  rank: Scalars["Int"]["output"];
   requireIntroduction: Scalars["Boolean"]["output"];
   requireReservationHandling: Scalars["Boolean"]["output"];
   reservableTimeSpans?: Maybe<Array<Maybe<ReservableTimeSpanType>>>;
@@ -4124,7 +4141,7 @@ export type ReservationUnitTypeNode = Node & {
   nameFi?: Maybe<Scalars["String"]["output"]>;
   nameSv?: Maybe<Scalars["String"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
-  rank?: Maybe<Scalars["Int"]["output"]>;
+  rank: Scalars["Int"]["output"];
 };
 
 export type ReservationUnitTypeNodeConnection = {

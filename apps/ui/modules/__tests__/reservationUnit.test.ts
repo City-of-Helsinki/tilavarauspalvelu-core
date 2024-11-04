@@ -1020,6 +1020,7 @@ describe("isReservationUnitReservable", () => {
       images: [],
       isArchived: false,
       isDraft: false,
+      rank: 0,
       name: "",
       paymentTypes: [],
       pricings: [],

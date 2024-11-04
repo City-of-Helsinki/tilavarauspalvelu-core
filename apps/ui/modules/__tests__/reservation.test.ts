@@ -55,6 +55,7 @@ function createMockReservationUnit({
     canApplyFreeOfCharge: false,
     contactInformation: "",
     description: "",
+    rank: 0,
     name: "Reservation unit",
     id: "123f4w90",
     uuid: "123f4w90",
