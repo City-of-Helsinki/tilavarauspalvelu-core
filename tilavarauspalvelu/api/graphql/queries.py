@@ -33,7 +33,7 @@ from .types.reservation_cancel_reason.types import ReservationCancelReasonNode
 from .types.reservation_deny_reason.types import ReservationDenyReasonNode
 from .types.reservation_metadata.types import ReservationMetadataFieldNode, ReservationMetadataSetNode
 from .types.reservation_purpose.types import ReservationPurposeNode
-from .types.reservation_unit.types import ReservationUnitNode
+from .types.reservation_unit.types import ReservationUnitAllNode, ReservationUnitNode
 from .types.reservation_unit_cancellation_rule.types import ReservationUnitCancellationRuleNode
 from .types.reservation_unit_image.types import ReservationUnitImageNode
 from .types.reservation_unit_option.types import ReservationUnitOptionNode
@@ -87,6 +87,7 @@ __all__ = [
     "ReservationMetadataSetNode",
     "ReservationNode",
     "ReservationPurposeNode",
+    "ReservationUnitAllNode",
     "ReservationUnitCancellationRuleNode",
     "ReservationUnitImageNode",
     "ReservationUnitNode",

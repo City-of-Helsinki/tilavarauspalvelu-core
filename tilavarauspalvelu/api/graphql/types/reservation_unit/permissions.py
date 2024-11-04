@@ -8,6 +8,7 @@ from tilavarauspalvelu.models import ReservationUnit, Unit
 from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
+    "ReservationUnitAllPermission",
     "ReservationUnitPermission",
 ]
 
@@ -39,3 +40,13 @@ class ReservationUnitPermission(BasePermission):
             raise GQLCodeError(msg, code=error_codes.ENTITY_NOT_FOUND)
 
         return unit
+
+
+class ReservationUnitAllPermission(BasePermission):
+    @classmethod
+    def has_permission(cls, user: AnyUser) -> bool:
+        return True
+
+    @classmethod
+    def has_mutation_permission(cls, user: AnyUser, input_data: dict[str, Any]) -> bool:
+        return False

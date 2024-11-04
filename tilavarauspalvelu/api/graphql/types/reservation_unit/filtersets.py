@@ -24,11 +24,33 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
+    "ReservationUnitAllFilterSet",
     "ReservationUnitFilterSet",
 ]
 
 
-class ReservationUnitFilterSet(ModelFilterSet):
+class ReservationUnitFilterSetMixin:
+    def get_only_with_permission(self, qs: ReservationUnitQuerySet, name: str, value: bool) -> QuerySet:
+        """Returns reservation units where the user has any kind of permissions in its unit"""
+        if not value:
+            return qs
+
+        user: AnyUser = self.request.user
+        if user.is_anonymous:
+            return qs.none()
+        if user.is_superuser:
+            return qs
+
+        if user.permissions.has_general_role():
+            return qs
+
+        unit_ids = list(user.active_unit_roles)
+        unit_group_ids = list(user.active_unit_group_roles)
+
+        return qs.filter(Q(unit_id__in=unit_ids) | Q(unit__unit_groups__in=unit_group_ids)).distinct()
+
+
+class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
     pk = IntMultipleChoiceFilter()
     tprek_id = django_filters.CharFilter(field_name="unit__tprek_id")
     tprek_department_id = django_filters.CharFilter(field_name="unit__tprek_department_id")
@@ -175,25 +197,6 @@ class ReservationUnitFilterSet(ModelFilterSet):
     def filter_by_reservation_state(qs: ReservationUnitQuerySet, name: str, value: list[str]) -> models.QuerySet:
         return qs.with_reservation_state_in(value)
 
-    def get_only_with_permission(self, qs: ReservationUnitQuerySet, name: str, value: bool) -> QuerySet:
-        """Returns reservation units where the user has any kind of permissions in its unit"""
-        if not value:
-            return qs
-
-        user: AnyUser = self.request.user
-        if user.is_anonymous:
-            return qs.none()
-        if user.is_superuser:
-            return qs
-
-        if user.permissions.has_general_role():
-            return qs
-
-        unit_ids = list(user.active_unit_roles)
-        unit_group_ids = list(user.active_unit_group_roles)
-
-        return qs.filter(Q(unit_id__in=unit_ids) | Q(unit__unit_groups__in=unit_group_ids)).distinct()
-
     def get_filter_reservable(self, qs: ReservationUnitQuerySet, name: str, value: dict[str, Any]) -> QuerySet:
         """
         Filter reservation units by their reservability.
@@ -248,3 +251,22 @@ class ReservationUnitFilterSet(ModelFilterSet):
             return qs
 
         return qs.exclude(first_reservable_datetime=None)
+
+
+class ReservationUnitAllFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
+    unit = IntMultipleChoiceFilter()
+    only_with_permission = django_filters.BooleanFilter(method="get_only_with_permission")
+
+    class Meta:
+        model = ReservationUnit
+        fields = {
+            "name_fi": ["exact", "icontains", "istartswith"],
+            "name_sv": ["exact", "icontains", "istartswith"],
+            "name_en": ["exact", "icontains", "istartswith"],
+        }
+        order_by = [
+            "name_fi",
+            "name_en",
+            "name_sv",
+            "rank",
+        ]

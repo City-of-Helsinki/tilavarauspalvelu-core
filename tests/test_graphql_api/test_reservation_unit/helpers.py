@@ -39,6 +39,8 @@ __all__ = [
 reservation_unit_query = partial(build_query, "reservationUnit")
 reservation_units_query = partial(build_query, "reservationUnits", connection=True, order_by="pkAsc")
 
+reservation_units_all_query = partial(build_query, "reservationUnitsAll", connection=False, order_by="pkAsc")
+
 CREATE_MUTATION = build_mutation("createReservationUnit", "ReservationUnitCreateMutation")
 UPDATE_MUTATION = build_mutation("updateReservationUnit", "ReservationUnitUpdateMutation")
 
