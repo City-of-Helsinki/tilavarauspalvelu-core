@@ -992,6 +992,15 @@ type CityNodeEdge {
   node: CityNode
 }
 
+input CurrentUserUpdateMutationInput {
+  preferredLanguage: PreferredLanguage
+}
+
+type CurrentUserUpdateMutationPayload {
+  pk: Int
+  preferredLanguage: PreferredLanguage
+}
+
 """
 An enumeration.
 """
@@ -1575,6 +1584,9 @@ type Mutation {
   updateBannerNotification(
     input: BannerNotificationUpdateMutationInput!
   ): BannerNotificationUpdateMutationPayload
+  updateCurrentUser(
+    input: CurrentUserUpdateMutationInput!
+  ): CurrentUserUpdateMutationPayload
   updateEquipment(
     input: EquipmentUpdateMutationInput!
   ): EquipmentUpdateMutationPayload
@@ -1606,8 +1618,10 @@ type Mutation {
     input: ResourceUpdateMutationInput!
   ): ResourceUpdateMutationPayload
   updateSpace(input: SpaceUpdateMutationInput!): SpaceUpdateMutationPayload
+  updateStaffUser(
+    input: UserStaffUpdateMutationInput!
+  ): UserStaffUpdateMutationPayload
   updateUnit(input: UnitUpdateMutationInput!): UnitUpdateMutationPayload
-  updateUser(input: UserUpdateMutationInput!): UserUpdateMutationPayload
 }
 
 """
@@ -1802,6 +1816,24 @@ input PersonSerializerInput {
   lastName: String!
   phoneNumber: String
   pk: Int
+}
+
+"""
+An enumeration.
+"""
+enum PreferredLanguage {
+  """
+  Englanti
+  """
+  EN
+  """
+  Suomi
+  """
+  FI
+  """
+  Ruotsi
+  """
+  SV
 }
 
 """
@@ -5918,12 +5950,12 @@ enum UserRoleChoice {
   VIEWER
 }
 
-input UserUpdateMutationInput {
+input UserStaffUpdateMutationInput {
   pk: Int!
   reservationNotification: ReservationNotification
 }
 
-type UserUpdateMutationPayload {
+type UserStaffUpdateMutationPayload {
   pk: Int
   reservationNotification: ReservationNotification
 }

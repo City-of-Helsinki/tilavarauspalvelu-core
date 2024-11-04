@@ -9,28 +9,23 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { env } from "@/env.mjs";
 import { getSignInUrl, buildGraphQLUrl } from "common/src/urlBuilder";
+import { type LocalizationLanguages } from "common/src/helpers";
 
 const apiBaseUrl = env.TILAVARAUS_API_URL ?? "";
 
-/// Check if user is logged in
-/// @param req - NextRequest
-/// @returns boolean
-/// Checks both sessionid and makes a request to the backend to check if the session is valid
-/// log incorrect requests but don't throw errors
-async function isLoggedIn(req: NextRequest) {
+type gqlQuery = {
+  query: string;
+  // TODO don't type to unknown (undefined and Date break JSON.stringify)
+  variables: Record<string, unknown>;
+};
+
+/// Fetch a query from the backend
+/// @param req - NextRequest used to copy headers etc.
+/// @param query - Query object with query and variables
+/// @returns Promise<Response>
+/// custom function so we don't have to import apollo client in middleware
+async function gqlQueryFetch(req: NextRequest, query: gqlQuery) {
   const { cookies, headers } = req;
-  const hasSession = cookies.has("sessionid");
-  if (!hasSession) {
-    return false;
-  }
-
-  const sessionid = cookies.get("sessionid");
-  const csrfToken = cookies.get("csrftoken");
-
-  if (csrfToken == null || sessionid == null) {
-    return false;
-  }
-
   // TODO this is copy to the createApolloClient function but different header types
   // NextRequest vs. RequestInit
   const newHeaders = new Headers({
@@ -38,9 +33,22 @@ async function isLoggedIn(req: NextRequest) {
     "Content-Type": "application/json",
   });
 
+  const sessionid = cookies.get("sessionid");
+  const csrfToken = cookies.get("csrftoken");
+
+  if (csrfToken == null) {
+    return new Response("missing csrf token", {
+      status: 400,
+      statusText: "Bad Request",
+    });
+  }
+
   newHeaders.append("X-Csrftoken", csrfToken.value);
-  newHeaders.append("Cookie", `sessionid=${sessionid.value}`);
   newHeaders.append("Cookie", `csrftoken=${csrfToken.value}`);
+  // queries can be made both with and without sessionid
+  if (sessionid != null) {
+    newHeaders.append("Cookie", `sessionid=${sessionid.value}`);
+  }
 
   const proto = headers.get("x-forwarded-proto") ?? "http";
   const hostname = headers.get("x-forwarded-host") ?? headers.get("host") ?? "";
@@ -49,7 +57,32 @@ async function isLoggedIn(req: NextRequest) {
   newHeaders.append("Referer", referer);
   // Use of fetch requires a string body (vs. gql query object)
   // the request returns either a valid user (e.g. pk) or null if user was not found
-  const body: string = JSON.stringify({
+  const body: string = JSON.stringify(query);
+
+  return fetch({
+    method: "POST",
+    url: buildGraphQLUrl(apiBaseUrl, env.ENABLE_FETCH_HACK),
+    headers: newHeaders,
+    // @ts-expect-error -- something broken in node types, body can be a string
+    body,
+  });
+}
+
+async function getCurrentUser(req: NextRequest): Promise<number | null> {
+  const { cookies } = req;
+  const hasSession = cookies.has("sessionid");
+  if (!hasSession) {
+    return null;
+  }
+
+  const sessionid = cookies.get("sessionid");
+  const csrfToken = cookies.get("csrftoken");
+
+  if (csrfToken == null || sessionid == null) {
+    return null;
+  }
+
+  const query: gqlQuery = {
     query: `
       query GetCurrentUser {
         currentUser {
@@ -57,34 +90,113 @@ async function isLoggedIn(req: NextRequest) {
         }
       }`,
     variables: {},
-  });
-
-  const res = await fetch({
-    method: "POST",
-    url: buildGraphQLUrl(apiBaseUrl, env.ENABLE_FETCH_HACK),
-    headers: newHeaders,
-    // @ts-expect-error -- something broken in node types, body can be a string
-    body,
-  });
+  };
+  const res = await gqlQueryFetch(req, query);
 
   if (!res.ok) {
     const text = await res.text();
     // eslint-disable-next-line no-console
     console.warn(`request failed: ${res.status} with message: ${text}`);
-    return false;
+    return null;
   }
 
-  const data = await res.json();
-  if (!data.data) {
+  const data: unknown = await res.json();
+  if (typeof data !== "object" || data == null || !("data" in data)) {
     // eslint-disable-next-line no-console
     console.warn("no data in response");
-    return false;
+    return null;
   }
-  const { currentUser } = data.data;
-  if (!currentUser) {
+  if (
+    typeof data.data === "object" &&
+    data.data != null &&
+    "currentUser" in data.data
+  ) {
+    const { currentUser } = data.data;
+    if (
+      typeof currentUser === "object" &&
+      currentUser != null &&
+      "pk" in currentUser
+    ) {
+      if (typeof currentUser.pk === "number") {
+        return currentUser.pk;
+      }
+    }
+  }
+  return null;
+}
+
+/// Check if user is logged in
+/// @param req - NextRequest
+/// @returns boolean
+/// Checks both sessionid and makes a request to the backend to check if the session is valid
+/// log incorrect requests but don't throw errors
+async function isLoggedIn(req: NextRequest) {
+  const user = await getCurrentUser(req);
+  if (!user) {
     return false;
   }
   return true;
+}
+
+function getLocalizationFromUrl(url: URL): LocalizationLanguages {
+  // frontpage has no trailing slash
+  if (url.pathname.startsWith("/en/") || url.pathname === "/en") {
+    return "en";
+  }
+  if (url.pathname.startsWith("/sv/") || url.pathname === "/sv") {
+    return "sv";
+  }
+  return "fi";
+}
+
+/// Save user language to the backend if it has changed
+/// @param req - NextRequest
+/// @returns Promise<string | undefined> - the new language or undefined if it hasn't changed
+/// uses the following cookies: sessionid, csrftoken, (language)
+/// only saves the language if the user is logged in
+/// NOTE The responsibility to update the cookie is on the caller (who creates the next request).
+async function maybeSaveUserLanguage(req: NextRequest) {
+  const { cookies } = req;
+  const url = new URL(req.url);
+  if (isPageRequest(url)) {
+    const sessionid = cookies.get("sessionid");
+    if (sessionid == null) {
+      return;
+    }
+    const cookieLang = cookies.get("language");
+    const language = getLocalizationFromUrl(url);
+    if (cookieLang?.value === language) {
+      return;
+    }
+
+    const currentUser = await getCurrentUser(req);
+    if (currentUser == null) {
+      return;
+    }
+
+    const query: gqlQuery = {
+      query: `
+        mutation SaveUserLanguage($preferredLanguage: PreferredLanguage!) {
+          updateCurrentUser(
+            input:{
+              preferredLanguage: $preferredLanguage
+            }
+          ) {
+             pk
+          }
+        }`,
+      variables: {
+        preferredLanguage: language.toUpperCase(),
+      },
+    };
+
+    const res = await gqlQueryFetch(req, query);
+    if (res.ok) {
+      return language;
+    }
+    // eslint-disable-next-line no-console
+    console.warn("failed to save user language", res.status, await res.text());
+  }
 }
 
 async function redirectProtectedRoute(req: NextRequest) {
@@ -104,6 +216,23 @@ async function redirectProtectedRoute(req: NextRequest) {
   return undefined;
 }
 
+/// Check if the request is a page request
+/// @param url - URL
+/// @returns boolean
+function isPageRequest(url: URL): boolean {
+  if (
+    // ignore healthcheck because it's for automated test suite that can't do redirects
+    url.pathname.startsWith("/healthcheck") ||
+    url.pathname.startsWith("/_next") ||
+    url.pathname.match(
+      /\.(webmanifest|js|css|png|jpg|jpeg|svg|gif|ico|json|woff|woff2|ttf|eot|otf|pdf)$/
+    )
+  ) {
+    return false;
+  }
+  return true;
+}
+
 /// are we missing a csrf token in cookies
 /// if so get the backend url to redirect to and add the current url as a redirect_to parameter
 function redirectCsrfToken(req: NextRequest): URL | undefined {
@@ -116,14 +245,7 @@ function redirectCsrfToken(req: NextRequest): URL | undefined {
   // need to ignore all assets outside of html requests (which don't have an extension)
   // so could we just check any request that doesn't have an extension?
   const requestUrl = new URL(req.url);
-  if (
-    // ignore healthcheck because it's for automated test suite that can't do redirects
-    requestUrl.pathname.startsWith("/healthcheck") ||
-    requestUrl.pathname.startsWith("/_next") ||
-    requestUrl.pathname.match(
-      /\.(webmanifest|js|css|png|jpg|jpeg|svg|gif|ico|json|woff|woff2|ttf|eot|otf|pdf)$/
-    )
-  ) {
+  if (!isPageRequest(requestUrl)) {
     return undefined;
   }
 
@@ -177,6 +299,14 @@ export async function middleware(req: NextRequest) {
     if (redirect) {
       return NextResponse.redirect(new URL(redirect, req.url));
     }
+  }
+
+  const lang = await maybeSaveUserLanguage(req);
+
+  if (lang != null) {
+    const n = NextResponse.next();
+    n.cookies.set("language", lang);
+    return n;
   }
   return NextResponse.next();
 }

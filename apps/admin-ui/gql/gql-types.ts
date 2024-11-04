@@ -897,6 +897,15 @@ export type CityNodeEdge = {
   node?: Maybe<CityNode>;
 };
 
+export type CurrentUserUpdateMutationInput = {
+  preferredLanguage?: InputMaybe<PreferredLanguage>;
+};
+
+export type CurrentUserUpdateMutationPayload = {
+  pk?: Maybe<Scalars["Int"]["output"]>;
+  preferredLanguage?: Maybe<PreferredLanguage>;
+};
+
 /** An enumeration. */
 export enum CustomerTypeChoice {
   Business = "BUSINESS",
@@ -1280,6 +1289,7 @@ export type Mutation = {
   updateApplication?: Maybe<ApplicationUpdateMutationPayload>;
   updateApplicationSection?: Maybe<ApplicationSectionUpdateMutationPayload>;
   updateBannerNotification?: Maybe<BannerNotificationUpdateMutationPayload>;
+  updateCurrentUser?: Maybe<CurrentUserUpdateMutationPayload>;
   updateEquipment?: Maybe<EquipmentUpdateMutationPayload>;
   updateEquipmentCategory?: Maybe<EquipmentCategoryUpdateMutationPayload>;
   updatePurpose?: Maybe<PurposeUpdateMutationPayload>;
@@ -1291,8 +1301,8 @@ export type Mutation = {
   updateReservationWorkingMemo?: Maybe<ReservationWorkingMemoMutationPayload>;
   updateResource?: Maybe<ResourceUpdateMutationPayload>;
   updateSpace?: Maybe<SpaceUpdateMutationPayload>;
+  updateStaffUser?: Maybe<UserStaffUpdateMutationPayload>;
   updateUnit?: Maybe<UnitUpdateMutationPayload>;
-  updateUser?: Maybe<UserUpdateMutationPayload>;
 };
 
 export type MutationAdjustReservationTimeArgs = {
@@ -1471,6 +1481,10 @@ export type MutationUpdateBannerNotificationArgs = {
   input: BannerNotificationUpdateMutationInput;
 };
 
+export type MutationUpdateCurrentUserArgs = {
+  input: CurrentUserUpdateMutationInput;
+};
+
 export type MutationUpdateEquipmentArgs = {
   input: EquipmentUpdateMutationInput;
 };
@@ -1515,12 +1529,12 @@ export type MutationUpdateSpaceArgs = {
   input: SpaceUpdateMutationInput;
 };
 
-export type MutationUpdateUnitArgs = {
-  input: UnitUpdateMutationInput;
+export type MutationUpdateStaffUserArgs = {
+  input: UserStaffUpdateMutationInput;
 };
 
-export type MutationUpdateUserArgs = {
-  input: UserUpdateMutationInput;
+export type MutationUpdateUnitArgs = {
+  input: UnitUpdateMutationInput;
 };
 
 /** An object with an ID */
@@ -1672,6 +1686,16 @@ export type PersonSerializerInput = {
   phoneNumber?: InputMaybe<Scalars["String"]["input"]>;
   pk?: InputMaybe<Scalars["Int"]["input"]>;
 };
+
+/** An enumeration. */
+export enum PreferredLanguage {
+  /** Englanti */
+  En = "EN",
+  /** Suomi */
+  Fi = "FI",
+  /** Ruotsi */
+  Sv = "SV",
+}
 
 /** An enumeration. */
 export enum PriceUnit {
@@ -5314,12 +5338,12 @@ export enum UserRoleChoice {
   Viewer = "VIEWER",
 }
 
-export type UserUpdateMutationInput = {
+export type UserStaffUpdateMutationInput = {
   pk: Scalars["Int"]["input"];
   reservationNotification?: InputMaybe<ReservationNotification>;
 };
 
-export type UserUpdateMutationPayload = {
+export type UserStaffUpdateMutationPayload = {
   pk?: Maybe<Scalars["Int"]["output"]>;
   reservationNotification?: Maybe<ReservationNotification>;
 };
