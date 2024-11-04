@@ -3,8 +3,8 @@ from graphene_django_extensions import DjangoNode
 from tilavarauspalvelu.models import Unit
 from tilavarauspalvelu.typing import AnyUser
 
-from .filtersets import UnitFilterSet
-from .permissions import UnitPermission
+from .filtersets import UnitAllFilterSet, UnitFilterSet
+from .permissions import UnitAllPermission, UnitPermission
 
 __all__ = [
     "UnitNode",
@@ -41,3 +41,18 @@ class UnitNode(DjangoNode):
         filterset_class = UnitFilterSet
         permission_classes = [UnitPermission]
         max_complexity = 12
+
+
+class UnitAllNode(DjangoNode):
+    """This Node should be kept to the bare minimum and never expose any relations to avoid performance issues."""
+
+    class Meta:
+        model = Unit
+        fields = [
+            "pk",
+            "tprek_id",
+            "name",
+        ]
+        filterset_class = UnitAllFilterSet
+        permission_classes = [UnitAllPermission]
+        skip_registry = True
