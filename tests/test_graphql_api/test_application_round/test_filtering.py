@@ -73,6 +73,33 @@ def test_application_round__filter__by_active__negative(graphql):
     assert response.node(1) == {"pk": application_round_2.pk}
 
 
+def test_application_round__filter__by_ongoing(graphql):
+    application_round_1 = ApplicationRoundFactory.create_in_status_upcoming()
+    application_round_2 = ApplicationRoundFactory.create_in_status_open()
+    ApplicationRoundFactory.create_in_status_results_sent()
+
+    graphql.login_with_superuser()
+    query = rounds_query(ongoing=True)
+    response = graphql(query)
+
+    assert len(response.edges) == 2, response
+    assert response.node(0) == {"pk": application_round_1.pk}
+    assert response.node(1) == {"pk": application_round_2.pk}
+
+
+def test_application_round__filter__by_ongoing__negative(graphql):
+    ApplicationRoundFactory.create_in_status_upcoming()
+    ApplicationRoundFactory.create_in_status_open()
+    application_round = ApplicationRoundFactory.create_in_status_results_sent()
+
+    graphql.login_with_superuser()
+    query = rounds_query(ongoing=False)
+    response = graphql(query)
+
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": application_round.pk}
+
+
 def test_application_round__filter__by_only_with_permissions__superuser(graphql):
     application_round = ApplicationRoundFactory.create()
 
