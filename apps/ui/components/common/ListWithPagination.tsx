@@ -5,6 +5,7 @@ import { Button, LoadingSpinner } from "hds-react";
 import { breakpoints } from "common/src/common/style";
 import type { PageInfo, SearchReservationUnitsQuery } from "@gql/gql-types";
 import type { ApolloQueryResult } from "@apollo/client";
+import ClientOnly from "common/src/ClientOnly";
 
 const TopWrapper = styled.div`
   @media (min-width: ${breakpoints.m}) {
@@ -57,15 +58,20 @@ function Content({
   loadingMore: boolean;
   fetchMore: () => void;
   showMore: boolean;
-}) {
+}): JSX.Element | null {
   const { t } = useTranslation();
 
   const hitCountSummary = t("searchResultList:paginationSummary", {
     count: items.length,
   });
 
+  if (items.length === 0) {
+    return null;
+  }
+
   return (
-    <>
+    // TODO Hydration errors
+    <ClientOnly>
       <ListContainer data-testid="list-with-pagination__list--container">
         {items.map((item) => item)}
       </ListContainer>
@@ -89,7 +95,7 @@ function Content({
           </>
         )}
       </Paginator>
-    </>
+    </ClientOnly>
   );
 }
 
@@ -135,14 +141,12 @@ export function ListWithPagination({
         )}
         {sortingComponent && sortingComponent}
       </TopWrapper>
-      {items.length > 0 && (
-        <Content
-          items={items}
-          fetchMore={handleFetchMore}
-          loadingMore={isInProcess}
-          showMore={hasMoreData}
-        />
-      )}
+      <Content
+        items={items}
+        fetchMore={handleFetchMore}
+        loadingMore={isInProcess}
+        showMore={hasMoreData}
+      />
     </div>
   );
 }
