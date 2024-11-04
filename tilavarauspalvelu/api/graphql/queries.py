@@ -15,7 +15,7 @@ from .types.application_round_time_slot.types import ApplicationRoundTimeSlotNod
 from .types.application_section.types import ApplicationSectionNode
 from .types.banner_notification.types import BannerNotificationNode
 from .types.city.types import CityNode
-from .types.equipment.types import EquipmentNode
+from .types.equipment.types import EquipmentAllNode, EquipmentNode
 from .types.equipment_category.types import EquipmentCategoryNode
 from .types.helsinki_profile.types import HelsinkiProfileDataNode
 from .types.keyword.types import KeywordCategoryNode, KeywordGroupNode, KeywordNode
@@ -63,6 +63,7 @@ __all__ = [
     "ApplicationSectionNode",
     "BannerNotificationNode",
     "CityNode",
+    "EquipmentAllNode",
     "EquipmentCategoryNode",
     "EquipmentNode",
     "GeneralRoleNode",

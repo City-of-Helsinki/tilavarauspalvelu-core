@@ -17,3 +17,13 @@ class EquipmentPermission(BasePermission):
     @classmethod
     def has_mutation_permission(cls, user: AnyUser, input_data: dict[str, Any]) -> bool:
         return user.permissions.can_manage_reservation_related_data()
+
+
+class EquipmentAllPermission(BasePermission):
+    @classmethod
+    def has_permission(cls, user: AnyUser) -> bool:
+        return True
+
+    @classmethod
+    def has_mutation_permission(cls, user: AnyUser, input_data: dict[str, Any]) -> bool:
+        return False
