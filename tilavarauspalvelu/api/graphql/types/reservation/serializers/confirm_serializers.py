@@ -144,14 +144,13 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
                     reservation=self.instance,
                 )
             else:
-                verkkokauppa_order: Order
                 if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
-                    verkkokauppa_order = create_mock_verkkokauppa_order(self.instance)
+                    verkkokauppa_order: Order = create_mock_verkkokauppa_order(self.instance)
                 else:
                     order_params: CreateOrderParams = get_verkkokauppa_order_params(self.instance)
 
                     try:
-                        verkkokauppa_order = VerkkokauppaAPIClient.create_order(order_params=order_params)
+                        verkkokauppa_order: Order = VerkkokauppaAPIClient.create_order(order_params=order_params)
                     except CreateOrderError as err:
                         SentryLogger.log_exception(
                             err, details="Creating order in Verkkokauppa failed", reservation_id=self.instance.pk

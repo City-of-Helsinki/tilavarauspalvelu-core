@@ -102,9 +102,7 @@ class WebhookOrderCancelViewSet(viewsets.ViewSet):
             SentryLogger.log_message(f"Verkkokauppa: {msg}", details=serializer.validated_data)
             return Response(data={"message": msg}, status=400)
 
-        payment_order.status = OrderStatus.CANCELLED
-        payment_order.processed_at = local_datetime()
-        payment_order.save(update_fields=["status", "processed_at"])
+        payment_order.actions.set_order_as_cancelled()
 
         return Response(data={"message": "Order cancellation completed successfully"}, status=200)
 
