@@ -96,12 +96,12 @@ function DataWrapper({
   children,
   isWide,
   isSummary,
-}: {
+}: Readonly<{
   label: string;
   children: React.ReactNode;
   isWide?: boolean;
   isSummary?: boolean;
-}): JSX.Element {
+}>): JSX.Element {
   const testSection = isSummary ? "summary" : "info";
   const testId = `reservation__${testSection}--${label}`;
   return (
@@ -119,12 +119,12 @@ function ButtonsWithPermChecks({
   isFree,
   onReservationUpdated,
   disableNonEssentialButtons,
-}: {
+}: Readonly<{
   reservation: ReservationType;
   isFree: boolean;
   onReservationUpdated: () => void;
   disableNonEssentialButtons?: boolean;
-}) {
+}>) {
   const { setModalContent } = useModal();
 
   const closeDialog = () => {
@@ -169,16 +169,17 @@ function translateType(res: ReservationType, t: TFunction): string {
     res.reserveeType,
     res.reserveeIsUnregisteredAssociation
   );
-  return `${t(part1)}${part2 ? ` ${t(part2)}` : ""}`;
+  const part2WithSpace = part2 ? ` ${t(part2)}` : "";
+  return `${t(part1)}${part2WithSpace}`;
 }
 
 function ReservationSummary({
   reservation,
   isFree,
-}: {
+}: Readonly<{
   reservation: ReservationType;
   isFree: boolean;
-}) {
+}>) {
   const { t } = useTranslation();
 
   const type =
@@ -248,7 +249,8 @@ function ReservationSummary({
     ...(price != null ? [price] : []),
     ...(cancelReasonString != null ? [cancelReasonString] : []),
     ...(rejectionReasonString != null ? [rejectionReasonString] : []),
-    ...(reservation.handlingDetails != null
+    ...(reservation.handlingDetails != null &&
+    reservation.handlingDetails !== ""
       ? [
           {
             l: "RequestedReservation.handlingDetails",
@@ -289,10 +291,10 @@ const onlyFutureDates: (d?: Date) => Date | undefined = (d) =>
 function TimeBlock({
   reservation,
   onReservationUpdated,
-}: {
+}: Readonly<{
   reservation: ReservationType;
   onReservationUpdated: () => Promise<ApolloQueryResult<ReservationQuery>>;
-}): JSX.Element {
+}>): JSX.Element {
   const [selected, setSelected] = useState<ReservationType | undefined>(
     undefined
   );
