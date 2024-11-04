@@ -15,11 +15,82 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
+    "UnitAllFilterSet",
     "UnitFilterSet",
 ]
 
 
-class UnitFilterSet(ModelFilterSet):
+class UnitFilterSetMixin:
+    def filter_by_only_with_permission(self, qs: models.QuerySet, name: str, value: bool) -> models.QuerySet:
+        if not value:
+            return qs
+
+        user: AnyUser = self.request.user
+        if user.is_anonymous:
+            return qs.none()
+        if user.is_superuser:
+            return qs
+
+        # All roles except the notification manager work with units.
+        role_choices = set(UserRoleChoice) - {UserRoleChoice.NOTIFICATION_MANAGER}
+        if user.permissions.has_general_role(role_choices=role_choices):
+            return qs
+
+        u_ids = list(user.active_unit_roles)
+        g_ids = list(user.active_unit_group_roles)
+
+        return qs.filter(Q(id__in=u_ids) | Q(unit_groups__in=g_ids)).distinct()
+
+    @staticmethod
+    def filter_by_published_reservation_units(qs: models.QuerySet, name: str, value: bool) -> models.QuerySet:
+        now = local_datetime()
+
+        if value:
+            query = (
+                Q(reservation_units__is_archived=False)
+                & Q(reservation_units__is_draft=False)
+                & (Q(reservation_units__publish_begins__isnull=True) | Q(reservation_units__publish_begins__lte=now))
+                & (Q(reservation_units__publish_ends__isnull=True) | Q(reservation_units__publish_ends__gt=now))
+            )
+
+        else:
+            query = (
+                Q(reservation_units__is_archived=True)
+                | Q(reservation_units__is_draft=True)
+                | (Q(reservation_units__publish_begins__gte=now))
+                | (Q(reservation_units__publish_ends__lt=now))
+            )
+
+        # Prevent multiple joins, see explanation above.
+        qs.query.filter_is_sticky = True
+        qs = qs.filter(query)
+        qs.query.filter_is_sticky = True
+        return qs.distinct()
+
+    @staticmethod
+    def filter_by_only_direct_bookable(qs: models.QuerySet, name: str, value: bool) -> models.QuerySet:
+        if not value:
+            return qs
+
+        # Prevent multiple joins, see explanation above.
+        qs.query.filter_is_sticky = True
+        qs = qs.filter(reservation_units__reservation_kind__in=ReservationKind.allows_direct)
+        qs.query.filter_is_sticky = True
+        return qs.distinct()
+
+    @staticmethod
+    def filter_by_only_seasonal_bookable(qs: models.QuerySet, name: str, value: bool) -> models.QuerySet:
+        if not value:
+            return qs
+
+        # Prevent multiple joins, see explanation above.
+        qs.query.filter_is_sticky = True
+        qs = qs.filter(reservation_units__reservation_kind__in=ReservationKind.allows_season)
+        qs.query.filter_is_sticky = True
+        return qs.distinct()
+
+
+class UnitFilterSet(ModelFilterSet, UnitFilterSetMixin):
     pk = IntMultipleChoiceFilter()
 
     name_fi = django_filters.CharFilter(field_name="name_fi", lookup_expr="istartswith")
@@ -77,26 +148,6 @@ class UnitFilterSet(ModelFilterSet):
             "unit_group_name_sv",
         ]
 
-    def filter_by_only_with_permission(self, qs: models.QuerySet, name: str, value: bool) -> models.QuerySet:
-        if not value:
-            return qs
-
-        user: AnyUser = self.request.user
-        if user.is_anonymous:
-            return qs.none()
-        if user.is_superuser:
-            return qs
-
-        # All roles except the notification manager work with units.
-        role_choices = set(UserRoleChoice) - {UserRoleChoice.NOTIFICATION_MANAGER}
-        if user.permissions.has_general_role(role_choices=role_choices):
-            return qs
-
-        u_ids = list(user.active_unit_roles)
-        g_ids = list(user.active_unit_group_roles)
-
-        return qs.filter(Q(id__in=u_ids) | Q(unit_groups__in=g_ids)).distinct()
-
     def filter_by_own_reservations(self, qs: models.QuerySet, name: str, value: bool) -> models.QuerySet:
         user = self.request.user
 
@@ -106,54 +157,6 @@ class UnitFilterSet(ModelFilterSet):
         # Prevent multiple joins, see explanation above.
         qs.query.filter_is_sticky = True
         qs = qs.filter(Q(reservation_units__reservations__user=user, _negated=not value))
-        qs.query.filter_is_sticky = True
-        return qs.distinct()
-
-    @staticmethod
-    def filter_by_published_reservation_units(qs: models.QuerySet, name: str, value: bool) -> models.QuerySet:
-        now = local_datetime()
-
-        if value:
-            query = (
-                Q(reservation_units__is_archived=False)
-                & Q(reservation_units__is_draft=False)
-                & (Q(reservation_units__publish_begins__isnull=True) | Q(reservation_units__publish_begins__lte=now))
-                & (Q(reservation_units__publish_ends__isnull=True) | Q(reservation_units__publish_ends__gt=now))
-            )
-
-        else:
-            query = (
-                Q(reservation_units__is_archived=True)
-                | Q(reservation_units__is_draft=True)
-                | (Q(reservation_units__publish_begins__gte=now))
-                | (Q(reservation_units__publish_ends__lt=now))
-            )
-
-        # Prevent multiple joins, see explanation above.
-        qs.query.filter_is_sticky = True
-        qs = qs.filter(query)
-        qs.query.filter_is_sticky = True
-        return qs.distinct()
-
-    @staticmethod
-    def filter_by_only_direct_bookable(qs: models.QuerySet, name: str, value: bool) -> models.QuerySet:
-        if not value:
-            return qs
-
-        # Prevent multiple joins, see explanation above.
-        qs.query.filter_is_sticky = True
-        qs = qs.filter(reservation_units__reservation_kind__in=ReservationKind.allows_direct)
-        qs.query.filter_is_sticky = True
-        return qs.distinct()
-
-    @staticmethod
-    def filter_by_only_seasonal_bookable(qs: models.QuerySet, name: str, value: bool) -> models.QuerySet:
-        if not value:
-            return qs
-
-        # Prevent multiple joins, see explanation above.
-        qs.query.filter_is_sticky = True
-        qs = qs.filter(reservation_units__reservation_kind__in=ReservationKind.allows_season)
         qs.query.filter_is_sticky = True
         return qs.distinct()
 
@@ -176,3 +179,22 @@ class UnitFilterSet(ModelFilterSet):
     @staticmethod
     def order_by_unit_group_name_sv(qs: UnitQuerySet, desc: bool) -> models.QuerySet:
         return qs.order_by_unit_group_name(language="sv", desc=desc)
+
+
+class UnitAllFilterSet(ModelFilterSet, UnitFilterSetMixin):
+    unit = IntMultipleChoiceFilter()
+    only_with_permission = django_filters.BooleanFilter(method="filter_by_only_with_permission")
+
+    class Meta:
+        model = Unit
+        fields = {
+            "name_fi": ["exact", "icontains", "istartswith"],
+            "name_sv": ["exact", "icontains", "istartswith"],
+            "name_en": ["exact", "icontains", "istartswith"],
+        }
+        order_by = [
+            "name_fi",
+            "name_en",
+            "name_sv",
+            "rank",
+        ]

@@ -111,6 +111,7 @@ from .queries import (
     SpaceNode,
     TaxPercentageNode,
     TermsOfUseNode,
+    UnitAllNode,
     UnitGroupNode,
     UnitNode,
     UserNode,
@@ -145,6 +146,7 @@ class Query(graphene.ObjectType):
     # Reservable entities
     unit = UnitNode.Node()
     units = UnitNode.Connection()
+    units_all = UnitAllNode.ListField()
     resource = ResourceNode.Node()
     resources = ResourceNode.Connection()
     space = SpaceNode.Node()
