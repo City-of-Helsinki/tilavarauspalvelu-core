@@ -40,6 +40,11 @@ class PaymentOrderActions:
             )
             raise
 
+    def set_order_as_cancelled(self) -> None:
+        self.payment_order.status = OrderStatus.CANCELLED
+        self.payment_order.processed_at = local_datetime()
+        self.payment_order.save(update_fields=["status", "processed_at"])
+
     def cancel_order_in_webshop(self) -> Order | None:
         try:
             return VerkkokauppaAPIClient.cancel_order(

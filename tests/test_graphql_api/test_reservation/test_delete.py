@@ -1,6 +1,7 @@
 import uuid
 
 import pytest
+from django.test import override_settings
 
 from tests.factories import OrderFactory, PaymentFactory, PaymentOrderFactory, ReservationFactory
 from tests.helpers import patch_method
@@ -152,3 +153,21 @@ def test_reservation__delete__reservation_is_in_draft_state_but_paid_in_verkkoka
     assert payment_order.status == OrderStatus.PAID
 
     assert EmailService.send_reservation_confirmed_email.called is True
+
+
+@override_settings(MOCK_VERKKOKAUPPA_API_ENABLED=True)
+def test_reservation__delete__mock_verkkokauppa(graphql):
+    reservation = ReservationFactory.create_for_delete(state=ReservationStateChoice.WAITING_FOR_PAYMENT)
+    payment_order = PaymentOrderFactory.create(
+        remote_id=uuid.uuid4(), reservation=reservation, status=OrderStatus.DRAFT
+    )
+
+    graphql.login_with_superuser()
+    data = get_delete_data(reservation)
+    response = graphql(DELETE_MUTATION, input_data=data)
+
+    payment_order.refresh_from_db()
+
+    assert response.has_errors is False
+    assert payment_order.processed_at is not None
+    assert payment_order.status == OrderStatus.CANCELLED

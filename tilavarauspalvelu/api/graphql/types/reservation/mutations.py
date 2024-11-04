@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, Any
 
 import graphene
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from graphene_django_extensions import CreateMutation, DeleteMutation, UpdateMutation
 
@@ -9,7 +10,6 @@ from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
 from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.typing import AnyUser
 from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CancelOrderError
-from utils.date_utils import local_datetime
 
 from .permissions import (
     ReservationCommentPermission,
@@ -148,8 +148,14 @@ class ReservationDeleteMutation(DeleteMutation):
             )
             raise ValidationError(msg)
 
-        # Verify PaymentOrder status from the webshop
         payment_order: PaymentOrder = reservation.payment_order.first()
+
+        if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
+            if payment_order and payment_order.status in OrderStatus.can_be_cancelled_statuses:
+                payment_order.actions.set_order_as_cancelled()
+            return
+
+        # Verify PaymentOrder status from the webshop
         if payment_order and payment_order.remote_id:
             payment_order.actions.refresh_order_status_from_webshop()
 
@@ -168,6 +174,4 @@ class ReservationDeleteMutation(DeleteMutation):
                 except CancelOrderError:
                     pass
 
-                payment_order.status = OrderStatus.CANCELLED
-                payment_order.processed_at = local_datetime()
-                payment_order.save(update_fields=["status", "processed_at"])
+                payment_order.actions.set_order_as_cancelled()
