@@ -1,6 +1,6 @@
 import React from "react";
 import { Button, Dialog, IconAlertCircleFill, IconInfoCircle } from "hds-react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 
 type Props = {
   acceptLabel?: string;

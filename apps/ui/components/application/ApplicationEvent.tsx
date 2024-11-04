@@ -428,8 +428,8 @@ function ApplicationEventInner({
           <ConfirmationDialog
             id="application-event-confirmation"
             isOpen
-            acceptLabel="application:Page1.deleteEvent"
-            cancelLabel="application:Page1.deleteEventCancel"
+            acceptLabel={t("application:Page1.deleteEvent")}
+            cancelLabel={t("application:Page1.deleteEventCancel")}
             heading={t("application:Page1.deleteEventHeading")}
             content={t("application:Page1.deleteEventContent")}
             onAccept={del}
