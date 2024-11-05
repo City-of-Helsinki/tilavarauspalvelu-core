@@ -18,20 +18,24 @@ import { FontMedium } from "./styled";
 const InnerContainer = styled.div<{ $hideStepper: boolean }>`
   display: grid;
   gap: 1em;
-  ${({ $hideStepper }) =>
-    $hideStepper
-      ? `grid-template-columns: 1fr;`
-      : `grid-template-columns: 18em 1fr;`}
+  grid-template-rows: repeat(3, auto);
 
-  @media (max-width: ${breakpoints.l}) {
-    grid-template-columns: 1fr;
+  grid-template-columns: 1fr;
+  @media (width > ${breakpoints.l}) {
+    grid-template-columns: ${({ $hideStepper }) =>
+      $hideStepper ? `1fr;` : `23em 1fr;`};
   }
 `;
 
-const NotesWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-m);
+const StyledNotesWhenApplying = styled(NotesWhenApplying)`
+  grid-column-start: 1;
+`;
+
+const ChildWrapper = styled.div`
+  @media (width > ${breakpoints.l}) {
+    grid-column: 2;
+    grid-row: 1 / -1;
+  }
 `;
 
 // TODO this should have more complete checks (but we are thinking of splitting the form anyway)
@@ -115,15 +119,13 @@ export function ApplicationPageWrapper({
       <FontMedium>{subTitle}</FontMedium>
       <InnerContainer $hideStepper={hideStepper}>
         {hideStepper ? null : <Stepper {...steps} />}
-        {/* TODO preview / view should not maybe display these notes */}
-        <NotesWrapper>
-          <div>
-            <NotesWhenApplying
-              applicationRound={application?.applicationRound ?? null}
-            />
-          </div>
-          {children}
-        </NotesWrapper>
+        <>
+          {/* TODO preview / view should not maybe display these notes */}
+          <StyledNotesWhenApplying
+            applicationRound={application?.applicationRound}
+          />
+          <ChildWrapper>{children}</ChildWrapper>
+        </>
       </InnerContainer>
     </>
   );

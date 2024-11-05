@@ -8,7 +8,7 @@ import {
   type ApplicationRoundsUiQuery,
   type ApplicationRoundsUiQueryVariables,
 } from "@gql/gql-types";
-import { breakpoints, H2 } from "common";
+import { breakpoints, H1 } from "common";
 import { createApolloClient } from "@/modules/apolloClient";
 import Sanitize from "@/components/common/Sanitize";
 import { getTranslation } from "@/modules/util";
@@ -50,10 +50,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   };
 };
 
-const Heading = styled(H2).attrs({ as: "h1" })``;
-
-// TODO why is row-reverse on mobile important? why not use the sidebar for notes on desktop similar to other pages?
-// or just follow the normal flow on both
 const ContentWrapper = styled.div`
   display: flex;
   gap: var(--spacing-m);
@@ -62,25 +58,17 @@ const ContentWrapper = styled.div`
   }
 `;
 
-const NotesWrapper = styled.div`
-  flex-grow: 1;
-`;
-
 function Criteria({ applicationRound }: PropsNarrowed): JSX.Element | null {
   const { t } = useTranslation();
 
   const title = `${getApplicationRoundName(applicationRound)} ${t("applicationRound:criteria")}`;
   return (
     <>
-      <div>
-        <BreadcrumbWrapper route={["/recurring", "criteria"]} />
-        <Heading>{title}</Heading>
-      </div>
+      <BreadcrumbWrapper route={["/recurring", "criteria"]} />
+      <H1 $noMargin>{title}</H1>
       <ContentWrapper>
         <Sanitize html={getTranslation(applicationRound, "criteria")} />
-        <NotesWrapper>
-          <NotesWhenApplying applicationRound={applicationRound} />
-        </NotesWrapper>
+        <NotesWhenApplying applicationRound={applicationRound} />
       </ContentWrapper>
     </>
   );

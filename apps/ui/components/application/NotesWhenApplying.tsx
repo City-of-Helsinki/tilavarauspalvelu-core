@@ -32,9 +32,15 @@ type NotesWhenApplyingProps = {
     ApplicationRoundNode,
     "notesWhenApplyingFi" | "notesWhenApplyingSv" | "notesWhenApplyingEn"
   > | null;
+  style?: React.CSSProperties;
+  className?: string;
 };
 
-function NotesWhenApplying({ applicationRound }: NotesWhenApplyingProps) {
+function NotesWhenApplying({
+  applicationRound,
+  style,
+  className,
+}: NotesWhenApplyingProps) {
   const { t, i18n } = useTranslation();
 
   if (!applicationRound) {
@@ -51,7 +57,7 @@ function NotesWhenApplying({ applicationRound }: NotesWhenApplyingProps) {
   }
 
   return (
-    <NotesBox>
+    <NotesBox style={style} className={className}>
       <NotesBoxHeading>
         {t("applicationRound:notesWhenApplying")}
       </NotesBoxHeading>
