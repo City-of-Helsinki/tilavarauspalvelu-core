@@ -2,15 +2,18 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { IconAngleLeft } from "hds-react";
-import { BasicLink } from "../styles/util";
+import { Link } from "react-router-dom";
 
-const StyledLink = styled(BasicLink)`
+const StyledLink = styled(Link)`
   display: inline-flex;
-  align-items: center;
   font-size: var(--fontsize-body-m);
+  color: var(--tilavaraus-admin-content-text-color);
   padding-right: var(--spacing-s);
   text-decoration: none;
+  user-select: none;
   gap: var(--spacing-2-xs);
+  align-content: center;
+  align-items: center;
 `;
 
 type Props = {

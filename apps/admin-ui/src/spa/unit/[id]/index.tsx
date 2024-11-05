@@ -1,48 +1,25 @@
 import { Button, IconPlusCircleFill, Notification } from "hds-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import styled from "styled-components";
-import { H1, H3 } from "common/src/common/typography";
-import { breakpoints } from "common/src/common/style";
+import { fontBold, fontMedium, H1, H2, H3 } from "common/src/common/typography";
 import { useUnitQuery } from "@gql/gql-types";
 import { parseAddress } from "@/common/util";
 import { errorToast } from "common/src/common/toast";
-import { BasicLink } from "@/styles/util";
 import Loader from "@/component/Loader";
 import { ExternalLink } from "@/component/ExternalLink";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import Error404 from "@/common/Error404";
 import { ReservationUnitList } from "./ReservationUnitList";
 import { getReservationUnitUrl, getSpacesResourcesUrl } from "@/common/urls";
+import { Flex } from "common/styles/util";
 
 interface IProps {
   [key: string]: string;
   unitPk: string;
 }
 
-const Name = styled(H1).attrs({ $legacy: true })`
-  line-height: 46px;
-  margin-bottom: 0;
-`;
-
-const Links = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 2em;
-  flex-wrap: wrap;
-  font-size: var(--fontsize-body-s);
-
-  @media (min-width: ${breakpoints.m}) {
-    flex-wrap: nowrap;
-  }
-`;
-
-const Address = styled.div`
-  font-size: var(--fontsize-body-s);
-  line-height: 26px;
-`;
 const Image = styled.img`
   clip-path: circle(50% at 50% 50%);
   width: 9rem;
@@ -52,68 +29,33 @@ const Heading = styled.div`
   flex-grow: 1;
 `;
 
-const Ingress = styled.div`
-  display: flex;
-  gap: var(--spacing-m);
-`;
-
-const ListContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-m);
-`;
-
-// TODO this is too complicated why?
-const Prop = styled.div<{ $disabled: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-2-xs);
-  font-family: var(--tilavaraus-admin-font-medium);
-  font-weight: 500;
-  margin-bottom: var(--spacing-xs);
+const Address = styled.div<{ $disabled?: boolean }>`
+  font-size: var(--fontsize-body-s);
+  line-height: 26px;
+  ${fontMedium}
 
   ${({ $disabled }) => $disabled && "opacity: 0.4;"}
 `;
 
-const HeadingLarge = styled.div`
-  font-size: var(--fontsize-heading-l);
-  font-family: var(--tilavaraus-admin-font-bold);
-  line-height: 43px;
-`;
-
-const Info = styled.div`
-  display: flex;
-`;
-
 const ResourceUnitCount = styled.div`
+  ${fontBold}
   padding: var(--spacing-s) 0;
-  font-family: var(--tilavaraus-admin-font-bold);
   font-size: var(--fontsize-heading-xs);
 `;
 
-const StyledButton = styled(Button)`
-  padding: 0;
-  span {
-    color: var(--color-black);
-    padding: 0;
-  }
-`;
-
-const StyledBoldButton = styled(StyledButton)`
-  font-family: var(--tilavaraus-admin-font-bold);
-  margin-left: auto;
+const StyledBoldButton = styled(Button)`
+  ${fontBold}
   span {
     color: var(--color-black);
   }
 `;
 
-const ReservationUnits = styled.div`
+const EmptyContainer = styled(Flex).attrs({
+  $align: "center",
+  $justify: "center",
+})`
   background-color: var(--tilavaraus-admin-gray);
   min-height: 20rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--spacing-m);
 `;
 
 function Unit(): JSX.Element {
@@ -145,24 +87,23 @@ function Unit(): JSX.Element {
 
   const reservationUnits = filterNonNullable(unit.reservationUnits);
 
+  const UNIT_REGISTRY_LINK = `https://asiointi.hel.fi/tprperhe/TPR/UI/ServicePoint/ServicePointEdit/`;
   return (
-    <ListContainer>
-      <Ingress>
+    <Flex>
+      <Flex $direction="row" $align="center">
         <Image src="https://tilavaraus.hel.fi/v1/media/reservation_unit_images/liikumistila2.jfif.250x250_q85_crop.jpg" />
         <Heading>
-          <Name>{unit?.nameFi}</Name>
+          <H1 $noMargin>{unit?.nameFi}</H1>
           {unit?.location ? (
             <Address>{parseAddress(unit?.location)}</Address>
           ) : (
-            <Prop $disabled>{t("Unit.noAddress")}</Prop>
+            <Address $disabled>{t("Unit.noAddress")}</Address>
           )}
         </Heading>
-        <Links>
-          <BasicLink to={getSpacesResourcesUrl(unitPk)}>
-            {t("Unit.showSpacesAndResources")}
-          </BasicLink>
-        </Links>
-      </Ingress>
+        <Link to={getSpacesResourcesUrl(unitPk)}>
+          {t("Unit.showSpacesAndResources")}
+        </Link>
+      </Flex>
       {!hasSpacesResources ? (
         <Notification
           type="alert"
@@ -170,29 +111,25 @@ function Unit(): JSX.Element {
           size="large"
         >
           {t("Unit.noSpacesResources")}{" "}
-          <BasicLink to={getSpacesResourcesUrl(unitPk)}>
+          <Link to={getSpacesResourcesUrl(unitPk)}>
             {t("Unit.createSpaces")}
-          </BasicLink>
+          </Link>
         </Notification>
       ) : null}
-      <div style={{ margin: "var(--spacing-s) 0" }}>
-        <ExternalLink
-          to={`https://asiointi.hel.fi/tprperhe/TPR/UI/ServicePoint/ServicePointEdit/${unit.tprekId}`}
-        >
-          {t("Unit.maintainOpeningHours")}
-        </ExternalLink>
-      </div>
-      <HeadingLarge>{t("Unit.reservationUnitTitle")}</HeadingLarge>
-      <Info>
-        <div>
-          {reservationUnits.length > 0 ? (
-            <ResourceUnitCount>
-              {t("Unit.reservationUnits", {
-                count: reservationUnits.length,
-              })}
-            </ResourceUnitCount>
-          ) : null}
-        </div>
+      <ExternalLink to={`${UNIT_REGISTRY_LINK}${unit.tprekId}`}>
+        {t("Unit.maintainOpeningHours")}
+      </ExternalLink>
+      <H2>{t("Unit.reservationUnitTitle")}</H2>
+      <Flex $direction="row" $justify="space-between">
+        {reservationUnits.length > 0 ? (
+          <ResourceUnitCount>
+            {t("Unit.reservationUnits", {
+              count: reservationUnits.length,
+            })}
+          </ResourceUnitCount>
+        ) : (
+          <div />
+        )}
         <StyledBoldButton
           disabled={!hasSpacesResources}
           variant="supplementary"
@@ -203,18 +140,18 @@ function Unit(): JSX.Element {
         >
           {t("Unit.reservationUnitCreate")}
         </StyledBoldButton>
-      </Info>
+      </Flex>
       {reservationUnits.length > 0 ? (
         <ReservationUnitList
           reservationUnits={reservationUnits}
           unitId={unitPk}
         />
       ) : (
-        <ReservationUnits>
+        <EmptyContainer>
           <H3 as="p">{t("Unit.noReservationUnitsTitle")}</H3>
-        </ReservationUnits>
+        </EmptyContainer>
       )}
-    </ListContainer>
+    </Flex>
   );
 }
 

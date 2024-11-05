@@ -18,17 +18,6 @@ export const Seranwrap = styled.div`
   opacity: 0.2;
 `;
 
-// TODO link component naming?
-export const BasicLink = styled(Link)`
-  color: var(--tilavaraus-admin-content-text-color);
-  text-decoration: none;
-  user-select: none;
-  display: inline-flex;
-  align-content: center;
-  align-items: center;
-  gap: var(--spacing-xs);
-`;
-
 export const TableLink = styled(Link)`
   color: black;
 `;
