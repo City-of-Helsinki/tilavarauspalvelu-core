@@ -23,6 +23,7 @@ def forwards_func(apps, schema_editor):
 
         objs = []
         for i, obj in enumerate(qs, start=max_rank + 1):
+            objs.append(obj)
             obj.rank = i
 
         model.objects.bulk_update(objs, ["rank"])
