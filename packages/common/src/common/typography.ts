@@ -32,7 +32,7 @@ export const Regular = styled.span`
   ${fontRegular}
 `;
 
-/// @param $large - If true, use larger font size
+/// @param $large - If true, use larger font size (use case: hero headings)
 /// @param $noMargin - If true, remove margin: use on pages with breadcrumbs
 /// @param $marginTop - Margin top size: should only be used on pages without breadcrumbs
 /// @param $marginBottom - Margin bottom size: should only be used on pages without breadcrumbs
@@ -54,13 +54,14 @@ export const H1 = styled.h1<{
       : `var(--spacing-${$marginTop ?? "s"}) 0 var(--spacing-${$marginBottom ?? "m"})`};
   word-break: break-word;
 
-  @media (min-width: ${breakpoints.s}) {
+  @media (width > ${breakpoints.s}) {
     font-size: ${({ $large }) =>
       !$large ? "var(--fontsize-heading-xl)" : "var(--fontsize-heading-xxl)"};
     line-height: var(--lineheight-s);
   }
 `;
 
+// TODO where is $large used?
 export const H2 = styled.h2<{ $large?: boolean; $noMargin?: boolean }>`
   font-size: ${({ $large }) =>
     !$large ? `var(--fontsize-heading-m)` : `var(--fontsize-heading-l)`};
@@ -69,7 +70,7 @@ export const H2 = styled.h2<{ $large?: boolean; $noMargin?: boolean }>`
   margin-bottom: ${({ $noMargin }) => ($noMargin ? `0` : `var(--spacing-m)`)};
   margin-top: ${({ $noMargin }) => ($noMargin ? `0` : `var(--spacing-s)`)};
 
-  @media (min-width: ${breakpoints.s}) {
+  @media (width > ${breakpoints.s}) {
     ${({ $large }) =>
       !$large
         ? `
@@ -83,16 +84,17 @@ export const H2 = styled.h2<{ $large?: boolean; $noMargin?: boolean }>`
   }
 `;
 
+// TODO can we remove $large?
 export const H3 = styled.h3<{ $large?: boolean; $noMargin?: boolean }>`
   font-size: ${({ $large }) =>
-    !$large ? `var(--fontsize-heading-s)` : `var(--fontsize-heading-m)`};
+    !$large ? `var(--fontsize-heading-s)` : `var(--fontsize-heading-s)`};
   ${fontRegular}
   line-height: 2rem;
   margin-bottom: ${({ $noMargin }) => ($noMargin ? `0` : `var(--spacing-m)`)};
 
-  @media (min-width: ${breakpoints.s}) {
+  @media (width > ${breakpoints.s}) {
     font-size: ${({ $large }) =>
-      !$large ? `var(--fontsize-heading-xs)` : `var(--fontsize-heading-s)`};
+      !$large ? `var(--fontsize-heading-m)` : `var(--fontsize-heading-m)`};
   }
 `;
 
@@ -103,7 +105,7 @@ export const H4 = styled.h4<{ $noMargin?: boolean }>`
   margin-bottom: ${({ $noMargin }) => ($noMargin ? `0` : `var(--spacing-s)`)};
   margin-top: ${({ $noMargin }) => ($noMargin ? `0` : `var(--spacing-m)`)};
 
-  @media (min-width: ${breakpoints.s}) {
+  @media (width > ${breakpoints.s}) {
     font-size: var(--fontsize-heading-m);
   }
 `;
@@ -114,7 +116,7 @@ export const H5 = styled.h5`
   line-height: 1.625;
   margin-bottom: var(--spacing-m);
 
-  @media (min-width: ${breakpoints.s}) {
+  @media (width > ${breakpoints.s}) {
     font-size: var(--fontsize-heading-s);
     line-height: var(--lineheight-l);
   }
@@ -126,7 +128,7 @@ export const H6 = styled.h6`
   line-height: 1.4;
   margin-bottom: var(--spacing-m);
 
-  @media (min-width: ${breakpoints.s}) {
+  @media (width > ${breakpoints.s}) {
     font-size: var(--fontsize-heading-xs);
     line-height: 1.35;
   }

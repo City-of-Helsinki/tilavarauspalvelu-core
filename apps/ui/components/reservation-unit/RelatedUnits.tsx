@@ -2,7 +2,6 @@ import { IconArrowRight, IconGroup, IconTicket } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import NextImage from "next/image";
-import styled from "styled-components";
 import { useMedia } from "react-use";
 import { breakpoints } from "common/src/common/style";
 import type { RelatedReservationUnitsQuery } from "@gql/gql-types";
@@ -22,6 +21,7 @@ import {
   getTranslationSafe,
 } from "common/src/common/util";
 import { getReservationUnitPath } from "@/modules/urls";
+import { H4 } from "common";
 
 type RelatedQueryT = NonNullable<
   RelatedReservationUnitsQuery["reservationUnits"]
@@ -30,28 +30,16 @@ type RelatedEdgeT = NonNullable<RelatedQueryT>["edges"][0];
 export type RelatedNodeT = NonNullable<NonNullable<RelatedEdgeT>["node"]>;
 type PropsType = {
   units: RelatedNodeT[];
+  className?: string;
+  style?: React.CSSProperties;
 };
 
-const StyledCarousel = styled(Carousel)`
-  &&& {
-    /* Make room for the Carousel controls */
-    margin: 0 auto !important;
-    width: calc(100% - 60px) !important;
-  }
-  .slider-list {
-    cursor: default !important;
-  }
-`;
-
-const Wrapper = styled.div`
-  margin: 0 var(--spacing-s);
-
-  @media (min-width: ${breakpoints.m}) {
-    margin: 0;
-  }
-`;
-
-export function RelatedUnits({ units }: PropsType): JSX.Element | null {
+export function RelatedUnits({
+  units,
+  style,
+  className,
+}: PropsType): JSX.Element | null {
+  const { t } = useTranslation();
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
   const isWideMobile = useMedia(`(max-width: ${breakpoints.l})`, false);
 
@@ -59,8 +47,10 @@ export function RelatedUnits({ units }: PropsType): JSX.Element | null {
     return null;
   }
   return (
-    <Wrapper>
-      <StyledCarousel
+    <div style={style} className={className}>
+      {/* TODO weird header size, check the Accordion so this matches them */}
+      <H4 as="h2">{t("reservationUnit:relatedReservationUnits")}</H4>
+      <Carousel
         slidesToShow={isMobile ? 1 : isWideMobile ? 2 : 3}
         slidesToScroll={isMobile ? 1 : isWideMobile ? 2 : 3}
         wrapAround={false}
@@ -70,8 +60,8 @@ export function RelatedUnits({ units }: PropsType): JSX.Element | null {
         {units.map((ru) => (
           <RelatedUnitCard key={ru.pk} reservationUnit={ru} />
         ))}
-      </StyledCarousel>
-    </Wrapper>
+      </Carousel>
+    </div>
   );
 }
 

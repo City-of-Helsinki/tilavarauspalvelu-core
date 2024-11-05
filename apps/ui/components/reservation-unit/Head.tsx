@@ -5,7 +5,6 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { formatDuration } from "common/src/common/util";
 import { fontRegular, H1, H3 } from "common/src/common/typography";
-import { breakpoints } from "common/src/common/style";
 import { ReservationKind, type ReservationUnitPageQuery } from "@gql/gql-types";
 import { formatDate, getTranslation, orderImages } from "@/modules/util";
 import IconWithText from "../common/IconWithText";
@@ -17,11 +16,10 @@ import {
   getUnitName,
   isReservationUnitPaid,
 } from "@/modules/reservationUnit";
-import BreadcrumbWrapper from "../common/BreadcrumbWrapper";
 import { isReservationStartInFuture } from "@/modules/reservation";
 import { filterNonNullable } from "common/src/helpers";
-import { getSingleSearchPath } from "@/modules/urls";
 import { Flex } from "common/styles/util";
+import { breakpoints } from "common";
 
 type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
 interface Props {
@@ -29,18 +27,6 @@ interface Props {
   reservationUnitIsReservable?: boolean;
   subventionSuffix?: JSX.Element;
 }
-
-// FIXME this breaks on 768px
-const RightContainer = styled.div`
-  font-size: var(--fontsize-body-m);
-  display: grid;
-  grid-template-columns: 1fr;
-
-  @media (min-width: ${breakpoints.l}) {
-    grid-template-columns: auto 465px;
-    gap: var(--spacing-layout-2-xl);
-  }
-`;
 
 const NotificationWrapper = styled.div`
   background-color: var(--color-engel-light);
@@ -78,50 +64,49 @@ function NonReservableNotification({
   );
 }
 
+const Wrapper = styled.div`
+  grid-column: 1 / -1;
+  grid-row: 1;
+
+  display: grid;
+  gap: var(--spacing-m);
+  grid-template-columns: 1fr;
+  @media (width > ${breakpoints.l}) {
+    grid-template-columns: 1fr 1fr;
+  }
+`;
+
 export function Head({
   reservationUnit,
   reservationUnitIsReservable,
   subventionSuffix,
 }: Props): JSX.Element {
-  const { t } = useTranslation();
-
   const reservationUnitName = getReservationUnitName(reservationUnit);
   const unitName = getUnitName(reservationUnit.unit ?? undefined);
-  const searchUrl = getSingleSearchPath();
 
-  const routes = [
-    { slug: searchUrl, title: t("breadcrumb:search") },
-    // NOTE Don't set slug. It hides the mobile breadcrumb
-    { title: reservationUnitName ?? "-" },
-  ];
   return (
-    <>
-      <BreadcrumbWrapper route={routes} />
-      <RightContainer>
-        <Flex>
-          <H1 $noMargin>{reservationUnitName}</H1>
-          <H3 as="h2" $noMargin>
-            {unitName}
-          </H3>
-          <IconList
-            reservationUnit={reservationUnit}
-            subventionSuffix={subventionSuffix}
-          />
-          {!reservationUnitIsReservable && (
-            <NonReservableNotification reservationUnit={reservationUnit} />
-          )}
-        </Flex>
-        <Images
-          images={orderImages(reservationUnit.images)}
-          contextName={reservationUnitName}
+    <Wrapper>
+      <Flex>
+        <H1 $noMargin>{reservationUnitName}</H1>
+        <H3 as="h2" $noMargin>
+          {unitName}
+        </H3>
+        <IconList
+          reservationUnit={reservationUnit}
+          subventionSuffix={subventionSuffix}
         />
-      </RightContainer>
-    </>
+        {!reservationUnitIsReservable && (
+          <NonReservableNotification reservationUnit={reservationUnit} />
+        )}
+      </Flex>
+      <Images
+        images={orderImages(reservationUnit.images)}
+        contextName={reservationUnitName}
+      />
+    </Wrapper>
   );
 }
 
-// FIXME this should have spacing-m margin on the bottom (but I'd prefer it to be gap on the layout)
-// (visible as an error on mobile)
 const IconListWrapper = styled.div`
   & > div:empty {
     display: none;
@@ -132,7 +117,7 @@ const IconListWrapper = styled.div`
   font-size: var(--fontsize-body-s);
   display: grid;
   gap: var(--spacing-m) var(--spacing-s);
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
 `;
 
 const StyledIconWithText = styled(IconWithText)`

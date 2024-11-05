@@ -54,13 +54,13 @@ export const Flex = styled.div<{
   $width?: "full" | "auto";
 }>`
   display: flex;
-  flex-wrap: ${({ $wrap }) => $wrap ?? "no-wrap"};
+  flex-wrap: ${({ $wrap }) => $wrap ?? "nowrap"};
   gap: ${({ $gap }) =>
     $gap != null ? `var(--spacing-${$gap})` : "var(--spacing-m)"};
   flex-direction: ${({ $direction }) =>
     $direction === "row" ? "row" : "column"};
-  justify-content: ${({ $justify }) => $justify ?? "flex-start"};
-  align-items: ${({ $align }) => $align ?? "flex-start"};
+  justify-content: ${({ $justify }) => $justify ?? "initial"};
+  align-items: ${({ $align }) => $align ?? "initial"};
 `;
 
 // TODO refactor this to have parameters for gap

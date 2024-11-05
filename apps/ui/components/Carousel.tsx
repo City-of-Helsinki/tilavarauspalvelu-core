@@ -70,6 +70,12 @@ const StyledCarousel = styled(NukaCarousel)<{
 }>`
   /* hack otherwise the carousel spans over 100%, probably related to children being a grid */
   max-width: calc(100vw - var(--spacing-m) * 4);
+
+  &&& {
+    /* Make room for the Carousel controls */
+    margin: 0 auto !important;
+    width: calc(100% - 60px) !important;
+  }
 `;
 
 const CustomBottomControls = styled.div`

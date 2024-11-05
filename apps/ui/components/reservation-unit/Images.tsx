@@ -13,23 +13,6 @@ type Props = {
   contextName?: string;
 };
 
-const StyledCarousel = styled(Carousel)`
-  max-width: 100%;
-  margin: 0;
-
-  @media (min-width: ${breakpoints.s}) {
-    max-width: 400px;
-  }
-
-  @media (min-width: ${breakpoints.m}) {
-    margin-right: var(--spacing-l) !important;
-  }
-
-  @media (min-width: ${breakpoints.l}) {
-    max-width: unset;
-  }
-`;
-
 const CarouselImage = styled.img`
   width: 100%;
   height: 300px;
@@ -103,7 +86,7 @@ export function Images({ images, contextName }: Props): JSX.Element {
 
   return (
     <>
-      <StyledCarousel
+      <Carousel
         controlAriaLabel={t("common:imgAltForSpace", {
           name: contextName,
         })}
@@ -124,7 +107,7 @@ export function Images({ images, contextName }: Props): JSX.Element {
             })} #${index + 1}`}
           />
         ))}
-      </StyledCarousel>
+      </Carousel>
       <Modal
         handleClose={() => {
           setShowModal(false);

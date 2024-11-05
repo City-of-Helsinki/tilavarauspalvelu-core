@@ -21,6 +21,16 @@ export const ReservationPageWrapper = styled.div<{ $nRows?: number }>`
   }
 `;
 
+// Larger breakpoint for reservation unit page because Calendar takes more space.
+export const ReservationUnitPageWrapper = styled(ReservationPageWrapper)`
+  @media (width > ${breakpoints.m}) {
+    grid-template-columns: 1fr;
+  }
+  @media (width > ${breakpoints.l}) {
+    grid-template-columns: 2fr 1fr;
+  }
+`;
+
 /* There is no breadcrumbs on this page so remove the margin */
 // TODO edit page at least should have this full sized
 export const Heading = styled(H1)`
