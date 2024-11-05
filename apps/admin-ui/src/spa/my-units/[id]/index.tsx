@@ -16,28 +16,16 @@ import { UserPermissionChoice, useUnitViewQuery } from "@gql/gql-types";
 import { useCheckPermission } from "@/hooks";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { LinkPrev } from "@/component/LinkPrev";
+import { TabWrapper } from "common/styles/util";
 
 type Params = {
   unitId: string;
   reservationUnitId: string;
 };
 
-// HDS tabs aren't responsive inside a grid container
-// flex and block cause problems on other pages (tables overflowing).
-// seems they or something else is not responsive without max-width hack also
-const ContainerHack = styled.div`
-  max-width: 92vw;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-s);
-  @media (min-width: ${breakpoints.m}) {
-    gap: var(--spacing-m);
-  }
-`;
-
 const LocationOnlyOnDesktop = styled.p`
   display: none;
-  @media (min-width: ${breakpoints.s}) {
+  @media (width > ${breakpoints.s}) {
     display: block;
   }
 `;
@@ -84,7 +72,7 @@ export function MyUnitView() {
     return (
       <>
         <LinkPrev />
-        <ContainerHack>{t("errors.router.unitNotFound")}</ContainerHack>
+        {t("errors.router.unitNotFound")}
       </>
     );
   }
@@ -101,7 +89,7 @@ export function MyUnitView() {
   const activeTab = selectedTab === "reservation-unit" ? 1 : 0;
 
   return (
-    <ContainerHack>
+    <>
       <H1>{unit?.nameFi}</H1>
       {unit.location && (
         <LocationOnlyOnDesktop>
@@ -116,25 +104,27 @@ export function MyUnitView() {
           {t("MyUnits.Calendar.header.recurringReservation")}
         </ButtonLikeLink>
       </div>
-      <Tabs initiallyActiveTab={activeTab}>
-        <Tabs.TabList>
-          <Tabs.Tab onClick={() => handleTabChange("unit")}>
-            {t("MyUnits.Calendar.Tabs.byReservationUnit")}
-          </Tabs.Tab>
-          <Tabs.Tab onClick={() => handleTabChange("reservation-unit")}>
-            {t("MyUnits.Calendar.Tabs.byUnit")}
-          </Tabs.Tab>
-        </Tabs.TabList>
-        <TabPanel>
-          <UnitReservations />
-        </TabPanel>
-        <TabPanel>
-          <ReservationUnitCalendarView
-            reservationUnitOptions={reservationUnitOptions}
-            unitPk={Number(pk)}
-          />
-        </TabPanel>
-      </Tabs>
-    </ContainerHack>
+      <TabWrapper>
+        <Tabs initiallyActiveTab={activeTab}>
+          <Tabs.TabList>
+            <Tabs.Tab onClick={() => handleTabChange("unit")}>
+              {t("MyUnits.Calendar.Tabs.byReservationUnit")}
+            </Tabs.Tab>
+            <Tabs.Tab onClick={() => handleTabChange("reservation-unit")}>
+              {t("MyUnits.Calendar.Tabs.byUnit")}
+            </Tabs.Tab>
+          </Tabs.TabList>
+          <TabPanel>
+            <UnitReservations />
+          </TabPanel>
+          <TabPanel>
+            <ReservationUnitCalendarView
+              reservationUnitOptions={reservationUnitOptions}
+              unitPk={Number(pk)}
+            />
+          </TabPanel>
+        </Tabs>
+      </TabWrapper>
+    </>
   );
 }

@@ -93,5 +93,5 @@ export const CenterSpinner = styled(LoadingSpinner)`
 /// Tab causes horizontal overflow without this
 /// we use grids primarily and components inside grid without max-width overflow.
 export const TabWrapper = styled.div`
-  max-width: 95vw;
+  max-width: calc(100vw - 2 * var(--tilavaraus-page-margin));
 `;
