@@ -33,7 +33,7 @@ class ReservationUnitInline(admin.TabularInline):
         return False
 
     def reservation_unit_link(self, obj):
-        url = reverse("admin:reservation_units_reservationunit_change", args=(obj.pk,))
+        url = reverse("admin:tilavarauspalvelu_reservationunit_change", args=(obj.pk,))
 
         return format_html(f"<a href={url}>{obj.name_fi}</a>")
 
