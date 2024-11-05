@@ -720,7 +720,7 @@ def test_application_section__filter__by_age_group(graphql):
     # - A superuser is using the system
     age_group_1 = AgeGroupFactory.create()
     age_group_2 = AgeGroupFactory.create()
-    application = ApplicationFactory.create_in_status_draft()
+    application = ApplicationFactory.create_in_status_draft(application_sections=[])
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application, age_group=age_group_1)
     ApplicationSectionFactory.create_in_status_unallocated(application=application, age_group=age_group_2)
     graphql.login_with_superuser()
