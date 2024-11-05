@@ -108,6 +108,7 @@ function ReservationCard({ reservation, type }: PropsT): JSX.Element {
         href={getReservationPath(reservation.pk, "cancel")}
         data-testid="reservation-card__button--cancel-reservation"
         key="cancel"
+        width="full"
       >
         {t("reservations:cancelReservationAbbreviated")}
         <IconCross aria-hidden />
@@ -119,6 +120,7 @@ function ReservationCard({ reservation, type }: PropsT): JSX.Element {
       href={link}
       data-testid="reservation-card__button--goto-reservation"
       key="show"
+      width="full"
     >
       {t("common:show")}
       <IconArrowRight aria-hidden />

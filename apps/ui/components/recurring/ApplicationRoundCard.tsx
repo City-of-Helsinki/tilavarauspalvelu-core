@@ -71,6 +71,7 @@ export function ApplicationRoundCard({ applicationRound }: Props): JSX.Element {
       href={getApplicationRoundPath(applicationRound.pk, "criteria")}
       target="_blank"
       key="criteria"
+      width="full"
     >
       {t("applicationRound:card.criteria")}
       <IconLinkExternal />
@@ -81,6 +82,7 @@ export function ApplicationRoundCard({ applicationRound }: Props): JSX.Element {
       <ButtonLikeLink
         key="button"
         href={getApplicationRoundPath(applicationRound.pk)}
+        width="full"
       >
         {t("application:Intro.startNewApplication")}
         <IconArrowRight aria-hidden />

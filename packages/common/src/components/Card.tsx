@@ -31,6 +31,8 @@ const Wrapper = styled.div<{ $bgColor: string }>`
   }
   background-color: ${(props) => props.$bgColor};
   display: flex;
+  height: 100%;
+  width: 100%;
   flex-direction: column;
   align-items: stretch;
 

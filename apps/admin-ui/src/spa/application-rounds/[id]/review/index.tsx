@@ -17,7 +17,6 @@ import {
   UserPermissionChoice,
 } from "@gql/gql-types";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
-import { TabWrapper } from "@/styles/layout";
 import { ApplicationRoundStatusLabel } from "../../ApplicationRoundStatusLabel";
 import TimeframeStatus from "../../TimeframeStatus";
 import { ApplicationDataLoader } from "./ApplicationDataLoader";
@@ -36,6 +35,7 @@ import RejectedOccurrencesDataLoader from "./RejectedOccurrencesDataLoader";
 import { errorToast } from "common/src/common/toast";
 import { hasPermission } from "@/modules/permissionHelper";
 import { useSession } from "@/hooks/auth";
+import { TabWrapper } from "common/styles/util";
 
 const HeadingContainer = styled.div`
   display: flex;

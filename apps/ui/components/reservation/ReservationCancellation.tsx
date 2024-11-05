@@ -2,7 +2,13 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import router from "next/router";
 import { Controller, useForm } from "react-hook-form";
-import { IconArrowRight, IconCross, IconSignout, Select } from "hds-react";
+import {
+  Button,
+  IconArrowRight,
+  IconCross,
+  IconSignout,
+  Select,
+} from "hds-react";
 import { useTranslation } from "next-i18next";
 import { OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
@@ -16,7 +22,6 @@ import {
 import { IconButton, ShowAllContainer } from "common/src/components";
 import Sanitize from "../common/Sanitize";
 import { getSelectedOption, getTranslation } from "@/modules/util";
-import { BlackButton, MediumButton } from "@/styles/util";
 import { ReservationInfoCard } from "./ReservationInfoCard";
 import { Paragraph } from "./styles";
 import { signOut } from "common/src/browserHelpers";
@@ -188,9 +193,11 @@ export function ReservationCancellation(props: Props): JSX.Element {
         <H1 $noMargin>{title}</H1>
         <p>{ingress}</p>
       </div>
-      <div style={{ gridRowEnd: "span 4" }}>
-        <ReservationInfoCard reservation={reservation} type="confirmed" />
-      </div>
+      <ReservationInfoCard
+        reservation={reservation}
+        type="confirmed"
+        style={{ gridRowEnd: "span 4" }}
+      />
       <div>
         {formState === "unsent" ? (
           <>
@@ -226,15 +233,16 @@ export function ReservationCancellation(props: Props): JSX.Element {
                 )}
               />
               <Actions>
-                <BlackButton
+                <Button
                   variant="secondary"
                   iconLeft={<IconCross aria-hidden />}
+                  // TODO this should be a link up the hierarchy (not history back)
                   onClick={() => router.back()}
                   data-testid="reservation-cancel__button--back"
                 >
                   {t("reservations:cancelReservationCancellation")}
-                </BlackButton>
-                <MediumButton
+                </Button>
+                <Button
                   variant="primary"
                   type="submit"
                   disabled={!watch("reason")}
@@ -242,7 +250,7 @@ export function ReservationCancellation(props: Props): JSX.Element {
                   isLoading={loading}
                 >
                   {t("reservations:cancelReservation")}
-                </MediumButton>
+                </Button>
               </Actions>
             </Form>
           </>

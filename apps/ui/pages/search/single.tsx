@@ -102,22 +102,22 @@ function SearchSingle({
   }, [content?.current?.offsetTop, currData?.reservationUnits, isMobile]);
 
   return (
-    <div>
+    <>
       {error ? (
         <Notification size="small" type="alert">
           {t("searchResultList:error")}
         </Notification>
       ) : null}
-      <div>
-        <H1>{t("search:single.heading")}</H1>
-        <SingleSearchForm
-          unitOptions={unitOptions}
-          reservationUnitTypeOptions={reservationUnitTypeOptions}
-          purposeOptions={purposeOptions}
-          equipmentsOptions={equipmentsOptions}
-          isLoading={isLoading}
-        />
-      </div>
+      <H1 $marginTop="l" $marginBottom="none">
+        {t("search:single.heading")}
+      </H1>
+      <SingleSearchForm
+        unitOptions={unitOptions}
+        reservationUnitTypeOptions={reservationUnitTypeOptions}
+        purposeOptions={purposeOptions}
+        equipmentsOptions={equipmentsOptions}
+        isLoading={isLoading}
+      />
       <section ref={content}>
         <ListWithPagination
           items={filterNonNullable(reservationUnits).map((ru) => (
@@ -130,7 +130,7 @@ function SearchSingle({
           sortingComponent={<SortingComponent />}
         />
       </section>
-    </div>
+    </>
   );
 }
 

@@ -1,12 +1,9 @@
 import React from "react";
 import styled from "styled-components";
-import { H3 } from "common/src/common/typography";
+import { H2 } from "common/src/common/typography";
 import { type ApplicationsQuery } from "@gql/gql-types";
 import ApplicationCard from "./ApplicationCard";
-
-const GroupName = styled(H3).attrs({ as: "h2" })`
-  margin-top: 0;
-`;
+import { Flex } from "common/styles/util";
 
 type Props = {
   name: string;
@@ -18,10 +15,7 @@ type Props = {
   actionCallback: (string: "error" | "cancel") => Promise<void>;
 };
 
-const Wrapper = styled.div`
-  display: flex;
-  flex-flow: column nowrap;
-  gap: var(--spacing-m);
+const Wrapper = styled(Flex)`
   margin-bottom: var(--spacing-layout-l);
 `;
 
@@ -45,7 +39,7 @@ function ApplicationsGroup({
 
   return (
     <Wrapper data-testid="applications__group--wrapper">
-      <GroupName>{name}</GroupName>
+      <H2 $noMargin>{name}</H2>
       {applications.map((application) => (
         <ApplicationCard
           key={application.pk}

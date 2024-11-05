@@ -48,8 +48,6 @@ const Form = styled.form`
   justify-content: space-between;
 
   @media (min-width: ${breakpoints.m}) {
-    /* hack for page jumping when the size of the component changes */
-    height: 391.797px;
     /* grid resize causes issues, so use fixed width */
     width: calc(390px - var(--spacing-m) * 2);
   }

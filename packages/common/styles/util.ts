@@ -41,7 +41,7 @@ export const FullRow = styled.div`
 // TODO should allow for switching to smaller gap on mobile (scale down)
 export const Flex = styled.div<{
   $direction?: "row" | "column";
-  $gap?: "2-xs" | "xs" | "s" | "m" | "l";
+  $gap?: "2-xs" | "xs" | "s" | "m" | "l" | "xl" | "2-xl";
   $justify?:
     | "center"
     | "flex-start"
@@ -51,8 +51,8 @@ export const Flex = styled.div<{
     | "space-evenly";
   $align?: "center" | "flex-start" | "flex-end" | "baseline" | "stretch";
   $wrap?: "wrap" | "nowrap";
+  $width?: "full" | "auto";
 }>`
-  width: 100%;
   display: flex;
   flex-wrap: ${({ $wrap }) => $wrap ?? "no-wrap"};
   gap: ${({ $gap }) =>
@@ -88,4 +88,10 @@ export const ButtonContainer = styled.div<{
 
 export const CenterSpinner = styled(LoadingSpinner)`
   margin: 0 auto var(--spacing-2-xl) auto;
+`;
+
+/// Tab causes horizontal overflow without this
+/// we use grids primarily and components inside grid without max-width overflow.
+export const TabWrapper = styled.div`
+  max-width: 95vw;
 `;

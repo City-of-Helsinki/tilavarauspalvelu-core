@@ -5,8 +5,7 @@ import { Tabs, TabList, Tab, TabPanel } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
-import { fontMedium, H1 } from "common/src/common/typography";
-import { breakpoints } from "common/src/common/style";
+import { H1 } from "common/src/common/typography";
 import {
   ReservationStateChoice,
   ReservationOrderingChoices,
@@ -21,31 +20,7 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { toApiDate } from "common/src/common/util";
 import { addDays } from "date-fns";
 import { errorToast } from "common/src/common/toast";
-
-const StyledTabList = styled(TabList)`
-  ul {
-    width: 100% !important;
-    position: relative;
-    border-width: 0 !important;
-  }
-`;
-
-const StyledTab = styled(Tab)`
-  ${fontMedium};
-
-  span {
-    &:before {
-      z-index: 1 !important;
-    }
-
-    min-width: unset;
-    padding: 0 var(--spacing-s) !important;
-
-    @media (min-width: ${breakpoints.s}) {
-      padding: 0 var(--spacing-xl) !important;
-    }
-  }
-`;
+import { TabWrapper } from "common/styles/util";
 
 const StyledTabPanel = styled(TabPanel)`
   display: flex;
@@ -122,21 +97,23 @@ function Reservations(): JSX.Element | null {
 
   return (
     <>
-      <H1>{t(`navigation:Item.reservations`)}</H1>
+      <H1 $marginTop="l" $marginBottom="none">
+        {t(`navigation:Item.reservations`)}
+      </H1>
       {/* HDS tabs doesn't support data-testid */}
-      <div data-testid="Reservations--page__tab_container">
+      <TabWrapper data-testid="Reservations--page__tab_container">
         <Tabs>
-          <StyledTabList>
-            <StyledTab onClick={() => setTab("upcoming")}>
+          <TabList>
+            <Tab onClick={() => setTab("upcoming")}>
               {t("reservations:upcomingReservations")}
-            </StyledTab>
-            <StyledTab onClick={() => setTab("past")}>
+            </Tab>
+            <Tab onClick={() => setTab("past")}>
               {t("reservations:pastReservations")}
-            </StyledTab>
-            <StyledTab onClick={() => setTab("cancelled")}>
+            </Tab>
+            <Tab onClick={() => setTab("cancelled")}>
               {t("reservations:cancelledReservations")}
-            </StyledTab>
-          </StyledTabList>
+            </Tab>
+          </TabList>
           <StyledTabPanel>
             {isLoading ? (
               <CenterSpinner />
@@ -189,7 +166,7 @@ function Reservations(): JSX.Element | null {
             )}
           </StyledTabPanel>
         </Tabs>
-      </div>
+      </TabWrapper>
     </>
   );
 }

@@ -6,6 +6,7 @@ export type ButtonStyleProps = {
   readonly size?: "normal" | "large";
   readonly fontSize?: "small" | "normal";
   readonly disabled?: boolean;
+  readonly width?: "full" | "auto";
 };
 
 export const ButtonCss = css<ButtonStyleProps>`
@@ -38,6 +39,7 @@ export const ButtonCss = css<ButtonStyleProps>`
   justify-content: center;
   box-sizing: border-box;
   min-width: 80px;
+  width: ${({ width }) => (width === "full" ? "100%" : "auto")};
   line-height: 1;
   text-align: center;
   min-height: 44px;

@@ -172,6 +172,7 @@ function ApplicationCard({ application, actionCallback }: Props): JSX.Element {
       disabled={!editable || application.pk == null || isLoading}
       href={editable ? getApplicationPath(application.pk, "page1") : ""}
       key="edit"
+      width="full"
     >
       {t("applicationCard:edit")}
       <IconPen aria-hidden="true" />
@@ -180,6 +181,7 @@ function ApplicationCard({ application, actionCallback }: Props): JSX.Element {
       href={getApplicationPath(application.pk, "view")}
       disabled={application.pk == null}
       key="view"
+      width="full"
     >
       {t("applicationCard:view")}
       <IconArrowRight aria-hidden="true" />

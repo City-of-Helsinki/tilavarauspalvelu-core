@@ -3,7 +3,7 @@ import styled from "styled-components";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { H1, H3 } from "common/src/common/typography";
+import { H1, H2 } from "common/src/common/typography";
 import {
   ApplicationRoundOrderingChoices,
   ApplicationRoundStatusChoice,
@@ -60,15 +60,13 @@ const RoundList = styled.div`
   display: flex;
   flex-flow: column nowrap;
   gap: var(--spacing-m);
-  margin-bottom: var(--spacing-layout-l);
+  margin-bottom: var(--spacing-layout-m);
+  :last-child {
+    margin-bottom: 0;
+  }
 `;
 
-const RoundHeading = styled(H3).attrs({ as: "h2" })`
-  margin-top: 0;
-  margin-bottom: var(--spacing-m);
-`;
-
-const RecurringLander = ({ applicationRounds }: Props): JSX.Element => {
+function RecurringLander({ applicationRounds }: Props): JSX.Element {
   const { t } = useTranslation();
 
   const activeApplicationRounds = applicationRounds.filter(
@@ -88,15 +86,15 @@ const RecurringLander = ({ applicationRounds }: Props): JSX.Element => {
   return (
     <>
       <div>
-        <H1>{t("recurringLander:heading")}</H1>
+        <H1 $marginTop="l" $marginBottom="none">
+          {t("recurringLander:heading")}
+        </H1>
         <HeroSubheading>{t("recurringLander:subHeading")}</HeroSubheading>
       </div>
-      <div>
+      <>
         {activeApplicationRounds.length > 0 ? (
           <RoundList data-testid="recurring-lander__application-round-container--active">
-            <RoundHeading>
-              {t("recurringLander:roundHeadings.active")}
-            </RoundHeading>
+            <H2 $noMargin>{t("recurringLander:roundHeadings.active")}</H2>
             {activeApplicationRounds.map((applicationRound) => (
               <ApplicationRoundCard
                 key={applicationRound.pk}
@@ -106,17 +104,13 @@ const RecurringLander = ({ applicationRounds }: Props): JSX.Element => {
           </RoundList>
         ) : (
           <RoundList data-testid="recurring-lander__application-round-container--active-empty">
-            <RoundHeading>
-              {t("recurringLander:roundHeadings.active")}
-            </RoundHeading>
+            <H2 $noMargin>{t("recurringLander:roundHeadings.active")}</H2>
             {t("recurringLander:noRounds")}
           </RoundList>
         )}
         {pendingApplicationRounds.length > 0 && (
           <RoundList data-testid="recurring-lander__application-round-container--pending">
-            <RoundHeading>
-              {t("recurringLander:roundHeadings.pending")}
-            </RoundHeading>
+            <H2 $noMargin>{t("recurringLander:roundHeadings.pending")}</H2>
             {pendingApplicationRounds.map((applicationRound) => (
               <ApplicationRoundCard
                 key={applicationRound.pk}
@@ -127,9 +121,7 @@ const RecurringLander = ({ applicationRounds }: Props): JSX.Element => {
         )}
         {pastApplicationRounds.length > 0 && (
           <RoundList data-testid="recurring-lander__application-round-container--past">
-            <RoundHeading>
-              {t("recurringLander:roundHeadings.past")}
-            </RoundHeading>
+            <H2 $noMargin>{t("recurringLander:roundHeadings.past")}</H2>
             {pastApplicationRounds.map((applicationRound) => (
               <ApplicationRoundCard
                 key={applicationRound.pk}
@@ -138,9 +130,9 @@ const RecurringLander = ({ applicationRounds }: Props): JSX.Element => {
             ))}
           </RoundList>
         )}
-      </div>
+      </>
     </>
   );
-};
+}
 
 export default RecurringLander;

@@ -178,7 +178,9 @@ function ApplicationsPage({
   return (
     <>
       <div>
-        <H1>{t("applications:heading")}</H1>
+        <H1 $marginTop="l" $marginBottom="none">
+          {t("applications:heading")}
+        </H1>
         <HeroSubheading>{t("applications:subHeading")}</HeroSubheading>
       </div>
       <div>

@@ -20,8 +20,7 @@ import { base64encode, filterNonNullable } from "common/src/helpers";
 import { SearchTags } from "@/component/SearchTags";
 import Loader from "@/component/Loader";
 import { useOptions } from "@/hooks";
-import { TabWrapper } from "@/styles/layout";
-import { autoGridCss } from "common/styles/util";
+import { autoGridCss, TabWrapper } from "common/styles/util";
 import { errorToast } from "common/src/common/toast";
 import {
   ALLOCATION_POLL_INTERVAL,

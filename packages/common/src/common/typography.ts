@@ -32,15 +32,26 @@ export const Regular = styled.span`
   ${fontRegular}
 `;
 
-export const H1 = styled.h1<{ $large?: boolean; $noMargin?: boolean }>`
+/// @param $large - If true, use larger font size
+/// @param $noMargin - If true, remove margin: use on pages with breadcrumbs
+/// @param $marginTop - Margin top size: should only be used on pages without breadcrumbs
+/// @param $marginBottom - Margin bottom size: should only be used on pages without breadcrumbs
+export const H1 = styled.h1<{
+  $large?: boolean;
+  $noMargin?: boolean;
+  $marginTop?: "s" | "m" | "l" | "xl";
+  $marginBottom?: "none" | "s" | "m" | "l" | "xl";
+}>`
   font-size: ${({ $large }) =>
     !$large
       ? "var(--fontsize-heading-l)"
       : " var(--fontsize-heading-xl-mobile)"};
   ${fontRegular}
   line-height: var(--lineheight-s);
-  margin: ${({ $noMargin }) =>
-    $noMargin ? "0" : "var(--spacing-s) 0 var(--spacing-m)"};
+  margin: ${({ $noMargin, $marginTop, $marginBottom }) =>
+    $noMargin
+      ? "0"
+      : `var(--spacing-${$marginTop ?? "s"}) 0 var(--spacing-${$marginBottom ?? "m"})`};
   word-break: break-word;
 
   @media (min-width: ${breakpoints.s}) {

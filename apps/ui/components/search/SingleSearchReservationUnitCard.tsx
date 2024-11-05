@@ -166,7 +166,7 @@ function ReservationUnitCard({ reservationUnit }: PropsT): JSX.Element {
   }
 
   const buttons = [
-    <ButtonLikeLink href={link} key={link}>
+    <ButtonLikeLink href={link} key={link} width="full">
       {t("common:show")}
       <IconArrowRight aria-hidden="true" />
     </ButtonLikeLink>,
