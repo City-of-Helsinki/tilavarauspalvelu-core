@@ -35,19 +35,6 @@ type HeaderProps = {
 
 const Wrapper = styled.div`
   @media (min-width: ${breakpoints.l}) {
-    [class*="module_headerNavigationMenu__"] {
-      width: 100% !important;
-      max-width: 100% !important;
-      margin: 0 auto;
-    }
-
-    [class*="module_headerActionBar__"],
-    [class*="module_headerNavigationMenu__"] ul {
-      width: 100%;
-      margin: 0 auto;
-      max-width: var(--container-width-xl);
-    }
-
     [class*="module_headerNavigationMenuContainer__"] li {
       a {
         margin: 0;
@@ -131,7 +118,16 @@ const menuItems = [
 ];
 
 function constructName(firstName?: string, lastName?: string) {
-  return firstName || lastName ? `${firstName} ${lastName}` : undefined;
+  if (firstName && lastName) {
+    return `${firstName} ${lastName}`;
+  }
+  if (firstName) {
+    return firstName;
+  }
+  if (lastName) {
+    return lastName;
+  }
+  return undefined;
 }
 
 function checkActive(pathname: string, routes: string[], exact: boolean) {

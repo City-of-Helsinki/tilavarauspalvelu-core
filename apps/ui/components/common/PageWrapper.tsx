@@ -27,13 +27,10 @@ export const Layout = styled.div`
 `;
 
 const Main = styled.main`
-  /* TODO there isn't these global variables defined in customer ui */
-  /*
   max-width: var(--tilavaraus-page-max-width);
   padding: 0 var(--tilavaraus-page-margin);
-*/
-  max-width: var(--container-width-xl);
-  padding: 0 var(--spacing-s);
+  /* TODO move to global styles */
+  box-sizing: border-box;
 
   margin: 0 auto;
   display: flex;

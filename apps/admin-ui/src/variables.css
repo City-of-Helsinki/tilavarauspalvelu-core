@@ -84,7 +84,6 @@
 
   /* layout size, these are the same as HDS uses, but for forward compatibility define them here */
   --tilavaraus-page-max-width: 1440px;
-  --tilavaraus-page-margin: 1.5rem;
 }
 
 /* override HDS variables (components define their own variables) */

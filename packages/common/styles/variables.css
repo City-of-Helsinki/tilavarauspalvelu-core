@@ -5,4 +5,7 @@
   --prose-width: 66ch;
   /* the colour is not a variable in hds, but it's the visited link colour in their component */
   --link-visited-color: #551a8b;
+  --spacing-none: 0;
+
+  --tilavaraus-page-margin: 1.5rem;
 }

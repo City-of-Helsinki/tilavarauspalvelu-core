@@ -26,4 +26,12 @@
   --tilavaraus-stack-order-tooltip: 100;
   --tilavaraus-stack-order-navigation: 100;
   --tilavaraus-stack-order-calendar-gutter: 101;
+
+  --tilavaraus-page-max-width: 1200px;
+}
+
+/* override HDS variables (components define their own variables) */
+* {
+  --header-margin: var(--tilavaraus-page-margin);
+  --header-max-width: var(--tilavaraus-page-max-width);
 }
