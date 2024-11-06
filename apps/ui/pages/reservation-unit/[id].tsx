@@ -103,6 +103,7 @@ import { useReservableTimes } from "@/hooks/useReservableTimes";
 import { errorToast } from "common/src/common/toast";
 import { ReservationTimePicker } from "@/components/reservation/ReservationTimePicker";
 import { ApolloError } from "@apollo/client";
+import { getReservationInProgressPath } from "@/modules/urls";
 import { ReservationPageWrapper } from "@/components/reservations/styles";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
@@ -491,10 +492,7 @@ function ReservationUnit({
         throw new Error("Reservation creation failed");
       }
       if (reservationUnit.pk != null) {
-        // TODO use url builder
-        router.push(
-          `/reservation-unit/${reservationUnit.pk}/reservation/${pk}`
-        );
+        router.push(getReservationInProgressPath(reservationUnit.pk, pk));
       }
     } catch (error: unknown) {
       const msg =

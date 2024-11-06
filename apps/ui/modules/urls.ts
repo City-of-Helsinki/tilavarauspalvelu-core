@@ -79,7 +79,7 @@ export function getReservationInProgressPath(
   if (pk == null || reservationPk == null) {
     return "";
   }
-  return `${reservationsPrefix}/${pk}/reservation/${reservationPk}`;
+  return `${reservationUnitPrefix}/${pk}/reservation/${reservationPk}`;
 }
 
 export function getReservationUnitPath(pk: Maybe<number> | undefined): string {
