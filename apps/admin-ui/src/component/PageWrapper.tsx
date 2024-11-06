@@ -12,7 +12,6 @@ import Loader from "./Loader";
 import { MainLander } from "./MainLander";
 import { ToastContainer } from "common/src/common/toast";
 import { useModal } from "@/context/ModalContext";
-import Modal from "@/component/Modal";
 import { useSession } from "@/hooks/auth";
 import { hasAnyPermission } from "@/modules/permissionHelper";
 import { mainStyles } from "common/styles/layout";
@@ -43,11 +42,6 @@ export default function PageWrapper({
   const { user } = useSession();
   const hasAccess = hasAnyPermission(user);
   const { modalContent } = useModal();
-  const modal = modalContent.isHds ? (
-    modalContent.content
-  ) : (
-    <Modal>{modalContent.content}</Modal>
-  );
   return (
     <ErrorBoundary FallbackComponent={(e) => FallbackComponent(e, feedbackUrl)}>
       <ClientOnly>
@@ -64,7 +58,7 @@ export default function PageWrapper({
           </Content>
         </Suspense>
         <ScrollToTop />
-        {modalContent.content && modal}
+        {modalContent.content}
       </ClientOnly>
     </ErrorBoundary>
   );

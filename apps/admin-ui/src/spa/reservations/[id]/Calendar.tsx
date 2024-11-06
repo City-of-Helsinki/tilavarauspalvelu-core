@@ -83,8 +83,7 @@ function Calendar({
         reservation={reservation}
         onAccept={handleEditAccept}
         onClose={() => setModalContent(null)}
-      />,
-      true
+      />
     );
   };
 

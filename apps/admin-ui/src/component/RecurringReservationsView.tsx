@@ -85,8 +85,7 @@ export function RecurringReservationsView({
         reservation={res}
         onAccept={handleChangeSuccess}
         onClose={() => setModalContent(null)}
-      />,
-      true
+      />
     );
   };
 
@@ -104,8 +103,7 @@ export function RecurringReservationsView({
           handleCloseRemoveDialog();
         }}
         onClose={handleCloseRemoveDialog}
-      />,
-      true
+      />
     );
   };
 

@@ -41,8 +41,7 @@ const ApprovalButtons = ({
         reservations={[reservation]}
         onReject={handleAccept}
         onClose={handleClose}
-      />,
-      true
+      />
     );
   };
 
@@ -52,8 +51,7 @@ const ApprovalButtons = ({
         reservation={reservation}
         onAccept={handleAccept}
         onClose={handleClose}
-      />,
-      true
+      />
     );
   };
 
@@ -64,8 +62,7 @@ const ApprovalButtons = ({
         reservation={reservation}
         onAccept={handleAccept}
         onClose={handleClose}
-      />,
-      true
+      />
     );
   };
 

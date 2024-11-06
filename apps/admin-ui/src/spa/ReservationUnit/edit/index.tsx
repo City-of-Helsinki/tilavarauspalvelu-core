@@ -1819,8 +1819,7 @@ function ReservationUnitEditor({
           reservationUnit={reservationUnit}
           onAccept={handleAcceptArchive}
           onClose={() => setModalContent(null)}
-        />,
-        true
+        />
       );
     }
   };
@@ -1834,8 +1833,7 @@ function ReservationUnitEditor({
             history(-1);
           }}
           onClose={() => setModalContent(null)}
-        />,
-        true
+        />
       );
     } else {
       history(-1);

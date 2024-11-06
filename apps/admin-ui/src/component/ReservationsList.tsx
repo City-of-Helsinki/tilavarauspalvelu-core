@@ -178,8 +178,7 @@ function AddNewReservationButton({
         onAccept={handleAccept}
         onClose={handleClose}
         reservationToCopy={reservationToCopy}
-      />,
-      true
+      />
     );
   };
 

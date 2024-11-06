@@ -52,8 +52,7 @@ const ApprovalButtonsRecurring = ({
         onReject={handleReject}
         onClose={handleClose}
         title={t("ApprovalButtons.recurring.DenyDialog.title")}
-      />,
-      true
+      />
     );
   };
 
