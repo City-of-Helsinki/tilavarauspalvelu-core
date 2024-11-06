@@ -9,7 +9,7 @@ import {
   type ApplicationSectionViewQueryVariables,
   ApplicationStatusChoice,
 } from "@gql/gql-types";
-import { Container, H2 } from "common";
+import { H2 } from "common";
 import { AllReservations } from "@/components/application/ApprovedReservations";
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
@@ -42,11 +42,11 @@ function ViewAll({ applicationSection }: PropsNarrowed): JSX.Element {
     },
   ];
   return (
-    <Container>
+    <>
       <BreadcrumbWrapper route={route} />
       <H2 as="h1">{heading}</H2>
       <AllReservations applicationSection={applicationSection} />
-    </Container>
+    </>
   );
 }
 

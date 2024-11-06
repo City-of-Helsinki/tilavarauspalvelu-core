@@ -3,7 +3,6 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
-import { Container as CommonContainer } from "common";
 import ClientOnly from "common/src/ClientOnly";
 import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
 import { truncatedText } from "@/styles/util";
@@ -14,6 +13,7 @@ import {
 } from "@/gql/gql-types";
 import { errorToast } from "common/src/common/toast";
 import { getApplicationPath } from "@/modules/urls";
+import { Flex, NoWrap } from "common/styles/util";
 
 type Props = {
   count: number;
@@ -21,58 +21,36 @@ type Props = {
 };
 
 const BackgroundContainer = styled.div`
-  background-color: var(--color-bus);
   position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
-  z-index: 20;
-  min-width: ${breakpoints.xs};
-`;
+  z-index: var(--tilavaraus-stack-order-start-application-bar);
 
-const Container = styled(CommonContainer)`
-  padding: var(--spacing-m) var(--spacing-m);
-`;
-
-const CountWrapper = styled.div`
-  position: relative;
-  width: 20px;
-  height: 18px;
-
-  @media (min-width: ${breakpoints.m}) {
-    width: 100px;
-  }
-`;
-
-const ReservationUnitCount = styled.div`
-  font-size: var(--fontsize-body-m);
-  position: absolute;
-  top: 0;
-  right: 0;
-  white-space: nowrap;
-`;
-
-const InnerContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  gap: var(--spacing-2-xs);
-  align-items: center;
+  background-color: var(--color-bus);
   color: var(--color-white);
-  padding-left: var(--spacing-m);
 
+  padding: var(--spacing-m) var(--spacing-m);
+  box-sizing: border-box;
+`;
+
+const InnerContainer = styled(Flex).attrs({
+  $direction: "row",
+  $align: "center",
+  $wrap: "wrap",
+})`
+  max-width: var(--tilavaraus-page-max-width);
+  width: 100%;
+  margin: 0 auto;
+
+  /* three div layout */
+  & > :last-child {
+    margin-left: auto;
+  }
+
+  gap: var(--spacing-2-xs);
   @media (min-width: ${breakpoints.m}) {
     gap: var(--spacing-l);
-  }
-`;
-
-const Left = styled.div`
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-
-  @media (min-width: ${breakpoints.m}) {
-    gap: var(--spacing-3-xl);
   }
 `;
 
@@ -127,45 +105,40 @@ function StartApplicationBar({
     return null;
   }
 
+  // TODO remove use of JustForDesktop and JustForMobile
   return (
     <BackgroundContainer>
-      <Container>
-        <InnerContainer>
-          <Left>
-            <CountWrapper>
-              <ReservationUnitCount id="reservationUnitCount">
-                <JustForDesktop>
-                  {t("shoppingCart:count", { count })}
-                </JustForDesktop>
-                <JustForMobile>
-                  {t("shoppingCart:countShort", { count })}
-                </JustForMobile>
-              </ReservationUnitCount>
-            </CountWrapper>
-            <DeleteButton
-              onClick={clearSelections}
-              size="small"
-              data-testid="start-application-bar__button--clear-selections"
-            >
-              <JustForDesktop>
-                {t("shoppingCart:deleteSelections")}
-              </JustForDesktop>
-              <JustForMobile>
-                {t("shoppingCart:deleteSelectionsShort")}
-              </JustForMobile>
-            </DeleteButton>
-          </Left>
-          <Button
-            id="startApplicationButton"
-            onClick={onNext}
-            disabled={isSaving}
-            iconRight={<IconArrowRight />}
-          >
-            <JustForDesktop>{t("shoppingCart:next")}</JustForDesktop>
-            <JustForMobile>{t("shoppingCart:nextShort")}</JustForMobile>
-          </Button>
-        </InnerContainer>
-      </Container>
+      <InnerContainer>
+        <div>
+          <NoWrap id="reservationUnitCount">
+            <JustForDesktop>
+              {t("shoppingCart:count", { count })}
+            </JustForDesktop>
+            <JustForMobile>
+              {t("shoppingCart:countShort", { count })}
+            </JustForMobile>
+          </NoWrap>
+        </div>
+        <DeleteButton
+          onClick={clearSelections}
+          size="small"
+          data-testid="start-application-bar__button--clear-selections"
+        >
+          <JustForDesktop>{t("shoppingCart:deleteSelections")}</JustForDesktop>
+          <JustForMobile>
+            {t("shoppingCart:deleteSelectionsShort")}
+          </JustForMobile>
+        </DeleteButton>
+        <Button
+          id="startApplicationButton"
+          onClick={onNext}
+          disabled={isSaving}
+          iconRight={<IconArrowRight />}
+        >
+          <JustForDesktop>{t("shoppingCart:next")}</JustForDesktop>
+          <JustForMobile>{t("shoppingCart:nextShort")}</JustForMobile>
+        </Button>
+      </InnerContainer>
     </BackgroundContainer>
   );
 }

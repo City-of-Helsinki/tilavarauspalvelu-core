@@ -3,8 +3,9 @@ import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
-import { CenteredContainer } from "common/src/layout/Container";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
+
+// TODO this is a copy of 404.tsx, but with 500 instead of 404
 
 /// next doesn't allow getServersideProps in 500.tsx (you have to use app router for that)
 export async function getStaticProps({ locale }: GetServerSidePropsContext) {
@@ -25,10 +26,8 @@ function Page500(): JSX.Element {
 
   return (
     <Wrapper>
-      <CenteredContainer>
-        <h1>500</h1>
-        <p>{t("500.body")}</p>
-      </CenteredContainer>
+      <h1>500</h1>
+      <p>{t("500.body")}</p>
     </Wrapper>
   );
 }
