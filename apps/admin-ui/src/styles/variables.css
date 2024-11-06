@@ -90,6 +90,5 @@
 * {
   --notification-z-index-toast: var(--tilavaraus-admin-stack-notification) !important;
   --header-z-index: var(--tilavaraus-admin-stack-main-menu);
-  --header-margin: var(--tilavaraus-page-margin);
   --header-max-width: var(--tilavaraus-page-max-width);
 }

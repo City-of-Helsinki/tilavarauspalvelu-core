@@ -15,6 +15,7 @@ import { useModal } from "@/context/ModalContext";
 import Modal from "@/component/Modal";
 import { useSession } from "@/hooks/auth";
 import { hasAnyPermission } from "@/modules/permissionHelper";
+import { mainStyles } from "common/styles/layout";
 
 type Props = {
   apiBaseUrl: string;
@@ -23,21 +24,7 @@ type Props = {
 };
 
 const Content = styled.main`
-  max-width: var(--tilavaraus-page-max-width);
-  margin: 0 auto;
-  padding: 0 var(--tilavaraus-page-margin);
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-
-  /* TODO move to global styles */
-  box-sizing: border-box;
-`;
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: row;
-  flex-grow: 1;
+  ${mainStyles}
 `;
 
 const FallbackComponent = (err: unknown, feedbackUrl: string) => {
@@ -65,20 +52,18 @@ export default function PageWrapper({
     <ErrorBoundary FallbackComponent={(e) => FallbackComponent(e, feedbackUrl)}>
       <ClientOnly>
         <Navigation apiBaseUrl={apiBaseUrl} />
-        <Wrapper>
-          <Suspense fallback={<Loader />}>
-            <Content>
-              {hasAccess && (
-                <BannerNotificationsList
-                  target={BannerNotificationTarget.Staff}
-                />
-              )}
-              {user ? children : <MainLander apiBaseUrl={apiBaseUrl} />}
-              <ToastContainer />
-            </Content>
-          </Suspense>
-          <ScrollToTop />
-        </Wrapper>
+        <Suspense fallback={<Loader />}>
+          <Content>
+            {hasAccess && (
+              <BannerNotificationsList
+                target={BannerNotificationTarget.Staff}
+              />
+            )}
+            {user ? children : <MainLander apiBaseUrl={apiBaseUrl} />}
+            <ToastContainer />
+          </Content>
+        </Suspense>
+        <ScrollToTop />
         {modalContent.content && modal}
       </ClientOnly>
     </ErrorBoundary>

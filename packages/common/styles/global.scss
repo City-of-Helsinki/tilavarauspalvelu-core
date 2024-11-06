@@ -1,0 +1,78 @@
+@import "variables";
+
+/* hack to deal with iPhone user agent overriding inherited colours with apple-system-blue */
+input:is([type="button"], [type="submit"], [type="reset"]),
+input[type="file"]::file-selector-button,
+button {
+  color: black;
+}
+
+/****************************************************
+ * Common styles
+ ****************************************************/
+
+p {
+  font-size: var(--fontsize-body-m);
+  line-height: var(--lineheight-l);
+  @media (min-width: 768px) {
+    font-size: var(--fontsize-body-l);
+  }
+  &:last-of-type {
+    margin-bottom: 0;
+  }
+}
+
+strong {
+  font-family: var(--font-bold);
+  font-weight: 700;
+}
+
+/****************************************************
+ * Helsinki Design System overrides
+ ****************************************************/
+
+/* HDS secndary button to use black theming */
+[class*="button_hds-button--secondary"]:not(:disabled) {
+  --font-family: var(--font-medium);
+  --color: var(--color-black);
+  --color-hover: var(--color-black);
+  --color-focus: var(--color-black);
+  --color-hover-focus: var(--color-black);
+  --background-color: var(--color-white);
+  --background-color-hover: var(--color-black-20);
+  --background-color-focus: var(--color-black-20);
+  --background-color-hover-focus: var(--color-black-20);
+  --border-color: var(--color-black);
+  --border-color-hover: var(--border-color);
+  --border-color-focus: var(--border-color);
+  --border-color-hover-focus: var(--border-color);
+
+  font-family: var(--font-family);
+  color: var(--color);
+  border-color: var(--color-black);
+}
+
+/****************************************************
+ * Page layout
+ ****************************************************/
+html,
+body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  margin: 0;
+}
+html {
+  /* only set min-height on html to avoid creating extra scrollbars */
+  min-height: 100vh;
+  font-family: var(--font-regular), sans-serif;
+  line-height: var(--lineheight-l);
+}
+
+#__next {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  flex-grow: 1;
+  box-sizing: border-box;
+}

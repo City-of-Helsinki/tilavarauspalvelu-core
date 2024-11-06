@@ -9,7 +9,7 @@ import { ExternalScripts } from "@/components/ExternalScripts";
 import { DataContextProvider } from "@/context/DataContext";
 import { createApolloClient } from "@/modules/apolloClient";
 import { TrackingWrapper } from "@/modules/tracking";
-import "common/styles/variables.css";
+import "common/styles/global.scss";
 import "../styles/global.scss";
 import { updateSentryConfig } from "@/sentry.client.config";
 import { ToastContainer } from "common/src/common/toast";

@@ -32,6 +32,5 @@
 
 /* override HDS variables (components define their own variables) */
 * {
-  --header-margin: var(--tilavaraus-page-margin);
   --header-max-width: var(--tilavaraus-page-max-width);
 }

@@ -1,69 +1,7 @@
 @import "font";
 @import "variables";
-#root {
-  height: 100%;
-  margin: 0;
-}
 
-/* hack to deal with iPhone user agent overriding inherited colours with apple-system-blue */
-input:is([type="button"], [type="submit"], [type="reset"]),
-input[type="file"]::file-selector-button,
-button {
-  color: black;
-}
-
-body {
-  font-family: "HelsinkiGrotesk", sans-serif;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  margin: 0;
-  min-width: 320px;
-  word-break: break-word;
-  line-height: var(--lineheight-l);
-  min-height: 100vh;
-}
-
-#__next {
-  min-height: 100vh;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  overflow-y: hidden;
-}
-
-// utils
-
-// adjust koros svg similary to footer
-.koros > svg {
-  left: 50%;
-  position: relative;
-  transform: translateX(-50%);
-  width: 8028px;
-}
-
-.koros {
-  overflow-x: hidden;
-}
-
-h1,
-h2 {
-  font-family: var(--font-bold);
-}
-
-// align items for example icon + text vertically
-.align-vertically {
-  display: flex;
-  align-items: center;
-}
-
-.margin-left-s {
-  margin-left: var(--spacing-s);
-}
-
-.margin-top {
-  margin-top: var(--spacing-s);
-}
-
+/* TODO is this correct? if it's it should be in common/styles/global.scss */
 a {
   &:visited {
     color: inherit;
@@ -74,43 +12,13 @@ a {
   text-decoration: none;
 }
 
-p {
-  line-height: var(--lineheight-l);
-}
-
+/* TODO is this correct? if it's it should be in common/styles/global.scss */
 ul {
   padding-left: var(--spacing-m);
 
   li {
     line-height: var(--lineheight-l);
   }
-}
-
-strong {
-  font-family: var(--font-bold);
-  font-weight: 700;
-}
-
-button {
-  color: var(--color-black);
-}
-
-[class*="button_hds-button--secondary"]:not(:disabled) {
-  font-family: var(--font-medium);
-  --color: var(--color-black);
-  color: var(--color);
-  border-color: var(--color-black);
-  --color-hover: var(--color-black);
-  --color-focus: var(--color-black);
-  --color-hover-focus: var(--color-black);
-  --background-color: var(--color-white);
-  --background-color-hover: var(--color-black-20);
-  --background-color-focus: var(--color-black-20);
-  --background-color-hover-focus: var(--color-black-20);
-  --border-color: var(--color-black);
-  --border-color-hover: var(--border-color);
-  --border-color-focus: var(--border-color);
-  --border-color-hover-focus: var(--border-color);
 }
 
 // cookiehub overrides

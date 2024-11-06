@@ -1,5 +1,6 @@
 import { LoadingSpinner } from "hds-react";
 import styled, { css } from "styled-components";
+import { breakpoints } from "../src";
 
 // TODO rename this file after moving common styled components here
 
@@ -93,5 +94,11 @@ export const CenterSpinner = styled(LoadingSpinner)`
 /// Tab causes horizontal overflow without this
 /// we use grids primarily and components inside grid without max-width overflow.
 export const TabWrapper = styled.div`
-  max-width: calc(100vw - 2 * var(--tilavaraus-page-margin));
+  max-width: calc(100vw - 2 * var(--spacing-xs));
+  @media (min-width: ${breakpoints.s}) {
+    max-width: calc(100vw - 2 * var(--spacing-s));
+  }
+  @media (min-width: ${breakpoints.m}) {
+    max-width: calc(100vw - 2 * var(--spacing-m));
+  }
 `;

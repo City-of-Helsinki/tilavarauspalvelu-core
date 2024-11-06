@@ -1,8 +1,9 @@
 import React, { useEffect } from "react";
 import type { AppProps } from "next/app";
+// why?
 import "hds-core/lib/base.css";
-import "common/styles/variables.css";
-import "../index.scss";
+import "common/styles/global.scss";
+import "../styles/global.scss";
 import { ApolloProvider } from "@apollo/client";
 import { createClient } from "@/common/apolloClient";
 import { updateSentryConfig } from "../../sentry.client.config";

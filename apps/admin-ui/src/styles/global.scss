@@ -1,0 +1,10 @@
+@import "font";
+@import "variables";
+
+a {
+  text-underline-offset: 2px;
+}
+
+section[aria-label="Tooltip"] {
+  white-space: pre-line;
+}
