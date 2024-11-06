@@ -80,23 +80,6 @@ const StyledForm = styled.form`
     grid-column: span 1;
     grid-row: 2 / -1;
   }
-
-  /* TODO what is the purpose of this and why it's done only here? */
-  label {
-    ${fontMedium};
-
-    span {
-      line-height: unset;
-      transform: unset;
-      margin-left: 0;
-      display: inline;
-      font-size: unset;
-    }
-  }
-
-  input[type="radio"] + label {
-    ${fontRegular};
-  }
 `;
 
 const TitleSection = styled(Flex)`

@@ -88,7 +88,6 @@ import {
   PendingReservationFormSchema,
   type PendingReservationFormType,
 } from "@/components/reservation-unit/schema";
-import { MediumButton } from "@/styles/util";
 import LoginFragment from "@/components/LoginFragment";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { useReservableTimes } from "@/hooks/useReservableTimes";
@@ -96,7 +95,7 @@ import { errorToast } from "common/src/common/toast";
 import { ReservationTimePicker } from "@/components/reservation/ReservationTimePicker";
 import { ApolloError } from "@apollo/client";
 import { ReservationUnitPageWrapper } from "@/components/reservations/styles";
-import { Notification } from "hds-react";
+import { Button, Notification } from "hds-react";
 import {
   getReservationInProgressPath,
   getSingleSearchPath,
@@ -247,19 +246,8 @@ const StyledApplicationRoundScheduleDay = styled.div`
   }
 `;
 
-// TODO remove MediumButton and use the Button component
-const SubmitButton = styled(MediumButton)`
+const SubmitButton = styled(Button)`
   white-space: nowrap;
-
-  > span {
-    margin: 0 !important;
-    padding-right: var(--spacing-3-xs);
-    padding-left: var(--spacing-3-xs);
-  }
-
-  @media (min-width: ${breakpoints.m}) {
-    order: unset;
-  }
 `;
 
 // Returns an element for a weekday in the application round timetable, with up to two timespans

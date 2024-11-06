@@ -3,13 +3,12 @@
  *  This component needs to be wrapped inside a Form context
  */
 import type { OptionType } from "common/types/common";
-import { Notification, IconArrowLeft, IconArrowRight } from "hds-react";
+import { Notification, IconArrowLeft, IconArrowRight, Button } from "hds-react";
 import { useFormContext, UseFormReturn } from "react-hook-form";
 import React, { useState } from "react";
 import { Trans, useTranslation } from "next-i18next";
 import styled from "styled-components";
 import MetaFields from "common/src/reservation-form/MetaFields";
-import { MediumButton } from "@/styles/util";
 import { ActionContainer } from "./styles";
 import InfoDialog from "../common/InfoDialog";
 import {
@@ -112,7 +111,7 @@ export function Step0({
         generalFields={generalFields}
       />
       <ActionContainer>
-        <MediumButton
+        <Button
           variant="primary"
           type="submit"
           disabled={submitDisabled}
@@ -122,8 +121,8 @@ export function Step0({
           loadingText={t("reservationCalendar:nextStepLoading")}
         >
           {t("reservationCalendar:nextStep")}
-        </MediumButton>
-        <MediumButton
+        </Button>
+        <Button
           variant="secondary"
           type="button"
           iconLeft={<IconArrowLeft aria-hidden />}
@@ -131,7 +130,7 @@ export function Step0({
           data-testid="reservation__button--cancel"
         >
           {t("common:cancel")}
-        </MediumButton>
+        </Button>
       </ActionContainer>
     </>
   );

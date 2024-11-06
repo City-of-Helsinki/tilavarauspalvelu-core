@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
-import { IconArrowLeft, IconArrowRight } from "hds-react";
+import { Button, IconArrowLeft, IconArrowRight } from "hds-react";
 import {
   type ReservationQuery,
   type ReservationUnitPageFieldsFragment,
 } from "@gql/gql-types";
 import { ActionContainer } from "./styles";
-import { MediumButton } from "@/styles/util";
 import { useFormContext } from "react-hook-form";
 import {
   ApplicationFields,
@@ -77,7 +76,7 @@ export function Step1({
         setIsTermsAccepted={handleTermsAcceptedChange}
       />
       <ActionContainer>
-        <MediumButton
+        <Button
           variant="primary"
           type="submit"
           iconRight={
@@ -89,15 +88,15 @@ export function Step1({
           disabled={!areTermsAccepted}
         >
           {submitText}
-        </MediumButton>
-        <MediumButton
+        </Button>
+        <Button
           variant="secondary"
           iconLeft={<IconArrowLeft aria-hidden />}
           onClick={() => setStep(0)}
           data-test="reservation__button--cancel"
         >
           {t("common:prev")}
-        </MediumButton>
+        </Button>
       </ActionContainer>
     </>
   );
