@@ -242,7 +242,7 @@ class Query(graphene.ObjectType):
         return HelsinkiProfileDataNode.get_data(info, application_id=application_id, reservation_id=reservation_id)
 
     def resolve_order(root: None, info: GQLInfo, *, order_uuid: str, **kwargs: Any):
-        queryset = optimize(PaymentOrder.objects.filter(remote_id=order_uuid), info)
+        queryset = optimize(PaymentOrder.objects.filter(remote_id=order_uuid, reservation__isnull=False), info)
         order = next(iter(queryset), None)  # Avoids adding additional ordering.
         if order is None:
             msg = f"PaymentOrder-object with orderUuid='{order_uuid}' does not exist."

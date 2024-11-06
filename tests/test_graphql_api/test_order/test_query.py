@@ -2,6 +2,7 @@ import freezegun
 import pytest
 
 from tilavarauspalvelu.enums import OrderStatus
+from tilavarauspalvelu.models import PaymentOrder
 
 from .helpers import get_order, order_query
 
@@ -100,3 +101,18 @@ def test_order__query__expires_in_minutes_keeps_updating_based_on_current_time(g
 
     assert response_4.has_errors is False
     assert response_4.first_query_object["expiresInMinutes"] is None
+
+
+@freezegun.freeze_time("2021-01-01T12:00:00Z")
+def test_order__query__reservation_is_deleted__nothing_returned(graphql):
+    """Order's reservation is deleted, so order can't be found even by superuser."""
+    order = get_order()
+    order.reservation.delete()
+
+    graphql.login_with_superuser()
+    query = order_query(order_uuid=order.remote_id)
+    response = graphql(query)
+
+    assert response.has_errors is True
+    assert response.error_message() == f"PaymentOrder-object with orderUuid='{order.remote_id}' does not exist."
+    assert PaymentOrder.objects.filter(remote_id=order.remote_id).exists() is True  # Order still exists in DB
