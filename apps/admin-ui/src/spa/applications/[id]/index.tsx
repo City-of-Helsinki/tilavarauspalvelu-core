@@ -10,6 +10,7 @@ import {
   IconCross,
   IconArrowRedo,
   Tag,
+  Accordion as HDSAccordion,
 } from "hds-react";
 import { isEqual, trim } from "lodash";
 import { type ApolloQueryResult } from "@apollo/client";
@@ -41,7 +42,6 @@ import { WEEKDAYS } from "common/src/const";
 import { formatNumber, formatDate, formatAgeGroups } from "@/common/util";
 import ScrollIntoView from "@/common/ScrollIntoView";
 import { Accordion } from "@/component/Accordion";
-import { Accordion as HDSAccordion } from "@/common/hds-fork/Accordion";
 import Loader from "@/component/Loader";
 import { ApplicationWorkingMemo } from "@/component/WorkingMemo";
 import ShowWhenTargetInvisible from "@/component/ShowWhenTargetInvisible";
@@ -979,6 +979,7 @@ function ApplicationDetails({
         <HDSAccordion
           heading={t("RequestedReservation.workingMemo")}
           initiallyOpen={application.workingMemo.length > 0}
+          closeButton={false}
         >
           <ApplicationWorkingMemo
             applicationPk={applicationPk}

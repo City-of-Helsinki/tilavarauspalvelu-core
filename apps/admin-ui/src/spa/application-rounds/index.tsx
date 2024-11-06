@@ -13,7 +13,6 @@ import {
 import { filterNonNullable } from "common/src/helpers";
 import { getApplicationRoundUrl } from "@/common/urls";
 import { formatDate } from "@/common/util";
-import { Accordion } from "@/common/hds-fork/Accordion";
 import { errorToast } from "common/src/common/toast";
 import { truncate } from "@/helpers";
 import Loader from "@/component/Loader";
@@ -21,6 +20,7 @@ import { ApplicationRoundCard } from "./ApplicationRoundCard";
 import { TableLink } from "@/styles/util";
 import { CustomTable } from "@/component/Table";
 import Error404 from "@/common/Error404";
+import { Accordion } from "hds-react";
 
 const AccordionContainer = styled.div`
   display: flex;
@@ -29,7 +29,9 @@ const AccordionContainer = styled.div`
 `;
 
 // NOTE fix table overflowing the page on mobile
-const StyledAccordion = styled(Accordion)`
+const StyledAccordion = styled(Accordion).attrs({
+  closeButton: false,
+})`
   & > div > div {
     display: grid;
   }
@@ -64,7 +66,7 @@ function RoundsAccordion({
   }
 
   return (
-    <Accordion heading={name} initiallyOpen={initiallyOpen}>
+    <Accordion heading={name} initiallyOpen={initiallyOpen} closeButton={false}>
       <AccordionContainer>
         {!rounds || rounds.length === 0
           ? emptyContent || <span>no data {name}</span>

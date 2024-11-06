@@ -20,7 +20,6 @@ import { ButtonContainer } from "common/styles/util";
 import ShowWhenTargetInvisible from "@/component/ShowWhenTargetInvisible";
 import { StickyHeader } from "@/component/StickyHeader";
 import { ReservationWorkingMemo } from "@/component/WorkingMemo";
-import { Accordion } from "@/common/hds-fork/Accordion";
 import { BirthDate } from "@/component/BirthDate";
 import {
   createTagString,
@@ -41,8 +40,13 @@ import { base64encode, isPriceFree } from "common/src/helpers";
 import { fontMedium } from "common";
 import { formatAgeGroup } from "@/common/util";
 import Error404 from "@/common/Error404";
+import { Accordion as AccordionBase } from "hds-react";
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
+
+const Accordion = styled(AccordionBase).attrs({
+  closeButton: false,
+})``;
 
 const ApplicationDatas = styled.div`
   display: grid;
