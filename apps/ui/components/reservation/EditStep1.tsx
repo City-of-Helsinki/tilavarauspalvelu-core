@@ -69,17 +69,17 @@ const Actions = styled.div`
   }
 `;
 
-const BylineSection = styled.div`
-  grid-row: 3;
+const StyledReservationInfoCard = styled(ReservationInfoCard)`
+  grid-row: 2;
   @media (width > ${breakpoints.m}) {
-    grid-row: 1 / -1;
+    grid-row: 1 / span 2;
   }
 `;
 
 const StyledForm = styled.form`
   @media (width > ${breakpoints.m}) {
-    grid-column: 1 / -2;
     grid-row: 2 / -1;
+    grid-column: 1 / span 1;
   }
 `;
 
@@ -133,12 +133,10 @@ export function EditStep1({
   const termsAccepted = isTermsAccepted.space && isTermsAccepted.service;
   return (
     <>
-      <BylineSection>
-        <ReservationInfoCard
-          reservation={modifiedReservation}
-          type="confirmed"
-        />
-      </BylineSection>
+      <StyledReservationInfoCard
+        reservation={modifiedReservation}
+        type="confirmed"
+      />
       <StyledForm
         onSubmit={(e) => {
           e.preventDefault();

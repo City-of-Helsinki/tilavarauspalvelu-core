@@ -23,15 +23,19 @@ type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
   const { t } = useTranslation();
   const { reservation } = props;
-  // TODO should have cancel in the breadcrumb (and slug for the reservation)
   const routes = [
     {
       slug: "/reservations",
       title: t("breadcrumb:reservations"),
     },
     {
-      // NOTE Don't set slug. It hides the mobile breadcrumb
+      slug: getReservationPath(reservation.pk),
       title: t("reservations:reservationName", { id: reservation.pk }),
+    },
+    {
+      // NOTE Don't set slug. It hides the mobile breadcrumb
+      slug: "",
+      title: t("reservations:cancelReservation"),
     },
   ];
 

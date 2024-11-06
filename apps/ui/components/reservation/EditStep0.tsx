@@ -63,6 +63,10 @@ const StyledCalendarWrapper = styled.div`
   }
 `;
 
+const Form = styled.form`
+  grid-column: 1;
+`;
+
 const Actions = styled.div`
   display: flex;
   flex-direction: column;
@@ -76,7 +80,7 @@ const Actions = styled.div`
 
 const StyledReservationInfoCard = styled(ReservationInfoCard)`
   grid-column: 1 / -1;
-  grid-row: 3;
+  grid-row: 2;
   @media (min-width: ${breakpoints.m}) {
     grid-column-start: unset;
     grid-column-end: -1;
@@ -86,7 +90,7 @@ const StyledReservationInfoCard = styled(ReservationInfoCard)`
 
 const StyledQuickReservation = styled(QuickReservation)`
   grid-column: 1 / -1;
-  grid-row: 4;
+  grid-row: 3;
   @media (min-width: ${breakpoints.m}) {
     grid-column-start: unset;
     grid-column-end: -1;
@@ -99,7 +103,7 @@ const PinkBox = styled(PinkBoxBase)`
   grid-row: -1;
   @media (min-width: ${breakpoints.l}) {
     grid-column: span 1 / -1;
-    grid-row: 3;
+    grid-row: 3 / -1;
   }
 `;
 
@@ -247,13 +251,7 @@ export function EditStep0({
           blockingReservations={blockingReservations}
         />
       </StyledCalendarWrapper>
-      <form
-        noValidate
-        onSubmit={handleSubmit(submitReservation)}
-        style={{
-          gridColumn: "1 / span 1",
-        }}
-      >
+      <Form noValidate onSubmit={handleSubmit(submitReservation)}>
         <Actions>
           <ButtonLikeLink
             href={`/reservations/${reservation.pk}`}
@@ -274,7 +272,7 @@ export function EditStep0({
             {t("reservationCalendar:nextStep")}
           </Button>
         </Actions>
-      </form>
+      </Form>
     </>
   );
 }

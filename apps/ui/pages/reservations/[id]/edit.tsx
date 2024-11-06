@@ -42,14 +42,18 @@ import {
 import { NotModifiableReason } from "@/components/reservation/NotModifiableReason";
 import { getReservationPath } from "@/modules/urls";
 import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
-import { H1 } from "common";
+import { breakpoints, H1 } from "common";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 // HDS pushes className into wrong element (sub not the outermost)
 const StepperWrapper = styled.div`
-  grid-column: 1 / -2;
+  grid-column: 1 / -1;
+  grid-row: 1;
+  @media (width > ${breakpoints.m}) {
+    grid-column: 1 / span 1;
+  }
 `;
 
 // copy of ReservationCancellation but some changes to grid layoout
@@ -189,10 +193,8 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
   // TODO does this include non active application rounds?
   const activeApplicationRounds = reservationUnit.applicationRounds;
 
-  // TODO add breadcrumbs (should be similar to reservations/[id].tsx) for consistency
-  // TODO move the breadcrumbs to a wrapper component (we have an early return above)
   return (
-    <>
+    <ReservationPageWrapper $nRows={5}>
       <StepperWrapper>
         <H1>{t(title)}</H1>
         <Stepper
@@ -224,7 +226,7 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
           isSubmitting={isLoading}
         />
       )}
-    </>
+    </ReservationPageWrapper>
   );
 }
 
@@ -232,24 +234,26 @@ function ReservationEditPageWrapper(props: PropsNarrowed): JSX.Element {
   const { t } = useTranslation();
 
   const { reservation } = props;
-  // TODO should have edit in the breadcrumb (and slug for reservation)
   const routes = [
     {
       slug: "/reservations",
       title: t("breadcrumb:reservations"),
     },
     {
-      // NOTE Don't set slug. It hides the mobile breadcrumb
+      slug: getReservationPath(reservation.pk),
       title: t("reservations:reservationName", { id: reservation.pk }),
+    },
+    {
+      // NOTE Don't set slug. It hides the mobile breadcrumb
+      slug: "",
+      title: t("reservations:modifyReservationTime"),
     },
   ];
 
   return (
     <>
       <BreadcrumbWrapper route={routes} />
-      <ReservationPageWrapper>
-        <ReservationEditPage {...props} />
-      </ReservationPageWrapper>
+      <ReservationEditPage {...props} />
     </>
   );
 }
