@@ -29,6 +29,14 @@ const nextConfig = {
   },
   i18n,
   basePath: env.NEXT_PUBLIC_BASE_URL,
+  async rewrites() {
+    return [
+      {
+        source: "/reservation/confirmation/:id",
+        destination: "/reservations/:id/confirmation",
+      },
+    ];
+  },
   compiler: {
     styledComponents: {
       ssr: true,
