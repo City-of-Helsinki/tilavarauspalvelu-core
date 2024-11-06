@@ -9,30 +9,15 @@ export const seasonalPrefix = "/recurring";
 export const applicationsPath = `${applicationsPrefix}/`;
 export const reservationsPath = `${reservationsPrefix}/`;
 
+type ApplicationRoundPages = "criteria";
 export function getApplicationRoundPath(
-  id: Maybe<number> | undefined,
-  page?: string | undefined
-): string {
-  if (id == null) {
-    return "";
-  }
-  return `${seasonalPrefix}/${id}/${page ?? ""}`;
-}
-
-export function getSeasonalSearchPath(
   pk: Maybe<number> | undefined,
-  params?: URLSearchParams
+  page?: ApplicationRoundPages | undefined
 ): string {
   if (pk == null) {
     return "";
   }
-  const base = `${seasonalPrefix}/${pk}`;
-
-  if (params && Object.keys(params).length > 0) {
-    return `${base}?${params.toString()}`;
-  }
-
-  return base;
+  return `${seasonalPrefix}/${pk}/${page ?? ""}`;
 }
 
 export function getSingleSearchPath(params?: URLSearchParams): string {
@@ -72,9 +57,10 @@ export function getApplicationSectionPath(
   return `${getApplicationPath(applicationPk, "view")}/${sectionPk}`;
 }
 
+type ReservationPages = "cancel" | "edit" | "confirmation";
 export function getReservationPath(
   pk: Maybe<number> | undefined,
-  page?: string | undefined
+  page?: ReservationPages | undefined
 ): string {
   if (pk == null) {
     return "";
