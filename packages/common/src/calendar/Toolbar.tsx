@@ -1,152 +1,88 @@
 import React from "react";
 import { IconAngleLeft, IconAngleRight } from "hds-react";
-import classNames from "classnames";
 import { format, startOfWeek, endOfWeek } from "date-fns";
 import { fi } from "date-fns/locale/fi";
 import styled from "styled-components";
 import type { NavigateAction, View } from "react-big-calendar";
 import { useTranslation } from "next-i18next";
-import { NoWrap } from "../../styles/util";
+import { Flex, NoWrap } from "../../styles/util";
+import { fontMedium } from "../common/typography";
+import { breakpoints } from "../common/style";
 
-export type ToolbarProps = {
-  onNavigate: (n: NavigateAction) => void;
-  onView: (n: View) => void;
-  view: string;
-  date: Date;
-  children?: React.ReactNode;
-};
-
-const Wrapper = styled.div`
-  &:before {
-    content: "";
-    display: block;
-    position: absolute;
-    inset: 0 0 0 -5px;
-    z-index: 21;
+const DateNavigationWrapper = styled(Flex).attrs({
+  $direction: "row",
+  $align: "center",
+})`
+  flex-grow: 1;
+  > span {
+    flex-grow: 1;
   }
 
-  & > * {
-    z-index: 22;
-  }
-  display: flex;
-  position: relative;
-  justify-content: space-between;
-  margin-top: var(--spacing-m);
-  margin-bottom: 0;
-  padding-bottom: var(--spacing-xs);
-
-  .rbc-toolbar-label {
-    &:first-letter {
-      text-transform: capitalize;
-    }
-    font-family: var(--font-medium);
-    font-weight: 500;
-    font-size: var(--fontsize-body-l);
-  }
-
-  .rbc-toolbar-navigation-hz {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    order: 3;
-    width: 100%;
-    height: 50px;
-
-    @media (width > 810px) {
-      order: unset;
-      width: 40%;
-      height: unset;
-    }
-  }
-
-  button {
-    &.rbc-toolbar-button--borderless {
-      border: none;
-      color: var(--color-gray-dark);
-      margin-bottom: 0;
-    }
-
-    &[disabled] {
-      border-color: var(--color-black-30);
-      color: var(--color-black-30);
-    }
-
-    cursor: pointer;
-    border-radius: 0;
-    border: 2px solid var(--color-black);
-    font-family: var(--font-medium) !important;
-    font-weight: 500;
-    color: var(--color-black);
-    font-size: var(--fontsize-body-m);
-    height: 44px;
-    user-select: none;
-    margin-bottom: var(--spacing-xs);
-  }
-
-  .rbc-btn-group {
-    width: 100%;
-
-    button {
-      &.rbc-active {
-        &:first-of-type,
-        &:last-of-type {
-          &:hover {
-            border-color: var(--color-bus);
-          }
-
-          border-color: var(--color-bus);
-        }
-
-        cursor: default;
-        background-color: var(--color-bus);
-        color: var(--color-white);
-        border-color: var(--color-bus);
-      }
-
-      &:first-of-type,
-      &:last-of-type {
-        &:hover {
-          border-color: var(--color-black-30);
-        }
-
-        border-right: 2px solid var(--color-black);
-        border-left: 2px solid var(--color-black);
-      }
-
-      cursor: pointer;
-      border-right: 1px solid var(--color-black);
-      border-left: 1px solid var(--color-black);
-      font-family: var(--font-bold);
-      width: 33.333%;
-    }
-
-    @media (width > 400px) {
-      width: unset;
-
-      button {
-        width: unset;
-      }
-    }
-  }
-`;
-
-const ButtonWrapper = styled.div`
-  display: flex;
-  gap: var(--spacing-s);
+  /* looks better as last on mobile
+   * could also make it first but then it has to be greedy
+   * so the buttons will always break to the next line  */
   order: 2;
-
-  @media (width > 400px) {
+  @media (min-width: ${breakpoints.s}) {
     order: unset;
   }
 `;
 
-export function Toolbar({
-  onNavigate,
-  onView,
-  view,
-  date,
-  children,
-}: ToolbarProps) {
+const Label = styled(NoWrap)`
+  display: inline-flex;
+  justify-content: center;
+  text-transform: capitalize;
+  ${fontMedium}
+  font-size: var(--fontsize-body-l);
+`;
+
+/* TODO rewrite this to use inheritable button styles (or HDS buttons) */
+const Btn = styled.button<{
+  $borderless?: boolean;
+  $active?: boolean;
+}>`
+  /* rbc-toolbar button overrides these */
+  && {
+    border: 2px solid var(--color-black);
+    border-radius: 0;
+    cursor: pointer;
+    user-select: none;
+    ${fontMedium}
+    color: var(--color-black);
+    font-size: var(--fontsize-body-m);
+    height: 44px;
+
+    ${(props) =>
+      props.$borderless &&
+      `
+      border: none;
+      color: var(--color-gray-dark);
+    `}
+
+    ${(props) =>
+      props.$active &&
+      `
+      cursor: default;
+      background-color: var(--color-bus);
+      color: var(--color-white);
+      border-color: var(--color-bus);
+    `}
+
+    &[disabled] {
+      cursor: not-allowed;
+      border-color: var(--color-black-30);
+      color: var(--color-black-30);
+    }
+  }
+`;
+
+type ToolbarProps = {
+  onNavigate: (n: NavigateAction) => void;
+  onView: (n: View) => void;
+  view: string;
+  date: Date;
+};
+
+export function Toolbar({ onNavigate, onView, view, date }: ToolbarProps) {
   const culture = { locale: fi };
   const { t } = useTranslation();
 
@@ -180,22 +116,26 @@ export function Toolbar({
   }
 
   return (
-    <Wrapper className="rbc-toolbar">
-      <ButtonWrapper>
-        <button
+    <Flex
+      $direction="row"
+      $gap="xs"
+      $justify="space-between"
+      $align="center"
+      $wrap="wrap"
+      className="rbc-toolbar"
+    >
+      <div>
+        <Btn
           type="button"
-          onClick={() => {
-            onNavigate("TODAY");
-          }}
-          aria-label={String(t("reservationCalendar:showCurrentDay"))}
+          onClick={() => onNavigate("TODAY")}
+          aria-label={t("reservationCalendar:showCurrentDay")}
         >
           {t("common:today")}
-        </button>
-        {children}
-      </ButtonWrapper>
-      <div className="rbc-toolbar-navigation-hz">
-        <button
-          className="rbc-toolbar-button--borderless"
+        </Btn>
+      </div>
+      <DateNavigationWrapper>
+        <Btn
+          $borderless
           type="button"
           onClick={() => onNavigate("PREV")}
           aria-label={t("reservationCalendar:showPrevious", {
@@ -203,10 +143,10 @@ export function Toolbar({
           })}
         >
           <IconAngleLeft />
-        </button>
-        <NoWrap className="rbc-toolbar-label">{title}</NoWrap>
-        <button
-          className="rbc-toolbar-button--borderless"
+        </Btn>
+        <Label>{title}</Label>
+        <Btn
+          $borderless
           type="button"
           onClick={() => onNavigate("NEXT")}
           aria-label={t("reservationCalendar:showNext", {
@@ -214,13 +154,11 @@ export function Toolbar({
           })}
         >
           <IconAngleRight />
-        </button>
-      </div>
-      <div className="rbc-btn-group">
-        <button
-          className={classNames("", {
-            "rbc-active": view === "day",
-          })}
+        </Btn>
+      </DateNavigationWrapper>
+      <div>
+        <Btn
+          $active={view === "day"}
           type="button"
           onClick={() => onView("day")}
           aria-label={t("reservationCalendar:showView", {
@@ -228,11 +166,9 @@ export function Toolbar({
           })}
         >
           {t("common:day")}
-        </button>
-        <button
-          className={classNames("", {
-            "rbc-active": view === "week",
-          })}
+        </Btn>
+        <Btn
+          $active={view === "week"}
           type="button"
           onClick={() => onView("week")}
           aria-label={t("reservationCalendar:showView", {
@@ -240,8 +176,8 @@ export function Toolbar({
           })}
         >
           {t("common:week")}
-        </button>
+        </Btn>
       </div>
-    </Wrapper>
+    </Flex>
   );
 }
