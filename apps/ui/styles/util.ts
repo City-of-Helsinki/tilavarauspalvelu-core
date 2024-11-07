@@ -12,14 +12,24 @@ export const truncatedText = css`
 export const pixel =
   "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
 
+/// @deprecated
 export const MediumButton = styled(Button)`
   font-size: var(--fontsize-body-m);
   ${fontMedium};
 `;
 
+/// @deprecated
 export const BlackButton = styled(Button)`
   font-size: var(--fontsize-body-m);
   ${fontMedium};
+`;
+
+/// Used for making a reservation, scales the button to max container width
+export const SubmitButton = styled(Button)`
+  white-space: nowrap;
+  && {
+    width: 100%;
+  }
 `;
 
 export const arrowUp = css`

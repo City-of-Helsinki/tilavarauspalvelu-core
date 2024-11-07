@@ -8,7 +8,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { breakpoints } from "common/src/common/style";
-import { fontMedium, fontRegular, H1 } from "common/src/common/typography";
+import { H1 } from "common/src/common/typography";
 import {
   CustomerTypeChoice,
   useConfirmReservationMutation,

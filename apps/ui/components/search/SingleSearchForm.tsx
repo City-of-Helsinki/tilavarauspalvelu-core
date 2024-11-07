@@ -10,7 +10,7 @@ import { TimeRangePicker } from "common/src/components/form";
 import { toUIDate } from "common/src/common/util";
 import { fromUIDate } from "@/modules/util";
 import { getDurationOptions, participantCountOptions } from "@/modules/const";
-import { MediumButton } from "@/styles/util";
+import { SubmitButton } from "@/styles/util";
 import { Checkbox, DateRangePicker } from "@/components/form";
 import { FilterTagList } from "./FilterTagList";
 import SingleLabelInputGroup from "@/components/common/SingleLabelInputGroup";
@@ -24,6 +24,7 @@ import {
   mapSingleBooleanParamToFormValue,
   mapSingleParamToFormValue,
 } from "@/modules/search";
+import { Flex } from "common/styles/util";
 
 const TopContainer = styled.div`
   display: flex;
@@ -119,14 +120,16 @@ const OptionalFilters = styled(ShowAllContainer)`
   }
 `;
 
-const BottomContainer = styled.div`
-  margin: var(--spacing-m) 0;
-  display: flex;
-  width: 100%;
+const BottomContainer = styled(Flex).attrs({
+  $justify: "space-between",
+  $align: "center",
+})`
+  /* TODO have to use this or add gap to the parent
+   * there is an issue with the grid above on desktop (not mobile) having an extra gap
+   */
+  margin-top: var(--spacing-m);
+  /* have to use flex-flow: otherwise on desktop the button will be split to the second line */
   flex-flow: column nowrap;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--spacing-m);
   @media (min-width: ${breakpoints.m}) {
     flex-flow: row nowrap;
   }
@@ -141,11 +144,10 @@ const SingleLabelRangeWrapper = styled(SingleLabelInputGroup)<{
   }
 `;
 
-const SubmitButton = styled(MediumButton)`
-  width: 100%;
+// TODO setting fixed width is bad, but 100% here is too wide
+const StyledSubmitButton = styled(SubmitButton)`
   @media (min-width: ${breakpoints.s}) {
-    width: 120px;
-    white-space: nowrap;
+    max-width: 120px;
   }
 `;
 
@@ -420,14 +422,14 @@ export function SingleSearchForm({
           multiSelectFilters={multiSelectFilters}
           hideList={hideTagList}
         />
-        <SubmitButton
+        <StyledSubmitButton
           id="searchButton"
           type="submit"
           iconLeft={<IconSearch />}
           isLoading={isLoading}
         >
           {t("searchForm:searchButton")}
-        </SubmitButton>
+        </StyledSubmitButton>
       </BottomContainer>
     </form>
   );

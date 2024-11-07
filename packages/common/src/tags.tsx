@@ -7,9 +7,7 @@ export const FilterTags = styled.div`
   flex-wrap: wrap;
   align-items: center;
   gap: var(--spacing-s);
-  margin-right: var(--spacing-m);
   flex-grow: 1;
-  width: calc(100% - 120px);
 `;
 
 export const StyledTag = styled(Tag)`

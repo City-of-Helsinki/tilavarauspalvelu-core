@@ -11,7 +11,7 @@ import { type SubmitHandler, useForm } from "react-hook-form";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { participantCountOptions } from "@/modules/const";
-import { MediumButton } from "@/styles/util";
+import { SubmitButton } from "@/styles/util";
 import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
 import { useSearchModify, useSearchValues } from "@/hooks/useSearchValues";
 import { FilterTagList } from "./FilterTagList";
@@ -120,12 +120,10 @@ const ButtonContainer = styled.div`
   gap: var(--spacing-m);
 `;
 
-const SubmitButton = styled(MediumButton)`
-  width: 100%;
-
+// TODO setting fixed width is bad, but 100% here is too wide
+const StyledSubmitButton = styled(SubmitButton)`
   @media (min-width: ${breakpoints.s}) {
-    width: auto;
-    white-space: nowrap;
+    max-width: 120px;
   }
 `;
 
@@ -258,14 +256,14 @@ export function SeasonalSearchForm({
           />
         </Filters>
         <JustForDesktop customBreakpoint={desktopBreakpoint}>
-          <SubmitButton
+          <StyledSubmitButton
             id="searchButton-desktop"
             type="submit"
             isLoading={isLoading}
             iconLeft={<IconSearch />}
           >
             {t("searchForm:searchButton")}
-          </SubmitButton>
+          </StyledSubmitButton>
         </JustForDesktop>
       </TopContainer>
       <JustForMobile customBreakpoint={desktopBreakpoint}>
@@ -292,14 +290,14 @@ export function SeasonalSearchForm({
           style={{ width: "100%" }}
           customBreakpoint={desktopBreakpoint}
         >
-          <SubmitButton
+          <StyledSubmitButton
             id="searchButton-mobile"
             type="submit"
             isLoading={isLoading}
             iconLeft={<IconSearch />}
           >
             {t("searchForm:searchButton")}
-          </SubmitButton>
+          </StyledSubmitButton>
         </JustForMobile>
       </ButtonContainer>
     </form>

@@ -58,7 +58,7 @@ import {
   isReservationUnitPublished,
   isReservationUnitReservable,
 } from "@/modules/reservationUnit";
-import EquipmentList from "@/components/reservation-unit/EquipmentList";
+import { EquipmentList } from "@/components/reservation-unit/EquipmentList";
 import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
 import {
   type FocusTimeSlot,
@@ -95,13 +95,14 @@ import { errorToast } from "common/src/common/toast";
 import { ReservationTimePicker } from "@/components/reservation/ReservationTimePicker";
 import { ApolloError } from "@apollo/client";
 import { ReservationUnitPageWrapper } from "@/components/reservations/styles";
-import { Button, Notification } from "hds-react";
 import {
   getReservationInProgressPath,
   getSingleSearchPath,
 } from "@/modules/urls";
+import { Notification } from "hds-react";
 import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 import { Flex } from "common/styles/util";
+import { SubmitButton } from "@/styles/util";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -244,10 +245,6 @@ const StyledApplicationRoundScheduleDay = styled.div`
     width: 9ch;
     margin-right: var(--spacing-s);
   }
-`;
-
-const SubmitButton = styled(Button)`
-  white-space: nowrap;
 `;
 
 // Returns an element for a weekday in the application round timetable, with up to two timespans

@@ -32,11 +32,6 @@ const StyledButton = styled(Button).attrs({
   size: "small",
 })`
   white-space: nowrap;
-  font-family: var(--font-medium) !important;
-  font-size: var(--fontsize-body-m) !important;
-  svg {
-    min-width: 24px;
-  }
 
   @media (max-width: ${breakpoints.s}) {
     width: 100%;

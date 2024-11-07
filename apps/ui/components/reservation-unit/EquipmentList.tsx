@@ -13,13 +13,12 @@ type Props = {
 
 const EquipmentContainer = styled(ShowAllContainer)`
   .ShowAllContainer__Content {
-    margin: 0;
     list-style: none;
-    display: grid;
-    grid-template-columns: 1fr;
     gap: var(--spacing-2-xs) var(--spacing-m);
     padding: 0;
 
+    display: grid;
+    grid-template-columns: 1fr;
     @media (min-width: ${breakpoints.s}) {
       grid-template-columns: 1fr 1fr;
       row-gap: var(--spacing-s);
@@ -31,7 +30,10 @@ const EquipmentItem = styled.li`
   font-size: var(--fontsize-body-l);
 `;
 
-function EquipmentList({ equipment, itemsToShow = 6 }: Props): JSX.Element {
+export function EquipmentList({
+  equipment,
+  itemsToShow = 6,
+}: Props): JSX.Element {
   const { t } = useTranslation();
 
   const equipmentList = useMemo(() => {
@@ -52,5 +54,3 @@ function EquipmentList({ equipment, itemsToShow = 6 }: Props): JSX.Element {
     </EquipmentContainer>
   );
 }
-
-export default EquipmentList;

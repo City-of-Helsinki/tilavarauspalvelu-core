@@ -12,7 +12,6 @@ import {
 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import type { ReservationUnitPageQuery } from "@gql/gql-types";
-import { truncatedText } from "@/styles/util";
 import { getReservationUnitPrice } from "@/modules/reservationUnit";
 import {
   capitalize,
@@ -20,7 +19,7 @@ import {
   getSelectedOption,
 } from "@/modules/util";
 import {
-  Controller,
+  useController,
   type Control,
   type FieldValues,
   type SubmitHandler,
@@ -31,6 +30,7 @@ import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { useMedia } from "react-use";
 import { type FocusTimeSlot } from "@/modules/reservation";
 import { ControlledDateInput } from "common/src/components/form";
+import { Flex } from "common/styles/util";
 
 type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
 type CommonProps = {
@@ -50,35 +50,6 @@ type Props =
       mode: "edit";
     });
 
-const Wrapper = styled.div`
-  border-top: 1px solid var(--color-black-50);
-`;
-
-const TogglerTop = styled.div``;
-
-const TogglerBottom = styled.div`
-  display: flex;
-  align-self: flex-end;
-  justify-content: flex-end;
-  min-width: 177px;
-  padding-bottom: var(--spacing-xs);
-
-  button {
-    width: 100%;
-    max-width: 177px;
-  }
-`;
-
-const ToggleControls = styled.div`
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--spacing-m);
-  width: 100%;
-  padding: var(--spacing-3-xs) var(--spacing-3-xs) 0;
-  box-sizing: border-box;
-`;
-
 const ToggleButton = styled.button`
   background: var(--color-white);
   border: 0;
@@ -86,27 +57,30 @@ const ToggleButton = styled.button`
 `;
 
 const TogglerLabel = styled.div`
-  display: flex;
-  flex-direction: column;
   padding: var(--spacing-xs) 0;
 `;
 
 const TogglerDate = styled.div`
-  line-height: var(--lineheight-l);
   ${fontBold}
 `;
 
-const TogglerPrice = styled.div`
-  line-height: var(--lineheight-l);
-`;
-
 const Content = styled.div<{ $isAnimated: boolean }>`
+  /* kinda clean solution to the problem, scales effortlessly
+   * causes no pop-out because the content doesn't fit etc.
+   * TODO: fix some positions so for example submit button is always aligned to the bottom right
+   * TODO: there is empty space on the row of the toggle button
+   * */
   display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
   gap: var(--spacing-xs);
-  align-items: flex-end;
-  padding: 0;
-  grid-template-columns: repeat(2, 1fr);
+  /* buttons and selects are different sizes, dont stretch them */
+  align-items: end;
 
+  /* TODO not fan of the animation, it's jerky and the submit button disappears and reappears
+   * because it's rendered twice (inside and out of the accordion)
+   * cleaner would be to use visibility transition or custom transform-y to bring the new elements
+   * from the top while pushing the submit button down.
+   */
   ${({ $isAnimated }) =>
     $isAnimated &&
     `
@@ -115,7 +89,7 @@ const Content = styled.div<{ $isAnimated: boolean }>`
 
     &.entering,
     &.entered {
-      max-height: 300px;
+      max-height: 600px;
       padding: var(--spacing-s) 0 var(--spacing-m) 0;
     }
 
@@ -125,46 +99,18 @@ const Content = styled.div<{ $isAnimated: boolean }>`
     }
   `}
 
-  button {
-    width: 100% !important;
-  }
-
-  h3 {
-    margin-top: 0;
-  }
-
+  /* necessary but not a fan of doing it like this, make a separate component or use html defaults */
   label {
     ${fontMedium};
-  }
-
-  @media (min-width: ${breakpoints.m}) {
-    grid-template-columns: repeat(4, 24%);
-    gap: var(--spacing-xs);
-    justify-content: space-between;
-    padding-bottom: var(--spacing-s);
-  }
-
-  @media (min-width: ${breakpoints.xl}) {
-    grid-template-columns:
-      154px 140px minmax(max-content, 190px) minmax(90px, 1fr)
-      110px auto;
   }
 `;
 
 const PriceWrapper = styled.div`
-  ${fontMedium};
-  align-self: flex-end;
-  order: 2;
-
-  @media (min-width: ${breakpoints.m}) {
-    order: unset;
-  }
+  display: grid;
+  grid-template-columns: subgrid;
 `;
 
 const Price = styled.div`
-  display: flex;
-  align-items: center;
-  height: 58px;
   ${fontRegular};
   font-size: var(--fontsize-body-l);
   line-height: var(--lineheight-l);
@@ -174,78 +120,9 @@ const ResetButton = styled(Button).attrs({
   variant: "secondary",
   iconLeft: <IconCross aria-hidden />,
 })<{ $isLast?: boolean }>`
-  --color: var(--color-black);
-  white-space: nowrap;
-  order: 1;
-
   && {
-    border: var(--border-width) solid var(--color-black-50) !important;
-    &:hover,
-    &:focus-within {
-      border-color: var(--color-black) !important;
-    }
-  }
-
-  span {
-    ${fontRegular};
-    padding-left: 0;
-  }
-
-  svg {
-    min-width: 24px;
-  }
-
-  @media (min-width: ${breakpoints.m}) {
-    order: unset;
-    grid-column: ${({ $isLast }) => ($isLast ? "4" : "3")} / 4;
-  }
-
-  @media (min-width: ${breakpoints.xl}) {
-    grid-column: unset;
-
-    [class*="Button-module__icon"] {
-      display: none;
-    }
-  }
-`;
-
-const SelectButton = styled(Button)`
-  order: 7;
-  ${truncatedText};
-
-  @media (min-width: ${breakpoints.m}) {
-    display: none;
-    grid-column: 4/4;
-  }
-
-  @media (min-width: ${breakpoints.xl}) {
-    grid-column: unset;
-  }
-`;
-
-const SubmitButtonWrapper = styled.div`
-  order: 3;
-`;
-
-const StyledControlledSelect = styled(ControlledSelect)`
-  & > div:nth-of-type(2) {
-    line-height: var(--lineheight-l);
-  }
-
-  button > span {
-    white-space: nowrap;
-  }
-
-  ul {
-    transform: unset;
-    bottom: 54px;
-    left: -2px;
-    border-top: var(--border-width) solid var(--dropdown-border-color-focus);
-    border-bottom: var(--divider-width) solid var(--menu-divider-color);
-
-    li {
-      white-space: nowrap;
-    }
+    --border-color: var(--color-black-50);
+    --font-family: var(--font-regular);
   }
 `;
 
@@ -266,9 +143,9 @@ function TogglerLabelContent({
   return (
     <>
       <TogglerDate>{togglerLabel}</TogglerDate>
-      <TogglerPrice>
+      <div>
         {t("common:price")}: {price}
-      </TogglerPrice>
+      </div>
     </>
   );
 }
@@ -286,28 +163,14 @@ export function ReservationCalendarControls({
   const { t } = useTranslation();
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
 
-  const { control, watch, handleSubmit, setValue } = reservationForm;
+  const { control, watch, handleSubmit } = reservationForm;
   const formDate = watch("date");
   const formDuration = watch("duration");
   const dateValue = useMemo(() => fromUIDate(formDate ?? ""), [formDate]);
+
   const duration = !Number.isNaN(Number(formDuration))
     ? Number(formDuration)
     : (reservationUnit.minReservationDuration ?? 0);
-
-  const togglerLabel = (() => {
-    if (!focusSlot.isReservable) {
-      return t("reservationCalendar:selectTime");
-    }
-    const dateStr = capitalize(
-      formatDateTimeRange(t, focusSlot.start, focusSlot.end)
-    );
-    const durationStr =
-      duration != null
-        ? getSelectedOption(duration, durationOptions)?.label
-        : "";
-
-    return `${dateStr}, ${durationStr}`;
-  })();
 
   const price =
     dateValue != null && duration != null
@@ -329,120 +192,152 @@ export function ReservationCalendarControls({
   const submitButton = "submitButton" in rest ? rest.submitButton : null;
 
   return (
-    <Wrapper data-testid="reservation-unit__reservation-controls--wrapper">
-      <form noValidate onSubmit={handleSubmit(submitReservation)}>
-        <TogglerTop>
-          <Controller
-            name="isControlsVisible"
-            control={control}
-            render={({ field }) => (
-              <ToggleControls>
-                <TogglerLabel>
-                  {focusSlot.isReservable ? (
-                    <TogglerLabelContent
-                      areControlsVisible={field.value}
-                      togglerLabel={togglerLabel}
-                      t={t}
-                      price={price}
-                    />
-                  ) : (
-                    t("reservationCalendar:selectTime")
-                  )}
-                </TogglerLabel>
-                <ToggleButton
-                  onClick={() => {
-                    field.onChange(!field.value);
-                  }}
-                  data-testid="reservation-unit__reservation-controls--toggle-button"
-                  type="button"
-                >
-                  {field.value ? (
-                    <IconAngleDown aria-label={t("common:showLess")} size="m" />
-                  ) : (
-                    <IconAngleUp aria-label={t("common:showMore")} size="m" />
-                  )}
-                </ToggleButton>
-              </ToggleControls>
-            )}
-          />
-        </TogglerTop>
-        <TogglerBottom>
-          {focusSlot.isReservable && !areControlsVisible && submitButton}
-        </TogglerBottom>
-        <Transition
-          mountOnEnter
-          unmountOnExit
-          timeout={isMobile ? 500 : 0}
-          in={areControlsVisible}
-        >
-          {(state) => (
-            <Content className={state} $isAnimated={isMobile}>
-              <ControlledDateInput
-                name="date"
-                control={control}
-                label={t("reservationCalendar:startDate")}
-                initialMonth={dateValue ?? new Date()}
-                minDate={new Date()}
-                maxDate={
-                  lastOpeningDate?.endDatetime
-                    ? new Date(lastOpeningDate.endDatetime)
-                    : new Date()
-                }
-              />
-              <div data-testid="reservation__input--duration">
-                <StyledControlledSelect
-                  name="duration"
-                  // react-hook-form has issues with typing generic Select
-                  control={control as unknown as Control<FieldValues>}
-                  label={t("reservationCalendar:duration")}
-                  options={durationOptions}
-                />
-              </div>
-              <StyledControlledSelect
-                name="time"
-                label={t("reservationCalendar:startTime")}
+    <form
+      noValidate
+      onSubmit={handleSubmit(submitReservation)}
+      data-testid="reservation-unit__reservation-controls--wrapper"
+    >
+      <ControlledToggler
+        form={reservationForm}
+        focusSlot={focusSlot}
+        price={price}
+        durationOptions={durationOptions}
+      />
+      {/* TODO the submit button part should be refactored so that we hide the other buttons instead of
+       * adding a second submit button */}
+      {focusSlot.isReservable && !areControlsVisible && (
+        <Flex $align="flex-end">{submitButton}</Flex>
+      )}
+      <Transition
+        mountOnEnter
+        unmountOnExit
+        timeout={isMobile ? 500 : 0}
+        in={areControlsVisible}
+      >
+        {(state) => (
+          <Content className={state} $isAnimated={isMobile}>
+            <ControlledDateInput
+              name="date"
+              control={control}
+              label={t("reservationCalendar:startDate")}
+              initialMonth={dateValue ?? new Date()}
+              minDate={new Date()}
+              maxDate={
+                lastOpeningDate?.endDatetime
+                  ? new Date(lastOpeningDate.endDatetime)
+                  : new Date()
+              }
+            />
+            <div data-testid="reservation__input--duration">
+              <ControlledSelect
+                name="duration"
                 // react-hook-form has issues with typing generic Select
                 control={control as unknown as Control<FieldValues>}
-                options={startingTimeOptions}
-                placeholder={t("common:select")}
+                label={t("reservationCalendar:duration")}
+                options={durationOptions}
               />
-              <PriceWrapper>
-                {focusSlot.isReservable && (
-                  <>
-                    <label htmlFor="price">{t("common:price")}</label>
-                    <Price id="price" data-testid="reservation__price--value">
-                      {price}
-                    </Price>
-                  </>
-                )}
-              </PriceWrapper>
-              <ResetButton
-                onClick={() => reservationForm.reset()}
-                disabled={!focusSlot}
+            </div>
+            <ControlledSelect
+              name="time"
+              label={t("reservationCalendar:startTime")}
+              // react-hook-form has issues with typing generic Select
+              control={control as unknown as Control<FieldValues>}
+              options={startingTimeOptions}
+              placeholder={t("common:select")}
+            />
+            <PriceWrapper>
+              {focusSlot.isReservable && (
+                <>
+                  {/* TODO for doesn't work with div either change it to disabled input or remove it */}
+                  <label htmlFor="price">{t("common:price")}</label>
+                  <Price id="price" data-testid="reservation__price--value">
+                    {price}
+                  </Price>
+                </>
+              )}
+            </PriceWrapper>
+            <ResetButton
+              onClick={() => reservationForm.reset()}
+              disabled={!focusSlot}
+            >
+              {t("searchForm:resetForm")}
+            </ResetButton>
+            {mode === "create" && submitButton ? (
+              <Flex
+                style={{
+                  gridColumnEnd: "-1",
+                }}
               >
-                {t("searchForm:resetForm")}
-              </ResetButton>
-              {mode === "edit" ? (
-                <SelectButton
-                  onClick={() => {
-                    setValue("isControlsVisible", !areControlsVisible, {
-                      shouldDirty: true,
-                      shouldValidate: true,
-                      shouldTouch: true,
-                    });
-                  }}
-                  disabled={!focusSlot.isReservable}
-                  data-testid="reservation__button--select-time"
-                >
-                  {t("reservationCalendar:selectTime")}
-                </SelectButton>
-              ) : mode === "create" && submitButton ? (
-                <SubmitButtonWrapper>{submitButton}</SubmitButtonWrapper>
-              ) : null}
-            </Content>
-          )}
-        </Transition>
-      </form>
-    </Wrapper>
+                {submitButton}
+              </Flex>
+            ) : null}
+          </Content>
+        )}
+      </Transition>
+    </form>
+  );
+}
+
+function ControlledToggler({
+  form,
+  focusSlot,
+  price,
+  durationOptions,
+}: {
+  form: UseFormReturn<PendingReservationFormType>;
+  focusSlot: FocusTimeSlot;
+  price: string | null;
+  durationOptions: { label: string; value: number }[];
+}): JSX.Element {
+  const { t } = useTranslation();
+  const { control, watch } = form;
+
+  const duration = watch("duration");
+
+  const togglerLabel = (() => {
+    if (!focusSlot.isReservable) {
+      return t("reservationCalendar:selectTime");
+    }
+    const dateStr = capitalize(
+      formatDateTimeRange(t, focusSlot.start, focusSlot.end)
+    );
+    const durationStr = getSelectedOption(duration, durationOptions)?.label;
+
+    return `${dateStr}, ${durationStr}`;
+  })();
+
+  const {
+    field: { onChange, value },
+  } = useController({
+    name: "isControlsVisible",
+    control,
+  });
+
+  return (
+    <Flex $align="flex-start" $justify="space-between" $direction="row">
+      <TogglerLabel>
+        {focusSlot.isReservable ? (
+          <TogglerLabelContent
+            areControlsVisible={value}
+            togglerLabel={togglerLabel}
+            t={t}
+            price={price}
+          />
+        ) : (
+          t("reservationCalendar:selectTime")
+        )}
+      </TogglerLabel>
+      <ToggleButton
+        onClick={() => onChange(!value)}
+        data-testid="reservation-unit__reservation-controls--toggle-button"
+        type="button"
+      >
+        {value ? (
+          <IconAngleDown aria-label={t("common:showLess")} size="m" />
+        ) : (
+          <IconAngleUp aria-label={t("common:showMore")} size="m" />
+        )}
+      </ToggleButton>
+    </Flex>
   );
 }
