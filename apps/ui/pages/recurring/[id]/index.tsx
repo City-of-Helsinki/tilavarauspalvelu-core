@@ -79,8 +79,10 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   };
 }
 
+// Uses larger font size
+// TODO should move the default 0 margin to the typography file
 const Ingress = styled(HeroSubheading)`
-  margin-bottom: var(--spacing-xs);
+  margin: 0;
 `;
 
 function SeasonalSearch({
@@ -128,41 +130,35 @@ function SeasonalSearch({
           {t("searchResultList:error")}
         </Notification>
       ) : null}
-      <div>
-        <BreadcrumbWrapper route={["/recurring", "search"]} />
-        <div>
-          <H1>{t("search:recurring.heading")}</H1>
-          <Ingress>{t("search:recurring.text")}</Ingress>
-          <SeasonalSearchForm
-            unitOptions={unitOptions}
-            reservationUnitTypeOptions={reservationUnitTypeOptions}
-            purposeOptions={purposeOptions}
-            isLoading={isLoading}
+      <BreadcrumbWrapper route={["/recurring", "search"]} />
+      <H1 $noMargin>{t("search:recurring.heading")}</H1>
+      <Ingress>{t("search:recurring.text")}</Ingress>
+      <SeasonalSearchForm
+        unitOptions={unitOptions}
+        reservationUnitTypeOptions={reservationUnitTypeOptions}
+        purposeOptions={purposeOptions}
+        isLoading={isLoading}
+      />
+      <ListWithPagination
+        items={reservationUnits?.map((ru) => (
+          <ReservationUnitCard
+            selectReservationUnit={selectReservationUnit}
+            containsReservationUnit={containsReservationUnit}
+            removeReservationUnit={removeReservationUnit}
+            reservationUnit={ru}
+            key={ru.pk}
           />
-        </div>
-      </div>
-      <div>
-        <ListWithPagination
-          items={reservationUnits?.map((ru) => (
-            <ReservationUnitCard
-              selectReservationUnit={selectReservationUnit}
-              containsReservationUnit={containsReservationUnit}
-              removeReservationUnit={removeReservationUnit}
-              reservationUnit={ru}
-              key={ru.pk}
-            />
-          ))}
-          isLoading={isLoading}
-          hasMoreData={query.hasMoreData}
-          pageInfo={pageInfo}
-          fetchMore={(cursor) => fetchMore(cursor)}
-          sortingComponent={<SortingComponent />}
-        />
-        <StartApplicationBar
-          count={selectedReservationUnits.length}
-          clearSelections={clearSelections}
-        />
-      </div>
+        ))}
+        isLoading={isLoading}
+        hasMoreData={query.hasMoreData}
+        pageInfo={pageInfo}
+        fetchMore={(cursor) => fetchMore(cursor)}
+        sortingComponent={<SortingComponent />}
+      />
+      <StartApplicationBar
+        count={selectedReservationUnits.length}
+        clearSelections={clearSelections}
+      />
     </>
   );
 }

@@ -5,9 +5,9 @@ import { useSearchModify, useSearchValues } from "@/hooks/useSearchValues";
 import { type TFunction } from "i18next";
 
 type FilterTagProps = {
-  filters: string[];
-  multiSelectFilters: string[];
-  hideList: string[];
+  filters: readonly string[];
+  multiSelectFilters: readonly string[];
+  hideList: readonly string[];
   translateTag: (key: string, value: string) => string | undefined;
 };
 

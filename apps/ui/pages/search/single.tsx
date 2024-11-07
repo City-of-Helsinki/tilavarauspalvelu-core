@@ -23,6 +23,7 @@ import { getSearchOptions, processVariables } from "@/modules/search";
 import { useSearchValues } from "@/hooks/useSearchValues";
 import { useSearchQuery } from "@/hooks/useSearchQuery";
 import { SortingComponent } from "@/components/SortingComponent";
+import { Flex } from "common/styles/util";
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, query } = ctx;
@@ -118,7 +119,7 @@ function SearchSingle({
         equipmentsOptions={equipmentsOptions}
         isLoading={isLoading}
       />
-      <section ref={content}>
+      <Flex as="section" ref={content}>
         <ListWithPagination
           items={filterNonNullable(reservationUnits).map((ru) => (
             <ReservationUnitCard reservationUnit={ru} key={ru.pk} />
@@ -129,7 +130,7 @@ function SearchSingle({
           fetchMore={(cursor) => fetchMore(cursor)}
           sortingComponent={<SortingComponent />}
         />
-      </section>
+      </Flex>
     </>
   );
 }

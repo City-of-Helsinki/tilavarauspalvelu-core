@@ -3,14 +3,11 @@ import { useTranslation } from "next-i18next";
 import { IconSearch, TextInput } from "hds-react";
 import { type SubmitHandler, useForm, Controller } from "react-hook-form";
 import styled from "styled-components";
-import { breakpoints } from "common/src/common/style";
 import { addYears, startOfDay } from "date-fns";
-import { ShowAllContainer } from "common/src/components";
 import { TimeRangePicker } from "common/src/components/form";
 import { toUIDate } from "common/src/common/util";
 import { fromUIDate } from "@/modules/util";
 import { getDurationOptions, participantCountOptions } from "@/modules/const";
-import { SubmitButton } from "@/styles/util";
 import { Checkbox, DateRangePicker } from "@/components/form";
 import { FilterTagList } from "./FilterTagList";
 import SingleLabelInputGroup from "@/components/common/SingleLabelInputGroup";
@@ -24,115 +21,16 @@ import {
   mapSingleBooleanParamToFormValue,
   mapSingleParamToFormValue,
 } from "@/modules/search";
-import { Flex } from "common/styles/util";
-
-const TopContainer = styled.div`
-  display: flex;
-  flex-flow: column nowrap;
-  gap: var(--spacing-m);
-
-  @media (min-width: ${breakpoints.m}) {
-    grid-template-columns: 1fr 154px;
-  }
-`;
-
-const Filters = styled.div`
-  margin-top: 0;
-  max-width: 100%;
-  display: grid;
-  grid-template-columns: auto;
-  grid-template-rows: repeat(2, auto);
-  grid-gap: var(--spacing-m);
-  font-size: var(--fontsize-body-m);
-  > div {
-    grid-column: 1 / span 3;
-  }
-
-  label {
-    font-family: var(--font-medium);
-    font-weight: 500;
-  }
-
-  @media (min-width: ${breakpoints.m}) {
-    margin-top: var(--spacing-s);
-    grid-template-columns: repeat(3, auto);
-    > div {
-      grid-column: span 1;
-    }
-  }
-
-  @media (min-width: ${breakpoints.l}) {
-    grid-template-columns: repeat(3, 1fr);
-  }
-`;
+import {
+  BottomContainer,
+  Filters,
+  OptionalFilters,
+  StyledSubmitButton,
+} from "./styled";
 
 const StyledCheckBox = styled(Checkbox)`
-  &&& {
-    @media (min-width: ${breakpoints.m}) {
-      margin-top: calc(-70px + var(--spacing-layout-2-xs));
-      grid-column: 3 / span 1;
-      grid-row: 4;
-    }
-  }
-`;
-
-const OptionalFilters = styled(ShowAllContainer)`
-  && {
-    grid-column: 1 / span 3;
-  }
-  > [class="ShowAllContainer__Content"] {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--spacing-m);
-    &:empty {
-      row-gap: 0;
-    }
-  }
-  /* If OptionalFilters is closed (== has no children), remove the row-gap and margin-top from the
-  toggle button container. Otherwise the toggle button container will have an unwanted gap above it
-  resulting from the empty grid row in breakpoints larger than mobile/s. */
-  @media (min-width: ${breakpoints.m}) {
-    grid-column: 1 / span 2;
-    grid-row: 3 / span 1;
-    > [class*="ShowAllContainer__ToggleButtonContainer"] {
-      margin-top: var(--spacing-s);
-    }
-    > [class="ShowAllContainer__Content"] {
-      grid-template-columns: repeat(2, 1fr);
-      gap: var(--spacing-m);
-      &:empty {
-        row-gap: 0;
-        ~ [class*="ShowAllContainer__ToggleButtonContainer"] {
-          margin-top: 0;
-        }
-      }
-    }
-
-    > div {
-      grid-column: span 1;
-    }
-  }
-  @media (min-width: ${breakpoints.l}) {
-    > [class*="ShowAllContainer__Content"] {
-      grid-template-columns: repeat(3, 1fr);
-      grid-column: 1 / span 3;
-    }
-  }
-`;
-
-const BottomContainer = styled(Flex).attrs({
-  $justify: "space-between",
-  $align: "center",
-})`
-  /* TODO have to use this or add gap to the parent
-   * there is an issue with the grid above on desktop (not mobile) having an extra gap
-   */
-  margin-top: var(--spacing-m);
-  /* have to use flex-flow: otherwise on desktop the button will be split to the second line */
-  flex-flow: column nowrap;
-  @media (min-width: ${breakpoints.m}) {
-    flex-flow: row nowrap;
-  }
+  margin: 0 !important;
+  grid-column: -2 / span 1;
 `;
 
 const SingleLabelRangeWrapper = styled(SingleLabelInputGroup)<{
@@ -141,13 +39,6 @@ const SingleLabelRangeWrapper = styled(SingleLabelInputGroup)<{
 }>`
   & > div:not(:first-child) {
     margin-top: var(--spacing-s);
-  }
-`;
-
-// TODO setting fixed width is bad, but 100% here is too wide
-const StyledSubmitButton = styled(SubmitButton)`
-  @media (min-width: ${breakpoints.s}) {
-    max-width: 120px;
   }
 `;
 
@@ -285,136 +176,134 @@ export function SingleSearchForm({
 
   return (
     <form noValidate onSubmit={handleSubmit(onSearch)}>
-      <TopContainer>
-        <Filters>
-          <ControlledMultiSelect
-            name="purposes"
-            control={control}
-            options={purposeOptions}
-            label={t("searchForm:purposesFilter")}
+      <Filters>
+        <ControlledMultiSelect
+          name="purposes"
+          control={control}
+          options={purposeOptions}
+          label={t("searchForm:purposesFilter")}
+        />
+        <ControlledMultiSelect
+          name="unit"
+          control={control}
+          options={unitOptions}
+          label={t("searchForm:unitFilter")}
+        />
+        <ControlledMultiSelect
+          name="equipments"
+          control={control}
+          options={equipmentsOptions}
+          label={t("searchForm:equipmentsFilter")}
+        />
+        <SingleLabelRangeWrapper label={t("common:dateLabel")}>
+          <DateRangePicker
+            startDate={fromUIDate(String(getValues("startDate")))}
+            endDate={fromUIDate(String(getValues("endDate")))}
+            onChangeStartDate={(date: Date | null) =>
+              setValue("startDate", date != null ? toUIDate(date) : null)
+            }
+            onChangeEndDate={(date: Date | null) =>
+              setValue("endDate", date != null ? toUIDate(date) : null)
+            }
+            labels={{
+              begin: t("dateSelector:labelStartDate"),
+              end: t("dateSelector:labelEndDate"),
+            }}
+            placeholder={{
+              begin: t("common:beginLabel"),
+              end: t("common:endLabel"),
+            }}
+            limits={{
+              startMinDate: startOfDay(new Date()),
+              startMaxDate: addYears(new Date(), 2),
+              endMinDate: startOfDay(new Date()),
+              endMaxDate: addYears(new Date(), 2),
+            }}
           />
-          <ControlledMultiSelect
-            name="unit"
+        </SingleLabelRangeWrapper>
+        <SingleLabelRangeWrapper label={t("common:timeLabel")}>
+          <TimeRangePicker
             control={control}
-            options={unitOptions}
-            label={t("searchForm:unitFilter")}
+            names={{ begin: "timeBegin", end: "timeEnd" }}
+            labels={{
+              begin: `${t("common:time")}: ${t("common:beginLabel")}`,
+              end: `${t("common:time")}: ${t("common:endLabel")}`,
+            }}
+            placeholders={{
+              begin: t("common:beginLabel"),
+              end: t("common:endLabel"),
+            }}
+            clearable={{ begin: true, end: true }}
           />
-          <ControlledMultiSelect
-            name="equipments"
-            control={control}
-            options={equipmentsOptions}
-            label={t("searchForm:equipmentsFilter")}
-          />
-          <SingleLabelRangeWrapper label={t("common:dateLabel")}>
-            <DateRangePicker
-              startDate={fromUIDate(String(getValues("startDate")))}
-              endDate={fromUIDate(String(getValues("endDate")))}
-              onChangeStartDate={(date: Date | null) =>
-                setValue("startDate", date != null ? toUIDate(date) : null)
-              }
-              onChangeEndDate={(date: Date | null) =>
-                setValue("endDate", date != null ? toUIDate(date) : null)
-              }
-              labels={{
-                begin: t("dateSelector:labelStartDate"),
-                end: t("dateSelector:labelEndDate"),
-              }}
-              placeholder={{
-                begin: t("common:beginLabel"),
-                end: t("common:endLabel"),
-              }}
-              limits={{
-                startMinDate: startOfDay(new Date()),
-                startMaxDate: addYears(new Date(), 2),
-                endMinDate: startOfDay(new Date()),
-                endMaxDate: addYears(new Date(), 2),
-              }}
-            />
-          </SingleLabelRangeWrapper>
-          <SingleLabelRangeWrapper label={t("common:timeLabel")}>
-            <TimeRangePicker
-              control={control}
-              names={{ begin: "timeBegin", end: "timeEnd" }}
-              labels={{
-                begin: `${t("common:time")}: ${t("common:beginLabel")}`,
-                end: `${t("common:time")}: ${t("common:endLabel")}`,
-              }}
-              placeholders={{
-                begin: t("common:beginLabel"),
-                end: t("common:endLabel"),
-              }}
-              clearable={{ begin: true, end: true }}
-            />
-          </SingleLabelRangeWrapper>
-          <ControlledSelect
-            name="duration"
-            control={control}
-            clearable
-            options={durationOptions}
-            label={t("searchForm:durationFilter", { duration: "" })}
-          />
-          <OptionalFilters
-            showAllLabel={t("searchForm:showMoreFilters")}
-            showLessLabel={t("searchForm:showLessFilters")}
-            maximumNumber={0}
-            data-testid="search-form__filters--optional"
-            initiallyOpen={showOptionalFilters}
+        </SingleLabelRangeWrapper>
+        <ControlledSelect
+          name="duration"
+          control={control}
+          clearable
+          options={durationOptions}
+          label={t("searchForm:durationFilter", { duration: "" })}
+        />
+        <OptionalFilters
+          showAllLabel={t("searchForm:showMoreFilters")}
+          showLessLabel={t("searchForm:showLessFilters")}
+          maximumNumber={0}
+          data-testid="search-form__filters--optional"
+          initiallyOpen={showOptionalFilters}
+        >
+          <SingleLabelInputGroup
+            label={t("searchForm:participantCountCombined")}
           >
-            <SingleLabelInputGroup
-              label={t("searchForm:participantCountCombined")}
-            >
-              <ControlledSelect
-                name="minPersons"
-                control={control}
-                options={participantCountOptions}
-                clearable
-                label={`${t("searchForm:participantCountCombined")} ${t("common:minimum")}`}
-                placeholder={t("common:minimum")}
-                className="inputSm inputGroupStart"
-              />
-              <ControlledSelect
-                name="maxPersons"
-                control={control}
-                options={participantCountOptions}
-                clearable
-                label={`${t("searchForm:participantCountCombined")} ${t("common:maximum")}`}
-                placeholder={t("common:maximum")}
-                className="inputSm inputGroupEnd"
-              />
-            </SingleLabelInputGroup>
-            <ControlledMultiSelect
-              name="reservationUnitTypes"
+            <ControlledSelect
+              name="minPersons"
               control={control}
-              options={unitTypeOptions}
-              label={t("searchForm:typeLabel")}
+              options={participantCountOptions}
+              clearable
+              label={`${t("searchForm:participantCountCombined")} ${t("common:minimum")}`}
+              placeholder={t("common:minimum")}
+              className="inputSm inputGroupStart"
             />
-            <TextInput
-              id="search"
-              label={t("searchForm:textSearchLabel")}
-              {...register("textSearch")}
-              placeholder={t("searchForm:searchTermPlaceholder")}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleSubmit(onSearch)();
-                }
-              }}
+            <ControlledSelect
+              name="maxPersons"
+              control={control}
+              options={participantCountOptions}
+              clearable
+              label={`${t("searchForm:participantCountCombined")} ${t("common:maximum")}`}
+              placeholder={t("common:maximum")}
+              className="inputSm inputGroupEnd"
             />
-          </OptionalFilters>
-          <Controller
-            name="showOnlyReservable"
+          </SingleLabelInputGroup>
+          <ControlledMultiSelect
+            name="reservationUnitTypes"
             control={control}
-            render={({ field: { value, onChange } }) => (
-              <StyledCheckBox
-                id="showOnlyReservable"
-                name="showOnlyReservable"
-                label={t("searchForm:showOnlyReservableLabel")}
-                onChange={onChange}
-                checked={value}
-              />
-            )}
+            options={unitTypeOptions}
+            label={t("searchForm:typeLabel")}
           />
-        </Filters>
-      </TopContainer>
+          <TextInput
+            id="search"
+            label={t("searchForm:textSearchLabel")}
+            {...register("textSearch")}
+            placeholder={t("searchForm:searchTermPlaceholder")}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSubmit(onSearch)();
+              }
+            }}
+          />
+        </OptionalFilters>
+        <Controller
+          name="showOnlyReservable"
+          control={control}
+          render={({ field: { value, onChange } }) => (
+            <StyledCheckBox
+              id="showOnlyReservable"
+              name="showOnlyReservable"
+              label={t("searchForm:showOnlyReservableLabel")}
+              onChange={onChange}
+              checked={value}
+            />
+          )}
+        />
+      </Filters>
       <BottomContainer>
         <FilterTagList
           translateTag={translateTag}

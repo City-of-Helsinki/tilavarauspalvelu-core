@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { fontMedium } from "../common/typography";
 import IconButton from "./IconButton";
 
-interface ShowAllContainerProps {
+export interface ShowAllContainerProps {
   // Label-text for the "show all" toggle-button
   showAllLabel: string;
   // Label-text for the "show less" toggle-button (optional, defaults to showAllLabel)

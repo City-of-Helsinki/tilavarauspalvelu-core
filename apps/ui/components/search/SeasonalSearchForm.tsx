@@ -1,131 +1,20 @@
-import React, { ReactNode, useState } from "react";
+import React from "react";
 import { useTranslation } from "next-i18next";
-import {
-  TextInput,
-  IconSearch,
-  Button,
-  IconAngleUp,
-  IconAngleDown,
-} from "hds-react";
+import { TextInput, IconSearch } from "hds-react";
 import { type SubmitHandler, useForm } from "react-hook-form";
-import styled from "styled-components";
-import { breakpoints } from "common/src/common/style";
 import { participantCountOptions } from "@/modules/const";
-import { SubmitButton } from "@/styles/util";
-import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
 import { useSearchModify, useSearchValues } from "@/hooks/useSearchValues";
 import { FilterTagList } from "./FilterTagList";
 import { ParsedUrlQuery } from "node:querystring";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { ControlledMultiSelect } from "./ControlledMultiSelect";
+import { BottomContainer, Filters, StyledSubmitButton } from "./styled";
 import {
   mapQueryParamToNumber,
   mapQueryParamToNumberArray,
   mapSingleParamToFormValue,
 } from "@/modules/search";
-
-const desktopBreakpoint = "840px";
-
-const TopContainer = styled.div`
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--spacing-m);
-  align-items: flex-end;
-
-  @media (min-width: ${desktopBreakpoint}) {
-    grid-template-columns: 1fr 154px;
-  }
-`;
-
-const FilterToggleWrapper = styled.div`
-  display: grid;
-  justify-items: center;
-  margin: var(--spacing-xs) 0;
-`;
-
-const Hr = styled.hr`
-  border-color: var(--color-black-60);
-  border-style: solid;
-`;
-
-const Filters = styled.div<{ $areFiltersVisible: boolean }>`
-  margin-top: 0;
-  max-width: 100%;
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-gap: var(--spacing-m);
-  font-size: var(--fontsize-body-m);
-
-  ${({ $areFiltersVisible }) =>
-    !$areFiltersVisible &&
-    `
-    @media (max-width: ${desktopBreakpoint}) {
-    & > *:nth-child(n + 3) {
-      display: none;
-    }}
-  `}
-
-  label {
-    font-family: var(--font-medium);
-    font-weight: 500;
-  }
-
-  @media (min-width: ${breakpoints.m}) {
-    margin-top: var(--spacing-s);
-    grid-template-columns: 1fr 1fr;
-  }
-
-  @media (min-width: ${breakpoints.l}) {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
-`;
-
-const Group = styled.div<{ children: ReactNode[]; $gap?: string }>`
-  > div:first-of-type {
-    label {
-      width: calc(${({ children }) => children.length} * 100%);
-    }
-  }
-
-  .inputGroupEnd {
-    & > div {
-      border-left-width: 0;
-    }
-    margin-left: 0;
-  }
-
-  .inputGroupStart {
-    & > div {
-      border-right-width: 0;
-    }
-
-    & + .inputGroupEnd > div {
-      border-left-width: 2px;
-    }
-
-    margin-right: 0;
-  }
-
-  display: grid;
-  grid-template-columns: repeat(${({ children }) => children.length}, 1fr);
-  ${({ $gap }) => $gap && `gap: ${$gap};`}
-`;
-
-const ButtonContainer = styled.div`
-  margin: var(--spacing-m) 0;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-m);
-`;
-
-// TODO setting fixed width is bad, but 100% here is too wide
-const StyledSubmitButton = styled(SubmitButton)`
-  @media (min-width: ${breakpoints.s}) {
-    max-width: 120px;
-  }
-`;
+import SingleLabelInputGroup from "../common/SingleLabelInputGroup";
 
 const filterOrder = [
   "applicationRound",
@@ -135,7 +24,7 @@ const filterOrder = [
   "reservationUnitTypes",
   "unit",
   "purposes",
-];
+] as const;
 
 type FormValues = {
   minPersons: number | null;
@@ -174,7 +63,6 @@ export function SeasonalSearchForm({
 }): JSX.Element | null {
   const { t } = useTranslation();
 
-  const [areFiltersVisible, setAreFiltersVisible] = useState(false);
   const { handleSearch } = useSearchModify();
 
   const searchValues = useSearchValues();
@@ -200,106 +88,82 @@ export function SeasonalSearchForm({
     }
   };
 
-  const multiSelectFilters = ["unit", "reservationUnitTypes", "purposes"];
-  const hideList = ["id", "order", "sort", "ref"];
+  const multiSelectFilters = [
+    "unit",
+    "reservationUnitTypes",
+    "purposes",
+  ] as const;
+  const hideList = ["id", "order", "sort", "ref"] as const;
 
   return (
     <form noValidate onSubmit={handleSubmit(search)}>
-      <TopContainer>
-        <Filters $areFiltersVisible={areFiltersVisible}>
-          <TextInput
-            id="search"
-            label={t("searchForm:textSearchLabel")}
-            {...register("textSearch")}
-            placeholder={t("searchForm:searchTermPlaceholder")}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleSubmit(search)();
-              }
-            }}
-          />
-          <Group>
-            <ControlledSelect
-              name="minPersons"
-              control={control}
-              clearable
-              options={participantCountOptions}
-              label={t("searchForm:participantCountCombined")}
-              className="inputSm inputGroupStart"
-            />
-            <ControlledSelect
-              name="maxPersons"
-              control={control}
-              clearable
-              options={participantCountOptions}
-              label="&nbsp;"
-              className="inputSm inputGroupEnd"
-            />
-          </Group>
-          <ControlledMultiSelect
-            name="reservationUnitTypes"
+      <Filters>
+        <TextInput
+          id="search"
+          label={t("searchForm:textSearchLabel")}
+          {...register("textSearch")}
+          placeholder={t("searchForm:searchTermPlaceholder")}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSubmit(search)();
+            }
+          }}
+        />
+        {/* TODO this could be combined as a common search option */}
+        <SingleLabelInputGroup label={t("searchForm:participantCountCombined")}>
+          <ControlledSelect
+            name="minPersons"
             control={control}
-            options={reservationUnitTypeOptions}
-            label={t("searchForm:typeLabel")}
+            clearable
+            options={participantCountOptions}
+            label={`${t("searchForm:participantCountCombined")} ${t("common:minimum")}`}
+            placeholder={t("common:minimum")}
+            className="inputSm inputGroupStart"
           />
-          <ControlledMultiSelect
-            name="unit"
+          <ControlledSelect
+            name="maxPersons"
             control={control}
-            options={unitOptions}
-            label={t("searchForm:unitFilter")}
+            clearable
+            options={participantCountOptions}
+            label={`${t("searchForm:participantCountCombined")} ${t("common:maximum")}`}
+            placeholder={t("common:maximum")}
+            className="inputSm inputGroupEnd"
           />
-          <ControlledMultiSelect
-            name="purposes"
-            control={control}
-            options={purposeOptions}
-            label={t("searchForm:purposesFilter")}
-          />
-        </Filters>
-        <JustForDesktop customBreakpoint={desktopBreakpoint}>
-          <StyledSubmitButton
-            id="searchButton-desktop"
-            type="submit"
-            isLoading={isLoading}
-            iconLeft={<IconSearch />}
-          >
-            {t("searchForm:searchButton")}
-          </StyledSubmitButton>
-        </JustForDesktop>
-      </TopContainer>
-      <JustForMobile customBreakpoint={desktopBreakpoint}>
-        <FilterToggleWrapper>
-          <Button
-            data-testid="search-form__button--toggle-filters"
-            variant="supplementary"
-            onClick={() => setAreFiltersVisible(!areFiltersVisible)}
-            iconLeft={areFiltersVisible ? <IconAngleUp /> : <IconAngleDown />}
-          >
-            {t(`searchForm:show${areFiltersVisible ? "Less" : "More"}Filters`)}
-          </Button>
-        </FilterToggleWrapper>
-        <Hr />
-      </JustForMobile>
-      <ButtonContainer>
+        </SingleLabelInputGroup>
+        <ControlledMultiSelect
+          name="reservationUnitTypes"
+          control={control}
+          options={reservationUnitTypeOptions}
+          label={t("searchForm:typeLabel")}
+        />
+        <ControlledMultiSelect
+          name="unit"
+          control={control}
+          options={unitOptions}
+          label={t("searchForm:unitFilter")}
+        />
+        <ControlledMultiSelect
+          name="purposes"
+          control={control}
+          options={purposeOptions}
+          label={t("searchForm:purposesFilter")}
+        />
+      </Filters>
+      <BottomContainer>
         <FilterTagList
           translateTag={translateTag}
           filters={filterOrder}
           multiSelectFilters={multiSelectFilters}
           hideList={hideList}
         />
-        <JustForMobile
-          style={{ width: "100%" }}
-          customBreakpoint={desktopBreakpoint}
+        <StyledSubmitButton
+          type="submit"
+          isLoading={isLoading}
+          iconLeft={<IconSearch />}
         >
-          <StyledSubmitButton
-            id="searchButton-mobile"
-            type="submit"
-            isLoading={isLoading}
-            iconLeft={<IconSearch />}
-          >
-            {t("searchForm:searchButton")}
-          </StyledSubmitButton>
-        </JustForMobile>
-      </ButtonContainer>
+          {t("searchForm:searchButton")}
+        </StyledSubmitButton>
+      </BottomContainer>
     </form>
   );
 }
