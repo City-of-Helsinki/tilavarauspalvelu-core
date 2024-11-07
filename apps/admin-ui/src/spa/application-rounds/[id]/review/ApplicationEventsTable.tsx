@@ -49,7 +49,7 @@ type ApplicationEventView = {
   applicantName?: string;
   nameFi: string;
   units: UnitType[];
-  status?: ApplicationSectionStatusChoice | undefined;
+  status?: ApplicationSectionStatusChoice;
   applicationCount: string;
 };
 

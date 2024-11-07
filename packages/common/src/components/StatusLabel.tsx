@@ -36,11 +36,11 @@ const ColoredLabel = styled(HDSStatusLabel)<{
   }
 `;
 
-/*
- * StatusLabel component (extends HDS StatusLabel with "draft" type)
+/* @name StatusLabel
+ * @description StatusLabel component (extends HDS StatusLabel with "draft" type)
  * @param {StatusLabelWithDraftType} type - StatusLabel type (neutral, info, alert, success, error, draft)
  * @param {JSX.Element} icon - Icon element
- * @param {slim} - toggle negative block margin, for use in table cells
+ * @param {boolean} slim - Toggle slim mode, for use in tight layouts (e.g. tables) (uses negative block margins)
  * @param {string} dataTestId - Test id
  * @param {React.ReactNode} children - Label text
  * @returns {JSX.Element} - Rendered StatusLabel component
@@ -48,8 +48,8 @@ const ColoredLabel = styled(HDSStatusLabel)<{
 function StatusLabel({
   type,
   icon,
-  testId,
   slim = false,
+  testId,
   children,
   ...rest
 }: Readonly<StatusLabelProps>): JSX.Element {

@@ -27,42 +27,42 @@ const getApplicationRoundStatus = (
       return {
         group: "g1",
         type: "alert",
-        icon: <IconClock />,
+        icon: <IconClock aria-hidden="true" />,
         label: ApplicationRoundStatusChoice.Open,
       };
     case ApplicationRoundStatusChoice.InAllocation:
       return {
         group: "g1",
         type: "info",
-        icon: <IconCogwheel />,
+        icon: <IconCogwheel aria-hidden="true" />,
         label: ApplicationRoundStatusChoice.InAllocation,
       };
     case ApplicationRoundStatusChoice.Handled:
       return {
         group: "g2",
         type: "success",
-        icon: <IconCheck />,
+        icon: <IconCheck aria-hidden="true" />,
         label: ApplicationRoundStatusChoice.Handled,
       };
     case ApplicationRoundStatusChoice.ResultsSent:
       return {
         group: "g2",
         type: "success",
-        icon: <IconEnvelope />,
+        icon: <IconEnvelope aria-hidden="true" />,
         label: ApplicationRoundStatusChoice.Handled,
       };
     case ApplicationRoundStatusChoice.Upcoming:
       return {
         group: "g4",
         type: "draft",
-        icon: <IconArrowTopRight />,
+        icon: <IconArrowTopRight aria-hidden="true" />,
         label: ApplicationRoundStatusChoice.Upcoming,
       };
     default:
       return {
         group: "g5",
         type: "neutral",
-        icon: <IconQuestionCircle />,
+        icon: <IconQuestionCircle aria-hidden="true" />,
         label: status ?? "-",
       };
   }

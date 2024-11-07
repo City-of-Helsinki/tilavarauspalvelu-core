@@ -51,17 +51,20 @@ const getStatusProps = (
 ): { type: StatusLabelType; icon: JSX.Element } => {
   switch (status) {
     case ApplicationStatusChoice.Draft:
-      return { type: "draft", icon: <IconArrowTopRight aria-hidden /> };
+      return { type: "draft", icon: <IconArrowTopRight aria-hidden="true" /> };
     case ApplicationStatusChoice.InAllocation:
-      return { type: "alert", icon: <IconClock aria-hidden /> };
+      return { type: "alert", icon: <IconClock aria-hidden="true" /> };
     case ApplicationStatusChoice.Received:
-      return { type: "info", icon: <IconCogwheel aria-hidden /> };
+      return { type: "info", icon: <IconCogwheel aria-hidden="true" /> };
     case ApplicationStatusChoice.Handled:
-      return { type: "success", icon: <IconCheck aria-hidden /> };
+      return { type: "success", icon: <IconCheck aria-hidden="true" /> };
     case ApplicationStatusChoice.ResultsSent:
-      return { type: "success", icon: <IconEnvelope aria-hidden /> };
+      return { type: "success", icon: <IconEnvelope aria-hidden="true" /> };
     default:
-      return { type: "neutral", icon: <IconQuestionCircle aria-hidden /> };
+      return {
+        type: "neutral",
+        icon: <IconQuestionCircle aria-hidden="true" />,
+      };
   }
 };
 

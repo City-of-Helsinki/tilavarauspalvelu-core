@@ -63,7 +63,10 @@ const getStatusLabelProps = (
     case ReservationStateChoice.RequiresHandling:
       return { type: "info", icon: <IconCogwheel aria-hidden="true" /> };
     default:
-      return { type: "info", icon: <IconQuestionCircleFill aria-hidden /> };
+      return {
+        type: "info",
+        icon: <IconQuestionCircleFill aria-hidden="true" />,
+      };
   }
 };
 

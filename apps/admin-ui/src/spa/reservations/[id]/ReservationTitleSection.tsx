@@ -91,7 +91,23 @@ export const APPLICATION_LINK_QUERY = gql`
   }
 `;
 
-const getLabelProps = (
+const getStatusLabelType = (s?: Maybe<OrderStatus>): StatusLabelType => {
+  switch (s) {
+    case OrderStatus.Paid:
+    case OrderStatus.Refunded:
+      return "success";
+    case OrderStatus.Expired:
+      return "error";
+    case OrderStatus.PaidManually:
+    case OrderStatus.Draft:
+      return "alert";
+    case OrderStatus.Cancelled:
+    default:
+      return "neutral";
+  }
+};
+
+const getReservationStateLabelProps = (
   s?: Maybe<ReservationStateChoice>
 ): { type: StatusLabelType; icon: JSX.Element } => {
   switch (s) {
@@ -134,23 +150,8 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
     const applicationLink = getApplicationUrl(applicationPk, sectionPk);
 
     const order = reservation.paymentOrder[0];
-    const statusLabelType = ((s?: Maybe<OrderStatus>): StatusLabelType => {
-      switch (s) {
-        case OrderStatus.Paid:
-        case OrderStatus.Refunded:
-          return "success";
-        case OrderStatus.Expired:
-          return "error";
-        case OrderStatus.PaidManually:
-        case OrderStatus.Draft:
-          return "alert";
-        case OrderStatus.Cancelled:
-        default:
-          return "neutral";
-      }
-    })(order?.status);
-
-    const stateLabelProps = getLabelProps(reservation?.state);
+    const paymentStatusLabelType = getStatusLabelType(order?.status);
+    const reservationState = getReservationStateLabelProps(reservation.state);
 
     return (
       <div>
@@ -160,7 +161,7 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
             {order?.status != null && (
               <AlignVertically>
                 <StatusLabel
-                  type={statusLabelType}
+                  type={paymentStatusLabelType}
                   data-testid="reservation_title_section__order_status"
                   icon={<IconEuroSign aria-hidden="true" />}
                 >
@@ -169,13 +170,15 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
               </AlignVertically>
             )}
             <AlignVertically style={{ gap: "var(--spacing-xs)" }}>
-              <StatusLabel
-                type={stateLabelProps.type}
-                icon={stateLabelProps.icon}
-                testId="reservation_title_section__state"
-              >
-                {t(`RequestedReservation.state.${reservation.state}`)}
-              </StatusLabel>
+              {reservation.state && (
+                <StatusLabel
+                  type={reservationState.type}
+                  icon={reservationState.icon}
+                  data-testid="reservation_title_section__reservation_state"
+                >
+                  {t(`Reservation.state.${reservation.state}`)}
+                </StatusLabel>
+              )}
             </AlignVertically>
           </HorisontalFlex>
         </NameState>

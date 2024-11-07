@@ -60,15 +60,18 @@ const getPublishingStateProps = (
     case ReservationUnitPublishingState.ScheduledHiding:
     case ReservationUnitPublishingState.ScheduledPeriod:
     case ReservationUnitPublishingState.ScheduledPublishing:
-      return { type: "info", icon: <IconClock ariaHidden /> };
+      return { type: "info", icon: <IconClock aria-hidden="true" /> };
     case ReservationUnitPublishingState.Published:
-      return { type: "success", icon: <IconCheck ariaHidden /> };
+      return { type: "success", icon: <IconCheck aria-hidden="true" /> };
     case ReservationUnitPublishingState.Draft:
-      return { type: "draft", icon: <IconPen ariaHidden /> };
+      return { type: "draft", icon: <IconPen aria-hidden="true" /> };
     case ReservationUnitPublishingState.Hidden:
-      return { type: "neutral", icon: <IconEyeCrossed ariaHidden /> };
+      return { type: "neutral", icon: <IconEyeCrossed aria-hidden="true" /> };
     default:
-      return { type: "neutral", icon: <IconQuestionCircleFill ariaHidden /> };
+      return {
+        type: "neutral",
+        icon: <IconQuestionCircleFill aria-hidden="true" />,
+      };
   }
 };
 
