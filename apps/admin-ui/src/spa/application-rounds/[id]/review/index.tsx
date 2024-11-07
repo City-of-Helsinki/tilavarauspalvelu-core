@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Link, useSearchParams } from "react-router-dom";
 import { type Maybe } from "graphql/jsutils/Maybe";
-import { H2 } from "common/src/common/typography";
+import { H1 } from "common/src/common/typography";
 import { filterNonNullable } from "common/src/helpers";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import {
@@ -35,19 +35,7 @@ import RejectedOccurrencesDataLoader from "./RejectedOccurrencesDataLoader";
 import { errorToast } from "common/src/common/toast";
 import { hasPermission } from "@/modules/permissionHelper";
 import { useSession } from "@/hooks/auth";
-import { TabWrapper } from "common/styles/util";
-
-const HeadingContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const LinkContainer = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  gap: var(--spacing-m);
-`;
+import { Flex, TabWrapper } from "common/styles/util";
 
 const AllocationButtonsContainer = styled.div`
   display: flex;
@@ -305,20 +293,18 @@ export function Review({
 
   return (
     <>
-      <>
-        <HeadingContainer>
-          <H2 as="h1" style={{ marginBottom: 0 }}>
-            {applicationRound.nameFi}
-          </H2>
+      <div style={{ marginTop: "var(--spacing-s)" }}>
+        <Flex $align="center" $justify="space-between" $direction="row">
+          <H1 $noMargin>{applicationRound.nameFi}</H1>
           <ApplicationRoundStatusLabel status={applicationRound.status} />
-        </HeadingContainer>
-        <LinkContainer>
+        </Flex>
+        <Flex $justify="flex-start" $direction="row">
           <TimeframeStatus
             applicationPeriodBegin={applicationRound.applicationPeriodBegin}
             applicationPeriodEnd={applicationRound.applicationPeriodEnd}
           />
           <Link to="criteria">{t("ApplicationRound.roundCriteria")}</Link>
-        </LinkContainer>
+        </Flex>
         {/* NOTE this check blocks users that don't have permissions to end the allocation
          * so for them it's always showing the allocation tool
          */}
@@ -345,7 +331,7 @@ export function Review({
             </AllocationButtonContainer>
           )}
         </AllocationButtonsContainer>
-      </>
+      </div>
       <TabWrapper>
         <Tabs initiallyActiveTab={activeTabIndex}>
           <Tabs.TabList>

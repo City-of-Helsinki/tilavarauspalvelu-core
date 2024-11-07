@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { AutoGrid, FullRow } from "common/styles/util";
+import { AutoGrid } from "common/styles/util";
 import { SearchTags } from "@/component/SearchTags";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import {
@@ -103,34 +103,35 @@ export function Filters({
   }));
 
   return (
-    <AutoGrid>
-      <MultiSelectFilter name="unit" options={unitOptions} />
-      {statusOption !== "application" ? (
-        eventStatusOptions.length > 0 ? (
-          <MultiSelectFilter name="eventStatus" options={eventStatusOptions} />
-        ) : null
-      ) : (
-        <MultiSelectFilter name="status" options={statusOptions} />
-      )}
-      {enableApplicant && (
-        <MultiSelectFilter name="applicant" options={applicantOptions} />
-      )}
-      {enableWeekday && (
-        <MultiSelectFilter name="weekday" options={weekdayOptions} />
-      )}
-      {enableReservationUnit && (
-        <MultiSelectFilter
-          name="reservationUnit"
-          options={reservationUnitOptions}
-        />
-      )}
-      <SearchFilter name="search" />
-      <FullRow>
-        <SearchTags hide={hideSearchTags} translateTag={translateTag} />
-      </FullRow>
-      <FullRow>
-        <HR />
-      </FullRow>
-    </AutoGrid>
+    <>
+      <AutoGrid>
+        <MultiSelectFilter name="unit" options={unitOptions} />
+        {statusOption !== "application" ? (
+          eventStatusOptions.length > 0 ? (
+            <MultiSelectFilter
+              name="eventStatus"
+              options={eventStatusOptions}
+            />
+          ) : null
+        ) : (
+          <MultiSelectFilter name="status" options={statusOptions} />
+        )}
+        {enableApplicant && (
+          <MultiSelectFilter name="applicant" options={applicantOptions} />
+        )}
+        {enableWeekday && (
+          <MultiSelectFilter name="weekday" options={weekdayOptions} />
+        )}
+        {enableReservationUnit && (
+          <MultiSelectFilter
+            name="reservationUnit"
+            options={reservationUnitOptions}
+          />
+        )}
+        <SearchFilter name="search" />
+      </AutoGrid>
+      <SearchTags hide={hideSearchTags} translateTag={translateTag} />
+      <HR />
+    </>
   );
 }
