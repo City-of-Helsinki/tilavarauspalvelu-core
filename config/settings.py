@@ -645,6 +645,19 @@ class Local(Common, overrides_from=LocalMixin):
 
     HAUKI_API_KEY = values.StringValue(default=None)
 
+    # --- Verkkokauppa settings --------------------------------------------------------------------------------------
+
+    VERKKOKAUPPA_PRODUCT_API_URL = values.StringValue(default="")
+    VERKKOKAUPPA_ORDER_API_URL = values.StringValue(default="")
+    VERKKOKAUPPA_PAYMENT_API_URL = values.StringValue(default="")
+    VERKKOKAUPPA_MERCHANT_API_URL = values.StringValue(default="")
+    VERKKOKAUPPA_NAMESPACE = values.StringValue(default="tilanvaraus_dev")
+    VERKKOKAUPPA_API_KEY = values.StringValue(default="")
+
+    MOCK_VERKKOKAUPPA_API_ENABLED = values.BooleanValue(default=True)
+    MOCK_VERKKOKAUPPA_FRONTEND_URL = values.StringValue(default="http://localhost:3000")
+    MOCK_VERKKOKAUPPA_BACKEND_URL = values.StringValue(default="http://localhost:8000")
+
     # --- Graphene settings ------------------------------------------------------------------------------------------
 
     GRAPHENE = {
@@ -690,6 +703,20 @@ class Local(Common, overrides_from=LocalMixin):
 
     EMAIL_VARAAMO_EXT_LINK = "https://fake.local.varaamo.hel.fi"
     EMAIL_FEEDBACK_EXT_LINK = "https://fake.local.varaamo.hel.fi/feedback"
+
+    @classmethod
+    def post_setup(cls) -> None:
+        # Validate Verkkokauppa settings
+        if cls.MOCK_VERKKOKAUPPA_API_ENABLED:
+            assert cls.MOCK_VERKKOKAUPPA_FRONTEND_URL, "Mock Verkkokauppa frontend URL is required"
+            assert cls.MOCK_VERKKOKAUPPA_BACKEND_URL, "Mock Verkkokauppa backend URL is required"
+        else:
+            assert cls.VERKKOKAUPPA_PRODUCT_API_URL, "Verkkokauppa product API URL is required"
+            assert cls.VERKKOKAUPPA_ORDER_API_URL, "Verkkokauppa order API URL is required"
+            assert cls.VERKKOKAUPPA_PAYMENT_API_URL, "Verkkokauppa payment API URL is required"
+            assert cls.VERKKOKAUPPA_MERCHANT_API_URL, "Verkkokauppa merchant API URL is required"
+            assert cls.VERKKOKAUPPA_NAMESPACE, "Verkkokauppa namespace is required"
+            assert cls.VERKKOKAUPPA_API_KEY, "Verkkokauppa API key is required"
 
 
 class Docker(Common, overrides_from=DockerMixin):
