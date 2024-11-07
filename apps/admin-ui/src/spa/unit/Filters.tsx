@@ -1,5 +1,5 @@
 import React from "react";
-import { AutoGrid, FullRow } from "common/styles/util";
+import { AutoGrid } from "common/styles/util";
 import { SearchFilter } from "@/component/QueryParamFilters";
 import { SearchTags } from "@/component/SearchTags";
 
@@ -18,9 +18,7 @@ export function Filters(): JSX.Element {
       <AutoGrid>
         <SearchFilter name="search" labelKey="unit" />
       </AutoGrid>
-      <FullRow>
-        <SearchTags hide={[]} translateTag={translateTag} />
-      </FullRow>
+      <SearchTags hide={[]} translateTag={translateTag} />
     </>
   );
 }

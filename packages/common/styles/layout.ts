@@ -7,6 +7,11 @@ export const mainStyles = css`
   margin: 0 auto;
   width: 100%;
 
+  /* don't add gaps for empty elements */
+  & > *:empty {
+    display: none;
+  }
+
   display: flex;
   flex-direction: column;
   flex-grow: 1;
