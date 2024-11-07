@@ -83,6 +83,10 @@ class TermsOfUseTypeChoices(models.TextChoices):
     SERVICE = "service_terms", _("Service-specific terms")
     PRICING = "pricing_terms", _("Pricing terms")
 
+    @classmethod
+    def specific_terms(cls) -> list[TermsOfUseTypeChoices]:
+        return list(set(cls.__members__.values()) - {TermsOfUseTypeChoices.GENERIC})
+
 
 class Language(models.TextChoices):
     FI = "fi", _("Finnish")
@@ -785,7 +789,8 @@ class ApplicantTypeChoice(models.TextChoices):
     COMMUNITY = "COMMUNITY", pgettext_lazy("ApplicantType", "Community")
     COMPANY = "COMPANY", pgettext_lazy("ApplicantType", "Company")
 
-    def get_customer_type_choice(self) -> CustomerTypeChoice:
+    @enum.property
+    def customer_type_choice(self) -> CustomerTypeChoice:
         match self:
             case ApplicantTypeChoice.INDIVIDUAL:
                 return CustomerTypeChoice.INDIVIDUAL
@@ -795,6 +800,21 @@ class ApplicantTypeChoice(models.TextChoices):
                 return CustomerTypeChoice.NONPROFIT
             case ApplicantTypeChoice.COMPANY:
                 return CustomerTypeChoice.BUSINESS
+
+    @enum.property
+    def should_have_organisation(self) -> bool:
+        return self in {
+            ApplicantTypeChoice.ASSOCIATION,
+            ApplicantTypeChoice.COMMUNITY,
+            ApplicantTypeChoice.COMPANY,
+        }
+
+    @enum.property
+    def should_have_home_city(self) -> bool:
+        return self in {
+            ApplicantTypeChoice.ASSOCIATION,
+            ApplicantTypeChoice.COMMUNITY,
+        }
 
 
 class ApplicationRoundStatusChoice(models.TextChoices):
@@ -963,6 +983,22 @@ class OrganizationTypeChoice(models.TextChoices):
     UNREGISTERED_ASSOCIATION = "UNREGISTERED_ASSOCIATION", pgettext_lazy("OrganizationType", "Unregistered association")
     MUNICIPALITY_CONSORTIUM = "MUNICIPALITY_CONSORTIUM", pgettext_lazy("OrganizationType", "Municipality consortium")
     RELIGIOUS_COMMUNITY = "RELIGIOUS_COMMUNITY", pgettext_lazy("OrganizationType", "Religious community")
+
+    @enum.property
+    def applicant_type(self) -> ApplicantTypeChoice:
+        match self:
+            case OrganizationTypeChoice.COMPANY:
+                return ApplicantTypeChoice.COMPANY
+            case OrganizationTypeChoice.REGISTERED_ASSOCIATION:
+                return ApplicantTypeChoice.ASSOCIATION
+            case OrganizationTypeChoice.PUBLIC_ASSOCIATION:
+                return ApplicantTypeChoice.ASSOCIATION
+            case OrganizationTypeChoice.UNREGISTERED_ASSOCIATION:
+                return ApplicantTypeChoice.ASSOCIATION
+            case OrganizationTypeChoice.RELIGIOUS_COMMUNITY:
+                return ApplicantTypeChoice.COMMUNITY
+            case OrganizationTypeChoice.MUNICIPALITY_CONSORTIUM:
+                return ApplicantTypeChoice.ASSOCIATION
 
 
 class BannerNotificationLevel(models.TextChoices):

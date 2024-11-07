@@ -32,8 +32,8 @@ class Resource(models.Model):
         default=ResourceLocationType.FIXED.value,
     )
 
-    buffer_time_before: datetime.timedelta | None = models.DurationField(blank=True, null=True)
-    buffer_time_after: datetime.timedelta | None = models.DurationField(blank=True, null=True)
+    buffer_time_before: datetime.timedelta | None = models.DurationField(blank=True, null=True)  # Deprecated
+    buffer_time_after: datetime.timedelta | None = models.DurationField(blank=True, null=True)  # Deprecated
 
     space: Space | None = models.ForeignKey(
         "tilavarauspalvelu.Space",

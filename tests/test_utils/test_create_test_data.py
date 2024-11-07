@@ -2,10 +2,10 @@ import django.apps
 import pytest
 from django.db import models
 
+from tests.helpers import with_mock_verkkokauppa
 from tilavarauspalvelu.management.commands.create_test_data import create_test_data
 from tilavarauspalvelu.models import (
     AbilityGroup,
-    AffectingTimeSpan,
     Building,
     Introduction,
     Keyword,
@@ -16,13 +16,9 @@ from tilavarauspalvelu.models import (
     RealEstate,
     RecurringReservation,
     RejectedOccurrence,
-    ReservationMetadataField,
     ReservationStatistic,
     ReservationStatisticsReservationUnit,
-    ReservationUnitHierarchy,
     ReservationUnitImage,
-    ReservationUnitPaymentType,
-    TaxPercentage,
 )
 from tilavarauspalvelu.models.request_log.model import RequestLog
 from tilavarauspalvelu.models.sql_log.model import SQLLog
@@ -42,12 +38,6 @@ apps_to_check: list[str] = [
     "spaces",
     "terms_of_use",
     "api",
-]
-
-models_that_always_contain_data: list[type[models.Model]] = [
-    ReservationMetadataField,
-    ReservationUnitPaymentType,
-    TaxPercentage,
 ]
 
 models_that_should_be_empty: list[type[models.Model]] = [
@@ -72,6 +62,7 @@ models_that_should_be_empty: list[type[models.Model]] = [
 
 @pytest.mark.django_db
 @pytest.mark.slow
+@with_mock_verkkokauppa
 def test_create_test_data():
     all_models = []
     for app_config in django.apps.apps.app_configs.values():
@@ -79,15 +70,9 @@ def test_create_test_data():
             all_models.extend(app_config.get_models())
 
     for model in all_models:
-        if model in models_that_always_contain_data:
-            continue
         assert not model.objects.exists(), f"Model {model.__name__} is not empty"
 
     create_test_data(flush=False)
-
-    # Call refresh at the end, since signals for it are disabled.
-    ReservationUnitHierarchy.refresh()
-    AffectingTimeSpan.refresh()
 
     for model in all_models:
         if model in models_that_should_be_empty:

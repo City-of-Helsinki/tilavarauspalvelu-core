@@ -1,7 +1,7 @@
 import pytest
 from lookup_property import L
 
-from tests.factories import ApplicationRoundFactory
+from tests.factories.application_round import ApplicationRoundBuilder
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
 from tilavarauspalvelu.models import ApplicationRound
 
@@ -13,6 +13,6 @@ pytestmark = [
 
 @pytest.mark.parametrize("status", ApplicationRoundStatusChoice.values)
 def test_application_round_factory_create_in_status(status):
-    application_round = ApplicationRoundFactory.create_in_status(status=status)
+    application_round = ApplicationRoundBuilder().with_status(status).create()
     assert application_round.status == status
     assert ApplicationRound.objects.filter(L(status=status)).exists()

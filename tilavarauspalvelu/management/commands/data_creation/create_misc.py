@@ -1,11 +1,11 @@
-# ruff: noqa: S311
+from typing import Literal
 
-from datetime import datetime, timedelta
-
-from django.utils.timezone import localtime
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
 
-from tilavarauspalvelu.enums import BannerNotificationLevel, BannerNotificationTarget
+from tests.factories import TermsOfUseFactory
+from tests.factories.banner_notification import BannerNotificationBuilder
+from tilavarauspalvelu.enums import BannerNotificationLevel, BannerNotificationTarget, TermsOfUseTypeChoices
+from tilavarauspalvelu.models import TermsOfUse
 from tilavarauspalvelu.models.banner_notification.model import BannerNotification
 from tilavarauspalvelu.tasks import (
     prune_reservations_task,
@@ -14,91 +14,77 @@ from tilavarauspalvelu.tasks import (
 )
 from utils.date_utils import DEFAULT_TIMEZONE
 
-from .utils import faker_en, faker_fi, faker_sv, with_logs
+from .utils import with_logs
 
 
-@with_logs()
+@with_logs
 def _create_banner_notifications():
-    today: datetime = localtime()
-    with_link_created: bool = False
-    with_bold_created: bool = False
-    banner_notifications: list[BannerNotification] = []
+    banner_notifications: list[BannerNotification] = [
+        (
+            BannerNotificationBuilder()
+            .active()
+            .bold_messages()
+            .build(
+                name="Active message with bold text.",
+                target=BannerNotificationTarget.ALL,
+            )
+        ),
+        (
+            BannerNotificationBuilder()
+            .active()
+            .messages_are_links()
+            .build(
+                name="Active message with link.",
+                target=BannerNotificationTarget.ALL,
+            )
+        ),
+    ]
+
     for target in BannerNotificationTarget.values:
         for level in BannerNotificationLevel.values:
-            draft_message_fi = faker_fi.sentence()
-            active_message_fi = faker_fi.sentence()
-            scheduled_message_fi = faker_fi.sentence()
-            past_message_fi = faker_fi.sentence()
-
-            if not with_link_created:
-                draft_message_fi += f" {faker_fi.url()}"
-                active_message_fi += f" {faker_fi.url()}"
-                scheduled_message_fi += f" {faker_fi.url()}"
-                past_message_fi += f" {faker_fi.url()}"
-                with_link_created = True
-
-            elif not with_bold_created:
-                draft_message_fi = f"<b>{draft_message_fi}</b>"
-                active_message_fi = f"<b>{active_message_fi}</b>"
-                scheduled_message_fi = f"<b>{scheduled_message_fi}</b>"
-                past_message_fi = f"<b>{past_message_fi}</b>"
-                with_bold_created = True
-
             banner_notifications += [
-                BannerNotification(
-                    name=f"Draft {level} notification for {target}",
-                    message=draft_message_fi,
-                    message_fi=draft_message_fi,
-                    message_en=faker_en.sentence(),
-                    message_sv=faker_sv.sentence(),
-                    level=level,
-                    target=target,
-                    draft=True,
-                    active_from=None,
-                    active_until=None,
+                (
+                    BannerNotificationBuilder()
+                    .draft()
+                    .build(
+                        name=f"Draft {level} notification for {target}",
+                        level=level,
+                        target=target,
+                    )
                 ),
-                BannerNotification(
-                    name=f"Active {level} notification for {target}",
-                    message=active_message_fi,
-                    message_fi=active_message_fi,
-                    message_en=faker_en.sentence(),
-                    message_sv=faker_sv.sentence(),
-                    level=level,
-                    target=target,
-                    draft=False,
-                    active_from=today - timedelta(days=1),
-                    active_until=today + timedelta(days=7),
+                (
+                    BannerNotificationBuilder()
+                    .active()
+                    .build(
+                        name=f"Active {level} notification for {target}",
+                        level=level,
+                        target=target,
+                    )
                 ),
-                BannerNotification(
-                    name=f"Scheduled {level} notification for {target}",
-                    message=scheduled_message_fi,
-                    message_fi=scheduled_message_fi,
-                    message_en=faker_en.sentence(),
-                    message_sv=faker_sv.sentence(),
-                    level=level,
-                    target=target,
-                    draft=False,
-                    active_from=today + timedelta(days=7),
-                    active_until=today + timedelta(days=14),
+                (
+                    BannerNotificationBuilder()
+                    .scheduled()
+                    .build(
+                        name=f"Scheduled {level} notification for {target}",
+                        level=level,
+                        target=target,
+                    )
                 ),
-                BannerNotification(
-                    name=f"Past {level} notification for {target}",
-                    message=past_message_fi,
-                    message_fi=past_message_fi,
-                    message_en=faker_en.sentence(),
-                    message_sv=faker_sv.sentence(),
-                    level=level,
-                    target=target,
-                    draft=False,
-                    active_from=today - timedelta(days=7),
-                    active_until=today - timedelta(days=1),
+                (
+                    BannerNotificationBuilder()
+                    .past()
+                    .build(
+                        name=f"Past {level} notification for {target}",
+                        level=level,
+                        target=target,
+                    )
                 ),
             ]
 
     return BannerNotification.objects.bulk_create(banner_notifications)
 
 
-@with_logs()
+@with_logs
 def _create_periodic_tasks() -> None:
     even_5_minute = CrontabSchedule.objects.create(
         minute="0,5,10,15,20,25,30,35,40,45,50,55",
@@ -145,3 +131,43 @@ def _create_periodic_tasks() -> None:
             "voidaan hakea esikäsiteltynä."
         ),
     )
+
+
+@with_logs
+def _create_general_terms_of_use() -> list[TermsOfUse]:
+    general_terms: dict[str, dict[Literal["fi", "en", "sv"], str]] = {
+        "accessibility": {
+            "fi": "Saavutettavuusseloste",
+            "en": "Accessibility Statement",
+            "sv": "Tillgänglighet",
+        },
+        "booking": {
+            "fi": "Yleiset sopimusehdot",
+            "en": "General Terms and Conditions",
+            "sv": "Allmänna villkor",
+        },
+        "privacy": {
+            "fi": "Tietosuojaseloste",
+            "en": "Privacy Statement",
+            "sv": "Dataskyddspolicy",
+        },
+        "service": {
+            "fi": "Palvelun yleiset käyttöehdot",
+            "en": "General Terms of Service",
+            "sv": "Allmänna användarvillkor",
+        },
+    }
+
+    terms_of_use: list[TermsOfUse] = []
+    for term_id, term_name in general_terms.items():
+        terms = TermsOfUseFactory.build(
+            id=term_id,
+            name=term_name["fi"],
+            name_fi=term_name["fi"],
+            name_sv=term_name["en"],
+            name_en=term_name["sv"],
+            terms_type=TermsOfUseTypeChoices.GENERIC,
+        )
+        terms_of_use.append(terms)
+
+    return TermsOfUse.objects.bulk_create(terms_of_use)

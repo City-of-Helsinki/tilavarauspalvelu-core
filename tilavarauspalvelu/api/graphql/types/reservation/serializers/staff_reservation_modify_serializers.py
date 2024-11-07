@@ -1,7 +1,6 @@
 import datetime
 from typing import Any
 
-from django.utils.timezone import get_default_timezone
 from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPrimaryKeyField
 from rest_framework import serializers
 
@@ -16,8 +15,7 @@ from tilavarauspalvelu.enums import (
     ReservationTypeChoice,
 )
 from tilavarauspalvelu.models import AgeGroup, City, Reservation, ReservationPurpose, ReservationUnit
-
-DEFAULT_TIMEZONE = get_default_timezone()
+from utils.date_utils import DEFAULT_TIMEZONE
 
 
 class StaffReservationModifySerializer(OldPrimaryKeyUpdateSerializer, ReservationSchedulingMixin):

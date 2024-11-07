@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-import contextlib
 from functools import cached_property
 from inspect import cleandoc
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
@@ -81,30 +80,6 @@ class ReservationUnitHierarchy(models.Model):
             if settings.RAISE_ERROR_ON_REFRESH_FAILURE:
                 raise
             SentryLogger.log_exception(error, details="Failed to refresh materialized view.")
-
-    @classmethod
-    @contextlib.contextmanager
-    def delay_refresh(cls) -> None:
-        """
-        Temporarily disables refreshing the materialized view.
-
-        If the view would be refreshed, the refresh is delayed until the end of the context.
-        This is helpful when the refresh would otherwise be triggered many times in a short period of time.
-        """
-        original_refresh = cls.refresh
-        should_refresh = False
-
-        def _refresh(*args: Any, **kwargs: Any) -> None:
-            nonlocal should_refresh
-            should_refresh = True
-
-        try:
-            cls.refresh = _refresh
-            yield
-        finally:
-            cls.refresh = original_refresh
-            if should_refresh:
-                cls.refresh()
 
     # For migrations.
 

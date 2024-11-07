@@ -1,7 +1,7 @@
 import pytest
 from lookup_property import L
 
-from tests.factories import ApplicationSectionFactory
+from tests.factories.application_section import ApplicationSectionBuilder
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, ApplicationStatusChoice
 from tilavarauspalvelu.models import ApplicationSection
 
@@ -21,7 +21,7 @@ pytestmark = [
     ],
 )
 def test_application_section_factory_create_in_status(status, application_status):
-    section = ApplicationSectionFactory.create_in_status(status=status)
+    section = ApplicationSectionBuilder().with_status(status).create()
     assert section.status == status
     assert ApplicationSection.objects.filter(L(status=status.value)).exists()
 

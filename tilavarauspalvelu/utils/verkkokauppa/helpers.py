@@ -142,7 +142,7 @@ def create_mock_verkkokauppa_order(reservation: Reservation) -> Order:
     # Assume that the first URL in CORS_ALLOWED_ORIGINS is the backend URL
     base_url = settings.MOCK_VERKKOKAUPPA_BACKEND_URL.strip("/")
     # Reservation URI in the django admin
-    mock_verkkokauppa_checkout_url = reverse("mock_verkkokauppa", args=[order_uuid]).strip("/")
+    mock_verkkokauppa_checkout_url = reverse("mock_verkkokauppa:checkout", args=[order_uuid]).strip("/")
     admin_url = reverse("admin:tilavarauspalvelu_reservation_change", args=[reservation.id]).strip("/")
 
     return Order(

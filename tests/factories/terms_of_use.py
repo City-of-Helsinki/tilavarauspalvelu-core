@@ -22,10 +22,10 @@ class TermsOfUseFactory(GenericDjangoModelFactory[TermsOfUse]):
     name_en = FakerEN("word")
     name_sv = FakerSV("word")
 
-    text = FakerFI("text")
+    text = FakerFI("p_tags")
     text_fi = LazyAttribute(lambda i: i.text)
-    text_en = FakerEN("text")
-    text_sv = FakerSV("text")
+    text_en = FakerEN("p_tags")
+    text_sv = FakerSV("p_tags")
 
     terms_type = fuzzy.FuzzyChoice(TermsOfUseTypeChoices.values)
 

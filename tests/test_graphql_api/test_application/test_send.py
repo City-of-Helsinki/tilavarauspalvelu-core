@@ -1,6 +1,7 @@
 import pytest
 
 from tests.factories import ApplicationFactory
+from tests.factories.application import ApplicationBuilder
 from tests.helpers import patch_method
 from tilavarauspalvelu.enums import ApplicationStatusChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
@@ -87,7 +88,7 @@ def test_send_application__wrong_status(graphql, status):
     # given:
     # - There is a draft application in a certain status
     # - A superuser is using the system
-    application = ApplicationFactory.create_in_status(status, application_sections__name="foo")
+    application = ApplicationBuilder().with_status(status).create()
     graphql.login_with_superuser()
 
     # when:

@@ -1,6 +1,6 @@
 import pytest
 
-from tests.factories import ApplicationFactory
+from tests.factories.application import ApplicationBuilder
 from tilavarauspalvelu.enums import ApplicationStatusChoice
 
 # Applied to all tests
@@ -11,5 +11,5 @@ pytestmark = [
 
 @pytest.mark.parametrize("status", ApplicationStatusChoice.values)
 def test_application_factory_create_in_status(status):
-    application = ApplicationFactory.create_in_status(status=status)
+    application = ApplicationBuilder().with_status(status=status).create()
     assert application.status == status

@@ -5,7 +5,6 @@ from decimal import Decimal
 import freezegun
 import pytest
 from django.test import override_settings
-from django.utils.timezone import get_default_timezone
 
 from tests.factories import (
     ApplicationRoundFactory,
@@ -19,16 +18,13 @@ from tests.factories import (
 )
 from tilavarauspalvelu.enums import ReservationStartInterval, ReservationStateChoice
 from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
-from utils.date_utils import local_date, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 
 from .helpers import ADJUST_MUTATION, get_adjust_data
 
 pytestmark = [
     pytest.mark.django_db,
 ]
-
-
-DEFAULT_TIMEZONE = get_default_timezone()
 
 
 @override_settings(SEND_EMAILS=True)

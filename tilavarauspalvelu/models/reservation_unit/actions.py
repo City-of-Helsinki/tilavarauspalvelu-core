@@ -3,8 +3,6 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any
 
-from django.db import models
-
 from tilavarauspalvelu.enums import ReservationStartInterval
 from tilavarauspalvelu.exceptions import HaukiAPIError
 from tilavarauspalvelu.models import (
@@ -25,6 +23,8 @@ from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
+
+    from django.db import models
 
 
 class ReservationUnitHaukiExporter:
@@ -350,19 +350,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         return begin_time.second == 0 and begin_time.microsecond == 0 and begin_time.minute % interval_minutes == 0
 
     def get_active_pricing(self, by_date: datetime.date | None = None) -> ReservationUnitPricing | None:
-        """Returns the active pricing for the reservation unit."""
-        today = local_date()
-        if by_date is None:
-            by_date = today
-
-        return (
-            self.reservation_unit.pricings.filter(
-                models.Q(begins__lte=today)  # Is active regardless of `is_activated_on_begins` value
-                | models.Q(begins__lte=by_date, is_activated_on_begins=False)
-            )
-            .order_by("-begins")
-            .first()
-        )
+        return self.reservation_unit.pricings.active(from_date=by_date).first()
 
     def get_merchant(self) -> PaymentMerchant | None:
         if self.reservation_unit.payment_merchant is not None:

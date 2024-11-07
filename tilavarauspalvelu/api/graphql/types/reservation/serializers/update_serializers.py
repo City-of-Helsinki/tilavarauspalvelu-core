@@ -1,6 +1,5 @@
 import datetime
 
-from django.utils.timezone import get_default_timezone
 from graphene.utils.str_converters import to_camel_case
 
 from tilavarauspalvelu.api.graphql.extensions.serializers import OldPrimaryKeyUpdateSerializer
@@ -8,8 +7,7 @@ from tilavarauspalvelu.api.graphql.extensions.validation_errors import Validatio
 from tilavarauspalvelu.api.graphql.types.reservation.serializers.create_serializers import ReservationCreateSerializer
 from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice
 from tilavarauspalvelu.models import Reservation
-
-DEFAULT_TIMEZONE = get_default_timezone()
+from utils.date_utils import DEFAULT_TIMEZONE
 
 
 class ReservationUpdateSerializer(OldPrimaryKeyUpdateSerializer, ReservationCreateSerializer):

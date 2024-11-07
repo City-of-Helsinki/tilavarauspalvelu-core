@@ -11,16 +11,13 @@ from tests.test_external_services.test_tprek.helpers import SINGLE_TPREK_UNIT_JS
 from tilavarauspalvelu.models import Location
 from tilavarauspalvelu.utils.importers.tprek_api_client import TprekAPIClient
 from tilavarauspalvelu.utils.importers.tprek_unit_importer import TprekUnitHaukiResourceIdImporter, TprekUnitImporter
-from utils.date_utils import local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.sentry import SentryLogger
 
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
-
-
-DEFAULT_TIMEZONE = get_default_timezone()
 
 
 @patch_method(TprekAPIClient.get_unit, return_value=(None, None))

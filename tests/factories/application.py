@@ -1,22 +1,18 @@
 import datetime
 from datetime import timedelta
-from typing import Any
+from typing import Any, Self
 
 from django.utils.timezone import get_default_timezone, now
 from factory import fuzzy
 
 from tilavarauspalvelu.enums import ApplicantTypeChoice, ApplicationStatusChoice, Priority, Weekday
 from tilavarauspalvelu.models import Application, ApplicationRound, ReservationUnit
+from utils.date_utils import local_datetime
 
-from ._base import FakerFI, ForeignKeyFactory, GenericDjangoModelFactory, ReverseForeignKeyFactory
-from .allocated_time_slot import AllocatedTimeSlotFactory
-from .application_round import ApplicationRoundFactory
-from .application_section import ApplicationSectionFactory
-from .reservation_unit import ReservationUnitFactory
-from .space import SpaceFactory
-from .suitable_time_range import SuitableTimeRangeFactory
+from ._base import FakerFI, ForeignKeyFactory, GenericDjangoModelFactory, ModelFactoryBuilder, ReverseForeignKeyFactory
 
 __all__ = [
+    "ApplicationBuilder",
     "ApplicationFactory",
 ]
 
@@ -45,214 +41,62 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
     application_sections = ReverseForeignKeyFactory("tests.factories.ApplicationSectionFactory")
 
     @classmethod
-    def create_in_status(cls, status: ApplicationStatusChoice, **kwargs: Any) -> Application:
+    def create_in_status(cls, status: ApplicationStatusChoice) -> Application:
         match status:
             case ApplicationStatusChoice.DRAFT:
-                return cls.create_in_status_draft(**kwargs)
+                return cls.create_in_status_draft_no_sections()
             case ApplicationStatusChoice.RECEIVED:
-                return cls.create_in_status_received(**kwargs)
+                return cls.create_in_status_received()
             case ApplicationStatusChoice.IN_ALLOCATION:
-                return cls.create_in_status_in_allocation(**kwargs)
+                return cls.create_in_status_in_allocation_no_sections()
             case ApplicationStatusChoice.HANDLED:
-                return cls.create_in_status_handled(**kwargs)
+                return cls.create_in_status_handled_no_sections()
             case ApplicationStatusChoice.RESULTS_SENT:
-                return cls.create_in_status_results_sent(**kwargs)
+                return cls.create_in_status_results_sent()
             case ApplicationStatusChoice.EXPIRED:
-                return cls.create_in_status_expired(**kwargs)
+                return cls.create_in_status_expired()
             case ApplicationStatusChoice.CANCELLED:
-                return cls.create_in_status_cancelled(**kwargs)
+                return cls.create_in_status_cancelled()
 
     @classmethod
     def create_in_status_draft_no_sections(cls, **kwargs: Any) -> Application:
-        return cls.create_in_status_draft(application_sections=[], **kwargs)
+        return ApplicationBuilder().draft(sections=False).create(**kwargs)
 
     @classmethod
     def create_in_status_draft(cls, **kwargs: Any) -> Application:
-        """
-        Create a draft application:
-        - in an open application round
-        - with a single application section
-            - with a single reservation unit option
-        """
-        kwargs.setdefault("cancelled_date", None)
-        kwargs.setdefault("sent_date", None)
-
-        if "application_round" not in kwargs:
-            sub_kwargs = cls.pop_sub_kwargs("application_round", kwargs)
-            kwargs["application_round"] = ApplicationRoundFactory.create_in_status_open(**sub_kwargs)
-
-        key = "application_sections"
-        application_section_kwargs = cls.pop_sub_kwargs(key, kwargs)
-
-        application = cls.create(**kwargs)
-
-        if key not in kwargs:  # allow for empty application sections
-            application_section_kwargs["application"] = application
-            ApplicationSectionFactory.create_in_status_unallocated(**application_section_kwargs)
-
-        return application
+        return ApplicationBuilder().draft().create(**kwargs)
 
     @classmethod
     def create_in_status_received(cls, **kwargs: Any) -> Application:
-        """
-        Create a received application:
-        - in an open application round
-        - with a single application section
-            - with a single reservation unit option
-        """
-        kwargs.setdefault("cancelled_date", None)
-        kwargs.setdefault("sent_date", now())
-
-        if "application_round" not in kwargs:
-            sub_kwargs = cls.pop_sub_kwargs("application_round", kwargs)
-            kwargs["application_round"] = ApplicationRoundFactory.create_in_status_open(**sub_kwargs)
-
-        key = "application_sections"
-        application_section_kwargs = cls.pop_sub_kwargs(key, kwargs)
-
-        application = cls.create(**kwargs)
-
-        if key not in kwargs:  # allow for empty application sections
-            application_section_kwargs["application"] = application
-            ApplicationSectionFactory.create_in_status_unallocated(**application_section_kwargs)
-
-        return application
+        return ApplicationBuilder().received().create(**kwargs)
 
     @classmethod
     def create_in_status_in_allocation_no_sections(cls, **kwargs: Any) -> Application:
-        return cls.create_in_status_in_allocation(application_sections=[], **kwargs)
+        return ApplicationBuilder().in_allocation(sections=False).create(**kwargs)
 
     @classmethod
     def create_in_status_in_allocation(cls, **kwargs: Any) -> Application:
-        """
-        Create an application to be allocated:
-        - in an application round in allocation
-        - with a single application section
-            - with a single reservation unit option
-        """
-        kwargs.setdefault("cancelled_date", None)
-        kwargs.setdefault("sent_date", now())
-
-        if "application_round" not in kwargs:
-            sub_kwargs = cls.pop_sub_kwargs("application_round", kwargs)
-            kwargs["application_round"] = ApplicationRoundFactory.create_in_status_in_allocation(**sub_kwargs)
-
-        key = "application_sections"
-        key_kwargs = cls.pop_sub_kwargs(key, kwargs)
-
-        application = cls.create(**kwargs)
-        if key not in kwargs:
-            key_kwargs["application"] = application
-            ApplicationSectionFactory.create_in_status_in_allocation(**key_kwargs)
-
-        return application
+        return ApplicationBuilder().in_allocation().create(**kwargs)
 
     @classmethod
     def create_in_status_handled_no_sections(cls, **kwargs: Any) -> Application:
-        return cls.create_in_status_handled(application_sections=[], **kwargs)
+        return ApplicationBuilder().handled(sections=False).create(**kwargs)
 
     @classmethod
     def create_in_status_handled(cls, **kwargs: Any) -> Application:
-        """
-        Create a handled application:
-        - in a handled application round
-        - with a single application section
-            - with a single reservation unit option
-                - that has been allocated
-        """
-        kwargs.setdefault("cancelled_date", None)
-        kwargs.setdefault("sent_date", now())
-
-        if "application_round" not in kwargs:
-            sub_kwargs = cls.pop_sub_kwargs("application_round", kwargs)
-            kwargs["application_round"] = ApplicationRoundFactory.create_in_status_handled(**sub_kwargs)
-
-        key = "application_sections"
-        key_kwargs = cls.pop_sub_kwargs(key, kwargs)
-
-        application = cls.create(**kwargs)
-        if key not in kwargs:
-            key_kwargs["application"] = application
-            ApplicationSectionFactory.create_in_status_handled(**key_kwargs)
-
-        return application
+        return ApplicationBuilder().handled().create(**kwargs)
 
     @classmethod
     def create_in_status_results_sent(cls, **kwargs: Any) -> Application:
-        """
-        Create an application, the result of which has been sent to the user:
-        - in a handled application round
-        - with a single application section
-            - with a single reservation unit option
-                - that has been allocated
-        """
-        kwargs.setdefault("cancelled_date", None)
-        kwargs.setdefault("sent_date", now())
-        kwargs.setdefault("results_ready_notification_sent_date", now())
-
-        if "application_round" not in kwargs:
-            round_kwargs = cls.pop_sub_kwargs("application_round", kwargs)
-            kwargs["application_round"] = ApplicationRoundFactory.create_in_status_results_sent(**round_kwargs)
-
-        key = "application_sections"
-        key_kwargs = cls.pop_sub_kwargs(key, kwargs)
-
-        application = cls.create(**kwargs)
-        if key not in kwargs:
-            key_kwargs["application"] = application
-            ApplicationSectionFactory.create_in_status_handled(**key_kwargs)
-
-        return application
+        return ApplicationBuilder().results_sent().create(**kwargs)
 
     @classmethod
     def create_in_status_expired(cls, **kwargs: Any) -> Application:
-        """
-        Create an expired application:
-        - in a handled application round
-        - with a single unallocated application section
-            - with a single reservation unit option
-        """
-        kwargs.setdefault("cancelled_date", None)
-        kwargs.setdefault("sent_date", None)
-
-        if "application_round" not in kwargs:
-            sub_kwargs = cls.pop_sub_kwargs("application_round", kwargs)
-            kwargs["application_round"] = ApplicationRoundFactory.create_in_status_handled(**sub_kwargs)
-
-        key = "application_sections"
-        key_kwargs = cls.pop_sub_kwargs(key, kwargs)
-
-        application = cls.create(**kwargs)
-        if key not in kwargs:
-            key_kwargs["application"] = application
-            ApplicationSectionFactory.create_in_status_unallocated(**key_kwargs)
-
-        return application
+        return ApplicationBuilder().expired().create(**kwargs)
 
     @classmethod
     def create_in_status_cancelled(cls, **kwargs: Any) -> Application:
-        """
-        Create a cancelled application.
-        - in an open application round
-        - with a single application section
-            - with a single reservation unit option
-        """
-        kwargs.setdefault("cancelled_date", now())
-
-        if "application_round" not in kwargs:
-            sub_kwargs = cls.pop_sub_kwargs("application_round", kwargs)
-            kwargs["application_round"] = ApplicationRoundFactory.create_in_status_open(**sub_kwargs)
-
-        key = "application_sections"
-        key_kwargs = cls.pop_sub_kwargs(key, kwargs)
-
-        application = cls.create(**kwargs)
-
-        if key not in kwargs:
-            key_kwargs["application"] = application
-            ApplicationSectionFactory.create_in_status_unallocated(**key_kwargs)
-
-        return application
+        return ApplicationBuilder().cancelled().create(**kwargs)
 
     @classmethod
     def create_application_ready_for_allocation(
@@ -280,6 +124,13 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
         - By default, the application has 2 suitable time ranges from 10:00-14:00 (Monday & Tuesday).
         - If pre_allocated, there are allocated time slots equal to reservations per week.
         """
+        from .allocated_time_slot import AllocatedTimeSlotFactory
+        from .application_round import ApplicationRoundFactory
+        from .application_section import ApplicationSectionFactory
+        from .reservation_unit import ReservationUnitFactory
+        from .space import SpaceFactory
+        from .suitable_time_range import SuitableTimeRangeFactory
+
         if reservation_unit is None:
             reservation_unit = ReservationUnitFactory.create(spaces=[SpaceFactory.create()])
 
@@ -332,3 +183,247 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
             )
 
         return application
+
+
+class ApplicationBuilder(ModelFactoryBuilder[Application]):
+    factory = ApplicationFactory
+
+    def with_status(self, status: ApplicationStatusChoice) -> Self:
+        match status:
+            case ApplicationStatusChoice.DRAFT:
+                return self.draft()
+            case ApplicationStatusChoice.RECEIVED:
+                return self.received()
+            case ApplicationStatusChoice.IN_ALLOCATION:
+                return self.in_allocation()
+            case ApplicationStatusChoice.HANDLED:
+                return self.handled()
+            case ApplicationStatusChoice.RESULTS_SENT:
+                return self.results_sent()
+            case ApplicationStatusChoice.EXPIRED:
+                return self.expired()
+            case ApplicationStatusChoice.CANCELLED:
+                return self.cancelled()
+
+    def draft(self, *, sections: bool = True) -> Self:
+        """
+        Create a draft application:
+        - in an open application round
+        - with a single application section
+            - with a single reservation unit option
+        """
+        from .application_round import ApplicationRoundBuilder
+        from .application_section import ApplicationSectionBuilder
+
+        self.kwargs.setdefault("cancelled_date", None)
+        self.kwargs.setdefault("sent_date", None)
+
+        for key, value in ApplicationRoundBuilder().open().kwargs.items():
+            self.kwargs.setdefault(f"application_round__{key}", value)
+
+        if sections:
+            for key, value in ApplicationSectionBuilder().unallocated().kwargs.items():
+                self.kwargs.setdefault(f"application_sections__{key}", value)
+
+        return self
+
+    def received(self, *, sections: bool = True) -> Self:
+        """
+        Create a received application:
+        - in an open application round
+        - with a single application section
+            - with a single reservation unit option
+        """
+        from .application_round import ApplicationRoundBuilder
+        from .application_section import ApplicationSectionBuilder
+
+        self.kwargs.setdefault("cancelled_date", None)
+        self.kwargs.setdefault("sent_date", local_datetime())
+
+        for key, value in ApplicationRoundBuilder().open().kwargs.items():
+            self.kwargs.setdefault(f"application_round__{key}", value)
+
+        if sections:
+            for key, value in ApplicationSectionBuilder().unallocated().kwargs.items():
+                self.kwargs.setdefault(f"application_sections__{key}", value)
+
+        return self
+
+    def in_allocation(self, *, sections: bool = True) -> Self:
+        """
+        Create an application to be allocated:
+        - in an application round in allocation
+        - with a single application section
+            - with a single reservation unit option
+        """
+        from .application_round import ApplicationRoundBuilder
+        from .application_section import ApplicationSectionBuilder
+
+        self.kwargs.setdefault("cancelled_date", None)
+        self.kwargs.setdefault("sent_date", local_datetime())
+        self.kwargs.setdefault("in_allocation_notification_sent_date", local_datetime())
+
+        for key, value in ApplicationRoundBuilder().in_allocation().kwargs.items():
+            self.kwargs.setdefault(f"application_round__{key}", value)
+
+        if sections:
+            for key, value in ApplicationSectionBuilder().in_allocation().kwargs.items():
+                self.kwargs.setdefault(f"application_sections__{key}", value)
+
+        return self
+
+    def handled(self, *, sections: bool = True) -> Self:
+        """
+        Create a handled application:
+        - in a handled application round
+        - with a single application section
+            - with a single reservation unit option
+                - that has been allocated
+        """
+        from .application_round import ApplicationRoundBuilder
+        from .application_section import ApplicationSectionBuilder
+
+        self.kwargs.setdefault("cancelled_date", None)
+        self.kwargs.setdefault("sent_date", local_datetime())
+        self.kwargs.setdefault("in_allocation_notification_sent_date", local_datetime())
+
+        for key, value in ApplicationRoundBuilder().handled().kwargs.items():
+            self.kwargs.setdefault(f"application_round__{key}", value)
+
+        if sections:
+            for key, value in ApplicationSectionBuilder().handled().kwargs.items():
+                self.kwargs.setdefault(f"application_sections__{key}", value)
+
+        return self
+
+    def results_sent(self, *, sections: bool = True) -> Self:
+        """
+        Create an application, the result of which has been sent to the user:
+        - in a handled application round
+        - with a single application section
+            - with a single reservation unit option
+                - that has been allocated
+        """
+        from .application_round import ApplicationRoundBuilder
+        from .application_section import ApplicationSectionBuilder
+
+        self.kwargs.setdefault("cancelled_date", None)
+        self.kwargs.setdefault("sent_date", local_datetime())
+        self.kwargs.setdefault("in_allocation_notification_sent_date", local_datetime())
+        self.kwargs.setdefault("results_ready_notification_sent_date", local_datetime())
+
+        for key, value in ApplicationRoundBuilder().results_sent().kwargs.items():
+            self.kwargs.setdefault(f"application_round__{key}", value)
+
+        if sections:
+            for key, value in ApplicationSectionBuilder().handled().kwargs.items():
+                self.kwargs.setdefault(f"application_sections__{key}", value)
+
+        return self
+
+    def expired(self, *, sections: bool = True) -> Self:
+        """
+        Create an expired application:
+        - in a handled application round
+        - with a single unallocated application section
+            - with a single reservation unit option
+        """
+        from .application_round import ApplicationRoundBuilder
+        from .application_section import ApplicationSectionBuilder
+
+        self.kwargs.setdefault("cancelled_date", None)
+        self.kwargs.setdefault("sent_date", None)
+
+        for key, value in ApplicationRoundBuilder().handled().kwargs.items():
+            self.kwargs.setdefault(f"application_round__{key}", value)
+
+        if sections:
+            for key, value in ApplicationSectionBuilder().unallocated().kwargs.items():
+                self.kwargs.setdefault(f"application_sections__{key}", value)
+
+        return self
+
+    def cancelled(self, *, sections: bool = True) -> Self:
+        """
+        Create a cancelled application.
+        - in an open application round
+        - with a single application section
+            - with a single reservation unit option
+        """
+        from .application_round import ApplicationRoundBuilder
+        from .application_section import ApplicationSectionBuilder
+
+        self.kwargs.setdefault("cancelled_date", now())
+
+        for key, value in ApplicationRoundBuilder().open().kwargs.items():
+            self.kwargs.setdefault(f"application_round__{key}", value)
+
+        if sections:
+            for key, value in ApplicationSectionBuilder().unallocated().kwargs.items():
+                self.kwargs.setdefault(f"application_sections__{key}", value)
+
+        return self
+
+    def in_application_round(self, application_round: ApplicationRound) -> Self:
+        for key in list(self.kwargs):
+            if key.startswith("application_round"):
+                del self.kwargs[key]
+
+        self.kwargs.setdefault("application_round", application_round)
+        return self
+
+    def for_applicant_type(self, applicant_type: ApplicantTypeChoice) -> Self:
+        match applicant_type:
+            case ApplicantTypeChoice.INDIVIDUAL:
+                return self.for_individual()
+            case ApplicantTypeChoice.ASSOCIATION:
+                return self.for_association()
+            case ApplicantTypeChoice.COMMUNITY:
+                return self.for_community()
+            case ApplicantTypeChoice.COMPANY:
+                return self.for_company()
+
+    def for_individual(self) -> Self:
+        self.kwargs["applicant_type"] = ApplicantTypeChoice.INDIVIDUAL
+        self.kwargs["organisation"] = None
+        self.kwargs["home_city"] = None
+        return self
+
+    def for_association(self, unregistered: bool = False) -> Self:
+        from .organisation import OrganisationFactory
+
+        self.kwargs["applicant_type"] = ApplicantTypeChoice.ASSOCIATION
+        self.kwargs["organisation__identifier"] = None if unregistered else OrganisationFactory.identifier.generate()
+        return self
+
+    def for_community(self, unregistered: bool = False) -> Self:
+        from .organisation import OrganisationFactory
+
+        self.kwargs["applicant_type"] = ApplicantTypeChoice.COMMUNITY
+        self.kwargs["organisation__identifier"] = None if unregistered else OrganisationFactory.identifier.generate()
+        return self
+
+    def for_company(self) -> Self:
+        from .organisation import OrganisationFactory
+
+        self.kwargs["applicant_type"] = ApplicantTypeChoice.COMPANY
+        self.kwargs["organisation__identifier"] = OrganisationFactory.identifier.generate()
+        self.kwargs["home_city"] = None
+        return self
+
+    def set_description_info(
+        self,
+        applicant_type: str,
+        suitable_time: str,
+        section: str,
+        option: str,
+    ) -> Self:
+        self.kwargs["additional_information"] = "\n".join(
+            [
+                f"Applicant type: {applicant_type}",
+                f"Suitable time ranges: {suitable_time}",
+                f"Application section: {section}",
+                f"Reservation unit options: {option}",
+            ],
+        )
+        return self

@@ -7,6 +7,7 @@ from freezegun import freeze_time
 from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tests.factories import BannerNotificationFactory, UserFactory
+from tests.factories.banner_notification import BannerNotificationBuilder
 from tilavarauspalvelu.enums import BannerNotificationLevel, BannerNotificationTarget
 
 # Applied to all tests
@@ -53,15 +54,15 @@ def test_sort_banner_notifications_by_state(graphql, order_by, expected):
         draft=True,
         target=BannerNotificationTarget.ALL,
     )
-    BannerNotificationFactory.create_active(
+    BannerNotificationBuilder().active().create(
         message="2",
         target=BannerNotificationTarget.ALL,
     )
-    BannerNotificationFactory.create_scheduled(
+    BannerNotificationBuilder().scheduled().create(
         message="3",
         target=BannerNotificationTarget.ALL,
     )
-    BannerNotificationFactory.create_past(
+    BannerNotificationBuilder().past().create(
         message="4",
         target=BannerNotificationTarget.ALL,
     )
@@ -114,12 +115,12 @@ def test_sort_banner_notifications_by_name(graphql, order_by, expected):
     # given:
     # - There are two banner notification with different names in the system
     # - Notification manager user is using the system
-    BannerNotificationFactory.create_active(
+    BannerNotificationBuilder().active().create(
         name="foo",
         message="1",
         target=BannerNotificationTarget.ALL,
     )
-    BannerNotificationFactory.create_active(
+    BannerNotificationBuilder().active().create(
         name="bar",
         message="2",
         target=BannerNotificationTarget.ALL,
@@ -177,12 +178,12 @@ def test_sort_banner_notifications_by_start_date(graphql, order_by, expected):
     # - There are two banner notification with different start dates & and one without one
     # - Notification manager user is using the system
     today = timezone.now()
-    BannerNotificationFactory.create_active(
+    BannerNotificationBuilder().active().create(
         message="1",
         target=BannerNotificationTarget.ALL,
         active_from=today - timedelta(days=1),
     )
-    BannerNotificationFactory.create_active(
+    BannerNotificationBuilder().active().create(
         message="2",
         target=BannerNotificationTarget.ALL,
         active_from=today - timedelta(days=2),
@@ -245,12 +246,12 @@ def test_sort_banner_notifications_by_end_date(graphql, order_by, expected):
     # - There are two banner notification with different end dates & and one without one
     # - Notification manager user is using the system
     today = timezone.now()
-    BannerNotificationFactory.create_active(
+    BannerNotificationBuilder().active().create(
         message="1",
         target=BannerNotificationTarget.ALL,
         active_until=today + timedelta(days=1),
     )
-    BannerNotificationFactory.create_active(
+    BannerNotificationBuilder().active().create(
         message="2",
         target=BannerNotificationTarget.ALL,
         active_until=today + timedelta(days=2),
@@ -311,15 +312,15 @@ def test_sort_banner_notifications_by_target(graphql, order_by, expected):
     # given:
     # - There are banner notification for all target audiences in the system
     # - Notification manager user is using the system
-    BannerNotificationFactory.create_active(
+    BannerNotificationBuilder().active().create(
         message="1",
         target=BannerNotificationTarget.ALL,
     )
-    BannerNotificationFactory.create_active(
+    BannerNotificationBuilder().active().create(
         message="2",
         target=BannerNotificationTarget.USER,
     )
-    BannerNotificationFactory.create_active(
+    BannerNotificationBuilder().active().create(
         message="3",
         target=BannerNotificationTarget.STAFF,
     )
@@ -374,15 +375,15 @@ def test_sort_banner_notifications_by_level(graphql, order_by, expected):
     # given:
     # - There are banner notification for all types in the system
     # - Notification manager user is using the system
-    BannerNotificationFactory.create_active(
+    BannerNotificationBuilder().active().create(
         message="1",
         level=BannerNotificationLevel.NORMAL,
     )
-    BannerNotificationFactory.create_active(
+    BannerNotificationBuilder().active().create(
         message="2",
         level=BannerNotificationLevel.WARNING,
     )
-    BannerNotificationFactory.create_active(
+    BannerNotificationBuilder().active().create(
         message="3",
         level=BannerNotificationLevel.EXCEPTION,
     )

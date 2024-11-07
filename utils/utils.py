@@ -172,3 +172,7 @@ def update_query_params(url: str, **params: str) -> str:
     query_params.update(params)
     url_parts["query"] = urllib.parse.urlencode(query_params)
     return urllib.parse.urlunparse(url_parts.values())  # type: ignore[return-value]
+
+
+def as_p_tags(texts: Iterable[str]) -> str:
+    return "".join(f"<p>{p}</p>" for p in texts)

@@ -669,7 +669,6 @@ def test_reservation__filter__by_text_search__email_pattern(graphql):
 
 @freeze_time("2021-01-01", tz_offset=2)  # UTC+2
 def test_reservation__filter__by_begin_and_end_dates_is_timezone_aware(graphql):
-    DEFAULT_TIMEZONE = timezone.get_default_timezone()
     assert str(DEFAULT_TIMEZONE) == "Europe/Helsinki"
 
     # 2021-01-01

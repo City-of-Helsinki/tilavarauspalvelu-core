@@ -1,16 +1,16 @@
 import datetime
-import random
-from typing import Any
+from typing import Any, Self
 
 import factory
 from factory import fuzzy
 
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, Weekday
-from tilavarauspalvelu.models import ApplicationSection
+from tilavarauspalvelu.models import Application, ApplicationSection
 
-from ._base import FakerFI, ForeignKeyFactory, GenericDjangoModelFactory, ReverseForeignKeyFactory
+from ._base import FakerFI, ForeignKeyFactory, GenericDjangoModelFactory, ModelFactoryBuilder, ReverseForeignKeyFactory
 
 __all__ = [
+    "ApplicationSectionBuilder",
     "ApplicationSectionFactory",
 ]
 
@@ -38,59 +38,67 @@ class ApplicationSectionFactory(GenericDjangoModelFactory[ApplicationSection]):
     suitable_time_ranges = ReverseForeignKeyFactory("tests.factories.SuitableTimeRangeFactory")
 
     @classmethod
-    def create_in_status(cls, status: ApplicationSectionStatusChoice, **kwargs: Any) -> ApplicationSection:
-        match status:
-            case ApplicationSectionStatusChoice.UNALLOCATED:
-                return cls.create_in_status_unallocated(**kwargs)
-            case ApplicationSectionStatusChoice.IN_ALLOCATION:
-                return cls.create_in_status_in_allocation(**kwargs)
-            case ApplicationSectionStatusChoice.HANDLED:
-                return cls.create_in_status_handled(**kwargs)
-            case ApplicationSectionStatusChoice.REJECTED:
-                return cls.create_in_status_rejected(**kwargs)
+    def create_in_status_unallocated(cls, **kwargs: Any) -> ApplicationSection:
+        return ApplicationSectionBuilder().unallocated().create(**kwargs)
 
     @classmethod
-    def create_in_status_unallocated(cls, **kwargs: Any) -> ApplicationSection:
+    def create_in_status_in_allocation(cls, **kwargs: Any) -> ApplicationSection:
+        return ApplicationSectionBuilder().in_allocation().create(**kwargs)
+
+    @classmethod
+    def create_in_status_handled(cls, **kwargs: Any) -> ApplicationSection:
+        return ApplicationSectionBuilder().handled().create(**kwargs)
+
+    @classmethod
+    def create_in_status_rejected(cls, **kwargs: Any) -> ApplicationSection:
+        return ApplicationSectionBuilder().rejected().create(**kwargs)
+
+
+class ApplicationSectionBuilder(ModelFactoryBuilder[ApplicationSection]):
+    factory = ApplicationSectionFactory
+
+    def with_status(self, status: ApplicationSectionStatusChoice) -> Self:
+        match status:
+            case ApplicationSectionStatusChoice.UNALLOCATED:
+                return self.unallocated()
+            case ApplicationSectionStatusChoice.IN_ALLOCATION:
+                return self.in_allocation()
+            case ApplicationSectionStatusChoice.HANDLED:
+                return self.handled()
+            case ApplicationSectionStatusChoice.REJECTED:
+                return self.rejected()
+
+    def unallocated(self) -> Self:
         """
         Create an unallocated application section:
         - in a draft application
         - in an open application round
         - with a single reservation unit option
         """
-        from .application import ApplicationFactory
+        from .application import ApplicationBuilder
 
-        if "application" not in kwargs:
-            sub_kwargs = cls.pop_sub_kwargs("application", kwargs)
-            sub_kwargs["application_sections"] = []
-            kwargs["application"] = ApplicationFactory.create_in_status_draft(**sub_kwargs)
+        for key, value in ApplicationBuilder().draft(sections=False).kwargs.items():
+            self.kwargs.setdefault(f"application__{key}", value)
 
-        if not cls.has_sub_kwargs("reservation_unit_options", kwargs):
-            kwargs["reservation_unit_options__rejected"] = False
+        self.kwargs["reservation_unit_options__rejected"] = False
+        return self
 
-        return cls.create(**kwargs)
-
-    @classmethod
-    def create_in_status_in_allocation(cls, **kwargs: Any) -> ApplicationSection:
+    def in_allocation(self) -> Self:
         """
         Create an unallocated application section:
         - in an application in allocation
         - in an application round in allocation
         - with a single reservation unit option
         """
-        from .application import ApplicationFactory
+        from .application import ApplicationBuilder
 
-        if "application" not in kwargs:
-            sub_kwargs = cls.pop_sub_kwargs("application", kwargs)
-            sub_kwargs["application_sections"] = []
-            kwargs["application"] = ApplicationFactory.create_in_status_in_allocation(**sub_kwargs)
+        for key, value in ApplicationBuilder().in_allocation(sections=False).kwargs.items():
+            self.kwargs.setdefault(f"application__{key}", value)
 
-        if not cls.has_sub_kwargs("reservation_unit_options", kwargs):
-            kwargs["reservation_unit_options__rejected"] = False
+        self.kwargs["reservation_unit_options__rejected"] = False
+        return self
 
-        return cls.create(**kwargs)
-
-    @classmethod
-    def create_in_status_handled(cls, **kwargs: Any) -> ApplicationSection:
+    def handled(self, *, allocations: bool = True) -> Self:
         """
         Create a handled application section:
         - in an application in allocation
@@ -98,41 +106,40 @@ class ApplicationSectionFactory(GenericDjangoModelFactory[ApplicationSection]):
         - with a single reservation unit option with a single allocation
         - with 1 applied reservations per week
         """
-        from .application import ApplicationFactory
+        from .application import ApplicationBuilder
 
-        kwargs["applied_reservations_per_week"] = 1
+        for key, value in ApplicationBuilder().in_allocation(sections=False).kwargs.items():
+            self.kwargs.setdefault(f"application__{key}", value)
 
-        if "application" not in kwargs:
-            sub_kwargs = cls.pop_sub_kwargs("application", kwargs)
-            sub_kwargs["application_sections"] = []
-            kwargs["application"] = ApplicationFactory.create_in_status_in_allocation(**sub_kwargs)
+        self.kwargs["applied_reservations_per_week"] = 1
+        self.kwargs["reservation_unit_options__rejected"] = False
 
-        if not cls.has_sub_kwargs("reservation_unit_options", kwargs):
-            kwargs["reservation_unit_options__allocated_time_slots__day_of_the_week"] = Weekday.MONDAY
+        if allocations:
+            self.kwargs["reservation_unit_options__allocated_time_slots__day_of_the_week"] = Weekday.MONDAY
 
-        return cls.create(**kwargs)
+        return self
 
-    @classmethod
-    def create_in_status_rejected(cls, **kwargs: Any) -> ApplicationSection:
+    def rejected(self) -> Self:
         """
         Create a rejected application section:
         - in an application in allocation
         - in an application round in allocation
         - without any allocated reservation unit options
         """
-        from .application import ApplicationFactory
+        from .application import ApplicationBuilder
 
-        kwargs["applied_reservations_per_week"] = 1
+        for key, value in ApplicationBuilder().in_allocation(sections=False).kwargs.items():
+            self.kwargs.setdefault(f"application__{key}", value)
 
-        if "application" not in kwargs:
-            sub_kwargs = cls.pop_sub_kwargs("application", kwargs)
-            sub_kwargs["application_sections"] = []
-            kwargs["application"] = ApplicationFactory.create_in_status_in_allocation(**sub_kwargs)
+        self.kwargs["applied_reservations_per_week"] = 1
+        self.kwargs["reservation_unit_options__rejected"] = True
+        self.kwargs["reservation_unit_options__locked"] = False
+        return self
 
-        if not cls.has_sub_kwargs("reservation_unit_options", kwargs):
-            # All options are either locked or rejected
-            is_rejected = random.choice([True, False])
-            kwargs["reservation_unit_options__rejected"] = is_rejected
-            kwargs["reservation_unit_options__locked"] = not is_rejected
+    def in_application(self, application: Application) -> Self:
+        for key in list(self.kwargs):
+            if key.startswith("application"):
+                del self.kwargs[key]
 
-        return cls.create(**kwargs)
+        self.kwargs.setdefault("application", application)
+        return self

@@ -1,7 +1,6 @@
 import datetime
 from typing import TYPE_CHECKING
 
-from django.utils.timezone import get_default_timezone
 from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPrimaryKeyField
 from rest_framework import serializers
 
@@ -23,12 +22,10 @@ from tilavarauspalvelu.models import (
     ReservationPurpose,
     ReservationUnit,
 )
-from utils.date_utils import local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.typing import AnyUser
-
-DEFAULT_TIMEZONE = get_default_timezone()
 
 
 class ReservationStaffCreateSerializer(OldPrimaryKeySerializer, ReservationSchedulingMixin):

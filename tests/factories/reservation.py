@@ -1,6 +1,8 @@
 import datetime
+import math
+import random
 from decimal import Decimal
-from typing import Any
+from typing import Any, Self
 
 from factory import LazyAttribute, fuzzy
 
@@ -11,12 +13,20 @@ from tilavarauspalvelu.enums import (
     ReservationStateChoice,
     ReservationTypeChoice,
 )
-from tilavarauspalvelu.models import Reservation, ReservationUnit
+from tilavarauspalvelu.models import Reservation, ReservationUnit, User
 from utils.date_utils import local_start_of_day, next_hour, utc_datetime
 
-from ._base import FakerFI, ForeignKeyFactory, GenericDjangoModelFactory, ManyToManyFactory, ReverseForeignKeyFactory
+from ._base import (
+    FakerFI,
+    ForeignKeyFactory,
+    GenericDjangoModelFactory,
+    ManyToManyFactory,
+    ModelFactoryBuilder,
+    ReverseForeignKeyFactory,
+)
 
 __all__ = [
+    "ReservationBuilder",
     "ReservationFactory",
 ]
 
@@ -57,7 +67,7 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
     free_of_charge_reason = None
 
     # Reservee information
-    reservee_id = LazyAttribute(lambda i: str(getattr(i.user, "id", "")))
+    reservee_id = FakerFI("company_business_id")
     reservee_first_name = FakerFI("first_name")
     reservee_last_name = FakerFI("last_name")
     reservee_email = FakerFI("email")
@@ -279,3 +289,83 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         kwargs.setdefault("end", begin + datetime.timedelta(hours=1))
         kwargs.setdefault("reservation_units", [reservation_unit])
         return cls.create(**kwargs)
+
+
+class NextDateError(Exception): ...
+
+
+class ReservationBuilder(ModelFactoryBuilder[Reservation]):
+    factory = ReservationFactory
+
+    def for_user(self, user: User) -> Self:
+        self.kwargs["user"] = user
+        self.kwargs["reservee_first_name"] = user.first_name
+        self.kwargs["reservee_last_name"] = user.last_name
+        self.kwargs["reservee_email"] = user.email
+        self.kwargs["reservee_language"] = user.get_preferred_language()
+        return self
+
+    def for_reservation_unit(self, reservation_unit: ReservationUnit) -> Self:
+        min_persons = reservation_unit.min_persons or 0
+        max_persons = reservation_unit.max_persons or (min_persons + 10)
+        self.kwargs["num_persons"] = random.randint(min_persons, max_persons)
+        self.kwargs["buffer_time_before"] = reservation_unit.buffer_time_before
+        self.kwargs["buffer_time_after"] = reservation_unit.buffer_time_after
+        return self
+
+    def for_customer_type(self, customer_type: CustomerTypeChoice) -> Self:
+        match customer_type:
+            case CustomerTypeChoice.BUSINESS:
+                return self.for_business()
+            case CustomerTypeChoice.NONPROFIT:
+                return self.for_nonprofit()
+            case CustomerTypeChoice.INDIVIDUAL:
+                return self.for_individual()
+
+    def for_business(self) -> Self:
+        self.kwargs["reservee_type"] = CustomerTypeChoice.BUSINESS
+        self.kwargs["reservee_organisation_name"] = self.factory.reservee_organisation_name.generate()
+        self.kwargs["reservee_id"] = self.factory.reservee_id.generate()
+        self.kwargs["reservee_is_unregistered_association"] = False
+        return self
+
+    def for_nonprofit(self, unregistered: bool = False) -> Self:
+        self.kwargs["reservee_type"] = CustomerTypeChoice.NONPROFIT
+        self.kwargs["reservee_organisation_name"] = ""
+        self.kwargs["reservee_id"] = "" if unregistered else self.factory.reservee_id.generate()
+        self.kwargs["reservee_is_unregistered_association"] = False
+        return self
+
+    def for_individual(self) -> Self:
+        self.kwargs["reservee_type"] = CustomerTypeChoice.INDIVIDUAL
+        self.kwargs["reservee_organisation_name"] = ""
+        self.kwargs["reservee_id"] = ""
+        self.kwargs["reservee_is_unregistered_association"] = False
+        return self
+
+    def starting_at(
+        self,
+        begin: datetime.datetime,
+        reservation_unit: ReservationUnit,
+        *,
+        allow_overnight: bool = False,
+    ) -> Self:
+        """Add begin datetime and end datetime based on given reservation unit's allowed durations."""
+        min_hours = math.ceil(reservation_unit.min_reservation_duration.total_seconds() / 3600)
+        max_hours = math.ceil(reservation_unit.max_reservation_duration.total_seconds() / 3600)
+
+        if not allow_overnight:
+            # Reservation must end before midnight (=hour is 23)
+            max_hours = min(max_hours, 23 - begin.hour)
+
+            # If reservations cannot be this short on this day, go to the next day.
+            if max_hours < min_hours:
+                raise NextDateError
+
+        duration = random.choice(range(min_hours, max_hours + 1))  # '+ 1' is for inclusive range maximum
+
+        self.kwargs["begin"] = begin
+        self.kwargs["end"] = begin + datetime.timedelta(hours=duration)
+        self.kwargs["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(self.kwargs["begin"])
+        self.kwargs["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(self.kwargs["end"])
+        return self

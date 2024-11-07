@@ -492,7 +492,7 @@ def _get_recurring_reservation_details(recurring_reservation: RecurringReservati
     application_section = recurring_reservation.allocated_time_slot.reservation_unit_option.application_section
     application = application_section.application
 
-    reservee_type = ApplicantTypeChoice(application.applicant_type).get_customer_type_choice()
+    reservee_type = ApplicantTypeChoice(application.applicant_type).customer_type_choice
     contact_person: Person | None = getattr(application, "contact_person", None)
     billing_address: Address | None = getattr(application, "billing_address", None)
 

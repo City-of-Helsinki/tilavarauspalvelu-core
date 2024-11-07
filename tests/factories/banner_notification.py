@@ -1,15 +1,18 @@
-from datetime import timedelta
-from typing import Any
+from __future__ import annotations
 
-from django.utils import timezone
+from datetime import timedelta
+from typing import Self
+
 from factory import LazyAttribute, fuzzy
 
 from tilavarauspalvelu.enums import BannerNotificationLevel, BannerNotificationTarget
 from tilavarauspalvelu.models.banner_notification.model import BannerNotification
+from utils.date_utils import local_datetime
 
-from ._base import FakerEN, FakerFI, FakerSV, GenericDjangoModelFactory
+from ._base import FakerEN, FakerFI, FakerSV, GenericDjangoModelFactory, ModelFactoryBuilder
 
 __all__ = [
+    "BannerNotificationBuilder",
     "BannerNotificationFactory",
 ]
 
@@ -17,13 +20,14 @@ __all__ = [
 class BannerNotificationFactory(GenericDjangoModelFactory[BannerNotification]):
     class Meta:
         model = BannerNotification
+        django_get_or_create = ["name"]
 
-    name = FakerFI("text", max_nb_chars=100)
+    name = FakerFI("text", max_nb_chars=100, unique=True)
 
-    message = FakerFI("text", max_nb_chars=1_000)
+    message = FakerFI("sentence")
     message_fi = LazyAttribute(lambda i: i.message)
-    message_en = FakerEN("text", max_nb_chars=1_000)
-    message_sv = FakerSV("text", max_nb_chars=1_000)
+    message_en = FakerEN("sentence")
+    message_sv = FakerSV("sentence")
 
     draft = True
     level = fuzzy.FuzzyChoice(BannerNotificationLevel.values)
@@ -31,26 +35,55 @@ class BannerNotificationFactory(GenericDjangoModelFactory[BannerNotification]):
     active_from = None
     active_until = None
 
-    @classmethod
-    def create_active(cls, **kwargs: Any) -> BannerNotification:
-        today = timezone.now()
-        kwargs.setdefault("draft", False)
-        kwargs.setdefault("active_from", today - timedelta(days=1))
-        kwargs.setdefault("active_until", today + timedelta(days=1))
-        return cls.create(**kwargs)
 
-    @classmethod
-    def create_scheduled(cls, **kwargs: Any) -> BannerNotification:
-        today = timezone.now()
-        kwargs.setdefault("draft", False)
-        kwargs.setdefault("active_from", today + timedelta(days=1))
-        kwargs.setdefault("active_until", today + timedelta(days=2))
-        return cls.create(**kwargs)
+class BannerNotificationBuilder(ModelFactoryBuilder[BannerNotification]):
+    factory = BannerNotificationFactory
 
-    @classmethod
-    def create_past(cls, **kwargs: Any) -> BannerNotification:
-        today = timezone.now()
-        kwargs.setdefault("draft", False)
-        kwargs.setdefault("active_from", today - timedelta(days=2))
-        kwargs.setdefault("active_until", today - timedelta(days=1))
-        return cls.create(**kwargs)
+    def draft(self) -> Self:
+        self.kwargs.setdefault("draft", True)
+        self.kwargs.setdefault("active_from", None)
+        self.kwargs.setdefault("active_until", None)
+        return self
+
+    def active(self) -> Self:
+        now = local_datetime()
+        self.kwargs.setdefault("draft", False)
+        self.kwargs.setdefault("active_from", now - timedelta(days=1))
+        self.kwargs.setdefault("active_until", now + timedelta(days=1))
+        return self
+
+    def scheduled(self) -> Self:
+        now = local_datetime()
+        self.kwargs.setdefault("draft", False)
+        self.kwargs.setdefault("active_from", now + timedelta(days=1))
+        self.kwargs.setdefault("active_until", now + timedelta(days=2))
+        return self
+
+    def past(self) -> Self:
+        now = local_datetime()
+        self.kwargs.setdefault("draft", False)
+        self.kwargs.setdefault("active_from", now - timedelta(days=2))
+        self.kwargs.setdefault("active_until", now - timedelta(days=1))
+        return self
+
+    def bold_messages(self) -> Self:
+        message_fi = self.kwargs.get("message", self.kwargs.get("message_fi", self.factory.message.generate()))
+        message_en = self.kwargs.get("message_sv", self.factory.message_en.generate())
+        message_sv = self.kwargs.get("message_en", self.factory.message_sv.generate())
+
+        message_fi = f"<b>{message_fi}</b>"
+        message_en = f"<b>{message_en}</b>"
+        message_sv = f"<b>{message_sv}</b>"
+
+        self.kwargs["message"] = message_fi
+        self.kwargs["message_fi"] = message_fi
+        self.kwargs["message_en"] = message_en
+        self.kwargs["message_sv"] = message_sv
+        return self
+
+    def messages_are_links(self) -> Self:
+        self.kwargs["message"] = "https://www.example.com"
+        self.kwargs["message_fi"] = "https://www.example.com"
+        self.kwargs["message_en"] = "https://www.example.com"
+        self.kwargs["message_sv"] = "https://www.example.com"
+        return self

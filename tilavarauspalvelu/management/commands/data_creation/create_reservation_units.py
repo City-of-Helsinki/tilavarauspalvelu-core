@@ -1,25 +1,34 @@
-# ruff: noqa: S311
-
+import datetime
+import itertools
 import random
-import uuid
-import zoneinfo
-from datetime import UTC, date, datetime, time, timedelta
 from decimal import Decimal
-from itertools import cycle
+from inspect import cleandoc
+from typing import TYPE_CHECKING
 
+from tests.factories import (
+    PaymentProductFactory,
+    ReservationUnitPricingFactory,
+    ReservationUnitTypeFactory,
+    ResourceFactory,
+    SpaceFactory,
+    UnitFactory,
+)
+from tests.factories.reservation_unit import ReservationUnitBuilder
+from tests.factories.reservation_unit_pricing import ReservationUnitPricingBuilder
 from tilavarauspalvelu.enums import (
     AuthenticationType,
+    PaymentType,
     PriceUnit,
     ReservationKind,
     ReservationStartInterval,
+    ResourceLocationType,
     TermsOfUseTypeChoices,
 )
 from tilavarauspalvelu.models import (
-    Equipment,
     OriginHaukiResource,
-    Purpose,
-    Qualifier,
-    ReservableTimeSpan,
+    PaymentAccounting,
+    PaymentMerchant,
+    PaymentProduct,
     ReservationMetadataSet,
     ReservationUnit,
     ReservationUnitCancellationRule,
@@ -27,422 +36,1418 @@ from tilavarauspalvelu.models import (
     ReservationUnitPricing,
     ReservationUnitType,
     Resource,
-    Service,
+    Space,
     TaxPercentage,
     TermsOfUse,
     Unit,
 )
+from utils.date_utils import DEFAULT_TIMEZONE
 
+from .create_reservation_related_things import (
+    _create_cancellation_rules,
+    _create_equipments,
+    _create_hauki_resources,
+    _create_payment_accountings,
+    _create_payment_merchants,
+    _create_purposes,
+    _create_qualifiers,
+    _create_reservation_metadata_sets,
+    _create_reservation_unit_payment_types,
+    _create_services,
+    _create_specific_terms_of_use,
+    _create_tax_percentages,
+)
 from .create_seasonal_booking import _create_application_round_time_slots
 from .utils import (
-    Paragraphs,
+    BufferInfo,
+    CancelInfo,
+    DurationInfo,
+    FreeReservationUnitData,
+    HandlingInfo,
+    PaidReservationUnitData,
+    PaymentTypeInfo,
+    PriceInfo,
+    ReservableWindowInfo,
+    ReservationKindInfo,
+    SeasonalReservationUnitData,
     SetName,
-    faker_en,
-    faker_fi,
-    faker_sv,
-    get_paragraphs,
+    StartIntervalInfo,
+    TaxPercentageInfo,
+    get_combinations,
     random_subset,
-    weighted_choice,
     with_logs,
 )
 
+if TYPE_CHECKING:
+    from django.db import models
 
-@with_logs()
-def _create_reservation_units(
-    units: list[Unit],
-    reservation_unit_types: list[ReservationUnitType],
-    terms_of_use: dict[str, TermsOfUse],
-    cancellation_rules: list[ReservationUnitCancellationRule],
-    metadata_sets: dict[SetName, ReservationMetadataSet],
-    equipments: list[Equipment],
-    purposes: list[Purpose],
-    qualifiers: list[Qualifier],
-    resources: list[Resource],
-    services: list[Service],
-    hauki_resources: list[OriginHaukiResource],
-) -> list[ReservationUnit]:
-    reservation_unit_types_loop = cycle(reservation_unit_types)
-    cancellation_rules_loop = cycle(cancellation_rules)
-    metadata_set_loop = cycle(metadata_sets.items())
 
-    hauki_ids = {
-        # Oodin nuorisotila - Oodin nuorisotila
-        0: "15cf9b75-30f4-4f8e-9c0e-32dc126bf640",
-        # Arabian nuorisotalo - Sali
-        1: "861de2ef-5524-416d-9845-6c7a85ff181d",
-        # Ungdomsgården Sandels - Bändihuone
-        2: "333c8668-faf1-4754-bb53-e1c6c46cedc9",
-    }
+@with_logs
+def _create_reservation_units() -> list[ReservationUnit]:
+    # --- Create dependencies for the reservation units  ------------------------------------------------------------
 
-    reservation_units: list[ReservationUnit] = []
-    for i, unit in enumerate(units):
-        description = get_paragraphs()
-        terms = get_paragraphs()
-        pending = get_paragraphs()
-        confirmed = get_paragraphs()
-        cancelled = get_paragraphs()
+    hauki_resources = _create_hauki_resources()
+    terms_of_use = _create_specific_terms_of_use()
+    metadata_sets = _create_reservation_metadata_sets()
+    cancellation_rules = _create_cancellation_rules()
+    tax_percentages = _create_tax_percentages()
+    payment_types = _create_reservation_unit_payment_types()
+    merchants = _create_payment_merchants()
+    accountings = _create_payment_accountings()
 
-        min_duration = random.randint(1, 4)
-        max_duration = random.randint(min_duration + 1, 8)
+    # --- Create reservation units ----------------------------------------------------------------------------------
 
-        min_persons = random.randint(1, 40)
-        max_persons = random.randint(min_persons + 1, 100)
+    _create_free_reservation_units(
+        cancellation_rules,
+        hauki_resources,
+        metadata_sets,
+        terms_of_use,
+        tax_percentages,
+    )
 
-        min_before = weighted_choice(list(range(10)), weights=[10, 5] + [1] * 8)
-        max_before = random.randint(min_before + 1, 90)
+    _create_paid_reservation_units(
+        cancellation_rules,
+        hauki_resources,
+        metadata_sets,
+        terms_of_use,
+        tax_percentages,
+        payment_types,
+        merchants,
+        accountings,
+    )
 
-        hauki_id = hauki_ids.get(i, str(uuid.uuid4()))
+    _create_seasonal_bookable_reservation_units(
+        cancellation_rules,
+        hauki_resources,
+        metadata_sets,
+        terms_of_use,
+        tax_percentages,
+    )
 
-        can_apply_free_of_charge = weighted_choice([True, False], weights=[1, 10])
-        if can_apply_free_of_charge:
-            set_name: SetName = random.choice(SetName.applying_free_of_charge())
-            metadata_set = metadata_sets[set_name]
-        else:
-            set_name, metadata_set = next(metadata_set_loop)
-            while set_name.for_applying_free_of_charge:
-                set_name, metadata_set = next(metadata_set_loop)
+    _create_empty_reservation_units(
+        cancellation_rules,
+        metadata_sets,
+        terms_of_use,
+        tax_percentages,
+    )
 
-        reservation_kind = weighted_choice(ReservationKind.values, weights=[1, 1, 10])
+    _create_archived_reservation_units(
+        cancellation_rules,
+        metadata_sets,
+        terms_of_use,
+        hauki_resources,
+        tax_percentages,
+    )
 
-        name = f"Reservation Unit {i}"
-        if reservation_kind == ReservationKind.SEASON:
-            name += ", vain kausivarattava"
-        if unit.spaces.first().parent is not None:
-            name += ", alitila"
-        if unit.spaces.first().children.exists():
-            name += ", ylitila"
+    _create_single_reservation_per_user_reservation_units(
+        cancellation_rules,
+        metadata_sets,
+        terms_of_use,
+        hauki_resources,
+        tax_percentages,
+    )
 
-        reservation_unit = ReservationUnit(
-            allow_reservations_without_opening_hours=True,
-            authentication=weighted_choice(AuthenticationType.values, weights=[2, 1]),
-            can_apply_free_of_charge=can_apply_free_of_charge,
-            cancellation_rule=next(cancellation_rules_loop),
-            cancellation_terms=terms_of_use[TermsOfUseTypeChoices.CANCELLATION.value],
-            contact_information=faker_fi.text(),
-            description=description.fi,
-            description_en=description.en,
-            description_fi=description.fi,
-            description_sv=description.sv,
-            max_persons=max_persons,
-            max_reservation_duration=timedelta(hours=max_duration),
-            max_reservations_per_user=weighted_choice(
-                [None, 2, 5, 10],
-                weights=[10, 1, 1, 1],
-            ),
-            metadata_set=metadata_set,
-            min_persons=min_persons,
-            min_reservation_duration=timedelta(hours=min_duration),
-            name=name,
-            name_en=f"{name} EN",
-            name_fi=f"{name} FI",
-            name_sv=f"{name} SV",
-            origin_hauki_resource=random.choice(hauki_resources),
-            payment_terms=terms_of_use[TermsOfUseTypeChoices.PAYMENT.value],
-            pricing_terms=terms_of_use[TermsOfUseTypeChoices.PRICING.value],
-            rank=i,
-            reservation_begins=datetime(2021, 1, 1, tzinfo=UTC),
-            reservation_cancelled_instructions=cancelled.fi,
-            reservation_cancelled_instructions_en=cancelled.en,
-            reservation_cancelled_instructions_fi=cancelled.fi,
-            reservation_cancelled_instructions_sv=cancelled.sv,
-            reservation_confirmed_instructions=confirmed.fi,
-            reservation_confirmed_instructions_en=confirmed.en,
-            reservation_confirmed_instructions_fi=confirmed.fi,
-            reservation_confirmed_instructions_sv=confirmed.sv,
-            reservation_kind=reservation_kind,
-            reservation_pending_instructions=pending.fi,
-            reservation_pending_instructions_en=pending.en,
-            reservation_pending_instructions_fi=pending.fi,
-            reservation_pending_instructions_sv=pending.sv,
-            reservation_start_interval=random.choice(ReservationStartInterval.values),
-            reservation_unit_type=next(reservation_unit_types_loop),
-            reservations_max_days_before=max_before,
-            reservations_min_days_before=min_before,
-            service_specific_terms=terms_of_use[TermsOfUseTypeChoices.SERVICE.value],
-            surface_area=random.randint(10, 1000),
-            terms_of_use=terms.fi,
-            terms_of_use_en=terms.en,
-            terms_of_use_fi=terms.fi,
-            terms_of_use_sv=terms.sv,
-            unit=unit,
-            uuid=hauki_id,
-        )
-        reservation_units.append(reservation_unit)
+    _create_full_day_reservation_units(
+        cancellation_rules,
+        metadata_sets,
+        terms_of_use,
+        hauki_resources,
+        tax_percentages,
+    )
 
-    reservation_units = ReservationUnit.objects.bulk_create(reservation_units)
+    _create_reservation_units_in_space_hierarchies(
+        cancellation_rules,
+        metadata_sets,
+        terms_of_use,
+        hauki_resources,
+        tax_percentages,
+    )
 
-    payment_types = _create_reservation_payment_types()
+    _create_reservation_units_in_resource_hierarchies(
+        cancellation_rules,
+        metadata_sets,
+        terms_of_use,
+        hauki_resources,
+        tax_percentages,
+    )
 
-    is_empty_created: bool = False
+    # --- Add reservables ------------------------------------------------------------------------------------------
+
+    equipments = _create_equipments()
+    purposes = _create_purposes()
+    qualifiers = _create_qualifiers()
+    services = _create_services()
+
+    reservation_units = list(ReservationUnit.objects.all())
     for reservation_unit in reservation_units:
         reservation_unit.equipments.add(*random_subset(equipments))
         reservation_unit.purposes.add(*random_subset(purposes))
         reservation_unit.qualifiers.add(*random_subset(qualifiers))
         reservation_unit.services.add(*random_subset(services))
-        reservation_unit.payment_types.add(*random_subset(payment_types))
-
-        if not is_empty_created:
-            reservation_unit.name = f"Empty {reservation_unit.name}"
-            reservation_unit.name_fi = reservation_unit.name
-            reservation_unit.name_en = f"Empty {reservation_unit.name_en}"
-            reservation_unit.name_sv = f"Empty {reservation_unit.name_sv}"
-            is_empty_created = True
-            continue
-
-        reservation_unit.resources.add(*random_subset(resources))
-        reservation_unit.spaces.add(*list(reservation_unit.unit.spaces.all()))
-
-    _create_application_round_time_slots(reservation_units)
 
     return reservation_units
 
 
-@with_logs()
-def _create_reservation_unit_types(*, number: int = 3) -> list[ReservationUnitType]:
-    reservation_unit_types: list[ReservationUnitType] = []
-    for i in range(number):
-        reservation_unit_type = ReservationUnitType(
-            name=f"Reservation Unit Type {i}",
-            name_fi=f"Reservation Unit Type {i}",
-            name_sv=f"Reservation Unit Type {i}",
-            name_en=f"Reservation Unit Type {i}",
-            rank=i,
-        )
-        reservation_unit_types.append(reservation_unit_type)
+@with_logs
+def _create_free_reservation_units(
+    cancellation_rules: list[ReservationUnitCancellationRule],
+    hauki_resources: list[OriginHaukiResource],
+    metadata_sets: dict[SetName, ReservationMetadataSet],
+    terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
+    tax_percentages: dict[str, TaxPercentage],
+) -> None:
+    """
+    Create reservation units that:
+     - Are free of charge
+     - Are only DIRECT bookable
+     - Only require WEAK authentication
 
-    return ReservationUnitType.objects.bulk_create(reservation_unit_types)
+    Create combinations with:
+     - Different buffer times
+     - Different min/max reservation times
+     - Different min/max days before reservation can be made
+     - Different start intervals
+     - Different cancellation rules
+     - Handling requirements
+    """
+    buffer_time_choices: list[BufferInfo] = [
+        BufferInfo(name="(-0, +0)", before=datetime.timedelta(minutes=0), after=datetime.timedelta(minutes=0)),
+        BufferInfo(name="(-30, +30)", before=datetime.timedelta(minutes=30), after=datetime.timedelta(minutes=30)),
+        BufferInfo(name="(-15, +60)", before=datetime.timedelta(minutes=15), after=datetime.timedelta(minutes=60)),
+    ]
+    reservation_time_choices: list[DurationInfo] = [
+        DurationInfo(name="short", minimum=datetime.timedelta(minutes=15), maximum=datetime.timedelta(minutes=60)),
+        DurationInfo(name="long", minimum=datetime.timedelta(hours=2), maximum=datetime.timedelta(hours=5)),
+    ]
+    min_max_days_before_choices: list[ReservableWindowInfo] = [
+        ReservableWindowInfo(name="now", minimum=0, maximum=14),
+        ReservableWindowInfo(name="later", minimum=3, maximum=30),
+    ]
+    start_interval_choices: list[StartIntervalInfo] = [
+        StartIntervalInfo(name="15", value=ReservationStartInterval.INTERVAL_15_MINUTES),
+        StartIntervalInfo(name="30", value=ReservationStartInterval.INTERVAL_30_MINUTES),
+        StartIntervalInfo(name="90", value=ReservationStartInterval.INTERVAL_90_MINUTES),
+    ]
+    cancellation_rule_choices: list[CancelInfo] = [
+        CancelInfo(name="cannot", value=[None]),
+        CancelInfo(name="allowed", value=cancellation_rules),
+    ]
+    handling_info_choices: list[HandlingInfo] = [
+        HandlingInfo(name="no", handling_required=False),
+        HandlingInfo(name="yes", handling_required=True),
+    ]
 
+    ReservationUnitSpacesThoughModel: type[models.Model] = ReservationUnit.spaces.through  # noqa: N806
 
-@with_logs()
-def _create_reservation_payment_types() -> list[ReservationUnitPaymentType]:
-    payment_types: list[ReservationUnitPaymentType] = []
-    codes = ["ONLINE", "INVOICE", "ON_SITE"]
-    for code in codes:
-        # Creation is done one-by-one since 'code' is a primary key
-        # and 'bulk_create' doesn't support 'update_conflicts' with primary keys:
-        # https://docs.djangoproject.com/en/4.2/ref/models/querysets/#bulk-create
-        payment_type, _ = ReservationUnitPaymentType.objects.get_or_create(code=code)
-        payment_types.append(payment_type)
-
-    return payment_types
-
-
-@with_logs()
-def _create_pricings(reservation_units: list[ReservationUnit]) -> list[ReservationUnitPricing]:
-    tax_percentages: dict[int, TaxPercentage] = {int(tax.value): tax for tax in _create_tax_percentages()}
-    zero_tax: TaxPercentage = tax_percentages.pop(0)
-
-    pricing_options: list[int] = [0, 10, 49, 77]
-
+    spaces: list[Space] = []
+    reservation_units: list[ReservationUnit] = []
+    reservation_unit_spaces: list[models.Model] = []
     pricings: list[ReservationUnitPricing] = []
-    for reservation_unit in reservation_units:
-        highest_price = weighted_choice(pricing_options, weights=[5, 1, 1, 3])
-        tax = zero_tax if highest_price == 0 else random.choice(list(tax_percentages.values()))
 
-        lowest_price: int = 0
-        if highest_price > 0:
-            lowest_price = random.randint(1, highest_price - 1)
+    reservation_unit_type = ReservationUnitTypeFactory.create(
+        name="Ilmainen",
+        name_fi="Ilmainen",
+        name_en="Free",
+        name_sv="Gratis",
+    )
 
-        pricing = ReservationUnitPricing(
-            begins=date(2021, 1, 1),
-            price_unit=random.choice(PriceUnit.values),
-            lowest_price=lowest_price,
-            highest_price=highest_price,
+    # One shared unit for all free reservation units
+    unit = UnitFactory.create(
+        name="Keskustoimisto",
+        name_fi="Keskustoimisto",
+        name_en="Central office",
+        name_sv="Centrala kontoret",
+        tprek_id=None,
+        tprek_department_id=None,
+    )
+
+    unit_counter = itertools.count(start=1)
+
+    for data in get_combinations(
+        iterables=[
+            buffer_time_choices,
+            reservation_time_choices,
+            min_max_days_before_choices,
+            start_interval_choices,
+            cancellation_rule_choices,
+            handling_info_choices,
+        ],
+        output_type=FreeReservationUnitData,
+    ):
+        set_name: SetName = random.choice(SetName.non_free_of_charge_applying())
+        reservation_kind = ReservationKind.DIRECT
+        authentication = AuthenticationType.WEAK
+        number = next(unit_counter)
+
+        space = SpaceFactory.build_for_bulk_create(
+            name=f"Toimistokoppi #{number}",
+            name_fi=f"Toimistokoppi #{number}",
+            name_en=f"Office cubicle #{number}",
+            name_sv=f"Kontorsbås #{number}",
+            unit=unit,
+        )
+        spaces.append(space)
+
+        reservation_unit = (
+            ReservationUnitBuilder()
+            .set(
+                name=f"Ankea toimistokoppi #{number}",
+                name_fi=f"Ankea toimistokoppi #{number}",
+                name_en=f"Drab office cubicle #{number}",
+                name_sv=f"Dyster kontorsbås #{number}",
+                unit=unit,
+                origin_hauki_resource=random.choice(hauki_resources),
+                allow_reservations_without_opening_hours=True,
+                reservations_min_days_before=data.reservable_window_info.minimum,
+                reservations_max_days_before=data.reservable_window_info.maximum,
+                min_reservation_duration=data.duration_info.minimum,
+                max_reservation_duration=data.duration_info.maximum,
+                buffer_time_before=data.buffer_info.before,
+                buffer_time_after=data.buffer_info.after,
+                reservation_start_interval=data.start_interval_info.value,
+                authentication=authentication,
+                can_apply_free_of_charge=False,
+                max_reservations_per_user=None,
+                reservation_unit_type=reservation_unit_type,
+                reservation_kind=reservation_kind,
+                cancellation_rule=random.choice(data.cancellation_rule_info.value),
+                require_reservation_handling=data.handling_info.handling_required,
+                metadata_set=metadata_sets[set_name],
+                reservation_begins=datetime.datetime(2021, 1, 1, tzinfo=DEFAULT_TIMEZONE),
+                cancellation_terms=terms_of_use[TermsOfUseTypeChoices.CANCELLATION],
+                payment_terms=terms_of_use[TermsOfUseTypeChoices.PAYMENT],
+                pricing_terms=terms_of_use[TermsOfUseTypeChoices.PRICING],
+                service_specific_terms=terms_of_use[TermsOfUseTypeChoices.SERVICE],
+            )
+            .set_description_info(
+                buffer_time=data.buffer_info.name,
+                reservation_time=data.duration_info.name,
+                reservable_window=data.reservable_window_info.name,
+                max_reservations="unlimited",
+                reservation_kind=reservation_kind.value,
+                start_interval=data.start_interval_info.name,
+                authentication=authentication.value,
+                cancellation_rule=data.cancellation_rule_info.name,
+                handling_required=data.handling_info.name,
+                pricing="free",
+                payment_type="none",
+                tax_percentage="0%",
+                metadata_set=set_name.value,
+                can_apply_free_of_charge="no need",
+            )
+            .build()
+        )
+        reservation_units.append(reservation_unit)
+
+        reservation_unit_spaces.append(
+            ReservationUnitSpacesThoughModel(
+                reservationunit=reservation_unit,
+                space=space,
+            )
+        )
+
+        pricing = ReservationUnitPricingFactory.build(
+            begins=datetime.date(2021, 1, 1),
+            price_unit=PriceUnit.PRICE_UNIT_FIXED,
+            lowest_price=Decimal("0"),
+            highest_price=Decimal("0"),
             reservation_unit=reservation_unit,
-            tax_percentage=tax,
+            tax_percentage=tax_percentages["0"],
         )
         pricings.append(pricing)
-        addendum = "maksuton" if highest_price == 0 else "maksullinen"
 
-        reservation_unit.name = f"{reservation_unit.name}, {addendum}"
-        reservation_unit.name_fi = reservation_unit.name
-        reservation_unit.name_en = f"{reservation_unit.name_en}, {addendum}"
-        reservation_unit.name_sv = f"{reservation_unit.name_sv}, {addendum}"
-
-    ReservationUnit.objects.bulk_update(reservation_units, fields=["name", "name_fi", "name_en", "name_sv"])
-    return ReservationUnitPricing.objects.bulk_create(pricings)
+    Space.objects.bulk_create(spaces)
+    ReservationUnit.objects.bulk_create(reservation_units)
+    ReservationUnitSpacesThoughModel.objects.bulk_create(reservation_unit_spaces)
+    ReservationUnitPricing.objects.bulk_create(pricings)
 
 
-@with_logs()
-def _create_tax_percentages() -> list[TaxPercentage]:
-    tax_percentages: list[TaxPercentage] = []
-    percentages = (0, 10, 14, 24, Decimal("25.5"))
-    for percentage in percentages:
-        # Creation is done one-by-one since 'value' is a not defined as unique
-        # and 'bulk_create' doesn't support 'update_conflicts' without a unique constraint:
-        # https://docs.djangoproject.com/en/4.2/ref/models/querysets/#bulk-create
-        tax_percentage, _ = TaxPercentage.objects.get_or_create(value=percentage)
-        tax_percentages.append(tax_percentage)
+@with_logs
+def _create_paid_reservation_units(
+    cancellation_rules: list[ReservationUnitCancellationRule],
+    hauki_resources: list[OriginHaukiResource],
+    metadata_sets: dict[SetName, ReservationMetadataSet],
+    terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
+    tax_percentages: dict[str, TaxPercentage],
+    payment_types: dict[str, ReservationUnitPaymentType],
+    merchants: list[PaymentMerchant],
+    accountings: list[PaymentAccounting],
+) -> None:
+    """
+    Create reservation units that:
+     - Are paid
+     - Are only DIRECT bookable
+     - Require STRONG authentication
 
-    return tax_percentages
-
-
-@with_logs()
-def _create_hauki_resources() -> list[OriginHaukiResource]:
-    hauki_resources: list[OriginHaukiResource] = []
-    time_options: list[list[dict[str, str]]] = [
-        [
-            {
-                "start_time": "09:00:00",
-                "end_time": "11:00:00",
-            },
-            {
-                "start_time": "12:00:00",
-                "end_time": "20:00:00",
-            },
-        ],
-        [
-            {
-                "overnight": True,
-                "start_time": "19:00:00",
-                "end_time": "08:00:00",
-            },
-        ],
-        [
-            {
-                "full_day": True,
-            },
-        ],
-        [
-            {
-                "start_time": "10:00:00",
-                "end_time": "20:00:00",
-            },
-        ],
+    Create combinations with:
+     - Different min/max reservation times
+     - Different cancellation rules
+     - Different pricings
+     - Handling requirements
+     - Different payment types
+     - Different tax percentages
+    """
+    reservation_time_choices: list[DurationInfo] = [
+        DurationInfo(name="short", minimum=datetime.timedelta(minutes=15), maximum=datetime.timedelta(minutes=60)),
+        DurationInfo(name="long", minimum=datetime.timedelta(hours=2), maximum=datetime.timedelta(hours=5)),
+    ]
+    cancellation_rule_choices: list[CancelInfo] = [
+        CancelInfo(name="cannot", value=[None]),
+        CancelInfo(name="allowed", value=cancellation_rules),
+    ]
+    price_choices: list[PriceInfo] = [
+        PriceInfo(
+            name="fixed price",
+            highest_price=Decimal("10"),
+            lowest_price=Decimal("10"),
+            price_unit=PriceUnit.PRICE_UNIT_FIXED,
+            can_apply_free_of_charge=False,
+        ),
+        PriceInfo(
+            name="hourly price",
+            highest_price=Decimal("10"),
+            lowest_price=Decimal("10"),
+            price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
+            can_apply_free_of_charge=False,
+        ),
+        PriceInfo(
+            name="can ask for subvention",
+            highest_price=Decimal("15"),
+            lowest_price=Decimal("10"),
+            price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
+            can_apply_free_of_charge=True,
+        ),
+    ]
+    handling_info_choices: list[HandlingInfo] = [
+        HandlingInfo(name="no", handling_required=False),
+        HandlingInfo(name="yes", handling_required=True),
+    ]
+    payment_type_choices: list[PaymentTypeInfo] = [
+        PaymentTypeInfo(name="invoice", payment_type=PaymentType.INVOICE),
+        PaymentTypeInfo(name="online", payment_type=PaymentType.ONLINE),
+        PaymentTypeInfo(name="on site", payment_type=PaymentType.ON_SITE),
+    ]
+    tax_percentage_choices: list[TaxPercentageInfo] = [
+        TaxPercentageInfo(name="14%", value="14"),
+        TaxPercentageInfo(name="25.5%", value="25.5"),
     ]
 
-    for i in range(len(time_options)):
-        hauki_resource = OriginHaukiResource(
-            id=i,
-            opening_hours_hash="",
-            latest_fetched_date=None,
+    ReservationUnitPaymentTypesThoughModel: type[models.Model] = ReservationUnit.payment_types.through  # noqa: N806
+    ReservationUnitSpacesThoughModel: type[models.Model] = ReservationUnit.spaces.through  # noqa: N806
+
+    units: list[Unit] = []
+    reservation_units: list[ReservationUnit] = []
+    spaces: list[Space] = []
+    reservation_unit_spaces: list[models.Model] = []
+    reservation_unit_payment_types: list[models.Model] = []
+    pricings: list[ReservationUnitPricing] = []
+    payment_products: list[PaymentProduct] = []
+
+    unit_counter = itertools.count(start=1)
+
+    reservation_unit_type = ReservationUnitTypeFactory.create(
+        name="Maksullinen",
+        name_fi="Maksullinen",
+        name_en="Paid",
+        name_sv="Betald",
+    )
+
+    for data in get_combinations(
+        iterables=[
+            reservation_time_choices,
+            cancellation_rule_choices,
+            price_choices,
+            handling_info_choices,
+            payment_type_choices,
+            tax_percentage_choices,
+        ],
+        output_type=PaidReservationUnitData,
+    ):
+        merchant = random.choice(merchants)
+        accounting = random.choice(accountings)
+
+        set_name: SetName = random.choice(SetName.applying_free_of_charge())
+        reservation_kind = ReservationKind.DIRECT
+        authentication = AuthenticationType.STRONG
+        reservation_start_interval = ReservationStartInterval.INTERVAL_30_MINUTES
+        number = next(unit_counter)
+
+        unit = UnitFactory.build(
+            name=f"Vessapaikka #{number}",
+            name_fi=f"Vessapaikka #{number}",
+            name_en=f"Toilet location #{number}",
+            name_sv=f"Toalett plats #{number}",
+            tprek_id=None,
+            tprek_department_id=None,
+            payment_merchant=merchant,
+            payment_accounting=accounting,
         )
-        hauki_resources.append(hauki_resource)
+        units.append(unit)
 
-    hauki_resources = OriginHaukiResource.objects.bulk_create(hauki_resources)
+        space = SpaceFactory.build_for_bulk_create(
+            name=f"Vessa koppi #{number}",
+            name_fi=f"Vessa koppi #{number}",
+            name_en=f"Toilet stall #{number}",
+            name_sv=f"Toalett kopp #{number}",
+            unit=unit,
+        )
+        spaces.append(space)
 
-    local_timezone = zoneinfo.ZoneInfo("Europe/Helsinki")
-    today = datetime.now(tz=local_timezone).date()
+        payment_product = PaymentProductFactory.build(merchant=merchant)
+        payment_products.append(payment_product)
 
-    timespans: list[ReservableTimeSpan] = []
-    for i, hauki_resource in enumerate(hauki_resources):
-        for option in time_options[i]:
-            if option.get("full_day"):
-                timespans.append(
-                    ReservableTimeSpan(
-                        resource=hauki_resource,
-                        start_datetime=datetime.combine(
-                            date=today,
-                            time=time.fromisoformat("00:00:00"),
-                            tzinfo=local_timezone,
-                        ),
-                        end_datetime=datetime.combine(
-                            date=today + timedelta(days=721),
-                            time=time.fromisoformat("00:00:00"),
-                            tzinfo=local_timezone,
-                        ),
-                    ),
-                )
-                continue
+        reservation_unit = (
+            ReservationUnitBuilder()
+            .set(
+                name=f"Maksullinen vessa #{number}",
+                name_fi=f"Maksullinen vessa #{number}",
+                name_en=f"Paid toilet #{number}",
+                name_sv=f"Betalad toalett #{number}",
+                unit=unit,
+                payment_product=payment_product,
+                payment_merchant=merchant,
+                payment_accounting=accounting,
+                origin_hauki_resource=random.choice(hauki_resources),
+                allow_reservations_without_opening_hours=True,
+                reservations_min_days_before=0,
+                reservations_max_days_before=14,
+                min_reservation_duration=data.duration_info.minimum,
+                max_reservation_duration=data.duration_info.maximum,
+                buffer_time_before=datetime.timedelta(),
+                buffer_time_after=datetime.timedelta(),
+                reservation_start_interval=reservation_start_interval,
+                authentication=authentication,
+                can_apply_free_of_charge=data.price_info.can_apply_free_of_charge,
+                max_reservations_per_user=None,
+                reservation_unit_type=reservation_unit_type,
+                reservation_kind=reservation_kind,
+                cancellation_rule=random.choice(data.cancellation_rule_info.value),
+                require_reservation_handling=data.handling_info.handling_required,
+                metadata_set=metadata_sets[set_name],
+                reservation_begins=datetime.datetime(2021, 1, 1, tzinfo=DEFAULT_TIMEZONE),
+                cancellation_terms=terms_of_use[TermsOfUseTypeChoices.CANCELLATION],
+                payment_terms=terms_of_use[TermsOfUseTypeChoices.PAYMENT],
+                pricing_terms=terms_of_use[TermsOfUseTypeChoices.PRICING],
+                service_specific_terms=terms_of_use[TermsOfUseTypeChoices.SERVICE],
+            )
+            .set_description_info(
+                buffer_time="(-0, +0)",
+                reservation_time=data.duration_info.name,
+                reservable_window="now",
+                max_reservations="unlimited",
+                reservation_kind=reservation_kind.value,
+                start_interval=reservation_start_interval.value,
+                authentication=authentication.value,
+                cancellation_rule=data.cancellation_rule_info.name,
+                handling_required=data.handling_info.name,
+                pricing=data.price_info.name,
+                payment_type=data.payment_type_info.payment_type.name,
+                tax_percentage=data.tax_percentage_info.name,
+                metadata_set=set_name.value,
+            )
+            .build()
+        )
+        reservation_units.append(reservation_unit)
 
-            timespans += [
-                ReservableTimeSpan(
-                    resource=hauki_resource,
-                    start_datetime=datetime.combine(
-                        date=today + timedelta(days=day),
-                        time=time.fromisoformat(option["start_time"]),
-                        tzinfo=local_timezone,
-                    ),
-                    end_datetime=datetime.combine(
-                        date=today + timedelta(days=day + (1 if option.get("overnight") else 0)),
-                        time=time.fromisoformat(option["end_time"]),
-                        tzinfo=local_timezone,
-                    ),
-                )
-                for day in range(721)
-            ]
+        reservation_unit_spaces.append(
+            ReservationUnitSpacesThoughModel(
+                reservationunit=reservation_unit,
+                space=space,
+            )
+        )
 
-    ReservableTimeSpan.objects.bulk_create(timespans)
-    return hauki_resources
+        reservation_unit_payment_types.append(
+            ReservationUnitPaymentTypesThoughModel(
+                reservationunit=reservation_unit,
+                reservationunitpaymenttype=payment_types[data.payment_type_info.payment_type],
+            ),
+        )
+
+        pricing = ReservationUnitPricingFactory.build(
+            begins=datetime.date(2021, 1, 1),
+            price_unit=data.price_info.price_unit,
+            lowest_price=data.price_info.lowest_price,
+            highest_price=data.price_info.highest_price,
+            reservation_unit=reservation_unit,
+            tax_percentage=tax_percentages[data.tax_percentage_info.value],
+        )
+        pricings.append(pricing)
+
+    Unit.objects.bulk_create(units)
+    Space.objects.bulk_create(spaces)
+    PaymentProduct.objects.bulk_create(payment_products)
+    ReservationUnit.objects.bulk_create(reservation_units)
+    ReservationUnitSpacesThoughModel.objects.bulk_create(reservation_unit_spaces)
+    ReservationUnitPaymentTypesThoughModel.objects.bulk_create(reservation_unit_payment_types)
+    ReservationUnitPricing.objects.bulk_create(pricings)
 
 
-@with_logs()
-def _create_terms_of_use() -> dict[str, TermsOfUse]:
-    #
-    # Create general terms
-    #
-    generic_terms = ["accessibility", "booking", "privacy", "service"]
-    term_names = [
-        Paragraphs(fi="Saavutettavuusseloste", en="Accessibility Statement", sv="Tillgänglighet"),
-        Paragraphs(fi="Yleiset sopimusehdot", en="General Terms and Conditions", sv="Allmänna villkor"),
-        Paragraphs(fi="Tietosuojaseloste", en="Privacy Statement", sv="Dataskyddspolicy"),
-        Paragraphs(fi="Palvelun yleiset käyttöehdot", en="General Terms of Service", sv="Allmänna användarvillkor"),
+@with_logs
+def _create_seasonal_bookable_reservation_units(
+    cancellation_rules: list[ReservationUnitCancellationRule],
+    hauki_resources: list[OriginHaukiResource],
+    metadata_sets: dict[SetName, ReservationMetadataSet],
+    terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
+    tax_percentages: dict[str, TaxPercentage],
+) -> None:
+    """
+    Create reservation units that:
+     - Are only SEASONAL bookable
+     - Only require WEAK authentication
+
+    Create combinations with:
+     - Different min/max reservation times
+     - Different cancellation rules
+     - Seasonal and direct / seasonal only
+    """
+    reservation_time_choices: list[DurationInfo] = [
+        DurationInfo(name="short", minimum=datetime.timedelta(minutes=15), maximum=datetime.timedelta(minutes=60)),
+        DurationInfo(name="long", minimum=datetime.timedelta(hours=2), maximum=datetime.timedelta(hours=5)),
+    ]
+    cancellation_rule_choices: list[CancelInfo] = [
+        CancelInfo(name="cannot", value=[None]),
+        CancelInfo(name="allowed", value=cancellation_rules),
+    ]
+    reservation_kind_choices: list[ReservationKindInfo] = [
+        ReservationKindInfo(name="seasonal", value=ReservationKind.SEASON),
+        ReservationKindInfo(name="direct and seasonal", value=ReservationKind.DIRECT_AND_SEASON),
     ]
 
-    for term_id, names in zip(generic_terms, term_names, strict=True):
-        text_fi = faker_fi.text()
-        text_sv = faker_sv.text()
-        text_en = faker_en.text()
+    ReservationUnitSpacesThoughModel: type[models.Model] = ReservationUnit.spaces.through  # noqa: N806
 
-        TermsOfUse.objects.create(
-            id=term_id,
-            name=names.fi,
-            name_fi=names.fi,
-            name_sv=names.en,
-            name_en=names.sv,
-            text=text_fi,
-            text_fi=text_fi,
-            text_sv=text_sv,
-            text_en=text_en,
-            terms_type=TermsOfUseTypeChoices.GENERIC,
+    units: list[Unit] = []
+    reservation_units: list[ReservationUnit] = []
+    spaces: list[Space] = []
+    reservation_unit_spaces: list[models.Model] = []
+    pricings: list[ReservationUnitPricing] = []
+
+    unit_counter = itertools.count(start=1)
+
+    reservation_unit_type = ReservationUnitTypeFactory.create(
+        name="Kausikäyttöinen",
+        name_fi="Kausikäyttöinen",
+        name_en="Seasonal use",
+        name_sv="Säsongsanvänd",
+    )
+
+    for data in get_combinations(
+        iterables=[
+            reservation_time_choices,
+            cancellation_rule_choices,
+            reservation_kind_choices,
+        ],
+        output_type=SeasonalReservationUnitData,
+        multiplier=3,
+    ):
+        set_name: SetName = random.choice(SetName.non_free_of_charge_applying())
+        authentication = AuthenticationType.WEAK
+        reservation_start_interval = ReservationStartInterval.INTERVAL_30_MINUTES
+        number = next(unit_counter)
+
+        unit = UnitFactory.build(
+            name=f"Harrastushalli #{number}",
+            name_fi=f"Harrastushalli #{number}",
+            name_en=f"Hobbyhall #{number}",
+            name_sv=f"Hobbyhall #{number}",
+            tprek_id=None,
+            tprek_department_id=None,
+        )
+        units.append(unit)
+
+        space = SpaceFactory.build_for_bulk_create(
+            name=f"Kerhohuone #{number}",
+            name_fi=f"Kerhohuone #{number}",
+            name_en=f"Club room #{number}",
+            name_sv=f"Klubbrum #{number}",
+            unit=unit,
+        )
+        spaces.append(space)
+
+        reservation_unit = (
+            ReservationUnitBuilder()
+            .set(
+                name=f"Kausivarattava kerhohuone #{number}",
+                name_fi=f"Kausivarattava kerhohuone #{number}",
+                name_en=f"Seasonal club room #{number}",
+                name_sv=f"Säsongsöppet klubbrum #{number}",
+                unit=unit,
+                origin_hauki_resource=random.choice(hauki_resources),
+                allow_reservations_without_opening_hours=True,
+                reservations_min_days_before=0,
+                reservations_max_days_before=14,
+                min_reservation_duration=data.duration_info.minimum,
+                max_reservation_duration=data.duration_info.maximum,
+                buffer_time_before=datetime.timedelta(),
+                buffer_time_after=datetime.timedelta(),
+                reservation_start_interval=reservation_start_interval,
+                authentication=authentication,
+                can_apply_free_of_charge=False,
+                max_reservations_per_user=None,
+                reservation_unit_type=reservation_unit_type,
+                reservation_kind=data.reservation_kind_info.value,
+                cancellation_rule=random.choice(data.cancellation_rule_info.value),
+                require_reservation_handling=False,
+                metadata_set=metadata_sets[set_name],
+                reservation_begins=datetime.datetime(2021, 1, 1, tzinfo=DEFAULT_TIMEZONE),
+                cancellation_terms=terms_of_use[TermsOfUseTypeChoices.CANCELLATION],
+                payment_terms=terms_of_use[TermsOfUseTypeChoices.PAYMENT],
+                pricing_terms=terms_of_use[TermsOfUseTypeChoices.PRICING],
+                service_specific_terms=terms_of_use[TermsOfUseTypeChoices.SERVICE],
+            )
+            .set_description_info(
+                buffer_time="(-0, +0)",
+                reservation_time=data.duration_info.name,
+                reservable_window="now",
+                max_reservations="unlimited",
+                reservation_kind=data.reservation_kind_info.name,
+                start_interval=str(reservation_start_interval.as_number),
+                authentication=authentication.value,
+                cancellation_rule=data.cancellation_rule_info.name,
+                handling_required="no",
+                pricing="free",
+                payment_type="none",
+                tax_percentage="0%",
+                metadata_set=set_name.value,
+            )
+            .build()
+        )
+        reservation_units.append(reservation_unit)
+
+        reservation_unit_spaces.append(
+            ReservationUnitSpacesThoughModel(
+                reservationunit=reservation_unit,
+                space=space,
+            )
         )
 
-    #
-    # Create other kinds of terms
-    #
-    terms_of_use: list[TermsOfUse] = []
-    term_types: list[str] = [
-        TermsOfUseTypeChoices.PAYMENT.value,
-        TermsOfUseTypeChoices.CANCELLATION.value,
-        TermsOfUseTypeChoices.RECURRING.value,
-        TermsOfUseTypeChoices.SERVICE.value,
-        TermsOfUseTypeChoices.PRICING.value,
-    ]
-    for term_type in term_types:
-        name = term_type.replace("_", " ").title()
-
-        text_fi = faker_fi.text()
-        text_sv = faker_sv.text()
-        text_en = faker_en.text()
-
-        terms = TermsOfUse(
-            id=f"{term_type}_1",
-            name=name,
-            name_fi=name,
-            name_sv=name,
-            name_en=name,
-            text=text_fi,
-            text_fi=text_fi,
-            text_sv=text_sv,
-            text_en=text_en,
-            terms_type=term_type,
+        pricing = ReservationUnitPricingFactory.build(
+            begins=datetime.date(2021, 1, 1),
+            price_unit=PriceUnit.PRICE_UNIT_FIXED,
+            lowest_price=Decimal("0"),
+            highest_price=Decimal("0"),
+            reservation_unit=reservation_unit,
+            tax_percentage=tax_percentages["0"],
         )
-        terms_of_use.append(terms)
+        pricings.append(pricing)
 
-    return {term.terms_type: term for term in TermsOfUse.objects.bulk_create(terms_of_use)}
+    Unit.objects.bulk_create(units)
+    Space.objects.bulk_create(spaces)
+    ReservationUnit.objects.bulk_create(reservation_units)
+    ReservationUnitSpacesThoughModel.objects.bulk_create(reservation_unit_spaces)
+    ReservationUnitPricing.objects.bulk_create(pricings)
+
+    _create_application_round_time_slots(reservation_units)
 
 
-@with_logs()
-def _create_cancellation_rules(*, number: int = 1) -> list[ReservationUnitCancellationRule]:
-    cancellation_rules: list[ReservationUnitCancellationRule] = []
-    for i in range(number):
-        cancellation_rule = ReservationUnitCancellationRule(
-            name=f"Cancellation Rule {i}",
-            name_fi=f"Cancellation Rule {i}",
-            name_sv=f"Cancellation Rule {i}",
-            name_en=f"Cancellation Rule {i}",
-            can_be_cancelled_time_before=timedelta(days=i),
+@with_logs
+def _create_empty_reservation_units(
+    cancellation_rules: list[ReservationUnitCancellationRule],
+    metadata_sets: dict[SetName, ReservationMetadataSet],
+    terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
+    tax_percentages: dict[str, TaxPercentage],
+) -> None:
+    """Creates reservation units that have no spaces, resources, or hauki resource, making it "un-bookable"."""
+    unit = UnitFactory.create(
+        name="Tyhjä toimipiste",
+        name_fi="Tyhjä toimipiste",
+        name_en="Empty unit",
+        name_sv="Tomt unit",
+        tprek_id=None,
+        tprek_department_id=None,
+    )
+
+    reservation_unit_type = ReservationUnitTypeFactory.create(
+        name="Tyhjä",
+        name_fi="Tyhjä",
+        name_en="Empty",
+        name_sv="Tomt",
+    )
+
+    reservation_unit = _get_base_reservation_unit_builder(
+        reservation_unit_type=reservation_unit_type,
+        metadata_sets=metadata_sets,
+        terms_of_use=terms_of_use,
+        cancellation_rules=cancellation_rules,
+    ).create(
+        name="Tyhjä varausyksikkö",
+        name_fi="Tyhjä varausyksikkö",
+        name_en="Empty reservation unit",
+        name_sv="Tomt reservation unit",
+        unit=unit,
+        origin_hauki_resource=None,
+    )
+
+    ReservationUnitPricingFactory.create(
+        begins=datetime.date(2021, 1, 1),
+        price_unit=PriceUnit.PRICE_UNIT_FIXED,
+        lowest_price=Decimal("0"),
+        highest_price=Decimal("0"),
+        reservation_unit=reservation_unit,
+        tax_percentage=tax_percentages["0"],
+    )
+
+
+@with_logs
+def _create_archived_reservation_units(
+    cancellation_rules: list[ReservationUnitCancellationRule],
+    metadata_sets: dict[SetName, ReservationMetadataSet],
+    terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
+    hauki_resources: list[OriginHaukiResource],
+    tax_percentages: dict[str, TaxPercentage],
+) -> None:
+    """Creates reservation units that are archived, meaning it has been "soft-removed" from the system."""
+    unit = UnitFactory.create(
+        name="Arkistoitu",
+        name_fi="Arkistoitu",
+        name_en="Archived",
+        name_sv="Arkiverat",
+        tprek_id=None,
+        tprek_department_id=None,
+    )
+
+    reservation_unit_type = ReservationUnitTypeFactory.create(
+        name="Arkistoitu",
+        name_fi="Arkistoitu",
+        name_en="Archived",
+        name_sv="Arkiverat",
+    )
+
+    space = SpaceFactory.create(
+        name="Vanhanaikainen disko",
+        name_fi="Vanhanaikainen disko",
+        name_en="Old fashioned disco",
+        name_sv="Gammaldags disco",
+        unit=unit,
+    )
+
+    reservation_unit = (
+        _get_base_reservation_unit_builder(
+            reservation_unit_type=reservation_unit_type,
+            metadata_sets=metadata_sets,
+            terms_of_use=terms_of_use,
+            cancellation_rules=cancellation_rules,
+            hauki_resources=hauki_resources,
         )
-        cancellation_rules.append(cancellation_rule)
+        .for_space(space)
+        .create(
+            is_archived=True,
+        )
+    )
 
-    return ReservationUnitCancellationRule.objects.bulk_create(cancellation_rules)
+    reservation_unit.spaces.add(space)
+
+    ReservationUnitPricingFactory.create(
+        begins=datetime.date(2021, 1, 1),
+        price_unit=PriceUnit.PRICE_UNIT_FIXED,
+        lowest_price=Decimal("0"),
+        highest_price=Decimal("0"),
+        reservation_unit=reservation_unit,
+        tax_percentage=tax_percentages["0"],
+    )
+
+
+@with_logs
+def _create_single_reservation_per_user_reservation_units(
+    cancellation_rules: list[ReservationUnitCancellationRule],
+    metadata_sets: dict[SetName, ReservationMetadataSet],
+    terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
+    hauki_resources: list[OriginHaukiResource],
+    tax_percentages: dict[str, TaxPercentage],
+) -> None:
+    """Creates reservation units where one user can only have a single reservation at a time."""
+    unit = UnitFactory.create(
+        name="Yksi varaus per käyttäjä",
+        name_fi="Yksi varaus per käyttäjä",
+        name_en="Single reservation per user",
+        name_sv="Enkel bokning per användare",
+        tprek_id=None,
+        tprek_department_id=None,
+    )
+
+    reservation_unit_type = ReservationUnitTypeFactory.create(
+        name="Yksi varaus",
+        name_fi="Yksi varaus",
+        name_en="Single reservation",
+        name_sv="Enkel bokning",
+    )
+
+    space = SpaceFactory.create(
+        name="Ainutkertainen pakohuone",
+        name_fi="Ainutkertainen pakohuone",
+        name_en="Once-in-a-lifetime escape room",
+        name_sv="En gång i livet utrymningsrum",
+        unit=unit,
+    )
+
+    reservation_unit = (
+        _get_base_reservation_unit_builder(
+            reservation_unit_type=reservation_unit_type,
+            metadata_sets=metadata_sets,
+            terms_of_use=terms_of_use,
+            cancellation_rules=cancellation_rules,
+            hauki_resources=hauki_resources,
+        )
+        .for_space(space)
+        .create(
+            max_reservations_per_user=1,
+        )
+    )
+
+    reservation_unit.spaces.add(space)
+
+    ReservationUnitPricingFactory.create(
+        begins=datetime.date(2021, 1, 1),
+        price_unit=PriceUnit.PRICE_UNIT_FIXED,
+        lowest_price=Decimal("0"),
+        highest_price=Decimal("0"),
+        reservation_unit=reservation_unit,
+        tax_percentage=tax_percentages["0"],
+    )
+
+
+@with_logs
+def _create_full_day_reservation_units(
+    cancellation_rules: list[ReservationUnitCancellationRule],
+    metadata_sets: dict[SetName, ReservationMetadataSet],
+    terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
+    hauki_resources: list[OriginHaukiResource],
+    tax_percentages: dict[str, TaxPercentage],
+) -> None:
+    """Creates reservation units where a single booking blocks all other reservations for the same day."""
+    unit = UnitFactory.create(
+        name="Koko päivän varattava",
+        name_fi="Koko päivän varattava",
+        name_en="Full day bookable",
+        name_sv="Hela dagen bokbart",
+        tprek_id=None,
+        tprek_department_id=None,
+    )
+
+    reservation_unit_type = ReservationUnitTypeFactory.create(
+        name="Koko päivän",
+        name_fi="Koko päivän",
+        name_en="Full day",
+        name_sv="Hela dagen",
+    )
+
+    ReservationUnitSpacesThoughModel: type[models.Model] = ReservationUnit.spaces.through  # noqa: N806
+
+    reservation_units: list[ReservationUnit] = []
+    spaces: list[Space] = []
+    reservation_unit_spaces: list[models.Model] = []
+    pricings: list[ReservationUnitPricing] = []
+
+    for i in range(1, 11):
+        space = SpaceFactory.build_for_bulk_create(
+            name=f"Koko päivän leikkipuisto {i}",
+            name_fi=f"Koko päivän leikkipuisto {i}",
+            name_en=f"All day playground {i}",
+            name_sv=f"Lekplats hela dagen {i}",
+            unit=unit,
+        )
+        spaces.append(space)
+
+        reservation_unit = (
+            _get_base_reservation_unit_builder(
+                reservation_unit_type=reservation_unit_type,
+                metadata_sets=metadata_sets,
+                terms_of_use=terms_of_use,
+                cancellation_rules=cancellation_rules,
+                hauki_resources=hauki_resources,
+            )
+            .for_space(space)
+            .build(
+                reservation_block_whole_day=True,
+            )
+        )
+        reservation_units.append(reservation_unit)
+
+        reservation_unit_spaces.append(
+            ReservationUnitSpacesThoughModel(
+                reservationunit=reservation_unit,
+                space=space,
+            ),
+        )
+
+        pricing = ReservationUnitPricingFactory.build(
+            begins=datetime.date(2021, 1, 1),
+            price_unit=PriceUnit.PRICE_UNIT_FIXED,
+            lowest_price=Decimal("0"),
+            highest_price=Decimal("0"),
+            reservation_unit=reservation_unit,
+            tax_percentage=tax_percentages["0"],
+        )
+        pricings.append(pricing)
+
+    Space.objects.bulk_create(spaces)
+    ReservationUnit.objects.bulk_create(reservation_units)
+    ReservationUnitSpacesThoughModel.objects.bulk_create(reservation_unit_spaces)
+    ReservationUnitPricing.objects.bulk_create(pricings)
+
+
+@with_logs
+def _create_reservation_units_in_space_hierarchies(
+    cancellation_rules: list[ReservationUnitCancellationRule],
+    metadata_sets: dict[SetName, ReservationMetadataSet],
+    terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
+    hauki_resources: list[OriginHaukiResource],
+    tax_percentages: dict[str, TaxPercentage],
+) -> None:
+    """
+    Create reservation units which different parts of the same physical location.
+    Reserving some part of the location also prevents reserving any other parts that
+    either contain it or are subdivisions of it.
+
+    Here is the example that is created:
+
+    Exhibition center
+    ├─ Exhibition center event venue
+    │  ├─ Exhibition center grand hall
+    │  ├─ Exhibition center auditorium
+    │  ├─ Exhibition center dining hall
+    ├─ Exhibition center private premises
+    │  ├─ Exhibition center lecture hall
+    │  ├─ Exhibition center meeting room
+    │  ├─ Exhibition center penthouse
+    │  │  ├─ Exhibition center penthouse karaoke room
+    │  │  ├─ Exhibition center rooftop terrace
+    │  │  ├─ Exhibition center private spa
+    """
+    # --- Setup  ---------------------------------------------------------------------------------------------------
+
+    SpacesThoughModel: type[models.Model] = ReservationUnit.spaces.through  # noqa: N806
+
+    reservation_units: list[ReservationUnit] = []
+    reservation_unit_spaces: list[models.Model] = []
+    pricings: list[ReservationUnitPricing] = []
+
+    reservation_unit_type = ReservationUnitTypeFactory.create(
+        name="Tilahierarkia",
+        name_fi="Tilahierarkia",
+        name_en="Space hierarchy",
+        name_sv="Rumstavshierarki",
+    )
+
+    reservation_unit_base = _get_base_reservation_unit_builder(
+        reservation_unit_type=reservation_unit_type,
+        metadata_sets=metadata_sets,
+        terms_of_use=terms_of_use,
+        cancellation_rules=cancellation_rules,
+        hauki_resources=hauki_resources,
+    ).set(
+        description=cleandoc(
+            """
+            Messukeskus EXP
+            ├─ EXP Päätapahtumapaikka
+            │  ├─ EXP Suuri sali
+            │  ├─ EXP Auditorio
+            │  ├─ EXP Ruokasali
+            ├─ EXP Yksityiset tilat
+            │  ├─ EXP Luentosali
+            │  ├─ EXP Kokoushuone
+            │  ├─ EXP Kattohuoneisto
+            │  │  ├─ EXP Karaoke huone
+            │  │  ├─ EXP Kattoterassi
+            │  │  ├─ EXP Yksityinen kylpylä
+            """
+        ),
+    )
+
+    pricing_base = ReservationUnitPricingBuilder().set(
+        begins=datetime.date(2021, 1, 1),
+        price_unit=PriceUnit.PRICE_UNIT_FIXED,
+        lowest_price=Decimal("0"),
+        highest_price=Decimal("0"),
+        tax_percentage=tax_percentages["0"],
+    )
+
+    # --- Create common unit ---------------------------------------------------------------------------------------
+
+    unit = UnitFactory.create(
+        name="Messukeskus",
+        name_fi="Messukeskus",
+        name_en="Exhibition center",
+        name_sv="Utställningscenter",
+        tprek_id=None,
+        tprek_department_id=None,
+    )
+
+    # --- Create spaces --------------------------------------------------------------------------------------------
+
+    # Can't use 'bulk_create' to create these due to how MPTT works.
+    exhibition_center = SpaceFactory.create(
+        name="Messukeskus EXP",
+        name_fi="Messukeskus EXP",
+        name_en="Exhibition center EXP",
+        name_sv="Utställningscenter EXP",
+        unit=unit,
+    )
+    main_venue = SpaceFactory.create(
+        parent=exhibition_center,
+        name="EXP Päätapahtumapaikka",
+        name_fi="EXP Päätapahtumapaikka",
+        name_en="EXP Main Venue",
+        name_sv="EXP Huvudplats",
+        unit=unit,
+    )
+    grand_hall = SpaceFactory.create(
+        parent=main_venue,
+        name="EXP Suuri sali",
+        name_fi="EXP Suuri sali",
+        name_en="EXP Grand Hall",
+        name_sv="EXP Stora salen",
+        unit=unit,
+    )
+    auditorium = SpaceFactory.create(
+        parent=main_venue,
+        name="EXP Auditorio",
+        name_fi="EXP Auditorio",
+        name_en="EXP Auditorium",
+        name_sv="EXP Hörsal",
+        unit=unit,
+    )
+    dining_hall = SpaceFactory.create(
+        parent=main_venue,
+        name="EXP Ruokasali",
+        name_fi="EXP Ruokasali",
+        name_en="EXP Dining Hall",
+        name_sv="EXP Matsal",
+        unit=unit,
+    )
+    private_premises = SpaceFactory.create(
+        parent=exhibition_center,
+        name="EXP Yksityiset tilat",
+        name_fi="EXP Yksityiset tilat",
+        name_en="EXP Private Premises",
+        name_sv="EXP Privata lokaler",
+        unit=unit,
+    )
+    lecture_hall = SpaceFactory.create(
+        parent=private_premises,
+        name="EXP Luentosali",
+        name_fi="EXP Luentosali",
+        name_en="EXP Lecture Hall",
+        name_sv="EXP Föreläsningssal",
+        unit=unit,
+    )
+    meeting_room = SpaceFactory.create(
+        parent=private_premises,
+        name="EXP Kokoushuone",
+        name_fi="EXP Kokoushuone",
+        name_en="EXP Meeting Room",
+        name_sv="EXP Mötesrum",
+        unit=unit,
+    )
+    penthouse = SpaceFactory.create(
+        parent=private_premises,
+        name="EXP Kattohuoneisto",
+        name_fi="EXP Kattohuoneisto",
+        name_en="EXP Penthouse",
+        name_sv="EXP Takvåning",
+        unit=unit,
+    )
+    karaoke_room = SpaceFactory.create(
+        parent=penthouse,
+        name="EXP Karaoke huone",
+        name_fi="EXP Karaoke huone",
+        name_en="EXP Karaokerum",
+        name_sv="EXP Karaoke Room",
+        unit=unit,
+    )
+    rooftop_terrace = SpaceFactory.create(
+        parent=penthouse,
+        name="EXP Kattoterassi",
+        name_fi="EXP Kattoterassi",
+        name_en="EXP Rooftop Terrace",
+        name_sv="EXP Takterrass",
+        unit=unit,
+    )
+    spa = SpaceFactory.create(
+        parent=penthouse,
+        name="EXP Yksityinen kylpylä",
+        name_fi="EXP Yksityinen kylpylä",
+        name_en="EXP Private Spa",
+        name_sv="EXP Privat spa",
+        unit=unit,
+    )
+
+    Space.objects.rebuild()
+
+    # --- Create reservation units ---------------------------------------------------------------------------------
+
+    exhibition_center_unit = reservation_unit_base.for_space(exhibition_center).build()
+    reservation_units.append(exhibition_center_unit)
+    pricings.append(pricing_base.build(reservation_unit=exhibition_center_unit))
+    reservation_unit_spaces.append(SpacesThoughModel(reservationunit=exhibition_center_unit, space=exhibition_center))
+
+    main_venue_unit = reservation_unit_base.for_space(main_venue).build()
+    reservation_units.append(main_venue_unit)
+    pricings.append(pricing_base.build(reservation_unit=main_venue_unit))
+    reservation_unit_spaces.append(SpacesThoughModel(reservationunit=main_venue_unit, space=main_venue))
+
+    grand_hall_unit = reservation_unit_base.for_space(grand_hall).build()
+    reservation_units.append(grand_hall_unit)
+    pricings.append(pricing_base.build(reservation_unit=grand_hall_unit))
+    reservation_unit_spaces.append(SpacesThoughModel(reservationunit=grand_hall_unit, space=grand_hall))
+
+    auditorium_unit = reservation_unit_base.for_space(auditorium).build()
+    reservation_units.append(auditorium_unit)
+    pricings.append(pricing_base.build(reservation_unit=auditorium_unit))
+    reservation_unit_spaces.append(SpacesThoughModel(reservationunit=auditorium_unit, space=auditorium))
+
+    dining_hall_unit = reservation_unit_base.for_space(dining_hall).build()
+    reservation_units.append(dining_hall_unit)
+    pricings.append(pricing_base.build(reservation_unit=dining_hall_unit))
+    reservation_unit_spaces.append(SpacesThoughModel(reservationunit=dining_hall_unit, space=dining_hall))
+
+    private_premises_unit = reservation_unit_base.for_space(private_premises).build()
+    reservation_units.append(private_premises_unit)
+    pricings.append(pricing_base.build(reservation_unit=private_premises_unit))
+    reservation_unit_spaces.append(SpacesThoughModel(reservationunit=private_premises_unit, space=private_premises))
+
+    lecture_hall_unit = reservation_unit_base.for_space(lecture_hall).build()
+    reservation_units.append(lecture_hall_unit)
+    pricings.append(pricing_base.build(reservation_unit=lecture_hall_unit))
+    reservation_unit_spaces.append(SpacesThoughModel(reservationunit=lecture_hall_unit, space=lecture_hall))
+
+    meeting_room_unit = reservation_unit_base.for_space(meeting_room).build()
+    reservation_units.append(meeting_room_unit)
+    pricings.append(pricing_base.build(reservation_unit=meeting_room_unit))
+    reservation_unit_spaces.append(SpacesThoughModel(reservationunit=meeting_room_unit, space=meeting_room))
+
+    penthouse_unit = reservation_unit_base.for_space(penthouse).build()
+    reservation_units.append(penthouse_unit)
+    pricings.append(pricing_base.build(reservation_unit=penthouse_unit))
+    reservation_unit_spaces.append(SpacesThoughModel(reservationunit=penthouse_unit, space=penthouse))
+
+    karaoke_room_unit = reservation_unit_base.for_space(karaoke_room).build()
+    reservation_units.append(karaoke_room_unit)
+    pricings.append(pricing_base.build(reservation_unit=karaoke_room_unit))
+    reservation_unit_spaces.append(SpacesThoughModel(reservationunit=karaoke_room_unit, space=karaoke_room))
+
+    rooftop_terrace_unit = reservation_unit_base.for_space(rooftop_terrace).build()
+    reservation_units.append(rooftop_terrace_unit)
+    pricings.append(pricing_base.build(reservation_unit=rooftop_terrace_unit))
+    reservation_unit_spaces.append(SpacesThoughModel(reservationunit=rooftop_terrace_unit, space=rooftop_terrace))
+
+    spa_unit = reservation_unit_base.for_space(spa).build()
+    reservation_units.append(spa_unit)
+    pricings.append(pricing_base.build(reservation_unit=spa_unit))
+    reservation_unit_spaces.append(SpacesThoughModel(reservationunit=spa_unit, space=spa))
+
+    ReservationUnit.objects.bulk_create(reservation_units)
+    SpacesThoughModel.objects.bulk_create(reservation_unit_spaces)
+    ReservationUnitPricing.objects.bulk_create(pricings)
+
+
+@with_logs
+def _create_reservation_units_in_resource_hierarchies(
+    cancellation_rules: list[ReservationUnitCancellationRule],
+    metadata_sets: dict[SetName, ReservationMetadataSet],
+    terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
+    hauki_resources: list[OriginHaukiResource],
+    tax_percentages: dict[str, TaxPercentage],
+) -> None:
+    """
+    Create reservation units that share some common resources but different locations.
+    Reserving the resource for one location prevents reserving the other locations,
+    since the resource is no longer available.
+
+    Here is the example that is created:
+
+    Resources:
+    - Coffee machine
+    - Printer
+
+    Spaces:
+    - Kitchen
+    - Open office space
+    - Meeting room
+    - Break room
+
+    Reservation units:
+    - Open office space
+        - Resources:
+            - Printer
+    - Meeting room
+        - Resources:
+            - Printer
+            - Coffee machine
+    - Break room
+        - Resources:
+            - Printer
+            - Coffee machine
+    """
+    # --- Setup  ---------------------------------------------------------------------------------------------------
+
+    SpacesThoughModel: type[models.Model] = ReservationUnit.spaces.through  # noqa: N806
+    ResourceThoughModel: type[models.Model] = ReservationUnit.resources.through  # noqa: N806
+
+    reservation_unit_type = ReservationUnitTypeFactory.create(
+        name="Resurssihierarkia",
+        name_fi="Resurssihierarkia",
+        name_en="Resource hierarchy",
+        name_sv="Resursshierarki",
+    )
+
+    reservation_units: list[ReservationUnit] = []
+    reservation_unit_spaces: list[models.Model] = []
+    reservation_unit_resources: list[models.Model] = []
+    pricings: list[ReservationUnitPricing] = []
+
+    reservation_unit_base = _get_base_reservation_unit_builder(
+        reservation_unit_type=reservation_unit_type,
+        metadata_sets=metadata_sets,
+        terms_of_use=terms_of_use,
+        cancellation_rules=cancellation_rules,
+        hauki_resources=hauki_resources,
+    ).set(
+        description=cleandoc(
+            """
+            - Konttorin avoimet työskentelytilat
+                - Resurssit:
+                    - Konttorin ainoa tulostin
+            - Konttorin kokoushuone
+                - Resurssit:
+                    - Konttorin ainoa tulostin
+                    - Konttorin ainoa kahvikone
+            - Konttorin taukohuone
+                - Resurssit:
+                    - Konttorin ainoa tulostin
+                    - Konttorin ainoa kahvikone
+            """
+        ),
+    )
+
+    pricing_base = ReservationUnitPricingBuilder().set(
+        begins=datetime.date(2021, 1, 1),
+        price_unit=PriceUnit.PRICE_UNIT_FIXED,
+        lowest_price=Decimal("0"),
+        highest_price=Decimal("0"),
+        tax_percentage=tax_percentages["0"],
+    )
+
+    # --- Create unit ---------------------------------------------------------------------------------------------
+
+    unit = UnitFactory.create(
+        name="Niukkaresurssinen konttori",
+        name_fi="Niukkaresurssinen konttori",
+        name_en="Office of scarce resources",
+        name_sv="Kontoret för knappa resurser",
+        tprek_id=None,
+        tprek_department_id=None,
+    )
+
+    # --- Create spaces --------------------------------------------------------------------------------------------
+
+    kitchen = SpaceFactory.build_for_bulk_create(
+        name="Konttorin keittiö",
+        name_fi="Konttorin keittiö",
+        name_en="Office kichen",
+        name_sv="Kontors kök",
+        unit=unit,
+    )
+    open_office_space = SpaceFactory.build_for_bulk_create(
+        name="Konttorin avoimet työskentelytilat",
+        name_fi="Konttorin avoimet työskentelytilat",
+        name_en="Open office space",
+        name_sv="Kontorets öppna arbetsytor",
+        unit=unit,
+    )
+    meeting_room = SpaceFactory.build_for_bulk_create(
+        name="Konttorin kokoushuone",
+        name_fi="Konttorin kokoushuone",
+        name_en="Office meeting room",
+        name_sv="Kontors mötesrum",
+        unit=unit,
+    )
+    break_room = SpaceFactory.build_for_bulk_create(
+        name="Konttorin taukohuone",
+        name_fi="Konttorin taukohuone",
+        name_en="Office breakroom",
+        name_sv="Kontorspausrum",
+        unit=unit,
+    )
+    Space.objects.bulk_create([kitchen, open_office_space, meeting_room, break_room])
+
+    # --- Add resources --------------------------------------------------------------------------------------------
+
+    coffee_machine = ResourceFactory.build(
+        name="Konttorin ainoa kahvikone",
+        name_fi="Konttorin ainoa kahvikone",
+        name_en="The only coffee machine in the office",
+        name_sv="Den enda kaffemaskinen på kontoret",
+        space=kitchen,
+        location_type=ResourceLocationType.MOVABLE,
+    )
+    printer = ResourceFactory.build(
+        name="Konttorin ainoa tulostin",
+        name_fi="Konttorin ainoa tulostin",
+        name_en="The only printer in the office",
+        name_sv="Den enda skrivaren på kontoret",
+        space=open_office_space,
+        location_type=ResourceLocationType.FIXED,
+    )
+
+    Resource.objects.bulk_create([coffee_machine, printer])
+
+    # --- Create reservation units ---------------------------------------------------------------------------------
+
+    meeting_room_unit = reservation_unit_base.for_space(meeting_room).build()
+    reservation_units.append(meeting_room_unit)
+    pricings.append(pricing_base.build(reservation_unit=meeting_room_unit))
+    reservation_unit_spaces.append(SpacesThoughModel(reservationunit=meeting_room_unit, space=meeting_room))
+    reservation_unit_resources.append(ResourceThoughModel(reservationunit=meeting_room_unit, resource=coffee_machine))
+    reservation_unit_resources.append(ResourceThoughModel(reservationunit=meeting_room_unit, resource=printer))
+
+    break_room_unit = reservation_unit_base.for_space(break_room).build()
+    reservation_units.append(break_room_unit)
+    pricings.append(pricing_base.build(reservation_unit=break_room_unit))
+    reservation_unit_spaces.append(SpacesThoughModel(reservationunit=break_room_unit, space=break_room))
+    reservation_unit_resources.append(ResourceThoughModel(reservationunit=break_room_unit, resource=coffee_machine))
+    reservation_unit_resources.append(ResourceThoughModel(reservationunit=break_room_unit, resource=printer))
+
+    open_office_unit = reservation_unit_base.for_space(open_office_space).build()
+    reservation_units.append(open_office_unit)
+    pricings.append(pricing_base.build(reservation_unit=open_office_unit))
+    reservation_unit_spaces.append(SpacesThoughModel(reservationunit=open_office_unit, space=open_office_space))
+    reservation_unit_resources.append(ResourceThoughModel(reservationunit=open_office_unit, resource=printer))
+
+    ReservationUnit.objects.bulk_create(reservation_units)
+    SpacesThoughModel.objects.bulk_create(reservation_unit_spaces)
+    ResourceThoughModel.objects.bulk_create(reservation_unit_resources)
+    ReservationUnitPricing.objects.bulk_create(pricings)
+
+
+def _get_base_reservation_unit_builder(
+    *,
+    reservation_unit_type: ReservationUnitType,
+    metadata_sets: dict[SetName, ReservationMetadataSet],
+    terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
+    cancellation_rules: list[ReservationUnitCancellationRule] = (None,),
+    hauki_resources: list[OriginHaukiResource] = (None,),
+) -> ReservationUnitBuilder:
+    return ReservationUnitBuilder().set(
+        origin_hauki_resource=random.choice(hauki_resources),
+        allow_reservations_without_opening_hours=True,
+        reservations_min_days_before=0,
+        reservations_max_days_before=14,
+        min_reservation_duration=datetime.timedelta(hours=1),
+        max_reservation_duration=datetime.timedelta(hours=4),
+        buffer_time_before=datetime.timedelta(),
+        buffer_time_after=datetime.timedelta(),
+        reservation_start_interval=ReservationStartInterval.INTERVAL_30_MINUTES,
+        authentication=AuthenticationType.WEAK,
+        can_apply_free_of_charge=False,
+        max_reservations_per_user=None,
+        reservation_unit_type=reservation_unit_type,
+        reservation_kind=ReservationKind.DIRECT,
+        cancellation_rule=random.choice(cancellation_rules),
+        require_reservation_handling=False,
+        metadata_set=metadata_sets[SetName.set_1],
+        reservation_begins=datetime.datetime(2021, 1, 1, tzinfo=DEFAULT_TIMEZONE),
+        cancellation_terms=terms_of_use[TermsOfUseTypeChoices.CANCELLATION],
+        payment_terms=terms_of_use[TermsOfUseTypeChoices.PAYMENT],
+        pricing_terms=terms_of_use[TermsOfUseTypeChoices.PRICING],
+        service_specific_terms=terms_of_use[TermsOfUseTypeChoices.SERVICE],
+    )

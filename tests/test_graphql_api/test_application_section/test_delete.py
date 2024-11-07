@@ -1,6 +1,6 @@
 import pytest
 
-from tests.factories import ApplicationSectionFactory
+from tests.factories.application_section import ApplicationSectionBuilder
 from tests.test_graphql_api.test_application_section.helpers import DELETE_MUTATION, get_application_section_delete_data
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice
 
@@ -22,7 +22,7 @@ def test_cannot_delete_application_event_not_unallocated(graphql, status):
     # given:
     # - There is an application event with the given status
     # - A superuser is using the system
-    section = ApplicationSectionFactory.create_in_status(status)
+    section = ApplicationSectionBuilder().with_status(status).create()
     graphql.login_with_superuser()
 
     # when:

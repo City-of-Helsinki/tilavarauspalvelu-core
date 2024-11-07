@@ -204,6 +204,7 @@ lint.ignore = [
     "ERA001",   # Commented code is fine here.
 ]
 "tilavarauspalvelu/management/commands/data_creation/*.py" = [
+    "S101",     # Asserts are fine in test data creation.
     "S311",     # pseudo-random generators are fine here.
     "PLR0913",  # Can take as many arguments as needed.
     "PLR0915",  # Can have as many statements as needed.

@@ -2,15 +2,13 @@ import datetime
 from typing import Any, NamedTuple
 
 import pytest
-from django.utils.timezone import get_default_timezone
 from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tests.test_external_services.test_hauki.test_reservable_time_spans_client import _get_date
 from tilavarauspalvelu.enums import HaukiResourceState
 from tilavarauspalvelu.utils.opening_hours.hauki_api_types import HaukiAPIOpeningHoursResponseTime
 from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
-
-DEFAULT_TIMEZONE = get_default_timezone()
+from utils.date_utils import DEFAULT_TIMEZONE
 
 
 class TimeSpanElementParams(NamedTuple):

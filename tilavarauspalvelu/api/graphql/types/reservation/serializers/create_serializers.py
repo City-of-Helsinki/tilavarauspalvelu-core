@@ -2,7 +2,6 @@ import datetime
 from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
-from django.utils.timezone import get_default_timezone
 from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPrimaryKeyField
 from rest_framework import serializers
 
@@ -22,14 +21,12 @@ from tilavarauspalvelu.enums import (
 from tilavarauspalvelu.models import AgeGroup, City, Reservation, ReservationPurpose, ReservationUnit
 from tilavarauspalvelu.typing import AnyUser, WSGIRequest
 from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
+from utils.date_utils import DEFAULT_TIMEZONE
 from utils.external_service.errors import ExternalServiceError
 from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
     from django.core.handlers.wsgi import WSGIRequest
-
-
-DEFAULT_TIMEZONE = get_default_timezone()
 
 
 class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin, ReservationSchedulingMixin):

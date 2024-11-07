@@ -2,19 +2,18 @@ import datetime
 from functools import partial
 
 import pytest
-from django.utils.timezone import get_default_timezone
 from graphene_django_extensions.testing import build_query
 
 from tests.factories import ReservationFactory, ReservationUnitFactory, SpaceFactory, UnitFactory
 from tilavarauspalvelu.enums import ReservationStateChoice
 from tilavarauspalvelu.models import ReservationUnitHierarchy
+from utils.date_utils import DEFAULT_TIMEZONE
 
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
 
-DEFAULT_TIMEZONE = get_default_timezone()
 affecting_reservations_query = partial(build_query, "affectingReservations", order_by="pkAsc")
 
 

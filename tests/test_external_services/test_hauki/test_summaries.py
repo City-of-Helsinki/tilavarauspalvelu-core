@@ -1,17 +1,15 @@
 import datetime
 
 import pytest
-from django.utils.timezone import get_default_timezone
 
 from tests.factories import OriginHaukiResourceFactory, ReservableTimeSpanFactory
 from tilavarauspalvelu.utils.opening_hours.summaries import get_resources_total_hours_per_resource
+from utils.date_utils import DEFAULT_TIMEZONE
 
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
-
-DEFAULT_TIMEZONE = get_default_timezone()
 
 
 def test__get_resources_total_hours_per_resource__when_no_resources():

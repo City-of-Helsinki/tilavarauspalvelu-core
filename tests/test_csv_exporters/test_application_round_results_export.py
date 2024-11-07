@@ -11,6 +11,8 @@ from tests.factories import (
     ApplicationSectionFactory,
     ReservationUnitOptionFactory,
 )
+from tests.factories.application import ApplicationBuilder
+from tests.factories.application_section import ApplicationSectionBuilder
 from tilavarauspalvelu.enums import Weekday
 from tilavarauspalvelu.utils.exporter.application_round_result_exporter import (
     ApplicationRoundResultCSVExporter,
@@ -82,7 +84,7 @@ def test_application_round_results_export__no_suitable_time_ranges(graphql):
         application_round=application_round,
     )
 
-    exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round)
+    exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round.id)
     assert exporter.export() is None
 
 
@@ -93,7 +95,7 @@ def test_application_round_results_export__application_status_is_expired(graphql
         application_sections__suitable_time_ranges__day_of_the_week=Weekday.TUESDAY,
     )
 
-    exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round)
+    exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round.id)
     assert exporter.export() is None
 
 
@@ -111,16 +113,21 @@ def test_application_round_results_export__application_status_is_draft(graphql):
 def test_application_round_results_export__section_has_no_allocated_time_slots(graphql):
     """Section which has no allocated time slots should still be exported."""
     application_round = ApplicationRoundFactory.create_in_status_handled()
-    application = ApplicationFactory.create_in_status_in_allocation(application_round=application_round)
-    section = ApplicationSectionFactory.create_in_status_handled(
-        application=application,
-        suitable_time_ranges__day_of_the_week=Weekday.WEDNESDAY,
-        reservation_unit_options__reservation_unit__name="foo",
+    application = ApplicationBuilder().in_allocation().in_application_round(application_round).create()
+    section = (
+        ApplicationSectionBuilder()
+        .handled(allocations=False)
+        .in_application(application)
+        .create(
+            suitable_time_ranges__day_of_the_week=Weekday.WEDNESDAY,
+            reservation_unit_options__reservation_unit__name="foo",
+        )
     )
 
     exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round.id)
     with mock.patch(CSV_WRITER_MOCK_PATH) as mock_writer:
         exporter.export()
+
     writes = get_writes(mock_writer)
     assert len(writes) == 2
 
@@ -162,6 +169,7 @@ def test_application_round_results_export__reservation_unit_option_ordering(grap
     exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round.id)
     with mock.patch(CSV_WRITER_MOCK_PATH) as mock_writer:
         exporter.export()
+
     writes = get_writes(mock_writer)
     assert len(writes) == 4
 
@@ -207,6 +215,7 @@ def test_application_round_results_export__allocated_slot_ordering(graphql):
     exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round.id)
     with mock.patch(CSV_WRITER_MOCK_PATH) as mock_writer:
         exporter.export()
+
     writes = get_writes(mock_writer)
     assert len(writes) == 4
 

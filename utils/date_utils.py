@@ -14,7 +14,9 @@ __all__ = [
     "combine",
     "compare_datetimes",
     "compare_times",
+    "get_date_range",
     "get_periods_between",
+    "get_time_range",
     "local_date",
     "local_date_string",
     "local_datetime",
@@ -31,6 +33,7 @@ __all__ = [
     "next_hour",
     "time_as_timedelta",
     "time_difference",
+    "timedelta_as_time",
     "timedelta_from_json",
     "timedelta_to_json",
     "utc_date",
@@ -394,6 +397,17 @@ def time_as_timedelta(_input: datetime.datetime | datetime.time, /) -> datetime.
     )
 
 
+def timedelta_as_time(_input: datetime.timedelta, /) -> datetime.time:
+    """Convert timedelta to time as measured form the start of the day."""
+    time_seconds = _input.total_seconds()
+    return datetime.time(
+        hour=int(time_seconds // 3600),
+        minute=int(time_seconds // 60) % 60,
+        second=int(time_seconds) % 60,
+        microsecond=int((time_seconds % 1) * 1_000_000),
+    )
+
+
 def datetime_range_as_string(*, start_datetime: datetime.datetime, end_datetime: datetime.datetime) -> str:
     """Format a datetime range to a human readable string."""
     strformat = "%Y-%m-%d %H:%M"
@@ -462,7 +476,7 @@ def get_periods_between(
     tzinfo: zoneinfo.ZoneInfo | datetime.timezone | None = None,
 ) -> Generator[tuple[datetime.datetime, datetime.datetime], None, None]:
     """
-    Generate datetimes based on the given start and end dates.
+    Generate datetimes based on the given start and end dates (both inclusive).
 
     Note: This will generate the times in such a way that the time will be the same after
           switching to daylight saving time and back.
@@ -490,6 +504,44 @@ def get_periods_between(
 
     for delta in range(0, (end_date - start_date).days + 1, interval):
         yield start_datetime + datetime.timedelta(days=delta), end_datetime + datetime.timedelta(days=delta)
+
+
+def get_date_range(
+    start_date: datetime.date,
+    *,
+    number: int,
+) -> Generator[datetime.date, None, None]:
+    """
+    Generate dates from the given start date (inclusive) until the given number of dates have been generated.
+
+    :param start_date: From which date to generate dates?
+    :param number: How many dates to generate?
+    """
+    for delta in range(number):
+        yield start_date + datetime.timedelta(days=delta)
+
+
+def get_time_range(
+    start_time: datetime.time,
+    end_time: datetime.time,
+    *,
+    delta_seconds: int = 3600,  # 1 hour
+) -> Generator[datetime.time, None, None]:
+    """
+    Generate times from the given start time (inclusive)
+    for every given number of seconds (default: 1 hour)
+    until the given end time (exclusive).
+    """
+    if start_time > end_time:
+        msg = "End time cannot be before start time."
+        raise ValueError(msg)
+
+    current = time_as_timedelta(start_time)
+    end_at = time_as_timedelta(end_time)
+
+    while current < end_at:
+        yield timedelta_as_time(current)
+        current += datetime.timedelta(seconds=delta_seconds)
 
 
 def normalize_as_datetime(value: datetime.date | datetime.datetime, *, timedelta_days: int = 0) -> datetime.datetime:

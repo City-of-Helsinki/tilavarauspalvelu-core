@@ -5,13 +5,11 @@ from typing import Any
 import requests
 from django.conf import settings
 from django.contrib.gis.geos import Point
-from django.utils.timezone import get_default_timezone
 from requests import Response
 
+from utils.date_utils import DEFAULT_TIMEZONE
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 from utils.external_service.errors import ExternalServiceError, ExternalServiceRequestError
-
-DEFAULT_TIMEZONE = get_default_timezone()
 
 
 @dataclass

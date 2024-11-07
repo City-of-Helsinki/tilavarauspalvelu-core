@@ -5,6 +5,7 @@ from graphene_django_extensions.testing.utils import parametrize_helper
 from graphql_relay import to_global_id
 
 from tests.factories import BannerNotificationFactory, UserFactory
+from tests.factories.banner_notification import BannerNotificationBuilder
 from tilavarauspalvelu.api.graphql.types.banner_notification.types import BannerNotificationNode
 from tilavarauspalvelu.enums import BannerNotificationTarget
 
@@ -119,7 +120,7 @@ def test_filter_banner_notifications_by_is_active(graphql, value, expected):
     # - There are two banner notifications in the system, one active and one inactive
     # - Notification manager user is using the system
     BannerNotificationFactory.create(name="foo")
-    BannerNotificationFactory.create_active(name="bar")
+    BannerNotificationBuilder().active().create(name="bar")
     user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
@@ -172,9 +173,9 @@ def test_filter_banner_notifications_by_is_visible(graphql, value, expected):
     # given:
     # - There are six banner notifications in the system, one for each target in active and inactive state
     # - Notification manager user is using the system
-    BannerNotificationFactory.create_active(name="foo", target=BannerNotificationTarget.USER)
-    BannerNotificationFactory.create_active(name="bar", target=BannerNotificationTarget.STAFF)
-    BannerNotificationFactory.create_active(name="baz", target=BannerNotificationTarget.ALL)
+    BannerNotificationBuilder().active().create(name="foo", target=BannerNotificationTarget.USER)
+    BannerNotificationBuilder().active().create(name="bar", target=BannerNotificationTarget.STAFF)
+    BannerNotificationBuilder().active().create(name="baz", target=BannerNotificationTarget.ALL)
     BannerNotificationFactory.create(name="1", target=BannerNotificationTarget.USER)
     BannerNotificationFactory.create(name="2", target=BannerNotificationTarget.STAFF)
     BannerNotificationFactory.create(name="3", target=BannerNotificationTarget.ALL)

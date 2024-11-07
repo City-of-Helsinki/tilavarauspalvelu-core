@@ -29,3 +29,14 @@ class ReservableTimeSpanFactory(GenericDjangoModelFactory[OriginHaukiResource]):
         kwargs["start_datetime"] = start_datetime
         kwargs["end_datetime"] = end_datetime
         return super().create(**kwargs)
+
+    @classmethod
+    def build(
+        cls,
+        start_datetime: datetime.datetime,
+        end_datetime: datetime.datetime,
+        **kwargs: Any,
+    ) -> ReservableTimeSpan:
+        kwargs["start_datetime"] = start_datetime
+        kwargs["end_datetime"] = end_datetime
+        return super().build(**kwargs)

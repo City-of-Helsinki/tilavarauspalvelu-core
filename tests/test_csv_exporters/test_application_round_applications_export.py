@@ -7,6 +7,7 @@ from django.utils import timezone
 from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tests.factories import ApplicationFactory, ApplicationRoundFactory
+from tests.factories.application import ApplicationBuilder
 from tilavarauspalvelu.enums import ApplicantTypeChoice, Priority, Weekday
 from tilavarauspalvelu.utils.exporter.application_round_applications_exporter import (
     ApplicationExportRow,
@@ -58,7 +59,7 @@ def test_application_round_applications_export__multiple_applications(graphql):
     section_1: ApplicationSection = application_1.application_sections.first()
     section_2: ApplicationSection = application_2.application_sections.first()
 
-    exporter = ApplicationRoundApplicationsCSVExporter(application_round_id=application_round)
+    exporter = ApplicationRoundApplicationsCSVExporter(application_round_id=application_round.id)
     with mock.patch(CSV_WRITER_MOCK_PATH) as mock_writer:
         exporter.export()
 
@@ -233,7 +234,7 @@ def test_application_round_applications_export__missing_data(graphql, column_val
     # when:
     # - The exporter is run
     with mock.patch(CSV_WRITER_MOCK_PATH) as mock_writer:
-        ApplicationRoundApplicationsCSVExporter(application_round_id=application_round).export()
+        ApplicationRoundApplicationsCSVExporter(application_round_id=application_round.id).export()
 
     # then:
     # - The writes to the csv file are correct
@@ -251,17 +252,21 @@ def test_application_round_applications_export__no_reservation_unit_options(grap
     # given:
     # - There is a single application with no reservation unit options
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
-    application_1 = ApplicationFactory.create_in_status_in_allocation(
-        application_round=application_round,
-        application_sections__suitable_time_ranges__day_of_the_week=Weekday.MONDAY,
-        application_sections__reservation_unit_options=[],
+    application_1 = (
+        ApplicationBuilder()
+        .in_allocation(sections=False)
+        .in_application_round(application_round)
+        .create(
+            application_sections__suitable_time_ranges__day_of_the_week=Weekday.MONDAY,
+            application_sections__reservation_unit_options=[],
+        )
     )
     application_1.application_sections.first()
 
     # when:
     # - The exporter is run
     with mock.patch(CSV_WRITER_MOCK_PATH) as mock_writer:
-        ApplicationRoundApplicationsCSVExporter(application_round_id=application_round).export()
+        ApplicationRoundApplicationsCSVExporter(application_round_id=application_round.id).export()
 
     # then:
     # - The csv doesn't contain the reservation unit options column

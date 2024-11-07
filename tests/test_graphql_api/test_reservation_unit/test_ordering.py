@@ -1,12 +1,8 @@
 import pytest
-from django.utils.timezone import get_default_timezone
 
 from tests.factories import ReservationUnitFactory
 
 from .helpers import reservation_units_query
-
-DEFAULT_TIMEZONE = get_default_timezone()
-
 
 # Applied to all tests
 pytestmark = [

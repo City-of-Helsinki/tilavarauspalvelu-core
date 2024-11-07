@@ -3,19 +3,17 @@ from functools import partial
 from zoneinfo import ZoneInfo
 
 import pytest
-from django.utils.timezone import get_default_timezone
 from graphene_django_extensions.testing import build_query
 from graphql_relay import to_global_id
 
 from tests.factories import OriginHaukiResourceFactory, ReservableTimeSpanFactory, ReservationUnitFactory
 from tilavarauspalvelu.models import ReservationUnit
+from utils.date_utils import DEFAULT_TIMEZONE
 
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
-
-DEFAULT_TIMEZONE = get_default_timezone()
 
 UTCOFFSET = f"0{int(datetime.datetime(2021, 5, 1, tzinfo=DEFAULT_TIMEZONE).utcoffset().total_seconds()/3600)}:00"
 

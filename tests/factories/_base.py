@@ -1,15 +1,24 @@
-from collections.abc import Callable, Iterable
-from typing import Any, Generic, TypeVar
+from __future__ import annotations
 
+from copy import copy, deepcopy
+from typing import TYPE_CHECKING, Any, Generic, Self, TypeVar
+
+import faker
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.db.models import Model
 from factory import Factory, FactoryError, Faker, PostGeneration, SubFactory
 from factory.base import BaseFactory
-from factory.builder import BuildStep, Resolver
 from factory.django import DjangoModelFactory
 from factory.utils import import_object
 
-from ._typing import ENProviders, FactoryType, FIProviders, SVProviders
+from .providers import CUSTOM_PROVIDERS
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable
+
+    from factory.builder import BuildStep, Resolver
+
+    from ._typing import ENProviders, FactoryType, FIProviders, SVProviders
 
 __all__ = [
     "FakerEN",
@@ -37,12 +46,40 @@ class BaseFaker(Faker):
         cls._get_faker().unique.clear()
 
     def evaluate(self, instance: Resolver, step: BuildStep, extra: dict[str, Any]) -> Any:
-        extra.pop("locale", self._DEFAULT_LOCALE)
         unique = extra.pop("unique", False)
+        return self.generate(unique=unique, **extra)
+
+    def generate(self, *, unique: bool = False, **kwargs: Any) -> Any:
+        """
+        Allows generating new values manually.
+
+        >>> class FooFactory(GenericDjangoModelFactory[Foo]):
+        ...     name = FakerFI("name")
+        ...
+        ...     @classmethod
+        ...     def create(cls, **kwargs: Any) -> Foo:
+        ...         name = cls.name.generate()  # Generates a random name here.
+        ...         kwargs["name"] = f"<b>{name}</b>"
+        ...         return super().create(**kwargs)
+        """
+        kwargs.pop("locale", self._DEFAULT_LOCALE)
         faker_instance = self._get_faker()
         if unique:
             faker_instance = faker_instance.unique
-        return faker_instance.format(self.provider, **extra)
+        return faker_instance.format(self.provider, **kwargs)
+
+    @classmethod
+    def _get_faker(cls, locale: Any = None) -> faker.Faker:
+        locale = cls._DEFAULT_LOCALE
+
+        if locale not in cls._FAKER_REGISTRY:
+            faker_instance = faker.Faker(
+                locale=cls._DEFAULT_LOCALE,
+                includes=CUSTOM_PROVIDERS,
+            )
+            cls._FAKER_REGISTRY[locale] = faker_instance
+
+        return cls._FAKER_REGISTRY[locale]
 
 
 class FakerFI(BaseFaker):
@@ -183,6 +220,45 @@ class GenericFactory(Factory, Generic[T]):
     @classmethod
     def create_batch(cls: Generic[T], size: int, **kwargs: Any) -> list[T]:
         return super().create_batch(size, **kwargs)
+
+
+class ModelFactoryBuilder(Generic[TModel]):
+    """
+    Allows using the builder pattern to build-up kwargs for factories.
+    Subclass this class and add custom builder methods to it.
+    """
+
+    # Add the factory class to this attribute in subclasses!
+    factory: type[GenericDjangoModelFactory[TModel]]
+
+    def __init__(self) -> None:
+        self.kwargs: dict[str, Any] = {}
+
+    def copy(self) -> Self:
+        new = self.__class__()
+        new.kwargs.update(copy(self.kwargs))
+        return new
+
+    def deepcopy(self) -> Self:
+        new = self.__class__()
+        new.kwargs.update(deepcopy(self.kwargs))
+        return new
+
+    def set(self, **kwargs: Any) -> Self:
+        self.kwargs.update(kwargs)
+        return self
+
+    def build(self, **kwargs: Any) -> TModel:
+        return self.factory.build(**(self.kwargs | kwargs))
+
+    def create(self, **kwargs: Any) -> TModel:
+        return self.factory.create(**(self.kwargs | kwargs))
+
+    def build_batch(self, size: int, **kwargs: Any) -> list[TModel]:
+        return self.factory.build_batch(size, **(self.kwargs | kwargs))
+
+    def create_batch(self, size: int, **kwargs: Any) -> list[TModel]:
+        return self.factory.create_batch(size, **(self.kwargs | kwargs))
 
 
 # --- Related factories --------------------------------------------------------------------------------------------

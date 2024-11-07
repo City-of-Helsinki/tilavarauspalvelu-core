@@ -4,7 +4,7 @@ from decimal import Decimal
 from tilavarauspalvelu.enums import PriceUnit
 from tilavarauspalvelu.models import ReservationUnitPricing
 
-from ._base import ForeignKeyFactory, GenericDjangoModelFactory
+from ._base import ForeignKeyFactory, GenericDjangoModelFactory, ModelFactoryBuilder
 
 __all__ = [
     "ReservationUnitPricingFactory",
@@ -33,3 +33,7 @@ class ReservationUnitPricingFactory(GenericDjangoModelFactory[ReservationUnitPri
         kwargs.setdefault("tax_percentage__value", Decimal(0))
 
         return cls.create(**kwargs)
+
+
+class ReservationUnitPricingBuilder(ModelFactoryBuilder[ReservationUnitPricing]):
+    factory = ReservationUnitPricingFactory

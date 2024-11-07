@@ -13,10 +13,10 @@ class EquipmentFactory(GenericDjangoModelFactory[Equipment]):
     class Meta:
         model = Equipment
 
-    name = FakerFI("word")
+    name = FakerFI("job")
     name_fi = LazyAttribute(lambda i: i.name)
-    name_sv = FakerSV("word")
-    name_en = FakerEN("word")
+    name_sv = FakerSV("job")
+    name_en = FakerEN("job")
 
     category = ForeignKeyFactory("tests.factories.EquipmentCategoryFactory")
     reservation_units = ManyToManyFactory("tests.factories.ReservationUnitFactory")

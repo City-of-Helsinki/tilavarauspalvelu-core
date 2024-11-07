@@ -1,8 +1,10 @@
+from typing import Self
+
 import factory
 
-from tilavarauspalvelu.models import ReservationUnitOption
+from tilavarauspalvelu.models import ApplicationSection, ReservationUnitOption
 
-from ._base import ForeignKeyFactory, GenericDjangoModelFactory, ReverseForeignKeyFactory
+from ._base import ForeignKeyFactory, GenericDjangoModelFactory, ModelFactoryBuilder, ReverseForeignKeyFactory
 
 
 class ReservationUnitOptionFactory(GenericDjangoModelFactory[ReservationUnitOption]):
@@ -17,3 +19,15 @@ class ReservationUnitOptionFactory(GenericDjangoModelFactory[ReservationUnitOpti
     reservation_unit = ForeignKeyFactory("tests.factories.ReservationUnitFactory")
 
     allocated_time_slots = ReverseForeignKeyFactory("tests.factories.AllocatedTimeSlotFactory")
+
+
+class ReservationUnitOptionBuilder(ModelFactoryBuilder[ReservationUnitOption]):
+    factory = ReservationUnitOptionFactory
+
+    def in_application_section(self, application_section: ApplicationSection) -> Self:
+        for key in list(self.kwargs):
+            if key.startswith("application_section"):
+                del self.kwargs[key]
+
+        self.kwargs.setdefault("application_section", application_section)
+        return self

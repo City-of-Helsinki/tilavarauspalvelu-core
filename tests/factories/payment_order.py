@@ -1,14 +1,18 @@
 import uuid
 from decimal import Decimal
+from typing import Self
 
 import factory
+from django.conf import settings
+from django.urls import reverse
 
 from tilavarauspalvelu.enums import Language, OrderStatus, PaymentType
-from tilavarauspalvelu.models import PaymentOrder
+from tilavarauspalvelu.models import PaymentOrder, Reservation
 
-from ._base import ForeignKeyFactory, GenericDjangoModelFactory
+from ._base import ForeignKeyFactory, GenericDjangoModelFactory, ModelFactoryBuilder
 
 __all__ = [
+    "PaymentOrderBuilder",
     "PaymentOrderFactory",
 ]
 
@@ -34,3 +38,19 @@ class PaymentOrderFactory(GenericDjangoModelFactory[PaymentOrder]):
     reservation_user_uuid = None
     checkout_url = ""
     receipt_url = ""
+
+
+class PaymentOrderBuilder(ModelFactoryBuilder[PaymentOrder]):
+    factory = PaymentOrderFactory
+
+    def for_mock_order(self, reservation: Reservation) -> Self:
+        order_uuid = uuid.uuid4()
+        base_url = settings.MOCK_VERKKOKAUPPA_BACKEND_URL.strip("/")
+        checkout_url = reverse("mock_verkkokauppa:checkout", args=[order_uuid]).strip("/")
+        receipt_url = reverse("admin:tilavarauspalvelu_reservation_change", args=[reservation.id]).strip("/")
+
+        return self.set(
+            remote_id=order_uuid,
+            checkout_url=f"{base_url}/{checkout_url}/",
+            receipt_url=f"{base_url}/{receipt_url}/?",
+        )

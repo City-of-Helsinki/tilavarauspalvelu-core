@@ -40,7 +40,7 @@ def year_not_in_future(year: int | None) -> None:
 class Organisation(SerializableMixin, models.Model):
     name: str = models.CharField(max_length=255)
     email: str = models.EmailField(blank=True, default="")
-    identifier: str | None = models.CharField(max_length=255, null=True, unique=False)
+    identifier: str | None = models.CharField(max_length=255, null=True)
     year_established: int | None = models.PositiveIntegerField(null=True, blank=True, validators=[year_not_in_future])
     active_members: int | None = models.PositiveIntegerField(null=True)
     core_business: str = models.TextField(blank=True)

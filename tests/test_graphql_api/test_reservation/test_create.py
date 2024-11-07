@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING, NamedTuple
 
 import freezegun
 import pytest
-from django.utils.timezone import get_default_timezone
 from graphene_django_extensions.testing import parametrize_helper
 
 from tests.factories import (
@@ -31,7 +30,7 @@ from tilavarauspalvelu.enums import (
 from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
 from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
 from tilavarauspalvelu.utils.helauth.typing import ADLoginAMR
-from utils.date_utils import local_datetime, local_end_of_day, local_start_of_day, next_hour
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, local_end_of_day, local_start_of_day, next_hour
 from utils.decimal_utils import round_decimal
 from utils.sentry import SentryLogger
 
@@ -44,8 +43,6 @@ if TYPE_CHECKING:
 pytestmark = [
     pytest.mark.django_db,
 ]
-
-DEFAULT_TIMEZONE = get_default_timezone()
 
 
 def test_reservation__create__success(graphql):

@@ -2,7 +2,6 @@ import datetime
 
 import freezegun
 import pytest
-from django.utils.timezone import get_default_timezone
 
 from tests.factories import (
     AgeGroupFactory,
@@ -18,11 +17,9 @@ from tests.factories import (
 )
 from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
-from utils.date_utils import local_datetime, next_hour, timedelta_to_json
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, next_hour, timedelta_to_json
 
 from .helpers import CREATE_STAFF_MUTATION, get_staff_create_data
-
-DEFAULT_TIMEZONE = get_default_timezone()
 
 # Applied to all tests
 pytestmark = [

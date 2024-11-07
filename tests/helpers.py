@@ -1,3 +1,4 @@
+import uuid
 from collections.abc import Callable
 from functools import wraps
 from typing import Any, NamedTuple, ParamSpec, Self, TypeVar
@@ -8,6 +9,9 @@ import polib
 import pytest
 from django.conf import settings
 from django.http import HttpRequest
+from django.test import override_settings
+from django.test.signals import root_urlconf_changed
+from django.urls import NoReverseMatch, URLResolver, include, path, reverse
 from django.utils import translation
 from django.utils.functional import lazy
 from django.utils.translation import trans_real
@@ -23,6 +27,9 @@ __all__ = [
     "TranslationsFromPOFiles",
 ]
 
+
+T = TypeVar("T")
+P = ParamSpec("P")
 
 TNamedTuple = TypeVar("TNamedTuple", bound=NamedTuple)
 
@@ -44,10 +51,6 @@ class ResponseMock:
 
     def json(self) -> dict[str, Any]:
         return self.json_data
-
-
-T = TypeVar("T")
-P = ParamSpec("P")
 
 
 class patch_method:
@@ -210,3 +213,37 @@ class TranslationsFromPOFiles:
 
         msg = f"Language '{lang_code}' is not supported"
         raise LookupError(msg)
+
+
+def with_mock_verkkokauppa(func: Callable[P, None]) -> Callable[P, None]:
+    """Enables mock verkkokauppa API for the duration of the test."""
+
+    @wraps(func)
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> None:
+        from config.urls import urlpatterns
+
+        urls: URLResolver = path(
+            "mock_verkkokauppa/",
+            include("tilavarauspalvelu.api.mock_verkkokauppa_api.urls", namespace="mock_verkkokauppa"),
+        )
+
+        missing = False
+
+        # The mock verkkokauppa URLs are registered conditionally,
+        # so we need to check it they exist and add them to 'urlpatterns' if they don't.
+        try:
+            reverse("mock_verkkokauppa:checkout", args=[str(uuid.uuid4())])
+        except NoReverseMatch:
+            missing = True
+            urlpatterns.append(urls)
+            root_urlconf_changed(setting="ROOT_URLCONF")
+
+        try:
+            with override_settings(MOCK_VERKKOKAUPPA_API_ENABLED=True):
+                func(*args, **kwargs)
+        finally:
+            if missing:
+                urlpatterns.remove(urls)
+                root_urlconf_changed(setting="ROOT_URLCONF")
+
+    return wrapper

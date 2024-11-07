@@ -4,7 +4,6 @@ from types import SimpleNamespace
 from typing import NamedTuple, cast
 
 import pytest
-from django.utils.timezone import get_default_timezone
 from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tests.factories import OriginHaukiResourceFactory, ReservableTimeSpanFactory, ReservationUnitFactory
@@ -18,9 +17,7 @@ from tilavarauspalvelu.utils.first_reservable_time.first_reservable_time_reserva
     ReservationUnitFirstReservableTimeHelper,
 )
 from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
-
-DEFAULT_TIMEZONE = get_default_timezone()
-
+from utils.date_utils import DEFAULT_TIMEZONE
 
 # Applied to all tests
 pytestmark = [

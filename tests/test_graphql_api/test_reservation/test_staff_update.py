@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 
 import freezegun
 import pytest
-from django.utils.timezone import get_default_timezone
 
 from tests.factories import (
     OriginHaukiResourceFactory,
@@ -15,9 +14,7 @@ from tests.factories import (
 from tests.test_graphql_api.test_reservation.helpers import ADJUST_STAFF_MUTATION
 from tilavarauspalvelu.enums import ReservationStateChoice
 from tilavarauspalvelu.models import Reservation
-from utils.date_utils import timedelta_to_json
-
-DEFAULT_TIMEZONE = get_default_timezone()
+from utils.date_utils import DEFAULT_TIMEZONE, timedelta_to_json
 
 # Applied to all tests
 pytestmark = [

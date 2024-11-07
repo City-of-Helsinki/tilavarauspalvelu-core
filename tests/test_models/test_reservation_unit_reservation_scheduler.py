@@ -1,7 +1,6 @@
 import datetime
 
 import pytest
-from django.utils.timezone import get_default_timezone
 from freezegun import freeze_time
 
 from tests.factories import (
@@ -14,8 +13,7 @@ from tests.factories import (
 )
 from tilavarauspalvelu.enums import ReservationStateChoice
 from tilavarauspalvelu.models import ReservationUnit
-
-DEFAULT_TIMEZONE = get_default_timezone()
+from utils.date_utils import DEFAULT_TIMEZONE
 
 
 def _get_date(*, month=1, day=1) -> datetime.date:

@@ -19,7 +19,7 @@ __all__ = [
 
 class ReservationUnitCancellationRule(models.Model):
     name: str = models.CharField(max_length=255)
-    needs_handling: bool = models.BooleanField(default=False)
+    needs_handling: bool = models.BooleanField(default=False)  # DEPRECATED
     can_be_cancelled_time_before: datetime.timedelta | None = models.DurationField(
         default=datetime.timedelta(hours=24),
         blank=True,

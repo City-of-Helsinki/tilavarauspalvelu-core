@@ -1,6 +1,7 @@
 import pytest
 
 from tests.factories import ApplicationFactory, ApplicationRoundFactory, ReservationUnitFactory, UserFactory
+from tests.factories.application import ApplicationBuilder
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ApplicationStatusChoice
 
 from .helpers import SET_HANDLED_MUTATION, disable_reservation_generation
@@ -142,7 +143,7 @@ def test_application_round__set_handled__error__has_applications_in_status(graph
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
     assert application_round.status == ApplicationRoundStatusChoice.IN_ALLOCATION
 
-    application = ApplicationFactory.create_in_status(status=application_status, application_round=application_round)
+    application = ApplicationBuilder().with_status(application_status).in_application_round(application_round).create()
     assert application.status == application_status
 
     graphql.login_with_superuser()

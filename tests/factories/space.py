@@ -1,3 +1,5 @@
+from typing import Any
+
 from factory import LazyAttribute
 
 from tilavarauspalvelu.models import Space
@@ -36,3 +38,15 @@ class SpaceFactory(GenericDjangoModelFactory[Space]):
 
     resources = ReverseForeignKeyFactory("tests.factories.ResourceFactory")
     reservation_units = ManyToManyFactory("tests.factories.ReservationUnitFactory")
+
+    @classmethod
+    def build_for_bulk_create(cls, **kwargs: Any) -> Space:
+        """
+        Builds a Space object with the MPTT fields set to 0, so that 'bulk_create' works.
+        Should call Space.objects.rebuild() after the bulk create to update the MPTT fields.
+        """
+        kwargs["lft"] = 0
+        kwargs["rght"] = 0
+        kwargs["tree_id"] = 0
+        kwargs["level"] = 0
+        return cls.build(**kwargs)

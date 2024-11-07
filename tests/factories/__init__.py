@@ -16,7 +16,7 @@ from .keyword import KeywordFactory
 from .keyword_category import KeywordCategoryFactory
 from .keyword_group import KeywordGroupFactory
 from .location import LocationFactory
-from .organization import OrganisationFactory
+from .organisation import OrganisationFactory
 from .origin_hauki_resource import OriginHaukiResourceFactory
 from .payment_accounting import PaymentAccountingFactory
 from .payment_merchant import PaymentMerchantFactory

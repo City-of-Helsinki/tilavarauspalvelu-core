@@ -19,7 +19,6 @@ from tilavarauspalvelu.enums import (
     ReservationUnitPublishingState,
     ReservationUnitReservationState,
 )
-from utils.date_utils import local_date
 from utils.db import NowTT
 
 from .queryset import ReservationUnitManager
@@ -293,32 +292,18 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
         """Get the pricing type from the currently active pricing."""
         from tilavarauspalvelu.models import ReservationUnitPricing
 
-        sq = models.Subquery(
+        return models.Subquery(  # type: ignore[return-value]
             queryset=(
-                ReservationUnitPricing.objects.filter(
-                    reservation_unit=models.OuterRef("pk"),
-                    begins__lte=local_date(),
-                )
-                .order_by("-begins")
+                ReservationUnitPricing.objects.filter(reservation_unit=models.OuterRef("pk"))
+                .active()
                 .values("highest_price")[:1]
             ),
             output_field=models.CharField(null=True),
         )
-        return sq  # type: ignore[return-value]  # noqa: RET504
 
     @active_pricing_price.override
     def _(self) -> Decimal | None:
-        from tilavarauspalvelu.models import ReservationUnitPricing
-
-        return (
-            ReservationUnitPricing.objects.filter(
-                reservation_unit=self,
-                begins__lte=local_date(),
-            )
-            .order_by("-begins")
-            .values_list("highest_price", flat=True)
-            .first()
-        )
+        return self.pricings.active().values_list("highest_price", flat=True).first()
 
     @lookup_property
     def publishing_state() -> str:

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import contextlib
 import datetime
 from functools import cached_property
 from inspect import cleandoc
@@ -119,15 +118,6 @@ class AffectingTimeSpan(models.Model):
             last_updated = local_datetime().isoformat()
             max_allowed_age = datetime.timedelta(minutes=settings.AFFECTING_TIME_SPANS_UPDATE_INTERVAL_MINUTES)
             cache.set(cls.CACHE_KEY, last_updated, timeout=max_allowed_age.total_seconds())
-
-    @classmethod
-    @contextlib.contextmanager
-    def refresh_at_the_end(cls) -> None:
-        """Refresh the materialized view at the end of the context."""
-        try:
-            yield
-        finally:
-            cls.refresh()
 
     @classmethod
     def is_valid(cls) -> bool:

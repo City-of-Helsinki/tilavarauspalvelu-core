@@ -1,19 +1,17 @@
-# ruff: noqa: S311
-
 from django.contrib.auth.hashers import make_password
 
+from tests.factories import UserFactory
 from tilavarauspalvelu.enums import ReservationNotification, UserRoleChoice
 from tilavarauspalvelu.models import User
 
 from .utils import with_logs
 
 
-@with_logs()
+@with_logs
 def _create_users() -> list[User]:
-    # TODO: Refactor this function
     users: list[User] = [
         # Django admin user
-        User(
+        UserFactory.build(
             date_of_birth=None,
             department_name=None,
             email="tvp@example.com",
@@ -30,7 +28,7 @@ def _create_users() -> list[User]:
             uuid="6a3a72f4-2f84-11ee-9b45-718d9db674aa",
         ),
         # General Admin (090909-900D)
-        User(
+        UserFactory.build(
             date_of_birth="1909-09-09",
             department_name=None,
             email="desada2353@saeoil.com",
@@ -47,7 +45,7 @@ def _create_users() -> list[User]:
             uuid="2816d76a-4b72-452f-8eff-de35f5c2062e",
         ),
         # Unit Reserver (010101-900V)
-        User(
+        UserFactory.build(
             date_of_birth="1901-01-01",
             department_name=None,
             email="cmwrwapvcajwldiyul@cazlg.com",
@@ -64,7 +62,7 @@ def _create_users() -> list[User]:
             uuid="b3a9eb95-c941-47e0-9c30-af85349f3bed",
         ),
         # Unit Viewer (020202-900V)
-        User(
+        UserFactory.build(
             date_of_birth="1902-02-02",
             department_name=None,
             email="fsr81505@omeie.com",
@@ -81,7 +79,7 @@ def _create_users() -> list[User]:
             uuid="63c47e08-edc3-4dad-8d40-5eebe677f62f",
         ),
         # Unit Handler (030303-900V)
-        User(
+        UserFactory.build(
             date_of_birth="1903-03-03",
             department_name=None,
             email="srj22958@omeie.com",
@@ -98,7 +96,7 @@ def _create_users() -> list[User]:
             uuid="fd692237-80e6-4eaf-94e2-edb4db7cd7bb",
         ),
         # Unit Admin (040404-900V)
-        User(
+        UserFactory.build(
             date_of_birth="1904-04-04",
             department_name=None,
             email="kgo52202@omeie.com",

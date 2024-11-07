@@ -19,6 +19,7 @@ from tests.factories import (
     UserFactory,
     UserSocialAuthFactory,
 )
+from tests.factories.application import ApplicationBuilder
 from tilavarauspalvelu.enums import ApplicationStatusChoice, OrderStatus, ReservationNotification
 from tilavarauspalvelu.models import GeneralRole, UnitRole, User
 from tilavarauspalvelu.models.user.actions import (
@@ -222,7 +223,7 @@ def test_anonymization__can_anonymize__open_reservations():
 def test_anonymization__can_anonymize__open_applications(status):
     user = UserFactory.create(first_name="foo")
 
-    ApplicationFactory.create_in_status(status, user=user)
+    ApplicationBuilder().with_status(status).create(user=user)
 
     can_anonymize = user.actions.can_anonymize()
 

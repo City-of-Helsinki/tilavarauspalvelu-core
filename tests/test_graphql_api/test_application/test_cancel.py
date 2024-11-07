@@ -1,6 +1,7 @@
 import pytest
 
 from tests.factories import ApplicationFactory
+from tests.factories.application import ApplicationBuilder
 from tilavarauspalvelu.enums import ApplicationStatusChoice
 
 from .helpers import CANCEL_MUTATION
@@ -44,7 +45,7 @@ def test_cancel_application__wrong_status(graphql, status):
     # given:
     # - There is a draft application in a certain status
     # - A superuser is using the system
-    application = ApplicationFactory.create_in_status(status)
+    application = ApplicationBuilder().with_status(status).create()
     graphql.login_with_superuser()
 
     # when:

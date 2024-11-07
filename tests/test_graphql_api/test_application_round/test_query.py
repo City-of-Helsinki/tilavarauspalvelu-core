@@ -3,6 +3,7 @@ import datetime
 import pytest
 
 from tests.factories import ApplicationFactory, ApplicationRoundFactory, ReservationFactory, ReservationUnitFactory
+from tests.factories.application import ApplicationBuilder
 from tests.test_graphql_api.test_application_round.helpers import rounds_query
 from tilavarauspalvelu.enums import (
     ApplicationRoundReservationCreationStatusChoice,
@@ -76,19 +77,19 @@ def test_application_round_query__all_fields(graphql):
         "notesWhenApplyingFi": application_round.notes_when_applying_fi,
         "notesWhenApplyingEn": application_round.notes_when_applying_en,
         "notesWhenApplyingSv": application_round.notes_when_applying_sv,
-        "applicationPeriodBegin": application_round.application_period_begin.isoformat(),
-        "applicationPeriodEnd": application_round.application_period_end.isoformat(),
+        "applicationPeriodBegin": application_round.application_period_begin.astimezone(datetime.UTC).isoformat(),
+        "applicationPeriodEnd": application_round.application_period_end.astimezone(datetime.UTC).isoformat(),
         "reservationPeriodBegin": application_round.reservation_period_begin.isoformat(),
         "reservationPeriodEnd": application_round.reservation_period_end.isoformat(),
-        "publicDisplayBegin": application_round.public_display_begin.isoformat(),
-        "publicDisplayEnd": application_round.public_display_end.isoformat(),
+        "publicDisplayBegin": application_round.public_display_begin.astimezone(datetime.UTC).isoformat(),
+        "publicDisplayEnd": application_round.public_display_end.astimezone(datetime.UTC).isoformat(),
         "handledDate": None,
         "sentDate": None,
         "reservationUnits": [],
         "purposes": [],
         "termsOfUse": {"nameFi": application_round.terms_of_use.name_fi},
         "status": application_round.status,
-        "statusTimestamp": application_round.status_timestamp.isoformat(),
+        "statusTimestamp": application_round.status_timestamp.astimezone(datetime.UTC).isoformat(),
         "applicationsCount": 0,
         "reservationUnitCount": 0,
         "isSettingHandledAllowed": False,
@@ -190,7 +191,7 @@ def test_application_round_query__is_setting_handled_allowed__application_status
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
     assert application_round.status == ApplicationRoundStatusChoice.IN_ALLOCATION
 
-    ApplicationFactory.create_in_status(status=application_status, application_round=application_round)
+    ApplicationBuilder().with_status(application_status).in_application_round(application_round).create()
 
     graphql.login_with_superuser()
     response = graphql(rounds_query(fields="isSettingHandledAllowed"))

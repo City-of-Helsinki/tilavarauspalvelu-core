@@ -1,7 +1,6 @@
 import datetime
 
 import pytest
-from django.utils.timezone import get_default_timezone
 from graphql_relay import to_global_id
 
 from tests.factories import (
@@ -33,8 +32,6 @@ from tilavarauspalvelu.enums import (
 from utils.date_utils import local_datetime, next_hour
 
 from .helpers import reservation_unit_query, reservation_units_query
-
-DEFAULT_TIMEZONE = get_default_timezone()
 
 # Applied to all tests
 pytestmark = [

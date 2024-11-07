@@ -42,11 +42,11 @@ class ApplicationRound(models.Model):
     criteria: str = models.TextField(default="")
     notes_when_applying: str = models.TextField(blank=True, default="")
 
-    # When the application round accepts reservations
+    # Period when the application round accepts applications
     application_period_begin: datetime.datetime = models.DateTimeField()
     application_period_end: datetime.datetime = models.DateTimeField()
 
-    # Period where the application in the application round are being allocated to
+    # Period where the reservations from the application round's applications will be allocated to
     reservation_period_begin: datetime.date = models.DateField()
     reservation_period_end: datetime.date = models.DateField()
 

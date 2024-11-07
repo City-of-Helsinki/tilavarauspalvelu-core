@@ -14,10 +14,10 @@ class OrganisationFactory(GenericDjangoModelFactory[Organisation]):
     class Meta:
         model = Organisation
 
-    name = FakerFI("city")
+    name = FakerFI("company")
     name_fi = LazyAttribute(lambda i: i.name)
-    name_en = FakerEN("city")
-    name_sv = FakerSV("city")
+    name_en = FakerEN("company")
+    name_sv = FakerSV("company")
 
     email = FakerFI("email")
 

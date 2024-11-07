@@ -1,16 +1,25 @@
-from datetime import timedelta
-from typing import Any
+import datetime
+from typing import Any, Self
 
 import factory
 from factory import LazyAttribute
 
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
 from tilavarauspalvelu.models import ApplicationRound
-from utils.date_utils import utc_start_of_day
+from utils.date_utils import local_start_of_day
 
-from ._base import FakerEN, FakerFI, FakerSV, ForeignKeyFactory, GenericDjangoModelFactory, ManyToManyFactory
+from ._base import (
+    FakerEN,
+    FakerFI,
+    FakerSV,
+    ForeignKeyFactory,
+    GenericDjangoModelFactory,
+    ManyToManyFactory,
+    ModelFactoryBuilder,
+)
 
 __all__ = [
+    "ApplicationRoundBuilder",
     "ApplicationRoundFactory",
 ]
 
@@ -35,16 +44,16 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
     notes_when_applying_en = FakerEN("sentence")
     notes_when_applying_sv = FakerSV("sentence")
 
-    timestamp = factory.LazyFunction(utc_start_of_day)  # private helper (see Meta.exclude)
+    timestamp = factory.LazyFunction(local_start_of_day)  # private helper (see Meta.exclude)
 
     application_period_begin = factory.LazyAttribute(lambda i: i.timestamp)
-    application_period_end = factory.LazyAttribute(lambda i: i.application_period_begin + timedelta(weeks=4))
+    application_period_end = factory.LazyAttribute(lambda i: i.application_period_begin + datetime.timedelta(weeks=4))
 
     reservation_period_begin = factory.LazyAttribute(lambda i: i.timestamp.date())
-    reservation_period_end = factory.LazyAttribute(lambda i: i.reservation_period_begin + timedelta(weeks=4))
+    reservation_period_end = factory.LazyAttribute(lambda i: i.reservation_period_begin + datetime.timedelta(weeks=4))
 
     public_display_begin = factory.LazyAttribute(lambda i: i.timestamp)
-    public_display_end = factory.LazyAttribute(lambda i: i.public_display_begin + timedelta(weeks=4))
+    public_display_end = factory.LazyAttribute(lambda i: i.public_display_begin + datetime.timedelta(weeks=4))
 
     handled_date = None
     sent_date = None
@@ -69,44 +78,77 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
 
     @classmethod
     def create_in_status_upcoming(cls, **kwargs: Any) -> ApplicationRound:
-        """Create an upcoming application round."""
-        kwargs.setdefault("sent_date", None)
-        kwargs.setdefault("handled_date", None)
-        kwargs.setdefault("application_period_begin", utc_start_of_day() + timedelta(days=2))
-        return cls.create(**kwargs)
+        return ApplicationRoundBuilder().upcoming().create(**kwargs)
 
     @classmethod
     def create_in_status_open(cls, **kwargs: Any) -> ApplicationRound:
-        """Create an open application round."""
-        kwargs.setdefault("sent_date", None)
-        kwargs.setdefault("handled_date", None)
-        kwargs.setdefault("application_period_begin", utc_start_of_day() - timedelta(days=2))
-        kwargs.setdefault("application_period_end", utc_start_of_day() + timedelta(days=2))
-        return cls.create(**kwargs)
+        return ApplicationRoundBuilder().open().create(**kwargs)
 
     @classmethod
     def create_in_status_in_allocation(cls, **kwargs: Any) -> ApplicationRound:
-        """Create an application round in allocation."""
-        kwargs.setdefault("sent_date", None)
-        kwargs.setdefault("handled_date", None)
-        kwargs.setdefault("application_period_begin", utc_start_of_day() - timedelta(days=2))
-        kwargs.setdefault("application_period_end", utc_start_of_day() - timedelta(days=2))
-        return cls.create(**kwargs)
+        return ApplicationRoundBuilder().in_allocation().create(**kwargs)
 
     @classmethod
     def create_in_status_handled(cls, **kwargs: Any) -> ApplicationRound:
-        """Create a handled application round."""
-        kwargs.setdefault("sent_date", None)
-        kwargs.setdefault("handled_date", utc_start_of_day())
-        kwargs.setdefault("application_period_begin", utc_start_of_day() - timedelta(days=2))
-        kwargs.setdefault("application_period_end", utc_start_of_day() - timedelta(days=2))
-        return cls.create(**kwargs)
+        return ApplicationRoundBuilder().handled().create(**kwargs)
 
     @classmethod
     def create_in_status_results_sent(cls, **kwargs: Any) -> ApplicationRound:
-        """Create an application round with results sent."""
-        kwargs.setdefault("sent_date", utc_start_of_day())
-        kwargs.setdefault("handled_date", utc_start_of_day())
-        kwargs.setdefault("application_period_begin", utc_start_of_day() - timedelta(days=2))
-        kwargs.setdefault("application_period_end", utc_start_of_day() - timedelta(days=2))
-        return cls.create(**kwargs)
+        return ApplicationRoundBuilder().results_sent().create(**kwargs)
+
+
+class ApplicationRoundBuilder(ModelFactoryBuilder[ApplicationRound]):
+    factory = ApplicationRoundFactory
+
+    def with_status(self, status: ApplicationRoundStatusChoice) -> Self:
+        match status:
+            case ApplicationRoundStatusChoice.UPCOMING:
+                return self.upcoming()
+            case ApplicationRoundStatusChoice.OPEN:
+                return self.open()
+            case ApplicationRoundStatusChoice.IN_ALLOCATION:
+                return self.in_allocation()
+            case ApplicationRoundStatusChoice.HANDLED:
+                return self.handled()
+            case ApplicationRoundStatusChoice.RESULTS_SENT:
+                return self.results_sent()
+
+    def upcoming(self) -> Self:
+        return self.set(
+            sent_date=None,
+            handled_date=None,
+            application_period_begin=local_start_of_day() + datetime.timedelta(days=2),
+            application_period_end=local_start_of_day() + datetime.timedelta(days=4),
+        )
+
+    def open(self) -> Self:
+        return self.set(
+            sent_date=None,
+            handled_date=None,
+            application_period_begin=local_start_of_day() - datetime.timedelta(days=2),
+            application_period_end=local_start_of_day() + datetime.timedelta(days=2),
+        )
+
+    def in_allocation(self) -> Self:
+        return self.set(
+            sent_date=None,
+            handled_date=None,
+            application_period_begin=local_start_of_day() - datetime.timedelta(days=4),
+            application_period_end=local_start_of_day() - datetime.timedelta(days=2),
+        )
+
+    def handled(self) -> Self:
+        return self.set(
+            sent_date=None,
+            handled_date=local_start_of_day(),
+            application_period_begin=local_start_of_day() - datetime.timedelta(days=4),
+            application_period_end=local_start_of_day() - datetime.timedelta(days=2),
+        )
+
+    def results_sent(self) -> Self:
+        return self.set(
+            sent_date=local_start_of_day(),
+            handled_date=local_start_of_day(),
+            application_period_begin=local_start_of_day() - datetime.timedelta(days=4),
+            application_period_end=local_start_of_day() - datetime.timedelta(days=2),
+        )

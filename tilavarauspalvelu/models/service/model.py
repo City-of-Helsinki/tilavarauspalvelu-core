@@ -30,8 +30,8 @@ class Service(models.Model):
         default=ServiceTypeChoices.INTRODUCTION,
     )
 
-    buffer_time_before: datetime.timedelta | None = models.DurationField(blank=True, null=True)
-    buffer_time_after: datetime.timedelta | None = models.DurationField(blank=True, null=True)
+    buffer_time_before: datetime.timedelta | None = models.DurationField(blank=True, null=True)  # Deprecated
+    buffer_time_after: datetime.timedelta | None = models.DurationField(blank=True, null=True)  # Deprecated
 
     # Translated field hints
     name_fi: str | None
