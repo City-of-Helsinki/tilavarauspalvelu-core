@@ -109,5 +109,7 @@
   "add": "Add",
   "subtract": "Subtract",
   "inclTax": "incl. VAT {{taxPercentage}} %",
-  "headAlt": "Tilan ikoni"
+  "peopleSuffixShort": "ppl",
+  "yearSuffixShort": "y",
+  "amountSuffixShort": "pcs"
 }

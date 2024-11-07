@@ -109,5 +109,7 @@
   "add": "Lisää",
   "subtract": "Vähennä",
   "inclTax": "sis. alv {{taxPercentage}}%",
-  "headAlt": "Tilan ikoni"
+  "peopleSuffixShort": "hlö",
+  "yearSuffixShort": "v",
+  "amountSuffixShort": "kpl"
 }

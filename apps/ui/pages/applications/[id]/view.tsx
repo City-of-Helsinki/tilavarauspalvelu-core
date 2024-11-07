@@ -4,7 +4,7 @@ import { getTranslationSafe } from "common/src/common/util";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { createApolloClient } from "@/modules/apolloClient";
-import { ViewInner } from "@/components/application/ViewInner";
+import { ViewApplication } from "@/components/application/ViewApplication";
 import {
   getCommonServerSideProps,
   getGenericTerms,
@@ -56,12 +56,12 @@ function View({ application, tos }: PropsNarrowed): JSX.Element {
               <ApprovedReservations application={application} />
             </Tabs.TabPanel>
             <Tabs.TabPanel>
-              <ViewInner application={application} tos={tos} />
+              <ViewApplication application={application} tos={tos} />
             </Tabs.TabPanel>
           </Tabs>
         </>
       ) : (
-        <ViewInner application={application} tos={tos} />
+        <ViewApplication application={application} tos={tos} />
       )}
     </Container>
   );

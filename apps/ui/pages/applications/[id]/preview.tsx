@@ -10,7 +10,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { default as ErrorComponent } from "next/error";
 import { MediumButton } from "@/styles/util";
 import { ButtonContainer, CenterSpinner } from "@/components/common/common";
-import { ViewInner } from "@/components/application/ViewInner";
+import { ViewApplication } from "@/components/application/ViewApplication";
 import { createApolloClient } from "@/modules/apolloClient";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
 import {
@@ -93,7 +93,7 @@ function Preview(props: PropsNarrowed): JSX.Element {
       application={application}
     >
       <form onSubmit={onSubmit}>
-        <ViewInner
+        <ViewApplication
           application={application}
           tos={tos}
           acceptTermsOfUse={acceptTermsOfUse}

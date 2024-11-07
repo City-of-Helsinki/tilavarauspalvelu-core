@@ -164,19 +164,19 @@
     "homeCity": "City",
     "heading": "4. Review and submit the application",
     "text": "Summary of your application",
-    "basicInfoSubHeading": "Applicant information",
-    "firstName": "Contact person's first name ",
-    "lastName": "Contact person's surname",
-    "applicantTypeLabel": "Applicant type",
-    "email": "Email ",
-    "phoneNumber": "Telephone number",
+    "basicInfoSubHeading": "Applicant details",
+    "contactPerson": "Contact person",
+    "contactInfo": "Contact information",
+    "address": "Address",
     "additionalInformation": "Additional details about the purpose of the booking",
     "organisation": {
-      "name": "Applicant name",
-      "coreBusiness": "Core business"
+      "name": "Official name",
+      "coreBusiness": "Core business",
+      "registrationNumber": "Business ID",
+      "billingAddress": "Billing address"
     },
     "applicationEvent": {
-      "name": "Application name",
+      "applicationInfo": "Application details",
       "numPersons": "Group size",
       "ageGroup": "Age group",
       "abilityGroup": "",
@@ -186,7 +186,10 @@
       "end": "End date",
       "minDuration": "Minimum duration",
       "maxDuration": "Maximum duration",
-      "eventsPerWeek": "Number of bookings per week"
+      "eventsPerWeek": "Number of bookings per week",
+      "appliedSpaces": "Requested spaces",
+      "schedules": "Requested time slots",
+      "scheduleTooltip": "Secondary time slots in parentheses ( )"
     },
     "applicationEventSchedules": "Requested time slots",
     "noData": {
@@ -203,6 +206,12 @@
     "subHeading": {
       "applicationInfo": "Application information"
     }
+  },
+  "applicationEventStatus": {
+    "UNALLOCATED": "Unallocated",
+    "IN_ALLOCATION": "In allocation",
+    "HANDLED": "Handled",
+    "REJECTED": "Rejected"
   },
   "view": {
     "heading": "Seasonal booking application",

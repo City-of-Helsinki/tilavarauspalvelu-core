@@ -164,29 +164,29 @@
     "homeCity": "Hemort",
     "heading": "4. Kontrollera och lämna in ansökan",
     "text": "Sammandrag av din ansökan",
-    "basicInfoSubHeading": "Kontakt uppgifer",
-    "firstName": "Kontaktpersonens förnamn",
-    "lastName": "Kontaktpersonens efternamn",
-    "applicantTypeLabel": "Typ av ansökare",
-    "email": "E-postadress",
-    "phoneNumber": "Telefonnummer",
+    "basicInfoSubHeading": "Ansökningsinformation",
+    "contactPerson": "Kontaktperson",
+    "contactInfo": "Kontaktinformation",
+    "address": "Postadress",
     "additionalInformation": "Tilläggsinformation om bokningens ändamål",
     "organisation": {
       "name": "Ansökarens namn",
-      "coreBusiness": "Kärnverksamhet"
+      "coreBusiness": "Kärnverksamhet",
+      "billingAddress": "Fakturaadress"
     },
     "applicationEvent": {
-      "name": "Säsongbokningens namn",
+      "applicationInfo": "Säsongbokningens detaljer",
       "numPersons": "Gruppstorlek",
       "ageGroup": "Åldersgrupp",
       "abilityGroup": "",
       "purpose": "Användningsändamål",
       "additionalInfo": "Tilläggsuppgifter om bokningen",
-      "begin": "Start datum",
-      "end": "Slutdatum",
-      "minDuration": "Minsta bokningslängden",
-      "maxDuration": "Maximala bokningslängden",
-      "eventsPerWeek": "Antal bokningar per vecka"
+      "period": "Bokningsperiod",
+      "duration": "Säsongbokningens varaktighet",
+      "eventsPerWeek": "Bokningar per vecka",
+      "appliedSpaces": "Önskade lokaler",
+      "schedules": "Önskade tider",
+      "scheduleTooltip": "Sekundära tidsönskemål i parentes ( )"
     },
     "applicationEventSchedules": "Önskade tider",
     "noData": {
@@ -199,10 +199,13 @@
     },
     "reservationUnitTerms": "Kompletterande bokningssvillkor",
     "termsOfService": "Bokningsvillkor för Helsingfors stads lokaler och utrustning",
-    "userAcceptsTerms": "Jag har läst avtalsvillkoren och de kompletterande bokningsvillkoren och godkänner dessa.",
-    "subHeading": {
-      "applicationInfo": "Bokningsinformation"
-    }
+    "userAcceptsTerms": "Jag har läst avtalsvillkoren och de kompletterande bokningsvillkoren och godkänner dessa."
+  },
+  "applicationEventStatus": {
+    "UNALLOCATED": "Mottagen",
+    "IN_ALLOCATION": "I behandling",
+    "HANDLED": "Behandlad",
+    "REJECTED": "Avslagen"
   },
   "view": {
     "heading": "Säsongbokningsansökan",

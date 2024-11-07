@@ -6,6 +6,7 @@ import { fontBold, H4 } from "common/src/common/typography";
 import { fromMondayFirstUnsafe } from "common/src/helpers";
 import { WEEKDAYS } from "common/src/const";
 import { ApplicationEventScheduleFormType } from "./Form";
+import { getDayTimes } from "@/modules/util";
 
 type Props = {
   primary: ApplicationEventScheduleFormType[];
@@ -33,15 +34,7 @@ function Weekdays({
   return (
     <>
       {WEEKDAYS.map((day) => {
-        const value = schedules
-          .filter((s) => s.day === day)
-          .map(
-            (cur) =>
-              `${Number(cur.begin.substring(0, 2))}-${Number(
-                cur.end.startsWith("00") ? 24 : cur.end.substring(0, 2)
-              )}`
-          )
-          .join(", ");
+        const value = getDayTimes(schedules, day);
         return (
           <WeekWrapper key={day}>
             <Label>

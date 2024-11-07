@@ -19,6 +19,7 @@ const AccordionElement = styled.div`
   margin-bottom: var(--spacing-layout-xs);
   margin-left: 0;
   padding-left: 0;
+  --accordion-border-color: var(--color-black-50);
 `;
 
 const HeadingButton = styled(Button).attrs({
@@ -32,7 +33,7 @@ const HeadingButton = styled(Button).attrs({
     width: 100%;
     padding-left: 0;
     border-left: 0;
-    border-bottom: 1px solid var(--color-black-50) !important;
+    border-bottom: 1px solid var(--accordion-border-color) !important;
 
     span {
       ${({ theme }) => {

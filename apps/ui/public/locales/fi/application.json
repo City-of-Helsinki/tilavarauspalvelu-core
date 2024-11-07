@@ -165,31 +165,32 @@
     "homeCity": "Kotipaikka",
     "heading": "4. Tarkista ja lähetä hakemus",
     "text": "Yhteenveto hakemuksestasi",
-    "basicInfoSubHeading": "Varaajan tiedot",
-    "firstName": "Yhteyshenkilön etunimi",
-    "lastName": "Yhteyshenkilön sukunimi",
-    "applicantTypeLabel": "Hakijan tyyppi",
-    "email": "Sähköpostiosoite",
-    "phoneNumber": "Puhelinnumero",
+    "basicInfoSubHeading": "Hakijan tiedot",
+    "contactPerson": "Yhteyshenkilö",
+    "contactInfo": "Yhteystiedot",
+    "address": "Postiosoite",
     "additionalInformation": "Lisätietoja varauksen käyttötarkoituksesta",
     "organisation": {
-      "name": "Hakijan nimi",
-      "coreBusiness": "Ydintoiminta"
+      "name": "Yhdistyksen tai yhteisön virallinen nimi",
+      "coreBusiness": "Ydintoiminta",
+      "registrationNumber": "Y-tunnus",
+      "billingAddress": "Laskutusosoite"
     },
     "applicationEvent": {
-      "name": "Kausivarauksen nimi",
+      "applicationInfo": "Hakemuksen tiedot",
       "numPersons": "Ryhmän koko",
       "ageGroup": "Ikäryhmä",
       "abilityGroup": "Tasoryhmä",
       "purpose": "Varauksen käyttötarkoitus",
       "additionalInfo": "Lisätietoja varaukseen liittyen",
-      "begin": "Kauden aloituspäivä",
-      "end": "Kauden päätöspäivä",
-      "minDuration": "Varauksen vähimmäiskesto",
-      "maxDuration": "Varauksen enimmäiskesto",
-      "eventsPerWeek": "Varausten määrä viikossa"
+      "period": "Kausi",
+      "duration": "Varauksen kesto",
+      "eventsPerWeek": "Varausten määrä viikossa",
+      "appliedSpaces": "Tilatoiveet",
+      "schedules": "Aikatoiveet",
+      "scheduleTooltip": "Toissijaiset aikatoiveet merkitty sulkumerkeillä ( )"
     },
-    "applicationEventSchedules": "Toivotut ajat",
+    "applicationEventSchedules": "Aikatoiveet",
     "noData": {
       "heading": "Lomakkeen tietoja ei ole vielä olemassa",
       "text": "Täytä ensin lomake"
@@ -200,10 +201,13 @@
     },
     "reservationUnitTerms": "Täydentävät varausehdot",
     "termsOfService": "Helsingin kaupungin tilojen ja laitteiden varausehdot",
-    "userAcceptsTerms": "Olen lukenut ja hyväksyn sopimusehdot ja täydentävät varausehdot.",
-    "subHeading": {
-      "applicationInfo": "Varauksen tiedot"
-    }
+    "userAcceptsTerms": "Olen lukenut ja hyväksyn sopimusehdot ja täydentävät varausehdot."
+  },
+  "applicationEventStatus": {
+    "UNALLOCATED": "Vastaanotettu",
+    "IN_ALLOCATION": "Käsittelyssä",
+    "HANDLED": "Hyväksytty",
+    "REJECTED": "Hylätty"
   },
   "view": {
     "heading": "Kausivaraushakemus",
