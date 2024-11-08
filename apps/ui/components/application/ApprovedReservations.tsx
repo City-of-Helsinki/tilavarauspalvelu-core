@@ -67,13 +67,15 @@ const H3 = styled(H5).attrs({ as: "h3" })`
   margin: 0;
 `;
 
+const BREAKPOINT = breakpoints.m;
+
 const ListContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: var(--spacing-m);
 
   margin-top: var(--spacing-l);
-  @media (width > ${breakpoints.s}) {
+  @media (width > ${BREAKPOINT}) {
     margin-top: var(--spacing-xl);
   }
 `;
@@ -82,7 +84,7 @@ const ListContainer = styled.div`
 // NOTE HDS Table can't be styled so have to wrap it in an extra div.
 const TableWrapper = styled.div`
   /* Mobile uses cards, so no horizontal scroll */
-  @media (width > ${breakpoints.s}) {
+  @media (width > ${BREAKPOINT}) {
     & > div {
       overflow-x: auto;
       > table {
@@ -92,7 +94,7 @@ const TableWrapper = styled.div`
     }
   }
 
-  @media (width <= ${breakpoints.s}) {
+  @media (width <= ${BREAKPOINT}) {
     && table {
       /* border can't be in tr because it can't be styled */
       --border-width: 1px;
@@ -158,7 +160,7 @@ const ButtonContainer = styled.div`
   gap: var(--spacing-s);
   justify-content: center;
   flex-direction: row;
-  @media (max-width: ${breakpoints.s}) {
+  @media (max-width: ${BREAKPOINT}) {
     flex-direction: column;
   }
 `;
@@ -290,7 +292,7 @@ type ApplicationSectionT = NonNullable<QueryT["applicationSections"]>[0];
 
 const OnlyForMobile = styled.span`
   display: inline;
-  @media (width > ${breakpoints.s}) {
+  @media (width > ${BREAKPOINT}) {
     display: none;
   }
 `;
@@ -304,7 +306,7 @@ const IconTextWrapper = styled.span`
   > svg {
     display: inline;
   }
-  @media (width > ${breakpoints.s}) {
+  @media (width > ${BREAKPOINT}) {
     > svg {
       display: none;
     }
@@ -340,7 +342,7 @@ function ReservationUnitTable({
 
   const lang = getLocalizationLang(i18n.language);
 
-  const isMobile = useMedia(`(max-width: ${breakpoints.s})`, false);
+  const isMobile = useMedia(`(max-width: ${BREAKPOINT})`, false);
 
   const cols = [
     {
@@ -518,7 +520,7 @@ const CancelButton = styled(Button).attrs({
 `;
 
 const StyledStatusLabel = styled(StatusLabel)`
-  @media (width <= ${breakpoints.s}) {
+  @media (width <= ${BREAKPOINT}) {
     position: absolute;
     right: var(--spacing-s);
     top: var(--spacing-s);
