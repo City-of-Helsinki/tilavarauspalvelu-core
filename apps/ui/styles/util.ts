@@ -1,5 +1,6 @@
-import { fontMedium } from "common/src/common/typography";
+import { fontMedium, fontRegular } from "common/src/common/typography";
 import { Button } from "hds-react";
+import Link from "next/link";
 import styled, { css } from "styled-components";
 
 export const truncatedText = css`
@@ -39,4 +40,14 @@ export const arrowDown = css`
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
   border-top: 8px solid var(--color-white);
+`;
+
+// TODO there should be other link styles combine this with them
+export const InlineStyledLink = styled(Link)`
+  && {
+    display: inline;
+    color: var(--color-black);
+    text-decoration: underline;
+    ${fontRegular};
+  }
 `;
