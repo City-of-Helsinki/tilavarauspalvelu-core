@@ -5,6 +5,8 @@ from decimal import Decimal
 from inspect import cleandoc
 from typing import TYPE_CHECKING
 
+from django.conf import settings
+
 from tests.factories import (
     PaymentProductFactory,
     ReservationUnitPricingFactory,
@@ -32,6 +34,7 @@ from tilavarauspalvelu.models import (
     ReservationMetadataSet,
     ReservationUnit,
     ReservationUnitCancellationRule,
+    ReservationUnitImage,
     ReservationUnitPaymentType,
     ReservationUnitPricing,
     ReservationUnitType,
@@ -41,6 +44,7 @@ from tilavarauspalvelu.models import (
     TermsOfUse,
     Unit,
 )
+from tilavarauspalvelu.tasks import create_reservation_unit_thumbnails_and_urls
 from utils.date_utils import DEFAULT_TIMEZONE
 
 from .create_reservation_related_things import (
@@ -56,6 +60,7 @@ from .create_reservation_related_things import (
     _create_services,
     _create_specific_terms_of_use,
     _create_tax_percentages,
+    _fetch_and_build_reservation_unit_image,
 )
 from .create_seasonal_booking import _create_application_round_time_slots
 from .utils import (
@@ -171,6 +176,9 @@ def _create_reservation_units() -> list[ReservationUnit]:
         tax_percentages,
     )
 
+    if settings.UPDATE_RESERVATION_UNIT_THUMBNAILS:
+        create_reservation_unit_thumbnails_and_urls()
+
     # --- Add reservables ------------------------------------------------------------------------------------------
 
     equipments = _create_equipments()
@@ -243,6 +251,7 @@ def _create_free_reservation_units(
     reservation_units: list[ReservationUnit] = []
     reservation_unit_spaces: list[models.Model] = []
     pricings: list[ReservationUnitPricing] = []
+    images: list[ReservationUnitImage] = []
 
     reservation_unit_type = ReservationUnitTypeFactory.create(
         name="Ilmainen",
@@ -356,10 +365,19 @@ def _create_free_reservation_units(
         )
         pricings.append(pricing)
 
+        image = _fetch_and_build_reservation_unit_image(
+            reservation_unit=reservation_unit,
+            image_url="https://images.unsplash.com/photo-1577412647305-991150c7d163",
+            filename="toimistokoppi",
+        )
+        if image is not None:
+            images.append(image)
+
     Space.objects.bulk_create(spaces)
     ReservationUnit.objects.bulk_create(reservation_units)
     ReservationUnitSpacesThoughModel.objects.bulk_create(reservation_unit_spaces)
     ReservationUnitPricing.objects.bulk_create(pricings)
+    ReservationUnitImage.objects.bulk_create(images)
 
 
 @with_logs
@@ -442,6 +460,7 @@ def _create_paid_reservation_units(
     reservation_unit_payment_types: list[models.Model] = []
     pricings: list[ReservationUnitPricing] = []
     payment_products: list[PaymentProduct] = []
+    images: list[ReservationUnitImage] = []
 
     unit_counter = itertools.count(start=1)
 
@@ -573,6 +592,13 @@ def _create_paid_reservation_units(
         )
         pricings.append(pricing)
 
+        image = _fetch_and_build_reservation_unit_image(
+            reservation_unit=reservation_unit,
+            image_url="https://images.unsplash.com/photo-1414452110837-9dab484a417d",
+            filename="vessa",
+        )
+        images.append(image)
+
     Unit.objects.bulk_create(units)
     Space.objects.bulk_create(spaces)
     PaymentProduct.objects.bulk_create(payment_products)
@@ -580,6 +606,7 @@ def _create_paid_reservation_units(
     ReservationUnitSpacesThoughModel.objects.bulk_create(reservation_unit_spaces)
     ReservationUnitPaymentTypesThoughModel.objects.bulk_create(reservation_unit_payment_types)
     ReservationUnitPricing.objects.bulk_create(pricings)
+    ReservationUnitImage.objects.bulk_create(images)
 
 
 @with_logs
@@ -620,6 +647,7 @@ def _create_seasonal_bookable_reservation_units(
     spaces: list[Space] = []
     reservation_unit_spaces: list[models.Model] = []
     pricings: list[ReservationUnitPricing] = []
+    images: list[ReservationUnitImage] = []
 
     unit_counter = itertools.count(start=1)
 
@@ -735,6 +763,7 @@ def _create_seasonal_bookable_reservation_units(
     ReservationUnit.objects.bulk_create(reservation_units)
     ReservationUnitSpacesThoughModel.objects.bulk_create(reservation_unit_spaces)
     ReservationUnitPricing.objects.bulk_create(pricings)
+    ReservationUnitImage.objects.bulk_create(images)
 
     _create_application_round_time_slots(reservation_units)
 
@@ -785,6 +814,14 @@ def _create_empty_reservation_units(
         reservation_unit=reservation_unit,
         tax_percentage=tax_percentages["0"],
     )
+
+    image = _fetch_and_build_reservation_unit_image(
+        reservation_unit=reservation_unit,
+        image_url="https://images.unsplash.com/photo-1515511856280-7b23f68d2996",
+        filename="tyhjä",
+    )
+    if image is not None:
+        image.save()
 
 
 @with_logs
@@ -904,6 +941,14 @@ def _create_single_reservation_per_user_reservation_units(
         tax_percentage=tax_percentages["0"],
     )
 
+    image = _fetch_and_build_reservation_unit_image(
+        reservation_unit=reservation_unit,
+        image_url="https://images.unsplash.com/photo-1543359032-4fd9e3b0b32a",
+        filename="ainutkertainen",
+    )
+    if image is not None:
+        image.save()
+
 
 @with_logs
 def _create_full_day_reservation_units(
@@ -936,6 +981,7 @@ def _create_full_day_reservation_units(
     spaces: list[Space] = []
     reservation_unit_spaces: list[models.Model] = []
     pricings: list[ReservationUnitPricing] = []
+    images: list[ReservationUnitImage] = []
 
     for i in range(1, 11):
         space = SpaceFactory.build_for_bulk_create(
@@ -979,10 +1025,19 @@ def _create_full_day_reservation_units(
         )
         pricings.append(pricing)
 
+        image = _fetch_and_build_reservation_unit_image(
+            reservation_unit=reservation_unit,
+            image_url="https://images.unsplash.com/photo-1707760457564-4a5bc08be1cc",
+            filename="kokopaiva",
+        )
+        if image is not None:
+            images.append(image)
+
     Space.objects.bulk_create(spaces)
     ReservationUnit.objects.bulk_create(reservation_units)
     ReservationUnitSpacesThoughModel.objects.bulk_create(reservation_unit_spaces)
     ReservationUnitPricing.objects.bulk_create(pricings)
+    ReservationUnitImage.objects.bulk_create(images)
 
 
 @with_logs
@@ -1020,6 +1075,7 @@ def _create_reservation_units_in_space_hierarchies(
     reservation_units: list[ReservationUnit] = []
     reservation_unit_spaces: list[models.Model] = []
     pricings: list[ReservationUnitPricing] = []
+    images: list[ReservationUnitImage] = []
 
     reservation_unit_type = ReservationUnitTypeFactory.create(
         name="Tilahierarkia",
@@ -1180,64 +1236,161 @@ def _create_reservation_units_in_space_hierarchies(
     pricings.append(pricing_base.build(reservation_unit=exhibition_center_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=exhibition_center_unit, space=exhibition_center))
 
+    image = _fetch_and_build_reservation_unit_image(
+        reservation_unit=exhibition_center_unit,
+        image_url="https://images.unsplash.com/photo-1559171667-74fe3499b5ba",
+        filename="messukeskus",
+    )
+    if image is not None:
+        images.append(image)
+
     main_venue_unit = reservation_unit_base.for_space(main_venue).build()
     reservation_units.append(main_venue_unit)
     pricings.append(pricing_base.build(reservation_unit=main_venue_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=main_venue_unit, space=main_venue))
+
+    image = _fetch_and_build_reservation_unit_image(
+        reservation_unit=main_venue_unit,
+        image_url="https://images.unsplash.com/photo-1592899940510-1240e12e70db",
+        filename="messukeskus_tilat",
+    )
+    if image is not None:
+        images.append(image)
 
     grand_hall_unit = reservation_unit_base.for_space(grand_hall).build()
     reservation_units.append(grand_hall_unit)
     pricings.append(pricing_base.build(reservation_unit=grand_hall_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=grand_hall_unit, space=grand_hall))
 
+    image = _fetch_and_build_reservation_unit_image(
+        reservation_unit=grand_hall_unit,
+        image_url="https://images.unsplash.com/photo-1698070415992-3a8f8dc61e55",
+        filename="messukeskus_suurisali",
+    )
+    if image is not None:
+        images.append(image)
+
     auditorium_unit = reservation_unit_base.for_space(auditorium).build()
     reservation_units.append(auditorium_unit)
     pricings.append(pricing_base.build(reservation_unit=auditorium_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=auditorium_unit, space=auditorium))
+
+    image = _fetch_and_build_reservation_unit_image(
+        reservation_unit=auditorium_unit,
+        image_url="https://images.unsplash.com/photo-1675327161957-929e3faa37cc",
+        filename="messukeskus_auditorio",
+    )
+    if image is not None:
+        images.append(image)
 
     dining_hall_unit = reservation_unit_base.for_space(dining_hall).build()
     reservation_units.append(dining_hall_unit)
     pricings.append(pricing_base.build(reservation_unit=dining_hall_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=dining_hall_unit, space=dining_hall))
 
+    image = _fetch_and_build_reservation_unit_image(
+        reservation_unit=dining_hall_unit,
+        image_url="https://images.unsplash.com/photo-1524824267900-2fa9cbf7a506",
+        filename="messukeskus_ruokasali",
+    )
+    if image is not None:
+        images.append(image)
+
     private_premises_unit = reservation_unit_base.for_space(private_premises).build()
     reservation_units.append(private_premises_unit)
     pricings.append(pricing_base.build(reservation_unit=private_premises_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=private_premises_unit, space=private_premises))
+
+    image = _fetch_and_build_reservation_unit_image(
+        reservation_unit=private_premises_unit,
+        image_url="https://images.unsplash.com/photo-1529579018789-28bb8d323ae0",
+        filename="messukeskus_yksityistilat",
+    )
+    if image is not None:
+        images.append(image)
 
     lecture_hall_unit = reservation_unit_base.for_space(lecture_hall).build()
     reservation_units.append(lecture_hall_unit)
     pricings.append(pricing_base.build(reservation_unit=lecture_hall_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=lecture_hall_unit, space=lecture_hall))
 
+    image = _fetch_and_build_reservation_unit_image(
+        reservation_unit=lecture_hall_unit,
+        image_url="https://images.unsplash.com/photo-1702763529935-f4f7b4df3380",
+        filename="messukeskus_luoentosali",
+    )
+    if image is not None:
+        images.append(image)
+
     meeting_room_unit = reservation_unit_base.for_space(meeting_room).build()
     reservation_units.append(meeting_room_unit)
     pricings.append(pricing_base.build(reservation_unit=meeting_room_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=meeting_room_unit, space=meeting_room))
+
+    image = _fetch_and_build_reservation_unit_image(
+        reservation_unit=meeting_room_unit,
+        image_url="https://images.unsplash.com/photo-1505624198937-c704aff72608",
+        filename="messukeskus_kokoushuone",
+    )
+    if image is not None:
+        images.append(image)
 
     penthouse_unit = reservation_unit_base.for_space(penthouse).build()
     reservation_units.append(penthouse_unit)
     pricings.append(pricing_base.build(reservation_unit=penthouse_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=penthouse_unit, space=penthouse))
 
+    image = _fetch_and_build_reservation_unit_image(
+        reservation_unit=penthouse_unit,
+        image_url="https://images.unsplash.com/photo-1565623833408-d77e39b88af6",
+        filename="messukeskus_kattohuoneisto",
+    )
+    if image is not None:
+        images.append(image)
+
     karaoke_room_unit = reservation_unit_base.for_space(karaoke_room).build()
     reservation_units.append(karaoke_room_unit)
     pricings.append(pricing_base.build(reservation_unit=karaoke_room_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=karaoke_room_unit, space=karaoke_room))
+
+    image = _fetch_and_build_reservation_unit_image(
+        reservation_unit=karaoke_room_unit,
+        image_url="https://images.unsplash.com/photo-1632499356678-e407ca5ac1b8",
+        filename="messukeskus_karaoke",
+    )
+    if image is not None:
+        images.append(image)
 
     rooftop_terrace_unit = reservation_unit_base.for_space(rooftop_terrace).build()
     reservation_units.append(rooftop_terrace_unit)
     pricings.append(pricing_base.build(reservation_unit=rooftop_terrace_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=rooftop_terrace_unit, space=rooftop_terrace))
 
+    image = _fetch_and_build_reservation_unit_image(
+        reservation_unit=rooftop_terrace_unit,
+        image_url="https://images.unsplash.com/photo-1657639753220-8d59b05958d1",
+        filename="messukeskus_karaoke",
+    )
+    if image is not None:
+        images.append(image)
+
     spa_unit = reservation_unit_base.for_space(spa).build()
     reservation_units.append(spa_unit)
     pricings.append(pricing_base.build(reservation_unit=spa_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=spa_unit, space=spa))
 
+    image = _fetch_and_build_reservation_unit_image(
+        reservation_unit=spa_unit,
+        image_url="https://images.unsplash.com/photo-1507652313519-d4e9174996dd",
+        filename="messukeskus_spa",
+    )
+    if image is not None:
+        images.append(image)
+
     ReservationUnit.objects.bulk_create(reservation_units)
     SpacesThoughModel.objects.bulk_create(reservation_unit_spaces)
     ReservationUnitPricing.objects.bulk_create(pricings)
+    ReservationUnitImage.objects.bulk_create(images)
 
 
 @with_logs
@@ -1294,6 +1447,7 @@ def _create_reservation_units_in_resource_hierarchies(
     reservation_unit_spaces: list[models.Model] = []
     reservation_unit_resources: list[models.Model] = []
     pricings: list[ReservationUnitPricing] = []
+    images: list[ReservationUnitImage] = []
 
     reservation_unit_base = _get_base_reservation_unit_builder(
         reservation_unit_type=reservation_unit_type,
@@ -1400,6 +1554,14 @@ def _create_reservation_units_in_resource_hierarchies(
     reservation_unit_resources.append(ResourceThoughModel(reservationunit=meeting_room_unit, resource=coffee_machine))
     reservation_unit_resources.append(ResourceThoughModel(reservationunit=meeting_room_unit, resource=printer))
 
+    image = _fetch_and_build_reservation_unit_image(
+        reservation_unit=meeting_room_unit,
+        image_url="https://images.unsplash.com/photo-1462826303086-329426d1aef5",
+        filename="toimisto_kokoushuone",
+    )
+    if image is not None:
+        images.append(image)
+
     break_room_unit = reservation_unit_base.for_space(break_room).build()
     reservation_units.append(break_room_unit)
     pricings.append(pricing_base.build(reservation_unit=break_room_unit))
@@ -1407,16 +1569,33 @@ def _create_reservation_units_in_resource_hierarchies(
     reservation_unit_resources.append(ResourceThoughModel(reservationunit=break_room_unit, resource=coffee_machine))
     reservation_unit_resources.append(ResourceThoughModel(reservationunit=break_room_unit, resource=printer))
 
+    image = _fetch_and_build_reservation_unit_image(
+        reservation_unit=break_room_unit,
+        image_url="https://images.unsplash.com/photo-1568992687947-868a62a9f521",
+        filename="toimisto_taukohuone",
+    )
+    if image is not None:
+        images.append(image)
+
     open_office_unit = reservation_unit_base.for_space(open_office_space).build()
     reservation_units.append(open_office_unit)
     pricings.append(pricing_base.build(reservation_unit=open_office_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=open_office_unit, space=open_office_space))
     reservation_unit_resources.append(ResourceThoughModel(reservationunit=open_office_unit, resource=printer))
 
+    image = _fetch_and_build_reservation_unit_image(
+        reservation_unit=open_office_unit,
+        image_url="https://images.unsplash.com/photo-1531973576160-7125cd663d86",
+        filename="toimisto_avokonttori",
+    )
+    if image is not None:
+        images.append(image)
+
     ReservationUnit.objects.bulk_create(reservation_units)
     SpacesThoughModel.objects.bulk_create(reservation_unit_spaces)
     ResourceThoughModel.objects.bulk_create(reservation_unit_resources)
     ReservationUnitPricing.objects.bulk_create(pricings)
+    ReservationUnitImage.objects.bulk_create(images)
 
 
 def _get_base_reservation_unit_builder(

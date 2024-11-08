@@ -63,7 +63,9 @@ models_that_should_be_empty: list[type[models.Model]] = [
 @pytest.mark.django_db
 @pytest.mark.slow
 @with_mock_verkkokauppa
-def test_create_test_data():
+def test_create_test_data(settings):
+    settings.UPDATE_RESERVATION_UNIT_THUMBNAILS = True
+
     all_models = []
     for app_config in django.apps.apps.app_configs.values():
         if app_config.name in apps_to_check:

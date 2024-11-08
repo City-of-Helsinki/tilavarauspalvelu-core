@@ -3,8 +3,11 @@ import itertools
 import random
 from decimal import Decimal
 from itertools import cycle
+from pathlib import Path
 from typing import Literal
 
+import requests
+from django.conf import settings
 from django.contrib.gis.geos import Point
 
 from tests.factories import (
@@ -25,13 +28,14 @@ from tests.factories import (
     ReservationMetadataSetFactory,
     ReservationPurposeFactory,
     ReservationUnitCancellationRuleFactory,
+    ReservationUnitImageFactory,
     ReservationUnitPaymentTypeFactory,
     ServiceFactory,
     TaxPercentageFactory,
     TermsOfUseFactory,
 )
 from tilavarauspalvelu.constants import COORDINATE_SYSTEM_ID
-from tilavarauspalvelu.enums import PaymentType, ServiceTypeChoices, TermsOfUseTypeChoices
+from tilavarauspalvelu.enums import PaymentType, ReservationUnitImageType, ServiceTypeChoices, TermsOfUseTypeChoices
 from tilavarauspalvelu.models import (
     AgeGroup,
     City,
@@ -49,6 +53,7 @@ from tilavarauspalvelu.models import (
     ReservationMetadataField,
     ReservationMetadataSet,
     ReservationPurpose,
+    ReservationUnit,
     ReservationUnitCancellationRule,
     ReservationUnitImage,
     ReservationUnitPaymentType,
@@ -60,7 +65,7 @@ from tilavarauspalvelu.models import (
 )
 from utils.date_utils import DEFAULT_TIMEZONE, combine, local_start_of_day
 
-from .utils import FieldCombination, SetName, with_logs
+from .utils import FieldCombination, PurposeData, SetName, with_logs
 
 
 @with_logs
@@ -79,7 +84,143 @@ def _create_qualifiers() -> list[Qualifier]:
 
 @with_logs
 def _create_purposes() -> list[Purpose]:
-    purposes = [PurposeFactory.build() for _ in range(10)]
+    purpose_data: list[PurposeData] = [
+        PurposeData(
+            name_fi="Pidä kokous",
+            name_en="Hold a meeting",
+            name_sv="Håll möte",
+            image_url=(
+                "https://tilavaraus.test.hel.ninja/"
+                "media/reservation_unit_purpose_images/Varaamo_Pida_kokous_Maija_Astikainen.jpg"
+            ),
+            image_filename="Varaamo_Pida_kokous_Maija_Astikainen",
+        ),
+        PurposeData(
+            name_fi="Löydä juhlatila",
+            name_en="Find a party venue",
+            name_sv="Hitta festlokal",
+            image_url=(
+                "https://tilavaraus.test.hel.ninja/"
+                "media/reservation_unit_purpose_images/Varaamo_Loyda_juhlatila_Maija_Astikainen.jpg"
+            ),
+            image_filename="Varaamo_Loyda_juhlatila_Maija_Astikainen",
+        ),
+        PurposeData(
+            name_fi="Järjestä tapahtuma",
+            name_en="Organise an event",
+            name_sv="Arrangera evenemang",
+            image_url=(
+                "https://tilavaraus.test.hel.ninja/"
+                "media/reservation_unit_purpose_images/Varaamo_Jarjesta_tapahtuma_Vesa_Laitinen.jpg"
+            ),
+            image_filename="Varaamo_Jarjesta_tapahtuma_Vesa_Laitinen",
+        ),
+        PurposeData(
+            name_fi="Harrasta yhdessä",
+            name_en="Engage in hobbies together",
+            name_sv="Utöva hobbyer tillsammans",
+            image_url=(
+                "https://tilavaraus.test.hel.ninja/"
+                "media/reservation_unit_purpose_images/Varaamo_Harrasta_yhdessa_Maija_Astikainen.jpg"
+            ),
+            image_filename="Varaamo_Harrasta_yhdessa_Maija_Astikainen",
+        ),
+        PurposeData(
+            name_fi="Liiku ja rentoudu",
+            name_en="Exercise and relax",
+            name_sv="Motionera och koppla av",
+            image_url=(
+                "https://tilavaraus.test.hel.ninja/"
+                "media/reservation_unit_purpose_images/Varaamo_Liiku_Maija_Astikainen.jpg"
+            ),
+            image_filename="Varaamo_Liiku_Maija_Astikainen",
+        ),
+        PurposeData(
+            name_fi="Pelaa digitaalisesti",
+            name_en="Exercise and relax",
+            name_sv="Motionera och koppla av",
+            image_url=(
+                "https://tilavaraus.test.hel.ninja/"
+                "media/reservation_unit_purpose_images/Varaamo_Pelaa_digitaalisesti_Maija_Astikainen_FmzBTxt.jpg"
+            ),
+            image_filename="Varaamo_Pelaa_digitaalisesti_Maija_Astikainen_FmzBTxt",
+        ),
+        PurposeData(
+            name_fi="Työskentele yksin tai ryhmässä",
+            name_en="Work alone or in a group",
+            name_sv="Arbeta enskilt eller i grupp",
+            image_url=(
+                "https://tilavaraus.test.hel.ninja/"
+                "media/reservation_unit_purpose_images/Varaamo_Tyoskentele_yksin_tai_ryhmassa_Maija_Astikainen.jpg"
+            ),
+            image_filename="Varaamo_Tyoskentele_yksin_tai_ryhmassa_Maija_Astikainen",
+        ),
+        PurposeData(
+            name_fi="Tee musiikkia tai äänitä",
+            name_en="Make music or record",
+            name_sv="Gör musik eller spela in",
+            image_url=(
+                "https://tilavaraus.test.hel.ninja/"
+                "media/reservation_unit_purpose_images/Varaamo_Tee_musiikkia_ja_aanita_Maija_Astikainen.jpg"
+            ),
+            image_filename="Varaamo_Tee_musiikkia_ja_aanita_Maija_Astikainen",
+        ),
+        PurposeData(
+            name_fi="Käytä laitteita",
+            name_en="Use equipment",
+            name_sv="Använd utrustning",
+            image_url=(
+                "https://tilavaraus.test.hel.ninja/"
+                "media/reservation_unit_purpose_images/Varaamo_Kayta_laitteita2_Maija_Astikainen.jpg"
+            ),
+            image_filename="Varaamo_Kayta_laitteita2_Maija_Astikainen",
+        ),
+        PurposeData(
+            name_fi="Sauno tai mökkeile",
+            name_en="Take a sauna or stay in a cabin",
+            name_sv="Bada bastu eller bo i stuga",
+            image_url=(
+                "https://tilavaraus.test.hel.ninja/"
+                "media/reservation_unit_purpose_images/Varaamo_sauna_maarit_hohteri.png"
+            ),
+            image_filename="Varaamo_sauna_maarit_hohteri",
+            extension=".png",
+        ),
+        PurposeData(
+            name_fi="Järjestä näyttely",
+            name_en="Organize an exhibition",
+            name_sv="Organisera en utställning",
+            image_url=(
+                "https://tilavaraus.test.hel.ninja/"
+                "media/reservation_unit_purpose_images/JPG-1_varaamo_jakomaki_2811202_maija_astikainen-3202-Edit.jpg"
+            ),
+            image_filename="JPG-1_varaamo_jakomaki_2811202_maija_astikainen-3202-Edit",
+        ),
+    ]
+
+    purposes: list[Purpose] = []
+
+    add_images = settings.MEDIA_ROOT and settings.DOWNLOAD_IMAGES_FOR_TEST_DATA
+
+    for data in purpose_data:
+        image: str | None = None
+        if add_images:
+            path = Path(settings.MEDIA_ROOT) / settings.RESERVATION_UNIT_PURPOSE_IMAGES_ROOT / data.image_filename
+            path = path.with_suffix(data.extension)
+            if not path.exists():
+                _fetch_image(data.image_url, path)
+
+            image = f"{settings.RESERVATION_UNIT_PURPOSE_IMAGES_ROOT}/{data.image_filename}{data.extension}"
+
+        purpose = PurposeFactory.build(
+            name=data.name_fi,
+            name_fi=data.name_fi,
+            name_en=data.name_en,
+            name_sv=data.name_sv,
+            image=image,
+        )
+        purposes.append(purpose)
+
     return Purpose.objects.bulk_create(purposes)
 
 
@@ -569,10 +710,58 @@ def _create_payment_accountings() -> list[PaymentAccounting]:
     return PaymentAccounting.objects.bulk_create(accountings)
 
 
-@with_logs
-def _create_reservation_unit_images() -> list[ReservationUnitImage]:
-    # TODO: Create images for reservation units
-    #  - Download images and cache them.
-    #  - If unsuccessful, don't create images.
-    #  - Don't do this in when running tests, since it's slow.
-    pass
+def _fetch_and_build_reservation_unit_image(
+    reservation_unit: ReservationUnit,
+    image_url: str,
+    filename: str,
+    extension: str = ".jpg",
+    image_type: ReservationUnitImageType = ReservationUnitImageType.MAIN,
+) -> ReservationUnitImage | None:
+    """
+    Build a new reservation unit image using the image from the given URL. Image must be in JPEG format.
+    Save image using the given filename. If this function is called later for the same filename,
+    and that file already exists, use the existing file instead of downloading the image again.
+    """
+    # Don't create images during tests, since it's slow.
+    if not settings.DOWNLOAD_IMAGES_FOR_TEST_DATA:
+        return None
+
+    if not settings.MEDIA_ROOT:
+        msg = f"Media root not set. Cannot save image from '{image_url}'."
+        print(msg)  # noqa: T201, RUF100
+        return None
+
+    path = Path(settings.MEDIA_ROOT) / settings.RESERVATION_UNIT_IMAGES_ROOT / filename
+    path = path.with_suffix(extension)
+
+    if not path.exists():
+        _fetch_image(image_url, path)
+
+    return ReservationUnitImageFactory.build(
+        image=f"{settings.RESERVATION_UNIT_IMAGES_ROOT}/{filename}{extension}",
+        image_type=image_type,
+        reservation_unit=reservation_unit,
+    )
+
+
+def _fetch_image(image_url: str, path: Path) -> None:
+    response = requests.get(image_url, timeout=5)
+    if response.status_code != 200:
+        msg = f"Could not download image from '{image_url}' (status: {response.status_code})"
+        print(msg)  # noqa: T201, RUF100
+        return
+
+    content_type = response.headers.get("Content-Type")
+    if content_type == "image/jpeg":
+        assert path.suffix == ".jpg", f"Mismatching file extension '{path.suffix}' and content type '{content_type}'"
+
+    elif content_type == "image/png":
+        assert path.suffix == ".png", f"Mismatching file extension '{path.suffix}' and content type '{content_type}'"
+
+    else:
+        msg = f"Unknown content type: {content_type}"
+        print(msg)  # noqa: T201, RUF100
+        return
+
+    with open(path, "wb") as handler:
+        handler.write(response.content)

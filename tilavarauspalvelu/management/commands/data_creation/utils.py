@@ -320,3 +320,13 @@ class AllocationTime:
 @dataclasses.dataclass(slots=True)
 class AllocationInfo:
     allocations: dict[Annotated[int, "Res Unit PK"], list[AllocationTime]] = dataclasses.field(default_factory=dict)
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class PurposeData:
+    name_fi: str
+    name_en: str
+    name_sv: str
+    image_url: str
+    image_filename: str
+    extension: str = ".jpg"
