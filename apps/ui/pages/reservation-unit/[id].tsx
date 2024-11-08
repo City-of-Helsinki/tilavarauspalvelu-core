@@ -373,7 +373,7 @@ function ReservationUnit({
     resolver: zodResolver(PendingReservationFormSchema),
   });
 
-  const { watch, setValue } = reservationForm;
+  const { watch } = reservationForm;
 
   const durationValue = watch("duration");
   const dateValue = watch("date");
@@ -485,13 +485,6 @@ function ReservationUnit({
       });
     }
   };
-
-  // Set default duration if it's not set
-  useEffect(() => {
-    if (!durationValue) {
-      setValue("duration", durationOptions[0]?.value);
-    }
-  }, [dateValue, timeValue, durationValue, durationOptions, setValue]);
 
   // store reservation unit overall reservability to use in JSX and pass to some child elements
   const [reservationUnitIsReservable, reason] =
