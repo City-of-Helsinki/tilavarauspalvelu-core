@@ -302,6 +302,24 @@ def _create_caisa() -> None:
         name_en="Multi-purpose space",
         name_sv="Allaktivitetslokal",
     )
+    reservation_unit_type_exercise = ReservationUnitTypeFactory.create(
+        name="Sisäliikuntatila",
+        name_fi="Sisäliikuntatila",
+        name_en="Indoor exercise facility",
+        name_sv="Inomhusidrottslokal",
+    )
+    reservation_unit_type_teaching = ReservationUnitTypeFactory.create(
+        name="Opetustila",
+        name_fi="Opetustila",
+        name_en="Teaching facility",
+        name_sv="Undervisningslokal",
+    )
+    reservation_unit_type_work = ReservationUnitTypeFactory.create(
+        name="Työpiste",
+        name_fi="Työpiste",
+        name_en="Workstation",
+        name_sv="Arbetsstation",
+    )
 
     ###########################################################################################################
     # Create qualifiers
@@ -911,6 +929,7 @@ def _create_caisa() -> None:
         can_apply_free_of_charge=False,
         allow_reservations_without_opening_hours=False,
         unit=caisa,
+        reservation_unit_type=reservation_unit_type_exercise,
         payment_terms=payment_terms_1,
         cancellation_terms=cancel_terms_14_days,
         service_specific_terms=service_terms_oodi,
@@ -1015,6 +1034,7 @@ def _create_caisa() -> None:
         can_apply_free_of_charge=True,
         allow_reservations_without_opening_hours=False,
         unit=caisa,
+        reservation_unit_type=reservation_unit_type_teaching,
         payment_terms=payment_terms_3,
         cancellation_terms=cancel_terms_zero_days,
         service_specific_terms=service_terms_youth,
@@ -1112,6 +1132,7 @@ def _create_caisa() -> None:
         can_apply_free_of_charge=False,
         allow_reservations_without_opening_hours=False,
         unit=caisa,
+        reservation_unit_type=reservation_unit_type_work,
         payment_terms=payment_terms_free_of_charge,
         cancellation_terms=cancel_terms_cannot_cancel,
         service_specific_terms=service_terms_library,
@@ -1189,6 +1210,7 @@ def _create_caisa() -> None:
         can_apply_free_of_charge=False,
         allow_reservations_without_opening_hours=False,
         unit=caisa,
+        reservation_unit_type=reservation_unit_type_multipurpose,
         payment_terms=payment_terms_1,
         cancellation_terms=cancel_terms_cannot_cancel,
         service_specific_terms=service_terms_library,
@@ -1290,6 +1312,7 @@ def _create_caisa() -> None:
         can_apply_free_of_charge=False,
         allow_reservations_without_opening_hours=False,
         unit=caisa,
+        reservation_unit_type=reservation_unit_type_multipurpose,
         payment_terms=payment_terms_free_of_charge,
         cancellation_terms=cancel_terms_14_days,
         service_specific_terms=service_terms_library,
@@ -1385,6 +1408,7 @@ def _create_caisa() -> None:
         can_apply_free_of_charge=False,
         allow_reservations_without_opening_hours=False,
         unit=caisa,
+        reservation_unit_type=reservation_unit_type_multipurpose,
         payment_terms=payment_terms_free_of_charge,
         cancellation_terms=cancel_terms_zero_days,
         service_specific_terms=service_terms_library,
