@@ -4,18 +4,20 @@ from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from django.contrib.auth import user_logged_in
-from django.db.models.signals import m2m_changed, post_delete, post_save
+from django.db.models.signals import m2m_changed, post_delete, post_save, pre_save
 from django.dispatch import receiver
 
-from tilavarauspalvelu.models import Reservation, ReservationUnit, Space, User
+from tilavarauspalvelu.models import Purpose, Reservation, ReservationUnit, ReservationUnitImage, Space, User
 from tilavarauspalvelu.tasks import (
     Action,
     create_or_update_reservation_statistics,
+    create_reservation_unit_thumbnails_and_urls,
     refresh_reservation_unit_product_mapping,
     update_affecting_time_spans_task,
     update_reservation_unit_hierarchy_task,
 )
 from utils.date_utils import local_datetime
+from utils.image_cache import purge_previous_image_cache
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.typing import M2MAction
@@ -125,3 +127,24 @@ def update_last_login(user: User, **kwargs: Any) -> None:
             "sent_email_about_anonymization",
         ]
     )
+
+
+@receiver(pre_save, sender=Purpose, dispatch_uid="purpose_to_save")
+def purpose_to_save(instance: Purpose, *args: Any, **kwargs: Any):
+    if settings.IMAGE_CACHE_ENABLED:
+        purge_previous_image_cache(instance)
+
+
+@receiver(pre_save, sender=ReservationUnitImage, dispatch_uid="reservation_unit_image_to_save")
+def reservation_unit_image_to_save(instance: ReservationUnitImage, *args: Any, **kwargs: Any):
+    if settings.IMAGE_CACHE_ENABLED:
+        purge_previous_image_cache(instance)
+
+
+@receiver(post_save, sender=ReservationUnitImage, dispatch_uid="reservation_unit_image_saved")
+def reservation_unit_image_saved(instance: ReservationUnitImage, *args: Any, **kwargs: Any):
+    created: bool = kwargs.get("created", True)
+    update_fields: list[str] = kwargs.get("update_fields", [])
+
+    if settings.UPDATE_RESERVATION_UNIT_THUMBNAILS and (created or "image" in update_fields):
+        create_reservation_unit_thumbnails_and_urls.delay(instance.pk)

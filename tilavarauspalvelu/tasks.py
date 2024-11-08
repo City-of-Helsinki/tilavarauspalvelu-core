@@ -71,7 +71,6 @@ from tilavarauspalvelu.utils.verkkokauppa.product.exceptions import CreateOrUpda
 from tilavarauspalvelu.utils.verkkokauppa.product.types import CreateOrUpdateAccountingParams, CreateProductParams
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.date_utils import local_date, local_datetime, local_end_of_day, local_start_of_day
-from utils.image_cache import purge
 from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
@@ -429,25 +428,31 @@ def refresh_reservation_unit_accounting(reservation_unit_pk) -> None:
 
 
 @app.task(name="update_reservation_unit_image_urls")
-def update_urls(pk: int | None = None) -> None:
-    images = ReservationUnitImage.objects.filter(image__isnull=False)
+def create_reservation_unit_thumbnails_and_urls(pk: int | None = None) -> None:
+    """Create optimized thumbnail images and update URLs to the reservation unit instances."""
+    reservation_unit_images = ReservationUnitImage.objects.filter(image__isnull=False)
+    if pk is not None:
+        reservation_unit_images = reservation_unit_images.filter(pk=pk)
 
-    if pk:
-        images = images.filter(pk=pk)
+    images: list[ReservationUnitImage] = list(reservation_unit_images)
+    if not images:
+        return
 
     for image in images:
         try:
             image.large_url = image.image["large"].url
             image.medium_url = image.image["medium"].url
             image.small_url = image.image["small"].url
-            image.save(update_urls=False)
-
         except InvalidImageFormatError as err:
             SentryLogger.log_exception(err, details="Unable to update image urls", reservation_unit_image_id=image.pk)
+
+    ReservationUnitImage.objects.bulk_update(images, ["large_url", "medium_url", "small_url"])
 
 
 @app.task(name="purge_image_cache")
 def purge_image_cache(image_path: str) -> None:
+    from utils.image_cache import purge
+
     purge(image_path)
 
 

@@ -11,7 +11,7 @@ from easy_thumbnails.fields import ThumbnailerImageField
 from .queryset import PurposeManager
 
 if TYPE_CHECKING:
-    from easy_thumbnails.files import ThumbnailFile
+    from easy_thumbnails.files import ThumbnailerImageFieldFile
 
     from .actions import PurposeActions
 
@@ -26,7 +26,7 @@ class Purpose(models.Model):
 
     name: str = models.CharField(max_length=200)
 
-    image: ThumbnailFile | None
+    image: ThumbnailerImageFieldFile | None
     image = ThumbnailerImageField(upload_to=settings.RESERVATION_UNIT_PURPOSE_IMAGES_ROOT, null=True)
 
     # Translated field hints
@@ -45,12 +45,6 @@ class Purpose(models.Model):
 
     def __str__(self) -> str:
         return self.name
-
-    def save(self, *args, **kwargs) -> None:
-        from tilavarauspalvelu.utils.image_purge import purge_previous_image_cache
-
-        purge_previous_image_cache(self)
-        super().save(*args, **kwargs)
 
     @cached_property
     def actions(self) -> PurposeActions:

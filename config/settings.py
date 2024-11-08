@@ -528,6 +528,7 @@ class Common(Environment):
     REBUILD_SPACE_HIERARCHY = True
     SENTRY_LOGGER_ALWAYS_RE_RAISE = False
     UNSAFE_SKIP_IAT_CLAIM_VALIDATION = False
+    UPDATE_RESERVATION_UNIT_THUMBNAILS = True
 
     PRUNE_RESERVATIONS_OLDER_THAN_MINUTES = 20
     REMOVE_RESERVATION_STATS_OLDER_THAN_YEARS = 5
@@ -889,6 +890,8 @@ class AutomatedTests(EmptyDefaults, Common, dotenv_path=None, overrides_from=Aut
     # since they slow them down a lot in CI. Refresh should be called manually when needed.
     UPDATE_RESERVATION_UNIT_HIERARCHY = False
     UPDATE_AFFECTING_TIME_SPANS = False
+    UPDATE_RESERVATION_UNIT_THUMBNAILS = False
+    DOWNLOAD_IMAGES_FOR_TEST_DATA = False
     # Turn off statistics saving during tests for performance reasons
     SAVE_RESERVATION_STATISTICS = False
     # Always re-raise silenced Sentry errors during testing for better debugging

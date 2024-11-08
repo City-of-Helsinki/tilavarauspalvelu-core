@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from functools import cached_property
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.db import models
@@ -13,7 +13,7 @@ from tilavarauspalvelu.enums import ReservationUnitImageType
 from .queryset import ReservationUnitImageManager
 
 if TYPE_CHECKING:
-    from easy_thumbnails.files import ThumbnailFile
+    from easy_thumbnails.files import ThumbnailerImageFieldFile
 
     from tilavarauspalvelu.models import ReservationUnit
 
@@ -31,7 +31,7 @@ class ReservationUnitImage(models.Model):
         on_delete=models.CASCADE,
     )
 
-    image: ThumbnailFile | None
+    image: ThumbnailerImageFieldFile | None
     image = ThumbnailerImageField(upload_to=settings.RESERVATION_UNIT_IMAGES_ROOT, null=True)
     image_type: str = models.CharField(max_length=20, choices=ReservationUnitImageType.choices)
 
@@ -50,19 +50,6 @@ class ReservationUnitImage(models.Model):
 
     def __str__(self) -> str:
         return f"{self.reservation_unit.name} ({self.get_image_type_display()})"
-
-    def save(self, *args: Any, **kwargs: Any) -> None:
-        from tilavarauspalvelu.utils.image_purge import purge_previous_image_cache
-
-        purge_previous_image_cache(self)
-
-        run_update_urls = bool(kwargs.pop("update_urls", True))
-        super().save(*args, **kwargs)
-
-        if run_update_urls:
-            from tilavarauspalvelu.tasks import update_urls
-
-            update_urls.delay(self.pk)
 
     @cached_property
     def actions(self) -> ReservationUnitImageActions:
