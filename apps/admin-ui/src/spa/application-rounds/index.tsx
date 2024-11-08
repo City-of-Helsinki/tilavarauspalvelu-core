@@ -21,15 +21,19 @@ import { TableLink } from "@/styles/util";
 import { CustomTable } from "@/component/Table";
 import Error404 from "@/common/Error404";
 import { Accordion } from "hds-react";
+import { Flex } from "common/styles/util";
 
-const AccordionContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-l);
+const AccordionWithoutTopPadding = styled(Accordion).attrs({
+  closeButton: false,
+})`
+  & [class*="Accordion-module_accordionHeader__"] {
+    padding-top: 0;
+    margin-top: 0;
+  }
 `;
 
 // NOTE fix table overflowing the page on mobile
-const StyledAccordion = styled(Accordion).attrs({
+const StyledAccordion = styled(AccordionWithoutTopPadding).attrs({
   closeButton: false,
 })`
   & > div > div {
@@ -66,8 +70,8 @@ function RoundsAccordion({
   }
 
   return (
-    <Accordion heading={name} initiallyOpen={initiallyOpen} closeButton={false}>
-      <AccordionContainer>
+    <AccordionWithoutTopPadding heading={name} initiallyOpen={initiallyOpen}>
+      <Flex $gap="l">
         {!rounds || rounds.length === 0
           ? emptyContent || <span>no data {name}</span>
           : rounds?.map((round) => (
@@ -76,8 +80,8 @@ function RoundsAccordion({
                 applicationRound={round}
               />
             ))}
-      </AccordionContainer>
-    </Accordion>
+      </Flex>
+    </AccordionWithoutTopPadding>
   );
 }
 

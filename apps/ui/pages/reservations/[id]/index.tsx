@@ -91,61 +91,28 @@ const SubHeading = styled(H4).attrs({ as: "h2" })`
   }
 `;
 
-const StatusContainer = styled.div`
-  display: flex;
-  gap: var(--spacing-s);
-`;
-
 /* use empty liberally to remove empty elements that add spacing because of margins */
-const Actions = styled.div`
+const Actions = styled(Flex).attrs({
+  $direction: "row",
+  $wrap: "wrap",
+})`
   &:empty {
     display: none;
   }
-
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-m);
-
-  @media (min-width: ${breakpoints.s}) {
-    button {
-      max-width: 300px;
-    }
-  }
-
-  @media (min-width: ${breakpoints.m}) {
-    flex-direction: row;
-  }
 `;
 
-const SecondaryActions = styled.div`
+const SecondaryActions = styled(Flex)`
   &:empty {
     display: none;
   }
 
   margin-top: var(--spacing-l);
-  display: flex;
-  gap: var(--spacing-m);
-  flex-direction: column;
-
-  @media (min-width: ${breakpoints.s}) {
-    > button {
-      justify-self: flex-end;
-      max-width: 300px;
-    }
-  }
-
-  @media (min-width: ${breakpoints.m}) {
-    display: inline-flex;
-    justify-items: flex-end;
-  }
 `;
 
 const Content = styled.div`
   font-size: var(--fontsize-body-l);
-  max-width: 65ch;
+  max-width: var(--prose-width);
 `;
-
-const ParagraphHeading = styled(H4).attrs({ as: "h3" })``;
 
 const Paragraph = styled.p`
   white-space: pre-line;
@@ -173,10 +140,6 @@ const ContentContainer = styled.div`
 `;
 
 const AccordionContent = styled.div`
-  font-size: var(--fontsize-body-l);
-  line-height: var(--lineheight-l);
-  white-space: pre-wrap;
-  word-break: break-word;
   margin-bottom: var(--spacing-s);
   padding-top: var(--spacing-m);
 `;
@@ -443,7 +406,7 @@ function Reservation({
             <H1 $noMargin data-testid="reservation__name">
               {t("reservations:reservationName", { id: reservation.pk })}
             </H1>
-            <StatusContainer>
+            <Flex $gap="s" $direction="row">
               <ReservationStatus
                 testId="reservation__status"
                 state={reservation.state ?? ReservationStateChoice.Confirmed}
@@ -454,7 +417,7 @@ function Reservation({
                   testId="reservation__payment-status"
                 />
               )}
-            </StatusContainer>
+            </Flex>
           </Flex>
           <SubHeading>
             <Link
@@ -537,24 +500,18 @@ function Reservation({
           {instructionsKey &&
             getTranslation(reservationUnit, instructionsKey) && (
               <ContentContainer>
-                <ParagraphHeading>
-                  {t("reservations:reservationInfo")}
-                </ParagraphHeading>
+                <H4 as="h3">{t("reservations:reservationInfo")}</H4>
                 <Paragraph>
                   {getTranslation(reservationUnit, instructionsKey)}
                 </Paragraph>
               </ContentContainer>
             )}
-          <ParagraphHeading>
-            {t("reservationApplication:applicationInfo")}
-          </ParagraphHeading>
+          <H4 as="h3">{t("reservationApplication:applicationInfo")}</H4>
           <ReservationInfo
             reservation={reservation}
             supportedFields={supportedFields}
           />
-          <ParagraphHeading>
-            {t("reservationCalendar:reserverInfo")}
-          </ParagraphHeading>
+          <H4 as="h3">{t("reservationCalendar:reserverInfo")}</H4>
           <ReserveeInfo
             reservation={reservation}
             supportedFields={supportedFields}
@@ -572,12 +529,12 @@ function Reservation({
                 theme="thin"
                 data-testid="reservation__payment-and-cancellation-terms"
               >
-                {paymentTermsContent != null && (
+                {paymentTermsContent && (
                   <AccordionContent>
                     <Sanitize html={paymentTermsContent} />
                   </AccordionContent>
                 )}
-                {cancellationTermsContent != null && (
+                {cancellationTermsContent && (
                   <AccordionContent>
                     <Sanitize html={cancellationTermsContent} />
                   </AccordionContent>

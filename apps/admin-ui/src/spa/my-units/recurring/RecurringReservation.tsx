@@ -23,7 +23,7 @@ function RecurringReservationInner({ unitId }: { unitId: number }) {
 
   return (
     <>
-      <H1>{t("MyUnits.RecurringReservation.pageTitle")}</H1>
+      <H1 $noMargin>{t("MyUnits.RecurringReservation.pageTitle")}</H1>
       {reservationUnits !== undefined && reservationUnits?.length > 0 ? (
         <RecurringReservationForm reservationUnits={reservationUnits} />
       ) : (

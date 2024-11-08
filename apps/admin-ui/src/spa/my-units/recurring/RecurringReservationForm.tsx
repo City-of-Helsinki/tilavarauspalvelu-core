@@ -17,7 +17,6 @@ import {
   type RecurringReservationForm as RecurringReservationFormT,
 } from "@/schemas";
 import { type NewReservationListItem } from "@/component/ReservationsList";
-import { ActionsWrapper } from "./commonStyling";
 import { WeekdaysSelector } from "./WeekdaysSelector";
 import {
   useCreateRecurringReservation,
@@ -32,7 +31,7 @@ import { ControlledDateInput } from "common/src/components/form";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { Element } from "@/styles/util";
 import { Label } from "@/styles/layout";
-import { AutoGrid } from "common/styles/util";
+import { AutoGrid, Flex } from "common/styles/util";
 import { errorToast } from "common/src/common/toast";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import {
@@ -386,7 +385,11 @@ function RecurringReservationForm({
             </ReservationTypeForm>
           )}
 
-          <ActionsWrapper>
+          <Flex
+            $direction="row"
+            $justify="flex-end"
+            style={{ gridColumn: "1 / -1" }}
+          >
             {/* cancel is disabled while sending because we have no rollback */}
             <ButtonLikeLink
               to=".."
@@ -405,7 +408,7 @@ function RecurringReservationForm({
             >
               {t("common.reserve")}
             </Button>
-          </ActionsWrapper>
+          </Flex>
         </AutoGrid>
       </form>
     </FormProvider>

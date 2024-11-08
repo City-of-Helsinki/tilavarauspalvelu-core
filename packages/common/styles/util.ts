@@ -33,16 +33,32 @@ export const AutoGrid = styled.div<{
   gap: ${({ $largeGap }) =>
       $largeGap ? " var(--spacing-xl)" : "var(--spacing-m)"}
     var(--spacing-m);
+
+  & > :empty {
+    display: none;
+  }
 `;
 
 export const FullRow = styled.div`
   grid-column: 1 / -1;
 `;
 
+export type SpacingSize =
+  | "none"
+  | "2-xs"
+  | "xs"
+  | "s"
+  | "m"
+  | "l"
+  | "xl"
+  | "2-xl";
+
 // TODO should allow for switching to smaller gap on mobile (scale down)
 export const Flex = styled.div<{
   $direction?: "row" | "column";
-  $gap?: "2-xs" | "xs" | "s" | "m" | "l" | "xl" | "2-xl";
+  $gap?: SpacingSize;
+  $marginTop?: SpacingSize;
+  $marginBottom?: SpacingSize;
   $justify?:
     | "center"
     | "flex-start"
@@ -62,6 +78,10 @@ export const Flex = styled.div<{
     $direction === "row" ? "row" : "column"};
   justify-content: ${({ $justify }) => $justify ?? "initial"};
   align-items: ${({ $align }) => $align ?? "initial"};
+  margin-top: ${({ $marginTop }) =>
+    $marginTop ? `var(--spacing-${$marginTop})` : "0"};
+  margin-bottom: ${({ $marginBottom }) =>
+    $marginBottom ? `var(--spacing-${$marginBottom})` : "0"};
 `;
 
 // TODO refactor this to have parameters for gap
@@ -101,4 +121,16 @@ export const TabWrapper = styled.div`
   @media (min-width: ${breakpoints.m}) {
     max-width: calc(100vw - 2 * var(--spacing-m));
   }
+`;
+
+/// Container for Heading + label / buttons
+/// Assumes that you disable outer margins on the children and it's inside a flex container with gaps.
+export const TitleSection = styled(Flex).attrs({
+  $direction: "row",
+  $justify: "space-between",
+  $wrap: "wrap",
+  $align: "center",
+  $gap: "xs",
+})<{ $noMargin?: boolean }>`
+  margin-top: ${({ $noMargin }) => ($noMargin ? "0" : "var(--spacing-s)")};
 `;

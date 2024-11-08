@@ -39,8 +39,8 @@ export const Regular = styled.span`
 export const H1 = styled.h1<{
   $large?: boolean;
   $noMargin?: boolean;
-  $marginTop?: "s" | "m" | "l" | "xl";
-  $marginBottom?: "none" | "s" | "m" | "l" | "xl";
+  $marginTop?: "none" | "xs" | "s" | "m" | "l" | "xl";
+  $marginBottom?: "none" | "xs" | "s" | "m" | "l" | "xl";
 }>`
   font-size: ${({ $large }) =>
     !$large

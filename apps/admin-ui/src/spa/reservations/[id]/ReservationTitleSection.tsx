@@ -19,7 +19,7 @@ import {
   useReservationApplicationLinkQuery,
 } from "@gql/gql-types";
 import { getName } from "./util";
-import { Flex } from "common/styles/util";
+import { Flex, TitleSection } from "common/styles/util";
 import { formatDateTime } from "@/common/util";
 import { getApplicationUrl } from "@/common/urls";
 import { gql } from "@apollo/client";
@@ -35,27 +35,14 @@ const AlignVertically = styled.div`
   flex-grow: 1;
 `;
 
-const NameState = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  margin-bottom: var(--spacing-xs);
-
-  @media (min-width: ${breakpoints.m}) {
-    flex-direction: row;
-    margin-bottom: 0;
-  }
-`;
-
-const Tagline = styled.div`
+const Tagline = styled.p`
   font-size: var(--fontsize-body-xl);
   margin-bottom: var(--spacing-xs);
 `;
 
-const DateTime = styled.div`
-  margin-bottom: var(--spacing-s);
-  display: flex;
-  gap: var(--spacing-xs);
+const DateTime = styled(Flex).attrs({
+  $gap: "xs",
+})`
   > a {
     ${fontMedium}
   }
@@ -66,6 +53,7 @@ type Props = {
   reservation: ReservationType;
   tagline: string;
   overrideTitle?: string;
+  noMargin?: boolean;
 };
 
 export const APPLICATION_LINK_QUERY = gql`
@@ -133,7 +121,7 @@ const getReservationStateLabelProps = (
 };
 
 const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
-  ({ reservation, tagline, overrideTitle }: Props, ref) => {
+  ({ reservation, tagline, overrideTitle, noMargin }: Props, ref) => {
     const { t } = useTranslation();
 
     // ignore error on purpose because this is going to fail with permission error
@@ -156,9 +144,9 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
 
     return (
       <div>
-        <NameState ref={ref}>
-          <H1>{overrideTitle ?? getName(reservation, t)}</H1>
-          <Flex $direction="column" $align="center">
+        <TitleSection $noMargin={noMargin} ref={ref}>
+          <H1 $noMargin>{overrideTitle ?? getName(reservation, t)}</H1>
+          <Flex $direction="row" $align="center">
             {order?.status != null && (
               <AlignVertically>
                 <StatusLabel
@@ -182,7 +170,7 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
               )}
             </AlignVertically>
           </Flex>
-        </NameState>
+        </TitleSection>
         <Tagline data-testid="reservation_title_section__tagline">
           {tagline}
         </Tagline>

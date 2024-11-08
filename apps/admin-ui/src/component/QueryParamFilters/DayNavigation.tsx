@@ -7,17 +7,13 @@ import { fromUIDate, toUIDate } from "common/src/common/util";
 import { breakpoints } from "common";
 import { toMondayFirstUnsafe } from "common/src/helpers";
 import { useSearchParams } from "react-router-dom";
+import { Flex } from "common/styles/util";
 
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: row;
+const Wrapper = styled(Flex).attrs({
+  $gap: "none",
+  $direction: "row",
+})`
   place-items: center;
-  gap: 0;
-  color: black;
-  text-decoration: none !important;
-  svg {
-    color: black;
-  }
   position: relative;
 `;
 
@@ -32,18 +28,13 @@ const WeekDay = styled.span`
 `;
 
 const BorderlessDatePicker = styled(DateInput)`
-  border-color: transparent;
+  --input-border-color-default: transparent;
   max-width: 180px;
   @media (min-width: ${breakpoints.m}) {
     margin-right: var(--spacing-s);
   }
   & input {
     text-align: center;
-    border-color: transparent !important;
-  }
-
-  & *[class*="hds-text-input__buttons"] > button {
-    padding: 0 !important;
   }
 `;
 
@@ -91,6 +82,7 @@ export function DayNavigation({ name }: Props): JSX.Element {
         aria-label={t("common.prev")}
         size="small"
         variant="supplementary"
+        theme="black"
         onClick={onPreviousDay}
         iconLeft={<IconAngleLeft />}
       >
@@ -110,6 +102,7 @@ export function DayNavigation({ name }: Props): JSX.Element {
         aria-label={t("common.next")}
         size="small"
         variant="supplementary"
+        theme="black"
         onClick={onNextDay}
         iconLeft={<IconAngleRight />}
       >

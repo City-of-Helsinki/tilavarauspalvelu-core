@@ -39,9 +39,6 @@ type IParams = {
   applicationRoundPk: string;
 };
 
-const StyledH1 = styled(H1).attrs({ $legacy: true })`
-  margin: 0;
-`;
 const Ingress = styled.p`
   font-size: var(--fontsize-body-xl);
   margin: 0;
@@ -489,11 +486,9 @@ function ApplicationRoundAllocation({
   );
 
   return (
-    // TODO top gap is 2rem but the rest of the page is something else so can't change the container directly
-    <div>
-      {/* TODO these look like they have wrong margins */}
+    <>
       <div>
-        <StyledH1>{t("Allocation.allocationTitle")}</StyledH1>
+        <H1 $noMargin>{t("Allocation.allocationTitle")}</H1>
         <Ingress>{roundName}</Ingress>
       </div>
       <MoreWrapper
@@ -560,7 +555,7 @@ function ApplicationRoundAllocation({
         refetchApplicationEvents={handleRefetchApplicationEvents}
         applicationRoundStatus={applicationRoundStatus}
       />
-    </div>
+    </>
   );
 }
 

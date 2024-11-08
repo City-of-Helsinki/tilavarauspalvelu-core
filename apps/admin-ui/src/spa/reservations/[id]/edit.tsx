@@ -17,13 +17,15 @@ import ReservationTypeForm from "@/component/ReservationTypeForm";
 import Loader from "@/component/Loader";
 import { HR } from "@/component/Table";
 import { useOptions } from "@/hooks";
-import { EditPageWrapper } from "./EditPageWrapper";
 import { useReservationEditData } from "./hooks";
 import { useStaffReservationMutation } from "../hooks";
 import { filterNonNullable } from "common/src/helpers";
 import { flattenMetadata } from "@/common/util";
 import { errorToast } from "common/src/common/toast";
 import { ButtonContainer } from "common/styles/util";
+import { createTagString } from "./util";
+import ReservationTitleSection from "./ReservationTitleSection";
+import { LinkPrev } from "@/component/LinkPrev";
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 type ReservationUnitType = NonNullable<ReservationType["reservationUnits"]>[0];
@@ -250,5 +252,33 @@ export function EditPage() {
         </ErrorBoundary>
       )}
     </EditPageWrapper>
+  );
+}
+
+function EditPageWrapper({
+  children,
+  reservation,
+  title,
+}: {
+  title: string;
+  reservation?: ReservationType;
+  children: React.ReactNode;
+}) {
+  const { t } = useTranslation();
+  const tagline = reservation ? createTagString(reservation, t) : "";
+
+  return (
+    <>
+      <LinkPrev />
+      {reservation && (
+        <ReservationTitleSection
+          reservation={reservation}
+          tagline={tagline}
+          overrideTitle={title}
+          noMargin
+        />
+      )}
+      {children}
+    </>
   );
 }

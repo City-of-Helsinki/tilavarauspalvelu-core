@@ -23,6 +23,7 @@ import { type PendingReservationFormType } from "@/components/reservation-unit/s
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { getSelectedOption } from "@/modules/util";
 import { type FocusTimeSlot } from "@/modules/reservation";
+import { Flex } from "common/styles/util";
 
 type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
 type Props = {
@@ -136,11 +137,6 @@ const NoTimes = styled.div`
   margin: var(--spacing-s) 0 calc(var(--spacing-s) * -1) 0;
 `;
 
-const ActionWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
-
 export function QuickReservation({
   reservationUnit,
   subventionSuffix,
@@ -218,7 +214,7 @@ export function QuickReservation({
           }
         />
       </div>
-      <ActionWrapper>
+      <Flex $direction="row" $justify="space-between">
         <Price data-testid="quick-reservation-price">
           {focusSlot?.isReservable && (
             <>
@@ -228,7 +224,7 @@ export function QuickReservation({
           )}
         </Price>
         {focusSlot?.isReservable && LoginAndSubmit}
-      </ActionWrapper>
+      </Flex>
     </Form>
   );
 }

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { type TFunction } from "i18next";
-import styled from "styled-components";
 import {
   type BannerNotificationNode,
   BannerNotificationOrderingChoices,
@@ -27,12 +26,7 @@ import {
   IconQuestionCircleFill,
 } from "hds-react";
 import { getNotificationUrl } from "@/common/urls";
-
-const HeaderContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
+import { Flex } from "common/styles/util";
 
 const getStatusLabelProps = (
   state: BannerNotificationState | null | undefined
@@ -179,8 +173,11 @@ function Page() {
 
   return (
     <>
-      <HeaderContainer>
-        <H1>{t("Notifications.pageTitle")}</H1>
+      <Flex $align="center" $justify="space-between" $direction="row">
+        <div>
+          <H1>{t("Notifications.pageTitle")}</H1>
+          <p>{t("Notifications.pageDescription")}</p>
+        </div>
         <ButtonLikeLink
           variant="primary"
           size="large"
@@ -188,8 +185,7 @@ function Page() {
         >
           {t("Notifications.newNotification")}
         </ButtonLikeLink>
-      </HeaderContainer>
-      <p>{t("Notifications.pageDescription")}</p>
+      </Flex>
       {loading && notifications.length === 0 ? (
         <Loader />
       ) : (

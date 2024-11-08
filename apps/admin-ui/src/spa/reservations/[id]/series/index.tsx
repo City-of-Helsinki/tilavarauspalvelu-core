@@ -308,110 +308,108 @@ function SeriesPageInner({ pk }: { pk: number }) {
   return (
     <>
       <LinkPrev />
-      <>
-        <H1>{t("ReservationEditSeries.heading")}</H1>
-        <FormProvider {...form}>
-          <form onSubmit={handleSubmit(onSubmit)} noValidate>
-            <AutoGrid $minWidth="12rem" $largeGap>
-              <ControlledDateInput
-                name="startingDate"
-                control={control}
-                error={translateError(errors.startingDate?.message)}
-                required
-                // NOTE we can't change the start date of the series
-                disabled
-              />
+      <H1 $noMargin>{t("ReservationEditSeries.heading")}</H1>
+      <FormProvider {...form}>
+        <form onSubmit={handleSubmit(onSubmit)} noValidate>
+          <AutoGrid $minWidth="12rem" $largeGap>
+            <ControlledDateInput
+              name="startingDate"
+              control={control}
+              error={translateError(errors.startingDate?.message)}
+              required
+              // NOTE we can't change the start date of the series
+              disabled
+            />
 
-              <ControlledDateInput
-                name="endingDate"
-                control={control}
-                error={translateError(errors.endingDate?.message)}
-                required
-              />
+            <ControlledDateInput
+              name="endingDate"
+              control={control}
+              error={translateError(errors.endingDate?.message)}
+              required
+            />
 
+            <Controller
+              control={control}
+              name="startTime"
+              render={({ field: { ...field } }) => (
+                // NOTE using our custom time input because HDS doesn't allow reset
+                <TimeInput
+                  {...field}
+                  label={t(`ReservationDialog.startTime`)}
+                  error={translateError(errors.startTime?.message)}
+                />
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="endTime"
+              render={({ field: { ...field } }) => (
+                // NOTE using our custom time input because HDS doesn't allow reset
+                <TimeInput
+                  {...field}
+                  label={t(`ReservationDialog.endTime`)}
+                  error={translateError(errors.endTime?.message)}
+                />
+              )}
+            />
+            <Element $start>
+              <BufferToggles
+                before={reservationUnit?.bufferTimeBefore ?? 0}
+                after={reservationUnit?.bufferTimeAfter ?? 0}
+              />
+            </Element>
+
+            <Element $start>
               <Controller
+                name="repeatOnDays"
                 control={control}
-                name="startTime"
-                render={({ field: { ...field } }) => (
-                  // NOTE using our custom time input because HDS doesn't allow reset
-                  <TimeInput
-                    {...field}
-                    label={t(`ReservationDialog.startTime`)}
-                    error={translateError(errors.startTime?.message)}
+                render={({ field: { value, onChange } }) => (
+                  <WeekdaysSelector
+                    label={t("MyUnits.RecurringReservationForm.repeatOnDays")}
+                    value={value}
+                    onChange={onChange}
+                    errorText={translateError(errors.repeatOnDays?.message)}
                   />
                 )}
               />
+            </Element>
 
-              <Controller
-                control={control}
-                name="endTime"
-                render={({ field: { ...field } }) => (
-                  // NOTE using our custom time input because HDS doesn't allow reset
-                  <TimeInput
-                    {...field}
-                    label={t(`ReservationDialog.endTime`)}
-                    error={translateError(errors.endTime?.message)}
-                  />
-                )}
+            <Element
+              $wide
+              id="edit-recurring__reservations-list"
+              $unlimitedMaxWidth
+            >
+              {/* TODO can we refactor this part (the name + count) into the ReservationListEditor */}
+              <Label $bold>
+                {t(`MyUnits.RecurringReservationForm.reservationsList`, {
+                  count: reservationsCount,
+                })}
+              </Label>
+              {localError && (
+                <Notification type="alert">{localError}</Notification>
+              )}
+              <ReservationListEditor
+                setRemovedReservations={setRemovedReservations}
+                removedReservations={removedReservations}
+                items={checkedReservations}
+                isTall
               />
-              <Element $start>
-                <BufferToggles
-                  before={reservationUnit?.bufferTimeBefore ?? 0}
-                  after={reservationUnit?.bufferTimeAfter ?? 0}
-                />
-              </Element>
-
-              <Element $start>
-                <Controller
-                  name="repeatOnDays"
-                  control={control}
-                  render={({ field: { value, onChange } }) => (
-                    <WeekdaysSelector
-                      label={t("MyUnits.RecurringReservationForm.repeatOnDays")}
-                      value={value}
-                      onChange={onChange}
-                      errorText={translateError(errors.repeatOnDays?.message)}
-                    />
-                  )}
-                />
-              </Element>
-
-              <Element
-                $wide
-                id="edit-recurring__reservations-list"
-                $unlimitedMaxWidth
-              >
-                {/* TODO can we refactor this part (the name + count) into the ReservationListEditor */}
-                <Label $bold>
-                  {t(`MyUnits.RecurringReservationForm.reservationsList`, {
-                    count: reservationsCount,
-                  })}
-                </Label>
-                {localError && (
-                  <Notification type="alert">{localError}</Notification>
-                )}
-                <ReservationListEditor
-                  setRemovedReservations={setRemovedReservations}
-                  removedReservations={removedReservations}
-                  items={checkedReservations}
-                  isTall
-                />
-              </Element>
-              <ButtonContainer
-                style={{
-                  gridColumn: "1 / -1",
-                  justifyContent: "flex-end",
-                }}
-              >
-                <ButtonLikeLink to="..">{t("common:cancel")}</ButtonLikeLink>
-                <Button size="small" type="submit">
-                  {t("ReservationEditSeries.submit")}
-                </Button>
-              </ButtonContainer>
-            </AutoGrid>
-          </form>
-        </FormProvider>
-      </>
+            </Element>
+            <ButtonContainer
+              style={{
+                gridColumn: "1 / -1",
+                justifyContent: "flex-end",
+              }}
+            >
+              <ButtonLikeLink to="..">{t("common:cancel")}</ButtonLikeLink>
+              <Button size="small" type="submit">
+                {t("ReservationEditSeries.submit")}
+              </Button>
+            </ButtonContainer>
+          </AutoGrid>
+        </form>
+      </FormProvider>
     </>
   );
 }

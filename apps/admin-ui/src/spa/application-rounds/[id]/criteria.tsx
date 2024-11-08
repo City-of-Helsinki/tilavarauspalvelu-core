@@ -3,29 +3,25 @@ import { gql } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
-import { H2, H3, SemiBold, Strong } from "common/src/common/typography";
+import { H1, H3, SemiBold, Strong } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { useApplicationRoundCriteriaQuery } from "@gql/gql-types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { formatDate } from "@/common/util";
 import { errorToast } from "common/src/common/toast";
 import Loader from "@/component/Loader";
-import { Accordion } from "@/component/Accordion";
+import { Accordion as AccordionBase } from "@/component/Accordion";
 import TimeframeStatus from "../TimeframeStatus";
+import { Flex } from "common/styles/util";
 
 interface IRouteParams {
   [key: string]: string;
   applicationRoundId: string;
 }
 
-const HeadContainer = styled.div`
-  display: flex;
-  gap: var(--spacing-s);
-  flex-direction: column;
-  justify-content: space-between;
-
-  @media (min-width: ${breakpoints.s}) {
-    flex-direction: row;
+const Accordion = styled(AccordionBase)`
+  && > div > h2 {
+    --header-padding: 0;
   }
 `;
 
@@ -106,17 +102,19 @@ function Criteria({
 
   return (
     <>
-      <H2 as="h1">{applicationRound.nameFi}</H2>
-      <HeadContainer>
-        <TimeframeStatus
-          applicationPeriodBegin={applicationRound.applicationPeriodBegin}
-          applicationPeriodEnd={applicationRound.applicationPeriodEnd}
-        />
-        <span>
-          <SemiBold>{applicationRound.reservationUnitCount}</SemiBold>{" "}
-          <span>{t("ApplicationRound.attachedReservationUnits")}</span>
-        </span>
-      </HeadContainer>
+      <div>
+        <H1 $marginBottom="xs">{applicationRound.nameFi}</H1>
+        <Flex $direction="row" $justify="space-between" $wrap="wrap">
+          <TimeframeStatus
+            applicationPeriodBegin={applicationRound.applicationPeriodBegin}
+            applicationPeriodEnd={applicationRound.applicationPeriodEnd}
+          />
+          <span>
+            <SemiBold>{applicationRound.reservationUnitCount}</SemiBold>{" "}
+            <span>{t("ApplicationRound.attachedReservationUnits")}</span>
+          </span>
+        </Flex>
+      </div>
       <Accordion
         heading={t("ApplicationRound.searchAndUsageTimeRanges")}
         initiallyOpen

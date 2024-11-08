@@ -1,21 +1,16 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
-import styled from "styled-components";
 import { ErrorBoundary } from "react-error-boundary";
 import { H1 } from "common/src/common/typography";
 import { RecurringReservationsView } from "@/component/RecurringReservationsView";
-import { ActionsWrapper } from "./commonStyling";
 import Error404 from "@/common/Error404";
 import { useRecurringReservationQuery } from "@gql/gql-types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { errorToast } from "common/src/common/toast";
 import { getReservationUrl } from "@/common/urls";
-
-const InfoSection = styled.p`
-  margin: var(--spacing-l) 0;
-`;
+import { Flex } from "common/styles/util";
 
 function RecurringReservationDoneInner({
   recurringPk,
@@ -43,19 +38,21 @@ function RecurringReservationDoneInner({
   const reservationUrl = getReservationUrl(reservations[0]?.pk);
 
   return (
-    <div>
-      <H1>{reservations.length > 0 ? t(`title`) : t("allFailedTitle")}</H1>
-      <InfoSection>{t(`successInfo`)}</InfoSection>
+    <>
+      <H1 $marginBottom="none">
+        {reservations.length > 0 ? t(`title`) : t("allFailedTitle")}
+      </H1>
+      <p>{t(`successInfo`)}</p>
       <RecurringReservationsView recurringPk={recurringPk} />
-      <ActionsWrapper>
+      <Flex $direction="row" $justify="flex-end" $wrap="wrap">
         <ButtonLikeLink to="../../.." relative="path">
           {t(`buttonToUnit`)}
         </ButtonLikeLink>
         <ButtonLikeLink disabled={reservationUrl === ""} to={reservationUrl}>
           {t(`buttonToReservation`)}
         </ButtonLikeLink>
-      </ActionsWrapper>
-    </div>
+      </Flex>
+    </>
   );
 }
 

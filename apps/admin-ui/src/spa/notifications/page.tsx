@@ -13,7 +13,6 @@ import {
   IconClock,
   IconPen,
   RadioButton,
-  Select,
   SelectionGroup,
   TextInput,
 } from "hds-react";
@@ -29,7 +28,6 @@ import {
 } from "@gql/gql-types";
 import { H1 } from "common/src/common/typography";
 import { fromUIDate } from "common/src/common/util";
-import { breakpoints } from "common";
 import Loader from "@/component/Loader";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import {
@@ -50,6 +48,8 @@ import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { errorToast, successToast } from "common/src/common/toast";
 import StatusLabel from "common/src/components/StatusLabel";
 import { type StatusLabelType } from "common/src/tags";
+import { Flex, TitleSection } from "common/styles/util";
+import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 
 const RichTextInput = dynamic(() => import("@/component/RichTextInput"), {
   ssr: false,
@@ -162,22 +162,13 @@ function BannerNotificationStatusLabel({
   );
 }
 
-const StatusTagContainer = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  justify-content: space-between;
-  align-items: flex-start;
-  flex-direction: column;
-  @media (width > ${breakpoints.s}) {
-    flex-direction: row;
-  }
-`;
+const ButtonContainerCommon = styled(Flex).attrs({
+  $justify: "space-between",
+  $align: "center",
+  $gap: "l",
+  $direction: "row",
+})``;
 
-const ButtonContainerCommon = styled.div`
-  display: flex;
-  justify-content: space-between;
-  gap: var(--spacing-l);
-`;
 const ButtonContainer = styled(ButtonContainerCommon)`
   grid-column: 1 / -1;
 `;
@@ -507,49 +498,23 @@ const NotificationForm = ({
         errorText={translateError(errors.name?.message)}
         data-testid="Notification__Page--name-input"
       />
-      <Controller
+      <ControlledSelect
         control={control}
         name="level"
-        render={({ field: { value, onChange } }) => (
-          <Select<{ value: string; label: string }>
-            id="notification-level"
-            label={t("form.level")}
-            options={levelOptions}
-            placeholder={t("form.selectPlaceholder")}
-            onChange={(x: { value: string; label: string }) =>
-              onChange(x.value)
-            }
-            value={{
-              value,
-              label: value != null ? t(`form.levelEnum.${value}`) : "",
-            }}
-            invalid={!!errors.level}
-            error={translateError(errors.level?.message)}
-            required
-          />
-        )}
+        label={t("form.level")}
+        options={levelOptions}
+        placeholder={t("form.selectPlaceholder")}
+        error={translateError(errors.level?.message)}
+        required
       />
-      <Controller
+      <ControlledSelect
         control={control}
         name="targetGroup"
-        render={({ field: { value, onChange } }) => (
-          <Select<{ value: string; label: string }>
-            id="notification-target-group"
-            label={t("headings.targetGroup")}
-            options={targetGroupOptions}
-            placeholder={t("form.selectPlaceholder")}
-            onChange={(x: { value: string; label: string }) =>
-              onChange(x.value)
-            }
-            value={{
-              value,
-              label: value != null ? t(`target.${value}`) : "",
-            }}
-            invalid={!!errors.targetGroup}
-            error={translateError(errors.targetGroup?.message)}
-            required
-          />
-        )}
+        label={t("headings.targetGroup")}
+        options={targetGroupOptions}
+        placeholder={t("form.selectPlaceholder")}
+        error={translateError(errors.targetGroup?.message)}
+        required
       />
       <Controller
         control={control}
@@ -713,12 +678,12 @@ function LoadedContent({
   const name = getName(isNew, false, notification?.name, t);
   return (
     <>
-      <StatusTagContainer>
-        <H1>{name}</H1>
+      <TitleSection>
+        <H1 $noMargin>{name}</H1>
         {notification?.state && (
           <BannerNotificationStatusLabel state={notification.state} />
         )}
-      </StatusTagContainer>
+      </TitleSection>
       {(notification || isNew) && (
         <NotificationForm notification={notification ?? undefined} />
       )}

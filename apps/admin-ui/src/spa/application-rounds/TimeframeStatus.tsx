@@ -13,7 +13,7 @@ interface IProps {
 }
 
 const Wrapper = styled.span`
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: var(--spacing-3-xs);
 `;

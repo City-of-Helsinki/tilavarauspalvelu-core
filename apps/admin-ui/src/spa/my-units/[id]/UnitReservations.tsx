@@ -78,13 +78,6 @@ function UnitReservationsInner({
   );
 }
 
-const HorisontalFlexWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-`;
-
 type Params = {
   unitId: string;
   reservationUnitId: string;
@@ -137,7 +130,12 @@ export function UnitReservations(): JSX.Element {
       </AutoGrid>
       <SearchTags hide={["date", "tab"]} translateTag={translateTag} />
       <HR />
-      <HorisontalFlexWrapper>
+      <Flex
+        $gap="none"
+        $direction="row"
+        $justify="space-between"
+        $align="center"
+      >
         <Button
           variant="secondary"
           theme="black"
@@ -152,7 +150,7 @@ export function UnitReservations(): JSX.Element {
         </Button>
         <DayNavigation name="date" />
         <div />
-      </HorisontalFlexWrapper>
+      </Flex>
       {/* TODO missing unitId is an error, not return null */}
       {unitId ? (
         <UnitReservationsInner

@@ -433,155 +433,150 @@ function RequestedReservation({
           }
         />
       </ShowWhenTargetInvisible>
-      <div>
-        <ReservationTitleSection
-          ref={ref}
+      <ReservationTitleSection
+        ref={ref}
+        reservation={reservation}
+        tagline={reservationTagline}
+      />
+      <ButtonContainer $justify="flex-start" $noMargin>
+        <ButtonsWithPermChecks
           reservation={reservation}
-          tagline={reservationTagline}
+          onReservationUpdated={refetch}
+          isFree={!isNonFree}
         />
-        <ButtonContainer $justify="flex-start">
-          <ButtonsWithPermChecks
-            reservation={reservation}
-            onReservationUpdated={refetch}
-            isFree={!isNonFree}
-          />
-        </ButtonContainer>
-        <ReservationSummary reservation={reservation} isFree={!isNonFree} />
-        <div>
-          <VisibleIfPermission
-            permission={UserPermissionChoice.CanViewReservations}
-            reservation={reservation}
+      </ButtonContainer>
+      <ReservationSummary reservation={reservation} isFree={!isNonFree} />
+      <div>
+        <VisibleIfPermission
+          permission={UserPermissionChoice.CanViewReservations}
+          reservation={reservation}
+        >
+          <Accordion
+            heading={t("RequestedReservation.workingMemo")}
+            initiallyOpen={
+              reservation.workingMemo?.length != null &&
+              reservation.workingMemo?.length > 0
+            }
           >
-            <Accordion
-              heading={t("RequestedReservation.workingMemo")}
-              initiallyOpen={
-                reservation.workingMemo?.length != null &&
-                reservation.workingMemo?.length > 0
-              }
-            >
-              <ReservationWorkingMemo
-                reservationPk={reservation.pk ?? 0}
-                refetch={refetch}
-                initialValue={reservation.workingMemo ?? ""}
-              />
-            </Accordion>
-          </VisibleIfPermission>
-          <TimeBlock reservation={reservation} onReservationUpdated={refetch} />
-          <Accordion heading={t("RequestedReservation.reservationDetails")}>
-            <ApplicationDatas>
-              <DataWrapper label={t("RequestedReservation.id")}>
-                {reservation.pk}
-              </DataWrapper>
-              <DataWrapper label={t("RequestedReservation.numPersons")}>
-                {reservation.numPersons}
-              </DataWrapper>
-              {reservation.ageGroup && (
-                <DataWrapper label={t("filters.ageGroup")}>
-                  {`${formatAgeGroup(reservation.ageGroup)} ${t("RequestedReservation.ageGroupSuffix")}`}
-                </DataWrapper>
-              )}
-              <DataWrapper label={t("filters.purpose")}>
-                {reservation.purpose?.nameFi}
-              </DataWrapper>
-              <DataWrapper label={t("RequestedReservation.description")}>
-                {reservation.description}
-              </DataWrapper>
-            </ApplicationDatas>
+            <ReservationWorkingMemo
+              reservationPk={reservation.pk ?? 0}
+              refetch={refetch}
+              initialValue={reservation.workingMemo ?? ""}
+            />
           </Accordion>
-          <Accordion heading={t("RequestedReservation.reservationUser")}>
+        </VisibleIfPermission>
+        <TimeBlock reservation={reservation} onReservationUpdated={refetch} />
+        <Accordion heading={t("RequestedReservation.reservationDetails")}>
+          <ApplicationDatas>
+            <DataWrapper label={t("RequestedReservation.id")}>
+              {reservation.pk}
+            </DataWrapper>
+            <DataWrapper label={t("RequestedReservation.numPersons")}>
+              {reservation.numPersons}
+            </DataWrapper>
+            {reservation.ageGroup && (
+              <DataWrapper label={t("filters.ageGroup")}>
+                {`${formatAgeGroup(reservation.ageGroup)} ${t("RequestedReservation.ageGroupSuffix")}`}
+              </DataWrapper>
+            )}
+            <DataWrapper label={t("filters.purpose")}>
+              {reservation.purpose?.nameFi}
+            </DataWrapper>
+            <DataWrapper label={t("RequestedReservation.description")}>
+              {reservation.description}
+            </DataWrapper>
+          </ApplicationDatas>
+        </Accordion>
+        <Accordion heading={t("RequestedReservation.reservationUser")}>
+          <ApplicationDatas>
+            <DataWrapper label={t("RequestedReservation.reserveeType")}>
+              {translateType(reservation, t)}
+            </DataWrapper>
+            <DataWrapper
+              label={t(
+                reservation.reserveeType === CustomerTypeChoice.Business
+                  ? "RequestedReservation.reserveeBusinessName"
+                  : "RequestedReservation.reserveeOrganisationName"
+              )}
+            >
+              {reservation.reserveeOrganisationName}
+            </DataWrapper>
+            <DataWrapper label={t("filters.homeCity")}>
+              {reservation.homeCity?.nameFi}
+            </DataWrapper>
+            <DataWrapper label={t("RequestedReservation.reserveeId")}>
+              {reservation.reserveeId || t("RequestedReservation.noReserveeId")}
+            </DataWrapper>
+            <DataWrapper label={t("RequestedReservation.reserveeFirstName")}>
+              {reservation.reserveeFirstName}
+            </DataWrapper>
+            <DataWrapper label={t("RequestedReservation.reserveeLastName")}>
+              {reservation.reserveeLastName}
+            </DataWrapper>
+            <DataWrapper label={t("RequestedReservation.reserveePhone")}>
+              {reservation.reserveePhone}
+            </DataWrapper>
+            <DataWrapper label={t("RequestedReservation.reserveeEmail")}>
+              {reservation.reserveeEmail}
+            </DataWrapper>
+          </ApplicationDatas>
+        </Accordion>
+        {isNonFree && (
+          <Accordion heading={t("RequestedReservation.pricingDetails")}>
             <ApplicationDatas>
-              <DataWrapper label={t("RequestedReservation.reserveeType")}>
-                {translateType(reservation, t)}
+              <DataWrapper label={t("RequestedReservation.price")}>
+                {reservation.price && reservationPrice(reservation, t)}
+              </DataWrapper>
+              <DataWrapper label={t("RequestedReservation.paymentState")}>
+                {order?.status == null
+                  ? "-"
+                  : t(`Payment.status.${order?.status}`)}
               </DataWrapper>
               <DataWrapper
-                label={t(
-                  reservation.reserveeType === CustomerTypeChoice.Business
-                    ? "RequestedReservation.reserveeBusinessName"
-                    : "RequestedReservation.reserveeOrganisationName"
-                )}
+                label={t("RequestedReservation.applyingForFreeOfCharge")}
               >
-                {reservation.reserveeOrganisationName}
+                {t(
+                  reservation.applyingForFreeOfCharge
+                    ? "common.true"
+                    : "common.false"
+                )}
               </DataWrapper>
-              <DataWrapper label={t("filters.homeCity")}>
-                {reservation.homeCity?.nameFi}
-              </DataWrapper>
-              <DataWrapper label={t("RequestedReservation.reserveeId")}>
-                {reservation.reserveeId ||
-                  t("RequestedReservation.noReserveeId")}
-              </DataWrapper>
-              <DataWrapper label={t("RequestedReservation.reserveeFirstName")}>
-                {reservation.reserveeFirstName}
-              </DataWrapper>
-              <DataWrapper label={t("RequestedReservation.reserveeLastName")}>
-                {reservation.reserveeLastName}
-              </DataWrapper>
-              <DataWrapper label={t("RequestedReservation.reserveePhone")}>
-                {reservation.reserveePhone}
-              </DataWrapper>
-              <DataWrapper label={t("RequestedReservation.reserveeEmail")}>
-                {reservation.reserveeEmail}
+              <DataWrapper label={t("RequestedReservation.freeOfChargeReason")}>
+                {reservation.freeOfChargeReason}
               </DataWrapper>
             </ApplicationDatas>
           </Accordion>
-          {isNonFree && (
-            <Accordion heading={t("RequestedReservation.pricingDetails")}>
-              <ApplicationDatas>
-                <DataWrapper label={t("RequestedReservation.price")}>
-                  {reservation.price && reservationPrice(reservation, t)}
-                </DataWrapper>
-                <DataWrapper label={t("RequestedReservation.paymentState")}>
-                  {order?.status == null
-                    ? "-"
-                    : t(`Payment.status.${order?.status}`)}
-                </DataWrapper>
-                <DataWrapper
-                  label={t("RequestedReservation.applyingForFreeOfCharge")}
-                >
-                  {t(
-                    reservation.applyingForFreeOfCharge
-                      ? "common.true"
-                      : "common.false"
-                  )}
-                </DataWrapper>
-                <DataWrapper
-                  label={t("RequestedReservation.freeOfChargeReason")}
-                >
-                  {reservation.freeOfChargeReason}
-                </DataWrapper>
-              </ApplicationDatas>
-            </Accordion>
-          )}
-          <Accordion heading={t("RequestedReservation.reserveeDetails")}>
-            <ApplicationDatas>
-              <DataWrapper label={t("RequestedReservation.user")}>
-                {trim(
-                  `${reservation?.user?.firstName || ""} ${
-                    reservation?.user?.lastName || ""
-                  }`
-                ) || t("RequestedReservation.noName")}
-              </DataWrapper>
-              <DataWrapper label={t("RequestedReservation.email")}>
-                {reservation?.user?.email}
-              </DataWrapper>
-              <DataWrapper label={t("RequestedReservation.birthDate")}>
-                <BirthDate reservationPk={reservation?.pk ?? 0} />
-              </DataWrapper>
-              <DataWrapper label={t("RequestedReservation.addressStreet")}>
-                <span>{reservation.reserveeAddressStreet || "-"}</span>
-                <br />
-                <span>
-                  {reservation.reserveeAddressZip ||
-                  reservation.reserveeAddressCity
-                    ? `${reservation.reserveeAddressZip} ${reservation.reserveeAddressCity}`
-                    : ""}
-                </span>
-              </DataWrapper>
-              <DataWrapper label={t("RequestedReservation.addressCity")}>
-                {reservation.reserveeAddressCity || "-"}
-              </DataWrapper>
-            </ApplicationDatas>
-          </Accordion>
-        </div>
+        )}
+        <Accordion heading={t("RequestedReservation.reserveeDetails")}>
+          <ApplicationDatas>
+            <DataWrapper label={t("RequestedReservation.user")}>
+              {trim(
+                `${reservation?.user?.firstName || ""} ${
+                  reservation?.user?.lastName || ""
+                }`
+              ) || t("RequestedReservation.noName")}
+            </DataWrapper>
+            <DataWrapper label={t("RequestedReservation.email")}>
+              {reservation?.user?.email}
+            </DataWrapper>
+            <DataWrapper label={t("RequestedReservation.birthDate")}>
+              <BirthDate reservationPk={reservation?.pk ?? 0} />
+            </DataWrapper>
+            <DataWrapper label={t("RequestedReservation.addressStreet")}>
+              <span>{reservation.reserveeAddressStreet || "-"}</span>
+              <br />
+              <span>
+                {reservation.reserveeAddressZip ||
+                reservation.reserveeAddressCity
+                  ? `${reservation.reserveeAddressZip} ${reservation.reserveeAddressCity}`
+                  : ""}
+              </span>
+            </DataWrapper>
+            <DataWrapper label={t("RequestedReservation.addressCity")}>
+              {reservation.reserveeAddressCity || "-"}
+            </DataWrapper>
+          </ApplicationDatas>
+        </Accordion>
       </div>
     </>
   );

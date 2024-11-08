@@ -35,7 +35,7 @@ import RejectedOccurrencesDataLoader from "./RejectedOccurrencesDataLoader";
 import { errorToast } from "common/src/common/toast";
 import { hasPermission } from "@/modules/permissionHelper";
 import { useSession } from "@/hooks/auth";
-import { Flex, TabWrapper } from "common/styles/util";
+import { Flex, TabWrapper, TitleSection } from "common/styles/util";
 
 const AllocationButtonsContainer = styled.div`
   display: flex;
@@ -293,45 +293,45 @@ export function Review({
 
   return (
     <>
-      <div style={{ marginTop: "var(--spacing-s)" }}>
-        <Flex $align="center" $justify="space-between" $direction="row">
+      <TitleSection>
+        <div>
           <H1 $noMargin>{applicationRound.nameFi}</H1>
-          <ApplicationRoundStatusLabel status={applicationRound.status} />
-        </Flex>
-        <Flex $justify="flex-start" $direction="row">
-          <TimeframeStatus
-            applicationPeriodBegin={applicationRound.applicationPeriodBegin}
-            applicationPeriodEnd={applicationRound.applicationPeriodEnd}
-          />
-          <Link to="criteria">{t("ApplicationRound.roundCriteria")}</Link>
-        </Flex>
-        {/* NOTE this check blocks users that don't have permissions to end the allocation
-         * so for them it's always showing the allocation tool
-         */}
-        <AllocationButtonsContainer>
-          {isEndingAllowed || isHandled ? (
-            <div>
-              <EndAllocation
-                applicationRound={applicationRound}
-                refetch={refetch}
-              />
-            </div>
-          ) : null}
-          {!isHandled && (
-            <AllocationButtonContainer>
-              {isAllocationEnabled ? (
-                <ButtonLikeLink to="allocation" variant="primary" size="large">
-                  {t("ApplicationRound.allocate")}
-                </ButtonLikeLink>
-              ) : (
-                <Button variant="primary" disabled>
-                  {t("ApplicationRound.allocate")}
-                </Button>
-              )}
-            </AllocationButtonContainer>
-          )}
-        </AllocationButtonsContainer>
-      </div>
+          <Flex $justify="flex-start" $direction="row" $marginTop="xs">
+            <TimeframeStatus
+              applicationPeriodBegin={applicationRound.applicationPeriodBegin}
+              applicationPeriodEnd={applicationRound.applicationPeriodEnd}
+            />
+            <Link to="criteria">{t("ApplicationRound.roundCriteria")}</Link>
+          </Flex>
+        </div>
+        <ApplicationRoundStatusLabel status={applicationRound.status} />
+      </TitleSection>
+      {/* NOTE this check blocks users that don't have permissions to end the allocation
+       * so for them it's always showing the allocation tool
+       */}
+      <AllocationButtonsContainer>
+        {isEndingAllowed || isHandled ? (
+          <div>
+            <EndAllocation
+              applicationRound={applicationRound}
+              refetch={refetch}
+            />
+          </div>
+        ) : null}
+        {!isHandled && (
+          <AllocationButtonContainer>
+            {isAllocationEnabled ? (
+              <ButtonLikeLink to="allocation" variant="primary" size="large">
+                {t("ApplicationRound.allocate")}
+              </ButtonLikeLink>
+            ) : (
+              <Button variant="primary" disabled>
+                {t("ApplicationRound.allocate")}
+              </Button>
+            )}
+          </AllocationButtonContainer>
+        )}
+      </AllocationButtonsContainer>
       <TabWrapper>
         <Tabs initiallyActiveTab={activeTabIndex}>
           <Tabs.TabList>
