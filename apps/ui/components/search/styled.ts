@@ -53,9 +53,9 @@ export const BottomContainer = styled(Flex).attrs({
   }
 `;
 
-// TODO setting fixed width is bad, but 100% here is too wide
+// Have to set max-width so this doesn't grow inside a flex container
 export const StyledSubmitButton = styled(SubmitButton)`
   @media (min-width: ${breakpoints.s}) {
-    max-width: 120px;
+    max-width: fit-content;
   }
 `;
