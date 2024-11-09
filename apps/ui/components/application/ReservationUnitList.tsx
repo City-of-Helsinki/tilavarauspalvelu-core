@@ -1,9 +1,7 @@
-import { IconPlusCircle, Notification as HDSNotification } from "hds-react";
+import { Button, IconPlusCircle, Notification } from "hds-react";
 import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next";
-import styled from "styled-components";
-import type { OptionType } from "common/types/common";
 import type {
   ApplicationQuery,
   ReservationUnitCardFieldsFragment,
@@ -11,14 +9,19 @@ import type {
 import { IconButton } from "common/src/components";
 import { filterNonNullable } from "common/src/helpers";
 import Modal from "../common/Modal";
-import ReservationUnitModal from "../reservation-unit/ReservationUnitModal";
-import ReservationUnitCard from "../reservation-unit/ReservationUnitCard";
 import type { ApplicationFormValues } from "./Form";
+import { ReservationUnitCard } from "./reservation-unit-card";
+import { Flex } from "common/styles/util";
+import { ReservationUnitModalContent } from "./reservation-unit-modal-content";
+import { breakpoints } from "common";
 
 type Node = NonNullable<ApplicationQuery["application"]>;
 type AppRoundNode = NonNullable<Node["applicationRound"]>;
 type ReservationUnitType = ReservationUnitCardFieldsFragment;
 
+type OptionType =
+  | { value: string; label: string }
+  | { value: number; label: string };
 type OptionTypes = {
   purposeOptions: OptionType[];
   reservationUnitTypeOptions: OptionType[];
@@ -32,21 +35,6 @@ type Props = {
   options: OptionTypes;
   minSize?: number;
 };
-
-const MainContainer = styled.div`
-  margin-top: var(--spacing-l);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-l);
-`;
-
-const ButtonContainer = styled.div`
-  margin-top: var(--spacing-s);
-`;
-
-const Notification = styled(HDSNotification)`
-  --notification-z-index: 0 !important;
-`;
 
 // selected reservation units are applicationEvent.eventReservationUnits
 // available reservation units are applicationRound.reservationUnits
@@ -143,7 +131,7 @@ export function ReservationUnitList({
   const hasNoUnitsError = unitErros != null && unitErros.message === "Required";
 
   return (
-    <MainContainer>
+    <Flex>
       {hasNoUnitsError && (
         <Notification
           type="error"
@@ -174,19 +162,25 @@ export function ReservationUnitList({
           onMoveUp={moveUp}
         />
       ))}
-      <ButtonContainer>
-        <IconButton
-          onClick={() => setShowModal(true)}
-          icon={<IconPlusCircle aria-hidden />}
-          label={t("reservationUnitList:add")}
-        />
-      </ButtonContainer>
+      <IconButton
+        onClick={() => setShowModal(true)}
+        icon={<IconPlusCircle aria-hidden="true" />}
+        label={t("reservationUnitList:add")}
+      />
       <Modal
-        handleClose={() => setShowModal(false)}
         show={showModal}
-        closeButtonKey="reservationUnitModal:returnToApplication"
+        handleClose={() => setShowModal(false)}
+        maxWidth={breakpoints.l}
+        fullHeight
+        actions={
+          <Flex $align="flex-end">
+            <Button onClick={() => setShowModal(false)}>
+              {t("reservationUnitModal:returnToApplication")}
+            </Button>
+          </Flex>
+        }
       >
-        <ReservationUnitModal
+        <ReservationUnitModalContent
           currentReservationUnits={currentReservationUnits}
           applicationRound={applicationRound}
           handleAdd={handleAdd}
@@ -194,6 +188,6 @@ export function ReservationUnitList({
           options={options}
         />
       </Modal>
-    </MainContainer>
+    </Flex>
   );
 }

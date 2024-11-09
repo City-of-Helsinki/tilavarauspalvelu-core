@@ -5,15 +5,15 @@ import {
   IconLocation,
   TextInput,
   Select,
-  LoadingSpinner,
   IconLinkExternal,
+  Button,
 } from "hds-react";
 import React, { ChangeEvent, useState } from "react";
 import Link from "next/link";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import type { OptionType } from "common/types/common";
-import { fontMedium } from "common/src/common/typography";
+import { H2, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
   ReservationUnitOrderingChoices,
@@ -22,8 +22,8 @@ import {
   type ApplicationQuery,
 } from "@gql/gql-types";
 import { filterNonNullable, getImageSource } from "common/src/helpers";
+import { AutoGrid, Flex } from "common/styles/util";
 import { getAddressAlt, getMainImage, getTranslation } from "@/modules/util";
-import { MediumButton } from "@/styles/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
 import IconWithText from "../common/IconWithText";
@@ -32,8 +32,7 @@ import { getReservationUnitPath } from "@/modules/urls";
 const Container = styled.div`
   width: 100%;
   display: grid;
-  margin-top: var(--spacing-l);
-  gap: var(--spacing-m);
+  gap: var(--spacing-s);
   align-items: start;
 
   @media (max-width: ${breakpoints.l}) {
@@ -59,10 +58,6 @@ const Container = styled.div`
   grid-template-columns: 180px auto 230px;
 `;
 
-const Actions = styled.div`
-  display: flex;
-`;
-
 const Name = styled.span`
   font-family: var(--font-bold);
   font-size: var(--fontsize-heading-m);
@@ -83,31 +78,12 @@ const Main = styled.span`
 `;
 
 const Props = styled.span`
-  font-size: var(--fontsize-body-m);
-  grid-area: props;
-  display: flex;
-  align-items: center;
-
-  svg {
-    margin-right: var(--spacing-xs);
-  }
-
-  span:not(:first-child) {
-    margin-right: var(--spacing-layout-m);
-  }
-
-  @media (max-width: ${breakpoints.m}) {
-    flex-direction: column;
-    align-items: flex-start;
-
-    span:not(:first-child) {
-      margin-right: 0;
-    }
-  }
+  font-size: var(--fontsize-body-s);
 `;
 
 const Image = styled.img`
   grid-area: image;
+  object-fit: cover;
   width: 178px;
   height: 185px;
 `;
@@ -191,82 +167,17 @@ function ReservationUnitCard({
           />
         )}
       </Props>
-      <Actions>
-        <MediumButton
-          iconRight={<IconArrowRight />}
-          onClick={handle}
-          variant={isSelected ? "danger" : "secondary"}
-        >
-          {buttonText}
-        </MediumButton>
-      </Actions>
+      <Button
+        iconRight={<IconArrowRight />}
+        onClick={handle}
+        size="small"
+        variant={isSelected ? "danger" : "secondary"}
+      >
+        {buttonText}
+      </Button>
     </Container>
   );
 }
-
-const MainContainer = styled.div`
-  overflow-y: auto;
-  width: 48em;
-  height: 40em;
-
-  @media (max-width: ${breakpoints.s}) {
-    margin: 0;
-    padding: var(--spacing-xs);
-    width: calc(100% - 2 * var(--spacing-xs));
-    height: 100%;
-  }
-`;
-
-const Heading = styled.div`
-  font-family: var(--font-bold);
-  font-size: var(--fontsize-heading-l);
-`;
-
-const Text = styled.span`
-  font-family: var(--font-bold);
-  font-size: var(--fontsize-heading-s);
-`;
-
-const Filters = styled.div`
-  @media (max-width: ${breakpoints.m}) {
-    grid-template-columns: 1fr;
-    margin-left: 0;
-  }
-
-  margin-top: var(--spacing-m);
-  margin-left: 5px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-m);
-
-  label {
-    ${fontMedium}
-  }
-`;
-
-const ButtonContainer = styled.div`
-  margin-top: var(--spacing-m);
-  margin-left: 5px;
-  display: flex;
-  align-items: center;
-`;
-
-const SearchButton = styled(MediumButton).attrs({
-  type: "submit",
-})`
-  margin-right: var(--spacing-m);
-`;
-
-const Ruler = styled.hr`
-  margin-top: var(--spacing-layout-m);
-`;
-
-const Results = styled.div`
-  margin-bottom: 112px;
-  width: 99%;
-`;
-
-const SmallSpinner = styled(LoadingSpinner).attrs({ small: true })``;
 
 type Node = NonNullable<ApplicationQuery["application"]>;
 type AppRoundNode = NonNullable<Node["applicationRound"]>;
@@ -282,7 +193,7 @@ const emptyOption = {
   label: "",
 };
 
-function ReservationUnitModal({
+export function ReservationUnitModalContent({
   applicationRound,
   handleAdd,
   handleRemove,
@@ -340,10 +251,10 @@ function ReservationUnitModal({
   );
 
   return (
-    <MainContainer>
-      <Heading>{t("reservationUnitModal:heading")}</Heading>
-      <Text>{getApplicationRoundName(applicationRound)}</Text>
-      <Filters>
+    <Flex>
+      <H2 $noMargin>{t("reservationUnitModal:heading")}</H2>
+      <H3 as="p">{getApplicationRoundName(applicationRound)}</H3>
+      <AutoGrid $minWidth="14rem">
         <TextInput
           id="reservationUnitSearch.search"
           label={t("reservationUnitModal:searchTermLabel")}
@@ -381,35 +292,24 @@ function ReservationUnitModal({
           }}
           defaultValue={emptyOption}
         />
-      </Filters>
-      <ButtonContainer>
-        <SearchButton
-          onClick={(e) => {
-            e.preventDefault();
-            refetch();
-          }}
-        >
+      </AutoGrid>
+      <Flex $align="flex-end">
+        <Button isLoading={loading} onClick={(_) => refetch()}>
           {t("common:search")}
-        </SearchButton>
-        {loading && <SmallSpinner />}
-      </ButtonContainer>
-      <Ruler />
-      <Results>
-        {reservationUnits.length === 0 && <div>{t("common:noResults")}</div>}
-        {reservationUnits.map((ru) => (
-          <ReservationUnitCard
-            handleAdd={() => handleAdd(ru)}
-            handleRemove={() => handleRemove(ru)}
-            isSelected={
-              currentReservationUnits.find((i) => i.pk === ru.pk) !== undefined
-            }
-            reservationUnit={ru}
-            key={ru.pk}
-          />
-        ))}
-      </Results>
-    </MainContainer>
+        </Button>
+      </Flex>
+      {reservationUnits.length === 0 && <div>{t("common:noResults")}</div>}
+      {reservationUnits.map((ru) => (
+        <ReservationUnitCard
+          handleAdd={() => handleAdd(ru)}
+          handleRemove={() => handleRemove(ru)}
+          isSelected={
+            currentReservationUnits.find((i) => i.pk === ru.pk) !== undefined
+          }
+          reservationUnit={ru}
+          key={ru.pk}
+        />
+      ))}
+    </Flex>
   );
 }
-
-export default ReservationUnitModal;

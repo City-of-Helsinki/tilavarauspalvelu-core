@@ -11,7 +11,6 @@ import {
   fromUIDate,
 } from "common/src/common/util";
 import type {
-  AgeGroupNode,
   ImageFragment,
   LocationFieldsI18nFragment,
 } from "@gql/gql-types";
@@ -96,22 +95,6 @@ function getLabel(
 }
 
 export { getLabel as getParameterLabel };
-
-/// @deprecated - OptionType is dangerous, union types break type safety in comparisons
-export const mapOptions = (
-  src: ParameterType[] | AgeGroupNode[],
-  emptyOptionLabel?: string,
-  lang: LocalizationLanguages = "fi"
-): OptionType[] => {
-  const r: OptionType[] = [
-    ...(emptyOptionLabel ? [{ label: emptyOptionLabel, value: 0 }] : []),
-    ...src.map((v) => ({
-      label: getLabel(v, lang),
-      value: v.pk ?? 0,
-    })),
-  ];
-  return r;
-};
 
 export const getSelectedOption = (
   selectedId: number | string | null,

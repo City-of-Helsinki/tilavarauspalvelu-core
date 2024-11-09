@@ -8,7 +8,7 @@ import {
 } from "@gql/gql-types";
 import { useFormContext } from "react-hook-form";
 import { filterNonNullable } from "common/src/helpers";
-import { getTranslation, mapOptions } from "@/modules/util";
+import { getTranslation } from "@/modules/util";
 import { MediumButton } from "@/styles/util";
 import { useOptions } from "@/hooks/useOptions";
 import { ButtonContainer } from "../common/common";
@@ -42,7 +42,10 @@ export function Page1({ applicationRound, onNext }: Props): JSX.Element | null {
       name: getTranslation(u, "name"),
     }));
 
-  const unitOptions = mapOptions(units);
+  const unitOptions = units.map((u) => ({
+    value: u.pk,
+    label: u.name,
+  }));
 
   const { options } = useOptions();
 

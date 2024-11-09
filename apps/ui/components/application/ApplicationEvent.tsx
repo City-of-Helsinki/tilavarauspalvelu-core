@@ -1,14 +1,9 @@
-// TODO this file should be moved to application/ since the only user is Page1
-// also remove default export
 import React, { useState } from "react";
-import { Checkbox, DateInput, NumberInput, Select, TextInput } from "hds-react";
+import { Button, Checkbox, DateInput, NumberInput, TextInput } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { Controller, useFormContext } from "react-hook-form";
-import styled from "styled-components";
-import { OptionType } from "common/types/common";
+import { useFormContext } from "react-hook-form";
 import type { ApplicationQuery } from "@gql/gql-types";
-import { fontRegular, H5 } from "common/src/common/typography";
-import { breakpoints } from "common/src/common/style";
+import { H5 } from "common/src/common/typography";
 import { CheckboxWrapper } from "common/src/reservation-form/components";
 import { getLocalizationLang } from "common/src/helpers";
 import { ReservationUnitList } from "./ReservationUnitList";
@@ -22,11 +17,19 @@ import { ApplicationEventSummary } from "./ApplicationEventSummary";
 import { Accordion } from "@/components/Accordion";
 import { getDurationOptions } from "@/modules/const";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
-import { MediumButton } from "@/styles/util";
 import { ApplicationFormValues } from "./Form";
+import { AutoGrid, Flex } from "common/styles/util";
+import {
+  ControlledNumberInput,
+  ControlledSelect,
+} from "common/src/components/form";
 
 type Node = NonNullable<ApplicationQuery["application"]>;
 type AppRoundNode = NonNullable<Node["applicationRound"]>;
+
+type OptionType =
+  | { label: string; value: string }
+  | { label: string; value: number };
 type OptionTypes = {
   ageGroupOptions: OptionType[];
   purposeOptions: OptionType[];
@@ -43,69 +46,6 @@ type Props = {
   onToggleAccordion: () => void;
   onDeleteEvent: () => void;
 };
-
-const Wrapper = styled.div`
-  margin-bottom: var(--spacing-s);
-`;
-
-const SubHeadLine = styled(H5).attrs({
-  as: "h2",
-})`
-  margin-top: var(--spacing-layout-m);
-`;
-
-const TwoColumnContainer = styled.div`
-  margin-top: var(--spacing-l);
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-l);
-
-  label {
-    ${fontRegular};
-  }
-
-  @media (max-width: ${breakpoints.m}) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const PeriodContainer = styled.div`
-  margin-top: var(--spacing-m);
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-l);
-  align-items: baseline;
-  margin-bottom: var(--spacing-layout-s);
-
-  label {
-    ${fontRegular};
-  }
-
-  @media (max-width: ${breakpoints.m}) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const ActionContainer = styled.div`
-  display: flex;
-  flex-direction: column-reverse;
-  margin-top: var(--spacing-layout-l);
-  gap: var(--spacing-l);
-
-  @media (min-width: ${breakpoints.m}) {
-    flex-direction: row;
-    justify-content: space-between;
-    gap: var(--spacing-l);
-  }
-`;
-
-const Button = styled(MediumButton)`
-  width: 100%;
-
-  @media (min-width: ${breakpoints.m}) {
-    width: 250px;
-  }
-`;
 
 function ApplicationEventInner({
   index,
@@ -185,11 +125,9 @@ function ApplicationEventInner({
   }));
 
   return (
-    <>
-      <SubHeadLine>
-        {t("application:Page1.basicInformationSubHeading")}
-      </SubHeadLine>
-      <TwoColumnContainer>
+    <Flex $gap="s" $marginTop="s">
+      <H5 as="h3">{t("application:Page1.basicInformationSubHeading")}</H5>
+      <AutoGrid>
         <div>
           <TextInput
             {...register(`applicationSections.${index}.name`)}
@@ -201,68 +139,31 @@ function ApplicationEventInner({
           />
         </div>
         <div>
-          <NumberInput
-            id={`applicationSections.${index}.numPersons`}
-            required
-            {...register(`applicationSections.${index}.numPersons`, {
-              validate: {
-                required: (val) => Boolean(val),
-                numPersonsMin: (val) => Number(val) > 0,
-              },
-              valueAsNumber: true,
-            })}
+          <ControlledNumberInput
+            name={`applicationSections.${index}.numPersons`}
             label={t("application:Page1.groupSize")}
             min={0}
-            max={undefined}
-            minusStepButtonAriaLabel={t("common:subtract")}
-            plusStepButtonAriaLabel={t("common:add")}
-            step={1}
-            invalid={errors.applicationSections?.[index]?.numPersons != null}
             errorText={getTranslatedError("numPersons")}
           />
         </div>
-        <Controller
+        <ControlledSelect
           control={control}
-          rules={{ required: true }}
+          required
           name={`applicationSections.${index}.ageGroup`}
-          render={({ field }) => (
-            <Select
-              value={
-                ageGroupOptions.find((v) => v.value === field.value) ?? null
-              }
-              onChange={(v: (typeof ageGroupOptions)[0]) =>
-                field.onChange(v.value)
-              }
-              required
-              label={t("application:Page1.ageGroup")}
-              options={ageGroupOptions}
-              invalid={errors.applicationSections?.[index]?.ageGroup != null}
-              error={getTranslatedError("ageGroup")}
-            />
-          )}
+          label={t("application:Page1.ageGroup")}
+          options={ageGroupOptions}
+          error={getTranslatedError("ageGroup")}
         />
-        <Controller
+        <ControlledSelect
           control={control}
-          rules={{ required: true }}
+          options={purposeOptions}
           name={`applicationSections.${index}.purpose`}
-          render={({ field }) => (
-            <Select
-              label={t("application:Page1.purpose")}
-              value={
-                purposeOptions.find((v) => v.value === field.value) ?? null
-              }
-              onChange={(v: (typeof purposeOptions)[0]) =>
-                field.onChange(v.value)
-              }
-              required
-              options={purposeOptions}
-              invalid={errors.applicationSections?.[index]?.purpose != null}
-              error={getTranslatedError("purpose")}
-            />
-          )}
+          label={t("application:Page1.purpose")}
+          required
+          error={getTranslatedError("purpose")}
         />
-      </TwoColumnContainer>
-      <SubHeadLine>{t("application:Page1.spacesSubHeading")}</SubHeadLine>
+      </AutoGrid>
+      <H5 as="h3"> {t("application:Page1.spacesSubHeading")}</H5>
       <ReservationUnitList
         applicationRound={applicationRound}
         index={index}
@@ -274,9 +175,7 @@ function ApplicationEventInner({
           unitOptions,
         }}
       />
-      <SubHeadLine>
-        {t("application:Page1.applicationRoundSubHeading")}
-      </SubHeadLine>
+      <H5 as="h3">{t("application:Page1.applicationRoundSubHeading")}</H5>
       <CheckboxWrapper>
         <Checkbox
           id={`applicationSections.${index}.defaultPeriod`}
@@ -294,7 +193,7 @@ function ApplicationEventInner({
           disabled={selectionIsDefaultPeriod}
         />
       </CheckboxWrapper>
-      <PeriodContainer>
+      <AutoGrid>
         <DateInput
           // disableConfirmation: is not accessible
           language={getLocalizationLang(i18n.language)}
@@ -343,51 +242,22 @@ function ApplicationEventInner({
           invalid={errors.applicationSections?.[index]?.end != null}
           errorText={getTranslatedError("end")}
         />
-        {/* TODO should use ControlledSelect */}
-        <Controller
+        <ControlledSelect
           control={control}
           name={`applicationSections.${index}.minDuration`}
-          rules={{ required: true }}
-          render={({ field }) => (
-            <Select
-              id={field.name}
-              value={
-                durationOptions.find((x) => x.value === field.value) ?? null
-              }
-              placeholder={t("common:select")}
-              options={durationOptions}
-              label={t("application:Page1.minDuration")}
-              required
-              onChange={(selection: (typeof durationOptions)[0]): void => {
-                field.onChange(selection.value);
-              }}
-              invalid={errors.applicationSections?.[index]?.minDuration != null}
-              error={getTranslatedError("minDuration")}
-            />
-          )}
+          options={durationOptions}
+          label={t("application:Page1.minDuration")}
+          required
+          error={getTranslatedError("minDuration")}
         />
-        {/* TODO should use ControlledSelect */}
-        <Controller
+        <ControlledSelect
           control={control}
           name={`applicationSections.${index}.maxDuration`}
-          rules={{ required: true }}
-          render={({ field }) => (
-            <Select
-              id={field.name}
-              value={
-                durationOptions.find((x) => x.value === field.value) ?? null
-              }
-              placeholder={t("common:select")}
-              options={durationOptions}
-              label={t("application:Page1.maxDuration")}
-              required
-              onChange={(selection: (typeof durationOptions)[0]): void => {
-                field.onChange(selection.value);
-              }}
-              invalid={errors.applicationSections?.[index]?.maxDuration != null}
-              error={getTranslatedError("maxDuration")}
-            />
-          )}
+          placeholder={t("common:select")}
+          options={durationOptions}
+          label={t("application:Page1.maxDuration")}
+          required
+          error={getTranslatedError("maxDuration")}
         />
         <NumberInput
           id={`applicationSections.${index}.appliedReservationsPerWeek`}
@@ -410,35 +280,33 @@ function ApplicationEventInner({
           }
           errorText={getTranslatedError("appliedReservationsPerWeek")}
         />
-      </PeriodContainer>
+      </AutoGrid>
       <ApplicationEventSummary
         applicationSection={getValues(`applicationSections.${index}`)}
         name={watch(`applicationSections.${index}.name`) ?? ""}
       />
-      <ActionContainer>
-        <Button
-          type="button"
-          variant="secondary"
-          id={`applicationSections[${index}].delete`}
-          onClick={() => setIsWaitingForDelete(true)}
-        >
-          {t("application:Page1.deleteEvent")}
-        </Button>
-        {isWaitingForDelete && (
-          <ConfirmationDialog
-            id="application-event-confirmation"
-            isOpen
-            acceptLabel={t("application:Page1.deleteEvent")}
-            cancelLabel={t("application:Page1.deleteEventCancel")}
-            heading={t("application:Page1.deleteEventHeading")}
-            content={t("application:Page1.deleteEventContent")}
-            onAccept={del}
-            onCancel={() => setIsWaitingForDelete(false)}
-            variant="danger"
-          />
-        )}
-      </ActionContainer>
-    </>
+      <Button
+        variant="secondary"
+        size="small"
+        id={`applicationSections[${index}].delete`}
+        onClick={() => setIsWaitingForDelete(true)}
+      >
+        {t("application:Page1.deleteEvent")}
+      </Button>
+      {isWaitingForDelete && (
+        <ConfirmationDialog
+          id="application-event-confirmation"
+          isOpen
+          acceptLabel={t("application:Page1.deleteEvent")}
+          cancelLabel={t("application:Page1.deleteEventCancel")}
+          heading={t("application:Page1.deleteEventHeading")}
+          content={t("application:Page1.deleteEventContent")}
+          onAccept={del}
+          onCancel={() => setIsWaitingForDelete(false)}
+          variant="danger"
+        />
+      )}
+    </Flex>
   );
 }
 
@@ -462,18 +330,16 @@ export function ApplicationEvent(props: Props): JSX.Element {
   const hasErrors = errors.applicationSections?.[index] != null;
 
   return (
-    <Wrapper>
-      <Accordion
-        onToggle={onToggleAccordion}
-        open={isVisible || hasErrors}
-        heading={eventName || t("application:Page1.applicationEventName")}
-        theme="thin"
-      >
-        {/* Accordion doesn't remove from DOM on hide, but this is too slow if it's visible */}
-        {shouldRenderInner && (
-          <ApplicationEventInner {...props} del={onDeleteEvent} />
-        )}
-      </Accordion>
-    </Wrapper>
+    <Accordion
+      onToggle={onToggleAccordion}
+      open={isVisible || hasErrors}
+      heading={eventName || t("application:Page1.applicationEventName")}
+      theme="thin"
+    >
+      {/* Accordion doesn't remove from DOM on hide, but this is too slow if it's visible */}
+      {shouldRenderInner && (
+        <ApplicationEventInner {...props} del={onDeleteEvent} />
+      )}
+    </Accordion>
   );
 }

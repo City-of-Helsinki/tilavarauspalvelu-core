@@ -109,12 +109,10 @@ export function Images({ images, contextName }: Props): JSX.Element {
         ))}
       </Carousel>
       <Modal
-        handleClose={() => {
-          setShowModal(false);
-        }}
+        handleClose={() => setShowModal(false)}
         show={showModal}
-        closeButtonKey="common:close"
-        showControlButtons={false}
+        // TODO should calculate max width based on image size
+        maxWidth="576px"
       >
         <ModalContent>
           {currentImage ? (

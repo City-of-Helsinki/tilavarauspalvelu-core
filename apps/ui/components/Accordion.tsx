@@ -6,7 +6,8 @@ import { H4 } from "common/src/common/typography";
 type Theme = "default" | "thin";
 
 type Props = {
-  heading?: string;
+  heading: string;
+  headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
   open?: boolean;
   children: React.ReactNode;
   onToggle?: () => void;
@@ -81,10 +82,9 @@ const Content = styled.div<{ $open: boolean }>`
   display: ${({ $open }) => ($open ? "block" : "none")};
 `;
 
-const Heading = styled(H4).attrs({ as: "div" })``;
-
 export function Accordion({
   heading,
+  headingLevel = 2,
   open = false,
   children,
   onToggle,
@@ -121,7 +121,7 @@ export function Accordion({
         onClick={onToggle}
         theme={theme}
       >
-        <Heading>{heading}</Heading>
+        <H4 as={`h${headingLevel}`}>{heading}</H4>
       </HeadingButton>
       <Content $open={isOpen}>{children}</Content>
     </AccordionElement>

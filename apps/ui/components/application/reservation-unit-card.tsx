@@ -167,7 +167,8 @@ const ErrorNotification = styled(Notification).attrs({
   --fontsize-heading-xs: var(--fontsize-body-s);
 `;
 
-function ReservationUnitCard({
+/// Custom card for selecting reservation units for application
+export function ReservationUnitCard({
   reservationUnit,
   order,
   onDelete,
@@ -251,5 +252,3 @@ function ReservationUnitCard({
     </NameCardContainer>
   );
 }
-
-export default ReservationUnitCard;

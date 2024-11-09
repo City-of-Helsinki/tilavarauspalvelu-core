@@ -433,7 +433,7 @@ function Page2({ application, onNext }: Props): JSX.Element {
             open={index === 0}
             key={event.pk ?? "NEW"}
             id={`timeSelector-${index}`}
-            heading={event.name || undefined}
+            heading={event.name ?? ""}
             theme="thin"
           >
             <StyledNotification
