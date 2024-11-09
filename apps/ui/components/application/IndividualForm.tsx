@@ -2,12 +2,12 @@ import React from "react";
 import { TextInput } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
-import { TwoColumnContainer } from "common/src/reservation-form/styles";
 import { applicationErrorText } from "@/modules/util";
-import { FormSubHeading, SpanTwoColumns } from "../common/common";
 import { EmailInput } from "./EmailInput";
 import { BillingAddress } from "./BillingAddress";
 import type { ApplicationFormPage3Values } from "./Form";
+import { FormSubHeading, SpanTwoColumns } from "./styled";
+import { AutoGrid } from "common/styles/util";
 
 const IndividualForm = (): JSX.Element => {
   const { t } = useTranslation();
@@ -18,7 +18,7 @@ const IndividualForm = (): JSX.Element => {
   } = useFormContext<ApplicationFormPage3Values>();
 
   return (
-    <TwoColumnContainer>
+    <AutoGrid>
       <FormSubHeading as="h2">
         {t("application:Page3.subHeading.basicInfo")}
       </FormSubHeading>
@@ -95,7 +95,7 @@ const IndividualForm = (): JSX.Element => {
         />
       </SpanTwoColumns>
       <EmailInput />
-    </TwoColumnContainer>
+    </AutoGrid>
   );
 };
 

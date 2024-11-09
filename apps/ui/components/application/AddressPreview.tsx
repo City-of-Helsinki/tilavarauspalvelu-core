@@ -1,8 +1,7 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import type { AddressNode } from "@gql/gql-types";
-import { SpanTwoColumns } from "../common/common";
-import { StyledLabelValue } from "./styled";
+import { SpanTwoColumns, StyledLabelValue } from "./styled";
 
 function Address({
   address,

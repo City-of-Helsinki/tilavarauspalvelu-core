@@ -1,10 +1,6 @@
 import styled from "styled-components";
 import { type TFunction, useTranslation } from "next-i18next";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
-import {
-  Subheading,
-  TwoColumnContainer,
-} from "common/src/reservation-form/styles";
 import { capitalize } from "@/modules/util";
 import {
   CustomerTypeChoice,
@@ -12,6 +8,8 @@ import {
   type ReservationQuery,
 } from "@/gql/gql-types";
 import { type FieldName, containsField } from "common/src/metaFieldsHelpers";
+import { AutoGrid } from "common/styles/util";
+import { H4 } from "common";
 
 type OptionType = {
   label: string;
@@ -32,15 +30,17 @@ const ParagraphAlt = styled.div<{ $isWide?: boolean }>`
   }
 `;
 
-const PreviewLabel = styled.span`
-  display: block;
+const PreviewLabel = styled.div`
   color: var(--color-black-70);
   padding-bottom: var(--spacing-2-xs);
 `;
 
-const PreviewValue = styled.span`
-  display: block;
+const PreviewValue = styled.div`
   font-size: var(--fontsize-body-l);
+`;
+
+const Container = styled(AutoGrid)`
+  margin-bottom: var(--spacing-2-xl);
 `;
 
 function isNotEmpty(
@@ -155,8 +155,8 @@ export function ApplicationFields({
 
   return (
     <>
-      <Subheading>{t("reservationCalendar:reserverInfo")}</Subheading>
-      <TwoColumnContainer style={{ marginBottom: "var(--spacing-2-xl)" }}>
+      <H4 as="h2">{t("reservationCalendar:reserverInfo")}</H4>
+      <Container>
         <>
           {hasReserveeType && (
             <ParagraphAlt $isWide>
@@ -188,7 +188,7 @@ export function ApplicationFields({
             );
           })}
         </>
-      </TwoColumnContainer>
+      </Container>
     </>
   );
 }
@@ -215,8 +215,8 @@ export function GeneralFields({
 
   return (
     <>
-      <Subheading>{t("reservationCalendar:reservationInfo")} </Subheading>
-      <TwoColumnContainer style={{ marginBottom: "var(--spacing-2-xl)" }}>
+      <H4 as="h2">{t("reservationCalendar:reservationInfo")}</H4>
+      <Container>
         <>
           {filteredGeneralFields.map((key) => {
             const value = convertMaybeOptionValue(key, reservation, options, t);
@@ -236,7 +236,7 @@ export function GeneralFields({
             );
           })}
         </>
-      </TwoColumnContainer>
+      </Container>
     </>
   );
 }

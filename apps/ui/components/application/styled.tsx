@@ -4,6 +4,8 @@ import LabelValue from "../common/LabelValue";
 import TermsBox from "common/src/termsbox/TermsBox";
 import { breakpoints, fontMedium, fontRegular } from "common";
 import { AccordionWithState } from "@/components/Accordion";
+import { H5 } from "common/src/common/typography";
+import { FullRow } from "common/styles/util";
 
 export const CheckboxContainer = styled.div`
   margin-top: var(--spacing-m);
@@ -184,4 +186,11 @@ export const CompactTermsBox = styled(TermsBox)`
 // TODO this isn't thought through (naming wise, use cases etc.)
 export const FontMedium = styled.div`
   ${fontMedium}
+`;
+
+export const SpanTwoColumns = styled(FullRow).attrs({ as: "span" })``;
+
+export const FormSubHeading = styled(H5)`
+  margin: var(--spacing-m) 0 0 0;
+  grid-column: 1 / -1;
 `;

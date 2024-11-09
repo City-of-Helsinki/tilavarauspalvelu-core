@@ -10,10 +10,7 @@ import {
   fromApiDate as fromAPIDate,
   fromUIDate,
 } from "common/src/common/util";
-import type {
-  ImageFragment,
-  LocationFieldsI18nFragment,
-} from "@gql/gql-types";
+import type { ImageFragment, LocationFieldsI18nFragment } from "@gql/gql-types";
 import { isBrowser } from "./const";
 import { type LocalizationLanguages } from "common/src/helpers";
 

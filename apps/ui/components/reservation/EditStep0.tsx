@@ -34,10 +34,10 @@ import { ReservationTimePicker } from "./ReservationTimePicker";
 import { QuickReservation } from "../reservation-unit/QuickReservation";
 import { getNextAvailableTime } from "../reservation-unit/utils";
 import { ReservationInfoCard } from "./ReservationInfoCard";
-import { Subheading } from "common/src/reservation-form/styles";
 import Sanitize from "@/components/common/Sanitize";
 import { type RoundPeriod } from "@/modules/reservable";
 import { PinkBox as PinkBoxBase } from "./styles";
+import { H4 } from "common";
 
 type ReservationUnitNodeT = NonNullable<
   ReservationUnitPageQuery["reservationUnit"]
@@ -221,7 +221,7 @@ export function EditStep0({
       {/* TODO on mobile in the design this is after the calendar but before action buttons */}
       {termsOfUse !== "" && (
         <PinkBox>
-          <Subheading>{t("reservations:reservationInfoBoxHeading")}</Subheading>
+          <H4 as="h2">{t("reservations:reservationInfoBoxHeading")}</H4>
           <Sanitize html={termsOfUse} />
         </PinkBox>
       )}

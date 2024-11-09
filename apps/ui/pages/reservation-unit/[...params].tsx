@@ -8,7 +8,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { breakpoints } from "common/src/common/style";
-import { H1 } from "common/src/common/typography";
+import { H1, H4 } from "common/src/common/typography";
 import {
   CustomerTypeChoice,
   useConfirmReservationMutation,
@@ -24,7 +24,6 @@ import {
   ReservationStateChoice,
 } from "@gql/gql-types";
 import { type Inputs } from "common/src/reservation-form/types";
-import { Subheading } from "common/src/reservation-form/styles";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getReservationPath, getReservationUnitPath } from "@/modules/urls";
 import Sanitize from "@/components/common/Sanitize";
@@ -382,9 +381,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
         />
         {termsOfUse && (
           <PinkBox>
-            <Subheading>
-              {t("reservations:reservationInfoBoxHeading")}
-            </Subheading>
+            <H4 as="h2">{t("reservations:reservationInfoBoxHeading")}</H4>
             <Sanitize html={termsOfUse} />
           </PinkBox>
         )}

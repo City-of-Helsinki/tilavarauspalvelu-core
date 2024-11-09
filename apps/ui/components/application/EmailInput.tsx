@@ -3,8 +3,8 @@ import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
 import { Notification, TextInput } from "hds-react";
 import { applicationErrorText } from "@/modules/util";
-import { SpanTwoColumns } from "../common/common";
 import type { ApplicationFormPage3Values } from "./Form";
+import { SpanTwoColumns } from "./styled";
 
 const EmailInput = () => {
   const { t } = useTranslation();

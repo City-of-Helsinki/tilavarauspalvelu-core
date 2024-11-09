@@ -3,14 +3,14 @@ import { TextInput, Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
 import { CheckboxWrapper } from "common/src/reservation-form/components";
-import { TwoColumnContainer } from "common/src/reservation-form/styles";
 import { applicationErrorText } from "@/modules/util";
-import { FormSubHeading } from "../common/common";
+import { FormSubHeading } from "./styled";
 import { EmailInput } from "./EmailInput";
 import { BillingAddress } from "./BillingAddress";
 import { ApplicationFormPage3Values } from "./Form";
+import { AutoGrid } from "common/styles/util";
 
-const CompanyForm = (): JSX.Element => {
+export const CompanyForm = (): JSX.Element => {
   const { t } = useTranslation();
 
   const {
@@ -23,7 +23,7 @@ const CompanyForm = (): JSX.Element => {
   const hasBillingAddress = watch("hasBillingAddress");
 
   return (
-    <TwoColumnContainer>
+    <AutoGrid>
       <FormSubHeading>
         {t("application:Page3.subHeading.basicInfo")}
       </FormSubHeading>
@@ -200,8 +200,6 @@ const CompanyForm = (): JSX.Element => {
         )}
       />
       <EmailInput />
-    </TwoColumnContainer>
+    </AutoGrid>
   );
 };
-
-export { CompanyForm };

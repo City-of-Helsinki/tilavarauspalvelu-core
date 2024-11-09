@@ -54,10 +54,9 @@ const Wrapper = styled.div`
   padding: var(--spacing-m);
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--spacing-l);
-  background: var(--color-white);
+  gap: var(--spacing-m);
 
-  @media (min-width: ${breakpoints.m}) {
+  @media (min-width: ${breakpoints.s}) {
     grid-template-columns: 1fr 1fr;
   }
 `;
@@ -66,7 +65,6 @@ const Heading = styled(H4).attrs({
   as: "div",
 })`
   ${fontBold};
-  font-size: var(--fontsize-heading-s);
   margin-top: 0;
 `;
 

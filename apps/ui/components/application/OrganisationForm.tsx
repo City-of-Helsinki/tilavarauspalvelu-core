@@ -8,11 +8,11 @@ import { breakpoints } from "common/src/common/style";
 import { CheckboxWrapper } from "common/src/reservation-form/components";
 import { ApplicantTypeChoice } from "@gql/gql-types";
 import { applicationErrorText } from "@/modules/util";
-import { FormSubHeading } from "../common/common";
 import { EmailInput } from "./EmailInput";
 import { BillingAddress } from "./BillingAddress";
 import type { ApplicationFormPage3Values } from "./Form";
-import { TwoColumnContainer } from "common/src/reservation-form/styles";
+import { AutoGrid } from "common/styles/util";
+import { FormSubHeading } from "./styled";
 
 const Placeholder = styled.span`
   @media (max-width: ${breakpoints.m}) {
@@ -24,7 +24,9 @@ type Props = {
   homeCityOptions: OptionType[];
 };
 
-const OrganisationForm = ({ homeCityOptions }: Props): JSX.Element | null => {
+export const OrganisationForm = ({
+  homeCityOptions,
+}: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
   const {
@@ -49,7 +51,7 @@ const OrganisationForm = ({ homeCityOptions }: Props): JSX.Element | null => {
   }, [hasRegistration, register, unregister]);
 
   return (
-    <TwoColumnContainer>
+    <AutoGrid>
       <FormSubHeading>
         {t("application:Page3.subHeading.basicInfo")}
       </FormSubHeading>
@@ -256,8 +258,6 @@ const OrganisationForm = ({ homeCityOptions }: Props): JSX.Element | null => {
         )}
       />
       <EmailInput />
-    </TwoColumnContainer>
+    </AutoGrid>
   );
 };
-
-export { OrganisationForm };

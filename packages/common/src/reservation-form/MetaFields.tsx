@@ -18,12 +18,12 @@ import { CustomerTypeChoice, MetadataSetsFragment } from "../../gql/gql-types";
 import ReservationFormField from "./ReservationFormField";
 import { Inputs, Reservation } from "./types";
 import RadioButtonWithImage from "./RadioButtonWithImage";
-import { fontMedium, fontRegular } from "../common/typography";
+import { fontMedium, fontRegular, H4, H5 } from "../common/typography";
 import type { OptionType } from "../../types/common";
-import { GroupHeading, Subheading, TwoColumnContainer } from "./styles";
 import IconPremises from "../icons/IconPremises";
 import { containsField } from "../metaFieldsHelpers";
 import { filterNonNullable } from "../helpers";
+import { AutoGrid } from "../../styles/util";
 
 type CommonProps = {
   options: Record<string, OptionType[]>;
@@ -38,6 +38,13 @@ type Props = CommonProps & {
   generalFields: Field[];
   reservationApplicationFields: Field[];
 };
+
+const Subheading = styled(H4).attrs({ as: "h2" })``;
+
+const GroupHeading = styled(H5)`
+  grid-column: 1 / -1;
+  margin-bottom: 0;
+`;
 
 const Container = styled.div`
   margin-bottom: var(--spacing-m);
@@ -76,7 +83,7 @@ const ReserverInfoHeading = styled(Subheading)`
   margin: "var(--spacing-layout-m) 0 var(--spacing-xs)";
 `;
 
-const ReservationApplicationFieldsContainer = styled(TwoColumnContainer)`
+const ReservationApplicationFieldsContainer = styled(AutoGrid)`
   margin: "var(--spacing-layout-m) 0 var(--spacing-layout-m)";
 `;
 
@@ -226,7 +233,7 @@ export function ReservationMetaFields({
       <InfoHeading $zeroMargin={noHeadingMarginal}>
         {t("reservationCalendar:reservationInfo")}
       </InfoHeading>
-      <TwoColumnContainer>
+      <AutoGrid>
         <ReservationFormFields
           options={options}
           fields={fields}
@@ -248,7 +255,7 @@ export function ReservationMetaFields({
           }}
           data={data}
         />
-      </TwoColumnContainer>
+      </AutoGrid>
     </>
   );
 }
