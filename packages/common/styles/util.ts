@@ -105,6 +105,11 @@ export const ButtonContainer = styled.div<{
   width: 100%;
   margin-bottom: ${({ $noMargin }) => ($noMargin ? "0" : "var(--spacing-s);")};
   justify-content: ${({ $justify }) => $justify ?? "flex-end"};
+
+  @media (max-width: ${breakpoints.s}) {
+    flex-direction: column;
+    gap: var(--spacing-s);
+  }
 `;
 
 export const CenterSpinner = styled(LoadingSpinner)`

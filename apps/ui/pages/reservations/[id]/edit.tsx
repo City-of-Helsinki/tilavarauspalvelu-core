@@ -162,9 +162,7 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
         <HeadingSection>
           <H1>{t(title)}</H1>
         </HeadingSection>
-        <div style={{ gridColumn: "1 / -1" }}>
-          <NotModifiableReason reservation={reservation} />
-        </div>
+        <NotModifiableReason reservation={reservation} />
       </>
     );
   }

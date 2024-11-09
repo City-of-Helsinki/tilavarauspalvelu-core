@@ -1,17 +1,8 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import router from "next/router";
-import { Controller, useForm } from "react-hook-form";
-import {
-  Button,
-  IconArrowRight,
-  IconCross,
-  IconSignout,
-  Select,
-} from "hds-react";
+import { useForm } from "react-hook-form";
+import { Button, IconArrowRight, IconCross, IconSignout } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { OptionType } from "common/types/common";
-import { breakpoints } from "common/src/common/style";
 import NotificationBox from "common/src/common/NotificationBox";
 import { fontMedium, H1 } from "common/src/common/typography";
 import {
@@ -21,9 +12,8 @@ import {
 } from "@gql/gql-types";
 import { IconButton, ShowAllContainer } from "common/src/components";
 import Sanitize from "../common/Sanitize";
-import { getSelectedOption, getTranslation } from "@/modules/util";
+import { getTranslation } from "@/modules/util";
 import { ReservationInfoCard } from "./ReservationInfoCard";
-import { Paragraph } from "./styles";
 import { signOut } from "common/src/browserHelpers";
 import { ReservationPageWrapper } from "../reservations/styles";
 import {
@@ -31,6 +21,10 @@ import {
   getTranslationSafe,
 } from "common/src/common/util";
 import { errorToast } from "common/src/common/toast";
+import { ControlledSelect } from "common/src/components/form";
+import { AutoGrid, ButtonContainer, Flex } from "common/styles/util";
+import { ButtonLikeLink } from "../common/ButtonLikeLink";
+import { getReservationPath } from "@/modules/urls";
 
 type CancelReasonsQ = NonNullable<
   ReservationCancelReasonsQuery["reservationCancelReasons"]
@@ -52,44 +46,22 @@ const TermsContainer = styled(ShowAllContainer)`
   }
 `;
 
-const Actions = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-m);
-  margin-top: var(--spacing-xl);
-  justify-content: space-between;
-
-  @media (min-width: ${breakpoints.s}) {
-    flex-direction: row;
-
-    button {
-      max-width: 300px;
-    }
-  }
+const Actions = styled(ButtonContainer).attrs({
+  $justify: "space-between",
+})`
+  grid-column: 1 / -1;
 `;
 
 const Form = styled.form`
-  margin-top: var(--spacing-m);
-
   label {
     ${fontMedium};
   }
 `;
 
-const StyledSelect = styled(Select<OptionType>)`
-  margin-bottom: var(--spacing-l);
-
-  @media (min-width: ${breakpoints.l}) {
-    width: 50%;
-  }
-`;
-
-const ReturnLinkContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  margin-top: var(--spacing-3-xl);
-`;
+const ReturnLinkContainer = styled(Flex).attrs({
+  $gap: "none",
+  $alig: "flex-start",
+})``;
 
 function ReturnLinkList({ apiBaseUrl }: { apiBaseUrl: string }): JSX.Element {
   const { t } = useTranslation();
@@ -114,12 +86,17 @@ function ReturnLinkList({ apiBaseUrl }: { apiBaseUrl: string }): JSX.Element {
   );
 }
 
+type FormValues = {
+  reason: number;
+  description?: string;
+};
+
 // TODO there is also pages/reservation/cancel.tsx (what is that?)
 export function ReservationCancellation(props: Props): JSX.Element {
   const { t, i18n } = useTranslation();
   const { apiBaseUrl } = props;
 
-  const [formState, setFormState] = useState<"unsent" | "sent">("unsent");
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const lang = convertLanguageCode(i18n.language);
   const reasons = props.reasons.map((node) => ({
@@ -129,8 +106,8 @@ export function ReservationCancellation(props: Props): JSX.Element {
 
   const [cancelReservation, { loading }] = useCancelReservationMutation();
 
-  const { register, handleSubmit, getValues, setValue, watch, control } =
-    useForm();
+  const form = useForm<FormValues>();
+  const { register, handleSubmit, watch, control } = form;
 
   useEffect(() => {
     register("reason", { required: true });
@@ -148,7 +125,7 @@ export function ReservationCancellation(props: Props): JSX.Element {
       )
     : null;
 
-  const onSubmit = (formData: { reason?: number; description?: string }) => {
+  const onSubmit = (formData: FormValues) => {
     if (!reservation.pk || !formData.reason) {
       return;
     }
@@ -163,8 +140,8 @@ export function ReservationCancellation(props: Props): JSX.Element {
           },
         },
       });
-      setFormState("sent");
-      // TODO Why?
+      // TODO redirect to a success page (or back to the reservation page with a toast is preferable)
+      setIsSuccess(true);
       window.scrollTo(0, 0);
     } catch (e) {
       errorToast({
@@ -173,19 +150,19 @@ export function ReservationCancellation(props: Props): JSX.Element {
     }
   };
 
-  const title =
-    formState === "unsent"
-      ? t("reservations:cancelReservation")
-      : t("reservations:reservationCancelledTitle");
-  const ingress =
-    formState === "unsent"
-      ? t("reservations:cancelReservationBody")
-      : t("reservations:reservationCancelledBody");
+  const title = !isSuccess
+    ? t("reservations:cancelReservation")
+    : t("reservations:reservationCancelledTitle");
+  const ingress = !isSuccess
+    ? t("reservations:cancelReservationBody")
+    : t("reservations:reservationCancelledBody");
 
   const cancellationTerms =
     reservationUnit?.cancellationTerms != null
       ? getTranslation(reservationUnit?.cancellationTerms, "text")
       : null;
+
+  // TODO check that the reservation hasn't been cancelled already
 
   return (
     <ReservationPageWrapper>
@@ -198,8 +175,8 @@ export function ReservationCancellation(props: Props): JSX.Element {
         type="confirmed"
         style={{ gridRowEnd: "span 4" }}
       />
-      <div>
-        {formState === "unsent" ? (
+      <Flex style={{ gridRow: "2 / -1" }}>
+        {!isSuccess ? (
           <>
             <p>{t("reservations:cancelInfoBody")}</p>
             <TermsContainer
@@ -215,56 +192,42 @@ export function ReservationCancellation(props: Props): JSX.Element {
               )}
             </TermsContainer>
             <Form onSubmit={handleSubmit(onSubmit)}>
-              <Controller
-                name="reason"
-                control={control}
-                render={() => (
-                  <StyledSelect
-                    id="reservation__button--cancel-reason"
-                    label={t("reservations:cancelReason")}
-                    onChange={(val: OptionType) => {
-                      setValue("reason", val.value);
-                    }}
-                    options={[...reasons]}
-                    placeholder={t("common:select")}
-                    value={getSelectedOption(getValues("reason"), reasons)}
-                    required
-                  />
-                )}
-              />
-              <Actions>
-                <Button
-                  variant="secondary"
-                  iconLeft={<IconCross aria-hidden />}
-                  // TODO this should be a link up the hierarchy (not history back)
-                  onClick={() => router.back()}
-                  data-testid="reservation-cancel__button--back"
-                >
-                  {t("reservations:cancelReservationCancellation")}
-                </Button>
-                <Button
-                  variant="primary"
-                  type="submit"
-                  disabled={!watch("reason")}
-                  data-testid="reservation-cancel__button--cancel"
-                  isLoading={loading}
-                >
-                  {t("reservations:cancelReservation")}
-                </Button>
-              </Actions>
+              <AutoGrid>
+                <ControlledSelect
+                  name="reason"
+                  control={control}
+                  label={t("reservations:cancelReason")}
+                  options={reasons}
+                  required
+                />
+                <Actions>
+                  <ButtonLikeLink
+                    data-testid="reservation-cancel__button--back"
+                    href={getReservationPath(reservation.pk)}
+                  >
+                    <IconCross aria-hidden="true" />
+                    {t("reservations:cancelReservationCancellation")}
+                  </ButtonLikeLink>
+                  <Button
+                    variant="primary"
+                    type="submit"
+                    disabled={!watch("reason")}
+                    data-testid="reservation-cancel__button--cancel"
+                    isLoading={loading}
+                  >
+                    {t("reservations:cancelReservation")}
+                  </Button>
+                </Actions>
+              </AutoGrid>
             </Form>
           </>
         ) : (
           <>
-            {formState === "sent" && instructions && (
-              <Paragraph style={{ margin: "var(--spacing-xl) 0" }}>
-                {instructions}
-              </Paragraph>
-            )}
+            {isSuccess && instructions && <p>{instructions}</p>}
             <ReturnLinkList apiBaseUrl={apiBaseUrl} />
           </>
         )}
-      </div>
+      </Flex>
     </ReservationPageWrapper>
   );
 }

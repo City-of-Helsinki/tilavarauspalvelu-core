@@ -3,18 +3,16 @@ import {
   getWhyReservationCantBeChanged,
   isReservationCancellable,
 } from "@/modules/reservation";
+import { Flex } from "common/styles/util";
 import { useTranslation } from "next-i18next";
 import React from "react";
 import styled from "styled-components";
 
-const Reasons = styled.div`
+const Reasons = styled(Flex)`
   &:empty {
     display: none;
   }
 
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-m);
   margin-top: var(--spacing-m);
   margin-bottom: var(--spacing-m);
 `;

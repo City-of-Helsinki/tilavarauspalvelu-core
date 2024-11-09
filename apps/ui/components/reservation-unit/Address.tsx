@@ -12,6 +12,7 @@ import { IconLinkExternal } from "hds-react";
 import { IconButton } from "common/src/components";
 import { mapUrlPrefix } from "@/modules/const";
 import { getTranslation } from "@/modules/util";
+import { Flex } from "common/styles/util";
 
 type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
 type NodeT = Pick<QueryT, "unit">;
@@ -19,26 +20,18 @@ type Props = {
   reservationUnit: NodeT;
 };
 
-const Container = styled.div`
-  margin: var(--spacing-xs) 0;
-`;
-
-const Name = styled(H4).attrs({ as: "h3" })``;
-
 const AddressSpan = styled.span`
   font-size: var(--fontsize-body-l);
 `;
 
-const Links = styled.div`
+const Links = styled(Flex).attrs({
+  $gap: "xs",
+})`
   margin-top: var(--spacing-m);
   font-family: var(--font-medium);
   font-weight: 500;
 
-  display: flex;
-  flex-direction: column;
-
   /* IconButton includes too much padding */
-  gap: var(--spacing-xs);
   && > * > * {
     margin: 0;
   }
@@ -130,8 +123,8 @@ export function AddressSection({ reservationUnit }: Props): JSX.Element {
   );
 
   return (
-    <Container data-testid="reservation-unit__address--container">
-      <Name>{getTranslation(reservationUnit, "name")}</Name>
+    <div data-testid="reservation-unit__address--container">
+      <H4 as="h3">{getTranslation(reservationUnit, "name")}</H4>
       {addressStreet && <AddressSpan>{addressStreet}</AddressSpan>}
       {location?.addressZip && addressCity && (
         <AddressSpan>{`, ${location?.addressZip} ${addressCity}`}</AddressSpan>
@@ -158,6 +151,6 @@ export function AddressSection({ reservationUnit }: Props): JSX.Element {
           icon={<IconLinkExternal aria-hidden />}
         />
       </Links>
-    </Container>
+    </div>
   );
 }
