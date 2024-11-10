@@ -2,7 +2,6 @@ import { isSameDay, parseISO } from "date-fns";
 import { i18n, TFunction } from "next-i18next";
 import { trim } from "lodash";
 import type { ApolloError } from "@apollo/client";
-import type { OptionType } from "common";
 import {
   toApiDate,
   toUIDate,
@@ -92,35 +91,6 @@ function getLabel(
 }
 
 export { getLabel as getParameterLabel };
-
-export const getSelectedOption = (
-  selectedId: number | string | null,
-  options: OptionType[]
-): OptionType | null => {
-  const selected = String(selectedId);
-  const option = options.find((o) => String(o.value) === selected);
-  return option ?? null;
-};
-
-export const getComboboxValues = (
-  value: string,
-  options: OptionType[]
-): OptionType[] => {
-  if (value.length === 0) {
-    return [];
-  }
-  if (value.includes(",")) {
-    return value
-      .split(",")
-      .map((unit) => getSelectedOption(unit, options))
-      .filter((x): x is OptionType => x != null);
-  }
-  const val = getSelectedOption(value, options);
-  if (val) {
-    return [val];
-  }
-  return [];
-};
 
 const imagePriority = ["main", "map", "ground_plan", "other"].map((n) =>
   n.toUpperCase()

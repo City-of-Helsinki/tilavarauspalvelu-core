@@ -21,7 +21,6 @@ import {
 import { ControlledDateInput } from "common/src/components/form";
 import { type PendingReservationFormType } from "@/components/reservation-unit/schema";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
-import { getSelectedOption } from "@/modules/util";
 import { type FocusTimeSlot } from "@/modules/reservation";
 import { Flex } from "common/styles/util";
 
@@ -210,7 +209,7 @@ export function QuickReservation({
           reservationForm={reservationForm}
           nextAvailableTime={nextAvailableTime}
           durationString={
-            getSelectedOption(duration, durationOptions)?.label.trim() ?? ""
+            durationOptions.find((opt) => opt.value === duration)?.label ?? ""
           }
         />
       </div>

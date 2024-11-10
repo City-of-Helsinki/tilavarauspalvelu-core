@@ -13,11 +13,7 @@ import {
 import { breakpoints } from "common/src/common/style";
 import type { ReservationUnitPageQuery } from "@gql/gql-types";
 import { getReservationUnitPrice } from "@/modules/reservationUnit";
-import {
-  capitalize,
-  formatDateTimeRange,
-  getSelectedOption,
-} from "@/modules/util";
+import { capitalize, formatDateTimeRange } from "@/modules/util";
 import {
   useController,
   type Control,
@@ -301,7 +297,8 @@ function ControlledToggler({
     const dateStr = capitalize(
       formatDateTimeRange(t, focusSlot.start, focusSlot.end)
     );
-    const durationStr = getSelectedOption(duration, durationOptions)?.label;
+    const selected = durationOptions.find((opt) => opt.value === duration);
+    const durationStr = selected?.label ?? "";
 
     return `${dateStr}, ${durationStr}`;
   })();

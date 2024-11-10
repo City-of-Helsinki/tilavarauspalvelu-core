@@ -1,9 +1,5 @@
 import { ApolloError } from "@apollo/client";
-import {
-  getComboboxValues,
-  getReadableList,
-  printErrorMessages,
-} from "../util";
+import { getReadableList, printErrorMessages } from "../util";
 
 jest.mock("next-i18next", () => ({
   i18n: {
@@ -13,23 +9,6 @@ jest.mock("next-i18next", () => ({
     },
   },
 }));
-
-test("getComboboxValues", () => {
-  const optionsAbc = [
-    { label: "a", value: "a" },
-    { label: "b", value: "b" },
-    { label: "c", value: "c" },
-  ];
-
-  expect(getComboboxValues("b,c", optionsAbc)).toEqual([
-    { label: "b", value: "b" },
-    { label: "c", value: "c" },
-  ]);
-
-  expect(getComboboxValues("", optionsAbc)).toEqual([]);
-  expect(getComboboxValues("b,c", [])).toEqual([]);
-  expect(getComboboxValues("", [])).toEqual([]);
-});
 
 test("getReadableList", () => {
   expect(getReadableList(["a"])).toEqual("a");
