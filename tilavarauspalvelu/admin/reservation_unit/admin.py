@@ -238,7 +238,7 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
         else:
             # Filehandler needs to be left open for Django to be able to stream the file
             # Should fix the exporter to use an in-memory stream instead of writing to a file.
-            return FileResponse(open(path, "rb"))  # noqa: SIM115
+            return FileResponse(open(path, "rb"))
 
     def save_model(self, request, obj, form, change) -> None:
         super().save_model(request, obj, form, change)
