@@ -7,7 +7,7 @@ import {
 } from "@gql/gql-types";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import type { GetServerSidePropsContext } from "next";
-import { Trans, useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next";
 import { ReservationInfoCard } from "@/components/reservation/ReservationInfoCard";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { base64encode } from "common/src/helpers";
@@ -87,27 +87,22 @@ function ReservationConfirmation({
     : "reservationSuccessful";
   const title = t(`reservationUnit:${titleKey}`);
 
+  const confirmPostfix = requiresHandling ? "Handling" : "";
+  const confirmationText = t(
+    `reservationUnit:reservationReminderText${confirmPostfix}`
+  );
   return (
     <Wrapper>
-      <H1 $noMargin>{title}</H1>
-      <p>
-        <Trans
-          i18nKey={`reservationUnit:reservationReminderText${
-            requiresHandling ? "Handling" : ""
-          }`}
-          t={t}
-          components={{
-            br: <br />,
-            lnk: (
-              <InlineStyledLink href={reservationsPath}>
-                Omat varaukset -sivulta
-              </InlineStyledLink>
-            ),
-          }}
-        >
-          {" "}
-        </Trans>
-      </p>
+      <div>
+        <H1 $noMargin>{title}</H1>
+        <p>{confirmationText}</p>
+        <p>
+          {t("reservationUnit:findYourReservations")}{" "}
+          <InlineStyledLink href={reservationsPath}>
+            {t("reservationUnit:myReservationsLink")}
+          </InlineStyledLink>
+        </p>
+      </div>
       <Actions reservation={reservation} />
       <Instructions reservation={reservation} />
       <BackLinkList
