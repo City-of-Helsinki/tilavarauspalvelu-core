@@ -260,7 +260,6 @@ const TagContainer = styled.div`
   grid-row: 1;
   order: -1;
   justify-content: flex-start;
-  margin: 0 var(--spacing-2-xs);
 
   /* display the tags on top of the image */
   .card--with-image & {
@@ -272,7 +271,7 @@ const TagContainer = styled.div`
       grid-column: 2;
       align-items: flex-start;
       justify-content: flex-end;
-      margin-top: unset;
+      margin-top: 0;
     }
   }
 `;

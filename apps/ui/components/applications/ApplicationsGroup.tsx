@@ -37,6 +37,11 @@ function ApplicationsGroup({
   if (roundPk == null) {
     return null;
   }
+  applications.sort((a, b) => {
+    return (
+      new Date(a.sentDate ?? 0).getTime() - new Date(b.sentDate ?? 0).getTime()
+    );
+  });
 
   return (
     <Wrapper data-testid="applications__group--wrapper">

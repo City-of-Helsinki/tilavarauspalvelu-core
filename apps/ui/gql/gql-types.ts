@@ -5584,6 +5584,7 @@ export type ApplicationsQuery = {
         pk?: number | null;
         status?: ApplicationStatusChoice | null;
         lastModifiedDate: string;
+        sentDate?: string | null;
         applicantType?: ApplicantTypeChoice | null;
         applicationRound: {
           pk?: number | null;
@@ -8921,6 +8922,7 @@ export const ApplicationsDocument = gql`
           status
           ...ApplicationName
           lastModifiedDate
+          sentDate
         }
       }
     }

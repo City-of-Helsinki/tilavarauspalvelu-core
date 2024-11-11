@@ -93,6 +93,7 @@ export const APPLICATIONS = gql`
           status
           ...ApplicationName
           lastModifiedDate
+          sentDate
         }
       }
     }
