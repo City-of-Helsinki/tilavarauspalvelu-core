@@ -66,7 +66,7 @@ type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 // TODO clean this up, way too much css
 // also this breaks way too early to two lines (should just have no-wrap on the two elements)
 // reason is the way the separator is added
-const SubHeading = styled(H4).attrs({ as: "h2" })`
+const SubHeading = styled(H4).attrs({ as: "p" })`
   ${fontRegular}
   margin-top: 0;
 
@@ -109,44 +109,106 @@ const SecondaryActions = styled(Flex)`
   margin-top: var(--spacing-l);
 `;
 
-const Content = styled.div`
-  font-size: var(--fontsize-body-l);
-  max-width: var(--prose-width);
-`;
-
-const Paragraph = styled.p`
-  white-space: pre-line;
-  margin-bottom: var(--spacing-xl);
-
-  & > span {
-    display: block;
-  }
-`;
-
-const ParagraphAlt = styled(Paragraph)`
-  margin-bottom: 0;
-  & > span {
-    display: inline;
-  }
-`;
-
-const ContentContainer = styled.div`
-  margin-bottom: var(--spacing-xl);
-  white-space: pre-line;
-
-  div[role="heading"] {
-    font-size: var(--fontsize-heading-s);
-  }
-`;
-
 const AccordionContent = styled.div`
   margin-bottom: var(--spacing-s);
   padding-top: var(--spacing-m);
 `;
 
-const Terms = styled.div`
-  margin-bottom: var(--spacing-xl);
-`;
+function ReserveeBusinessInfo({
+  reservation,
+  supportedFields,
+}: {
+  reservation: NodeT;
+  supportedFields: Pick<ReservationMetadataFieldNode, "fieldName">[];
+}): JSX.Element {
+  const { t } = useTranslation();
+  return (
+    <>
+      {containsField(supportedFields, "reserveeOrganisationName") && (
+        <p>
+          {t("reservations:organisationName")}:{" "}
+          <span data-testid="reservation__reservee-organisation-name">
+            {reservation.reserveeOrganisationName || "-"}
+          </span>
+        </p>
+      )}
+      {containsField(supportedFields, "reserveeId") && (
+        <p>
+          {t("reservations:reserveeId")}:
+          <span data-testid="reservation__reservee-id">
+            {reservation.reserveeId || "-"}
+          </span>
+        </p>
+      )}
+      {containsNameField(supportedFields) && (
+        <p>
+          {t("reservations:contactName")}:{" "}
+          <span data-testid="reservation__reservee-name">
+            {`${reservation.reserveeFirstName || ""} ${
+              reservation.reserveeLastName || ""
+            }`.trim()}
+          </span>
+        </p>
+      )}
+      {containsField(supportedFields, "reserveePhone") && (
+        <p>
+          {t("reservations:contactPhone")}:
+          <span data-testid="reservation__reservee-phone">
+            {reservation.reserveePhone}
+          </span>
+        </p>
+      )}
+      {containsField(supportedFields, "reserveeEmail") && (
+        <p>
+          {t("reservations:contactEmail")}:
+          <span data-testid="reservation__reservee-email">
+            {reservation.reserveeEmail}
+          </span>
+        </p>
+      )}
+    </>
+  );
+}
+
+function ReserveePersonInfo({
+  reservation,
+  supportedFields,
+}: {
+  reservation: NodeT;
+  supportedFields: Pick<ReservationMetadataFieldNode, "fieldName">[];
+}) {
+  const { t } = useTranslation();
+  return (
+    <>
+      {containsNameField(supportedFields) && (
+        <p>
+          {t("common:name")}:{" "}
+          <span data-testid="reservation__reservee-name">
+            {`${reservation.reserveeFirstName || ""} ${
+              reservation.reserveeLastName || ""
+            }`.trim()}
+          </span>
+        </p>
+      )}
+      {containsField(supportedFields, "reserveePhone") && (
+        <p>
+          {t("common:phone")}:
+          <span data-testid="reservation__reservee-phone">
+            {reservation.reserveePhone || "-"}
+          </span>
+        </p>
+      )}
+      {containsField(supportedFields, "reserveeEmail") && (
+        <p>
+          {t("common:email")}:
+          <span data-testid="reservation__reservee-email">
+            {reservation.reserveeEmail || "-"}
+          </span>
+        </p>
+      )}
+    </>
+  );
+}
 
 function ReserveeInfo({
   reservation,
@@ -156,87 +218,25 @@ function ReserveeInfo({
   supportedFields: Pick<ReservationMetadataFieldNode, "fieldName">[];
 }) {
   const { t } = useTranslation();
-  if (
+  const showBusinessFields =
     CustomerTypeChoice.Business === reservation.reserveeType ||
-    CustomerTypeChoice.Nonprofit === reservation.reserveeType
-  ) {
-    return (
-      <ContentContainer>
-        {containsField(supportedFields, "reserveeOrganisationName") && (
-          <ParagraphAlt>
-            {t("reservations:organisationName")}:{" "}
-            <span data-testid="reservation__reservee-organisation-name">
-              {reservation.reserveeOrganisationName || "-"}
-            </span>
-          </ParagraphAlt>
-        )}
-        {containsField(supportedFields, "reserveeId") && (
-          <ParagraphAlt>
-            {t("reservations:reserveeId")}:
-            <span data-testid="reservation__reservee-id">
-              {reservation.reserveeId || "-"}
-            </span>
-          </ParagraphAlt>
-        )}
-        {containsNameField(supportedFields) && (
-          <ParagraphAlt>
-            {t("reservations:contactName")}:{" "}
-            <span data-testid="reservation__reservee-name">
-              {`${reservation.reserveeFirstName || ""} ${
-                reservation.reserveeLastName || ""
-              }`.trim()}
-            </span>
-          </ParagraphAlt>
-        )}
-        {containsField(supportedFields, "reserveePhone") && (
-          <ParagraphAlt>
-            {t("reservations:contactPhone")}:
-            <span data-testid="reservation__reservee-phone">
-              {reservation.reserveePhone}
-            </span>
-          </ParagraphAlt>
-        )}
-        {containsField(supportedFields, "reserveeEmail") && (
-          <ParagraphAlt>
-            {t("reservations:contactEmail")}:
-            <span data-testid="reservation__reservee-email">
-              {reservation.reserveeEmail}
-            </span>
-          </ParagraphAlt>
-        )}
-      </ContentContainer>
-    );
-  }
+    CustomerTypeChoice.Nonprofit === reservation.reserveeType;
 
   return (
-    <ContentContainer>
-      {containsNameField(supportedFields) && (
-        <ParagraphAlt>
-          {t("common:name")}:{" "}
-          <span data-testid="reservation__reservee-name">
-            {`${reservation.reserveeFirstName || ""} ${
-              reservation.reserveeLastName || ""
-            }`.trim()}
-          </span>
-        </ParagraphAlt>
+    <div>
+      <H4 as="h2">{t("reservationCalendar:reserverInfo")}</H4>
+      {showBusinessFields ? (
+        <ReserveeBusinessInfo
+          reservation={reservation}
+          supportedFields={supportedFields}
+        />
+      ) : (
+        <ReserveePersonInfo
+          reservation={reservation}
+          supportedFields={supportedFields}
+        />
       )}
-      {containsField(supportedFields, "reserveePhone") && (
-        <ParagraphAlt>
-          {t("common:phone")}:
-          <span data-testid="reservation__reservee-phone">
-            {reservation.reserveePhone || "-"}
-          </span>
-        </ParagraphAlt>
-      )}
-      {containsField(supportedFields, "reserveeEmail") && (
-        <ParagraphAlt>
-          {t("common:email")}:
-          <span data-testid="reservation__reservee-email">
-            {reservation.reserveeEmail || "-"}
-          </span>
-        </ParagraphAlt>
-      )}
-    </ContentContainer>
+    </div>
   );
 }
 
@@ -253,18 +253,23 @@ function ReservationInfo({
     containsField(supportedFields, field)
   );
 
+  if (fields.length === 0) {
+    return null;
+  }
+
   return (
-    <ContentContainer>
+    <div>
+      <H4 as="h2">{t("reservationApplication:applicationInfo")}</H4>
       {fields.map((field) => (
-        <ParagraphAlt key={field}>
+        <p key={field}>
           {t(`reservationApplication:label.common.${field}`)}:{" "}
           <span data-testid={`reservation__${field}`}>
             {/* FIXME remove the value function */}
             {getReservationValue(reservation as ReservationNode, field) || "-"}
           </span>
-        </ParagraphAlt>
+        </p>
       ))}
-    </ContentContainer>
+    </div>
   );
 }
 
@@ -496,27 +501,23 @@ function Reservation({
           </Actions>
           <NotModifiableReason reservation={reservation} />
         </div>
-        <Content>
+        <Flex>
           {instructionsKey &&
             getTranslation(reservationUnit, instructionsKey) && (
-              <ContentContainer>
-                <H4 as="h3">{t("reservations:reservationInfo")}</H4>
-                <Paragraph>
-                  {getTranslation(reservationUnit, instructionsKey)}
-                </Paragraph>
-              </ContentContainer>
+              <div>
+                <H4 as="h2">{t("reservations:reservationInfo")}</H4>
+                <p>{getTranslation(reservationUnit, instructionsKey)}</p>
+              </div>
             )}
-          <H4 as="h3">{t("reservationApplication:applicationInfo")}</H4>
           <ReservationInfo
             reservation={reservation}
             supportedFields={supportedFields}
           />
-          <H4 as="h3">{t("reservationCalendar:reserverInfo")}</H4>
           <ReserveeInfo
             reservation={reservation}
             supportedFields={supportedFields}
           />
-          <Terms>
+          <div>
             {(paymentTermsContent || cancellationTermsContent) && (
               <Accordion
                 heading={t(
@@ -570,9 +571,9 @@ function Reservation({
                 )}
               </AccordionContent>
             </Accordion>
-          </Terms>
+          </div>
           <AddressSection reservationUnit={reservationUnit} />
-        </Content>
+        </Flex>
       </ReservationPageWrapper>
     </>
   );
