@@ -5,7 +5,7 @@ import TermsBox from "common/src/termsbox/TermsBox";
 import { breakpoints, fontMedium, fontRegular } from "common";
 import { AccordionWithState } from "@/components/Accordion";
 import { H5 } from "common/src/common/typography";
-import { FullRow } from "common/styles/util";
+import { Flex, FullRow } from "common/styles/util";
 
 export const CheckboxContainer = styled.div`
   margin-top: var(--spacing-m);
@@ -67,11 +67,11 @@ export const ApplicationInfoContainer = styled.div`
   }
 `;
 
-export const InfoItemContainer = styled.div<{ $fullWidth?: boolean }>`
+export const InfoItemContainer = styled(Flex).attrs({
+  align: "flex-end",
+  gap: "none",
+})<{ $fullWidth?: boolean }>`
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-content: flex-end;
   position: relative;
   background: var(--color-white);
   width: 100%;
@@ -93,15 +93,13 @@ export const InfoItemContainer = styled.div<{ $fullWidth?: boolean }>`
   }
 `;
 
-export const InfoItem = styled.div`
+export const InfoItem = styled(Flex).attrs({
+  $align: "stretch",
+})`
   margin: var(--spacing-m) 0;
   height: 100%;
-  display: flex;
   box-sizing: border-box;
   width: 100%;
-  gap: var(--spacing-m);
-  flex-direction: column;
-  align-items: stretch;
   padding: 0;
 
   h3 {

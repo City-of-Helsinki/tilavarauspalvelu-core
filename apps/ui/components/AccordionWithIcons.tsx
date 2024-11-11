@@ -1,4 +1,5 @@
 import { breakpoints } from "common";
+import { Flex } from "common/styles/util";
 import { Button, IconAngleDown, IconAngleUp, useAccordion } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
@@ -23,7 +24,7 @@ const Heading = styled.h2<{ as: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" }>`
 
 const ClosedAccordionWrapper = styled.div`
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: 1fr auto;
   align-items: center;
   gap: var(--spacing-s);
 
@@ -65,11 +66,11 @@ const ButtonListWrapper = styled.div`
   }
 `;
 
-const IconLabel = styled.div`
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-
+const IconLabel = styled(Flex).attrs({
+  $gap: "xs",
+  $align: "center",
+  $direction: "row",
+})`
   /* truncate the first child span while not touch the postfix */
   min-width: 0;
   max-width: 100%;

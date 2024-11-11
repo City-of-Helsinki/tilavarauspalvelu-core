@@ -49,6 +49,7 @@ import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import { AccordionWithIcons } from "../AccordionWithIcons";
 import { CenterSpinner } from "../common/common";
 import { useMedia } from "react-use";
+import { ButtonContainer, Flex } from "common/styles/util";
 
 const N_RESERVATIONS_TO_SHOW = 20;
 
@@ -60,23 +61,14 @@ type Props = {
   application: ApplicationT;
 };
 
-const H3 = styled(H5).attrs({ as: "h3" })`
+const H3 = styled(H5).attrs({
+  as: "h3",
+  $noMargin: true,
+})`
   ${fontMedium}
-  margin: 0;
 `;
 
-const BREAKPOINT = breakpoints.m;
-
-const ListContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-m);
-
-  margin-top: var(--spacing-l);
-  @media (width > ${BREAKPOINT}) {
-    margin-top: var(--spacing-xl);
-  }
-`;
+export const BREAKPOINT = breakpoints.m;
 
 // Tables can't do horizontal scroll without wrapping the table in a div
 // NOTE HDS Table can't be styled so have to wrap it in an extra div.
@@ -156,16 +148,6 @@ const TableWrapper = styled.div`
       }
       /* stylelint-enable no-descending-specificity */
     }
-  }
-`;
-
-const ButtonContainer = styled.div`
-  display: flex;
-  gap: var(--spacing-s);
-  justify-content: center;
-  flex-direction: row;
-  @media (max-width: ${BREAKPOINT}) {
-    flex-direction: column;
   }
 `;
 
@@ -262,7 +244,7 @@ export function ApprovedReservations({ application }: Props) {
   );
   const initiallyOpen = app?.applicationSections?.length === 1;
   return (
-    <ListContainer>
+    <Flex>
       {loading && <CenterSpinner />}
       {sections.map((aes) => (
         <AccordionWithIcons
@@ -296,7 +278,7 @@ export function ApprovedReservations({ application }: Props) {
           />
         </AccordionWithIcons>
       ))}
-    </ListContainer>
+    </Flex>
   );
 }
 
@@ -793,7 +775,9 @@ export function AllReservations({
   const reservations = sectionToreservations(t, applicationSection);
   return (
     <>
-      <H3 as="h2">{t("application:view.reservationsTab.reservationsTitle")}</H3>
+      <H3 $noMargin>
+        {t("application:view.reservationsTab.reservationsTitle")}
+      </H3>
       <ReservationsTable reservations={reservations} />
     </>
   );
@@ -816,12 +800,12 @@ export function ApplicationSection({
     .slice(0, N_RESERVATIONS_TO_SHOW);
 
   return (
-    <ListContainer>
+    <Flex>
       <H3>{t("application:view.reservationsTab.reservationUnitsTitle")}</H3>
       <ReservationUnitTable reservationUnits={reservationUnits} />
       <H3>{t("application:view.reservationsTab.reservationsTitle")}</H3>
       <ReservationsTable reservations={reservations} />
-      <ButtonContainer>
+      <ButtonContainer $justify="center">
         <ButtonLikeLink
           href={getApplicationSectionPath(
             applicationSection.pk,
@@ -845,6 +829,6 @@ export function ApplicationSection({
           {t("application:view.reservationsTab.cancelApplication")}
         </Button>
       </ButtonContainer>
-    </ListContainer>
+    </Flex>
   );
 }

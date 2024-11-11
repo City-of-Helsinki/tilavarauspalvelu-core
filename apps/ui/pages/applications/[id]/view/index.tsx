@@ -17,10 +17,23 @@ import {
 } from "@gql/gql-types";
 import { Tabs } from "hds-react";
 import { formatDateTime } from "@/modules/util";
-import { ApprovedReservations } from "@/components/application/ApprovedReservations";
+import {
+  ApprovedReservations,
+  BREAKPOINT,
+} from "@/components/application/ApprovedReservations";
 import { gql } from "@apollo/client";
 import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 import { H1 } from "common";
+import styled from "styled-components";
+
+const TabPanel = styled(Tabs.TabPanel)`
+  && {
+    margin-top: var(--spacing-l);
+    @media (width > ${BREAKPOINT}) {
+      margin-top: var(--spacing-xl);
+    }
+  }
+`;
 
 function View({ application, tos }: PropsNarrowed): JSX.Element {
   const { t, i18n } = useTranslation();
@@ -43,7 +56,7 @@ function View({ application, tos }: PropsNarrowed): JSX.Element {
   return (
     <>
       <BreadcrumbWrapper route={["/applications", "application"]} />
-      <H1>{applicationRoundName}</H1>
+      <H1 $noMargin>{applicationRoundName}</H1>
       {showReservations ? (
         <>
           <p>
@@ -59,12 +72,12 @@ function View({ application, tos }: PropsNarrowed): JSX.Element {
                 {t("application:view.application")}
               </Tabs.Tab>
             </Tabs.TabList>
-            <Tabs.TabPanel>
+            <TabPanel>
               <ApprovedReservations application={application} />
-            </Tabs.TabPanel>
-            <Tabs.TabPanel>
+            </TabPanel>
+            <TabPanel>
               <ViewApplication application={application} tos={tos} />
-            </Tabs.TabPanel>
+            </TabPanel>
           </Tabs>
         </>
       ) : (
