@@ -86,7 +86,7 @@ function WorkingMemo({
         value={workingMemo}
         onChange={(e) => setWorkingMemo(e.target.value)}
       />
-      <ButtonContainer>
+      <ButtonContainer $noMargin>
         <Button
           size="small"
           variant="secondary"

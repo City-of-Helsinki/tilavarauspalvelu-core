@@ -172,7 +172,7 @@ function AllApplicationRounds(): JSX.Element | null {
   return (
     <>
       <div>
-        <H1>{t("MainMenu.applicationRounds")}</H1>
+        <H1 $marginTop="l">{t("MainMenu.applicationRounds")}</H1>
         <p>{t("ApplicationRound.description")}</p>
       </div>
       <RoundsAccordion

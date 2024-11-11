@@ -103,7 +103,9 @@ function Criteria({
   return (
     <>
       <div>
-        <H1 $marginBottom="xs">{applicationRound.nameFi}</H1>
+        <H1 $marginTop="l" $marginBottom="xs">
+          {applicationRound.nameFi}
+        </H1>
         <Flex $direction="row" $justify="space-between" $wrap="wrap">
           <TimeframeStatus
             applicationPeriodBegin={applicationRound.applicationPeriodBegin}

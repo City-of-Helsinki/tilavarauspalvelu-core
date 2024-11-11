@@ -91,6 +91,7 @@ export const H3 = styled.h3<{ $large?: boolean; $noMargin?: boolean }>`
   ${fontRegular}
   line-height: 2rem;
   margin-bottom: ${({ $noMargin }) => ($noMargin ? `0` : `var(--spacing-m)`)};
+  margin-top: ${({ $noMargin }) => ($noMargin ? `0` : `var(--spacing-s)`)};
 
   @media (width > ${breakpoints.s}) {
     font-size: ${({ $large }) =>
@@ -110,11 +111,18 @@ export const H4 = styled.h4<{ $noMargin?: boolean }>`
   }
 `;
 
-export const H5 = styled.h5`
+export const H5 = styled.h5<{
+  $noMargin?: boolean;
+  $marginTop?: "none" | "xs" | "s" | "m" | "l" | "xl";
+  $marginBottom?: "none" | "xs" | "s" | "m" | "l" | "xl";
+}>`
   font-size: var(--fontsize-heading-xs);
   ${fontBold}
   line-height: 1.625;
-  margin-bottom: var(--spacing-m);
+  margin-bottom: ${({ $noMargin, $marginBottom }) =>
+    $noMargin ? `0` : `var(--spacing-${$marginBottom ?? "s"})`};
+  margin-top: ${({ $noMargin, $marginTop }) =>
+    $noMargin ? `0` : `var(--spacing-${$marginTop ?? "s"})`};
 
   @media (width > ${breakpoints.s}) {
     font-size: var(--fontsize-heading-s);

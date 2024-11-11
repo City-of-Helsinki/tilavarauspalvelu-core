@@ -7,7 +7,7 @@ import {
   useUnitOptions,
   useReservationUnitOptions,
 } from "@/hooks";
-import { AutoGrid } from "common/styles/util";
+import { AutoGrid, Flex } from "common/styles/util";
 import {
   CheckboxFilter,
   DateRangeFilter,
@@ -24,17 +24,9 @@ import {
 } from "@gql/gql-types";
 import { fromUIDate, isValidDate } from "common/src/common/util";
 
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-s);
-`;
-
 const MoreWrapper = styled(ShowAllContainer)`
-  margin-top: var(--spacing-s);
   .ShowAllContainer__ToggleButton {
     color: var(--color-bus);
-    margin-top: var(--spacing-s);
   }
 `;
 
@@ -152,8 +144,8 @@ export function Filters({
   }
 
   return (
-    <Wrapper>
-      <AutoGrid>
+    <Flex>
+      <AutoGrid $minWidth="18rem">
         <MultiSelectFilter
           options={reservationTypeOptions}
           name="reservationType"
@@ -170,7 +162,7 @@ export function Filters({
         showLessLabel={t("ReservationUnitsSearch.lessFilters")}
         maximumNumber={0}
       >
-        <AutoGrid>
+        <AutoGrid $minWidth="18rem">
           <DateRangeFilter name="date" />
           <MultiSelectFilter options={unitOptions} name="unit" />
           <MultiSelectFilter
@@ -196,6 +188,6 @@ export function Filters({
         defaultTags={defaultFilters}
         clearButtonLabel={clearButtonLabel}
       />
-    </Wrapper>
+    </Flex>
   );
 }

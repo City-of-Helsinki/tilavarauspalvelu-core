@@ -10,12 +10,11 @@ import {
   IconCross,
   IconArrowRedo,
   Tag,
-  Accordion as HDSAccordion,
 } from "hds-react";
 import { isEqual, trim } from "lodash";
 import { type ApolloQueryResult } from "@apollo/client";
 import { type TFunction } from "i18next";
-import { H2, H4, H5, Strong } from "common/src/common/typography";
+import { H1, H3, H4, H5, Strong } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import {
@@ -41,7 +40,7 @@ import { convertWeekday, type Day } from "common/src/conversion";
 import { WEEKDAYS } from "common/src/const";
 import { formatNumber, formatDate, formatAgeGroups } from "@/common/util";
 import ScrollIntoView from "@/common/ScrollIntoView";
-import { Accordion } from "@/component/Accordion";
+import { Accordion as AccordionBase } from "@/component/Accordion";
 import Loader from "@/component/Loader";
 import { ApplicationWorkingMemo } from "@/component/WorkingMemo";
 import ShowWhenTargetInvisible from "@/component/ShowWhenTargetInvisible";
@@ -54,6 +53,7 @@ import { getApplicantName, getApplicationStatusColor } from "@/helpers";
 import Error404 from "@/common/Error404";
 import { useCheckPermission } from "@/hooks";
 import { errorToast } from "common/src/common/toast";
+import { Flex, TitleSection } from "common/styles/util";
 
 type ApplicationType = NonNullable<ApplicationAdminQuery["application"]>;
 type ApplicationSectionType = NonNullable<
@@ -80,10 +80,6 @@ function printSuitableTimes(
     .join(", ");
 }
 
-const StyledStatusBlock = styled(StatusBlock)`
-  margin: 0;
-`;
-
 function getApplicationStatusIcon(status: ApplicationStatusChoice): {
   icon: ReactNode | null;
   style: React.CSSProperties;
@@ -108,6 +104,10 @@ function getApplicationStatusIcon(status: ApplicationStatusChoice): {
       };
   }
 }
+
+const StyledStatusBlock = styled(StatusBlock)`
+  margin: 0;
+`;
 
 function ApplicationStatusBlock({
   status,
@@ -146,13 +146,6 @@ const EventProps = styled.div`
   word-break: break-all;
 `;
 
-const DefinitionList = styled.div`
-  line-height: var(--lineheight-l);
-  display: flex;
-  gap: var(--spacing-s);
-  flex-direction: column;
-`;
-
 const Label = styled.span``;
 
 const Value = styled.span`
@@ -160,18 +153,16 @@ const Value = styled.span`
   font-weight: 700;
 `;
 
-const StyledAccordion = styled(Accordion).attrs({
-  style: {
-    "--header-font-size": "var(--fontsize-heading-m)",
-    "--button-size": "var(--fontsize-heading-l)",
-  } as React.CSSProperties,
-})`
-  margin-top: 48px;
+const Accordion = styled(AccordionBase)`
+  --spacing-unit: 0;
+  & h2 {
+    --header-padding: var(--spacing-xs);
+    margin: 0;
+  }
 `;
 
 const PreCard = styled.div`
   font-size: var(--fontsize-body-s);
-  margin-bottom: var(--spacing-2-xs);
 `;
 
 const EventSchedules = styled.div`
@@ -204,22 +195,6 @@ const SchedulesCardContainer = styled.div`
 const EventSchedule = styled.div`
   font-size: var(--fontsize-body-m);
   line-height: 2em;
-`;
-
-const StyledH5 = styled(H5)`
-  font-size: var(--fontsize-heading-xs);
-  font-family: (--font-bold);
-  margin-bottom: var(--spacing-2-xs);
-`;
-
-// TODO this is duplicated in other pages (H1 + status tag)
-// TODO should not use margin-top almost ever. The container (reused in all layouts) should have the correct padding.
-// spacing between elements should be either gap if possible or margin-bottom if not.
-const HeadingContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-top: var(--spacing-s);
-  align-items: start;
 `;
 
 const ApplicationSectionsContainer = styled.div`
@@ -341,7 +316,9 @@ function SchedulesContent({
 
   return (
     <div>
-      <StyledH5>{title}</StyledH5>
+      <H5 as="h4" $marginTop="none">
+        {title}
+      </H5>
       {calendar.map(({ day, schedulesTxt }) => (
         <EventSchedule key={day}>
           <Strong>{t(`dayLong.${day}`)}</Strong>
@@ -650,7 +627,7 @@ function ApplicationSectionDetails({
 
   return (
     <ScrollIntoView key={section.pk} hash={hash}>
-      <StyledAccordion heading={heading} initiallyOpen>
+      <Accordion heading={heading} initiallyOpen>
         <EventProps>
           {section.ageGroup && (
             <ValueBox
@@ -682,7 +659,7 @@ function ApplicationSectionDetails({
           />
           <ValueBox label={t("ApplicationEvent.dates")} value={dates} />
         </EventProps>
-        <HeadingContainer style={{ alignItems: "center" }}>
+        <Flex $justify="space-between" $direction="row" $align="center">
           <H4 as="h3">{t("ApplicationEvent.requestedReservationUnits")}</H4>
           <RejectAllOptionsButton
             section={section}
@@ -691,7 +668,7 @@ function ApplicationSectionDetails({
               application?.status ?? ApplicationStatusChoice.Draft
             }
           />
-        </HeadingContainer>
+        </Flex>
         <ApplicationSectionsContainer>
           {rows.map((row) => (
             <div style={{ display: "contents" }} key={row.pk}>
@@ -718,7 +695,7 @@ function ApplicationSectionDetails({
             </SchedulesCardContainer>
           </Card>
         </EventSchedules>
-      </StyledAccordion>
+      </Accordion>
     </ScrollIntoView>
   );
 }
@@ -929,19 +906,19 @@ function ApplicationDetails({
         />
       </ShowWhenTargetInvisible>
       <>
-        <HeadingContainer>
-          <H2 as="h1" ref={ref} style={{ margin: "0" }}>
+        <TitleSection>
+          <H1 ref={ref} $noMargin>
             {customerName}
-          </H2>
+          </H1>
           {application.status != null && (
             <ApplicationStatusBlock status={application.status} />
           )}
-        </HeadingContainer>
+        </TitleSection>
         <PreCard>
           {t("Application.applicationReceivedTime")}{" "}
           {formatDate(application.lastModifiedDate, "d.M.yyyy HH:mm")}
         </PreCard>
-        <div style={{ marginBottom: "var(--spacing-s)" }}>
+        <div>
           <RejectApplicationButton
             application={application}
             refetch={refetch}
@@ -953,10 +930,9 @@ function ApplicationDetails({
             "--padding-horizontal": "var(--spacing-m)",
             "--padding-vertical": "var(--spacing-m)",
           }}
-          style={{ marginBottom: "var(--spacing-m)" }}
         >
           <CardContentContainer>
-            <DefinitionList>
+            <Flex $gap="s">
               <KV
                 k={t("Application.applicantType")}
                 v={t(`Application.applicantTypes.${application.applicantType}`)}
@@ -969,24 +945,23 @@ function ApplicationDetails({
                   v={application.organisation?.coreBusinessFi || "-"}
                 />
               )}
-            </DefinitionList>
-            <DefinitionList>
+            </Flex>
+            <Flex $gap="s">
               <KV k={t("Application.numHours")} v="-" />
               <KV k={t("Application.numTurns")} v="-" />
-            </DefinitionList>
+            </Flex>
           </CardContentContainer>
         </Card>
-        <HDSAccordion
+        <Accordion
           heading={t("RequestedReservation.workingMemo")}
           initiallyOpen={application.workingMemo.length > 0}
-          closeButton={false}
         >
           <ApplicationWorkingMemo
             applicationPk={applicationPk}
             refetch={refetch}
             initialValue={application.workingMemo}
           />
-        </HDSAccordion>
+        </Accordion>
         {applicationSections.map((section) => (
           <ApplicationSectionDetails
             section={section}
@@ -995,7 +970,9 @@ function ApplicationDetails({
             refetch={refetch}
           />
         ))}
-        <H4>{t("Application.customerBasicInfo")}</H4>
+        <H3 as="h2" $noMargin>
+          {t("Application.customerBasicInfo")}
+        </H3>
         <EventProps>
           <ValueBox
             label={t("Application.authenticatedUser")}
@@ -1033,7 +1010,9 @@ function ApplicationDetails({
             value={<BirthDate applicationPk={application.pk ?? 0} />}
           />
         </EventProps>
-        <H4>{t("Application.contactPersonInformation")}</H4>
+        <H3 as="h2" $noMargin>
+          {t("Application.contactPersonInformation")}
+        </H3>
         <EventProps>
           <ValueBox
             label={t("Application.contactPersonFirstName")}
@@ -1054,7 +1033,9 @@ function ApplicationDetails({
         </EventProps>
         {isOrganisation ? (
           <>
-            <H4>{t("Application.contactInformation")}</H4>
+            <H3 as="h2" $noMargin>
+              {t("Application.contactInformation")}
+            </H3>
             <EventProps>
               <ValueBox
                 label={t("common.streetAddress")}
@@ -1073,11 +1054,11 @@ function ApplicationDetails({
         ) : null}
         {hasBillingAddress ? (
           <>
-            <H4>
+            <H3 as="h2" $noMargin>
               {application.applicantType === ApplicantTypeChoice.Individual
                 ? t("Application.contactInformation")
                 : t("common.billingAddress")}
-            </H4>
+            </H3>
             <EventProps>
               <ValueBox
                 label={t("common.streetAddress")}

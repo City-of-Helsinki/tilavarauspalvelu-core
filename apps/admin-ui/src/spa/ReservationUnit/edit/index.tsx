@@ -43,13 +43,13 @@ import { DateTimeInput } from "common/src/components/form/DateTimeInput";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { H1, H4, fontBold } from "common/src/common/typography";
 import { breakpoints } from "common";
-import { AutoGrid, FullRow, Flex } from "common/styles/util";
+import { AutoGrid, FullRow, Flex, TitleSection } from "common/styles/util";
 import Loader from "@/component/Loader";
 import { errorToast, successToast } from "common/src/common/toast";
 import { useModal } from "@/context/ModalContext";
 import { parseAddress, getTranslatedError } from "@/common/util";
 import Error404 from "@/common/Error404";
-import { Accordion } from "@/component/Accordion";
+import { Accordion as AccordionBase } from "@/component/Accordion";
 import { ControlledNumberInput } from "common/src/components/form/ControlledNumberInput";
 import { ArchiveDialog } from "./ArchiveDialog";
 import { ReservationStateTag, ReservationUnitStateTag } from "./tags";
@@ -79,30 +79,26 @@ const RichTextInput = dynamic(
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;
 
+const Accordion = styled(AccordionBase)`
+  & h2 {
+    --header-padding: var(--spacing-s);
+  }
+`;
+
 // Override the Accordion style: force border even if the accordion is open
 // because the last section is not an accordion but a button and it looks funny otherwise
 // TODO should we limit the width of the text boxes? or the whole form?
-const StyledContainerMedium = styled.div`
+const StyledContainerMedium = styled(Flex)`
   & > div:nth-last-of-type(2) > div {
     /* stylelint-disable-next-line csstools/value-no-unknown-custom-properties */
     border-bottom: 1px solid var(--border-color);
   }
-`;
 
-// NOTE some magic values so the sticky buttons don't hide the bottom of the page
-const Wrapper = styled.div`
+  /* NOTE some magic values so the sticky buttons don't hide the bottom of the page */
   padding-bottom: 16rem;
   @media (width > ${breakpoints.m}) {
     padding-bottom: 8rem;
   }
-`;
-
-const SlimH4 = styled(H4)`
-  margin: 0;
-`;
-
-const ArchiveButton = styled(Button)`
-  margin-top: var(--spacing-m);
 `;
 
 const SubAccordion = styled(Accordion)`
@@ -241,26 +237,6 @@ const WhiteButton = styled(Button)<{
   margin: 0;
 `;
 
-const TitleSectionWithTags = styled.div`
-  display: flex;
-  flex-flow: row wrap;
-  gap: var(--spacing-m);
-  justify-content: space-between;
-  align-items: center;
-  margin: var(--spacing-s) 0 var(--spacing-m);
-  & > h1 {
-    margin: 0;
-  }
-`;
-
-const TagContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--spacing-m);
-`;
-
 const bufferTimeOptions = [
   { value: 900, label: "15 minuuttia" },
   { value: 1800, label: "30 minuuttia" },
@@ -383,12 +359,7 @@ function DiscardChangesDialog({
   );
 }
 
-const DisplayUnitWrapper = styled.div`
-  margin-bottom: var(--spacing-m);
-`;
-
 const UnitInformationWrapper = styled.div`
-  line-height: 32px;
   font-size: var(--fontsize-heading-s);
   > div:first-child {
     ${fontBold}
@@ -408,19 +379,19 @@ function DisplayUnit({
 }): JSX.Element {
   const location = unit?.location;
   return (
-    <DisplayUnitWrapper>
-      <TitleSectionWithTags>
-        <H1>{heading}</H1>
-        <TagContainer>
+    <>
+      <TitleSection>
+        <H1 $noMargin>{heading}</H1>
+        <Flex $direction="row" $gap="xs">
           <ReservationStateTag state={reservationState} />
           <ReservationUnitStateTag state={unitState} />
-        </TagContainer>
-      </TitleSectionWithTags>
+        </Flex>
+      </TitleSection>
       <UnitInformationWrapper>
         <div>{unit?.nameFi ?? "-"}</div>
         <div>{location != null ? parseAddress(location) : "-"}</div>
       </UnitInformationWrapper>
-    </DisplayUnitWrapper>
+    </>
   );
 }
 
@@ -1294,7 +1265,7 @@ function CommunicationSection({
   return (
     <Accordion heading={t("ReservationUnitEditor.communication")}>
       <Flex>
-        <SlimH4>{t("ReservationUnitEditor.pendingInstructions")}</SlimH4>
+        <H4 $noMargin>{t("ReservationUnitEditor.pendingInstructions")}</H4>
         {(
           [
             "reservationPendingInstructionsFi",
@@ -1318,7 +1289,7 @@ function CommunicationSection({
             )}
           />
         ))}
-        <SlimH4>{t("ReservationUnitEditor.confirmedInstructions")}</SlimH4>
+        <H4 $noMargin>{t("ReservationUnitEditor.confirmedInstructions")}</H4>
         {(
           [
             "reservationConfirmedInstructionsFi",
@@ -1347,7 +1318,7 @@ function CommunicationSection({
           heading={t("ReservationUnitEditor.cancelledSubAccordion")}
           headingLevel="h3"
         >
-          <SlimH4>{t("ReservationUnitEditor.cancelledInstructions")}</SlimH4>
+          <H4 $noMargin>{t("ReservationUnitEditor.cancelledInstructions")}</H4>
           {(
             [
               "reservationCancelledInstructionsFi",
@@ -1403,7 +1374,7 @@ function OpeningHoursSection({
   return (
     <Accordion heading={t("openingHours")}>
       {reservationUnit?.haukiUrl ? (
-        <AutoGrid>
+        <AutoGrid $alignCenter>
           <p style={{ gridColumn: "1 / -1" }}>
             {t("openingHoursHelperTextHasLink")}
           </p>
@@ -1906,14 +1877,14 @@ function ReservationUnitEditor({
         />
         {isSeasonal && <SeasonalSection form={form} />}
         <div>
-          <ArchiveButton
+          <Button
             onClick={handleArchiveButtonClick}
             variant="secondary"
             disabled={isSaving || !archiveEnabled}
             theme="black"
           >
             {t("ReservationUnitEditor.archive")}
-          </ArchiveButton>
+          </Button>
         </div>
       </StyledContainerMedium>
       <ButtonsStripe>
@@ -2039,15 +2010,13 @@ function EditorWrapper({ previewUrlPrefix }: { previewUrlPrefix: string }) {
   const cleanPreviewUrlPrefix = previewUrlPrefix.replace(/\/$/, "");
 
   return (
-    <Wrapper>
-      <ReservationUnitEditor
-        reservationUnit={reservationUnit}
-        form={form}
-        unitPk={unitPk}
-        refetch={refetch}
-        previewUrlPrefix={cleanPreviewUrlPrefix}
-      />
-    </Wrapper>
+    <ReservationUnitEditor
+      reservationUnit={reservationUnit}
+      form={form}
+      unitPk={unitPk}
+      refetch={refetch}
+      previewUrlPrefix={cleanPreviewUrlPrefix}
+    />
   );
 }
 

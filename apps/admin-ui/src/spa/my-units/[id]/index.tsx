@@ -90,12 +90,14 @@ export function MyUnitView() {
 
   return (
     <>
-      <H1>{unit?.nameFi}</H1>
-      {unit.location && (
-        <LocationOnlyOnDesktop>
-          {parseAddress(unit.location)}
-        </LocationOnlyOnDesktop>
-      )}
+      <div>
+        <H1 $marginTop="l">{unit?.nameFi}</H1>
+        {unit.location && (
+          <LocationOnlyOnDesktop>
+            {parseAddress(unit.location)}
+          </LocationOnlyOnDesktop>
+        )}
+      </div>
       <div>
         <ButtonLikeLink
           to={canCreateReservations ? recurringReservationUrl : ""}

@@ -12,7 +12,7 @@ function Units(): JSX.Element {
   return (
     <>
       <div>
-        <H1>{t("MainMenu.units")}</H1>
+        <H1 $marginTop="l">{t("MainMenu.units")}</H1>
         <p>
           {t("Units.description")}
           <Link

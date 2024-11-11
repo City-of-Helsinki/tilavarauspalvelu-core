@@ -26,7 +26,7 @@ import {
   IconQuestionCircleFill,
 } from "hds-react";
 import { getNotificationUrl } from "@/common/urls";
-import { Flex } from "common/styles/util";
+import { TitleSection } from "common/styles/util";
 
 const getStatusLabelProps = (
   state: BannerNotificationState | null | undefined
@@ -173,10 +173,12 @@ function Page() {
 
   return (
     <>
-      <Flex $align="center" $justify="space-between" $direction="row">
+      <TitleSection>
         <div>
-          <H1>{t("Notifications.pageTitle")}</H1>
-          <p>{t("Notifications.pageDescription")}</p>
+          <H1 $noMargin>{t("Notifications.pageTitle")}</H1>
+          <p style={{ maxWidth: "var(--prose-width)" }}>
+            {t("Notifications.pageDescription")}
+          </p>
         </div>
         <ButtonLikeLink
           variant="primary"
@@ -185,7 +187,7 @@ function Page() {
         >
           {t("Notifications.newNotification")}
         </ButtonLikeLink>
-      </Flex>
+      </TitleSection>
       {loading && notifications.length === 0 ? (
         <Loader />
       ) : (

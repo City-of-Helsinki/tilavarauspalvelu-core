@@ -130,6 +130,7 @@ export const TabWrapper = styled.div`
 
 /// Container for Heading + label / buttons
 /// Assumes that you disable outer margins on the children and it's inside a flex container with gaps.
+/// With breadcrumbs, use $noMargin.
 export const TitleSection = styled(Flex).attrs({
   $direction: "row",
   $justify: "space-between",
@@ -137,5 +138,5 @@ export const TitleSection = styled(Flex).attrs({
   $align: "center",
   $gap: "xs",
 })<{ $noMargin?: boolean }>`
-  margin-top: ${({ $noMargin }) => ($noMargin ? "0" : "var(--spacing-s)")};
+  margin-top: ${({ $noMargin }) => ($noMargin ? "0" : "var(--spacing-l)")};
 `;

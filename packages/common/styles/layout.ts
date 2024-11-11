@@ -21,13 +21,19 @@ export const mainStyles = css`
     gap: var(--spacing-l);
   }
 
+  /* add bit bottom padding so content doesn't touch the bottom (or the footer Koros) */
+  padding-bottom: var(--spacing-xl);
+
   /* NOTE these are copied from HDS --header-margin
    * but it's a local variable so we can't use it here */
-  padding: 0 var(--spacing-xs);
+  padding-left: var(--spacing-xs);
+  padding-right: var(--spacing-xs);
   @media (min-width: ${breakpoints.s}) {
-    padding: 0 var(--spacing-s);
+    padding-left: var(--spacing-s);
+    padding-right: var(--spacing-s);
   }
   @media (min-width: ${breakpoints.m}) {
-    padding: 0 var(--spacing-m);
+    padding-left: var(--spacing-m);
+    padding-right: var(--spacing-m);
   }
 `;

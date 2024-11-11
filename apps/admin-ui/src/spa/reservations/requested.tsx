@@ -43,9 +43,9 @@ export function RequestedPage(): JSX.Element {
   ];
 
   return (
-    <div>
+    <>
       <div>
-        <H1>{t("Reservations.reservationListHeading")}</H1>
+        <H1 $marginTop="l">{t("Reservations.reservationListHeading")}</H1>
         <p>{t("Reservations.reservationListDescription")}</p>
       </div>
       <Filters
@@ -54,6 +54,6 @@ export function RequestedPage(): JSX.Element {
       />
       <HR />
       <ReservationsDataLoader />
-    </div>
+    </>
   );
 }

@@ -14,26 +14,24 @@ import { NewResourceModal } from "./resource/NewResourceModal";
 import { base64encode } from "common/src/helpers";
 import { errorToast } from "common/src/common/toast";
 import Error404 from "@/common/Error404";
-import { H2 } from "common";
+import { fontBold, H2 } from "common";
+import { Flex } from "common/styles/util";
 
 interface IProps {
   [key: string]: string;
   unitPk: string;
 }
 
-const TableHead = styled.div`
-  display: flex;
-  margin-bottom: var(--spacing-m);
-  margin-top: var(--spacing-m);
-`;
+const TableHead = styled(Flex).attrs({
+  $direction: "row",
+  $justify: "space-between",
+  $align: "center",
+})``;
 
 const ActionButton = styled(Button)`
-  margin-left: auto;
-  padding: 0;
   span {
-    padding: 0;
     color: var(--color-black);
-    font-family: var(--tilavaraus-admin-font-bold);
+    ${fontBold}
   }
 `;
 
