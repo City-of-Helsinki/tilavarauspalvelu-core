@@ -5,7 +5,6 @@ import { type ReservationInfoContainerFragment } from "@gql/gql-types";
 import { Trans, useTranslation } from "next-i18next";
 import { daysByMonths } from "@/modules/const";
 import { formatDate } from "@/modules/util";
-import { Content } from "./ReservationUnitStyles";
 import { H4 } from "common/src/common/typography";
 import styled from "styled-components";
 
@@ -69,7 +68,7 @@ export function ReservationInfoContainer({
 
   // TODO this should be a list
   return (
-    <Content data-testid="reservation-unit__reservation-info">
+    <div data-testid="reservation-unit__reservation-info">
       <Subheading $noMargin>
         {t("reservationCalendar:reservationInfo")}
       </Subheading>
@@ -81,7 +80,7 @@ export function ReservationInfoContainer({
       {reservationUnitIsReservable && (
         <ReservationMaxReservationsPerUser {...reservationUnit} />
       )}
-    </Content>
+    </div>
   );
 }
 

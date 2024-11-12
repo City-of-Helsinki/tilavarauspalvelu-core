@@ -23,6 +23,7 @@ import {
 } from "@/modules/util";
 import { getImageSource } from "common/src/helpers";
 import { getReservationUnitPath } from "@/modules/urls";
+import { Flex } from "common/styles/util";
 
 type Type = "pending" | "confirmed" | "complete";
 
@@ -69,13 +70,15 @@ const MainImage = styled.img`
   object-fit: cover;
 `;
 
-const Content = styled.div`
+const Content = styled(Flex).attrs({
+  $gap: "xs",
+})`
   padding: 1px var(--spacing-m) var(--spacing-xs);
 `;
 
 const Heading = styled(H4).attrs({ as: "h3" })`
   margin-top: var(--spacing-m);
-  margin-bottom: var(--spacing-xs);
+  margin-bottom: 0;
 `;
 
 const StyledLink = styled(Link)`
@@ -84,15 +87,10 @@ const StyledLink = styled(Link)`
   text-underline-offset: 4px;
 `;
 
-const Value = styled.div`
-  margin-bottom: var(--spacing-s);
-  line-height: var(--lineheight-l);
-`;
+const Value = styled.div``;
 
 const Subheading = styled(Value)`
   font-size: var(--fontsize-body-l);
-  line-height: var(--lineheight-xl);
-  margin-bottom: var(--spacing-xs);
 `;
 
 type Props = {

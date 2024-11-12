@@ -7,8 +7,8 @@ type Props = {
 };
 
 const StyledContent = styled.div`
-  p {
-    margin-block: 0;
+  p:empty {
+    display: none;
   }
   a {
     text-decoration: underline;

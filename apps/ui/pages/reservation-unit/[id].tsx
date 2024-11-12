@@ -74,7 +74,6 @@ import {
 } from "@/modules/reservable";
 import SubventionSuffix from "@/components/reservation/SubventionSuffix";
 import InfoDialog from "@/components/common/InfoDialog";
-import { Content } from "@/components/reservation-unit/ReservationUnitStyles";
 import { QuickReservation } from "@/components/reservation-unit/QuickReservation";
 import { ReservationInfoContainer } from "@/components/reservation-unit/ReservationInfoContainer";
 import {
@@ -649,17 +648,15 @@ function ReservationUnit({
         </JustForDesktop>
       </div>
       <PageContentWrapper>
-        <Content data-testid="reservation-unit__description">
+        <div data-testid="reservation-unit__description">
           <H4 as="h3">{t("reservationUnit:description")}</H4>
           <Sanitize html={getTranslation(reservationUnit, "description")} />
-        </Content>
+        </div>
         {equipment?.length > 0 && (
-          <Content data-testid="reservation-unit__equipment">
-            <H4 as="h3" $noMargin>
-              {t("reservationUnit:equipment")}
-            </H4>
+          <div data-testid="reservation-unit__equipment">
+            <H4 as="h3">{t("reservationUnit:equipment")}</H4>
             <EquipmentList equipment={equipment} />
-          </Content>
+          </div>
         )}
         {reservationUnitIsReservable && (
           <div data-testid="reservation-unit__calendar--wrapper">

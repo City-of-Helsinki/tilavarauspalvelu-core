@@ -109,11 +109,6 @@ const SecondaryActions = styled(Flex)`
   margin-top: var(--spacing-l);
 `;
 
-const AccordionContent = styled.div`
-  margin-bottom: var(--spacing-s);
-  padding-top: var(--spacing-m);
-`;
-
 function ReserveeBusinessInfo({
   reservation,
   supportedFields,
@@ -530,15 +525,9 @@ function Reservation({
                 theme="thin"
                 data-testid="reservation__payment-and-cancellation-terms"
               >
-                {paymentTermsContent && (
-                  <AccordionContent>
-                    <Sanitize html={paymentTermsContent} />
-                  </AccordionContent>
-                )}
+                {paymentTermsContent && <Sanitize html={paymentTermsContent} />}
                 {cancellationTermsContent && (
-                  <AccordionContent>
-                    <Sanitize html={cancellationTermsContent} />
-                  </AccordionContent>
+                  <Sanitize html={cancellationTermsContent} />
                 )}
               </Accordion>
             )}
@@ -548,9 +537,7 @@ function Reservation({
                 theme="thin"
                 data-testid="reservation__pricing-terms"
               >
-                <AccordionContent>
-                  <Sanitize html={pricingTermsContent} />
-                </AccordionContent>
+                <Sanitize html={pricingTermsContent} />
               </Accordion>
             )}
             <Accordion
@@ -559,17 +546,13 @@ function Reservation({
               data-testid="reservation__terms-of-use"
             >
               {serviceSpecificTermsContent && (
-                <AccordionContent>
-                  <Sanitize html={serviceSpecificTermsContent} />
-                </AccordionContent>
+                <Sanitize html={serviceSpecificTermsContent} />
               )}
-              <AccordionContent>
-                {termsOfUse?.genericTerms != null && (
-                  <Sanitize
-                    html={getTranslation(termsOfUse.genericTerms, "text")}
-                  />
-                )}
-              </AccordionContent>
+              {termsOfUse?.genericTerms != null && (
+                <Sanitize
+                  html={getTranslation(termsOfUse.genericTerms, "text")}
+                />
+              )}
             </Accordion>
           </div>
           <AddressSection reservationUnit={reservationUnit} />

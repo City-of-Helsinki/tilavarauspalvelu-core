@@ -16,6 +16,7 @@ const EquipmentContainer = styled(ShowAllContainer)`
     list-style: none;
     gap: var(--spacing-2-xs) var(--spacing-m);
     padding: 0;
+    margin: 0;
 
     display: grid;
     grid-template-columns: 1fr;
