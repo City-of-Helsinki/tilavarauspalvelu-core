@@ -13,7 +13,7 @@ from tilavarauspalvelu.enums import (
     ReservationStateChoice,
     ReservationTypeChoice,
 )
-from tilavarauspalvelu.models import Reservation, ReservationUnit, User
+from tilavarauspalvelu.models import Reservation, ReservationUnit, ReservationUnitPricing, User
 from utils.date_utils import local_start_of_day, next_hour, utc_datetime
 
 from ._base import (
@@ -349,6 +349,8 @@ class ReservationBuilder(ModelFactoryBuilder[Reservation]):
         reservation_unit: ReservationUnit,
         *,
         allow_overnight: bool = False,
+        subsidised: bool = False,
+        pricing: ReservationUnitPricing | None = None,
     ) -> Self:
         """Add begin datetime and end datetime based on given reservation unit's allowed durations."""
         min_hours = math.ceil(reservation_unit.min_reservation_duration.total_seconds() / 3600)
@@ -363,9 +365,17 @@ class ReservationBuilder(ModelFactoryBuilder[Reservation]):
                 raise NextDateError
 
         duration = random.choice(range(min_hours, max_hours + 1))  # '+ 1' is for inclusive range maximum
+        end = begin + datetime.timedelta(hours=duration)
 
         self.kwargs["begin"] = begin
-        self.kwargs["end"] = begin + datetime.timedelta(hours=duration)
+        self.kwargs["end"] = end
         self.kwargs["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(self.kwargs["begin"])
         self.kwargs["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(self.kwargs["end"])
+
+        if pricing is not None:
+            self.kwargs["price"] = pricing.actions.calculate_reservation_price(duration=end - begin)
+            self.kwargs["non_subsidised_price"] = pricing.highest_price
+            self.kwargs["unit_price"] = pricing.lowest_price if subsidised else pricing.highest_price
+            self.kwargs["tax_percentage_value"] = pricing.tax_percentage.value
+
         return self

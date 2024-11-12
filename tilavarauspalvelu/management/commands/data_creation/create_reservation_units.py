@@ -48,18 +48,13 @@ from tilavarauspalvelu.tasks import create_reservation_unit_thumbnails_and_urls
 from utils.date_utils import DEFAULT_TIMEZONE
 
 from .create_reservation_related_things import (
-    _create_cancellation_rules,
     _create_equipments,
-    _create_hauki_resources,
     _create_payment_accountings,
     _create_payment_merchants,
     _create_purposes,
     _create_qualifiers,
-    _create_reservation_metadata_sets,
     _create_reservation_unit_payment_types,
     _create_services,
-    _create_specific_terms_of_use,
-    _create_tax_percentages,
     _fetch_and_build_reservation_unit_image,
 )
 from .create_seasonal_booking import _create_application_round_time_slots
@@ -71,6 +66,7 @@ from .utils import (
     HandlingInfo,
     PaidReservationUnitData,
     PaymentTypeInfo,
+    Percentage,
     PriceInfo,
     ReservableWindowInfo,
     ReservationKindInfo,
@@ -88,14 +84,15 @@ if TYPE_CHECKING:
 
 
 @with_logs
-def _create_reservation_units() -> list[ReservationUnit]:
+def _create_reservation_units(
+    metadata_sets: dict[SetName, ReservationMetadataSet],
+    terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
+    cancellation_rules: list[ReservationUnitCancellationRule],
+    hauki_resources: list[OriginHaukiResource],
+    tax_percentages: dict[Percentage, TaxPercentage],
+) -> list[ReservationUnit]:
     # --- Create dependencies for the reservation units  ------------------------------------------------------------
 
-    hauki_resources = _create_hauki_resources()
-    terms_of_use = _create_specific_terms_of_use()
-    metadata_sets = _create_reservation_metadata_sets()
-    cancellation_rules = _create_cancellation_rules()
-    tax_percentages = _create_tax_percentages()
     payment_types = _create_reservation_unit_payment_types()
     merchants = _create_payment_merchants()
     accountings = _create_payment_accountings()
@@ -202,7 +199,7 @@ def _create_free_reservation_units(
     hauki_resources: list[OriginHaukiResource],
     metadata_sets: dict[SetName, ReservationMetadataSet],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
-    tax_percentages: dict[str, TaxPercentage],
+    tax_percentages: dict[Percentage, TaxPercentage],
 ) -> None:
     """
     Create reservation units that:
@@ -386,7 +383,7 @@ def _create_paid_reservation_units(
     hauki_resources: list[OriginHaukiResource],
     metadata_sets: dict[SetName, ReservationMetadataSet],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
-    tax_percentages: dict[str, TaxPercentage],
+    tax_percentages: dict[Percentage, TaxPercentage],
     payment_types: dict[str, ReservationUnitPaymentType],
     merchants: list[PaymentMerchant],
     accountings: list[PaymentAccounting],
@@ -615,7 +612,7 @@ def _create_seasonal_bookable_reservation_units(
     hauki_resources: list[OriginHaukiResource],
     metadata_sets: dict[SetName, ReservationMetadataSet],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
-    tax_percentages: dict[str, TaxPercentage],
+    tax_percentages: dict[Percentage, TaxPercentage],
 ) -> None:
     """
     Create reservation units that:
@@ -773,7 +770,7 @@ def _create_empty_reservation_units(
     cancellation_rules: list[ReservationUnitCancellationRule],
     metadata_sets: dict[SetName, ReservationMetadataSet],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
-    tax_percentages: dict[str, TaxPercentage],
+    tax_percentages: dict[Percentage, TaxPercentage],
 ) -> None:
     """Creates reservation units that have no spaces, resources, or hauki resource, making it "un-bookable"."""
     unit = UnitFactory.create(
@@ -830,7 +827,7 @@ def _create_archived_reservation_units(
     metadata_sets: dict[SetName, ReservationMetadataSet],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     hauki_resources: list[OriginHaukiResource],
-    tax_percentages: dict[str, TaxPercentage],
+    tax_percentages: dict[Percentage, TaxPercentage],
 ) -> None:
     """Creates reservation units that are archived, meaning it has been "soft-removed" from the system."""
     unit = UnitFactory.create(
@@ -889,7 +886,7 @@ def _create_single_reservation_per_user_reservation_units(
     metadata_sets: dict[SetName, ReservationMetadataSet],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     hauki_resources: list[OriginHaukiResource],
-    tax_percentages: dict[str, TaxPercentage],
+    tax_percentages: dict[Percentage, TaxPercentage],
 ) -> None:
     """Creates reservation units where one user can only have a single reservation at a time."""
     unit = UnitFactory.create(
@@ -956,7 +953,7 @@ def _create_full_day_reservation_units(
     metadata_sets: dict[SetName, ReservationMetadataSet],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     hauki_resources: list[OriginHaukiResource],
-    tax_percentages: dict[str, TaxPercentage],
+    tax_percentages: dict[Percentage, TaxPercentage],
 ) -> None:
     """Creates reservation units where a single booking blocks all other reservations for the same day."""
     unit = UnitFactory.create(
@@ -1046,7 +1043,7 @@ def _create_reservation_units_in_space_hierarchies(
     metadata_sets: dict[SetName, ReservationMetadataSet],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     hauki_resources: list[OriginHaukiResource],
-    tax_percentages: dict[str, TaxPercentage],
+    tax_percentages: dict[Percentage, TaxPercentage],
 ) -> None:
     """
     Create reservation units which different parts of the same physical location.
@@ -1399,7 +1396,7 @@ def _create_reservation_units_in_resource_hierarchies(
     metadata_sets: dict[SetName, ReservationMetadataSet],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     hauki_resources: list[OriginHaukiResource],
-    tax_percentages: dict[str, TaxPercentage],
+    tax_percentages: dict[Percentage, TaxPercentage],
 ) -> None:
     """
     Create reservation units that share some common resources but different locations.
@@ -1596,6 +1593,70 @@ def _create_reservation_units_in_resource_hierarchies(
     ResourceThoughModel.objects.bulk_create(reservation_unit_resources)
     ReservationUnitPricing.objects.bulk_create(pricings)
     ReservationUnitImage.objects.bulk_create(images)
+
+
+@with_logs
+def _create_reservation_unit_for_recurring_reservations(
+    metadata_sets: dict[SetName, ReservationMetadataSet],
+    terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
+    cancellation_rules: list[ReservationUnitCancellationRule],
+    hauki_resources: list[OriginHaukiResource],
+    tax_percentage: TaxPercentage,
+) -> ReservationUnit:
+    unit = UnitFactory.create(
+        name="Toistuva",
+        name_fi="Toistuva",
+        name_en="Recurring",
+        name_sv="Återkommande",
+        tprek_id=None,
+        tprek_department_id=None,
+    )
+    space = SpaceFactory.create(
+        name="Toistuva treenikenttä",
+        name_fi="Toistuva treenikenttä",
+        name_en="Recurring training ground",
+        name_sv="Återkommande träningsplats",
+        unit=unit,
+    )
+    reservation_unit_type = ReservationUnitTypeFactory.create(
+        name="Toistuva",
+        name_fi="Toistuva",
+        name_en="Recurring",
+        name_sv="Återkommande",
+    )
+
+    reservation_unit = (
+        _get_base_reservation_unit_builder(
+            reservation_unit_type=reservation_unit_type,
+            metadata_sets=metadata_sets,
+            terms_of_use=terms_of_use,
+            cancellation_rules=cancellation_rules,
+            hauki_resources=hauki_resources,
+        )
+        .for_space(space)
+        .create()
+    )
+
+    reservation_unit.spaces.add(space)
+
+    ReservationUnitPricingFactory.create(
+        begins=datetime.date(2021, 1, 1),
+        price_unit=PriceUnit.PRICE_UNIT_FIXED,
+        lowest_price=Decimal("0"),
+        highest_price=Decimal("0"),
+        reservation_unit=reservation_unit,
+        tax_percentage=tax_percentage,
+    )
+
+    image = _fetch_and_build_reservation_unit_image(
+        reservation_unit=reservation_unit,
+        image_url="https://plus.unsplash.com/premium_photo-1684713510655-e6e31536168d",
+        filename="treenikentta",
+    )
+    if image is not None:
+        image.save()
+
+    return reservation_unit
 
 
 def _get_base_reservation_unit_builder(

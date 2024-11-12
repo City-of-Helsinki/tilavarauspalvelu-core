@@ -4,7 +4,6 @@ import random
 from decimal import Decimal
 from itertools import cycle
 from pathlib import Path
-from typing import Literal
 
 import requests
 from django.conf import settings
@@ -65,7 +64,7 @@ from tilavarauspalvelu.models import (
 )
 from utils.date_utils import DEFAULT_TIMEZONE, combine, local_start_of_day
 
-from .utils import FieldCombination, PurposeData, SetName, with_logs
+from .utils import FieldCombination, Percentage, PurposeData, SetName, with_logs
 
 
 @with_logs
@@ -246,7 +245,7 @@ def _create_reservation_unit_payment_types() -> dict[PaymentType.INVOICE, Reserv
 
 
 @with_logs
-def _create_tax_percentages() -> dict[Literal["0", "10", "14", "24", "25.5"], TaxPercentage]:
+def _create_tax_percentages() -> dict[Percentage, TaxPercentage]:
     tax_percentages: list[TaxPercentage] = [
         TaxPercentageFactory.build(value=Decimal(percentage))  #
         for percentage in ("0", "10", "14", "24", "25.5")
@@ -745,7 +744,13 @@ def _fetch_and_build_reservation_unit_image(
 
 
 def _fetch_image(image_url: str, path: Path) -> None:
-    response = requests.get(image_url, timeout=5)
+    try:
+        response = requests.get(image_url, timeout=8)
+    except Exception as e:
+        msg = f"Could not download image from '{image_url}': {e}"
+        print(msg)  # noqa: T201, RUF100
+        return
+
     if response.status_code != 200:
         msg = f"Could not download image from '{image_url}' (status: {response.status_code})"
         print(msg)  # noqa: T201, RUF100

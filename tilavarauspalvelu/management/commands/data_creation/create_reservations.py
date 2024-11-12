@@ -3,6 +3,7 @@ import random
 
 from django.db import models
 
+from tests.factories import RecurringReservationFactory, RejectedOccurrenceFactory
 from tests.factories.payment_order import PaymentOrderBuilder
 from tests.factories.reservation import NextDateError, ReservationBuilder
 from tilavarauspalvelu.enums import (
@@ -13,23 +14,33 @@ from tilavarauspalvelu.enums import (
     ReservationKind,
     ReservationStateChoice,
     ReservationTypeChoice,
+    TermsOfUseTypeChoices,
+    WeekdayChoice,
 )
 from tilavarauspalvelu.models import (
     AgeGroup,
     City,
+    OriginHaukiResource,
     PaymentOrder,
+    RecurringReservation,
+    RejectedOccurrence,
     Reservation,
     ReservationCancelReason,
     ReservationDenyReason,
+    ReservationMetadataSet,
     ReservationPurpose,
     ReservationUnit,
+    ReservationUnitCancellationRule,
     ReservationUnitPricing,
+    TaxPercentage,
+    TermsOfUse,
     User,
 )
-from utils.date_utils import DEFAULT_TIMEZONE, combine, get_date_range, local_date, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, combine, get_date_range, get_periods_between, local_date, local_datetime
 
 from .create_reservation_related_things import _create_cancel_reasons, _create_deny_reasons
-from .utils import weighted_choice, with_logs
+from .create_reservation_units import _create_reservation_unit_for_recurring_reservations
+from .utils import SetName, weighted_choice, with_logs
 
 
 @with_logs
@@ -153,8 +164,8 @@ def _create_normal_reservations(
         min_interval_hours = max(int(max_buffer.total_seconds() / 3600), 1 if busy else 5)
         max_interval_hours = max(min_interval_hours + 1, 3 if busy else 10)
 
-        price: ReservationUnitPricing = next(iter(reservation_unit.pricings.all()), None)
-        assert price is not None, "Reservation unit must have at least one pricing"
+        pricing: ReservationUnitPricing = next(iter(reservation_unit.pricings.all()), None)
+        assert pricing is not None, "Reservation unit must have at least one pricing"
 
         payment_types_choices: list[PaymentType] = [
             PaymentType(payment_type.code) for payment_type in reservation_unit.payment_types.all()
@@ -179,7 +190,7 @@ def _create_normal_reservations(
                 customer_type = weighted_choice(customer_type_choices, weights=[5, 1, 1])
                 reservation_type = weighted_choice(reservation_type_choices, weights=[5, 1, 1])
 
-                if reservation_state in handling_state_choices and price.highest_price != price.lowest_price:
+                if reservation_state in handling_state_choices and pricing.highest_price != pricing.lowest_price:
                     applying_for_free_of_charge = random.choice([True, False])
                     if applying_for_free_of_charge:
                         free_of_charge_reason = "Reason for applying for free of charge"
@@ -193,7 +204,7 @@ def _create_normal_reservations(
                         .for_user(user)
                         .for_reservation_unit(reservation_unit)
                         .for_customer_type(customer_type)
-                        .starting_at(begin_datetime, reservation_unit)
+                        .starting_at(begin_datetime, reservation_unit, pricing=pricing)
                         .build(
                             type=reservation_type,
                             state=reservation_state,
@@ -201,11 +212,6 @@ def _create_normal_reservations(
                             handled_at=handled_at,
                             confirmed_at=local_datetime(),
                             created_at=local_datetime(),
-                            #
-                            price=price.lowest_price,
-                            non_subsidised_price=price.highest_price,
-                            unit_price=price.lowest_price,
-                            tax_percentage_value=price.tax_percentage.value,
                             #
                             applying_for_free_of_charge=applying_for_free_of_charge,
                             free_of_charge_reason=free_of_charge_reason,
@@ -232,7 +238,7 @@ def _create_normal_reservations(
                     )
                 )
 
-                if price.highest_price > 0:
+                if pricing.highest_price > 0:
                     payment_order = _build_payment_order(reservation, payment_types_choices)
                     payment_orders.append(payment_order)
 
@@ -339,8 +345,8 @@ def _create_full_day_reservations(
         if reservation_unit.require_reservation_handling:
             handled_at = local_datetime()
 
-        price: ReservationUnitPricing = next(iter(reservation_unit.pricings.all()), None)
-        assert price is not None, "Reservation unit must have at least one pricing"
+        pricing: ReservationUnitPricing = next(iter(reservation_unit.pricings.all()), None)
+        assert pricing is not None, "Reservation unit must have at least one pricing"
 
         for reservation_date in get_date_range(start_date, number=14):
             skip_day = weighted_choice([True, False], weights=[1, 5])
@@ -358,18 +364,13 @@ def _create_full_day_reservations(
                 .for_user(user)
                 .for_reservation_unit(reservation_unit)
                 .for_customer_type(customer_type)
-                .starting_at(begin_datetime, reservation_unit)
+                .starting_at(begin_datetime, reservation_unit, pricing=pricing)
                 .build(
                     type=reservation_type,
                     state=ReservationStateChoice.CONFIRMED,
                     #
                     handled_at=handled_at,
                     confirmed_at=local_datetime(),
-                    #
-                    price=price.highest_price,
-                    non_subsidised_price=price.highest_price,
-                    unit_price=price.highest_price,
-                    tax_percentage_value=price.tax_percentage.value,
                     #
                     applying_for_free_of_charge=False,
                     free_of_charge_reason=None,
@@ -466,8 +467,8 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
     reservation_date = local_date()
 
     for reservation_unit in space_reservation_units:
-        price: ReservationUnitPricing = next(iter(reservation_unit.pricings.all()), None)
-        assert price is not None, "Reservation unit must have at least one pricing"
+        pricing: ReservationUnitPricing = next(iter(reservation_unit.pricings.all()), None)
+        assert pricing is not None, "Reservation unit must have at least one pricing"
 
         begin_time = datetime.time(hour=random.randint(8, 12), tzinfo=DEFAULT_TIMEZONE)
         begin_datetime = combine(reservation_date, begin_time)
@@ -479,18 +480,13 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
             .for_user(user)
             .for_reservation_unit(reservation_unit)
             .for_customer_type(customer_type)
-            .starting_at(begin_datetime, reservation_unit)
+            .starting_at(begin_datetime, reservation_unit, pricing=pricing)
             .build(
                 type=ReservationTypeChoice.NORMAL,
                 state=ReservationStateChoice.CONFIRMED,
                 #
                 handled_at=None,
                 confirmed_at=local_datetime(),
-                #
-                price=price.highest_price,
-                non_subsidised_price=price.highest_price,
-                unit_price=price.highest_price,
-                tax_percentage_value=price.tax_percentage.value,
                 #
                 applying_for_free_of_charge=False,
                 free_of_charge_reason=None,
@@ -513,8 +509,8 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
         reservation_date += datetime.timedelta(days=1)
 
     for reservation_unit in resource_reservation_units:
-        price: ReservationUnitPricing = next(iter(reservation_unit.pricings.all()), None)
-        assert price is not None, "Reservation unit must have at least one pricing"
+        pricing: ReservationUnitPricing = next(iter(reservation_unit.pricings.all()), None)
+        assert pricing is not None, "Reservation unit must have at least one pricing"
 
         begin_time = datetime.time(hour=random.randint(8, 12), tzinfo=DEFAULT_TIMEZONE)
         begin_datetime = combine(reservation_date, begin_time)
@@ -526,18 +522,13 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
             .for_user(user)
             .for_reservation_unit(reservation_unit)
             .for_customer_type(customer_type)
-            .starting_at(begin_datetime, reservation_unit)
+            .starting_at(begin_datetime, reservation_unit, pricing=pricing)
             .build(
                 type=ReservationTypeChoice.NORMAL,
                 state=ReservationStateChoice.CONFIRMED,
                 #
                 handled_at=None,
                 confirmed_at=local_datetime(),
-                #
-                price=price.highest_price,
-                non_subsidised_price=price.highest_price,
-                unit_price=price.highest_price,
-                tax_percentage_value=price.tax_percentage.value,
                 #
                 applying_for_free_of_charge=False,
                 free_of_charge_reason=None,
@@ -561,3 +552,325 @@ def _create_reservations_for_reservation_units_affecting_other_reservation_units
 
     Reservation.objects.bulk_create(reservations)
     ReservationUnitThroughModel.objects.bulk_create(reservation_reservation_units)
+
+
+@with_logs
+def _create_recurring_reservations(
+    metadata_sets: dict[SetName, ReservationMetadataSet],
+    terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
+    cancellation_rules: list[ReservationUnitCancellationRule],
+    hauki_resources: list[OriginHaukiResource],
+    tax_percentage: TaxPercentage,
+    reservation_purposes: list[ReservationPurpose],
+    age_groups: list[AgeGroup],
+    cities: list[City],
+) -> None:
+    user = User.objects.get(username="tvp")
+
+    reservation_unit = _create_reservation_unit_for_recurring_reservations(
+        metadata_sets=metadata_sets,
+        terms_of_use=terms_of_use,
+        cancellation_rules=cancellation_rules,
+        hauki_resources=hauki_resources,
+        tax_percentage=tax_percentage,
+    )
+
+    _create_past_recurring_reservation(
+        name="Viime kauden futistreenit",
+        weekdays=[WeekdayChoice.MONDAY],
+        reservation_unit=reservation_unit,
+        user=user,
+        reservation_purposes=reservation_purposes,
+        age_groups=age_groups,
+        cities=cities,
+    )
+
+    _create_future_recurring_reservation(
+        name="Tulevan kauden futistreenit",
+        weekdays=[WeekdayChoice.MONDAY],
+        reservation_unit=reservation_unit,
+        user=user,
+        reservation_purposes=reservation_purposes,
+        age_groups=age_groups,
+        cities=cities,
+    )
+
+    _create_ongoing_recurring_reservation(
+        name="Aikuisten treenit kaksi kertaa viikossa",
+        weekdays=[WeekdayChoice.WEDNESDAY, WeekdayChoice.FRIDAY],
+        reservation_unit=reservation_unit,
+        user=user,
+        reservation_purposes=reservation_purposes,
+        age_groups=age_groups,
+        cities=cities,
+    )
+
+    _create_ongoing_recurring_reservation(
+        name="Ajoittaiset viikonloppupelit",
+        weekdays=[WeekdayChoice.SATURDAY],
+        reservation_unit=reservation_unit,
+        user=user,
+        reservation_purposes=reservation_purposes,
+        age_groups=age_groups,
+        cities=cities,
+        cancel_random=3,
+        deny_random=3,
+        reject_random=3,
+    )
+
+
+@with_logs
+def _create_past_recurring_reservation(
+    name: str,
+    weekdays: list[WeekdayChoice],
+    reservation_unit: ReservationUnit,
+    user: User,
+    reservation_purposes: list[ReservationPurpose],
+    age_groups: list[AgeGroup],
+    cities: list[City],
+    *,
+    cancel_random: int = 0,
+    deny_random: int = 0,
+    reject_random: int = 0,
+) -> None:
+    today = local_date()
+
+    age_group = random.choice(age_groups)
+    series = RecurringReservationFactory.create(
+        name=name,
+        #
+        begin_date=today - datetime.timedelta(days=90),
+        end_date=today - datetime.timedelta(days=1),
+        #
+        end_time=datetime.time(hour=11, minute=0),
+        begin_time=datetime.time(hour=9, minute=0),
+        #
+        weekdays=",".join(str(day.value) for day in weekdays),
+        reservation_unit=reservation_unit,
+        user=user,
+        age_group=age_group,
+    )
+    _create_reservations_for_series(
+        series=series,
+        reservation_purposes=reservation_purposes,
+        age_group=age_group,
+        cities=cities,
+        cancel_random=cancel_random,
+        deny_random=deny_random,
+        reject_random=reject_random,
+    )
+
+
+@with_logs
+def _create_future_recurring_reservation(
+    name: str,
+    weekdays: list[WeekdayChoice],
+    reservation_unit: ReservationUnit,
+    user: User,
+    reservation_purposes: list[ReservationPurpose],
+    age_groups: list[AgeGroup],
+    cities: list[City],
+    *,
+    cancel_random: int = 0,
+    deny_random: int = 0,
+    reject_random: int = 0,
+) -> None:
+    today = local_date()
+
+    age_group = random.choice(age_groups)
+    series = RecurringReservationFactory.create(
+        name=name,
+        #
+        begin_date=today + datetime.timedelta(days=1),
+        end_date=today + datetime.timedelta(days=90),
+        #
+        begin_time=datetime.time(hour=8, minute=0),
+        end_time=datetime.time(hour=10, minute=0),
+        #
+        weekdays=",".join(str(day.value) for day in weekdays),
+        reservation_unit=reservation_unit,
+        user=user,
+        age_group=age_group,
+    )
+    _create_reservations_for_series(
+        series=series,
+        reservation_purposes=reservation_purposes,
+        age_group=age_group,
+        cities=cities,
+        cancel_random=cancel_random,
+        deny_random=deny_random,
+        reject_random=reject_random,
+    )
+
+
+@with_logs
+def _create_ongoing_recurring_reservation(
+    name: str,
+    weekdays: list[WeekdayChoice],
+    reservation_unit: ReservationUnit,
+    user: User,
+    reservation_purposes: list[ReservationPurpose],
+    age_groups: list[AgeGroup],
+    cities: list[City],
+    *,
+    cancel_random: int = 0,
+    deny_random: int = 0,
+    reject_random: int = 0,
+) -> None:
+    today = local_date()
+
+    age_group = random.choice(age_groups)
+    series = RecurringReservationFactory.create(
+        name=name,
+        #
+        begin_date=today - datetime.timedelta(days=30),
+        end_date=today + datetime.timedelta(days=60),
+        #
+        begin_time=datetime.time(hour=14, minute=0),
+        end_time=datetime.time(hour=16, minute=0),
+        #
+        weekdays=",".join(str(day.value) for day in weekdays),
+        reservation_unit=reservation_unit,
+        user=user,
+        age_group=age_group,
+    )
+    _create_reservations_for_series(
+        series=series,
+        reservation_purposes=reservation_purposes,
+        age_group=age_group,
+        cities=cities,
+        cancel_random=cancel_random,
+        deny_random=deny_random,
+        reject_random=reject_random,
+    )
+
+
+def _create_reservations_for_series(
+    series: RecurringReservation,
+    reservation_purposes: list[ReservationPurpose],
+    cities: list[City],
+    age_group: AgeGroup,
+    *,
+    cancel_random: int = 0,
+    deny_random: int = 0,
+    reject_random: int = 0,
+) -> None:
+    ReservationUnitThroughModel: type[models.Model] = Reservation.reservation_units.through  # noqa: N806
+
+    pricing: ReservationUnitPricing | None = series.reservation_unit.pricings.active().first()
+    assert pricing is not None, "Reservation unit must have at least one pricing"
+
+    weekdays: list[int] = [int(val) for val in series.weekdays.split(",") if val != ""]
+
+    reservations: list[Reservation] = []
+    reservation_reservation_units: list[models.Model] = []
+    occurrences: list[RejectedOccurrence] = []
+
+    for weekday in weekdays:
+        delta: int = weekday - series.begin_date.weekday()
+        if delta < 0:
+            delta += 7
+
+        begin_date = series.begin_date + datetime.timedelta(days=delta)
+
+        periods = get_periods_between(
+            start_date=begin_date,
+            end_date=series.end_date,
+            start_time=series.begin_time,
+            end_time=series.end_time,
+            interval=series.recurrence_in_days,
+            tzinfo=DEFAULT_TIMEZONE,
+        )
+
+        buffer_time_before = series.reservation_unit.actions.get_actual_before_buffer(series.begin_time)
+        buffer_time_after = series.reservation_unit.actions.get_actual_before_buffer(series.end_time)
+
+        for begin, end in periods:
+            reservation = (
+                ReservationBuilder()
+                .for_user(series.user)
+                .for_reservation_unit(series.reservation_unit)
+                .for_nonprofit()
+                .build(
+                    recurring_reservation=series,
+                    #
+                    begin=begin,
+                    end=end,
+                    buffer_time_before=buffer_time_before,
+                    buffer_time_after=buffer_time_after,
+                    #
+                    type=ReservationTypeChoice.NORMAL,
+                    state=ReservationStateChoice.CONFIRMED,
+                    #
+                    handled_at=None,
+                    confirmed_at=local_datetime(),
+                    created_at=local_datetime(),
+                    #
+                    price=pricing.actions.calculate_reservation_price(duration=end - begin),
+                    non_subsidised_price=pricing.highest_price,
+                    unit_price=pricing.highest_price,
+                    tax_percentage_value=pricing.tax_percentage.value,
+                    #
+                    applying_for_free_of_charge=False,
+                    free_of_charge_reason=None,
+                    #
+                    purpose=random.choice(reservation_purposes),
+                    age_group=age_group,
+                    home_city=random.choice(cities),
+                    #
+                    deny_reason=None,
+                    cancel_reason=None,
+                )
+            )
+
+            reservations.append(reservation)
+
+            reservation_reservation_units.append(
+                ReservationUnitThroughModel(
+                    reservation=reservation,
+                    reservationunit=series.reservation_unit,
+                )
+            )
+
+    if cancel_random > 0:
+        cancel_reasons = list(ReservationCancelReason.objects.all())
+        assert cancel_reasons, "Reservation cancel reasons not found"
+
+        for reservation in random.sample(reservations, cancel_random):
+            reservation.state = ReservationStateChoice.CANCELLED
+            reservation.cancel_reason = random.choice(cancel_reasons)
+            reservation.cancel_details = "Cancelled"
+
+    if deny_random > 0:
+        deny_reasons = list(ReservationDenyReason.objects.all())
+        assert deny_reasons, "Reservation deny reasons not found"
+
+        for reservation in random.sample(reservations, deny_random):
+            # Reset cancellation.
+            reservation.cancel_reason = None
+            reservation.cancel_details = ""
+
+            reservation.state = ReservationStateChoice.DENIED
+            reservation.deny_reason = random.choice(deny_reasons)
+            reservation.handled_at = local_datetime()
+
+    if reject_random > 0:
+        rejected_count: int = 0
+
+        while rejected_count <= reject_random:
+            # Replace the reservation with a rejected occurrence.
+            index = random.randint(0, len(reservations) - 1)
+            reservation = reservations.pop(index)
+            reservation_reservation_units.pop(index)
+            occurrence = RejectedOccurrenceFactory.build(
+                begin_datetime=reservation.begin,
+                end_datetime=reservation.end,
+                recurring_reservation=reservation.recurring_reservation,
+                created_at=local_datetime(),
+            )
+            occurrences.append(occurrence)
+            rejected_count += 1
+
+    Reservation.objects.bulk_create(reservations)
+    ReservationUnitThroughModel.objects.bulk_create(reservation_reservation_units)
+    RejectedOccurrence.objects.bulk_create(occurrences)

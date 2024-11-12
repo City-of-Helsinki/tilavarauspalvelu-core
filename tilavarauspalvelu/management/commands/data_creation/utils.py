@@ -42,6 +42,8 @@ if TYPE_CHECKING:
 T = TypeVar("T")
 P = ParamSpec("P")
 
+type Percentage = Literal["0", "10", "14", "24", "25.5"]
+
 
 def random_subset(
     sequence: Sequence[T],
