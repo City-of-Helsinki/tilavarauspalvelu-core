@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import datetime
-import math
-from decimal import Decimal
 from typing import TYPE_CHECKING, Literal
 
 from django.conf import settings
@@ -14,7 +12,6 @@ from tilavarauspalvelu.enums import (
     CalendarProperty,
     CustomerTypeChoice,
     EventProperty,
-    PriceUnit,
     TimezoneProperty,
     TimezoneRuleProperty,
 )
@@ -23,6 +20,8 @@ from tilavarauspalvelu.translation import get_attr_by_language, get_translated
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 if TYPE_CHECKING:
+    from decimal import Decimal
+
     from tilavarauspalvelu.models import Location, Reservation, ReservationUnit, Unit
     from tilavarauspalvelu.typing import Lang
 
@@ -226,19 +225,5 @@ class ReservationActions:
         if pricing is None:
             raise ValueError("Reservation unit has no pricing information")
 
-        if pricing.highest_price == 0:
-            return Decimal("0")
-
-        price_unit = PriceUnit(pricing.price_unit)
-        price = pricing.lowest_price if subsidised else pricing.highest_price
-
-        # Time-based calculation is needed only if price unit is not fixed.
-        # Otherwise, we can just use the price defined in the reservation unit
-        if price_unit in PriceUnit.fixed_price_units:
-            return price
-
-        # Price calculations use duration rounded to the next 15 minutes
-        duration_seconds = int((end_datetime - begin_datetime).total_seconds())
-        duration_minutes = int(math.ceil(duration_seconds / 60 / 15) * 15)
-
-        return (price / price_unit.in_minutes) * duration_minutes
+        duration = end_datetime - begin_datetime
+        return pricing.actions.calculate_reservation_price(duration, subsidised=subsidised)
