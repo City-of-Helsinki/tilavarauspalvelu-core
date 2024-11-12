@@ -172,7 +172,7 @@ def test_email_service__send_permission_deactivation_emails(outbox):
 
     assert len(outbox) == 1
 
-    assert outbox[0].subject == "Your permissions in Varaamo are going to be deactivated"
+    assert outbox[0].subject == "Your staff access to Varaamo is expiring"
     assert sorted(outbox[0].bcc) == ["user@email.com"]
 
 
@@ -205,7 +205,7 @@ def test_email_service__send_permission_deactivation_emails__permissions_going_t
 
     assert len(outbox) == 1
 
-    assert outbox[0].subject == "Your permissions in Varaamo are going to be deactivated"
+    assert outbox[0].subject == "Your staff access to Varaamo is expiring"
     assert sorted(outbox[0].bcc) == ["user@email.com"]
 
 
@@ -237,7 +237,7 @@ def test_email_service__send_permission_deactivation_emails__general_admin(outbo
 
     assert len(outbox) == 1
 
-    assert outbox[0].subject == "Your permissions in Varaamo are going to be deactivated"
+    assert outbox[0].subject == "Your staff access to Varaamo is expiring"
     assert sorted(outbox[0].bcc) == ["user@email.com"]
 
 
@@ -270,7 +270,7 @@ def test_email_service__send_permission_deactivation_emails__unit_admin(outbox):
 
     assert len(outbox) == 1
 
-    assert outbox[0].subject == "Your permissions in Varaamo are going to be deactivated"
+    assert outbox[0].subject == "Your staff access to Varaamo is expiring"
     assert sorted(outbox[0].bcc) == ["user@email.com"]
 
 
@@ -309,10 +309,10 @@ def test_email_service__send_permission_deactivation_emails__multiple_languages(
 
     assert len(outbox) == 2
 
-    assert outbox[0].subject == "Varaamo-tunnuksesi käyttöoikeudet ovat vanhenemassa"
+    assert outbox[0].subject == "Henkilökunnan käyttöoikeutesi Varaamoon on vanhentumassa"
     assert sorted(outbox[0].bcc) == ["user2@email.com"]
 
-    assert outbox[1].subject == "Your permissions in Varaamo are going to be deactivated"
+    assert outbox[1].subject == "Your staff access to Varaamo is expiring"
     assert sorted(outbox[1].bcc) == ["user1@email.com"]
 
 
@@ -362,7 +362,7 @@ def test_email_service__send_user_anonymization_emails(outbox):
 
     assert len(outbox) == 1
 
-    assert outbox[0].subject == "The data in your Varaamo account will be removed soon"
+    assert outbox[0].subject == "Your user account in the Varaamo service is expiring"
     assert sorted(outbox[0].bcc) == ["user@email.com"]
 
 
@@ -423,7 +423,7 @@ def test_email_service__send_user_anonymization_emails__going_to_be_old(outbox):
 
     assert len(outbox) == 1
 
-    assert outbox[0].subject == "The data in your Varaamo account will be removed soon"
+    assert outbox[0].subject == "Your user account in the Varaamo service is expiring"
     assert sorted(outbox[0].bcc) == ["user@email.com"]
 
 
@@ -470,10 +470,10 @@ def test_email_service__send_user_anonymization_emails__multiple_languages(outbo
 
     assert len(outbox) == 2
 
-    assert outbox[0].subject == "Tiedot Varaamo tililläsi tullaan poistamaan pian"
+    assert outbox[0].subject == "Käyttäjätilisi Varaamo-palveluun on vanhentumassa"
     assert sorted(outbox[0].bcc) == ["user2@email.com"]
 
-    assert outbox[1].subject == "The data in your Varaamo account will be removed soon"
+    assert outbox[1].subject == "Your user account in the Varaamo service is expiring"
     assert sorted(outbox[1].bcc) == ["user1@email.com"]
 
 

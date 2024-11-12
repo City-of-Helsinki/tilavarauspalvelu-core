@@ -166,22 +166,17 @@ def test_render_permission_deactivation__html():
     html_content = render_html(email_type=EmailType.PERMISSION_DEACTIVATION, context=context)
     text_content = html_email_to_text(html_content)
 
-    message = (
-        "Your account in Varaamo has staff permissions. "
-        "Since you haven't logged in for a while, these permissions are going to be revoked."
-    )
-
     assert text_content == cleandoc(
-        f"""
+        """
         ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
 
         **Varaamo**
 
         **Hi,**
 
-        {message}
+        Your staff access to Varaamo will expire if you do not log in to the service within two weeks.
 
-        You can login to Varaamo here to prevent this from happening:
+        Log in to the service at:
         <https://fake.varaamo.hel.fi/kasittely>
 
         Kind regards
@@ -205,17 +200,22 @@ def test_render_user_anonymization__html():
     html_content = render_html(email_type=EmailType.USER_ANONYMIZATION, context=context)
     text_content = html_email_to_text(html_content)
 
+    message = (
+        "Your user account in the Varaamo service will expire if you do not log in within two weeks. "
+        "The information will be permanently deleted if your account expires."
+    )
+
     assert text_content == cleandoc(
-        """
+        f"""
         ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
 
         **Varaamo**
 
         **Hi,**
 
-        Your account in Varaamo has not been used for a while. The data in your account will be removed soon.
+        {message}
 
-        You can login to Varaamo here to prevent this from happening:
+        You can extend the validity of your user account by logging into the service at:
         <https://fake.varaamo.hel.fi/en>
 
         Kind regards

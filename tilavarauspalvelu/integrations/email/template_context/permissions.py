@@ -28,17 +28,12 @@ def get_context_for_permission_deactivation(*, language: Lang) -> EmailContext:
     link_tag = create_anchor_tag(link=link)
 
     return {
-        "title": pgettext("Email", "Your permissions in Varaamo are going to be deactivated"),
+        "title": pgettext("Email", "Your staff access to Varaamo is expiring"),
         "text_permission_deactivation": pgettext(
             "Email",
-            # NOTE: Must format like this so that Django can discover the translation.
-            "Your account in Varaamo has staff permissions. Since you haven't logged in for a while, "
-            "these permissions are going to be revoked.",
+            "Your staff access to Varaamo will expire if you do not log in to the service within two weeks.",
         ),
-        "text_login_to_prevent": pgettext(
-            "Email",
-            "You can login to Varaamo here to prevent this from happening",
-        ),
+        "text_login_to_prevent": pgettext("Email", "Log in to the service at"),
         "login_url": link,
         "login_url_html": link_tag,
         **get_contex_for_base_template(language=language),
@@ -52,14 +47,16 @@ def get_context_for_user_anonymization(*, language: Lang) -> EmailContext:
     link_tag = create_anchor_tag(link=link)
 
     return {
-        "title": pgettext("Email", "The data in your Varaamo account will be removed soon"),
+        "title": pgettext("Email", "Your user account in the Varaamo service is expiring"),
         "text_user_anonymization": pgettext(
             "Email",
-            "Your account in Varaamo has not been used for a while. The data in your account will be removed soon.",
+            # NOTE: Must format like this so that Django can discover the translation.
+            "Your user account in the Varaamo service will expire if you do not log in within two weeks. "
+            "The information will be permanently deleted if your account expires.",
         ),
         "text_login_to_prevent": pgettext(
             "Email",
-            "You can login to Varaamo here to prevent this from happening",
+            "You can extend the validity of your user account by logging into the service at",
         ),
         "login_url": link,
         "login_url_html": link_tag,

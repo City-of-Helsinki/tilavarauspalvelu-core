@@ -27,12 +27,11 @@ def test_get_context__permission_deactivation__en():
 
     assert context == {
         "email_recipient_name": None,
-        "title": "Your permissions in Varaamo are going to be deactivated",
+        "title": "Your staff access to Varaamo is expiring",
         "text_permission_deactivation": (
-            "Your account in Varaamo has staff permissions. "
-            "Since you haven't logged in for a while, these permissions are going to be revoked."
+            "Your staff access to Varaamo will expire if you do not log in to the service within two weeks."
         ),
-        "text_login_to_prevent": "You can login to Varaamo here to prevent this from happening",
+        "text_login_to_prevent": "Log in to the service at",
         "login_url": "https://fake.varaamo.hel.fi/kasittely",
         "login_url_html": '<a href="https://fake.varaamo.hel.fi/kasittely">https://fake.varaamo.hel.fi/kasittely</a>',
         **BASE_TEMPLATE_CONTEXT_EN,
@@ -48,12 +47,12 @@ def test_get_context__permission_deactivation__fi():
 
     assert context == {
         "email_recipient_name": None,
-        "title": "Varaamo-tunnuksesi käyttöoikeudet ovat vanhenemassa",
+        "title": "Henkilökunnan käyttöoikeutesi Varaamoon on vanhentumassa",
         "text_permission_deactivation": (
-            "Sähköpostiosoitteellasi on Varaamossa käyttäjätunnus, jolle on myönnetty henkilökunnan käyttöoikeuksia. "
-            "Koska tunnuksella ei ole kirjauduttu lähiaikoina, tullaan nämä oikeudet poistamaan."
+            "Henkilökunnan käyttöoikeutesi Varaamoon vanhenee, "
+            "jos et kirjaudu sisään palveluun kahden viikon kuluessa."
         ),
-        "text_login_to_prevent": "Voit kirjautua palveluun osoitteessa",
+        "text_login_to_prevent": "Kirjaudu palveluun osoitteessa",
         "login_url": "https://fake.varaamo.hel.fi/kasittely",
         "login_url_html": '<a href="https://fake.varaamo.hel.fi/kasittely">https://fake.varaamo.hel.fi/kasittely</a>',
         **BASE_TEMPLATE_CONTEXT_FI,
@@ -69,12 +68,11 @@ def test_get_context__permission_deactivation__sv():
 
     assert context == {
         "email_recipient_name": None,
-        "title": "Dina behörigheter i Varaamo kommer att avaktiveras",
+        "title": "Din personalåtkomst till Varaamo håller på att gå ut",
         "text_permission_deactivation": (
-            "Ditt konto i Varaamo har personalbehörighet. "
-            "Eftersom du inte har loggat in på ett tag kommer dessa behörigheter att återkallas."
+            "Din personalåtkomst till Varaamo kommer att upphöra om du inte loggar in på tjänsten inom två veckor."
         ),
-        "text_login_to_prevent": "Du kan logga in på Varaamo här för att förhindra att detta händer",
+        "text_login_to_prevent": "Logga in i tjänsten på",
         "login_url": "https://fake.varaamo.hel.fi/kasittely",
         "login_url_html": '<a href="https://fake.varaamo.hel.fi/kasittely">https://fake.varaamo.hel.fi/kasittely</a>',
         **BASE_TEMPLATE_CONTEXT_SV,
@@ -90,11 +88,12 @@ def test_get_context__user_anonymization__en():
 
     assert context == {
         "email_recipient_name": None,
-        "title": "The data in your Varaamo account will be removed soon",
+        "title": "Your user account in the Varaamo service is expiring",
         "text_user_anonymization": (
-            "Your account in Varaamo has not been used for a while. The data in your account will be removed soon."
+            "Your user account in the Varaamo service will expire if you do not log in within two weeks. "
+            "The information will be permanently deleted if your account expires."
         ),
-        "text_login_to_prevent": "You can login to Varaamo here to prevent this from happening",
+        "text_login_to_prevent": "You can extend the validity of your user account by logging into the service at",
         "login_url": "https://fake.varaamo.hel.fi/en",
         "login_url_html": '<a href="https://fake.varaamo.hel.fi/en">https://fake.varaamo.hel.fi/en</a>',
         **BASE_TEMPLATE_CONTEXT_EN,
@@ -110,13 +109,12 @@ def test_get_context__user_anonymization__fi():
 
     assert context == {
         "email_recipient_name": None,
-        "title": "Tiedot Varaamo tililläsi tullaan poistamaan pian",
+        "title": "Käyttäjätilisi Varaamo-palveluun on vanhentumassa",
         "text_user_anonymization": (
-            "Sähköpostiosoitteellasi on Varaamossa käyttäjätunnus mutta et ole enää "
-            "käyttänyt palvelua lähiaikoina. Tunnukseen liittyvät tiedot tullaan "
-            "poistamaan järjestelmästämme pian."
+            "Käyttäjätilisi Varaamo-palvelussa vanhenee, jos et kirjaudu sisään palveluun kahden viikon kuluessa. "
+            "Tiedot poistetaan pysyvästi, jos tilisi vanhenee."
         ),
-        "text_login_to_prevent": "Voit kirjautua palveluun osoitteessa",
+        "text_login_to_prevent": "Voit jatkaa käyttäjätilisi voimassaoloa kirjautumalla sisään palveluun osoitteessa",
         "login_url": "https://fake.varaamo.hel.fi",
         "login_url_html": '<a href="https://fake.varaamo.hel.fi">https://fake.varaamo.hel.fi</a>',
         **BASE_TEMPLATE_CONTEXT_FI,
@@ -132,11 +130,14 @@ def test_get_context__user_anonymization__sv():
 
     assert context == {
         "email_recipient_name": None,
-        "title": "Uppgifterna i ditt Varaamo-konto kommer snart att tas bort",
+        "title": "Ditt användarkonto i Varaamo-tjänsten håller på att gå ut",
         "text_user_anonymization": (
-            "Ditt konto i Varaamo har inte använts på ett tag. Uppgifterna på ditt konto kommer snart att tas bort."
+            "Ditt användarkonto på tjänsten Varaamo kommer att upphöra om du inte loggar in inom två veckor. "
+            "Informationen kommer att raderas permanent om ditt konto upphör."
         ),
-        "text_login_to_prevent": "Du kan logga in på Varaamo här för att förhindra att detta händer",
+        "text_login_to_prevent": (
+            "Du kan förlänga giltigheten för ditt användarkonto genom att logga in på tjänsten på"
+        ),
         "login_url": "https://fake.varaamo.hel.fi/sv",
         "login_url_html": '<a href="https://fake.varaamo.hel.fi/sv">https://fake.varaamo.hel.fi/sv</a>',
         **BASE_TEMPLATE_CONTEXT_SV,
