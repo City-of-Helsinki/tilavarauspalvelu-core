@@ -137,14 +137,11 @@ def purpose_to_save(instance: Purpose, *args: Any, **kwargs: Any):
 
 @receiver(pre_save, sender=ReservationUnitImage, dispatch_uid="reservation_unit_image_to_save")
 def reservation_unit_image_to_save(instance: ReservationUnitImage, *args: Any, **kwargs: Any):
-    if settings.IMAGE_CACHE_ENABLED:
+    if settings.UPDATE_RESERVATION_UNIT_THUMBNAILS and settings.IMAGE_CACHE_ENABLED:
         purge_previous_image_cache(instance)
 
 
 @receiver(post_save, sender=ReservationUnitImage, dispatch_uid="reservation_unit_image_saved")
 def reservation_unit_image_saved(instance: ReservationUnitImage, *args: Any, **kwargs: Any):
-    created: bool = kwargs.get("created", True)
-    update_fields: list[str] = kwargs.get("update_fields", [])
-
-    if settings.UPDATE_RESERVATION_UNIT_THUMBNAILS and (created or "image" in update_fields):
+    if settings.UPDATE_RESERVATION_UNIT_THUMBNAILS:
         create_reservation_unit_thumbnails_and_urls.delay(instance.pk)
