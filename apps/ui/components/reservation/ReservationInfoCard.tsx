@@ -164,7 +164,6 @@ export function ReservationInfoCard({
   const img = getMainImage(reservationUnit);
   const imgSrc = getImageSource(img, "medium");
 
-  // Have to make client only because date formatting doesn't work on server side
   return (
     <Wrapper $type={type}>
       {!disableImage && <MainImage src={imgSrc} alt={name} />}
@@ -185,12 +184,6 @@ export function ReservationInfoCard({
             </span>
           </Subheading>
         )}
-        <Subheading>
-          {t("reservations:reservationNumber")}:{" "}
-          <span data-testid="reservation__reservation-info-card__reservationNumber">
-            {reservation.pk ?? "-"}
-          </span>
-        </Subheading>
         <Subheading>
           {reservationUnit.unit != null
             ? getTranslation(reservationUnit.unit, "name")
