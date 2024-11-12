@@ -2966,38 +2966,46 @@ msgstr "Varausnumero"
 
 #: tilavarauspalvelu/integrations/email/template_context/permissions.py
 msgctxt "Email"
-msgid "Your permissions in Varaamo are going to be deactivated"
-msgstr "Varaamo-tunnuksesi käyttöoikeudet ovat vanhenemassa"
+msgid "Your staff access to Varaamo is expiring"
+msgstr "Henkilökunnan käyttöoikeutesi Varaamoon on vanhentumassa"
 
 #: tilavarauspalvelu/integrations/email/template_context/permissions.py
 msgctxt "Email"
 msgid ""
-"Your account in Varaamo has staff permissions. Since you haven't logged in "
-"for a while, these permissions are going to be revoked."
+"Your staff access to Varaamo will expire if you do not log in to the service "
+"within two weeks."
 msgstr ""
-"Sähköpostiosoitteellasi on Varaamossa käyttäjätunnus, jolle on myönnetty "
-"henkilökunnan käyttöoikeuksia. Koska tunnuksella ei ole kirjauduttu "
-"lähiaikoina, tullaan nämä oikeudet poistamaan."
+"Henkilökunnan käyttöoikeutesi Varaamoon vanhenee, jos et kirjaudu sisään "
+"palveluun kahden viikon kuluessa."
 
 #: tilavarauspalvelu/integrations/email/template_context/permissions.py
 msgctxt "Email"
-msgid "You can login to Varaamo here to prevent this from happening"
-msgstr "Voit kirjautua palveluun osoitteessa"
+msgid "Log in to the service at"
+msgstr "Kirjaudu palveluun osoitteessa"
 
 #: tilavarauspalvelu/integrations/email/template_context/permissions.py
 msgctxt "Email"
-msgid "The data in your Varaamo account will be removed soon"
-msgstr "Tiedot Varaamo tililläsi tullaan poistamaan pian"
+msgid "Your user account in the Varaamo service is expiring"
+msgstr "Käyttäjätilisi Varaamo-palveluun on vanhentumassa"
 
 #: tilavarauspalvelu/integrations/email/template_context/permissions.py
 msgctxt "Email"
 msgid ""
-"Your account in Varaamo has not been used for a while. The data in your "
-"account will be removed soon."
+"Your user account in the Varaamo service will expire if you do not log in "
+"within two weeks. The information will be permanently deleted if your "
+"account expires."
 msgstr ""
-"Sähköpostiosoitteellasi on Varaamossa käyttäjätunnus mutta et ole enää "
-"käyttänyt palvelua lähiaikoina. Tunnukseen liittyvät tiedot tullaan "
-"poistamaan järjestelmästämme pian."
+"Käyttäjätilisi Varaamo-palvelussa vanhenee, jos et kirjaudu sisään palveluun "
+"kahden viikon kuluessa. Tiedot poistetaan pysyvästi, jos tilisi vanhenee."
+
+#: tilavarauspalvelu/integrations/email/template_context/permissions.py
+msgctxt "Email"
+msgid ""
+"You can extend the validity of your user account by logging into the service "
+"at"
+msgstr ""
+"Voit jatkaa käyttäjätilisi voimassaoloa kirjautumalla sisään palveluun "
+"osoitteessa"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
