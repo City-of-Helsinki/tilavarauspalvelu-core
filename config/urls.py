@@ -44,6 +44,7 @@ urlpatterns = [
     ),
     path("tinymce/", include("tinymce.urls")),
     path("csrf/", csrf_view),
+    path("system-status/", include("health_check.urls", namespace="health_check")),
 ]
 
 if settings.MOCK_VERKKOKAUPPA_API_ENABLED:

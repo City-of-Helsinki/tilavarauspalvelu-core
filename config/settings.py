@@ -79,6 +79,13 @@ class Common(Environment):
         "social_django",
         "tinymce",
         "subforms",
+        # Health check
+        "health_check",
+        "health_check.db",
+        "health_check.cache",
+        "health_check.contrib.celery",
+        "health_check.contrib.celery_ping",
+        "health_check.contrib.redis",
         # Our app
         "tilavarauspalvelu",
     ]
