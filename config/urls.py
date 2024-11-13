@@ -6,7 +6,13 @@ from django.views.decorators.csrf import csrf_exempt
 from graphene_django_extensions import FileUploadGraphQLView
 
 from tilavarauspalvelu.api.gdpr.views import TilavarauspalveluGDPRAPIView
-from tilavarauspalvelu.api.rest.views import csrf_view, reservation_ical, terms_of_use_pdf
+from tilavarauspalvelu.api.rest.views import (
+    csrf_view,
+    liveness_check,
+    readiness_check,
+    reservation_ical,
+    terms_of_use_pdf,
+)
 from tilavarauspalvelu.api.webhooks.urls import webhook_router
 
 # Mock the `each_context` method to add some custom context variables.
@@ -45,6 +51,8 @@ urlpatterns = [
     path("tinymce/", include("tinymce.urls")),
     path("csrf/", csrf_view),
     path("system-status/", include("health_check.urls", namespace="health_check")),
+    path("liveness/", liveness_check, name="liveness_check"),
+    path("readiness/", readiness_check, name="readiness_check"),
 ]
 
 if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
