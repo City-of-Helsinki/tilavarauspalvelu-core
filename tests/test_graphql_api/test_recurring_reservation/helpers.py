@@ -20,6 +20,7 @@ recurring_reservations_query = partial(build_query, "recurringReservations", con
 CREATE_SERIES_MUTATION = build_mutation("createReservationSeries", "ReservationSeriesCreateMutation")
 UPDATE_SERIES_MUTATION = build_mutation("updateReservationSeries", "ReservationSeriesUpdateMutation")
 RESCHEDULE_SERIES_MUTATION = build_mutation("rescheduleReservationSeries", "ReservationSeriesRescheduleMutation")
+DENY_SERIES_MUTATION = build_mutation("denyReservationSeries", "ReservationSeriesDenyMutation", fields="denied future")
 
 
 def get_minimal_series_data(reservation_unit: ReservationUnit, user: User, **overrides: Any) -> dict[str, Any]:

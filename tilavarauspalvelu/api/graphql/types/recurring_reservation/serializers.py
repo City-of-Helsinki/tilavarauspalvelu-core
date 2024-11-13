@@ -18,7 +18,13 @@ from tilavarauspalvelu.enums import (
     ReservationTypeStaffChoice,
     WeekdayChoice,
 )
-from tilavarauspalvelu.models import RecurringReservation, Reservation, ReservationStatistic, ReservationUnit
+from tilavarauspalvelu.models import (
+    RecurringReservation,
+    Reservation,
+    ReservationDenyReason,
+    ReservationStatistic,
+    ReservationUnit,
+)
 from tilavarauspalvelu.models.recurring_reservation.actions import ReservationDetails
 from tilavarauspalvelu.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task
 from tilavarauspalvelu.utils.opening_hours.reservable_time_span_client import ReservableTimeSpanClient
@@ -611,3 +617,67 @@ def validate_series_time_slots(
     if not is_valid_start_interval:
         msg = f"Reservation start time does not match the allowed interval of {interval_minutes} minutes."
         raise ValidationError(msg, code=error_codes.RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL)
+
+
+class ReservationSeriesDenyInputSerializer(NestingModelSerializer):
+    instance: RecurringReservation
+
+    deny_reason = serializers.IntegerField(required=True)
+    handling_details = serializers.CharField(required=False)
+
+    class Meta:
+        model = RecurringReservation
+        fields = [
+            "pk",
+            "deny_reason",
+            "handling_details",
+        ]
+        extra_kwargs = {
+            "deny_reason": {"required": True},
+            "handling_details": {"required": False},
+        }
+
+    @staticmethod
+    def validate_deny_reason(value: int) -> int:
+        if ReservationDenyReason.objects.filter(pk=value).exists():
+            return value
+        msg = f"Deny reason with pk {value} does not exist."
+        raise ValidationError(msg, code=error_codes.DENY_REASON_DOES_NOT_EXIST)
+
+    def save(self, **kwargs: Any) -> RecurringReservation:
+        now = local_datetime()
+
+        reservations = self.instance.reservations.filter(
+            begin__gt=now,
+            state__in=ReservationStateChoice.states_that_can_change_to_deny,
+        )
+
+        reservations.update(
+            state=ReservationStateChoice.DENIED,
+            deny_reason=self.validated_data["deny_reason"],
+            handling_details=self.validated_data.get("handling_details", ""),
+            handled_at=now,
+        )
+
+        # Must refresh the materialized view since reservations state changed to 'DENIED'
+        if settings.UPDATE_AFFECTING_TIME_SPANS:
+            update_affecting_time_spans_task.delay()
+
+        if settings.SAVE_RESERVATION_STATISTICS:
+            create_or_update_reservation_statistics.delay(
+                reservation_pks=[reservation.pk for reservation in reservations],
+            )
+
+        return self.instance
+
+
+class ReservationSeriesDenyOutputSerializer(NestingModelSerializer):
+    denied = serializers.IntegerField(required=True)
+    future = serializers.IntegerField(required=True)
+
+    class Meta:
+        model = RecurringReservation
+        fields = [
+            "denied",
+            "future",
+        ]

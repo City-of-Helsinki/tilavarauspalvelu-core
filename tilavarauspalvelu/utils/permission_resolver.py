@@ -52,16 +52,34 @@ class PermissionResolver:
             or bool(self.user.active_unit_group_roles)
         )
 
-    def has_general_role(self, *, role_choices: Container[UserRoleChoice] | None = None) -> bool:
+    def has_general_role(
+        self,
+        *,
+        role_choices: Container[UserRoleChoice] | None = None,
+        permit_reserver: bool = True,
+    ) -> bool:
         """
         Check if the user has any of the given roles in their general roles.
         If no choices are given, check if the user has any general role.
+
+        :param role_choices: The roles to check for. If not given, check if the user has any general role.
+        :param permit_reserver: If set to False, don't count the `RESERVER` role if the user has it.
+                                Reservers are only supposed to be able to modify their own reservations,
+                                so this can be set to False if checking permissions for other user's reservations.
         """
         if self.is_user_anonymous_or_inactive():
             return False
         if role_choices is None:  # Has any general role
-            return bool(self.user.active_general_roles)
-        return any(role in role_choices for role in self.user.active_general_roles)
+            return any(
+                role  #
+                for role in self.user.active_general_roles
+                if permit_reserver or role != UserRoleChoice.RESERVER
+            )
+        return any(
+            role in role_choices  #
+            for role in self.user.active_general_roles
+            if permit_reserver or role != UserRoleChoice.RESERVER
+        )
 
     def has_role_for_units_or_their_unit_groups(
         self,
@@ -69,6 +87,7 @@ class PermissionResolver:
         units: Iterable[Unit] | None = None,
         role_choices: Container[UserRoleChoice] | None = None,
         require_all: bool = False,
+        permit_reserver: bool = True,
     ) -> bool:
         """
         Check if the user has at least one of the given roles in the given units or their unit groups.
@@ -79,6 +98,9 @@ class PermissionResolver:
         :param units: Units to check for the role.
         :param role_choices: Roles to check for.
         :param require_all: If True, require roles in all the given units or their unit groups instead of any.
+        :param permit_reserver: If set to False, don't count the `RESERVER` role as a role for the given units.
+                                Reservers are only supposed to be able to modify their own reservations,
+                                so this can be set to False if checking permissions for other user's reservations.
         """
         if self.is_user_anonymous_or_inactive():
             return False
@@ -104,7 +126,11 @@ class PermissionResolver:
         has_role = False
         for unit in units:
             roles = self.user.active_unit_roles.get(unit.pk, [])
-            has_role = any(role in role_choices for role in roles)
+            has_role = any(
+                role in role_choices  #
+                for role in roles
+                if permit_reserver or role != UserRoleChoice.RESERVER
+            )
 
             # No role though units -> check through unit groups
             if not has_role:
@@ -112,6 +138,7 @@ class PermissionResolver:
                     role in role_choices
                     for unit_group in unit.unit_groups.all()
                     for role in self.user.active_unit_group_roles.get(unit_group.pk, [])
+                    if permit_reserver or role != UserRoleChoice.RESERVER
                 )
 
             # If we require roles for all units, we need to keep checking until all units have been checked.
@@ -199,20 +226,21 @@ class PermissionResolver:
 
     # Permission checks
 
-    def can_create_staff_reservation(self, reservation_unit: ReservationUnit) -> bool:
+    def can_create_staff_reservation(self, reservation_unit: ReservationUnit, *, is_reservee: bool = False) -> bool:
         if self.is_user_anonymous_or_inactive():
             return False
         if self.user.is_superuser:
             return True
 
         role_choices = UserRoleChoice.can_create_staff_reservations()
-        if self.has_general_role(role_choices=role_choices):
+        if self.has_general_role(role_choices=role_choices, permit_reserver=is_reservee):
             return True
 
         return self.has_role_for_units_or_their_unit_groups(
             units=[reservation_unit.unit],
             role_choices=role_choices,
             require_all=True,
+            permit_reserver=is_reservee,
         )
 
     def can_manage_application(
