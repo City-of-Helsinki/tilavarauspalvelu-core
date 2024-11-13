@@ -1,10 +1,11 @@
 import React from "react";
 import { Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
-import type {
-  ApplicationQuery,
-  Maybe,
-  TermsOfUseTextFieldsFragment,
+import {
+  type ApplicationQuery,
+  ApplicationStatusChoice,
+  type Maybe,
+  type TermsOfUseTextFieldsFragment,
 } from "@gql/gql-types";
 import { getTranslation } from "@/modules/util";
 import { ApplicantInfoPreview } from "./ApplicantInfoPreview";
@@ -34,7 +35,9 @@ export function ViewApplication({
   const { t } = useTranslation();
 
   const tos2 = application.applicationRound?.termsOfUse;
-
+  const shouldShowNotification =
+    application.status !== ApplicationStatusChoice.ResultsSent &&
+    application.status !== ApplicationStatusChoice.Draft;
   return (
     <>
       <ApplicationSection>
@@ -79,14 +82,16 @@ export function ViewApplication({
           </CheckboxContainer>
         </Accordion>
       )}
-      <div>
-        {/* Wrap the notification in a div, since HDS-notification has <section> as the root element and we need section:last-of-type to hit the last ApplicationSection */}
-        <StyledNotification
-          label={t("application:preview.notification.processing")}
-        >
-          {t("application:preview.notification.body")}
-        </StyledNotification>
-      </div>
+      {shouldShowNotification && (
+        <div>
+          {/* Wrap the notification in a div, since HDS-notification has <section> as the root element and we need section:last-of-type to hit the last ApplicationSection */}
+          <StyledNotification
+            label={t("application:preview.notification.processing")}
+          >
+            {t("application:preview.notification.body")}
+          </StyledNotification>
+        </div>
+      )}
     </>
   );
 }

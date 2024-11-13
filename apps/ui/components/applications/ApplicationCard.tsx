@@ -7,7 +7,6 @@ import {
   IconCheck,
   IconCogwheel,
   IconCross,
-  IconEnvelope,
   IconPen,
   IconQuestionCircle,
 } from "hds-react";
@@ -101,16 +100,12 @@ function getApplicationStatusLabelProps(
         type: "success",
         icon: <IconCheck aria-hidden="true" />,
       };
-    case ApplicationStatusChoice.InAllocation:
     case ApplicationStatusChoice.Handled:
+    case ApplicationStatusChoice.InAllocation:
+    case ApplicationStatusChoice.Received:
       return {
         type: "info",
         icon: <IconCogwheel aria-hidden="true" />,
-      };
-    case ApplicationStatusChoice.Received:
-      return {
-        type: "alert",
-        icon: <IconEnvelope aria-hidden="true" />,
       };
     // These two should never be shown to the client, so they are shown as any other unexpected status
     case ApplicationStatusChoice.Cancelled:

@@ -51,6 +51,7 @@ export const ApplicationSectionHeader = styled.h2`
   [class*="statusLabel__"] {
     position: relative;
     transform: translateY(-4px);
+    ${fontRegular};
   }
 `;
 

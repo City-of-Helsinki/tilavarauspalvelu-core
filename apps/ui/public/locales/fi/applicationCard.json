@@ -15,7 +15,7 @@
     "EXPIRED": "Rauennut",
     "HANDLED": "Käsittelyssä",
     "IN_ALLOCATION": "Käsittelyssä",
-    "RECEIVED": "Lähetetty",
+    "RECEIVED": "Käsittelyssä",
     "RESULTS_SENT": "Käsitelty"
   },
   "reservations": "Varaukset",
