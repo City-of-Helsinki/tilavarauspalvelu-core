@@ -14,6 +14,7 @@ def test_reservation_unit_all__no_pagination_limit(graphql):
     graphene_settings.RELAY_CONNECTION_MAX_LIMIT = 1
 
     ReservationUnitFactory.create_batch(2)
+    ReservationUnitFactory.create(is_archived=True)  # Should not be returned
 
     graphql.login_with_superuser()
     query = reservation_units_all_query(fields="pk nameFi nameEn nameSv")
