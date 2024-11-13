@@ -30,8 +30,7 @@ celerybeat-schedule
 .python-version
 .tox
 coverage.xml
-celery.exchange
-celery.pidbox.exchange
+control/*
 .ruff_cache
 pytest.ini
 dump.rdb
