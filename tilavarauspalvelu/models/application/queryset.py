@@ -9,10 +9,9 @@ from django.db.models.functions import Coalesce
 from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L
 
-from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ApplicationSectionStatusChoice
+from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ApplicationStatusChoice
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.enums import ApplicationStatusChoice
     from tilavarauspalvelu.models import Application
 
 
@@ -110,7 +109,7 @@ class ApplicationQuerySet(models.QuerySet):
         """Get all applications that need the "application in allocation" notification to be sent."""
         return self.filter(
             L(application_round__status=ApplicationRoundStatusChoice.IN_ALLOCATION.value),
-            L(status=ApplicationSectionStatusChoice.IN_ALLOCATION.value),
+            L(status=ApplicationStatusChoice.IN_ALLOCATION.value),
             in_allocation_notification_sent_date__isnull=True,
             application_sections__isnull=False,
         )
@@ -118,8 +117,8 @@ class ApplicationQuerySet(models.QuerySet):
     def should_send_handled_email(self) -> Self:
         """Get all applications that need the "application handled" notification to be sent."""
         return self.filter(
-            L(application_round__status=ApplicationRoundStatusChoice.HANDLED.value),
-            L(status=ApplicationSectionStatusChoice.HANDLED.value),
+            L(application_round__status=ApplicationRoundStatusChoice.RESULTS_SENT.value),
+            L(status=ApplicationStatusChoice.RESULTS_SENT.value),
             results_ready_notification_sent_date__isnull=True,
             application_sections__isnull=False,
         )

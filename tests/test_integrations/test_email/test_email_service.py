@@ -4,7 +4,7 @@ import pytest
 from django.test import override_settings
 from freezegun import freeze_time
 
-from tests.factories import ApplicationFactory, ReservationFactory, UnitFactory, UserFactory
+from tests.factories import ApplicationFactory, ApplicationRoundFactory, ReservationFactory, UnitFactory, UserFactory
 from tests.helpers import TranslationsFromPOFiles, patch_method
 from tilavarauspalvelu.enums import Language, ReservationNotification, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
@@ -104,7 +104,8 @@ def test_email_service__send_application_in_allocation_emails__no_recipients(out
 
 @override_settings(SEND_EMAILS=True)
 def test_email_service__send_application_handled_emails(outbox):
-    application = ApplicationFactory.create_in_status_handled()
+    application_round = ApplicationRoundFactory.create_in_status_results_sent()
+    application = ApplicationFactory.create_in_status_handled(application_round=application_round)
 
     EmailService.send_application_handled_emails()
 
@@ -116,8 +117,15 @@ def test_email_service__send_application_handled_emails(outbox):
 
 @override_settings(SEND_EMAILS=True)
 def test_email_service__send_application_handled_emails__multiple_languages(outbox):
-    application_1 = ApplicationFactory.create_in_status_handled(user__preferred_language="fi")
-    application_2 = ApplicationFactory.create_in_status_handled(user__preferred_language="en")
+    application_round = ApplicationRoundFactory.create_in_status_results_sent()
+    application_1 = ApplicationFactory.create_in_status_handled(
+        application_round=application_round,
+        user__preferred_language="fi",
+    )
+    application_2 = ApplicationFactory.create_in_status_handled(
+        application_round=application_round,
+        user__preferred_language="en",
+    )
 
     with TranslationsFromPOFiles():
         EmailService.send_application_handled_emails()
@@ -134,7 +142,7 @@ def test_email_service__send_application_handled_emails__multiple_languages(outb
 @override_settings(SEND_EMAILS=True)
 @patch_method(SentryLogger.log_message)
 def test_email_service__send_application_handled_emails__wrong_status(outbox):
-    ApplicationFactory.create_in_status_in_allocation()
+    ApplicationFactory.create_in_status_handled()
 
     EmailService.send_application_handled_emails()
 
@@ -149,7 +157,10 @@ def test_email_service__send_application_handled_emails__wrong_status(outbox):
 @override_settings(SEND_EMAILS=True)
 @patch_method(SentryLogger.log_message)
 def test_email_service__send_application_handled_emails__no_recipients(outbox):
-    ApplicationFactory.create_in_status_handled(user__email="", contact_person__email="")
+    application_round = ApplicationRoundFactory.create_in_status_results_sent()
+    ApplicationFactory.create_in_status_handled(
+        application_round=application_round, user__email="", contact_person__email=""
+    )
 
     EmailService.send_application_handled_emails()
 
