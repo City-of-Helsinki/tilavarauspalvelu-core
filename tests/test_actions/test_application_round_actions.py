@@ -1,6 +1,6 @@
 import pytest
 
-from tests.factories import AllocatedTimeSlotFactory, ApplicationRoundFactory, ReservationFactory
+from tests.factories import AllocatedTimeSlotFactory, ApplicationFactory, ApplicationRoundFactory, ReservationFactory
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ReservationTypeChoice
 from tilavarauspalvelu.models import AllocatedTimeSlot, RecurringReservation, Reservation, ReservationUnitOption
 
@@ -74,3 +74,16 @@ def test_reset_application_round_allocation__handled():
     assert Reservation.objects.count() == 0
     assert ReservationUnitOption.objects.filter(locked=True).count() == 1
     assert application_round.handled_date is None
+
+
+def test_reset_application_round_allocation__results_sent():
+    application_round = ApplicationRoundFactory.create_in_status_results_sent()
+    application = ApplicationFactory.create_in_status_results_sent(application_round=application_round)
+
+    application_round.actions.reset_application_round_allocation()
+
+    application_round.refresh_from_db()
+    application.refresh_from_db()
+
+    assert application_round.status == ApplicationRoundStatusChoice.HANDLED
+    assert application.results_ready_notification_sent_date is None

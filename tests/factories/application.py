@@ -188,6 +188,7 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
         """
         kwargs.setdefault("cancelled_date", None)
         kwargs.setdefault("sent_date", now())
+        kwargs.setdefault("results_ready_notification_sent_date", now())
 
         if "application_round" not in kwargs:
             round_kwargs = cls.pop_sub_kwargs("application_round", kwargs)
