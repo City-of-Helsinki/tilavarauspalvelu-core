@@ -1,7 +1,9 @@
 import hmac
 import io
 
+from django.apps import apps
 from django.core.handlers.wsgi import WSGIRequest
+from django.db import connection
 from django.http import FileResponse, HttpResponseRedirect, JsonResponse
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import csrf_exempt
@@ -12,7 +14,11 @@ from tilavarauspalvelu.utils.pdf import render_to_pdf
 from utils.utils import ical_hmac_signature
 
 __all__ = [
+    "csrf_view",
+    "liveness_check",
+    "readiness_check",
     "reservation_ical",
+    "terms_of_use_pdf",
 ]
 
 
@@ -107,3 +113,22 @@ def terms_of_use_pdf(request: WSGIRequest) -> FileResponse | JsonResponse:
         as_attachment=as_attachment,
         filename=f"{title.replace(' ', '_')}.pdf",
     )
+
+
+@require_GET
+@csrf_exempt  # NOSONAR
+def liveness_check(request: WSGIRequest) -> JsonResponse:
+    return JsonResponse({"status": "RUNNING"}, status=200)
+
+
+@require_GET
+@csrf_exempt  # NOSONAR
+def readiness_check(request: WSGIRequest) -> JsonResponse:
+    try:
+        connection.ensure_connection()
+        apps.check_apps_ready()
+        apps.check_models_ready()
+    except Exception as error:
+        return JsonResponse({"status": "NOT_READY", "error": str(error)}, status=503)
+
+    return JsonResponse({"status": "READY"}, status=200)
