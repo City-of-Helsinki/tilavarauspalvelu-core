@@ -10,6 +10,10 @@ SET_HANDLED_MUTATION = build_mutation(
     "setApplicationRoundHandled",
     "SetApplicationRoundHandledMutation",
 )
+SET_RESULTS_SENT_MUTATION = build_mutation(
+    "setApplicationRoundResultsSent",
+    "SetApplicationRoundResultsSentMutation",
+)
 
 
 @contextlib.contextmanager
