@@ -378,3 +378,29 @@ def test_reservation__query__order__all_fields(graphql):
             "expiresInMinutes": 5,
         }
     }
+
+
+def test_reservation__query__reservation_unit_is_archived_but_data_is_still_returned_through_relation(graphql):
+    reservation = ReservationFactory.create(reservation_units__is_archived=True)
+    reservation_unit = reservation.reservation_units.first()
+
+    graphql.login_with_superuser()
+    global_id = to_global_id("ReservationNode", reservation.pk)
+
+    fields = "pk reservationUnits { pk isArchived }"
+    expected_response = {
+        "pk": reservation.pk,
+        "reservationUnits": [{"pk": reservation_unit.pk, "isArchived": True}],
+    }
+
+    # Single
+    query = reservation_query(id=global_id, fields=fields)
+    response = graphql(query)
+    assert response.has_errors is False, response.errors
+    assert response.first_query_object == expected_response
+
+    # All
+    query = reservations_query(fields=fields)
+    response = graphql(query)
+    assert response.has_errors is False, response.errors
+    assert response.node(0) == expected_response
