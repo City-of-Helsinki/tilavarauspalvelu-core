@@ -6,6 +6,7 @@ from freezegun import freeze_time
 from tests.factories import RecurringReservationFactory, ReservationFactory
 from tilavarauspalvelu.enums import ReservationStateChoice, WeekdayChoice
 from tilavarauspalvelu.models import AffectingTimeSpan, Reservation, ReservationStatistic, ReservationUnitHierarchy
+from tilavarauspalvelu.tasks import create_or_update_reservation_statistics
 from utils.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_datetime, local_time
 
 from .helpers import RESCHEDULE_SERIES_MUTATION, create_reservation_series, get_minimal_reschedule_data
@@ -747,6 +748,8 @@ def test_recurring_reservations__reschedule_series__create_statistics(graphql, s
 
     recurring_reservation = create_reservation_series()
 
+    create_or_update_reservation_statistics(recurring_reservation.reservations.values_list("pk", flat=True))
+
     # We have 9 reservations, so there should be 9 reservation statistics.
     assert ReservationStatistic.objects.count() == 9
 
@@ -772,6 +775,8 @@ def test_recurring_reservations__reschedule_series__create_statistics__partial(g
     settings.SAVE_RESERVATION_STATISTICS = True
 
     recurring_reservation = create_reservation_series()
+
+    create_or_update_reservation_statistics(recurring_reservation.reservations.values_list("pk", flat=True))
 
     # We have 9 reservations, so there should be 9 reservation statistics.
     assert ReservationStatistic.objects.count() == 9

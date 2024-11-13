@@ -1,10 +1,10 @@
 import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from factory import LazyAttribute, fuzzy
 
 from tilavarauspalvelu.enums import ReservationStartInterval, ReservationStateChoice, WeekdayChoice
-from tilavarauspalvelu.models import RecurringReservation
+from tilavarauspalvelu.models import RecurringReservation, Reservation
 from utils.date_utils import DEFAULT_TIMEZONE, get_periods_between, local_datetime
 
 from ._base import (
@@ -14,6 +14,9 @@ from ._base import (
     GenericDjangoModelFactory,
     ReverseForeignKeyFactory,
 )
+
+if TYPE_CHECKING:
+    from django.db import models
 
 __all__ = [
     "RecurringReservationFactory",
@@ -70,6 +73,8 @@ class RecurringReservationFactory(GenericDjangoModelFactory[RecurringReservation
         if not weekdays:
             weekdays = [series.begin_date.weekday()]
 
+        reservations: list[Reservation] = []
+
         for weekday in weekdays:
             delta: int = weekday - series.begin_date.weekday()
             if delta < 0:
@@ -86,12 +91,26 @@ class RecurringReservationFactory(GenericDjangoModelFactory[RecurringReservation
                 tzinfo=DEFAULT_TIMEZONE,
             )
             for begin, end in periods:
-                ReservationFactory.create(
+                reservation = ReservationFactory.build(
                     recurring_reservation=series,
-                    reservation_units=[series.reservation_unit],
+                    user=series.user,
                     begin=begin,
                     end=end,
                     **sub_kwargs,
                 )
+                reservations.append(reservation)
+
+        Reservation.objects.bulk_create(reservations)
+
+        # Add reservation units.
+        ReservationReservationUnit: type[models.Model] = Reservation.reservation_units.through  # noqa: N806
+        reservation_reservation_units: list[ReservationReservationUnit] = [
+            ReservationReservationUnit(
+                reservation=reservation,
+                reservationunit=series.reservation_unit,
+            )
+            for reservation in reservations
+        ]
+        ReservationReservationUnit.objects.bulk_create(reservation_reservation_units)
 
         return series

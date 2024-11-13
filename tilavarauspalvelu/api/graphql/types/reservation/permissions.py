@@ -82,7 +82,7 @@ class ReservationStaffCreatePermission(BasePermission):
     @classmethod
     def has_create_permission(cls, user: AnyUser, input_data: dict[str, Any]) -> bool:
         reservation_unit = cls._get_reservation_unit(input_data)
-        return user.permissions.can_create_staff_reservation(reservation_unit)
+        return user.permissions.can_create_staff_reservation(reservation_unit, is_reservee=True)
 
     @classmethod
     def _get_reservation_unit(cls, input_data: dict[str, Any]) -> ReservationUnit:
