@@ -71,6 +71,7 @@ from .mutations import (
     RestoreAllApplicationOptionsMutation,
     RestoreAllSectionOptionsMutation,
     SetApplicationRoundHandledMutation,
+    SetApplicationRoundResultsSentMutation,
     SpaceCreateMutation,
     SpaceDeleteMutation,
     SpaceUpdateMutation,
@@ -305,6 +306,7 @@ class Mutation(graphene.ObjectType):
     reject_all_application_options = RejectAllApplicationOptionsMutation.Field()
     restore_all_application_options = RestoreAllApplicationOptionsMutation.Field()
     set_application_round_handled = SetApplicationRoundHandledMutation.Field()
+    set_application_round_results_sent = SetApplicationRoundResultsSentMutation.Field()
     #
     # Reservable entities
     update_unit = UnitUpdateMutation.Field()

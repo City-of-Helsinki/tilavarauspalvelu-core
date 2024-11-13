@@ -23,7 +23,7 @@ from .types.application.mutations import (
     RejectAllApplicationOptionsMutation,
     RestoreAllApplicationOptionsMutation,
 )
-from .types.application_round.mutation import SetApplicationRoundHandledMutation
+from .types.application_round.mutation import SetApplicationRoundHandledMutation, SetApplicationRoundResultsSentMutation
 from .types.application_section.mutations import (
     ApplicationSectionCreateMutation,
     ApplicationSectionDeleteMutation,
@@ -130,6 +130,7 @@ __all__ = [
     "RestoreAllApplicationOptionsMutation",
     "RestoreAllSectionOptionsMutation",
     "SetApplicationRoundHandledMutation",
+    "SetApplicationRoundResultsSentMutation",
     "SpaceCreateMutation",
     "SpaceDeleteMutation",
     "SpaceUpdateMutation",
