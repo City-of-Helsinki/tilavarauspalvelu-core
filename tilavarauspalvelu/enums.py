@@ -853,6 +853,7 @@ class ApplicationRoundStatusChoice(models.TextChoices):
         return self in [
             ApplicationRoundStatusChoice.IN_ALLOCATION,
             ApplicationRoundStatusChoice.HANDLED,
+            ApplicationRoundStatusChoice.RESULTS_SENT,
         ]
 
 

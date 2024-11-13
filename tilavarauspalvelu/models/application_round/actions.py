@@ -13,7 +13,7 @@ class ApplicationRoundActions:
         Remove application round allocations, and unlock locked reservation unit options.
         Rejected options stay rejected.
         """
-        from tilavarauspalvelu.models import AllocatedTimeSlot, ReservationUnitOption
+        from tilavarauspalvelu.models import AllocatedTimeSlot, Application, ReservationUnitOption
 
         match self.application_round.status:
             case ApplicationRoundStatusChoice.IN_ALLOCATION:
@@ -55,6 +55,15 @@ class ApplicationRoundActions:
                 RecurringReservation.objects.filter(models.Q(**{lookup: self.application_round})).delete()
 
                 self.application_round.handled_date = None
+                self.application_round.save()
+
+            case ApplicationRoundStatusChoice.RESULTS_SENT:
+                # Reset handling email dates and round sent date
+                Application.objects.filter(application_round=self.application_round).update(
+                    results_ready_notification_sent_date=None,
+                )
+
+                self.application_round.sent_date = None
                 self.application_round.save()
 
             case _:
