@@ -9,8 +9,7 @@ from elasticsearch_django.models import SearchDocumentManagerMixin, SearchResult
 from lookup_property import L
 
 from tilavarauspalvelu.utils.first_reservable_time.first_reservable_time_helper import FirstReservableTimeHelper
-from utils.date_utils import local_datetime
-from utils.db import ArrayUnnest, SubqueryArray
+from utils.db import ArrayUnnest, NowTT
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator
@@ -32,16 +31,6 @@ type ReservationUnitPK = int
 
 
 class ReservationUnitQuerySet(SearchResultsQuerySet):
-    def scheduled_for_publishing(self) -> Self:
-        now = local_datetime()
-        return self.filter(
-            Q(is_archived=False, is_draft=False)
-            & (
-                Q(publish_begins__isnull=False, publish_begins__gt=now)
-                | Q(publish_ends__isnull=False, publish_ends__lte=now)
-            )
-        )
-
     def with_first_reservable_time(
         self,
         filter_date_start: date | None,
@@ -67,86 +56,6 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
         )
         helper.calculate_all_first_reservable_times()
         return helper.get_annotated_queryset()
-
-    @property
-    def _related_space_ids(self) -> models.QuerySet[dict[str, int]]:
-        from tilavarauspalvelu.models import Space
-
-        return (
-            Space.objects.filter(reservation_units__id=models.OuterRef("id"))
-            .with_family(include_self=True)
-            .annotate(all_families=ArrayUnnest("family"))
-            .values("all_families")
-        )
-
-    def with_affecting_spaces(self) -> Self:
-        """
-        Annotate the queryset with a list of distinct space ids of all spaces
-        that are either direct spaces of the reservation unit, or are
-        in the same space hierarchy with one of those spaces.
-        """
-        return self.annotate(
-            spaces_affecting_reservations=SubqueryArray(
-                queryset=self._related_space_ids,
-                agg_field="all_families",
-                distinct=True,
-            ),
-        )
-
-    def with_affecting_spaces_alias(self) -> Self:
-        return self.alias(
-            spaces_affecting_reservations=models.Subquery(
-                queryset=self._related_space_ids,
-            ),
-        )
-
-    @property
-    def _related_resource_ids(self) -> models.QuerySet[dict[str, int]]:
-        from tilavarauspalvelu.models import Resource
-
-        return Resource.objects.filter(reservation_units__id=models.OuterRef("id")).values("id")
-
-    def with_affecting_resources(self) -> Self:
-        """
-        Annotate the queryset with a list of distinct resource ids of all resources
-        that are linked to the reservation unit.
-        """
-        return self.annotate(
-            resources_affecting_reservations=SubqueryArray(
-                queryset=self._related_resource_ids,
-                agg_field="id",
-                distinct=True,
-            ),
-        )
-
-    def with_affecting_resources_alias(self) -> Self:
-        return self.alias(
-            resources_affecting_reservations=models.Subquery(
-                queryset=self._related_resource_ids,
-            ),
-        )
-
-    def with_reservation_unit_ids_affecting_reservations(self) -> Self:
-        """Annotate queryset with reservation ids for all reservation units that affect its reservations."""
-        from tilavarauspalvelu.models import ReservationUnit
-
-        return (
-            self.with_affecting_spaces_alias()
-            .with_affecting_resources_alias()
-            .annotate(
-                reservation_units_affecting_reservations=SubqueryArray(
-                    queryset=(
-                        ReservationUnit.objects.filter(
-                            Q(id=models.OuterRef("id"))
-                            | Q(spaces__in=models.OuterRef("spaces_affecting_reservations"))
-                            | Q(resources__in=models.OuterRef("resources_affecting_reservations"))
-                        ).values("id")
-                    ),
-                    agg_field="id",
-                    distinct=True,
-                ),
-            )
-        )
 
     @property
     def affected_reservation_unit_ids(self) -> models.QuerySet[dict[str, int]]:
@@ -199,6 +108,26 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
 
     def with_reservation_state_in(self, states: list[str]) -> Self:
         return self.filter(L(reservation_state__in=states))
+
+    def published(self) -> Self:
+        return self.filter(is_draft=False, is_archived=False)
+
+    @property
+    def _is_visible(self):
+        return (
+            Q(publish_begins__lte=NowTT())  #
+            | Q(publish_begins__isnull=True)
+        ) & (
+            Q(publish_ends__gt=NowTT())  #
+            | Q(publish_ends__isnull=True)
+            | Q(publish_ends__lt=models.F("publish_begins"))
+        )
+
+    def visible(self) -> Self:
+        return self.published().filter(self._is_visible)
+
+    def hidden(self) -> Self:
+        return self.published().exclude(self._is_visible)
 
 
 class ReservationUnitManager(SearchDocumentManagerMixin.from_queryset(ReservationUnitQuerySet)):

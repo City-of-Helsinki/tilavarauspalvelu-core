@@ -33,6 +33,7 @@ urlpatterns = [
     path("v1/reservation_calendar/<int:pk>/", reservation_ical, name="reservation_calendar"),
     path("v1/terms_of_use_pdf/", terms_of_use_pdf, name="terms_of_use_pdf"),
     path("v1/webhook/", include(webhook_router.urls)),
+    path("v1/palvelukartta/", include("tilavarauspalvelu.api.palvelukartta.urls")),
     path("pysocial/", include("social_django.urls", namespace="social")),
     path("helauth/", include("tilavarauspalvelu.api.helauth.urls")),
     re_path(
