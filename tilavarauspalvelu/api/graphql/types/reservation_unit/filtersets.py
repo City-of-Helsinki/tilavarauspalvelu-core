@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Any
 
 import django_filters
 from django.db import models
-from django.db.models import F, Q, QuerySet
+from django.db.models import Q, QuerySet
 from elasticsearch_django.models import SearchQuery
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntMultipleChoiceFilter
@@ -11,7 +11,6 @@ from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntMult
 from tilavarauspalvelu.enums import ReservationKind, ReservationUnitPublishingState, ReservationUnitReservationState
 from tilavarauspalvelu.models import ReservationUnit
 from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
-from utils.date_utils import local_datetime
 from utils.elasticsearch import build_elastic_query_str
 from utils.utils import log_text_search
 
@@ -166,27 +165,12 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
 
     @staticmethod
     def get_is_visible(qs: ReservationUnitQuerySet, name: str, value: bool) -> QuerySet:
-        now = local_datetime()
-
-        qs = qs.filter(is_draft=False, is_archived=False)
-        published = (  #
-            (  #
-                Q(publish_begins__lte=now) | Q(publish_begins__isnull=True)
-            )
-            & (  #
-                Q(publish_ends__gt=now) | Q(publish_ends__isnull=True) | Q(publish_ends__lt=F("publish_begins"))
-            )
-        )
-
-        if value:
-            return qs.filter(published)
-        return qs.exclude(published)
+        return qs.visible() if value else qs.hidden()
 
     @staticmethod
     def get_reservation_kind(qs: ReservationUnitQuerySet, name: str, value: str) -> QuerySet:
         if name.upper() == ReservationKind.DIRECT_AND_SEASON:
             return qs.filter(reservation_kind__isnull=False)
-
         return qs.filter(reservation_kind__icontains=value)
 
     @staticmethod
