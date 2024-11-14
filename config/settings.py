@@ -317,6 +317,10 @@ class Common(Environment):
     SOCIAL_AUTH_TUNNISTAMO_SCOPE = values.ListValue(env_name="TUNNISTAMO_SCOPE", default=[])
 
     SOCIAL_AUTH_TUNNISTAMO_LOGIN_ERROR_URL = "/admin/"
+    SOCIAL_AUTH_TUNNISTAMO_INACTIVE_USER_URL = values.StringValue(
+        env_name="TUNNISTAMO_INACTIVE_USER_URL",
+        default="/deactivated-account",
+    )
     SOCIAL_AUTH_TUNNISTAMO_PIPELINE = (
         *SOCIAL_AUTH_PIPELINE,
         "tilavarauspalvelu.utils.helauth.pipeline.fetch_additional_info_for_user_from_helsinki_profile",
@@ -637,6 +641,10 @@ class Local(Common, overrides_from=LocalMixin):
 
     APP_LOGGING_LEVEL = values.StringValue(default="INFO")
 
+    # --- Tunnistamo / Social Auth settings --------------------------------------------------------------------------
+
+    SOCIAL_AUTH_TUNNISTAMO_INACTIVE_USER_URL = "http://localhost:3000/deactivated-account"
+
     # --- (H)Aukiolosovellus settings --------------------------------------------------------------------------------
 
     HAUKI_API_KEY = values.StringValue(default=None)
@@ -728,6 +736,8 @@ class Docker(Common, overrides_from=DockerMixin):
     MEDIA_ROOT = "/media"
 
     DATABASES = values.DatabaseURLValue(default="postgis://tvp:tvp@db/tvp")
+
+    SOCIAL_AUTH_TUNNISTAMO_INACTIVE_USER_URL = "http://localhost:3000/deactivated-account"
 
     REDIS_URL = values.StringValue(default="redis://redis:6379/0")
     ELASTICSEARCH_URL = values.StringValue(default="http://elastic:9200")
