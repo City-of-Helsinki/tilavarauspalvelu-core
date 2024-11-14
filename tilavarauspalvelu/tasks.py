@@ -18,10 +18,13 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from easy_thumbnails.exceptions import InvalidImageFormatError
 from elasticsearch_django.index import create_index, delete_index, update_index
+from lookup_property import L
 
 from config.celery import app
 from tilavarauspalvelu.enums import (
     ApplicantTypeChoice,
+    ApplicationRoundStatusChoice,
+    ApplicationStatusChoice,
     CustomerTypeChoice,
     HaukiResourceState,
     OrderStatus,
@@ -32,6 +35,7 @@ from tilavarauspalvelu.enums import (
 from tilavarauspalvelu.models import (
     AffectingTimeSpan,
     AllocatedTimeSlot,
+    Application,
     PaymentOrder,
     PaymentProduct,
     PersonalInfoViewLog,
@@ -66,7 +70,7 @@ from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import GetPaymentEr
 from tilavarauspalvelu.utils.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
 from tilavarauspalvelu.utils.verkkokauppa.product.types import CreateOrUpdateAccountingParams, CreateProductParams
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from utils.date_utils import local_datetime, local_end_of_day, local_start_of_day
+from utils.date_utils import local_date, local_datetime, local_end_of_day, local_start_of_day
 from utils.image_cache import purge
 from utils.sentry import SentryLogger
 
@@ -600,6 +604,16 @@ def generate_reservation_series_from_allocations(application_round_id: int) -> N
 
     if settings.SAVE_RESERVATION_STATISTICS:
         create_or_update_reservation_statistics.delay(reservation_pks=list(reservation_pks))
+
+
+@app.task(name="delete_expired_applications")
+def delete_expired_applications() -> None:
+    cutoff_date = local_date() - datetime.timedelta(days=settings.REMOVE_EXPIRED_APPLICATIONS_OLDER_THAN_DAYS)
+    Application.objects.filter(
+        L(status__in=[ApplicationStatusChoice.EXPIRED, ApplicationStatusChoice.CANCELLED])
+        & L(application_round__status=ApplicationRoundStatusChoice.RESULTS_SENT)
+        & Q(application_round__application_period_end__lte=cutoff_date)
+    ).delete()
 
 
 @app.task(name="save_sql_queries_from_request")
