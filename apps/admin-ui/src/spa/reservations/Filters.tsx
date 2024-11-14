@@ -71,7 +71,9 @@ export function Filters({
   );
 
   const { options: unitOptions } = useUnitOptions();
+
   const { options: reservationUnitOptions } = useReservationUnitOptions();
+
   const recurringOptions = [
     { value: "only", label: t("filters.label.onlyRecurring") },
     { value: "onlyNot", label: t("filters.label.onlyNotRecurring") },

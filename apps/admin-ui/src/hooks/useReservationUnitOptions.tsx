@@ -5,6 +5,7 @@ import {
   ReservationUnitOrderingChoices,
   useReservationUnitsFilterParamsQuery,
 } from "@gql/gql-types";
+import { useSearchParams } from "react-router-dom";
 
 export const RESERVATION_UNITS_FILTER_PARAMS_QUERY = gql`
   query ReservationUnitsFilterParams(
@@ -35,11 +36,14 @@ export const RESERVATION_UNITS_FILTER_PARAMS_QUERY = gql`
 `;
 
 export function useReservationUnitOptions() {
-  const { data, loading, fetchMore } = useReservationUnitsFilterParamsQuery({
-    variables: {
-      orderBy: [ReservationUnitOrderingChoices.NameFiAsc],
-    },
-  });
+  const [params] = useSearchParams();
+  const { data, loading, fetchMore, refetch } =
+    useReservationUnitsFilterParamsQuery({
+      variables: {
+        unit: params.getAll("unit").map(Number),
+        orderBy: [ReservationUnitOrderingChoices.NameFiAsc],
+      },
+    });
 
   // auto fetch more (there is no limit, expect number of them would be a few hundred, but in theory this might cause problems)
   // NOTE have to useEffect, onComplete stops at 200 items
@@ -53,6 +57,10 @@ export function useReservationUnitOptions() {
       });
     }
   }, [data, fetchMore]);
+
+  useEffect(() => {
+    refetch();
+  }, [params]);
 
   const resUnits = filterNonNullable(
     data?.reservationUnits?.edges.map((x) => x?.node)
