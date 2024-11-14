@@ -176,7 +176,7 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
                   icon={reservationState.icon}
                   data-testid="reservation_title_section__reservation_state"
                 >
-                  {t(`Reservation.state.${reservation.state}`)}
+                  {t(`RequestedReservation.state.${reservation.state}`)}
                 </StatusLabel>
               )}
             </AlignVertically>
