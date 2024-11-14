@@ -14,10 +14,10 @@ from tilavarauspalvelu.api.graphql.types.application_round_time_slot.serializers
 )
 from tilavarauspalvelu.api.graphql.types.reservation_unit_image.serializers import ReservationUnitImageFieldSerializer
 from tilavarauspalvelu.api.graphql.types.reservation_unit_pricing.serializers import ReservationUnitPricingSerializer
-from tilavarauspalvelu.enums import ReservationStartInterval, WeekdayChoice
+from tilavarauspalvelu.enums import ReservationStartInterval, ReservationUnitPublishingState, WeekdayChoice
 from tilavarauspalvelu.models import ReservationUnit, ReservationUnitPricing
 from tilavarauspalvelu.utils.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
-from utils.date_utils import local_date
+from utils.date_utils import local_date, local_datetime
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
@@ -334,6 +334,15 @@ class ReservationUnitSerializer(NestingModelSerializer):
                     ReservationUnitPricing.objects.create(**pricing, reservation_unit=reservation_unit)
 
     def update(self, instance: ReservationUnit, validated_data: dict[str, Any]) -> ReservationUnit:
+        # The ReservationUnit can't be archived if it has active reservations in the future
+        if instance.publishing_state != ReservationUnitPublishingState.ARCHIVED and validated_data.get("is_archived"):
+            future_reservations = instance.reservations.going_to_occur().filter(end__gt=local_datetime())
+            if future_reservations.exists():
+                raise ValidationError(
+                    "Reservation unit can't be archived if it has any reservations in the future",
+                    code=error_codes.RESERVATION_UNIT_HAS_FUTURE_RESERVATIONS,
+                )
+
         pricings = validated_data.pop("pricings", [])
         reservation_unit = super().update(instance, validated_data)
         self.handle_pricings(pricings, instance)

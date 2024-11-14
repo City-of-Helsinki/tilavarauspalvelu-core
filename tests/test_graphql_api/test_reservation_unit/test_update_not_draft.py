@@ -3,13 +3,16 @@ from decimal import Decimal
 import pytest
 
 from tests.factories import (
+    ReservationFactory,
     ReservationUnitCancellationRuleFactory,
     ReservationUnitFactory,
     ReservationUnitPaymentTypeFactory,
     TaxPercentageFactory,
     TermsOfUseFactory,
 )
-from tilavarauspalvelu.enums import PaymentType, ReservationStartInterval, TermsOfUseTypeChoices
+from tilavarauspalvelu.api.graphql.extensions import error_codes
+from tilavarauspalvelu.enums import PaymentType, ReservationStartInterval, ReservationStateChoice, TermsOfUseTypeChoices
+from utils.date_utils import next_hour
 
 from .helpers import UPDATE_MUTATION, get_non_draft_update_input_data
 
@@ -290,6 +293,52 @@ def test_reservation_unit__update__archiving_also_sets_as_draft(graphql):
     data = get_non_draft_update_input_data(
         reservation_unit,
         isDraft=True,  # This should be ignored
+        isArchived=True,
+    )
+
+    response = graphql(UPDATE_MUTATION, input_data=data)
+    assert response.has_errors is False, response
+
+    reservation_unit.refresh_from_db()
+    assert reservation_unit.is_archived is True
+    assert reservation_unit.is_draft is True
+
+
+def test_reservation_unit__update__archiving_is_blocked_if_reservation_unit_has_future_reservations(graphql):
+    graphql.login_with_superuser()
+
+    reservation_unit = ReservationUnitFactory.create(is_draft=False)
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit,
+        begin=next_hour(plus_days=1),
+        end=next_hour(plus_days=1, plus_hours=1),
+    )
+    data = get_non_draft_update_input_data(
+        reservation_unit,
+        isArchived=True,
+    )
+
+    response = graphql(UPDATE_MUTATION, input_data=data)
+    assert response.has_errors is True, response
+    assert response.field_error_codes()[0] == error_codes.RESERVATION_UNIT_HAS_FUTURE_RESERVATIONS
+
+    reservation_unit.refresh_from_db()
+    assert reservation_unit.is_archived is False
+    assert reservation_unit.is_draft is False
+
+
+def test_reservation_unit__update__archiving_not_blocked_if_reservation_unit_has_future_inactive_reservations(graphql):
+    graphql.login_with_superuser()
+
+    reservation_unit = ReservationUnitFactory.create(is_draft=False)
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit,
+        state=ReservationStateChoice.CANCELLED,
+        begin=next_hour(plus_days=1),
+        end=next_hour(plus_days=1, plus_hours=1),
+    )
+    data = get_non_draft_update_input_data(
+        reservation_unit,
         isArchived=True,
     )
 
