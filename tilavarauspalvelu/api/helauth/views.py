@@ -31,6 +31,11 @@ def login_view(request: WSGIRequest) -> HttpResponseRedirect:
     if lang:
         url = update_query_params(url, ui_locales=lang)
 
+    login_method_hint: str | None = request.GET.get("ui")
+    if login_method_hint == "customer":
+        # For `kc_idp_hint`, see: https://www.keycloak.org/docs/latest/server_admin/#_client_suggested_idp
+        url = update_query_params(url, kc_idp_hint="suomi_fi")
+
     return HttpResponseRedirect(url)
 
 

@@ -35,9 +35,18 @@ class ProxyTunnistamoOIDCAuthBackend(TunnistamoOIDCAuth):
 
     def auth_params(self, state: str | None = None) -> dict[str, str]:
         params = super().auth_params(state)
-        lang = self.strategy.request_data().get("ui_locales")
+
+        request_data = self.strategy.request_data()
+
+        # Parameters from `tilavarauspalvelu.api.helauth.views.login_view`.
+        lang = request_data.get("ui_locales")
+        login_method_hint = request_data.get("kc_idp_hint")
+
         if lang:
             params["ui_locales"] = lang
+        if login_method_hint:
+            params["kc_idp_hint"] = login_method_hint
+
         return params
 
     def get_end_session_url(self, request: WSGIRequest, id_token: str) -> str | None:
