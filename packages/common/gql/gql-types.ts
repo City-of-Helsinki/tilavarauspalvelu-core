@@ -622,6 +622,17 @@ export enum ApplicationSectionOrderingChoices {
   StatusDesc = "statusDesc",
 }
 
+export type ApplicationSectionReservationCancellationMutationInput = {
+  cancelDetails?: InputMaybe<Scalars["String"]["input"]>;
+  cancelReason: Scalars["Int"]["input"];
+  pk: Scalars["Int"]["input"];
+};
+
+export type ApplicationSectionReservationCancellationMutationPayload = {
+  cancelled?: Maybe<Scalars["Int"]["output"]>;
+  future?: Maybe<Scalars["Int"]["output"]>;
+};
+
 /** An enumeration. */
 export enum ApplicationSectionStatusChoice {
   Handled = "HANDLED",
@@ -913,6 +924,17 @@ export enum CustomerTypeChoice {
   Nonprofit = "NONPROFIT",
 }
 
+/** This Node should be kept to the bare minimum and never expose any relations to avoid performance issues. */
+export type EquipmentAllNode = Node & {
+  /** The ID of the object */
+  id: Scalars["ID"]["output"];
+  name: Scalars["String"]["output"];
+  nameEn?: Maybe<Scalars["String"]["output"]>;
+  nameFi?: Maybe<Scalars["String"]["output"]>;
+  nameSv?: Maybe<Scalars["String"]["output"]>;
+  pk?: Maybe<Scalars["Int"]["output"]>;
+};
+
 export type EquipmentCategoryCreateMutationInput = {
   name: Scalars["String"]["input"];
   nameEn?: InputMaybe<Scalars["String"]["input"]>;
@@ -1044,6 +1066,12 @@ export enum EquipmentOrderingChoices {
   CategoryRankDesc = "categoryRankDesc",
   NameAsc = "nameAsc",
   NameDesc = "nameDesc",
+  NameEnAsc = "nameEnAsc",
+  NameEnDesc = "nameEnDesc",
+  NameFiAsc = "nameFiAsc",
+  NameFiDesc = "nameFiDesc",
+  NameSvAsc = "nameSvAsc",
+  NameSvDesc = "nameSvDesc",
 }
 
 export type EquipmentUpdateMutationInput = {
@@ -1247,6 +1275,7 @@ export enum LoginMethod {
 export type Mutation = {
   adjustReservationTime?: Maybe<ReservationAdjustTimeMutationPayload>;
   approveReservation?: Maybe<ReservationApproveMutationPayload>;
+  cancelAllApplicationSectionReservations?: Maybe<ApplicationSectionReservationCancellationMutationPayload>;
   cancelApplication?: Maybe<ApplicationCancelMutationPayload>;
   cancelReservation?: Maybe<ReservationCancellationMutationPayload>;
   confirmReservation?: Maybe<ReservationConfirmMutationPayload>;
@@ -1274,6 +1303,7 @@ export type Mutation = {
   deleteResource?: Maybe<ResourceDeleteMutationPayload>;
   deleteSpace?: Maybe<SpaceDeleteMutationPayload>;
   denyReservation?: Maybe<ReservationDenyMutationPayload>;
+  denyReservationSeries?: Maybe<ReservationSeriesDenyMutationPayload>;
   refreshOrder?: Maybe<RefreshOrderMutationPayload>;
   refundReservation?: Maybe<ReservationRefundMutationPayload>;
   rejectAllApplicationOptions?: Maybe<RejectAllApplicationOptionsMutationPayload>;
@@ -1284,6 +1314,7 @@ export type Mutation = {
   restoreAllSectionOptions?: Maybe<RestoreAllSectionOptionsMutationPayload>;
   sendApplication?: Maybe<ApplicationSendMutationPayload>;
   setApplicationRoundHandled?: Maybe<SetApplicationRoundHandledMutationPayload>;
+  setApplicationRoundResultsSent?: Maybe<SetApplicationRoundResultsSentMutationPayload>;
   staffAdjustReservationTime?: Maybe<ReservationStaffAdjustTimeMutationPayload>;
   staffReservationModify?: Maybe<ReservationStaffModifyMutationPayload>;
   updateApplication?: Maybe<ApplicationUpdateMutationPayload>;
@@ -1311,6 +1342,10 @@ export type MutationAdjustReservationTimeArgs = {
 
 export type MutationApproveReservationArgs = {
   input: ReservationApproveMutationInput;
+};
+
+export type MutationCancelAllApplicationSectionReservationsArgs = {
+  input: ApplicationSectionReservationCancellationMutationInput;
 };
 
 export type MutationCancelApplicationArgs = {
@@ -1421,6 +1456,10 @@ export type MutationDenyReservationArgs = {
   input: ReservationDenyMutationInput;
 };
 
+export type MutationDenyReservationSeriesArgs = {
+  input: ReservationSeriesDenyMutationInput;
+};
+
 export type MutationRefreshOrderArgs = {
   input: RefreshOrderMutationInput;
 };
@@ -1459,6 +1498,10 @@ export type MutationSendApplicationArgs = {
 
 export type MutationSetApplicationRoundHandledArgs = {
   input: SetApplicationRoundHandledMutationInput;
+};
+
+export type MutationSetApplicationRoundResultsSentArgs = {
+  input: SetApplicationRoundResultsSentMutationInput;
 };
 
 export type MutationStaffAdjustReservationTimeArgs = {
@@ -1847,6 +1890,7 @@ export type Query = {
   equipmentCategories?: Maybe<EquipmentCategoryNodeConnection>;
   equipmentCategory?: Maybe<EquipmentCategoryNode>;
   equipments?: Maybe<EquipmentNodeConnection>;
+  equipmentsAll?: Maybe<Array<EquipmentAllNode>>;
   keywordCategories?: Maybe<KeywordCategoryNodeConnection>;
   keywordGroups?: Maybe<KeywordGroupNodeConnection>;
   keywords?: Maybe<KeywordNodeConnection>;
@@ -1868,6 +1912,7 @@ export type Query = {
   reservationUnitCancellationRules?: Maybe<ReservationUnitCancellationRuleNodeConnection>;
   reservationUnitTypes?: Maybe<ReservationUnitTypeNodeConnection>;
   reservationUnits?: Maybe<ReservationUnitNodeConnection>;
+  reservationUnitsAll?: Maybe<Array<ReservationUnitAllNode>>;
   reservations?: Maybe<ReservationNodeConnection>;
   resource?: Maybe<ResourceNode>;
   resources?: Maybe<ResourceNodeConnection>;
@@ -1879,6 +1924,7 @@ export type Query = {
   unit?: Maybe<UnitNode>;
   unitGroups?: Maybe<UnitGroupNodeConnection>;
   units?: Maybe<UnitNodeConnection>;
+  unitsAll?: Maybe<Array<UnitAllNode>>;
   user?: Maybe<UserNode>;
 };
 
@@ -1962,6 +2008,7 @@ export type QueryApplicationRoundsArgs = {
   last?: InputMaybe<Scalars["Int"]["input"]>;
   name?: InputMaybe<Scalars["String"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
+  ongoing?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyWithPermissions?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<ApplicationRoundOrderingChoices>>>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
@@ -2081,6 +2128,10 @@ export type QueryEquipmentsArgs = {
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   rankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   rankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+};
+
+export type QueryEquipmentsAllArgs = {
+  orderBy?: InputMaybe<Array<InputMaybe<EquipmentOrderingChoices>>>;
 };
 
 export type QueryKeywordCategoriesArgs = {
@@ -2348,6 +2399,21 @@ export type QueryReservationUnitsArgs = {
   unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
+export type QueryReservationUnitsAllArgs = {
+  nameEn?: InputMaybe<Scalars["String"]["input"]>;
+  nameEn_Icontains?: InputMaybe<Scalars["String"]["input"]>;
+  nameEn_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
+  nameFi?: InputMaybe<Scalars["String"]["input"]>;
+  nameFi_Icontains?: InputMaybe<Scalars["String"]["input"]>;
+  nameFi_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
+  nameSv?: InputMaybe<Scalars["String"]["input"]>;
+  nameSv_Icontains?: InputMaybe<Scalars["String"]["input"]>;
+  nameSv_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
+  onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
+  orderBy?: InputMaybe<Array<InputMaybe<ReservationUnitOrderingChoices>>>;
+  unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+};
+
 export type QueryReservationsArgs = {
   after?: InputMaybe<Scalars["String"]["input"]>;
   applyingForFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -2493,6 +2559,21 @@ export type QueryUnitsArgs = {
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   publishedReservationUnits?: InputMaybe<Scalars["Boolean"]["input"]>;
   serviceSector?: InputMaybe<Scalars["Decimal"]["input"]>;
+};
+
+export type QueryUnitsAllArgs = {
+  nameEn?: InputMaybe<Scalars["String"]["input"]>;
+  nameEn_Icontains?: InputMaybe<Scalars["String"]["input"]>;
+  nameEn_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
+  nameFi?: InputMaybe<Scalars["String"]["input"]>;
+  nameFi_Icontains?: InputMaybe<Scalars["String"]["input"]>;
+  nameFi_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
+  nameSv?: InputMaybe<Scalars["String"]["input"]>;
+  nameSv_Icontains?: InputMaybe<Scalars["String"]["input"]>;
+  nameSv_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
+  onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
+  orderBy?: InputMaybe<Array<InputMaybe<UnitOrderingChoices>>>;
+  unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type QueryUserArgs = {
@@ -2679,6 +2760,8 @@ export enum RejectedOccurrenceOrderingChoices {
   ReservationUnitNameDesc = "reservationUnitNameDesc",
   ReservationUnitPkAsc = "reservationUnitPkAsc",
   ReservationUnitPkDesc = "reservationUnitPkDesc",
+  UnitNameAsc = "unitNameAsc",
+  UnitNameDesc = "unitNameDesc",
   UnitPkAsc = "unitPkAsc",
   UnitPkDesc = "unitPkDesc",
 }
@@ -3263,6 +3346,17 @@ export type ReservationSeriesCreateMutationPayload = {
   weekdays?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
 };
 
+export type ReservationSeriesDenyMutationInput = {
+  denyReason: Scalars["Int"]["input"];
+  handlingDetails?: InputMaybe<Scalars["String"]["input"]>;
+  pk: Scalars["Int"]["input"];
+};
+
+export type ReservationSeriesDenyMutationPayload = {
+  denied?: Maybe<Scalars["Int"]["output"]>;
+  future?: Maybe<Scalars["Int"]["output"]>;
+};
+
 export type ReservationSeriesRescheduleMutationInput = {
   beginDate?: InputMaybe<Scalars["Date"]["input"]>;
   beginTime?: InputMaybe<Scalars["Time"]["input"]>;
@@ -3576,6 +3670,17 @@ export enum ReservationTypeStaffChoice {
   /** Henkilökunta */
   Staff = "STAFF",
 }
+
+/** This Node should be kept to the bare minimum and never expose any relations to avoid performance issues. */
+export type ReservationUnitAllNode = Node & {
+  /** The ID of the object */
+  id: Scalars["ID"]["output"];
+  name: Scalars["String"]["output"];
+  nameEn?: Maybe<Scalars["String"]["output"]>;
+  nameFi?: Maybe<Scalars["String"]["output"]>;
+  nameSv?: Maybe<Scalars["String"]["output"]>;
+  pk?: Maybe<Scalars["Int"]["output"]>;
+};
 
 export type ReservationUnitCancellationRuleNode = Node & {
   canBeCancelledTimeBefore?: Maybe<Scalars["Duration"]["output"]>;
@@ -3904,6 +4009,7 @@ export type ReservationUnitNode = Node & {
 export type ReservationUnitNodeApplicationRoundsArgs = {
   active?: InputMaybe<Scalars["Boolean"]["input"]>;
   name?: InputMaybe<Scalars["String"]["input"]>;
+  ongoing?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyWithPermissions?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<ApplicationRoundOrderingChoices>>>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
@@ -4632,6 +4738,14 @@ export type SetApplicationRoundHandledMutationPayload = {
   pk?: Maybe<Scalars["Int"]["output"]>;
 };
 
+export type SetApplicationRoundResultsSentMutationInput = {
+  pk: Scalars["Int"]["input"];
+};
+
+export type SetApplicationRoundResultsSentMutationPayload = {
+  pk?: Maybe<Scalars["Int"]["output"]>;
+};
+
 export type SpaceCreateMutationInput = {
   building?: InputMaybe<Scalars["Int"]["input"]>;
   code?: InputMaybe<Scalars["String"]["input"]>;
@@ -4899,6 +5013,18 @@ export type TimeSlotSerializerInput = {
 export type TimeSlotType = {
   begin: Scalars["Time"]["output"];
   end: Scalars["Time"]["output"];
+};
+
+/** This Node should be kept to the bare minimum and never expose any relations to avoid performance issues. */
+export type UnitAllNode = Node & {
+  /** The ID of the object */
+  id: Scalars["ID"]["output"];
+  name: Scalars["String"]["output"];
+  nameEn?: Maybe<Scalars["String"]["output"]>;
+  nameFi?: Maybe<Scalars["String"]["output"]>;
+  nameSv?: Maybe<Scalars["String"]["output"]>;
+  pk?: Maybe<Scalars["Int"]["output"]>;
+  tprekId?: Maybe<Scalars["String"]["output"]>;
 };
 
 export type UnitGroupNode = Node & {

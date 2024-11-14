@@ -669,6 +669,17 @@ enum ApplicationSectionOrderingChoices {
   statusDesc
 }
 
+input ApplicationSectionReservationCancellationMutationInput {
+  cancelDetails: String
+  cancelReason: Int!
+  pk: Int!
+}
+
+type ApplicationSectionReservationCancellationMutationPayload {
+  cancelled: Int
+  future: Int
+}
+
 """
 An enumeration.
 """
@@ -1034,6 +1045,21 @@ Represents a DurationField value as an integer in seconds.
 """
 scalar Duration
 
+"""
+This Node should be kept to the bare minimum and never expose any relations to avoid performance issues.
+"""
+type EquipmentAllNode implements Node {
+  """
+  The ID of the object
+  """
+  id: ID!
+  name: String!
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int
+}
+
 input EquipmentCategoryCreateMutationInput {
   name: String!
   nameEn: String
@@ -1193,6 +1219,12 @@ enum EquipmentOrderingChoices {
   categoryRankDesc
   nameAsc
   nameDesc
+  nameEnAsc
+  nameEnDesc
+  nameFiAsc
+  nameFiDesc
+  nameSvAsc
+  nameSvDesc
 }
 
 input EquipmentUpdateMutationInput {
@@ -1464,6 +1496,9 @@ type Mutation {
   approveReservation(
     input: ReservationApproveMutationInput!
   ): ReservationApproveMutationPayload
+  cancelAllApplicationSectionReservations(
+    input: ApplicationSectionReservationCancellationMutationInput!
+  ): ApplicationSectionReservationCancellationMutationPayload
   cancelApplication(
     input: ApplicationCancelMutationInput!
   ): ApplicationCancelMutationPayload
@@ -1541,6 +1576,9 @@ type Mutation {
   denyReservation(
     input: ReservationDenyMutationInput!
   ): ReservationDenyMutationPayload
+  denyReservationSeries(
+    input: ReservationSeriesDenyMutationInput!
+  ): ReservationSeriesDenyMutationPayload
   refreshOrder(input: RefreshOrderMutationInput!): RefreshOrderMutationPayload
   refundReservation(
     input: ReservationRefundMutationInput!
@@ -1569,6 +1607,9 @@ type Mutation {
   setApplicationRoundHandled(
     input: SetApplicationRoundHandledMutationInput!
   ): SetApplicationRoundHandledMutationPayload
+  setApplicationRoundResultsSent(
+    input: SetApplicationRoundResultsSentMutationInput!
+  ): SetApplicationRoundResultsSentMutationPayload
   staffAdjustReservationTime(
     input: ReservationStaffAdjustTimeMutationInput!
   ): ReservationStaffAdjustTimeMutationPayload
@@ -2106,6 +2147,7 @@ type Query {
     last: Int
     name: String
     offset: Int
+    ongoing: Boolean
     onlyWithPermissions: Boolean
     """
     Järjestä
@@ -2244,6 +2286,12 @@ type Query {
     rankGte: Decimal
     rankLte: Decimal
   ): EquipmentNodeConnection
+  equipmentsAll(
+    """
+    Järjestä
+    """
+    orderBy: [EquipmentOrderingChoices]
+  ): [EquipmentAllNode!]
   keywordCategories(
     after: String
     before: String
@@ -2530,6 +2578,23 @@ type Query {
     typeRankLte: Decimal
     unit: [Int]
   ): ReservationUnitNodeConnection
+  reservationUnitsAll(
+    nameEn: String
+    nameEn_Icontains: String
+    nameEn_Istartswith: String
+    nameFi: String
+    nameFi_Icontains: String
+    nameFi_Istartswith: String
+    nameSv: String
+    nameSv_Icontains: String
+    nameSv_Istartswith: String
+    onlyWithPermission: Boolean
+    """
+    Järjestä
+    """
+    orderBy: [ReservationUnitOrderingChoices]
+    unit: [Int]
+  ): [ReservationUnitAllNode!]
   reservations(
     after: String
     applyingForFreeOfCharge: Boolean
@@ -2693,6 +2758,23 @@ type Query {
     publishedReservationUnits: Boolean
     serviceSector: Decimal
   ): UnitNodeConnection
+  unitsAll(
+    nameEn: String
+    nameEn_Icontains: String
+    nameEn_Istartswith: String
+    nameFi: String
+    nameFi_Icontains: String
+    nameFi_Istartswith: String
+    nameSv: String
+    nameSv_Icontains: String
+    nameSv_Istartswith: String
+    onlyWithPermission: Boolean
+    """
+    Järjestä
+    """
+    orderBy: [UnitOrderingChoices]
+    unit: [Int]
+  ): [UnitAllNode!]
   user(
     """
     The ID of the object
@@ -2911,6 +2993,8 @@ enum RejectedOccurrenceOrderingChoices {
   reservationUnitNameDesc
   reservationUnitPkAsc
   reservationUnitPkDesc
+  unitNameAsc
+  unitNameDesc
   unitPkAsc
   unitPkDesc
 }
@@ -3587,6 +3671,17 @@ type ReservationSeriesCreateMutationPayload {
   weekdays: [Int]
 }
 
+input ReservationSeriesDenyMutationInput {
+  denyReason: Int!
+  handlingDetails: String
+  pk: Int!
+}
+
+type ReservationSeriesDenyMutationPayload {
+  denied: Int
+  future: Int
+}
+
 input ReservationSeriesRescheduleMutationInput {
   beginDate: Date
   beginTime: Time
@@ -3951,6 +4046,21 @@ enum ReservationTypeStaffChoice {
   STAFF
 }
 
+"""
+This Node should be kept to the bare minimum and never expose any relations to avoid performance issues.
+"""
+type ReservationUnitAllNode implements Node {
+  """
+  The ID of the object
+  """
+  id: ID!
+  name: String!
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int
+}
+
 type ReservationUnitCancellationRuleNode implements Node {
   canBeCancelledTimeBefore: Duration
   """
@@ -4201,6 +4311,7 @@ type ReservationUnitNode implements Node {
   applicationRounds(
     active: Boolean
     name: String
+    ongoing: Boolean
     onlyWithPermissions: Boolean
     """
     Järjestä
@@ -5106,6 +5217,14 @@ type SetApplicationRoundHandledMutationPayload {
   pk: Int
 }
 
+input SetApplicationRoundResultsSentMutationInput {
+  pk: Int!
+}
+
+type SetApplicationRoundResultsSentMutationPayload {
+  pk: Int
+}
+
 input SpaceCreateMutationInput {
   building: Int
   code: String
@@ -5463,6 +5582,22 @@ Leverages the internal Python implementation of UUID (uuid.UUID) to provide nati
 in fields, resolvers and input.
 """
 scalar UUID
+
+"""
+This Node should be kept to the bare minimum and never expose any relations to avoid performance issues.
+"""
+type UnitAllNode implements Node {
+  """
+  The ID of the object
+  """
+  id: ID!
+  name: String!
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int
+  tprekId: String
+}
 
 type UnitGroupNode implements Node {
   """
