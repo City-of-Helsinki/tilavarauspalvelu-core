@@ -174,7 +174,7 @@ const getColConfig = (t: TFunction) =>
         const statusProps = getStatusProps(status);
         return (
           <StatusLabel type={statusProps.type} icon={statusProps.icon} slim>
-            {t(`Application.statuses.${status}`)}
+            {t(`ApplicationSectionStatusChoice.${status}`)}
           </StatusLabel>
         );
       },
