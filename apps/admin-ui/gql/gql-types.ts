@@ -6627,13 +6627,11 @@ export type ReservationUnitsFilterParamsQueryVariables = Exact<{
 }>;
 
 export type ReservationUnitsFilterParamsQuery = {
-  reservationUnits?: {
-    totalCount?: number | null;
-    edges: Array<{
-      node?: { id: string; nameFi?: string | null; pk?: number | null } | null;
-    } | null>;
-    pageInfo: { endCursor?: string | null; hasNextPage: boolean };
-  } | null;
+  reservationUnitsAll?: Array<{
+    id: string;
+    nameFi?: string | null;
+    pk?: number | null;
+  }> | null;
 };
 
 export type ReservationUnitTypesFilterQueryVariables = Exact<{
@@ -6654,20 +6652,17 @@ export type ReservationUnitTypesFilterQuery = {
 };
 
 export type UnitsFilterQueryVariables = Exact<{
-  after?: InputMaybe<Scalars["String"]["input"]>;
   orderBy?: InputMaybe<
     Array<InputMaybe<UnitOrderingChoices>> | InputMaybe<UnitOrderingChoices>
   >;
 }>;
 
 export type UnitsFilterQuery = {
-  units?: {
-    totalCount?: number | null;
-    edges: Array<{
-      node?: { id: string; nameFi?: string | null; pk?: number | null } | null;
-    } | null>;
-    pageInfo: { endCursor?: string | null; hasNextPage: boolean };
-  } | null;
+  unitsAll?: Array<{
+    id: string;
+    nameFi?: string | null;
+    pk?: number | null;
+  }> | null;
 };
 
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never }>;
@@ -10902,28 +10897,17 @@ export type ReservationDenyReasonsQueryResult = Apollo.QueryResult<
 >;
 export const ReservationUnitsFilterParamsDocument = gql`
   query ReservationUnitsFilterParams(
-    $after: String
     $unit: [Int]
     $orderBy: [ReservationUnitOrderingChoices]
   ) {
-    reservationUnits(
-      after: $after
+    reservationUnitsAll(
       onlyWithPermission: true
       unit: $unit
       orderBy: $orderBy
     ) {
-      edges {
-        node {
-          id
-          nameFi
-          pk
-        }
-      }
-      pageInfo {
-        endCursor
-        hasNextPage
-      }
-      totalCount
+      id
+      nameFi
+      pk
     }
   }
 `;
@@ -11090,20 +11074,11 @@ export type ReservationUnitTypesFilterQueryResult = Apollo.QueryResult<
   ReservationUnitTypesFilterQueryVariables
 >;
 export const UnitsFilterDocument = gql`
-  query UnitsFilter($after: String, $orderBy: [UnitOrderingChoices]) {
-    units(onlyWithPermission: true, after: $after, orderBy: $orderBy) {
-      edges {
-        node {
-          id
-          nameFi
-          pk
-        }
-      }
-      pageInfo {
-        endCursor
-        hasNextPage
-      }
-      totalCount
+  query UnitsFilter($orderBy: [UnitOrderingChoices]) {
+    unitsAll(onlyWithPermission: true, orderBy: $orderBy) {
+      id
+      nameFi
+      pk
     }
   }
 `;
