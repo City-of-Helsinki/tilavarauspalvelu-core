@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any
 
 import graphene
 from django.conf import settings
+from django.contrib.auth import logout
 from django.db import models
 from graphene import Field
 from graphene_django.debug import DjangoDebug
@@ -235,6 +236,10 @@ class Query(graphene.ObjectType):
         debug = Field(DjangoDebug, name="_debug")
 
     def resolve_current_user(root: None, info: GQLInfo, **kwargs: Any) -> User | None:
+        if not info.context.user.is_active:
+            logout(info.context)
+            return None
+
         if info.context.user.is_anonymous:
             return None
 
