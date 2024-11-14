@@ -33,6 +33,13 @@ class ProxyTunnistamoOIDCAuthBackend(TunnistamoOIDCAuth):
     def get_user(self, user_id: Any = None) -> User | None:
         return get_user(user_id) if user_id is not None else None
 
+    def auth_params(self, state: str | None = None) -> dict[str, str]:
+        params = super().auth_params(state)
+        lang = self.strategy.request_data().get("ui_locales")
+        if lang:
+            params["ui_locales"] = lang
+        return params
+
     def get_end_session_url(self, request: WSGIRequest, id_token: str) -> str | None:
         url = self.oidc_config().get("end_session_endpoint")
 

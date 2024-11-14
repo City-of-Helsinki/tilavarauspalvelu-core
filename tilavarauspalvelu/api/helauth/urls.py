@@ -4,13 +4,12 @@
 # `helusers.tunnistamo_oidc.TunnistamoOIDCAuth` is specifically included in the
 # `AUTHENTICATION_BACKENDS` setting.
 from django.urls import path
-from helusers.views import LoginView
 
-from .views import logout_view
+from .views import login_view, logout_view
 
 app_name = "helusers"
 
 urlpatterns = [
-    path("login/", LoginView.as_view(), name="auth_login"),
+    path("login/", login_view, name="auth_login"),
     path("logout/", logout_view, name="auth_logout"),
 ]
