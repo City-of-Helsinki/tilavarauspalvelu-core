@@ -2,13 +2,36 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.http import HttpResponseRedirect
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.cache import never_cache
-from django.views.decorators.csrf import csrf_protect
-from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from django.views.decorators.http import require_GET, require_POST
 
 from tilavarauspalvelu.typing import WSGIRequest
 from utils.utils import update_query_params
+
+
+@require_GET
+@csrf_exempt  # NOSONAR
+@never_cache
+def login_view(request: WSGIRequest) -> HttpResponseRedirect:
+    # We make sure the user is logged out first, because otherwise
+    # PSA will enter the connect flow where a new social authentication
+    # method is connected to an existing user account.
+    logout(request)
+
+    url = reverse("social:begin", kwargs={"backend": "tunnistamo"})
+
+    redirect_to: str | None = request.GET.get("next")
+    if redirect_to:
+        url = update_query_params(url, next=redirect_to)
+
+    lang: str | None = request.GET.get("lang")
+    if lang:
+        url = update_query_params(url, ui_locales=lang)
+
+    return HttpResponseRedirect(url)
 
 
 @require_POST
