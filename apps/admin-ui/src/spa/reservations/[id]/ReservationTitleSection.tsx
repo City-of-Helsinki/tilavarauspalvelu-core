@@ -10,7 +10,6 @@ import {
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { fontMedium, H1 } from "common/src/common/typography";
-import { breakpoints } from "common/src/common/style";
 import {
   type Maybe,
   OrderStatus,
@@ -26,14 +25,6 @@ import { gql } from "@apollo/client";
 import { ExternalLink } from "@/component/ExternalLink";
 import StatusLabel from "common/src/components/StatusLabel";
 import { type StatusLabelType } from "common/src/tags";
-
-const AlignVertically = styled.div`
-  display: flex;
-  gap: var(--spacing-m);
-  flex-direction: row;
-  align-items: center;
-  flex-grow: 1;
-`;
 
 const Tagline = styled.p`
   font-size: var(--fontsize-body-xl);
@@ -148,27 +139,23 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
           <H1 $noMargin>{overrideTitle ?? getName(reservation, t)}</H1>
           <Flex $direction="row" $align="center">
             {order?.status != null && (
-              <AlignVertically>
-                <StatusLabel
-                  type={paymentStatusLabelType}
-                  testId="reservation_title_section__order_status"
-                  icon={<IconEuroSign aria-hidden="true" />}
-                >
-                  {t(`Payment.status.${order?.status}`)}
-                </StatusLabel>
-              </AlignVertically>
+              <StatusLabel
+                type={paymentStatusLabelType}
+                testId="reservation_title_section__order_status"
+                icon={<IconEuroSign aria-hidden="true" />}
+              >
+                {t(`Payment.status.${order?.status}`)}
+              </StatusLabel>
             )}
-            <AlignVertically style={{ gap: "var(--spacing-xs)" }}>
-              {reservation.state && (
-                <StatusLabel
-                  type={reservationState.type}
-                  icon={reservationState.icon}
-                  testId="reservation_title_section__reservation_state"
-                >
-                  {t(`RequestedReservation.state.${reservation.state}`)}
-                </StatusLabel>
-              )}
-            </AlignVertically>
+            {reservation.state && (
+              <StatusLabel
+                type={reservationState.type}
+                icon={reservationState.icon}
+                testId="reservation_title_section__reservation_state"
+              >
+                {t(`RequestedReservation.state.${reservation.state}`)}
+              </StatusLabel>
+            )}
           </Flex>
         </TitleSection>
         <Tagline data-testid="reservation_title_section__tagline">
