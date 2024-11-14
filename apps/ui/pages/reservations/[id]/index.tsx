@@ -21,8 +21,6 @@ import {
   ReservationDocument,
   type ReservationQuery,
   type ReservationQueryVariables,
-  CurrentUserDocument,
-  type CurrentUserQuery,
   OrderStatus,
 } from "@gql/gql-types";
 import Link from "next/link";
@@ -649,7 +647,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
     // NOTE errors will fallback to 404
     const id = base64encode(`ReservationNode:${pk}`);
-    const { data, error } = await apolloClient.query<
+    const { data } = await apolloClient.query<
       ReservationQuery,
       ReservationQueryVariables
     >({
@@ -658,24 +656,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       variables: { id },
     });
 
-    const { data: userData } = await apolloClient.query<CurrentUserQuery>({
-      query: CurrentUserDocument,
-      fetchPolicy: "no-cache",
-    });
-    const user = userData?.currentUser;
-
-    if (error) {
-      // eslint-disable-next-line no-console
-      console.error("Error while fetching reservation", error);
-    }
-
     const { reservation } = data ?? {};
-    // Return 404 for unauthorized access
-    if (
-      reservation != null &&
-      user != null &&
-      reservation.user?.pk === user.pk
-    ) {
+    if (reservation != null) {
       return {
         props: {
           ...commonProps,

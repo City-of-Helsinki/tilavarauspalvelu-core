@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  CurrentUserQuery,
   ReservationDocument,
   type ReservationQuery,
   type ReservationQueryVariables,
@@ -18,7 +17,6 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { base64encode } from "common/src/helpers";
 import { CenterSpinner } from "@/components/common/common";
 import Error from "next/error";
-import { CURRENT_USER } from "@/modules/queries/user";
 import { createApolloClient } from "@/modules/apolloClient";
 
 // TODO styles are copies from [...params].tsx
@@ -118,13 +116,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     });
     const { reservation } = reservationData || {};
 
-    const { data: userData } = await client.query<CurrentUserQuery>({
-      query: CURRENT_USER,
-      fetchPolicy: "no-cache",
-    });
-    const user = userData?.currentUser;
-
-    if (user != null && user.pk === reservation?.user?.pk) {
+    if (reservation) {
       return {
         props: {
           ...getCommonServerSideProps(),

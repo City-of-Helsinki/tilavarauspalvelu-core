@@ -38,6 +38,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const commonProps = getCommonServerSideProps();
   const client = createApolloClient(commonProps.apiBaseUrl, ctx);
 
+  // NOTE have to be done with double query because applications returns everything the user has access to (not what he owns)
   const { data: userData } = await client.query<CurrentUserQuery>({
     query: CurrentUserDocument,
   });

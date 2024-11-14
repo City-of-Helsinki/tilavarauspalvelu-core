@@ -9,11 +9,11 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { env } from "@/env.mjs";
 import { getSignInUrl, buildGraphQLUrl } from "common/src/urlBuilder";
-import { type LocalizationLanguages } from "common/src/helpers";
+import { base64encode, type LocalizationLanguages } from "common/src/helpers";
 
 const apiBaseUrl = env.TILAVARAUS_API_URL ?? "";
 
-type gqlQuery = {
+type QqlQuery = {
   query: string;
   // TODO don't type to unknown (undefined and Date break JSON.stringify)
   variables: Record<string, unknown>;
@@ -24,7 +24,7 @@ type gqlQuery = {
 /// @param query - Query object with query and variables
 /// @returns Promise<Response>
 /// custom function so we don't have to import apollo client in middleware
-async function gqlQueryFetch(req: NextRequest, query: gqlQuery) {
+async function gqlQueryFetch(req: NextRequest, query: QqlQuery) {
   const { cookies, headers } = req;
   // TODO this is copy to the createApolloClient function but different header types
   // NextRequest vs. RequestInit
@@ -68,10 +68,40 @@ async function gqlQueryFetch(req: NextRequest, query: gqlQuery) {
   });
 }
 
+type User = {
+  pk: number;
+  hasAccess: boolean;
+};
+
+const RESERVATION_QUERY = `
+  reservation(id: $reservationId) {
+    id
+    user {
+      id
+      pk
+    }
+  }`;
+
+const APPLICATION_QUERY = `
+  application(id: $applicationId) {
+    id
+    user {
+      id
+      pk
+    }
+  }`;
+
 /// Get the current user from the backend
 /// @param req - NextRequest
+/// @param opts - optional parameters for fetching additional data
 /// @returns Promise<number | null> - user id or null if not logged in
-async function getCurrentUser(req: NextRequest): Promise<number | null> {
+async function getCurrentUser(
+  req: NextRequest,
+  opts?: {
+    applicationPk?: number | null;
+    reservationPk?: number | null;
+  }
+): Promise<User | null> {
   const { cookies } = req;
   const hasSession = cookies.has("sessionid");
   if (!hasSession) {
@@ -85,14 +115,37 @@ async function getCurrentUser(req: NextRequest): Promise<number | null> {
     return null;
   }
 
-  const query: gqlQuery = {
+  const applicationId =
+    opts?.applicationPk != null
+      ? base64encode(`ApplicationNode:${opts.applicationPk}`)
+      : null;
+  const reservationId =
+    opts?.reservationPk != null
+      ? base64encode(`ReservationNode:${opts.reservationPk}`)
+      : null;
+
+  // NOTE: need to build queries dynamically because of the optional parameters
+  const params =
+    reservationId != null || applicationId != null
+      ? `(
+${reservationId ? "$reservationId: ID!" : ""}
+${applicationId ? "$applicationId: ID!" : ""}
+)`
+      : "";
+
+  const query: QqlQuery = {
     query: `
-      query GetCurrentUser {
+      query GetCurrentUser ${params} {
         currentUser {
           pk
         }
+        ${reservationId ? RESERVATION_QUERY : ""}
+        ${applicationId ? APPLICATION_QUERY : ""}
       }`,
-    variables: {},
+    variables: {
+      ...(reservationId != null ? { reservationId } : {}),
+      ...(applicationId != null ? { applicationId } : {}),
+    },
   };
   const res = await gqlQueryFetch(req, query);
 
@@ -109,21 +162,68 @@ async function getCurrentUser(req: NextRequest): Promise<number | null> {
     console.warn("no data in response");
     return null;
   }
-  if (
-    typeof data.data === "object" &&
-    data.data != null &&
-    "currentUser" in data.data
-  ) {
-    const { currentUser } = data.data;
+
+  return parseUserGQLquery(data.data, reservationId, applicationId);
+}
+
+function parseUserGQLquery(
+  data: unknown,
+  reservationId: string | null,
+  applicationId: string | null
+): User | null {
+  let userPk = null;
+  let hasAccess = reservationId == null && applicationId == null;
+  if (typeof data !== "object" || data == null) {
+    return null;
+  }
+
+  if ("currentUser" in data) {
+    const { currentUser } = data;
     if (
       typeof currentUser === "object" &&
       currentUser != null &&
       "pk" in currentUser
     ) {
-      if (typeof currentUser.pk === "number") {
-        return currentUser.pk;
+      userPk = typeof currentUser.pk === "number" ? currentUser.pk : null;
+    }
+  }
+
+  if ("reservation" in data) {
+    const { reservation } = data;
+    if (
+      reservation != null &&
+      typeof reservation === "object" &&
+      "user" in reservation &&
+      reservation.user != null &&
+      typeof reservation.user === "object" &&
+      "pk" in reservation.user
+    ) {
+      const { pk } = reservation.user;
+      if (pk != null && typeof pk === "number") {
+        hasAccess = pk === userPk;
       }
     }
+  }
+
+  if ("application" in data) {
+    const { application } = data;
+    if (
+      application != null &&
+      typeof application === "object" &&
+      "user" in application &&
+      application.user != null &&
+      typeof application.user === "object" &&
+      "pk" in application.user
+    ) {
+      const { pk } = application.user;
+      if (pk != null && typeof pk === "number") {
+        hasAccess = pk === userPk;
+      }
+    }
+  }
+
+  if (userPk != null) {
+    return { pk: userPk, hasAccess };
   }
   return null;
 }
@@ -149,7 +249,7 @@ function getLocalizationFromUrl(url: URL): LocalizationLanguages {
 /// NOTE The responsibility to update the cookie is on the caller (who creates the next request).
 async function maybeSaveUserLanguage(
   req: NextRequest,
-  user: number | null
+  user: User | null
 ): Promise<string | undefined> {
   const { cookies } = req;
   const url = new URL(req.url);
@@ -167,7 +267,7 @@ async function maybeSaveUserLanguage(
       return;
     }
 
-    const query: gqlQuery = {
+    const query: QqlQuery = {
       query: `
         mutation SaveUserLanguage($preferredLanguage: PreferredLanguage!) {
           updateCurrentUser(
@@ -198,7 +298,7 @@ async function maybeSaveUserLanguage(
 /// @returns Promise<string | undefined> - the redirect url or null if no redirect is needed
 function getRedirectProtectedRoute(
   req: NextRequest,
-  user: number | null
+  user: User | null
 ): string | null {
   const { headers } = req;
 
@@ -267,11 +367,18 @@ function redirectCsrfToken(req: NextRequest): URL | undefined {
 // refactor the matcher or fix the underlining matcher issue in nextjs
 // matcher syntax: /hard-path/:path* -> /hard-path/anything
 // our syntax: hard-path
-const authenticatedRoutes = [
+const reservationRoutes = [
   "reservation", //:path*',
   "reservations", //:path*',
+];
+const applicationRoutes = [
   "applications", //:path*',
   "application", //:path*',
+];
+const authenticatedRoutes = [
+  // just in case if the route falls through
+  ...reservationRoutes,
+  ...applicationRoutes,
   "success",
 ];
 // url matcher that is very specific to our case
@@ -297,7 +404,42 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  const user = await getCurrentUser(req);
+  const url = new URL(req.url);
+  let reservationPk: number | null = null;
+  let applicationPk: number | null = null;
+
+  if (reservationRoutes.some((route) => doesUrlMatch(req.url, route))) {
+    const id = url.pathname.match(/\/reservations?\/(\d+)/)?.[1];
+    const pk = Number(id);
+    // can be either an url issues (user error) or a bug in our matcher
+    if (pk > 0) {
+      reservationPk = pk;
+    } else {
+      // eslint-disable-next-line no-console
+      console.error("Invalid reservation id");
+    }
+  }
+  if (applicationRoutes.some((route) => doesUrlMatch(req.url, route))) {
+    const id = url.pathname.match(/\/applications?\/(\d+)/)?.[1];
+    const pk = Number(id);
+    // can be either an url issues (user error) or a bug in our matcher
+    if (pk > 0) {
+      applicationPk = pk;
+    } else {
+      // eslint-disable-next-line no-console
+      console.error("Invalid application id");
+    }
+  }
+
+  const options = {
+    applicationPk,
+    reservationPk,
+  };
+
+  const user = await getCurrentUser(req, options);
+  if (user != null && !user.hasAccess) {
+    return NextResponse.error();
+  }
 
   if (authenticatedRoutes.some((route) => doesUrlMatch(req.url, route))) {
     const redirect = getRedirectProtectedRoute(req, user);

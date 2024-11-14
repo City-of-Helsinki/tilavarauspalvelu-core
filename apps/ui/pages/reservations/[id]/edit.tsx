@@ -12,7 +12,6 @@ import {
   ReservationDocument,
   type ReservationQuery,
   type ReservationQueryVariables,
-  type CurrentUserQuery,
   type Mutation,
   type MutationAdjustReservationTimeArgs,
   useAdjustReservationTimeMutation,
@@ -21,7 +20,6 @@ import { base64encode, filterNonNullable } from "common/src/helpers";
 import { toApiDate } from "common/src/common/util";
 import { addYears } from "date-fns";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
-import { CURRENT_USER } from "@/modules/queries/user";
 import { type FetchResult } from "@apollo/client";
 import { useRouter } from "next/router";
 import { StepState, Stepper } from "hds-react";
@@ -289,12 +287,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     });
     const { reservationUnit } = reservationUnitData;
 
-    const { data: userData } = await client.query<CurrentUserQuery>({
-      query: CURRENT_USER,
-      fetchPolicy: "no-cache",
-    });
-    const user = userData?.currentUser;
-
     const options = await queryOptions(client, locale ?? "");
 
     const timespans = filterNonNullable(reservationUnit?.reservableTimeSpans);
@@ -302,11 +294,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       reservationUnitData?.affectingReservations
     );
 
-    if (
-      reservation != null &&
-      reservationUnit != null &&
-      reservation.user?.pk === user?.pk
-    ) {
+    if (reservation != null && reservationUnit != null) {
       return {
         props: {
           ...commonProps,

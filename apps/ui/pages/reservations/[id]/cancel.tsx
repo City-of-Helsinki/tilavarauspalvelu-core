@@ -2,7 +2,6 @@ import React from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import {
-  CurrentUserQuery,
   ReservationCancelReasonsDocument,
   type ReservationCancelReasonsQuery,
   type ReservationCancelReasonsQueryVariables,
@@ -15,7 +14,6 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { isReservationCancellable } from "@/modules/reservation";
-import { CURRENT_USER } from "@/modules/queries/user";
 import { getReservationPath } from "@/modules/urls";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -47,12 +45,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     });
     const { reservation } = reservationData || {};
 
-    const { data: userData } = await client.query<CurrentUserQuery>({
-      query: CURRENT_USER,
-      fetchPolicy: "no-cache",
-    });
-    const user = userData?.currentUser;
-
     const { data: cancelReasonsData } = await client.query<
       ReservationCancelReasonsQuery,
       ReservationCancelReasonsQueryVariables
@@ -67,16 +59,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       )
     );
 
-    if (reservation?.user?.pk !== user?.pk) {
-      return {
-        notFound: true,
-        props: {
-          notFound: true,
-          ...commonProps,
-          ...(await serverSideTranslations(locale ?? "fi")),
-        },
-      };
-    }
     const canCancel =
       reservation != null && isReservationCancellable(reservation);
     if (canCancel) {
