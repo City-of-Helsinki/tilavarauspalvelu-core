@@ -162,7 +162,7 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
               <AlignVertically>
                 <StatusLabel
                   type={paymentStatusLabelType}
-                  data-testid="reservation_title_section__order_status"
+                  testId="reservation_title_section__order_status"
                   icon={<IconEuroSign aria-hidden="true" />}
                 >
                   {t(`Payment.status.${order?.status}`)}
@@ -174,7 +174,7 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
                 <StatusLabel
                   type={reservationState.type}
                   icon={reservationState.icon}
-                  data-testid="reservation_title_section__reservation_state"
+                  testId="reservation_title_section__reservation_state"
                 >
                   {t(`RequestedReservation.state.${reservation.state}`)}
                 </StatusLabel>
