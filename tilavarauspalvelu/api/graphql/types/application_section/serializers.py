@@ -1,8 +1,9 @@
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, TypedDict
 
 from django.db import models
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.serializers import NotProvided
+from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
@@ -10,7 +11,17 @@ from tilavarauspalvelu.api.graphql.types.reservation_unit_option.serializers imp
     ReservationUnitOptionApplicantSerializer,
 )
 from tilavarauspalvelu.api.graphql.types.suitable_time_range.serializers import SuitableTimeRangeSerializer
-from tilavarauspalvelu.models import AllocatedTimeSlot, Application, ApplicationRound, ApplicationSection
+from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.models import (
+    AllocatedTimeSlot,
+    Application,
+    ApplicationRound,
+    ApplicationSection,
+    Reservation,
+    ReservationCancelReason,
+)
+from utils.date_utils import local_datetime
+from utils.db import NowTT
 from utils.utils import comma_sep_str
 
 if TYPE_CHECKING:
@@ -195,3 +206,94 @@ class RestoreAllSectionOptionsSerializer(NestingModelSerializer):
     def save(self, **kwargs: Any) -> ApplicationSection:
         self.instance.reservation_unit_options.all().update(rejected=False)
         return self.instance
+
+
+class CancellationOutput(TypedDict):
+    expected_cancellations: int
+    actual_cancellations: int
+
+
+class ApplicationSectionReservationCancellationInputSerializer(NestingModelSerializer):
+    instance: ApplicationSection
+
+    cancel_reason = serializers.IntegerField(required=True)
+    cancel_details = serializers.CharField(required=False)
+
+    class Meta:
+        model = ApplicationSection
+        fields = [
+            "pk",
+            "cancel_reason",
+            "cancel_details",
+        ]
+        extra_kwargs = {
+            "cancel_reason": {"required": True},
+            "cancel_details": {"required": False},
+        }
+
+    @staticmethod
+    def validate_cancel_reason(value: int) -> int:
+        if ReservationCancelReason.objects.filter(pk=value).exists():
+            return value
+        msg = f"Cancel reason with pk {value} does not exist."
+        raise ValidationError(msg, code=error_codes.CANCEL_REASON_DOES_NOT_EXIST)
+
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
+        if self.instance.application.application_round.status != ApplicationRoundStatusChoice.RESULTS_SENT:
+            msg = "Application sections application round is not in 'RESULTS_SENT' state."
+            raise ValidationError(msg, code=error_codes.APPLICATION_ROUND_NOT_IN_RESULTS_SENT_STATE)
+
+        return data
+
+    def save(self, **kwargs: Any) -> CancellationOutput:
+        future_reservations = Reservation.objects.filter(
+            user=self.instance.application.user,
+            begin__gt=local_datetime(),
+            recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=self.instance,
+        )
+
+        cancellable_reservations = (
+            future_reservations.filter(
+                type=ReservationTypeChoice.SEASONAL,
+                state=ReservationStateChoice.CONFIRMED,
+                price=0,
+                reservation_units__cancellation_rule__isnull=False,
+            )
+            .alias(
+                cancellation_time=models.F("reservation_units__cancellation_rule__can_be_cancelled_time_before"),
+                cancellation_cutoff=NowTT() + models.F("cancellation_time"),
+            )
+            .filter(
+                begin__gt=models.F("cancellation_cutoff"),
+            )
+            .distinct()
+        )
+
+        data = CancellationOutput(
+            expected_cancellations=future_reservations.count(),
+            actual_cancellations=cancellable_reservations.count(),
+        )
+
+        cancellable_reservations.update(
+            state=ReservationStateChoice.CANCELLED,
+            cancel_reason=self.validated_data["cancel_reason"],
+            cancel_details=self.validated_data.get("cancel_details", ""),
+        )
+
+        return data
+
+
+class ApplicationSectionReservationCancellationOutputSerializer(NestingModelSerializer):
+    future = serializers.IntegerField(required=True)
+    cancelled = serializers.IntegerField(required=True)
+
+    class Meta:
+        model = ApplicationSection
+        fields = [
+            "future",
+            "cancelled",
+        ]
+        extra_kwargs = {
+            "future": {"required": True},
+            "cancelled": {"required": True},
+        }

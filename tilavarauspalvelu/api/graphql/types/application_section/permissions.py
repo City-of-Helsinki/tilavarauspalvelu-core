@@ -60,3 +60,9 @@ class UpdateAllSectionOptionsPermission(BasePermission):
             .distinct()
         )
         return user.permissions.can_manage_applications_for_units(units)
+
+
+class ApplicationSectionReservationCancellationPermission(BasePermission):
+    @classmethod
+    def has_update_permission(cls, instance: ApplicationSection, user: AnyUser, input_data: dict[str, Any]) -> bool:
+        return user == instance.application.user

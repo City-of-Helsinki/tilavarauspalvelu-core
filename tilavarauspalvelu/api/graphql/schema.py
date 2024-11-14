@@ -25,6 +25,7 @@ from .mutations import (
     ApplicationCreateMutation,
     ApplicationSectionCreateMutation,
     ApplicationSectionDeleteMutation,
+    ApplicationSectionReservationCancellationMutation,
     ApplicationSectionUpdateMutation,
     ApplicationSendMutation,
     ApplicationUpdateMutation,
@@ -307,6 +308,7 @@ class Mutation(graphene.ObjectType):
     restore_all_section_options = RestoreAllSectionOptionsMutation.Field()
     reject_all_application_options = RejectAllApplicationOptionsMutation.Field()
     restore_all_application_options = RestoreAllApplicationOptionsMutation.Field()
+    cancel_all_application_section_reservations = ApplicationSectionReservationCancellationMutation.Field()
     set_application_round_handled = SetApplicationRoundHandledMutation.Field()
     set_application_round_results_sent = SetApplicationRoundResultsSentMutation.Field()
     #
