@@ -68,6 +68,9 @@ async function gqlQueryFetch(req: NextRequest, query: gqlQuery) {
   });
 }
 
+/// Get the current user from the backend
+/// @param req - NextRequest
+/// @returns Promise<number | null> - user id or null if not logged in
 async function getCurrentUser(req: NextRequest): Promise<number | null> {
   const { cookies } = req;
   const hasSession = cookies.has("sessionid");
@@ -125,19 +128,7 @@ async function getCurrentUser(req: NextRequest): Promise<number | null> {
   return null;
 }
 
-/// Check if user is logged in
-/// @param req - NextRequest
-/// @returns boolean
-/// Checks both sessionid and makes a request to the backend to check if the session is valid
-/// log incorrect requests but don't throw errors
-async function isLoggedIn(req: NextRequest) {
-  const user = await getCurrentUser(req);
-  if (!user) {
-    return false;
-  }
-  return true;
-}
-
+/// Get language code from the url
 function getLocalizationFromUrl(url: URL): LocalizationLanguages {
   // frontpage has no trailing slash
   if (url.pathname.startsWith("/en/") || url.pathname === "/en") {
@@ -151,13 +142,20 @@ function getLocalizationFromUrl(url: URL): LocalizationLanguages {
 
 /// Save user language to the backend if it has changed
 /// @param req - NextRequest
+/// @param user - user id or null if not logged in
 /// @returns Promise<string | undefined> - the new language or undefined if it hasn't changed
 /// uses the following cookies: sessionid, csrftoken, (language)
 /// only saves the language if the user is logged in
 /// NOTE The responsibility to update the cookie is on the caller (who creates the next request).
-async function maybeSaveUserLanguage(req: NextRequest) {
+async function maybeSaveUserLanguage(
+  req: NextRequest,
+  user: number | null
+): Promise<string | undefined> {
   const { cookies } = req;
   const url = new URL(req.url);
+  if (user == null) {
+    return;
+  }
   if (isPageRequest(url)) {
     const sessionid = cookies.get("sessionid");
     if (sessionid == null) {
@@ -166,11 +164,6 @@ async function maybeSaveUserLanguage(req: NextRequest) {
     const cookieLang = cookies.get("language");
     const language = getLocalizationFromUrl(url);
     if (cookieLang?.value === language) {
-      return;
-    }
-
-    const currentUser = await getCurrentUser(req);
-    if (currentUser == null) {
       return;
     }
 
@@ -199,11 +192,17 @@ async function maybeSaveUserLanguage(req: NextRequest) {
   }
 }
 
-async function redirectProtectedRoute(req: NextRequest) {
+/// Check if the user is logged in and redirect to the sign in page if not
+/// @param req - NextRequest
+/// @param user - user id or null if not logged in
+/// @returns Promise<string | undefined> - the redirect url or null if no redirect is needed
+function getRedirectProtectedRoute(
+  req: NextRequest,
+  user: number | null
+): string | null {
   const { headers } = req;
-  const isSignedIn = await isLoggedIn(req);
 
-  if (!isSignedIn) {
+  if (user == null) {
     // on the server we are behind a gateway so get the forwarded headers
     // localhost has no headers
     const currentUrl = req.url;
@@ -213,7 +212,7 @@ async function redirectProtectedRoute(req: NextRequest) {
     const origin = `${protocol}://${host}`;
     return getSignInUrl(apiBaseUrl, url.pathname, origin);
   }
-  return undefined;
+  return null;
 }
 
 /// Check if the request is a page request
@@ -269,7 +268,6 @@ function redirectCsrfToken(req: NextRequest): URL | undefined {
 // matcher syntax: /hard-path/:path* -> /hard-path/anything
 // our syntax: hard-path
 const authenticatedRoutes = [
-  "intro",
   "reservation", //:path*',
   "reservations", //:path*',
   "applications", //:path*',
@@ -294,14 +292,21 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
+  // don't make unnecessary requests to the backend for every asset
+  if (!isPageRequest(new URL(req.url))) {
+    return NextResponse.next();
+  }
+
+  const user = await getCurrentUser(req);
+
   if (authenticatedRoutes.some((route) => doesUrlMatch(req.url, route))) {
-    const redirect = await redirectProtectedRoute(req);
+    const redirect = getRedirectProtectedRoute(req, user);
     if (redirect) {
       return NextResponse.redirect(new URL(redirect, req.url));
     }
   }
 
-  const lang = await maybeSaveUserLanguage(req);
+  const lang = await maybeSaveUserLanguage(req, user);
 
   if (lang != null) {
     const n = NextResponse.next();
