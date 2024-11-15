@@ -50,9 +50,9 @@ urlpatterns = [
     ),
     path("tinymce/", include("tinymce.urls")),
     path("csrf/", csrf_view),
-    path("system-status/", include("health_check.urls", namespace="health_check")),
-    path("liveness/", liveness_check, name="liveness_check"),
-    path("readiness/", readiness_check, name="readiness_check"),
+    path("monitoring/system-status/", include("health_check.urls", namespace="health_check")),
+    path("monitoring/liveness/", liveness_check, name="liveness_check"),
+    path("monitoring/readiness/", readiness_check, name="readiness_check"),
 ]
 
 if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
