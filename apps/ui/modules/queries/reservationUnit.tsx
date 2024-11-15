@@ -64,7 +64,7 @@ const RESERVATION_UNIT_PAGE_FRAGMENT = gql`
         end
       }
     }
-    applicationRounds(active: true) {
+    applicationRounds(ongoing: true) {
       id
       reservationPeriodBegin
       reservationPeriodEnd

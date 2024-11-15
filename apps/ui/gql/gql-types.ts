@@ -8499,7 +8499,7 @@ export const ReservationUnitPageFieldsFragmentDoc = gql`
         end
       }
     }
-    applicationRounds(active: true) {
+    applicationRounds(ongoing: true) {
       id
       reservationPeriodBegin
       reservationPeriodEnd
