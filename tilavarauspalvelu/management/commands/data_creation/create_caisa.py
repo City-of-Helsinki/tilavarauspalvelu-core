@@ -67,7 +67,7 @@ def _create_caisa() -> None:
     ###########################################################################################################
 
     tax_percentage_0 = TaxPercentageFactory.create(value=0.0)
-    tax_percentage_24 = TaxPercentageFactory.create(value=24.0)
+    tax_percentage_255 = TaxPercentageFactory.create(value=25.5)
     payment_type_online = ReservationUnitPaymentTypeFactory.create(code="ONLINE")
 
     ###########################################################################################################
@@ -752,7 +752,7 @@ def _create_caisa() -> None:
         price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
         lowest_price=0.0,
         highest_price=40.0,
-        tax_percentage=tax_percentage_24,
+        tax_percentage=tax_percentage_255,
     )
 
     image = _fetch_and_build_reservation_unit_image(
@@ -967,7 +967,7 @@ def _create_caisa() -> None:
         price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
         lowest_price=40.0,
         highest_price=40.0,
-        tax_percentage=tax_percentage_24,
+        tax_percentage=tax_percentage_255,
     )
 
     image = _fetch_and_build_reservation_unit_image(
@@ -1074,7 +1074,7 @@ def _create_caisa() -> None:
         price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
         lowest_price=0.0,
         highest_price=30.0,
-        tax_percentage=tax_percentage_24,
+        tax_percentage=tax_percentage_255,
     )
 
     image = _fetch_and_build_reservation_unit_image(
@@ -1251,7 +1251,7 @@ def _create_caisa() -> None:
         price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
         lowest_price=0.0,
         highest_price=30.0,
-        tax_percentage=tax_percentage_24,
+        tax_percentage=tax_percentage_255,
     )
 
     image = _fetch_and_build_reservation_unit_image(
