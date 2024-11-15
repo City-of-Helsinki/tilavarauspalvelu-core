@@ -847,7 +847,7 @@ def _create_caisa() -> None:
     )
 
     image = _fetch_and_build_reservation_unit_image(
-        reservation_unit=aina_kasiteltava_kellarikerros,
+        reservation_unit=maksuton_mankeli,
         image_url="https://tilavaraus.test.hel.ninja/media/reservation_unit_images/Kuva1.png",
         filename="Kuva1",
         extension=".png",
@@ -856,7 +856,7 @@ def _create_caisa() -> None:
         image.save()
 
     image = _fetch_and_build_reservation_unit_image(
-        reservation_unit=aina_kasiteltava_kellarikerros,
+        reservation_unit=maksuton_mankeli,
         image_url="https://tilavaraus.test.hel.ninja/media/reservation_unit_images/Kuva2.png",
         filename="Kuva2",
         extension=".png",
@@ -866,7 +866,7 @@ def _create_caisa() -> None:
         image.save()
 
     image = _fetch_and_build_reservation_unit_image(
-        reservation_unit=aina_kasiteltava_kellarikerros,
+        reservation_unit=maksuton_mankeli,
         image_url="https://tilavaraus.test.hel.ninja/media/reservation_unit_images/Kuva3.png",
         filename="Kuva3",
         extension=".png",
