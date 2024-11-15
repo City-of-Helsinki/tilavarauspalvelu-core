@@ -85,7 +85,6 @@ class Common(Environment):
         "health_check.cache",
         "health_check.contrib.celery",
         "health_check.contrib.celery_ping",
-        "health_check.contrib.redis",
         # Our app
         "tilavarauspalvelu",
     ]
@@ -950,7 +949,10 @@ class Platta(Common, use_environ=True):
     @classmethod
     def post_setup(cls) -> None:
         import sentry_sdk
+        from health_check.plugins import plugin_dir
         from sentry_sdk.integrations.django import DjangoIntegration
+
+        from .health_checks import RedisSentinelHealthCheck
 
         sentry_sdk.init(
             dsn=cls.SENTRY_DSN,
@@ -958,6 +960,8 @@ class Platta(Common, use_environ=True):
             release=cls.APP_VERSION,  # type: ignore
             integrations=[DjangoIntegration()],
         )
+
+        plugin_dir.register(RedisSentinelHealthCheck)
 
 
 class MidHook(EmptyDefaults, Platta, use_environ=True):
