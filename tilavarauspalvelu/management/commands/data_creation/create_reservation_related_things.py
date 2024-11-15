@@ -768,5 +768,6 @@ def _fetch_image(image_url: str, path: Path) -> None:
         print(msg)  # noqa: T201, RUF100
         return
 
-    with open(path, "wb") as handler:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(file=path, mode="wb") as handler:
         handler.write(response.content)
