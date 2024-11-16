@@ -22,7 +22,7 @@ import { getReservationUnitInstructionsKey } from "@/modules/reservationUnit";
 import { getTranslation } from "@/modules/util";
 import { BlackButton } from "@/styles/util";
 import { Paragraph } from "./styles";
-import { ButtonLikeLink } from "../common/ButtonLikeLink";
+import { ButtonLikeExternalLink } from "../common/ButtonLikeLink";
 import { getReservationUnitPath, reservationsPath } from "@/modules/urls";
 
 type Node = NonNullable<ReservationQuery["reservation"]>;
@@ -140,16 +140,15 @@ function ReservationConfirmation({
       </Paragraph>
       {reservation.state === ReservationStateChoice.Confirmed && (
         <ActionContainer1 style={{ marginBottom: "var(--spacing-2-xl)" }}>
-          <ButtonLikeLink
+          <ButtonLikeExternalLink
             size="large"
             disabled={!reservation.calendarUrl}
             data-testid="reservation__confirmation--button__calendar-url"
             href={reservation.calendarUrl ?? ""}
-            locale={false}
           >
             {t("reservations:saveToCalendar")}
             <IconCalendar aria-hidden />
-          </ButtonLikeLink>
+          </ButtonLikeExternalLink>
           {order?.receiptUrl && (
             <BlackButton
               data-testid="reservation__confirmation--button__receipt-link"

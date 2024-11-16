@@ -57,7 +57,10 @@ import {
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { containsField, containsNameField } from "common/src/metaFieldsHelpers";
 import { NotModifiableReason } from "@/components/reservation/NotModifiableReason";
-import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
+import {
+  ButtonLikeLink,
+  ButtonLikeExternalLink,
+} from "@/components/common/ButtonLikeLink";
 import { useRouter } from "next/router";
 import { successToast } from "common/src/common/toast";
 import { ReservationPageWrapper } from "@/components/reservations/styles";
@@ -476,16 +479,15 @@ function Reservation({
             <ReservationInfoCard reservation={reservation} type="complete" />
             <SecondaryActions>
               {reservation.state === ReservationStateChoice.Confirmed && (
-                <ButtonLikeLink
+                <ButtonLikeExternalLink
                   size="large"
                   disabled={!reservation.calendarUrl}
                   data-testid="reservation__button--calendar-link"
                   href={reservation.calendarUrl ?? ""}
-                  locale={false}
                 >
                   {t("reservations:saveToCalendar")}
                   <IconCalendar aria-hidden />
-                </ButtonLikeLink>
+                </ButtonLikeExternalLink>
               )}
               {hasReceipt && (
                 <ButtonLikeLink
