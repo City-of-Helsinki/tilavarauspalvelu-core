@@ -53,7 +53,7 @@ def test_email_service__send_application_received_email__no_recipients(outbox):
 
 @override_settings(SEND_EMAILS=True)
 def test_email_service__send_application_in_allocation_emails(outbox):
-    application = ApplicationFactory.create_in_status_in_allocation()
+    application = ApplicationFactory.create_in_status_in_allocation(in_allocation_notification_sent_date=None)
 
     EmailService.send_application_in_allocation_emails()
 
@@ -64,9 +64,24 @@ def test_email_service__send_application_in_allocation_emails(outbox):
 
 
 @override_settings(SEND_EMAILS=True)
+def test_email_service__send_application_in_allocation_emails__already_sent(outbox):
+    ApplicationFactory.create_in_status_in_allocation()
+
+    EmailService.send_application_in_allocation_emails()
+
+    assert len(outbox) == 0
+
+
+@override_settings(SEND_EMAILS=True)
 def test_email_service__send_application_in_allocation_emails__multiple_languages(outbox):
-    application_1 = ApplicationFactory.create_in_status_in_allocation(user__preferred_language="fi")
-    application_2 = ApplicationFactory.create_in_status_in_allocation(user__preferred_language="en")
+    application_1 = ApplicationFactory.create_in_status_in_allocation(
+        user__preferred_language="fi",
+        in_allocation_notification_sent_date=None,
+    )
+    application_2 = ApplicationFactory.create_in_status_in_allocation(
+        user__preferred_language="en",
+        in_allocation_notification_sent_date=None,
+    )
 
     with TranslationsFromPOFiles():
         EmailService.send_application_in_allocation_emails()
@@ -92,7 +107,11 @@ def test_email_service__send_application_in_allocation_emails__wrong_status(outb
 @override_settings(SEND_EMAILS=True)
 @patch_method(SentryLogger.log_message)
 def test_email_service__send_application_in_allocation_emails__no_recipients(outbox):
-    ApplicationFactory.create_in_status_in_allocation(user__email="", contact_person__email="")
+    ApplicationFactory.create_in_status_in_allocation(
+        user__email="",
+        contact_person__email="",
+        in_allocation_notification_sent_date=None,
+    )
 
     EmailService.send_application_in_allocation_emails()
 
