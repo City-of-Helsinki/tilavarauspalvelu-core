@@ -594,7 +594,8 @@ def _create_paid_reservation_units(
             image_url="https://images.unsplash.com/photo-1414452110837-9dab484a417d",
             filename="vessa",
         )
-        images.append(image)
+        if image is not None:
+            images.append(image)
 
     Unit.objects.bulk_create(units)
     Space.objects.bulk_create(spaces)
