@@ -2,6 +2,7 @@ ci:
   skip:
     # Cannot access poetry on pre-commit.ci
     - python-safety-dependencies-check
+    - poetry-lock
 
 repos:
 
@@ -32,4 +33,16 @@ repos:
     hooks:
       - id: python-safety-dependencies-check
         files: pyproject.toml
-        args: ["--ignore=64396,64459"]
+        # Ignore some issues in sub-dependencies:
+        # - https://data.safetycli.com/v/64396/97c/  | django-helusers -> python-jose -> ecdsa
+        # - https://data.safetycli.com/v/64459/97c/  | django-helusers -> python-jose -> ecdsa
+        # - https://data.safetycli.com/v/70612/97c/  | django-jinja -> jinja2
+        # - https://data.safetycli.com/v/70715/97c/  | django-helusers -> python-jose
+        # - https://data.safetycli.com/v/70716/97c/  | django-helusers -> python-jose
+        args: ["--ignore=64396,64459,70612,70715,70716"]
+
+  - repo: https://github.com/python-poetry/poetry
+    rev: 1.8.4
+    hooks:
+    -   id: poetry-check
+    -   id: poetry-lock
