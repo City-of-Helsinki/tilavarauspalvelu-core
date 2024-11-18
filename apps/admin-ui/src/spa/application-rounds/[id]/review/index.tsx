@@ -15,6 +15,7 @@ import {
   ApplicationRoundReservationCreationStatusChoice,
   type ApplicationRoundQuery,
   UserPermissionChoice,
+  useSendResultsMutation,
 } from "@gql/gql-types";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { ApplicationRoundStatusLabel } from "../../ApplicationRoundStatusLabel";
@@ -78,6 +79,14 @@ export const END_ALLOCATION_MUTATION = gql`
   }
 `;
 
+export const SEND_RESULTS_MUTATION = gql`
+  mutation SendResults($pk: Int!) {
+    setApplicationRoundResultsSent(input: { pk: $pk }) {
+      pk
+    }
+  }
+`;
+
 function EndAllocation({
   applicationRound,
   refetch,
@@ -89,6 +98,7 @@ function EndAllocation({
   const { t } = useTranslation();
 
   const [mutation] = useEndAllocationMutation();
+  const [sendResults] = useSendResultsMutation();
 
   const handleEndAllocation = async () => {
     try {
@@ -124,8 +134,15 @@ function EndAllocation({
     refetch();
   };
 
-  const handleSendResults = () => {
-    errorToast({ text: "TODO: not implemented handleSendResults" });
+  const handleSendResults = async () => {
+    try {
+      await sendResults({
+        variables: { pk: applicationRound.pk ?? 0 },
+      });
+    } catch (err) {
+      errorToast({ text: t("errors.errorSendingResults") });
+    }
+    refetch();
   };
 
   const hasFailed =
@@ -261,6 +278,9 @@ export function Review({
   // i.e. state.InAllocation -> isSettingHandledAllowed -> state.Handled -> state.ResultsSent
   const isHandled =
     applicationRound.status === ApplicationRoundStatusChoice.Handled;
+  const isResultsSent =
+    applicationRound.status === ApplicationRoundStatusChoice.ResultsSent;
+  const hideAllocation = isHandled || isResultsSent;
 
   const isEndingAllowed = applicationRound.isSettingHandledAllowed;
 
@@ -294,7 +314,13 @@ export function Review({
         $direction="row-reverse"
         $alignItems="center"
       >
-        {!isHandled && (
+        {isEndingAllowed || isHandled ? (
+          <EndAllocation
+            applicationRound={applicationRound}
+            refetch={refetch}
+          />
+        ) : null}
+        {!hideAllocation && (
           <>
             {isAllocationEnabled ? (
               <ButtonLikeLink to="allocation" variant="primary" size="large">
@@ -307,12 +333,6 @@ export function Review({
             )}
           </>
         )}
-        {isEndingAllowed || isHandled ? (
-          <EndAllocation
-            applicationRound={applicationRound}
-            refetch={refetch}
-          />
-        ) : null}
       </Flex>
       <TabWrapper>
         <Tabs initiallyActiveTab={activeTabIndex}>

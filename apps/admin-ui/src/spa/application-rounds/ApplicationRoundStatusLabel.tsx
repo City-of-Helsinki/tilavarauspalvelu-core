@@ -28,35 +28,35 @@ export function getApplicationRoundStatus(
         group: "g1",
         type: "alert",
         icon: <IconClock aria-hidden="true" />,
-        label: ApplicationRoundStatusChoice.Open,
+        label: status,
       };
     case ApplicationRoundStatusChoice.InAllocation:
       return {
         group: "g1",
         type: "info",
         icon: <IconCogwheel aria-hidden="true" />,
-        label: ApplicationRoundStatusChoice.InAllocation,
+        label: status,
       };
     case ApplicationRoundStatusChoice.Handled:
       return {
         group: "g2",
         type: "success",
         icon: <IconCheck aria-hidden="true" />,
-        label: ApplicationRoundStatusChoice.Handled,
+        label: status,
       };
     case ApplicationRoundStatusChoice.ResultsSent:
       return {
         group: "g2",
         type: "success",
         icon: <IconEnvelope aria-hidden="true" />,
-        label: ApplicationRoundStatusChoice.Handled,
+        label: status,
       };
     case ApplicationRoundStatusChoice.Upcoming:
       return {
         group: "g4",
         type: "draft",
         icon: <IconArrowTopRight aria-hidden="true" />,
-        label: ApplicationRoundStatusChoice.Upcoming,
+        label: status,
       };
     default:
       return {

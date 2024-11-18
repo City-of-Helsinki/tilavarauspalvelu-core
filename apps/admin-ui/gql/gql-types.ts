@@ -7050,6 +7050,14 @@ export type EndAllocationMutation = {
   setApplicationRoundHandled?: { pk?: number | null } | null;
 };
 
+export type SendResultsMutationVariables = Exact<{
+  pk: Scalars["Int"]["input"];
+}>;
+
+export type SendResultsMutation = {
+  setApplicationRoundResultsSent?: { pk?: number | null } | null;
+};
+
 export type ApplicationsQueryVariables = Exact<{
   applicationRound: Scalars["Int"]["input"];
   unit?: InputMaybe<
@@ -12680,6 +12688,56 @@ export type EndAllocationMutationResult =
 export type EndAllocationMutationOptions = Apollo.BaseMutationOptions<
   EndAllocationMutation,
   EndAllocationMutationVariables
+>;
+export const SendResultsDocument = gql`
+  mutation SendResults($pk: Int!) {
+    setApplicationRoundResultsSent(input: { pk: $pk }) {
+      pk
+    }
+  }
+`;
+export type SendResultsMutationFn = Apollo.MutationFunction<
+  SendResultsMutation,
+  SendResultsMutationVariables
+>;
+
+/**
+ * __useSendResultsMutation__
+ *
+ * To run a mutation, you first call `useSendResultsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSendResultsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [sendResultsMutation, { data, loading, error }] = useSendResultsMutation({
+ *   variables: {
+ *      pk: // value for 'pk'
+ *   },
+ * });
+ */
+export function useSendResultsMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    SendResultsMutation,
+    SendResultsMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<SendResultsMutation, SendResultsMutationVariables>(
+    SendResultsDocument,
+    options
+  );
+}
+export type SendResultsMutationHookResult = ReturnType<
+  typeof useSendResultsMutation
+>;
+export type SendResultsMutationResult =
+  Apollo.MutationResult<SendResultsMutation>;
+export type SendResultsMutationOptions = Apollo.BaseMutationOptions<
+  SendResultsMutation,
+  SendResultsMutationVariables
 >;
 export const ApplicationsDocument = gql`
   query Applications(
