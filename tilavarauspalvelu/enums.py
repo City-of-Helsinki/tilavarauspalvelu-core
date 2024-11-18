@@ -436,6 +436,13 @@ class ReservationTypeChoice(models.TextChoices):
             ReservationTypeChoice.STAFF.value,
         ]
 
+    @classproperty
+    def types_that_can_be_cancelled(cls) -> list[str]:
+        return [  # type: ignore[return-type]
+            ReservationTypeChoice.NORMAL.value,
+            ReservationTypeChoice.SEASONAL.value,
+        ]
+
 
 class ReservationTypeStaffChoice(models.TextChoices):
     # These are the same as the ones above, but for the staff create endpoint

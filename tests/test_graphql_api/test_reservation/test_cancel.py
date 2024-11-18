@@ -8,7 +8,7 @@ from django.test import override_settings
 
 from tests.factories import PaymentOrderFactory, ReservationFactory
 from tests.helpers import patch_method
-from tilavarauspalvelu.enums import OrderStatus, PaymentType, ReservationStateChoice
+from tilavarauspalvelu.enums import OrderStatus, PaymentType, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.models import ReservationCancelReason
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.date_utils import local_datetime
@@ -20,8 +20,9 @@ pytestmark = [
 ]
 
 
-def test_reservation__cancel__success(graphql):
-    reservation = ReservationFactory.create_for_cancellation()
+@pytest.mark.parametrize("reservation_type", [ReservationTypeChoice.NORMAL, ReservationTypeChoice.SEASONAL])
+def test_reservation__cancel__success(graphql, reservation_type):
+    reservation = ReservationFactory.create_for_cancellation(type=reservation_type)
 
     graphql.login_with_superuser()
     data = get_cancel_data(reservation)
@@ -48,6 +49,36 @@ def test_reservation__cancel__adds_cancel_details(graphql):
 
     reservation.refresh_from_db()
     assert reservation.cancel_details == "foo"
+
+
+@pytest.mark.parametrize(
+    "reservation_type",
+    [
+        ReservationTypeChoice.BLOCKED,
+        ReservationTypeChoice.STAFF,
+        ReservationTypeChoice.BEHALF,
+    ],
+)
+def test_reservation__cancel__fails_type_wrong(graphql, reservation_type):
+    reservation = ReservationFactory.create_for_cancellation(type=reservation_type)
+
+    graphql.login_with_superuser()
+    data = get_cancel_data(reservation)
+    response = graphql(CANCEL_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Only reservations with type ['NORMAL', 'SEASONAL'] can be cancelled."]
+
+
+def test_reservation__cancel__fails_when_type_is_seasonal_and_reservation_is_paid(graphql):
+    reservation = ReservationFactory.create_for_cancellation(type=ReservationTypeChoice.SEASONAL, price=10)
+
+    graphql.login_with_superuser()
+    data = get_cancel_data(reservation)
+    response = graphql(CANCEL_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Paid seasonal reservations cannot be cancelled."]
 
 
 def test_reservation__cancel__fails_if_state_is_not_confirmed(graphql):

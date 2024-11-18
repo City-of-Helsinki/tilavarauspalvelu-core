@@ -5,7 +5,7 @@ from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
-from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
+from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.tasks import refund_paid_reservation_task
@@ -44,6 +44,14 @@ class ReservationCancellationSerializer(NestingModelSerializer):
         data = super().validate(data)
         if self.instance.state != ReservationStateChoice.CONFIRMED.value:
             msg = "Only reservations with state 'CONFIRMED' can be cancelled."
+            raise ValidationError(msg, code=error_codes.RESERVATION_CANCELLATION_NOT_ALLOWED)
+
+        if self.instance.type not in ReservationTypeChoice.types_that_can_be_cancelled:
+            msg = f"Only reservations with type {ReservationTypeChoice.types_that_can_be_cancelled} can be cancelled."
+            raise ValidationError(msg, code=error_codes.RESERVATION_CANCELLATION_NOT_ALLOWED)
+
+        if self.instance.type == ReservationTypeChoice.SEASONAL.value and self.instance.price > 0:
+            msg = "Paid seasonal reservations cannot be cancelled."
             raise ValidationError(msg, code=error_codes.RESERVATION_CANCELLATION_NOT_ALLOWED)
 
         now = local_datetime()
