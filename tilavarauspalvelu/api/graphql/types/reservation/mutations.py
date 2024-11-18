@@ -133,7 +133,9 @@ class ReservationStaffModifyMutation(UpdateMutation):
         permission_classes = [StaffReservationModifyPermission]
 
 
-class ReservationDeleteMutation(DeleteMutation):
+class ReservationDeleteTentativeMutation(DeleteMutation):
+    """Used only for deleting a reservation before it is confirmed."""
+
     class Meta:
         model = Reservation
         permission_classes = [ReservationPermission]
@@ -141,9 +143,9 @@ class ReservationDeleteMutation(DeleteMutation):
     @classmethod
     def validate_deletion(cls, reservation: Reservation, user: AnyUser) -> None:
         # Check Reservation state
-        if reservation.state not in ReservationStateChoice.states_that_can_be_cancelled:
+        if reservation.state not in ReservationStateChoice.states_that_can_be_deleted:
             msg = (
-                f"Reservation which is not in {ReservationStateChoice.states_that_can_be_cancelled} "
+                f"Reservation which is not in {ReservationStateChoice.states_that_can_be_deleted} "
                 f"state cannot be deleted."
             )
             raise ValidationError(msg)
@@ -175,3 +177,10 @@ class ReservationDeleteMutation(DeleteMutation):
                     pass
 
                 payment_order.actions.set_order_as_cancelled()
+
+
+class ReservationDeleteMutation(ReservationDeleteTentativeMutation):
+    # TODO: Remove after frontend is updated to use ReservationDeleteTentativeMutation
+    class Meta:
+        model = Reservation
+        permission_classes = [ReservationPermission]

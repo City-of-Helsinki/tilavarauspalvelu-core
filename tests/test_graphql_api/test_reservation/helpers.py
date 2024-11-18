@@ -18,7 +18,7 @@ reservations_query = partial(build_query, "reservations", connection=True, order
 
 CREATE_MUTATION = build_mutation("createReservation", "ReservationCreateMutation")
 UPDATE_MUTATION = build_mutation("updateReservation", "ReservationUpdateMutation")
-DELETE_MUTATION = build_mutation("deleteReservation", "ReservationDeleteMutation", fields="deleted")
+DELETE_MUTATION = build_mutation("deleteTentativeReservation", "ReservationDeleteTentativeMutation", fields="deleted")
 ADJUST_MUTATION = build_mutation("adjustReservationTime", "ReservationAdjustTimeMutation")
 APPROVE_MUTATION = build_mutation("approveReservation", "ReservationApproveMutation")
 DENY_MUTATION = build_mutation("denyReservation", "ReservationDenyMutation")
