@@ -3,9 +3,6 @@ import { Button, IconAngleDown, IconAngleUp, useAccordion } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 
-// There is only one use case for this so not testing other cases (or making it flexible)
-const N_ICONS = 3;
-
 type Props = {
   heading: string;
   headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
@@ -19,13 +16,14 @@ type Props = {
 };
 
 const Heading = styled.h2<{ as: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" }>`
+  grid-column: 1 / -2;
   padding: 0;
   margin: 0;
 `;
 
 const ClosedAccordionWrapper = styled.div`
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: repeat(4, 1fr);
   align-items: center;
   gap: var(--spacing-s);
 
@@ -35,22 +33,23 @@ const ClosedAccordionWrapper = styled.div`
 
 const IconListWrapper = styled.div`
   display: grid;
-  gap: var(--spacing-s);
+  gap: var(--spacing-xs);
 
   grid-row: subgrid;
   grid-column: 1 / -1;
   grid-template-columns: auto;
   @media (width > ${breakpoints.m}) {
-    grid-column: unset;
-    grid-template-columns: repeat(${N_ICONS}, auto);
+    gap: var(--spacing-s);
+    grid-template-columns: auto 1fr 2fr;
   }
 `;
 
 const ButtonListWrapper = styled.div`
-  display: block;
+  display: grid;
   gap: var(--spacing-s);
   align-self: center;
   align-items: end;
+  justify-content: end;
 
   @media (width > ${breakpoints.s}) {
     grid-column-start: -1;

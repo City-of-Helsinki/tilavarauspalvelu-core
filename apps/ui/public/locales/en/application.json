@@ -215,7 +215,7 @@
   },
   "view": {
     "heading": "Seasonal booking application",
-    "reservations": "Accepted bookings",
+    "reservations": "Confirmed bookings",
     "application": "Application",
     "handledDate": "Handled",
     "allReservations": "All bookings",
@@ -224,14 +224,14 @@
       "rejected": "Rejected",
       "modified": "Modified",
       "showAllReservations": "Show all bookings",
-      "cancelApplication": "Cancel whole application",
+      "cancelApplication": "Cancel all bookings",
       "reservationUnitsTitle": "Location",
       "reservationsTitle": "Reservations",
       "others": "others",
       "reservationCountPostfix": "bookings"
     },
-    "helpLink": "Help",
-    "helpLinkLong": "Unit specific help",
+    "helpLink": "Instructions",
+    "helpLinkLong": "Space Instructions",
     "helpModal": {
       "title": "Unit specific information"
     }

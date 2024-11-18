@@ -214,20 +214,20 @@
     "handledDate": "Behandlad",
     "allReservations": "Alla bokningar",
     "reservationsTab": {
-      "reservationUnit": "Lokal",
+      "reservationUnit": "Utrymme",
       "rejected": "Avslagen",
       "modified": "Ändrad",
       "showAllReservations": "Visa alla bokningar",
-      "cancelApplication": "Avbryt ansökan",
+      "cancelApplication": "Avboka alla bokningar",
       "reservationUnitsTitle": "Verksamhetsställe",
       "reservationsTitle": "Bokningar",
       "others": "andra",
       "reservationCountPostfix": "bokningar"
     },
-    "helpLink": "Hjälp",
+    "helpLink": "Instruktioner",
     "helpLinkLong": "Hjälp för ansökan",
     "helpModal": {
-      "title": "Lokal specifik information"
+      "title": "Lokalens instruktioner"
     }
   },
   "sent": {

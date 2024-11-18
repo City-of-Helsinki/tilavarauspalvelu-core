@@ -220,8 +220,8 @@
       "rejected": "Hylätty",
       "modified": "Muokattu",
       "showAllReservations": "Näytä kaikki varaukset",
-      "cancelApplication": "Peru koko kausivaraus",
-      "reservationUnitsTitle": "Toimipisteet",
+      "cancelApplication": "Peru kaikki varaukset",
+      "reservationUnitsTitle": "Toimipiste",
       "reservationsTitle": "Varaukset",
       "others": "muuta",
       "reservationCountPostfix": "varausta"

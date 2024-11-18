@@ -32,7 +32,6 @@ import {
   IconCalendarRecurring,
   IconClock,
   IconCross,
-  IconEuroSign,
   IconInfoCircle,
   IconLinkExternal,
   IconLocation,
@@ -46,7 +45,6 @@ import Sanitize from "../common/Sanitize";
 import { LinkLikeButton } from "common/styles/buttonCss";
 import { type TFunction } from "i18next";
 import { convertWeekday } from "common/src/conversion";
-import { formatTime } from "@/modules/util";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import { AccordionWithIcons } from "../AccordionWithIcons";
 import { CenterSpinner } from "../common/common";
@@ -83,8 +81,14 @@ const ListContainer = styled.div`
 // Tables can't do horizontal scroll without wrapping the table in a div
 // NOTE HDS Table can't be styled so have to wrap it in an extra div.
 const TableWrapper = styled.div`
+  /* TODO move this to a more general TableWrapper shared with admin-ui */
   /* Mobile uses cards, so no horizontal scroll */
   @media (width > ${BREAKPOINT}) {
+    /* NOTE this requires using buttons (or other elements with padding) on every row */
+    & tbody > tr > td {
+      padding-top: 0;
+      padding-bottom: 0;
+    }
     & > div {
       overflow-x: auto;
       > table {
@@ -248,13 +252,22 @@ export function ApprovedReservations({ application }: Props) {
 
   const lang = getLocalizationLang(i18n.language);
 
+  const sections = filterNonNullable(
+    app?.applicationSections?.filter((aes) => {
+      const slots = aes.reservationUnitOptions.flatMap(
+        (x) => x.allocatedTimeSlots
+      );
+      return slots.length > 0;
+    })
+  );
+  const initiallyOpen = app?.applicationSections?.length === 1;
   return (
     <ListContainer>
       {loading && <CenterSpinner />}
-      {app?.applicationSections?.map((aes) => (
+      {sections.map((aes) => (
         <AccordionWithIcons
           heading={aes.name}
-          initiallyOpen={app.applicationSections?.length === 1}
+          initiallyOpen={initiallyOpen}
           headingLevel={2}
           icons={[
             {
@@ -326,7 +339,6 @@ type ReservationUnitTableElem = {
     | "nameEn"
   >;
   dateOfWeek: string;
-  price: string;
   // same for this actual end / start times or a combined string
   time: string;
 };
@@ -378,27 +390,13 @@ function ReservationUnitTable({
       ),
     },
     {
-      key: "price",
-      headerName: t("common:price"),
-      isSortable: false,
-      transform: ({ price }: ReservationUnitTableElem) =>
-        price ? (
-          <IconTextWrapper aria-label={t("common:price")}>
-            <IconEuroSign aria-hidden="true" />
-            {price}
-          </IconTextWrapper>
-        ) : (
-          ""
-        ),
-    },
-    {
       key: "helpLink",
       headerName: t("application:view.helpModal.title"),
       transform: ({ reservationUnit }: ReservationUnitTableElem) => (
         <LinkLikeButton
           onClick={() => setModal(reservationUnit)}
-          // table already includes padding
-          style={{ padding: 0 }}
+          // Match the size of a small button
+          style={{ minHeight: "44px" }}
         >
           <IconInfoCircle aria-hidden="true" />
           {isMobile
@@ -514,6 +512,7 @@ function createReservationUnitLink({
 const CancelButton = styled(Button).attrs({
   theme: "black",
   variant: "supplementary",
+  size: "small",
   iconLeft: <IconCross aria-hidden="true" />,
 })`
   white-space: nowrap;
@@ -617,9 +616,10 @@ function ReservationsTable({
       key: "cancelButton",
       headerName: "",
       isSortable: false,
-      transform: ({ pk }: ReservationsTableElem) => (
+      transform: ({ pk, status }: ReservationsTableElem) => (
         <CancelButton
           onClick={() => handleCancel(pk)}
+          disabled={status === "rejected"}
           // TODO on mobile this should be hidden behind a popover (for now it's hidden)
           className="hide-on-mobile"
         >
@@ -636,29 +636,78 @@ function ReservationsTable({
   );
 }
 
+/// Converts a date to minutes discarding date and seconds
+function toMinutes(d: Date): number {
+  return d.getHours() * 60 + d.getMinutes();
+}
+
+/// Creates time and date strings for reservations
+/// @param t - translation function
+/// @param res - reservation object
+/// @param orig - original reservation object (use undefined if not possible to modify)
+function toTimeString(
+  t: TFunction,
+  reservation: {
+    begin: string;
+    end: string;
+  },
+  orig?: {
+    beginTime: string;
+    endTime: string;
+  }
+): { date: Date; time: string; dayOfWeek: string; isModified: boolean } {
+  const start = new Date(reservation.begin);
+  const end = new Date(reservation.end);
+  const dayOfWeek = t(`weekDayLong.${start.getDay()}`);
+
+  const originalBeginMins = orig != null ? timeToMinutes(orig.beginTime) : -1;
+  const originalEndMins = orig != null ? timeToMinutes(orig.endTime) : -1;
+
+  const beginMins = toMinutes(start);
+  const endMins = toMinutes(end);
+  const isModified =
+    orig != null &&
+    (originalBeginMins !== beginMins || originalEndMins !== endMins);
+  const btime = formatMinutes(beginMins);
+  const etime = formatMinutes(endMins);
+  const time = `${btime} - ${etime}`;
+  return {
+    date: start,
+    time,
+    dayOfWeek,
+    isModified,
+  };
+}
+
 function sectionToreservations(
   t: TFunction,
   section: ApplicationSectionT
 ): ReservationsTableElem[] {
   const recurringReservations = filterNonNullable(
     section.reservationUnitOptions.flatMap((ruo) =>
-      ruo.allocatedTimeSlots.map((ats) => ats.recurringReservation)
+      ruo.allocatedTimeSlots.map((ats) =>
+        ats.recurringReservation != null
+          ? {
+              ...ats.recurringReservation,
+              allocatedTimeSlot: {
+                dayOfTheWeek: ats.dayOfTheWeek,
+                beginTime: ats.beginTime,
+                endTime: ats.endTime,
+              },
+            }
+          : null
+      )
     )
   );
+
   function getRejected(
     r: (typeof recurringReservations)[0]
   ): ReservationsTableElem[] {
     return r.rejectedOccurrences.map((res) => {
-      const start = new Date(res.beginDatetime);
-      const end = new Date(res.endDatetime);
-      const dayOfWeek = t(`weekDayLong.${start.getDay()}`);
-      const stime = formatTime(t, start);
-      const etime = formatTime(t, end);
-      const time = `${stime} - ${etime}`;
+      const reservation = { begin: res.beginDatetime, end: res.endDatetime };
+      const rest = toTimeString(t, reservation);
       return {
-        date: start,
-        dayOfWeek,
-        time,
+        ...rest,
         reservationUnit: r.reservationUnit,
         status: "rejected",
         pk: 0,
@@ -670,17 +719,7 @@ function sectionToreservations(
     r: (typeof recurringReservations)[0]
   ): ReservationsTableElem[] {
     return r.reservations.map((res) => {
-      const start = new Date(res.begin);
-      const end = new Date(res.end);
-      const dayOfWeek = t(`weekDayLong.${start.getDay()}`);
-
-      const beginMins = timeToMinutes(r.beginTime ?? "");
-      const endMins = timeToMinutes(r.endTime ?? "");
-      const beginMins2 = start.getHours() * 60 + start.getMinutes();
-      const endMins2 = end.getHours() * 60 + end.getMinutes();
-      const isModified = beginMins !== beginMins2 || endMins !== endMins2;
-      const btime = formatMinutes(beginMins2);
-      const etime = formatMinutes(endMins2);
+      const { isModified, ...rest } = toTimeString(t, res, r.allocatedTimeSlot);
 
       const status =
         res.state === ReservationStateChoice.Denied
@@ -689,9 +728,7 @@ function sectionToreservations(
             ? "modified"
             : "";
       return {
-        date: start,
-        dayOfWeek,
-        time: `${btime} - ${etime}`,
+        ...rest,
         reservationUnit: r.reservationUnit,
         status,
         pk: res.pk ?? 0,
@@ -742,8 +779,6 @@ function sectionToReservationUnits(
       reservationUnit,
       // NOTE our translations are sunday first
       dateOfWeek: t(`weekDayLong.${fromMondayFirst(day)}`),
-      // Pricing is not implemented. So all are empty
-      price: "",
       time,
     };
   });
@@ -801,7 +836,7 @@ export function ApplicationSection({
         <Button
           variant="secondary"
           theme="black"
-          key="cancel"
+          size="small"
           onClick={() => {
             errorToast({ text: "Not implemented: cancel application" });
           }}
