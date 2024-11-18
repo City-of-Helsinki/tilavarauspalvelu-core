@@ -19,26 +19,10 @@ from tilavarauspalvelu.models import (
     ReservationStatistic,
     ReservationStatisticsReservationUnit,
     ReservationUnitImage,
+    ServiceSector,
 )
 from tilavarauspalvelu.models.request_log.model import RequestLog
 from tilavarauspalvelu.models.sql_log.model import SQLLog
-
-apps_to_check: list[str] = [
-    "common",
-    "users",
-    "applications",
-    "email_notification",
-    "merchants",
-    "opening_hours",
-    "permissions",
-    "reservation_units",
-    "reservations",
-    "resources",
-    "services",
-    "spaces",
-    "terms_of_use",
-    "api",
-]
 
 models_that_should_be_empty: list[type[models.Model]] = [
     AbilityGroup,
@@ -57,6 +41,7 @@ models_that_should_be_empty: list[type[models.Model]] = [
     ReservationStatisticsReservationUnit,
     ReservationUnitImage,
     SQLLog,
+    ServiceSector,
 ]
 
 
@@ -66,10 +51,7 @@ models_that_should_be_empty: list[type[models.Model]] = [
 def test_create_test_data(settings):
     settings.UPDATE_RESERVATION_UNIT_THUMBNAILS = True
 
-    all_models = []
-    for app_config in django.apps.apps.app_configs.values():
-        if app_config.name in apps_to_check:
-            all_models.extend(app_config.get_models())
+    all_models = django.apps.apps.app_configs["tilavarauspalvelu"].get_models()
 
     for model in all_models:
         assert not model.objects.exists(), f"Model {model.__name__} is not empty"
