@@ -27,6 +27,10 @@ updates:
       python-dependencies:
         patterns:
           - "*"
+    ignore:
+      # Don't update django-debug-toolbar until django-graphiql-debug-toolbar is updated for support past 4.4.5.
+      # django-graphiql-debug-toolbar uses a private variable, which was removed in 4.4.6, which was a breaking change.
+      - dependency-name: "django-debug-toolbar"
 
   # Update Docker dependencies
   - package-ecosystem: "docker"
