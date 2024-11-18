@@ -717,8 +717,8 @@ def _fetch_and_build_reservation_unit_image(
     image_type: ReservationUnitImageType = ReservationUnitImageType.MAIN,
 ) -> ReservationUnitImage | None:
     """
-    Build a new reservation unit image using the image from the given URL. Image must be in JPEG format.
-    Save image using the given filename. If this function is called later for the same filename,
+    Build a new reservation unit image using the image from the given URL.
+    Save image using the given filename and extension. If this function is called later for the same filename,
     and that file already exists, use the existing file instead of downloading the image again.
     """
     # Don't create images during tests, since it's slow.
@@ -744,15 +744,20 @@ def _fetch_and_build_reservation_unit_image(
 
 
 def _fetch_image(image_url: str, path: Path) -> None:
+    """
+    Fetch image from the internet and save it to the given path (including filename).
+    Validate that the downloaded image is a known image format, and that it matches file extension
+    in the given path.
+    """
+    if not path.suffix:
+        msg = "Path must be a path to a file, not a directory."
+        raise RuntimeError(msg)
+
     try:
         response = requests.get(image_url, timeout=8)
+        response.raise_for_status()
     except Exception as e:
         msg = f"Could not download image from '{image_url}': {e}"
-        print(msg)  # noqa: T201, RUF100
-        return
-
-    if response.status_code != 200:
-        msg = f"Could not download image from '{image_url}' (status: {response.status_code})"
         print(msg)  # noqa: T201, RUF100
         return
 
