@@ -50,7 +50,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile
       args:
-        DEPS: main,test,lint
+        DEPS: main,admin,celery,test,lint
     depends_on:
       db:
         condition: service_healthy
