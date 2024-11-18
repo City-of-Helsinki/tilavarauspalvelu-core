@@ -21,8 +21,7 @@
     "codegen:ui": "graphql-codegen --config codegen.ts --project ui",
     "codegen:common": "graphql-codegen --config codegen.ts --project common",
     "codegen": "pnpm codegen:admin & pnpm codegen:ui & pnpm codegen:common",
-    "codegen:watch": "pnpm codegen:admin --watch & pnpm codegen:ui --watch & pnpm codegen:common --watch",
-    "generate:emails": "turbo generate:emails"
+    "codegen:watch": "pnpm codegen:admin --watch & pnpm codegen:ui --watch & pnpm codegen:common --watch"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.2",

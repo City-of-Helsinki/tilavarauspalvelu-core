@@ -16,7 +16,6 @@
       "inputs": ["**/*.tsx", "**/*.ts", "test/**/*.ts", "test/**/*.tsx"]
     },
     "lint": {},
-    "generate:emails": {},
     "dev": {
       "cache": false,
       "persistent": true

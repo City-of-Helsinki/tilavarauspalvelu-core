@@ -42,12 +42,6 @@ Install deps
 pnpm i
 ```
 
-
-Update email templates
-``` sh
-pnpm generate:emails
-```
-
 Start both frontends in dev mode
 ``` sh
 pnpm dev
