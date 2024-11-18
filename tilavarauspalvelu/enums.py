@@ -11,7 +11,6 @@ from django.db import models
 from django.utils.functional import classproperty
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext_lazy
-from enumfields import Enum
 
 from tilavarauspalvelu.typing import permission
 
@@ -277,35 +276,23 @@ class EmailType(models.TextChoices):
         return f"email/text/{self.value}.jinja"
 
 
-class HaukiResourceState(Enum):
-    OPEN = "open"
-    CLOSED = "closed"
-    UNDEFINED = "undefined"
-    SELF_SERVICE = "self_service"
-    WITH_KEY = "with_key"
-    WITH_RESERVATION = "with_reservation"
-    OPEN_AND_RESERVABLE = "open_and_reservable"
-    WITH_KEY_AND_RESERVATION = "with_key_and_reservation"
-    ENTER_ONLY = "enter_only"
-    EXIT_ONLY = "exit_only"
-    WEATHER_PERMITTING = "weather_permitting"
-    NOT_IN_USE = "not_in_use"
-    MAINTENANCE = "maintenance"
-
-    class Labels:
-        OPEN = pgettext_lazy("HaukiResourceState", "Open")
-        CLOSED = pgettext_lazy("HaukiResourceState", "Closed")
-        UNDEFINED = pgettext_lazy("HaukiResourceState", "Undefined")
-        SELF_SERVICE = pgettext_lazy("HaukiResourceState", "Self service")
-        WITH_KEY = pgettext_lazy("HaukiResourceState", "With key")
-        WITH_RESERVATION = pgettext_lazy("HaukiResourceState", "With reservation")
-        OPEN_AND_RESERVABLE = pgettext_lazy("HaukiResourceState", "Open and reservable")
-        WITH_KEY_AND_RESERVATION = pgettext_lazy("HaukiResourceState", "With key and reservation")
-        ENTER_ONLY = pgettext_lazy("HaukiResourceState", "Enter only")
-        EXIT_ONLY = pgettext_lazy("HaukiResourceState", "Exit only")
-        WEATHER_PERMITTING = pgettext_lazy("HaukiResourceState", "Weather permitting")
-        NOT_IN_USE = pgettext_lazy("HaukiResourceState", "Not in use")
-        MAINTENANCE = pgettext_lazy("HaukiResourceState", "Maintenance")
+class HaukiResourceState(models.TextChoices):
+    OPEN = "open", pgettext_lazy("HaukiResourceState", "Open")
+    CLOSED = "closed", pgettext_lazy("HaukiResourceState", "Closed")
+    UNDEFINED = "undefined", pgettext_lazy("HaukiResourceState", "Undefined")
+    SELF_SERVICE = "self_service", pgettext_lazy("HaukiResourceState", "Self service")
+    WITH_KEY = "with_key", pgettext_lazy("HaukiResourceState", "With key")
+    WITH_RESERVATION = "with_reservation", pgettext_lazy("HaukiResourceState", "With reservation")
+    OPEN_AND_RESERVABLE = "open_and_reservable", pgettext_lazy("HaukiResourceState", "Open and reservable")
+    WITH_KEY_AND_RESERVATION = (
+        "with_key_and_reservation",
+        pgettext_lazy("HaukiResourceState", "With key and reservation"),
+    )
+    ENTER_ONLY = "enter_only", pgettext_lazy("HaukiResourceState", "Enter only")
+    EXIT_ONLY = "exit_only", pgettext_lazy("HaukiResourceState", "Exit only")
+    WEATHER_PERMITTING = "weather_permitting", pgettext_lazy("HaukiResourceState", "Weather permitting")
+    NOT_IN_USE = "not_in_use", pgettext_lazy("HaukiResourceState", "Not in use")
+    MAINTENANCE = "maintenance", pgettext_lazy("HaukiResourceState", "Maintenance")
 
     @classmethod
     def accessible_states(cls):

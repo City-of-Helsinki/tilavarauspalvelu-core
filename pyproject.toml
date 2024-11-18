@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "Tilavarauspalvelu"
 version = "0"
-description = ""
+description = "Backend for the new space and resource reservation platform for the City of Helsinki."
 authors = []
 classifiers = [
     # This prevents accidentally running 'poetry publish'
@@ -10,83 +10,75 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = ">=3.12,<3.13"
-celery = { extras = ["redis"], version = "5.4.0" }
-certifi = "2024.8.30"
-cryptography = "43.0.3"
 Django = "5.1.3"
-django-admin-data-views = "0.4.2"
-django-admin-extra-buttons = "1.6.0"
-django-admin-rangefilter = "0.13.2"
-django-admin-sortable2 = "2.2.3"
 django-auditlog = "3.0.0"
-django-celery-beat = "2.7.0"
-django-celery-results = "2.5.1"
 django-cors-headers = "4.6.0"
-django-enumfields2 = "3.0.2"
-django-environ = "0.11.2"
 django-environment-config = { version = "0.2.2", extras = ["db"] }
-django-extensions = "3.2.3"
-django-extra-fields = "3.0.2"
 django-filter = "24.3"
-django-graphql-jwt = "0.4.0"
 django-health-check = "3.18.3"
 django-helusers = "0.13.0"
-django-import-export = "4.2.1"
 django-jinja = "2.11.0"
 django-lookup-property = "0.1.7"
-django-modeltranslation = "0.19.10"
-django-more-admin-filters = "1.8"
+django-modeltranslation = "0.19.11"
 django-mptt = "0.16.0"
-django-recurrence = "1.11.1"
 django-redis = "5.4.0"
-django-subforms = "0.3.1"
-django-tinymce = "4.1.0"
 djangorestframework = "3.15.2"
 easy-thumbnails = "2.10"
 elasticsearch-django = "8.5.2"
 graphene-django = "3.2.2"
-graphene-django-extensions = "0.4.8"
+graphene-django-extensions = "0.4.9"
 helsinki-profile-gdpr-api = "0.2.0"
-hiredis = "3.0.0"
 icalendar = "6.0.1"
-jinja2 = "3.1.4"
 mjml-python = "1.3.4"
 psycopg2 = "2.9.10"
 python-dateutil = "2.9.0.post0"
-pyyaml = "6.0.2"
-redis = "5.2.0"
+redis = { version = "5.2.0", extras = ["hiredis"] }
 sentry-sdk = "2.18.0"
 social-auth-app-django = "5.4.2"
+# Skip installation on Windows as uWSGI does not support it without Cygwin.
+uWSGI = { version = "2.0.28", markers = "sys_platform != 'win32'" }
 whitenoise = "6.8.2"
 xhtml2pdf = "0.2.16"
 
-[tool.poetry.dependencies.uWSGI]
-version = "2.0.23"
-# Skip installation on Windows as uWSGI does not support it without Cygwin.
-# Windows users should use WSL for their local development virtualenv, but can
-# still create another virtualenv in Windows without uWSGI for pre-commit hooks.
-markers = "sys_platform != 'win32'"
+[tool.poetry.group.admin.dependencies]
+# Dependencies related to the admin panel or other "administrative" tasks.
+django-admin-data-views = "0.4.2"
+django-admin-extra-buttons = "1.6.0"
+django-admin-rangefilter = "0.13.2"
+django-admin-sortable2 = "2.2.4"
+django-extensions = "3.2.3"
+django-import-export = "4.2.1"
+django-more-admin-filters = "1.9"
+django-subforms = "0.3.1"
+django-tinymce = "4.1.0"
+
+[tool.poetry.group.celery.dependencies]
+# Dependencies related to Celery tasks.
+celery = { version = "5.4.0", extras = ["redis"] }
+django-celery-beat = "2.7.0"
+django-celery-results = "2.5.1"
 
 [tool.poetry.group.test.dependencies]
+# Dependencies only required for running tests.
 django-debug-toolbar = "4.4.6"  # django-graphiql-debug-toolbar 0.2.0 breaks with django-debug-toolbar 4.4.6
 django-graphiql-debug-toolbar = "0.2.0"
 factory-boy = "3.3.1"
-faker = "30.8.2"
+faker = "33.0.0"
 freezegun = "1.5.1"
+html2text = "2024.2.26"
 polib = "1.2.0"
+pyinstrument = "5.0.0"
 pypdf2 = "3.0.1"
 pytest = "8.3.3"
 pytest-cov = "6.0.0"
 pytest-django = "4.9.0"
 pytest-xdist = "3.6.1"
-requests-mock = "1.12.1"
-html2text = "2024.2.26"
 
 [tool.poetry.group.lint.dependencies]
+# Dependencies only required for linting.
 pre-commit = "4.0.1"
-ruff = "0.7.3"
+ruff = "0.7.4"
 ruff-lsp = "0.0.58"
-pyinstrument = "5.0.0"
 
 [tool.poetry.plugins.pytest11]
 tilavarauspalvelu = "tests.plugins"

@@ -49,7 +49,7 @@ FROM base AS builder
 # Old variables need to be redeclared after "from" statements so that defaults can be used.
 ARG PROJECT_ROOT=/tvp
 ARG VENV_ROOT=$PROJECT_ROOT/venv
-ARG DEPS=main
+ARG DEPS=main,admin,celery
 
 # Install build dependencies
 # - build-essential: for building uWSGI
@@ -72,7 +72,7 @@ ENV POETRY_VIRTUALENVS_IN_PROJECT=true
 ENV POETRY_INSTALLER_PARALLEL=false
 
 # Install poetry.
-RUN curl -sSL https://install.python-poetry.org | POETRY_VERSION=1.7.1 python -
+RUN curl -sSL https://install.python-poetry.org | POETRY_VERSION=1.8.4 python -
 
 # Copy poetry files.
 COPY poetry.lock pyproject.toml /
