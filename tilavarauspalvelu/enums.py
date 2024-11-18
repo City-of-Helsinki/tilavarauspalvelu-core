@@ -400,7 +400,8 @@ class ReservationStateChoice(models.TextChoices):
         ]
 
     @classproperty
-    def states_that_can_be_cancelled(self) -> list[str]:
+    def states_that_can_be_deleted(self) -> list[str]:
+        # "Alustava varaus" / "tentative reservation"
         return [  # type: ignore[return-type]
             ReservationStateChoice.CREATED.value,
             ReservationStateChoice.WAITING_FOR_PAYMENT.value,
