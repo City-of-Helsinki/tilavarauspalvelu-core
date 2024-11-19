@@ -241,6 +241,9 @@ const translations: ITranslations = {
       RESERVATION_UNIT_MISSING_RESERVATION_UNIT_TYPE: [
         "Varausyksiköllä ei ole varausyksikkötyyppiä",
       ],
+      RESERVATION_UNIT_HAS_FUTURE_RESERVATIONS: [
+        "Varausyksiköllä on tulevia varauksia",
+      ],
     },
     descriptive: {
       "Reservation overlaps with reservation before due to buffer time.": [
