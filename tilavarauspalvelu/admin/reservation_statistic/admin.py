@@ -3,11 +3,12 @@ from import_export.admin import ExportMixin
 from import_export.formats.base_formats import CSV
 from rangefilter.filters import DateRangeFilter
 
+from tilavarauspalvelu.admin.helpers import ImmutableModelAdmin
 from tilavarauspalvelu.models import ReservationStatistic
 
 
 @admin.register(ReservationStatistic)
-class ReservationStatisticAdmin(ExportMixin, admin.ModelAdmin):
+class ReservationStatisticAdmin(ExportMixin, ImmutableModelAdmin):
     # Functions
     formats = [CSV]
 

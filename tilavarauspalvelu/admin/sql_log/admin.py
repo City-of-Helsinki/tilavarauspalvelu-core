@@ -6,6 +6,7 @@ from django.utils.safestring import SafeString, mark_safe
 from django.utils.translation import gettext_lazy as _
 from rangefilter.filters import DateTimeRangeFilter
 
+from tilavarauspalvelu.admin.helpers import ImmutableModelAdmin
 from tilavarauspalvelu.models.sql_log.model import SQLLog
 from tilavarauspalvelu.models.sql_log.queryset import SQLLogQuerySet
 from tilavarauspalvelu.typing import WSGIRequest
@@ -78,7 +79,7 @@ class SQLLogAdminForm(forms.ModelForm):
 
 
 @admin.register(SQLLog)
-class SQLLogAdmin(admin.ModelAdmin):
+class SQLLogAdmin(ImmutableModelAdmin):
     # Functions
     search_fields = [
         "sql",
@@ -147,9 +148,3 @@ class SQLLogAdmin(admin.ModelAdmin):
     @admin.display(description=_("Stack Info"), ordering="stack_info")
     def _stack_info(self, obj: SQLLog) -> SafeString:
         return mark_safe(f"<pre>{obj.stack_info}</pre>")  # noqa: S308  # nosec  # NOSONAR
-
-    def has_add_permission(self, request: WSGIRequest) -> bool:
-        return False
-
-    def has_change_permission(self, request: WSGIRequest, obj: SQLLog | None = None) -> bool:
-        return False
