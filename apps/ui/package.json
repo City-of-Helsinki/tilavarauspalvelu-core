@@ -43,7 +43,7 @@
     "react-transition-group": "^4.4.5",
     "react-use": "^17.5.1",
     "sanitize-html": "^2.13.0",
-    "sass": "^1.78.0",
+    "sass": "^1.81.0",
     "styled-components": "5.3.11",
     "tsconfig": "workspace:*",
     "typescript-cookie": "^1.0.6",
