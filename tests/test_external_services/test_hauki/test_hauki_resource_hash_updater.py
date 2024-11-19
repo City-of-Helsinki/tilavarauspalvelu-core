@@ -4,8 +4,7 @@ from typing import TYPE_CHECKING
 import freezegun
 import pytest
 
-from tests.factories import ReservableTimeSpanFactory
-from tests.factories.origin_hauki_resource import OriginHaukiResourceFactory
+from tests.factories import OriginHaukiResourceFactory, ReservableTimeSpanFactory
 from tests.helpers import patch_method
 from tests.mocks import MockResponse
 from tilavarauspalvelu.constants import NEVER_ANY_OPENING_HOURS_HASH

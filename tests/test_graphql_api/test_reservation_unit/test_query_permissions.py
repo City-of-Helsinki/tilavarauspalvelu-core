@@ -3,6 +3,7 @@ import datetime
 import pytest
 
 from tests.factories import (
+    ApplicationRoundTimeSlotFactory,
     PaymentMerchantFactory,
     PaymentProductFactory,
     ReservationCancelReasonFactory,
@@ -11,7 +12,6 @@ from tests.factories import (
     ReservationUnitFactory,
     UserFactory,
 )
-from tests.factories.application_round_time_slot import ApplicationRoundTimeSlotFactory
 from tilavarauspalvelu.models import PersonalInfoViewLog
 
 from .helpers import reservation_units_query

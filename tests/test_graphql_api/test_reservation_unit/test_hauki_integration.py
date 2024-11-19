@@ -26,7 +26,7 @@ def test_reservation_unit__update__send_resource_to_hauki_when_resource_id_exist
 
     reservation_unit = ReservationUnitFactory.create(
         is_draft=True,
-        origin_hauki_resource=OriginHaukiResourceFactory.create(id=1),
+        origin_hauki_resource=OriginHaukiResourceFactory.create(),
     )
     data = get_draft_update_input_data(reservation_unit)
 
@@ -100,7 +100,7 @@ def test_reservation_unit__query__hauki_url__regular_user(graphql):
 def test_reservation_unit__query__hauki_url__superuser(graphql, settings):
     user = graphql.login_with_superuser()
 
-    origin_hauki_resource = OriginHaukiResourceFactory.create(id=987)
+    origin_hauki_resource = OriginHaukiResourceFactory.create()
     reservation_unit = ReservationUnitFactory.create(
         unit__tprek_department_id="ORGANISATION",
         uuid="3774af34-9916-40f2-acc7-68db5a627710",

@@ -1,4 +1,4 @@
-from typing import Any
+import factory
 
 from tilavarauspalvelu.models import OriginHaukiResource
 
@@ -14,11 +14,6 @@ class OriginHaukiResourceFactory(GenericDjangoModelFactory[OriginHaukiResource])
         model = OriginHaukiResource
         django_get_or_create = ["id"]
 
-    id = None
+    id = factory.Sequence(int)
     opening_hours_hash = ""
     latest_fetched_date = None
-
-    @classmethod
-    def create(cls, id: int, **kwargs: Any) -> OriginHaukiResource:  # noqa: A002
-        kwargs["id"] = id
-        return super().create(**kwargs)
