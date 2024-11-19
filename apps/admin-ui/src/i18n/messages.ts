@@ -244,6 +244,9 @@ const translations: ITranslations = {
       RESERVATION_UNIT_HAS_FUTURE_RESERVATIONS: [
         "Varausyksiköllä on tulevia varauksia",
       ],
+      RESERVATION_DENYING_NOT_ALLOWED: [
+        "Ainoastaan käsiteltävät ja hyväksytyt varaukset voidaan hylätä",
+      ],
     },
     descriptive: {
       "Reservation overlaps with reservation before due to buffer time.": [

@@ -14,7 +14,7 @@ import {
   ReservationList,
 } from "@/component/ReservationsList";
 import { ReservationListButton } from "@/component/ReservationListButton";
-import DenyDialog from "@/component/DenyDialog";
+import { DenyDialog } from "@/component/DenyDialog";
 import { useModal } from "@/context/ModalContext";
 import { EditTimeModal } from "@/component/EditTimeModal";
 import { base64encode, filterNonNullable } from "common/src/helpers";
@@ -96,7 +96,7 @@ export function RecurringReservationsView({
   const handleRemove = (res: (typeof reservations)[0]) => {
     setModalContent(
       <DenyDialog
-        reservations={[res]}
+        reservation={res}
         onReject={() => {
           refetch();
           onReservationUpdated?.();

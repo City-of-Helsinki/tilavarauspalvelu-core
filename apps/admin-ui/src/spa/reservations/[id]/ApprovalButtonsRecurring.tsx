@@ -3,7 +3,7 @@ import { ReservationStateChoice, type ReservationQuery } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { Button } from "hds-react";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
-import DenyDialog from "@/component/DenyDialog";
+import { DenyDialogSeries } from "@/component/DenyDialog";
 import { useModal } from "@/context/ModalContext";
 import { useRecurringReservations } from "@/hooks";
 
@@ -21,15 +21,16 @@ type Props = {
 };
 
 // NOTE some copy paste from ApprovalButtons
-const ApprovalButtonsRecurring = ({
+export function ApprovalButtonsRecurring({
   recurringReservation,
   handleClose,
   handleAccept,
   disableNonEssentialButtons,
-}: Props): JSX.Element | null => {
+}: Props): JSX.Element | null {
   const { setModalContent } = useModal();
   const { t } = useTranslation();
 
+  // check if there are any reservations that can be deleted
   const { loading, reservations, refetch } = useRecurringReservations(
     recurringReservation.pk ?? undefined
   );
@@ -40,15 +41,21 @@ const ApprovalButtonsRecurring = ({
   };
 
   const now = new Date();
+  // TODO don't need to do this anymore we can just pass the first reservation here
   // need to do get all data here otherwise totalCount is incorrect (filter here instead of in the query)
   const reservationsPossibleToDelete = reservations
     .filter((x) => new Date(x.begin) > now)
     .filter((x) => x.state === ReservationStateChoice.Confirmed);
 
   const handleDenyClick = () => {
+    const reservation = reservationsPossibleToDelete.find(() => true);
+    if (reservation == null) {
+      return;
+    }
     setModalContent(
-      <DenyDialog
-        reservations={reservationsPossibleToDelete}
+      <DenyDialogSeries
+        reservation={reservation}
+        recurringReservation={recurringReservation}
         onReject={handleReject}
         onClose={handleClose}
         title={t("ApprovalButtons.recurring.DenyDialog.title")}
@@ -95,6 +102,4 @@ const ApprovalButtonsRecurring = ({
       )}
     </>
   );
-};
-
-export default ApprovalButtonsRecurring;
+}

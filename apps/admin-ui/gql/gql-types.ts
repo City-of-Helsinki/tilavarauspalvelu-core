@@ -6306,6 +6306,36 @@ export type ApplicationDateOfBirthQuery = {
   } | null;
 };
 
+export type DenyReservationMutationVariables = Exact<{
+  input: ReservationDenyMutationInput;
+}>;
+
+export type DenyReservationMutation = {
+  denyReservation?: {
+    pk?: number | null;
+    state?: ReservationStateChoice | null;
+  } | null;
+};
+
+export type DenyReservationSeriesMutationVariables = Exact<{
+  input: ReservationSeriesDenyMutationInput;
+}>;
+
+export type DenyReservationSeriesMutation = {
+  denyReservationSeries?: {
+    denied?: number | null;
+    future?: number | null;
+  } | null;
+};
+
+export type RefundReservationMutationVariables = Exact<{
+  input: ReservationRefundMutationInput;
+}>;
+
+export type RefundReservationMutation = {
+  refundReservation?: { pk?: number | null } | null;
+};
+
 export type StaffAdjustReservationTimeMutationVariables = Exact<{
   input: ReservationStaffAdjustTimeMutationInput;
 }>;
@@ -8279,25 +8309,6 @@ export type ApproveReservationMutation = {
     pk?: number | null;
     state?: ReservationStateChoice | null;
   } | null;
-};
-
-export type DenyReservationMutationVariables = Exact<{
-  input: ReservationDenyMutationInput;
-}>;
-
-export type DenyReservationMutation = {
-  denyReservation?: {
-    pk?: number | null;
-    state?: ReservationStateChoice | null;
-  } | null;
-};
-
-export type RefundReservationMutationVariables = Exact<{
-  input: ReservationRefundMutationInput;
-}>;
-
-export type RefundReservationMutation = {
-  refundReservation?: { pk?: number | null } | null;
 };
 
 export type RequireHandlingMutationVariables = Exact<{
@@ -10333,6 +10344,158 @@ export type ApplicationDateOfBirthSuspenseQueryHookResult = ReturnType<
 export type ApplicationDateOfBirthQueryResult = Apollo.QueryResult<
   ApplicationDateOfBirthQuery,
   ApplicationDateOfBirthQueryVariables
+>;
+export const DenyReservationDocument = gql`
+  mutation DenyReservation($input: ReservationDenyMutationInput!) {
+    denyReservation(input: $input) {
+      pk
+      state
+    }
+  }
+`;
+export type DenyReservationMutationFn = Apollo.MutationFunction<
+  DenyReservationMutation,
+  DenyReservationMutationVariables
+>;
+
+/**
+ * __useDenyReservationMutation__
+ *
+ * To run a mutation, you first call `useDenyReservationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDenyReservationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [denyReservationMutation, { data, loading, error }] = useDenyReservationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDenyReservationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    DenyReservationMutation,
+    DenyReservationMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    DenyReservationMutation,
+    DenyReservationMutationVariables
+  >(DenyReservationDocument, options);
+}
+export type DenyReservationMutationHookResult = ReturnType<
+  typeof useDenyReservationMutation
+>;
+export type DenyReservationMutationResult =
+  Apollo.MutationResult<DenyReservationMutation>;
+export type DenyReservationMutationOptions = Apollo.BaseMutationOptions<
+  DenyReservationMutation,
+  DenyReservationMutationVariables
+>;
+export const DenyReservationSeriesDocument = gql`
+  mutation DenyReservationSeries($input: ReservationSeriesDenyMutationInput!) {
+    denyReservationSeries(input: $input) {
+      denied
+      future
+    }
+  }
+`;
+export type DenyReservationSeriesMutationFn = Apollo.MutationFunction<
+  DenyReservationSeriesMutation,
+  DenyReservationSeriesMutationVariables
+>;
+
+/**
+ * __useDenyReservationSeriesMutation__
+ *
+ * To run a mutation, you first call `useDenyReservationSeriesMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDenyReservationSeriesMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [denyReservationSeriesMutation, { data, loading, error }] = useDenyReservationSeriesMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDenyReservationSeriesMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    DenyReservationSeriesMutation,
+    DenyReservationSeriesMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    DenyReservationSeriesMutation,
+    DenyReservationSeriesMutationVariables
+  >(DenyReservationSeriesDocument, options);
+}
+export type DenyReservationSeriesMutationHookResult = ReturnType<
+  typeof useDenyReservationSeriesMutation
+>;
+export type DenyReservationSeriesMutationResult =
+  Apollo.MutationResult<DenyReservationSeriesMutation>;
+export type DenyReservationSeriesMutationOptions = Apollo.BaseMutationOptions<
+  DenyReservationSeriesMutation,
+  DenyReservationSeriesMutationVariables
+>;
+export const RefundReservationDocument = gql`
+  mutation RefundReservation($input: ReservationRefundMutationInput!) {
+    refundReservation(input: $input) {
+      pk
+    }
+  }
+`;
+export type RefundReservationMutationFn = Apollo.MutationFunction<
+  RefundReservationMutation,
+  RefundReservationMutationVariables
+>;
+
+/**
+ * __useRefundReservationMutation__
+ *
+ * To run a mutation, you first call `useRefundReservationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRefundReservationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [refundReservationMutation, { data, loading, error }] = useRefundReservationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useRefundReservationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    RefundReservationMutation,
+    RefundReservationMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    RefundReservationMutation,
+    RefundReservationMutationVariables
+  >(RefundReservationDocument, options);
+}
+export type RefundReservationMutationHookResult = ReturnType<
+  typeof useRefundReservationMutation
+>;
+export type RefundReservationMutationResult =
+  Apollo.MutationResult<RefundReservationMutation>;
+export type RefundReservationMutationOptions = Apollo.BaseMutationOptions<
+  RefundReservationMutation,
+  RefundReservationMutationVariables
 >;
 export const StaffAdjustReservationTimeDocument = gql`
   mutation StaffAdjustReservationTime(
@@ -14940,107 +15103,6 @@ export type ApproveReservationMutationResult =
 export type ApproveReservationMutationOptions = Apollo.BaseMutationOptions<
   ApproveReservationMutation,
   ApproveReservationMutationVariables
->;
-export const DenyReservationDocument = gql`
-  mutation DenyReservation($input: ReservationDenyMutationInput!) {
-    denyReservation(input: $input) {
-      pk
-      state
-    }
-  }
-`;
-export type DenyReservationMutationFn = Apollo.MutationFunction<
-  DenyReservationMutation,
-  DenyReservationMutationVariables
->;
-
-/**
- * __useDenyReservationMutation__
- *
- * To run a mutation, you first call `useDenyReservationMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useDenyReservationMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [denyReservationMutation, { data, loading, error }] = useDenyReservationMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useDenyReservationMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    DenyReservationMutation,
-    DenyReservationMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    DenyReservationMutation,
-    DenyReservationMutationVariables
-  >(DenyReservationDocument, options);
-}
-export type DenyReservationMutationHookResult = ReturnType<
-  typeof useDenyReservationMutation
->;
-export type DenyReservationMutationResult =
-  Apollo.MutationResult<DenyReservationMutation>;
-export type DenyReservationMutationOptions = Apollo.BaseMutationOptions<
-  DenyReservationMutation,
-  DenyReservationMutationVariables
->;
-export const RefundReservationDocument = gql`
-  mutation RefundReservation($input: ReservationRefundMutationInput!) {
-    refundReservation(input: $input) {
-      pk
-    }
-  }
-`;
-export type RefundReservationMutationFn = Apollo.MutationFunction<
-  RefundReservationMutation,
-  RefundReservationMutationVariables
->;
-
-/**
- * __useRefundReservationMutation__
- *
- * To run a mutation, you first call `useRefundReservationMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRefundReservationMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [refundReservationMutation, { data, loading, error }] = useRefundReservationMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useRefundReservationMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    RefundReservationMutation,
-    RefundReservationMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    RefundReservationMutation,
-    RefundReservationMutationVariables
-  >(RefundReservationDocument, options);
-}
-export type RefundReservationMutationHookResult = ReturnType<
-  typeof useRefundReservationMutation
->;
-export type RefundReservationMutationResult =
-  Apollo.MutationResult<RefundReservationMutation>;
-export type RefundReservationMutationOptions = Apollo.BaseMutationOptions<
-  RefundReservationMutation,
-  RefundReservationMutationVariables
 >;
 export const RequireHandlingDocument = gql`
   mutation RequireHandling($input: ReservationRequiresHandlingMutationInput!) {
