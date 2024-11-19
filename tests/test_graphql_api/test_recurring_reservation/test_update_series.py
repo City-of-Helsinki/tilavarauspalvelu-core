@@ -19,8 +19,8 @@ pytestmark = [
 
 
 def test_recurring_reservations__update_series(graphql):
-    age_group_1 = AgeGroupFactory.create()
-    age_group_2 = AgeGroupFactory.create()
+    age_group_1 = AgeGroupFactory.create(minimum=18, maximum=100)
+    age_group_2 = AgeGroupFactory.create(minimum=0, maximum=17)
     purpose_1 = ReservationPurposeFactory.create()
     purpose_2 = ReservationPurposeFactory.create()
     city_1 = CityFactory.create()

@@ -718,8 +718,8 @@ def test_application_section__filter__by_age_group(graphql):
     # given:
     # - There is an application with two application sections with different age groups
     # - A superuser is using the system
-    age_group_1 = AgeGroupFactory.create()
-    age_group_2 = AgeGroupFactory.create()
+    age_group_1 = AgeGroupFactory.create(minimum=18, maximum=100)
+    age_group_2 = AgeGroupFactory.create(minimum=0, maximum=17)
     application = ApplicationFactory.create_in_status_draft(application_sections=[])
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application, age_group=age_group_1)
     ApplicationSectionFactory.create_in_status_unallocated(application=application, age_group=age_group_2)
@@ -742,8 +742,8 @@ def test_application_section__filter__by_age_group__multiple(graphql):
     # given:
     # - There is an application with two application sections with different age groups
     # - A superuser is using the system
-    age_group_1 = AgeGroupFactory.create()
-    age_group_2 = AgeGroupFactory.create()
+    age_group_1 = AgeGroupFactory.create(minimum=18, maximum=100)
+    age_group_2 = AgeGroupFactory.create(minimum=0, maximum=17)
     application = ApplicationFactory.create_in_status_draft(application_sections=[])
     section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application, age_group=age_group_1)
     section_2 = ApplicationSectionFactory.create_in_status_unallocated(application=application, age_group=age_group_2)
