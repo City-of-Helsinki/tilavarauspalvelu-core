@@ -38,7 +38,7 @@ export function getSeasonalSearchPath(
 export function getSingleSearchPath(params?: URLSearchParams): string {
   const base = `${singleSearchPrefix}/`;
 
-  if (params && Object.keys(params).length > 0) {
+  if (params != null) {
     return `${base}?${params.toString()}`;
   }
 
