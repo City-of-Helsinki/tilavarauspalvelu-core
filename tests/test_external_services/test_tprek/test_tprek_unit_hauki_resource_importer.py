@@ -72,8 +72,7 @@ def test__tprek_unit_hauki_resource_importer__all_resources_not_found():
 
 @patch_method(HaukiAPIClient.get)
 def test__tprek_unit_hauki_resource_importer__origin_hauki_resource__already_exists():
-    origin_hauki_resource = OriginHaukiResourceFactory.create(id=999)
-    unit = UnitFactory.create(tprek_id=888, origin_hauki_resource=origin_hauki_resource)
+    unit = UnitFactory.create(tprek_id=888, origin_hauki_resource=OriginHaukiResourceFactory.create())
 
     TprekUnitHaukiResourceIdImporter.import_hauki_resources_for_units(units=[unit])
 

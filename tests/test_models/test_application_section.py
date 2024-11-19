@@ -3,8 +3,12 @@ import datetime
 import pytest
 from lookup_property import L
 
-from tests.factories import AllocatedTimeSlotFactory, ApplicationRoundFactory, ReservationUnitOptionFactory
-from tests.factories.application_section import ApplicationSectionFactory
+from tests.factories import (
+    AllocatedTimeSlotFactory,
+    ApplicationRoundFactory,
+    ApplicationSectionFactory,
+    ReservationUnitOptionFactory,
+)
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, Weekday
 from tilavarauspalvelu.models import ApplicationSection
 
