@@ -9,10 +9,10 @@ from django.utils.safestring import SafeString, mark_safe
 from django.utils.translation import gettext_lazy as _
 from rangefilter.filters import DateTimeRangeFilterBuilder, NumericRangeFilterBuilder
 
+from tilavarauspalvelu.admin.helpers import ImmutableModelAdmin
 from tilavarauspalvelu.admin.sql_log.admin import SQLLogAdminInline
 from tilavarauspalvelu.models.request_log.model import RequestLog
 from tilavarauspalvelu.models.request_log.queryset import RequestLogQuerySet
-from tilavarauspalvelu.models.sql_log.model import SQLLog
 from tilavarauspalvelu.typing import WSGIRequest
 from tilavarauspalvelu.utils.exporter.sql_log_exporter import SQLLogCSVExporter
 from utils.sentry import SentryLogger
@@ -39,7 +39,7 @@ class RequestLogAdminForm(forms.ModelForm):
 
 
 @admin.register(RequestLog)
-class RequestLogAdmin(admin.ModelAdmin):
+class RequestLogAdmin(ImmutableModelAdmin):
     # Functions
     actions = ["export_results_to_csv"]
     search_fields = [
@@ -119,12 +119,6 @@ class RequestLogAdmin(admin.ModelAdmin):
                 duration_sql=Coalesce(models.Sum("sql_logs__duration_ns"), 0),
             )
         )
-
-    def has_add_permission(self, request: WSGIRequest) -> bool:
-        return False
-
-    def has_change_permission(self, request: WSGIRequest, obj: SQLLog | None = None) -> bool:
-        return False
 
     @admin.action(description=_("Export rows to CSV"))
     def export_results_to_csv(self, request: WSGIRequest, queryset: RequestLogQuerySet) -> FileResponse | None:
