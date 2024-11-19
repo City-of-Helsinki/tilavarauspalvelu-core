@@ -191,12 +191,12 @@ export function processVariables(
             endDate && endDate >= today ? toApiDate(endDate) : null,
         }
       : {}),
-    ...(values.timeBegin != null
+    ...(values.timeBegin != null && values.timeBegin !== ""
       ? {
           reservableTimeStart: ignoreMaybeArray(values.timeBegin),
         }
       : {}),
-    ...(values.timeBegin != null
+    ...(values.timeEnd != null && values.timeEnd !== ""
       ? {
           reservableTimeEnd: ignoreMaybeArray(values.timeEnd),
         }

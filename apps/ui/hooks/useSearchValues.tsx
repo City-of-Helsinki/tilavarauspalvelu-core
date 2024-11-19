@@ -21,7 +21,7 @@ export function useSearchModify() {
   const searchValues = useSearchValues();
 
   // TODO type this properly (not a Record)
-  const handleSearch = (criteria: Record<string, string>, force: boolean) => {
+  const handleSearch = (criteria: Record<string, unknown>, force: boolean) => {
     const { sort, order, ref } = router.query;
     const newSort = sort != null && !Array.isArray(sort) ? sort : null;
     const newOrder = order != null && !Array.isArray(order) ? order : null;

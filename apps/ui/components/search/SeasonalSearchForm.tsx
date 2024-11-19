@@ -185,12 +185,7 @@ export function SeasonalSearchForm({
   });
 
   const search: SubmitHandler<FormValues> = (criteria: FormValues) => {
-    // Remove empty (null || "") values from the criteria
-    const searchCriteria = Object.entries(criteria).reduce((c, cv) => {
-      if (cv[1] == null || cv[1] === "") return c;
-      return { ...c, [cv[0]]: cv[1] };
-    }, {});
-    handleSearch(searchCriteria, true);
+    handleSearch(criteria, true);
   };
 
   const translateTag = (key: string, value: string): string | undefined => {
