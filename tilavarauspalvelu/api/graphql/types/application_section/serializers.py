@@ -217,7 +217,7 @@ class ApplicationSectionReservationCancellationInputSerializer(NestingModelSeria
     instance: ApplicationSection
 
     cancel_reason = serializers.IntegerField(required=True)
-    cancel_details = serializers.CharField(required=False)
+    cancel_details = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = ApplicationSection

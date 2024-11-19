@@ -623,7 +623,7 @@ class ReservationSeriesDenyInputSerializer(NestingModelSerializer):
     instance: RecurringReservation
 
     deny_reason = serializers.IntegerField(required=True)
-    handling_details = serializers.CharField(required=False)
+    handling_details = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = RecurringReservation
