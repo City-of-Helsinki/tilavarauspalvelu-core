@@ -45,12 +45,22 @@ class PaymentOrderBuilder(ModelFactoryBuilder[PaymentOrder]):
 
     def for_mock_order(self, reservation: Reservation) -> Self:
         order_uuid = uuid.uuid4()
-        base_url = settings.MOCK_VERKKOKAUPPA_BACKEND_URL.strip("/")
-        checkout_url = reverse("mock_verkkokauppa:checkout", args=[order_uuid]).strip("/")
-        receipt_url = reverse("admin:tilavarauspalvelu_reservation_change", args=[reservation.id]).strip("/")
+
+        if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
+            base_url = settings.MOCK_VERKKOKAUPPA_BACKEND_URL.strip("/")
+
+            checkout_path = reverse("mock_verkkokauppa:checkout", args=[order_uuid]).strip("/")
+            receipt_path = reverse("admin:tilavarauspalvelu_reservation_change", args=[reservation.id]).strip("/")
+
+            checkout_url = f"{base_url}/{checkout_path}/"
+            receipt_url = f"{base_url}/{receipt_path}/?"
+
+        else:
+            checkout_url = f"https://checkout-test.test.hel.ninja/{order_uuid}?user={reservation.user.uuid}"
+            receipt_url = f"https://checkout-test.test.hel.ninja/{order_uuid}/receipt?user={reservation.user.uuid}"
 
         return self.set(
             remote_id=order_uuid,
-            checkout_url=f"{base_url}/{checkout_url}/",
-            receipt_url=f"{base_url}/{receipt_url}/?",
+            checkout_url=checkout_url,
+            receipt_url=receipt_url,
         )

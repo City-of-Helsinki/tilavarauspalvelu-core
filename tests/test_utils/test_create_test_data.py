@@ -2,7 +2,6 @@ import django.apps
 import pytest
 from django.db import models
 
-from tests.helpers import with_mock_verkkokauppa
 from tilavarauspalvelu.management.commands.create_test_data import create_test_data
 from tilavarauspalvelu.models import (
     AbilityGroup,
@@ -47,8 +46,8 @@ models_that_should_be_empty: list[type[models.Model]] = [
 
 @pytest.mark.django_db
 @pytest.mark.slow
-@with_mock_verkkokauppa
 def test_create_test_data(settings):
+    settings.MOCK_VERKKOKAUPPA_API_ENABLED = False
     settings.UPDATE_RESERVATION_UNIT_THUMBNAILS = True
 
     all_models = django.apps.apps.app_configs["tilavarauspalvelu"].get_models()
