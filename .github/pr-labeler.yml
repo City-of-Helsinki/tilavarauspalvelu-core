@@ -1,0 +1,3 @@
+feature: ["add-*"]
+fix: ["fix-*"]
+dependencies: ["pre-commit-ci-update-config"]

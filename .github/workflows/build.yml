@@ -8,6 +8,9 @@ on:
       - "v*"
   pull_request:
   workflow_dispatch:
+  repository_dispatch:
+    types:
+      - fast-forward
 
 # Cancel a workflow from the same PR, branch or tag when a new workflow is triggered.
 concurrency:

@@ -1,9 +1,5 @@
 
 changelog:
-  exclude:
-    authors:
-      - dependabot[bot]
-      - pre-commit-ci[bot]
   categories:
     - title: Features
       labels:
@@ -21,4 +17,6 @@ changelog:
       labels:
         - improvement
         - refactor
+    - title: Automated
+      labels:
         - dependencies
