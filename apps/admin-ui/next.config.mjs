@@ -20,10 +20,8 @@ const config = {
   transpilePackages: ["common"],
   // create a smaller bundle
   output: "standalone",
-  experimental: {
-    // this includes files from the monorepo base two directories up
-    outputFileTracingRoot: join(ROOT_PATH, "../../"),
-  },
+  // this includes files from the monorepo base two directories up
+  outputFileTracingRoot: join(ROOT_PATH, "../../"),
   // don't block builds use a separate CI step for this
   typescript: {
     ignoreBuildErrors: true,

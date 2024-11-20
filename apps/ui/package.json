@@ -31,7 +31,7 @@
     "hds-react": "^3.11.0",
     "i18next": "^23.15.1",
     "lodash": "^4.17.21",
-    "next": "14.2.15",
+    "next": "15.0.3",
     "next-compose-plugins": "^2.2.1",
     "next-i18next": "^15.3.1",
     "next-transpile-modules": "^10.0.1",
