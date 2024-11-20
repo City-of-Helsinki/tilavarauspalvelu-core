@@ -3,7 +3,7 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 import * as Sentry from "@sentry/nextjs";
 import { env } from "@/env.mjs";
-import { getVersion } from "@/helpers/serverUtils";
+import { getVersion } from "@/modules/baseUtils.mjs";
 
 const { SENTRY_DSN, SENTRY_ENVIRONMENT } = env;
 const VERSION = getVersion();

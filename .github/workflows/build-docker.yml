@@ -78,10 +78,15 @@ jobs:
       with:
         context: .
         push: true
+        secrets: |
+          "sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }}"
         build-args: |
           APP=${{ env.BUILD_APP }}
           NEXT_PUBLIC_BASE_URL=${{ env.NEXT_PUBLIC_BASE_URL }}
           EMAIL_VARAAMO_EXT_LINK=${{ env.EMAIL_VARAAMO_EXT_LINK }}
+          NEXT_PUBLIC_SOURCE_VERSION=${{ github.sha }}
+          NEXT_PUBLIC_SOURCE_BRANCH_NAME=${{ github.ref_name }}
+          CI=true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         annotations: ${{ steps.meta.outputs.annotations }}

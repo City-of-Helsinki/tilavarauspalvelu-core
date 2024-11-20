@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 // NOTE not using App.tsx so need to import i18n here also
 import "@/i18n";
-import { getVersion } from "@/helpers/serverUtils";
+import { getVersion } from "@/modules/baseUtils.mjs";
 import { useRouter } from "next/router";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];

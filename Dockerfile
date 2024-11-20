@@ -12,7 +12,7 @@ RUN turbo prune --scope=$APP --docker
 
 # Add lockfile and package.json's of isolated subworkspace
 FROM base AS installer
-RUN apt-get update && apt-get install -y --no-install-recommends dumb-init
+RUN apt-get update && apt-get install -y --no-install-recommends dumb-init ca-certificates
 WORKDIR /app
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
@@ -29,6 +29,16 @@ ARG NEXT_PUBLIC_BASE_URL
 ENV NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL
 ARG EMAIL_VARAAMO_EXT_LINK
 ENV EMAIL_VARAAMO_EXT_LINK=$EMAIL_VARAAMO_EXT_LINK
+# Version information from build pipeline (pass it to sentry sourcemap upload)
+ARG NEXT_PUBLIC_SOURCE_VERSION
+ARG NEXT_PUBLIC_SOURCE_BRANCH_NAME
+ENV NEXT_PUBLIC_SOURCE_VERSION=$NEXT_PUBLIC_SOURCE_VERSION
+ENV NEXT_PUBLIC_SOURCE_BRANCH_NAME=$NEXT_PUBLIC_SOURCE_BRANCH_NAME
+# Pass CI variable to the build
+ARG CI
+ENV CI=$CI
+ENV SENTRY_LOG_LEVEL=debug
+
 # Build should not fail on missing env variables
 # TODO this should be removed because we need NEXT_PUBLIC_TILAVARAUS_API_URL to be set during build
 # unless we let it be undefined and use "" as default value (does it work?)
@@ -36,7 +46,8 @@ ENV EMAIL_VARAAMO_EXT_LINK=$EMAIL_VARAAMO_EXT_LINK
 ENV SKIP_ENV_VALIDATION=true
 COPY turbo.json turbo.json
 RUN corepack enable
-RUN pnpm turbo run build --filter=$APP...
+RUN --mount=type=secret,id=sentry_auth_token,env=SENTRY_AUTH_TOKEN \
+  pnpm turbo run build --filter=$APP...
 
 FROM base AS runner
 ARG APP

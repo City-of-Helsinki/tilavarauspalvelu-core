@@ -4,6 +4,7 @@ import * as url from "node:url";
 import analyser from "@next/bundle-analyzer";
 import { withSentryConfig } from "@sentry/nextjs";
 import { env } from "./src/env.mjs";
+import { getVersion } from "./src/modules/baseUtils.mjs";
 
 // @ts-expect-error -- This works because it's only run on node (not browser)
 await import("./src/env.mjs");
@@ -46,8 +47,13 @@ const config = {
         destination: "/api/:any*",
       },
       {
-        source: "/logout/:any*",
-        destination: "/logout/:any*",
+        source: "/auth/logout/:any*",
+        destination: "/auth/logout/:any*",
+      },
+      // Do not rewrite sentry tunnel
+      {
+        source: "/monitoring/:any*",
+        destination: "/monitoring/:any*",
       },
       // Rewrite everything else to use `pages/index`
       {
@@ -97,17 +103,27 @@ export default withSentryConfig(nextConfig, {
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options
   org: "city-of-helsinki",
-  project: "tilavaraus-admin-ui",
-  sentryUrl: "https://sentry.test.hel.ninja/",
+  project: "tilavarauspalvelu-admin-ui",
+  // only upload source maps to production sentry
+  sentryUrl: "https://sentry.hel.fi/",
   authToken: env.SENTRY_AUTH_TOKEN,
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,
-  // For all available options, see:
-  // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
-
   // Hides source maps from generated client bundles
   hideSourceMaps: true,
-
   // Automatically tree-shake Sentry logger statements to reduce bundle size
   disableLogger: true,
+  // Upload a larger set of source maps for prettier stack traces (increases build time)
+  widenClientFileUpload: true,
+  // Automatically annotate React components to show their full name in breadcrumbs and session replay
+  reactComponentAnnotation: {
+    enabled: true,
+  },
+  release: {
+    name: getVersion().replace("/", "-"),
+  },
+  // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
+  tunnelRoute: "/monitoring",
+  // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
+  automaticVercelMonitors: false,
 });

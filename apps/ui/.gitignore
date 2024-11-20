@@ -14,3 +14,6 @@
 # cypress
 cypress/screenshots
 cypress/videos
+
+# Sentry Config File
+.env.sentry-build-plugin

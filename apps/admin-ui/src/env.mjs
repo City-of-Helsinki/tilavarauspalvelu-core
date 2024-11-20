@@ -1,3 +1,4 @@
+// @ts-check
 import { z } from "zod";
 
 // Coerces a string to true if it's "true" or "1", false if "false" or "0"
@@ -43,7 +44,7 @@ function createEnv() {
 
   if (isServer && !serverConfig?.success) {
     // eslint-disable-next-line no-console
-    console.error("Server env validation failed", serverConfig.error);
+    console.error("Server env validation failed", serverConfig?.error);
   }
 
   const clientSchema = skipValidation ? ClientSchema.partial() : ClientSchema;

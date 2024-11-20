@@ -14,14 +14,9 @@ import {
 } from "@gql/gql-types";
 import { genericTermsVariant } from "./const";
 import { base64encode } from "common/src/helpers";
+import { getVersion } from "./baseUtils.mjs";
 
-export function getVersion(): string {
-  return (
-    env.NEXT_PUBLIC_SOURCE_BRANCH_NAME?.replace("main", "") ||
-    env.NEXT_PUBLIC_SOURCE_VERSION?.slice(0, 8) ||
-    "local"
-  );
-}
+export { getVersion };
 
 export function getCommonServerSideProps() {
   // NOTE don't return undefined here, it breaks JSON.stringify used by getServerSideProps

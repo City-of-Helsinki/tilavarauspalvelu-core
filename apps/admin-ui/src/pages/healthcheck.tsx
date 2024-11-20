@@ -1,6 +1,6 @@
 import Head from "next/head";
 import Layout from "./layout";
-import { getVersion } from "@/helpers/serverUtils";
+import { getVersion } from "@/modules/baseUtils.mjs";
 
 /* Separate healthcheck page that does no GraphQL queries to avoid csrf token issues */
 export default function Index({ version }: Props) {

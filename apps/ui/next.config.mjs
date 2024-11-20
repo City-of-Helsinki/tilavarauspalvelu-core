@@ -5,10 +5,12 @@ import * as url from "node:url";
 import i18nconfig from "./next-i18next.config.js";
 import { withSentryConfig } from "@sentry/nextjs";
 import { env } from "./env.mjs";
+import { getVersion } from "./modules/baseUtils.mjs";
 
 // TODO why was this necessary?
 // This breaks tests, they work on admin-ui but not here...
 // await import ("./env.mjs");
+
 const ROOT_PATH = url.fileURLToPath(new URL(".", import.meta.url));
 
 const { i18n } = i18nconfig;
@@ -67,17 +69,29 @@ export default withSentryConfig(nextConfig, {
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options
   org: "city-of-helsinki",
-  project: "tilavaraus-ui",
-  sentryUrl: "https://sentry.test.hel.ninja/",
+  project: "tilavarauspalvelu-ui",
+  // project: "tilavaraus-ui",
+  // only upload source maps to production sentry
+  sentryUrl: "https://sentry.hel.fi/",
+  // sentryUrl: "https://sentry.test.hel.ninja/",
   authToken: env.SENTRY_AUTH_TOKEN,
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,
   // For all available options, see:
   // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
-
   // Hides source maps from generated client bundles
   hideSourceMaps: true,
-
   // Automatically tree-shake Sentry logger statements to reduce bundle size
   disableLogger: true,
+  // Upload a larger set of source maps for prettier stack traces (increases build time)
+  widenClientFileUpload: true,
+  // Automatically annotate React components to show their full name in breadcrumbs and session replay
+  reactComponentAnnotation: {
+    enabled: true,
+  },
+  release: {
+    name: getVersion().replace("/", "-"),
+  },
+  // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
+  tunnelRoute: "/monitoring",
 });

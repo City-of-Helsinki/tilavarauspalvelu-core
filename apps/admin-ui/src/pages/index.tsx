@@ -1,7 +1,7 @@
 import React from "react";
 import { App } from "@/App";
 import Layout from "./layout";
-import { getVersion } from "@/helpers/serverUtils";
+import { getVersion } from "@/modules/baseUtils.mjs";
 
 export type PageProps = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 

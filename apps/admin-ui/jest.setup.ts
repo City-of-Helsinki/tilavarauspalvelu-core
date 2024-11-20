@@ -1,5 +1,4 @@
 /* eslint-disable import/no-extraneous-dependencies */
-// @ts-check
 import "@testing-library/jest-dom";
 import { toHaveNoViolations } from "jest-axe";
 
