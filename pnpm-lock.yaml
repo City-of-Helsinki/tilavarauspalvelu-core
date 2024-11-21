@@ -428,8 +428,8 @@ importers:
         specifier: ^18.2.0
         version: 18.2.0
       react-big-calendar:
-        specifier: ^1.8.6
-        version: 1.13.4(react-dom@18.3.1(react@18.2.0))(react@18.2.0)
+        specifier: ^1.15.0
+        version: 1.15.0(react-dom@18.3.1(react@18.2.0))(react@18.2.0)
       react-dom:
         specifier: ^18.3.1
         version: 18.3.1(react@18.2.0)
@@ -477,8 +477,8 @@ importers:
         specifier: ^18.2.7
         version: 18.2.7
       '@types/react-big-calendar':
-        specifier: ^1.8.10
-        version: 1.8.10
+        specifier: ^1.15.0
+        version: 1.15.0
       '@types/react-dom':
         specifier: 18.3.0
         version: 18.3.0
@@ -2781,8 +2781,8 @@ packages:
   '@types/quill@1.3.10':
     resolution: {integrity: sha512-IhW3fPW+bkt9MLNlycw8u8fWb7oO7W5URC9MfZYHBlA24rex9rs23D5DETChu1zvgVdc5ka64ICjJOgQMr6Shw==}
 
-  '@types/react-big-calendar@1.8.10':
-    resolution: {integrity: sha512-HczsLxbLic0wppijPYay9fNaJjYAM9umdKY/0Jats1u3RyYHl+6uHX+uwMVk/ssX6JfuP6tKOhvVld/9xgtFgA==}
+  '@types/react-big-calendar@1.15.0':
+    resolution: {integrity: sha512-eZF0HCwalF8bFaEpcxufrIEAu8m6UiTjqbuQk66i7RbuPbi4xjlJqFeQ6Pb6TCudZVZ5ttnz9AquQDvgKGM3cQ==}
 
   '@types/react-dom@18.3.0':
     resolution: {integrity: sha512-EhwApuTmMBmXuFOikhQLIBUn6uFg81SwLMOAUgodJF14SOBOCMdU04gDoYi0WOJJHD144TL32z4yDqCW3dnkQg==}
@@ -6037,8 +6037,8 @@ packages:
   randombytes@2.1.0:
     resolution: {integrity: sha512-vYl3iOX+4CKUWuxGi9Ukhie6fsqXqS9FE2Zaic4tNFD2N2QQaXOMFbuKK4QmDHC0JO6B1Zp41J0LpT0oR68amQ==}
 
-  react-big-calendar@1.13.4:
-    resolution: {integrity: sha512-eTc67wNHrEbtK7SW2dKlAWjPTcaMfg8BaL5ei4BQ/5FKzVOt3LrmBiq7hr9sOxOYtOfMRxWYMkjkZRvrlRWRBw==}
+  react-big-calendar@1.15.0:
+    resolution: {integrity: sha512-RNiPH1Vh/fpJpNIValpl6lHvuEroWkDvS8z3YW2QpmGUuAk6a0Q1uEujlQTd/gQrpKAaBA4Gyc1mzCdNIQ7DZQ==}
     peerDependencies:
       react: ^16.14.0 || ^17 || ^18
       react-dom: ^16.14.0 || ^17 || ^18
@@ -10383,7 +10383,7 @@ snapshots:
     dependencies:
       parchment: 1.1.4
 
-  '@types/react-big-calendar@1.8.10':
+  '@types/react-big-calendar@1.15.0':
     dependencies:
       '@types/date-arithmetic': 4.1.4
       '@types/prop-types': 15.7.12
@@ -14265,9 +14265,9 @@ snapshots:
     dependencies:
       safe-buffer: 5.2.1
 
-  react-big-calendar@1.13.4(react-dom@18.3.1(react@18.2.0))(react@18.2.0):
+  react-big-calendar@1.15.0(react-dom@18.3.1(react@18.2.0))(react@18.2.0):
     dependencies:
-      '@babel/runtime': 7.25.6
+      '@babel/runtime': 7.26.0
       clsx: 1.2.1
       date-arithmetic: 4.1.0
       dayjs: 1.11.13
