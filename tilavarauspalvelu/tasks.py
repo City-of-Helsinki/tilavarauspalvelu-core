@@ -714,6 +714,6 @@ def send_user_anonymization_email_task():
     EmailService.send_user_anonymization_emails()
 
 
-@app.task(name="deactivate_old_permissions")
+@app.task(name="anonymize_old_users")
 def anonymize_old_users_task() -> None:
     User.objects.anonymize_inactive_users()
