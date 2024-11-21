@@ -1,4 +1,5 @@
 import datetime
+from typing import Any
 
 from graphene.utils.str_converters import to_camel_case
 
@@ -30,7 +31,7 @@ class ReservationUpdateSerializer(OldPrimaryKeyUpdateSerializer, ReservationCrea
         self.fields["reservation_unit_pks"].required = False
         self.fields["purpose_pk"].required = False
 
-    def validate(self, data, prefill_from_profile=False):
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         if self.instance.state != ReservationStateChoice.CREATED.value:
             msg = "Reservation cannot be changed anymore."
             raise ValidationErrorWithCode(msg, ValidationErrorCodes.CHANGES_NOT_ALLOWED)
@@ -40,7 +41,7 @@ class ReservationUpdateSerializer(OldPrimaryKeyUpdateSerializer, ReservationCrea
             msg = f"Setting the reservation state to '{getattr(new_state, 'value', new_state)}' is not allowed."
             raise ValidationErrorWithCode(msg, ValidationErrorCodes.STATE_CHANGE_NOT_ALLOWED)
 
-        data = super().validate(data, prefill_from_profile)
+        data = super().validate(data)
         data["state"] = new_state
 
         reservation_units = data.get("reservation_units", getattr(self.instance, "reservation_units", None))

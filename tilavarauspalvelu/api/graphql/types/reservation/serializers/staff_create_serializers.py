@@ -1,5 +1,5 @@
 import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPrimaryKeyField
 from rest_framework import serializers
@@ -166,7 +166,7 @@ class ReservationStaffCreateSerializer(OldPrimaryKeySerializer, ReservationSched
             "reservee_phone": {"required": False},
         }
 
-    def validate(self, data):
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         data = super().validate(data)
 
         begin = data.get("begin").astimezone(DEFAULT_TIMEZONE)

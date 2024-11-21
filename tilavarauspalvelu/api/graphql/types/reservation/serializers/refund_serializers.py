@@ -1,5 +1,6 @@
 import datetime
 from decimal import Decimal
+from typing import Any
 
 from tilavarauspalvelu.api.graphql.extensions.serializers import OldPrimaryKeySerializer
 from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
@@ -19,7 +20,7 @@ class ReservationRefundSerializer(OldPrimaryKeySerializer):
             "pk",
         ]
 
-    def validate(self, data):
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
         if self.instance.price_net <= Decimal("0.0"):
             msg = "Only reservations with price greater than 0 can be refunded."
