@@ -99,6 +99,7 @@ class PermissionCheckerType(ObjectType):
     @classmethod
     def run(
         cls,
+        *,
         user: AnyUser,
         permission: UserPermissionChoice,
         unit_ids: list[int],

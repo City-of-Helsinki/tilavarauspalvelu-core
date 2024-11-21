@@ -76,7 +76,7 @@ class UnitRoleAdmin(admin.ModelAdmin):
             )
         )
 
-    def save_model(self, request: WSGIRequest, obj: UnitRole, form, change: bool) -> UnitRole:
+    def save_model(self, request: WSGIRequest, obj: UnitRole, form, change: bool) -> UnitRole:  # noqa: FBT001
         obj.assigner = request.user
         return super().save_model(request, obj, form, change)
 

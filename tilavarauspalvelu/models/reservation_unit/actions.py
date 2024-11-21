@@ -220,6 +220,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
 
     def get_next_reservation(
         self,
+        *,
         end_time: datetime.datetime,
         reservation: Reservation | None = None,
         exclude_blocked: bool = False,
@@ -242,6 +243,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
 
     def get_previous_reservation(
         self,
+        *,
         start_time: datetime.datetime,
         reservation: Reservation | None = None,
         exclude_blocked: bool = False,

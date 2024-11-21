@@ -142,6 +142,7 @@ class FirstReservableTimeHelper:
     def __init__(  # noqa: PLR0915
         self,
         reservation_unit_queryset: ReservationUnitQuerySet,
+        *,
         filter_date_start: datetime.date | None = None,
         filter_date_end: datetime.date | None = None,
         filter_time_start: datetime.time | None = None,

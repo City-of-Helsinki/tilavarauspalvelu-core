@@ -175,7 +175,9 @@ class TranslationsFromPOFiles:
         raise NotImplementedError
 
     def activate(self, language: Lang) -> None:
-        assert language in self.language_options  # noqa: S101
+        if language not in self.language_options:
+            msg = f"Language '{language}' is not supported"
+            raise LookupError(msg)
         self.language = language
 
     def deactivate(self) -> None:
@@ -193,13 +195,13 @@ class TranslationsFromPOFiles:
     def check_for_language(self, language: Lang) -> bool:
         return language in self.language_options
 
-    def get_language_from_request(self, request: HttpRequest, check_path: bool = False):
+    def get_language_from_request(self, request: HttpRequest, check_path: bool = False):  # noqa: FBT002
         return trans_real.get_language_from_request(request, check_path)
 
     def get_language_from_path(self, request: HttpRequest) -> None:
         return trans_real.get_language_from_path(request)
 
-    def get_supported_language_variant(self, lang_code: Lang, strict: bool = False) -> str:
+    def get_supported_language_variant(self, lang_code: Lang, strict: bool = False) -> str:  # noqa: FBT002
         if "fi" in lang_code:
             return "fi"
         if "sv" in lang_code:

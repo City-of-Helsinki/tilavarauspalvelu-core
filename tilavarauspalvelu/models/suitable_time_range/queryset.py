@@ -47,7 +47,7 @@ class SuitableTimeRangeQuerySet(models.QuerySet):
         # it can be allocated. Otherwise, it cannot be allocated.
         return any(begin_time >= slot["begin_time"] and end_time <= slot["end_time"] for slot in merged)
 
-    def fulfilled(self, value: bool) -> Self:
+    def fulfilled(self, *, value: bool) -> Self:
         return self.filter(L(fulfilled=value))
 
 

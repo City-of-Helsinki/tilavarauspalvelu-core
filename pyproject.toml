@@ -117,7 +117,7 @@ lint.select = [
     "ERA",      # eradicate
     "F",        # pyflakes
     "FA",       # flake8-future-annotations
-    #"FBT",     # flake8-boolean-trap  # TODO: Enable this and fix (95) issues
+    "FBT",      # flake8-boolean-trap
     "FLY",      # flynt
     "FURB",     # refurb
     #"G",       # flake8-logging-format  # TODO: Enable this and fix (20) issues
@@ -204,14 +204,14 @@ lint.dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$|^args$|^kwargs$
 "local_settings*.py" = [
     "ERA001",   # Commented code is fine here.
 ]
+"utils/query_performance.py" = [
+    "PLR0912",  # This one is allowed to be as complex as it needs to be.
+]
 "tilavarauspalvelu/management/commands/data_creation/*.py" = [
     "S101",     # Asserts are fine in test data creation.
     "S311",     # pseudo-random generators are fine here.
     "PLR0913",  # Can take as many arguments as needed.
     "PLR0915",  # Can have as many statements as needed.
-]
-"utils/query_performance.py" = [
-    "PLR0912",  # This one is allowed to be as complex as it needs to be.
 ]
 "tilavarauspalvelu/api/webhooks/serializers.py" = [
     "N802",     # Allow non-lowercase function names for webhook serializers.
@@ -219,6 +219,9 @@ lint.dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$|^args$|^kwargs$
 ]
 "tilavarauspalvelu/api/graphql/extensions/error_codes.py" = [
     "ERA001",   # Commented code is fine here.
+]
+"tilavarauspalvelu/api/graphql/types/*/filtersets.py" = [
+    "FBT001",   # Filtersets filter_* methods require three positional arguments, last one being boolean.
 ]
 "test_*.py" = [
     "ARG",      # Allow unused arguments in tests (These are usually fixtures)
@@ -236,6 +239,7 @@ lint.dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$|^args$|^kwargs$
 "*tests/*.py" = [
     "ARG",      # Allow unused arguments in tests (These are usually fixtures)
     "ANN",      # No need to annotate tests
+    "FBT001",   # Factory methods may require positional boolean arguments
     "N801",     # Allow whatever class names in tests
     "N802",     # Allow whatever function names in tests
     "N815",     # Allow whatever variable names in tests

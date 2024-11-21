@@ -60,7 +60,7 @@ class HaukiResourceHashUpdater:
         )
         logger.info(f"Fetched {len(self.fetched_hauki_resources)} hauki resources in total.")
 
-    def _update_origin_hauki_resource_hashes(self, force_refetch: bool = False) -> None:
+    def _update_origin_hauki_resource_hashes(self, *, force_refetch: bool = False) -> None:
         """Update hashes for OriginHaukiResources that have had their opening hours changed."""
         cutoff_date = timezone.now().date()
 

@@ -127,7 +127,7 @@ class QueryLoggingMiddleware:
         execute: Callable[..., Any],
         sql: str,
         params: tuple[Any, ...],
-        many: bool,
+        many: bool,  # noqa: FBT001
         context: dict[str, Any],
         query_log: list[QueryInfo],
     ) -> Any:

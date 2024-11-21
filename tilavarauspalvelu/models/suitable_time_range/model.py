@@ -91,7 +91,7 @@ class SuitableTimeRange(models.Model):
                         ]
                     )
                 ),
-                then=models.Value(True),
+                then=models.Value(value=True),
             ),
             default=models.Exists(
                 AllocatedTimeSlot.objects.filter(

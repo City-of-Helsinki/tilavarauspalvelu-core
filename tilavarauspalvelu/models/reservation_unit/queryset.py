@@ -33,6 +33,7 @@ type ReservationUnitPK = int
 class ReservationUnitQuerySet(SearchResultsQuerySet):
     def with_first_reservable_time(
         self,
+        *,
         filter_date_start: date | None,
         filter_date_end: date | None,
         filter_time_start: time | None,

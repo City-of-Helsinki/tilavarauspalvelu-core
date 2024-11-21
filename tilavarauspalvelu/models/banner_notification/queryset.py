@@ -61,13 +61,13 @@ class BannerNotificationQuerySet(models.QuerySet):
 
         return self.none()
 
-    def order_by_level(self, desc: bool = False) -> Self:
+    def order_by_level(self, *, desc: bool = False) -> Self:
         return self.order_by_expression(alias="__level", expression=BANNER_LEVEL_SORT_ORDER, desc=desc)
 
-    def order_by_state(self, desc: bool = False) -> Self:
+    def order_by_state(self, *, desc: bool = False) -> Self:
         return self.order_by_expression(alias="__state", expression=BANNER_STATE_SORT_ORDER, desc=desc)
 
-    def order_by_target(self, desc: bool = False) -> Self:
+    def order_by_target(self, *, desc: bool = False) -> Self:
         return self.order_by_expression(alias="__target", expression=BANNER_TARGET_SORT_ORDER, desc=desc)
 
 

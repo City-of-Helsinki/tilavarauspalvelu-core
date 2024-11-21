@@ -252,7 +252,7 @@ class ReservationSchedulingMixin:
             else reservation_unit.actions.get_actual_before_buffer(begin)
         )
         previous_reservation = reservation_unit.actions.get_previous_reservation(
-            begin, self.instance, exclude_blocked=True
+            start_time=begin, reservation=self.instance, exclude_blocked=True
         )
         if previous_reservation:
             previous_buffer = previous_reservation.buffer_time_after
@@ -263,7 +263,9 @@ class ReservationSchedulingMixin:
             if new_buffer_after is not None  # for formatting
             else reservation_unit.actions.get_actual_after_buffer(end)
         )
-        next_reservation = reservation_unit.actions.get_next_reservation(end, self.instance, exclude_blocked=True)
+        next_reservation = reservation_unit.actions.get_next_reservation(
+            end_time=end, reservation=self.instance, exclude_blocked=True
+        )
         if next_reservation:
             next_buffer = next_reservation.buffer_time_before
             buffer_after = max(next_buffer, buffer_after)

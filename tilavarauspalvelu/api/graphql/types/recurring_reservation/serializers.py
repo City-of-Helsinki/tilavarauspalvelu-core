@@ -196,7 +196,12 @@ class ReservationSeriesCreateSerializer(NestingModelSerializer):
         # This way if we get, e.g., overlapping reservations, the whole operation is rolled back.
         with transaction.atomic():
             instance = super().save()
-            reservations = self.create_reservations(instance, reservation_details, skip_dates, check_opening_hours)
+            reservations = self.create_reservations(
+                instance=instance,
+                reservation_details=reservation_details,
+                skip_dates=skip_dates,
+                check_opening_hours=check_opening_hours,
+            )
 
         # Must refresh the materialized view since new reservations are created.
         if settings.UPDATE_AFFECTING_TIME_SPANS:
@@ -211,6 +216,7 @@ class ReservationSeriesCreateSerializer(NestingModelSerializer):
 
     def create_reservations(
         self,
+        *,
         instance: RecurringReservation,
         reservation_details: ReservationDetails,
         skip_dates: list[datetime.date],

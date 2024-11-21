@@ -51,11 +51,11 @@ class ApplicationFilterSet(ModelFilterSet):
 
     @staticmethod
     def order_by_applicant(qs: ApplicationQuerySet, desc: bool) -> QuerySet:
-        return qs.order_by_applicant(desc)
+        return qs.order_by_applicant(desc=desc)
 
     @staticmethod
     def order_by_applicant_type(qs: ApplicationQuerySet, desc: bool) -> QuerySet:
-        return qs.order_by_applicant_type(desc)
+        return qs.order_by_applicant_type(desc=desc)
 
     @staticmethod
     def order_by_preferred_unit_name_fi(qs: ApplicationQuerySet, desc: bool) -> QuerySet:
