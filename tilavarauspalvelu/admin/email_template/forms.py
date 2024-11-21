@@ -49,11 +49,13 @@ number_widget = forms.NumberInput(attrs={"size": WIDTH})
 # --- Base forms -------------------------------------------------------------------------------------------------
 
 
-class EmailTemplateForm(forms.Form):
+class BaseEmailTemplateForm(forms.Form):
+    """Base form for email template testers, not meant to be used directly."""
+
     send_to = forms.EmailField(initial="", widget=email_widget)
 
     @classmethod
-    def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> Self:
+    def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> Self:  # noqa: ARG003
         """Fill form from model information."""
         return cls()
 
@@ -72,7 +74,7 @@ class TemplateSwitcherForm(forms.Form):
 
 
 class ReservationUnitSelectForm(forms.Form):
-    """Allows pre-filling the email tester from from a reservation unit."""
+    """Allows pre-filling the email tester from a reservation unit."""
 
     reservation_unit = forms.ChoiceField(
         widget=forms.Select(attrs={"id": "test_email_reservation_unit_select"}),
@@ -87,7 +89,7 @@ class ReservationUnitSelectForm(forms.Form):
         self.fields["reservation_unit"].choices = runit_choices
 
 
-def select_tester_form(*, email_type: EmailType) -> type[EmailTemplateForm] | None:  # noqa: PLR0912, PLR0911
+def select_tester_form(*, email_type: EmailType) -> type[BaseEmailTemplateForm] | None:  # noqa: PLR0912, PLR0911
     """Select email tester form based on email type."""
     match email_type:
         case EmailType.APPLICATION_HANDLED:
@@ -164,7 +166,7 @@ class PendingInstructionsFormMixin(forms.Form):
 
 class ApplicationHandledEmailTemplateTesterForm(
     LanguageFormMixin,
-    EmailTemplateForm,
+    BaseEmailTemplateForm,
 ):
     def to_context(self) -> EmailContext:
         return get_context_for_application_handled(language=self.cleaned_data["language"])
@@ -172,7 +174,7 @@ class ApplicationHandledEmailTemplateTesterForm(
 
 class ApplicationInAllocationEmailTemplateTesterForm(
     LanguageFormMixin,
-    EmailTemplateForm,
+    BaseEmailTemplateForm,
 ):
     def to_context(self) -> EmailContext:
         return get_context_for_application_in_allocation(language=self.cleaned_data["language"])
@@ -180,7 +182,7 @@ class ApplicationInAllocationEmailTemplateTesterForm(
 
 class ApplicationReceivedEmailTemplateTesterForm(
     LanguageFormMixin,
-    EmailTemplateForm,
+    BaseEmailTemplateForm,
 ):
     def to_context(self) -> EmailContext:
         return get_context_for_application_received(language=self.cleaned_data["language"])
@@ -188,7 +190,7 @@ class ApplicationReceivedEmailTemplateTesterForm(
 
 class PermissionDeactivationEmailTemplateTesterForm(
     LanguageFormMixin,
-    EmailTemplateForm,
+    BaseEmailTemplateForm,
 ):
     def to_context(self) -> EmailContext:
         return get_context_for_permission_deactivation(language=self.cleaned_data["language"])
@@ -196,7 +198,7 @@ class PermissionDeactivationEmailTemplateTesterForm(
 
 class UserAnonymizationEmailTemplateTesterForm(
     LanguageFormMixin,
-    EmailTemplateForm,
+    BaseEmailTemplateForm,
 ):
     def to_context(self) -> EmailContext:
         return get_context_for_user_anonymization(language=self.cleaned_data["language"])
@@ -208,7 +210,7 @@ class ReservationCancelledEmailTemplateTesterForm(
     ReservationBasicInfoFormMixin,
     EmailRecipientFormMixin,
     LanguageFormMixin,
-    EmailTemplateForm,
+    BaseEmailTemplateForm,
 ):
     cancel_reason = forms.CharField(initial="[PERUUTUKSEN SYY]", widget=text_widget)
 
@@ -248,7 +250,7 @@ class ReservationConfirmedEmailTemplateTesterForm(
     ReservationBasicInfoFormMixin,
     EmailRecipientFormMixin,
     LanguageFormMixin,
-    EmailTemplateForm,
+    BaseEmailTemplateForm,
 ):
     @classmethod
     def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang):
@@ -285,7 +287,7 @@ class ReservationApprovedEmailTemplateTesterForm(
     ReservationBasicInfoFormMixin,
     EmailRecipientFormMixin,
     LanguageFormMixin,
-    EmailTemplateForm,
+    BaseEmailTemplateForm,
 ):
     non_subsidised_price = forms.DecimalField(decimal_places=2, initial=Decimal("10.00"), widget=number_widget)
 
@@ -325,7 +327,7 @@ class ReservationHandlingRequiredEmailTemplateTesterForm(
     ReservationBasicInfoFormMixin,
     EmailRecipientFormMixin,
     LanguageFormMixin,
-    EmailTemplateForm,
+    BaseEmailTemplateForm,
 ):
     subsidised_price = forms.DecimalField(decimal_places=2, initial=Decimal("10.00"), widget=number_widget)
     applying_for_free_of_charge = forms.BooleanField(initial=False, required=False)
@@ -365,7 +367,7 @@ class ReservationModifiedEmailTemplateTesterForm(
     ReservationBasicInfoFormMixin,
     EmailRecipientFormMixin,
     LanguageFormMixin,
-    EmailTemplateForm,
+    BaseEmailTemplateForm,
 ):
     @classmethod
     def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang):
@@ -402,7 +404,7 @@ class ReservationNeedsToBePaidEmailTemplateTesterForm(
     ReservationBasicInfoFormMixin,
     EmailRecipientFormMixin,
     LanguageFormMixin,
-    EmailTemplateForm,
+    BaseEmailTemplateForm,
 ):
     payment_due_date = forms.DateField(initial=datetime.date.today(), widget=date_widget)
 
@@ -441,7 +443,7 @@ class ReservationRejectedEmailTemplateTesterForm(
     ReservationBasicInfoFormMixin,
     EmailRecipientFormMixin,
     LanguageFormMixin,
-    EmailTemplateForm,
+    BaseEmailTemplateForm,
 ):
     booking_number = forms.IntegerField(initial=0, widget=number_widget)
     rejection_reason = forms.CharField(initial="[HYLKÄYKSEN SYY]", widget=text_widget)
@@ -478,7 +480,7 @@ class StaffNotificationReservationMadeEmailTemplateTesterForm(
     ReservationBasicInfoFormMixin,
     EmailRecipientFormMixin,
     LanguageFormMixin,
-    EmailTemplateForm,
+    BaseEmailTemplateForm,
 ):
     reservation_name = forms.CharField(initial="[VARAUKSEN NIMI]", widget=text_widget)
     reservee_name = forms.CharField(initial="[VARAAJAN NIMI]", widget=text_widget)
@@ -512,7 +514,7 @@ class StaffNotificationReservationRequiresHandlingEmailTemplateTesterForm(
     ReservationBasicInfoFormMixin,
     EmailRecipientFormMixin,
     LanguageFormMixin,
-    EmailTemplateForm,
+    BaseEmailTemplateForm,
 ):
     reservation_name = forms.CharField(initial="[VARAUKSEN NIMI]", widget=text_widget)
     reservee_name = forms.CharField(initial="[VARAAJAN NIMI]", widget=text_widget)

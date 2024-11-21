@@ -88,7 +88,7 @@ def get_context_for_reservation_cancelled(
             "cancel_reason": get_attr_by_language(reservation.cancel_reason, "reason", language=language),
             "cancelled_instructions": reservation.actions.get_instructions(kind="cancelled", language=language),
             **params_for_base_info(reservation=reservation, language=language),
-            **params_for_price_info(reservation=reservation, language=language),
+            **params_for_price_info(reservation=reservation),
         }
 
     return {
@@ -98,20 +98,18 @@ def get_context_for_reservation_cancelled(
         "cancel_reason": data["cancel_reason"],
         "instructions_label": pgettext("Email", "Additional information about cancellation"),
         "instructions": data["cancelled_instructions"],
-        **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"], language=language),
+        **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_reservation_basic_info(
             reservation_unit_name=data["reservation_unit_name"],
             unit_name=data["unit_name"],
             unit_location=data["unit_location"],
             begin_datetime=data["begin_datetime"],
             end_datetime=data["end_datetime"],
-            language=language,
         ),
         **get_contex_for_reservation_price(
             price=data["price"],
             tax_percentage=data["tax_percentage"],
             booking_number=data["booking_number"],
-            language=language,
         ),
         **get_contex_for_closing(language=language),
     }
@@ -154,7 +152,7 @@ def get_context_for_reservation_confirmed(
             "email_recipient_name": reservation.actions.get_email_reservee_name(),
             "confirmed_instructions": reservation.actions.get_instructions(kind="confirmed", language=language),
             **params_for_base_info(reservation=reservation, language=language),
-            **params_for_price_info(reservation=reservation, language=language),
+            **params_for_price_info(reservation=reservation),
         }
 
     return {
@@ -162,20 +160,18 @@ def get_context_for_reservation_confirmed(
         "text_reservation_confirmed": pgettext("Email", "You have made a new booking"),
         "instructions_label": pgettext("Email", "Additional information about your booking"),
         "instructions": data["confirmed_instructions"],
-        **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"], language=language),
+        **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_reservation_basic_info(
             reservation_unit_name=data["reservation_unit_name"],
             unit_name=data["unit_name"],
             unit_location=data["unit_location"],
             begin_datetime=data["begin_datetime"],
             end_datetime=data["end_datetime"],
-            language=language,
         ),
         **get_contex_for_reservation_price(
             price=data["price"],
             tax_percentage=data["tax_percentage"],
             booking_number=data["booking_number"],
-            language=language,
         ),
         **get_contex_for_reservation_manage_link(language=language),
         **get_contex_for_closing_polite(language=language),
@@ -221,7 +217,7 @@ def get_context_for_reservation_approved(
             "non_subsidised_price": reservation.non_subsidised_price,
             "confirmed_instructions": reservation.actions.get_instructions(kind="confirmed", language=language),
             **params_for_base_info(reservation=reservation, language=language),
-            **params_for_price_info(reservation=reservation, language=language),
+            **params_for_price_info(reservation=reservation),
         }
 
     text_reservation_approved = (
@@ -235,20 +231,18 @@ def get_context_for_reservation_approved(
         "text_reservation_approved": text_reservation_approved,
         "instructions_label": pgettext("Email", "Additional information about your booking"),
         "instructions": data["confirmed_instructions"],
-        **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"], language=language),
+        **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_reservation_basic_info(
             reservation_unit_name=data["reservation_unit_name"],
             unit_name=data["unit_name"],
             unit_location=data["unit_location"],
             begin_datetime=data["begin_datetime"],
             end_datetime=data["end_datetime"],
-            language=language,
         ),
         **get_contex_for_reservation_price(
             price=data["price"],
             tax_percentage=data["tax_percentage"],
             booking_number=data["booking_number"],
-            language=language,
         ),
         **get_contex_for_reservation_manage_link(language=language),
         **get_contex_for_closing_polite(language=language),
@@ -294,7 +288,7 @@ def get_context_for_reservation_requires_handling(
             "email_recipient_name": reservation.actions.get_email_reservee_name(),
             "pending_instructions": reservation.actions.get_instructions(kind="pending", language=language),
             **params_for_base_info(reservation=reservation, language=language),
-            **params_for_price_range_info(reservation=reservation, language=language),
+            **params_for_price_range_info(reservation=reservation),
         }
 
     return {
@@ -308,14 +302,13 @@ def get_context_for_reservation_requires_handling(
         ),
         "instructions_label": pgettext("Email", "Additional information about your booking"),
         "instructions": data["pending_instructions"],
-        **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"], language=language),
+        **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_reservation_basic_info(
             reservation_unit_name=data["reservation_unit_name"],
             unit_name=data["unit_name"],
             unit_location=data["unit_location"],
             begin_datetime=data["begin_datetime"],
             end_datetime=data["end_datetime"],
-            language=language,
         ),
         **get_contex_for_reservation_price_range(
             price=data["price"],
@@ -323,7 +316,6 @@ def get_context_for_reservation_requires_handling(
             tax_percentage=data["tax_percentage"],
             booking_number=data["booking_number"],
             applying_for_free_of_charge=data["applying_for_free_of_charge"],
-            language=language,
         ),
         **get_contex_for_reservation_manage_link(language=language),
         **get_contex_for_closing_polite(language=language),
@@ -367,7 +359,7 @@ def get_context_for_reservation_modified(
             "email_recipient_name": reservation.actions.get_email_reservee_name(),
             "confirmed_instructions": reservation.actions.get_instructions(kind="confirmed", language=language),
             **params_for_base_info(reservation=reservation, language=language),
-            **params_for_price_info(reservation=reservation, language=language),
+            **params_for_price_info(reservation=reservation),
         }
 
     return {
@@ -375,20 +367,18 @@ def get_context_for_reservation_modified(
         "text_reservation_modified": pgettext("Email", "Your booking has been updated"),
         "instructions_label": pgettext("Email", "Additional information about your booking"),
         "instructions": data["confirmed_instructions"],
-        **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"], language=language),
+        **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_reservation_basic_info(
             reservation_unit_name=data["reservation_unit_name"],
             unit_name=data["unit_name"],
             unit_location=data["unit_location"],
             begin_datetime=data["begin_datetime"],
             end_datetime=data["end_datetime"],
-            language=language,
         ),
         **get_contex_for_reservation_price(
             price=data["price"],
             tax_percentage=data["tax_percentage"],
             booking_number=data["booking_number"],
-            language=language,
         ),
         **get_contex_for_reservation_manage_link(language=language),
         **get_contex_for_closing_polite(language=language),
@@ -434,7 +424,7 @@ def get_context_for_reservation_requires_payment(
             "payment_due_date": local_date(),
             "confirmed_instructions": reservation.actions.get_instructions(kind="confirmed", language=language),
             **params_for_base_info(reservation=reservation, language=language),
-            **params_for_price_info(reservation=reservation, language=language),
+            **params_for_price_info(reservation=reservation),
         }
 
     link = get_my_reservations_ext_link(language=language)
@@ -449,20 +439,18 @@ def get_context_for_reservation_requires_payment(
         "pay_reservation_link": f"{text}: {link}",
         "instructions_label": pgettext("Email", "Additional information about your booking"),
         "instructions": data["confirmed_instructions"],
-        **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"], language=language),
+        **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_reservation_basic_info(
             reservation_unit_name=data["reservation_unit_name"],
             unit_name=data["unit_name"],
             unit_location=data["unit_location"],
             begin_datetime=data["begin_datetime"],
             end_datetime=data["end_datetime"],
-            language=language,
         ),
         **get_contex_for_reservation_price(
             price=data["price"],
             tax_percentage=data["tax_percentage"],
             booking_number=data["booking_number"],
-            language=language,
         ),
         **get_contex_for_reservation_manage_link(language=language),
         **get_contex_for_closing_polite(language=language),
@@ -518,14 +506,13 @@ def get_context_for_reservation_rejected(
         "booking_number": str(data["booking_number"]),
         "instructions_label": pgettext("Email", "Additional information"),
         "instructions": data["cancelled_instructions"],
-        **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"], language=language),
+        **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_reservation_basic_info(
             reservation_unit_name=data["reservation_unit_name"],
             unit_name=data["unit_name"],
             unit_location=data["unit_location"],
             begin_datetime=data["begin_datetime"],
             end_datetime=data["end_datetime"],
-            language=language,
         ),
         **get_contex_for_closing(language=language),
     }
@@ -569,7 +556,7 @@ def get_context_for_staff_notification_reservation_made(
             **params_for_base_info(reservation=reservation, language=language),
         }
 
-    link = get_staff_reservations_ext_link(booking_number=data["booking_number"], language=language)
+    link = get_staff_reservations_ext_link(booking_number=data["booking_number"])
 
     return {
         "title": (
@@ -593,16 +580,15 @@ def get_context_for_staff_notification_reservation_made(
         "text_check_details": pgettext("Email", "You can view the booking at"),
         "staff_reservations_ext_link_html": create_anchor_tag(link=link),
         "staff_reservations_ext_link": link,
-        **get_contex_for_base_template(language=language),
+        **get_contex_for_base_template(),
         **get_contex_for_reservation_basic_info(
             reservation_unit_name=data["reservation_unit_name"],
             unit_name=data["unit_name"],
             unit_location=data["unit_location"],
             begin_datetime=data["begin_datetime"],
             end_datetime=data["end_datetime"],
-            language=language,
         ),
-        **get_contex_for_closing_staff(language=language),
+        **get_contex_for_closing_staff(),
     }
 
 
@@ -644,7 +630,7 @@ def get_context_for_staff_notification_reservation_requires_handling(
             **params_for_base_info(reservation=reservation, language=language),
         }
 
-    link = get_staff_reservations_ext_link(booking_number=data["booking_number"], language=language)
+    link = get_staff_reservations_ext_link(booking_number=data["booking_number"])
 
     return {
         "title": (
@@ -668,14 +654,13 @@ def get_context_for_staff_notification_reservation_requires_handling(
         "text_check_details": pgettext("Email", "You can view and handle the booking at"),
         "staff_reservations_ext_link_html": create_anchor_tag(link=link),
         "staff_reservations_ext_link": link,
-        **get_contex_for_base_template(language=language),
+        **get_contex_for_base_template(),
         **get_contex_for_reservation_basic_info(
             reservation_unit_name=data["reservation_unit_name"],
             unit_name=data["unit_name"],
             unit_location=data["unit_location"],
             begin_datetime=data["begin_datetime"],
             end_datetime=data["end_datetime"],
-            language=language,
         ),
-        **get_contex_for_closing_staff(language=language),
+        **get_contex_for_closing_staff(),
     }
