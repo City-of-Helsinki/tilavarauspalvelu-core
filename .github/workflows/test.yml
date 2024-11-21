@@ -116,7 +116,7 @@ jobs:
           DATABASE_URL: postgis://tvp:tvp@localhost:5432/tvp
 
       - name: "Run pytest with coverage"
-        run: poetry run pytest --cov=. --cov-report=xml --cov-branch --disable-warnings --skip-slow
+        run: poetry run pytest --cov=. --cov-report=xml --cov-branch --disable-warnings
         env:
           DJANGO_SETTINGS_ENVIRONMENT: AutomatedTests
 
