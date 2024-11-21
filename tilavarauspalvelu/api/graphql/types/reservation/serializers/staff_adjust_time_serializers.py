@@ -1,5 +1,5 @@
 import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
 
@@ -60,7 +60,7 @@ class StaffReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reserv
 
         return instance
 
-    def validate(self, data):
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         data = super().validate(data)
 
         if self.instance.state != ReservationStateChoice.CONFIRMED.value:

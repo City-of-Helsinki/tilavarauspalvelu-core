@@ -46,7 +46,7 @@ class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reservation
             EmailService.send_staff_notification_reservation_requires_handling_email(reservation=instance)
         return instance
 
-    def validate(self, data):
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         data = super().validate(data)
 
         if self.instance.state != ReservationStateChoice.CONFIRMED.value:

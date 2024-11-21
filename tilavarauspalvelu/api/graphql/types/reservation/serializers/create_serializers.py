@@ -131,7 +131,7 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
         self.fields["num_persons"].required = False
         self.fields["purpose_pk"].required = False
 
-    def validate(self, data: dict[str, Any], prefill_from_profile: bool = True) -> dict[str, Any]:
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         begin: datetime.datetime = data.get("begin", getattr(self.instance, "begin", None))
         end: datetime.datetime = data.get("end", getattr(self.instance, "end", None))
         begin = begin.astimezone(DEFAULT_TIMEZONE)
@@ -174,8 +174,7 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
             data["tax_percentage_value"] = price_calculation_result.tax_percentage_value
             data["non_subsidised_price"] = price_calculation_result.non_subsidised_price
 
-        prefill_from_profile = prefill_from_profile and settings.PREFILL_RESERVATION_WITH_PROFILE_DATA
-        if prefill_from_profile:
+        if settings.PREFILL_RESERVATION_WITH_PROFILE_DATA:
             self._prefill_reservation_from_profile(data)
 
         return data

@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
@@ -64,7 +64,7 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
             return PaymentType.INVOICE
         return PaymentType.ONLINE
 
-    def validate(self, data, prefill_from_profile=False):
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         data = super().validate(data)
 
         if self.instance.payment_order.exists() == 1:
