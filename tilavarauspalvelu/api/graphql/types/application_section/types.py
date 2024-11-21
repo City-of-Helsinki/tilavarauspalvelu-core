@@ -92,5 +92,5 @@ class ApplicationSectionNode(DjangoNode):
         return queryset
 
     @classmethod
-    def _add_units_for_permissions(cls, queryset: ApplicationQuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
+    def _add_units_for_permissions(cls, queryset: ApplicationQuerySet, *args) -> models.QuerySet:
         return queryset.with_permissions()

@@ -11,7 +11,6 @@ from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ApplicationSta
 from tilavarauspalvelu.models import ApplicationRound
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.admin.application.admin import ApplicationAdmin
     from tilavarauspalvelu.typing import WSGIRequest
 
 
@@ -19,7 +18,7 @@ class ApplicationRoundFilter(admin.SimpleListFilter):
     title = _("Application Round")
     parameter_name = "application_round"
 
-    def lookups(self, request: WSGIRequest, model_admin: ApplicationAdmin) -> list[tuple[str, str]]:
+    def lookups(self, *args) -> list[tuple[str, str]]:
         return ApplicationRound.objects.filter(
             Q(sent_date__isnull=True) | Q(handled_date__isnull=True),
         ).values_list("id", "name")
@@ -35,7 +34,7 @@ class ApplicationRoundStatusFilter(admin.SimpleListFilter):
     title = _("Application round status")
     parameter_name = "round_status"
 
-    def lookups(self, request: WSGIRequest, model_admin: ApplicationAdmin) -> list[tuple[str, str]]:
+    def lookups(self, *args) -> list[tuple[str, str]]:
         return ApplicationRoundStatusChoice.choices
 
     def queryset(self, request: WSGIRequest, queryset: QuerySet) -> QuerySet:
@@ -49,7 +48,7 @@ class ApplicationStatusFilter(admin.SimpleListFilter):
     title = _("Application status")
     parameter_name = "application_status"
 
-    def lookups(self, request: WSGIRequest, model_admin: ApplicationAdmin) -> list[tuple[str, str]]:
+    def lookups(self, *args) -> list[tuple[str, str]]:
         return ApplicationStatusChoice.choices
 
     def queryset(self, request: WSGIRequest, queryset: QuerySet) -> QuerySet:
