@@ -5,7 +5,6 @@ from django.db import models
 from graphene_django_extensions import DjangoNode
 from lookup_property import L
 from query_optimizer import AnnotatedField
-from query_optimizer.optimizer import QueryOptimizer
 
 from tilavarauspalvelu.enums import ApplicationRoundReservationCreationStatusChoice, ApplicationRoundStatusChoice
 from tilavarauspalvelu.models import Application, ApplicationRound, ReservationUnit
@@ -92,5 +91,5 @@ class ApplicationRoundNode(DjangoNode):
         return root.is_setting_handled_allowed
 
     @classmethod
-    def pre_optimization_hook(cls, queryset: ApplicationRoundQuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
+    def pre_optimization_hook(cls, queryset: ApplicationRoundQuerySet, *args) -> models.QuerySet:
         return queryset.with_permissions()

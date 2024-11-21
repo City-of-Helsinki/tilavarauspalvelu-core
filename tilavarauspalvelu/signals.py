@@ -41,7 +41,7 @@ def space_modify(instance: Space, *args: Any, **kwargs: Any) -> None:
 
 @receiver(post_save, sender=Reservation, dispatch_uid="reservation_create")
 def reservation_create(
-    sender: type[Reservation],
+    sender: type[Reservation],  # noqa: ARG001
     instance: Reservation,
     raw: bool = False,
     **kwargs,
@@ -65,10 +65,7 @@ def reservation_create(
 
 
 @receiver(post_delete, sender=Reservation, dispatch_uid="reservation_delete")
-def reservation_delete(
-    sender: type[Reservation],
-    **kwargs,
-) -> None:
+def reservation_delete(sender: type[Reservation], **kwargs) -> None:  # noqa: ARG001
     if settings.UPDATE_AFFECTING_TIME_SPANS:
         update_affecting_time_spans_task.delay(using=kwargs.get("using"))
 

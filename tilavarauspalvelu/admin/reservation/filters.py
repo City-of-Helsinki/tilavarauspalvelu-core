@@ -10,7 +10,7 @@ class RecurringReservationListFilter(admin.SimpleListFilter):
     title = _("Recurring reservation")
     parameter_name = "recurring_reservation"
 
-    def lookups(self, request: WSGIRequest, model_admin: admin.ModelAdmin) -> list[tuple[str, str]]:
+    def lookups(self, *args) -> list[tuple[str, str]]:
         return [
             ("1", _("Yes")),
             ("0", _("No")),
@@ -28,7 +28,7 @@ class PaidReservationListFilter(admin.SimpleListFilter):
     title = _("Paid reservation")
     parameter_name = "paid_reservation"
 
-    def lookups(self, request: WSGIRequest, model_admin: admin.ModelAdmin) -> list[tuple[str, str]]:
+    def lookups(self, *args) -> list[tuple[str, str]]:
         return [
             ("1", _("Yes")),
             ("0", _("No")),
