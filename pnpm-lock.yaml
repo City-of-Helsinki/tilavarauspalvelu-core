@@ -81,11 +81,11 @@ importers:
         specifier: ^16.9.0
         version: 16.9.0
       hds-core:
-        specifier: ^3.10.1
-        version: 3.10.1
+        specifier: ^3.11.0
+        version: 3.11.0
       hds-react:
-        specifier: ^3.10.1
-        version: 3.10.1(@types/react@18.2.7)(eslint@8.57.1)(graphql-ws@5.16.0(graphql@16.9.0))(postcss@8.4.45)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)(typescript@5.6.2)
+        specifier: ^3.11.0
+        version: 3.11.0(@types/react@18.2.7)(eslint@8.57.1)(graphql-ws@5.16.0(graphql@16.9.0))(postcss@8.4.45)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)(typescript@5.6.2)
       i18next:
         specifier: ^23.15.1
         version: 23.15.1
@@ -256,14 +256,14 @@ importers:
         specifier: ^16.9.0
         version: 16.9.0
       hds-core:
-        specifier: ^3.10.1
-        version: 3.10.1
+        specifier: ^3.11.0
+        version: 3.11.0
       hds-design-tokens:
-        specifier: ^3.10.1
-        version: 3.10.1
+        specifier: ^3.11.0
+        version: 3.11.0
       hds-react:
-        specifier: ^3.10.1
-        version: 3.10.1(@types/react@18.2.7)(eslint@8.57.1)(graphql-ws@5.16.0(graphql@16.9.0))(postcss@8.4.45)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)(typescript@5.6.2)
+        specifier: ^3.11.0
+        version: 3.11.0(@types/react@18.2.7)(eslint@8.57.1)(graphql-ws@5.16.0(graphql@16.9.0))(postcss@8.4.45)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)(typescript@5.6.2)
       i18next:
         specifier: ^23.15.1
         version: 23.15.1
@@ -410,8 +410,8 @@ importers:
         specifier: workspace:*
         version: link:../eslint-config-custom
       hds-react:
-        specifier: ^3.10.1
-        version: 3.10.1(@types/react@18.2.7)(eslint@8.57.1)(graphql-ws@5.16.0(graphql@16.9.0))(postcss@8.4.45)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)(typescript@5.6.2)
+        specifier: ^3.11.0
+        version: 3.11.0(@types/react@18.2.7)(eslint@8.57.1)(graphql-ws@5.16.0(graphql@16.9.0))(postcss@8.4.45)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)(typescript@5.6.2)
       i18next:
         specifier: ^23.15.1
         version: 23.15.1
@@ -4644,14 +4644,14 @@ packages:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
 
-  hds-core@3.10.1:
-    resolution: {integrity: sha512-UJKYX8ivRMWFiPmqMFN0wWnXI2qslhLA9bX8ap7caQ4icbeALfqgPtGcO9ccGghUExNXbt3s3JsDD+Tmkt4VLw==}
+  hds-core@3.11.0:
+    resolution: {integrity: sha512-405+8VHW4N3/y5ESWGOv6vUIbgp/DCYjQVpdVLsWg6RowrUwNk9VvU6N2ZpEP8HM3ujJYu/bcIQ6zzwvAOFMCA==}
 
-  hds-design-tokens@3.10.1:
-    resolution: {integrity: sha512-v20N0GQFk6S/94LQnJofdEa/M1xP0lZXAfxFasGGYiMMx60wq9j/D12e8lBJ6BKvb2hLYNGL1KfT16Du5MigYQ==}
+  hds-design-tokens@3.11.0:
+    resolution: {integrity: sha512-A44gjN+TDpQQnCnw/AflCHIrqBZP8FYUW+HlPPUx4SCe4ISnEWVvxrEFWvzfOXSmO+9MDSXdNKS4ItEwluJUMQ==}
 
-  hds-react@3.10.1:
-    resolution: {integrity: sha512-X8Zx5DfzWnB9Sb3AJFtusH/gSDSYtt6WgHFYcea+mTnS4Pf3ISAsey3nmczcL1vBS0eavACn4TVGfQ/X/gUIWA==}
+  hds-react@3.11.0:
+    resolution: {integrity: sha512-n3JiEX1K9xWqwEi7VvZvDj4+wnpMNCZX9mmOdsK8h9ZYGHS49vPnvYLXs3hlX/Ljw1XGsgX3vtQlOO69C1iu2g==}
     peerDependencies:
       postcss: ^8.4.21
       react: ^16.8.0 || ^17
@@ -4690,9 +4690,6 @@ packages:
   http-proxy-agent@7.0.2:
     resolution: {integrity: sha512-T1gkAiYYDWYx3V5Bmyu7HcfcvL7mUrTWiM6yOfa3PIphViJ/gFPbvidQ+veqSOHci/PxBcDabeUNCzpOODJZig==}
     engines: {node: '>= 14'}
-
-  http-status-typed@1.0.1:
-    resolution: {integrity: sha512-U8jF221dmNNZbdBiOoK2HduguCwparnsP0z11PQZaDtaHBHuxG3gCimxQi8Cfb8VECave4yoVbONSByQU6z0Ew==}
 
   https-proxy-agent@5.0.1:
     resolution: {integrity: sha512-dFcAjpTQFgoLMzC2VwU+C/CbS7uRL0lWmxDITmqm7C+7F0Odmj6s9l6alZc6AELXhrnggM2CeWSXHGOdX2YtwA==}
@@ -12630,11 +12627,11 @@ snapshots:
     dependencies:
       function-bind: 1.1.2
 
-  hds-core@3.10.1: {}
+  hds-core@3.11.0: {}
 
-  hds-design-tokens@3.10.1: {}
+  hds-design-tokens@3.11.0: {}
 
-  hds-react@3.10.1(@types/react@18.2.7)(eslint@8.57.1)(graphql-ws@5.16.0(graphql@16.9.0))(postcss@8.4.45)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)(typescript@5.6.2):
+  hds-react@3.11.0(@types/react@18.2.7)(eslint@8.57.1)(graphql-ws@5.16.0(graphql@16.9.0))(postcss@8.4.45)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)(typescript@5.6.2):
     dependencies:
       '@apollo/client': 3.11.8(@types/react@18.2.7)(graphql-ws@5.16.0(graphql@16.9.0))(graphql@16.9.0)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)
       '@babel/runtime': 7.17.9
@@ -12652,8 +12649,7 @@ snapshots:
       date-fns: 2.16.1
       downshift: 6.0.6(react@18.2.0)
       graphql: 16.9.0
-      hds-core: 3.10.1
-      http-status-typed: 1.0.1
+      hds-core: 3.11.0
       jwt-decode: 3.1.2
       kashe: 1.0.4
       lodash: 4.17.21
@@ -12721,8 +12717,6 @@ snapshots:
       debug: 4.3.7(supports-color@5.5.0)
     transitivePeerDependencies:
       - supports-color
-
-  http-status-typed@1.0.1: {}
 
   https-proxy-agent@5.0.1:
     dependencies:
