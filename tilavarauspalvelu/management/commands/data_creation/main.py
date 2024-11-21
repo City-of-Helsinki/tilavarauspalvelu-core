@@ -25,7 +25,7 @@ from .utils import refresh_materialized_views_at_the_end, with_logs
 
 @with_logs
 @refresh_materialized_views_at_the_end
-def create_test_data(flush: bool = True) -> None:
+def create_test_data(*, flush: bool = True) -> None:
     if flush:
         _clear_database()
 

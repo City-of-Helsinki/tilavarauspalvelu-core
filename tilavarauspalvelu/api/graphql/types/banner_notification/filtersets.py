@@ -46,13 +46,13 @@ class BannerNotificationFilterSet(ModelFilterSet):
         return qs.visible(self.request.user) if value else qs.hidden(self.request.user)
 
     @staticmethod
-    def order_by_level(qs: BannerNotificationQuerySet, desc: bool) -> BannerNotificationQuerySet:
-        return qs.order_by_level(desc)
+    def order_by_level(qs: BannerNotificationQuerySet, *, desc: bool) -> BannerNotificationQuerySet:
+        return qs.order_by_level(desc=desc)
 
     @staticmethod
-    def order_by_target(qs: BannerNotificationQuerySet, desc: bool) -> BannerNotificationQuerySet:
-        return qs.order_by_target(desc)
+    def order_by_target(qs: BannerNotificationQuerySet, *, desc: bool) -> BannerNotificationQuerySet:
+        return qs.order_by_target(desc=desc)
 
     @staticmethod
-    def order_by_state(qs: BannerNotificationQuerySet, desc: bool) -> BannerNotificationQuerySet:
-        return qs.order_by_state(desc)
+    def order_by_state(qs: BannerNotificationQuerySet, *, desc: bool) -> BannerNotificationQuerySet:
+        return qs.order_by_state(desc=desc)

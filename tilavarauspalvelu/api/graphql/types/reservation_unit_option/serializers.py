@@ -25,7 +25,7 @@ class ReservationUnitOptionHandlerSerializer(NestingModelSerializer):
             "locked",
         ]
 
-    def validate_rejected(self, value: bool) -> bool:
+    def validate_rejected(self, value: bool) -> bool:  # noqa: FBT001
         if value and self.instance.allocated_time_slots.exists():
             msg = "Cannot reject a reservation unit option with allocations"
             raise ValidationError(msg)

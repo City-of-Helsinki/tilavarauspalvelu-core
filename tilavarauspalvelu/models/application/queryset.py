@@ -56,10 +56,10 @@ class ApplicationQuerySet(models.QuerySet):
     def order_by_status(self, *, desc: bool = False) -> Self:
         return self.order_by(models.OrderBy(L("status_sort_order"), descending=desc))
 
-    def order_by_applicant(self, desc: bool = False) -> Self:
+    def order_by_applicant(self, *, desc: bool = False) -> Self:
         return self.order_by(models.OrderBy(L("applicant"), descending=desc))
 
-    def order_by_applicant_type(self, desc: bool = False) -> Self:
+    def order_by_applicant_type(self, *, desc: bool = False) -> Self:
         return self.order_by(models.OrderBy(L("applicant_type_sort_order"), descending=desc))
 
     def _fetch_all(self) -> None:

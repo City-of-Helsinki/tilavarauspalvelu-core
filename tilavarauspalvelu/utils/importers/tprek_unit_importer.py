@@ -21,7 +21,7 @@ class TprekUnitImporter:
         self.updated_units_count = 0
         self.units_for_hauki_import = []
 
-    def update_unit_from_tprek(self, units: list[Unit] | QuerySet[Unit], force_update: bool = False) -> None:
+    def update_unit_from_tprek(self, units: list[Unit] | QuerySet[Unit], *, force_update: bool = False) -> None:
         """
         Get the data for each unit from TPREK API, and update the corresponding unit in the database
 

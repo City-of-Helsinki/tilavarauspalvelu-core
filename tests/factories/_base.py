@@ -274,7 +274,7 @@ class ForeignKeyFactory(SubFactory, Generic[TModel]):
     3. The 'required' argument on the factory is set to 'False' (default).
     """
 
-    def __init__(self, factory: FactoryType, required: bool = False, **kwargs: Any) -> None:
+    def __init__(self, factory: FactoryType, required: bool = False, **kwargs: Any) -> None:  # noqa: FBT002
         # Skip SubFactory.__init__ to replace its factory wrapper with ours
         self.required = required
         super(SubFactory, self).__init__(**kwargs)

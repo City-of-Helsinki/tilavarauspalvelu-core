@@ -18,4 +18,4 @@ class SuitableTimeRangeFilterSet(ModelFilterSet):
 
     @staticmethod
     def filter_by_fulfilled(qs: SuitableTimeRangeQuerySet, name: str, value: bool) -> QuerySet:
-        return qs.fulfilled(value)
+        return qs.fulfilled(value=value)

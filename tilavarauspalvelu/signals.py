@@ -43,6 +43,7 @@ def space_modify(instance: Space, *args: Any, **kwargs: Any) -> None:
 def reservation_create(
     sender: type[Reservation],  # noqa: ARG001
     instance: Reservation,
+    *,
     raw: bool = False,
     **kwargs,
 ) -> None:
@@ -74,6 +75,7 @@ def reservation_delete(sender: type[Reservation], **kwargs) -> None:  # noqa: AR
 def reservations_reservation_units_m2m(
     action: M2MAction,
     instance: Reservation,
+    *,
     reverse: bool = False,
     raw: bool = False,
     **kwargs: Any,
@@ -86,7 +88,7 @@ def reservations_reservation_units_m2m(
 
 
 @receiver(post_save, sender=ReservationUnit, dispatch_uid="reservation_unit_saved")
-def reservation_unit_saved(instance: ReservationUnit, created: bool, *args: Any, **kwargs: Any):
+def reservation_unit_saved(instance: ReservationUnit, *, created: bool, **kwargs: Any):
     if settings.UPDATE_PRODUCT_MAPPING:
         refresh_reservation_unit_product_mapping.delay(instance.pk)
 

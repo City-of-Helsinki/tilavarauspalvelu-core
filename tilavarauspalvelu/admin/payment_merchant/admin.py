@@ -80,7 +80,7 @@ class PaymentMerchantForm(forms.ModelForm):
             self.fields["paytrail_merchant_id"].required = False
             self.fields["paytrail_merchant_id"].widget.input_type = "hidden"
 
-    def save(self, commit=True):
+    def save(self, commit=True):  # noqa: FBT002
         instance: PaymentMerchant | None = self.instance
 
         if instance:

@@ -40,16 +40,16 @@ def test_reservation_unit__get_next_reservation():
 
     ReservationUnitHierarchy.refresh()
 
-    next_reservation = reservation_unit.actions.get_next_reservation(now)
+    next_reservation = reservation_unit.actions.get_next_reservation(end_time=now)
     assert next_reservation is not None
     assert next_reservation.name == reservation_blocked.name
 
     # Ignores given reservation
-    next_reservation = reservation_unit.actions.get_next_reservation(now, reservation=reservation_blocked)
+    next_reservation = reservation_unit.actions.get_next_reservation(end_time=now, reservation=reservation_blocked)
     assert next_reservation is not None
     assert next_reservation.name == reservation.name
 
     # Ignores blocked reservations
-    next_reservation = reservation_unit.actions.get_next_reservation(now, exclude_blocked=True)
+    next_reservation = reservation_unit.actions.get_next_reservation(end_time=now, exclude_blocked=True)
     assert next_reservation is not None
     assert next_reservation.name == reservation.name

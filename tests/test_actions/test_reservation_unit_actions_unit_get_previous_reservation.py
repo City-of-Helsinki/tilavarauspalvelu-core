@@ -35,16 +35,18 @@ def test_reservation_unit__get_previous_reservation():
 
     ReservationUnitHierarchy.refresh()
 
-    previous_reservation = reservation_unit.actions.get_previous_reservation(NOW)
+    previous_reservation = reservation_unit.actions.get_previous_reservation(start_time=NOW)
     assert previous_reservation is not None
     assert previous_reservation.name == reservation_blocked.name
 
     # Ignores given reservation
-    previous_reservation = reservation_unit.actions.get_previous_reservation(NOW, reservation=reservation_blocked)
+    previous_reservation = reservation_unit.actions.get_previous_reservation(
+        start_time=NOW, reservation=reservation_blocked
+    )
     assert previous_reservation is not None
     assert previous_reservation.name == reservation.name
 
     # Ignores blocked reservations
-    previous_reservation = reservation_unit.actions.get_previous_reservation(NOW, exclude_blocked=True)
+    previous_reservation = reservation_unit.actions.get_previous_reservation(start_time=NOW, exclude_blocked=True)
     assert previous_reservation is not None
     assert previous_reservation.name == reservation.name

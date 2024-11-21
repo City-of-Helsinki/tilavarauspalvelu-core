@@ -329,7 +329,7 @@ class ReservationBuilder(ModelFactoryBuilder[Reservation]):
         self.kwargs["reservee_is_unregistered_association"] = False
         return self
 
-    def for_nonprofit(self, unregistered: bool = False) -> Self:
+    def for_nonprofit(self, *, unregistered: bool = False) -> Self:
         self.kwargs["reservee_type"] = CustomerTypeChoice.NONPROFIT
         self.kwargs["reservee_organisation_name"] = ""
         self.kwargs["reservee_id"] = "" if unregistered else self.factory.reservee_id.generate()

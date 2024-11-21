@@ -44,7 +44,11 @@ RESTORE_MUTATION = build_mutation(
 )
 
 
-def get_application_create_data(application_round: ApplicationRound, create_sections: bool = False) -> dict[str, Any]:
+def get_application_create_data(
+    application_round: ApplicationRound,
+    *,
+    create_sections: bool = False,
+) -> dict[str, Any]:
     sections: list[dict[str, Any]] = []
     home_city = CityFactory.create()
 

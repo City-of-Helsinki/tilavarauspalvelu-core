@@ -61,7 +61,7 @@ class GeneralRoleAdmin(admin.ModelAdmin):
             )
         )
 
-    def save_model(self, request: WSGIRequest, obj: GeneralRole, form, change: bool) -> GeneralRole:
+    def save_model(self, request: WSGIRequest, obj: GeneralRole, form, change: bool) -> GeneralRole:  # noqa: FBT001
         obj.assigner = request.user
         return super().save_model(request, obj, form, change)
 

@@ -377,9 +377,9 @@ class ApplicationBuilder(ModelFactoryBuilder[Application]):
             case ApplicantTypeChoice.INDIVIDUAL:
                 return self.for_individual()
             case ApplicantTypeChoice.ASSOCIATION:
-                return self.for_association()
+                return self.for_association(unregistered=False)
             case ApplicantTypeChoice.COMMUNITY:
-                return self.for_community()
+                return self.for_community(unregistered=False)
             case ApplicantTypeChoice.COMPANY:
                 return self.for_company()
 
@@ -389,14 +389,14 @@ class ApplicationBuilder(ModelFactoryBuilder[Application]):
         self.kwargs["home_city"] = None
         return self
 
-    def for_association(self, unregistered: bool = False) -> Self:
+    def for_association(self, unregistered: bool) -> Self:
         from .organisation import OrganisationFactory
 
         self.kwargs["applicant_type"] = ApplicantTypeChoice.ASSOCIATION
         self.kwargs["organisation__identifier"] = None if unregistered else OrganisationFactory.identifier.generate()
         return self
 
-    def for_community(self, unregistered: bool = False) -> Self:
+    def for_community(self, unregistered: bool) -> Self:
         from .organisation import OrganisationFactory
 
         self.kwargs["applicant_type"] = ApplicantTypeChoice.COMMUNITY
