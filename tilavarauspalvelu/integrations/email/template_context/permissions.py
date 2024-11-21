@@ -24,7 +24,7 @@ __all__ = [
 
 @get_translated
 def get_context_for_permission_deactivation(*, language: Lang) -> EmailContext:
-    link = get_staff_login_link(language=language)
+    link = get_staff_login_link()
     link_tag = create_anchor_tag(link=link)
 
     return {
@@ -36,7 +36,7 @@ def get_context_for_permission_deactivation(*, language: Lang) -> EmailContext:
         "text_login_to_prevent": pgettext("Email", "Log in to the service at"),
         "login_url": link,
         "login_url_html": link_tag,
-        **get_contex_for_base_template(language=language),
+        **get_contex_for_base_template(),
         **get_contex_for_closing(language=language),
     }
 
@@ -60,6 +60,6 @@ def get_context_for_user_anonymization(*, language: Lang) -> EmailContext:
         ),
         "login_url": link,
         "login_url_html": link_tag,
-        **get_contex_for_base_template(language=language),
+        **get_contex_for_base_template(),
         **get_contex_for_closing(language=language),
     }

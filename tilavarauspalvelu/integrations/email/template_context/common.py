@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 # --- Partials -----------------------------------------------------------------------------------------------------
 
 
-def get_contex_for_base_template(email_recipient_name: str | None = None, *, language: Lang) -> EmailContext:
+def get_contex_for_base_template(*, email_recipient_name: str | None = None) -> EmailContext:
     return {
         "service_name": pgettext("Email", "Varaamo"),
         "current_year": str(local_datetime().year),
@@ -47,7 +47,7 @@ def get_contex_for_closing_polite(*, language: Lang) -> EmailContext:
     }
 
 
-def get_contex_for_closing_staff(*, language: Lang) -> EmailContext:
+def get_contex_for_closing_staff() -> EmailContext:
     return {
         "with_regards": pgettext("Email", "Kind regards"),
         "service_name": pgettext("Email", "Varaamo"),
@@ -79,13 +79,12 @@ def get_contex_for_automatic_message(*, language: Lang) -> EmailContext:
 
 
 def get_contex_for_reservation_basic_info(
+    *,
     reservation_unit_name: str,
     unit_name: str,
     unit_location: str,
     begin_datetime: datetime.datetime,
     end_datetime: datetime.datetime,
-    *,
-    language: Lang,
 ) -> EmailContext:
     return {
         "reservation_unit_name": reservation_unit_name,
@@ -118,13 +117,7 @@ def get_contex_for_reservation_manage_link(*, language: Lang) -> EmailContext:
     }
 
 
-def get_contex_for_reservation_price(
-    price: Decimal,
-    tax_percentage: Decimal,
-    booking_number: int,
-    *,
-    language: Lang,
-) -> EmailContext:
+def get_contex_for_reservation_price(*, price: Decimal, tax_percentage: Decimal, booking_number: int) -> EmailContext:
     return {
         "price_label": pgettext("Email", "Price"),
         "price": price,
@@ -136,13 +129,12 @@ def get_contex_for_reservation_price(
 
 
 def get_contex_for_reservation_price_range(
+    *,
     price: Decimal,
     subsidised_price: Decimal,
     tax_percentage: Decimal,
     booking_number: int,
     applying_for_free_of_charge: bool,
-    *,
-    language: Lang,
 ) -> EmailContext:
     return {
         "price_label": pgettext("Email", "Price"),
@@ -159,11 +151,7 @@ def get_contex_for_reservation_price_range(
 # --- Params for contexts ------------------------------------------------------------------------------------------
 
 
-def params_for_base_info(
-    reservation: Reservation,
-    *,
-    language: Lang,
-) -> dict[str, Any]:
+def params_for_base_info(*, reservation: Reservation, language: Lang) -> dict[str, Any]:
     # Currently, there is ever only one reservation unit per reservation.
     primary: ReservationUnit = reservation.reservation_units.select_related("unit__location").first()
 
@@ -176,7 +164,7 @@ def params_for_base_info(
     }
 
 
-def params_for_price_info(reservation: Reservation, *, language: Lang) -> dict[str, Any]:
+def params_for_price_info(*, reservation: Reservation) -> dict[str, Any]:
     return {
         "price": reservation.price,
         "tax_percentage": reservation.tax_percentage_value,
@@ -184,7 +172,7 @@ def params_for_price_info(reservation: Reservation, *, language: Lang) -> dict[s
     }
 
 
-def params_for_price_range_info(reservation: Reservation, *, language: Lang) -> dict[str, Any]:
+def params_for_price_range_info(*, reservation: Reservation) -> dict[str, Any]:
     begin_datetime = reservation.begin.astimezone(DEFAULT_TIMEZONE)
     end_datetime = reservation.end.astimezone(DEFAULT_TIMEZONE)
 
@@ -223,19 +211,12 @@ def get_my_reservations_ext_link(*, language: Lang) -> str:
     return f"{url_base}/reservations"
 
 
-def get_staff_login_link(
-    *,
-    language: Lang,
-) -> str:
+def get_staff_login_link() -> str:
     url_base = settings.EMAIL_VARAAMO_EXT_LINK.removesuffix("/")
     return f"{url_base}/kasittely"
 
 
-def get_staff_reservations_ext_link(
-    booking_number,
-    *,
-    language: Lang,
-) -> str:
+def get_staff_reservations_ext_link(*, booking_number) -> str:
     url_base = settings.EMAIL_VARAAMO_EXT_LINK.removesuffix("/")
     return f"{url_base}/kasittely/reservations/{booking_number}"
 
@@ -245,7 +226,7 @@ def get_feedback_ext_link(*, language: Lang) -> str:
     return update_query_params(url=url_base, lang=language)
 
 
-def create_anchor_tag(link: str, text: str | None = None) -> str:
+def create_anchor_tag(*, link: str, text: str | None = None) -> str:
     if text is None:
         text = link
     return f'<a href="{link}">{text}</a>'

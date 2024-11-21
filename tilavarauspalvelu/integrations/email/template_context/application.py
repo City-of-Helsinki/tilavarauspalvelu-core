@@ -35,7 +35,7 @@ def get_context_for_application_handled(*, language: Lang) -> EmailContext:
         "text_application_handled": pgettext("Email", "Your application has been processed"),
         "text_view_application_html": text_view_application % {"page": create_anchor_tag(link=link, text=text)},
         "text_view_application": text_view_application % {"page": f"{text}: {link}"},
-        **get_contex_for_base_template(language=language),
+        **get_contex_for_base_template(),
         **get_contex_for_closing_polite(language=language),
     }
 
@@ -57,7 +57,7 @@ def get_context_for_application_in_allocation(*, language: Lang) -> EmailContext
         ),
         "text_view_application_html": text_view_application % {"page": create_anchor_tag(link=link, text=text)},
         "text_view_application": text_view_application % {"page": f"{text}: {link}"},
-        **get_contex_for_base_template(language=language),
+        **get_contex_for_base_template(),
         **get_contex_for_closing_polite(language=language),
     }
 
@@ -77,6 +77,6 @@ def get_context_for_application_received(*, language: Lang) -> EmailContext:
         "text_application_received": pgettext("Email", "Thank you for your application"),
         "text_view_application_html": text_view_application % {"page": create_anchor_tag(link=link, text=text)},
         "text_view_application": text_view_application % {"page": text} + f": {link}",
-        **get_contex_for_base_template(language=language),
+        **get_contex_for_base_template(),
         **get_contex_for_closing_polite(language=language),
     }
