@@ -52,7 +52,7 @@ class ExtraKwargs(TypedDict):
 
 
 def fetch_additional_info_for_user_from_helsinki_profile(
-    backend: TunnistamoOIDCAuth,
+    backend: TunnistamoOIDCAuth,  # noqa: ARG001
     request: WSGIRequest,
     response: OIDCResponse,
     user: User | None = None,
@@ -107,7 +107,7 @@ def update_user_from_profile(request: WSGIRequest, *, user: User | None = None) 
 
 
 def migrate_user_from_tunnistamo_to_keycloak(
-    backend: TunnistamoOIDCAuth,
+    backend: TunnistamoOIDCAuth,  # noqa: ARG001
     request: WSGIRequest,
     response: OIDCResponse,
     user: User | None = None,

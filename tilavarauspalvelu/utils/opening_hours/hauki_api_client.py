@@ -196,7 +196,7 @@ class HaukiAPIClient(BaseExternalServiceClient):
         return f"{hauki_api_url_base}/v1/{endpoint}/"
 
     @classmethod
-    def _get_mutate_headers(cls, headers: dict[str, Any] | None) -> dict[str, Any]:
+    def _get_mutate_headers(cls, headers: dict[str, Any] | None) -> dict[str, Any]:  # noqa: ARG003
         """Add the API key to POST and PUT request headers."""
         if not settings.HAUKI_API_KEY:
             msg = "HAUKI_API_KEY environment variable must to be configured."

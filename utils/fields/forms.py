@@ -120,7 +120,7 @@ def convert_lookup_field(field: LookupPropertyField, registry: Registry | None =
             return None
 
         class CustomField(graphene.Field):
-            def wrap_resolve(self, parent_resolver: Any) -> Any:
+            def wrap_resolve(self, parent_resolver: Any) -> Any:  # noqa: ARG002
                 def custom_resolver(root: models.Model, info: GQLInfo):
                     return field.target_property.__get__(root, type(root))
 
