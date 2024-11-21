@@ -56,7 +56,7 @@ class LivenessProbe(bootsteps.StartStopStep):
             priority=10,  # Run before other tasks.
         )
 
-    def stop(self, worker: WorkController) -> None:
+    def stop(self, worker: WorkController) -> None:  # noqa: ARG002
         """Called when the worker shuts down."""
         # Cancel the timer.
         if self.schedule_entry is not None:

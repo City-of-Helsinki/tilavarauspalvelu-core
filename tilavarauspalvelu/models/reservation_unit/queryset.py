@@ -131,5 +131,5 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
 
 
 class ReservationUnitManager(SearchDocumentManagerMixin.from_queryset(ReservationUnitQuerySet)):
-    def get_search_queryset(self, index: str = "_all") -> models.QuerySet:
+    def get_search_queryset(self, index: str = "_all") -> models.QuerySet:  # noqa: ARG002
         return self.get_queryset()

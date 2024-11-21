@@ -100,7 +100,7 @@ lint.preview = true
 lint.select = [
     "A",        # flake8-builtins
     #"ANN",     # flake8-annotations  # TODO: Enable this and fix (401) issues
-    #"ARG",     # flake8-unused-arguments # TODO: Enable this and fix (353) issues
+    "ARG",      # flake8-unused-arguments
     "B",        # flake8-bugbear
     #"BLE",     # flake8-blind-except  # TODO: Enable this and fix (7) issues
     "C4",       # flake8-comprehensions
@@ -198,6 +198,7 @@ lint.ignore = [
     "PLR2004",  # magic-value-comparison
     "PLW2901",  # redefined-loop-name
 ]
+lint.dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$|^args$|^kwargs$|^info$|^sender$|^name$|^optimizer|^obj$|^options$|^model_admin$|^request$|^user|^view$|^input_data$|^filters$"
 
 [tool.ruff.lint.extend-per-file-ignores]
 "local_settings*.py" = [
@@ -220,6 +221,7 @@ lint.ignore = [
     "ERA001",   # Commented code is fine here.
 ]
 "test_*.py" = [
+    "ARG",      # Allow unused arguments in tests (These are usually fixtures)
     "ANN",      # No need to annotate tests
     "S101",     # Obviousle asserts are fine in tests
     "S105",     # Hardcoded passwords are fine in tests
@@ -232,6 +234,7 @@ lint.ignore = [
     "N806",     # Allow whatever variable names in tests
 ]
 "*tests/*.py" = [
+    "ARG",      # Allow unused arguments in tests (These are usually fixtures)
     "ANN",      # No need to annotate tests
     "N801",     # Allow whatever class names in tests
     "N802",     # Allow whatever function names in tests

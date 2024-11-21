@@ -88,7 +88,7 @@ class InRange(models.Lookup):  # pragma: no cover
     lookup_name = "in_range"
     prepare_rhs = False
 
-    def get_db_prep_lookup(self, value: range, connection) -> tuple[str, list[int]]:
+    def get_db_prep_lookup(self, value: range, connection) -> tuple[str, list[int]]:  # noqa: ARG002
         return "%s, %s, %s", [value.start, value.stop, value.step]
 
     def as_sql(self, compiler, connection) -> tuple[str, list]:
