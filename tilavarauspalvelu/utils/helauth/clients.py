@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any
 from django.conf import settings
 from django.utils.functional import classproperty
 from graphene_django_extensions.utils import get_nested
-from requests import HTTPError, Response
+from requests import HTTPError
 from social_django.models import DjangoStorage
 from social_django.strategy import DjangoStrategy
 
@@ -20,6 +20,8 @@ from utils.external_service.errors import ExternalServiceError, ExternalServiceR
 from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
+    from requests import Response
+
     from tilavarauspalvelu.typing import AnyUser, SessionMapping
     from tilavarauspalvelu.utils.helauth.typing import (
         BirthdayInfo,

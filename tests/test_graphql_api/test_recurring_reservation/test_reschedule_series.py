@@ -1,15 +1,19 @@
 import datetime
+from typing import TYPE_CHECKING
 
 import pytest
 from freezegun import freeze_time
 
 from tests.factories import RecurringReservationFactory, ReservationFactory
 from tilavarauspalvelu.enums import ReservationStateChoice, WeekdayChoice
-from tilavarauspalvelu.models import AffectingTimeSpan, Reservation, ReservationStatistic, ReservationUnitHierarchy
+from tilavarauspalvelu.models import AffectingTimeSpan, ReservationStatistic, ReservationUnitHierarchy
 from tilavarauspalvelu.tasks import create_or_update_reservation_statistics
 from utils.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_datetime, local_time
 
 from .helpers import RESCHEDULE_SERIES_MUTATION, create_reservation_series, get_minimal_reschedule_data
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import Reservation
 
 # Applied to all tests
 pytestmark = [

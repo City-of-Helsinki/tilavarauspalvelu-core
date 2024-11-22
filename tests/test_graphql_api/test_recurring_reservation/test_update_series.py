@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING
+
 import pytest
 
 from tests.factories import (
@@ -8,9 +10,12 @@ from tests.factories import (
     ReservationPurposeFactory,
 )
 from tilavarauspalvelu.enums import CustomerTypeChoice
-from tilavarauspalvelu.models import Reservation, ReservationStatistic
+from tilavarauspalvelu.models import ReservationStatistic
 
 from .helpers import UPDATE_SERIES_MUTATION
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import Reservation
 
 # Applied to all tests
 pytestmark = [

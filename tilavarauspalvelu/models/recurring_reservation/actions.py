@@ -5,22 +5,8 @@ import datetime
 from itertools import chain
 from typing import TYPE_CHECKING, Any, TypedDict
 
-from tilavarauspalvelu.enums import (
-    CustomerTypeChoice,
-    RejectionReadinessChoice,
-    ReservationStateChoice,
-    ReservationTypeChoice,
-    ReservationTypeStaffChoice,
-)
-from tilavarauspalvelu.models import (
-    AffectingTimeSpan,
-    AgeGroup,
-    RecurringReservation,
-    RejectedOccurrence,
-    ReservableTimeSpan,
-    Reservation,
-    ReservationPurpose,
-)
+from tilavarauspalvelu.enums import RejectionReadinessChoice
+from tilavarauspalvelu.models import AffectingTimeSpan, RejectedOccurrence, Reservation
 from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
 from utils.date_utils import DEFAULT_TIMEZONE, combine, get_periods_between
 
@@ -29,7 +15,20 @@ if TYPE_CHECKING:
 
     from django.db import models
 
-    from tilavarauspalvelu.models import City, User
+    from tilavarauspalvelu.enums import (
+        CustomerTypeChoice,
+        ReservationStateChoice,
+        ReservationTypeChoice,
+        ReservationTypeStaffChoice,
+    )
+    from tilavarauspalvelu.models import (
+        AgeGroup,
+        City,
+        RecurringReservation,
+        ReservableTimeSpan,
+        ReservationPurpose,
+        User,
+    )
 
 
 class ReservationPeriod(TypedDict):

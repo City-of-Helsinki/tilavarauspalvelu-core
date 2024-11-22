@@ -7,9 +7,8 @@ from django.contrib.auth import user_logged_in
 from django.db.models.signals import m2m_changed, post_delete, post_save, pre_save
 from django.dispatch import receiver
 
-from tilavarauspalvelu.models import Purpose, Reservation, ReservationUnit, ReservationUnitImage, Space, User
+from tilavarauspalvelu.models import Purpose, Reservation, ReservationUnit, ReservationUnitImage, Space
 from tilavarauspalvelu.tasks import (
-    Action,
     create_or_update_reservation_statistics,
     create_reservation_unit_thumbnails_and_urls,
     refresh_reservation_unit_product_mapping,
@@ -20,6 +19,8 @@ from utils.date_utils import local_datetime
 from utils.image_cache import purge_previous_image_cache
 
 if TYPE_CHECKING:
+    from tilavarauspalvelu.models import User
+    from tilavarauspalvelu.tasks import Action
     from tilavarauspalvelu.typing import M2MAction
 
 

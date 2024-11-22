@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import date, timedelta
+from datetime import timedelta
 from functools import cached_property
 from typing import TYPE_CHECKING
 
@@ -18,6 +18,8 @@ from utils.db import NowTT, SubqueryCount
 from .queryset import ApplicationSectionManager
 
 if TYPE_CHECKING:
+    from datetime import date
+
     from tilavarauspalvelu.models import AgeGroup, Application, ReservationPurpose
 
     from .actions import ApplicationSectionActions

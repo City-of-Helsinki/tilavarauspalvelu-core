@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from django.db import transaction
@@ -18,18 +18,15 @@ from tilavarauspalvelu.enums import (
     ReservationTypeStaffChoice,
     WeekdayChoice,
 )
-from tilavarauspalvelu.models import (
-    RecurringReservation,
-    Reservation,
-    ReservationDenyReason,
-    ReservationStatistic,
-    ReservationUnit,
-)
+from tilavarauspalvelu.models import RecurringReservation, Reservation, ReservationDenyReason, ReservationStatistic
 from tilavarauspalvelu.models.recurring_reservation.actions import ReservationDetails
 from tilavarauspalvelu.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task
 from tilavarauspalvelu.utils.opening_hours.reservable_time_span_client import ReservableTimeSpanClient
 from utils.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_datetime
 from utils.fields.serializer import CurrentUserDefaultNullable, input_only_field
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import ReservationUnit
 
 __all__ = [
     "ReservationSeriesCreateSerializer",

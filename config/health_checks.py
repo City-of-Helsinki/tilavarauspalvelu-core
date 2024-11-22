@@ -1,10 +1,14 @@
 import logging
+from typing import TYPE_CHECKING
 
 from django.conf import settings
-from django_redis.pool import SentinelConnectionFactory, get_connection_factory
+from django_redis.pool import get_connection_factory
 from health_check.backends import BaseHealthCheckBackend
 from health_check.exceptions import ServiceUnavailable
 from redis import exceptions
+
+if TYPE_CHECKING:
+    from django_redis.pool import SentinelConnectionFactory
 
 logger = logging.getLogger(__name__)
 

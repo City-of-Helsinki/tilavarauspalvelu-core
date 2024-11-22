@@ -5,13 +5,14 @@ from typing import TYPE_CHECKING, Self
 from django.db import models
 from lookup_property import L
 
-from utils.date_utils import TimeSlot, merge_time_slots
+from utils.date_utils import merge_time_slots
 
 if TYPE_CHECKING:
     import datetime
 
     from tilavarauspalvelu.enums import Weekday
     from tilavarauspalvelu.models import ApplicationSection
+    from utils.date_utils import TimeSlot
 
 
 __all__ = [
