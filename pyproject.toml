@@ -150,7 +150,10 @@ lint.select = [
 ]
 # Preview rules
 lint.extend-select = [
+    "A006",     # builtin-lambda-argument-shadowing
+    "B901",     # return-in-generator
     "B909",     # loop-iterator-mutation
+    "C420",     # unnecessary-dict-comprehension-for-iterable
     "FURB110",  # if-exp-instead-of-or-operator
     "FURB113",  # repeated-append
     "FURB118",  # reimplemented-operator
