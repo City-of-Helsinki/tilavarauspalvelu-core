@@ -157,6 +157,14 @@ lint.extend-select = [
     "FURB171",  # single-item-membership-test
     "PLR1733",  # unnecessary-dict-index-lookup
     "PLR6104",  # non-augmented-assignment
+    "RUF027",   # missing-f-string-syntax
+    "RUF028",   # invalid-formatter-suppression-comment
+    "RUF031",   # incorrectly-parenthesized-tuple-in-subscript
+    "RUF032",   # decimal-from-float-literal
+    "RUF033",   # post-init-default
+    "RUF034",   # useless-if-else
+    "RUF035",   # unsafe-markup-use
+    "RUF036",   # none-not-at-end-of-union
     "UP042",    # replace-str-enum
 ]
 lint.ignore = [

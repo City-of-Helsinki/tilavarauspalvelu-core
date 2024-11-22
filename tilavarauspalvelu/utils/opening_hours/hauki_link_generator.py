@@ -9,7 +9,7 @@ from django.conf import settings
 from utils.date_utils import local_datetime
 
 
-def generate_hauki_link(reservation_unit_uuid: uuid.UUID | str, username: str, organization_id: str) -> None | str:
+def generate_hauki_link(reservation_unit_uuid: uuid.UUID | str, username: str, organization_id: str) -> str | None:
     if not (
         settings.HAUKI_ADMIN_UI_URL
         and settings.HAUKI_SECRET
