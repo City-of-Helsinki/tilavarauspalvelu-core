@@ -1,6 +1,5 @@
 import datetime
 from typing import TYPE_CHECKING
-from unittest import mock
 
 import pytest
 
@@ -13,14 +12,11 @@ from tests.factories import (
 )
 from tests.factories.application import ApplicationBuilder
 from tests.factories.application_section import ApplicationSectionBuilder
+from tests.test_csv_exporters.helpers import mock_csv_writer
 from tilavarauspalvelu.enums import Weekday
-from tilavarauspalvelu.utils.exporter.application_round_result_exporter import (
-    ApplicationRoundResultCSVExporter,
-    ApplicationSectionExportRow,
-)
+from tilavarauspalvelu.services.csv_export import ApplicationRoundResultCSVExporter
+from tilavarauspalvelu.services.csv_export.application_round_result_exporter import ApplicationSectionExportRow
 from utils.date_utils import local_date_string, local_timedelta_string
-
-from .helpers import get_writes
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import AllocatedTimeSlot, ApplicationSection
@@ -29,8 +25,6 @@ if TYPE_CHECKING:
 pytestmark = [
     pytest.mark.django_db,
 ]
-
-CSV_WRITER_MOCK_PATH = "tilavarauspalvelu.utils.exporter.application_round_result_exporter.csv.writer"
 
 
 def test_application_round_results_export__single_application__all_fields(graphql):
@@ -49,32 +43,34 @@ def test_application_round_results_export__single_application__all_fields(graphq
     allocation: AllocatedTimeSlot = section.reservation_unit_options.first().allocated_time_slots.first()
 
     exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round.id)
-    with mock.patch(CSV_WRITER_MOCK_PATH) as mock_writer:
-        exporter.export()
+    with mock_csv_writer() as mock_writer:
+        exporter.write()
 
-    writes = get_writes(mock_writer)
+    writes = mock_writer.get_writes()
     assert len(writes) == 2
 
-    header_rows = exporter._get_header_rows()
-    assert writes[0] == header_rows
-    assert writes[1] == ApplicationSectionExportRow(
-        application_id=str(application.id),
-        application_status=application.status.value,
-        applicant=application.organisation.name,
-        section_id=str(section.id),
-        section_status=section.status.value,
-        section_name=section.name,
-        reservations_begin_date=local_date_string(section.reservations_begin_date),
-        reservations_end_date=local_date_string(section.reservations_end_date),
-        applied_reservations_per_week=str(section.applied_reservations_per_week),
-        reservation_min_duration=local_timedelta_string(section.reservation_min_duration),
-        reservation_max_duration=local_timedelta_string(section.reservation_max_duration),
-        reservation_unit_name="foo",
-        unit_name="fizz",
-        day_of_the_week=allocation.day_of_the_week,
-        begin_time="12:00",
-        end_time="14:00",
-        price="",
+    header_rows = [list(row.as_row()) for row in exporter.get_header_rows()]
+    assert writes[0] == header_rows[0]
+    assert writes[1] == list(
+        ApplicationSectionExportRow(
+            application_id=str(application.id),
+            application_status=application.status.value,
+            applicant=application.organisation.name,
+            section_id=str(section.id),
+            section_status=section.status.value,
+            section_name=section.name,
+            reservations_begin_date=local_date_string(section.reservations_begin_date),
+            reservations_end_date=local_date_string(section.reservations_end_date),
+            applied_reservations_per_week=str(section.applied_reservations_per_week),
+            reservation_min_duration=local_timedelta_string(section.reservation_min_duration),
+            reservation_max_duration=local_timedelta_string(section.reservation_max_duration),
+            reservation_unit_name="foo",
+            unit_name="fizz",
+            day_of_the_week=allocation.day_of_the_week,
+            begin_time="12:00",
+            end_time="14:00",
+            price="",
+        ).as_row()
     )
 
 
@@ -85,7 +81,7 @@ def test_application_round_results_export__no_suitable_time_ranges(graphql):
     )
 
     exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round.id)
-    assert exporter.export() is None
+    assert exporter.write()
 
 
 def test_application_round_results_export__application_status_is_expired(graphql):
@@ -96,7 +92,11 @@ def test_application_round_results_export__application_status_is_expired(graphql
     )
 
     exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round.id)
-    assert exporter.export() is None
+    with mock_csv_writer() as mock_writer:
+        exporter.write()
+
+    writes = mock_writer.get_writes()
+    assert len(writes) == 1  # Just the header
 
 
 def test_application_round_results_export__application_status_is_draft(graphql):
@@ -107,7 +107,11 @@ def test_application_round_results_export__application_status_is_draft(graphql):
     )
 
     exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round.id)
-    assert exporter.export() is None
+    with mock_csv_writer() as mock_writer:
+        exporter.write()
+
+    writes = mock_writer.get_writes()
+    assert len(writes) == 1  # Just the header
 
 
 def test_application_round_results_export__section_has_no_allocated_time_slots(graphql):
@@ -125,13 +129,13 @@ def test_application_round_results_export__section_has_no_allocated_time_slots(g
     )
 
     exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round.id)
-    with mock.patch(CSV_WRITER_MOCK_PATH) as mock_writer:
-        exporter.export()
+    with mock_csv_writer() as mock_writer:
+        exporter.write()
 
-    writes = get_writes(mock_writer)
+    writes = mock_writer.get_writes()
     assert len(writes) == 2
 
-    section_row: ApplicationSectionExportRow = writes[1]  # type: ignore
+    section_row = ApplicationSectionExportRow(*writes[1])
     assert section_row.section_id == str(section.id)
     assert section_row.reservation_unit_name == ""
     assert section_row.day_of_the_week == ""
@@ -167,15 +171,15 @@ def test_application_round_results_export__reservation_unit_option_ordering(grap
     )
 
     exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round.id)
-    with mock.patch(CSV_WRITER_MOCK_PATH) as mock_writer:
-        exporter.export()
+    with mock_csv_writer() as mock_writer:
+        exporter.write()
 
-    writes = get_writes(mock_writer)
+    writes = mock_writer.get_writes()
     assert len(writes) == 4
 
-    assert writes[1].reservation_unit_name == "one"  # type: ignore
-    assert writes[2].reservation_unit_name == "two"  # type: ignore
-    assert writes[3].reservation_unit_name == "three"  # type: ignore
+    assert ApplicationSectionExportRow(*writes[1]).reservation_unit_name == "one"  # type: ignore
+    assert ApplicationSectionExportRow(*writes[2]).reservation_unit_name == "two"  # type: ignore
+    assert ApplicationSectionExportRow(*writes[3]).reservation_unit_name == "three"  # type: ignore
 
 
 def test_application_round_results_export__allocated_slot_ordering(graphql):
@@ -213,29 +217,29 @@ def test_application_round_results_export__allocated_slot_ordering(graphql):
     )
 
     exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round.id)
-    with mock.patch(CSV_WRITER_MOCK_PATH) as mock_writer:
-        exporter.export()
+    with mock_csv_writer() as mock_writer:
+        exporter.write()
 
-    writes = get_writes(mock_writer)
+    writes = mock_writer.get_writes()
     assert len(writes) == 4
 
-    section_row: ApplicationSectionExportRow = writes[1]  # type: ignore
-    assert section_row.section_id == str(section.id)
-    assert section_row.reservation_unit_name == "foo"
-    assert section_row.day_of_the_week == Weekday.WEDNESDAY
-    assert section_row.begin_time == "12:00"
-    assert section_row.end_time == "14:00"
+    section_row_1 = ApplicationSectionExportRow(*writes[1])
+    assert section_row_1.section_id == str(section.id)
+    assert section_row_1.reservation_unit_name == "foo"
+    assert section_row_1.day_of_the_week == Weekday.WEDNESDAY
+    assert section_row_1.begin_time == "12:00"
+    assert section_row_1.end_time == "14:00"
 
-    section_row: ApplicationSectionExportRow = writes[2]  # type: ignore
-    assert section_row.section_id == str(section.id)
-    assert section_row.reservation_unit_name == "foo"
-    assert section_row.day_of_the_week == Weekday.WEDNESDAY
-    assert section_row.begin_time == "18:00"
-    assert section_row.end_time == "20:00"
+    section_row_2 = ApplicationSectionExportRow(*writes[2])
+    assert section_row_2.section_id == str(section.id)
+    assert section_row_2.reservation_unit_name == "foo"
+    assert section_row_2.day_of_the_week == Weekday.WEDNESDAY
+    assert section_row_2.begin_time == "18:00"
+    assert section_row_2.end_time == "20:00"
 
-    section_row: ApplicationSectionExportRow = writes[3]  # type: ignore
-    assert section_row.section_id == str(section.id)
-    assert section_row.reservation_unit_name == "foo"
-    assert section_row.day_of_the_week == Weekday.FRIDAY
-    assert section_row.begin_time == "10:00"
-    assert section_row.end_time == "12:00"
+    section_row_3 = ApplicationSectionExportRow(*writes[3])
+    assert section_row_3.section_id == str(section.id)
+    assert section_row_3.reservation_unit_name == "foo"
+    assert section_row_3.day_of_the_week == Weekday.FRIDAY
+    assert section_row_3.begin_time == "10:00"
+    assert section_row_3.end_time == "12:00"

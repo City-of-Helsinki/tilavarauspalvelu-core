@@ -15,9 +15,11 @@ from tilavarauspalvelu.admin.reservation_unit_image.admin import ReservationUnit
 from tilavarauspalvelu.admin.reservation_unit_pricing.admin import ReservationUnitPricingInline
 from tilavarauspalvelu.enums import ReservationKind
 from tilavarauspalvelu.models import ReservationUnit
+from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
+from tilavarauspalvelu.services.csv_export import ReservationUnitExporter
 from tilavarauspalvelu.typing import WSGIRequest
 from tilavarauspalvelu.utils.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
-from tilavarauspalvelu.utils.reservation_units.export_data import ReservationUnitExporter
+from utils.sentry import SentryLogger
 
 from .form import ReservationUnitAdminForm
 
@@ -226,19 +228,16 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
         return queryset, may_have_duplicates
 
     @admin.action(description="Export selected reservation units to CSV")
-    def export_to_csv(self, request, queryset):
+    def export_to_csv(self, request: WSGIRequest, queryset: ReservationUnitQuerySet) -> FileResponse | None:
         try:
-            path = ReservationUnitExporter.export_reservation_unit_data(queryset=queryset)
-        except Exception as e:
-            self.message_user(
-                request,
-                f"Error while exporting reservation units: {e}",
-                level=messages.ERROR,
-            )
-        else:
-            # Filehandler needs to be left open for Django to be able to stream the file
-            # Should fix the exporter to use an in-memory stream instead of writing to a file.
-            return FileResponse(open(path, "rb"))
+            exporter = ReservationUnitExporter(queryset=queryset)
+            response = exporter.to_file_response()
+        except Exception as error:
+            self.message_user(request, f"Error while exporting results: {error}", level=messages.ERROR)
+            SentryLogger.log_exception(error, "Error while exporting ReservationUnits")
+            return None
+
+        return response
 
     def save_model(self, request, obj, form, change) -> None:
         super().save_model(request, obj, form, change)

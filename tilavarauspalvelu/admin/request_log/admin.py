@@ -13,8 +13,8 @@ from tilavarauspalvelu.admin.helpers import ImmutableModelAdmin
 from tilavarauspalvelu.admin.sql_log.admin import SQLLogAdminInline
 from tilavarauspalvelu.models.request_log.model import RequestLog
 from tilavarauspalvelu.models.request_log.queryset import RequestLogQuerySet
+from tilavarauspalvelu.services.csv_export import SQLLogCSVExporter
 from tilavarauspalvelu.typing import WSGIRequest
-from tilavarauspalvelu.utils.exporter.sql_log_exporter import SQLLogCSVExporter
 from utils.sentry import SentryLogger
 
 
@@ -109,7 +109,7 @@ class RequestLogAdmin(ImmutableModelAdmin):
         """
         return mark_safe(val)  # noqa: S308  # nosec  # NOSONAR
 
-    def get_queryset(self, request: WSGIRequest) -> RequestLogQuerySet:
+    def get_queryset(self, request: WSGIRequest) -> models.QuerySet:
         return (
             super()
             .get_queryset(request)
@@ -122,15 +122,12 @@ class RequestLogAdmin(ImmutableModelAdmin):
 
     @admin.action(description=_("Export rows to CSV"))
     def export_results_to_csv(self, request: WSGIRequest, queryset: RequestLogQuerySet) -> FileResponse | None:
-        exporter = SQLLogCSVExporter(queryset=queryset)
         try:
-            response = exporter.export_as_file_response()
-        except Exception as err:
-            self.message_user(request, f"Error while exporting results: {err}", level=messages.ERROR)
-            SentryLogger.log_exception(err, "Error while exporting SQL log results")
+            exporter = SQLLogCSVExporter(queryset=queryset)
+            response = exporter.to_file_response()
+        except Exception as error:
+            self.message_user(request, f"Error while exporting results: {error}", level=messages.ERROR)
+            SentryLogger.log_exception(error, "Error while exporting SQL log results")
             return None
-
-        if not response:
-            self.message_user(request, "No data to export.", level=messages.WARNING)
 
         return response

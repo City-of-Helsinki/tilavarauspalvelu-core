@@ -1,17 +1,18 @@
 import itertools
 from datetime import datetime
 from decimal import Decimal
-from unittest import mock
 
 import pytest
 from django.utils import timezone
 from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tests.factories import ReservationUnitFactory
+from tilavarauspalvelu.enums import AuthenticationType, ReservationKind, ReservationStartInterval
 from tilavarauspalvelu.models import ReservationUnit
-from tilavarauspalvelu.utils.reservation_units.export_data import HEADER_ROW, ReservationUnitExporter
+from tilavarauspalvelu.services.csv_export import ReservationUnitExporter
+from utils.date_utils import local_datetime_string, local_timedelta_string
 
-from .helpers import Missing, MissingParams, get_writes
+from .helpers import Missing, MissingParams, mock_csv_writer
 
 # Applied to all tests
 pytestmark = [
@@ -45,17 +46,18 @@ def test_reservation_unit_export_multiple():
 
     # when:
     # - The exporter is run for all reservation units
-    open_mock = mock.patch("tilavarauspalvelu.utils.reservation_units.export_data.open", new=mock.mock_open())
-    csv_writer_mock = mock.patch("tilavarauspalvelu.utils.reservation_units.export_data.csv.writer")
-    with open_mock, csv_writer_mock as mock_file:
-        ReservationUnitExporter.export_reservation_unit_data()
+    exporter = ReservationUnitExporter()
+    with mock_csv_writer() as mock_writer:
+        exporter.write()
 
     # then:
     # - the writes contain the expected data
-    writes = get_writes(mock_file)
+    writes = mock_writer.get_writes()
 
     assert len(writes) == 3, writes
-    assert writes[0] == HEADER_ROW
+
+    headers = [list(row.as_row()) for row in exporter.get_header_rows()]
+    assert writes[0] == headers[0]
 
     index = itertools.count()
     row_2 = writes[1]
@@ -94,12 +96,12 @@ def test_reservation_unit_export_multiple():
     assert row_2[next(index)] == reservation_unit_1.pricings.first().lowest_price
     assert row_2[next(index)] == reservation_unit_1.pricings.first().highest_price
     assert row_2[next(index)] == reservation_unit_1.pricings.first().tax_percentage
-    assert row_2[next(index)] == reservation_unit_1.reservation_begins.strftime("%d:%m:%Y %H:%M")
-    assert row_2[next(index)] == reservation_unit_1.reservation_ends.strftime("%d:%m:%Y %H:%M")
+    assert row_2[next(index)] == local_datetime_string(reservation_unit_1.reservation_begins)
+    assert row_2[next(index)] == local_datetime_string(reservation_unit_1.reservation_ends)
     assert row_2[next(index)] == reservation_unit_1.metadata_set.name
     assert row_2[next(index)] == reservation_unit_1.require_reservation_handling
-    assert row_2[next(index)] == reservation_unit_1.authentication
-    assert row_2[next(index)] == reservation_unit_1.reservation_kind
+    assert row_2[next(index)] == AuthenticationType(reservation_unit_1.authentication).label
+    assert row_2[next(index)] == ReservationKind(reservation_unit_1.reservation_kind).label
     assert row_2[next(index)] == reservation_unit_1.payment_types.first().code
     assert row_2[next(index)] == reservation_unit_1.can_apply_free_of_charge
     assert row_2[next(index)] == reservation_unit_1.reservation_pending_instructions_fi
@@ -116,10 +118,10 @@ def test_reservation_unit_export_multiple():
     assert row_2[next(index)] == reservation_unit_1.max_persons
     assert row_2[next(index)] == reservation_unit_1.min_persons
     assert row_2[next(index)] == reservation_unit_1.surface_area
-    assert row_2[next(index)] == reservation_unit_1.buffer_time_before
-    assert row_2[next(index)] == reservation_unit_1.buffer_time_after
+    assert row_2[next(index)] == (local_timedelta_string(reservation_unit_1.buffer_time_before) or None)
+    assert row_2[next(index)] == (local_timedelta_string(reservation_unit_1.buffer_time_after) or None)
     assert row_2[next(index)] == reservation_unit_1.origin_hauki_resource_id
-    assert row_2[next(index)] == reservation_unit_1.reservation_start_interval
+    assert row_2[next(index)] == ReservationStartInterval(reservation_unit_1.reservation_start_interval).label
     assert row_2[next(index)] == reservation_unit_1.reservations_max_days_before
     assert row_2[next(index)] == reservation_unit_1.reservations_min_days_before
     assert row_2[next(index)] == reservation_unit_1.max_reservations_per_user
@@ -202,11 +204,11 @@ def test_reservation_unit_export_multiple():
             ),
             "Missing Reservation begins": MissingParams(
                 missing=Missing(deleted=["reservation_begins"]),
-                column_value_mapping={"Reservation begins": ""},
+                column_value_mapping={"Reservation begins": None},
             ),
             "Missing Reservation ends": MissingParams(
                 missing=Missing(deleted=["reservation_ends"]),
-                column_value_mapping={"Reservation ends": ""},
+                column_value_mapping={"Reservation ends": None},
             ),
             "Missing Reservation unit type": MissingParams(
                 missing=Missing(null=["reservation_unit_type"]),
@@ -248,14 +250,13 @@ def test_reservation_unit_export_missing_relations(column_value_mapping, missing
 
     # when:
     # - The exporter is run for all reservation units
-    open_mock = mock.patch("tilavarauspalvelu.utils.reservation_units.export_data.open", new=mock.mock_open())
-    csv_writer_mock = mock.patch("tilavarauspalvelu.utils.reservation_units.export_data.csv.writer")
-    with open_mock, csv_writer_mock as mock_file:
-        ReservationUnitExporter.export_reservation_unit_data()
+    exporter = ReservationUnitExporter()
+    with mock_csv_writer() as mock_writer:
+        exporter.write()
 
     # then:
     # - the writes contain the expected data
-    writes = get_writes(mock_file)
+    writes = mock_writer.get_writes()
 
     assert len(writes) == 2, writes
     for column, expected_value in column_value_mapping.items():
@@ -270,12 +271,11 @@ def test_reservation_unit_export_subset():
 
     # when:
     # - The exporter is run for the first 3 reservation units
-    open_mock = mock.patch("tilavarauspalvelu.utils.reservation_units.export_data.open", new=mock.mock_open())
-    csv_writer_mock = mock.patch("tilavarauspalvelu.utils.reservation_units.export_data.csv.writer")
-    with open_mock, csv_writer_mock as mock_file:
-        ReservationUnitExporter.export_reservation_unit_data(queryset=ReservationUnit.objects.all()[:3])
+    exporter = ReservationUnitExporter(queryset=ReservationUnit.objects.all()[:3])
+    with mock_csv_writer() as mock_writer:
+        exporter.write()
 
     # then:
     # - the writes contain only 3 rows (+header)
-    writes = get_writes(mock_file)
+    writes = mock_writer.get_writes()
     assert len(writes) == 4, writes

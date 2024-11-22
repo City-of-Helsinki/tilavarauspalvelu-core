@@ -1,13 +1,15 @@
-from dataclasses import dataclass, field
+import dataclasses
+from collections.abc import Generator
+from contextlib import contextmanager
 from typing import Any, NamedTuple
 from unittest import mock
 
 
-@dataclass
+@dataclasses.dataclass
 class Missing:
-    deleted: list[str] = field(default_factory=list)
-    null: list[str] = field(default_factory=list)
-    empty: list[str] = field(default_factory=list)
+    deleted: list[str] = dataclasses.field(default_factory=list)
+    null: list[str] = dataclasses.field(default_factory=list)
+    empty: list[str] = dataclasses.field(default_factory=list)
 
     def remove_from_data(self, data: dict[str, Any]) -> None:
         self._delete(data)
@@ -49,5 +51,13 @@ class MissingParams(NamedTuple):
     column_value_mapping: dict[str, Any]
 
 
-def get_writes(mock_file: mock.MagicMock) -> list[list[str]]:
-    return [call[1][0] for call in mock_file.mock_calls if call[0] == "().writerow"]
+class CSVWriterMock(mock.MagicMock):
+    def get_writes(self) -> list[list[str]]:
+        return [call[1][0] for call in self.mock_calls if call[0] == "().writerow"]
+
+
+@contextmanager
+def mock_csv_writer() -> Generator[CSVWriterMock, None, None]:
+    path = "tilavarauspalvelu.services.csv_export._base_exporter.csv.writer"
+    with mock.patch(path, new_callable=CSVWriterMock) as mock_file:
+        yield mock_file
