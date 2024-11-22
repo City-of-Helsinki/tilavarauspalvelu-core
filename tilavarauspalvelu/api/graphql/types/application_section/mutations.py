@@ -49,7 +49,8 @@ class ApplicationSectionDeleteMutation(DeleteMutation):
     @classmethod
     def validate_deletion(cls, instance: ApplicationSection, user: AnyUser) -> None:
         if not instance.status.can_delete:
-            raise ValidationError("Application section has been allocated and cannot be deleted anymore.")
+            msg = "Application section has been allocated and cannot be deleted anymore."
+            raise ValidationError(msg)
 
 
 class RejectAllSectionOptionsMutation(UpdateMutation):

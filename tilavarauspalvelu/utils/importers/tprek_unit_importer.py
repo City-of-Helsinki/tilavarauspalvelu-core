@@ -34,7 +34,8 @@ class TprekUnitImporter:
 
         for unit in units:
             if unit.tprek_id is None:
-                raise ValueError(f"Unit TPREK ID is None: {unit.pk}")
+                msg = f"Unit TPREK ID is None: {unit.pk}"
+                raise ValueError(msg)
 
             tprek_unit_data, tprek_location_data = TprekAPIClient.get_unit(unit_tprek_id=unit.tprek_id)
 

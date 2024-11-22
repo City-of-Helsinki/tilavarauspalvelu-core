@@ -62,7 +62,8 @@ class PaymentMerchantForm(forms.ModelForm):
         if instance and instance.id:
             merchant_info = VerkkokauppaAPIClient.get_merchant(merchant_uuid=instance.id)
             if merchant_info is None:
-                raise GetMerchantError(f"Merchant info for {instance.id!s} not found from Merchant API")
+                msg = f"Merchant info for {instance.id!s} not found from Merchant API"
+                raise GetMerchantError(msg)
 
             self.fields["shop_id"].initial = merchant_info.shop_id
             self.fields["name"].initial = merchant_info.name

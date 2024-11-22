@@ -135,10 +135,8 @@ class StaffReservationModifySerializer(OldPrimaryKeyUpdateSerializer, Reservatio
         data = super().validate(data)
 
         if self.instance.state != ReservationStateChoice.CONFIRMED.value:
-            raise ValidationErrorWithCode(
-                "Reservation must be in confirmed state.",
-                ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED,
-            )
+            msg = "Reservation must be in confirmed state."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED)
 
         self.check_time_passed()
         if data.get("type"):
@@ -148,16 +146,12 @@ class StaffReservationModifySerializer(OldPrimaryKeyUpdateSerializer, Reservatio
 
     def check_type(self, type_: str) -> None:
         if self.instance.type == ReservationTypeChoice.NORMAL.value and type_ != ReservationTypeChoice.NORMAL.value:
-            raise ValidationErrorWithCode(
-                f"Reservation type cannot be changed from NORMAL to {type_.upper()}.",
-                ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED,
-            )
+            msg = f"Reservation type cannot be changed from NORMAL to {type_.upper()}."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED)
 
         if type_ == ReservationTypeChoice.NORMAL.value and self.instance.type != ReservationTypeChoice.NORMAL.value:
-            raise ValidationErrorWithCode(
-                f"Reservation type cannot be changed to NORMAl from state {self.instance.type.upper()}.",
-                ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED,
-            )
+            msg = f"Reservation type cannot be changed to NORMAl from state {self.instance.type.upper()}."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED)
 
     def check_time_passed(self) -> None:
         now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
@@ -166,7 +160,5 @@ class StaffReservationModifySerializer(OldPrimaryKeyUpdateSerializer, Reservatio
             now -= datetime.timedelta(days=1)
 
         if self.instance.end.date() < now.date():
-            raise ValidationErrorWithCode(
-                "Reservation cannot be changed anymore.",
-                ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED,
-            )
+            msg = "Reservation cannot be changed anymore."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED)

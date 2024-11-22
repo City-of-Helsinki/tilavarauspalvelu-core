@@ -27,9 +27,11 @@ def purge(path: str) -> None:
         return
 
     if not settings.IMAGE_CACHE_VARNISH_HOST:
-        raise ImageCacheConfigurationError("IMAGE_CACHE_VARNISH_HOST setting is not configured")
+        msg = "IMAGE_CACHE_VARNISH_HOST setting is not configured"
+        raise ImageCacheConfigurationError(msg)
     if not settings.IMAGE_CACHE_PURGE_KEY:
-        raise ImageCacheConfigurationError("IMAGE_CACHE_PURGE_KEY setting is not configured")
+        msg = "IMAGE_CACHE_PURGE_KEY setting is not configured"
+        raise ImageCacheConfigurationError(msg)
 
     full_url = urljoin(settings.IMAGE_CACHE_VARNISH_HOST, path)
 

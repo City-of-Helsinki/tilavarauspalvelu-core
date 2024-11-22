@@ -29,12 +29,12 @@ class ReservableTimeSpanClient:
 
         # If the resource does not have a hash set, we should raise an error.
         if not self.origin_hauki_resource.opening_hours_hash:
-            raise ReservableTimeSpanClientValueError(
-                f"{self.origin_hauki_resource} does not have opening_hours_hash set."
-            )
+            msg = f"{self.origin_hauki_resource} does not have opening_hours_hash set."
+            raise ReservableTimeSpanClientValueError(msg)
         # If the resource has never any opening hours, we can raise an error
         if self.origin_hauki_resource.opening_hours_hash == NEVER_ANY_OPENING_HOURS_HASH:
-            raise ReservableTimeSpanClientNothingToDoError(f"{self.origin_hauki_resource} never has any opening hours.")
+            msg = f"{self.origin_hauki_resource} never has any opening hours."
+            raise ReservableTimeSpanClientNothingToDoError(msg)
 
     def run(self) -> list[ReservableTimeSpan]:
         self._init_date_range()
@@ -73,9 +73,8 @@ class ReservableTimeSpanClient:
         self.end_date = self.end_date.replace(day=calendar.monthrange(self.end_date.year, self.end_date.month)[1])
 
         if self.start_date >= self.end_date:
-            raise ReservableTimeSpanClientNothingToDoError(
-                f"{self.origin_hauki_resource} already has the latest reservable time spans fetched."
-            )
+            msg = f"{self.origin_hauki_resource} already has the latest reservable time spans fetched."
+            raise ReservableTimeSpanClientNothingToDoError(msg)
 
     def _get_opening_hours_from_hauki_api(self) -> HaukiAPIOpeningHoursResponseItem:
         return HaukiAPIClient.get_resource_opening_hours(

@@ -69,7 +69,8 @@ class ApplicationExportRow(BaseExportRow):
         current_value: str | None = getattr(self, key, None)
         new_value = f"{local_time_string(time_range.begin_time)}-{local_time_string(time_range.end_time)}"
         if current_value is None:
-            raise ValueError(f"Key {key} not found in {self.__class__.__name__}")
+            msg = f"Key {key} not found in {self.__class__.__name__}"
+            raise ValueError(msg)
         # If the value is already set, append the new time range to the end of the string.
         # Time ranges should be in chronological order.
         if current_value:

@@ -35,4 +35,5 @@ class SpaceDeleteMutation(DeleteMutation):
     def validate_deletion(cls, instance: Space, user: AnyUser) -> None:
         in_active_round = ApplicationRound.objects.active().filter(reservation_units__spaces=instance).exists()
         if in_active_round:
-            raise ValidationError("Space occurs in active application round.")
+            msg = "Space occurs in active application round."
+            raise ValidationError(msg)

@@ -50,22 +50,16 @@ class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reservation
         data = super().validate(data)
 
         if self.instance.state != ReservationStateChoice.CONFIRMED.value:
-            raise ValidationErrorWithCode(
-                "Only reservations in 'CONFIRMED' state can be rescheduled.",
-                ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED,
-            )
+            msg = "Only reservations in 'CONFIRMED' state can be rescheduled."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED)
 
         if self.instance.type not in ReservationTypeChoice.allowed_for_user_time_adjust:
-            raise ValidationErrorWithCode(
-                "Only reservations of type 'NORMAL' or 'BEHALF' can be rescheduled.",
-                ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED,
-            )
+            msg = "Only reservations of type 'NORMAL' or 'BEHALF' can be rescheduled."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED)
 
         if self.instance.handled_at:
-            raise ValidationErrorWithCode(
-                "Reservation has gone through handling and cannot be changed anymore.",
-                ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED,
-            )
+            msg = "Reservation has gone through handling and cannot be changed anymore."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED)
 
         begin: datetime.datetime = data["begin"].astimezone(DEFAULT_TIMEZONE)
         end: datetime.datetime = data["end"].astimezone(DEFAULT_TIMEZONE)
@@ -91,57 +85,41 @@ class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reservation
 
     def check_begin(self, begin, end) -> None:
         if begin > end:
-            raise ValidationErrorWithCode(
-                "End cannot be before begin",
-                ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED,
-            )
+            msg = "End cannot be before begin"
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED)
 
         now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
 
         if begin < now:
-            raise ValidationErrorWithCode(
-                "Reservation new begin cannot be in the past",
-                ValidationErrorCodes.RESERVATION_BEGIN_IN_PAST,
-            )
+            msg = "Reservation new begin cannot be in the past"
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_BEGIN_IN_PAST)
 
         if self.instance.begin < now:
-            raise ValidationErrorWithCode(
-                "Reservation time cannot be changed when current begin time is in past.",
-                ValidationErrorCodes.RESERVATION_CURRENT_BEGIN_IN_PAST,
-            )
+            msg = "Reservation time cannot be changed when current begin time is in past."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_CURRENT_BEGIN_IN_PAST)
 
     def check_cancellation_rules(self, reservation_unit: ReservationUnit) -> None:
         now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
 
         cancel_rule = reservation_unit.cancellation_rule
         if not cancel_rule:
-            raise ValidationErrorWithCode(
-                "Reservation time cannot be changed thus no cancellation rule.",
-                ValidationErrorCodes.CANCELLATION_NOT_ALLOWED,
-            )
+            msg = "Reservation time cannot be changed thus no cancellation rule."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.CANCELLATION_NOT_ALLOWED)
         must_be_cancelled_before = self.instance.begin - cancel_rule.can_be_cancelled_time_before
         if must_be_cancelled_before < now:
-            raise ValidationErrorWithCode(
-                "Reservation time cannot be changed because the cancellation period has expired.",
-                ValidationErrorCodes.CANCELLATION_TIME_PAST,
-            )
+            msg = "Reservation time cannot be changed because the cancellation period has expired."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.CANCELLATION_TIME_PAST)
         if cancel_rule.needs_handling:
-            raise ValidationErrorWithCode(
-                "Reservation time change needs manual handling.",
-                ValidationErrorCodes.CANCELLATION_NOT_ALLOWED,
-            )
+            msg = "Reservation time change needs manual handling."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.CANCELLATION_NOT_ALLOWED)
 
     def check_and_handle_pricing(self, data) -> None:
         if self.instance.price > 0:
-            raise ValidationErrorWithCode(
-                "Reservation time cannot be changed due to its price",
-                ValidationErrorCodes.CANCELLATION_NOT_ALLOWED,
-            )
+            msg = "Reservation time cannot be changed due to its price"
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.CANCELLATION_NOT_ALLOWED)
         if self.requires_price_calculation(data):
             pricing = self.calculate_price(data["begin"], data["end"], self.instance.reservation_units.all())
 
             if pricing.reservation_price > 0:
-                raise ValidationErrorWithCode(
-                    "Reservation begin time change causes price change that not allowed.",
-                    ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED,
-                )
+                msg = "Reservation begin time change causes price change that not allowed."
+                raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED)

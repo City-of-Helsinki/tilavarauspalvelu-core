@@ -113,7 +113,7 @@ lint.select = [
     "DJ",       # flake8-django
     #"DTZ",     # flake8-datetimez  # TODO: Enable this and fix (52) issues
     "E",        # pycodestyle errors
-    #"EM",      # flake8-errmsg  # TODO: Enable this and fix (188) issues
+    "EM",       # flake8-errmsg
     "ERA",      # eradicate
     "F",        # pyflakes
     "FA",       # flake8-future-annotations

@@ -36,7 +36,8 @@ class Product:
                 merchant_id=uuid.UUID(json["merchantId"]),
             )
         except (KeyError, ValueError) as e:
-            raise ParseProductError("Could not parse product") from e
+            msg = "Could not parse product"
+            raise ParseProductError(msg) from e
 
 
 @dataclass(frozen=True)
@@ -102,4 +103,5 @@ class Accounting:
                 balance_profit_center=json["balanceProfitCenter"],
             )
         except (KeyError, ValueError) as e:
-            raise ParseAccountingError("Could not parse accounting") from e
+            msg = "Could not parse accounting"
+            raise ParseAccountingError(msg) from e

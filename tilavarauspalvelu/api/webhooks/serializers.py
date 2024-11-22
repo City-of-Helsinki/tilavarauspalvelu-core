@@ -11,13 +11,15 @@ class WebhookPaymentSerializer(serializers.Serializer):
     @staticmethod
     def validate_namespace(namespace: str) -> str:
         if namespace != settings.VERKKOKAUPPA_NAMESPACE:
-            raise serializers.ValidationError(f"Invalid namespace: '{namespace}'")
+            msg = f"Invalid namespace: '{namespace}'"
+            raise serializers.ValidationError(msg)
         return namespace
 
     @staticmethod
     def validate_eventType(event_type: str) -> str:
         if event_type != "PAYMENT_PAID":
-            raise serializers.ValidationError(f"Unsupported event type: '{event_type}'")
+            msg = f"Unsupported event type: '{event_type}'"
+            raise serializers.ValidationError(msg)
         return event_type
 
 
@@ -29,13 +31,15 @@ class WebhookOrderCancelSerializer(serializers.Serializer):
     @staticmethod
     def validate_namespace(namespace: str) -> str:
         if namespace != settings.VERKKOKAUPPA_NAMESPACE:
-            raise serializers.ValidationError(f"Invalid namespace: '{namespace}'")
+            msg = f"Invalid namespace: '{namespace}'"
+            raise serializers.ValidationError(msg)
         return namespace
 
     @staticmethod
     def validate_eventType(event_type: str) -> str:
         if event_type != "ORDER_CANCELLED":
-            raise serializers.ValidationError(f"Unsupported event type: '{event_type}'")
+            msg = f"Unsupported event type: '{event_type}'"
+            raise serializers.ValidationError(msg)
         return event_type
 
 
@@ -49,11 +53,13 @@ class WebhookRefundSerializer(serializers.Serializer):
     @staticmethod
     def validate_namespace(namespace: str) -> str:
         if namespace != settings.VERKKOKAUPPA_NAMESPACE:
-            raise serializers.ValidationError(f"Invalid namespace: '{namespace}'")
+            msg = f"Invalid namespace: '{namespace}'"
+            raise serializers.ValidationError(msg)
         return namespace
 
     @staticmethod
     def validate_eventType(event_type: str) -> str:
         if event_type != "REFUND_PAID":
-            raise serializers.ValidationError(f"Unsupported event type: '{event_type}'")
+            msg = f"Unsupported event type: '{event_type}'"
+            raise serializers.ValidationError(msg)
         return event_type

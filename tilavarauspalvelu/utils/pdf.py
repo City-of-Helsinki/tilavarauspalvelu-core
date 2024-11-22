@@ -11,5 +11,6 @@ def render_to_pdf(template: str, **context: Any) -> bytes:
     template = get_template(template).render(context)
     pdf = pisa.pisaDocument(src=BytesIO(template.encode("UTF-8")), dest=result)
     if pdf.err:
-        raise ValueError(f"Error while rendering PDF: {pdf.err}")
+        msg = f"Error while rendering PDF: {pdf.err}"
+        raise ValueError(msg)
     return result.getvalue()

@@ -133,10 +133,8 @@ class ReservationUnitSerializer(NestingModelSerializer):
         start_interval: str | None = self.get_or_default("reservation_start_interval", data)
 
         if min_duration and max_duration and min_duration > max_duration:
-            raise ValidationError(
-                "minReservationDuration can't be greater than maxReservationDuration",
-                code=error_codes.RESERVATION_UNIT_MIN_MAX_RESERVATION_DURATIONS_INVALID,
-            )
+            msg = "minReservationDuration can't be greater than maxReservationDuration"
+            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MIN_MAX_RESERVATION_DURATIONS_INVALID)
 
         if start_interval is None:
             return
@@ -145,28 +143,20 @@ class ReservationUnitSerializer(NestingModelSerializer):
         if min_duration:
             min_duration_minutes = min_duration.total_seconds() // 60
             if min_duration_minutes < interval_minutes:
-                raise ValidationError(
-                    "minReservationDuration must be at least the reservation start interval",
-                    code=error_codes.RESERVATION_UNIT_MIN_RESERVATION_DURATION_INVALID,
-                )
+                msg = "minReservationDuration must be at least the reservation start interval"
+                raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MIN_RESERVATION_DURATION_INVALID)
             if min_duration_minutes % interval_minutes != 0:
-                raise ValidationError(
-                    "minReservationDuration must be a multiple of the reservation start interval",
-                    code=error_codes.RESERVATION_UNIT_MIN_RESERVATION_DURATION_INVALID,
-                )
+                msg = "minReservationDuration must be a multiple of the reservation start interval"
+                raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MIN_RESERVATION_DURATION_INVALID)
 
         if max_duration:
             max_duration_minutes = max_duration.total_seconds() // 60
             if max_duration_minutes < interval_minutes:
-                raise ValidationError(
-                    "maxReservationDuration must be at least the reservation start interval",
-                    code=error_codes.RESERVATION_UNIT_MAX_RESERVATION_DURATION_INVALID,
-                )
+                msg = "maxReservationDuration must be at least the reservation start interval"
+                raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MAX_RESERVATION_DURATION_INVALID)
             if max_duration_minutes % interval_minutes != 0:
-                raise ValidationError(
-                    "maxReservationDuration must be a multiple of the reservation start interval",
-                    code=error_codes.RESERVATION_UNIT_MAX_RESERVATION_DURATION_INVALID,
-                )
+                msg = "maxReservationDuration must be a multiple of the reservation start interval"
+                raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MAX_RESERVATION_DURATION_INVALID)
 
     def _validate_for_publish(self, data: dict[str, Any]) -> None:
         required_translations: list[str] = [
@@ -312,7 +302,8 @@ class ReservationUnitSerializer(NestingModelSerializer):
             try:
                 instance.actions.send_reservation_unit_to_hauki()
             except ExternalServiceError as err:
-                raise GraphQLError("Sending reservation unit as resource to HAUKI failed.") from err
+                msg = "Sending reservation unit as resource to HAUKI failed."
+                raise GraphQLError(msg) from err
 
     @staticmethod
     def handle_pricings(pricings: list[dict[Any, Any]], reservation_unit: ReservationUnit) -> None:
@@ -338,10 +329,8 @@ class ReservationUnitSerializer(NestingModelSerializer):
         if instance.publishing_state != ReservationUnitPublishingState.ARCHIVED and validated_data.get("is_archived"):
             future_reservations = instance.reservations.going_to_occur().filter(end__gt=local_datetime())
             if future_reservations.exists():
-                raise ValidationError(
-                    "Reservation unit can't be archived if it has any reservations in the future",
-                    code=error_codes.RESERVATION_UNIT_HAS_FUTURE_RESERVATIONS,
-                )
+                msg = "Reservation unit can't be archived if it has any reservations in the future"
+                raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_HAS_FUTURE_RESERVATIONS)
 
         pricings = validated_data.pop("pricings", [])
         reservation_unit = super().update(instance, validated_data)

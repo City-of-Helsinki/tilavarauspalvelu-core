@@ -25,7 +25,8 @@ class MockVerkkokauppaView(TemplateView):
 
     def get_payment_order(self, order_uuid: str | None) -> PaymentOrder:
         if order_uuid is None:
-            raise Http404("Order UUID is missing.")
+            msg = "Order UUID is missing."
+            raise Http404(msg)
 
         try:
             payment_order = get_object_or_404(PaymentOrder, remote_id=order_uuid)

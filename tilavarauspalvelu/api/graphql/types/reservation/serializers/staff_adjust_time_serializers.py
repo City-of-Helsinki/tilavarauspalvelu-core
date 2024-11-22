@@ -64,10 +64,8 @@ class StaffReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reserv
         data = super().validate(data)
 
         if self.instance.state != ReservationStateChoice.CONFIRMED.value:
-            raise ValidationErrorWithCode(
-                "Reservation must be in confirmed state.",
-                ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED,
-            )
+            msg = "Reservation must be in confirmed state."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED)
 
         begin = data["begin"].astimezone(DEFAULT_TIMEZONE)
         end = data["end"].astimezone(DEFAULT_TIMEZONE)
@@ -97,10 +95,8 @@ class StaffReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reserv
 
     def check_begin(self, new_begin: datetime.datetime, new_end: datetime.datetime) -> None:
         if new_begin > new_end:
-            raise ValidationErrorWithCode(
-                "End cannot be before begin",
-                ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED,
-            )
+            msg = "End cannot be before begin"
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED)
 
         now = local_datetime()
         min_allowed_date = now.date()
@@ -110,13 +106,9 @@ class StaffReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reserv
             min_allowed_date -= datetime.timedelta(days=1)
 
         if self.instance.end.astimezone(DEFAULT_TIMEZONE).date() < min_allowed_date:
-            raise ValidationErrorWithCode(
-                "Reservation time cannot be changed anymore.",
-                ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED,
-            )
+            msg = "Reservation time cannot be changed anymore."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED)
 
         if new_begin.astimezone(DEFAULT_TIMEZONE).date() < min_allowed_date:
-            raise ValidationErrorWithCode(
-                "Reservation new begin date cannot be in the past.",
-                ValidationErrorCodes.RESERVATION_BEGIN_IN_PAST,
-            )
+            msg = "Reservation new begin date cannot be in the past."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_BEGIN_IN_PAST)

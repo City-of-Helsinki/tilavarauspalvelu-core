@@ -144,7 +144,8 @@ def local_datetime(
     if all((year, month, day)):
         return datetime.datetime(year, month, day, hour, minute, second, microsecond, tzinfo=DEFAULT_TIMEZONE)
     if any((year, month, day)):
-        raise ValueError("'year', 'month' and 'day' must be given together")
+        msg = "'year', 'month' and 'day' must be given together"
+        raise ValueError(msg)
     return datetime.datetime.now(tz=DEFAULT_TIMEZONE)
 
 
@@ -290,7 +291,8 @@ def utc_datetime(
     if all((year, month, day)):
         return datetime.datetime(year, month, day, hour, minute, second, microsecond, tzinfo=datetime.UTC)
     if any((year, month, day)):
-        raise ValueError("'year', 'month' and 'day' must be given together")
+        msg = "'year', 'month' and 'day' must be given together"
+        raise ValueError(msg)
     return datetime.datetime.now(tz=datetime.UTC)
 
 

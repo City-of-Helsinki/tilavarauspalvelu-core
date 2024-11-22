@@ -7,7 +7,8 @@ class InvalidWeekdayError(Exception):
 
 def validate_weekday(weekday: int) -> None:
     if weekday < 0 or weekday > 6:
-        raise InvalidWeekdayError("Not a valid weekday")
+        msg = "Not a valid weekday"
+        raise InvalidWeekdayError(msg)
 
 
 # Finds the next matching weekday after or on given date

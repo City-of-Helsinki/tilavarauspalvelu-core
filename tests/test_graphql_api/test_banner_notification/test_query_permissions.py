@@ -28,7 +28,8 @@ def login_based_on_type(graphql, user_type: UserType) -> User | None:
         return graphql.login_user_with_role(role=UserRoleChoice.RESERVER)
     if user_type == UserType.NOTIFICATION_MANAGER:
         return graphql.login_user_with_role(role=UserRoleChoice.NOTIFICATION_MANAGER)
-    raise ValueError(f"Unknown user type: {user_type}")
+    msg = f"Unknown user type: {user_type}"
+    raise ValueError(msg)
 
 
 @pytest.mark.parametrize(

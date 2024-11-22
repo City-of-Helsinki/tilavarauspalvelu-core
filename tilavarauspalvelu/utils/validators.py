@@ -15,15 +15,15 @@ if TYPE_CHECKING:
 
 def is_numeric(value: str) -> None:
     if len(value) > 0 and not re.match(r"^\d*$", value):
-        raise ValidationError("Value must be numeric")
+        msg = "Value must be numeric"
+        raise ValidationError(msg)
 
 
 def validate_accounting_project(project_value: str) -> None:
     allowed_lengths = [7, 10, 12, 14, 16]
     if len(project_value) not in allowed_lengths:
-        raise ValidationError(
-            f"Value must be string of one of the following lenghts: {', '.join(map(str, allowed_lengths))}"
-        )
+        msg = f"Value must be string of one of the following lenghts: {', '.join(map(str, allowed_lengths))}"
+        raise ValidationError(msg)
 
 
 class TimeSlotSerializer(serializers.Serializer):

@@ -223,10 +223,8 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
 
     def check_sku(self, current_sku, new_sku) -> None:
         if current_sku is not None and current_sku != new_sku:
-            raise ValidationErrorWithCode(
-                "An ambiguous SKU cannot be assigned for this reservation.",
-                ValidationErrorCodes.AMBIGUOUS_SKU,
-            )
+            msg = "An ambiguous SKU cannot be assigned for this reservation."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.AMBIGUOUS_SKU)
 
     def check_max_reservations_per_user(self, user: AnyUser, reservation_unit: ReservationUnit) -> None:
         if reservation_unit.max_reservations_per_user is None:
@@ -238,14 +236,10 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
             .count()
         )
         if num_active_user_reservations >= reservation_unit.max_reservations_per_user:
-            raise ValidationErrorWithCode(
-                "Maximum number of active reservations for this reservation unit exceeded.",
-                ValidationErrorCodes.MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED,
-            )
+            msg = "Maximum number of active reservations for this reservation unit exceeded."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED)
 
     def check_reservation_kind(self, reservation_unit) -> None:
         if reservation_unit.reservation_kind == ReservationKind.SEASON:
-            raise ValidationErrorWithCode(
-                "Reservation unit is only available or seasonal booking.",
-                ValidationErrorCodes.RESERVATION_UNIT_TYPE_IS_SEASON,
-            )
+            msg = "Reservation unit is only available or seasonal booking."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_UNIT_TYPE_IS_SEASON)

@@ -89,7 +89,8 @@ class HaukiAPIClient(BaseExternalServiceClient):
         response_json: HaukiAPIResource = cls.response_json(response)
 
         if not response_json.get("id"):
-            raise HaukiAPIError("Hauki API did not return a resource id.")
+            msg = "Hauki API did not return a resource id."
+            raise HaukiAPIError(msg)
 
         return response_json
 
@@ -101,7 +102,8 @@ class HaukiAPIClient(BaseExternalServiceClient):
         response_json: HaukiAPIResource = cls.response_json(response)
 
         if not response_json.get("id"):
-            raise HaukiAPIError("Hauki API did not return a resource id.")
+            msg = "Hauki API did not return a resource id."
+            raise HaukiAPIError(msg)
 
         return response_json
 
@@ -114,7 +116,8 @@ class HaukiAPIClient(BaseExternalServiceClient):
         response_json: HaukiAPIResource = cls.response_json(response)
 
         if not response_json.get("id"):
-            raise HaukiAPIError("Hauki API did not return a resource id.")
+            msg = "Hauki API did not return a resource id."
+            raise HaukiAPIError(msg)
 
         return response_json
 
@@ -151,9 +154,11 @@ class HaukiAPIClient(BaseExternalServiceClient):
         response_json: HaukiAPIOpeningHoursResponse = cls.response_json(response)
 
         if response_json["count"] == 0:
-            raise HaukiAPIError(f"Hauki API did not return any resources matching '{hauki_resource_id}'.")
+            msg = f"Hauki API did not return any resources matching '{hauki_resource_id}'."
+            raise HaukiAPIError(msg)
         if response_json["count"] > 1:
-            raise HaukiAPIError("Received too many results from Hauki API.")
+            msg = "Received too many results from Hauki API."
+            raise HaukiAPIError(msg)
 
         return response_json["results"][0]
 
@@ -184,7 +189,8 @@ class HaukiAPIClient(BaseExternalServiceClient):
     @classmethod
     def _build_url(cls, endpoint: str) -> str:
         if not settings.HAUKI_API_URL:
-            raise HaukiConfigurationError("HAUKI_API_URL environment variable must to be configured.")
+            msg = "HAUKI_API_URL environment variable must to be configured."
+            raise HaukiConfigurationError(msg)
 
         hauki_api_url_base = settings.HAUKI_API_URL.removesuffix("/")
         return f"{hauki_api_url_base}/v1/{endpoint}/"
@@ -193,6 +199,7 @@ class HaukiAPIClient(BaseExternalServiceClient):
     def _get_mutate_headers(cls, headers: dict[str, Any] | None) -> dict[str, Any]:
         """Add the API key to POST and PUT request headers."""
         if not settings.HAUKI_API_KEY:
-            raise HaukiConfigurationError("HAUKI_API_KEY environment variable must to be configured.")
+            msg = "HAUKI_API_KEY environment variable must to be configured."
+            raise HaukiConfigurationError(msg)
 
         return {"Authorization": f"APIToken {settings.HAUKI_API_KEY}"}

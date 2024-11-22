@@ -74,7 +74,8 @@ class Payment:
             )
         except (KeyError, ValueError) as err:
             SentryLogger.log_exception(err, details="Parsing refund failed", json=json)
-            raise ParsePaymentError(f"Could not parse payment: {err!s}") from err
+            msg = f"Could not parse payment: {err!s}"
+            raise ParsePaymentError(msg) from err
 
     @classmethod
     def _parse_datetime(cls, string: str) -> datetime:
@@ -115,7 +116,8 @@ class Refund:
             )
         except (KeyError, ValueError) as err:
             SentryLogger.log_exception(err, details="Parsing refund failed", json=json)
-            raise ParseRefundError(f"Could not parse refund: {err!s}") from err
+            msg = f"Could not parse refund: {err!s}"
+            raise ParseRefundError(msg) from err
 
 
 @dataclass(frozen=True)
@@ -142,4 +144,5 @@ class RefundStatusResult:
             )
         except (KeyError, ValueError) as err:
             SentryLogger.log_exception(err, details="Parsing refund status failed", json=json)
-            raise ParseRefundStatusError(f"Could not parse refund status: {err!s}") from err
+            msg = f"Could not parse refund status: {err!s}"
+            raise ParseRefundStatusError(msg) from err

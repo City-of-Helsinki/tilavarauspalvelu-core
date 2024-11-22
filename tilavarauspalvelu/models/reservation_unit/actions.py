@@ -49,10 +49,12 @@ class ReservationUnitHaukiExporter:
     def _convert_reservation_unit_to_hauki_resource_data(self) -> dict[str, Any]:
         parent_unit_resource_id = self._get_parent_resource_id()
         if not parent_unit_resource_id:
-            raise HaukiAPIError("Parent Unit does have 'Hauki Resource' set and could not get it from Hauki API.")
+            msg = "Parent Unit does have 'Hauki Resource' set and could not get it from Hauki API."
+            raise HaukiAPIError(msg)
 
         if not self.reservation_unit.unit.tprek_department_id:
-            raise HaukiAPIError("Parent Unit does not have a department id.")
+            msg = "Parent Unit does not have a department id."
+            raise HaukiAPIError(msg)
 
         return {
             "name": HaukiTranslatedField(

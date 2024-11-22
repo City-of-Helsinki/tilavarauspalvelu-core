@@ -178,19 +178,25 @@ class FirstReservableTimeHelper:
         ##########################
 
         if filter_date_start < today:
-            raise ValueError("'reservable_date_start' must be not be in the past.")
+            msg = "'reservable_date_start' must be not be in the past."
+            raise ValueError(msg)
         if filter_date_end < today:
-            raise ValueError("'reservable_date_end' must be not be in the past.")
+            msg = "'reservable_date_end' must be not be in the past."
+            raise ValueError(msg)
         if filter_date_end > two_years_from_now:
-            raise ValueError("'reservable_date_end' must be not be more than two years in the future.")
+            msg = "'reservable_date_end' must be not be more than two years in the future."
+            raise ValueError(msg)
         if filter_date_start > filter_date_end:
-            raise ValueError("'reservable_date_start' must be before 'reservable_date_end'.")
+            msg = "'reservable_date_start' must be before 'reservable_date_end'."
+            raise ValueError(msg)
 
         if filter_time_start is not None and filter_time_end is not None and filter_time_start >= filter_time_end:
-            raise ValueError("'reservable_time_start' must be before 'reservable_time_end'.")
+            msg = "'reservable_time_start' must be before 'reservable_time_end'."
+            raise ValueError(msg)
 
         if minimum_duration_minutes is not None and int(minimum_duration_minutes) < 15:
-            raise ValueError("'minimum_duration_minutes' can not be less than '15'.")
+            msg = "'minimum_duration_minutes' can not be less than '15'."
+            raise ValueError(msg)
 
         # Shortest possible reservation unit interval is 15 minutes, so it's used as the default value
         minimum_duration_minutes = int(minimum_duration_minutes) if minimum_duration_minutes else 15

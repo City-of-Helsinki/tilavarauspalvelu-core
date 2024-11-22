@@ -264,9 +264,11 @@ class TimeSpanElement:
             return closed_time_spans
 
         if filter_time_start and filter_time_start.tzinfo is not None:
-            raise ValueError("`filter_time_start` must be timezone naive.")
+            msg = "`filter_time_start` must be timezone naive."
+            raise ValueError(msg)
         if filter_time_end and filter_time_end.tzinfo is not None:
-            raise ValueError("`filter_time_end` must be timezone naive.")
+            msg = "`filter_time_end` must be timezone naive."
+            raise ValueError(msg)
 
         # Loop through every day between the start and end date of this time span
         for day in self.get_dates_range():

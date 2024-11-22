@@ -71,7 +71,8 @@ class ApplicationUpdateSerializer(ApplicationCreateSerializer):
     def validate_working_memo(self, value: str) -> str:
         user: AnyUser = self.request_user
         if not user.permissions.can_view_application(self.instance, reserver_needs_role=True):
-            raise serializers.ValidationError("No permission to access working memo.")
+            msg = "No permission to access working memo."
+            raise serializers.ValidationError(msg)
 
         return value
 
