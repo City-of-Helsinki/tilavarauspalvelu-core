@@ -671,7 +671,8 @@ class PriceUnit(models.TextChoices):
             case PriceUnit.PRICE_UNIT_PER_WEEK:
                 return 10080
             case _:
-                raise ValueError(f"Price unit {self} cannot be represented in minutes.")
+                msg = f"Price unit {self} cannot be represented in minutes."
+                raise ValueError(msg)
 
 
 class PricingStatus(models.TextChoices):

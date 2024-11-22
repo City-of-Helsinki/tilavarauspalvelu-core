@@ -120,7 +120,8 @@ class ReservableTimeSpanFirstReservableTimeHelper:
             for reservation in reservation_time_spans:
                 # Reservation (with buffers) can not overlap with the reservable time span (without buffers).
                 if reservable_time_span.overlaps_with(reservation):
-                    raise ValueError("Reservable Time Span overlaps with Reservation buffer. This should never happen.")
+                    msg = "Reservable Time Span overlaps with Reservation buffer. This should never happen."
+                    raise ValueError(msg)
 
                 # Only continue forward if a buffered time span overlaps with a reservation (without buffers)
                 if not reservation.overlaps_with(reservable_time_span):

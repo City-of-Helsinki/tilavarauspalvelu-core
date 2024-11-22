@@ -50,10 +50,8 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
         payment_types = reservation_unit.payment_types
 
         if payment_types.count() == 0:
-            raise ValidationErrorWithCode(
-                "Reservation unit does not have payment types defined. At least one payment type must be defined.",
-                ValidationErrorCodes.INVALID_PAYMENT_TYPE,
-            )
+            msg = "Reservation unit does not have payment types defined. At least one payment type must be defined."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.INVALID_PAYMENT_TYPE)
 
         # Rules to pick the default, defined in TILA-1974:
         # 1. If only one payment type is defined, use that
@@ -70,16 +68,12 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
         data = super().validate(data)
 
         if self.instance.payment_order.exists() == 1:
-            raise ValidationErrorWithCode(
-                "Reservation cannot be changed anymore because it is attached to a payment order",
-                ValidationErrorCodes.CHANGES_NOT_ALLOWED,
-            )
+            msg = "Reservation cannot be changed anymore because it is attached to a payment order"
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.CHANGES_NOT_ALLOWED)
 
         if self.instance.reservation_units.count() > 1:
-            raise ValidationErrorWithCode(
-                "Reservations with multiple reservation units are not supported.",
-                ValidationErrorCodes.MULTIPLE_RESERVATION_UNITS,
-            )
+            msg = "Reservations with multiple reservation units are not supported."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.MULTIPLE_RESERVATION_UNITS)
 
         # If reservation requires handling, it can't be confirmed here and needs to be manually handled by the staff
         if not self.instance.requires_handling:
@@ -89,20 +83,18 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
             active_pricing = reservation_unit.actions.get_active_pricing()
             if active_pricing.highest_price > 0 or self.instance.price_net > 0:
                 if not reservation_unit.payment_product and not settings.MOCK_VERKKOKAUPPA_API_ENABLED:
-                    raise ValidationErrorWithCode(
-                        "Reservation unit is missing payment product",
-                        ValidationErrorCodes.MISSING_PAYMENT_PRODUCT,
-                    )
+                    msg = "Reservation unit is missing payment product"
+                    raise ValidationErrorWithCode(msg, ValidationErrorCodes.MISSING_PAYMENT_PRODUCT)
 
                 if not payment_type:
                     data["payment_type"] = self._get_default_payment_type()
                 elif not reservation_unit.payment_types.filter(code=payment_type).exists():
                     allowed_values = sorted(x.code for x in reservation_unit.payment_types.all())
-                    raise ValidationErrorWithCode(
+                    msg = (
                         f"Reservation unit does not support {payment_type} payment type. "
-                        f"Allowed values: {', '.join(allowed_values)}",
-                        ValidationErrorCodes.INVALID_PAYMENT_TYPE,
+                        f"Allowed values: {', '.join(allowed_values)}"
                     )
+                    raise ValidationErrorWithCode(msg, ValidationErrorCodes.INVALID_PAYMENT_TYPE)
         return data
 
     @property
@@ -155,10 +147,8 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
                         SentryLogger.log_exception(
                             err, details="Creating order in Verkkokauppa failed", reservation_id=self.instance.pk
                         )
-                        raise ValidationErrorWithCode(
-                            "Upstream service call failed. Unable to confirm the reservation.",
-                            ValidationErrorCodes.UPSTREAM_CALL_FAILED,
-                        ) from err
+                        msg = "Upstream service call failed. Unable to confirm the reservation."
+                        raise ValidationErrorWithCode(msg, ValidationErrorCodes.UPSTREAM_CALL_FAILED) from err
 
                 PaymentOrder.objects.create(
                     payment_type=payment_type,

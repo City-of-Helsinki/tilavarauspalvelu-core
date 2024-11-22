@@ -32,7 +32,8 @@ class RefreshOrderMutation(DjangoMutation):
 
         payment_order: PaymentOrder | None = PaymentOrder.objects.filter(remote_id=remote_id).first()
         if not payment_order:
-            raise ValidationErrorWithCode("Order not found", ValidationErrorCodes.NOT_FOUND)
+            msg = "Order not found"
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.NOT_FOUND)
 
         if payment_order.status not in OrderStatus.needs_update_statuses:
             return RefreshOrderMutationOutput(

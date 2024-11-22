@@ -42,7 +42,8 @@ def _set_user_roles() -> None:
             )
 
         else:
-            raise ValueError(f"Unknown role kind: {kind}")
+            msg = f"Unknown role kind: {kind}"
+            raise ValueError(msg)
 
 
 @with_logs

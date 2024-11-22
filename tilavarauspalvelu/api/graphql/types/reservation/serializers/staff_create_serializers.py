@@ -218,20 +218,18 @@ class ReservationStaffCreateSerializer(OldPrimaryKeySerializer, ReservationSched
         ]
 
         if reservation_type not in allowed_types:
-            raise ValidationErrorWithCode(
+            msg = (
                 f"Reservation type {reservation_type} is not allowed in this mutation. "
-                f"Allowed choices are {', '.join(allowed_types)}.",
-                ValidationErrorCodes.RESERVATION_TYPE_NOT_ALLOWED,
+                f"Allowed choices are {', '.join(allowed_types)}."
             )
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_TYPE_NOT_ALLOWED)
 
         return reservation_type
 
     def check_begin(self, begin: datetime.datetime, end: datetime.datetime) -> None:
         if begin > end:
-            raise ValidationErrorWithCode(
-                "End cannot be before begin",
-                ValidationErrorCodes.RESERVATION_BEGIN_AFTER_END,
-            )
+            msg = "End cannot be before begin"
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_BEGIN_AFTER_END)
 
         now = local_datetime()
         min_allowed_date = now.date()
@@ -241,7 +239,5 @@ class ReservationStaffCreateSerializer(OldPrimaryKeySerializer, ReservationSched
             min_allowed_date -= datetime.timedelta(days=1)
 
         if begin.astimezone(DEFAULT_TIMEZONE).date() < min_allowed_date:
-            raise ValidationErrorWithCode(
-                "Reservation begin date cannot be in the past.",
-                ValidationErrorCodes.RESERVATION_BEGIN_IN_PAST,
-            )
+            msg = "Reservation begin date cannot be in the past."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_BEGIN_IN_PAST)

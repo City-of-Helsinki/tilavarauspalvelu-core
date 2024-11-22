@@ -172,10 +172,8 @@ class ReservationSchedulingMixin:
     def check_reservation_time(self, reservation_unit: ReservationUnit) -> None:
         state = reservation_unit.publishing_state
         if state in [ReservationUnitPublishingState.DRAFT.value, ReservationUnitPublishingState.ARCHIVED.value]:
-            raise ValidationErrorWithCode(
-                f"Reservation unit is not reservable due to its status: '{state}'.",
-                ValidationErrorCodes.RESERVATION_UNIT_NOT_RESERVABLE,
-            )
+            msg = f"Reservation unit is not reservable due to its status: '{state}'."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_UNIT_NOT_RESERVABLE)
 
         now = timezone.now()
 
@@ -184,10 +182,8 @@ class ReservationSchedulingMixin:
         is_invalid_end = self._get_invalid_end(reservation_unit, now)
 
         if is_invalid_begin or is_invalid_end:
-            raise ValidationErrorWithCode(
-                "Reservation unit is not reservable at current time.",
-                ValidationErrorCodes.RESERVATION_UNIT_NOT_RESERVABLE,
-            )
+            msg = "Reservation unit is not reservable at current time."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_UNIT_NOT_RESERVABLE)
 
     def check_reservation_overlap(
         self,
@@ -196,10 +192,8 @@ class ReservationSchedulingMixin:
         end: datetime.datetime,
     ) -> None:
         if reservation_unit.actions.check_reservation_overlap(begin, end, self.instance):
-            raise ValidationErrorWithCode(
-                "Overlapping reservations are not allowed.",
-                ValidationErrorCodes.OVERLAPPING_RESERVATIONS,
-            )
+            msg = "Overlapping reservations are not allowed."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.OVERLAPPING_RESERVATIONS)
 
     @staticmethod
     def check_opening_hours(
@@ -209,10 +203,8 @@ class ReservationSchedulingMixin:
     ) -> None:
         is_open = reservation_unit.actions.is_open(begin, end)
         if not reservation_unit.allow_reservations_without_opening_hours and not is_open:
-            raise ValidationErrorWithCode(
-                "Reservation unit is not open within desired reservation time.",
-                ValidationErrorCodes.RESERVATION_UNIT_IS_NOT_OPEN,
-            )
+            msg = "Reservation unit is not open within desired reservation time."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_UNIT_IS_NOT_OPEN)
 
     @staticmethod
     def check_reservation_duration(
@@ -223,24 +215,18 @@ class ReservationSchedulingMixin:
         duration: datetime.timedelta = end - begin
 
         if reservation_unit.max_reservation_duration and duration > reservation_unit.max_reservation_duration:
-            raise ValidationErrorWithCode(
-                "Reservation duration exceeds one or more reservation unit's maximum duration.",
-                ValidationErrorCodes.RESERVATION_UNITS_MAX_DURATION_EXCEEDED,
-            )
+            msg = "Reservation duration exceeds one or more reservation unit's maximum duration."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_UNITS_MAX_DURATION_EXCEEDED)
 
         if reservation_unit.min_reservation_duration and duration < reservation_unit.min_reservation_duration:
-            raise ValidationErrorWithCode(
-                "Reservation duration less than one or more reservation unit's minimum duration.",
-                ValidationErrorCodes.RESERVATION_UNIT_MIN_DURATION_NOT_EXCEEDED,
-            )
+            msg = "Reservation duration less than one or more reservation unit's minimum duration."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_UNIT_MIN_DURATION_NOT_EXCEEDED)
 
         interval_minutes = ReservationStartInterval(reservation_unit.reservation_start_interval).as_number
         duration_minutes = duration.total_seconds() / 60
         if duration_minutes % interval_minutes > 0:
-            raise ValidationErrorWithCode(
-                f"Reservation duration is not a multiple of the allowed interval of {interval_minutes} minutes.",
-                ValidationErrorCodes.RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL,
-            )
+            msg = f"Reservation duration is not a multiple of the allowed interval of {interval_minutes} minutes."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL)
 
     def check_buffer_times(
         self,
@@ -283,16 +269,12 @@ class ReservationSchedulingMixin:
             buffer_after = max(next_buffer, buffer_after)
 
         if previous_reservation and buffer_before and (previous_reservation.end + buffer_before) > begin:
-            raise ValidationErrorWithCode(
-                "Reservation overlaps with reservation before due to buffer time.",
-                ValidationErrorCodes.RESERVATION_OVERLAP,
-            )
+            msg = "Reservation overlaps with reservation before due to buffer time."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_OVERLAP)
 
         if next_reservation and buffer_after and (next_reservation.begin - buffer_after) < end:
-            raise ValidationErrorWithCode(
-                "Reservation overlaps with reservation after due to buffer time.",
-                ValidationErrorCodes.RESERVATION_OVERLAP,
-            )
+            msg = "Reservation overlaps with reservation after due to buffer time."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_OVERLAP)
 
     @staticmethod
     def check_reservation_start_time(reservation_unit: ReservationUnit, begin: datetime.datetime) -> None:
@@ -302,26 +284,20 @@ class ReservationSchedulingMixin:
         interval_minutes = ReservationStartInterval(reservation_unit.reservation_start_interval).as_number
         possible_start_times = reservation_unit.actions.get_possible_start_times(begin.date(), interval_minutes)
         if begin not in possible_start_times:
-            raise ValidationErrorWithCode(
-                f"Reservation start time does not match the allowed interval of {interval_minutes} minutes.",
-                ValidationErrorCodes.RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL,
-            )
+            msg = f"Reservation start time does not match the allowed interval of {interval_minutes} minutes."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL)
 
     @staticmethod
     def check_reservation_days_before(begin: datetime.datetime, reservation_unit: ReservationUnit) -> None:
         max_days_before = reservation_unit.reservations_max_days_before
         if max_days_before and (begin - local_datetime()) > datetime.timedelta(days=max_days_before):
-            raise ValidationErrorWithCode(
-                f"Reservation start time is earlier than {reservation_unit.reservations_max_days_before} days before.",
-                ValidationErrorCodes.RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE,
-            )
+            msg = f"Reservation start time is earlier than {reservation_unit.reservations_max_days_before} days before."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE)
 
         min_days_before = reservation_unit.reservations_min_days_before
         if min_days_before and (begin - local_start_of_day()) < datetime.timedelta(days=min_days_before):
-            raise ValidationErrorWithCode(
-                f"Reservation start time is later than {reservation_unit.reservations_min_days_before} days before.",
-                ValidationErrorCodes.RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE,
-            )
+            msg = f"Reservation start time is later than {reservation_unit.reservations_min_days_before} days before."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE)
 
     @staticmethod
     def check_open_application_round(
@@ -332,10 +308,8 @@ class ReservationSchedulingMixin:
         open_app_round = reservation_unit.actions.is_in_open_application_round(begin.date(), end.date())
 
         if open_app_round:
-            raise ValidationErrorWithCode(
-                "One or more reservation units are in open application round.",
-                ValidationErrorCodes.RESERVATION_UNIT_IN_OPEN_ROUND,
-            )
+            msg = "One or more reservation units are in open application round."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_UNIT_IN_OPEN_ROUND)
 
     @staticmethod
     def check_reservation_intervals_for_staff_reservation(
@@ -358,7 +332,5 @@ class ReservationSchedulingMixin:
             start_time += interval_timedelta
 
         if begin.time() not in possible_start_times:
-            raise ValidationErrorWithCode(
-                f"Reservation start time does not match the allowed interval of {interval_minutes} minutes.",
-                ValidationErrorCodes.RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL,
-            )
+            msg = f"Reservation start time does not match the allowed interval of {interval_minutes} minutes."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL)

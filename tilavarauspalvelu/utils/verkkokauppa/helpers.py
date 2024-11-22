@@ -57,7 +57,8 @@ def get_meta_label(key: str, reservation: Reservation) -> str:
         },
     }
     if key not in labels:
-        raise UnsupportedMetaKeyError(f"Invalid meta label key '{key}'")
+        msg = f"Invalid meta label key '{key}'"
+        raise UnsupportedMetaKeyError(msg)
 
     preferred_language = reservation.reservee_language or "fi"
     return labels[key][preferred_language]

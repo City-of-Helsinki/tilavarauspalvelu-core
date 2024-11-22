@@ -168,7 +168,8 @@ class Order:
             )
         except (KeyError, ValueError) as err:
             SentryLogger.log_exception(err, details="Parsing order failed", json=json)
-            raise ParseOrderError(f"Could not parse order: {err!s}") from err
+            msg = f"Could not parse order: {err!s}"
+            raise ParseOrderError(msg) from err
 
 
 @dataclass(frozen=True)

@@ -125,7 +125,8 @@ def test_django_admin_site__pages_load__data_views():
                     admin_url = reverse(f"admin:{url_pattern.name}", args=[email_type.value])
                     assert client.get(admin_url).status_code == 200, admin_url
             else:
-                raise pytest.fail(f"Unknown converter = {converter}")
+                msg = f"Unknown converter = {converter}"
+                raise pytest.fail(msg)
 
         # Views that don't take arguments
         else:

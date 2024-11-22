@@ -219,11 +219,13 @@ class ReservationActions:
         # Currently, there is ever only one reservation unit per reservation
         reservation_unit: ReservationUnit | None = self.reservation.reservation_units.first()
         if reservation_unit is None:
-            raise ValueError("Reservation has no reservation unit")
+            msg = "Reservation has no reservation unit"
+            raise ValueError(msg)
 
         pricing = reservation_unit.actions.get_active_pricing(by_date=begin_datetime.date())
         if pricing is None:
-            raise ValueError("Reservation unit has no pricing information")
+            msg = "Reservation unit has no pricing information"
+            raise ValueError(msg)
 
         duration = end_datetime - begin_datetime
         return pricing.actions.calculate_reservation_price(duration, subsidised=subsidised)

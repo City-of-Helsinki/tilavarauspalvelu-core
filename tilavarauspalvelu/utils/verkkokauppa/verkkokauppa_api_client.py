@@ -77,15 +77,18 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             response_json = cls.response_json(response)
 
             if response.status_code == 404:
-                raise GetOrderError(f"Order not found: {response_json.get('errors')}")
+                msg = f"Order not found: {response_json.get('errors')}"
+                raise GetOrderError(msg)
             if response.status_code != 200:
-                raise GetOrderError(f"{action_fail}: {response_json.get('errors')}")
+                msg = f"{action_fail}: {response_json.get('errors')}"
+                raise GetOrderError(msg)
 
             return Order.from_json(response_json)
 
         except (RequestException, ExternalServiceError, ParseOrderError) as err:
             SentryLogger.log_exception(err, details=f"{action_fail}.", order_id=order_uuid)
-            raise GetOrderError(f"{action_fail}: {err!s}") from err
+            msg = f"{action_fail}: {err!s}"
+            raise GetOrderError(msg) from err
 
     @classmethod
     def create_order(cls, *, order_params: CreateOrderParams) -> Order:
@@ -100,13 +103,15 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             response_json = cls.response_json(response)
 
             if response.status_code != 201:
-                raise CreateOrderError(f"{action_fail}: {response_json.get('errors')}")
+                msg = f"{action_fail}: {response_json.get('errors')}"
+                raise CreateOrderError(msg)
 
             return Order.from_json(response_json)
 
         except (RequestException, ExternalServiceError, ParseOrderError) as err:
             SentryLogger.log_exception(err, details=f"{action_fail}.", order_params=order_params)
-            raise CreateOrderError(f"{action_fail}: {err!s}") from err
+            msg = f"{action_fail}: {err!s}"
+            raise CreateOrderError(msg) from err
 
     @classmethod
     def cancel_order(cls, *, order_uuid: uuid.UUID, user_uuid: uuid.UUID) -> Order | None:
@@ -123,13 +128,15 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             if response.status_code == 404:
                 return None
             if response.status_code != 200:
-                raise CancelOrderError(f"{action_fail}: {response_json.get('errors')}")
+                msg = f"{action_fail}: {response_json.get('errors')}"
+                raise CancelOrderError(msg)
 
             return Order.from_json(response_json["order"])
 
         except (RequestException, ExternalServiceError, ParseOrderError) as err:
             SentryLogger.log_exception(err, details=f"{action_fail}.", order_id=order_uuid)
-            raise CancelOrderError(f"{action_fail}: {err!s}") from err
+            msg = f"{action_fail}: {err!s}"
+            raise CancelOrderError(msg) from err
 
     ###########
     # Payment #
@@ -152,7 +159,8 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
                 return None
 
             if response.status_code != 200:
-                raise GetPaymentError(f"{action_fail}: {response_json.get('errors')}")
+                msg = f"{action_fail}: {response_json.get('errors')}"
+                raise GetPaymentError(msg)
 
             return Payment.from_json(response_json)
 
@@ -175,12 +183,14 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
                 return None
 
             if response.status_code != 200:
-                raise GetRefundStatusError(f"{action_fail}: {response_json.get('errors')}")
+                msg = f"{action_fail}: {response_json.get('errors')}"
+                raise GetRefundStatusError(msg)
 
             return RefundStatusResult.from_json(response_json)
 
         except (RequestException, ExternalServiceError, ParseRefundStatusError) as err:
-            raise GetRefundStatusError(f"{action_fail}: {err!s}") from err
+            msg = f"{action_fail}: {err!s}"
+            raise GetRefundStatusError(msg) from err
 
     @classmethod
     def refund_order(cls, *, order_uuid: uuid.UUID) -> Refund | None:
@@ -200,7 +210,8 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
                     details=f"Response body: {response.text}",
                     level="error",
                 )
-                raise RefundPaymentError(f"{action_fail}: problem with upstream service")
+                msg = f"{action_fail}: problem with upstream service"
+                raise RefundPaymentError(msg)
 
             refund_count = len(response_json["refunds"]) if "refunds" in response_json else 0
             if refund_count == 1:
@@ -210,11 +221,13 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
                 details=f"Response contains {refund_count} refunds instead of one. Response body: {response.text}",
                 level="error",
             )
-            raise RefundPaymentError(f"Refund response refund count expected to be 1 but was {refund_count}")
+            msg = f"Refund response refund count expected to be 1 but was {refund_count}"
+            raise RefundPaymentError(msg)
 
         except (RequestException, ExternalServiceError, ParseRefundError) as err:
             SentryLogger.log_exception(err, details=action_fail, order_id=order_uuid)
-            raise RefundPaymentError(f"{action_fail}: {err!s}") from err
+            msg = f"{action_fail}: {err!s}"
+            raise RefundPaymentError(msg) from err
 
     ############
     # Merchant #
@@ -234,11 +247,13 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
                 return None
 
             if response.status_code != 200:
-                raise GetMerchantError(f"{action_fail}: {response_json.get('errors')}")
+                msg = f"{action_fail}: {response_json.get('errors')}"
+                raise GetMerchantError(msg)
 
             return MerchantInfo.from_json(response_json)
         except (RequestException, ExternalServiceError, ParseMerchantError) as err:
-            raise GetMerchantError(f"{action_fail}: {err!s}") from err
+            msg = f"{action_fail}: {err!s}"
+            raise GetMerchantError(msg) from err
 
     @classmethod
     def create_merchant(cls, *, params: CreateMerchantParams) -> Merchant:
@@ -253,7 +268,8 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             response_json = cls.response_json(response)
 
             if response.status_code != 201:
-                raise CreateMerchantError(f"{action_fail}: {response_json.get('errors')}")
+                msg = f"{action_fail}: {response_json.get('errors')}"
+                raise CreateMerchantError(msg)
 
             return Merchant.from_json(response_json)
 
@@ -276,9 +292,11 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             response_json = cls.response_json(response)
 
             if response.status_code == 404:
-                raise UpdateMerchantError(f"{action_fail}: merchant {merchant_uuid} not found")
+                msg = f"{action_fail}: merchant {merchant_uuid} not found"
+                raise UpdateMerchantError(msg)
             if response.status_code != 200:
-                raise UpdateMerchantError(f"{action_fail}: {response_json.get('errors')}")
+                msg = f"{action_fail}: {response_json.get('errors')}"
+                raise UpdateMerchantError(msg)
 
             return Merchant.from_json(response_json)
 
@@ -303,12 +321,14 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             response_json = cls.response_json(response)
 
             if response.status_code != 201:
-                raise CreateProductError(f"{action_fail}: {response_json.get('errors')}")
+                msg = f"{action_fail}: {response_json.get('errors')}"
+                raise CreateProductError(msg)
 
             return Product.from_json(response_json)
 
         except (RequestException, ExternalServiceError, ParseProductError) as err:
-            raise CreateProductError(f"{action_fail}: {err}") from err
+            msg = f"{action_fail}: {err}"
+            raise CreateProductError(msg) from err
 
     @classmethod
     def create_or_update_accounting(
@@ -336,12 +356,14 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             response_json = cls.response_json(response)
 
             if response.status_code != 201:
-                raise CreateOrUpdateAccountingError(f"{action_fail}: {response_json.get('errors')}")
+                msg = f"{action_fail}: {response_json.get('errors')}"
+                raise CreateOrUpdateAccountingError(msg)
 
             return Accounting.from_json(response_json)
 
         except (RequestException, ExternalServiceError, ParseAccountingError) as err:
-            raise CreateOrUpdateAccountingError(f"{action_fail}: {err}") from err
+            msg = f"{action_fail}: {err}"
+            raise CreateOrUpdateAccountingError(msg) from err
 
     ##################
     # Helper methods #

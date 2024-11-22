@@ -115,7 +115,8 @@ class TprekAPIClient(BaseExternalServiceClient):
     @staticmethod
     def _build_url(endpoint: str) -> str:
         if not settings.TPREK_UNIT_URL:
-            raise ExternalServiceError("'TPREK_UNIT_URL' environment variable must to be configured.")
+            msg = "'TPREK_UNIT_URL' environment variable must to be configured."
+            raise ExternalServiceError(msg)
 
         tprek_api_url_base = settings.TPREK_UNIT_URL.removesuffix("/")
         return f"{tprek_api_url_base}/{endpoint}"
