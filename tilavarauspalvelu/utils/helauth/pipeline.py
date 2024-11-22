@@ -62,7 +62,7 @@ def fetch_additional_info_for_user_from_helsinki_profile(
         return {"user": user}
 
     id_token = IDToken.from_string(response["id_token"])
-    if id_token is not None and not id_token.is_ad_login and user.profile_id == "":
+    if id_token is not None and not id_token.is_ad_login and not user.profile_id:
         update_user_from_profile(request, user=user)
 
     return {"user": user}

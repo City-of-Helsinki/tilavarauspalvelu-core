@@ -163,7 +163,7 @@ class RecurringReservationActions:
         end_time: datetime.time = self.recurring_reservation.end_time
         reservation_unit = self.recurring_reservation.reservation_unit
 
-        weekdays: list[int] = [int(val) for val in self.recurring_reservation.weekdays.split(",") if val != ""]
+        weekdays: list[int] = [int(val) for val in self.recurring_reservation.weekdays.split(",") if val]
         if not weekdays:
             weekdays = [self.recurring_reservation.begin_date.weekday()]
 

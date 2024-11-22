@@ -111,4 +111,4 @@ def test__TimeSpanElement__copy():
         end_datetime=_get_date(day=2, hour=12),
         is_reservable=False,
     )
-    assert time_span.__copy__() == time_span
+    assert time_span.__copy__() == time_span  # noqa: PLC2801
