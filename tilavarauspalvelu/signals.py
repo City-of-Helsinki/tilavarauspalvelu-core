@@ -104,13 +104,13 @@ def reservation_unit_deleted(*args: Any, **kwargs: Any):
 
 @receiver(m2m_changed, sender=ReservationUnit.spaces.through, dispatch_uid="reservation_unit_spaces_modified")
 def reservation_unit_spaces_modified(action: Action, *args: Any, **kwargs: Any):
-    if settings.UPDATE_RESERVATION_UNIT_HIERARCHY and action in ["post_add", "post_remove", "post_clear"]:
+    if settings.UPDATE_RESERVATION_UNIT_HIERARCHY and action in {"post_add", "post_remove", "post_clear"}:
         update_reservation_unit_hierarchy_task.delay(using=kwargs.get("using"))
 
 
 @receiver(m2m_changed, sender=ReservationUnit.resources.through, dispatch_uid="reservation_unit_resources_modified")
 def reservation_unit_resources_modified(action: Action, *args: Any, **kwargs: Any):
-    if settings.UPDATE_RESERVATION_UNIT_HIERARCHY and action in ["post_add", "post_remove", "post_clear"]:
+    if settings.UPDATE_RESERVATION_UNIT_HIERARCHY and action in {"post_add", "post_remove", "post_clear"}:
         update_reservation_unit_hierarchy_task.delay(using=kwargs.get("using"))
 
 

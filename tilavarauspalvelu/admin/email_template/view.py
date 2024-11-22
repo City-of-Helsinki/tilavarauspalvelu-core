@@ -69,9 +69,9 @@ def email_type_admin_view(request: WSGIRequest, email_type: str) -> HttpResponse
     except Exception:
         return HttpResponse("Invalid email type")
 
-    as_html = request.GET.get("text", "false").lower() not in ("true", "1", "t")
+    as_html = request.GET.get("text", "false").lower() not in {"true", "1", "t"}
     language: Lang = request.GET.get("lang", "fi")
-    if language not in ("fi", "en", "sv"):
+    if language not in {"fi", "en", "sv"}:
         language = "fi"
 
     content = render_with_mock_data(email_type=email_type, language=language, as_html=as_html)

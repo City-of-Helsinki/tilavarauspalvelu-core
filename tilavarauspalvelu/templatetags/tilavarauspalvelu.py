@@ -23,6 +23,6 @@ def format_currency(price: Decimal | float) -> str:
 @library.filter(name="sentence")
 def format_sentence(text: str) -> str:
     text = text.strip()
-    if text[-1] in (".", "!", "?", ":"):
+    if text[-1] in {".", "!", "?", ":"}:
         return text
     return f"{text}."

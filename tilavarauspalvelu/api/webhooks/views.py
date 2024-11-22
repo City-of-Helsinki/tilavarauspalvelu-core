@@ -38,7 +38,7 @@ class WebhookOrderPaidViewSet(viewsets.GenericViewSet):
             SentryLogger.log_message(f"Verkkokauppa: {msg}", details=serializer.validated_data)
             return Response(data={"message": msg}, status=404)
 
-        if payment_order.status not in [OrderStatus.DRAFT, OrderStatus.EXPIRED, OrderStatus.CANCELLED]:
+        if payment_order.status not in {OrderStatus.DRAFT, OrderStatus.EXPIRED, OrderStatus.CANCELLED}:
             msg = "Order is already in a state where no updates are needed"
             return Response(data={"message": msg}, status=200)
 

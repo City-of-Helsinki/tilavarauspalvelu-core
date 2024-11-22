@@ -37,7 +37,7 @@ class ReservationUpdateSerializer(OldPrimaryKeyUpdateSerializer, ReservationCrea
             raise ValidationErrorWithCode(msg, ValidationErrorCodes.CHANGES_NOT_ALLOWED)
 
         new_state = data.get("state", self.instance.state)
-        if new_state not in [ReservationStateChoice.CANCELLED.value, ReservationStateChoice.CREATED.value]:
+        if new_state not in {ReservationStateChoice.CANCELLED.value, ReservationStateChoice.CREATED.value}:
             msg = f"Setting the reservation state to '{getattr(new_state, 'value', new_state)}' is not allowed."
             raise ValidationErrorWithCode(msg, ValidationErrorCodes.STATE_CHANGE_NOT_ALLOWED)
 

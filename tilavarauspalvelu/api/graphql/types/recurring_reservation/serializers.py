@@ -96,7 +96,7 @@ class ReservationSeriesReservationCreateSerializer(NestingModelSerializer):
             "home_city",
             "age_group",
         ]
-        extra_kwargs = {field: {"required": field in ["type", "user"]} for field in fields}
+        extra_kwargs = {field: {"required": field in {"type", "user"}} for field in fields}
 
 
 class ReservationSeriesCreateSerializer(NestingModelSerializer):

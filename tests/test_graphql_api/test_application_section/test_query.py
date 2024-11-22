@@ -140,4 +140,4 @@ def test_all_statuses(graphql):
     # 1 query to fetch unit groups for permission checks for applications
     # 1 query to fetch application rounds with their status annotations
     # 1 query to fetch units for permission checks for application rounds
-    assert len(response.queries) in [8, 9], response.query_log
+    assert len(response.queries) in {8, 9}, response.query_log

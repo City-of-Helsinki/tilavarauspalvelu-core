@@ -845,10 +845,10 @@ class ApplicationRoundStatusChoice(models.TextChoices):
 
     @DynamicClassAttribute
     def is_allocation_upcoming(self) -> bool:
-        return self in [
+        return self in {
             ApplicationRoundStatusChoice.UPCOMING,
             ApplicationRoundStatusChoice.OPEN,
-        ]
+        }
 
     @DynamicClassAttribute
     def can_remove_allocations(self) -> bool:
@@ -856,10 +856,10 @@ class ApplicationRoundStatusChoice(models.TextChoices):
 
     @DynamicClassAttribute
     def past_allocation(self) -> bool:
-        return self in [
+        return self in {
             ApplicationRoundStatusChoice.HANDLED,
             ApplicationRoundStatusChoice.RESULTS_SENT,
-        ]
+        }
 
     @DynamicClassAttribute
     def is_ongoing(self) -> bool:
@@ -867,11 +867,11 @@ class ApplicationRoundStatusChoice(models.TextChoices):
 
     @DynamicClassAttribute
     def allows_resetting(self) -> bool:
-        return self in [
+        return self in {
             ApplicationRoundStatusChoice.IN_ALLOCATION,
             ApplicationRoundStatusChoice.HANDLED,
             ApplicationRoundStatusChoice.RESULTS_SENT,
-        ]
+        }
 
 
 class ApplicationRoundReservationCreationStatusChoice(models.TextChoices):
@@ -917,32 +917,32 @@ class ApplicationStatusChoice(models.TextChoices):
 
     @DynamicClassAttribute
     def can_send(self):
-        return self in [
+        return self in {
             ApplicationStatusChoice.DRAFT,
             ApplicationStatusChoice.RECEIVED,
-        ]
+        }
 
     @DynamicClassAttribute
     def can_cancel(self):
-        return self in [
+        return self in {
             ApplicationStatusChoice.DRAFT,
             ApplicationStatusChoice.RECEIVED,
-        ]
+        }
 
     @DynamicClassAttribute
     def can_flag(self) -> bool:
-        return self in [
+        return self in {
             ApplicationStatusChoice.IN_ALLOCATION,
             ApplicationStatusChoice.HANDLED,
             ApplicationStatusChoice.RESULTS_SENT,
-        ]
+        }
 
     @DynamicClassAttribute
     def can_reset(self) -> bool:
-        return self in [
+        return self in {
             ApplicationStatusChoice.IN_ALLOCATION,
             ApplicationStatusChoice.HANDLED,
-        ]
+        }
 
     @classproperty
     def blocks_anonymization(cls) -> list[str]:
@@ -968,10 +968,10 @@ class ApplicationSectionStatusChoice(models.TextChoices):
 
     @DynamicClassAttribute
     def can_allocate(self) -> bool:
-        return self in [
+        return self in {
             ApplicationSectionStatusChoice.UNALLOCATED,
             ApplicationSectionStatusChoice.IN_ALLOCATION,
-        ]
+        }
 
     @DynamicClassAttribute
     def can_delete(self) -> bool:
@@ -979,11 +979,11 @@ class ApplicationSectionStatusChoice(models.TextChoices):
 
     @DynamicClassAttribute
     def can_reset(self) -> bool:
-        return self in [
+        return self in {
             ApplicationSectionStatusChoice.UNALLOCATED,
             ApplicationSectionStatusChoice.IN_ALLOCATION,
             ApplicationSectionStatusChoice.HANDLED,
-        ]
+        }
 
 
 class OrganizationTypeChoice(models.TextChoices):

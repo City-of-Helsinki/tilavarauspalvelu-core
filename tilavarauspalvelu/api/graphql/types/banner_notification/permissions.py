@@ -25,15 +25,15 @@ class BannerNotificationPermission(BasePermission):
             return False
 
         if user.is_anonymous:
-            return instance.target in [BannerNotificationTarget.USER, BannerNotificationTarget.ALL]
+            return instance.target in {BannerNotificationTarget.USER, BannerNotificationTarget.ALL}
 
         if not user.is_active:
             return False
 
         if user.permissions.has_any_role():
-            return instance.target in [BannerNotificationTarget.STAFF, BannerNotificationTarget.ALL]
+            return instance.target in {BannerNotificationTarget.STAFF, BannerNotificationTarget.ALL}
 
-        return instance.target in [BannerNotificationTarget.USER, BannerNotificationTarget.ALL]
+        return instance.target in {BannerNotificationTarget.USER, BannerNotificationTarget.ALL}
 
     @classmethod
     def has_mutation_permission(cls, user: AnyUser, input_data: dict[str, Any]) -> bool:
