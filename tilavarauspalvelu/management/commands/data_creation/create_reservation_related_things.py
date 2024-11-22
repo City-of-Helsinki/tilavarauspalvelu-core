@@ -774,5 +774,5 @@ def _fetch_image(image_url: str, path: Path) -> None:
         return
 
     path.parent.mkdir(parents=True, exist_ok=True)
-    with open(file=path, mode="wb") as handler:
+    with Path(file=path).open(mode="wb") as handler:
         handler.write(response.content)

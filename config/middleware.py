@@ -183,9 +183,9 @@ class ProfilerMiddleware:
         output_html = html_renderer.render(profile_session)
 
         t = local_datetime().strftime("%Y-%m-%dT%H-%M-%S")
-        with open(f"graphql-{t}.{sc_renderer.output_file_extension}", mode="w", encoding="utf-8") as file:
+        with Path(f"graphql-{t}.{sc_renderer.output_file_extension}").open(mode="w", encoding="utf-8") as file:
             file.write(output_sc)
-        with open(f"graphql-{t}.{html_renderer.output_file_extension}", mode="w", encoding="utf-8") as file:
+        with Path(f"graphql-{t}.{html_renderer.output_file_extension}").open(mode="w", encoding="utf-8") as file:
             file.write(output_html)
 
         return response

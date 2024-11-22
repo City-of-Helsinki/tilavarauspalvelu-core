@@ -120,7 +120,6 @@ lint.select = [
     "FBT",      # flake8-boolean-trap
     "FLY",      # flynt
     "FURB",     # refurb
-    #"G",       # flake8-logging-format  # TODO: Enable this and fix (20) issues
     "I",        # isort
     "ICN",      # flake8-import-conventions
     "INP",      # flake8-no-pep420
@@ -132,7 +131,7 @@ lint.select = [
     "PIE",      # flake8-pie
     "PL",       # pylint
     "PT",       # flake8-pytest-style
-    #"PTH",     # flake8-use-pathlib  # TODO: Enable this and fix (6) issues
+    "PTH",      # flake8-use-pathlib
     "PYI",      # flake8-pyi
     "Q",        # flake8-quotes
     "R",        # Refactor
