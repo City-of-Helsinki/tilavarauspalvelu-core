@@ -22,11 +22,11 @@ from utils.date_utils import local_datetime, local_start_of_day
 class PriceCalculationResult:
     instance: Reservation
 
-    reservation_price: Decimal = Decimal("0")
-    unit_price: Decimal = Decimal("0")
-    tax_percentage_value: Decimal = Decimal("0")
-    non_subsidised_price: Decimal = Decimal("0")
-    subsidised_price: Decimal = Decimal("0")
+    reservation_price: Decimal = Decimal(0)
+    unit_price: Decimal = Decimal(0)
+    tax_percentage_value: Decimal = Decimal(0)
+    non_subsidised_price: Decimal = Decimal(0)
+    subsidised_price: Decimal = Decimal(0)
 
     def __init__(
         self,
@@ -91,11 +91,11 @@ class ReservationPriceMixin:
         ]
 
         calculation_result = PriceCalculationResult(
-            reservation_price=Decimal("0"),
-            unit_price=Decimal("0"),
-            tax_percentage_value=Decimal("0"),
-            non_subsidised_price=Decimal("0"),
-            subsidised_price=Decimal("0"),
+            reservation_price=Decimal(0),
+            unit_price=Decimal(0),
+            tax_percentage_value=Decimal(0),
+            non_subsidised_price=Decimal(0),
+            subsidised_price=Decimal(0),
         )
 
         for reservation_unit in reservation_units:

@@ -788,16 +788,16 @@ def test_reservation__create__price_calculation__future_pricing(graphql):
     ReservationUnitPricingFactory.create(
         begins=now,
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
-        highest_price=Decimal("6"),
-        tax_percentage__value=Decimal("24"),
+        highest_price=Decimal(6),
+        tax_percentage__value=Decimal(24),
         reservation_unit=reservation_unit,
     )
 
     future_pricing = ReservationUnitPricingFactory(
         begins=now + timedelta(days=1),
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
-        highest_price=Decimal("10"),
-        tax_percentage__value=Decimal("24"),
+        highest_price=Decimal(10),
+        tax_percentage__value=Decimal(24),
         reservation_unit=reservation_unit,
     )
 

@@ -567,7 +567,7 @@ def test_reservation__update__price_calculation_not_triggered_if_time_not_change
         price=Decimal("12.4"),
         non_subsidised_price=Decimal("12.4"),
         unit_price=Decimal("10.0"),
-        tax_percentage_value=Decimal("24"),
+        tax_percentage_value=Decimal(24),
     )
     price = reservation.price
     price_net = reservation.price_net
@@ -602,7 +602,7 @@ def test_reservation__update__price_calculation_triggered_if_begin_changes(graph
         price=Decimal("12.4"),
         non_subsidised_price=Decimal("12.4"),
         unit_price=Decimal("10.0"),
-        tax_percentage_value=Decimal("24"),
+        tax_percentage_value=Decimal(24),
     )
 
     pricing = ReservationUnitPricingFactory.create(
@@ -636,7 +636,7 @@ def test_reservation__update__price_calculation_triggered_if_end_changes(graphql
         price=Decimal("12.4"),
         non_subsidised_price=Decimal("12.4"),
         unit_price=Decimal("10.0"),
-        tax_percentage_value=Decimal("24"),
+        tax_percentage_value=Decimal(24),
     )
 
     pricing = ReservationUnitPricingFactory.create(
@@ -670,7 +670,7 @@ def test_reservation__update__price_calculation_triggered_if_unit_changes(graphq
         price=Decimal("12.4"),
         non_subsidised_price=Decimal("12.4"),
         unit_price=Decimal("10.0"),
-        tax_percentage_value=Decimal("24"),
+        tax_percentage_value=Decimal(24),
     )
 
     pricing = ReservationUnitPricingFactory.create(
@@ -702,7 +702,7 @@ def test_reservation__update__price_calculation_uses_to_future_pricing(graphql):
         price=Decimal("12.4"),
         non_subsidised_price=Decimal("12.4"),
         unit_price=Decimal("10.0"),
-        tax_percentage_value=Decimal("24"),
+        tax_percentage_value=Decimal(24),
     )
 
     pricing_change = reservation.begin + datetime.timedelta(days=1)

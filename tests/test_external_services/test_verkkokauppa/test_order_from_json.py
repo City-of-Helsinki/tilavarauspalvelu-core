@@ -70,13 +70,13 @@ def test_order_from_json():
     assert order.items[0].product_name == "Tilavarauspalvelu"
     assert order.items[0].quantity == 1
     assert order.items[0].unit == "pcs"
-    assert order.items[0].row_price_net == Decimal("10")
+    assert order.items[0].row_price_net == Decimal(10)
     assert order.items[0].row_price_vat == Decimal("2.4")
     assert order.items[0].row_price_total == Decimal("12.4")
-    assert order.items[0].price_net == Decimal("10")
+    assert order.items[0].price_net == Decimal(10)
     assert order.items[0].price_gross == Decimal("12.4")
     assert order.items[0].price_vat == Decimal("2.4")
-    assert order.items[0].vat_percentage == Decimal("24")
+    assert order.items[0].vat_percentage == Decimal(24)
     assert order.items[0].meta[0].order_item_meta_id == uuid.UUID("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6")
     assert order.subscription_id == uuid.UUID("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6")
 

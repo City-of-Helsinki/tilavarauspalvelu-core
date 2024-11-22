@@ -18,8 +18,8 @@ class ReservationUnitPricingFactory(GenericDjangoModelFactory[ReservationUnitPri
     begins = datetime.date(2021, 1, 1)
     price_unit = PriceUnit.PRICE_UNIT_PER_15_MINS
 
-    lowest_price = Decimal("5")
-    highest_price = Decimal("10")
+    lowest_price = Decimal(5)
+    highest_price = Decimal(10)
 
     is_activated_on_begins = False
 

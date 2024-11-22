@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import enum
+import operator
 from enum import StrEnum
 from inspect import cleandoc
 from types import DynamicClassAttribute
@@ -239,7 +240,7 @@ class UserRoleChoice(models.TextChoices):
                 for key, value in cls.__dict__.items()
                 if isinstance(value, permission)
             ),
-            key=lambda x: x[0],
+            key=operator.itemgetter(0),
         )
 
 
