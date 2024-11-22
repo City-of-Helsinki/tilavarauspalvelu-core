@@ -174,20 +174,20 @@ class ReservationNode(DjangoNode):
             field: (
                 staff_field_check
                 if field
-                in [
+                in {
                     # STAFF FIELDS
                     "type",
                     "handling_details",
                     "working_memo",
                     "handled_at",
                     "staff_event",
-                ]
+                }
                 # FIELDS ARE PRIVATE BY DEFAULT
                 else private_field_check
             )
             for field in fields
             if field
-            not in [
+            not in {
                 # PUBLIC FIELDS
                 "pk",
                 "state",
@@ -197,7 +197,7 @@ class ReservationNode(DjangoNode):
                 "buffer_time_after",
                 "reservation_units",
                 "is_blocked",
-            ]
+            }
         }
         max_complexity = 22
         filterset_class = ReservationFilterSet

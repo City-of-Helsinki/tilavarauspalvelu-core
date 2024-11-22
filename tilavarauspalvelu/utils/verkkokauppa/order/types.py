@@ -138,7 +138,7 @@ class Order:
                                 key=meta["key"],
                                 value=meta["value"],
                                 label=meta.get("label"),
-                                visible_in_checkout=meta.get("visibleInCheckout") not in [False, "false"],
+                                visible_in_checkout=meta.get("visibleInCheckout") not in {False, "false"},
                                 ordinal=meta.get("ordinal"),
                             )
                             for meta in item["meta"]

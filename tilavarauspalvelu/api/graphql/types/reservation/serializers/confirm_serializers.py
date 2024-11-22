@@ -117,10 +117,10 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
 
         if (
             state
-            in [
+            in {
                 ReservationStateChoice.CONFIRMED.value,
                 ReservationStateChoice.WAITING_FOR_PAYMENT.value,
-            ]
+            }
             and self.instance.price_net > 0
         ):
             payment_type = self.validated_data["payment_type"].upper()

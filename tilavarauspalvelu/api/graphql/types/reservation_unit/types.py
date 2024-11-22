@@ -180,7 +180,7 @@ class ReservationUnitNode(DjangoNode):
     @classmethod
     def filter_queryset(cls, queryset: models.QuerySet, info: GQLInfo) -> models.QuerySet:
         # Allow fetching data for archived reservation units, through relations from ReservationNode
-        if getattr(info.return_type, "name", None) in ["ReservationNode", "ReservationNodeConnection"]:
+        if getattr(info.return_type, "name", None) in {"ReservationNode", "ReservationNodeConnection"}:
             return queryset
         # Archived reservation units should not be directly visible in the API
         return queryset.filter(is_archived=False)

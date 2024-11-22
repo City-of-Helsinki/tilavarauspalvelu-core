@@ -99,7 +99,7 @@ class RotatingCeleryLogging(Logging):
 app = Celery("tilavarauspalvelu", log=RotatingCeleryLogging)
 
 # Add the liveness probe to the worker in platta environments.
-if os.getenv("DJANGO_SETTINGS_ENVIRONMENT") in ("Development", "Testing", "Staging", "Production"):
+if os.getenv("DJANGO_SETTINGS_ENVIRONMENT") in {"Development", "Testing", "Staging", "Production"}:
     app.steps["worker"].add(LivenessProbe)
 
 # Add default configuration for Celery.

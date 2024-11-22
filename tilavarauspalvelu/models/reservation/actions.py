@@ -194,7 +194,7 @@ class ReservationActions:
 
     def get_email_reservee_name(self) -> str:
         # Note: Different from 'reservation.reservee_name' (simpler, mainly)
-        if self.reservation.reservee_type in (CustomerTypeChoice.INDIVIDUAL.value, None):
+        if self.reservation.reservee_type in {CustomerTypeChoice.INDIVIDUAL.value, None}:
             return f"{self.reservation.reservee_first_name} {self.reservation.reservee_last_name}".strip()
         return self.reservation.reservee_organisation_name
 

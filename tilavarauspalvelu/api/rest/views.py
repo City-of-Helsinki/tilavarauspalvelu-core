@@ -80,7 +80,7 @@ def csrf_view(request: WSGIRequest) -> HttpResponseRedirect | JsonResponse:  # N
 def terms_of_use_pdf(request: WSGIRequest) -> FileResponse | JsonResponse:
     """Download the booking terms of use as a PDF"""
     title = "Tilavarauspalvelu yleiset sopimusehdot"
-    as_attachment = request.GET.get("as_attachment", "1").lower() not in ("0", "false", "no", "n")
+    as_attachment = request.GET.get("as_attachment", "1").lower() not in {"0", "false", "no", "n"}
 
     try:
         terms = TermsOfUse.objects.get(id="booking")

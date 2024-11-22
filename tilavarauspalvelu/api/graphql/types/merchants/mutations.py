@@ -57,7 +57,7 @@ class RefreshOrderMutation(DjangoMutation):
             raise ValidationErrorWithCode(msg, ValidationErrorCodes.EXTERNAL_SERVICE_ERROR) from error
 
         new_status: OrderStatus = payment_order.actions.get_order_status_from_webshop_response(webshop_payment)
-        if new_status in (OrderStatus.CANCELLED, OrderStatus.PAID):
+        if new_status in {OrderStatus.CANCELLED, OrderStatus.PAID}:
             payment_order.actions.update_order_status(new_status, webshop_payment.payment_id)
 
         return RefreshOrderMutationOutput(

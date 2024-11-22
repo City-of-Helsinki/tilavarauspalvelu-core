@@ -171,7 +171,7 @@ class ReservationSchedulingMixin:
 
     def check_reservation_time(self, reservation_unit: ReservationUnit) -> None:
         state = reservation_unit.publishing_state
-        if state in [ReservationUnitPublishingState.DRAFT.value, ReservationUnitPublishingState.ARCHIVED.value]:
+        if state in {ReservationUnitPublishingState.DRAFT.value, ReservationUnitPublishingState.ARCHIVED.value}:
             msg = f"Reservation unit is not reservable due to its status: '{state}'."
             raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_UNIT_NOT_RESERVABLE)
 

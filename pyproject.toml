@@ -168,6 +168,7 @@ lint.extend-select = [
     "PLE4703",  # modified-iterating-set
     "PLR1733",  # unnecessary-dict-index-lookup
     "PLR6104",  # non-augmented-assignment
+    "PLR6201",  # literal-membership
     "PLW0108",  # unnecessary-lambda
     "PLW1514",  # unspecified-encoding
     "PLW1641",  # eq-without-hash (NOTE: Does not check for __hash__ implementations in superclasses.)

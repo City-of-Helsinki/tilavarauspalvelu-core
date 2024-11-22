@@ -62,7 +62,7 @@ class PaymentOrderActions:
     def get_order_status_from_webshop_response(self, webshop_payment: Payment | None) -> OrderStatus:
         """Determines the order status based on the payment response from the webshop."""
         # Statuses PAID, PAID_MANUALLY and REFUNDED are "final" and should not be updated from the webshop.
-        if self.payment_order.status in (OrderStatus.REFUNDED, OrderStatus.PAID, OrderStatus.PAID_MANUALLY):
+        if self.payment_order.status in {OrderStatus.REFUNDED, OrderStatus.PAID, OrderStatus.PAID_MANUALLY}:
             return OrderStatus(self.payment_order.status)
 
         older_than_minutes = settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES
