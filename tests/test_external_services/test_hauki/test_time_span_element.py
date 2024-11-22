@@ -13,7 +13,7 @@ from utils.date_utils import DEFAULT_TIMEZONE
 
 class TimeSpanElementParams(NamedTuple):
     time_element_changes: dict[str, Any]
-    expected: None | TimeSpanElement
+    expected: TimeSpanElement | None
 
 
 @pytest.mark.parametrize(
