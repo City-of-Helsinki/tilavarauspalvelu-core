@@ -5,19 +5,9 @@ from typing import TYPE_CHECKING, Any
 
 from tilavarauspalvelu.enums import ReservationStartInterval
 from tilavarauspalvelu.exceptions import HaukiAPIError
-from tilavarauspalvelu.models import (
-    Building,
-    Location,
-    OriginHaukiResource,
-    PaymentAccounting,
-    PaymentMerchant,
-    ReservableTimeSpan,
-    Reservation,
-    ReservationUnit,
-    ReservationUnitPricing,
-)
+from tilavarauspalvelu.models import OriginHaukiResource
 from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
-from tilavarauspalvelu.utils.opening_hours.hauki_api_types import HaukiAPIResource, HaukiTranslatedField
+from tilavarauspalvelu.utils.opening_hours.hauki_api_types import HaukiTranslatedField
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, time_as_timedelta
 from utils.external_service.errors import ExternalServiceError
 
@@ -25,6 +15,18 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
     from django.db import models
+
+    from tilavarauspalvelu.models import (
+        Building,
+        Location,
+        PaymentAccounting,
+        PaymentMerchant,
+        ReservableTimeSpan,
+        Reservation,
+        ReservationUnit,
+        ReservationUnitPricing,
+    )
+    from tilavarauspalvelu.utils.opening_hours.hauki_api_types import HaukiAPIResource
 
 
 class ReservationUnitHaukiExporter:

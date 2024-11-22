@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from datetime import datetime, timedelta
+from datetime import timedelta
 from typing import TYPE_CHECKING
 
 from tilavarauspalvelu.enums import ReservationStartInterval
@@ -9,6 +9,8 @@ from tilavarauspalvelu.utils.first_reservable_time.utils import ReservableTimeOu
 from tilavarauspalvelu.utils.opening_hours.time_span_element_utils import override_reservable_with_closed_time_spans
 
 if TYPE_CHECKING:
+    from datetime import datetime
+
     from tilavarauspalvelu.models import ReservableTimeSpan
     from tilavarauspalvelu.utils.first_reservable_time.first_reservable_time_reservation_unit_helper import (
         ReservationUnitFirstReservableTimeHelper,

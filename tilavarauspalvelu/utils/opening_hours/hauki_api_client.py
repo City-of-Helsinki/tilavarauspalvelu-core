@@ -1,17 +1,19 @@
 import datetime
-from typing import Any, NotRequired, TypedDict, Unpack
+from typing import TYPE_CHECKING, Any, NotRequired, TypedDict, Unpack
 
 from django.conf import settings
 
 from tilavarauspalvelu.exceptions import HaukiAPIError, HaukiConfigurationError
 from tilavarauspalvelu.utils.opening_hours.hauki_api_types import (
     HaukiAPIDatePeriod,
-    HaukiAPIOpeningHoursResponse,
     HaukiAPIOpeningHoursResponseItem,
     HaukiAPIResource,
     HaukiAPIResourceListResponse,
 )
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.utils.opening_hours.hauki_api_types import HaukiAPIOpeningHoursResponse
 
 __all__ = [
     "HaukiAPIClient",

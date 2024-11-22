@@ -296,6 +296,10 @@ section-order = [
     "local-folder",
 ]
 
+[tool.ruff.lint.flake8-type-checking]
+strict = true
+quote-annotations = false
+
 [tool.ruff.lint.flake8-import-conventions]
 banned-from = [
     # Python standard libraries

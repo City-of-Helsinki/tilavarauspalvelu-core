@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 import pytest
 from django.contrib import admin
 from django.test import Client, override_settings
-from django.urls import URLPattern, reverse
+from django.urls import reverse
 
 from tests import factories
 from tests.helpers import patch_method
@@ -16,6 +16,8 @@ from tilavarauspalvelu.tasks import create_or_update_reservation_statistics
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 
 if TYPE_CHECKING:
+    from django.urls import URLPattern
+
     from tests.factories._base import GenericDjangoModelFactory
 
 

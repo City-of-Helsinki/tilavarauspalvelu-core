@@ -1,7 +1,12 @@
+from typing import TYPE_CHECKING
+
 from django.db import models
 
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
-from tilavarauspalvelu.models import ApplicationRound, RecurringReservation, Reservation
+from tilavarauspalvelu.models import RecurringReservation, Reservation
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import ApplicationRound
 
 
 class ApplicationRoundActions:

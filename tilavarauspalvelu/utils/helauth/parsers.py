@@ -11,22 +11,24 @@ from tilavarauspalvelu.models import City
 from tilavarauspalvelu.utils.helauth.typing import (
     BirthdayInfo,
     LoginMethod,
-    PermanentAddress,
-    PermanentForeignAddress,
-    ProfileAddress,
-    ProfileData,
-    ProfileEmail,
     ProfileForeignAddress,
     ProfileLocalAddress,
-    ProfileNode,
-    ProfilePhone,
     ReservationPrefillInfo,
     UserProfileInfo,
-    VerifiedPersonalInfo,
 )
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import User
+    from tilavarauspalvelu.utils.helauth.typing import (
+        PermanentAddress,
+        PermanentForeignAddress,
+        ProfileAddress,
+        ProfileData,
+        ProfileEmail,
+        ProfileNode,
+        ProfilePhone,
+        VerifiedPersonalInfo,
+    )
 
 __all__ = [
     "ProfileDataParser",

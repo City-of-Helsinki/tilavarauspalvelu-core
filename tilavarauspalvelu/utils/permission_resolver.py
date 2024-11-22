@@ -4,12 +4,13 @@ from typing import TYPE_CHECKING, Self
 
 from django.db.models import Q
 
-from tilavarauspalvelu.enums import UserPermissionChoice, UserRoleChoice
+from tilavarauspalvelu.enums import UserRoleChoice
 from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
     from collections.abc import Container, Iterable
 
+    from tilavarauspalvelu.enums import UserPermissionChoice
     from tilavarauspalvelu.models import (
         Application,
         ApplicationRound,

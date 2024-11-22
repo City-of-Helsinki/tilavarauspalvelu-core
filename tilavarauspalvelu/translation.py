@@ -38,7 +38,6 @@ from .models import (
     TermsOfUse,
     Unit,
     UnitGroup,
-    User,
 )
 
 if TYPE_CHECKING:
@@ -47,6 +46,7 @@ if TYPE_CHECKING:
     from django.db import models
     from django.utils.functional import Promise
 
+    from .models import User
     from .typing import Lang
 
 __all__ = [

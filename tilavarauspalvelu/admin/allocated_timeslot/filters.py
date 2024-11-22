@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from django.contrib import admin
-from django.db.models import Q, QuerySet
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
 
@@ -16,6 +16,8 @@ from tilavarauspalvelu.enums import (
 from tilavarauspalvelu.models import ApplicationRound
 
 if TYPE_CHECKING:
+    from django.db.models import QuerySet
+
     from tilavarauspalvelu.typing import WSGIRequest
 
 

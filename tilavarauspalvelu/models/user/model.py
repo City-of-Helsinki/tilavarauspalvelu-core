@@ -11,8 +11,8 @@ from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 from helusers.models import AbstractUser
 
-from tilavarauspalvelu.enums import ReservationNotification, UserPermissionChoice, UserRoleChoice
-from tilavarauspalvelu.utils.helauth.typing import ExtraData, IDToken
+from tilavarauspalvelu.enums import ReservationNotification, UserRoleChoice
+from tilavarauspalvelu.utils.helauth.typing import IDToken
 from tilavarauspalvelu.utils.helauth.utils import get_jwt_payload
 from tilavarauspalvelu.utils.permission_resolver import PermissionResolver
 from utils.date_utils import DEFAULT_TIMEZONE
@@ -24,7 +24,9 @@ if TYPE_CHECKING:
 
     from social_django.models import UserSocialAuth
 
+    from tilavarauspalvelu.enums import UserPermissionChoice
     from tilavarauspalvelu.models import UnitRole
+    from tilavarauspalvelu.utils.helauth.typing import ExtraData
 
     from .actions import UserActions
 

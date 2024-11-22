@@ -3,14 +3,14 @@ from __future__ import annotations
 import datetime
 import random
 import uuid
-from typing import Any, Self
+from typing import TYPE_CHECKING, Any, Self
 
 import factory
 from factory import LazyAttribute
 from factory.fuzzy import FuzzyInteger
 
 from tilavarauspalvelu.enums import AuthenticationType, ReservationKind, ReservationStartInterval
-from tilavarauspalvelu.models import ReservationUnit, Space
+from tilavarauspalvelu.models import ReservationUnit
 from utils.date_utils import local_start_of_day
 from utils.utils import as_p_tags
 
@@ -24,6 +24,9 @@ from ._base import (
     ModelFactoryBuilder,
     ReverseForeignKeyFactory,
 )
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import Space
 
 __all__ = [
     "ReservationUnitBuilder",
