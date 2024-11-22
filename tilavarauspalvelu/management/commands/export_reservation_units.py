@@ -8,5 +8,5 @@ from tilavarauspalvelu.utils.reservation_units.export_data import ReservationUni
 class Command(BaseCommand):
     help = "Exports reservation unit data from the database"
 
-    def handle(self, *args: Any, **options: Any):
+    def handle(self, *args: Any, **options: Any) -> None:
         ReservationUnitExporter.export_reservation_unit_data()

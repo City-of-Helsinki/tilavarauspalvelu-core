@@ -89,7 +89,7 @@ def reservations_reservation_units_m2m(
 
 
 @receiver(post_save, sender=ReservationUnit, dispatch_uid="reservation_unit_saved")
-def reservation_unit_saved(instance: ReservationUnit, *, created: bool, **kwargs: Any):
+def reservation_unit_saved(instance: ReservationUnit, *, created: bool, **kwargs: Any) -> None:
     if settings.UPDATE_PRODUCT_MAPPING:
         refresh_reservation_unit_product_mapping.delay(instance.pk)
 
@@ -98,19 +98,19 @@ def reservation_unit_saved(instance: ReservationUnit, *, created: bool, **kwargs
 
 
 @receiver(post_delete, sender=ReservationUnit, dispatch_uid="reservation_unit_deleted")
-def reservation_unit_deleted(*args: Any, **kwargs: Any):
+def reservation_unit_deleted(*args: Any, **kwargs: Any) -> None:
     if settings.UPDATE_RESERVATION_UNIT_HIERARCHY:
         update_reservation_unit_hierarchy_task.delay(using=kwargs.get("using"))
 
 
 @receiver(m2m_changed, sender=ReservationUnit.spaces.through, dispatch_uid="reservation_unit_spaces_modified")
-def reservation_unit_spaces_modified(action: Action, *args: Any, **kwargs: Any):
+def reservation_unit_spaces_modified(action: Action, *args: Any, **kwargs: Any) -> None:
     if settings.UPDATE_RESERVATION_UNIT_HIERARCHY and action in {"post_add", "post_remove", "post_clear"}:
         update_reservation_unit_hierarchy_task.delay(using=kwargs.get("using"))
 
 
 @receiver(m2m_changed, sender=ReservationUnit.resources.through, dispatch_uid="reservation_unit_resources_modified")
-def reservation_unit_resources_modified(action: Action, *args: Any, **kwargs: Any):
+def reservation_unit_resources_modified(action: Action, *args: Any, **kwargs: Any) -> None:
     if settings.UPDATE_RESERVATION_UNIT_HIERARCHY and action in {"post_add", "post_remove", "post_clear"}:
         update_reservation_unit_hierarchy_task.delay(using=kwargs.get("using"))
 
@@ -130,18 +130,18 @@ def update_last_login(user: User, **kwargs: Any) -> None:
 
 
 @receiver(pre_save, sender=Purpose, dispatch_uid="purpose_to_save")
-def purpose_to_save(instance: Purpose, *args: Any, **kwargs: Any):
+def purpose_to_save(instance: Purpose, *args: Any, **kwargs: Any) -> None:
     if settings.IMAGE_CACHE_ENABLED:
         purge_previous_image_cache(instance)
 
 
 @receiver(pre_save, sender=ReservationUnitImage, dispatch_uid="reservation_unit_image_to_save")
-def reservation_unit_image_to_save(instance: ReservationUnitImage, *args: Any, **kwargs: Any):
+def reservation_unit_image_to_save(instance: ReservationUnitImage, *args: Any, **kwargs: Any) -> None:
     if settings.UPDATE_RESERVATION_UNIT_THUMBNAILS and settings.IMAGE_CACHE_ENABLED:
         purge_previous_image_cache(instance)
 
 
 @receiver(post_save, sender=ReservationUnitImage, dispatch_uid="reservation_unit_image_saved")
-def reservation_unit_image_saved(instance: ReservationUnitImage, *args: Any, **kwargs: Any):
+def reservation_unit_image_saved(instance: ReservationUnitImage, *args: Any, **kwargs: Any) -> None:
     if settings.UPDATE_RESERVATION_UNIT_THUMBNAILS:
         create_reservation_unit_thumbnails_and_urls.delay(instance.pk)

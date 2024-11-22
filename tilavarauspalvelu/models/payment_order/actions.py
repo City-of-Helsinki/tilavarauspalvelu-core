@@ -115,7 +115,7 @@ class PaymentOrderActions:
             EmailService.send_reservation_confirmed_email(reservation=self.payment_order.reservation)
             EmailService.send_staff_notification_reservation_made_email(reservation=self.payment_order.reservation)
 
-    def refresh_order_status_from_webshop(self):
+    def refresh_order_status_from_webshop(self) -> None:
         """Fetches the payment status from the webshop and updates the PaymentOrder status accordingly."""
         webshop_payment: Payment | None = self.get_order_payment_from_webshop()
         new_status: OrderStatus = self.get_order_status_from_webshop_response(webshop_payment)

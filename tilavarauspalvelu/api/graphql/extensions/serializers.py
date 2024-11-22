@@ -21,7 +21,7 @@ class OldPrimaryKeySerializerBase(serializers.ModelSerializer):
 
         return int_val
 
-    def validation_error_to_graphql_error(self, error: serializers.ValidationError):
+    def validation_error_to_graphql_error(self, error: serializers.ValidationError) -> GraphQLError:
         fields, message = self.compile_fields_and_errors(error.detail)
         return GraphQLError(message, extensions={"field": fields}, original_error=error)
 

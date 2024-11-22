@@ -52,7 +52,7 @@ class RecurringReservationFilterSet(ModelFilterSet):
             ("reservation_unit__unit__name_sv", "unit_name_sv"),
         ]
 
-    def get_reservation_unit_name(self, qs, name: str, value: str):
+    def get_reservation_unit_name(self, qs, name: str, value: str) -> models.QuerySet[RecurringReservation]:
         language = name[-2:]
         words = value.split(",")
 

@@ -140,14 +140,14 @@ def prune_reservations_task() -> None:
 
 
 @app.task(name="send_application_in_allocation_email")
-def send_application_in_allocation_email_task():
+def send_application_in_allocation_email_task() -> None:
     from tilavarauspalvelu.integrations.email.main import EmailService
 
     EmailService.send_application_in_allocation_emails()
 
 
 @app.task(name="send_application_handled_email")
-def send_application_handled_email_task():
+def send_application_handled_email_task() -> None:
     from tilavarauspalvelu.integrations.email.main import EmailService
 
     EmailService.send_application_handled_emails()
@@ -701,14 +701,14 @@ def deactivate_old_permissions_task() -> None:
 
 
 @app.task(name="send_permission_deactivation_email")
-def send_permission_deactivation_email_task():
+def send_permission_deactivation_email_task() -> None:
     from tilavarauspalvelu.integrations.email.main import EmailService
 
     EmailService.send_permission_deactivation_emails()
 
 
 @app.task(name="send_user_anonymization_email")
-def send_user_anonymization_email_task():
+def send_user_anonymization_email_task() -> None:
     from tilavarauspalvelu.integrations.email.main import EmailService
 
     EmailService.send_user_anonymization_emails()

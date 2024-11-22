@@ -251,7 +251,7 @@ class Query(graphene.ObjectType):
         application_id: int | None = kwargs.get("application_id")
         return HelsinkiProfileDataNode.get_data(info, application_id=application_id, reservation_id=reservation_id)
 
-    def resolve_order(root: None, info: GQLInfo, *, order_uuid: str, **kwargs: Any):
+    def resolve_order(root: None, info: GQLInfo, *, order_uuid: str, **kwargs: Any) -> PaymentOrder | None:
         queryset = optimize(PaymentOrder.objects.filter(remote_id=order_uuid, reservation__isnull=False), info)
         order = next(iter(queryset), None)  # Avoids adding additional ordering.
         if order is None:
@@ -270,7 +270,7 @@ class Query(graphene.ObjectType):
             require_all=kwargs.get("require_all", False),
         )
 
-    def resolve_banner_notifications(root: None, info: GQLInfo, **kwargs: Any):
+    def resolve_banner_notifications(root: None, info: GQLInfo, **kwargs: Any) -> models.QuerySet[BannerNotification]:
         user: AnyUser = info.context.user
         if user.permissions.can_manage_notifications():
             return BannerNotification.objects.all()

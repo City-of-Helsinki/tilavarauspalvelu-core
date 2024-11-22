@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 class RedisSentinelHealthCheck(BaseHealthCheckBackend):
     """Health check for Redis using a sentinel."""
 
-    def check_status(self):
+    def check_status(self) -> None:
         """Check the connectio to Redis using a sentinel."""
         logger.debug("Creating connection factory for Redis sentinel...")
 

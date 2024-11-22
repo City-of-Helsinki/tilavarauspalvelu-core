@@ -143,13 +143,13 @@ class ReservationSchedulingMixin:
     instance: Reservation | None
 
     @classmethod
-    def _get_invalid_begin(cls, reservation_unit, now: datetime.datetime):
+    def _get_is_invalid_begin(cls, reservation_unit, now: datetime.datetime) -> bool:
         return (reservation_unit.reservation_begins and now < reservation_unit.reservation_begins) or (
             reservation_unit.publish_begins and now < reservation_unit.publish_begins
         )
 
     @classmethod
-    def _get_invalid_end(cls, reservation_unit: ReservationUnit, now: datetime.datetime):
+    def _get_is_invalid_end(cls, reservation_unit: ReservationUnit, now: datetime.datetime) -> bool:
         reservation_in_reservations_closed_period = (
             reservation_unit.reservation_ends
             and now >= reservation_unit.reservation_ends
@@ -177,9 +177,9 @@ class ReservationSchedulingMixin:
 
         now = timezone.now()
 
-        is_invalid_begin = self._get_invalid_begin(reservation_unit, now)
+        is_invalid_begin = self._get_is_invalid_begin(reservation_unit, now)
 
-        is_invalid_end = self._get_invalid_end(reservation_unit, now)
+        is_invalid_end = self._get_is_invalid_end(reservation_unit, now)
 
         if is_invalid_begin or is_invalid_end:
             msg = "Reservation unit is not reservable at current time."

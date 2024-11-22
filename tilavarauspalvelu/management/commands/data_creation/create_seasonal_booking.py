@@ -127,7 +127,7 @@ def _create_handled_application_rounds(
     age_groups: list[AgeGroup],
     cities: list[City],
     users: list[User],
-):
+) -> None:
     now = local_datetime()
     today = now.date()
 
@@ -258,7 +258,7 @@ def _create_application_round_in_allocations(
     age_groups: list[AgeGroup],
     cities: list[City],
     users: list[User],
-):
+) -> None:
     """
     Create an application in allocation round where there are:
 
@@ -602,7 +602,7 @@ def _create_upcoming_application_rounds(
     terms_of_use: TermsOfUse,
     reservation_units: list[ReservationUnit],
     reservation_purposes: list[ReservationPurpose],
-):
+) -> None:
     now = local_datetime()
     today = now.date()
 

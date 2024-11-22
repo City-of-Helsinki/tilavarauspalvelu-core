@@ -73,7 +73,7 @@ class ReservationQuerySet(models.QuerySet):
             end__date__gte=period_start,
         )
 
-    def going_to_occur(self: Self):
+    def going_to_occur(self: Self) -> Self:
         return self.filter(state__in=ReservationStateChoice.states_going_to_occur)
 
     def active(self: Self) -> Self:
