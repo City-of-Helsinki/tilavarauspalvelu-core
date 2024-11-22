@@ -16,7 +16,7 @@ class RecurringReservationListFilter(admin.SimpleListFilter):
             ("0", _("No")),
         ]
 
-    def queryset(self, request: WSGIRequest, queryset: QuerySet[Reservation]):
+    def queryset(self, request: WSGIRequest, queryset: QuerySet[Reservation]) -> QuerySet[Reservation]:
         if self.value() == "1":
             return queryset.filter(recurring_reservation__isnull=False)
         if self.value() == "0":
@@ -34,7 +34,7 @@ class PaidReservationListFilter(admin.SimpleListFilter):
             ("0", _("No")),
         ]
 
-    def queryset(self, request: WSGIRequest, queryset: QuerySet[Reservation]):
+    def queryset(self, request: WSGIRequest, queryset: QuerySet[Reservation]) -> QuerySet[Reservation]:
         if self.value() == "1":
             return queryset.filter(price__gt=0)
         if self.value() == "0":

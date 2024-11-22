@@ -215,7 +215,7 @@ class ReservationCancelledEmailTemplateTesterForm(
     cancel_reason = forms.CharField(initial="[PERUUTUKSEN SYY]", widget=text_widget)
 
     @classmethod
-    def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang):
+    def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> Self:
         return cls(
             initial={
                 "reservation_unit_name": get_attr_by_language(instance, "name", language),
@@ -253,7 +253,7 @@ class ReservationConfirmedEmailTemplateTesterForm(
     BaseEmailTemplateForm,
 ):
     @classmethod
-    def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang):
+    def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> Self:
         return cls(
             initial={
                 "reservation_unit_name": get_attr_by_language(instance, "name", language),
@@ -292,7 +292,7 @@ class ReservationApprovedEmailTemplateTesterForm(
     non_subsidised_price = forms.DecimalField(decimal_places=2, initial=Decimal("10.00"), widget=number_widget)
 
     @classmethod
-    def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang):
+    def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> Self:
         return cls(
             initial={
                 "reservation_unit_name": get_attr_by_language(instance, "name", language),
@@ -333,7 +333,7 @@ class ReservationHandlingRequiredEmailTemplateTesterForm(
     applying_for_free_of_charge = forms.BooleanField(initial=False, required=False)
 
     @classmethod
-    def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang):
+    def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> Self:
         return cls(
             initial={
                 "reservation_unit_name": get_attr_by_language(instance, "name", language),
@@ -370,7 +370,7 @@ class ReservationModifiedEmailTemplateTesterForm(
     BaseEmailTemplateForm,
 ):
     @classmethod
-    def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang):
+    def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> Self:
         return cls(
             initial={
                 "reservation_unit_name": get_attr_by_language(instance, "name", language),
@@ -409,7 +409,7 @@ class ReservationNeedsToBePaidEmailTemplateTesterForm(
     payment_due_date = forms.DateField(initial=datetime.date.today(), widget=date_widget)
 
     @classmethod
-    def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang):
+    def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> Self:
         return cls(
             initial={
                 "reservation_unit_name": get_attr_by_language(instance, "name", language),
@@ -449,7 +449,7 @@ class ReservationRejectedEmailTemplateTesterForm(
     rejection_reason = forms.CharField(initial="[HYLKÄYKSEN SYY]", widget=text_widget)
 
     @classmethod
-    def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang):
+    def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> Self:
         return cls(
             initial={
                 "reservation_unit_name": get_attr_by_language(instance, "name", language),
@@ -487,7 +487,7 @@ class StaffNotificationReservationMadeEmailTemplateTesterForm(
     booking_number = forms.IntegerField(initial=0, widget=number_widget)
 
     @classmethod
-    def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang):
+    def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> Self:
         return cls(
             initial={
                 "reservation_unit_name": get_attr_by_language(instance, "name", language),
@@ -521,7 +521,7 @@ class StaffNotificationReservationRequiresHandlingEmailTemplateTesterForm(
     booking_number = forms.IntegerField(initial=0, widget=number_widget)
 
     @classmethod
-    def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang):
+    def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> Self:
         return cls(
             initial={
                 "reservation_unit_name": get_attr_by_language(instance, "name", language),

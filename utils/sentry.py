@@ -27,7 +27,7 @@ class SentryLogger:
             capture_exception(err)
 
     @staticmethod
-    def log_if_raises(details: str, *, catch: list[type[Exception]] | None = None, re_raise: bool = False):
+    def log_if_raises(details: str, *, catch: list[type[Exception]] | None = None, re_raise: bool = False) -> Callable:
         """
         Decorator that logs exceptions raised by the decorated function.
         Note that the decorated function should return None.
