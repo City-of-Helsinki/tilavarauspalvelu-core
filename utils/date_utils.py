@@ -217,6 +217,12 @@ def local_iso_format(_datetime: datetime.datetime, /) -> str:
     return _datetime.astimezone(DEFAULT_TIMEZONE).isoformat(timespec="seconds")
 
 
+def local_datetime_string(_datetime: datetime.datetime, /, *, seconds: bool = False) -> str:
+    """Get the datetime in the local timezone in the finnish datetime format."""
+    fmt = "%d.%m.%Y %H:%M:%S" if seconds else "%d.%m.%Y %H:%M"
+    return _datetime.astimezone(DEFAULT_TIMEZONE).strftime(fmt)
+
+
 def local_date_string(_date: datetime.date, /) -> str:
     """Format a date to a string in the finnish local format."""
     return _date.strftime("%d.%m.%Y")
@@ -241,7 +247,7 @@ def local_timedelta_string(delta: datetime.timedelta, /) -> str:
     if seconds:
         duration_string += f" {seconds} s"
 
-    return duration_string
+    return duration_string.strip()
 
 
 def next_hour(*, plus_minutes: int = 0, plus_hours: int = 0, plus_days: int = 0) -> datetime.datetime:

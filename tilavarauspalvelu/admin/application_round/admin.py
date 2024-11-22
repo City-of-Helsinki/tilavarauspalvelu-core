@@ -12,11 +12,11 @@ from modeltranslation.admin import TranslationAdmin
 from tilavarauspalvelu.admin.application_round.form import ApplicationRoundAdminForm
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
 from tilavarauspalvelu.models import ApplicationRound
-from tilavarauspalvelu.typing import WSGIRequest
-from tilavarauspalvelu.utils.exporter.application_round_applications_exporter import (
+from tilavarauspalvelu.services.csv_export import (
     ApplicationRoundApplicationsCSVExporter,
+    ApplicationRoundResultCSVExporter,
 )
-from tilavarauspalvelu.utils.exporter.application_round_result_exporter import ApplicationRoundResultCSVExporter
+from tilavarauspalvelu.typing import WSGIRequest
 from utils.sentry import SentryLogger
 
 
@@ -98,31 +98,25 @@ class ApplicationRoundAdmin(ExtraButtonsMixin, TranslationAdmin):
 
     @button(label="Export applications to CSV", change_form=True)
     def export_applications_to_csv(self, request: WSGIRequest, pk: int) -> FileResponse | None:
-        exporter = ApplicationRoundApplicationsCSVExporter(application_round_id=pk)
         try:
-            response = exporter.export_as_file_response()
-        except Exception as err:
-            self.message_user(request, f"Error while exporting applications: {err}", level=messages.ERROR)
-            SentryLogger.log_exception(err, "Error while exporting ApplicationRound applications")
+            exporter = ApplicationRoundApplicationsCSVExporter(application_round_id=pk)
+            response = exporter.to_file_response()
+        except Exception as error:
+            self.message_user(request, f"Error while exporting applications: {error}", level=messages.ERROR)
+            SentryLogger.log_exception(error, "Error while exporting ApplicationRound applications")
             return None
-
-        if not response:
-            self.message_user(request, "No data to export for application round.", level=messages.WARNING)
 
         return response
 
     @button(label="Export results to CSV", change_form=True)
     def export_results_to_csv(self, request: WSGIRequest, pk: int) -> FileResponse | None:
-        exporter = ApplicationRoundResultCSVExporter(application_round_id=pk)
         try:
-            response = exporter.export_as_file_response()
-        except Exception as err:
-            self.message_user(request, f"Error while exporting results: {err}", level=messages.ERROR)
-            SentryLogger.log_exception(err, "Error while exporting ApplicationRound results")
+            exporter = ApplicationRoundResultCSVExporter(application_round_id=pk)
+            response = exporter.to_file_response()
+        except Exception as error:
+            self.message_user(request, f"Error while exporting results: {error}", level=messages.ERROR)
+            SentryLogger.log_exception(error, "Error while exporting ApplicationRound results")
             return None
-
-        if not response:
-            self.message_user(request, "No data to export for application round.", level=messages.WARNING)
 
         return response
 
