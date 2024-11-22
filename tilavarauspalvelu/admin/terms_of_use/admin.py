@@ -1,7 +1,10 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from admin_extra_buttons.decorators import button
 from admin_extra_buttons.mixins import ExtraButtonsMixin
 from django.contrib import admin
-from django.core.handlers.wsgi import WSGIRequest
 from django.forms import ModelForm
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -9,6 +12,10 @@ from modeltranslation.admin import TranslationAdmin
 from tinymce.widgets import TinyMCE
 
 from tilavarauspalvelu.models import TermsOfUse
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import WSGIRequest
+
 
 __all__ = [
     "TermsOfUseAdmin",

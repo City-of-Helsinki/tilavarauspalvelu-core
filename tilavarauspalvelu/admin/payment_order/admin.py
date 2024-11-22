@@ -1,13 +1,18 @@
+from __future__ import annotations
+
 import uuid
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from django import forms
 from django.contrib import admin
-from django.core.handlers.wsgi import WSGIRequest
-from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.models import PaymentOrder
+
+if TYPE_CHECKING:
+    from django.db import models
+
+    from tilavarauspalvelu.typing import WSGIRequest
 
 __all__ = [
     "PaymentOrderAdmin",

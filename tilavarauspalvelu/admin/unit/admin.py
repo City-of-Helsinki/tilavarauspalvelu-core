@@ -1,9 +1,11 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from admin_extra_buttons.decorators import button
 from admin_extra_buttons.mixins import ExtraButtonsMixin
 from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin, messages
-from django.core.handlers.wsgi import WSGIRequest
-from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from modeltranslation.admin import TranslationAdmin
 
@@ -11,6 +13,11 @@ from tilavarauspalvelu.admin.location.admin import LocationInline
 from tilavarauspalvelu.models import Unit
 from tilavarauspalvelu.utils.importers.tprek_unit_importer import TprekUnitImporter
 from utils.sentry import SentryLogger
+
+if TYPE_CHECKING:
+    from django.db.models import QuerySet
+
+    from tilavarauspalvelu.typing import WSGIRequest
 
 
 @admin.register(Unit)
