@@ -312,6 +312,9 @@ suppress-none-returning = true
 strict = true
 quote-annotations = false
 
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"django.core.handlers.wsgi.WSGIRequest".msg = "Use `tilavarauspalvelu.typing.WSGIRequest` instead."
+
 [tool.ruff.lint.flake8-import-conventions]
 banned-from = [
     # Python standard libraries

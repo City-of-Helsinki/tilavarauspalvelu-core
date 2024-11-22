@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import hmac
 import io
+from typing import TYPE_CHECKING
 
 from django.apps import apps
-from django.core.handlers.wsgi import WSGIRequest
 from django.db import connection
 from django.http import FileResponse, HttpResponseRedirect, JsonResponse
 from django.middleware.csrf import get_token
@@ -12,6 +14,9 @@ from django.views.decorators.http import require_GET
 from tilavarauspalvelu.models import Reservation, TermsOfUse
 from tilavarauspalvelu.utils.pdf import render_to_pdf
 from utils.utils import ical_hmac_signature
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import WSGIRequest
 
 __all__ = [
     "csrf_view",

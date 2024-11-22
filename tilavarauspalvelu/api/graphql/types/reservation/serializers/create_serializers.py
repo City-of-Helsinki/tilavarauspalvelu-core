@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 from typing import TYPE_CHECKING, Any
 
@@ -19,14 +21,13 @@ from tilavarauspalvelu.enums import (
     ReservationStateChoice,
 )
 from tilavarauspalvelu.models import AgeGroup, City, Reservation, ReservationPurpose, ReservationUnit
-from tilavarauspalvelu.typing import AnyUser, WSGIRequest
 from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
 from utils.date_utils import DEFAULT_TIMEZONE
 from utils.external_service.errors import ExternalServiceError
 from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
-    from django.core.handlers.wsgi import WSGIRequest
+    from tilavarauspalvelu.typing import AnyUser, WSGIRequest
 
 
 class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin, ReservationSchedulingMixin):

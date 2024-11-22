@@ -1,17 +1,21 @@
+from __future__ import annotations
+
 import datetime
 from contextlib import contextmanager
 from dataclasses import dataclass
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 from unittest.mock import MagicMock, patch
 
-from django.core.handlers.wsgi import WSGIRequest
 from django.utils.timezone import get_default_timezone
 from helusers.settings import api_token_auth_settings
 from jose import jwk, jwt
 from jose.constants import ALGORITHMS
 
 from tests.helpers import ResponseMock
-from tilavarauspalvelu.models import User
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import User
+    from tilavarauspalvelu.typing import WSGIRequest
 
 
 @contextmanager

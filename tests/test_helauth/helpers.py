@@ -1,8 +1,11 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 from unittest.mock import MagicMock
 
-from django.core.handlers.wsgi import WSGIRequest
-
-from tilavarauspalvelu.models import User
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import User
+    from tilavarauspalvelu.typing import WSGIRequest
 
 
 def mock_request(user: User) -> WSGIRequest:

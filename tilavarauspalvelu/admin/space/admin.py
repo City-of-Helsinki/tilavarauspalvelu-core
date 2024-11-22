@@ -1,12 +1,19 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from django.contrib import admin
-from django.core.handlers.wsgi import WSGIRequest
-from django.db import models
 from django.utils.translation import gettext_lazy as _
 from modeltranslation.admin import TranslationAdmin
 from mptt.admin import MPTTModelAdmin
 
 from tilavarauspalvelu.admin.location.admin import LocationInline
 from tilavarauspalvelu.models import Space
+
+if TYPE_CHECKING:
+    from django.db import models
+
+    from tilavarauspalvelu.typing import WSGIRequest
 
 
 class SpaceInline(admin.StackedInline):

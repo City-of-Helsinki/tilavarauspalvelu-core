@@ -65,7 +65,7 @@ class TimeSlotDB(TypedDict):
     end: str  # datetime.time
 
 
-class WSGIRequest(wsgi.WSGIRequest):
+class WSGIRequest(wsgi.WSGIRequest):  # noqa: TID251
     user: AnyUser
     session: SessionStore
 
