@@ -1,3 +1,4 @@
+import operator
 from typing import TYPE_CHECKING, Any, TypedDict
 
 from django.db import models
@@ -114,7 +115,7 @@ class ApplicationSectionSerializer(NestingModelSerializer):
             return
 
         # Check preferred_order is sequential, starting from zero
-        for index, (tracked, pks) in enumerate(sorted(tracked_ordering.items(), key=lambda x: x[0])):
+        for index, (tracked, pks) in enumerate(sorted(tracked_ordering.items(), key=operator.itemgetter(0))):
             if index != tracked:
                 # There should be only one pk in the list, since we raised errors early
                 option_errors.append(

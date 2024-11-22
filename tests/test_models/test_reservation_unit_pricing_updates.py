@@ -16,7 +16,7 @@ pytestmark = [
 
 
 TAX_CHANGE_DATE = datetime.date(2024, 9, 1)
-CURRENT_TAX = Decimal("24")
+CURRENT_TAX = Decimal(24)
 FUTURE_TAX = Decimal("25.5")
 
 
@@ -43,13 +43,13 @@ def test_reservation_unit__update_pricings__tax_percentage__future_pricing_befor
     pricing_1 = ReservationUnitPricingFactory.create(
         begins=datetime.date(2024, 1, 1),
         tax_percentage__value=CURRENT_TAX,
-        highest_price=Decimal("10"),
+        highest_price=Decimal(10),
     )
     pricing_2 = ReservationUnitPricingFactory.create(
         begins=datetime.date(2024, 8, 31),
         reservation_unit=pricing_1.reservation_unit,
         tax_percentage__value=CURRENT_TAX,
-        highest_price=Decimal("20"),
+        highest_price=Decimal(20),
     )
 
     update_reservation_unit_pricings_tax_percentage(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX))
@@ -143,7 +143,7 @@ def test_reservation_unit__update_pricings__tax_percentage__different_tax_percen
     ReservationUnitPricingFactory.create(
         begins=datetime.date(2024, 1, 1),
         reservation_unit=reservation_unit,
-        tax_percentage__value=Decimal("10"),  # Tax percentage is different
+        tax_percentage__value=Decimal(10),  # Tax percentage is different
     )
 
     update_reservation_unit_pricings_tax_percentage(str(TAX_CHANGE_DATE), str(CURRENT_TAX), str(FUTURE_TAX))

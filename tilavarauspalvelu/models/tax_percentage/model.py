@@ -42,7 +42,7 @@ class TaxPercentage(models.Model):
 
     @property
     def decimal(self) -> Decimal:
-        return self.value / Decimal("100")
+        return self.value / Decimal(100)
 
     @property
     def multiplier(self) -> Decimal:

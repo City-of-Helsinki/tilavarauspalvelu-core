@@ -175,7 +175,7 @@ def test_reservation__refund__payment_order_is_waiting_for_refund(graphql):
 def test_reservation__refund__reservation_price_is_zero(graphql):
     reservation = ReservationFactory.create_for_refund(
         state=ReservationStateChoice.CONFIRMED,
-        price=Decimal("0"),
+        price=Decimal(0),
     )
     payment_order = reservation.payment_order.first()
 

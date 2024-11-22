@@ -86,7 +86,7 @@ class PaymentOrder(models.Model):
 
         if self.price_net is not None and self.price_net < Decimal("0.01"):
             validation_errors.setdefault("price_net", []).append(_("Must be greater than 0.01"))
-        if self.price_vat is not None and self.price_vat < Decimal("0"):
+        if self.price_vat is not None and self.price_vat < Decimal(0):
             validation_errors.setdefault("price_vat", []).append(_("Must be greater than 0"))
         if self.price_total is not None and self.price_total != failsafe_price_net + failsafe_price_vat:
             validation_errors.setdefault("price_total", []).append(_("Must be the sum of net and vat amounts"))

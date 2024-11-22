@@ -333,7 +333,7 @@ def test_reservation__confirm__allows_unsupported_payment_type_with_zero_price(g
         reservation_units__payment_types__code=PaymentType.INVOICE,
         reservation_units__pricings__lowest_price=0,
         reservation_units__pricings__highest_price=0,
-        price=Decimal("0"),
+        price=Decimal(0),
     )
 
     graphql.login_with_superuser()
@@ -427,7 +427,7 @@ def test_reservation__confirm__cannot_confirm_if_order_exists(graphql):
 
 
 def test_reservation__confirm__order_not_created_when_price_is_zero(graphql):
-    reservation = ReservationFactory.create_for_confirmation(price=Decimal("0"))
+    reservation = ReservationFactory.create_for_confirmation(price=Decimal(0))
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
@@ -483,7 +483,7 @@ def test_reservation__confirm__without_price_and_with_free_pricing_does_not_requ
         reservation_units__payment_product=None,
         reservation_units__pricings__lowest_price=0,
         reservation_units__pricings__highest_price=0,
-        price=Decimal("0"),
+        price=Decimal(0),
     )
 
     graphql.login_with_superuser()

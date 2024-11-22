@@ -58,9 +58,9 @@ class PaymentFactory(GenericFactory[Payment]):
     status = "payment_created"
     payment_method = "creditcards"
     payment_type = "order"
-    total_excl_tax = Decimal("100")
-    total = Decimal("124")
-    tax_amount = Decimal("24")
+    total_excl_tax = Decimal(100)
+    total = Decimal(124)
+    tax_amount = Decimal(24)
     description = "Mock description"
     additional_info = '{"payment_method": creditcards}'
     token = uuid.uuid4()

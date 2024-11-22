@@ -152,9 +152,18 @@ lint.select = [
 lint.extend-select = [
     "B909",     # loop-iterator-mutation
     "FURB110",  # if-exp-instead-of-or-operator
+    "FURB113",  # repeated-append
+    "FURB118",  # reimplemented-operator
+    "FURB131",  # delete-full-slice
+    "FURB132",  # check-and-remove-from-set
     "FURB142",  # for-loop-set-mutations
     "FURB145",  # slice-copy
+    "FURB148",  # unnecessary-enumerate
+    "FURB157",  # verbose-decimal-constructor
     "FURB171",  # single-item-membership-test
+    "FURB188",  # slice-to-remove-prefix-or-suffix
+    "FURB189",  # subclass-builtin
+    "FURB192",  # sorted-min-max
     "PLR1733",  # unnecessary-dict-index-lookup
     "PLR6104",  # non-augmented-assignment
     "RUF027",   # missing-f-string-syntax
@@ -204,10 +213,10 @@ lint.dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$|^args$|^kwargs$
     "PLR0912",  # This one is allowed to be as complex as it needs to be.
 ]
 "tilavarauspalvelu/management/commands/data_creation/*.py" = [
-    "S101",     # Asserts are fine in test data creation.
-    "S311",     # pseudo-random generators are fine here.
     "PLR0913",  # Can take as many arguments as needed.
     "PLR0915",  # Can have as many statements as needed.
+    "S101",     # Asserts are fine in test data creation.
+    "S311",     # pseudo-random generators are fine here.
 ]
 "tilavarauspalvelu/api/webhooks/serializers.py" = [
     "N802",     # Allow non-lowercase function names for webhook serializers.
@@ -220,21 +229,21 @@ lint.dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$|^args$|^kwargs$
     "FBT001",   # Filtersets filter_* methods require three positional arguments, last one being boolean.
 ]
 "test_*.py" = [
-    "ARG",      # Allow unused arguments in tests (These are usually fixtures)
     "ANN",      # No need to annotate tests
+    "ARG",      # Allow unused arguments in tests (These are usually fixtures)
+    "N806",     # Allow whatever variable names in tests
+    "PLR0915",  # Can have as many statements as needed.
+    "PLR2004",  # Magic value comparisons are allowed in tests.
     "S101",     # Obviousle asserts are fine in tests
     "S105",     # Hardcoded passwords are fine in tests
     "S106",     # Hardcoded passwords are fine in tests
     "S108",     # No need to care about insecure temp file usages in tests
     "S311",     # Pseudo-random generators are fine here.
     "SLF",      # Allow accessing private members in tests
-    "PLR0915",  # Can have as many statements as needed.
-    "PLR2004",  # Magic value comparisons are allowed in tests.
-    "N806",     # Allow whatever variable names in tests
 ]
 "*tests/*.py" = [
-    "ARG",      # Allow unused arguments in tests (These are usually fixtures)
     "ANN",      # No need to annotate tests
+    "ARG",      # Allow unused arguments in tests (These are usually fixtures)
     "FBT001",   # Factory methods may require positional boolean arguments
     "N801",     # Allow whatever class names in tests
     "N802",     # Allow whatever function names in tests

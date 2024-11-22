@@ -22,7 +22,7 @@ def test_reservation__calculate_price__subsidised_price_is_equal_to_lowest_price
     pricing = ReservationUnitPricingFactory.create(price_unit=PriceUnit.PRICE_UNIT_FIXED)
     prices = ReservationPriceMixin().calculate_price(begin, end, [pricing.reservation_unit])
 
-    assert prices.reservation_price == Decimal("10")
+    assert prices.reservation_price == Decimal(10)
     assert prices.subsidised_price == pricing.lowest_price
 
 
@@ -90,13 +90,13 @@ def test_reservation__calculate_price__future_has_same_tax_percentage():
     pricing_1 = ReservationUnitPricingFactory.create(
         reservation_unit=reservation_unit,
         begins=day_1,
-        tax_percentage__value=Decimal("24"),
+        tax_percentage__value=Decimal(24),
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
     )
     pricing_2 = ReservationUnitPricingFactory.create(
         reservation_unit=reservation_unit,
         begins=day_2,
-        tax_percentage__value=Decimal("24"),
+        tax_percentage__value=Decimal(24),
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
         highest_price=Decimal("100.0"),
     )
@@ -116,7 +116,7 @@ def test_reservation__calculate_price__is_activated_on_begins():
     pricing_1 = ReservationUnitPricingFactory.create(
         reservation_unit=reservation_unit,
         begins=day_1,
-        tax_percentage__value=Decimal("24"),
+        tax_percentage__value=Decimal(24),
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
     )
     pricing_2 = ReservationUnitPricingFactory.create(
@@ -159,7 +159,7 @@ def test_reservation__calculate_price__active_is_free_future_is_paid_and_differe
     )
 
     prices = ReservationPriceMixin().calculate_price(day_1, day_1, [reservation_unit])
-    assert prices.tax_percentage_value == Decimal("0")
+    assert prices.tax_percentage_value == Decimal(0)
 
     prices = ReservationPriceMixin().calculate_price(day_2, day_2, [reservation_unit])
     assert prices.tax_percentage_value == Decimal("25.5")
@@ -186,4 +186,4 @@ def test_reservation__calculate_price__active_is_paid_future_is_free_and_differe
     assert prices.tax_percentage_value == Decimal("25.5")
 
     prices = ReservationPriceMixin().calculate_price(day_2, day_2, [reservation_unit])
-    assert prices.tax_percentage_value == Decimal("0")
+    assert prices.tax_percentage_value == Decimal(0)

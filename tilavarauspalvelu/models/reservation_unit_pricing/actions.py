@@ -15,7 +15,7 @@ class ReservationUnitPricingActions:
 
     def calculate_reservation_price(self, duration: datetime.timedelta, *, subsidised: bool = False) -> Decimal:
         if self.pricing.highest_price == 0:
-            return Decimal("0")
+            return Decimal(0)
 
         price_unit = PriceUnit(self.pricing.price_unit)
         price = self.pricing.lowest_price if subsidised else self.pricing.highest_price
