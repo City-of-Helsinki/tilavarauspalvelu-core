@@ -164,8 +164,14 @@ lint.extend-select = [
     "FURB188",  # slice-to-remove-prefix-or-suffix
     "FURB189",  # subclass-builtin
     "FURB192",  # sorted-min-max
+    "PLE1141",  # dict-iter-missing-items
+    "PLE4703",  # modified-iterating-set
     "PLR1733",  # unnecessary-dict-index-lookup
     "PLR6104",  # non-augmented-assignment
+    "PLW0108",  # unnecessary-lambda
+    "PLW1514",  # unspecified-encoding
+    "PLW1641",  # eq-without-hash (NOTE: Does not check for __hash__ implementations in superclasses.)
+    "PLW3201",  # bad-dunder-method-name
     "RUF027",   # missing-f-string-syntax
     "RUF028",   # invalid-formatter-suppression-comment
     "RUF031",   # incorrectly-parenthesized-tuple-in-subscript
