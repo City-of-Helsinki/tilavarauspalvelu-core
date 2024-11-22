@@ -95,9 +95,11 @@ extend-exclude = [
     "config/settings.py",
     "venv",
 ]
-lint.explicit-preview-rules = true
-lint.preview = true
-lint.select = [
+
+[tool.ruff.lint]
+explicit-preview-rules = true
+preview = true
+select = [
     "A",        # flake8-builtins
     #"ANN",     # flake8-annotations  # TODO: Enable this and fix (401) issues
     "ARG",      # flake8-unused-arguments
@@ -149,7 +151,7 @@ lint.select = [
     "W",        # pycodestyle warnings
 ]
 # Preview rules
-lint.extend-select = [
+extend-select = [
     "A006",     # builtin-lambda-argument-shadowing
     "B901",     # return-in-generator
     "B909",     # loop-iterator-mutation
@@ -193,7 +195,7 @@ lint.extend-select = [
     "RUF036",   # none-not-at-end-of-union
     "UP042",    # replace-str-enum
 ]
-lint.ignore = [
+ignore = [
     # Conflicting with ruff-format
     "ISC001",   # single-line-implicit-string-concatenation
 
@@ -220,7 +222,7 @@ lint.ignore = [
     "PLR2004",  # magic-value-comparison
     "PLW2901",  # redefined-loop-name
 ]
-lint.dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$|^args$|^kwargs$|^options$|^info$|^name$|^obj$|^request$|^user|^view$|^input_data$|^filters$"
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$|^args$|^kwargs$|^options$|^info$|^name$|^obj$|^request$|^user|^view$|^input_data$|^filters$"
 
 [tool.ruff.lint.extend-per-file-ignores]
 "local_settings*.py" = [
@@ -281,25 +283,17 @@ known-third-party = [
     "django",
 ]
 known-first-party = [
-    "actions",
-    "api",
-    "applications",
-    "common",
-    "elastic_django",
-    "email_notification",
-    "merchants",
-    "opening_hours",
-    "permissions",
-    "reservation_units",
-    "reservations",
-    "resources",
-    "services",
-    "spaces",
-    "terms_of_use",
+    "config",
     "tests",
     "tilavarauspalvelu",
-    "users",
     "utils",
+]
+section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "first-party",
+    "local-folder",
 ]
 
 [tool.ruff.lint.flake8-import-conventions]
