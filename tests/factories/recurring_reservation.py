@@ -69,7 +69,7 @@ class RecurringReservationFactory(GenericDjangoModelFactory[RecurringReservation
         space = SpaceFactory.create(unit=series.reservation_unit.unit)
         series.reservation_unit.spaces.add(space)
 
-        weekdays: list[int] = [int(val) for val in series.weekdays.split(",") if val != ""]
+        weekdays: list[int] = [int(val) for val in series.weekdays.split(",") if val]
         if not weekdays:
             weekdays = [series.begin_date.weekday()]
 

@@ -74,7 +74,7 @@ def _find_missing_translations(
             if entry.msgctxt is not None:
                 key = f"{entry.msgctxt} | {key}"
 
-            if entry.msgstr == "":
+            if not entry.msgstr:
                 missing[key].missing_languages.add(item.lang)
             if entry not in item.contents:
                 missing[key].not_included_previous.add(item.lang)

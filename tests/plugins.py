@@ -18,7 +18,7 @@ def setup_now_tt():
     Setup NowTT for tests so that when freezegun is used,
     it will also setup the offset in the database for NowTT.
     """
-    from freezegun.api import _freeze_time
+    from freezegun.api import _freeze_time  # noqa: PLC2701
 
     freezes: dict[int, int] = {}
 

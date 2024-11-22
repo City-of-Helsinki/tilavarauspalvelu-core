@@ -233,6 +233,7 @@ class ReservationSchedulingMixin:
         reservation_unit: ReservationUnit,
         begin: datetime.datetime,
         end: datetime.datetime,
+        *,
         reservation_type: ReservationNode | None = None,
         new_buffer_before: datetime.timedelta | None = None,
         new_buffer_after: datetime.timedelta | None = None,

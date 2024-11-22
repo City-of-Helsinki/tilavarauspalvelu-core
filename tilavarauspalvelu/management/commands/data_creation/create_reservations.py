@@ -760,7 +760,7 @@ def _create_reservations_for_series(
     pricing: ReservationUnitPricing | None = series.reservation_unit.pricings.active().first()
     assert pricing is not None, "Reservation unit must have at least one pricing"
 
-    weekdays: list[int] = [int(val) for val in series.weekdays.split(",") if val != ""]
+    weekdays: list[int] = [int(val) for val in series.weekdays.split(",") if val]
 
     reservations: list[Reservation] = []
     reservation_reservation_units: list[models.Model] = []

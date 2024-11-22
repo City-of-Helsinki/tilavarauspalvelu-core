@@ -122,7 +122,7 @@ class QueryLoggingMiddleware:
             except Exception as error:
                 SentryLogger.log_exception(error, "Error in QueryLoggingMiddleware")
 
-    def log(
+    def log(  # noqa: PLR0917
         self,
         execute: Callable[..., Any],
         sql: str,

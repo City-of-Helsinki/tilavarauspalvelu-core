@@ -58,6 +58,7 @@ class AllocatedTimeSlotQuerySet(models.QuerySet):
 
     def has_overlapping_allocations(
         self,
+        *,
         reservation_unit_option: ReservationUnitOption,
         begin_date: datetime.date,
         end_date: datetime.date,
