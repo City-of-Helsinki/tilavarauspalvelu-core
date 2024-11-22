@@ -77,8 +77,8 @@ pytest-xdist = "3.6.1"
 [tool.poetry.group.lint.dependencies]
 # Dependencies only required for linting.
 pre-commit = "4.0.1"
-ruff = "0.7.4"
-ruff-lsp = "0.0.58"
+ruff = "0.8.0"
+ruff-lsp = "0.0.59"
 
 [tool.poetry.plugins.pytest11]
 tilavarauspalvelu = "tests.plugins"
@@ -142,7 +142,7 @@ lint.select = [
     "SIM",      # flake8-simplify
     "SLF",      # flake8-self
     "T20",      # flake8-print
-    "TCH",      # flake8-type-checking
+    "TC",       # flake8-type-checking
     "TID",      # flake8-tidy-imports
     "TRY",      # tryceratops
     "UP",       # pyupgrade
@@ -155,15 +155,8 @@ lint.extend-select = [
     "FURB142",  # for-loop-set-mutations
     "FURB145",  # slice-copy
     "FURB171",  # single-item-membership-test
-    "PLE0307",  # invalid-str-return-type
-    "PLR0916",  # too-many-boolean-expressions
-    "PLR1730",  # if-stmt-min-max
     "PLR1733",  # unnecessary-dict-index-lookup
     "PLR6104",  # non-augmented-assignment
-    "PLW0211",  # bad-staticmethod-argument
-    "PLW0642",  # self-or-cls-assignment
-    "RUF021",   # parenthesize-chained-operators
-    "RUF022",   # unsorted-dunder-all
     "UP042",    # replace-str-enum
 ]
 lint.ignore = [
@@ -182,10 +175,6 @@ lint.ignore = [
     # Allow longer error messages in raised exceptions
     "TRY003",   # raise-vanilla-args
 
-    # Missing type annotation for `self` in method
-    "ANN101",   # missing-type-self
-    # Missing type annotation for `cls` in method
-    "ANN102",   # missing-type-cls
     # Any-typing allowed
     "ANN401",   # any-type
 
