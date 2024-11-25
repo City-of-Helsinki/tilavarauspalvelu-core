@@ -228,9 +228,6 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$|^args$|^kwargs$|^opt
 "local_settings*.py" = [
     "ERA001",   # Commented code is fine here.
 ]
-"utils/query_performance.py" = [
-    "PLR0912",  # This one is allowed to be as complex as it needs to be.
-]
 "utils/date_utils.py" = [
     "PLR0917",  # Can have as many positional arguments as needed.
 ]
