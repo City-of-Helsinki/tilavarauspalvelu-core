@@ -30,7 +30,7 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.typing import AnyUser, WSGIRequest
 
 
-class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin, ReservationSchedulingMixin):
+class ReservationBaseSaveSerializer(OldPrimaryKeySerializer, ReservationPriceMixin, ReservationSchedulingMixin):
     reservation_unit_pks = serializers.ListField(
         child=IntegerPrimaryKeyField(queryset=ReservationUnit.objects.all()),
         source="reservation_units",

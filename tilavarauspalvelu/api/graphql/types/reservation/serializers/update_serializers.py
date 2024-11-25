@@ -6,7 +6,9 @@ from graphene.utils.str_converters import to_camel_case
 
 from tilavarauspalvelu.api.graphql.extensions.serializers import OldPrimaryKeyUpdateSerializer
 from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
-from tilavarauspalvelu.api.graphql.types.reservation.serializers.create_serializers import ReservationCreateSerializer
+from tilavarauspalvelu.api.graphql.types.reservation.serializers._base_save_serializer import (
+    ReservationBaseSaveSerializer,
+)
 from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice
 from utils.date_utils import local_datetime
 
@@ -14,7 +16,7 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import Reservation, ReservationUnit
 
 
-class ReservationUpdateSerializer(OldPrimaryKeyUpdateSerializer, ReservationCreateSerializer):
+class ReservationUpdateSerializer(OldPrimaryKeyUpdateSerializer, ReservationBaseSaveSerializer):
     instance: Reservation
 
     def __init__(self, *args, **kwargs) -> None:
