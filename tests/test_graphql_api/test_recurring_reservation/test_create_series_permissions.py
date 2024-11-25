@@ -1,7 +1,8 @@
 import pytest
 
-from tests.factories import ReservationUnitFactory, UserFactory
 from tilavarauspalvelu.enums import UserRoleChoice
+
+from tests.factories import ReservationUnitFactory, UserFactory
 
 from .helpers import CREATE_SERIES_MUTATION, get_minimal_series_data
 

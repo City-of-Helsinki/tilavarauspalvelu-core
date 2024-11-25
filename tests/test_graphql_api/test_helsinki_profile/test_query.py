@@ -1,11 +1,12 @@
 import pytest
 
-from tests.factories import ApplicationFactory, ReservationFactory, UserFactory
-from tests.factories.helsinki_profile import MyProfileDataFactory
-from tests.helpers import ResponseMock, patch_method
 from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
 from tilavarauspalvelu.utils.helauth.typing import ADLoginAMR, LoginMethod, ProfileLoginAMR
 from utils.sentry import SentryLogger
+
+from tests.factories import ApplicationFactory, ReservationFactory, UserFactory
+from tests.factories.helsinki_profile import MyProfileDataFactory
+from tests.helpers import ResponseMock, patch_method
 
 from .helpers import profile_query
 

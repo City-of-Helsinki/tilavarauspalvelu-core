@@ -6,7 +6,6 @@ import pytest
 from django.utils.timezone import get_default_timezone
 from freezegun import freeze_time
 
-from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory, UserFactory
 from tilavarauspalvelu.enums import CustomerTypeChoice, Language
 from tilavarauspalvelu.utils.verkkokauppa.exceptions import UnsupportedMetaKeyError
 from tilavarauspalvelu.utils.verkkokauppa.helpers import (
@@ -14,6 +13,8 @@ from tilavarauspalvelu.utils.verkkokauppa.helpers import (
     get_meta_label,
     get_verkkokauppa_order_params,
 )
+
+from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory, UserFactory
 
 # Applied to all tests
 pytestmark = [

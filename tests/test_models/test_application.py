@@ -3,6 +3,9 @@ import datetime
 import pytest
 from lookup_property import L
 
+from tilavarauspalvelu.enums import ApplicationStatusChoice
+from tilavarauspalvelu.models import Application
+
 from tests.factories import (
     AllocatedTimeSlotFactory,
     ApplicationFactory,
@@ -13,8 +16,6 @@ from tests.factories import (
     ReservationUnitOptionFactory,
     UserFactory,
 )
-from tilavarauspalvelu.enums import ApplicationStatusChoice
-from tilavarauspalvelu.models import Application
 
 # Applied to all tests
 pytestmark = [

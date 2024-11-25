@@ -8,9 +8,10 @@ from freezegun import freeze_time
 from icalendar import Calendar
 from rest_framework.reverse import reverse
 
-from tests.factories import LocationFactory, ReservationFactory, ReservationUnitFactory, UnitFactory, UserFactory
 from utils.date_utils import local_datetime
 from utils.utils import ical_hmac_signature
+
+from tests.factories import LocationFactory, ReservationFactory, ReservationUnitFactory, UnitFactory, UserFactory
 
 pytestmark = [
     pytest.mark.django_db,

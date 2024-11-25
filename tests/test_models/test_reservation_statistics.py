@@ -4,6 +4,9 @@ from decimal import Decimal
 import pytest
 from django.utils.timezone import get_default_timezone
 
+from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice, Weekday
+from tilavarauspalvelu.models import AgeGroup, City, ReservationStatistic
+
 from tests.factories import (
     RecurringReservationFactory,
     ReservationCancelReasonFactory,
@@ -12,8 +15,6 @@ from tests.factories import (
     ReservationUnitFactory,
     UnitFactory,
 )
-from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice, Weekday
-from tilavarauspalvelu.models import AgeGroup, City, ReservationStatistic
 
 # Applied to all tests
 pytestmark = [

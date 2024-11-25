@@ -1,7 +1,8 @@
 import pytest
 
-from tests.factories import ReservationFactory
 from tilavarauspalvelu.enums import ReservationStateChoice, UserRoleChoice
+
+from tests.factories import ReservationFactory
 
 from .helpers import APPROVE_MUTATION, get_approve_data
 

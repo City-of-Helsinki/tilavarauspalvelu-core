@@ -2,8 +2,6 @@ from typing import Literal
 
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
 
-from tests.factories import TermsOfUseFactory
-from tests.factories.banner_notification import BannerNotificationBuilder
 from tilavarauspalvelu.enums import BannerNotificationLevel, BannerNotificationTarget, TermsOfUseTypeChoices
 from tilavarauspalvelu.models import TermsOfUse
 from tilavarauspalvelu.models.banner_notification.model import BannerNotification
@@ -13,6 +11,9 @@ from tilavarauspalvelu.tasks import (
     update_expired_orders_task,
 )
 from utils.date_utils import DEFAULT_TIMEZONE
+
+from tests.factories import TermsOfUseFactory
+from tests.factories.banner_notification import BannerNotificationBuilder
 
 from .utils import with_logs
 

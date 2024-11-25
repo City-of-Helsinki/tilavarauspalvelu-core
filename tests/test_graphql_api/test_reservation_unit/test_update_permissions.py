@@ -1,7 +1,8 @@
 import pytest
 
-from tests.factories import ReservationUnitFactory
 from tilavarauspalvelu.enums import UserRoleChoice
+
+from tests.factories import ReservationUnitFactory
 
 from .helpers import UPDATE_MUTATION, get_draft_update_input_data
 

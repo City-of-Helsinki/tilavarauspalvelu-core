@@ -1,8 +1,9 @@
 import pytest
 from django.urls import reverse
 
-from tests.factories import ReservationUnitFactory, UnitFactory
 from utils.date_utils import local_datetime
+
+from tests.factories import ReservationUnitFactory, UnitFactory
 
 pytestmark = [
     pytest.mark.django_db,

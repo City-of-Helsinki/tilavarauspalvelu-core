@@ -5,6 +5,10 @@ from typing import Any, NamedTuple
 
 from graphene_django_extensions.testing import build_mutation, build_query
 
+from tilavarauspalvelu.enums import AuthenticationType, PriceUnit, ReservationKind, ReservationStartInterval
+from tilavarauspalvelu.models import ReservationUnit
+from utils.date_utils import local_datetime
+
 from tests.factories import (
     PaymentProductFactory,
     ReservationMetadataSetFactory,
@@ -17,9 +21,6 @@ from tests.factories import (
     TaxPercentageFactory,
     UnitFactory,
 )
-from tilavarauspalvelu.enums import AuthenticationType, PriceUnit, ReservationKind, ReservationStartInterval
-from tilavarauspalvelu.models import ReservationUnit
-from utils.date_utils import local_datetime
 
 __all__ = [
     "CREATE_MUTATION",

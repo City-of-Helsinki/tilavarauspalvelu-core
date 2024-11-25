@@ -1,9 +1,10 @@
 import pytest
 from freezegun import freeze_time
 
-from tests.factories import ReservationDenyReasonFactory
 from tilavarauspalvelu.enums import ReservationStateChoice
 from utils.date_utils import local_datetime
+
+from tests.factories import ReservationDenyReasonFactory
 
 from .helpers import DENY_SERIES_MUTATION, create_reservation_series
 

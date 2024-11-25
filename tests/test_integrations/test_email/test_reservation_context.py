@@ -4,6 +4,18 @@ from decimal import Decimal
 
 from freezegun import freeze_time
 
+from tilavarauspalvelu.integrations.email.template_context import (
+    get_context_for_reservation_approved,
+    get_context_for_reservation_cancelled,
+    get_context_for_reservation_confirmed,
+    get_context_for_reservation_modified,
+    get_context_for_reservation_rejected,
+    get_context_for_reservation_requires_handling,
+    get_context_for_reservation_requires_payment,
+    get_context_for_staff_notification_reservation_made,
+    get_context_for_staff_notification_reservation_requires_handling,
+)
+
 from tests.helpers import TranslationsFromPOFiles
 from tests.test_integrations.test_email.helpers import (
     AUTOMATIC_REPLY_CONTEXT_EN,
@@ -33,17 +45,6 @@ from tests.test_integrations.test_email.helpers import (
     RESERVATION_PRICE_RANGE_INFO_CONTEXT_EN,
     RESERVATION_PRICE_RANGE_INFO_CONTEXT_FI,
     RESERVATION_PRICE_RANGE_INFO_CONTEXT_SV,
-)
-from tilavarauspalvelu.integrations.email.template_context import (
-    get_context_for_reservation_approved,
-    get_context_for_reservation_cancelled,
-    get_context_for_reservation_confirmed,
-    get_context_for_reservation_modified,
-    get_context_for_reservation_rejected,
-    get_context_for_reservation_requires_handling,
-    get_context_for_reservation_requires_payment,
-    get_context_for_staff_notification_reservation_made,
-    get_context_for_staff_notification_reservation_requires_handling,
 )
 
 

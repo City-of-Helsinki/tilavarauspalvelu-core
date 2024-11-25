@@ -3,8 +3,9 @@ from typing import Any, NamedTuple
 import pytest
 from graphene_django_extensions.testing.utils import parametrize_helper
 
-from tests.factories import ReservationFactory
 from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationTypeChoice
+
+from tests.factories import ReservationFactory
 
 
 class Params(NamedTuple):

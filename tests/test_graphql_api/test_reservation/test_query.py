@@ -5,6 +5,9 @@ import freezegun
 import pytest
 from graphql_relay import to_global_id
 
+from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationTypeChoice
+from tilavarauspalvelu.models import PersonalInfoViewLog
+
 from tests.factories import (
     PaymentOrderFactory,
     ReservationFactory,
@@ -13,8 +16,6 @@ from tests.factories import (
     UnitGroupFactory,
     UserFactory,
 )
-from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationTypeChoice
-from tilavarauspalvelu.models import PersonalInfoViewLog
 
 from .helpers import reservation_query, reservations_query
 

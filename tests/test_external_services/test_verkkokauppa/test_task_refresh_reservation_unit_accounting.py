@@ -3,6 +3,12 @@ import uuid
 import pytest
 from django.test import override_settings
 
+from tilavarauspalvelu.tasks import refresh_reservation_unit_accounting
+from tilavarauspalvelu.utils.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
+from tilavarauspalvelu.utils.verkkokauppa.product.types import CreateOrUpdateAccountingParams, Product
+from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
+from utils.sentry import SentryLogger
+
 from tests.factories import (
     PaymentAccountingFactory,
     PaymentMerchantFactory,
@@ -10,11 +16,6 @@ from tests.factories import (
     ReservationUnitPricingFactory,
 )
 from tests.helpers import patch_method
-from tilavarauspalvelu.tasks import refresh_reservation_unit_accounting
-from tilavarauspalvelu.utils.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
-from tilavarauspalvelu.utils.verkkokauppa.product.types import CreateOrUpdateAccountingParams, Product
-from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from utils.sentry import SentryLogger
 
 # Applied to all tests
 pytestmark = [

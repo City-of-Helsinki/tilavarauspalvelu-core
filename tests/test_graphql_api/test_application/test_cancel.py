@@ -1,8 +1,9 @@
 import pytest
 
+from tilavarauspalvelu.enums import ApplicationStatusChoice
+
 from tests.factories import ApplicationFactory
 from tests.factories.application import ApplicationBuilder
-from tilavarauspalvelu.enums import ApplicationStatusChoice
 
 from .helpers import CANCEL_MUTATION
 

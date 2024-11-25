@@ -2,8 +2,9 @@ import datetime
 
 import pytest
 
-from tests.factories import ReservationUnitFactory
 from tilavarauspalvelu.enums import ReservationUnitPublishingState
+
+from tests.factories import ReservationUnitFactory
 
 # Applied to all tests
 pytestmark = [

@@ -3,8 +3,9 @@ import datetime
 import pytest
 from django.utils.timezone import get_default_timezone
 
-from tests.factories import AllocatedTimeSlotFactory, ApplicationFactory, ApplicationSectionFactory
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, ApplicationStatusChoice, Weekday
+
+from tests.factories import AllocatedTimeSlotFactory, ApplicationFactory, ApplicationSectionFactory
 
 from .helpers import allocations_query
 

@@ -1,7 +1,8 @@
 import pytest
 
-from tests.factories import ApplicationRoundTimeSlotFactory, ReservationUnitFactory
 from tilavarauspalvelu.enums import WeekdayChoice
+
+from tests.factories import ApplicationRoundTimeSlotFactory, ReservationUnitFactory
 
 from .helpers import UPDATE_MUTATION
 

@@ -2,6 +2,10 @@ from decimal import Decimal
 
 import pytest
 
+from tilavarauspalvelu.api.graphql.extensions import error_codes
+from tilavarauspalvelu.enums import PaymentType, ReservationStartInterval, ReservationStateChoice, TermsOfUseTypeChoices
+from utils.date_utils import next_hour
+
 from tests.factories import (
     ReservationFactory,
     ReservationUnitCancellationRuleFactory,
@@ -10,9 +14,6 @@ from tests.factories import (
     TaxPercentageFactory,
     TermsOfUseFactory,
 )
-from tilavarauspalvelu.api.graphql.extensions import error_codes
-from tilavarauspalvelu.enums import PaymentType, ReservationStartInterval, ReservationStateChoice, TermsOfUseTypeChoices
-from utils.date_utils import next_hour
 
 from .helpers import UPDATE_MUTATION, get_non_draft_update_input_data
 

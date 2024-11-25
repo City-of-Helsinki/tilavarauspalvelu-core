@@ -3,10 +3,11 @@ from unittest import mock
 
 import pytest
 
-from tests.factories import PaymentOrderFactory, ReservationFactory
-from tests.helpers import patch_method
 from tilavarauspalvelu.tasks import refund_paid_reservation_task
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
+
+from tests.factories import PaymentOrderFactory, ReservationFactory
+from tests.helpers import patch_method
 
 # Applied to all tests
 pytestmark = [

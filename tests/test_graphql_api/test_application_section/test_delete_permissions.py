@@ -1,8 +1,9 @@
 import pytest
 
+from tilavarauspalvelu.models import ApplicationSection
+
 from tests.factories import ApplicationSectionFactory
 from tests.test_graphql_api.test_application_section.helpers import DELETE_MUTATION, get_application_section_delete_data
-from tilavarauspalvelu.models import ApplicationSection
 
 # Applied to all tests
 pytestmark = [

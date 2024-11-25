@@ -4,7 +4,6 @@ from typing import Any
 
 from graphene_django_extensions.testing import build_mutation, build_query
 
-from tests.factories import RecurringReservationFactory
 from tilavarauspalvelu.enums import ReservationTypeChoice, WeekdayChoice
 from tilavarauspalvelu.models import (
     AffectingTimeSpan,
@@ -14,6 +13,8 @@ from tilavarauspalvelu.models import (
     User,
 )
 from utils.date_utils import local_date, local_time
+
+from tests.factories import RecurringReservationFactory
 
 recurring_reservations_query = partial(build_query, "recurringReservations", connection=True, order_by="nameAsc")
 

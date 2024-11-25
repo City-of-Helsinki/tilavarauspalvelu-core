@@ -1,10 +1,11 @@
 import pytest
 
-from tests.factories import OriginHaukiResourceFactory, ReservationUnitFactory
-from tests.helpers import patch_method
 from tilavarauspalvelu.exceptions import HaukiAPIError
 from tilavarauspalvelu.models import ReservationUnit
 from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
+
+from tests.factories import OriginHaukiResourceFactory, ReservationUnitFactory
+from tests.helpers import patch_method
 
 # Applied to all tests
 pytestmark = [

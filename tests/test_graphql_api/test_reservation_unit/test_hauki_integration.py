@@ -4,11 +4,12 @@ import freezegun
 import pytest
 from graphql_relay import to_global_id
 
-from tests.factories import OriginHaukiResourceFactory, ReservationUnitFactory
-from tests.helpers import patch_method
 from tilavarauspalvelu.exceptions import HaukiAPIError
 from tilavarauspalvelu.models.reservation_unit.actions import ReservationUnitHaukiExporter
 from tilavarauspalvelu.utils.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
+
+from tests.factories import OriginHaukiResourceFactory, ReservationUnitFactory
+from tests.helpers import patch_method
 
 from .helpers import UPDATE_MUTATION, get_draft_update_input_data, reservation_unit_query
 

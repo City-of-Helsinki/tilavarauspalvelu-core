@@ -1,8 +1,9 @@
 import freezegun
 import pytest
 
-from tests.factories import RecurringReservationFactory
 from tilavarauspalvelu.enums import RejectionReadinessChoice, Weekday
+
+from tests.factories import RecurringReservationFactory
 
 from .helpers import recurring_reservations_query
 

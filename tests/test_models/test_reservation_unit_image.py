@@ -6,8 +6,9 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import override_settings
 from PIL import Image
 
-from tests.factories import ReservationUnitFactory
 from tilavarauspalvelu.models import ReservationUnitImage
+
+from tests.factories import ReservationUnitFactory
 
 # Applied to all tests
 pytestmark = [

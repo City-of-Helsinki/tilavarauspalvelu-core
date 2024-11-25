@@ -1,10 +1,11 @@
 import pytest
 
+from tilavarauspalvelu.enums import ApplicationStatusChoice
+from tilavarauspalvelu.integrations.email.main import EmailService
+
 from tests.factories import ApplicationFactory
 from tests.factories.application import ApplicationBuilder
 from tests.helpers import patch_method
-from tilavarauspalvelu.enums import ApplicationStatusChoice
-from tilavarauspalvelu.integrations.email.main import EmailService
 
 from .helpers import SEND_MUTATION
 

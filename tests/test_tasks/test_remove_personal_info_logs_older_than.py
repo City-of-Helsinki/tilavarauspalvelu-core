@@ -1,9 +1,10 @@
 import pytest
 from freezegun import freeze_time
 
-from tests.factories import UserFactory
 from tilavarauspalvelu.models import PersonalInfoViewLog
 from tilavarauspalvelu.tasks import remove_old_personal_info_view_logs
+
+from tests.factories import UserFactory
 
 pytestmark = [
     pytest.mark.django_db,

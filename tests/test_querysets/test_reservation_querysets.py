@@ -5,11 +5,12 @@ from collections import defaultdict
 
 import pytest
 
-from tests.factories import ReservationFactory, ReservationUnitFactory, ResourceFactory, SpaceFactory, UnitFactory
 from tilavarauspalvelu.enums import Language, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.models import AffectingTimeSpan, Reservation, ReservationUnit, ReservationUnitHierarchy
 from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
 from utils.date_utils import DEFAULT_TIMEZONE, local_date
+
+from tests.factories import ReservationFactory, ReservationUnitFactory, ResourceFactory, SpaceFactory, UnitFactory
 
 # Applied to all tests
 pytestmark = [

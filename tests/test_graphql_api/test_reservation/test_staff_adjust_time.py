@@ -4,10 +4,11 @@ import freezegun
 import pytest
 from django.test import override_settings
 
-from tests.factories import ReservationFactory
 from tilavarauspalvelu.enums import ReservationStartInterval, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.models import ReservationUnitHierarchy
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, next_hour
+
+from tests.factories import ReservationFactory
 
 from .helpers import ADJUST_STAFF_MUTATION, get_staff_adjust_data
 

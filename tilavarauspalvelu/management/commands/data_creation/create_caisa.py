@@ -2,6 +2,17 @@ from __future__ import annotations
 
 import datetime
 
+from tilavarauspalvelu.enums import (
+    AuthenticationType,
+    PriceUnit,
+    ReservationKind,
+    ReservationStartInterval,
+    ReservationUnitImageType,
+    TermsOfUseTypeChoices,
+)
+from tilavarauspalvelu.models import ReservableTimeSpan, ReservationMetadataSet
+from utils.date_utils import DEFAULT_TIMEZONE, combine, local_date
+
 from tests.factories import (
     EquipmentCategoryFactory,
     EquipmentFactory,
@@ -21,16 +32,6 @@ from tests.factories import (
     TermsOfUseFactory,
     UnitFactory,
 )
-from tilavarauspalvelu.enums import (
-    AuthenticationType,
-    PriceUnit,
-    ReservationKind,
-    ReservationStartInterval,
-    ReservationUnitImageType,
-    TermsOfUseTypeChoices,
-)
-from tilavarauspalvelu.models import ReservableTimeSpan, ReservationMetadataSet
-from utils.date_utils import DEFAULT_TIMEZONE, combine, local_date
 
 from .create_reservation_related_things import _fetch_and_build_reservation_unit_image
 from .utils import SetName, with_logs

@@ -1,7 +1,8 @@
 import pytest
 
-from tests.factories import UserFactory
 from tilavarauspalvelu.enums import ReservationNotification
+
+from tests.factories import UserFactory
 
 from .helpers import STAFF_UPDATE_MUTATION
 

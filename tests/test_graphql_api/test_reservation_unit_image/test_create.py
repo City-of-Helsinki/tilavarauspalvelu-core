@@ -3,8 +3,9 @@ from typing import TYPE_CHECKING
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from tests.factories import ReservationUnitFactory
 from tilavarauspalvelu.enums import ReservationUnitImageType
+
+from tests.factories import ReservationUnitFactory
 
 from .helpers import CREATE_MUTATION
 

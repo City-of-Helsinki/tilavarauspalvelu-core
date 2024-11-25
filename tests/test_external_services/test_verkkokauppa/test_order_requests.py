@@ -9,8 +9,6 @@ from urllib.parse import urljoin
 import pytest
 from requests import Timeout
 
-from tests.helpers import patch_method
-from tests.mocks import MockResponse
 from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CancelOrderError, CreateOrderError, GetOrderError
 from tilavarauspalvelu.utils.verkkokauppa.order.types import (
     CreateOrderParams,
@@ -21,6 +19,9 @@ from tilavarauspalvelu.utils.verkkokauppa.order.types import (
 )
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.sentry import SentryLogger
+
+from tests.helpers import patch_method
+from tests.mocks import MockResponse
 
 create_order_params: CreateOrderParams = CreateOrderParams(
     namespace="test-namespace",

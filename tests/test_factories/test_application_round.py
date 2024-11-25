@@ -1,9 +1,10 @@
 import pytest
 from lookup_property import L
 
-from tests.factories.application_round import ApplicationRoundBuilder
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
 from tilavarauspalvelu.models import ApplicationRound
+
+from tests.factories.application_round import ApplicationRoundBuilder
 
 # Applied to all tests
 pytestmark = [

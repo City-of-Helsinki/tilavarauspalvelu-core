@@ -1,8 +1,9 @@
 from django.contrib.auth.models import Group, Permission
 
-from tests.factories import GeneralRoleFactory, UnitGroupFactory, UnitRoleFactory
 from tilavarauspalvelu.enums import UserRoleChoice
 from tilavarauspalvelu.models import Unit, UnitGroup, User
+
+from tests.factories import GeneralRoleFactory, UnitGroupFactory, UnitRoleFactory
 
 from .utils import with_logs
 

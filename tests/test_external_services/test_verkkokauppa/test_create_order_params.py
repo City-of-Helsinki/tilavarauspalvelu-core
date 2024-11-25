@@ -7,10 +7,11 @@ import freezegun
 import pytest
 from django.conf import settings
 
-from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory, UserFactory
 from tilavarauspalvelu.enums import CustomerTypeChoice
 from tilavarauspalvelu.utils.verkkokauppa.helpers import get_verkkokauppa_order_params
 from utils.date_utils import local_datetime
+
+from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory, UserFactory
 
 # Applied to all tests
 pytestmark = [

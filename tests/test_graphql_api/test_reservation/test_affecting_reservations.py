@@ -4,10 +4,11 @@ from functools import partial
 import pytest
 from graphene_django_extensions.testing import build_query
 
-from tests.factories import ReservationFactory, ReservationUnitFactory, SpaceFactory, UnitFactory
 from tilavarauspalvelu.enums import ReservationStateChoice
 from tilavarauspalvelu.models import ReservationUnitHierarchy
 from utils.date_utils import DEFAULT_TIMEZONE
+
+from tests.factories import ReservationFactory, ReservationUnitFactory, SpaceFactory, UnitFactory
 
 # Applied to all tests
 pytestmark = [

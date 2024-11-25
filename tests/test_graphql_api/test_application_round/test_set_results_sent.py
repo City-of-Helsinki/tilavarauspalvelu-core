@@ -3,9 +3,10 @@ from unittest.mock import patch
 
 import pytest
 
+from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
+
 from tests.factories import ApplicationFactory, ApplicationRoundFactory
 from tests.test_graphql_api.test_application_round.helpers import SET_RESULTS_SENT_MUTATION
-from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
 
 # Applied to all tests
 pytestmark = [

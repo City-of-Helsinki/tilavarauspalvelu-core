@@ -1,10 +1,11 @@
 import pytest
 from django.test import RequestFactory
 
-from tests.factories import ReservationUnitFactory
 from tilavarauspalvelu.admin.reservation_unit.admin import ReservationUnitAdmin
 from tilavarauspalvelu.enums import ReservationKind
 from tilavarauspalvelu.models import ReservationUnit
+
+from tests.factories import ReservationUnitFactory
 
 # Applied to all tests
 pytestmark = [

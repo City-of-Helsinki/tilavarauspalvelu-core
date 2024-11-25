@@ -1,7 +1,8 @@
 import pytest
 
-from tests.factories import BannerNotificationFactory, UserFactory
 from tilavarauspalvelu.models.banner_notification.model import BannerNotification
+
+from tests.factories import BannerNotificationFactory, UserFactory
 
 from .helpers import DELETE_MUTATION
 

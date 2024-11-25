@@ -6,6 +6,14 @@ import pytest
 from django.conf import settings
 from graphene_django_extensions.testing import parametrize_helper
 
+from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
+from utils.external_service.errors import (
+    ExternalServiceError,
+    ExternalServiceParseJSONError,
+    ExternalServiceRequestError,
+)
+from utils.sentry import SentryLogger
+
 from tests.factories import CityFactory, UserFactory
 from tests.factories.helsinki_profile import (
     MyProfileDataFactory,
@@ -14,13 +22,6 @@ from tests.factories.helsinki_profile import (
     ProfilePhoneFactory,
 )
 from tests.helpers import ResponseMock, patch_method
-from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
-from utils.external_service.errors import (
-    ExternalServiceError,
-    ExternalServiceParseJSONError,
-    ExternalServiceRequestError,
-)
-from utils.sentry import SentryLogger
 
 pytestmark = [
     pytest.mark.django_db,

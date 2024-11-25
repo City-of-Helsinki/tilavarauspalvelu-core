@@ -8,11 +8,12 @@ import pytest
 from django.utils import timezone
 from graphene_django_extensions.testing.utils import parametrize_helper
 
-from tests.factories import ReservationUnitFactory
 from tilavarauspalvelu.enums import AuthenticationType, ReservationKind, ReservationStartInterval
 from tilavarauspalvelu.models import ReservationUnit
 from tilavarauspalvelu.services.csv_export import ReservationUnitExporter
 from utils.date_utils import local_datetime_string, local_timedelta_string
+
+from tests.factories import ReservationUnitFactory
 
 from .helpers import Missing, MissingParams, mock_csv_writer
 

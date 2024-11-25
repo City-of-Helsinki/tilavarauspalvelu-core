@@ -6,14 +6,15 @@ from django.contrib import admin
 from django.test import Client, override_settings
 from django.urls import reverse
 
-from tests import factories
-from tests.helpers import patch_method
-from tests.mocks import MockResponse
-from tests.test_external_services.test_verkkokauppa.test_merchant_requests import get_merchant_response
 from tilavarauspalvelu.enums import EmailType
 from tilavarauspalvelu.models import RequestLog, Reservation, SQLLog
 from tilavarauspalvelu.tasks import create_or_update_reservation_statistics
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
+
+from tests import factories
+from tests.helpers import patch_method
+from tests.mocks import MockResponse
+from tests.test_external_services.test_verkkokauppa.test_merchant_requests import get_merchant_response
 
 if TYPE_CHECKING:
     from django.urls import URLPattern

@@ -5,6 +5,10 @@ import datetime
 import freezegun
 import pytest
 
+from tilavarauspalvelu.enums import ReservationStateChoice
+from tilavarauspalvelu.models import Reservation
+from utils.date_utils import DEFAULT_TIMEZONE, timedelta_to_json
+
 from tests.factories import (
     OriginHaukiResourceFactory,
     ReservableTimeSpanFactory,
@@ -14,9 +18,6 @@ from tests.factories import (
     UserFactory,
 )
 from tests.test_graphql_api.test_reservation.helpers import ADJUST_STAFF_MUTATION
-from tilavarauspalvelu.enums import ReservationStateChoice
-from tilavarauspalvelu.models import Reservation
-from utils.date_utils import DEFAULT_TIMEZONE, timedelta_to_json
 
 # Applied to all tests
 pytestmark = [

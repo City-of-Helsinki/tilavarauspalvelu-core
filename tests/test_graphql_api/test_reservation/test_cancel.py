@@ -6,12 +6,13 @@ from unittest import mock
 import pytest
 from django.test import override_settings
 
-from tests.factories import PaymentOrderFactory, ReservationFactory
-from tests.helpers import patch_method
 from tilavarauspalvelu.enums import OrderStatus, PaymentType, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.models import ReservationCancelReason
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.date_utils import local_datetime
+
+from tests.factories import PaymentOrderFactory, ReservationFactory
+from tests.helpers import patch_method
 
 from .helpers import CANCEL_MUTATION, get_cancel_data
 

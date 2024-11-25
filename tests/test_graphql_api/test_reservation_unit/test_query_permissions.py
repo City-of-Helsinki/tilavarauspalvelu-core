@@ -2,6 +2,8 @@ import datetime
 
 import pytest
 
+from tilavarauspalvelu.models import PersonalInfoViewLog
+
 from tests.factories import (
     ApplicationRoundTimeSlotFactory,
     PaymentMerchantFactory,
@@ -12,7 +14,6 @@ from tests.factories import (
     ReservationUnitFactory,
     UserFactory,
 )
-from tilavarauspalvelu.models import PersonalInfoViewLog
 
 from .helpers import reservation_units_query
 

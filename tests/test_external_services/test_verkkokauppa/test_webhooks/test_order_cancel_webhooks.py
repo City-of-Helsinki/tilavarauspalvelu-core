@@ -8,13 +8,14 @@ import pytest
 from django.urls import reverse
 from django.utils.timezone import get_default_timezone
 
-from tests.factories import PaymentOrderFactory
-from tests.helpers import patch_method
 from tilavarauspalvelu.enums import OrderStatus
 from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import GetOrderError
 from tilavarauspalvelu.utils.verkkokauppa.order.types import Order
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.sentry import SentryLogger
+
+from tests.factories import PaymentOrderFactory
+from tests.helpers import patch_method
 
 # Applied to all tests
 pytestmark = [

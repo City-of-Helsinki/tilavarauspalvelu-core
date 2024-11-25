@@ -1,8 +1,9 @@
 import pytest
 
-from tests.factories import AllocatedTimeSlotFactory, ApplicationFactory, ApplicationRoundFactory, ReservationFactory
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ReservationTypeChoice
 from tilavarauspalvelu.models import AllocatedTimeSlot, RecurringReservation, Reservation, ReservationUnitOption
+
+from tests.factories import AllocatedTimeSlotFactory, ApplicationFactory, ApplicationRoundFactory, ReservationFactory
 
 # Applied to all tests
 pytestmark = [

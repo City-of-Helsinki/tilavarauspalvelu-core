@@ -3,6 +3,10 @@ import datetime
 import pytest
 from freezegun import freeze_time
 
+from tilavarauspalvelu.enums import ReservationStateChoice
+from tilavarauspalvelu.models import ReservationUnit
+from utils.date_utils import DEFAULT_TIMEZONE
+
 from tests.factories import (
     ApplicationRoundFactory,
     OriginHaukiResourceFactory,
@@ -11,9 +15,6 @@ from tests.factories import (
     ReservationUnitFactory,
     SpaceFactory,
 )
-from tilavarauspalvelu.enums import ReservationStateChoice
-from tilavarauspalvelu.models import ReservationUnit
-from utils.date_utils import DEFAULT_TIMEZONE
 
 
 def _get_date(*, month=1, day=1) -> datetime.date:

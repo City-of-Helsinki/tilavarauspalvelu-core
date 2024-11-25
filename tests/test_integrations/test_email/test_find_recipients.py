@@ -1,6 +1,5 @@
 import pytest
 
-from tests.factories import ApplicationFactory, ReservationFactory, ReservationUnitFactory, UserFactory
 from tilavarauspalvelu.enums import Language, ReservationNotification
 from tilavarauspalvelu.integrations.email.find_recipients import (
     get_application_email_recipients,
@@ -9,6 +8,8 @@ from tilavarauspalvelu.integrations.email.find_recipients import (
     get_reservation_staff_notification_recipients_by_language,
     get_users_by_email_language,
 )
+
+from tests.factories import ApplicationFactory, ReservationFactory, ReservationUnitFactory, UserFactory
 
 pytestmark = [
     pytest.mark.django_db,

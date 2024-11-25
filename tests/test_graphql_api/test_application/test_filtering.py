@@ -1,7 +1,8 @@
 import pytest
 
-from tests.factories import ApplicationFactory
 from tilavarauspalvelu.enums import ApplicantTypeChoice
+
+from tests.factories import ApplicationFactory
 
 from .helpers import applications_query
 

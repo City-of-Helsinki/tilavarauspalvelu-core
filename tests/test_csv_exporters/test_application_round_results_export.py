@@ -3,6 +3,11 @@ from typing import TYPE_CHECKING
 
 import pytest
 
+from tilavarauspalvelu.enums import Weekday
+from tilavarauspalvelu.services.csv_export import ApplicationRoundResultCSVExporter
+from tilavarauspalvelu.services.csv_export.application_round_result_exporter import ApplicationSectionExportRow
+from utils.date_utils import local_date_string, local_timedelta_string
+
 from tests.factories import (
     AllocatedTimeSlotFactory,
     ApplicationFactory,
@@ -13,10 +18,6 @@ from tests.factories import (
 from tests.factories.application import ApplicationBuilder
 from tests.factories.application_section import ApplicationSectionBuilder
 from tests.test_csv_exporters.helpers import mock_csv_writer
-from tilavarauspalvelu.enums import Weekday
-from tilavarauspalvelu.services.csv_export import ApplicationRoundResultCSVExporter
-from tilavarauspalvelu.services.csv_export.application_round_result_exporter import ApplicationSectionExportRow
-from utils.date_utils import local_date_string, local_timedelta_string
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import AllocatedTimeSlot, ApplicationSection

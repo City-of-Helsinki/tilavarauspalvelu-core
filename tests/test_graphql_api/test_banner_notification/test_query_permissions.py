@@ -1,10 +1,11 @@
 import pytest
 from graphene_django_extensions.testing import parametrize_helper
 
-from tests.factories import BannerNotificationFactory
-from tests.factories.banner_notification import BannerNotificationBuilder
 from tilavarauspalvelu.enums import BannerNotificationTarget, UserRoleChoice
 from tilavarauspalvelu.models import User
+
+from tests.factories import BannerNotificationFactory
+from tests.factories.banner_notification import BannerNotificationBuilder
 
 from .helpers import FieldParams, TargetParams, UserType, UserTypeParams
 

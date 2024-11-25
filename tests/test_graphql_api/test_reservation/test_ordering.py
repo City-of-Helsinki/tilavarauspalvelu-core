@@ -3,9 +3,10 @@ import datetime
 import pytest
 from django.utils import timezone
 
+from tilavarauspalvelu.enums import CustomerTypeChoice, OrderStatus
+
 from tests.factories import PaymentOrderFactory, ReservationFactory, ReservationUnitFactory
 from tests.test_graphql_api.test_reservation.helpers import reservations_query
-from tilavarauspalvelu.enums import CustomerTypeChoice, OrderStatus
 
 # Applied to all tests
 pytestmark = [

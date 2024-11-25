@@ -4,13 +4,14 @@ import pytest
 from django.test import override_settings
 from freezegun import freeze_time
 
-from tests.factories import ApplicationFactory, ApplicationRoundFactory, ReservationFactory, UnitFactory, UserFactory
-from tests.helpers import TranslationsFromPOFiles, patch_method
 from tilavarauspalvelu.enums import Language, ReservationNotification, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models.user.actions import ANONYMIZED_FIRST_NAME, ANONYMIZED_LAST_NAME
 from utils.date_utils import local_datetime
 from utils.sentry import SentryLogger
+
+from tests.factories import ApplicationFactory, ApplicationRoundFactory, ReservationFactory, UnitFactory, UserFactory
+from tests.helpers import TranslationsFromPOFiles, patch_method
 
 pytestmark = [
     pytest.mark.django_db,
