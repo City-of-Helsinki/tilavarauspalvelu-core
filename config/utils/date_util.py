@@ -6,7 +6,7 @@ class InvalidWeekdayError(Exception):
 
 
 def validate_weekday(weekday: int) -> None:
-    if weekday < 0 or weekday > 6:
+    if weekday < 0 or weekday > 6:  # noqa: PLR2004
         msg = "Not a valid weekday"
         raise InvalidWeekdayError(msg)
 

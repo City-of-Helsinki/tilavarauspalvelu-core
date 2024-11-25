@@ -215,7 +215,6 @@ ignore = [
     "PLR2044",  # empty-comment
 
     # To be enabled in the future
-    "PLR2004",  # magic-value-comparison
     "PLW2901",  # redefined-loop-name
 ]
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$|^options$|^info$|^name$|^obj$|^request$|^user|^view$|^input_data$|^filters$"

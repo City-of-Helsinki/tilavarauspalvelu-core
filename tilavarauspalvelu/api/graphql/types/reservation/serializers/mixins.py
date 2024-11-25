@@ -324,7 +324,7 @@ class ReservationSchedulingMixin:
         interval_minutes = ReservationStartInterval(reservation_unit.reservation_start_interval).as_number
 
         # Staff reservations ignore start intervals longer than 30 minutes
-        if interval_minutes != 15:
+        if interval_minutes != 15:  # noqa: PLR2004
             interval_minutes = 30
 
         interval_timedelta = datetime.timedelta(minutes=interval_minutes)
