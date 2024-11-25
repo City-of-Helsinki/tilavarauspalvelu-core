@@ -69,14 +69,13 @@ class with_indices(Generic[T]):  # noqa: N801, RUF100
 
     >>> items = [1, 2, 2, 3, 4, 5, 5, 6, 8, 7]
     >>> for i, item in (gen := with_indices(items)):
-    ...    if item % 2 == 0:
-    ...        del items[i]
-    ...        # Set when item has been deleted.
-    ...        gen.item_deleted = True
-    ...    if item % 3 == 0:
-    ...        # Added items will be handled at the end
-    ...        items.append(10)
-    ...
+    ...     if item % 2 == 0:
+    ...         del items[i]
+    ...         # Set when item has been deleted.
+    ...         gen.item_deleted = True
+    ...     if item % 3 == 0:
+    ...         # Added items will be handled at the end
+    ...         items.append(10)
     >>> items
     [1, 3, 5, 5, 7]
     """

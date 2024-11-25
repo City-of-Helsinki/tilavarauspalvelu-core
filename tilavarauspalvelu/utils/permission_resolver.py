@@ -31,7 +31,8 @@ class PermissionResolver:
     Users must have `user.is_active=True` for their set permissions to apply.
     Also works for anonymous users.
 
-    >>> if user.permissions.can_manage_reservation(reservation): ...
+    >>> if user.permissions.can_manage_reservation(reservation):
+    ...     ...
     """
 
     def __get__(self, instance: AnyUser | None, owner: type[User]) -> Self:
