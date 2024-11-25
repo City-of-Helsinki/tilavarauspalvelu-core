@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
@@ -7,13 +9,14 @@ from tilavarauspalvelu.api.graphql.extensions.validation_errors import Validatio
 from tilavarauspalvelu.api.graphql.types.reservation.serializers.update_serializers import ReservationUpdateSerializer
 from tilavarauspalvelu.enums import Language, OrderStatus, PaymentType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
-from tilavarauspalvelu.models import PaymentOrder, Reservation
+from tilavarauspalvelu.models import PaymentOrder
 from tilavarauspalvelu.utils.verkkokauppa.helpers import create_mock_verkkokauppa_order, get_verkkokauppa_order_params
 from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CreateOrderError
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
+    from tilavarauspalvelu.models import Reservation
     from tilavarauspalvelu.utils.verkkokauppa.order.types import CreateOrderParams, Order
 
 

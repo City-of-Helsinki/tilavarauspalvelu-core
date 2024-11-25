@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import uuid
 from datetime import datetime, timedelta
 from decimal import Decimal
@@ -5,10 +7,9 @@ from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.urls import reverse
-from django.utils.timezone import get_default_timezone
 
 from config.utils.date_util import localized_short_weekday
-from tilavarauspalvelu.models import PaymentMerchant, PaymentProduct, Reservation
+from tilavarauspalvelu.models import PaymentMerchant, PaymentProduct
 from tilavarauspalvelu.utils.verkkokauppa.exceptions import UnsupportedMetaKeyError
 from tilavarauspalvelu.utils.verkkokauppa.order.types import (
     CreateOrderParams,
@@ -17,10 +18,10 @@ from tilavarauspalvelu.utils.verkkokauppa.order.types import (
     OrderItemMetaParams,
     OrderItemParams,
 )
-from utils.date_utils import local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ReservationUnit
+    from tilavarauspalvelu.models import Reservation, ReservationUnit
 
 
 def parse_datetime(string: str | None) -> datetime | None:
@@ -35,8 +36,8 @@ def get_formatted_reservation_time(reservation: Reservation) -> str:
     Weekday is localized based on user's preferred language, but rest
     of the format is always the same: ww dd.mm.yyyy hh:mm-hh:mm
     """
-    begin = reservation.begin.astimezone(get_default_timezone())
-    end = reservation.end.astimezone(get_default_timezone())
+    begin = reservation.begin.astimezone(DEFAULT_TIMEZONE)
+    end = reservation.end.astimezone(DEFAULT_TIMEZONE)
 
     preferred_language = reservation.reservee_language or "fi"
     weekday = localized_short_weekday(begin.weekday(), preferred_language)

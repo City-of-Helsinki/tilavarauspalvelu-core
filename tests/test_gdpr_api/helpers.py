@@ -6,12 +6,12 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Literal
 from unittest.mock import MagicMock, patch
 
-from django.utils.timezone import get_default_timezone
 from helusers.settings import api_token_auth_settings
 from jose import jwk, jwt
 from jose.constants import ALGORITHMS
 
 from tests.helpers import ResponseMock
+from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import User
@@ -34,7 +34,7 @@ def get_gdpr_auth_header(user: User, *, scopes: list[str], loa: Literal["substan
     audience = api_token_auth_settings.AUDIENCE
     issuer = api_token_auth_settings.ISSUER
 
-    now = datetime.datetime.now(tz=get_default_timezone())
+    now = local_datetime()
     expire = now + datetime.timedelta(days=14)
 
     jwt_data = {

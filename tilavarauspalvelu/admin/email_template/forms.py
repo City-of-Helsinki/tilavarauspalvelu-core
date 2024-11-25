@@ -25,6 +25,7 @@ from tilavarauspalvelu.integrations.email.template_context import (
 )
 from tilavarauspalvelu.models import ReservationUnit
 from tilavarauspalvelu.translation import get_attr_by_language
+from utils.date_utils import local_date
 from utils.utils import safe_getattr
 
 if TYPE_CHECKING:
@@ -406,7 +407,7 @@ class ReservationNeedsToBePaidEmailTemplateTesterForm(
     LanguageFormMixin,
     BaseEmailTemplateForm,
 ):
-    payment_due_date = forms.DateField(initial=datetime.date.today(), widget=date_widget)
+    payment_due_date = forms.DateField(initial=local_date(), widget=date_widget)
 
     @classmethod
     def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> Self:

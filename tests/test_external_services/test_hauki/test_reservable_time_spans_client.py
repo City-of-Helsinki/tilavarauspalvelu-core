@@ -1,8 +1,9 @@
+from __future__ import annotations
+
 import datetime
 import zoneinfo
 
 import pytest
-from django.utils import timezone
 from freezegun import freeze_time
 
 from tests.helpers import patch_method
@@ -20,7 +21,7 @@ from tilavarauspalvelu.utils.opening_hours.hauki_api_types import (
 )
 from tilavarauspalvelu.utils.opening_hours.reservable_time_span_client import ReservableTimeSpanClient
 from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
-from utils.date_utils import DEFAULT_TIMEZONE
+from utils.date_utils import DEFAULT_TIMEZONE, local_date
 
 # Applied to all tests
 pytestmark = [
@@ -232,7 +233,7 @@ def test__ReservableTimeSpanClient__init__latest_fetched_date_is_defined(reserva
 
 
 def test__ReservableTimeSpanClient__init__latest_fetched_date_is_defined__raise(reservation_unit):
-    latest_fetched_date = timezone.now().date() + datetime.timedelta(days=ReservableTimeSpanClient.DAYS_TO_FETCH + 31)
+    latest_fetched_date = local_date() + datetime.timedelta(days=ReservableTimeSpanClient.DAYS_TO_FETCH + 31)
     reservation_unit.origin_hauki_resource.latest_fetched_date = latest_fetched_date
 
     client = ReservableTimeSpanClient(reservation_unit.origin_hauki_resource)

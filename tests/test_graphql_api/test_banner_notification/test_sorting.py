@@ -1,14 +1,16 @@
+from __future__ import annotations
+
 from datetime import timedelta
 from typing import NamedTuple
 
 import pytest
-from django.utils import timezone
 from freezegun import freeze_time
 from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tests.factories import BannerNotificationFactory, UserFactory
 from tests.factories.banner_notification import BannerNotificationBuilder
 from tilavarauspalvelu.enums import BannerNotificationLevel, BannerNotificationTarget
+from utils.date_utils import local_datetime
 
 # Applied to all tests
 pytestmark = [
@@ -177,7 +179,7 @@ def test_sort_banner_notifications_by_start_date(graphql, order_by, expected):
     # given:
     # - There are two banner notification with different start dates & and one without one
     # - Notification manager user is using the system
-    today = timezone.now()
+    today = local_datetime()
     BannerNotificationBuilder().active().create(
         message="1",
         target=BannerNotificationTarget.ALL,
@@ -245,7 +247,7 @@ def test_sort_banner_notifications_by_end_date(graphql, order_by, expected):
     # given:
     # - There are two banner notification with different end dates & and one without one
     # - Notification manager user is using the system
-    today = timezone.now()
+    today = local_datetime()
     BannerNotificationBuilder().active().create(
         message="1",
         target=BannerNotificationTarget.ALL,

@@ -1,14 +1,17 @@
+from __future__ import annotations
+
 import logging
 from datetime import datetime, time
-
-from django.utils import timezone
+from typing import TYPE_CHECKING
 
 from tilavarauspalvelu.exceptions import ReservableTimeSpanClientNothingToDoError, ReservableTimeSpanClientValueError
 from tilavarauspalvelu.models import OriginHaukiResource
 from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
-from tilavarauspalvelu.utils.opening_hours.hauki_api_types import HaukiAPIResource
 from tilavarauspalvelu.utils.opening_hours.reservable_time_span_client import ReservableTimeSpanClient
-from utils.date_utils import DEFAULT_TIMEZONE
+from utils.date_utils import DEFAULT_TIMEZONE, local_date
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.utils.opening_hours.hauki_api_types import HaukiAPIResource
 
 logger = logging.getLogger(__name__)
 
@@ -62,7 +65,7 @@ class HaukiResourceHashUpdater:
 
     def _update_origin_hauki_resource_hashes(self, *, force_refetch: bool = False) -> None:
         """Update hashes for OriginHaukiResources that have had their opening hours changed."""
-        cutoff_date = timezone.now().date()
+        cutoff_date = local_date()
 
         for resource in self.fetched_hauki_resources:
             # Check if the resources hash has changed

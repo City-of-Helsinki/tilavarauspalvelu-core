@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import datetime
 from typing import TYPE_CHECKING, Any
 
 from graphene.utils.str_converters import to_camel_case
@@ -9,7 +8,7 @@ from tilavarauspalvelu.api.graphql.extensions.serializers import OldPrimaryKeyUp
 from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from tilavarauspalvelu.api.graphql.types.reservation.serializers.create_serializers import ReservationCreateSerializer
 from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice
-from utils.date_utils import DEFAULT_TIMEZONE
+from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Reservation, ReservationUnit
@@ -68,7 +67,7 @@ class ReservationUpdateSerializer(OldPrimaryKeyUpdateSerializer, ReservationCrea
     def validated_data(self):
         validated_data = super().validated_data
         validated_data["user"] = self.instance.user  # Do not change the user.
-        validated_data["confirmed_at"] = datetime.datetime.now().astimezone(DEFAULT_TIMEZONE)
+        validated_data["confirmed_at"] = local_datetime()
         return validated_data
 
     def check_metadata_fields(self, data: dict[str, Any], reservation_unit: ReservationUnit) -> None:

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 from typing import Any
 
@@ -15,7 +17,7 @@ from tilavarauspalvelu.enums import (
     ReservationTypeChoice,
 )
 from tilavarauspalvelu.models import AgeGroup, City, Reservation, ReservationPurpose, ReservationUnit
-from utils.date_utils import DEFAULT_TIMEZONE
+from utils.date_utils import local_datetime
 
 
 class StaffReservationModifySerializer(OldPrimaryKeyUpdateSerializer, ReservationSchedulingMixin):
@@ -154,7 +156,7 @@ class StaffReservationModifySerializer(OldPrimaryKeyUpdateSerializer, Reservatio
             raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED)
 
     def check_time_passed(self) -> None:
-        now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
+        now = local_datetime()
 
         if now.hour <= 1:
             now -= datetime.timedelta(days=1)

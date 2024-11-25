@@ -3,7 +3,6 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import TYPE_CHECKING, Any
 
-from django.utils import timezone
 from graphene_django_extensions import NestingModelSerializer
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -19,6 +18,7 @@ from tilavarauspalvelu.api.graphql.types.person.serializers import PersonSeriali
 from tilavarauspalvelu.enums import ApplicationStatusChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import AllocatedTimeSlot, Application, ReservationUnitOption
+from utils.date_utils import local_datetime
 from utils.fields.serializer import CurrentUserDefaultNullable
 
 if TYPE_CHECKING:
@@ -106,7 +106,7 @@ class ApplicationSendSerializer(NestingModelSerializer):
         return data
 
     def save(self, **kwargs: Any) -> Application:
-        self.instance.sent_date = timezone.now()
+        self.instance.sent_date = local_datetime()
         self.instance.save()
         EmailService.send_application_received_email(application=self.instance)
         return self.instance
@@ -133,7 +133,7 @@ class ApplicationCancelSerializer(NestingModelSerializer):
         return data
 
     def save(self, **kwargs: Any) -> Application:
-        self.instance.cancelled_date = timezone.now()
+        self.instance.cancelled_date = local_datetime()
         self.instance.save()
         return self.instance
 

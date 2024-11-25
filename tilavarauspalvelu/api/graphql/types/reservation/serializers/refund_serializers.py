@@ -1,4 +1,5 @@
-import datetime
+from __future__ import annotations
+
 from decimal import Decimal
 from typing import Any
 
@@ -7,7 +8,7 @@ from tilavarauspalvelu.api.graphql.extensions.validation_errors import Validatio
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
 from tilavarauspalvelu.models import PaymentOrder, Reservation
 from tilavarauspalvelu.tasks import refund_paid_reservation_task
-from utils.date_utils import DEFAULT_TIMEZONE
+from utils.date_utils import local_datetime
 from utils.utils import comma_sep_str
 
 
@@ -21,7 +22,7 @@ class ReservationRefundSerializer(OldPrimaryKeySerializer):
         ]
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
-        now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
+        now = local_datetime()
         if self.instance.price_net <= Decimal("0.0"):
             msg = "Only reservations with price greater than 0 can be refunded."
             raise ValidationErrorWithCode(msg, ValidationErrorCodes.REFUND_NOT_ALLOWED)

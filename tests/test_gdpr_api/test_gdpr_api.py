@@ -1,10 +1,11 @@
+from __future__ import annotations
+
 import datetime
 import uuid
 
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
-from django.utils import timezone
 from freezegun import freeze_time
 from rest_framework.exceptions import ErrorDetail
 
@@ -19,7 +20,7 @@ from tests.factories import (
 )
 from tests.helpers import patch_method
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
-from utils.date_utils import DEFAULT_TIMEZONE
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.sentry import SentryLogger
 
 from .helpers import get_gdpr_auth_header, patch_oidc_config
@@ -600,7 +601,7 @@ def test_delete_user_data__dont_anonymize_if_open_payments(api_client, settings)
 
 def test_delete_user_data__dont_anonymize_if_open_reservations(api_client, settings):
     user = UserFactory.create(username="foo")
-    begin = timezone.now()
+    begin = local_datetime()
     end = begin + datetime.timedelta(hours=2)
     ReservationFactory.create(user=user, begin=begin, end=end, state=ReservationStateChoice.CREATED)
 
@@ -631,7 +632,7 @@ def test_delete_user_data__dont_anonymize_if_open_reservations(api_client, setti
 
 def test_delete_user_data__dont_anonymize_if_reservation_one_month_ago(api_client, settings):
     user = UserFactory.create(username="foo")
-    begin = timezone.now() - relativedelta(months=1)
+    begin = local_datetime() - relativedelta(months=1)
     end = begin + datetime.timedelta(hours=2)
     ReservationFactory.create(user=user, begin=begin, end=end, state=ReservationStateChoice.CONFIRMED)
 

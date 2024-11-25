@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING
 
 from auditlog.models import LogEntry
 from dateutil.relativedelta import relativedelta
-from django.utils import timezone
 from social_django.models import UserSocialAuth
 
 from tilavarauspalvelu.enums import (
@@ -26,6 +25,7 @@ from tilavarauspalvelu.models import (
     UnitRole,
 )
 from tilavarauspalvelu.typing import UserAnonymizationInfo
+from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -164,7 +164,7 @@ class UserActions:
         )
 
     def can_anonymize(self) -> UserAnonymizationInfo:
-        month_ago = timezone.now() - relativedelta(months=1)
+        month_ago = local_datetime() - relativedelta(months=1)
 
         has_open_reservations = (
             self.user.reservations.filter(end__gte=month_ago)

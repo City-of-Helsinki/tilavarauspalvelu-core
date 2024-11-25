@@ -1,10 +1,10 @@
-import datetime
-from typing import NamedTuple
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, NamedTuple
 
 import graphene
 from django.db import models
 from django.db.models import Sum
-from django.utils.timezone import get_default_timezone
 from graphene_django_extensions import DjangoNode
 from graphql import GraphQLError
 from lookup_property import L
@@ -23,12 +23,17 @@ from tilavarauspalvelu.models import (
     Space,
     Unit,
 )
-from tilavarauspalvelu.typing import GQLInfo
 from tilavarauspalvelu.utils.opening_hours.hauki_link_generator import generate_hauki_link
+from utils.date_utils import DEFAULT_TIMEZONE
 from utils.db import SubqueryCount
 
 from .filtersets import ReservationUnitAllFilterSet, ReservationUnitFilterSet
 from .permissions import ReservationUnitAllPermission, ReservationUnitPermission
+
+if TYPE_CHECKING:
+    import datetime
+
+    from tilavarauspalvelu.typing import GQLInfo
 
 __all__ = [
     "ReservationUnitAllNode",
@@ -326,8 +331,8 @@ class ReservationUnitNode(DjangoNode):
 
         return [
             ReservableTimeSpanItem(
-                start_datetime=time_span.start_datetime.astimezone(get_default_timezone()),
-                end_datetime=time_span.end_datetime.astimezone(get_default_timezone()),
+                start_datetime=time_span.start_datetime.astimezone(DEFAULT_TIMEZONE),
+                end_datetime=time_span.end_datetime.astimezone(DEFAULT_TIMEZONE),
             )
             for time_span in root.origin_hauki_resource.reservable_time_spans.all().overlapping_with_period(
                 start_date, end_date

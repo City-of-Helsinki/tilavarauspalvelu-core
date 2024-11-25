@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import datetime
 from typing import TYPE_CHECKING, Any
 
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
@@ -14,9 +13,11 @@ from tilavarauspalvelu.api.graphql.types.reservation.serializers.mixins import (
 from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import Reservation
-from utils.date_utils import DEFAULT_TIMEZONE
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 if TYPE_CHECKING:
+    import datetime
+
     from tilavarauspalvelu.models import ReservationUnit
 
 
@@ -93,7 +94,7 @@ class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reservation
             msg = "End cannot be before begin"
             raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED)
 
-        now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
+        now = local_datetime()
 
         if begin < now:
             msg = "Reservation new begin cannot be in the past"
@@ -104,7 +105,7 @@ class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reservation
             raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_CURRENT_BEGIN_IN_PAST)
 
     def check_cancellation_rules(self, reservation_unit: ReservationUnit) -> None:
-        now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
+        now = local_datetime()
 
         cancel_rule = reservation_unit.cancellation_rule
         if not cancel_rule:
